@@ -8444,6 +8444,11 @@ run_moat_gate_selftests() {
   if [ -f "${REPO_ROOT}/ops/bridge-hardening.sh" ]; then
     _bh_ok=1; _mg_map "${REPO_ROOT}/ops/bridge-hardening.sh" > "${d}/proj/ops/bridge-hardening.sh"
   fi
+  # o wrapper do runner do convidado (degrau 2, 2026-10-16), RASTREADO e com os caminhos mapeados como o TSV
+  local _cr_ok=0
+  if [ -f "${REPO_ROOT}/ops/chat-runner.sh" ]; then
+    _cr_ok=1; _mg_map "${REPO_ROOT}/ops/chat-runner.sh" > "${d}/proj/ops/chat-runner.sh"
+  fi
   git init -q -b main "${d}/adotante"
   git -C "${d}/adotante" remote add origin https://github.com/onion-bancada/adotante.git
   mkdir -p "${d}/adotante/docs/evolution/inbound"
@@ -8469,6 +8474,7 @@ EOF
     printf '#!/usr/bin/env bash\n# lembrete: o a2a-invite.sh create só pelo wrapper\nls -la /var/www/onion-landing\n' > "${d}/scratch/so-leitura.sh"
   fi
   [ "${_bh_ok}" = 1 ] && cp "${d}/proj/ops/bridge-hardening.sh" "${d}/scratch/bh-copia.sh"
+  [ "${_cr_ok}" = 1 ] && cp "${d}/proj/ops/chat-runner.sh" "${d}/scratch/cr-copia.sh"
   # a cópia NÃO rastreada do wrapper da fila e o script mínimo com função que embrulha sudo (2026-10-15)
   if [ "${_queue_ok}" = 1 ]; then
     cp "${d}/proj/ops/a2a-queue-live.sh" "${d}/scratch/queue-copia.sh"
@@ -8847,10 +8853,36 @@ EOF" "${L}" \
       '_moat_emit("inanalisavel", "ONION_BRIDGE_HARDENING_TEST",' '(lambda *a: None)("inanalisavel", "ONION_BRIDGE_HARDENING_TEST",'
     _mgcase "(b5) CÓPIA do wrapper fora do projeto → FECHA (o nome do wrapper + alvo no corpo)" "2:cópia não versionada de um wrapper" "${P}" \
       "bash ${d}/scratch/bh-copia.sh install --apply" "${J}" \
-      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live",)'
+      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "chat-runner")'
     fi
   else
     record_skip "moat-gate: (b*) sem ops/bridge-hardening.sh — casos do drop-in de integridade pulados"
+  fi
+  # ── o runner do convidado (2026-10-16): só o wrapper escreve as units, o lançador, o drop-in e as HOMEs do CLI ──
+  if [ "${_cr_ok}" = 1 ]; then
+    local CRT CRL CRD; CRT="$(awk -F'\t' '$4=="ops/chat-runner.sh" && $3 ~ /@\.service$/ {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    CRL="$(awk -F'\t' '$4=="ops/chat-runner.sh" && $3 ~ /libexec/ {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    CRD="$(awk -F'\t' '$4=="ops/chat-runner.sh" && $3 ~ /40-chat-runner\.conf$/ {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    if [ -z "${CRT}" ] || [ -z "${CRL}" ] || [ -z "${CRD}" ]; then record_fail "moat-gate: (m0)" "ops/moat-targets.tsv sem as linhas do ops/chat-runner.sh (core-only)"
+    else
+    _mgcase "(m1) tee direto no template do runner → VETO nomeando o wrapper (mais específico que /etc/systemd)" "2:ops/chat-runner.sh" "${P}" \
+      "sudo tee ${CRT} < unit.service" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
+    _mgcase "(m2) lançador instalado à mão no libexec → VETO nomeando o wrapper" "2:ops/chat-runner.sh" "${P}" \
+      "sudo install -m 0644 launcher.py ${CRL}/launcher.py" "${J}" '_MOAT_WRITE_DEST = {"cp", "install", "rsync",' '_MOAT_WRITE_DEST = {"cp", "rsync",'
+    _mgcase "(m3) restart do socket do runner → VETO nomeando o wrapper" "2:ops/chat-runner.sh" "${P}" \
+      'sudo systemctl restart onion-chat.socket' "${J}" $'    if verb not in _MOAT_UNIT_MUTATE:\n        return' $'    if True:\n        return'
+    _mgcase "(m4) o wrapper VERSIONADO (com o drop-in citado na linha) → passa" 0 "${P}" \
+      "bash ops/chat-runner.sh install --apply && echo \"drop-in em ${CRD}\"" "${J}" \
+      '    if _moat_versioned(p) and not copied:' '    if False:'
+    _mgcase "(m5) modo de teste do wrapper na linha de comando → FECHA" "2:modo de teste do wrapper do runner" "${P}" \
+      "export ONION_CHAT_RUNNER_TEST=1; ONION_CHAT_RUNNER_UNIT_DIR=/tmp/x bash ops/chat-runner.sh show" "${J}" \
+      '_moat_emit("inanalisavel", "ONION_CHAT_RUNNER_TEST",' '(lambda *a: None)("inanalisavel", "ONION_CHAT_RUNNER_TEST",'
+    _mgcase "(m6) CÓPIA do wrapper fora do projeto → FECHA (o nome do wrapper + alvo no corpo)" "2:cópia não versionada de um wrapper" "${P}" \
+      "bash ${d}/scratch/cr-copia.sh install --apply" "${J}" \
+      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening")'
+    fi
+  else
+    record_skip "moat-gate: (m*) sem ops/chat-runner.sh — casos do runner do convidado pulados"
   fi
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
@@ -9498,6 +9530,318 @@ PY
   _bhcase "(h23) restart que não aplica o drop-in → o verify do processo vivo reprova → rc 1 com ROLLBACK impresso" \
     'verify_live || fail_after' 'true || fail_after' _c_noeffect
   [ -d "${d}/h" ] && chmod -R u+rwX "${d}/h" 2>/dev/null
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo chat-runner (2026-10-16) — o wrapper core-only do DEGRAU 2 do isolamento do /chat: o runner do convidado sob um
+# UID dinâmico por sessão (lançador por socket, units, grupo, ACLs, drop-in que liga o runner no bridge). Defeito
+# datado: o agente do /chat de convidado rodava no UID da conta do serviço, que lê o .env, o environ e o PAT e grava o
+# data/ (E_DEGRAU1_EM_PRODUCAO_1016: o teto que o degrau 1 declarou). Cada caso roda o wrapper REAL em MODO DE TESTE
+# DECLARADO (ONION_CHAT_RUNNER_TEST=1: home, estado, units, libexec, backup, socket e trava de sandbox) com systemctl,
+# systemd-run, getent, groupadd, setfacl, getfacl, journalctl e curl FALSOS no PATH, um `sudo` STUB que sai 97 e um
+# runner FALSO no socket (python) que responde ao initialize e recusa a flag proibida. O sandbox da unit transitória é
+# simulado por permissão (ProtectHome = home 000; TemporaryFileSystem = o resto do estado sai; grupo = raízes só wx).
+# CADA caso tem MUTANTE, provado por _prove_mutation.
+# ---------------------------------------------------------------------------
+run_chat_runner_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/chat-runner.sh"
+  if [ ! -f "${wr}" ]; then record_skip "chat-runner: sem ops/chat-runner.sh (core-only) — nada a testar"; return; fi
+  command -v flock >/dev/null 2>&1 || { record_skip "chat-runner: flock ausente → pulado"; return; }
+  [ -x /usr/bin/python3 ] || { record_skip "chat-runner: /usr/bin/python3 ausente → pulado"; return; }
+  [ "$(id -u)" = 0 ] && { record_skip "chat-runner: rodando como root (o sandbox é simulado por permissão) → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/stub" "${d}/fake" "${d}/inbin" "${d}/st"
+  printf '#!/bin/sh\necho "sudo-stub: a bancada nunca chama sudo" >&2\nexit 97\n' > "${d}/stub/sudo"
+  # o runner FALSO no socket: lê o cabeçalho; recusa a flag proibida (fecha sem byte) a menos que accept-all; responde
+  # ao initialize com o mesmo request_id
+  cat > "${d}/fake/fakerunner.py" <<'EOF'
+import json, os, socket, sys, threading
+path, flag = sys.argv[1], sys.argv[2]
+try:
+    os.unlink(path)
+except OSError:
+    pass
+s = socket.socket(socket.AF_UNIX); s.bind(path); s.listen(8)
+def h(c):
+    b = b""
+    while not b.endswith(b"\n"):
+        x = c.recv(1)
+        if not x:
+            c.close(); return
+        b += x
+    hd = json.loads(b)
+    if "--dangerously-skip-permissions" in hd.get("args", []) and not os.path.exists(flag):
+        c.close(); return
+    buf = b""
+    while b"\n" not in buf:
+        x = c.recv(65536)
+        if not x:
+            break
+        buf += x
+    try:
+        rid = json.loads(buf.split(b"\n")[0])["request_id"]
+    except Exception:
+        rid = "?"
+    c.sendall(json.dumps({"type": "control_response", "response": {"subtype": "success", "request_id": rid, "response": {}}}).encode() + b"\n")
+    c.close()
+while True:
+    c, _ = s.accept(); threading.Thread(target=h, args=(c,), daemon=True).start()
+EOF
+  cat > "${d}/fake/systemctl" <<'EOF'
+#!/bin/sh
+F="$CR_FAKE"; echo "systemctl $*" >> "$F/calls"
+case "$1" in
+  show)
+    shift; props=""; val=0
+    while [ $# -gt 0 ]; do case "$1" in -p) props="$props $2"; shift 2 ;; --value) val=1; shift ;; *) shift ;; esac; done
+    for p in $props; do
+      case "$p" in
+        MainPID) v="$(cat "$F/mainpid")" ;;
+        InvocationID) v="$(cat "$F/inv")" ;;
+        DropInPaths) v="$(ls "$ONION_CHAT_RUNNER_UNIT_DIR"/onion-vps-bridge.service.d/*.conf 2>/dev/null | paste -sd' ' -)" ;;
+        *) v="" ;;
+      esac
+      if [ "$val" = 1 ]; then echo "$v"; else echo "$p=$v"; fi
+    done ;;
+  cat) case "$2" in onion-vps-bridge) exit 0 ;; onion-chat.socket) [ -f "$ONION_CHAT_RUNNER_UNIT_DIR/onion-chat.socket" ] ;; *) exit 1 ;; esac ;;
+  is-active) if [ -f "$F/runner.pid" ] && kill -0 "$(cat "$F/runner.pid")" 2>/dev/null; then echo active; else echo inactive; exit 3; fi ;;
+  restart)
+    case "$2" in
+      onion-chat.socket)
+        [ -f "$F/runner.pid" ] && kill "$(cat "$F/runner.pid")" 2>/dev/null
+        python3 "$CR_FAKEDIR/fakerunner.py" "$ONION_CHAT_RUNNER_SOCKET" "$F/accept-all" </dev/null >/dev/null 2>&1 &
+        echo $! > "$F/runner.pid"
+        n=0; while [ ! -S "$ONION_CHAT_RUNNER_SOCKET" ] && [ $n -lt 50 ]; do sleep 0.1; n=$((n+1)); done ;;
+      onion-vps-bridge)
+        [ -f "$F/restart-fail" ] && exit 1
+        [ -f "$F/same-inv" ] || echo "inv-$(date +%s%N)" > "$F/inv" ;;
+    esac ;;
+  *) : ;;
+esac
+EOF
+  # a unit transitória FALSA: aplica o sandbox por permissão, liga os binds de /run/onion-chat-bin num dir falso,
+  # exporta o Environment= e roda o script com o `id -u` de um UID dinâmico; restaura tudo depois
+  cat > "${d}/fake/systemd-run" <<'EOF'
+#!/bin/sh
+F="$CR_FAKE"; : > "$F/sr-args"
+while [ $# -gt 0 ]; do case "$1" in --quiet|--pipe|--wait|--collect) shift ;; -p) echo "$2" >> "$F/sr-args"; shift 2 ;; *) break ;; esac; done
+H="$ONION_CHAT_RUNNER_SVC_HOME"; S="$ONION_CHAT_RUNNER_STATE"; B="$F/runbin"; rm -rf "$B" "$F/hidden"; mkdir -p "$B" "$F/hidden"
+grep -qx 'ProtectHome=yes' "$F/sr-args" && [ ! -f "$F/noprotect" ] && chmod 000 "$H"
+if grep -qx "TemporaryFileSystem=$S" "$F/sr-args"; then
+  for e in "$S"/* "$S"/.[!.]*; do [ -e "$e" ] || continue; case "${e##*/}" in workspaces|chat-homes) : ;; *) mv "$e" "$F/hidden/" ;; esac; done
+fi
+if grep -q '^SupplementaryGroups=' "$F/sr-args"; then for r in "$S/workspaces" "$S/chat-homes"; do [ -d "$r" ] && chmod 0311 "$r"; done; fi
+grep '^BindReadOnlyPaths=' "$F/sr-args" | sed 's/^BindReadOnlyPaths=//' | while IFS=: read -r src dst; do ln -sf "$src" "$B/${dst##*/}"; done
+envs="$(grep '^Environment=' "$F/sr-args" | sed 's/^Environment=//' | sed "s#/run/onion-chat-bin/#$B/#g" | tr '\n' ' ')"
+sed -e "s#/run/onion-chat-bin/#$B/#g" -e 's/ pid=[^;]*;/ pid=1;/' | env PATH="$CR_INBIN:$PATH" $envs "$@"; rc=$?
+chmod 0750 "$H"; for r in "$S/workspaces" "$S/chat-homes"; do [ -d "$r" ] && chmod 0750 "$r"; done
+for e in "$F/hidden"/* "$F/hidden"/.[!.]*; do [ -e "$e" ] && mv "$e" "$S/"; done
+exit $rc
+EOF
+  printf '#!/bin/sh\n[ "$*" = "-u" ] && { echo 61234; exit 0; }\nexec /usr/bin/id "$@"\n' > "${d}/inbin/id"
+  printf '#!/bin/sh\n[ "$1" = group ] && grep -qx "$2" "$CR_FAKE/groups" 2>/dev/null && { echo "$2:x:999:"; exit 0; }\nexit 2\n' > "${d}/fake/getent"
+  printf '#!/bin/sh\n[ "$1" = --system ] || exit 9\necho "$2" >> "$CR_FAKE/groups"\n' > "${d}/fake/groupadd"
+  printf '#!/bin/sh\necho "setfacl $*" >> "$CR_FAKE/acl"\n' > "${d}/fake/setfacl"
+  # getfacl falso: o que os setfacl registraram para AQUELE caminho, na forma do getfacl
+  cat > "${d}/fake/getfacl" <<'EOF'
+#!/bin/sh
+for p; do :; done
+case "$*" in *" -R "*) echo "# file: $p"; exit 0 ;; esac
+grep -F -- " -- $p" "$CR_FAKE/acl" 2>/dev/null | while read -r _ rest; do
+  case " $rest " in *" -- $p "*) : ;; *) continue ;; esac
+  spec="$(printf '%s\n' "$rest" | sed -n 's/.*-m \([^ ]*\) --.*/\1/p')"
+  printf '%s\n' "$spec" | tr ',' '\n' | sed -e 's/^d:g:/default:group:/' -e 's/^d:u:/default:user:/' -e 's/^d:m:/default:mask:/' -e 's/^g:/group:/' -e 's/^u:/user:/'
+done
+EOF
+  printf '#!/bin/sh\n[ -f "$CR_FAKE/health-bad" ] && exit 22\n[ -f "$CR_FAKE/health-after-bad" ] && [ "$(cat "$CR_FAKE/inv")" != inv-0 ] && exit 22\necho "{\\"ok\\":true}"\n' > "${d}/fake/curl"
+  printf '#!/bin/sh\n[ -f "$CR_FAKE/noauth" ] || echo "[onion-bridge] identidade: JWKS OK | auth: enforce"\n[ -f "$CR_FAKE/norunner" ] || echo "[onion-bridge] chat-runner: LIGADO para convidados"\n[ -f "$CR_FAKE/nokey" ] && echo "[onion-bridge] chat-runner LIGADO sem ANTHROPIC_API_KEY"\nexit 0\n' > "${d}/fake/journalctl"
+  chmod +x "${d}/stub/sudo" "${d}/fake/"* "${d}/inbin/id"
+  # os processos "vivos" do bridge falso: um COM a variável que o drop-in liga, outro sem
+  ( exec env CHAT_RUNNER_SOCKET="${d}/run/onion-chat.sock" sleep 600 </dev/null >/dev/null 2>&1 ) & local pid_on=$!
+  ( exec env -u CHAT_RUNNER_SOCKET sleep 600 </dev/null >/dev/null 2>&1 ) & local pid_off=$!
+  # _crreset: a home (com o bridge servido num repo git), o estado e os dirs de instalação, como a VPS os teria
+  _crreset() {
+    [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
+    [ -d "${d}/h" ] && chmod -R u+rwX "${d}/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null
+    rm -rf "${d}/h" "${d}/state" "${d}/units" "${d}/libexec" "${d}/bk" "${d}/run" "${d}/st" "${d}/lock"; mkdir -p "${d}/st" "${d}/run" "${d}/units"
+    local B="${d}/h/onion-bridge" C="${d}/h/onion-bridge/deploy/chat-runner"
+    mkdir -p "${C}" "${B}/src" "${B}/data" "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64" "${d}/h/.ssh"
+    printf '#!/bin/sh\necho cli-falso\n' > "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"; chmod +x "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"
+    printf 'node_modules/\n' > "${B}/.gitignore"; echo x > "${B}/src/server.ts"; echo x > "${B}/src/chat-runner.ts"; echo pat > "${d}/h/.git-credentials"
+    cat > "${C}/launcher.py" <<'PYEOF'
+import os, sys
+# lançador STUB da bancada: só o --check-config (o de verdade mora no repo do bridge)
+if "--check-config" in sys.argv:
+    c = os.environ.get("ONION_CHAT_CLAUDE", "")
+    sys.exit(0 if os.path.isfile(c) and os.access(c, os.X_OK) else 65)
+PYEOF
+    printf '[Socket]\nListenStream=@SOCKET@\nAccept=yes\nSocketUser=@SVC_USER@\nSocketMode=0600\n' > "${C}/onion-chat.socket.in"
+    printf '%s\n' '[Unit]' 'CollectMode=inactive-or-failed' '[Service]' 'DynamicUser=yes' 'User=onion-chat-%i' 'SupplementaryGroups=@GROUP@' \
+      'StandardInput=socket' 'StandardOutput=socket' 'RuntimeMaxSec=1800' 'UMask=0007' 'PrivateTmp=yes' 'ProtectHome=yes' 'ProtectProc=invisible' \
+      'TemporaryFileSystem=@STATE@' 'BindPaths=@STATE@/workspaces @STATE@/chat-homes' \
+      'BindReadOnlyPaths=@CLAUDE_SRC@:/run/onion-chat-bin/claude' 'BindReadOnlyPaths=@LIBEXEC@/launcher.py:/run/onion-chat-bin/launcher.py' \
+      'Environment=ONION_CHAT_WS_ROOT=@STATE@/workspaces ONION_CHAT_HOME_ROOT=@STATE@/chat-homes ONION_CHAT_CLAUDE=/run/onion-chat-bin/claude' \
+      'ExecStart=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py' > "${C}/onion-chat@.service.in"
+    git -C "${B}" init -q -b main && git -C "${B}" add -A && git -C "${B}" -c user.email=t@t -c user.name=t commit -q -m base
+    mkdir -p "${d}/state/workspaces/aaaaaaaaaaaaaaaa" "${d}/state/orgs"; echo bare > "${d}/state/orgs/repo"; chmod 0750 "${d}/state" "${d}/state/workspaces"
+    echo inv-0 > "${d}/st/inv"; echo "${pid_on}" > "${d}/st/mainpid"
+  }
+  _crr() {
+    local w="$1" rc=0 out; shift
+    out="$(cd "${d}" && env PATH="${d}/fake:${d}/stub:${PATH}" LC_ALL=C CR_FAKE="${d}/st" CR_FAKEDIR="${d}/fake" CR_INBIN="${d}/inbin" \
+      ONION_CHAT_RUNNER_TEST=1 ONION_CHAT_RUNNER_SVC_HOME="${d}/h" ONION_CHAT_RUNNER_STATE="${d}/state" ONION_CHAT_RUNNER_UNIT_DIR="${d}/units" \
+      ONION_CHAT_RUNNER_LIBEXEC="${d}/libexec" ONION_CHAT_RUNNER_BACKUP_DIR="${d}/bk" ONION_CHAT_RUNNER_SOCKET="${d}/run/onion-chat.sock" \
+      ONION_CHAT_RUNNER_LOCK="${d}/lock" ${CRR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  _crcase() {
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    sed "s#^PROD_LOCK=.*#PROD_LOCK=${d}/lock#" "${wr}" > "${d}/w.sh"
+    _crreset; CR_WHY=""; "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "chat-runner: ${name}"; else record_fail "chat-runner: ${name}" "${CR_WHY:-caso não satisfeito}"; fi
+    cp "${d}/w.sh" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 - "${d}/m.sh" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    _crreset; "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "chat-runner: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  _crrc() { [ "${1%%|*}" = "$2" ]; }
+  _crhas() { case "${1#*|}" in *"$2"*) true ;; *) false ;; esac; }
+  _crcalls() { grep -c "systemctl $1" "${d}/st/calls" 2>/dev/null || true; }
+  _crinstalled() { [ -f "${d}/units/onion-chat.socket" ] || [ -f "${d}/units/onion-chat@.service" ] || [ -d "${d}/libexec" ] \
+                     || [ -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ] || [ -s "${d}/st/groups" ] || [ -s "${d}/st/acl" ]; }
+  _cc_dry() { local r; r="$(_crr "$1" install)"; CR_WHY="${r:0:500}"
+    _crrc "${r}" 0 && _crhas "${r}" "ENSAIO OK" && _crhas "${r}" "AUSENTE travessia" && _crhas "${r}" "OK não alcança ${d}/h/.git-credentials" \
+      && ! _crinstalled && [ "$(_crcalls restart)" = 0 ] && [ ! -d "${d}/state/chat-homes" ]; }
+  _cc_render() { local r; r="$(_crr "$1" show)"; CR_WHY="${r:0:400}"
+    _crrc "${r}" 0 && _crhas "${r}" "TemporaryFileSystem=${d}/state"$'\n' && _crhas "${r}" "ListenStream=${d}/run/onion-chat.sock" \
+      && _crhas "${r}" "User=onion-chat-%i" && _crhas "${r}" "SupplementaryGroups=onion-chat" && _crhas "${r}" "Environment=CHAT_RUNNER_SOCKET=${d}/run/onion-chat.sock" \
+      && ! grep -qE '@[A-Z_]+@' <<< "${r#*|}"; }
+  _cc_marker() { local r; printf 'Nova=@NOVO@\n' >> "${d}/h/onion-bridge/deploy/chat-runner/onion-chat@.service.in"
+    git -C "${d}/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qam novo
+    r="$(_crr "$1" show)"; CR_WHY="${r:0:300}"; _crrc "${r}" 1 && _crhas "${r}" "marcador sem valor" && _crhas "${r}" "@NOVO@"; }
+  _cc_dirty() { local r; echo '# plantado' >> "${d}/h/onion-bridge/deploy/chat-runner/launcher.py"
+    r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"; _crrc "${r}" 1 && _crhas "${r}" "mudança não commitada" && ! _crinstalled; }
+  _cc_nosrc() { local r; git -C "${d}/h/onion-bridge" rm -q deploy/chat-runner/launcher.py && git -C "${d}/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qm rm
+    r="$(_crr "$1" install)"; CR_WHY="${r:0:300}"; _crrc "${r}" 1 && _crhas "${r}" "faça o deploy do bridge"; }
+  _cc_apply() { local r; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:900}"
+    _crrc "${r}" 0 && _crhas "${r}" "OK — runner instalado e ligado" && _crhas "${r}" "verify OK" \
+      && [ -f "${d}/units/onion-chat.socket" ] && [ -f "${d}/units/onion-chat@.service" ] && [ -f "${d}/libexec/launcher.py" ] \
+      && [ -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ] && grep -qx onion-chat "${d}/st/groups" \
+      && grep -qF -- "-m g:onion-chat:--x -- ${d}/state" "${d}/st/acl" && [ -d "${d}/state/chat-homes" ] \
+      && [ -d "${d}/state/workspaces/0000000000000000" ] && [ -d "${d}/state/chat-homes/0000000000000000" ] \
+      && [ "$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")" = 1 ]; }
+  _cc_acldefault() { local r; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300} | $(grep -c . "${d}/st/acl" 2>/dev/null)"
+    _crrc "${r}" 0 && grep -qF -- "-m g:onion-chat:--x,d:g:onion-chat:rwx,d:u:$(id -un):rwx,d:m::rwx -- ${d}/state/workspaces" "${d}/st/acl"; }
+  _cc_aclexisting() { local r; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"
+    _crrc "${r}" 0 && grep -qF -- "setfacl -R -P -m g:onion-chat:rwX,u:$(id -un):rwX -- ${d}/state/workspaces/aaaaaaaaaaaaaaaa" "${d}/st/acl"; }
+  _cc_handshake() { local r; : > "${d}/st/accept-all"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:600}"
+    _crrc "${r}" 1 && _crhas "${r}" "FALHA recusa" && _crhas "${r}" "o bridge NÃO foi ligado" \
+      && [ ! -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ] && [ "$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")" = 0 ]; }
+  _cc_health() { local r; : > "${d}/st/health-bad"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"
+    _crrc "${r}" 2 && ! _crinstalled; }
+  _cc_sameinv() { local r; : > "${d}/st/same-inv"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"
+    _crrc "${r}" 1 && _crhas "${r}" "a invocação não mudou"; }
+  _cc_norunner() { local r; : > "${d}/st/norunner"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"
+    _crrc "${r}" 1 && _crhas "${r}" "sem 'chat-runner: LIGADO'"; }
+  _cc_nokey() { local r; : > "${d}/st/nokey"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"
+    _crrc "${r}" 1 && _crhas "${r}" "SEM chave da API"; }
+  _cc_drift() { local r; _crr "$1" install --apply >/dev/null
+    echo '# mudou no bridge' >> "${d}/h/onion-bridge/deploy/chat-runner/launcher.py"
+    git -C "${d}/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qam mudou
+    r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "DIFERE do renderizado" && _crhas "${r}" "${d}/libexec/launcher.py"; }
+  _cc_notloaded() { local r; _crr "$1" install --apply >/dev/null; mv "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" "${d}/st/40.bak"
+    r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"; mv "${d}/st/40.bak" "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf"
+    _crrc "${r}" 1 && _crhas "${r}" "NÃO está carregado"; }
+  _cc_noenv() { local r; _crr "$1" install --apply >/dev/null; echo "${pid_off}" > "${d}/st/mainpid"
+    r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "não tem CHAT_RUNNER_SOCKET"; }
+  _cc_ensfail() { local r; : > "${d}/st/noprotect"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:500}"
+    _crrc "${r}" 1 && _crhas "${r}" "o ENSAIO reprovou" && _crhas "${r}" "FALHA alcança ${d}/h/.git-credentials" && ! _crinstalled; }
+  _cc_hidden() { local r; : > "${d}/st/noprotect"; _crr "$1" install --apply >/dev/null; rm -f "${d}/st/noprotect"
+    # o TemporaryFileSystem que não pega: o estado mostra o repo de org (o sandbox simulado pula o esconder)
+    sed -i 's#^TemporaryFileSystem=.*#TemporaryFileSystem=/nao-pega#' "${d}/h/onion-bridge/deploy/chat-runner/onion-chat@.service.in"
+    git -C "${d}/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qam tfs
+    r="$(_crr "$1" install)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "mostra ${d}/state/orgs"; }
+  _cc_noop() { local r n; r="$(_crr "$1" install --apply)"; _crrc "${r}" 0 || { CR_WHY="1ª: ${r:0:300}"; return 1; }
+    n="$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")"; r="$(_crr "$1" install --apply)"; CR_WHY="2ª: ${r:0:300}"
+    _crrc "${r}" 0 && _crhas "${r}" "NOOP" && [ "$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")" = "${n}" ]; }
+  _cc_rollback() { local r; : > "${d}/st/health-after-bad"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:900}"
+    _crrc "${r}" 1 && _crhas "${r}" "ROLLBACK MANUAL" && _crhas "${r}" "setfacl --restore=${d}/bk/" && _crhas "${r}" "groupdel onion-chat" \
+      && _crhas "${r}" "rm -f ${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf"; }
+  _cc_linkstate() { local r; mv "${d}/state/workspaces" "${d}/state/ws-real"; ln -s ws-real "${d}/state/workspaces"
+    r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"; _crrc "${r}" 1 && _crhas "${r}" "SYMLINK" && ! _crinstalled; }
+  _cc_env() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" ONION_CHAT_RUNNER_LOCK="${d}/x" bash "$1" show 2>&1)" || rc=$?
+    CR_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"produção não se redireciona"*) true ;; *) false ;; esac; }
+  _cc_copy() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" bash "$1" show 2>&1)" || rc=$?
+    CR_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"não é arquivo rastreado"*) true ;; *) false ;; esac; }
+  _cc_lock() { local r; rm -f "${d}/held"
+    ( flock -x 8; : > "${d}/held"; sleep 4 ) 8>"${d}/lock" &
+    local _n=0; while [ ! -f "${d}/held" ] && [ "${_n}" -lt 50 ]; do sleep 0.1; _n=$((_n + 1)); done
+    r="$(_crr "$1" install)"; CR_WHY="${r:0:200}"; wait; _crrc "${r}" 2; }
+  _cc_opt() { local r; r="$(_crr "$1" install --socket /tmp/outro)"; CR_WHY="${r:0:200}"; _crrc "${r}" 3; }
+  _cc_testprod() { local r rc=0
+    r="$(cd "${d}" && env PATH="${d}/fake:${d}/stub:${PATH}" ONION_CHAT_RUNNER_TEST=1 ONION_CHAT_RUNNER_SVC_HOME="${d}/h" ONION_CHAT_RUNNER_STATE=/var/lib/onion-bridge \
+      ONION_CHAT_RUNNER_UNIT_DIR="${d}/units" ONION_CHAT_RUNNER_LIBEXEC="${d}/libexec" ONION_CHAT_RUNNER_BACKUP_DIR="${d}/bk" \
+      ONION_CHAT_RUNNER_SOCKET="${d}/run/s.sock" ONION_CHAT_RUNNER_LOCK="${d}/lock" bash "$1" show 2>&1)" || rc=$?
+    CR_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ]; }
+  _cc_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
+    CR_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
+  _crcase "(r1) install sem --apply é ENSAIO: rc 0, nada instalado, nenhum grupo, nenhuma ACL, nenhum restart" 'if [ "${APPLY}" = 0 ]; then' 'if false; then' _cc_dry
+  _crcase "(r2) show: o socket, o template (User=onion-chat-%i, grupo, TemporaryFileSystem do estado) e o drop-in com os valores medidos" \
+    '-e "s#@STATE@#${STATE}#g"' '-e "s#@STATEX@#${STATE}#g"' _cc_render
+  _crcase "(r3) marcador sem valor no modelo do bridge servido → rc 1 nomeando-o" "  if grep -nE '@[A-Z_]+@' \"\$2\" >/dev/null; then die 1" '  if false; then die 1' _cc_marker
+  _crcase "(r4) fonte com mudança não commitada no bridge servido → rc 1, nada instalado" \
+    '|| die 1 "${f} tem mudança não commitada no bridge servido: recusado"' '|| true' _cc_dirty
+  _crcase "(r5) bridge servido sem o runner → rc 1 pedindo o deploy do bridge antes" \
+    '|| die 1 "o bridge servido não tem ${f}: faça o deploy do bridge' '|| true "o bridge servido não tem ${f}: faça o deploy do bridge' _cc_nosrc
+  _crcase "(r6) --apply: grupo, ACLs, sonda, lançador, units, aperto de mão, drop-in, restart e verify OK" \
+    'priv install "${own[@]}" -m 0644 "${TMPD}/${DROPIN_NAME}" "${DROPIN_DIR}/${DROPIN_NAME}" ||' 'true ||' _cc_apply
+  _crcase "(r7) as raízes ganham a ACL PADRÃO (grupo e conta do serviço rwx no que nascer dentro)" \
+    'priv setfacl -m "g:${GROUP}:--x,d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- "${d}"' 'priv setfacl -m "g:${GROUP}:--x" -- "${d}"' _cc_acldefault
+  _crcase "(r8) o workspace que JÁ existia ganha a ACL do grupo, sem seguir symlink" \
+    'priv setfacl -R -P -m "g:${GROUP}:rwX,u:${SVC_USER}:rwX" -- "${w}"' 'true' _cc_aclexisting
+  _crcase "(r9) aperto de mão que reprova (a recusa não recusa) → rc 1, o bridge NÃO é ligado nem reiniciado" \
+    'handshake | sed '"'"'s/^/    /'"'"'; [ "${PIPESTATUS[0]}" = 0 ] || fail_after "o aperto de mão' 'handshake | sed '"'"'s/^/    /'"'"'; true || fail_after "o aperto de mão' _cc_handshake
+  _crcase "(r10) /health doente antes do --apply → rc 2, nada escrito" \
+    "grep -q '\"ok\":true' <<<\"\$(curl -fsS -m 5 \"\${HEALTH_LOCAL}\" 2>/dev/null)\"" 'true' _cc_health
+  _crcase "(r11) restart do bridge que não troca a invocação → rc 1" '[ -n "${INV}" ] && [ "${INV}" != "${OLD_INV}" ] ||' '[ -n "${INV}" ] ||' _cc_sameinv
+  _crcase "(r12) boot desta invocação sem 'chat-runner: LIGADO' → rc 1" \
+    'grep -q "chat-runner: LIGADO" <<<"${BOOT}" || fail_after' 'true || fail_after' _cc_norunner
+  _crcase "(r13) boot com o runner ligado SEM chave da API → rc 1" \
+    'grep -q "chat-runner LIGADO sem ANTHROPIC_API_KEY" <<<"${BOOT}" && fail_after' 'false && fail_after' _cc_nokey
+  _crcase "(r14) verify: o lançador instalado difere do bridge servido (update sem reinstalar) → rc 1 nomeando-o" \
+    'if priv cmp -s "${TMPD}/${f%%:*}" "${dst}"; then vok' 'if true; then vok' _cc_drift
+  _crcase "(r15) verify com o drop-in NÃO carregado na unit do bridge → rc 1" \
+    '  case " ${dp} " in *"/${DROPIN_NAME} "*) vok' '  case " ${dp} " in *) vok' _cc_notloaded
+  _crcase "(r16) verify: o processo vivo do bridge sem CHAT_RUNNER_SOCKET → rc 1" \
+    '[ "$(priv grep -czx -- "CHAT_RUNNER_SOCKET=${SOCKET}" "/proc/${pid}/environ" 2>/dev/null)" -ge 1 ]' 'true' _cc_noenv
+  _crcase "(r17) ensaio em que a home do serviço segue ao alcance → rc 1, nada escrito" \
+    'if [ -r "$p" ] || [ -w "$p" ]; then bad "alcança $p"' 'if false; then bad "alcança $p"' _cc_ensfail
+  _crcase "(r18) ensaio em que o resto do estado (repos de org) aparece na unit → rc 1 nomeando-o" \
+    'case "$e" in workspaces|chat-homes) : ;; *) bad' 'case "$e" in *) : ;; workspaces) bad' _cc_hidden
+  _crcase "(r19) 2º --apply idêntico e provado → NOOP, sem novo restart" 'if [ "${changed}" = 0 ]; then' 'if false; then' _cc_noop
+  _crcase "(r20) falha depois do restart → rc 1 com ROLLBACK (drop-in, setfacl --restore, groupdel do grupo criado)" \
+    '  [ "${created_group}" = 1 ] && echo "  sudo groupdel ${GROUP}' '  false && echo "  sudo groupdel ${GROUP}' _cc_rollback
+  _crcase "(r21) raiz de workspaces que é SYMLINK → rc 1, nada instalado" \
+    '  [ "$(priv realpath -m -- "${p}")" = "${p}" ] || die 1 "${p} tem SYMLINK' '  true || die 1 "${p} tem SYMLINK' _cc_linkstate
+  _crcase "(r22) ONION_CHAT_RUNNER_* sem o modo de teste → rc 3 (produção não se redireciona)" \
+    "if compgen -e | grep -E '^ONION_CHAT_RUNNER_' >/dev/null; then" 'if false; then' _cc_env
+  _crcase "(r23) cópia do wrapper fora de um checkout, em produção → rc 3 antes de qualquer sudo" \
+    '    || die 3 "${_f} não é arquivo rastreado' '    || true "${_f} não é arquivo rastreado' _cc_copy
+  _crcase "(r24) trava ocupada (update-bridge ou wrapper do bridge rodando) → rc 2" 'flock -n 9 || die 2' 'true || die 2' _cc_lock
+  _crcase "(r25) opção fora da lista fechada → rc 3" '    *) die 3 "opção não aceita: $1' '    *) shift 2; continue; die 3 "opção não aceita: $1' _cc_opt
+  _crcase "(r26) modo de teste com o estado de produção do bridge → rc 3" \
+    'case "${_r}/" in "${PROD_SVC_HOME}/"*|"${PROD_STATE}/"*|' 'case "${_r}/" in "/nunca/"*|' _cc_testprod
+  _crcase "(r27) --help mostra o EXIT inteiro (até '3 uso inválido')" "'/^# USO/,/^# MODO DE TESTE/p'" "'/^# USO/,/^# EXIT/p'" _cc_help
+  [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
+  kill "${pid_on}" "${pid_off}" 2>/dev/null; wait "${pid_on}" "${pid_off}" 2>/dev/null
+  [ -d "${d}/h" ] && chmod -R u+rwX "${d}/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null
   rm -rf "${d}"
 }
 
@@ -31901,6 +32245,7 @@ _family run_moat_gate_selftests
 _family run_a2a_invite_live_selftests
 _family run_a2a_queue_live_selftests
 _family run_bridge_hardening_selftests
+_family run_chat_runner_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests
