@@ -9662,11 +9662,18 @@ case "$1" in
           User) if [ -f "$F/eff-root" ]; then v=root; else v=onion-chat-verify; fi ;;
           ExecStart) v="{ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py ; ignore_errors=no }" ;;
           ExecStartPre|ExecStartPost) continue ;;
-          DropInPaths) if [ -f "$F/eff-dropin" ]; then v=/run/systemd/system/onion-chat@.service.d/90-x.conf; else v=""; fi ;;
+          DropInPaths) v=""; [ -f "$ONION_CHAT_RUNNER_UNIT_DIR/onion-chat@.service.d/60-egress-fence.conf" ] && case "$unit" in onion-chat@*) v="$ONION_CHAT_RUNNER_UNIT_DIR/onion-chat@.service.d/60-egress-fence.conf" ;; esac
+            [ -f "$F/eff-dropin" ] && v="$v /run/systemd/system/onion-chat@.service.d/90-x.conf" ;;
+          IPAddressDeny|IPAddressAllow|BindReadOnlyPaths) v=""; fz="$ONION_CHAT_RUNNER_UNIT_DIR/onion-chat@.service.d/60-egress-fence.conf"
+            if [ -f "$fz" ] && [ ! -f "$F/eff-nofence" ]; then v="$(grep "^$p=" "$fz" | cut -d= -f2- | tr '\n' ' ')"; fi ;;
           *) v="" ;;
         esac
         if [ "$val" = 1 ]; then echo "$v"; else echo "$p=$v"; fi
       done; exit 0 ;;
+    esac
+    case "$unit" in *.slice)
+      for p in $props; do v=""; [ "$p" = IPAddressAllow ] && [ -f "$F/slice-allow" ] && [ "$unit" = system.slice ] && v=any
+        if [ "$val" = 1 ]; then echo "$v"; else echo "$p=$v"; fi; done; exit 0 ;;
     esac
     for p in $props; do
       case "$p" in
@@ -9698,7 +9705,7 @@ EOF
   cat > "${d}/fake/systemd-run" <<'EOF'
 #!/bin/sh
 F="$CR_FAKE"; : > "$F/sr-args"
-while [ $# -gt 0 ]; do case "$1" in --quiet|--pipe|--wait|--collect) shift ;; -p) echo "$2" >> "$F/sr-args"; shift 2 ;; *) break ;; esac; done
+while [ $# -gt 0 ]; do case "$1" in --quiet|--pipe|--wait|--collect) shift ;; --slice=*) echo "SLICE=${1#--slice=}" >> "$F/sr-args"; shift ;; -p) echo "$2" >> "$F/sr-args"; shift 2 ;; *) break ;; esac; done
 H="$ONION_CHAT_RUNNER_SVC_HOME"; S="$ONION_CHAT_RUNNER_STATE"; B="$F/runbin"; rm -rf "$B" "$F/hidden" "$F/tfs-on"; mkdir -p "$B" "$F/hidden"
 grep '^BindReadOnlyPaths=' "$F/sr-args" | sed 's/^BindReadOnlyPaths=//' | while IFS=: read -r src dst; do cp "$src" "$B/${dst##*/}"; done
 if grep -qx 'ProtectHome=yes' "$F/sr-args" && [ ! -f "$F/noprotect" ]; then
@@ -9716,6 +9723,35 @@ for e in "$F/hidden"/* "$F/hidden"/.[!.]*; do [ -e "$e" ] && mv "$e" "$S/"; done
 exit $rc
 EOF
   printf '#!/bin/sh\n[ "$*" = "-u" ] && { echo 61234; exit 0; }\nexec /usr/bin/id "$@"\n' > "${d}/inbin/id"
+  # a sonda de REDE da cerca, falsa: dentro da unit transitória falsa não há filtro de cgroup, então o "barrado" sai das
+  # propriedades que a unit recebeu (IPAddressDeny do loopback); net-open simula a cerca que não pegou, net-noapi a API cortada
+  cat > "${d}/inbin/python3" <<'EOF'
+#!/bin/sh
+# python3 -I <sonda> probe <alvo>… | api <host>: sem filtro de cgroup aqui, o estado sai das propriedades que a unit recebeu
+# (com o IPAddressDeny do loopback = barrado); net-open = a cerca não pegou; ctl-drop = descarte também sem a cerca
+case "$3" in
+  probe) shift 3
+    # fora da slice do runner, um IPAddressAllow herdado de outra slice valeria: a sonda falsa só responde nela
+    grep -qxF 'SLICE=system-onion\x2dchat.slice' "$CR_FAKE/sr-args" || { for t; do echo "NET $t erro:fora-da-slice-do-runner"; done; exit 0; }
+    fenced=0; grep -qx 'IPAddressDeny=127.0.0.0/8' "$CR_FAKE/sr-args" && fenced=1
+    for t; do
+      if [ "$fenced" = 1 ] && [ ! -f "$CR_FAKE/net-open" ]; then v=barrado; elif [ -f "$CR_FAKE/ctl-drop" ]; then v=barrado; else v=aberto; fi
+      echo "NET $t $v"
+    done; exit 0 ;;
+  api)
+    if [ -f "$CR_FAKE/net-notls" ]; then echo "OK cerca: o DNS de $4 segue (resolvedores públicos)"; exit 0; fi
+    if [ -f "$CR_FAKE/net-noapi" ]; then echo "FALHA cerca: o DNS de $4 falhou (gaierror)"
+    else echo "OK cerca: o DNS de $4 segue (resolvedores públicos)"; echo "OK cerca: o TLS com $4 segue (TLSv1.3, certificado verificado)"; fi
+    exit 0 ;;
+esac
+exec /usr/bin/python3 "$@"
+EOF
+  # os endereços globais do host, falsos: um v4 e um v6 públicos (de documentação) e uma ponte de contêiner (já na faixa privada)
+  cat > "${d}/fake/ip" <<'EOF'
+#!/bin/sh
+[ -f "$CR_FAKE/ip-empty" ] && { echo '[]'; exit 0; }
+echo '[{"ifname":"eth0","addr_info":[{"family":"inet","local":"203.0.113.7","scope":"global"},{"family":"inet6","local":"2001:db8::7","scope":"global"}]},{"ifname":"docker0","addr_info":[{"family":"inet","local":"172.17.0.1","scope":"global"}]}]'
+EOF
   printf '#!/bin/sh\nif [ -f "$CR_FAKE/tfs-on" ]; then echo tmpfs; else echo ext4; fi\n' > "${d}/inbin/findmnt"
   printf '#!/bin/sh\n[ "$1" = group ] && grep -qx "$2" "$CR_FAKE/groups" 2>/dev/null && { echo "$2:x:999:"; exit 0; }\nexit 2\n' > "${d}/fake/getent"
   printf '#!/bin/sh\n[ "$1" = --system ] || exit 9\necho "$2" >> "$CR_FAKE/groups"\n' > "${d}/fake/groupadd"
@@ -9732,11 +9768,13 @@ grep -F -- " -- $p" "$CR_FAKE/acl" 2>/dev/null | while read -r _ rest; do
 done
 EOF
   printf '#!/bin/sh\n[ -f "$CR_FAKE/health-bad" ] && exit 22\n[ -f "$CR_FAKE/health-after-bad" ] && [ "$(cat "$CR_FAKE/inv")" != inv-0 ] && exit 22\necho "{\\"ok\\":true}"\n' > "${d}/fake/curl"
-  printf '#!/bin/sh\ncase " $* " in *" -t onion-chat "*) if [ -f "$CR_FAKE/j-svc-uid" ]; then u=$(/usr/bin/id -u); else u=61234; fi; echo "chat-runner: sessão uid=$u slug=0000000000… flags=--tools"; echo "chat-runner: RECUSA uid=61235: flag fora da allowlist"; exit 0 ;; esac\n[ -f "$CR_FAKE/noauth" ] || echo "[onion-bridge] identidade: JWKS OK | auth: enforce"\n[ -f "$CR_FAKE/norunner" ] || echo "[onion-bridge] chat-runner: LIGADO para convidados"\n[ -f "$CR_FAKE/nokey" ] && echo "[onion-bridge] chat-runner LIGADO sem ANTHROPIC_API_KEY"\nexit 0\n' > "${d}/fake/journalctl"
+  printf '#!/bin/sh\ncase " $* " in *" -t onion-chat "*) [ -f "$CR_FAKE/j-forged" ] && case " $* " in *" _SYSTEMD_SLICE="*) exit 0 ;; esac; if [ -f "$CR_FAKE/j-svc-uid" ]; then u=$(/usr/bin/id -u); else u=61234; fi; echo "chat-runner: sessão uid=$u slug=0000000000… flags=--tools"; echo "chat-runner: RECUSA uid=61235: flag fora da allowlist"; exit 0 ;; esac\n[ -f "$CR_FAKE/noauth" ] || echo "[onion-bridge] identidade: JWKS OK | auth: enforce"\n[ -f "$CR_FAKE/norunner" ] || echo "[onion-bridge] chat-runner: LIGADO para convidados"\n[ -f "$CR_FAKE/nokey" ] && echo "[onion-bridge] chat-runner LIGADO sem ANTHROPIC_API_KEY"\nexit 0\n' > "${d}/fake/journalctl"
   chmod +x "${d}/stub/sudo" "${d}/fake/"* "${d}/inbin/"*
   # os processos "vivos" do bridge falso: um COM a variável que o drop-in liga, outro sem
-  ( exec env CHAT_RUNNER_SOCKET="${d}/run/onion-chat.sock" sleep 600 </dev/null >/dev/null 2>&1 ) & local pid_on=$!
-  ( exec env -u CHAT_RUNNER_SOCKET sleep 600 </dev/null >/dev/null 2>&1 ) & local pid_off=$!
+  # 3600 s, não 600: com os casos da cerca a família passou de 10 min, e o "bridge vivo" morria no meio (medido:
+  # os --apply do fim reprovavam no CHAT_RUNNER_SOCKET do processo); o fim da família os mata
+  ( exec env CHAT_RUNNER_SOCKET="${d}/run/onion-chat.sock" sleep 3600 </dev/null >/dev/null 2>&1 ) & local pid_on=$!
+  ( exec env -u CHAT_RUNNER_SOCKET sleep 3600 </dev/null >/dev/null 2>&1 ) & local pid_off=$!
   # _crreset: a home (com o bridge servido num repo git), o estado e os dirs de instalação, como a VPS os teria
   _crreset() {
     [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
@@ -9766,6 +9804,10 @@ PYEOF
       'Environment=ONION_CHAT_WS_ROOT=@STATE@/workspaces ONION_CHAT_HOME_ROOT=@STATE@/chat-homes ONION_CHAT_CLAUDE=/run/onion-chat-bin/claude' \
       'ExecStart=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py' 'ExecStopPost=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py --fixup' \
       > "${C}/onion-chat@.service.in"
+    printf '%s\n' '# modelo da cerca (bancada)' '[Service]' 'IPAddressDeny=0.0.0.0/8' 'IPAddressDeny=127.0.0.0/8' 'IPAddressDeny=::/128' 'IPAddressDeny=::1/128' \
+      'IPAddressDeny=169.254.0.0/16' 'IPAddressDeny=fe80::/10' 'IPAddressDeny=10.0.0.0/8' 'IPAddressDeny=172.16.0.0/12' 'IPAddressDeny=192.168.0.0/16' \
+      'IPAddressDeny=100.64.0.0/10' 'IPAddressDeny=fc00::/7' 'IPAddressDeny=@HOST_ADDRS@' \
+      'BindReadOnlyPaths=/run/systemd/resolve/resolv.conf:/etc/resolv.conf' > "${C}/onion-chat-egress-fence.conf.in"
     git -C "${B}" init -q -b main && git -C "${B}" add -A && git -C "${B}" -c user.email=t@t -c user.name=t commit -q -m base
     mkdir -p "${d}/state/workspaces/aaaaaaaaaaaaaaaa/.git" "${d}/state/orgs"
     echo "setfacl -m g:onion-chat:rwx -- ${d}/state/workspaces/aaaaaaaaaaaaaaaa/.git" > "${d}/st/acl.seed"; echo bare > "${d}/state/orgs/repo"; chmod 0750 "${d}/state" "${d}/state/workspaces"
@@ -9800,7 +9842,10 @@ PY
   _crhas() { case "${1#*|}" in *"$2"*) true ;; *) false ;; esac; }
   _crcalls() { grep -c "systemctl $1" "${d}/st/calls" 2>/dev/null || true; }
   _crinstalled() { [ -f "${d}/units/onion-chat.socket" ] || [ -f "${d}/units/onion-chat@.service" ] || [ -d "${d}/libexec" ] \
-                     || [ -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ] || [ -s "${d}/st/groups" ] || [ -s "${d}/st/acl" ]; }
+                     || [ -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ] || [ -s "${d}/st/groups" ] || [ -s "${d}/st/acl" ] \
+                     || [ -e "${d}/units/onion-chat@.service.d/60-egress-fence.conf" ]; }
+  _crfence() { [ -f "${d}/units/onion-chat@.service.d/60-egress-fence.conf" ]; }
+  _crfmodel() { git -C "${d}/home/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qam "$1"; }
   _cc_dry() { local r; r="$(_crr "$1" install)"; CR_WHY="${r:0:500}"
     _crrc "${r}" 0 && _crhas "${r}" "ENSAIO OK" && _crhas "${r}" "AUSENTE travessia" && _crhas "${r}" "OK não alcança ${d}/home/h/.git-credentials" \
       && ! _crinstalled && [ "$(_crcalls restart)" = 0 ] && [ ! -d "${d}/state/chat-homes" ]; }
@@ -9888,16 +9933,61 @@ PY
     CR_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"produção não se redireciona"*) true ;; *) false ;; esac; }
   _cc_copy() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" bash "$1" show 2>&1)" || rc=$?
     CR_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"não é arquivo rastreado"*) true ;; *) false ;; esac; }
-  _cc_lock() { local r; rm -f "${d}/held"
-    ( flock -x 8; : > "${d}/held"; sleep 4 ) 8>"${d}/lock" &
+  _cc_lock() { local r lp; rm -f "${d}/held"
+    ( flock -x 8; : > "${d}/held"; sleep 4 ) 8>"${d}/lock" & lp=$!
     local _n=0; while [ ! -f "${d}/held" ] && [ "${_n}" -lt 50 ]; do sleep 0.1; _n=$((_n + 1)); done
-    r="$(_crr "$1" install)"; CR_WHY="${r:0:200}"; wait; _crrc "${r}" 2; }
+    # `wait` SEM pid esperava também o "bridge vivo" falso (sleep longo): só o segurador da trava
+    r="$(_crr "$1" install)"; CR_WHY="${r:0:200}"; wait "${lp}"; _crrc "${r}" 2; }
   _cc_opt() { local r; r="$(_crr "$1" install --socket /tmp/outro)"; CR_WHY="${r:0:200}"; _crrc "${r}" 3; }
   _cc_testprod() { local r rc=0
     r="$(cd "${d}" && env PATH="${d}/fake:${d}/stub:${PATH}" ONION_CHAT_RUNNER_TEST=1 ONION_CHAT_RUNNER_SVC_HOME="${d}/home/h" ONION_CHAT_RUNNER_STATE=/var/lib/onion-bridge \
       ONION_CHAT_RUNNER_UNIT_DIR="${d}/units" ONION_CHAT_RUNNER_LIBEXEC="${d}/libexec" ONION_CHAT_RUNNER_BACKUP_DIR="${d}/bk" \
       ONION_CHAT_RUNNER_SOCKET="${d}/run/s.sock" ONION_CHAT_RUNNER_LOCK="${d}/lock" bash "$1" show 2>&1)" || rc=$?
     CR_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ]; }
+  _cc_f_dry() { local r; r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 0 && _crhas "${r}" "ENSAIO OK" && _crhas "${r}" "OK cerca: TCP para 127.0.0.1:8787 barrado (sem a cerca: aberto)" && _crhas "${r}" "OK cerca: o TLS com api.anthropic.com" \
+      && _crhas "${r}" "install --apply --egress-fence" && ! _crinstalled; }
+  _cc_f_apply() { local r f="${d}/units/onion-chat@.service.d/60-egress-fence.conf"; r="$(_crr "$1" install --apply --egress-fence)"; CR_WHY="${r:0:900}"
+    _crrc "${r}" 0 && _crhas "${r}" "verify OK" && _crhas "${r}" "OK efetivo: a cerca de rede carregada" && _crhas "${r}" "dentro da cerca de rede" \
+      && _crfence && grep -qx 'IPAddressDeny=2001:db8::7/128 203.0.113.7/32' "${f}" && ! grep -q '172.17.0.1' "${f}" && grep -qxF "# onion-chat-runner: v1" "${f}" \
+      && ! grep -q '^IPAddressAllow' "${f}" && _crhas "${r}" "OK cerca: TCP para [2001:db8::7]:22 barrado (sem a cerca: aberto)" && _crhas "${r}" "OK cerca: TCP para 127.0.0.53:22 barrado"; }
+  _cc_f_off() { local r; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 0 && ! _crfence && _crhas "${r}" "cerca de rede DESLIGADA (padrão)" && _crhas "${r}" "AUSENTE cerca de rede"; }
+  _cc_f_wideallow() { local r; printf 'IPAddressAllow=127.0.0.53/32\n' >> "${d}/home/h/onion-bridge/deploy/chat-runner/onion-chat-egress-fence.conf.in"; _crfmodel furo
+    r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "fora da allowlist da cerca: IPAddressAllow" && ! _crinstalled; }
+  _cc_f_empty() { local r; sed -i 's#^IPAddressDeny=@HOST_ADDRS@$#IPAddressDeny=@HOST_ADDRS@\nIPAddressDeny=#' "${d}/home/h/onion-bridge/deploy/chat-runner/onion-chat-egress-fence.conf.in"; _crfmodel vazio
+    r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "IPAddressDeny com valor VAZIO" && ! _crinstalled; }
+  _cc_f_noresolv() { local r; sed -i '/^BindReadOnlyPaths=/d' "${d}/home/h/onion-bridge/deploy/chat-runner/onion-chat-egress-fence.conf.in"; _crfmodel semdns
+    r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "BindReadOnlyPaths=- (exigido só" && ! _crinstalled; }
+  _cc_f_sliceallow() { local r; : > "${d}/st/slice-allow"; r="$(_crr "$1" install --apply --egress-fence)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 1 && _crhas "${r}" "IPAddressAllow=any na slice system.slice" && [ ! -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ]; }
+  _cc_f_ctldrop() { local r; : > "${d}/st/ctl-drop"; r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 1 && _crhas "${r}" "NÃO PROVA (descartado também sem a cerca)" && ! _crinstalled; }
+  _cc_f_classify() { local np rc=0; np="${d}/np.py"
+    awk '/^NETPY="\$\(cat <<.NETPY.$/ {f=1; next} /^NETPY$/ {f=0} f' "$1" > "${np}"
+    CR_WHY="$(/usr/bin/python3 -I "${np}" --classify-selftest 2>&1)" || rc=$?; [ "${rc}" = 0 ] && [ -s "${np}" ] && case "${CR_WHY}" in *"8 de 8"*) true ;; *) false ;; esac; }
+  _cc_f_forged() { local r; : > "${d}/st/j-forged"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 1 && _crhas "${r}" "não mostra a sessão sob UID próprio" && [ ! -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ]; }
+  _cc_f_missing() { local r; sed -i '/^IPAddressDeny=169.254.0.0\/16$/d' "${d}/home/h/onion-bridge/deploy/chat-runner/onion-chat-egress-fence.conf.in"; _crfmodel falta
+    r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "faltam: 169.254.0.0/16" && ! _crinstalled; }
+  _cc_f_extra() { local r; sed -i 's#^\[Service\]$#[Service]\nDynamicUser=no#' "${d}/home/h/onion-bridge/deploy/chat-runner/onion-chat-egress-fence.conf.in"; _crfmodel extra
+    r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "fora da allowlist da cerca: DynamicUser" && ! _crinstalled; }
+  _cc_f_noip() { local r; : > "${d}/st/ip-empty"; r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:400}"
+    _crrc "${r}" 2 && _crhas "${r}" "não medi os endereços globais do host"; }
+  _cc_f_nomodel() { local r; git -C "${d}/home/h/onion-bridge" rm -q deploy/chat-runner/onion-chat-egress-fence.conf.in && _crfmodel sem-cerca
+    r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:400}"; _crrc "${r}" 1 && _crhas "${r}" "faça o deploy do bridge com a cerca"; }
+  _cc_f_effdiff() { local r; : > "${d}/st/eff-nofence"; r="$(_crr "$1" install --apply --egress-fence)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 1 && _crhas "${r}" "a cerca carregada difere da renderizada" && [ ! -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ]; }
+  _cc_f_open() { local r; _crr "$1" install --apply --egress-fence >/dev/null; : > "${d}/st/net-open"; r="$(_crr "$1" verify)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 1 && _crhas "${r}" "FALHA cerca: TCP para 127.0.0.1:8787 aberto" && _crhas "${r}" "reprovou"; }
+  _cc_f_noapi() { local r; : > "${d}/st/net-notls"; r="$(_crr "$1" install --egress-fence)"; CR_WHY="${r:0:700}"
+    _crrc "${r}" 1 && _crhas "${r}" "o TLS com a API não foi provado" && _crhas "${r}" "o ENSAIO reprovou" && ! _crinstalled; }
+  _cc_f_keep() { local r n; r="$(_crr "$1" install --apply --egress-fence)"; _crrc "${r}" 0 || { CR_WHY="1ª: ${r:0:300}"; return 1; }
+    n="$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")"; r="$(_crr "$1" install --apply)"; CR_WHY="2ª: ${r:0:500}"
+    _crrc "${r}" 0 && _crhas "${r}" "NOOP" && _crfence && [ "$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")" = "${n}" ]; }
+  _cc_f_rollback() { local r; : > "${d}/st/health-after-bad"; r="$(_crr "$1" install --apply --egress-fence)"; CR_WHY="${r:0:900}"
+    _crrc "${r}" 1 && _crhas "${r}" "ROLLBACK MANUAL" && _crhas "${r}" "sudo rm -f ${d}/units/onion-chat@.service.d/60-egress-fence.conf"; }
+  _cc_f_flagonly() { local r; r="$(_crr "$1" verify --egress-fence)"; CR_WHY="${r:0:200}"; _crrc "${r}" 3; }
   _cc_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
     CR_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
   _crcase "(r1) install sem --apply é ENSAIO: rc 0, nada instalado, nenhum grupo, nenhuma ACL, nenhum restart" 'if [ "${APPLY}" = 0 ]; then' 'if false; then' _cc_dry
@@ -9967,6 +10057,49 @@ PY
   _crcase "(r26) modo de teste com o estado de produção do bridge → rc 3" \
     'case "${_r}/" in "${PROD_SVC_HOME}/"*|"${PROD_STATE}/"*|' 'case "${_r}/" in "/nunca/"*|' _cc_testprod
   _crcase "(r27) --help mostra o EXIT inteiro (até '3 uso inválido')" "'/^# USO/,/^# MODO DE TESTE/p'" "'/^# USO/,/^# EXIT/p'" _cc_help
+  # ── a CERCA DE REDE (opção A do degrau 3, D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016): desligada por padrão ──
+  _crcase "(r38) install --egress-fence sem --apply: ensaio com a cerca (loopback barrado, TLS com a API segue), nada instalado" \
+    $'for a in ${v}; do printf \'%s\\n\' "-p" "${k}=${a}"; done; fi ;;' ':; fi ;;' _cc_f_dry
+  _crcase "(r58) a sonda da cerca roda NA SLICE do runner (fora dela um allow herdado de outra slice valeria)" \
+    $'| priv systemd-run --quiet --pipe --wait --collect --slice="${RUNNER_SLICE}" "${props[@]}" /bin/sh -s 2>&1)"; rc=$?' \
+    $'| priv systemd-run --quiet --pipe --wait --collect "${props[@]}" /bin/sh -s 2>&1)"; rc=$?' _cc_f_dry
+  _crcase "(r39) --apply --egress-fence: a cerca instalada com os endereços do host medidos (a ponte de contêiner fora), efetiva e provada" \
+    'priv install "${own[@]}" -m 0644 "${TMPD}/${FENCE_NAME}" "${FENCE_DIR}/${FENCE_NAME}" ||' 'true ||' _cc_f_apply
+  _crcase "(r40) sem a flag a cerca fica DESLIGADA (padrão): nada de IPAddressDeny instalado, verify diz AUSENTE" \
+    'if [ "${EGRESS}" = 1 ] || priv test -e' 'if true || priv test -e' _cc_f_off
+  _crcase "(r41) modelo com QUALQUER IPAddressAllow (o furo no stub abria toda porta em 0.0.0.0) → rc 1, nada instalado" \
+    '        elif k == "BindReadOnlyPaths":' '        elif k in ("BindReadOnlyPaths", "IPAddressAllow"):' _cc_f_wideallow
+  _crcase "(r52) modelo com IPAddressDeny VAZIO (no systemd zera a lista) → rc 1, nada instalado" \
+    '            bad.append("%s com valor VAZIO (linha %d: no systemd zera a lista acumulada)" % (k, n)); continue' '            continue' _cc_f_empty
+  _crcase "(r53) modelo sem o resolv.conf público (o DNS cairia sob a cerca) → rc 1" \
+    '    if binds != [fresolv]:' '    if False:' _cc_f_noresolv
+  _crcase "(r54) IPAddressAllow numa slice-mãe (herdado, vence o deny) → rc 1, o bridge não é ligado" \
+    '    [ -z "${sa// /}" ] || { echo "    FALHA efetivo: IPAddressAllow=${sa} na slice' '    true || { echo "    FALHA efetivo: IPAddressAllow=${sa} na slice' _cc_f_sliceallow
+  _crcase "(r55) alvo descartado TAMBÉM sem a cerca (perna de controle) → não prova, rc 1, nada instalado" \
+    '      barrado:barrado) bad "cerca: $t NÃO PROVA' '      barrado:barrado) ok "cerca: $t NÃO PROVA' _cc_f_ctldrop
+  _crcase "(r56) o classificador da sonda de rede (aberto/recusado/barrado/erro) confere com exceções sintéticas" \
+    '        return "recusado"' '        return "barrado"' _cc_f_classify
+  _crcase "(r57) linha do journal com o identificador forjado, fora da slice do runner → não prova a identidade, rc 1" \
+    '-t onion-chat "_SYSTEMD_SLICE=${RUNNER_SLICE}"' '-t onion-chat' _cc_f_forged
+  _crcase "(r42) modelo sem uma faixa exigida (o link-local do metadata) → rc 1 nomeando-a" '    if got != want:' '    if False:' _cc_f_missing
+  _crcase "(r43) modelo da cerca com diretiva fora da allowlist (DynamicUser=no) → rc 1" \
+    '            bad.append("diretiva fora da allowlist da cerca: %s" % k)' '            pass' _cc_f_extra
+  _crcase "(r44) endereços do host não medidos → rc 2 (a cerca sem eles deixaria o próprio host ao alcance)" \
+    '    [ -n "${HOST_ADDRS}" ] || die 2 "não medi' '    true || die 2 "não medi' _cc_f_noip
+  _crcase "(r45) --egress-fence com o bridge servido sem o modelo da cerca → rc 1 pedindo o deploy do bridge" \
+    '      || die 1 "o bridge servido não tem ${FENCE_SRC}' '      || true "o bridge servido não tem ${FENCE_SRC}' _cc_f_nomodel
+  _crcase "(r46) a cerca EFETIVA difere da renderizada (o systemd não a carregou) → rc 1, o bridge não é ligado" \
+    "sys.exit(0 if n(sys.argv[1])==n(sys.argv[2]) else 1)" "sys.exit(0)" _cc_f_effdiff
+  _crcase "(r47) verify com a cerca instalada que NÃO barra o loopback → rc 1" \
+    '      *) bad "cerca: TCP para $t ${fs:-sem resposta}' '      *) ok "cerca: TCP para $t ${fs:-sem resposta}' _cc_f_open
+  _crcase "(r48) a sonda da API morre sem a linha do TLS (timeout em silêncio) → o ensaio reprova, nada instalado" \
+    '*) bad "cerca: o TLS com a API não foi provado"' '*) true "cerca: o TLS com a API não foi provado"' _cc_f_noapi
+  _crcase "(r49) cerca instalada é ESTADO: o install sem a flag a mantém e dá NOOP, sem restart" \
+    'if [ "${EGRESS}" = 1 ] || priv test -e "${FENCE_DIR}/${FENCE_NAME}"; then FENCE=1; fi' 'if [ "${EGRESS}" = 1 ]; then FENCE=1; fi' _cc_f_keep
+  _crcase "(r50) falha depois do restart com a cerca → o ROLLBACK tira a cerca" \
+    '  if [ "${installed_fence}" = 1 ] || [ "${FENCE}" = 1 ]; then' '  if false; then' _cc_f_rollback
+  _crcase "(r51) --egress-fence fora do install → rc 3" \
+    '    --egress-fence) [ "${SUB}" = install ] || die 3' '    --egress-fence) true || die 3' _cc_f_flagonly
   [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
   kill "${pid_on}" "${pid_off}" 2>/dev/null; wait "${pid_on}" "${pid_off}" 2>/dev/null
   chmod 0755 "${d}/home" 2>/dev/null; [ -d "${d}/home/h" ] && chmod -R u+rwX "${d}/home/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null

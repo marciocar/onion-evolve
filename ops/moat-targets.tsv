@@ -33,6 +33,9 @@
 #     aperto de mão pelo socket e liga o runner no bridge pelo drop-in 40-chat-runner.conf. O estado do bridge
 #     (/var/lib/onion-bridge: workspaces e repos de org) é escrito pelo SERVIÇO; pela sessão, só o wrapper (as HOMEs do
 #     CLI, a sonda e as ACLs) — o resto é do maestro.
+#   · a CERCA DE REDE do runner (opção A do degrau 3, 2026-10-16): o drop-in onion-chat@.service.d/60-egress-fence.conf
+#     nasce só pelo chat-runner.sh (install --egress-fence), renderizado do modelo do bridge servido com os endereços do
+#     host medidos na instalação; um drop-in nesse diretório mudaria toda instância do runner sem passar pela allowlist.
 #   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
 #     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
 #     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
@@ -51,6 +54,7 @@ deploy	path	/etc/systemd/system/onion-vps-bridge.service.d/30-integrity.conf	ops
 deploy	path	/etc/systemd/system/onion-vps-bridge.service.d/40-chat-runner.conf	ops/chat-runner.sh
 deploy	path	/etc/systemd/system/onion-chat.socket	ops/chat-runner.sh
 deploy	path	/etc/systemd/system/onion-chat@.service	ops/chat-runner.sh
+deploy	path	/etc/systemd/system/onion-chat@.service.d	ops/chat-runner.sh
 deploy	path	/usr/local/libexec/onion-chat	ops/chat-runner.sh
 deploy	path	/var/backups/onion-chat-runner	ops/chat-runner.sh
 deploy	path	/run/onion-chat.sock	ops/chat-runner.sh
