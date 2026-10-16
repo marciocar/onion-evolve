@@ -51,7 +51,7 @@
 | 60.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
 | 51.8 | `C_OPCAO_3_NATIVE_SANDBOX_STRICT` | chat-agent-isolation-2026-10 | OPÇÃO (3) sandbox nativo bwrap/seccomp/proxy — só com perfil AppArmor + failIfUnavailable + allowUnsandboxedCommands=false. |
 | 40.0 | `D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT` | chat-agent-isolation-2026-10 | DECISÃO ABERTA: isolar o agente do /chat por (0) convidado sem Bash, (1) systemd reescrito, (2) UID separado, (3) sandbox estrito |
-| 30.2 | `C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE` | chat-agent-isolation-2026-10 | OPÇÃO (1) systemd já — REESCRITA: sem EnvironmentFile, com ReadOnlyPaths voltado à integridade (código do bridge, .claude d |
+| 33.0 | `C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE` | chat-agent-isolation-2026-10 | OPÇÃO (1) systemd já — REESCRITA: sem EnvironmentFile, com ReadOnlyPaths voltado à integridade (código do bridge, .claude d |
 | 30.2 | `C_OPCAO_5_NARROW_CREDENTIAL_BROKER` | chat-agent-isolation-2026-10 | OPÇÃO (5) credential broker — estreito: proxy da ANTHROPIC_API_KEY e ferramenta de git, sobre a opção 2. |
 | 17.5 | `C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE` | chat-agent-isolation-2026-10 | OPÇÃO (0) imediato sem root: convidado sem Bash + deny Edit/Write no home do onion fora do workspace. |
 | 7.5 | `C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION` | chat-agent-isolation-2026-10 | OPÇÃO (4) container/microVM por sessão — inviável nesta VPS (sem KVM); opcional por adotante. |

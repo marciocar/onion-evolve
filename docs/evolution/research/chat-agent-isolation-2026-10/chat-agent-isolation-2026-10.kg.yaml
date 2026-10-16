@@ -20,7 +20,9 @@ meta:
                                # Gatilhos antecipados: (1) [LIDOS na rodada de primárias de 2026-10-15]; (2) o degrau
                                # 0 ou 1 ser aplicado no vivo; (3) update do Claude Code/SDK no bridge.
   # kg-backlog-guard: on
-  # ═══ TETO: 131 NÓS ═══
+  # ═══ TETO: 132 NÓS ═══
+  #   DEGRAU 1 EM PRODUÇÃO (2026-10-16, +1): o --apply do 30-integrity.conf medido no processo vivo
+  #   (E_DEGRAU1_EM_PRODUCAO_1016). Ele DISPARA o gatilho (2) da revisita acima (degrau 1 aplicado no vivo).
   #   DEGRAU 1 + SPIKES (2026-10-16, +4): o selo «1 já, 2 e 3 por spike» nasce como nó PRÓPRIO ligado à mãe
   #   (que segue open até os degraus 2 e 3), mais as três medições que ele pede — o ensaio do drop-in de
   #   integridade numa unit transitória (degrau 1), o lançador por socket sob DynamicUser (spike 2) e o que o
