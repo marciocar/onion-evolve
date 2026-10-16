@@ -9782,7 +9782,8 @@ EOF
     rm -rf "${d}/home" "${d}/state" "${d}/units" "${d}/libexec" "${d}/bk" "${d}/run" "${d}/st" "${d}/lock"; mkdir -p "${d}/st" "${d}/run" "${d}/units" "${d}/home"
     local B="${d}/home/h/onion-bridge" C="${d}/home/h/onion-bridge/deploy/chat-runner"
     mkdir -p "${C}" "${B}/src" "${B}/data" "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64" "${d}/home/h/.ssh"
-    printf '#!/bin/sh\necho cli-falso\n' > "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"; chmod +x "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"
+    # o CLI FALSO responde uma versão no piso (SAC-156: o wrapper mede o --version contra o CLI_FLOOR)
+    printf '#!/bin/sh\necho "2.1.301 (Claude Code)"\n' > "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"; chmod +x "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"
     printf 'node_modules/\n' > "${B}/.gitignore"; echo x > "${B}/src/server.ts"; echo x > "${B}/src/chat-runner.ts"; echo pat > "${d}/home/h/.git-credentials"
     cat > "${C}/launcher.py" <<'PYEOF'
 import os, sys
@@ -9987,6 +9988,16 @@ PY
     _crrc "${r}" 0 && _crhas "${r}" "NOOP" && _crfence && [ "$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")" = "${n}" ]; }
   _cc_f_rollback() { local r; : > "${d}/st/health-after-bad"; r="$(_crr "$1" install --apply --egress-fence)"; CR_WHY="${r:0:900}"
     _crrc "${r}" 1 && _crhas "${r}" "ROLLBACK MANUAL" && _crhas "${r}" "sudo rm -f ${d}/units/onion-chat@.service.d/60-egress-fence.conf"; }
+  # SAC-156: o piso do CLI do SDK (CVE-2026-39861, >= 2.1.64), medido pelo --version do binário que o template liga
+  _crcli() { printf '#!/bin/sh\necho "%s"\n' "$1" > "${d}/home/h/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"; }
+  _cc_floor_verify() { local r; _crr "$1" install --apply >/dev/null; _crcli "2.1.63 (Claude Code)"; r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"
+    _crrc "${r}" 1 && _crhas "${r}" "FALHA o CLI do SDK responde 2.1.63, ABAIXO do piso 2.1.64"; }
+  _cc_floor_numeric() { local r; _crr "$1" install --apply >/dev/null; _crcli "2.1.100 (Claude Code)"; r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"
+    _crrc "${r}" 0 && _crhas "${r}" "OK o CLI do SDK responde 2.1.100, no piso 2.1.64 ou acima"; }
+  _cc_floor_install() { local r; _crcli "2.1.63 (Claude Code)"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:400}"
+    _crrc "${r}" 1 && _crhas "${r}" "ABAIXO do piso 2.1.64" && ! _crinstalled; }
+  _cc_floor_noversion() { local r; _crr "$1" install --apply >/dev/null; _crcli "cli-falso"; r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"
+    _crrc "${r}" 1 && _crhas "${r}" "não respondeu uma versão a --version"; }
   _cc_f_flagonly() { local r; r="$(_crr "$1" verify --egress-fence)"; CR_WHY="${r:0:200}"; _crrc "${r}" 3; }
   _cc_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
     CR_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
@@ -10100,6 +10111,15 @@ PY
     '  if [ "${installed_fence}" = 1 ] || [ "${FENCE}" = 1 ]; then' '  if false; then' _cc_f_rollback
   _crcase "(r51) --egress-fence fora do install → rc 3" \
     '    --egress-fence) [ "${SUB}" = install ] || die 3' '    --egress-fence) true || die 3' _cc_f_flagonly
+  _crcase "(r59) verify com o CLI do SDK ABAIXO do piso 2.1.64 (CVE-2026-39861) → rc 1 nomeando o piso" \
+    '    if [ "${v}" -ge "${fl}" ]; then' '    if true; then' _cc_floor_verify
+  _crcase "(r60) o piso compara por campo, não por texto: 2.1.100 passa (lexical diria 2.1.100 < 2.1.64)" \
+    '    v=$(( 10#${BASH_REMATCH[1]} * 1000000000000 + 10#${BASH_REMATCH[2]} * 1000000 + 10#${BASH_REMATCH[3]} ))' \
+    '    v=$(( 10#${BASH_REMATCH[1]} * 1000000000000 + 10#${BASH_REMATCH[2]} * 1000000 + 10#${BASH_REMATCH[3]:0:1} ))' _cc_floor_numeric
+  _crcase "(r61) install --apply com o CLI abaixo do piso → rc 1 antes de instalar qualquer coisa" \
+    'CLI_FLOOR_LINE="$(cli_floor)" || die 1' 'CLI_FLOOR_LINE="$(cli_floor)" || true' _cc_floor_install
+  _crcase "(r62) CLI que não responde versão a --version → FALHA, nunca passa calado" \
+    '(${CLAUDE_SRC}): ${out:0:60}"; return 1' '(${CLAUDE_SRC}): ${out:0:60}"; return 0' _cc_floor_noversion
   [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
   kill "${pid_on}" "${pid_off}" 2>/dev/null; wait "${pid_on}" "${pid_off}" 2>/dev/null
   chmod 0755 "${d}/home" 2>/dev/null; [ -d "${d}/home/h" ] && chmod -R u+rwX "${d}/home/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null
