@@ -93,8 +93,18 @@ EOF
 post_update_checks() {
 local mode="$1"
 # NOT_PROVEN nasce vazio no topo; o NOOP pode chegar aqui com um item (o boot vivo sem 'auth: enforce').
-grep -q "JWKS OK" <<<"${BOOT}" \
-  || NOT_PROVEN+=("JWKS não confirmou neste boot (Logto fora?): com auth enforce, TODO /chat dá 401 até voltar")
+# O JWKS É MEDIDO UMA VEZ, e isso foi medido (2026-10-16, achado irmão do #1174): o veredito sai do jwksSelfCheck do
+# bridge na MESMA linha do "auth: enforce" que a fase 5 espera, então no update não há corrida entre a linha e o
+# veredito, e ele tem segundos. O uso real (cada /chat) re-busca sozinho no bridge (kid desconhecido, piso de 60 s):
+# re-medir daqui não provaria o uso, só repetiria o boot. Mas no NOOP o boot vivo pode ter DIAS: o "JWKS OK" é um
+# instantâneo do boot, não a alcançabilidade de agora, e a linha OK do NOOP não pode dizer mais do que isso.
+if grep -q "JWKS OK" <<<"${BOOT}"; then
+  if [ "${mode}" = noop ]; then
+    log "JWKS: OK no boot vivo, em $(grep -m1 "identidade: JWKS" <<<"${BOOT}" | cut -d' ' -f1) (instantâneo do boot; a alcançabilidade de AGORA não é re-medida aqui — teto Q_JWKS_REFETCH_STORM)"
+  fi
+else
+  NOT_PROVEN+=("JWKS não confirmou neste boot (Logto fora?): com auth enforce, TODO /chat dá 401 até voltar")
+fi
 # NRestarts ABSOLUTO: o stop e o start manuais ZERAM o contador (medido pelo refutador em 2026-10-16 numa unit de usuário
 # com Restart=always no systemd 255: 3 reinícios → stop → 0 → start → 0 → uma queda → 1). Qualquer valor acima de zero
 # é queda desde o último start manual (no update, o DESTE boot). (A 1ª redação comparava com o valor de antes do start e
@@ -106,8 +116,8 @@ elif [ "${NEW_RESTARTS}" -gt 0 ]; then
   NOT_PROVEN+=("o serviço reiniciou sozinho depois do start (NRestarts=${NEW_RESTARTS}): investigar o journal antes de confiar")
 fi
 # post_verify <rótulo> <wrapper em ${SELF_DIR}> <cura>: o rc é capturado SEM o set -e matar (o `|| rc=$?`), e as
-# linhas de FALHA vão ao stderr. 0 = provado · 1 = reprovou · outro = não mediu (trava, sudo, unit, o teto de 10 min
-# do timeout = 124) — os dois últimos entram em NOT_PROVEN, porque "não medi" nunca é "está bom". Cada entrada leva o
+# linhas de FALHA vão ao stderr. 0 = provado · 1 = reprovou · outro = não mediu (2 é o "não pude medir" declarado
+# pelos dois wrappers — trava, sudo -n, unit, alvo ilegível —; 124 é o teto de 10 min do timeout) — os dois últimos entram em NOT_PROVEN, porque "não medi" nunca é "está bom". Cada entrada leva o
 # comando que a cura para a frente.
 # O JUIZ É O SERVIDO: o verify roda do checkout do operador, que pode não ser o origin/main (um worktree de feature
 # julgaria o piso e as cópias com outro código). Ele só vale se for byte a byte o mesmo arquivo do clone servido,
@@ -200,7 +210,8 @@ if [ "${OLD_CLONE_HEAD}" = "${CLONE_REMOTE}" ] && [ "${OLD_BRIDGE_HEAD}" = "${BR
   log "NOOP — clone e bridge já em origin/main (${OLD_CLONE_HEAD:0:8} / ${OLD_BRIDGE_HEAD:0:8}), árvores limpas. Serviço intocado; re-verificando o boot vivo."
   NEW_CLONE_HEAD="${OLD_CLONE_HEAD}"
   INV="$(systemctl show "${UNIT}" -p InvocationID --value)"
-  BOOT="$(sudo journalctl "_SYSTEMD_INVOCATION_ID=${INV}" --no-pager 2>/dev/null || true)"
+  # -o short-iso: cada linha nasce com a sua data, e a do JWKS vai nomeada na linha do NOOP (o boot vivo pode ter dias)
+  BOOT="$(sudo journalctl "_SYSTEMD_INVOCATION_ID=${INV}" --no-pager -o short-iso 2>/dev/null || true)"
   grep -q "auth: enforce" <<<"${BOOT}" || NOT_PROVEN+=("o boot vivo (invocação ${INV:0:8}) não tem 'auth: enforce' no journal")
   post_update_checks noop
   log "NOOP OK — boot vivo (invocação ${INV:0:8}) verificado, nada a atualizar."

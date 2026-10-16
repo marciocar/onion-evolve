@@ -213,12 +213,18 @@ verify_live() {
   local pid uid gid out rc dp
   pid="$(systemctl show -p MainPID --value "${UNIT}" 2>/dev/null)" || return 2
   [[ "${pid}" =~ ^[1-9][0-9]*$ ]] || { say "a unit ${UNIT} não tem processo vivo (MainPID=${pid:-?})"; return 2; }
-  dp="$(systemctl show -p DropInPaths --value "${UNIT}" 2>/dev/null)"
+  dp="$(systemctl show -p DropInPaths --value "${UNIT}" 2>/dev/null)" || { say "NÃO MEDI: o systemctl show de ${UNIT} falhou (DropInPaths)"; return 2; }
   case " ${dp} " in *"/${DROPIN_NAME} "*) : ;; *) say "o ${DROPIN_NAME} NÃO está carregado na unit (DropInPaths: ${dp:-vazio})"; return 1 ;; esac
   uid="$(id -u "${SVC_USER}" 2>/dev/null)"; gid="$(id -g "${SVC_USER}" 2>/dev/null)"
   [ -n "${uid}" ] && [ -n "${gid}" ] || { say "não resolvi o uid/gid de ${SVC_USER}"; return 2; }
   out="$(check_script live | priv nsenter -t "${pid}" -m -S "${uid}" -G "${gid}" --wdns=/ -- sh -s 2>&1)"; rc=$?
   printf '%s\n' "${out}"
+  # NÃO MEDIU ≠ REPROVOU (2026-10-16, E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016): o sh de checagem SEMPRE imprime
+  # a linha n_fail=<N> por último. Sem ela, o sh nem chegou ao fim: o sudo -n pediu senha, o nsenter não entrou no
+  # namespace (MainPID que acabou de morrer, alvo ilegível) ou o sh caiu. Isso é rc 2 (não pude medir), nunca rc 1 —
+  # antes saía 1, e o update-bridge o rotulava "o verify REPROVOU" sem nada ter sido medido.
+  grep -qE '^n_fail=[0-9]+$' <<<"${out}" \
+    || { say "NÃO MEDI: o check no namespace do MainPID ${pid} não rodou até o fim (rc ${rc}; sudo -n, nsenter ou alvo ilegível): $(tail -1 <<<"${out}" | cut -c1-200)"; return 2; }
   [ "${rc}" = 0 ] && grep -qx 'n_fail=0' <<<"${out}" || return 1
   say "verify OK — namespace do MainPID ${pid}: $(grep -c '^OK ' <<<"${out}") checagem(ns), 0 falha"
 }
