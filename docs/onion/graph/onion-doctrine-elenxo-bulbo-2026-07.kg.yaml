@@ -548,6 +548,24 @@ nodes:
     trace: ".claude/validation/lint-selftest.sh"
     label: "O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objeto e o nó de costura ligado por S TRACES_TO D. Só a pergunta e o Elenxo os pegam. GATILHO: o 1º desses consolos achado depois de passar no gate."
 
+  - id: E_DISSECT_CAMPO_VAZIO_DESLOCAVA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-16"
+    verified_against: "origin/main 64e84e59: dissect-census.sh --check-verdict sobre 3 fixtures em scratch — critério vazio deu sem-x_dissect_criterion,superacao-id-invalido; veredito no meta: (id vazio) com critério e nenhuma medida deu RECUSADO (rc 1); overcoming vazio deu superacao-id-invalido. Com o separador \\037: só sem-x_dissect_criterion, rc 0 e sem-x_dissect_overcoming. Caso og-e1 reprova contra o mutante fiel (produtor e read em tab, ops/mutate-and-restore.sh aninhado)"
+    trace: ".claude/validation/dissect-census.sh"
+    label: "O GATE DO VEREDITO NEGATIVO ERRAVA DE CAMPO: com campo vazio no nó da reprovação, o read com IFS de tab colapsava os tabs e o vizinho tomava o lugar; o motivo impresso era o de outro campo. Cura: separador \\037."
+    narrative: "Tab é IFS-whitespace para o read do bash: tabs seguidos colapsam. Critério vazio saía com superacao-id-invalido (a medida caía em og_ov); um negativo com nenhuma medida declarado no meta: (id vazio, 1º campo) saía RECUSADO; overcoming vazio com medida saía superacao-id-invalido em vez de sem-x_dissect_overcoming. Os outros reads de tab da família (o do --check-verdict no mesmo script, os dois do dissect-plans.sh, os do evolve-census.sh e do kg-census-parity-check.sh) foram medidos: toda coluna nasce com padrão não-vazio ou o vazio só pode ser o último campo — declarado no código onde a invariante é frágil."
+    provenance:
+      source: "sinal da sessão de curadoria (2026-10-16), tratado como DADO e reproduzido no main"
+      locator: "dissect-census.sh, bloco ogm do ramo rejeitar/parquear; caso og-e1/og-e1m do lint-selftest.sh"
+      method: "medição: fixtures executadas contra o main e contra a branch, mais mutante fiel"
+      locality: "repo"
+
 edges:
   # as auto-incriminacoes reais sustentam a tese central (a forma prova a filosofia)
   - from: E_ZIMMERMAN_FIX
@@ -655,5 +673,8 @@ edges:
     to: D_SUPERACAO_TEM_DE_ENTREGAR
     edge_type: CONSTRAINS
   - from: D_SUPERACAO_TEM_DE_ENTREGAR
+    to: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
+    edge_type: CONSTRAINS
+  - from: E_DISSECT_CAMPO_VAZIO_DESLOCAVA
     to: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
     edge_type: CONSTRAINS
