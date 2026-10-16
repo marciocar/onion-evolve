@@ -1,0 +1,166 @@
+# kg-backlog-guard: on
+# ═══ TETO: 10 NÓS ═══ (nasce com 9: 7 da forja + D_MANTER_ATUALIZADO_E_ETERNO pelo selo + 1 de folga)
+meta:
+  id: keep-current-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-16"
+  review_after: "2026-11-16"
+  # Forja de GUARDA (/meta:forge-guard) da ordem do maestro de 2026-10-16: "base atual, sempre",
+  # declarada ETERNA no reforço seguinte. Doutrina: docs/knowledge-base/concepts/keep-current-doctrine.md.
+nodes:
+  - id: E_DEFEITO_SDK_DEFASADO_SEM_AVISO
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-16'
+    verified_against: "sudo -n -u onion head do package.json do @anthropic-ai/claude-agent-sdk servido pelo bridge: version 0.3.301; npm view @anthropic-ai/claude-agent-sdk dist-tags: latest 0.3.302; npm view @anthropic-ai/claude-code dist-tags: latest 2.1.302, stable 2.1.292; CLAUDE_CODE_EXECPATH da sessão em 2.1.301 com o disco em 2.1.302"
+    trace: '.claude/validation/currency-census.sh'
+    label: 'O DEFEITO, DATADO: em 2026-10-16 o Agent SDK que serve o bridge estava em 0.3.301 com o npm já em 0.3.302, e nenhuma superfície avisou. A defasagem foi achada pelo maestro, não pela maquinaria.'
+    narrative: 'O DEFEITO, DATADO: em 2026-10-16 o Agent SDK que serve o bridge estava em 0.3.301 com o npm já em 0.3.302, e nenhuma superfície avisou. O hook de drift só compara processo × disco do CLI do host; o censo do /meta:cc-update compara o SDK com o CLI do HOST, não com o publicado, e só roda quando o maestro o invoca. A defasagem foi achada pelo maestro, não pela maquinaria.'
+    provenance:
+      source: "⟨o host do core⟩: registro npm e o SDK servido pelo bridge"
+      locator: "npm view @anthropic-ai/claude-agent-sdk dist-tags --json; leitura do package.json do SDK servido como a conta dona (sudo -n, ambiente limpo)"
+      method: "medição: comandos executados na sessão de 2026-10-16"
+      locality: "repo"
+
+  - id: E_PREAMBULO_SO_NO_SCRATCHPAD
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-16'
+    verified_against: "git grep 'BASE ATUAL, SEMPRE' em origin/main 9ae5e233: zero ocorrência; a regra existia só no agent-preamble.md do scratchpad da sessão"
+    trace: '.claude/commands/common/prompts/execution-agent-preamble.md'
+    label: 'A REGRA EVAPORAVA: a ordem "base atual, sempre" vivia só no preâmbulo de agente do scratchpad da sessão; nenhum arquivo versionado a continha. Foi levada a um fragmento versionado.'
+    narrative: 'A REGRA EVAPORAVA: o preâmbulo dos agentes de execução, onde a ordem "base atual, sempre" foi escrita, vivia só no scratchpad da sessão. Nenhum arquivo versionado a continha. O maestro disse no reforço que ela é eterna, "não só em memória e sessão"; o preâmbulo foi levado para um fragmento versionado sem os dados da sessão.'
+    provenance:
+      source: "origin/main 9ae5e233"
+      locator: "git grep -n 'BASE ATUAL, SEMPRE' 9ae5e233"
+      method: "medição: git grep no core antes da forja"
+      locality: "repo"
+
+  - id: E_DOGFOOD_CACHE_ENVENENADO
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-16'
+    verified_against: "1º disparo do hook na VPS depois de uma perfilagem com ONION_CURRENCY_GIT vazio: o aviso declarou o git AUSENTE e omitiu a base; curado com a chave do cache cobrindo toda fonte trocável e o registro do npm/PyPI; caso (j) da bancada, mutante M4"
+    trace: '.claude/validation/currency-census.sh'
+    label: 'O DOGFOOD ACHOU O QUE A BANCADA NÃO TINHA: o cache do censo era chaveado só pelo repo, e uma leitura com fonte trocada virou a resposta de produção (o 1º aviso real disse que o git faltava). Cura: a chave cobre toda fonte trocável.'
+    narrative: 'O DOGFOOD ACHOU O DEFEITO QUE A BANCADA NÃO TINHA: o cache do censo era chaveado só pelo repo, então uma leitura com fonte trocada (perfilagem, bancada, registro inalcançável simulado) virava a resposta da leitura de produção na hora seguinte. O 1º aviso real disse que o git faltava numa máquina que tem git. Cura: a chave cobre repo, cada fonte trocável, a conta e o registro configurado.'
+    provenance:
+      source: ".claude/validation/currency-census.sh"
+      locator: "bloco do cache (a chave) e caso (j) de run_currency_census_selftests"
+      method: "medição: disparo real do hook na sessão de 2026-10-16"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_HOOK_DE_AVISO
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: done
+    verified_at: '2026-10-16'
+    verified_against: "guard-census 2026-10-16: nenhuma guarda da classe (busca 'version drift stale outdated'); molde = session-version-drift.sh (UserPromptSubmit, aviso 1× por sessão e estado); família currency_census 23/23 com LC_ALL=C e 11 mutantes"
+    trace: '.claude/hooks/session-currency-check.sh'
+    label: 'O SUBSTRATO: hook UserPromptSubmit que AVISA (molde session-version-drift), sobre um medidor com cache de 1 h. Sem veto exit 2: toda superfície depende de registro de terceiro e de rede, e vetar quando o npm publica é falso positivo por construção.'
+    narrative: 'O SUBSTRATO: hook UserPromptSubmit que AVISA, copiado do session-version-drift (sessões vivem dias; só um hook ao longo da sessão vê a defasagem nascer), sobre um medidor separado com cache de 1 h. Sem veto exit 2: toda superfície depende de registro de terceiro e de rede, e vetar no minuto em que o npm publica é falso positivo por construção (cláusula 4 da doutrina de guardas). Não duplica o drift processo × disco nem o censo do cc-update: lê os MESMOS alvos de SDK dele, no mesmo formato.'
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "GUARD_CENSUS_QUERY='version drift stale outdated ' bash .claude/validation/guard-census.sh . --markdown"
+      method: "medição: censo de guardas antes da forja"
+      locality: "repo"
+
+  - id: C_TETO_LATEST_NAO_E_ESTABILIDADE
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-16'
+    verified_against: "npm view @anthropic-ai/claude-code dist-tags: stable 2.1.292 × latest 2.1.302; o host não declara autoUpdatesChannel, logo segue latest"
+    label: 'TETO 1: o censo compara com o que o registro publica no canal, não com o que é seguro adotar. Pacote com pino de contrato sobe no produto que fixa o pino. Versão nova que quebra se acha no dogfood, não aqui.'
+    narrative: 'TETO 1: o censo compara com o que o REGISTRO publica no canal, não com o que é seguro adotar. Para o CLI o canal é o que o host segue (latest por padrão, lido do autoUpdatesChannel); para os pacotes com pino de contrato (PyYAML e jsonschema do leitor do KG-SSOT) a subida é do produto, e a ação diz isso. Versão nova que quebra se acha no dogfood, não aqui.'
+    provenance:
+      source: "registro npm"
+      locator: "npm view @anthropic-ai/claude-code dist-tags --json"
+      method: "medição: comando executado em 2026-10-16"
+      locality: "web"
+
+  - id: C_TETO_SUBAGENTE_SEM_HOOK
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: '2026-10-16'
+    verified_against: "o hook registrado é UserPromptSubmit no settings.json do projeto; subagente não recebe prompt do usuário; o fechamento de PR já rebaseia sobre a origin/main antes de enviar"
+    trace: '.claude/commands/common/prompts/execution-agent-preamble.md'
+    label: 'TETO 2: subagente não dispara UserPromptSubmit, então o hook não o cobra; a regra chega pelo preâmbulo versionado (que manda rodar o censo) e o fechamento de PR rebaseia sobre a origin/main.'
+    narrative: 'TETO 2: subagente não dispara UserPromptSubmit, então o hook não o cobra. A regra chega a ele pelo preâmbulo versionado, que manda rodar o censo antes de construir, e a base velha é barrada no fim pelo rebase do fechamento de PR. A base que o hook mede é a do checkout da sessão principal, não a de uma worktree de agente.'
+    provenance:
+      source: ".claude/settings.json"
+      locator: "hooks.UserPromptSubmit (session-currency-check.sh)"
+      method: "leitura: registro do hook no settings do projeto"
+      locality: "repo"
+
+  - id: C_TETO_SUPERFICIES_LISTADAS
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-16'
+    verified_against: "cabeçalho do currency-census.sh: cinco superfícies (claude-cli, agent-sdk, kg-ssot, python PyYAML/jsonschema, base)"
+    trace: '.claude/validation/currency-census.sh'
+    label: 'TETO 3: só as superfícies listadas são medidas: CLI do host, Agent SDK de quem serve, vendor kg-ssot, PyYAML e jsonschema do python do lint, e a base. Pacotes do sistema, node/npm, o lock de outro repo e as transitivas ficam fora; ampliar é editar o censo com caso de bancada.'
+    provenance:
+      source: ".claude/validation/currency-census.sh"
+      locator: "cabeçalho, bloco AS SUPERFÍCIES"
+      method: "leitura: cabeçalho do medidor"
+      locality: "repo"
+  - id: D_MANTER_ATUALIZADO_E_ETERNO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «manter atualizado é eterno»"
+    label: "ORDEM DO MAESTRO, 2026-10-16: usar sempre as versões mais atuais e nunca construir sobre base velha; faltou pacote, pedir autorização e instalar. E a ordem é ETERNA: vive como doutrina versionada e como gatilho que cobra, não em memória nem em sessão."
+    narrative: "Selado por /meta:decide em 2026-10-16: escolhida «manter atualizado é eterno» (resposta livre do maestro, fora das opções oferecidas); descartadas: «só em memória e sessão»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «ordem do maestro em dois reforços: 'temos que usar sempre as versões mais atuais e não sair criando coisas em cima de base velha' e 'este aviso anterior de manter atualizado é eterno, não só em memoria e sessão'»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
+
+edges:
+  - from: E_DEFEITO_SDK_DEFASADO_SEM_AVISO
+    to: D_SUBSTRATO_HOOK_DE_AVISO
+    edge_type: SUPPORTS
+  - from: E_PREAMBULO_SO_NO_SCRATCHPAD
+    to: D_SUBSTRATO_HOOK_DE_AVISO
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_CACHE_ENVENENADO
+    to: D_SUBSTRATO_HOOK_DE_AVISO
+    edge_type: SUPPORTS
+  - from: C_TETO_LATEST_NAO_E_ESTABILIDADE
+    to: D_SUBSTRATO_HOOK_DE_AVISO
+    edge_type: CONSTRAINS
+  - from: C_TETO_SUBAGENTE_SEM_HOOK
+    to: D_SUBSTRATO_HOOK_DE_AVISO
+    edge_type: CONSTRAINS
+  - from: C_TETO_SUPERFICIES_LISTADAS
+    to: D_SUBSTRATO_HOOK_DE_AVISO
+    edge_type: CONSTRAINS
+  - from: D_MANTER_ATUALIZADO_E_ETERNO
+    to: E_PREAMBULO_SO_NO_SCRATCHPAD
+    edge_type: SUPPORTS

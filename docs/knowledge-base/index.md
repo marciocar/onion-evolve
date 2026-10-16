@@ -77,6 +77,7 @@ docs/knowledge-base/
 - [Transfer Heuristic (Aristóteles)](concepts/transfer-heuristic-aristotle.md) — **CANDIDATO** — régua de transferência *igual → transfere / diferente → desenha* (lente de Aristóteles); invocada por `/meta:adopt`
 - [Transformer Architecture](concepts/transformer-architecture.md) — Transformer: a arquitetura por trás do reasoner do Onion
 - [Verify-External-for-Current](concepts/verify-external-for-current.md) — forcing function: claim sobre atual/emergente/popular (versão·device·player·framework·tendência) ⇒ verify externo (web) obrigatório; WebFetch é budget separado do WebSearch; sem verificar → declarar "não verificado". O `verify(vivo)` do SSOT-as-runtime aplicado ao mundo externo
+- [Base atual, sempre](concepts/keep-current-doctrine.md) — ordem eterna do maestro (2026-10-16): construir sobre a origin/main recém-buscada e as versões atuais; defasagem é subida ou nomeada; faltou pacote ⇒ pedir autorização e instalar. Cobrada pelo hook `session-currency-check.sh` (medidor `currency-census.sh`)
 - [Worklog Protocol](concepts/worklog-protocol.md) — sessões retomáveis com eficácia de IA (STATE.md, leitura Tier 0→3, checkpoint)
 
 ---
