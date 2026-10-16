@@ -38818,24 +38818,31 @@ run_cc_delta_census_selftests() {
      && ! LC_ALL=C grep -q '^external_edges:' "${g}"; then
     record_pass "cc-delta-census: (i) o esqueleto ensina external_edges SUPERSEDES sobre a rodada anterior, comentado, sem a chave velha"
   else record_fail "cc-delta-census: (i)" "forma da Aufhebung no esqueleto: $(LC_ALL=C grep -n 'external_edges\|supersedes' "${g}" 2>/dev/null | head -5 | tr '\n' ' ')"; fi
-  # (j)–(n) o CLI EMBUTIDO no Agent SDK de quem serve (SAC-155, rodada r12 de 2026-10-16): o host media 2.1.301 e o
-  #     bridge rodava o 2.1.232 do SDK 0.3.232, invisível ao censo. Fixture: um SDK falso no sandbox (package.json +
-  #     binário que responde --version), alvo com conta `-`; produção não é tocada.
-  local sdk="${sb}/sdk" tg="${sb}/targets.tsv" tab; tab="$(printf '\t')"
-  mkdir -p "${sdk}/claude-agent-sdk" "${sdk}/linux-x64"
-  printf '{"name":"@anthropic-ai/claude-agent-sdk","version":"0.3.1","claudeCodeVersion":"1.0.1"}\n' > "${sdk}/claude-agent-sdk/package.json"
-  printf '#!/bin/sh\necho "1.0.1 (Claude Code)"\n' > "${sdk}/linux-x64/claude"; chmod +x "${sdk}/linux-x64/claude"
-  printf '# comentário\nbridge\t-\t%s\t%s\n' "${sdk}/claude-agent-sdk/package.json" "${sdk}/linux-x64/claude" > "${tg}"
+  # (j)–(u) o CLI EMBUTIDO no Agent SDK de quem serve (SAC-155, rodada r12 de 2026-10-16): o host media 2.1.301 e o
+  #     bridge rodava o 2.1.232 do SDK 0.3.232, invisível ao censo. Fixture: um SDK falso no sandbox, na forma do
+  #     pacote (node_modules/@anthropic-ai/claude-agent-sdk + o irmão -linux-x64/claude), alvo com conta `-`;
+  #     produção não é tocada. TETO: o ramo `sudo -n -u <conta>` e o `timeout 30` não são exercidos (exigiriam
+  #     outra conta e um binário que trava) — o dogfood na VPS mede o primeiro.
+  local nm="${sb}/sdk/node_modules/@anthropic-ai" tg="${sb}/targets.tsv" tab yml; tab="$(printf '\t')"
+  local pk="${nm}/claude-agent-sdk/package.json" bn="${nm}/claude-agent-sdk-linux-x64/claude"
+  mkdir -p "${nm}/claude-agent-sdk" "${nm}/claude-agent-sdk-linux-x64"
+  printf '{"name":"@anthropic-ai/claude-agent-sdk","version":"0.3.1","claudeCodeVersion":"1.0.1"}\n' > "${pk}"
+  printf '#!/bin/sh\necho "1.0.1 (Claude Code)"\n' > "${bn}"; chmod +x "${bn}"
+  printf '# comentário\n  # indentado\n\nbridge\t-\t%s\t%s\n' "${pk}" "${bn}" > "${tg}"
+  _ccd_sdk() {  # <arquivo de alvos> [--markdown|--tsv] [disco]: roda o SUT com o CHANGELOG da bancada
+    CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK="${3:-1.0.3}" CC_DELTA_PROC= CC_DELTA_SDK_TARGETS="$1" \
+      bash "${sut}" "${sb}/r" "${2:---tsv}" 2>&1
+  }
   # (j) alvo medido pelo BINÁRIO, 2 versões publicadas atrás do host (1.0.2 e 1.0.3): linha na tabela + aviso com N
-  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= CC_DELTA_SDK_TARGETS="${tg}" bash "${sut}" "${sb}/r" --markdown 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(_ccd_sdk "${tg}" --markdown)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && LC_ALL=C grep -qF '| SDK `bridge` (CLI embutido, binário --version) | 1.0.1 (SDK 0.3.1) |' <<< "${out}" \
      && LC_ALL=C grep -qF 'o CLI do SDK bridge (1.0.1, SDK 0.3.1) está 2 versão(ões) publicada(s) atrás do host (1.0.3)' <<< "${out}"; then
     record_pass "cc-delta-census: (j) o CLI do SDK entra na tabela de versões e o veredito avisa N versões atrás do host"
   else record_fail "cc-delta-census: (j)" "rc=${rc} $(_emit "${out}" | LC_ALL=C grep -E 'SDK|atrás' | head -3 | tr '\n' ' ')"; fi
-  # (k) alvo INALCANÇÁVEL → NÃO MEDIDO com rc na linha e no aviso, nunca versão vazia; o rc do censo segue 0
-  printf 'sumido\t-\t%s\t%s\n' "${sb}/nao-ha/package.json" "${sb}/nao-ha/claude" > "${sb}/t-sumido.tsv"
-  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= CC_DELTA_SDK_TARGETS="${sb}/t-sumido.tsv" bash "${sut}" "${sb}/r" --tsv 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -q "^sdk${tab}sumido${tab}nao_medido${tab}package.json rc=1, binário rc=12[67]" <<< "${out}" \
+  # (k) alvo INALCANÇÁVEL (na forma, mas ausente) → NÃO MEDIDO com rc na linha e no aviso; o rc do censo segue 0
+  printf 'sumido\t-\t%s\t%s\n' "${sb}/x/node_modules/@anthropic-ai/claude-agent-sdk/package.json" "${sb}/x/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude" > "${sb}/t-sumido.tsv"
+  if out="$(_ccd_sdk "${sb}/t-sumido.tsv")"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -q "^sdk${tab}sumido${tab}nao_medido${tab}package.json rc=1.*; binário rc=12[67]" <<< "${out}" \
      && LC_ALL=C grep -q "^aviso${tab}SDK sumido: NÃO MEDIDO (package.json rc=1" <<< "${out}"; then
     record_pass "cc-delta-census: (k) alvo inalcançável → NÃO MEDIDO com rc (linha e aviso), censo rc 0"
   else record_fail "cc-delta-census: (k)" "rc=${rc} $(_emit "${out}" | LC_ALL=C grep -E '^(sdk|aviso)' | head -3 | tr '\t\n' '  ')"; fi
@@ -38850,8 +38857,9 @@ run_cc_delta_census_selftests() {
     record_pass "cc-delta-census: (l) sem alvos declara sem_alvo; o arquivo de alvos default do repo é lido"
   else record_fail "cc-delta-census: (l)" "rc=${rc} sem=[$(LC_ALL=C grep '^sdk' <<< "${g}" | tr '\t' ' ')] com=[$(LC_ALL=C grep '^sdk' <<< "${out}" | tr '\t' ' ')]"; fi
   # (m) binário e package.json DIVERGEM → vale o binário (o que roda) e o aviso nomeia a divergência
-  printf '{"version":"0.3.1","claudeCodeVersion":"1.0.2"}\n' > "${sdk}/claude-agent-sdk/package.json"
-  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= CC_DELTA_SDK_TARGETS="${tg}" bash "${sut}" "${sb}/r" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  printf '{"version":"0.3.1","claudeCodeVersion":"1.0.2"}\n' > "${pk}"
+  if out="$(_ccd_sdk "${tg}")"; then rc=0; else rc=$?; fi
+  printf '{"name":"@anthropic-ai/claude-agent-sdk","version":"0.3.1","claudeCodeVersion":"1.0.1"}\n' > "${pk}"
   if [ "${rc}" -eq 0 ] && LC_ALL=C grep -q "^sdk${tab}bridge${tab}1.0.1${tab}" <<< "${out}" \
      && LC_ALL=C grep -qF 'o binário responde 1.0.1 e o package.json declara claudeCodeVersion 1.0.2' <<< "${out}"; then
     record_pass "cc-delta-census: (m) binário e pacote divergem → vale o binário, divergência avisada"
@@ -38860,6 +38868,71 @@ run_cc_delta_census_selftests() {
   if LC_ALL=C grep -q "override ativo.*CC_DELTA_SDK_TARGETS=${tg}" <<< "${out}"; then
     record_pass "cc-delta-census: (n) CC_DELTA_SDK_TARGETS é declarado como override"
   else record_fail "cc-delta-census: (n)" "override da variável de alvos não declarado: $(_emit "${out}" | head -1)"; fi
+  # (o) FORMA FECHADA (refutador, passada 1: um alvo rodou como uid 0 e leu /etc/shadow): conta root, pacote fora
+  #     de node_modules/@anthropic-ai/claude-agent-sdk e binário fora da mesma árvore são recusados SEM executar nada
+  local spy="${nm}/claude-agent-sdk-linux-x64/spy"; rm -f "${sb}/spy-ran"
+  printf '#!/bin/sh\ntouch %s\necho 9.9.9\n' "${sb}/spy-ran" > "${spy}"; chmod +x "${spy}"
+  printf 'raiz\troot\t%s\t%s\nfora\t-\t/etc/passwd\t-\noutro\t-\t%s\t%s\ncinco\t-\t%s\t%s\textra\n' "${pk}" "${bn}" "${pk}" "${spy}" "${pk}" "${bn}" > "${sb}/t-forma.tsv"
+  if out="$(_ccd_sdk "${sb}/t-forma.tsv")"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ ! -e "${sb}/spy-ran" ] \
+     && LC_ALL=C grep -q "^sdk${tab}raiz${tab}nao_medido${tab}.*conta recusada" <<< "${out}" \
+     && LC_ALL=C grep -q "^sdk${tab}fora${tab}nao_medido${tab}.*o package.json tem de ser" <<< "${out}" \
+     && LC_ALL=C grep -q "^sdk${tab}outro${tab}nao_medido${tab}.*o binário tem de ser" <<< "${out}" \
+     && LC_ALL=C grep -q "^sdk${tab}(linha 4)${tab}nao_medido${tab}linha 4 do arquivo de alvos com 5 coluna(s), não 4" <<< "${out}"; then
+    record_pass "cc-delta-census: (o) conta root, pacote e binário fora da forma são recusados sem executar nada"
+  else record_fail "cc-delta-census: (o)" "rc=${rc} spy=$([ -e "${sb}/spy-ran" ] && echo RODOU || echo não) $(_emit "${out}" | LC_ALL=C grep '^sdk' | tr '\t\n' '  ')"; fi
+  # (p) MEIA-FALHA nunca some: binário rc 0 sem versão → vale o pacote, com fonte anotada E aviso próprio;
+  #     pacote ausente com binário bom → vale o binário, com aviso de que o cruzamento não aconteceu
+  printf '#!/bin/sh\necho "usage: claude"\n' > "${bn}"
+  if out="$(_ccd_sdk "${tg}")"; then rc=0; else rc=$?; fi
+  g="${out}"; printf '#!/bin/sh\necho "1.0.1 (Claude Code)"\n' > "${bn}"; mv "${pk}" "${pk}.off"
+  if out="$(_ccd_sdk "${tg}")"; then :; else rc=$?; fi
+  mv "${pk}.off" "${pk}"
+  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -qx "sdk${tab}bridge${tab}1.0.1${tab}0.3.1${tab}package.json claudeCodeVersion (binário NÃO respondeu)" <<< "${g}" \
+     && LC_ALL=C grep -qF 'SDK bridge: binário rc=0 SEM versão na saída — a versão 1.0.1 é a DECLARADA pelo pacote' <<< "${g}" \
+     && LC_ALL=C grep -qx "sdk${tab}bridge${tab}1.0.1${tab}-${tab}binário --version" <<< "${out}" \
+     && LC_ALL=C grep -qF 'SDK bridge: package.json rc=1' <<< "${out}" && LC_ALL=C grep -qF 'sem a declaração cruzada' <<< "${out}"; then
+    record_pass "cc-delta-census: (p) meia-falha (binário sem versão, pacote ausente) gera aviso próprio, nunca some"
+  else record_fail "cc-delta-census: (p)" "rc=${rc} a=[$(LC_ALL=C grep -E '^(sdk|aviso.*SDK bridge:)' <<< "${g}" | tr '\t\n' '  ')] b=[$(LC_ALL=C grep -E '^(sdk|aviso.*SDK bridge:)' <<< "${out}" | tr '\t\n' '  ')]"; fi
+  # (q) dois alvos, o 1º binário LÊ o stdin: o 2º ainda é medido (sem o `< /dev/null` o binário comia o arquivo de
+  #     alvos); e a linha com CRLF é lida (o `\r` grudava no caminho do binário)
+  local nm2="${sb}/sdk2/node_modules/@anthropic-ai"
+  mkdir -p "${nm2}/claude-agent-sdk" "${nm2}/claude-agent-sdk-linux-x64"
+  printf '{"version":"0.3.4","claudeCodeVersion":"1.0.4"}\n' > "${nm2}/claude-agent-sdk/package.json"
+  printf '#!/bin/sh\ncat > /dev/null\necho 1.0.4\n' > "${nm2}/claude-agent-sdk-linux-x64/claude"; chmod +x "${nm2}/claude-agent-sdk-linux-x64/claude"
+  printf 'come\t-\t%s\t%s\r\nbridge\t-\t%s\t%s\r\n' "${nm2}/claude-agent-sdk/package.json" "${nm2}/claude-agent-sdk-linux-x64/claude" "${pk}" "${bn}" > "${sb}/t-dois.tsv"
+  if out="$(_ccd_sdk "${sb}/t-dois.tsv")"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -qx "sdk${tab}come${tab}1.0.4${tab}0.3.4${tab}binário --version" <<< "${out}" \
+     && LC_ALL=C grep -qx "sdk${tab}bridge${tab}1.0.1${tab}0.3.1${tab}binário --version" <<< "${out}" \
+     && LC_ALL=C grep -qF 'o CLI do SDK come (1.0.4) está À FRENTE do host (1.0.3)' <<< "${out}"; then
+    record_pass "cc-delta-census: (q) binário que lê stdin não come os alvos seguintes; CRLF lido; SDK à frente avisado"
+  else record_fail "cc-delta-census: (q)" "rc=${rc} $(_emit "${out}" | LC_ALL=C grep -E '^(sdk|aviso.*FRENTE)' | tr '\t\n' '  ')"; fi
+  # (r) arquivo só de comentários → aviso de que não declara alvo (não fica mudo); pré-release do binário avisado
+  printf '# nada\n\n' > "${sb}/t-vazio.tsv"
+  if out="$(_ccd_sdk "${sb}/t-vazio.tsv")"; then rc=0; else rc=$?; fi
+  g="${out}"
+  if out="$(_ccd_sdk "${sb}/nao-existe.tsv")"; then :; else rc=$?; fi
+  g="${g}${out}"; printf '#!/bin/sh\necho "1.0.2-beta.3 (Claude Code)"\n' > "${bn}"
+  if out="$(_ccd_sdk "${tg}")"; then :; else rc=$?; fi
+  printf '#!/bin/sh\necho "1.0.1 (Claude Code)"\n' > "${bn}"
+  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -q "^sdk${tab}(alvos)${tab}nao_medido${tab}.*não declara nenhum alvo" <<< "${g}" \
+     && LC_ALL=C grep -q "^sdk${tab}(alvos)${tab}nao_medido${tab}o arquivo de alvos declarado não existe" <<< "${g}" \
+     && LC_ALL=C grep -qF 'SDK bridge: o binário responde 1.0.2-beta.3, um PRÉ-RELEASE' <<< "${out}"; then
+    record_pass "cc-delta-census: (r) arquivo sem alvo ou inexistente é avisado; pré-release do binário é avisado"
+  else record_fail "cc-delta-census: (r)" "rc=${rc} $(_emit "${g}${out}" | LC_ALL=C grep -E '^(sdk|aviso.*PRÉ)' | tr '\t\n' '  ')"; fi
+  # (s) o ESQUELETO (--write) carrega a versão do SDK no verified_against, e rótulo de linha malformada com aspas e
+  #     barra não quebra o YAML (refutador, passada 1: entrava cru e o PyYAML reprovava o grafo)
+  printf 'x"y\\z\t-\t/a\t-\nbridge\t-\t%s\t%s\n' "${pk}" "${bn}" > "${sb}/t-write.tsv"
+  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= CC_DELTA_TODAY=2026-10-08 CC_DELTA_SDK_TARGETS="${sb}/t-write.tsv" \
+       bash "${sut}" "${sb}/r" --tsv --write "${sb}/w/radar-E3-2026-10-08-r9s" 2>&1)"; then rc=0; else rc=$?; fi
+  yml="${sb}/w/radar-E3-2026-10-08-r9s/radar-E3-2026-10-08-r9s.kg.yaml"
+  if [ "${rc}" -ne 0 ] || ! LC_ALL=C grep -qF ', SDK (linha 1) NÃO MEDIDO, SDK bridge 1.0.1"' "${yml}" 2>/dev/null; then
+    record_fail "cc-delta-census: (s)" "rc=${rc} $(LC_ALL=C grep -m1 'verified_against: "CHANGELOG' "${yml}" 2>/dev/null)"
+  elif ! python3 -c 'import yaml' >/dev/null 2>&1; then
+    record_skip "cc-delta-census: (s) PyYAML ausente — a linha do SDK está no esqueleto, o parse NÃO verificado"
+  elif python3 -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1]))' "${yml}" >/dev/null 2>&1; then
+    record_pass "cc-delta-census: (s) o esqueleto leva a versão do SDK e o rótulo malformado não quebra o YAML"
+  else record_fail "cc-delta-census: (s)" "o esqueleto com alvo malformado não é YAML válido"; fi
   # (e) o ESQUELETO escrito em (a) passa no radar (--integrity --schema) e no contrato v3
   g="${sb}/w/radar-E3-2026-10-08-r9/radar-E3-2026-10-08-r9.kg.yaml"
   if [ ! -f "${g}" ]; then record_fail "cc-delta-census: (e)" "esqueleto não escrito em ${g}"
