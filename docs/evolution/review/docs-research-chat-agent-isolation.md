@@ -2,7 +2,8 @@
 branch: docs/research-chat-agent-isolation
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 81d4203ede133bcb9a84c29f3d0f04466e13afbdafd8f7e1b27d9d919ba56720
+reviewed_code_sha256: 388b485b779aff3141376b584dc924b2928ac994590db152411cf36decae7a6a
 findings_total: 3
 findings_real: 3
 tokens: 96064
