@@ -204,7 +204,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -8439,6 +8439,11 @@ run_moat_gate_selftests() {
   if [ -f "${REPO_ROOT}/ops/a2a-queue-live.sh" ]; then
     _queue_ok=1; _mg_map "${REPO_ROOT}/ops/a2a-queue-live.sh" > "${d}/proj/ops/a2a-queue-live.sh"
   fi
+  # o wrapper do drop-in de integridade do bridge (2026-10-16), RASTREADO e com os caminhos mapeados como o TSV
+  local _bh_ok=0
+  if [ -f "${REPO_ROOT}/ops/bridge-hardening.sh" ]; then
+    _bh_ok=1; _mg_map "${REPO_ROOT}/ops/bridge-hardening.sh" > "${d}/proj/ops/bridge-hardening.sh"
+  fi
   git init -q -b main "${d}/adotante"
   git -C "${d}/adotante" remote add origin https://github.com/onion-bancada/adotante.git
   mkdir -p "${d}/adotante/docs/evolution/inbound"
@@ -8463,6 +8468,7 @@ EOF
     cp "${d}/proj/.claude/utils/federation-transport/a2a-invite.sh" "${d}/scratch/renomeado.sh"
     printf '#!/usr/bin/env bash\n# lembrete: o a2a-invite.sh create só pelo wrapper\nls -la /var/www/onion-landing\n' > "${d}/scratch/so-leitura.sh"
   fi
+  [ "${_bh_ok}" = 1 ] && cp "${d}/proj/ops/bridge-hardening.sh" "${d}/scratch/bh-copia.sh"
   # a cópia NÃO rastreada do wrapper da fila e o script mínimo com função que embrulha sudo (2026-10-15)
   if [ "${_queue_ok}" = 1 ]; then
     cp "${d}/proj/ops/a2a-queue-live.sh" "${d}/scratch/queue-copia.sh"
@@ -8822,6 +8828,29 @@ EOF" "${L}" \
     fi
   else
     record_skip "moat-gate: (p*) sem ops/a2a-queue-live.sh — casos da fila A2A pulados"
+  fi
+  # ── o drop-in de integridade do bridge (2026-10-16): só o wrapper escreve o 30-integrity.conf e os placeholders ──
+  if [ "${_bh_ok}" = 1 ]; then
+    local BHD BHS; BHD="$(awk -F'\t' '$4=="ops/bridge-hardening.sh" && $3 ~ /\.conf$/ {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    BHS="$(awk -F'\t' '$4=="ops/bridge-hardening.sh" && $3 ~ /settings\.json$/ {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    if [ -z "${BHD}" ] || [ -z "${BHS}" ]; then record_fail "moat-gate: (b0)" "ops/moat-targets.tsv sem as linhas do ops/bridge-hardening.sh (core-only)"
+    else
+    _mgcase "(b1) tee direto no drop-in de integridade → VETO nomeando o wrapper (mais específico que /etc/systemd)" "2:ops/bridge-hardening.sh" "${P}" \
+      "sudo tee ${BHD} < drop.conf" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
+    _mgcase "(b2) placeholder do settings.json da conta do serviço escrito à mão → VETO nomeando o wrapper" "2:ops/bridge-hardening.sh" "${P}" \
+      "sudo -u svc sh -c 'echo {} > ${BHS}'" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
+    _mgcase "(b3) o wrapper VERSIONADO (com o drop-in citado na linha) → passa" 0 "${P}" \
+      "bash ops/bridge-hardening.sh install --apply && echo \"drop-in em ${BHD}\"" "${J}" \
+      '    if _moat_versioned(p) and not copied:' '    if False:'
+    _mgcase "(b4) modo de teste do wrapper na linha de comando → FECHA" "2:modo de teste do wrapper do drop-in" "${P}" \
+      "export ONION_BRIDGE_HARDENING_TEST=1; ONION_BRIDGE_HARDENING_DROPIN_DIR=/tmp/x bash ops/bridge-hardening.sh show" "${J}" \
+      '_moat_emit("inanalisavel", "ONION_BRIDGE_HARDENING_TEST",' '(lambda *a: None)("inanalisavel", "ONION_BRIDGE_HARDENING_TEST",'
+    _mgcase "(b5) CÓPIA do wrapper fora do projeto → FECHA (o nome do wrapper + alvo no corpo)" "2:cópia não versionada de um wrapper" "${P}" \
+      "bash ${d}/scratch/bh-copia.sh install --apply" "${J}" \
+      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live",)'
+    fi
+  else
+    record_skip "moat-gate: (b*) sem ops/bridge-hardening.sh — casos do drop-in de integridade pulados"
   fi
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
@@ -9189,6 +9218,286 @@ PY
   _qlcase "(q29) list em texto não imprime caractere de controle vindo do remetente" \
     'o={k: ("".join(c for c in v if c.isprintable()) if isinstance(v, str) else v) for k, v in json.loads(sys.argv[1]).items()}' \
     'o=json.loads(sys.argv[1])' _c_ansi
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo bridge-hardening (2026-10-16) — o wrapper core-only do DEGRAU 1 do isolamento do /chat: o drop-in de
+# INTEGRIDADE do onion-vps-bridge (ReadOnlyPaths no código que o serviço executa e na raiz de confiança do A2A,
+# InaccessiblePaths na chave de deploy e no PAT). Defeito datado: a home da conta do serviço inteira era gravável
+# dentro da unit (medido no namespace vivo: src/, jwks/ e .bashrc rw; o .git-credentials legível). Cada caso roda o
+# wrapper REAL em MODO DE TESTE DECLARADO (ONION_BRIDGE_HARDENING_TEST=1: home, estado e drop-ins de sandbox) com
+# systemctl, systemd-run, nsenter, journalctl, findmnt e curl FALSOS no PATH e um `sudo` STUB que sai 97 — nenhum
+# caso, nem mutante, alcança a unit real. O namespace é simulado por permissão (só-leitura = sem bit de escrita;
+# inacessível = 000), então a família não roda como root. CADA caso tem MUTANTE, provado por _prove_mutation.
+# ---------------------------------------------------------------------------
+run_bridge_hardening_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/bridge-hardening.sh"
+  if [ ! -f "${wr}" ]; then record_skip "bridge-hardening: sem ops/bridge-hardening.sh (core-only) — nada a testar"; return; fi
+  command -v flock >/dev/null 2>&1 || { record_skip "bridge-hardening: flock ausente → pulado"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "bridge-hardening: python3 ausente → pulado"; return; }
+  [ "$(id -u)" = 0 ] && { record_skip "bridge-hardening: rodando como root (a simulação do namespace é por permissão) → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/stub" "${d}/fake" "${d}/st"
+  printf '#!/bin/sh\necho "sudo-stub: a bancada nunca chama sudo" >&2\nexit 97\n' > "${d}/stub/sudo"
+  # apply.sh [--save <arq>] --file <arq>: aplica ReadOnlyPaths= (tira a escrita) e InaccessiblePaths= (000) ao sandbox; com
+  # --save <arq> guarda os modos anteriores para o systemd-run falso restaurar (a unit transitória não persiste)
+  cat > "${d}/fake/apply.sh" <<'EOF'
+#!/bin/sh
+# só-leitura = sem bit de escrita na ÁRVORE; exceção ReadWritePaths= aninhada devolve a escrita; inacessível = 000.
+# Cada caminho só-leitura entra na lista de "pontos de montagem" que o findmnt falso consulta.
+save=""; file=""; skip=""; mounts=""
+while [ $# -gt 0 ]; do case "$1" in --save) save="$2"; shift 2 ;; --file) file="$2"; shift 2 ;; --skip) skip="$2"; shift 2 ;; --mounts) mounts="$2"; shift 2 ;; *) shift ;; esac; done
+for pass in 1 2; do
+while IFS= read -r l; do
+  case "$l" in ReadOnlyPaths=*) m=ro; v="${l#ReadOnlyPaths=}" ;; InaccessiblePaths=*) m=ina; v="${l#InaccessiblePaths=}" ;; ReadWritePaths=*) m=rw; v="${l#ReadWritePaths=}" ;; *) continue ;; esac
+  # --skip ro: a montagem EXISTE mas ficou rw (o caso que isola a checagem de escrita); outro --skip pula de vez
+  sk=0; [ "$m" = "$skip" ] && { [ "$m" = ro ] && sk=1 || continue; }
+  if [ "$pass" = 1 ] && [ "$m" = rw ]; then continue; fi
+  if [ "$pass" = 2 ] && [ "$m" != rw ]; then continue; fi
+  for p in $v; do case "$p" in -*) p="${p#-}"; nest=1 ;; *) nest=0 ;; esac; [ -e "$p" ] || continue
+    if [ "$m" = rw ]; then [ "$nest" = 1 ] || continue; fi   # o RW base (a home inteira) não desfaz o só-leitura
+    [ -n "$save" ] && find "$p" -exec stat -c '%a %n' {} + >> "$save"
+    case "$m" in ro) [ "$sk" = 1 ] || chmod -R a-w "$p"; [ -n "$mounts" ] && echo "$p" >> "$mounts" ;; ina) chmod 000 "$p" ;; rw) chmod -R u+w "$p" ;; esac
+  done
+done < "$file"
+done
+EOF
+  cat > "${d}/fake/systemctl" <<'EOF'
+#!/bin/sh
+F="$BH_FAKE"; echo "systemctl $*" >> "$F/calls"
+case "$1" in
+  show)
+    shift; props=""; val=0
+    while [ $# -gt 0 ]; do case "$1" in -p) props="$props $2"; shift 2 ;; --value) val=1; shift ;; *) shift ;; esac; done
+    for p in $props; do
+      case "$p" in
+        MainPID) v="$(cat "$F/mainpid" 2>/dev/null || echo 0)" ;;
+        InvocationID) v="$(cat "$F/inv")" ;;
+        DropInPaths) v="$(cat "$F/dropins")" ;;
+        User) v="$(id -un)" ;;
+        WorkingDirectory) v="$ONION_BRIDGE_HARDENING_SVC_HOME/onion-bridge" ;;
+        ProtectSystem) v=strict ;; ProtectHome) v=read-only ;; PrivateTmp) v=yes ;; NoNewPrivileges) v=yes ;; UMask) v=0027 ;;
+        *) v="" ;;
+      esac
+      if [ "$val" = 1 ]; then echo "$v"; else echo "$p=$v"; fi
+    done ;;
+  daemon-reload) : ;;
+  restart)
+    [ -f "$F/restart-fail" ] && exit 1
+    [ -f "$F/same-inv" ] || echo "inv-$(date +%s%N)" > "$F/inv"
+    ls "$ONION_BRIDGE_HARDENING_DROPIN_DIR"/*.conf | paste -sd' ' - > "$F/dropins"
+    [ -n "${BH_RESTART_NOEFFECT:-}" ] || [ ! -f "$ONION_BRIDGE_HARDENING_DROPIN_DIR/30-integrity.conf" ] \
+      || sh "$BH_FAKEDIR/apply.sh" --file "$ONION_BRIDGE_HARDENING_DROPIN_DIR/30-integrity.conf" --mounts "$F/mounts"
+    echo 4242 > "$F/mainpid" ;;
+  *) : ;;
+esac
+EOF
+  cat > "${d}/fake/systemd-run" <<'EOF'
+#!/bin/sh
+F="$BH_FAKE"; : > "$F/sr-args"; props=""
+while [ $# -gt 0 ]; do
+  case "$1" in --quiet|--pipe|--wait|--collect) shift ;; -p) echo "$2" >> "$F/sr-args"; shift 2 ;; *) break ;; esac
+done
+: > "$F/sr-save"
+# noeffect-ro: a unit transitória sobe, mas o só-leitura NÃO pega (o inacessível sim) — o caso (h4) isola a checagem
+sk=""; [ -f "$F/noeffect-ro" ] && sk=ro
+[ -f "$F/noeffect" ] || sh "$BH_FAKEDIR/apply.sh" --save "$F/sr-save" --file "$F/sr-args" --skip "$sk" --mounts "$F/mounts-ens"
+"$@"; rc=$?
+# restaura em ordem INVERSA (o diretório pai por último, senão o chmod do filho bate no pai sem escrita)
+tac "$F/sr-save" | while read -r m p; do chmod "$m" "$p"; done; rm -f "$F/mounts-ens"
+exit $rc
+EOF
+  printf '#!/bin/sh\nwhile [ "$#" -gt 0 ] && [ "$1" != -- ]; do shift; done\nshift\nexec "$@"\n' > "${d}/fake/nsenter"
+  # findmnt falso: OPTIONS pela escrita; TARGET = o próprio caminho se ele está na lista de pontos de montagem
+  printf '#!/bin/sh\nfor p; do :; done\ncase "$*" in *TARGET*) if grep -qxF "$p" "$BH_FAKE/mounts" "$BH_FAKE/mounts-ens" 2>/dev/null; then echo "$p"; else echo /; fi; exit 0 ;; esac\nif [ -w "$p" ]; then echo rw,relatime; else echo ro,relatime; fi\n' > "${d}/fake/findmnt"
+  printf '#!/bin/sh\nif [ -f "$BH_FAKE/noauth" ]; then echo "boot sem a linha"; else echo "[onion-bridge] identidade: JWKS OK | auth: enforce"; fi\n' > "${d}/fake/journalctl"
+  printf '#!/bin/sh\n[ -f "$BH_FAKE/health-bad" ] && exit 22\necho "{\\"ok\\":true}"\n' > "${d}/fake/curl"
+  chmod +x "${d}/stub/sudo" "${d}/fake/"*
+  # _bhreset: a home, o estado e os drop-ins de sandbox, como a VPS os tem (medido em 2026-10-16)
+  _bhreset() {
+    [ -d "${d}/h" ] && chmod -R u+rwX "${d}/h" 2>/dev/null
+    rm -rf "${d}/h" "${d}/var" "${d}/dropin" "${d}/bk" "${d}/st" "${d}/lock"; mkdir -p "${d}/st"
+    local H="${d}/h"
+    mkdir -p "${H}/onion-bridge/src" "${H}/onion-bridge/scripts" "${H}/onion-bridge/node_modules/.bin" "${H}/onion-bridge/web" \
+      "${H}/onion-bridge/data" "${H}/onion-evolve/.claude/utils/federation-transport/jwks" "${H}/onion-evolve/.claude/validation" \
+      "${H}/onion-evolve/.claude/sessions" "${H}/onion-evolve/.git/hooks" "${H}/.local/share" "${H}/onion-evolve/.claude/validation" "${H}/onion-evolve/docs/evolution/federation" "${H}/.claude/projects" "${H}/.ssh" \
+      "${d}/var" "${d}/dropin"
+    printf '#!/bin/sh\necho tsx-falso\n' > "${H}/onion-bridge/node_modules/.bin/tsx"; chmod +x "${H}/onion-bridge/node_modules/.bin/tsx"
+    for f in onion-bridge/src/server.ts onion-bridge/package.json onion-bridge/tsconfig.json .bashrc .profile .gitconfig .claude.json \
+             .ssh/deploy .git-credentials onion-evolve/docs/evolution/federation/members.yaml onion-evolve/docs/evolution/trust-log.md \
+             onion-evolve/.claude/utils/federation-transport/a2a-verify.sh onion-evolve/.claude/validation/trust-topology-check.sh \
+             onion-evolve/.git/config onion-bridge/package-lock.json; do echo x > "${H}/${f}"; done
+    printf '[Service]\nNoNewPrivileges=yes\n' > "${d}/dropin/10-memory-protection.conf"
+    printf '[Service]\nProtectSystem=strict\nProtectHome=read-only\nPrivateTmp=true\nUMask=0027\nReadWritePaths=%s %s\n' "${H}" "${d}/var" > "${d}/dropin/20-hardening.conf"
+    ls "${d}/dropin"/*.conf | paste -sd' ' - > "${d}/st/dropins"
+    echo inv-0 > "${d}/st/inv"; echo 4241 > "${d}/st/mainpid"
+  }
+  # _bhr <wrapper> <args…> → "rc|saída", env de teste completo; BHR_ENV extra
+  _bhr() {
+    local w="$1" rc=0 out; shift
+    out="$(cd "${d}" && env PATH="${d}/fake:${d}/stub:${PATH}" LC_ALL=C BH_FAKE="${d}/st" BH_FAKEDIR="${d}/fake" \
+      ONION_BRIDGE_HARDENING_TEST=1 ONION_BRIDGE_HARDENING_SVC_HOME="${d}/h" ONION_BRIDGE_HARDENING_STATE="${d}/var" \
+      ONION_BRIDGE_HARDENING_DROPIN_DIR="${d}/dropin" ONION_BRIDGE_HARDENING_BACKUP_DIR="${d}/bk" ONION_BRIDGE_HARDENING_LOCK="${d}/lock" \
+      ${BHR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  # _bhcase <nome> <ANTIGO> <NOVO> <função-de-caso> — intacto e mutante (cópia com ANTIGO→NOVO, 1ª ocorrência)
+  _bhcase() {
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    # a trava de PRODUÇÃO nunca é aberta pela bancada, nem por um mutante que caia no ramo de produção
+    sed "s#^PROD_LOCK=.*#PROD_LOCK=${d}/lock#" "${wr}" > "${d}/w.sh"
+    _bhreset; BH_WHY=""; "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "bridge-hardening: ${name}"; else record_fail "bridge-hardening: ${name}" "${BH_WHY:-caso não satisfeito}"; fi
+    cp "${d}/w.sh" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 - "${d}/m.sh" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    _bhreset; "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "bridge-hardening: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  _bhrc() { [ "${1%%|*}" = "$2" ]; }
+  _bhhas() { case "${1#*|}" in *"$2"*) true ;; *) false ;; esac; }
+  _bhcalls() { grep -c "systemctl $1" "${d}/st/calls" 2>/dev/null || true; }
+  _c_dry() { local r; r="$(_bhr "$1" install)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 0 && _bhhas "${r}" "ENSAIO OK" && [ ! -e "${d}/dropin/30-integrity.conf" ] && [ ! -e "${d}/h/.claude/settings.json" ] \
+      && [ "$(_bhcalls restart)" = 0 ] && [ "$(_bhcalls daemon-reload)" = 0 ] && test -w "${d}/h/onion-bridge/src" && [ ! -e "${d}/h/.config" ]; }
+  _c_render() { local r; r="$(_bhr "$1" show)"; BH_WHY="${r:0:300}"
+    _bhrc "${r}" 0 && _bhhas "${r}" "# onion-bridge-hardening: v1" \
+      && _bhhas "${r}" "ReadOnlyPaths=-${d}/h/onion-bridge"$'\n' && _bhhas "${r}" "ReadOnlyPaths=-${d}/h/onion-evolve"$'\n' \
+      && _bhhas "${r}" "ReadWritePaths=-${d}/h/onion-bridge/data" && _bhhas "${r}" "ReadOnlyPaths=-${d}/h/.claude/settings.json" \
+      && _bhhas "${r}" "ReadOnlyPaths=-${d}/h/.config" && _bhhas "${r}" "ReadOnlyPaths=-${d}/h/.npmrc" \
+      && _bhhas "${r}" "InaccessiblePaths=-${d}/h/.ssh" && _bhhas "${r}" "InaccessiblePaths=-${d}/h/.git-credentials" \
+      && ! grep -q '^EnvironmentFile' <<< "${r#*|}"; }
+  _c_props() { local r; r="$(_bhr "$1" install)"; BH_WHY="${r:0:300} | $(tr '\n' ' ' < "${d}/st/sr-args" 2>/dev/null)"
+    _bhrc "${r}" 0 && grep -qx "User=$(id -un)" "${d}/st/sr-args" && grep -q "^ReadOnlyPaths=.*-${d}/h/onion-evolve" "${d}/st/sr-args" && grep -q "^ReadWritePaths=${d}/h ${d}/var .*-${d}/h/onion-evolve/.claude/sessions" "${d}/st/sr-args" && grep -q "^InaccessiblePaths=.*-${d}/h/.git-credentials" "${d}/st/sr-args"; }
+  _c_ensfail() { local r; : > "${d}/st/noeffect-ro"; r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 1 && _bhhas "${r}" "o ENSAIO reprovou" && _bhhas "${r}" "FALHA só-leitura GRAVÁVEL (montagem: rw) ${d}/h/onion-bridge" \
+      && [ ! -e "${d}/dropin/30-integrity.conf" ] && [ "$(_bhcalls restart)" = 0 ]; }
+  _c_apply() { local r; r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:600}"
+    _bhrc "${r}" 0 && _bhhas "${r}" "OK — 30-integrity.conf instalado" && [ -f "${d}/dropin/30-integrity.conf" ] \
+      && [ "$(cat "${d}/h/.claude/settings.json" 2>/dev/null)" = "{}" ] && [ "$(cat "${d}/h/.claude/settings.local.json" 2>/dev/null)" = "{}" ] \
+      && grep -q daemon-reload <<< "$(grep -m1 'daemon-reload\|restart' "${d}/st/calls")" \
+      && [ -d "${d}/h/.config" ] && [ -d "${d}/h/.local/bin" ] && [ -f "${d}/h/.npmrc" ] && [ ! -s "${d}/h/.npmrc" ] \
+      && grep -qF '. "$HOME/.profile"' "${d}/h/.bash_profile" \
+      && ! test -w "${d}/h/onion-bridge/src" && ! test -w "${d}/h/onion-evolve/.git" && ! test -r "${d}/h/.git-credentials" \
+      && test -w "${d}/h/onion-bridge/data" && test -w "${d}/h/onion-evolve/docs/evolution/trust-log.md"; }
+  _c_backup() { local r b; printf '[Service]\nReadOnlyPaths=-/velho\n' > "${d}/dropin/30-integrity.conf"
+    r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:500}"; b="$(ls "${d}/bk"/30-integrity.conf.* 2>/dev/null | head -1)"
+    _bhrc "${r}" 0 && [ -n "${b}" ] && grep -qx 'ReadOnlyPaths=-/velho' "${b}" && _bhhas "${r}" "install -m 0644 ${b} ${d}/dropin/30-integrity.conf" \
+      && _bhhas "${r}" "NÃO foi gerado por este wrapper"; }
+  _c_noeffect() { local r
+    # o restart que NÃO aplica o drop-in (o namespace segue gravável): o verify do processo vivo tem de reprovar
+    r="$(BHR_ENV="BH_RESTART_NOEFFECT=1" _bhr "$1" install --apply)"; BH_WHY="${r:0:600}"
+    _bhrc "${r}" 1 && _bhhas "${r}" "o verify no processo vivo reprovou" && _bhhas "${r}" "ROLLBACK MANUAL" \
+      && _bhhas "${r}" "sudo rm -f ${d}/dropin/30-integrity.conf" && _bhhas "${r}" "then rm -f ${d}/h/.claude/settings.json; fi"; }
+  _c_health() { local r; : > "${d}/st/health-bad"; r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:300}"
+    _bhrc "${r}" 2 && [ ! -e "${d}/dropin/30-integrity.conf" ] && [ ! -e "${d}/h/.claude/settings.json" ]; }
+  _c_sameinv() { local r; : > "${d}/st/same-inv"; r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:300}"
+    _bhrc "${r}" 1 && _bhhas "${r}" "a invocação não mudou"; }
+  _c_noauth() { local r; : > "${d}/st/noauth"; r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:300}"
+    _bhrc "${r}" 1 && _bhhas "${r}" "sem 'auth: enforce'"; }
+  _c_noop() { local r n; r="$(_bhr "$1" install --apply)"; _bhrc "${r}" 0 || { BH_WHY="1ª: ${r:0:300}"; return 1; }
+    n="$(_bhcalls restart)"; r="$(_bhr "$1" install --apply)"; BH_WHY="2ª: ${r:0:300}"
+    _bhrc "${r}" 0 && _bhhas "${r}" "NOOP" && [ "$(_bhcalls restart)" = "${n}" ]; }
+  _c_premise() { local r; printf '[Service]\nProtectSystem=strict\nReadWritePaths=%s\n' "${d}/var" > "${d}/dropin/20-hardening.conf"
+    r="$(_bhr "$1" install)"; BH_WHY="${r:0:300}"; _bhrc "${r}" 1 && _bhhas "${r}" "premissa mudou"; }
+  _c_envfile() { local r; printf 'EnvironmentFile=%s/onion-bridge/.env\n' "${d}/h" >> "${d}/dropin/20-hardening.conf"
+    r="$(_bhr "$1" install)"; BH_WHY="${r:0:300}"; _bhrc "${r}" 1 && _bhhas "${r}" "EnvironmentFile"; }
+  _c_missing() { local r; rm -f "${d}/h/.profile"; r="$(_bhr "$1" install)"; BH_WHY="${r:0:300}"
+    _bhrc "${r}" 1 && _bhhas "${r}" "AUSENTE(S): ${d}/h/.profile"; }
+  _c_mount() { local r; _bhr "$1" install --apply >/dev/null
+    # o caminho segue sem escrita, mas NÃO é ponto de montagem próprio (um rename do pai o tiraria: achado 1)
+    grep -vxF "${d}/h/onion-evolve" "${d}/st/mounts" > "${d}/st/m2"; mv "${d}/st/m2" "${d}/st/mounts"
+    r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"; _bhrc "${r}" 1 && _bhhas "${r}" "sem ponto de montagem próprio" && _bhhas "${r}" "${d}/h/onion-evolve"; }
+  _c_link() { local r; mv "${d}/h/.bashrc" "${d}/h/bashrc.real"; ln -s "${d}/h/onion-bridge/data" "${d}/h/.bashrc"
+    r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:300}"; _bhrc "${r}" 1 && _bhhas "${r}" "SYMLINK" && [ ! -e "${d}/dropin/30-integrity.conf" ]; }
+  _c_midlink() { local r; mv "${d}/h/onion-evolve/.claude" "${d}/h/onion-evolve/.claude-x"; ln -s .claude-x "${d}/h/onion-evolve/.claude"
+    r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:300}"; _bhrc "${r}" 1 && _bhhas "${r}" "SYMLINK no caminho" && [ ! -e "${d}/dropin/30-integrity.conf" ]; }
+  _c_trust() { local r; _bhr "$1" install --apply >/dev/null; chmod u+w "${d}/h/onion-evolve/.claude/utils/federation-transport/a2a-verify.sh"
+    r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"; _bhrc "${r}" 1 && _bhhas "${r}" "arquivo de confiança GRAVÁVEL ${d}/h/onion-evolve/.claude/utils/federation-transport/a2a-verify.sh"; }
+  _c_noopverify() { local r n; BHR_ENV="BH_RESTART_NOEFFECT=1" _bhr "$1" install --apply >/dev/null
+    # 1ª execução: instalou, mas o restart não aplicou (verify reprovou). A 2ª, com o drop-in IDÊNTICO no disco, não
+    # pode dizer NOOP: o processo vivo não o prova
+    n="$(_bhcalls restart)"; r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 0 && _bhhas "${r}" "segue para o restart" && [ "$(_bhcalls restart)" -gt "${n}" ]; }
+  _c_env() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" ONION_BRIDGE_HARDENING_LOCK="${d}/x" bash "$1" show 2>&1)" || rc=$?
+    BH_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"produção não se redireciona"*) true ;; *) false ;; esac; }
+  _c_copy() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" bash "$1" show 2>&1)" || rc=$?
+    BH_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"não é arquivo rastreado"*) true ;; *) false ;; esac; }
+  _c_lock() { local r; rm -f "${d}/held"
+    ( flock -x 8; : > "${d}/held"; sleep 4 ) 8>"${d}/lock" &
+    local _n=0; while [ ! -f "${d}/held" ] && [ "${_n}" -lt 50 ]; do sleep 0.1; _n=$((_n + 1)); done
+    r="$(_bhr "$1" install)"; BH_WHY="${r:0:200}"; wait; _bhrc "${r}" 2; }
+  _c_notloaded() { local r; _bhr "$1" show | sed 's/^[0-9]*|//' > "${d}/st/shown.conf"; sh "${d}/fake/apply.sh" --file "${d}/st/shown.conf"
+    # o namespace JÁ protegido por outro meio, mas o drop-in não está carregado: o verify reprova pelo carregamento
+    r="$(_bhr "$1" verify)"; BH_WHY="${r:0:300}"; _bhrc "${r}" 1 && _bhhas "${r}" "NÃO está carregado"; }
+  _c_verify() { local r; _bhr "$1" install --apply >/dev/null; r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 0 && _bhhas "${r}" "verify OK" && _bhhas "${r}" "OK inacessível ${d}/h/.git-credentials" || return 1
+    # o modo de falha: um arquivo protegido trocado POR FORA perde o bind (medido); aqui, ganha a escrita de volta
+    chmod u+w "${d}/h/.bashrc"; r="$(_bhr "$1" verify)"; BH_WHY="pós-troca: ${r:0:400}"
+    _bhrc "${r}" 1 && _bhhas "${r}" "FALHA só-leitura GRAVÁVEL (montagem: rw) ${d}/h/.bashrc"; }
+  _c_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
+    BH_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
+  _c_opt() { local r; r="$(_bhr "$1" install --unit outra)"; BH_WHY="${r:0:200}"; _bhrc "${r}" 3; }
+  _c_testprod() { local r rc=0
+    r="$(cd "${d}" && env PATH="${d}/fake:${d}/stub:${PATH}" ONION_BRIDGE_HARDENING_TEST=1 ONION_BRIDGE_HARDENING_SVC_HOME=/home/onion \
+      ONION_BRIDGE_HARDENING_STATE="${d}/var" ONION_BRIDGE_HARDENING_DROPIN_DIR="${d}/dropin" ONION_BRIDGE_HARDENING_BACKUP_DIR="${d}/bk" \
+      ONION_BRIDGE_HARDENING_LOCK="${d}/lock" bash "$1" show 2>&1)" || rc=$?
+    BH_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ]; }
+  _bhcase "(h1) install sem --apply é ENSAIO: rc 0, nada instalado, nenhum placeholder, nenhum restart" 'if [ "${APPLY}" = 0 ]; then' 'if false; then' _c_dry
+  _bhcase "(h2) o drop-in: só-leitura no código e na raiz de confiança, inacessível a chave e o PAT, sem EnvironmentFile" \
+    'INACCESSIBLE=( .ssh .git-credentials )' 'INACCESSIBLE=( .ssh )' _c_render
+  _bhcase "(h3) o ensaio leva à unit transitória as propriedades da unit de hoje + as do drop-in novo" \
+    'props+=(-p "ReadWritePaths=${rw} ${rwn% }" -p "ReadOnlyPaths=${ro% }" -p "InaccessiblePaths=${ina% }")' 'props+=(-p "ReadWritePaths=${rw}")' _c_props
+  _bhcase "(h4) ensaio em que um alvo segue gravável → rc 1, nada instalado" \
+    "  echo '  if test -w \"\$p\" || [ \"\$o\" != ro ]; then bad" "  echo '  if false; then bad" _c_ensfail
+  _bhcase "(h5) --apply: placeholders {}, daemon-reload antes do restart, drop-in instalado e provado no namespace" \
+    "as_svc sh -c 'umask 022; set -C; printf \"{}\\n\" > \"\$1\"' _ \"\${f}\"" 'true' _c_apply
+  _bhcase "(h6) --apply com drop-in anterior estranho: backup com o conteúdo velho e rollback que o reinstala" \
+    'priv install -d -m 0700 "${BACKUP_DIR}" && priv install -m 0600 "${DROPIN_DIR}/${DROPIN_NAME}" "${BK}"' 'true' _c_backup
+  _bhcase "(h8) /health doente antes do --apply → rc 2, nada escrito" \
+    "grep -q '\"ok\":true' <<<\"\$(curl -fsS -m 5 \"\${HEALTH_LOCAL}\" 2>/dev/null)\"" 'true' _c_health
+  _bhcase "(h9) restart que não troca a invocação → rc 1 (a prova seria do boot antigo)" \
+    '[ -n "${INV}" ] && [ "${INV}" != "${OLD_INV}" ] ||' '[ -n "${INV}" ] ||' _c_sameinv
+  _bhcase "(h10) boot desta invocação sem 'auth: enforce' → rc 1" \
+    'grep -q "auth: enforce" <<<"${BOOT}" || fail_after' 'true || fail_after' _c_noauth
+  _bhcase "(h11) 2º --apply idêntico → NOOP, sem novo restart" \
+    'cmp -s "${TMPD}/atual.conf" "${TMPD}/${DROPIN_NAME}" && [ "${#need_ph[@]}" = 0 ]' 'false' _c_noop
+  _bhcase "(h12) 20-hardening sem a home em ReadWritePaths → rc 1 (premissa do aninhamento)" \
+    '  || die 1 "premissa mudou: ${BASE_DROPIN} não dá' '  || true "premissa mudou: ${BASE_DROPIN} não dá' _c_premise
+  _bhcase "(h13) EnvironmentFile= no 20-hardening → rc 1" "grep -qE '^EnvironmentFile=' <<<\"\${base}\" && die 1" 'false && die 1' _c_envfile
+  _bhcase "(h14) caminho a proteger ausente → rc 1 nomeando-o" '[ "${#missing[@]}" = 0 ] || die 1' 'true || die 1' _c_missing
+  _bhcase "(h15) ONION_BRIDGE_HARDENING_* sem o modo de teste → rc 3 (produção não se redireciona)" \
+    "if compgen -e | grep -E '^ONION_BRIDGE_HARDENING_' >/dev/null; then" 'if false; then' _c_env
+  _bhcase "(h16) cópia do wrapper fora de um checkout, em produção → rc 3 antes de qualquer sudo" \
+    '    || die 3 "${_f} não é arquivo rastreado' '    || true "${_f} não é arquivo rastreado' _c_copy
+  _bhcase "(h17) trava ocupada (update-bridge ou wrapper A2A rodando) → rc 2" 'flock -n 9 || die 2' 'true || die 2' _c_lock
+  _bhcase "(h18) verify com o drop-in NÃO carregado na unit → rc 1, mesmo com o namespace protegido" \
+    '  case " ${dp} " in *"/${DROPIN_NAME} "*) : ;;' '  case " ${dp} " in *) : ;;' _c_notloaded
+  _bhcase "(h19) verify: OK no namespace provado; arquivo protegido que volta a ser gravável → rc 1 nomeando-o" \
+    '[ "${rc}" = 0 ] && grep -qx '"'"'n_fail=0'"'"' <<<"${out}" || return 1' 'true' _c_verify
+  _bhcase "(h20) --help mostra o EXIT inteiro (até '3 uso inválido')" "'/^# USO/,/^# MODO DE TESTE/p'" "'/^# USO/,/^# EXIT/p'" _c_help
+  _bhcase "(h21) opção fora da lista fechada → rc 3" '    *) die 3 "opção não aceita: $1' '    *) shift 2; continue; die 3 "opção não aceita: $1' _c_opt
+  _bhcase "(h22) modo de teste com a home de produção da conta do serviço → rc 3" \
+    'case "${_r}/" in "${PROD_SVC_HOME}/"*|' 'case "${_r}/" in "/nunca/"*|' _c_testprod
+  _bhcase "(h24) caminho só-leitura que NÃO é ponto de montagem próprio → verify rc 1 (o rename do pai o tiraria)" \
+    "  echo '  elif [ \"\$m\" != \"\$p\" ]; then bad" "  echo '  elif false; then bad" _c_mount
+  _bhcase "(h25) alvo que é SYMLINK → rc 1, nada instalado (o bind seguiria o link)" \
+    '[ "$(priv realpath -m -- "${SVC_HOME}/${p}")" = "${SVC_HOME}/${p}" ] ||' 'true ||' _c_link
+  _bhcase "(h27) symlink num componente do MEIO de uma exceção gravável → rc 1, nada instalado" \
+    '[ "$(priv realpath -m -- "${SVC_HOME}/${p}")" = "${SVC_HOME}/${p}" ] ||' 'true ||' _c_midlink
+  _bhcase "(h28) arquivo de confiança concreto gravável com a raiz só-leitura → verify rc 1 nomeando-o" \
+    "then bad \"arquivo de confiança GRAVÁVEL" "then ok \"arquivo de confiança GRAVÁVEL" _c_trust
+  _bhcase "(h26) drop-in idêntico no disco mas NÃO provado no processo vivo → não é NOOP, reinicia" \
+    '  if verify_live >/dev/null 2>&1; then' '  if true; then' _c_noopverify
+  _bhcase "(h23) restart que não aplica o drop-in → o verify do processo vivo reprova → rc 1 com ROLLBACK impresso" \
+    'verify_live || fail_after' 'true || fail_after' _c_noeffect
+  [ -d "${d}/h" ] && chmod -R u+rwX "${d}/h" 2>/dev/null
   rm -rf "${d}"
 }
 
@@ -31591,6 +31900,7 @@ _family run_pretooluse_veto_selftests
 _family run_moat_gate_selftests
 _family run_a2a_invite_live_selftests
 _family run_a2a_queue_live_selftests
+_family run_bridge_hardening_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests
