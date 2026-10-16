@@ -43,10 +43,10 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-10-16"
-    verified_against: "bash .claude/validation/meeting-graph-check.sh --selftest (19 polaridades verdes) e a família meeting_graph da bancada, com um mutante por cura; dogfood do /product:extract-meeting por agente de contexto limpo sobre duas transcrições fictícias"
+    verified_against: "bash .claude/validation/meeting-graph-check.sh --selftest (37 polaridades verdes, mais o caso do contrato onde o vendor existe) e a família meeting_graph da bancada, com um mutante por cura; dogfood do /product:extract-meeting por agente de contexto limpo sobre duas transcrições fictícias"
     label: "PASSO ZERO entregue: o /product:extract-meeting grava também o .kg.yaml da reunião a partir de texto, e o meeting-graph-check.sh reprova a reunião sem tentativa de aviso registrada (o caso de bancada pedido), além do trace fora do trecho e do tipo errado."
     trace: ".claude/validation/meeting-graph-check.sh"
-    narrative: "O 1º dogfood achou um furo do próprio gate: o grafo com confidence: high passava, porque o radar não confere tipo de campo e o contrato não era chamado. Curado no mesmo PR: o gate cobra impact inteiro 1-5 e confidence 0-1 (CAMPO-FORA-DO-TIPO) e roda o kg-contract-check.sh onde ele mora ao lado."
+    narrative: "O 1º dogfood achou um furo do próprio gate: o grafo com confidence: high passava, porque o radar não confere tipo de campo e o contrato não era chamado. Curado no mesmo PR: o gate cobra impact inteiro 1-5 e confidence 0-1 (CAMPO-FORA-DO-TIPO) e roda o kg-contract-check.sh onde ele mora ao lado. O refutador opus (1ª passada) achou mais quatro fugas, todas curadas com caso e mutante: comentário na coluna 0 cegava o leitor, nó sem x_meeting_role escapava das regras, a parada não era amarrada à recusa (faixa que atravessava passava), e a fonte podia ser absoluta ou sair da raiz."
     provenance:
       source: ".claude/validation/meeting-graph-check.sh"
       locator: "--selftest; lint-selftest.sh, run_meeting_graph_selftests"
@@ -60,8 +60,8 @@ nodes:
     impact: 3
     confidence: 0.85
     verified_at: "2026-10-16"
-    verified_against: "git grep -nE 'docs/meet(ings)?\\b' -- .claude docs em origin/main 5179e467: 31 ocorrências de docs/meet (todas em exemplos e no KB do Whisper, nenhuma gravação real) e 3 de docs/meetings (todas no extract, o único que grava); diretórios reais nos repos locais da máquina do core: 2 adotantes com docs/meetings/ e arquivos de reunião, 0 com docs/meet/"
-    label: "O diretório canônico das reuniões é docs/meetings/: é onde o único gravador (o extract) já escrevia, é onde há arquivos reais em adotantes (2 contra 0) e casa com os nomes dos comandos. As 31 citações de docs/meet foram migradas."
+    verified_against: "git grep -wn 'docs/meet' 5179e467 -- .claude docs ':!docs/evolution' | wc -l = 29 linhas com docs/meet (todas em exemplos e no KB do Whisper, nenhuma gravação real) e 3 com docs/meetings (todas no extract, o único que grava); diretórios reais nos repos locais da máquina do core: 2 adotantes com docs/meetings/ e arquivos de reunião, 0 com docs/meet/"
+    label: "O diretório canônico das reuniões é docs/meetings/: é onde o único gravador (o extract) já escrevia, é onde há arquivos reais em adotantes (2 contra 0) e casa com os nomes dos comandos. As 29 linhas com docs/meet foram migradas."
     trace: ".claude/commands/product/extract-meeting.md"
     narrative: "Defeito apontado pela curadoria (E_MC_MAQUINARIA_SO_TEXTO): o extract gravava em docs/meetings/ e o consolidate e o whisper liam docs/meet/. O acréscimo do maestro à decisão da Vexa mandou padronizar. Conferido pela ausência da palavra velha: git grep -wn 'docs/meet' -- .claude docs ':!docs/evolution' devolve 0. Nada foi movido: o core não tem nenhum dos dois diretórios, e os arquivos reais dos adotantes já estão no canônico."
     provenance:
