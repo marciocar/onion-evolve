@@ -24,12 +24,12 @@ nodes:
   - id: D_REA_METHOD_2610
     node_type: decision
     impact: 4
-    confidence: 0.75
+    confidence: 0.7
     x_dissect_level: 3
     x_dissect_verdict: parquear
-    x_dissect_criterion: "gh api 'search/code?q=x_absorb_target+repo:marciocar/onion-evolve+path:docs/evolution/dissect+extension:yaml' --jq .total_count"
+    x_dissect_criterion: "git grep -lE '^[[:space:]]+x_absorb_target:' origin/main -- 'docs/evolution/dissect/*.kg.yaml' | wc -l"
     x_dissect_overcoming: E_CORE_JA_SUPERA_REA_1016
-    x_gatilho: "(a) o critério acima sai 2 ou mais (hoje 1, conductor-2026-10) E algum plano x_absorb_* fica com a família de paridade inexistente ou sem citar a peça depois do forge: aí entra um check pós-forge, não uma mudança no dissect-plans.sh (Q_REABRIR_PARIDADE_POS_FORGE). (b) dispara o Q_REABRIR_CARIMBO_POR_PROBE de superpowers-2026-10 (o worker do kg-freshness ou do census devolve probe {argv[], expect_regex}): aí a ideia do REA entra como duas chaves, required_authority no nó e authority no KgReverifySchema (Q_REABRIR_AUTORIDADE_NO_PROBE)."
+    x_gatilho: "(a) o critério acima sai 2 ou mais (hoje 1, conductor-2026-10; conta a CHAVE x_absorb_target no início de linha, não a menção ao token, que este próprio grafo carrega e o gh api da proposta contaria depois do merge) E algum plano x_absorb_* fica com a família de paridade inexistente ou sem citar a peça depois do forge: aí entra um check pós-forge, não uma mudança no dissect-plans.sh (Q_REABRIR_PARIDADE_POS_FORGE). (b) dispara o Q_REABRIR_CARIMBO_POR_PROBE de superpowers-2026-10 (o worker do kg-freshness ou do census devolve probe {argv[], expect_regex}): aí a ideia do REA entra como duas chaves, required_authority no nó e authority no KgReverifySchema (Q_REABRIR_AUTORIDADE_NO_PROBE)."
     label: "PARQUEAR o método do REA: o core já supera o que importa (KgReverifySchema por node_id com cobertura PARCIAL, caso que reprova contra o mutante, escada de autoridade). Reabre por dois gatilhos: o 2º plano de absorção sem paridade depois do forge, ou o probe."
     trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-rea-method-parquear.md"
     status: done
@@ -54,15 +54,15 @@ nodes:
     confidence: 0.85
     x_dissect_level: 3
     verified_at: "2026-10-16"
-    verified_against: "leitura do core em origin/main cff29401 pela triagem: KgReverifySchema em .claude/commands/meta/kg-freshness.md:162, coverage TOTAL|PARCIAL na :186 e a guarda PARCIAL ⇒ UNVERIFIABLE na :200; forge.md:85-86 (todo caso reprova contra a versão defeituosa); x_absorb_target em 1 só grafo de docs/evolution/dissect (conductor-2026-10), por grep -rl e pelo gh api do critério"
+    verified_against: "leitura do core em origin/main cff29401 pela triagem: KgReverifySchema em .claude/commands/meta/kg-freshness.md:162, coverage TOTAL|PARCIAL na :186 e a guarda PARCIAL ⇒ UNVERIFIABLE na :200; forge.md:85-86 (todo caso reprova contra a versão defeituosa); a chave x_absorb_target em 1 só grafo de docs/evolution/dissect (conductor-2026-10), pelo git grep ancorado do x_dissect_criterion em origin/main"
     source_tier: 9
     source_kind: primary-repo
-    label: "SUPERAÇÃO medida no core: o KgReverifySchema prende cada registro a um node_id com cobertura PARCIAL ⇒ UNVERIFIABLE (o REA nem tem cobertura parcial); o forge exige caso que reprova contra o mutante, mais forte que tipos de caso; e há 1 só plano de absorção."
+    label: "SUPERAÇÃO PARCIAL medida no core (o que falta, o verificador enumerar o id, vai ao gatilho b): o KgReverifySchema prende cada registro a um node_id com cobertura PARCIAL ⇒ UNVERIFIABLE; o forge exige caso que reprova contra o mutante; e há 1 só plano de absorção."
     trace: ".claude/commands/meta/kg-freshness.md"
     provenance:
       source: "core origin/main cff29401; grafo da dissecação do método do REA no repo do adotante de curadoria (nó E_N3_CORE_JA_SUPERA, conferido pela sessão de lá por C1)"
       locator: ".claude/commands/meta/kg-freshness.md:162-202; .claude/commands/meta/forge.md:85-86; docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
-      method: "medição: grep -n nas linhas citadas, grep -rl x_absorb_target docs/evolution/dissect e o gh api do x_dissect_criterion (total_count 1)"
+      method: "medição: grep -n nas linhas citadas e o git grep ancorado do x_dissect_criterion (saída 1)"
       locality: "repo"
 
   - id: Q_REABRIR_PARIDADE_POS_FORGE
@@ -73,9 +73,9 @@ nodes:
     confidence: 0.5
     x_dissect_level: 3
     verified_at: "2026-10-16"
-    verified_against: "gh api do x_dissect_criterion do D_REA_METHOD_2610: total_count 1 em 2026-10-16 (só conductor-2026-10)"
+    verified_against: "git grep ancorado do x_dissect_criterion do D_REA_METHOD_2610: saída 1 em 2026-10-16 (só conductor-2026-10)"
     label: "Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexistente, e os tipos de caso do REA variam por política."
-    x_gatilho: "reabrir quando o gh api do x_dissect_criterion sair 2 ou mais E algum plano x_absorb_* ficar com a família de paridade inexistente ou sem citar a peça depois do forge. A cura é um check pós-forge, não mudança no dissect-plans.sh."
+    x_gatilho: "reabrir quando o x_dissect_criterion sair 2 ou mais E algum plano x_absorb_* ficar com a família de paridade inexistente ou sem citar a peça depois do forge. A cura é um check pós-forge, não mudança no dissect-plans.sh."
     trace: ".claude/validation/dissect-plans.sh"
 
   - id: Q_REABRIR_AUTORIDADE_NO_PROBE
