@@ -20,7 +20,12 @@ meta:
                                # Gatilhos antecipados: (1) [LIDOS na rodada de primárias de 2026-10-15]; (2) o degrau
                                # 0 ou 1 ser aplicado no vivo; (3) update do Claude Code/SDK no bridge.
   # kg-backlog-guard: on
-  # ═══ TETO: 136 NÓS ═══
+  # ═══ TETO: 140 NÓS ═══
+  #   DEGRAU 2 EM PRODUÇÃO + OBJETO DO DEGRAU 3 (2026-10-16, +4): a prova no processo vivo do --apply do degrau 2
+  #   (E_DEGRAU2_EM_PRODUCAO_1016), a medição do que o sandbox nativo ainda protegeria com os degraus 0 e 2 de pé
+  #   (nada no convidado), a superação que leva a rede de saída para a unit do runner com o critério de reabertura, e
+  #   a decisão OPEN para o maestro. O motivo do teto: o selo do degrau 3 pedia construir, e a medição achou o
+  #   objeto vazio — isso é decisão nova, não detalhe de nó existente.
   #   DEGRAU 2 CONSTRUÍDO (2026-10-16, +2): o spike do WORKSPACE que o E_SPIKE2 deixou aberto (opções medidas com units de
   #   runtime, a escolhida e por quê) e a construção com o dogfood real (units de runtime + o SDK do bridge, sem chamar a
   #   API) e os modos de falha, cada um dizendo o que confirma, o que corrige e o teto que fica.
@@ -2146,6 +2151,66 @@ nodes:
       method: "medição: units de runtime, grupo temporário e fixture removidos ao fim; API falsa no loopback; journal do lançador"
       locality: "host"
 
+  # ═══ DEGRAU 2 EM PRODUÇÃO E O OBJETO DO DEGRAU 3 (2026-10-16) ═══
+  # Antes de construir o degrau 3, medir o que ele ainda protegeria com os degraus 0 e 2 de pé. Medido: nada no convidado.
+
+  - id: E_DEGRAU2_EM_PRODUCAO_1016
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "ops/chat-runner.sh (core-only) install --apply rc 0 pela sessão principal (socket ativo às 11:31:49 UTC, bridge reiniciado às 11:31:51 UTC), depois do merge do PR #1165 e do deploy do bridge b7d224db (onion-bridge#74); verify REPETIDO por esta sessão às 11:47 UTC: rc 0, n_fail=0; CHAT_RUNNER_SOCKET no environ do MainPID 1144574; /health 200"
+    label: "DEGRAU 2 EM PRODUÇÃO: o /chat de convidado roda pelo socket num lançador sob UID dinâmico próprio; o verify passa com 0 falha no instalado e no processo vivo, inclusive o aperto de mão pelo socket sob UID próprio. Não medido: um turno real de convidado com a API."
+    narrative: "Medido em 2026-10-16. A sessão principal rodou o --apply do wrapper às 11:31 UTC (rc 0): grupo do runner, ACLs, lançador e as duas units, socket ligado e o drop-in 40-chat-runner.conf com o restart do bridge. Esta sessão repetiu o verify às 11:47 UTC, independente da que instalou: rc 0 e n_fail=0. Ele prova o efetivo da unit no systemctl show (DynamicUser=yes, User=onion-chat-%i, só o ExecStart do lançador, ProtectHome=yes, sem drop-in), o sandbox do template INSTALADO numa unit transitória (a home do serviço some, o environ do bridge ilegível, o estado como tmpfs só com workspaces e chat-homes, travessia sem listagem), o aperto de mão real pelo socket como a conta do serviço (o CLI respondeu ao initialize em 1,1 s, 14185 bytes) com a sessão sob UID próprio lida do journal, a recusa do lançador (flag fora da allowlist fecha sem um byte) e nenhum .git de workspace aberto ao grupo. Leitura independente do wrapper: CHAT_RUNNER_SOCKET presente no environ do MainPID 1144574, o bridge servido em b7d224db (merge do onion-bridge#74) e /health 200. NÃO MEDIDO: um turno real de convidado logado com a API (o aperto de mão para no initialize, sem chamar a API) e a primeira cópia de transcritos de uma conversa real."
+    trace: "ops/chat-runner.sh (core-only) verify; PR #1165; onion-bridge#74"
+    provenance:
+      source: "onion-vps-bridge e onion-chat.socket no host, systemd 255.4"
+      locator: "ops/chat-runner.sh verify; systemctl show -p ActiveEnterTimestamp; environ do MainPID; GET /health no loopback"
+      method: "medição: wrapper em produção, repetido por sessão independente da que instalou, mais leitura sem escrita"
+      locality: "host"
+
+  - id: E_DEGRAU3_OBJETO_MEDIDO_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "doc sandboxing de code.claude.com baixada em 2026-10-16 (sha256 f3feed627e09b91d…, l.9, l.11, l.42-43) e tools-reference (sha256 320420019ef6584a…, l.608); agent-policy.ts e o lançador do bridge em b7d224db; o código do WebFetch no CLI 2.1.232 do bridge e no 2.1.301 do host; o preflight de domínio da Anthropic consultado; units transitórias sob DynamicUser com as propriedades de rede do runner"
+    label: "OBJETO DO DEGRAU 3 MEDIDO: com os degraus 0 e 2 de pé, o sandbox nativo NÃO protege nada no convidado. Ele cobre só Bash, PowerShell e Monitor (e filhos), e o convidado não tem nenhum dos três. A rede que resta é a do WebFetch, que o sandbox declaradamente não limita."
+    narrative: "Medido em 2026-10-16. (1) ESCOPO DO SANDBOX (doc atual, verbatim): 'the limits apply to Bash, PowerShell, and Monitor commands and the processes they start'; 'The sandbox covers shell commands only. Claude's file tools, MCP servers, and hooks run outside it'; 'A denyRead entry doesn't stop the Read tool, and allowedDomains doesn't limit WebFetch'; hooks, MCP locais, monitores de plugin, LSP e apiKeyHelper 'run with your full access'. (2) O CONVIDADO no bridge b7d224db: tools só Read, Grep, Glob, WebFetch, WebSearch e TodoWrite (mais Edit, Write e NotebookEdit com bridge:write); Bash, Monitor, PowerShell, REPL, Workflow, Task e Agent em disallowedTools E na deny; disableAllHooks e disableSkillShellExecution; e o lançador do degrau 2 EXIGE isso (recusa --tools fora do conjunto, --disallowedTools sem negar as que executam, --settings sem os dois flags, --managed-settings diferente de allowManagedHooksOnly). Sem MCP passado pelo bridge, e o .mcp.json do workspace sob deny de escrita; MCP e hooks rodariam FORA do sandbox de qualquer forma. Logo o objeto do sandbox no convidado é VAZIO, e ligar o degrau 3 hoje não muda nenhum caminho de execução. (3) A REDE QUE RESTA é a do WebFetch, que roda no processo do CLI. Código do WebFetch nos dois CLIs (2.1.232 do bridge e 2.1.301 do host): a única guarda de URL é o tamanho, sem usuário e senha, e um hostname com ponto (localhost e nome sem ponto recusados); depois vem o upgrade de http para https e o preflight de domínio da Anthropic. Esse preflight respondeu can_fetch true para 127.0.0.1, 169.254.169.254, 10.0.0.1, 127.0.0.1.nip.io e 2130706433 (consultado direto). (4) Numa unit transitória sob DynamicUser com a rede do runner (RestrictAddressFamilies AF_UNIX AF_INET AF_INET6, sem IPAddressDeny), o TCP chegou a 27 de 27 portas escutando no loopback (o bridge, a API de administração do Caddy, o Vaultwarden, bancos e APIs de contêiner); o metadata 169.254.169.254 não respondeu. Nenhuma dessas portas completou TLS sem SNI (27 de 27 falharam), e o WebFetch só fala https. Logo o SSRF do convidado para o loopback está fechado HOJE pelo PROTOCOLO, não por política: um serviço TLS futuro no loopback o abre, e nada o vigia. LIMITES: o WebFetch não foi chamado por um modelo (exigiria a API); o SNI para um nome que resolve no loopback só bate no Caddy, que serve o mesmo que serve à internet; e a exfiltração do próprio workspace por WebFetch (injeção vinda de uma página) é da classe do degrau 5 e do egress, não do sandbox."
+    trace: "sondas do scratchpad da sessão: s3obj/probe_net.py, s3obj/ipdeny.out e s3obj/ipdeny-ctl.out; a doc baixada em s3obj/sandboxing.md e s3obj/tools-reference.md"
+    provenance:
+      source: "doc do Claude Code (sandboxing, tools-reference) + o bridge b7d224db + os CLIs 2.1.232 e 2.1.301 + systemd 255.4 do host"
+      locator: "sandboxing l.9, l.11 e l.42-43; tools-reference l.608; agent-policy.ts READ_ONLY_TOOLS, EXEC_TOOLS e DENY_RULES; launcher.py REQUIRED_FLAGS; a guarda de URL do WebFetch (hostname.split('.').length<2) e o domain_info"
+      method: "medição: leitura da doc e do código instalado, consulta ao preflight, units transitórias sem nada persistente (0 unit restante)"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: "A rede de saída do convidado se fecha na UNIT do runner (IPAddressDeny do loopback, link-local e faixas privadas, com o resolvedor liberado), não no sandbox nativo, que não alcança o WebFetch. O degrau 3 reabre só quando o convidado voltar a executar código."
+    narrative: "Superação de E_DEGRAU3_OBJETO_MEDIDO_1016. Spike em 2026-10-16, unit transitória sob DynamicUser: com IPAddressDeny de 127.0.0.0/8, ::1, 169.254.0.0/16, fe80::/10, 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 100.64.0.0/10 e fc00::/7, e IPAddressAllow do resolvedor local (127.0.0.53 e 127.0.0.54), o DNS de api.anthropic.com resolveu e o TLS 1.3 com ela fechou; o TCP para o bridge, a administração do Caddy, o Vaultwarden e o gateway do Docker deu timeout. Controle sem a diretiva: os quatro abertos. Uma linha por faixa (o systemd-run recusa a lista com 'localhost'). Vale para o WebFetch E para qualquer execução futura do convidado, porque é do cgroup inteiro. CRITÉRIO PARA REABRIR O DEGRAU 3 (gatilho, não cronograma): (a) Bash, PowerShell ou Monitor voltar ao convidado; (b) o admin passar a rodar pelo runner; (c) a doc do sandbox passar a cobrir o WebFetch ou as ferramentas de arquivo (o /meta:cc-update re-mede a cada versão). Nesses casos o passo de E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016 segue válido e dentro da instância do degrau 2. NÃO MEDIDO: a diretiva na unit do runner REAL, um turno real com a API sob ela, e a allowlist fechada do wrapper (ela recusaria a diretiva nova até ser estendida)."
+    trace: "sondas do scratchpad da sessão: s3obj/ipdeny.out (com a diretiva) e s3obj/ipdeny-ctl.out (controle)"
+
+  - id: D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-16"
+    verified_against: "NÃO SELADA: aguarda o maestro. A recomendação é desta sessão, de um agente, e passou pelo refutador."
+    label: "DECISÃO ABERTA: o degrau 3 não tem objeto no convidado com os degraus 0 e 2 de pé. Opções: (A, recomendada) parquear o degrau 3 com gatilho e fechar a rede local na unit do runner; (B) parquear o degrau 3 com gatilho e não mexer na rede; (C) construir o degrau 3 mesmo assim."
+    narrative: "Nasce de E_DEGRAU3_OBJETO_MEDIDO_1016 e responde a D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016, que mandou o degrau 3 esperar o degrau 2 (em produção desde 11:31 UTC, E_DEGRAU2_EM_PRODUCAO_1016). (A) RECOMENDADA, «Parquear o degrau 3 com gatilho e fechar a rede local na unit do runner»: o degrau 3 fica parado com o gatilho de C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX, sem socat, sem perfil AppArmor e sem cópia do bwrap no host. O SSRF do WebFetch para o loopback, hoje fechado só pelo protocolo, vira política: IPAddressDeny na unit do runner (PR no bridge com o modelo da unit + extensão da allowlist do wrapper + caso de bancada com mutante + verify que prova o timeout no loopback e o TLS na API). Custo: um PR em cada repo e um --apply. (B) «Parquear o degrau 3 com gatilho e não mexer na rede»: zero mudança; o SSRF segue fechado pelo protocolo, sem vigia. (C) «Construir o degrau 3 mesmo assim»: instala socat, a cópia privada do bwrap e o perfil AppArmor 'userns' para um caminho que nenhuma ferramenta do convidado usa, ou seja, superfície de kernel nova (E_USERNS_KERNEL_SURFACE_RISK) sem ganho medido. Descartada nas três: o managed-settings do host, que valeria para toda sessão Claude Code da VPS."
+    trace: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml"
+
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
     to: Q_CHAT_AGENT_ISOLATION_2026
@@ -2720,3 +2785,36 @@ edges:
   - from: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
     to: C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF
     edge_type: CONSTRAINS
+  - from: E_DEGRAU2_EM_PRODUCAO_1016
+    to: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
+    edge_type: SUPPORTS
+  - from: E_DEGRAU2_EM_PRODUCAO_1016
+    to: C_OPCAO_2_SEPARATE_UID_RUNNER
+    edge_type: SUPPORTS
+  - from: E_DEGRAU2_EM_PRODUCAO_1016
+    to: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
+    edge_type: SUPPORTS
+  - from: E_DEGRAU2_EM_PRODUCAO_1016
+    to: D_MAESTRO_DEGRAU2_CONSTRUIR_JA_1016
+    edge_type: TRACES_TO
+  - from: E_DEGRAU3_OBJETO_MEDIDO_1016
+    to: E_SANDBOXING_SHELL_ONLY
+    edge_type: SUPPORTS
+  - from: E_DEGRAU3_OBJETO_MEDIDO_1016
+    to: C_OPCAO_3_NATIVE_SANDBOX_STRICT
+    edge_type: CONSTRAINS
+  - from: E_DEGRAU3_OBJETO_MEDIDO_1016
+    to: D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX
+    to: E_DEGRAU3_OBJETO_MEDIDO_1016
+    edge_type: TRACES_TO
+  - from: E_DEGRAU3_OBJETO_MEDIDO_1016
+    to: D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX
+    to: D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016
+    edge_type: SUPPORTS
+  - from: D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016
+    to: D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016
+    edge_type: TRACES_TO

@@ -19,10 +19,32 @@ As sessões de /chat, de admin e de convidados, rodam o agente de código (Agent
 de jti) e dos segredos do serviço (`.env` com o M2M do Logto, `.git-credentials` com o PAT). Como isolar,
 e o que serve ao ecossistema Onion?
 
+## Decisão ABERTA: o degrau 3 sem objeto no convidado (`D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016`)
+
+Antes de construir o degrau 3, esta rodada mediu o que ele ainda protegeria com os degraus 0 e 2 de pé
+(`E_DEGRAU3_OBJETO_MEDIDO_1016`). **Nada no convidado.** Pela doc atual, o sandbox nativo cobre só Bash,
+PowerShell e Monitor e os processos que eles iniciam. Ferramentas de arquivo, MCP e hooks rodam fora dele, e
+`allowedDomains` não limita o WebFetch. O convidado não tem nenhuma ferramenta que execute: o bridge as nega
+em três lugares e o lançador do degrau 2 recusa a sessão que não as negue. A rede que resta é a do **WebFetch**.
+Ele aceita IP literal (o preflight da Anthropic respondeu `can_fetch: true` para `127.0.0.1` e
+`169.254.169.254`), e o UID do runner alcança por TCP 27 de 27 portas do loopback. Hoje o que fecha o SSRF é o
+**protocolo**: o WebFetch só fala https, e nenhuma dessas portas completou TLS sem SNI. Nenhuma política o fecha.
+O spike `IPAddressDeny=` na unit (`C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX`) fecha o loopback, o
+link-local e as faixas privadas e mantém o DNS e o TLS com a API.
+
+| Opção | O quê |
+|---|---|
+| **A (recomendada)** | Parquear o degrau 3 com gatilho e fechar a rede local na unit do runner (`IPAddressDeny=`, um PR em cada repo e um `--apply`) |
+| B | Parquear o degrau 3 com gatilho e não mexer na rede (o SSRF segue fechado só pelo protocolo) |
+| C | Construir o degrau 3 mesmo assim (socat, bwrap privado e perfil `userns` para um caminho que o convidado não usa) |
+
+O degrau 3 reabre por **gatilho**: o convidado voltar a ter Bash, PowerShell ou Monitor; o admin passar a rodar
+pelo runner; ou a doc do sandbox passar a cobrir o WebFetch ou as ferramentas de arquivo.
+
 ## Decisões do maestro sobre os degraus 2 e 3 (seladas em 2026-10-16)
 
 - **Degrau 2** (`D_MAESTRO_DEGRAU2_CONSTRUIR_JA_1016`): «Construir já, instalar com você» (descartadas: «Só a cura
-  parcial do data/» e «Parquear com gatilho»). Construído e provado em runtime; a instalação é o `--apply` root do maestro.
+  parcial do data/» e «Parquear com gatilho»). Construído, provado em runtime e **em produção desde 11:31 UTC** (`E_DEGRAU2_EM_PRODUCAO_1016`: verify com 0 falha, repetido por sessão independente).
 - **Degrau 3** (`D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016`): «Depois do degrau 2» (descartadas: «Instalar socat e
   perfil já» e «Parquear»). O caminho sem o managed-settings do host passa pela instância do degrau 2.
 
@@ -47,8 +69,8 @@ os degraus 1–3 esperam as provas virarem evidência.
 |---|---|---|---|
 | **0** | Convidado sem Bash; deny Edit/Write no home do onion fora do workspace **e** no `.claude/` e `CLAUDE.md` do próprio workspace (`E_OBJECAO_32_WORKSPACE_CLAUDE_DIR_WRITABLE`) | nada de root | **decidido (aplicar já)** |
 | **1** | systemd reescrito, **só integridade**: sem `EnvironmentFile=` (o segredo iria para o environ legível pelo mesmo UID, `E_OBJECAO_01`), `ReadOnlyPaths=` no código do bridge, `.claude` do home, dotfiles, JWKS e `members.yaml`; `InaccessiblePaths=` no `.ssh` e no `.git-credentials` depois de medir o uso | root uma vez; medir as escritas de um chat real antes do restart | **decidido; ensaiado** (`E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016`), a aplicar pelo wrapper |
-| **2** | UID separado por sessão (template `onion-chat@` com `DynamicUser=`), plugado pela costura `spawnClaudeCodeProcess`; a troca de UID é do **chamador** (`E_SDK_SPAWNOPTIONS_HAS_NO_UID`), e o bridge não consegue trocá-la (`E_OBJECAO_27`): lançador ativado por socket, instalado pelo root | root; dogfood do wrapper | **construído e provado em runtime** (`E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016`); aguarda o `--apply` do maestro |
-| **3** | sandbox nativo como defesa em profundidade, só com perfil AppArmor numa **cópia privada** do bwrap (`E_OBJECAO_30`: o perfil no bwrap do sistema libera userns às 6 contas), `failIfUnavailable` explícito no nível de política e `allowUnsandboxedCommands:false` | root; política | **spike feito** (`E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016`); selado para depois do degrau 2 |
+| **2** | UID separado por sessão (template `onion-chat@` com `DynamicUser=`), plugado pela costura `spawnClaudeCodeProcess`; a troca de UID é do **chamador** (`E_SDK_SPAWNOPTIONS_HAS_NO_UID`), e o bridge não consegue trocá-la (`E_OBJECAO_27`): lançador ativado por socket, instalado pelo root | root; dogfood do wrapper | **em produção** (`E_DEGRAU2_EM_PRODUCAO_1016`); falta medir um turno real de convidado com a API |
+| **3** | sandbox nativo como defesa em profundidade, só com perfil AppArmor numa **cópia privada** do bwrap (`E_OBJECAO_30`: o perfil no bwrap do sistema libera userns às 6 contas), `failIfUnavailable` explícito no nível de política e `allowUnsandboxedCommands:false` | root; política | **sem objeto no convidado** (`E_DEGRAU3_OBJETO_MEDIDO_1016`); decisão aberta (`D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016`) |
 | 4 | microVM/container por sessão | KVM (ausente nesta VPS) | fora desta VPS; opcional por adotante |
 | 5 | broker estreito (proxy da `ANTHROPIC_API_KEY`, git atrás de ferramenta) **sobre** o degrau 2 | o degrau 2 | aguarda |
 
@@ -102,6 +124,9 @@ workspace é gravável e carregado por `settingSources:["project"]` (`_32`).
 
 ## NÃO-VERIFICADOS
 
+0. **Degraus 2 e 3 (2026-10-16):** um turno real de convidado logado com a API sob o runner; o WebFetch chamado
+   por um modelo contra um IP do loopback (medidos só o código, o preflight e o TLS); `IPAddressDeny=` na unit
+   do runner real.
 1. **O que as três provas deixaram aberto:** se a deny de Edit/Write em `<workspace>/.claude/**` barra a
    escrita **pelo modelo** (exige chamada real à API); o lançador por socket do degrau 2 (a prova usou sudo);
    o teardown por EOF; o caminho específico do AppArmor no degrau 3 (com `socat` ausente o CLI para antes; um
