@@ -1,6 +1,6 @@
 ---
 branch: feat/chat-runner-degrau2
-pr: pendente
+pr: 1165
 date: 2026-10-16
 reviewed_diff_sha256: d8aba14bbc801d4ddea5c82d0ffd0c9cd88a70cf516df0bea1c9ac9ca7969903
 reviewed_code_sha256: f5f49ddb2d112d0d6f3b0e0dc64c0f6a6382d11817983fbce37567053171f93b
