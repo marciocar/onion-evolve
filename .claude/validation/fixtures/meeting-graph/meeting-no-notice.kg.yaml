@@ -1,0 +1,115 @@
+meta:
+  id: meeting-2026-10-15-cadastro-fornecedores
+  schema_version: "1"
+  baseline: "2026-10-16"
+  x_meeting_date: "2026-10-15"
+  x_meeting_source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
+  x_capture_stopped_at: "-"
+  purpose: "Alinhamento do cadastro de fornecedores: CNPJ pedido uma vez só com validação na hora"
+
+nodes:
+  - id: MEETING
+    node_type: entity
+    x_meeting_role: meeting
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "Reunião de alinhamento do cadastro de fornecedores, 2026-10-15, 14h00, entre Diego e Elisa."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt#L1-L2"
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linhas 1-2"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
+      locator: "#L1-L2"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+  - id: P_DIEGO
+    node_type: entity
+    x_meeting_role: participant
+    x_notice_ref: "-"
+    x_notice_response: sem_resposta
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    label: "Diego Ficticio, conduziu a reunião; não há aviso de gravação na transcrição, logo sem resposta."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt#L3"
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linha 3 (primeira fala)"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
+      locator: "#L3"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+  - id: P_ELISA
+    node_type: entity
+    x_meeting_role: participant
+    x_notice_ref: "-"
+    x_notice_response: sem_resposta
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    label: "Elisa Amostra, propôs a mudança do formulário; não há aviso de gravação na transcrição, logo sem resposta."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt#L4"
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linha 4 (primeira fala)"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
+      locator: "#L4"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+  - id: D_CNPJ_ONCE
+    node_type: decision
+    x_meeting_role: decision
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "Decidido pedir o CNPJ uma vez só no formulário de fornecedores, com validação na hora."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt#L4-L5"
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linhas 4-5"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
+      locator: "#L4-L5"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+  - id: A_ADJUST_FORM
+    node_type: claim
+    x_meeting_role: action
+    x_owner: P_ELISA
+    x_due: "2026-10-21"
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "[INFERIDO] Elisa ajusta o formulário até quarta, dia 21; mês e ano deduzidos da data da reunião (2026-10-21)."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt#L6"
+  - id: R_VALIDATION_SERVICE
+    node_type: claim
+    x_meeting_role: risk
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A validação do CNPJ depende de um serviço externo que às vezes cai."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt#L7"
+
+edges:
+  - from: P_DIEGO
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: P_ELISA
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: D_CNPJ_ONCE
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: A_ADJUST_FORM
+    to: D_CNPJ_ONCE
+    edge_type: DEPENDS_ON
+  - from: R_VALIDATION_SERVICE
+    to: D_CNPJ_ONCE
+    edge_type: CONSTRAINS

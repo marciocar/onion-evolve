@@ -21,8 +21,8 @@ tags:
   - strategic-analysis
   - gap-analysis
 
-version: "3.0.0"
-updated: "2025-12-01"
+version: "3.1.0"
+updated: "2026-10-16"
 
 related_commands:
   - /product/extract-meeting
@@ -47,6 +47,12 @@ Transformar múltiplas reuniões em conhecimento estratégico consolidado, ident
 - **Insights Estratégicos**: Padrões não explícitos e conexões importantes
 - **Pontos Não Ditos**: Assuntos que deveriam ter sido mencionados mas não foram
 - **Pontos Não Compreendidos**: Decisões ou ideias que parecem não ter sido entendidas
+
+**Onde moram as reuniões:** `docs/meetings/`, o mesmo diretório em que o `/product:extract-meeting` grava o
+resumo (`<nome>-extract.md`) e o grafo da reunião (`<nome>.kg.yaml`). Quando houver o grafo, leia-o junto do
+resumo: as decisões, ações e riscos dele trazem `trace` ao trecho da transcrição, e é esse trace que a
+consolidação deve citar. A consolidação ainda sai em Markdown; o grafo de consolidação entre reuniões (as
+reuniões ligadas por arestas) é trabalho aberto.
 
 ## ⚡ Fluxo de Execução
 
@@ -160,7 +166,7 @@ Verificar se a consolidação criada contém:
 Salvar a consolidação criada em arquivo estruturado:
 
 ```markdown
-# Salvar em: docs/meet/consolidation-[data]-[tema].md
+# Salvar em: docs/meetings/consolidation-[data]-[tema].md
 
 # Consolidação de Reuniões: [Tema Principal]
 
@@ -216,19 +222,19 @@ Use `/product/consolidate-meetings` quando:
 
 ```bash
 # Consolidar todas as reuniões de uma pasta
-/product/consolidate-meetings "docs/meet/gamification-meetings/"
+/product/consolidate-meetings "docs/meetings/gamification-meetings/"
 
 # Consolidar arquivos específicos
-/product/consolidate-meetings "docs/meet/meeting-1.md docs/meet/meeting-2.md docs/meet/meeting-3.md"
+/product/consolidate-meetings "docs/meetings/meeting-1.md docs/meetings/meeting-2.md docs/meetings/meeting-3.md"
 
 # Foco em divergências
-/product/consolidate-meetings "docs/meet/gamification-meetings/" --focus="divergences"
+/product/consolidate-meetings "docs/meetings/gamification-meetings/" --focus="divergences"
 
 # Foco em insights estratégicos
-/product/consolidate-meetings "docs/meet/strategic-planning/" --focus="insights"
+/product/consolidate-meetings "docs/meetings/strategic-planning/" --focus="insights"
 
 # Foco em pontos não ditos/compreendidos
-/product/consolidate-meetings "docs/meet/audio-recording-dec-1-9-38-extract.md" --focus="gaps"
+/product/consolidate-meetings "docs/meetings/audio-recording-dec-1-9-38-extract.md" --focus="gaps"
 ```
 
 ### Focos Disponíveis

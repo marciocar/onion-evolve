@@ -1,0 +1,166 @@
+meta:
+  id: meeting-2026-10-16-relatorios
+  schema_version: "1"
+  baseline: "2026-10-16"
+  x_meeting_date: "2026-10-16"
+  x_meeting_source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
+  x_capture_stopped_at: "-"
+  purpose: "Grafo FICTÍCIO de reunião para a bancada do meeting-graph-check.sh: pessoas, aviso, decisão, ação e risco, cada nó com trace ao trecho."
+
+nodes:
+
+  - id: MEETING
+    node_type: entity
+    x_meeting_role: meeting
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linhas 1-2"
+    label: "Reunião de planejamento do módulo de relatórios, 2026-10-16, 10h00."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L1-L2"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
+      locator: "#L1-L2"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+
+  - id: NOTICE_1
+    node_type: evidence
+    x_meeting_role: notice_attempt
+    x_notice_channel: chat
+    x_notice_text: "Aviso: esta reunião está sendo gravada e transcrita para virar ata e grafo. Quem não concordar, diga agora."
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linha 3"
+    label: "Tentativa de aviso no chat, por Ana Teste, às 10:00:05."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L3"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
+      locator: "#L3"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+
+  - id: P_ANA_TESTE
+    node_type: entity
+    x_meeting_role: participant
+    x_notice_ref: NOTICE_1
+    x_notice_response: autora_do_aviso
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linha 3"
+    label: "Ana Teste: conduziu a reunião e postou o aviso."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L3"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
+      locator: "#L3"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+
+  - id: P_BRUNO_EXEMPLO
+    node_type: entity
+    x_meeting_role: participant
+    x_notice_ref: NOTICE_1
+    x_notice_response: ciente
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linha 4"
+    label: "Bruno Exemplo: respondeu ao aviso «Ciente, pode gravar»."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L4"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
+      locator: "#L4"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+
+  - id: P_CARLA_MODELO
+    node_type: entity
+    x_meeting_role: participant
+    x_notice_ref: NOTICE_1
+    x_notice_response: ciente
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linha 5"
+    label: "Carla Modelo: respondeu ao aviso «Ciente»."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L5"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
+      locator: "#L5"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+
+  - id: D_RELATORIO_PDF_PLANILHA
+    node_type: decision
+    x_meeting_role: decision
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "leitura da transcrição, linhas 6-7"
+    label: "O relatório mensal sai em PDF e em planilha; o HTML fica de fora por enquanto."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L6-L7"
+    provenance:
+      source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
+      locator: "#L6-L7"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+
+  - id: A_GERADOR_PLANILHA
+    node_type: claim
+    x_meeting_role: action
+    x_owner: P_CARLA_MODELO
+    x_due: "2026-10-23"
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "Carla Modelo monta o gerador de planilha até sexta, 2026-10-23."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L8"
+
+  - id: R_LIB_PDF_SEM_MANUTENCAO
+    node_type: claim
+    x_meeting_role: risk
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Risco: a biblioteca de PDF em uso está sem manutenção há um ano."
+    trace: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L9"
+
+edges:
+
+  - from: NOTICE_1
+    to: MEETING
+    edge_type: SUPPORTS
+  - from: P_ANA_TESTE
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: P_BRUNO_EXEMPLO
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: P_CARLA_MODELO
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: D_RELATORIO_PDF_PLANILHA
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: A_GERADOR_PLANILHA
+    to: D_RELATORIO_PDF_PLANILHA
+    edge_type: DEPENDS_ON
+  - from: R_LIB_PDF_SEM_MANUTENCAO
+    to: D_RELATORIO_PDF_PLANILHA
+    edge_type: CONSTRAINS

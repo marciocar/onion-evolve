@@ -311,10 +311,10 @@ whisper reuniao-28-nov.m4a --language pt --model large --device cuda --output_fo
 /product/extract-meeting source=reuniao-28-nov.txt level=executive
 
 # 3. Consolidar múltiplas reuniões
-/product/consolidate-meetings source=docs/meet/sprint-planning/
+/product/consolidate-meetings source=docs/meetings/sprint-planning/
 
 # 4. Converter em tasks acionáveis
-/product/convert-to-tasks source=docs/meet/consolidation-*.md
+/product/convert-to-tasks source=docs/meetings/consolidation-*.md
 ```
 
 ### Otimização para Framework EXTRACT

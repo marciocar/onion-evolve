@@ -3,7 +3,9 @@ name: extract-meeting
 description: |
   Extração estruturada de conhecimento de transcrições de reuniões usando Framework EXTRACT.
   Use para transformar arquivos de contexto bruto em artefatos de alto valor para humanos, sistemas e IA.
-allowed-tools: Read Write Bash(find *) Bash(test -e *) Bash(mkdir -p *) Bash(basename *)
+  Grava o resumo (.md) e o grafo da reunião (.kg.yaml, com trace ao trecho e o registro de aviso aos
+  participantes) em docs/meetings/, e o grafo só fica se passar no gate meeting-graph-check.sh.
+allowed-tools: Read Write Bash(find *) Bash(test -e *) Bash(mkdir -p *) Bash(basename *) Bash(wc -l *) Bash(bash .claude/validation/meeting-graph-check.sh *)
 
 parameters:
   - name: source
@@ -23,8 +25,8 @@ tags:
   - knowledge-base
   - documentation
 
-version: "3.0.0"
-updated: "2025-12-01"
+version: "3.1.0"
+updated: "2026-10-16"
 
 related_commands:
   - /product/task
@@ -38,6 +40,10 @@ related_agents:
 
 knowledge_bases:
   - docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md
+
+outputs:
+  - docs/meetings/<nome>-extract.md
+  - docs/meetings/<nome>.kg.yaml
 ---
 
 # 📋 Extrair Conhecimento de Reunião
@@ -47,6 +53,16 @@ Transformação de transcrições brutas em conhecimento estruturado usando o Fr
 ## 🎯 Objetivo
 
 Processar transcrições de reuniões e gerar outputs estruturados consumíveis por humanos, sistemas e IA, seguindo as 7 dimensões do Framework EXTRACT.
+
+Toda extração gera **dois artefatos** em `docs/meetings/`, o diretório único das reuniões (o
+`/product:consolidate-meetings`, o `/product:whisper` e o `@whisper-specialist` leem e gravam no mesmo lugar):
+
+- `<nome>-extract.md`: o resumo EXTRACT no nível pedido, para gente ler;
+- `<nome>.kg.yaml`: o **grafo da reunião** (pessoas, aviso, decisões, ações e riscos), cada nó com
+  `trace` ao trecho da transcrição. É a entrada da consolidação entre reuniões.
+
+A entrada aceita hoje é **transcrição em texto** (`.txt` ou `.md`, uma fala por linha). Áudio e vídeo passam
+antes pelo `/product:whisper`, que gera o texto.
 
 ## ⚡ Fluxo de Execução
 
@@ -72,6 +88,10 @@ fi
 # Ler transcrição(ões)
 Read "{{source}}"
 ```
+
+O grafo cita o trecho por **número de linha** (`#L<a>[-L<b>]`), então leia a transcrição com os números
+de linha (a ferramenta Read já os mostra) e guarde-os. Uma transcrição de uma linha só (o texto corrido de alguns exportadores) não dá trecho
+citável: quebre uma fala por linha antes de extrair.
 
 ### Passo 3: Aplicar Framework EXTRACT
 
@@ -145,7 +165,8 @@ Processar a transcrição abaixo aplicando o Framework EXTRACT completo.
 Output YAML completo seguindo schema do knowledge base.
 
 **Nível `graph`:**
-JSON com entidades e relacionamentos para sistemas.
+Só o grafo da reunião (Passo 6), sem o `.md`. O grafo é gravado em **todo** nível; os outros níveis
+mudam só o resumo.
 
 ### Passo 5: Salvar Resultado
 
@@ -161,6 +182,119 @@ mkdir -p docs/meetings/
 write "${OUTPUT_FILE}"
 ```
 
+### Passo 6: Gravar o grafo da reunião (`docs/meetings/<nome>.kg.yaml`)
+
+`<nome>` é o mesmo `OUTPUT_NAME` do Passo 5 (o nome da transcrição sem extensão), então o resumo e o grafo
+ficam lado a lado: `docs/meetings/<nome>-extract.md` e `docs/meetings/<nome>.kg.yaml`.
+
+Escreva o grafo na gramática do `.kg.yaml` (o radar é `awk`: uma chave por linha, listas com `- id:` e
+`- from:`, `node_type:`/`edge_type:` nunca `type:`, datas entre aspas, `label` ≤ 280 caracteres, ids
+`[A-Za-z0-9_]` em inglês ou sem acento). O esquema mínimo:
+
+```yaml
+meta:
+  id: meeting-<AAAA-MM-DD>-<tema>
+  schema_version: "1"
+  baseline: "<data da extração>"
+  x_meeting_date: "<AAAA-MM-DD da reunião>"
+  x_meeting_source: "<caminho da transcrição, relativo à raiz do repo>"
+  x_capture_stopped_at: "-"        # ou "#L<n>": a linha em que a captura parou porque alguém recusou
+  purpose: "<uma linha: do que a reunião tratou>"
+
+nodes:
+  - id: MEETING                    # 1 por grafo
+    node_type: entity
+    x_meeting_role: meeting
+    plane: DEV
+    status: confirmed
+    impact: 3                      # INTEIRO de 1 a 5 (nunca low/medium/high)
+    confidence: 0.9                # NÚMERO de 0 a 1 (nunca high/medium/low)
+    label: "<uma frase em pt-BR, até 280 caracteres>"
+    trace: "<x_meeting_source>#L1-L2"
+    verified_at: "<data da extração>"
+    verified_against: "leitura da transcrição, linhas 1-2"
+    provenance:
+      source: "<x_meeting_source>"
+      locator: "#L1-L2"
+      method: "leitura: trecho da transcrição da reunião"
+      locality: "repo"
+  - id: NOTICE_1                   # 1 por TENTATIVA de aviso (gravação, transcrição, uso dos dados)
+    node_type: evidence
+    x_meeting_role: notice_attempt
+    x_notice_channel: chat         # chat | voz | convite | outro
+    x_notice_text: "<o texto do aviso, verbatim>"
+  - id: P_<NOME>                   # 1 por participante
+    node_type: entity
+    x_meeting_role: participant
+    x_notice_ref: NOTICE_1         # a tentativa de aviso a que esta pessoa responde
+    x_notice_response: ciente      # ciente | recusou | sem_resposta | autora_do_aviso
+  - id: D_<DECISAO>
+    node_type: decision
+    x_meeting_role: decision
+  - id: A_<ACAO>
+    node_type: claim
+    x_meeting_role: action
+    x_owner: P_<NOME>              # ou NAO_ESPECIFICADO
+    x_due: "<AAAA-MM-DD>"          # opcional
+  - id: R_<RISCO>
+    node_type: claim
+    x_meeting_role: risk
+
+edges:
+  - from: NOTICE_1
+    to: MEETING
+    edge_type: SUPPORTS             # o aviso sustenta a reunião
+  - from: P_<NOME>
+    to: MEETING
+    edge_type: TRACES_TO            # participante e decisão apontam a reunião
+  - from: D_<DECISAO>
+    to: MEETING
+    edge_type: TRACES_TO
+  - from: A_<ACAO>
+    to: D_<DECISAO>
+    edge_type: DEPENDS_ON           # a ação nasce da decisão
+  - from: R_<RISCO>
+    to: D_<DECISAO>
+    edge_type: CONSTRAINS           # o risco limita a decisão sem derrubá-la
+```
+
+Todo nó com `x_meeting_role` leva os campos que o `MEETING` mostra acima: `plane: DEV`, `status`,
+`impact` (inteiro 1-5), `confidence` (número 0-1), `label` (pt-BR) e
+**`trace: "<x_meeting_source>#L<a>[-L<b>]"`**, o trecho de onde o fato saiu.
+- **`confirmed`**: reunião, aviso, participante e decisão tomada. Levam `verified_at`, `verified_against` e o
+  bloco `provenance` exatamente na forma do `MEETING` (o `locator` é o mesmo trecho do `trace`).
+- **`open`**: ação e risco (são compromisso e incerteza, não fato verificado), só com o `trace`.
+- **Trace do participante**: a linha em que ele responde ao aviso; sem resposta, a primeira fala dele.
+- **Inferência**: dono ou prazo que você deduziu (ex.: "eu faço até sexta" → a data) entra com
+  `[INFERIDO]` no `label` e `confidence` de 0.6 ou menos. Dono que ninguém nomeou é `NAO_ESPECIFICADO`.
+- **Arestas**: as do bloco `edges:` acima, uma por nó. Nó sem aresta reprova no radar como órfão.
+
+**O registro de aviso (aviso ≠ consentimento).** O grafo registra **o que aconteceu**: cada tentativa de
+aviso e a resposta de cada participante a ela. Ele **nunca declara consentimento legal**: isso é juízo
+jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_consent`/`consentimento_legal`.
+- Sem aviso na transcrição, **não invente um**: grave o grafo sem `notice_attempt`, com cada participante em
+  `x_notice_ref: "-"` e `x_notice_response: sem_resposta`, e o gate reprova com um motivo só,
+  `SEM-TENTATIVA-DE-AVISO`. É o comportamento esperado; o caminho é registrar o aviso na próxima reunião (ou anexar à transcrição o aviso
+  que foi dado por outro canal, como o convite, e citar essa linha).
+- Participante que não respondeu é `sem_resposta`, nunca `ciente` por suposição.
+- Se alguém **recusou**, a captura para ali: `x_capture_stopped_at: "#L<linha da recusa>"`, e nenhuma
+  decisão, ação ou risco pode citar trecho depois dessa linha.
+
+### Passo 7: Gate do grafo
+
+```bash
+bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
+```
+
+- **rc 0**: conforme (aviso registrado, trace ao trecho, radar verde).
+- **rc 1**: reprovado. A saída lista um motivo por linha, `MOTIVO<TAB>nó<TAB>detalhe`; mostre todos. Corrija o que é erro de extração (trace
+  errado, nó órfão, dono que não é participante) e rode de novo. `SEM-TENTATIVA-DE-AVISO` e
+  `RECUSA-SEM-PARADA` **não se corrigem no grafo**: dizem que a reunião não tem registro de aviso ou que a
+  captura seguiu depois de uma recusa. Mostre o motivo ao usuário e não apresente o grafo como válido.
+- **rc 2**: o gate não pôde julgar (radar ou python3 ausente). Não é verde: diga isso ao usuário.
+
+> **Dados reais.** O grafo guarda nomes e falas reais, sem anonimização. Não o grave em repositório público.
+
 ## 📤 Output Esperado
 
 ```
@@ -169,6 +303,7 @@ write "${OUTPUT_FILE}"
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📁 Arquivo: docs/meetings/[nome]-extract.md
+🕸️ Grafo:   docs/meetings/[nome].kg.yaml (gate: ✅ conforme | ✗ MOTIVO)
 
 📊 Extração EXTRACT:
 ∟ Essência: ✅
@@ -207,7 +342,7 @@ write "${OUTPUT_FILE}"
 # Processar pasta de contexto
 /product/extract-meeting source=contextos/projeto-x/
 
-# Gerar grafo para sistemas
+# Só o grafo da reunião (docs/meetings/reuniao.kg.yaml), sem o resumo
 /product/extract-meeting source=reuniao.txt level=graph
 ```
 
@@ -216,6 +351,7 @@ write "${OUTPUT_FILE}"
 - **Agente**: `@extract-meeting-specialist`
 - **Knowledge Base**: `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md`
 - **Framework**: EXTRACT (7 dimensões)
+- **Gate do grafo**: `.claude/validation/meeting-graph-check.sh` (esquema completo no cabeçalho dele)
 
 ## ⚠️ Notas
 

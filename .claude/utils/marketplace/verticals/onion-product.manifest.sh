@@ -47,7 +47,14 @@ SKILLS=(
 )
 HOOKS=()
 UTILS=(".claude/utils/task-manager")   # o helper env-check.sh: sem ele os comandos que leem o provider não têm caminho (o veto barra abrir o .env)
-VALIDATION=()
+# O gate do grafo de reunião que o /product:extract-meeting manda rodar (SAC-157, 2026-10-16), e o radar que
+# ele chama AO LADO (mesma forma do onion-engineering, que também empacota o radar com a lib). Sem o radar no
+# bundle o gate sai 2 ("não pude julgar"), nunca verde.
+VALIDATION=(
+  ".claude/validation/meeting-graph-check.sh"
+  ".claude/validation/kg-radar.sh"
+  ".claude/validation/lib/status-factor.awk"
+)
 TEMPLATES=()
 DOCS=(
   "docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md"

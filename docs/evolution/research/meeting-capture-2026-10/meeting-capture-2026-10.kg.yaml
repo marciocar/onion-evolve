@@ -1,0 +1,110 @@
+meta:
+  id: meeting-capture-2026-10
+  schema_version: "1"
+  baseline: "2026-10-16"
+  review_after: "2026-11-15"   # 30d: o MESMO prazo do grafo de pesquisa da curadoria (ferramentas e preços mudam rápido)
+  purpose: |
+    Triagem do core da pesquisa de captura de reunião → grafo (SAC-157). A pesquisa canônica (13 nós: maquinaria
+    do Onion, landscape de bot, captura local, arquivo e STT medido) mora no repo de curadoria, no MESMO caminho
+    relativo deste arquivo. Aqui ficam só o que o core decide e o que o core executa: o modelo aviso ≠
+    consentimento absorvido por reescrita, o passo zero (diretório único e o grafo por reunião a partir de
+    texto) e a pergunta aberta da máquina de captura. Os vereditos das ferramentas moram nos grafos de
+    dissecação do core: docs/evolution/dissect/vexa-2026-10/ e docs/evolution/dissect/anarlog-2026-10/.
+  # kg-backlog-guard: on
+  # ═══ TETO: 5 NÓS. Cresce quando a curadoria devolver a pesquisa da máquina de captura (SAC-164) ou o grafo de consolidação entrar em plano. ═══
+  # Proposta triada: docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md
+
+nodes:
+
+  - id: P_CONSENT_EVIDENCE_REWRITE
+    node_type: decision
+    impact: 4
+    confidence: 0.7
+    label: "ABSORVER POR REESCRITA o modelo aviso ≠ consentimento do anarlog, em pt-BR, como campos do grafo de cada reunião: tentativa de aviso registrada, resposta por participante, parar na recusa, nunca declarar consentimento legal."
+    trace: ".claude/validation/meeting-graph-check.sh"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «Absorver por reescrita (Recomendado)»"
+    narrative: |-
+      Proposto pela curadoria (P_CONSENT_EVIDENCE_REWRITE no grafo da dissecação do anarlog, fonte: meeting-consent.ts e a migration session_consent_evidence do anarlog no pin e8a9dec). Independe do app: serve a qualquer modo de entrada (bot, extensão, captura local, arquivo, API nativa). A reescrita vive no esquema do grafo de reunião do /product:extract-meeting e é cobrada pelo meeting-graph-check.sh: SEM-TENTATIVA-DE-AVISO, PARTICIPANTE-SEM-RESPOSTA, RECUSA-SEM-PARADA, CAPTURA-APOS-RECUSA e CONSENTIMENTO-LEGAL-DECLARADO. Nenhuma linha do anarlog foi copiada: os nomes e o enum de respostas (ciente, recusou, sem_resposta, autora_do_aviso) são do Onion.
+
+      Selado por /meta:decide em 2026-10-16: escolhida «Absorver por reescrita (Recomendado)»; descartadas: «Só um campo livre de consentimento».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «Modelo aviso ≠ consentimento do anarlog (P_CONSENT_EVIDENCE_REWRITE): absorver por reescrita como campos do grafo de cada reunião? [texto da pergunta reconstruído do tema pela triagem; o literal não chegou ao agente que selou]»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
+
+  - id: E_MEETING_GRAPH_GATE_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "bash .claude/validation/meeting-graph-check.sh --selftest (19 polaridades verdes) e a família meeting_graph da bancada, com um mutante por cura; dogfood do /product:extract-meeting por agente de contexto limpo sobre duas transcrições fictícias"
+    label: "PASSO ZERO entregue: o /product:extract-meeting grava também o .kg.yaml da reunião a partir de texto, e o meeting-graph-check.sh reprova a reunião sem tentativa de aviso registrada (o caso de bancada pedido), além do trace fora do trecho e do tipo errado."
+    trace: ".claude/validation/meeting-graph-check.sh"
+    narrative: "O 1º dogfood achou um furo do próprio gate: o grafo com confidence: high passava, porque o radar não confere tipo de campo e o contrato não era chamado. Curado no mesmo PR: o gate cobra impact inteiro 1-5 e confidence 0-1 (CAMPO-FORA-DO-TIPO) e roda o kg-contract-check.sh onde ele mora ao lado."
+    provenance:
+      source: ".claude/validation/meeting-graph-check.sh"
+      locator: "--selftest; lint-selftest.sh, run_meeting_graph_selftests"
+      method: "medição: selftest e bancada com mutantes, mais dogfood do comando por agente de contexto limpo"
+      locality: "repo"
+
+  - id: E_DIR_MEETINGS_CANONICO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "git grep -nE 'docs/meet(ings)?\\b' -- .claude docs em origin/main 5179e467: 31 ocorrências de docs/meet (todas em exemplos e no KB do Whisper, nenhuma gravação real) e 3 de docs/meetings (todas no extract, o único que grava); diretórios reais nos repos locais da máquina do core: 2 adotantes com docs/meetings/ e arquivos de reunião, 0 com docs/meet/"
+    label: "O diretório canônico das reuniões é docs/meetings/: é onde o único gravador (o extract) já escrevia, é onde há arquivos reais em adotantes (2 contra 0) e casa com os nomes dos comandos. As 31 citações de docs/meet foram migradas."
+    trace: ".claude/commands/product/extract-meeting.md"
+    narrative: "Defeito apontado pela curadoria (E_MC_MAQUINARIA_SO_TEXTO): o extract gravava em docs/meetings/ e o consolidate e o whisper liam docs/meet/. O acréscimo do maestro à decisão da Vexa mandou padronizar. Conferido pela ausência da palavra velha: git grep -wn 'docs/meet' -- .claude docs ':!docs/evolution' devolve 0. Nada foi movido: o core não tem nenhum dos dois diretórios, e os arquivos reais dos adotantes já estão no canônico."
+    provenance:
+      source: "git grep em origin/main 5179e467 e listagem dos repos locais"
+      locator: "7 arquivos migrados: whisper-specialist, consolidate-documents, consolidate-meetings, convert-to-tasks, transform-consolidated, whisper (comando) e o KB tools/whisper.md"
+      method: "medição: git grep antes e depois, e ls dos diretórios docs/meet e docs/meetings"
+      locality: "repo"
+
+  - id: Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.4
+    label: "Máquina de captura: o maestro usa Windows como cliente e quer a VPS como servidor principal (extensão de navegador ou plugin), com o processamento local ou na VPS. Qual caminho de captura e STT funciona assim? Pesquisa da curadoria na SAC-164."
+    x_gatilho: "fecha quando a curadoria devolver a SAC-164 (filha da SAC-157) com o caminho medido para Windows cliente + VPS servidor: qual captura (extensão da Vexa, outra extensão, app local) roda no Windows, onde o STT roda (local ou VPS) e como o áudio chega à VPS. Reabre D_ANARLOG_2610 se o anarlog não tiver caminho no Windows."
+    trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
+    narrative: |-
+      Resposta livre do maestro em 2026-10-16, à pergunta sobre a máquina de captura (registrada verbatim, NÃO é decisão selada): "O servidor principal vai ser como a VPS aqui, quem sabe extensão de navegador ou plugin? Minha Máquina é windows, mas isso não pode ser um problema. Se precisar passe para o Curation pesquisar o que fazer. O processamento pode ser local ou passar pela VPS."
+
+      Fecha a lacuna E_N2_CAPTURE_MACHINE do grafo do anarlog na curadoria pelo lado do FATO (é Windows), e abre a do caminho: o motor STT embutido do anarlog só existe em macOS Apple Silicon e o aviso dele recusa no Windows (E_AVISO_WINDOWS_RECUSA em anarlog-2026-10); a extensão da Vexa captura a aba do navegador, o que é independente do sistema, mas o host desktop dela no Windows não foi medido. O motor medido pela curadoria (Parakeet em CPU de 8 vCPU) é o perfil da VPS.
+
+  - id: Q_MEETING_CONSOLIDATION_GRAPH
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando: hoje o meeting-graph-check.sh só roda quando o extract o chama, não no lint do repo que guarda as reuniões."
+    x_gatilho: "entra em plano quando houver 2 ou mais grafos de reunião reais num repo (o consolidado precisa de matéria) ou quando um grafo de reunião editado à mão escapar do gate."
+    trace: ".claude/commands/product/consolidate-meetings.md"
+
+edges:
+
+  - from: E_MEETING_GRAPH_GATE_1016
+    to: P_CONSENT_EVIDENCE_REWRITE
+    edge_type: SUPPORTS
+  - from: E_DIR_MEETINGS_CANONICO
+    to: E_MEETING_GRAPH_GATE_1016
+    edge_type: SUPPORTS
+  - from: Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016
+    to: P_CONSENT_EVIDENCE_REWRITE
+    edge_type: CONSTRAINS
+  - from: Q_MEETING_CONSOLIDATION_GRAPH
+    to: E_MEETING_GRAPH_GATE_1016
+    edge_type: CONSTRAINS

@@ -1,0 +1,8 @@
+Transcrição FICTÍCIA para a bancada do grafo de reunião. Nenhuma pessoa, empresa ou dado real.
+Reunião de alinhamento do cadastro de fornecedores, 2026-10-15, 14h00.
+[14:00:04] Diego Ficticio: Boa tarde. Vamos direto ao cadastro de fornecedores.
+[14:00:40] Elisa Amostra: O formulário atual pede CNPJ duas vezes. Proposta: pedir uma vez só e validar na hora.
+[14:01:15] Diego Ficticio: Fechado, uma vez só, com validação na hora.
+[14:01:50] Elisa Amostra: Eu ajusto o formulário até quarta, dia 21.
+[14:02:30] Diego Ficticio: Risco: a validação depende de um serviço externo que às vezes cai.
+[14:03:00] Diego Ficticio: Era isso. Obrigado.

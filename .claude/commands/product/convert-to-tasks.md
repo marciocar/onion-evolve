@@ -169,10 +169,10 @@ Lista de tasks criadas com IDs e URLs, apresentada de forma clara:
 
 ```bash
 # 1. Consolidar reuniões
-/product/consolidate-meetings "docs/meet/sprint-planning/"
+/product/consolidate-meetings "docs/meetings/sprint-planning/"
 
 # 2. Converter em tasks
-/product/convert-to-tasks "docs/meet/consolidation-*.md"
+/product/convert-to-tasks "docs/meetings/consolidation-*.md"
 ```
 
 ### Após Consolidar Documentos

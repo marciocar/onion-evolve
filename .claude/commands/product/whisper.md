@@ -107,10 +107,10 @@ Apresentar workflow completo:
    /product/extract-meeting source={{arquivo_txt}} level=executive
 
 2. Consolidar múltiplas reuniões:
-   /product/consolidate-meetings source=docs/meet/
+   /product/consolidate-meetings source=docs/meetings/
 
 3. Converter em tasks:
-   /product/convert-to-tasks source=docs/meet/consolidation-*.md
+   /product/convert-to-tasks source=docs/meetings/consolidation-*.md
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -208,8 +208,8 @@ Apresentar workflow completo:
 /product/extract-meeting source=reuniao-28-nov.txt
 
 # 3. Consolidar e converter (workflow completo)
-/product/consolidate-meetings source=docs/meet/
-/product/convert-to-tasks source=docs/meet/consolidation-*.md
+/product/consolidate-meetings source=docs/meetings/
+/product/convert-to-tasks source=docs/meetings/consolidation-*.md
 ```
 
 ### Caso 4: Troubleshooting
@@ -250,12 +250,12 @@ Este comando facilita o workflow completo:
 # → Gera: conhecimento estruturado
 
 # 3. Consolidar múltiplas reuniões
-/product/consolidate-meetings source=docs/meet/sprint-planning/
+/product/consolidate-meetings source=docs/meetings/sprint-planning/
 
 # → Gera: documento consolidado
 
 # 4. Converter em tasks
-/product/convert-to-tasks source=docs/meet/consolidation-*.md
+/product/convert-to-tasks source=docs/meetings/consolidation-*.md
 
 # → Gera: tasks no Task Manager
 ```

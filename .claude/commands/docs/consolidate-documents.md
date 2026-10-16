@@ -304,7 +304,7 @@ Use `/docs/consolidate-documents` quando:
 /docs/consolidate-documents "docs/gamification/" --focus="insights"
 
 # Foco em gaps de informação
-/docs/consolidate-documents "docs/meet/gamification-meetings/" --focus="gaps"
+/docs/consolidate-documents "docs/meetings/gamification-meetings/" --focus="gaps"
 
 # Foco em estrutura otimizada
 /docs/consolidate-documents "docs/business-context/" --focus="structure"

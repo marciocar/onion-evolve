@@ -459,6 +459,9 @@ Você identifica e apresenta pontos que:
 
 - **Agente Relacionado**: @extract-meeting-specialist (extração estruturada)
 - **Knowledge Base**: `docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md`
+- **Reuniões**: `docs/meetings/` — o resumo `<nome>-extract.md` e o grafo `<nome>.kg.yaml` de cada reunião,
+  ambos gravados pelo `/product:extract-meeting`; cite o `trace` do grafo (o trecho da transcrição) ao
+  apontar divergência ou convergência
 - **Framework EXTRACT**: Base para extração inicial (usado pelo extract-meeting-specialist)
 
 ## 📈 Métricas de Qualidade

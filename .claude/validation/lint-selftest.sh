@@ -39822,6 +39822,76 @@ EOF_MUT
 }
 _family run_mcp_onion_kg_writer_selftests
 
+# GRAFO DE REUNIÃO — SAC-157 (passo zero do core, 2026-10-16). O /product:extract-meeting passou a gravar o
+# `.kg.yaml` da reunião, e o gate dele é o meeting-graph-check.sh: trace ao trecho da transcrição e o modelo
+# aviso ≠ consentimento (tentativa de aviso, resposta por participante, parada na recusa, nunca consentimento
+# legal). Casos: (a) o --selftest próprio (20 polaridades) · (b) a CLI sobre a fixture boa, como o comando a
+# chama → rc 0 · (c) a CLI sobre a reunião SEM tentativa de aviso (o grafo que o próprio comando gerou no dogfood)
+# → rc 1 com esse motivo e só ele · (d) sem o radar
+# ao lado → rc 2, nunca verde · (m) UM MUTANTE POR CURA, na CÓPIA — mutante que não se aplica é FALHA.
+run_meeting_graph_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/meeting-graph-check.sh" fx="${REPO_ROOT}/.claude/validation/fixtures/meeting-graph"
+  if [ ! -f "${chk}" ] || [ ! -f "${fx}/meeting-ok.kg.yaml" ] || [ ! -f "${fx}/meeting-no-notice.kg.yaml" ]; then
+    record_fail "meeting-graph" "checador ou fixtures ausentes"; return; fi
+  local o rc
+  # (a) o --selftest próprio
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE '^meeting-graph selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
+    record_pass "meeting-graph: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos)"
+  else record_fail "meeting-graph: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) a CLI na fixture boa, com a raiz do repo (o trace é relativo a ela)
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/meeting-graph-check.sh" "${fx}/meeting-ok.kg.yaml" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'conforme' <<< "${o}"; then record_pass "meeting-graph: (b) reunião com aviso registrado → rc 0"
+  else record_fail "meeting-graph: (b) fixture boa" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
+  # (c) o MODO DE FALHA que a SAC-157 pediu: reunião sem tentativa de aviso registrada reprova no gate
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/meeting-graph-check.sh" "${fx}/meeting-no-notice.kg.yaml" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^SEM-TENTATIVA-DE-AVISO\t' <<< "${o}" && [ "$(grep -c $'\t' <<< "${o}")" -eq 1 ]; then record_pass "meeting-graph: (c) reunião sem tentativa de aviso → rc 1 SEM-TENTATIVA-DE-AVISO"
+  else record_fail "meeting-graph: (c) sem aviso" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
+  # (d) sem o radar ao lado → rc 2 (não julgou a integridade, não passa)
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/.claude/validation/lib" "${sb}/.claude/validation/fixtures/meeting-graph"
+  cp "${chk}" "${sb}/.claude/validation/"; cp "${fx}"/* "${sb}/.claude/validation/fixtures/meeting-graph/"
+  local s="${sb}/.claude/validation/meeting-graph-check.sh"
+  if o="$(cd "${sb}" && LC_ALL=C bash "${s}" "${sb}/.claude/validation/fixtures/meeting-graph/meeting-ok.kg.yaml" --root "${sb}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'kg-radar.sh ausente' <<< "${o}"; then record_pass "meeting-graph: (d) sem o radar ao lado → rc 2 (não julga, não passa)"
+  else record_fail "meeting-graph: (d) sem radar" "rc=${rc}; $(head -2 <<< "${o}" | tr '\n' '|')"; fi
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${sb}/.claude/validation/"; cp "${REPO_ROOT}/.claude/validation/lib/status-factor.awk" "${sb}/.claude/validation/lib/"
+  # (m) MUTANTES — reverte cada cura na CÓPIA e EXIGE que o caso nomeado do --selftest reprove
+  local old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "meeting-graph: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "meeting-graph: (m) mutante morde → ✗ ${want}"
+    else record_fail "meeting-graph: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+if not notices:$(printf '\x1f')if 0:$(printf '\x1f')sem tentativa de aviso reprova
+    if n.get("x_notice_channel") not in CHAN or not n.get("x_notice_text"):$(printf '\x1f')    if 0:$(printf '\x1f')aviso sem texto reprova
+        if not resp: fail($(printf '\x1f')        if 0: fail($(printf '\x1f')participante sem resposta reprova
+RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso"}$(printf '\x1f')RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso", "consentiu"}$(printf '\x1f')resposta 'consentiu' reprova
+        if notices and roles.get(ref) != "notice_attempt": fail($(printf '\x1f')        if 0: fail($(printf '\x1f')ref de aviso inexistente reprova
+    if re.search(r"legal_consent|consentimento_legal", k, re.I): legal.append(k)$(printf '\x1f')    pass$(printf '\x1f')consentimento legal declarado reprova
+if refused and stop_line is None:$(printf '\x1f')if 0:$(printf '\x1f')recusa sem parada reprova
+if r in ("decision", "action", "risk") and by[i].get("_from", 0) > stop_line:$(printf '\x1f')if 0:$(printf '\x1f')recusa com parada antes da decisão reprova
+    if not t: fail("TRACE-AUSENTE", n["id"], "nó de reunião sem trace ao trecho"); continue$(printf '\x1f')    if not t: continue$(printf '\x1f')nó sem trace reprova
+    if not m or m.group(1) != src:$(printf '\x1f')    if not m:$(printf '\x1f')trace para outro arquivo reprova
+    if a < 1 or b < a or (nlines is not None and b > nlines):$(printf '\x1f')    if 0:$(printf '\x1f')trace além do fim do arquivo reprova
+        if not (o == "NAO_ESPECIFICADO" or roles.get(o) == "participant"):$(printf '\x1f')        if 0:$(printf '\x1f')ação sem dono reprova
+    if r not in ROLES: fail($(printf '\x1f')    if 0: fail($(printf '\x1f')papel desconhecido reprova
+    else: fail("TRANSCRICAO-AUSENTE"$(printf '\x1f')    else: (lambda *a: None)("TRANSCRICAO-AUSENTE"$(printf '\x1f')transcrição ausente reprova
+  if [ "\${rrc}" -ne 0 ]; then$(printf '\x1f')  if false; then$(printf '\x1f')radar reprova o órfão
+    if not re.fullmatch(r"[1-5]", n.get("impact", "")):$(printf '\x1f')    if 0:$(printf '\x1f')impact em texto reprova
+    if not (re.fullmatch(r"(0(\.\d+)?|1(\.0+)?)", c)):$(printf '\x1f')    if 0:$(printf '\x1f')confidence em texto reprova
+if notices and roles.get(ref) != "notice_attempt": fail($(printf '\x1f')if roles.get(ref) != "notice_attempt": fail($(printf '\x1f')sem aviso, com refs '-', reprova por um motivo só
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_meeting_graph_selftests
+
 # ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
 # ---------------------------------------------------------------------------
