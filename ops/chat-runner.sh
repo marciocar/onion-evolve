@@ -557,9 +557,14 @@ run_sandbox_probe() {   # run_sandbox_probe <template> <com-grupo> <launcher> [<
 # o piso do CLI (CLI_FLOOR): imprime UMA linha OK/FALHA; rc 0 = o binário responde uma versão no piso ou acima.
 # Comparação numérica por campo (2.1.100 > 2.1.64), nunca lexical; saída sem versão é FALHA, nunca passa calada
 cli_floor() {
-  local out v fl
-  out="$(as_svc /usr/bin/env -i PATH=/usr/bin:/bin HOME=/nonexistent DISABLE_AUTOUPDATER=1 "${CLAUDE_SRC}" --version 2>/dev/null)"
+  local out v fl rc
+  # com teto (um binário trocado que trave não prende o verify nem o install) e com o rc lido à parte: sudo que falha
+  # e CLI que sai com erro não podem virar "não respondeu uma versão" (refutador da SAC-156, achado 5)
+  out="$(as_svc /usr/bin/timeout 30 /usr/bin/env -i PATH=/usr/bin:/bin HOME=/nonexistent DISABLE_AUTOUPDATER=1 "${CLAUDE_SRC}" --version 2>/dev/null)"; rc=$?
   out="${out:0:200}"
+  if [ "${rc}" != 0 ]; then
+    echo "FALHA o --version do CLI do SDK, como a conta do serviço, saiu com rc ${rc}$([ "${rc}" = 124 ] && echo ' (teto de 30 s)') (${CLAUDE_SRC})"; return 1
+  fi
   [[ "${CLI_FLOOR}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]] || { echo "FALHA CLI_FLOOR fora da forma: ${CLI_FLOOR}"; return 1; }
   fl=$(( 10#${BASH_REMATCH[1]} * 1000000000000 + 10#${BASH_REMATCH[2]} * 1000000 + 10#${BASH_REMATCH[3]} ))
   if [[ "${out}" =~ ^([0-9]{1,6})\.([0-9]{1,6})\.([0-9]{1,6}) ]]; then
