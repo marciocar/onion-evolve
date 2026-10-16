@@ -34322,7 +34322,8 @@ import http.server, sys
 script = [l.rstrip("\n").split("\t", 1) for l in open(sys.argv[1], encoding="utf-8") if l.strip()]
 class H(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
-        self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        req = self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        if len(sys.argv) > 3: open(sys.argv[3], "ab").write(req + b"\n")   # log opcional do corpo recebido
         code, body = script.pop(0) if script else ("500", '{"x":1}')
         self.send_response(int(code)); self.send_header("Content-Type", "application/json"); self.end_headers()
         self.wfile.write(body.encode())
@@ -34366,6 +34367,61 @@ PYSRV
     if [ "${rc}" -ne 1 ] || ! grep -qF 'GraphQL errors' "${d}/err"; then record_pass "task-manager-dispatcher: (m) mutante (errors aceito) morde → o (f) reprovaria (rc=${rc})"
     else record_fail "task-manager-dispatcher: (m) mutante NÃO morde" "(f) segue verde com a cura revertida"; fi
   else record_fail "task-manager-dispatcher: (m) mutante não aplicou" "(f)"; fi
+  # (n) comment.add — 2026-10-16: `comment.add SAC-1 --body-file f` publicava o TEXTO LITERAL "--body-file" (o 2º
+  #     posicional era o corpo) em 4 issues reais, com rc 0. Porta fechada (SRV_PORT=1) = erro de rede seria rc 1,
+  #     logo rc 2 prova a recusa ANTES da rede. (n1) flag desconhecida → rc 2; (n2) --body-file envia o CONTEÚDO;
+  #     (n3) --body-file sem valor → rc 2; (n4) texto sem aspas (posicional extra) → rc 2, nunca só a 1ª palavra;
+  #     (n5) corpo que começa com traços (`--- régua`) é corpo, não flag; (n6) `-` lê a entrada padrão (antes
+  #     publicava "-"); (n7) `--body-file=arq`. Mutantes: (mn1) o parse antigo (2º posicional = corpo) reprova o (n2)
+  #     pelo motivo certo, publicando o literal; (mn2) sem a guarda de posicional extra, o (n4) reprova.
+  _cmt() {  # $1 = tm.sh a usar; resto = argumentos depois de "comment.add SAC-1"; entrada padrão de CMT_IN
+    rm -f "${d}/port" "${d}/req.log"; python3 -I -B "${d}/srv.py" "${d}/s4" "${d}/port" "${d}/req.log" & local sp=$! i=0
+    while [ ! -s "${d}/port" ] && [ "${i}" -lt 50 ]; do sleep 0.1; i=$((i+1)); done
+    SRV_PORT="$(cat "${d}/port" 2>/dev/null)"
+    if _fake "$1" comment.add SAC-1 "${@:2}" < "${CMT_IN:-/dev/null}"; then rc=0; else rc=$?; fi
+    kill "${sp}" 2>/dev/null || true; wait "${sp}" 2>/dev/null || true   # nunca espera o timeout do servidor
+  }
+  _cmt_closed() {  # porta fechada: só a recusa antes da rede dá rc 2
+    SRV_PORT=1; if _fake "$1" comment.add SAC-1 "${@:2}" < /dev/null; then rc=0; else rc=$?; fi
+  }
+  printf '200\t{"data":{"issue":{"id":"u1","identifier":"SAC-1","title":"t","children":{"nodes":[]}}}}\n200\t{"data":{"commentCreate":{"success":true,"comment":{"id":"c1","body":"x","url":"u"}}}}\n' > "${d}/s4"
+  printf 'CORPO_DO_ARQUIVO_7f3 com acento: ação\n' > "${d}/corpo.md"
+  printf 'CORPO_DA_ENTRADA_9c1\n' > "${d}/stdin.md"
+  _cmt_closed "${tm}" --corpo x
+  if [ "${rc}" -eq 2 ] && grep -qF 'opção desconhecida: --corpo' "${d}/err"; then record_pass "task-manager-dispatcher: (n1) comment.add com flag desconhecida → rc 2 antes da rede"
+  else record_fail "task-manager-dispatcher: (n1) flag desconhecida" "rc=${rc} $(head -1 "${d}/err")"; fi
+  _cmt "${tm}" --body-file "${d}/corpo.md"
+  if [ "${rc}" -eq 0 ] && grep -qF 'CORPO_DO_ARQUIVO_7f3' "${d}/req.log" && ! grep -qF '"body": "--body-file"' "${d}/req.log"; then
+    record_pass "task-manager-dispatcher: (n2) comment.add --body-file envia o conteúdo do arquivo, não o nome da flag"
+  else record_fail "task-manager-dispatcher: (n2) --body-file" "rc=${rc} $(head -1 "${d}/err") log=$(head -c 200 "${d}/req.log" 2>/dev/null)"; fi
+  _cmt_closed "${tm}" --body-file
+  if [ "${rc}" -eq 2 ] && grep -qF -- '--body-file exige valor' "${d}/err"; then record_pass "task-manager-dispatcher: (n3) --body-file sem valor (a forma do defeito) → rc 2"
+  else record_fail "task-manager-dispatcher: (n3) --body-file sem valor" "rc=${rc} $(head -1 "${d}/err")"; fi
+  _cmt_closed "${tm}" texto solto
+  if [ "${rc}" -eq 2 ] && grep -qF 'entre aspas' "${d}/err"; then record_pass "task-manager-dispatcher: (n4) texto sem aspas (posicional extra) → rc 2, não publica a 1ª palavra"
+  else record_fail "task-manager-dispatcher: (n4) posicional extra" "rc=${rc} $(head -1 "${d}/err")"; fi
+  _cmt "${tm}" '--- régua no topo'
+  if [ "${rc}" -eq 0 ] && grep -qF -- '"body": "--- r' "${d}/req.log"; then record_pass "task-manager-dispatcher: (n5) corpo que começa com traços chega à rede como corpo"
+  else record_fail "task-manager-dispatcher: (n5) corpo com traços" "rc=${rc} $(head -1 "${d}/err")"; fi
+  CMT_IN="${d}/stdin.md" _cmt "${tm}" -
+  if [ "${rc}" -eq 0 ] && grep -qF 'CORPO_DA_ENTRADA_9c1' "${d}/req.log" && ! grep -qF '"body": "-"' "${d}/req.log"; then record_pass "task-manager-dispatcher: (n6) \`-\` lê a entrada padrão (não publica \"-\")"
+  else record_fail "task-manager-dispatcher: (n6) stdin" "rc=${rc} $(head -1 "${d}/err")"; fi
+  _cmt "${tm}" "--body-file=${d}/corpo.md"
+  if [ "${rc}" -eq 0 ] && grep -qF 'CORPO_DO_ARQUIVO_7f3' "${d}/req.log"; then record_pass "task-manager-dispatcher: (n7) --body-file=<arq> aceito"
+  else record_fail "task-manager-dispatcher: (n7) --body-file=" "rc=${rc} $(head -1 "${d}/err")"; fi
+  _mutpy() { python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' "${cp_tm}/adapters/linear.py" "$1" "$2"; }
+  cp "${py}" "${cp_tm}/adapters/linear.py"
+  if _mutpy '    o, pos = _comment_opts(args)' '    o, pos = {}, list(args[:2])'; then
+    _cmt "${cp_tm}/tm.sh" --body-file "${d}/corpo.md"
+    if grep -qF '"body": "--body-file"' "${d}/req.log" 2>/dev/null; then record_pass "task-manager-dispatcher: (mn1) mutante (parse antigo) publica o literal \"--body-file\" → o (n2) reprova pelo motivo certo"
+    else record_fail "task-manager-dispatcher: (mn1) mutante NÃO reproduz o defeito" "rc=${rc} $(head -1 "${d}/err")"; fi
+  else record_fail "task-manager-dispatcher: (mn1) mutante não aplicou" "(n2)"; fi
+  cp "${py}" "${cp_tm}/adapters/linear.py"
+  if _mutpy '        if len(pos) != 2:' '        if False:'; then
+    _cmt_closed "${cp_tm}/tm.sh" texto solto
+    if [ "${rc}" -ne 2 ]; then record_pass "task-manager-dispatcher: (mn2) mutante (sem guarda de posicional extra) morde → o (n4) reprovaria (rc=${rc})"
+    else record_fail "task-manager-dispatcher: (mn2) mutante NÃO morde" "(n4) segue verde"; fi
+  else record_fail "task-manager-dispatcher: (mn2) mutante não aplicou" "(n4)"; fi
   # ── SAC-116: leitura COMPLETA e anexos, contra um servidor ROTEADO (casa a operação GraphQL pelo nome
   #    no corpo do POST, ou o caminho no GET; regra `once` é consumida na ordem). Cada caso REPROVA o
   #    defeito nomeado; cada cura tem um mutante na CÓPIA do linear.py que EXIGE o FAIL do caso dela.

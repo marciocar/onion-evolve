@@ -2055,6 +2055,23 @@ nodes:
       method: "medição: leitura de estado e execuções sem privilégio; nenhum perfil carregado, nenhum pacote instalado"
       locality: "host"
 
+  - id: E_DEGRAU1_EM_PRODUCAO_1016
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "ops/bridge-hardening.sh (core-only) install em ensaio (rc 0, 0 falha) e install --apply (rc 0) no onion-vps-bridge, depois do merge do PR #1163 (a1b97752); verify 28 checagens / 0 falha no namespace do MainPID 2126666; findmnt via nsenter, /health, POST /a2a sem bearer e journal lidos pela sessão principal"
+    label: "DEGRAU 1 EM PRODUÇÃO: o 30-integrity.conf está instalado e vale no processo VIVO do bridge — árvores e dotfiles só-leitura, data/ gravável, .ssh e .git-credentials inacessíveis — sem regressão medida em /health, no 401 do /a2a nem no journal."
+    narrative: "Medido em 2026-10-16 ~05:10 UTC pela sessão principal. O ensaio repetiu 0 falha com 6 placeholders ausentes; o --apply criou os 6 (.claude/settings.json e settings.local.json, .config, .local/bin, .npmrc, .bash_profile), instalou o drop-in, reiniciou e o verify provou 28 checagens no namespace do MainPID 2126666. Conferência INDEPENDENTE do wrapper, só leitura: findmnt -T no namespace dá ro para src/ do bridge, .bashrc e o members.yaml do clone servido, e rw para data/; /health 200; POST /a2a sem bearer 401 (o guard segue de pé); o serviço active; 0 linha de EROFS/read-only no journal dos últimos 10 min. A sonda de ESCRITA manual (touch em src/) foi vetada pela guarda do MOAT (o alvo é servido) — a de escrita fica com o verify do wrapper, que é o caminho autorizado. NÃO MEDIDO: um turno real de /chat (exige login de convidado) e um POST /a2a ASSINADO com o drop-in ativo (o caminho que grava em data/ e roda o a2a-verify do clone servido). TETO que segue (de E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016): segredo legível no mesmo UID e data/ gravável, os dois do degrau 2."
+    trace: "ops/bridge-hardening.sh (core-only) install --apply e verify; PR #1163"
+    provenance:
+      source: "onion-vps-bridge no host, systemd 255.4"
+      locator: "⟨drop-in 30-integrity.conf do onion-vps-bridge⟩; nsenter -t <MainPID> -m findmnt"
+      method: "medição: wrapper em produção + leitura independente sem escrita em caminho servido"
+      locality: "host"
+
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
     to: Q_CHAT_AGENT_ISOLATION_2026
@@ -2591,5 +2608,14 @@ edges:
     to: C_OPCAO_3_NATIVE_SANDBOX_STRICT
     edge_type: CONSTRAINS
   - from: E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016
+    to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
+    edge_type: TRACES_TO
+  - from: E_DEGRAU1_EM_PRODUCAO_1016
+    to: E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016
+    edge_type: SUPPORTS
+  - from: E_DEGRAU1_EM_PRODUCAO_1016
+    to: C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE
+    edge_type: SUPPORTS
+  - from: E_DEGRAU1_EM_PRODUCAO_1016
     to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
     edge_type: TRACES_TO
