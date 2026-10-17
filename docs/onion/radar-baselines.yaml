@@ -13,14 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-16
-    cc_version: "2.1.301"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "0/13 reprovados no juiz; 3 exagerados reescritos (69 versões eram distância de patch, 57 publicadas; o buraco de Workflow é o Scan do meta-evolve-fanout) + 3 omissões medidas com impacto <= 1"
-                            # rodada 12 (2.1.300->2.1.301, uma versão, 51 itens). O achado não é um item: o /chat em
-                            # produção (bridge + runner do convidado) roda o CLI 2.1.232 do SDK 0.3.232, preso pelo
-                            # lock, então o delta não chega aos degraus de isolamento (SAC-155 censo, SAC-156 SDK).
-                            # Histórico da r11 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-16-r12/radar-E3-2026-10-16-r12.kg.yaml
+    last_run: 2026-10-17
+    cc_version: "2.1.302"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "1/12 reprovado no juiz (auto mode: as sessões vivas do maestro rodam em bypass, não em auto), 0 exagerados, 0 omissões de impacto >= 2; Aufhebung: SUPERSEDES do E_SDK_0_3_301 da r12"
+                            # rodada 13 (2.1.301->2.1.302, uma versão, 63 itens). Desta vez o delta chega à produção
+                            # (o /chat roda o CLI 2.1.302 do SDK 0.3.302); toca o fork por padrão no admin do bridge
+                            # (SAC-168) e o revisor de IA do CI, preso no CLI 2.1.220 do pin da action (SAC-169).
+                            # Histórico da r12 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

@@ -1,0 +1,218 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "o data/2.1.302.txt ou o locator de um nó não bate byte a byte com a seção ## 2.1.302 do CHANGELOG oficial",
+   "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '/^## 2.1.302$/{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-17-r13/data/2.1.302.txt"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando ou a leitura citados em verified_against, re-executados no vivo, devolvem outro número ou outro estado",
+   "check": "re-executar o grep, a leitura de linha, o --version ou a sonda citados no nó e comparar com o verified_against"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) o Onion e a superfície nomeada não existe, não é exercitada pelo item, ou existe outra superfície do core ou do /chat que o item alcança e o nó nega",
+   "check": "grep -rn <termo do item> .claude ops .github e leitura do arquivo e linha nomeados no nó (no bridge, como a conta do serviço)"
+  },
+  {
+   "id": "CU4_IMPACTO_DESPROPORCIONAL",
+   "when": "o impacto declarado difere em 2 ou mais pontos do que a medição sustenta, ou a causa afirmada não é a medida",
+   "check": "comparar o impact do nó com a consequência medida no vivo (quem roda o caminho, com que frequência, o que quebra)"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core, do CI ou do /chat em produção com impacto >= 2 medido e a rodada não tem nó para ele",
+   "check": "para cada item de data/2.1.302.txt, grep da superfície correspondente no core, no .github e no bridge"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "cmp <(awk '/^## 2.1.302$/{f=1;print;next} /^## /{f=0} f' CHANGELOG.md) data/2.1.302.txt; bash .claude/validation/cc-delta-census.sh --markdown"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "cópia e tabela de versões do censo",
+    "medida": "cmp vazio; 66 linhas e 63 itens; o censo mostra baseline 2.1.301 e disco, processo e SDK bridge em 2.1.302 (SDK 0.3.302)"
+   },
+   "nota": "nada a corrigir"
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "varredura item a item de data/2.1.302.txt contra .claude, ops, .github, src do bridge, mcpServers do usuário e journal do onion-vps-bridge"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "cobertura da pergunta pelos nós da rodada",
+    "medida": "nenhum item com impacto >= 2 sem nó; candidatos medidos (ToolSearch, Prompt is too long, foreground aninhado, Artifact, MCP 2026-07-28) ficaram em impacto 1 ou menos"
+   },
+   "nota": "pode fechar depois do juiz, com a correção do nó de auto mode"
+  },
+  {
+   "alvo": "E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "git log --oneline -1 e --version do binário do SDK como a conta do serviço; bash ops/chat-runner.sh verify"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "versão do CLI servido pelo /chat",
+    "medida": "clone em 7f4322c; package.json 0.3.302 com claudeCodeVersion 2.1.302; binário glibc responde 2.1.302 e o musl nem executa no host; processo nascido 00:18:51 UTC; verify rc 0, n_fail=0"
+   },
+   "nota": "o cabeçalho de ops/cc-sdk-targets.tsv ainda diz 'Medido: 0.3.301' (deriva de doc fora do nó)"
+  },
+  {
+   "alvo": "E_FORK_LIGADO_POR_PADRAO_ALCANCA_O_ADMIN_DO_BRIDGE",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_IMPACTO_DESPROPORCIONAL",
+    "comando": "captura local de /v1/messages com 2.1.301 e 2.1.302, em -p e com CLAUDE_CODE_ENTRYPOINT=sdk-ts, contando fork e background na ferramenta Agent"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "oferta do fork ao admin do /chat",
+    "medida": "fork: 2.1.301 = 2 menções, 2.1.302 = 10 (-p e sdk-ts), =0 volta a 2; background por padrão já existia na 2.1.301 (7 menções); 0 fork em src/ e na unit; agentPolicy l.155-161 sem tools no admin"
+   },
+   "nota": "a saída em segundo plano não é efeito do fork (anterior ao delta); no ramo bypass o agentPolicy devolve também allowDangerouslySkipPermissions"
+  },
+  {
+   "alvo": "E_REVISOR_DO_CI_INSTALA_O_CLI_2_1_220",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "gh api repos/anthropics/claude-code-action/contents/src/entrypoints/run.ts?ref=be7b93b1907a4abad570368f3c74b6fe3807510b --jq .content | base64 -d | grep -n 'claudeCodeVersion ='"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "versão do CLI instalada pelo revisor do CI",
+    "medida": "pin l.78 '2.1.220', main l.80 '2.1.302'; as 2 ocorrências da action usam o mesmo pin; 69 seções em (2.1.220, 2.1.302]; run 38992146256 com o revisor desligado"
+   },
+   "nota": "nada a corrigir"
+  },
+  {
+   "alvo": "E_NENHUM_ITEM_TOCA_SANDBOX_WEBFETCH_STREAMJSON_1017",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -ciF de cada palavra de isolamento em data/2.1.302.txt; tipos dos hooks nos dois settings; sed -n 155,166p src/agent-policy.ts (como a conta do serviço)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "palavras de isolamento no delta e modo passado pelo bridge e pelo runner",
+    "medida": "0 nas seis palavras de isolamento, 1 em permission e 1 em hook; 23 + 2 hooks, todos command; permissionMode nos dois ramos; runner l.625 --permission-mode default"
+   },
+   "nota": "nada a corrigir"
+  },
+  {
+   "alvo": "E_AUTO_MODE_DO_MAESTRO_RECEBE_A_COMPACTACAO",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "ps -u marcio -o pid,lstart,args | grep claude; leitura do cmdline de cada sessão procurando --permission-mode e --dangerously-skip-permissions"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "sessão do maestro que de fato roda em auto mode",
+    "medida": "5 sessões interativas vivas com --dangerously-skip-permissions (14/10 a 17/10) e 1 de fundo com --permission-mode bypassPermissions; nenhuma em auto; settings.local.json do core e do usuário sem defaultMode; 0 CLAUDE_CODE_AUTO_MODE_MODEL em .claude e ops"
+   },
+   "nota": "rebaixar a 'não toca as sessões vivas (bypass)'"
+  },
+  {
+   "alvo": "E_CLAUDE_DESIGN_STANDALONE_FECHA_EM_DEZEMBRO",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rniE 'claude\\.ai/design|design-sync|design-login|DesignSync|Claude Design' .claude docs ops"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "uso do Claude Design standalone pelo core",
+    "medida": "0 em .claude; DesignSync na lista de ferramentas da 2.1.302; architecture-challenges.md l.149 confere"
+   },
+   "nota": "faltou citar docs/analysis/onion-distribution-strategy-2026-06.md l.25 e l.100"
+  },
+  {
+   "alvo": "E_SINAIS_DO_DELTA_SEM_CONSUMIDOR_1017",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "git --version; git config --get extensions.refstorage; grep de isolation worktree; sed -n 880p ops/publish-door.sh; src/config.ts l.71; MemoryMax da unit do runner"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "consumidores dos sinais listados",
+    "medida": "git 2.43.0; refstorage ausente; 13 linhas de worktree; só claude plugin validate executa; 0 .mcp.json; 0 OTel; 0 ANTHROPIC_BASE_URL; upload 10 MB; MemoryMax=2G"
+   },
+   "nota": "nada a corrigir"
+  },
+  {
+   "alvo": "E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_302",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "guarda de deriva de binário na 2.1.302",
+    "medida": "rc 0, 6 passaram, 0 pularam, 0 falharam; o caso (f) leu o binário instalado 2.1.302"
+   },
+   "nota": "nada a corrigir"
+  },
+  {
+   "alvo": "Q_FORK_NO_ADMIN_DO_BRIDGE_DECIDIR",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_IMPACTO_DESPROPORCIONAL",
+    "comando": "mesma captura sdk-ts em 2.1.301 e 2.1.302: background nas duas, fork só na 2.1.302"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "decisão sobre o fork no admin",
+    "medida": "sem CLAUDE_CODE_FORK_SUBAGENT na unit nem em src/; o arquivo de ambiente não foi lido, por regra; nenhum turno real medido"
+   },
+   "nota": "separar custo/cópia de contexto do fork (novo) da saída em segundo plano (anterior ao delta)"
+  },
+  {
+   "alvo": "Q_PIN_DO_REVISOR_DO_CI_SOBE_OU_ENTRA_NO_CENSO",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -rn 'claude-code-action@' .github/workflows; cat ops/cc-sdk-targets.tsv"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "pin atualizado ou censo que declara o CLI do CI",
+    "medida": "pin be7b93b1 nas 2 ocorrências; cc-sdk-targets.tsv só declara o bridge; o censo não tem linha do CI"
+   },
+   "nota": "nada a corrigir"
+  }
+ ],
+ "omissoes": [],
+ "aufhebung": {
+  "forma": "SUPERSEDES",
+  "alvo": "docs/evolution/research/radar-E3-2026-10-16-r12/radar-E3-2026-10-16-r12.kg.yaml#E_SDK_0_3_301_EM_PRODUCAO_1016",
+  "razao": "o /chat serve 0.3.302 com CLI 2.1.302 desde o PR #78 (7f4322c); E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017 o substitui; precedente da r12"
+ },
+ "juiz": "subagente general-purpose, model opus, effort high, mandato REFUTAR; 156656 tokens, 49 chamadas, 7,5 min (2026-10-17)"
+}
