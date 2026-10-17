@@ -6211,6 +6211,55 @@ run_vendor_core_removed_selftests() {
   if grep -q 'arquivo que o core REMOVEU não sai' <<< "${_err}" && git -C "$t" cat-file -e HEAD:.claude/workflows/old.js 2>/dev/null; then
     record_pass "vendor-core-removed: (d) sem pin anterior no carimbo nada sai, e o aviso e dito em stderr (rc=${_rc})"
   else record_fail "vendor-core-removed: (d) sem pin" "rc=${_rc} stderr=[${_err:0:160}]"; fi
+  # (e) arquivo que o core PASSOU A EXCLUIR do manifesto (não apagou) sai da vendor e do adotante
+  #     (2026-10-17): a skill onion-publish saiu da adoção por `:(exclude)` e ficava no adotante depois
+  #     do --update rc=0, porque o pin anterior era medido com o manifesto NOVO, que já a excluía.
+  #     O arquivo continua no core; só deixou de viajar. MUTANTE: medir o lado antigo com os excludes.
+  _vcr_excluded() {  # $1=vendor-branch.sh → "rc<TAB>skill-no-HEAD<TAB>skill-na-vendor<TAB>mine"
+    local _h="$1" _d _c _t _p1 _r=0
+    _d="$(mktemp -d)"; _c="$_d/c"; _t="$_d/a"
+    mkdir -p "$_c/.claude/commands" "$_c/.claude/skills/onion-publish" "$_c/.claude/skills/onion" "$_t"
+    git -C "$_c" init -q; git -C "$_t" init -q
+    printf 'cmd\n' > "$_c/.claude/commands/foo.md"
+    printf 'publish\n' > "$_c/.claude/skills/onion-publish/SKILL.md"
+    printf 'onion\n' > "$_c/.claude/skills/onion/SKILL.md"
+    git -C "$_c" add -A; git -C "$_c" commit -qm core
+    _p1="$(git -C "$_c" rev-parse --short=12 HEAD)"
+    git -C "$_c" archive HEAD -- .claude | tar -x -C "$_t"
+    printf 'meu\n' > "$_t/.claude/commands/mine.md"
+    printf 'source_commit: %s\n' "$_p1" > "$_t/.claude/.onion-version"
+    git -C "$_t" add -A; git -C "$_t" commit -qm adopt
+    bash "$_h" seed "$_t" "$(git -C "$_t" rev-parse --abbrev-ref HEAD)" >/dev/null 2>&1
+    printf 'cmd2\n' > "$_c/.claude/commands/foo.md"; git -C "$_c" commit -qam "outra mudanca"
+    ONION_ROLE=adopted bash "$_h" update "$_t" "$_c" "$(git -C "$_c" rev-parse --short=12 HEAD)" "$(git -C "$_t" rev-parse --abbrev-ref HEAD)" >/dev/null 2>&1 || _r=$?
+    printf '%s\t%s\t%s\t%s\n' "$_r" \
+      "$(git -C "$_t" cat-file -e HEAD:.claude/skills/onion-publish/SKILL.md 2>/dev/null && echo fica || echo saiu)" \
+      "$(git -C "$_t" cat-file -e onion/vendor:.claude/skills/onion-publish/SKILL.md 2>/dev/null && echo fica || echo saiu)" \
+      "$(git -C "$_t" cat-file -e HEAD:.claude/commands/mine.md 2>/dev/null && echo fica || echo saiu)"
+    rm -rf "$_d"
+  }
+  local _er _eh _ev _em
+  IFS=$'\t' read -r _er _eh _ev _em < <(_vcr_excluded "${helper}")
+  if [ "${_er}" = 0 ] && [ "${_eh}" = saiu ] && [ "${_ev}" = saiu ] && [ "${_em}" = fica ]; then
+    record_pass "vendor-core-removed: (e) arquivo que o core passou a EXCLUIR sai do adotante e da vendor; o arquivo proprio dele fica"
+  else record_fail "vendor-core-removed: (e) exclusao nova" "rc=${_er} HEAD=${_eh} vendor=${_ev} mine=${_em}"; fi
+  local _emd; _emd="$(mktemp -d)"
+  _vcr_mutate() {  # $1=origem $2=destino $3=forma nova do lado antigo → mutante do vendor-branch.sh
+    ANCHOR='$(printf '"'"'%s\n'"'"' $mf | grep -vxF -f <(bash "$HERE/vendor-manifest.sh" --retired-excludes) || true)' \
+    REPL="$3" python3 -c 'import os,sys; s=open(sys.argv[1]).read(); a=os.environ["ANCHOR"]; open(sys.argv[2],"w").write(s.replace(a, os.environ["REPL"], 1) if a in s else s)' "$1" "$2"
+  }
+  _vcr_mutate "${helper}" "${_emd}/vendor-branch.sh" '$(printf '"'"'%s '"'"' $mf)\'
+  _adopt_sibs_beside "${_emd}"
+  if cmp -s "${helper}" "${_emd}/vendor-branch.sh"; then
+    record_fail "vendor-core-removed: (e-MUT) setup" "a mutacao nao foi aplicada (ancora do lado antigo mudou?)"
+  else
+    IFS=$'\t' read -r _er _eh _ev _em < <(_vcr_excluded "${_emd}/vendor-branch.sh")
+    if [ "${_eh}" = fica ]; then
+      record_pass "vendor-core-removed: (e-MUT) medindo o lado antigo com os excludes, a skill FICA no adotante — (e) e load-bearing"
+    else record_fail "vendor-core-removed: (e-MUT)" "o mutante tirou a skill mesmo assim (HEAD=${_eh}) — (e) nao prova o lado antigo"; fi
+  fi
+  rm -rf "${_emd}"; unset -f _vcr_excluded
+  unset -f _vcr_mutate
   rm -rf "$d"
 }
 _family run_vendor_core_removed_selftests
@@ -24930,6 +24979,39 @@ run_role_cut_selftests() {
       record_pass "role-cut: (u6-MUT) sem ler o kind do carimbo a porta recebe o canal upstream — (u6) é load-bearing"
     else record_fail "role-cut: (u6-MUT)" "o mutante ainda corta o canal da porta — (u6) não prova a leitura do kind"; fi
   else record_fail "role-cut: (u6-MUT) setup" "a mutação não foi aplicada (âncora do kind mudou?)"; fi
+
+  # (v) CORE-ONLY NÃO VIAJA PARA ADOÇÃO (2026-10-17, nó E_SKILL_CORE_ONLY_VIAJOU): no destino adoção,
+  #     adopted e hub não recebem a skill onion-publish (ela conduz o /meta:publish, que só roda na
+  #     fonte), e a exclusão NÃO liga o corte de comandos — a meta-fábrica do adotante fica. A porta
+  #     (--kind door) segue levando a skill. Medido no bundle EXTRAÍDO; o oráculo é a diferença exata
+  #     entre adoção e porta, que tem de ser só o diretório da skill.
+  #     MUTANTE: tirar a linha que acrescenta _CORE_ONLY_ADOPTION_EXCLUDES reprova (v).
+  _v_check() {  # $1=vendor-manifest → vazio se as polaridades batem, senão o desvio
+    local _vmx="$1" _r _ad _dr _diff _bad=""
+    for _r in adopted hub; do
+      _t_bundle "${d}/v-ad-${_r}" "${_vmx}" --role "${_r}" --kind adoption --repo "${REPO_ROOT}"
+      _t_bundle "${d}/v-dr-${_r}" "${_vmx}" --role "${_r}" --kind door --repo "${REPO_ROOT}"
+      grep -q . "${d}/v-ad-${_r}" || { _bad="${_bad} ${_r}:bundle-vazio"; continue; }
+      grep -qxF .claude/skills/onion-publish/SKILL.md "${d}/v-ad-${_r}" && _bad="${_bad} ${_r}:skill-vazou-na-adocao"
+      grep -qxF .claude/skills/onion-publish/SKILL.md "${d}/v-dr-${_r}" || _bad="${_bad} ${_r}:skill-sumiu-da-porta"
+      grep -qxF .claude/commands/meta/create-command.md "${d}/v-ad-${_r}" || _bad="${_bad} ${_r}:meta-fabrica-cortada"
+      _diff="$(LC_ALL=C comm -13 <(LC_ALL=C sort "${d}/v-ad-${_r}") <(LC_ALL=C sort "${d}/v-dr-${_r}") | grep -v '^\.claude/skills/onion-publish/' || true)"
+      [ -n "${_diff}" ] && _bad="${_bad} ${_r}:adocao-perdeu-mais:$(head -1 <<< "${_diff}")"
+    done
+    printf '%s' "${_bad}"
+  }
+  local _vbad; _vbad="$(_v_check "${vm}")"
+  if [ -z "${_vbad}" ]; then
+    record_pass "role-cut: (v) adopted e hub, no destino adoção, não recebem a skill onion-publish e mantêm a meta-fábrica; a porta segue com ela"
+  else record_fail "role-cut: (v)" "desvio:${_vbad}"; fi
+  local _vm_mut="${d}/vm-v-mut.sh"
+  sed '/_CORE_ONLY_ADOPTION_EXCLUDES\[@\]/d' "${vm}" > "${_vm_mut}"
+  if ! cmp -s "${vm}" "${_vm_mut}"; then
+    if [ -n "$(_v_check "${_vm_mut}")" ]; then
+      record_pass "role-cut: (v-MUT) sem a exclusão de adoção a skill volta a viajar e (v) reprova"
+    else record_fail "role-cut: (v-MUT)" "o mutante não mudou o veredito — (v) não mede a exclusão"; fi
+  else record_fail "role-cut: (v-MUT) setup" "a mutação não foi aplicada (âncora mudou?)"; fi
+  unset -f _v_check
   unset -f _t_bundle _t_judge
 
   rm -rf "${d}"

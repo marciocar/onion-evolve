@@ -238,10 +238,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.5
-    verified_against: ".claude/utils/adopt/vendor-manifest.sh"
+    verified_at: "2026-10-17"
+    verified_against: "execução 2026-10-17 (branch fix/adopter-manifest-no-onion-publish): vendor-manifest.sh exclui .claude/skills/onion-publish no destino adoção, fora do _role_cut (que ligaria o corte de comandos); medido no bundle extraído, adopted e hub perdem só o SKILL.md e a porta segue com ele; caso (v) de role_cut com mutante. Defeito achado no dogfood do --update num clone descartável de adotante: o vendor-branch.sh media o pin anterior com o manifesto NOVO e a skill ficava; curado medindo o lado antigo só pelas raízes positivas, caso (e) de vendor_core_removed com mutante. Fora deste item, mesma classe: o comando /meta:publish segue viajando morto ao adotante"
     label: "medir se a skill onion-publish viaja ao adotante e, se viajar, tirá-la do manifesto"
   - id: Q_CANAL_VIVO_ENTRE_SESSOES
     node_type: question
