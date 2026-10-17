@@ -39282,6 +39282,27 @@ run_rule_title_in_prose_selftests() {
   [ "${_hrc}" -eq 0 ] || record_fail "rule-title-in-prose" "o selftest do hook saiu ${_hrc}"
 }
 _family run_rule_title_in_prose_selftests
+
+# Modo house-code-gloss — sigla da casa na prosa ao maestro vem com a glosa (pedido do maestro em
+# 2026-10-17: "expressões que não lembro como aqui no r13, I3, ..."; reforço do mesmo dia: "isso é para
+# você escrever certo e não para ficar travando toda hora"). O caminho normal é o LEMBRETE no
+# UserPromptSubmit; o Stop só barra a reincidência de sigla de opacidade alta. O glossário é
+# .claude/validation/house-codes.tsv. Delega ao --selftest do hook: as polaridades de texto, o caso
+# literal do maestro, a resposta normal que nunca trava e os modos ponta a ponta pelo stdin JSON.
+run_house_code_gloss_selftests() {
+  local hok="${REPO_ROOT}/.claude/hooks/house-code-gloss.sh" _ho _hrc=0 line
+  if [ ! -f "${hok}" ]; then record_fail "house-code-gloss" "hook ausente: ${hok}"; return; fi
+  if [ ! -f "${REPO_ROOT}/.claude/validation/house-codes.tsv" ]; then record_fail "house-code-gloss" "glossário ausente: .claude/validation/house-codes.tsv"; return; fi
+  _ho="$(LC_ALL=C bash "${hok}" --selftest 2>&1)" || _hrc=$?
+  while IFS= read -r line; do
+    case "${line}" in
+      *"  ✅ "*) record_pass "house-code-gloss: ${line#*✅ }" ;;
+      *"  ✗ "*)  record_fail "house-code-gloss" "${line#*✗ }" ;;
+    esac
+  done <<< "${_ho}"
+  [ "${_hrc}" -eq 0 ] || record_fail "house-code-gloss" "o selftest do hook saiu ${_hrc}"
+}
+_family run_house_code_gloss_selftests
 _family run_role_promotion_selftests
 _family run_r84_pathspec_selftests
 _family run_silent_measurer_selftests

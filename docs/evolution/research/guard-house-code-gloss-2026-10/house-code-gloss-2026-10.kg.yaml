@@ -1,0 +1,146 @@
+# kg-backlog-guard: on
+# ═══ TETO: 12 NÓS ═══
+meta:
+  id: house-code-gloss-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-17"
+  review_after: "2026-11-16"   # 30d: guarda nova de prosa; re-medir a taxa de bloqueio com o lembrete no ar
+  # Forja de GUARDA (/meta:forge-guard): sigla da casa na prosa ao maestro vem com a glosa. Irmã do
+  # hook de título de REGRA (rule-title-in-prose.sh), que foi o molde. O glossário é a fonte única:
+  # .claude/validation/house-codes.tsv.
+nodes:
+  - id: E_DEFEITO_SIGLA_SEM_GLOSA_AO_MAESTRO
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-17'
+    verified_against: 'pedido do maestro em 2026-10-17 sobre a frase do assistente "Processo, disco e SDK do bridge estão todos em 2.1.302, então a rodada r13 pode medir. Lanço os dois agentes." (bloco de texto intermediário de um turno; a glosa só veio num bloco seguinte, pelo nome do comando)'
+    trace: '.claude/hooks/house-code-gloss.sh'
+    label: 'O DEFEITO, DATADO: em 2026-10-17 o maestro não reconheceu "r13" e "I3" na prosa do assistente ("expressões que não lembro como aqui no r13, I3, ...") e pediu um mecanismo irmão da guarda de título de REGRA.'
+    provenance:
+      source: "pedido do maestro na sessão de 2026-10-17"
+      locator: "transcript da sessão principal de 2026-10-17, turno do pedido sobre a frase da rodada r13"
+      method: "testemunho: pedido do maestro em 2026-10-17, com a frase literal citada"
+      locality: "pessoa"
+
+  - id: E_REFORCO_ESCREVER_CERTO_NAO_TRAVAR
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-17'
+    verified_against: 'reforço do maestro no mesmo dia, repassado pela sessão principal: "isso é para voce escrever certo e não para ficar travando toda hora"'
+    trace: '.claude/hooks/house-code-gloss.sh'
+    label: 'O REFORÇO QUE DECIDE O DESENHO (2026-10-17): o objetivo é a resposta já sair certa, não barrar depois. O que age ANTES de escrever é o caminho normal; o bloqueio no fim do turno é rede rara, com a taxa medida e declarada.'
+    provenance:
+      source: "reforço do maestro na sessão de 2026-10-17"
+      locator: "mensagem da sessão principal ao agente da forja, com a frase literal do maestro"
+      method: "testemunho: reforço do maestro em 2026-10-17"
+      locality: "pessoa"
+
+  - id: E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-17'
+    verified_against: 'bash .claude/hooks/house-code-gloss.sh --scan <transcript> em 4 sessões reais desta casa (815 + 143 + 415 + 195 = 1568 turnos)'
+    trace: '.claude/hooks/house-code-gloss.sh'
+    label: 'A MEDIDA que escolheu a política: em 1568 turnos reais, 527 (33,6%) têm alguma sigla da casa sem glosa; barrar toda sigla de opacidade alta travaria 50 (3,2%); barrar só a reincidência já lembrada travaria 14 (0,9%), antes de qualquer efeito do lembrete.'
+    narrative: "Por sessão (turnos · com sigla sem glosa · reincidência · toda alta): 815 · 300 · 10 · 37; 143 · 8 · 0 · 0; 415 · 160 · 4 · 12; 195 · 59 · 0 · 1. A massa dos 33,6% é de opacidade baixa (ids de tarefa sem assunto, fases F1–F6, MOAT, Elenxo), que só entram no lembrete. As de opacidade alta reais foram r8–r13, E3, N0–N3 e I3. A 1ª redação acusava falso positivo em três formas, curadas antes desta medida: o nome do comando em crase era a glosa e era apagado; o dois-pontos depois de negrito (N1:**) não contava; e achados numerados do próprio texto (N1, N2, N3 ao lado de N5, N8) colidiam com os níveis do dissect."
+    provenance:
+      source: ".claude/hooks/house-code-gloss.sh"
+      locator: "LC_ALL=C bash .claude/hooks/house-code-gloss.sh --scan ⟨transcript JSONL da sessão⟩, nas 4 sessões mais recentes de 2026-10-17"
+      method: "medição: varredura determinística dos transcripts pelo próprio hook"
+      locality: "host"
+
+  - id: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: done
+    verified_at: '2026-10-17'
+    verified_against: 'família house_code_gloss da bancada (15 casos) e 10 mutantes plantados, 10 mordem; dogfood no ponto real do caso literal (lembrete injetado no turno seguinte com a glosa de r13; política estrita barra rc 2)'
+    trace: '.claude/hooks/house-code-gloss.sh'
+    label: 'Substrato e política: o molde é o hook Stop de título de REGRA. Caminho normal: UserPromptSubmit injeta a glosa das siglas que o turno anterior usou sem glosa. Rede: o Stop barra só sigla de opacidade alta cuja linha do glossário já veio no lembrete.'
+    narrative: "A sigla do caso literal saiu num bloco intermediário, que o maestro lê quando chega; a glosa veio depois. Molde: o hook de título de REGRA, o mais exercitado no censo (8 casos). Escolhida pela medida E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS entre as três opções que o reforço do maestro listou: avisar sem bloquear (0%, mas sem rede), bloquear só a reincidência (0,9%) e bloquear só as de opacidade alta (3,2%). A política fica em ONION_HOUSE_CODE_STOP (reincidence padrão, alta estrita, off só lembrete), para o maestro trocar sem forja nova. Consequência declarada: o caso literal de 2026-10-17 (r13 na 1ª vez) NÃO barra na política padrão. Ele recebe o lembrete no turno seguinte, e barra se reincidir ou na política estrita (casos i e n da bancada). Cada bloco de texto é julgado na ordem em que o maestro o lê: a glosa de um bloco anterior do mesmo turno cobre os seguintes, mas a de um bloco posterior chega tarde. Decisão tomada pelo agente da forja sob a autorização do maestro, sem pergunta: ela é dele para trocar."
+    provenance:
+      source: ".claude/hooks/house-code-gloss.sh"
+      locator: "cabeçalho do hook (POR QUÊ e COMO) + bash .claude/hooks/house-code-gloss.sh --selftest"
+      method: "medição: bancada, mutantes e varredura de transcripts reais"
+      locality: "repo"
+
+  - id: C_TETO_A_GLOSA_E_JULGADA_POR_FORMA
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-17'
+    verified_against: 'cabeçalho de .claude/hooks/lib/house_codes.py (TETO DECLARADO) e casos b, c e d da bancada'
+    trace: '.claude/hooks/lib/house_codes.py'
+    label: 'TETO 1: a glosa é julgada por forma, não por sentido. Uma glosa errada mas bem formada passa ("r13 (uma coisa)"); texto entre aspas não é isento; rótulo local de tabela fora do glossário (A1, T2, M3) passa sempre.'
+    provenance:
+      source: ".claude/hooks/lib/house_codes.py"
+      locator: "bloco TETO DECLARADO no cabeçalho"
+      method: "derivado: leitura do próprio lib e dos casos de bancada"
+      locality: "repo"
+
+  - id: C_TETO_O_GLOSSARIO_E_A_LISTA
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-17'
+    verified_against: '.claude/validation/house-codes.tsv (26 linhas de sigla) e o vendor-manifest, que leva .claude/validation e .claude/hooks a todo papel; o settings.json do core chega ao adotante pela fusão de hooks'
+    trace: '.claude/validation/house-codes.tsv'
+    label: 'TETO 2: o hook só conhece as siglas do glossário. Sigla nova da casa sem linha no house-codes.tsv passa calada, e é o vocabulário que falha primeiro numa guarda de lista. O glossário viaja ao adotante com o hook e traz as siglas do core, não as dele.'
+    narrative: "Id de nó (D_…, Q_…, E_…) só conta se existir num .kg.yaml versionado: a lista é o próprio corpus, lida por git ls-files, e fora de um repositório git os ids de nó calam. Abreviação R<N> só conta se a REGRA N existir no lint ou no checador de bundle."
+    provenance:
+      source: ".claude/validation/house-codes.tsv"
+      locator: "cabeçalho do glossário (FORMATO) + .claude/utils/adopt/vendor-manifest.sh (lista _base)"
+      method: "derivado: leitura do glossário e do manifesto de vendorização"
+      locality: "repo"
+  - id: D_MAESTRO_SIGLA_DA_CASA_COM_GLOSA_2026_10_17
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-17"
+    verified_against: "decisão do maestro em 2026-10-17, por pergunta com opções (/meta:decide): escolhida «temos uma guarda para obrigar a citar o nome de regras e deveria pegar também ser usada ou ter uma para quando voce usa espressões que não lembro com aqui no r13, I3, ... — reforço: isso é para voce escrever certo e não para ficar travando toda hora»"
+    label: "Decisão do maestro (2026-10-17): sigla da casa na prosa ao maestro vem com a glosa, por mecanismo irmão da guarda de título de REGRA. O objetivo é escrever certo, não travar: o lembrete antes de escrever é o caminho normal e o bloqueio é rede rara."
+    narrative: "Selado por /meta:decide em 2026-10-17: escolhida «temos uma guarda para obrigar a citar o nome de regras e deveria pegar também ser usada ou ter uma para quando voce usa espressões que não lembro com aqui no r13, I3, ... — reforço: isso é para voce escrever certo e não para ficar travando toda hora»; descartadas: «deixar a glosa na disciplina da sessão, sem mecanismo» · «barrar toda sigla sem glosa no fim do turno»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-17: «As siglas da casa na prosa ao maestro precisam de um mecanismo, e com que força?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      locality: "pessoa"
+
+edges:
+  - from: E_DEFEITO_SIGLA_SEM_GLOSA_AO_MAESTRO
+    to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    edge_type: SUPPORTS
+  - from: E_REFORCO_ESCREVER_CERTO_NAO_TRAVAR
+    to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    edge_type: SUPPORTS
+  - from: E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS
+    to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    edge_type: SUPPORTS
+  - from: C_TETO_A_GLOSA_E_JULGADA_POR_FORMA
+    to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    edge_type: CONSTRAINS
+  - from: C_TETO_O_GLOSSARIO_E_A_LISTA
+    to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    edge_type: CONSTRAINS
+  - from: D_MAESTRO_SIGLA_DA_CASA_COM_GLOSA_2026_10_17
+    to: E_DEFEITO_SIGLA_SEM_GLOSA_AO_MAESTRO
+    edge_type: TRACES_TO
