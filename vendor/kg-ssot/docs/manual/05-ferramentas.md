@@ -2,11 +2,11 @@
 
 [← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
 
-As sete ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
+As sete ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3.11 ou mais com as versões fixadas, e com hash, em
 [`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/requirements.txt
 ```
 
 Todo `rc` segue a mesma convenção: **0** passou, **1** algo reprovou, **2** a entrada está quebrada (arquivo
@@ -90,7 +90,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.7.3",
+  "release": "kg-ssot-v4.7.4",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [

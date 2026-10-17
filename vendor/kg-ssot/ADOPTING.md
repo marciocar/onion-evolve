@@ -17,7 +17,7 @@ A lista está em [`spec/release.json`](spec/release.json):
 - o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
   HTTP local;
 - o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
-- as dependências fixadas (`tools/requirements.txt`, Python 3 com PyYAML e jsonschema);
+- as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256 conferido por `--require-hashes`);
 - este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
 - o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
   arquivos da release);
@@ -47,14 +47,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -83,7 +83,7 @@ As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/
 Na raiz do adotante, **nesta ordem**:
 
 ```bash
-pip install -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
+pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
 git add vendor/kg-ssot                                       # antes do gate: ele só mede arquivo rastreado
 python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava .kg-ssot/gate.json
 ```
@@ -99,7 +99,7 @@ venv é recusado (`externally-managed-environment`). Instale as dependências nu
 dele:
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
 echo .venv/ >> .gitignore                                    # o venv não entra no git
 .venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
 ```
@@ -183,12 +183,12 @@ jobs:
           python-version: '3.12'
       - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
         run: |
-          pip install -r vendor/kg-ssot/tools/requirements.txt
+          pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
           python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
           python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
 
-Em outro CI, o passo é o mesmo: Python 3, as dependências fixadas e os dois comandos.
+Em outro CI, o passo é o mesmo: Python 3.11 ou mais, as dependências fixadas com `--require-hashes` e os dois comandos.
 
 **`check`** reprova (rc 1) quando um arquivo do vendor foi editado, apagado ou acrescentado. Isso inclui
 bytecode num `__pycache__`, que trocaria o leitor sem mudar a fonte, e symlink. Os scripts do kit não gravam
@@ -290,7 +290,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;

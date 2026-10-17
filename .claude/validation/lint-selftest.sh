@@ -8085,8 +8085,19 @@ PYF
       *) record_pass "currency-census: (g) pinada entra no aviso como INFORMATIVA (nomeia, não manda subir aqui)" ;; esac ;;
     *) record_fail "currency-census: (g) pinada no aviso" "esperava a linha informativa, veio: ${o:0:200}" ;; esac
   o="$(_cc FAKE_INST_PyYAML=6.0.2 -- --fresh)"
-  case "$(_st "${o}" python:PyYAML)|$(_act "${o}" python:PyYAML)" in "defasada|6.0.2|6.0.3|"*"PyYAML==6.0.3"*) record_pass "currency-census: (g2) instalado 6.0.2 × pino 6.0.3 ⇒ defasada, instale o pino" ;;
-    *) record_fail "currency-census: (g2) fora do pino" "veio: $(_st "${o}" python:PyYAML)" ;; esac
+  # o conselho instala o requirements.txt INTEIRO com --require-hashes (kg-ssot-v4.7.4): `pip install PyYAML==X`
+  # avulso furaria o hash. Mutante: voltar o conselho para `${pkg}==${pin}` reprova este caso.
+  case "$(_st "${o}" python:PyYAML)|$(_act "${o}" python:PyYAML)" in "defasada|6.0.2|6.0.3|"*"--require-hashes -r vendor/kg-ssot/tools/requirements.txt"*) record_pass "currency-census: (g2) instalado 6.0.2 × pino 6.0.3 ⇒ defasada, instale o pino pelo requirements com --require-hashes" ;;
+    *) record_fail "currency-census: (g2) fora do pino" "veio: $(_st "${o}" python:PyYAML)|$(_act "${o}" python:PyYAML)" ;; esac
+  # (g3) o requirements.txt no formato com hash (kg-ssot-v4.7.4: `PyYAML==6.0.3 \` e as linhas `--hash=`) ainda
+  #      dá o pino: instalado 6.0.3 × PyPI 6.0.4 segue PINADA. Mutante: ancorar o pino no fim da linha
+  #      (`\([0-9][0-9.]*\)$`) perde o pino do formato com hash e reprova este caso.
+  local kreq="${d}/repo/vendor/kg-ssot/tools/requirements.txt"
+  printf 'PyYAML==6.0.3 \\\n    --hash=sha256:%064d\njsonschema==4.26.0 \\\n    --hash=sha256:%064d\n' 1 2 > "${kreq}"
+  o="$(_cc FAKE_PIP_PyYAML=6.0.4 -- --fresh)"
+  case "$(_st "${o}" python:PyYAML)" in "pinada|6.0.3|6.0.4") record_pass "currency-census: (g3) requirements com --hash ainda dá o pino ⇒ pinada" ;;
+    *) record_fail "currency-census: (g3) formato com hash" "veio: $(_st "${o}" python:PyYAML)" ;; esac
+  printf 'PyYAML==6.0.3\njsonschema==4.26.0\n' > "${kreq}"
   # (h) base: em dia; origin andou sem fetch; buscado e não rebaseado; origin inalcançável
   r="$(_st "$(_cc -- --fresh)" base:main)"
   [ "${r%%|*}" = "em-dia" ] && record_pass "currency-census: (h) HEAD = origin/main ⇒ base em dia" \
@@ -34948,6 +34959,32 @@ run_kg_contract_check_selftests() {
   rm -rf "${sb}"
 }
 _family run_kg_contract_check_selftests
+
+# --require-hashes em TODO lugar que instala as dependências do leitor do contrato (kg-ssot-v4.7.4, 2026-10-17):
+# o requirements.txt do vendor passou a trazer o sha256 de cada arquivo publicado das 7 dependências, mas o hash
+# só vale se o pip for chamado com --require-hashes; sem a flag, um wheel trocado no índice com a mesma versão
+# entra calado. Aviso da sessão do produto: o template de CI dos adotantes instalava sem a flag. A população é
+# medida (git grep nos rastreados, fora do vendor, dos docs e desta bancada), nunca uma lista de caminhos: o defeito de uma
+# guarda por lista é o vocabulário. Piso de 2 sítios (o CI do core e o template), para não passar no vazio.
+run_kg_ssot_require_hashes_selftests() {
+  # selftest-covers: .github/workflows/onion-validate.yml .claude/utils/adopt/ci-workflow-onion.tpl .claude/validation/currency-census.sh vendor/kg-ssot/tools/requirements.txt
+  local r="${REPO_ROOT}" f n=0 bad="" ln
+  while IFS= read -r f; do
+    while IFS= read -r ln; do
+      n=$((n + 1))
+      case "${ln}" in *--require-hashes*) ;; *) bad="${bad} ${f}" ;; esac
+    done < <(LC_ALL=C command grep -E 'pip3?( |.*-m pip ).*install.*vendor/kg-ssot/tools/requirements\.txt' "${r}/${f}" 2>/dev/null)
+  done < <(LC_ALL=C git -C "${r}" grep -lE 'install.*vendor/kg-ssot/tools/requirements\.txt' \
+           -- ':!vendor/' ':!docs/' ':!*.md' ':!*.kg.yaml' ':!.claude/validation/lint-selftest.sh' 2>/dev/null)
+  if [ "${n}" -ge 2 ] && [ -z "${bad}" ]; then
+    record_pass "kg-ssot-require-hashes: os ${n} pip install do requirements do kg-ssot levam --require-hashes"
+  else record_fail "kg-ssot-require-hashes" "sítios=${n} (piso 2), sem --require-hashes:${bad:- nenhum}"; fi
+  # (b) o requirements vendorizado traz hash: sem --hash a flag faria o pip recusar tudo (falha alta, mas aqui ela é nomeada)
+  if LC_ALL=C command grep -q -- '--hash=sha256:' "${r}/vendor/kg-ssot/tools/requirements.txt" 2>/dev/null; then
+    record_pass "kg-ssot-require-hashes: (b) o requirements vendorizado traz --hash=sha256"
+  else record_fail "kg-ssot-require-hashes: (b)" "vendor/kg-ssot/tools/requirements.txt sem --hash: --require-hashes recusaria a instalação"; fi
+}
+_family run_kg_ssot_require_hashes_selftests
 
 # REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe) — SAC-103, 2026-10-10. As ondas O4–O7
 # da migração de provenance (SAC-73) limparam o caminho de máquina do corpus; nada impedia a volta, e a régua

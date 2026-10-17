@@ -162,7 +162,7 @@ jobs:
 
       - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
         # O radar (kg-radar.sh) é o leitor de semântica e integridade; a FORMA do .kg.yaml é julgada pelo
-        # contrato v4.3 vendorizado por pin (tag kg-ssot-v4.7.3 do adotante dedicado ao KG-SSOT; o v4.1 trouxe
+        # contrato v4.3 vendorizado por pin (tag kg-ssot-v4.7.4 do adotante dedicado ao KG-SSOT; o v4.1 trouxe
         # 4 avisos SHOULD ao v4.0, o v4.2 traz a dívida POR NÓ e o `provenance.locality` opcional, adotado em
         # 2026-10-09, SAC-97; o v4.3 traz `external_edges`, a aresta para nó de outro grafo, conferida contra
         # TODOS os .kg.yaml rastreados, inclusive os do --exclude; adotado em 2026-10-10, SAC-98). Medido em
@@ -172,8 +172,15 @@ jobs:
         # a dívida SHOULD só pode descer e, desde o v4.2, é contada POR OCORRÊNCIA (código × nó). A base
         # GUARDA a granularidade ("granularity": "node"), por isso este passo NÃO passa --granularity: o
         # gate lê a da base. rc 2 = entrada quebrada, nunca verde.
+        # Desde a kg-ssot-v4.7.4 o requirements.txt traz o sha256 de cada arquivo publicado das 7 dependências:
+        # --require-hashes faz o pip recusar qualquer arquivo que não bata (pino de versão sem hash ainda aceita
+        # um wheel trocado no índice). O piso é Python 3.11 (todo arquivo do rpds-py pinado o exige); abaixo
+        # dele o passo para com a causa nomeada, em vez de um "no matching distribution" do pip.
         run: |
-          python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt
+          python3 --version
+          python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' \
+            || { echo "ERRO: o leitor do contrato KG-SSOT exige Python 3.11 ou mais; o runner tem $(python3 --version 2>&1)"; exit 1; }
+          python3 -m pip install --quiet --require-hashes -r vendor/kg-ssot/tools/requirements.txt
           # O vendor check, os --exclude (fora do corpus, política selada pelo maestro em 2026-10-08) e o
           # gate vivem em ops/kg-gate-ci.sh, que o pr-finalize também chama: um lugar só para os --exclude,
           # que têm de casar com os da base (.kg-ssot/gate.json; regrave com `bash ops/kg-gate-ci.sh --update`).

@@ -6,9 +6,9 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.7.3](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.3-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.7.4](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.4-6f42c1)](spec/release.json)
 [![Suíte: 225/225](https://img.shields.io/badge/su%C3%ADte-225%2F225-2ea44f)](spec/conformance/README.md)
-[![Python 3](https://img.shields.io/badge/python-3-3776ab)](tools/requirements.txt)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
 
@@ -36,7 +36,7 @@ versionado junto do código, e um **contrato formal** decide no CI o que reprova
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot && cd kg-ssot
-python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/requirements.txt
 
 # a suíte de conformidade contra o leitor de referência
 .venv/bin/python3 -I tools/kg_conformance.py | tail -2
@@ -120,12 +120,12 @@ flowchart LR
 | **Códigos estáveis** | Toda violação tem um código como `form.required.node.provenance`, e `--where` diz o nó |
 | **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
 | **Armazém com gate** | `kg_store.py` grava `.kg.yaml` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
-| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, só com a biblioteca padrão |
+| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
 | **Suíte em dados puros** | 225 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
-| **Sem plataforma** | Python 3, PyYAML e jsonschema. Nenhum servidor, nenhum editor, nenhum assistente obrigatório |
+| **Sem plataforma** | Python 3.11 ou mais, PyYAML e jsonschema, instalados com hash conferido (`--require-hashes`). Nenhum servidor, nenhum editor, nenhum assistente obrigatório |
 
 ## O que o KG-SSOT não é
 
@@ -138,7 +138,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.7.3`. O leitor de referência passa em 225 de 225 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.7.4`. O leitor de referência passa em 225 de 225 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.

@@ -261,15 +261,20 @@ leg_py_one() {  # <pkg>
   inst="$("${PY}" -I -c 'import importlib.metadata as m,sys
 try: print(m.version(sys.argv[1]))
 except Exception: pass' "${pkg}" 2>/dev/null | _ver)"
+  # Com pino, o conselho instala pelo requirements.txt INTEIRO com --require-hashes (desde a kg-ssot-v4.7.4 ele
+  # traz o sha256 de cada arquivo publicado): `pip install pkg==X` avulso fura a verificação de hash.
+  local hreq="${PY} -m pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt"
   if [ -z "${inst}" ]; then
-    _row "python:${pkg}" - "${pin:--}" ausente "${pkg} não está instalado no python do lint (${pypath}): ${ASK} ${pkg}${pin:+==${pin}} pelo PyPI (${PY} -m pip install ${pkg}${pin:+==${pin}})"; return 0
+    if [ -n "${pin}" ]; then _row "python:${pkg}" - "${pin}" ausente "${pkg} não está instalado no python do lint (${pypath}): ${ASK} ${pkg}==${pin} pelo PyPI (${hreq})"
+    else _row "python:${pkg}" - - ausente "${pkg} não está instalado no python do lint (${pypath}): ${ASK} ${pkg} pelo PyPI (${PY} -m pip install ${pkg})"; fi
+    return 0
   fi
   latest="$(_src "pypi-${pkg}" "${TTL}" "${VRE}" _pypi "${pkg}")" || rc=$?
   if [ "${rc}" = 66 ]; then _row "python:${pkg}" "${inst}" - ausente "falta o pip no python do lint (${pypath}): ${ASK} o pip (${PY} -m ensurepip ou o pacote da distro)"; return 0; fi
   [ -n "${latest}" ] || { _row "python:${pkg}" "${inst}" - nao-medida "o PyPI inalcançável pelo pip (rc=${rc})"; return 0; }
   if [ -n "${pin}" ]; then
-    if [ "${inst}" != "${pin}" ] && _newer "${inst}" "${pin}"; then _row "python:${pkg}" "${inst}" "${pin}" fora-do-pino "o instalado (${inst}) está À FRENTE do pino do contrato (${pin}) e o CI instala o pino: alinhe com ${PY} -m pip install ${pkg}==${pin}, ou suba o pino no produto kg-ssot"
-    elif [ "${inst}" != "${pin}" ]; then _row "python:${pkg}" "${inst}" "${pin}" defasada "${PY} -m pip install ${pkg}==${pin} (o pino do contrato KG-SSOT, vendor/kg-ssot/tools/requirements.txt; o PyPI está em ${latest})"
+    if [ "${inst}" != "${pin}" ] && _newer "${inst}" "${pin}"; then _row "python:${pkg}" "${inst}" "${pin}" fora-do-pino "o instalado (${inst}) está À FRENTE do pino do contrato (${pin}) e o CI instala o pino: alinhe com ${hreq}, ou suba o pino no produto kg-ssot"
+    elif [ "${inst}" != "${pin}" ]; then _row "python:${pkg}" "${inst}" "${pin}" defasada "${hreq} (o pino do contrato KG-SSOT, vendor/kg-ssot/tools/requirements.txt; o PyPI está em ${latest})"
     elif [ "${pin}" = "${latest}" ]; then _row "python:${pkg}" "${inst}" "${latest}" em-dia "-"
     elif _newer "${pin}" "${latest}"; then _row "python:${pkg}" "${inst}" "${latest}" nao-medida "o pino (${pin}) está À FRENTE do PyPI (${latest}): registro atrasado ou índice trocado"
     else _row "python:${pkg}" "${inst}" "${latest}" pinada "o pino do contrato KG-SSOT é ${pin}: a subida para ${latest} é do produto kg-ssot e chega pelo re-vendor"; fi

@@ -43,8 +43,13 @@ jobs:
           for t in jq git awk python3; do command -v "$t" >/dev/null 2>&1 || missing="${missing} $t"; done
           [ -z "${missing}" ] || { echo "ERRO: falta no runner —${missing}"; exit 1; }
           # o leitor do contrato do .kg.yaml (vendor/kg-ssot, que viaja com o Onion) precisa de PyYAML e
-          # jsonschema; sem eles o kg-contract-check sai rc 2, "não julgado" (SAC-149)
-          if [ -f vendor/kg-ssot/tools/requirements.txt ]; then python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt; fi
+          # jsonschema; sem eles o kg-contract-check sai rc 2, "não julgado" (SAC-149). O requirements.txt traz
+          # o sha256 de cada arquivo publicado: --require-hashes recusa o que não bater. Piso: Python 3.11.
+          if [ -f vendor/kg-ssot/tools/requirements.txt ]; then
+            python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' \
+              || { echo "ERRO: o leitor do contrato KG-SSOT exige Python 3.11 ou mais; o runner tem $(python3 --version 2>&1)"; exit 1; }
+            python3 -m pip install --quiet --require-hashes -r vendor/kg-ssot/tools/requirements.txt
+          fi
 
       - name: Lint determinístico de artefatos Onion
         run: bash .claude/validation/lint-artifacts.sh

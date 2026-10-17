@@ -141,7 +141,7 @@ vocabulário só apareça onde o caso o pede. `proposals/` está vazia.
 ## Rodar
 
 ```bash
-pip install -r tools/requirements.txt          # PyYAML e jsonschema, versões exatas
+pip install --require-hashes -r tools/requirements.txt          # PyYAML e jsonschema, versões exatas
 python3 -I tools/kg_conformance.py             # --suite DIR, --schema F, --should-schema F, --json OUT
 # proposals/ contra um contrato candidato, quando houver um rascunho de versão futura
 python3 -I tools/kg_conformance.py --proposals-schema <candidato>.schema.json \

@@ -1,4 +1,4 @@
-# KG-SSOT 4.7.3 (tag kg-ssot-v4.7.3): o texto completo para agentes de IA
+# KG-SSOT 4.7.4 (tag kg-ssot-v4.7.4): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,9 +14,9 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.7.3](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.3-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.7.4](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.4-6f42c1)](spec/release.json)
 [![Suíte: 225/225](https://img.shields.io/badge/su%C3%ADte-225%2F225-2ea44f)](spec/conformance/README.md)
-[![Python 3](https://img.shields.io/badge/python-3-3776ab)](tools/requirements.txt)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
 
@@ -44,7 +44,7 @@ versionado junto do código, e um **contrato formal** decide no CI o que reprova
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot && cd kg-ssot
-python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/requirements.txt
 
 # a suíte de conformidade contra o leitor de referência
 .venv/bin/python3 -I tools/kg_conformance.py | tail -2
@@ -128,12 +128,12 @@ flowchart LR
 | **Códigos estáveis** | Toda violação tem um código como `form.required.node.provenance`, e `--where` diz o nó |
 | **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
 | **Armazém com gate** | `kg_store.py` grava `.kg.yaml` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
-| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, só com a biblioteca padrão |
+| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
 | **Suíte em dados puros** | 225 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
-| **Sem plataforma** | Python 3, PyYAML e jsonschema. Nenhum servidor, nenhum editor, nenhum assistente obrigatório |
+| **Sem plataforma** | Python 3.11 ou mais, PyYAML e jsonschema, instalados com hash conferido (`--require-hashes`). Nenhum servidor, nenhum editor, nenhum assistente obrigatório |
 
 ## O que o KG-SSOT não é
 
@@ -146,7 +146,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.7.3`. O leitor de referência passa em 225 de 225 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.7.4`. O leitor de referência passa em 225 de 225 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -210,7 +210,7 @@ A lista está em [`spec/release.json`](spec/release.json):
 - o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
   HTTP local;
 - o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
-- as dependências fixadas (`tools/requirements.txt`, Python 3 com PyYAML e jsonschema);
+- as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256 conferido por `--require-hashes`);
 - este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
 - o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
   arquivos da release);
@@ -240,14 +240,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -276,7 +276,7 @@ As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/
 Na raiz do adotante, **nesta ordem**:
 
 ```bash
-pip install -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
+pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
 git add vendor/kg-ssot                                       # antes do gate: ele só mede arquivo rastreado
 python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava .kg-ssot/gate.json
 ```
@@ -292,7 +292,7 @@ venv é recusado (`externally-managed-environment`). Instale as dependências nu
 dele:
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
 echo .venv/ >> .gitignore                                    # o venv não entra no git
 .venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
 ```
@@ -376,12 +376,12 @@ jobs:
           python-version: '3.12'
       - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
         run: |
-          pip install -r vendor/kg-ssot/tools/requirements.txt
+          pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
           python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
           python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
 
-Em outro CI, o passo é o mesmo: Python 3, as dependências fixadas e os dois comandos.
+Em outro CI, o passo é o mesmo: Python 3.11 ou mais, as dependências fixadas com `--require-hashes` e os dois comandos.
 
 **`check`** reprova (rc 1) quando um arquivo do vendor foi editado, apagado ou acrescentado. Isso inclui
 bytecode num `__pycache__`, que trocaria o leitor sem mudar a fonte, e symlink. Os scripts do kit não gravam
@@ -483,7 +483,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -555,7 +555,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.7.3** (tag `kg-ssot-v4.7.3`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.7.4** (tag `kg-ssot-v4.7.4`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 
@@ -629,7 +629,7 @@ O resultado é um arquivo que uma máquina consegue julgar no CI, como julga có
 |---|---|
 | O contrato | Dois JSON Schemas, MUST (reprova) e SHOULD (alerta), mais as regras de integridade que o schema não alcança |
 | A suíte de conformidade | 225 casos em `latest/`, em dados puros, com o veredito e os códigos esperados de cada um |
-| O leitor de referência | `kg_validate.py`, em Python 3 com PyYAML e jsonschema, sem outra dependência |
+| O leitor de referência | `kg_validate.py`, em Python 3.11 ou mais com PyYAML e jsonschema, sem outra dependência |
 | O kit de adoção | `kg_vendor.py`, que traz uma release por tag, e `kg_gate.py`, a catraca por grafo no CI |
 | O armazém com gate | `kg_store.py`, que grava grafos em disco, num repo git ou num armazém versionado, só depois do PASS do contrato |
 | O servidor MCP de referência | `kg_mcp.py`, que dá a um modelo o contrato e o armazém por MCP, por stdio ou HTTP local |
@@ -1056,11 +1056,11 @@ O repositório do produto guarda o v1, o v2 e o v3 em `spec/` como histórico; a
 
 [← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
 
-As sete ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
+As sete ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3.11 ou mais com as versões fixadas, e com hash, em
 [`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/requirements.txt
 ```
 
 Todo `rc` segue a mesma convenção: **0** passou, **1** algo reprovou, **2** a entrada está quebrada (arquivo
@@ -1144,7 +1144,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.7.3",
+  "release": "kg-ssot-v4.7.4",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -1564,15 +1564,15 @@ flowchart LR
   C --> D["4. CI: check + gate<br/>em todo PR"]
 ```
 
-Na raiz do seu repo, com Python 3:
+Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsonschema, declara `Requires-Python >=3.11`):
 
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
-python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
+python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
 echo .venv/ >> .gitignore
 git add vendor/kg-ssot .gitignore docs/          # e os seus .kg.yaml, onde estiverem
 .venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
@@ -1587,7 +1587,7 @@ completo do GitHub Actions está na seção "O passo de CI" do [`ADOPTING.md`](.
 ```yaml
 - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
   run: |
-    pip install -r vendor/kg-ssot/tools/requirements.txt
+    pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
     python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
     python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
@@ -2237,7 +2237,7 @@ vocabulário só apareça onde o caso o pede. `proposals/` está vazia.
 ## Rodar
 
 ```bash
-pip install -r tools/requirements.txt          # PyYAML e jsonschema, versões exatas
+pip install --require-hashes -r tools/requirements.txt          # PyYAML e jsonschema, versões exatas
 python3 -I tools/kg_conformance.py             # --suite DIR, --schema F, --should-schema F, --json OUT
 # proposals/ contra um contrato candidato, quando houver um rascunho de versão futura
 python3 -I tools/kg_conformance.py --proposals-schema <candidato>.schema.json \
