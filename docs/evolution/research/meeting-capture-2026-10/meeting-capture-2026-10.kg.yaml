@@ -11,10 +11,12 @@ meta:
     texto) e a pergunta aberta da máquina de captura. Os vereditos das ferramentas moram nos grafos de
     dissecação do core: docs/evolution/dissect/vexa-2026-10/ e docs/evolution/dissect/anarlog-2026-10/.
   # kg-backlog-guard: on
-  # ═══ TETO: 10 NÓS. Subiu de 5 para 9 em 2026-10-17 pelo gatilho declarado aqui: a curadoria devolveu a SAC-164, e o maestro selou
-  # três decisões (caminho da captura, adaptador de STT e diarização) e abriu uma pergunta (a medição sherpa-onnx × Sortformer). Subiu de 9
-  # para 10 em 2026-10-19 pelo mesmo gatilho: a segunda rodada de transcrição voltou (SAC-177) e o maestro selou manter o motor. Cresce de
-  # novo quando o grafo de consolidação entrar em plano. ═══
+  # ═══ TETO: 11 NÓS. Subiu de 5 para 9 em 2026-10-17 pelo gatilho declarado aqui: a curadoria devolveu a SAC-164, e o maestro selou
+  # três decisões (caminho da captura, adaptador de STT e diarização) e abriu uma pergunta (a medição sherpa-onnx × Sortformer). Subiu de
+  # 9 para 10 no mesmo dia pela EXECUÇÃO de D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017: o serviço reescrito no core trouxe uma medição nova (a
+  # memória do lote com vad_batch=1), que é evidência e não cabe nos nós de decisão. Subiu de 10 para 11 em 2026-10-19 pelo gatilho da
+  # medição que volta: a segunda rodada de transcrição (SAC-177) voltou e o maestro selou manter o motor. Cresce de novo quando o ao vivo
+  # for re-medido ou o grafo de consolidação entrar em plano. ═══
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-19-proposal-asr-second-round.md
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-17-proposal-windows-client-vps-server.md
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md
@@ -201,6 +203,33 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 
+  - id: E_MC_STT_SERVICO_CORE_MEDIDO_1017
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-17"
+    verified_against: "o servidor REESCRITO (ops/stt/server.py) na VPS de 8 vCPU, fora de unit, com o venv do lock e o modelo da revisão fixada; o arquivo de 61,5 min montado como na Emenda 2 da curadoria (30 falas FLEURS pt_br × 7 voltas, Random(164), PCM_16), por POST /v1/listen, um processo novo por braço; e a bancada stt_service (63 verdes, 28 mutantes no núcleo e no smoke, 22 no wrapper) e moat_gate (237 verdes, com os casos s1–s6)"
+    label: "STT em lote reescrito no core (ops/stt/, core-only). Com vad_batch=1, 61,5 min dão RSS 2,31e9 B (6,92e9 com lote de 8) e WER 5,92 % (6,19 %); teto MemoryMax=6G. Instalado na VPS: ainda não."
+    trace: "ops/stt-service.sh"
+    narrative: |-
+      Onde mora e por quê: o serviço é código de OPERAÇÃO desta VPS, não framework: vive em ops/stt/ (servidor, núcleo puro, prova do verify, lock com hash e fixture) e o wrapper em ops/stt-service.sh, no molde do bridge-hardening e do chat-runner. ops/ não viaja para adotante; o MOAT ganhou as linhas da unit onion-vps-stt, da área de instalação do serviço, do diretório do token e do backup da unit, e o juiz fecha o modo de teste do wrapper e a cópia dele fora do projeto.
+
+      O que foi reescrito: a fonte é o adaptador da Emenda 2 (onion-curation @ 8d08d726c117, data/vps-stt/emenda2/server.py, sha256 199e1f82b52f…). Ficaram as duas rotas de LOTE (POST /v1/audio/transcriptions e POST /v1/listen) e o /health; o WS ao vivo NÃO foi reescrito (a regra deu N = 0 nesta VPS). Mudou: auth por token fail-closed e teto de corpo como ASGI por fora das rotas, VAD fixo (o cliente não o ajusta), ffmpeg só com lista fechada de formatos e protocolo `file`, reamostragem pelo ffmpeg. A fidelidade da reescrita está no número: com vad_batch=8 ela reproduz o WER da curadoria ao centésimo (6,188 %, S/D/I 282/21/89).
+
+      A medição (2 braços, 1 repetição cada, carga ambiente alta: load average 7,8 e 9,2, outras sessões rodando): vad_batch=1 → 244,4 s, RTF 0,0662, VmHWM 2,313e9 B, WER 5,919 % (S/D/I 274/24/77); vad_batch=8 → 411,6 s, RTF 0,1115, VmHWM 6,915e9 B, WER 6,188 %. O lote de 8 trechos preenchidos explicava a RSS (a hipótese da curadoria) e também parte do WER: o preenchimento mudava as hipóteses. O RTF não é comparável entre os braços (a carga variou); a memória e o WER são. Com 1 repetição, o WER de 5,92 % é um ponto, não um intervalo.
+
+      O teto: MemoryMax=6G sem swap. Medido: 2,31e9 B no arquivo de 1 h mono. Estimado, NÃO medido: o pior caso com 2 pedidos em memória (QUEUE_MAX=2) e corpos de até 384 MB (≈ 1 h 40 de WAV float32 mono). Estourou, o kernel mata o processo e o systemd o reinicia; o pedido em curso cai.
+
+      Não medido aqui: a unit de verdade com o sandbox (o --apply prova isso numa unit transitória ANTES de trocar a de produção, e o verify depois); multicanal com áudio real; os clientes reais (Vexa, anarlog); o timeout de 30 s do cliente Vexa contra os ~4 min de 1 h de reunião (o cliente precisa de requestTimeoutMs maior: é configuração do lado de lá); o TLS e o domínio no proxy, que esperam decisão do maestro.
+    provenance:
+      source: "ops/stt/server.py e ops/stt-service.sh nesta VPS"
+      locator: "medição de 2026-10-17 11:39–11:50 (UTC-3), script membench no scratchpad da sessão; bancada: lint-selftest.sh --families stt_service e moat_gate"
+      method: "medição: servidor real por HTTP com WER por jiwer na normalização da curadoria, VmHWM do processo (status do kernel), e bancada com mutantes"
+      locality: "repo"
+
 edges:
 
   - from: E_MEETING_GRAPH_GATE_1016
@@ -230,3 +259,9 @@ edges:
   - from: D_MC_ASR2_MANTER_MOTOR_1019
     to: D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017
     edge_type: TRACES_TO
+  - from: E_MC_STT_SERVICO_CORE_MEDIDO_1017
+    to: D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017
+    edge_type: SUPPORTS
+  - from: E_MC_STT_SERVICO_CORE_MEDIDO_1017
+    to: D_MC_CAPTURA_WINDOWS_LOTE_VPS_1017
+    edge_type: SUPPORTS
