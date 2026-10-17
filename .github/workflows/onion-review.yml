@@ -251,13 +251,14 @@ jobs:
         # depois mostrou 401 na origem. Ficou na v1.0.183 por ser a mais recente verificada
         # compatível, não por curar nada.
         # SUBIDO para v1.0.252 (f27be6b6, 2026-10-16) em 2026-10-17 (SAC-169): o pin velho instalava
-        # o CLI 2.1.220, 69 versões publicadas atrás do host (2.1.302), e nenhum censo via isso — hoje
+        # o CLI 2.1.220, 70 versões publicadas no npm atrás do host (2.1.302), e nenhum censo via isso — hoje
         # o currency-census.sh tem a linha `action:anthropics/claude-code-action`. Medido nas notas e
         # no diff v1.0.183..v1.0.252 contra o que este job usa: inputs prompt/anthropic_api_key/
         # claude_args e outputs execution_file/structured_output inalterados; execution_file segue
         # `JSON.stringify(..., null, 2)` com is_error. MUDA DE COMPORTAMENTO (#1607): o `--max-turns`
-        # de claude_args agora é IMPOSTO pelo SDK, e um resultado "success" com num_turns acima do
-        # teto vira falha — antes o teto de 60 podia estourar calado. Novo output `conclusion`.
+        # de claude_args agora é IMPOSTO pelo SDK (antes o teto de 60 podia estourar calado: o #1607
+        # cita 60→73), e um "success" acima do teto vira falha só no OUTCOME da action — que este job
+        # não lê: o review-verdict.sh julga is_error/subtype dentro do execution_file. Novo output `conclusion`.
         # O PR que sobe o pin edita este arquivo e faz a action se auto-pular: a prova é o PR SEGUINTE.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
@@ -374,13 +375,14 @@ jobs:
         # depois mostrou 401 na origem. Ficou na v1.0.183 por ser a mais recente verificada
         # compatível, não por curar nada.
         # SUBIDO para v1.0.252 (f27be6b6, 2026-10-16) em 2026-10-17 (SAC-169): o pin velho instalava
-        # o CLI 2.1.220, 69 versões publicadas atrás do host (2.1.302), e nenhum censo via isso — hoje
+        # o CLI 2.1.220, 70 versões publicadas no npm atrás do host (2.1.302), e nenhum censo via isso — hoje
         # o currency-census.sh tem a linha `action:anthropics/claude-code-action`. Medido nas notas e
         # no diff v1.0.183..v1.0.252 contra o que este job usa: inputs prompt/anthropic_api_key/
         # claude_args e outputs execution_file/structured_output inalterados; execution_file segue
         # `JSON.stringify(..., null, 2)` com is_error. MUDA DE COMPORTAMENTO (#1607): o `--max-turns`
-        # de claude_args agora é IMPOSTO pelo SDK, e um resultado "success" com num_turns acima do
-        # teto vira falha — antes o teto de 60 podia estourar calado. Novo output `conclusion`.
+        # de claude_args agora é IMPOSTO pelo SDK (antes o teto de 60 podia estourar calado: o #1607
+        # cita 60→73), e um "success" acima do teto vira falha só no OUTCOME da action — que este job
+        # não lê: o review-verdict.sh julga is_error/subtype dentro do execution_file. Novo output `conclusion`.
         # O PR que sobe o pin edita este arquivo e faz a action se auto-pular: a prova é o PR SEGUINTE.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
