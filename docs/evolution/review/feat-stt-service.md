@@ -2,7 +2,7 @@
 branch: feat/stt-service
 pr: 1184
 date: 2026-10-17
-reviewed_diff_sha256: a80b9a90577c9fddaec6f8522b1c90d46a126b3dc4c51e96e2cb2c40c587432d
+reviewed_diff_sha256: 03c9109b35cf9131100d9f6bfeb6cd37f127cee0b3998eec93731fca999700c6
 reviewed_code_sha256: 58be352ac275ee58967a9a307d90803a69c509553bc13b2ed84a7e30711346f0
 findings_total: 17
 findings_real: 16
