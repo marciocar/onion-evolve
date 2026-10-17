@@ -1,9 +1,8 @@
 ---
 branch: feat/stt-service
-pr: pendente
+pr: 1184
 date: 2026-10-17
-reviewed_diff_sha256: 45e805f608706c2619cf33887135112dcb1ac9a35b94e896ea1cdc840a3f1394
-reviewed_code_sha256: 8e73eff2e21df59887263b86eb3ff6c596a6b95a9d8a4f5d845ba1c0749cc0c0
+reviewed_diff_sha256: pendente
 findings_total: 17
 findings_real: 16
 tokens: 303551
@@ -77,3 +76,12 @@ com (s1)–(s6) e os 2 mutantes antigos re-ancorados na tupla nova `_MOAT_WRAPPE
 - Medição de memória com 1 repetição por braço e carga ambiente alta (load 7,8–9,2): o RTF não é comparável entre
   braços; o pior caso com 2 pedidos e corpos de 384 MB é ESTIMADO, não medido.
 - O ffmpeg escreve o out.wav (float32, até o teto de 3 h) no /tmp privado da unit, que fica no disco raiz.
+
+## Re-revisão (depois das 2 passadas)
+
+O diff mudou depois da revisão só na BANCADA: o 1º CI do #1184 reprovou em STRICT o ⊘ do caso (s) (sem o venv do
+serviço no runner). A cura troca o ⊘ por uma conferência pela FORMA (AST do `server.py`: o `build_app` devolve
+`core.AuthGate(core.BodyLimit(...))` e o `parse_args` recusa host fora do loopback), com mutante (`return inner`
+reprova), e o rótulo diz que o servidor real não rodou ali. Re-revisado por mim (sessão de execução), sem refutador:
+não muda código de produção (`ops/stt/*.py`, wrapper) — só `.claude/validation/lint-selftest.sh`, o resíduo e o grafo.
+Bancada sem o venv, STRICT: 78 verdes, 0 ⊘.
