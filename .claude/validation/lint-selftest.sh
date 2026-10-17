@@ -34961,28 +34961,54 @@ run_kg_contract_check_selftests() {
 _family run_kg_contract_check_selftests
 
 # --require-hashes em TODO lugar que instala as dependências do leitor do contrato (kg-ssot-v4.7.4, 2026-10-17):
-# o requirements.txt do vendor passou a trazer o sha256 de cada arquivo publicado das 7 dependências, mas o hash
-# só vale se o pip for chamado com --require-hashes; sem a flag, um wheel trocado no índice com a mesma versão
-# entra calado. Aviso da sessão do produto: o template de CI dos adotantes instalava sem a flag. A população é
-# medida (git grep nos rastreados, fora do vendor, dos docs e desta bancada), nunca uma lista de caminhos: o defeito de uma
-# guarda por lista é o vocabulário. Piso de 2 sítios (o CI do core e o template), para não passar no vazio.
+# o requirements.txt do vendor passou a trazer o sha256 de cada arquivo publicado das 7 dependências. O pip já
+# confere esses hashes sozinho quando o arquivo os traz; a flag acrescenta falhar alto se o arquivo um dia perder
+# todos os hashes (sem ela, o pip voltaria a instalar sem conferir, calado). Aviso da sessão do produto: o
+# template de CI dos adotantes instalava sem a flag. A população é medida (git grep nos rastreados, fora do
+# vendor, dos docs e desta bancada), nunca uma lista de caminhos: o defeito de uma guarda por lista é o
+# vocabulário. Por isso a linha é normalizada antes de casar: continuação com `\` juntada (o `-r` na linha de
+# baixo não escapa) e comentário cortado (a flag citada num `# …` não conta). Casa o pip que instala pelo
+# requirements do vendor E o que instala PyYAML ou jsonschema avulsos (que furariam o hash). O template passa a
+# flag por variável (`${rh}`, só quando o requirements do alvo traz hash): vale se o MESMO arquivo a define
+# como `rh="--require-hashes"`. Piso: os 3 sítios medidos em 2026-10-17 (CI do core, template, conselho do
+# censo); um sítio a menos é a guarda deixando de ver alguém, não sucesso. Teto declarado: requirements passado
+# por variável (`-r "${RQ}"`) não é visto.
+_krh_norm() {  # <arquivo> → linhas lógicas, continuação juntada e comentário cortado
+  awk '{ while ($0 ~ /\\$/ && (getline nx) > 0) { sub(/\\$/, "", $0); $0 = $0 " " nx } print }' "$1" \
+    | sed -e 's/^[[:space:]]*#.*$//' -e 's/[[:space:]]#[^"'"'"']*$//'
+}
 run_kg_ssot_require_hashes_selftests() {
   # selftest-covers: .github/workflows/onion-validate.yml .claude/utils/adopt/ci-workflow-onion.tpl .claude/validation/currency-census.sh vendor/kg-ssot/tools/requirements.txt
-  local r="${REPO_ROOT}" f n=0 bad="" ln
+  local r="${REPO_ROOT}" f n=0 bad="" ln pat
+  pat='pip3?[[:space:]].*install.*(vendor/kg-ssot/tools/requirements\.txt|[[:space:]](PyYAML|jsonschema)([=<>~! ]|$))'
   while IFS= read -r f; do
     while IFS= read -r ln; do
       n=$((n + 1))
-      case "${ln}" in *--require-hashes*) ;; *) bad="${bad} ${f}" ;; esac
-    done < <(LC_ALL=C command grep -E 'pip3?( |.*-m pip ).*install.*vendor/kg-ssot/tools/requirements\.txt' "${r}/${f}" 2>/dev/null)
-  done < <(LC_ALL=C git -C "${r}" grep -lE 'install.*vendor/kg-ssot/tools/requirements\.txt' \
+      case "${ln}" in
+        *--require-hashes*) ;;
+        *'${rh}'*) LC_ALL=C command grep -qF 'rh="--require-hashes"' "${r}/${f}" || bad="${bad} ${f}" ;;
+        *) bad="${bad} ${f}" ;;
+      esac
+    done < <(_krh_norm "${r}/${f}" | LC_ALL=C command grep -E "${pat}")
+  done < <(LC_ALL=C git -C "${r}" grep -lE 'pip3?[[:space:]]' \
            -- ':!vendor/' ':!docs/' ':!*.md' ':!*.kg.yaml' ':!.claude/validation/lint-selftest.sh' 2>/dev/null)
-  if [ "${n}" -ge 2 ] && [ -z "${bad}" ]; then
-    record_pass "kg-ssot-require-hashes: os ${n} pip install do requirements do kg-ssot levam --require-hashes"
-  else record_fail "kg-ssot-require-hashes" "sítios=${n} (piso 2), sem --require-hashes:${bad:- nenhum}"; fi
+  if [ "${n}" -ge 3 ] && [ -z "${bad}" ]; then
+    record_pass "kg-ssot-require-hashes: os ${n} pip install das dependências do kg-ssot levam --require-hashes"
+  else record_fail "kg-ssot-require-hashes" "sítios=${n} (piso 3), sem --require-hashes:${bad:- nenhum}"; fi
   # (b) o requirements vendorizado traz hash: sem --hash a flag faria o pip recusar tudo (falha alta, mas aqui ela é nomeada)
   if LC_ALL=C command grep -q -- '--hash=sha256:' "${r}/vendor/kg-ssot/tools/requirements.txt" 2>/dev/null; then
     record_pass "kg-ssot-require-hashes: (b) o requirements vendorizado traz --hash=sha256"
   else record_fail "kg-ssot-require-hashes: (b)" "vendor/kg-ssot/tools/requirements.txt sem --hash: --require-hashes recusaria a instalação"; fi
+  # (c) a normalização: um sandbox com as três formas que escapavam (o -r na linha de baixo, a flag só no
+  #     comentário e o pacote avulso) reprova as três; a forma certa passa. Sem isto o piso seria a única defesa.
+  local sb ln2 nb=0
+  sb="$(TMPDIR=/tmp mktemp -d)"
+  printf 'run: |\n  python3 -m pip install --quiet \\\n    -r vendor/kg-ssot/tools/requirements.txt\n  pip install -r vendor/kg-ssot/tools/requirements.txt # --require-hashes\n  pip3 install PyYAML==6.0.3 jsonschema==4.26.0\n  python3 -m pip install --require-hashes \\\n    -r vendor/kg-ssot/tools/requirements.txt\n' > "${sb}/w.yml"
+  while IFS= read -r ln2; do case "${ln2}" in *--require-hashes*) ;; *) nb=$((nb + 1)) ;; esac
+  done < <(_krh_norm "${sb}/w.yml" | LC_ALL=C command grep -E "${pat}")
+  if [ "${nb}" -eq 3 ]; then record_pass "kg-ssot-require-hashes: (c) -r em linha de baixo, flag só em comentário e pacote avulso ⇒ os 3 vistos sem a flag"
+  else record_fail "kg-ssot-require-hashes: (c)" "esperava 3 sítios sem a flag no sandbox, veio ${nb}"; fi
+  rm -rf "${sb}"
 }
 _family run_kg_ssot_require_hashes_selftests
 
