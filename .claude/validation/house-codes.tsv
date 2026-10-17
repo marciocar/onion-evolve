@@ -13,36 +13,38 @@
 #   3 opacity   alta = o maestro não reconstrói sozinho (a rede do Stop pode barrar) |
 #               baixa = cunhagem dele ou rótulo local do texto (só entra no lembrete, nunca barra)
 #   4 gloss     a glosa canônica, curta, para escrever junto: "SIGLA (glosa)"
-#   5 accept    regex python: se casar NA MESMA FRASE (com a sigla removida), a frase já glosou.
+#   5 accept    regex python: se casar PERTO da sigla (6 palavras para cada lado, na mesma frase), glosou.
 #               "-" = só a glosa estrutural conta (parêntese logo depois, " — "/": " com texto, ou a
 #               sigla dentro de um parêntese que explica algo).
+#   6 domain    regex python: a sigla só é a da casa se isto aparecer no MESMO BLOCO de texto; sem o
+#               domínio ela é palavra comum ou rótulo local ("o teste E3 do formulário") e cala. "-" = sempre.
 #
 # O que a glosa estrutural aceita vale para TODA linha; o accept só acrescenta palavras.
 # Para acrescentar uma sigla: uma linha aqui + um caso na bancada (run_house_code_gloss_selftests).
 #
-# kind	code	opacity	gloss	accept
-static	I3	alta	o invariante "um escritor por repo" (só a sessão dona do repositório commita nele)	escritor|commita no repo|repo alheio
-static	r\d{1,3}	alta	a rodada N do radar do Claude Code (a medição do que cada versão nova do Claude Code muda no Onion)	radar|Claude Code|cc-update
-static	E1	alta	o eixo E1 do radar de mundo (agentes com grafo de conhecimento)	KG|grafo|conhecimento
-static	E2	alta	o eixo E2 do radar de mundo (sistemas que se auto-melhoram)	self-improving|auto-?melhor|auto-?evolu
-static	E3	alta	o eixo E3 do radar de mundo (o que muda a cada versão do Claude Code)	Claude Code
-static	E4	alta	o eixo E4 do radar de mundo (capital e mercado)	capital|mercado|investiment
-static	E5	alta	o eixo E5 do radar de mundo (gates determinísticos)	determin
-static	E6	alta	o eixo E6 do radar de mundo (a fronteira de modelos e a escada de modelos da sessão)	modelo|lineup
-static	N0	alta	o nível N0 do /meta:dissect (identidade: quem mantém, licença, trajetória)	identidade|dissec
-static	N1	alta	o nível N1 do /meta:dissect (capacidade: o que a ferramenta faz e o Onion não)	capacidade|dissec
-static	N2	alta	o nível N2 do /meta:dissect (mecanismo: como ela faz)	mecanismo|dissec
-static	N3	alta	o nível N3 do /meta:dissect (transferibilidade: o que se transfere para o Onion)	transfer|dissec
-static	N4	alta	o nível N4 do /meta:dissect (absorção: o plano de trazer para o Onion)	absor|dissec
-static	D10	alta	a dimensão D10 do /meta:evolve (frescor da memória de sessão)	memória|dimens|evolve
-static	W7	alta	a cláusula W7 do MOAT (o Onion é invocado pelo maestro, nunca agendado: sem cron)	agend|cron|invocad
-static	NS1	alta	o norte NS1 (o grafo de conhecimento como norte do Onion)	norte|grafo|conhecimento
-static	MOAT	baixa	a fronteira do que só o humano faz (merge, deploy, ato irreversível)	irrevers|humano|maestro|manual|deploy|merge
-static	SDAAL	baixa	o padrão de abstração do Onion (adapter plugável por provedor)	abstra|adapter|adaptador|costura|plugáv|provedor
-static	Elenxo	baixa	o método de refutar antes de selar	refut|adversári
-static	F\d	baixa	a fase N do plano em curso (diga do quê)	fase|etapa|porta|plano
-static	S\d{1,2}	baixa	o spike/cenário N (diga o que ele testa)	spike|cenário|teste
-static	AUTOMATE|AUDIT|ADVISE	baixa	o degrau da escada de automação	degrau|escada|automa
-rule	R\d{2,3}	alta	REGRA N (título)	-
-node	[A-Z][A-Z0-9]{0,3}_[A-Z][A-Z0-9_]{2,}	alta	o título do nó	-
-issue	SAC-\d+	baixa	a tarefa do task manager (diga o assunto)	-
+# kind	code	opacity	gloss	accept	domain
+static	I3	alta	o invariante "um escritor por repo" (só a sessão dona do repositório commita nele)	escritor|commita no repo|repo alheio	-
+static	r\d{1,3}	alta	a rodada N do radar do Claude Code (a medição do que cada versão nova do Claude Code muda no Onion)	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+
+static	E1	alta	o eixo E1 do radar de mundo (agentes com grafo de conhecimento)	KG|grafo|conhecimento	radar|eixo
+static	E2	alta	o eixo E2 do radar de mundo (sistemas que se auto-melhoram)	self-improving|auto-?melhor|auto-?evolu	radar|eixo
+static	E3	alta	o eixo E3 do radar de mundo (o que muda a cada versão do Claude Code)	Claude Code	radar|eixo
+static	E4	alta	o eixo E4 do radar de mundo (capital e mercado)	capital|mercado|investiment	radar|eixo
+static	E5	alta	o eixo E5 do radar de mundo (gates determinísticos)	determin	radar|eixo
+static	E6	alta	o eixo E6 do radar de mundo (a fronteira de modelos e a escada de modelos da sessão)	modelo|lineup	radar|eixo
+static	N0	alta	o nível N0 do /meta:dissect (identidade: quem mantém, licença, trajetória)	identidade|dissec	dissec|n[ií]vel
+static	N1	alta	o nível N1 do /meta:dissect (capacidade: o que a ferramenta faz e o Onion não)	capacidade|dissec	dissec|n[ií]vel
+static	N2	alta	o nível N2 do /meta:dissect (mecanismo: como ela faz)	mecanismo|dissec	dissec|n[ií]vel
+static	N3	alta	o nível N3 do /meta:dissect (transferibilidade: o que se transfere para o Onion)	transfer|dissec	dissec|n[ií]vel
+static	N4	alta	o nível N4 do /meta:dissect (absorção: o plano de trazer para o Onion)	absor|dissec	dissec|n[ií]vel
+static	D10	alta	a dimensão D10 do /meta:evolve (frescor da memória de sessão)	memória|dimens|evolve	evolve|dimens|mem[oó]ria
+static	W7	alta	a cláusula W7 do MOAT (o Onion é invocado pelo maestro, nunca agendado: sem cron)	agend|cron|invocad	-
+static	NS1	alta	o norte NS1 (o grafo de conhecimento como norte do Onion)	norte|grafo|conhecimento	-
+static	MOAT	baixa	a fronteira do que só o humano faz (merge, deploy, ato irreversível)	irrevers|humano|maestro|manual|deploy|merge	-
+static	SDAAL	baixa	o padrão de abstração do Onion (adapter plugável por provedor)	abstra|adapter|adaptador|costura|plugáv|provedor	-
+static	Elenxo	baixa	o método de refutar antes de selar	refut|adversári	-
+static	F\d	baixa	a fase N do plano em curso (diga do quê)	fase|etapa|porta|plano	-
+static	S\d{1,2}	baixa	o spike/cenário N (diga o que ele testa)	spike|cenário|teste	-
+static	AUTOMATE|AUDIT|ADVISE	baixa	o degrau da escada de automação	degrau|escada|automa	-
+rule	R\d{2,3}	alta	REGRA N (título)	-	-
+node	[A-Z][A-Z0-9]{0,3}_[A-Z][A-Z0-9_]{2,}	alta	o título do nó	-	-
+issue	SAC-\d+	baixa	a tarefa do task manager (diga o assunto)	-	-

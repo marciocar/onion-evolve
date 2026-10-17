@@ -49,10 +49,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: '2026-10-17'
-    verified_against: 'bash .claude/hooks/house-code-gloss.sh --scan <transcript> em 4 sessões reais desta casa (815 + 143 + 415 + 195 = 1568 turnos)'
+    verified_against: 'bash .claude/hooks/house-code-gloss.sh --scan <transcript> em 4 sessões reais desta casa (815 + 143 + 415 + 195 = 1568 turnos, 507 abertos pelo maestro), depois das curas da 1ª passada do refutador'
     trace: '.claude/hooks/house-code-gloss.sh'
-    label: 'A MEDIDA que escolheu a política: em 1568 turnos reais, 527 (33,6%) têm alguma sigla da casa sem glosa; barrar toda sigla de opacidade alta travaria 50 (3,2%); barrar só a reincidência já lembrada travaria 14 (0,9%), antes de qualquer efeito do lembrete.'
-    narrative: "Por sessão (turnos · com sigla sem glosa · reincidência · toda alta): 815 · 300 · 10 · 37; 143 · 8 · 0 · 0; 415 · 160 · 4 · 12; 195 · 59 · 0 · 1. A massa dos 33,6% é de opacidade baixa (ids de tarefa sem assunto, fases F1–F6, MOAT, Elenxo), que só entram no lembrete. As de opacidade alta reais foram r8–r13, E3, N0–N3 e I3. A 1ª redação acusava falso positivo em três formas, curadas antes desta medida: o nome do comando em crase era a glosa e era apagado; o dois-pontos depois de negrito (N1:**) não contava; e achados numerados do próprio texto (N1, N2, N3 ao lado de N5, N8) colidiam com os níveis do dissect."
+    label: 'A MEDIDA que escolheu a política: em 1568 turnos reais, 570 (36,4%) têm alguma sigla da casa sem glosa; barrar toda sigla de opacidade alta travaria 30 (1,9%); barrar só a reincidência lembrada no turno travaria 3 (0,2%), antes de qualquer efeito do lembrete.'
+    narrative: "Por sessão (turnos · abertos pelo maestro · com sigla sem glosa · reincidência · toda alta): 815 · 258 · 330 · 2 · 18; 143 · 52 · 10 · 0 · 2; 415 · 115 · 168 · 1 · 9; 195 · 82 · 62 · 0 · 1. A massa é de opacidade baixa (ids de tarefa sem assunto, fases F1–F6, MOAT, Elenxo), que só entra no lembrete. Os 3 bloqueios restantes são reais: N2 numa conversa sobre o dissect, e r7/r8 numa resposta sobre a rodada do radar. A 1ª medida (antes do refutador) dava 0,9% de reincidência e 3,2% de toda alta: recomputava o lembrete em vez de observá-lo, contava turnos de aviso de tarefa de fundo como do maestro e confundia palavras comuns (o teste E3 do formulário, o r1 do relatório) com as siglas da casa."
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "LC_ALL=C bash .claude/hooks/house-code-gloss.sh --scan ⟨transcript JSONL da sessão⟩, nas 4 sessões mais recentes de 2026-10-17"
@@ -66,10 +66,10 @@ nodes:
     confidence: 0.85
     status: done
     verified_at: '2026-10-17'
-    verified_against: 'família house_code_gloss da bancada (15 casos) e 10 mutantes plantados, 10 mordem; dogfood no ponto real do caso literal (lembrete injetado no turno seguinte com a glosa de r13; política estrita barra rc 2)'
+    verified_against: 'família house_code_gloss da bancada (19 casos) e 19 mutantes plantados, 19 mordem; dogfood no ponto real do caso literal (lembrete injetado no turno seguinte com a glosa de r13; política estrita barra rc 2)'
     trace: '.claude/hooks/house-code-gloss.sh'
-    label: 'Substrato e política: o molde é o hook Stop de título de REGRA. Caminho normal: UserPromptSubmit injeta a glosa das siglas que o turno anterior usou sem glosa. Rede: o Stop barra só sigla de opacidade alta cuja linha do glossário já veio no lembrete.'
-    narrative: "A sigla do caso literal saiu num bloco intermediário, que o maestro lê quando chega; a glosa veio depois. Molde: o hook de título de REGRA, o mais exercitado no censo (8 casos). Escolhida pela medida E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS entre as três opções que o reforço do maestro listou: avisar sem bloquear (0%, mas sem rede), bloquear só a reincidência (0,9%) e bloquear só as de opacidade alta (3,2%). A política fica em ONION_HOUSE_CODE_STOP (reincidence padrão, alta estrita, off só lembrete), para o maestro trocar sem forja nova. Consequência declarada: o caso literal de 2026-10-17 (r13 na 1ª vez) NÃO barra na política padrão. Ele recebe o lembrete no turno seguinte, e barra se reincidir ou na política estrita (casos i e n da bancada). Cada bloco de texto é julgado na ordem em que o maestro o lê: a glosa de um bloco anterior do mesmo turno cobre os seguintes, mas a de um bloco posterior chega tarde. Decisão tomada pelo agente da forja sob a autorização do maestro, sem pergunta: ela é dele para trocar."
+    label: 'Substrato e política: molde do hook Stop de título de REGRA. Normal: o UserPromptSubmit injeta a glosa das siglas que o turno anterior usou sem glosa e grava as de opacidade alta lembradas. Rede: o Stop barra só a lembrada NESTE turno que voltou sem glosa.'
+    narrative: "A sigla do caso literal saiu num bloco intermediário, que o maestro lê quando chega; a glosa veio depois. Molde: o hook de título de REGRA, o mais exercitado no censo (8 casos). Escolhida pela medida E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS entre as três opções que o reforço do maestro listou: avisar sem bloquear (0%, mas sem rede), bloquear só a reincidência (0,2%) e bloquear só as de opacidade alta (1,9%). O lembrete é ESTADO OBSERVADO, não recomputado: o prompt grava o que lembrou, o Stop lê e consome; só há estado em turno aberto pelo maestro (o UserPromptSubmit não dispara em aviso de tarefa de fundo), e a sigla que o maestro escreveu no pedido não barra. Reincidência vale pelo mesmo token, ou pela mesma linha estática do glossário (lembrada r12, a r13 também barra). A política fica em ONION_HOUSE_CODE_STOP (reincidence padrão, alta estrita, off só lembrete; valor desconhecido vale off), para o maestro trocar sem forja nova. Consequência declarada: o caso literal de 2026-10-17 (r13 na 1ª vez) NÃO barra na política padrão; recebe o lembrete no turno seguinte, e barra se reincidir ou na política estrita (casos i e n da bancada). Decisão tomada pelo agente da forja sob a autorização do maestro, sem pergunta: ela é dele para trocar."
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "cabeçalho do hook (POR QUÊ e COMO) + bash .claude/hooks/house-code-gloss.sh --selftest"
@@ -83,9 +83,9 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: '2026-10-17'
-    verified_against: 'cabeçalho de .claude/hooks/lib/house_codes.py (TETO DECLARADO) e casos b, c e d da bancada'
+    verified_against: 'cabeçalho de .claude/hooks/lib/house_codes.py (TETO DECLARADO) e casos b, c, d, r e s da bancada'
     trace: '.claude/hooks/lib/house_codes.py'
-    label: 'TETO 1: a glosa é julgada por forma, não por sentido. Uma glosa errada mas bem formada passa ("r13 (uma coisa)"); texto entre aspas não é isento; rótulo local de tabela fora do glossário (A1, T2, M3) passa sempre.'
+    label: 'TETO 1: a glosa é julgada por forma, não por sentido. Glosa errada mas bem formada passa ("r13 (uma coisa qualquer)"); texto entre aspas não é isento; rótulo local fora do glossário (A1, T2) passa sempre; menção de passagem perto da sigla conta como glosa.'
     provenance:
       source: ".claude/hooks/lib/house_codes.py"
       locator: "bloco TETO DECLARADO no cabeçalho"
@@ -102,12 +102,29 @@ nodes:
     verified_against: '.claude/validation/house-codes.tsv (26 linhas de sigla) e o vendor-manifest, que leva .claude/validation e .claude/hooks a todo papel; o settings.json do core chega ao adotante pela fusão de hooks'
     trace: '.claude/validation/house-codes.tsv'
     label: 'TETO 2: o hook só conhece as siglas do glossário. Sigla nova da casa sem linha no house-codes.tsv passa calada, e é o vocabulário que falha primeiro numa guarda de lista. O glossário viaja ao adotante com o hook e traz as siglas do core, não as dele.'
-    narrative: "Id de nó (D_…, Q_…, E_…) só conta se existir num .kg.yaml versionado: a lista é o próprio corpus, lida por git ls-files, e fora de um repositório git os ids de nó calam. Abreviação R<N> só conta se a REGRA N existir no lint ou no checador de bundle."
+    narrative: "A coluna domain corta colisão com palavra comum, e o preço é o escape simétrico: sigla da casa num bloco que não cita o domínio dela (r13 sem rodada, radar ou versão; N2 sem dissect) cala. Id de nó (D_…, Q_…, E_…) só conta se existir num .kg.yaml versionado: a lista é o próprio corpus, lida por git ls-files, e fora de um repositório git os ids de nó calam. Abreviação R<N> só conta se a REGRA N existir no lint ou no checador de bundle."
     provenance:
       source: ".claude/validation/house-codes.tsv"
       locator: "cabeçalho do glossário (FORMATO) + .claude/utils/adopt/vendor-manifest.sh (lista _base)"
       method: "derivado: leitura do glossário e do manifesto de vendorização"
       locality: "repo"
+  - id: E_ELENXO_1A_PASSADA_RECALCULAVA_O_LEMBRETE
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-17'
+    verified_against: 'refutador opus, 1ª passada sobre o commit 19cf879f: 7 reprovações (2 altas), cada uma com evidência executada; curadas no mesmo laço e cobertas pelos casos p, q, r, s, e e l da bancada, com mutante'
+    trace: '.claude/hooks/house-code-gloss.sh'
+    label: 'ELENXO, 1ª passada: o Stop recomputava o lembrete e barrava em turno de aviso de tarefa de fundo (7 de 10 bloqueios), e a resposta a "o que é I3?" travava. Também: glosas de fachada passavam, palavras comuns colidiam, e REGRA N titulada não glosava o RN.'
+    narrative: "Curas: estado observado e consumido (prompt grava, Stop lê e apaga) e só em turno aberto pelo maestro; cópula (é, significa, isto é) e sigla do pedido do maestro contam; parêntese e dois-pontos exigem duas palavras de verdade; accept só perto da sigla; coluna domain contra palavra comum; E3/E4 não é caminho; ênfase não esconde; REGRA N titulada glosa o RN; enum de política fechado; linha JSON que não é objeto não quebra. O número do cabeçalho do hook saiu: a taxa mora só no nó da medida."
+    provenance:
+      source: ".claude/hooks/house-code-gloss.sh"
+      locator: "relatório do refutador da 1ª passada (scratchpad da sessão, refut1/) + bash .claude/hooks/house-code-gloss.sh --selftest"
+      method: "medição: passada adversarial com entradas executadas, conferida pela bancada"
+      locality: "repo"
+
   - id: D_MAESTRO_SIGLA_DA_CASA_COM_GLOSA_2026_10_17
     node_type: decision
     layer: audit
@@ -126,6 +143,9 @@ nodes:
       locality: "pessoa"
 
 edges:
+  - from: E_ELENXO_1A_PASSADA_RECALCULAVA_O_LEMBRETE
+    to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    edge_type: SUPPORTS
   - from: E_DEFEITO_SIGLA_SEM_GLOSA_AO_MAESTRO
     to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
     edge_type: SUPPORTS
