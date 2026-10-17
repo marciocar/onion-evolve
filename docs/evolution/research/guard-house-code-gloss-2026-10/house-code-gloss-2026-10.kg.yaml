@@ -42,17 +42,17 @@ nodes:
       method: "testemunho: reforço do maestro em 2026-10-17"
       locality: "pessoa"
 
-  - id: E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS
+  - id: E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS
     node_type: evidence
     plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
     verified_at: '2026-10-17'
-    verified_against: 'bash .claude/hooks/house-code-gloss.sh --scan <transcript> em 4 sessões reais desta casa (815 + 143 + 415 + 195 = 1568 turnos, 507 abertos pelo maestro), depois das curas da 1ª passada do refutador'
+    verified_against: 'bash .claude/hooks/house-code-gloss.sh --scan <transcript> em 4 sessões reais desta casa (810 + 141 + 412 + 193 = 1556 turnos, 468 do maestro), depois das curas da 2ª passada do refutador; a última linha do --scan traz os totais'
     trace: '.claude/hooks/house-code-gloss.sh'
-    label: 'A MEDIDA que escolheu a política: em 1568 turnos reais, 570 (36,4%) têm alguma sigla da casa sem glosa; barrar toda sigla de opacidade alta travaria 30 (1,9%); barrar só a reincidência lembrada no turno travaria 3 (0,2%), antes de qualquer efeito do lembrete.'
-    narrative: "Por sessão (turnos · abertos pelo maestro · com sigla sem glosa · reincidência · toda alta): 815 · 258 · 330 · 2 · 18; 143 · 52 · 10 · 0 · 2; 415 · 115 · 168 · 1 · 9; 195 · 82 · 62 · 0 · 1. A massa é de opacidade baixa (ids de tarefa sem assunto, fases F1–F6, MOAT, Elenxo), que só entra no lembrete. Os 3 bloqueios restantes são reais: N2 numa conversa sobre o dissect, e r7/r8 numa resposta sobre a rodada do radar. A 1ª medida (antes do refutador) dava 0,9% de reincidência e 3,2% de toda alta: recomputava o lembrete em vez de observá-lo, contava turnos de aviso de tarefa de fundo como do maestro e confundia palavras comuns (o teste E3 do formulário, o r1 do relatório) com as siglas da casa."
+    label: 'A MEDIDA que escolheu a política: em 1556 turnos reais, 566 (36,4%) têm alguma sigla da casa sem glosa; barrar toda sigla de opacidade alta travaria 36 (2,3%); barrar só a reincidência lembrada no turno travaria 4 (0,3%), antes do efeito do lembrete.'
+    narrative: "Por sessão (turnos · do maestro · com sigla sem glosa · reincidência · toda alta): 810 · 222 · 326 · 3 · 23; 141 · 58 · 10 · 0 · 2; 412 · 108 · 168 · 1 · 10; 193 · 80 · 62 · 0 · 1. A massa é de opacidade baixa (ids de tarefa sem assunto, fases F1–F6, MOAT, Elenxo), que só entra no lembrete. Os 4 bloqueios restantes: E3 numa resposta sobre a versão do Claude Code, N2 duas vezes numa conversa sobre o dissect, e r7/r8 numa resposta sobre a rodada do radar; um dos N2 é de fronteira (a glosa estava na frase seguinte, fora da janela). TETO da simulação: ela não reproduz o lembrete de MEIO de turno (mensagem em fila), só o do início. A 1ª medida, antes do refutador, dava 0,9% e 3,2%: recomputava o lembrete, contava aviso de tarefa de fundo como turno do maestro e confundia palavra comum com sigla."
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "LC_ALL=C bash .claude/hooks/house-code-gloss.sh --scan ⟨transcript JSONL da sessão⟩, nas 4 sessões mais recentes de 2026-10-17"
@@ -66,10 +66,10 @@ nodes:
     confidence: 0.85
     status: done
     verified_at: '2026-10-17'
-    verified_against: 'família house_code_gloss da bancada (19 casos) e 19 mutantes plantados, 19 mordem; dogfood no ponto real do caso literal (lembrete injetado no turno seguinte com a glosa de r13; política estrita barra rc 2)'
+    verified_against: 'família house_code_gloss da bancada (24 casos) e 26 mutantes plantados, 26 mordem; dogfood no ponto real do caso literal (lembrete injetado no turno seguinte com a glosa de r13; política estrita barra rc 2)'
     trace: '.claude/hooks/house-code-gloss.sh'
     label: 'Substrato e política: molde do hook Stop de título de REGRA. Normal: o UserPromptSubmit injeta a glosa das siglas que o turno anterior usou sem glosa e grava as de opacidade alta lembradas. Rede: o Stop barra só a lembrada NESTE turno que voltou sem glosa.'
-    narrative: "A sigla do caso literal saiu num bloco intermediário, que o maestro lê quando chega; a glosa veio depois. Molde: o hook de título de REGRA, o mais exercitado no censo (8 casos). Escolhida pela medida E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS entre as três opções que o reforço do maestro listou: avisar sem bloquear (0%, mas sem rede), bloquear só a reincidência (0,2%) e bloquear só as de opacidade alta (1,9%). O lembrete é ESTADO OBSERVADO, não recomputado: o prompt grava o que lembrou, o Stop lê e consome; só há estado em turno aberto pelo maestro (o UserPromptSubmit não dispara em aviso de tarefa de fundo), e a sigla que o maestro escreveu no pedido não barra. Reincidência vale pelo mesmo token, ou pela mesma linha estática do glossário (lembrada r12, a r13 também barra). A política fica em ONION_HOUSE_CODE_STOP (reincidence padrão, alta estrita, off só lembrete; valor desconhecido vale off), para o maestro trocar sem forja nova. Consequência declarada: o caso literal de 2026-10-17 (r13 na 1ª vez) NÃO barra na política padrão; recebe o lembrete no turno seguinte, e barra se reincidir ou na política estrita (casos i e n da bancada). Decisão tomada pelo agente da forja sob a autorização do maestro, sem pergunta: ela é dele para trocar."
+    narrative: "A sigla do caso literal saiu num bloco intermediário, que o maestro lê quando chega; a glosa veio depois. Molde: o hook de título de REGRA, o mais exercitado no censo (8 casos). Escolhida pela medida E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS entre as três opções que o reforço do maestro listou: avisar sem bloquear (0%, mas sem rede), bloquear só a reincidência (0,3%) e bloquear só as de opacidade alta (2,3%). O lembrete é ESTADO OBSERVADO, não recomputado: o prompt grava o que lembrou e uma MARCA (o turno e quantos blocos já existiam), o Stop lê, consome e julga só os blocos depois da marca — o UserPromptSubmit dispara também no MEIO do turno, quando uma mensagem entra em fila. Só barra turno do maestro (aberto por ele ou com mensagem dele em fila), a sigla que ele escreveu não barra, e o resumo de compactação não abre turno. Reincidência vale pelo mesmo token, ou pela mesma linha estática do glossário (lembrada r12, a r13 também barra). A política fica em ONION_HOUSE_CODE_STOP (reincidence padrão, alta estrita, off só lembrete; valor desconhecido vale off), para o maestro trocar sem forja nova. Consequência declarada: o caso literal de 2026-10-17 (r13 na 1ª vez) NÃO barra na política padrão; recebe o lembrete no turno seguinte, e barra se reincidir ou na política estrita (casos i e n da bancada). Decisão tomada pelo agente da forja sob a autorização do maestro, sem pergunta: ela é dele para trocar."
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "cabeçalho do hook (POR QUÊ e COMO) + bash .claude/hooks/house-code-gloss.sh --selftest"
@@ -99,7 +99,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: '2026-10-17'
-    verified_against: '.claude/validation/house-codes.tsv (26 linhas de sigla) e o vendor-manifest, que leva .claude/validation e .claude/hooks a todo papel; o settings.json do core chega ao adotante pela fusão de hooks'
+    verified_against: '.claude/validation/house-codes.tsv (uma linha por sigla; o --scan imprime o total) e o vendor-manifest, que leva .claude/validation e .claude/hooks a todo papel; o settings.json do core chega ao adotante pela fusão de hooks'
     trace: '.claude/validation/house-codes.tsv'
     label: 'TETO 2: o hook só conhece as siglas do glossário. Sigla nova da casa sem linha no house-codes.tsv passa calada, e é o vocabulário que falha primeiro numa guarda de lista. O glossário viaja ao adotante com o hook e traz as siglas do core, não as dele.'
     narrative: "A coluna domain corta colisão com palavra comum, e o preço é o escape simétrico: sigla da casa num bloco que não cita o domínio dela (r13 sem rodada, radar ou versão; N2 sem dissect) cala. Id de nó (D_…, Q_…, E_…) só conta se existir num .kg.yaml versionado: a lista é o próprio corpus, lida por git ls-files, e fora de um repositório git os ids de nó calam. Abreviação R<N> só conta se a REGRA N existir no lint ou no checador de bundle."
@@ -125,6 +125,23 @@ nodes:
       method: "medição: passada adversarial com entradas executadas, conferida pela bancada"
       locality: "repo"
 
+  - id: E_ELENXO_2A_PASSADA_O_LEMBRETE_DO_MEIO_DO_TURNO
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-17'
+    verified_against: 'refutador opus, 2ª passada sobre o commit cdd63eec: 7 reprovações (1 alta), cada uma com evidência executada; curadas no mesmo laço e cobertas pelos casos u, v, w, x, y e m da bancada, com mutante'
+    trace: '.claude/hooks/house-code-gloss.sh'
+    label: 'ELENXO, 2ª passada: mensagem do maestro em FILA dispara o UserPromptSubmit no meio do turno, e a 1ª menção barrava mesmo com glosa depois. Também: glosas comuns em pt-BR recusadas, compactação abria turno, estado em diretório aberto seguia link.'
+    narrative: "Curas: marca no estado (o Stop julga só depois do lembrete) e soma de lembretes no mesmo turno; cópula com vírgula, que, ou seja, isto é, diz que e =; janela do accept em 8 palavras; o resumo de compactação continua o turno e não é do maestro; diretório de estado exige dono e modo 0700, arquivo aberto sem seguir link e com 0600; o caminho lento da cauda relê inteiro; caso de nó com fixture própria (o selftest viaja); número do grafo saiu do texto à mão. Achado do próprio laço: o .pyc do lib é validado por mtime em segundos e tamanho, e uma edição do mesmo tamanho rodava código velho; o motor agora não grava bytecode."
+    provenance:
+      source: ".claude/hooks/house-code-gloss.sh"
+      locator: "relatório do refutador da 2ª passada (scratchpad da sessão, refut2/) + bash .claude/hooks/house-code-gloss.sh --selftest"
+      method: "medição: passada adversarial com entradas executadas, conferida pela bancada e por 26 mutantes"
+      locality: "repo"
+
   - id: D_MAESTRO_SIGLA_DA_CASA_COM_GLOSA_2026_10_17
     node_type: decision
     layer: audit
@@ -143,6 +160,9 @@ nodes:
       locality: "pessoa"
 
 edges:
+  - from: E_ELENXO_2A_PASSADA_O_LEMBRETE_DO_MEIO_DO_TURNO
+    to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
+    edge_type: SUPPORTS
   - from: E_ELENXO_1A_PASSADA_RECALCULAVA_O_LEMBRETE
     to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
     edge_type: SUPPORTS
@@ -152,7 +172,7 @@ edges:
   - from: E_REFORCO_ESCREVER_CERTO_NAO_TRAVAR
     to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
     edge_type: SUPPORTS
-  - from: E_MEDIDA_TAXA_DE_BLOQUEIO_EM_1568_TURNOS
+  - from: E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS
     to: D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA
     edge_type: SUPPORTS
   - from: C_TETO_A_GLOSA_E_JULGADA_POR_FORMA

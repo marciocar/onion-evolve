@@ -13,7 +13,7 @@
 #   3 opacity   alta = o maestro não reconstrói sozinho (a rede do Stop pode barrar) |
 #               baixa = cunhagem dele ou rótulo local do texto (só entra no lembrete, nunca barra)
 #   4 gloss     a glosa canônica, curta, para escrever junto: "SIGLA (glosa)"
-#   5 accept    regex python: se casar PERTO da sigla (6 palavras para cada lado, na mesma frase), glosou.
+#   5 accept    regex python: se casar PERTO da sigla (8 palavras para cada lado, na mesma frase), glosou.
 #               "-" = só a glosa estrutural conta (parêntese logo depois, " — "/": " com texto, ou a
 #               sigla dentro de um parêntese que explica algo).
 #   6 domain    regex python: a sigla só é a da casa se isto aparecer no MESMO BLOCO de texto; sem o
@@ -28,7 +28,7 @@ static	r\d{1,3}	alta	a rodada N do radar do Claude Code (a medição do que cada
 static	E1	alta	o eixo E1 do radar de mundo (agentes com grafo de conhecimento)	KG|grafo|conhecimento	radar|eixo
 static	E2	alta	o eixo E2 do radar de mundo (sistemas que se auto-melhoram)	self-improving|auto-?melhor|auto-?evolu	radar|eixo
 static	E3	alta	o eixo E3 do radar de mundo (o que muda a cada versão do Claude Code)	Claude Code	radar|eixo
-static	E4	alta	o eixo E4 do radar de mundo (capital e mercado)	capital|mercado|investiment	radar|eixo
+static	E4	alta	o eixo E4 do radar de mundo (capital e mercado)	capital|mercado|invest	radar|eixo
 static	E5	alta	o eixo E5 do radar de mundo (gates determinísticos)	determin	radar|eixo
 static	E6	alta	o eixo E6 do radar de mundo (a fronteira de modelos e a escada de modelos da sessão)	modelo|lineup	radar|eixo
 static	N0	alta	o nível N0 do /meta:dissect (identidade: quem mantém, licença, trajetória)	identidade|dissec	dissec|n[ií]vel
