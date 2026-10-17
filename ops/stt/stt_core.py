@@ -259,6 +259,19 @@ def deepgram_body(channels, duration: float, request_id: str, sha256: str, creat
             "results": {"channels": channels}}
 
 
+def audio_too_long(frames: int, sample_rate: int, channels: int, max_s: float) -> str | None:
+    """Teto da DURAÇÃO decodificada (a bomba de descompressão: 4 MB de FLAC de silêncio são 6 h de áudio). Devolve a
+    mensagem do 413, ou None. Vale por canal (a duração) e no total (canais × duração, o que o motor vai processar)."""
+    if sample_rate <= 0 or frames < 0 or channels < 1:
+        return "invalid audio header"
+    dur = frames / sample_rate
+    if dur > max_s:
+        return f"audio too long ({dur:.0f} s > {max_s:.0f} s)"
+    if dur * channels > 2 * max_s:
+        return f"audio too long across channels ({dur * channels:.0f} s > {2 * max_s:.0f} s)"
+    return None
+
+
 TRUE_WORDS = ("true", "1", "yes")
 PCM_RATES = (8000, 16000, 22050, 24000, 32000, 44100, 48000)
 MAX_CHANNELS = 8
