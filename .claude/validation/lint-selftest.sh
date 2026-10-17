@@ -10959,7 +10959,7 @@ PY
               '^LoadCredential=token:' '^CapabilityBoundingSet=$' '^Environment=HF_HUB_OFFLINE=1 '; do
     grep -qE -- "${want}" <<<"${U}" || miss+=" ${want}"
   done
-  grep -E '^ExecStart=' <<<"${U}" | grep -qi token && miss+=" (token no ExecStart)"
+  grep -qiE '^ExecStart=.*token' <<<"${U}" && miss+=" (token no ExecStart)"
   if [ -z "${miss}" ]; then record_pass "stt-service: (w1) show renderiza loopback, sandbox, sem saída de rede, MemoryMax=6G e token por credencial"
   else record_fail "stt-service: (w1) show" "faltou:${miss}"; fi
   local m1
