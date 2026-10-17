@@ -124,6 +124,8 @@
 .claude/commands/meta/setup-integration.md	Q_BYTECODE_SEM_TESTE	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/commands/product/check.md	C_QUATRO_ARTEFATOS_DE_VALIDACAO_CONTRA_METASPEC	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/commands/product/consolidate-meetings.md	E_lacuna_pipeline	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
+.claude/commands/product/consolidate-meetings.md	Q_MEETING_CONSOLIDATION_GRAPH	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
+.claude/commands/product/extract-meeting.md	E_DIR_MEETINGS_CANONICO	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
 .claude/commands/product/task.md	E_J_D3_6	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/product/transform-consolidated.md	C_precedente_interactive	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
 .claude/commands/quick/analysis.md	C_d2_analysis_diff	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
@@ -583,6 +585,10 @@
 .claude/validation/lint-selftest.sh	Q_FAMILIA_POR_ARQUIVO	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PRECOMMIT_SELECAO_POR_CASO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/meeting-graph-check.sh	E_MEETING_GRAPH_GATE_1016	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
+.claude/validation/meeting-graph-check.sh	P_CONSENT_EVIDENCE_REWRITE	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
+.claude/validation/meeting-graph-check.sh	Q_ANARLOG_PORTAO_EXPORT	docs/evolution/dissect/anarlog-2026-10/anarlog-2026-10.kg.yaml
+.claude/validation/meeting-graph-check.sh	Q_VEXA_PORTAO_MEET	docs/evolution/dissect/vexa-2026-10/vexa-2026-10.kg.yaml
 .claude/validation/members-validate.sh	Q_members_ci_gate	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/onion-regen-lib.sh	E_PATCH_ID_MUDA_PELO_CONTEXTO	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 .claude/validation/onion-version.sh	C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
@@ -1474,6 +1480,13 @@ docs/evolution/inbox/_processed/2026-10-13-proposal-superpowers-parquear.md	E_TR
 docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md	Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md	Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md	Q_XSESSION_LIVE_NOT_VERIFIED	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md	D_ANARLOG_2610	docs/evolution/dissect/anarlog-2026-10/anarlog-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md	D_VEXA_2610	docs/evolution/dissect/vexa-2026-10/vexa-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md	E_AVISO_WINDOWS_RECUSA	docs/evolution/dissect/anarlog-2026-10/anarlog-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md	E_CURADORIA_ANARLOG_1016	docs/evolution/dissect/anarlog-2026-10/anarlog-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md	E_CURADORIA_VEXA_1016	docs/evolution/dissect/vexa-2026-10/vexa-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md	Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md	Q_VEXA_TEAMS_PARQUEADO	docs/evolution/dissect/vexa-2026-10/vexa-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-16-proposal-rea-method-parquear.md	D_REA_METHOD_2610	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
