@@ -5,27 +5,36 @@
 # fonte única da glosa). Aqui mora só o "o que conta como glosa" e o "o que não é prosa".
 #
 # ── O QUE NÃO É PROSA (nunca acusa) ───────────────────────────────────────────────────────────────
-#   · bloco de código (```…```) e código em crase (`…`);
-#   · linha de citação (começa com ">"): saída ou fala citada;
-#   · URL; e a sigla colada a "/", "." seguido de letra, "-" ou "_" (caminho, arquivo, branch, id composto);
-#   · "REGRA N (Título)": o título de regra é glosa de REGRA, não frase do assistente.
+#   · bloco de código (```…```) e código em crase (`…`) — o conteúdo da crase fica como CONTEXTO
+#     ("a rodada r12 do `/meta:cc-update`" está glosada pelo nome do comando), mas nada dentro dela acusa;
+#   · linha de citação (começa com ">"): saída ou fala citada; e URL;
+#   · caminho, arquivo ou branch: o pedaço sem espaço que contém a sigla tem "/" ou "." seguido de letra,
+#     ou palavra minúscula de 3+ letras colada por "-" ou "/" (docs/radar-E3-r13/x.md, chore/radar-e3-r13).
+#     "E3/E4" e "E3-E5" NÃO são caminho: as duas siglas contam;
+#   · "REGRA N (Título)": o título de regra é glosa de REGRA — e glosa também o "RN" da mesma resposta.
 #
-# ── O QUE CONTA COMO GLOSA (a resposta inteira vale: glosou uma vez, as demais menções passam) ──────
-#   · parêntese logo depois da sigla: "I3 (um escritor por repo)";
-#   · a sigla dentro de um parêntese que explica algo: "o norte do Onion (NS1)" — o parêntese tem ao
-#     menos duas outras palavras, ou vem logo depois de texto;
-#   · " — " ou ": " seguido de texto: "I3: o core nunca commita no repo alheio";
-#   · o `accept` da linha do glossário casando na MESMA FRASE, com a sigla removida dela.
+# ── QUANDO A SIGLA CONTA (o DOMÍNIO) ────────────────────────────────────────────────────────────────
+#   A coluna `domain` do glossário: a sigla só é a da casa se o domínio aparecer no BLOCO. Sem ele, é
+#   palavra comum ou rótulo local ("o teste E3 do formulário", "o r1 do relatório") e cala. E rótulo
+#   local numerado (N5, N8 ao lado de N1–N3: a letra com número que o glossário não tem) cala a família.
 #
-# TETO DECLARADO: o casamento é LÉXICO. Uma glosa errada mas bem formada passa ("r13 (uma coisa)");
-# texto entre aspas não é isento; rótulo local de tabela (A1, T2, M3…) não está no glossário e passa
-# sempre. Um id de nó só conta se existir num .kg.yaml versionado (git ls-files); fora de um repo
-# git, ids de nó não são medidos (calam).
+# ── O QUE CONTA COMO GLOSA (glosou num bloco, as menções seguintes do bloco passam) ──────────────────
+#   · parêntese logo depois da sigla, com 2+ palavras de 3+ letras que não são siglas: "I3 (um escritor
+#     por repo)"; "(ok)" ou "(I3, E3)" não glosam;
+#   · " — " ou ": " seguido de 2+ palavras de 3+ letras: "I3: o core nunca commita no repo alheio";
+#     "r13: 2.1.302" não glosa;
+#   · cópula: "I3 é / significa / quer dizer / isto é / ou seja / são" seguida de 3+ palavras;
+#   · o `accept` da linha casando PERTO da sigla (6 palavras para cada lado, na mesma frase).
+#
+# TETO DECLARADO: o casamento é LÉXICO. Uma glosa errada mas bem formada passa ("r13 (uma coisa
+# qualquer)"); texto entre aspas não é isento; rótulo local fora do glossário (A1, T2, M3) passa sempre;
+# o accept perto da sigla aceita menção de passagem ("atualizei o Claude Code e a r13 mediu"). Um id de
+# nó só conta se existir num .kg.yaml versionado (git ls-files); fora de um repo git, ids de nó calam.
 import os
 import re
 import subprocess
 
-_WORD = r"[A-Za-zÀ-ÿ0-9]"
+_W3 = r"[A-Za-zÀ-ÿ]{3,}"
 
 
 def load_glossary(path):
@@ -39,16 +48,17 @@ def load_glossary(path):
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         cols = line.split("\t")
-        if len(cols) < 5 or cols[0] == "kind":
+        if len(cols) < 6 or cols[0] == "kind":
             continue
-        kind, code, opacity, gloss, accept = cols[:5]
+        kind, code, opacity, gloss, accept, domain = cols[:6]
         try:
-            rx = re.compile(r"(?<![\w/.\-`])(?:%s)(?![\w/\-`]|\.\w)" % code)
+            rx = re.compile(r"(?<![\w.`$])(?:%s)(?![\w`]|\.\w)" % code)
             acc = None if accept.strip() in ("", "-") else re.compile(accept, re.I)
+            dom = None if domain.strip() in ("", "-") else re.compile(domain, re.I)
         except re.error:
             continue
         rows.append({"kind": kind, "code": code, "opacity": opacity, "gloss": gloss,
-                     "rx": rx, "accept": acc})
+                     "rx": rx, "accept": acc, "domain": dom})
     return rows
 
 
@@ -104,16 +114,37 @@ def node_titles(root, ids):
 
 
 def prose(text):
-    """(texto, faixas de código em crase). O que não é prosa vira espaço; o código em crase FICA no
-    texto (ele é contexto: "a rodada r12 do `/meta:cc-update`" está glosada pelo nome do comando), mas
-    nenhuma sigla DENTRO dele é acusada — as faixas devolvidas dizem onde ele está."""
+    """(texto, faixas de código em crase, números de REGRA tituladas). O que não é prosa vira espaço."""
     t = re.sub(r"```.*?```", lambda m: " " * len(m.group(0)), text, flags=re.S)
     t = "\n".join(" " * len(ln) if ln.lstrip().startswith(">") else ln for ln in t.split("\n"))
     t = re.sub(r"https?://\S+", lambda m: " " * len(m.group(0)), t)
-    t = re.sub(r"\bREGRAS? \d+(?:\s*[/–,-]\s*\d+)*\s*\([^()]*(?:\([^()]*\)[^()]*)*\)",
+    titled = set()
+
+    def _rule(m):
+        titled.update(int(n) for n in re.findall(r"\d+", m.group(1)))
+        return " " * len(m.group(0))
+    t = re.sub(r"\bREGRAS? (\d+(?:\s*[/–,-]\s*\d+)*)\s*\([^()]*(?:\([^()]*\)[^()]*)*\)", _rule, t)
+    # ênfase markdown em volta da sigla (_I3_, *I3*) não a esconde
+    t = re.sub(r"(?<![\w*])[_*]{1,2}(?=[A-Za-z0-9])|(?<=[A-Za-z0-9])[_*]{1,2}(?![\w*])",
                lambda m: " " * len(m.group(0)), t)
     spans = [(m.start(), m.end()) for m in re.finditer(r"`[^`\n]*`", t)]
-    return t, spans
+    return t, spans, titled
+
+
+def _chunk(t, start, end):
+    a = start
+    while a > 0 and not t[a - 1].isspace():
+        a -= 1
+    b = end
+    while b < len(t) and not t[b].isspace():
+        b += 1
+    return t[a:b].strip("()[]{}.,;:!?\"'«»“”")
+
+
+def _is_path(chunk):
+    if re.search(r"\.[A-Za-z]", chunk) or chunk.count("/") >= 2:
+        return True
+    return bool(re.search(r"[/-][a-z]{3,}|[a-z]{3,}[/-]", chunk))
 
 
 def _sentence(t, start, end):
@@ -124,64 +155,76 @@ def _sentence(t, start, end):
     return t[left + 1:start], t[end:right]
 
 
-def _structural(t, start, end, before, after):
+def _words(s, codes_rx):
+    return [w for w in re.findall(_W3, s) if not codes_rx.fullmatch(w)]
+
+
+def _structural(t, start, end, after, codes_rx):
     a = after
-    if re.match(r"\s*\(", a):
+    m = re.match(r"\**\s*\(([^()]*)\)", a)
+    if m and len(_words(m.group(1), codes_rx)) >= 2:
         return True
-    if re.match(r"\**\s*(?:—|–|:)\**\s+\**%s" % _WORD, a):
+    m = re.match(r"\**\s*(?:—|–|:)\**\s+(.*)", a)
+    if m and len(_words(" ".join(m.group(1).split()[:8]), codes_rx)) >= 2:
         return True
-    # dentro de um parêntese que explica: "texto (SIGLA)" ou "(texto, SIGLA)"
+    m = re.match(r"\**\s+(?:é|são|era|significa|quer dizer|isto é|ou seja)\s+(.*)", a, re.I)
+    if m and len(re.findall(_W3, " ".join(m.group(1).split()[:10]))) >= 3:
+        return True
+    # dentro de um parêntese que explica: "(texto que explica, SIGLA)"
     op = t.rfind("(", 0, start)
     cl = t.rfind(")", 0, start)
     if op > cl:
         close = t.find(")", end)
-        if close != -1:
-            inner = (t[op + 1:start] + " " + t[end:close])
-            words = re.findall(r"%s{2,}" % _WORD, inner)
-            if len(words) >= 2:
-                return True
-            if re.search(r"%s{3,}\s*$" % _WORD, t[max(0, op - 40):op]):
-                return True
+        if close != -1 and len(_words(t[op + 1:start] + " " + t[end:close], codes_rx)) >= 2:
+            return True
     return False
 
 
+def _near(before, after, n=6):
+    return " ".join(before.split()[-n:]) + " " + " ".join(after.split()[:n])
+
+
 def _local_families(t, glossary):
-    """Prefixos de rótulo LOCAL: a resposta usa a mesma letra com número que o glossário não tem
-    (N5, N8, N10 ao lado de N1–N3 = achados numerados do próprio texto, não níveis do dissect)."""
+    """Letras de rótulo LOCAL: a resposta usa a mesma letra com número que o glossário não tem."""
     known = set()
     for row in glossary:
         if row["kind"] == "static":
             known.update(re.findall(r"^[A-Z]\d+$", row["code"]))
     fams = set()
-    for m in re.finditer(r"(?<![\w/.\-`])([A-Z])(\d{1,3})(?![\w/\-`]|\.\w)", t):
-        tok = m.group(0)
-        if tok in known:
-            continue
-        if any(k[0] == m.group(1) for k in known):
+    for m in re.finditer(r"(?<![\w.`])([A-Z])(\d{1,3})(?![\w`]|\.\w)", t):
+        if m.group(0) not in known and any(k[0] == m.group(1) for k in known):
             fams.add(m.group(1))
     return fams
 
 
 def findings(text, glossary, titles=None, root=None, glossed_out=None, already=()):
-    """Lista de {token, kind, opacity, gloss} das siglas sem glosa em NENHUMA menção da resposta.
+    """Lista de {token, row, kind, opacity, gloss} das siglas sem glosa em NENHUMA menção do bloco.
     `already` = siglas glosadas num bloco ANTERIOR do mesmo turno (o maestro já leu a glosa);
     `glossed_out` (set) recebe as siglas que ESTE bloco glosou."""
-    t, spans = prose(text)
+    t, spans, titled = prose(text)
     fams = _local_families(t, glossary)
-    seen = {}       # token -> dict (com glossed=bool acumulado)
+    codes_rx = re.compile("|".join("(?:%s)" % r["code"] for r in glossary))
+    seen = {}
     for row in glossary:
+        if row["domain"] is not None and not row["domain"].search(t):
+            continue
         for m in row["rx"].finditer(t):
             if any(a <= m.start() < b for a, b in spans):
                 continue
             tok = m.group(0)
             if row["kind"] == "static" and re.match(r"^[A-Z]\d+$", tok) and tok[0] in fams:
                 continue
+            ch = _chunk(t, m.start(), m.end())
+            if ch != tok and _is_path(ch):
+                continue
             before, after = _sentence(t, m.start(), m.end())
-            ok = _structural(t, m.start(), m.end(), before, after)
+            ok = _structural(t, m.start(), m.end(), after, codes_rx)
+            if not ok and row["kind"] == "rule" and int(tok[1:]) in titled:
+                ok = True
             if not ok and row["accept"] is not None:
-                ok = bool(row["accept"].search(before + " " + after))
-            d = seen.setdefault(tok, {"token": tok, "row": row["code"], "kind": row["kind"], "opacity": row["opacity"],
-                                      "gloss": row["gloss"], "glossed": False})
+                ok = bool(row["accept"].search(_near(before, after)))
+            d = seen.setdefault(tok, {"token": tok, "row": row["code"], "kind": row["kind"],
+                                      "opacity": row["opacity"], "gloss": row["gloss"], "glossed": False})
             d["glossed"] = d["glossed"] or ok
     if glossed_out is not None:
         glossed_out.update(k for k, d in seen.items() if d["glossed"])
