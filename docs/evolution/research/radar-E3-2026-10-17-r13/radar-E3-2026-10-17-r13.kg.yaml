@@ -29,6 +29,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-17"
     verified_against: "CHANGELOG oficial: seções 2.1.302 (66 linhas, 63 itens); baseline 2.1.301, disco 2.1.302, processo 2.1.302, SDK bridge 2.1.302"
+    trace: "docs/evolution/research/radar-E3-2026-10-17-r13/SYNTHESIS.md"
     label: "o delta desde a baseline 2.1.301 são 1 versão(ões), de 2.1.302 a 2.1.302, extraídas do CHANGELOG oficial"
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
@@ -117,7 +118,7 @@ nodes:
     confidence: 0.6
     verified_at: "2026-10-17"
     verified_against: "medido em 2026-10-17: o settings do usuário (lido, não tocado) tem permissions.defaultMode = auto; o .claude/settings.json do core não define defaultMode; 0 ocorrências de CLAUDE_CODE_AUTO_MODE_MODEL no core; medido pelo juiz na linha de comando dos processos vivos: as 5 sessões interativas do maestro (abertas de 14/10 a 17/10) rodam com --dangerously-skip-permissions e a de fundo com --permission-mode bypassPermissions, nenhuma em auto; o settings.local.json do core e o do usuário não definem defaultMode"
-    narrative: "Juiz: REPROVA na 1ª redação, que dizia que as sessões do maestro rodam em auto mode e recebem a compactação do classificador. O defaultMode=auto do settings do usuário é sobrescrito pelo modo com que as sessões são lançadas, e em bypass o classificador não roda. Rebaixado a 'não toca as sessões vivas'; volta a valer se o maestro lançar sessões sem o bypass."
+    narrative: "Juiz: REPROVA na 1ª redação, que dizia que as sessões do maestro rodam em auto mode e recebem a compactação do classificador. O defaultMode=auto do settings do usuário é sobrescrito pelo modo com que as sessões são lançadas, e em bypass o classificador não roda. Rebaixado a 'não toca as sessões vivas'; volta a valer se o maestro lançar sessões sem o bypass. Id anterior: E_AUTO_MODE_DO_MAESTRO_RECEBE_A_COMPACTACAO (o alvo do REPROVA em data/judge-verdicts.json)."
     label: "o defaultMode=auto do settings do usuário não alcança as sessões vivas do maestro, que rodam em bypass, então a compactação do classificador e o CLAUDE_CODE_AUTO_MODE_MODEL da 2.1.302 não as tocam"
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
