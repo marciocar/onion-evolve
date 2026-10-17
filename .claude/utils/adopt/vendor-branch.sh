@@ -352,6 +352,13 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   # RENAME (o caso que motivou): a vendor ganha delete+add do mesmo conteúdo, e a detecção de rename do
   # merge leva a edição do adotante para o nome novo, sem conflito (medido, caso (c) da bancada).
   # Pin anterior ausente ou que não é commit da fonte → NADA sai, e isso é DITO (status quo, declarado).
+  # O LADO ANTIGO SE MEDE SEM AS EXCLUSÕES DE APOSENTADORIA (2026-10-17): com o manifesto inteiro, o
+  # `:(exclude)` que APOSENTA um arquivo também filtrava o pin anterior, e ele nunca entrava no delta —
+  # medido num clone descartável de adotante: a skill onion-publish, tirada da adoção, ficava nele depois
+  # do --update rc=0. SÓ as de aposentadoria saem do lado antigo (`vendor-manifest.sh --retired-excludes`):
+  # A 1ª cura tirava TODAS. Isso não apaga arquivo próprio do adotante (o lado antigo é a árvore do CORE
+  # no pin anterior, e a bancada refutou essa objeção), mas estenderia a remoção aos CORTES DE PAPEL: um
+  # adotante que trocou de papel perderia o que o corte novo tira, decisão que ninguém tomou. Estreito.
   # LIMITE DECLARADO: o manifesto só lista raiz que EXISTE no HEAD da fonte; se o core apagar uma raiz
   # INTEIRA (ex.: `.claude/workflows/` vazio), os arquivos dela não entram no delta e ficam.
   # >>> D_CURE-core-removed (run_vendor_core_removed_selftests remove ESTE bloco p/ provar load-bearing) >>>
@@ -361,7 +368,7 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
     _pidx="$(mktemp)"; _pold="$(mktemp)"; rm -f "$_pidx"
     # shellcheck disable=SC2046
     GIT_INDEX_FILE="$_pidx" git -C "$SRC" read-tree "$_prev" 2>/dev/null \
-      && GIT_INDEX_FILE="$_pidx" git -C "$SRC" ls-files -z -- $(printf '%s ' $mf) 2>/dev/null \
+      && GIT_INDEX_FILE="$_pidx" git -C "$SRC" ls-files -z -- $(printf '%s\n' $mf | grep -vxF -f <(bash "$HERE/vendor-manifest.sh" --retired-excludes) || true) 2>/dev/null \
          | grep -zvE '^\.claude/validation/[^/]*-baseline\.txt$' | LC_ALL=C sort -zu > "$_pold"
     rm -f "$_pidx"
     _gone="$(LC_ALL=C comm -z -23 "$_pold" "$req" | tr '\0' '\n')"

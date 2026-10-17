@@ -76,6 +76,7 @@ while [ $# -gt 0 ]; do
     --repo) REPO="${2:-}"; shift 2 ;;
     --kind) KIND="${2:-}"; shift 2 ;;
     --emit-scrub-roots) MODE="scrub"; shift ;;
+    --retired-excludes) MODE="retired"; shift ;;
     --check-bundle) MODE="check"; BUNDLE="${2:-}"; shift 2 ;;
     --stub-baselines) MODE="stub"; BUNDLE="${2:-}"; shift 2 ;;
     --list) MODE="list"; ROLE="${2:-}"; shift 2 ;;
@@ -641,6 +642,21 @@ _target_owns_contract() {
   return 0
 }
 
+# ── CORE-ONLY NÃO VIAJA PARA ADOÇÃO, em NENHUM papel (2026-10-17, E_SKILL_CORE_ONLY_VIAJOU) ─────────
+# A skill onion-publish conduz o /meta:publish, que só roda na FONTE (role: source): o motor dela
+# (ops/publish-door.sh) não vendoriza. Medido: o manifesto de papel adopted, extraído por git archive,
+# entregava .claude/skills/onion-publish, porque o `_role_cut` só a corta em standalone|plugins — a
+# skill chegava MORTA a todo adotante adopted e hub. Fica FORA do `_role_cut` de propósito: um corte não
+# vazio ali LIGA o corte de comandos do roles.yaml (`_emit_command_excludes`), que tiraria a meta-fábrica
+# do adotante, decisão separada que ninguém tomou. Vale só no destino adoção: a porta onion-core é o
+# core das empresas e leva a skill (o materializador escolhe o papel; a doutrina das portas decide).
+_CORE_ONLY_ADOPTION_EXCLUDES=(':(exclude).claude/skills/onion-publish')
+# --retired-excludes: o vendor-branch.sh pergunta QUAIS exclusões são APOSENTADORIA (o core deixou de
+# mandar algo que mandava) para tirá-las só do lado antigo do delta de remoção. As outras exclusões
+# (identidade, contrato do próprio alvo, corte de papel) têm outro significado e nunca entram aqui: medir o
+# lado antigo sem elas estenderia a remoção do --update aos cortes de papel, decisão separada.
+if [ "${MODE}" = "retired" ]; then printf '%s\n' "${_CORE_ONLY_ADOPTION_EXCLUDES[@]}"; exit 0; fi
+
 if [ "${MODE}" = "manifest" ]; then
   git -C "${REPO}" rev-parse HEAD >/dev/null 2>&1 || {
     echo "ERRO: '${REPO}' não é repositório git com HEAD — o manifesto de transporte é declarado ∩ HEAD; use --emit-scrub-roots para a superfície declarada" >&2; exit 2; }
@@ -654,6 +670,7 @@ if [ "${MODE}" = "manifest" ]; then
     done
   fi
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_role_excludes "${REPO}" "${ROLE}")
+  [ "${KIND}" = adoption ] && _spec+=("${_CORE_ONLY_ADOPTION_EXCLUDES[@]}")   # antes dos companheiros: eles derivam do que já saiu
   # o rc do corte de comandos É LIDO: `< <(…)` o engolia, e foi assim que o fail-open passou calado.
   _cmd_out="$(_emit_command_excludes "${REPO}" "${ROLE}")" || exit 3
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done <<< "${_cmd_out}"
