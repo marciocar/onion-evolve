@@ -2,7 +2,8 @@
 branch: docs/meeting-capture-windows-vps-decisions
 pr: pendente
 date: 2026-10-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 56b531808f5cfaa22e93a8de18ab8d5f8869b4aa41999df15959ee0322f57b32
+reviewed_code_sha256: 7f43374ca5df62169a1ec7673051435972ebbdf9f755de0bddecfcb8bdbdabdd
 findings_total: 6
 findings_real: 5
 tokens: 93116
