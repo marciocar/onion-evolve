@@ -1,0 +1,3 @@
+# ops/stt/pip.lock — o pip do venv do onion-stt, subido ANTES do requirements.lock (o ensurepip do python3.12 do Ubuntu traz o 24.0; o
+# atual em 2026-10-17 é o 26.2.1). Mesmo regime: --require-hashes --only-binary :all: --no-deps.
+pip==26.2.1 --hash=sha256:71138adf1f4ca900cdb7d289c21b7494329f2332b6d85f0e1c42108c0384ed3e
