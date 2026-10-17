@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**567 itens abertos** em 109 grafo(s) com aberto (de 139 no escopo) · 110 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**573 itens abertos** em 112 grafo(s) com aberto (de 142 no escopo) · 113 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -941,6 +941,13 @@
 | 2.0 | `E_SKILL_CORE_ONLY_VIAJOU` | fila-2026-10-06 | a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese) |
 | 2.0 | `Q_MANIFESTO_SEM_SKILL_CORE_ONLY` | fila-2026-10-06 | medir se a skill onion-publish viaja ao adotante e, se viajar, tirá-la do manifesto |
 
+## anarlog-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_ANARLOG_PORTAO_EXPORT` | anarlog-2026-10 | Portão do anarlog: numa reunião de teste consentida, o export JSON traz palavras com start_ms, end_ms, channel e speaker, e a tr |
+| 4.0 | `E_AVISO_WINDOWS_RECUSA` | anarlog-2026-10 | RISCO ao costurar: a função de postar o aviso do anarlog recusa no Windows, e o maestro disse que a máquina dele é Windows. O  |
+
 ## core — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -954,6 +961,13 @@
 |--:|---|---|---|
 | 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
 | 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
+
+## vexa-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_VEXA_PORTAO_MEET` | vexa-2026-10 | Portão do Meet: num teste consentido, sem dado real, a extensão + desktop da Vexa produz 1 segmento ou mais com speaker não vaz |
+| 3.0 | `Q_VEXA_TEAMS_PARQUEADO` | vexa-2026-10 | O Teams fica parqueado dentro do veredito enquanto o join autenticado da Vexa for admitido sem áudio (issue #1795 aberta). |
 
 ## constellation-dialogic-layer-2026-07 — 2 item(ns)
 
@@ -1047,6 +1061,13 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## meeting-capture-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016` | meeting-capture-2026-10 | Máquina de captura: o maestro usa Windows como cliente e quer a VPS como servidor principal (extensão de navegador ou plugin), c |
+| 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
 
 ## task-progress-story-points-2026-10 — 2 item(ns)
 
