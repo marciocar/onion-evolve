@@ -1089,13 +1089,6 @@
 |--:|---|---|---|
 | 3.0 | `Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO` | radar-E3-2026-10-14-r11 | o _cleanup do pr-finalize deve abortar o rebase que ele mesmo começou, para a morte no meio do --rebase não deixar a worktree em |
 
-## radar-E3-2026-10-17-r13 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.0 | `Q_FORK_NO_ADMIN_DO_BRIDGE_DECIDIR` | radar-E3-2026-10-17-r13 | decidir se o admin do /chat mantém o fork de subagente que o SDK 0.3.302 ligou por padrão, medindo antes um turno real que o use |
-| 2.0 | `Q_PIN_DO_REVISOR_DO_CI_SOBE_OU_ENTRA_NO_CENSO` | radar-E3-2026-10-17-r13 | o revisor de IA do CI deve subir o pin da action (CLI 2.1.220 hoje) ou o censo deve declarar essa versão, para a defasagem do CI  |
-
 ## superpowers-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1145,6 +1138,13 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.0 | `Q_live_narration` | kg-console-rich-design-2026-07 | Narração LIVE opcional (POST a um LLM 'explique esta seleção') como enhancement que degrada gracioso offline — gated; a pré |
+
+## radar-E3-2026-10-17-r13 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.0 | `Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL` | radar-E3-2026-10-17-r13 | medir um turno real do admin do /chat com o fork ligado (custo da cópia de contexto e saída em segundo plano antes do fim do tur |
+| 2.0 | `Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-17-r13 | o revisor de IA do CI no pin novo (v1.0.252, CLI 2.1.302) tem de ser provado num PR seguinte com a label review:ia |
 
 ## vendor-multi-branch-2026-07 — 1 item(ns)
 
