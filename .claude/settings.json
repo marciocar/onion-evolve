@@ -105,6 +105,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-degraded-notice.sh\""
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/house-code-gloss.sh\" prompt",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -229,6 +238,15 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/rule-title-in-prose.sh\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/house-code-gloss.sh\" stop",
+            "timeout": 10
           }
         ]
       }
