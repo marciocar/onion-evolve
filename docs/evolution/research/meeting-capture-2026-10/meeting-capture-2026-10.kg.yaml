@@ -91,7 +91,7 @@ nodes:
 
       Selado por /meta:decide em 2026-10-17: escolhida «Captura no Windows, lote na VPS (Recomendado)»; descartadas: «Lote na VPS, só por arquivo» · «Esperar o ao vivo».
 
-      Fechada pelo gatilho do x_gatilho: a curadoria devolveu a SAC-164 (filha da SAC-157) com a proposta docs/evolution/inbox/_processed/2026-10-17-proposal-windows-client-vps-server.md, e a pergunta é respondida pela decisão D_MC_CAPTURA_WINDOWS_LOTE_VPS_1017 (aresta TRACES_TO dela para cá). O anarlog TEM caminho no Windows (instalador v1.4.30, WASAPI loopback, provedor custom apontando para a VPS), então D_ANARLOG_2610 não reabre.
+      Fechada pelo gatilho do x_gatilho: a curadoria devolveu a SAC-164 (filha da SAC-157) com a proposta docs/evolution/inbox/_processed/2026-10-17-proposal-windows-client-vps-server.md, e a pergunta é respondida pela decisão D_MC_CAPTURA_WINDOWS_LOTE_VPS_1017 (aresta TRACES_TO dela para cá). Pela leitura de código no pin (NÃO executado no Windows; o braço W e os clientes reais estão na lista de não medidos do sinal), o anarlog tem caminho de CAPTURA no Windows: instalador v1.4.30, WASAPI loopback, provedor custom apontando para a VPS. O STT, porém, vai para a VPS, e isso colide com o x_gatilho de Q_ANARLOG_PORTAO_EXPORT (anarlog-2026-10), que pede a transcrição "sem sair da máquina de captura" e diz que, sem STT local no Windows, o portão reprova e D_ANARLOG_2610 reabre. Este PR de registro NÃO julga essa colisão: emendar o portão para "STT na VPS pelo provedor custom" ou reabrir o veredito é decisão do maestro, pendente.
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «Caminho da captura de reuniões (Windows como cliente, VPS como servidor). Medido na VPS: o Parakeet v3 int8 transcreve 1 h de reunião em ~7 min (WER 6,19 %), mas ao vivo a VPS sem GPU não aguenta nem 1 reunião pela regra. Selamos qual caminho?»"
@@ -132,13 +132,13 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-17"
     verified_against: "decisão do maestro em 2026-10-17, por pergunta com opções (/meta:decide): escolhida «Parakeet pelo adaptador do core (Recomendado)»"
-    label: "O core absorve por reescrita o adaptador de STT da curadoria (OpenAI /v1/audio/transcriptions, Deepgram WS e POST /v1/listen) e o serve na VPS com o Parakeet: wrapper de ops/, TLS, auth por token, localhost atrás do proxy, bancada; deploy pelo MOAT."
+    label: "O Parakeet é servido pelo adaptador do core: o core absorve por reescrita o adaptador de STT da curadoria (OpenAI /v1/audio/transcriptions, Deepgram WS e POST /v1/listen) e o opera na VPS. O desenho de operação vem do sinal, não do selo (ver narrative)."
     narrative: |-
       Selado por /meta:decide em 2026-10-17: escolhida «Parakeet pelo adaptador do core (Recomendado)»; descartadas: «Stack oficial da NVIDIA (NeMo/Riva)» · «API hospedada da NVIDIA».
 
       Duas falas encadeadas. A 1ª pergunta foi: "O adaptador de STT (um servidor Python sobre o onnx-asr, com rotas OpenAI, Deepgram ao vivo e Deepgram em lote; construído pela curadoria porque não havia um aberto) mora onde?", com as opções «Serviço da VPS, operado pelo core (Recomendado)», «Fica na curadoria, só como referência» e «Usar um serviço pago (Deepgram)». O maestro respondeu LIVRE, fora das opções (registrada verbatim): "quero usar o modelo da nvidia". A pergunta de esclarecimento (a do selo, no provenance) mostrou que o motor medido já é da NVIDIA (Parakeet TDT 0.6b v3) e que a escolha era COMO servi-lo.
 
-      O que a escolha quer dizer: o adaptador hoje em data/vps-stt/ no repo da curadoria NÃO é copiado; o core o reescreve com bancada e o opera como serviço da VPS (localhost atrás do proxy com TLS, auth por token), com deploy só pelo wrapper de ops/ (MOAT). Nada disso está construído ainda: a decisão é de direção, a execução é trabalho seguinte.
+      O que a escolha quer dizer: o adaptador hoje em data/vps-stt/ no repo da curadoria NÃO é copiado; o core o reescreve com bancada e o opera como serviço da VPS (localhost atrás do proxy com TLS, auth por token), com deploy só pelo wrapper de ops/ (MOAT). Esse desenho de operação (wrapper, TLS, token, proxy, bancada, MOAT) vem do sinal (§1 "Faltam" e §6.2) e da instrução da sessão principal, não das opções do selo. Nada disso está construído ainda: a decisão é de direção, a execução é trabalho seguinte.
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-17: «Sobre 'quero usar o modelo da NVIDIA': o motor já é da NVIDIA (o Parakeet TDT 0.6b v3 é modelo da NVIDIA, vencedor da medição). O que muda é COMO ele é servido. Qual?»"
@@ -153,7 +153,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-17"
     verified_against: "decisão do maestro em 2026-10-17, por pergunta com opções (/meta:decide): escolhida «Medir os dois e decidir pelo número (Recomendado)»"
-    label: "Diarização: medir os dois e decidir pelo número — sherpa-onnx com a segmentação pyannote 3.0 (sem token) × Sortformer da NVIDIA na versão atual, por DER em pt-BR e custo em CPU na VPS, com critério pré-registrado; a rodada é pedida à curadoria."
+    label: "Diarização: medir os dois e decidir pelo número — sherpa-onnx com a segmentação pyannote 3.0 (sem token) × Sortformer da NVIDIA na versão atual, por DER em pt-BR e custo em CPU na VPS, com critério pré-registrado; a rodada é a pedir à curadoria."
     narrative: |-
       Selado por /meta:decide em 2026-10-17: escolhida «Medir os dois e decidir pelo número (Recomendado)»; descartadas: «Só o da NVIDIA» · «Só o sherpa-onnx».
 
@@ -170,7 +170,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.4
-    label: "Diarização da reunião em pt-BR na VPS sem GPU: o sherpa-onnx com a segmentação pyannote 3.0 (sem token do Hugging Face) ou o Sortformer da NVIDIA na versão atual? Decide o número: DER em pt-BR e custo em CPU, por critério pré-registrado. Pesquisa pedida à curadoria."
+    label: "Diarização da reunião em pt-BR na VPS sem GPU: o sherpa-onnx com a segmentação pyannote 3.0 (sem token do Hugging Face) ou o Sortformer da NVIDIA na versão atual? Decide o número: DER em pt-BR e custo em CPU, por critério pré-registrado. Pesquisa a pedir à curadoria."
     x_gatilho: "fecha quando a curadoria devolver a rodada com o protocolo pré-registrado (commitado antes de rodar), as versões atuais dos dois motores, o DER em pt-BR, o RTF e o RSS na VPS de 8 vCPU; sem um dos dois braços medido, não fecha."
     trace: "docs/evolution/inbox/_processed/2026-10-17-proposal-windows-client-vps-server.md"
 
@@ -199,4 +199,4 @@ edges:
     edge_type: TRACES_TO
   - from: Q_DIARIZACAO_SHERPA_X_SORTFORMER_1017
     to: D_MC_DIARIZACAO_MEDIR_OS_DOIS_1017
-    edge_type: DEPENDS_ON
+    edge_type: CONSTRAINS
