@@ -24,6 +24,7 @@ REGRAS COMUNS (agente de execução do core Onion, `<raiz do repo>`; `<autoriza�
 - Citar regra sempre como "REGRA N (Título)" (título real, de `.claude/validation/rules-registry.sh` ou dos docs gerados).
 - USE A MAQUINARIA, nunca à mão: resíduo SÓ pelo gerador `bash .claude/validation/review-artifact-check.sh --skeleton > docs/evolution/review/$(git branch --show-current | tr / -).md`, preencher, conferir `--schema`; fechar SÓ com `bash ops/pr-finalize.sh --push`; tarefas no task manager por `bash .claude/utils/task-manager/tm.sh` (carregar o `.env` só com `set -a; source .env; set +a` dentro do comando; NUNCA ler/imprimir o `.env`). Commit `--no-verify` só como checkpoint.
 - Processos longos: `run_in_background` com log em arquivo, espere por PID; nunca `| tail` para medir rc.
+- **LOGS COM NOME ÚNICO.** O scratchpad é compartilhado entre agentes paralelos: todo log ou arquivo seu leva o nome da sua branch ou worktree (ex.: `finalize-<branch>.log`), nunca um nome genérico como `finalize.log`. Medido em 2026-10-16: um agente sobrescreveu o `finalize.log` de outro.
 - Bancada: todo caso novo reprova contra mutante plantado por `ops/mutate-and-restore.sh`; rode com `LC_ALL=C`.
 - Grafo: o que nasce de decisão/achado vai a nó no grafo do tema (radar `--integrity --schema` e `kg-contract-check.sh` rc 0); teto do `meta:` sobe só com motivo.
 - Refutador: antes do PR, um subagente general-purpose model opus com mandato REFUTAR o diff; cure o que ele achar.
