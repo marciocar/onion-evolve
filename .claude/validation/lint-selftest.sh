@@ -11081,8 +11081,31 @@ PY
   # fila são provados só onde o venv existe (a VPS depois do --apply).
   local spy="${ONION_STT_SELFTEST_PY:-}" cand
   if [ -z "${spy}" ]; then for cand in /opt/onion-stt/venv-*/bin/python; do [ -x "${cand}" ] && spy="${cand}"; done; fi
+  # ⚠️ SEM O VENV NÃO É SKIP (o CI roda em STRICT: ⊘ = FALHA, medido no 1º CI do #1184): sem as dependências, a
+  # AMARRAÇÃO é conferida pela FORMA (AST do server.py: o build_app devolve core.AuthGate(core.BodyLimit(...)) e o
+  # parse_args recusa host fora do loopback), com mutante; o rótulo DIZ que o servidor real não rodou aqui.
+  _st_ast() {  # <server.py> → rc 0 se a amarração está na forma
+    python3 -I - "$1" <<'PY'
+import ast, sys
+t = ast.parse(open(sys.argv[1], encoding="utf-8").read())
+fn = {f.name: f for f in t.body if isinstance(f, ast.FunctionDef)}
+def is_call(n, attr):
+    return isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == attr \
+        and isinstance(n.func.value, ast.Name) and n.func.value.id == "core"
+rets = [r for r in ast.walk(fn["build_app"]) if isinstance(r, ast.Return) and r.value is not None]
+last = fn["build_app"].body[-1]
+ok_wrap = isinstance(last, ast.Return) and is_call(last.value, "AuthGate") and last.value.args and is_call(last.value.args[0], "BodyLimit")
+ok_host = "is_loopback" in ast.unparse(fn["parse_args"])
+sys.exit(0 if ok_wrap and ok_host else 1)
+PY
+  }
   if [ -z "${spy}" ] || ! "${spy}" -I -c 'import numpy, soundfile, starlette, uvicorn' >/dev/null 2>&1; then
-    record_skip "stt-service: (s) server.py real — sem o venv do serviço (ONION_STT_SELFTEST_PY ou a área instalada): amarração NÃO exercida aqui"
+    local am="${d}/ast-mut"; mkdir -p "${am}"; cp "${st}/server.py" "${am}/server.py"
+    if _st_ast "${st}/server.py" && ! LC_ALL=C bash "${helper}" "${am}/server.py" \
+         '    return core.AuthGate(core.BodyLimit(inner, a.max_body_mb * 1024 * 1024), token)|||    return inner  # ONION_MUTANTE' \
+         bash -c "$(declare -f _st_ast); _st_ast '${am}/server.py'" >/dev/null 2>&1; then
+      record_pass "stt-service: (s) amarração do AuthGate/BodyLimit e recusa de host pela FORMA (sem o venv neste host: o server.py real NÃO rodou aqui; roda com ONION_STT_SELFTEST_PY ou a área instalada)"
+    else record_fail "stt-service: (s) forma da amarração" "o build_app não devolve core.AuthGate(core.BodyLimit(...)) ou o mutante passou"; fi
   else
     local so src_ok=11
     if so="$(cd / && LC_ALL=C "${spy}" -I -B "${st}/server_selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
@@ -11112,7 +11135,7 @@ PY
 EOF_SMUT
   fi
   unset -f _st_hfjson _st_reset _st_env _st_install_rendered _st_stage_all _stcase _st_post_ok _p_none _p_live _p_free _p_hfbad \
-    _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap _p_halfdeny _p_reload
+    _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap _p_halfdeny _p_reload _st_ast
   rm -rf "${d}"
 }
 

@@ -63,7 +63,8 @@ fica como próxima leva).
 
 ## Mutantes
 
-Bancada `stt_service`: 87 verdes com o venv do serviço (77 + 1 ⊘ sem ele, como no CI). Mutantes plantados por
+Bancada `stt_service`: 87 verdes com o venv do serviço; sem ele (CI, STRICT), 78 verdes, com a amarração do server.py
+conferida pela FORMA (AST + mutante) e o rótulo dizendo que o servidor real não rodou (o 1º CI reprovou o ⊘ em STRICT). Mutantes plantados por
 `ops/mutate-and-restore.sh` numa CÓPIA: 32 no núcleo e no smoke, 9 no server.py, 24 no wrapper. Tetos declarados no
 cabeçalho da família (defesa dupla: `if not token` do authorized; S_ISLNK do load_token). `moat_gate`: 237 verdes,
 com (s1)–(s6) e os 2 mutantes antigos re-ancorados na tupla nova `_MOAT_WRAPPER_COPIES`.
