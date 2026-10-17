@@ -2,8 +2,8 @@
 title: 'Resíduo — a skill onion-publish sai da adoção, e o --update passa a tirá-la de quem já a tem'
 date: 2026-10-17
 branch: fix/adopter-manifest-no-onion-publish
-reviewed_diff_sha256: b8bda0ed5f92684ed4f3174268d59fab5164bab0418a96988ee9ed163b5d1b75
-reviewed_code_sha256: 7d3d44f6b558c171d3dff44ae3ff3cc4d3fc2fdd263652355655c3592b310059
+reviewed_diff_sha256: 474513b1c28f4e3a251db2f14159e63423499e3a0a1eb0cd0efe45e4c22d4c4a
+reviewed_code_sha256: 30616c1a09ef8ea3476e901496201d0485b8c29105bdb57d0bd43b8c031d6cde
 findings_total: 3
 findings_real: 2
 findings_fixed: 2
