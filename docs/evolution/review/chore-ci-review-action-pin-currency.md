@@ -2,7 +2,8 @@
 branch: chore/ci-review-action-pin-currency
 pr: pendente
 date: 2026-10-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: afe60884dab111246d9383fdf505f4cd27cff08029dd5cf34ead7a047a5eb790
+reviewed_code_sha256: 1874fb65be1199e8dceda6c2fec94294dcf74674898805ddf971733ba3978338
 findings_total: 10
 findings_real: 9
 tokens: 142094
