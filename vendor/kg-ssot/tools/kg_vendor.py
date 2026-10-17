@@ -4,7 +4,10 @@
   update --tag T [--dest DIR] [--source REPO] [--force] [--profile P]
       Lê da TAG (git archive, nunca a árvore de trabalho) os arquivos que o spec/release.json DESSA tag lista,
       e substitui DIR inteiro (arquivo que saiu da release some). Grava o carimbo DIR/.kg-ssot-version: tag,
-      commit, versão, contrato e o sha256 de cada arquivo. Não commita: quem commita é o adotante.
+      commit, versão, contrato e o sha256 de cada arquivo. Da 4.8.1 em diante, grava DIR/.gitattributes com `* -text`: um
+      atributo aninhado vence o do repo, e a regra de fim de linha do adotante (`*.json text eol=lf`, autocrlf)
+      não reescreve no índice os bytes da release (as fixtures com CRLF de propósito). Não commita: quem
+      commita é o adotante.
       DIR só é substituído se não existir, ou se tiver o carimbo E estiver íntegro (check rc 0); um vendor
       editado só é substituído com --force, para a edição local não sumir em silêncio.
       --source é o repo git (caminho ou URL, como o repositório público https://github.com/marciocar/kg-ssot) que
@@ -14,9 +17,11 @@
       rodar o gate e o check (contrato, leitor, gate, vendor, requirements, guia e licença), sem a suíte. O carimbo
       registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;
       --profile full volta à release inteira.
-  check [--dest DIR]
+  check [--dest DIR] [--index]
       Recalcula os sha256 e compara com o carimbo: arquivo editado, faltando ou sobrando (inclusive bytecode em
-      __pycache__ e symlink) → rc 1. O contrato não se customiza no adotante; uma mudança necessária volta ao produto
+      __pycache__ e symlink) → rc 1. Com --index, confere os blobs do índice do git (o carimbo também lido do
+      índice) em vez da árvore de trabalho: é o que o commit vai levar, e pega antes do commit uma normalização
+      de fim de linha que a árvore de trabalho esconde. O contrato não se customiza no adotante; uma mudança necessária volta ao produto
       como issue no repositório público. LIMITE: o carimbo atesta a si mesmo; o check pega edição acidental, não quem edita um
       arquivo E recalcula o carimbo. Isso o review do PR do adotante pega (o diff do carimbo fica à vista).
 
@@ -46,6 +51,10 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 STAMP = ".kg-ssot-version"
+ATTRS = ".gitattributes"
+# os bytes da release são os do carimbo: nenhuma conversão de fim de linha do repo do adotante (eol, autocrlf)
+ATTRS_SINCE = (4, 8, 1)  # a release que passou a levar o .gitattributes no vendor
+ATTRS_TEXT = "# Gravado pelo kg_vendor.py: os bytes do vendor são os do carimbo, sem conversão de fim de linha.\n* -text\n"
 RELEASE = "spec/release.json"
 VENDOR = "tools/kg_vendor.py"  # se a release o leva, todo perfil leva: sem ele não há check nem update
 DEFAULT_DEST = "vendor/kg-ssot"
@@ -170,7 +179,7 @@ def update(dest, tag, source, force=False, profile=None):
             with io.StringIO() as sink:
                 stdout, sys.stdout = sys.stdout, sink
                 try:
-                    clean = check(dest) == 0
+                    clean = check(dest, legacy_ok=True) == 0
                 finally:
                     sys.stdout = stdout
             if not clean:
@@ -222,6 +231,10 @@ def update(dest, tag, source, force=False, profile=None):
                  "files": dict(sorted(hashes.items()))}
         if profile:
             stamp["profile"] = profile
+        if _version(release.get("version")) >= ATTRS_SINCE:
+            # só nas releases que o conhecem: o kit vendorizado de uma tag anterior acusaria o arquivo como sobrando
+            (staged / ATTRS).write_bytes(ATTRS_TEXT.encode("utf-8"))
+            stamp["gitattributes"] = sha256(ATTRS_TEXT.encode("utf-8"))
         (staged / STAMP).write_text(json.dumps(stamp, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         # troca por rename no mesmo diretório: o vendor nunca fica pela metade
         old = pathlib.Path(tmp) / "old"
@@ -238,18 +251,76 @@ def update(dest, tag, source, force=False, profile=None):
     return 0
 
 
-def check(dest):
-    dest = pathlib.Path(dest)
-    stamp = read_stamp(dest)
-    want = stamp["files"]
-    got, links = {}, []
-    for p in dest.rglob("*"):
-        rel = p.relative_to(dest).as_posix()
-        if p.is_symlink():
+def _index_tree(dest):
+    """{caminho relativo a DIR: bytes} e a lista de symlinks, lidos do índice do git (o que o commit vai levar)."""
+    if not dest.is_dir():
+        raise Broken(f"{dest} não existe")
+    try:
+        prefix = git(dest, "rev-parse", "--show-prefix").strip()
+    except Broken as exc:
+        raise Broken(f"{dest} não está num repo git: --index precisa do índice ({exc})") from exc
+    # --full-name: o caminho vem da raiz do repo, e só o prefixo exato de DIR sai (um vendor aninhado dentro do
+    # vendor não se confunde com ele); surrogateescape: um nome que não é UTF-8 vira sobrando, não traceback
+    out = git(dest, "ls-files", "-z", "--stage", "--full-name", "--", ".", binary=True)
+    files, links = {}, []
+    for entry in filter(None, out.decode("utf-8", "surrogateescape").split("\0")):
+        meta, path = entry.split("\t", 1)
+        mode, blob, _ = meta.split()
+        if not path.startswith(prefix):
+            raise Broken(f"o índice devolveu {path!r} fora de {prefix!r}")
+        rel = path[len(prefix):]
+        if mode == "120000":
             links.append(rel)
-        elif p.is_file() and rel != STAMP:
-            got[rel] = sha256(p.read_bytes())
-    lines = [f"✗ editado  {f}" for f in sorted(want.keys() & got.keys()) if want[f] != got[f]]
+        else:
+            files[rel] = git(dest, "cat-file", "blob", blob, binary=True)
+    return files, links
+
+
+def _version(text):
+    try:
+        return tuple(int(x) for x in str(text).split("."))
+    except ValueError:
+        return ()
+
+
+def check(dest, index=False, legacy_ok=False):
+    """legacy_ok: o update aceita refazer um vendor da 4.8.1 gravado por um kit anterior (sem o .gitattributes)."""
+    dest = pathlib.Path(dest)
+    if index:
+        tree, links = _index_tree(dest)
+        if STAMP not in tree:
+            raise Broken(f"carimbo {dest / STAMP} ausente do índice: rode git add no vendor antes do check --index")
+        with tempfile.TemporaryDirectory() as tmp:
+            (pathlib.Path(tmp) / STAMP).write_bytes(tree[STAMP])
+            stamp = read_stamp(tmp)
+    else:
+        stamp = read_stamp(dest)
+        tree, links = {}, []
+        for p in dest.rglob("*"):
+            rel = p.relative_to(dest).as_posix()
+            if p.is_symlink():
+                links.append(rel)
+            elif p.is_file():
+                tree[rel] = p.read_bytes()
+    want = stamp["files"]
+    attrs = tree.pop(ATTRS, None)
+    tree.pop(STAMP, None)
+    got = {rel: sha256(data) for rel, data in tree.items()}
+    lines = []
+    if "gitattributes" in stamp:  # carimbo da 4.8.1 em diante: o .gitattributes do vendor é parte dele
+        if attrs is None:
+            lines.append(f"✗ faltando {ATTRS}")
+        elif sha256(attrs) != stamp["gitattributes"]:
+            lines.append(f"✗ editado  {ATTRS}")
+    else:
+        if attrs is not None:
+            got[ATTRS] = sha256(attrs)
+        if _version(stamp.get("version")) >= ATTRS_SINCE and not legacy_ok:
+            # o kit da 4.8.0 trouxe a 4.8.1 sem gravar o .gitattributes: o vendor fica exposto à regra de fim de
+            # linha do repo, e o update de novo, já com o kit novo, o grava
+            lines.append(f"✗ faltando {ATTRS} (o carimbo da {stamp['version']} foi gravado por um kg_vendor anterior:"
+                         " rode o update de novo, agora com o kit novo)")
+    lines += [f"✗ editado  {f}" for f in sorted(want.keys() & got.keys()) if want[f] != got[f]]
     lines += [f"✗ faltando {f}" for f in sorted(want.keys() - got.keys() - set(links))]
     lines += [f"✗ sobrando {f}" for f in sorted(got.keys() - want.keys())]
     lines += [f"✗ symlink  {f}" for f in sorted(links)]
@@ -273,11 +344,12 @@ def main(argv=None):
     up.add_argument("--profile", help="traz só um perfil da release (ex.: gate, sem a suíte)")
     ck = sub.add_parser("check", help="confere o destino contra o carimbo")
     ck.add_argument("--dest", default=DEFAULT_DEST)
+    ck.add_argument("--index", action="store_true", help="confere os blobs do índice do git, não a árvore de trabalho")
     args = ap.parse_args(argv)
     try:
         if args.cmd == "update":
             return update(args.dest, args.tag, args.source, args.force, args.profile)
-        return check(args.dest)
+        return check(args.dest, args.index)
     except (Broken, OSError, tarfile.TarError) as exc:
         print(f"VENDOR QUEBRADO  {exc}")
         return 2

@@ -47,14 +47,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -250,7 +250,10 @@ Sobre `--update`:
 ## 4. Atualizar a tag
 
 O PR que muda a tag faz três coisas:
-1. roda `kg_vendor.py update` com a tag nova e `git add vendor/kg-ssot` (o gate mede só arquivo rastreado);
+1. roda `kg_vendor.py update` com a tag nova, `git add vendor/kg-ssot` (o gate mede só arquivo rastreado) e
+   `kg_vendor.py check --dest vendor/kg-ssot --index`, que confere o que o commit vai levar. Desde a 4.8.1, o vendor
+   traz o próprio `.gitattributes` (`* -text`), para a regra de fim de linha do repositório não reescrever os bytes
+   da release no índice. Quem sai de uma tag anterior à 4.8.1 roda o `update` duas vezes (a nota abaixo explica);
 2. roda `kg_gate.py` e explica no PR a diferença que aparecer;
 3. grava a base com `--update`, porque um contrato novo muda a identidade.
 
@@ -268,6 +271,19 @@ Entram três avisos SHOULD no `.kg.yaml`, os pontos do perfil JSON em rampa: `ya
 grafo que tenha um desses ganha um código de dívida novo, e o `kg_gate.py` reprova até o `--update` com
 `--accept-regression "<motivo>"`, ou até o grafo ser corrigido. A 4.8.0 foi medida nos 454 `.kg.yaml` do core e
 nos deste repositório, e nenhum dispara os avisos novos.
+
+Da `kg-ssot-v4.8.0` para a `kg-ssot-v4.8.1`, nem o contrato nem o leitor mudam. Muda o vendor: o `update` grava
+`vendor/kg-ssot/.gitattributes` com `* -text`, e o carimbo passa a conferi-lo. Na 4.8.0, um repositório com regra de
+fim de linha para `*.json` (`*.json text eol=lf`, por exemplo) normalizava no índice as duas fixtures da suíte que
+têm CRLF de propósito, e o `kg_vendor.py check` reprovava num checkout novo, como o do CI, embora passasse na árvore
+de trabalho.
+
+**De qualquer tag anterior à 4.8.1, rode o update duas vezes.** O `update` roda pelo `kg_vendor.py` que já está no
+vendor, e o de uma tag anterior traz a 4.8.1 sem gravar o `.gitattributes`. O `check` da 4.8.1 acusa isso ("rode o update de novo"). O segundo `update`,
+já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git add`, o `check --index` confirma que o
+índice guarda os bytes da release. Outra saída é rodar o update uma vez só, pelo clone da tag
+(`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
+pode ficar.
 
 **O `.kg.json`.** A 4.8.0 lê o mesmo modelo de dados num arquivo `.kg.json`, por um parser JSON, no perfil JSON do
 contrato: RFC 8259 com um BOM inicial aceito, I-JSON (RFC 7493, sem surrogate solto e com inteiro dentro de
@@ -305,8 +321,9 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --source https://github.com/marciocar/kg-ssot`,
-   e `git add vendor/kg-ssot`;
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --source https://github.com/marciocar/kg-ssot`
+   duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
+   `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
 3. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "<motivo>"` grava esses grafos em

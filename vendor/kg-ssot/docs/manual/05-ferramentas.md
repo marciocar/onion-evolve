@@ -90,7 +90,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.8.0",
+  "release": "kg-ssot-v4.8.1",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -234,8 +234,14 @@ python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.1 --dest v
 vendor atualizado: vendor/kg-ssot ← kg-ssot-v4.7.1 (04d73f2e2f64), 313 arquivos
 ```
 
+O `update` grava também `vendor/kg-ssot/.gitattributes` com `* -text`. Um atributo aninhado vence o do repositório,
+e assim a regra de fim de linha do adotante (`*.json text eol=lf`, `core.autocrlf`) não reescreve no índice os bytes
+da release. A suíte tem fixtures com CRLF de propósito, que sem isso chegariam alteradas ao CI.
+
 O `check` recalcula os sha256 e compara com o carimbo. Um arquivo editado, apagado ou sobrando (inclusive
-bytecode num `__pycache__`) dá rc 1.
+bytecode num `__pycache__`) dá rc 1, e o `.gitattributes` do vendor também é conferido. Com `--index`, o `check`
+confere os blobs do índice do git, que é o que o commit vai levar, e não a árvore de trabalho. Rode-o depois do
+`git add vendor/kg-ssot`: ele pega antes do commit uma normalização que a árvore de trabalho esconde.
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
@@ -251,6 +257,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 | `--dest DIR` | Onde fica o vendor (default `vendor/kg-ssot`) |
 | `--profile gate` | Traz só o mínimo para rodar o gate e o check (10 arquivos, sem a suíte); `--profile full` volta à release inteira |
 | `--force` | Substitui um vendor editado localmente |
+| `--index` (no `check`) | Confere o índice do git em vez da árvore de trabalho |
 
 **Por que `-B`?** Os scripts do kit não gravam bytecode, mas uma ferramenta sua que **importa** um módulo do kit
 grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `python3 -I -B`, ou com
