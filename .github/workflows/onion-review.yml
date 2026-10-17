@@ -243,13 +243,22 @@ jobs:
         timeout-minutes: 11
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.preflight.outputs.ok == 'true' }}
         continue-on-error: true
-        # PINADO em v1.0.183 (2026-07-25). A VERSÃO NUNCA FOI A CAUSA — o pin anterior
+        # PINADO em v1.0.183 (2026-07-25) até 2026-10-17. A VERSÃO NUNCA FOI A CAUSA — o pin anterior
         # (v1.0.171) nasceu em 07-18 da hipótese "a regressão veio da v1.0.172+, lançada em
         # 07-14, mesmo dia em que o revisor passou a crashar". Era COINCIDÊNCIA DE DATA: o que
         # aconteceu por volta de 07-14 foi a credencial deixar de valer. Testado nas duas
         # pontas em 2026-08-03 — v1.0.171 e v1.0.183 falham idêntico —, e o pré-voo acima
-        # depois mostrou 401 na origem. Fica na v1.0.183 por ser a mais recente verificada
+        # depois mostrou 401 na origem. Ficou na v1.0.183 por ser a mais recente verificada
         # compatível, não por curar nada.
+        # SUBIDO para v1.0.252 (f27be6b6, 2026-10-16) em 2026-10-17 (SAC-169): o pin velho instalava
+        # o CLI 2.1.220, 69 versões publicadas atrás do host (2.1.302), e nenhum censo via isso — hoje
+        # o currency-census.sh tem a linha `action:anthropics/claude-code-action`. Medido nas notas e
+        # no diff v1.0.183..v1.0.252 contra o que este job usa: inputs prompt/anthropic_api_key/
+        # claude_args e outputs execution_file/structured_output inalterados; execution_file segue
+        # `JSON.stringify(..., null, 2)` com is_error. MUDA DE COMPORTAMENTO (#1607): o `--max-turns`
+        # de claude_args agora é IMPOSTO pelo SDK, e um resultado "success" com num_turns acima do
+        # teto vira falha — antes o teto de 60 podia estourar calado. Novo output `conclusion`.
+        # O PR que sobe o pin edita este arquivo e faz a action se auto-pular: a prova é o PR SEGUINTE.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
         # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
@@ -257,7 +266,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b
+        uses: anthropics/claude-code-action@f27be6b65a4652f08a2ba3cff79114829b588967
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -357,13 +366,22 @@ jobs:
         timeout-minutes: 11
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.preflight.outputs.ok == 'true' && steps.v1.outputs.revisou != 'true' }}
         continue-on-error: true
-        # PINADO em v1.0.183 (2026-07-25). A VERSÃO NUNCA FOI A CAUSA — o pin anterior
+        # PINADO em v1.0.183 (2026-07-25) até 2026-10-17. A VERSÃO NUNCA FOI A CAUSA — o pin anterior
         # (v1.0.171) nasceu em 07-18 da hipótese "a regressão veio da v1.0.172+, lançada em
         # 07-14, mesmo dia em que o revisor passou a crashar". Era COINCIDÊNCIA DE DATA: o que
         # aconteceu por volta de 07-14 foi a credencial deixar de valer. Testado nas duas
         # pontas em 2026-08-03 — v1.0.171 e v1.0.183 falham idêntico —, e o pré-voo acima
-        # depois mostrou 401 na origem. Fica na v1.0.183 por ser a mais recente verificada
+        # depois mostrou 401 na origem. Ficou na v1.0.183 por ser a mais recente verificada
         # compatível, não por curar nada.
+        # SUBIDO para v1.0.252 (f27be6b6, 2026-10-16) em 2026-10-17 (SAC-169): o pin velho instalava
+        # o CLI 2.1.220, 69 versões publicadas atrás do host (2.1.302), e nenhum censo via isso — hoje
+        # o currency-census.sh tem a linha `action:anthropics/claude-code-action`. Medido nas notas e
+        # no diff v1.0.183..v1.0.252 contra o que este job usa: inputs prompt/anthropic_api_key/
+        # claude_args e outputs execution_file/structured_output inalterados; execution_file segue
+        # `JSON.stringify(..., null, 2)` com is_error. MUDA DE COMPORTAMENTO (#1607): o `--max-turns`
+        # de claude_args agora é IMPOSTO pelo SDK, e um resultado "success" com num_turns acima do
+        # teto vira falha — antes o teto de 60 podia estourar calado. Novo output `conclusion`.
+        # O PR que sobe o pin edita este arquivo e faz a action se auto-pular: a prova é o PR SEGUINTE.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
         # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
@@ -371,7 +389,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@be7b93b1907a4abad570368f3c74b6fe3807510b
+        uses: anthropics/claude-code-action@f27be6b65a4652f08a2ba3cff79114829b588967
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |

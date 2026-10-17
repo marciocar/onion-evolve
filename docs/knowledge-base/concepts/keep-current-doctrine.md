@@ -71,7 +71,10 @@ isso ser lembrado/cobrado"*. Por isso esta página é a fonte citável, e não a
 **As superfícies medidas hoje:** o CLI do Claude Code em disco × o canal no npm; o Agent SDK de quem
 serve por SDK × o latest do npm (os alvos são os mesmos do censo do `/meta:cc-update`); o `vendor/kg-ssot`
 × a maior tag do produto; PyYAML e jsonschema no python do lint × o PyPI (com o pino do contrato citado);
-o HEAD do checkout × a branch padrão do origin (por `git ls-remote`, sem mudar refs).
+o HEAD do checkout × a branch padrão do origin (por `git ls-remote`, sem mudar refs); e o pin por SHA da
+`anthropics/claude-code-action` nos workflows × a maior tag de release dela, com o CLI que cada commit
+instala no texto da ação (desde 2026-10-17, SAC-169: o revisor de IA do CI rodava o CLI 2.1.220 com o host
+em 2.1.302, e nenhum censo via; um CLI que a action instala no runner é tão "em produção" quanto o do disco).
 
 **Por que aviso e não veto (`exit 2`).** Toda superfície depende de registro de terceiro e de rede: um veto
 que dispara no minuto em que o npm publica é falso positivo por construção, e falso positivo treina a

@@ -8,7 +8,8 @@ meta:
   baseline: "2026-10-17"
   review_after: "2026-11-16"   # 30d: cadência de ferramenta
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-17); 12 depois da rodada e do juiz (2026-10-17), teto mantido.
+  #   2 no esqueleto (2026-10-17); 12 depois da rodada e do juiz (2026-10-17), teto mantido;
+  #   15 depois da SAC-169 (pin subido) e do selo da SAC-168 (2026-10-17), teto mantido.
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
 # external_edges:
@@ -173,15 +174,51 @@ nodes:
   - id: Q_FORK_NO_ADMIN_DO_BRIDGE_DECIDIR
     node_type: question
     layer: audit
+    impact: 2
+    confidence: 0.5
+    label: "decidir se o admin do /chat mantém o fork de subagente que o SDK 0.3.302 ligou por padrão, medindo antes um turno real que o use"
+    status: done
     plane: DEV
-    status: open
+    verified_at: "2026-10-17"
+    verified_against: "decisão do maestro em 2026-10-17, por pergunta com opções (/meta:decide): escolhida «Manter ligado e medir (Recomendado)»"
+    narrative: |-
+      Issue SAC-168 no Linear, criada pelo tm.sh em 2026-10-17 no projeto Onion — core: próximas levas.
+
+      verified_against anterior: «aberta pela rodada r13 em 2026-10-17: fecha quando um turno admin real pelo SDK 0.3.302 chamar o fork e se medir o custo e a cópia de contexto que ele traz (o novo da 2.1.302), separado da saída em segundo plano depois do query(), que é anterior ao delta e vale para todo subagente (correção do juiz), e o maestro decidir entre manter o fork no admin ou fixar CLAUDE_CODE_FORK_SUBAGENT=0 no env do agente do bridge»
+      Selado por /meta:decide em 2026-10-17: escolhida «Manter ligado e medir (Recomendado)»; descartadas: «Desligar no admin».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-17: «SAC-168: no CLI 2.1.302, o fork de subagentes vem ligado por padrão. O fork é o subagente que herda o contexto inteiro da conversa. Ele chega ao ADMIN do /chat do bridge, que não tem restrição de ferramentas; o convidado não recebe, porque só tem Read. O admin mantém o fork?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-17"
+      locality: "pessoa"
+  - id: Q_PIN_DO_REVISOR_DO_CI_SOBE_OU_ENTRA_NO_CENSO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
     impact: 2
     confidence: 0.5
     verified_at: "2026-10-17"
-    verified_against: "aberta pela rodada r13 em 2026-10-17: fecha quando um turno admin real pelo SDK 0.3.302 chamar o fork e se medir o custo e a cópia de contexto que ele traz (o novo da 2.1.302), separado da saída em segundo plano depois do query(), que é anterior ao delta e vale para todo subagente (correção do juiz), e o maestro decidir entre manter o fork no admin ou fixar CLAUDE_CODE_FORK_SUBAGENT=0 no env do agente do bridge"
-    narrative: "Issue SAC-168 no Linear, criada pelo tm.sh em 2026-10-17 no projeto Onion — core: próximas levas."
-    label: "decidir se o admin do /chat mantém o fork de subagente que o SDK 0.3.302 ligou por padrão, medindo antes um turno real que o use"
-  - id: Q_PIN_DO_REVISOR_DO_CI_SOBE_OU_ENTRA_NO_CENSO
+    verified_against: "aberta pela rodada r13 em 2026-10-17: fecha quando o pin da claude-code-action do onion-review.yml subir para um commit que instale a linha atual (o main fixa 2.1.302) com o revisor provado num PR seguinte, ou quando o censo declarar a versão do CLI que o pin instala ao lado do bridge"
+    narrative: "Issue SAC-169 no Linear, criada pelo tm.sh em 2026-10-17 no projeto Onion — core: próximas levas. Fechada em 2026-10-17 por E_PIN_DO_REVISOR_SOBE_E_ENTRA_NO_CENSO_1017, pelas DUAS saídas: o pin subiu para a v1.0.252 (CLI 2.1.302) e o currency-census.sh ganhou a linha action:anthropics/claude-code-action, com bancada e mutantes. O que não fecha aqui: a prova do revisor no pin novo é do PR SEGUINTE com a label review:ia (o PR que edita o workflow faz a action se auto-pular), registrada em Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL."
+    label: "o revisor de IA do CI deve subir o pin da action (CLI 2.1.220 hoje) ou o censo deve declarar essa versão, para a defasagem do CI deixar de ser invisível"
+  - id: E_PIN_DO_REVISOR_SOBE_E_ENTRA_NO_CENSO_1017
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-17"
+    verified_against: "medido em 2026-10-17: a maior release da claude-code-action é a v1.0.252 (commit f27be6b6, 2026-10-16, o mesmo da tag v1 e do main), cujo src/entrypoints/run.ts fixa claudeCodeVersion 2.1.302; o pin be7b93b1 é a v1.0.183 (CLI 2.1.220). O diff v1.0.183..v1.0.252 (117 commits) mantém os inputs que o onion-review.yml usa (prompt, anthropic_api_key, claude_args) e os outputs que ele lê (execution_file, ainda JSON.stringify com is_error, e structured_output); acrescenta o output conclusion; e o #1607 passa a IMPOR o --max-turns de claude_args e a reprovar resultado success com num_turns acima do teto. O currency-census.sh, rodado no core antes da subida, devolveu action:anthropics/claude-code-action 1.0.183 → 1.0.252 defasada com o CLI de cada um e o sed de subida; depois da subida, em-dia. Bancada currency_census 57/57 com 8 casos novos (aa..aa8) e 5 mutantes plantados por mutate-and-restore, todos mortos."
+    narrative: "As duas saídas da SAC-169 no mesmo PR, pela ordem da base atual: subir o pin e fazer o censo enxergar a superfície, para a defasagem não voltar a ficar invisível. O revisor segue desligado por padrão; nenhuma run com crédito foi gasta para provar o pin novo."
+    label: "o pin da claude-code-action do revisor de IA do CI subiu da v1.0.183 (CLI 2.1.220) para a v1.0.252 (CLI 2.1.302), e o censo de atualidade passou a ter linha para ele"
+    provenance:
+      source: "github.com/anthropics/claude-code-action (releases, git ls-remote --tags e compare be7b93b1...f27be6b6)"
+      locator: "refs/tags/v1.0.252^{} = f27be6b6; src/entrypoints/run.ts l.80 const claudeCodeVersion = \"2.1.302\"; PR #1607 (enforce max turns from claude args)"
+      method: "medição: gh api, git ls-remote, execução do currency-census.sh e da bancada currency_census"
+      locality: "web"
+  - id: Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL
     node_type: question
     layer: audit
     plane: DEV
@@ -189,9 +226,21 @@ nodes:
     impact: 2
     confidence: 0.5
     verified_at: "2026-10-17"
-    verified_against: "aberta pela rodada r13 em 2026-10-17: fecha quando o pin da claude-code-action do onion-review.yml subir para um commit que instale a linha atual (o main fixa 2.1.302) com o revisor provado num PR seguinte, ou quando o censo declarar a versão do CLI que o pin instala ao lado do bridge"
-    narrative: "Issue SAC-169 no Linear, criada pelo tm.sh em 2026-10-17 no projeto Onion — core: próximas levas."
-    label: "o revisor de IA do CI deve subir o pin da action (CLI 2.1.220 hoje) ou o censo deve declarar essa versão, para a defasagem do CI deixar de ser invisível"
+    verified_against: "aberta em 2026-10-17 pela subida do pin (SAC-169): fecha quando um PR seguinte ao merge, com a label review:ia, mostrar o revisor rodando na v1.0.252 com revisou=true e o CLI 2.1.302 no log de instalação; se morrer em t=0 ou por error_max_turns (o teto de 60 agora é imposto), o caminho é ajustar o claude_args, nunca voltar ao pin velho"
+    narrative: "O PR que edita o onion-review.yml faz a action se auto-pular, então a prova não cabe nele. Ligar a label gasta crédito da chave do repositório, que está sem crédito por decisão; por isso fica para o próximo PR em que o maestro ligar o revisor."
+    label: "o revisor de IA do CI no pin novo (v1.0.252, CLI 2.1.302) tem de ser provado num PR seguinte com a label review:ia"
+  - id: Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-17"
+    verified_against: "aberta em 2026-10-17 pela decisão do maestro na SAC-168 (manter o fork ligado no admin e medir): fecha quando um turno real do admin do /chat chamar o fork e se medir (1) o custo da cópia de contexto que ele traz e (2) se a saída em segundo plano chega antes do fim do turno. Critério de desligar (CLAUDE_CODE_FORK_SUBAGENT=0 no env do agente do bridge): custo da cópia desproporcional ao turno ou saída que chega depois do fim do turno ou se perde"
+    narrative: "Issue SAC-168 no Linear, que fica aberta enquanto a medição pender. A decisão está selada em Q_FORK_NO_ADMIN_DO_BRIDGE_DECIDIR."
+    label: "medir um turno real do admin do /chat com o fork ligado (custo da cópia de contexto e saída em segundo plano antes do fim do turno) e desligar se custo ou comportamento forem ruins"
+
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -229,3 +278,12 @@ edges:
   - from: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_302
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     edge_type: SUPPORTS
+  - from: E_PIN_DO_REVISOR_SOBE_E_ENTRA_NO_CENSO_1017
+    to: Q_PIN_DO_REVISOR_DO_CI_SOBE_OU_ENTRA_NO_CENSO
+    edge_type: SUPPORTS
+  - from: E_PIN_DO_REVISOR_SOBE_E_ENTRA_NO_CENSO_1017
+    to: Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL
+    edge_type: SUPPORTS
+  - from: Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL
+    to: Q_FORK_NO_ADMIN_DO_BRIDGE_DECIDIR
+    edge_type: DEPENDS_ON
