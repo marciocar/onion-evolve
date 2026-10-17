@@ -204,7 +204,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -8890,6 +8890,11 @@ run_moat_gate_selftests() {
   if [ -f "${REPO_ROOT}/ops/chat-runner.sh" ]; then
     _cr_ok=1; _mg_map "${REPO_ROOT}/ops/chat-runner.sh" > "${d}/proj/ops/chat-runner.sh"
   fi
+  # o wrapper do STT em lote (2026-10-17), RASTREADO e com os caminhos mapeados como o TSV
+  local _st_ok=0
+  if [ -f "${REPO_ROOT}/ops/stt-service.sh" ]; then
+    _st_ok=1; _mg_map "${REPO_ROOT}/ops/stt-service.sh" > "${d}/proj/ops/stt-service.sh"
+  fi
   git init -q -b main "${d}/adotante"
   git -C "${d}/adotante" remote add origin https://github.com/onion-bancada/adotante.git
   mkdir -p "${d}/adotante/docs/evolution/inbound"
@@ -8918,6 +8923,8 @@ EOF
   # a cópia do wrapper do runner reduzida ao que só a regra da CÓPIA pega: escreve por ARRAY (o juiz não segue array —
   # teto declarado) e o nome do wrapper no código; a cópia inteira fecha antes por outro caminho (sudo com opção de runtime)
   [ "${_cr_ok}" = 1 ] && printf '#!/usr/bin/env bash\nNAME=chat-runner\nU=/etc/systemd/system/onion-chat@.service\na=(install -m 0644 unit.service)\n"${a[@]}" "$U"\n' > "${d}/scratch/cr-copia.sh"
+  # idem para o wrapper do STT em lote: só a regra da CÓPIA a pega (escrita por ARRAY + o nome do wrapper no código)
+  [ "${_st_ok}" = 1 ] && printf '#!/usr/bin/env bash\nNAME=stt-service\nU=/etc/systemd/system/onion-vps-stt.service\na=(install -m 0644 unit.service)\n"${a[@]}" "$U"\n' > "${d}/scratch/st-copia.sh"
   # a cópia NÃO rastreada do wrapper da fila e o script mínimo com função que embrulha sudo (2026-10-15)
   if [ "${_queue_ok}" = 1 ]; then
     cp "${d}/proj/ops/a2a-queue-live.sh" "${d}/scratch/queue-copia.sh"
@@ -9296,7 +9303,7 @@ EOF" "${L}" \
       '_moat_emit("inanalisavel", "ONION_BRIDGE_HARDENING_TEST",' '(lambda *a: None)("inanalisavel", "ONION_BRIDGE_HARDENING_TEST",'
     _mgcase "(b5) CÓPIA do wrapper fora do projeto → FECHA (o nome do wrapper + alvo no corpo)" "2:cópia não versionada de um wrapper" "${P}" \
       "bash ${d}/scratch/bh-copia.sh install --apply" "${J}" \
-      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "chat-runner")'
+      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner", "stt-service")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "chat-runner", "stt-service")'
     fi
   else
     record_skip "moat-gate: (b*) sem ops/bridge-hardening.sh — casos do drop-in de integridade pulados"
@@ -9322,10 +9329,34 @@ EOF" "${L}" \
       '_moat_emit("inanalisavel", "ONION_CHAT_RUNNER_TEST",' '(lambda *a: None)("inanalisavel", "ONION_CHAT_RUNNER_TEST",'
     _mgcase "(m6) CÓPIA do wrapper fora do projeto → FECHA (o nome do wrapper + alvo no corpo)" "2:cópia não versionada de um wrapper" "${P}" \
       "bash ${d}/scratch/cr-copia.sh install --apply" "${J}" \
-      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening")'
+      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner", "stt-service")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "stt-service")'
     fi
   else
     record_skip "moat-gate: (m*) sem ops/chat-runner.sh — casos do runner do convidado pulados"
+  fi
+  # ── o STT em lote (2026-10-17): só o wrapper escreve a unit, a área /opt, o token e o backup ──
+  if [ "${_st_ok}" = 1 ]; then
+    local STU STO; STU="$(awk -F'\t' '$4=="ops/stt-service.sh" && $3 ~ /onion-vps-stt\.service$/ {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    STO="$(awk -F'\t' '$4=="ops/stt-service.sh" && $3 ~ /^\/opt\// {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    if [ -z "${STU}" ] || [ -z "${STO}" ]; then record_fail "moat-gate: (s0)" "ops/moat-targets.tsv sem as linhas do ops/stt-service.sh (core-only)"
+    else
+    _mgcase "(s1) tee direto na unit do STT → VETO nomeando o wrapper (mais específico que /etc/systemd)" "2:ops/stt-service.sh" "${P}" \
+      "sudo tee ${STU} < unit.service" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
+    _mgcase "(s2) modelo copiado à mão para a área do STT → VETO nomeando o wrapper" "2:ops/stt-service.sh" "${P}" \
+      "sudo cp encoder.onnx ${STO}/models/x/encoder.onnx" "${J}" '_MOAT_WRITE_DEST = {"cp", "install", "rsync",' '_MOAT_WRITE_DEST = {"install", "rsync",'
+    _mgcase "(s3) restart da unit do STT → VETO nomeando o wrapper" "2:ops/stt-service.sh" "${P}" \
+      'sudo systemctl restart onion-vps-stt' "${J}" $'    if verb not in _MOAT_UNIT_MUTATE:\n        return' $'    if True:\n        return'
+    _mgcase "(s4) o wrapper VERSIONADO → passa" 0 "${P}" \
+      "bash ops/stt-service.sh install --apply && echo \"unit em ${STU}\"" "${J}" '    if _moat_versioned(p) and not copied:' '    if False:'
+    _mgcase "(s5) modo de teste do wrapper na linha de comando → FECHA" "2:modo de teste do wrapper do STT em lote" "${P}" \
+      "export ONION_STT_SERVICE_TEST=1; ONION_STT_SERVICE_ROOT=/tmp/x bash ops/stt-service.sh show" "${J}" \
+      '_moat_emit("inanalisavel", "ONION_STT_SERVICE_TEST",' '(lambda *a: None)("inanalisavel", "ONION_STT_SERVICE_TEST",'
+    _mgcase "(s6) CÓPIA do wrapper fora do projeto → FECHA (o nome do wrapper + alvo no corpo)" "2:cópia não versionada de um wrapper" "${P}" \
+      "bash ${d}/scratch/st-copia.sh install --apply" "${J}" \
+      '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner", "stt-service")' '_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening", "chat-runner")'
+    fi
+  else
+    record_skip "moat-gate: (s*) sem ops/stt-service.sh — casos do STT em lote pulados"
   fi
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
@@ -10577,6 +10608,395 @@ PY
   [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
   kill "${pid_on}" "${pid_off}" 2>/dev/null; wait "${pid_on}" "${pid_off}" 2>/dev/null
   chmod 0755 "${d}/home" 2>/dev/null; [ -d "${d}/home/h" ] && chmod -R u+rwX "${d}/home/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# stt-service (2026-10-17, D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017): o STT em LOTE do core. Duas metades:
+#   (a) o núcleo puro e a prova do verify (ops/stt/selftest.py, só stdlib, roda sem o motor): token fail-closed,
+#       Bearer/Token, 401 do AuthGate antes da rota, 413 do teto de corpo (declarado e chunked), palavras e tempos, as
+#       formas OpenAI/Deepgram, e o smoke.py REPROVANDO servidor falso sem auth, com tempos inválidos, recall baixo
+#       ou código diferente. CONTAGEM travada (caso apagado = falha). (m) UM MUTANTE POR CASO, plantado por
+#       ops/mutate-and-restore.sh numa CÓPIA (o arquivo vivo nunca é mutado), com --until no caso que tem de cair.
+#   (w) o wrapper ops/stt-service.sh em MODO DE TESTE com systemctl, systemd-run, ss, curl e ffmpeg FALSOS no PATH:
+#       a unit renderizada (loopback, sandbox, sem rede de saída, teto de memória, token por credencial), o uso
+#       inválido, o ensaio que não escreve nada, os pins conferidos contra a fonte (Hugging Face e PyPI falsos), a
+#       porta ocupada, o verify (loopback, MemoryMax, código servido, unit divergente, prova que reprova ou não mede) e
+#       o --apply (token 0600 que nunca aparece na saída; prova pré-troca que reprova deixa a unit intocada). Cada
+#       caso tem MUTANTE numa cópia do wrapper (o arquivo vivo nunca é mutado).
+# TETOS DECLARADOS (mutante sobrevive por defesa DUPLA, por isso fora da lista): o `if not token` do authorized (o
+# compare_digest contra b"" já recusa) e o S_ISLNK do load_token (o lstat do symlink dá 0777 e o teste de modo recusa).
+# O download e o hash dos arquivos do modelo (stage_hf) não rodam aqui: exigiriam o modelo de 0,65 GB; o dogfood do
+# --apply na VPS é a prova deles, e o ensaio confere o pin contra a fonte a cada rodada.
+# ---------------------------------------------------------------------------
+run_stt_service_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/stt-service.sh" st="${REPO_ROOT}/ops/stt" helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
+  if [ ! -f "${wr}" ] || [ ! -f "${st}/selftest.py" ]; then record_skip "stt-service: sem ops/stt-service.sh (core-only) — nada a testar"; return; fi
+  command -v python3 >/dev/null 2>&1 || { record_skip "stt-service: python3 ausente → pulado"; return; }
+  command -v flock >/dev/null 2>&1 || { record_skip "stt-service: flock ausente → pulado"; return; }
+  [ "$(id -u)" = 0 ] && { record_skip "stt-service: rodando como root (o wrapper recusa root) → pulado"; return; }
+  [ -f "${helper}" ] || { record_fail "stt-service" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
+  local d; d="$(mktemp -d)"
+  # ── (a) o harness do núcleo e do smoke ──
+  local want_total=41 o rc
+  if o="$(LC_ALL=C python3 -I -B "${st}/selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} FAIL 0$" <<< "${o}"; then
+    record_pass "stt-service: (a) núcleo e prova do verify — ${want_total} casos (token, 401, 413, palavras, formas, smoke que reprova)"
+  else record_fail "stt-service: (a) harness" "rc=${rc}: $(grep -E '^(FAIL|TOTAL)' <<< "${o}" | head -4 | tr '\n' '|')"; fi
+  # ── (m) um mutante por caso: alvo<TAB>âncora<TAB>novo<TAB>caso ──
+  local tgt old new want n mo mrc
+  mkdir -p "${d}/mut"
+  while IFS=$'\x1f' read -r tgt old new want; do
+    [ -n "${tgt}" ] || continue
+    cp "${st}/stt_core.py" "${d}/mut/stt_core.py"; cp "${st}/smoke.py" "${d}/mut/smoke.py"
+    n="$(grep -cF -- "${old}" "${d}/mut/${tgt}" || true)"
+    if [ "${n}" != 1 ]; then record_fail "stt-service: (m) ${want}" "âncora do mutante aparece ${n}× em ${tgt} (tem de ser 1): ${old:0:80}"; continue; fi
+    if mo="$(LC_ALL=C bash "${helper}" "${d}/mut/${tgt}" "${old}|||${new}" python3 -I -B "${st}/selftest.py" \
+             --core "${d}/mut/stt_core.py" --smoke "${d}/mut/smoke.py" --until "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want}" <<< "${mo}"; then record_pass "stt-service: (m) mutante reprova ${want}"
+    else record_fail "stt-service: (m) ${want}" "o mutante SOBREVIVEU (rc=${mrc}): $(tail -2 <<< "${mo}" | tr '\n' '|')"; fi
+  done <<EOF_MUT
+stt_core.py$(printf '\x1f')    if scheme.lower() not in AUTH_SCHEMES:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')esquema-estranho-recusa
+stt_core.py$(printf '\x1f')    return hmac.compare_digest(cred.encode("utf-8", "surrogateescape"), token)$(printf '\x1f')    return True  # ONION_MUTANTE$(printf '\x1f')token-errado-recusa
+stt_core.py$(printf '\x1f')            if not authorized(_header(scope, b"authorization"), self.token):$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')authgate-401-sem-token
+stt_core.py$(printf '\x1f')PROTECTED_PREFIX = "/v1/"$(printf '\x1f')PROTECTED_PREFIX = "/nada/"  # ONION_MUTANTE$(printf '\x1f')authgate-401-token-errado
+stt_core.py$(printf '\x1f')                if scope["type"] == "websocket":$(printf '\x1f')                if False:  # ONION_MUTANTE$(printf '\x1f')authgate-ws-fecha-sem-token
+stt_core.py$(printf '\x1f')            raise ConfigError("AuthGate sem token")$(printf '\x1f')            pass  # ONION_MUTANTE$(printf '\x1f')authgate-recusa-construir-sem-token
+stt_core.py$(printf '\x1f')    if st.st_mode & 0o077:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')load-token-modo-aberto-recusa
+stt_core.py$(printf '\x1f')    if len(tok) < TOKEN_MIN_LEN:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')load-token-curto-recusa
+stt_core.py$(printf '\x1f')    if not re.fullmatch(rb"[A-Za-z0-9._~+/=-]+", tok):$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')load-token-alfabeto-recusa
+stt_core.py$(printf '\x1f')            if n < 0 or n > self.max_bytes:$(printf '\x1f')            if n > self.max_bytes:  # ONION_MUTANTE$(printf '\x1f')bodylimit-content-length-invalido-413
+stt_core.py$(printf '\x1f')            if n < 0 or n > self.max_bytes:$(printf '\x1f')            if n < 0:  # ONION_MUTANTE$(printf '\x1f')bodylimit-content-length-413
+stt_core.py$(printf '\x1f')                if seen > self.max_bytes:$(printf '\x1f')                if False:  # ONION_MUTANTE$(printf '\x1f')bodylimit-chunked-413
+stt_core.py$(printf '\x1f')        if tok.startswith(" ") or not groups:$(printf '\x1f')        if not groups:  # ONION_MUTANTE$(printf '\x1f')words-agrupa-por-espaco
+stt_core.py$(printf '\x1f')        if i + 1 < len(groups) and groups[i + 1][1] > start:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')words-fim-limitado-pela-seguinte
+stt_core.py$(printf '\x1f')        if rel_end > 0:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')words-fim-limitado-pelo-trecho
+stt_core.py$(printf '\x1f')        out.append({"word": text, "start": round(offset + start, 3),$(printf '\x1f')        out.append({"word": text, "start": round(start + 0 * len("ONION_MUTANTE"), 3),$(printf '\x1f')words-offset-absoluto
+stt_core.py$(printf '\x1f')        prob = min(math.exp(sum(lps) / len(lps)), 1.0)$(printf '\x1f')        prob = 1.0  # ONION_MUTANTE$(printf '\x1f')words-probabilidade-da-media-de-logprob
+stt_core.py$(printf '\x1f')        if w["word"][-1:] in _SENTENCE_END:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')split-pontuacao-final
+stt_core.py$(printf '\x1f')    if not segs and fallback_text:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')split-fallback-texto
+stt_core.py$(printf '\x1f')    return [{k: v for k, v in w.items() if k != "_lps"} for w in words]$(printf '\x1f')    return [dict(w) for w in words]  # ONION_MUTANTE$(printf '\x1f')openai-verbose-forma
+stt_core.py$(printf '\x1f')    if fmt == "json":$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')openai-json-e-text
+stt_core.py$(printf '\x1f')    bare = _EDGE_PUNCT.sub("", unicodedata.normalize("NFC", w["word"])).lower()$(printf '\x1f')    bare = w["word"].lower()  # ONION_MUTANTE$(printf '\x1f')deepgram-forma
+stt_core.py$(printf '\x1f')    if dur * channels > 2 * max_s:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')duracao-acima-do-teto
+stt_core.py$(printf '\x1f')    if channels > MAX_CHANNELS:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')canais-acima-do-teto
+stt_core.py$(printf '\x1f')    return 0 <= frames < UNKNOWN_FRAMES$(printf '\x1f')    return 0 <= frames  # ONION_MUTANTE$(printf '\x1f')frames-desconhecidos-vao-ao-ffmpeg
+stt_core.py$(printf '\x1f')    if sr not in PCM_RATES:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')pcm-params
+smoke.py$(printf '\x1f')        if st1 == 401 and st2 == 401:$(printf '\x1f')        if True:  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-servidor-sem-auth
+smoke.py$(printf '\x1f')        if not isinstance(s, (int, float)) or not isinstance(e, (int, float)) or not (0 <= s < e <= duration + 0.05) or s < prev:$(printf '\x1f')        if not isinstance(s, (int, float)) or not isinstance(e, (int, float)):  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-tempos-invalidos
+smoke.py$(printf '\x1f')        (ok if rc >= meta["min_word_recall"] else bad)(f"OpenAI: recall$(printf '\x1f')        (ok if True else bad)(f"OpenAI: recall  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-recall-baixo
+smoke.py$(printf '\x1f')        if h.get("server_sha256") == expect_sha:$(printf '\x1f')        if True:  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-codigo-diferente
+smoke.py$(printf '\x1f')        if h.get("core_sha256") == expect_core_sha:$(printf '\x1f')        if True:  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-nucleo-diferente
+smoke.py$(printf '\x1f')        if pool.get(w, 0) > 0:$(printf '\x1f')        if w in pool:  # ONION_MUTANTE$(printf '\x1f')smoke-recall-conta-repeticao
+EOF_MUT
+
+  # ── (w) o wrapper em modo de teste, com falsos no PATH ──
+  local fk="${d}/fake" W
+  mkdir -p "${fk}" "${d}/wops"
+  cat > "${fk}/systemctl" <<'EOF'
+#!/bin/sh
+F="$STT_FAKE"
+case "$1" in
+  --version) echo "systemd 255 (fake)"; exit 0 ;;
+  show)
+    shift; props=""; val=0
+    while [ $# -gt 0 ]; do case "$1" in -p) props="$props $2"; shift 2 ;; --value) val=1; shift ;; *) shift ;; esac; done
+    [ -f "$F/show-fail" ] && exit 1
+    for p in $props; do
+      if [ "$p" = InvocationID ]; then v="$(cat "$F/inv")"; else v="$(sed -n "s/^$p=//p" "$F/show")"; fi
+      if [ "$val" = 1 ]; then echo "$v"; else echo "$p=$v"; fi
+    done ;;
+  restart) [ -f "$F/restart-fail" ] && exit 1; [ -f "$F/ss.after" ] && cp "$F/ss.after" "$F/ss"; echo "inv-$(date +%s%N)" > "$F/inv"; echo restart >> "$F/calls" ;;
+  daemon-reload|enable) echo "$1" >> "$F/calls" ;;
+esac
+exit 0
+EOF
+  cat > "${fk}/systemd-run" <<'EOF'
+#!/bin/sh
+F="$STT_FAKE"; mode=url
+for a; do [ "$a" = --serve ] && mode=serve; done
+echo "$mode $*" >> "$F/sr-calls"
+cat "$F/smoke-$mode"
+exit "$(cat "$F/smoke-$mode-rc" 2>/dev/null || echo 0)"
+EOF
+  printf '#!/bin/sh\ncat "$STT_FAKE/ss" 2>/dev/null; exit 0\n' > "${fk}/ss"
+  printf '#!/bin/sh\necho "ffmpeg version 6.1.1-fake Copyright"\n' > "${fk}/ffmpeg"
+  cat > "${fk}/curl" <<'EOF'
+#!/bin/sh
+F="$STT_FAKE"; url=""
+for a; do case "$a" in http*) url="$a" ;; esac; done
+case "$url" in
+  */api/models/istupakov/parakeet*) cat "$F/hf-model.json" ;;
+  */api/models/istupakov/silero*) cat "$F/hf-vad.json" ;;
+  https://pypi.org/pypi/*)
+    printf '{"urls":['; sep=""
+    while read -r h; do grep -qx "$h" "$F/pypi-drop" 2>/dev/null && continue; printf '%s{"digests":{"sha256":"%s"}}' "$sep" "$h"; sep=","; done < "$F/pypi-hashes"
+    printf ']}' ;;
+  */health) [ -f "$F/health-down" ] && exit 7; cat "$F/health" ;;
+  *) exit 22 ;;
+esac
+EOF
+  chmod +x "${fk}"/*
+  # a cópia que leva os mutantes: o wrapper + o ops/stt de verdade ao lado (o SRC é relativo ao wrapper)
+  ln -s "${st}" "${d}/wops/stt"
+  local sha_srv; sha_srv="$(sha256sum < "${st}/server.py" | cut -d' ' -f1)"
+  _st_hfjson() {  # <repo-var-prefix MODEL|VAD> → o JSON da API do Hugging Face com os pins DO WRAPPER
+    python3 - "$1" "${wr}" <<'PY'
+import json, re, sys
+pre, src = sys.argv[1], open(sys.argv[2], encoding="utf-8").read()
+rev = re.search(rf"^{pre}_REV=(\w+)$", src, re.M).group(1)
+block = re.search(rf"^{pre}_FILES=\((.*?)^\)", src, re.M | re.S).group(1)
+sib = []
+for name, kind, dig, size in re.findall(r'"(\S+) (sha256|gitsha1) (\w+) (\d+)"', block):
+    s = {"rfilename": name, "size": int(size)}
+    if kind == "sha256":
+        s["lfs"] = {"sha256": dig}; s["blobId"] = "0" * 40
+    else:
+        s["blobId"] = dig
+    sib.append(s)
+print(json.dumps({"sha": rev, "siblings": sib}))
+PY
+  }
+  _st_reset() {  # o estado padrão: serviço vivo, saudável, na porta só em loopback, com a unit renderizada instalada
+    rm -rf "${d}/run"; mkdir -p "${d}/run/units" "${d}/run/fk"
+    local F="${d}/run/fk"
+    printf '%s\n' ActiveState=active MainPID=4242 "FragmentPath=${d}/run/units/onion-vps-stt.service" DropInPaths= MemoryMax=6442450944 \
+      MemorySwapMax=0 MemoryCurrent=2000000000 'IPAddressDeny=0.0.0.0/0 ::/0' 'IPAddressAllow=127.0.0.0/8 ::1/128' DynamicUser=yes \
+      ProtectHome=yes NRestarts=0 NeedDaemonReload=no > "${F}/show"
+    echo inv-1 > "${F}/inv"
+    printf 'LISTEN 0 2048 127.0.0.1:8765 0.0.0.0:* users:(("python",pid=4242,fd=6))\n' > "${F}/ss"
+    printf '{"ready":true,"live":false,"server_sha256":"%s"}\n' "${sha_srv}" > "${F}/health"
+    printf 'OK smoke\nn_fail=0\n' > "${F}/smoke-url"; printf 'OK smoke\nn_fail=0\n' > "${F}/smoke-serve"
+    _st_hfjson MODEL > "${F}/hf-model.json"; _st_hfjson VAD > "${F}/hf-vad.json"
+    sed -n 's/.*--hash=sha256:\([0-9a-f]*\).*/\1/p' "${st}/pip.lock" "${st}/requirements.lock" > "${F}/pypi-hashes"
+  }
+  _st_env() {  # roda o wrapper <arquivo> com os argumentos, no modo de teste
+    local f="$1"; shift
+    env ONION_STT_SERVICE_TEST=1 ONION_STT_SERVICE_ROOT="${d}/run/root" ONION_STT_SERVICE_ETC="${d}/run/etc" \
+      ONION_STT_SERVICE_UNIT_DIR="${d}/run/units" ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" \
+      STT_FAKE="${d}/run/fk" PATH="${fk}:${PATH}" LC_ALL=C bash "${f}" "$@" 2>&1
+  }
+  _st_install_rendered() { _st_env "${wr}" show > "${d}/run/units/onion-vps-stt.service"; }
+  _st_stage_all() {  # a área montada (os diretórios endereçados pelo conteúdo, lidos da unit renderizada, com o marcador)
+    local u p; u="$(_st_env "${wr}" show)"
+    for p in $(grep -oE "${d}/run/root/(venv|code)-[0-9a-f]{12}" <<<"${u}" | sort -u) \
+             $(grep -oE -- "--(model|vad)-dir [^ ]+" <<<"${u}" | awk '{print $2}'); do
+      mkdir -p "${p}"; : > "${p}/.onion-stt-complete"
+    done
+  }
+  # _stcase <nome> <rc esperado> <padrão na saída (ERE) ou -> <âncora> <novo> <preparo> <args…>: o caso passa no VIVO e
+  # REPROVA na cópia mutada (rc diferente ou padrão ausente). O <preparo> roda antes de cada execução (estado limpo).
+  _stcase() {
+    local name="$1" want="$2" pat="$3" old="$4" new="$5" prep="$6"; shift 6
+    local out rc ok=0 mout mrc nm
+    _st_reset; "${prep}"
+    out="$(_st_env "${wr}" "$@")"; rc=$?
+    if [ "${rc}" = "${want}" ] && { [ "${pat}" = - ] || grep -qE -- "${pat}" <<<"${out}"; } && _st_post_ok; then ok=1
+      record_pass "stt-service: ${name}"
+    else record_fail "stt-service: ${name}" "rc=${rc} (esperado ${want}): $(tail -3 <<<"${out}" | tr '\n' '|' | cut -c1-300)"; fi
+    cp "${wr}" "${d}/wops/stt-service.sh"
+    nm="$(grep -cF -- "${old}" "${d}/wops/stt-service.sh" || true)"
+    if [ "${nm}" != 1 ]; then record_fail "stt-service: ${name} (MUT)" "âncora aparece ${nm}× no wrapper (tem de ser 1): ${old:0:80}"; return; fi
+    _st_reset; "${prep}"
+    mout="$(LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "${old}|||${new}" \
+            env ONION_STT_SERVICE_TEST=1 ONION_STT_SERVICE_ROOT="${d}/run/root" ONION_STT_SERVICE_ETC="${d}/run/etc" \
+            ONION_STT_SERVICE_UNIT_DIR="${d}/run/units" ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" \
+            STT_FAKE="${d}/run/fk" PATH="${fk}:${PATH}" bash "${d}/wops/stt-service.sh" "$@" 2>&1)"; mrc=$?
+    if [ "${mrc}" = "${want}" ] && { [ "${pat}" = - ] || grep -qE -- "${pat}" <<<"${mout}"; } && _st_post_ok; then
+      record_fail "stt-service: ${name} (MUT)" "o mutante SOBREVIVEU: ${new:0:80}"
+    else record_pass "stt-service: ${name} (MUT reprova)"; fi
+  }
+  _st_post_ok() { return 0; }   # a pós-condição do caso (cada caso que precisa a redefine e a devolve depois)
+  _p_none() { :; }
+  _p_live() { _st_install_rendered; }
+  _p_free() { : > "${d}/run/fk/ss"; }   # ensaio: porta livre, nada instalado
+  # (w1) a unit renderizada: loopback, sandbox, sem rede de saída, teto de memória, token por credencial e não no argv
+  _st_post_ok() { :; }
+  local U; U="$(_st_reset; _st_env "${wr}" show)"
+  local miss=""
+  for want in 'ExecStart=.* --host 127.0.0.1 ' '^DynamicUser=yes$' '^ProtectHome=yes$' '^ProtectSystem=strict$' '^PrivateTmp=yes$' \
+              '^NoNewPrivileges=yes$' '^IPAddressDeny=any$' '^IPAddressAllow=localhost$' '^MemoryMax=6G$' '^MemorySwapMax=0$' \
+              '^LoadCredential=token:' '^CapabilityBoundingSet=$' '^Environment=HF_HUB_OFFLINE=1 '; do
+    grep -qE -- "${want}" <<<"${U}" || miss+=" ${want}"
+  done
+  grep -qiE '^ExecStart=.*token' <<<"${U}" && miss+=" (token no ExecStart)"
+  if [ -z "${miss}" ]; then record_pass "stt-service: (w1) show renderiza loopback, sandbox, sem saída de rede, MemoryMax=6G e token por credencial"
+  else record_fail "stt-service: (w1) show" "faltou:${miss}"; fi
+  local m1
+  for m1 in '"RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX" "IPAddressDeny=any" "IPAddressAllow=localhost"|||"RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX"  # ONION_MUTANTE' \
+            'SERVER_ARGS=( --host 127.0.0.1 --model-dir|||SERVER_ARGS=( --host 0.0.0.0 --model-dir  # ONION_MUTANTE' \
+            '"ProtectSystem=strict" "ProtectHome=yes"|||"ProtectSystem=strict"  # ONION_MUTANTE' \
+            '"DynamicUser=yes" "LoadCredential=token:${TOKEN_FILE}"|||"LoadCredential=token:${TOKEN_FILE}"  # ONION_MUTANTE'; do
+    cp "${wr}" "${d}/wops/stt-service.sh"
+    local mu; mu="$(_st_reset; LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "${m1}" env ONION_STT_SERVICE_TEST=1 \
+      ONION_STT_SERVICE_ROOT="${d}/run/root" ONION_STT_SERVICE_ETC="${d}/run/etc" ONION_STT_SERVICE_UNIT_DIR="${d}/run/units" \
+      ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" bash "${d}/wops/stt-service.sh" show 2>&1)"
+    local mmiss=""
+    for want in 'ExecStart=.* --host 127.0.0.1 ' '^DynamicUser=yes$' '^ProtectHome=yes$' '^IPAddressDeny=any$'; do
+      grep -qE -- "${want}" <<<"${mu}" || mmiss+=" ${want}"
+    done
+    if [ -n "${mmiss}" ]; then record_pass "stt-service: (w1) MUT reprova (${m1%%|||*})"; else record_fail "stt-service: (w1) MUT" "sobreviveu: ${m1:0:80}"; fi
+  done
+  # (w2) produção não se redireciona por ambiente · (w3) uso inválido
+  local r2; r2="$(env ONION_STT_SERVICE_ROOT=/tmp/x LC_ALL=C bash "${wr}" show 2>&1)"; rc=$?
+  # o mutante roda num CHECKOUT git temporário (o wrapper e o ops/stt rastreados e commitados): sem isso a cópia morreria
+  # antes, na guarda do "arquivo rastreado", e o caso provaria a guarda errada (refutador, passada 1)
+  local gr="${d}/gitw"; mkdir -p "${gr}/ops"; cp -r "${st}" "${gr}/ops/stt"; cp "${wr}" "${gr}/ops/stt-service.sh"
+  git -C "${gr}" init -q -b main && git -C "${gr}" add -A && git -C "${gr}" -c user.email=t@t -c user.name=t commit -q -m base
+  # o mutante é COMMITADO no checkout temporário antes de rodar: sem a guarda do ambiente, a produção segue e imprime a
+  # unit (rc 0) — a prova de que é ESTA guarda, e não a do rastreio, que recusa
+  local r2m; r2m="$(LC_ALL=C bash "${helper}" "${gr}/ops/stt-service.sh" "  if compgen -e | grep -E '^ONION_STT_SERVICE_' >/dev/null; then|||  if false; then  # ONION_MUTANTE" \
+     bash -c 'cd "$1" && git -c user.email=t@t -c user.name=t commit -qam mutante && env ONION_STT_SERVICE_ROOT=/tmp/x bash ops/stt-service.sh show' _ "${gr}" 2>&1)"; local rc2m=$?
+  if [ "${rc}" = 3 ] && grep -q 'não se redireciona' <<<"${r2}" && [ "${rc2m}" = 0 ] && grep -q '^\[Service\]' <<<"${r2m}"; then
+    record_pass "stt-service: (w2) ONION_STT_SERVICE_* sem o modo de teste → rc 3 (e o mutante sem a guarda passa adiante)"
+  else record_fail "stt-service: (w2)" "rc=${rc} rc_mutante=${rc2m}: ${r2:0:160}"; fi
+  _stcase "(w3) opção fora da lista fechada → rc 3" 3 'opção não aceita' \
+    '    *) die 3 "opção não aceita: $1' '    *) shift; continue; die 3 "x: $1  # ONION_MUTANTE' _p_none install --port 9999
+  # (w4) o ensaio não escreve nada
+  _st_post_ok() { [ ! -e "${d}/run/root" ] && [ ! -e "${d}/run/etc" ] && [ -z "$(ls -A "${d}/run/units")" ]; }
+  _stcase "(w4) ensaio com tudo conferido → rc 0 e NADA escrito (área, token, unit)" 0 'ENSAIO OK: nada foi escrito' \
+    'if [ "${APPLY}" = 0 ]; then' 'if false; then  # ONION_MUTANTE' _p_free install
+  _st_post_ok() { return 0; }
+  # (w5) pin do modelo diferente da fonte · (w6) hash do lock ausente no PyPI · (w7) porta de outro processo
+  _p_hfbad() { _p_free; sed -i 's/6139d2fa7e1b086097b277c7149725edbab89cc7c7ae64b23c741be4055aff09/'"$(printf 'e%.0s' $(seq 64))"'/' "${d}/run/fk/hf-model.json"; }
+  _stcase "(w5) sha256 publicado do encoder diferente do fixado → rc 1" 1 'FALHA encoder-model.int8.onnx' \
+    '    if s is None or got != digest or int(s.get("size") or -1) != int(size):' '    if s is None:  # ONION_MUTANTE' _p_hfbad install
+  _p_pypibad() { _p_free; grep -m1 '^onnxruntime==' "${st}/requirements.lock" | sed 's/.*sha256://' > "${d}/run/fk/pypi-drop"; }
+  _stcase "(w6) hash do lock que o PyPI não publica → rc 1" 1 'FALHA onnxruntime' \
+    "      printf '    FALHA %s %s: o hash %s não está entre os arquivos publicados\\n' \"\${name}\" \"\${ver}\" \"\${hash:0:12}\"; bad=1" \
+    "      printf '    FALHA %s %s: o hash %s não está entre os arquivos publicados\\n' \"\${name}\" \"\${ver}\" \"\${hash:0:12}\"  # ONION_MUTANTE" _p_pypibad install
+  _p_portother() { printf 'LISTEN 0 128 127.0.0.1:8765 0.0.0.0:* users:(("nc",pid=999,fd=3))\n' > "${d}/run/fk/ss"; sed -i 's/^MainPID=.*/MainPID=0/' "${d}/run/fk/show"; }
+  _stcase "(w7) a porta é de outro processo → rc 1" 1 'ocupada por outro processo' \
+    '    || die 1 "a porta ${PORT} está ocupada por outro processo: ${occ}"' '    || true  # ONION_MUTANTE' _p_portother install
+  # (w8..w14) o verify
+  _stcase "(w8) verify do serviço saudável → rc 0" 0 'verify OK' \
+    '  [ "${vrc}" = 0 ] || return "${vrc}"' '  return 1  # ONION_MUTANTE' _p_live verify
+  _p_wide() { _p_live; printf 'LISTEN 0 2048 0.0.0.0:8765 0.0.0.0:*\n' > "${d}/run/fk/ss"; }
+  _stcase "(w9) verify com a porta escutando fora do loopback → rc 1" 1 'FORA do loopback' \
+    '    case "${a}" in "127.0.0.1:${PORT}"|"[::1]:${PORT}") : ;; *)' '    case "${a}" in *) : ;; ONION_MUTANTE)' _p_wide verify
+  _p_smokefail() { _p_live; printf 'OK a\nFALHA 401 sem token: esperado 401/401, veio 200/200\nn_fail=1\n' > "${d}/run/fk/smoke-url"; echo 1 > "${d}/run/fk/smoke-url-rc"; }
+  _stcase "(w10) verify cuja prova pelo cliente reprova (servidor aceitou sem token) → rc 1" 1 'FALHA 401' \
+    "  [ \"\${rc}\" = 0 ] && grep -qx 'n_fail=0' <<<\"\${out}\" && return 0" "  return 0  # ONION_MUTANTE" _p_smokefail verify
+  _p_smokecut() { _p_live; printf 'OK a\n' > "${d}/run/fk/smoke-url"; echo 1 > "${d}/run/fk/smoke-url-rc"; }
+  _stcase "(w11) verify cuja prova não chega ao fim (sem n_fail=) → rc 2, NÃO MEDI" 2 'NÃO MEDI' \
+    "  if ! grep -qE '^n_fail=[0-9]+\$' <<<\"\${out}\"; then" "  if false; then  # ONION_MUTANTE" _p_smokecut verify
+  _p_mem() { _p_live; sed -i 's/^MemoryMax=.*/MemoryMax=infinity/' "${d}/run/fk/show"; }
+  _stcase "(w12) verify com MemoryMax efetivo diferente → rc 1" 1 'MemoryMax efetivo' \
+    '  [ "${mem}" = "${MEMORY_MAX_BYTES}" ] || {' '  true || { : ONION_MUTANTE;' _p_mem verify
+  _p_sha() { _p_live; printf '{"ready":true,"server_sha256":"%s"}\n' "$(printf 'b%.0s' $(seq 64))" > "${d}/run/fk/health"; }
+  _stcase "(w13) verify com o processo servindo outro código → rc 1" 1 'serve outro código' \
+    '  [ "${hsha}" = "${SERVER_SHA}" ] || {' '  true || { : ONION_MUTANTE;' _p_sha verify
+  _p_drift() { _p_live; sed -i 's/MemoryMax=6G/MemoryMax=8G/' "${d}/run/units/onion-vps-stt.service"; }
+  _stcase "(w14) verify com a unit instalada diferente da renderizada → rc 1" 1 'DIFERE da renderizada' \
+    '  if priv cmp -s "${UNIT_FILE}" "${TMPD}/${UNIT}.service"; then' '  if true; then : ONION_MUTANTE;' _p_drift verify
+  # (w15) o --apply: token 0600 gerado e NUNCA na saída, unit instalada = renderizada, prova pré-troca e verify rodados
+  _p_apply() { _p_free; _st_stage_all; printf 'LISTEN 0 2048 127.0.0.1:8765 0.0.0.0:*\n' > "${d}/run/fk/ss.after"; }
+  _st_post_ok() {
+    local t="${d}/run/etc/token"
+    [ -f "${t}" ] && [ "$(stat -c %a "${t}")" = 600 ] && [ "$(wc -c < "${t}")" -ge 33 ] \
+      && ! grep -qF -- "$(cat "${t}")" <<<"${_ST_LAST_OUT:-}" \
+      && cmp -s "${d}/run/units/onion-vps-stt.service" <(_st_env "${wr}" show) \
+      && grep -q '^serve ' "${d}/run/fk/sr-calls" && grep -q '^url ' "${d}/run/fk/sr-calls"
+  }
+  # o fake do ss responde "porta livre" no pré-voo e "loopback" depois do restart (o systemctl falso troca o arquivo)
+  _ST_LAST_OUT=""
+  _st_env_capture() { _ST_LAST_OUT="$(_st_env "$@")"; printf '%s\n' "${_ST_LAST_OUT}"; }
+  _st_reset; _p_apply; _st_env_capture "${wr}" install --apply > "${d}/apply.out"; rc=$?
+  if [ "${rc}" = 0 ] && _st_post_ok; then record_pass "stt-service: (w15) --apply instala, gera o token 0600 sem imprimi-lo, prova antes e depois da troca"
+  else record_fail "stt-service: (w15) --apply" "rc=${rc}: $(tail -4 "${d}/apply.out" | tr '\n' '|' | cut -c1-300)"; fi
+  cp "${wr}" "${d}/wops/stt-service.sh"; _st_reset; _p_apply
+  _ST_LAST_OUT="$(LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "  priv sh -c 'umask 077; set -C;|||  priv sh -c 'umask 022; set -C; : ONION_MUTANTE;" \
+    env ONION_STT_SERVICE_TEST=1 ONION_STT_SERVICE_ROOT="${d}/run/root" ONION_STT_SERVICE_ETC="${d}/run/etc" \
+    ONION_STT_SERVICE_UNIT_DIR="${d}/run/units" ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" \
+    STT_FAKE="${d}/run/fk" PATH="${fk}:${PATH}" bash "${d}/wops/stt-service.sh" install --apply 2>&1)"; rc=$?
+  if [ "${rc}" = 0 ] && _st_post_ok; then record_fail "stt-service: (w15) MUT" "o token 0644 passou pela pós-condição"
+  else record_pass "stt-service: (w15) MUT reprova (token gerado com umask 022)"; fi
+  _st_post_ok() { return 0; }
+  # (w16) prova pré-troca que reprova: a unit de produção NÃO é tocada
+  _p_prefail() { _p_apply; printf 'FALHA rede de saída ABERTA\nn_fail=1\n' > "${d}/run/fk/smoke-serve"; echo 1 > "${d}/run/fk/smoke-serve-rc"; }
+  _st_post_ok() { [ ! -e "${d}/run/units/onion-vps-stt.service" ] && ! grep -q restart "${d}/run/fk/calls" 2>/dev/null; }
+  _stcase "(w16) a prova pré-troca reprova → rc 1 e a unit de produção NÃO é tocada" 1 'NÃO foi tocada' \
+    '[ "${r}" = 0 ] || die "${r}" "a prova pré-troca reprovou' '[ 0 = 0 ] || die "${r}" "a prova pré-troca reprovou  # ONION_MUTANTE' _p_prefail install --apply
+  _st_post_ok() { return 0; }
+  # (w17) drop-in na unit · (w18) IPAddressAllow fora do loopback · (w19) swap ligado (refutador, passada 1: o verify lia
+  # só o IPAddressDeny e o FragmentPath; um drop-in com IPAddressAllow=any abria a saída com o verify verde)
+  _p_dropin() { _p_live; sed -i "s|^DropInPaths=.*|DropInPaths=${d}/run/units/onion-vps-stt.service.d/x.conf|" "${d}/run/fk/show"; }
+  _stcase "(w17) verify com drop-in na unit → rc 1" 1 'drop-in' \
+    '  [ -z "${dpi}" ] || {' '  true || { : ONION_MUTANTE;' _p_dropin verify
+  _p_allow() { _p_live; sed -i 's|^IPAddressAllow=.*|IPAddressAllow=127.0.0.0/8 ::1/128 0.0.0.0/0|' "${d}/run/fk/show"; }
+  _stcase "(w18) verify com IPAddressAllow fora do loopback → rc 1" 1 'IPAddressAllow efetivo fora do loopback' \
+    '  for a in ${ipa}; do case "${a}" in 127.0.0.0/8|::1/128|127.0.0.1/32|localhost) : ;; *)' '  for a in ${ipa}; do case "${a}" in *) : ;; ONION_MUTANTE)' _p_allow verify
+  _p_halfdeny() { _p_live; sed -i 's|^IPAddressDeny=.*|IPAddressDeny=::/0|' "${d}/run/fk/show"; }
+  _stcase "(w20) verify com IPAddressDeny só de IPv6 → rc 1" 1 'não nega tudo' \
+    "  { grep -qE '(^| )any( |\$)' <<<\"\${ipd}\" || { grep -qE '(^| )0\\.0\\.0\\.0/0( |\$)' <<<\"\${ipd}\" && grep -qE '(^| )::/0( |\$)' <<<\"\${ipd}\"; }; } \\" \
+    "  { true || { : ONION_MUTANTE; }; } \\" _p_halfdeny verify
+  _p_reload() { _p_live; sed -i "s/^NeedDaemonReload=.*/NeedDaemonReload=yes/" "${d}/run/fk/show"; }
+  _stcase "(w21) verify com a unit em disco diferente da carregada → rc 1" 1 'NeedDaemonReload' \
+    '  [ "$(sed -n '"'"'s/^NeedDaemonReload=//p'"'"' <<<"${show}")" = no ] || {' '  true || { : ONION_MUTANTE;' _p_reload verify
+  _p_swap() { _p_live; sed -i 's|^MemorySwapMax=.*|MemorySwapMax=infinity|' "${d}/run/fk/show"; }
+  _stcase "(w19) verify com swap liberado → rc 1" 1 'MemorySwapMax efetivo' \
+    '  [ "$(sed -n '"'"'s/^MemorySwapMax=//p'"'"' <<<"${show}")" = 0 ] || {' '  true || { : ONION_MUTANTE;' _p_swap verify
+  # ── (s) o server.py de VERDADE com motor falso: exige o venv do serviço (ONION_STT_SELFTEST_PY, ou o instalado na área
+  # do serviço). Sem ele: ⊘ declarado — no CI a amarração do AuthGate/BodyLimit, o teto de duração, o 413 chunked e a
+  # fila são provados só onde o venv existe (a VPS depois do --apply).
+  local spy="${ONION_STT_SELFTEST_PY:-}" cand
+  if [ -z "${spy}" ]; then for cand in /opt/onion-stt/venv-*/bin/python; do [ -x "${cand}" ] && spy="${cand}"; done; fi
+  # ⚠️ SEM O VENV NÃO É SKIP (o CI roda em STRICT: ⊘ = FALHA, medido no 1º CI do #1184): sem as dependências, a
+  # AMARRAÇÃO é conferida pela FORMA (AST do server.py: o build_app devolve core.AuthGate(core.BodyLimit(...)) e o
+  # parse_args recusa host fora do loopback), com mutante; o rótulo DIZ que o servidor real não rodou aqui.
+  _st_ast() {  # <server.py> → rc 0 se a amarração está na forma
+    python3 -I - "$1" <<'PY'
+import ast, sys
+t = ast.parse(open(sys.argv[1], encoding="utf-8").read())
+fn = {f.name: f for f in t.body if isinstance(f, ast.FunctionDef)}
+def is_call(n, attr):
+    return isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr == attr \
+        and isinstance(n.func.value, ast.Name) and n.func.value.id == "core"
+rets = [r for r in ast.walk(fn["build_app"]) if isinstance(r, ast.Return) and r.value is not None]
+last = fn["build_app"].body[-1]
+ok_wrap = isinstance(last, ast.Return) and is_call(last.value, "AuthGate") and last.value.args and is_call(last.value.args[0], "BodyLimit")
+ok_host = "is_loopback" in ast.unparse(fn["parse_args"])
+sys.exit(0 if ok_wrap and ok_host else 1)
+PY
+  }
+  if [ -z "${spy}" ] || ! "${spy}" -I -c 'import numpy, soundfile, starlette, uvicorn' >/dev/null 2>&1; then
+    local am="${d}/ast-mut"; mkdir -p "${am}"; cp "${st}/server.py" "${am}/server.py"
+    if _st_ast "${st}/server.py" && ! LC_ALL=C bash "${helper}" "${am}/server.py" \
+         '    return core.AuthGate(core.BodyLimit(inner, a.max_body_mb * 1024 * 1024), token)|||    return inner  # ONION_MUTANTE' \
+         bash -c "$(declare -f _st_ast); _st_ast '${am}/server.py'" >/dev/null 2>&1; then
+      record_pass "stt-service: (s) amarração do AuthGate/BodyLimit e recusa de host pela FORMA (sem o venv neste host: o server.py real NÃO rodou aqui; roda com ONION_STT_SELFTEST_PY ou a área instalada)"
+    else record_fail "stt-service: (s) forma da amarração" "o build_app não devolve core.AuthGate(core.BodyLimit(...)) ou o mutante passou"; fi
+  else
+    local so src_ok=11
+    if so="$(cd / && LC_ALL=C "${spy}" -I -B "${st}/server_selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" = 0 ] && grep -qE "^TOTAL ${src_ok} FAIL 0$" <<<"${so}"; then
+      record_pass "stt-service: (s) server.py real com motor falso — ${src_ok} casos (401 amarrado, loopback, teto de duração, 413 chunked, fila)"
+    else record_fail "stt-service: (s) server.py real" "rc=${rc}: $(grep -E '^(FAIL|TOTAL|SKIP)' <<<"${so}" | head -4 | tr '\n' '|')"; fi
+    mkdir -p "${d}/smut"
+    while IFS=$'\x1f' read -r old new want; do
+      [ -n "${old}" ] || continue
+      cp "${st}/server.py" "${st}/stt_core.py" "${d}/smut/"
+      n="$(grep -cF -- "${old}" "${d}/smut/server.py" || true)"
+      if [ "${n}" != 1 ]; then record_fail "stt-service: (s) ${want}" "âncora aparece ${n}× no server.py: ${old:0:80}"; continue; fi
+      if mo="$(cd / && LC_ALL=C bash "${helper}" "${d}/smut/server.py" "${old}|||${new}" "${spy}" -I -B "${st}/server_selftest.py" \
+               --server "${d}/smut/server.py" --until "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
+      if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want}" <<<"${mo}"; then record_pass "stt-service: (s) mutante reprova ${want}"
+      else record_fail "stt-service: (s) ${want}" "o mutante SOBREVIVEU (rc=${mrc}): $(tail -2 <<<"${mo}" | tr '\n' '|')"; fi
+    done <<EOF_SMUT
+    return core.AuthGate(core.BodyLimit(inner, a.max_body_mb * 1024 * 1024), token)$(printf '\x1f')    return inner  # ONION_MUTANTE$(printf '\x1f')srv-sem-token-401
+        if not ipaddress.ip_address(a.host).is_loopback:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-host-fora-do-loopback-recusa
+            why = core.audio_too_long(int(info.frames), int(info.samplerate), int(info.channels), max_s)$(printf '\x1f')            why = None  # ONION_MUTANTE$(printf '\x1f')srv-duracao-acima-do-teto-413
+    why = core.audio_too_long(int(oinfo.frames), int(oinfo.samplerate), int(oinfo.channels), max_s)$(printf '\x1f')    why = None  # ONION_MUTANTE$(printf '\x1f')srv-duracao-pelo-ffmpeg-413
+    inner = Starlette(routes=routes, exception_handlers={core.BodyTooLarge: too_large})$(printf '\x1f')    inner = Starlette(routes=routes)  # ONION_MUTANTE$(printf '\x1f')srv-chunked-acima-do-teto-413
+            except core.BodyTooLarge:$(printf '\x1f')            except ZeroDivisionError:  # ONION_MUTANTE$(printf '\x1f')srv-multipart-chunked-acima-do-teto-413
+    except (RuntimeError, OSError) as e:  # LibsndfileError é RuntimeError: arquivo corrompido é 400, nunca 500$(printf '\x1f')    except ZeroDivisionError as e:  # ONION_MUTANTE$(printf '\x1f')srv-flac-corrompido-400
+           *([] if multichannel else ["-ac", "1"]), "-c:a", "pcm_s16le", "-fs", str(fs), "-y", out]$(printf '\x1f')           *([] if multichannel else ["-ac", "1"]), "-c:a", "pcm_s16le", "-y", out]  # ONION_MUTANTE$(printf '\x1f')srv-ffmpeg-fs-limita-disco
+        if state["inflight"] >= a.queue_max:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-fila-cheia-429
+EOF_SMUT
+  fi
+  unset -f _st_hfjson _st_reset _st_env _st_install_rendered _st_stage_all _stcase _st_post_ok _p_none _p_live _p_free _p_hfbad \
+    _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap _p_halfdeny _p_reload _st_ast
   rm -rf "${d}"
 }
 
@@ -33185,6 +33605,7 @@ _family run_a2a_invite_live_selftests
 _family run_a2a_queue_live_selftests
 _family run_bridge_hardening_selftests
 _family run_chat_runner_selftests
+_family run_stt_service_selftests
 _family run_update_bridge_selftests
 _family run_version_drift_selftests
 _family run_currency_census_selftests
