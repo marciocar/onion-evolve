@@ -2,7 +2,7 @@
 branch: feat/keep-current-eternal
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: ae4c151fb324f83cdb2bed35169622b14e69bec774120ea851c107446cd4e889
+reviewed_diff_sha256: 56a27c2faed37d147171c564d790f78238df7a60524988d4d69232503c53a227
 reviewed_code_sha256: f7cd4e72b83b5a06a97caa96d40f9cc20be78c4774b977aba63178ad8a84c5e0
 findings_total: 29
 findings_real: 29
