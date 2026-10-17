@@ -151,11 +151,18 @@
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+.claude/hooks/house-code-gloss.sh	D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
+.claude/hooks/house-code-gloss.sh	E_DEFEITO_SIGLA_SEM_GLOSA_AO_MAESTRO	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
+.claude/hooks/house-code-gloss.sh	E_ELENXO_1A_PASSADA_RECALCULAVA_O_LEMBRETE	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
+.claude/hooks/house-code-gloss.sh	E_ELENXO_2A_PASSADA_O_LEMBRETE_DO_MEIO_DO_TURNO	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
+.claude/hooks/house-code-gloss.sh	E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
+.claude/hooks/house-code-gloss.sh	E_REFORCO_ESCREVER_CERTO_NAO_TRAVAR	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_OBJECAO_HOOK_STALENESS_IS_THE_BRANCH	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_OBJECAO_MAIN_MUST_KEEP_VERSIONING	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_PERNA_DE_LEITURA_E_CEGA_A_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/hooks/lib/house_codes.py	C_TETO_A_GLOSA_E_JULGADA_POR_FORMA	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	C_FUNCAO_DA_STRING_SO_ERA_JULGADA_NA_DEFINICAO	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	C_TETO_RESOLUCAO_LOCAL_E_FONTES	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
@@ -428,6 +435,7 @@
 .claude/validation/guardrails/onion-effect-gate.sh	E_WIRE_IN_LIVE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/harness-inventory.sh	E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/harness-inventory.sh	E_SSOT_DO_HARNESS_COM_CATRACA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
+.claude/validation/house-codes.tsv	C_TETO_O_GLOSSARIO_E_A_LISTA	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/validation/injected-cut-check.sh	C_DOCUMENTACAO_INDISTINGUIVEL_DE_INVOCACAO_VIVA	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/validation/injected-cut-check.sh	E_DEFEITO_DATADO_TRES_SITIOS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/injected-cut-check.sh	E_O_DOGFOOD_ACHOU_TRES_DEFEITOS_QUE_LEITURA_NAO_ACHA	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
