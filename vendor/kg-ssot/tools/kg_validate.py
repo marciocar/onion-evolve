@@ -20,6 +20,12 @@ da suíte, os de codes() e warnings() (parse.*, form.*, integrity.*, yaml.*), co
 Sem --schema, o contrato é o vigente (CONTRACT_MUST) e os avisos são do SHOULD dele (CONTRACT_SHOULD). Com
 --schema S, o SHOULD é --should-schema, ou o vizinho S.should.schema.json quando existe, ou nenhum.
 
+O .kg.json (o mesmo modelo de dados em JSON) é lido pelo parser JSON no perfil do contrato (RFC 8259 e I-JSON): um
+arquivo *.json vira JsonText (as_source), e '-' segue --stdin-format yaml|json. No .kg.json, inteiro fora de
+±(2^53−1) reprova como form.type; surrogate solto, mais de 128 coleções aninhadas, espaço fora da RFC e BOM que não é o
+inicial reprovam como parse.yaml-error. No .kg.yaml, os três primeiros são os avisos yaml.unsafe-integer,
+yaml.lone-surrogate e yaml.depth-over-128.
+
 --corpus DIR liga a conferência da ponta externa das external_edges (v4.3) contra os .kg.yaml sob DIR.
 --where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta (where()); a saída padrão não muda.
 --spike troca a saída humana e o rc pelos do spike (check() e classify(), perfil Yaml12BoolLoader), para
@@ -30,7 +36,7 @@ rc: 0 todo arquivo passa no MUST (com --spike: em schema + integridade) · 1 alg
 quebrada (schema ou arquivo ilegível, git show que falha).
 
 Uso:
-  kg_validate.py [--schema S [--should-schema S2]] FILE...
+  kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...
   kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]
 """
 import argparse
@@ -205,40 +211,78 @@ class NonFinite:
         return f"NonFinite({self.text})"
 
 
-def _contains_non_finite(value):
-    if isinstance(value, NonFinite):
-        return True
-    if isinstance(value, dict):
-        return any(_contains_non_finite(v) for v in value.values())
-    if isinstance(value, list):
-        return any(_contains_non_finite(v) for v in value)
+def _contains(value, hit):
+    """Algum valor sob `value` (ele incluído) satisfaz hit? Sem recursão: a profundidade do documento não pesa na
+    pilha (O2 da medição da opção b)."""
+    stack = [value]
+    while stack:
+        v = stack.pop()
+        if hit(v):
+            return True
+        if isinstance(v, dict):
+            stack.extend(v.values())
+        elif isinstance(v, list):
+            stack.extend(v)
     return False
+
+
+def _is_non_finite(v):
+    return isinstance(v, NonFinite)
+
+
+MAX_SAFE_INTEGER = 2 ** 53 - 1  # o I-JSON (RFC 7493): acima disto, um double não guarda o inteiro exato
+
+
+def is_unsafe_integer(v):
+    """Número de valor inteiro com módulo acima de 2^53−1, escrito como inteiro ou como float (9007199254740993,
+    1e20): o perfil JSON o recusa, porque um leitor JS (double) perde o valor exato. O .nan e o .inf ficam com o
+    NonFinite; o bool não é número aqui."""
+    if isinstance(v, bool):
+        return False
+    if isinstance(v, int):
+        return abs(v) > MAX_SAFE_INTEGER
+    return isinstance(v, float) and math.isfinite(v) and v.is_integer() and abs(v) > MAX_SAFE_INTEGER
 
 
 NESTED = {"node": ("provenance",)}  # objetos aninhados que o contrato define: o código desce neles
 
 
-def non_finite_codes(doc):
-    """form.type para .nan/.inf em QUALQUER posição, também onde o schema não tem tipo (x_, chave
-    desconhecida, dentro de lista): o JSON não os representa, e um leitor JS perderia o dado."""
+def _scoped_type_codes(doc, hit):
+    """form.type.<escopo>.<campo> para cada campo do documento sob o qual algum valor satisfaz hit (um valor fora
+    do modelo JSON): o mesmo caminho de códigos do .nan/.inf, também onde o schema não tem tipo (x_, chave
+    desconhecida, dentro de lista). Um item de nodes ou edges que é ele mesmo o valor vira o campo item."""
+    def contains(v):
+        return _contains(v, hit)
     out = set()
     for key, value in doc.items():
         if key in ("nodes", "edges") and isinstance(value, list):
             scope = "node" if key == "nodes" else "edge"
             for item in value:
-                if isinstance(item, NonFinite):
+                if hit(item):
                     out.add(f"form.type.{scope}.item")
                 elif isinstance(item, dict):
                     for k, v in item.items():
                         if k in NESTED.get(scope, ()) and isinstance(v, dict):  # objeto que o schema define
-                            out |= {f"form.type.{scope}.{k}.{kk}" for kk, vv in v.items() if _contains_non_finite(vv)}
-                        elif _contains_non_finite(v):
+                            out |= {f"form.type.{scope}.{k}.{kk}" for kk, vv in v.items() if contains(vv)}
+                        elif contains(v):
                             out.add(f"form.type.{scope}.{k}")
         elif key == "meta" and isinstance(value, dict):
-            out |= {f"form.type.meta.{k}" for k, v in value.items() if _contains_non_finite(v)}
-        elif _contains_non_finite(value):
+            out |= {f"form.type.meta.{k}" for k, v in value.items() if contains(v)}
+        elif contains(value):
             out.add(f"form.type.top.{key}")
     return out
+
+
+def non_finite_codes(doc):
+    """form.type para .nan/.inf em QUALQUER posição, também onde o schema não tem tipo (x_, chave
+    desconhecida, dentro de lista): o JSON não os representa, e um leitor JS perderia o dado."""
+    return _scoped_type_codes(doc, _is_non_finite)
+
+
+def unsafe_integer_codes(doc):
+    """form.type para o inteiro fora de ±(2^53−1) (is_unsafe_integer), com o caminho de non_finite_codes. É MUST no
+    .kg.json; no .kg.yaml o mesmo achado é o aviso yaml.unsafe-integer (a rampa do CRITERIA.md do v2)."""
+    return _scoped_type_codes(doc, is_unsafe_integer)
 
 
 def json_key(k):
@@ -441,6 +485,12 @@ def integrity(doc, refs=("on",), corpus=None):
 
 
 def check(text, validator):
+    if isinstance(text, JsonText):  # o .kg.json: o parse é o do perfil JSON, e o resto segue o formato do spike
+        _, doc, code = parse_v1(text)
+        if code:
+            return {"parse": code, "schema": [], "integrity": []}
+        return {"parse": None, "schema": [c for err in validator.iter_errors(doc) for c in classify(err)],
+                "integrity": integrity(doc)}
     if _too_deep(text):  # o mesmo teto do parse_v1: parsear isto derruba o processo
         return {"parse": "yaml-error: aninhamento além do teto", "schema": [], "integrity": []}
     try:
@@ -590,7 +640,16 @@ def _depth(value):
 
 
 def parse_error_line(text):
-    """A linha (contando de 1) em que o parse falha, pela marca do erro do parser de referência; None sem marca."""
+    """A linha (contando de 1) em que o parse falha, pela marca do erro do parser de referência; None sem marca. No
+    .kg.json, a linha é a do JSONDecodeError; a chave repetida, a profundidade e o surrogate solto não têm marca."""
+    if isinstance(text, JsonText):
+        try:
+            _load_json(text)
+        except json.JSONDecodeError as exc:
+            return exc.lineno
+        except (ValueError, RecursionError):
+            return None
+        return None
     if _too_deep(text):  # recusado antes do parser (parse_v1): não há marca, e parsear derruba
         return None
     try:
@@ -628,12 +687,126 @@ def _parse(text, loader):
         return None, None, "parse.yaml-error", raw
 
 
-@functools.lru_cache(maxsize=1024)
+PROFILE_DEPTH = 128  # coleções aninhadas que o perfil do modelo admite: MUST no .kg.json, aviso no .kg.yaml
+_LONE_SURROGATE = re.compile("[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]")
+
+
+def collection_depth(value, limit=PROFILE_DEPTH):
+    """Quantas coleções (mapas e listas) o documento construído aninha, a raiz contando 1; para assim que passa de
+    limit. Sem recursão: mede antes de canonical() e de non_finite_codes() (O2 da medição da opção b)."""
+    best, stack = 0, [(value, 1)]
+    while stack:
+        v, d = stack.pop()
+        if isinstance(v, dict):
+            stack += [(x, d + 1) for x in v.values()]
+        elif isinstance(v, list):
+            stack += [(x, d + 1) for x in v]
+        else:
+            continue
+        best = max(best, d)
+        if best > limit:
+            return best
+    return best
+
+
+def has_lone_surrogate(value):
+    """Alguma chave ou texto do documento tem um surrogate solto (U+D800 a U+DFFF sem o par)? O I-JSON o proíbe, e o
+    texto não é Unicode válido. Um par alto+baixo adjacente conta como o caractere que ele forma (o parser JSON já o
+    junta; o YAML puro do PyYAML o deixa em dois), como num leitor JS. Sem recursão."""
+    stack = [value]
+    while stack:
+        v = stack.pop()
+        if isinstance(v, str):
+            if _LONE_SURROGATE.search(v):
+                return True
+        elif isinstance(v, dict):
+            stack.extend(k for k in v if isinstance(k, str))
+            stack.extend(v.values())
+        elif isinstance(v, list):
+            stack.extend(v)
+    return False
+
+
+class JsonText(str):
+    """Texto de um .kg.json: o mesmo modelo de dados, lido por um parser JSON e não pelo loader YAML (o JSON é
+    quase um subconjunto do YAML 1.2, e o quase é o que diverge: tab, chave longa, NaN, aspas simples)."""
+
+
+def as_source(name, text):
+    """O texto como o leitor deve lê-lo: JsonText para *.json, str para o resto (o YAML, como sempre)."""
+    return JsonText(text) if str(name).endswith(".json") else text  # sensível a maiúsculas, como o run.mjs e o NAME do kg_store
+
+
+def _json_pairs(dups):
+    """O object_pairs_hook que anota a chave repetida em `dups` em vez de interromper o parse: a repetição só decide
+    depois da sintaxe, da profundidade e do surrogate, na mesma ordem do leitor JS (parseJson)."""
+    def pairs(items):
+        out = {}
+        for k, v in items:
+            if k in out:  # o decodificador já resolveu os escapes: "\u0069d" e "id" são a mesma chave
+                dups.append(k)
+            out[k] = v
+        return out
+    return pairs
+
+
+def _json_constant(name):
+    raise ValueError(f"{name} não é JSON")  # NaN, Infinity e -Infinity (RFC 8259, seção 6)
+
+
+def _json_int(digits):
+    """O inteiro do JSON: exato até 20 dígitos (2^64 cabe), e daí em diante o float, que já passa de 2^53 ou estoura
+    o double (inf, o NonFinite). Assim o int() do Python não recusa o inteiro de 5.000 dígitos (o teto de 4.300) e o
+    veredito não depende da forma escrita: 1 seguido de 400 zeros e 1e400 dão o mesmo form.type."""
+    return int(digits) if len(digits) <= 21 else float(digits)
+
+
+_JSON_WS = " \t\n\r"  # o espaço em branco da RFC 8259, e só ele (o str.strip() do Python tira também \x1c e NBSP)
+
+
+def _json_body(text):
+    """O texto sem UM BOM inicial (aceito e descartado); um segundo BOM fica no texto e o json.loads o recusa."""
+    return text[1:] if text.startswith("\ufeff") else text
+
+
+def _load_json(text, dups=None):
+    return json.loads(_json_body(text), object_pairs_hook=_json_pairs([] if dups is None else dups),
+                      parse_constant=_json_constant, parse_int=_json_int)
+
+
+def _parse_json(text):
+    """O parse de um .kg.json no perfil JSON do contrato, com os mesmos códigos do caminho YAML (o vocabulário não tem
+    parse.json-error). Recusa com parse.yaml-error: sintaxe fora da RFC 8259, NaN e Infinity, BOM fora do início,
+    surrogate solto (I-JSON) e mais de 128 coleções aninhadas. A profundidade é medida antes de canonical(), e o
+    RecursionError do próprio json.loads (um texto de milhares de níveis) também é parse.yaml-error. A ordem é a do
+    leitor JS: vazio, sintaxe, profundidade e surrogate, chave repetida, null, raiz."""
+    if not _json_body(text).strip(_JSON_WS):
+        return None, None, "parse.empty-document"
+    dups = []
+    try:
+        value = _load_json(text, dups)
+    except (ValueError, RecursionError):
+        return None, None, "parse.yaml-error"
+    if collection_depth(value) > PROFILE_DEPTH or has_lone_surrogate(value):
+        return None, None, "parse.yaml-error"
+    if dups:
+        return None, None, "parse.duplicate-key"
+    if value is None:
+        return None, None, "parse.empty-document"
+    if not isinstance(value, dict):
+        return None, None, "parse.root-not-mapping"
+    return value, canonical(value, json_keys=True), None  # 1e400 vira inf e daí NonFinite, como o .inf do YAML
+
+
+@functools.lru_cache(maxsize=1024, typed=True)
 def parse_v1(text):
     """O parse do contrato v1, um só para codes(), warnings() e external_info(): (documento cru, canônico, código).
     Guardado por texto (lru_cache): o mesmo arquivo é parseado uma vez por processo, e nenhum chamador altera o
     documento devolvido, que é compartilhado. O parser em C entra só como atalho (loader_for); quando o documento
-    é fundo demais, refaz com o puro, cujo veredito é o de referência."""
+    é fundo demais, refaz com o puro, cujo veredito é o de referência. Um JsonText vai ao parser JSON (_parse_json);
+    o cache é typed, para o mesmo texto lido como YAML e como JSON não se misturar."""
+    if isinstance(text, JsonText):
+        return _parse_json(text)
     if _too_deep(text):
         return None, None, "parse.yaml-error"
     loader = loader_for(text)
@@ -653,7 +826,7 @@ def code_counts(text, validator, corpus=None):
     if parse_code:
         return collections.Counter([parse_code])
     out = collections.Counter(c for err in validator.iter_errors(doc) for c in form_codes(err))
-    out.update(non_finite_codes(doc))
+    out.update(non_finite_codes(doc) | (unsafe_integer_codes(doc) if isinstance(text, JsonText) else set()))
     out.update(integrity(doc, refs=("trigger", "on"), corpus=corpus))
     edges = doc.get("edges") if isinstance(doc.get("edges"), list) else []
     with_on = sum(1 for e in edges if isinstance(e, dict) and "on" in e)
@@ -722,6 +895,23 @@ def coherence_located(doc):
     return out
 
 
+def yaml_profile_warnings(text, raw):
+    """Os pontos 1 a 3 do perfil JSON no .kg.yaml, como aviso SHOULD (a rampa do CRITERIA.md do v2; no .kg.json eles
+    são MUST e reprovam antes daqui): yaml.unsafe-integer (inteiro fora de ±(2^53−1)), yaml.lone-surrogate (surrogate
+    solto em chave ou valor) e yaml.depth-over-128 (mais de 128 coleções aninhadas). Um por arquivo, como a data sem
+    aspas. O teto de parse do YAML (MAX_DEPTH) continua como está."""
+    if isinstance(text, JsonText):
+        return []
+    out = []
+    if _contains(raw, is_unsafe_integer):
+        out.append("yaml.unsafe-integer")
+    if has_lone_surrogate(raw):
+        out.append("yaml.lone-surrogate")
+    if collection_depth(raw) > PROFILE_DEPTH:
+        out.append("yaml.depth-over-128")
+    return out
+
+
 def coherence_warnings(doc):
     """Os avisos de coherence_located() contados por código (Counter)."""
     return collections.Counter(code for code, _ in coherence_located(doc))
@@ -737,6 +927,7 @@ def warning_counts(text, validator, should_validator):
     out = collections.Counter({c: n for c, n in should.items() if c not in must})
     if _has_unquoted_date(raw):
         out["yaml.unquoted-date"] += 1
+    out.update(yaml_profile_warnings(text, raw))
     out.update(coherence_warnings(doc))
     return out
 
@@ -802,8 +993,10 @@ def path_text(path):
 
 
 def yaml_lines(text):
-    """A árvore de nós do YAML (compose, sem construir valores), para achar a linha de um caminho; None se não compõe."""
-    if _too_deep(text):  # o mesmo teto do parse: compor isto derruba o processo
+    """A árvore de nós do YAML (compose, sem construir valores), para achar a linha de um caminho; None se não compõe.
+    Um JsonText não passa pelo compose (a libyaml só aceita str exato, e o JSON não é lido como YAML): None, e o
+    line_of de um .kg.json devolve None, declarado no verdict como linha nula."""
+    if isinstance(text, JsonText) or _too_deep(text):  # o mesmo teto do parse: compor isto derruba o processo
         return None
     try:
         return yaml.compose(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
@@ -812,7 +1005,8 @@ def yaml_lines(text):
 
 
 def line_of(tree, path):
-    """A linha (contando de 1) do ponto mais fundo do caminho que existe no YAML; None sem árvore."""
+    """A linha (contando de 1) do ponto mais fundo do caminho que existe no YAML; None sem árvore (o .kg.json não tem
+    árvore: yaml_lines devolve None para ele, e a linha da ocorrência sai nula)."""
     node, line = tree, (tree.start_mark.line + 1 if tree is not None else None)
     for p in path:
         if isinstance(node, yaml.MappingNode):
@@ -843,10 +1037,26 @@ MESSAGES = {
     "integrity.untraced-decision": "A decisão não diz de onde veio: falta trace, provenance ou aresta TRACES_TO.",
     "yaml.unquoted-date": "Há uma data sem aspas; leitores YAML diferentes a leem de formas diferentes.",
     "yaml.forbidden-key-on": "A aresta usa a chave on, proibida (em YAML 1.1 ela vira o booleano True).",
+    "yaml.unsafe-integer": "Há um número inteiro fora de ±(2^53−1); um leitor JS (double) perde o valor exato dele.",
+    "yaml.lone-surrogate": "Há um surrogate solto (U+D800 a U+DFFF sem o par) numa chave ou num texto.",
+    "yaml.depth-over-128": "O documento aninha mais de 128 coleções (mapas e listas).",
+}
+# No .kg.json, os códigos de parse são os mesmos do YAML (o vocabulário não tem parse.json-error), e a frase diz o
+# formato em que o texto foi lido (O7 da medição da opção b).
+JSON_MESSAGES = {
+    "parse.yaml-error": "O arquivo não é JSON válido no perfil do .kg.json: sintaxe da RFC 8259 (sem comentário, "
+                        "vírgula sobrando, aspas simples, NaN nem Infinity), um BOM só no início, nenhum surrogate "
+                        "solto e até 128 coleções aninhadas.",
+    "parse.duplicate-key": "Há uma chave repetida no mesmo objeto JSON (comparada depois de resolvidos os escapes).",
+    "parse.empty-document": "O arquivo JSON está vazio, só tem espaço em branco ou é null.",
+    "parse.root-not-mapping": "A raiz do arquivo JSON não é um objeto (meta, nodes, edges).",
 }
 HINTS = {
     "yaml.unquoted-date": 'Ponha a data entre aspas, por exemplo verified_at: "2026-10-13".',
     "yaml.forbidden-key-on": "Troque on: por trigger:.",
+    "yaml.unsafe-integer": "Escreva o número entre aspas, como texto, ou use um valor dentro de ±9007199254740991.",
+    "yaml.lone-surrogate": "Troque o escape solto pelo caractere inteiro (o par alto e baixo) ou remova-o.",
+    "yaml.depth-over-128": "Achate a estrutura: um grafo de verdade fica em 3 ou 4 níveis.",
     "integrity.orphan-node": "Ligue o nó a outro com uma aresta, ou remova o nó.",
     "integrity.duplicate-id": "Dê um id único a cada nó.",
     "integrity.untraced-decision": "Acrescente trace, provenance ou uma aresta TRACES_TO saindo da decisão.",
@@ -866,8 +1076,11 @@ KIND_TEXT = {"required": "Falta o campo obrigatório", "enum": "Valor fora da li
 SCOPE_TEXT = {"node": "no nó", "edge": "na aresta", "meta": "no meta", "top": "no topo"}
 
 
-def message_of(code):
-    """A frase humana em pt-BR de um código: a específica, ou a montada da forma form.<tipo>.<escopo>.<campo>."""
+def message_of(code, json_text=False):
+    """A frase humana em pt-BR de um código: a específica, ou a montada da forma form.<tipo>.<escopo>.<campo>.
+    json_text: o texto foi lido como .kg.json, e a frase de parse diz isso (JSON_MESSAGES)."""
+    if json_text and code in JSON_MESSAGES:
+        return JSON_MESSAGES[code]
     if code in MESSAGES:
         return MESSAGES[code]
     parts = code.split(".")
@@ -899,7 +1112,8 @@ def occurrences(text, validator, should_validator=None, corpus=None):
         for code in form_codes(err):
             out.append(("MUST", code, schema_place(doc, path), path))
             must.add(code)
-    out += [("MUST", code, "arquivo", []) for code in sorted(non_finite_codes(doc))]
+    typed = non_finite_codes(doc) | (unsafe_integer_codes(doc) if isinstance(text, JsonText) else set())
+    out += [("MUST", code, "arquivo", []) for code in sorted(typed)]
     out += [("MUST", code, place, place_path(doc, place))
             for code, place in integrity_located(doc, refs=("trigger", "on"), corpus=corpus)]
     out += [("MUST", "yaml.forbidden-key-on", place, place_path(doc, place) + ["on"])
@@ -910,6 +1124,7 @@ def occurrences(text, validator, should_validator=None, corpus=None):
             out += [("SHOULD", code, schema_place(doc, path), path) for code in form_codes(err) if code not in must]
         if _has_unquoted_date(raw):
             out.append(("SHOULD", "yaml.unquoted-date", "arquivo", []))
+        out += [("SHOULD", code, "arquivo", []) for code in yaml_profile_warnings(text, raw)]
         out += [("SHOULD", code, place, place_path(doc, place)) for code, place in coherence_located(doc)]
     return out
 
@@ -930,7 +1145,7 @@ def verdict(text, validator, should_validator=None, corpus=None, source=None, li
         item = {"level": level, "code": code, "place": place, "path": path_text(path),
                 "line": (parse_line if code.startswith("parse.") else line_of(tree, path) if tree is not None and path
                          else None),
-                "message": message_of(code)}
+                "message": message_of(code, isinstance(text, JsonText))}
         hint = hint_of(code)
         if hint:
             item["hint"] = hint
@@ -990,15 +1205,16 @@ def load_sources(args):
         for name in names:
             text = subprocess.run(["git", "-C", args.git, "show", f"{args.rev}:{name}"],
                                   capture_output=True, text=True, check=True).stdout
-            yield name, text
+            yield name, as_source(name, text)
     else:
         for name in args.files:
             if name == "-":
                 stream = getattr(sys.stdin, "buffer", None)  # UTF-8 inválido é UnicodeDecodeError: rc 2
-                yield "-", stream.read().decode("utf-8") if stream is not None else sys.stdin.read()
+                text = stream.read().decode("utf-8") if stream is not None else sys.stdin.read()
+                yield "-", JsonText(text) if args.stdin_format == "json" else text  # o stdin não tem extensão
                 continue
             with open(name, encoding="utf-8") as fh:
-                yield name, fh.read()
+                yield name, as_source(name, fh.read())
 
 
 def summarize(results):
@@ -1041,11 +1257,15 @@ def fmt_counts(counter):
     return " · ".join(f"{c} ×{n}" for c, n in sorted(counter.items()))
 
 
-def report(name, must, should):
-    """As linhas humanas de um arquivo: veredito, códigos MUST e avisos SHOULD com contagem."""
+def report(name, must, should, json_text=False):
+    """As linhas humanas de um arquivo: veredito, códigos MUST e avisos SHOULD com contagem. Num .kg.json que não
+    parseia, uma linha a mais diz que o texto foi lido como JSON (o código de parse é o mesmo do YAML)."""
     lines = [f"{'REPROVA' if must else 'PASSA  '} {name}"]
     if must:
         lines.append(f"  MUST   {fmt_counts(must)}")
+        parse = [c for c in must if c.startswith("parse.")]
+        if json_text and parse:
+            lines.append(f"  JSON   {message_of(parse[0], True)}")
     if should:
         lines.append(f"  SHOULD {fmt_counts(should)}")
     return lines
@@ -1076,7 +1296,9 @@ def main(argv=None):
     ap.add_argument("--format", choices=("human", "json"), default="human",
                     help="json: o veredito estruturado kg-ssot.verdict/1 (spec/verdict.schema.json) em stdout")
     ap.add_argument("--limit", type=int, default=50, help="no --format json, ocorrências por arquivo (default 50)")
-    ap.add_argument("files", nargs="*", help="arquivos .kg.yaml; '-' lê o grafo do stdin")
+    ap.add_argument("--stdin-format", choices=("yaml", "json"), default="yaml",
+                    help="o formato do grafo lido de '-' (default yaml); um arquivo segue a extensão (.json é JSON)")
+    ap.add_argument("files", nargs="*", help="arquivos .kg.yaml ou .kg.json; '-' lê o grafo do stdin")
     args = ap.parse_args(argv)
     # no modo json o stdout é só JSON: a mensagem de entrada quebrada (rc 2) vai para o stderr
     say = (lambda msg: print(msg, file=sys.stderr)) if args.format == "json" else print
@@ -1122,7 +1344,7 @@ def main(argv=None):
         should = warning_counts(text, validator, should_v) if should_v is not None else collections.Counter()
         failed += bool(must)
         warned += bool(should)
-        lines += report(name, must, should)
+        lines += report(name, must, should, isinstance(text, JsonText))
         if args.where:  # a mesma ocorrência repetida (os ramos if/then do schema) vira uma linha com ×n
             found = collections.Counter(where(text, validator, should_v, corpus))
             lines += [f"    {level:<6} {code}  {place}" + (f" ×{n}" if n > 1 else "")

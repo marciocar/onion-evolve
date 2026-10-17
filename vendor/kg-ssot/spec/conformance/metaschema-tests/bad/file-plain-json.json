@@ -1,0 +1,13 @@
+{
+  "description": "Um caso .json que não é .kg.json: o nome do arquivo de caso tem de dizer o formato do grafo.",
+  "layer": "parse",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-minimal.json",
+      "description": "o grafo mínimo em JSON, sem o .kg no nome",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

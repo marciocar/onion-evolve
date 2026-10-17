@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Runner da suíte de conformidade do .kg.yaml para o leitor de referência (kg_validate.py).
+"""Runner da suíte de conformidade do .kg.yaml e do .kg.json para o leitor de referência (kg_validate.py).
 
 Depende só de Python 3, PyYAML e jsonschema, sem nenhum harness de agente. É o molde que um leitor
 em outra linguagem imita: para cada caso, o conjunto de códigos emitidos tem de ser IGUAL ao
@@ -9,7 +9,7 @@ Passos:
   1. auto-teste do metaschema: aceita metaschema-tests/good/ e recusa metaschema-tests/bad/;
   2. cada manifest.json (em fixtures/) valida contra manifest.schema.json, cumpre a regra de pending_on da pasta
      (vazio em latest/, não vazio em proposals/) e aponta só para arquivos que existem;
-  3. cada caso roda no leitor e é comparado por conjunto.
+  3. cada caso roda no leitor e é comparado por conjunto; o caso .kg.json é lido pelo perfil JSON (as_source).
 
 rc: 0 se latest/ passa inteiro · 1 se algum caso de latest/ falha (inclusive o leitor caindo nele)
 · 2 se a própria suíte está quebrada: metaschema ou manifesto ilegível ou inválido, pending_on fora
@@ -92,7 +92,7 @@ def suite_errors(suite, meta_validator):
         referenced |= {(m.parent / f).resolve() for f in files}
         latest_cases += len(files) if folder == "latest" else 0
     # Um arquivo de caso fora de todo manifesto nunca roda, e ninguém fica sabendo.
-    for f in sorted(list(cases_root.rglob("*.yaml"))):
+    for f in sorted(list(cases_root.rglob("*.yaml")) + list(cases_root.rglob("*.kg.json"))):
         if f.resolve() not in referenced:
             out.append(f"{f.relative_to(cases_root)}: arquivo de caso fora de todo manifesto")
     if not latest_cases:
@@ -119,7 +119,7 @@ def run_cases(suite, validator, should_validator, proposals=None):
                 "expected": {"codes": want_codes, "warnings": want_warn},
             }
             try:
-                text = path.read_text(encoding="utf-8")
+                text = kg_validate.as_source(path.name, path.read_text(encoding="utf-8"))  # .kg.json: o perfil JSON
                 corpus = kg_validate.corpus_index(m.parent / case["corpus"]) if "corpus" in case else None
                 got_codes = sorted(set(kg_validate.codes(text, must_v, corpus)))
                 got_warn = sorted(set(kg_validate.warnings(text, must_v, should_v)))

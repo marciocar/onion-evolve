@@ -90,7 +90,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.7.4",
+  "release": "kg-ssot-v4.8.0",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -260,7 +260,8 @@ grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `py
 
 Para quem grava grafo por programa (um servidor de escrita, um chat, um pipeline que gera o grafo de um caso), o
 `kg_store.py` é uma biblioteca, com um CLI por cima, que só escreve depois do veredito PASS do contrato. Há três
-armazéns com a mesma interface (`read`, `list`, `write`, `delete`, `history`):
+armazéns com a mesma interface (`read`, `list`, `write`, `delete`, `history`). O formato vem do nome: `.kg.yaml` é
+julgado no perfil YAML e `.kg.json` no perfil JSON do contrato ([capítulo 3](03-formato.md#o-mesmo-modelo-em-kgjson)):
 
 - `DiskStore`: só a cabeça em disco, sem histórico;
 - `GitStore`: um commit por gravação ou remoção. O git roda isolado na raiz do armazém e nunca sobe para um repo

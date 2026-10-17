@@ -1,4 +1,4 @@
-# KG-SSOT 4.7.4 (tag kg-ssot-v4.7.4): o texto completo para agentes de IA
+# KG-SSOT 4.8.0 (tag kg-ssot-v4.8.0): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,8 +14,8 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.7.4](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.4-6f42c1)](spec/release.json)
-[![Suíte: 225/225](https://img.shields.io/badge/su%C3%ADte-225%2F225-2ea44f)](spec/conformance/README.md)
+[![Contrato: v4 · release 4.8.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.8.0-6f42c1)](spec/release.json)
+[![Suíte: 261/261](https://img.shields.io/badge/su%C3%ADte-261%2F261-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
@@ -56,7 +56,7 @@ python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/require
 ```
 
 ```text
-latest: 225/225 (reprova)
+latest: 261/261 (reprova)
 optional: 10/24 (só reporta)
 PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
 REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
@@ -93,7 +93,7 @@ O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `med
 flowchart LR
   subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
     C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>225 casos em dados puros"]
+    S["Suíte de conformidade<br/>261 casos em dados puros"]
     R["Leitor de referência<br/>kg_validate.py"]
     S -- "todo leitor passa" --> R
     C --> R
@@ -127,9 +127,10 @@ flowchart LR
 | **Arestas entre grafos** | `external_edges` com a ponta externa conferida no corpus |
 | **Códigos estáveis** | Toda violação tem um código como `form.required.node.provenance`, e `--where` diz o nó |
 | **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
-| **Armazém com gate** | `kg_store.py` grava `.kg.yaml` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
+| **Dois formatos, um modelo** | O `.kg.yaml` para escrever e revisar no diff, e o `.kg.json` para o runtime (um app, um servidor), lido por um parser JSON no perfil JSON do contrato (RFC 8259, I-JSON, até 128 níveis, chave única). O gate e as `external_edges` seguem só com `.kg.yaml` |
+| **Armazém com gate** | `kg_store.py` grava `.kg.yaml` ou `.kg.json` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
 | **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
-| **Suíte em dados puros** | 225 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
+| **Suíte em dados puros** | 261 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
@@ -146,7 +147,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.7.4`. O leitor de referência passa em 225 de 225 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.8.0`. O leitor de referência passa em 261 de 261 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -210,7 +211,7 @@ A lista está em [`spec/release.json`](spec/release.json):
 - o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
   HTTP local;
 - o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
-- as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256 conferido por `--require-hashes`);
+- as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256, que o pip confere ao instalar; o `--require-hashes` faz a instalação falhar se um dia o arquivo perder os hashes);
 - este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
 - o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
   arquivos da release);
@@ -240,14 +241,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -455,6 +456,21 @@ testemunho em PROD, verificação antes do fato e decisão sem origem; a tabela 
 Se a dívida SHOULD subir (por desenho, quando o corpus tem o que os avisos novos acusam), o `--update` desse PR vai com
 `--accept-regression "<motivo>"`; se não subir, o `--update` grava a identidade nova sem motivo.
 
+Da `kg-ssot-v4.7.x` para a `kg-ssot-v4.8.0`, o sha256 dos schemas não muda, e nenhum veredito MUST de `.kg.yaml` muda.
+Entram três avisos SHOULD no `.kg.yaml`, os pontos do perfil JSON em rampa: `yaml.unsafe-integer` (inteiro fora de
+±(2^53−1)), `yaml.lone-surrogate` (surrogate solto) e `yaml.depth-over-128` (mais de 128 coleções aninhadas). Um
+grafo que tenha um desses ganha um código de dívida novo, e o `kg_gate.py` reprova até o `--update` com
+`--accept-regression "<motivo>"`, ou até o grafo ser corrigido. A 4.8.0 foi medida nos 454 `.kg.yaml` do core e
+nos deste repositório, e nenhum dispara os avisos novos.
+
+**O `.kg.json`.** A 4.8.0 lê o mesmo modelo de dados num arquivo `.kg.json`, por um parser JSON, no perfil JSON do
+contrato: RFC 8259 com um BOM inicial aceito, I-JSON (RFC 7493, sem surrogate solto e com inteiro dentro de
+±(2^53−1)), no máximo 128 coleções aninhadas e chave única. No `.kg.json`, esses pontos reprovam (MUST).
+`kg_validate.py`, `kg_conformance.py`, `kg_store.py` e `kg_mcp.py` leem os dois formatos pela extensão (sensível a
+maiúsculas: `.kg.json`). **O gate continua só com `.kg.yaml`**: um `.kg.json` commitado no repositório não é medido
+pelo `kg_gate.py`, e as `external_edges` só apontam para `.kg.yaml`. Quem guarda `.kg.json` no repo e quer o CI
+cobrando roda `kg_validate.py` neles num passo próprio.
+
 ## 5. Do v3 para o v4
 
 O v4 é uma versão maior: o que alertava no v3 passa a reprovar. Quem está numa tag `contract-v3.x` (anterior à
@@ -483,7 +499,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --source https://github.com/marciocar/kg-ssot`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -542,7 +558,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
 A ordem importa: os casos de corpus conferem a ponta externa contra os `.kg.yaml` rastreados quando a suíte mora num
-repo git, e com o vendor ainda fora do git um caso falha (`latest: 224/225`). Depois compare com os códigos que o seu
+repo git, e com o vendor ainda fora do git um caso falha (`latest: 260/261`). Depois compare com os códigos que o seu
 leitor emite. O formato dos casos e como rodar a suíte com um leitor em outra linguagem estão em
 `spec/conformance/README.md`.
 
@@ -555,7 +571,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.7.4** (tag `kg-ssot-v4.7.4`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.8.0** (tag `kg-ssot-v4.8.0`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 
@@ -854,6 +870,24 @@ Convenções: **obr.** = obrigatório; *data* = texto `AAAA-MM-DD` que existe no
   `off` são texto.
 - Chaves comparadas na forma JSON: `1` e `"1"` colidem (`parse.duplicate-key`).
 - `.nan` e `.inf` reprovam em qualquer posição, porque o JSON não os representa.
+- O perfil JSON vale também no `.kg.yaml`, como aviso: inteiro fora de ±(2^53−1) (`yaml.unsafe-integer`), surrogate
+  solto (`yaml.lone-surrogate`) e mais de 128 coleções aninhadas (`yaml.depth-over-128`).
+
+### O mesmo modelo em `.kg.json`
+
+O grafo pode vir em JSON, num arquivo `.kg.json` (a extensão é sensível a maiúsculas), com os mesmos campos e as
+mesmas regras. Ele é lido por um parser JSON, no perfil JSON do contrato, e cada ponto do perfil reprova:
+
+- sintaxe da RFC 8259: sem comentário, vírgula sobrando, aspas simples, `NaN` ou `Infinity`. O espaço em branco é só
+  espaço, tab, LF e CR, e um BOM inicial é aceito e descartado;
+- I-JSON (RFC 7493): sem surrogate solto, em chave ou valor, e todo número de valor inteiro dentro de ±(2^53−1),
+  escrito como inteiro ou como float (`9007199254740993` e `1e20` reprovam);
+- no máximo 128 coleções aninhadas, contando a raiz;
+- chave única em cada objeto, comparada depois dos escapes (`"label"` e `"\u006cabel"` colidem).
+
+A sintaxe inválida sai como `parse.yaml-error`, porque o vocabulário de códigos não tem um código próprio do JSON.
+Quando a sintaxe falha, ela decide antes da chave repetida. O gate (`kg_gate.py`) e as `external_edges` seguem só
+com `.kg.yaml`.
 
 ## Topo
 
@@ -1144,7 +1178,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.7.4",
+  "release": "kg-ssot-v4.8.0",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -1314,7 +1348,8 @@ grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `py
 
 Para quem grava grafo por programa (um servidor de escrita, um chat, um pipeline que gera o grafo de um caso), o
 `kg_store.py` é uma biblioteca, com um CLI por cima, que só escreve depois do veredito PASS do contrato. Há três
-armazéns com a mesma interface (`read`, `list`, `write`, `delete`, `history`):
+armazéns com a mesma interface (`read`, `list`, `write`, `delete`, `history`). O formato vem do nome: `.kg.yaml` é
+julgado no perfil YAML e `.kg.json` no perfil JSON do contrato ([capítulo 3](03-formato.md#o-mesmo-modelo-em-kgjson)):
 
 - `DiskStore`: só a cabeça em disco, sem histórico;
 - `GitStore`: um commit por gravação ou remoção. O git roda isolado na raiz do armazém e nunca sobe para um repo
@@ -1569,7 +1604,7 @@ Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsons
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -1600,6 +1635,9 @@ completo do GitHub Actions está na seção "O passo de CI" do [`ADOPTING.md`](.
 - Uma troca de contrato aparece no PR: a base guarda o nome e o sha256 dos schemas.
 
 Consertar um grafo não compensa quebrar outro: a comparação do MUST é por grafo.
+
+O gate mede só `.kg.yaml`. Um `.kg.json` no repositório fica fora dele, e quem quer o CI cobrando roda
+`kg_validate.py` nesses arquivos num passo próprio.
 
 ## Atualizar a tag
 
@@ -2024,6 +2062,9 @@ A lista completa, com a forma de cada código, está em
 | Código | Como resolver |
 |---|---|
 | `yaml.unquoted-date` | Ponha as datas entre aspas: `"2026-10-12"` |
+| `yaml.unsafe-integer` | Um número inteiro passa de ±(2^53−1), e um leitor JS perde o valor exato. Grave-o como texto, entre aspas. No `.kg.json`, reprova |
+| `yaml.lone-surrogate` | Há um surrogate solto (U+D800 a U+DFFF sem o par). Corrija o texto. No `.kg.json`, reprova |
+| `yaml.depth-over-128` | Mais de 128 coleções aninhadas. Achate a estrutura. No `.kg.json`, reprova |
 | `form.range.node.label` | Encurte o `label` para até 280 caracteres e mova o resto para `narrative` |
 | `form.pattern.node.provenance.method` | Use `<classe>: <detalhe>`, com a classe em `medição`, `leitura`, `juízes`, `derivado` ou `testemunho`. Reprova no v5 |
 | `form.required.node.verified_against` | Diga o que foi conferido no `verified_at` |
@@ -2094,7 +2135,7 @@ Python dele. Detalhes no [capítulo 6](06-adocao-e-ci.md#nota-de-ambiente).
 
 ========== spec/conformance/README.md ==========
 
-# Suíte de conformidade do `.kg.yaml`
+# Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 > Os casos medem o contrato v4: `spec/kg-contract-v4.schema.json` (MUST) e
 > `spec/kg-contract-v4.should.schema.json` (SHOULD).
@@ -2106,7 +2147,7 @@ harness de agente.
 
 ## Formato
 
-Um **grupo** é uma pasta com um `manifest.json` e um `.kg.yaml` real por caso. O arquivo é real, e não
+Um **grupo** é uma pasta com um `manifest.json` e um `.kg.yaml` (ou `.kg.json`) real por caso. O arquivo é real, e não
 texto embutido no JSON, para que qualquer CLI receba o caminho e leia como leria um grafo de verdade.
 
 ```json
@@ -2204,6 +2245,28 @@ A aresta externa conta como ligação: o nó ligado só por ela não é órfão.
 o leitor diz isso na saída. A referência é relativa e com `/`: segmentos começam por letra, dígito ou `_`, sem `.` ou
 `..`, sem `\` e sem `:`.
 
+**O `.kg.json`.** O mesmo modelo de dados pode vir em JSON, num arquivo `.kg.json`, lido por um parser JSON no
+**perfil JSON** do contrato (`latest/json/`). Nele, estes pontos são **MUST**:
+
+| Ponto | O que reprova | Código |
+|---|---|---|
+| Números pelo I-JSON (RFC 7493) | número de valor inteiro com módulo acima de 2^53−1, escrito como inteiro ou como float (`9007199254740992`, `1e20`); o que estoura o double (`1e400`, um inteiro de 401 dígitos) já é não finito | `form.type.<escopo>.<campo>`, o caminho do `.nan` |
+| Strings sem surrogate solto (I-JSON) | `\ud800` sem o par, em chave ou em valor; o par `\ud83d\ude00` é um caractere só | `parse.yaml-error` |
+| Profundidade | mais de 128 coleções aninhadas (a raiz conta 1) | `parse.yaml-error` |
+| Espaço em branco da RFC 8259 | só espaço, tab, LF e CR; um BOM inicial é aceito e descartado, e qualquer outro reprova (NBSP e `\x1c` não são espaço) | `parse.yaml-error` |
+| Sintaxe da RFC 8259 | comentário, vírgula sobrando, chave sem aspas, aspas simples, `NaN`, `Infinity` | `parse.yaml-error` |
+| Chave única (ADR 002) | a mesma chave duas vezes no objeto, comparada depois de resolvidos os escapes | `parse.duplicate-key` |
+
+O documento vazio, só com espaço da RFC ou `null` é `parse.empty-document`. A sintaxe JSON inválida usa
+`parse.yaml-error`: o vocabulário não tem um `parse.json-error`. No `.kg.yaml`, os três primeiros pontos são **SHOULD**,
+e o veredito MUST do YAML não muda (`latest/yaml/json-profile/`):
+
+| Código | Quando alerta |
+|---|---|
+| `yaml.unsafe-integer` | número de valor inteiro fora de ±(2^53−1) |
+| `yaml.lone-surrogate` | surrogate solto numa chave ou num texto |
+| `yaml.depth-over-128` | mais de 128 coleções aninhadas (o teto de parse do YAML segue em 1000) |
+
 O v4.2 acrescenta `provenance.locality`, opcional, com o enum `repo`, `web`, `host` ou `pessoa`. O valor fora do enum
 alerta como `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), e nenhum veredito muda.
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
@@ -2228,7 +2291,8 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 225 casos contra o contrato v4. Os grupos do
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 261 casos contra o contrato v4, 30 deles
+`.kg.json`. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
 viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de

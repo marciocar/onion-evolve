@@ -1,0 +1,54 @@
+{
+  "description": "Os números do .kg.json pelo I-JSON (RFC 7493), MUST: um valor inteiro com módulo acima de 2^53−1, escrito como inteiro ou como float, e o número que estoura o double reprovam como form.type, no caminho do .nan/.inf.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-infinity-1e400.kg.json",
+      "description": "1e400 estoura o double: não é finito, e reprova como tipo, igual ao .inf do YAML",
+      "valid": false,
+      "codes": [
+        "form.type.node.confidence"
+      ]
+    },
+    {
+      "file": "bad-integer-2-53.kg.json",
+      "description": "2^53, um além do maior inteiro seguro (I-JSON, RFC 7493): reprova como tipo, também em campo x_",
+      "valid": false,
+      "codes": [
+        "form.type.meta.x_n"
+      ]
+    },
+    {
+      "file": "valid-integer-max-safe.kg.json",
+      "description": "-(2^53−1), o menor inteiro seguro: passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-integer-401-digits.kg.json",
+      "description": "um inteiro de 401 dígitos estoura o double: o veredito é o do 1e400, qualquer que seja a forma escrita",
+      "valid": false,
+      "codes": [
+        "form.type.meta.x_n"
+      ]
+    },
+    {
+      "file": "bad-float-1e20.kg.json",
+      "description": "1e20 é um número de valor inteiro acima de 2^53−1, escrito como float: também viola o perfil",
+      "valid": false,
+      "codes": [
+        "form.type.meta.x_n"
+      ]
+    },
+    {
+      "file": "bad-impact-unsafe-integer.kg.json",
+      "description": "num campo do schema, o inteiro inseguro é tipo ao lado do limite que o schema acusa",
+      "valid": false,
+      "codes": [
+        "form.range.node.impact",
+        "form.type.node.impact"
+      ]
+    }
+  ]
+}

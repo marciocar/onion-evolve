@@ -7,8 +7,10 @@ stream). É um ADAPTADOR: o produto não depende dele, e ele não depende de um
 cliente específico.
 
 Ferramentas:
-  kg_validate     julga um texto .kg.yaml e devolve o kg-ssot.verdict/1 (com o armazém como corpus, se há armazém)
-  kg_write        grava pelo armazém: só com PASS do contrato (kg_store.write); devolve o resultado com o veredito
+  kg_validate     julga um texto .kg.yaml (ou .kg.json, com format json) e devolve o kg-ssot.verdict/1 (com o armazém
+                  como corpus, se há armazém)
+  kg_write        grava pelo armazém: só com PASS do contrato (kg_store.write), no formato que o nome diz; devolve o
+                  resultado com o veredito
   kg_delete       remove pelo armazém, se nenhum grafo que aponta para o nome reprovar sem ele
   kg_get          lê um grafo (ou uma versão anterior, com ref)
   kg_list         lista os grafos do armazém
@@ -42,24 +44,29 @@ SERVER_NAME = "kg-ssot"
 PROTOCOLS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")  # o primeiro é o preferido
 MAX_BYTES = 2_000_000
 
-NAME_PROP = {"type": "string", "description": "caminho relativo no armazém, terminado em .kg.yaml (ex.: grafos/caso.kg.yaml)"}
-TEXT_PROP = {"type": "string", "description": "o documento .kg.yaml inteiro, em YAML"}
+NAME_PROP = {"type": "string", "description": "caminho relativo no armazém, terminado em .kg.yaml ou .kg.json (ex.: "
+                                             "grafos/caso.kg.yaml); a extensão diz o formato do texto"}
+TEXT_PROP = {"type": "string", "description": "o documento inteiro: YAML num .kg.yaml, JSON num .kg.json"}
+FORMAT_PROP = {"enum": ["yaml", "json"], "description": "o formato do texto: yaml (.kg.yaml, o default) ou json (.kg.json, "
+                                                        "no perfil JSON do contrato); com name, o default é o da extensão"}
 TOOLS = {
     "kg_validate": {
-        "description": "Julga um grafo .kg.yaml pelo contrato KG-SSOT vigente sem gravar. Devolve verdict PASS ou FAIL e, "
-                       "por ocorrência, code (estável), place, path, line, message e hint (a correção). Corrija pelos "
-                       "hints e julgue de novo antes de gravar.",
+        "description": "Julga um grafo .kg.yaml (ou .kg.json, com format json) pelo contrato KG-SSOT vigente sem "
+                       "gravar. Devolve verdict PASS ou FAIL e, por ocorrência, code (estável), place, path, line, "
+                       "message e hint (a correção). Corrija pelos hints e julgue de novo antes de gravar.",
         "inputSchema": {"type": "object", "additionalProperties": False, "required": ["text"],
                         "properties": {"text": TEXT_PROP,
                                        "name": dict(NAME_PROP, description="o nome que o grafo teria no armazém "
                                                     "(confere a ponta externa como se estivesse lá)"),
+                                       "format": FORMAT_PROP,
                                        "limit": {"type": "integer", "minimum": 1, "maximum": 500,
                                                  "description": "ocorrências devolvidas (default 50)"}}},
         "needs_store": False, "writes": False},
     "kg_write": {
         "description": "Grava um grafo no armazém, só se o contrato aprovar o candidato e os grafos que apontam para "
-                       "ele. written=false traz reason (gate, conflict, not_judged) e o veredito. Use expected_sha256 "
-                       "(o sha256 do que você leu, ou 'new' para um nome novo) para não sobrescrever a mudança de outro.",
+                       "ele. O formato vem do nome: .kg.yaml é YAML e .kg.json é JSON. written=false traz reason "
+                       "(gate, conflict, not_judged) e o veredito. Use expected_sha256 (o sha256 do que você leu, ou "
+                       "'new' para um nome novo) para não sobrescrever a mudança de outro.",
         "inputSchema": {"type": "object", "additionalProperties": False, "required": ["name", "text"],
                         "properties": {"name": NAME_PROP, "text": TEXT_PROP,
                                        "message": {"type": "string", "maxLength": 500},
@@ -119,9 +126,16 @@ def schema_help():
     except OSError:
         example = None
     return {"contract": kg_validate.contract_info(kg_validate.CONTRACT_MUST, kg_validate.CONTRACT_SHOULD),
-            "how_to_read": "must reprova (verdict FAIL); should só avisa. Os dois são JSON Schema 2020-12 sobre o YAML "
-                           "lido como JSON (datas entre aspas viram texto). O exemplo passa nos dois.",
-            "integrity": ["um único documento YAML, com a raiz em mapa",
+            "how_to_read": "must reprova (verdict FAIL); should só avisa. Os dois são JSON Schema 2020-12 sobre o grafo "
+                           "lido como JSON (no YAML, datas entre aspas viram texto). O exemplo passa nos dois.",
+            "formats": {"yaml": "o .kg.yaml: YAML 1.2 core restrito (chave única, sem .nan nem .inf, datas entre aspas); "
+                                "inteiro fora de ±(2^53−1), surrogate solto e mais de 128 níveis só avisam",
+                        "json": "o .kg.json: o mesmo modelo em JSON, no perfil do contrato (RFC 8259 e I-JSON). Reprova "
+                                "inteiro fora de ±(2^53−1) (form.type), surrogate solto, mais de 128 níveis, NaN, "
+                                "comentário, vírgula sobrando, espaço fora da RFC e BOM que não é o inicial "
+                                "(parse.yaml-error), e chave repetida (parse.duplicate-key). kg_validate pede "
+                                "format: json; kg_write lê pela extensão do nome."},
+            "integrity": ["um único documento (YAML, ou um objeto JSON no .kg.json), com a raiz em mapa",
                           "ids de nó únicos; toda aresta liga dois ids que existem; nenhum nó fica sem aresta",
                           "a ponta externa (outro.kg.yaml#ID) tem de existir no armazém",
                           "datas entre aspas (\"2026-10-13\"), nunca soltas"],
@@ -242,6 +256,15 @@ class Server:
             raise ToolError(f"o grafo passa de {self.max_bytes} bytes")
         return text
 
+    @staticmethod
+    def _as_format(text, gname, fmt):
+        """O texto como o leitor o lê: format json é o .kg.json (JsonText), yaml é o .kg.yaml. Sem format, o default é
+        o da extensão do nome, e sem nome é yaml; um format que contradiz a extensão é erro de uso."""
+        by_name = "json" if gname.endswith(".kg.json") else "yaml" if gname != "-" else None
+        if fmt is not None and by_name is not None and fmt != by_name:
+            raise ToolError(f"format {fmt} contradiz o nome {gname}")
+        return kg_validate.JsonText(text) if (fmt or by_name or "yaml") == "json" else text
+
     def _run(self, name, args):
         if name == "kg_schema_help":
             return schema_help(), False
@@ -250,10 +273,11 @@ class Server:
             gname = args.get("name", "-")
             if gname != "-":
                 kg_store.check_name(gname)
+            text = self._as_format(text, gname, args.get("format"))
             corpus = None
             if self.store is not None:
                 items = self.store._texts(skip=gname)
-                corpus = kg_validate.index_texts(items + ([(gname, text)] if gname != "-" else []))
+                corpus = kg_store.DiskStore.corpus_of(items + ([(gname, text)] if gname != "-" else []))
             return kg_validate.judge([(gname, text)], corpus=corpus, limit=args.get("limit", 50)), False
         if name == "kg_write":
             r = self.store.write(args["name"], self._text(args), args.get("message"), self.author,

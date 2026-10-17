@@ -1,0 +1,185 @@
+{
+  "description": "O .kg.json no perfil JSON do contrato (MUST): a sintaxe da RFC 8259, o espaço em branco dela, um BOM só no início, nenhum surrogate solto (I-JSON), até 128 coleções aninhadas e chave única. O código de parse é o mesmo do YAML (o vocabulário não tem parse.json-error).",
+  "layer": "parse",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-minimal.kg.json",
+      "description": "o grafo mínimo em JSON, indentado com espaço",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-tab-indent.kg.json",
+      "description": "indentado com tab, o que JSON.stringify(x, null, '\\t') grava: tab é espaço em branco da RFC 8259 (o YAML o recusaria)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-long-key.kg.json",
+      "description": "chave x_ com mais de 1024 caracteres: o JSON não tem o limite da chave implícita do YAML",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-bom.kg.json",
+      "description": "um BOM inicial é aceito e descartado",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-double-bom.kg.json",
+      "description": "dois BOM: só o primeiro é descartado, e o segundo não é espaço em branco da RFC",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "valid-rfc-whitespace.kg.json",
+      "description": "espaço, tab, CR e LF antes, entre e depois dos valores: os quatro da RFC 8259",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-only-rfc-whitespace.kg.json",
+      "description": "só espaço em branco da RFC: o documento vazio",
+      "valid": false,
+      "codes": [
+        "parse.empty-document"
+      ]
+    },
+    {
+      "file": "bad-empty.kg.json",
+      "description": "arquivo vazio",
+      "valid": false,
+      "codes": [
+        "parse.empty-document"
+      ]
+    },
+    {
+      "file": "bad-only-x1c.kg.json",
+      "description": "só o separador \\x1c, que o str.strip() do Python tiraria: não é espaço da RFC, então é JSON inválido e não vazio",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-nbsp-outside.kg.json",
+      "description": "NBSP antes do objeto: o trim() do JS o tiraria, mas não é espaço da RFC",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-nan.kg.json",
+      "description": "o literal NaN não é JSON (RFC 8259, seção 6)",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-trailing-comma.kg.json",
+      "description": "vírgula sobrando depois do último campo do meta",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-comment.kg.json",
+      "description": "comentário não é JSON",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-unquoted-key.kg.json",
+      "description": "chave sem aspas não é JSON",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-single-quotes.kg.json",
+      "description": "aspas simples não são JSON",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-lone-surrogate-value.kg.json",
+      "description": "surrogate solto (\\ud800 sem o par) num valor: o I-JSON o proíbe",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-lone-surrogate-key.kg.json",
+      "description": "surrogate solto (\\udc00) numa chave",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "valid-surrogate-pair.kg.json",
+      "description": "o par \\ud83d\\ude00 é um caractere só (U+1F600): não é surrogate solto",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-depth-128.kg.json",
+      "description": "128 coleções aninhadas (a raiz, o meta e 126 listas): o limite do perfil",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-depth-129.kg.json",
+      "description": "129 coleções aninhadas: uma além do limite do perfil",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-duplicate-key.kg.json",
+      "description": "chave repetida no mesmo objeto (regra do contrato, ADR 002)",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "bad-duplicate-key-escaped.kg.json",
+      "description": "a mesma chave com escape: comparada depois de resolvido o \\u005f, \"x\\u005fn\" é \"x_n\"",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "bad-duplicate-then-syntax.kg.json",
+      "description": "chave repetida antes de uma vírgula sobrando: a sintaxe decide antes da chave repetida, nos dois leitores",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-duplicate-in-depth-129.kg.json",
+      "description": "chave repetida num documento de 129 coleções aninhadas: a profundidade decide antes da chave repetida, nos dois leitores",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    }
+  ]
+}

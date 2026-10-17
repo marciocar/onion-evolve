@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""O armazém de .kg.yaml que só grava o que o contrato aprova.
+"""O armazém de .kg.yaml e .kg.json que só grava o que o contrato aprova.
 
 Biblioteca primeiro, CLI por cima. Três armazéns com a mesma interface (read, list, write, delete, history):
   DiskStore(root)       a cabeça em disco, sem histórico;
@@ -12,6 +12,9 @@ O gate (o que nenhum dos três pula):
     porque trocar um grafo pode deixar a aresta externa de outro sem ponta;
   - delete() julga os grafos que apontam para o nome removido, contra o armazém sem ele;
   - só grava com PASS em todos. Nada reprovado é escrito;
+  - o formato vem do nome: o .kg.json é julgado pelo perfil JSON do contrato (kg_validate.as_source), e o .kg.yaml
+    pelo perfil YAML. O corpus da ponta externa segue só com os .kg.yaml, como o do gate (corpus_index), porque a
+    referência externa (<caminho>.kg.yaml#<id>) só aponta para .kg.yaml;
   - o corpus é o mesmo que o gate do repo (kg_validate.corpus_index) veria: no GitStore, só o RASTREADO (list() e o
     julgamento ignoram o .kg.yaml não rastreado); disco e versionado recusam uma raiz dentro de worktree git, onde os
     dois corpus divergiriam;
@@ -24,7 +27,7 @@ senão "gate" (o contrato reprovou: verdict traz o porquê), "conflict" (expecte
 nunca vira PASS nem "gate"). expected_sha256 é a trava otimista: o sha256 da cabeça que quem grava leu, ou NEW para
 exigir que o nome ainda não exista. Gravar o mesmo texto da cabeça é written com unchanged=true e ref null.
 
-Segurança do caminho: o nome é relativo, termina em .kg.yaml, cada segmento começa por letra, dígito ou _ (sem `..`
+Segurança do caminho: o nome é relativo, termina em .kg.yaml ou .kg.json, cada segmento começa por letra, dígito ou _ (sem `..`
 nem oculto). Raiz, pastas e arquivo não podem ser symlink: tudo se abre por dir_fd com O_NOFOLLOW (POSIX).
 O que fica com quem adota, de propósito: autenticação, identidade, área por usuário (um root por usuário), tamanho
 máximo, número de grafos, timeout e concorrência entre processos sem flock.
@@ -58,7 +61,7 @@ try:
 except ImportError:  # sem flock (Windows): a trava entre processos fica com quem adota, como a doc diz
     fcntl = None
 
-NAME = re.compile(r"^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml$")
+NAME = re.compile(r"^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)$")
 NEW = "new"
 META = ".kg-store"
 LOCK = ".kg-store.lock"
@@ -83,7 +86,7 @@ def sha256(text):
 
 def check_name(name):
     if not isinstance(name, str) or not NAME.fullmatch(name):
-        raise StoreError(f"nome inválido: {name!r} (relativo, termina em .kg.yaml, sem '..' nem segmento oculto)")
+        raise StoreError(f"nome inválido: {name!r} (relativo, termina em .kg.yaml ou .kg.json, sem '..' nem segmento oculto)")
     if any(len(seg.encode("utf-8")) > SEGMENT_MAX for seg in name.split("/")):
         raise StoreError(f"nome inválido: segmento com mais de {SEGMENT_MAX} bytes")
     return name
@@ -266,7 +269,7 @@ class DiskStore:
 
     # --- leitura -------------------------------------------------------------------------------------------
     def list(self):
-        """Os nomes .kg.yaml do armazém, em ordem. Pasta ou arquivo oculto, symlink e nome fora da forma ficam fora."""
+        """Os nomes .kg.yaml e .kg.json do armazém, em ordem. Pasta ou arquivo oculto, symlink e nome fora da forma ficam fora."""
         return self._disk_names()
 
     def _disk_names(self):
@@ -302,6 +305,7 @@ class DiskStore:
 
     # --- o gate --------------------------------------------------------------------------------------------
     def _texts(self, skip=None):
+        """[(nome, texto)] do armazém, cada texto como o leitor deve lê-lo (as_source: o .kg.json é JsonText)."""
         items = []
         for n in self.list():
             if n == skip:
@@ -310,15 +314,21 @@ class DiskStore:
                 t = self._read_head(n)
             except StoreError:  # ilegível (não UTF-8) entra sem ids, como no corpus_index do gate
                 t = None
-            items.append((n, t if t is not None else ""))
+            items.append((n, kg_validate.as_source(n, t if t is not None else "")))
         return items
+
+    @staticmethod
+    def corpus_of(items):
+        """O corpus da ponta externa a partir de [(nome, texto)]: só os .kg.yaml, como o corpus_index do gate."""
+        return kg_validate.index_texts([(n, t) for n, t in items if n.endswith(".kg.yaml")])
 
     def _judge(self, name, text):
         """(doc, erro): julga o candidato (text None = remoção) e os grafos que apontam para name, contra o armazém
         com o candidato no lugar. doc None com erro = não julgado."""
         try:
             others = self._texts(skip=name)
-            corpus = kg_validate.index_texts(others + ([(name, text)] if text is not None else []))
+            text = kg_validate.as_source(name, text) if text is not None else None
+            corpus = self.corpus_of(others + ([(name, text)] if text is not None else []))
             sources = [(name, text)] if text is not None else []
             sources += [(n, t) for n, t in others if name in kg_validate.external_targets(t)]
             doc = kg_validate.judge(sources, self.schema, corpus=corpus)
@@ -466,7 +476,7 @@ class GitStore(DiskStore):
 
     def list(self):
         """Os nomes RASTREADOS (o mesmo corpus do gate do repo, que lê git ls-files), regulares e na forma do nome."""
-        out = self._git("ls-files", "-z", "--", "*.kg.yaml", check=False)
+        out = self._git("ls-files", "-z", "--", "*.kg.yaml", "*.kg.json", check=False)
         if out.returncode != 0:
             return []
         disk = set(self._disk_names())
