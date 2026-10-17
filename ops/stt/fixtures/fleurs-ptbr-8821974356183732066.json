@@ -1,0 +1,11 @@
+{
+  "file": "fleurs-ptbr-8821974356183732066.flac",
+  "sha256": "7b5d5b845ec3cc40c19e0a4267471c9f5b94371c853c841e2bbf964528718922",
+  "reference": "Logo após o início das hostilidades, a Grã-Bretanha começou um bloqueio naval à Alemanha.",
+  "reference_normalized": "logo após o início das hostilidades a grã-bretanha começou um bloqueio naval à alemanha",
+  "duration_s": 7.2,
+  "source": "FLEURS (google/fleurs), pt_br, split test, sentence_id 1907, arquivo 8821974356183732066.wav",
+  "license": "CC-BY-4.0 (Conneau et al., 2022, FLEURS); recodificado para FLAC 16 kHz mono 16 bits, sem outra alteração",
+  "provenance": "cópia local da curadoria (SAC-157, stt-bench/data/wav), lida em 2026-10-17; não baixado por esta sessão",
+  "min_word_recall": 0.8
+}
