@@ -15,28 +15,41 @@
 #
 # ── POR QUE UserPromptSubmit, AVISO e não veto ─────────────────────────────────────────────────────
 # Sessões aqui vivem dias (o session-version-drift mediu 6): só um hook ao longo da vida da sessão vê a
-# defasagem nascer. A rede é paga no máximo uma vez por TTL (cache do censo, 1 h); nos outros prompts é
-# leitura de arquivo. NUNCA bloqueia (exit 0 sempre): toda superfície depende de registro de terceiro e de
-# rede, e um veto que dispara quando o npm publica é falso positivo por construção (cláusula 4 da doutrina
+# defasagem nascer. Os registros são lidos no máximo 1× por hora, o origin e o SDK 1× a cada 5 min, e
+# fonte que falhou fica 10 min sem ser tentada (o prazo de cada perna é 9 s). NUNCA bloqueia (exit 0
+# sempre): toda superfície depende de registro de terceiro e de rede, e um veto que dispara quando o npm publica é falso positivo por construção (cláusula 4 da doutrina
 # de guardas). Subir é ato do fluxo, com o maestro sabendo.
 #
 # ── DISCIPLINA ─────────────────────────────────────────────────────────────────────────────────────
-# Avisa UMA vez por (sessão, assinatura do que não está em dia): se algo novo ficar defasado, ou o publicado
-# andar, avisa de novo. Fonte inalcançável aparece como NÃO MEDIDO, nunca como "em dia".
+# Avisa UMA vez por (sessão, superfície, assinatura): se algo novo ficar defasado, o publicado andar, ou uma
+# superfície que tinha voltado a em dia cair de novo, avisa de novo. Fonte inalcançável aparece como NÃO
+# MEDIDO, nunca como "em dia". A rede é paga no máximo uma vez por TTL de cada fonte (o censo guarda só as
+# respostas remotas; o lado local é relido a cada prompt, então a cura aparece na hora).
 set -uo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 census="${ONION_CURRENCY_CENSUS:-${here}/../validation/currency-census.sh}"
 [ -f "${census}" ] || exit 0
 repo="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-notice="$(bash "${census}" "${repo}" --notice 2>/dev/null)" || exit 0
-[ -n "${notice}" ] || exit 0
-# assinatura: as linhas do aviso sem a idade da medição (que muda a cada minuto)
-sig="$(printf '%s\n' "${notice}" | sed '1s/Medido há [0-9]* min//' | cksum | awk '{print $1}')"
-state_dir="${ONION_CURRENCY_STATE_DIR:-${XDG_RUNTIME_DIR:-/tmp}/onion-currency-notice}"
-mkdir -p "${state_dir}" 2>/dev/null || true
-marker="${state_dir}/${CLAUDE_CODE_SESSION_ID:-nosession}-${sig}"
-[ -e "${marker}" ] && exit 0
-: > "${marker}" 2>/dev/null || true
-printf '%s\n' "${notice}"
+tsv="$(bash "${census}" "${repo}" --tsv </dev/null 2>/dev/null)" || exit 0
+state_dir="${ONION_CURRENCY_STATE_DIR:-${XDG_RUNTIME_DIR:-${HOME:-/tmp}/.cache}/onion-currency-notice}"
+mkdir -p -m 700 "${state_dir}" 2>/dev/null || true
+sess="${CLAUDE_CODE_SESSION_ID:-nosession}"; sess="${sess//[^A-Za-z0-9._-]/_}"
+state="${state_dir}/${sess}.tsv"; [ -f "${state}" ] || : > "${state}" 2>/dev/null
+# POR SUPERFÍCIE (não pelo aviso inteiro): cada superfície que não está em dia é avisada 1× por sessão e
+# por assinatura; a que VOLTA a em dia sai do estado, e se ela cair de novo o aviso volta. Na BASE a
+# assinatura é só o estado (a branch padrão anda a cada merge: re-avisar a cada sha seria ruído).
+out="$(awk -F'\t' -v OFS='\t' -v stf="${state}" '
+  BEGIN { while ((getline l < stf) > 0) { split(l, a, "\t"); seen[a[1]] = a[2] } }
+  NF >= 4 {
+    s = $1; ok = ($4 == "em-dia" || $4 == "pinada")
+    if (ok) { delete seen[s]; next }
+    sig = (s ~ /^base/) ? $4 : $4 "|" $2 "|" $3
+    if (seen[s] != sig) { print "N", $0; seen[s] = sig }
+  }
+  END { for (k in seen) print "S", k, seen[k] }' <<<"${tsv}")"
+printf '%s\n' "${out}" | awk -F'\t' -v OFS='\t' '$1=="S"{print $2,$3}' > "${state}.$$" 2>/dev/null && mv -f "${state}.$$" "${state}" 2>/dev/null
+new_rows="$(printf '%s\n' "${out}" | awk -F'\t' -v OFS='\t' '$1=="N"{ $1=""; sub(/^\t/, ""); print }')"
+[ -n "${new_rows}" ] || exit 0
+printf '%s\n' "${new_rows}" | bash "${census}" --render
 echo "  (Repasse ao maestro com a fonte: este aviso é do hook session-currency-check.sh, medido pelo currency-census.sh.)"
 exit 0

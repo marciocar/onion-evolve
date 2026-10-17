@@ -67,9 +67,9 @@ nodes:
     confidence: 0.85
     status: done
     verified_at: '2026-10-16'
-    verified_against: "guard-census 2026-10-16: nenhuma guarda da classe (busca 'version drift stale outdated'); molde = session-version-drift.sh (UserPromptSubmit, aviso 1× por sessão e estado); família currency_census 23/23 com LC_ALL=C e 11 mutantes"
+    verified_against: "guard-census 2026-10-16: nenhuma guarda da classe (busca 'version drift stale outdated'); molde = session-version-drift.sh (UserPromptSubmit, aviso 1× por sessão e estado); família currency_census 36/36 com LC_ALL=C; 22 mutantes, 21 mordem e 1 (o .. no caminho do SDK) é redundante por medição, porque a conferência do caminho real o recusa"
     trace: '.claude/hooks/session-currency-check.sh'
-    label: 'O SUBSTRATO: hook UserPromptSubmit que AVISA (molde session-version-drift), sobre um medidor com cache de 1 h. Sem veto exit 2: toda superfície depende de registro de terceiro e de rede, e vetar quando o npm publica é falso positivo por construção.'
+    label: 'O SUBSTRATO: hook UserPromptSubmit que AVISA (molde session-version-drift), sobre um medidor que guarda só respostas remotas. Sem veto exit 2: toda superfície depende de registro de terceiro e de rede, e vetar quando o npm publica é falso positivo por construção.'
     narrative: 'O SUBSTRATO: hook UserPromptSubmit que AVISA, copiado do session-version-drift (sessões vivem dias; só um hook ao longo da sessão vê a defasagem nascer), sobre um medidor separado com cache de 1 h. Sem veto exit 2: toda superfície depende de registro de terceiro e de rede, e vetar no minuto em que o npm publica é falso positivo por construção (cláusula 4 da doutrina de guardas). Não duplica o drift processo × disco nem o censo do cc-update: lê os MESMOS alvos de SDK dele, no mesmo formato.'
     provenance:
       source: ".claude/validation/guard-census.sh"
@@ -142,7 +142,26 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
+  - id: E_ELENXO_1A_PASSADA_CACHE_E_PRAZO
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-16'
+    verified_against: "refutador opus, 1a passada sobre 9b8db6bf: 7 reprovações com demonstração em sandbox (cache envenenável e injetável, cura escondida 1 h, ferramenta ausente lida como rede, perna morta calada, prazo de 15 s estourável, sudo seguindo symlink, assinatura que re-avisava por sha ou emudecia no vai-e-volta) e 3 mutantes sobreviventes; todas curadas e cobertas por caso e mutante na família currency_census"
+    trace: '.claude/validation/currency-census.sh'
+    label: 'O ELENXO REESCREVEU O CACHE: guardar a LINHA pronta deixava forjar o aviso e escondia a cura por 1 h. A cura guarda só respostas remotas na forma de versão, relê o local a cada prompt, põe prazo por perna e declara a perna morta; aviso por superfície.'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_currency_census_selftests, casos (i2) (j)-(j5) (k5) (l) (m) (n) (o)"
+      method: "medição: refutador em sandbox e bancada com mutantes, 2026-10-16"
+      locality: "repo"
+
 edges:
+  - from: E_ELENXO_1A_PASSADA_CACHE_E_PRAZO
+    to: D_SUBSTRATO_HOOK_DE_AVISO
+    edge_type: SUPPORTS
   - from: E_DEFEITO_SDK_DEFASADO_SEM_AVISO
     to: D_SUBSTRATO_HOOK_DE_AVISO
     edge_type: SUPPORTS

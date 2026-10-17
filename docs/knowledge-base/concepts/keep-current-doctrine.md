@@ -64,8 +64,8 @@ isso ser lembrado/cobrado"*. Por isso esta página é a fonte citável, e não a
 
 | Peça | O que faz | Quando dispara |
 |---|---|---|
-| `.claude/validation/currency-census.sh` | mede cada superfície contra o publicado e devolve `em-dia` · `defasada` (com a ação de subida) · `nao-medida` · `ausente` (com o pedido de autorização) | sob demanda (`--table` para humano) e pelo hook |
-| `.claude/hooks/session-currency-check.sh` | injeta o aviso na sessão quando algo não está em dia | todo prompt (`UserPromptSubmit`); a rede é paga no máximo uma vez por hora (cache do censo); cada aviso sai 1× por sessão e re-sai quando o estado muda |
+| `.claude/validation/currency-census.sh` | mede cada superfície contra o publicado e devolve `em-dia` · `defasada` (com a ação de subida) · `pinada` (atrás por pino de contrato: a subida é do produto, não avisa) · `nao-medida` (fonte inalcançável, perna morta ou estourada, leitura suspeita) · `ausente` (com o pedido de autorização) | sob demanda (`--table` para humano) e pelo hook |
+| `.claude/hooks/session-currency-check.sh` | injeta o aviso na sessão quando algo não está em dia | todo prompt (`UserPromptSubmit`). Só as respostas REMOTAS ficam em cache (registros 1 h; origin e SDK 5 min; fonte que falhou, 10 min), o lado local é relido a cada prompt, e cada perna tem prazo de 9 s. Cada superfície avisa 1× por sessão e re-avisa quando o publicado anda ou quando ela volta a cair depois de ter ficado em dia |
 | `.claude/hooks/session-version-drift.sh` (pré-existente) | o processo da sessão roda um CLI que o disco já trocou | todo prompt |
 
 **As superfícies medidas hoje:** o CLI do Claude Code em disco × o canal no npm; o Agent SDK de quem
@@ -93,6 +93,14 @@ origin antes de enviar.
   transitivas ficam fora; ampliar as superfícies é editar o censo, com caso de bancada.
 - **A base medida é a do checkout da sessão principal**, não a de uma worktree de agente (o subagente
   roda o censo no próprio diretório).
+- **O canal do CLI é lido do npm**, não do manifesto do instalador nativo (alinhados em 2026-10-16): se o
+  npm publicar antes, `claude update` ainda não sobe e o aviso persiste até o nativo chegar. Managed
+  settings não são lidos para o canal.
+- **Em PR empilhado** a ação "rebase sobre a branch padrão" é errada: a base certa é a branch-mãe.
+- **Versão com sufixo** (`0.3.302-beta.1`) é comparada pelo número (`0.3.302`).
+- **O hook viaja** (o registro dele entra no adotante pela fusão de hooks): lá ele lê o npm, o PyPI, o
+  remoto do kg-ssot e o origin, no máximo pelas TTLs acima. A perna do SDK só existe onde há alvos
+  declarados (no core).
 - **Não sobe nada sozinho.** Instalar, subir e re-implantar são atos com autorização; o gatilho cobra,
   não executa.
 
