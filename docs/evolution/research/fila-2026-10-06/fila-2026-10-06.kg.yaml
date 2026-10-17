@@ -10,6 +10,7 @@ meta:
   baseline: "2026-10-06"
   review_after: "2026-11-05"   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
+  #   30 em 2026-10-17, NO TETO: colhido Q_ROTULO_SEPARADO_DA_NARRATIVA (done, sem referência externa); entrou E_HOOK_PR_SEM_PASSADA_CURADO (SUPERSEDES o falso positivo, curado no #948).
   #   30 em 2026-10-08, NO TETO (+par do Brain MCP; os nós do contrato vivem em contrato-kg-absorcao-2026-10; +E_PR_FINALIZE_ATRITO_MEDIDO, +programa do SDAAL do task manager, +conflito de projeção gerada): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
   #   história fica no git e nos resíduos); entraram E_/Q_PRECOMMIT_SELECAO. Teto segue 30.
 nodes:
@@ -34,7 +35,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 2
     confidence: 0.9
     verified_at: "2026-10-06"
@@ -45,6 +46,22 @@ nodes:
       source: ".claude/hooks/bash-empty-result-guard.sh"
       locator: "aviso PR-SEM-PASSADA-ADVERSARIAL nos PRs #932-#939, todos com resíduo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
+  - id: E_HOOK_PR_SEM_PASSADA_CURADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-17"
+    verified_against: "PR #948 (36351d9c): o aviso confere o resíduo commitado na branch do PR (--head, ou a do último cd); casos (s)(t)(u) da família empty_result_guard com mutante; ao vivo, os PRs #949, #1186 e #1187 abriram sem o aviso"
+    trace: ".claude/hooks/bash-empty-result-guard.sh"
+    label: "o aviso PR-SEM-PASSADA-ADVERSARIAL confere o resíduo na branch do PR e o papel do repo, e não dispara mais em PR de worktree com resíduo"
+    provenance:
+      source: ".claude/hooks/bash-empty-result-guard.sh"
+      locator: "PR #948; casos (s)(t)(u) de run_empty_result_guard_selftests"
+      method: "medição: bancada com mutante e uso ao vivo em três PRs"
       locality: "repo"
   - id: E_MAPA_SEM_MERGE_ONION_HOOKS
     node_type: evidence
@@ -146,12 +163,18 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: open
+    status: confirmed
     impact: 2
-    confidence: 0.5
-    verified_against: "adoção do onion-kg-ssot (hipótese do agente, não verificada)"
+    confidence: 0.9
+    verified_at: "2026-10-17"
+    verified_against: "medido em 2026-10-17: o manifesto de papel adopted (resolve-manifest.sh + git archive HEAD) entrega .claude/skills/onion-publish; o _role_cut do vendor-manifest.sh só a corta em standalone|plugins"
     trace: ".claude/utils/adopt/vendor-manifest.sh"
-    label: "a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese)"
+    label: "a skill onion-publish, que é só do core, viaja para adotante adopted e hub: o corte por papel só a tira em standalone e plugins"
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "_role_cut (case standalone|plugins); resolve-manifest.sh <core> adopted + git archive HEAD lista .claude/skills/onion-publish"
+      method: "medição: manifesto de papel adopted extraído por git archive em 2026-10-17"
+      locality: "repo"
   # ── a fila: compromissos abertos, um por item aprovado ───────────────────────────────────────
   - id: Q_PR_FINALIZE_MELHORIAS
     node_type: question
@@ -160,16 +183,18 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
+    verified_at: "2026-10-17"
     verified_against: "ops/pr-finalize.sh; cura aprovada pelo maestro 2026-10-07 (4 achados de E_PR_FINALIZE_ATRITO_MEDIDO). EXECUÇÃO 2026-10-08 (SAC-66, branch fix/pr-finalize-pipeline): os 4 atritos curados, com 15 casos novos na família pre_push e 5 mutantes que reprovam (sem restauro do resíduo: 3 casos; hook sempre: 1; hook nunca: 4; sem o resumo final: 1; --check caindo no modo real: 2). A fila está no teto de 30, por isso a evidência da execução mora aqui e não num nó novo"
-    label: "pr-finalize: os 4 atritos de E_PR_FINALIZE_ATRITO_MEDIDO estão curados (carimbo transacional, commit só de projeção sem o hook, violação nomeada no fim, --check sem escrita); resta registrar a etapa e o rc da falha, catracas estáticas no checkpoint e o rebase com índice sujo"
+    label: "pr-finalize: os 4 atritos de E_PR_FINALIZE_ATRITO_MEDIDO e a catraca estática no checkpoint estão curados (pré-voo no ambiente do runner, PR #946); resta registrar a etapa e o rc da falha e aceitar o rebase com índice sujo"
   - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.8
-    verified_against: ".claude/validation/lint-selftest.sh"
+    verified_at: "2026-10-17"
+    verified_against: "medido em 2026-10-17: lint-selftest.sh --map faz as famílias hooks_diff e merge_hooks_prune reivindicarem .claude/utils/adopt/merge-onion-hooks.sh"
     label: "nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar"
   - id: Q_KG_SCHEMA_FORMAL
     node_type: question
@@ -181,16 +206,6 @@ nodes:
     verified_at: "2026-10-08"
     verified_against: "execução mergeada e medida: PR #967 (2026-10-08T05:27:28Z, 69409a84e3b5) vendorizou o contrato v3 do .kg.yaml (JSON Schema 2020-12, MUST e SHOULD) por pin e o gate por grafo roda no CI (run 37731420161: 142 de 142 no MUST); a medição pedida (quantos grafos passariam num schema estrito) foi feita pelo adotante dedicado e repetida aqui"
     label: "JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito"
-  - id: Q_ROTULO_SEPARADO_DA_NARRATIVA
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 3
-    confidence: 0.6
-    verified_at: "2026-10-08"
-    verified_against: "execução mergeada e medida: o contrato v3 vendorizado tem o campo narrative no nó (vendor/kg-ssot/spec/kg-contract-v3.schema.json) e alerta label acima de 280; o PR #969 (6a6c55a4b940) ensinou os geradores a escrever label curto mais narrative; a migração do corpus antigo é o SAC-73"
-    label: "separar o rótulo factual da narrativa num campo próprio do nó"
   - id: Q_PODA_CLAUDE_MD_REVISITA
     node_type: question
     layer: audit
@@ -216,7 +231,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_against: ".claude/hooks/pretooluse-merge-gate.sh"
+    verified_at: "2026-10-17"
+    verified_against: "medido em 2026-10-17: pretooluse-merge-gate.sh ainda sai com exit 0 em silêncio quando o projeto não tem ops/pr-merge-verified.sh (o caso de todo adotante)"
     label: "a trava de merge deve avisar no adotante em vez de sair calada"
   - id: Q_MANIFESTO_SEM_SKILL_CORE_ONLY
     node_type: question
@@ -420,14 +436,8 @@ edges:
     to: Q_KG_SCHEMA_FORMAL
     edge_type: SUPPORTS
   - from: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
-    to: Q_ROTULO_SEPARADO_DA_NARRATIVA
-    edge_type: SUPPORTS
-  - from: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
     to: Q_PODA_CLAUDE_MD_REVISITA
     edge_type: SUPPORTS
-  - from: Q_ROTULO_SEPARADO_DA_NARRATIVA
-    to: Q_KG_SCHEMA_FORMAL
-    edge_type: DEPENDS_ON
   - from: E_RADAR_CEGO_A_TIPO_TROCADO
     to: Q_MU07_TIPO_DE_NO_TROCADO
     edge_type: SUPPORTS
@@ -461,3 +471,6 @@ edges:
   - from: E_BRAIN_MCP_PEDIDO_DE_CAMPO
     to: Q_ONION_BRAIN_MCP
     edge_type: SUPPORTS
+  - from: E_HOOK_PR_SEM_PASSADA_CURADO
+    to: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
+    edge_type: SUPERSEDES
