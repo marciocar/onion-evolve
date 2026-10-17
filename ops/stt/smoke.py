@@ -91,7 +91,7 @@ def check_words(label, words, duration, key_start="start", key_end="end"):
     ok(f"{label}: {len(words)} palavra(s) com tempos crescentes dentro de {duration:.2f} s")
 
 
-def run_checks(base, token, fixture, meta, expect_sha):
+def run_checks(base, token, fixture, meta, expect_sha, expect_core_sha=""):
     st, body = request(f"{base}/health", timeout=10)
     try:
         h = json.loads(body)
@@ -106,6 +106,11 @@ def run_checks(base, token, fixture, meta, expect_sha):
             ok("o processo serve o código esperado (server_sha256 confere)")
         else:
             bad(f"server_sha256 {str(h.get('server_sha256'))[:12]} != esperado {expect_sha[:12]}")
+    if expect_core_sha:
+        if h.get("core_sha256") == expect_core_sha:
+            ok("o processo serve o núcleo esperado (core_sha256 confere)")
+        else:
+            bad(f"core_sha256 {str(h.get('core_sha256'))[:12]} != esperado {expect_core_sha[:12]}")
     audio = open(fixture, "rb").read()
     body_mp, ctype = multipart({"response_format": "verbose_json", "language": "pt"}, os.path.basename(fixture), audio)
     for label, hdrs in (("sem token", {}), ("token errado", {"Authorization": "Bearer " + "x" * 48}),
@@ -166,12 +171,14 @@ def main(argv=None):
     g.add_argument("--serve", nargs=argparse.REMAINDER)
     ap.add_argument("--fixture", required=True)
     ap.add_argument("--expect-sha", default="")
+    ap.add_argument("--expect-core-sha", default="")
     ap.add_argument("--token-file", default=None)
     ap.add_argument("--no-egress-check", action="store_true")
     a = ap.parse_args(argv)
     proc = None
     try:
-        tf = a.token_file or os.path.join(os.environ.get("CREDENTIALS_DIRECTORY", ""), "token")
+        cred_dir = os.environ.get("CREDENTIALS_DIRECTORY", "")
+        tf = a.token_file or (os.path.join(cred_dir, "token") if cred_dir else "")
         try:
             token = open(tf).read().strip()
         except OSError as e:
@@ -198,7 +205,7 @@ def main(argv=None):
                 return 1
         else:
             base = a.url.rstrip("/")
-        run_checks(base, token, a.fixture, meta, a.expect_sha)
+        run_checks(base, token, a.fixture, meta, a.expect_sha, a.expect_core_sha)
         if not a.no_egress_check:
             check_egress()
         return 1 if FAILS else 0

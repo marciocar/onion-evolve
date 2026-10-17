@@ -23,7 +23,8 @@ de 25 s. O `--vad-batch` (trechos por inferência) é o ajuste de memória: ver 
 Origem: REESCRITA (não cópia) de onion-curation @ 8d08d726c117,
 docs/evolution/research/meeting-capture-2026-10/data/vps-stt/emenda2/server.py (sha256 199e1f82b52f…, lido em
 2026-10-17). Mudou: Starlette em vez de FastAPI; auth por token (fail-closed) e teto de corpo como ASGI por fora das
-rotas; VAD do lote fixo (o cliente não o ajusta mais); o ffmpeg só lê arquivo com lista fechada de formatos; a
+rotas; VAD do lote fixo (o cliente não o ajusta mais); teto da DURAÇÃO decodificada (--max-audio-s, lido do cabeçalho
+antes de decodificar); o ffmpeg (fallback do que o libsndfile não lê) só lê arquivo, com lista fechada de formatos; a
 reamostragem fora de 16 kHz é do ffmpeg (a interpolação linear foi embora); sem o WS ao vivo.
 """
 from __future__ import annotations
@@ -54,6 +55,10 @@ FFMPEG_FORMATS = "wav,flac,ogg,mp3,matroska,webm,mov,mp4,m4a,3gp,3g2,mj2,aac,opu
 FFMPEG_TIMEOUT_S = 600
 
 
+class AudioTooLong(ValueError):
+    """Duração decodificada acima do teto: vira 413, nunca chega ao motor."""
+
+
 def _sha256_file(p: str) -> str:
     h = hashlib.sha256()
     with open(p, "rb") as f:
@@ -74,6 +79,7 @@ def parse_args(argv=None):
     ap.add_argument("--queue-max", type=int, default=2, help="pedidos em curso + na fila antes do 503/429")
     ap.add_argument("--vad-batch", type=int, default=1, help="trechos do VAD por inferência (8 = o medido pela curadoria)")
     ap.add_argument("--max-body-mb", type=int, default=384)
+    ap.add_argument("--max-audio-s", type=float, default=10800.0, help="teto da duração DECODIFICADA por canal (3 h)")
     ap.add_argument("--direct-max-s", type=float, default=25.0)
     ap.add_argument("--file-max-speech-s", type=float, default=30.0)
     ap.add_argument("--file-min-silence-ms", type=float, default=500.0)
@@ -140,13 +146,16 @@ class Engine:
         return text, segments, dur, mode, time.perf_counter() - t
 
 
-def decode_audio(np, sf, raw: bytes, query, tmpdir: str):
+def decode_audio(np, sf, raw: bytes, query, tmpdir: str, max_s: float):
     """→ lista de canais float32 a 16 kHz e a taxa de origem. PCM cru pela query; contêiner pelo libsndfile; o resto
     (e toda taxa != 16 kHz) pelo ffmpeg, que só lê o arquivo temporário e só aceita a lista fechada de formatos."""
     pcm = core.raw_pcm_params(query)
     if pcm is not None:
         sr, ch = pcm
         n = len(raw) // (2 * ch) * (2 * ch)
+        why = core.audio_too_long(n // (2 * ch), sr, ch, max_s)
+        if why:
+            raise AudioTooLong(why)
         data = (np.frombuffer(raw[:n], dtype="<i2").astype(np.float32) / 32768.0).reshape(-1, ch)
         if sr == SR:
             return [np.ascontiguousarray(data[:, c]) for c in range(ch)], sr
@@ -155,26 +164,40 @@ def decode_audio(np, sf, raw: bytes, query, tmpdir: str):
         sf.write(src, data, sr, subtype="PCM_16")
     else:
         try:
-            data, sr = sf.read(io.BytesIO(raw), dtype="float32", always_2d=True)
-            if sr == SR:
-                return [np.ascontiguousarray(data[:, c]) for c in range(data.shape[1])], sr
+            info = sf.info(io.BytesIO(raw))
         except Exception:  # noqa: BLE001 — contêiner que o libsndfile não lê: vai ao ffmpeg
-            sr = None
+            info = None
+        if info is not None:
+            # o cabeçalho diz a duração ANTES de decodificar: a bomba é recusada sem alocar nada
+            why = core.audio_too_long(int(info.frames), int(info.samplerate), int(info.channels), max_s)
+            if why:
+                raise AudioTooLong(why)
+        sr = None
+        if info is not None and int(info.samplerate) == SR:
+            data, sr = sf.read(io.BytesIO(raw), dtype="float32", always_2d=True)
+            return [np.ascontiguousarray(data[:, c]) for c in range(data.shape[1])], sr
         src = os.path.join(tmpdir, "in.bin")
         with open(src, "wb") as f:
             f.write(raw)
     out = os.path.join(tmpdir, "out.wav")
+    # -t corta a decodificação UM segundo acima do teto (o cabeçalho de quem não é libsndfile não é lido antes): o
+    # que passar disso é recusado abaixo, e o disco do /tmp privado nunca recebe mais que o teto
     cmd = ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-protocol_whitelist", "file",
-           "-format_whitelist", FFMPEG_FORMATS, "-i", src, "-vn", "-ar", str(SR), "-c:a", "pcm_f32le", "-y", out]
+           "-format_whitelist", FFMPEG_FORMATS, "-i", src, "-vn", "-t", str(int(max_s) + 1), "-ar", str(SR),
+           "-c:a", "pcm_f32le", "-y", out]
     try:
         p = subprocess.run(cmd, capture_output=True, timeout=FFMPEG_TIMEOUT_S, check=False)
     except subprocess.TimeoutExpired:
         raise ValueError("cannot decode audio: ffmpeg timeout") from None
     if p.returncode or not os.path.exists(out):
         raise ValueError("cannot decode audio: " + p.stderr[-300:].decode(errors="replace").replace(tmpdir, "<tmp>").strip())
+    oinfo = sf.info(out)
+    if int(oinfo.channels) > core.MAX_CHANNELS:
+        raise ValueError(f"too many channels ({oinfo.channels})")
+    why = core.audio_too_long(int(oinfo.frames), int(oinfo.samplerate), int(oinfo.channels), max_s)
+    if why:
+        raise AudioTooLong(why)
     data, osr = sf.read(out, dtype="float32", always_2d=True)
-    if data.shape[1] > core.MAX_CHANNELS:
-        raise ValueError(f"too many channels ({data.shape[1]})")
     return [np.ascontiguousarray(data[:, c]) for c in range(data.shape[1])], (sr or osr)
 
 
@@ -199,7 +222,7 @@ def build_app(a, engine, token: bytes):
 
     def decode_mono(raw, query, multichannel):
         with tempfile.TemporaryDirectory(prefix="stt-") as td:
-            chans, _sr = decode_audio(np, sf, raw, query, td)
+            chans, _sr = decode_audio(np, sf, raw, query, td, a.max_audio_s)
         if not chans or len(chans[0]) == 0:
             raise ValueError("empty audio")
         if multichannel and len(chans) > 1:
@@ -225,6 +248,8 @@ def build_app(a, engine, token: bytes):
         try:
             try:
                 form = await request.form(max_files=1, max_fields=16)
+            except core.BodyTooLarge:
+                raise  # o teto de corpo vira 413 pelo handler do app, nunca "multipart inválido"
             except Exception:  # noqa: BLE001 — multipart malformado
                 return JSONResponse({"error": {"message": "invalid multipart body", "type": "invalid_request_error"}}, status_code=400)
             f = form.get("file")
@@ -237,6 +262,8 @@ def build_app(a, engine, token: bytes):
             raw = await f.read()
             try:
                 audio = (await run(decode_mono, raw, {}, False))[0]
+            except AudioTooLong as e:
+                return JSONResponse({"error": {"message": str(e), "type": "invalid_request_error"}}, status_code=413)
             except ValueError as e:
                 return JSONResponse({"error": {"message": str(e), "type": "invalid_request_error"}}, status_code=400)
             del raw
@@ -266,6 +293,8 @@ def build_app(a, engine, token: bytes):
             digest = hashlib.sha256(raw).hexdigest()
             try:
                 chans = await run(decode_mono, raw, q, multichannel)
+            except AudioTooLong as e:
+                return JSONResponse({"err_code": "PAYLOAD_TOO_LARGE", "err_msg": str(e), "request_id": rid}, status_code=413)
             except ValueError as e:
                 return JSONResponse({"err_code": "Bad Request", "err_msg": str(e), "request_id": rid}, status_code=400)
             del raw
@@ -285,13 +314,19 @@ def build_app(a, engine, token: bytes):
     routes = [Route("/health", health, methods=["GET"]),
               Route("/v1/audio/transcriptions", transcriptions, methods=["POST"]),
               Route("/v1/listen", listen, methods=["POST"])]
-    inner = Starlette(routes=routes)
+    async def too_large(_request, _exc):
+        # o BodyLimit levanta no meio da leitura do corpo (chunked): sem este handler, o ServerErrorMiddleware do
+        # Starlette respondia 500 antes de o BodyLimit poder responder 413 (refutador, passada 1, medido)
+        return JSONResponse({"error": {"message": "request body too large", "type": "invalid_request_error"}}, status_code=413)
+
+    inner = Starlette(routes=routes, exception_handlers={core.BodyTooLarge: too_large})
     return core.AuthGate(core.BodyLimit(inner, a.max_body_mb * 1024 * 1024), token)
 
 
 def main(argv=None):
     a = parse_args(argv)
-    token_path = a.token_file or os.path.join(os.environ.get("CREDENTIALS_DIRECTORY", ""), "token")
+    cred_dir = os.environ.get("CREDENTIALS_DIRECTORY", "")
+    token_path = a.token_file or (os.path.join(cred_dir, "token") if cred_dir else "")
     try:
         token = core.load_token(token_path)
         engine = Engine(a)
