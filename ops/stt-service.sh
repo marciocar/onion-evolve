@@ -294,8 +294,9 @@ check_hf() {  # <repo> <rev> <arquivos…>: a revisão fixada publica cada arqui
   printf '%s\n' "$@" | python3 -c '
 import json, sys
 api = json.loads(sys.argv[1]); rev = sys.argv[2]
-if api.get("sha") != rev:
-    print(f"FALHA a revisão respondida ({api.get(\"sha\")}) não é a fixada"); sys.exit(1)
+got_rev = api.get("sha")
+if got_rev != rev:
+    print(f"FALHA a revisão respondida ({got_rev}) não é a fixada"); sys.exit(1)
 sib = {s["rfilename"]: s for s in api.get("siblings", [])}
 bad = 0
 for line in sys.stdin:
@@ -303,7 +304,8 @@ for line in sys.stdin:
     s = sib.get(name)
     got = None if s is None else ((s.get("lfs") or {}).get("sha256") if kind == "sha256" else s.get("blobId"))
     if s is None or got != digest or int(s.get("size") or -1) != int(size):
-        print(f"FALHA {name}: publicado {got} ({None if s is None else s.get(\"size\")} B) != fixado {digest[:12]} ({size} B)"); bad += 1
+        pub_size = None if s is None else s.get("size")
+        print(f"FALHA {name}: publicado {got} ({pub_size} B) != fixado {digest[:12]} ({size} B)"); bad += 1
     else:
         print(f"OK {name} {digest[:12]} ({size} B)")
 sys.exit(1 if bad else 0)' "${api}" "${rev}" | sed 's/^/    /'
