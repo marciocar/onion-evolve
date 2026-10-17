@@ -341,11 +341,15 @@ leg_act() {
   local wf="${REPO}/.github/workflows"; [ -d "${wf}" ] || return 0
   local a p pins files v rc lv lsha pv cn cp
   for a in ${ACTIONS}; do
-    pins="$(cat "${wf}"/*.yml "${wf}"/*.yaml 2>/dev/null | grep -oE "uses:[[:space:]]*${a}@[^[:space:]\"'#]+" | sed 's/.*@//' | sort -u)"
+    # linha comentada fica fora; aspas e subcaminho (…/base-action, que também instala o CLI) entram; o pin só
+    # sai com caracteres de ref (sem glob nem espaço — refutador, 2026-10-17)
+    pins="$(cat "${wf}"/*.yml "${wf}"/*.yaml 2>/dev/null | grep -vE '^[[:space:]]*#' \
+      | grep -oE "uses:[[:space:]]*[\"']?${a}(/[A-Za-z0-9._-]+)*@[A-Za-z0-9._/-]+" | sed 's/.*@//' | sort -u)"
     [ -n "${pins}" ] || continue
     _has "${GIT}" || { _row "action:${a}" - - ausente "falta o git para ler as tags da action: ${ASK} o git pela distro"; continue; }
-    for p in ${pins}; do
-      files="$(grep -lF "${a}@${p}" "${wf}"/*.yml "${wf}"/*.yaml 2>/dev/null | sed "s|^${REPO}/||" | tr '\n' ' ')"; files="${files% }"
+    while IFS= read -r p; do
+      [ -n "${p}" ] || continue
+      files="$(grep -lE "${a}(/[A-Za-z0-9._-]+)*@${p}([^A-Za-z0-9._/-]|\$)" "${wf}"/*.yml "${wf}"/*.yaml 2>/dev/null | sed "s|^${REPO}/||" | tr '\n' ' ')"; files="${files% }"
       if ! [[ "${p}" =~ ^[0-9a-f]{40}$ ]]; then
         _row "action:${a}" "${p}" - nao-medida "o pin não é SHA de commit (@${p}, em ${files}): a casa pina por SHA, e o censo só julga pin por SHA"; continue
       fi
@@ -358,12 +362,19 @@ leg_act() {
       fi
       if _newer "${pv}" "${lv}"; then _row "action:${a}" "${pv}" "${lv}" nao-medida "a tag do pin (v${pv}) está À FRENTE da maior tag lida (v${lv}): leitura suspeita"; continue; fi
       cp="CLI não lido"; cn="CLI não lido"
-      if _has "${CURL}"; then
-        cp="$(_src "act-cli-${a}-${p:0:12}" "${TTL}" "${VRE}" _act_cli "${a}" "${p}")" && cp="CLI ${cp}" || cp="CLI não lido"
-        cn="$(_src "act-cli-${a}-${lsha:0:12}" "${TTL}" "${VRE}" _act_cli "${a}" "${lsha}")" && cn="CLI ${cn}" || cn="CLI não lido"
+      if _has "${CURL}"; then  # as duas leituras em PARALELO: em série, ls-remote + 2 curl passariam do prazo da perna
+        local tc; tc="$(mktemp -d)" || tc=""
+        if [ -n "${tc}" ]; then
+          _src "act-cli-${a}-${p:0:12}" "${TTL}" "${VRE}" _act_cli "${a}" "${p}" > "${tc}/p" &
+          _src "act-cli-${a}-${lsha:0:12}" "${TTL}" "${VRE}" _act_cli "${a}" "${lsha}" > "${tc}/n" &
+          wait
+          [ -s "${tc}/p" ] && cp="CLI $(awk 'NR==1' "${tc}/p")"
+          [ -s "${tc}/n" ] && cn="CLI $(awk 'NR==1' "${tc}/n")"
+          rm -rf "${tc}"
+        fi
       fi
       _row "action:${a}" "${pv}" "${lv}" defasada "o pin ${p:0:8} (v${pv}) instala o ${cp}; a v${lv} instala o ${cn}. Suba: sed -i 's/${p}/${lsha}/g' ${files} — leia as notas das releases entre as duas contra os inputs usados, e prove no PR SEGUINTE (o PR que edita o workflow pode fazer a action se auto-pular)"
-    done
+    done <<< "${pins}"
   done
 }
 

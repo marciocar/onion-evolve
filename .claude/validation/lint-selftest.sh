@@ -8315,7 +8315,7 @@ PYF
     printf 'jobs:\n  r:\n    steps:\n      - uses: actions/checkout@v4\n      - name: rev\n        uses: anthropics/claude-code-action@%s\n' "${pin}" > "${d}/r3/.github/workflows/review.yml"
     env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_NPM= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_GIT=git \
       ONION_CURRENCY_ACTION_REMOTE_BASE="${d}/act" ONION_CURRENCY_ACTION_RAW_BASE="file://${d}/raw" \
-      ONION_CURRENCY_CACHE_DIR="${d}/cache" ONION_CURRENCY_TIMEOUT=20 "$@" bash "${sut}" "${d}/r3" --fresh 2>/dev/null </dev/null
+      ONION_CURRENCY_CACHE_DIR="${d}/cache" ONION_CURRENCY_TIMEOUT=20 "$@" bash "${sut}" "${d}/r3" ${CA_FLAGS---fresh} 2>/dev/null </dev/null
   }
   o="$(_ca "${sa}")"
   case "$(_st "${o}" action:anthropics/claude-code-action)|$(_act "${o}" action:anthropics/claude-code-action)" in
@@ -8340,7 +8340,22 @@ PYF
   o="$(_ca "${sa}" ONION_CURRENCY_ACTION_RAW_BASE="file://${d}/sem-raw")"
   case "$(_st "${o}" action:anthropics/claude-code-action)|$(_act "${o}" action:anthropics/claude-code-action)" in "defasada|1.0.183|1.0.252|"*"CLI não lido"*) record_pass "currency-census: (aa7) raw inalcançável ⇒ segue defasada, com o CLI declarado não lido" ;;
     *) record_fail "currency-census: (aa7) raw inalcançável" "veio: $(_st "${o}" action:anthropics/claude-code-action)" ;; esac
-  rm -f "${d}/r3/.github/workflows/review.yml"
+  # (aa9) o CACHE é por pin: medido o pin novo, trocar para o velho SEM --fresh tem de dar a tag do velho (não a do outro)
+  _ca "${sb}" >/dev/null; r="$(_st "$(CA_FLAGS= _ca "${sa}")" action:anthropics/claude-code-action)"
+  [ "${r}" = "defasada|1.0.183|1.0.252" ] && record_pass "currency-census: (aa9) cache por pin: trocar o pin sem --fresh já mede a tag do pin trocado" \
+    || record_fail "currency-census: (aa9) cache por pin" "veio: ${r}"
+  # (aa10) dois pins em dois arquivos: um entre aspas (.yml), outro no subcaminho base-action (.yaml); a linha
+  #        COMENTADA com um terceiro pin fica fora (refutador, 2026-10-17: aspas sumiam e comentário entrava)
+  _ca "${sb}" >/dev/null
+  printf 'jobs:\n  r:\n    steps:\n      - uses: "anthropics/claude-code-action@%s"\n      # - uses: anthropics/claude-code-action@%s\n' "${sa}" "${sc}" > "${d}/r3/.github/workflows/review.yml"
+  printf 'jobs:\n  b:\n    steps:\n      - uses: anthropics/claude-code-action/base-action@%s\n' "${sb}" > "${d}/r3/.github/workflows/base.yaml"
+  o="$(env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_NPM= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_GIT=git \
+      ONION_CURRENCY_ACTION_REMOTE_BASE="${d}/act" ONION_CURRENCY_ACTION_RAW_BASE="file://${d}/raw" \
+      ONION_CURRENCY_CACHE_DIR="${d}/cache" ONION_CURRENCY_TIMEOUT=20 bash "${sut}" "${d}/r3" --fresh 2>/dev/null </dev/null)"
+  r="$(printf '%s\n' "${o}" | awk -F'\t' '$1=="action:anthropics/claude-code-action"{print $4"|"$2}' | sort | tr '\n' ' ')"
+  case "${r}|$(printf '%s\n' "${o}" | grep -c "review.yml")" in "defasada|1.0.183 em-dia|1.0.252 |1") record_pass "currency-census: (aa10) pin entre aspas e pin no base-action (.yaml) medidos; a linha comentada fica fora" ;;
+    *) record_fail "currency-census: (aa10) dois pins" "veio: ${r}" ;; esac
+  rm -f "${d}/r3/.github/workflows/review.yml" "${d}/r3/.github/workflows/base.yaml"
   r="$(env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_NPM= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_ACTION_REMOTE_BASE="${d}/act" ONION_CURRENCY_CACHE_DIR="${d}/cache" bash "${sut}" "${d}/r3" --fresh 2>/dev/null </dev/null)"
   [ -z "${r}" ] && record_pass "currency-census: (aa8) sem workflow que use a action ⇒ superfície omitida" \
     || record_fail "currency-census: (aa8) superfície inexistente" "veio: ${r:0:120}"

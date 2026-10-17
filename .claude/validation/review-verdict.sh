@@ -147,8 +147,8 @@ count_findings() { # $1=texto do parecer
 # apaga a diferença que decide o conserto (subir `--max-turns` × investigar a origem).
 reason_for_subtype() { # $1=subtype
   case "${1}" in
-    # Os QUATRO subtypes de erro que o SDK declara (sdk.d.ts:4269-4271, v0.3.220 — a mesma do pin
-    # be7b93b). Nomear so dois deixava dois cairem no balde generico `is-error:<subtype>`, apagando
+    # Os QUATRO subtypes de erro que o SDK declara (sdk.d.ts:4269-4271 na v0.3.220, do pin be7b93b;
+    # os mesmos quatro na v0.3.302 do pin f27be6b6, sdk.d.ts:5796, conferido em 2026-10-17). Nomear so dois deixava dois cairem no balde generico `is-error:<subtype>`, apagando
     # a diferenca que decide o conserto — que e a razao de esta funcao existir.
     error_max_turns)     printf 'orcamento-de-turnos' ;;
     error_during_execution) printf 'erro-na-execucao' ;;
