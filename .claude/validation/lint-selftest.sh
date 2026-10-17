@@ -9400,7 +9400,7 @@ exit $rc
 EOF
   # priv-fail: o `sudo -n nsenter …` de produção falhando ANTES de entrar no namespace (o stub faz o papel do sudo, que
   # no modo de teste não é chamado): a mensagem e o rc 1 do sudo real, e nenhuma linha do sh de checagem
-  printf '#!/bin/sh\n[ -f "$BH_FAKE/priv-fail" ] && { echo "sudo: a password is required" >&2; exit 1; }\nwhile [ "$#" -gt 0 ] && [ "$1" != -- ]; do shift; done\nshift\nexec "$@"\n' > "${d}/fake/nsenter"
+  printf '#!/bin/sh\n[ -f "$BH_FAKE/priv-fail" ] && { echo "sudo: a password is required" >&2; exit 1; }\n[ -f "$BH_FAKE/cut-after-falha" ] && { echo "OK x"; echo "FALHA só-leitura GRAVÁVEL /x/src"; echo "sh: 1: Cannot fork" >&2; exit 2; }\nwhile [ "$#" -gt 0 ] && [ "$1" != -- ]; do shift; done\nshift\nexec "$@"\n' > "${d}/fake/nsenter"
   # findmnt falso: OPTIONS pela escrita; TARGET = o próprio caminho se ele está na lista de pontos de montagem
   printf '#!/bin/sh\nfor p; do :; done\ncase "$*" in *TARGET*) if grep -qxF "$p" "$BH_FAKE/mounts" "$BH_FAKE/mounts-ens" 2>/dev/null; then echo "$p"; else echo /; fi; exit 0 ;; esac\nif [ -w "$p" ]; then echo rw,relatime; else echo ro,relatime; fi\n' > "${d}/fake/findmnt"
   printf '#!/bin/sh\nif [ -f "$BH_FAKE/noauth" ]; then echo "boot sem a linha"; else echo "[onion-bridge] identidade: JWKS OK | auth: enforce"; fi\n' > "${d}/fake/journalctl"
@@ -9585,16 +9585,25 @@ PY
   _bhcase "(h28) arquivo de confiança concreto gravável com a raiz só-leitura → verify rc 1 nomeando-o" \
     "then bad \"arquivo de confiança GRAVÁVEL" "then ok \"arquivo de confiança GRAVÁVEL" _c_trust
   _bhcase "(h26) drop-in idêntico no disco mas NÃO provado no processo vivo → não é NOOP, reinicia" \
-    '  if verify_live >/dev/null 2>&1; then' '  if true; then' _c_noopverify
+    '  if [ "${local_vrc}" = 0 ]; then' '  if true; then' _c_noopverify
   _bhcase "(h23) restart que não aplica o drop-in → o verify do processo vivo reprova → rc 1 com ROLLBACK impresso" \
-    'verify_live || fail_after' 'true || fail_after' _c_noeffect
+    '_vrc=0; verify_live || _vrc=$?' '_vrc=0; true || _vrc=$?' _c_noeffect
   # NÃO MEDIU ≠ REPROVOU (E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016): o sudo que falha não é um veredito
   _c_privfail() { local r; _bhr "$1" install --apply >/dev/null; : > "${d}/st/priv-fail"; r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"
     _bhrc "${r}" 2 && _bhhas "${r}" "NÃO MEDI: o check no namespace do MainPID" && _bhhas "${r}" "sudo: a password is required"; }
   _c_showfail() { local r; _bhr "$1" install --apply >/dev/null; : > "${d}/st/show-fail"; r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"
     _bhrc "${r}" 2 && _bhhas "${r}" "NÃO MEDI: o systemctl show" && ! _bhhas "${r}" "NÃO está carregado"; }
+  _c_cutfalha() { local r; _bhr "$1" install --apply >/dev/null; : > "${d}/st/cut-after-falha"; r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 1 && ! _bhhas "${r}" "NÃO MEDI"; }
+  _c_noop_privfail() { local r n; _bhr "$1" install --apply >/dev/null; n="$(_bhcalls restart)"; : > "${d}/st/priv-fail"
+    r="$(_bhr "$1" install --apply)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 2 && _bhhas "${r}" "NÃO MEDI o processo vivo" && [ "$(_bhcalls restart)" = "${n}" ]; }
+  _bhcase "(h31) FALHA medida e o sh morre antes do n_fail (fork negado) → rc 1 REPROVOU, nunca o NÃO MEDI que a esconderia" \
+    "    grep -q '^FALHA ' <<<\"\${out}\" && {" "    false && {" _c_cutfalha
+  _bhcase "(h32) 2º --apply idêntico com o sudo falhando → rc 2, sem restart às cegas" \
+    '  [ "${local_vrc}" = 2 ] && die 2' '  false && die 2' _c_noop_privfail
   _bhcase "(h29) verify em que o sudo -n do nsenter falha (sem a linha n_fail) → rc 2 NÃO MEDI, nunca o rc 1 de reprovado" \
-    "  grep -qE '^n_fail=[0-9]+\$' <<<\"\${out}\" \\" "  true \\" _c_privfail
+    "  if ! grep -qE '^n_fail=[0-9]+\$' <<<\"\${out}\"; then" "  if false; then" _c_privfail
   _bhcase "(h30) verify em que o systemctl show do DropInPaths falha → rc 2 NÃO MEDI, nunca 'NÃO está carregado'" \
     '2>/dev/null)" || { say "NÃO MEDI: o systemctl show de ${UNIT} falhou (DropInPaths)"; return 2; }' '2>/dev/null)"' _c_showfail
   [ -d "${d}/h" ] && chmod -R u+rwX "${d}/h" 2>/dev/null

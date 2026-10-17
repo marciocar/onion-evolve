@@ -223,8 +223,12 @@ verify_live() {
   # a linha n_fail=<N> por último. Sem ela, o sh nem chegou ao fim: o sudo -n pediu senha, o nsenter não entrou no
   # namespace (MainPID que acabou de morrer, alvo ilegível) ou o sh caiu. Isso é rc 2 (não pude medir), nunca rc 1 —
   # antes saía 1, e o update-bridge o rotulava "o verify REPROVOU" sem nada ter sido medido.
-  grep -qE '^n_fail=[0-9]+$' <<<"${out}" \
-    || { say "NÃO MEDI: o check no namespace do MainPID ${pid} não rodou até o fim (rc ${rc}; sudo -n, nsenter ou alvo ilegível): $(tail -1 <<<"${out}" | cut -c1-200)"; return 2; }
+  if ! grep -qE '^n_fail=[0-9]+$' <<<"${out}"; then
+    # Mas FALHA medida é medida (refutador, passada 1): uma linha FALHA antes do sh morrer (fork negado, OOM) é REPROVOU
+    # — senão o "não medi" esconderia uma reprovação real, o pior lado do erro.
+    grep -q '^FALHA ' <<<"${out}" && { say "o check morreu antes do fim (rc ${rc}), mas já tinha medido FALHA: reprovado"; return 1; }
+    say "NÃO MEDI: o check no namespace do MainPID ${pid} não rodou até o fim (rc ${rc}; sudo -n, nsenter ou alvo ilegível): $(tail -1 <<<"${out}" | cut -c1-200)"; return 2
+  fi
   [ "${rc}" = 0 ] && grep -qx 'n_fail=0' <<<"${out}" || return 1
   say "verify OK — namespace do MainPID ${pid}: $(grep -c '^OK ' <<<"${out}") checagem(ns), 0 falha"
 }
@@ -262,7 +266,10 @@ for q in "${PLACEHOLDERS[@]}"; do priv test -e "${SVC_HOME}/${q%%:*}" || need_ph
 if [ "${installed}" = 1 ] && cmp -s "${TMPD}/atual.conf" "${TMPD}/${DROPIN_NAME}" && [ "${#need_ph[@]}" = 0 ]; then
   # idêntico no disco NÃO é carregado no processo: um --apply que morreu entre o install e o restart deixaria a
   # proteção fora para sempre sob um NOOP (refutador, achado 4). O NOOP só vale com o verify do processo vivo
-  if verify_live >/dev/null 2>&1; then
+  local_vrc=0; verify_live >/dev/null 2>&1 || local_vrc=$?
+  # não medido não é reprovado: reiniciar o serviço de produção sem ter medido nada é agir às cegas (refutador, passada 1)
+  [ "${local_vrc}" = 2 ] && die 2 "NÃO MEDI o processo vivo (sudo -n, nsenter ou systemctl): nada foi tocado"
+  if [ "${local_vrc}" = 0 ]; then
     say "NOOP — o ${DROPIN_NAME} instalado é idêntico ao renderizado, os placeholders existem e o verify do processo vivo passa. Serviço intocado."
     exit 0
   fi
@@ -369,7 +376,8 @@ for _ in $(seq 1 10); do
   sleep 2
 done
 grep -q "auth: enforce" <<<"${BOOT}" || fail_after "boot desta invocação sem 'auth: enforce'"
-verify_live || fail_after "o verify no processo vivo reprovou depois do restart"
+_vrc=0; verify_live || _vrc=$?
+[ "${_vrc}" = 0 ] || fail_after "o verify no processo vivo $([ "${_vrc}" = 2 ] && echo 'NÃO MEDIU (rc 2)' || echo reprovou) depois do restart"
 say "OK — ${DROPIN_NAME} instalado e provado no namespace vivo (invocação ${INV:0:8}); ${#created[@]} placeholder(s) criado(s)"
 rollback 2>&1 | sed 's/^/  (se precisar) /'
 exit 0
