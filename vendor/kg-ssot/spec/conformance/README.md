@@ -1,4 +1,4 @@
-# Suíte de conformidade do `.kg.yaml`
+# Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 > Os casos medem o contrato v4: `spec/kg-contract-v4.schema.json` (MUST) e
 > `spec/kg-contract-v4.should.schema.json` (SHOULD).
@@ -10,7 +10,7 @@ harness de agente.
 
 ## Formato
 
-Um **grupo** é uma pasta com um `manifest.json` e um `.kg.yaml` real por caso. O arquivo é real, e não
+Um **grupo** é uma pasta com um `manifest.json` e um `.kg.yaml` (ou `.kg.json`) real por caso. O arquivo é real, e não
 texto embutido no JSON, para que qualquer CLI receba o caminho e leia como leria um grafo de verdade.
 
 ```json
@@ -108,6 +108,28 @@ A aresta externa conta como ligação: o nó ligado só por ela não é órfão.
 o leitor diz isso na saída. A referência é relativa e com `/`: segmentos começam por letra, dígito ou `_`, sem `.` ou
 `..`, sem `\` e sem `:`.
 
+**O `.kg.json`.** O mesmo modelo de dados pode vir em JSON, num arquivo `.kg.json`, lido por um parser JSON no
+**perfil JSON** do contrato (`latest/json/`). Nele, estes pontos são **MUST**:
+
+| Ponto | O que reprova | Código |
+|---|---|---|
+| Números pelo I-JSON (RFC 7493) | número de valor inteiro com módulo acima de 2^53−1, escrito como inteiro ou como float (`9007199254740992`, `1e20`); o que estoura o double (`1e400`, um inteiro de 401 dígitos) já é não finito | `form.type.<escopo>.<campo>`, o caminho do `.nan` |
+| Strings sem surrogate solto (I-JSON) | `\ud800` sem o par, em chave ou em valor; o par `\ud83d\ude00` é um caractere só | `parse.yaml-error` |
+| Profundidade | mais de 128 coleções aninhadas (a raiz conta 1) | `parse.yaml-error` |
+| Espaço em branco da RFC 8259 | só espaço, tab, LF e CR; um BOM inicial é aceito e descartado, e qualquer outro reprova (NBSP e `\x1c` não são espaço) | `parse.yaml-error` |
+| Sintaxe da RFC 8259 | comentário, vírgula sobrando, chave sem aspas, aspas simples, `NaN`, `Infinity` | `parse.yaml-error` |
+| Chave única (ADR 002) | a mesma chave duas vezes no objeto, comparada depois de resolvidos os escapes | `parse.duplicate-key` |
+
+O documento vazio, só com espaço da RFC ou `null` é `parse.empty-document`. A sintaxe JSON inválida usa
+`parse.yaml-error`: o vocabulário não tem um `parse.json-error`. No `.kg.yaml`, os três primeiros pontos são **SHOULD**,
+e o veredito MUST do YAML não muda (`latest/yaml/json-profile/`):
+
+| Código | Quando alerta |
+|---|---|
+| `yaml.unsafe-integer` | número de valor inteiro fora de ±(2^53−1) |
+| `yaml.lone-surrogate` | surrogate solto numa chave ou num texto |
+| `yaml.depth-over-128` | mais de 128 coleções aninhadas (o teto de parse do YAML segue em 1000) |
+
 O v4.2 acrescenta `provenance.locality`, opcional, com o enum `repo`, `web`, `host` ou `pessoa`. O valor fora do enum
 alerta como `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), e nenhum veredito muda.
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
@@ -132,7 +154,8 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 225 casos contra o contrato v4. Os grupos do
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 261 casos contra o contrato v4, 30 deles
+`.kg.json`. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
 viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de

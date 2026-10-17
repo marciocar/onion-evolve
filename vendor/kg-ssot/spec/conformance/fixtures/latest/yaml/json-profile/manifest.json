@@ -1,0 +1,55 @@
+{
+  "description": "Os pontos 1 a 3 do perfil JSON no .kg.yaml, como aviso SHOULD (a rampa do v2): inteiro fora de ±(2^53−1), surrogate solto e mais de 128 coleções aninhadas. O veredito MUST do YAML não muda.",
+  "layer": "yaml",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "warn-unsafe-integer.kg.yaml",
+      "description": "2^53 no .kg.yaml: o perfil JSON alerta (SHOULD na rampa do v2), e o MUST do YAML não muda",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unsafe-integer"
+      ]
+    },
+    {
+      "file": "warn-float-1e20.kg.yaml",
+      "description": "1e20 no .kg.yaml: valor inteiro acima de 2^53−1 escrito como float",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unsafe-integer"
+      ]
+    },
+    {
+      "file": "valid-integer-max-safe.kg.yaml",
+      "description": "2^53−1 no .kg.yaml: o maior inteiro seguro não alerta",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-lone-surrogate.kg.yaml",
+      "description": "surrogate solto num texto do .kg.yaml: alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.lone-surrogate"
+      ]
+    },
+    {
+      "file": "warn-depth-129.kg.yaml",
+      "description": "129 coleções aninhadas no .kg.yaml: alerta (no .kg.json reprovaria)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.depth-over-128"
+      ]
+    },
+    {
+      "file": "valid-depth-128.kg.yaml",
+      "description": "128 coleções aninhadas no .kg.yaml: o limite, sem aviso",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

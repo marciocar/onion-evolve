@@ -4,6 +4,9 @@
 A ponta externa das external_edges (v4.3) é conferida contra TODOS os .kg.yaml rastreados, inclusive os excluídos do
 corpus: alvo inexistente ou apagado reprova quem aponta (integrity.dangling-external).
 
+Um .kg.json no repo fica fora do gate: a 4.8.0 lê .kg.json no kg_validate, no armazém e no MCP, mas o gate e as
+external_edges seguem só com .kg.yaml.
+
 Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/* e docs/materials/*, os
 excluídos padrão, ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
   failing — grafo → códigos MUST que ele carrega hoje (a dívida herdada, nomeada por caminho);

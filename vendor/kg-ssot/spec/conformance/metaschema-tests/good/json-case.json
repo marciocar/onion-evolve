@@ -1,0 +1,21 @@
+{
+  "description": "Grupo com um caso .kg.json, lido pelo perfil JSON do contrato.",
+  "layer": "parse",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-minimal.kg.json",
+      "description": "o grafo mínimo em JSON",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-nan.kg.json",
+      "description": "o literal NaN não é JSON",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    }
+  ]
+}

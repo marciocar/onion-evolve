@@ -33,6 +33,9 @@ A lista completa, com a forma de cada código, está em
 | Código | Como resolver |
 |---|---|
 | `yaml.unquoted-date` | Ponha as datas entre aspas: `"2026-10-12"` |
+| `yaml.unsafe-integer` | Um número inteiro passa de ±(2^53−1), e um leitor JS perde o valor exato. Grave-o como texto, entre aspas. No `.kg.json`, reprova |
+| `yaml.lone-surrogate` | Há um surrogate solto (U+D800 a U+DFFF sem o par). Corrija o texto. No `.kg.json`, reprova |
+| `yaml.depth-over-128` | Mais de 128 coleções aninhadas. Achate a estrutura. No `.kg.json`, reprova |
 | `form.range.node.label` | Encurte o `label` para até 280 caracteres e mova o resto para `narrative` |
 | `form.pattern.node.provenance.method` | Use `<classe>: <detalhe>`, com a classe em `medição`, `leitura`, `juízes`, `derivado` ou `testemunho`. Reprova no v5 |
 | `form.required.node.verified_against` | Diga o que foi conferido no `verified_at` |

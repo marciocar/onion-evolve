@@ -15,6 +15,24 @@ Convenções: **obr.** = obrigatório; *data* = texto `AAAA-MM-DD` que existe no
   `off` são texto.
 - Chaves comparadas na forma JSON: `1` e `"1"` colidem (`parse.duplicate-key`).
 - `.nan` e `.inf` reprovam em qualquer posição, porque o JSON não os representa.
+- O perfil JSON vale também no `.kg.yaml`, como aviso: inteiro fora de ±(2^53−1) (`yaml.unsafe-integer`), surrogate
+  solto (`yaml.lone-surrogate`) e mais de 128 coleções aninhadas (`yaml.depth-over-128`).
+
+### O mesmo modelo em `.kg.json`
+
+O grafo pode vir em JSON, num arquivo `.kg.json` (a extensão é sensível a maiúsculas), com os mesmos campos e as
+mesmas regras. Ele é lido por um parser JSON, no perfil JSON do contrato, e cada ponto do perfil reprova:
+
+- sintaxe da RFC 8259: sem comentário, vírgula sobrando, aspas simples, `NaN` ou `Infinity`. O espaço em branco é só
+  espaço, tab, LF e CR, e um BOM inicial é aceito e descartado;
+- I-JSON (RFC 7493): sem surrogate solto, em chave ou valor, e todo número de valor inteiro dentro de ±(2^53−1),
+  escrito como inteiro ou como float (`9007199254740993` e `1e20` reprovam);
+- no máximo 128 coleções aninhadas, contando a raiz;
+- chave única em cada objeto, comparada depois dos escapes (`"label"` e `"\u006cabel"` colidem).
+
+A sintaxe inválida sai como `parse.yaml-error`, porque o vocabulário de códigos não tem um código próprio do JSON.
+Quando a sintaxe falha, ela decide antes da chave repetida. O gate (`kg_gate.py`) e as `external_edges` seguem só
+com `.kg.yaml`.
 
 ## Topo
 

@@ -40,3 +40,10 @@
 *.pdf   binary
 *.woff  binary
 *.woff2 binary
+
+# O VENDOR DO CONTRATO KG-SSOT viaja BYTE A BYTE (2026-10-17, subida para kg-ssot-v4.8.0): o
+# kg_vendor.py check confere o sha256 de cada arquivo contra o carimbo da tag, e a 4.8.0 traz
+# fixtures de conformidade do perfil JSON com CRLF DE PROPÓSITO (whitespace da RFC 8259). O
+# `*.json text eol=lf` acima as normalizava no índice, e um checkout novo (o CI) via 2 arquivos
+# "editados": medido exportando o índice e rodando o check (rc=1). `-text` vem DEPOIS para vencer.
+vendor/kg-ssot/** -text

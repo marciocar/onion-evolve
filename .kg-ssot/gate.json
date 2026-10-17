@@ -1,7 +1,7 @@
 {
   "contract": "kg-contract-v4.schema.json",
   "contract_sha256": "4b26d6967feadbaaa1fe24b943adf409d017a9a126296a179899a1e2d6aae84c",
-  "graphs": 156,
+  "graphs": 175,
   "failing": {
     "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": [
       "form.unknown-key.meta.label",

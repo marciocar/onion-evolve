@@ -17,7 +17,7 @@ A lista está em [`spec/release.json`](spec/release.json):
 - o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
   HTTP local;
 - o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
-- as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256 conferido por `--require-hashes`);
+- as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256, que o pip confere ao instalar; o `--require-hashes` faz a instalação falhar se um dia o arquivo perder os hashes);
 - este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
 - o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
   arquivos da release);
@@ -47,14 +47,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -262,6 +262,21 @@ testemunho em PROD, verificação antes do fato e decisão sem origem; a tabela 
 Se a dívida SHOULD subir (por desenho, quando o corpus tem o que os avisos novos acusam), o `--update` desse PR vai com
 `--accept-regression "<motivo>"`; se não subir, o `--update` grava a identidade nova sem motivo.
 
+Da `kg-ssot-v4.7.x` para a `kg-ssot-v4.8.0`, o sha256 dos schemas não muda, e nenhum veredito MUST de `.kg.yaml` muda.
+Entram três avisos SHOULD no `.kg.yaml`, os pontos do perfil JSON em rampa: `yaml.unsafe-integer` (inteiro fora de
+±(2^53−1)), `yaml.lone-surrogate` (surrogate solto) e `yaml.depth-over-128` (mais de 128 coleções aninhadas). Um
+grafo que tenha um desses ganha um código de dívida novo, e o `kg_gate.py` reprova até o `--update` com
+`--accept-regression "<motivo>"`, ou até o grafo ser corrigido. A 4.8.0 foi medida nos 454 `.kg.yaml` do core e
+nos deste repositório, e nenhum dispara os avisos novos.
+
+**O `.kg.json`.** A 4.8.0 lê o mesmo modelo de dados num arquivo `.kg.json`, por um parser JSON, no perfil JSON do
+contrato: RFC 8259 com um BOM inicial aceito, I-JSON (RFC 7493, sem surrogate solto e com inteiro dentro de
+±(2^53−1)), no máximo 128 coleções aninhadas e chave única. No `.kg.json`, esses pontos reprovam (MUST).
+`kg_validate.py`, `kg_conformance.py`, `kg_store.py` e `kg_mcp.py` leem os dois formatos pela extensão (sensível a
+maiúsculas: `.kg.json`). **O gate continua só com `.kg.yaml`**: um `.kg.json` commitado no repositório não é medido
+pelo `kg_gate.py`, e as `external_edges` só apontam para `.kg.yaml`. Quem guarda `.kg.json` no repo e quer o CI
+cobrando roda `kg_validate.py` neles num passo próprio.
+
 ## 5. Do v3 para o v4
 
 O v4 é uma versão maior: o que alertava no v3 passa a reprovar. Quem está numa tag `contract-v3.x` (anterior à
@@ -290,7 +305,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.4 --source https://github.com/marciocar/kg-ssot`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.0 --source https://github.com/marciocar/kg-ssot`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -349,6 +364,6 @@ python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
 A ordem importa: os casos de corpus conferem a ponta externa contra os `.kg.yaml` rastreados quando a suíte mora num
-repo git, e com o vendor ainda fora do git um caso falha (`latest: 224/225`). Depois compare com os códigos que o seu
+repo git, e com o vendor ainda fora do git um caso falha (`latest: 260/261`). Depois compare com os códigos que o seu
 leitor emite. O formato dos casos e como rodar a suíte com um leitor em outra linguagem estão em
 `spec/conformance/README.md`.
