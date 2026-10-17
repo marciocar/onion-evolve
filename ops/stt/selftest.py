@@ -300,6 +300,12 @@ try:
             and alt["words"][3]["word"] == "início" and alt["words"][3]["punctuated_word"] == "início."
         return ok, f"alt={alt}"
 
+    @case("duracao-acima-do-teto")
+    def _():
+        ok = core.audio_too_long(16000 * 10, 16000, 1, 5) is not None and core.audio_too_long(16000 * 3, 16000, 1, 5) is None \
+            and core.audio_too_long(16000 * 4, 16000, 3, 5) is not None and core.audio_too_long(10, 0, 1, 5) is not None
+        return ok, "teto de duração errado (por canal, no total ou cabeçalho inválido)"
+
     @case("pcm-params")
     def _():
         ok = core.raw_pcm_params({}) is None and core.raw_pcm_params({"encoding": "linear16", "sample_rate": "48000", "channels": "2"}) == (48000, 2)
@@ -344,7 +350,8 @@ try:
 
             def do_GET(self):
                 self._send(200, {"ready": True, "live": False, "engine": "fake",
-                                 "server_sha256": "f" * 64 if mode == "sha" else "a" * 64})
+                                 "server_sha256": "f" * 64 if mode == "sha" else "a" * 64,
+                                 "core_sha256": "e" * 64 if mode == "coresha" else "c" * 64})
 
             def do_POST(self):
                 n = int(self.headers.get("Content-Length") or 0)
@@ -362,7 +369,7 @@ try:
         threading.Thread(target=srv.serve_forever, daemon=True).start()
         return srv
 
-    def run_smoke(mode, expect_sha="a" * 64):
+    def run_smoke(mode, expect_sha="a" * 64, expect_core="c" * 64):
         srv = fake_server(mode)
         smoke.FAILS.clear()
         import contextlib
@@ -370,7 +377,7 @@ try:
         buf = _io.StringIO()
         try:
             with contextlib.redirect_stdout(buf):
-                smoke.run_checks(f"http://127.0.0.1:{srv.server_address[1]}", TOK.decode(), FIXTURE, META, expect_sha)
+                smoke.run_checks(f"http://127.0.0.1:{srv.server_address[1]}", TOK.decode(), FIXTURE, META, expect_sha, expect_core)
         finally:
             srv.shutdown()
         return list(smoke.FAILS), buf.getvalue()
@@ -399,6 +406,11 @@ try:
     def _():
         fails, _ = run_smoke("sha")
         return any("server_sha256" in f for f in fails), f"falhas={fails}"
+
+    @case("smoke-reprova-nucleo-diferente")
+    def _():
+        fails, _ = run_smoke("coresha")
+        return any("core_sha256" in f for f in fails), f"falhas={fails}"
 
     @case("smoke-recall-conta-repeticao")
     def _():

@@ -47,7 +47,7 @@ PROD_ROOT=/opt/onion-stt
 PROD_ETC=/etc/onion-stt
 PROD_UNIT_DIR=/etc/systemd/system
 PROD_BACKUP_DIR=/var/backups/onion-stt
-PROD_LOCK=/tmp/onion-stt-service.lock
+PROD_LOCK="/run/user/$(id -u)/onion-stt-service.lock"   # do operador: num /tmp comum outra conta seguraria o flock
 MARKER="# onion-stt-service: v1"
 COMPLETE=.onion-stt-complete
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -80,6 +80,7 @@ WORKERS=1
 QUEUE_MAX=2
 VAD_BATCH=1         # trechos do VAD por inferência; 8 era o padrão do onnx-asr
 MAX_BODY_MB=384
+MAX_AUDIO_S=10800   # teto da duração DECODIFICADA por canal (3 h): 4 MB de FLAC de silêncio eram 6 h e +2,7 GB (refutador)
 MEMORY_MAX=6G       # teto do cgroup; sem swap (MemorySwapMax=0): estourou, o kernel mata e o systemd reinicia
 MEMORY_MAX_BYTES=6442450944
 MIN_FREE_KB=$(( 3 * 1024 * 1024 ))   # disco livre exigido para montar (~0,7 GB de modelo + ~0,2 GB de venv, com folga)
@@ -148,8 +149,9 @@ CODE_DIR="${ROOT}/code-${CODE_ID}"
 TOKEN_FILE="${ETC}/token"
 UNIT_FILE="${UNIT_DIR}/${UNIT}.service"
 SERVER_SHA="$(sha256sum < "${SRC}/server.py" | cut -d' ' -f1)"
+CORE_SHA="$(sha256sum < "${SRC}/stt_core.py" | cut -d' ' -f1)"
 SERVER_ARGS=( --host 127.0.0.1 --model-dir "${MODEL_DIR}" --vad-dir "${VAD_DIR}" --intra-op "${INTRA_OP}" --workers "${WORKERS}"
-              --queue-max "${QUEUE_MAX}" --vad-batch "${VAD_BATCH}" --max-body-mb "${MAX_BODY_MB}" )
+              --queue-max "${QUEUE_MAX}" --vad-batch "${VAD_BATCH}" --max-body-mb "${MAX_BODY_MB}" --max-audio-s "${MAX_AUDIO_S}" )
 
 # as propriedades do sandbox: a MESMA lista vai para a unit e para a transitória do ensaio (o que se prova é o que roda)
 SANDBOX=(
@@ -220,20 +222,29 @@ transient_smoke() {
 
 # ── verify: o serviço VIVO ───────────────────────────────────────────────────────────────────────────
 verify_live() {
-  local show st pid frag mem cur ipd ldr addrs a h hsha vrc nok
-  show="$(systemctl show "${UNIT}" -p ActiveState -p MainPID -p FragmentPath -p MemoryMax -p MemoryCurrent -p IPAddressDeny \
-          -p DynamicUser -p ProtectHome -p NRestarts 2>/dev/null)" || { say "NÃO MEDI: systemctl show ${UNIT} falhou"; return 2; }
+  local show st pid frag mem cur ipd ipa dpi ldr addrs a h hsha vrc nok
+  show="$(systemctl show "${UNIT}" -p ActiveState -p MainPID -p FragmentPath -p DropInPaths -p MemoryMax -p MemorySwapMax \
+          -p MemoryCurrent -p IPAddressDeny -p IPAddressAllow -p DynamicUser -p ProtectHome -p NRestarts 2>/dev/null)" \
+    || { say "NÃO MEDI: systemctl show ${UNIT} falhou"; return 2; }
   st="$(sed -n 's/^ActiveState=//p' <<<"${show}")"; pid="$(sed -n 's/^MainPID=//p' <<<"${show}")"
   frag="$(sed -n 's/^FragmentPath=//p' <<<"${show}")"; mem="$(sed -n 's/^MemoryMax=//p' <<<"${show}")"
   cur="$(sed -n 's/^MemoryCurrent=//p' <<<"${show}")"; ipd="$(sed -n 's/^IPAddressDeny=//p' <<<"${show}")"
   [ "${st}" = active ] && [[ "${pid}" =~ ^[1-9][0-9]*$ ]] || { say "a unit ${UNIT} não está ativa (ActiveState=${st:-?}, MainPID=${pid:-?})"; return 1; }
   [ "${frag}" = "${UNIT_FILE}" ] || { say "a unit carregada vem de ${frag:-?}, não de ${UNIT_FILE}"; return 1; }
+  # um drop-in (onion-vps-stt.service.d/*.conf) mudaria a unit sem passar pela comparação abaixo (IPAddressAllow=any
+  # abriria a saída e o cmp do FragmentPath seguiria igual): a unit deste serviço não tem drop-in, nenhum
+  dpi="$(sed -n 's/^DropInPaths=//p' <<<"${show}")"
+  [ -z "${dpi}" ] || { say "a unit tem drop-in(s) que este wrapper não gera: ${dpi}"; return 1; }
   priv grep -qxF "${MARKER}" "${UNIT_FILE}" 2>/dev/null || { say "${UNIT_FILE} não foi gerada por este wrapper (sem o marcador)"; return 1; }
   if priv cmp -s "${UNIT_FILE}" "${TMPD}/${UNIT}.service"; then say "OK a unit instalada é a renderizada deste commit"
   else say "a unit instalada DIFERE da renderizada deste commit (rode install para ver a diferença)"; return 1; fi
   [ "${mem}" = "${MEMORY_MAX_BYTES}" ] || { say "MemoryMax efetivo ${mem:-?} != ${MEMORY_MAX_BYTES}"; return 1; }
+  [ "$(sed -n 's/^MemorySwapMax=//p' <<<"${show}")" = 0 ] || { say "MemorySwapMax efetivo diferente de 0"; return 1; }
   say "OK MemoryMax=${mem} (em uso agora: ${cur:-?} B)"
   grep -qE '(^| )(0\.0\.0\.0/0|any)( |$)' <<<"${ipd}" || grep -q '::/0' <<<"${ipd}" || { say "IPAddressDeny efetivo sem 'any' (${ipd:-vazio})"; return 1; }
+  # o allow vence o deny: só o loopback pode estar nele (127.0.0.0/8 e ::1/128 é como o systemd mostra `localhost`)
+  ipa="$(sed -n 's/^IPAddressAllow=//p' <<<"${show}")"
+  for a in ${ipa}; do case "${a}" in 127.0.0.0/8|::1/128|127.0.0.1/32|localhost) : ;; *) say "IPAddressAllow efetivo fora do loopback: ${a}"; return 1 ;; esac; done
   grep -qx 'DynamicUser=yes' <<<"${show}" && grep -qx 'ProtectHome=yes' <<<"${show}" || { say "DynamicUser/ProtectHome efetivos diferentes de yes"; return 1; }
   say "OK sandbox efetivo: DynamicUser, ProtectHome, IPAddressDeny=${ipd}"
   ldr="$(ss -ltnH "sport = :${PORT}" 2>/dev/null)" || { say "NÃO MEDI: ss falhou"; return 2; }
@@ -248,7 +259,7 @@ verify_live() {
   [ "${hsha}" = "${SERVER_SHA}" ] || { say "o processo serve outro código (server_sha256 ${hsha:0:12} != ${SERVER_SHA:0:12} do repositório)"; return 1; }
   say "OK /health pronto, servindo o server.py deste commit (${SERVER_SHA:0:12})"
   say "prova pelo cliente numa unit transitória (token por LoadCredential=, mesmo sandbox):"
-  transient_smoke "verify" --url "http://127.0.0.1:${PORT}" --expect-sha "${SERVER_SHA}"; vrc=$?
+  transient_smoke "verify" --url "http://127.0.0.1:${PORT}" --expect-sha "${SERVER_SHA}" --expect-core-sha "${CORE_SHA}"; vrc=$?
   [ "${vrc}" = 0 ] || return "${vrc}"
   nok="$(grep -c '' <<<"${show}")"
   say "verify OK — ${UNIT} vivo (MainPID ${pid}), loopback, token exigido, fixture transcrito, MemoryMax ${MEMORY_MAX} (${nok} propriedades lidas)"
@@ -403,10 +414,15 @@ stage_venv() {
   say "montado ${VENV_DIR} (lock por hash, pip check limpo)"
 }
 stage_code() {
-  staged "${CODE_DIR}" && { say "reusa ${CODE_DIR}"; return 0; }
+  local f
+  if staged "${CODE_DIR}"; then
+    # o nome é o hash do conteúdo, mas quem o confere é o disco: arquivo trocado depois do marcador refaz o diretório
+    for f in "${CODE_FILES[@]}"; do priv cmp -s "${SRC}/${f}" "${CODE_DIR}/${f}" || break; done
+    if priv cmp -s "${SRC}/${f}" "${CODE_DIR}/${f}"; then say "reusa ${CODE_DIR} (conteúdo conferido)"; return 0; fi
+    say "${CODE_DIR} difere da fonte (${f}): refaço"
+  fi
   fresh_dir "${CODE_DIR}" || return 1
   priv install -d -m 0755 "${CODE_DIR}/fixtures" || return 1
-  local f
   for f in "${CODE_FILES[@]}"; do priv install -m 0644 "${SRC}/${f}" "${CODE_DIR}/${f}" || return 1; done
   printf '%s\n' "${CODE_ID}" | priv tee "${CODE_DIR}/${COMPLETE}" >/dev/null
   say "montado ${CODE_DIR}"

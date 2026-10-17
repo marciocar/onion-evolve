@@ -10778,7 +10778,7 @@ run_stt_service_selftests() {
   [ -f "${helper}" ] || { record_fail "stt-service" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
   local d; d="$(mktemp -d)"
   # ── (a) o harness do núcleo e do smoke ──
-  local want_total=37 o rc
+  local want_total=39 o rc
   if o="$(LC_ALL=C python3 -I -B "${st}/selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} FAIL 0$" <<< "${o}"; then
     record_pass "stt-service: (a) núcleo e prova do verify — ${want_total} casos (token, 401, 413, palavras, formas, smoke que reprova)"
@@ -10818,11 +10818,13 @@ stt_core.py$(printf '\x1f')    if not segs and fallback_text:$(printf '\x1f')   
 stt_core.py$(printf '\x1f')    return [{k: v for k, v in w.items() if k != "_lps"} for w in words]$(printf '\x1f')    return [dict(w) for w in words]  # ONION_MUTANTE$(printf '\x1f')openai-verbose-forma
 stt_core.py$(printf '\x1f')    if fmt == "json":$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')openai-json-e-text
 stt_core.py$(printf '\x1f')    bare = _EDGE_PUNCT.sub("", unicodedata.normalize("NFC", w["word"])).lower()$(printf '\x1f')    bare = w["word"].lower()  # ONION_MUTANTE$(printf '\x1f')deepgram-forma
+stt_core.py$(printf '\x1f')    if dur * channels > 2 * max_s:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')duracao-acima-do-teto
 stt_core.py$(printf '\x1f')    if sr not in PCM_RATES:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')pcm-params
 smoke.py$(printf '\x1f')        if st1 == 401 and st2 == 401:$(printf '\x1f')        if True:  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-servidor-sem-auth
 smoke.py$(printf '\x1f')        if not isinstance(s, (int, float)) or not isinstance(e, (int, float)) or not (0 <= s < e <= duration + 0.05) or s < prev:$(printf '\x1f')        if not isinstance(s, (int, float)) or not isinstance(e, (int, float)):  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-tempos-invalidos
 smoke.py$(printf '\x1f')        (ok if rc >= meta["min_word_recall"] else bad)(f"OpenAI: recall$(printf '\x1f')        (ok if True else bad)(f"OpenAI: recall  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-recall-baixo
 smoke.py$(printf '\x1f')        if h.get("server_sha256") == expect_sha:$(printf '\x1f')        if True:  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-codigo-diferente
+smoke.py$(printf '\x1f')        if h.get("core_sha256") == expect_core_sha:$(printf '\x1f')        if True:  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-nucleo-diferente
 smoke.py$(printf '\x1f')        if pool.get(w, 0) > 0:$(printf '\x1f')        if w in pool:  # ONION_MUTANTE$(printf '\x1f')smoke-recall-conta-repeticao
 EOF_MUT
 
@@ -10896,8 +10898,9 @@ PY
   _st_reset() {  # o estado padrão: serviço vivo, saudável, na porta só em loopback, com a unit renderizada instalada
     rm -rf "${d}/run"; mkdir -p "${d}/run/units" "${d}/run/fk"
     local F="${d}/run/fk"
-    printf '%s\n' ActiveState=active MainPID=4242 "FragmentPath=${d}/run/units/onion-vps-stt.service" MemoryMax=6442450944 \
-      MemoryCurrent=2000000000 'IPAddressDeny=0.0.0.0/0 ::/0' DynamicUser=yes ProtectHome=yes NRestarts=0 > "${F}/show"
+    printf '%s\n' ActiveState=active MainPID=4242 "FragmentPath=${d}/run/units/onion-vps-stt.service" DropInPaths= MemoryMax=6442450944 \
+      MemorySwapMax=0 MemoryCurrent=2000000000 'IPAddressDeny=0.0.0.0/0 ::/0' 'IPAddressAllow=127.0.0.0/8 ::1/128' DynamicUser=yes \
+      ProtectHome=yes NRestarts=0 > "${F}/show"
     echo inv-1 > "${F}/inv"
     printf 'LISTEN 0 2048 127.0.0.1:8765 0.0.0.0:* users:(("python",pid=4242,fd=6))\n' > "${F}/ss"
     printf '{"ready":true,"live":false,"server_sha256":"%s"}\n' "${sha_srv}" > "${F}/health"
@@ -10974,10 +10977,15 @@ PY
   done
   # (w2) produção não se redireciona por ambiente · (w3) uso inválido
   local r2; r2="$(env ONION_STT_SERVICE_ROOT=/tmp/x LC_ALL=C bash "${wr}" show 2>&1)"; rc=$?
-  cp "${wr}" "${d}/wops/stt-service.sh"
-  local r2m; r2m="$(LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "  if compgen -e | grep -E '^ONION_STT_SERVICE_' >/dev/null; then|||  if false; then  # ONION_MUTANTE" \
-     env ONION_STT_SERVICE_ROOT=/tmp/x bash "${d}/wops/stt-service.sh" verify 2>&1)"; local rc2m=$?
-  if [ "${rc}" = 3 ] && grep -q 'não se redireciona' <<<"${r2}" && ! grep -q 'não se redireciona' <<<"${r2m}"; then
+  # o mutante roda num CHECKOUT git temporário (o wrapper e o ops/stt rastreados e commitados): sem isso a cópia morreria
+  # antes, na guarda do "arquivo rastreado", e o caso provaria a guarda errada (refutador, passada 1)
+  local gr="${d}/gitw"; mkdir -p "${gr}/ops"; cp -r "${st}" "${gr}/ops/stt"; cp "${wr}" "${gr}/ops/stt-service.sh"
+  git -C "${gr}" init -q -b main && git -C "${gr}" add -A && git -C "${gr}" -c user.email=t@t -c user.name=t commit -q -m base
+  # o mutante é COMMITADO no checkout temporário antes de rodar: sem a guarda do ambiente, a produção segue e imprime a
+  # unit (rc 0) — a prova de que é ESTA guarda, e não a do rastreio, que recusa
+  local r2m; r2m="$(LC_ALL=C bash "${helper}" "${gr}/ops/stt-service.sh" "  if compgen -e | grep -E '^ONION_STT_SERVICE_' >/dev/null; then|||  if false; then  # ONION_MUTANTE" \
+     bash -c 'cd "$1" && git -c user.email=t@t -c user.name=t commit -qam mutante && env ONION_STT_SERVICE_ROOT=/tmp/x bash ops/stt-service.sh show' _ "${gr}" 2>&1)"; local rc2m=$?
+  if [ "${rc}" = 3 ] && grep -q 'não se redireciona' <<<"${r2}" && [ "${rc2m}" = 0 ] && grep -q '^\[Service\]' <<<"${r2m}"; then
     record_pass "stt-service: (w2) ONION_STT_SERVICE_* sem o modo de teste → rc 3 (e o mutante sem a guarda passa adiante)"
   else record_fail "stt-service: (w2)" "rc=${rc} rc_mutante=${rc2m}: ${r2:0:160}"; fi
   _stcase "(w3) opção fora da lista fechada → rc 3" 3 'opção não aceita' \
@@ -11048,8 +11056,52 @@ PY
   _stcase "(w16) a prova pré-troca reprova → rc 1 e a unit de produção NÃO é tocada" 1 'NÃO foi tocada' \
     '[ "${r}" = 0 ] || die "${r}" "a prova pré-troca reprovou' '[ 0 = 0 ] || die "${r}" "a prova pré-troca reprovou  # ONION_MUTANTE' _p_prefail install --apply
   _st_post_ok() { return 0; }
+  # (w17) drop-in na unit · (w18) IPAddressAllow fora do loopback · (w19) swap ligado (refutador, passada 1: o verify lia
+  # só o IPAddressDeny e o FragmentPath; um drop-in com IPAddressAllow=any abria a saída com o verify verde)
+  _p_dropin() { _p_live; sed -i "s|^DropInPaths=.*|DropInPaths=${d}/run/units/onion-vps-stt.service.d/x.conf|" "${d}/run/fk/show"; }
+  _stcase "(w17) verify com drop-in na unit → rc 1" 1 'drop-in' \
+    '  [ -z "${dpi}" ] || {' '  true || { : ONION_MUTANTE;' _p_dropin verify
+  _p_allow() { _p_live; sed -i 's|^IPAddressAllow=.*|IPAddressAllow=127.0.0.0/8 ::1/128 0.0.0.0/0|' "${d}/run/fk/show"; }
+  _stcase "(w18) verify com IPAddressAllow fora do loopback → rc 1" 1 'IPAddressAllow efetivo fora do loopback' \
+    '  for a in ${ipa}; do case "${a}" in 127.0.0.0/8|::1/128|127.0.0.1/32|localhost) : ;; *)' '  for a in ${ipa}; do case "${a}" in *) : ;; ONION_MUTANTE)' _p_allow verify
+  _p_swap() { _p_live; sed -i 's|^MemorySwapMax=.*|MemorySwapMax=infinity|' "${d}/run/fk/show"; }
+  _stcase "(w19) verify com swap liberado → rc 1" 1 'MemorySwapMax efetivo' \
+    '  [ "$(sed -n '"'"'s/^MemorySwapMax=//p'"'"' <<<"${show}")" = 0 ] || {' '  true || { : ONION_MUTANTE;' _p_swap verify
+  # ── (s) o server.py de VERDADE com motor falso: exige o venv do serviço (ONION_STT_SELFTEST_PY, ou o instalado na área
+  # do serviço). Sem ele: ⊘ declarado — no CI a amarração do AuthGate/BodyLimit, o teto de duração, o 413 chunked e a
+  # fila são provados só onde o venv existe (a VPS depois do --apply).
+  local spy="${ONION_STT_SELFTEST_PY:-}" cand
+  if [ -z "${spy}" ]; then for cand in /opt/onion-stt/venv-*/bin/python; do [ -x "${cand}" ] && spy="${cand}"; done; fi
+  if [ -z "${spy}" ] || ! "${spy}" -I -c 'import numpy, soundfile, starlette, uvicorn' >/dev/null 2>&1; then
+    record_skip "stt-service: (s) server.py real — sem o venv do serviço (ONION_STT_SELFTEST_PY ou a área instalada): amarração NÃO exercida aqui"
+  else
+    local so src_ok=8
+    if so="$(cd / && LC_ALL=C "${spy}" -I -B "${st}/server_selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" = 0 ] && grep -qE "^TOTAL ${src_ok} FAIL 0$" <<<"${so}"; then
+      record_pass "stt-service: (s) server.py real com motor falso — ${src_ok} casos (401 amarrado, loopback, teto de duração, 413 chunked, fila)"
+    else record_fail "stt-service: (s) server.py real" "rc=${rc}: $(grep -E '^(FAIL|TOTAL|SKIP)' <<<"${so}" | head -4 | tr '\n' '|')"; fi
+    mkdir -p "${d}/smut"
+    while IFS=$'\x1f' read -r old new want; do
+      [ -n "${old}" ] || continue
+      cp "${st}/server.py" "${st}/stt_core.py" "${d}/smut/"
+      n="$(grep -cF -- "${old}" "${d}/smut/server.py" || true)"
+      if [ "${n}" != 1 ]; then record_fail "stt-service: (s) ${want}" "âncora aparece ${n}× no server.py: ${old:0:80}"; continue; fi
+      if mo="$(cd / && LC_ALL=C bash "${helper}" "${d}/smut/server.py" "${old}|||${new}" "${spy}" -I -B "${st}/server_selftest.py" \
+               --server "${d}/smut/server.py" --until "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
+      if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want}" <<<"${mo}"; then record_pass "stt-service: (s) mutante reprova ${want}"
+      else record_fail "stt-service: (s) ${want}" "o mutante SOBREVIVEU (rc=${mrc}): $(tail -2 <<<"${mo}" | tr '\n' '|')"; fi
+    done <<EOF_SMUT
+    return core.AuthGate(core.BodyLimit(inner, a.max_body_mb * 1024 * 1024), token)$(printf '\x1f')    return inner  # ONION_MUTANTE$(printf '\x1f')srv-sem-token-401
+        if not ipaddress.ip_address(a.host).is_loopback:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-host-fora-do-loopback-recusa
+            why = core.audio_too_long(int(info.frames), int(info.samplerate), int(info.channels), max_s)$(printf '\x1f')            why = None  # ONION_MUTANTE$(printf '\x1f')srv-duracao-acima-do-teto-413
+    why = core.audio_too_long(int(oinfo.frames), int(oinfo.samplerate), int(oinfo.channels), max_s)$(printf '\x1f')    why = None  # ONION_MUTANTE$(printf '\x1f')srv-duracao-pelo-ffmpeg-413
+    inner = Starlette(routes=routes, exception_handlers={core.BodyTooLarge: too_large})$(printf '\x1f')    inner = Starlette(routes=routes)  # ONION_MUTANTE$(printf '\x1f')srv-chunked-acima-do-teto-413
+            except core.BodyTooLarge:$(printf '\x1f')            except ZeroDivisionError:  # ONION_MUTANTE$(printf '\x1f')srv-multipart-chunked-acima-do-teto-413
+        if state["inflight"] >= a.queue_max:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-fila-cheia-429
+EOF_SMUT
+  fi
   unset -f _st_hfjson _st_reset _st_env _st_install_rendered _st_stage_all _stcase _st_post_ok _p_none _p_live _p_free _p_hfbad \
-    _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture
+    _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap
   rm -rf "${d}"
 }
 
