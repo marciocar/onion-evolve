@@ -7986,7 +7986,7 @@ run_currency_census_selftests() {
   if ! command -v python3 >/dev/null 2>&1; then record_skip "currency-census: python3 ausente → pulado"; return; fi
   local d; d="$(mktemp -d)"
   mkdir -p "${d}/bin" "${d}/versions" "${d}/cache" "${d}/state" "${d}/srv/node_modules/@anthropic-ai/claude-agent-sdk"
-  chmod 700 "${d}/cache"
+  chmod 700 "${d}/cache" "${d}/state"   # o hook só confia em estado num diretório da conta e não gravável por outros
   : > "${d}/versions/2.1.302"; chmod +x "${d}/versions/2.1.302"; ln -s "${d}/versions/2.1.302" "${d}/bin/claude"
   # npm falso: conta as chamadas (o cache é provado por elas), FAKE_NPM_FAIL = inalcançável, FAKE_NPM_SLEEP = travado
   cat > "${d}/bin/npm" <<'NPM'
@@ -8080,8 +8080,10 @@ PYF
   o="$(_cc FAKE_PIP_PyYAML=6.0.4 -- --fresh)"
   case "$(_st "${o}" python:PyYAML)|$(_act "${o}" python:PyYAML)" in "pinada|6.0.3|6.0.4|"*"produto kg-ssot"*) record_pass "currency-census: (g) PyPI 6.0.4 × pino 6.0.3 ⇒ pinada (a subida é do produto)" ;;
     *) record_fail "currency-census: (g) pinada" "veio: $(_st "${o}" python:PyYAML)" ;; esac
-  case "$(_cc FAKE_PIP_PyYAML=6.0.4 -- --fresh --notice)" in *PyYAML*) record_fail "currency-census: (g) pinada no aviso" "a pinada não pode avisar (sem ação neste repo)" ;;
-    *) record_pass "currency-census: (g) pinada não entra no aviso" ;; esac
+  o="$(_cc FAKE_PIP_PyYAML=6.0.4 -- --fresh --notice)"
+  case "${o}" in *"python:PyYAML: 6.0.3, PyPI em 6.0.4 — PINADA (informativo"*) case "${o}" in *"PyYAML"*DEFASADA*) record_fail "currency-census: (g) pinada no aviso" "a pinada saiu como DEFASADA" ;;
+      *) record_pass "currency-census: (g) pinada entra no aviso como INFORMATIVA (nomeia, não manda subir aqui)" ;; esac ;;
+    *) record_fail "currency-census: (g) pinada no aviso" "esperava a linha informativa, veio: ${o:0:200}" ;; esac
   o="$(_cc FAKE_INST_PyYAML=6.0.2 -- --fresh)"
   case "$(_st "${o}" python:PyYAML)|$(_act "${o}" python:PyYAML)" in "defasada|6.0.2|6.0.3|"*"PyYAML==6.0.3"*) record_pass "currency-census: (g2) instalado 6.0.2 × pino 6.0.3 ⇒ defasada, instale o pino" ;;
     *) record_fail "currency-census: (g2) fora do pino" "veio: $(_st "${o}" python:PyYAML)" ;; esac
@@ -8161,12 +8163,30 @@ PYF
   o="$(env PATH="${d}/nobin" bash "${sut}" "${d}/repo" --fresh 2>/dev/null </dev/null)"
   case "$(_st "${o}" ferramentas)|$(_act "${o}" ferramentas)" in ausente*timeout*"peça autorização"*) record_pass "currency-census: (m) sem timeout ⇒ AUSENTE nomeando o timeout" ;;
     *) record_fail "currency-census: (m) ferramenta da medição" "veio: ${o:0:200}" ;; esac
-  # (n) PRAZO: registro travado ⇒ a perna estoura e vira não medida, sem passar do prazo
-  local s0 s1; s0="$(date +%s)"
-  o="$(_cc FAKE_NPM_SLEEP=30 ONION_CURRENCY_DEADLINE=2 ONION_CURRENCY_TIMEOUT=20 -- --fresh)"; s1="$(date +%s)"
-  case "$(_st "${o}" perna:cli)|$(_act "${o}" perna:cli)" in nao-medida*"estourou o prazo"*) [ $((s1 - s0)) -le 8 ] && record_pass "currency-census: (n) registro travado ⇒ perna estourada NÃO MEDIDA em $((s1 - s0)) s" \
+  # (n) PRAZO: três alvos de SDK que travam (FIFO sem escritor), cada leitura no teto da fonte ⇒ a perna passa
+  #     do prazo, é morta e vira NÃO MEDIDA — e o censo inteiro não passa do prazo
+  local s0 s1 q; : > "${d}/t-fifo.tsv"
+  for q in 1 2 3; do mkdir -p "${d}/f${q}/node_modules/@anthropic-ai/claude-agent-sdk"; mkfifo "${d}/f${q}/node_modules/@anthropic-ai/claude-agent-sdk/package.json"
+    printf 'b%s\t-\t%s\t-\n' "${q}" "${d}/f${q}/node_modules/@anthropic-ai/claude-agent-sdk/package.json" >> "${d}/t-fifo.tsv"; done
+  s0="$(date +%s)"
+  o="$(_cc ONION_CURRENCY_SDK_TARGETS="${d}/t-fifo.tsv" ONION_CURRENCY_DEADLINE=3 ONION_CURRENCY_TIMEOUT=2 -- --fresh)"; s1="$(date +%s)"
+  case "$(_st "${o}" perna:sdk)|$(_act "${o}" perna:sdk)" in nao-medida*"estourou o prazo"*) [ $((s1 - s0)) -le 8 ] && record_pass "currency-census: (n) alvos travados ⇒ perna estourada NÃO MEDIDA em $((s1 - s0)) s" \
       || record_fail "currency-census: (n) prazo" "levou $((s1 - s0)) s" ;;
     *) record_fail "currency-census: (n) prazo" "veio: ${o:0:200}" ;; esac
+  # (n2) teto da fonte maior que o prazo é GRAMPEADO: o registro travado falha dentro da perna e a falha é gravada
+  rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"; rm -f "${d}/calls"
+  s0="$(date +%s)"; _cc FAKE_NPM_SLEEP=30 ONION_CURRENCY_DEADLINE=3 ONION_CURRENCY_TIMEOUT=20 -- >/dev/null; n1="$(_ncalls)"
+  o="$(_cc FAKE_NPM_SLEEP=30 ONION_CURRENCY_DEADLINE=3 ONION_CURRENCY_TIMEOUT=20 -- )"; s1="$(date +%s)"; n2="$(_ncalls)"
+  [ "${n1}" -gt 0 ] && [ "${n1}" = "${n2}" ] && [ "$(_st "${o}" "claude-cli (canal latest)" | cut -d'|' -f1)" = "nao-medida" ] && [ $((s1 - s0)) -le 9 ] \
+    && record_pass "currency-census: (n2) teto da fonte grampeado ao prazo: a falha é gravada e o 2º prompt não paga o registro" \
+    || record_fail "currency-census: (n2) grampo do teto" "chamadas ${n1}→${n2}, $((s1 - s0)) s, cli $(_st "${o}" "claude-cli (canal latest)")"
+  # (n3) marca EM CURSO velha (perna morta pelo prazo) vale como falha: a fonte não é paga de novo
+  local cf; rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"; _cc -- >/dev/null
+  for cf in "${d}"/cache/*/npm-sdk; do rm -f "${cf}"; : > "${cf}.inflight"; touch -d '-60 seconds' "${cf}.inflight"; done
+  rm -f "${d}/calls"; o="$(_cc FAKE_NPM_SDK=0.3.302 -- )"
+  case "$(grep -c "claude-agent-sdk" "${d}/calls" 2>/dev/null)|$(_st "${o}" agent-sdk:bridge | cut -d'|' -f1)" in "|nao-medida"|"0|nao-medida") record_pass "currency-census: (n3) marca em curso velha ⇒ falha em cache, o registro não é pago de novo" ;;
+    *) record_fail "currency-census: (n3) marca em curso" "veio: $(grep -c "claude-agent-sdk" "${d}/calls" 2>/dev/null)|$(_st "${o}" agent-sdk:bridge)" ;; esac
+  rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"
   # (o) perna que MORRE vira linha não medida (nunca some calada)
   o="$(_cc ONION_CURRENCY_DEADLINE=abc -- --fresh)"
   case "$(_st "${o}" perna:sdk)|$(_act "${o}" perna:sdk)" in nao-medida*"morreu"*) record_pass "currency-census: (o) perna morta ⇒ linha NÃO MEDIDA declarando a morte" ;;
@@ -8178,7 +8198,7 @@ PYF
       CLAUDE_PROJECT_DIR="${d}/repo" CLAUDE_CODE_SESSION_ID=bench "$@" bash "${hk}" </dev/null 2>/dev/null)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
-  printf '#!/usr/bin/env bash\nexec env ONION_CC_BIN=%q ONION_CC_CHANNEL=latest ONION_CURRENCY_NPM=%q ONION_CURRENCY_PY=%q ONION_CURRENCY_SDK_TARGETS=%q ONION_CURRENCY_KG_SSOT_REMOTE=%q ONION_CURRENCY_CACHE_DIR=%q ONION_CURRENCY_TIMEOUT=20 ONION_CURRENCY_DEADLINE=40 FAKE_INST_PyYAML=6.0.3 FAKE_INST_jsonschema=4.26.0 FAKE_PIP_PyYAML=6.0.3 FAKE_PIP_jsonschema=4.26.0 FAKE_NPM_CC=2.1.302 bash %q "$@" --fresh\n' \
+  printf '#!/usr/bin/env bash\nexec env ONION_CC_BIN=%q ONION_CC_CHANNEL=latest ONION_CURRENCY_NPM=%q ONION_CURRENCY_PY=%q ONION_CURRENCY_SDK_TARGETS=%q ONION_CURRENCY_KG_SSOT_REMOTE=%q ONION_CURRENCY_CACHE_DIR=%q ONION_CURRENCY_TIMEOUT=20 ONION_CURRENCY_DEADLINE="${ONION_CURRENCY_DEADLINE:-12}" FAKE_INST_PyYAML=6.0.3 FAKE_INST_jsonschema=4.26.0 FAKE_PIP_PyYAML=6.0.3 FAKE_PIP_jsonschema=4.26.0 FAKE_NPM_CC=2.1.302 bash %q "$@" --fresh\n' \
     "${d}/bin/claude" "${d}/bin/npm" "${d}/bin/py" "${d}/targets.tsv" "${d}/kg.git" "${d}/cache" "${sut}" > "${d}/census-wrap.sh"
   printf '{"version":"4.10.0"}\n' > "${d}/repo/vendor/kg-ssot/.kg-ssot-version"
   r="$(_hk FAKE_NPM_SDK=0.3.301)"
@@ -8205,6 +8225,66 @@ PYF
   local r3; r3="$(_hk FAKE_NPM_SDK=0.3.303)"
   case "${r}|${r2}|${r3}" in "0|"*"base:main"*"|0||0|"*"base:main"*DEFASADA*) record_pass "currency-census: (k5) base: avisa, cala no sha novo, limpa no pull, re-avisa quando cai de novo" ;;
     *) record_fail "currency-census: (k5) vai-e-volta da base" "2ª='${r2:0:80}' 3ª='${r3:0:80}'" ;; esac
+  # ── passada 2 do refutador: cada caso abaixo é o mutante sobrevivente ou o defeito novo que ela achou ──
+  local fb="${d}/fakebin"; mkdir -p "${fb}"
+  # (p) EPIPE: resposta do pip GRANDE (> buffer do pipe): um leitor que fecha cedo faria a pipeline sair 141
+  printf '#!/usr/bin/env bash\ncase " $* " in\n  *" -m pip "*) printf "%%s (%%s)\\n" "${*: -1}" "${FAKE_PIP_PyYAML:-6.0.3}"; head -c 200000 /dev/zero | tr "\\0" x | fold -w 100; echo; exit 0 ;;\nesac\nexec %q "$@"\n' "${d}/bin/py" > "${d}/bin/pybig"
+  printf '#!/usr/bin/env bash\ncase " $* " in\n  *" -m pip "*) echo "WARNING: Retrying (Retry(total=4))" >&2; printf "%%s (%%s)\\n" "${*: -1}" "6.0.3"; exit 0 ;;\nesac\nexec %q "$@"\n' "${d}/bin/py" > "${d}/bin/pywarn"
+  chmod +x "${d}/bin/pybig" "${d}/bin/pywarn"
+  r="$(_st "$(_cc ONION_CURRENCY_PY="${d}/bin/pybig" -- --fresh)" python:PyYAML)"
+  [ "${r%%|*}" = "em-dia" ] && record_pass "currency-census: (p) resposta grande do pip ⇒ em dia (sem SIGPIPE de leitor que fecha cedo)" \
+    || record_fail "currency-census: (p) EPIPE" "veio: ${r}"
+  # (q) aviso do pip em STDERR não vira a primeira linha da resposta
+  r="$(_st "$(_cc ONION_CURRENCY_PY="${d}/bin/pywarn" -- --fresh)" python:PyYAML)"
+  [ "${r%%|*}" = "em-dia" ] && record_pass "currency-census: (q) retry do pip em stderr ⇒ em dia (stderr à parte)" \
+    || record_fail "currency-census: (q) stderr do pip" "veio: ${r}"
+  # (r) diretório de cache de OUTRA conta (stat falso diz uid 0) ⇒ não é usado
+  printf '#!/usr/bin/env bash\nif [ "$1" = "-c" ] && [ "$2" = "%%u %%a" ] && [ "$3" = "%s" ]; then echo "0 700"; exit 0; fi\nexec %q "$@"\n' "${d}/cache" "$(command -v stat)" > "${fb}/stat"; chmod +x "${fb}/stat"
+  rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"; rm -f "${d}/calls"
+  _cc PATH="${fb}:${PATH}" -- >/dev/null; n1="$(_ncalls)"; _cc PATH="${fb}:${PATH}" -- >/dev/null; n2="$(_ncalls)"; rm -f "${fb}/stat"
+  [ "${n1}" -gt 0 ] && [ "${n2}" -gt "${n1}" ] && record_pass "currency-census: (r) cache de dono alheio ⇒ ignorado (npm ${n1}→${n2})" \
+    || record_fail "currency-census: (r) dono do cache" "chamadas ${n1}→${n2} (esperava crescer)"
+  # (s) conta de uid 0 que NÃO se chama root (id falso) ⇒ recusada, nada lido
+  printf '#!/usr/bin/env bash\ncase "$*" in "-u svc") echo 0 ;; "-un") echo svc ;; *) exec %q "$@" ;; esac\n' "$(command -v id)" > "${fb}/id"; chmod +x "${fb}/id"
+  printf 'bridge\tsvc\t%s\t-\n' "${d}/srv/node_modules/@anthropic-ai/claude-agent-sdk/package.json" > "${d}/t-uid0.tsv"
+  r="$(_st "$(_cc PATH="${fb}:${PATH}" ONION_CURRENCY_SDK_TARGETS="${d}/t-uid0.tsv" -- --fresh)" agent-sdk:bridge)"; rm -f "${fb}/id"
+  [ "${r}" = "nao-medida|-|-" ] && record_pass "currency-census: (s) conta com uid 0 de outro nome ⇒ recusada" \
+    || record_fail "currency-census: (s) uid 0" "veio: ${r}"
+  # (t) pino À FRENTE do PyPI ⇒ não medido; instalado À FRENTE do pino ⇒ fora-do-pino (nunca "defasada" mandando descer)
+  r="$(_st "$(_cc FAKE_PIP_PyYAML=6.0.2 -- --fresh)" python:PyYAML)"
+  [ "${r%%|*}" = "nao-medida" ] && record_pass "currency-census: (t) pino 6.0.3 à frente do PyPI 6.0.2 ⇒ não medido" \
+    || record_fail "currency-census: (t) pino à frente" "veio: ${r}"
+  r="$(_st "$(_cc FAKE_INST_PyYAML=6.0.4 FAKE_PIP_PyYAML=6.0.4 -- --fresh)" python:PyYAML)"
+  [ "${r%%|*}" = "fora-do-pino" ] && record_pass "currency-census: (t2) instalado 6.0.4 à frente do pino 6.0.3 ⇒ fora-do-pino" \
+    || record_fail "currency-census: (t2) fora do pino" "veio: ${r}"
+  # (u) valor de cache com data no FUTURO não é aceito
+  rm -rf "${d}/cache"; mkdir -m 700 "${d}/cache"; _cc -- >/dev/null
+  for cf in "${d}"/cache/*/npm-sdk; do printf '9.9.9\n' > "${cf}"; touch -d '+1 day' "${cf}"; done
+  o="$(_cc -- )"
+  case "${o}" in *9.9.9*) record_fail "currency-census: (u) cache do futuro" "o 9.9.9 forjado com data futura chegou à saída" ;;
+    *) record_pass "currency-census: (u) valor de cache com data futura é ignorado" ;; esac
+  # (v) sort sem -V ⇒ AUSENTE (o semver lexical inverteria 4.10 e 4.9)
+  printf '#!/usr/bin/env bash\nargs=(); for a in "$@"; do [ "$a" = -V ] || args+=("$a"); done\nexec %q "${args[@]}"\n' "$(command -v sort)" > "${fb}/sort"; chmod +x "${fb}/sort"
+  o="$(_cc PATH="${fb}:${PATH}" -- --fresh)"; rm -f "${fb}/sort"
+  case "$(_st "${o}" ferramentas)|$(_act "${o}" ferramentas)" in ausente*"sort -V"*) record_pass "currency-census: (v) sort sem -V ⇒ AUSENTE nomeando o sort -V" ;;
+    *) record_fail "currency-census: (v) sort -V" "veio: ${o:0:200}" ;; esac
+  # (w) hook: a perna que morre avisa; volta (some do TSV); morre de novo ⇒ AVISA de novo (não emudece)
+  local w1 w2 w3; rm -rf "${d}/state"; mkdir -m 700 "${d}/state"
+  w1="$(_hk ONION_CURRENCY_DEADLINE=abc FAKE_NPM_SDK=0.3.303)"; _hk FAKE_NPM_SDK=0.3.303 >/dev/null; w3="$(_hk ONION_CURRENCY_DEADLINE=abc FAKE_NPM_SDK=0.3.303)"
+  case "${w1}|${w3}" in "0|"*"perna:sdk"*"|0|"*"perna:sdk"*) record_pass "currency-census: (w) perna morre, volta e morre de novo ⇒ o hook re-avisa" ;;
+    *) record_fail "currency-census: (w) perna que volta a morrer" "1ª='${w1:0:80}' 3ª='${w3:0:80}'" ;; esac
+  # (y) a sessão vem do JSON do hook: duas sessões sem a variável, ids distintos no stdin ⇒ as duas recebem o aviso
+  rm -rf "${d}/state"; mkdir -m 700 "${d}/state"
+  _hks() { printf '{"session_id":"%s"}' "$1" | ONION_CURRENCY_CENSUS="${d}/census-wrap.sh" ONION_CURRENCY_STATE_DIR="${d}/state" \
+             CLAUDE_PROJECT_DIR="${d}/repo" FAKE_NPM_SDK=0.3.303 CLAUDE_CODE_SESSION_ID= bash "${hk}" 2>/dev/null; }
+  w1="$(_hks sA)"; w2="$(_hks sB)"
+  case "${w1}|${w2}" in *DEFASADA*"|"*DEFASADA*) record_pass "currency-census: (y) session_id do stdin separa as sessões (as duas recebem o aviso)" ;;
+    *) record_fail "currency-census: (y) sessão do stdin" "A='${w1:0:60}' B='${w2:0:60}'" ;; esac
+  # (z) estado do hook num diretório gravável por outros ⇒ não é confiado: avisa sem deduplicar (outra conta não cala o aviso)
+  rm -rf "${d}/state"; mkdir -m 700 "${d}/state"; chmod 777 "${d}/state"
+  w1="$(_hk FAKE_NPM_SDK=0.3.303)"; w2="$(_hk FAKE_NPM_SDK=0.3.303)"
+  case "${w1}|${w2}" in "0|"*DEFASADA*"|0|"*DEFASADA*) record_pass "currency-census: (z) estado gravável por outros ⇒ ignorado, o aviso não é calado" ;;
+    *) record_fail "currency-census: (z) estado hostil" "1ª='${w1:0:60}' 2ª='${w2:0:60}'" ;; esac
   rm -rf "${d}"
 }
 

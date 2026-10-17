@@ -64,7 +64,7 @@ isso ser lembrado/cobrado"*. Por isso esta página é a fonte citável, e não a
 
 | Peça | O que faz | Quando dispara |
 |---|---|---|
-| `.claude/validation/currency-census.sh` | mede cada superfície contra o publicado e devolve `em-dia` · `defasada` (com a ação de subida) · `pinada` (atrás por pino de contrato: a subida é do produto, não avisa) · `nao-medida` (fonte inalcançável, perna morta ou estourada, leitura suspeita) · `ausente` (com o pedido de autorização) | sob demanda (`--table` para humano) e pelo hook |
+| `.claude/validation/currency-census.sh` | mede cada superfície contra o publicado e devolve `em-dia` · `defasada` (com a ação de subida) · `pinada` (atrás por pino de contrato: aviso INFORMATIVO, a subida é do produto) · `fora-do-pino` (instalado à frente do pino que o CI instala) · `nao-medida` (fonte inalcançável, perna morta ou estourada, leitura suspeita) · `ausente` (com o pedido de autorização) | sob demanda (`--table` para humano) e pelo hook |
 | `.claude/hooks/session-currency-check.sh` | injeta o aviso na sessão quando algo não está em dia | todo prompt (`UserPromptSubmit`). Só as respostas REMOTAS ficam em cache (registros 1 h; origin e SDK 5 min; fonte que falhou, 10 min), o lado local é relido a cada prompt, e cada perna tem prazo de 9 s. Cada superfície avisa 1× por sessão e re-avisa quando o publicado anda ou quando ela volta a cair depois de ter ficado em dia |
 | `.claude/hooks/session-version-drift.sh` (pré-existente) | o processo da sessão roda um CLI que o disco já trocou | todo prompt |
 
@@ -101,6 +101,13 @@ origin antes de enviar.
 - **O hook viaja** (o registro dele entra no adotante pela fusão de hooks): lá ele lê o npm, o PyPI, o
   remoto do kg-ssot e o origin, no máximo pelas TTLs acima. A perna do SDK só existe onde há alvos
   declarados (no core).
+- **A versão servida do SDK fica em cache 5 min** (é lida por sudo como a conta dona): depois de subir o
+  SDK, o aviso pode persistir até 5 min. Entre a conferência do caminho real e a leitura há uma janela
+  (TOCTOU) que só a conta dona explora, e o que sai é só uma string de versão.
+- **Fonte travada pode deixar um processo vivo** por até o teto da fonte (4 s) depois que o censo sai; o
+  prazo da perna é grampeado em 12 s para o hook (15 s) nunca ser morto.
+- **A dedupe é por sessão**, lida do `session_id` do JSON do hook; sem ele, da variável de ambiente; o
+  estado só vale num diretório da conta não gravável por outros (fora disso o aviso repete, nunca cala).
 - **Não sobe nada sozinho.** Instalar, subir e re-implantar são atos com autorização; o gatilho cobra,
   não executa.
 
