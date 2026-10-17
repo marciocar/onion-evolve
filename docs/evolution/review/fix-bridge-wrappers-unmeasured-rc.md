@@ -2,7 +2,8 @@
 branch: fix/bridge-wrappers-unmeasured-rc
 pr: pendente
 date: 2026-10-17
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: abcfb1fc913a8716b2f41f45b3e4a0b62f0b7772da569b4b3977719ccddf56b6
+reviewed_code_sha256: 9ad516c4888383752e7d59b135505dbdda48d9759ee00ed24d25155c79193601
 findings_total: 2
 findings_real: 2
 tokens: 143957
