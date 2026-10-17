@@ -8296,6 +8296,54 @@ PYF
   w1="$(_hk FAKE_NPM_SDK=0.3.303)"; w2="$(_hk FAKE_NPM_SDK=0.3.303)"
   case "${w1}|${w2}" in "0|"*DEFASADA*"|0|"*DEFASADA*) record_pass "currency-census: (z) estado gravável por outros ⇒ ignorado, o aviso não é calado" ;;
     *) record_fail "currency-census: (z) estado hostil" "1ª='${w1:0:60}' 2ª='${w2:0:60}'" ;; esac
+  # (aa) SAC-169: o pin por SHA da action do revisor de IA do CI (instala um CLI) entra no censo.
+  #      Action falsa: v1.0.99 (leve) e v1.0.183 (anotada) no commit A (CLI 2.1.220); v1.0.252 no B (CLI 2.1.302);
+  #      um commit C sem tag. O semver numérico tem de achar 1.0.252 acima de 1.0.99.
+  local ag="${d}/act-src" ab="${d}/act/anthropics/claude-code-action" sa sb sc ar="${d}/raw/anthropics/claude-code-action"
+  mkdir -p "${ag}/src/entrypoints" "${d}/act/anthropics" "${d}/r3/.github/workflows"
+  ${g} init -q "${ag}"
+  printf '  const claudeCodeVersion = "2.1.220";\n' > "${ag}/src/entrypoints/run.ts"
+  ${g} -C "${ag}" add -A; ${g} -C "${ag}" commit -q -m a; sa="$(git -C "${ag}" rev-parse HEAD)"
+  ${g} -C "${ag}" tag v1.0.99; ${g} -C "${ag}" tag -a -m r v1.0.183
+  printf '  const claudeCodeVersion = "2.1.302";\n' > "${ag}/src/entrypoints/run.ts"
+  ${g} -C "${ag}" commit -q -am b; sb="$(git -C "${ag}" rev-parse HEAD)"; ${g} -C "${ag}" tag -a -m r v1.0.252
+  ${g} -C "${ag}" commit -q --allow-empty -m c; sc="$(git -C "${ag}" rev-parse HEAD)"
+  ${g} clone -q --bare "${ag}" "${ab}" 2>/dev/null
+  for q in "${sa}" "${sb}"; do mkdir -p "${ar}/${q}/src/entrypoints"; git -C "${ag}" show "${q}:src/entrypoints/run.ts" > "${ar}/${q}/src/entrypoints/run.ts"; done
+  _ca() {  # <pin> [VAR=val …] → TSV só da perna das actions (as outras superfícies desligadas)
+    local pin="$1"; shift
+    printf 'jobs:\n  r:\n    steps:\n      - uses: actions/checkout@v4\n      - name: rev\n        uses: anthropics/claude-code-action@%s\n' "${pin}" > "${d}/r3/.github/workflows/review.yml"
+    env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_NPM= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_GIT=git \
+      ONION_CURRENCY_ACTION_REMOTE_BASE="${d}/act" ONION_CURRENCY_ACTION_RAW_BASE="file://${d}/raw" \
+      ONION_CURRENCY_CACHE_DIR="${d}/cache" ONION_CURRENCY_TIMEOUT=20 "$@" bash "${sut}" "${d}/r3" --fresh 2>/dev/null </dev/null
+  }
+  o="$(_ca "${sa}")"
+  case "$(_st "${o}" action:anthropics/claude-code-action)|$(_act "${o}" action:anthropics/claude-code-action)" in
+    "defasada|1.0.183|1.0.252|"*"CLI 2.1.220"*"CLI 2.1.302"*"sed -i 's/${sa}/${sb}/g' .github/workflows/review.yml"*)
+      record_pass "currency-census: (aa) pin da v1.0.183 × v1.0.252 ⇒ defasada, com o CLI de cada um (2.1.220 → 2.1.302) e o sed de subida" ;;
+    *) record_fail "currency-census: (aa) pin da action defasado" "veio: $(_st "${o}" action:anthropics/claude-code-action) / $(_act "${o}" action:anthropics/claude-code-action | cut -c1-160)" ;; esac
+  case "$(printf '%s\n' "${o}" | bash "${sut}" --render)" in *"action:anthropics/claude-code-action: 1.0.183 → 1.0.252 DEFASADA"*) record_pass "currency-census: (aa2) o aviso nomeia a action e as duas versões" ;;
+    *) record_fail "currency-census: (aa2) aviso da action" "sem a linha DEFASADA da action" ;; esac
+  r="$(_st "$(_ca "${sb}")" action:anthropics/claude-code-action)"
+  [ "${r}" = "em-dia|1.0.252|1.0.252" ] && record_pass "currency-census: (aa3) pin no commit da maior tag ⇒ em dia" \
+    || record_fail "currency-census: (aa3) pin em dia" "veio: ${r}"
+  r="$(_st "$(_ca v1)" action:anthropics/claude-code-action)"
+  [ "${r}" = "nao-medida|v1|-" ] && record_pass "currency-census: (aa4) pin por tag móvel (@v1) ⇒ não medido, nunca em dia" \
+    || record_fail "currency-census: (aa4) pin por tag" "veio: ${r}"
+  o="$(_ca "${sc}")"; r="$(_st "${o}" action:anthropics/claude-code-action)|$(_act "${o}" action:anthropics/claude-code-action)"
+  case "${r}" in "nao-medida|${sc:0:8}|1.0.252|"*"não é commit de nenhuma tag"*) r=ok ;; esac
+  [ "${r}" = ok ] && record_pass "currency-census: (aa5) pin fora de qualquer tag de release ⇒ não medido" \
+    || record_fail "currency-census: (aa5) pin sem tag" "veio: ${r}"
+  r="$(_st "$(_ca "${sa}" ONION_CURRENCY_ACTION_REMOTE_BASE="${d}/sumiu")" action:anthropics/claude-code-action)"
+  [ "${r%%|*}" = "nao-medida" ] && record_pass "currency-census: (aa6) repositório da action inalcançável ⇒ não medido" \
+    || record_fail "currency-census: (aa6) action inalcançável" "veio: ${r}"
+  o="$(_ca "${sa}" ONION_CURRENCY_ACTION_RAW_BASE="file://${d}/sem-raw")"
+  case "$(_st "${o}" action:anthropics/claude-code-action)|$(_act "${o}" action:anthropics/claude-code-action)" in "defasada|1.0.183|1.0.252|"*"CLI não lido"*) record_pass "currency-census: (aa7) raw inalcançável ⇒ segue defasada, com o CLI declarado não lido" ;;
+    *) record_fail "currency-census: (aa7) raw inalcançável" "veio: $(_st "${o}" action:anthropics/claude-code-action)" ;; esac
+  rm -f "${d}/r3/.github/workflows/review.yml"
+  r="$(env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_NPM= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_ACTION_REMOTE_BASE="${d}/act" ONION_CURRENCY_CACHE_DIR="${d}/cache" bash "${sut}" "${d}/r3" --fresh 2>/dev/null </dev/null)"
+  [ -z "${r}" ] && record_pass "currency-census: (aa8) sem workflow que use a action ⇒ superfície omitida" \
+    || record_fail "currency-census: (aa8) superfície inexistente" "veio: ${r:0:120}"
   rm -rf "${d}"
 }
 

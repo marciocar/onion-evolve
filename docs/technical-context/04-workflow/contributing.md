@@ -192,8 +192,11 @@ Categorias de violação: **HARD** (bloqueia CI/merge) vs **SOFT** (aviso, não 
 `.github/workflows/onion-review.yml` ("Onion Code Review (Claude)"): dispara em
 `pull_request: [opened, synchronize, labeled, unlabeled]` — **mas só revisa quando o interruptor
 manda** (ver "Interruptor do revisor", abaixo) —, roda `anthropics/claude-code-action` **pinado** em
-`v1.0.171` (commit `e90deca4`) — não a tag móvel `@v1` — porque a `@v1` regrediu para 100% de crash
-em 2026-07-14 (`onion-review.yml:36-41`). O prompt aplica a doutrina do `@metaspec-gate-keeper`
+SHA de commit — não a tag móvel `@v1`. O pin está em `v1.0.252` (commit `f27be6b6`, que instala o
+CLI 2.1.302) desde 2026-10-17; antes ficou em `v1.0.171` e `v1.0.183` (CLI 2.1.220), e a causa do crash
+de 2026-07-14 era a credencial, não a versão (o histórico está no comentário do passo no workflow). A
+defasagem do pin aparece no censo de atualidade (`currency-census.sh`, linha
+`action:anthropics/claude-code-action`). O prompt aplica a doutrina do `@metaspec-gate-keeper`
 contra `docs/meta-specs/`.
 
 **Semântica de vermelho/verde é contraintuitiva por design**: o job só fica vermelho quando o

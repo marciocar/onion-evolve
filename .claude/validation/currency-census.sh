@@ -22,6 +22,11 @@
 #   python:<pkg>      PyYAML e jsonschema (as diretas do leitor do KG-SSOT) no python3 do lint × PyPI. Quando o
 #                     instalado é o PINO do contrato e o PyPI andou, o estado é `pinada`: a subida é do produto.
 #   base:<branch>     HEAD deste checkout × a branch padrão do origin (git ls-remote --symref; sem fetch).
+#   action:<o/r>      o pin por SHA de uma action que INSTALA um CLI (hoje: anthropics/claude-code-action, a do
+#                     revisor de IA do CI) nos workflows de .github/workflows/ × a maior tag vX.Y.Z do repositório
+#                     da action. Defasada, a ação traz o CLI que cada commit instala (lido de src/entrypoints/run.ts
+#                     no raw do GitHub) e o comando de subida. Nasceu da rodada r13 do radar E3 (2026-10-17, SAC-169):
+#                     o pin instalava o CLI 2.1.220 com o host em 2.1.302, e nenhum censo tinha linha para ele.
 #
 # ESTADOS: em-dia · defasada (com a AÇÃO) · pinada (atrás por pino de contrato: aviso INFORMATIVO, a subida é do
 #   produto) · fora-do-pino (instalado à frente do pino que o CI instala) · nao-medida (fonte
@@ -42,12 +47,15 @@
 # PRAZO: cada perna roda sob `timeout ${ONION_CURRENCY_DEADLINE:-9}`; perna estourada ou morta vira nao-medida.
 # Env de bancada (cada fonte é trocável; DEFINIDO-vazio desliga a superfície): ONION_CC_BIN · ONION_CC_CHANNEL ·
 #   ONION_CURRENCY_NPM · ONION_CURRENCY_GIT · ONION_CURRENCY_PY · ONION_CURRENCY_SDK_TARGETS ·
-#   ONION_CURRENCY_KG_SSOT_REMOTE · ONION_CURRENCY_TIMEOUT (por fonte, s, default 4) · ONION_CURRENCY_DEADLINE
+#   ONION_CURRENCY_KG_SSOT_REMOTE · ONION_CURRENCY_ACTION_REMOTE_BASE (default https://github.com) ·
+#   ONION_CURRENCY_ACTION_RAW_BASE (default https://raw.githubusercontent.com; aceita file://) · ONION_CURRENCY_CURL ·
+#   ONION_CURRENCY_TIMEOUT (por fonte, s, default 4) · ONION_CURRENCY_DEADLINE
 # Exit: 0 sempre que mediu (o estado está nas linhas) · 2 uso errado.
 # TETO: compara com o que o REGISTRO publica, não com o que é seguro adotar. O canal do CLI vem do npm, não do
 #   manifesto do instalador nativo (alinhados em 2026-10-16; se o npm publicar antes, `claude update` não sobe e
 #   o aviso persiste até o nativo chegar); managed settings não são lidos. Não vê dependência fora destas
-#   superfícies. A base é a do checkout passado, e a ação "rebase sobre a padrão" é errada em PR empilhado.
+#   superfícies. Das actions, só as da lista ACTIONS e só pin por SHA (pin por tag é nao-medida); o CLI do commit
+#   é lido de src/entrypoints/run.ts e some do texto (não do estado) se o arquivo mudar de lugar. A base é a do checkout passado, e a ação "rebase sobre a padrão" é errada em PR empilhado.
 #   Exercitado por lint-selftest.sh (run_currency_census_selftests).
 # =============================================================================
 set -uo pipefail
@@ -94,6 +102,10 @@ GIT="${ONION_CURRENCY_GIT-git}"
 PY="${ONION_CURRENCY_PY-python3}"
 CC_BIN="${ONION_CC_BIN-claude}"
 KG_REMOTE="${ONION_CURRENCY_KG_SSOT_REMOTE:-https://github.com/marciocar/kg-ssot}"
+ACT_REMOTE_BASE="${ONION_CURRENCY_ACTION_REMOTE_BASE:-https://github.com}"
+ACT_RAW_BASE="${ONION_CURRENCY_ACTION_RAW_BASE:-https://raw.githubusercontent.com}"
+CURL="${ONION_CURRENCY_CURL-curl}"
+ACTIONS="anthropics/claude-code-action"   # actions que INSTALAM um CLI e que a casa pina por SHA de commit
 ASK="peça autorização ao maestro para instalar"
 VRE='^[0-9]+\.[0-9]+\.[0-9]+$'
 
@@ -122,7 +134,7 @@ _cache_init() {
   local st; st="$(stat -c '%u %a' "${base}" 2>/dev/null)" || return 0
   [ "${st%% *}" = "$(id -u)" ] || return 0                       # dono tem de ser a conta que lê
   case "${st##* }" in *[2367]?|*?[2367]) return 0 ;; esac          # grupo/outros com escrita ⇒ sem cache
-  local key; key="$(printf '%s\n' "${REPO}" "${NPM}" "${GIT}" "${PY}" "${KG_REMOTE}" "${npm_config_registry-}" "${PIP_INDEX_URL-}" | cksum | awk '{print $1}')"
+  local key; key="$(printf '%s\n' "${REPO}" "${NPM}" "${GIT}" "${PY}" "${KG_REMOTE}" "${ACT_REMOTE_BASE}" "${ACT_RAW_BASE}" "${npm_config_registry-}" "${PIP_INDEX_URL-}" | cksum | awk '{print $1}')"
   CDIR="${base}/${key}"; mkdir -p -m 700 "${CDIR}" 2>/dev/null || CDIR=""
 }
 # _src <nome> <ttl> <regex> <função…>: o valor da fonte, do cache se fresco e na forma; senão mede e grava.
@@ -167,6 +179,21 @@ _pypi() {  # stderr à parte: aviso/retry do pip em stderr não pode virar a "pr
   if [ "${rc}" != 0 ]; then grep -q "No module named pip" "${err}" && rc=66; rm -f "${err}"; return "${rc}"; fi
   rm -f "${err}"
   printf '%s\n' "${out}" | awk -v p="$1" 'tolower($1)==tolower(p) && $2 ~ /^\(/ && !d {d=1; print $2}' | _ver
+}
+_act_tags() {  # <dono/repo> <sha do pin> → "<maior vX.Y.Z> <sha do commit dela> <maior tag do pin, ou ->"
+  local out list
+  out="$(GIT_TERMINAL_PROMPT=0 timeout "${T}" "${GIT}" ls-remote --tags "${ACT_REMOTE_BASE}/$1")" || return 1
+  # tag anotada aparece duas vezes: o objeto da tag e o commit (^{}); vale o commit
+  list="$(printf '%s\n' "${out}" | awk '{ r=$2; pe=sub(/\^\{\}$/,"",r)
+      if (r !~ /^refs\/tags\/v[0-9]+\.[0-9]+\.[0-9]+$/ || $1 !~ /^[0-9a-f]{40}$/) next
+      v=substr(r,12); if (pe || !(v in s)) s[v]=$1 } END { for (v in s) print v, s[v] }' | sort -V)"
+  [ -n "${list}" ] || return 1
+  printf '%s %s\n' "$(printf '%s\n' "${list}" | tail -1)" \
+    "$(printf '%s\n' "${list}" | awk -v p="$2" '$2==p{v=$1} END{print (v==""?"-":v)}')"
+}
+_act_cli() {  # <dono/repo> <sha> → a versão do CLI que aquele commit da action instala
+  timeout "${T}" "${CURL}" -fsS --max-time "${T}" "${ACT_RAW_BASE}/$1/$2/src/entrypoints/run.ts" \
+    | sed -n 's/.*claudeCodeVersion[[:space:]]*=[[:space:]]*"\([0-9][0-9.]*\)".*/\1/p' | _ver
 }
 _origin() {
   local out br sha
@@ -309,9 +336,40 @@ leg_base() {
   fi
 }
 
+leg_act() {
+  [ -n "${GIT}" ] || return 0
+  local wf="${REPO}/.github/workflows"; [ -d "${wf}" ] || return 0
+  local a p pins files v rc lv lsha pv cn cp
+  for a in ${ACTIONS}; do
+    pins="$(cat "${wf}"/*.yml "${wf}"/*.yaml 2>/dev/null | grep -oE "uses:[[:space:]]*${a}@[^[:space:]\"'#]+" | sed 's/.*@//' | sort -u)"
+    [ -n "${pins}" ] || continue
+    _has "${GIT}" || { _row "action:${a}" - - ausente "falta o git para ler as tags da action: ${ASK} o git pela distro"; continue; }
+    for p in ${pins}; do
+      files="$(grep -lF "${a}@${p}" "${wf}"/*.yml "${wf}"/*.yaml 2>/dev/null | sed "s|^${REPO}/||" | tr '\n' ' ')"; files="${files% }"
+      if ! [[ "${p}" =~ ^[0-9a-f]{40}$ ]]; then
+        _row "action:${a}" "${p}" - nao-medida "o pin não é SHA de commit (@${p}, em ${files}): a casa pina por SHA, e o censo só julga pin por SHA"; continue
+      fi
+      rc=0; v="$(_src "act-tags-${a}-${p:0:12}" "${TTL}" '^[0-9]+\.[0-9]+\.[0-9]+ [0-9a-f]{40} ([0-9]+\.[0-9]+\.[0-9]+|-)$' _act_tags "${a}" "${p}")" || rc=$?
+      [ -n "${v}" ] || { _row "action:${a}" "${p:0:8}" - nao-medida "as tags de ${ACT_REMOTE_BASE}/${a} inalcançáveis por git ls-remote ou sem tag vX.Y.Z (rc=${rc})"; continue; }
+      lv="${v%% *}"; v="${v#* }"; lsha="${v%% *}"; pv="${v##* }"
+      if [ "${p}" = "${lsha}" ]; then _row "action:${a}" "${lv}" "${lv}" em-dia "-"; continue; fi
+      if [ "${pv}" = "-" ]; then
+        _row "action:${a}" "${p:0:8}" "${lv}" nao-medida "o pin ${p:0:8} (em ${files}) não é commit de nenhuma tag de release: pode estar à frente ou atrás da v${lv}; confira à mão"; continue
+      fi
+      if _newer "${pv}" "${lv}"; then _row "action:${a}" "${pv}" "${lv}" nao-medida "a tag do pin (v${pv}) está À FRENTE da maior tag lida (v${lv}): leitura suspeita"; continue; fi
+      cp="CLI não lido"; cn="CLI não lido"
+      if _has "${CURL}"; then
+        cp="$(_src "act-cli-${a}-${p:0:12}" "${TTL}" "${VRE}" _act_cli "${a}" "${p}")" && cp="CLI ${cp}" || cp="CLI não lido"
+        cn="$(_src "act-cli-${a}-${lsha:0:12}" "${TTL}" "${VRE}" _act_cli "${a}" "${lsha}")" && cn="CLI ${cn}" || cn="CLI não lido"
+      fi
+      _row "action:${a}" "${pv}" "${lv}" defasada "o pin ${p:0:8} (v${pv}) instala o ${cp}; a v${lv} instala o ${cn}. Suba: sed -i 's/${p}/${lsha}/g' ${files} — leia as notas das releases entre as duas contra os inputs usados, e prove no PR SEGUINTE (o PR que edita o workflow pode fazer a action se auto-pular)"
+    done
+  done
+}
+
 if [ -n "${LEG}" ]; then
   _cache_init
-  case "${LEG}" in cli) leg_cli ;; sdk) leg_sdk ;; kg) leg_kg ;; py) leg_py ;; base) leg_base ;; *) exit 2 ;; esac
+  case "${LEG}" in cli) leg_cli ;; sdk) leg_sdk ;; kg) leg_kg ;; py) leg_py ;; base) leg_base ;; act) leg_act ;; *) exit 2 ;; esac
   exit 0
 fi
 
@@ -324,12 +382,12 @@ if [ -n "${pre}" ]; then
 else
   tmp="$(mktemp -d)"
   fl=""; [ "${FRESH}" = 1 ] && fl="--fresh"
-  for l in cli sdk kg py base; do
+  for l in cli sdk kg py base act; do
     ( timeout -k 1 "${DEADLINE}" bash "$0" "${REPO}" --leg "${l}" ${fl} < /dev/null > "${tmp}/${l}" 2>/dev/null; echo $? > "${tmp}/${l}.rc" ) &
   done
   wait
   rows=""
-  for l in cli sdk kg py base; do
+  for l in cli sdk kg py base act; do
     r="$(cat "${tmp}/${l}" 2>/dev/null)"; rc="$(cat "${tmp}/${l}.rc" 2>/dev/null || echo 99)"
     [ -n "${r}" ] && rows="${rows}${r}"$'\n'
     case "${rc}" in
