@@ -643,8 +643,8 @@ _target_owns_contract() {
 }
 
 # ── CORE-ONLY NÃO VIAJA PARA ADOÇÃO, em NENHUM papel (2026-10-17, E_SKILL_CORE_ONLY_VIAJOU) ─────────
-# A skill onion-publish conduz o /meta:publish, que só roda na FONTE (role: source): o motor dela
-# (ops/publish-door.sh) não vendoriza. Medido: o manifesto de papel adopted, extraído por git archive,
+# A skill onion-publish conduz o /meta:publish, que só roda na FONTE (role: source): o motor dela, o
+# publicador de portas, é core-only e não vendoriza. Medido: o manifesto de papel adopted, extraído por git archive,
 # entregava .claude/skills/onion-publish, porque o `_role_cut` só a corta em standalone|plugins — a
 # skill chegava MORTA a todo adotante adopted e hub. Fica FORA do `_role_cut` de propósito: um corte não
 # vazio ali LIGA o corte de comandos do roles.yaml (`_emit_command_excludes`), que tiraria a meta-fábrica
