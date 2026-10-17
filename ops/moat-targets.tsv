@@ -36,6 +36,10 @@
 #   · a CERCA DE REDE do runner (opção A do degrau 3, 2026-10-16): o drop-in onion-chat@.service.d/60-egress-fence.conf
 #     nasce só pelo chat-runner.sh (install --egress-fence), renderizado do modelo do bridge servido com os endereços do
 #     host medidos na instalação; um drop-in nesse diretório mudaria toda instância do runner sem passar pela allowlist.
+#   · o STT em LOTE do core (2026-10-17, D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017) tem wrapper próprio: stt-service.sh monta
+#     /opt/onion-stt (modelo e VAD por revisão fixada e sha256, venv por lock com hash, código), gera o token em
+#     /etc/onion-stt (0600, nunca em argv), prova o sandbox numa unit transitória ANTES de trocar a unit onion-vps-stt,
+#     guarda a anterior em /var/backups/onion-stt e prova o serviço vivo. Uma linha por caminho que só ele escreve.
 #   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
 #     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
 #     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
@@ -46,6 +50,7 @@ deploy	unit	onion-vps-*	-
 deploy	unit	onion-adopt-*	-
 deploy	unit	onion-chat.socket	ops/chat-runner.sh
 deploy	unit	onion-chat@*	ops/chat-runner.sh
+deploy	unit	onion-vps-stt	ops/stt-service.sh
 deploy	path	/var/www/onion-landing	ops/deploy-site.sh
 deploy	path	/var/www	-
 deploy	path	/etc/caddy	ops/install-caddy-config.sh
@@ -58,6 +63,10 @@ deploy	path	/etc/systemd/system/onion-chat@.service.d	ops/chat-runner.sh
 deploy	path	/usr/local/libexec/onion-chat	ops/chat-runner.sh
 deploy	path	/var/backups/onion-chat-runner	ops/chat-runner.sh
 deploy	path	/run/onion-chat.sock	ops/chat-runner.sh
+deploy	path	/etc/systemd/system/onion-vps-stt.service	ops/stt-service.sh
+deploy	path	/opt/onion-stt	ops/stt-service.sh
+deploy	path	/etc/onion-stt	ops/stt-service.sh
+deploy	path	/var/backups/onion-stt	ops/stt-service.sh
 deploy	path	/var/lib/onion-bridge	-
 deploy	path	/var/lib/onion-bridge/chat-homes	ops/chat-runner.sh
 deploy	path	/home/onion	ops/update-bridge.sh

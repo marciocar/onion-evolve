@@ -15,14 +15,25 @@ import tempfile
 
 ap = argparse.ArgumentParser()
 ap.add_argument("--core", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "stt_core.py"))
+ap.add_argument("--smoke", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "smoke.py"))
 ap.add_argument("--until", default=None)
 A = ap.parse_args()
-spec = importlib.util.spec_from_file_location("stt_core_under_test", A.core)
-core = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(core)
+
+
+def _load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+core = _load("stt_core_under_test", A.core)
+smoke = _load("stt_smoke_under_test", A.smoke)
+FIXTURE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "fleurs-ptbr-8821974356183732066.flac")
 
 TOK = b"t0k3n-de-teste-com-mais-de-32-caracteres-xyz"
 RESULTS = []
+TMPDIRS = []
 
 
 class Stop(Exception):
@@ -146,6 +157,7 @@ try:
     # ── token em arquivo ────────────────────────────────────────────────────────────────────────────
     def tokfile(content: bytes, mode: int):
         d = tempfile.mkdtemp()
+        TMPDIRS.append(d)
         p = os.path.join(d, "token")
         with open(p, "wb") as f:
             f.write(content)
@@ -224,9 +236,9 @@ try:
 
     @case("words-fim-limitado-pela-seguinte")
     def _():
-        w = core.words_from_tokens(TOKS, TS, LPS, 0.0, 3.0)
-        # "Logo": último token 0.40 + 2×0.08 = 0.56, a seguinte começa em 0.80 → 0.56; "após": 0.88+0.16=1.04 > 1.20? não → 1.04
-        ok = w[0]["end"] == 0.56 and w[1]["end"] == 1.04 and all(x["end"] <= y["start"] for x, y in zip(w, w[1:]))
+        # "a": 0.00 + 2×0.08 = 0.16, mas "b" começa em 0.10 → o fim de "a" é 0.10; "b": 0.10 + 0.16 = 0.26 (trecho até 3 s)
+        w = core.words_from_tokens([" a", " b"], [0.0, 0.1], [0.0, 0.0], 0.0, 3.0)
+        ok = [x["end"] for x in w] == [0.1, 0.26]
         return ok, f"fins={[x['end'] for x in w]}"
 
     @case("words-fim-limitado-pelo-trecho")
@@ -299,9 +311,104 @@ try:
             except ValueError:
                 pass
         return ok, "parâmetro de PCM inválido aceito"
+    # ── a prova do verify (smoke.py) contra um servidor FALSO: ela tem de reprovar o que está errado ────
+    import http.server
+    import threading
+
+    META = json.load(open(FIXTURE.rsplit(".", 1)[0] + ".json", encoding="utf-8"))
+    REF_WORDS = META["reference"].split()
+
+    def fake_server(mode):
+        """mode: auth (exige o token) | open (200 para todos) | badtimes (palavras com fim < início) | wrong (outra frase)
+        | sha (health com outro sha)"""
+        words = [{"word": w, "start": round(0.3 + 0.4 * i, 3), "end": round(0.6 + 0.4 * i, 3), "probability": 0.99}
+                 for i, w in enumerate(REF_WORDS)]
+        text = META["reference"]
+        if mode == "badtimes":
+            words[3] = dict(words[3], start=2.0, end=1.0)
+        if mode == "wrong":
+            text = "nada a ver com a frase de referência"
+            words = [dict(w, word="x") for w in words]
+
+        class H(http.server.BaseHTTPRequestHandler):
+            def log_message(self, *a):
+                pass
+
+            def _send(self, code, obj):
+                b = json.dumps(obj).encode()
+                self.send_response(code)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(b)))
+                self.end_headers()
+                self.wfile.write(b)
+
+            def do_GET(self):
+                self._send(200, {"ready": True, "live": False, "engine": "fake",
+                                 "server_sha256": "f" * 64 if mode == "sha" else "a" * 64})
+
+            def do_POST(self):
+                n = int(self.headers.get("Content-Length") or 0)
+                self.rfile.read(n)
+                auth = self.headers.get("Authorization") or ""
+                if mode != "open" and auth not in ("Bearer " + TOK.decode(), "Token " + TOK.decode()):
+                    return self._send(401, {"error": "x"})
+                if self.path.startswith("/v1/audio/transcriptions"):
+                    return self._send(200, {"text": text, "segments": [{"words": words}], "words": words})
+                dw = [{"word": w["word"].lower(), "start": w["start"], "end": w["end"], "confidence": 0.99,
+                       "punctuated_word": w["word"]} for w in words]
+                return self._send(200, {"results": {"channels": [{"alternatives": [{"transcript": text, "words": dw}]}]}})
+
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        return srv
+
+    def run_smoke(mode, expect_sha="a" * 64):
+        srv = fake_server(mode)
+        smoke.FAILS.clear()
+        import contextlib
+        import io as _io
+        buf = _io.StringIO()
+        try:
+            with contextlib.redirect_stdout(buf):
+                smoke.run_checks(f"http://127.0.0.1:{srv.server_address[1]}", TOK.decode(), FIXTURE, META, expect_sha)
+        finally:
+            srv.shutdown()
+        return list(smoke.FAILS), buf.getvalue()
+
+    @case("smoke-aprova-servidor-correto")
+    def _():
+        fails, out = run_smoke("auth")
+        return not fails and out.count("OK ") >= 8, f"falhas={fails}"
+
+    @case("smoke-reprova-servidor-sem-auth")
+    def _():
+        fails, _ = run_smoke("open")
+        return sum("401" in f for f in fails) == 3, f"falhas={fails}"
+
+    @case("smoke-reprova-tempos-invalidos")
+    def _():
+        fails, _ = run_smoke("badtimes")
+        return sum("tempo inválido" in f for f in fails) == 2, f"falhas={fails}"
+
+    @case("smoke-reprova-recall-baixo")
+    def _():
+        fails, _ = run_smoke("wrong")
+        return sum("recall" in f for f in fails) == 2, f"falhas={fails}"
+
+    @case("smoke-reprova-codigo-diferente")
+    def _():
+        fails, _ = run_smoke("sha")
+        return any("server_sha256" in f for f in fails), f"falhas={fails}"
+
+    @case("smoke-recall-conta-repeticao")
+    def _():
+        return smoke.recall("a a b", "a b") == 2 / 3 and smoke.recall("Logo, após!", "logo após") == 1.0, "recall errado"
 except Stop:
     pass
 
+import shutil  # noqa: E402
+for _d in TMPDIRS:
+    shutil.rmtree(_d, ignore_errors=True)
 n_fail = sum(1 for _, ok in RESULTS if not ok)
 print(f"TOTAL {len(RESULTS)} FAIL {n_fail}")
 sys.exit(1 if n_fail else 0)
