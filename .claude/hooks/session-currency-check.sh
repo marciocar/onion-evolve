@@ -30,24 +30,33 @@ here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 census="${ONION_CURRENCY_CENSUS:-${here}/../validation/currency-census.sh}"
 [ -f "${census}" ] || exit 0
 repo="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+# a sessão vem do JSON do hook (stdin); sem ele, do ambiente. Sem nenhuma, não há como deduplicar por sessão.
+payload=""; [ -t 0 ] || payload="$(head -c 65536 2>/dev/null)"
+sess="$(printf '%s' "${payload}" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([A-Za-z0-9._-]*\)".*/\1/p' | awk 'NR==1')"
+[ -n "${sess}" ] || sess="${CLAUDE_CODE_SESSION_ID:-nosession}"
+sess="${sess//[^A-Za-z0-9._-]/_}"
 tsv="$(bash "${census}" "${repo}" --tsv </dev/null 2>/dev/null)" || exit 0
-state_dir="${ONION_CURRENCY_STATE_DIR:-${XDG_RUNTIME_DIR:-${HOME:-/tmp}/.cache}/onion-currency-notice}"
+# o estado só vale num diretório da conta e não gravável por outros; fora disso, avisa sem deduplicar
+# (barulho num ambiente quebrado é preferível a um aviso que outra conta pode calar)
+state_dir="${ONION_CURRENCY_STATE_DIR:-${XDG_RUNTIME_DIR:-${HOME:-/nonexistent}/.cache}/onion-currency-notice}"
 mkdir -p -m 700 "${state_dir}" 2>/dev/null || true
-sess="${CLAUDE_CODE_SESSION_ID:-nosession}"; sess="${sess//[^A-Za-z0-9._-]/_}"
-state="${state_dir}/${sess}.tsv"; [ -f "${state}" ] || : > "${state}" 2>/dev/null
+state=""
+st="$(stat -c '%u %a' "${state_dir}" 2>/dev/null)" && [ "${st%% *}" = "$(id -u)" ] && case "${st##* }" in *[2367]?|*?[2367]) ;; *) state="${state_dir}/${sess}.tsv" ;; esac
+[ -z "${state}" ] || [ -f "${state}" ] || : > "${state}" 2>/dev/null
 # POR SUPERFÍCIE (não pelo aviso inteiro): cada superfície que não está em dia é avisada 1× por sessão e
-# por assinatura; a que VOLTA a em dia sai do estado, e se ela cair de novo o aviso volta. Na BASE a
-# assinatura é só o estado (a branch padrão anda a cada merge: re-avisar a cada sha seria ruído).
-out="$(awk -F'\t' -v OFS='\t' -v stf="${state}" '
+# por assinatura; a que VOLTA a em dia, ou que SOME da medição (perna que morreu e voltou), sai do estado,
+# e se ela cair de novo o aviso volta. Na BASE a assinatura é só o estado (a branch padrão anda a cada
+# merge: re-avisar a cada sha seria ruído).
+out="$(awk -F'\t' -v OFS='\t' -v stf="${state:-/dev/null}" '
   BEGIN { while ((getline l < stf) > 0) { split(l, a, "\t"); seen[a[1]] = a[2] } }
   NF >= 4 {
-    s = $1; ok = ($4 == "em-dia" || $4 == "pinada")
-    if (ok) { delete seen[s]; next }
+    s = $1; cur[s] = 1
+    if ($4 == "em-dia") { delete seen[s]; next }
     sig = (s ~ /^base/) ? $4 : $4 "|" $2 "|" $3
     if (seen[s] != sig) { print "N", $0; seen[s] = sig }
   }
-  END { for (k in seen) print "S", k, seen[k] }' <<<"${tsv}")"
-printf '%s\n' "${out}" | awk -F'\t' -v OFS='\t' '$1=="S"{print $2,$3}' > "${state}.$$" 2>/dev/null && mv -f "${state}.$$" "${state}" 2>/dev/null
+  END { for (k in seen) if (k in cur) print "S", k, seen[k] }' <<<"${tsv}")"
+[ -n "${state}" ] && { printf '%s\n' "${out}" | awk -F'\t' -v OFS='\t' '$1=="S"{print $2,$3}' > "${state}.$$" 2>/dev/null && mv -f "${state}.$$" "${state}" 2>/dev/null; }
 new_rows="$(printf '%s\n' "${out}" | awk -F'\t' -v OFS='\t' '$1=="N"{ $1=""; sub(/^\t/, ""); print }')"
 [ -n "${new_rows}" ] || exit 0
 printf '%s\n' "${new_rows}" | bash "${census}" --render

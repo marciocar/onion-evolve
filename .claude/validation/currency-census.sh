@@ -23,14 +23,15 @@
 #                     instalado é o PINO do contrato e o PyPI andou, o estado é `pinada`: a subida é do produto.
 #   base:<branch>     HEAD deste checkout × a branch padrão do origin (git ls-remote --symref; sem fetch).
 #
-# ESTADOS: em-dia · defasada (com a AÇÃO) · pinada (atrás por pino de contrato; não avisa) · nao-medida (fonte
+# ESTADOS: em-dia · defasada (com a AÇÃO) · pinada (atrás por pino de contrato: aviso INFORMATIVO, a subida é do
+#   produto) · fora-do-pino (instalado à frente do pino que o CI instala) · nao-medida (fonte
 #   INALCANÇÁVEL, perna morta ou estourada, leitura suspeita — nunca vira "em dia") · ausente (falta a
 #   ferramenta que mede: PEÇA AUTORIZAÇÃO AO MAESTRO para instalar, pela fonte oficial, e instale).
 #
 # Uso: currency-census.sh [REPO_DIR] [--tsv|--notice|--table] [--fresh]
 #      currency-census.sh --render < linhas.tsv     (o texto do aviso a partir de linhas já medidas; uso do hook)
 #   --tsv     superfície · instalado · atual · estado · ação (default)
-#   --notice  só o que pede atenção (não em-dia, não pinada); vazio quando tudo está em dia
+#   --notice  só o que pede atenção (tudo menos em-dia; a pinada como informativa); vazio quando tudo está em dia
 #   --fresh   ignora o cache das fontes
 # CACHE — só das respostas REMOTAS e da leitura do SDK (por sudo), nunca da linha pronta: o lado local (disco,
 #   HEAD, carimbo, módulos) é relido a cada chamada, então a cura aparece na hora. Cada entrada é UM valor que
@@ -63,22 +64,30 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-render() {  # stdin: linhas TSV → o aviso (só o que pede atenção)
-  local bad; bad="$(awk -F'\t' 'NF>=4 && $4!="em-dia" && $4!="pinada"')"
+render() {  # stdin: linhas TSV → o aviso (só o que pede atenção; a pinada entra como INFORMATIVA)
+  local bad; bad="$(awk -F'\t' 'NF>=4 && $4!="em-dia"')"
   [ -n "${bad}" ] || return 0
   echo "⚠️ Onion — BASE ATUAL, SEMPRE (ordem eterna do maestro, 2026-10-16; doutrina: docs/knowledge-base/concepts/keep-current-doctrine.md):"
   printf '%s\n' "${bad}" | awk -F'\t' '{
     if ($4=="defasada")     printf "  • %s: %s → %s DEFASADA. Ação: %s\n", $1, $2, $3, $5;
     else if ($4=="ausente") printf "  • %s: AUSENTE a ferramenta que mede. %s\n", $1, $5;
+    else if ($4=="pinada")  printf "  • %s: %s, PyPI em %s — PINADA (informativo, sem ação neste repo): %s\n", $1, $2, $3, $5;
+    else if ($4=="fora-do-pino") printf "  • %s: %s FORA DO PINO %s. Ação: %s\n", $1, $2, $3, $5;
     else                    printf "  • %s: NÃO MEDIDO (não é \"em dia\"): %s\n", $1, $5 }'
   echo "  Antes de construir sobre o que está defasado: suba no mesmo fluxo, ou NOMEIE ao maestro o porquê de não subir. Faltou pacote: peça autorização ao maestro e instale pela fonte oficial — nunca contorne."
 }
-if [ "${FMT}" = render ]; then render; exit 0; fi
+if [ "${FMT}" = render ]; then [ -t 0 ] && { echo "currency-census: --render lê as linhas TSV do stdin" >&2; exit 2; }; render; exit 0; fi
 
 [ -d "${REPO}" ] || { echo "currency-census: repo inexistente: ${REPO}" >&2; exit 2; }
 REPO="$(cd "${REPO}" && pwd -P)"
 T="${ONION_CURRENCY_TIMEOUT:-4}"
 DEADLINE="${ONION_CURRENCY_DEADLINE:-9}"
+# o hook tem 15 s: prazo de perna acima de 12 s faria o Claude Code matar o hook e o aviso sumir calado; e
+# fonte com teto maior que o prazo da perna faria a perna morrer antes de gravar a falha (refutador, passada 2)
+if [[ "${DEADLINE}" =~ ^[0-9]+$ ]]; then
+  [ "${DEADLINE}" -gt 12 ] && DEADLINE=12
+  [[ "${T}" =~ ^[0-9]+$ ]] && [ "${T}" -ge "${DEADLINE}" ] && T=$(( DEADLINE > 1 ? DEADLINE - 1 : 1 ))
+fi
 TTL="${ONION_CURRENCY_TTL:-3600}"
 NPM="${ONION_CURRENCY_NPM-npm}"
 GIT="${ONION_CURRENCY_GIT-git}"
@@ -88,7 +97,10 @@ KG_REMOTE="${ONION_CURRENCY_KG_SSOT_REMOTE:-https://github.com/marciocar/kg-ssot
 ASK="peça autorização ao maestro para instalar"
 VRE='^[0-9]+\.[0-9]+\.[0-9]+$'
 
-_ver() { grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1; }
+# ⚠️ Sob pipefail, NENHUM leitor que fecha cedo (head -1, awk …exit): o escritor toma SIGPIPE e a pipeline
+# sai 141 — medido pelo refutador em 2026-10-16 (3 em 3000; foi a causa do NÃO MEDIDO intermitente do k3).
+# Todo "primeira linha" aqui é awk 'NR==1', que lê a entrada inteira.
+_ver() { grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | awk 'NR==1'; }
 _newer() { [ "$1" != "$2" ] && [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -1)" = "$1" ]; }  # a > b
 _row() { printf '%s\t%s\t%s\t%s\t%s\n' "$1" "${2:--}" "${3:--}" "$4" "$5"; }
 _judge() {  # <superfície> <instalado> <atual> <ação>
@@ -122,19 +134,26 @@ _src() {
     f="${CDIR}/${name//[^A-Za-z0-9._-]/_}"
     if [ "${FRESH}" = 0 ] && [ -f "${f}" ]; then
       now="$(date +%s)"; mt="$(stat -c %Y "${f}" 2>/dev/null || echo 0)"; age=$(( now - mt ))
-      v="$(head -c 200 "${f}" 2>/dev/null | head -1)"
+      v="$(head -c 200 "${f}" 2>/dev/null | awk 'NR==1')"
       if [ "${age}" -ge 0 ] && [[ "${v}" =~ ${re} ]] && [ "${age}" -lt "${ttl}" ]; then printf '%s\n' "${v}"; return 0; fi
       if [ "${age}" -ge 0 ] && [ "${age}" -lt 600 ] && [[ "${v}" =~ ^FAIL\ ([0-9]+)$ ]]; then return "${BASH_REMATCH[1]}"; fi
     fi
+    # marca de medição EM CURSO deixada por uma perna morta pelo prazo: velha o bastante para não ser de uma
+    # medição viva, nova o bastante para valer como falha (600 s) ⇒ não paga o prazo de novo
+    if [ "${FRESH}" = 0 ] && [ -f "${f}.inflight" ]; then
+      now="$(date +%s)"; mt="$(stat -c %Y "${f}.inflight" 2>/dev/null || echo 0)"; age=$(( now - mt ))
+      if [ "${age}" -gt $(( DEADLINE + 2 )) ] && [ "${age}" -lt 600 ]; then return 124; fi
+    fi
+    : > "${f}.inflight" 2>/dev/null
   fi
   rc=0; v="$("$@" 2>/dev/null)" || rc=$?
-  v="$(printf '%s' "${v}" | head -1)"
+  v="${v%%$'\n'*}"
   if [ "${rc}" = 0 ] && [[ "${v}" =~ ${re} ]]; then
-    [ -n "${f}" ] && { printf '%s\n' "${v}" > "${f}.$$" && mv -f "${f}.$$" "${f}"; } 2>/dev/null
+    [ -n "${f}" ] && { printf '%s\n' "${v}" > "${f}.$$" && mv -f "${f}.$$" "${f}"; rm -f "${f}.inflight"; } 2>/dev/null
     printf '%s\n' "${v}"; return 0
   fi
   [ "${rc}" = 0 ] && rc=65
-  [ -n "${f}" ] && { printf 'FAIL %s\n' "${rc}" > "${f}.$$" && mv -f "${f}.$$" "${f}"; } 2>/dev/null
+  [ -n "${f}" ] && { printf 'FAIL %s\n' "${rc}" > "${f}.$$" && mv -f "${f}.$$" "${f}"; rm -f "${f}.inflight"; } 2>/dev/null
   return "${rc}"
 }
 _npm_tag() { timeout "${T}" "${NPM}" view "$1" "dist-tags.$2" | _ver; }
@@ -142,16 +161,18 @@ _kg_latest() {
   GIT_TERMINAL_PROMPT=0 timeout "${T}" "${GIT}" ls-remote --tags --refs "${KG_REMOTE}" 'kg-ssot-v*' \
     | sed -n 's|.*refs/tags/kg-ssot-v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$|\1|p' | sort -V | tail -1
 }
-_pypi() {
-  local out; out="$(PIP_DISABLE_PIP_VERSION_CHECK=1 timeout "${T}" "${PY}" -I -m pip index versions "$1" 2>&1)" || {
-    printf '%s' "${out}" | grep -q "No module named pip" && return 66; return 1; }
-  printf '%s\n' "${out}" | head -1 | grep -oiE "^$1 \([0-9][0-9.]*\)" | _ver
+_pypi() {  # stderr à parte: aviso/retry do pip em stderr não pode virar a "primeira linha" da resposta
+  local out err rc=0; err="$(mktemp)" || return 1
+  out="$(PIP_DISABLE_PIP_VERSION_CHECK=1 timeout "${T}" "${PY}" -I -m pip index versions "$1" 2>"${err}")" || rc=$?
+  if [ "${rc}" != 0 ]; then grep -q "No module named pip" "${err}" && rc=66; rm -f "${err}"; return "${rc}"; fi
+  rm -f "${err}"
+  printf '%s\n' "${out}" | awk -v p="$1" 'tolower($1)==tolower(p) && $2 ~ /^\(/ && !d {d=1; print $2}' | _ver
 }
 _origin() {
   local out br sha
   out="$(GIT_TERMINAL_PROMPT=0 timeout "${T}" "${GIT}" -C "${REPO}" ls-remote --symref origin HEAD)" || return 1
-  br="$(printf '%s\n' "${out}" | sed -n 's|^ref: refs/heads/\([^[:space:]]*\)[[:space:]]*HEAD$|\1|p' | head -1)"
-  sha="$(printf '%s\n' "${out}" | awk '$2=="HEAD" && $1 ~ /^[0-9a-f]+$/ && length($1)==40 {print $1; exit}')"
+  br="$(printf '%s\n' "${out}" | sed -n 's|^ref: refs/heads/\([^[:space:]]*\)[[:space:]]*HEAD$|\1|p' | awk 'NR==1')"
+  sha="$(printf '%s\n' "${out}" | awk '$2=="HEAD" && $1 ~ /^[0-9a-f]+$/ && length($1)==40 && !d {d=1; print $1}')"
   [ -n "${br}" ] && [ -n "${sha}" ] && printf '%s %s\n' "${br}" "${sha}"
 }
 _sdk_read() {  # <conta|-> <package.json> → a versão, só se o caminho declarado for o REAL
@@ -226,6 +247,7 @@ leg_kg() {
 try: print(json.load(open(sys.argv[1])).get("version",""))
 except Exception: pass' "${stamp}" 2>/dev/null | _ver)"
   [ -n "${v}" ] || { _row kg-ssot - - nao-medida "o carimbo do vendor kg-ssot não declara versão legível"; return 0; }
+  [ -n "${GIT}" ] || return 0
   _has "${GIT}" || { _row kg-ssot "${v}" - ausente "falta o git para ler as tags do produto: ${ASK} o git pela distro"; return 0; }
   latest="$(_src kg-tags "${TTL}" "${VRE}" _kg_latest)" || rc=$?
   [ -n "${latest}" ] || { _row kg-ssot "${v}" - nao-medida "o repositório do produto (${KG_REMOTE}) inalcançável ou sem tag kg-ssot-v* (rc=${rc})"; return 0; }
@@ -235,7 +257,7 @@ except Exception: pass' "${stamp}" 2>/dev/null | _ver)"
 leg_py_one() {  # <pkg>
   local pkg="$1" req="${REPO}/vendor/kg-ssot/tools/requirements.txt" pin="" inst latest rc=0 pypath
   pypath="$(command -v "${PY}")"
-  [ -f "${req}" ] && pin="$(sed -n "s/^${pkg}==\([0-9][0-9.]*\).*/\1/p" "${req}" | head -1)"
+  [ -f "${req}" ] && pin="$(sed -n "s/^${pkg}==\([0-9][0-9.]*\).*/\1/p" "${req}" | awk 'NR==1')"
   inst="$("${PY}" -I -c 'import importlib.metadata as m,sys
 try: print(m.version(sys.argv[1]))
 except Exception: pass' "${pkg}" 2>/dev/null | _ver)"
@@ -246,7 +268,8 @@ except Exception: pass' "${pkg}" 2>/dev/null | _ver)"
   if [ "${rc}" = 66 ]; then _row "python:${pkg}" "${inst}" - ausente "falta o pip no python do lint (${pypath}): ${ASK} o pip (${PY} -m ensurepip ou o pacote da distro)"; return 0; fi
   [ -n "${latest}" ] || { _row "python:${pkg}" "${inst}" - nao-medida "o PyPI inalcançável pelo pip (rc=${rc})"; return 0; }
   if [ -n "${pin}" ]; then
-    if [ "${inst}" != "${pin}" ]; then _row "python:${pkg}" "${inst}" "${pin}" defasada "${PY} -m pip install ${pkg}==${pin} (o pino do contrato KG-SSOT, vendor/kg-ssot/tools/requirements.txt; o PyPI está em ${latest})"
+    if [ "${inst}" != "${pin}" ] && _newer "${inst}" "${pin}"; then _row "python:${pkg}" "${inst}" "${pin}" fora-do-pino "o instalado (${inst}) está À FRENTE do pino do contrato (${pin}) e o CI instala o pino: alinhe com ${PY} -m pip install ${pkg}==${pin}, ou suba o pino no produto kg-ssot"
+    elif [ "${inst}" != "${pin}" ]; then _row "python:${pkg}" "${inst}" "${pin}" defasada "${PY} -m pip install ${pkg}==${pin} (o pino do contrato KG-SSOT, vendor/kg-ssot/tools/requirements.txt; o PyPI está em ${latest})"
     elif [ "${pin}" = "${latest}" ]; then _row "python:${pkg}" "${inst}" "${latest}" em-dia "-"
     elif _newer "${pin}" "${latest}"; then _row "python:${pkg}" "${inst}" "${latest}" nao-medida "o pino (${pin}) está À FRENTE do PyPI (${latest}): registro atrasado ou índice trocado"
     else _row "python:${pkg}" "${inst}" "${latest}" pinada "o pino do contrato KG-SSOT é ${pin}: a subida para ${latest} é do produto kg-ssot e chega pelo re-vendor"; fi
@@ -268,7 +291,7 @@ leg_base() {
   _has "${GIT}" || { _row base - - ausente "falta o git para medir a base: ${ASK} o git pela distro"; return 0; }
   "${GIT}" -C "${REPO}" remote get-url origin >/dev/null 2>&1 || return 0
   local v rc=0 br sha cur n
-  v="$(_src origin-head 300 '^[A-Za-z0-9._/-]+ [0-9a-f]{40}$' _origin)" || rc=$?
+  v="$(_src "origin-head-$("${GIT}" -C "${REPO}" remote get-url origin 2>/dev/null | cksum | awk '{print $1}')" 300 '^[A-Za-z0-9._/-]+ [0-9a-f]{40}$' _origin)" || rc=$?
   [ -n "${v}" ] || { _row base - - nao-medida "o origin inalcançável por git ls-remote --symref (rc=${rc})"; return 0; }
   br="${v%% *}"; sha="${v##* }"
   cur="$("${GIT}" -C "${REPO}" rev-parse --short HEAD 2>/dev/null)"
@@ -289,7 +312,7 @@ fi
 
 # ── pré-voo: as ferramentas de que a MEDIÇÃO depende (faltando, é ausente — nunca "inalcançável") ────────────
 pre=""
-for tool in timeout stat cksum sort sed awk head readlink mktemp; do _has "${tool}" || pre="${pre:+${pre}, }${tool}"; done
+for tool in timeout stat cksum sort sed awk head tail readlink mktemp grep cat rm date id; do _has "${tool}" || pre="${pre:+${pre}, }${tool}"; done
 if [ -z "${pre}" ] && [ "$(printf '1.10.0\n1.9.0\n' | sort -V 2>/dev/null | tail -1)" != "1.10.0" ]; then pre="sort -V (GNU coreutils)"; fi
 if [ -n "${pre}" ]; then
   rows="$(_row ferramentas - - ausente "falta ${pre}, de que o censo depende: ${ASK} o GNU coreutils pela distro")"
