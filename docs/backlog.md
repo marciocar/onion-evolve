@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**573 itens abertos** em 112 grafo(s) com aberto (de 143 no escopo) · 113 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**575 itens abertos** em 113 grafo(s) com aberto (de 144 no escopo) · 114 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1088,6 +1088,13 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 3.0 | `Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO` | radar-E3-2026-10-14-r11 | o _cleanup do pr-finalize deve abortar o rebase que ele mesmo começou, para a morte no meio do --rebase não deixar a worktree em |
+
+## radar-E3-2026-10-17-r13 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_FORK_NO_ADMIN_DO_BRIDGE_DECIDIR` | radar-E3-2026-10-17-r13 | decidir se o admin do /chat mantém o fork de subagente que o SDK 0.3.302 ligou por padrão, medindo antes um turno real que o use |
+| 2.0 | `Q_PIN_DO_REVISOR_DO_CI_SOBE_OU_ENTRA_NO_CENSO` | radar-E3-2026-10-17-r13 | o revisor de IA do CI deve subir o pin da action (CLI 2.1.220 hoje) ou o censo deve declarar essa versão, para a defasagem do CI  |
 
 ## superpowers-2026-10 — 2 item(ns)
 
