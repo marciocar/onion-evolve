@@ -184,7 +184,7 @@ nodes:
     impact: 4
     confidence: 0.8
     verified_at: "2026-10-17"
-    verified_against: "o servidor REESCRITO (ops/stt/server.py) na VPS de 8 vCPU, fora de unit, com o venv do lock e o modelo da revisão fixada; o arquivo de 61,5 min montado como na Emenda 2 da curadoria (30 falas FLEURS pt_br × 7 voltas, Random(164), PCM_16), por POST /v1/listen, um processo novo por braço; e a bancada stt_service (87 verdes com o venv do serviço; sem ele, 77 e o ⊘ declarado do server.py real) e moat_gate (237 verdes, com os casos s1–s6)"
+    verified_against: "o servidor REESCRITO (ops/stt/server.py) na VPS de 8 vCPU, fora de unit, com o venv do lock e o modelo da revisão fixada; o arquivo de 61,5 min montado como na Emenda 2 da curadoria (30 falas FLEURS pt_br × 7 voltas, Random(164), PCM_16), por POST /v1/listen, um processo novo por braço; e a bancada stt_service (87 verdes com o venv do serviço; sem ele, 78, com a amarração do server.py conferida pela forma) e moat_gate (237 verdes, com os casos s1–s6)"
     label: "STT em lote reescrito no core (ops/stt/, core-only). Com vad_batch=1, 61,5 min dão RSS 2,31e9 B (6,92e9 com lote de 8) e WER 5,92 % (6,19 %); teto MemoryMax=6G. Instalado na VPS: ainda não."
     trace: "ops/stt-service.sh"
     narrative: |-
