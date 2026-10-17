@@ -264,12 +264,22 @@ def audio_too_long(frames: int, sample_rate: int, channels: int, max_s: float) -
     mensagem do 413, ou None. Vale por canal (a duração) e no total (canais × duração, o que o motor vai processar)."""
     if sample_rate <= 0 or frames < 0 or channels < 1:
         return "invalid audio header"
+    if channels > MAX_CHANNELS:
+        return f"too many channels ({channels} > {MAX_CHANNELS})"
     dur = frames / sample_rate
     if dur > max_s:
         return f"audio too long ({dur:.0f} s > {max_s:.0f} s)"
     if dur * channels > 2 * max_s:
         return f"audio too long across channels ({dur * channels:.0f} s > {2 * max_s:.0f} s)"
     return None
+
+
+UNKNOWN_FRAMES = 1 << 60  # o libsndfile devolve ~2^63 quando o FLAC de stream não declara total_samples
+
+
+def header_frames_known(frames: int) -> bool:
+    """Cabeçalho que não sabe a própria duração (FLAC escrito para pipe) não é bomba: vai ao ffmpeg, que tem -t e -fs."""
+    return 0 <= frames < UNKNOWN_FRAMES
 
 
 TRUE_WORDS = ("true", "1", "yes")

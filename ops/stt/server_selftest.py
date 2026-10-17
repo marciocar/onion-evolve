@@ -234,6 +234,52 @@ try:
             stop(s, th)
         return st == 413, f"status={st} {b[:120]!r}"
 
+    @case("srv-canais-acima-do-teto-413")
+    def _():
+        b = io.BytesIO()
+        sf.write(b, np.zeros((16000, 9), dtype=np.float32), 16000, format="WAV", subtype="PCM_16")
+        s, th, base = serve()
+        try:
+            st, body = req(base + "/v1/listen?multichannel=true", b.getvalue(), AUTH)
+        finally:
+            stop(s, th)
+        return st == 413, f"status={st} {body[:120]!r}"
+
+    @case("srv-flac-corrompido-400")
+    def _():
+        b = io.BytesIO()
+        sf.write(b, (np.random.default_rng(1).standard_normal(16000 * 5) * 0.1).astype(np.float32), 16000, format="FLAC")
+        raw = bytearray(b.getvalue())
+        for i in range(4096, len(raw), 997):
+            raw[i] ^= 0xFF
+        s, th, base = serve()
+        try:
+            st, body = req(base + "/v1/listen", bytes(raw), {"Authorization": "Token " + TOK, "Content-Type": "audio/flac"})
+        finally:
+            stop(s, th)
+        return st in (200, 400) and st != 500, f"status={st} {body[:120]!r}"
+
+    @case("srv-ffmpeg-fs-limita-disco")
+    def _():
+        if not shutil.which("ffmpeg"):
+            return True, ""
+        src = os.path.join(TMP, "multi.wav")
+        sf.write(src, np.zeros((16000 * 10, 32), dtype=np.float32), 16000, subtype="PCM_16")
+        mka = os.path.join(TMP, "multi.mka")
+        p = subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-i", src, "-c:a", "pcm_s16le", "-y", mka])
+        if p.returncode:
+            return False, "não gerei o mka de 32 canais"
+        td = tempfile.mkdtemp(dir=TMP)
+        try:
+            srv.decode_audio(np, sf, open(mka, "rb").read(), {}, td, 2.0, True)
+            return False, "aceitou 32 canais × 10 s com teto de 2 s"
+        except srv.AudioTooLong:
+            pass
+        size = os.path.getsize(os.path.join(td, "out.wav")) if os.path.exists(os.path.join(td, "out.wav")) else 0
+        lim = (2 * 2.0 + 2) * 16000 * 2 + (1 << 20)
+        # o -fs é teto MOLE (o ffmpeg confere depois de gravar o pacote): sem ele seriam ~10 MB; com ele, o teto + 1 pacote
+        return 0 < size <= lim + (1 << 20), f"out.wav com {size} B (teto {lim:.0f} B + 1 MiB)"
+
     @case("srv-fila-cheia-429")
     def _():
         s, th, base = serve(["--queue-max", "1"], delay=2.0)

@@ -224,13 +224,15 @@ transient_smoke() {
 verify_live() {
   local show st pid frag mem cur ipd ipa dpi ldr addrs a h hsha vrc nok
   show="$(systemctl show "${UNIT}" -p ActiveState -p MainPID -p FragmentPath -p DropInPaths -p MemoryMax -p MemorySwapMax \
-          -p MemoryCurrent -p IPAddressDeny -p IPAddressAllow -p DynamicUser -p ProtectHome -p NRestarts 2>/dev/null)" \
+          -p MemoryCurrent -p IPAddressDeny -p IPAddressAllow -p DynamicUser -p ProtectHome -p NRestarts -p NeedDaemonReload 2>/dev/null)" \
     || { say "NÃO MEDI: systemctl show ${UNIT} falhou"; return 2; }
   st="$(sed -n 's/^ActiveState=//p' <<<"${show}")"; pid="$(sed -n 's/^MainPID=//p' <<<"${show}")"
   frag="$(sed -n 's/^FragmentPath=//p' <<<"${show}")"; mem="$(sed -n 's/^MemoryMax=//p' <<<"${show}")"
   cur="$(sed -n 's/^MemoryCurrent=//p' <<<"${show}")"; ipd="$(sed -n 's/^IPAddressDeny=//p' <<<"${show}")"
   [ "${st}" = active ] && [[ "${pid}" =~ ^[1-9][0-9]*$ ]] || { say "a unit ${UNIT} não está ativa (ActiveState=${st:-?}, MainPID=${pid:-?})"; return 1; }
   [ "${frag}" = "${UNIT_FILE}" ] || { say "a unit carregada vem de ${frag:-?}, não de ${UNIT_FILE}"; return 1; }
+  # o arquivo pode ser o renderizado e a config VIVA outra (editaram, recarregaram, devolveram sem reload)
+  [ "$(sed -n 's/^NeedDaemonReload=//p' <<<"${show}")" = no ] || { say "a unit em disco difere da carregada (NeedDaemonReload≠no): rode install"; return 1; }
   # um drop-in (onion-vps-stt.service.d/*.conf) mudaria a unit sem passar pela comparação abaixo (IPAddressAllow=any
   # abriria a saída e o cmp do FragmentPath seguiria igual): a unit deste serviço não tem drop-in, nenhum
   dpi="$(sed -n 's/^DropInPaths=//p' <<<"${show}")"
@@ -241,7 +243,9 @@ verify_live() {
   [ "${mem}" = "${MEMORY_MAX_BYTES}" ] || { say "MemoryMax efetivo ${mem:-?} != ${MEMORY_MAX_BYTES}"; return 1; }
   [ "$(sed -n 's/^MemorySwapMax=//p' <<<"${show}")" = 0 ] || { say "MemorySwapMax efetivo diferente de 0"; return 1; }
   say "OK MemoryMax=${mem} (em uso agora: ${cur:-?} B)"
-  grep -qE '(^| )(0\.0\.0\.0/0|any)( |$)' <<<"${ipd}" || grep -q '::/0' <<<"${ipd}" || { say "IPAddressDeny efetivo sem 'any' (${ipd:-vazio})"; return 1; }
+  # `any` é mostrado como as DUAS faixas: só uma delas deixaria a outra família aberta (refutador, passada 2)
+  { grep -qE '(^| )any( |$)' <<<"${ipd}" || { grep -qE '(^| )0\.0\.0\.0/0( |$)' <<<"${ipd}" && grep -qE '(^| )::/0( |$)' <<<"${ipd}"; }; } \
+    || { say "IPAddressDeny efetivo não nega tudo (${ipd:-vazio})"; return 1; }
   # o allow vence o deny: só o loopback pode estar nele (127.0.0.0/8 e ::1/128 é como o systemd mostra `localhost`)
   ipa="$(sed -n 's/^IPAddressAllow=//p' <<<"${show}")"
   for a in ${ipa}; do case "${a}" in 127.0.0.0/8|::1/128|127.0.0.1/32|localhost) : ;; *) say "IPAddressAllow efetivo fora do loopback: ${a}"; return 1 ;; esac; done

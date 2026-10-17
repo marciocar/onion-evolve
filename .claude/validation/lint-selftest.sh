@@ -10639,7 +10639,7 @@ run_stt_service_selftests() {
   [ -f "${helper}" ] || { record_fail "stt-service" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
   local d; d="$(mktemp -d)"
   # ── (a) o harness do núcleo e do smoke ──
-  local want_total=39 o rc
+  local want_total=41 o rc
   if o="$(LC_ALL=C python3 -I -B "${st}/selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} FAIL 0$" <<< "${o}"; then
     record_pass "stt-service: (a) núcleo e prova do verify — ${want_total} casos (token, 401, 413, palavras, formas, smoke que reprova)"
@@ -10680,6 +10680,8 @@ stt_core.py$(printf '\x1f')    return [{k: v for k, v in w.items() if k != "_lps
 stt_core.py$(printf '\x1f')    if fmt == "json":$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')openai-json-e-text
 stt_core.py$(printf '\x1f')    bare = _EDGE_PUNCT.sub("", unicodedata.normalize("NFC", w["word"])).lower()$(printf '\x1f')    bare = w["word"].lower()  # ONION_MUTANTE$(printf '\x1f')deepgram-forma
 stt_core.py$(printf '\x1f')    if dur * channels > 2 * max_s:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')duracao-acima-do-teto
+stt_core.py$(printf '\x1f')    if channels > MAX_CHANNELS:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')canais-acima-do-teto
+stt_core.py$(printf '\x1f')    return 0 <= frames < UNKNOWN_FRAMES$(printf '\x1f')    return 0 <= frames  # ONION_MUTANTE$(printf '\x1f')frames-desconhecidos-vao-ao-ffmpeg
 stt_core.py$(printf '\x1f')    if sr not in PCM_RATES:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')pcm-params
 smoke.py$(printf '\x1f')        if st1 == 401 and st2 == 401:$(printf '\x1f')        if True:  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-servidor-sem-auth
 smoke.py$(printf '\x1f')        if not isinstance(s, (int, float)) or not isinstance(e, (int, float)) or not (0 <= s < e <= duration + 0.05) or s < prev:$(printf '\x1f')        if not isinstance(s, (int, float)) or not isinstance(e, (int, float)):  # ONION_MUTANTE$(printf '\x1f')smoke-reprova-tempos-invalidos
@@ -10761,7 +10763,7 @@ PY
     local F="${d}/run/fk"
     printf '%s\n' ActiveState=active MainPID=4242 "FragmentPath=${d}/run/units/onion-vps-stt.service" DropInPaths= MemoryMax=6442450944 \
       MemorySwapMax=0 MemoryCurrent=2000000000 'IPAddressDeny=0.0.0.0/0 ::/0' 'IPAddressAllow=127.0.0.0/8 ::1/128' DynamicUser=yes \
-      ProtectHome=yes NRestarts=0 > "${F}/show"
+      ProtectHome=yes NRestarts=0 NeedDaemonReload=no > "${F}/show"
     echo inv-1 > "${F}/inv"
     printf 'LISTEN 0 2048 127.0.0.1:8765 0.0.0.0:* users:(("python",pid=4242,fd=6))\n' > "${F}/ss"
     printf '{"ready":true,"live":false,"server_sha256":"%s"}\n' "${sha_srv}" > "${F}/health"
@@ -10925,6 +10927,13 @@ PY
   _p_allow() { _p_live; sed -i 's|^IPAddressAllow=.*|IPAddressAllow=127.0.0.0/8 ::1/128 0.0.0.0/0|' "${d}/run/fk/show"; }
   _stcase "(w18) verify com IPAddressAllow fora do loopback → rc 1" 1 'IPAddressAllow efetivo fora do loopback' \
     '  for a in ${ipa}; do case "${a}" in 127.0.0.0/8|::1/128|127.0.0.1/32|localhost) : ;; *)' '  for a in ${ipa}; do case "${a}" in *) : ;; ONION_MUTANTE)' _p_allow verify
+  _p_halfdeny() { _p_live; sed -i 's|^IPAddressDeny=.*|IPAddressDeny=::/0|' "${d}/run/fk/show"; }
+  _stcase "(w20) verify com IPAddressDeny só de IPv6 → rc 1" 1 'não nega tudo' \
+    "  { grep -qE '(^| )any( |\$)' <<<\"\${ipd}\" || { grep -qE '(^| )0\\.0\\.0\\.0/0( |\$)' <<<\"\${ipd}\" && grep -qE '(^| )::/0( |\$)' <<<\"\${ipd}\"; }; } \\" \
+    "  { true || { : ONION_MUTANTE; }; } \\" _p_halfdeny verify
+  _p_reload() { _p_live; sed -i "s/^NeedDaemonReload=.*/NeedDaemonReload=yes/" "${d}/run/fk/show"; }
+  _stcase "(w21) verify com a unit em disco diferente da carregada → rc 1" 1 'NeedDaemonReload' \
+    '  [ "$(sed -n '"'"'s/^NeedDaemonReload=//p'"'"' <<<"${show}")" = no ] || {' '  true || { : ONION_MUTANTE;' _p_reload verify
   _p_swap() { _p_live; sed -i 's|^MemorySwapMax=.*|MemorySwapMax=infinity|' "${d}/run/fk/show"; }
   _stcase "(w19) verify com swap liberado → rc 1" 1 'MemorySwapMax efetivo' \
     '  [ "$(sed -n '"'"'s/^MemorySwapMax=//p'"'"' <<<"${show}")" = 0 ] || {' '  true || { : ONION_MUTANTE;' _p_swap verify
@@ -10936,7 +10945,7 @@ PY
   if [ -z "${spy}" ] || ! "${spy}" -I -c 'import numpy, soundfile, starlette, uvicorn' >/dev/null 2>&1; then
     record_skip "stt-service: (s) server.py real — sem o venv do serviço (ONION_STT_SELFTEST_PY ou a área instalada): amarração NÃO exercida aqui"
   else
-    local so src_ok=8
+    local so src_ok=11
     if so="$(cd / && LC_ALL=C "${spy}" -I -B "${st}/server_selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
     if [ "${rc}" = 0 ] && grep -qE "^TOTAL ${src_ok} FAIL 0$" <<<"${so}"; then
       record_pass "stt-service: (s) server.py real com motor falso — ${src_ok} casos (401 amarrado, loopback, teto de duração, 413 chunked, fila)"
@@ -10958,11 +10967,13 @@ PY
     why = core.audio_too_long(int(oinfo.frames), int(oinfo.samplerate), int(oinfo.channels), max_s)$(printf '\x1f')    why = None  # ONION_MUTANTE$(printf '\x1f')srv-duracao-pelo-ffmpeg-413
     inner = Starlette(routes=routes, exception_handlers={core.BodyTooLarge: too_large})$(printf '\x1f')    inner = Starlette(routes=routes)  # ONION_MUTANTE$(printf '\x1f')srv-chunked-acima-do-teto-413
             except core.BodyTooLarge:$(printf '\x1f')            except ZeroDivisionError:  # ONION_MUTANTE$(printf '\x1f')srv-multipart-chunked-acima-do-teto-413
+    except (RuntimeError, OSError) as e:  # LibsndfileError é RuntimeError: arquivo corrompido é 400, nunca 500$(printf '\x1f')    except ZeroDivisionError as e:  # ONION_MUTANTE$(printf '\x1f')srv-flac-corrompido-400
+           *([] if multichannel else ["-ac", "1"]), "-c:a", "pcm_s16le", "-fs", str(fs), "-y", out]$(printf '\x1f')           *([] if multichannel else ["-ac", "1"]), "-c:a", "pcm_s16le", "-y", out]  # ONION_MUTANTE$(printf '\x1f')srv-ffmpeg-fs-limita-disco
         if state["inflight"] >= a.queue_max:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-fila-cheia-429
 EOF_SMUT
   fi
   unset -f _st_hfjson _st_reset _st_env _st_install_rendered _st_stage_all _stcase _st_post_ok _p_none _p_live _p_free _p_hfbad \
-    _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap
+    _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap _p_halfdeny _p_reload
   rm -rf "${d}"
 }
 
