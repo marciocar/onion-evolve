@@ -23,8 +23,9 @@
 #     por repo)"; "(ok)" ou "(I3, E3)" não glosam;
 #   · " — " ou ": " seguido de 2+ palavras de 3+ letras: "I3: o core nunca commita no repo alheio";
 #     "r13: 2.1.302" não glosa;
-#   · cópula: "I3 é / significa / quer dizer / isto é / ou seja / são" seguida de 3+ palavras;
-#   · o `accept` da linha casando PERTO da sigla (6 palavras para cada lado, na mesma frase).
+#   · cópula: "I3 é / significa / quer dizer / isto é / ou seja / diz que / =" (vírgula e "que" opcionais)
+#     seguida de 3+ palavras;
+#   · o `accept` da linha casando PERTO da sigla (8 palavras para cada lado, na mesma frase).
 #
 # TETO DECLARADO: o casamento é LÉXICO. Uma glosa errada mas bem formada passa ("r13 (uma coisa
 # qualquer)"); texto entre aspas não é isento; rótulo local fora do glossário (A1, T2, M3) passa sempre;
@@ -167,7 +168,8 @@ def _structural(t, start, end, after, codes_rx):
     m = re.match(r"\**\s*(?:—|–|:)\**\s+(.*)", a)
     if m and len(_words(" ".join(m.group(1).split()[:8]), codes_rx)) >= 2:
         return True
-    m = re.match(r"\**\s+(?:é|são|era|significa|quer dizer|isto é|ou seja)\s+(.*)", a, re.I)
+    m = re.match(r"\**\s*(?:=|,?\s*(?:que\s+)?(?:é|são|era|significa|quer dizer|isto é|ou seja|diz que|diz))\s*,?\s+(.*)",
+                 a, re.I)
     if m and len(re.findall(_W3, " ".join(m.group(1).split()[:10]))) >= 3:
         return True
     # dentro de um parêntese que explica: "(texto que explica, SIGLA)"
@@ -180,7 +182,7 @@ def _structural(t, start, end, after, codes_rx):
     return False
 
 
-def _near(before, after, n=6):
+def _near(before, after, n=8):
     return " ".join(before.split()[-n:]) + " " + " ".join(after.split()[:n])
 
 
