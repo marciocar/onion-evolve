@@ -211,7 +211,7 @@ nodes:
     impact: 4
     confidence: 0.8
     verified_at: "2026-10-17"
-    verified_against: "o servidor REESCRITO (ops/stt/server.py) na VPS de 8 vCPU, fora de unit, com o venv do lock e o modelo da revisão fixada; o arquivo de 61,5 min montado como na Emenda 2 da curadoria (30 falas FLEURS pt_br × 7 voltas, Random(164), PCM_16), por POST /v1/listen, um processo novo por braço; e a bancada stt_service (79 verdes com o venv do serviço; sem ele, 71 e o ⊘ declarado do server.py real) e moat_gate (237 verdes, com os casos s1–s6)"
+    verified_against: "o servidor REESCRITO (ops/stt/server.py) na VPS de 8 vCPU, fora de unit, com o venv do lock e o modelo da revisão fixada; o arquivo de 61,5 min montado como na Emenda 2 da curadoria (30 falas FLEURS pt_br × 7 voltas, Random(164), PCM_16), por POST /v1/listen, um processo novo por braço; e a bancada stt_service (87 verdes com o venv do serviço; sem ele, 77 e o ⊘ declarado do server.py real) e moat_gate (237 verdes, com os casos s1–s6)"
     label: "STT em lote reescrito no core (ops/stt/, core-only). Com vad_batch=1, 61,5 min dão RSS 2,31e9 B (6,92e9 com lote de 8) e WER 5,92 % (6,19 %); teto MemoryMax=6G. Instalado na VPS: ainda não."
     trace: "ops/stt-service.sh"
     narrative: |-
@@ -223,7 +223,7 @@ nodes:
 
       O teto: MemoryMax=6G sem swap. Medido: 2,31e9 B no arquivo de 1 h mono. Estimado, NÃO medido: o pior caso com 2 pedidos em memória (QUEUE_MAX=2) e corpos de até 384 MB (≈ 1 h 40 de WAV float32 mono). Estourou, o kernel mata o processo e o systemd o reinicia; o pedido em curso cai.
 
-      A 1ª passada do refutador achou a bomba de descompressão (4,1 MB de FLAC de silêncio = 6 h, +2,7 GB e 134 s presos): curada com o teto da DURAÇÃO decodificada (--max-audio-s 10800, lido do cabeçalho antes de decodificar, e -t no ffmpeg). Re-medido com o mesmo arquivo: 413 em 0,035 s; um m4a de 4 h pelo ffmpeg: 413 em 26 s com pico de 1,18e9 B.
+      A 1ª passada do refutador achou a bomba de descompressão (4,1 MB de FLAC de silêncio = 6 h, +2,7 GB e 134 s presos): curada com o teto da DURAÇÃO decodificada (--max-audio-s 10800, lido do cabeçalho antes de decodificar, e -t no ffmpeg). Re-medido com o mesmo arquivo: 413 em 0,035 s; um m4a de 4 h pelo ffmpeg: 413 em 26 s com pico de 1,18e9 B. A 2ª passada achou a mesma bomba por CANAIS (o ffmpeg escrevia o arquivo inteiro antes da recusa): curada com -fs, -ac 1 e PCM de 16 bits.
 
       Não medido aqui: a unit de verdade com o sandbox (o --apply prova isso numa unit transitória ANTES de trocar a de produção, e o verify depois); multicanal com áudio real; os clientes reais (Vexa, anarlog); o timeout de 30 s do cliente Vexa contra os ~4 min de 1 h de reunião (o cliente precisa de requestTimeoutMs maior: é configuração do lado de lá); o TLS e o domínio no proxy, que esperam decisão do maestro.
     provenance:

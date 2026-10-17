@@ -55,6 +55,10 @@ FFMPEG_FORMATS = "wav,flac,ogg,mp3,matroska,webm,mov,mp4,m4a,3gp,3g2,mj2,aac,opu
 FFMPEG_TIMEOUT_S = 600
 
 
+def out_size(p: str) -> int:
+    return os.path.getsize(p)
+
+
 class AudioTooLong(ValueError):
     """Duração decodificada acima do teto: vira 413, nunca chega ao motor."""
 
@@ -146,7 +150,14 @@ class Engine:
         return text, segments, dur, mode, time.perf_counter() - t
 
 
-def decode_audio(np, sf, raw: bytes, query, tmpdir: str, max_s: float):
+def decode_audio(np, sf, raw: bytes, query, tmpdir: str, max_s: float, multichannel: bool = False):
+    try:
+        return _decode_audio(np, sf, raw, query, tmpdir, max_s, multichannel)
+    except (RuntimeError, OSError) as e:  # LibsndfileError é RuntimeError: arquivo corrompido é 400, nunca 500
+        raise ValueError(f"cannot decode audio: {str(e).replace(tmpdir, '<tmp>')[:200]}") from None
+
+
+def _decode_audio(np, sf, raw: bytes, query, tmpdir: str, max_s: float, multichannel: bool):
     """→ lista de canais float32 a 16 kHz e a taxa de origem. PCM cru pela query; contêiner pelo libsndfile; o resto
     (e toda taxa != 16 kHz) pelo ffmpeg, que só lê o arquivo temporário e só aceita a lista fechada de formatos."""
     pcm = core.raw_pcm_params(query)
@@ -167,8 +178,10 @@ def decode_audio(np, sf, raw: bytes, query, tmpdir: str, max_s: float):
             info = sf.info(io.BytesIO(raw))
         except Exception:  # noqa: BLE001 — contêiner que o libsndfile não lê: vai ao ffmpeg
             info = None
+        if info is not None and not core.header_frames_known(int(info.frames)):
+            info = None  # duração desconhecida no cabeçalho: o ffmpeg decide, com -t e -fs
         if info is not None:
-            # o cabeçalho diz a duração ANTES de decodificar: a bomba é recusada sem alocar nada
+            # o cabeçalho diz a duração e os canais ANTES de decodificar: a bomba é recusada sem alocar nada
             why = core.audio_too_long(int(info.frames), int(info.samplerate), int(info.channels), max_s)
             if why:
                 raise AudioTooLong(why)
@@ -180,11 +193,13 @@ def decode_audio(np, sf, raw: bytes, query, tmpdir: str, max_s: float):
         with open(src, "wb") as f:
             f.write(raw)
     out = os.path.join(tmpdir, "out.wav")
-    # -t corta a decodificação UM segundo acima do teto (o cabeçalho de quem não é libsndfile não é lido antes): o
-    # que passar disso é recusado abaixo, e o disco do /tmp privado nunca recebe mais que o teto
+    # -t corta a decodificação UM segundo acima do teto e -fs corta o ARQUIVO no teto de canais × duração (sem -fs, 64
+    # canais de opus num mka escreviam 245 MB por minuto no /tmp antes da recusa: refutador, passada 2, medido). Sem
+    # multichannel, -ac 1 já mistura no ffmpeg. PCM de 16 bits: metade do disco do float32, e o motor lê float de volta.
+    fs = int((2 * max_s + 2) * SR * 2 + (1 << 20))
     cmd = ["ffmpeg", "-nostdin", "-hide_banner", "-loglevel", "error", "-protocol_whitelist", "file",
            "-format_whitelist", FFMPEG_FORMATS, "-i", src, "-vn", "-t", str(int(max_s) + 1), "-ar", str(SR),
-           "-c:a", "pcm_f32le", "-y", out]
+           *([] if multichannel else ["-ac", "1"]), "-c:a", "pcm_s16le", "-fs", str(fs), "-y", out]
     try:
         p = subprocess.run(cmd, capture_output=True, timeout=FFMPEG_TIMEOUT_S, check=False)
     except subprocess.TimeoutExpired:
@@ -192,8 +207,8 @@ def decode_audio(np, sf, raw: bytes, query, tmpdir: str, max_s: float):
     if p.returncode or not os.path.exists(out):
         raise ValueError("cannot decode audio: " + p.stderr[-300:].decode(errors="replace").replace(tmpdir, "<tmp>").strip())
     oinfo = sf.info(out)
-    if int(oinfo.channels) > core.MAX_CHANNELS:
-        raise ValueError(f"too many channels ({oinfo.channels})")
+    if out_size(out) >= fs - (1 << 16):  # o -fs cortou: o que sobrou é parcial, nunca transcrição
+        raise AudioTooLong("decoded audio too large (channels × duration)")
     why = core.audio_too_long(int(oinfo.frames), int(oinfo.samplerate), int(oinfo.channels), max_s)
     if why:
         raise AudioTooLong(why)
@@ -222,7 +237,7 @@ def build_app(a, engine, token: bytes):
 
     def decode_mono(raw, query, multichannel):
         with tempfile.TemporaryDirectory(prefix="stt-") as td:
-            chans, _sr = decode_audio(np, sf, raw, query, td, a.max_audio_s)
+            chans, _sr = decode_audio(np, sf, raw, query, td, a.max_audio_s, multichannel)
         if not chans or len(chans[0]) == 0:
             raise ValueError("empty audio")
         if multichannel and len(chans) > 1:

@@ -306,6 +306,16 @@ try:
             and core.audio_too_long(16000 * 4, 16000, 3, 5) is not None and core.audio_too_long(10, 0, 1, 5) is not None
         return ok, "teto de duração errado (por canal, no total ou cabeçalho inválido)"
 
+    @case("canais-acima-do-teto")
+    def _():
+        return core.audio_too_long(16000, 16000, core.MAX_CHANNELS + 1, 5) is not None \
+            and core.audio_too_long(16000, 16000, core.MAX_CHANNELS, 5) is None, "teto de canais errado"
+
+    @case("frames-desconhecidos-vao-ao-ffmpeg")
+    def _():
+        return not core.header_frames_known(9223372036854775807) and core.header_frames_known(16000) \
+            and not core.header_frames_known(-1), "sentinela de duração desconhecida errado"
+
     @case("pcm-params")
     def _():
         ok = core.raw_pcm_params({}) is None and core.raw_pcm_params({"encoding": "linear16", "sample_rate": "48000", "channels": "2"}) == (48000, 2)
