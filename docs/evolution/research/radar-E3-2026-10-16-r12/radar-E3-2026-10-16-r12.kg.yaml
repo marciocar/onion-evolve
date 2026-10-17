@@ -213,12 +213,12 @@ nodes:
     node_type: evidence
     layer: audit
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.85
     verified_at: "2026-10-16"
     verified_against: "medido pela sessão principal em 2026-10-16 por volta de 20:45 UTC: onion-bridge#77 mergeado pelo maestro (0d1bc843) e core #1171 mergeado (99a821cb); o wrapper de deploy do bridge saiu rc 0 com backup cifrado antes, e o resultado foi clone 99a821cb, bridge 0d1bc843, health 200 local e público, auth enforce, verify do degrau 1 e do runner OK depois do update; o chat-runner verify independente saiu rc 0 com n_fail=0, com as linhas 'OK o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'OK o argv do SDK servido, com a política do convidado, passa pelo lançador instalado (25 asserções)', e a cerca de rede (TLS com a API) segue; como o n_fail conta toda falha do verify, o zero inclui o aperto de mão pelo socket (initialize respondido pelo CLI novo, cliente do próprio verify, não o spawnClaudeCodeProcess do bridge) e a recusa da flag fora da allowlist, sem a linha literal citada aqui; o package.json do SDK no clone servido, lido como a conta do serviço, declara 0.3.301; re-medido nesta passada: o cc-delta-census.sh segue com 0 menções a SDK, então o censo continua cego ao CLI do bridge; lacuna medida: o piso barra no install do runner (die) e só AVISA no deploy do bridge, cujo wrapper diz que reprovar não desfaz o update; não medido: um turno com a API real"
-    narrative: "Fecha a SAC-156. A versão saiu de 0.3.232 (CLI 2.1.232, E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232) para 0.3.301 (CLI 2.1.301), e o piso 2.1.64 do CVE-2026-39861 passou a ser cobrado pelo verify, não mais garantido por acaso de versão. A prova cobre o deploy, a versão do CLI servido e o argv pelo lançador; o turno ponta a ponta com a API fica como lacuna declarada."
+    narrative: "Fecha a SAC-156. A versão saiu de 0.3.232 (CLI 2.1.232, E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232) para 0.3.301 (CLI 2.1.301), e o piso 2.1.64 do CVE-2026-39861 passou a ser cobrado pelo verify, não mais garantido por acaso de versão. A prova cobre o deploy, a versão do CLI servido e o argv pelo lançador; o turno ponta a ponta com a API fica como lacuna declarada. Superada em 2026-10-17 por E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017 (rodada r13): onion-bridge 7f4322c (PR #78) subiu o SDK para 0.3.302 com o CLI 2.1.302, e o verify do runner saiu rc 0; a medição desta rodada valeu até ali."
     label: "o /chat em produção serve o SDK 0.3.301 com o CLI 2.1.301, acima do piso 2.1.64 que o verify do runner agora cobra, depois do deploy de onion-bridge 0d1bc843 e core 99a821cb com rc 0"
     provenance:
       source: "onion-bridge@0d1bc843 (PR #77) e onion-evolve@99a821cb (PR #1171); saída do chat-runner verify e do wrapper de deploy do bridge"

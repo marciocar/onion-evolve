@@ -1,8 +1,8 @@
 ---
 kg: docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml
 run_id: "sem run de Workflow: rodada conduzida pelo /meta:cc-update num agente de execução, com 1 juiz opus/high (subagente não-fork)"
-tokens: 156656
-agents: 1
+tokens: 298330
+agents: 2
 duration_min: 60
 ---
 
@@ -11,8 +11,8 @@ duration_min: 60
 O medidor (`cc-delta-census.sh`) separou o delta: **uma versão, 63 itens**, copiados em `data/2.1.302.txt`. O
 juiz baixou o CHANGELOG oficial e conferiu a cópia byte a byte: `cmp` vazio, 66 linhas.
 
-- **Custo.** Os tokens do frontmatter são os do juiz (7,5 min). Os 60 min cobrem a rodada inteira, que não
-  tem medida de tokens própria.
+- **Custo.** Os tokens do frontmatter somam os dois subagentes: o juiz (156.656, 7,5 min) e o refutador do diff
+  (141.674). Os 60 min cobrem a rodada inteira, que não tem medida de tokens própria.
 - **Guarda de deriva.** A guarda de binário que o censo manda rodar (`lint-selftest.sh --families
   cited_directive`, com `LC_ALL=C`) saiu rc 0: 6 casos passaram, 0 falharam.
 - **Versões.** A tabela do censo mostra baseline 2.1.301 e disco, processo e SDK do bridge em 2.1.302.
@@ -50,6 +50,11 @@ e **0 omissões** de impacto ≥ 2.
 - **Correção no fork.** A saída em segundo plano depois do `query()` não é efeito do fork. O padrão de subagente
   em segundo plano já existia na 2.1.301, então a condição de fechamento da SAC-168 separa as duas coisas.
 - **Deriva fora do delta.** O cabeçalho de `ops/cc-sdk-targets.tsv` ainda dizia 0.3.301. Foi curado nesta branch.
+- **Refutador do diff (opus).** Achou 4 pontos, todos curados aqui:
+  - o nó superado na r12 ainda estava `confirmed` e passou a `superseded`, como a r12 fez com o seu;
+  - a SYNTHESIS não tinha nó que a citasse (REGRA 29 (Gate de PROVENIÊNCIA INVERTIDO, com catraca));
+  - o REPROVA apontava o id antigo do nó de auto mode, que agora fica registrado na narrativa;
+  - o contrato de custo contava só o juiz.
 
 A Aufhebung que o juiz decidiu foi SUPERSEDES de `E_SDK_0_3_301_EM_PRODUCAO_1016`. Desta vez o schema
 `entrega|nenhuma` foi entregue ao juiz, como a r12 pedia, e ele respondeu `nenhuma` em todas as superações.
