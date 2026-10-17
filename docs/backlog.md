@@ -1066,8 +1066,8 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 4.0 | `Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016` | meeting-capture-2026-10 | Máquina de captura: o maestro usa Windows como cliente e quer a VPS como servidor principal (extensão de navegador ou plugin), c |
 | 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
+| 3.2 | `Q_DIARIZACAO_SHERPA_X_SORTFORMER_1017` | meeting-capture-2026-10 | Diarização da reunião em pt-BR na VPS sem GPU: o sherpa-onnx com a segmentação pyannote 3.0 (sem token do Hugging Face) ou o  |
 
 ## task-progress-story-points-2026-10 — 2 item(ns)
 
