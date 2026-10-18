@@ -12,6 +12,8 @@
 # O QUE FAZ: no bloco do nó ONION_INSTALLED, grava `x_pin: "<source_commit>"` (o campo de máquina que a
 # REGRA 108 lê), troca o 1º "pin `<hex>`" do label pelo pin novo e re-carimba verified_at/verified_against
 # como leitura do carimbo. Não toca outro nó nem outro campo. Idempotente.
+# Também troca, em verified_against e provenance (source/locator), as citações do pin ANTIGO pelo novo: esses
+# campos descrevem a verificação atual. Label e narrative (a história) ficam como o dono escreveu.
 # O QUE NÃO FAZ: inventar onde está o pin. Nó sem x_pin e com label sem "pin `<hex>`" (editado pelo dono)
 # ganha só o x_pin e o aviso; grafo ou nó ausente = nada a carimbar (adotante sem semente), dito.
 #
@@ -83,11 +85,34 @@ if vi is not None:
 SEED_VA = ("stamp-claude-onion-version-lido-na-adocao", "stamp-claude-onion-version-lido-pelo-escritor-do-carimbo")
 if gi is not None and blk[gi].split(":", 1)[1].strip().strip('"\'') in SEED_VA:   # o do dono fica
     blk[gi] = "    verified_against: stamp-claude-onion-version-lido-pelo-escritor-do-carimbo"
+# A FONTE DA VERIFICAÇÃO acompanha o pin (2026-10-18, sinal de um adotante): o motor trocava o verified_at e o
+# x_pin e deixava verified_against e provenance citando o pin ANTIGO, e o nó declarava verificado o que não
+# verificou mais. Esses dois campos descrevem a verificação ATUAL, então o pin antigo vira o novo neles; o
+# label e a narrative guardam a HISTÓRIA e ficam como o dono escreveu. Só troca o pin que ESTAVA no nó (cur):
+# um outro hash citado ali é referência do dono, não o pin desta adoção.
+swapped = 0
+if cur:
+    HEX = re.compile(r"\b[0-9a-f]{7,40}\b")
+    def _swap(m):
+        global swapped
+        h = m.group(0); k = min(len(h), len(cur))
+        if k >= 7 and h[:k] == cur[:k] and h[:min(len(h), len(pin))] != pin[:min(len(h), len(pin))]:
+            swapped += 1; return pin
+        return h
+    in_prov = False
+    for n, l in enumerate(blk):
+        if l.startswith("    provenance:"):
+            in_prov = True; continue
+        if in_prov and not l.startswith("      "):
+            in_prov = False
+        if l.startswith("    verified_against:") or (in_prov and re.match(r"^      (source|locator):", l)):
+            blk[n] = HEX.sub(_swap, l)
 new = lines[:start] + blk + lines[end:]
 if new != lines:
     open(path + ".pin-tmp", "w", encoding="utf-8").write("\n".join(new))
     import os; os.replace(path + ".pin-tmp", path)
 print(f"stamp-adoption-graph-pin: ONION_INSTALLED carimbado com o pin {pin}"
-      + ("" if label_ok else " (só o x_pin: o label foi editado pelo dono e ficou intacto — confira-o)"))
+      + ("" if label_ok else " (só o x_pin: o label foi editado pelo dono e ficou intacto — confira-o)")
+      + (f"; {swapped} citação(ões) do pin antigo em verified_against/provenance trocada(s) pelo novo" if swapped else ""))
 sys.exit(rc)
 PY

@@ -32463,6 +32463,35 @@ run_adopter_shape_selftests() {
   if [ -z "${_i3}" ]; then
     record_pass "adopter-shape: (i3) label e verified_against do dono intactos, id com aspas, pin de 7 hex, mesmo pin = nada muda"
   else record_fail "adopter-shape: (i3)" "${_i3}"; fi
+  # (i4) A FONTE DA VERIFICAÇÃO acompanha o pin (2026-10-18, sinal de um adotante, forma do grafo real dele):
+  #      verified_against e provenance (source/locator) que citavam o pin ANTIGO passam a citar o novo; o label
+  #      (história do dono) e um OUTRO hash citado como referência ficam. MUTANTE: sem a troca, (i4) reprova.
+  _i4_run() {  # $1=helper → lista de desvios (vazio = ok)
+    local _e="${d}/i4-$RANDOM" _bad=""
+    mkdir -p "${_e}/.claude" "${_e}/docs/onion/graph"
+    printf 'source_commit: 3bd13fc565e2\nrole: adopted\n' > "${_e}/.claude/.onion-version"
+    printf '%s\n' 'nodes:' '  - id: ONION_INSTALLED' '    verified_at: "2026-10-16"' \
+      '    verified_against: stamp-lido-apos-o-update-cff2940153ab' '    x_pin: "cff2940153ab"' \
+      '    label: "Framework instalado: pin `cff2940153ab` (adotado em `fe8359e38b43`)"' \
+      '    provenance:' '      source: "carimbo na branch do update cff2940153ab, comparado com fe8359e38b43"' \
+      '      locator: "linha source_commit: cff2940153ab"' '      method: "leitura: do carimbo"' > "${_e}/docs/onion/graph/onion-adoption.kg.yaml"
+    bash "$1" "${_e}" >/dev/null 2>&1 || true
+    local _g="${_e}/docs/onion/graph/onion-adoption.kg.yaml"
+    grep -qx '    verified_against: stamp-lido-apos-o-update-3bd13fc565e2' "${_g}" || _bad="${_bad} verified_against-ficou-com-o-pin-antigo"
+    grep -qx '      locator: "linha source_commit: 3bd13fc565e2"' "${_g}" || _bad="${_bad} locator-ficou-com-o-pin-antigo"
+    grep -qF 'source: "carimbo na branch do update 3bd13fc565e2, comparado com fe8359e38b43"' "${_g}" || _bad="${_bad} source-errado(trocou-a-referencia-ou-nao-trocou-o-pin)"
+    grep -qF 'label: "Framework instalado: pin `cff2940153ab` (adotado em `fe8359e38b43`)"' "${_g}" || _bad="${_bad} label-da-historia-reescrito"
+    printf '%s' "${_bad}"
+  }
+  local _i4; _i4="$(_i4_run "${_pk}")"
+  if [ -z "${_i4}" ]; then record_pass "adopter-shape: (i4) o pin antigo em verified_against/provenance vira o novo; o label e a outra referência ficam"
+  else record_fail "adopter-shape: (i4)" "${_i4}"; fi
+  local _i4m="${d}/stamp-i4-mut.sh"
+  sed 's/^if cur:$/if False:/' "${_pk}" > "${_i4m}"
+  if cmp -s "${_pk}" "${_i4m}"; then record_fail "adopter-shape: (i4-MUT) setup" "a mutação não foi aplicada (âncora mudou?)"
+  elif [ -n "$(_i4_run "${_i4m}")" ]; then record_pass "adopter-shape: (i4-MUT) sem a troca o pin antigo fica na fonte — (i4) é load-bearing"
+  else record_fail "adopter-shape: (i4-MUT)" "o mutante passou — (i4) não mede a troca"; fi
+  unset -f _i4_run
 
   rm -rf "${d}"
 }
