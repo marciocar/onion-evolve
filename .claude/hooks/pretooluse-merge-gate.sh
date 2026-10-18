@@ -20,7 +20,11 @@
 #  · O script `ops/pr-merge-verified.sh` (core-only) chama `gh pr merge` POR DENTRO — o hook só vê a string do
 #    modelo, não subprocessos. É exatamente o que se quer: o caminho verificado passa, o nu não.
 #  · Sem `ops/pr-merge-verified.sh` (core-only) no projeto (adotante via /meta:adopt copia .claude/, não ops/)
-#    o hook se DESARMA: não se veta o único caminho de merge de uma casa que não tem o verificado.
+#    o hook não VETA: não se veta o único caminho de merge de uma casa que não tem o verificado. Mas
+#    desde 2026-10-17 ele também não CALA (E_MERGE_GATE_INERTE_NO_ADOTANTE, medido na adoção do
+#    onion-kg-ssot): cada caso que vetaria no core vira AVISO injetado no contexto (additionalContext,
+#    exit 0), dizendo que nada conferiu o CI antes do merge. Antes, a sessão do adotante mergeava sem
+#    saber que a trava que ela via citada na doutrina não existia ali.
 #  · Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira (heredoc/prosa que CITA `gh pr merge`
 #    não veta — a classe guarda-por-vocabulário, falso-positivo medido no hook irmão em 09-01).
 #  · Escape deliberado = o maestro roda fora da sessão. Não há flag de bypass por desenho.
@@ -50,10 +54,23 @@ fi
 [ -d "$hcwd" ] || hcwd=$PWD
 [ -z "$cmd" ] && exit 0
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-[ -f "${root}/ops/pr-merge-verified.sh" ] || exit 0
+ADVISE=0; [ -f "${root}/ops/pr-merge-verified.sh" ] || ADVISE=1   # adotante: avisa em vez de vetar
+# O aviso do adotante: JSON de PreToolUse com additionalContext (o mesmo canal do kg-read-leg.sh), exit 0.
+# Não cita o caminho do script do core: ele não viaja, e a frase seria um ponteiro para o que não existe.
+advise() {
+  local _r; _r="$(printf '%s' "$1" | sed -E 's/ negad[oa]( |$)/\1/; s/ +$//')"   # no adotante nada é negado
+  local _m="TRAVA DE MERGE (aviso, não veto) — no core isto seria vetado: ${_r}. Este repo não tem o caminho verificado de merge do core (ele não viaja na adoção), então NADA conferiu o CI antes deste comando, e o host pode não proteger a main. Antes de seguir, rode 'gh pr checks <N>' e confira que todos os checks passaram."
+  if [ "$nopy" = 0 ]; then
+    M="$_m" python3 -c 'import json,os; print(json.dumps({"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":os.environ["M"]}}, ensure_ascii=False))'
+  else
+    printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"TRAVA DE MERGE (aviso, não veto): comando com forma de merge ou push e sem python3 para analisá-lo. Este repo não tem o caminho verificado de merge do core, então nada conferiu o CI antes dele. Antes de seguir, rode gh pr checks <N> e confira que todos os checks passaram."}}'
+  fi
+  exit 0
+}
 # SEM python3 não há tokenizador: fecha SÓ o que pode tocar a main (recorte medido, ver a lib).
 if [ "$nopy" = 1 ]; then
   onion_nopy_touches merge-gate "$cmd" || exit 0
+  [ "$ADVISE" = 1 ] && advise "sem python3"
   echo "GUARDA-PRETOOLUSE: python3 ausente ou quebrado — o veto não consegue analisar este comando, que tem forma de merge ou push (git push, gh pr merge, gh api com rota de merge/contents/refs/graphql, gh repo sync). Fechado por segurança: o host não protege a main neste repo. Instale python3 (o tokenizador dos vetos); o merge segue pelo caminho verificado, bash ops/pr-merge-verified.sh <PR> --sync (core-only)." >&2
   exit 2
 fi
@@ -65,7 +82,7 @@ fi
 inv=$(ONION_CWD="$hcwd" onion_invocation_lines "$cmd")
 [ -z "$inv" ] && exit 0
 
-deny() { echo "GUARDA-PRETOOLUSE: $1 — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (lê CI + onion-review-verdict e recusa vermelho; o host não protege main neste repo). Se for deliberado, o maestro roda fora da sessão." >&2; exit 2; }  # (core-only): só alcançável depois do teste de presença acima
+deny() { [ "$ADVISE" = 1 ] && advise "$1"; echo "GUARDA-PRETOOLUSE: $1 — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (lê CI + onion-review-verdict e recusa vermelho; o host não protege main neste repo). Se for deliberado, o maestro roda fora da sessão." >&2; exit 2; }  # (core-only): só alcançável depois do teste de presença acima
 
 # (0) INANALISÁVEL que tem a forma de merge, ou de push que pode tocar a main → FECHADO. A lib só emite
 #     isto quando não consegue PROVAR o que o shell vai executar; supor que era inofensivo é exatamente

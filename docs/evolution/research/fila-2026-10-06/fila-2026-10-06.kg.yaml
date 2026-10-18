@@ -228,11 +228,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.7
-    verified_at: "2026-10-17"
-    verified_against: "medido em 2026-10-17: pretooluse-merge-gate.sh ainda sai com exit 0 em silêncio quando o projeto não tem ops/pr-merge-verified.sh (o caso de todo adotante)"
+    verified_at: "2026-10-18"
+    verified_against: "execução 2026-10-18 (branch fix/merge-gate-warns-in-adopter): sem o caminho verificado no repo, cada caso que vetaria no core vira additionalContext com exit 0 (o canal do kg-read-leg.sh), dizendo que nada conferiu o CI; push de branch de trabalho segue calado; casos (adv-a/b/c) de pretooluse_veto com mutante; no core o veto exit 2 segue igual"
     label: "a trava de merge deve avisar no adotante em vez de sair calada"
   - id: Q_MANIFESTO_SEM_SKILL_CORE_ONLY
     node_type: question

@@ -8882,6 +8882,43 @@ PY
       record_pass "pretooluse-veto: (pr-bash) onion_protected_branches ${_pl%%:*} = ${_pl#*:}"
     else record_fail "pretooluse-veto: (pr-bash) onion_protected_branches ${_pl%%:*}" "esperava '${_pl#*:}', veio '${_got% }'"; fi
   done
+  # (adv) NO ADOTANTE A TRAVA AVISA EM VEZ DE CALAR (2026-10-17, E_MERGE_GATE_INERTE_NO_ADOTANTE): sem o
+  #       caminho verificado do core no repo, o que vetaria vira additionalContext com exit 0 — nunca veto
+  #       (é o único caminho de merge da casa) e nunca silêncio. O caso honesto (push de branch de
+  #       trabalho) segue calado. MUTANTE: o ramo do adotante voltando a `exit 0` reprova (adv-a) e (adv-b).
+  _adv_run() {  # $1=hook $2=repo $3=comando → "rc<TAB>contexto-ou-vazio"
+    local _o _r=0
+    _o="$(printf '{"cwd":"%s","tool_input":{"command":"%s"}}' "$2" "$3" | CLAUDE_PROJECT_DIR="$2" bash "$1" 2>/dev/null)" || _r=$?
+    printf '%s\t%s\n' "$_r" "$(printf '%s' "$_o" | python3 -c 'import json,sys
+t=sys.stdin.read().strip()
+try: print(json.loads(t)["hookSpecificOutput"]["additionalContext"] if t else "")
+except Exception: print("JSON-INVALIDO")' 2>/dev/null)"
+  }
+  local _adr; _adr="$(mktemp -d)"; git -C "${_adr}" init -q; git -C "${_adr}" branch -M main 2>/dev/null || true
+  local _ar _ac
+  IFS=$'\t' read -r _ar _ac < <(_adv_run "${mg}" "${_adr}" "gh pr merge 3 --squash")
+  if [ "${_ar}" = 0 ] && grep -q 'TRAVA DE MERGE (aviso, não veto)' <<< "${_ac}"; then
+    record_pass "pretooluse-veto: (adv-a) adotante: gh pr merge → aviso em additionalContext, rc=0 (sem veto, sem silêncio)"
+  else record_fail "pretooluse-veto: (adv-a)" "rc=${_ar} contexto=[${_ac:0:120}]"; fi
+  IFS=$'\t' read -r _ar _ac < <(_adv_run "${mg}" "${_adr}" "git push origin main")
+  if [ "${_ar}" = 0 ] && grep -q 'TRAVA DE MERGE' <<< "${_ac}" && ! grep -q 'negado' <<< "${_ac}"; then
+    record_pass "pretooluse-veto: (adv-b) adotante: git push origin main → aviso que não diz 'negado'"
+  else record_fail "pretooluse-veto: (adv-b)" "rc=${_ar} contexto=[${_ac:0:120}]"; fi
+  IFS=$'\t' read -r _ar _ac < <(_adv_run "${mg}" "${_adr}" "git push origin feat/x")
+  if [ "${_ar}" = 0 ] && [ -z "${_ac}" ]; then
+    record_pass "pretooluse-veto: (adv-c) adotante: push de branch de trabalho → SILENCIOSO (o caso honesto)"
+  else record_fail "pretooluse-veto: (adv-c)" "rc=${_ar} contexto=[${_ac:0:120}] — aviso em todo push vira fadiga"; fi
+  local _amd; _amd="$(mktemp -d)"; mkdir -p "${_amd}/lib"; cp "${REPO_ROOT}/.claude/hooks/lib/"*.sh "${_amd}/lib/"
+  sed 's#^ADVISE=0; \[ -f "\${root}/ops/pr-merge-verified.sh" \] || ADVISE=1 .*#[ -f "${root}/ops/pr-merge-verified.sh" ] || exit 0; ADVISE=0#' "${mg}" > "${_amd}/mg.sh"
+  if cmp -s "${mg}" "${_amd}/mg.sh"; then
+    record_fail "pretooluse-veto: (adv-MUT) setup" "a mutação não foi aplicada (âncora do ADVISE mudou?)"
+  else
+    IFS=$'\t' read -r _ar _ac < <(_adv_run "${_amd}/mg.sh" "${_adr}" "gh pr merge 3 --squash")
+    if [ -z "${_ac}" ]; then
+      record_pass "pretooluse-veto: (adv-MUT) sem o ramo de aviso a trava volta a calar no adotante — (adv-a) é load-bearing"
+    else record_fail "pretooluse-veto: (adv-MUT)" "o mutante ainda avisou — (adv-a) não mede o ramo do adotante"; fi
+  fi
+  rm -rf "${_adr}" "${_amd}"; unset -f _adv_run
   rm -rf "${pr_root}"
 }
 
