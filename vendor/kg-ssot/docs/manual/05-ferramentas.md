@@ -90,7 +90,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.8.2",
+  "release": "kg-ssot-v4.9.0",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -276,7 +276,7 @@ julgado no perfil YAML e `.kg.json` no perfil JSON do contrato ([capítulo 3](03
 - `VersionedStore`: a cabeça em disco mais um registro de eventos e as versões no diretório oculto `.kg-store/`,
   sem git.
 
-Para importar do vendor (o kit não é pacote pip), ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem gravar
+Pelo pacote PyPI, é `from kg_ssot import kg_store`. Para importar do vendor, ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem gravar
 bytecode, como no [capítulo 6](06-adocao-e-ci.md#num-app):
 
 ```python

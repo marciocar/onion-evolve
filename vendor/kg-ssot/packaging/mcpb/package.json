@@ -1,0 +1,9 @@
+{
+  "name": "kg-ssot-mcpb-build",
+  "private": true,
+  "version": "0.0.0",
+  "description": "A CLI do MCPB fixada para empacotar o bundle kg-ssot (packaging/mcpb/build.py).",
+  "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2"
+  }
+}

@@ -33,8 +33,11 @@ from jsonschema import Draft202012Validator
 from jsonschema.exceptions import SchemaError
 
 sys.dont_write_bytecode = True  # num vendor, rodar a suíte não pode sujar o diretório carimbado
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import kg_validate  # noqa: E402  (o leitor de referência mora ao lado)
+if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
+    from . import kg_validate
+else:  # script ou vendor: o leitor de referência mora ao lado
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_validate  # noqa: E402
 
 FOLDERS = ("latest", "optional", "proposals")
 
@@ -133,7 +136,7 @@ def run_cases(suite, validator, should_validator, proposals=None):
 
 
 def main(argv=None):
-    root = pathlib.Path(__file__).resolve().parent.parent
+    root = kg_validate._ROOT  # o spec/ do pacote instalado ou o do repo
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--suite", default=str(root / "spec" / "conformance"))
     ap.add_argument("--schema", default=str(kg_validate.CONTRACT_MUST))

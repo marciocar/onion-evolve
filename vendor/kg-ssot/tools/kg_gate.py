@@ -47,8 +47,11 @@ import subprocess
 import sys
 
 sys.dont_write_bytecode = True  # num vendor, rodar o gate não pode sujar o diretório carimbado
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import kg_validate  # noqa: E402
+if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
+    from . import kg_validate
+else:  # script ou vendor
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_validate  # noqa: E402
 
 DEFAULT_BASELINE = ".kg-ssot/gate.json"
 DEFAULT_EXCLUDE = ("*/fixtures/*", "docs/materials/*")

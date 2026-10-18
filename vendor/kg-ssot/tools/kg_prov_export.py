@@ -30,8 +30,11 @@ import urllib.parse
 
 sys.dont_write_bytecode = True
 HERE = pathlib.Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-import kg_validate  # noqa: E402
+if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
+    from . import kg_validate
+else:  # script ou vendor
+    sys.path.insert(0, str(HERE))
+    import kg_validate  # noqa: E402
 
 CONTEXT = {
     "prov": "http://www.w3.org/ns/prov#",

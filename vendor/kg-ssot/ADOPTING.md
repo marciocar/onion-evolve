@@ -18,6 +18,16 @@ A lista está em [`spec/release.json`](spec/release.json):
   HTTP local;
 - o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
 - as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256, que o pip confere ao instalar; o `--require-hashes` faz a instalação falhar se um dia o arquivo perder os hashes);
+- a receita do pacote PyPI (`packaging/python/`): o script de build, o README do cadastro e as ferramentas de build
+  fixadas por hash. O mesmo kit sai no PyPI como `kg-ssot`, para usar como biblioteca, comando ou servidor MCP; para o
+  gate no CI, o vendor por tag continua o canal recomendado;
+- o leitor JS (`tools/runners/ajv/`) e a receita do pacote npm (`packaging/npm/`): o mesmo leitor sai no npm como
+  `kg-ssot`, com o validador do contrato pré-compilado, para Node e React Native/Expo. No vendor, eles viajam como
+  receita: para usar o leitor JS, instale o pacote (`npm install kg-ssot`). Um `npm install` ou um build dentro do
+  vendor deixa arquivos que o `kg_vendor.py check` acusa como sobrando;
+- a receita do MCP Bundle (`packaging/mcpb/`): o servidor MCP de referência empacotado para clientes como o Claude
+  Desktop, que instalam o pacote `kg-ssot` pelo `uv`, e o modelo do `server.json` do MCP Registry
+  (`packaging/mcp-registry/`). Também são receitas no vendor;
 - este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
 - o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
   arquivos da release);
@@ -47,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -285,6 +295,13 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.8.2` para a `kg-ssot-v4.9.0`, nenhum veredito muda. Num valor com `\n` no fim, a referência deixa de
+emitir um código redundante: ela passou a casar os regex por inteiro, como o ECMA-262 dos patterns do contrato. O kit passa a sair também no PyPI
+como `kg-ssot`, o leitor JS no npm como `kg-ssot` e o servidor MCP como MCP Bundle (as receitas em `packaging/`
+viajam na release), e os módulos acham o `spec/` ao lado de si no
+pacote instalado ou no diretório pai no vendor. Para quem usa o vendor, nada muda: um `update` basta, e o gate não
+precisa de `--update`.
+
 Da `kg-ssot-v4.8.1` para a `kg-ssot-v4.8.2`, nenhum veredito nem código muda. Só a saída melhora: o veredito do
 `.kg.json` passa a trazer a linha de cada ocorrência, a dica do `integrity.orphan-node` traz o id do nó e a aresta
 que o conserta, a mensagem e a dica do `integrity.verified-before-fact` dizem as duas leituras (vigência futura ou
@@ -327,7 +344,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a

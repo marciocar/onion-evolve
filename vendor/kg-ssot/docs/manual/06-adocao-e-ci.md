@@ -18,7 +18,7 @@ Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsons
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -84,7 +84,18 @@ que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a impleme
 [capítulo 8](08-receitas.md#uma-regra-de-negócio-ligada-ao-código)).
 
 - **No CI:** o caminho acima vale para qualquer repo, de qualquer linguagem: o gate só precisa de Python no CI.
-- **Em tempo de execução, em Python:** o kit não é pacote pip. Ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem
+- **Em tempo de execução, em Python, pelo pacote:** desde a 4.9.0 o kit também sai no PyPI como `kg-ssot`
+  (`pip install kg-ssot`), com os módulos em `kg_ssot` e os comandos `kg-validate`, `kg-conformance`, `kg-gate`,
+  `kg-store`, `kg-mcp` e `kg-prov-export`. O contrato e a suíte viajam dentro do pacote:
+
+  ```python
+  from kg_ssot import kg_store
+  store = kg_store.GitStore("/var/lib/meu-app/grafos", init=True)   # fora do repo do app
+  ```
+
+  O pacote é o caminho para o app; para o **gate no CI**, o vendor por tag continua o canal recomendado, porque o
+  contrato que julga o grafo fica no diff do repositório.
+- **Em tempo de execução, em Python, pelo vendor:** ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem
   gravar bytecode, para o `check` do vendor seguir íntegro:
 
   ```python
@@ -98,6 +109,21 @@ que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a impleme
   A raiz do armazém fica **fora** do repo do app. Dentro de um repo git, o `DiskStore` e o `VersionedStore`
   recusam a raiz; o `GitStore` com a raiz no próprio repo commita no branch em que ele estiver, fora do PR, e numa
   subpasta do repo cria um repositório git aninhado.
-- **Em outra linguagem:** não há leitor de referência pronto fora do Python. Valide pelo CLI
+- **Em JavaScript (Node, React Native, Expo):** desde a 4.9.0 o leitor JS sai no npm como `kg-ssot`
+  (`npm install kg-ssot`). A entrada não importa nada do Node, e o validador do contrato vem pré-compilado, sem
+  `new Function` nem `eval`, então roda no Hermes. `verdict(texto, { format })` devolve o veredito MUST com os códigos
+  da suíte, e o comando `kg-ssot-validate` julga arquivos. Ele mede só o MUST: os avisos SHOULD, a linha e as dicas
+  ficam com o leitor de referência em Python.
+- **Num cliente de MCP, como o Claude Desktop:** desde a 4.9.0 o servidor MCP de referência também sai como MCP
+  Bundle (`kg-ssot-<versão>.mcpb`). Ele é anexado à release da tag no repositório público depois que o pacote
+  `kg-ssot` da mesma versão sai no PyPI, porque o bundle instala o pacote de lá. Ao instalar, o cliente pergunta o
+  diretório do armazém e se o servidor fica só leitura, e instala o pacote pelo `uv` na sua máquina. O `uv` cria o
+  ambiente dentro da pasta da extensão, travado por um `uv.lock` com o hash de cada dependência. O bundle tem a
+  atestação de proveniência do GitHub (`gh attestation verify kg-ssot-<versão>.mcpb --repo marciocar/kg-ssot`) e
+  aparece no MCP Registry oficial como `io.github.marciocar/kg-ssot`. O armazém é o versionado: cada gravação fica registrada, e o `kg_history` a
+  mostra. Uma pasta dentro de um repositório git usa o git, num repositório aninhado (o repositório de fora passa a
+  vê-la como pasta não rastreada). Quando a pasta não abre, o servidor sobe só com o julgamento.
+  O servidor roda local, por stdio, e não fala com nenhum serviço externo.
+- **Em outra linguagem:** não há leitor pronto além do Python e do JavaScript. Valide pelo CLI
   (`kg_validate.py --format json` devolve o veredito JSON de `spec/verdict.schema.json`) ou por um modelo pelo
   servidor MCP (`kg_mcp.py`); um leitor próprio prova que concorda com o contrato passando na suíte (capítulo 7).
