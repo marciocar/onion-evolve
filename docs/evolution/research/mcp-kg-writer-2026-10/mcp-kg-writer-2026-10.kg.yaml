@@ -41,6 +41,22 @@ nodes:
     label: "Com cadastro aberto no IdP e 'qualquer logado escreve', o teto por área (200 grafos de até 512 KB) limita uma conta, mas não o número de contas: precisa de cota de disco ou de lista de e-mails?"
     narrative: "Achado da passada adversarial do PR. O Brain resolveu a mesma pergunta com ONION_KG_ALLOWED_EMAILS. A decisão (1) diz que qualquer logado escreve, então a lista não entrou. Fica para o maestro decidir com o uso medido."
     trace: "ops/mcp-onion-kg-writer/README.md"
+  - id: D_WRITER_MEDIR_E_ATUALIZAR_1018
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-18"
+    verified_against: "decisão do maestro em 2026-10-18, por pergunta com opções (/meta:decide): escolhida «Medir e atualizar»"
+    label: "onion-kg-writer: medir as áreas de dados contra as regras de nome da kg-ssot-v4.9.1 e, com 0 colisões, atualizar pelo wrapper de deploy; colisão achada para e volta ao maestro"
+    narrative: "Selado por /meta:decide em 2026-10-18: escolhida «Medir e atualizar»; descartadas: «Só medir agora» · «Adiar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-18: «O onion-kg-writer em produção está em 524aaada, vendor kg-ssot 4.7.3. O que fazer?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
+      locality: "pessoa"
 
 edges:
   - from: A_MCP_KG_WRITER_SERVER
@@ -49,6 +65,9 @@ edges:
   - from: Q_CADASTRO_ABERTO_E_DISCO
     to: D_MCP_KG_WRITER_CHAT_DA_CASA
     edge_type: CONSTRAINS
+  - from: D_WRITER_MEDIR_E_ATUALIZAR_1018
+    to: D_MCP_KG_WRITER_CHAT_DA_CASA
+    edge_type: TRACES_TO
 
 external_edges:
   - from: D_MCP_KG_WRITER_CHAT_DA_CASA

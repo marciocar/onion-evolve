@@ -966,6 +966,17 @@
 |--:|---|---|---|
 | 5.4 | `Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA` | elenxo-mecanismos-lint-2026-08-13 | O TETO DA GUARDA DIRTY-TREE GANHA DONO NO GRAFO (8o Elenxo, fechamento do Q_PARECER): no caminho benigno a guarda NAO emite nada  |
 
+## fila-2026-10-06 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
+| 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
+| 4.5 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
+| 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
+| 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
+| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
+
 ## guard-pre-push-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -993,17 +1004,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE` | evolve-cures-2026-10 | O TERCEIRO SITIO que o no C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA nomeava e a cura 4 NAO curou (achado R3 do Elenxo da leva 2 |
-
-## fila-2026-10-06 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
-| 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
-| 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
-| 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
-| 3.0 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
-| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
 
 ## granaai-doctrine-absorption-2026-07 — 1 item(ns)
 
