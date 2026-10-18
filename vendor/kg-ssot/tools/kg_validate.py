@@ -40,6 +40,7 @@ Uso:
   kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]
 """
 import argparse
+import bisect
 import collections
 import datetime
 import functools
@@ -994,8 +995,8 @@ def path_text(path):
 
 def yaml_lines(text):
     """A árvore de nós do YAML (compose, sem construir valores), para achar a linha de um caminho; None se não compõe.
-    Um JsonText não passa pelo compose (a libyaml só aceita str exato, e o JSON não é lido como YAML): None, e o
-    line_of de um .kg.json devolve None, declarado no verdict como linha nula."""
+    Um JsonText não passa pelo compose (a libyaml só aceita str exato, e o JSON não é lido como YAML): None; a linha
+    do .kg.json vem de json_lines."""
     if isinstance(text, JsonText) or _too_deep(text):  # o mesmo teto do parse: compor isto derruba o processo
         return None
     try:
@@ -1004,9 +1005,76 @@ def yaml_lines(text):
         return None
 
 
+def json_lines(text):
+    """{caminho (tupla): linha} de um .kg.json, com a semântica de line_of no YAML: num objeto, a linha da CHAVE; numa
+    lista, a do início do item; a raiz, a do início do documento. A linha conta \\n, como o JSONDecodeError (um CR solto,
+    sem \\n, não abre linha; pelo CLI o arquivo é lido com quebras universais e o caso não aparece). A chave
+    entra decodificada (os escapes resolvidos), como o caminho do schema a vê. None se o texto não varre."""
+    s = _json_body(text)
+    breaks = [i for i, c in enumerate(s) if c == "\n"]
+    n, out = len(s), {}
+
+    def line(i):
+        return bisect.bisect_left(breaks, i) + 1
+
+    def skip(i):
+        while i < n and s[i] in _JSON_WS:
+            i += 1
+        return i
+
+    def string_end(i):
+        j = i + 1
+        while s[j] != '"':
+            j += 2 if s[j] == "\\" else 1
+        return j + 1
+
+    def value(i, path):  # a profundidade já foi limitada a 128 pelo parse do perfil
+        i = skip(i)
+        out.setdefault(path, line(i))
+        if s[i] in "{[":
+            close, idx = ("}", None) if s[i] == "{" else ("]", 0)
+            i = skip(i + 1)
+            if s[i] == close:
+                return i + 1
+            while True:
+                i = skip(i)
+                if idx is None:
+                    end = string_end(i)
+                    key = json.loads(s[i:end])
+                    out[path + (key,)] = line(i)
+                    i = skip(end) + 1  # o ':'
+                    i = value(i, path + (key,))
+                else:
+                    i = value(i, path + (idx,))
+                    idx += 1
+                i = skip(i)
+                if s[i] == close:
+                    return i + 1
+                i += 1  # a vírgula
+        if s[i] == '"':
+            return string_end(i)
+        j = i
+        while j < n and s[j] not in ",]}" and s[j] not in _JSON_WS:
+            j += 1
+        return j
+
+    try:
+        value(0, ())
+    except (IndexError, ValueError, RecursionError):
+        return None
+    return out
+
+
 def line_of(tree, path):
-    """A linha (contando de 1) do ponto mais fundo do caminho que existe no YAML; None sem árvore (o .kg.json não tem
-    árvore: yaml_lines devolve None para ele, e a linha da ocorrência sai nula)."""
+    """A linha (contando de 1) do ponto mais fundo do caminho que existe no documento; None sem árvore. A árvore é a
+    do YAML (yaml_lines) ou o mapa de caminho para linha do .kg.json (json_lines)."""
+    if isinstance(tree, dict):
+        line = tree.get(())
+        for k in range(1, len(path) + 1):
+            if tuple(path[:k]) not in tree:
+                break
+            line = tree[tuple(path[:k])]
+        return line
     node, line = tree, (tree.start_mark.line + 1 if tree is not None else None)
     for p in path:
         if isinstance(node, yaml.MappingNode):
@@ -1033,7 +1101,8 @@ MESSAGES = {
     "integrity.dangling-external": "A ponta externa aponta para um arquivo ou um id que não existe no corpus.",
     "integrity.dangling-external-local": "A ponta local da aresta externa não existe neste arquivo.",
     "integrity.testimony-in-prod": "O nó está em PROD, mas a única base dele é testemunho.",
-    "integrity.verified-before-fact": "A data de verificação é anterior à data do fato (valid_from).",
+    "integrity.verified-before-fact": "A data de verificação (verified_at) é anterior à data do fato (valid_from): "
+                                      "ou o fato tem vigência futura, ou as datas estão trocadas.",
     "integrity.untraced-decision": "A decisão não diz de onde veio: falta trace, provenance ou aresta TRACES_TO.",
     "yaml.unquoted-date": "Há uma data sem aspas; leitores YAML diferentes a leem de formas diferentes.",
     "yaml.forbidden-key-on": "A aresta usa a chave on, proibida (em YAML 1.1 ela vira o booleano True).",
@@ -1057,7 +1126,12 @@ HINTS = {
     "yaml.unsafe-integer": "Escreva o número entre aspas, como texto, ou use um valor dentro de ±9007199254740991.",
     "yaml.lone-surrogate": "Troque o escape solto pelo caractere inteiro (o par alto e baixo) ou remova-o.",
     "yaml.depth-over-128": "Achate a estrutura: um grafo de verdade fica em 3 ou 4 níveis.",
-    "integrity.orphan-node": "Ligue o nó a outro com uma aresta, ou remova o nó.",
+    "integrity.orphan-node": "Todo nó precisa de pelo menos uma aresta. Ligue-o a outro nó em edges (from: o id dele, "
+                             "to: o id do outro, edge_type: TRACES_TO, SUPPORTS ou DEPENDS_ON, o que disser a relação), "
+                             "ou remova o nó.",
+    "integrity.verified-before-fact": "Se o fato tem vigência futura (uma norma lida antes de entrar em vigor), o aviso é "
+                                      "esperado e pode ficar na linha de base do gate. Se não, as datas estão trocadas: "
+                                      "valid_from é quando o fato passou a valer, e verified_at, quando foi conferido.",
     "integrity.duplicate-id": "Dê um id único a cada nó.",
     "integrity.untraced-decision": "Acrescente trace, provenance ou uma aresta TRACES_TO saindo da decisão.",
     "integrity.testimony-in-prod": "Deixe o nó em DEV, ou apoie-o numa medição ou leitura conferida.",
@@ -1090,7 +1164,14 @@ def message_of(code, json_text=False):
     return f"Violação {code}."
 
 
-def hint_of(code):
+def hint_of(code, place=None):
+    """A correção do código; no integrity.orphan-node com o lugar 'nó X', a dica traz o id do nó. Um nó sem id ('nó #2',
+    o índice) fica com a dica genérica: não há id para citar."""
+    if (code == "integrity.orphan-node" and isinstance(place, str) and place.startswith("nó ")
+            and not place.startswith("nó #")):
+        nid = place[3:]
+        return (f"Todo nó precisa de pelo menos uma aresta. Ligue {nid} a outro nó em edges (from: {nid}, to: o id do "
+                "outro, edge_type: TRACES_TO, SUPPORTS ou DEPENDS_ON, o que disser a relação), ou remova o nó.")
     if code in HINTS:
         return HINTS[code]
     if code.startswith("form.unknown-key."):
@@ -1135,7 +1216,7 @@ def verdict(text, validator, should_validator=None, corpus=None, source=None, li
     verdict é PASS sem MUST e FAIL com qualquer MUST (um arquivo que não parseia reprova com parse.*, como na suíte).
     summary conta TODAS as ocorrências por nível e código; occurrences traz até `limit`, com truncated e total."""
     occ = occurrences(text, validator, should_validator, corpus)
-    tree = yaml_lines(text) if occ else None
+    tree = (json_lines(text) if isinstance(text, JsonText) else yaml_lines(text)) if occ else None
     parse_line = parse_error_line(text) if occ and occ[0][1].startswith("parse.") else None
     summary = {"MUST": collections.Counter(), "SHOULD": collections.Counter()}
     for level, code, _, _ in occ:
@@ -1146,7 +1227,7 @@ def verdict(text, validator, should_validator=None, corpus=None, source=None, li
                 "line": (parse_line if code.startswith("parse.") else line_of(tree, path) if tree is not None and path
                          else None),
                 "message": message_of(code, isinstance(text, JsonText))}
-        hint = hint_of(code)
+        hint = hint_of(code, place)
         if hint:
             item["hint"] = hint
         items.append(item)
@@ -1347,8 +1428,11 @@ def main(argv=None):
         lines += report(name, must, should, isinstance(text, JsonText))
         if args.where:  # a mesma ocorrência repetida (os ramos if/then do schema) vira uma linha com ×n
             found = collections.Counter(where(text, validator, should_v, corpus))
-            lines += [f"    {level:<6} {code}  {place}" + (f" ×{n}" if n > 1 else "")
-                      for (level, code, place), n in sorted(found.items(), key=lambda x: (x[0][0] != "MUST", x[0][1:]))]
+            for (level, code, place), n in sorted(found.items(), key=lambda x: (x[0][0] != "MUST", x[0][1:])):
+                lines.append(f"    {level:<6} {code}  {place}" + (f" ×{n}" if n > 1 else ""))
+                hint = hint_of(code, place) if level == "MUST" else None  # no MUST, a correção ao lado do lugar
+                if hint:
+                    lines.append(f"           → {hint}")
     summary = summarize(results)
     if args.json:
         with open(args.json, "w", encoding="utf-8") as fh:

@@ -53,7 +53,7 @@ Opções úteis:
 
 | Opção | Efeito |
 |---|---|
-| `--where` | Uma linha por ocorrência, com o nó ou a aresta |
+| `--where` | Uma linha por ocorrência, com o nó ou a aresta; numa ocorrência MUST, a correção vem logo abaixo |
 | `--corpus DIR` | Confere a ponta externa das `external_edges` contra os `.kg.yaml` rastreados pelo git sob `DIR` (fora de um repo git, todos) |
 | `--schema F` | Valida contra outro MUST (o SHOULD vizinho vem junto, se existir) |
 | `--format json` | O veredito estruturado em stdout (ver abaixo), para ferramentas e servidores MCP |
@@ -90,7 +90,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.8.1",
+  "release": "kg-ssot-v4.8.2",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -121,8 +121,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
 
 - **O que é estável:** `code` é o vocabulário da suíte e do gate, e é por ele que uma ferramenta decide. `message` e
   `hint` são texto para pessoas e podem mudar.
-- **O lugar da ocorrência:** `path` aponta no documento (`nodes[7].provenance.method`) e `line` é a linha do YAML,
-  para quem edita corrigir o ponto certo sem reescrever o grafo.
+- **O lugar da ocorrência:** `path` aponta no documento (`nodes[7].provenance.method`) e `line` é a linha no arquivo,
+  no `.kg.yaml` e no `.kg.json`, para quem edita corrigir o ponto certo sem reescrever o grafo.
 - **O corte:** `summary` conta todas as ocorrências. `occurrences` traz até `--limit`, e `truncated` e `total` dizem
   se cortou. Assim um grafo grande não enche o contexto de um modelo.
 - **O contrato que julgou:** `contract` traz o caminho, o sha256 de cada schema e a release, para quem precisa provar
