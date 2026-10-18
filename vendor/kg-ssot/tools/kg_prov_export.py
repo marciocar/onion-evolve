@@ -96,12 +96,28 @@ def export(doc, base):
     return {"@context": CONTEXT, "@graph": out}
 
 
+def _utf8_stdio():
+    """A saída que vai para pipe ou arquivo sai em UTF-8 (no Windows, o padrão seria cp1252, que derruba o ✓ e entrega
+    a quem consome o JSON outra codificação); no terminal, fica a do console, trocando o caractere que ela não tem."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                tty = stream.isatty()
+            except ValueError:
+                continue
+            if tty:
+                stream.reconfigure(errors="replace")
+            else:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("graph")
     ap.add_argument("--base", default="urn:kg-ssot:graph:",
                     help="prefixo das IRIs dos nós (default: urn:kg-ssot:graph:)")
     args = ap.parse_args(argv)
+    _utf8_stdio()
     try:
         text = pathlib.Path(args.graph).read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:

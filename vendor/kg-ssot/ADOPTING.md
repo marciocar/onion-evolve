@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -295,6 +295,26 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.9.0` para a `kg-ssot-v4.9.1`, nenhum veredito muda. Muda o armazém e o servidor MCP:
+- **O armazém roda no Windows.** Na 4.9.0 ele recusava abrir lá, e o MCPB no Claude Desktop do Windows subia só com o
+  julgamento. No Windows, que não tem `dir_fd`, cada passo do caminho é conferido por `lstat` (link simbólico, junção e
+  ponto de montagem são recusados; o arquivo do OneDrive sob demanda passa), o arquivo aberto tem de ser o que o
+  `lstat` viu, e o caminho é conferido de novo depois da leitura e antes da troca final na gravação. A trava entre
+  processos é a do `msvcrt`. É mais fraco que no POSIX, e o manual diz onde.
+- **Nomes portáveis.** O armazém recusa criar um nome com segmento reservado do Windows (`CON`, `NUL`, `COM1`...) ou que
+  termina em ponto; um nome assim que já está no armazém continua lendo, gravando e sendo removido. Nenhuma operação
+  (ler, gravar, remover, histórico) aceita um nome que só difere pela caixa de um que está no armazém: no Windows e no
+  macOS os dois seriam o mesmo arquivo, e remover `ALVO.kg.yaml` apagaria `alvo.kg.yaml` sem julgar quem aponta para
+  ele. Um par antigo com as duas caixas, num disco que as distingue, segue funcionando pela caixa exata.
+- **O servidor diz por que subiu sem armazém.** Com `--store-optional`, uma raiz que não abre não derruba o
+  `kg_mcp.py`: ele sobe só com `kg_validate` e `kg_schema_help` e põe o motivo nas instruções, na descrição das duas
+  ferramentas e no `kg_schema_help`. Sem a opção, uma raiz sem permissão agora dá rc 2 com a mensagem, em vez de
+  traceback. O MCPB usa a opção, e uma raiz que chega com `${...}` sem expandir não cria armazém.
+- **Os módulos acham o `spec/` pelo próprio caminho.** O `kg_store.py`, o `kg_mcp.py` e o `kg_conformance.py` deixam de
+  usar o `_ROOT` do `kg_validate` importado; um `kg_validate` falso num teste não desvia mais o spec dos vizinhos.
+
+Um `update` basta, e o gate não precisa de `--update`.
+
 Da `kg-ssot-v4.8.2` para a `kg-ssot-v4.9.0`, nenhum veredito muda. Num valor com `\n` no fim, a referência deixa de
 emitir um código redundante: ela passou a casar os regex por inteiro, como o ECMA-262 dos patterns do contrato. O kit passa a sair também no PyPI
 como `kg-ssot`, o leitor JS no npm como `kg-ssot` e o servidor MCP como MCP Bundle (as receitas em `packaging/`
@@ -344,7 +364,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a

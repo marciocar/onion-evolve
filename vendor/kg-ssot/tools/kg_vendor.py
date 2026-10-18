@@ -333,6 +333,21 @@ def check(dest, index=False, legacy_ok=False):
     return 0
 
 
+def _utf8_stdio():
+    """A saída que vai para pipe ou arquivo sai em UTF-8 (no Windows, o padrão seria cp1252, que derruba o ✓ e entrega
+    a quem consome o JSON outra codificação); no terminal, fica a do console, trocando o caractere que ela não tem."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                tty = stream.isatty()
+            except ValueError:
+                continue
+            if tty:
+                stream.reconfigure(errors="replace")
+            else:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -346,6 +361,7 @@ def main(argv=None):
     ck.add_argument("--dest", default=DEFAULT_DEST)
     ck.add_argument("--index", action="store_true", help="confere os blobs do índice do git, não a árvore de trabalho")
     args = ap.parse_args(argv)
+    _utf8_stdio()
     try:
         if args.cmd == "update":
             return update(args.dest, args.tag, args.source, args.force, args.profile)
