@@ -10,7 +10,7 @@ findings_fixed: 1
 tokens: 90000
 duration_min: 90
 verdict: CORRIGIDO
-elenxo: sim
+elenxo: nao
 nota: >-
   Sinal de campo de um adotante: o aviso da trava de merge disparou num comando honesto, com push de branch de
   trabalho. Reproduzido com o tool_input.command LITERAL, extraído do transcrito dele; a reconstrução à mão não
@@ -32,7 +32,7 @@ nota: >-
   não, e nenhuma linha de push ou merge real perdida. As 5 foram lidas uma a uma: 2 são o meu próprio teste
   dentro de uma string entre aspas simples, que o bash não executa; 3 são comandos do adotante com push de
   branch de trabalho. Na forma exata desses comandos, com o alvo trocado para a main, o hook do core veta
-  nas duas versões (rc=2).
+  nas duas versões (rc=2). O campo elenxo diz nao: a passada adversarial não chegou a avaliar a cura.
 ---
 
 # Resíduo — `fix/heredoc-opener-multiline-quote`
