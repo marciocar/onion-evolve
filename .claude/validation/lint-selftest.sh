@@ -24992,17 +24992,20 @@ run_role_cut_selftests() {
       _t_bundle "${d}/v-ad-${_r}" "${_vmx}" --role "${_r}" --kind adoption --repo "${REPO_ROOT}"
       _t_bundle "${d}/v-dr-${_r}" "${_vmx}" --role "${_r}" --kind door --repo "${REPO_ROOT}"
       grep -q . "${d}/v-ad-${_r}" || { _bad="${_bad} ${_r}:bundle-vazio"; continue; }
-      grep -qxF .claude/skills/onion-publish/SKILL.md "${d}/v-ad-${_r}" && _bad="${_bad} ${_r}:skill-vazou-na-adocao"
-      grep -qxF .claude/skills/onion-publish/SKILL.md "${d}/v-dr-${_r}" || _bad="${_bad} ${_r}:skill-sumiu-da-porta"
+      for _x in .claude/skills/onion-publish/SKILL.md .claude/commands/meta/publish.md \
+                .claude/rules/publish-lens.md .claude/commands/common/prompts/publish-doctrine.md; do
+        grep -qxF "${_x}" "${d}/v-ad-${_r}" && _bad="${_bad} ${_r}:vazou-na-adocao:${_x}"
+        grep -qxF "${_x}" "${d}/v-dr-${_r}" || _bad="${_bad} ${_r}:sumiu-da-porta:${_x}"
+      done
       grep -qxF .claude/commands/meta/create-command.md "${d}/v-ad-${_r}" || _bad="${_bad} ${_r}:meta-fabrica-cortada"
-      _diff="$(LC_ALL=C comm -13 <(LC_ALL=C sort "${d}/v-ad-${_r}") <(LC_ALL=C sort "${d}/v-dr-${_r}") | grep -v '^\.claude/skills/onion-publish/' || true)"
+      _diff="$(LC_ALL=C comm -13 <(LC_ALL=C sort "${d}/v-ad-${_r}") <(LC_ALL=C sort "${d}/v-dr-${_r}") | grep -vE '^\.claude/(skills/onion-publish/|commands/meta/publish\.md$|rules/publish-lens\.md$|commands/common/prompts/publish-doctrine\.md$)' || true)"
       [ -n "${_diff}" ] && _bad="${_bad} ${_r}:adocao-perdeu-mais:$(head -1 <<< "${_diff}")"
     done
     printf '%s' "${_bad}"
   }
   local _vbad; _vbad="$(_v_check "${vm}")"
   if [ -z "${_vbad}" ]; then
-    record_pass "role-cut: (v) adopted e hub, no destino adoção, não recebem a skill onion-publish e mantêm a meta-fábrica; a porta segue com ela"
+    record_pass "role-cut: (v) adopted e hub, no destino adoção, não recebem o /meta:publish (comando, skill, lente, doutrina) e mantêm a meta-fábrica; a porta segue com eles"
   else record_fail "role-cut: (v)" "desvio:${_vbad}"; fi
   local _vm_mut="${d}/vm-v-mut.sh"
   sed '/_CORE_ONLY_ADOPTION_EXCLUDES\[@\]/d' "${vm}" > "${_vm_mut}"
