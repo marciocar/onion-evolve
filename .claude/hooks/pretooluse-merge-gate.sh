@@ -21,8 +21,8 @@
 #    modelo, não subprocessos. É exatamente o que se quer: o caminho verificado passa, o nu não.
 #  · Sem `ops/pr-merge-verified.sh` (core-only) no projeto (adotante via /meta:adopt copia .claude/, não ops/)
 #    o hook não VETA: não se veta o único caminho de merge de uma casa que não tem o verificado. Mas
-#    desde 2026-10-17 ele também não CALA (E_MERGE_GATE_INERTE_NO_ADOTANTE, medido na adoção do
-#    onion-kg-ssot): cada caso que vetaria no core vira AVISO injetado no contexto (additionalContext,
+#    desde 2026-10-17 ele também não CALA (E_MERGE_GATE_INERTE_NO_ADOTANTE, medido na adoção de um
+#    adotante): cada caso que vetaria no core vira AVISO injetado no contexto (additionalContext,
 #    exit 0), dizendo que nada conferiu o CI antes do merge. Antes, a sessão do adotante mergeava sem
 #    saber que a trava que ela via citada na doutrina não existia ali.
 #  · Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira (heredoc/prosa que CITA `gh pr merge`
