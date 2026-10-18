@@ -45,7 +45,7 @@
     "root": {
       "type": "directory",
       "title": "Diretório do armazém",
-      "description": "Onde os grafos ficam gravados. Fora de um repositório git: o armazém recusa uma raiz dentro de um.",
+      "description": "Onde os grafos ficam gravados. Se a pasta não abrir, o servidor só julga e o Claude diz por quê; dentro de um repositório git, cada gravação vira um commit.",
       "required": true,
       "default": "${DOCUMENTS}/kg-ssot"
     },

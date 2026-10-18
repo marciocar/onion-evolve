@@ -1,4 +1,4 @@
-# KG-SSOT 4.9.0 (tag kg-ssot-v4.9.0): o texto completo para agentes de IA
+# KG-SSOT 4.9.1 (tag kg-ssot-v4.9.1): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,7 +14,7 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.9.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.9.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.9.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.9.1-6f42c1)](spec/release.json)
 [![Suíte: 261/261](https://img.shields.io/badge/su%C3%ADte-261%2F261-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
@@ -152,7 +152,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.9.0`. O leitor de referência passa em 261 de 261 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.9.1`. O leitor de referência passa em 261 de 261 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -256,14 +256,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -494,6 +494,26 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.9.0` para a `kg-ssot-v4.9.1`, nenhum veredito muda. Muda o armazém e o servidor MCP:
+- **O armazém roda no Windows.** Na 4.9.0 ele recusava abrir lá, e o MCPB no Claude Desktop do Windows subia só com o
+  julgamento. No Windows, que não tem `dir_fd`, cada passo do caminho é conferido por `lstat` (link simbólico, junção e
+  ponto de montagem são recusados; o arquivo do OneDrive sob demanda passa), o arquivo aberto tem de ser o que o
+  `lstat` viu, e o caminho é conferido de novo depois da leitura e antes da troca final na gravação. A trava entre
+  processos é a do `msvcrt`. É mais fraco que no POSIX, e o manual diz onde.
+- **Nomes portáveis.** O armazém recusa criar um nome com segmento reservado do Windows (`CON`, `NUL`, `COM1`...) ou que
+  termina em ponto; um nome assim que já está no armazém continua lendo, gravando e sendo removido. Nenhuma operação
+  (ler, gravar, remover, histórico) aceita um nome que só difere pela caixa de um que está no armazém: no Windows e no
+  macOS os dois seriam o mesmo arquivo, e remover `ALVO.kg.yaml` apagaria `alvo.kg.yaml` sem julgar quem aponta para
+  ele. Um par antigo com as duas caixas, num disco que as distingue, segue funcionando pela caixa exata.
+- **O servidor diz por que subiu sem armazém.** Com `--store-optional`, uma raiz que não abre não derruba o
+  `kg_mcp.py`: ele sobe só com `kg_validate` e `kg_schema_help` e põe o motivo nas instruções, na descrição das duas
+  ferramentas e no `kg_schema_help`. Sem a opção, uma raiz sem permissão agora dá rc 2 com a mensagem, em vez de
+  traceback. O MCPB usa a opção, e uma raiz que chega com `${...}` sem expandir não cria armazém.
+- **Os módulos acham o `spec/` pelo próprio caminho.** O `kg_store.py`, o `kg_mcp.py` e o `kg_conformance.py` deixam de
+  usar o `_ROOT` do `kg_validate` importado; um `kg_validate` falso num teste não desvia mais o spec dos vizinhos.
+
+Um `update` basta, e o gate não precisa de `--update`.
+
 Da `kg-ssot-v4.8.2` para a `kg-ssot-v4.9.0`, nenhum veredito muda. Num valor com `\n` no fim, a referência deixa de
 emitir um código redundante: ela passou a casar os regex por inteiro, como o ECMA-262 dos patterns do contrato. O kit passa a sair também no PyPI
 como `kg-ssot`, o leitor JS no npm como `kg-ssot` e o servidor MCP como MCP Bundle (as receitas em `packaging/`
@@ -543,7 +563,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -616,7 +636,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.9.0** (tag `kg-ssot-v4.9.0`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.9.1** (tag `kg-ssot-v4.9.1`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 
@@ -1223,7 +1243,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.9.0",
+  "release": "kg-ssot-v4.9.1",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -1487,15 +1507,26 @@ python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana \
   PASS nem `"gate"`, para quem chama distinguir "reprovou" de "não deu para julgar".
 - **A trava otimista:** `expected_sha256` é o sha256 da cabeça que quem grava leu, ou `NEW` (no CLI, `new`) para
   exigir que o nome ainda não exista. Gravar o mesmo texto da cabeça dá `written` com `unchanged` e sem commit.
-- **O caminho:** o nome é relativo, termina em `.kg.yaml` e não tem `..` nem segmento oculto. Raiz, pastas e arquivo
-  não podem ser symlink: tudo se abre com `O_NOFOLLOW`, o que exige POSIX.
+- **O caminho:** o nome é relativo, termina em `.kg.yaml` ou `.kg.json` e não tem `..` nem segmento oculto. Para o
+  armazém ser copiável entre sistemas, ele recusa criar um nome com segmento reservado do Windows (`CON`, `NUL`,
+  `COM1`...) ou que termina em ponto (o que já existe segue funcionando), e nenhuma operação aceita um nome que só
+  difere pela caixa de um que está no armazém. Raiz, pastas e arquivo não podem ser link:
+  - **no macOS e no Linux (POSIX),** tudo se abre por `dir_fd` com `O_NOFOLLOW`, e trocar uma pasta no meio da operação
+    não desvia nada;
+  - **no Windows,** que não tem `dir_fd`, cada passo do caminho é conferido por `lstat` (link simbólico, junção e ponto
+    de montagem são recusados; o reparse point que não redireciona o nome, como o arquivo do OneDrive sob demanda,
+    passa), o arquivo aberto tem de ser o mesmo que o `lstat` viu, e o caminho é conferido de novo depois da leitura e,
+    na gravação, antes da troca final. É mais fraco: quem pode escrever dentro da raiz consegue trocar uma pasta entre
+    a conferência e o uso. Num sistema de arquivos sem id de arquivo (o FAT de um pendrive), a comparação do arquivo
+    aberto não prova nada, e só a recusa de link sobra. Num armazém de uma pessoa só, na pasta dela, isso não muda
+    nada; num armazém compartilhado, prefira POSIX.
 - **O histórico:** `history(nome)` lista as operações, da mais nova para a mais antiga, com `ref`, `op`
   (`write` ou `delete`), autor, data e mensagem. `read(nome, ref=...)` lê uma versão anterior: o sha do commit no
   git, o `seq` do evento no versionado.
 - **O git isolado:** o `GitStore` não lê a config do sistema nem a do usuário (sem hooks, sem gpg, sem `autocrlf`, sem
   arquivo de exclusão), então o que ele guarda é byte a byte o texto aprovado, com o sha256 do resultado.
 - **O que fica com quem adota, de propósito:** autenticação, identidade, área por usuário (um root por usuário),
-  tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock`.
+  tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock` nem `msvcrt`.
 - **O rc do CLI:** 0 gravou ou leu, 1 recusado (`gate`, `conflict`, `missing`, nome inexistente) e 2 entrada
   quebrada ou `not_judged`.
 
@@ -1517,6 +1548,11 @@ produto não depende dele, e ele não depende de um cliente específico.
 | `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
 Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
+
+Com `--store-optional`, uma raiz que não abre (um arquivo no lugar da pasta, uma pasta sem permissão) não derruba o
+servidor: ele sobe só com `kg_validate` e `kg_schema_help` e diz o motivo ao modelo, nas instruções, na descrição das
+duas ferramentas e num campo `store` do `kg_schema_help`. Assim o modelo conta ao usuário por que não há `kg_write`, em
+vez de supor um modo só leitura. Sem a opção, a raiz que não abre é rc 2, com a mensagem no stderr.
 
 Uma configuração de cliente por stdio, com um armazém versionado fora do repo:
 
@@ -1542,6 +1578,7 @@ Uma configuração de cliente por stdio, com um armazém versionado fora do repo
 | `--read-only` | Tira `kg_write` e `kg_delete` |
 | `--http PORTA` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote` |
 | `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
+| `--store-optional` | Raiz que não abre não derruba o servidor: ele sobe sem armazém e diz o motivo ao modelo |
 
 Uma gravação recusada, como o modelo a recebe (o `structuredContent`, abreviado):
 
@@ -1656,7 +1693,7 @@ Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsons
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -1760,8 +1797,10 @@ que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a impleme
   atestação de proveniência do GitHub (`gh attestation verify kg-ssot-<versão>.mcpb --repo marciocar/kg-ssot`) e
   aparece no MCP Registry oficial como `io.github.marciocar/kg-ssot`. O armazém é o versionado: cada gravação fica registrada, e o `kg_history` a
   mostra. Uma pasta dentro de um repositório git usa o git, num repositório aninhado (o repositório de fora passa a
-  vê-la como pasta não rastreada). Quando a pasta não abre, o servidor sobe só com o julgamento.
-  O servidor roda local, por stdio, e não fala com nenhum serviço externo.
+  vê-la como pasta não rastreada). Quando a pasta não abre, o servidor sobe só com o julgamento e diz o motivo ao
+  modelo, que o conta no chat (desde a 4.9.1; na 4.9.0 o motivo ia só para o log). Roda no macOS, no Linux e no
+  Windows; no Windows, o armazém roda desde a 4.9.1 (na 4.9.0 ele não abria lá), com a proteção de caminho descrita no
+  capítulo 5. O servidor roda local, por stdio, e não fala com nenhum serviço externo.
 - **Em outra linguagem:** não há leitor pronto além do Python e do JavaScript. Valide pelo CLI
   (`kg_validate.py --format json` devolve o veredito JSON de `spec/verdict.schema.json`) ou por um modelo pelo
   servidor MCP (`kg_mcp.py`); um leitor próprio prova que concorda com o contrato passando na suíte (capítulo 7).

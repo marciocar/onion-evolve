@@ -18,7 +18,7 @@ Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsons
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -122,8 +122,10 @@ que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a impleme
   atestação de proveniência do GitHub (`gh attestation verify kg-ssot-<versão>.mcpb --repo marciocar/kg-ssot`) e
   aparece no MCP Registry oficial como `io.github.marciocar/kg-ssot`. O armazém é o versionado: cada gravação fica registrada, e o `kg_history` a
   mostra. Uma pasta dentro de um repositório git usa o git, num repositório aninhado (o repositório de fora passa a
-  vê-la como pasta não rastreada). Quando a pasta não abre, o servidor sobe só com o julgamento.
-  O servidor roda local, por stdio, e não fala com nenhum serviço externo.
+  vê-la como pasta não rastreada). Quando a pasta não abre, o servidor sobe só com o julgamento e diz o motivo ao
+  modelo, que o conta no chat (desde a 4.9.1; na 4.9.0 o motivo ia só para o log). Roda no macOS, no Linux e no
+  Windows; no Windows, o armazém roda desde a 4.9.1 (na 4.9.0 ele não abria lá), com a proteção de caminho descrita no
+  capítulo 5. O servidor roda local, por stdio, e não fala com nenhum serviço externo.
 - **Em outra linguagem:** não há leitor pronto além do Python e do JavaScript. Valide pelo CLI
   (`kg_validate.py --format json` devolve o veredito JSON de `spec/verdict.schema.json`) ou por um modelo pelo
   servidor MCP (`kg_mcp.py`); um leitor próprio prova que concorda com o contrato passando na suíte (capítulo 7).

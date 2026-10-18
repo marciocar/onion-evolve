@@ -26,7 +26,7 @@ import time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 HERE = pathlib.Path(__file__).resolve().parent
-CLI = HERE / "node_modules" / ".bin" / "mcpb"
+CLI = HERE / "node_modules" / "@anthropic-ai" / "mcpb" / "dist" / "cli" / "cli.js"  # pelo node: o .bin não roda no Windows
 
 
 class Broken(Exception):
@@ -111,10 +111,10 @@ def main(argv=None):
             target = out / f"kg-ssot-{v}.mcpb"
             if a.lock and not lock(dest, a.lock_wait):
                 return 1
-            for cmd in ([str(CLI), "validate", str(dest / "manifest.json")], [str(CLI), "pack", str(dest), str(target)]):
+            for cmd in (["node", str(CLI), "validate", str(dest / "manifest.json")], ["node", str(CLI), "pack", str(dest), str(target)]):
                 p = subprocess.run(cmd, capture_output=True, text=True)
                 if p.returncode:
-                    print(f"MCPB FALHOU  {cmd[1]} rc {p.returncode}: {(p.stdout + p.stderr).strip()[-400:]}")
+                    print(f"MCPB FALHOU  {cmd[2]} rc {p.returncode}: {(p.stdout + p.stderr).strip()[-400:]}")
                     return 1
             print(f"kg-ssot {v}: {target}")
             return 0

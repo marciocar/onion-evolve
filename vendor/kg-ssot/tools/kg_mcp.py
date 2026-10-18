@@ -25,7 +25,9 @@ O autor das gravações é o do servidor (--author), nunca um argumento da ferra
 Uso:
   kg_mcp.py --root DIR [--backend disk|git|versioned] [--init] [--author "Nome <email>"] [--read-only]
             [--http PORTA [--host 127.0.0.1] [--allow-remote]] [--max-bytes N]
-Sem --root, só kg_validate e kg_schema_help ficam disponíveis.
+Sem --root, só kg_validate e kg_schema_help ficam disponíveis. Com --store-optional, uma raiz que não abre não derruba o
+servidor: ele sobe só com kg_validate e kg_schema_help e diz o motivo ao modelo, nas instruções, na descrição das duas
+ferramentas e no kg_schema_help (o host de um bundle guarda o stderr num log que o usuário não vê).
 rc: 0 saída normal · 2 entrada quebrada (raiz inválida, opção inválida).
 """
 import argparse
@@ -116,7 +118,15 @@ class _RpcError(Exception):
         self.code = code
 
 
-EXAMPLE = kg_validate._ROOT / "spec" / "conformance" / "fixtures" / "latest" / "form" / "minimal" / "valid-minimal.kg.yaml"
+def _spec_home():
+    """A raiz que tem o spec/, pelo caminho DESTE módulo (como o _home do kg_validate): ao lado no pacote, no pai no
+    repo e no vendor. Não depende do kg_validate importado, então um kg_validate falso num teste não a desvia."""
+    here = pathlib.Path(__file__).resolve().parent
+    return here if (here / "spec" / "release.json").is_file() else here.parent
+
+
+SPEC_HOME = _spec_home()
+EXAMPLE = SPEC_HOME / "spec" / "conformance" / "fixtures" / "latest" / "form" / "minimal" / "valid-minimal.kg.yaml"
 
 
 def schema_help():
@@ -164,11 +174,21 @@ def _check_args(name, args):
 
 
 class Server:
-    def __init__(self, store=None, author=None, read_only=False, max_bytes=MAX_BYTES):
+    def __init__(self, store=None, author=None, read_only=False, max_bytes=MAX_BYTES, store_error=None):
         self.store, self.author, self.read_only, self.max_bytes = store, author, read_only, max_bytes
+        self.store_error = store_error if store is None else None
+
+    def store_note(self):
+        """O aviso ao modelo quando o armazém foi pedido e não abriu, ou None."""
+        if not self.store_error:
+            return None
+        return (f"ARMAZÉM INDISPONÍVEL nesta sessão: {self.store_error}. Sem ele não existem kg_write, kg_get, "
+                "kg_list, kg_history nem kg_delete; diga isso ao usuário com o motivo, em vez de supor modo só leitura.")
 
     def tools(self):
-        return [{"name": n, "description": t["description"], "inputSchema": t["inputSchema"]}
+        note = self.store_note()
+        return [{"name": n, "description": t["description"] + (f" {note}" if note else ""),
+                 "inputSchema": t["inputSchema"]}
                 for n, t in TOOLS.items()
                 if (self.store is not None or not t["needs_store"]) and not (self.read_only and t["writes"])]
 
@@ -205,7 +225,8 @@ class Server:
                           "capabilities": {"tools": {"listChanged": False}},
                           "serverInfo": {"name": SERVER_NAME, "version": self._release()},
                           "instructions": "Chame kg_schema_help antes do primeiro grafo; julgue com kg_validate e "
-                                          "corrija pelos hints; grave com kg_write, que recusa o que reprova."}
+                                          "corrija pelos hints; grave com kg_write, que recusa o que reprova."
+                                          + (f" {self.store_note()}" if self.store_note() else "")}
             elif method == "ping":
                 result = {}
             elif method == "tools/list":
@@ -225,7 +246,7 @@ class Server:
     @staticmethod
     def _release():
         try:
-            return json.loads((kg_validate._ROOT / "spec" / "release.json").read_text(encoding="utf-8")).get("version", "?")
+            return json.loads((SPEC_HOME / "spec" / "release.json").read_text(encoding="utf-8")).get("version", "?")
         except (OSError, ValueError):
             return "?"
 
@@ -270,7 +291,10 @@ class Server:
 
     def _run(self, name, args):
         if name == "kg_schema_help":
-            return schema_help(), False
+            help_ = schema_help()
+            if self.store_note():
+                help_["store"] = {"available": False, "note": self.store_note()}
+            return help_, False
         if name == "kg_validate":
             text = self._text(args)
             gname = args.get("name", "-")
@@ -414,6 +438,21 @@ def make_http_handler(server):
     return Handler
 
 
+def _utf8_stdio():
+    """A saída que vai para pipe ou arquivo sai em UTF-8 (no Windows, o padrão seria cp1252, que derruba o ✓ e entrega
+    a quem consome o JSON outra codificação); no terminal, fica a do console, trocando o caractere que ela não tem."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                tty = stream.isatty()
+            except ValueError:
+                continue
+            if tty:
+                stream.reconfigure(errors="replace")
+            else:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", help="raiz do armazém; sem ela, só kg_validate e kg_schema_help")
@@ -426,7 +465,10 @@ def main(argv=None):
     ap.add_argument("--allow-remote", action="store_true",
                     help="aceita --host fora do loopback (sem auth nem TLS: só atrás de um proxy que faça os dois)")
     ap.add_argument("--max-bytes", type=int, default=MAX_BYTES)
+    ap.add_argument("--store-optional", action="store_true",
+                    help="raiz que não abre não derruba o servidor: ele sobe sem armazém e diz o motivo ao modelo")
     args = ap.parse_args(argv)
+    _utf8_stdio()
     if args.max_bytes < 1:
         print("ENTRADA QUEBRADA  --max-bytes tem de ser 1 ou mais", file=sys.stderr)
         return 2
@@ -435,12 +477,21 @@ def main(argv=None):
               "--allow-remote atrás de um proxy que faça os dois", file=sys.stderr)
         return 2
     try:
-        store = kg_store.open_store(args.backend, args.root, init=args.init) if args.root else None
         kg_store.check_author(args.author)
     except kg_store.StoreError as exc:
         print(f"ENTRADA QUEBRADA  {exc}", file=sys.stderr)
         return 2
-    server = Server(store, args.author, args.read_only, args.max_bytes)
+    store = store_error = None
+    if args.root is not None:  # --root "" é raiz vazia, recusada pelo armazém, não "sem armazém" calado
+        try:
+            store = kg_store.open_store(args.backend, args.root, init=args.init)
+        except (kg_store.StoreError, OSError, ValueError, RuntimeError) as exc:  # sem permissão, NUL, laço de link
+            if not args.store_optional:
+                print(f"ENTRADA QUEBRADA  {exc}", file=sys.stderr)
+                return 2
+            store_error = f"a raiz {args.root} não abriu ({exc})"
+            print(f"kg-ssot: {store_error}; o servidor sobe só com kg_validate e kg_schema_help", file=sys.stderr)
+    server = Server(store, args.author, args.read_only, args.max_bytes, store_error)
     if args.http is None:
         serve_stdio(server)
         return 0

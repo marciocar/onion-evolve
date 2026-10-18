@@ -135,8 +135,30 @@ def run_cases(suite, validator, should_validator, proposals=None):
     return results
 
 
+def _spec_home():
+    """A raiz que tem o spec/, pelo caminho DESTE módulo (como o _home do kg_validate): ao lado no pacote, no pai no
+    repo e no vendor. Não depende do kg_validate importado, então um kg_validate falso num teste não a desvia."""
+    here = pathlib.Path(__file__).resolve().parent
+    return here if (here / "spec" / "release.json").is_file() else here.parent
+
+
+def _utf8_stdio():
+    """A saída que vai para pipe ou arquivo sai em UTF-8 (no Windows, o padrão seria cp1252, que derruba o ✓ e entrega
+    a quem consome o JSON outra codificação); no terminal, fica a do console, trocando o caractere que ela não tem."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                tty = stream.isatty()
+            except ValueError:
+                continue
+            if tty:
+                stream.reconfigure(errors="replace")
+            else:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv=None):
-    root = kg_validate._ROOT  # o spec/ do pacote instalado ou o do repo
+    root = _spec_home()  # o spec/ do pacote instalado ou o do repo, pelo caminho deste módulo
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--suite", default=str(root / "spec" / "conformance"))
     ap.add_argument("--schema", default=str(kg_validate.CONTRACT_MUST))
@@ -145,6 +167,7 @@ def main(argv=None):
     ap.add_argument("--proposals-schema", help="MUST candidato, só para proposals/")
     ap.add_argument("--proposals-should-schema", help="SHOULD candidato, só para proposals/")
     args = ap.parse_args(argv)
+    _utf8_stdio()
     if bool(args.proposals_schema) != bool(args.proposals_should_schema):
         ap.error("--proposals-schema e --proposals-should-schema vão juntos")
     suite = pathlib.Path(args.suite)

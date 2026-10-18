@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Roda o MCPB desempacotado como um host o roda (o comando do mcp_config, com uv run) e confere o servidor:
 initialize, as 7 ferramentas, kg_write de um grafo válido e recusa de um inválido, kg_history com a gravação, o modo
-só leitura sem kg_write nem kg_delete, e uma raiz dentro de um repo git (o armazém passa ao git).
+só leitura sem kg_write nem kg_delete, uma raiz dentro de um repo git (o armazém passa ao git) e uma raiz que não abre
+(o servidor sobe só com o julgamento e diz o motivo ao modelo).
 
 Uso: python3 -I packaging/mcpb/host_check.py <bundle desempacotado> <dir com o wheel kg-ssot> <dir de trabalho>
 O wheel entra por UV_FIND_LINKS, para testar o pacote desta árvore. rc 0 tudo certo, 1 alguma conferência falhou.
@@ -30,7 +31,8 @@ def session(bundle, wheels, root, read_only, calls):
     sub = {"${__dirname}": str(bundle), "${user_config.root}": str(root), "${user_config.read_only}": read_only}
     args = [sub.get(a, a) for a in cfg["args"]]
     p = subprocess.run([cfg["command"], *args], input="\n".join(json.dumps(m) for m in msgs) + "\n",
-                       capture_output=True, text=True, env=env, timeout=300)
+                       capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
+                       timeout=300)
     out = {d.get("id"): d for d in map(json.loads, p.stdout.splitlines())}
     return out, p
 
@@ -40,6 +42,8 @@ def text(resp):
 
 
 def main(bundle, wheels, work):
+    if hasattr(sys.stdout, "reconfigure"):  # no Windows, a saída em pipe seria cp1252, sem o ✓
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     work = pathlib.Path(work)
     fails = []
     out, p = session(bundle, wheels, work / "store", "false",
@@ -59,6 +63,13 @@ def main(bundle, wheels, work):
     subprocess.run(["git", "-C", str(repo), "init", "-q"], check=True)
     out, _ = session(bundle, wheels, repo / "kg", "false", [("kg_write", {"name": "a.kg.yaml", "text": VALID})])
     checks.append(("raiz dentro de repo git grava pelo git", 2 in out and text(out[2]).get("written") is True))
+    blocker = work / "arquivo"
+    blocker.write_text("não é pasta", encoding="utf-8")
+    out, _ = session(bundle, wheels, blocker / "kg", "false", [])
+    bare = [t["name"] for t in out.get(1, {}).get("result", {}).get("tools", [])]
+    note = out.get(0, {}).get("result", {}).get("instructions", "")
+    checks.append(("raiz que não abre: só o julgamento, com o motivo ao modelo",
+                   sorted(bare) == ["kg_schema_help", "kg_validate"] and "ARMAZÉM INDISPONÍVEL" in note))
     for name, ok in checks:
         print(("✓ " if ok else "✗ ") + name)
         if not ok:

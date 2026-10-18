@@ -90,7 +90,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.9.0",
+  "release": "kg-ssot-v4.9.1",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -354,15 +354,26 @@ python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana \
   PASS nem `"gate"`, para quem chama distinguir "reprovou" de "não deu para julgar".
 - **A trava otimista:** `expected_sha256` é o sha256 da cabeça que quem grava leu, ou `NEW` (no CLI, `new`) para
   exigir que o nome ainda não exista. Gravar o mesmo texto da cabeça dá `written` com `unchanged` e sem commit.
-- **O caminho:** o nome é relativo, termina em `.kg.yaml` e não tem `..` nem segmento oculto. Raiz, pastas e arquivo
-  não podem ser symlink: tudo se abre com `O_NOFOLLOW`, o que exige POSIX.
+- **O caminho:** o nome é relativo, termina em `.kg.yaml` ou `.kg.json` e não tem `..` nem segmento oculto. Para o
+  armazém ser copiável entre sistemas, ele recusa criar um nome com segmento reservado do Windows (`CON`, `NUL`,
+  `COM1`...) ou que termina em ponto (o que já existe segue funcionando), e nenhuma operação aceita um nome que só
+  difere pela caixa de um que está no armazém. Raiz, pastas e arquivo não podem ser link:
+  - **no macOS e no Linux (POSIX),** tudo se abre por `dir_fd` com `O_NOFOLLOW`, e trocar uma pasta no meio da operação
+    não desvia nada;
+  - **no Windows,** que não tem `dir_fd`, cada passo do caminho é conferido por `lstat` (link simbólico, junção e ponto
+    de montagem são recusados; o reparse point que não redireciona o nome, como o arquivo do OneDrive sob demanda,
+    passa), o arquivo aberto tem de ser o mesmo que o `lstat` viu, e o caminho é conferido de novo depois da leitura e,
+    na gravação, antes da troca final. É mais fraco: quem pode escrever dentro da raiz consegue trocar uma pasta entre
+    a conferência e o uso. Num sistema de arquivos sem id de arquivo (o FAT de um pendrive), a comparação do arquivo
+    aberto não prova nada, e só a recusa de link sobra. Num armazém de uma pessoa só, na pasta dela, isso não muda
+    nada; num armazém compartilhado, prefira POSIX.
 - **O histórico:** `history(nome)` lista as operações, da mais nova para a mais antiga, com `ref`, `op`
   (`write` ou `delete`), autor, data e mensagem. `read(nome, ref=...)` lê uma versão anterior: o sha do commit no
   git, o `seq` do evento no versionado.
 - **O git isolado:** o `GitStore` não lê a config do sistema nem a do usuário (sem hooks, sem gpg, sem `autocrlf`, sem
   arquivo de exclusão), então o que ele guarda é byte a byte o texto aprovado, com o sha256 do resultado.
 - **O que fica com quem adota, de propósito:** autenticação, identidade, área por usuário (um root por usuário),
-  tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock`.
+  tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock` nem `msvcrt`.
 - **O rc do CLI:** 0 gravou ou leu, 1 recusado (`gate`, `conflict`, `missing`, nome inexistente) e 2 entrada
   quebrada ou `not_judged`.
 
@@ -384,6 +395,11 @@ produto não depende dele, e ele não depende de um cliente específico.
 | `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
 Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
+
+Com `--store-optional`, uma raiz que não abre (um arquivo no lugar da pasta, uma pasta sem permissão) não derruba o
+servidor: ele sobe só com `kg_validate` e `kg_schema_help` e diz o motivo ao modelo, nas instruções, na descrição das
+duas ferramentas e num campo `store` do `kg_schema_help`. Assim o modelo conta ao usuário por que não há `kg_write`, em
+vez de supor um modo só leitura. Sem a opção, a raiz que não abre é rc 2, com a mensagem no stderr.
 
 Uma configuração de cliente por stdio, com um armazém versionado fora do repo:
 
@@ -409,6 +425,7 @@ Uma configuração de cliente por stdio, com um armazém versionado fora do repo
 | `--read-only` | Tira `kg_write` e `kg_delete` |
 | `--http PORTA` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote` |
 | `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
+| `--store-optional` | Raiz que não abre não derruba o servidor: ele sobe sem armazém e diz o motivo ao modelo |
 
 Uma gravação recusada, como o modelo a recebe (o `structuredContent`, abreviado):
 

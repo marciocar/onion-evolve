@@ -11,9 +11,11 @@ import json
 import sys
 import urllib.request
 
-# o frontend (build), o backend (hatchling) e as dependências deles, todas fixadas
+# o frontend (build), o backend (hatchling) e as dependências deles, todas fixadas; o colorama o build só pede no
+# Windows (marcador sys_platform == "win32"), e sem ele o --require-hashes recusa a instalação lá
 PINS = {"build": "1.6.1", "pyproject_hooks": "1.3.3", "packaging": "26.3", "hatchling": "1.32.4",
-        "pathspec": "1.1.1", "pluggy": "1.7.0", "trove-classifiers": "2026.9.21.13", "tomlkit": "0.15.2"}
+        "pathspec": "1.1.1", "pluggy": "1.7.0", "trove-classifiers": "2026.9.21.13", "tomlkit": "0.15.2",
+        "colorama": "0.4.6"}
 
 
 def hashes(name, version):

@@ -28,9 +28,20 @@ nunca vira PASS nem "gate"). expected_sha256 é a trava otimista: o sha256 da ca
 exigir que o nome ainda não exista. Gravar o mesmo texto da cabeça é written com unchanged=true e ref null.
 
 Segurança do caminho: o nome é relativo, termina em .kg.yaml ou .kg.json, cada segmento começa por letra, dígito ou _ (sem `..`
-nem oculto). Raiz, pastas e arquivo não podem ser symlink: tudo se abre por dir_fd com O_NOFOLLOW (POSIX).
+nem oculto). O armazém é copiável entre sistemas: um nome NOVO não pode ter segmento reservado do Windows (CON, NUL,
+COM1...) nem que termina em ponto, e nenhuma operação aceita um nome que só difere pela caixa de um que está no armazém
+(no Windows e no macOS os dois seriam o mesmo arquivo, e o gate julgaria o nome errado). O nome que já está no armazém
+segue funcionando. Raiz, pastas e arquivo não podem ser link:
+  - no POSIX, tudo se abre por dir_fd com O_NOFOLLOW, e a troca de uma pasta no meio da operação não desvia nada;
+  - no Windows, que não tem dir_fd, cada passo do caminho é conferido por lstat (link simbólico, junção e ponto de
+    montagem são recusados; o reparse point que não redireciona o nome, como o arquivo do OneDrive sob demanda, passa),
+    o arquivo aberto tem de ser o mesmo que o lstat viu, e o caminho é conferido de novo depois da leitura e, na
+    gravação, antes da troca final (o replace). É mais fraco que o POSIX: quem pode escrever dentro da raiz consegue
+    trocar uma pasta entre a conferência e o uso. Num sistema de arquivos sem id de arquivo (st_ino 0, como o FAT de
+    um pendrive), a comparação do arquivo aberto não prova nada e só a recusa de link sobra. A trava entre processos é
+    a do msvcrt.
 O que fica com quem adota, de propósito: autenticação, identidade, área por usuário (um root por usuário), tamanho
-máximo, número de grafos, timeout e concorrência entre processos sem flock.
+máximo, número de grafos, timeout e concorrência entre processos onde não há flock nem msvcrt.
 
 CLI (saída JSON no stdout):
   kg_store.py --backend disk|git|versioned --root DIR [--init] list
@@ -51,6 +62,7 @@ import secrets
 import stat
 import subprocess
 import sys
+import time
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
@@ -61,8 +73,12 @@ else:  # script ou vendor
 
 try:
     import fcntl
-except ImportError:  # sem flock (Windows): a trava entre processos fica com quem adota, como a doc diz
+except ImportError:  # Windows: a trava é a do msvcrt
     fcntl = None
+try:
+    import msvcrt
+except ImportError:  # POSIX
+    msvcrt = None
 
 NAME = re.compile(r"^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)$")
 NEW = "new"
@@ -70,9 +86,23 @@ META = ".kg-store"
 LOCK = ".kg-store.lock"
 AUTHOR = re.compile(r"[^<>\n\r\x00]+ <[^<>\s\x00]+>")  # fullmatch: o $ casaria antes de um \n final
 SEGMENT_MAX = 200  # bytes por segmento do nome: sobra espaço no NAME_MAX para o arquivo temporário
-VERDICT_SCHEMA = kg_validate._ROOT / "spec" / "verdict.schema.json"  # ao lado do módulo no pacote, no pai no repo
+def _spec_home():
+    """A raiz que tem o spec/, pelo caminho DESTE módulo (como o _home do kg_validate): ao lado no pacote, no pai no
+    repo e no vendor. Não depende do kg_validate importado, então um kg_validate falso num teste não a desvia."""
+    here = pathlib.Path(__file__).resolve().parent
+    return here if (here / "spec" / "release.json").is_file() else here.parent
+
+
+VERDICT_SCHEMA = _spec_home() / "spec" / "verdict.schema.json"
 _NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
 _DIRECTORY = getattr(os, "O_DIRECTORY", 0)
+_BINARY = getattr(os, "O_BINARY", 0)  # no Windows, sem ele o os.open abre em modo texto e troca \n por \r\n
+_REPARSE = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0x400)
+_NAME_SURROGATE = 0x20000000  # o bit das tags que redirecionam o nome (symlink, junção, montagem)
+# o caminho seguro: "posix" (dir_fd e O_NOFOLLOW), "win" (lstat antes e depois) ou None (o armazém não abre)
+_POSIX_FD = hasattr(os, "supports_dir_fd") and os.open in os.supports_dir_fd
+PATH_MODE = "posix" if _POSIX_FD else "win" if os.name == "nt" else None
+_WIN_RESERVED = re.compile(r"(?i)(?:con|prn|aux|nul|com[0-9]|lpt[0-9])(?:\..*)?")
 
 
 class StoreError(Exception):
@@ -93,6 +123,45 @@ def check_name(name):
     if any(len(seg.encode("utf-8")) > SEGMENT_MAX for seg in name.split("/")):
         raise StoreError(f"nome inválido: segmento com mais de {SEGMENT_MAX} bytes")
     return name
+
+
+def check_portable(name):
+    """Um nome NOVO tem de existir em todo sistema: nenhum segmento reservado do Windows (CON, NUL, COM1...) nem que
+    termina em ponto. O nome que já está no armazém segue lendo, gravando e removendo."""
+    if any(seg.endswith(".") or _WIN_RESERVED.fullmatch(seg) for seg in name.split("/")):
+        raise StoreError(f"nome inválido: {name!r} (segmento reservado no Windows, como CON ou NUL, ou que termina em ponto)")
+    return name
+
+
+def _is_link(st):
+    """Link simbólico, junção ou ponto de montagem: o que redireciona o nome para outro lugar (no Windows, a junção não
+    é S_ISLNK). O reparse point que não redireciona (o arquivo do OneDrive sob demanda, a deduplicação) não é link: a
+    tag dele não tem o bit de name surrogate. No Windows, o os.lstat devolve a tag de todo name surrogate e ATRAVESSA o
+    reparse point que não o é, devolvendo a tag 0 (Modules/posixmodule.c, win32_xstat_slow_impl); o DirEntry traz a
+    tag real. Nos dois casos, só o bit de name surrogate faz link. A tag 0 de um sistema de arquivos que não a informa
+    é o caso de _redirects."""
+    if stat.S_ISLNK(st.st_mode):
+        return True
+    return bool(getattr(st, "st_file_attributes", 0) & _REPARSE
+                and getattr(st, "st_reparse_tag", 0) & _NAME_SURROGATE)
+
+
+def _redirects(path, st):
+    """O passo path (com o lstat st) leva para outro lugar? Link pela tag (_is_link), ou um reparse point sem tag (o
+    sistema de arquivos que não informa a tag, como alguns redirecionadores de rede): ali, o lstat e o stat apontarem
+    para arquivos diferentes é link."""
+    if _is_link(st):
+        return True
+    if getattr(st, "st_file_attributes", 0) & _REPARSE and not getattr(st, "st_reparse_tag", 0):
+        try:
+            return not _same(st, os.stat(path))
+        except OSError:
+            return True
+    return False
+
+
+def _same(a, b):
+    return (a.st_dev, a.st_ino) == (b.st_dev, b.st_ino)
 
 
 def check_author(author):
@@ -121,25 +190,44 @@ def _verdict_ok(doc):
     return not any(True for _ in _verdict_validator.iter_errors(doc))
 
 
+def _win_retry(op, tries=6):
+    """No Windows, um antivírus ou o indexador segura o arquivo por instantes (PermissionError): tenta de novo."""
+    for i in range(tries):
+        try:
+            return op()
+        except PermissionError:
+            if os.name != "nt" or i == tries - 1:
+                raise
+            time.sleep(0.02 * 2 ** i)
+
+
 class DiskStore:
     """A cabeça em disco. history() é vazio: este armazém não guarda versão anterior."""
     backend = "disk"
 
     def __init__(self, root, schema=None, init=False):
-        if not hasattr(os, "supports_dir_fd") or os.open not in os.supports_dir_fd:
-            raise StoreError("o armazém exige POSIX (os.open com dir_fd e O_NOFOLLOW)")
+        if PATH_MODE not in ("posix", "win"):
+            raise StoreError("o armazém exige POSIX (os.open com dir_fd e O_NOFOLLOW) ou Windows")
+        self._posix = PATH_MODE == "posix"
+        if not str(root).strip():
+            raise StoreError("raiz vazia: diga o diretório do armazém")
         self.root = pathlib.Path(root)
         if init and not os.path.lexists(self.root):
             ancestor = self.root.absolute()
             while not os.path.lexists(ancestor):
+                if ancestor.parent == ancestor:  # um drive ou compartilhamento que não existe: nada acima para criar
+                    raise StoreError(f"a raiz {self.root} está num drive ou compartilhamento que não existe")
                 ancestor = ancestor.parent
             self._check_root(ancestor)  # recusa antes de criar a pasta, não depois
-            self.root.mkdir(parents=True)
+            try:
+                self.root.mkdir(parents=True)
+            except OSError as exc:
+                raise StoreError(f"não deu para criar a raiz {self.root}: {exc}") from exc
         try:
             st = os.lstat(self.root)
         except OSError as exc:
             raise StoreError(f"raiz ilegível: {exc}") from exc
-        if stat.S_ISLNK(st.st_mode) or not stat.S_ISDIR(st.st_mode):
+        if _is_link(st) or not stat.S_ISDIR(st.st_mode):
             raise StoreError(f"a raiz {self.root} tem de ser um diretório, não symlink")
         self.root = self.root.resolve()
         self.schema = schema or kg_validate.CONTRACT_MUST
@@ -157,7 +245,7 @@ class DiskStore:
         if out.returncode == 0 and out.stdout.strip() == b"true":
             raise StoreError(f"{path} está dentro de um repo git: use o GitStore (o corpus do gate é o rastreado)")
 
-    # --- caminho seguro: tudo por dir_fd, nada segue symlink -----------------------------------------------
+    # --- caminho seguro: nada segue symlink (POSIX por dir_fd; Windows por lstat antes e depois) --------------
     def _dir(self, parts, create=False):
         fd = os.open(self.root, os.O_RDONLY | _DIRECTORY | _NOFOLLOW)
         try:
@@ -180,9 +268,84 @@ class DiskStore:
             os.close(fd)
             raise
 
-    def _read_head(self, name):
-        """O texto da cabeça, ou None se o nome não existe. Symlink no caminho é StoreError."""
-        *parts, leaf = check_name(name).split("/")
+    def _win_dir(self, parts, create=False):
+        """(pasta, passos): a pasta sob a raiz com cada passo conferido por lstat (nenhum link, junção ou reparse
+        point), e a identidade de cada passo para _win_recheck conferir de novo antes de a operação terminar."""
+        path = self.root
+        steps = []
+        for part in [None, *parts]:
+            if part is not None:
+                path = path / part
+                if create:
+                    try:
+                        os.mkdir(path)
+                    except FileExistsError:
+                        pass
+            try:
+                st = os.lstat(path)
+            except FileNotFoundError:
+                raise NotFound(f"pasta inexistente: {part}")
+            except OSError as exc:
+                raise StoreError(f"pasta ilegível: {path}: {exc}") from exc
+            if _redirects(path, st) or not stat.S_ISDIR(st.st_mode):
+                raise StoreError(f"pasta recusada (link, junção ou não-diretório): {part or path}")
+            steps.append((path, st))
+        return path, steps
+
+    @staticmethod
+    def _win_recheck(steps):
+        """O caminho é o mesmo de antes da operação: nenhum passo virou link nem foi trocado por outra pasta."""
+        for path, before in steps:
+            try:
+                st = os.lstat(path)
+            except OSError as exc:
+                raise StoreError(f"o caminho mudou durante a operação: {path}") from exc
+            if _is_link(st) or not _same(st, before):
+                raise StoreError(f"o caminho mudou durante a operação: {path}")
+
+    @staticmethod
+    def _win_open(path, flags, mode=0o644, exists=True):
+        """Abre path no Windows recusando link: o lstat de antes, e o arquivo aberto tem de ser o que o lstat viu.
+        exists=False aceita que o arquivo ainda não exista (criação)."""
+        try:
+            before = os.lstat(path)
+        except FileNotFoundError:
+            if exists:
+                raise
+            before = None
+        if before is not None and (_redirects(path, before) or not stat.S_ISREG(before.st_mode)):
+            raise StoreError(f"arquivo recusado (link, junção ou não regular): {path.name}")
+        fd = os.open(path, flags | _BINARY, mode)
+        try:
+            opened = os.fstat(fd)
+            after = os.lstat(path)
+            if (_is_link(after) or not stat.S_ISREG(opened.st_mode) or not _same(opened, after)
+                    or (before is not None and not _same(opened, before))):
+                raise StoreError(f"arquivo recusado (trocado durante a abertura): {path.name}")
+        except BaseException:
+            os.close(fd)
+            raise
+        return fd
+
+    def _read_file(self, parts):
+        """Os bytes do arquivo parts (pastas + folha) sob a raiz, ou None se não existe. Link no caminho ou arquivo que
+        não é regular é StoreError."""
+        *parts, leaf = parts
+        if not self._posix:
+            try:
+                path, steps = self._win_dir(parts)
+            except NotFound:
+                return None
+            try:
+                fd = self._win_open(path / leaf, os.O_RDONLY)
+            except FileNotFoundError:
+                return None
+            except OSError as exc:
+                raise StoreError(f"arquivo recusado: {leaf}: {exc}") from exc
+            with os.fdopen(fd, "rb") as fh:
+                data = fh.read()
+            self._win_recheck(steps)
+            return data
         try:
             dfd = self._dir(parts)
         except NotFound:
@@ -193,13 +356,19 @@ class DiskStore:
             except FileNotFoundError:
                 return None
             except OSError as exc:
-                raise StoreError(f"arquivo recusado (symlink?): {name}") from exc
+                raise StoreError(f"arquivo recusado (symlink?): {leaf}") from exc
             with os.fdopen(fd, "rb") as fh:
                 if not stat.S_ISREG(os.fstat(fh.fileno()).st_mode):
-                    raise StoreError(f"não é arquivo regular: {name}")
-                data = fh.read()
+                    raise StoreError(f"não é arquivo regular: {leaf}")
+                return fh.read()
         finally:
             os.close(dfd)
+
+    def _read_head(self, name):
+        """O texto da cabeça, ou None se o nome não existe. Symlink no caminho é StoreError."""
+        data = self._read_file(check_name(name).split("/"))
+        if data is None:
+            return None
         try:
             return data.decode("utf-8")
         except UnicodeDecodeError as exc:
@@ -214,8 +383,25 @@ class DiskStore:
     def _write_file(self, parts, data):
         """Grava parts (pastas + folha) sob a raiz por tmp + replace, sem seguir symlink."""
         *parts, leaf = parts
-        dfd = self._dir(parts, create=True)
         tmp = f".{leaf[:40]}.{secrets.token_hex(6)}.tmp"
+        if not self._posix:
+            path, steps = self._win_dir(parts, create=True)
+            fd = self._win_open(path / tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL, exists=False)
+            try:
+                with os.fdopen(fd, "wb") as fh:
+                    fh.write(data)
+                    fh.flush()
+                    os.fsync(fh.fileno())
+                self._win_recheck(steps)
+                _win_retry(lambda: os.replace(path / tmp, path / leaf))
+            except BaseException:
+                try:
+                    os.unlink(path / tmp)
+                except OSError:
+                    pass
+                raise
+            return
+        dfd = self._dir(parts, create=True)
         try:
             fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_EXCL | _NOFOLLOW, 0o644, dir_fd=dfd)
             try:
@@ -233,8 +419,38 @@ class DiskStore:
         finally:
             os.close(dfd)
 
+    def _append(self, parts, data):
+        """Acrescenta data ao fim do arquivo parts (criado se falta), com fsync, sem seguir symlink."""
+        *parts, leaf = parts
+        if not self._posix:
+            path, steps = self._win_dir(parts, create=True)
+            fd = self._win_open(path / leaf, os.O_WRONLY | os.O_CREAT | os.O_APPEND, exists=False)
+            with os.fdopen(fd, "ab") as fh:
+                fh.write(data)
+                fh.flush()
+                os.fsync(fh.fileno())
+            self._win_recheck(steps)
+            return
+        dfd = self._dir(parts, create=True)
+        try:
+            fd = os.open(leaf, os.O_WRONLY | os.O_CREAT | os.O_APPEND | _NOFOLLOW, 0o644, dir_fd=dfd)
+            with os.fdopen(fd, "ab") as fh:
+                fh.write(data)
+                fh.flush()
+                os.fsync(fh.fileno())
+        finally:
+            os.close(dfd)
+
     def _remove_head(self, name):
         *parts, leaf = name.split("/")
+        if not self._posix:
+            path, steps = self._win_dir(parts)
+            try:
+                _win_retry(lambda: os.unlink(path / leaf))  # o unlink de um link remove o link, nunca o alvo
+            except OSError as exc:
+                raise StoreError(f"não deu para remover {name}: {exc}") from exc
+            self._win_recheck(steps)
+            return
         dfd = self._dir(parts)
         try:
             os.unlink(leaf, dir_fd=dfd)
@@ -252,6 +468,20 @@ class DiskStore:
             self._write_head(name, previous)
 
     def _lock(self):
+        if not self._posix:
+            try:
+                fd = self._win_open(self.root / LOCK, os.O_RDWR | os.O_CREAT, exists=False)
+            except OSError as exc:
+                raise StoreError(f"trava recusada ({LOCK}): {exc}") from exc
+            if msvcrt is None:  # o caminho do Windows fora do Windows (a bancada): confere o arquivo, sem trava
+                return ("none", fd)
+            while True:  # LK_NBLCK não espera: a espera é este laço, sem o limite de 10 s do LK_LOCK
+                try:
+                    os.lseek(fd, 0, os.SEEK_SET)
+                    msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+                    return ("msvcrt", fd)
+                except OSError:
+                    time.sleep(0.05)
         if fcntl is None:
             return None
         rfd = os.open(self.root, os.O_RDONLY | _DIRECTORY | _NOFOLLOW)
@@ -262,12 +492,20 @@ class DiskStore:
         finally:
             os.close(rfd)
         fcntl.flock(fd, fcntl.LOCK_EX)
-        return fd
+        return ("flock", fd)
 
     @staticmethod
-    def _unlock(fd):
-        if fd is not None:
-            fcntl.flock(fd, fcntl.LOCK_UN)
+    def _unlock(lock):
+        if lock is None:
+            return
+        kind, fd = lock
+        try:
+            if kind == "flock":
+                fcntl.flock(fd, fcntl.LOCK_UN)
+            elif kind == "msvcrt":
+                os.lseek(fd, 0, os.SEEK_SET)
+                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+        finally:
             os.close(fd)
 
     # --- leitura -------------------------------------------------------------------------------------------
@@ -284,14 +522,22 @@ class DiskStore:
                     if e.name.startswith("."):
                         continue
                     rel = prefix + e.name
-                    if e.is_dir(follow_symlinks=False):
+                    try:  # no Windows, o DirEntry traz a tag real do reparse point
+                        st = e.stat(follow_symlinks=False)
+                    except FileNotFoundError:  # removido durante a listagem
+                        continue
+                    if _is_link(st):  # link e junção ficam fora, como pasta e arquivo oculto
+                        continue
+                    if stat.S_ISDIR(st.st_mode):
                         walk(e.path, rel + "/")
-                    elif e.is_file(follow_symlinks=False) and NAME.fullmatch(rel):
+                    elif stat.S_ISREG(st.st_mode) and NAME.fullmatch(rel):
                         out.append(rel)
         walk(self.root, "")
         return sorted(out)
 
     def read(self, name, ref=None):
+        check_name(name)
+        self._check_case(name)
         if ref is not None:
             return self._read_ref(check_name(name), ref)
         text = self._visible(name, self._read_head(name))
@@ -304,6 +550,7 @@ class DiskStore:
 
     def history(self, name):
         check_name(name)
+        self._check_case(name)
         return []
 
     # --- o gate --------------------------------------------------------------------------------------------
@@ -354,7 +601,10 @@ class DiskStore:
         lock = self._lock()
         try:
             self._precheck()
+            self._check_case(name)
             head = self._read_head(name)
+            if head is None:
+                check_portable(name)
             visible = self._visible(name, head)
             current = sha256(visible) if visible is not None else None
             if expected_sha256 is not None and expected_sha256 != (current or NEW):
@@ -386,6 +636,7 @@ class DiskStore:
         lock = self._lock()
         try:
             self._precheck()
+            self._check_case(name)
             head = self._read_head(name)
             if self._visible(name, head) is None:
                 return self._result(name, False, "missing")
@@ -409,6 +660,38 @@ class DiskStore:
 
     def _precheck(self):
         """O registro está legível? Falha aqui, antes de tocar a cabeça."""
+
+    def _case_clash(self, name):
+        """O caminho do armazém que difere de name só pela caixa num segmento (pasta ou arquivo) que não existe com a
+        caixa exata, ou None. No Windows e no macOS os dois seriam o mesmo arquivo: ler, gravar ou remover por ele
+        mexeria no outro sem o gate saber. Um par que já existe com as duas caixas (num disco que as distingue) segue.
+        Olha só as pastas do caminho, não a árvore inteira."""
+        path = self.root
+        for k, seg in enumerate(name.split("/")):
+            try:
+                with os.scandir(path) as it:
+                    entries = [e.name for e in it]
+            except (FileNotFoundError, NotADirectoryError):
+                return None
+            if seg in entries:
+                path = path / seg
+                try:  # não desce por um link: o caminho normal o recusa, e o nome de fora da raiz não vaza na mensagem
+                    if _redirects(path, os.lstat(path)):
+                        return None
+                except OSError:
+                    return None
+                continue
+            other = next((e for e in entries if e.casefold() == seg.casefold()), None)
+            if other is None:
+                return None
+            return "/".join(name.split("/")[:k] + [other])
+        return None
+
+    def _check_case(self, name):
+        clash = self._case_clash(name)
+        if clash is not None:
+            raise StoreError(f"nome inválido: {name!r} só difere de {clash!r} pela caixa (no Windows e no macOS os dois "
+                             "são o mesmo arquivo)")
 
     def _visible(self, name, head):
         """A cabeça como o armazém a enxerga (no disco, o próprio arquivo); a trava e o missing usam esta régua."""
@@ -437,12 +720,12 @@ class GitStore(DiskStore):
                 raise StoreError(f"{self.root} não tem .git (use init=True para criar)")
             self._git("init", "-q", setup=True)
         st = os.lstat(git)
-        if stat.S_ISLNK(st.st_mode) or not stat.S_ISDIR(st.st_mode):
+        if _is_link(st) or not stat.S_ISDIR(st.st_mode):
             raise StoreError(f"{git} tem de ser um diretório, não symlink nem gitfile")
         exclude = git / "info" / "exclude"  # a trava do armazém não é conteúdo: fica fora do status
         try:
             for p in (git / "info", exclude):
-                if os.path.lexists(p) and stat.S_ISLNK(os.lstat(p).st_mode):
+                if os.path.lexists(p) and _is_link(os.lstat(p)):
                     raise StoreError(f"{p} é symlink")
             current = exclude.read_text(encoding="utf-8") if exclude.is_file() else ""
             if LOCK not in current.split("\n"):
@@ -524,6 +807,7 @@ class GitStore(DiskStore):
 
     def history(self, name):
         check_name(name)
+        self._check_case(name)
         out = self._git("log", "--format=%H%x1f%an <%ae>%x1f%aI%x1f%s", "--name-status", "--", name, check=False)
         if out.returncode != 0:  # repo sem commit ainda
             return []
@@ -558,24 +842,13 @@ class VersionedStore(DiskStore):
         return last["sha256"] if last else None
 
     def _meta_read(self, rel):
-        parts = [META, *rel.split("/")]
-        try:
-            dfd = self._dir(parts[:-1])
-        except NotFound:
+        data = self._read_file([META, *rel.split("/")])
+        if data is None:
             return None
         try:
-            fd = os.open(parts[-1], os.O_RDONLY | _NOFOLLOW, dir_fd=dfd)
-        except FileNotFoundError:
-            return None
-        except OSError as exc:
-            raise StoreError(f"{META}/{rel} recusado (symlink?)") from exc
-        finally:
-            os.close(dfd)
-        with os.fdopen(fd, "rb") as fh:
-            try:
-                return fh.read().decode("utf-8")
-            except UnicodeDecodeError as exc:
-                raise StoreError(f"{META}/{rel} não é UTF-8") from exc
+            return data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise StoreError(f"{META}/{rel} não é UTF-8") from exc
 
     def _commit(self, op, name, sha, message, author, text):
         if sha is not None:
@@ -586,21 +859,15 @@ class VersionedStore(DiskStore):
         seq = len(self._events()) + 1
         event = {"seq": seq, "op": op, "name": name, "sha256": sha, "author": author, "message": message,
                  "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")}
-        dfd = self._dir([META], create=True)
         try:
-            fd = os.open("events.jsonl", os.O_WRONLY | os.O_CREAT | os.O_APPEND | _NOFOLLOW, 0o644, dir_fd=dfd)
-            with os.fdopen(fd, "a", encoding="utf-8") as fh:
-                fh.write(json.dumps(event, ensure_ascii=False) + "\n")
-                fh.flush()
-                os.fsync(fh.fileno())
+            self._append([META, "events.jsonl"], (json.dumps(event, ensure_ascii=False) + "\n").encode("utf-8"))
         except OSError as exc:
             raise StoreError(f"não deu para registrar o evento: {exc}") from exc
-        finally:
-            os.close(dfd)
         return seq
 
     def history(self, name):
         check_name(name)
+        self._check_case(name)
         return [{"ref": e["seq"], "op": e["op"], "author": e["author"], "ts": e["ts"], "message": e["message"],
                  "sha256": e["sha256"]} for e in reversed(self._events()) if e["name"] == name]
 
@@ -629,6 +896,21 @@ def open_store(backend, root, **kw):
     return BACKENDS[backend](root, **kw)
 
 
+def _utf8_stdio():
+    """A saída que vai para pipe ou arquivo sai em UTF-8 (no Windows, o padrão seria cp1252, que derruba o ✓ e entrega
+    a quem consome o JSON outra codificação); no terminal, fica a do console, trocando o caractere que ela não tem."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                tty = stream.isatty()
+            except ValueError:
+                continue
+            if tty:
+                stream.reconfigure(errors="replace")
+            else:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--backend", choices=sorted(BACKENDS), default="disk")
@@ -650,6 +932,7 @@ def main(argv=None):
     p = sub.add_parser("history")
     p.add_argument("name")
     args = ap.parse_args(argv)
+    _utf8_stdio()
 
     def emit(obj):
         print(json.dumps(obj, ensure_ascii=False, indent=1))

@@ -223,6 +223,21 @@ def read_base(path):
     return base
 
 
+def _utf8_stdio():
+    """A saída que vai para pipe ou arquivo sai em UTF-8 (no Windows, o padrão seria cp1252, que derruba o ✓ e entrega
+    a quem consome o JSON outra codificação); no terminal, fica a do console, trocando o caractere que ela não tem."""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                tty = stream.isatty()
+            except ValueError:
+                continue
+            if tty:
+                stream.reconfigure(errors="replace")
+            else:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--repo", default=".", help="o repo cujos grafos são medidos (default: .)")
@@ -238,6 +253,7 @@ def main(argv=None):
                     help="com --update: troca a granularidade da dívida SHOULD (graph, o padrão, ou node); sem ela, vale"
                          " a da base")
     args = ap.parse_args(argv)
+    _utf8_stdio()
     if args.granularity and not args.update:
         print("GATE QUEBRADO  --granularity só vale com --update (a base lembra a granularidade)")
         return 2
