@@ -57,6 +57,11 @@
 set -uo pipefail
 
 die() { echo "PR-FINALIZE: $*" >&2; exit 1; }
+# A ETAPA CORRENTE (2026-10-18, decisão do maestro): rodada morta no meio deixava o log parado na última
+# linha boa, sem dizer que morreu, onde, nem com que código. Medido: SIGTERM no pré-voo saiu rc=143 com o
+# log terminando em "sombra: …", indistinguível de rodada ainda viva. O trap de saída diz as três coisas.
+_STEP="preparação"; _SIG=""
+_step() { _STEP="$1"; }
 PUSH=0; REBASE=0; CHECK=0; SUBJ="docs: projeções geradas regeneradas"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -150,16 +155,74 @@ _abort_own_rebase() {  # SAC-136: morto no MEIO do rebase que ELE começou, o mo
   fi
 }
 _cleanup() {
+  local _rc=$?   # PRIMEIRA linha: qualquer comando antes trocaria o código de saída da rodada
   _abort_own_rebase
   _restore_res
   local w; for w in "${_WTS[@]}"; do git -C "${ROOT}" worktree remove --force "${w}" >/dev/null 2>&1; done
   local x; for x in "${_DIRS[@]}"; do rm -rf "${x}"; done
+  if [ -n "${_SIG}" ]; then
+    echo "PR-FINALIZE: MORREU por sinal ${_SIG} na etapa «${_STEP}» (rc=${_rc}) — a rodada não terminou" >&2
+  elif [ "${_rc}" != 0 ]; then
+    echo "PR-FINALIZE: parou na etapa «${_STEP}» (rc=${_rc})" >&2
+  fi
 }
 trap _cleanup EXIT
+# Sem estes dois, o sinal mata o bash SEM rodar o trap de saída (medido: nada de limpeza nem de linha).
+# Ressalva do bash: o trap só roda quando o filho em primeiro plano termina; o runner que mata o GRUPO
+# de processos (o caso medido) derruba o filho junto, e a linha sai na hora.
+trap '_SIG=TERM; exit 143' TERM
+trap '_SIG=INT; exit 130' INT
 
+_only_generated() {  # o índice só traz projeção gerada e o resíduo deste PR?
+  local f
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    [ "${f}" = "${RES}" ] && continue
+    onion_is_generated "${f}" || return 1
+  done < <(git diff --cached --name-only)
+  return 0
+}
+
+_commit() {  # $1 = assunto; commita SÓ se há algo stageado
+  git diff --cached --quiet && return 0
+  local v=("${VERIFY[@]}") why=""
+  # SÓ projeção + resíduo: o hook seria a 2ª passada do mesmo lint que o passo 3 faz sobre ESTE commit,
+  # no ambiente do CI, antes de qualquer envio. Conteúdo do PR no índice → o hook roda, como sempre.
+  if [ "${#v[@]}" = 0 ] && _only_generated; then
+    v=(--no-verify); why=" — só projeção e resíduo: o lint do commit (passo 3) é o gate, uma passada em vez de duas"
+  fi
+  local args=(-q "${v[@]}" -m "$1")
+  [ -n "${TRAILER}" ] && args+=(-m "${TRAILER}")
+  local log hf; log="$(mktemp)"; hf="$(mktemp)"; _DIRS+=("${log}" "${hf}")
+  if ! ONION_LINT_HARD_FILE="${hf}" git commit "${args[@]}" > "${log}" 2>&1; then
+    cat "${log}" >&2
+    # o QUE reprovou, por último (SAC-66): antes saía só "o gate local reprovou", e saber a regra custava
+    # rodar o lint inteiro de novo
+    echo "PR-FINALIZE: o que reprovou o commit:" >&2
+    if [ -s "${hf}" ]; then sed 's/^/  /' "${hf}" >&2
+    else grep -E 'VIOLATION|❌|✗|ABORTOU|MORREU' "${log}" | tail -15 | sed 's/^/  /' >&2; fi
+    die "commit recusado ('$1') — o gate local reprovou; corrija e rode de novo"
+  fi
+  cat "${log}"
+  [ -n "${why}" ] && echo "PR-FINALIZE: commit '$1' sem o hook${why}"
+  return 0
+}
+
+_PRECOMMIT=0
 if [ "${REBASE}" = 1 ]; then
-  # o --autostash devolveria o conteúdo stageado FORA do índice, e ele sumiria do commit em silêncio
-  git diff --cached --quiet || die "--rebase exige índice limpo: commite o conteúdo do PR antes"
+  _step "rebase sobre a origin/main"
+  # ÍNDICE SUJO (2026-10-18, decisão do maestro): antes o motor RECUSAVA ("commite antes"), e o commit à mão
+  # rodava o pre-commit inteiro (~20 min nesta VPS) para um commit que a etapa 3 abaixo lint de qualquer
+  # forma, sobre o commit, no ambiente do CI. Agora o conteúdo stageado vira commit AQUI, pelo mesmo
+  # _commit (a mesma regra de hook: com o checkpoint, sem o hook; sem ele, o hook roda), e só então o
+  # rebase. Nada de stash: o --autostash devolveria o conteúdo FORA do índice, e ele sumiria do commit.
+  if ! git diff --cached --quiet; then
+    _step "commit do conteúdo antes do rebase"
+    _commit "${SUBJ}"
+    _PRECOMMIT=1
+    echo "PR-FINALIZE: índice sujo — o conteúdo virou o commit '${SUBJ}' antes do rebase; a etapa 3 julga esse commit"
+    _step "rebase sobre a origin/main"
+  fi
   git fetch -q origin || die "fetch falhou"
   _OWN_REBASE=1   # daqui até o fim do bloco o rebase é NOSSO: morte no meio = o _cleanup o aborta
   # DRIVER DAS FAMÍLIAS (SAC-146, 2026-10-15): o .gitattributes liga a bancada a `merge=onion-selftest-families`,
@@ -202,41 +265,6 @@ if [ "${REBASE}" = 1 ]; then
   git merge-base --is-ancestor origin/main HEAD || die "o rebase NÃO trouxe a origin/main para baixo do HEAD — nada a enviar"
   echo "PR-FINALIZE: rebaseado sobre origin/main @ $(git rev-parse --short origin/main)"
 fi
-
-_only_generated() {  # o índice só traz projeção gerada e o resíduo deste PR?
-  local f
-  while IFS= read -r f; do
-    [ -n "${f}" ] || continue
-    [ "${f}" = "${RES}" ] && continue
-    onion_is_generated "${f}" || return 1
-  done < <(git diff --cached --name-only)
-  return 0
-}
-
-_commit() {  # $1 = assunto; commita SÓ se há algo stageado
-  git diff --cached --quiet && return 0
-  local v=("${VERIFY[@]}") why=""
-  # SÓ projeção + resíduo: o hook seria a 2ª passada do mesmo lint que o passo 3 faz sobre ESTE commit,
-  # no ambiente do CI, antes de qualquer envio. Conteúdo do PR no índice → o hook roda, como sempre.
-  if [ "${#v[@]}" = 0 ] && _only_generated; then
-    v=(--no-verify); why=" — só projeção e resíduo: o lint do commit (passo 3) é o gate, uma passada em vez de duas"
-  fi
-  local args=(-q "${v[@]}" -m "$1")
-  [ -n "${TRAILER}" ] && args+=(-m "${TRAILER}")
-  local log hf; log="$(mktemp)"; hf="$(mktemp)"; _DIRS+=("${log}" "${hf}")
-  if ! ONION_LINT_HARD_FILE="${hf}" git commit "${args[@]}" > "${log}" 2>&1; then
-    cat "${log}" >&2
-    # o QUE reprovou, por último (SAC-66): antes saía só "o gate local reprovou", e saber a regra custava
-    # rodar o lint inteiro de novo
-    echo "PR-FINALIZE: o que reprovou o commit:" >&2
-    if [ -s "${hf}" ]; then sed 's/^/  /' "${hf}" >&2
-    else grep -E 'VIOLATION|❌|✗|ABORTOU|MORREU' "${log}" | tail -15 | sed 's/^/  /' >&2; fi
-    die "commit recusado ('$1') — o gate local reprovou; corrija e rode de novo"
-  fi
-  cat "${log}"
-  [ -n "${why}" ] && echo "PR-FINALIZE: commit '$1' sem o hook${why}"
-  return 0
-}
 
 _regen() {  # regenera TODA projeção gerada com catraca no lint e stageia só elas
   bash .claude/utils/adopt/regen-ssot-projections.sh "${ROOT}" >/dev/null || die "regen-ssot-projections.sh falhou"
@@ -324,6 +352,7 @@ if [ -f .claude/validation/review-artifact-check.sh ]; then
     || { printf '%s\n' "${_sch}" >&2; die "o resíduo está fora do esquema — corrija e rode de novo (nada rodou ainda: nem pré-voo, nem lint)"; }
 fi
 
+_step "0 pré-voo"
 # 0. PRÉ-VOO (2026-10-07; SEMPRE desde 2026-10-15, SAC-141, D_PRE_VOO_SEMPRE_E_SOMBRA): roda as famílias que o
 #    diff ALTEROU por dentro (+ a catraca estática `| grep -q`) num ambiente que IMITA o runner — o corpo vive em
 #    ops/testing/preflight-run.sh, que o pre-push também chama. Até 2026-10-15 ele só rodava sob
@@ -357,6 +386,7 @@ _lint_in() {  # <worktree com o commit a julgar> <arquivo de HARD> → _rc e _ha
 # O que se quer saber antes de escrever: o que o regen mudaria, se o resíduo carimba ou é recusado, e se o
 # commit resultante passa no lint. Tudo isso roda na cópia; o repo vivo (árvore, índice, resíduo, refs)
 # não é tocado. Ficam só objetos soltos no banco do git, que o gc recolhe — declarado.
+[ "${CHECK}" = 1 ] && _step "--check (ensaio sem escrita)"
 if [ "${CHECK}" = 1 ]; then
   _ck="$(mktemp -d)"; _DIRS+=("${_ck}")
   _t0="$(git write-tree)" || die "--check: não li o índice como árvore"
@@ -389,14 +419,17 @@ if [ "${CHECK}" = 1 ]; then
 fi
 
 # 1. conteúdo stageado + projeções + resíduo carimbado sobre esse mesmo índice → UM commit
+_step "1 commit (projeções e resíduo)"
 _snap_res
 _regen
 _restamp
-_commit "${SUBJ}"
+# conteúdo já commitado antes do rebase: este commit é só de projeção, e não repete o assunto do PR
+if [ "${_PRECOMMIT}" = 1 ]; then _commit "docs: projeções geradas regeneradas"; else _commit "${SUBJ}"; fi
 # 2. projeção que lê produtores que o commit muda: regenera até ficar ESTÁVEL (no máximo 3 voltas).
 #    Desde 2026-10-13 o testing-state.md não lê mais os contadores do resíduo (passo A de
 #    D_MERGE_PROCESS_ONION_2026_10: eles saem só em testing-state.sh --live); segue na lista e é regenerado
 #    aqui como qualquer projeção, só que não muda mais por PR. A volta continua valendo para as demais.
+_step "2 projeções estáveis"
 for _i in 1 2 3; do
   _regen
   _restamp
@@ -405,6 +438,7 @@ for _i in 1 2 3; do
   [ "${_i}" = 3 ] && die "projeções não estabilizaram em 3 voltas — há gerador lendo o próprio resultado"
 done
 # 3. o veredito sobre o COMMIT, não a árvore (bloqueador B2): worktree destacada do HEAD, env do CI
+_step "3 lint do commit"
 git diff --cached --quiet || die "sobrou conteúdo stageado fora do commit — nada enviado"
 _tmp="$(mktemp -d)"; _DIRS+=("${_tmp}")
 git worktree add -q --detach "${_tmp}/wt" HEAD || die "não montei o HEAD para julgar"
@@ -417,6 +451,7 @@ fi
 # 4. o contrato KG-SSOT sobre o MESMO commit, pela MESMA invocação do CI (ops/kg-gate-ci.sh): a catraca
 #    da dívida SHOULD por grafo é do kg_gate.py, não do lint, e o #1106 passou aqui e reprovou no CI por
 #    ela (label de 538 caracteres, 2026-10-14). ~5 s. Sem PyYAML/jsonschema o gate sai rc 2 e o envio para.
+_step "4 contrato KG-SSOT"
 if ! (cd "${_tmp}/wt" && bash ops/kg-gate-ci.sh) > "${_tmp}/kggate.txt" 2>&1; then
   echo "PR-FINALIZE: o contrato KG-SSOT reprovou o commit (o mesmo passo do CI):" >&2
   grep -E '^✗|ausente|Error|erro' "${_tmp}/kggate.txt" | grep -v '(herdado)' | head -20 | sed 's/^/  /' >&2
@@ -428,6 +463,7 @@ printf '%s\n' "$(git rev-parse HEAD)" > "$(git rev-parse --git-common-dir)/onion
 echo "PR-FINALIZE: ${BR} pronto — 0 HARD, contrato KG-SSOT verde, resíduo casando, projeções estáveis."
 # 5. push só por pedido explícito
 if [ "${PUSH}" = 1 ]; then
+  _step "5 push"
   # --force-with-lease: depois de --rebase o push é reescrita da PRÓPRIA branch; o lease recusa se o
   # remoto andou por outra mão. Nunca é a main: a branch foi recusada lá em cima.
   # --force-if-includes: depois do `git fetch` do --rebase o lease simples fica vazio e apagava commit de

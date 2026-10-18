@@ -180,12 +180,12 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.7
-    verified_at: "2026-10-17"
-    verified_against: "ops/pr-finalize.sh; cura aprovada pelo maestro 2026-10-07 (4 achados de E_PR_FINALIZE_ATRITO_MEDIDO). EXECUÇÃO 2026-10-08 (SAC-66, branch fix/pr-finalize-pipeline): os 4 atritos curados, com 15 casos novos na família pre_push e 5 mutantes que reprovam (sem restauro do resíduo: 3 casos; hook sempre: 1; hook nunca: 4; sem o resumo final: 1; --check caindo no modo real: 2). A fila está no teto de 30, por isso a evidência da execução mora aqui e não num nó novo"
-    label: "pr-finalize: os 4 atritos de E_PR_FINALIZE_ATRITO_MEDIDO e a catraca estática no checkpoint estão curados (pré-voo no ambiente do runner, PR #946); resta registrar a etapa e o rc da falha e aceitar o rebase com índice sujo"
+    verified_at: "2026-10-18"
+    verified_against: "ops/pr-finalize.sh; cura aprovada pelo maestro 2026-10-07 (4 achados de E_PR_FINALIZE_ATRITO_MEDIDO). EXECUÇÃO 2026-10-08 (SAC-66, branch fix/pr-finalize-pipeline): os 4 atritos curados, com 15 casos novos na família pre_push e 5 mutantes que reprovam (sem restauro do resíduo: 3 casos; hook sempre: 1; hook nunca: 4; sem o resumo final: 1; --check caindo no modo real: 2). A fila está no teto de 30, por isso a evidência da execução mora aqui e não num nó novo. EXECUÇÃO 2026-10-18 (branch fix/pr-finalize-step-and-dirty-rebase, decisão do maestro por pergunta com opções): medido antes, SIGTERM no grupo deixava o log na linha do pré-voo, sem dizer que morreu (rc=143); agora o trap nomeia sinal, etapa e rc, casos (st) e (sig) com mutante. O --rebase com índice sujo commita o conteúdo antes do rebase em vez de recusar, caso (dr) com mutante; dogfood num clone descartável, rc=0"
+    label: "pr-finalize: os atritos de E_PR_FINALIZE_ATRITO_MEDIDO, a catraca estática no checkpoint (#946), a etapa e o rc da rodada que para ou morre, e o rebase com índice sujo estão curados"
   - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
     node_type: question
     layer: audit

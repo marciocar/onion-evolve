@@ -41,7 +41,7 @@ ZERO=0000000000000000000000000000000000000000
 ROOT="$(git rev-parse --show-toplevel)" || exit 0
 fail=0
 REMOTE="${1:-origin}"; URL="${2:-}"
-if [ "${ONION_PREPUSH_TEST:-0}" != 1 ]; then unset ONION_PREPUSH_PR ONION_PREPUSH_LINT ONION_PREPUSH_NO_WORKTREE; fi
+if [ "${ONION_PREPUSH_TEST:-0}" != 1 ]; then unset ONION_PREPUSH_PR ONION_PREPUSH_LINT ONION_PREPUSH_NO_WORKTREE ONION_PREPUSH_PREFLIGHT; fi
 # julga pelo DESTINO, não pelo nome (menor 7 do Elenxo 2): `git push <url-do-origin>` ou um remote
 # `mirror` com a mesma URL entregavam HARD no PR sem julgamento
 ORIGIN_URL="$(git remote get-url --push origin 2>/dev/null || true)"
@@ -95,8 +95,12 @@ while read -r _lref lsha rref _rsha; do
   # o PRÉ-VOO da bancada sobre o MESMO commit (SAC-141, 2026-10-15): o push que não passou pelo pr-finalize
   # pulava a bancada local inteira. Só depois do lint verde, e só onde o corpo existe (core).
   pfo="" pfrc=0
-  if [ "${rc}" = 0 ] && [ "${hard}" = 0 ] && [ -f "${wt}/ops/testing/preflight-run.sh" ]; then
-    pfo="$(cd "${wt}" && bash ops/testing/preflight-run.sh 2>&1 </dev/null)" || pfrc=$?
+  # ONION_PREPUSH_PREFLIGHT (ponto de teste, 2026-10-18): a bancada aponta um stub. Sem ele, os casos da família
+  # pre_push rodavam o pré-voo do CHECKOUT VIVO; num PR que mexe na própria família, ela rodava dentro de si
+  # mesma e o veredito dependia do cache do pré-voo (medido: 1 ✗ sem cache, 58/58 com).
+  pfs="${ONION_PREPUSH_PREFLIGHT:-ops/testing/preflight-run.sh}"
+  if [ "${rc}" = 0 ] && [ "${hard}" = 0 ] && { [ -n "${ONION_PREPUSH_PREFLIGHT:-}" ] || [ -f "${wt}/ops/testing/preflight-run.sh" ]; }; then
+    pfo="$(cd "${wt}" && bash "${pfs}" 2>&1 </dev/null)" || pfrc=$?
   fi
   if [ -n "${tmp}" ]; then git -C "${ROOT}" worktree remove --force "${wt}" >/dev/null 2>&1; rm -rf "${tmp}"; fi
 

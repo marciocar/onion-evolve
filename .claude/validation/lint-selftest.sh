@@ -11263,7 +11263,8 @@ run_pre_push_selftests() {
     if [ "${got}" = "$2" ]; then record_pass "pre-push: $1 (rc=$2)"
     else record_fail "pre-push: $1" "esperava rc=$2, veio rc=${got}"; fi
   }
-  local W="ONION_PREPUSH_PR=9 ONION_PREPUSH_NO_WORKTREE=1"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/pfok.sh"   # pré-voo hermético: o do checkout vivo julgaria o diff DESTE PR
+  local W="ONION_PREPUSH_PR=9 ONION_PREPUSH_NO_WORKTREE=1 ONION_PREPUSH_PREFLIGHT=${d}/pfok.sh"
   _ppc "PR aberto + lint com HARD → RECUSA"                 1 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
   _ppc "PR aberto + rc 0 mas HARD=2 → RECUSA (lê o número)"  1 "${W} ONION_PREPUSH_LINT=${d}/liar.sh" "${S}"
   _ppc "PR aberto + 0 HARD → passa"                          0 "${W} ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
@@ -11407,6 +11408,82 @@ run_pre_push_selftests() {
     ( cd "${sb}/o" && git config user.email o@o && git config user.name o && sed -i 2s/.*/MAIN/ c.txt && git commit -qam main2 && git push -q origin main ) >/dev/null 2>&1
     g="$(_pf "${sb}" --rebase)"; _pfc "rebase limpo sobre main que mexe noutra linha → passa" 0 "${g}" "${sb}"
   fi
+  # (dr) --rebase com ÍNDICE SUJO (2026-10-18, decisão do maestro): o motor commita o conteúdo stageado ANTES
+  #      do rebase, em vez de recusar, e o commit de projeções seguinte não repete o assunto do PR.
+  #      MUTANTE: a recusa antiga ("--rebase exige índice limpo") de volta reprova este caso.
+  _dr_run() {  # $1=motor $2=nome → "rc<TAB>assuntos(3)<TAB>tem-main<TAB>disse-indice-sujo"
+    local _m="$1" _s="${d}/$2" _r=0
+    _sbmk "${_s}" || { printf 'NOSB\t\t\t\n'; return; }
+    ( cd "${_s}/w" && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
+    git clone -q "${_s}/remote.git" "${_s}/o" 2>/dev/null
+    ( cd "${_s}/o" && git config user.email o@o && git config user.name o && sed -i 2s/.*/MAIN/ c.txt && git commit -qam main2 && git push -q origin main ) >/dev/null 2>&1
+    (cd "${_s}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${_m}" --rebase -m "feat: conteudo" > "${_s}/out" 2>&1) || _r=$?
+    printf '%s\t%s\t%s\t%s\n' "${_r}" "$(git -C "${_s}/w" log --format=%s -3 | tr '\n' '|')" \
+      "$(git -C "${_s}/w" merge-base --is-ancestor origin/main HEAD 2>/dev/null && echo sim || echo nao)" \
+      "$(grep -q 'índice sujo' "${_s}/out" && echo sim || echo nao)"
+  }
+  local _dr _drs _drm _dri
+  IFS=$'\t' read -r _dr _drs _drm _dri < <(_dr_run "${pf}" dr)
+  if [ "${_dr}" = 0 ] && [ "${_drm}" = sim ] && [ "${_dri}" = sim ] && grep -q 'feat: conteudo' <<< "${_drs}" \
+     && [ "$(grep -o 'feat: conteudo' <<< "${_drs}" | wc -l)" = 1 ]; then
+    record_pass "pr-finalize: (dr) --rebase com índice sujo → commita o conteúdo antes, rebaseia e passa (assunto do PR uma vez só)"
+  else record_fail "pr-finalize: (dr) índice sujo" "rc=${_dr} assuntos=[${_drs}] main=${_drm} disse=${_dri}: $(tail -1 "${d}/dr/out" 2>/dev/null)"; fi
+  local _drmut="${d}/pf-dr-mut.sh"
+  python3 - "${pf}" "${_drmut}" <<'PYM'
+import sys; s=open(sys.argv[1]).read()
+a='  if ! git diff --cached --quiet; then\n    _step "commit do conteúdo antes do rebase"'
+b='  git diff --cached --quiet || die "--rebase exige índice limpo: commite o conteúdo do PR antes"\n  if false; then\n    _step "commit do conteúdo antes do rebase"'
+open(sys.argv[2],'w').write(s.replace(a,b,1) if a in s else s)
+PYM
+  if cmp -s "${pf}" "${_drmut}"; then record_fail "pr-finalize: (dr-MUT) setup" "a mutação não foi aplicada (âncora mudou?)"
+  else
+    IFS=$'\t' read -r _dr _drs _drm _dri < <(_dr_run "${_drmut}" dr-mut)
+    if [ "${_dr}" != 0 ]; then record_pass "pr-finalize: (dr-MUT) com a recusa antiga o mesmo caso reprova (rc=${_dr}) — (dr) é load-bearing"
+    else record_fail "pr-finalize: (dr-MUT)" "a recusa antiga passou — (dr) não mede o índice sujo"; fi
+  fi
+  unset -f _dr_run
+  # (st) a rodada que PARA nomeia a etapa e o código (2026-10-18): o lint do commit reprova → a última linha
+  #      diz «3 lint do commit» e rc=1. MUTANTE: sem a linha do trap de saída, (st) reprova.
+  _st_run() {  # $1=motor $2=nome → saída do motor
+    local _s="${d}/$2"
+    _sbmk "${_s}" || { echo NOSB; return; }
+    ( cd "${_s}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && echo 1 > verdict && git add -A ) >/dev/null 2>&1
+    (cd "${_s}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "$1" -m t1 2>&1) || true
+  }
+  if grep -q 'parou na etapa «3 lint do commit» (rc=1)' <<< "$(_st_run "${pf}" st)"; then
+    record_pass "pr-finalize: (st) rodada que para nomeia a etapa e o rc («3 lint do commit», rc=1)"
+  else record_fail "pr-finalize: (st) etapa" "a saída não nomeou a etapa: $(_st_run "${pf}" st2 | tail -2 | tr '\n' ' ')"; fi
+  local _stmut="${d}/pf-st-mut.sh"
+  sed '/PR-FINALIZE: parou na etapa/d' "${pf}" > "${_stmut}"
+  if cmp -s "${pf}" "${_stmut}"; then record_fail "pr-finalize: (st-MUT) setup" "a mutação não foi aplicada"
+  elif grep -q 'parou na etapa' <<< "$(_st_run "${_stmut}" st-mut)"; then record_fail "pr-finalize: (st-MUT)" "sem a linha a saída ainda nomeia — (st) não mede o trap"
+  else record_pass "pr-finalize: (st-MUT) sem a linha do trap a etapa some — (st) é load-bearing"; fi
+  unset -f _st_run
+  # (sig) MORTA POR SINAL no meio (o caso medido: SIGTERM do runner ao GRUPO de processos): a linha diz
+  #       o sinal e a etapa. MUTANTE: sem o trap de TERM o bash morre sem rodar o trap de saída.
+  _sig_run() {  # $1=motor $2=nome → saída do motor depois do kill do grupo
+    local _s="${d}/$2" _p
+    _sbmk "${_s}" || { echo NOSB; return; }
+    ( cd "${_s}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" \
+      && printf '#!/bin/bash\nsleep 30\n' > .claude/validation/lint-artifacts.sh && git add -A ) >/dev/null 2>&1
+    set -m
+    ( cd "${_s}/w" && ONION_FINALIZE_CHECKPOINT=1 exec bash "$1" -m t1 > "${_s}/out" 2>&1 ) &
+    _p=$!
+    set +m
+    local _w=0; while [ "${_w}" -lt 40 ] && ! grep -q 'lint\|pré-voo\|sombra' "${_s}/out" 2>/dev/null; do sleep 0.5; _w=$((_w+1)); done
+    sleep 2; kill -TERM -- "-${_p}" 2>/dev/null || true; wait "${_p}" 2>/dev/null || true
+    cat "${_s}/out" 2>/dev/null
+  }
+  local _so; _so="$(_sig_run "${pf}" sig)"
+  if grep -q 'MORREU por sinal TERM na etapa «' <<< "${_so}"; then
+    record_pass "pr-finalize: (sig) morta por SIGTERM no grupo → nomeia o sinal e a etapa ($(grep -o 'etapa «.*»' <<< "${_so}" | head -1))"
+  else record_fail "pr-finalize: (sig) sinal" "a saída não disse que morreu: $(tail -2 <<< "${_so}" | tr '\n' ' ')"; fi
+  local _sgmut="${d}/pf-sig-mut.sh"
+  sed "/^trap '_SIG=TERM; exit 143' TERM$/d" "${pf}" > "${_sgmut}"
+  if cmp -s "${pf}" "${_sgmut}"; then record_fail "pr-finalize: (sig-MUT) setup" "a mutação não foi aplicada"
+  elif grep -q 'MORREU por sinal' <<< "$(_sig_run "${_sgmut}" sig-mut)"; then record_fail "pr-finalize: (sig-MUT)" "sem o trap de TERM ainda disse que morreu — (sig) não mede o trap"
+  else record_pass "pr-finalize: (sig-MUT) sem o trap de TERM a rodada morre calada — (sig) é load-bearing"; fi
+  unset -f _sig_run
   # ── SAC-67 (2026-10-08) → F4 DAS PORTAS (2026-10-10): até a F4, conflito SÓ em plugins/ era projeção e o
   # --rebase o remontava das fontes. O `plugins/` saiu do core e deixou de ser projeção: um conflito ali é
   # tão REAL quanto qualquer outro, e o motor recusa. Conflito de FONTE continua recusa. Plugin de mentira:
