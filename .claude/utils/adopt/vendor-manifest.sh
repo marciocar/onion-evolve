@@ -650,7 +650,13 @@ _target_owns_contract() {
 # vazio ali LIGA o corte de comandos do roles.yaml (`_emit_command_excludes`), que tiraria a meta-fábrica
 # do adotante, decisão separada que ninguém tomou. Vale só no destino adoção: a porta onion-core é o
 # core das empresas e leva a skill (o materializador escolhe o papel; a doutrina das portas decide).
-_CORE_ONLY_ADOPTION_EXCLUDES=(':(exclude).claude/skills/onion-publish')
+# 2026-10-18: o comando /meta:publish e as duas peças que só existem por ele (a lente e a doutrina, que
+# a própria lente declara "seguem o comando"). Os companheiros não saem sozinhos aqui: o derivador
+# (_emit_companion_excludes) só roda quando há corte de PAPEL, e este corte não é de papel.
+_CORE_ONLY_ADOPTION_EXCLUDES=(':(exclude).claude/skills/onion-publish'
+                              ':(exclude).claude/commands/meta/publish.md'
+                              ':(exclude).claude/rules/publish-lens.md'
+                              ':(exclude).claude/commands/common/prompts/publish-doctrine.md')
 # --retired-excludes: o vendor-branch.sh pergunta QUAIS exclusões são APOSENTADORIA (o core deixou de
 # mandar algo que mandava) para tirá-las só do lado antigo do delta de remoção. As outras exclusões
 # (identidade, contrato do próprio alvo, corte de papel) têm outro significado e nunca entram aqui: medir o
