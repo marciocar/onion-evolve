@@ -955,6 +955,22 @@ nodes:
       locator: "PROP_BASE ao lado de FAM_MAX; caso (r3g) e (r3g-MUT) de run_publish_release_selftests"
       method: "medição: publicação real + ensaio contra as portas reais + bancada com mutante"
       locality: "repo"
+  - id: D_PORTAS_ENSAIAR_E_PUBLICAR_1018
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-18"
+    verified_against: "decisão do maestro em 2026-10-18, por pergunta com opções (/meta:decide): escolhida «Ensaiar e publicar»"
+    label: "publicar as 4 portas com os vendors kg-ssot 4.9.0 e 4.9.1: ensaio --all e, se a proposta for patch, publicar com esse número; outro nível volta a pergunta"
+    narrative: "Selado por /meta:decide em 2026-10-18: escolhida «Ensaiar e publicar»; descartadas: «Esperar a próxima mudança»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-18: «As 4 portas estão na onion-v2.0.2 e 2 commits atrás. Publicar agora?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
+      locality: "pessoa"
 
 edges:
   # o dano é a evidência de que a lacuna existia
@@ -1199,3 +1215,6 @@ edges:
   - from: E_PROPOSTA_CONTAVA_A_RELEASE_NOVA
     to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
     edge_type: SUPPORTS
+  - from: D_PORTAS_ENSAIAR_E_PUBLICAR_1018
+    to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    edge_type: TRACES_TO

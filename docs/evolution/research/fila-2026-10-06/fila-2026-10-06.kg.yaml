@@ -385,6 +385,38 @@ nodes:
     confidence: 0.5
     verified_against: "sinal 2026-10-08-onion-brain-mcp do brain-granaai (hub); direção do maestro 2026-10-08: pesquisa + decisão, com o hub como piloto"
     label: "MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claude Code: o framework mantém ou a família hospeda, auth por org, escopo por raiz, frescor por commit"
+  - id: D_FILA_PODA_PRIMEIRO_1018
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-18"
+    verified_against: "decisão do maestro em 2026-10-18, por pergunta com opções (/meta:decide): escolhida «Poda do CLAUDE.md»"
+    label: "a próxima frente da fila é a poda do CLAUDE.md: medir o custo em tokens e enxugar para regras com ponteiros"
+    narrative: "Selado por /meta:decide em 2026-10-18: escolhida «Poda do CLAUDE.md»; descartadas: «MCP só-leitura do Brain» · «Task manager completo» · «Tipo de nó trocado»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-18: «Próxima frente da fila (grafo fila-2026-10-06), qual primeiro?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
+      locality: "pessoa"
+  - id: D_GRANAAI_MEDIR_ANTES_1018
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-18"
+    verified_against: "decisão do maestro em 2026-10-18, por pergunta com opções (/meta:decide): escolhida «Medir antes»"
+    label: "granaai: medir onde o Onion do membro vive (outro checkout, desacoplado ou abandonado) antes de mexer no registro"
+    narrative: "Selado por /meta:decide em 2026-10-18: escolhida «Medir antes»; descartadas: «Aposentar o membro» · «Deixar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-18: «granaai: o clone local do membro não tem carimbo .onion-version. Qual o caminho?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
+      locality: "pessoa"
 edges:
   - from: E_MAPA_SEM_MERGE_ONION_HOOKS
     to: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
@@ -428,3 +460,9 @@ edges:
   - from: E_HOOK_PR_SEM_PASSADA_CURADO
     to: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
     edge_type: SUPERSEDES
+  - from: D_FILA_PODA_PRIMEIRO_1018
+    to: Q_PODA_CLAUDE_MD_REVISITA
+    edge_type: TRACES_TO
+  - from: D_GRANAAI_MEDIR_ANTES_1018
+    to: Q_GRANAAI_CLONE_SEM_CARIMBO
+    edge_type: TRACES_TO
