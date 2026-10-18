@@ -2,8 +2,8 @@
 title: 'Resíduo — a trava de merge avisa no adotante em vez de sair calada'
 date: 2026-10-18
 branch: fix/merge-gate-warns-in-adopter
-reviewed_diff_sha256: c02cb45b651ca7733ae0413e164e2db5e5e5801077a61fb8e35f01399707d9d9
-reviewed_code_sha256: 5410823a874db3e7778f99d0688f90a3be8c8032720cb0425b73fcb2d5cffe11
+reviewed_diff_sha256: 35307b102871fe120379ce52ad17da20759b38c0b96962005979d6c42d69db32
+reviewed_code_sha256: 6eba32f068e8172817860c6d2a2a7942e44f9a241dfa8c0bbe6ec8f6d8938998
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
