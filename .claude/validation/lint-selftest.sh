@@ -31897,6 +31897,29 @@ STUB
   if [ "${_r}" -eq 0 ] && grep -q 'no MESMO pin: esta porta entra na mesma release' <<< "${_o}" && grep -q 'refs/tags/onion-v1.0.0' <<< "$(_tags "${plugup}")"; then
     record_pass "publish_release: (r3f) a mesma publicação (mesmo pin) entra noutra porta com o mesmo número"
   else record_fail "publish_release: (r3f)" "rc=${_r} out=${_o:0:400}"; fi
+  # (r3g) A PROPOSTA DA 2ª PORTA NÃO CONTA A RELEASE QUE A PRÓPRIA RODADA PUBLICA (2026-10-18): medido na
+  #       onion-v2.0.0, as portas depois da 1ª propunham o bump SOBRE o número recém-selado (3.0.0) e a tag
+  #       levava o aviso de divergência. Aqui: a porta-p entra na 1.0.0 e a proposta dela é a 1.0.0, sem aviso.
+  #       MUTANTE: a base da proposta voltando a ser o máximo da família (com a release nova) reprova.
+  if [ "${_r}" -eq 0 ] && grep -qP '^PROPOSTA-DA-PORTA\tporta-p\t[^\t]*\t[^\t]*\t1\.0\.0$' <<< "${_o}" && ! grep -q 'selado onion-v1.0.0, proposta' <<< "${_o}"; then
+    record_pass "publish_release: (r3g) a 2ª porta da mesma release propõe o próprio número selado, sem aviso de divergência"
+  else record_fail "publish_release: (r3g) proposta sobre a release recém-publicada" "$(grep -P '^PROPOSTA-DA-PORTA|selado' <<< "${_o}" | tr '\n' ' ')"; fi
+  # o MUTANTE roda SEM efeito colateral (a 1ª redação apagava a tag da porta-p e commitava no core do sandbox,
+  # e derrubava o (r9) adiante): o script é trocado só na árvore, e o ensaio com --version, sem --push, compara
+  # as duas bases. Com a cura a proposta é a própria 1.0.0; com a base contando a release nova, sai 1.0.1.
+  local _r3gm="${d}/pd-r3g-mut.sh"
+  sed 's/^PROP_BASE="\$(.*$/PROP_BASE="${FAM_MAX}"/' "${sut}" > "${_r3gm}"
+  if cmp -s "${sut}" "${_r3gm}"; then record_fail "publish_release: (r3g-MUT) setup" "a mutação não foi aplicada"
+  else
+    _pr porta-p --version 1.0.0; local _r3g_real="${_o}"
+    cp "${_r3gm}" "${core}/ops/publish-door.sh"
+    _pr porta-p --version 1.0.0
+    cp "${sut}" "${core}/ops/publish-door.sh"
+    if grep -qP '^PROPOSTA-DA-PORTA\tporta-p\t[^\t]*\t[^\t]*\t1\.0\.0$' <<< "${_r3g_real}" \
+       && grep -qP '^PROPOSTA-DA-PORTA\tporta-p\t1\.0\.0\t[^\t]*\t1\.0\.1$' <<< "${_o}"; then
+      record_pass "publish_release: (r3g-MUT) com a base contando a release nova, a proposta sai sobre ela (1.0.1) — (r3g) é load-bearing"
+    else record_fail "publish_release: (r3g-MUT)" "real=[$(grep -P '^PROPOSTA-DA-PORTA' <<< "${_r3g_real}")] mutante=[$(grep -P '^PROPOSTA-DA-PORTA' <<< "${_o}")]"; fi
+  fi
 
   # (r4) comando ADICIONADO ⇒ minor (1.1.0); o commit `docs:` não entra no changelog
   printf '# comando dois\n' > "${core}/.claude/commands/x/two.md"; _cpr "feat: adiciona o comando dois"

@@ -512,6 +512,11 @@ while IFS=$'\037' read -r _fid _fkind _ _fremote _ _; do
   _furl=""
 done <<< "$(_members_tsv)"
 FAM_MAX="$(awk -F'\t' '{print $3}' <<< "${_fam_rows}" | grep -E "${SEMVER_RE}" | sort -V | tail -n1 || true)"
+# A BASE DA PROPOSTA não conta a release que ESTA rodada publica (2026-10-18): no --all --push, a 1ª porta
+# criava a tag do número selado, e as seguintes propunham o bump SOBRE ele — medido na publicação da
+# onion-v2.0.0: "PROPOSTA DA FAMÍLIA onion-v3.0.0" logo depois de publicar, e o aviso de divergência na tag.
+# FAM_MAX segue com ela (o número selado tem de passar dele, salvo a mesma publicação); PROP_BASE não.
+PROP_BASE="$(awk -F'\t' '{print $3}' <<< "${_fam_rows}" | grep -E "${SEMVER_RE}" | grep -vxF "${VERSION:-__sem_versao__}" | sort -V | tail -n1 || true)"
 if [ -n "${FAM_UNREAD}" ]; then
   if [ -n "${VERSION}" ]; then
     echo "ERRO: não li as tags de${FAM_UNREAD} — o número é da família, e sem ler todas as portas não confiro ${VERSION}." >&2; exit 3
@@ -690,12 +695,12 @@ _reasons="${_reasons#; }"; [ -n "${_reasons}" ] || _reasons="nenhuma superfície
 # a BASE do número é o máximo da FAMÍLIA; o nível vem do diff desta porta
 if [ "${REL_MEASURED}" -eq 0 ]; then
   LEVEL="NÃO-MEDIDO"; PROPOSED="NÃO-MEDIDO"; _reasons="tags ilegíveis: sem base não há proposta"
-elif [ -z "${FAM_MAX}" ]; then
+elif [ -z "${PROP_BASE}" ]; then
   LEVEL="primeira"; PROPOSED="1.0.0"; _reasons="primeira release da família (nenhuma tag ${TAG_PREFIX}* em porta nenhuma); ${_reasons}"
 elif [ -z "${LAST_REL}" ]; then
-  LEVEL="primeira"; PROPOSED="$(_bump "${FAM_MAX}" patch)"; _reasons="primeira release desta porta, com a família em ${TAG_PREFIX}${FAM_MAX}"
+  LEVEL="primeira"; PROPOSED="$(_bump "${PROP_BASE}" patch)"; _reasons="primeira release desta porta, com a família em ${TAG_PREFIX}${PROP_BASE}"
 else
-  PROPOSED="$(_bump "${FAM_MAX}" "${LEVEL}")"
+  PROPOSED="$(_bump "${PROP_BASE}" "${LEVEL}")"
 fi
 # o intervalo do changelog: source_commit da tag anterior → o pin novo, filtrado pelos caminhos que a
 # porta mudou (core, standalone e mini espelham o caminho do core; nos plugins o filtro é .claude/)
@@ -755,7 +760,7 @@ _pin_date="$(git -C "${CORE}" log -1 --format=%cd --date=short "${PIN_FULL}" 2>/
 echo "  (4b) proposta: ${TAG_PREFIX}${PROPOSED} (${LEVEL}) — ${_reasons}"
 [ -n "${_brk}" ] && printf '%s\n' "${_brk}" | sed 's/^/       BREAKING (core-only, não viaja): /'
 # campo 3 = a BASE da proposta (máximo da família; '—' sem tag nenhuma; NÃO-MEDIDO se ilegível)
-_pbase="${FAM_MAX:-—}"; [ "${REL_MEASURED}" -eq 0 ] && _pbase="NÃO-MEDIDO"
+_pbase="${PROP_BASE:-—}"; [ "${REL_MEASURED}" -eq 0 ] && _pbase="NÃO-MEDIDO"
 printf 'PROPOSTA-DA-PORTA\t%s\t%s\t%s\t%s\n' "${DOOR}" "${_pbase}" "${LEVEL}" "${PROPOSED}"
 if [ -n "${VERSION}" ] && [ "${VERSION}" != "${PROPOSED}" ]; then
   echo "  ⚠️ (4b) selado ${TAG_PREFIX}${VERSION}, proposta da porta ${TAG_PREFIX}${PROPOSED}: o selo é do maestro (no --all, a proposta da família agrega as portas)"

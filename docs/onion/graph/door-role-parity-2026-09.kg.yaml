@@ -936,6 +936,26 @@ nodes:
       method: "medição: bancada com LC_ALL=C; cada mutante plantado pelo mutate-and-restore e o caso reprova"
       locality: "repo"
 
+  - id: E_PROPOSTA_CONTAVA_A_RELEASE_NOVA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-18"
+    verified_against: "publicação real da onion-v2.0.0 (2026-10-18): o --all --push terminou com PROPOSTA DA FAMÍLIA onion-v3.0.0 e o aviso de divergência; depois da cura, o ensaio --all --version 2.0.0 contra as quatro portas reais deu 2.0.0 nas quatro, sem aviso; caso (r3g) de run_publish_release_selftests com mutante"
+    source_kind: repo
+    source_tier: 10
+    label: "no --all --push, as portas depois da 1ª propunham o bump sobre o número que a própria rodada acabara de publicar"
+    narrative: "A 1ª porta cria a tag do número selado; as seguintes liam o máximo da família JÁ com ela (FAM_MAX) e somavam o nível medido contra a release anterior delas, então a 2.0.0 virava proposta 3.0.0 e a tag levava o aviso falso de divergência. A cura separa as duas perguntas: FAM_MAX (inclui a release nova) segue conferindo que o número selado passa da família; PROP_BASE (exclui o número desta rodada) é a base da proposta. Não afetou o que foi publicado: só a proposta impressa e a linha de divergência da mensagem da tag."
+    trace: "ops/publish-door.sh"
+    provenance:
+      source: "ops/publish-door.sh, cálculo da proposta (4b) e da base da família"
+      locator: "PROP_BASE ao lado de FAM_MAX; caso (r3g) e (r3g-MUT) de run_publish_release_selftests"
+      method: "medição: publicação real + ensaio contra as portas reais + bancada com mutante"
+      locality: "repo"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -1176,3 +1196,6 @@ edges:
   - from: D_FONTE_DO_UPDATE_RESOLVIDA_POR_MECANISMO
     to: E_PUBLICAR_SOB_DEMANDA_F3
     edge_type: DEPENDS_ON
+  - from: E_PROPOSTA_CONTAVA_A_RELEASE_NOVA
+    to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    edge_type: SUPPORTS
