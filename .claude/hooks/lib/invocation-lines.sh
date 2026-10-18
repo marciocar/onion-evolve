@@ -394,9 +394,16 @@ def push_dest_ours(where, remote, cfg):
 
 
 # ── pré-passadas que respeitam aspas ───────────────────────────────────────────────────────────
-def find_heredoc_openers(line):
-    """[(delimitador, inerte?)] dos `<<` FORA de aspas (`echo "<<EOF"` não abre nada)."""
-    out, i, n, q, stack = [], 0, len(line), None, []
+def find_heredoc_openers(line, state=None):
+    """[(delimitador, inerte?)] dos `<<` FORA de aspas (`echo "<<EOF"` não abre nada).
+    `state` = [aspa, pilha] em que a linha COMEÇA, e sai como o estado em que ela TERMINA. Sem ele, cada
+    linha recomeçava fora de aspas: medido em 2026-10-18 (sinal de um adotante), um `git commit -m "…"` de
+    várias linhas fechado na linha do `cat > r.md <<EOF` fazia o `"` de fecho parecer abertura, o `<<EOF`
+    parecia estar entre aspas, e o CORPO do heredoc era lido como comando — veto falso no core, aviso
+    falso no adotante. O lado perigoso (um `<<EOF` dentro da string tomado por heredoc, engolindo um push)
+    já falhava fechado; com o estado carregado ele passa a ser lido como texto, que é o que o bash faz."""
+    out, i, n = [], 0, len(line)
+    q, stack = (state[0], list(state[1])) if state else (None, [])
     while i < n:
         c = line[i]
         if q == '"' and line.startswith("$(", i):
@@ -441,6 +448,8 @@ def find_heredoc_openers(line):
                 out.append((re.sub(r"""['"\\]""", "", word), inert))
                 i = j + len(word); continue
         i += 1
+    if state is not None:
+        state[0], state[1] = q, stack
     return out
 
 
@@ -474,6 +483,7 @@ def heredocs(text):
     fnames = set(re.findall(r"(?:^|[;&|({\s])([A-Za-z_][A-Za-z0-9_:.-]*)\s*\(\s*\)", text)) | \
         set(re.findall(r"\bfunction\s+([A-Za-z_][A-Za-z0-9_:.-]*)", text))
     fn_on_line = re.compile(r"(^|[;&|(]|\s)\s*(" + "|".join(re.escape(n) for n in sorted(fnames)) + r")(\s|$)") if fnames else None
+    qstate = [None, []]    # aspas abertas entre LINHAS de comando (o corpo de heredoc não conta: é literal)
     while i < len(lines):
         ln = lines[i]
         if pend:
@@ -488,7 +498,7 @@ def heredocs(text):
             i += 1
             continue
         out.append(ln)
-        for term, inert in find_heredoc_openers(ln):
+        for term, inert in find_heredoc_openers(ln, qstate):
             # um SHELL como comando na linha do opener (`bash -s -- x <<E`, `bash /dev/stdin <<E`,
             # `cat <<E | bash`) faz do corpo CÓDIGO; a 1ª regex só aceitava `-letras` (Elenxo, B5)
             # o shell só conta FORA de aspas: `--title "compat com bash 5" --body "$(cat <<'EOF'` não é

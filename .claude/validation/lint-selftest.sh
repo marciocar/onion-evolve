@@ -8919,6 +8919,47 @@ except Exception: print("JSON-INVALIDO")' 2>/dev/null)"
     else record_fail "pretooluse-veto: (adv-MUT)" "o mutante ainda avisou — (adv-a) não mede o ramo do adotante"; fi
   fi
   rm -rf "${_adr}" "${_amd}"; unset -f _adv_run
+  # (hq) ASPAS QUE ATRAVESSAM LINHAS antes de um heredoc (2026-10-18, sinal de um adotante, comando literal
+  #      extraído do transcrito dele): `git commit -m "…"` de várias linhas fechado na linha do `cat > r.md <<EOF`
+  #      fazia o `"` de fecho parecer abertura; o `<<EOF` ficava "entre aspas" e o CORPO (crases escapadas que
+  #      citam merge) era lido como comando → veto falso no core, aviso falso no adotante.
+  #      (hq-a) core: a forma do adotante (com push de branch) passa calada; (hq-b) adotante: sem aviso;
+  #      (hq-c) o lado perigoso — `cat <<EOF` DENTRO da string, push na main depois — segue vetado no core.
+  #      MUTANTE: o scanner sem o estado carregado entre linhas reprova (hq-a) e (hq-b).
+  local _hqc _hqa; _hqc="$(mktemp -d)"; _hqa="$(mktemp -d)"
+  git -C "${_hqc}" init -q; git -C "${_hqc}" branch -M main 2>/dev/null || true; mkdir -p "${_hqc}/ops"; : > "${_hqc}/ops/pr-merge-verified.sh"
+  git -C "${_hqa}" init -q; git -C "${_hqa}" branch -M main 2>/dev/null || true
+  printf '%s\n' 'git commit -q -m "fix(onion): atualizar' '' 'cita cff2940153ab e a narrative" > /dev/null 2>&1; cat > r.md <<EOF' \
+    'reviewed_diff_sha256: $sha' '  \`source_commit 3bd13fc565e2\`. A \`onion/vendor\` está em \`681e100\`, o segundo pai do merge \`7cb428d\`.' \
+    'EOF' 'git push -q -u origin chore/onion-update' > "${_hqc}/honesto.txt"
+  printf '%s\n' 'git commit -m "linha um' 'cat <<EOF dentro da mensagem' 'fim" ; git push origin main' 'EOF' > "${_hqc}/perigoso.txt"
+  _hq_run() {  # $1=hook $2=repo $3=arquivo-com-o-comando → "rc<TAB>contexto"
+    local _o _r=0
+    _o="$(python3 -c 'import json,sys;print(json.dumps({"cwd":sys.argv[2],"tool_input":{"command":open(sys.argv[1]).read()}}))' "$3" "$2" \
+          | CLAUDE_PROJECT_DIR="$2" bash "$1" 2>/dev/null)" || _r=$?
+    printf '%s\t%s\n' "${_r}" "$(printf '%s' "${_o}" | grep -o 'TRAVA DE MERGE' | head -1)"
+  }
+  local _hr _hc
+  IFS=$'\t' read -r _hr _hc < <(_hq_run "${mg}" "${_hqc}" "${_hqc}/honesto.txt")
+  if [ "${_hr}" = 0 ]; then record_pass "pretooluse-veto: (hq-a) core: mensagem multilinha + heredoc com crases que citam merge + push de branch → PASSA"
+  else record_fail "pretooluse-veto: (hq-a)" "veto falso no comando honesto (rc=${_hr})"; fi
+  IFS=$'\t' read -r _hr _hc < <(_hq_run "${mg}" "${_hqa}" "${_hqc}/honesto.txt")
+  if [ "${_hr}" = 0 ] && [ -z "${_hc}" ]; then record_pass "pretooluse-veto: (hq-b) adotante: o mesmo comando → SEM aviso"
+  else record_fail "pretooluse-veto: (hq-b)" "aviso falso no adotante (rc=${_hr} '${_hc}')"; fi
+  IFS=$'\t' read -r _hr _hc < <(_hq_run "${mg}" "${_hqc}" "${_hqc}/perigoso.txt")
+  if [ "${_hr}" = 2 ]; then record_pass "pretooluse-veto: (hq-c) core: 'cat <<EOF' DENTRO da string + push na main → VETA (o bash executaria o push)"
+  else record_fail "pretooluse-veto: (hq-c)" "o push na main escondido atrás de um falso heredoc passou (rc=${_hr})"; fi
+  local _hqm; _hqm="$(mktemp -d)"; mkdir -p "${_hqm}/lib"; cp "${REPO_ROOT}/.claude/hooks/lib/"*.sh "${_hqm}/lib/"
+  cp "${mg}" "${_hqm}/mg.sh"
+  sed -i 's/for term, inert in find_heredoc_openers(ln, qstate):/for term, inert in find_heredoc_openers(ln):/' "${_hqm}/lib/invocation-lines.sh"
+  if cmp -s "${REPO_ROOT}/.claude/hooks/lib/invocation-lines.sh" "${_hqm}/lib/invocation-lines.sh"; then
+    record_fail "pretooluse-veto: (hq-MUT) setup" "a mutação não foi aplicada (âncora mudou?)"
+  else
+    IFS=$'\t' read -r _hr _hc < <(_hq_run "${_hqm}/mg.sh" "${_hqc}" "${_hqc}/honesto.txt")
+    if [ "${_hr}" = 2 ]; then record_pass "pretooluse-veto: (hq-MUT) sem o estado entre linhas o veto falso volta — (hq-a) é load-bearing"
+    else record_fail "pretooluse-veto: (hq-MUT)" "o mutante não vetou (rc=${_hr}) — (hq-a) não mede o estado carregado"; fi
+  fi
+  rm -rf "${_hqc}" "${_hqa}" "${_hqm}"; unset -f _hq_run
   rm -rf "${pr_root}"
 }
 
