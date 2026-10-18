@@ -36,9 +36,12 @@ import sys
 import urllib.parse
 
 sys.dont_write_bytecode = True
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import kg_store  # noqa: E402
-import kg_validate  # noqa: E402
+if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
+    from . import kg_store, kg_validate
+else:  # script ou vendor
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_store  # noqa: E402
+    import kg_validate  # noqa: E402
 
 SERVER_NAME = "kg-ssot"
 PROTOCOLS = ("2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05")  # o primeiro é o preferido

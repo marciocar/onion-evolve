@@ -1,0 +1,6 @@
+[project]
+name = "kg-ssot-mcpb"
+version = "@VERSION@"
+description = "MCPB do servidor MCP de referência do KG-SSOT: o pacote kg-ssot rodado por stdio."
+requires-python = ">=3.11"
+dependencies = ["kg-ssot==@VERSION@"]

@@ -58,7 +58,14 @@ from jsonschema import Draft202012Validator, FormatChecker, validators
 from jsonschema.exceptions import ValidationError
 
 
-_ROOT = pathlib.Path(__file__).resolve().parent.parent
+def _home():
+    """A raiz que tem o spec/: ao lado do módulo no pacote instalado (kg_ssot/spec), no pai no repo e no vendor
+    (tools/ ao lado de spec/)."""
+    here = pathlib.Path(__file__).resolve().parent
+    return here if (here / "spec" / "release.json").is_file() else here.parent
+
+
+_ROOT = _home()
 # O contrato VIGENTE, num lugar só: a suíte, o gate e as outras ferramentas leem daqui.
 CONTRACT_MUST = _ROOT / "spec" / "kg-contract-v4.schema.json"
 CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
@@ -341,11 +348,13 @@ def classify(error):
     return [f"{scope}.{field}:{v}"]
 
 
+# fullmatch nos três (EXTERNAL_REF, SLUG, ISO_PREFIX): o $ do Python casa antes de um \n final, e o do ECMA-262, o dos
+# patterns do contrato e do leitor JS, não; com match, "a.kg.yaml#ID\n" passava aqui e virava dangling-external.
 EXTERNAL_REF = re.compile(r"^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml#[A-Za-z][A-Za-z0-9_]*$")
 
 
 def is_external(ref):
-    return isinstance(ref, str) and EXTERNAL_REF.match(ref) is not None
+    return isinstance(ref, str) and EXTERNAL_REF.fullmatch(ref) is not None
 
 
 def item_place(key, index, item):
@@ -539,7 +548,7 @@ def form_codes(error):
     if "propertyNames" in error.schema_path:  # nível SHOULD: o nome da chave
         if error.validator == "pattern":  # nome que não é slug (<<, 1.0, chave com espaço)
             return [f"form.pattern.{scope}.{'.'.join(prefix + ['key'])}"]
-        if not SLUG.match(str(error.instance)):
+        if not SLUG.fullmatch(str(error.instance)):
             return []  # nome não-slug já alerta como form.pattern.<escopo>.key; não repete como unknown-key
         return [f"form.unknown-key.{scope}.{'.'.join(prefix + [str(error.instance)])}"]  # fora da gramática e sem x_
     kind = FORM_TYPE.get(error.validator, error.validator)
@@ -884,7 +893,7 @@ def coherence_located(doc):
                                          or (isinstance(method, str) and TESTIMONY_METHOD.match(method))):
             out.append(("integrity.testimony-in-prod", place))
         vf, va = n.get("valid_from"), n.get("verified_at")
-        if isinstance(vf, str) and isinstance(va, str) and ISO_PREFIX.match(vf) and ISO_PREFIX.match(va):
+        if isinstance(vf, str) and isinstance(va, str) and ISO_PREFIX.fullmatch(vf) and ISO_PREFIX.fullmatch(va):
             k = min(len(vf), len(va))
             if va[:k] < vf[:k]:
                 out.append(("integrity.verified-before-fact", place))
@@ -1240,7 +1249,7 @@ def contract_info(must_path, should_path):
     """De onde veio o julgamento: os caminhos do contrato, o sha256 de cada um e a release que o leitor carrega."""
     def sha(p):
         return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() if p else None
-    home = pathlib.Path(__file__).resolve().parent.parent
+    home = _ROOT
     release = None
     try:
         release = json.loads((home / "spec" / "release.json").read_text(encoding="utf-8")).get("tag")

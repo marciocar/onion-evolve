@@ -1,0 +1,60 @@
+{
+  "manifest_version": "0.4",
+  "name": "kg-ssot",
+  "display_name": "KG-SSOT — grafo de conhecimento verificável",
+  "version": "@VERSION@",
+  "description": "Julga e grava grafos de conhecimento .kg.yaml e .kg.json pelo contrato do KG-SSOT: toda afirmação diz de onde veio e quando foi conferida.",
+  "long_description": "O servidor MCP de referência do KG-SSOT dá a um modelo o contrato formal do grafo de conhecimento verificável e um armazém que só grava o que passa nele.\n\n- **kg_validate** julga um texto .kg.yaml ou .kg.json e devolve o veredito estruturado, com código, caminho, linha, mensagem e dica de correção.\n- **kg_write** grava no armazém só o que passa no contrato; **kg_get**, **kg_list**, **kg_history** e **kg_delete** completam o armazém.\n- **kg_schema_help** devolve o contrato vigente, um exemplo mínimo e as correções mais comuns.\n\nO armazém fica no diretório que você escolher, no seu computador. O servidor roda localmente, por stdio, e não fala com nenhum serviço externo. Manual: https://github.com/marciocar/kg-ssot/tree/main/docs/manual",
+  "author": {
+    "name": "Marcio Carvalho"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marciocar/kg-ssot"
+  },
+  "homepage": "https://github.com/marciocar/kg-ssot",
+  "documentation": "https://github.com/marciocar/kg-ssot/tree/main/docs/manual",
+  "support": "https://github.com/marciocar/kg-ssot/issues",
+  "icon": "icon.png",
+  "server": {
+    "type": "uv",
+    "entry_point": "server/main.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "--directory", "${__dirname}", "server/main.py", "--root", "${user_config.root}", "--read-only", "${user_config.read_only}"]
+    }
+  },
+  "tools": [
+    {"name": "kg_validate", "description": "Julga um grafo .kg.yaml ou .kg.json pelo contrato e devolve o veredito estruturado."},
+    {"name": "kg_write", "description": "Grava um grafo no armazém, só se ele passar no contrato."},
+    {"name": "kg_get", "description": "Lê um grafo do armazém."},
+    {"name": "kg_list", "description": "Lista os grafos do armazém."},
+    {"name": "kg_history", "description": "Mostra o histórico de gravações de um grafo."},
+    {"name": "kg_delete", "description": "Remove um grafo, só se nenhum outro deixar de passar por isso."},
+    {"name": "kg_schema_help", "description": "Devolve o contrato vigente, um exemplo mínimo e as correções mais comuns."}
+  ],
+  "keywords": ["knowledge-graph", "provenance", "verifiable", "json-schema", "yaml", "audit", "kg-ssot"],
+  "license": "Apache-2.0",
+  "compatibility": {
+    "platforms": ["darwin", "linux", "win32"],
+    "runtimes": {
+      "python": ">=3.11"
+    }
+  },
+  "user_config": {
+    "root": {
+      "type": "directory",
+      "title": "Diretório do armazém",
+      "description": "Onde os grafos ficam gravados. Fora de um repositório git: o armazém recusa uma raiz dentro de um.",
+      "required": true,
+      "default": "${DOCUMENTS}/kg-ssot"
+    },
+    "read_only": {
+      "type": "boolean",
+      "title": "Só leitura",
+      "description": "Sem kg_write nem kg_delete: o modelo só julga e lê.",
+      "required": false,
+      "default": false
+    }
+  }
+}

@@ -6,7 +6,7 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.8.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.8.2-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.9.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.9.0-6f42c1)](spec/release.json)
 [![Suíte: 261/261](https://img.shields.io/badge/su%C3%ADte-261%2F261-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
@@ -56,7 +56,12 @@ REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.
 · 2 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
 ```
 
-Para levar a um repositório seu, o caminho é o [capítulo 6 do manual](docs/manual/06-adocao-e-ci.md).
+Para usar como comando, biblioteca ou servidor MCP, o mesmo kit sai no PyPI: `pip install kg-ssot` traz os comandos
+`kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
+do pacote. Em JavaScript, `npm install kg-ssot` traz o leitor JS, com o validador pré-compilado que roda também
+no React Native e no Expo. Para um cliente de MCP como o Claude Desktop, o servidor sai também como MCP Bundle
+(`.mcpb`). Para levar o gate a um repositório seu, o caminho é o vendor por tag, no
+[capítulo 6 do manual](docs/manual/06-adocao-e-ci.md).
 
 ## Um nó, por dentro
 
@@ -139,7 +144,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.8.2`. O leitor de referência passa em 261 de 261 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.9.0`. O leitor de referência passa em 261 de 261 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.

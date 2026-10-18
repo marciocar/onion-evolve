@@ -1,4 +1,4 @@
-# KG-SSOT 4.8.2 (tag kg-ssot-v4.8.2): o texto completo para agentes de IA
+# KG-SSOT 4.9.0 (tag kg-ssot-v4.9.0): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,7 +14,7 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.8.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.8.2-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.9.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.9.0-6f42c1)](spec/release.json)
 [![Suíte: 261/261](https://img.shields.io/badge/su%C3%ADte-261%2F261-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
@@ -64,7 +64,12 @@ REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.
 · 2 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
 ```
 
-Para levar a um repositório seu, o caminho é o [capítulo 6 do manual](docs/manual/06-adocao-e-ci.md).
+Para usar como comando, biblioteca ou servidor MCP, o mesmo kit sai no PyPI: `pip install kg-ssot` traz os comandos
+`kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
+do pacote. Em JavaScript, `npm install kg-ssot` traz o leitor JS, com o validador pré-compilado que roda também
+no React Native e no Expo. Para um cliente de MCP como o Claude Desktop, o servidor sai também como MCP Bundle
+(`.mcpb`). Para levar o gate a um repositório seu, o caminho é o vendor por tag, no
+[capítulo 6 do manual](docs/manual/06-adocao-e-ci.md).
 
 ## Um nó, por dentro
 
@@ -147,7 +152,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.8.2`. O leitor de referência passa em 261 de 261 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.9.0`. O leitor de referência passa em 261 de 261 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -212,6 +217,16 @@ A lista está em [`spec/release.json`](spec/release.json):
   HTTP local;
 - o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
 - as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256, que o pip confere ao instalar; o `--require-hashes` faz a instalação falhar se um dia o arquivo perder os hashes);
+- a receita do pacote PyPI (`packaging/python/`): o script de build, o README do cadastro e as ferramentas de build
+  fixadas por hash. O mesmo kit sai no PyPI como `kg-ssot`, para usar como biblioteca, comando ou servidor MCP; para o
+  gate no CI, o vendor por tag continua o canal recomendado;
+- o leitor JS (`tools/runners/ajv/`) e a receita do pacote npm (`packaging/npm/`): o mesmo leitor sai no npm como
+  `kg-ssot`, com o validador do contrato pré-compilado, para Node e React Native/Expo. No vendor, eles viajam como
+  receita: para usar o leitor JS, instale o pacote (`npm install kg-ssot`). Um `npm install` ou um build dentro do
+  vendor deixa arquivos que o `kg_vendor.py check` acusa como sobrando;
+- a receita do MCP Bundle (`packaging/mcpb/`): o servidor MCP de referência empacotado para clientes como o Claude
+  Desktop, que instalam o pacote `kg-ssot` pelo `uv`, e o modelo do `server.json` do MCP Registry
+  (`packaging/mcp-registry/`). Também são receitas no vendor;
 - este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
 - o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
   arquivos da release);
@@ -241,14 +256,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -479,6 +494,13 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.8.2` para a `kg-ssot-v4.9.0`, nenhum veredito muda. Num valor com `\n` no fim, a referência deixa de
+emitir um código redundante: ela passou a casar os regex por inteiro, como o ECMA-262 dos patterns do contrato. O kit passa a sair também no PyPI
+como `kg-ssot`, o leitor JS no npm como `kg-ssot` e o servidor MCP como MCP Bundle (as receitas em `packaging/`
+viajam na release), e os módulos acham o `spec/` ao lado de si no
+pacote instalado ou no diretório pai no vendor. Para quem usa o vendor, nada muda: um `update` basta, e o gate não
+precisa de `--update`.
+
 Da `kg-ssot-v4.8.1` para a `kg-ssot-v4.8.2`, nenhum veredito nem código muda. Só a saída melhora: o veredito do
 `.kg.json` passa a trazer a linha de cada ocorrência, a dica do `integrity.orphan-node` traz o id do nó e a aresta
 que o conserta, a mensagem e a dica do `integrity.verified-before-fact` dizem as duas leituras (vigência futura ou
@@ -521,7 +543,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -594,7 +616,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.8.2** (tag `kg-ssot-v4.8.2`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.9.0** (tag `kg-ssot-v4.9.0`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 
@@ -1201,7 +1223,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.8.2",
+  "release": "kg-ssot-v4.9.0",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -1387,7 +1409,7 @@ julgado no perfil YAML e `.kg.json` no perfil JSON do contrato ([capítulo 3](03
 - `VersionedStore`: a cabeça em disco mais um registro de eventos e as versões no diretório oculto `.kg-store/`,
   sem git.
 
-Para importar do vendor (o kit não é pacote pip), ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem gravar
+Pelo pacote PyPI, é `from kg_ssot import kg_store`. Para importar do vendor, ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem gravar
 bytecode, como no [capítulo 6](06-adocao-e-ci.md#num-app):
 
 ```python
@@ -1634,7 +1656,7 @@ Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsons
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -1700,7 +1722,18 @@ que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a impleme
 [capítulo 8](08-receitas.md#uma-regra-de-negócio-ligada-ao-código)).
 
 - **No CI:** o caminho acima vale para qualquer repo, de qualquer linguagem: o gate só precisa de Python no CI.
-- **Em tempo de execução, em Python:** o kit não é pacote pip. Ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem
+- **Em tempo de execução, em Python, pelo pacote:** desde a 4.9.0 o kit também sai no PyPI como `kg-ssot`
+  (`pip install kg-ssot`), com os módulos em `kg_ssot` e os comandos `kg-validate`, `kg-conformance`, `kg-gate`,
+  `kg-store`, `kg-mcp` e `kg-prov-export`. O contrato e a suíte viajam dentro do pacote:
+
+  ```python
+  from kg_ssot import kg_store
+  store = kg_store.GitStore("/var/lib/meu-app/grafos", init=True)   # fora do repo do app
+  ```
+
+  O pacote é o caminho para o app; para o **gate no CI**, o vendor por tag continua o canal recomendado, porque o
+  contrato que julga o grafo fica no diff do repositório.
+- **Em tempo de execução, em Python, pelo vendor:** ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem
   gravar bytecode, para o `check` do vendor seguir íntegro:
 
   ```python
@@ -1714,7 +1747,22 @@ que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a impleme
   A raiz do armazém fica **fora** do repo do app. Dentro de um repo git, o `DiskStore` e o `VersionedStore`
   recusam a raiz; o `GitStore` com a raiz no próprio repo commita no branch em que ele estiver, fora do PR, e numa
   subpasta do repo cria um repositório git aninhado.
-- **Em outra linguagem:** não há leitor de referência pronto fora do Python. Valide pelo CLI
+- **Em JavaScript (Node, React Native, Expo):** desde a 4.9.0 o leitor JS sai no npm como `kg-ssot`
+  (`npm install kg-ssot`). A entrada não importa nada do Node, e o validador do contrato vem pré-compilado, sem
+  `new Function` nem `eval`, então roda no Hermes. `verdict(texto, { format })` devolve o veredito MUST com os códigos
+  da suíte, e o comando `kg-ssot-validate` julga arquivos. Ele mede só o MUST: os avisos SHOULD, a linha e as dicas
+  ficam com o leitor de referência em Python.
+- **Num cliente de MCP, como o Claude Desktop:** desde a 4.9.0 o servidor MCP de referência também sai como MCP
+  Bundle (`kg-ssot-<versão>.mcpb`). Ele é anexado à release da tag no repositório público depois que o pacote
+  `kg-ssot` da mesma versão sai no PyPI, porque o bundle instala o pacote de lá. Ao instalar, o cliente pergunta o
+  diretório do armazém e se o servidor fica só leitura, e instala o pacote pelo `uv` na sua máquina. O `uv` cria o
+  ambiente dentro da pasta da extensão, travado por um `uv.lock` com o hash de cada dependência. O bundle tem a
+  atestação de proveniência do GitHub (`gh attestation verify kg-ssot-<versão>.mcpb --repo marciocar/kg-ssot`) e
+  aparece no MCP Registry oficial como `io.github.marciocar/kg-ssot`. O armazém é o versionado: cada gravação fica registrada, e o `kg_history` a
+  mostra. Uma pasta dentro de um repositório git usa o git, num repositório aninhado (o repositório de fora passa a
+  vê-la como pasta não rastreada). Quando a pasta não abre, o servidor sobe só com o julgamento.
+  O servidor roda local, por stdio, e não fala com nenhum serviço externo.
+- **Em outra linguagem:** não há leitor pronto além do Python e do JavaScript. Valide pelo CLI
   (`kg_validate.py --format json` devolve o veredito JSON de `spec/verdict.schema.json`) ou por um modelo pelo
   servidor MCP (`kg_mcp.py`); um leitor próprio prova que concorda com o contrato passando na suíte (capítulo 7).
 

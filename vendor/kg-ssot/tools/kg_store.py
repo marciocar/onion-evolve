@@ -53,8 +53,11 @@ import subprocess
 import sys
 
 sys.dont_write_bytecode = True
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import kg_validate  # noqa: E402
+if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
+    from . import kg_validate
+else:  # script ou vendor
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_validate  # noqa: E402
 
 try:
     import fcntl
@@ -67,7 +70,7 @@ META = ".kg-store"
 LOCK = ".kg-store.lock"
 AUTHOR = re.compile(r"[^<>\n\r\x00]+ <[^<>\s\x00]+>")  # fullmatch: o $ casaria antes de um \n final
 SEGMENT_MAX = 200  # bytes por segmento do nome: sobra espaço no NAME_MAX para o arquivo temporário
-VERDICT_SCHEMA = pathlib.Path(__file__).resolve().parent.parent / "spec" / "verdict.schema.json"
+VERDICT_SCHEMA = kg_validate._ROOT / "spec" / "verdict.schema.json"  # ao lado do módulo no pacote, no pai no repo
 _NOFOLLOW = getattr(os, "O_NOFOLLOW", 0)
 _DIRECTORY = getattr(os, "O_DIRECTORY", 0)
 
@@ -512,7 +515,7 @@ class GitStore(DiskStore):
         return self._git("rev-parse", "HEAD").stdout.decode().strip()
 
     def _read_ref(self, name, ref):
-        if not re.match(r"^[0-9a-fA-F]{4,64}$", str(ref)):
+        if not re.fullmatch(r"[0-9a-fA-F]{4,64}", str(ref)):  # fullmatch: o $ aceitaria um \n final
             raise StoreError(f"ref inválida: {ref!r} (um sha de commit)")
         out = self._git("show", f"{ref}:{name}", check=False)
         if out.returncode != 0:

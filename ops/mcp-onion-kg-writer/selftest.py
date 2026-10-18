@@ -104,6 +104,11 @@ _spec.loader.exec_module(real)
 for _k in dir(real):
     if not _k.startswith('__'):
         globals()[_k] = getattr(real, _k)
+# o _ROOT aponta o vendor FALSO (kg-ssot-v4.9.0+): o kg_store.py valida o próprio veredito contra
+# _ROOT/spec/verdict.schema.json, e com o _ROOT real ele lia o schema do vendor de verdade (só a versão 1),
+# recusando o /2 antes da conferência explícita de versão do writer, que o caso existe para exercitar.
+import pathlib as _pl
+_ROOT = _pl.Path(HERE).parent
 
 
 def judge(sources, schema=None, should_schema=None, corpus=None, limit=50):
@@ -141,7 +146,8 @@ def fake_code_root(base):
     tools = os.path.join(fr, 'vendor', 'kg-ssot', 'tools')
     os.makedirs(os.path.join(fr, '.claude', 'validation'))
     os.makedirs(tools)
-    os.makedirs(os.path.join(fr, 'vendor', 'kg-ssot', 'spec'))
+    # o spec/ REAL inteiro (o armazém lê outros schemas pelo mesmo _ROOT); só o verdict.schema.json muda abaixo
+    shutil.copytree(os.path.join(CODE_ROOT, 'vendor', 'kg-ssot', 'spec'), os.path.join(fr, 'vendor', 'kg-ssot', 'spec'))
     with open(os.path.join(fr, '.claude', 'validation', 'kg-radar.sh'), 'w') as fh:
         fh.write('#!/usr/bin/env bash\nexit 0\n')
     real_tools = os.path.join(CODE_ROOT, 'vendor', 'kg-ssot', 'tools')

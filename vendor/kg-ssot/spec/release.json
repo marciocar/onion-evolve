@@ -1,6 +1,6 @@
 {
-  "version": "4.8.2",
-  "tag": "kg-ssot-v4.8.2",
+  "version": "4.9.0",
+  "tag": "kg-ssot-v4.9.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -28,7 +28,17 @@
     "tools/kg_prov_export.py",
     "tools/kg_store.py",
     "tools/kg_mcp.py",
-    "tools/requirements.txt"
+    "tools/requirements.txt",
+    "packaging/python/",
+    "packaging/npm/",
+    "tools/runners/ajv/kg.mjs",
+    "tools/runners/ajv/run.mjs",
+    "tools/runners/ajv/standalone.mjs",
+    "tools/runners/ajv/package.json",
+    "tools/runners/ajv/package-lock.json",
+    "packaging/mcpb/",
+    "packaging/mirror/",
+    "packaging/mcp-registry/"
   ],
   "profiles": {
     "gate": [

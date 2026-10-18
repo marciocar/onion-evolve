@@ -1,0 +1,27 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.marciocar/kg-ssot",
+  "title": "KG-SSOT",
+  "description": "Grafo de conhecimento verificável: julga e grava .kg.yaml e .kg.json pelo contrato do KG-SSOT.",
+  "version": "@VERSION@",
+  "websiteUrl": "https://github.com/marciocar/kg-ssot/tree/main/docs/manual",
+  "repository": {
+    "url": "https://github.com/marciocar/kg-ssot",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "kg-ssot",
+      "version": "@VERSION@",
+      "runtimeHint": "uvx",
+      "transport": {"type": "stdio"}
+    },
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/marciocar/kg-ssot/releases/download/kg-ssot-v@VERSION@/kg-ssot-@VERSION@.mcpb",
+      "fileSha256": "@MCPB_SHA256@",
+      "transport": {"type": "stdio"}
+    }
+  ]
+}
