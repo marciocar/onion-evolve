@@ -1,4 +1,4 @@
-# KG-SSOT 4.8.1 (tag kg-ssot-v4.8.1): o texto completo para agentes de IA
+# KG-SSOT 4.8.2 (tag kg-ssot-v4.8.2): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,7 +14,7 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.8.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.8.1-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.8.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.8.2-6f42c1)](spec/release.json)
 [![Suíte: 261/261](https://img.shields.io/badge/su%C3%ADte-261%2F261-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
@@ -147,7 +147,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.8.1`. O leitor de referência passa em 261 de 261 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.8.2`. O leitor de referência passa em 261 de 261 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -241,14 +241,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -479,6 +479,12 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.8.1` para a `kg-ssot-v4.8.2`, nenhum veredito nem código muda. Só a saída melhora: o veredito do
+`.kg.json` passa a trazer a linha de cada ocorrência, a dica do `integrity.orphan-node` traz o id do nó e a aresta
+que o conserta, a mensagem e a dica do `integrity.verified-before-fact` dizem as duas leituras (vigência futura ou
+datas trocadas), e o `--where` mostra a correção abaixo de cada ocorrência MUST. Um `update` basta, e o gate não
+precisa de `--update`.
+
 **O `.kg.json`.** A 4.8.0 lê o mesmo modelo de dados num arquivo `.kg.json`, por um parser JSON, no perfil JSON do
 contrato: RFC 8259 com um BOM inicial aceito, I-JSON (RFC 7493, sem surrogate solto e com inteiro dentro de
 ±(2^53−1)), no máximo 128 coleções aninhadas e chave única. No `.kg.json`, esses pontos reprovam (MUST).
@@ -515,7 +521,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -588,7 +594,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.8.1** (tag `kg-ssot-v4.8.1`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.8.2** (tag `kg-ssot-v4.8.2`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 
@@ -1158,7 +1164,7 @@ Opções úteis:
 
 | Opção | Efeito |
 |---|---|
-| `--where` | Uma linha por ocorrência, com o nó ou a aresta |
+| `--where` | Uma linha por ocorrência, com o nó ou a aresta; numa ocorrência MUST, a correção vem logo abaixo |
 | `--corpus DIR` | Confere a ponta externa das `external_edges` contra os `.kg.yaml` rastreados pelo git sob `DIR` (fora de um repo git, todos) |
 | `--schema F` | Valida contra outro MUST (o SHOULD vizinho vem junto, se existir) |
 | `--format json` | O veredito estruturado em stdout (ver abaixo), para ferramentas e servidores MCP |
@@ -1195,7 +1201,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.8.1",
+  "release": "kg-ssot-v4.8.2",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -1226,8 +1232,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
 
 - **O que é estável:** `code` é o vocabulário da suíte e do gate, e é por ele que uma ferramenta decide. `message` e
   `hint` são texto para pessoas e podem mudar.
-- **O lugar da ocorrência:** `path` aponta no documento (`nodes[7].provenance.method`) e `line` é a linha do YAML,
-  para quem edita corrigir o ponto certo sem reescrever o grafo.
+- **O lugar da ocorrência:** `path` aponta no documento (`nodes[7].provenance.method`) e `line` é a linha no arquivo,
+  no `.kg.yaml` e no `.kg.json`, para quem edita corrigir o ponto certo sem reescrever o grafo.
 - **O corte:** `summary` conta todas as ocorrências. `occurrences` traz até `--limit`, e `truncated` e `total` dizem
   se cortou. Assim um grafo grande não enche o contexto de um modelo.
 - **O contrato que julgou:** `contract` traz o caminho, o sha256 de cada schema e a release, para quem precisa provar
@@ -1628,7 +1634,7 @@ Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsons
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.2 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -2069,7 +2075,7 @@ Rode `kg_validate.py --where <arquivo>` primeiro: ele diz o código e o nó.
 | `form.required.node.<campo>` | Falta um dos sete campos obrigatórios | Acrescente o campo |
 | `form.enum.node.<campo>` | Valor fora da lista (`node_type`, `plane`, `status`) | Veja as listas no [capítulo 3](03-formato.md) |
 | `form.pattern.node.verified_at` | Data em formato errado ou que não existe no calendário | `AAAA-MM-DD`, entre aspas |
-| `integrity.orphan-node` | Um nó sem nenhuma aresta | Ligue-o a outro nó, ou tire-o |
+| `integrity.orphan-node` | Um nó sem nenhuma aresta | Todo nó precisa de pelo menos uma aresta: em `edges`, `from:` o id dele, `to:` o id de outro nó e o `edge_type` da relação (`TRACES_TO`, `SUPPORTS`, `DEPENDS_ON`...). Sem relação, tire o nó. O `--where` mostra a correção com o id |
 | `integrity.dangling-to` · `-from` · `-trigger` · `-on` | A aresta (ou o gatilho dela) aponta para um id que não existe | Corrija o id, ou crie o nó |
 | `integrity.duplicate-id` | Dois nós com o mesmo id | Renomeie um |
 | `integrity.dangling-external-local` | A ponta local de uma `external_edges` não existe neste arquivo | Corrija o id |
@@ -2096,6 +2102,7 @@ A lista completa, com a forma de cada código, está em
 | `form.required.node.verified_against` | Diga o que foi conferido no `verified_at` |
 | `form.required.node.verified_at` | Nó PROD sem `verified_at`: carimbe a última conferência |
 | `integrity.untraced-decision` | Dê origem à decisão: `trace`, `provenance` ou uma aresta `TRACES_TO` |
+| `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`. Se o fato tem vigência futura (uma norma lida antes de entrar em vigor), o aviso é esperado e pode ficar na linha de base do gate. Se não, as datas estão trocadas: `valid_from` é quando o fato passou a valer, e `verified_at`, quando foi conferido |
 | `integrity.testimony-in-prod` | Meça e troque a classe para `medição`, ou aceite o risco visível |
 
 ## O gate
@@ -3051,7 +3058,7 @@ de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos d
                 "code": {"type": "string", "pattern": "^(parse|form|integrity|yaml)\\.[A-Za-z0-9_.-]+$"},
                 "place": {"type": "string", "description": "o lugar legível: 'nó X', 'aresta #3 (A -> B)', 'meta', 'topo' ou 'arquivo'"},
                 "path": {"type": "string", "description": "o caminho no documento, como nodes[7].provenance.method; vazio quando é o arquivo inteiro"},
-                "line": {"type": ["integer", "null"], "minimum": 1, "description": "a linha do YAML (contando de 1) do ponto mais fundo do caminho que existe; null quando o YAML não compõe"},
+                "line": {"type": ["integer", "null"], "minimum": 1, "description": "a linha (contando de 1) do ponto mais fundo do caminho que existe: no objeto ou mapa, a linha da chave; na lista, o início do item. Vale para o .kg.yaml e, desde a 4.8.2, para o .kg.json; null quando o documento não varre, quando a ocorrência não tem caminho (a chave desconhecida no topo, por exemplo) e no erro de parse sem marca"},
                 "message": {"type": "string", "description": "a frase em pt-BR para pessoas; pode mudar entre versões"},
                 "hint": {"type": "string", "description": "a correção canônica, quando o código tem uma"}
               }

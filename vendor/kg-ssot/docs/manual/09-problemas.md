@@ -14,7 +14,7 @@ Rode `kg_validate.py --where <arquivo>` primeiro: ele diz o código e o nó.
 | `form.required.node.<campo>` | Falta um dos sete campos obrigatórios | Acrescente o campo |
 | `form.enum.node.<campo>` | Valor fora da lista (`node_type`, `plane`, `status`) | Veja as listas no [capítulo 3](03-formato.md) |
 | `form.pattern.node.verified_at` | Data em formato errado ou que não existe no calendário | `AAAA-MM-DD`, entre aspas |
-| `integrity.orphan-node` | Um nó sem nenhuma aresta | Ligue-o a outro nó, ou tire-o |
+| `integrity.orphan-node` | Um nó sem nenhuma aresta | Todo nó precisa de pelo menos uma aresta: em `edges`, `from:` o id dele, `to:` o id de outro nó e o `edge_type` da relação (`TRACES_TO`, `SUPPORTS`, `DEPENDS_ON`...). Sem relação, tire o nó. O `--where` mostra a correção com o id |
 | `integrity.dangling-to` · `-from` · `-trigger` · `-on` | A aresta (ou o gatilho dela) aponta para um id que não existe | Corrija o id, ou crie o nó |
 | `integrity.duplicate-id` | Dois nós com o mesmo id | Renomeie um |
 | `integrity.dangling-external-local` | A ponta local de uma `external_edges` não existe neste arquivo | Corrija o id |
@@ -41,6 +41,7 @@ A lista completa, com a forma de cada código, está em
 | `form.required.node.verified_against` | Diga o que foi conferido no `verified_at` |
 | `form.required.node.verified_at` | Nó PROD sem `verified_at`: carimbe a última conferência |
 | `integrity.untraced-decision` | Dê origem à decisão: `trace`, `provenance` ou uma aresta `TRACES_TO` |
+| `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`. Se o fato tem vigência futura (uma norma lida antes de entrar em vigor), o aviso é esperado e pode ficar na linha de base do gate. Se não, as datas estão trocadas: `valid_from` é quando o fato passou a valer, e `verified_at`, quando foi conferido |
 | `integrity.testimony-in-prod` | Meça e troque a classe para `medição`, ou aceite o risco visível |
 
 ## O gate

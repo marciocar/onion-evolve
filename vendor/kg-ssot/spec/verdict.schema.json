@@ -56,7 +56,7 @@
                 "code": {"type": "string", "pattern": "^(parse|form|integrity|yaml)\\.[A-Za-z0-9_.-]+$"},
                 "place": {"type": "string", "description": "o lugar legível: 'nó X', 'aresta #3 (A -> B)', 'meta', 'topo' ou 'arquivo'"},
                 "path": {"type": "string", "description": "o caminho no documento, como nodes[7].provenance.method; vazio quando é o arquivo inteiro"},
-                "line": {"type": ["integer", "null"], "minimum": 1, "description": "a linha do YAML (contando de 1) do ponto mais fundo do caminho que existe; null quando o YAML não compõe"},
+                "line": {"type": ["integer", "null"], "minimum": 1, "description": "a linha (contando de 1) do ponto mais fundo do caminho que existe: no objeto ou mapa, a linha da chave; na lista, o início do item. Vale para o .kg.yaml e, desde a 4.8.2, para o .kg.json; null quando o documento não varre, quando a ocorrência não tem caminho (a chave desconhecida no topo, por exemplo) e no erro de parse sem marca"},
                 "message": {"type": "string", "description": "a frase em pt-BR para pessoas; pode mudar entre versões"},
                 "hint": {"type": "string", "description": "a correção canônica, quando o código tem uma"}
               }
