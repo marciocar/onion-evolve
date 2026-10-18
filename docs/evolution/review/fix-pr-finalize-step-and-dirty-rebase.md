@@ -2,11 +2,11 @@
 title: 'Resíduo — o pr-finalize nomeia a etapa e o rc da rodada que para, e o --rebase aceita índice sujo'
 date: 2026-10-18
 branch: fix/pr-finalize-step-and-dirty-rebase
-reviewed_diff_sha256: fe6b5a40616966ad013c5d28361d6136e1de72b159d26a02bc408ca778ea30cd
-reviewed_code_sha256: d201e04ca3d3d84ad63efb0ab3642debd42188b820951cbac05f8aa5e8200edb
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
+reviewed_diff_sha256: 4f5605769a9a8d2e738681e57cb50655ddae353b6754d230c5f14402987017f9
+reviewed_code_sha256: 586a478933d74dc4ca30f5597771b2627a1abed6b1d8f94ca67e2374b33d0760
+findings_total: 4
+findings_real: 4
+findings_fixed: 4
 tokens: 0
 duration_min: 75
 verdict: CORRIGIDO
@@ -30,8 +30,16 @@ nota: >-
   ONION_PREPUSH_PREFLIGHT no pre-push, que só vale sob ONION_PREPUSH_TEST=1, e a bancada aponta um stub.
   Bancada pre_push: 58/58, com os casos (dr), (st) e (sig), cada um com o seu mutante. A catraca de locale
   pegou um [^»] meu no (sig) e foi corrigida. As famílias vizinhas (preflight_*, hook_regen_table,
-  shell_pipefail_robustness) passam verdes. Grafo: Q_PR_FINALIZE_MELHORIAS passa a done. Confirmed do
-  grafo editado, todos vistos: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA, E_HOOK_PR_SEM_PASSADA_CURADO,
+  shell_pipefail_robustness) passam verdes. Grafo: Q_PR_FINALIZE_MELHORIAS passa a done.
+  (4) ACHADO DO CI, curado: a 1ª versão deste PR deixou a faixa 2 calada 14 min até o timeout. O caso
+  "worktree do commit empurrado + 0 HARD", que é antigo, e o caso do "eater" chamavam o hook sem stub. O
+  pré-voo rodava a pre_push (o diff a muda), ela chamava o hook, e de novo, SEM FIM: medido na VPS, 24
+  processos aninhados. O meu "58/58" local só passava pelo cache do pré-voo. Duas curas: o stub agora é
+  EXPORTADO no início da família, e vale para as chamadas diretas; e uma guarda de classe no
+  preflight-run.sh, que não roda aninhado dentro de outro pré-voo (ONION_IN_PREFLIGHT, repassada pelo
+  env -i). Medido depois: pre_push em 67 s, 58/58, zero órfãos. Num clone descartável com tudo
+  commitado, o caminho antigo termina em 64 s com o pré-voo 61/61 (antes, timeout).
+  Confirmed do grafo editado, todos vistos: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA, E_HOOK_PR_SEM_PASSADA_CURADO,
   E_MAPA_SEM_MERGE_ONION_HOOKS, E_DOIS_LEITORES_DIVERGIAM, E_NARRATIVA_NO_ROTULO_VAZA_GABARITO,
   E_RADAR_CEGO_A_TIPO_TROCADO, E_CANAL_VIVO_ENTRE_SESSOES_USADO, E_MERGE_GATE_INERTE_NO_ADOTANTE,
   E_SKILL_CORE_ONLY_VIAJOU, D_PAPEL_DUAS_DIMENSOES, E_PR_FINALIZE_ATRITO_MEDIDO,

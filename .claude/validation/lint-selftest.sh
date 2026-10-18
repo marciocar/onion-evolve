@@ -11253,6 +11253,11 @@ run_pre_push_selftests() {
   # passaria pelo motivo errado. Guardado e retirado antes; devolvido no fim dos casos de marcador.
   local mk; mk="$(git -C "${REPO_ROOT}" rev-parse --git-common-dir)/onion-prefinalize-ok"
   local had=""; [ -f "${mk}" ] && had="$(cat "${mk}")"; rm -f "${mk}"
+  # PRÉ-VOO HERMÉTICO em TODO caso (2026-10-18): o do checkout vivo julga o diff DESTE PR, e num PR que mexe
+  # nesta família ela rodava dentro de si mesma SEM FIM (medido: a faixa 2 do CI calada 14 min até o timeout,
+  # e uma árvore local de 24 processos de pré-voo aninhados). O ponto de teste só vale sob ONION_PREPUSH_TEST=1.
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/pfok.sh"
+  export ONION_PREPUSH_PREFLIGHT="${d}/pfok.sh"   # EXPORTADO: vale também para as chamadas diretas ao hook
   _pp() {  # <env> <sha> [remote] [url] [ref] → rc do hook
     local rc=0
     printf '%s %s %s %s\n' "${5:-refs/heads/x}" "$2" "${5:-refs/heads/x}" "${Z}" | (cd "${REPO_ROOT}" && env ONION_PREPUSH_TEST=1 $1 bash "${hook}" "${3:-origin}" "${4:-u}" >/dev/null 2>&1) || rc=$?
@@ -11263,8 +11268,7 @@ run_pre_push_selftests() {
     if [ "${got}" = "$2" ]; then record_pass "pre-push: $1 (rc=$2)"
     else record_fail "pre-push: $1" "esperava rc=$2, veio rc=${got}"; fi
   }
-  printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/pfok.sh"   # pré-voo hermético: o do checkout vivo julgaria o diff DESTE PR
-  local W="ONION_PREPUSH_PR=9 ONION_PREPUSH_NO_WORKTREE=1 ONION_PREPUSH_PREFLIGHT=${d}/pfok.sh"
+  local W="ONION_PREPUSH_PR=9 ONION_PREPUSH_NO_WORKTREE=1"
   _ppc "PR aberto + lint com HARD → RECUSA"                 1 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
   _ppc "PR aberto + rc 0 mas HARD=2 → RECUSA (lê o número)"  1 "${W} ONION_PREPUSH_LINT=${d}/liar.sh" "${S}"
   _ppc "PR aberto + 0 HARD → passa"                          0 "${W} ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
@@ -11664,6 +11668,7 @@ PYM
     else record_fail "pr-finalize: SAC-66 (4) --check com HARD" "estado mudou ou sem a recusa: $(tr '\n' ' ' < "${sb}/out" | cut -c1-200)"; fi
     g="$(_pfn "${sb}" --check --push)"; _pfc "SAC-66 (4): --check com --push → recusa" 1 "${g}" "${sb}"
   fi
+  unset ONION_PREPUSH_PREFLIGHT
 }
 
 # ---------------------------------------------------------------------------

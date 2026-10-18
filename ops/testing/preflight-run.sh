@@ -23,6 +23,15 @@
 # Bancada: run_preflight_families_selftests e run_machine_slots_selftests (g).
 # =============================================================================
 set -uo pipefail
+# PRÉ-VOO ANINHADO NÃO RODA (2026-10-18): a bancada exercita o pre-push e o pr-finalize, e os dois chamam este
+# pré-voo; quando o diff do PR muda uma dessas famílias, o pré-voo a rodava, ela chamava o pré-voo de novo, e
+# assim SEM FIM (medido: a faixa 2 do CI calada 14 min até o timeout, 24 processos aninhados na VPS). O pré-voo
+# de fora já julga o diff; o de dentro só repetiria o mesmo julgamento. Sai 0 dizendo isso.
+if [ -n "${ONION_IN_PREFLIGHT:-}" ]; then
+  echo "pré-voo aninhado (dentro de outro pré-voo): pulado — o de fora julga este diff" >&2
+  exit 0
+fi
+export ONION_IN_PREFLIGHT=1   # e o `env -i` abaixo a repassa: sem isso a bancada de dentro não a veria
 
 [ -f ops/testing/preflight-families.sh ] || { echo "preflight-run: ops/testing/preflight-families.sh ausente" >&2; exit 2; }
 fams="$(bash ops/testing/preflight-families.sh)" || { echo "preflight-run: não descobri as famílias alteradas" >&2; exit 2; }
@@ -44,7 +53,7 @@ else
   echo "pré-voo no ambiente do runner — famílias: ${fams} (a completa é do CI; ONION_SELFTEST_FULL=1 a pede aqui)"
 fi
 home="$(mktemp -d)"; printf '[user]\n\tuseConfigOnly = true\n' > "${home}/.gitconfig"
-out="$(env -i PATH="${PATH}" HOME="${home}" GIT_CONFIG_NOSYSTEM=1 LC_ALL=C TERM=dumb \
+out="$(env -i PATH="${PATH}" HOME="${home}" GIT_CONFIG_NOSYSTEM=1 LC_ALL=C TERM=dumb ONION_IN_PREFLIGHT=1 \
   bash .claude/validation/lint-selftest.sh ${sel[@]+"${sel[@]}"} 2>&1)"; rc=$?
 rm -rf "${home}"
 if [ "${rc}" != 0 ] || grep -q 'ABORTOU' <<< "${out}"; then
