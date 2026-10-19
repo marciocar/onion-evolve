@@ -153,7 +153,7 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole superby; 
   if [ -z "${live}" ] && [ -n "${clone}" ] && [ -n "${branch}" ]; then
     _ref=""
     if git -C "${clone}" rev-parse --verify --quiet "refs/remotes/origin/${branch}" >/dev/null; then _ref="origin/${branch}"; src="clone(origin/${branch})"
-    elif ! git -C "${clone}" remote | grep -q .; then _ref="${branch}"; src="clone-local(sem remoto)"; fi
+    elif ! grep -q . <<< "$(git -C "${clone}" remote)"; then _ref="${branch}"; src="clone-local(sem remoto)"; fi
     if [ -n "${_ref}" ]; then
       _st="$(git -C "${clone}" show "${_ref}:.claude/.onion-version" 2>/dev/null || true)"
       live="$(printf '%s\n' "${_st}" | _stamp_pin)"

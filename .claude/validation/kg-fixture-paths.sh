@@ -32,7 +32,7 @@ set -uo pipefail
 #   __snapshots__/       — snapshots de teste (nunca conhecimento)
 KG_FIXTURE_RE='(^|/)(__)?fixtures?(__)?/|(^|/)testdata/|(^|/)__snapshots__/'
 
-kg_is_fixture() { printf '%s\n' "$1" | grep -qE "${KG_FIXTURE_RE}"; }
+kg_is_fixture() { grep -qE "${KG_FIXTURE_RE}" <<< "$1"; }
 
 # MATERIAL DIDÁTICO (2026-10-06, sinal de campo de um adotante): `docs/materials/` guarda grafos de EXEMPLO,
 # com dados fictícios (o example-domain: churn de 8% contra 3%), para ensinar adotante frio. Não é

@@ -1300,7 +1300,7 @@ _rule_glob_matches() { # $1=glob
       *)                                           # '**/*.kg.yaml' → '*.kg.yaml', procurado SOB o prefixo
         _hit="$(find "${root}" ${_depth} -name "${pat}" -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
     esac
-    [ -n "${_hit}" ] && return 0                   # sem pipe: `find | grep -q` é a corrida EPIPE de sempre
+    [ -n "${_hit}" ] && return 0                   # sem pipe: find seguido de grep -q é a corrida EPIPE de sempre
   done <<< "${_alts_ng}"
   return 1
 }
@@ -1727,8 +1727,8 @@ check_capability_conformance() {
         [ -n "${r}" ] || continue
         ty="${r%%:*}"; va="${r#*:}"; ok=0
         case "${ty}" in
-          agent)      find "${REPO_ROOT}/.claude/agents" -name "${va}.md" 2>/dev/null | grep -q . && ok=1 ;;
-          command)    find "${REPO_ROOT}/.claude/commands" -name "${va}.md" 2>/dev/null | grep -q . && ok=1 ;;
+          agent)      grep -q . <<< "$(find "${REPO_ROOT}/.claude/agents" -name "${va}.md" 2>/dev/null)" && ok=1 ;;
+          command)    grep -q . <<< "$(find "${REPO_ROOT}/.claude/commands" -name "${va}.md" 2>/dev/null)" && ok=1 ;;
           skill)      [ -d "${REPO_ROOT}/.claude/skills/${va}" ] && ok=1 ;;
           validation) [ -f "${REPO_ROOT}/.claude/validation/${va}" ] && ok=1 ;;
           util)       [ -d "${REPO_ROOT}/.claude/utils/${va}" ] && ok=1 ;;
@@ -3447,7 +3447,7 @@ check_inventory_total_drift() {
 # ===========================================================================
 check_frontmatter_scalar_colon() {
   while IFS= read -r -d '' f; do
-    head -1 "${f}" | grep -q '^---$' || continue   # só arquivos com bloco de frontmatter
+    grep -q '^---$' <<< "$(head -1 "${f}")" || continue   # só arquivos com bloco de frontmatter
     awk '
       NR==1 && $0=="---" { infm=1; next }
       infm && $0=="---"  { exit }

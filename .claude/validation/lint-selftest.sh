@@ -1985,13 +1985,13 @@ run_kg_freshness_selftests() {
   # (m) ESCOPO — nó com verdict OK ENTRA na fila. É a decisão que carrega o fluxo: o caso que
   # o motivou (C_ancestor_cap_zeroes_floors, no grafo do M2) tem carimbo do dia, alvo declarado,
   # os três vereditos passam — e mente. Filtrar por flagado nasceria cego ao caso fundador.
-  if printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_ANCORADA" && $11=="OK"' | grep -q . \
-     && printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_AFIRMA" && $11=="UNANCHORED"' | grep -q .; then
+  if grep -q . <<< "$(printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_ANCORADA" && $11=="OK"')" \
+     && grep -q . <<< "$(printf '%s\n' "${tsv}" | awk -F'\t' '$1=="C_AFIRMA" && $11=="UNANCHORED"')"; then
     record_pass "kg-freshness: (m) a fila inclui nó com verdict OK (escopo ≠ 'o que o radar flagou')"
   else record_fail "kg-freshness: (m) escopo da fila" "C_ANCORADA(OK) e/ou C_AFIRMA(UNANCHORED) ausentes"; fi
 
   # (n) o que é HISTÓRIA fica fora — mesmo racional do FRESCOR humano.
-  if ! printf '%s\n' "${tsv}" | awk -F'\t' '$4=="superseded" || $4=="refuted"' | grep -q .; then
+  if ! grep -q . <<< "$(printf '%s\n' "${tsv}" | awk -F'\t' '$4=="superseded" || $4=="refuted"')"; then
     record_pass "kg-freshness: (n) superseded/refuted fora da fila (história não se re-verifica)"
   else record_fail "kg-freshness: (n) exclusão de história" "nó reconciliado apareceu na fila"; fi
 
@@ -2972,7 +2972,7 @@ run_rules_registry_selftests() {
 
   # (e) SEVERIDADE = corpo ∪ tag — guarda de severidade dinâmica + tag declarada → HARD + SOFT
   printf '# REGRA 29 — dinamica [HARD + SOFT]\n# previne: z\ncheck_d() {\n  violation "${sev}" "x" "y"\n  violation "SOFT" "b" "c"\n}\n' > "${tmp}/sev.sh"
-  if RULES_LINT_SRC="${tmp}/sev.sh" bash "${gen}" 2>/dev/null | grep -qE '^\| 29 \|.*HARD \+ SOFT'; then
+  if grep -qE '^\| 29 \|.*HARD \+ SOFT' <<< "$(RULES_LINT_SRC="${tmp}/sev.sh" bash "${gen}" 2>/dev/null)"; then
     record_pass "rules-registry: (e) severidade = corpo ∪ tag (dinâmica declarada vira HARD + SOFT)"
   else record_fail "rules-registry: (e)" "união corpo∪tag não produziu HARD + SOFT"; fi
 
@@ -6514,7 +6514,7 @@ run_vendor_branch_selftests() {
   _vb_core "$core" 3
   local rc=0; bash "${helper}" update "$t" "$core" "$(git -C "$core" rev-parse --short=12 HEAD)" "$ib" >/dev/null 2>&1 || rc=$?
   if [ "$rc" -eq 10 ] && grep -q CUSTOMIZADO "$t/.claude/commands/foo.md" \
-     && git -C "$t" diff --name-only --diff-filter=U 2>/dev/null | grep -q foo.md; then
+     && grep -q foo.md <<< "$(git -C "$t" diff --name-only --diff-filter=U 2>/dev/null)"; then
     record_pass "vendor-branch: customização local → CONFLITO (exit 10), não clobada"
   else record_fail "vendor-branch: conflito" "exit=$rc ou customização clobada/sem conflito"; fi
   git -C "$t" merge --abort 2>/dev/null || true
@@ -6882,8 +6882,8 @@ run_compose_settings_selftests() {
   else record_fail "compose-settings: determinismo" "composição varia entre execuções"; fi
   # --provenance é alias de --show-scope (formato novo: <scope>\t<path>=<valor> + sobreposição)
   local TAB=$'\t'
-  if bash "${helper}" --provenance "$d/fw.json" "$d/person.json" 2>/dev/null \
-       | grep -qxF "person.json${TAB}theme=\"light\"${TAB}# sobrepõe: fw.json"; then
+  if grep -qxF "person.json${TAB}theme=\"light\"${TAB}# sobrepõe: fw.json" \
+       <<< "$(bash "${helper}" --provenance "$d/fw.json" "$d/person.json" 2>/dev/null)"; then
     record_pass "compose-settings: proveniência (theme ← person sobrepõe fw)"
   else record_fail "compose-settings: proveniência" "proveniência incorreta"; fi
   printf '%s' '{bad' > "$d/bad.json"
@@ -7693,7 +7693,7 @@ run_research_workflow_selftests() {
     grep -q "^export const meta = {" "${wf}" && grep -q "name: 'onion-research'" "${wf}" && record_pass "research-workflow: (b) meta literal com name onion-research" || record_fail "research-workflow: (b)" "meta ausente/alterado"
     rm -rf "${d}"
   fi
-  if awk '/^---$/{c++; next} c==1' "${sk}" | grep -q "^description:"; then record_pass "research-workflow: (c) SKILL.md tem description (auto-ativação)"
+  if grep -q "^description:" <<< "$(awk '/^---$/{c++; next} c==1' "${sk}")"; then record_pass "research-workflow: (c) SKILL.md tem description (auto-ativação)"
   else record_fail "research-workflow: (c)" "SKILL.md sem description no frontmatter"; fi
   grep -q "argument-hint" "${sk}" && record_fail "research-workflow: (d)" "argument-hint não é aceito em SKILL.md (2.1.258)" || record_pass "research-workflow: (d) SKILL.md sem chave proibida argument-hint"
   grep -q "MODE === 'decision'" "${wf}" && grep -q "const ELENXO_SCHEMA" "${wf}" && grep -q "kind: { enum: \['finding', 'discarded-by-evidence', 'discarded-by-comodismo'\] }" "${wf}" \
@@ -7890,7 +7890,7 @@ run_research_lens_selftests() {
     record_pass "research-lens: (f) kg-corpus-grep acha por termo no label e conta o corpus"
   else record_fail "research-lens: (f)" "rc=${rc}: ${out:0:200}"; fi
   out="$(ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch 2>&1)"
-  if ! grep -q "C_Z" <<< "${out}"&& ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch --all-status 2>&1 | grep -q "C_Z"; then
+  if ! grep -q "C_Z" <<< "${out}"&& grep -q "C_Z" <<< "$(ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch --all-status 2>&1)"; then
     record_pass "research-lens: (g) superseded escondido por default, visível com --all-status"
   else record_fail "research-lens: (g)" "filtro de status errado: ${out:0:200}"; fi
   rc=0; ONION_KG_CORPUS_FILES= ONION_KG_CORPUS_ROOT="${d}/vazio" bash "${cg}" x >/dev/null 2>&1 || rc=$?
@@ -12223,7 +12223,7 @@ run_mail_receiver_selftests() {
   if [ -z "$(bash "${helper}" --repo "$t" 2>&1)" ]; then record_pass "mail-receiver: dedup (mesmo conjunto → silencioso)"
   else record_fail "mail-receiver: dedup" "não deduplicou"; fi
   printf 'y' > "$t/docs/evolution/inbound/b.md"
-  if printf '%s' "$(bash "${helper}" --repo "$t" 2>&1)" | grep -q '2 não-lido'; then
+  if grep -q '2 não-lido' <<< "$(bash "${helper}" --repo "$t" 2>&1)"; then
     record_pass "mail-receiver: conjunto novo → acorda de novo"
   else record_fail "mail-receiver: novo" "não reacordou no conjunto novo"; fi
   rm -f "$t/.claude/sessions/.mail-receiver.state"
@@ -12246,7 +12246,7 @@ run_detect_transport_selftests() {
   if [ "$(FEDERATION_TRANSPORT=local bash "${helper}" x 2>/dev/null)" = "local" ]; then record_pass "detect-transport: env=local → local"
   else record_fail "detect-transport: local" "env=local não resolveu"; fi
   if [ "$(FEDERATION_TRANSPORT=a2a-live bash "${helper}" x 2>/dev/null)" = "a2a-live" ] \
-     && FEDERATION_TRANSPORT=a2a-live bash "${helper}" x 2>&1 >/dev/null | grep -qi gated; then
+     && grep -qi gated <<< "$(FEDERATION_TRANSPORT=a2a-live bash "${helper}" x 2>&1 >/dev/null)"; then
     record_pass "detect-transport: a2a-live explícito → a2a-live + avisa GATED (stub)"
   else record_fail "detect-transport: a2a-live" "não é a2a-live ou não avisou gated"; fi
   if [ "$(FEDERATION_TRANSPORT=auto bash "${helper}" __fantasma__ 2>/dev/null)" = "git-async" ]; then
@@ -15226,9 +15226,13 @@ run_empty_result_guard_selftests() {
   #       segundo `trap ... EXIT` a substituiu (bash guarda UM handler por sinal). Re-armar sem
   #       asserção deixa o próximo `trap` — ou um helper `source`ado — desarmá-la de novo em silêncio.
   #       Esta checagem roda EM RUNTIME e pega inclusive clobber vindo de arquivo externo.
-  if trap -p EXIT 2>/dev/null | grep -q '_bench_on_exit'; then
+  # `trap -p` direto em arquivo, no shell CORRENTE: dentro de $(...) a bancada não enxerga o handler do
+  # pai (medido em 2026-10-19, na onda 2 do EPIPE), e o pipe antigo era a classe que a onda cura.
+  local _tpf; _tpf="$(mktemp)"; trap -p EXIT > "${_tpf}" 2>/dev/null
+  if grep -q '_bench_on_exit' "${_tpf}"; then
     record_pass "empty-result-guard: (b5c) o handler de EXIT ainda é o combinado — a guarda de abort NÃO está muda"
   else record_fail "empty-result-guard: (b5c)" "INVARIANTE VIOLADA: o handler de EXIT foi substituído — a guarda de abort está MUDA e um abort passaria como '666 verdes'"; fi
+  rm -f "${_tpf}"
 
   # (b3) CALA na CURA — o idioma do colchete. Sem este caso a regra poderia ser "acusa sempre que
   #      vir pgrep", que empurraria quem obedece para o bypass (a lição da REGRA 56, que puniu
@@ -21231,8 +21235,8 @@ run_capability_selftests() {
   done
 
   # (b) resolução: agente real resolve, bogus não
-  if find "${REPO_ROOT}/.claude/agents" -name "soc2-specialist.md" 2>/dev/null | grep -q . \
-     && ! find "${REPO_ROOT}/.claude/agents" -name "__nao_existe__.md" 2>/dev/null | grep -q .; then
+  if grep -q . <<< "$(find "${REPO_ROOT}/.claude/agents" -name "soc2-specialist.md" 2>/dev/null)" \
+     && ! grep -q . <<< "$(find "${REPO_ROOT}/.claude/agents" -name "__nao_existe__.md" 2>/dev/null)"; then
     record_pass "capability: resolução de REQUIRES acerta presente/ausente"
   else record_fail "capability: resolução" "primitiva de resolução incorreta"; fi
 
@@ -21289,8 +21293,7 @@ run_capability_selftests() {
     local nc_out
     nc_out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${SANDBOX}/.claude/utils/marketplace/./verticals/selftest-noncanon-probe.manifest.sh" 2>&1)" || true
     rm -f "${nc_dst}"
-    if printf '%s
-' "${nc_out}" | grep -q "mas só cumpre"; then
+    if grep -q "mas só cumpre" <<< "${nc_out}"; then
       record_pass "only-gate: --only não-canônico (/./) mantém a R20 detectando (inode-compare vivo)"
     else
       record_fail "only-gate: --only não-canônico" "R20 ficou cega a path com /./ — o -ef regrediu para string-compare?"
@@ -21348,7 +21351,7 @@ run_graph_selftests() {
     record_fail "graph: yaml_list" "função yaml_list não encontrada em graph.sh"
   fi
   # (b) regressão nos dados reais: nenhum nó de template no grafo
-  if bash "${gen}" --triples 2>/dev/null | grep -qE 'agente-[0-9]|comando-[0-9]|autonomy:'; then
+  if grep -qE 'agente-[0-9]|comando-[0-9]|autonomy:' <<< "$(bash "${gen}" --triples 2>/dev/null)"; then
     record_fail "graph: sem ruído de template" "triplas contêm placeholders (agente-N/comando-N/autonomy:)"
   else record_pass "graph: triplas sem ruído de template (placeholders de exemplos)"; fi
 
@@ -21375,7 +21378,7 @@ run_graph_selftests() {
     record_pass "graph: atores+comunicação presentes (maestro/assistant/onion)"
   else record_fail "graph: atores" "arestas de ator/comunicação ausentes — triplas=$(_emit "${T}" | grep -c .) · 1as: [$(_emit "${T}" | head -3 | tr '\n\t' '| ' | cut -c1-160)] · stderr: [$(bash "${gen}" --triples 2>&1 >/dev/null | head -2 | tr '\n' '|' | cut -c1-160)] (intermitente 1/15 em paralelo, 2026-09-03)"; fi
 
-  if bash "${gen}" --impact design-system-specialist 2>/dev/null | grep -q "onion-design"; then
+  if grep -q "onion-design" <<< "$(bash "${gen}" --impact design-system-specialist 2>/dev/null)"; then
     record_pass "graph: --impact retorna dependentes reais"
   else record_fail "graph: --impact" "impacto reverso não achou dependente conhecido"; fi
 
@@ -22191,7 +22194,7 @@ run_onion_version_selftests() {
   printf 'framework: onion\nsource_commit: abc123\nrole: adopted\n' > "${d}/.claude/.onion-version"
   out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
   if [ "${out}" = "role: adopted" ] \
-     && ! bash "${d}/.claude/validation/onion-version.sh" | grep -qE '^role: (source|hub)'; then
+     && ! grep -qE '^role: (source|hub)' <<< "$(bash "${d}/.claude/validation/onion-version.sh")"; then
     record_pass "onion-version: stamp adopted → gate do adopt REJEITA (FED-3-1 vivo)"
   else record_fail "onion-version: stamp adopted" "gate deveria rejeitar adopted; veio '${out}'"; fi
 
@@ -22205,7 +22208,7 @@ run_onion_version_selftests() {
   printf 'framework: acme-adopter\nsource_commit: abc123\nrole: hub\n' > "${d}/.claude/.onion-version"
   out="$(bash "${d}/.claude/validation/onion-version.sh" | grep '^role:' || true)"
   if [ "${out}" = "role: hub" ] \
-     && bash "${d}/.claude/validation/onion-version.sh" | grep -qE '^role: (source|hub)'; then
+     && grep -qE '^role: (source|hub)' <<< "$(bash "${d}/.claude/validation/onion-version.sh")"; then
     record_pass "onion-version: stamp hub → gate do adopt ACEITA (Camada 2 aberta)"
   else record_fail "onion-version: stamp hub" "gate deveria aceitar hub; veio '${out}'"; fi
   rm -rf "${d}"
@@ -22276,7 +22279,7 @@ _prov_run() {
   rm -f "${tf}"
 }
 
-_prov_has() { printf '%s\n' "$1" | grep -qE "^$2	$3	$4	"; }
+_prov_has() { grep -qE "^$2	$3	$4	" <<< "$1"; }
 
 # NOME: run_kg_COVERAGE_selftests, não run_kg_provenance_selftests. Colisão real
 # (2026-07-20→21): esta função nasceu com o mesmo nome da guarda do modo --provenance
@@ -22597,7 +22600,7 @@ _df_run() {
   _DF_OUT="$(cat "${tf}")"; rm -f "${tf}"
 }
 
-_df_has() { printf '%s\n' "$1" | grep -qE "^$2"$'\t'"$3"$'\t'"$4"$'\t'; }
+_df_has() { grep -qE "^$2"$'\t'"$3"$'\t'"$4"$'\t' <<< "$1"; }
 
 run_doctrine_freshness_selftests() {
   local h="${REPO_ROOT}/.claude/validation/doctrine-freshness.sh"
@@ -22753,7 +22756,7 @@ run_doctrine_freshness_selftests() {
   # =========================================================================
   # BLOCO F — (P2 reforço) prova ESTRUTURAL: o helper NÃO faz rede (CI-safe by construction)
   # =========================================================================
-  if grep -vE '^[[:space:]]*#' "${h}" | grep -qE 'curl|wget|/dev/tcp|nc |WebFetch|ntpstat.*http'; then
+  if grep -qE 'curl|wget|/dev/tcp|nc |WebFetch|ntpstat.*http' <<< "$(grep -vE '^[[:space:]]*#' "${h}")"; then
     record_fail "doctrine: (P2) no-network" "o helper contém chamada de rede fora de comentário — não é CI-safe"
   else
     record_pass "doctrine: (P2) CI-SAFE por construção — nenhuma chamada de rede no corpo do helper (só o repo decide)"
@@ -23533,7 +23536,7 @@ run_session_beacon_selftests() {
     # dele carrega "claude" — senão não é o cenário que o bug exigia
     out="$(sed 's/.*) //' "/proc/${child_pid}/stat" 2>/dev/null | awk '{print $2}' || true)"
     if [ -n "${child_pid}" ] && [ "${out}" = "1" ] \
-       && tr '\0' ' ' < "/proc/${child_pid}/cmdline" 2>/dev/null | grep -q 'claude'; then
+       && grep -q 'claude' <<< "$(tr '\0' ' ' < "/proc/${child_pid}/cmdline" 2>/dev/null)"; then
       ONION_BEACON_OWNER_PID="${child_pid}" bash "${sb}" up "${d}" "sess-sonda"
       if ! grep -q '^owner_pid:' "${d}/.claude/beacons/sess-sonda.beacon"; then
         record_pass "session-beacon: sonda REJEITA processo não-claude com 'claude' no cmdline (comm/argv0 decidem)"
@@ -26167,7 +26170,7 @@ PYI
   else record_fail "selftest-lanes: (p) --report altera contagem" "sem=[$(tr '\n' '|' <<< "${sem}")] com=[$(tr '\n' '|' <<< "${com}")]"; fi
   # (q) o TOTAL do TSV é a SOMA das linhas de família — um relatório cuja aritmética não fecha é
   #     pior que relatório nenhum: ele parece medição.
-  if [ -f "${rep}" ] && head -1 "${rep}" | grep -q '^familia'; then
+  if [ -f "${rep}" ] && grep -q '^familia' <<< "$(head -1 "${rep}")"; then
     local somap totp
     somap="$(awk -F'\t' '$1!="familia" && $1!="TOTAL" && $1!="FAIL" && $1!="SKIP" {s+=$2} END{print s+0}' "${rep}")"
     totp="$(awk -F'\t' '$1=="TOTAL"{print $2+0}' "${rep}")"
@@ -27022,14 +27025,14 @@ run_model_ladder_selftests() {
   else record_fail "model-ladder: (a) piso/picker" "rc=${rc}: $(head -c 120 "${d}/err")"; fi
   # (b) piso por fallback ⇒ permite, ladder=degraded, aviso no stderr
   rc="$(_sw claude-fable-5-1 claude-sonnet-5 sonnet fallback)"
-  if [ "${rc}" = 0 ] && tail -1 "${d}/log.jsonl" | grep -q '"decision":"allow","ladder":"degraded"' && grep -q "DEGRADADA" "${d}/err"; then
+  if [ "${rc}" = 0 ] && grep -q '"decision":"allow","ladder":"degraded"' <<< "$(tail -1 "${d}/log.jsonl")" && grep -q "DEGRADADA" "${d}/err"; then
     record_pass "model-ladder: (b) piso por fallback ⇒ permite com ladder=degraded e aviso"
   else record_fail "model-ladder: (b) piso/fallback" "rc=${rc}; $(tail -1 "${d}/log.jsonl" | cut -c1-160)"; fi
   # (c) aviso de degradação a cada prompt enquanto degradado; silêncio após restored
   out="$(printf '{"session_id":"sess-1","hook_event_name":"UserPromptSubmit","prompt":"x"}' | ONION_MODEL_SWITCH_LOG="${d}/log.jsonl" CLAUDE_PROJECT_DIR="${d}" CLAUDE_CODE_SESSION_ID=sess-1 bash "${nt}" 2>&1 || true)"
   rc="$(_sw claude-sonnet-5 claude-fable-5-1 fable picker)"
   local out2; out2="$(printf '{"session_id":"sess-1","hook_event_name":"UserPromptSubmit","prompt":"x"}' | ONION_MODEL_SWITCH_LOG="${d}/log.jsonl" CLAUDE_PROJECT_DIR="${d}" CLAUDE_CODE_SESSION_ID=sess-1 bash "${nt}" 2>&1 || true)"
-  if grep -q "DEGRADADA na escada" <<< "${out}"&& grep -q "claude-sonnet-5" <<< "${out}"&& [ -z "${out2}" ] && [ "${rc}" = 0 ] && tail -1 "${d}/log.jsonl" | grep -q '"ladder":"restored"'; then
+  if grep -q "DEGRADADA na escada" <<< "${out}"&& grep -q "claude-sonnet-5" <<< "${out}"&& [ -z "${out2}" ] && [ "${rc}" = 0 ] && grep -q '"ladder":"restored"' <<< "$(tail -1 "${d}/log.jsonl")"; then
     record_pass "model-ladder: (c) aviso a cada prompt enquanto degradado; volta ao primário ⇒ ladder=restored e silêncio"
   else record_fail "model-ladder: (c) aviso" "out='${out:0:80}' out2='${out2:0:40}' rc=${rc}"; fi
   # (d) fora da escada pelo picker ⇒ VETO (o 1+3 continua)
@@ -28196,7 +28199,7 @@ run_realign_selftests() {
     if [ "${_nn}" = "${_sn}" ] && [ "${_nn}" -gt 0 ] 2>/dev/null; then
       record_pass "realign: --status-tsv lista TODOS os ${_nn} nós (inclusive atenção zero)"
     else record_fail "realign: --status-tsv incompleto" "arquivo tem ${_nn} nós, o feed devolveu ${_sn} — a cura do superador morto vira no-op"; fi
-    if bash "${_rad}" "${_fm}" --status-tsv 2>/dev/null | grep -q "Q_SUPERADOR_QUE_CAIU$(printf '\t')refuted"; then
+    if grep -q "Q_SUPERADOR_QUE_CAIU$(printf '\t')refuted" <<< "$(bash "${_rad}" "${_fm}" --status-tsv 2>/dev/null)"; then
       record_pass "realign: --status-tsv traz o status do nó REFUTADO (o que o freshness-tsv omite)"
     else record_fail "realign: --status-tsv sem o refutado" "o feed não traz o superador morto — foi assim que a 1ª cura ficou muda"; fi
   fi
@@ -28538,8 +28541,8 @@ m=lambda n,r: {"node_id":n,"kg_file":sys.argv[2],"verdict":"DRIFTED","realidade"
 json.dump({"run_id":"wf_fixture","medidos":[m("N_GATED","GATED"),m("N_MORTO","MORTO-CANDIDATO")],"juizo":{},"nao_medidos_por_teto":[],"parametros":{}},open(sys.argv[1],'w'))
 PY
   rc=0; out="$(ONION_CENSUS_ROOT="$d" python3 "${seal}" seal "$d/c.json" 2>&1)" || rc=$?
-  if [ $rc -eq 0 ] && grep -qE 'to: N_GATED\n?' "$d/$g" && awk '/to: N_GATED/{getline; print}' "$d/$g" | grep -q CONSTRAINS \
-     && awk '/to: N_MORTO/{getline; print}' "$d/$g" | grep -q SUPERSEDES; then
+  if [ $rc -eq 0 ] && grep -qE 'to: N_GATED\n?' "$d/$g" && grep -q CONSTRAINS <<< "$(awk '/to: N_GATED/{getline; print}' "$d/$g")" \
+     && grep -q SUPERSEDES <<< "$(awk '/to: N_MORTO/{getline; print}' "$d/$g")"; then
     record_pass "census-seal: (d) DRIFTED+GATED vira CONSTRAINS (alvo segue open) e DRIFTED+MORTO vira SUPERSEDES"
   else record_fail "census-seal: (d)" "aresta pela realidade nao aplicada (rc=$rc): $out $(grep -A1 'to: N_' "$d/$g")"; fi
   # (v3) o que o censo ESCREVE nasce no contrato v3 (2026-10-08, SAC-71): partindo de um grafo conforme,
@@ -28791,7 +28794,7 @@ run_backlog_projection_selftests() {
   #     O script pina `export LC_ALL=C`; este caso prova que a pinagem sobrevive ao chamador.
   local loc found_alt=""
   for loc in en_US.utf8 en_US.UTF-8 C.utf8; do
-    if locale -a 2>/dev/null | grep -qx "${loc}"; then found_alt="${loc}"; break; fi
+    if grep -qx "${loc}" <<< "$(locale -a 2>/dev/null)"; then found_alt="${loc}"; break; fi
   done
   if [ -n "${found_alt}" ]; then
     ( cd "${sb}" && LC_ALL="${found_alt}" bash .claude/validation/kg-backlog-project.sh --markdown > "${sb}/loc.out" 2>/dev/null )
@@ -34917,7 +34920,7 @@ run_zoho_adapter_selftests() {
   # Por isso o caso agora cobra o ANINHAMENTO — a convenção que a §1 do adapter já declarava e que
   # eu não apliquei a mim. Guarda que canoniza a conclusão da semana passada é pior que guarda nenhuma.
   local _sec_sub; _sec_sub="$(_zoho_sec 'createSubtask')"
-  if grep -qF '"parental_info":{"parent_task_id"' <<< "$(printf '%s' "${_sec_sub}")" && grep -qF 'depth' <<< "${_sec_sub}"; then
+  if grep -qF '"parental_info":{"parent_task_id"' <<< "${_sec_sub}" && grep -qF 'depth' <<< "${_sec_sub}"; then
     record_pass "zoho-adapter: (f) createSubtask usa o vínculo ANINHADO parental_info, com a evidência (depth 1 / has_subtasks)"
   else record_fail "zoho-adapter: (f)" "a seção do createSubtask não mostra \`{\"parental_info\":{\"parent_task_id\":…}}\` nem a evidência medida (filha depth 1, pai has_subtasks true) — as formas PLANAS dão 400 e já produziram DUAS conclusões erradas neste arquivo"; fi
 

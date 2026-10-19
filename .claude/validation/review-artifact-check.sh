@@ -176,7 +176,7 @@ fi
 # SÓ quando o diff é EXCLUSIVAMENTE o workflow. Antes bastava TOCAR o arquivo: medido, um PR de 52
 # arquivos com uma linha nele saía integralmente isento — buraco que não exige má-fé.
 if [ -z "$(git diff --name-only "${BASE}" HEAD 2>/dev/null | grep -vx '.github/workflows/onion-review.yml' | head -1)" ] \
-   && git diff --name-only "${BASE}" HEAD 2>/dev/null | grep -qx '.github/workflows/onion-review.yml'; then
+   && grep -qx '.github/workflows/onion-review.yml' <<< "$(git diff --name-only "${BASE}" HEAD 2>/dev/null)"; then
   _skip "PR-edita-o-proprio-revisor(ovo-galinha)"
   [ "${FORMAT}" = tsv ] || printf '  ⊘ fora de escopo: %s\n' "${SKIPS}"
   exit 0

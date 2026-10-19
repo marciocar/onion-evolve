@@ -83,7 +83,7 @@ _scan() {
   # Medido 2026-09-14: sob C, `[[:alnum:]]` casa BYTE, então `PoC Banví` virava o candidato `Ita` —
   # e tolerar `Ita` no baseline passa a tolerar `Itamar`/`Itaipu` no mesmo arquivo, que é catraca
   # furada. Nome comercial brasileiro tem acento; a guarda tem de ler caractere, não byte.
-  local _LC=C.UTF-8; locale -a 2>/dev/null | grep -qix 'C.utf-\?8' || _LC=en_US.UTF-8
+  local _LC=C.UTF-8; grep -qix 'C.utf-\?8' <<< "$(locale -a 2>/dev/null)" || _LC=en_US.UTF-8
   # entidade HTML, URL e operador de shell NÃO são nome de empresa — e o `docs/sdaal/index.html`
   # sozinho traria centenas de `&quot;` se isto faltasse.
   # O PRÓPRIO BASELINE está sob .claude/validation e, portanto, dentro da superfície varrida — sem
