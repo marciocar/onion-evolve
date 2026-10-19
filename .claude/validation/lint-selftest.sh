@@ -10778,10 +10778,10 @@ run_stt_service_selftests() {
   [ -f "${helper}" ] || { record_fail "stt-service" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
   local d; d="$(mktemp -d)"
   # ── (a) o harness do núcleo e do smoke ──
-  local want_total=41 o rc
+  local want_total=44 o rc
   if o="$(LC_ALL=C python3 -I -B "${st}/selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} FAIL 0$" <<< "${o}"; then
-    record_pass "stt-service: (a) núcleo e prova do verify — ${want_total} casos (token, 401, 413, palavras, formas, smoke que reprova)"
+    record_pass "stt-service: (a) núcleo e prova do verify — ${want_total} casos (token, credencial do systemd, 401, 413, palavras, formas, smoke que reprova)"
   else record_fail "stt-service: (a) harness" "rc=${rc}: $(grep -E '^(FAIL|TOTAL)' <<< "${o}" | head -4 | tr '\n' '|')"; fi
   # ── (m) um mutante por caso: alvo<TAB>âncora<TAB>novo<TAB>caso ──
   local tgt old new want n mo mrc
@@ -10797,12 +10797,14 @@ run_stt_service_selftests() {
     else record_fail "stt-service: (m) ${want}" "o mutante SOBREVIVEU (rc=${mrc}): $(tail -2 <<< "${mo}" | tr '\n' '|')"; fi
   done <<EOF_MUT
 stt_core.py$(printf '\x1f')    if scheme.lower() not in AUTH_SCHEMES:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')esquema-estranho-recusa
+stt_core.py$(printf '\x1f')        mask = 0o037$(printf '\x1f')        mask = 0o000  # ONION_MUTANTE$(printf '\x1f')load-token-credencial-0444-recusa
+stt_core.py$(printf '\x1f')    if cred_dir and os.path.dirname(os.path.abspath(path)) == os.path.abspath(cred_dir) and st.st_uid in (0, os.geteuid()):$(printf '\x1f')    if True:  # ONION_MUTANTE$(printf '\x1f')load-token-0440-fora-da-credencial-recusa
 stt_core.py$(printf '\x1f')    return hmac.compare_digest(cred.encode("utf-8", "surrogateescape"), token)$(printf '\x1f')    return True  # ONION_MUTANTE$(printf '\x1f')token-errado-recusa
 stt_core.py$(printf '\x1f')            if not authorized(_header(scope, b"authorization"), self.token):$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')authgate-401-sem-token
 stt_core.py$(printf '\x1f')PROTECTED_PREFIX = "/v1/"$(printf '\x1f')PROTECTED_PREFIX = "/nada/"  # ONION_MUTANTE$(printf '\x1f')authgate-401-token-errado
 stt_core.py$(printf '\x1f')                if scope["type"] == "websocket":$(printf '\x1f')                if False:  # ONION_MUTANTE$(printf '\x1f')authgate-ws-fecha-sem-token
 stt_core.py$(printf '\x1f')            raise ConfigError("AuthGate sem token")$(printf '\x1f')            pass  # ONION_MUTANTE$(printf '\x1f')authgate-recusa-construir-sem-token
-stt_core.py$(printf '\x1f')    if st.st_mode & 0o077:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')load-token-modo-aberto-recusa
+stt_core.py$(printf '\x1f')    if st.st_mode & mask:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')load-token-modo-aberto-recusa
 stt_core.py$(printf '\x1f')    if len(tok) < TOKEN_MIN_LEN:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')load-token-curto-recusa
 stt_core.py$(printf '\x1f')    if not re.fullmatch(rb"[A-Za-z0-9._~+/=-]+", tok):$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')load-token-alfabeto-recusa
 stt_core.py$(printf '\x1f')            if n < 0 or n > self.max_bytes:$(printf '\x1f')            if n > self.max_bytes:  # ONION_MUTANTE$(printf '\x1f')bodylimit-content-length-invalido-413

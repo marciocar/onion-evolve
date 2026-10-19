@@ -186,6 +186,34 @@ try:
         _, p = tokfile(TOK, 0o644)
         return refused(p), "token 0644 aceito"
 
+    def in_creddir(d, fn):
+        old = os.environ.get("CREDENTIALS_DIRECTORY")
+        os.environ["CREDENTIALS_DIRECTORY"] = d
+        try:
+            return fn()
+        finally:
+            if old is None:
+                os.environ.pop("CREDENTIALS_DIRECTORY", None)
+            else:
+                os.environ["CREDENTIALS_DIRECTORY"] = old
+
+    @case("load-token-credencial-systemd-0440-ok")
+    def _():
+        d, p = tokfile(TOK, 0o440)
+        return in_creddir(d, lambda: core.load_token(p) == TOK), "credencial 0440 do systemd recusada"
+
+    @case("load-token-credencial-0444-recusa")
+    def _():
+        d, p = tokfile(TOK, 0o444)
+        return in_creddir(d, lambda: refused(p)), "credencial legível por outros aceita"
+
+    @case("load-token-0440-fora-da-credencial-recusa")
+    def _():
+        d, p = tokfile(TOK, 0o440)
+        other = tempfile.mkdtemp()
+        TMPDIRS.append(other)
+        return in_creddir(other, lambda: refused(p)) and refused(p), "0440 fora do diretório de credenciais aceito"
+
     @case("load-token-symlink-recusa")
     def _():
         d, p = tokfile(TOK, 0o600)
