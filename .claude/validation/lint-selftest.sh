@@ -10833,6 +10833,19 @@ EOF_MUT
   # ── (w) o wrapper em modo de teste, com falsos no PATH ──
   local fk="${d}/fake" W
   mkdir -p "${fk}" "${d}/wops"
+  # python3 falso: só a sonda de versão do wrapper responde como a máquina-alvo (3.12, o que o lock fixa); o resto vai ao
+  # interpretador real. Sem ele a bancada media a versão do RUNNER, não o wrapper: o ubuntu 26.04 do CI não traz 3.12 e
+  # (w4)..(w16) caíam todos na recusa de versão. O (w22) prova que a recusa morde.
+  local py_real; py_real="$(command -v python3)"
+  cat > "${fk}/python3" <<EOF_PY
+#!/bin/sh
+if [ "\$1" = -c ] && case "\$2" in *"sys.version_info[:2] == (3, 12)"*) true ;; *) false ;; esac; then
+  [ -e "\${STT_FAKE}/pyver-bad" ] && exit 1
+  exit 0
+fi
+exec "${py_real}" "\$@"
+EOF_PY
+  chmod +x "${fk}/python3"
   cat > "${fk}/systemctl" <<'EOF'
 #!/bin/sh
 F="$STT_FAKE"
@@ -11008,6 +11021,10 @@ PY
   _p_portother() { printf 'LISTEN 0 128 127.0.0.1:8765 0.0.0.0:* users:(("nc",pid=999,fd=3))\n' > "${d}/run/fk/ss"; sed -i 's/^MainPID=.*/MainPID=0/' "${d}/run/fk/show"; }
   _stcase "(w7) a porta é de outro processo → rc 1" 1 'ocupada por outro processo' \
     '    || die 1 "a porta ${PORT} está ocupada por outro processo: ${occ}"' '    || true  # ONION_MUTANTE' _p_portother install
+  # (w22) a máquina sem 3.12 é recusada (o python3 falso responde à sonda como 3.13)
+  _p_pyver() { _p_free; : > "${d}/run/fk/pyver-bad"; }
+  _stcase "(w22) python3 que não é 3.12 → rc 1 (o lock fixa rodas cp312)" 1 'python3 não é 3.12' \
+    '  || die 1 "python3 não é 3.12: o requirements.lock fixa rodas cp312 (refaça o lock para a versão nova)"' '  || true  # ONION_MUTANTE' _p_pyver install
   # (w8..w14) o verify
   _stcase "(w8) verify do serviço saudável → rc 0" 0 'verify OK' \
     '  [ "${vrc}" = 0 ] || return "${vrc}"' '  return 1  # ONION_MUTANTE' _p_live verify
@@ -11134,7 +11151,7 @@ PY
         if state["inflight"] >= a.queue_max:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-fila-cheia-429
 EOF_SMUT
   fi
-  unset -f _st_hfjson _st_reset _st_env _st_install_rendered _st_stage_all _stcase _st_post_ok _p_none _p_live _p_free _p_hfbad \
+  unset -f _st_hfjson _st_reset _st_env _st_install_rendered _st_stage_all _stcase _st_post_ok _p_none _p_live _p_free _p_pyver _p_hfbad \
     _p_pypibad _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap _p_halfdeny _p_reload _st_ast
   rm -rf "${d}"
 }
