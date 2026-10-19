@@ -14,6 +14,21 @@
 #               citado que não está na fila (inexistente ou já fechado) vira AVISO nomeado.
 #   thread      worktrees do repo com arquivo não commitado ou commit não empurrado (ou prunable)
 #   triage      itens de 1º nível em docs/evolution/{inbox,inbound,kg-inbox} (fora README e `_*`)
+#   merge alheio  com --foreign-repo <dono/nome> (repetível): os PRs abertos DAQUELE repo, que a sessão
+#               não mergeia (a trava de merge veta `gh pr merge`, inclusive com -R) — é do maestro com `!`
+#   access      o gh que falha por CREDENCIAL vira linha, não só aviso: o conserto é um login interativo
+#
+# ── QUEM EXECUTA (coluna actor, pedido do maestro em 2026-10-19) ─────────────────────────────
+# Cada linha diz QUEM faz o ato seguinte e o comando pronto (coluna action). A classe só é dada onde a
+# medição a PROVA; o resto é pista declarada:
+#   faço-eu        a sessão executa (selo, checkpoint, merge pelo caminho verificado, prune, triagem);
+#                  a pergunta oferece "Eu faço agora"
+#   maestro-com-!  só roda com o prefixo `!` no prompt do maestro: o veto (exit 2) barra a sessão e o
+#                  `!` não passa por ele (merge de PR de outro repo)
+#   maestro-fora   precisa do que a sessão não tem: TTY, navegador, segredo, corpo (o `gh auth login`)
+#   outro-dono     a worktree de OUTRA sessão ou agente (I3): não se toca, confere-se o dono
+# A coluna hint, só nas linhas seal, copia LITERALMENTE o trecho do nó com forma de ato manual (sudo,
+# `!`, "fora da sessão", "só o maestro", login, MOAT): pista para a sessão ler o nó, nunca classe.
 #
 # ── DESCOBERTA POR REFERÊNCIA (cláusula 1 da forja) ─────────────────────────────────────────
 # O corpus não é varrido por palavra-chave "parece decisão": o nó entra porque o texto CITA o id dele,
@@ -29,6 +44,7 @@
 #
 # Uso:  bash .claude/validation/decide-census.sh [<repo>] [--markdown|--tsv] [--cite <arquivo|->]
 #                                               [--theme "<termos>"] [--window <dias>] [--no-gh]
+#                                               [--foreign-repo <dono/nome>]...
 # Env (bancada e sandbox; NUNCA para fingir medição — todo override ativo é declarado na saída):
 #   DECIDE_TODAY=<AAAA-MM-DD>   data de referência da janela (default: date +%F)
 #   DECIDE_GH=<binário>         o `gh` a usar (default: gh)
@@ -39,7 +55,7 @@
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_decide_selftests).
 # ===========================================================================
 set -uo pipefail
-REPO=""; FMT="--markdown"; CITE=""; THEME=""; WINDOW="7"; NOGH="0"
+REPO=""; FMT="--markdown"; CITE=""; THEME=""; WINDOW="7"; NOGH="0"; FOREIGN=""
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "decide-census: $1 exige um valor" >&2; exit 2; }; }   # rc 2, nunca o 1 do ${:?}
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -48,6 +64,11 @@ while [ $# -gt 0 ]; do
     --theme) _need "$@"; shift; THEME="$1" ;;
     --window) _need "$@"; shift; WINDOW="$1" ;;
     --no-gh) NOGH="1" ;;
+    --foreign-repo) _need "$@"; shift
+      # dono/nome, sem `-` inicial (viraria flag dentro do card), sem `..`; repetido entra uma vez
+      LC_ALL=C grep -qE '^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9._-]+$' <<< "$1" && ! LC_ALL=C grep -q '\.\.' <<< "$1" \
+        || { echo "decide-census: --foreign-repo exige dono/nome (${1})" >&2; exit 2; }
+      case " ${FOREIGN} " in *" $1 "*) ;; *) FOREIGN="${FOREIGN}${FOREIGN:+ }$1" ;; esac ;;
     --*) echo "decide-census: opção desconhecida: $1" >&2; exit 2 ;;
     *) REPO="$1" ;;
   esac
@@ -76,9 +97,9 @@ TODAY="${DECIDE_TODAY:-$(date +%F)}"
 GH="${DECIDE_GH:-gh}"
 
 PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${FMT}" "${CITE}" "${CITE_LABEL}" "${THEME}" "${WINDOW}" \
-  "${NOGH}" "${TODAY}" "${TOP}" "${GH}" "${OVR}" <<'PY'
+  "${NOGH}" "${TODAY}" "${TOP}" "${GH}" "${OVR}" "${FOREIGN}" <<'PY'
 import sys, os, re, json, subprocess, datetime
-repo, fmt, cite, cite_label, theme, window, nogh, today, top, gh, ovr = sys.argv[1:12]
+repo, fmt, cite, cite_label, theme, window, nogh, today, top, gh, ovr, foreign = sys.argv[1:13]
 window, top = int(window), int(top)
 try:
     import yaml
@@ -134,7 +155,8 @@ for g in graphs:
             ln = next((i + 1 for i, l in enumerate(txt.split('\n')) if re.match(r'^\s+(x_)?drive_checkpoint\s*:', l)), 0)
             note = meta.get('x_drive_checkpoint_note', meta.get('drive_checkpoint_note')) or '(sem nota)'
             checkpoints.append({'kind': 'checkpoint', 'ref': g, 'origin': f'{g}:{ln}', 'label': clip(note, 220),
-                                'state': 'pending', 'via': 'meta', 'options': ''})
+                                'state': 'pending', 'via': 'meta', 'options': '', 'actor': 'faço-eu',
+                                'action': f'depois do "selar": `bash .claude/validation/kg-drive-project.sh {g} --seal`'})
     # quem CHEGA por aresta a cada nó: as opções às vezes vivem como NÓS vizinhos (C_OPCAO_* → D_ por SUPPORTS),
     # não como trecho da prosa — medido na forja: 4 das 159 decisões abertas, e o padrão fixo sobre a prosa não as
     # via (o dogfood selou uma cópia de D_UNIDADE_BILHETAVEL_DO_ONION enxergando 4 das 6 opções).
@@ -262,6 +284,19 @@ def options_of(n):
             if '?' in sent and re.search(r'\bou\b', sent): found.append(clip(sent, 160))
     return found   # sem teto: corte de trecho é corte silencioso (a 1ª versão parava em 4 e escondia (e) e (f))
 
+# trechos com forma de ATO MANUAL: cópia literal com vizinhança, padrão fixo. Pista, nunca classe: o nó diz
+# "do maestro (MOAT)" tanto quando o ato é um `!` quanto quando é uma decisão; a sessão lê o nó e decide o card.
+MANUAL_PAT = re.compile(r'(?i)\bsudo\b|com `!`|`!` no prompt|fora da sess[ãa]o|gh auth login|pass insert|login interativo'
+                        r'|\bTTY\b|do maestro \(MOAT\)|s[óo] o maestro|merge do maestro|maestro roda')
+def manual_of(n):
+    text = n['label'] + ' ' + n['narrative']
+    found = []
+    for m in MANUAL_PAT.finditer(text):
+        a, b = max(0, m.start() - 60), min(len(text), m.end() + 60)
+        s = ('…' if a else '') + one(text[a:b]) + ('…' if b < len(text) else '')
+        if not any(m.group(0) in f for f in found): found.append(s)
+    return found
+
 seal_rows = []
 for n in open_nodes:
     via = []
@@ -274,47 +309,136 @@ for n in open_nodes:
     seal_rows.append({'kind': 'seal', 'ref': n['id'], 'origin': f"{n['graph']}:{n['line']}", 'label': clip(n['label'], 220),
                       'state': f"{n['type']} impacto {n['impact']}", 'via': ','.join(via),
                       'options': ' ⟂ '.join(opts), 'pri': pri, 'imp': n['impact'],
-                      'incoming': ' · '.join(n['incoming'])})
+                      'incoming': ' · '.join(n['incoming']), 'actor': 'faço-eu',
+                      'action': f"depois da resposta: `bash .claude/validation/kg-decide-seal.sh {n['graph']} {n['id']} --chosen \"…\" --rejected \"…\" --date {today} --question \"…\"`",
+                      'hint': ' ⟂ '.join(manual_of(n))})
 
 # ── PRs abertos (gh) — falha é AVISO NOMEADO ────────────────────────────────────────────────
+# Falha por CREDENCIAL vira também uma linha `access` (maestro-fora): o conserto é um login interativo,
+# que a sessão não tem como fazer (sem TTY nem navegador). Forma medida em 2026-10-19 com uma credencial
+# inválida: "HTTP 401: Bad credentials … Try authenticating with:  gh auth login -h github.com".
+AUTH_PAT = re.compile(r'(?i)gh auth login|HTTP 401|bad credentials|not logged in|authentication required')
+VERIFIED = 'ops/pr-merge-verified.sh'   # (core-only): o caminho verificado de merge do core; o adotante não o tem
+_rcv, _ls = git('ls-files', '--', VERIFIED)
+has_verified = bool(_ls.strip()) and os.path.isfile(os.path.join(repo, VERIFIED))
+access_rows = []
+def gh_prs(target):
+    """→ (lista de PRs, motivo da falha). target '' = este repo; senão dono/nome."""
+    cmd = [gh, 'pr', 'list', '--state', 'open', '--limit', '100', '--json', 'number,title,headRefName,isDraft,statusCheckRollup']
+    if target: cmd += ['-R', target]
+    try:
+        r = subprocess.run(cmd, cwd=repo, capture_output=True, text=True, timeout=45)
+        if r.returncode != 0:
+            err = r.stderr or r.stdout
+            if AUTH_PAT.search(err) and not access_rows:
+                envtok = [k for k in ('GH_TOKEN', 'GITHUB_TOKEN') if os.environ.get(k)]
+                fix = (f'a credencial vem de {"/".join(envtok)} no AMBIENTE, que vence o login guardado: troque ou remova a variável onde o Claude Code é lançado (`.env`, perfil do shell) e reabra a sessão · conferir: `gh auth status`'
+                       if envtok else
+                       'num terminal FORA da sessão (é interativo, com código no navegador): `gh auth login -h github.com` · conferir: `gh auth status`')
+                access_rows.append({'kind': 'access', 'ref': 'gh-auth', 'origin': target or 'este repo',
+                                    'label': f'o gh não autentica: {clip(err, 140)}', 'state': 'sem credencial', 'via': 'gh',
+                                    'options': '', 'pri': 1, 'imp': 0, 'actor': 'maestro-fora',
+                                    'action': fix + ' · depois a sessão re-mede (`/meta:decide`)'})
+            return None, f'rc {r.returncode}: {clip(err, 160)}'
+        prs = json.loads(r.stdout or 'null')
+        if not isinstance(prs, list): return None, 'resposta não é lista JSON'
+        return prs, ''
+    except FileNotFoundError: return None, f'binário ausente ({gh})'
+    except subprocess.TimeoutExpired: return None, 'timeout de 45 s'
+    except ValueError as e: return None, f'JSON ilegível: {clip(e, 120)}'
+BAD = {'FAILURE', 'CANCELLED', 'TIMED_OUT', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'ERROR'}
+def checks_of(p):
+    ok = fail = pend = 0; fails = []
+    for c in p.get('statusCheckRollup') or []:
+        concl = (c.get('conclusion') or '').upper(); st = (c.get('status') or '').upper(); state = (c.get('state') or '').upper()
+        if concl in BAD or state in BAD: fail += 1; fails.append(c.get('name') or c.get('context') or '?')
+        elif (st and st != 'COMPLETED') or state in ('PENDING', 'EXPECTED'): pend += 1
+        else: ok += 1
+    st = f'checks {ok} ok · {fail} falha · {pend} em curso' + (f' (falha: {", ".join(fails[:3])}{"…" if len(fails) > 3 else ""})' if fails else '')
+    if p.get('isDraft'): st = 'rascunho · ' + st
+    return ok, fail, pend, st
+_mm = {}
+def merge_method(target):
+    """o que o repo ACEITA (gh repo view; target '' = este) → {'--rebase','--squash','--merge'}; ilegível → None."""
+    if target in _mm: return _mm[target]
+    try:
+        r = subprocess.run([gh, 'repo', 'view', *([target] if target else []), '--json', 'squashMergeAllowed,rebaseMergeAllowed,mergeCommitAllowed'],
+                           cwd=repo, capture_output=True, text=True, timeout=45)
+        d = json.loads(r.stdout or 'null') if r.returncode == 0 else None
+    except (FileNotFoundError, subprocess.TimeoutExpired, ValueError): d = None
+    _mm[target] = None if not isinstance(d, dict) else {f for k, f in (('rebaseMergeAllowed', '--rebase'), ('squashMergeAllowed', '--squash'), ('mergeCommitAllowed', '--merge')) if d.get(k) is True}
+    return _mm[target]
+# O PR de UPDATE de adotante (/meta:adopt --update: chore/onion-update-<pin>, ou a adoção onion/adopt) traz um
+# merge real com onion/vendor; rebase e squash o linearizam e o update seguinte conflita em falso (medido em
+# 2026-10-08 num adotante). Ele é merge commit. Os outros seguem a ordem da casa (rebase, squash, merge), e o
+# card DIZ que o método foi inferido: o medidor não conhece a convenção do repo alheio.
+UPDATE_HEAD = re.compile(r'^(chore/onion-update-|onion/(adopt|vendor)$)')
+def merge_flag(target, head):
+    allowed = merge_method(target)
+    if UPDATE_HEAD.match(head or ''):
+        if allowed is None or '--merge' in allowed: return '--merge', ' (PR de update do Onion: merge commit, para a onion/vendor seguir ancestral da main)'
+        return '', ' (PR de update do Onion e o repo NÃO aceita merge commit: rebase ou squash quebram o próximo update — resolva no forge antes)'
+    if allowed is None: return '--rebase', ' (método NÃO medido: confira com `gh repo view' + (f' {target}' if target else '') + ' --json squashMergeAllowed,rebaseMergeAllowed,mergeCommitAllowed`)'
+    for f in ('--rebase', '--squash', '--merge'):
+        if f in allowed: return f, (f' (inferido: o 1º que o repo aceita na ordem rebase, squash, merge; aceita {len(allowed)})' if len(allowed) > 1 else '')
+    return '', ' (o repo não aceita nenhum método pela API: confira no forge)'
+
 merge_rows = []; pr_desc = ''
 if nogh == '1':
     avisos.append('PRs NÃO medidos (--no-gh): "nenhum PR" aqui não quer dizer zero PRs'); pr_desc = 'NÃO MEDIDOS (--no-gh)'
+    if foreign.split(): avisos.append(f'--foreign-repo ignorado por --no-gh: {foreign}')
 else:
-    why = ''
-    try:
-        r = subprocess.run([gh, 'pr', 'list', '--state', 'open', '--limit', '100', '--json',
-                            'number,title,headRefName,isDraft,statusCheckRollup'],
-                           cwd=repo, capture_output=True, text=True, timeout=45)
-        if r.returncode != 0: why = f'rc {r.returncode}: {clip(r.stderr or r.stdout, 160)}'
-        else:
-            prs = json.loads(r.stdout or 'null')
-            if not isinstance(prs, list): why = 'resposta não é lista JSON'
-    except FileNotFoundError: why = f'binário ausente ({gh})'
-    except subprocess.TimeoutExpired: why = 'timeout de 45 s'
-    except ValueError as e: why = f'JSON ilegível: {clip(e, 120)}'
+    prs, why = gh_prs('')
     if why:
         avisos.append(f'gh indisponível — PRs abertos e CI NÃO medidos ({why}); a ausência de linhas merge NÃO é zero PRs')
         pr_desc = 'NÃO MEDIDOS'
     else:
         pr_desc = f'{len(prs)} aberto(s)'
         if len(prs) >= 100: avisos.append('100 PRs abertos: o limite do gh foi atingido, pode haver mais')
-        BAD = {'FAILURE', 'CANCELLED', 'TIMED_OUT', 'ACTION_REQUIRED', 'STARTUP_FAILURE', 'ERROR'}
         for p in prs:
-            ok = fail = pend = 0; fails = []
-            for c in p.get('statusCheckRollup') or []:
-                concl = (c.get('conclusion') or '').upper(); st = (c.get('status') or '').upper(); state = (c.get('state') or '').upper()
-                if concl in BAD or state in BAD: fail += 1; fails.append(c.get('name') or c.get('context') or '?')
-                elif (st and st != 'COMPLETED') or state in ('PENDING', 'EXPECTED'): pend += 1
-                else: ok += 1
-            st = f'checks {ok} ok · {fail} falha · {pend} em curso' + (f' (falha: {", ".join(fails[:3])}{"…" if len(fails) > 3 else ""})' if fails else '')
-            if p.get('isDraft'): st = 'rascunho · ' + st
-            merge_rows.append({'kind': 'merge', 'ref': f"PR#{p.get('number')}", 'origin': p.get('headRefName') or '',
+            n = p.get('number'); ok, fail, pend, st = checks_of(p)
+            if fail: act = f'investigo e conserto o check vermelho: `gh pr checks {n}`'
+            elif pend: act = f'acompanho o CI em segundo plano (o `--watch` passa do teto de uma chamada): `gh pr checks {n} --watch`'
+            elif not ok: act = f'sem check nenhum no head: confiro se o CI disparou (`gh pr view {n} --json headRefOid,statusCheckRollup`) antes de qualquer merge'
+            elif p.get('isDraft'): act = f'depois do "sim": `gh pr ready {n}` e espero o CI'
+            elif has_verified: act = f'depois do "sim", pelo caminho verificado: `bash {VERIFIED} {n} --sync`'   # (core-only)
+            else:
+                mf, why = merge_flag('', p.get('headRefName'))
+                act = (f'depois do "sim": `gh pr checks {n}` (todos verdes) e `gh pr merge {n} {mf}`{why} — este repo não tem caminho verificado de merge'
+                       if mf else f'não mergeio: {why.strip(" ()")}')
+            merge_rows.append({'kind': 'merge', 'ref': f"PR#{n}", 'origin': p.get('headRefName') or '',
                                'label': clip(p.get('title') or '', 200), 'state': st, 'via': 'gh', 'options': '',
-                               'pri': 1 if fail else 4, 'imp': 0})
+                               'pri': 1 if fail else 4, 'imp': 0, 'actor': 'faço-eu', 'action': act})
+    # PRs de OUTRO repo (o maestro ou a conversa os nomeia): a sessão lê, mas não mergeia — a trava veta
+    # `gh pr merge` em qualquer forma, inclusive com `-R`; o escape declarado é o `!` no prompt do maestro.
+    for fr in [x for x in foreign.split() if x]:
+        fprs, fwhy = gh_prs(fr)
+        if fwhy:
+            avisos.append(f'repo alheio {fr}: PRs NÃO medidos ({fwhy})'); continue
+        if not fprs:
+            avisos.append(f'repo alheio {fr}: 0 PRs abertos (medido)'); continue
+        for p in fprs:
+            n = p.get('number'); ok, fail, pend, st = checks_of(p)
+            if fail or pend:
+                act = f'leio o CI e trago o diagnóstico: `gh pr checks {n} -R {fr}` (o conserto é na branch do PR, não aqui)'
+                actor = 'faço-eu'
+            elif p.get('isDraft'):
+                act = (f'é RASCUNHO (o gh recusa o merge): quem o abriu marca pronto, no SEU prompt `! gh pr ready {n} -R {fr}`,'
+                       ' e o CI de lá roda · depois a sessão re-mede e traz o card do merge')
+                actor = 'maestro-com-!'
+            else:
+                mflag, why = merge_flag(fr, p.get('headRefName'))
+                act = ((f'no SEU prompt, com o prefixo: `! gh pr merge {n} -R {fr} {mflag} --delete-branch`{why}' if mflag
+                        else f'não há comando seguro: {why.strip(" ()")}')
+                       + ('' if ok else ' (sem check nenhum no head: nada conferiu este PR)')
+                       + f' · conferir: `gh pr view {n} -R {fr} --json state -q .state` = MERGED · depois a sessão segue o que dependia dele')
+                actor = 'maestro-com-!'
+            merge_rows.append({'kind': 'merge', 'ref': f"{fr}#{n}", 'origin': p.get('headRefName') or '',
+                               'label': clip(p.get('title') or '', 200), 'state': st, 'via': 'gh -R', 'options': '',
+                               'pri': 1 if fail else 4, 'imp': 0, 'actor': actor, 'action': act})
 
 # ── worktrees com trabalho não empurrado ────────────────────────────────────────────────────
-thread_rows = []
+thread_rows = []; other_branches = {}
 rc, wl = git('worktree', 'list', '--porcelain')
 rc_r, remotes = git('remote')
 has_remote = bool(remotes.strip())
@@ -328,7 +452,9 @@ for blk in wl.strip().split('\n\n') if wl.strip() else []:
     rel = os.path.relpath(path, ra) if (path == ra or path.startswith(ra + os.sep)) else path
     if 'prunable' in kv or not os.path.isdir(path):
         thread_rows.append({'kind': 'thread', 'ref': br, 'origin': rel, 'label': 'worktree prunable (o diretório sumiu)',
-                            'state': 'prunable', 'via': 'git', 'options': '', 'pri': 5, 'imp': 0}); continue
+                            'state': 'prunable', 'via': 'git', 'options': '', 'pri': 5, 'imp': 0,
+                            'actor': 'faço-eu', 'action': 'limpo o registro: `git worktree prune`'}); continue
+    if os.path.realpath(path) != os.path.realpath(ra) and br not in ('(detached)', '?'): other_branches[br] = path
     rc1, st = git('status', '--porcelain', cwd=path)
     dirty = len([x for x in st.split('\n') if x.strip()]) if rc1 == 0 else -1
     unp = 0
@@ -337,8 +463,19 @@ for blk in wl.strip().split('\n\n') if wl.strip() else []:
         unp = int(cnt.strip()) if rc2 == 0 and cnt.strip().isdigit() else -1
     if dirty == 0 and unp == 0: continue
     lab = f"{'?' if dirty < 0 else dirty} arquivo(s) não commitado(s) · {'?' if unp < 0 else unp} commit(s) não empurrado(s)"
+    # DONO: só a worktree onde o medidor roda é provadamente desta sessão. A de agente (`.claude/worktrees/agent-*`)
+    # é do agente enquanto ele roda (I3, medido em 2026-09-02: um amend colidiu com o commit dele), e qualquer
+    # outra pode ser de outra sessão — o medidor não sabe, e por isso não oferece mexer nela.
+    if os.path.realpath(path) == os.path.realpath(ra):
+        actor = 'faço-eu'
+        act = (f'commito o pendente e empurro: `git -C {rel} push -u origin {br}`' if br not in ('main', 'master', '(detached)', '?')
+               else f'está em {br}: crio uma branch de tópico, commito e empurro (commit na main é barrado)')
+    else:
+        actor = 'outro-dono'
+        act = (f"é de outra sessão ou agente (I3): não toco. Confiro o dono: `git -C {path} log -1 --format='%h %cr %s'`"
+               ' · abandonada? quem a abriu empurra ou remove')
     thread_rows.append({'kind': 'thread', 'ref': br, 'origin': rel, 'label': lab, 'state': 'em voo', 'via': 'git',
-                        'options': '', 'pri': 5, 'imp': 0})
+                        'options': '', 'pri': 5, 'imp': 0, 'actor': actor, 'action': act})
 
 # ── inbox/inbound/kg-inbox de 1º nível ──────────────────────────────────────────────────────
 triage_rows = []
@@ -347,45 +484,73 @@ for sub in ('docs/evolution/inbox', 'docs/evolution/inbound', 'docs/evolution/kg
     if not os.path.isdir(p): continue
     items = sorted(x for x in os.listdir(p) if not x.startswith(('_', '.')) and x != 'README.md')
     if items:
+        cmdt = '/meta:kg-inbox' if sub.endswith('kg-inbox') else '/meta:co-evolve'
         triage_rows.append({'kind': 'triage', 'ref': sub, 'origin': sub, 'label': f'{len(items)} item(ns) não processado(s): ' + clip(', '.join(items), 180),
-                            'state': f'{len(items)}', 'via': 'fs', 'options': '', 'pri': 6, 'imp': 0})
+                            'state': f'{len(items)}', 'via': 'fs', 'options': '', 'pri': 6, 'imp': 0,
+                            'actor': 'faço-eu', 'action': f'trio pelo comando da casa: `{cmdt}`'})
 
+# o PR cuja branch está na worktree de OUTRA sessão é dela (I3): consertar ou mergear daqui colide com quem empurra
+for r in merge_rows:
+    if r['via'] == 'gh' and r['origin'] in other_branches:
+        r['actor'] = 'outro-dono'
+        r['action'] = f"a branch está na worktree {other_branches[r['origin']]}, de outra sessão ou agente (I3): não toco antes de ela fechar"
 for r in checkpoints: r.update(pri=0, imp=0)
-rows = checkpoints + merge_rows + seal_rows + thread_rows + triage_rows
-rows.sort(key=lambda r: (r['pri'], -int(r['imp'] or 0), r['ref']))
+rows = checkpoints + access_rows + merge_rows + seal_rows + thread_rows + triage_rows
+KORD = {'checkpoint': 0, 'access': 1, 'merge': 2, 'seal': 3, 'thread': 4, 'triage': 5}
+rows.sort(key=lambda r: (r['pri'], KORD.get(r['kind'], 9), -int(r['imp'] or 0), r['ref']))
 
 def tsvc(s): return str(s).replace('\t', ' ').replace('\n', ' ')
 if fmt == '--tsv':
-    print('kind\tref\torigin\tlabel\tstate\tvia\toptions\tincoming')
-    for r in rows: print('\t'.join(tsvc(r.get(k, '')) for k in ('kind', 'ref', 'origin', 'label', 'state', 'via', 'options', 'incoming')))
-    for a in avisos: print(f'warn\t-\t-\t{tsvc(a)}\t\t\t\t')
+    COLS = ('kind', 'ref', 'origin', 'label', 'state', 'via', 'options', 'incoming', 'actor', 'action', 'hint')
+    print('\t'.join(COLS))
+    for r in rows: print('\t'.join(tsvc(r.get(k, '')) for k in COLS))
+    for a in avisos: print(f'warn\t-\t-\t{tsvc(a)}' + '\t' * (len(COLS) - 4))
     sys.exit(0)
 
 KH = {'checkpoint': 'checkpoint pendente — BLOQUEIA (P0.5 do /meta:drive: o lote anterior não foi selado)',
-      'merge': 'merge — PRs abertos e o estado do CI (merge é do maestro, pelo caminho verificado)',
+      'access': 'access — credencial que falta (o conserto é do maestro, fora da sessão)',
+      'merge': 'merge — PRs abertos e o CI (deste repo: a sessão oferece o caminho verificado; de outro repo: o maestro, com o prefixo `! `)',
       'seal': 'seal — nós decision/question abertos (candidatos a selo; o FILTRO decide se são do maestro)',
       'thread': 'thread — worktrees com trabalho não commitado ou não empurrado',
       'triage': 'triage — inbox/inbound/kg-inbox com itens não processados'}
 print(f'# decide-census · {today} · {len(rows)} linha(s) em voo')
 print(f'fontes: grafos={len(graphs)} · nós decision/question open={len(open_nodes)} · janela={base_desc} · '
       f'cite={cite_label or "—"} · tema={(chr(34) + theme + chr(34)) if terms else "—"} · PRs={pr_desc}')
+# quem executa, contado: a sessão lê isto antes de compor (o que é "faço-eu" vira oferta, o "maestro-*" vira card)
+ACT = {'faço-eu': '🤖 faço-eu', 'maestro-com-!': '⌨️ maestro-com-!', 'maestro-fora': '🙋 maestro-fora', 'outro-dono': '↪️ outro-dono'}
+cnt = {}; nseal = 0
+for r in rows:
+    if r['kind'] == 'seal': nseal += 1; continue   # a DECISÃO é do maestro; o selo depois dela é sempre da sessão
+    cnt[r.get('actor', '?')] = cnt.get(r.get('actor', '?'), 0) + 1
+print('quem executa: ' + ' · '.join(f'{ACT.get(k, k)} {cnt.get(k, 0)}' for k in ACT)
+      + f' · 🗳️ decisões a selar {nseal}' + (f" · ⚠️ sem classe {cnt['?']}" if cnt.get('?') else ''))
 if avisos:
     print('\n## ⚠️ Avisos (medição incompleta ou não-produção — leia antes das linhas)')
     for a in avisos: print(f'- {a}')
 shown = rows[:top]; rest = rows[top:]
+# o comando que se REPETE linha a linha sai uma vez, no cabeçalho da seção; a linha ▶ fica para o que é único
+SH = {'seal': f"  ▶ 🗳️ a decisão é do maestro; o selo, depois da resposta, é {ACT['faço-eu']} — `bash .claude/validation/kg-decide-seal.sh <grafo> <ID> --chosen \"…\" --rejected \"…\" --date {today} --question \"…\"`",
+      'thread': f"  ▶ {ACT['outro-dono']} = de outra sessão ou agente (I3): não toco; confiro o dono com `git -C <caminho> log -1 --format='%h %cr %s'`, e quem a abriu empurra ou remove"}
+def badge(r): return ACT.get(r.get('actor'), '⚠️ sem classe')
 cur = None
 for r in shown:
     if r['kind'] != cur:
         cur = r['kind']; print(f"\n## {KH[cur]}")
+        if cur == 'seal' or (cur == 'thread' and any(x['kind'] == 'thread' and x.get('actor') == 'outro-dono' for x in shown)):
+            print(SH[cur])
     if r['kind'] == 'seal':
-        print(f"- [{r['via']}] `{r['ref']}` ({r['state']}) — {r['origin']} — {r['label']}")
+        print(f"- 🗳️ [{r['via']}] `{r['ref']}` ({r['state']}) — {r['origin']} — {r['label']}")
         print(f"  - trechos com forma de opção (cópia literal; podem não ser as opções): {('«' + r['options'].replace(' ⟂ ', '» · «') + '»') if r['options'] else '(nenhum trecho com forma de opção no nó — compor com embasamento, ou a opção é pesquisar antes)'}")
         if r['incoming']:
             print(f"  - chegam por aresta (leia-os: opções e objeções às vezes vivem aqui): {r['incoming']}")
+        if r.get('hint'):
+            print(f"  - pista de ATO MANUAL depois do selo (cópia literal; leia o nó, o card é seu): «{r['hint'].replace(' ⟂ ', '» · «')}»")
     elif r['kind'] == 'merge':
-        print(f"- {r['ref']} `{r['origin']}` — {r['label']} · {r['state']}")
+        print(f"- {badge(r)} {r['ref']} `{r['origin']}` — {r['label']} · {r['state']}")
     else:
-        print(f"- `{r['ref']}` — {r['origin']} — {r['label']}")
+        print(f"- {badge(r)} `{r['ref']}` — {r['origin']} — {r['label']}")
+    if r['kind'] != 'seal' and r.get('actor') != 'outro-dono':
+        print(f"  - ▶ {r.get('action') or '(sem comando medido)'}")
 if rest:
     print(f'\n⚠️ TETO: mostradas {len(shown)} de {len(rows)} linhas (DECIDE_CENSUS_TOP={top}), na ordem bloqueio→atenção.')
     print(f'   As {len(rest)} restantes NÃO são zero — NOMEADAS: ' + ', '.join(f"{r['kind']}:{r['ref']}" for r in rest))

@@ -40617,7 +40617,7 @@ DEC_PY
     record_pass "decide: (b) nó citado por id aparece com as opções lidas literalmente; o não citado fora da janela não"
   else record_fail "decide: (b)" "$(_emit "${out}" | grep '^seal' | tr '\t\n' '  ')"; fi
   # (j) quem CHEGA por aresta é listado: as opções às vezes vivem como nós vizinhos (C_OPCAO_* → D_), não na prosa
-  if grep -q "^seal$(printf '\t')Q_CITADO$(printf '\t').*$(printf '\t')D_NOVO (decision, SUPPORTS)\$" <<< "${out}"; then
+  if grep -q "^seal$(printf '\t')Q_CITADO$(printf '\t').*$(printf '\t')D_NOVO (decision, SUPPORTS)$(printf '\t')faço-eu$(printf '\t')" <<< "${out}"; then
     record_pass "decide: (j) o nó vizinho que chega por aresta é listado com tipo e aresta"
   else record_fail "decide: (j)" "$(_emit "${out}" | grep '^seal.Q_CITADO' | tr '\t\n' '  ')"; fi
   # (c) a janela traz o nó cujo id/label mudou dentro dela (D_NOVO, commit de 2026-10-10)
@@ -40680,6 +40680,140 @@ DEC_PY
   if [ -z "${_kb}" ]; then
     record_pass "decide: (k) grafo vazio, nó em flow-style e clone raso viram aviso nomeado; opção sem valor sai rc 2"
   else record_fail "decide: (k)" "${_kb}"; fi
+  # ── QUEM EXECUTA (coluna actor/action, pedido do maestro em 2026-10-19) ──────────────────────
+  # (l) cada linha diz quem faz o ato seguinte: o PR deste repo, o checkpoint, a triagem e a worktree ONDE o
+  #     medidor roda são faço-eu, com o comando pronto; a worktree de OUTRA sessão é outro-dono (I3) e não ganha
+  #     oferta de push. Mutante que morde: sem a comparação de dono, a wt2 sai faço-eu.
+  local _lb="" T; T="$(printf '\t')"
+  "${G[@]}" -C "${r}" worktree add -q "${sb}/wt2" -b feat/outra 2>/dev/null
+  : > "${sb}/wt2/novo.txt"; "${G[@]}" -C "${sb}/wt2" add novo.txt; "${G[@]}" -C "${sb}/wt2" commit -q -m wt2
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-ok" bash "${sut}" "${r}" --tsv --cite "${sb}/cite.txt" 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _lb="${_lb} rc=${rc}"
+  head -1 <<< "${out}" | grep -q "${T}incoming${T}actor${T}action${T}hint\$" || _lb="${_lb} cabecalho"
+  grep -q "^merge${T}PR#7${T}.*${T}faço-eu${T}investigo e conserto o check vermelho: \`gh pr checks 7\`" <<< "${out}" || _lb="${_lb} merge-vermelho"
+  grep -q "^checkpoint${T}docs/b/b.kg.yaml${T}.*${T}faço-eu${T}depois do \"selar\": \`bash .claude/validation/kg-drive-project.sh docs/b/b.kg.yaml --seal\`" <<< "${out}" || _lb="${_lb} checkpoint"
+  grep -q "^triage${T}docs/evolution/inbox${T}.*${T}faço-eu${T}trio pelo comando da casa: \`/meta:co-evolve\`" <<< "${out}" || _lb="${_lb} triagem"
+  grep -qE "^thread${T}(main|master)${T}\.${T}.*${T}faço-eu${T}está em (main|master): crio uma branch de tópico" <<< "${out}" || _lb="${_lb} wt-propria"
+  grep -q "^thread${T}feat/outra${T}.*${T}outro-dono${T}é de outra sessão ou agente (I3): não toco" <<< "${out}" || _lb="${_lb} wt-alheia"
+  grep -q "^thread${T}feat/outra${T}.*${T}faço-eu${T}" <<< "${out}" && _lb="${_lb} wt-alheia-com-oferta"
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-ok" bash "${sut}" "${r}" --markdown --cite "${sb}/cite.txt" 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q '^quem executa: 🤖 faço-eu 4 · ⌨️ maestro-com-! 0 · 🙋 maestro-fora 0 · ↪️ outro-dono 1 · 🗳️ decisões a selar 2$' <<< "${out}" || _lb="${_lb} contagem-md"
+  "${G[@]}" -C "${r}" worktree remove --force "${sb}/wt2" 2>/dev/null; "${G[@]}" -C "${r}" branch -q -D feat/outra 2>/dev/null
+  if [ -z "${_lb}" ]; then
+    record_pass "decide: (l) cada linha traz quem executa e o comando; a worktree de outra sessão é outro-dono, sem oferta"
+  else record_fail "decide: (l)" "${_lb} :: $(_emit "${out}" | grep -E '^(quem|thread|merge)' | head -4 | tr '\t\n' '  ')"; fi
+  # (m) PR de OUTRO repo (--foreign-repo) verde é maestro-com-!: a trava veta `gh pr merge` com -R, o escape é o `!`.
+  #     O método vem do repo medido (aqui só rebase), e o vermelho de lá é faço-eu (ler o CI). Mutante: classe
+  #     faço-eu no verde, ou --squash cravado, reprova.
+  local _mb=""
+  cat > "${sb}/gh-multi" <<'GHM'
+#!/usr/bin/env bash
+case " $* " in
+  *" repo view dono/alheio "*) printf '%s\n' '{"squashMergeAllowed":false,"rebaseMergeAllowed":true,"mergeCommitAllowed":false}' ;;
+  *" -R dono/alheio "*) printf '%s\n' '[{"number":11,"title":"rascunho lá","headRefName":"feat/rl","isDraft":true,"statusCheckRollup":[{"name":"ci","status":"COMPLETED","conclusion":"SUCCESS"}]},{"number":9,"title":"feat lá","headRefName":"feat/la","isDraft":false,"statusCheckRollup":[{"name":"ci","status":"COMPLETED","conclusion":"SUCCESS"}]},{"number":10,"title":"fix lá","headRefName":"fix/la","isDraft":false,"statusCheckRollup":[{"name":"ci","status":"COMPLETED","conclusion":"FAILURE"}]}]' ;;
+  *" -R dono/vazio "*) printf '%s\n' '[]' ;;
+  *" pr list "*) printf '%s\n' '[]' ;;
+  *) exit 1 ;;
+esac
+GHM
+  chmod +x "${sb}/gh-multi"
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-multi" bash "${sut}" "${r}" --tsv --foreign-repo dono/alheio --foreign-repo dono/vazio 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _mb="${_mb} rc=${rc}"
+  grep -q "^merge${T}dono/alheio#9${T}feat/la${T}.*${T}maestro-com-!${T}no SEU prompt, com o prefixo: \`! gh pr merge 9 -R dono/alheio --rebase --delete-branch\` · conferir: \`gh pr view 9 -R dono/alheio --json state -q .state\` = MERGED" <<< "${out}" || _mb="${_mb} verde-nao-e-maestro"
+  grep -q "^merge${T}dono/alheio#10${T}.*${T}faço-eu${T}leio o CI e trago o diagnóstico: \`gh pr checks 10 -R dono/alheio\`" <<< "${out}" || _mb="${_mb} vermelho-alheio"
+  grep -q "^warn${T}-${T}-${T}repo alheio dono/vazio: 0 PRs abertos (medido)" <<< "${out}" || _mb="${_mb} vazio-calado"
+  grep -q "^merge${T}dono/alheio#11${T}.*${T}maestro-com-!${T}é RASCUNHO (o gh recusa o merge)" <<< "${out}" || _mb="${_mb} rascunho-alheio"
+  grep -q "^merge${T}dono/alheio#11${T}.*gh pr merge" <<< "${out}" && _mb="${_mb} rascunho-com-merge"
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-multi" bash "${sut}" "${r}" --tsv --foreign-repo dono/alheio --foreign-repo dono/alheio 2>&1)"; then rc=0; else rc=$?; fi
+  [ "$(grep -c "^merge${T}dono/alheio#9${T}" <<< "${out}")" = 1 ] || _mb="${_mb} repetido-duplica"
+  for _bad in '-R/x' 'dono/' '/x' 'a/../b'; do
+    if out="$(bash "${sut}" "${r}" --no-gh --foreign-repo "${_bad}" 2>&1)"; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 2 ] || _mb="${_mb} torto(${_bad})-rc${rc}"
+  done
+  if out="$(bash "${sut}" "${r}" --no-gh --foreign-repo semdono 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 2 ] && grep -q 'foreign-repo exige dono/nome' <<< "${out}" || _mb="${_mb} sem-barra-rc${rc}"
+  if out="$(bash "${sut}" "${r}" --no-gh --foreign-repo 'dono/x;rm' 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 2 ] || _mb="${_mb} caractere-rc${rc}"
+  if [ -z "${_mb}" ]; then
+    record_pass "decide: (m) PR verde de outro repo é maestro-com-! com o método medido; o vermelho é faço-eu; --foreign-repo torto sai rc 2"
+  else record_fail "decide: (m)" "${_mb}"; fi
+  # (n) gh que falha por CREDENCIAL vira linha access maestro-fora com o login (interativo, fora da sessão); a falha
+  #     que não é credencial (binário ausente, caso f) continua só aviso. Mutante: sem o AUTH_PAT, nenhuma linha access.
+  local _nb=""
+  printf '#!/usr/bin/env bash\nprintf "HTTP 401: Bad credentials (https://api.github.com/graphql)\\nTry authenticating with:  gh auth login -h github.com\\n" >&2\nexit 1\n' > "${sb}/gh-401"
+  chmod +x "${sb}/gh-401"
+  # o runner do CI TEM GH_TOKEN/GITHUB_TOKEN no ambiente: o caso tira as duas para medir o ramo do login, e as
+  # repõe de propósito para medir o ramo da variável (que vence o login guardado, e aí o login não cura nada)
+  if out="$(env -u GH_TOKEN -u GITHUB_TOKEN DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-401" bash "${sut}" "${r}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _nb="${_nb} rc=${rc}"
+  grep -q "^access${T}gh-auth${T}este repo${T}o gh não autentica: HTTP 401.*${T}maestro-fora${T}num terminal FORA da sessão.*\`gh auth login -h github.com\` · conferir: \`gh auth status\`" <<< "${out}" || _nb="${_nb} sem-access"
+  [ "$(grep -c '^access' <<< "${out}")" = 1 ] || _nb="${_nb} access-duplicado"
+  if out="$(env -u GITHUB_TOKEN GH_TOKEN=invalido DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-401" bash "${sut}" "${r}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q "^access${T}.*${T}maestro-fora${T}a credencial vem de GH_TOKEN no AMBIENTE" <<< "${out}" || _nb="${_nb} env-mandou-login"
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-nao-existe" bash "${sut}" "${r}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q '^access' <<< "${out}" && _nb="${_nb} binario-ausente-virou-access"
+  if [ -z "${_nb}" ]; then
+    record_pass "decide: (n) gh sem credencial vira linha maestro-fora com o login e a conferência; binário ausente fica aviso"
+  else record_fail "decide: (n)" "${_nb}"; fi
+  # (o) a linha seal traz a PISTA literal de ato manual do nó (hint), e o nó sem a forma não traz nenhuma.
+  #     Mutante: hint vazio sempre reprova; padrão largo demais (casar "maestro") pinta Q_CITADO e reprova.
+  local _ob="" r3="${sb}/r3"
+  "${G[@]}" -C "${sb}" init -q r3; mkdir -p "${r3}/docs"
+  _dec_graph m "$(_dec_node D_MANUAL decision open 'trocar a chave do bridge' 'o maestro decide; depois roda com `!` no prompt o wrapper de deploy, porque o veto barra a sessão.')" \
+    "$(_dec_node D_LIMPO decision open 'escolher o nome do maestro' '(a) nome curto; (b) nome longo.')" > "${r3}/docs/m.kg.yaml"
+  "${G[@]}" -C "${r3}" add -A; "${G[@]}" -C "${r3}" commit -q -m o1
+  printf 'D_MANUAL D_LIMPO\n' > "${sb}/cite3.txt"
+  if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r3}" --tsv --no-gh --cite "${sb}/cite3.txt" 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _ob="${_ob} rc=${rc}"
+  grep -q "^seal${T}D_MANUAL${T}.*${T}faço-eu${T}depois da resposta: \`bash .claude/validation/kg-decide-seal.sh docs/m.kg.yaml D_MANUAL .*${T}.*depois roda com \`!\` no prompt o wrapper" <<< "${out}" || _ob="${_ob} sem-pista"
+  grep -q "^seal${T}D_LIMPO${T}.*${T}faço-eu${T}[^${T}]*${T}\$" <<< "${out}" || _ob="${_ob} pista-espuria"
+  if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r3}" --markdown --no-gh --cite "${sb}/cite3.txt" 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q '^  - pista de ATO MANUAL depois do selo (cópia literal; leia o nó, o card é seu): «.*com `!` no prompt' <<< "${out}" || _ob="${_ob} md-sem-pista"
+  [ "$(grep -c 'pista de ATO MANUAL' <<< "${out}")" = 1 ] || _ob="${_ob} md-pista-conta"
+  if [ -z "${_ob}" ]; then
+    record_pass "decide: (o) a pista literal de ato manual sai no nó que a tem, e só nele"
+  else record_fail "decide: (o)" "${_ob} :: $(_emit "${out}" | grep -E 'seal|pista' | head -3 | tr '\t\n' '  ')"; fi
+  # (p) o ramo que é o centro da tese: PR DESTE repo. Com o caminho verificado rastreado, o verde é ele; o rascunho
+  #     é `gh pr ready`; o sem-check e o pendente nunca viram oferta de merge; o PR cuja branch está na worktree de
+  #     outra sessão é outro-dono (I3). Sem o caminho verificado (adotante), o verde leva o método medido do repo, e
+  #     o PR de update do Onion leva merge commit. Mutantes: tirar o has_verified, o ramo do rascunho, o do
+  #     sem-check, a herança de dono ou o UPDATE_HEAD reprova.
+  local _pb="" r4="${sb}/r4"
+  "${G[@]}" -C "${sb}" init -q r4; mkdir -p "${r4}/ops"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${r4}/ops/pr-merge-verified.sh"
+  "${G[@]}" -C "${r4}" add -A; "${G[@]}" -C "${r4}" commit -q -m p1
+  "${G[@]}" -C "${r4}" worktree add -q "${sb}/wt4" -b feat/alheia 2>/dev/null
+  cat > "${sb}/gh-p" <<'GHP'
+#!/usr/bin/env bash
+ok='[{"name":"ci","status":"COMPLETED","conclusion":"SUCCESS"}]'
+case " $* " in
+  *" repo view "*) printf '%s\n' '{"squashMergeAllowed":true,"rebaseMergeAllowed":true,"mergeCommitAllowed":true}' ;;
+  *" pr list "*) printf '%s\n' "[{\"number\":1,\"title\":\"verde\",\"headRefName\":\"feat/verde\",\"isDraft\":false,\"statusCheckRollup\":${ok}},
+{\"number\":2,\"title\":\"rascunho\",\"headRefName\":\"feat/rascunho\",\"isDraft\":true,\"statusCheckRollup\":${ok}},
+{\"number\":3,\"title\":\"sem ci\",\"headRefName\":\"feat/semci\",\"isDraft\":false,\"statusCheckRollup\":[]},
+{\"number\":4,\"title\":\"pendente\",\"headRefName\":\"feat/pend\",\"isDraft\":false,\"statusCheckRollup\":[{\"name\":\"ci\",\"status\":\"IN_PROGRESS\",\"conclusion\":\"\"}]},
+{\"number\":5,\"title\":\"de outro\",\"headRefName\":\"feat/alheia\",\"isDraft\":false,\"statusCheckRollup\":${ok}},
+{\"number\":6,\"title\":\"update\",\"headRefName\":\"chore/onion-update-abc123\",\"isDraft\":false,\"statusCheckRollup\":${ok}}]" ;;
+  *) exit 1 ;;
+esac
+GHP
+  chmod +x "${sb}/gh-p"
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-p" bash "${sut}" "${r4}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _pb="${_pb} rc=${rc}"
+  grep -q "^merge${T}PR#1${T}.*${T}faço-eu${T}depois do \"sim\", pelo caminho verificado: \`bash ops/pr-merge-verified.sh 1 --sync\`" <<< "${out}" || _pb="${_pb} verde-sem-verificado"
+  grep -q "^merge${T}PR#2${T}.*${T}faço-eu${T}depois do \"sim\": \`gh pr ready 2\`" <<< "${out}" || _pb="${_pb} rascunho"
+  grep -q "^merge${T}PR#3${T}.*${T}faço-eu${T}sem check nenhum no head" <<< "${out}" || _pb="${_pb} sem-ci"
+  grep -q "^merge${T}PR#4${T}.*${T}faço-eu${T}acompanho o CI em segundo plano" <<< "${out}" || _pb="${_pb} pendente"
+  grep -q "^merge${T}PR#5${T}.*${T}outro-dono${T}a branch está na worktree ${sb}/wt4" <<< "${out}" || _pb="${_pb} dono-nao-herdado"
+  grep -qE "^merge${T}PR#[34]${T}.*(pr-merge-verified|gh pr merge)" <<< "${out}" && _pb="${_pb} merge-oferecido-sem-ci-verde"
+  "${G[@]}" -C "${r4}" rm -q ops/pr-merge-verified.sh; "${G[@]}" -C "${r4}" commit -q -m p2
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-p" bash "${sut}" "${r4}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q "^merge${T}PR#1${T}.*${T}faço-eu${T}depois do \"sim\": \`gh pr checks 1\` (todos verdes) e \`gh pr merge 1 --rebase\` (inferido: o 1º que o repo aceita" <<< "${out}" || _pb="${_pb} adotante-sem-metodo"
+  grep -q "^merge${T}PR#6${T}.*\`gh pr merge 6 --merge\` (PR de update do Onion: merge commit" <<< "${out}" || _pb="${_pb} update-sem-merge-commit"
+  "${G[@]}" -C "${r4}" worktree remove --force "${sb}/wt4" 2>/dev/null
+  if [ -z "${_pb}" ]; then
+    record_pass "decide: (p) PR deste repo: verde pelo caminho verificado, rascunho, sem-CI e pendente sem oferta de merge, branch alheia é outro-dono, update é merge commit"
+  else record_fail "decide: (p)" "${_pb} :: $(_emit "${out}" | grep '^merge' | cut -f2,9,10 | tr '\t\n' '  ')"; fi
 
   # ── o SELADOR, sobre cópia descartável fora de git (o gate é só o radar) ──────────────────
   g="${sb}/s.kg.yaml"; cp "${r}/docs/a/a.kg.yaml" "${g}"
