@@ -2,7 +2,7 @@
 title: 'Resíduo — onda 2 do EPIPE: os pontos compostos e o baseline em 3'
 date: 2026-10-19
 branch: fix/epipe-wave-2
-reviewed_diff_sha256: e1952cc6c0007510773266b94032883e6503659121da2f3a55a3e17269c69c8f
+reviewed_diff_sha256: 4f938b98def108896dabda8d87a67e680466fc1297d83728ac4d84c7aa270a1c
 reviewed_code_sha256: dae63e0cccdbe40b943af79df6ff4f5521424be24e2451503e51d32af99a8b88
 findings_total: 3
 findings_real: 3
