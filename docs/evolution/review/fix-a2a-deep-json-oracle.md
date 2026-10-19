@@ -2,7 +2,8 @@
 title: 'Resíduo — o caso do JSON fundo do convite A2A deixa de depender da versão do Python'
 date: 2026-10-19
 branch: fix/a2a-deep-json-oracle
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 699ead817d9ba31fef1ad8b97105730eea5318824eb5bc5abaeac718d3940928
+reviewed_code_sha256: f93db9e9b59688ed84478a421bbf288aa641eca235143589178aa5504abcfbf7
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
