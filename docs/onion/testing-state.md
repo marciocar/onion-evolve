@@ -10,22 +10,7 @@
 
 ## 1. O que EXISTE (contagem estática)
 
-| Dimensão | Nº | Produtor |
-|---|---:|---|
-| Famílias na bancada | **↻ ao vivo** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **↻ ao vivo** | `bash .claude/validation/harness-inventory.sh --env` |
-| Regras do lint | **↻ ao vivo** | `bash .claude/validation/rules-registry.sh --counts` |
-| — HARD | **↻ ao vivo** | `bash .claude/validation/rules-registry.sh --counts` |
-| Pares de modo consumido | **↻ ao vivo** | `bash .claude/validation/consumed-mode-check.sh .` |
-| — sem teste | **↻ ao vivo** | `bash .claude/validation/consumed-mode-check.sh .` |
-| Baselines de catraca | **↻ ao vivo** | `git ls-files '.claude/validation/*-baseline.txt'` |
-
-> `↻ ao vivo`: o número muda a cada PR, então **não mora neste painel** (ainda é versionado em
-> `testing-inventory.md`, a projeção do inventário — passo B) — versioná-lo aqui punha este painel em quase todo PR e fazia dois PRs
-> paralelos colidirem nele (passo A de `D_MERGE_PROCESS_ONION_2026_10`). Para ler:
-> `bash .claude/validation/testing-state.sh --live`.
-
-Detalhe completo: [`testing-inventory.md`](testing-inventory.md) (SSOT gerada, catracada).
+⊘ **NÃO MEDIDO** — `harness-inventory.sh --env` não respondeu.
 
 ## 2. O que RODOU (última execução da bancada)
 
@@ -90,4 +75,4 @@ Declarado para que a ausência não seja lida como zero:
 
 <sub>Painel gerado por `.claude/validation/testing-state.sh` a partir de
 `harness-inventory.sh`, `review-ledger.sh` e `docs/onion/metrics/selftest-runs.jsonl`.
-Produtores vivos nesta geração: 3/3.</sub>
+Produtores vivos nesta geração: 2/3.</sub>
