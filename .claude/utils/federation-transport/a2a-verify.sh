@@ -326,7 +326,7 @@ for m in ms:
         break
 PY
 )"
-printf '%s\n' "${OWNED}" | grep -qxF "${KID}" || veto "kid-not-owned-by-from:${KID}" "jws"
+grep -qxF "${KID}" <<< "${OWNED}" || veto "kid-not-owned-by-from:${KID}" "jws"
 
 TMP="$(mktemp -d)"; trap 'rm -rf "${TMP}"' EXIT
 b64url_decode "${SIG_B64}" > "${TMP}/sig.bin"

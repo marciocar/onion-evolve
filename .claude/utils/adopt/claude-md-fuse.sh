@@ -27,11 +27,11 @@ classify() {
     case "${line}" in
       ''|'#'*|'|'*|'>'*|'<!--'*) continue ;;                           # vazio, título, tabela, citação, comentário
     esac
-    if printf '%s' "${line}" | grep -qiE '\b(MUST|NUNCA|SEMPRE|obrigat(ó|Ó|o|O)ri[oa]|never|always|do not|don'\''t|proibido|forbidden)\b'; then
+    if grep -qiE '\b(MUST|NUNCA|SEMPRE|obrigat(ó|Ó|o|O)ri[oa]|never|always|do not|don'\''t|proibido|forbidden)\b' <<< "${line}"; then
       echo rules; return 0
     fi
     # linha só de link/comando (bullet com backticks ou URL) não é prosa
-    if printf '%s' "${line}" | grep -qE '^\s*[-*]\s*(`[^`]+`|\[[^]]+\]\([^)]+\)|https?://)\S*\s*$'; then continue; fi
+    if grep -qE '^\s*[-*]\s*(`[^`]+`|\[[^]]+\]\([^)]+\)|https?://)\S*\s*$' <<< "${line}"; then continue; fi
     words="$(printf '%s' "${line}" | wc -w)"
     [ "${words}" -ge 25 ] && { echo rules; return 0; }
   done < "${f}"

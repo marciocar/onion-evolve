@@ -163,7 +163,7 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole superby; 
     why="${why:+${why}; }sem clone"
   fi
 
-  if [ -z "${live}" ] || ! printf '%s' "${live}" | grep -qE '^[0-9a-fA-F]{7,40}$'; then
+  if [ -z "${live}" ] || ! grep -qE '^[0-9a-fA-F]{7,40}$' <<< "${live}"; then
     [ -n "${live}" ] && why="pin ilegível no carimbo: '${live}'"
     printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "?" "—" "${branch:-?} ${bsrc}" "ILEGÍVEL: ${why:-motivo não apurado}"
     n_ill=$((n_ill + 1)); continue

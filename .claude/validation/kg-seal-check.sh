@@ -222,7 +222,7 @@ for syn in ${SYNS}; do
     }
   ' "${ROOT}/${graph}")"
 
-  if printf '%s' "${out}" | grep -q '^VACUO'; then
+  if grep -q '^VACUO' <<< "${out}"; then
     _out HARD VACUIDADE "${ledger}" "o par ledger/grafo foi lido e ZERO itens foram julgados — parser morto ou ledger sem linhas de dado. Guarda que nao le nada nao pode dizer que esta tudo certo"
     continue
   fi

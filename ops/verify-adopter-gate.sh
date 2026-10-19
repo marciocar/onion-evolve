@@ -117,7 +117,7 @@ RC=$?
 [ "$RC" -eq 0 ] && CRIOU_COMMIT=1
 
 EXECUTOU=0
-if printf '%s' "$OUTPUT" | grep -q "Onion pre-commit"; then
+if grep -q "Onion pre-commit" <<< "$OUTPUT"; then
   ok "o hook EXECUTOU no commit (assinatura observada)"
   EXECUTOU=1
 else

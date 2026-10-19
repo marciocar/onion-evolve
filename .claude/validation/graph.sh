@@ -185,7 +185,7 @@ case "${MODE}" in
     echo "# Órfãos — artefatos que o Onion tem mas ninguém referencia (related/requires):"
     refs="$(triples_sorted | awk -F'\t' '$2=="related"||$2=="requires"{print $3}' | sort -u)"
     triples_sorted | awk -F'\t' '$2=="has-member"{print $3}' | sort -u | while IFS= read -r m; do
-      printf '%s\n' "${refs}" | grep -qiF "${m}" || echo "  ${m}"
+      grep -qiF "${m}" <<< "${refs}" || echo "  ${m}"
     done
     ;;
 

@@ -197,7 +197,7 @@ KNOWN=""
 HARD=0; SOFT=0
 while IFS=$'\t' read -r f id seg; do
   [ -n "${id}" ] || continue
-  if printf '%s\n' "${KNOWN}" | grep -qxF "${f}	${id}"; then
+  if grep -qxF "${f}	${id}" <<< "${KNOWN}"; then
     SOFT=$((SOFT + 1))
     [ "${FORMAT}" = tsv ] || printf '  ⊘ tolerado pelo baseline: %s (%s) em %s\n' "${id}" "${seg}" "${f}"
   else

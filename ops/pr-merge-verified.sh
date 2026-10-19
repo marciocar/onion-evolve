@@ -643,12 +643,12 @@ if [ -z "$head_runs" ]; then
   # (2) O GATE LOCAL É EXERCIDO AQUI, não citado. Sem isto o escape seria um --force com nome bonito.
   say "    rodando o gate determinístico LOCAL (é ele que substitui o CI; não aceito número citado)"
   _lint_out="$(LC_ALL=C bash "${REPO_ROOT:-$(git rev-parse --show-toplevel)}/.claude/validation/lint-artifacts.sh" 2>&1)"; _lint_rc=$?
-  printf '%s\n' "${_lint_out}" | grep -qF 'MORREU' \
+  grep -qF 'MORREU' <<< "${_lint_out}" \
     && die "--ci-inoperante: o lint MORREU antes do sumário — não pude julgar, logo não libero."
   [ "${_lint_rc}" -eq 0 ] \
     || die "--ci-inoperante: lint local rc=${_lint_rc} (há HARD). A cobertura que substituiria o CI está VERMELHA — recusa. $(printf '%s\n' "${_lint_out}" | grep -m1 'Violações HARD')"
   _bench_out="$(LC_ALL=C bash "${REPO_ROOT:-$(git rev-parse --show-toplevel)}/.claude/validation/lint-selftest.sh" --jobs auto 2>&1)"; _bench_rc=$?
-  printf '%s\n' "${_bench_out}" | grep -qF 'ABORTOU' \
+  grep -qF 'ABORTOU' <<< "${_bench_out}" \
     && die "--ci-inoperante: a bancada ABORTOU antes da soma — o verde parcial não vale. Recusa."
   [ "${_bench_rc}" -eq 0 ] \
     || die "--ci-inoperante: bancada local rc=${_bench_rc}. $(printf '%s\n' "${_bench_out}" | grep -m1 'Falharam')"
@@ -661,7 +661,7 @@ if [ -z "$head_runs" ]; then
   # script existe para combater. Ancorado na FORMA do sumário (`Passaram : <n>` no início da linha,
   # com dois-pontos) e tomando a ÚLTIMA ocorrência, que é a agregada.
   _bench_pass="$(printf '%s\n' "${_bench_out}" | awk '/^[[:space:]]*Passaram[[:space:]]*:[[:space:]]*[0-9]+[[:space:]]*$/{v=$3} END{print v}')"
-  printf '%s' "${_bench_pass}" | grep -qE '^[0-9]+$' \
+  grep -qE '^[0-9]+$' <<< "${_bench_pass}" \
     || die "--ci-inoperante: não consegui LER a contagem da bancada do sumário (li '${_bench_pass}'). O veredito seria correto pelo rc, mas eu não registro no PR um número que não sei — e registro sem número não audita. Recusa."
   say "    ✓ gate local EXERCIDO: lint 0 HARD · bancada ${_bench_pass:-?} casos, 0 falhas"
   CI_INOPERANTE_PROVADO="rajada de ${_streak} startup_failure no topo do forge · lint 0 HARD · bancada ${_bench_pass:-?} casos/0 falhas"
@@ -722,7 +722,7 @@ done <<< "$_falhos"
 # Dispensa PREVENTIVA é recusada: só se dispensa o que de fato está falhando agora.
 for _d in "${DISPENSA[@]:-}"; do
   [ -n "$_d" ] || continue
-  printf '%s\n' "$_falhos" | grep -qxF "$_d" \
+  grep -qxF "$_d" <<< "$_falhos" \
     || die "'--dispensa ${_d}' recusada: esse check NÃO está falhando no head ${HEAD_SHA:0:8}. Dispensa preventiva é cheque em branco para a próxima vez que ele falhar."
 done
 if [ "${#DISPENSA[@]}" -gt 0 ]; then
@@ -936,7 +936,7 @@ else
   merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${MERGE_EXTRA[@]}" "${DEL[@]}" 2>&1)"; rc=$?
 fi
 if [ "$rc" -ne 0 ] && [ "${MERGE_COMMIT}" -eq 0 ]; then
-  if printf '%s' "$merge_out" | grep -qi "can't be rebased\|cannot be rebased"; then
+  if grep -qi "can't be rebased\|cannot be rebased" <<< "$merge_out"; then
     say "⚠️  --rebase recusado (stack re-apontada); degradando p/ --squash com os mesmos gates"
     merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --squash "${MERGE_EXTRA[@]}" "${DEL[@]}" 2>&1)"; rc=$?
   fi
@@ -973,7 +973,7 @@ if [ "$rc" -ne 0 ]; then
   [ -z "$state_after" ] && die "gh pr merge saiu com rc=${rc} e eu NÃO CONSEGUI LER o estado do PR depois (gh falhou?) — não declaro nem merge nem não-merge. Saída do gh: $(printf '%s' "$merge_out" | tail -1)"
   # O `gh` dizendo que o PR JÁ estava mergeado nunca pode virar sucesso deste run — barra antes
   # de qualquer aritmética de data, e sem depender de relógio nenhum.
-  if printf '%s' "$merge_out" | grep -qi "already been merged\|not mergeable"; then
+  if grep -qi "already been merged\|not mergeable" <<< "$merge_out"; then
     die "gh pr merge saiu com rc=${rc} dizendo que o PR já estava mergeado/não-mergeável — o merge NÃO foi deste run. Saída: $(printf '%s' "$merge_out" | tail -1)"
   fi
   case "$state_after" in

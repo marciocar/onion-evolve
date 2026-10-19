@@ -6,39 +6,15 @@
 # FORMATO: <arquivo><TAB><nº de sítios tolerados>. A métrica de saúde é este número DIMINUINDO.
 # Sítio NOVO em arquivo fora da lista, ou ACIMA da contagem, é HARD.
 # CURA: conteúdo numa variável + `grep -q PAD <<< "$var"` (medida: 0 falhas em 480).
-.claude/hooks/bash-empty-result-guard.sh	10
-.claude/hooks/lib/invocation-lines.sh	1
-.claude/hooks/pretooluse-protect-main.sh	3
-.claude/hooks/rule-title-in-prose.sh	2
-.claude/utils/adopt/claude-md-fuse.sh	2
-.claude/utils/adopt/merge-prettierignore.sh	1
-.claude/utils/adopt/vendor-branch.sh	1
-.claude/utils/federation-transport/a2a-verify.sh	2
-.claude/validation/aside-router.sh	12
-.claude/validation/consumed-mode-check.sh	3
-.claude/validation/diary-index.sh	1
 .claude/validation/doctrine-freshness.sh	2
-.claude/validation/graph.sh	1
-.claude/validation/guardrails/test-r15.sh	5
-.claude/validation/identifier-language-check.sh	1
-.claude/validation/kb-vendored-link-check.sh	6
 .claude/validation/kg-fixture-paths.sh	1
-.claude/validation/kg-reverify-schema-check.sh	3
-.claude/validation/kg-seal-check.sh	1
-.claude/validation/kg-verification-coverage.sh	4
+.claude/validation/kg-verification-coverage.sh	1
 .claude/validation/lint-artifacts.sh	4
-.claude/validation/lint-selftest.sh	33
+.claude/validation/lint-selftest.sh	29
 .claude/validation/pipe-verdict-check.sh	3
-.claude/validation/plugin-deps-check.sh	4
-.claude/validation/plugin-hooks-check.sh	2
-.claude/validation/plugin-namespace-check.sh	2
 .claude/validation/review-artifact-check.sh	1
-.claude/validation/review-verdict.sh	10
 .claude/validation/vendor-scrub-form-check.sh	1
 ops/bridge-auth/logto-provision.sh	1
 ops/install-caddy-config.sh	2
-ops/model-lineup-probe.sh	1
-ops/pr-merge-verified.sh	6
-ops/registry-pins.sh	2
+ops/registry-pins.sh	1
 ops/update-bridge.sh	3
-ops/verify-adopter-gate.sh	1

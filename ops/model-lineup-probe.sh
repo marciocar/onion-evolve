@@ -24,7 +24,7 @@ printf 'model\tstatus\tseconds\tnote\n'; bad=0
 while IFS= read -r m; do
   t0=$(date +%s); status=ok; note=""
   if o="$(timeout "${tmo}" "${cc}" -p --model "${m}" --max-turns 1 'responda apenas: ok' 2>&1)"; then
-    printf '%s' "${o}" | grep -qi 'ok' || { status=unexpected; note="$(printf '%s' "${o}" | head -1 | cut -c1-80)"; }
+    grep -qi 'ok' <<< "${o}" || { status=unexpected; note="$(printf '%s' "${o}" | head -1 | cut -c1-80)"; }
   else
     rc=$?; status=denied; [ "${rc}" -eq 124 ] && status=timeout; note="$(printf '%s' "${o}" | grep -vE '^\s*$' | head -1 | cut -c1-80)"; bad=$((bad+1))
   fi
