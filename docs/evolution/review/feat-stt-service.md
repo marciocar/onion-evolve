@@ -2,8 +2,8 @@
 branch: feat/stt-service
 pr: 1184
 date: 2026-10-17
-reviewed_diff_sha256: 03c9109b35cf9131100d9f6bfeb6cd37f127cee0b3998eec93731fca999700c6
-reviewed_code_sha256: 58be352ac275ee58967a9a307d90803a69c509553bc13b2ed84a7e30711346f0
+reviewed_diff_sha256: 588f3c1176b0e47c688882672e2616bb537a2fd9f8643db8b666b347a104faee
+reviewed_code_sha256: b26db6988dad94a40e6196c40233bdefcf2865c69477f70e377ae0e0fc6a3e4d
 findings_total: 17
 findings_real: 16
 tokens: 303551
@@ -86,3 +86,14 @@ serviço no runner). A cura troca o ⊘ por uma conferência pela FORMA (AST do 
 reprova), e o rótulo diz que o servidor real não rodou ali. Re-revisado por mim (sessão de execução), sem refutador:
 não muda código de produção (`ops/stt/*.py`, wrapper) — só `.claude/validation/lint-selftest.sh`, o resíduo e o grafo.
 Bancada sem o venv, STRICT: 78 verdes, 0 ⊘.
+
+## Re-revisão depois do rebase (2026-10-19)
+
+O PR ficou 53 commits atrás da `main` e foi rebaseado depois do selo da segunda rodada de transcrição (#1212). O
+`git range-diff` contra a versão revisada mostra 10 dos 12 commits idênticos. Os dois que mudaram (o 3 e o 4)
+mudaram só no grafo `meeting-capture-2026-10` (o TETO passa a 11 e a aresta de `D_MC_ASR2_MANTER_MOTOR_1019` fica
+junto das duas deste PR) e em `docs/onion/testing-inventory.md`, que é projeção e foi regenerada. O patch de
+código é o mesmo. O hash de código mudou porque a base mudou: a `main` trouxe as ondas 1 e 2 do EPIPE em
+`lint-selftest.sh`, que este PR também toca. A interação foi exercida no pré-voo do `pr-finalize`, com as
+famílias `moat_gate`, `stt_service` e `shell_pipefail_robustness` (318 verdes). O radar do grafo passa em
+`--integrity --schema` e o teto bate (11/11). Sem achado novo. A bancada completa fica para o CI.
