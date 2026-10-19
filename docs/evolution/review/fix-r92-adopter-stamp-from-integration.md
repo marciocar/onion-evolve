@@ -2,7 +2,8 @@
 title: 'Resíduo — a REGRA 92 lê o carimbo do adotante na branch de integração'
 date: 2026-10-19
 branch: fix/r92-adopter-stamp-from-integration
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 39db2b6438c7ed8a27e12594de2881a83d2a632cf97812b2968a3fee519fe973
+reviewed_code_sha256: ae18d97463a046fc6367b4f1037d793e8e9bdd874c43ae42011717a0b268343e
 findings_total: 1
 findings_real: 1
 findings_fixed: 0
