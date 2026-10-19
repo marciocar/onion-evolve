@@ -2,7 +2,8 @@
 title: 'Resíduo — onda 1 do EPIPE: 75 pontos curados e a catraca que só encolhe'
 date: 2026-10-19
 branch: fix/epipe-wave-1
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 53da0d31687ae2325c72676b7a92d1b53da387ec30fd5fbee71ca732a7ff95f4
+reviewed_code_sha256: aa02b06feff436ae68a9b053bc03721513243beb3ad2c0a8b6a8b3933adc7156
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
