@@ -2,7 +2,8 @@
 title: 'Resíduo — o merge do .prettierignore deixa de re-anexar caminho presente por EPIPE sob pipefail'
 date: 2026-10-19
 branch: fix/prettierignore-epipe
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9b1567fb42b8274f54d530a3a10db45d330e2994a0881a8ae8836e60c95d2817
+reviewed_code_sha256: 42a33cd4fbdea01e4fc0599206a5ab3414627c3f0bfded6e6e847da19066c6e2
 findings_total: 1
 findings_real: 1
 findings_fixed: 0
