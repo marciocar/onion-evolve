@@ -2,7 +2,7 @@
 branch: feat/stt-service
 pr: 1184
 date: 2026-10-17
-reviewed_diff_sha256: 588f3c1176b0e47c688882672e2616bb537a2fd9f8643db8b666b347a104faee
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: b26db6988dad94a40e6196c40233bdefcf2865c69477f70e377ae0e0fc6a3e4d
 findings_total: 17
 findings_real: 16
@@ -97,3 +97,14 @@ código é o mesmo. O hash de código mudou porque a base mudou: a `main` trouxe
 `lint-selftest.sh`, que este PR também toca. A interação foi exercida no pré-voo do `pr-finalize`, com as
 famílias `moat_gate`, `stt_service` e `shell_pipefail_robustness` (318 verdes). O radar do grafo passa em
 `--integrity --schema` e o teto bate (11/11). Sem achado novo. A bancada completa fica para o CI.
+
+## Cura depois do CI no ubuntu 26.04 (2026-10-19)
+
+O 1º CI depois do rebase reprovou a faixa 3: de (w4) a (w16), todos com `python3 não é 3.12`. A `main` tinha
+voltado o runner para o `ubuntu-latest` (26.04), que não traz 3.12. A bancada passava o `python3` REAL à sonda de
+versão do wrapper, então media o runner e não o wrapper. A recusa em si está certa: o lock fixa rodas `cp312`.
+A cura fica na bancada: um `python3` falso no PATH dos falsos responde só à sonda, como a máquina-alvo, e
+repassa todo o resto ao interpretador real. O caso novo (w22) prova que a recusa morde (rc 1, com mutante).
+Medido nos dois ambientes: com o 3.12 da VPS, 80/80; com um runner simulado (um `python3` à frente no PATH que
+reprova a sonda), 80/80. A mesma simulação SEM a cura reproduz as falhas do CI, de (w4) a (w16). Logo o verde
+mede a cura, não o ambiente.
