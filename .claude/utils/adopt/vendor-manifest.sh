@@ -656,7 +656,11 @@ _target_owns_contract() {
 _CORE_ONLY_ADOPTION_EXCLUDES=(':(exclude).claude/skills/onion-publish'
                               ':(exclude).claude/commands/meta/publish.md'
                               ':(exclude).claude/rules/publish-lens.md'
-                              ':(exclude).claude/commands/common/prompts/publish-doctrine.md')
+                              ':(exclude).claude/commands/common/prompts/publish-doctrine.md'
+                              ':(exclude).claude/validation/claude-md-size-ceiling.txt')
+# 2026-10-19 (D_TETO_NAO_VIAJA_NO_TRANSPORTE): o teto em bytes do CLAUDE.md é o número DESTE repositório;
+# no adotante ele não teria objeto (o lint se cala em papel derivado) e diria um tamanho que não é o dele.
+# A guarda (claude-md-size-check.sh) viaja e, sem o arquivo de teto, cala por desenho.
 # --retired-excludes: o vendor-branch.sh pergunta QUAIS exclusões são APOSENTADORIA (o core deixou de
 # mandar algo que mandava) para tirá-las só do lado antigo do delta de remoção. As outras exclusões
 # (identidade, contrato do próprio alvo, corte de papel) têm outro significado e nunca entram aqui: medir o
