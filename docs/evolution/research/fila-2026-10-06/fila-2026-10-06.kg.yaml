@@ -425,6 +425,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-18: «granaai: o clone local do membro não tem carimbo .onion-version. Qual o caminho?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
       locality: "pessoa"
+  - id: D_PODA_CATRACA_E_L2_DIRIGIDO_1019
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-19"
+    verified_against: "decisão do maestro em 2026-10-19, por pergunta com opções (/meta:decide): escolhida «Catraca + L2 dirigido»"
+    label: "a poda do CLAUDE.md segue em duas pernas: catraca de tamanho no lint agora, e replay L2 dirigido nos dois blocos grandes (biografia do Contexto e formatação por provider) nos tiers do maestro e do subagente; o corte só depois do veredito"
+    narrative: "Selado por /meta:decide em 2026-10-19: escolhida «Catraca + L2 dirigido»; descartadas: «Só o L2 dirigido» · «Só a catraca» · «Mover sem medir»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-19: «Poda do CLAUDE.md: com o L1 cumprido (90 sessões, carrega sempre), como seguimos?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      locality: "pessoa"
 edges:
   - from: E_MAPA_SEM_MERGE_ONION_HOOKS
     to: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
@@ -473,4 +489,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_GRANAAI_MEDIR_ANTES_1018
     to: Q_GRANAAI_CLONE_SEM_CARIMBO
+    edge_type: TRACES_TO
+  - from: D_PODA_CATRACA_E_L2_DIRIGIDO_1019
+    to: Q_PODA_CLAUDE_MD_REVISITA
     edge_type: TRACES_TO
