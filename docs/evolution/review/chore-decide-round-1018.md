@@ -2,8 +2,7 @@
 title: 'Resíduo — a rodada do /meta:decide de 2026-10-18: quatro selos, a fila colhida e o pin da action em dia'
 date: 2026-10-18
 branch: chore/decide-round-1018
-reviewed_diff_sha256: d65e9e748e3943ba36a02f2260aa0d5d553d888616ebdf3886902bd1e79f5b31
-reviewed_code_sha256: 09160fa1bac259a1d6946fe9ccad9a85b0e8a3bdf87c619ec6cfd38eb639cd8b
+reviewed_diff_sha256: pendente
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
@@ -12,7 +11,7 @@ duration_min: 30
 verdict: CORRIGIDO
 elenxo: nao
 nota: >-
-  Rodada do /meta:decide de 2026-10-18. O maestro escolheu as quatro recomendadas, e cada uma foi selada pelo
+  Rodada do /meta:decide de 2026-10-18. Na 2ª rodada (2026-10-19) o maestro selou Q_GRANAAI_CLONE_SEM_CARIMBO em "Guarda lê a integração"; a cura vai em PR próprio. Na 1ª, escolheu as quatro recomendadas, e cada uma foi selada pelo
   kg-decide-seal.sh, com radar e contrato verdes: D_PORTAS_ENSAIAR_E_PUBLICAR_1018 (door-role-parity),
   D_WRITER_MEDIR_E_ATUALIZAR_1018 (mcp-kg-writer), D_GRANAAI_MEDIR_ANTES_1018 e D_FILA_PODA_PRIMEIRO_1018
   (fila). As duas da fila são decisões de RUMO, não de encerramento, e por isso nascem como nós novos ligados
