@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 6 NÓS ═══
+# ═══ TETO: 8 NÓS ═══ (+2 em 2026-10-19: os dois selos do maestro na revisão do #1203, folga e viagem)
 meta:
   id: claude-md-size-2026-10
   schema_version: "1"
@@ -107,6 +107,38 @@ nodes:
       locator: "repos git temporários com a cópia da guarda"
       method: "medição: execução real dos cenários"
       locality: "repo"
+  - id: D_TETO_NASCE_COM_64B_DE_FOLGA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-19"
+    verified_against: "decisão do maestro em 2026-10-19, por pergunta com opções (/meta:decide): escolhida «Mergear com 64 B de folga»"
+    label: "o teto do CLAUDE.md nasce em 25.982 B, com 64 B de folga declarada para a contagem da REGRA 9 ganhar um dígito sem virar HARD por 1 byte"
+    narrative: "Selado por /meta:decide em 2026-10-19: escolhida «Mergear com 64 B de folga»; descartadas: «Mergear com folga zero» · «Não mergear agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-19: «Merge do #1203 (REGRA 109 + cura do EPIPE no hook do shell): com que teto?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      locality: "pessoa"
+  - id: D_TETO_NAO_VIAJA_NO_TRANSPORTE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-19"
+    verified_against: "decisão do maestro em 2026-10-19, por pergunta com opções (/meta:decide): escolhida «Cortar o teto do transporte»"
+    label: "o arquivo de teto do CLAUDE.md sai do transporte: a guarda viaja sem objeto, e o adotante não recebe o número de outro repositório"
+    narrative: "Selado por /meta:decide em 2026-10-19: escolhida «Cortar o teto do transporte»; descartadas: «Deixar viajar inerte» · «Abrir como opt-in no adotante»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-19: «A guarda só julga o core; o arquivo de teto viaja junto com .claude/validation. O que fazer com ele?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      locality: "pessoa"
 
 edges:
   - from: E_CLAUDE_MD_CRESCEU_52_DEPOIS_DO_SELO
@@ -129,3 +161,9 @@ edges:
     to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
     edge_type: CONSTRAINS
     label: "o que a guarda não vê"
+  - from: D_TETO_NASCE_COM_64B_DE_FOLGA
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    edge_type: TRACES_TO
+  - from: D_TETO_NAO_VIAJA_NO_TRANSPORTE
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    edge_type: TRACES_TO

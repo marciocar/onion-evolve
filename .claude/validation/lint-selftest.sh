@@ -25170,12 +25170,13 @@ run_role_cut_selftests() {
       _t_bundle "${d}/v-dr-${_r}" "${_vmx}" --role "${_r}" --kind door --repo "${REPO_ROOT}"
       grep -q . "${d}/v-ad-${_r}" || { _bad="${_bad} ${_r}:bundle-vazio"; continue; }
       for _x in .claude/skills/onion-publish/SKILL.md .claude/commands/meta/publish.md \
-                .claude/rules/publish-lens.md .claude/commands/common/prompts/publish-doctrine.md; do
+                .claude/rules/publish-lens.md .claude/commands/common/prompts/publish-doctrine.md \
+                .claude/validation/claude-md-size-ceiling.txt; do
         grep -qxF "${_x}" "${d}/v-ad-${_r}" && _bad="${_bad} ${_r}:vazou-na-adocao:${_x}"
         grep -qxF "${_x}" "${d}/v-dr-${_r}" || _bad="${_bad} ${_r}:sumiu-da-porta:${_x}"
       done
       grep -qxF .claude/commands/meta/create-command.md "${d}/v-ad-${_r}" || _bad="${_bad} ${_r}:meta-fabrica-cortada"
-      _diff="$(LC_ALL=C comm -13 <(LC_ALL=C sort "${d}/v-ad-${_r}") <(LC_ALL=C sort "${d}/v-dr-${_r}") | grep -vE '^\.claude/(skills/onion-publish/|commands/meta/publish\.md$|rules/publish-lens\.md$|commands/common/prompts/publish-doctrine\.md$)' || true)"
+      _diff="$(LC_ALL=C comm -13 <(LC_ALL=C sort "${d}/v-ad-${_r}") <(LC_ALL=C sort "${d}/v-dr-${_r}") | grep -vE '^\.claude/(skills/onion-publish/|commands/meta/publish\.md$|rules/publish-lens\.md$|commands/common/prompts/publish-doctrine\.md$|validation/claude-md-size-ceiling\.txt$)' || true)"
       [ -n "${_diff}" ] && _bad="${_bad} ${_r}:adocao-perdeu-mais:$(head -1 <<< "${_diff}")"
     done
     printf '%s' "${_bad}"
