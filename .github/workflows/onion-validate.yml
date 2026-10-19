@@ -73,7 +73,7 @@ permissions:
 
 jobs:
   lint-onion-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
     # ── DIVISÃO DE 2026-08-16: este job é o GATE SOBRE A MUDANÇA (lê o diff e reprova o
     #    artefato). A BANCADA (lint-selftest.sh, 689 asserções À ÉPOCA — o número de hoje vive
     #    em `docs/onion/testing-inventory.md`) saiu para `onion-selftest.yml`
