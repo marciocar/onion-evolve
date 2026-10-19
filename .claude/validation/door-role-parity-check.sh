@@ -135,7 +135,7 @@ while IFS=$'\x1f' read -r mid role path kind; do
     # members-validate.sh, não desta guarda.
     [ -n "${role}" ] || continue
     if [ -z "${path}" ] || [ ! -d "${path}" ]; then adopter_unreadable=$((adopter_unreadable + 1)); continue; fi
-    # O CARIMBO É O DA INTEGRAÇÃO, não o da branch em que o clone está (2026-10-19, medido no granaai):
+    # O CARIMBO É O DA INTEGRAÇÃO, não o da branch em que o clone está (2026-10-19, medido num adotante real):
     # o clone da equipe estava numa branch de trabalho sem `.claude/` rastreado, e a guarda acusava
     # CARIMBO-AUSENTE num membro vivo e adotado (o carimbo estava na `develop`, igual ao registro). A
     # árvore de trabalho segue sendo a 1ª fonte; sem ela, lê-se o carimbo da branch de integração

@@ -34471,7 +34471,7 @@ run_door_role_parity_selftests() {
   if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/CARIMBO-AUSENTE' <<< "${_drpa_out}"; then
     record_pass "door-role-parity: (g5) adotante com clone e SEM carimbo é nomeado (não passa calado)"
   else record_fail "door-role-parity: (g5)" "clone sem carimbo passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
-  # (g6) O CARIMBO É O DA INTEGRAÇÃO (2026-10-19, medido no granaai): clone vivo e adotado, parado numa
+  # (g6) O CARIMBO É O DA INTEGRAÇÃO (2026-10-19, medido num adotante real): clone vivo e adotado, parado numa
   # branch de trabalho sem `.claude/` rastreado, com o carimbo na `develop`. A guarda acusava
   # CARIMBO-AUSENTE num membro em dia. Ler a integração cala (g6); sem carimbo em lugar nenhum, segue
   # nomeado (g6b). Voltar a ler só a árvore de trabalho reprova (g6).
