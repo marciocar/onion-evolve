@@ -47,7 +47,7 @@ jobs:
   # e o teto de linhas medido) vive em ops/review/review-mode-decide.sh, que tem bancada — o YAML só
   # encadeia. Valor fora do enum ⇒ este job FALHA nomeado, e o veredito também (nunca silêncio).
   onion-review-mode:
-    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     if: ${{ github.event.pull_request.head.repo.fork == false }}
     outputs:
@@ -95,7 +95,7 @@ jobs:
 
   onion-review:
     needs: onion-review-mode
-    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
+    runs-on: ubuntu-latest
     # ⚠️ 15 → 26, e a razão e MEDIDA (PR #871, 2026-09-24): o teto era do JOB e cobria AS DUAS
     # tentativas. A 1a consumiu ~14 min, o retry recebeu 55 SEGUNDOS e foi cancelado — retry sem
     # orcamento e decorativo. Pior: o passo "aviso se nenhuma tentativa revisou (soft-pass, nao
@@ -836,7 +836,7 @@ jobs:
   # commit — subir o número sem tornar a falha visível só adiaria o próximo silêncio.
   # ═══════════════════════════════════════════════════════════════════════════════════
   onion-review-verdict:
-    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
+    runs-on: ubuntu-latest
     needs: [onion-review-mode, onion-review]
     # `!cancelled()` e NÃO `always()`: com always(), cancelar a run NÃO cancela este job — o
     # GitHub re-avalia o `if` e always() dá true. Um `gh run cancel` humano virava

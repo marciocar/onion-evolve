@@ -29,7 +29,7 @@ permissions:
 
 jobs:
   diagnose:
-    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     if: ${{ github.event.pull_request.head.repo.fork == false || github.event_name == 'workflow_dispatch' }}
     # ⚠️ UM SÓ BLOCO `env:` — havia DOIS, e o YAML inteiro não parseava. O workflow ficou

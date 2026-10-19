@@ -39,7 +39,7 @@ permissions:
 
 jobs:
   door-staleness:
-    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
+    runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
       - name: Checkout

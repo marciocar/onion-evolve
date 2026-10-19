@@ -30,7 +30,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.5
-    status: open
+    status: done
+    verified_at: '2026-10-19'
+    verified_against: "PR-sonda #1210 (bancada no runner ubuntu-26.04): 4171 passaram, 0 pulados, 0 falharam em STRICT; curas no #1207 (JSON fundo) e no #1209 (falso claude em script)"
     label: 'adaptar ao ubuntu-26.04 as guardas que caem por ambiente (a sonda do session-beacon e o que mais aparecer) e devolver o CI ao ubuntu-latest'
     x_gatilho: "reproduzir o 26.04 num container na VPS e rodar a bancada completa nele; fecha quando ela passar lá e o runs-on voltar ao ubuntu-latest"
   - id: D_RUNNER_FIXADO_2404_1019
@@ -50,6 +52,23 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 
+  - id: E_BANCADA_COMPLETA_VERDE_NO_2604
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-19'
+    verified_against: "PR-sonda #1210, run da bancada com Image: ubuntu-26.04 nas 4 faixas: 796 + 1128 + 1009 + 1238 = 4171 passaram, 0 pulados, 0 falharam, ONION_SELFTEST_STRICT=1"
+    trace: '.github/workflows/onion-selftest.yml'
+    label: 'a bancada completa passa no runner ubuntu-26.04 em STRICT (4171/0/0) depois das curas do JSON fundo e do falso claude; o CI volta ao ubuntu-latest'
+    narrative: 'A 1ª tentativa de medir foi num container ubuntu:26.04 na VPS e não serviu: o container não espelha a imagem do GitHub (mawk no lugar de gawk, sem as ferramentas pré-instaladas), e 263 famílias nem rodaram. A medida honesta foi o runner real, por um PR-sonda em rascunho, fechado sem merge.'
+    provenance:
+      source: "logs do GitHub Actions do PR #1210"
+      locator: "gh run view <run> --job <job> --log: linhas 'Image:' e 'Passaram/Pularam/Falharam'"
+      method: "medição: leitura dos logs dos 4 jobs da bancada no runner 26.04"
+      locality: "repo"
+
 edges:
   - from: E_RUNNER_2604_DERRUBA_GUARDAS_POR_AMBIENTE
     to: Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST
@@ -58,3 +77,7 @@ edges:
   - from: D_RUNNER_FIXADO_2404_1019
     to: Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST
     edge_type: TRACES_TO
+  - from: E_BANCADA_COMPLETA_VERDE_NO_2604
+    to: Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST
+    edge_type: SUPPORTS
+    label: "a bancada verde no 26.04 fecha a adaptação"
