@@ -1,0 +1,60 @@
+# kg-backlog-guard: on
+# ═══ TETO: 6 NÓS ═══
+meta:
+  id: ci-runner-2604-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-19"
+  review_after: "2026-11-02"
+  # O GitHub migra o ubuntu-latest para o ubuntu-26.04, e guardas da bancada que dependem do ambiente caem lá.
+nodes:
+  - id: E_RUNNER_2604_DERRUBA_GUARDAS_POR_AMBIENTE
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-19'
+    verified_against: "logs dos jobs: run 39275866461 (push ao main) e PRs #1207/#1208, todos Image: ubuntu-26.04; os verdes do mesmo dia em ubuntu-24.04 (run 39272227166)"
+    trace: '.github/workflows/onion-selftest.yml'
+    label: 'no runner ubuntu-26.04 duas guardas da bancada caem por ambiente: o JSON de 100.000 níveis passa a ser lido (Python 3.14 com pilha grande) e a sonda do session-beacon não observa o comm em 2 s; no 24.04 as duas passam'
+    narrative: 'O JSON fundo foi medido e curado no #1207 (o leitor 3.14 com pilha ≥ 16 MB lê; o oráculo passa a aceitar os dois desfechos honestos). O session-beacon não foi reproduzido: só aparece no 26.04, em modo STRICT, como guarda que não pôde ser exercida. O push ao main gerou o revert automático #1205, que não tem relação com o commit revertido.'
+    provenance:
+      source: "logs do GitHub Actions (onion-selftest)"
+      locator: "gh run view <run> --job <job> --log: linhas 'Image:' e os casos ✗/⊘"
+      method: "medição: leitura dos logs dos jobs que falharam e dos que passaram"
+      locality: "repo"
+
+  - id: Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: 'adaptar ao ubuntu-26.04 as guardas que caem por ambiente (a sonda do session-beacon e o que mais aparecer) e devolver o CI ao ubuntu-latest'
+    x_gatilho: "reproduzir o 26.04 num container na VPS e rodar a bancada completa nele; fecha quando ela passar lá e o runs-on voltar ao ubuntu-latest"
+  - id: D_RUNNER_FIXADO_2404_1019
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-19"
+    verified_against: "decisão do maestro em 2026-10-19, por pergunta com opções (/meta:decide): escolhida «Fixar 24.04 e adaptar»"
+    label: "o CI do core fixa o runner em ubuntu-24.04 enquanto as guardas que caem por ambiente no 26.04 não forem adaptadas; depois volta ao ubuntu-latest"
+    narrative: "Selado por /meta:decide em 2026-10-19: escolhida «Fixar 24.04 e adaptar»; descartadas: «Adaptar sem fixar» · «Re-rodar e esperar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-19: «O ubuntu-latest migra para o 26.04 e duas guardas caem por ambiente; como tratar?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      locality: "pessoa"
+
+edges:
+  - from: E_RUNNER_2604_DERRUBA_GUARDAS_POR_AMBIENTE
+    to: Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST
+    edge_type: SUPPORTS
+    label: "a queda medida abre a adaptação"
+  - from: D_RUNNER_FIXADO_2404_1019
+    to: Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST
+    edge_type: TRACES_TO

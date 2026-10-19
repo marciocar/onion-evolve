@@ -88,7 +88,7 @@ jobs:
   # bancada) e nao inline aqui: YAML inline nao tem teste, e a primeira tentativa inline quebrou
   # o bloco escalar.
   plano:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
     timeout-minutes: 5
     outputs:
       faixas: ${{ steps.p.outputs.faixas }}
@@ -134,7 +134,7 @@ jobs:
       fail-fast: false               # uma faixa vermelha nao esconde o resultado das outras
       matrix:
         faixa: ${{ fromJson(needs.plano.outputs.faixas) }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
     # 25 min: medido 908s (15,1 min) local na KVM 8 com 646 guardas; o runner é mais rápido
     # (686s com 689). Os dois números são de 2026-08 e NÃO se reescrevem — snapshot histórico
     # explica a folga que se escolheu naquele dia. O tamanho de HOJE está em
@@ -231,7 +231,7 @@ jobs:
     name: selftest-gate
     needs: [plano, selftest]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
     timeout-minutes: 5
     steps:
       - name: Agregar o veredito das faixas
@@ -252,7 +252,7 @@ jobs:
   alarme-main:
     needs: [plano, selftest, selftest-gate]
     if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # fixado em 2026-10-19 (D_RUNNER_FIXADO_2404_1019): no 26.04 guardas caem por ambiente
     timeout-minutes: 10
     permissions:
       contents: write        # empurrar a branch revert/<sha12>
