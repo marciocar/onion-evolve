@@ -2380,6 +2380,7 @@ docs/onion/radar-baselines.yaml	E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA	docs/evo
 docs/onion/radar-baselines.yaml	Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
 docs/onion/radar-sources.yaml	E_MERCADO_E3_R5_SINAL_FRACO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 docs/onion/radar-sources.yaml	Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
+docs/onion/testing-inventory.md	E_EXISTE_NAO_E_RODOU	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 docs/onion/testing-validation-system.md	E_A_DISCIPLINA_VIROU_MECANISMO_DE_PAINEL	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/technical-context/01-core/	L1_CORE	docs/onion/graph/technical-context-core-2026-07.kg.yaml
 docs/technical-context/01-core/adr/index.md	F_ADR	docs/onion/graph/technical-context-core-2026-07.kg.yaml
