@@ -13430,8 +13430,14 @@ STUB
   else record_fail "federation-a2a: invite surrogate" "rc=${rc} err='${ierr}'"; fi
   python3 -c 'import sys; open(sys.argv[1],"w").write("{\"version\":1,\"x\":" + "["*100000 + "]"*100000 + ",\"invites\":[]}")' "${iv}"; chmod 600 "${iv}"
   _fa_ls check --file "${iv}" --json
-  if [ "${rc}" -eq 2 ] && [ "$(jq -r .state <<< "${out}")" = unmeasured ]; then record_pass "federation-a2a: invite JSON fundo demais para o leitor → não medido (rc 2), nunca 'o bridge recusa'"
-  else record_fail "federation-a2a: invite JSON fundo" "rc=${rc} state=$(jq -r .state <<< "${out}" 2>/dev/null)"; fi
+  # O invariante é "nunca 'o bridge recusa'": o JSON.parse do Node lê o arquivo. Se ESTE leitor não consegue,
+  # o certo é "não medido" (rc 2); se consegue, o certo é ler (rc 0, ok). Medido em 2026-10-19: do Python 3.14
+  # em diante o limite do decodificador é a pilha real, e com pilha ≥ 16 MB (o runner ubuntu-26.04) os 100.000
+  # níveis LÊEM — o oráculo antigo, que só aceitava rc 2, derrubou a main e gerou um revert automático (#1205).
+  local _jst; _jst="$(jq -r .state <<< "${out}" 2>/dev/null)"
+  if { [ "${rc}" -eq 2 ] && [ "${_jst}" = unmeasured ]; } || { [ "${rc}" -eq 0 ] && [ "${_jst}" = ok ]; }; then
+    record_pass "federation-a2a: invite JSON fundo → não medido (rc 2) se o leitor não alcança, ok (rc 0) se alcança; nunca 'o bridge recusa'"
+  else record_fail "federation-a2a: invite JSON fundo" "rc=${rc} state=${_jst}"; fi
   printf '{"version":1,"invites":[]}\n' > "${iv}"; chmod 600 "${iv}"; mkfifo "${sb}/desc.fifo"
   rc=0; out="$(timeout 10 bash "${inv_m}" inspect --invite "${sb}/desc.fifo" --member acme --json 2>&1)" || rc=$?
   if [ "${rc}" -eq 1 ] && _fa_has "${out}" 'não é arquivo regular'; then record_pass "federation-a2a: invite inspect com FIFO no descritor → recusa sem travar"
