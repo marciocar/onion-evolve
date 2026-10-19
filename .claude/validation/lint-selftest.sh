@@ -23415,8 +23415,12 @@ run_session_beacon_selftests() {
   # `sleep` renomeada → comm=claude) dispensa haver uma sessão real por perto: o mesmo
   # veredito em dev e no CI. Sem este caso, inverter a comparação de `comm` passaria batido.
   fake_dir="$(mktemp -d)"
-  if cp "$(command -v sleep)" "${fake_dir}/claude" 2>/dev/null; then
-    "${fake_dir}/claude" 30 & fake_pid=$!
+  # O falso `claude` é um SCRIPT, não uma cópia do `sleep` (2026-10-19, medido num container ubuntu:26.04):
+  # lá o coreutils é o uutils, um binário multicall que escolhe a ferramenta pelo argv[0] — copiado como
+  # `claude`, ele responde "unknown program 'claude'" e sai na hora, e o comm nunca é visto (o ⊘ derrubava o
+  # CI em STRICT). O comm de um script é o nome do arquivo; o laço de `sleep 1` não deixa órfão ao ser morto.
+  if printf '#!/bin/sh\nwhile :; do sleep 1; done\n' > "${fake_dir}/claude" && chmod +x "${fake_dir}/claude"; then
+    "${fake_dir}/claude" & fake_pid=$!
     # ESPERA O `exec`, com teto. A 1a forma lia `/proc/<pid>/comm` NA HORA, e isso e corrida: entre o
     # `&` e o exec do filho o comm ainda e o do shell, o caso caia no `record_skip` e sob
     # ONION_SELFTEST_STRICT=1 o ⊘ PINTA O CI DE VERMELHO. Medido 2026-09-23: a mesma faixa passou as
