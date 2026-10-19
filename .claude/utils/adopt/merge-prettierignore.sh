@@ -79,7 +79,10 @@ existing_norm="$(tr -d '\r' < "${PI}" 2>/dev/null || true)"
 missing=()
 while IFS= read -r p; do
   [ -n "${p}" ] || continue
-  if ! printf '%s\n' "${existing_norm}" | grep -qxF "${p}"; then
+  # here-string, nunca `printf | grep -q`: sob pipefail o grep -q sai no 1º acerto, o printf leva
+  # EPIPE e o pipeline devolve ≠0 — o caminho PRESENTE virava "faltante" e era re-anexado (falha
+  # intermitente da bancada no CI, medida em 3 de 12 runs falhos até 2026-10-19).
+  if ! grep -qxF "${p}" <<< "${existing_norm}"; then
     missing+=("${p}")
   fi
 done <<< "${paths}"

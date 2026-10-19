@@ -14030,6 +14030,15 @@ run_prettierignore_selftests() {
   else record_fail "prettierignore: complete" "mutou um alvo já completo"; fi
   rm -rf "${d}"
 
+  # (d2) complete GRANDE (>64 KB depois dos caminhos) → no-op. Força deterministicamente o EPIPE que o
+  # `printf | grep -q` sob pipefail sofria só às vezes no CI: o grep acha cedo, o printf fica escrevendo.
+  d="$(mktemp -d)"; { cat "${tpl}"; for _i in $(seq 1 3000); do printf 'padding/linha-%05d/arquivo-qualquer.md\n' "${_i}"; done; } > "${d}/.prettierignore"
+  before="$(cksum < "${d}/.prettierignore")"; bash "${helper}" "${d}" >/dev/null 2>&1
+  after="$(cksum < "${d}/.prettierignore")"
+  if [ "${before}" = "${after}" ]; then record_pass "prettierignore: complete GRANDE é no-op (sem EPIPE sob pipefail)"
+  else record_fail "prettierignore: complete GRANDE" "mutou um alvo já completo (EPIPE do printf|grep -q sob pipefail)"; fi
+  rm -rf "${d}"
+
   # (e) complete-no-header → 5 paths soltos (espelha um caso real de campo): no-op, NÃO injeta cabeçalho órfão
   d="$(mktemp -d)"
   # (vendor/kg-ssot/ entrou no template em 2026-10-15, SAC-149: o alvo "completo" passou a ter os 6 caminhos)
