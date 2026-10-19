@@ -166,13 +166,22 @@ nodes:
 
   - id: Q_DIARIZACAO_SHERPA_X_SORTFORMER_1017
     node_type: question
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.4
     label: "Diarização da reunião em pt-BR na VPS sem GPU: o sherpa-onnx com a segmentação pyannote 3.0 (sem token do Hugging Face) ou o Sortformer da NVIDIA na versão atual? Decide o número: DER em pt-BR e custo em CPU, por critério pré-registrado. Pesquisa a pedir à curadoria."
     x_gatilho: "fecha quando a curadoria devolver a rodada com o protocolo pré-registrado (commitado antes de rodar), as versões atuais dos dois motores, o DER em pt-BR, o RTF e o RSS na VPS de 8 vCPU; sem um dos dois braços medido, não fecha."
     trace: "docs/evolution/inbox/_processed/2026-10-17-proposal-windows-client-vps-server.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-19"
+    verified_against: "decisão do maestro em 2026-10-19, por pergunta com opções (/meta:decide): escolhida «Nemotron-3 v3-offline: Nemotron-3-Diarization q8_0 pelo NeMo-Speech.cpp 0.2.0, preset v3-offline, em CPU, sem token, depois do Parakeet; sherpa-onnx + CAM++ de reserva; licença OpenMDW-1.1 aceita para uso interno»"
+    narrative: |-
+      Selado por /meta:decide em 2026-10-19: escolhida «Nemotron-3 v3-offline: Nemotron-3-Diarization q8_0 pelo NeMo-Speech.cpp 0.2.0, preset v3-offline, em CPU, sem token, depois do Parakeet; sherpa-onnx + CAM++ de reserva; licença OpenMDW-1.1 aceita para uso interno»; descartadas: «sherpa-onnx + CAM++ como caminho principal» · «Medir áudio real antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-19: «Diarização no lote da VPS (SAC-167): qual caminho selar, e a licença OpenMDW-1.1 serve para uso interno?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
+      locality: "pessoa"
 
 edges:
 
