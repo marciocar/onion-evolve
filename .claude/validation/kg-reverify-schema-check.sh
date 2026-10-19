@@ -70,7 +70,7 @@ _check_file() {
   req_block="$(printf '%s\n' "${schema}" | awk '/^  required:/{f=1} f{print} f&&/\],?$/{exit}')"
   local field
   for field in "${REQUIRED_FIELDS[@]}"; do
-    printf '%s' "${req_block}" | grep -q "\"${field}\"" \
+    grep -q "\"${field}\"" <<< "${req_block}" \
       || _viol CAMPO-NAO-OBRIGATORIO "'${field}' não está no 'required' raiz — um worker que o OMITA passa na validação"
   done
 
@@ -117,7 +117,7 @@ print(" ".join(problems))
   #     e este schema viveu 17 dias nessa forma com a guarda dizendo OK. A guarda agora recusa a
   #     forma que o substrato recusa. Só chave REAL conta (indentação de topo, 2 espaços) —
   #     comentário `//` citando o histórico não dispara.
-  if printf '%s\n' "${schema}" | grep -qE '^  (allOf|anyOf|oneOf):'; then
+  if grep -qE '^  (allOf|anyOf|oneOf):' <<< "${schema}"; then
     _viol FORMATO-RECUSADO-PELA-API "o schema usa allOf/anyOf/oneOf no TOPO — a API recusa essa forma (400, medido 2026-08-29) e as guardas nunca rodam. Use a cadeia if/then/else aninhada com raiz na COBERTURA (equivalência provada por tabela-verdade; raiz no verdict DIVERGE em 2 casos)"
   fi
   case " ${missing} " in
@@ -139,7 +139,7 @@ if [ "${1:-}" = "--selftest" ]; then
     printf '%s\n' "${body}" > "${TMP}/c.md"
     output="$(CMD="${TMP}/c.md" _check_file "${TMP}/c.md" 2>&1)" && rc=0 || rc=$?
     if [ -n "${expected}" ]; then
-      if printf '%s' "${output}" | grep -q "${expected}"; then echo "  ✓ acusa: ${name}"
+      if grep -q "${expected}" <<< "${output}"; then echo "  ✓ acusa: ${name}"
       else echo "  ✗ NÃO acusou: ${name} (esperava ${expected})"; failures=$((failures + 1)); fi
     else
       if [ -z "${output}" ]; then echo "  ✓ passa limpo: ${name}"

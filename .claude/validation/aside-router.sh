@@ -52,18 +52,18 @@ detect() {
   # Ordem: mais específico primeiro (guarda-regra antes de guarda; ±etapa explícitos).
   # Canônicos exigem ':'; aliases fluídos (lembre-se / mandou bem / em paralelo / enquanto isso) aceitam ':' ou ','.
   local key=""
-  if   printf '%s' "$line" | grep -qiE '^guarda-regra[[:space:]]*:';                  then key=GUARDRAIL
-  elif printf '%s' "$line" | grep -qiE '^\+etapa[[:space:]]*:';                        then key=ADD_STEP
-  elif printf '%s' "$line" | grep -qiE '^-etapa[[:space:]]*:';                         then key=DROP_STEP
-  elif printf '%s' "$line" | grep -qiE '^(dúvida|duvida|pergunta)[[:space:]]*:';       then key=QUESTION
-  elif printf '%s' "$line" | grep -qiE '^(corrige|dica|orienta)[[:space:]]*:';         then key=CORRECTION
-  elif printf '%s' "$line" | grep -qiE '^(reforço|reforco)[[:space:]]*:';              then key=PRAISE
-  elif printf '%s' "$line" | grep -qiE '^mandou bem[[:space:]]*,';                     then key=PRAISE
-  elif printf '%s' "$line" | grep -qiE '^(nota|fyi|avisa)[[:space:]]*:';               then key=NOTE
-  elif printf '%s' "$line" | grep -qiE '^(guarda|relembra)[[:space:]]*:';              then key=REMEMBER
-  elif printf '%s' "$line" | grep -qiE '^lembre-se[[:space:]]*[:,]';                   then key=REMEMBER
-  elif printf '%s' "$line" | grep -qiE '^(paralelo|pesquisa)[[:space:]]*:';            then key=PARALLEL
-  elif printf '%s' "$line" | grep -qiE '^(em paralelo|enquanto isso)[[:space:]]*[:,]'; then key=PARALLEL
+  if   grep -qiE '^guarda-regra[[:space:]]*:' <<< "$line";                  then key=GUARDRAIL
+  elif grep -qiE '^\+etapa[[:space:]]*:' <<< "$line";                        then key=ADD_STEP
+  elif grep -qiE '^-etapa[[:space:]]*:' <<< "$line";                         then key=DROP_STEP
+  elif grep -qiE '^(dúvida|duvida|pergunta)[[:space:]]*:' <<< "$line";       then key=QUESTION
+  elif grep -qiE '^(corrige|dica|orienta)[[:space:]]*:' <<< "$line";         then key=CORRECTION
+  elif grep -qiE '^(reforço|reforco)[[:space:]]*:' <<< "$line";              then key=PRAISE
+  elif grep -qiE '^mandou bem[[:space:]]*,' <<< "$line";                     then key=PRAISE
+  elif grep -qiE '^(nota|fyi|avisa)[[:space:]]*:' <<< "$line";               then key=NOTE
+  elif grep -qiE '^(guarda|relembra)[[:space:]]*:' <<< "$line";              then key=REMEMBER
+  elif grep -qiE '^lembre-se[[:space:]]*[:,]' <<< "$line";                   then key=REMEMBER
+  elif grep -qiE '^(paralelo|pesquisa)[[:space:]]*:' <<< "$line";            then key=PARALLEL
+  elif grep -qiE '^(em paralelo|enquanto isso)[[:space:]]*[:,]' <<< "$line"; then key=PARALLEL
   else return 0
   fi
   route "$key"

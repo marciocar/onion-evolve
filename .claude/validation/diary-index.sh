@@ -106,7 +106,7 @@ while IFS= read -r f; do
 
   # Marcar compartilhável
   SHARE_MARKER=""
-  if [ "$SHARE" -gt 0 ] || echo "$CLASS" | grep -qE "^(peer|downstream|public|collective)$" 2>/dev/null; then
+  if [ "$SHARE" -gt 0 ] || grep -qE "^(peer|downstream|public|collective)$" 2>/dev/null <<< "$CLASS"; then
     SHARE_MARKER=" 📤"
     SHARABLE=$((SHARABLE + 1))
   fi

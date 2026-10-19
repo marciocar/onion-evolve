@@ -144,23 +144,23 @@ _selftest() {
   printf '{"requires":[]}\n' > "${d}/r/plugins/onion-x/.claude-plugin/capability.json"; printf '# x\n' > "${d}/r/plugins/onion-x/README.md"
   # (a) dependência de fato sem declaração → HARD
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "dependencia-nao-declarada" && [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 1 ]; then echo "  ✅ (a) uso de outro plugin sem REQUIRES_PLUGINS → 1 HARD"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
+  if grep -q "dependencia-nao-declarada" <<< "${out}" && [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 1 ]; then echo "  ✅ (a) uso de outro plugin sem REQUIRES_PLUGINS → 1 HARD"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
   # (a2) só menção de comando de outro plugin → SOFT informativa, não HARD
   printf 'Use /onion:kg.\n' > "${d}/r/plugins/onion-x/commands/c.md"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "^SOFT	mencao-cruzada" && ! printf '%s' "${out}" | grep -q "^HARD"; then echo "  ✅ (a2) menção de comando de outro plugin = SOFT informativa"; else echo "  ✗ (a2): ${out}"; fails=$((fails+1)); fi
+  if grep -q "^SOFT	mencao-cruzada" <<< "${out}" && ! grep -q "^HARD" <<< "${out}"; then echo "  ✅ (a2) menção de comando de outro plugin = SOFT informativa"; else echo "  ✗ (a2): ${out}"; fails=$((fails+1)); fi
   printf 'Use /onion:kg e a skill skills/orch.\n' > "${d}/r/plugins/onion-x/commands/c.md"
   # (b) declarado no manifesto mas capability/README não refletem → requires-sem-plugin + readme-sem-requer
   printf 'PLUGIN_NAME="onion-x"\nCOMMANDS=()\nREQUIRES_PLUGINS=(onion)\n' > "${d}/r/.claude/utils/marketplace/verticals/onion-x.manifest.sh"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "requires-sem-plugin" && printf '%s' "${out}" | grep -q "readme-sem-requer" && ! printf '%s' "${out}" | grep -q "dependencia-nao-declarada"; then echo "  ✅ (b) declarado ⇒ exige capability.json plugin:onion + README 'Requer'"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
+  if grep -q "requires-sem-plugin" <<< "${out}" && grep -q "readme-sem-requer" <<< "${out}" && ! grep -q "dependencia-nao-declarada" <<< "${out}"; then echo "  ✅ (b) declarado ⇒ exige capability.json plugin:onion + README 'Requer'"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
   # (c) tudo coerente → limpo; (d) duplicata → HARD
   printf '{"requires":["plugin:onion"]}\n' > "${d}/r/plugins/onion-x/.claude-plugin/capability.json"; printf '# x\n\n## Requer\n\n- `onion`\n' > "${d}/r/plugins/onion-x/README.md"
   out="$(bash "$0" "${d}/r" --format tsv)"
   if [ -z "${out}" ]; then echo "  ✅ (c) contrato coerente = limpo"; else echo "  ✗ (c): ${out}"; fails=$((fails+1)); fi
   mkdir -p "${d}/r/plugins/onion-x/skills/orch"; printf 'skill2\n' > "${d}/r/plugins/onion-x/skills/orch/SKILL.md"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "duplicado" && printf '%s' "${out}" | grep -q "DIVERGENTE"; then echo "  ✅ (d) artefato duplicado (divergente) → HARD"; else echo "  ✗ (d): ${out}"; fails=$((fails+1)); fi
+  if grep -q "duplicado" <<< "${out}" && grep -q "DIVERGENTE" <<< "${out}"; then echo "  ✅ (d) artefato duplicado (divergente) → HARD"; else echo "  ✗ (d): ${out}"; fails=$((fails+1)); fi
   [ "${fails}" -eq 0 ] && { echo "plugin-deps-check selftest: OK"; return 0; }
   echo "plugin-deps-check selftest: ${fails} falha(s)"; return 1
 }

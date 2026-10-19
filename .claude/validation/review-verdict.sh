@@ -345,7 +345,7 @@ JSON
 
   # --texto imprime o parecer, e e a fonte que NAO depende do posting funcionar.
   local t; t="$(reviewer_text "${d}/comtexto.json")"
-  if printf '%s' "${t}" | grep -q 'O diff esta conforme'; then
+  if grep -q 'O diff esta conforme' <<< "${t}"; then
     printf '  ✓ review-verdict: --texto imprime o parecer integro (fonte independente do github_token)\n'
   else printf '  ✗ review-verdict: --texto nao trouxe o parecer: %s\n' "${t}"; rc=1; fi
 
@@ -364,7 +364,7 @@ JSON
 ]
 JSON
   t="$(reviewer_text "${d}/comerros.json")"
-  if printf '%s' "${t}" | grep -q 'max turns (60) reached'; then
+  if grep -q 'max turns (60) reached' <<< "${t}"; then
     printf '  ✓ review-verdict: erro com errors[] → imprime o DIAGNOSTICO do SDK (nao manda cacar mudanca de schema)\n'
   else printf '  ✗ review-verdict: errors[] nao chegou a saida: %s\n' "${t}"; rc=1; fi
 
@@ -378,7 +378,7 @@ JSON
 ]
 JSON
   t="$(reviewer_text "${d}/parcial.json")"
-  if printf '%s' "${t}" | grep -q 'VEREDITO: 2 violacoes'; then
+  if grep -q 'VEREDITO: 2 violacoes' <<< "${t}"; then
     printf '  ✓ review-verdict: erro sem errors[] → salva o texto PARCIAL do assistant (o veredito sobrevive)\n'
   else printf '  ✗ review-verdict: texto parcial perdido: %s\n' "${t}"; rc=1; fi
 
@@ -387,7 +387,7 @@ JSON
 [ { "type": "result", "subtype": "error_during_execution", "is_error": true, "num_turns": 0, "total_cost_usd": 0 } ]
 JSON
   t="$(reviewer_text "${d}/mudo.json")"
-  if printf '%s' "${t}" | grep -q 'nao chegou a falar'; then
+  if grep -q 'nao chegou a falar' <<< "${t}"; then
     printf '  ✓ review-verdict: sem NENHUMA das tres fontes → diz que o revisor nao falou (ausencia real, nomeada)\n'
   else printf '  ✗ review-verdict: piso de degradacao errado: %s\n' "${t}"; rc=1; fi
 
@@ -410,20 +410,20 @@ JSON
   # O revisor DEVOLVE; quem posta e o Onion. Estes casos guardam a ponte.
   local c
   c="$(comment_body '<!-- m -->' '{"veredito":"1 violacao","achados":[{"arquivo":"a.sh","linha":7,"regra":"commands.md:88","evidencia":"orq em agente"}]}' '')"
-  if printf '%s' "${c}" | grep -q '| `a.sh:7` | commands.md:88 |' \
-     && printf '%s' "${c}" | grep -q '<!-- m -->'; then
+  if grep -q '| `a.sh:7` | commands.md:88 |' <<< "${c}" \
+     && grep -q '<!-- m -->' <<< "${c}"; then
     printf '  ✓ review-verdict: --corpo renderiza a tabela com arquivo:linha e carrega a marca sticky\n'
   else printf '  ✗ review-verdict: --corpo nao renderizou: %s\n' "${c}"; rc=1; fi
 
   # achado SEM linha — o schema torna `linha` opcional, e a tabela nao pode imprimir "a.sh:"
   c="$(comment_body '<!-- m -->' '{"veredito":"x","achados":[{"arquivo":"b.md","regra":"r","evidencia":"e"}]}' '')"
-  if printf '%s' "${c}" | grep -q '| `b.md` |'; then
+  if grep -q '| `b.md` |' <<< "${c}"; then
     printf '  ✓ review-verdict: --corpo omite o `:linha` quando o achado nao tem linha\n'
   else printf '  ✗ review-verdict: --corpo com linha ausente saiu errado: %s\n' "${c}"; rc=1; fi
 
   # `achados: []` e CONFORME, nao "sem parecer" — a distincao que o array empty existe para fazer
   c="$(comment_body '<!-- m -->' '{"veredito":"conforme","achados":[]}' '')"
-  if printf '%s' "${c}" | grep -q 'nenhum achado'; then
+  if grep -q 'nenhum achado' <<< "${c}"; then
     printf '  ✓ review-verdict: --corpo com achados vazios diz CONFORME (array empty != ausencia)\n'
   else printf '  ✗ review-verdict: --corpo nao distinguiu conforme de empty: %s\n' "${c}"; rc=1; fi
 
@@ -432,7 +432,7 @@ JSON
   local empty=0
   for so in '' 'lixo-nao-json' '{"sem":"achados"}'; do
     c="$(comment_body '<!-- m -->' "${so}" "${d}/comtexto.json")"
-    printf '%s' "${c}" | grep -q 'O diff esta conforme' || empty=$((empty + 1))
+    grep -q 'O diff esta conforme' <<< "${c}" || empty=$((empty + 1))
   done
   if [ "${empty}" -eq 0 ]; then
     printf '  ✓ review-verdict: --corpo cai para PROSA nos 3 casos degenerados (empty/lixo/sem-achados) — nunca corpo empty\n'
@@ -444,7 +444,7 @@ JSON
   sed -i 's|    reviewer_text "${f}"|    :|' "${mut5}/m.sh"
   if ! cmp -s "$0" "${mut5}/m.sh"; then
     c="$(bash "${mut5}/m.sh" --corpo '<!-- m -->' '' "${d}/comtexto.json")"
-    if ! printf '%s' "${c}" | grep -q 'O diff esta conforme'; then
+    if ! grep -q 'O diff esta conforme' <<< "${c}"; then
       printf '  ✓ review-verdict: (MUT) sem o fallback o parecer SOME do corpo — o fallback e load-bearing\n'
     else printf '  ✗ review-verdict: (MUT) parecer sobreviveu sem o fallback\n'; rc=1; fi
   else printf '  ✗ review-verdict: (MUT) mutacao do fallback NAO aplicada — o teste nao prova nada\n'; rc=1; fi

@@ -363,7 +363,7 @@ hard=0; soft=0
 # versão anterior refazia sha1 dentro de um `cmd | getline` por candidato só para reencontrar o nome.
 while IFS=$'\037' read -r n nid; do
   [ -n "${n}" ] || continue
-  if ! printf '%s\n' "${known}" | grep -qxF "${n}"; then
+  if ! grep -qxF "${n}" <<< "${known}"; then
     emit HARD NOVO "${n%%::*}" \
       "no '${nid:-<id oculto>}' e plane:PROD impact>=4 SEM verified_at e FORA do baseline — meca contra o vivo antes de selar (/meta:kg-freshness), ou o grafo afirma sobre producao sem nunca ter olhado."
     hard=$((hard+1))
@@ -432,7 +432,7 @@ _retired() {  # $1 = chave path::hash → 0 se o ledger a declara retirada (só 
 }
 while IFS= read -r k; do
   [ -n "${k}" ] || continue
-  printf '%s\n' "${UNVERIFIED}" | grep -qxF "${k}" && continue
+  grep -qxF "${k}" <<< "${UNVERIFIED}" && continue
   kp="${k%%::*}"
   # RETIRADO: as três travas do cabeçalho (ledger + arquivo AUSENTE da árvore + saída declarada).
   if _retired "${k}" && [ ! -e "${REPO_ROOT}/${kp}" ]; then
@@ -441,7 +441,7 @@ while IFS= read -r k; do
     soft=$((soft+1)); continue
   fi
   # a linha ainda está no baseline, ou o operador já a removeu? muda só o conselho da mensagem
-  if printf '%s\n' "${known}" | grep -qxF "${k}"; then hint="remova do baseline"; else hint="a linha ja saiu do baseline"; fi
+  if grep -qxF "${k}" <<< "${known}"; then hint="remova do baseline"; else hint="a linha ja saiu do baseline"; fi
   rec="$(resolve_key "${k}")"
   n_rec=$(printf '%s' "${rec}" | grep -c . || true)
   # AMBIGUIDADE: mais de um nó do corpus casa esta chave. Não dá para dizer se mudou de path, se

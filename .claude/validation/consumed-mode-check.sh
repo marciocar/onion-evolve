@@ -120,7 +120,7 @@ if [ "${SELFTEST:-0}" = "1" ]; then
   _st_repo "$_d" 'bash "${SCRIPT_DIR}/alvo.sh" --modo' 'bash "${SCRIPT_DIR}/outro.sh" --modo'
   _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
   if [ "${_rc}" -eq 1 ] && grep -q 'MODO-SEM-TESTE' <<< "${_out}" \
-     && printf '%s' "${_out}" | grep -q 'alvo.sh' && printf '%s' "${_out}" | grep -q -- '--modo'; then
+     && grep -q 'alvo.sh' <<< "${_out}" && grep -q -- '--modo' <<< "${_out}"; then
     _st_ok '(b) modo consumido e NAO exercitado -> acusa, exit 1, nomeando script e flag'
   else _st_bad '(b)' "nao acusou ou nao nomeou (rc=${_rc}): ${_out}"; fi
   rm -rf "$_d"
@@ -130,7 +130,7 @@ if [ "${SELFTEST:-0}" = "1" ]; then
   _d="$(mktemp -d)"
   _st_repo "$_d" 'bash "${SCRIPT_DIR}/alvo.sh" --modo' 'bash "${SCRIPT_DIR}/alvo.sh" --outroModo'
   _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
-  if [ "${_rc}" -eq 1 ] && printf '%s' "${_out}" | grep -q -- '--modo'; then
+  if [ "${_rc}" -eq 1 ] && grep -q -- '--modo' <<< "${_out}"; then
     _st_ok '(c) mesmo script com flag DIFERENTE ainda acusa — o par e (script, flags)'
   else _st_bad '(c)' "o detector ignorou a flag (rc=${_rc}): ${_out}"; fi
   rm -rf "$_d"
@@ -140,7 +140,7 @@ if [ "${SELFTEST:-0}" = "1" ]; then
   #     para quem so olha o exit code 0.
   _d="$(mktemp -d)"; mkdir -p "$_d/.claude/validation"
   _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
-  if [ "${_rc}" -eq 2 ] && printf '%s' "${_out}" | grep -qi 'ileg'; then
+  if [ "${_rc}" -eq 2 ] && grep -qi 'ileg' <<< "${_out}"; then
     _st_ok '(d) fonte ausente -> exit 2 nomeando o arquivo (fail-loud, nunca aprovacao)'
   else _st_bad '(d)' "fonte ausente nao deu exit 2 (rc=${_rc}): ${_out}"; fi
   rm -rf "$_d"

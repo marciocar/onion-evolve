@@ -46,20 +46,20 @@ if printf '%s\n' "$inv" | grep -E '^__ONION_UNANALYZABLE__ merge=[01] main=1 ::'
 fi
 push_lines=$(printf '%s\n' "$inv" | grep -E '^git[[:space:]]+push([[:space:]]|$)' || true)
 [ -z "$push_lines" ] && exit 0
-printf '%s' "$push_lines" | grep -qE '(--force([^-]|$)|--force-with-lease|[[:space:]]-[a-eg-z]*f[a-z]*([[:space:]]|$))' || exit 0
+grep -qE '(--force([^-]|$)|--force-with-lease|[[:space:]]-[a-eg-z]*f[a-z]*([[:space:]]|$))' <<< "$push_lines" || exit 0
 main_target=0
 # `main` na linha canônica é o NOME do ramo protegido: a lib já converte nele o ramo de produção
 # resolvido (`master` num gitflow clássico — Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, 2026-10-12).
 # `HEAD:main` / `x:main` / `refs/heads/main` também são alvo main — a v1 exigia ESPAÇO antes de
 # `main` e deixava passar o refspec com dois-pontos (buraco achado pela bancada da auditoria
 # D_AUDITAR_GATES_TEXTUAIS, 2026-09-02: `git push -f origin HEAD:main` saía rc=0).
-printf '%s' "$push_lines" | grep -qE '([[:space:]]|:)(refs/heads/)?main([[:space:]]|$|:)' && main_target=1
+grep -qE '([[:space:]]|:)(refs/heads/)?main([[:space:]]|$|:)' <<< "$push_lines" && main_target=1
 if [ "$main_target" -eq 0 ]; then
   # Fallback branch-corrente SÓ para push NU (flags apenas, sem remote/refspec): um push com alvo
   # explícito que não cita main não pode herdar o veto da branch onde a sessão está SENTADA —
   # o 2º falso-positivo de produção (2026-09-01): loop de merge parado em main pushava "$br" de
   # feature e era vetado. Push nu = a linha termina após push+flags.
-  if printf '%s' "$push_lines" | grep -qE 'git[[:space:]]+push([[:space:]]+-[^[:space:]]+)*[[:space:]]*$'; then
+  if grep -qE 'git[[:space:]]+push([[:space:]]+-[^[:space:]]+)*[[:space:]]*$' <<< "$push_lines"; then
     onion_on_protected_branch "$hcwd" && main_target=1
   fi
 fi

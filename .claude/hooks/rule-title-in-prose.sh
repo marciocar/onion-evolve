@@ -90,9 +90,9 @@ if [ "${1:-}" = "--selftest" ]; then
   fails=0
   out="$(printf 'A REGRA 21 acusou e a REGRA 74 também.\n' | _check_text)"
   # 74 mora no checador de bundle desde a F4: o título TEM de vir de lá, não de "não encontrado"
-  if printf '%s' "${out}" | grep -q '^21|REGRA 21 (Grafo' && printf '%s' "${out}" | grep -q '^74|REGRA 74 (Caminho .claude/ NU'; then echo "  ✅ (a) menções sem título detectadas com a forma correta"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
+  if grep -q '^21|REGRA 21 (Grafo' <<< "${out}" && grep -q '^74|REGRA 74 (Caminho .claude/ NU' <<< "${out}"; then echo "  ✅ (a) menções sem título detectadas com a forma correta"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
   out="$(printf 'A REGRA 21 (Grafo sincronizado) passou; veja `REGRA 74` em ```REGRA 62```.\n' | _check_text)"
-  if [ -z "$(printf '%s' "${out}" | grep -v '^74|')" ] && printf '%s' "${out}" | grep -q '^74|'; then echo "  ✅ (b) titulada e bloco de código isentos; crase não isenta"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
+  if [ -z "$(printf '%s' "${out}" | grep -v '^74|')" ] && grep -q '^74|' <<< "${out}"; then echo "  ✅ (b) titulada e bloco de código isentos; crase não isenta"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
   # (d) 98-101 nasceram com cabeçalho `# REGRA N (Título) — HARD` e este hook as via como "título não
   #     encontrado" (medido 2026-10-11). A catraca nº7 do rules-registry.sh impede a forma voltar; aqui
   #     o hook prova que lê a ponta mais nova do registro.

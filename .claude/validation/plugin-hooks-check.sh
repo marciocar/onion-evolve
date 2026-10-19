@@ -116,11 +116,11 @@ _selftest() {
   # (b) motor ausente + repo prefixado
   printf '#!/usr/bin/env bash\nE="$REPO/${CLAUDE_PLUGIN_ROOT}/validation/missing.sh"\n[ -f "$E" ] || exit 0\n' > "${d}/r/plugins/p/hooks/g.sh"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "repo-prefixado" && printf '%s' "${out}" | grep -q "motor-ausente"; then echo "  ✅ (b) repo-prefixado + motor-ausente detectados"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
+  if grep -q "repo-prefixado" <<< "${out}" && grep -q "motor-ausente" <<< "${out}"; then echo "  ✅ (b) repo-prefixado + motor-ausente detectados"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
   # (c) matcher divergente (plugin sem matcher, core com Bash) + script ausente
   printf '{"hooks":{"PostToolUse":[{"hooks":[{"type":"command","command":"bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/g.sh\\""}]}],"UserPromptSubmit":[{"hooks":[{"type":"command","command":"bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/nope.sh\\""}]}]}}\n' > "${d}/r/plugins/p/hooks/hooks.json"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "matcher-divergente" && printf '%s' "${out}" | grep -q "script-ausente"; then echo "  ✅ (c) matcher-divergente + script-ausente detectados"; else echo "  ✗ (c): ${out}"; fails=$((fails+1)); fi
+  if grep -q "matcher-divergente" <<< "${out}" && grep -q "script-ausente" <<< "${out}"; then echo "  ✅ (c) matcher-divergente + script-ausente detectados"; else echo "  ✗ (c): ${out}"; fails=$((fails+1)); fi
   [ "${fails}" -eq 0 ] && { echo "plugin-hooks-check selftest: OK"; return 0; }
   echo "plugin-hooks-check selftest: ${fails} falha(s)"; return 1
 }

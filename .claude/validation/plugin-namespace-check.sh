@@ -183,11 +183,11 @@ _selftest() {
   printf 'PLUGIN_NAME="probe-b"\nCOMMANDS=(.claude/commands/beta/three.md)\n' > "${d}/src/.claude/utils/marketplace/verticals/probe-b.manifest.sh"
   # (a) mapa derivado: dir achatado + arquivo; forma do plugin
   out="$(bash "$0" "${d}/src" --map)"
-  if printf '%s\n' "${out}" | grep -q "^/alpha:two	probe-a	/probe-a:two$" && printf '%s\n' "${out}" | grep -q "^/beta:three	probe-b	/probe-b:three$"; then echo "  ✅ (a) mapa derivado dos manifestos (dir achatado + arquivo)"; else echo "  ✗ (a) mapa: ${out}"; fails=$((fails+1)); fi
+  if grep -q "^/alpha:two	probe-a	/probe-a:two$" <<< "${out}" && grep -q "^/beta:three	probe-b	/probe-b:three$" <<< "${out}"; then echo "  ✅ (a) mapa derivado dos manifestos (dir achatado + arquivo)"; else echo "  ✗ (a) mapa: ${out}"; fails=$((fails+1)); fi
   # (b) as três classes num arquivo do plugin
   printf 'Rode /alpha:two depois /beta:three e por fim /meta:adopt. URL https://x/meta:nao e path a/meta:nao nao contam.\n' > "${d}/src/plugins/probe-a/commands/one.md"
   out="$(bash "$0" "${d}/src" --format tsv)"
-  if [ "$(printf '%s\n' "${out}" | grep -c .)" -eq 3 ] && printf '%s\n' "${out}" | grep -q "mesmo-plugin" && printf '%s\n' "${out}" | grep -q "cross-plugin" && printf '%s\n' "${out}" | grep -q "dangling"; then echo "  ✅ (b) três classes detectadas, URL/path não contam"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
+  if [ "$(printf '%s\n' "${out}" | grep -c .)" -eq 3 ] && grep -q "mesmo-plugin" <<< "${out}" && grep -q "cross-plugin" <<< "${out}" && grep -q "dangling" <<< "${out}"; then echo "  ✅ (b) três classes detectadas, URL/path não contam"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
   # (c) forma do plugin e forma sem barra são limpas
   printf 'Rode /probe-a:two depois /probe-b:three e por fim meta:adopt.\n' > "${d}/src/plugins/probe-a/commands/one.md"
   out="$(bash "$0" "${d}/src" --format tsv)"

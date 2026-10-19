@@ -141,32 +141,32 @@ run_selftest() {
   # (i) link VIVO p/ docs/analysis SEM baseline => HARD (novo)
   printf '# a\nver [x](../../analysis/foo.md) fim\n' > "${kbdir}/a.md"
   printf '# baseline vazio\n' > "${BL}"; _run
-  if printf '%s' "${out}" | grep -q "^HARD"; then echo "  ✅ (i) link core-privado novo reprova"; else echo "  ✗ (i)"; fails=$((fails+1)); fi
+  if grep -q "^HARD" <<< "${out}"; then echo "  ✅ (i) link core-privado novo reprova"; else echo "  ✗ (i)"; fails=$((fails+1)); fi
 
   # (ii) MESMO link no baseline => tolerado (SOFT, sem HARD)
   printf 'docs/knowledge-base/concepts/a.md|docs/analysis/foo.md\n' >> "${BL}"; _run
-  if printf '%s' "${out}" | grep -q "^HARD"; then echo "  ✗ (ii) passivo no baseline não deveria dar HARD"; fails=$((fails+1)); else echo "  ✅ (ii) passivo baselined tolerado (SOFT)"; fi
+  if grep -q "^HARD" <<< "${out}"; then echo "  ✗ (ii) passivo no baseline não deveria dar HARD"; fails=$((fails+1)); else echo "  ✅ (ii) passivo baselined tolerado (SOFT)"; fi
 
   # (iii) link intra-KB (não core-privado) => IGNORADO (nunca viola)
   printf '# b\nver [y](outra-kb.md) e [z](../frameworks/g.md) fim\n' > "${kbdir}/b.md"
   printf '# baseline vazio\n' > "${BL}"; _run
-  if printf '%s' "${out}" | grep -q "b.md"; then echo "  ✗ (iii) link intra-KB não deveria violar"; fails=$((fails+1)); else echo "  ✅ (iii) link intra-KB ignorado"; fi
+  if grep -q "b.md" <<< "${out}"; then echo "  ✗ (iii) link intra-KB não deveria violar"; fails=$((fails+1)); else echo "  ✅ (iii) link intra-KB ignorado"; fi
 
   # (iv) link p/ .claude/diary (o bug de campo) => HARD
   printf '# c\nver [w](../../../.claude/diary/2026-07-21-x.md) fim\n' > "${kbdir}/c.md"
   printf '# baseline vazio\n' > "${BL}"; _run
-  if printf '%s' "${out}" | grep -q "diary"; then echo "  ✅ (iv) link p/ .claude/diary reprova (o bug de campo)"; else echo "  ✗ (iv)"; fails=$((fails+1)); fi
+  if grep -q "diary" <<< "${out}"; then echo "  ✅ (iv) link p/ .claude/diary reprova (o bug de campo)"; else echo "  ✗ (iv)"; fails=$((fails+1)); fi
 
   # (v) link p/ .claude/skills (VENDORIZADO — adotante recebe) => IGNORADO
   rm -f "${kbdir}/c.md"
   printf '# d\nver [s](../../../.claude/skills/onion/SKILL.md) fim\n' > "${kbdir}/d.md"
   printf '# baseline vazio\n' > "${BL}"; _run
-  if printf '%s' "${out}" | grep -q "skills"; then echo "  ✗ (v) .claude/skills é vendorizado, não deveria violar"; fails=$((fails+1)); else echo "  ✅ (v) link p/ .claude/skills (vendorizado) ignorado"; fi
+  if grep -q "skills" <<< "${out}"; then echo "  ✗ (v) .claude/skills é vendorizado, não deveria violar"; fails=$((fails+1)); else echo "  ✅ (v) link p/ .claude/skills (vendorizado) ignorado"; fi
 
   # (vi) sem baseline => HARD acionável (NO-BASELINE), não silêncio
   rm -f "${kbdir}/d.md" "${kbdir}/b.md"; rm -f "${BL}"
   printf '# a\nver [x](../../analysis/foo.md) fim\n' > "${kbdir}/a.md"; _run
-  if printf '%s' "${out}" | grep -q "NO-BASELINE"; then echo "  ✅ (vi) baseline ausente = HARD acionável"; else echo "  ✗ (vi)"; fails=$((fails+1)); fi
+  if grep -q "NO-BASELINE" <<< "${out}"; then echo "  ✅ (vi) baseline ausente = HARD acionável"; else echo "  ✗ (vi)"; fails=$((fails+1)); fi
 
   rm -rf "${tmp}"; echo "  selftest: $((6-fails))/6 verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1

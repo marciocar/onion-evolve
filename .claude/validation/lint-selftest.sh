@@ -2233,6 +2233,18 @@ PY
     if [ "${_n}" -gt "${_tol}" ]; then _new_ones="${_new_ones} ${_f}(${_n}>${_tol})"
     else _passivo=$(( _passivo + _n )); fi
   done <<< "${_current}"
+  # a catraca SÓ ENCOLHE: ponto curado e baseline não baixado deixa o ganho destravado — foi assim que
+  # 14 curas de 2026-10-19 ficaram com o baseline em 138 contra 124 reais, e a cura podia voltar calada.
+  local _stale=""
+  while IFS=$'\t' read -r _f _tol; do
+    case "${_f}" in ''|'#'*) continue ;; esac
+    _n="$(grep -F "${_f}"$'\t' <<< "${_current}" | head -1 | cut -f2 || true)"; _n="${_n:-0}"
+    [ "${_n}" -lt "${_tol}" ] && _stale="${_stale} ${_f}(${_n}<${_tol})"
+  done < "${_pvb}"
+  if [ -n "${_stale}" ]; then
+    record_fail "shell-pipefail: catraca da classe <produtor>|grep -q DESTRAVADA" \
+      "ponto(s) curado(s) com o baseline ainda tolerando o antigo — baixe: bash ${_pvc} --emit-baseline > ${_pvb}:${_stale}"
+  fi
   if [ -n "${_new_ones}" ]; then
     record_fail "shell-pipefail: VEREDITO por <produtor>|grep -q ACIMA da catraca" \
       "sítio NOVO da classe (o leitor fecha cedo, o escritor toma EPIPE, pipefail reprova com o padrão PRESENTE) — cure com here-string \`grep -q PAD <<< \"\$var\"\`:${_new_ones}"
@@ -27287,7 +27299,7 @@ run_plugin_hooks_resolvable_selftests() {
 [h.pop("onFailure", None) for v in d["hooks"].values() for g in v for h in g["hooks"]]
 json.dump(d, open(p, "w"), indent=2)' "${d}/src/plugins/hp/hooks/hooks.json"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q "motor-ausente" && printf '%s' "${out}" | grep -q "repo-prefixado" && printf '%s' "${out}" | grep -q "matcher-divergente" && printf '%s' "${out}" | grep -q "onfailure-divergente"; then
+  if grep -q "motor-ausente" <<< "${out}" && grep -q "repo-prefixado" <<< "${out}" && grep -q "matcher-divergente" <<< "${out}" && grep -q "onfailure-divergente" <<< "${out}"; then
     record_pass "plugin-hooks-resolvable: (c) mutante → motor-ausente + repo-prefixado + matcher-divergente + onfailure-divergente"
   else record_fail "plugin-hooks-resolvable: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-240)"; fi
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
@@ -27306,17 +27318,17 @@ run_plugin_bare_path_selftests() {
   printf -- '---\nname: x\nallowed-tools: Bash(bash .claude/utils/co/relay.sh*)\n---\nVeja `.claude/utils/c4-templates.md`, `${CLAUDE_PLUGIN_ROOT}/utils/ok.md` e `.claude/sessions/x`.\n' > "${d}/r/plugins/p/commands/x.md"
   # (a) sem baseline → NO-BASELINE + 2 NOVO (sessions/ e PLUGIN_ROOT não contam)
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q "NO-BASELINE" && [ "$(printf '%s\n' "${out}" | grep -c "	NOVO	")" -eq 2 ]; then record_pass "plugin-bare-path: (a) sem baseline = NO-BASELINE + 2 NOVO (sessions/ e PLUGIN_ROOT não contam)"
+  if grep -q "NO-BASELINE" <<< "${out}" && [ "$(printf '%s\n' "${out}" | grep -c "	NOVO	")" -eq 2 ]; then record_pass "plugin-bare-path: (a) sem baseline = NO-BASELINE + 2 NOVO (sessions/ e PLUGIN_ROOT não contam)"
   else record_fail "plugin-bare-path: (a)" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   # (b) baseline emitido → passivo SOFT, allowed-tools sinalizado, 0 HARD
   bash "${h}" "${d}/r" --emit-baseline > "${d}/r/.claude/validation/plugin-bare-path-baseline.txt"
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
-  if ! printf '%s' "${out}" | grep -q "^HARD" && printf '%s' "${out}" | grep -q "ALLOWED-TOOLS" && printf '%s' "${out}" | grep -q "PASSIVO"; then record_pass "plugin-bare-path: (b) passivo baselined = SOFT; allowed-tools sinalizado"
+  if ! grep -q "^HARD" <<< "${out}" && grep -q "ALLOWED-TOOLS" <<< "${out}" && grep -q "PASSIVO" <<< "${out}"; then record_pass "plugin-bare-path: (b) passivo baselined = SOFT; allowed-tools sinalizado"
   else record_fail "plugin-bare-path: (b)" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   # (c) ref NOVA fora do baseline = HARD
   printf 'Nova: `.claude/commands/common/templates/t.md`.\n' >> "${d}/r/plugins/p/commands/x.md"
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q "^HARD	NOVO"; then record_pass "plugin-bare-path: (c) ref nova fora do baseline = HARD"
+  if grep -q "^HARD	NOVO" <<< "${out}"; then record_pass "plugin-bare-path: (c) ref nova fora do baseline = HARD"
   else record_fail "plugin-bare-path: (c)" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   rm -rf "${d}"
 }
