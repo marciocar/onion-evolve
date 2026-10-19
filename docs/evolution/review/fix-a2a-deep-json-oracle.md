@@ -2,7 +2,8 @@
 title: 'Resíduo — o JSON fundo do convite A2A deixa de depender da versão do Python, e o CI fixa o runner em 24.04'
 date: 2026-10-19
 branch: fix/a2a-deep-json-oracle
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4458b599324f9c9792d302df181345e422b9f675bce6249d46c7cf5205d41256
+reviewed_code_sha256: c69b3af3f40386bc206abfc3273ccca0ad7c59c48d9ad3837c8990c78690128c
 findings_total: 2
 findings_real: 2
 findings_fixed: 1

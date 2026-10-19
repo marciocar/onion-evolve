@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**568 itens abertos** em 113 grafo(s) com aberto (de 146 no escopo) · 114 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**569 itens abertos** em 114 grafo(s) com aberto (de 147 no escopo) · 115 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1015,6 +1015,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2` | vetos-por-tokens-2026-10 | TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se  |
+
+## ci-runner-2604-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_ADAPTAR_GUARDAS_AO_2604_E_VOLTAR_AO_LATEST` | ci-runner-2604-2026-10 | adaptar ao ubuntu-26.04 as guardas que caem por ambiente (a sonda do session-beacon e o que mais aparecer) e devolver o CI ao ubun |
 
 ## fios-abertos — 3 item(ns)
 
