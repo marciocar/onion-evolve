@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**570 itens abertos** em 113 grafo(s) com aberto (de 145 no escopo) · 114 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**569 itens abertos** em 113 grafo(s) com aberto (de 145 no escopo) · 114 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1057,12 +1057,11 @@
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
 
-## meeting-capture-2026-10 — 2 item(ns)
+## meeting-capture-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
-| 3.2 | `Q_DIARIZACAO_SHERPA_X_SORTFORMER_1017` | meeting-capture-2026-10 | Diarização da reunião em pt-BR na VPS sem GPU: o sherpa-onnx com a segmentação pyannote 3.0 (sem token do Hugging Face) ou o  |
 
 ## task-progress-story-points-2026-10 — 2 item(ns)
 

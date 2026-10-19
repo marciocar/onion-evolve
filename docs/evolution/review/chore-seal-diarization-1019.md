@@ -2,7 +2,8 @@
 title: 'Resíduo — o maestro sela a diarização da VPS: Nemotron-3 v3-offline'
 date: 2026-10-19
 branch: chore/seal-diarization-1019
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1144439ca0da109f1a6f81a224a0fd984e2085b816d484db3d5b9af29d3ed4ff
+reviewed_code_sha256: 3b6f6a71ad901f2b5ecd4ce5c984d9d1f3df87b852ce40669f3d0822e67a88b8
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
