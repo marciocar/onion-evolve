@@ -2,7 +2,8 @@
 title: 'Resíduo — a catraca de tamanho do CLAUDE.md (REGRA 109) e o selo da poda em duas pernas'
 date: 2026-10-19
 branch: feat/claude-md-size-ratchet
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 14f497c2d746addac368e2e4eac9742ef4b1b6a02b4f54f353c5b6964c2125a6
+reviewed_code_sha256: a2f8ed08a4881cf7434c333e7a2f0d4d448835c0d1354571412e4df4d224b875
 findings_total: 7
 findings_real: 7
 findings_fixed: 6
