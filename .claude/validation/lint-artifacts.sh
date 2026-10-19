@@ -5981,7 +5981,7 @@ check_adoption_graph_pin
 #   commits, depois do selo de 2026-09-25 que mandava medir antes de podar (D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS);
 #   decisão do maestro de 2026-10-19: D_PODA_CATRACA_E_L2_DIRIGIDO_1019. Passar do `ceiling:` do baseline é HARD;
 #   subir o teto contra a integração sem `raise:` que cite nó existente é HARD; folga > 512 B é SOFT (trave o ganho).
-#   Lógica em claude-md-size-check.sh; baseline em claude-md-size-baseline.txt. Sem baseline, sem objeto.
+#   Lógica em claude-md-size-check.sh; baseline em claude-md-size-ceiling.txt. Sem baseline, sem objeto.
 # ===========================================================================
 check_claude_md_size() {
   local helper="${SCRIPT_DIR}/claude-md-size-check.sh"

@@ -12,7 +12,7 @@
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
 | Famílias na bancada | **282** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
-| Sítios de asserção (**não** asserções executadas) | **2304** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
+| Sítios de asserção (**não** asserções executadas) | **2305** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **118** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
 | Arquivos de fixture rastreados | **168** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
@@ -25,7 +25,7 @@
 | Scripts de validação | **114** | `git ls-files '.claude/validation/*.sh'` |
 | Hooks | **22** | `git ls-files '.claude/hooks/*.sh'` |
 | Workflows de CI | **5** | `git ls-files '.github/workflows/*.yml'` |
-| Baselines de catraca | **16** | `git ls-files '.claude/validation/*-baseline.txt'` |
+| Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
 ## O que RODOU
 
@@ -33,7 +33,7 @@ Este arquivo conta o que **existe**. Quantas asserções de fato **passaram** é
 execução, vive em `docs/onion/metrics/selftest-runs.jsonl` (**2** envelope(s)
 coletado(s)) e é projetado em [`testing-state.md`](testing-state.md).
 
-A distinção não é formalismo. Há **2304** sítios estáticos de asserção e a última
+A distinção não é formalismo. Há **2305** sítios estáticos de asserção e a última
 execução completa contou **mais** que isso, porque sítio dentro de laço dispara N vezes.
 Publicar o número estático como "tamanho da bancada" trocaria uma defasagem por um erro de
 categoria — e foi por confundir os dois que `689 asserções` sobreviveu em três comentários

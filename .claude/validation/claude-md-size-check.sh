@@ -17,7 +17,7 @@
 #           do maestro de 2026-10-19 (D_PODA_CATRACA_E_L2_DIRIGIDO_1019, grafo fila-2026-10-06) pediu
 #           esta catraca e o replay L2 antes de qualquer corte.
 #
-# BASELINE: .claude/validation/claude-md-size-baseline.txt
+# BASELINE: .claude/validation/claude-md-size-ceiling.txt
 #             ceiling: <bytes>
 #             raise: <AAAA-MM-DD> +<bytes> <NODE_ID> <motivo>     (zero ou mais)
 #           Sem baseline (adotante, porta) a guarda não tem objeto: cala, rc 0.
@@ -46,7 +46,7 @@ _raises_of()  { command grep -E '^raise:' <<< "$1" | tr -d '\r' || true; }
 
 run_check() {
   local repo="$1" fmt="$2" base_ref="$3"
-  local md="${repo}/CLAUDE.md" bl_rel=".claude/validation/claude-md-size-baseline.txt"
+  local md="${repo}/CLAUDE.md" bl_rel=".claude/validation/claude-md-size-ceiling.txt"
   local bl="${repo}/${bl_rel}" hard=0
   [ -f "${md}" ] || return 0
   if [ -z "${base_ref}" ]; then
@@ -130,10 +130,10 @@ run_selftest() {
     git -C "${d}/r" init -q -b main 2>/dev/null || git -C "${d}/r" init -q
     printf 'nodes:\n  - id: D_PORQUE_EXISTE\n' > "${d}/r/kg/x.kg.yaml"
     head -c "$1" /dev/zero | tr '\0' 'a' > "${d}/r/CLAUDE.md"
-    printf '%s\n' "$2" > "${d}/r/.claude/validation/claude-md-size-baseline.txt"
+    printf '%s\n' "$2" > "${d}/r/.claude/validation/claude-md-size-ceiling.txt"
     git -C "${d}/r" add -A && git -C "${d}/r" -c user.email=t@t -c user.name=t commit -qm base
     git -C "${d}/r" branch -q base
-    [ -n "${3:-}" ] && printf '%s\n' "$3" > "${d}/r/.claude/validation/claude-md-size-baseline.txt"
+    [ -n "${3:-}" ] && printf '%s\n' "$3" > "${d}/r/.claude/validation/claude-md-size-ceiling.txt"
     git -C "${d}/r" add -A && git -C "${d}/r" -c user.email=t@t -c user.name=t commit -qm head --allow-empty
     if out="$(bash "${SELF}" "${d}/r" --format tsv --base-ref base 2>&1)"; then rc=0; else rc=$?; fi
   }
@@ -159,13 +159,13 @@ run_selftest() {
   _repo 26050 $'ceiling: 26000\nraise: 2026-10-19 +82 D_PORQUE_EXISTE motivo' $'ceiling: 26050\nraise: 2026-10-19 +132 D_PORQUE_EXISTE motivo'
   { [ "${rc}" = 1 ] && command grep -q $'^HARD\tRAISE-EDITADA' <<< "${out}"; } && _ok "(k) raise: antiga editada para cobrir a subida → HARD" || _ko "(k)"
   _repo 999 'ceiling: 100'
-  rm -f "${d}/r/.claude/validation/claude-md-size-baseline.txt"; git -C "${d}/r" add -A; git -C "${d}/r" -c user.email=t@t -c user.name=t commit -qm rm
+  rm -f "${d}/r/.claude/validation/claude-md-size-ceiling.txt"; git -C "${d}/r" add -A; git -C "${d}/r" -c user.email=t@t -c user.name=t commit -qm rm
   if out="$(bash "${SELF}" "${d}/r" --format tsv --base-ref base 2>&1)"; then rc=0; else rc=$?; fi
   { [ "${rc}" = 1 ] && command grep -q $'^HARD\tBASELINE-REMOVIDO' <<< "${out}"; } && _ok "(l) baseline apagado com a base tendo um → HARD (não desliga a guarda)" || _ko "(l)"
   # (n) PR honesto que não tocou o baseline, e a main abaixou o teto depois: compara com o merge-base → SILENCIOSO
   _repo 140 'ceiling: 150'
   git -C "${d}/r" checkout -q -b feat; printf 'b\n' >> "${d}/r/x"; git -C "${d}/r" add -A; git -C "${d}/r" -c user.email=t@t -c user.name=t commit -qm feat
-  git -C "${d}/r" checkout -q base; printf 'ceiling: 140\n' > "${d}/r/.claude/validation/claude-md-size-baseline.txt"
+  git -C "${d}/r" checkout -q base; printf 'ceiling: 140\n' > "${d}/r/.claude/validation/claude-md-size-ceiling.txt"
   git -C "${d}/r" add -A; git -C "${d}/r" -c user.email=t@t -c user.name=t commit -qm poda; git -C "${d}/r" checkout -q feat
   if out="$(bash "${SELF}" "${d}/r" --format tsv --base-ref base 2>&1)"; then rc=0; else rc=$?; fi
   { [ "${rc}" = 0 ] && ! command grep -q '^HARD' <<< "${out}"; } && _ok "(n) a main abaixou o teto depois do PR honesto → compara com o merge-base, SILENCIOSO" || _ko "(n)"

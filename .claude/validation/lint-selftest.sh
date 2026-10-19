@@ -15455,6 +15455,14 @@ run_empty_result_guard_selftests() {
     else record_fail "empty-result-guard: (p) mutation" "o mutante SEM o filtro ainda satisfaz (l) — o caso (l) passa por vacuo"; fi
   fi
   rm -rf "${gd}"
+  # (r) COMANDO GRANDE (>64 KB) com o padrão no começo: o `printf | grep -q` sob pipefail levava EPIPE e a
+  #     guarda CALAVA (0/8 na versão antiga, medido em 2026-10-19; era a falha intermitente do (g) no CI).
+  #     Here-string não tem pipe: 8/8. Determinístico, sem depender da corrida.
+  local _big; _big="$(python3 -c "import json;print(json.dumps('sudo ls /root/dir/*.log\n# '+'x'*200000))")"
+  out="$(_erg "${_big}" '""' || true)"
+  if grep -q 'GLOB-SOB-SUDO' <<< "${out}"; then
+    record_pass "empty-result-guard: (r) comando de 200 KB com o padrão no começo → acusa (sem EPIPE sob pipefail)"
+  else record_fail "empty-result-guard: (r) comando grande" "calou: o printf|grep -q sob pipefail levou EPIPE"; fi
 }
 
 # Modo varredura-sa — REGRA 54. O caso que FALTAVA: rodar o lint de DENTRO de um worktree.
@@ -35615,7 +35623,7 @@ run_claude_md_size_selftests() {
   else record_fail "claude-md-size: (b) corpus real" "rc=${rc}; ${o:0:200}"; fi
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
   cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
-  printf 'ceiling: 10\n' > "${sd}/.claude/validation/claude-md-size-baseline.txt"
+  printf 'ceiling: 10\n' > "${sd}/.claude/validation/claude-md-size-ceiling.txt"
   printf 'uma linha que passa do teto de dez bytes\n' > "${sd}/CLAUDE.md"
   ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
   local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
