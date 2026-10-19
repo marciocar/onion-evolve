@@ -2,8 +2,8 @@
 branch: feat/stt-service
 pr: 1184
 date: 2026-10-17
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: b26db6988dad94a40e6196c40233bdefcf2865c69477f70e377ae0e0fc6a3e4d
+reviewed_diff_sha256: 45160279d34305c891226e8105a9108ff7470eb7cdb8714eee547c8b8d8d2e57
+reviewed_code_sha256: 9a90182106cc095863addb48cb0f71e16dd735a400490af1c9a3a73e531dfdfc
 findings_total: 17
 findings_real: 16
 tokens: 303551
