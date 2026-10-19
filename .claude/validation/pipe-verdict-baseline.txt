@@ -6,15 +6,4 @@
 # FORMATO: <arquivo><TAB><nº de sítios tolerados>. A métrica de saúde é este número DIMINUINDO.
 # Sítio NOVO em arquivo fora da lista, ou ACIMA da contagem, é HARD.
 # CURA: conteúdo numa variável + `grep -q PAD <<< "$var"` (medida: 0 falhas em 480).
-.claude/validation/doctrine-freshness.sh	2
-.claude/validation/kg-fixture-paths.sh	1
-.claude/validation/kg-verification-coverage.sh	1
-.claude/validation/lint-artifacts.sh	4
-.claude/validation/lint-selftest.sh	29
 .claude/validation/pipe-verdict-check.sh	3
-.claude/validation/review-artifact-check.sh	1
-.claude/validation/vendor-scrub-form-check.sh	1
-ops/bridge-auth/logto-provision.sh	1
-ops/install-caddy-config.sh	2
-ops/registry-pins.sh	1
-ops/update-bridge.sh	3

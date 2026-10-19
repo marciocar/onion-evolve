@@ -498,7 +498,7 @@ while IFS= read -r k; do
     # acabou de receber o arquivo movido — e o teste diria "ja existia" sobre um `git mv` legitimo.
     # Fail-open de ref vazia, medido aqui mesmo. Sem ponto de ramificacao nao ha como distinguir
     # homonimo de mudanca, e isso vai DITO na mensagem em vez de ser adivinhado.
-    if [ -n "${BASE_REF}" ] && git show "${BASE_REF}:${rpath}" 2>/dev/null | grep -qE "^[[:space:]]*-[[:space:]]*id:[[:space:]]*${rid}[[:space:]]*$"; then
+    if [ -n "${BASE_REF}" ] && grep -qE "^[[:space:]]*-[[:space:]]*id:[[:space:]]*${rid}[[:space:]]*$" <<< "$(git show "${BASE_REF}:${rpath}" 2>/dev/null)"; then
       emit HARD ID-AMBIGUO "${kp}" \
         "o no '${rid}' JA EXISTIA em ${rpath} antes desta branch — logo ele nao MUDOU de ${kp} para la: sao HOMONIMOS, e o gate NAO SABE qual era o desta entrada. Desambigue renomeando um dos ids, ou meca o no e remova a entrada."
       hard=$((hard+1)); continue

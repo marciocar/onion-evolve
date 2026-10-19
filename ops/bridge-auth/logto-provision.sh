@@ -120,9 +120,8 @@ step() { printf '\n── %s\n' "$*"; }
 # estado SEM configuração); então a falta dele é o caso NORMAL, não a exceção. Falhe cedo,
 # falhe explicando, e entregue o comando exato. [[fix-must-become-mechanism]]
 step "pré-flight: o issuer do tenant admin está alcançável?"
-if ! curl -sS -k --max-time 5 --resolve "${RESOLVE}" \
-     "${TOKEN_ORIGIN}/oidc/.well-known/openid-configuration" 2>/dev/null \
-     | grep -q "console.onionevolve.com/oidc"; then
+if ! grep -q "console.onionevolve.com/oidc" <<< "$(curl -sS -k --max-time 5 --resolve "${RESOLVE}" \
+     "${TOKEN_ORIGIN}/oidc/.well-known/openid-configuration" 2>/dev/null)"; then
   cat >&2 <<'HELP'
 ERRO: o issuer do tenant `admin` não responde no loopback.
 

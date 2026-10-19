@@ -215,7 +215,7 @@ clock_trusted() {
     [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" = "yes" ] && return 0
   fi
   if command -v chronyc >/dev/null 2>&1; then
-    chronyc tracking 2>/dev/null | grep -q '^Leap status.*Normal' && return 0
+    grep -q '^Leap status.*Normal' <<< "$(chronyc tracking 2>/dev/null)" && return 0
   fi
   if command -v ntpstat >/dev/null 2>&1; then
     ntpstat >/dev/null 2>&1 && return 0
@@ -241,7 +241,7 @@ read_fm_field() {  # <arquivo-abs> <campo>
   ' "$1" 2>/dev/null || true
 }
 
-is_ymd() { printf '%s' "$1" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; }
+is_ymd() { grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' <<< "$1"; }
 
 # ---------------------------------------------------------------------------
 # LISTA WORLD-FACING efetiva (default no código, ou --list-file p/ a fixture)

@@ -70,7 +70,7 @@ live_names() {
   set -f
 }
 
-is_managed_live() { $SUDO_CMD head -n1 "$1" 2>/dev/null | grep -qF "$MANAGED_MARK"; }
+is_managed_live() { grep -qF "$MANAGED_MARK" <<< "$($SUDO_CMD head -n1 "$1" 2>/dev/null)"; }
 
 # Renderiza um conf.d gerido para a stdout: carimbo + template com @@NOME@@ resolvidos.
 # Recusa (die) marcador sem valor, valor vazio, ou valor com espaço/aspas/quebra de linha.
@@ -333,7 +333,7 @@ STUB
   STUB_SEEN="$SB/seen" t "conf.d gerido com segredos → apply feliz" 0 apply_config
   ok "conf.d gerido instalado e renderizado" 'grep -qF "k=cafe1234*" "$CONF_DEST_DIR/demo.caddy" && grep -qF "u \$2a\$14\$abc" "$CONF_DEST_DIR/demo.caddy"'
   ok "conf.d gerido sem marcador residual" '! grep -qE "@@[A-Z0-9_]+@@" "$CONF_DEST_DIR/demo.caddy"'
-  ok "conf.d gerido carimbado (1ª linha)" 'head -n1 "$CONF_DEST_DIR/demo.caddy" | grep -qF "$MANAGED_MARK"'
+  ok "conf.d gerido carimbado (1ª linha)" 'grep -qF "$MANAGED_MARK" <<< "$(head -n1 "$CONF_DEST_DIR/demo.caddy")"'
   ok "conf.d gerido em 0640" '[[ "$(stat -c %a "$CONF_DEST_DIR/demo.caddy")" == 640 ]]'
   ok "não gerido intocado (hash igual)" '[[ "$(sha256sum "$CONF_DEST_DIR/vault.caddy" | awk "{print \$1}")" == "$vault_hash" ]]'
   ok "validate viu o ESTÁGIO (import reescrito), não o vivo" '[[ -f "$SB/seen" ]] && ! grep -qF "$CONF_DEST_DIR/" "$SB/seen"'

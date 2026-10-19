@@ -193,7 +193,7 @@ fi
 }
 
 # ── 1. pré-voo ────────────────────────────────────────────────────────────────────────────
-curl -fsS -m 5 "${HEALTH_LOCAL}" | grep -q '"ok":true' \
+grep -q '"ok":true' <<< "$(curl -fsS -m 5 "${HEALTH_LOCAL}")" \
   || { echo "[update-bridge] ERRO: /health já está doente ANTES do update — triagem primeiro, update depois." >&2; exit 1; }
 OLD_CLONE_HEAD="$(sudo -u onion git -C "${CLONE}" rev-parse HEAD)"   || fail "rev-parse do clone falhou"
 OLD_BRIDGE_HEAD="$(sudo -u onion git -C "${BRIDGE}" rev-parse HEAD)" || fail "rev-parse do bridge falhou"
@@ -268,11 +268,11 @@ DEPS_TOUCHED=0
 # Espera ativa (não sleep fixo): o boot já mediu 1s e 3s em invocações reais — margem zero.
 up=0
 for _ in $(seq 1 15); do
-  if curl -fsS -m 3 "${HEALTH_LOCAL}" 2>/dev/null | grep -q '"ok":true'; then up=1; break; fi
+  if grep -q '"ok":true' <<< "$(curl -fsS -m 3 "${HEALTH_LOCAL}" 2>/dev/null)"; then up=1; break; fi
   sleep 2
 done
 [ "${up}" = 1 ] || fail "/health local não voltou em ~30s"
-curl -fsS -m 10 "${HEALTH_PUBLIC}" | grep -q '"ok":true' || fail "/health via Caddy não voltou"
+grep -q '"ok":true' <<< "$(curl -fsS -m 10 "${HEALTH_PUBLIC}")" || fail "/health via Caddy não voltou"
 [ "${NEW_BRIDGE_HEAD}" = "${BRIDGE_REMOTE}" ] || fail "bridge não ficou em origin/main"
 [ "${NEW_CLONE_HEAD}"  = "${CLONE_REMOTE}"  ] || fail "clone não ficou em origin/main"
 INV="$(systemctl show "${UNIT}" -p InvocationID --value)"
