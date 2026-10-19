@@ -41,7 +41,15 @@ def load_token(path: str) -> bytes:
         raise ConfigError(f"token: não li {path}: {e.strerror}") from None
     if stat.S_ISLNK(st.st_mode) or not stat.S_ISREG(st.st_mode):
         raise ConfigError(f"token: {path} não é arquivo regular")
-    if st.st_mode & 0o077:
+    # A credencial do systemd (LoadCredential=) chega 0440 root:root, num tmpfs ro e privado à unit (mode=700), e o
+    # usuário dinâmico a lê por ACL: o bit de grupo ali é do grupo root, não acesso de terceiros (medido no systemd 255,
+    # 2026-10-19). Só DENTRO de $CREDENTIALS_DIRECTORY aceita-se leitura de grupo, e só de dono root ou do próprio processo.
+    # Fora dele, segue estrito: nada para grupo ou outros.
+    mask = 0o077
+    cred_dir = os.environ.get("CREDENTIALS_DIRECTORY", "")
+    if cred_dir and os.path.dirname(os.path.abspath(path)) == os.path.abspath(cred_dir) and st.st_uid in (0, os.geteuid()):
+        mask = 0o037
+    if st.st_mode & mask:
         raise ConfigError(f"token: {path} com modo {oct(st.st_mode & 0o777)} (grupo/outros têm acesso; exija 0600 ou 0400)")
     with open(path, "rb") as f:
         raw = f.read(4096)
