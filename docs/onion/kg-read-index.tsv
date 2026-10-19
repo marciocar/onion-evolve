@@ -390,6 +390,11 @@
 .claude/validation/cited-directive-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/cited-directive-check.sh	E_REEXTRACAO_2_1_295_SO_NOMES	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/cited-directive-check.sh	E_SEIS_MUTANTES_MORDERAM	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
+.claude/validation/claude-md-size-check.sh	C_TETO_CATRACA_PRECISA_DA_INTEGRACAO	docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml
+.claude/validation/claude-md-size-check.sh	C_TETO_MEDE_BYTES_NAO_COMPORTAMENTO	docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml
+.claude/validation/claude-md-size-check.sh	C_TETO_NAO_VE_OUTRAS_CARGAS_PERMANENTES	docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml
+.claude/validation/claude-md-size-check.sh	C_TETO_NO_CITADO_SO_POR_EXISTENCIA	docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml
+.claude/validation/claude-md-size-check.sh	D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE	docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	A_DOCUMENTACAO_LIDA_COMO_INVOCACAO_E_CLASSE_SISTEMICA	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	C_MAQ4_EXTRATOR_REGRA59_TETO	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
@@ -684,6 +689,7 @@ CLAUDE.md	C_IDENTITY_CANON	docs/onion/graph/onion-identity-2026-07.kg.yaml
 CLAUDE.md	C_p4_gate_visibility	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 CLAUDE.md	D_FAMILIA_TEM_DOIS_REGIMES_2026_09	docs/onion/graph/onion-identity-2026-07.kg.yaml
 CLAUDE.md	E_CLAUDE_MD	docs/onion/graph/onion-identity-2026-07.kg.yaml
+CLAUDE.md	E_CLAUDE_MD_CRESCEU_52_DEPOIS_DO_SELO	docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml
 CLAUDE.md	E_F3_BYPASS_EM_PROJECT_SETTINGS_IGNORADO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 CLAUDE.md	E_F3_PERMISSION_PROMPTS_NONE	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 LICENSE	SY6_ev_licenca_mit	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -2374,7 +2380,6 @@ docs/onion/radar-baselines.yaml	E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA	docs/evo
 docs/onion/radar-baselines.yaml	Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
 docs/onion/radar-sources.yaml	E_MERCADO_E3_R5_SINAL_FRACO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 docs/onion/radar-sources.yaml	Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
-docs/onion/testing-inventory.md	E_EXISTE_NAO_E_RODOU	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 docs/onion/testing-validation-system.md	E_A_DISCIPLINA_VIROU_MECANISMO_DE_PAINEL	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/technical-context/01-core/	L1_CORE	docs/onion/graph/technical-context-core-2026-07.kg.yaml
 docs/technical-context/01-core/adr/index.md	F_ADR	docs/onion/graph/technical-context-core-2026-07.kg.yaml
