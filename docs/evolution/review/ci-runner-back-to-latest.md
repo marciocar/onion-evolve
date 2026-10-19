@@ -2,7 +2,8 @@
 title: 'Resíduo — o CI volta ao ubuntu-latest, com a bancada completa verde no 26.04'
 date: 2026-10-19
 branch: ci/runner-back-to-latest
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4e0e1137618ca0892255cc2d05faaf258e07dde9ae7ec54a48b1bf8b7a9fa736
+reviewed_code_sha256: d247080dae337abcafea5ba9d833b264b1d65172853117d2b4cb3be710f727db
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
