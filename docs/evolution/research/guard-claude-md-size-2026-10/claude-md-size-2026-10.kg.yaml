@@ -1,0 +1,131 @@
+# kg-backlog-guard: on
+# ═══ TETO: 6 NÓS ═══
+meta:
+  id: claude-md-size-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-19"
+  review_after: "2026-11-19"
+  # Forja (/meta:forge-guard) da catraca de tamanho do CLAUDE.md, a 1ª perna de
+  # D_PODA_CATRACA_E_L2_DIRIGIDO_1019 (grafo fila-2026-10-06). A 2ª perna, o replay L2, não é guarda.
+nodes:
+  - id: E_CLAUDE_MD_CRESCEU_52_DEPOIS_DO_SELO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-19'
+    verified_against: "wc -c CLAUDE.md = 25918 em origin/main 9648da70; git log --since=2026-09-03 --numstat -- CLAUDE.md = +132 -38; instructions-loaded-census.sh: CLAUDE.md em 90 sessões, 104 session_start, 40 compact"
+    trace: 'CLAUDE.md'
+    label: 'O DEFEITO, DATADO: o CLAUDE.md do core foi de 17.041 B (2026-09-03) para 25.918 B (+52%, +132/−38 linhas em ~20 commits) depois do selo de 2026-09-25 que mandava medir antes de podar; carrega em toda sessão e compactação (~7,2k tokens)'
+    narrative: 'A assimetria adiciona-vs-deleta que a pesquisa de 2026-09-03 mediu no próprio repo (E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO) continuou depois da decisão: nenhum mecanismo cobrava o tamanho, e a decisão de medir comportamento antes de cortar não impedia de acrescentar. Por seção: 37% "Contexto do Projeto" (muita biografia datada) e 35% task manager + formatação por provider.'
+    provenance:
+      source: "CLAUDE.md e .claude/sessions/instructions-loaded.jsonl"
+      locator: "wc -c CLAUDE.md; git log --since=2026-09-03 --numstat -- CLAUDE.md; bash .claude/validation/instructions-loaded-census.sh"
+      method: "medição: comandos executados em 2026-10-19"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: done
+    verified_at: '2026-10-19'
+    verified_against: "guard-census.sh 2026-10-19: molde check de lint mais exercitado = ops-citation-travel-check.sh (19 casos); nenhuma guarda de tamanho do CLAUDE.md existia"
+    trace: '.claude/validation/claude-md-size-check.sh'
+    label: 'substrato: check de lint (REGRA 109) com baseline versionado e catraca contra a integração, molde do ops-citation-travel-check.sh; o teto só sobe com linha raise: que cite um nó existente'
+    narrative: 'Hook não serve: o tamanho é propriedade do commit, não de uma chamada de ferramenta. A forma do baseline com catraca é a da REGRA 100. O raise: com nó é a tradução literal da opção escolhida pelo maestro ("não cresce sem tirar o equivalente ou apontar para um nó"). Mutantes provados: sem o teto (a) reprova; sem a catraca (d)(f)(g) reprovam; sem conferir o nó (f) reprova.'
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "bash .claude/validation/guard-census.sh . --markdown (2026-10-19)"
+      method: "medição: censo de guardas executado antes da forja"
+      locality: "repo"
+
+  - id: C_TETO_MEDE_BYTES_NAO_COMPORTAMENTO
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-19'
+    verified_against: "claude-md-size-check.sh: só wc -c e git grep de id:; nenhum replay"
+    trace: '.claude/validation/claude-md-size-check.sh'
+    label: 'TETO: a guarda mede bytes, não comportamento; não sabe se a linha nova evita um erro nem se o corte que abriu folga tirou algo que importava — isso é o replay L2'
+    provenance:
+      source: ".claude/validation/claude-md-size-check.sh"
+      locator: "cabeçalho, seção TETO"
+      method: "leitura do artefato forjado"
+      locality: "repo"
+
+  - id: C_TETO_NO_CITADO_SO_POR_EXISTENCIA
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-19'
+    verified_against: "claude-md-size-check.sh: git grep -qE id:<NODE_ID> em *.kg.yaml rastreado"
+    trace: '.claude/validation/claude-md-size-check.sh'
+    label: 'TETO: o nó citado num raise: é conferido por existência num .kg.yaml rastreado, não por pertinência; citar um nó qualquer passa'
+    provenance:
+      source: ".claude/validation/claude-md-size-check.sh"
+      locator: "laço das linhas raise: novas"
+      method: "leitura do artefato forjado"
+      locality: "repo"
+
+  - id: C_TETO_CATRACA_PRECISA_DA_INTEGRACAO
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-19'
+    verified_against: "claude-md-size-check.sh: base_txt vazio quando a ref não tem o baseline"
+    trace: '.claude/validation/claude-md-size-check.sh'
+    label: 'TETO: a catraca compara com o baseline na integração (origin/<branch>); sem a ref ou sem o baseline nela (o PR que cria a guarda), só o teto vale'
+    provenance:
+      source: ".claude/validation/claude-md-size-check.sh"
+      locator: "bloco da catraca"
+      method: "leitura do artefato forjado"
+      locality: "repo"
+
+  - id: C_TETO_NAO_VE_OUTRAS_CARGAS_PERMANENTES
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-19'
+    verified_against: "Elenxo 2026-10-19 (E-4): CLAUDE.md de 98 B com @BIG.md de 50 KB, .claude/CLAUDE.md de 50 KB e rule sem paths: de 50 KB, todos rc 0; no core hoje as 7 rules têm paths: e não há .claude/CLAUDE.md"
+    trace: '.claude/validation/claude-md-size-check.sh'
+    label: 'TETO: a guarda mede só o CLAUDE.md da raiz; @import dentro dele, um .claude/CLAUDE.md e rule sem paths: também carregam sempre e escapam. A rota está aberta e ninguém a usa hoje'
+    narrative: 'A passada adversarial reprovou a 1ª versão com 2 falsos positivos (catraca contra a ponta da main em vez do merge-base; teto sem folga para a contagem da REGRA 9), 1 travamento (flag sem valor) e 4 escapes (NODE_ID cru numa regex, raise: antiga editada, baseline apagado desligando a guarda, e esta). As seis primeiras foram curadas com caso e mutante; esta fica declarada.'
+    provenance:
+      source: "passada adversarial (refutador isolado), 2026-10-19"
+      locator: "repos git temporários com a cópia da guarda"
+      method: "medição: execução real dos cenários"
+      locality: "repo"
+
+edges:
+  - from: E_CLAUDE_MD_CRESCEU_52_DEPOIS_DO_SELO
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    edge_type: SUPPORTS
+    label: "o defeito medido sustenta a guarda"
+  - from: C_TETO_MEDE_BYTES_NAO_COMPORTAMENTO
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    edge_type: CONSTRAINS
+    label: "o que a guarda não vê"
+  - from: C_TETO_NO_CITADO_SO_POR_EXISTENCIA
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    edge_type: CONSTRAINS
+    label: "o que a guarda não vê"
+  - from: C_TETO_CATRACA_PRECISA_DA_INTEGRACAO
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    edge_type: CONSTRAINS
+    label: "o que a guarda não vê"
+  - from: C_TETO_NAO_VE_OUTRAS_CARGAS_PERMANENTES
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_BASELINE
+    edge_type: CONSTRAINS
+    label: "o que a guarda não vê"

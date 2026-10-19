@@ -35598,6 +35598,38 @@ EOF_MUT
 }
 _family run_ops_citation_travel_selftests
 
+# REGRA 109 (CLAUDE.md não cresce sem tirar o equivalente ou citar um nó) — medido em 2026-10-19: +52% depois do
+# selo que mandava medir antes de podar. (a) o --selftest próprio; (b) o modo tsv no corpus real; (c) o lint de
+# produção emite a regra sobre o defeito verbatim; (m) mutante sem o teto reprova o (a).
+run_claude_md_size_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/claude-md-size-check.sh"
+  [ -f "${chk}" ] || { record_fail "claude-md-size" "guarda ausente"; return; }
+  local o rc
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF '14 passaram, 0 falharam' <<< "${o}"; then
+    record_pass "claude-md-size: (a) --selftest verde (14 casos: o defeito verbatim, o teto, a folga, a catraca pelo merge-base, o nó citado e os achados do Elenxo)"
+  else record_fail "claude-md-size: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/claude-md-size-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${o}"; then
+    record_pass "claude-md-size: (b) corpus real → rc 0, sem HARD no modo tsv"
+  else record_fail "claude-md-size: (b) corpus real" "rc=${rc}; ${o:0:200}"; fi
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  printf 'ceiling: 10\n' > "${sd}/.claude/validation/claude-md-size-baseline.txt"
+  printf 'uma linha que passa do teto de dez bytes\n' > "${sd}/CLAUDE.md"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'REGRA 109 (CLAUDE.md não cresce sem tirar o equivalente ou citar um nó): \[CRESCEU\]' <<< "${l}"; then
+    record_pass "claude-md-size: (c) o lint de produção (dispatcher) emite a REGRA 109 sobre o CLAUDE.md acima do teto"
+  else record_fail "claude-md-size: (c) dispatcher" "$(grep -E 'REGRA 109|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  sed -i 's/if \[ "${size}" -gt "${ceiling}" \]; then/if false; then/' "${sd}/.claude/validation/claude-md-size-check.sh"
+  if o="$(LC_ALL=C bash "${sd}/.claude/validation/claude-md-size-check.sh" --selftest 2>&1)" || ! grep -q '✗ claude-md-size: (a)' <<< "${o}"; then
+    record_fail "claude-md-size: (m) mutante sem o teto" "o --selftest passou com o teto desligado"
+  else record_pass "claude-md-size: (m) mutante sem o teto reprova o (a)"; fi
+  rm -rf "${sd}"
+}
+_family run_claude_md_size_selftests
+
 # REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) — SAC-83, medido ao vivo em 2026-10-11 (CC
 # 2.1.296, `claude -p` em sandbox): PreToolUse com script ausente saiu 127 e a ação RODOU; com onFailure: block
 # barrou. Casos: (a) as polaridades do --selftest · (b) o modo que o lint consome, no settings.json REAL · (c) o

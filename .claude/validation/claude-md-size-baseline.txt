@@ -1,0 +1,7 @@
+# Catraca de tamanho do CLAUDE.md (REGRA 109, claude-md-size-check.sh).
+# O teto só desce. Para subir, acrescente uma linha `raise:` que cite o nó do porquê:
+#   raise: <AAAA-MM-DD> +<bytes> <NODE_ID> <motivo>
+# Nasceu em 2026-10-19 no tamanho medido, 25.918 B, mais 64 B de folga declarada: uma contagem que a
+# REGRA 9 obriga a atualizar pode ganhar um dígito (99→100) e não deve virar HARD por 1 byte (achado do
+# Elenxo). Decisão: D_PODA_CATRACA_E_L2_DIRIGIDO_1019, grafo fila-2026-10-06.
+ceiling: 25982

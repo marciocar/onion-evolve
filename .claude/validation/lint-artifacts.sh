@@ -5975,6 +5975,40 @@ check_adoption_graph_pin() {
 check_adoption_graph_pin
 
 # ===========================================================================
+# REGRA 109 — CLAUDE.md não cresce sem tirar o equivalente ou citar um nó [HARD + SOFT]
+# previne: o arquivo que carrega em TODA sessão e compactação engordar sem ninguém decidir
+#   DANO MEDIDO (2026-10-19): o CLAUDE.md do core foi de 17.041 B (2026-09-03) para 25.918 B (+52%) em ~20
+#   commits, depois do selo de 2026-09-25 que mandava medir antes de podar (D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS);
+#   decisão do maestro de 2026-10-19: D_PODA_CATRACA_E_L2_DIRIGIDO_1019. Passar do `ceiling:` do baseline é HARD;
+#   subir o teto contra a integração sem `raise:` que cite nó existente é HARD; folga > 512 B é SOFT (trave o ganho).
+#   Lógica em claude-md-size-check.sh; baseline em claude-md-size-baseline.txt. Sem baseline, sem objeto.
+# ===========================================================================
+check_claude_md_size() {
+  local helper="${SCRIPT_DIR}/claude-md-size-check.sh"
+  [ -f "${helper}" ] || return 0
+  [ "${IS_DERIVED}" -eq 1 ] && return 0   # adotante/porta: o CLAUDE.md é do projeto dele, e o baseline não viaja
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}/CLAUDE.md"|*/claude-md-size-*) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-SOFT}" "${REPO_ROOT}/${_path#./}" "REGRA 109 (CLAUDE.md não cresce sem tirar o equivalente ou citar um nó): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/claude-md-size-check.sh" "REGRA 109 (CLAUDE.md não cresce sem tirar o equivalente ou citar um nó): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_claude_md_size
+
+# ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
 _LINT_SUMMARY_REACHED=1   # daqui para baixo, a saida E veredito (ver o trap no topo)
