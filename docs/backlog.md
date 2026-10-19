@@ -886,6 +886,16 @@
 | 4.2 | `Q_CONSOLO_INVISIVEL_A_FORMA` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objet |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
 
+## fila-2026-10-06 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.5 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
+| 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
+| 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
+| 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
+| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
+
 ## gtm-decisions-2026-07 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -938,16 +948,6 @@
 |--:|---|---|---|
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
-
-## fila-2026-10-06 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.0 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
-| 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
-| 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
-| 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
-| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
 
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)
 
