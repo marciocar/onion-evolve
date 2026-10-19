@@ -2,7 +2,8 @@
 title: 'Resíduo — o falso claude da sonda do session-beacon vira script, e a guarda volta a ser exercida no ubuntu 26.04'
 date: 2026-10-19
 branch: fix/beacon-fake-claude-script
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4e8e9df6d3e63cad3697754f92672a9b1481af9a58bcb00197484f51ea8eae10
+reviewed_code_sha256: c05614830caf4b09d352341cf0f94d1515b60dfc5d5adff8f7840c54b4a4ba8c
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
