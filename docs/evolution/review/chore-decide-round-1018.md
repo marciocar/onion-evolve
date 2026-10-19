@@ -2,7 +2,7 @@
 title: 'Resíduo — a rodada do /meta:decide de 2026-10-18: quatro selos, a fila colhida e o pin da action em dia'
 date: 2026-10-18
 branch: chore/decide-round-1018
-reviewed_diff_sha256: db9790ce319a809d045bd246d0e4732c863ccd7f48916afe5024c6a2f127de0e
+reviewed_diff_sha256: 137403d82d3f8f3753bb2ea73caa31cc95d80273f831e9508b2b1262d9980c9a
 reviewed_code_sha256: 2e776d351105fefcb2e1480d4785a4bdb2281b191464f7b766cb5751958f0a63
 findings_total: 1
 findings_real: 1
