@@ -171,13 +171,13 @@ esac
 # (2) glob dentro de path sob sudo — expande no shell do CHAMADOR, que pode não ter acesso.
 case "$cmd" in
   *sudo*)
-    if printf '%s' "$cmd" | grep -qE 'sudo[^|;]*(ls|cat|stat|head|tail|wc)[^|;]*/[^ ]*\*'; then
+    if grep -qE <<< "$cmd" 'sudo[^|;]*(ls|cat|stat|head|tail|wc)[^|;]*/[^ ]*\*'; then
       add 'GLOB-SOB-SUDO: o `*` expande no SEU shell ANTES do sudo — se você não tem acesso ao diretório, ele não casa nada e o comando recebe o literal. Use `sudo find <dir> -name "<padrão>"`, que expande DENTRO do sudo.'
     fi ;;
 esac
 
 # (3) erro engolido alimentando contagem/decisão — zero indistinguível de falha.
-if printf '%s' "$cmd" | grep -qE '2>/dev/null.*\|[[:space:]]*(wc[[:space:]]+-l|grep[[:space:]]+-c)'; then
+if grep -qE <<< "$cmd" '2>/dev/null.*\|[[:space:]]*(wc[[:space:]]+-l|grep[[:space:]]+-c)'; then
   add 'ERRO-ENGOLIDO-VIRANDO-NÚMERO: há `2>/dev/null` a montante de uma contagem — um comando que FALHOU e um objeto que NÃO EXISTE produzem o mesmo `0`. Mostre o stderr, ou use o helper: `source .claude/utils/safe-count.sh` → `count_files <dir> <glob>` / `count_matches <padrão> <arquivos>` / `count_lines <arquivo>` (alvo ausente = exit 2 + stderr, nunca zero silencioso).'
 fi
 
@@ -238,10 +238,10 @@ while IFS= read -r _stmt; do
                                           s/^[[:space:]]*//')"
     case "${_c}" in pgrep\ *|pkill\ *|pgrep|pkill) ;; *) continue ;; esac
     # MODO FULL por QUALQUER token de opção — cluster curto com `f`, ou a longa `--full`
-    printf '%s' "${_c}" | grep -qE '(^|[[:space:]])(-[a-zA-Z]*f[a-zA-Z]*|--full)([[:space:]]|$)' || continue
+    grep -qE <<< "${_c}" '(^|[[:space:]])(-[a-zA-Z]*f[a-zA-Z]*|--full)([[:space:]]|$)' || continue
     # DESARMES por opção da PRÓPRIA invocação: -A (ignora ancestrais, a cura real), -x (casa o NOME
     # do executável), -O/--older (o shell que roda o laço é NOVO)
-    if printf '%s' "${_c}" | grep -qE '(^|[[:space:]])(-[a-zA-Z]*[AxO][a-zA-Z]*|--ignore-ancestors|--exact|--older)([[:space:]]|$)'; then continue; fi
+    if grep -qE <<< "${_c}" '(^|[[:space:]])(-[a-zA-Z]*[AxO][a-zA-Z]*|--ignore-ancestors|--exact|--older)([[:space:]]|$)'; then continue; fi
     # COLCHETE: isenta só se a forma NUA não co-ocorrer. `bash x.sh & until ! pgrep -f '[x]'` tem o
     # `x` nu no lançamento, então o colchete não protege nada ali.
     # o ARGUMENTO termina no primeiro redirect — senão um `[` em `> /tmp/x[1].txt` isentaria a regra
@@ -380,9 +380,9 @@ fi
 #     considerou a hipótese — a guarda não tem o que ensinar.
 # Sobra exatamente a forma que me mordeu: descoberta nua cujo vazio eu ia ler como ausência.
 if [ -z "${out//[[:space:]]/}" ] \
-   && ! printf '%s' "$cmd" | grep -qE 'grep[[:space:]]+-[a-zA-Z]*[qc]' \
-   && ! printf '%s' "$cmd" | grep -qE '\|\|[[:space:]]*(echo|printf|true)|[[:space:]]else[[:space:]]' \
-   && printf '%s' "$cmd" | grep -qE '(^|[|;&[:space:]])(ls|find|git ls-files)([[:space:]]|$)'; then
+   && ! grep -qE <<< "$cmd" 'grep[[:space:]]+-[a-zA-Z]*[qc]' \
+   && ! grep -qE <<< "$cmd" '\|\|[[:space:]]*(echo|printf|true)|[[:space:]]else[[:space:]]' \
+   && grep -qE <<< "$cmd" '(^|[|;&[:space:]])(ls|find|git ls-files)([[:space:]]|$)'; then
   add 'VAZIO ≠ AUSÊNCIA: comando de descoberta devolveu NADA. Vazio pode ser (a) o objeto não existe, (b) o path/glob está errado, (c) você não tem acesso. São conclusões OPOSTAS. Confirme o caminho-pai antes de afirmar que algo não existe.'
 fi
 
@@ -422,7 +422,7 @@ _tem_gate_r56() {        # a REGRA 56 vem do LINT VENDORIZADO do PROJETO, não d
   local _v="${CLAUDE_PROJECT_DIR:-.}/.claude/valid""ation"
   [ -f "${_v}/review-artifact-check.sh" ] || [ -f "${_v}/lint-artifacts.sh" ]; }
 
-if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+merge([[:space:]]|$)'; then
+if grep -qE <<< "$cmd" '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+merge([[:space:]]|$)'; then
     if _tem_check_revisor; then
       add 'MERGE-SEM-FONTE-LIDA: `onion-review` sai VERDE POR DESENHO quando o revisor falha (soft-pass) — `pass` ali NÃO significa que houve revisão. A fonte é a linha `onion-review-verdict` em `gh pr checks <N>`. Se você não leu ESSA linha, você não sabe se este PR foi revisado.'
     else
@@ -459,7 +459,7 @@ _residuo_commitado() {  # $1=dir $2=branch — o resíduo da REGRA 56 está na b
 _repo_derivado() {  # o MESMO predicado da REGRA 56 (review-artifact-check.sh): fora de escopo ali
   grep -qE '^(role:[[:space:]]*(adopted|hub|standalone)|decoupled_from:|kind:[[:space:]]*door)' "$1/.claude/.onion-version" 2>/dev/null; }
 
-if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)'; then
+if grep -qE <<< "$cmd" '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)'; then
     _prd="$(_pr_dir)"; _prb="$(_pr_branch "${_prd}")"
     if _residuo_commitado "${_prd}" "${_prb}"; then
       :   # ritual cumprido: resíduo commitado na branch do PR — calar é o que impede a fadiga
@@ -502,7 +502,7 @@ fi
 # Agora: tokeniza POR STATEMENT (o mesmo split da (3b)), entende as opções globais do git, e aplica a
 # regra de posição CERTA para cada subcomando. Acentos são normalizados antes de segmentar — sem isso
 # `fix/rotação-de-chaves` truncava no captor e passava.
-if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)git([[:space:]]+(-C|-c)[[:space:]]+[^[:space:]]+|[[:space:]]+--git-dir=[^[:space:]]+)*[[:space:]]+(checkout|switch|branch|worktree)([[:space:]]|$)'; then
+if grep -qE <<< "$cmd" '(^|[;&|][[:space:]]*|^[[:space:]]*)git([[:space:]]+(-C|-c)[[:space:]]+[^[:space:]]+|[[:space:]]+--git-dir=[^[:space:]]+)*[[:space:]]+(checkout|switch|branch|worktree)([[:space:]]|$)'; then
   _wl="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/validation/lib/pt-br-words.txt"
   if [ -f "${_wl}" ]; then
     while IFS= read -r _bn; do
