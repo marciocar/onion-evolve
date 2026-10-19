@@ -2,14 +2,15 @@
 name: decide
 description: |
   Mede o que está em voo (checkpoints, PRs e CI, worktrees, inbox, nós citados), filtra o que é do
-  maestro, pergunta em rodadas com opções e recomendação, e sela cada resposta no grafo.
+  maestro, pergunta em rodadas com opções e recomendação, e sela cada resposta no grafo. Para cada ato
+  diz quem executa: oferece-se para fazer o que pode, e entrega o passo a passo do que é só do maestro.
 category: meta
 tags:
   - decision
   - kg
   - forge
-version: "1.0.0"
-updated: "2026-10-12"
+version: "1.1.0"
+updated: "2026-10-19"
 related_commands:
   - /meta:drive
   - /meta:forge
@@ -23,7 +24,7 @@ Quando há opções, pendências e fios abertos, e principalmente quando há uma
 entendimento a selar, este comando **mede** o que está acontecendo, **tira** o que a sessão pode medir
 ou derivar sozinha, **pergunta** o resto ao maestro em rodadas estruturadas (cada opção com a sua
 implicação, a recomendada primeiro) e **sela** cada resposta no grafo no mesmo movimento. A doutrina
-inteira (as 7 cláusulas e o que ela não promete) vive em
+inteira (as 8 cláusulas e o que ela não promete) vive em
 [`common:prompts:decide-doctrine`](../common/prompts/decide-doctrine.md). **Referencie, não copie.**
 
 **Por que existe:** pedido do maestro em 2026-10-12, forjado pelo `/meta:forge` no mesmo dia; decisão
@@ -35,8 +36,10 @@ de topologia e evidência em `docs/evolution/research/forge-decide-2026-10/`.
   maestro em 2026-10-14; **não** vai para o onion-mini, que nasce sem KG por desenho. Maestro-invocado;
   sem cron, sem agendamento (MOAT).
 - **Não decide pelo maestro** e **não sela o que não foi perguntado**.
-- Merge, deploy e escrita em repo alheio **continuam do maestro / do fluxo verificado**: no
-  questionário eles aparecem como pergunta (*se*, *quando*), nunca como ato desta sessão.
+- **O "sim" do maestro é a autorização; o ato vai pelo caminho da casa.** Merge de PR **deste** repo
+  com o "sim" a sessão executa pelo caminho verificado (`faço-eu`). Merge em repo alheio, deploy e o
+  que pede TTY, segredo ou corpo **continuam do maestro**: aí a sessão entrega o **card de passo a
+  passo** (cláusula 8), nunca contorna o veto.
 
 ## Contexto medido injetado (peça 3 — o medidor roda ANTES de você pensar)
 
@@ -57,27 +60,49 @@ opções compostas. Quando a linha traz **quem chega por aresta**, leia esses n�
 opções e objeções às vezes vivem neles, não na prosa do nó. Os avisos (gh indisponível, override ativo, teto) vêm antes das linhas: **ausência
 de linha com aviso não é zero**.
 
+Cada linha traz **quem executa** o ato seguinte e o comando pronto (`▶`), e a linha `quem executa:`
+conta as quatro classes. A classe só sai onde a medição a prova; a **pista de ato manual** das linhas
+`seal` é cópia literal do nó (pode errar para os dois lados), e quem decide o card é você, lendo o nó.
+
+| Classe | Quando (medido) | O que você faz |
+|---|---|---|
+| 🤖 **faço-eu** | a sessão executa: selo, checkpoint, merge **deste** repo pelo caminho verificado, triagem, a worktree onde o medidor roda | **oferece-se**: "Eu faço agora (Recomendado)" |
+| ⌨️ **maestro-com-!** | merge de PR de **outro** repo (`--foreign-repo`): no core o veto (exit 2) barra a sessão e o prefixo de bang no prompt do maestro não passa por ele; em todo papel, repo alheio não é da sessão (MOAT) | entrega o **card**, com `! ` na frente de cada comando |
+| 🙋 **maestro-fora** | precisa do que a sessão não tem: TTY, navegador, segredo, corpo (o `gh auth login`) | entrega o **card**, dizendo **onde** rodar |
+| ↪️ **outro-dono** | worktree de outra sessão ou agente (I3), e o PR cuja branch está numa delas | vai para "o que o filtro tirou", **sem** oferta de mexer |
+
 ## Procedimento
 
 1. **MEDIR.** O censo injetado acima é a medição sem a conversa. Rode-o de novo com o que a sessão
    sabe: `--cite -` recebendo pela entrada o texto que cita ids (as decisões mencionadas na conversa,
    o que o maestro escreveu ao invocar), e `--theme "<termos>"` quando houver tema. Exemplo:
    `printf '%s' "<texto com os ids>" | bash .claude/validation/decide-census.sh . --markdown --cite -`.
+   A conversa citou PR de **outro** repo? Passe `--foreign-repo <dono/nome>` (repetível): os PRs de lá
+   entram com o CI e o método de merge que o repo aceita, medidos.
    Linha de erro (rc 2) → declare a lacuna e pare; nunca reconstrua os fios de memória. Precisa do
-   conjunto inteiro (o markdown corta no teto e **nomeia** o resto)? `--tsv`.
+   conjunto inteiro (o markdown corta no teto e **nomeia** o resto)? `--tsv` (colunas `actor`,
+   `action` e `hint` no fim).
 2. **FILTRAR** (cláusula 1 da doutrina). Para cada linha: é **medível**? meça e reporte. É
    **derivável** da doutrina ou de decisão selada? aplique e cite. É de **outro dono** (repo alheio,
    outra sessão, merge/deploy)? encaminhe. O que sobra é do maestro. Guarde a lista do que saiu e o
    porquê: ela vai no relatório. **O que saiu não se sela pelo selador** (ele grava testemunho do
    maestro): nó fechado por medição fecha pelo `/meta:kg-freshness` ou pelo fluxo normal, nunca "em
    lote, sem pergunta". Para filtrar, **leia o nó** (e quem chega por aresta) — o texto do censo é
-   recorte, não o nó.
+   recorte, não o nó. Fechando o filtro, **classifique quem executa** cada ato que sobrou (cláusula
+   8): a classe do censo onde ela veio medida; nas linhas `seal`, a decisão é do maestro e o selo é
+   seu, mas o ato **depois** do selo pode ser dele (a pista diz onde olhar).
 3. **COMPOR as rodadas** (cláusulas 2 a 4). Até **4 perguntas por rodada**, **2 a 4 opções** por
    pergunta, `header` com até 12 caracteres, ordem **bloqueio → atenção** (a do censo). Cada opção:
    rótulo curto e descrição com **custo, o que destrava e o que fica gated**. A recomendada é a
    **primeira**, com o rótulo terminando em "(Recomendado)" e o porquê na descrição. Faltou
    embasamento? Uma opção é "pesquisar antes" (`/onion-research`, modo `decision`). Mais de 4
    perguntas → anuncie ao maestro as que ficam para a rodada seguinte, pelo nome, antes de perguntar.
+   **Ato, não decisão** (cláusula 8): o que é **faço-eu** vira a pergunta "faço?", com
+   **"Eu faço agora (Recomendado)"** primeiro (a descrição diz o comando, o custo e o que destrava),
+   **"Me dê o passo a passo"** e **"Depois"**. O que é **maestro-com-!** ou **maestro-fora** vira
+   **"Me dê o passo a passo (Recomendado)"**, **"Já fiz, confira"** (você roda a conferência do card)
+   e **"Depois"**. Decisão cuja execução é do maestro carrega isso na própria opção ("selar e receber
+   o card"), em vez de gastar uma 2ª pergunta.
 4. **PERGUNTAR** com `AskUserQuestion`. Uma rodada por vez.
 5. **SELAR** (cláusulas 5 a 7), resposta a resposta, **antes** da rodada seguinte, sempre pelo selador
    (peça 5), nunca editando o grafo à mão:
@@ -87,16 +112,24 @@ de linha com aviso não é zero**.
    - resposta livre ("Other"): a mesma chamada com `--other`; ambígua → não sela, pergunta de novo.
    - **checkpoint** do `/meta:drive` respondido "selar": o selo é do mecanismo dele,
      `bash .claude/validation/kg-drive-project.sh <grafo> --seal` (o selador desta peça não escreve
-     `meta`); **merge** respondido "sim": o ato é do maestro, pelo caminho verificado — aqui só se
-     registra a resposta no relatório.
+     `meta`); **merge** deste repo respondido "Eu faço agora": rode o comando da linha (o caminho
+     verificado, que recusa CI vermelho; recusou → diga por quê, não contorne); merge de **outro**
+     repo: o card, que o maestro roda com o prefixo de bang.
    O selador sai **0** só com o radar `--integrity --schema` exit 0 (e o contrato, onde vendorizado);
    **2** = recusou e nada escreveu (nó inexistente, já `done`, campo cego, id duplicado); **3** = o
    gate reprovou e a escrita foi **desfeita**. Em 2 ou 3, leia a mensagem, conserte a causa e
    re-tente; nunca contorne pela edição à mão.
-6. **PRÓXIMOS MOVIMENTOS.** Devolva ao maestro, nesta ordem: o que foi selado (nó, grafo, escolhida);
-   o que o filtro tirou e por quê; e a **lista de próximos movimentos** que a sessão executa agora (o
-   que cada selo destravou), mais o que ficou para ele (merge, deploy, outra sessão). Commit dos grafos
-   tocados no fluxo normal da sessão, com o selo e o trabalho no mesmo PR quando for o caso.
+6. **EXECUTAR o que é seu.** Cada "Eu faço agora" roda **já**, na ordem da rodada, e o resultado
+   (rc, o que mudou) entra no relatório. Falhou? Diga o rc e a causa, e ofereça o card.
+7. **PRÓXIMOS MOVIMENTOS.** Devolva ao maestro, nesta ordem, denso e escaneável:
+   - ✅ **feito agora**: o que foi selado (nó, grafo, escolhida) e o que você executou;
+   - 🧭 **cards do maestro**: um por ato **maestro-com-!** / **maestro-fora**, na forma da cláusula 8
+     (objetivo, por que é dele, pré-condição medida **agora**, passos copiáveis, como conferir, tempo,
+     o que você faz depois). Re-meça a pré-condição antes de escrever o card: card de ontem é palpite;
+   - ↪️ **o que o filtro tirou** e por quê (medido · derivado · de outro dono);
+   - ⏭️ **em voo**, o que ficou para "Depois", pelo nome.
+   Commit dos grafos tocados no fluxo normal da sessão, com o selo e o trabalho no mesmo PR quando for
+   o caso.
 
 ## Destino (peça 5)
 
@@ -126,7 +159,10 @@ registro de decisões por sessão), e aí a lente se deriva do caminho medido.
 
 - Não decide pelo maestro, não sela o que não foi perguntado e não grava recomendação como resposta.
 - Não re-pesquisa: sem embasamento, a opção é "pesquisar antes" (`/onion-research`, modo `decision`).
-- Não faz merge, deploy nem escreve em repo alheio (MOAT); não muda hook, guarda ou regra.
+- Não faz merge sem o "sim" do maestro, e com ele só pelo caminho verificado; não faz deploy nem
+  escreve em repo alheio (MOAT), e para esses entrega o card; não muda hook, guarda ou regra.
+- Não contorna veto: o card existe **porque** a sessão não pode, e nenhum passo dele pede à sessão
+  o que o veto barra.
 - Não lê o transcript: o que foi dito na conversa entra pelo `--cite`.
 - **Não vai para o onion-mini.** Desde 2026-10-14 ele está no conjunto `full` do `roles.yaml` e viaja
   para todo papel que tem KG (o medidor, o selador e o radar viajam junto, em `.claude/validation/`). O mini

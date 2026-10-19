@@ -93,6 +93,45 @@ A sessão grava **só** o que o maestro respondeu. Pergunta pulada não sela; re
 **recusado** pelo selador, que reconhece a chave pelo nome (`blind`/`cego`) — lição de 2026-10-06, a
 memória `never-fill-blind-human-gate`: um voto de IA no campo cego contaminou a leitura humana.
 
+### 8. Quem executa: oferecer-se sempre que puder, e entregar o passo a passo quando não puder
+Pedido do maestro em 2026-10-19, literal: *"além dele avaliar o que está aberto e trazer para ser
+selado com as suas instruções ele também traga em passo a passo atualizado de como fazer as questões
+que são manuais quando você não puder fazer no meu lugar ou se oferecer sempre para fazer quando
+possível"*, com a régua *"ux premium, a interação deve ser juicy"*. Decidir não basta: depois da
+resposta há um **ato**, e o maestro precisa saber, sem perguntar, quem o faz e como.
+
+Cada ato que sobra do filtro tem **uma** classe, e o medidor a dá onde ela é medível:
+
+| Classe | Critério (o que a prova) | Forma na pergunta |
+|---|---|---|
+| 🤖 **faço-eu** | a sessão tem a ferramenta e nenhum veto a barra: selo, checkpoint, merge **deste** repo pelo caminho verificado, triagem, a própria worktree | "Eu faço agora (Recomendado)" · "Me dê o passo a passo" · "Depois" |
+| ⌨️ **maestro-com-!** | merge de PR de outro repo. No core, a trava de merge veta `gh pr merge` em qualquer forma, inclusive com `-R`, e o escape declarado é o prefixo de bang no prompt do maestro, que não passa pelo hook; no adotante a trava só avisa, mas repo alheio continua não sendo da sessão (MOAT) | "Me dê o passo a passo (Recomendado)" · "Já fiz, confira" · "Depois" |
+| 🙋 **maestro-fora** | falta à sessão o que o ato pede: TTY, navegador, segredo que ela não lê, presença física (o `gh auth login`, o `pass` que pede o pinentry) | as mesmas três |
+| ↪️ **outro-dono** | o ato é de outra sessão ou agente (I3): a worktree que não é a desta sessão, e o PR cuja branch está numa delas | nenhuma: vai para "o que o filtro tirou" |
+
+**A recomendação segue a classe.** Quando a sessão pode, a recomendada é ela fazer: perguntar "quer
+que eu faça?" e depois ensinar a fazer à mão é transferir trabalho. Quando não pode, a recomendada é o
+card, e a sessão **nunca** propõe contornar o veto (o veto existe; o card é o caminho dele).
+
+**O card do passo a passo** (um por ato do maestro, no relatório final, denso e escaneável):
+
+> **⌨️ Mergear `dono/repo#N`** · ~1 min (estimado)
+> **Por que é seu:** a trava de merge barra `gh pr merge -R` na sessão; o prefixo de bang não passa por ela.
+> **Pré-condição, medida agora:** CI 4 ok · 0 falha; método aceito pelo repo: `--rebase`.
+> 1. `! gh pr merge N -R dono/repo --rebase --delete-branch`
+> 2. `! gh pr view N -R dono/repo --json state -q .state` → `MERGED`
+> **Depois, eu:** sincronizo o que dependia dele e sigo para o próximo item.
+
+As peças são fixas: **objetivo** em uma linha; **por que é do maestro** (o veto ou a falta, medidos);
+**pré-condição medida no momento** (card de ontem é palpite: re-meça antes de escrever); **passos
+numerados**, um comando copiável por passo, com `! ` na frente quando roda no prompt da sessão e
+**onde** roda quando é fora dela; **como conferir** que deu certo, com a saída esperada; **tempo**
+(medido, ou marcado "estimado"); e **o que a sessão faz logo depois**. Sem parede de texto: o porquê
+longo mora no nó, e o card aponta para ele.
+
+**"Já fiz, confira"** não é selo de confiança: a sessão roda o comando de conferência do card e
+reporta o que ele devolveu. Se não confere, diz o que viu e devolve o card.
+
 ## O que esta doutrina NÃO promete
 
 - **Não decide pelo maestro.** Mede, filtra, compõe, pergunta e grava; a escolha é dele.
@@ -110,8 +149,19 @@ memória `never-fill-blind-human-gate`: um voto de IA no campo cego contaminou a
   não por leitura do transcript.
 - **Contrato de custo** (`run_id` · `tokens` · `agents` · `duration_min`): **não se aplica** — o
   `/meta:decide` não é run de workflow; o medidor e o selador são 0 tokens. Declarado, não omitido.
-- **Não executa merge, deploy nem escrita em repo alheio** (MOAT): "merge" no questionário é a
-  pergunta *se* e *quando*; o ato segue o caminho verificado, nas mãos do maestro.
+- **Não executa deploy nem escrita em repo alheio** (MOAT), e **não mergeia sem o "sim"**: com ele,
+  o merge **deste** repo vai pelo caminho verificado (que recusa CI vermelho); o de outro repo vira
+  card do maestro.
+- **Não prova a classe onde ela não é medível.** O medidor classifica o que mede (o PR, a worktree, o
+  gh sem credencial); nas linhas de nó ele só copia a **pista** literal de ato manual (`sudo`, bang no
+  prompt, "fora da sessão", "só o maestro", MOAT), que erra para os dois lados: "o onion não tem sudo"
+  é pista e não é ato. Quem fecha a classe é a sessão, lendo o nó.
+- **Não julga o CI pelo veredito.** A pré-condição do card conta os checks do rollup do gh; um
+  `onion-review` verde que só significa "o revisor não rodou" conta como ok. No PR deste repo o caminho
+  verificado relê o veredito e recusa; no PR alheio, o card diz o que o rollup diz, e nada além.
+- **Não conhece a convenção de merge do repo alheio.** O método do card é o que o repo aceita pela
+  API, na ordem rebase, squash, merge, e o card diz quando foi inferido; o PR de update do Onion
+  (`chore/onion-update-*`) leva merge commit, porque rebase e squash quebram o update seguinte.
 
 ## 🔗 Referências
 
