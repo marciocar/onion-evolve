@@ -101,7 +101,7 @@ ele **não** diz que um item toca o Onion.
    executável ainda é prosa (SAC-65). Provider diferente de `linear` ou chave ausente → avise em pt-BR,
    sugira `/meta:setup-integration` e deixe só o nó.
 9. **FECHAR.** Regenere as projeções (o plugin onion não se regenera mais no core desde a F4 das
-   portas: ele nasce na publicação, `/meta:publish onion-plugins`); `bash ops/pr-finalize.sh --push`; PR com corpo em pt-BR; merge **só** por
+   portas: ele nasce na publicação, `/meta:publish onion-plugins` (core-only)); `bash ops/pr-finalize.sh --push`; PR com corpo em pt-BR; merge **só** por
    `ops/pr-merge-verified.sh`, com a dispensa nomeada quando o revisor do CI estiver sem crédito.
 10. **RELATAR.** Versão medida (baseline → instalada), quantos nós, o veredito do juiz, as issues
     criadas, o PR e o merge.

@@ -46,7 +46,7 @@ SKILLS=(
   ".claude/skills/onion-product-context"
 )
 HOOKS=()
-UTILS=(".claude/utils/task-manager" ".claude/utils/kg")   # utils/kg: a classe do caminho de máquina que o kg-contract-check.sh importa; o helper env-check.sh: sem ele os comandos que leem o provider não têm caminho (o veto barra abrir o .env)
+UTILS=(".claude/utils/task-manager" ".claude/utils/kg" ".claude/utils/scope")   # utils/scope: o resolve-context-dir.sh que os build-*-docs chamam antes de gravar (sinal de campo 2026-10-19); utils/kg: a classe do caminho de máquina que o kg-contract-check.sh importa; o helper env-check.sh: sem ele os comandos que leem o provider não têm caminho (o veto barra abrir o .env)
 # O gate do grafo de reunião que o /product:extract-meeting manda rodar (SAC-157, 2026-10-16), e o radar que
 # ele chama AO LADO (mesma forma do onion-engineering, que também empacota o radar com a lib). Sem o radar no
 # bundle o gate sai 2 ("não pude julgar"), nunca verde.

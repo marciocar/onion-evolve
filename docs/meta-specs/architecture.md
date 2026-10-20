@@ -242,7 +242,7 @@ Implicações:
 - **Identidade do framework: o pin** (commit + data), derivado do git. É a verdade que as guardas leem.
 - **Versão de release da família: `onion-vX.Y.Z`**, um **rótulo** de um pin publicado nas portas
   (decisão do maestro de 2026-10-11, nó `D_VERSIONAR_AS_PORTAS_POR_RELEASE` em
-  `docs/onion/graph/door-role-parity-2026-09.kg.yaml`). Nasce no `/meta:publish`: o motor **propõe** o
+  `docs/onion/graph/door-role-parity-2026-09.kg.yaml`). Nasce no `/meta:publish` (core-only): o motor **propõe** o
   bump pelo diff de superfície da porta e o maestro **sela** o número com `--version`. A tag mora nas
   **portas**, nunca no core. Nenhuma guarda lê a versão (a REGRA 85 (Porta pública espelha o core, com catraca), a REGRA 92
   (Papel da porta no registro concorda com o CARIMBO dela) e o `--status` medem o pin).
@@ -296,7 +296,7 @@ saem `framework`/`source_commit`/`source_commit_date`/`role`/`adopted_from` e, n
 `adopted_at`/`updated_at`, `kind: door` + `materialized_at: <YYYY-MM-DD>` — a porta é projeção regenerada
 inteira, então nada se herda do carimbo anterior e o `role` é obrigatório. Até 2026-10-09 a porta tinha
 um dialeto próprio (`onion_version`), que o `door-seal-pin.sh` ainda lê como fallback. Quando a
-materialização é uma **release** (o maestro selou `--version` no `/meta:publish`), o carimbo leva também
+materialização é uma **release** (o maestro selou `--version` no `/meta:publish` (core-only)), o carimbo leva também
 `release: X.Y.Z`, regenerado a cada publicação; sem release o campo não sai. Nenhuma guarda o lê.
 
 O campo **`integration_branch`** (opcional) é o **SSOT versionado** da branch de integração — a que os PRs

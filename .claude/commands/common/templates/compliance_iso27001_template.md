@@ -92,7 +92,8 @@ Ver mapeamento ISO 27001 ↔ SOC2 ao final de cada documento.
    - Disponibilidade (Availability): definição + controles aplicados
 
 3. **Comprometimento da Alta Direção**
-   - Declaração formal de compromisso (Clause 5.1)
+   - Declaração formal de compromisso (Clause 5.1) — cite a ata ou o registro de aprovação (data e
+     instância). Sem ele: `[TO BE COMPLETED]`, nunca "Aprovado pela Alta Direção" sem ata
    - Alocação de recursos e papéis
 
 4. **Matriz de Responsabilidades**

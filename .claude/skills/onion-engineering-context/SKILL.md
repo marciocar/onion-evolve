@@ -37,7 +37,9 @@ Para ler/gravar o contexto técnico vivo (arquitetura, decisões, estado), resol
 **nesta ordem** e use o primeiro que existir:
 
 1. **Mapa explícito**: chave `context.technical` em `.onion-version` (JSON) ou `.claude/onion-context.yaml`,
-   se o consumidor declarou um caminho próprio. **Declaração explícita vence convenção** — o específico
+   se o consumidor declarou um caminho próprio. Os passos 1 e 2 são executáveis:
+   `bash .claude/utils/scope/resolve-context-dir.sh technical` imprime a pasta (exit 3 = declaração
+   inválida: pare); os `/docs:build-*` o chamam antes de gravar (sinal de 2026-10-19). **Declaração explícita vence convenção** — o específico
    ganha do default. (Sinal de campo, adoção legacy 2026-07/D1: a adoção CRIA `docs/technical-context/`, então
    se o layout padrão viesse antes, o mapa explícito seria código morto exatamente para quem foi desenhado
    — o adotante com SSOT próprio, ex.: `docs/specs/` autoritativa, que quer declará-lo.)

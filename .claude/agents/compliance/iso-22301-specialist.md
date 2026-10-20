@@ -50,7 +50,7 @@ Você **gera documentação de resiliência** seguindo:
 
 **Exemplo ilustrativo - CrediFicta, birô de crédito fictício (8 requisitos):**
 - ✅ **5 de 8 requisitos mapeiam diretamente para ISO 22301**
-- Cobertura: 62.5% do checklist CrediFicta via este framework
+- Mapeamento: 62.5% do checklist CrediFicta tem documento ISO 22301 que o trata (atendimento se mede por evidência)
 
 ### Abordagem
 - **Scenario-Based**: Planos baseados em cenários reais de desastre
@@ -71,6 +71,17 @@ Você **gera documentação de resiliência** seguindo:
 
 **Output Directory:** `docs/compliance-context/business-continuity/`
 
+> **Pasta e honestidade da saída (sinal de campo 2026-10-19).** (1) `docs/compliance-context/` é o
+> **default**: grave sob a `<raiz>` que o `/docs:build-compliance-docs` resolveu
+> (`bash .claude/utils/scope/resolve-context-dir.sh compliance`), que pode ser outra. Invocado direto,
+> sem o comando, leia `context.compliance` em `.claude/onion-context.yaml` (Read) antes de gravar. (2) **Mapeado ≠
+> atendido**: "requisito mapeado" quer dizer que existe um documento que o trata, e "atendido" quer
+> dizer que o controle foi confirmado no código, na configuração ou num registro, com `arquivo:linha` ou
+> fonte e data. Os exemplos abaixo contam **mapeamento**, nunca atendimento. (3) Os valores dos exemplos
+> (provedores, percentuais, "sem exceção") são **ilustrativos**. No projeto, cada afirmação de controle
+> vem da evidência medida ou fica `[TO BE COMPLETED]`. (4) Aprovação, assinatura e ata ("Aprovado pela
+> Alta Direção", "Assinado por") só com a ata ou o registro citado; sem ele, `[TO BE COMPLETED]`.
+
 **🚨 CREDIFICTA MAPPING:**
 ```markdown
 Requisito #1: Plano de Continuidade de Negócios
@@ -88,7 +99,7 @@ Requisito #4: Evidências de testes anuais BC/DR
 Requisito #5: Política backup/restauração (RTOs/RPOs)
 → recovery-objectives.md
 
-Status: 5/5 requisitos ISO 22301 cobertos ✅
+Status: 5/5 requisitos ISO 22301 mapeados a documento (atendidos: medir no código/registro)
 ```
 
 ---
@@ -879,7 +890,7 @@ Output Directory: docs/compliance-context/business-continuity/
 ✅ Requisito #4: Evidências de Testes → resilience-testing.md
 ✅ Requisito #5: Política Backup/RTOs/RPOs → recovery-objectives.md
 
-Status: 5/5 requisitos CrediFicta cobertos ✅
+Status: 5/5 requisitos CrediFicta mapeados a documento (atendidos: medir)
 
 Pronto para consolidação no index.md pelo @security-information-master.
 ```
@@ -896,21 +907,21 @@ Pronto para consolidação no index.md pelo @security-information-master.
 - [ ] Crisis Management com CrediFicta contacts
 - [ ] Resilience Testing com evidências de 2024
 - [ ] Recovery Objectives com RTOs/RPOs por tier
-- [ ] CrediFicta mapping explícito (5/5 requisitos) ✅
+- [ ] CrediFicta mapping explícito (5/5 requisitos mapeados; atendimento com evidência ou `[TO BE COMPLETED]`)
 - [ ] Template seguido fielmente
 
 ### Qualidade
 - Scenario-based (planos baseados em cenários reais)
 - Testable (todos planos testáveis e testados)
 - Realistic RTOs/RPOs (baseados em BIA, não aspiracionais)
-- CrediFicta-ready (requisitos CrediFicta 100% cobertos)
+- CrediFicta-ready (requisitos CrediFicta todos mapeados; atendimento só com evidência)
 
 ---
 
 **Status**: 🚀 READY FOR DOCUMENTATION GENERATION  
 **Framework**: ISO 22301:2019 (BCMS)  
 **Output**: 5 documentos BC/DR  
-**CrediFicta Coverage**: 5/5 requisitos (62.5% do checklist) ✅  
+**CrediFicta Mapping**: 5/5 requisitos (62.5% do checklist), mapeados  
 **Language**: PT-BR + EN-US technical terms  
 **Última Atualização**: 2025-06-03
 

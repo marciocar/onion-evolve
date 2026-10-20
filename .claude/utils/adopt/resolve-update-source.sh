@@ -113,7 +113,7 @@ if [ "${KIND}" = door ] && [ "${REL}" != equal ]; then
   echo "RECUSADO: o alvo é uma PORTA (kind: door), e a fonte escolhida não é a ponta de origin/${INTEG} (relação: ${REL})." >&2
   echo "  Porta é projeção de origin/${INTEG}; um pin fora dela publicaria código não revisado num repo público." >&2
   [ "${REL}" = unmeasured ] && { echo "  Próximo passo: restabeleça o fetch de origin/${INTEG} e re-rode com --source origin." >&2; exit 3; }
-  echo "  Próximo passo: --source origin (ou o /meta:publish da porta, o caminho normal de uma porta)." >&2
+  echo "  Próximo passo: --source origin (ou, na fonte, o /meta:publish da porta (core-only), o caminho normal de uma porta)." >&2
   exit 4
 fi
 

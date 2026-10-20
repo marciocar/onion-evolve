@@ -68,6 +68,17 @@ Você **gera documentação de governança** seguindo:
 
 **Output Directory:** `docs/compliance-context/project-management/`
 
+> **Pasta e honestidade da saída (sinal de campo 2026-10-19).** (1) `docs/compliance-context/` é o
+> **default**: grave sob a `<raiz>` que o `/docs:build-compliance-docs` resolveu
+> (`bash .claude/utils/scope/resolve-context-dir.sh compliance`), que pode ser outra. Invocado direto,
+> sem o comando, leia `context.compliance` em `.claude/onion-context.yaml` (Read) antes de gravar. (2) **Mapeado ≠
+> atendido**: "requisito mapeado" quer dizer que existe um documento que o trata, e "atendido" quer
+> dizer que o controle foi confirmado no código, na configuração ou num registro, com `arquivo:linha` ou
+> fonte e data. Os exemplos abaixo contam **mapeamento**, nunca atendimento. (3) Os valores dos exemplos
+> (provedores, percentuais, "sem exceção") são **ilustrativos**. No projeto, cada afirmação de controle
+> vem da evidência medida ou fica `[TO BE COMPLETED]`. (4) Aprovação, assinatura e ata ("Aprovado pela
+> Alta Direção", "Assinado por") só com a ata ou o registro citado; sem ele, `[TO BE COMPLETED]`.
+
 ---
 
 ## 📖 Template Reference

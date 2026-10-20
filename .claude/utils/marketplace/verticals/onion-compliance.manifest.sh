@@ -14,7 +14,7 @@ AGENTS=(
   ".claude/agents/compliance/soc2-specialist.md"
   ".claude/agents/compliance/pmbok-specialist.md"
 )
-UTILS=()
+UTILS=(".claude/utils/scope")   # resolve-context-dir.sh: o build-compliance-docs resolve a pasta-alvo por ele (sinal de campo 2026-10-19); sem ele o comando viaja sem o Passo 0 (REGRA 27)
 VALIDATION=()
 TEMPLATES=(
   ".claude/commands/common/templates/compliance-context-template.md"

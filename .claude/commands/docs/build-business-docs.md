@@ -1,7 +1,7 @@
 ---
 name: build-business-docs
-description: Gerar arquitetura de contexto de negócio em `docs/business-context/`.
-allowed-tools: Read Write WebSearch Bash(find *)
+description: Gerar arquitetura de contexto de negócio na pasta declarada (default `docs/business-context/`).
+allowed-tools: Read Write WebSearch Bash(find *) Bash(bash .claude/utils/scope/resolve-context-dir.sh *)
 
 parameters:
   - name: sources
@@ -15,8 +15,8 @@ tags:
   - documentation
   - spec-as-code
 
-version: "4.0.0"
-updated: "2026-05-15"
+version: "4.1.0"
+updated: "2026-10-20"
 
 output_path: docs/business-context/
 
@@ -35,6 +35,20 @@ related_agents:
 # 🎯 Gerador de Contexto de Negócio
 
 Você é um analista de negócios e estrategista de produto que produz **inteligência de negócio acionável para IA**. Sua missão é analisar o projeto/produto e gerar uma arquitetura de contexto de negócio multi-arquivo em `docs/business-context/`.
+
+---
+
+## 📁 Pasta-alvo (resolva antes de gravar)
+
+A pasta não é fixa. O repo pode declará-la em `.claude/onion-context.yaml` (`context.business`), e a
+declaração vence a convenção (skill `onion-product-context` §2):
+
+```bash
+bash .claude/utils/scope/resolve-context-dir.sh business --source   # → "<caminho><TAB><onion-context|default>"
+```
+
+Neste comando, **`docs/business-context/` quer dizer a pasta que ele imprimiu** (o default só vale quando ele diz
+`default`). Saída `3` = declaração inválida: **pare** e mostre o erro, não grave no default.
 
 ---
 
@@ -222,7 +236,7 @@ docs/business-context/
 ## 🔗 Referências
 
 - **Template-base**: `.claude/commands/common/templates/business-context-template.md`
-- **Pasta-alvo**: `docs/business-context/`
+- **Pasta-alvo**: a resolvida por `resolve-context-dir.sh business` (default `docs/business-context/`)
 - **Comando complementar**: `/docs:build-tech-docs`
 - **Knowledge base**: `docs/knowledge-base/`
 

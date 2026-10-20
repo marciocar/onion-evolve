@@ -29,7 +29,7 @@
 # Uso       : assemble-plugin.sh <manifest> [source-root] [dest-dir]
 #             source-root default = git toplevel; dest default = <root>/plugins/<PLUGIN_NAME>
 #             (no CORE esse default é ignorado pelo git desde a F4 das portas: o plugin publicado
-#             mora no repo onion-plugins, montado pelo /meta:publish — nunca versionado aqui)
+#             mora no repo onion-plugins, montado pelo /meta:publish (core-only) — nunca versionado aqui)
 #             Determinístico + idempotente: mesmo HEAD → mesmo output.
 #
 # Gracioso  : manifesto/source inválido ou componente-fonte ausente → exit 2.

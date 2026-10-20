@@ -64,6 +64,17 @@ Você **gera documentação técnica de segurança** seguindo:
 
 **Output Directory:** `docs/compliance-context/security/`
 
+> **Pasta e honestidade da saída (sinal de campo 2026-10-19).** (1) `docs/compliance-context/` é o
+> **default**: grave sob a `<raiz>` que o `/docs:build-compliance-docs` resolveu
+> (`bash .claude/utils/scope/resolve-context-dir.sh compliance`), que pode ser outra. Invocado direto,
+> sem o comando, leia `context.compliance` em `.claude/onion-context.yaml` (Read) antes de gravar. (2) **Mapeado ≠
+> atendido**: "requisito mapeado" quer dizer que existe um documento que o trata, e "atendido" quer
+> dizer que o controle foi confirmado no código, na configuração ou num registro, com `arquivo:linha` ou
+> fonte e data. Os exemplos abaixo contam **mapeamento**, nunca atendimento. (3) Os valores dos exemplos
+> (provedores, percentuais, "sem exceção") são **ilustrativos**. No projeto, cada afirmação de controle
+> vem da evidência medida ou fica `[TO BE COMPLETED]`. (4) Aprovação, assinatura e ata ("Aprovado pela
+> Alta Direção", "Assinado por") só com a ata ou o registro citado; sem ele, `[TO BE COMPLETED]`.
+
 ---
 
 ## 📖 Template Reference
@@ -299,17 +310,20 @@ Autenticação de dois fatores obrigatória para todos sistemas críticos.
 
 ### Controles Implementados
 
+> Cada linha abaixo é **afirmação de controle**: entra com a evidência que a confirma (`arquivo:linha`,
+> configuração exportada, registro datado) ou fica `[TO BE COMPLETED]`. Os valores são ilustrativos.
+
 #### User Authentication (Autenticação de Usuários)
 
 **Single Sign-On (SSO):**
-- Provider: Auth0 / Okta
-- Protocols: SAML 2.0, OAuth 2.0, OIDC
-- Coverage: 100% dos sistemas internos
+- Provider: [provedor medido na configuração, ex.: Auth0 / Okta] — evidência: `[TO BE COMPLETED]`
+- Protocols: [SAML 2.0 / OAuth 2.0 / OIDC, conforme configurado]
+- Cobertura: [N de M sistemas internos atrás do SSO, contados] — evidência: `[TO BE COMPLETED]`
 
 **Multi-Factor Authentication (MFA):**
-- Mandatory for: Todos usuários (sem exceção)
-- Methods: TOTP, SMS, Biometria
-- Enforcement: Impossível acessar sem MFA
+- Exigido para: [população medida, ex.: "N de M usuários" — nunca "todos" sem a contagem]
+- Methods: [TOTP / WebAuthn / SMS, conforme configurado]
+- Enforcement: [a política que barra o acesso sem MFA, citada] — evidência: `[TO BE COMPLETED]`
 
 **Password Policy (Política de Senhas):**
 - Minimum Length: 12 caracteres

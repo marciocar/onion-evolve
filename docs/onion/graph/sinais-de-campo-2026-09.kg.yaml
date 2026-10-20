@@ -104,6 +104,102 @@ nodes:
       locator: "pergunta com opções de 2026-10-12: «O que fazer com o sinal do kg-ssot (spike: sobrevivência premia a proposta trivial; só valor com avaliador cego separa)?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
+  - id: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-20"
+    verified_against: "os dois sinais lidos inteiros: docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md (9 achados, aqui C1..C9) e docs/evolution/inbox/_processed/2026-10-19-dogfood-update-59ebe7fe1288.md (7 fricções, aqui U1..U7), os dois do hub brain-granaai no pin 59ebe7fe1288. Remedido no core em 2026-10-20: C3 (grep por onion-context nos cinco build-*-docs = 0; o mapa do hub declara context.compliance: docs/compliance), C5 (o Output Esperado do comando trazia 'ISO 27001: ✅ 12 documentos', 'Políticas: 100%', 'Controles: 85%'; os especialistas soc2 e iso-22301 contavam 'requisitos cobertos ✅' por documento existir, e o iso-27001 trazia 'MFA para todos (sem exceção)' como exemplo de controle), U7 (ops-citation-travel-check.sh não casava '/meta:publish': 19 citações sem declaração em 10 arquivos que viajam)"
+    label: "dois sinais do hub brain-granaai (2026-10-19), dezesseis fricções: nove do /docs:build-compliance-docs no campo e sete do --update 0d0636f4ca74 → 59ebe7fe1288"
+    narrative: "C1 nenhum build-*-docs tem etapa de grafo. C2 o comando não separa produção, desenvolvimento e controle só no documento. C3 a pasta-alvo ignora o .claude/onion-context.yaml. C4 o comando não lê fonte externa (wiki, task manager, chat da equipe). C5 o exemplo de saída ensina a inventar cobertura, e o comando cita um modo reconciliar que não define. C6 a precedência de evidência não cobre documento próprio feito para cliente. C7 escrever grafo à mão no contrato v4 tem três armadilhas sem molde (lista indentada, data entre aspas com verified_at, impact 1..5). C8 o session-currency-check.sh compara com a develop de produto e não com a integração do Onion. C9 subagente cortado por limite não deixa saída parcial. U1 o corpus do adotante herda o contrato v4 já reprovado (24 de 24 grafos no MUST) e nada avisa. U2 o vendor/kg-ssot nasce defasado (v4.9.1 contra v4.10.0 no upstream) sem ser nomeado. U3 o diff --stat do relatório subconta quando o manifesto cresce (239 contra 540). U4 o pretooluse-env-guard.sh barra operações que não leem segredo. U5 o índice da KB tem contagem que não bate (42 no cabeçalho, 44 listadas, 53 arquivos). U6 o procedimento não cobre a sessão do alvo dirigindo o update. U7 o corte do /meta:publish deixou citações em superfícies que viajam. O que o sinal mediu no adotante (24/24, 1.024 de 1.268 nós, 540 arquivos) não foi remedido aqui: é testemunho."
+    trace: "docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md"
+      locator: "os 9 achados numerados do sinal de compliance e as 7 fricções numeradas do sinal de update (2026-10-19-dogfood-update-59ebe7fe1288.md)"
+      method: "testemunho: medição do hub relayada como sinal; C3, C5 e U7 remedidos no core em 2026-10-20 pelos greps do verified_against"
+      locality: "repo"
+  - id: D_TRIAGEM_HUB_1019_EM_DUAS_ONDAS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20 pelo /meta:decide: executar a onda A até o PR, sem merge"
+    label: "triagem dos 16: nove viram cura (onda A, em execução), quatro viram feature (onda B) e três ficam no backlog com gatilho"
+    narrative: "Veredito por fricção. FIX, onda A: U2, U3, U4, U5, U7, C3, C5, C6 e C8. FEATURE, onda B: U1 primeiro (medir o contrato no corpus do alvo e dar caminho de migração), depois C1 com C2 (fase de grafo nos build-*-docs com prod, dev e policy) e C7 (escritor de grafo vendorizado conforme ao contrato e legível pelo radar). BACKLOG com gatilho: U6, C4 e C9. Quatro curas da onda A saem neste PR: C3 (resolve-context-dir.sh, chamado pelos cinco build-*-docs e pelas três skills de contexto), C5 (exemplo com contagens medidas e o comando que mede, a parcela [TO BE COMPLETED] à vista, modo reconcile definido, e os cinco prompts de compliance passando a dizer 'mapeado' em vez de 'coberto ✅'), C6 (documento próprio feito para fora como declaração a verificar, no comando e em evidence-source-interest.md) e U7 (REGRA 100 com o 2º vocabulário e as 19 citações declaradas). As outras cinco curas da onda A (U2, U3, U4, U5 e C8) correm em frentes paralelas."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "rodada de 2026-10-20 sobre os dois sinais do hub brain-granaai"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
+  - id: E_REGRA_100_NAO_VIA_O_COMANDO_CORTADO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-20"
+    verified_against: "bash .claude/validation/ops-citation-travel-check.sh . --format tsv antes da cura: 0 achados sobre /meta:publish; com o 2º vocabulário e antes das declarações: 19 HARD NEW em 10 arquivos; depois: HARD=0 e o baseline intocado. --selftest 22/22, e o mutante sem o vocabulário reprova (xx) e (xxi)"
+    label: "a REGRA 100 não pegou o U7 porque o vocabulário dela era só ops/<arquivo>, e /meta:publish é a face de comando do ops/publish-door.sh"
+    narrative: "O corte de 2026-10-18 tirou o /meta:publish da adoção, mas a guarda que barra superfície que viaja citando o que o destinatário não tem só casava o token ops/. A cura deriva o 2º vocabulário do mesmo SSOT do corte (vendor-manifest.sh --retired-excludes: cada .claude/commands/<cat>/<nome>.md vira /<cat>:<nome>), com as mesmas três declarações da regra. Teto declarado: a skill cortada (onion-publish) não entra, porque nome de skill não tem forma de invocação que se distinga de prosa."
+    trace: ".claude/validation/ops-citation-travel-check.sh"
+    provenance:
+      source: ".claude/validation/ops-citation-travel-check.sh"
+      locator: "o bloco 2º VOCABULÁRIO do cabeçalho e os casos (xx) a (xxii) do --selftest"
+      method: "medição: guarda rodada no corpus antes e depois, selftest e mutante"
+      locality: "repo"
+  - id: Q_HUB_1019_ONDA_B_CORPUS_HERDA_CONTRATO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "U1 (onda B, primeiro): o --update mede o contrato KG no corpus do alvo e o escreve no relatório, com caminho de migração do provenance a partir do trace — GATILHO: a onda A mergeada"
+    narrative: "No hub, o vendor/kg-ssot v4.9.1 chegou e o kg-contract-check.sh reprovou 24 de 24 grafos no MUST (form.required.node.provenance), enquanto o lint dava 0 HARD porque o gate do corpus (ops/kg-gate-ci.sh) não viaja. Números do sinal, não remedidos no core."
+    trace: "docs/evolution/inbox/_processed/2026-10-19-dogfood-update-59ebe7fe1288.md"
+  - id: Q_HUB_1019_ONDA_B_GRAFO_NOS_BUILD_DOCS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "C1 com C2 e C7 (onda B, depois do U1): fase de grafo nos build-*-docs, controle marcado prod, dev ou policy, e escritor de grafo vendorizado conforme ao contrato — GATILHO: U1 entregue"
+    narrative: "Cada controle seria medido contra a branch de produção (resolve-production-branch.sh), e o escritor já sairia legível pelo radar. O hub montou docs/compliance/graph/compliance.kg.yaml (275 nós) por fora do comando e caiu nas três armadilhas do C7, uma por vez. O sinal sugere que o contrato talvez precise de um campo para 'onde o código está' (o hub usou x_delivery), porque o plane diz contra o que a afirmação foi verificada."
+    trace: "docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md"
+  - id: Q_HUB_1019_BACKLOG_COM_GATILHO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro"
+    narrative: "GATILHOS propostos: U6 quando um 2º adotante dirigir o update da sessão do alvo, ou um commit de merge com conflito escapar do gate; C4 quando o adapter do provider ativo tiver item.read executável e um 2º adotante pedir a ligação controle→tarefa; C9 quando um 2º corte de subagente por limite perder trabalho. U6: o procedimento do --update assume a sessão da fonte (settings-before.json no core) e não diz se o commit do merge com conflito resolvido passa pelo gate. C4: wiki, task manager e chat da equipe ficam fora do /docs:build-compliance-docs, e foi o cruzamento entre fontes que achou o mais grave no hub. C9: o subagente que verificava o código parou por limite semanal da API sem gravar resultado parcial."
+    trace: "docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md"
+  - id: D_SINAL_COMPLIANCE_REDIGIDO_NO_CORE_PUBLICO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Redigir»"
+    label: "o sinal de compliance do hub é redigido no core: números, controles, lacunas e ferramentas do cliente viram descrição genérica, com aviso de que o original está no hub"
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «Redigir»; descartadas: «Só um ponteiro» · «Manter como chegou»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «O sinal de compliance do hub traz postura de segurança real do cliente e o core é público: o que fazer com o arquivo?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
 edges:
   - from: E_RADAR_IGNORAVA_O_SEGUNDO_MODO
     to: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
@@ -116,4 +212,22 @@ edges:
     edge_type: SUPPORTS
   - from: D_ABSORVER_CRITERIO_DE_VALOR_EM_SPIKE
     to: E_SPIKE_SOBREVIVENCIA_PREMIA_O_TRIVIAL_1012
+    edge_type: TRACES_TO
+  - from: D_TRIAGEM_HUB_1019_EM_DUAS_ONDAS
+    to: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
+    edge_type: TRACES_TO
+  - from: E_REGRA_100_NAO_VIA_O_COMANDO_CORTADO
+    to: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
+    edge_type: SUPPORTS
+  - from: Q_HUB_1019_ONDA_B_CORPUS_HERDA_CONTRATO
+    to: D_TRIAGEM_HUB_1019_EM_DUAS_ONDAS
+    edge_type: TRACES_TO
+  - from: Q_HUB_1019_ONDA_B_GRAFO_NOS_BUILD_DOCS
+    to: D_TRIAGEM_HUB_1019_EM_DUAS_ONDAS
+    edge_type: TRACES_TO
+  - from: Q_HUB_1019_BACKLOG_COM_GATILHO
+    to: D_TRIAGEM_HUB_1019_EM_DUAS_ONDAS
+    edge_type: TRACES_TO
+  - from: D_SINAL_COMPLIANCE_REDIGIDO_NO_CORE_PUBLICO
+    to: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
     edge_type: TRACES_TO

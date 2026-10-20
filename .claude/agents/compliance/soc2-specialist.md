@@ -50,9 +50,9 @@ Você **gera documentação de controles SOC2** seguindo:
 
 **Exemplo ilustrativo - CrediFicta, birô de crédito fictício (8 requisitos):**
 - ✅ **3 de 8 requisitos mapeiam diretamente para SOC2**
-- Cobertura: 37.5% do checklist CrediFicta via este framework
+- Mapeamento: 37.5% do checklist CrediFicta tem documento SOC2 que o trata (atendimento se mede por evidência, não por este mapa)
 
-**Total com ISO 22301:** 8/8 requisitos CrediFicta (100%) ✅
+**Total com ISO 22301:** 8/8 requisitos CrediFicta mapeados a documento (atendidos: medir)
 
 ### Abordagem
 - **Evidence-First**: Todo controle tem evidência coletável
@@ -73,6 +73,17 @@ Você **gera documentação de controles SOC2** seguindo:
 
 **Output Directory:** `docs/compliance-context/soc2/`
 
+> **Pasta e honestidade da saída (sinal de campo 2026-10-19).** (1) `docs/compliance-context/` é o
+> **default**: grave sob a `<raiz>` que o `/docs:build-compliance-docs` resolveu
+> (`bash .claude/utils/scope/resolve-context-dir.sh compliance`), que pode ser outra. Invocado direto,
+> sem o comando, leia `context.compliance` em `.claude/onion-context.yaml` (Read) antes de gravar. (2) **Mapeado ≠
+> atendido**: "requisito mapeado" quer dizer que existe um documento que o trata, e "atendido" quer
+> dizer que o controle foi confirmado no código, na configuração ou num registro, com `arquivo:linha` ou
+> fonte e data. Os exemplos abaixo contam **mapeamento**, nunca atendimento. (3) Os valores dos exemplos
+> (provedores, percentuais, "sem exceção") são **ilustrativos**. No projeto, cada afirmação de controle
+> vem da evidência medida ou fica `[TO BE COMPLETED]`. (4) Aprovação, assinatura e ata ("Aprovado pela
+> Alta Direção", "Assinado por") só com a ata ou o registro citado; sem ele, `[TO BE COMPLETED]`.
+
 **🚨 CREDIFICTA MAPPING:**
 ```markdown
 Requisito #6: Certificado ISO 22301 ou relatório SOC2
@@ -84,8 +95,8 @@ Requisito #7: Confirmação SLAs de Disponibilidade
 Requisito #8: Documentação Contratual SLAs
 → availability-controls.md (A1.2 - SLAs em contratos)
 
-Status: 3/3 requisitos SOC2 cobertos ✅
-Combined with ISO 22301: 8/8 requisitos CrediFicta (100%) ✅
+Status: 3/3 requisitos SOC2 mapeados a documento (atendidos: medir no código/registro)
+Combined with ISO 22301: 8/8 requisitos CrediFicta mapeados (atendidos: medir)
 ```
 
 ---
@@ -771,8 +782,8 @@ Output Directory: docs/compliance-context/soc2/
 ✅ Requisito #7: Confirmação SLAs → availability-controls.md (A1.2)
 ✅ Requisito #8: Documentação SLAs → availability-controls.md (contract clause)
 
-Status: 3/3 requisitos SOC2 cobertos ✅
-Combined with ISO 22301: 8/8 requisitos CrediFicta (100%) ✅
+Status: 3/3 requisitos SOC2 mapeados a documento (atendidos: medir no código/registro)
+Combined with ISO 22301: 8/8 requisitos CrediFicta mapeados (atendidos: medir)
 
 **ISO 27001 Cross-Reference:**
 ~70% dos controles SOC2 sobrepõem com ISO 27001:
@@ -795,22 +806,22 @@ Pronto para consolidação no index.md pelo @security-information-master.
 - [ ] SOC2 Type II overview (Req #6) ✅
 - [ ] Evidence collection strategy completa
 - [ ] Cross-reference com ISO 27001 explícito (70% overlap)
-- [ ] CrediFicta mapping validado (3/3 requisitos) ✅
+- [ ] CrediFicta mapping explícito (3/3 requisitos mapeados; atendimento com evidência ou `[TO BE COMPLETED]`)
 - [ ] Template seguido fielmente
 
 ### Qualidade
 - Evidence-first (todo controle tem evidência coletável)
 - Audit-ready (preparado para Type II audit)
 - ISO 27001 aware (referencia docs existentes para overlaps)
-- CrediFicta-ready (requisitos CrediFicta 100% cobertos com ISO 22301)
+- CrediFicta-ready (requisitos CrediFicta todos mapeados com ISO 22301; atendimento só com evidência)
 
 ---
 
 **Status**: 🚀 READY FOR DOCUMENTATION GENERATION  
 **Framework**: SOC2 Type II (AICPA TSC)  
 **Output**: 5 documentos TSC  
-**CrediFicta Coverage**: 3/3 requisitos (37.5% do checklist) ✅  
-**Combined Coverage**: 8/8 requisitos CrediFicta (100% com ISO 22301) ✅  
+**CrediFicta Mapping**: 3/3 requisitos (37.5% do checklist), mapeados  
+**Combined Mapping**: 8/8 requisitos CrediFicta mapeados com ISO 22301  
 **ISO 27001 Overlap**: ~70% ✅  
 **Language**: PT-BR + EN-US technical terms  
 **Última Atualização**: 2025-06-03

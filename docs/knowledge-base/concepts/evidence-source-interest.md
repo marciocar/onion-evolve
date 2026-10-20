@@ -1,6 +1,6 @@
 # Interesse da fonte — verificado ≠ neutro (o 3º eixo da evidência)
 
-> **Versão**: 1.0.0 | **Última atualização**: 2026-07-20 | **Categoria**: Conceitos
+> **Versão**: 1.1.0 | **Última atualização**: 2026-10-20 | **Categoria**: Conceitos
 > Confirmar que um documento **existe e diz X** não é o mesmo que ler **como X foi construído**. Quando a
 > evidência vem de **terceiro**, o `declarado≠verificado` precisa de um segundo eixo: *"quem produziu isto
 > ganha o quê com o que diz?"*. Um documento pode ser autêntico, íntegro e correto nos próprios termos — e
@@ -12,7 +12,7 @@
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | 1.0.0 |
+| **Versão** | 1.1.0 |
 | **Data de Criação** | 2026-07-20 |
 | **Categoria** | Conceitos |
 | **Origem** | Sinal de co-evolução (upstream) 2026-07-20 — **um adotante regulado**, durante auditoria de compliance para due diligence |
@@ -77,6 +77,31 @@ XSS, SQLi, NoSQLi e contra falha de autorização entre tenants, sem nada explor
 prévia — declaração contra o próprio interesse, portanto **a parte mais confiável do relatório**. E 7
 achados de autorização eram distintos e de lógica de negócio: **esses não se relativizam**.
 
+## 🏠 Documento próprio — o mesmo eixo, voltado para casa
+
+O eixo ③ não é só sobre **terceiro**. O documento que a **própria empresa** escreve **para fora** (status
+de certificação, carta de due diligence, questionário de segurança respondido, deck para investidor)
+tem o mesmo incentivo que o laudo do fornecedor: foi escrito para convencer quem paga ou quem audita.
+Ser interno e recente não o promove a "política vigente". Ele é **declaração a verificar**.
+
+A leitura muda em um ponto só: o que **confirma** o documento próprio é o nível mais forte da
+precedência (código, configuração, registro), e não outra declaração. Quando o código nega o que o
+documento declara, o código vence. A divergência entra como **lacuna nomeada**, com fonte e data dos
+dois lados, e nunca vira texto de conformidade.
+
+### Caso de campo (2026-10-19, um hub)
+
+Montando o grafo de compliance a partir da wiki, dos documentos de compliance e do código, o cruzamento
+das fontes achou o mais grave do levantamento dentro de casa. A wiki declarava um controle de acesso que
+o backlog interno negava pela contagem, e o status de certificação declarava um avanço que o documento do
+próprio programa dava como não iniciado. Cartas e status feitos para due diligence declaravam controles
+que o código não tinha. A régua de precedência do `/docs:build-compliance-docs`
+ordenava por frescor e só tratava o interesse do fornecedor externo, então não apontava nada disso.
+
+**O contrapeso vale igual:** documento próprio não é mentira por ser próprio. O que ele declara e o
+código confirma entra normalmente. O que ele **concede** (lacuna admitida, "não iniciado") é a parte de
+maior confiança, pelo mesmo princípio da declaração contra o próprio interesse.
+
 ## 🛡️ Guardas
 
 - **Interesse qualifica, não anula** — sem esta linha a doutrina vira cinismo (ver §princípio).
@@ -91,7 +116,8 @@ achados de autorização eram distintos e de lógica de negócio: **esses não s
 ## 🔌 Onde dói mais (superfícies de ingestão)
 
 - **`/meta:kg`** — ao modelar evidência de terceiro como nó.
-- **Vertical de compliance** — ao montar pacote de auditoria a partir de relatório de fornecedor.
+- **Vertical de compliance** — ao montar pacote de auditoria a partir de relatório de fornecedor, **e**
+  ao ler documento próprio escrito para cliente ou auditor (§Documento próprio).
 - **Pesquisa/deep-research** — ao citar fonte com interesse comercial. ⚠️ *A skill `deep-research` é do
   harness, não artefato do core: aqui a doutrina é referência para quem a usa, não wire-in.*
 

@@ -194,7 +194,7 @@ while IFS=$'\x1f' read -r mid role path kind; do
   #   Se uma dessas portas tiver `.onion-version`, NENHUM ramo especial vale: compara como as outras.
   #   TETO DECLARADO: para `plugins` esta guarda mede só a PRESENÇA da proveniência (a forma), não
   #   compara o `ref` com o `onion_version` do registro — isso é pin, e o pin é da REGRA 85 e do
-  #   `/meta:publish` (F3). Papel e pin são perguntas diferentes; misturá-las aqui criaria um 2º dono.
+  #   `/meta:publish` (core-only; F3). Papel e pin são perguntas diferentes; misturá-las aqui criaria um 2º dono.
   if [ ! -f "${path}/.claude/.onion-version" ]; then
     if [ "${role}" = "plugins" ]; then
       if compgen -G "${path}/plugins/*/.claude-plugin/provenance.json" >/dev/null; then continue; fi
@@ -243,7 +243,7 @@ if [ "${adopter_unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${adopter_unreadable} adotante(s) com clone INALCANÇÁVEL — compatibilidade registro×carimbo NÃO MEDIDA neles." >&2
 fi
 if [ "${mini_pending}" -gt 0 ]; then
-  echo "door-role-parity: ${mini_pending} porta(s) \`mini\` ainda sem carimbo (a 1ª publicação por allowlist é do maestro: /meta:publish onion-mini --replace-foreign) — paridade NÃO MEDIDA nelas." >&2
+  echo "door-role-parity: ${mini_pending} porta(s) \`mini\` ainda sem carimbo (a 1ª publicação por allowlist é do maestro, na fonte: /meta:publish onion-mini --replace-foreign (core-only)) — paridade NÃO MEDIDA nelas." >&2
 fi
 if [ "${unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${unreadable} porta(s) com clone INALCANÇÁVEL (sem local_path, ou diretório ausente) — paridade NÃO MEDIDA nelas. É o caso esperado no CI, onde o clone não existe; medir exigiria rede e credencial dentro do lint." >&2
