@@ -24691,6 +24691,60 @@ run_lint_hard_file_selftests() {
 }
 _family run_lint_hard_file_selftests
 
+# ── REGRA 16 (Contagem de inventário-TOTAL divergente da SSOT), feeder da linha 'Total' de tabela ──
+# Falso-positivo medido em 2026-10-20 na main: `| **Total** | | **8.749.759** | **122** | …` numa
+# tabela de CUSTO (coluna 'Tokens') era lido como a contagem `8`. A cura é de VOCABULÁRIO: 'Total' só
+# é inventário com a população nomeada (cabeçalho da coluna ou a célula), e o número é o token inteiro
+# com milhar. As fixtures vivem no manifesto (família `fixtures`); AQUI se prova que cada metade da
+# cura é load-bearing, rodando o lint MUTADO no mesmo sandbox — mutante que não roda é decoração.
+run_r16_table_total_selftests() {
+  local fxd="${REPO_ROOT}/.claude/validation/fixtures/r16-count-drift"
+  local lint="${SANDBOX:-}/.claude/validation/lint-artifacts.sh"
+  if [ -z "${SANDBOX:-}" ] || [ ! -f "${lint}" ] || [ ! -f "${fxd}/good-table-total-cost.md" ] \
+     || [ ! -f "${fxd}/bad-table-total-thousand.md" ]; then
+    record_skip "r16-table-total: sandbox ou fixture ausente → pulado"; return; fi
+  [ -n "${SSOT_AGENT_TOTAL:-}" ] || { record_skip "r16-table-total: SSOT de agentes vazia → pulado"; return; }
+  local vdir; vdir="$(dirname "${lint}")"
+  local mfull="${vdir}/zz-r16-mut-full.sh" mthou="${vdir}/zz-r16-mut-thousand.sh"
+  local probe="${SANDBOX}/docs/zz-r16-table-probe.md" msg="linha 'Total' de tabela"
+  # MUTANTE "desfaz a cura inteira": população sempre aceita + número cortado no 1º separador = a régua de antes
+  sed -e 's#if (is_pop(c\[i\]) || (i <= nh \&\& is_pop(h\[i\]))) {#if (1) {#' \
+      -e 's#/\[0-9\]+(\[.,\]\[0-9\]\[0-9\]\[0-9\])\*/#/[0-9]+/#' "${lint}" > "${mfull}"
+  # MUTANTE "só o milhar": a população continua exigida, mas `51.000` volta a ser lido `51`
+  sed -e 's#/\[0-9\]+(\[.,\]\[0-9\]\[0-9\]\[0-9\])\*/#/[0-9]+/#' "${lint}" > "${mthou}"
+  local rc_i rc_m out
+  _r16_hit() { grep -F 'zz-r16-table-probe' <<< "$1" | grep -qF "${msg}"; }
+  # (a) GOOD — tabela de custo: o intacto CALA; o mutante total ACUSA (lê `8`)
+  cp "${fxd}/good-table-total-cost.md" "${probe}"
+  out="$(bash "${lint}" --only="${probe}" 2>&1 || true)"
+  if _r16_hit "${out}"; then rc_i=1; else rc_i=0; fi
+  [ "${rc_i}" -eq 0 ] && record_pass "r16-table-total: (a) 'Total' de tabela de CUSTO (8.749.759 sob 'Tokens') → não acusa" \
+    || record_fail "r16-table-total: (a)" "falso-positivo voltou: $(grep -F 'zz-r16' <<< "${out}" | head -1 | cut -c1-160)"
+  out="$(bash "${mfull}" --only="${probe}" 2>&1 || true)"
+  # o mutante precisa acusar EXATAMENTE '8' — só "acusou" provaria a metade da população e deixaria a
+  # do milhar sem dente (o sed dela poderia virar no-op e o cmp ainda diferiria pelo outro)
+  if _r16_hit "${out}" && grep -F 'zz-r16-table-probe' <<< "${out}" | grep -qF "'8' ("; then rc_m=1; else rc_m=0; fi
+  _prove_mutation "r16-table-total: (a-MUT) com a régua antiga a tabela de custo volta a ser acusada como '8'" \
+    "${lint}" "${mfull}" "${rc_i}" "${rc_m}"
+  # (b) BAD — 'Total' com população na célula e número divergente: o intacto ACUSA (a regra ainda morde)
+  sed -e "s/__ONION_COMMANDS_DRIFT__/${SSOT_CMD_DRIFT}/g" "${fxd}/bad-table-total-pop-cell.md" > "${probe}"
+  out="$(bash "${lint}" --only="${probe}" 2>&1 || true)"
+  if _r16_hit "${out}"; then record_pass "r16-table-total: (b) '| **Total** | **${SSOT_CMD_DRIFT} comandos** |' divergente → acusa (a cura não afrouxou)"
+  else record_fail "r16-table-total: (b)" "a população nomeada na célula não disparou a regra"; fi
+  # (c) BAD — milhar sob população: o intacto ACUSA `${SSOT_AGENT_TOTAL}000`; o mutante do milhar lê o total e CALA
+  sed -e "s/__ONION_AGENTS_TOTAL__/${SSOT_AGENT_TOTAL}/g" "${fxd}/bad-table-total-thousand.md" > "${probe}"
+  out="$(bash "${lint}" --only="${probe}" 2>&1 || true)"
+  if _r16_hit "${out}"; then rc_i=0; else rc_i=1; fi
+  [ "${rc_i}" -eq 0 ] && record_pass "r16-table-total: (c) '${SSOT_AGENT_TOTAL}.000' sob 'Agentes' é lido inteiro → acusa" \
+    || record_fail "r16-table-total: (c)" "o número com milhar foi lido pela metade (calou)"
+  out="$(bash "${mthou}" --only="${probe}" 2>&1 || true)"
+  if _r16_hit "${out}"; then rc_m=0; else rc_m=1; fi
+  _prove_mutation "r16-table-total: (c-MUT) cortando no separador, '${SSOT_AGENT_TOTAL}.000' vira ${SSOT_AGENT_TOTAL} e cala" \
+    "${lint}" "${mthou}" "${rc_i}" "${rc_m}"
+  rm -f "${probe}" "${mfull}" "${mthou}"
+}
+_family run_r16_table_total_selftests
+
 run_fixtures_selftests() {
 # SHARD (faixa paralela): ONION_SELFTEST_SHARD=i/n → este worker processa só as linhas do manifest
 # cujo índice % n == i. A família `fixtures` é ~97% do tempo serial (94 casos × ~10 s); sem fatiar,
