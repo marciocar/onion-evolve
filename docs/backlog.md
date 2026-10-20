@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**571 itens abertos** em 114 grafo(s) com aberto (de 147 no escopo) · 115 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**569 itens abertos** em 113 grafo(s) com aberto (de 147 no escopo) · 114 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -935,14 +935,6 @@
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
-## sinais-de-campo-2026-09 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.4 | `Q_HUB_1019_ONDA_B_CORPUS_HERDA_CONTRATO` | sinais-de-campo-2026-09 | U1 (onda B, primeiro): o --update mede o contrato KG no corpus do alvo e o escreve no relatório, com caminho de migração do pro |
-| 4.8 | `Q_HUB_1019_ONDA_B_GRAFO_NOS_BUILD_DOCS` | sinais-de-campo-2026-09 | C1 com C2 e C7 (onda B, depois do U1): fase de grafo nos build-*-docs, controle marcado prod, dev ou policy, e escritor de grafo v |
-| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
-
 ## anarlog-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1039,12 +1031,13 @@
 | 4.5 | `Q_REABRIR_AUTORIDADE_NO_PROBE` | rea-method-2026-10 | Gatilho (b): quando o probe estruturado existir, o verificador deve nomear o id que fecha e a autoridade que provou? Esta é a ide |
 | 3.0 | `Q_REABRIR_PARIDADE_POS_FORGE` | rea-method-2026-10 | Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexis |
 
-## env-falso-positivo-2026-10 — 2 item(ns)
+## env-falso-positivo-2026-10 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.2 | `C_TETO_GREP_RECURSIVO_SEM_INCLUDE` | env-falso-positivo-2026-10 | teto: grep -r ou rg sobre uma pasta lê o .env que estiver dentro dela, e o veto julga o argumento (a pasta), não o que a recurs |
 | 2.8 | `C_TETO_DISCO_NO_MOMENTO_DO_VETO` | env-falso-positivo-2026-10 | teto: o glob conferido no disco vê a pasta no momento do veto; um x.env criado na mesma linha por nome montado em runtime, sem ci |
+| 2.8 | `C_TETO_U4_RESIDUAL` | env-falso-positivo-2026-10 | teto do U4: `grep -l` sobre `.env*`, heredoc dentro de `{ … } > arquivo` e `for` sobre glob com pasta desconhecida seguem barrad |
 
 ## radar-E3-2026-10-05-r7 — 1 item(ns)
 

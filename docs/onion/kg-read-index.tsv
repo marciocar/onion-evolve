@@ -190,9 +190,12 @@
 .claude/hooks/pretooluse-direct-provider-api.sh	E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-direct-provider-api.sh	E_REEXECUCAO_CONTRA_O_USO_REAL	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	D_U4_LISTAR_NOMEAR_CITAR_PASSAM	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_LINEAR	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_VETOU_COMANDO_SEM_ENV	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_GLOB_JULGADO_PELO_DISCO	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	E_U4_ESCAPES_ANTERIORES	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	E_U4_REPLAY_VETOS_REAIS_1020	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT	docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	C_TETO_PUSH_DIRETO_NO_ADOTANTE_SEGUE_SEM_VETO	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
@@ -400,6 +403,7 @@
 .claude/validation/consumed-mode-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/currency-census.sh	C_TETO_SUPERFICIES_LISTADAS	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
+.claude/validation/currency-census.sh	E_C8_BASE_CONTRA_A_PADRAO_DO_ORIGIN	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/validation/currency-census.sh	E_DEFEITO_SDK_DEFASADO_SEM_AVISO	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
 .claude/validation/currency-census.sh	E_DOGFOOD_CACHE_ENVENENADO	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
 .claude/validation/currency-census.sh	E_ELENXO_1A_PASSADA_CACHE_E_PRAZO	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
@@ -450,6 +454,7 @@
 .claude/validation/instructions-loaded-census.sh	C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/validation/instructions-loaded-census.sh	E_LEVA1_SKILL_E_NAO_MEDIVEL	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/validation/inventory.sh	E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
+.claude/validation/kb-index-check.sh	E_U5_INDICE_KB_CONTAGEM_SEM_GUARDA	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/validation/kb-vendored-link-check.sh	E_A_DIVIDA_DA_REGRA_45_ERA_O_QUE_PRENDIA_A_PORTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/kg-backlog-project.sh	C_OPCAO_O2_CONSUMIDOR_IRMAO_LACO	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-backlog-project.sh	C_OPCAO_O7_BACKLOG_PARAMETRIZA_RAIZ	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
@@ -563,6 +568,7 @@
 .claude/validation/lint-selftest.sh	A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	C_HUB_FIELD_SIGNALS_1019_CURED	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/validation/lint-selftest.sh	C_OPCAO_F_ABSORVER_TESTE_DE_MUTACAO_DE_REGRA	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_OS_TESTES_DO_BYTECODE_EXISTEM	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml

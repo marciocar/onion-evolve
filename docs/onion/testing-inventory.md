@@ -11,18 +11,18 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **285** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Famílias na bancada | **284** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
 | Sítios de asserção (**não** asserções executadas) | **2323** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **118** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
 | Arquivos de fixture rastreados | **168** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
-| Regras do lint | **101** | `bash .claude/validation/rules-registry.sh --counts` |
-| — das quais HARD | **89** | idem |
-| — das quais SOFT | **41** | idem |
-| — HARD **e** SOFT (contadas nas duas) | **29** | idem |
-| Pares de modo consumido (REGRA 59) | **70** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Regras do lint | **102** | `bash .claude/validation/rules-registry.sh --counts` |
+| — das quais HARD | **90** | idem |
+| — das quais SOFT | **42** | idem |
+| — HARD **e** SOFT (contadas nas duas) | **30** | idem |
+| Pares de modo consumido (REGRA 59) | **71** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
-| Scripts de validação | **114** | `git ls-files '.claude/validation/*.sh'` |
+| Scripts de validação | **115** | `git ls-files '.claude/validation/*.sh'` |
 | Hooks | **22** | `git ls-files '.claude/hooks/*.sh'` |
 | Workflows de CI | **5** | `git ls-files '.github/workflows/*.yml'` |
 | Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |
