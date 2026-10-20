@@ -384,7 +384,7 @@ _family() {
   if [ -n "${SELFTEST_FAMILIES}" ]; then
     case ",${SELFTEST_FAMILIES}," in *",${name},"*) ;; *) return 0 ;; esac
   fi
-  # FILA (faixa paralela): cada worker percorre o script e REIVINDICA a família com mkdir atômico; quem pegou
+  # FILA (faixa paralela): cada worker percorre o script e REIVINDICA a família pelo open exclusivo do bash (noclobber); quem pegou
   # uma pesada fica para trás e os outros seguem — balanceamento dinâmico sem tabela de tempos. `fixtures`
   # é fatiada (shard) e roda em todos. Ao terminar, marca done/: o pai acusa reivindicada-sem-done.
   # CORE-ONLY por DADO (Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE, cura (a), 2026-09-03): mapa família-a-família na
@@ -394,8 +394,10 @@ _family() {
   # ⚠️ A REIVINDICAÇÃO É O `open(O_CREAT|O_EXCL)` DO PRÓPRIO BASH (noclobber), NUNCA O BINÁRIO `mkdir`.
   #    Medido em 2026-10-20: o runner ubuntu-26.04 troca o coreutils pelo uutils 0.10.0, cujo `mkdir`
   #    confere a existência ANTES de criar e devolve rc=0 aos DOIS processos que chegam juntos (480 de
-  #    1000 corridas com 2 núcleos; o GNU, 0 de 1000). Os dois workers rodavam a MESMA família, o pai
-  #    somava "Passaram : 3" com exit 0 e o caso (h) da selftest_lanes caía só no CI (PRs #1226 e #1238).
+  #    1000 corridas com 2 núcleos no harness de subshell; 37–77 de 1000 noutro harness; o GNU, 0 sempre).
+  #    Os dois workers rodavam a MESMA família, o pai somava 3 ou 4 com exit 0 (reprodução local) e o caso
+  #    (h) da selftest_lanes caía só no CI (PRs #1226 e #1238) — e em toda faixa paralela do runner
+  #    alguma família podia rodar em dobro em silêncio (medido: vendor_manifest 2× num job do #1238).
   #    A atomicidade da trava não pode depender de qual implementação de coreutils a imagem traz:
   #    o noclobber do bash abre o arquivo com O_EXCL no kernel, sem binário externo no caminho.
   if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then
@@ -1418,6 +1420,14 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
         FAIL=$((FAIL + 1)); FAILED_CASES+=("família ${_fam} reivindicada e NÃO concluída (worker morreu no meio dela)")
       fi
     done
+    # DUPLA EXECUÇÃO é falha, não detalhe: a trava da fila deixou de ser atômica no runner (uutils,
+    # 2026-10-20) e uma família rodou nos dois workers com rc=0 e nenhum ✗ — a soma inflada só era
+    # vista pelo (h) da própria selftest_lanes. Cada worker emite uma linha por família que RODOU;
+    # mais de uma linha para o mesmo nome (fora `fixtures`, fatiada de propósito em todos) acusa.
+    while read -r _dn _dfam; do
+      [ -n "${_dfam:-}" ] || continue
+      FAIL=$((FAIL + 1)); FAILED_CASES+=("família ${_dfam} rodou ${_dn} vezes (a reivindicação da fila não foi exclusiva)")
+    done < <(for _r in "${REPORT_ROWS[@]}"; do printf '%s\n' "${_r%%$'\t'*}"; done | LC_ALL=C sort | uniq -c | awk '$1 > 1 && $2 != "fixtures"')
     rm -rf "${_tdir}"
     echo ""; echo "=== faixa paralela: ${_n} famílias / ${_j} workers (fila dinâmica) em $(( SECONDS - _t0 ))s ==="
     echo "  Arranque : ${_startup_shared}/${_j} worker(s) com retrato e inventário do pai (os demais fizeram o próprio)"
@@ -26932,14 +26942,17 @@ PYI
   out="$(bash "${copy}" --families zz_ok,zz_ok2 --jobs 2 2>&1)" && rc=0 || rc=$?
   if [ "${rc}" -eq 0 ] && grep -q 'Passaram : 2' <<< "${out}"&& grep -q 'faixa paralela: 2 famílias / 2 workers' <<< "${out}"; then
     record_pass "selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0"
-  else record_fail "selftest-lanes: (h) --jobs agrega" "rc=${rc}; $(printf '%s\n' "${out}" | grep -E 'Passaram|faixa' | tr '\n' '|' | cut -c1-140)"; fi
+  # a soma vem PRIMEIRO na mensagem: em 2026-10-20 o corte de 140 caracteres engoliu justamente o
+  # "Passaram : N" no runner, e o CI só provava "≠ 2" — o número da causa teve de vir da reprodução
+  else record_fail "selftest-lanes: (h) --jobs agrega" "rc=${rc}; $(grep -oE 'Passaram : [0-9]+' <<< "${out}" | tail -1); $(printf '%s\n' "${out}" | grep -E 'faixa' | tr '\n' '|' | cut -c1-140)"; fi
   # (h2) A REIVINDICAÇÃO DA FILA É ATÔMICA QUALQUER QUE SEJA O `mkdir` DA IMAGEM. Medido em 2026-10-20: o
   #      runner ubuntu-26.04 traz o uutils 0.10.0, cujo `mkdir` confere a existência e SÓ DEPOIS cria — dois
-  #      workers que chegam juntos recebem rc=0 os dois (480/1000 corridas em 2 núcleos; GNU: 0/1000). Os
-  #      dois rodavam a mesma família, o pai somava "Passaram : 3" com exit 0, e o (h) caía só no CI. Aqui o
+  #      workers que chegam juntos recebem rc=0 os dois (4% a 48% das corridas em 2 núcleos, conforme o harness; GNU: 0). Os
+  #      dois rodavam a mesma família, o pai somava 3 ou 4 com exit 0, e o (h) caía só no CI. Aqui o
   #      `mkdir` do PATH vira um imitador FIEL desse defeito, com BARREIRA: quem confere espera o outro
-  #      conferir também, então a corrida acontece em toda rodada, não por sorte. O SUT tem de dar 2; o
-  #      MUTANTE (a trava devolvida ao `mkdir`) tem de dar mais que 2 — senão o imitador não morde.
+  #      conferir também, então a corrida acontece em toda rodada, não por sorte. O SUT tem de dar 2 e
+  #      exit 0; o MUTANTE (a trava devolvida ao `mkdir`) tem de RODAR (somar mais que 2) e o PAI tem de
+  #      ACUSAR a dupla execução (exit 1 nomeando "rodou 2 vezes") — as duas metades da cura mordem.
   local _shim="${d}/zz-uu-shim" _real_mk; _real_mk="$(command -v mkdir)"
   mkdir -p "${_shim}/bin" "${_shim}/arrived"
   cat > "${_shim}/bin/mkdir" <<SHIM
@@ -26948,7 +26961,7 @@ PYI
 for _a in "\$@"; do case "\${_a}" in -p|--parents|-*p*) exec "${_real_mk}" "\$@" ;; esac; done
 _t="\${!#}"; [ -e "\${_t}" ] && { echo "mkdir: \${_t}: File exists" >&2; exit 1; }
 _k="${_shim}/arrived/\$(printf '%s' "\${_t}" | tr '/' '_')"; "${_real_mk}" -p "\${_k}"; : > "\${_k}/\$\$"
-for _i in \$(seq 1 50); do [ "\$(ls "\${_k}" | wc -l)" -ge 2 ] && break; sleep 0.1; done
+for _i in \$(seq 1 300); do [ "\$(ls "\${_k}" | wc -l)" -ge 2 ] && break; sleep 0.1; done
 exec "${_real_mk}" -p "\${_t}"
 SHIM
   chmod +x "${_shim}/bin/mkdir"
@@ -26970,9 +26983,14 @@ PYMUT
     rm -rf "${_shim}/arrived"; mkdir -p "${_shim}/arrived"
     _om="$(PATH="${_shim}/bin:${PATH}" bash "${_mut}" --families zz_ok,zz_ok2 --jobs 2 2>&1)" && _rm=0 || _rm=$?
     rm -f "${_mut}"
-    if [ "${_r2}" -eq 0 ] && grep -q 'Passaram : 2$' <<< "${_o2}" && ! grep -qE 'Passaram : (0|1|2)$' <<< "${_om}"; then
-      record_pass "selftest-lanes: (h2) mkdir não-atômico no PATH (uutils) ⇒ SUT soma 2; o mutante com a trava em mkdir soma $(grep -oE 'Passaram : [0-9]+' <<< "${_om}" | grep -oE '[0-9]+$') (o imitador morde)"
-    else record_fail "selftest-lanes: (h2) reivindicação não-atômica" "SUT rc=${_r2} $(grep -oE 'Passaram : [0-9]+' <<< "${_o2}"); mutante rc=${_rm} $(grep -oE 'Passaram : [0-9]+' <<< "${_om}") — esperado SUT=2 e mutante>2"; fi
+    # o mutante tem de RODAR até o sumário e somar MAIS que 2 (casamento POSITIVO): só "não deu 2"
+    # aprovava um mutante que morre antes do sumário (achado da passada adversarial, 2026-10-20:
+    # sintaxe quebrada ⇒ PASS). E o pai tem de acusar a dupla execução com exit 1, nomeando-a.
+    if [ "${_r2}" -eq 0 ] && grep -q 'Passaram : 2$' <<< "${_o2}" && ! grep -q 'rodou [0-9]* vezes' <<< "${_o2}" \
+       && [ "${_rm}" -eq 1 ] && grep -qE 'Passaram : ([3-9]|[1-9][0-9]+)$' <<< "${_om}" \
+       && grep -q 'família zz_ok rodou 2 vezes' <<< "${_om}"; then
+      record_pass "selftest-lanes: (h2) mkdir não-atômico no PATH (uutils) ⇒ SUT soma 2 e exit 0; o mutante com a trava em mkdir soma $(grep -oE 'Passaram : [0-9]+' <<< "${_om}" | grep -oE '[0-9]+$') e o pai ACUSA a dupla execução (exit 1)"
+    else record_fail "selftest-lanes: (h2) reivindicação não-atômica" "SUT rc=${_r2} $(grep -oE 'Passaram : [0-9]+' <<< "${_o2}"); mutante rc=${_rm} $(grep -oE 'Passaram : [0-9]+' <<< "${_om}") $(grep -oE 'família [a-z0-9_]+ rodou [0-9]+ vezes' <<< "${_om}" | head -1) — esperado SUT=2/exit 0 e mutante>2 com exit 1 nomeando a dupla execução"; fi
   fi
   out="$(bash "${copy}" --families zz_ok,zz_abort --jobs 2 2>&1)" && rc=0 || rc=$?
   if [ "${rc}" -eq 1 ] && grep -q 'ABORTOU sem somar' <<< "${out}"&& grep -q 'zz_abort reivindicada e NÃO concluída' <<< "${out}"&& ! grep -q '^OK ✓' <<< "${out}"; then
