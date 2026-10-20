@@ -3400,15 +3400,42 @@ check_inventory_total_drift() {
     #     repo inteiro". FALSO — o grep original era case-sensitive e não viu os dois acima. A
     #     frase justificava a regra com uma medição feita pela mesma régua enviesada que a regra
     #     usa, dentro de um commit que abria com "medição antes da regra". O Elenxo pegou.
-    while IFS= read -r line; do
-      [ -z "${line}" ] && continue
-      n="$(printf '%s' "${line}" | sed 's/^|[^|]*|//' | grep -oE '[0-9]+' | head -1 || true)"
+    #     ⚠️ VOCABULÁRIO DA POPULAÇÃO (2026-10-20, falso-positivo medido na main): a 1ª redação
+    #     pegava o 1º inteiro de QUALQUER linha 'Total' — e numa tabela de CUSTO
+    #     (`docs/evolution/research/chat-agent-isolation-2026-10/SYNTHESIS.md`,
+    #     `| **Total** | | **8.749.759** | **122** | …`, coluna 'Tokens') o `grep -oE '[0-9]+'`
+    #     cortava o separador de milhar e lia `8`, que não bate com SSOT nenhuma ⇒ acusação.
+    #     Dois defeitos, duas curas, nenhuma isenção de arquivo:
+    #       (1) 'Total' só é total de INVENTÁRIO quando o NOME DA POPULAÇÃO vem junto — no
+    #           cabeçalho da coluna do valor (`| Categoria | Comandos |`) OU na própria célula
+    #           (`| **Total** | **117 comandos** |`). Sem população nomeada, 'Total' é de outra
+    #           grandeza (tokens, minutos, R$) e a regra não tem o que comparar;
+    #       (2) o número é o TOKEN inteiro, com separador de milhar (`8.749.759` → 8749759,
+    #           nunca 8) — contagem lida pela metade é a mesma mentira por outro caminho.
+    #     A comparação continua contra o CONJUNTO (o conservadorismo acima fica intacto); só a
+    #     elegibilidade da linha estreitou, e por vocabulário, não por nome de arquivo.
+    #     O case-sensitive de 'Total' (acima) segue LOAD-BEARING. O awk é POSIX (sem `{n}`).
+    while IFS= read -r n; do
       [ -z "${n}" ] && continue
       case "${n}" in
         "${cmd}"|"${agent}"|"${skill}"|"${kb}") : ;;
         *) violation "SOFT" "${f}" "linha 'Total' de tabela com valor que não bate com nenhuma contagem da SSOT: '${n}' (comandos ${cmd} · agentes ${agent} · skills ${skill} · KBs ${kb}) — /meta:inventory" ;;
       esac
-    done < <(grep -E '^\|[[:space:]]*\*{0,2}Total\*{0,2}[[:space:]]*\|' "${f}" 2>/dev/null)
+    done < <(awk '
+      function is_pop(t) { t = tolower(t); return (t ~ /comandos|agentes|skills|knowledge[ \t]+bases|kbs/) }
+      /^\|[ \t:|-]+\|[ \t]*$/ && prev ~ /^\|/ { hdr = prev; prev = $0; next }
+      !/^\|/ { hdr = ""; prev = $0; next }
+      /^\|[ \t]*(\*\*)?Total(\*\*)?[ \t]*\|/ {
+        nc = split($0, c, "|"); nh = split(hdr, h, "|")
+        for (i = 3; i < nc; i++) {
+          if (!match(c[i], /[0-9]+([.,][0-9][0-9][0-9])*/)) continue
+          tok = substr(c[i], RSTART, RLENGTH)
+          if (is_pop(c[i]) || (i <= nh && is_pop(h[i]))) { gsub(/[.,]/, "", tok); print tok }
+          break
+        }
+      }
+      { prev = $0 }
+    ' "${f}" 2>/dev/null)
   # PRÉ-FILTRO (perf, 2026-07-13): só varre .md que CONTÊM uma frase-de-contagem candidata.
   #   Antes: 750 arquivos × ~8 greps/arquivo (esta é ~50% do tempo total do lint); ~90% dos .md
   #   não têm número+substantivo-de-inventário → puro overhead. O pattern abaixo é SUPERSET de
