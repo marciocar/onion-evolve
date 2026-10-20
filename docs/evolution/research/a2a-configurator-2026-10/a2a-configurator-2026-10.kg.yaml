@@ -730,19 +730,25 @@ nodes:
   - id: D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A
     node_type: decision
     layer: audit
-    plane: PROD
-    status: open
     impact: 5
     confidence: 0.6
-    verified_at: "2026-10-15"
-    verified_against: "E_N2_CHAT_ALCANCA_O_CLONE_SERVIDO; a cura do N1 (o aceite reverifica) já tira o valor de um registro forjado SEM envelope válido, mas não protege o JWKS e o registro, de que a própria reverificação depende"
     label: "como separar o agente do /chat dos insumos de confiança do A2A no clone servido (JWKS, members.yaml, estado de jti, fila)? Mudança de infra: do maestro (MOAT)"
-    narrative: "Opções: (a) ReadOnlyPaths= na unit para jwks/ e members.yaml do clone servido: o serviço nunca os escreve (só o deploy, fora do namespace), barato, imposto pelo kernel; não cobre estado de jti, trust-log nem fila, que o serviço grava; (b) sandbox nativo do Claude Code (bubblewrap) no subprocesso do /chat, para todo chamador, com escrita só no workspace e uploads e allowUnsandboxedCommands false, mais deny de Edit/Write no clone servido e em data/ também para o admin; exige socat (ausente) e medir o chat real; (c) UID separado para o agente do /chat (um runner próprio), com os insumos do A2A de outro dono: a fronteira mais forte, mas o NoNewPrivileges da unit impede trocar de usuário de dentro do serviço, então pede um serviço runner e IPC; (d) só regras de deny para o admin: insuficiente, o Bash passa por fora. Recomendada: (a) já, porque fecha o pino de chave forjado (o que a reverificação do aceite não fecha) sem tocar código, e (b) em seguida para a fila e o estado de jti; (c) se o /chat passar a ter convidados com bridge:write fora da casa."
+    status: done
+    plane: DEV
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Fechar, resíduo declarado. Medido no vivo em 2026-10-20 (systemctl show da unit do bridge e da unit do runner do /chat): o clone servido do core é ReadOnlyPaths (JWKS e members.yaml), exceto .claude/sessions e docs/evolution/trust-log.md; o data/ do bridge é gravável; o convidado roda com DynamicUser, ProtectHome=yes e TemporaryFileSystem sobre o estado do bridge. Resíduo: o admin do /chat (o maestro) roda com a conta do serviço em bypass e pode escrever no data/ (jti, fila) e no trust-log.md. Reabre se o /chat ganhar admin que não seja o maestro»"
+    narrative: |-
+      Opções: (a) ReadOnlyPaths= na unit para jwks/ e members.yaml do clone servido: o serviço nunca os escreve (só o deploy, fora do namespace), barato, imposto pelo kernel; não cobre estado de jti, trust-log nem fila, que o serviço grava; (b) sandbox nativo do Claude Code (bubblewrap) no subprocesso do /chat, para todo chamador, com escrita só no workspace e uploads e allowUnsandboxedCommands false, mais deny de Edit/Write no clone servido e em data/ também para o admin; exige socat (ausente) e medir o chat real; (c) UID separado para o agente do /chat (um runner próprio), com os insumos do A2A de outro dono: a fronteira mais forte, mas o NoNewPrivileges da unit impede trocar de usuário de dentro do serviço, então pede um serviço runner e IPC; (d) só regras de deny para o admin: insuficiente, o Bash passa por fora. Recomendada: (a) já, porque fecha o pino de chave forjado (o que a reverificação do aceite não fecha) sem tocar código, e (b) em seguida para a fila e o estado de jti; (c) se o /chat passar a ter convidados com bridge:write fora da casa.
+
+      verified_against anterior: «E_N2_CHAT_ALCANCA_O_CLONE_SERVIDO; a cura do N1 (o aceite reverifica) já tira o valor de um registro forjado SEM envelope válido, mas não protege o JWKS e o registro, de que a própria reverificação depende»
+      proveniência anterior: source «sessão do SAC-150 (proposta), a decidir pelo maestro» · locator «E_N2_CHAT_ALCANCA_O_CLONE_SERVIDO» · method «derivado: proposta da sessão a partir da medição; a decisão é do maestro» · locality «repo»
+      plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)
+      Selado por /meta:decide em 2026-10-20: escolhida «Fechar, resíduo declarado. Medido no vivo em 2026-10-20 (systemctl show da unit do bridge e da unit do runner do /chat): o clone servido do core é ReadOnlyPaths (JWKS e members.yaml), exceto .claude/sessions e docs/evolution/trust-log.md; o data/ do bridge é gravável; o convidado roda com DynamicUser, ProtectHome=yes e TemporaryFileSystem sobre o estado do bridge. Resíduo: o admin do /chat (o maestro) roda com a conta do serviço em bypass e pode escrever no data/ (jti, fila) e no trust-log.md. Reabre se o /chat ganhar admin que não seja o maestro»; descartadas: «Fechar também para o admin» · «Manter aberta».
     provenance:
-      source: "sessão do SAC-150 (proposta), a decidir pelo maestro"
-      locator: "E_N2_CHAT_ALCANCA_O_CLONE_SERVIDO"
-      method: "derivado: proposta da sessão a partir da medição; a decisão é do maestro"
-      locality: "repo"
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «D_N2: com os degraus 1 e 2 em produção, só resta o admin do /chat escrevendo no data/ e no trust-log; como fecha?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
   - id: Q_ESTADO_DE_JTI_SO_CRESCE
     node_type: question
     layer: audit

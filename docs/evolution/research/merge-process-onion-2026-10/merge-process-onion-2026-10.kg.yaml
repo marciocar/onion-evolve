@@ -76,13 +76,15 @@ nodes:
   - id: Q_MERGE_PROCESS_ONION_2026_10
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.7
-    verified_at: "2026-10-13"
-    verified_against: "rodada /onion-research modo decision wf_48596b33-657: 21 claims confirmadas por votação, 4 refutadas; Elenxo 46 objeções, 27 sobreviventes; re-medição do escritor via gh api e github/docs"
+    verified_at: "2026-10-20"
+    verified_against: "D_MERGE_PROCESS_ONION_2026_10 (status done, selado pelo maestro em 2026-10-13) neste grafo"
     label: "Qual o melhor processo de PR, CI e merge para o core (repo público de dono User, sem proteção, rebase linear, PRs paralelos de agentes numa sessão), frente ao mercado, e o que adotar em ordem e o que fica gated?"
-    narrative: "Pergunta inteira: merge queue nativa do GitHub (user x org), Bors/bors-ng, Mergify, Graphite, Aviator, Trunk merge queue, stacked PRs; projeções commitadas x geradas no CI ou depois do merge; merge driver de .gitattributes para gerados; bancada só das famílias tocadas no PR e completa na fila/no main; painel agregado global que todo PR altera. Fica OPEN até o maestro selar D_MERGE_PROCESS_ONION_2026_10. Aviator não teve nenhuma claim confirmada nesta rodada (lacuna)."
+    narrative: |-
+      Pergunta inteira: merge queue nativa do GitHub (user x org), Bors/bors-ng, Mergify, Graphite, Aviator, Trunk merge queue, stacked PRs; projeções commitadas x geradas no CI ou depois do merge; merge driver de .gitattributes para gerados; bancada só das famílias tocadas no PR e completa na fila/no main; painel agregado global que todo PR altera. Fica OPEN até o maestro selar D_MERGE_PROCESS_ONION_2026_10. Aviator não teve nenhuma claim confirmada nesta rodada (lacuna).
+      Fechado em 2026-10-20 pelo fluxo normal do /meta:decide (derivado, não selado de novo): a pergunta dizia ficar open até o maestro selar D_MERGE_PROCESS_ONION_2026_10, e ele o selou em 2026-10-13.
     trace: "run wf_48596b33-657 (/onion-research --mode decision, 2026-10-13)"
   - id: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     node_type: evidence

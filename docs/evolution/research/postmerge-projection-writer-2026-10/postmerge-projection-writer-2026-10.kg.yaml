@@ -63,13 +63,15 @@ nodes:
   - id: Q_POSTMERGE_PROJECTION_WRITER_2026_10
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.6
-    verified_at: "2026-10-14"
-    verified_against: "rodada /onion-research modo decision wf_e26bb266-4aa: 19 claims confirmadas por votação, 6 refutadas; Elenxo 52 objeções, 34 sobreviventes; ruleset 25001643 e contagem de commits de projeção re-medidos pelo escritor"
+    verified_at: "2026-10-20"
+    verified_against: "D_POSTMERGE_PROJECTION_WRITER_2026_10 (status done, selado em 2026-10-14) neste grafo"
     label: "Passo B de D_MERGE_PROCESS_ONION_2026_10: parar de commitar as projeções geradas em cada PR e regenerá-las no main depois do merge por um ESCRITOR ÚNICO — vale a pena, e como?"
-    narrative: "Pontos que a decisão precisa cobrir: (1) catracas HARD de projeção (REGRAS 39, 62, 80, 81 e 84) passam de 'PR em sincronia' para 'main em sincronia depois da regeneração' sem perder o dente; (2) o hook kg-read-leg lê kg-read-index.tsv em runtime; (3) as portas materializam de origin/main e só rodam depois da regeneração; (4) quem é o escritor único (job de Actions, PR automático, bot) frente ao ruleset do main e à concorrência de pushes; (5) incidente de 2026-10-13: bancada completa no push ao main reprovou em ff5abe51 por docs/backlog.md desatualizado (478 x 479), alarme #1086, reverts #1085/#1087, conserto #1088; (6) 30,7% dos commits do main eram projeção (re-medido em 2026-10-14: 149 dos últimos 300). Restrições: repo público de dono User (sem merge queue nativa), merge só por ops/pr-merge-verified.sh (hook exit-2), ruleset com required checks selftest-gate e lint-onion-artifacts, bypass do admin só em PR. Fica OPEN até o maestro selar D_POSTMERGE_PROJECTION_WRITER_2026_10."
+    narrative: |-
+      Pontos que a decisão precisa cobrir: (1) catracas HARD de projeção (REGRAS 39, 62, 80, 81 e 84) passam de 'PR em sincronia' para 'main em sincronia depois da regeneração' sem perder o dente; (2) o hook kg-read-leg lê kg-read-index.tsv em runtime; (3) as portas materializam de origin/main e só rodam depois da regeneração; (4) quem é o escritor único (job de Actions, PR automático, bot) frente ao ruleset do main e à concorrência de pushes; (5) incidente de 2026-10-13: bancada completa no push ao main reprovou em ff5abe51 por docs/backlog.md desatualizado (478 x 479), alarme #1086, reverts #1085/#1087, conserto #1088; (6) 30,7% dos commits do main eram projeção (re-medido em 2026-10-14: 149 dos últimos 300). Restrições: repo público de dono User (sem merge queue nativa), merge só por ops/pr-merge-verified.sh (hook exit-2), ruleset com required checks selftest-gate e lint-onion-artifacts, bypass do admin só em PR. Fica OPEN até o maestro selar D_POSTMERGE_PROJECTION_WRITER_2026_10.
+      Fechado em 2026-10-20 pelo fluxo normal do /meta:decide (derivado, não selado de novo): a pergunta era o Passo B de D_MERGE_PROCESS, e a decisão dela, D_POSTMERGE_PROJECTION_WRITER_2026_10, foi selada pelo maestro em 2026-10-14.
     trace: "run wf_e26bb266-4aa (/onion-research --mode decision, 2026-10-14)"
   - id: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
     node_type: evidence
