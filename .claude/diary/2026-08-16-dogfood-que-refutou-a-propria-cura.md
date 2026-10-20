@@ -65,7 +65,7 @@ A/B tarefa-versus-nó que eu tinha nomeado. Disparou ao vivo várias vezes neste
 
 **Selo do maestro (2026-10-20, `/meta:decide`, escolhida «Supera»):** o `kg-read-leg.sh` supera
 `D_build_none_of_three`. O selo é o nó `D_KG_READ_LEG_HOOK_SUPERA_NENHUMA_DAS_TRES`, com aresta SUPERSEDES, em
-`docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml`, entregue pelo PR #1217. Na hora deste
-re-teste o PR estava aberto, e em `origin/main` o `D_build_none_of_three` ainda aparecia `confirmed`.
+`docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml`, entregue pelo PR #1217, mergeado
+em 2026-10-20 03:11 UTC; desde então o `D_build_none_of_three` está `superseded` em `origin/main`.
 
 ## Re-testada em 2026-10-20 — PARCIAL: (dynamic, observei o artefato disparar) o hook `kg-read-leg.sh` está ligado e injeta o ponteiro no `PreToolUse`. O maestro selou que ele supera o `D_build_none_of_three` (PR #1217). O A/B de 08-16 fica como evidência do que a injeção no `SessionStart` não faz.
