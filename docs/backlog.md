@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**572 itens abertos** em 114 grafo(s) com aberto (de 147 no escopo) · 115 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**567 itens abertos** em 114 grafo(s) com aberto (de 147 no escopo) · 115 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -20,12 +20,11 @@
 | 2.4 | `E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DURA DE LOCATOR (tier 5, nao 9): o TST distingue e-mail PESSOAL (provedor proprio, protegido pela inviolabil |
 | 2.4 | `E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): o acordao invoca o principio da PROPORCIONALIDADE para exigir PARCIMONIA na qualificaca |
 
-## postmerge-projection-writer-2026-10 — 8 item(ns)
+## postmerge-projection-writer-2026-10 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 96.0 | `C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS` | postmerge-projection-writer-2026-10 | OPÇÃO B1 — escritor único sem bypass: job no push ao main (concurrency, sem cancelar) regenera, confere com porcelain, empurr |
-| 84.0 | `Q_POSTMERGE_PROJECTION_WRITER_2026_10` | postmerge-projection-writer-2026-10 | Passo B de D_MERGE_PROCESS_ONION_2026_10: parar de commitar as projeções geradas em cada PR e regenerá-las no main depois do me |
 | 69.0 | `C_OPCAO_C_CONTRARIAN_STRICT_LOCAL` | postmerge-projection-writer-2026-10 | OPÇÃO C (contrarian) — manter commitado e curar a combinação: o caminho verificado exige base == ponta do main (strict local |
 | 25.2 | `C_OPCAO_B2_ROLLING_REGEN_PR` | postmerge-projection-writer-2026-10 | OPÇÃO B2 — PR rolante de regeneração (um só, reescrito por force-push), com token de GitHub App para os required checks rod |
 | 7.8 | `C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH` | postmerge-projection-writer-2026-10 | OPÇÃO B3 — GitHub App na bypass list (always) empurrando direto ao main. Elenxo: REJEITAR (bypass do ruleset inteiro, chave pr |
@@ -42,73 +41,6 @@
 | 7.5 | `C_OPCAO_A_CONECTOR_REMOTO_PUBLICO` | plugin-mcp-posture-2026-09 | OPCAO (a): expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 too |
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
-
-## chat-agent-isolation-2026-10 — 49 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 93.0 | `Q_CHAT_AGENT_ISOLATION_2026` | chat-agent-isolation-2026-10 | Como isolar o agente de código do /chat do onion-bridge (Agent SDK, Bash, mesmo UID onion dono da raiz de confiança do A2A e dos |
-| 66.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
-| 54.0 | `C_OPCAO_3_NATIVE_SANDBOX_STRICT` | chat-agent-isolation-2026-10 | OPÇÃO (3) sandbox nativo bwrap/seccomp/proxy — só com perfil AppArmor + failIfUnavailable + allowUnsandboxedCommands=false. |
-| 40.0 | `D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT` | chat-agent-isolation-2026-10 | DECISÃO ABERTA: isolar o agente do /chat por (0) convidado sem Bash, (1) systemd reescrito, (2) UID separado, (3) sandbox estrito |
-| 33.0 | `C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE` | chat-agent-isolation-2026-10 | OPÇÃO (1) systemd já — REESCRITA: sem EnvironmentFile, com ReadOnlyPaths voltado à integridade (código do bridge, .claude d |
-| 30.2 | `C_OPCAO_5_NARROW_CREDENTIAL_BROKER` | chat-agent-isolation-2026-10 | OPÇÃO (5) credential broker — estreito: proxy da ANTHROPIC_API_KEY e ferramenta de git, sobre a opção 2. |
-| 17.5 | `C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE` | chat-agent-isolation-2026-10 | OPÇÃO (0) imediato sem root: convidado sem Bash + deny Edit/Write no home do onion fora do workspace. |
-| 16.8 | `C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX` | chat-agent-isolation-2026-10 | A rede de saída do convidado se fecha na UNIT do runner (IPAddressDeny do loopback, link-local e faixas privadas, com DNS pelos r |
-| 7.5 | `C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION` | chat-agent-isolation-2026-10 | OPÇÃO (4) container/microVM por sessão — inviável nesta VPS (sem KVM); opcional por adotante. |
-| 7.2 | `C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION` | chat-agent-isolation-2026-10 | Runner por sessão com HOME efêmero (unit template onion-chat@<sessão>) e DynamicUser=yes: UID único por sessão sem criar cont |
-| 6.0 | `C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER` | chat-agent-isolation-2026-10 | Lançador privilegiado instalado uma vez pelo root: unit template onion-chat@.service ativado por socket (DynamicUser=yes ou User= |
-| 6.0 | `C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF` | chat-agent-isolation-2026-10 | Teardown pelo canal, não por sinal: o SDK fecha o stdin e espera cerca de 2 s; o fechamento do socket encerra o CLI do outro lado |
-| 5.4 | `C_SUPERACAO_20261015_PROCESS_AND_UID_VIA_SPAWN` | chat-agent-isolation-2026-10 | Processo separado E UID separado, via spawnClaudeCodeProcess, presente no SDK instalado (sdk.d.ts:2132 da 0.3.232): o spawn do CLI |
-| 5.4 | `C_SUPERACAO_20261015_READONLY_FOR_INTEGRITY` | chat-agent-isolation-2026-10 | Variante da opção 1 voltada à integridade: ReadOnlyPaths em src/, node_modules/, web/ do bridge, .claude/settings.json, .bashrc |
-| 5.4 | `C_SUPERACAO_20261015_SANDBOX_THREE_PIECES` | chat-agent-isolation-2026-10 | A opção 3 só vale com as três peças: perfil AppArmor do bwrap instalado por root, sandbox.failIfUnavailable=true e allowUnsan |
-| 5.0 | `C_RECOMENDACAO_ELENXO_PRIMARIES_1015` | chat-agent-isolation-2026-10 | Recomendação do Elenxo (primárias): NÃO selar ainda. Degrau 1 = só integridade; degrau 2 exige lançador do root; degrau 3 no |
-| 4.5 | `C_SUPERACAO_20261015_EXPLICIT_FAILIFUNAVAILABLE_VIA_OPTIONS` | chat-agent-isolation-2026-10 | Passar o sandbox por Options (sandbox ou managedSettings) com failIfUnavailable=true explícito, sem depender do default de nenhum |
-| 4.5 | `C_SUPERACAO_20261015_POLICY_TIER_AND_WORKSPACE_CLAUDE_DENY` | chat-agent-isolation-2026-10 | Duas peças: (1) fixar sandbox e permissões no nível de política via Options.managedSettings (restrictive-only, sem arquivo de  |
-| 4.5 | `C_SUPERACAO_20261015_PRIVATE_BWRAP_COPY_BWRAPPATH` | chat-agent-isolation-2026-10 | Cópia PRIVADA do bwrap num caminho executável só pelo grupo do agente (root:onion-chat 0750), com o perfil 'userns,' preso a ES |
-| 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_DETERMINISTIC_OFF` | chat-agent-isolation-2026-10 | Em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; o desligamento determinístico é sandbox.allowUnsandb |
-| 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_INTERACTIVE_SCOPE_ASK_RULE` | chat-agent-isolation-2026-10 | Na sessão interativa, em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; uma ask rule Bash(dangerouslyDi |
-| 3.6 | `C_SUPERACAO_20261015_CONTAINMENT_WITHOUT_APPROVAL` | chat-agent-isolation-2026-10 | Contenção que não depende de aprovação: convidado sem Bash, ou Bash só no UID separado. |
-| 3.6 | `C_SUPERACAO_20261015_CVE39861_QUOTE_WITHOUT_UID_INFERENCE` | chat-agent-isolation-2026-10 | Formulação que o advisory sustenta: nenhuma das duas partes escreve fora do workspace sozinha, mas a combinação escreve em loc |
-| 3.6 | `C_SUPERACAO_20261015_DENY_PLUS_SANDBOX_OR_UID` | chat-agent-isolation-2026-10 | A cobertura completa vem das Read deny (ferramentas) somadas ao sandbox funcional (Bash) ou ao UID separado (tudo, inclusive hooks |
-| 3.6 | `C_SUPERACAO_20261015_EXCLUDED_COMMANDS_REGULAR_FLOW` | chat-agent-isolation-2026-10 | allowUnsandboxedCommands:false faz ignorar dangerouslyDisableSandbox; o comando que casa com excludedCommands roda fora do sandbox |
-| 3.6 | `C_SUPERACAO_20261015_FAIL_IF_UNAVAILABLE` | chat-agent-isolation-2026-10 | failIfUnavailable=true faz o agente morrer em vez de rodar sem gaiola. |
-| 3.6 | `C_SUPERACAO_20261015_GATEWAY_ONLY_FOR_AGENT_CREDS` | chat-agent-isolation-2026-10 | Usar o gateway só para o que o agente consome (API da Anthropic, git) e separar a raiz de confiança (M2M, JWKS, members.yaml, fi |
-| 3.6 | `C_SUPERACAO_20261015_HOSTING_LONG_RUNNING_MULTI_PROCESS` | chat-agent-isolation-2026-10 | Padrões da página: efêmero = um container por tarefa, destruído ao fim, com a tarefa por TASK_PROMPT; o /chat corresponde a Lo |
-| 3.6 | `C_SUPERACAO_20261015_HOSTING_MULTITENANT_LOGICAL_PLUS_EGRESS` | chat-agent-isolation-2026-10 | Multi-tenant em container compartilhado: a doc prescreve settingSources vazio, auto-memory off, CLAUDE_CONFIG_DIR e cwd por tenant |
-| 3.6 | `C_SUPERACAO_20261015_HOSTING_SHARED_CONTAINER_ADMITTED` | chat-agent-isolation-2026-10 | A página de hosting recomenda sandbox em container (com remissão a Docker, gVisor e Firecracker em secure-deployment) e, na seç |
-| 3.6 | `C_SUPERACAO_20261015_HOSTING_SUBPROCESS_OWNS_SHELL_CWD` | chat-agent-isolation-2026-10 | Formulação sustentada do hosting: o SDK hospeda um subprocesso CLI de longa vida, dono de shell, cwd e transcrições em disco,  |
-| 3.6 | `C_SUPERACAO_20261015_HOSTING_TOOL_CREDS_BY_PROXY` | chat-agent-isolation-2026-10 | Formulação sustentada de Auth and secrets: credenciais de FERRAMENTAS ficam fora do ambiente do agente e entram por proxy, e a c |
-| 3.6 | `C_SUPERACAO_20261015_INACCESSIBLEPATHS_IS_UNIT_WIDE` | chat-agent-isolation-2026-10 | InaccessiblePaths=/ReadOnlyPaths= valem para a unit inteira (Node e Bash juntos), então não separam o agente do serviço; e Envi |
-| 3.6 | `C_SUPERACAO_20261015_KEEP_LOADENVFILE_SEPARATE_UID` | chat-agent-isolation-2026-10 | Manter o loadEnvFile no processo e separar por UID (opção 2): com o home do onion em 0750, um UID onion-chat perde .env, .git-cr |
-| 3.6 | `C_SUPERACAO_20261015_MEASURE_THEN_DELETE_PAT` | chat-agent-isolation-2026-10 | Medir se o PAT ainda é necessário (o onion-evolve é público desde 10-13, o pull não precisa dele); se não for, apagar; se fo |
-| 3.6 | `C_SUPERACAO_20261015_MICROVM_OUT_OF_THIS_VPS` | chat-agent-isolation-2026-10 | Reinstalar como restrição: a opção 4 com microVM sai do caminho desta VPS; gVisor/Docker exigem root e a questão Docker×ufw, |
-| 3.6 | `C_SUPERACAO_20261015_NARROW_BROKER_ON_UID` | chat-agent-isolation-2026-10 | Opção 5 estreita sobre a 2: o runner (UID onion-chat) recebe ANTHROPIC_BASE_URL para um proxy local no processo da frente, que i |
-| 3.6 | `C_SUPERACAO_20261015_READONLY_CLAUDE_SETTINGS_EPHEMERAL_HOME` | chat-agent-isolation-2026-10 | ReadOnlyPaths para os .claude/settings*.json do home e para o código do bridge, mais deny de Edit/Write no home do onion fora do  |
-| 3.6 | `C_SUPERACAO_20261015_REANCHOR_HOSTING_LITERAL_QUOTES` | chat-agent-isolation-2026-10 | Reancorar as quotes do hosting que o verificador achou VERBATIM, sem a inferência que as derrubou: Container-based sandboxing (re |
-| 3.6 | `C_SUPERACAO_20261015_REINSTATE_BYPASS_RETRY_CONSTRAINT` | chat-agent-isolation-2026-10 | Reinstalar a claim do retry em bypass como restrição da opção 3: allowUnsandboxedCommands=false + failIfUnavailable=true. |
-| 3.6 | `C_SUPERACAO_20261015_SANDBOX_STRICT_MODE_MANAGED` | chat-agent-isolation-2026-10 | O Claude Code pode reexecutar fora do sandbox quando ele falha; em bypass sem prompt. Com allowUnsandboxedCommands:false e failIfU |
-| 3.6 | `C_SUPERACAO_20261015_SEPARATE_BY_UID_NOT_LIST` | chat-agent-isolation-2026-10 | Separar por UID em vez de listar: o UID do agente só enxerga o próprio workspace e o core vendorizado; o resto some por constru |
-| 3.6 | `C_SUPERACAO_20261015_SPAWN_HOOK_ONLY_COMMAND_ENV_SIGNAL` | chat-agent-isolation-2026-10 | spawnClaudeCodeProcess é a opção oficial para substituir o spawn do agente (VMs, containers, remoto); o gancho recebe só comma |
-| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_ALLOWLIST_AND_PRIVILEGE_WARNING` | chat-agent-isolation-2026-10 | Para fechar a escrita de código no degrau 1 a man page dá dois caminhos (RW aninhado em RO, ou allow-list com ProtectSystem=stri |
-| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_UNIT_AS_HARD_BOUNDARY` | chat-agent-isolation-2026-10 | UID separado num unit systemd próprio (User=onion-chat, ProtectSystem=strict, PrivateTmp, PrivateDevices, RestrictNamespaces, Sys |
-| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_UNIT_PER_SESSION_NOT_VM` | chat-agent-isolation-2026-10 | Reaproveitar a ideia do yolo-cage (um runner por sessão e um dispatcher de git fora da gaiola) com um unit systemd por sessão no |
-| 3.6 | `C_SUPERACAO_20261015_TREAT_BY_CALLER` | chat-agent-isolation-2026-10 | Tratar por chamador: convidado sem Bash, ou com Bash só no UID separado; admin em bypass segue no UID onion até o runner separad |
-| 3.6 | `C_SUPERACAO_20261015_USERNS_REMOVE_BROAD_PROFILES` | chat-agent-isolation-2026-10 | Formulação do discourse do Ubuntu: o risco é um perfil amplo alcançável por processo unconfined (busybox, nautilus), e as cur |
-| 3.0 | `C_SUPERACAO_20261015_TEARDOWN_BY_SYSTEMD_KILLMODE` | chat-agent-isolation-2026-10 | Teardown pelo próprio systemd: fechar o socket, mais RuntimeMaxSec= e KillMode=control-group no template onion-chat@, em vez de o |
-
-## merge-process-onion-2026-10 — 8 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 91.0 | `Q_MERGE_PROCESS_ONION_2026_10` | merge-process-onion-2026-10 | Qual o melhor processo de PR, CI e merge para o core (repo público de dono User, sem proteção, rebase linear, PRs paralelos de  |
-| 12.0 | `C_OPCAO_B_POSTMERGE_PROJECTION_WRITER` | merge-process-onion-2026-10 | OPÇÃO B — Opção 3 de Q_MERGE_DRIVER_PARA_PROJECAO_GERADA (gatilho disparado em #1062-#1065): parar de commitar projeções g |
-| 5.6 | `C_OPCAO_F_THIRD_PARTY_FREE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO F — fila de terceiro gratuita (Mergify Open Source / Trunk Free até 5 committers). GATED: gatilho = depois de A a D ain |
-| 5.4 | `C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO G — transferir o repo para uma organização Free para ter a fila nativa. GATED: custa a URL, o members.yaml, o marketpl |
-| 4.5 | `Q_MERGE_LOTE_COM_BISSECCAO` | merge-process-onion-2026-10 | B (GATED): mergear em LOTE com bissecção quando o main quebrar? Gatilho medido: o main quebrar por COMBINAÇÃO de PRs que só a |
-| 2.4 | `C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER` | merge-process-onion-2026-10 | OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa dri |
-| 2.0 | `C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT` | merge-process-onion-2026-10 | OPÇÃO K — contrarian: trunk direto sem fila e sem projeção commitada. Elenxo: REJEITAR — o core passa no critério time pe |
-| 1.0 | `C_OPCAO_J_STACKED_PRS_GRAPHITE` | merge-process-onion-2026-10 | OPÇÃO J — stacked PRs / Graphite. Elenxo: REJEITAR — a dor medida é de arquivo-ímã, não de dependência entre PRs. |
 
 ## engenharia-de-corpus-de-regras-2026-10 — 8 item(ns)
 
@@ -184,14 +116,65 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
-## a2a-configurator-2026-10 — 4 item(ns)
+## a2a-configurator-2026-10 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 66.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
-| 9.0 | `D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A` | a2a-configurator-2026-10 | como separar o agente do /chat dos insumos de confiança do A2A no clone servido (JWKS, members.yaml, estado de jti, fila)? Mudan |
 | 4.8 | `C_A8_SO_A_PARTE_DETERMINISTICA_RODOU` | a2a-configurator-2026-10 | do A8 e do A8g, rodou em sandbox o caminho de produção (fila → aceite → doc do inbox → sessão headless): 0 canário vazad |
 | 2.8 | `Q_ESTADO_DE_JTI_SO_CRESCE` | a2a-configurator-2026-10 | o estado de jti precisa de poda? Gatilho: o arquivo de estado de um receptor passar de 1 MiB ou 10 mil linhas (hoje 220 bytes) |
+
+## chat-agent-isolation-2026-10 — 47 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 66.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
+| 54.0 | `C_OPCAO_3_NATIVE_SANDBOX_STRICT` | chat-agent-isolation-2026-10 | OPÇÃO (3) sandbox nativo bwrap/seccomp/proxy — só com perfil AppArmor + failIfUnavailable + allowUnsandboxedCommands=false. |
+| 33.0 | `C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE` | chat-agent-isolation-2026-10 | OPÇÃO (1) systemd já — REESCRITA: sem EnvironmentFile, com ReadOnlyPaths voltado à integridade (código do bridge, .claude d |
+| 30.2 | `C_OPCAO_5_NARROW_CREDENTIAL_BROKER` | chat-agent-isolation-2026-10 | OPÇÃO (5) credential broker — estreito: proxy da ANTHROPIC_API_KEY e ferramenta de git, sobre a opção 2. |
+| 17.5 | `C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE` | chat-agent-isolation-2026-10 | OPÇÃO (0) imediato sem root: convidado sem Bash + deny Edit/Write no home do onion fora do workspace. |
+| 16.8 | `C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX` | chat-agent-isolation-2026-10 | A rede de saída do convidado se fecha na UNIT do runner (IPAddressDeny do loopback, link-local e faixas privadas, com DNS pelos r |
+| 7.5 | `C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION` | chat-agent-isolation-2026-10 | OPÇÃO (4) container/microVM por sessão — inviável nesta VPS (sem KVM); opcional por adotante. |
+| 7.2 | `C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION` | chat-agent-isolation-2026-10 | Runner por sessão com HOME efêmero (unit template onion-chat@<sessão>) e DynamicUser=yes: UID único por sessão sem criar cont |
+| 6.0 | `C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER` | chat-agent-isolation-2026-10 | Lançador privilegiado instalado uma vez pelo root: unit template onion-chat@.service ativado por socket (DynamicUser=yes ou User= |
+| 6.0 | `C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF` | chat-agent-isolation-2026-10 | Teardown pelo canal, não por sinal: o SDK fecha o stdin e espera cerca de 2 s; o fechamento do socket encerra o CLI do outro lado |
+| 5.4 | `C_SUPERACAO_20261015_PROCESS_AND_UID_VIA_SPAWN` | chat-agent-isolation-2026-10 | Processo separado E UID separado, via spawnClaudeCodeProcess, presente no SDK instalado (sdk.d.ts:2132 da 0.3.232): o spawn do CLI |
+| 5.4 | `C_SUPERACAO_20261015_READONLY_FOR_INTEGRITY` | chat-agent-isolation-2026-10 | Variante da opção 1 voltada à integridade: ReadOnlyPaths em src/, node_modules/, web/ do bridge, .claude/settings.json, .bashrc |
+| 5.4 | `C_SUPERACAO_20261015_SANDBOX_THREE_PIECES` | chat-agent-isolation-2026-10 | A opção 3 só vale com as três peças: perfil AppArmor do bwrap instalado por root, sandbox.failIfUnavailable=true e allowUnsan |
+| 5.0 | `C_RECOMENDACAO_ELENXO_PRIMARIES_1015` | chat-agent-isolation-2026-10 | Recomendação do Elenxo (primárias): NÃO selar ainda. Degrau 1 = só integridade; degrau 2 exige lançador do root; degrau 3 no |
+| 4.5 | `C_SUPERACAO_20261015_EXPLICIT_FAILIFUNAVAILABLE_VIA_OPTIONS` | chat-agent-isolation-2026-10 | Passar o sandbox por Options (sandbox ou managedSettings) com failIfUnavailable=true explícito, sem depender do default de nenhum |
+| 4.5 | `C_SUPERACAO_20261015_POLICY_TIER_AND_WORKSPACE_CLAUDE_DENY` | chat-agent-isolation-2026-10 | Duas peças: (1) fixar sandbox e permissões no nível de política via Options.managedSettings (restrictive-only, sem arquivo de  |
+| 4.5 | `C_SUPERACAO_20261015_PRIVATE_BWRAP_COPY_BWRAPPATH` | chat-agent-isolation-2026-10 | Cópia PRIVADA do bwrap num caminho executável só pelo grupo do agente (root:onion-chat 0750), com o perfil 'userns,' preso a ES |
+| 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_DETERMINISTIC_OFF` | chat-agent-isolation-2026-10 | Em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; o desligamento determinístico é sandbox.allowUnsandb |
+| 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_INTERACTIVE_SCOPE_ASK_RULE` | chat-agent-isolation-2026-10 | Na sessão interativa, em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; uma ask rule Bash(dangerouslyDi |
+| 3.6 | `C_SUPERACAO_20261015_CONTAINMENT_WITHOUT_APPROVAL` | chat-agent-isolation-2026-10 | Contenção que não depende de aprovação: convidado sem Bash, ou Bash só no UID separado. |
+| 3.6 | `C_SUPERACAO_20261015_CVE39861_QUOTE_WITHOUT_UID_INFERENCE` | chat-agent-isolation-2026-10 | Formulação que o advisory sustenta: nenhuma das duas partes escreve fora do workspace sozinha, mas a combinação escreve em loc |
+| 3.6 | `C_SUPERACAO_20261015_DENY_PLUS_SANDBOX_OR_UID` | chat-agent-isolation-2026-10 | A cobertura completa vem das Read deny (ferramentas) somadas ao sandbox funcional (Bash) ou ao UID separado (tudo, inclusive hooks |
+| 3.6 | `C_SUPERACAO_20261015_EXCLUDED_COMMANDS_REGULAR_FLOW` | chat-agent-isolation-2026-10 | allowUnsandboxedCommands:false faz ignorar dangerouslyDisableSandbox; o comando que casa com excludedCommands roda fora do sandbox |
+| 3.6 | `C_SUPERACAO_20261015_FAIL_IF_UNAVAILABLE` | chat-agent-isolation-2026-10 | failIfUnavailable=true faz o agente morrer em vez de rodar sem gaiola. |
+| 3.6 | `C_SUPERACAO_20261015_GATEWAY_ONLY_FOR_AGENT_CREDS` | chat-agent-isolation-2026-10 | Usar o gateway só para o que o agente consome (API da Anthropic, git) e separar a raiz de confiança (M2M, JWKS, members.yaml, fi |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_LONG_RUNNING_MULTI_PROCESS` | chat-agent-isolation-2026-10 | Padrões da página: efêmero = um container por tarefa, destruído ao fim, com a tarefa por TASK_PROMPT; o /chat corresponde a Lo |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_MULTITENANT_LOGICAL_PLUS_EGRESS` | chat-agent-isolation-2026-10 | Multi-tenant em container compartilhado: a doc prescreve settingSources vazio, auto-memory off, CLAUDE_CONFIG_DIR e cwd por tenant |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_SHARED_CONTAINER_ADMITTED` | chat-agent-isolation-2026-10 | A página de hosting recomenda sandbox em container (com remissão a Docker, gVisor e Firecracker em secure-deployment) e, na seç |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_SUBPROCESS_OWNS_SHELL_CWD` | chat-agent-isolation-2026-10 | Formulação sustentada do hosting: o SDK hospeda um subprocesso CLI de longa vida, dono de shell, cwd e transcrições em disco,  |
+| 3.6 | `C_SUPERACAO_20261015_HOSTING_TOOL_CREDS_BY_PROXY` | chat-agent-isolation-2026-10 | Formulação sustentada de Auth and secrets: credenciais de FERRAMENTAS ficam fora do ambiente do agente e entram por proxy, e a c |
+| 3.6 | `C_SUPERACAO_20261015_INACCESSIBLEPATHS_IS_UNIT_WIDE` | chat-agent-isolation-2026-10 | InaccessiblePaths=/ReadOnlyPaths= valem para a unit inteira (Node e Bash juntos), então não separam o agente do serviço; e Envi |
+| 3.6 | `C_SUPERACAO_20261015_KEEP_LOADENVFILE_SEPARATE_UID` | chat-agent-isolation-2026-10 | Manter o loadEnvFile no processo e separar por UID (opção 2): com o home do onion em 0750, um UID onion-chat perde .env, .git-cr |
+| 3.6 | `C_SUPERACAO_20261015_MEASURE_THEN_DELETE_PAT` | chat-agent-isolation-2026-10 | Medir se o PAT ainda é necessário (o onion-evolve é público desde 10-13, o pull não precisa dele); se não for, apagar; se fo |
+| 3.6 | `C_SUPERACAO_20261015_MICROVM_OUT_OF_THIS_VPS` | chat-agent-isolation-2026-10 | Reinstalar como restrição: a opção 4 com microVM sai do caminho desta VPS; gVisor/Docker exigem root e a questão Docker×ufw, |
+| 3.6 | `C_SUPERACAO_20261015_NARROW_BROKER_ON_UID` | chat-agent-isolation-2026-10 | Opção 5 estreita sobre a 2: o runner (UID onion-chat) recebe ANTHROPIC_BASE_URL para um proxy local no processo da frente, que i |
+| 3.6 | `C_SUPERACAO_20261015_READONLY_CLAUDE_SETTINGS_EPHEMERAL_HOME` | chat-agent-isolation-2026-10 | ReadOnlyPaths para os .claude/settings*.json do home e para o código do bridge, mais deny de Edit/Write no home do onion fora do  |
+| 3.6 | `C_SUPERACAO_20261015_REANCHOR_HOSTING_LITERAL_QUOTES` | chat-agent-isolation-2026-10 | Reancorar as quotes do hosting que o verificador achou VERBATIM, sem a inferência que as derrubou: Container-based sandboxing (re |
+| 3.6 | `C_SUPERACAO_20261015_REINSTATE_BYPASS_RETRY_CONSTRAINT` | chat-agent-isolation-2026-10 | Reinstalar a claim do retry em bypass como restrição da opção 3: allowUnsandboxedCommands=false + failIfUnavailable=true. |
+| 3.6 | `C_SUPERACAO_20261015_SANDBOX_STRICT_MODE_MANAGED` | chat-agent-isolation-2026-10 | O Claude Code pode reexecutar fora do sandbox quando ele falha; em bypass sem prompt. Com allowUnsandboxedCommands:false e failIfU |
+| 3.6 | `C_SUPERACAO_20261015_SEPARATE_BY_UID_NOT_LIST` | chat-agent-isolation-2026-10 | Separar por UID em vez de listar: o UID do agente só enxerga o próprio workspace e o core vendorizado; o resto some por constru |
+| 3.6 | `C_SUPERACAO_20261015_SPAWN_HOOK_ONLY_COMMAND_ENV_SIGNAL` | chat-agent-isolation-2026-10 | spawnClaudeCodeProcess é a opção oficial para substituir o spawn do agente (VMs, containers, remoto); o gancho recebe só comma |
+| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_ALLOWLIST_AND_PRIVILEGE_WARNING` | chat-agent-isolation-2026-10 | Para fechar a escrita de código no degrau 1 a man page dá dois caminhos (RW aninhado em RO, ou allow-list com ProtectSystem=stri |
+| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_UNIT_AS_HARD_BOUNDARY` | chat-agent-isolation-2026-10 | UID separado num unit systemd próprio (User=onion-chat, ProtectSystem=strict, PrivateTmp, PrivateDevices, RestrictNamespaces, Sys |
+| 3.6 | `C_SUPERACAO_20261015_SYSTEMD_UNIT_PER_SESSION_NOT_VM` | chat-agent-isolation-2026-10 | Reaproveitar a ideia do yolo-cage (um runner por sessão e um dispatcher de git fora da gaiola) com um unit systemd por sessão no |
+| 3.6 | `C_SUPERACAO_20261015_TREAT_BY_CALLER` | chat-agent-isolation-2026-10 | Tratar por chamador: convidado sem Bash, ou com Bash só no UID separado; admin em bypass segue no UID onion até o runner separad |
+| 3.6 | `C_SUPERACAO_20261015_USERNS_REMOVE_BROAD_PROFILES` | chat-agent-isolation-2026-10 | Formulação do discourse do Ubuntu: o risco é um perfil amplo alcançável por processo unconfined (busybox, nautilus), e as cur |
+| 3.0 | `C_SUPERACAO_20261015_TEARDOWN_BY_SYSTEMD_KILLMODE` | chat-agent-isolation-2026-10 | Teardown pelo próprio systemd: fechar o socket, mais RuntimeMaxSec= e KillMode=control-group no template onion-chat@, em vez de o |
 
 ## infra-vps-2026-10 — 7 item(ns)
 
@@ -791,6 +774,18 @@
 | 1.8 | `C_SKILLS_SEM_NAME` | triagem-evolve-kgssot-2026-10 | D8-0 (confirmado): 10 de 13 skills sem name: no frontmatter — o Claude Code usa o nome do diretório, então é forma, não defe |
 | 1.4 | `C_AGENTES_COM_MCP_DIRETO` | triagem-evolve-kgssot-2026-10 | D6-3 (confirmado, oportunista): dois agentes declaram ferramenta MCP direta; o do Jira é especialista (permitido pela doutrina),  |
 | 1.0 | `C_DISTINCOES_UNILATERAIS_D2_4_A_7` | triagem-evolve-kgssot-2026-10 | D2-4 a D2-7 (informado): declarações de distinção unilaterais ou ausentes em quatro clusters |
+
+## merge-process-onion-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.0 | `C_OPCAO_B_POSTMERGE_PROJECTION_WRITER` | merge-process-onion-2026-10 | OPÇÃO B — Opção 3 de Q_MERGE_DRIVER_PARA_PROJECAO_GERADA (gatilho disparado em #1062-#1065): parar de commitar projeções g |
+| 5.6 | `C_OPCAO_F_THIRD_PARTY_FREE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO F — fila de terceiro gratuita (Mergify Open Source / Trunk Free até 5 committers). GATED: gatilho = depois de A a D ain |
+| 5.4 | `C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO G — transferir o repo para uma organização Free para ter a fila nativa. GATED: custa a URL, o members.yaml, o marketpl |
+| 4.5 | `Q_MERGE_LOTE_COM_BISSECCAO` | merge-process-onion-2026-10 | B (GATED): mergear em LOTE com bissecção quando o main quebrar? Gatilho medido: o main quebrar por COMBINAÇÃO de PRs que só a |
+| 2.4 | `C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER` | merge-process-onion-2026-10 | OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa dri |
+| 2.0 | `C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT` | merge-process-onion-2026-10 | OPÇÃO K — contrarian: trunk direto sem fila e sem projeção commitada. Elenxo: REJEITAR — o core passa no critério time pe |
+| 1.0 | `C_OPCAO_J_STACKED_PRS_GRAPHITE` | merge-process-onion-2026-10 | OPÇÃO J — stacked PRs / Graphite. Elenxo: REJEITAR — a dor medida é de arquivo-ímã, não de dependência entre PRs. |
 
 ## dissect-forge-2026-10 — 2 item(ns)
 
