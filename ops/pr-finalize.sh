@@ -304,6 +304,14 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   # RESÍDUO da passada adversarial) antes de o carimbo chegar (dogfood no PR #924, 2026-10-05).
   local out sha decl code rcode
   out="$(_ci bash .claude/validation/review-artifact-check.sh . 2>&1)"
+  # ISENÇÃO DECLARADA da guarda (vocabulário fechado dela): o PR que edita SÓ o workflow do revisor não é
+  # gateado por ele (ovo-galinha: a action se auto-pula). A guarda sai 0 com "⊘ fora de escopo"; antes o
+  # motor morria aqui pedindo hash ou ✅ que a guarda, por desenho, não dá (medido no pin v1.0.254, 2026-10-20).
+  # Aceita SÓ esse rótulo, e o declara: qualquer outro "fora de escopo" segue recusado.
+  if grep -qF '⊘ fora de escopo: PR-edita-o-proprio-revisor(ovo-galinha)' <<< "${out}"; then
+    echo "PR-FINALIZE: isenção declarada pela guarda do resíduo: PR-edita-o-proprio-revisor(ovo-galinha) — sem carimbo; a prova é o PR seguinte" >&2
+    return 0
+  fi
   [ -f "${RES}" ] || die "resíduo ausente: ${RES} — escreva a passada adversarial (REGRA 56) e rode de novo"
   # `die` dentro de $(...) não aborta o script (maior 3 do Elenxo 2): o rc da substituição é lido aqui
   code="$(_codehash)" || exit 1
