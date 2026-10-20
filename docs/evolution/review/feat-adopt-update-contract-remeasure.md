@@ -1,7 +1,8 @@
 ---
 branch: feat/adopt-update-contract-remeasure
 date: 2026-10-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 12203175687e4610299c7cff703e3edaab6448714f684fe8476333bcf7ea8a36
+reviewed_code_sha256: d9537503e13682faae23b4502e57317254b110c6bf64e177667f21fbbc472a89
 tokens: 186435
 duration_min: 13
 findings_total: 9
