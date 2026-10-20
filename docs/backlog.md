@@ -370,7 +370,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 41.6 | `Q_PODA_INSTRUCTION_BLOAT_CORE` | poda-instruction-bloat-2026-09 | O que podar do CLAUDE.md (246 linhas / 17.041 bytes) e das skills do core do Onion para curar o agent instruction bloat (Thoughtwo |
-| 21.0 | `C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED` | poda-instruction-bloat-2026-09 | OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica op |
+| 24.5 | `C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED` | poda-instruction-bloat-2026-09 | OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica op |
 | 12.0 | `C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH` | poda-instruction-bloat-2026-09 | OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o |
 | 5.4 | `E_LACUNAS_DECLARADAS_PODA_0903` | poda-instruction-bloat-2026-09 | LACUNAS (custo declarado: 40 fontes, 12 claims, 2 confirmadas, 8 refutadas, 0 nao-verificadas por 403/truncagem). REFUTADAS QUE O  |
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
