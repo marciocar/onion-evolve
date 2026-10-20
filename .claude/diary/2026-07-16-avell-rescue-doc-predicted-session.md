@@ -8,7 +8,7 @@ affects: [identity, infra, method]
 breadcrumb_for: [catch-up, meta:kg, meta:co-evolve]
 share_with: [collective]
 next_recommended: ""
-review_after: 2026-10-14
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -43,3 +43,5 @@ o método usa pra decidir (a pesquisa que se auto-resgatou).
   artefato volta pro loop (é o [[deterministic-freshness-via-in-file-baseline]] aplicado a docs de pesquisa).
 - Ver `[[2026-07-16-two-homes-origin-and-coexistence]]` (a decisão de coexistência) e o KG
   `[[coexistence-two-homes-2026-07]]`.
+
+## Re-testada em 2026-10-20: (static, contra a melhor fonte atual) `951dc973` (#394, o doc resgatado) e `c9226499` (#395) seguem na história de `origin/main`; `docs/analysis/onion-research-team-mode-knowledge-federation-2026-07.md` e `docs/onion/graph/coexistence-two-homes-2026-07.kg.yaml` existem. A lição "capturar antes de sincronizar" é método e vale. Nota: o Avell deixou de ser casa (decisão do maestro em 2026-10-20, ver `2026-07-16-two-homes-origin-and-coexistence`), e a "coexistência Avell+VPS" do Signal fica como registro do que se desenhava em julho.

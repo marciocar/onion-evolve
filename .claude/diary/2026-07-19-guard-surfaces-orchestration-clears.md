@@ -8,7 +8,7 @@ affects: [meta, orchestration]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Reconhecer o play como repetível: ao adicionar uma GUARDA advisory nova ao motor soberano (kg-radar), a dívida que ela revela é trabalho de fan-out imediato — construir a guarda e limpar o que ela acha fecham no MESMO loop (fix→re-dogfood), não em sessões separadas. Próxima guarda advisory que nascer, já orquestrar o sweep da dívida na sequência."
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -39,3 +39,5 @@ fecharam no MESMO loop — é o `write(KG)` do próprio motor de percepção sob
 Ver `next_recommended`. A lição operacional: **guarda advisory nova → sweep da dívida no mesmo loop**.
 A guarda não é o fim; é a forcing function que gera o próximo trabalho — e esse trabalho é fan-out.
 Origem: o maestro pediu "atacar todos e dogfoodar orquestração" (2026-07-19) — o #2 virou a prova viva.
+
+## Re-testada em 2026-10-20: (static) `git cat-file -t` dá `commit` para `1870ef8` e `6c01740`; `kg-radar.sh` tem o modo `--provenance` (l.4, l.119).

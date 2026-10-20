@@ -8,7 +8,7 @@ affects: [docs, product, meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Aplicar retroativamente: auditar os READMEs/docs públicos da família por co-título com a plataforma (as 5 portas de plataforma têm padrão '(Cursor)/(Zed)/…' nos case-studies do hub) e por READMEs meramente funcionais que não vendem o conceito. Graduar o princípio para doutrina executável: uma nota de brand-voice que os geradores de doc (/docs:*, build-*-docs) e a skill language-standards consultem — hoje vive só aqui no diário."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -38,3 +38,5 @@ versionadas"), não com "o que tem dentro". A cara pública de cada repo é mark
 - README lidera com o **porquê** (problema→promessa→tese), depois o **quê** (bundle/recursos), depois
   o **como** (começar/adotar).
 - Vale para README, docs, case-studies, site — toda superfície pública.
+
+## Re-testada em 2026-10-20: (static) o H1 do `README.md` é "🧅 Onion", sem co-título de plataforma. O `next_recommended` segue aberto: não há nota de brand-voice do Onion em skills, comandos ou KB (as ocorrências de "brand voice" são do template genérico de business-context). Escopo da medição: só este repo (nenhum H1 com "(Claude Code)" nos `.md`); os READMEs das portas e os case-studies do hub não foram auditados nesta passada.

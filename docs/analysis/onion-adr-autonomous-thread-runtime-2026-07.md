@@ -2,7 +2,7 @@
 title: 'ADR — Runtime de orquestração autônoma de fios: escada graduada de autonomia (Audit→Automate) com moat determinístico'
 date: 2026-07-18
 type: adr
-status: accepted (degrau AUDIT) — o runtime foi MECANIZADO e dogfoodado em 2026-08-27 pelo /meta:drive (Censo `kg-drive-project.sh` #692 + laço `drive.md` #693; superação em `docs/onion/graph/drive-superacao-2026-08.kg.yaml`). Selado pelo maestro. ⚠️ Aceite QUALIFICADO: o dogfood exercitou a rota **research** + o laço P0-P6 completo (fio real conduzido ao checkpoint na catraca), NÃO a rota **execution→PR-verde** — essa e o lote completo se exercitam nos próximos drives reais. AUTOMATE (auto-merge) segue GATED (Fase 2)
+status: accepted (degrau AUDIT) — o runtime foi MECANIZADO e dogfoodado em 2026-08-27 pelo /meta:drive (Censo `kg-drive-project.sh` #692 + laço `drive.md` #693; superação em `docs/onion/graph/drive-superacao-2026-08.kg.yaml`). Selado pelo maestro. ⚠️ Aceite QUALIFICADO: o dogfood exercitou a rota **research** + o laço P0-P6 completo (fio real conduzido ao checkpoint na catraca), NÃO a rota **execution→PR-verde** — essa e o lote completo se exercitam nos próximos drives reais. AUTOMATE (auto-merge) seguia GATED (Fase 2) até 2026-10-14, quando o degrau foi FORJADO (PR #1107, 68c20c2a, /meta:drive --automate, drive.md l.20-23) com o merge desligado por padrão e --merge explícito na invocação (drift corrigido em 2026-10-20 pelo re-teste do diário)
 decision-scope: co-evolution / autonomy (o core conduz os fios pendentes com autonomia graduada)
 supersedes: none
 extends:
@@ -45,7 +45,7 @@ pós-refutação.
 - **Nível AUDIT — o piso (batch-confirm), único ATIVO nesta rodada:** o runtime avança um fio a **PR verde**
   sozinho; **o merge no main é 100% humano**, revisado **em LOTE** num checkpoint. Preserva "revisão humana em
   todo merge".
-- **Nível AUTOMATE — teto DESENHADO, GATED (não ativo):** auto-merge só destrava por **3 pré-condições duras**:
+- **Nível AUTOMATE — teto DESENHADO, GATED (não ativo) até 2026-10-14; FORJADO desde então (PR #1107, merge desligado por padrão, `--merge` explícito):** auto-merge só destrava por **3 pré-condições duras**:
   1. **Enabler git-nativo** — branches `auto/*` + **branch protection** restringindo quem/o-quê mergeia (o gatilho
      que `work-models:80` já armou: "1ª automação que commite sem humano"). *Cabear, não escrever* (telescópio #10).
   2. **Path-allowlist mecânica** — `git diff --name-only ∩ manifesto-vendor = ∅`. O manifesto `want=` do
@@ -97,4 +97,4 @@ ALINHADO, **sem merge** (AUDIT respeitado). E o driver aplicou a **própria tabe
 apendou a evidência e **parou no flip deste status** (`proposed→accepted`), porque status-de-verdade é
 selo humano. O maestro selou. **Aceite qualificado:** provou a rota **research** + o laço; a rota
 **execution→PR-verde** e o **lote completo** ficam para os próximos drives (achado #1 do resíduo
-`feat-meta-drive-phase1.md`). AUTOMATE segue GATED.
+`feat-meta-drive-phase1.md`). AUTOMATE seguiu GATED até 2026-10-14, quando foi forjado no `/meta:drive --automate` (PR #1107).

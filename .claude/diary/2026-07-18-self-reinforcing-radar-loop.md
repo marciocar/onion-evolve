@@ -8,7 +8,7 @@ affects: [co-evolution, meta]
 breadcrumb_for: []
 share_with: [granaai, metagamify]
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -32,3 +32,5 @@ KG" não é só diagnóstico: **produz ação, e a ação se verifica no mesmo i
 Construir observabilidade (radar/lente) **não é o fim** — é o começo do loop: o radar surfa o fio, o runtime
 fecha, o radar **re-confirma**. Ao herdar um branch órfão: `grep` o conteúdo-chave no main **antes** de assumir
 que está vivo (data engana; conteúdo decide). Cada checagem de saúde só fecha `confirmed` com re-verificação.
+
+## Re-testada em 2026-10-20: (static, e rodei) `federation-radar.sh` saiu 0 com "10 ponto(s) a re-verificar (declarado≠verificado). Advisory — não bloqueia": 2 pins não verificados, 5 anúncios em staging e 3 hubs sem sub-adotado.

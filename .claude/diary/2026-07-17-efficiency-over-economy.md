@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -24,3 +24,5 @@ Diretiva do maestro (verbatim): **"Não queremos economia, queremos eficiência 
 
 ## Next crumb
 Ao orquestrar, sempre declarar `model` + `effort` por fase e **reportar o tier** — não pedir permissão para gastar. Fase difícil que rodou barata (ou mecânica que rodou cara) é sinal de bug de tiering a corrigir.
+
+## Re-testada em 2026-10-20: (static) `onion-orchestration/SKILL.md` l.252-253 manda declarar o tier por fase no relatório e chama o desvio de "bug de tiering"; a memória `efficiency-over-economy` segue viva.

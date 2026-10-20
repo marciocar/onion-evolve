@@ -8,7 +8,7 @@ affects: [meta, engineering, compliance]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Quem for reusar a catraca de proveniência invertida: instalá-la SEMPRE com baseline emitido do filesystem do alvo (nunca herdando o baseline do core — ele explodiria o gate do adotante) e ciente de que o gate mede COBERTURA, não verdade. Enquanto quem alimenta o grafo for orquestração com verificação adversarial, o flanco fica fechado; no dia em que virar rotina apressada, o gate fica verde e o grafo fica oco. Se isso for detectado, o próximo mecanismo é um gate de PROFUNDIDADE (nó que não sustenta afirmação verificável não conta como cobertura) — e ele entra provando-se, pela REGRA DE ADMISSÃO."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: conditional
 valid_when: "o grafo continua sendo alimentado por orquestração com verificação adversarial, e não por rotina apressada de nó-por-documento"
 significance: "Invertemos a pergunta da proveniência — de 'as citações apontam para fontes reais?' para 'toda fonte é alcançável a partir do grafo?' — e a catraca pagou 92 documentos até o piso zero sem uma regressão."
@@ -50,3 +50,5 @@ Ver `next_recommended`. A catraca é **gameável por profundidade, não por pres
 verde sobre um grafo oco, ela mente com autoridade de mecanismo, que é a pior forma de mentir neste sistema.
 Ver [[mechanism-beats-prose]] (a lei que este instrumento tornou visível) e [[admission-rule-blindspot]]
 (o rigor com que o próximo gate de profundidade deve entrar).
+
+## Re-testada em 2026-10-20: (conditional, só o `valid_when`) a condição vale: o grafo segue alimentado por orquestração com passada adversarial (os selos de nó passam por `/meta:census` com juiz e por `/meta:decide`). Rodei `kg-provenance-coverage.sh`: 219 de 219 documentos cobertos, baseline com 0 entradas. O escopo cresceu de 92 para 219 documentos e o piso não subiu. O gate de PROFUNDIDADE do `next_recommended` não existe, e não houve detecção de grafo oco que o pedisse.

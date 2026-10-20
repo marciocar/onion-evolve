@@ -8,7 +8,7 @@ affects: [meta, product]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -23,3 +23,5 @@ Ao triar sinais de co-evolução (ou qualquer artefato), **ler o conteúdo COMPL
 
 ## Next crumb
 Antes de emitir veredito de triagem ou dizer "tema diferente/irrelevante", `Read` o arquivo inteiro. Vale para todo artefato que se vá triar, resumir ou publicar — não só sinais de co-evolução.
+
+## Re-testada em 2026-10-20: (static) a doutrina segue em vigor (memória `read-full-content-before-triage`) e nada a supera. Este re-teste a aplicou: cada migalha foi lida inteira antes do veredito.

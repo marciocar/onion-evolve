@@ -8,7 +8,7 @@ affects: [engineering, product]
 breadcrumb_for: []
 share_with: []
 next_recommended: "F1 quase fechado no onion-pessoal-app (só falta STT). PRÓXIMO substantivo antes do STT: GESTÃO DE PROMPTS do cérebro seguindo os NOSSOS conceitos — KG-SSOT-first + runtime (o prompt vive num SSOT, o runtime lê e verifica-contra-o-vivo) + dogfood (usar de verdade) + o padrão de mgmt de prompt mais popular/adotado de jul/2026 (verify-external antes de escolher). Hoje o prompt está hardcoded em llmAnthropic.ts — dívida consciente. Depois: STT (última peça F1) → então F2 (superfície + SSOT 6-camadas de inferência/P5, onde Q_METADATA_LEAK e o de-id-por-SLM moram). O app É o cliente KG-de-vida canônico (ver adopt-kg-life-g1-spike: adopt-para-KG NÃO se constrói)."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -47,10 +47,13 @@ Isso é a prova viva de "soberania por cifra" + "de-id LOCAL sempre" do ADR-003 
 o Onion pessoal N=1 tem superfície executável — o loop coletar→KG→reconciliar deixou de ser Wizard-of-Oz.
 
 ## Dívida consciente (para não fingir que está pronto)
-- **Prompt do cérebro hardcoded** (`llmAnthropic.ts`) — próximo passo é gestão de prompts KG-SSOT-first + runtime
-  + dogfood (nota do maestro).
+- ~~**Prompt do cérebro hardcoded**~~ **(pago, visto em 2026-10-20):** o app tem `promptStore.ts` e `promptEval.ts`,
+  e o `llmAnthropic.ts` pega o prompt por `getPrompt('brain-extract-converse', …)`, com o system separado dos dados.
 - **de-id é regra v1** (frágil por design; SLM on-device é F3/gated). Verticais sensíveis (Saúde/Relações) em
   over-redação; começa por Trabalho.
 - **Push on-device flaky** (RN fetch + isomorphic-git `EmptyServerResponseError`) → retry com backoff; fix mais
   fundo = trocar o http client por `expo/fetch`.
-- **STT** ainda não existe (última peça do F1).
+- **STT (visto em 2026-10-20):** o módulo `stt.ts` existe (e `tts.ts` também). Não verifiquei no aparelho se fecha
+  o F1.
+
+## Re-testada em 2026-10-20 — PARCIAL: (static, li o repo do app, último commit `0b33d0c` de 2026-10-08) a invariante e o loop seguem. Duas dívidas declaradas aqui foram pagas no código: a gestão de prompts (`promptStore.ts`) e o STT (`stt.ts`). O estado vivo do app é do KG da estrela, não desta migalha.

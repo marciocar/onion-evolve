@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: [catch-up, meta:co-evolve, onion-working-method]
 share_with: [collective]
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -31,6 +31,9 @@ escondida atrás de um fast-forward local.
   chegou no meio". O branch+PR é o que deixa a concorrência **visível e auditável**, não só segura.
 
 ## Next crumb
-`docs/knowledge-base/concepts/onion-working-method.md` cita PR pra features, mas não afirma
-explicitamente "todo commit em `main`, incluindo housekeeping/triagem do próprio core, vai por PR,
-sem exceção" — considerar adicionar essa frase lá, ancorada nesta entrada como evidência de campo.
+Superado por mecanismo (2026-08-23): `.githooks/pre-commit` l.21-34 barra commit na default branch
+(`core.hooksPath=.githooks`), e `pretooluse-protect-main.sh`/`pretooluse-merge-gate.sh` barram merge e push
+fora do caminho verificado. A frase na KB `onion-working-method.md` não foi adicionada e não faz falta: a
+guarda diz o mesmo e não esquece.
+
+## Re-testada em 2026-10-20 — PARCIAL: (static) o Signal vale e virou mecanismo: `.githooks/pre-commit` l.21-34 (guarda anti-commit na default branch, com `core.hooksPath` apontando para `.githooks`) e os hooks `pretooluse-protect-main.sh` e `pretooluse-merge-gate.sh`. O Next crumb (escrever a frase na KB) foi superado pela guarda e reescrito.

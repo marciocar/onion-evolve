@@ -8,7 +8,7 @@ affects: [meta]
 breadcrumb_for: []
 share_with: [granaai, metagamify]
 next_recommended: "Radar-checkavel: modelar instrumentos.kg.yaml layer:domain (1 no por CHECK, aresta READS->fonte, TRACES_TO->script:linha) pra o kg-radar auditar a doutrina. E gates faltantes p/ Absorcao/Trilha (breadcrumb doctrine)."
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -29,3 +29,5 @@ transversais (veredito advisory|gate; validade/frescor) + **unidade = CHECK, nao
 Distinguir sempre: SENSOR (ve) vs GATE (decide/escreve) vs PROJECAO (view) — ver != agir. Todo sensor declara de
 qual FONTE le (marca/estrutura/vivo). "Ver o estado" != "2 metades do read(KG)": instrumentos sao read+verify;
 a marca eh a perna write. Frescor eh lazy-por-sessao, nunca cron.
+
+## Re-testada em 2026-10-20: (static) a KB `onion-perception-instruments.md` l.38 e l.55 mantém o frescor lazy por sessão, nunca cron. O `next_recommended` (instrumentos `layer: domain`) segue aberto: não existe `instrumentos.kg.yaml`, e `perception-instruments-2026-07.kg.yaml` tem 0 nós `layer: domain`. Os únicos grafos do repo com `layer: domain` (`technical-context-core-2026-07.kg.yaml`, `colaboracao-onion-2026-07.kg.yaml`) modelam subsistemas e entidades, não um nó por CHECK com aresta READS para a fonte.

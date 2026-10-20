@@ -8,7 +8,7 @@ affects: [meta, research]
 breadcrumb_for: [verify-external-for-current-doctrine]
 share_with: [granaai, metagamify]
 next_recommended: "Nenhum obrigatório. Opcional: quando /meta:orchestrate ganhar um passo de pesquisa próprio (hoje delega à skill), reavaliar se a afordância precisa de superfície ali — por ora a delegação do Passo 2 cobre."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -36,3 +36,5 @@ A doutrina agora tem as **duas pernas**: KB durável (o quê/porquê, #449) + wi
 Ao tocar o fluxo de pesquisa de novo: a afordância vive no `@research-agent` (Fase 3) e na skill (Resiliência);
 não re-declarar em outros arquivos que delegam a esses dois. Se um comando de research ganhar caminho próprio
 (sem delegar à skill), aí sim reavaliar superfície — mas por default a delegação já cobre.
+
+## Re-testada em 2026-10-20: (static) `research-agent.md` tem `WebFetch` nos tools (l.11) e o ponteiro à KB (l.119). A afordância na skill mudou de linha: agora `onion-orchestration/SKILL.md` l.312 (antes l.179). A skill `onion-research` também existe e conduz ao workflow.

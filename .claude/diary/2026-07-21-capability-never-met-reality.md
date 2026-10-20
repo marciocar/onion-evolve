@@ -8,7 +8,7 @@ affects: [meta, engineering, compliance]
 breadcrumb_for: []
 share_with: []
 next_recommended: "NÃO desenhar transporte novo (a2a-live gated, federation-transport SDAAL, single-source+mesh) enquanto a capacidade de federação formal não encontrar UM caso real ou for marcada honestamente como não-exercida. E adotar a distinção como rotina: 'passa nos fixtures' é prova de FORMA; 'foi exercido contra um caso real' é prova de FUNÇÃO. Registrar as duas separadamente — no grafo, no inventário, no que for. Quando só a primeira existe, dizer isso em voz alta em vez de listar a capacidade como entregue."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: dynamic
 significance: "O passivo pago revelou a maior distância entre declarado e verificado do core — não num fato, mas numa CAPACIDADE inteira que passa em todos os testes e nunca tocou a realidade."
 ---
@@ -36,6 +36,13 @@ o mundo é prova de **função**. Listar a primeira como se fosse a segunda é o
   inequívoca — a adoção de um adotante real achou e consertou um bug (#303); a leva de modelagem achou nó
   órfão, contradição de status e aresta mal-modelada. Capacidade exercida produz achados. **Cinco semanas
   sem um único achado de federação não é maturidade — é ausência de uso.**
+- **Estado em 2026-10-20 (re-teste dynamic, rodei `find . -type d -name contracts`):** o único `contracts/` segue
+  sendo `.claude/validation/fixtures/contracts`, e `docs/evolution/federation/` segue sem contratos. O CHANGELOG não
+  registra `federation-check` nem rollback de federação (a única ocorrência de "rollback", l.365, é da VPS). A
+  capacidade formal de contratos segue não exercida. **O transporte andou contra o `next_recommended`:** o A2A foi
+  construído e posto em produção por decisão do maestro (`/meta:federation-a2a`; `f2899d17` "a fila A2A de
+  produção ganha wrapper"; `6810627d` "o hub recebe os filhos dele pelo bridge do core"), então o "não desenhar
+  transporte novo" está superado. A distinção forma × função segue valendo, e agora mira o ledger de contratos.
 - O custo de fechar é baixo: **os quatro adotantes locais existem** e estão clonados.
 
 ## Next crumb
@@ -43,3 +50,5 @@ Ver `next_recommended`. A decisão é binária e é do maestro: **exercer contra
 honestamente como capacidade não-exercida**. O que não serve é seguir tratando como entregue — porque aí o
 inventário mente com a autoridade de um teste verde, e os três desenhos abertos herdam a mentira.
 Ver [[mechanism-beats-prose]] e [[inverted-provenance-ratchet]].
+
+## Re-testada em 2026-10-20 — PARCIAL: (dynamic, rodei) 0 contratos reais registrados; a capacidade formal segue sem caso real. O veto ao transporte novo foi superado: o A2A existe e roda em produção.

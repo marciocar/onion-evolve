@@ -8,7 +8,7 @@ affects: [meta, research, co-evolution]
 breadcrumb_for: []
 share_with: [granaai, metagamify]
 next_recommended: "Ato-2 (GATED): cabear a afordancia no fluxo de pesquisa (/meta:orchestrate, skill onion-orchestration, comandos research) — passo 'claim sobre atual/emergente/popular ⇒ verify externo obrigatorio; senao marcar nao-verificado'. Derivar fresco contra o fluxo vivo quando o gate abrir; nao pre-cozinhar."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -33,9 +33,15 @@ maestro; triado via `/meta:co-evolve` (CORE).
   esgotar um transporte ≠ desistir).
 
 ## Next crumb
-**Ato-2 é GATED** — o wire-in mecânico no fluxo de pesquisa **não se pré-cozinha** aqui
+**Ato-2 FECHADO no mesmo dia** (ver `2026-07-19-verify-external-wired-into-research-flow`): `WebFetch` nos tools
+do `@research-agent` e o bullet em `onion-orchestration/SKILL.md` (hoje l.312). O texto abaixo é o registro do
+que se previa antes de o gate abrir.
+
+**Ato-2 era GATED** — o wire-in mecânico no fluxo de pesquisa **não se pré-cozinha** aqui
 (`gated-work-derives-fresh`): quando o gate abrir, derivar fresco contra o `/meta:orchestrate` / skill
 `onion-orchestration` / comandos de research vivos e adicionar o passo *"claim sobre atual/emergente/popular
 ⇒ verify externo obrigatório; senão marcar não-verificado"*. A KB é o *quê/porquê* durável; o *como* é o
 backlog. Ao retomar: partir da KB `verify-external-for-current.md` (não re-derivar a doutrina) e cabear só a
 afordância. Espelha o par KG-first + drive-to-verify — aqui o "vivo" é a web.
+
+## Re-testada em 2026-10-20 — PARCIAL: (static) a KB `verify-external-for-current.md` existe e o Signal vale. O Next crumb foi atualizado: o Ato-2 fechou no mesmo dia, e a afordância vive no `research-agent.md` (l.11 e l.119) e na skill (l.312).

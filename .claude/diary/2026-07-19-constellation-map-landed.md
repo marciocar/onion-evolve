@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Fase 2 da Constelação (🔬 radar cross-study, `kg-constellation-radar.sh`) permanece GATED pelo gatilho do ADR: duas estrelas colidirem/divergirem DE FATO ≥1× E ≥2 estrelas terem `.kg.yaml`. O mapa já expõe as colisões candidatas (hoje: `docs/onion/graph/` em 3 estrelas — behavior-mapping-kg, interface, pessoal-marcio; NS1 em 3). Quando o gatilho bater, o radar reconcilia via overlay `constellation.kg.yaml` (REFUTES/SUPERSEDES), NÃO git merge. Fase 3 (📬 carteiro, `study-deliver.sh`) fica gated por: maestro copiar um estudo pro core à mão ≥2×."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -50,3 +50,5 @@ Ver `next_recommended`. É a continuação natural do observatório: 🔬 radar 
 (Fase 3), ambos **gated** pelos gatilhos do ADR. O mapa (Fase 1) é o que destrava a leitura macro
 que os dois consomem. Origem: reenquadramento do maestro nesta sessão (o #1 é a 1ª fatia da
 constelação, não um ajuste de beacon). Aterra em [[2026-07-19-farol-organizer-key-by-worktree]].
+
+## Re-testada em 2026-10-20: (static, e rodei) `constellation-map.sh` roda: 7 estrelas, colisão de `docs/onion/graph/` em 2 estrelas e convergência NS1 em 3. A Fase 2 (`kg-constellation-radar.sh`) e a Fase 3 (`study-deliver.sh`) seguem sem existir, e o rodapé do mapa diz "radar (Fase 2, gated)".

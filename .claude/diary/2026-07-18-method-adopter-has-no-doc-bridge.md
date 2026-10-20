@@ -9,6 +9,7 @@ breadcrumb_for: []
 share_with: []
 next_recommended: ""
 review_after: 2026-10-15
+superseded: true
 conflict_class: static
 ---
 
@@ -22,3 +23,5 @@ Um **method-adopter** — que adota o **MÉTODO** do Onion (KG SDAAL) e **não v
 
 ## Next crumb
 Antes de transportar um anúncio downstream, cheque o **modo de adoção** do alvo (`members.yaml`): **file-adopter** (vendoriza) → `cp` p/ `docs/evolution/inbound/` (entrega-sem-commit); **method-adopter** (adota o método, `onion_version: n/a`) → **não há arquivo a entregar** — a doutrina o alcança via o método + o maestro. O `resolve-target` de `alvo: todos` inclui method-adopters; o **transporte** é que difere por modo.
+
+## Re-testada em 2026-10-20 — INVÁLIDA (superseded): (static, contra a melhor fonte atual) a regra "não force-criar `inbound/` num method-adopter" caiu. O `onion-pessoal` TEM caixa postal hoje: `/home/marcio/onion-pessoal/docs/evolution/inbound/README.md` l.4 diz "receber correio do core não exige o framework — canal ≠ vendorização", e o mesmo README registra que a ausência do diretório era efeito colateral, não decisão. A correção "caixa postal ≠ framework" está no grafo `federation-research-2026-06-reconciled.kg.yaml`. O que segue vivo é a distinção de modo (file-adopter vendoriza, method-adopter não), que `members.yaml` l.422-423 mantém (`kind: method`). O transporte não difere mais por modo: os dois recebem arquivo no `inbound/`.

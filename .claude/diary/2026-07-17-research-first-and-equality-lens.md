@@ -8,7 +8,7 @@ affects: [meta, product]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -23,3 +23,5 @@ Em temas amplos (mercado/estado-da-arte/frameworks), **não derivar modelo/posi�
 
 ## Next crumb
 Ao pegar tema amplo: propor/rodar orquestração de pesquisa antes de escrever posição. Em análise comparativa: tabelar igual/diferente com a ação exigida por linha.
+
+## Re-testada em 2026-10-20: (static) reforçada: a skill `onion-research` e o workflow `/onion-research` existem; a recusa por igualdade segue em `onion-elenxo-doctrine.md` l.159 e a lente Aristóteles em `onion-patterns/SKILL.md` l.250.
