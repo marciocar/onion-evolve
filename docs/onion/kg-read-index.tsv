@@ -2472,6 +2472,7 @@ ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_EM_REPO_SEM_CI	docs/evolution/resear
 ops/publish-door.sh	C_CHANGELOG_DIZ_NENHUMA_QUEBRA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
 ops/publish-door.sh	E_PROPOSTA_CONTAVA_A_RELEASE_NOVA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
 ops/review-gate-health.sh	E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+ops/stt-service.sh	E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
 ops/stt-service.sh	E_MC_STT_INSTALADO_LOOPBACK_1020	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
 ops/stt-service.sh	E_MC_STT_SERVICO_CORE_MEDIDO_1017	docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml
 ops/testing/main-bench-alarm.sh	E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
