@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**101 regras** no total — **89 HARD**, **41 SOFT**.
+**102 regras** no total — **90 HARD**, **42 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -122,6 +122,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | HARD + SOFT | o materializador ler o papel ERRADO e cortar maquinaria da porta pública |
 | 96 | Diretiva de contexto INJETADO não corta listagem em silêncio | HARD | a projeção que o harness injeta é lida pela sessão COMO SE FOSSE o conjunto — não há |
 | 108 | Pin do grafo de adoção concorda com o carimbo | HARD + SOFT | o grafo que o warm-up manda ler PRIMEIRO mentir sobre a versão do Onion instalada |
+| 110 | Índice da KB conta o que o disco tem | HARD + SOFT | o índice de docs/knowledge-base declarar uma contagem e listar outra, com arquivos fora dele |
 
 ## KG & proveniência
 

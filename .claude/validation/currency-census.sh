@@ -21,7 +21,8 @@
 #   kg-ssot           vendor/kg-ssot pinado × a maior tag kg-ssot-v* do repositório público do produto.
 #   python:<pkg>      PyYAML e jsonschema (as diretas do leitor do KG-SSOT) no python3 do lint × PyPI. Quando o
 #                     instalado é o PINO do contrato e o PyPI andou, o estado é `pinada`: a subida é do produto.
-#   base:<branch>     HEAD deste checkout × a branch padrão do origin (git ls-remote --symref; sem fetch).
+#   base:<branch>     HEAD deste checkout × a branch de INTEGRAÇÃO do Onion no origin, pelo resolve-integration-
+#                     branch.sh (C8, 2026-10-20); sem sinal de integração, a padrão do origin (ls-remote --symref). Sem fetch.
 #   action:<o/r>      o pin por SHA de uma action que INSTALA um CLI (hoje: anthropics/claude-code-action, a do
 #                     revisor de IA do CI) nos workflows de .github/workflows/ × a maior tag vX.Y.Z do repositório
 #                     da action. Defasada, a ação traz o CLI que cada commit instala (lido de src/entrypoints/run.ts
@@ -55,7 +56,7 @@
 #   manifesto do instalador nativo (alinhados em 2026-10-16; se o npm publicar antes, `claude update` não sobe e
 #   o aviso persiste até o nativo chegar); managed settings não são lidos. Não vê dependência fora destas
 #   superfícies. Das actions, só as da lista ACTIONS e só pin por SHA (pin por tag é nao-medida); o CLI do commit
-#   é lido de src/entrypoints/run.ts e some do texto (não do estado) se o arquivo mudar de lugar. A base é a do checkout passado, e a ação "rebase sobre a padrão" é errada em PR empilhado.
+#   é lido de src/entrypoints/run.ts e some do texto (não do estado) se o arquivo mudar de lugar. A base é a do checkout passado, e a ação "rebase sobre a integração" é errada em PR empilhado; a integração é a que o resolve-integration-branch.sh dá (a mesma do /engineer:pr).
 #   Exercitado por lint-selftest.sh (run_currency_census_selftests).
 # =============================================================================
 set -uo pipefail
@@ -202,6 +203,13 @@ _origin() {
   sha="$(printf '%s\n' "${out}" | awk '$2=="HEAD" && $1 ~ /^[0-9a-f]+$/ && length($1)==40 && !d {d=1; print $1}')"
   [ -n "${br}" ] && [ -n "${sha}" ] && printf '%s %s\n' "${br}" "${sha}"
 }
+_origin_branch() {  # <branch> → "branch sha" da ref no origin; nada (rc 0) quando ela não existe lá
+  local out sha
+  out="$(GIT_TERMINAL_PROMPT=0 timeout "${T}" "${GIT}" -C "${REPO}" ls-remote origin "refs/heads/$1")" || return 1
+  sha="$(printf '%s\n' "${out}" | awk -v r="refs/heads/$1" '$2==r && $1 ~ /^[0-9a-f]+$/ && length($1)==40 {print $1; exit}')"
+  [ -n "${sha}" ] && printf '%s %s\n' "$1" "${sha}"
+  return 0
+}
 _sdk_read() {  # <conta|-> <package.json> → a versão, só se o caminho declarado for o REAL
   local acct="$1" pkg="$2" raw
   local probe='p="$(readlink -f -- "$1")" && [ "$p" = "$1" ] && head -c 1048576 -- "$1"'
@@ -322,9 +330,35 @@ leg_base() {
   [ -e "${REPO}/.git" ] || return 0
   _has "${GIT}" || { _row base - - ausente "falta o git para medir a base: ${ASK} o git pela distro"; return 0; }
   "${GIT}" -C "${REPO}" remote get-url origin >/dev/null 2>&1 || return 0
-  local v rc=0 br sha cur n
-  v="$(_src "origin-head-$("${GIT}" -C "${REPO}" remote get-url origin 2>/dev/null | cksum | awk '{print $1}')" 300 '^[A-Za-z0-9._/-]+ [0-9a-f]{40}$' _origin)" || rc=$?
-  [ -n "${v}" ] || { _row base - - nao-medida "o origin inalcançável por git ls-remote --symref (rc=${rc})"; return 0; }
+  local v rc=0 br sha cur n ib="" ibe="" res ok key
+  # C8 (2026-10-20, sinal de campo de um hub adotante): a base se compara com a branch de INTEGRAÇÃO do Onion,
+  # pelo MESMO resolvedor do /engineer:pr (stamp → gitflow.branch.develop → develop → principal). Num hub cuja
+  # integração é onion/develop, comparar com a padrão do origin (a develop de produto) mandou rebasear sobre a
+  # branch errada. Só o PALPITE CEGO do resolvedor (sem sinal nenhum; ele avisa no stderr) cai no symref do
+  # origin, que é resposta melhor que "main". Integração que não está no origin: não medida, nunca a padrão.
+  res="${ONION_CURRENCY_RESOLVER:-$(dirname "${BASH_SOURCE[0]}")/resolve-integration-branch.sh}"
+  if [ -f "${res}" ]; then
+    ibe="$(bash "${res}" "${REPO}" 2>&1 >/dev/null)"; ib="$(bash "${res}" "${REPO}" 2>/dev/null)"
+    # passada adversarial: `integration_branch: "onion/develop"` (com aspas, editado à mão) volta COM as aspas;
+    # recusar e cair no symref seria o mesmo falso positivo que esta cura fecha, agora calado. Não medida, nomeada.
+    if [ -n "${ib}" ] && [ -z "${ibe}" ] && ! [[ "${ib}" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+      _row base - - nao-medida "a branch de integração que o resolve-integration-branch.sh devolveu não é um nome de branch ($(printf '%q' "${ib}" | cut -c1-60)): corrija integration_branch no .claude/.onion-version (sem aspas)"
+      return 0
+    fi
+  fi
+  ok='^[A-Za-z0-9._/-]+ [0-9a-f]{40}$'
+  key="$("${GIT}" -C "${REPO}" remote get-url origin 2>/dev/null | cksum | awk '{print $1}')"
+  if [ -n "${ib}" ] && [ -z "${ibe}" ]; then
+    v="$(_src "origin-int-${key}-$(printf '%s' "${ib}" | cksum | awk '{print $1}')" 300 "${ok}" _origin_branch "${ib}")" || rc=$?
+    if [ -z "${v}" ]; then
+      if [ "${rc}" = 65 ]; then _row "base:${ib}" - - nao-medida "a branch de integração ${ib} (resolve-integration-branch.sh) não está no origin: publique-a ou grave integration_branch no .claude/.onion-version"
+      else _row base - - nao-medida "o origin inalcançável por git ls-remote (rc=${rc})"; fi
+      return 0
+    fi
+  else
+    v="$(_src "origin-head-${key}" 300 "${ok}" _origin)" || rc=$?
+    [ -n "${v}" ] || { _row base - - nao-medida "o origin inalcançável por git ls-remote --symref (rc=${rc})"; return 0; }
+  fi
   br="${v%% *}"; sha="${v##* }"
   cur="$("${GIT}" -C "${REPO}" rev-parse --short HEAD 2>/dev/null)"
   if "${GIT}" -C "${REPO}" merge-base --is-ancestor "${sha}" HEAD 2>/dev/null; then _row "base:${br}" "${cur}" "${sha:0:8}" em-dia "-"; return 0; fi

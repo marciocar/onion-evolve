@@ -334,7 +334,7 @@ grep -q "instância adotada\|adopted" "$REPO/CLAUDE.md" 2>/dev/null \
   && echo "✅ .claude/: core presente" || echo "❌ .claude/: incompleto — usar o rescue-prompt (core-only)"
 
 # 4. Adapter do task manager existe
-TM="$(grep "^TASK_MANAGER_PROVIDER" "$REPO/.env" 2>/dev/null | cut -d= -f2 | tr -d ' ')"
+TM="$(bash "$REPO/.claude/utils/task-manager/env-check.sh" --env "$REPO/.env" --provider 2>/dev/null)"
 [ -f "$REPO/.claude/utils/task-manager/adapters/${TM}.md" ] \
   && echo "✅ task-manager: adapter $TM presente" \
   || echo "⚠️  task-manager: adapter '$TM' não encontrado (ou provider não configurado)"

@@ -1,0 +1,65 @@
+# Duas curas do core para sinais de campo do hub brain-granaai (2026-10-19): C8 (o censo de atualidade comparava a
+# base com a branch padrão do origin, não com a de integração do Onion) e U5 (o índice da KB declarava uma contagem,
+# listava outra e o disco tinha uma terceira). A terceira cura da mesma leva (U4, o veto do .env) vive no grafo
+# docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml.
+meta:
+  id: field-hub-update-2026-10-19
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-20"
+  review_after: "2026-11-20"
+nodes:
+  - id: E_C8_BASE_CONTRA_A_PADRAO_DO_ORIGIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-20"
+    verified_against: "currency-census.sh da main 3831c4ac rodado sobre o checkout do hub (integração onion/develop, resolvida por gitflow.branch.develop): base:develop defasada, '5 commit(s) atrás de origin/develop: rebase sobre origin/develop'; com a cura, base:onion/develop em-dia"
+    trace: ".claude/validation/currency-census.sh"
+    label: "C8: o censo de atualidade comparava a base com a branch PADRÃO do origin; num hub cuja integração é onion/develop, mandou rebasear sobre a develop de produto"
+    narrative: "A perna base: lia `git ls-remote --symref origin HEAD`, que dá a padrão do repositório. Num adotante a padrão é do produto e a integração do Onion é outra (o resolve-integration-branch.sh, o mesmo do /engineer:pr, a acha pelo stamp, pelo gitflow.branch.develop ou pela develop local). A cura usa o resolvedor; só o palpite cego dele (sem sinal nenhum, avisado no stderr) cai no symref, e integração ausente do origin vira não medida, nunca a padrão."
+    provenance:
+      source: "sinal de campo do hub de 2026-10-19 (revisão do build-compliance-docs, achado 8), reproduzido no checkout do hub"
+      locator: "bash .claude/validation/currency-census.sh <hub> --fresh, main × cura; bancada currency_census caso (h6)"
+      method: "medição: o censo da main e o da cura sobre o mesmo checkout, só leitura (ls-remote)"
+      locality: "repo"
+  - id: E_U5_INDICE_KB_CONTAGEM_SEM_GUARDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-20"
+    verified_against: "kb-index-check.sh sobre o índice da main 3831c4ac: Conceitos declara 42, lista 44, disco 53; 35 arquivos de conteúdo fora do índice; decisions/ (13 ADRs) sem seção; estatística 75 contra 106 no disco. Depois da correção do índice: saída vazia"
+    trace: ".claude/validation/kb-index-check.sh"
+    label: "U5: o índice da KB declarava 42 conceitos, listava 44 e o disco tinha 53 — o único conflito do merge do update do hub, e nenhuma guarda comparava a contagem com o disco"
+    narrative: "O índice é escrito pelo /docs:build-index, que manda contar no scan; a prosa não impediu o esquecimento. A cura é a REGRA 110 (Índice da KB conta o que o disco tem): cada seção `## … (N)`, as estatísticas e a árvore conferidas contra o disco, e cada arquivo de conteúdo com entrada. HARD no core, SOFT no derivado (o índice vendorizado é do core). O índice foi corrigido no mesmo PR: 9 conceitos, 2 ferramentas, 2 plataformas, 1 padrão, 2 agentic e a seção nova de Decisões."
+    provenance:
+      source: "sinal de campo do hub de 2026-10-19 (dogfood do --update 59ebe7fe1288, achado 5), medido no core"
+      locator: "bash .claude/validation/kb-index-check.sh .; bancada kb_index casos (a)–(m)"
+      method: "medição: o check sobre o índice antes e depois da correção, e mutante por comparação"
+      locality: "repo"
+  - id: C_HUB_FIELD_SIGNALS_1019_CURED
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-20"
+    verified_against: "bancada: currency_census (h6) e kb_index (a)–(m) verdes, cada uma com mutante que morde; o censo sobre o checkout do hub dá base:onion/develop em-dia; o kb-index-check sobre o índice corrigido sai vazio"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "os achados C8 e U5 do hub de 2026-10-19 estão curados no core por mecanismo (a perna base: pelo resolvedor de integração e a REGRA 110), com bancada e mutante"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh (run_currency_census_selftests, run_kb_index_selftests)"
+      locator: "casos (h6) e (a)–(m)"
+      method: "medição: bancada com LC_ALL=C e mutante por cura"
+      locality: "repo"
+edges:
+  - from: E_C8_BASE_CONTRA_A_PADRAO_DO_ORIGIN
+    to: C_HUB_FIELD_SIGNALS_1019_CURED
+    edge_type: SUPPORTS
+  - from: E_U5_INDICE_KB_CONTAGEM_SEM_GUARDA
+    to: C_HUB_FIELD_SIGNALS_1019_CURED
+    edge_type: SUPPORTS

@@ -6009,6 +6009,42 @@ check_claude_md_size() {
 check_claude_md_size
 
 # ===========================================================================
+# REGRA 110 — Índice da KB conta o que o disco tem [HARD no core · SOFT no derivado]
+# previne: o índice de docs/knowledge-base declarar uma contagem e listar outra, com arquivos fora dele
+#   DANO MEDIDO (2026-10-19, sinal de campo de um hub adotante no --update): "Conceitos Fundamentais (42)",
+#   44 entradas, 53 arquivos em concepts/ — o único conflito do merge do update. No core, no mesmo dia: 35
+#   arquivos de conteúdo fora do índice e a pasta decisions/ sem seção. O /docs:build-index manda contar no
+#   scan; a prosa não impede o esquecimento, e nenhuma guarda comparava. Seção `## … (N)`, estatísticas e a
+#   árvore da estrutura são conferidas contra o disco, e cada arquivo de conteúdo tem de ter entrada.
+#   Lógica em kb-index-check.sh. No derivado é SOFT: a KB vendorizada pode ganhar KB local, e o índice é do core.
+# ===========================================================================
+check_kb_index_counts() {
+  local helper="${SCRIPT_DIR}/kb-index-check.sh"
+  [ -f "${helper}" ] || return 0
+  [ -f "${REPO_ROOT}/docs/knowledge-base/index.md" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/docs/knowledge-base/*|*/kb-index-check.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err _flag=""
+  [ "${IS_DERIVED}" -eq 1 ] && _flag="--derived"
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv ${_flag} 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-SOFT}" "${REPO_ROOT}/${_path}" "REGRA 110 (Índice da KB conta o que o disco tem): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "HARD" "${helper}" "REGRA 110 (Índice da KB conta o que o disco tem): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_kb_index_counts
+
+# ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
 _LINT_SUMMARY_REACHED=1   # daqui para baixo, a saida E veredito (ver o trap no topo)

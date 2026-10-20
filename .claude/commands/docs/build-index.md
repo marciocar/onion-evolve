@@ -78,6 +78,9 @@ Não assuma esta lista — confirme com `find docs -maxdepth 1 -type d`. Tipicam
 ## Notas
 
 - **Contagens vêm do scan**, nunca de memória — releia a estrutura a cada execução.
+- **O índice da KB é conferido no lint** (REGRA 110, `.claude/validation/kb-index-check.sh`): cada `## … (N)`, as
+  estatísticas e a árvore contra o disco, e cada arquivo de conteúdo precisa de entrada. Depois de regenerar
+  `docs/knowledge-base/index.md`, rode `bash .claude/validation/kb-index-check.sh .` — saída vazia é o "em dia".
 - Os 3 contextos são **spec-as-code** (`architecture.md §1.3`): vazios/template no framework, populados no projeto-alvo.
 - Este comando **não cria conteúdo** de contexto — para isso use `/docs:build-business-docs`, `/docs:build-tech-docs`, `/docs:build-compliance-docs`.
 

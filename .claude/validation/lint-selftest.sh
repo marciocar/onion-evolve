@@ -8189,6 +8189,47 @@ PYF
   r="$(env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_CACHE_DIR="${d}/cache" bash "${sut}" "${d}/r2" --fresh 2>/dev/null </dev/null | awk -F'\t' '{print $1"|"$4}')"
   [ "${r}" = "base:trunk|em-dia" ] && record_pass "currency-census: (h5) branch padrão trunk lida pelo symref ⇒ base:trunk em dia" \
     || record_fail "currency-census: (h5) branch padrão" "veio: ${r}"
+  # (h6) C8 (2026-10-20, sinal de campo de um hub adotante): a base é a branch de INTEGRAÇÃO do Onion, pelo
+  #      resolve-integration-branch.sh, não a padrão do origin. Fixture: o origin tem a padrão `develop` (a de
+  #      produto, que anda) e a integração `onion/develop` (gitflow.branch.develop); o checkout está na ponta da
+  #      integração. Antes da cura: "5 commits atrás de origin/develop" no hub, rebase sobre a branch errada.
+  #      Polaridades: integração em dia ⇒ em-dia mesmo com a padrão à frente; a integração anda ⇒ defasada citando
+  #      origin/onion/develop; integração fora do origin ⇒ não medida (nunca a padrão). Mutantes: o resolvedor
+  #      ausente (env) e a cura desligada no código têm de devolver o falso positivo.
+  ${g} init -q --bare "${d}/o6.git"; git -C "${d}/o6.git" symbolic-ref HEAD refs/heads/develop
+  ${g} clone -q "${d}/o6.git" "${d}/r6" 2>/dev/null; ${g} -C "${d}/r6" checkout -q -b develop 2>/dev/null
+  ${g} -C "${d}/r6" commit -q --allow-empty -m produto; ${g} -C "${d}/r6" push -q origin develop 2>/dev/null
+  ${g} -C "${d}/r6" checkout -q -b onion/develop 2>/dev/null; ${g} -C "${d}/r6" commit -q --allow-empty -m onion
+  ${g} -C "${d}/r6" push -q origin onion/develop 2>/dev/null; git -C "${d}/r6" config gitflow.branch.develop onion/develop
+  ${g} clone -q "${d}/o6.git" "${d}/r6b" 2>/dev/null
+  ${g} -C "${d}/r6b" commit -q --allow-empty -m p2; ${g} -C "${d}/r6b" push -q origin develop 2>/dev/null
+  _c3() { local s="$1"; shift; env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_NPM= ONION_CURRENCY_KG_SSOT_REMOTE= \
+            ONION_CURRENCY_CACHE_DIR="${d}/cache" "$@" bash "${s}" "${d}/r6" --fresh 2>/dev/null </dev/null | awk -F'\t' '$1 ~ /^base/{print $1"|"$4"|"$5}'; }
+  local h6a h6m1 h6m2 h6b h6c
+  h6a="$(_c3 "${sut}")"
+  h6m1="$(_c3 "${sut}" ONION_CURRENCY_RESOLVER="${d}/nao-existe.sh")"
+  sed 's/if \[ -n "\${ib}" \] && \[ -z "\${ibe}" \]; then/if false; then/' "${sut}" > "${d}/census-mut.sh"
+  cp "$(dirname "${sut}")/resolve-integration-branch.sh" "${d}/resolve-integration-branch.sh"
+  h6m2="$(_c3 "${d}/census-mut.sh")"
+  ${g} clone -q -b onion/develop "${d}/o6.git" "${d}/r6c" 2>/dev/null
+  ${g} -C "${d}/r6c" commit -q --allow-empty -m o2; ${g} -C "${d}/r6c" push -q origin onion/develop 2>/dev/null
+  git -C "${d}/r6" fetch -q origin 2>/dev/null
+  h6b="$(_c3 "${sut}")"
+  git -C "${d}/r6" config gitflow.branch.develop onion/nao-publicada
+  h6c="$(_c3 "${sut}")"
+  # (h6d) passada adversarial: integration_branch entre aspas no stamp volta com as aspas — não medida e nomeada,
+  #       nunca o recuo calado para a padrão (que é o falso positivo que a cura fecha)
+  mkdir -p "${d}/r6/.claude"; printf 'integration_branch: "onion/develop"\n' > "${d}/r6/.claude/.onion-version"
+  local h6d; h6d="$(_c3 "${sut}")"; rm -f "${d}/r6/.claude/.onion-version"
+  case "${h6d}" in "base|nao-medida|"*"não é um nome de branch"*) ;; *) h6c="FALHOU(aspas: ${h6d})" ;; esac
+  case "${h6a}" in "base:onion/develop|em-dia|-") ;; *) h6a="FALHOU(${h6a})" ;; esac
+  case "${h6m1}" in "base:develop|defasada|"*) ;; *) h6m1="MUTANTE-VIVO(${h6m1})" ;; esac
+  case "${h6m2}" in "base:develop|defasada|"*) ;; *) h6m2="MUTANTE-VIVO(${h6m2})" ;; esac
+  case "${h6b}" in "base:onion/develop|defasada|"*"origin/onion/develop"*) ;; *) h6b="FALHOU(${h6b})" ;; esac
+  case "${h6c}" in "base:onion/nao-publicada|nao-medida|"*"não está no origin"*) ;; *) h6c="FALHOU(${h6c})" ;; esac
+  if [[ "${h6a}${h6m1}${h6m2}${h6b}${h6c}" != *FALHOU* && "${h6a}${h6m1}${h6m2}${h6b}${h6c}" != *VIVO* ]]; then
+    record_pass "currency-census: (h6) a base é a integração do Onion (onion/develop) e não a padrão do origin: em dia, defasada pela integração, fora do origin não medida; 2 mutantes mordem"
+  else record_fail "currency-census: (h6) base pela integração" "a=${h6a} m1=${h6m1} m2=${h6m2} b=${h6b} c=${h6c}"; fi
   # (i) conta root, caminho com .. e symlink ⇒ recusados (não medido), nunca lidos
   printf 'bridge\troot\t%s\t-\n' "${d}/srv/node_modules/@anthropic-ai/claude-agent-sdk/package.json" > "${d}/t-root.tsv"
   printf 'bridge\t-\t%s/srv/../srv/node_modules/@anthropic-ai/claude-agent-sdk/package.json\t-\n' "${d}" > "${d}/t-dots.tsv"
@@ -11699,6 +11740,122 @@ GLPY
     if [ -z "${gl_out}" ]; then
       record_pass "env-exposure: (l) glob julgado pela regra do bash e pelo disco: as 5 formas medidas passam; pasta com prod.env, cd, subshell, .env na linha e glob com ponto seguem barrados"
     else record_fail "env-exposure: (l) glob" "casos divergentes (índice:esperado>veio): ${gl_out}"; fi
+  fi
+  # (u) U4 (2026-10-20, sinal de campo de um hub adotante + REPLAY dos vetos reais desta máquina): de 74 comandos
+  #     distintos vetados nos transcripts, a main barrava 57; com a cura, 15 — 12 deles leem valor (ficam por
+  #     desenho). Polaridade 0: CADA ocorrência medida (find com `\(` e -prune, grep -o que só imprime nome de
+  #     chave, heredoc do relatório citando .env.test por "$REPORT", o laço de rebase com `case … *)`, git grep em
+  #     docs/, resíduo com SHA=$(…), python por heredoc, helper por $H, glob por pasta literal). Polaridade 2: as
+  #     leituras de valor e os escapes que a passada achou (dois anteriores à cura: `echo "$(cat .env)"` e
+  #     `find … | xargs cat`). E os MUTANTES: cada cura revertida numa cópia tem de inverter o caso dela.
+  if [ -f "${guard}" ]; then
+    local u4_out
+    u4_out="$(python3 - "${guard}" <<'U4PY'
+import json, os, shutil, subprocess, sys, tempfile
+G = sys.argv[1]
+root = tempfile.mkdtemp()
+SEM, COM = os.path.join(root, 'sem'), os.path.join(root, 'com')
+os.makedirs(os.path.join(SEM, 'data')); os.makedirs(COM)
+open(os.path.join(SEM, 'data', 'a.tsv'), 'w').close(); open(os.path.join(COM, 'prod.env'), 'w').close()
+def t(guard, cmd, cwd):
+    p = subprocess.run(['bash', guard], input=json.dumps({'tool_name': 'Bash', 'tool_input': {'command': cmd}, 'cwd': cwd}),
+                       capture_output=True, text=True)
+    return p.returncode
+Q = "'"
+C = {
+ # polaridade 0 — as ocorrências medidas
+ 'find-paren': (0, "find ~/x -maxdepth 4 \\( -name node_modules -o -name .git \\) -prune -o \\( -name " + Q + ".env*" + Q + " -o -name " + Q + "*.env" + Q + " \\) -print 2>&1 | head -40", SEM),
+ 'find-prune': (0, "cd ~/x && find . \\( -name node_modules -o -name dist \\) -prune -o -type f -iname " + Q + "*env*" + Q + " -print | head", SEM),
+ 'grep-o-eq': (0, "grep -oE " + Q + "^#? ?ZOHO_[A-Z_]+=" + Q + " .env | sort -u", SEM),
+ 'grep-o-lit': (0, "grep -o " + Q + "^[A-Z_]*LINEAR[A-Z_]*" + Q + " .env | sort -u", SEM),
+ 'grep-o-grp': (0, "grep -HoiE " + Q + "^[[:space:]]*(export[[:space:]]+)?[A-Z_]*(CLICKUP|SLACK)[A-Z0-9_]*[[:space:]]*=" + Q + " .env", SEM),
+ 'report': (0, "W=/x; REPORT=\"$W/docs/evolution/inbound/r.md\"; cat > \"$REPORT\" <<" + Q + "EOF" + Q + "\n- o .env.test fica fora\nEOF", SEM),
+ 'rebase-loop': (0, "cd /tmp && for i in $(seq 1 3); do U=$(git diff --name-only --diff-filter=U); [ -z \"$U\" ] && break; for f in $U; do case \"$f\" in docs/onion/*.md|docs/onion/*.tsv) git checkout --theirs -- \"$f\";; *) echo \"NAO: $f\"; break 2;; esac; done; done", SEM),
+ 'case-src': (0, "(set -a; source .env >/dev/null 2>&1; set +a; k=\"${K:-}\"; case \"$k\" in lin_*) echo a;; \"\") echo vazia;; *) echo outra;; esac)", SEM),
+ 'git-grep': (0, "git grep -nE " + Q + "docs/" + Q + " -- " + Q + "apps/**/Dockerfile*" + Q + " | head", SEM),
+ 'residue': (0, "SHA=$(git diff | sha256sum | cut -c1-64); cat > docs/r.md <<EOF\nsha: $SHA\n- **Merge:** o .env.local\nEOF", SEM),
+ 'residue-nl': (0, "mkdir -p d\ncat > d/x.md <<" + Q + "E" + Q + "\n- **a:** .env\nE", SEM),
+ 'py-heredoc': (0, "cd " + SEM + " && python3 -I - <<" + Q + "EOF" + Q + "\nprint(2 ** 3)\nEOF", SEM),
+ 'py-timeout': (0, "cd " + SEM + " && timeout 60 python3 -I - <<" + Q + "EOF" + Q + "\nprint(2 ** 3)\nEOF", SEM),
+ 'helper-var': (0, "H=.claude/utils/task-manager/env-check.sh; bash $H --env ~/x/.env --provider", SEM),
+ 'assign-only': (0, "E=/etc/app.env; [ -e $E ] && echo existe", SEM),
+ 'glob-var': (0, "D=data; grep -n x $D/*", SEM),
+ # polaridade 2 — leituras de valor e escapes
+ 'cat': (2, "cat .env", SEM),
+ 'grep-line': (2, "grep " + Q + "^[A-Z_]*=" + Q + " .env", SEM),
+ 'grep-o-val': (2, "grep -oE " + Q + "^[A-Z_]+=.*" + Q + " .env", SEM),
+ 'grep-o-val2': (2, "grep -oE " + Q + "^ZOHO_[A-Z_]+=[A-Za-z0-9]*" + Q + " .env", SEM),
+ 'grep-o-alt': (2, "grep -oE " + Q + "^A|[A-Z]*=" + Q + " .env", SEM),
+ 'grep-o-range': (2, "grep -oE " + Q + "^[0-z]*=" + Q + " .env", SEM),
+ 'grep-o-ctx': (2, "grep -oA2 " + Q + "^[A-Z_]*=" + Q + " .env", SEM),
+ 'grep-c': (2, "grep -c x .env", SEM),
+ 'find-exec': (2, "find . \\( -name .env \\) -exec cat {} \\;", SEM),
+ 'xargs': (2, "find . -name .env | xargs cat", SEM),
+ 'dq-subst': (2, "echo \"$(cat .env)\"", SEM),
+ 'script-heredoc': (2, "cat > x.sh <<" + Q + "E" + Q + "\ncat .env\nE", SEM),
+ 'source-data': (2, "source notes.md", SEM),
+ 'data-exec': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\nbash x.md", SEM),
+ 'subst-heredoc': (2, "$(cat <<" + Q + "E" + Q + ")\ncat .env\nE", SEM),
+ 'group-pipe': (2, "{ cat <<" + Q + "E" + Q + "\ncat .env\nE\n} | bash", SEM),
+ 'subsh-pipe': (2, "( cat <<" + Q + "E" + Q + "\ncat .env\nE\n) | sh", SEM),
+ 'unquoted-subst': (2, "cat > x.md <<E\n$(cat .env)\nE", SEM),
+ 'py-cites': (2, "python3 - <<" + Q + "P" + Q + "\nprint(open('.env').read())\nP", SEM),
+ 'case-body': (2, "case x in a|b) echo;; *) head .env;; esac", SEM),
+ 'case-subst': (2, "case x in $(cat .env)) echo;; esac", SEM),
+ 'glob-var-env': (2, "D=" + COM + "; cat $D/*", SEM),
+ # 2ª passada adversarial (2026-10-20): flag permutada pelo getopt, arquivo de dados executado na mesma linha,
+ # .env por variável no prefixo do interpretador
+ 'grep-o-permuted': (2, "grep -oE " + Q + "^[A-Z_]+=" + Q + " .env -A3", SEM),
+ 'data-then-subst': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\nbash -c \"$(cat x.md)\"", SEM),
+ 'data-then-pipe': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\ncat x.md | bash", SEM),
+ 'py-env-prefix': (2, "F=.env python3 -I - <<" + Q + "P" + Q + "\nimport os;print(open(os.environ[" + Q + "F" + Q + "]).read())\nP", SEM),
+ 'residue-noext':(2, "SHA=$(git diff | sha256sum); cat > r <<" + Q + "E" + Q + "\n- **x:** .env\nE", SEM),
+}
+# mutantes: (rótulo, trecho da cura, trecho revertido, casos que TÊM de inverter)
+M = [
+ ('M1 \\( volta a ser operador', "cmd[i + 1] in '();&|<>' else", "cmd[i + 1] in '' else", ['find-paren', 'find-prune']),
+ ('M2 padrão do case volta a ser comando', "    plain = _segments_plain(toks)\n", "    plain = _segments_plain(toks)\n    return plain\n", ['rebase-loop', 'case-src']),
+ ('M3 grep -o de nomes volta ao veto', "name in GREPS and grep_names_only(args, seg)", "False", ['grep-o-eq', 'grep-o-lit', 'grep-o-grp']),
+ ('M4 heredoc de dados volta ao veto', "    data = bool(dests) and", "    data = False and bool(dests) and", ['report', 'residue']),
+ ('M5 substituição no prefixo volta a recusar', "or len(HEREDOC_ANY.findall(prefix)) != 1", "or len(HEREDOC_ANY.findall(prefix)) != 1 or '$(' in prefix", ['residue']),
+ ('M6 heredoc de interpretador volta a ser shell', "if name in INTERP and all(a in INTERP_STDIN_OK for a in args[1:]):", "if False:", ['py-heredoc']),
+ ('M7 substituição entre aspas não é julgada', "    for sub in substitutions(cmd):\n        r = judge(sub, depth + 1)", "    for sub in []:\n        r = judge(sub, depth + 1)", ['dq-subst']),
+ ('M8 subshell aberto antes do consumidor', "if _sp.count('(') != _sp.count(')'):", "if False:", ['subsh-pipe']),
+ ('M9 xargs na linha que cita .env', "if name == 'xargs' and CTX['strict']:", "if False:", ['xargs']),
+ ('M10 shell executando arquivo de dados', "if name in SHELLS | {'source', '.'}:", "if False:", ['source-data']),
+ ('M11 glob com variável literal', "lambda m: _av.get(m.group(1), m.group(0))", "lambda m: m.group(0)", ['glob-var']),
+ ('M12 segmento só de atribuição', "                    assigned[_k] = _v\n            continue\n", "                    assigned[_k] = _v\n", ['assign-only']),
+ ('M13 quebra de linha no prefixo do heredoc', "punctuation_chars=';&|()<>\\n')\n        lex.whitespace = ' \\t\\r'\n        lex.whitespace_split = True\n        lex.commenters = ''\n        toks = list(lex)\n    except", "punctuation_chars=';&|()<>')\n        lex.whitespace_split = True\n        lex.commenters = ''\n        toks = list(lex)\n    except", ['residue-nl']),
+ ('M14 parêntese contado por token', "_sp.count('(') != _sp.count(')')", "toks[:k].count('(') != toks[:k].count(')')", ['residue']),
+ ('M15 timeout diante do interpretador', "    if args[0] == 'timeout':", "    if False:", ['py-timeout']),
+ ('M16 o = tem de ser o último', "if '=' in body and (body.count('=') != 1 or not body.endswith('=')):", "if False:", ['grep-o-val2']),
+ ('M17 alternância no topo', "        elif c == '|':\n            if depth == 0:\n                return False", "        elif c == '|':\n            pass", ['grep-o-alt']),
+ ('M18 opção permutada depois do padrão', "if i < pi or x.startswith('-')]", "if i < pi]", ['grep-o-permuted']),
+ ('M19 dado executado na mesma linha', "if any(d[4] and cites_env(d[2]) and data_used_as_code(cmd, d[4]) for d in docs):", "if False:", ['data-then-subst', 'data-then-pipe']),
+ ('M20 .env na variável do interpretador', "if cites_env(body) or kind == 'interp-env':", "if cites_env(body):", ['py-env-prefix']),
+]
+bad = []
+for k, (e, c, w) in C.items():
+    g = t(G, c, w)
+    if g != e:
+        bad.append('%s:%d>%d' % (k, e, g))
+src = open(G, encoding='utf-8').read()
+mg = os.path.join(root, 'mut.sh')
+alive = []
+for lab, a, b, ks in M:
+    if src.count(a) != 1:
+        bad.append('%s: trecho ausente (%d)' % (lab, src.count(a))); continue
+    open(mg, 'w', encoding='utf-8').write(src.replace(a, b))
+    flipped = [k for k in ks if t(mg, C[k][1], C[k][2]) != C[k][0]]
+    if len(flipped) != len(ks):
+        alive.append('%s (não inverteu: %s)' % (lab, ','.join(k for k in ks if k not in flipped)))
+shutil.rmtree(root, ignore_errors=True)
+print(' '.join(bad + ['VIVO ' + a for a in alive]))
+U4PY
+)" || u4_out="o harness do caso (u) não rodou"
+    if [ -z "${u4_out}" ]; then
+      record_pass "env-exposure: (u) U4: as 16 formas medidas que não leem valor passam; 27 leituras de valor e escapes seguem barrados; os 20 mutantes de cura mordem"
+    else record_fail "env-exposure: (u) U4 (listar/nome de chave/prosa × ler valor)" "${u4_out}"; fi
   fi
   # (m) o caminho sancionado para a pergunta "a chave tem \r?": --lint fala por NOME, nunca pelo valor; e o
   #     leitor tira o \r final (uma chave colada de editor Windows saía com ele e virava HTTP 401)
@@ -36168,6 +36325,88 @@ run_claude_md_size_selftests() {
   rm -rf "${sd}"
 }
 _family run_claude_md_size_selftests
+
+# REGRA 110 (Índice da KB conta o que o disco tem) — U5, sinal de campo de um hub adotante (2026-10-19): o índice
+# dizia 42 conceitos, listava 44 e o disco tinha 53. Polaridades com fixture: índice coerente cala; contagem, entrada
+# faltando, pasta sem seção, estatística e árvore erradas acusam HARD; no derivado, SOFT; o dispatcher emite a REGRA;
+# e dois mutantes (sem a comparação da contagem, sem a da listagem) têm de calar o caso que os pega.
+run_kb_index_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/kb-index-check.sh"
+  [ -f "${chk}" ] || { record_fail "kb-index" "guarda ausente: ${chk}"; return; }
+  local o rc
+  if o="$(LC_ALL=C bash "${chk}" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${o}"; then record_pass "kb-index: (a) corpus real → rc 0, sem HARD (o índice do core conta o que o disco tem)"
+  else record_fail "kb-index: (a) corpus real" "rc=${rc}; ${o:0:240}"; fi
+  local f; f="$(mktemp -d)"
+  mkdir -p "${f}/docs/knowledge-base/concepts" "${f}/docs/knowledge-base/tools/sub" "${f}/docs/knowledge-base/decisions"
+  : > "${f}/docs/knowledge-base/concepts/a.md"; : > "${f}/docs/knowledge-base/concepts/b.md"
+  : > "${f}/docs/knowledge-base/tools/t.md"; : > "${f}/docs/knowledge-base/tools/sub/README.md"
+  cat > "${f}/docs/knowledge-base/index.md" <<'KBI'
+# Índice
+- **3 documentos de conteúdo**
+- **2** em `concepts/` · **1** em `tools/`
+
+```
+docs/knowledge-base/
+├── concepts/   # 2 — x
+└── tools/      # 1 — y
+```
+
+## 🧠 Conceitos (2)
+
+> prosa que cita [outra](tools/t.md) não é entrada
+
+- [A](concepts/a.md) — a
+- [B](concepts/b.md) — b
+
+## 🛠️ Ferramentas (1 + 1 README)
+
+- [T](tools/t.md) — t
+KBI
+  if o="$(LC_ALL=C bash "${chk}" "${f}" --format tsv 2>&1)" && [ -z "${o}" ]; then record_pass "kb-index: (b) índice coerente com o disco ⇒ cala (a prosa da seção que cita outra pasta não confunde)"
+  else record_fail "kb-index: (b) índice coerente" "${o:0:240}"; fi
+  # (b2) formas legítimas de entrada que a 1ª redação reprovava (passada adversarial): âncora, título, negrito, `./`,
+  #      lista numerada, uma pasta em duas seções e um `## X (9)` dentro de bloco cercado; e o inverso, a entrada
+  #      só em comentário HTML não conta como listada
+  local f2; f2="$(mktemp -d)"; mkdir -p "${f2}/docs/knowledge-base/concepts"
+  : > "${f2}/docs/knowledge-base/concepts/a.md"; : > "${f2}/docs/knowledge-base/concepts/b.md"; : > "${f2}/docs/knowledge-base/concepts/c.md"
+  printf '%s\n' '## C1 (2)' '' '- **[A](concepts/a.md#sec)** — a' '1. [B](./concepts/b.md "t") — b' '' '```' '## Falso (9)' '```' '' '### C2 (1) 🧠' '' '- [C](concepts/c.md)' > "${f2}/docs/knowledge-base/index.md"
+  local b2a b2b; b2a="$(LC_ALL=C bash "${chk}" "${f2}" --format tsv 2>&1)"
+  printf '%s\n' '## C (3)' '- [A](concepts/a.md)' '- [B](concepts/b.md)' '<!-- - [C](concepts/c.md) -->' > "${f2}/docs/knowledge-base/index.md"
+  b2b="$(LC_ALL=C bash "${chk}" "${f2}" --format tsv 2>&1)"; rm -rf "${f2}"
+  if [ -z "${b2a}" ] && grep -q 'FORA-DO-INDICE.*concepts/c.md' <<< "${b2b}"; then record_pass "kb-index: (b2) âncora, título, negrito, ./, lista numerada, pasta em 2 seções e cabeçalho em bloco cercado não acusam; entrada só em comentário HTML acusa"
+  else record_fail "kb-index: (b2) formas de entrada" "legítimas=${b2a:0:160} | comentário=${b2b:0:120}"; fi
+  : > "${f}/docs/knowledge-base/concepts/c.md"; : > "${f}/docs/knowledge-base/decisions/d.md"
+  o="$(LC_ALL=C bash "${chk}" "${f}" --format tsv 2>&1)"
+  local want miss=""
+  for want in 'HARD	CONTAGEM' 'HARD	FORA-DO-INDICE' 'HARD	PASTA-SEM-SECAO' 'HARD	ESTATISTICA' 'HARD	ARVORE'; do
+    grep -qF "${want}" <<< "${o}" || miss="${miss} [${want}]"
+  done
+  grep -q 'concepts/c.md' <<< "${o}" || miss="${miss} [não nomeou concepts/c.md]"
+  if [ -z "${miss}" ]; then record_pass "kb-index: (c) arquivo novo fora do índice e pasta sem seção ⇒ HARD por contagem, entrada faltando (nomeada), pasta, estatística e árvore"
+  else record_fail "kb-index: (c) deriva" "faltou:${miss}; veio: ${o:0:200}"; fi
+  o="$(LC_ALL=C bash "${chk}" "${f}" --format tsv --derived 2>&1)"
+  if grep -q '^SOFT' <<< "${o}" && ! grep -q '^HARD' <<< "${o}"; then record_pass "kb-index: (d) no derivado a mesma deriva é SOFT (o índice vendorizado é do core)"
+  else record_fail "kb-index: (d) derivado" "${o:0:200}"; fi
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; cp -a "${f}/docs" "${sd}/" 2>/dev/null
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/docs/knowledge-base/index.md" 2>&1 || true)"
+  if grep -q 'REGRA 110 (Índice da KB conta o que o disco tem): \[FORA-DO-INDICE\]' <<< "${l}"; then
+    record_pass "kb-index: (e) o lint de produção (dispatcher) emite a REGRA 110 sobre o índice defasado"
+  else record_fail "kb-index: (e) dispatcher" "$(grep -E 'REGRA 110|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
+  local m1 m2
+  sed "s/    if g\['n'\] != len(files):/    if False:/" "${chk}" > "${f}/m1.sh"
+  sed 's/    if falta:/    if False:/' "${chk}" > "${f}/m2.sh"
+  m1="$(LC_ALL=C bash "${f}/m1.sh" "${f}" --format tsv 2>&1 | grep -c '	CONTAGEM	' || true)"
+  m2="$(LC_ALL=C bash "${f}/m2.sh" "${f}" --format tsv 2>&1 | grep -c '	FORA-DO-INDICE	' || true)"
+  if [ "${m1}" = 0 ] && [ "${m2}" = 0 ] && ! cmp -s "${chk}" "${f}/m1.sh" && ! cmp -s "${chk}" "${f}/m2.sh"; then
+    record_pass "kb-index: (m) os 2 mutantes (sem a comparação da contagem, sem a da listagem) calam o achado que o caso (c) exige"
+  else record_fail "kb-index: (m) mutantes" "contagem sob M1=${m1} listagem sob M2=${m2} (esperado 0 e 0; o sed precisa casar)"; fi
+  rm -rf "${f}"
+}
+_family run_kb_index_selftests
 
 # REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) — SAC-83, medido ao vivo em 2026-10-11 (CC
 # 2.1.296, `claude -p` em sandbox): PreToolUse com script ausente saiu 127 e a ação RODOU; com onFailure: block
