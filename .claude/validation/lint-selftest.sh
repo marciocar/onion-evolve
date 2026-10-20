@@ -40689,7 +40689,7 @@ DEC_PY
   : > "${sb}/wt2/novo.txt"; "${G[@]}" -C "${sb}/wt2" add novo.txt; "${G[@]}" -C "${sb}/wt2" commit -q -m wt2
   if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-ok" bash "${sut}" "${r}" --tsv --cite "${sb}/cite.txt" 2>&1)"; then rc=0; else rc=$?; fi
   [ "${rc}" -eq 0 ] || _lb="${_lb} rc=${rc}"
-  head -1 <<< "${out}" | grep -q "${T}incoming${T}actor${T}action${T}hint\$" || _lb="${_lb} cabecalho"
+  grep -q "${T}incoming${T}actor${T}action${T}hint\$" <<< "${out%%$'\n'*}" || _lb="${_lb} cabecalho"
   grep -q "^merge${T}PR#7${T}.*${T}faço-eu${T}investigo e conserto o check vermelho: \`gh pr checks 7\`" <<< "${out}" || _lb="${_lb} merge-vermelho"
   grep -q "^checkpoint${T}docs/b/b.kg.yaml${T}.*${T}faço-eu${T}depois do \"selar\": \`bash .claude/validation/kg-drive-project.sh docs/b/b.kg.yaml --seal\`" <<< "${out}" || _lb="${_lb} checkpoint"
   grep -q "^triage${T}docs/evolution/inbox${T}.*${T}faço-eu${T}trio pelo comando da casa: \`/meta:co-evolve\`" <<< "${out}" || _lb="${_lb} triagem"
