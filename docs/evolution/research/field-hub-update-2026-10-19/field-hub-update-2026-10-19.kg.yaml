@@ -168,6 +168,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-20: «O co-relay recusa o adotante mandando sinal ao onion-kg-ssot (role adopted: canal lateral), mas o kg-ssot é upstream de produto de todo vendor/kg-ssot: que canal?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
+  - id: E_UPDATE_PROVA_BLOQUEIO_DO_GATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "prove-gate-blocks.sh contra um clone descartável de um adotante de campo (HEAD 985d4bc47936): controle rc 0, plantado rc 1 com a REGRA 8 citada, PROVADO em 172 s com a versão curada pela passada adversarial; hook trocado por eco: NÃO PROVADO rc 1; sem pre-commit: NÃO PROVADO rc 3; o repo real do adotante igual antes e depois"
+    trace: ".claude/utils/adopt/prove-gate-blocks.sh"
+    label: "o --update prova que o gate do alvo BARRA: planta drift da REGRA 8 num sandbox clonado do alvo, exige rc≠0 com a regra citada e confere que o checkout real não mudou; o relatório diz PROVADO ou NÃO PROVADO com motivo"
+    narrative: "Recorrência medida: em 11 updates seguidos o verify-adopter-gate.sh (core-only) só provou execução, porque com o lint limpo o bloqueio nunca é exercido, e a sessão do adotante fazia o commit-sonda à mão. A violação escolhida é uma linha a mais em docs/onion/inventory.md: um arquivo gerado que todo papel recebe, comparado byte a byte, sem acender outras regras. O commit de controle separa 'barra HARD' de 'barra tudo'. No dogfood, a 1ª foto do checkout incluía todas as refs e acusou o repo real de ter mudado: era uma branch commitada pela sessão do adotante noutra worktree; a foto passou a ser HEAD, branch, status e config, e o 2º dogfood viu de novo uma ref do adotante andar no meio da prova sem acusar falso. A passada adversarial derrubou a 1ª versão com um falso PROVADO (hook que barra tudo, lido como HARD pré-existente porque o lint imprime SOFT como VIOLATION) e três falsos NÃO PROVADO (pendente só stageado, hook no gitdir comum de worktree, hook symlink que lintava o alvo real); os quatro curados com caso e mutante. Custo: dois lints do alvo, 3 a 4 minutos sob a máquina carregada."
+    provenance:
+      source: ".claude/utils/adopt/prove-gate-blocks.sh e a família prove_gate_blocks de .claude/validation/lint-selftest.sh, nesta branch"
+      locator: "dogfood: 'bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)'; bancada: 8 casos e 5 mutantes"
+      method: "medição: o helper real contra um clone local descartável do adotante, e a bancada com mutante por decisão"
+      locality: "host"
 edges:
   - from: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE
     to: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
@@ -204,4 +220,8 @@ edges:
     edge_type: TRACES_TO
   - from: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
     to: D_CANAL_UPSTREAM_POR_VENDOR
+    edge_type: SUPPORTS
+external_edges:
+  - from: E_UPDATE_PROVA_BLOQUEIO_DO_GATE
+    to: "docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml#D_CURAR_O_GATE_INERTE_DO_ADOTANTE"
     edge_type: SUPPORTS
