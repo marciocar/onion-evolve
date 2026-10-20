@@ -128,6 +128,22 @@ nodes:
     confidence: 0.6
     label: "fase 2: o --update conduz a migração do corpus quando o remeasure-contract.sh acusa dívida MUST, chamando o kg_migrate.py e o perfil do adotante que o kg-ssot publicar na 4.13.0"
     narrative: "Gatilho: o kg-ssot publicar o kg_migrate.py e o schema do perfil (D_U1_MIGRADOR_NO_KG_SSOT). Até lá o relatório só diz o número e o caminho. A fase deriva-se fresca contra a ferramenta que sair, sem pré-cozinhar a interface."
+  - id: D_CANAL_UPSTREAM_POR_VENDOR
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Upstream por vendor»"
+    label: "Sinal do adotante ao upstream de um vendor (ex.: vendor/kg-ssot) vai direto ao dono: o co-relay aceita como destino o upstream declarado no carimbo do vendor, com entrega-sem-commit; a recusa de canal lateral entre adotantes continua."
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «Upstream por vendor»; descartadas: «Regra de repasse no core» · «Issue no GitHub do kg-ssot»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «O co-relay recusa o adotante mandando sinal ao onion-kg-ssot (role adopted: canal lateral), mas o kg-ssot é upstream de produto de todo vendor/kg-ssot: que canal?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
 edges:
   - from: E_C8_BASE_CONTRA_A_PADRAO_DO_ORIGIN
     to: C_HUB_FIELD_SIGNALS_1019_CURED
@@ -153,3 +169,6 @@ edges:
   - from: Q_U1_FASE2_MIGRACAO_CONDUZIDA
     to: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
     edge_type: DEPENDS_ON
+  - from: D_CANAL_UPSTREAM_POR_VENDOR
+    to: E_U1_SINAL_MIGRACAO_CORPUS_V4
+    edge_type: TRACES_TO
