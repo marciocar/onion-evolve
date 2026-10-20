@@ -2,7 +2,8 @@
 title: 'Resíduo — o co-relay entrega ao dono de um vendor, provado pelo carimbo'
 date: 2026-10-20
 branch: feat/co-relay-vendor-upstream
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0b41ae22480ee04181ec412481152a3b82383e392b91ce2ca922bd8894557657
+reviewed_code_sha256: c3f87dd034628774e188342843348972a268abd078ae33b24aa15b2e78750b06
 findings_total: 13
 findings_real: 7
 findings_fixed: 6
