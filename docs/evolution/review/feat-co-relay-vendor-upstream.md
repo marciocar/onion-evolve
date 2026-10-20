@@ -2,7 +2,7 @@
 title: 'Resíduo — o co-relay entrega ao dono de um vendor, provado pelo carimbo'
 date: 2026-10-20
 branch: feat/co-relay-vendor-upstream
-reviewed_diff_sha256: 0b41ae22480ee04181ec412481152a3b82383e392b91ce2ca922bd8894557657
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: c3f87dd034628774e188342843348972a268abd078ae33b24aa15b2e78750b06
 findings_total: 13
 findings_real: 7
@@ -36,3 +36,12 @@ nota: >-
 Teto: a prova identifica o dono pelo conteúdo da release, então um fork ou espelho do produto que tenha a tag
 e caixa também recebe. É o comportamento querido (o mesmo produto), e o rodapé declara o carimbo e a tag
 para a sessão de lá conferir.
+
+
+## Re-revisão depois do rebase (2026-10-20, sessão principal)
+
+O PR foi rebaseado sobre a `main`, que tinha recebido o #1236 (o selo `D_CANAL_UPSTREAM_POR_VENDOR`), o #1237 e o
+#1235. O hash de código mudou porque a base trouxe esse código. O diff deste PR não mudou de natureza. Conferido no
+grafo `field-hub-update-2026-10-19`: a decisão do #1236 e o nó de evidência deste PR convivem sem conflito, e o radar
+`--integrity --schema` sai 0. Entra a aresta que o agente deixou pendente:
+`E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY` SUPPORTS `D_CANAL_UPSTREAM_POR_VENDOR`, ligando a execução à decisão do maestro.
