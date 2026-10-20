@@ -2,7 +2,8 @@
 branch: fix/r16-cost-total-false-positive
 pr: pendente
 date: 2026-10-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f762a404f810e5cc5a80e4a3af8d542a5154780fe89b63a09bf9e6bedf80f279
+reviewed_code_sha256: 95c7591145a43a0461cbf1dd0e606fd9f01b73bc7b8c89a02f664be66047b6c1
 findings_total: 2
 findings_real: 2
 tokens: 0
