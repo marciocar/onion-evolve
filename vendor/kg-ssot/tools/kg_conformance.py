@@ -125,7 +125,7 @@ def run_cases(suite, validator, should_validator, proposals=None):
                 text = kg_validate.as_source(path.name, path.read_text(encoding="utf-8"))  # .kg.json: o perfil JSON
                 corpus = kg_validate.corpus_index(m.parent / case["corpus"]) if "corpus" in case else None
                 got_codes = sorted(set(kg_validate.codes(text, must_v, corpus)))
-                got_warn = sorted(set(kg_validate.warnings(text, must_v, should_v)))
+                got_warn = sorted(set(kg_validate.warnings(text, must_v, should_v, corpus)))
             except Exception as exc:  # noqa: BLE001 — o leitor caiu: falha DO CASO, o gate da pasta decide o rc
                 row.update({"pass": False, "emitted": None, "error": f"{exc.__class__.__name__}: {exc}"})
             else:

@@ -147,6 +147,17 @@ com o veredito mais estrito nos três, por decisão de contrato de 2026-10-19. T
 - o tab fora de aspas, de bloco literal e de comentário (como espaço ou dentro de um texto sem aspas), como no parser
   puro do PyYAML.
 Medido em 2026-10-20: nenhum dos 1.391 `.kg.yaml` de quatro repos adotantes muda de veredito.
+
+O v4.5 acrescenta quatro coisas:
+- `verified_scope`, opcional, o alcance do `verified_at` (`latest/form/verified-scope/`). O MUST só aceita a chave; no
+  SHOULD, o enum é `fato`, `mecanismo` ou `nenhum` (fora dele alerta `form.enum.node.verified_scope`), e
+  `verified_scope` sem `verified_at` alerta `form.required.node.verified_at`.
+- `privado` no enum de `provenance.locality`: documento fora do repo, não público e reverificável por quem tem acesso.
+- Com o corpus, a `REFUTES` que chega de outro grafo pelas `external_edges` a um nó vivo conta para
+  `integrity.refutes-unreconciled` (`latest/integrity/external-corpus/`); sem o corpus, não conta.
+- O tab no espaço inicial de uma linha de continuação de texto entre aspas reprova como `parse.yaml-error`, nos dois
+  leitores e pela mesma regra explícita (`latest/yaml/strict-profile/`).
+Medido em 2026-10-20: nenhum dos 1.457 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD.
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
 caso, não do código.
 
@@ -169,7 +180,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 294 casos contra o contrato v4, 30 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 312 casos contra o contrato v4, 30 deles
 `.kg.json`. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito

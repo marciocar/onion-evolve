@@ -39,7 +39,8 @@ A lista completa, com a forma de cada código, está em
 | `form.range.node.label` | Encurte o `label` para até 280 caracteres e mova o resto para `narrative` |
 | `form.pattern.node.provenance.method` | Use `<classe>: <detalhe>`, com a classe em `medição`, `leitura`, `juízes`, `derivado` ou `testemunho`. Reprova no v5 |
 | `form.required.node.verified_against` | Diga o que foi conferido no `verified_at` |
-| `form.required.node.verified_at` | Nó PROD sem `verified_at`: carimbe a última conferência |
+| `form.required.node.verified_at` | Nó PROD sem `verified_at`, ou com `verified_scope` sem a data: carimbe a última conferência |
+| `form.enum.node.verified_scope` | Use `fato`, `mecanismo` ou `nenhum` |
 | `integrity.untraced-decision` | Dê origem à decisão: `trace`, `provenance` ou uma aresta `TRACES_TO` |
 | `integrity.refutes-unreconciled` | O nó recebe `REFUTES` e segue valendo: o grafo afirma e refuta a mesma coisa. Se a refutação procede, mude o status do alvo para `refuted` ou `superseded`; se não procede, tire a aresta ou mude o status de quem refuta. Hoje é aviso, e vai reprovar numa versão futura do contrato |
 | `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`. Se o fato tem vigência futura (uma norma lida antes de entrar em vigor), o aviso é esperado e pode ficar na linha de base do gate. Se não, as datas estão trocadas: `valid_from` é quando o fato passou a valer, e `verified_at`, quando foi conferido |

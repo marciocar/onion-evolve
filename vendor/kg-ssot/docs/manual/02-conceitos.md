@@ -150,7 +150,8 @@ hífens, travessão ou `?` reprovam (`form.pattern.node.provenance.source`). Se 
 Fora dessa forma, o contrato v4 **alerta** (`form.pattern.node.provenance.method`). No v5 vai reprovar.
 
 Um quarto campo, opcional, `locality`, diz se a fonte é reverificável por terceiros: `repo` (arquivo versionado
-no mesmo repositório), `web` (endereço público), `host` (só existe numa máquina) ou `pessoa` (relato de alguém).
+no mesmo repositório), `web` (endereço público), `host` (só existe numa máquina), `pessoa` (relato de alguém) ou, desde a
+4.12.0, `privado` (fora do repo, não público e reverificável por quem tem acesso, como o Google Drive da empresa).
 
 ## O carimbo de verificação
 

@@ -1,5 +1,5 @@
 {
-  "description": "provenance.locality (v4.2): opcional, enum repo, web, host ou pessoa, validado só no SHOULD. Mede o que é reverificável por terceiros e permite barrar host na publicação.",
+  "description": "provenance.locality (v4.2): opcional, enum repo, web, host ou pessoa, validado só no SHOULD. Mede o que é reverificável por terceiros e permite barrar host na publicação. Desde o v4.5, o enum ganha privado: documento fora do repo, não público e reverificável por quem tem acesso (Google Drive, wiki interna); o valor segue onde está a cópia lida.",
   "layer": "form",
   "pending_on": [],
   "cases": [
@@ -44,6 +44,12 @@
       "warnings": [
         "form.enum.node.provenance.locality"
       ]
+    },
+    {
+      "file": "valid-locality-privado.kg.yaml",
+      "description": "provenance.locality: privado (v4.5), documento fora do repo, não público e reverificável por quem tem acesso",
+      "valid": true,
+      "codes": []
     }
   ]
 }

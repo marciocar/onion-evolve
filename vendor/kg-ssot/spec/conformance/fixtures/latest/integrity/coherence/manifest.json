@@ -1,5 +1,5 @@
 {
-  "description": "Coerência entre campos e arestas (v4.1): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision. Desde o v4.4, nó que recebe REFUTES e segue vivo (nem superseded nem refuted; a question done já está respondida) alerta integrity.refutes-unreconciled: é a contradição que o radar reprova, como aviso por enquanto.",
+  "description": "Coerência entre campos e arestas (v4.1): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision. Desde o v4.4, nó que recebe REFUTES e segue vivo (nem superseded nem refuted; a question done já está respondida) alerta integrity.refutes-unreconciled: é a contradição que o radar reprova, como aviso por enquanto. Desde o v4.5, a REFUTES que chega pelas external_edges conta só quando o leitor tem o corpus (latest/integrity/external-corpus/).",
   "layer": "integrity",
   "pending_on": [],
   "cases": [
@@ -170,6 +170,12 @@
       "warnings": [
         "integrity.refutes-unreconciled"
       ]
+    },
+    {
+      "file": "valid-external-refutes-without-corpus.kg.yaml",
+      "description": "REFUTES que chega de outro grafo, sem o corpus: a ponta externa não foi conferida, e a aresta não conta para o aviso",
+      "valid": true,
+      "codes": []
     }
   ]
 }

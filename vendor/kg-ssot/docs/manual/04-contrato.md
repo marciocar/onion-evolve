@@ -48,7 +48,11 @@ O v4 é uma versão **maior**: o que alertava passou a reprovar.
 | `form.pattern.node.provenance.source` (`source` marcador) | — | **MUST** |
 | `form.pattern.node.provenance.method` (fora de `<classe>: <detalhe>`) | — | SHOULD (MUST no v5) |
 
-As versões menores da linha 4 só acrescentaram, sem mudar o veredito MUST de um grafo bem escrito:
+As versões menores da linha 4 acrescentaram sem mudar o veredito MUST de um grafo bem escrito, com uma exceção
+registrada: a 4.11.0 e a 4.12.0 passaram a reprovar construções raras do YAML (o perfil estrito), e foram menores
+porque nenhum dos grafos reais medidos em quatro repos adotantes mudou de veredito. Mesmo assim, contam como MUST novo
+para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem rótulo próprio
+(v4.4 na 4.11.0, v4.5 na 4.12.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -59,6 +63,11 @@ As versões menores da linha 4 só acrescentaram, sem mudar o veredito MUST de u
 | 4.5 | O veredito estruturado `kg-ssot.verdict/1` (`kg_validate.py --format json`) |
 | 4.6 | O armazém que só grava o que o contrato aprova (`kg_store.py`) |
 | 4.7 | O servidor MCP de referência (`kg_mcp.py`) e o teto de aninhamento e de aliases do leitor |
+| 4.8 | O `.kg.json` como formato do contrato, lido no perfil JSON; o vendor com o próprio `.gitattributes` (4.8.1) e o veredito com a linha de cada ocorrência (4.8.2) |
+| 4.9 | O pacote PyPI (`kg-ssot`) e o npm; na 4.9.1, o armazém no Windows |
+| 4.10 | O servidor MCP pronto para produção: perfil atrás de proxy, as duas eras do protocolo, o gate externo por comando e a imagem OCI |
+| 4.11 | Contrato v4.4: o aviso `integrity.refutes-unreconciled` e o perfil YAML estrito em três construções raras (MUST novo) |
+| 4.12 | Contrato v4.5: `verified_scope`, `locality: privado`, a `REFUTES` externa contando com o corpus e o tab no começo de continuação entre aspas (MUST novo) |
 
 ## Versões e tags
 

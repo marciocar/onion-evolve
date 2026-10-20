@@ -74,7 +74,7 @@ def measure_texts(items, corpus=None):
     must, should = validators()
     out = {}
     for name, text in items:
-        counts = kg_validate.warning_counts(text, must, should)
+        counts = kg_validate.warning_counts(text, must, should, corpus)
         out[name] = {"must": kg_validate.codes(text, must, corpus), "should": sorted(counts), "should_counts": dict(counts)}
     return out
 

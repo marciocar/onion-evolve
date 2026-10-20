@@ -32,6 +32,7 @@ const MAX_DEPTH = 1000; // coleções abertas de uma vez (MAX_DEPTH da referênc
 const PROFILE_DEPTH = 128;
 const SLUG = /^[A-Za-z_][A-Za-z0-9_-]*$/;
 const EXTERNAL_REF = /^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml#[A-Za-z][A-Za-z0-9_]*$/;
+const isExternal = (ref) => typeof ref === 'string' && EXTERNAL_REF.test(ref); // is_external da referência
 const CORE_INT = /^(?:[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+)$/;
 const Y = 'tag:yaml.org,2002:';
 // O timestamp do YAML 1.1 (o resolvedor implícito do PyYAML, que o Yaml12CoreLoader da referência mantém): no 1.2
@@ -253,6 +254,8 @@ function strictTokenError(tokens) {
     if (typeof t.source === 'string') {
       if ((t.type === 'space' || t.type === 'scalar' || t.type === 'directive') && t.source.includes('\t')) return true;
       if (t.type === 'tag' && (t.source === '!' || t.source === '!<!>')) return true;
+      if ((t.type === 'single-quoted-scalar' || t.type === 'double-quoted-scalar')
+          && t.source.split(/\r\n|\r|\n/).slice(1).some((line) => /^[ \t]*/.exec(line)[0].includes('\t'))) return true;
     }
     for (const v of Object.values(t)) if (v !== null && typeof v === 'object') stack.push(v);
   }
@@ -638,13 +641,20 @@ function containsValue(value, hit) {
 /** Os avisos de coerência, que cruzam campos ou arestas (coherence_located da referência), um por ocorrência:
  * integrity.testimony-in-prod, integrity.verified-before-fact, integrity.untraced-decision e
  * integrity.refutes-unreconciled. */
-export function coherenceCodes(doc) {
+export function coherenceCodes(doc, corpus = null) {
   const out = [];
   const edges = Array.isArray(doc.edges) ? doc.edges : [];
   const traced = new Set(edges.filter((e) => isObj(e) && get(e, 'edge_type') === 'TRACES_TO' && typeof get(e, 'from') === 'string')
     .map((e) => e.from));
   const refuted = new Set(edges.filter((e) => isObj(e) && get(e, 'edge_type') === 'REFUTES' && typeof get(e, 'to') === 'string')
     .map((e) => e.to));
+  if (corpus !== null && corpus !== undefined) { // v4.5: a REFUTES que chega de outro grafo, só com o corpus (a ponta externa conferida)
+    const ext = Array.isArray(doc.external_edges) ? doc.external_edges : [];
+    for (const e of ext) {
+      if (isObj(e) && get(e, 'edge_type') === 'REFUTES' && isExternal(get(e, 'from'))
+          && typeof get(e, 'to') === 'string' && !isExternal(get(e, 'to'))) refuted.add(e.to);
+    }
+  }
   for (const n of located(doc, 'nodes')) {
     const prov = isObj(get(n, 'provenance')) ? n.provenance : {};
     const method = get(prov, 'method');
@@ -685,14 +695,14 @@ export function yamlProfileCodes(doc) {
 /** Os códigos SHOULD de um texto (warnings da referência), ordenados e sem repetição: o que o schema SHOULD acusa e o
  * MUST não, a data sem aspas e os avisos do perfil (só no .kg.yaml) e os de coerência. Texto que não parseia não
  * recebe aviso. */
-export function warnings(text, validate, validateShould, { format = 'yaml' } = {}) {
+export function warnings(text, validate, validateShould, { format = 'yaml', corpus = null } = {}) {
   const parsed = parse(text, format);
-  return parsed.code ? [] : warningsOf(parsed, validate, validateShould, format);
+  return parsed.code ? [] : warningsOf(parsed, validate, validateShould, format, null, corpus);
 }
 
 // Os avisos de um texto já parseado. mustCodes: os form.* do MUST, se quem chama já os tem (o verdictOf, para não
 // validar duas vezes).
-function warningsOf(parsed, validate, validateShould, format, mustCodes = null) {
+function warningsOf(parsed, validate, validateShould, format, mustCodes = null, corpus = null) {
   const { doc } = parsed;
   let must = mustCodes;
   if (must === null) {
@@ -705,7 +715,7 @@ function warningsOf(parsed, validate, validateShould, format, mustCodes = null) 
     if (parsed.unquotedDate) out.add('yaml.unquoted-date');
     for (const c of yamlProfileCodes(doc)) out.add(c);
   }
-  for (const c of coherenceCodes(doc)) out.add(c);
+  for (const c of coherenceCodes(doc, corpus)) out.add(c);
   return [...out].sort();
 }
 
@@ -718,6 +728,6 @@ export function verdictOf(text, validate, opts = {}) {
     return { verdict: 'reject', codes: [parsed.code], warnings: validateShould ? [] : null, detail: '' };
   }
   const { codes: found, mustForm } = docCodesWithForm(parsed.doc, validate, corpus, format);
-  const warned = validateShould ? warningsOf(parsed, validate, validateShould, format, mustForm) : null;
+  const warned = validateShould ? warningsOf(parsed, validate, validateShould, format, mustForm, corpus) : null;
   return { verdict: found.length ? 'reject' : 'accept', codes: found, warnings: warned, detail: '' };
 }

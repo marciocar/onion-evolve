@@ -1,5 +1,5 @@
 {
-  "description": "A ponta externa conferida contra o corpus (v4.3): o caso declara corpus, o diretório que faz de raiz do repo, e o arquivo e o id do alvo têm de existir nele (integrity.dangling-external). O leitor sem corpus reporta n/a.",
+  "description": "A ponta externa conferida contra o corpus (v4.3): o caso declara corpus, o diretório que faz de raiz do repo, e o arquivo e o id do alvo têm de existir nele (integrity.dangling-external). O leitor sem corpus reporta n/a. Desde o v4.5, com o corpus, a REFUTES que chega de outro grafo a um nó vivo deste conta para integrity.refutes-unreconciled.",
   "layer": "integrity",
   "pending_on": [],
   "cases": [
@@ -33,6 +33,30 @@
       "codes": [
         "integrity.dangling-external"
       ],
+      "corpus": "."
+    },
+    {
+      "file": "warn-corpus-external-refutes-live.kg.yaml",
+      "description": "REFUTES que chega de outro grafo a um nó vivo deste: com o corpus, alerta (v4.5)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ],
+      "corpus": "."
+    },
+    {
+      "file": "valid-corpus-external-refutes-refuted.kg.yaml",
+      "description": "a mesma REFUTES externa sobre um nó refuted: reconciliado, nada a alertar",
+      "valid": true,
+      "codes": [],
+      "corpus": "."
+    },
+    {
+      "file": "valid-corpus-external-refutes-outgoing.kg.yaml",
+      "description": "REFUTES deste grafo para um nó de outro: o alvo não está neste arquivo, e o aviso não sai aqui",
+      "valid": true,
+      "codes": [],
       "corpus": "."
     }
   ]
