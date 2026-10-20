@@ -377,9 +377,13 @@ def speaker_ids(turns):
     return ids
 
 
-def speaker_for(start: float, end: float, turns, ids):
-    """O falante de [start, end]: o de MAIOR sobreposição; sem sobreposição, o do turno mais próximo (a palavra que cai
-    numa pausa curta do diarizador fica com quem falava perto dela). Sem turno nenhum → None."""
+DIAR_NEAREST_MAX_GAP_S = 1.5  # palavra a mais disso de qualquer turno fica SEM falante (nada confiante sem sinal)
+
+
+def speaker_label(start: float, end: float, turns):
+    """O RÓTULO do falante de [start, end]: o de MAIOR sobreposição; sem sobreposição, o do turno mais próximo se ele
+    estiver a até DIAR_NEAREST_MAX_GAP_S (a palavra que cai numa pausa curta do diarizador fica com quem falava perto);
+    mais longe, ou sem turno nenhum → None."""
     best, best_ov = None, 0.0
     for s, e, lab in turns:
         ov = min(end, e) - max(start, s)
@@ -391,16 +395,42 @@ def speaker_for(start: float, end: float, turns, ids):
             gap = s - end if s >= end else (start - e if start >= e else 0.0)
             if near is None or gap < near[0]:
                 near = (gap, lab)
-        best = near[1] if near else None
-    return None if best is None else ids[best]
+        if near is not None and near[0] <= DIAR_NEAREST_MAX_GAP_S:
+            best = near[1]
+    return best
 
 
-def assign_speakers(words, turns):
-    """Cópia das palavras com `speaker` (int a partir de 0). Sem turnos, devolve as palavras sem a chave."""
+def speaker_for(start: float, end: float, turns, ids):
+    """O falante (inteiro) de [start, end] pelo mapa `ids`: ver speaker_label."""
+    lab = speaker_label(start, end, turns)
+    return None if lab is None else ids[lab]
+
+
+def word_speaker_ids(words, turns):
+    """O mapa rótulo → inteiro pela ordem da primeira PALAVRA de cada falante (os ids das palavras começam em 0 e não
+    têm buraco); falante sem palavra entra depois, pela ordem da primeira fala."""
+    ids = {}
+    for w in words:
+        lab = speaker_label(w["start"], w["end"], turns)
+        if lab is not None and lab not in ids:
+            ids[lab] = len(ids)
+    for lab in speaker_ids(turns):
+        if lab not in ids:
+            ids[lab] = len(ids)
+    return ids
+
+
+def assign_speakers(words, turns, ids=None):
+    """Cópia das palavras com `speaker` (int a partir de 0). Sem turnos, devolve as palavras sem a chave; palavra
+    longe de qualquer turno também fica sem ela."""
     if not turns:
         return [dict(w) for w in words]
-    ids = speaker_ids(turns)
-    return [dict(w, speaker=speaker_for(w["start"], w["end"], turns, ids)) for w in words]
+    ids = ids or word_speaker_ids(words, turns)
+    out = []
+    for w in words:
+        sp = speaker_for(w["start"], w["end"], turns, ids)
+        out.append(dict(w) if sp is None else dict(w, speaker=sp))
+    return out
 
 
 def diarize_segments(segments, turns):
@@ -409,22 +439,25 @@ def diarize_segments(segments, turns):
     origem (as probabilidades por token não chegam até aqui). Segmento sem palavras herda o falante pelo seu tempo."""
     if not turns:
         return [dict(s) for s in segments]
-    ids = speaker_ids(turns)
+    ids = word_speaker_ids([w for s in segments for w in (s.get("words") or [])], turns)
     out = []
     for seg in segments:
-        ws = assign_speakers(seg.get("words") or [], turns)
+        ws = assign_speakers(seg.get("words") or [], turns, ids)
         if not ws:
-            out.append(dict(seg, speaker=speaker_for(seg["start"], seg["end"], turns, ids)))
+            sp = speaker_for(seg["start"], seg["end"], turns, ids)
+            out.append(dict(seg) if sp is None else dict(seg, speaker=sp))
             continue
         runs = [[ws[0]]]
         for w in ws[1:]:
-            if w["speaker"] == runs[-1][-1]["speaker"]:
+            if w.get("speaker") == runs[-1][-1].get("speaker"):
                 runs[-1].append(w)
             else:
                 runs.append([w])
         for r in runs:
-            out.append(dict(seg, start=r[0]["start"], end=r[-1]["end"], text=" ".join(w["word"] for w in r), words=r,
-                            speaker=r[0]["speaker"]))
+            piece = dict(seg, start=r[0]["start"], end=r[-1]["end"], text=" ".join(w["word"] for w in r), words=r)
+            if r[0].get("speaker") is not None:
+                piece["speaker"] = r[0]["speaker"]
+            out.append(piece)
     for i, s in enumerate(out):
         s["id"] = i
     return out
@@ -466,13 +499,16 @@ def diarize(binary: str, model: str, wav: str, tmpdir: str, timeout_s: float, ru
         rttm = os.path.join(tmpdir, "diar-out.rttm")
         if not os.path.isfile(wav):
             return DiarResult("failed", "diarization input missing", None, 0.0)
+        if os.path.lexists(rttm):
+            os.unlink(rttm)  # RTTM de um canal anterior nunca vale por este (o binário que sai 0 sem escrever)
         try:
             p = run(diar_command(binary, model, wav, rttm), capture_output=True, timeout=timeout_s, check=False,
                     env=diar_env(tmpdir), cwd=tmpdir, stdin=subprocess.DEVNULL)
         except subprocess.TimeoutExpired:
             return DiarResult("failed", f"timeout ({timeout_s:.0f} s)", None, time.perf_counter() - t0)
         if p.returncode != 0:
-            tail = (p.stderr or b"")[-160:].decode(errors="replace").replace(tmpdir, "<tmp>").strip()
+            tail = (p.stderr or b"")[-160:].decode(errors="replace").replace(tmpdir, "<tmp>").replace(model, "<model>") \
+                .replace(binary, "<bin>").strip()
             return DiarResult("failed", f"diarizer rc={p.returncode}: {tail}", None, time.perf_counter() - t0)
         if not os.path.isfile(rttm):
             return DiarResult("failed", "diarizer wrote no RTTM", None, time.perf_counter() - t0)

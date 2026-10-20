@@ -10825,7 +10825,7 @@ run_stt_service_selftests() {
   [ -f "${helper}" ] || { record_fail "stt-service" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
   local d; d="$(mktemp -d)"
   # ── (a) o harness do núcleo e do smoke ──
-  local want_total=70 o rc
+  local want_total=75 o rc
   if o="$(LC_ALL=C python3 -I -B "${st}/selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} FAIL 0$" <<< "${o}"; then
     record_pass "stt-service: (a) núcleo e prova do verify — ${want_total} casos (token, credencial do systemd, 401, 413, palavras, formas, diarização, smoke que reprova)"
@@ -10883,8 +10883,8 @@ stt_core.py$(printf '\x1f')    if len({t[2] for t in turns}) > max_speakers:$(pr
 stt_core.py$(printf '\x1f')    for _s, _e, lab in sorted(turns, key=lambda t: (t[0], t[1])):$(printf '\x1f')    for _s, _e, lab in turns:  # ONION_MUTANTE$(printf '\x1f')speaker-ids-na-ordem-da-primeira-fala
 stt_core.py$(printf '\x1f')        if ov > best_ov:$(printf '\x1f')        if ov > 0 and best is None:  # ONION_MUTANTE$(printf '\x1f')speaker-maior-sobreposicao
 stt_core.py$(printf '\x1f')            if near is None or gap < near[0]:$(printf '\x1f')            if near is None:  # ONION_MUTANTE$(printf '\x1f')speaker-na-pausa-vai-ao-turno-mais-proximo
-stt_core.py$(printf '\x1f')    return [dict(w, speaker=speaker_for(w["start"], w["end"], turns, ids)) for w in words]$(printf '\x1f')    return [dict(w, speaker=0) for w in words]  # ONION_MUTANTE$(printf '\x1f')assign-speakers-em-cada-palavra
-stt_core.py$(printf '\x1f')            if w["speaker"] == runs[-1][-1]["speaker"]:$(printf '\x1f')            if True:  # ONION_MUTANTE$(printf '\x1f')diar-segmento-cortado-na-troca-de-falante
+stt_core.py$(printf '\x1f')        out.append(dict(w) if sp is None else dict(w, speaker=sp))$(printf '\x1f')        out.append(dict(w, speaker=0))  # ONION_MUTANTE$(printf '\x1f')assign-speakers-em-cada-palavra
+stt_core.py$(printf '\x1f')            if w.get("speaker") == runs[-1][-1].get("speaker"):$(printf '\x1f')            if True:  # ONION_MUTANTE$(printf '\x1f')diar-segmento-cortado-na-troca-de-falante
 stt_core.py$(printf '\x1f')        out["speaker"] = w["speaker"]$(printf '\x1f')        pass  # ONION_MUTANTE$(printf '\x1f')deepgram-palavra-leva-speaker
 stt_core.py$(printf '\x1f')    return [binary, "diarize", wav, "-m", model, "--device", "cpu", "--preset", "v3-offline", "--format", "rttm",$(printf '\x1f')    return [binary, "diarize", wav, "-m", model, "--device", "cpu", "--preset", "v3-streaming", "--format", "rttm",  # ONION_MUTANTE$(printf '\x1f')diarize-ok-com-o-comando-medido
 stt_core.py$(printf '\x1f')    return {"PATH": "/nonexistent", "HOME": tmpdir,$(printf '\x1f')    return {"PATH": "/usr/bin:/bin", "HOME": tmpdir,  # ONION_MUTANTE$(printf '\x1f')diarize-ambiente-fechado
@@ -10897,6 +10897,11 @@ stt_core.py$(printf '\x1f')        if not os.path.isfile(wav):$(printf '\x1f')  
 stt_core.py$(printf '\x1f')        w.setframerate(sample_rate)$(printf '\x1f')        w.setframerate(8000)  # ONION_MUTANTE$(printf '\x1f')diarize-wav-e-o-mesmo-audio
 stt_core.py$(printf '\x1f')        if status not in DIAR_STATUSES:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')diar-status-fora-do-vocabulario-recusa
 stt_core.py$(printf '\x1f')    return 120.0 + 0.5 * max(duration_s, 0.0)$(printf '\x1f')    return 120.0  # ONION_MUTANTE$(printf '\x1f')diar-timeout-escala-com-a-duracao
+stt_core.py$(printf '\x1f')        if near is not None and near[0] <= DIAR_NEAREST_MAX_GAP_S:$(printf '\x1f')        if near is not None:  # ONION_MUTANTE$(printf '\x1f')speaker-longe-de-turno-fica-sem-falante
+stt_core.py$(printf '\x1f')    ids = ids or word_speaker_ids(words, turns)$(printf '\x1f')    ids = ids or speaker_ids(turns)  # ONION_MUTANTE$(printf '\x1f')speaker-ids-pela-primeira-palavra
+stt_core.py$(printf '\x1f')            os.unlink(rttm)  # RTTM de um canal anterior$(printf '\x1f')            pass  # ONION_MUTANTE RTTM de um canal anterior$(printf '\x1f')diarize-rttm-velho-nao-conta
+stt_core.py$(printf '\x1f')        if os.path.getsize(rttm) > DIAR_RTTM_MAX_BYTES:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')diarize-rttm-grande-vira-failed
+stt_core.py$(printf '\x1f').replace(model, "<model>")$(printf '\x1f').replace("ONION_MUTANTE", "<model>")$(printf '\x1f')diarize-stderr-sem-caminho-do-modelo
 smoke.py$(printf '\x1f')    turns, need = meta["turns"], meta["min_speaker_agreement"]$(printf '\x1f')    turns, need = meta["turns"], 1.01  # ONION_MUTANTE$(printf '\x1f')smoke-diar-aprova-servidor-correto
 smoke.py$(printf '\x1f')        elif not words or any(not isinstance(w.get("speaker"), int) for w in words):$(printf '\x1f')        elif not words:  # ONION_MUTANTE$(printf '\x1f')smoke-diar-reprova-sem-falante
 smoke.py$(printf '\x1f')            (ok if ag >= need and n == n_ref else bad)(f"Deepgram diarize:$(printf '\x1f')            (ok if True or "ONION_MUTANTE" else bad)(f"Deepgram diarize:$(printf '\x1f')smoke-diar-reprova-um-falante-so
@@ -11001,7 +11006,7 @@ PY
     rm -rf "${d}/run"; mkdir -p "${d}/run/units" "${d}/run/fk"
     local F="${d}/run/fk"
     printf '%s\n' ActiveState=active MainPID=4242 "FragmentPath=${d}/run/units/onion-vps-stt.service" DropInPaths= MemoryMax=6442450944 \
-      MemorySwapMax=0 MemoryCurrent=2000000000 'IPAddressDeny=0.0.0.0/0 ::/0' 'IPAddressAllow=127.0.0.0/8 ::1/128' DynamicUser=yes \
+      MemorySwapMax=0 MemoryCurrent=2000000000 OOMPolicy=continue 'IPAddressDeny=0.0.0.0/0 ::/0' 'IPAddressAllow=127.0.0.0/8 ::1/128' DynamicUser=yes \
       ProtectHome=yes NRestarts=0 NeedDaemonReload=no > "${F}/show"
     echo inv-1 > "${F}/inv"
     printf 'LISTEN 0 2048 127.0.0.1:8765 0.0.0.0:* users:(("python",pid=4242,fd=6))\n' > "${F}/ss"
@@ -11057,7 +11062,7 @@ PY
   local U; U="$(_st_reset; _st_env "${wr}" show)"
   local miss=""
   for want in 'ExecStart=.* --host 127.0.0.1 ' '^DynamicUser=yes$' '^ProtectHome=yes$' '^ProtectSystem=strict$' '^PrivateTmp=yes$' \
-              '^NoNewPrivileges=yes$' '^IPAddressDeny=any$' '^IPAddressAllow=localhost$' '^MemoryMax=6G$' '^MemorySwapMax=0$' \
+              '^NoNewPrivileges=yes$' '^IPAddressDeny=any$' '^IPAddressAllow=localhost$' '^MemoryMax=6G$' '^MemorySwapMax=0$' '^OOMPolicy=continue$' \
               '^LoadCredential=token:' '^CapabilityBoundingSet=$' '^Environment=HF_HUB_OFFLINE=1 ' \
               'ExecStart=.* --diar-bin [^ ]*/bin/nemo-speech-0\.2\.0-cpu@f396057150f1/nemo-speech-0\.2\.0-linux-x86_64-cpu/bin/nemo-speech ' \
               'ExecStart=.* --diar-model [^ ]*/models/nemotron-3-diarization-q8_0@f667ed73aee5/Nemotron-3-Diarization\.q8_0\.gguf ' \
@@ -11182,9 +11187,21 @@ PY
   _p_reload() { _p_live; sed -i "s/^NeedDaemonReload=.*/NeedDaemonReload=yes/" "${d}/run/fk/show"; }
   _stcase "(w21) verify com a unit em disco diferente da carregada → rc 1" 1 'NeedDaemonReload' \
     '  [ "$(sed -n '"'"'s/^NeedDaemonReload=//p'"'"' <<<"${show}")" = no ] || {' '  true || { : ONION_MUTANTE;' _p_reload verify
+  _p_oom() { _p_live; sed -i 's|^OOMPolicy=.*|OOMPolicy=stop|' "${d}/run/fk/show"; }
+  _stcase "(w26) verify com OOMPolicy=stop (o OOM do filho derrubaria a unit) → rc 1" 1 'OOMPolicy efetivo' \
+    '  [ "$(sed -n '"'"'s/^OOMPolicy=//p'"'"' <<<"${show}")" = continue ] || {' '  true || { : ONION_MUTANTE;' _p_oom verify
   _p_swap() { _p_live; sed -i 's|^MemorySwapMax=.*|MemorySwapMax=infinity|' "${d}/run/fk/show"; }
   _stcase "(w19) verify com swap liberado → rc 1" 1 'MemorySwapMax efetivo' \
     '  [ "$(sed -n '"'"'s/^MemorySwapMax=//p'"'"' <<<"${show}")" = 0 ] || {' '  true || { : ONION_MUTANTE;' _p_swap verify
+  # (w27) a extração do binário do diarizador é FILTRADA (tarfile filter="data") e a sonda não roda como root: pela FORMA,
+  # porque o stage_diar_bin só roda no --apply (o download real); o mutante tira o filtro e tem de reprovar
+  _st_tarform() { grep -qF 'extractall(sys.argv[2], filter="data")' "$1" && grep -qF 'setpriv --reuid=65534' "$1"; }
+  cp "${wr}" "${d}/wops/stt-service.sh"
+  if _st_tarform "${wr}" && ! LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" \
+       'extractall(sys.argv[2], filter="data")|||extractall(sys.argv[2])  # ONION_MUTANTE' \
+       bash -c "$(declare -f _st_tarform); _st_tarform '${d}/wops/stt-service.sh'" >/dev/null 2>&1; then
+    record_pass "stt-service: (w27) extração do diarizador filtrada e sonda sem root, pela FORMA (o download real é do --apply; o mutante sem filtro reprova)"
+  else record_fail "stt-service: (w27) forma da extração" "sem filter=\"data\" ou sem setpriv no stage_diar_bin, ou o mutante passou"; fi
   # (w23) digest do asset do diarizador no GitHub diferente do fixado · (w24) sha256 do gguf publicado diferente ·
   # (w25) a prova (verify e unit transitória) recebe o fixture de 2 falantes
   _p_ghbad() { _p_free; sed -i 's/f396057150f1b774935c7414fd32ebc04195a795a34120d78d8c9ecefa1b7507/'"$(printf 'd%.0s' $(seq 64))"'/' "${d}/run/fk/gh-release.json"; }
@@ -11231,7 +11248,7 @@ PY
       record_pass "stt-service: (s) amarração do AuthGate/BodyLimit e recusa de host pela FORMA (sem o venv neste host: o server.py real NÃO rodou aqui; roda com ONION_STT_SELFTEST_PY ou a área instalada)"
     else record_fail "stt-service: (s) forma da amarração" "o build_app não devolve core.AuthGate(core.BodyLimit(...)) ou o mutante passou"; fi
   else
-    local so src_ok=18
+    local so src_ok=22
     if so="$(cd / && LC_ALL=C "${spy}" -I -B "${st}/server_selftest.py" 2>&1)"; then rc=0; else rc=$?; fi
     if [ "${rc}" = 0 ] && grep -qE "^TOTAL ${src_ok} FAIL 0$" <<<"${so}"; then
       record_pass "stt-service: (s) server.py real com motor falso — ${src_ok} casos (401 amarrado, loopback, teto de duração, 413 chunked, fila, diarização que nunca derruba)"
@@ -11256,18 +11273,23 @@ PY
     except (RuntimeError, OSError) as e:  # LibsndfileError é RuntimeError: arquivo corrompido é 400, nunca 500$(printf '\x1f')    except ZeroDivisionError as e:  # ONION_MUTANTE$(printf '\x1f')srv-flac-corrompido-400
            *([] if multichannel else ["-ac", "1"]), "-c:a", "pcm_s16le", "-fs", str(fs), "-y", out]$(printf '\x1f')           *([] if multichannel else ["-ac", "1"]), "-c:a", "pcm_s16le", "-y", out]  # ONION_MUTANTE$(printf '\x1f')srv-ffmpeg-fs-limita-disco
         if state["inflight"] >= a.queue_max:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-fila-cheia-429
-                            words = core.assign_speakers(words, diar.turns)$(printf '\x1f')                            pass  # ONION_MUTANTE$(printf '\x1f')srv-diarize-deepgram-speaker-por-palavra
+                        words = core.assign_speakers(words, diar.turns)$(printf '\x1f')                        pass  # ONION_MUTANTE$(printf '\x1f')srv-diarize-deepgram-speaker-por-palavra
             body["metadata"]["onion_diarization"] = [d.public() for d in diars]$(printf '\x1f')            pass  # ONION_MUTANTE$(printf '\x1f')srv-diarize-falha-nao-derruba-a-transcricao
-            except Exception as e:  # noqa: BLE001 — exceção do diarizador vira failed, nunca 500$(printf '\x1f')            except ZeroDivisionError as e:  # ONION_MUTANTE$(printf '\x1f')srv-diarize-excecao-nao-derruba-a-transcricao
+        except Exception as e:  # noqa: BLE001 — exceção do diarizador vira failed, nunca 500$(printf '\x1f')        except ZeroDivisionError as e:  # ONION_MUTANTE$(printf '\x1f')srv-diarize-excecao-nao-derruba-a-transcricao
                 segments = core.diarize_segments(segments, diar.turns)$(printf '\x1f')                pass  # ONION_MUTANTE$(printf '\x1f')srv-diarize-openai-verbose-com-falante
             if want_diar and fmt != "verbose_json":$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')srv-diarize-openai-verbose-com-falante
-                self.early = core.DiarResult("unavailable", "diarization not configured on this server")$(printf '\x1f')                pass  # ONION_MUTANTE$(printf '\x1f')srv-diarize-sem-diarizador-declara-unavailable
-            elif self.dur > a.diar_max_s:$(printf '\x1f')            elif False:  # ONION_MUTANTE$(printf '\x1f')srv-diarize-acima-do-teto-declara-skipped
+            return None, core.DiarResult("unavailable", "diarization not configured on this server")$(printf '\x1f')            return None, None  # ONION_MUTANTE$(printf '\x1f')srv-diarize-sem-diarizador-declara-unavailable
+        if dur > a.diar_max_s:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')srv-diarize-acima-do-teto-declara-skipped
             if not (os.path.isfile(a.diar_bin) and os.access(a.diar_bin, os.X_OK)):$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')srv-diarize-boot-recusa-diarizador-ausente
+                    r[5] = diar_run(wav, early, dur, td)$(printf '\x1f')                    r[5] = diar_run(*pend[0], td)  # ONION_MUTANTE$(printf '\x1f')srv-diarize-multicanal-cada-canal
+                del audio  # o float32 do canal sai da memória ANTES de qualquer filho do diarizador subir$(printf '\x1f')                chans[i] = audio  # ONION_MUTANTE$(printf '\x1f')srv-diarize-float-solto-antes-do-filho
+            pcm = (np.clip(audio, -1.0, 1.0) * 32767.0).astype("<i2")$(printf '\x1f')            pcm = (audio * 32767.0).astype("<i2")  # ONION_MUTANTE$(printf '\x1f')srv-diarize-wav-com-clip
+                shutil.rmtree(td, ignore_errors=True)$(printf '\x1f')                pass  # ONION_MUTANTE$(printf '\x1f')srv-diarize-temporario-limpo
+            hdr["X-Diarization"] = dstat$(printf '\x1f')            pass  # ONION_MUTANTE$(printf '\x1f')srv-diarize-deepgram-speaker-por-palavra
 EOF_SMUT
   fi
   unset -f _st_hfjson _st_reset _st_env _st_install_rendered _st_stage_all _stcase _st_post_ok _p_none _p_live _p_free _p_pyver _p_hfbad \
-    _p_pypibad _p_ghbad _p_hfdiarbad _st_ghjson _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap _p_halfdeny _p_reload _st_ast
+    _p_pypibad _p_oom _p_ghbad _p_hfdiarbad _st_ghjson _st_tarform _p_portother _p_wide _p_smokefail _p_smokecut _p_mem _p_sha _p_drift _p_apply _p_prefail _st_env_capture _p_dropin _p_allow _p_swap _p_halfdeny _p_reload _st_ast
   rm -rf "${d}"
 }
 

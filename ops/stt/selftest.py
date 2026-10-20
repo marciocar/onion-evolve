@@ -618,6 +618,46 @@ try:
             ok = w.getnchannels() == 1 and w.getsampwidth() == 2 and w.getframerate() == 16000 and w.readframes(10 ** 6) == pcm
         return ok, "o WAV do diarizador não é o áudio recebido"
 
+    @case("speaker-longe-de-turno-fica-sem-falante")
+    def _():
+        ws = [{"word": "a", "start": 1.0, "end": 1.2}, {"word": "longe", "start": 40.0, "end": 40.3}]
+        got = core.assign_speakers(ws, TURNS)
+        return got[0].get("speaker") == 0 and "speaker" not in got[1], f"{got}"
+
+    @case("speaker-ids-pela-primeira-palavra")
+    def _():
+        turns = [(0.0, 1.0, "q"), (5.0, 6.0, "z"), (8.0, 9.0, "q")]
+        got = core.assign_speakers([{"word": "x", "start": 5.2, "end": 5.4}, {"word": "y", "start": 8.2, "end": 8.4}], turns)
+        return [w["speaker"] for w in got] == [0, 1], f"{got}"
+
+    @case("diarize-rttm-velho-nao-conta")
+    def _():
+        d, p = fake_bin("exit 0")
+        td = tempfile.mkdtemp()
+        TMPDIRS.append(td)
+        with open(os.path.join(td, "diar-out.rttm"), "w") as f:
+            f.write("SPEAKER x 1 0 1 <NA> <NA> velho <NA> <NA>\n")
+        wav = os.path.join(td, "in.wav")
+        core.write_wav16(wav, b"\0\0" * 100, 16000)
+        r = core.diarize(p, "m", wav, td, 10)
+        return r.status == "failed" and "no RTTM" in r.reason, f"{r.status} {r.reason}"
+
+    @case("diarize-rttm-grande-vira-failed")
+    def _():
+        old = core.DIAR_RTTM_MAX_BYTES
+        core.DIAR_RTTM_MAX_BYTES = 10
+        try:
+            r, _, _ = run_diar(WRITE_RTTM)
+        finally:
+            core.DIAR_RTTM_MAX_BYTES = old
+        return r.status == "failed" and "too large" in r.reason, f"{r.status} {r.reason}"
+
+    @case("diarize-stderr-sem-caminho-do-modelo")
+    def _():
+        r, d, _ = run_diar('printf "erro lendo %s\\n" "$4" >&2; exit 1')
+        model = os.path.join(d, "model.gguf")
+        return r.status == "failed" and model not in r.reason and "<model>" in r.reason, f"{r.reason}"
+
     @case("diar-status-fora-do-vocabulario-recusa")
     def _():
         try:
