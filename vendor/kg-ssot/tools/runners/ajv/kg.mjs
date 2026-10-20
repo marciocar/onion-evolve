@@ -9,7 +9,10 @@
 //   - formCodes: os erros do JSON Schema traduzidos para form.<tipo>.<escopo>.<campo> (form_codes);
 //   - unsafeIntegerCodes: o inteiro fora de ±(2^53−1) no .kg.json, form.type no caminho do .nan (unsafe_integer_codes);
 //   - integrity: ids únicos, pontas de aresta, órfãos e external_edges (integrity_located);
-//   - codes: tudo junto, ordenado e sem repetição (code_counts/codes).
+//   - codes: tudo junto, ordenado e sem repetição (code_counts/codes);
+//   - warnings: os avisos SHOULD (warnings da referência): o schema SHOULD sem o que o MUST já acusa, a data sem
+//     aspas, os três avisos do perfil no .kg.yaml (yaml.unsafe-integer, yaml.lone-surrogate, yaml.depth-over-128)
+//     e os de coerência (coherence_located).
 import { parseAllDocuments, isAlias, isMap, isPair, isScalar, isSeq } from 'yaml';
 
 // format: date é asserção (ADR 002): AAAA-MM-DD que existe no calendário, ano de 0001 a 9999, como o
@@ -24,13 +27,18 @@ export const DATE_RE = new RegExp(
 export const AJV_OPTIONS = { allErrors: true, strict: false, verbose: true, formats: { date: DATE_RE } };
 
 const MAX_DEPTH = 1000; // coleções abertas de uma vez (MAX_DEPTH da referência)
-// coleções aninhadas que o perfil do modelo admite (PROFILE_DEPTH da referência): MUST no .kg.json. No .kg.yaml a
-// referência só avisa (yaml.depth-over-128), e este leitor não mede aviso: lá ele deixa passar.
+// coleções aninhadas que o perfil do modelo admite (PROFILE_DEPTH da referência): MUST no .kg.json. No .kg.yaml é
+// só aviso (yaml.depth-over-128), medido por warnings().
 const PROFILE_DEPTH = 128;
 const SLUG = /^[A-Za-z_][A-Za-z0-9_-]*$/;
 const EXTERNAL_REF = /^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml#[A-Za-z][A-Za-z0-9_]*$/;
 const CORE_INT = /^(?:[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+)$/;
 const Y = 'tag:yaml.org,2002:';
+// O timestamp do YAML 1.1 (o resolvedor implícito do PyYAML, que o Yaml12CoreLoader da referência mantém): no 1.2
+// core ele é texto, mas um leitor 1.1 o leria como data, e por isso a forma sem aspas avisa (yaml.unquoted-date).
+const YAML11_TIMESTAMP = new RegExp('^(?:[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
+  + '|[0-9][0-9][0-9][0-9]-[0-9][0-9]?-[0-9][0-9]?(?:[Tt]|[ \\t]+)[0-9][0-9]?:[0-9][0-9]:[0-9][0-9](?:\\.[0-9]*)?'
+  + '(?:[ \\t]*(?:Z|[-+][0-9][0-9]?(?::[0-9][0-9])?))?)$');
 
 class ParseError extends Error {
   constructor(code) { super(code); this.code = code; }
@@ -137,9 +145,16 @@ function tooDeep(root) {
 // Converte a árvore de um documento no valor que a referência constrói. Alias compartilha o valor (como o
 // PyYAML), âncora repetida e alias sem âncora são erro de composição, chave composta é erro, e chave repetida
 // é comparada na forma JSON (1 e "1" colidem; 1 e 1.0, não).
-function convertDocument(doc) {
+function convertDocument(doc, marks = {}) {
   const anchors = new Map();
   const built = new Map();
+  // a data sem aspas, em chave ou valor: escalar plain na forma do timestamp 1.1, ou com a tag !!timestamp
+  const noteDate = (node) => {
+    if (node.tag === `${Y}timestamp`
+        || (!node.tag && node.type === 'PLAIN' && typeof node.value === 'string' && YAML11_TIMESTAMP.test(node.value))) {
+      marks.unquotedDate = true;
+    }
+  };
   const walk = (node) => {
     if (node === null || node === undefined) return null;
     if (isAlias(node)) {
@@ -152,6 +167,7 @@ function convertDocument(doc) {
       anchors.set(node.anchor, node);
     }
     if (isScalar(node)) {
+      noteDate(node);
       const v = scalarOf(node).value;
       built.set(node, v);
       return v;
@@ -179,6 +195,7 @@ function convertDocument(doc) {
         let key = 'null';
         if (keyNode !== null && keyNode !== undefined) {
           if (!isScalar(keyNode)) throw new ParseError('parse.yaml-error'); // chave composta (mapa ou lista)
+          noteDate(keyNode);
           key = scalarOf(keyNode).key;
         }
         if (seen.has(key)) throw new ParseError('parse.duplicate-key');
@@ -216,7 +233,7 @@ const codePoints = (text) => {
   return n;
 };
 
-/** O parse do .kg.yaml no perfil do contrato: { doc } ou { code: 'parse.*' }. */
+/** O parse do .kg.yaml no perfil do contrato: { doc, unquotedDate } ou { code: 'parse.*' }. */
 export function parseYaml(text) {
   let docs;
   try {
@@ -228,11 +245,12 @@ export function parseYaml(text) {
   }
   if (!Array.isArray(docs)) docs = [docs]; // EmptyStream é lista; um documento só também vem como lista
   const raw = [];
+  const marks = {};
   try {
     for (const d of docs) {
       if (d.errors.length) return { code: 'parse.yaml-error' };
       if (d.contents && tooDeep(d.contents)) return { code: 'parse.yaml-error' };
-      raw.push(convertDocument(d));
+      raw.push(convertDocument(d, marks));
     }
   } catch (exc) {
     if (exc instanceof ParseError) return { code: exc.code };
@@ -243,7 +261,7 @@ export function parseYaml(text) {
   if (!present.length) return { code: 'parse.empty-document' };
   if (raw.length !== 1) return { code: 'parse.not-single-document' };
   if (!isObj(raw[0])) return { code: 'parse.root-not-mapping' };
-  return { doc: raw[0] };
+  return { doc: raw[0], unquotedDate: Boolean(marks.unquotedDate) };
 }
 
 // ---------------------------------------------------------------- JSON
@@ -403,8 +421,9 @@ export function formCodes(err, doc) {
   let scope = path.length ? scopeOf(path) : 'top';
   const prefix = scope !== 'top' ? innerNames(path) : path.filter(notIndex);
   if (err.propertyName !== undefined) { // dentro de propertyNames: o nome da chave
-    if (err.keyword === 'pattern') return [`form.pattern.${scope}.${[...prefix, 'key'].join('.')}`];
-    if (!SLUG.test(err.propertyName)) return [];
+    // só o nome que não é slug é form.pattern (<<, 1.0, chave com espaço). O ajv achata os ramos do anyOf (enum OU
+    // ^x_): o pattern ^x_ que falha num nome slug é a mesma chave desconhecida, como no form_codes da referência
+    if (!SLUG.test(err.propertyName)) return err.keyword === 'pattern' ? [`form.pattern.${scope}.${[...prefix, 'key'].join('.')}`] : [];
     return [`form.unknown-key.${scope}.${[...prefix, err.propertyName].join('.')}`];
   }
   let kind = FORM_TYPE[err.keyword] || err.keyword;
@@ -531,13 +550,20 @@ export function integrity(doc, corpus = null, refs = ['trigger', 'on']) {
 /** Os códigos MUST de um documento já parseado: lista ordenada, sem repetição. format 'json': o inteiro inseguro
  * também reprova (no YAML ele só avisaria, e este leitor não mede aviso). */
 export function docCodes(doc, validate, corpus = null, format = 'yaml') {
-  const out = new Set();
-  if (!validate(doc)) for (const err of validate.errors || []) for (const c of formCodes(err, doc)) out.add(c);
+  return docCodesWithForm(doc, validate, corpus, format).codes;
+}
+
+// docCodes e, à parte, os form.* que o próprio validador MUST acusou (o `must` do warning_counts da referência, sem
+// os do .nan nem os do inteiro inseguro).
+function docCodesWithForm(doc, validate, corpus, format) {
+  const mustForm = new Set();
+  if (!validate(doc)) for (const err of validate.errors || []) for (const c of formCodes(err, doc)) mustForm.add(c);
+  const out = new Set(mustForm);
   for (const c of nonFiniteCodes(doc)) out.add(c);
   if (format === 'json') for (const c of unsafeIntegerCodes(doc)) out.add(c);
   for (const c of integrity(doc, corpus)) out.add(c);
   if (located(doc, 'edges').some((e) => has(e, 'on'))) out.add('yaml.forbidden-key-on');
-  return [...out].sort();
+  return { codes: [...out].sort(), mustForm };
 }
 
 /** O parse do formato pedido: 'yaml' (o default) ou 'json'. */
@@ -562,8 +588,101 @@ export function indexTexts(items) {
   return index;
 }
 
-/** A linha do contrato de runner para um texto: { verdict, codes, warnings: null, detail }. */
+// ---------------------------------------------------------------- avisos (SHOULD)
+
+const ISO_PREFIX = /^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$/;
+const TESTIMONY_METHOD = /^testemunho: /;
+// Só espaço no sentido do str.isspace do Python (o strip da referência): o trim() do JS tira o U+FEFF, que o Python
+// não tira, e não tira \x1c a \x1f nem o \x85, que o Python tira
+const PY_BLANK = /^[\t-\r\x1c-\x20\x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]*$/;
+
+/** Algum VALOR sob value (ele incluído; as chaves não) satisfaz hit? Sem recursão (_contains da referência). */
+function containsValue(value, hit) {
+  const stack = [value];
+  while (stack.length) {
+    const v = stack.pop();
+    if (hit(v)) return true;
+    if (Array.isArray(v)) stack.push(...v);
+    else if (isObj(v)) stack.push(...Object.values(v));
+  }
+  return false;
+}
+
+/** Os avisos de coerência, que cruzam campos ou arestas (coherence_located da referência), um por ocorrência:
+ * integrity.testimony-in-prod, integrity.verified-before-fact e integrity.untraced-decision. */
+export function coherenceCodes(doc) {
+  const out = [];
+  const edges = Array.isArray(doc.edges) ? doc.edges : [];
+  const traced = new Set(edges.filter((e) => isObj(e) && get(e, 'edge_type') === 'TRACES_TO' && typeof get(e, 'from') === 'string')
+    .map((e) => e.from));
+  for (const n of located(doc, 'nodes')) {
+    const prov = isObj(get(n, 'provenance')) ? n.provenance : {};
+    const method = get(prov, 'method');
+    if (get(n, 'plane') === 'PROD'
+        && (get(n, 'evidence_class') === 'testimony' || (typeof method === 'string' && TESTIMONY_METHOD.test(method)))) {
+      out.push('integrity.testimony-in-prod');
+    }
+    const vf = get(n, 'valid_from');
+    const va = get(n, 'verified_at');
+    if (typeof vf === 'string' && typeof va === 'string' && ISO_PREFIX.test(vf) && ISO_PREFIX.test(va)) {
+      const k = Math.min(vf.length, va.length);
+      if (va.slice(0, k) < vf.slice(0, k)) out.push('integrity.verified-before-fact');
+    }
+    const trace = get(n, 'trace');
+    if (get(n, 'node_type') === 'decision' && !['superseded', 'refuted'].includes(get(n, 'status'))
+        && !(typeof trace === 'string' && !PY_BLANK.test(trace)) && !Object.keys(prov).length
+        && !(typeof get(n, 'id') === 'string' && traced.has(n.id))) {
+      out.push('integrity.untraced-decision');
+    }
+  }
+  return out;
+}
+
+/** Os avisos do perfil JSON no .kg.yaml (yaml_profile_warnings): no .kg.json eles são MUST e reprovam antes. */
+export function yamlProfileCodes(doc) {
+  const out = [];
+  if (containsValue(doc, isUnsafeInteger)) out.push('yaml.unsafe-integer');
+  if (hasLoneSurrogate(doc)) out.push('yaml.lone-surrogate');
+  if (collectionDepth(doc) > PROFILE_DEPTH) out.push('yaml.depth-over-128');
+  return out;
+}
+
+/** Os códigos SHOULD de um texto (warnings da referência), ordenados e sem repetição: o que o schema SHOULD acusa e o
+ * MUST não, a data sem aspas e os avisos do perfil (só no .kg.yaml) e os de coerência. Texto que não parseia não
+ * recebe aviso. */
+export function warnings(text, validate, validateShould, { format = 'yaml' } = {}) {
+  const parsed = parse(text, format);
+  return parsed.code ? [] : warningsOf(parsed, validate, validateShould, format);
+}
+
+// Os avisos de um texto já parseado. mustCodes: os form.* do MUST, se quem chama já os tem (o verdictOf, para não
+// validar duas vezes).
+function warningsOf(parsed, validate, validateShould, format, mustCodes = null) {
+  const { doc } = parsed;
+  let must = mustCodes;
+  if (must === null) {
+    must = new Set();
+    if (!validate(doc)) for (const err of validate.errors || []) for (const c of formCodes(err, doc)) must.add(c);
+  }
+  const out = new Set();
+  if (!validateShould(doc)) for (const err of validateShould.errors || []) for (const c of formCodes(err, doc)) if (!must.has(c)) out.add(c);
+  if (format !== 'json') {
+    if (parsed.unquotedDate) out.add('yaml.unquoted-date');
+    for (const c of yamlProfileCodes(doc)) out.add(c);
+  }
+  for (const c of coherenceCodes(doc)) out.add(c);
+  return [...out].sort();
+}
+
+/** A linha do contrato de runner para um texto: { verdict, codes, warnings, detail }. Sem validateShould, warnings
+ * é null: o leitor não mediu o SHOULD. */
 export function verdictOf(text, validate, opts = {}) {
-  const found = codes(text, validate, opts);
-  return { verdict: found.length ? 'reject' : 'accept', codes: found, warnings: null, detail: '' };
+  const { format = 'yaml', corpus = null, validateShould = null } = opts;
+  const parsed = parse(text, format); // um parse só para o MUST e o SHOULD (o parse é quase todo o custo)
+  if (parsed.code) {
+    return { verdict: 'reject', codes: [parsed.code], warnings: validateShould ? [] : null, detail: '' };
+  }
+  const { codes: found, mustForm } = docCodesWithForm(parsed.doc, validate, corpus, format);
+  const warned = validateShould ? warningsOf(parsed, validate, validateShould, format, mustForm) : null;
+  return { verdict: found.length ? 'reject' : 'accept', codes: found, warnings: warned, detail: '' };
 }

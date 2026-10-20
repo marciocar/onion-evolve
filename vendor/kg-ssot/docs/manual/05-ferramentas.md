@@ -90,7 +90,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.9.1",
+  "release": "kg-ssot-v4.10.0",
   "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
@@ -302,7 +302,7 @@ feito: se o commit ou o evento falha, ela volta ao que era, e a exceção sobe p
 O CLI tem um subcomando por operação, com a saída em JSON no stdout:
 
 ```text
-kg_store.py --backend disk|git|versioned --root DIR [--init] list
+kg_store.py --backend disk|git|versioned --root DIR [--init] [--gate-cmd CMD [--gate-timeout S]] list
 kg_store.py ... read NOME [--ref REF]
 kg_store.py ... write NOME [ARQUIVO|-] [--message M] [--author "Nome <email>"] [--expected-sha256 S|new]
 kg_store.py ... delete NOME [--message M] [--author A] [--expected-sha256 S]
@@ -351,7 +351,9 @@ python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana \
 - **`reason`:** é `null` quando gravou. `"gate"` quer dizer que o contrato reprovou, e o `verdict` diz onde.
   `"conflict"` quer dizer que o `expected_sha256` não bate com a cabeça. `"missing"` aparece ao remover o que não
   existe. `"not_judged"` aparece quando o julgamento falhou ou saiu fora de `spec/verdict.schema.json`: nunca vira
-  PASS nem `"gate"`, para quem chama distinguir "reprovou" de "não deu para julgar".
+  PASS nem `"gate"`, para quem chama distinguir "reprovou" de "não deu para julgar". Com um gate externo, `"gate"`
+  com `error: "reprovado pelo gate externo"` quer dizer que o contrato aprovou e o gate de fora reprovou; o `verdict`
+  é o dele.
 - **A trava otimista:** `expected_sha256` é o sha256 da cabeça que quem grava leu, ou `NEW` (no CLI, `new`) para
   exigir que o nome ainda não exista. Gravar o mesmo texto da cabeça dá `written` com `unchanged` e sem commit.
 - **O caminho:** o nome é relativo, termina em `.kg.yaml` ou `.kg.json` e não tem `..` nem segmento oculto. Para o
@@ -372,6 +374,58 @@ python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana \
   git, o `seq` do evento no versionado.
 - **O git isolado:** o `GitStore` não lê a config do sistema nem a do usuário (sem hooks, sem gpg, sem `autocrlf`, sem
   arquivo de exclusão), então o que ele guarda é byte a byte o texto aprovado, com o sha256 do resultado.
+- **O gate externo (`--gate-cmd`):** é o gancho por onde quem adota liga um segundo gate, o dele, sem o produto
+  depender desse gate. O comando roda depois de o contrato aprovar, em cada gravação e cada remoção, e o armazém só
+  grava com PASS dos dois. Um grafo que o contrato reprova nunca chega ao comando.
+  - **A entrada:** o texto candidato vai pelo stdin em UTF-8 (vazio na remoção); leia-o como bytes e decodifique, para
+    não depender da página de código do sistema. O nome e a operação vão pelo ambiente, `KG_GATE_NAME` e `KG_GATE_OP`
+    (`write` ou `delete`). O comando herda o resto do ambiente do processo, menos a variável do segredo do `kg_mcp`
+    (`--secret-env`).
+  - **A saída:** um documento `kg-ssot.verdict/1` válido por `spec/verdict.schema.json`, com ao menos um resultado, rc
+    0 quando tudo passa e rc 1 quando algo reprova, e no máximo 16 MiB (o teto vale enquanto ele roda). O stderr do
+    gate é descartado: para diagnosticar, rode o comando à mão com o mesmo stdin e o mesmo ambiente. O código de uma ocorrência tem de começar por uma camada do contrato (`parse.`, `form.`,
+    `integrity.` ou `yaml.`); um gate de fora usa, por exemplo, `integrity.external.<nome>`.
+  - **Fail-closed:** comando que não roda, que passa de `--gate-timeout` (padrão 60 s, no máximo 86.400), que sai sem JSON, com saída
+    grande demais, com JSON fora do schema ou sem resultado, com rc fora de 0 e 1 ou com rc que não bate com o veredito
+    dá `"not_judged"`, nunca PASS, e nada é gravado. No tempo esgotado, numa interrupção (Ctrl+C), num SIGTERM ao
+    processo ou com a saída grande demais, morrem o comando e os processos que ele abriu. No Windows, matar o processo
+    à força (o "Finalizar tarefa") não deixa tratador nenhum agir, e o gate que estiver rodando pode ficar. No macOS e no Linux, um processo que o gate deixa
+    rodando depois de terminar bem também é morto (o grupo de processos dele); no Windows, não, e o gate de quem adota
+    não deve deixar nada para trás. `--gate-cmd ""` dá rc 2, para uma variável vazia nunca subir um servidor sem gate;
+    `--gate-timeout` sem `--gate-cmd` e, no `kg_mcp.py`, `--gate-cmd` com `--read-only` (o gate nunca rodaria) também
+    dão rc 2.
+  - **A trava:** o gate roda sob a trava da gravação. Um gate lento segura as outras gravações do mesmo armazém até o
+    `--gate-timeout`; no stdio, segura o servidor.
+  - **O mesmo texto:** gravar de novo o texto da última versão também passa pelo gate. Se ele reprovar agora, a
+    resposta é `"gate"`, mesmo sem nada a mudar.
+  - **Sem shell:** o comando é uma lista de argumentos, nunca uma linha de shell. No macOS e no Linux, a linha passa
+    pelas regras do `shlex` (a barra invertida escapa; ponha o caminho entre aspas). No Windows, as aspas duplas
+    agrupam e a barra invertida fica como está, como no comando `"C:\Program Files\Python\python.exe" C:\gates\x.py`.
+    As aspas valem em volta do argumento inteiro: `--opt="a b"` vira dois argumentos, e aspas simples não agrupam.
+    O texto do grafo só chega pelo stdin, então `$(...)` ou `;` nele não executam nada.
+  - **Pela biblioteca:** `open_store(..., gate=CommandGate(argv, timeout))`, ou qualquer chamável
+    `(nome, texto, op) -> (veredito, erro)`. Um chamável que levanta também dá `"not_judged"`.
+
+  Um gate de exemplo, só com a biblioteca padrão, que reprova o texto com a palavra PROIBIDO:
+
+  ```python
+  import json, os, sys
+  bad = "PROIBIDO" in sys.stdin.buffer.read().decode("utf-8")
+  occ = [{"level": "MUST", "code": "integrity.external.palavra-proibida", "place": "arquivo", "path": "",
+          "line": None, "message": "o texto tem uma palavra proibida"}] if bad else []
+  print(json.dumps({"schema_version": "kg-ssot.verdict/1",
+                    "contract": {"must": None, "should": None, "release": None, "sha256": {"must": None, "should": None}},
+                    "results": [{"source": os.environ["KG_GATE_NAME"], "verdict": "FAIL" if bad else "PASS",
+                                 "summary": {"MUST": {occ[0]["code"]: 1} if bad else {}, "SHOULD": {}},
+                                 "occurrences": occ, "total": len(occ), "truncated": False,
+                                 "external_checked": False}]}))
+  sys.exit(1 if bad else 0)
+  ```
+
+  ```bash
+  python3 -I tools/kg_store.py --backend versioned --root areas/ana --init \
+    --gate-cmd "python3 -I gates/proibido.py" write grafos/a.kg.yaml grafo.kg.yaml
+  ```
 - **O que fica com quem adota, de propósito:** autenticação, identidade, área por usuário (um root por usuário),
   tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock` nem `msvcrt`.
 - **O rc do CLI:** 0 gravou ou leu, 1 recusado (`gate`, `conflict`, `missing`, nome inexistente) e 2 entrada
@@ -423,9 +477,14 @@ Uma configuração de cliente por stdio, com um armazém versionado fora do repo
 | `--init` | Cria a raiz se não existir |
 | `--author "Nome <email>"` | Quem assina as gravações |
 | `--read-only` | Tira `kg_write` e `kg_delete` |
-| `--http PORTA` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote` |
+| `--http PORTA` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote`, que exige `--secret-env` |
+| `--secret-env VAR` · `--secret-header H` | O segredo compartilhado, lido da variável `VAR`, que cada requisição HTTP traz no header `H` (padrão `X-Api-Key`), comparado por hmac |
+| `--identity-header H` | O perfil "atrás de proxy": a identidade de cada requisição vem do header `H` (um e-mail), com área e autor próprios; exige `--secret-env` |
 | `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
+| `--max-graphs N` | Grafos por armazém, ou por área no perfil; além disso, um nome novo é recusado |
+| `--max-concurrent N` | Requisições HTTP ao mesmo tempo; além disso, 503 |
 | `--store-optional` | Raiz que não abre não derruba o servidor: ele sobe sem armazém e diz o motivo ao modelo |
+| `--gate-cmd CMD` · `--gate-timeout S` | Um gate externo depois do contrato, em toda gravação e remoção, também por área no perfil (veja o `kg_store.py`) |
 
 Uma gravação recusada, como o modelo a recebe (o `structuredContent`, abreviado):
 
@@ -445,8 +504,8 @@ Uma gravação recusada, como o modelo a recebe (o `structuredContent`, abreviad
 A resposta de `tools/call` traz o mesmo objeto em `structuredContent` e, como texto JSON, em `content`. Uma
 gravação recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir e tentar de novo.
 
-- **Quem assina:** o autor das gravações é o `--author` do servidor, nunca um argumento da ferramenta. O modelo não
-  escolhe quem assina.
+- **Quem assina:** o autor das gravações é o `--author` do servidor ou, no perfil "atrás de proxy", a identidade
+  autenticada da requisição. Nunca é um argumento da ferramenta: o modelo não escolhe quem assina.
 - **Os limites:** `--max-bytes` (padrão 2.000.000) limita o texto de um grafo. Os argumentos são conferidos contra o
   `inputSchema` que o `tools/list` anuncia: tipo errado, campo obrigatório ausente e campo desconhecido voltam como
   `isError`. Uma falha interna vira o erro JSON-RPC -32603, e o processo segue atendendo.
@@ -457,15 +516,118 @@ gravação recusada ou um nome inexistente vem com `isError: true`, para o model
 - **O protocolo:** uma mensagem por vez; lote JSON-RPC é recusado (saiu do MCP em 2025-06-18), e o id tem de ser texto
   ou inteiro. O stdio lê e escreve UTF-8 como bytes, independente do locale, e a resposta sai em JSON ASCII.
 - **O HTTP:** escuta em `127.0.0.1` por padrão. Recusa `Origin` cujo host não seja de loopback (contra DNS
-  rebinding), `MCP-Protocol-Version` desconhecida (400) e corpo sem `Content-Length`. Não há autenticação nem TLS: o
-  servidor só sai do loopback com `--allow-remote`, para rodar atrás de um proxy que faça os dois.
+  rebinding), `MCP-Protocol-Version` desconhecida (400) e corpo sem `Content-Length`. Não há TLS: o servidor só sai do
+  loopback com `--allow-remote`, que exige `--secret-env`, para rodar numa rede privada atrás de um proxy com TLS.
+- **O perfil "atrás de proxy" (`--identity-header`):** é o modo para um cliente com muitos usuários, como o LibreChat,
+  que manda o usuário logado num header.
+  - **Recusa por padrão:** toda requisição traz a identidade (um e-mail) e o segredo compartilhado. Sem identidade,
+    com identidade vazia (o LibreChat troca um placeholder ausente por texto vazio) ou malformada, ou com o segredo
+    errado, a resposta é 401, antes de qualquer ferramenta.
+  - **Área e autor:** cada identidade grava na própria área sob `--root`, num diretório `u-<nome>-<hash>`, e não
+    enxerga a dos outros. A gravação é assinada por ela, na forma `parte-local <e-mail>`. O e-mail não distingue
+    caixa: `Ana@X.org` e `ana@x.org` são a mesma identidade.
+  - **Por requisição:** identidade, área e autor viajam num contexto de cada requisição, e nunca num atributo do
+    servidor, que é um só entre as threads. Guardá-los no servidor deixaria uma requisição concorrente gravar na área
+    de outra, a classe do CVE-2026-25536 do SDK TypeScript. Um teste determinístico confere que nenhuma requisição
+    deixa ou troca estado no servidor, e outro, com duas identidades em paralelo, exercita o isolamento de ponta a
+    ponta. Um header de identidade ou de segredo repetido é recusado, para um proxy que acrescente o header em vez de
+    substituí-lo não deixar o cliente escolher a identidade.
+  - **O modelo de confiança:** quem tem o segredo afirma qualquer identidade. O segredo autentica o proxy (o
+    LibreChat), e é o proxy que autentica o usuário. Por isso o segredo nunca vai a um cliente final, e o servidor
+    fica numa rede que só o proxy alcança.
+  - **Os limites:** `--max-graphs` vale por área e é contado sob a trava da gravação, então gravações paralelas não
+    passam juntas dele. `initialize`, `ping` e as notificações não abrem nem criam área, e com `--read-only` a área
+    que ainda não existe não é criada. O número de áreas não tem limite: quem tem o segredo cria uma por identidade
+    nova (o modelo de confiança acima), e o servidor guarda as áreas abertas em memória enquanto roda.
+  - **A raiz das áreas:** é conferida ao subir. Vazia, inexistente sem `--init`, arquivo ou link dá rc 2, salvo
+    `--store-optional`, como a raiz fora do perfil.
+  - **O envelope `untrusted_data`:** `kg_get`, `kg_list` e `kg_history` devolvem `{"untrusted_data": ..., "notice":
+    ...}`, para o modelo tratar o texto gravado por outros como dado, nunca como instrução.
+  - **O que o perfil não é:** é "atrás de proxy", numa rede privada. Não é o perfil OAuth da especificação MCP, que
+    fica para quando houver uma matriz medida de clientes.
+- **A imagem OCI:** `ghcr.io/marciocar/kg-ssot:<versão>` traz o `kg-mcp` pronto, para rodar como serviço ao lado
+  de um cliente sem Python, como o LibreChat. Ela é construída do mesmo wheel do PyPI, com as dependências por hash e
+  a base fixada por digest (`packaging/oci/Dockerfile`), roda com um usuário sem privilégio (uid 10001) e guarda o
+  armazém no volume `/data`. Leva o label `io.modelcontextprotocol.server.name`, o que o MCP Registry usa para
+  conferir a posse. O workflow do espelho a publica atrás de aprovação, com a atestação de proveniência
+  (`gh attestation verify oci://ghcr.io/marciocar/kg-ssot:<versão> --repo marciocar/kg-ssot`).
+  - **Por stdio:** `docker run -i --rm ghcr.io/marciocar/kg-ssot:<versão>` só julga. Com `-v kg-data:/data` e
+    `--root /data/grafos --init`, grava.
+  - **Ao lado do LibreChat:** o perfil "atrás de proxy", na rede do compose e sem porta publicada no host:
+
+    ```yaml
+    # docker-compose.override.yml
+    services:
+      kg-ssot:
+        image: ghcr.io/marciocar/kg-ssot:<versão>
+        command: ["--http", "8080", "--host", "0.0.0.0", "--allow-remote",
+                  "--identity-header", "X-User-Email", "--secret-env", "KG_MCP_SECRET",
+                  "--root", "/data/areas", "--init", "--backend", "versioned"]
+        environment:
+          KG_MCP_SECRET: ${KG_MCP_SECRET}
+        volumes:
+          - kg-data:/data
+    volumes:
+      kg-data:
+    ```
+
+    ```yaml
+    # librechat.yaml
+    mcpSettings:
+      allowedDomains:  # lista FECHADA: só os domínios listados passam, para todos os servidores MCP por URL
+        - kg-ssot        # o nome do serviço no compose
+        # - os domínios dos outros servidores MCP que este librechat.yaml já usa
+    mcpServers:
+      kg-ssot:
+        type: streamable-http
+        url: http://kg-ssot:8080/mcp
+        headers:
+          X-User-Email: "{{LIBRECHAT_USER_EMAIL}}"
+          X-Api-Key: "${KG_MCP_SECRET}"
+    ```
+
+    Uma lista `allowedDomains` que não está vazia é fechada: só os domínios dela passam, para todos os servidores MCP
+    por URL. Se o `librechat.yaml` já tem outros, ponha os domínios deles na mesma lista, senão eles param de
+    funcionar.
+
+    O `--host 0.0.0.0` é o de dentro do container: sem porta publicada, o serviço só é alcançado pelos containers da
+    rede do compose (a rede padrão do compose não é `internal`, então o container ainda sai para a internet). Sem
+    `KG_MCP_SECRET`, o container sai com rc 2 e não serve nada. O segredo fica no `.env` do compose, nunca no
+    `librechat.yaml` versionado. Como toda variável de ambiente de container, ele aparece no `docker inspect`: quem
+    tem acesso ao docker do host o lê, como já lê o `.env`.
+  - **O volume:** com um volume nomeado, como no compose acima, o `/data` já nasce do usuário da imagem. Com uma pasta
+    do host montada em `/data`, ela tem de ser do uid 10001 (`chown 10001:10001 <pasta>`); senão o container sai
+    com rc 2 e `Permission denied`.
+  - **A plataforma:** a imagem sai só para `linux/amd64`.
+  - **O que a imagem não faz:** TLS e exposição para fora da rede do compose ficam com o proxy de quem adota, como no
+    perfil.
 - **Num repo:** o armazém de disco e o versionado recusam raiz dentro de um repo git (veja o `kg_store.py`). Dentro
   do repo, use `--backend git --root .`, que faz um commit por gravação no branch atual, fora de qualquer PR (rode-o
   num branch de trabalho), ou rode sem `--root` para só julgar.
-- **O que fica com quem adota, de propósito:** autenticação, TLS, identidade, multiusuário e área por usuário (um
-  processo ou um root por usuário), cota e timeout.
-- **As versões do protocolo:** o servidor negocia `2025-11-25`, `2025-06-18`, `2025-03-26` e `2024-11-05`, e
-  responde com a pedida quando a conhece.
+- **O que fica com quem adota, de propósito:** o TLS, o perfil OAuth, cota por usuário e timeout por ferramenta.
+- **Cliente que guarda o `tools/list`:** alguns clientes, como o LibreChat, validam os argumentos contra o
+  `tools/list` que guardaram ao subir. Depois de uma atualização que muda o `inputSchema` de uma ferramenta (um
+  argumento novo, um valor novo num enum), reinicie o cliente, ou ele recusa o argumento novo antes de chamar o
+  servidor. Um adotante já tropeçou nisso e passou a reiniciar o cliente no deploy quando o `tools/list` muda.
+- **As duas eras do protocolo:** o servidor fala as duas, e a própria requisição escolhe a era.
+  - **A era nova, `2026-07-28`, sem estado:** toda requisição traz no `params._meta` a versão
+    (`io.modelcontextprotocol/protocolVersion`) e as capacidades do cliente (`io.modelcontextprotocol/clientCapabilities`).
+    - **O que o servidor implementa:** `server/discover`.
+    - **O que todo resultado traz:** `resultType` e o `serverInfo` no `_meta`.
+    - **As dicas de cache:** `server/discover` e `tools/list` trazem `ttlMs` e `cacheScope`, que é `private` no perfil
+      "atrás de proxy", porque a lista depende da área.
+    - **Os erros, com o status HTTP da especificação:**
+      - falta um campo obrigatório do `_meta`: -32602, com 400;
+      - versão que o servidor não suporta: -32022, com 400 e, em `data.supported`, a mesma lista do `server/discover`
+        (as duas eras), por qualquer caminho; uma versão da era antiga pedida no `_meta` também dá -32022, com a mensagem
+        de que ela só vale pelo `initialize`;
+      - método desconhecido: -32601, com 404;
+      - header que falta ou diverge do corpo (`MCP-Protocol-Version`, `Mcp-Method`, `Mcp-Name`, com o sentinela
+        base64): -32020, com 400.
+  - **A era antiga (`2025-11-25`, `2025-06-18`, `2025-03-26`, `2024-11-05`):** segue com `initialize`, que responde com a
+    versão pedida quando a conhece. O servidor nunca emite `Mcp-Session-Id`, e GET e DELETE dão 405.
+  - **Medido com clientes oficiais:** o SDK Python `mcp` 2.3.0, que é o v2, na era nova, por stdio e por HTTP; e os SDKs
+    TypeScript 1.30.0, o do LibreChat, e 1.32.1 na era antiga. O CI roda os três.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 

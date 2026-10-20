@@ -74,6 +74,21 @@
       "description": "decision superseded sem origem: história, não SSOT viva",
       "valid": true,
       "codes": []
+    },
+    {
+      "file": "warn-untraced-decision-trace-blank-nel.kg.yaml",
+      "description": "decision cujo trace é só um NEL (U+0085): espaço no str.isspace, então não é origem, e alerta (o trim() do JS não o tira)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.untraced-decision"
+      ]
+    },
+    {
+      "file": "valid-decision-trace-only-feff.kg.yaml",
+      "description": "decision cujo trace é só um U+FEFF: não é espaço no str.isspace, então conta como trace (o trim() do JS o tiraria)",
+      "valid": true,
+      "codes": []
     }
   ]
 }
