@@ -2,7 +2,7 @@
 branch: chore/decide-round-2026-10-20b
 pr: pendente
 date: 2026-10-20
-reviewed_diff_sha256: 0915be1739c3240f7cd591ace2ce2ac857934c9a165d1c64db478474fe701df4
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 9395ce17940fb6c2a341b7d639cd00a0aacc3e92484d1ab9a96221fb4926aeac
 findings_total: 3
 findings_real: 2
@@ -48,3 +48,11 @@ Nenhum: não há código. O radar `--integrity --schema` sai 0 nos 5 grafos e o 
 
 O kg-writer na 4.12.0 e a prova de bloqueio do gate, as outras duas respostas da rodada, são execução e saem em
 trabalho próprio.
+
+## Re-revisão depois do rebase (2026-10-20)
+
+O #1235 entrou antes e acrescentou dois nós (`E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE` e `Q_U1_FASE2_MIGRACAO_CONDUZIDA`)
+e quatro arestas no mesmo ponto do `field-hub-update-2026-10-19`. O conflito foi de união: os dois lados
+acrescentam e nenhum edita o do outro. Resolvi ficando com os dois. O grafo tem 9 nós e o radar
+`--integrity --schema` sai 0. O hash de código mudou porque a base trouxe o código do #1234 e do #1235, não por
+este diff.
