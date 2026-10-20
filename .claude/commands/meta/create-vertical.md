@@ -149,7 +149,7 @@ ls .claude/utils/marketplace/verticals/*.manifest.sh   # ex.: onion-design.manif
 #     escrever verticals/<slug>.manifest.sh (PLUGIN_NAME/VERSION/DESC, COMMANDS/AGENTS/SKILLS/...)
 
 # 4b/4c NO CORE (papel source, desde a F4 das portas): NÃO monte o plugin aqui — o bundle nasce na
-#        publicação (/meta:publish onion-plugins). Só regenere o catálogo da raiz, que é projeção dos
+#        publicação (/meta:publish onion-plugins) (core-only). Só regenere o catálogo da raiz, que é projeção dos
 #        manifestos e aponta o repo público (o pre-commit também o faz quando o manifesto entra no commit):
 bash .claude/validation/marketplace-root-check.sh --write
 

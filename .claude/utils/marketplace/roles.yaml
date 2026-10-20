@@ -118,7 +118,7 @@ work_tool_sets:
     - federation-register
     - federation-rollback
     - federation-status
-    - publish                # /meta:publish (F3 das portas, SAC-92): publicar portas é ato da FONTE, par da skill onion-publish
+    - publish                # /meta:publish (core-only; F3 das portas, SAC-92): publicar portas é ato da FONTE, par da skill onion-publish
   # PENDING — comando que a matriz NÃO classificou. Fica com source e hub (o status quo dele) e NÃO viaja
   # para standalone/plugins até o maestro decidir. VAZIO de novo desde 2026-10-14: `decide` nasceu aqui em
   # 2026-10-12 e o maestro o classificou em `full` (viaja para todo papel com KG, menos o mini), e fica
@@ -181,7 +181,7 @@ roles:
     # O vendor-manifest.sh --role mini INCLUI so o que esta lista nomeia (o inverso do corte). Caminhos
     # relativos a .claude/; diretorio termina em `/`. Materializada pela 1a vez na F5 (SAC-94): a
     # verificacao dela, que NAO leva o lint, e o .claude/validation/door-mini-check.sh (allowlist exata,
-    # sem ponteiro morto, sem caminho de maquina), chamado pelo motor do /meta:publish.
+    # sem ponteiro morto, sem caminho de maquina), chamado pelo motor do /meta:publish (core-only).
     allowlist:
       commands:
         - commands/warm-up.md

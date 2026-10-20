@@ -16,6 +16,17 @@
 #           guarda via: a checagem de ponteiro morto não cobre `ops/`, e a REGRA 22/48 olham outros
 #           prefixos. Na varredura desta forja (2026-10-11): 203 citações nas raízes que viajam.
 #
+# 2º VOCABULÁRIO (sinal de campo 2026-10-19, num hub, pin 59ebe7fe1288): o corte de 2026-10-18
+#           tirou o `/meta:publish` da adoção, e cinco superfícies que viajam seguiam a citá-lo
+#           (`cc-update.md`, `create-vertical.md`, três comentários/mensagens de script). A guarda não
+#           via porque o vocabulário dela era SÓ `ops/<arquivo>`, e `/meta:publish` é a face de COMANDO do
+#           `ops/publish-door.sh`: a mesma classe sem o token. Agora ela casa também o comando core-only
+#           que a adoção corta, derivado de `vendor-manifest.sh --retired-excludes` (cada
+#           `.claude/commands/<cat>/<nome>.md` vira `/<cat>:<nome>`), com as MESMAS três declarações.
+#           Medido no dia: 19 citações sem declaração em 10 arquivos; todas declaradas no mesmo PR
+#           (baseline intocado). TETO: a SKILL cortada (`onion-publish`) não entra — nome de skill não
+#           tem forma de invocação que se distinga de prosa, e acusá-lo seria falso positivo.
+#
 # A DECISÃO QUE A GUARDA NÃO TOMA SOZINHA — e por que a catraca existe:
 #   "a citação descreve o destinatário?" é JUÍZO. Um script não sabe. O que ele sabe fazer é obrigar o
 #   autor a DECIDIR na hora de escrever, e deixar a decisão visível. Por isso a regra é: citação de
@@ -83,6 +94,34 @@ if [ "${#VENDORED_ROOTS[@]}" -eq 0 ]; then
                   .claude/hooks .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal)
 fi
 
+# O 2º VOCABULÁRIO — o COMANDO core-only que a adoção corta (sinal de campo 2026-10-19, num hub,
+# pin 59ebe7fe1288: o /meta:publish saiu do hub e cinco superfícies que viajam seguiam a citá-lo; a guarda
+# não via porque só casava `ops/<arquivo>`, e `/meta:publish` é a face de comando do ops/publish-door.sh).
+# SSOT: `vendor-manifest.sh --retired-excludes` (o que o core deixou de mandar à adoção). Cada
+# `.claude/commands/<cat>/<nome>.md` dali vira o token `/<cat>:<nome>` (e a grafia `/<cat>/<nome>`); os
+# próprios arquivos cortados não são varridos para ESTE vocabulário (são a superfície do comando, e na porta
+# source ele existe). Fallback explícito, nunca vazio, pelo mesmo motivo das raízes.
+CUT_CMDS=(); CUT_PATHS=()
+if [ -f "${_VM}" ]; then
+  while IFS= read -r _x; do
+    _x="${_x#:(exclude)}"; [ -n "${_x}" ] || continue
+    CUT_PATHS+=("${_x}")
+    _c="${_x#.claude/commands/}"
+    if [ "${_c}" != "${_x}" ] && [[ "${_c}" == */*.md ]] && [[ "${_c}" != */*/* ]]; then
+      _c="${_c%.md}"; CUT_CMDS+=("${_c%%/*}[:/]${_c#*/}")
+    fi
+  done < <(bash "${_VM}" --retired-excludes 2>/dev/null || true)
+fi
+if [ "${#CUT_CMDS[@]}" -eq 0 ]; then
+  # ⚠️ Só o comando e a skill, NUNCA a lente e a doutrina por nome: o derivador de companheiros do
+  # vendor-manifest.sh mantém viva a peça que um arquivo que viaja cita pelo nome, e este fallback a
+  # citava (r14 do publish_release no CI do PR 1221: a doutrina voltou ao standalone). Sem elas, o
+  # fallback acusa um pouco mais (a lente e a doutrina citam o comando), o lado seguro.
+  CUT_CMDS=("meta[:/]publish"); CUT_PATHS=(.claude/commands/meta/publish.md .claude/skills/onion-publish)
+fi
+_CMDRE="$(IFS='|'; printf '%s' "${CUT_CMDS[*]}")"
+_CUTP="$(IFS='|'; printf '%s' "${CUT_PATHS[*]}")"
+
 # Extrai "<rel>|<ops/token>" — UMA LINHA POR OCORRÊNCIA (a contagem por par alimenta a catraca) — de cada
 # citação NÃO declarada nas raízes que viajam.
 #
@@ -107,7 +146,7 @@ collect_violations() { # <repo_dir>
           -o -name '*.txt' -o -name '*.toml' \) \
        ! -name '*baseline.txt' ! -name 'lint-selftest.sh' ! -name "${SELF_NAME}" \
        ! -path '*/fixtures/*' -print0 2>/dev/null \
-  | xargs -0 -r awk -v prefix="${repo}/" '
+  | xargs -0 -r awk -v prefix="${repo}/" -v cmdre="${_CMDRE}" -v cutp="${_CUTP}" '
       function flush(   i) {
         if (rel != "" && !(fmcore && fmclosed)) for (i = 1; i <= nc; i++) if (!(cand[i] in gtok) || (i in cmsg)) print rel "|" cand[i]
         nc = 0; split("", cand); split("", cmsg); split("", gtok); split("", vtok)
@@ -117,7 +156,7 @@ collect_violations() { # <repo_dir>
         return (s ~ /(\$\{|\$)(R|root|ROOT|repo|REPO|_repo|REPO_ROOT|repo_root|CORE|core|CORE_ROOT|top|TOP|CLAUDE_PROJECT_DIR|PROJECT_DIR)\}?$/ || s ~ /\)$/)
       }
       # extrai os tokens de ops/ do CORE de uma linha; devolve em toks[1..n]
-      function tokens(s,   n, off, pre, c, t) {
+      function tokens(s,   n, off, pre, c, t, nx, p) {
         n = 0; off = 0; split("", toks)
         while (match(substr(s, off + 1), /ops\/([A-Za-z][A-Za-z0-9_-]*\.[A-Za-z][A-Za-z0-9]*|[A-Za-z][A-Za-z0-9_-]+\/[A-Za-z0-9_.*-]*)/)) {
           t = substr(s, off + RSTART, RLENGTH); pre = substr(s, 1, off + RSTART - 1); off = off + RSTART + RLENGTH - 1
@@ -126,9 +165,25 @@ collect_violations() { # <repo_dir>
           if (c == "/" && !rootvar(substr(pre, 1, length(pre) - 1))) continue   # src/ops/, URL, ./ops/, ${tmp}/ops/
           sub(/[.*]+$/, "", t); toks[++n] = t
         }
+        # 2º vocabulário: o comando core-only cortado da adoção (`/meta:publish`, `/meta/publish`). Cala no
+        # caminho (`commands/meta/publish.md`: há caractere de palavra ou `/` antes) e no nome mais longo
+        # (`/meta:publish-x`). O token sai normalizado com `:` para a catraca contar as duas grafias juntas.
+        if (cmdre != "" && !cutfile) {
+          off = 0
+          while (match(substr(s, off + 1), "/(" cmdre ")")) {
+            t = substr(s, off + RSTART, RLENGTH); pre = substr(s, 1, off + RSTART - 1)
+            nx = substr(s, off + RSTART + RLENGTH, 1); off = off + RSTART + RLENGTH - 1
+            c = substr(pre, length(pre), 1)
+            if (c ~ /[A-Za-z0-9_.\/-]/ || nx ~ /[A-Za-z0-9_-]/) continue
+            p = index(substr(t, 2), "/"); if (p > 0) t = substr(t, 1, p) ":" substr(t, p + 2)
+            toks[++n] = t
+          }
+        }
         return n
       }
       FNR == 1 { flush(); rel = FILENAME; if (index(rel, prefix) == 1) rel = substr(rel, length(prefix) + 1)
+                 cutfile = 0; ncp = split(cutp, cps, "|")
+                 for (i = 1; i <= ncp; i++) if (cps[i] != "" && (rel == cps[i] || index(rel, cps[i] "/") == 1)) cutfile = 1
                  fm = 0; isfm = 0; fmclosed = 0; fmcore = 0; indesc = 0; inpaths = 0
                  code = (FILENAME ~ /\.(sh|py|js|mjs|ts)$/); srconly = 0; indoc = 0 }
       { l = $0; sub(/\r$/, "", l); if (FNR == 1) sub(/^\357\273\277/, "", l) }
@@ -177,7 +232,7 @@ collect_violations() { # <repo_dir>
 # SELFTEST (self-contido, à la kb-vendored-link-check.sh) — as polaridades
 # ---------------------------------------------------------------------------
 run_selftest() {
-  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=19
+  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=22
   mkdir -p "${tmp}/.claude/rules" "${tmp}/.claude/hooks" "${tmp}/.claude/validation/fixtures" \
            "${tmp}/.claude/commands/meta" "${tmp}/docs/sdaal" "${tmp}/ops" "${tmp}/docs/evolution/notas"
   local BL="${tmp}/.claude/validation/ops-citation-travel-baseline.txt"
@@ -314,6 +369,29 @@ run_selftest() {
   _run
   if _has 'hooks/n.sh'; then echo "  ✗ (xix) regra source-only deveria calar"; fails=$((fails+1)); else echo "  ✅ (xix) mensagem de regra '# aplica-se: source' cala"; fi
 
+  # ── 2º vocabulário: o comando core-only cortado da adoção (sinal de campo 2026-10-19, num hub) ──
+  # (xx) o defeito VERBATIM: comando que viaja manda o hub rodar `/meta:publish onion-plugins` => HARD.
+  #      Mutante: com o 2º vocabulário desligado (cmdre vazio), este caso reprova.
+  _reset
+  printf '# 4b NO CORE: o bundle nasce na\n#        publicação (/meta:publish onion-plugins). Só regenere o catálogo.\n' > "${tmp}/.claude/commands/meta/create-vertical.md"
+  _run
+  if _has $'^HARD\tNEW\t.claude/commands/meta/create-vertical.md\t.*/meta:publish'; then echo "  ✅ (xx) /meta:publish num comando que viaja reprova (o defeito verbatim do hub)"; else echo "  ✗ (xx)"; fails=$((fails+1)); fi
+
+  # (xxi) marcador (core-only), CAMINHO do arquivo e nome mais longo => calam; a grafia /meta/publish conta junto
+  _reset
+  printf 'na fonte, rode /meta:publish --status (core-only)\nveja .claude/commands/meta/publish.md\no /meta:publish-door não existe\n' > "${tmp}/.claude/rules/c.md"
+  printf 'rode `/meta/publish onion-core` e depois `/meta:publish --status`\n' > "${tmp}/.claude/rules/d.md"
+  _run
+  if ! _has 'rules/c.md' && _has $'^HARD\tNEW\t.claude/rules/d.md\t.*/meta:publish.*(2 ocorr'; then echo "  ✅ (xxi) marcador, caminho e nome mais longo calam; /meta/publish e /meta:publish contam como um token"; else echo "  ✗ (xxi)"; fails=$((fails+1)); fi
+
+  # (xxii) a própria superfície cortada (o comando, a skill) não é varrida para este vocabulário
+  _reset; mkdir -p "${tmp}/.claude/skills/onion-publish"
+  printf 'rode /meta:publish onion-core\n' > "${tmp}/.claude/commands/meta/publish.md"
+  printf 'conduz o /meta:publish\n' > "${tmp}/.claude/skills/onion-publish/SKILL.md"
+  _run
+  rm -rf "${tmp}/.claude/skills/onion-publish"
+  if _has 'meta/publish.md' || _has 'onion-publish'; then echo "  ✗ (xxii) a superfície cortada não deveria acusar o próprio comando"; fails=$((fails+1)); else echo "  ✅ (xxii) o comando cortado e a skill dele citam /meta:publish sem acusar"; fi
+
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1
 }
@@ -385,7 +463,11 @@ else
   while IFS=$'\t' read -r sev tag path k detail; do
     [ -n "${sev}" ] || continue
     case "${tag}" in
-      NEW)     say "HARD" "NEW" "${path}" "cita '${k#*|}' (${detail}) num arquivo que VIAJA — ops/ não vai a nenhuma porta nem adotante, e lá a frase descreve um comportamento que o destinatário não tem: ${FIX}" ;;
+      NEW)     case "${k#*|}" in
+                 ops/*) _why="ops/ não vai a nenhuma porta nem adotante" ;;
+                 *)     _why="o comando é core-only e a adoção o corta (vendor-manifest.sh --retired-excludes)" ;;
+               esac
+               say "HARD" "NEW" "${path}" "cita '${k#*|}' (${detail}) num arquivo que VIAJA — ${_why}, e lá a frase descreve um comportamento que o destinatário não tem: ${FIX}" ;;
       PASSIVO) say "SOFT" "PASSIVO" "${path}" "passivo: cita '${k#*|}' (${detail}) — ${FIX}, e remova do baseline" ;;
       *)       say "SOFT" "BASELINE-OBSOLETA" "${BASELINE_REL}" "entrada '${k}': ${detail}" ;;
     esac

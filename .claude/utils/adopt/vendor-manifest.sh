@@ -552,7 +552,7 @@ if [ "${MODE}" = "list" ]; then
     docs       "$(_count '^docs/')" \
     total      "$(grep -c . <<< "${_lfiles}" || true)"
   # O MINI É ALLOWLIST: o que os arquivos dele citam e não viaja é ponteiro morto na porta didática.
-  # Desde a F5 (SAC-94) o detector é UM SÓ, o door-mini-check.sh — o mesmo que o motor do /meta:publish
+  # Desde a F5 (SAC-94) o detector é UM SÓ, o door-mini-check.sh — o mesmo que o motor do /meta:publish (core-only)
   # roda no bundle montado. Aqui ele mede uma montagem temporária do HEAD (manifesto + overlays), sem a
   # conferência de allowlist exata (que só faz sentido no que o materializador escreveu). Até a F5 a
   # detecção vivia inline aqui, e uma segunda cópia do detector seria a duplicação que este arquivo
@@ -569,7 +569,7 @@ if [ "${MODE}" = "list" ]; then
         _dmo="$(bash "${_dmc}" --bundle "${_mt}" --source "${REPO}" --no-exact 2>&1)" || _dmrc=$?
         case "${_dmrc}" in
           0) printf '%s\n' "${_dmo}" | sed 's/^/── /' ;;
-          1) echo "AVISO: o mini, montado do HEAD com os overlays, tem achado(s) que o motor do /meta:publish REPROVA:" >&2
+          1) echo "AVISO: o mini, montado do HEAD com os overlays, tem achado(s) que o motor do /meta:publish (core-only) REPROVA:" >&2
              printf '%s\n' "${_dmo}" >&2 ;;
           *) echo "AVISO: door-mini-check não mediu (rc=${_dmrc}): ${_dmo:0:200}" >&2 ;;
         esac
@@ -643,14 +643,14 @@ _target_owns_contract() {
 }
 
 # ── CORE-ONLY NÃO VIAJA PARA ADOÇÃO, em NENHUM papel (2026-10-17, E_SKILL_CORE_ONLY_VIAJOU) ─────────
-# A skill onion-publish conduz o /meta:publish, que só roda na FONTE (role: source): o motor dela, o
+# A skill onion-publish conduz o /meta:publish (core-only), que só roda na FONTE (role: source): o motor dela, o
 # publicador de portas, é core-only e não vendoriza. Medido: o manifesto de papel adopted, extraído por git archive,
 # entregava .claude/skills/onion-publish, porque o `_role_cut` só a corta em standalone|plugins — a
 # skill chegava MORTA a todo adotante adopted e hub. Fica FORA do `_role_cut` de propósito: um corte não
 # vazio ali LIGA o corte de comandos do roles.yaml (`_emit_command_excludes`), que tiraria a meta-fábrica
 # do adotante, decisão separada que ninguém tomou. Vale só no destino adoção: a porta onion-core é o
 # core das empresas e leva a skill (o materializador escolhe o papel; a doutrina das portas decide).
-# 2026-10-18: o comando /meta:publish e as duas peças que só existem por ele (a lente e a doutrina, que
+# 2026-10-18: o comando /meta:publish (core-only) e as duas peças que só existem por ele (a lente e a doutrina, que
 # a própria lente declara "seguem o comando"). Os companheiros não saem sozinhos aqui: o derivador
 # (_emit_companion_excludes) só roda quando há corte de PAPEL, e este corte não é de papel.
 _CORE_ONLY_ADOPTION_EXCLUDES=(':(exclude).claude/skills/onion-publish'

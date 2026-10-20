@@ -76,7 +76,7 @@ _check() {
     fi
     # O MANIFESTO TEM DE MONTAR (achado I4 da passada adversarial): a REGRA 19 (Plugins de vertical sincronizados com as fontes) aposentada era o único
     # gate de PR que acusava fonte bundlada apagada/renomeada ("assemble FALHOU"). Sem ela, a main ficaria
-    # impublicável em silêncio até o /meta:publish. Conferir que cada entrada declarada EXISTE não exige
+    # impublicável em silêncio até o /meta:publish (core-only). Conferir que cada entrada declarada EXISTE não exige
     # montar nem regenerar nada — é o atrito que a F4 tirou, sem devolver o atrito.
     local m e missing=""
     for m in "${repo}"/.claude/utils/marketplace/verticals/*.manifest.sh; do

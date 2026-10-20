@@ -186,7 +186,7 @@ LLM Validation:
 ❌ ISO 27001: Não explícito no checklist
 ❌ PMBOK: Não aplicável
 
-Resultado: ISO 22301 + SOC2 (8/8 requisitos cobertos ✅)
+Resultado: ISO 22301 + SOC2 (8/8 requisitos mapeados a documento; atendimento se mede por evidência)
 ```
 
 ---
@@ -449,6 +449,15 @@ Confirme quando concluir para eu consolidar no index.md.
 ### Step 3: Consolidação de Outputs
 
 Após todos specialists concluírem, consolidar em 2 arquivos principais:
+
+> **Pasta e honestidade da consolidação (sinal de campo 2026-10-19).** `docs/compliance-context/` é o
+> default: consolide sob a `<raiz>` resolvida pelo `/docs:build-compliance-docs`
+> (`bash .claude/utils/scope/resolve-context-dir.sh compliance`; invocado direto, leia
+> `context.compliance` em `.claude/onion-context.yaml`). "Frameworks implementados" no índice
+> quer dizer **documentados**, não certificados nem atendidos. O índice não traz percentual de
+> cobertura sem numerador medido (controle confirmado em código, configuração ou registro) e
+> denominador declarado. Aprovação sem ata citada fica `[TO BE COMPLETED]`, e a seção
+> **"Divergências"** lista o que um documento declara e a evidência nega.
 
 #### 3.1 Criar docs/compliance-context/index.md
 ```markdown
@@ -744,7 +753,7 @@ docs/compliance-context/
 └── due-diligence/
     └── credificta-response.md (resposta estruturada)
 
-Cobertura: 8/8 requisitos CrediFicta ✅
+Mapeamento: 8/8 requisitos CrediFicta com documento (atendidos: medir; lacunas em [TO BE COMPLETED])
 Tempo: ~3 minutos
 ```
 

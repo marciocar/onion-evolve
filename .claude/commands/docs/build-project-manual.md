@@ -1,7 +1,7 @@
 ---
 name: build-project-manual
 description: Montar o manual de UM PROJETO — a página que o usuário final dele abre — quando esse projeto é servido por agente + servidor MCP + atalhos.
-allowed-tools: Read Write WebFetch Bash(ls *) Bash(find *) Bash(grep *) Bash(node *) Bash(npx *) Bash(chromium*)
+allowed-tools: Read Write WebFetch Bash(bash .claude/utils/scope/resolve-context-dir.sh *) Bash(ls *) Bash(find *) Bash(grep *) Bash(node *) Bash(npx *) Bash(chromium*)
 
 parameters:
   - name: projeto
@@ -14,8 +14,8 @@ tags:
   - agent-mcp
   - documentation
 
-version: "1.0.0"
-updated: "2026-09-30"
+version: "1.1.0"
+updated: "2026-10-20"
 
 output_path: docs/business-context/site/
 # `site/` é a subárvore do material PUBLICADO para fora; o pai `docs/business-context/` é do
@@ -62,7 +62,9 @@ de cada pergunta de exemplo com dados reais. O que ele automatiza é o resto.
    | atalhos e seus comandos | o YAML de prompts que o seed projeta |
    | passos de acesso, textos de botão, política de MFA | a configuração do provedor de login e as telas reais |
    | o caminho principal | o fluxo que gera o valor para **este** cliente |
-3. **Copiar o esqueleto** para `docs/business-context/site/manual-<projeto>.html` e trocar os
+3. **Copiar o esqueleto** para `<negócio>/site/manual-<projeto>.html`, onde `<negócio>` é o que
+   `bash .claude/utils/scope/resolve-context-dir.sh business` imprime (o repo pode declarar a pasta em
+   `.claude/onion-context.yaml`; o default é `docs/business-context`; saída `3` = pare), e trocar os
    marcadores. As seções `[DOMINIO]` são **reescritas**; as `[SEMIGENÉRICO]` ajustadas; as
    `[GENÉRICO]` conferidas.
 4. **Separar os dois leitores** (cláusula 2 da doutrina): achados sobre limites, falhas e percentuais

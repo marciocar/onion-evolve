@@ -14348,6 +14348,62 @@ run_resolve_scope_layers_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo resolve-context-dir — exercita .claude/utils/scope/resolve-context-dir.sh (sinal de campo 2026-10-19,
+# num hub: o repo declarava `context.compliance: docs/compliance` e o /docs:build-compliance-docs
+# gravou em docs/compliance-context/). O caso (b) é o defeito verbatim; o mutante é o helper que ignora o
+# mapa e devolve sempre o default — (b) reprova. Self-contained.
+# ---------------------------------------------------------------------------
+run_resolve_context_dir_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/scope/resolve-context-dir.sh"
+  if [ ! -f "${helper}" ]; then record_fail "resolve-context-dir" "helper ausente: ${helper}"; return; fi
+  local t out rc; t="$(mktemp -d)"; mkdir -p "$t/.claude"
+  # (a) sem mapa → default da dimensão
+  out="$(bash "${helper}" compliance --repo "$t" --source 2>/dev/null)"
+  if [ "${out}" = $'docs/compliance-context\tdefault' ]; then record_pass "resolve-context-dir: (a) sem mapa → docs/compliance-context (default)"
+  else record_fail "resolve-context-dir: (a)" "veio '${out}'"; fi
+  # (b) o defeito verbatim: o mapa do hub declara outra pasta → ela vence o default
+  printf 'context:\n  business: docs/business-context\n  technical: docs/technical-context\n  compliance: docs/compliance\n' > "$t/.claude/onion-context.yaml"
+  out="$(bash "${helper}" compliance --repo "$t" --source 2>/dev/null)"
+  if [ "${out}" = $'docs/compliance\tonion-context' ]; then record_pass "resolve-context-dir: (b) context.compliance declarado vence o default (o caso do hub)"
+  else record_fail "resolve-context-dir: (b)" "veio '${out}' — a declaração explícita tem de vencer a convenção"; fi
+  # (c) aspas, comentário e barra final não mudam o caminho
+  printf 'context:  # mapa\n  technical: "docs/tech/"  # nota\n' > "$t/.claude/onion-context.yaml"
+  out="$(bash "${helper}" technical --repo "$t" 2>/dev/null)"
+  if [ "${out}" = "docs/tech" ]; then record_pass "resolve-context-dir: (c) aspas, comentário e barra final normalizados"
+  else record_fail "resolve-context-dir: (c)" "veio '${out}'"; fi
+  # (d) declaração absoluta ou com '..' → exit 3 (PARA; não grava no default calado)
+  printf 'context:\n  compliance: ../fora\n' > "$t/.claude/onion-context.yaml"
+  rc=0; bash "${helper}" compliance --repo "$t" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "resolve-context-dir: (d) declaração com '..' → exit 3"
+  else record_fail "resolve-context-dir: (d)" "esperava 3, veio ${rc}"; fi
+  # (e) dimensão desconhecida → exit 2
+  rc=0; bash "${helper}" design --repo "$t" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "resolve-context-dir: (e) dimensão fora de business|technical|compliance → exit 2"
+  else record_fail "resolve-context-dir: (e)" "esperava 2, veio ${rc}"; fi
+  # (f) declaração absoluta → exit 3; `--repo` sem valor → exit 2 (antes: laço infinito, passada adversarial)
+  printf 'context:\n  compliance: /abs\n' > "$t/.claude/onion-context.yaml"
+  rc=0; bash "${helper}" compliance --repo "$t" >/dev/null 2>&1 || rc=$?
+  local rc2=0; timeout 5 bash "${helper}" compliance --repo >/dev/null 2>&1 || rc2=$?
+  if [ "${rc}" -eq 3 ] && [ "${rc2}" -eq 2 ]; then record_pass "resolve-context-dir: (f) caminho absoluto → exit 3; --repo sem valor → exit 2 (sem laço)"
+  else record_fail "resolve-context-dir: (f)" "absoluto rc=${rc} (quer 3), --repo sem valor rc=${rc2} (quer 2)"; fi
+  # (g) só o filho DIRETO de context: responde, e espaço no fim do valor não entra no caminho
+  printf '\357\273\277context:\n  nested:\n    compliance: docs/errado\n  compliance: docs/certo   \n' > "$t/.claude/onion-context.yaml"
+  out="$(bash "${helper}" compliance --repo "$t" 2>/dev/null)"
+  if [ "${out}" = "docs/certo" ]; then record_pass "resolve-context-dir: (g) BOM, chave aninhada e espaço no fim não desviam o caminho"
+  else record_fail "resolve-context-dir: (g)" "veio '${out}'"; fi
+  # (m) MUTANTE: o helper que ignora o mapa (devolve sempre o default) tem de reprovar o caso do hub
+  local mu; mu="$(mktemp)"
+  sed 's/&& emit "${val}" "onion-context"/\&\& : "${val}"/' "${helper}" > "${mu}"
+  printf 'context:\n  compliance: docs/compliance\n' > "$t/.claude/onion-context.yaml"
+  out="$(bash "${mu}" compliance --repo "$t" 2>/dev/null)"
+  if ! command grep -q 'emit "${val}" "onion-context"' "${mu}" && [ "${out}" = "docs/compliance-context" ]; then
+    record_pass "resolve-context-dir: (m) mutante sem a leitura do mapa cai no default — o caso (b) o pegaria"
+  else record_fail "resolve-context-dir: (m) mutante" "não aplicou ou não mordeu (saída '${out}')"; fi
+  rm -f "${mu}"
+  rm -rf "$t"
+}
+
+# ---------------------------------------------------------------------------
 # Modo show-scope — exercita a proveniência-por-chave do compose-settings.sh (RFC-0005 Fase 2:
 # paridade `git config --show-scope`). Self-contained em mktemp. Cobre: sobreposição escalar ·
 # set-once · chave profunda · array com origem por-elemento · conflito de tipo (sub-chave não vaza) ·
@@ -21003,11 +21059,13 @@ run_assemble_plugin_selftests() {
     record_pass "assemble-plugin: design (commands+agents+utils+validation+proveniência)"
   else record_fail "assemble-plugin: design estrutura" "faltou componente no plugin design"; fi
 
-  # (b) COMPLIANCE: shape diferente — agentes + 1 command, SEM utils/ nem validation/ (generalização)
+  # (b) COMPLIANCE: shape diferente — agentes + 1 command + SÓ utils/scope (o resolve-context-dir.sh que o
+  #     Passo 0 do build-compliance-docs chama, sinal de campo 2026-10-19), SEM validation/ (sem gate: generaliza)
   bash "${helper}" "${mcompl}" "${REPO_ROOT}" "${d}/compliance" >/dev/null 2>&1
   if ls "${d}/compliance/agents/"*.md >/dev/null 2>&1 && [ -f "${d}/compliance/commands/build-compliance-docs.md" ] \
-     && [ ! -d "${d}/compliance/utils" ] && [ ! -d "${d}/compliance/validation" ]; then
-    record_pass "assemble-plugin: compliance (agentes+command, sem utils/gate — generaliza)"
+     && [ -f "${d}/compliance/utils/scope/resolve-context-dir.sh" ] \
+     && [ "$(ls "${d}/compliance/utils" 2>/dev/null | tr '\n' ' ')" = "scope " ] && [ ! -d "${d}/compliance/validation" ]; then
+    record_pass "assemble-plugin: compliance (agentes+command+utils/scope, sem gate — generaliza)"
   else record_fail "assemble-plugin: compliance estrutura" "shape inesperado no plugin compliance"; fi
 
   # (c) plugin.json = EXATAMENTE os 8 campos permitidos (ambos)
@@ -24480,6 +24538,9 @@ _family run_compose_settings_selftests
 
 # Modo resolve-scope-layers — fecha o loop do compose-settings (descobre a cadeia de escopo).
 _family run_resolve_scope_layers_selftests
+
+# Modo resolve-context-dir — a pasta do contexto de domínio sai do onion-context.yaml (sinal de campo 2026-10-19).
+_family run_resolve_context_dir_selftests
 
 # Modo show-scope — proveniência-por-chave do compositor (RFC-0005 Fase 2, `--show-scope`).
 _family run_show_scope_selftests
@@ -36013,8 +36074,8 @@ run_ops_citation_travel_selftests() {
   local o rc
   # (a) o --selftest próprio: acusa o defeito verbatim e cala nas três declarações + fora do escopo
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 19/19 verdes' <<< "${o}"; then
-    record_pass "ops-citation-travel: (a) --selftest verde (19 casos, os 2 últimos da SAC-149: a mensagem de violation e a regra source-only: o defeito verbatim, as três declarações, fora do escopo, catraca por contagem e os achados da passada adversarial)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 22/22 verdes' <<< "${o}"; then
+    record_pass "ops-citation-travel: (a) --selftest verde (22 casos: o defeito verbatim, as três declarações, fora do escopo, catraca por contagem, os achados da passada adversarial, os 2 da SAC-149 e os 3 do 2º vocabulário, o /meta:publish cortado da adoção, sinal de campo 2026-10-19)"
   else record_fail "ops-citation-travel: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --format tsv sai 0, sem HARD, e com o passivo à vista.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -36067,6 +36128,10 @@ sub(/\r\$/, "", l);$(printf '\x1f')sub(/\rX\$/, "", l);$(printf '\x1f')(xiv)
 for (t in lg) if (code) gtok[t] = 1$(printf '\x1f')for (t in lg) gtok[t] = 1$(printf '\x1f')(xvi)
 -[efxsdrL][[:space:]]+[^] ]+/)$(printf '\x1f')-[efxsd][[:space:]]+[^] ]+/)$(printf '\x1f')(xvii)
 if (inpaths) next$(printf '\x1f')if (0) next$(printf '\x1f')(xv)
+-v cmdre="\${_CMDRE}"$(printf '\x1f')-v cmdre=""$(printf '\x1f')(xx)
+if (c ~ /[A-Za-z0-9_.\/-]/ || nx ~ /[A-Za-z0-9_-]/) continue$(printf '\x1f')if (0) continue$(printf '\x1f')(xxi)
+p = index(substr(t, 2), "/"); if (p > 0)$(printf '\x1f')p = 0; if (p > 0)$(printf '\x1f')(xxi)
+if (cmdre != "" && !cutfile) {$(printf '\x1f')if (cmdre != "") {$(printf '\x1f')(xxii)
 EOF_MUT
   rm -rf "${sb}"
 }

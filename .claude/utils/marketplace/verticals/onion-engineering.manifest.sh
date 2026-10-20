@@ -42,7 +42,7 @@ SKILLS=(
   ".claude/skills/onion-engineering-context"
 )
 HOOKS=()
-UTILS=(".claude/utils/task-manager")   # o helper env-check.sh: sem ele os comandos que leem o provider não têm caminho (o veto barra abrir o .env)
+UTILS=(".claude/utils/task-manager" ".claude/utils/scope")   # utils/scope: o resolve-context-dir.sh que a skill onion-engineering-context manda rodar (sinal de campo 2026-10-19); o helper env-check.sh: sem ele os comandos que leem o provider não têm caminho (o veto barra abrir o .env)
 VALIDATION=(
   ".claude/validation/kg-radar.sh"
   ".claude/validation/lib/status-factor.awk"

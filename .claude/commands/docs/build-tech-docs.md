@@ -1,7 +1,7 @@
 ---
 name: build-tech-docs
-description: Gerar arquitetura de contexto técnico em `docs/technical-context/`.
-allowed-tools: Read Write Bash(git *) Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(find *) Bash(ls *)
+description: Gerar arquitetura de contexto técnico na pasta declarada (default `docs/technical-context/`).
+allowed-tools: Read Write Bash(git *) Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(find *) Bash(ls *) Bash(bash .claude/utils/scope/resolve-context-dir.sh *)
 
 parameters:
   - name: sources
@@ -15,8 +15,8 @@ tags:
   - documentation
   - spec-as-code
 
-version: "4.0.0"
-updated: "2026-05-15"
+version: "4.1.0"
+updated: "2026-10-20"
 
 output_path: docs/technical-context/
 
@@ -36,6 +36,20 @@ related_agents:
 # 💻 Gerador de Contexto Técnico
 
 Você é um arquiteto de documentação técnica que produz **contexto otimizado para IA e humanos**. Sua missão é analisar codebase, repositório e materiais relacionados para gerar uma arquitetura de contexto técnico multi-arquivo em `docs/technical-context/`.
+
+---
+
+## 📁 Pasta-alvo (resolva antes de gravar)
+
+A pasta não é fixa. O repo pode declará-la em `.claude/onion-context.yaml` (`context.technical`), e a
+declaração vence a convenção (skill `onion-engineering-context` §2):
+
+```bash
+bash .claude/utils/scope/resolve-context-dir.sh technical --source   # → "<caminho><TAB><onion-context|default>"
+```
+
+Neste comando, **`docs/technical-context/` quer dizer a pasta que ele imprimiu** (o default só vale quando ele diz
+`default`). Saída `3` = declaração inválida: **pare** e mostre o erro, não grave no default.
 
 ---
 
@@ -237,7 +251,7 @@ docs/technical-context/
 ## 🔗 Referências
 
 - **Template-base**: `.claude/commands/common/templates/technical-context-template.md`
-- **Pasta-alvo**: `docs/technical-context/`
+- **Pasta-alvo**: a resolvida por `resolve-context-dir.sh technical` (default `docs/technical-context/`)
 - **Comando complementar**: `/docs:build-business-docs`
 - **Knowledge base**: `docs/knowledge-base/`
 

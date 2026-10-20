@@ -2716,7 +2716,7 @@ check_door_staleness() {
       # ⚠️ INFORMATIVA POR INTEIRO DESDE A F3 DAS PORTAS (2026-10-10, SAC-92, D_MATRIZ_DE_PORTAS_2026_10:
       # "publicar é sob demanda e nunca trava o desenvolvimento"). SEM-BASELINE e PIN-DESCONHECIDO eram
       # HARD por serem "registro quebrado, não questão de momento" — e o argumento valia enquanto o pin do
-      # registro era a verdade sobre a porta. Com o /meta:publish o selo é o CARIMBO da porta, lido do
+      # registro era a verdade sobre a porta. Com o /meta:publish (core-only) o selo é o CARIMBO da porta, lido do
       # remoto (`ops/publish-door.sh --status`), e o `onion_version` do members.yaml virou CACHE: ninguém
       # mais o avança por PR. Cobrar HARD sobre um cache faria todo PR comum depender de manter um campo
       # que não é mais a fonte — o deadlock que a matriz decidiu desfazer. O sinal FICA, rotulado.
@@ -5230,7 +5230,7 @@ check_commands_without_model() {
 #   (`generate-marketplace.sh --from-manifests`), com `source` apontando o subdiretório do plugin no repo
 #   público — instalar pela raiz instala o PUBLICADO. Depende só de manifesto + face pública, então um PR
 #   que muda o corpo de uma fonte bundlada não a toca. A metade da PUBLICAÇÃO (o catálogo do bundle bate
-#   com a raiz) roda no /meta:publish onion-plugins (plugin-bundle-check.sh). Cura:
+#   com a raiz) roda no /meta:publish onion-plugins (core-only) (plugin-bundle-check.sh). Cura:
 #   marketplace-root-check.sh --write (temp+mv — redirecionar direto TRUNCA o arquivo antes de o gerador
 #   ler o top-level); o pre-commit regenera quando um manifesto entra no commit.
 # ===========================================================================
@@ -5258,7 +5258,7 @@ check_marketplace_root_sync() {
 # REGRA 74 — Caminho .claude/ NU dentro de plugin só resolve no core, com catraca [HARD + SOFT]
 # previne: baseline de passivo crescendo calado — um PR transformava ref NOVA (HARD) em PASSIVO (SOFT) acrescentando linha
 #   F4 das portas (2026-10-10): a varredura dos plugins MONTADOS saiu para a publicação (plugin-bundle-check.sh,
-#   passo 5d do /meta:publish), porque o core não versiona mais plugins/. A CATRACA ficou aqui — a passada
+#   passo 5d do /meta:publish (core-only)), porque o core não versiona mais plugins/. A CATRACA ficou aqui — a passada
 #   adversarial da F4 mediu que ela tinha sumido de todo gate (achado I2): a raiz temporária da publicação não
 #   é repo git, e nada mais comparava o baseline com origin/main. A catraca não precisa de bundle: compara
 #   `plugin-bare-path-baseline.txt` com o de origin/main e reprova se CRESCEU. Só ela é julgada aqui.
@@ -5808,7 +5808,7 @@ check_direct_provider_api
 # ─────────────────────────────────────────────────────────────────────────────
 # REGRA 106 — Superfície que viaja passa pela varredura de vazamento da publicação [HARD + SOFT]
 # previne: id de adotante com prefixo onion- ou caminho de máquina entrando por PR verde e só sendo barrado no fim, pelo motor de publicação das portas.
-#   DANO MEDIDO (2026-10-13, duas vezes na mesma noite): o ensaio de `/meta:publish --all` reprovou três
+#   DANO MEDIDO (2026-10-13, duas vezes na mesma noite): o ensaio de `/meta:publish --all` (core-only) reprovou três
 #   portas no passo (5a) do motor ("VAZAMENTO no bundle — a porta é PÚBLICA") por duas classes que
 #   entraram por PRs mergeados com o lint verde: caminho de máquina em comentários e fixtures que viajam
 #   (8 ocorrências, curado no #1096) e o id do repo privado de um adotante com prefixo `onion-` em 23

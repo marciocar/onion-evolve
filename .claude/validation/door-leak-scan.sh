@@ -5,7 +5,7 @@
 # É o código do passo (5a) do motor de publicação das portas, o `ops/publish-door.sh` (core-only),
 # EXTRAÍDO para que o motor e o lint chamem a MESMA coisa. Antes desta extração o (5a) só existia
 # dentro do motor, que roda no fim: medido em 2026-10-13, duas vezes na mesma noite, o ensaio de
-# `/meta:publish --all` reprovou três portas por vazamento que tinha entrado por PRs mergeados com o
+# `/meta:publish --all` (core-only) reprovou três portas por vazamento que tinha entrado por PRs mergeados com o
 # lint verde — caminho de máquina em comentários e fixtures que viajam, e o id de um repo privado de
 # adotante com prefixo `onion-` em 23 comentários de sinal de campo. A REGRA 36 (Superfície VENDORIZADA
 # sem nome comercial de cliente) ignora o prefixo `onion-` por desenho, e nenhuma guarda do lint

@@ -1,6 +1,6 @@
 ---
 name: build-compliance-docs
-description: Gerar arquitetura de compliance em `docs/compliance-context/`.
+description: Gerar arquitetura de compliance na pasta de contexto declarada (default `docs/compliance-context/`).
 
 parameters:
   - name: frameworks
@@ -9,16 +9,19 @@ parameters:
   - name: due_diligence
     description: Caminho para checklist de DD
     required: false
+  - name: mode
+    description: generate (default em pasta vazia) ou reconcile (default quando a pasta já tem docs)
+    required: false
 
-allowed-tools: Read Write Grep Glob Bash(grep *) Bash(find *) Bash(ls *)
+allowed-tools: Read Write Grep Glob Bash(grep *) Bash(find *) Bash(ls *) Bash(wc *) Bash(bash .claude/utils/scope/resolve-context-dir.sh *)
 category: docs
 tags:
   - compliance
   - security
   - audit
 
-version: "4.0.0"
-updated: "2026-06-16"
+version: "4.1.0"
+updated: "2026-10-20"
 
 related_commands:
   - /docs:build-tech-docs
@@ -52,12 +55,44 @@ Gerar arquitetura completa de docs de compliance multi-framework.
 
 # Modo 4: Completo
 /docs/build-compliance-docs frameworks="all"
+
+# Modo 5: Reconciliar (pasta já populada — o default nesse caso)
+/docs/build-compliance-docs mode=reconcile
 ```
+
+> **Modo `reconcile`.** A pasta-alvo já tem documentos (gerados antes ou escritos à mão). O comando
+> **não regenera** e **não sobrescreve** texto humano: lê cada documento, confronta cada controle que ele
+> declara com a evidência (régua de precedência abaixo), e só (1) troca `[TO BE COMPLETED]` por conteúdo
+> quando acha evidência citável, (2) marca `[INFERIDO]` o que inferiu, e (3) escreve no `index.md` uma
+> seção **"Divergências"** com cada controle que o documento declara e a evidência nega, com a fonte dos
+> dois lados (`arquivo:linha` ou documento e data). Documento sem nenhum controle confirmado não é apagado:
+> é listado como "sem evidência" na mesma seção. Em pasta populada e sem `mode`, o default é `reconcile`.
+> **Populada** quer dizer: há `.md` em `<raiz>` além de `README.md` e `index.md` (a pasta-template que a
+> adoção monta só tem o `README.md` e cai em `generate`). `frameworks` e `due_diligence` continuam valendo
+> em `reconcile`: escolhem quais documentos reconciliar, e um framework pedido sem documento na pasta é
+> gerado como em `generate` (só ele).
 
 ## ⚡ Fluxo de Execução
 
+### Passo 0: Resolver a pasta-alvo
+
+A pasta não é fixa. O repo pode declará-la em `.claude/onion-context.yaml` (`context.compliance`), e a
+declaração vence a convenção (skill `onion-compliance-context` §2):
+
+```bash
+bash .claude/utils/scope/resolve-context-dir.sh compliance --source
+# → "docs/compliance<TAB>onion-context"  (declarado)  ou  "docs/compliance-context<TAB>default"
+```
+
+Daqui em diante, **`<raiz>`** é o caminho que ele imprimiu. Saída `3` = declaração inválida: **pare** e
+mostre o erro (gravar no default quando o repo declarou outra pasta é o defeito que este passo cura).
+Passe a `<raiz>` a cada especialista no Passo 3: os caminhos `docs/compliance-context/` dos prompts deles
+são o default, não uma ordem.
+
 ### Passo 1: Detectar Modo
 
+SE `{{mode}}` = reconcile, ou `<raiz>` está populada (`.md` além de `README.md`/`index.md`) e `{{mode}}`
+não foi dado → Modo Reconciliar (os testes abaixo seguem valendo para escolher os frameworks)
 SE `{{frameworks}}` → Modo Seletivo
 SE `{{due_diligence}}` → Modo DD (analisar checklist)
 SENÃO → Modo Auto (analisar projeto)
@@ -94,6 +129,17 @@ propagar a contradição para a documentação gerada.
 > documento. **Interesse qualifica a leitura, não a anula** — achado distinto e de lógica de negócio não
 > se relativiza. Doutrina: [evidence-source-interest.md](../../../docs/knowledge-base/concepts/evidence-source-interest.md).
 
+> **⚠️ E o documento PRÓPRIO feito para fora carrega o mesmo interesse.** Status de certificação,
+> carta de due diligence, questionário de segurança respondido, deck para investidor: a empresa os escreve
+> para o cliente ou o auditor, e eles **declaram** controles. Não são "políticas vigentes" (nível 2) só
+> por serem internos e recentes. Valem como **declaração a verificar**: o controle que eles afirmam entra
+> como implementado **só** se o nível 1 (código, configuração, registro) o confirma. Quando o código nega
+> o que o documento declara, o código vence, e a divergência vira **lacuna nomeada** (fonte e data dos
+> dois lados) no `index.md`. Nunca vira texto de conformidade. Caso de campo (2026-10-19, um adotante):
+> a wiki declarava um controle que o backlog interno negava, e o status de certificação declarava um
+> avanço que o próprio documento do programa negava. Leitura completa em
+> [evidence-source-interest.md](../../../docs/knowledge-base/concepts/evidence-source-interest.md) §Documento próprio.
+
 > **Modo não-interativo (infer-from-evidence).** Sem usuário disponível ou evidência completa,
 > não bloqueie: infira a partir do repo e dos artefatos existentes, **marque cada inferência**
 > com `[INFERIDO]` e liste as suposições numa seção "Pendências de validação" no `index.md`.
@@ -118,20 +164,26 @@ PARALELO (todos ao mesmo tempo, sem esperar o anterior):
 
 **Fan-in (síntese):** após todos finalizarem, `@security-information-master` consolida os resultados e segue para o Passo 4.
 
+> **Em `reconcile`**, o despacho é o mesmo, mas o pedido a cada especialista muda: **ler** os documentos do
+> framework dele em `<raiz>`, confrontar cada controle declarado com a evidência e devolver a lista de
+> trocas (lacuna preenchida com fonte, `[INFERIDO]`, divergência). O especialista não reescreve documento
+> existente; o Passo 4 aplica só essas trocas e a seção "Divergências".
+
 ### Passo 4: Gerar Documentação
 
-Gere os arquivos em `docs/compliance-context/` seguindo o template-base
+Em `generate`, gere os arquivos em `<raiz>` (Passo 0) seguindo o template-base
 `.claude/commands/common/templates/compliance-context-template.md`. Crie apenas os arquivos dos
-frameworks selecionados.
+frameworks selecionados. Em `reconcile`, aplique só as trocas devolvidas no Passo 3 e escreva a
+seção "Divergências" do `index.md`; documento existente não é regenerado.
 
 > **Convenção de nomes (esta seção tem precedência sobre o template-base).** Use
 > **kebab-case minúsculo** para todos os arquivos e pastas (`risk-assessment.md`,
 > `trust-services.md`), exatamente como na estrutura abaixo. Se o template sugerir nomes em
 > UPPERCASE, **ignore** — a estrutura deste comando é a autoritativa.
 
-Estrutura de saída:
+Estrutura de saída (em `<raiz>`; o default é `docs/compliance-context/`):
 ```
-docs/compliance-context/
+<raiz>/
 ├── index.md
 ├── iso27001/
 │   ├── policy.md
@@ -146,35 +198,52 @@ docs/compliance-context/
 
 ### Passo 5: Validar e Entregar
 
+Antes de imprimir o resumo, **meça**. Cada número do resumo sai de um comando, e o comando vai junto:
+
+```bash
+find <raiz> -name '*.md' | wc -l                              # documentos na pasta (inclui README/index)
+grep -rlF '[TO BE COMPLETED]' <raiz> | wc -l                  # documentos com lacuna aberta
+grep -roF '[TO BE COMPLETED]' <raiz> | wc -l                  # lacunas abertas (marcadores)
+grep -roF '[INFERIDO]' <raiz> | wc -l                         # inferências sem confirmação
+```
+
+**Não há percentual de cobertura no resumo.** "Controles: 85%" exige um denominador (os controles
+aplicáveis) e um numerador medido (os confirmados no nível 1 da precedência). O comando não mede
+nenhum dos dois, então não imprime a razão. Documento gerado não é controle implementado, e a contagem
+de documentos não diz nada sobre conformidade.
+
 ## 📤 Output Esperado
+
+O exemplo mostra a **forma**. Os números são de uma rodada ilustrativa: copie o comando, nunca o número.
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ DOCS DE COMPLIANCE GERADOS
+📋 DOCS DE COMPLIANCE GERADOS — rascunho, não atestado
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📊 Frameworks:
-∟ ISO 27001: ✅ 12 documentos
-∟ SOC2: ✅ 8 documentos
+📁 Pasta: docs/compliance (declarada em .claude/onion-context.yaml)
+⚙️  Modo: generate · Frameworks: ISO 27001, SOC2
 
-📁 Estrutura:
-∟ docs/compliance-context/index.md
-∟ docs/compliance-context/iso27001/ (12)
-∟ docs/compliance-context/soc2/ (8)
+📊 Medido (comandos do Passo 5):
+∟ Documentos na pasta: 9  find docs/compliance -name '*.md' | wc -l
+∟ Com lacuna aberta: 7     grep -rlF '[TO BE COMPLETED]' docs/compliance | wc -l
+∟ Lacunas abertas: 41      grep -roF '[TO BE COMPLETED]' docs/compliance | wc -l
+∟ Inferências: 12          grep -roF '[INFERIDO]' docs/compliance | wc -l
 
-📋 Cobertura:
-∟ Políticas: 100%
-∟ Controles: 85%
-∟ Evidências: Template
+⚠️ Divergências (documento declara, evidência nega): 2 → index.md §Divergências
+∟ MFA "implantado" (wiki, AAAA-MM) × contagem de usuários com MFA no backlog (AAAA-MM)
+∟ "Aprovado pela Alta Direção" (policy.md) × nenhuma ata citada → [TO BE COMPLETED]
 
-🚀 Próximo: Revisar e customizar
+🚫 Não medido: cobertura de controles (sem denominador nem confirmação no código)
+
+🚀 Próximo: fechar as lacunas com evidência citável, ou rodar mode=reconcile depois
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 ## 🔗 Referências
 
 - **Template-base**: `.claude/commands/common/templates/compliance-context-template.md`
-- **Pasta-alvo**: `docs/compliance-context/`
+- **Pasta-alvo**: a resolvida no Passo 0 (`resolve-context-dir.sh compliance`; default `docs/compliance-context/`)
 - **Comandos complementares**: `/docs:build-tech-docs` · `/docs:build-business-docs`
 - **Ciclo de vida (SSOT viva)**: [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md)
 - Orquestrador: @security-information-master · ISO 27001: @iso-27001-specialist · SOC2: @soc2-specialist
@@ -184,4 +253,8 @@ docs/compliance-context/
 - Não criar um único arquivo grande — sempre multi-arquivo linkado pelo `index.md`
 - Docs gerados são templates base; customizar para o contexto específico antes de auditorias
 - Marcar gaps como `[TO BE COMPLETED]` e inferências como `[INFERIDO]` — nunca inventar conformidade
+- Aprovação, assinatura e ata ("Aprovado pela Alta Direção", "Assinado por") só com a ata ou o registro
+  citado (data e instância); sem ele, o campo fica `[TO BE COMPLETED]`
+- "Requisito mapeado" (existe documento que o trata) não é "requisito atendido" (controle confirmado no
+  nível 1 da precedência); o resumo e o `index.md` dizem qual dos dois é
 - Regenerar quando controles, escopo ou frameworks mudam (contexto é SSOT viva, não snapshot)
