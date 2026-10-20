@@ -39728,6 +39728,67 @@ run_remeasure_hard_selftests() {
   rm -rf "${d}"
 }
 _family run_remeasure_hard_selftests
+# ── applied-delta.sh: "Arquivos aplicados" do relatório do --update, MEDIDO NO ALVO (2026-10-20) ──────
+# O caso medido (sinal do hub, 2026-10-19): a fonte disse 239, chegaram 540, porque vendor/kg-ssot já existia
+# no core no pin e só entrou no MANIFESTO depois — chega inteiro no alvo e o delta da fonte não o vê. A fixture
+# reproduz o buraco em miniatura: o manifesto CRESCE (vendor/x entra depois do pin, já existindo nele), o delta
+# da fonte conta 1 e o alvo recebe 4. (a) é o número certo; (b) prova que a fixture tem o buraco (o jeito velho
+# subconta nela); (c) e (d) são o NÃO MEDIDO, nunca um número inventado. MUTANTE: trocar o merge-base pela ponta
+# da integração (o `..` de duas pontas) conta o commit que a integração ganhou depois — reprova (a).
+run_applied_delta_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/adopt/applied-delta.sh"
+  if [ ! -f "${sut}" ]; then record_fail "applied-delta" "SUT ausente: ${sut}"; return; fi
+  local d rc out old mut pin; d="$(mktemp -d)"
+  _ad_git() { git -C "$1" -c user.email=t@t -c user.name=t -c commit.gpgsign=false "${@:2}"; }
+  # FONTE: no pin, A/ está no manifesto e vendor/x/ já existe no repo, FORA dele; depois do pin muda só A/a.txt
+  # e o manifesto passa a incluir vendor/x/.
+  mkdir -p "${d}/src/A" "${d}/src/vendor/x"
+  git init -q -b main "${d}/src" >/dev/null 2>&1
+  echo v1 > "${d}/src/A/a.txt"; for i in 1 2 3; do echo "${i}" > "${d}/src/vendor/x/${i}.txt"; done
+  _ad_git "${d}/src" add -A; _ad_git "${d}/src" commit -qm pin
+  pin="$(_ad_git "${d}/src" rev-parse HEAD)"
+  echo v2 > "${d}/src/A/a.txt"; _ad_git "${d}/src" commit -qam muda-A
+  old="$(_ad_git "${d}/src" diff --name-only "${pin}..HEAD" -- A vendor/x | wc -l)"
+  # ALVO: a integração tem só A/ (o que o manifesto do pin levou); a onion/vendor traz A/ novo + vendor/x
+  # inteiro; a branch do update a mergeia; DEPOIS a integração ganha um commit alheio (z.txt), e a árvore tem
+  # a config pós-merge sem commit (settings modificado + carimbo novo).
+  mkdir -p "${d}/alvo/A" "${d}/alvo/.claude"
+  git init -q -b main "${d}/alvo" >/dev/null 2>&1
+  echo v1 > "${d}/alvo/A/a.txt"; echo '{}' > "${d}/alvo/.claude/settings.json"
+  _ad_git "${d}/alvo" add -A; _ad_git "${d}/alvo" commit -qm base
+  _ad_git "${d}/alvo" checkout -qb onion/vendor
+  cp -r "${d}/src/A" "${d}/src/vendor" "${d}/alvo/"; _ad_git "${d}/alvo" add -A; _ad_git "${d}/alvo" commit -qm vendor
+  _ad_git "${d}/alvo" checkout -q main; _ad_git "${d}/alvo" checkout -qb chore/onion-update-x
+  _ad_git "${d}/alvo" merge -q --no-ff -m merge onion/vendor
+  _ad_git "${d}/alvo" checkout -q main; echo z > "${d}/alvo/z.txt"; _ad_git "${d}/alvo" add z.txt; _ad_git "${d}/alvo" commit -qm alheio
+  _ad_git "${d}/alvo" checkout -q chore/onion-update-x
+  echo '{"hooks":{}}' > "${d}/alvo/.claude/settings.json"; echo 'source_commit: x' > "${d}/alvo/.claude/.onion-version"
+
+  rc=0; out="$(bash "${sut}" "${d}/alvo" main 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q ': 4 commitados + 2 pendentes$' <<< "${out}" && grep -qE '^ +3  vendor/x$' <<< "${out}"; then
+    record_pass "applied-delta: (a) manifesto que CRESCE → 4 commitados (vendor/x inteiro: 3) + 2 pendentes, medido no alvo"
+  else record_fail "applied-delta: (a)" "rc=${rc}: ${out}"; fi
+  if [ "${old}" -eq 1 ]; then
+    record_pass "applied-delta: (b) a fixture tem o buraco: o diff da fonte <pin>..HEAD -- <manifesto> conta 1 dos 4 (o 239 de 540)"
+  else record_fail "applied-delta: (b)" "o jeito velho contou ${old}, esperado 1 — a fixture não reproduz o buraco"; fi
+  rc=0; bash "${sut}" "${d}/alvo" nao-existe >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "applied-delta: (c) integração inexistente → rc=3 (NÃO MEDIDO)"
+  else record_fail "applied-delta: (c)" "integração inexistente saiu rc=${rc}"; fi
+  mkdir -p "${d}/nao-repo"; rc=0; bash "${sut}" "${d}/nao-repo" main >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "applied-delta: (d) alvo que não é repo git → rc=3 (NÃO MEDIDO)"
+  else record_fail "applied-delta: (d)" "não-repo saiu rc=${rc}"; fi
+  mut="${d}/mut.sh"
+  sed 's/^base="\$(git -C "\${W}" merge-base "\${INT}" HEAD 2>\/dev\/null)" || nm .*$/base="${INT}" # ONION_MUTANTE ponta da integração/' "${sut}" > "${mut}"
+  if ! grep -q 'ONION_MUTANTE ponta da integração' "${mut}"; then
+    record_fail "applied-delta: (m) mutante" "o sed não casou a linha do merge-base — o mutante não foi aplicado"
+  else
+    out="$(bash "${mut}" "${d}/alvo" main 2>&1)" || true
+    if grep -q ': 4 commitados' <<< "${out}"; then record_fail "applied-delta: (m) mutante" "a ponta da integração passou em (a): ${out}"
+    else record_pass "applied-delta: (m) mutante (ponta da integração em vez do merge-base) MORDE: conta o commit alheio"; fi
+  fi
+  rm -rf "${d}"; unset -f _ad_git
+}
+_family run_applied_delta_selftests
 
 # ── REGRA 89: a divida de Aufhebung, e as SEIS evasoes que uma passada adversarial provou ─────
 # POR QUE EXISTE (2026-09-23): a 1a versao desta guarda varria so os `kg:` das baselines — a

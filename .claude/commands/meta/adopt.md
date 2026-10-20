@@ -414,7 +414,7 @@ BR="<branch do commit: onion/adopt (adoção) | \$UPDATE_BR = chore/onion-update
 INBOUND="$DEST/docs/evolution/inbound"
 mkdir -p "$INBOUND/_processed"
 REPORT="$INBOUND/$(date +%F)-${OP}-${PIN}.md"
-# O orquestrador PREENCHE os campos reais (diff --stat já computado, novidades do CHANGELOG do core, etc.).
+# O orquestrador PREENCHE os campos reais (arquivos aplicados pelo applied-delta.sh, novidades do CHANGELOG do core, etc.).
 cat > "$REPORT" <<EOF
 ---
 title: 'Relatório de ${OP} Onion — pin ${PIN}'
@@ -430,7 +430,7 @@ flow: downstream (core→consumidor / distribuição)
 # Relatório de ${OP} — pin ${PIN}
 
 ## Arquivos aplicados
-<colar o git diff --stat ${PREV:+${PREV}..}HEAD do manifesto>
+<colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$DEST" "$INTEGRATION_BRANCH" — medido NO ALVO; rc=3 = NÃO MEDIDO, nunca o delta da fonte>
 
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
@@ -730,7 +730,7 @@ if [ "$TARGET_KIND" = door ]; then export ONION_KIND=door; else export ONION_KIN
 source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"; export ONION_TARGET="$TARGET"
 onion_load_manifest "$SOURCE_ROOT" "$TARGET_ROLE" || exit 1
 git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.env.example)
-# Delta só com pin VERIFICADO (senão o range mente); a cópia segura abaixo não depende do delta.
+# Delta da FONTE (pin VERIFICADO, senão o range mente): o que mudou no core, NÃO o que chega (entrada nova do manifesto some daqui).
 [ -n "$PIN_OK" ] && git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```
 
@@ -772,8 +772,8 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   # atualiza source_commit/date e escreve updated_at; adopted_at perdido → members.yaml, ou omitido com AVISO.
   ```
 - **Auto-emitir o relatório NO ALVO — ANTES do commit durável, que o leva na branch dedicada** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
-  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). Reusa o `diff --stat` já computado
-  acima. **O diff de hooks é a saída de** `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"` (entrada inteira; rc≠0 = NÃO MEDIDO). **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
+  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). **Os arquivos aplicados são medidos
+  NO ALVO**, nunca pelo delta da fonte acima: `bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$WORK" "$INTEGRATION_BRANCH"` (merge-base..HEAD + o pendente; rc=3 = NÃO MEDIDO). **O diff de hooks é a saída de** `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"` (entrada inteira; rc≠0 = NÃO MEDIDO). **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
   `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO).
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
   já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o
