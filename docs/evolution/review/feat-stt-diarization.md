@@ -11,7 +11,7 @@ duration_min: 11
 findings_fixed: 7
 verdict: REPROVADO_E_CURADO
 elenxo: sim
-reviewer: subagente general-purpose, mandato REFUTAR, 1 passada sobre o commit f914f25a (só leitura, sem sudo)
+reviewer: subagente general-purpose, mandato REFUTAR, 1 passada sobre o 1º commit do branch, antes do rebase (só leitura, sem sudo)
 nota: "o achado 8 foi curado em parte: o diarized_json do OpenAI fica declarado como não suportado"
 ---
 
