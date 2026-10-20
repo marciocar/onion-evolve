@@ -391,8 +391,15 @@ _family() {
   # cópia de um adotante greenfield com o .claude/ atual e role: adopted — 118 passam; estas 12 reprovam porque testam
   # SSOT/maquinaria que SÓ o core tem (radar-baselines, members.yaml, radar-sources, marketplace, moat, outbox, bundling,
   # registro de regras). No adotante pulam com ⊘ VISÍVEL; no core rodam. Re-medir ao adicionar família nova.
+  # ⚠️ A REIVINDICAÇÃO É O `open(O_CREAT|O_EXCL)` DO PRÓPRIO BASH (noclobber), NUNCA O BINÁRIO `mkdir`.
+  #    Medido em 2026-10-20: o runner ubuntu-26.04 troca o coreutils pelo uutils 0.10.0, cujo `mkdir`
+  #    confere a existência ANTES de criar e devolve rc=0 aos DOIS processos que chegam juntos (480 de
+  #    1000 corridas com 2 núcleos; o GNU, 0 de 1000). Os dois workers rodavam a MESMA família, o pai
+  #    somava "Passaram : 3" com exit 0 e o caso (h) da selftest_lanes caía só no CI (PRs #1226 e #1238).
+  #    A atomicidade da trava não pode depender de qual implementação de coreutils a imagem traz:
+  #    o noclobber do bash abre o arquivo com O_EXCL no kernel, sem binário externo no caminho.
   if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then
-    mkdir "${SELFTEST_QUEUE}/claimed/${name}" 2>/dev/null || return 0
+    ( set -C; : > "${SELFTEST_QUEUE}/claimed/${name}" ) 2>/dev/null || return 0
   fi
   # PREDICADO: "não é o core", não "é adopted". A forma antiga era CEGA para `hub` e `standalone`,
   # que também CONSOMEM o framework sem autorá-lo. Medido por dogfood em 2026-09-30, atualizando um
@@ -1405,7 +1412,7 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
     done
     for _fam in "${_fams[@]}"; do
       [ "${_fam}" = "fixtures" ] && continue
-      if [ ! -d "${_tdir}/q/claimed/${_fam}" ]; then
+      if [ ! -e "${_tdir}/q/claimed/${_fam}" ]; then
         FAIL=$((FAIL + 1)); FAILED_CASES+=("família ${_fam} NUNCA foi reivindicada por worker nenhum")
       elif [ ! -f "${_tdir}/q/done/${_fam}" ]; then
         FAIL=$((FAIL + 1)); FAILED_CASES+=("família ${_fam} reivindicada e NÃO concluída (worker morreu no meio dela)")
@@ -26926,6 +26933,47 @@ PYI
   if [ "${rc}" -eq 0 ] && grep -q 'Passaram : 2' <<< "${out}"&& grep -q 'faixa paralela: 2 famílias / 2 workers' <<< "${out}"; then
     record_pass "selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0"
   else record_fail "selftest-lanes: (h) --jobs agrega" "rc=${rc}; $(printf '%s\n' "${out}" | grep -E 'Passaram|faixa' | tr '\n' '|' | cut -c1-140)"; fi
+  # (h2) A REIVINDICAÇÃO DA FILA É ATÔMICA QUALQUER QUE SEJA O `mkdir` DA IMAGEM. Medido em 2026-10-20: o
+  #      runner ubuntu-26.04 traz o uutils 0.10.0, cujo `mkdir` confere a existência e SÓ DEPOIS cria — dois
+  #      workers que chegam juntos recebem rc=0 os dois (480/1000 corridas em 2 núcleos; GNU: 0/1000). Os
+  #      dois rodavam a mesma família, o pai somava "Passaram : 3" com exit 0, e o (h) caía só no CI. Aqui o
+  #      `mkdir` do PATH vira um imitador FIEL desse defeito, com BARREIRA: quem confere espera o outro
+  #      conferir também, então a corrida acontece em toda rodada, não por sorte. O SUT tem de dar 2; o
+  #      MUTANTE (a trava devolvida ao `mkdir`) tem de dar mais que 2 — senão o imitador não morde.
+  local _shim="${d}/zz-uu-shim" _real_mk; _real_mk="$(command -v mkdir)"
+  mkdir -p "${_shim}/bin" "${_shim}/arrived"
+  cat > "${_shim}/bin/mkdir" <<SHIM
+#!/bin/bash
+# imitador do mkdir do uutils 0.10.0: confere-depois-cria (não-atômico). Com -p, o real.
+for _a in "\$@"; do case "\${_a}" in -p|--parents|-*p*) exec "${_real_mk}" "\$@" ;; esac; done
+_t="\${!#}"; [ -e "\${_t}" ] && { echo "mkdir: \${_t}: File exists" >&2; exit 1; }
+_k="${_shim}/arrived/\$(printf '%s' "\${_t}" | tr '/' '_')"; "${_real_mk}" -p "\${_k}"; : > "\${_k}/\$\$"
+for _i in \$(seq 1 50); do [ "\$(ls "\${_k}" | wc -l)" -ge 2 ] && break; sleep 0.1; done
+exec "${_real_mk}" -p "\${_t}"
+SHIM
+  chmod +x "${_shim}/bin/mkdir"
+  local _mut="${d}/.claude/validation/lint-selftest-mut.sh" _o2 _om _r2 _rm
+  # âncora por REGEX ancorada no recuo da linha do `_family` (4 espaços): este caso cita a trava em prosa
+  # e não pode casar consigo mesmo (contagem tem de ser exatamente 1, senão o mutante não nasce)
+  python3 - "${copy}" "${_mut}" <<'PYMUT'
+import re, sys
+src, dst = sys.argv[1], sys.argv[2]
+s = open(src).read()
+rx = re.compile(r'^    \( set -C; : > "\$\{SELFTEST_QUEUE\}/claimed/\$\{name\}" \) 2>/dev/null \|\| return 0$', re.M)
+if len(rx.findall(s)) != 1: sys.exit(0)   # sem a âncora o mutante não nasce, e o caso acusa abaixo
+open(dst, "w").write(rx.sub('    mkdir "${SELFTEST_QUEUE}/claimed/${name}" 2>/dev/null || return 0', s))
+PYMUT
+  _o2="$(PATH="${_shim}/bin:${PATH}" bash "${copy}" --families zz_ok,zz_ok2 --jobs 2 2>&1)" && _r2=0 || _r2=$?
+  if [ ! -f "${_mut}" ]; then
+    record_fail "selftest-lanes: (h2) mutante" "a âncora da trava (noclobber) não está UMA vez no SUT — a cura sumiu ou mudou de forma; o mutante não nasceu"
+  else
+    rm -rf "${_shim}/arrived"; mkdir -p "${_shim}/arrived"
+    _om="$(PATH="${_shim}/bin:${PATH}" bash "${_mut}" --families zz_ok,zz_ok2 --jobs 2 2>&1)" && _rm=0 || _rm=$?
+    rm -f "${_mut}"
+    if [ "${_r2}" -eq 0 ] && grep -q 'Passaram : 2$' <<< "${_o2}" && ! grep -qE 'Passaram : (0|1|2)$' <<< "${_om}"; then
+      record_pass "selftest-lanes: (h2) mkdir não-atômico no PATH (uutils) ⇒ SUT soma 2; o mutante com a trava em mkdir soma $(grep -oE 'Passaram : [0-9]+' <<< "${_om}" | grep -oE '[0-9]+$') (o imitador morde)"
+    else record_fail "selftest-lanes: (h2) reivindicação não-atômica" "SUT rc=${_r2} $(grep -oE 'Passaram : [0-9]+' <<< "${_o2}"); mutante rc=${_rm} $(grep -oE 'Passaram : [0-9]+' <<< "${_om}") — esperado SUT=2 e mutante>2"; fi
+  fi
   out="$(bash "${copy}" --families zz_ok,zz_abort --jobs 2 2>&1)" && rc=0 || rc=$?
   if [ "${rc}" -eq 1 ] && grep -q 'ABORTOU sem somar' <<< "${out}"&& grep -q 'zz_abort reivindicada e NÃO concluída' <<< "${out}"&& ! grep -q '^OK ✓' <<< "${out}"; then
     record_pass "selftest-lanes: (i) worker que aborta ⇒ FALHA no pai (exit 1): sem trailer + família reivindicada-e-não-concluída nomeada"

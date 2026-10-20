@@ -4,7 +4,11 @@ meta:
   baseline: "2026-09-14"
   review_after: "2027-01-12"   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 55 NOS (era 54: +1 pela CLASSE backtick-em-prosa-dentro-de-contexto-que-interpreta,
+  # ═══ TETO: 56 NOS (era 55: +1 pela CLASSE trava-por-binario-externo, medida em 2026-10-20 com o
+  #     caso (h) da selftest_lanes caindo 3x num dia SO no runner: a imagem trocou o coreutils pelo
+  #     uutils e o `mkdir` deixou de ser atomico. Classe nova de bancada, com a mesma assinatura do
+  #     EPIPE (verde local, vermelho no CI de 2 nucleos) e causa OUTRA — por isso o no.)
+  #     (era 54: +1 pela CLASSE backtick-em-prosa-dentro-de-contexto-que-interpreta,
   #     TRES ocorrencias medidas em DOIS dias, todas com o artefato saindo 0 e parecendo certo. Cresce
   #     por recorrencia medida da mesma classe, que e o criterio declarado abaixo — e aqui a
   #     recorrencia e o proprio conteudo do no, nao a justificativa dele.)
@@ -942,7 +946,28 @@ nodes:
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
+  - id: C_TRAVA_POR_BINARIO_EXTERNO_PERDE_ATOMICIDADE_NA_IMAGEM
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    valid_from: "2026-10-18"
+    verified_at: "2026-10-20"
+    verified_against: 'corrida de dois processos no mesmo nome, 1000 rodadas em 2 nucleos: mkdir do GNU 0/1000, mkdir do uutils 0.10.0 (o do ubuntu-26.04) 480/1000 com rc=0 nos dois; noclobber do bash 0/1000 com o uutils no PATH. Caso (h) reproduzido: 14/180 falhas com o uutils, 0/120 com o GNU; depois da cura, 0 nas mesmas condicoes.'
+    label: 'CLASSE: trava de concorrencia feita com BINARIO externo (`mkdir` como mutex) herda a semantica da implementacao que a imagem traz. O uutils confere-depois-cria, e dois workers recebiam rc=0: a fila rodava a mesma familia 2x e o pai somava 3 com exit 0.'
+    narrative: 'Medido em 2026-10-20 sobre o caso (h) da familia selftest_lanes, que caiu 3 vezes num dia so no CI (PRs #1226 e #1238) e passava local. A assinatura e a do EPIPE (verde no dev, vermelho no runner de 2 nucleos) e a causa e outra: o runner ubuntu-26.04 (imagem 20261018) substitui o coreutils GNU pelo uutils 0.10.0, e o `mkdir` dele nao e atomico. A falha so aparece em PR que toca a propria bancada porque e o failsafe do --affected que seleciona a selftest_lanes; nos demais ela nem roda. O log do runner ja mostrava o efeito na bancada INTEIRA, nao so no (h): a familia vendor_manifest saiu duplicada (11 linhas de caso repetidas) no mesmo job, ou seja, os workers da fila rodavam familias em dobro em silencio. CURA no mecanismo: a reivindicacao passa a ser o `open(O_CREAT|O_EXCL)` do proprio bash (`set -C` + redirecionamento), sem binario no caminho; o caso (h2) poe no PATH um imitador fiel do defeito, com barreira que forca a corrida em toda rodada, e exige o SUT em 2 e o mutante (trava devolvida ao mkdir) acima de 2. Regra que sai: atomicidade nunca se pede a um utilitario de userland; pede-se ao kernel por uma primitiva do proprio interpretador (noclobber, flock no fd, os.mkdir).'
+    trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh (_family, reivindicacao da fila) + log do job 118913703983 do run 39505580236 (PR #1238, 1a tentativa)"
+      locator: "_family: a linha da trava por noclobber; job log: '✗ selftest-lanes: (h) --jobs agrega — rc=0' e as 11 linhas de caso de vendor-manifest em dobro; imagem ubuntu-26.04 20261018.168.1"
+      method: "medição: corrida de reivindicação com o binário real do uutils extraído da imagem ubuntu:26.04 e reprodução do (h) com taskset em 2 núcleos, com e sem carga"
+      locality: "repo"
+
 edges:
+  - from: C_TRAVA_POR_BINARIO_EXTERNO_PERDE_ATOMICIDADE_NA_IMAGEM
+    to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
+    edge_type: CONSTRAINS
   - from: C_BACKTICK_EM_PROSA_DENTRO_DE_CONTEXTO_QUE_INTERPRETA
     to: E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API
     edge_type: SUPPORTS
