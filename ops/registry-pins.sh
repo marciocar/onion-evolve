@@ -176,9 +176,15 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole superby; 
   # outro membro (um hub) — a 1ª versão carimbou esse pin no membro standalone. Carimbo de outra adoção não é pin
   # deste membro: acusa e não carimba, nem quando o pin bate.
   stamp_role="$(printf '%s\n' "${_st}" | awk '/^role:/{sub(/^role:[[:space:]]*/,""); sub(/[[:space:]]*#.*$/,""); gsub(/[[:space:]"\047]/,""); print; exit}')"
-  if [ -n "${stamp_role}" ] && [ -n "${regrole}" ]; then
+  # CARIMBO SEM `role:` (achado da passada adversarial de 2026-10-20): a 1ª forma só comparava quando os
+  # DOIS lados tinham papel, e o carimbo mudo pulava a conferência — o pin de outra adoção no mesmo remoto
+  # seria carimbado. O registro sempre tem `role:` (o members-validate.sh exige); o carimbo vivo também
+  # (write-stamp.sh grava). Papel ausente no carimbo não é "compatível por omissão": acusa e não carimba.
+  # O papel NUNCA é carimbado por este script, só acusado: ele muda o corte que viaja para o adotante, e
+  # re-carimbá-lo é ato da sessão DELE (`/meta:adopt --update --role …`); o registro se alinha à mão.
+  if [ -n "${regrole}" ]; then
     case "${regrole}:${stamp_role}" in hub:hub|standalone:standalone|standalone:adopted|consumer:adopted) ;; *)
-      printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "${live12}" "${src}" "${branch} ${bsrc}" "DIVERGE (papel: registro ${regrole} × carimbo ${stamp_role} — carimbo de OUTRA adoção?)"
+      printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "${live12}" "${src}" "${branch} ${bsrc}" "DIVERGE (papel: registro ${regrole} × carimbo ${stamp_role:-<sem role>} — carimbo de OUTRA adoção?)"
       n_div=$((n_div + 1)); continue ;;
     esac
   fi
