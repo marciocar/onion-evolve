@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**569 itens abertos** em 113 grafo(s) com aberto (de 147 no escopo) · 114 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**572 itens abertos** em 114 grafo(s) com aberto (de 147 no escopo) · 115 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -934,6 +934,14 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
+
+## sinais-de-campo-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.4 | `Q_HUB_1019_ONDA_B_CORPUS_HERDA_CONTRATO` | sinais-de-campo-2026-09 | U1 (onda B, primeiro): o --update mede o contrato KG no corpus do alvo e o escreve no relatório, com caminho de migração do pro |
+| 4.8 | `Q_HUB_1019_ONDA_B_GRAFO_NOS_BUILD_DOCS` | sinais-de-campo-2026-09 | C1 com C2 e C7 (onda B, depois do U1): fase de grafo nos build-*-docs, controle marcado prod, dev ou policy, e escritor de grafo v |
+| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
 ## anarlog-2026-10 — 2 item(ns)
 
