@@ -1,5 +1,5 @@
 {
-  "description": "Coerência entre campos e arestas (v4.1): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision.",
+  "description": "Coerência entre campos e arestas (v4.1): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision. Desde o v4.4, nó que recebe REFUTES e segue vivo (nem superseded nem refuted; a question done já está respondida) alerta integrity.refutes-unreconciled: é a contradição que o radar reprova, como aviso por enquanto.",
   "layer": "integrity",
   "pending_on": [],
   "cases": [
@@ -89,6 +89,87 @@
       "description": "decision cujo trace é só um U+FEFF: não é espaço no str.isspace, então conta como trace (o trim() do JS o tiraria)",
       "valid": true,
       "codes": []
+    },
+    {
+      "file": "warn-refutes-confirmed.kg.yaml",
+      "description": "REFUTES sobre uma evidência que segue confirmed: o grafo afirma e refuta a mesma coisa (o radar reprova como contradição)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ]
+    },
+    {
+      "file": "warn-refutes-open.kg.yaml",
+      "description": "REFUTES sobre um nó open: também segue vivo, e alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ]
+    },
+    {
+      "file": "warn-refutes-twice.kg.yaml",
+      "description": "duas REFUTES sobre o mesmo nó confirmed: alerta (a suíte compara o conjunto de códigos; a contagem, um por nó, é conferida nos testes de cada leitor)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ]
+    },
+    {
+      "file": "valid-refutes-refuted.kg.yaml",
+      "description": "REFUTES sobre um nó refuted: reconciliado, nada a alertar",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-refutes-superseded.kg.yaml",
+      "description": "REFUTES sobre um nó superseded: reconciliado, nada a alertar",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-refutes-question-open.kg.yaml",
+      "description": "REFUTES sobre uma question open: alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ]
+    },
+    {
+      "file": "valid-refutes-question-done.kg.yaml",
+      "description": "REFUTES sobre uma question done: a pergunta já está respondida, nada a alertar (a exceção do radar)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-refutes-decision-done.kg.yaml",
+      "description": "REFUTES sobre uma decision done: a exceção é da question done, por tipo e não por status, e a decision alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ]
+    },
+    {
+      "file": "warn-refutes-drifted.kg.yaml",
+      "description": "REFUTES sobre um nó drifted: reconciliação devida também é vida, e alerta (só superseded e refuted reconciliam)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ]
+    },
+    {
+      "file": "warn-refutes-unverifiable.kg.yaml",
+      "description": "REFUTES sobre um nó unverifiable: sem fonte recuperável não é reconciliado, e alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.refutes-unreconciled"
+      ]
     }
   ]
 }

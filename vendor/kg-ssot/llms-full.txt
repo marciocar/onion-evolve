@@ -1,4 +1,4 @@
-# KG-SSOT 4.10.0 (tag kg-ssot-v4.10.0): o texto completo para agentes de IA
+# KG-SSOT 4.11.0 (tag kg-ssot-v4.11.0): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,8 +14,8 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.10.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.10.0-6f42c1)](spec/release.json)
-[![Suíte: 263/263](https://img.shields.io/badge/su%C3%ADte-263%2F263-2ea44f)](spec/conformance/README.md)
+[![Contrato: v4 · release 4.11.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.11.0-6f42c1)](spec/release.json)
+[![Suíte: 294/294](https://img.shields.io/badge/su%C3%ADte-294%2F294-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
@@ -56,7 +56,7 @@ python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/require
 ```
 
 ```text
-latest: 263/263 (reprova)
+latest: 294/294 (reprova)
 optional: 10/24 (só reporta)
 PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
 REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
@@ -99,7 +99,7 @@ O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `med
 flowchart LR
   subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
     C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>263 casos em dados puros"]
+    S["Suíte de conformidade<br/>294 casos em dados puros"]
     R["Leitor de referência<br/>kg_validate.py"]
     S -- "todo leitor passa" --> R
     C --> R
@@ -136,7 +136,7 @@ flowchart LR
 | **Dois formatos, um modelo** | O `.kg.yaml` para escrever e revisar no diff, e o `.kg.json` para o runtime (um app, um servidor), lido por um parser JSON no perfil JSON do contrato (RFC 8259, I-JSON, até 128 níveis, chave única). O gate e as `external_edges` seguem só com `.kg.yaml` |
 | **Armazém com gate** | `kg_store.py` grava `.kg.yaml` ou `.kg.json` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
 | **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
-| **Suíte em dados puros** | 263 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
+| **Suíte em dados puros** | 294 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
@@ -153,7 +153,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.10.0`. O leitor de referência passa em 263 de 263 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.11.0`. O leitor de referência passa em 294 de 294 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -257,14 +257,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -495,6 +495,20 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.10.0` para a `kg-ssot-v4.11.0`, entra o contrato v4.4: um aviso SHOULD e três vereditos MUST raros do YAML.
+- **`integrity.refutes-unreconciled`:** nó que recebe `REFUTES` e segue vivo (nem `superseded` nem `refuted`; só a
+  `question` `done` não alerta). O grafo afirma e refuta a mesma coisa. O radar do core já reprova o caso como
+  contradição; aqui ele alerta agora e vira MUST numa versão futura.
+- **O perfil YAML estrito:** a tag `!` sem nome (também `!<!>`), o `!!timestamp` cujo texto não é data e o tab fora
+  de aspas, de bloco e de comentário reprovam como `parse.yaml-error`, na referência e no leitor JS. O tab já
+  reprovava na referência; mudam a tag `!` e o `!!timestamp`. Medido em 2026-10-20, nenhum dos 1.391 `.kg.yaml` de
+  quatro repos adotantes muda de veredito.
+- **A suíte ganha 31 casos** (294): 10 em `latest/integrity/coherence/` e 21 em `latest/yaml/strict-profile/`.
+
+O sha256 do SHOULD muda, então o PR do `update` roda o `kg_gate.py --update` depois de trazer a tag. Se o corpus não
+tem o caso, ele grava a identidade nova sem motivo. Se tem, a dívida sobe por desenho, e o `--update` vai com
+`--accept-regression "<motivo>"`; ou reconcilie antes o alvo (`refuted` ou `superseded`).
+
 Da `kg-ssot-v4.9.1` para a `kg-ssot-v4.10.0`, nenhum veredito MUST muda. Muda o servidor MCP e o leitor JS:
 - **O perfil "atrás de proxy" do `kg_mcp.py`** (`--identity-header`, `--secret-env`): identidade por header que
   recusa por padrão, segredo comparado por hmac, uma área e um autor por identidade, por requisição, os limites
@@ -585,7 +599,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -957,6 +971,11 @@ Convenções: **obr.** = obrigatório; *data* = texto `AAAA-MM-DD` que existe no
   `off` são texto.
 - Chaves comparadas na forma JSON: `1` e `"1"` colidem (`parse.duplicate-key`).
 - `.nan` e `.inf` reprovam em qualquer posição, porque o JSON não os representa.
+- Tab só dentro de aspas (numa linha), de bloco literal (`|` ou `>`) e de comentário. Como espaço (depois de `:`, no fim da linha,
+  entre a data e a hora) ou dentro de um texto sem aspas, reprova (`parse.yaml-error`). Use espaço.
+- A tag `!` sem nome (também `!<!>`) reprova, e o `!!timestamp` explícito só aceita texto na forma de data
+  (`AAAA-M-D`, com hora opcional `H:MM:SS`, fração com dígito e fuso `Z` ou `±H[:MM]`, até ±29). A forma é conferida,
+  o calendário não. Sem tag, escreva a data entre aspas.
 - O perfil JSON vale também no `.kg.yaml`, como aviso: inteiro fora de ±(2^53−1) (`yaml.unsafe-integer`), surrogate
   solto (`yaml.lone-surrogate`) e mais de 128 coleções aninhadas (`yaml.depth-over-128`).
 
@@ -1075,6 +1094,7 @@ O schema não alcança estas regras, e todo leitor tem de aplicá-las:
 | nó PROD sustentado só por testemunho | SHOULD | `integrity.testimony-in-prod` |
 | `verified_at` anterior a `valid_from` | SHOULD | `integrity.verified-before-fact` |
 | `decision` viva sem `trace`, sem `provenance` e sem `TRACES_TO` saindo dela | SHOULD | `integrity.untraced-decision` |
+| nó que recebe `REFUTES` e segue vivo (nem `superseded` nem `refuted`; a `question` `done` já está respondida) | SHOULD (MUST depois) | `integrity.refutes-unreconciled` |
 
 Uma aresta externa conta como ligação: o nó ligado só por ela não é órfão.
 
@@ -2354,7 +2374,7 @@ Rode `kg_validate.py --where <arquivo>` primeiro: ele diz o código e o nó.
 | `yaml.forbidden-key-on` | Aresta com a chave `on` | Troque por `trigger` |
 | `parse.duplicate-key` | Chave repetida no mesmo mapa | Tire a duplicata |
 | `parse.not-single-document` | Mais de um documento YAML (`---`) | Um grafo por arquivo |
-| `parse.yaml-error` | O YAML não parseia (ou passa do teto de aninhamento ou de aliases) | Corrija a sintaxe na linha que o erro aponta |
+| `parse.yaml-error` | O YAML não parseia (ou passa do teto de aninhamento ou de aliases). No perfil do contrato, também tab fora de aspas, de bloco e de comentário, a tag `!` sem nome e o `!!timestamp` que não é data | Corrija a sintaxe na linha que o erro aponta; troque o tab por espaço e ponha a data entre aspas |
 | `parse.empty-document` · `parse.root-not-mapping` | Arquivo vazio, ou a raiz não é um mapa | O grafo começa por `meta:`, `nodes:` e `edges:` |
 
 A lista completa, com a forma de cada código, está em
@@ -2373,6 +2393,7 @@ A lista completa, com a forma de cada código, está em
 | `form.required.node.verified_against` | Diga o que foi conferido no `verified_at` |
 | `form.required.node.verified_at` | Nó PROD sem `verified_at`: carimbe a última conferência |
 | `integrity.untraced-decision` | Dê origem à decisão: `trace`, `provenance` ou uma aresta `TRACES_TO` |
+| `integrity.refutes-unreconciled` | O nó recebe `REFUTES` e segue valendo: o grafo afirma e refuta a mesma coisa. Se a refutação procede, mude o status do alvo para `refuted` ou `superseded`; se não procede, tire a aresta ou mude o status de quem refuta. Hoje é aviso, e vai reprovar numa versão futura do contrato |
 | `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`. Se o fato tem vigência futura (uma norma lida antes de entrar em vigor), o aviso é esperado e pode ficar na linha de base do gate. Se não, as datas estão trocadas: `valid_from` é quando o fato passou a valer, e `verified_at`, quando foi conferido |
 | `integrity.testimony-in-prod` | Meça e troque a classe para `medição`, ou aceite o risco visível |
 
@@ -2494,7 +2515,7 @@ Cada código é um slug estável por camada, e o metaschema confere a forma.
 |---|---|---|
 | parse | `parse.<motivo>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
 | form | `form.<tipo>.<escopo>.<campo>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
-| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision` (SHOULD) |
+| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` (SHOULD) |
 | yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 | semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked` e os `semantic.domain-*` da camada domain (SHOULD) — só em `optional/` |
 
@@ -2573,6 +2594,21 @@ e o veredito MUST do YAML não muda (`latest/yaml/json-profile/`):
 
 O v4.2 acrescenta `provenance.locality`, opcional, com o enum `repo`, `web`, `host` ou `pessoa`. O valor fora do enum
 alerta como `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), e nenhum veredito muda.
+
+O v4.4 acrescenta `integrity.refutes-unreconciled` (`latest/integrity/coherence/`): nó que recebe `REFUTES` e segue
+vivo, isto é, nem `superseded` nem `refuted`. A `question` `done` não alerta, porque já está respondida. O grafo afirma e
+refuta a mesma coisa. Em `optional/semantic/`, o mesmo grafo reprova como `semantic.contradiction`, que é o que o radar
+faz; no contrato o caso é SHOULD agora e vira MUST numa versão futura, depois que os adotantes medirem a própria dívida.
+
+O v4.4 também fecha três construções raras do YAML em que os leitores discordavam (`latest/yaml/strict-profile/`),
+com o veredito mais estrito nos três, por decisão de contrato de 2026-10-19. Todas reprovam como `parse.yaml-error`:
+- a tag `!` sem nome, também na forma `!<!>`, em escalar ou coleção;
+- o `!!timestamp` explícito cujo texto não é data na forma estrita: a interseção do construtor do PyYAML com o do
+  `yaml` do JS (minuto e segundo com 2 dígitos, fração com pelo menos um dígito, fuso até ±29, só espaço entre a
+  data e a hora);
+- o tab fora de aspas, de bloco literal e de comentário (como espaço ou dentro de um texto sem aspas), como no parser
+  puro do PyYAML.
+Medido em 2026-10-20: nenhum dos 1.391 `.kg.yaml` de quatro repos adotantes muda de veredito.
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
 caso, não do código.
 
@@ -2595,7 +2631,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 263 casos contra o contrato v4, 30 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 294 casos contra o contrato v4, 30 deles
 `.kg.json`. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
@@ -3155,7 +3191,7 @@ de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos d
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:kg-contract-v4.should.schema.json",
   "title": "kg.yaml — contrato v4, nível SHOULD",
-  "description": "O contrato v4 do .kg.yaml, nível SHOULD (alerta, não reprova), o vigente. É o SHOULD v3 menos o que o v4 promoveu a MUST: a chave desconhecida sem x_ no topo, no meta, no nó e na aresta e o nó confirmed ou PROD sem provenance. Segue alertando: nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*), como form.pattern.<escopo>.key, que sem x_ também reprova no MUST; nó PROD sem verified_at; label do nó acima de 280 caracteres, form.range.node.label, porque a narrativa vai para narrative; a chave desconhecida dentro de provenance, fechada em source, locator, method e x_; e o grafo sem nós (nodes: []), como form.range.top.nodes: é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio. No v4, provenance.method alerta (form.pattern.node.provenance.method) quando não segue a forma canônica '<classe>: <detalhe>', com a classe em medição, leitura, juízes, derivado, testemunho; reprova no v5. Medição feita por terceiro e lida pelo autor do grafo é testemunho. No v4.1 entram quatro avisos que o próprio arquivo decide. O schema acusa a claim com verified_at e sem verified_against (form.required.node.verified_against): carimbo sem alvo não distingue verificado de declarado. Só a claim: evidence é a própria âncora, artifact nomeia o alvo, question não afirma e a origem da decision é cobrada por integrity.untraced-decision. O leitor acusa três avisos que cruzam campos ou arestas, por isso não cabem no schema: integrity.testimony-in-prod (nó PROD cuja base é testemunho), integrity.verified-before-fact (verified_at anterior a valid_from) e integrity.untraced-decision (decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela). No v4.2 entra provenance.locality, opcional, com o enum repo (arquivo versionado no próprio repo), web (endereço público), host (só existe numa máquina: journal local, caminho fora do repo) ou pessoa (relato de alguém): o valor fora do enum alerta como form.enum.node.provenance.locality. Serve para medir o que é reverificável por terceiros e para barrar host na publicação.",
+  "description": "O contrato v4 do .kg.yaml, nível SHOULD (alerta, não reprova), o vigente. É o SHOULD v3 menos o que o v4 promoveu a MUST: a chave desconhecida sem x_ no topo, no meta, no nó e na aresta e o nó confirmed ou PROD sem provenance. Segue alertando: nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*), como form.pattern.<escopo>.key, que sem x_ também reprova no MUST; nó PROD sem verified_at; label do nó acima de 280 caracteres, form.range.node.label, porque a narrativa vai para narrative; a chave desconhecida dentro de provenance, fechada em source, locator, method e x_; e o grafo sem nós (nodes: []), como form.range.top.nodes: é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio. No v4, provenance.method alerta (form.pattern.node.provenance.method) quando não segue a forma canônica '<classe>: <detalhe>', com a classe em medição, leitura, juízes, derivado, testemunho; reprova no v5. Medição feita por terceiro e lida pelo autor do grafo é testemunho. No v4.1 entram quatro avisos que o próprio arquivo decide. O schema acusa a claim com verified_at e sem verified_against (form.required.node.verified_against): carimbo sem alvo não distingue verificado de declarado. Só a claim: evidence é a própria âncora, artifact nomeia o alvo, question não afirma e a origem da decision é cobrada por integrity.untraced-decision. O leitor acusa três avisos que cruzam campos ou arestas, por isso não cabem no schema: integrity.testimony-in-prod (nó PROD cuja base é testemunho), integrity.verified-before-fact (verified_at anterior a valid_from) e integrity.untraced-decision (decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela). No v4.2 entra provenance.locality, opcional, com o enum repo (arquivo versionado no próprio repo), web (endereço público), host (só existe numa máquina: journal local, caminho fora do repo) ou pessoa (relato de alguém): o valor fora do enum alerta como form.enum.node.provenance.locality. Serve para medir o que é reverificável por terceiros e para barrar host na publicação. No v4.4 entra o quarto aviso do leitor, integrity.refutes-unreconciled: nó que recebe REFUTES e segue vivo (nem superseded nem refuted; a question done já está respondida, e não alerta). O grafo afirma e refuta a mesma coisa; o radar do framework onde o formato nasceu reprova o caso como contradição. Aqui é SHOULD agora e vira MUST numa versão futura, depois que os adotantes medirem a própria dívida.",
   "type": "object",
   "propertyNames": {
     "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"

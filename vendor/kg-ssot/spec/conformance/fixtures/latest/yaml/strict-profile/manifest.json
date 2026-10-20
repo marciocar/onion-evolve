@@ -1,0 +1,171 @@
+{
+  "description": "O perfil YAML estrito do v4.4 (decisão de contrato de 2026-10-19, «o mais estrito nos três»): a tag ! sem nome (também !<!>), em escalar ou coleção, reprova; o !!timestamp explícito só aceita a data na forma estrita, a interseção do PyYAML com o yaml do JS (minuto e segundo com 2 dígitos, fração com dígito, fuso até ±29, só espaço entre a data e a hora); e o tab fora de aspas, de bloco literal e de comentário reprova, como no parser puro do PyYAML. Os casos que reprovam no parse usam a extensão .yaml, como bad-yaml-syntax.yaml.",
+  "layer": "yaml",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-bare-tag-scalar.yaml",
+      "description": "a tag ! sem nome num escalar: o YAML 1.2 a lê como texto e o PyYAML como data; o perfil a recusa",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-bare-tag-collection.yaml",
+      "description": "a tag ! sem nome num mapa também é recusada",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-bare-tag-verbatim.yaml",
+      "description": "a forma verbatim !<!> é a mesma tag sem nome",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-timestamp-not-date.yaml",
+      "description": "!!timestamp com texto que não é data",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-timestamp-empty-fraction.yaml",
+      "description": "!!timestamp com ponto sem fração: o PyYAML aceita e o yaml do JS não; o perfil fica com o mais estrito",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-tab-between-date-and-time.yaml",
+      "description": "tab entre a data e a hora, sem aspas",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-tab-inside-plain.yaml",
+      "description": "tab dentro de um texto sem aspas: fora de aspas, de bloco e de comentário, o tab reprova",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-tab-after-colon.yaml",
+      "description": "tab como separação depois dos dois-pontos",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "valid-tab-in-double-quotes.kg.yaml",
+      "description": "tab literal dentro de aspas duplas: é conteúdo do texto, e passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-tab-in-comment.kg.yaml",
+      "description": "tab dentro de um comentário: passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-tab-in-block-scalar.kg.yaml",
+      "description": "tab no conteúdo de um bloco literal: passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-timestamp-strict.kg.yaml",
+      "description": "!!timestamp com data e hora na forma estrita: passa, e alerta pelas aspas como a data sem aspas",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unquoted-date"
+      ]
+    },
+    {
+      "file": "bad-timestamp-quoted-tab.yaml",
+      "description": "!!timestamp entre aspas com tab entre a data e a hora: o tab dentro de aspas passa no parse, e é a forma estrita do timestamp que reprova",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-bare-tag-verbatim-collection.yaml",
+      "description": "a forma verbatim !<!> numa lista: reprova como a tag sem nome",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-tab-in-directive.yaml",
+      "description": "tab como separação numa diretiva %YAML",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-timestamp-tz-30.yaml",
+      "description": "!!timestamp com fuso +30: o yaml do JS recusa, e a forma estrita para em ±29",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-timestamp-minute-1-digit.yaml",
+      "description": "!!timestamp com minuto de 1 dígito: o PyYAML recusa, e a forma estrita pede 2",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-timestamp-year-5-digits.yaml",
+      "description": "!!timestamp com ano de 5 dígitos",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "warn-timestamp-lowercase-t.kg.yaml",
+      "description": "!!timestamp com t minúsculo entre a data e a hora: os dois construtores aceitam, e alerta pelas aspas",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unquoted-date"
+      ]
+    },
+    {
+      "file": "bad-bare-tag-percent-escape.yaml",
+      "description": "a tag ! escrita com escape percentual (!<%21>): o parser a decodifica para !, e reprova como a tag sem nome",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-bare-tag-json-flow.yaml",
+      "description": "a tag ! colada ao : de uma chave JSON no flow",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    }
+  ]
+}

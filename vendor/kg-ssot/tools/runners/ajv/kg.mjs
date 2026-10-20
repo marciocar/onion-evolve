@@ -13,7 +13,7 @@
 //   - warnings: os avisos SHOULD (warnings da referência): o schema SHOULD sem o que o MUST já acusa, a data sem
 //     aspas, os três avisos do perfil no .kg.yaml (yaml.unsafe-integer, yaml.lone-surrogate, yaml.depth-over-128)
 //     e os de coerência (coherence_located).
-import { parseAllDocuments, isAlias, isMap, isPair, isScalar, isSeq } from 'yaml';
+import { Composer, Parser, isAlias, isMap, isPair, isScalar, isSeq } from 'yaml';
 
 // format: date é asserção (ADR 002): AAAA-MM-DD que existe no calendário, ano de 0001 a 9999, como o
 // datetime.date.fromisoformat do leitor de referência. É uma regex, e não uma função, para que o validador
@@ -39,6 +39,10 @@ const Y = 'tag:yaml.org,2002:';
 const YAML11_TIMESTAMP = new RegExp('^(?:[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
   + '|[0-9][0-9][0-9][0-9]-[0-9][0-9]?-[0-9][0-9]?(?:[Tt]|[ \\t]+)[0-9][0-9]?:[0-9][0-9]:[0-9][0-9](?:\\.[0-9]*)?'
   + '(?:[ \\t]*(?:Z|[-+][0-9][0-9]?(?::[0-9][0-9])?))?)$');
+
+// O !!timestamp explícito aceito pelo perfil (STRICT_TIMESTAMP da referência): a interseção do construtor do PyYAML com
+// o do yaml, sem tab entre a data e a hora (decisão de contrato de 2026-10-19).
+const STRICT_TIMESTAMP = /^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}(?:(?:[Tt]| +)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?: *(?:Z|[-+][012]?[0-9](?::[0-9]{2})?))?)?$/;
 
 class ParseError extends Error {
   constructor(code) { super(code); this.code = code; }
@@ -104,7 +108,11 @@ function scalarOf(node) {
     const big = src.startsWith('0o') ? BigInt(src) : BigInt(src.replace(/^\+/, ''));
     return { value: Number(big), key: big.toString(), int: true };
   }
-  if (tag === `${Y}timestamp`) return { value: String(node.source ?? value), key: String(node.source ?? value) };
+  if (tag === `${Y}timestamp`) {
+    const src = String(node.source ?? value);
+    if (!STRICT_TIMESTAMP.test(src)) throw new ParseError('parse.yaml-error'); // !!timestamp sem data na forma estrita
+    return { value: src, key: src };
+  }
   if (tag === `${Y}binary`) return { value: BYTES, key: "b''" };
   if (value === null || value === undefined) return { value: null, key: 'null' };
   if (typeof value === 'boolean') return { value, key: String(value) };
@@ -233,17 +241,36 @@ const codePoints = (text) => {
   return n;
 };
 
+// O que o perfil recusa já na leitura dos tokens, como o parser puro do PyYAML da referência
+// (decisão de contrato de 2026-10-19, «o mais estrito nos três»): o tab fora de aspas, de bloco e de comentário (no
+// espaço entre tokens ou dentro de um escalar plain) e a tag ! sem nome, também na forma !<!>. Sem recursão.
+function strictTokenError(tokens) {
+  const stack = [...tokens];
+  while (stack.length) {
+    const t = stack.pop();
+    if (Array.isArray(t)) { for (const x of t) stack.push(x); continue; } // sem spread: lista enorme estoura a pilha
+    if (t === null || typeof t !== 'object') continue;
+    if (typeof t.source === 'string') {
+      if ((t.type === 'space' || t.type === 'scalar' || t.type === 'directive') && t.source.includes('\t')) return true;
+      if (t.type === 'tag' && (t.source === '!' || t.source === '!<!>')) return true;
+    }
+    for (const v of Object.values(t)) if (v !== null && typeof v === 'object') stack.push(v);
+  }
+  return false;
+}
+
 /** O parse do .kg.yaml no perfil do contrato: { doc, unquotedDate } ou { code: 'parse.*' }. */
 export function parseYaml(text) {
   let docs;
   try {
-    docs = parseAllDocuments(text, {
-      version: '1.2', schema: 'core', uniqueKeys: false, merge: false, maxAliasCount: -1, prettyErrors: false,
-    });
+    const tokens = Array.from(new Parser().parse(text));
+    if (strictTokenError(tokens)) return { code: 'parse.yaml-error' };
+    docs = Array.from(new Composer({
+      version: '1.2', schema: 'core', uniqueKeys: false, merge: false, maxAliasCount: -1,
+    }).compose(tokens));
   } catch {
     return { code: 'parse.yaml-error' }; // aninhamento que estoura a pilha do parser, entre outros
   }
-  if (!Array.isArray(docs)) docs = [docs]; // EmptyStream é lista; um documento só também vem como lista
   const raw = [];
   const marks = {};
   try {
@@ -609,12 +636,15 @@ function containsValue(value, hit) {
 }
 
 /** Os avisos de coerência, que cruzam campos ou arestas (coherence_located da referência), um por ocorrência:
- * integrity.testimony-in-prod, integrity.verified-before-fact e integrity.untraced-decision. */
+ * integrity.testimony-in-prod, integrity.verified-before-fact, integrity.untraced-decision e
+ * integrity.refutes-unreconciled. */
 export function coherenceCodes(doc) {
   const out = [];
   const edges = Array.isArray(doc.edges) ? doc.edges : [];
   const traced = new Set(edges.filter((e) => isObj(e) && get(e, 'edge_type') === 'TRACES_TO' && typeof get(e, 'from') === 'string')
     .map((e) => e.from));
+  const refuted = new Set(edges.filter((e) => isObj(e) && get(e, 'edge_type') === 'REFUTES' && typeof get(e, 'to') === 'string')
+    .map((e) => e.to));
   for (const n of located(doc, 'nodes')) {
     const prov = isObj(get(n, 'provenance')) ? n.provenance : {};
     const method = get(prov, 'method');
@@ -633,6 +663,11 @@ export function coherenceCodes(doc) {
         && !(typeof trace === 'string' && !PY_BLANK.test(trace)) && !Object.keys(prov).length
         && !(typeof get(n, 'id') === 'string' && traced.has(n.id))) {
       out.push('integrity.untraced-decision');
+    }
+    const status = get(n, 'status');
+    if (typeof get(n, 'id') === 'string' && refuted.has(n.id) && !['superseded', 'refuted'].includes(status)
+        && !(status === 'done' && get(n, 'node_type') === 'question')) {
+      out.push('integrity.refutes-unreconciled');
     }
   }
   return out;

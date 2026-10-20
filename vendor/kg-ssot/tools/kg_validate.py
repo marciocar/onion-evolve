@@ -88,6 +88,17 @@ Yaml12BoolLoader.add_implicit_resolver(
     "tag:yaml.org,2002:bool", re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"), list("tTfF"))
 
 
+def _bool_loader_timestamp(loader, node):
+    """O !!timestamp explícito com texto que não é data: o construtor do PyYAML quebrava com AttributeError (match None),
+    e o check() saía com traceback. Vira erro de parse; a data válida segue o construtor de sempre."""
+    if not yaml.constructor.SafeConstructor.timestamp_regexp.match(loader.construct_scalar(node)):
+        raise yaml.constructor.ConstructorError(None, None, "!!timestamp sem data", node.start_mark)
+    return yaml.constructor.SafeConstructor.construct_yaml_timestamp(loader, node)
+
+
+Yaml12BoolLoader.add_constructor("tag:yaml.org,2002:timestamp", _bool_loader_timestamp)
+
+
 class DuplicateKeyError(yaml.constructor.ConstructorError):
     """Chave repetida num mapa: o YAML 1.2 exige chaves únicas, e o PyYAML ficaria com a última."""
 
@@ -120,6 +131,26 @@ class Yaml12CoreLoader(Yaml12BoolLoader):
                 raise DuplicateKeyError(None, None, f"chave repetida: {jk!r}", key_node.start_mark)
             mapping[jk] = self.construct_object(value_node, deep=deep)
         return mapping
+
+    def compose_node(self, parent, index):
+        """Duas construções raras que o perfil recusa (decisão de contrato de 2026-10-19, «o mais estrito nos três»): a tag
+        ! sem nome (também !<!>), em escalar ou coleção, e o !!timestamp explícito cujo texto não é data na forma
+        estrita (STRICT_TIMESTAMP). Só no parser puro: o loader_for manda para cá todo texto em que elas podem estar."""
+        event = self.peek_event()
+        tag = getattr(event, "tag", None)
+        if tag == "!":
+            raise yaml.composer.ComposerError(None, None, "tag ! sem nome", event.start_mark)
+        if (tag == "tag:yaml.org,2002:timestamp" and isinstance(event, yaml.ScalarEvent)
+                and not STRICT_TIMESTAMP.fullmatch(event.value)):
+            raise yaml.composer.ComposerError(None, None, f"!!timestamp sem data: {event.value!r}", event.start_mark)
+        return super().compose_node(parent, index)
+
+
+# O !!timestamp explícito aceito pelo perfil: a interseção do construtor do PyYAML com o do leitor JS, sem tab. Mês e dia
+# com 1 ou 2 dígitos, hora com 1 ou 2, minuto e segundo com 2, fração com pelo menos um dígito, fuso Z, ±H, ±HH ou ±HH:MM
+# (hora do fuso até 29) e só espaço entre a data e a hora. A data sem tag segue o resolvedor implícito (yaml.unquoted-date).
+STRICT_TIMESTAMP = re.compile(
+    r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}(?:(?:[Tt]| +)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?: *(?:Z|[-+][012]?[0-9](?::[0-9]{2})?))?)?")
 
 
 class UnquotedDate(str):
@@ -572,11 +603,16 @@ def form_codes(error):
 # Onde o parser em C (libyaml) e o puro divergem, medido pela revisão de 2026-10-13 em 63 entradas estranhas: tab
 # como separador ou no fim da linha, a diretiva %YAML, escape de surrogate, BOM fora do início e aninhamento
 # muito profundo. O puro é a referência do perfil; o C é só um atalho, usado quando o texto não tem nenhuma dessas
-# construções. Qual dos dois o YAML 1.2 manda para o tab é decisão de contrato, ainda não tomada.
+# construções. O tab fora de aspas, de bloco e de comentário reprova: o puro o recusa, e o contrato ficou com o mais
+# estrito (decisão de contrato de 2026-10-19), que o leitor JS segue. Pelo mesmo selo, a tag ! sem nome e o !!timestamp
+# explícito são julgados só pelo puro (Yaml12CoreLoader.compose_node): o texto que tem tag ! isolada, !!timestamp, a
+# forma longa ...2002:timestamp, uma diretiva %TAG ou uma tag com escape %xx (que o parser decodifica: !<%21> é a
+# tag !) cai nele. O : entra no que pode vir antes da tag, por causa da chave JSON no flow ({"a":! b}).
 # O escape \u só diverge na faixa dos surrogates (D800 a DFFF): medido em 2026-10-13 nos 65.536 valores, em 6 contextos
 # de aspas duplas. O \ufeff de texto extraído de PDF caía no puro e custava ao SGE mais que o dobro do tempo. O \U
 # segue arriscado inteiro (é raro, e acima de 10FFFF os dois erram por motivos diferentes).
-RISKY = re.compile(r"\t|%YAML|\\u[dD][89a-fA-F]|\\U|.\ufeff", re.S)
+RISKY = re.compile(r"\t|%YAML|%TAG|!!timestamp|2002:timestamp|\\u[dD][89a-fA-F]|\\U|.\ufeff"
+                   r"|(?:^|(?<=[\s\[{,:\ufeff]))!(?:<!>)?(?=[\s,\[\]{}]|$)|!(?:<[^>\s]*|[^\s\[\]{},]*)%[0-9A-Fa-f]{2}", re.S)
 SAFE_DEPTH = 200
 MAX_DEPTH = 1000  # coleções abertas de uma vez: acima disto o parser estoura a pilha (segfault medido)
 _DEEP_HINT = re.compile(r"(?m)^[ \t]*(?:[-?][ \t]+){2,}|^ {%d,}" % (MAX_DEPTH // 2))
@@ -879,6 +915,8 @@ def coherence_located(doc):
       (AAAA, AAAA-MM ou AAAA-MM-DD); data que não está nessa forma não é comparada;
     - integrity.untraced-decision: decision viva (não superseded nem refuted) sem origem: nem trace com texto, nem
       provenance, nem aresta TRACES_TO saindo dela.
+    - integrity.refutes-unreconciled: nó que recebe REFUTES e segue vivo (nem superseded nem refuted; uma question
+      done já está respondida): o grafo afirma e refuta a mesma coisa. É a contradição do radar, como aviso no v4.4.
     Um campo de tipo errado (from ou id em lista ou mapa) já reprova no MUST: aqui ele é ignorado, nunca quebra.
     """
     out = []
@@ -886,6 +924,8 @@ def coherence_located(doc):
     # só texto entra no conjunto: um from ou id em lista ou mapa já reprova no MUST, e aqui não pode quebrar o leitor
     traced = {e.get("from") for e in edges
               if isinstance(e, dict) and e.get("edge_type") == "TRACES_TO" and isinstance(e.get("from"), str)}
+    refuted = {e.get("to") for e in edges
+               if isinstance(e, dict) and e.get("edge_type") == "REFUTES" and isinstance(e.get("to"), str)}
     for n, place in _located(doc, "nodes"):
         prov = n.get("provenance") if isinstance(n.get("provenance"), dict) else {}
         method = prov.get("method")
@@ -902,6 +942,10 @@ def coherence_located(doc):
                 and not (isinstance(trace, str) and trace.strip()) and not prov
                 and not (isinstance(n.get("id"), str) and n["id"] in traced)):
             out.append(("integrity.untraced-decision", place))
+        status = n.get("status")
+        if (isinstance(n.get("id"), str) and n["id"] in refuted and status not in ("superseded", "refuted")
+                and not (status == "done" and n.get("node_type") == "question")):
+            out.append(("integrity.refutes-unreconciled", place))
     return out
 
 

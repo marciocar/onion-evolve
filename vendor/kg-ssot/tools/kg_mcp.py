@@ -47,8 +47,10 @@ import json
 import os
 import pathlib
 import re
+import socket
 import sys
 import threading
+import time
 import urllib.parse
 
 sys.dont_write_bytecode = True
@@ -618,6 +620,8 @@ def make_http_handler(server, profile=None, max_concurrent=None):
             sys.stderr.write("%s %s\n" % (self.address_string(), fmt % args))
 
         _holding = False  # a vaga de --max-concurrent desta requisição
+        _body_done = False  # o corpo já foi lido (senão, a resposta fecha com o lingering close)
+        LINGER_SECONDS = 1.0  # teto TOTAL do descarte, não por recv
 
         def _release(self):
             if self._holding:
@@ -631,8 +635,41 @@ def make_http_handler(server, profile=None, max_concurrent=None):
             if body is not None:
                 self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(data)))
+            linger = not self._body_done and self._declares_body()
+            if linger:
+                self.send_header("Connection", "close")
+                self.close_connection = True
             self.end_headers()
             self.wfile.write(data)
+            if linger:
+                self._linger()
+
+        def _declares_body(self):
+            """A requisição anuncia corpo, seja qual for o método: Transfer-Encoding, ou um Content-Length que não seja exatamente
+            um só "0" (negativo, repetido ou malformado contam como corpo, fail-closed)."""
+            values = self.headers.get_all("Content-Length") or []
+            return bool(self.headers.get("Transfer-Encoding")) or any(v.strip() != "0" for v in values)
+
+        def _linger(self):
+            """A recusa que sai antes de ler o corpo (401, 403, 405, 411, 413...) fecha com lingering close: fecha a
+            escrita e descarta o que o cliente ainda manda até ele fechar, por no máximo LINGER_SECONDS no total. Fechar
+            o socket com o corpo não lido manda RST: no Windows o cliente perde a resposta (WinError 10053, medido no CI
+            windows-latest em 2026-10-20), e no Linux o cliente que manda o corpo inteiro antes de ler leva
+            BrokenPipeError. O teto é de tempo e não de bytes, como no Apache e no nginx: um teto pequeno de bytes não
+            salvaria o 413, cujo corpo é por definição grande, e um cliente que pinga 1 byte por vez não prende a
+            thread além do prazo."""
+            try:
+                self.connection.shutdown(socket.SHUT_WR)
+                deadline = time.monotonic() + self.LINGER_SECONDS
+                while True:
+                    wait = deadline - time.monotonic()
+                    if wait <= 0:
+                        break
+                    self.connection.settimeout(wait)
+                    if not self.connection.recv(65536):
+                        break
+            except OSError:
+                pass
 
         def _refuse(self):
             self._send(405, {"error": "use POST /mcp"})
@@ -696,6 +733,7 @@ def make_http_handler(server, profile=None, max_concurrent=None):
                 return self._send(413, {"error": "corpo grande demais"})
             try:
                 body = self.rfile.read(size)
+                self._body_done = True
             except TimeoutError:  # Content-Length maior que o corpo: o cliente parou de mandar
                 return self._send(408, {"error": "corpo incompleto no prazo"})
             if len(body) != size:

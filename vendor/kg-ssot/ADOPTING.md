@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -295,6 +295,20 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.10.0` para a `kg-ssot-v4.11.0`, entra o contrato v4.4: um aviso SHOULD e três vereditos MUST raros do YAML.
+- **`integrity.refutes-unreconciled`:** nó que recebe `REFUTES` e segue vivo (nem `superseded` nem `refuted`; só a
+  `question` `done` não alerta). O grafo afirma e refuta a mesma coisa. O radar do core já reprova o caso como
+  contradição; aqui ele alerta agora e vira MUST numa versão futura.
+- **O perfil YAML estrito:** a tag `!` sem nome (também `!<!>`), o `!!timestamp` cujo texto não é data e o tab fora
+  de aspas, de bloco e de comentário reprovam como `parse.yaml-error`, na referência e no leitor JS. O tab já
+  reprovava na referência; mudam a tag `!` e o `!!timestamp`. Medido em 2026-10-20, nenhum dos 1.391 `.kg.yaml` de
+  quatro repos adotantes muda de veredito.
+- **A suíte ganha 31 casos** (294): 10 em `latest/integrity/coherence/` e 21 em `latest/yaml/strict-profile/`.
+
+O sha256 do SHOULD muda, então o PR do `update` roda o `kg_gate.py --update` depois de trazer a tag. Se o corpus não
+tem o caso, ele grava a identidade nova sem motivo. Se tem, a dívida sobe por desenho, e o `--update` vai com
+`--accept-regression "<motivo>"`; ou reconcilie antes o alvo (`refuted` ou `superseded`).
+
 Da `kg-ssot-v4.9.1` para a `kg-ssot-v4.10.0`, nenhum veredito MUST muda. Muda o servidor MCP e o leitor JS:
 - **O perfil "atrás de proxy" do `kg_mcp.py`** (`--identity-header`, `--secret-env`): identidade por header que
   recusa por padrão, segredo comparado por hmac, uma área e um autor por identidade, por requisição, os limites
@@ -385,7 +399,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
