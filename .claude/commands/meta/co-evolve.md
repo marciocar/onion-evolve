@@ -90,6 +90,9 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
   Ato-1 determinístico, **entrega-sem-commit** (untracked no `inbox/` do core; a sessão do core commita +
   tria). Se o core **não** vive na mesma máquina → entregar ao maestro transportar. Sem comunicação viva —
   assíncrono via git.
+- **Sinal ao dono de um VENDOR** (ex.: o kg-ssot de `vendor/kg-ssot/`): o mesmo `/meta:co-relay`, com
+  `--target <path-do-dono>`. O carteiro aceita quando a tag do carimbo `vendor/<x>/.<x>-version`, no repo do
+  dono, reproduz os arquivos do carimbo (ver o Passo 2 do co-relay); outro adotante segue recusado.
 - **Receber releases do framework (downstream):** ler o `inbound/` (relatório de update auto-emitido pelo core,
   com arquivos aplicados + novidades + próximos passos) e o `CHANGELOG` do core; atualizar com `/meta:adopt --update`.
 - O protocolo é **canônico no core** — este repo **referencia**, não redefine.

@@ -3,10 +3,10 @@ name: co-relay
 description: 'Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do /meta:co-deliver. Relaya um sinal do adotante (docs/evolution/inbox/) direto no inbox/ do CORE que vive na MESMA máquina, para o hook "you have mail" sinalizar 📬 sem o maestro copiar à mão. ENTREGA-SEM-COMMIT (o adotante nunca commita no repo alheio — invariante I3); o commit + triagem é da sessão do core. Dissolve o incidente "commit cross-repo na branch errada" (sinal S2): sem commit, não há pergunta de branch/push. Roda só no ADOTANTE.'
 category: meta
 tags: [co-evolution, upstream, transport, carteiro, inbox, relay, bridge]
-version: "1.1.0"
-updated: "2026-06-28"
+version: "1.2.0"
+updated: "2026-10-20"
 allowed-tools: Read Bash(bash .claude/utils/co-evolution/co-relay.sh*) Bash(ls docs/evolution/*) Bash(cat .claude/.onion-version)
-argument-hint: "[<signal-file>] --target <path-local-do-core> [--from <dir>] [--dry-run]"
+argument-hint: "[<signal-file>] --target <path-local-do-core|do-hub|do-dono-de-um-vendor> [--from <dir>] [--dry-run]"
 ---
 
 # 📨 /meta:co-relay — Carteiro-local (upstream, relay de sinal ao core)
@@ -48,6 +48,17 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
   **Desde a F3 do configurador A2A** o destino se prova: sem carimbo `.claude/.onion-version` é o core;
   com carimbo `role: hub` é um hub, e só o filho dele (carimbo `adopted`) relaya para lá; qualquer outro
   carimbo é outro adotante (canal lateral) e o helper recusa com exit 2.
+- **Upstream de VENDOR (desde 2026-10-20, `D_CANAL_UPSTREAM_POR_VENDOR`).** O adotante que vendoriza um
+  produto (`vendor/<x>/`, ex. `vendor/kg-ssot/`) também relaya ao **dono** dele, mesmo quando o dono é um
+  adotante do Onion (o `onion-kg-ssot` carimba `adopted`). A exceção se deriva do carimbo
+  `vendor/<x>/.<x>-version`, nunca de lista de nomes, e é estreita: a árvore de `refs/tags/<tag>` **do
+  destino** tem de reproduzir os sha256 de **todos** os arquivos do carimbo, e o destino tem de ter
+  `docs/evolution/inbox/` (o carteiro não abre caixa no repo alheio). A prova é por **conteúdo**, não por
+  URL nem por commit: o carimbo não grava URL, e a release vendorizada vem do **espelho** público, cujo
+  commit o repo do dono não tem (medido: carimbo `172c62a`, tag do dono `2a69199`, 444 de 444 sha256
+  iguais). O sinal entregue por este canal ganha um rodapé que nomeia o remetente, o carimbo e a tag.
+  Par que só vendoriza o mesmo produto tem os arquivos, mas não a tag, e segue recusado como canal lateral.
+  Se o dono não tiver a tag (clone desatualizado), a recusa diz: `git fetch --tags` lá.
 - `<signal-file>` opcional: basename ou path de UM sinal. Omitido = **todos** os `.md` de 1º nível de
   `docs/evolution/inbox/` (cuidado: pode re-relayar sinais antigos não-arquivados).
 - `--from <dir>` opcional: fonte alternativa (default = o `inbox/` do adotante).

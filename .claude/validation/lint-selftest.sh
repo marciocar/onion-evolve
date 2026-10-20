@@ -22661,6 +22661,98 @@ run_corelay_selftests() {
   done
   if [ "${okr3}" -eq 1 ]; then record_pass "co-relay: (F3.r3) standalone ou hub → um hub → exit 2 (só o filho do hub relaya para ele)"
   else record_fail "co-relay: (F3.r3) não-filho relayou ao hub" "rc=${rc}"; fi
+
+  # ── Canal UPSTREAM DE VENDOR (D_CANAL_UPSTREAM_POR_VENDOR, 2026-10-20) ─────────────────────────────────────
+  # O dono de um vendor (ex.: onion-kg-ssot, carimbo `adopted`) recebe sinal do adotante que o vendoriza quando a
+  # árvore da tag do carimbo, no destino, reproduz os sha256 do carimbo. Sem rede: o "dono" é um repo local com
+  # a tag; o carimbo do remetente é gerado dos blobs dessa tag, como o kg_vendor.py faz.
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "co-relay: (V*) canal de vendor" "python3 ausente"; return; fi
+  local own vrc
+  _mk_owner() {  # $1 = dir; $2 = conteúdo de A.md; $3 = msg do commit (muda o commit, não o conteúdo)
+    git -C "$1" init -q; mkdir -p "$1/.claude" "$1/docs/evolution/inbox" "$1/spec"
+    printf 'role: adopted\n' > "$1/.claude/.onion-version"
+    printf '%s\n' "$2" > "$1/A.md"; printf 'schema\n' > "$1/spec/s.json"
+    git -C "$1" add -A >/dev/null 2>&1
+    git -C "$1" -c user.name=t -c user.email=t@t commit -qm "$3" >/dev/null 2>&1
+    git -C "$1" -c user.name=t -c user.email=t@t tag -a prod-v1.0.0 -m rel >/dev/null 2>&1
+  }
+  _mk_vendor_stamp() {  # $1 = remetente; $2 = conteúdo de A.md vendorizado (o sha256 vai ao carimbo)
+    mkdir -p "$1/vendor/prod"
+    python3 -I -c '
+import hashlib, json, sys
+h = lambda b: hashlib.sha256(b).hexdigest()
+d = {"product": "prod", "tag": "prod-v1.0.0", "commit": "0" * 40, "version": "1.0.0",
+     "files": {"A.md": h((sys.argv[2] + "\n").encode()), "spec/s.json": h(b"schema\n")}}
+open(sys.argv[1] + "/vendor/prod/.prod-version", "w").write(json.dumps(d, indent=2) + "\n")' "$1" "$2"
+  }
+  _v_run() {  # $1 = helper; $2 = remetente; $3 = destino → rc
+    vrc=0; ( cd "$2" && bash "$1" --target "$3" ) >/dev/null 2>&1 || vrc=$?
+  }
+  # (V1) carimbo do vendor reproduzido pela tag do dono (carimbo adopted) → entrega, untracked, com o rodapé
+  d="$(mktemp -d)"; own="$(mktemp -d)"; mk_adopter "${d}" adopted; _mk_owner "${own}" "alfa" "c1"; _mk_vendor_stamp "${d}" "alfa"
+  _v_run "${helper}" "${d}" "${own}"
+  st="$(git -C "${own}" status --porcelain -- "${SIG}" 2>/dev/null | head -1)"
+  if [ "${vrc}" -eq 0 ] && [ "${st#'??'}" != "${st}" ] && grep -q 'vendor/prod/.prod-version' "${own}/${SIG}" \
+     && grep -q 'sinal de teste' "${own}/${SIG}"; then
+    record_pass "co-relay: (V1) o dono do vendor (carimbo adopted) prova a origem pela tag → entrega untracked, e o sinal diz qual carimbo autorizou"
+  else record_fail "co-relay: (V1) canal de vendor" "rc=${vrc} status='${st}'"; fi
+  # (V1b) a mesma entrega de novo é no-op: o rodapé é determinístico, o dedup por conteúdo segue valendo
+  local out_v; out_v="$( ( cd "${d}" && bash "${helper}" --target "${own}" ) 2>&1)"
+  if grep -q '0 relayado' <<< "${out_v}"; then record_pass "co-relay: (V1b) re-entrega idêntica pelo canal de vendor → no-op (rodapé sem data)"
+  else record_fail "co-relay: (V1b) re-entrega" "${out_v}"; fi
+  # (V5) a prova passa, mas o dono não tem docs/evolution/inbox/ → exit 2, nada criado no repo alheio
+  rm -rf "${own}/docs/evolution"
+  _v_run "${helper}" "${d}" "${own}"
+  if [ "${vrc}" -eq 2 ] && [ ! -e "${own}/docs/evolution" ]; then record_pass "co-relay: (V5) dono sem docs/evolution/inbox/ → exit 2, o carteiro não abre caixa alheia"
+  else record_fail "co-relay: (V5) dono sem caixa" "rc=${vrc}"; fi
+  rm -rf "${d}" "${own}"
+  # (V2) outro adotante SEM a tag (vendoriza o mesmo produto: tem os arquivos, não a história) → exit 2
+  d="$(mktemp -d)"; peer="$(mktemp -d)"; mk_adopter "${d}" adopted; _mk_vendor_stamp "${d}" "alfa"
+  mk_adopter "${peer}" adopted; rm -f "${peer}/${SIG}"; _mk_vendor_stamp "${peer}" "alfa"
+  _v_run "${helper}" "${d}" "${peer}"
+  if [ "${vrc}" -eq 2 ] && [ ! -f "${peer}/${SIG}" ]; then record_pass "co-relay: (V2) par adotado que só vendoriza o mesmo produto → exit 2 (canal lateral, como antes)"
+  else record_fail "co-relay: (V2) par lateral" "rc=${vrc}"; fi
+  rm -rf "${d}" "${peer}"
+  # (V3) a tag de MESMO NOME no destino com outro conteúdo (o carimbo aponta OUTRO repo) → exit 2
+  d="$(mktemp -d)"; own="$(mktemp -d)"; mk_adopter "${d}" adopted; _mk_owner "${own}" "beta" "c1"; _mk_vendor_stamp "${d}" "alfa"
+  _v_run "${helper}" "${d}" "${own}"; local rc_v3_intact="${vrc}"
+  if [ "${vrc}" -eq 2 ] && [ ! -f "${own}/${SIG}" ]; then record_pass "co-relay: (V3) tag homônima com outro conteúdo → exit 2 (o carimbo é de outro repo)"
+  else record_fail "co-relay: (V3) carimbo de outro repo" "rc=${vrc}"; fi
+  local v3_d="${d}" v3_own="${own}"
+  # (V4) o ESPELHO × o dono: commit diferente (o carimbo real traz o commit do espelho, que o dono não tem),
+  #      mesmo conteúdo → entrega. É o caso medido do kg-ssot: carimbo 172c62a, tag do dono 2a69199.
+  d="$(mktemp -d)"; own="$(mktemp -d)"; mk_adopter "${d}" adopted; _mk_owner "${own}" "alfa" "outra historia"
+  _mk_vendor_stamp "${d}" "alfa"; git -C "${own}" remote add origin git@github.com:acme/prod-dev.git
+  _v_run "${helper}" "${d}" "${own}"; local rc_v4_intact="${vrc}"
+  if [ "${vrc}" -eq 0 ] && [ -f "${own}/${SIG}" ]; then record_pass "co-relay: (V4) o dono com outro commit e outro remote que o espelho do carimbo, mesmo conteúdo → entrega (prova por conteúdo, não por URL nem commit)"
+  else record_fail "co-relay: (V4) espelho × dono" "rc=${vrc}"; fi
+  rm -f "${own}/${SIG}"
+  # ── Mutantes (o intacto passa; o mutante tem de reprovar) ──
+  local mutd; mutd="$(mktemp -d)"
+  # M1: aceitar pela EXISTÊNCIA da tag, sem comparar o conteúdo → (V3) deixa de recusar
+  sed 's/    if hashlib.sha256(blob).hexdigest() != files\[n\]:/    if False:/' "${helper}" > "${mutd}/m1.sh"
+  rm -f "${v3_own}/${SIG}"; _v_run "${mutd}/m1.sh" "${v3_d}" "${v3_own}"; local m1="${vrc}"
+  _prove_mutation "co-relay: (V-M1) sem a comparação de sha256, a tag homônima de outro repo passaria — (V3) morde" \
+    "${helper}" "${mutd}/m1.sh" "$([ "${rc_v3_intact}" -eq 2 ] && echo 0 || echo 1)" "$([ "${m1}" -eq 2 ] && echo 0 || echo 1)"
+  # M2: provar pelo COMMIT do carimbo (o desenho por commit/URL) → (V4), o caso real do espelho, deixa de entregar
+  sed 's|^if run("rev-parse", "--verify", "--quiet", "refs/tags/" + tag + "^{tree}").returncode != 0:|if run("rev-parse", "--verify", "--quiet", "refs/tags/" + tag + "^{commit}").stdout.decode().strip() != d.get("commit"):|' "${helper}" > "${mutd}/m2.sh"
+  _v_run "${mutd}/m2.sh" "${d}" "${own}"; local m2="${vrc}"; rm -f "${own}/${SIG}"
+  _prove_mutation "co-relay: (V-M2) prova por commit recusaria o dono real (espelho × dono) — (V4) morde" \
+    "${helper}" "${mutd}/m2.sh" "$([ "${rc_v4_intact}" -eq 0 ] && echo 0 || echo 1)" "$([ "${m2}" -eq 0 ] && echo 0 || echo 1)"
+  # M3: sem a checagem da caixa do dono → (V5) deixa de recusar (e cria docs/evolution/ no repo alheio)
+  sed 's|    if \[ ! -d "${TARGET}/docs/evolution/inbox" \]; then|    if false; then|' "${helper}" > "${mutd}/m3.sh"
+  local own5; own5="$(mktemp -d)"; _mk_owner "${own5}" "alfa" "c1"; rm -rf "${own5}/docs/evolution"
+  _v_run "${helper}" "${d}" "${own5}"; local rc_v5_intact="${vrc}"
+  _v_run "${mutd}/m3.sh" "${d}" "${own5}"; local m3="${vrc}"
+  _prove_mutation "co-relay: (V-M3) sem a checagem da caixa, o carteiro abriria docs/evolution/ no repo do dono — (V5) morde" \
+    "${helper}" "${mutd}/m3.sh" "$([ "${rc_v5_intact}" -eq 2 ] && echo 0 || echo 1)" "$([ "${m3}" -eq 2 ] && echo 0 || echo 1)"
+  # M4: sem o rodapé → o sinal chega sem dizer de onde veio a autorização → (V1) morde
+  sed 's|^      printf .\\n---\\n\\n<!-- co-relay: canal upstream de vendor -->\\n.$|      :|' "${helper}" > "${mutd}/m4.sh"
+  rm -f "${own}/${SIG}"; _v_run "${helper}" "${d}" "${own}"; local foot_i=1; grep -q 'canal upstream de vendor' "${own}/${SIG}" 2>/dev/null && foot_i=0
+  rm -f "${own}/${SIG}"; _v_run "${mutd}/m4.sh" "${d}" "${own}"; local foot_m=1; grep -q 'canal upstream de vendor' "${own}/${SIG}" 2>/dev/null && foot_m=0
+  _prove_mutation "co-relay: (V-M4) sem o rodapé, o dono recebe o sinal sem a autorização declarada — (V1) morde" \
+    "${helper}" "${mutd}/m4.sh" "${foot_i}" "${foot_m}"
+  rm -rf "${d}" "${own}" "${own5}" "${v3_d}" "${v3_own}" "${mutd}"
 }
 
 # ---------------------------------------------------------------------------
