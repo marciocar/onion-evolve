@@ -18,7 +18,7 @@ Na raiz do seu repo, com Python 3.11 ou mais (o `rpds-py`, dependência do jsons
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -112,7 +112,7 @@ que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a impleme
 - **Em JavaScript (Node, React Native, Expo):** desde a 4.9.0 o leitor JS sai no npm como `kg-ssot`
   (`npm install kg-ssot`). A entrada não importa nada do Node, e o validador do contrato vem pré-compilado, sem
   `new Function` nem `eval`, então roda no Hermes. `verdict(texto, { format })` devolve o veredito MUST com os códigos
-  da suíte, e o comando `kg-ssot-validate` julga arquivos. Ele mede só o MUST: os avisos SHOULD, a linha e as dicas
+  da suíte, e o comando `kg-ssot-validate` julga arquivos. Desde a 4.10.0 ele mede também os avisos SHOULD, com os mesmos códigos da referência em todos os casos da suíte; a linha e as dicas
   ficam com o leitor de referência em Python.
 - **Num cliente de MCP, como o Claude Desktop:** desde a 4.9.0 o servidor MCP de referência também sai como MCP
   Bundle (`kg-ssot-<versão>.mcpb`). Ele é anexado à release da tag no repositório público depois que o pacote

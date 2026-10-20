@@ -1,6 +1,6 @@
 // A suíte de conformidade rodada pelo pacote npm kg-ssot INSTALADO (o que um consumidor recebe), não pelo código do
 // repo. Uso, de dentro de um projeto que instalou o tarball: node suite.mjs <spec/conformance/fixtures/latest>
-// Imprime 'npm: N/M' e sai com rc 0 só quando todos os casos dão o veredito e os códigos esperados.
+// Imprime 'npm: N/M' e sai com rc 0 só quando todos os casos dão o veredito, os códigos e os avisos esperados.
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
@@ -28,7 +28,11 @@ for (const m of manifests.sort()) {
     const out = verdict(text, { format: file.endsWith('.json') ? 'json' : 'yaml', corpus });
     const want = c.valid ? 'accept' : 'reject';
     const codesOk = !c.codes || JSON.stringify([...c.codes].sort()) === JSON.stringify(out.codes);
-    if (out.verdict !== want || !codesOk) bad.push(`${c.file}: esperado ${want} ${JSON.stringify(c.codes)} · ${out.verdict} ${JSON.stringify(out.codes)}`);
+    const warnOk = JSON.stringify([...(c.warnings || [])].sort()) === JSON.stringify(out.warnings);
+    if (out.verdict !== want || !codesOk || !warnOk) {
+      bad.push(`${c.file}: esperado ${want} ${JSON.stringify(c.codes)} ${JSON.stringify(c.warnings || [])}`
+        + ` · ${out.verdict} ${JSON.stringify(out.codes)} ${JSON.stringify(out.warnings)}`);
+    }
   }
 }
 process.stdout.write(`npm: ${total - bad.length}/${total}\n`);

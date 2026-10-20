@@ -24,7 +24,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 HERE = pathlib.Path(__file__).resolve().parent
 AJV = ROOT / "tools" / "runners" / "ajv"
 MIRROR = "https://github.com/marciocar/kg-ssot"
-FILES = ["index.mjs", "index.d.mts", "kg.mjs", "core.d.mts", "must.mjs", "run.mjs", "node.d.mts", "cli.mjs", "spec/", "README.md",
+FILES = ["index.mjs", "index.d.mts", "kg.mjs", "core.d.mts", "must.mjs", "should.mjs", "validator.d.mts", "run.mjs", "node.d.mts", "cli.mjs", "spec/", "README.md",
          "LICENSE", "NOTICE"]
 
 
@@ -61,7 +61,8 @@ def manifest(version, deps):
         "exports": {
             ".": {"types": "./index.d.mts", "default": "./index.mjs"},
             "./core": {"types": "./core.d.mts", "default": "./kg.mjs"},
-            "./must": "./must.mjs",
+            "./must": {"types": "./validator.d.mts", "default": "./must.mjs"},
+            "./should": {"types": "./validator.d.mts", "default": "./should.mjs"},
             "./node": {"types": "./node.d.mts", "default": "./run.mjs"},
             "./spec/*": "./spec/*",
             "./package.json": "./package.json",
@@ -83,7 +84,7 @@ def stage(dest):
     dest.mkdir(parents=True, exist_ok=True)
     for name in ("kg.mjs", "run.mjs"):
         shutil.copy2(AJV / name, dest / name)
-    for name in ("index.mjs", "index.d.mts", "core.d.mts", "node.d.mts", "cli.mjs", "README.md"):
+    for name in ("index.mjs", "index.d.mts", "core.d.mts", "node.d.mts", "validator.d.mts", "cli.mjs", "README.md"):
         shutil.copy2(HERE / name, dest / name)
     (dest / "cli.mjs").chmod(0o755)
     for name in ("LICENSE", "NOTICE"):
@@ -93,9 +94,10 @@ def stage(dest):
     for p in ("release.json", "verdict.schema.json", pathlib.Path(rel["contract"]["must"]).name,
               pathlib.Path(rel["contract"]["should"]).name):
         shutil.copy2(ROOT / "spec" / p, spec / p)
-    p = subprocess.run(["node", str(AJV / "standalone.mjs"), str(dest / "must.mjs")], capture_output=True, text=True)
-    if p.returncode:
-        raise Broken(f"o validador pré-compilado não saiu: {p.stderr.strip()[-300:]}")
+    for out, extra in (("must.mjs", []), ("should.mjs", ["--should"])):
+        p = subprocess.run(["node", str(AJV / "standalone.mjs"), str(dest / out), *extra], capture_output=True, text=True)
+        if p.returncode:
+            raise Broken(f"o validador pré-compilado {out} não saiu: {p.stderr.strip()[-300:]}")
     (dest / "package.json").write_text(json.dumps(manifest(version, deps), ensure_ascii=False, indent=2) + "\n",
                                        encoding="utf-8")
     return version

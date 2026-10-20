@@ -59,9 +59,13 @@ import os
 import pathlib
 import re
 import secrets
+import shlex
 import stat
 import subprocess
 import sys
+import signal
+import tempfile
+import threading
 import time
 
 sys.dont_write_bytecode = True
@@ -201,11 +205,187 @@ def _win_retry(op, tries=6):
             time.sleep(0.02 * 2 ** i)
 
 
+def split_command(cmd):
+    """O comando do gate como lista de argumentos, sem shell. No POSIX, pelas regras do shlex; no Windows, onde a barra
+    invertida é separador de caminho, as aspas duplas agrupam e a barra fica como está."""
+    try:
+        if os.name != "nt":
+            return shlex.split(cmd)
+        return [t[1:-1] if len(t) >= 2 and t[0] == t[-1] == '"' else t for t in shlex.split(cmd, posix=False)]
+    except ValueError as exc:  # aspas sem fechar
+        raise StoreError(f"o comando do gate externo não se lê: {exc}") from exc
+
+
+_LIVE_GATES = set()  # os gates rodando agora, para um SIGTERM ao processo não deixá-los órfãos
+_LIVE_LOCK = threading.RLock()  # reentrante: o tratador do SIGTERM pode interromper a própria thread que o segura
+# o estado do encerramento: "stopping" depois do SIGTERM (nenhum gate novo abre), "spawning" enquanto a thread principal
+# cria e registra um gate, e "pending" com o sinal que chegou nesse meio, tratado logo depois do registro
+_TERM = {"stopping": False, "spawning": False, "pending": None}
+
+
+def kill_live_gates():
+    """Mata os gates externos que estão rodando (o grupo de cada um) e fecha a porta a gates novos. Chamado pelo
+    tratador do SIGTERM."""
+    with _LIVE_LOCK:
+        _TERM["stopping"] = True
+        live = list(_LIVE_GATES)
+    for p in live:
+        CommandGate._kill(p)
+
+
+def _on_term(signum, frame):
+    if _TERM["spawning"]:  # a thread principal está entre criar o gate e registrá-lo: o registro trata o sinal
+        _TERM["pending"] = signum
+        return
+    kill_live_gates()
+    raise SystemExit(128 + signum)
+
+
+def install_term_handler():
+    """No processo de vida longa (o kg_mcp, o CLI), um SIGTERM mata os gates antes de sair. Só na thread principal,
+    onde o Python aceita tratador de sinal. No Windows, matar o processo à força (TerminateProcess, o que o "Finalizar
+    tarefa" faz) não passa por tratador nenhum, e o gate que estiver rodando pode ficar."""
+    if hasattr(signal, "SIGTERM") and threading.current_thread() is threading.main_thread():
+        signal.signal(signal.SIGTERM, _on_term)
+
+
+class CommandGate:
+    """Um gate externo por comando: roda depois do PASS do contrato, na gravação e na remoção, e o armazém só grava com
+    PASS dos dois. É o gancho por onde quem adota liga o próprio gate sem o produto depender dele.
+
+    O comando é uma lista de argumentos (uma string passa por split_command) e nunca roda em shell. O texto candidato
+    vai pelo stdin em UTF-8 (vazio na remoção), e o nome e a operação pelo ambiente: KG_GATE_NAME e KG_GATE_OP (write
+    ou delete). O resto do ambiente é o do processo, menos as variáveis de drop_env (o kg_mcp tira a do segredo).
+    A saída tem de ser um documento kg-ssot.verdict/1 válido pelo spec/verdict.schema.json, com ao menos um resultado,
+    rc 0 quando tudo passa e rc 1 quando algo reprova. Qualquer outra coisa (comando que não roda, tempo esgotado,
+    saída sem JSON ou maior que MAX_OUTPUT, JSON fora do schema, rc que não bate com o veredito) é "não julgado",
+    nunca PASS.
+
+    A saída vai para um arquivo temporário, não para um pipe: um processo neto que herde a saída não segura a espera, e
+    no tempo esgotado o grupo de processos inteiro é morto. O gate roda sob a trava da gravação: um gate lento segura
+    as outras gravações do mesmo armazém até o --gate-timeout."""
+    MAX_OUTPUT = 16 * 1024 * 1024
+    MAX_TIMEOUT = 86400  # um dia: acima disso o tempo é engano, e no Windows estoura a espera em milissegundos
+
+    def __init__(self, argv, timeout=60, drop_env=()):
+        argv = split_command(argv) if isinstance(argv, str) else list(argv or [])
+        if not argv:
+            raise StoreError("gate externo vazio: diga o comando")
+        if not (isinstance(timeout, (int, float)) and 0 < timeout <= self.MAX_TIMEOUT):  # recusa também NaN
+            raise StoreError(f"o tempo do gate externo tem de ser de mais de 0 até {self.MAX_TIMEOUT} segundos")
+        self.argv, self.timeout, self.drop_env = argv, timeout, frozenset(drop_env)
+
+    @staticmethod
+    def _kill(p):
+        """Mata o comando e os processos que ele abriu (o grupo no POSIX, a árvore no Windows)."""
+        try:
+            if os.name == "nt":  # pelo caminho do sistema, nunca um taskkill achado no diretório atual
+                taskkill = os.path.join(os.environ.get("SystemRoot", r"C:\Windows"), "System32", "taskkill.exe")
+                subprocess.run([taskkill, "/F", "/T", "/PID", str(p.pid)], capture_output=True, timeout=30)
+            else:
+                os.killpg(p.pid, 9)
+        except (OSError, subprocess.SubprocessError):
+            pass
+        try:
+            p.kill()
+            p.wait(timeout=30)
+        except (OSError, subprocess.SubprocessError):
+            pass
+
+    def _wait(self, p, stdout):
+        """Espera o comando até o tempo, conferindo o tamanho da saída enquanto ele roda: (rc, None), ou (None, o
+        motivo) com o comando e os processos dele mortos."""
+        deadline = time.monotonic() + self.timeout
+        while True:
+            try:
+                return p.wait(timeout=min(0.1, max(0.0, deadline - time.monotonic()))), None
+            except subprocess.TimeoutExpired:
+                pass
+            if os.fstat(stdout.fileno()).st_size > self.MAX_OUTPUT:
+                self._kill(p)
+                return None, f"a saída do gate externo passou de {self.MAX_OUTPUT} bytes"
+            if time.monotonic() >= deadline:
+                self._kill(p)
+                return None, f"o gate externo passou de {self.timeout} s"
+
+    def __call__(self, name, text, op):
+        fold = str.upper if os.name == "nt" else str  # no Windows, o nome da variável não distingue caixa
+        drop = {fold(k) for k in self.drop_env}
+        env = {k: v for k, v in os.environ.items() if fold(k) not in drop}
+        env.update(KG_GATE_NAME=name, KG_GATE_OP=op)
+        group = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt"
+                 else {"start_new_session": True})
+        try:
+            stdin, stdout = tempfile.TemporaryFile(), tempfile.TemporaryFile()
+        except OSError as exc:  # sem diretório temporário: não julgado, sem o caminho dele na mensagem
+            return None, f"o gate externo não rodou (sem arquivo temporário: {exc.strerror or type(exc).__name__})"
+        with stdin, stdout:
+            stdin.write((text or "").encode("utf-8"))
+            stdin.seek(0)
+            # um SIGTERM entre criar o processo e registrá-lo não deixa um gate que o tratador não conhece: nas outras
+            # threads, a trava segura o tratador; na principal, o sinal fica pendente e é tratado depois do registro.
+            # Sem máscara de sinal, que o gate herdaria (e com ela o timeout do coreutils e o kill do operador não o
+            # parariam)
+            main = threading.current_thread() is threading.main_thread()
+            try:
+                with _LIVE_LOCK:
+                    if _TERM["stopping"]:
+                        return None, "o gate externo não rodou (o processo está encerrando)"
+                    if main:
+                        _TERM["spawning"] = True
+                    try:
+                        p = subprocess.Popen(self.argv, stdin=stdin, stdout=stdout, stderr=subprocess.DEVNULL, env=env,
+                                             **group)
+                    except (OSError, ValueError) as exc:
+                        return None, (f"o gate externo não rodou ({type(exc).__name__}: "
+                                      f"{getattr(exc, 'strerror', None) or exc})")
+                    _LIVE_GATES.add(p)
+            finally:
+                if main:
+                    _TERM["spawning"] = False
+                    signum, _TERM["pending"] = _TERM["pending"], None
+                    if signum is not None:
+                        _on_term(signum, None)
+            try:
+                rc, why = self._wait(p, stdout)
+            except BaseException:  # Ctrl+C ou qualquer exceção na espera: o gate não fica órfão
+                self._kill(p)
+                raise
+            finally:
+                with _LIVE_LOCK:
+                    _LIVE_GATES.discard(p)
+            if why:
+                return None, why
+            if os.name != "nt":  # um neto que o gate deixou de pé (o grupo dele) não sobrevive à gravação
+                try:
+                    os.killpg(p.pid, 9)
+                except OSError:
+                    pass
+            if rc not in (0, 1):
+                return None, f"o gate externo saiu com rc {rc}"
+            if stdout.seek(0, os.SEEK_END) > self.MAX_OUTPUT:  # o que ele escreveu entre a última conferência e o fim
+                return None, f"a saída do gate externo passou de {self.MAX_OUTPUT} bytes"
+            stdout.seek(0)
+            raw = stdout.read()
+        try:
+            doc = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError):
+            return None, "o gate externo não devolveu um veredito JSON"
+        if not _verdict_ok(doc):
+            return None, "o veredito do gate externo saiu fora de spec/verdict.schema.json"
+        if not doc["results"]:
+            return None, "o veredito do gate externo veio sem resultado"
+        if any(r["verdict"] == "FAIL" for r in doc["results"]) != (rc == 1):
+            return None, "o rc do gate externo não bate com o veredito dele"
+        return doc, None
+
+
 class DiskStore:
     """A cabeça em disco. history() é vazio: este armazém não guarda versão anterior."""
     backend = "disk"
 
-    def __init__(self, root, schema=None, init=False):
+    def __init__(self, root, schema=None, init=False, gate=None):
+        self.gate = gate  # o gate externo (CommandGate ou um chamável (name, text, op) -> (doc, erro)), depois do contrato
         if PATH_MODE not in ("posix", "win"):
             raise StoreError("o armazém exige POSIX (os.open com dir_fd e O_NOFOLLOW) ou Windows")
         self._posix = PATH_MODE == "posix"
@@ -588,11 +768,32 @@ class DiskStore:
             return None, "o julgamento saiu fora de spec/verdict.schema.json"
         return doc, None
 
+    def _judge_all(self, name, text):
+        """(doc, erro, de_fora): o contrato e, se ele aprova, o gate externo. de_fora diz que o FAIL veio do gate
+        externo. Uma falha do gate externo, ou um gate que levanta, é "não julgado", nunca PASS."""
+        doc, err = self._judge(name, text)
+        if doc is None or self.gate is None or any(r["verdict"] == "FAIL" for r in doc["results"]):
+            return doc, err, False
+        try:
+            gdoc, gerr = self.gate(name, text, "write" if text is not None else "delete")
+        except Exception as exc:  # noqa: BLE001 - o gate de quem adota não derruba o armazém nem vira PASS
+            return None, f"o gate externo levantou {type(exc).__name__}: {exc}", False
+        if gdoc is not None and _verdict_ok(gdoc) and not gdoc["results"]:
+            gdoc, gerr = None, "veredito sem resultado"
+        if gdoc is None or not _verdict_ok(gdoc):
+            gerr = gerr or "veredito fora de spec/verdict.schema.json"
+            return None, gerr if "gate externo" in gerr else f"gate externo: {gerr}", False
+        if any(r["verdict"] == "FAIL" for r in gdoc["results"]):
+            return gdoc, None, True
+        return doc, None, False
+
     def _result(self, name, written, reason=None, sha=None, ref=None, verdict=None, error=None, unchanged=False):
         return {"written": written, "reason": reason, "name": name, "sha256": sha, "ref": ref,
                 "verdict": verdict, "error": error, "unchanged": unchanged}
 
-    def write(self, name, text, message=None, author=None, expected_sha256=None):
+    def write(self, name, text, message=None, author=None, expected_sha256=None, max_names=None):
+        """max_names: um nome NOVO é recusado (StoreError) quando o armazém já tem esse número de grafos. A conta é
+        feita sob a trava da gravação, para gravações concorrentes não passarem juntas do limite."""
         check_name(name)
         check_author(author)
         message = check_message(message, f"grava {name}")
@@ -605,15 +806,18 @@ class DiskStore:
             head = self._read_head(name)
             if head is None:
                 check_portable(name)
+                if max_names is not None and len(self.list()) >= max_names:
+                    raise StoreError(f"o armazém já tem {max_names} grafos, o limite deste servidor")
             visible = self._visible(name, head)
             current = sha256(visible) if visible is not None else None
             if expected_sha256 is not None and expected_sha256 != (current or NEW):
                 return self._result(name, False, "conflict", current)
-            doc, err = self._judge(name, text)
+            doc, err, external = self._judge_all(name, text)
             if doc is None:
                 return self._result(name, False, "not_judged", current, error=err)
             if any(r["verdict"] == "FAIL" for r in doc["results"]):
-                return self._result(name, False, "gate", current, verdict=doc)
+                return self._result(name, False, "gate", current, verdict=doc,
+                                    error="reprovado pelo gate externo" if external else None)
             new = sha256(text)
             if new == self._recorded_sha(name):  # o mesmo texto da última versão registrada: sem commit nem evento
                 if new != current:
@@ -643,11 +847,12 @@ class DiskStore:
             current = sha256(head)
             if expected_sha256 is not None and expected_sha256 != current:
                 return self._result(name, False, "conflict", current)
-            doc, err = self._judge(name, None)
+            doc, err, external = self._judge_all(name, None)
             if doc is None:
                 return self._result(name, False, "not_judged", current, error=err)
             if any(r["verdict"] == "FAIL" for r in doc["results"]):
-                return self._result(name, False, "gate", current, verdict=doc)
+                return self._result(name, False, "gate", current, verdict=doc,
+                                    error="reprovado pelo gate externo" if external else None)
             self._remove_head(name)
             try:
                 ref = self._commit("delete", name, None, message, author, None)
@@ -711,8 +916,8 @@ class GitStore(DiskStore):
     pai dela: nunca sobe para um repo de fora. author vai no --author; o committer é fixo do serviço (committer=)."""
     backend = "git"
 
-    def __init__(self, root, schema=None, init=False, committer=("kg-store", "kg-store@localhost")):
-        super().__init__(root, schema, init)
+    def __init__(self, root, schema=None, init=False, committer=("kg-store", "kg-store@localhost"), gate=None):
+        super().__init__(root, schema, init, gate)
         self.committer = committer
         git = self.root / ".git"
         if not os.path.lexists(git):
@@ -916,6 +1121,9 @@ def main(argv=None):
     ap.add_argument("--backend", choices=sorted(BACKENDS), default="disk")
     ap.add_argument("--root", required=True)
     ap.add_argument("--init", action="store_true", help="cria a raiz (e o repo, no git) se não existe")
+    ap.add_argument("--gate-cmd", help="um gate externo, depois do contrato: o comando recebe o texto no stdin e devolve "
+                                       "um kg-ssot.verdict/1 (veja CommandGate)")
+    ap.add_argument("--gate-timeout", type=float, help="segundos para o gate externo (default 60)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("list")
     p = sub.add_parser("read")
@@ -937,7 +1145,14 @@ def main(argv=None):
     def emit(obj):
         print(json.dumps(obj, ensure_ascii=False, indent=1))
     try:
-        store = open_store(args.backend, args.root, init=args.init)
+        # --gate-cmd "" (uma variável vazia) é recusado, nunca "sem gate" calado
+        if args.gate_timeout is not None and args.gate_cmd is None:
+            raise StoreError("--gate-timeout sem --gate-cmd: não há gate para o tempo")
+        gate = (CommandGate(args.gate_cmd, 60 if args.gate_timeout is None else args.gate_timeout)
+                if args.gate_cmd is not None else None)
+        if gate is not None:
+            install_term_handler()
+        store = open_store(args.backend, args.root, init=args.init, gate=gate)
         if args.cmd == "list":
             emit({"names": store.list()})
             return 0

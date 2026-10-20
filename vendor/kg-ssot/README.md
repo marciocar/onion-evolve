@@ -6,8 +6,8 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.9.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.9.1-6f42c1)](spec/release.json)
-[![Suíte: 261/261](https://img.shields.io/badge/su%C3%ADte-261%2F261-2ea44f)](spec/conformance/README.md)
+[![Contrato: v4 · release 4.10.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.10.0-6f42c1)](spec/release.json)
+[![Suíte: 263/263](https://img.shields.io/badge/su%C3%ADte-263%2F263-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
@@ -48,7 +48,7 @@ python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/require
 ```
 
 ```text
-latest: 261/261 (reprova)
+latest: 263/263 (reprova)
 optional: 10/24 (só reporta)
 PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
 REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
@@ -60,7 +60,8 @@ Para usar como comando, biblioteca ou servidor MCP, o mesmo kit sai no PyPI: `pi
 `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
 do pacote. Em JavaScript, `npm install kg-ssot` traz o leitor JS, com o validador pré-compilado que roda também
 no React Native e no Expo. Para um cliente de MCP como o Claude Desktop, o servidor sai também como MCP Bundle
-(`.mcpb`). Para levar o gate a um repositório seu, o caminho é o vendor por tag, no
+(`.mcpb`), e para rodar como serviço ao lado de um cliente sem Python, como o LibreChat, há a imagem OCI
+`ghcr.io/marciocar/kg-ssot` ([manual, "A imagem OCI"](docs/manual/05-ferramentas.md)). Para levar o gate a um repositório seu, o caminho é o vendor por tag, no
 [capítulo 6 do manual](docs/manual/06-adocao-e-ci.md).
 
 ## Um nó, por dentro
@@ -90,7 +91,7 @@ O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `med
 flowchart LR
   subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
     C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>261 casos em dados puros"]
+    S["Suíte de conformidade<br/>263 casos em dados puros"]
     R["Leitor de referência<br/>kg_validate.py"]
     S -- "todo leitor passa" --> R
     C --> R
@@ -127,7 +128,7 @@ flowchart LR
 | **Dois formatos, um modelo** | O `.kg.yaml` para escrever e revisar no diff, e o `.kg.json` para o runtime (um app, um servidor), lido por um parser JSON no perfil JSON do contrato (RFC 8259, I-JSON, até 128 níveis, chave única). O gate e as `external_edges` seguem só com `.kg.yaml` |
 | **Armazém com gate** | `kg_store.py` grava `.kg.yaml` ou `.kg.json` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
 | **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
-| **Suíte em dados puros** | 261 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
+| **Suíte em dados puros** | 263 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
@@ -144,7 +145,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.9.1`. O leitor de referência passa em 261 de 261 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.10.0`. O leitor de referência passa em 263 de 263 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.

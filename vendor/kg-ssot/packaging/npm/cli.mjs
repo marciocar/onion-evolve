@@ -4,7 +4,7 @@
 //   kg-ssot-validate <arquivo>... [--json] [--corpus DIR]
 //
 // rc 0 quando todos passam no MUST, 1 quando algum reprova, 2 com entrada quebrada (arquivo ilegível, UTF-8
-// inválido). --json imprime uma linha JSON por arquivo, no contrato de runner da suíte. --corpus confere a ponta
+// inválido). Os avisos SHOULD saem numa linha AVISO e não mudam o rc. --json imprime uma linha JSON por arquivo, no contrato de runner da suíte. --corpus confere a ponta
 // externa das external_edges contra os .kg.yaml sob DIR.
 import { readFileSync } from 'node:fs';
 
@@ -60,5 +60,6 @@ for (const file of files) {
   else if (out.verdict === 'accept') process.stdout.write(`PASSA   ${file}\n`);
   else if (out.verdict === 'reject') process.stdout.write(`REPROVA ${file}\n  MUST   ${out.codes.join(' · ')}\n`);
   else process.stdout.write(`ERRO    ${file}\n  ${out.detail}\n`);
+  if (!json && out.warnings?.length) process.stdout.write(`  AVISO  ${out.warnings.join(' · ')}\n`);
 }
 process.exit(rc);

@@ -1,17 +1,24 @@
-// Entrada do pacote npm kg-ssot: o núcleo do leitor (kg.mjs, sem fs nem geração de código) com o validador MUST do
-// contrato já pré-compilado (must.mjs, sem new Function nem eval). Serve a Node e a bundles de React Native/Expo.
+// Entrada do pacote npm kg-ssot: o núcleo do leitor (kg.mjs, sem fs nem geração de código) com os validadores MUST e
+// SHOULD do contrato já pré-compilados (must.mjs e should.mjs, sem new Function nem eval). Serve a Node e a bundles
+// de React Native/Expo.
 //
 //   import { verdict } from 'kg-ssot';
-//   verdict(texto, { format: 'yaml' })   // { verdict: 'accept' | 'reject', codes: [...], warnings: null, detail: '' }
+//   verdict(texto, { format: 'yaml' })   // { verdict: 'accept' | 'reject', codes: [...], warnings: [...], detail: '' }
 import validateMust from './must.mjs';
-import { codes as codesWith, verdictOf } from './kg.mjs';
+import validateShould from './should.mjs';
+import { codes as codesWith, verdictOf, warnings as warningsWith } from './kg.mjs';
 
 export * from './kg.mjs';
-export { validateMust };
+export { validateMust, validateShould };
 
-/** O veredito do contrato vigente para o texto de um grafo; format é 'yaml' (o default) ou 'json'. */
+/** O veredito do contrato vigente para o texto de um grafo (MUST e SHOULD); format é 'yaml' (o default) ou 'json'. */
 export function verdict(text, { format = 'yaml', corpus = null } = {}) {
-  return verdictOf(text, validateMust, { format, corpus });
+  return verdictOf(text, validateMust, { format, corpus, validateShould });
+}
+
+/** Os códigos SHOULD (avisos) do texto de um grafo, ordenados e sem repetição; vazio quando não há aviso. */
+export function checkWarnings(text, { format = 'yaml' } = {}) {
+  return warningsWith(text, validateMust, validateShould, { format });
 }
 
 /** Os códigos MUST do texto de um grafo, ordenados e sem repetição; vazio quando passa. */

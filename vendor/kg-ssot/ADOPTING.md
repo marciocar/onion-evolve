@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -295,6 +295,27 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.9.1` para a `kg-ssot-v4.10.0`, nenhum veredito MUST muda. Muda o servidor MCP e o leitor JS:
+- **O perfil "atrás de proxy" do `kg_mcp.py`** (`--identity-header`, `--secret-env`): identidade por header que
+  recusa por padrão, segredo comparado por hmac, uma área e um autor por identidade, por requisição, os limites
+  `--max-graphs` e `--max-concurrent`, e o envelope `untrusted_data`. Fora do perfil, nada muda.
+- **As duas eras do protocolo MCP:** o `kg_mcp.py` fala a 2026-07-28, sem estado (`server/discover` e o `_meta` por
+  requisição), e segue falando a 2025-11-25, com `initialize` e sem sessão. A era é escolhida por requisição.
+- **O gate externo** (`--gate-cmd`, no `kg_store.py` e no `kg_mcp.py`): um comando seu, sem shell, que julga depois do
+  contrato em cada gravação e remoção e devolve um `kg-ssot.verdict/1`. O armazém só grava com PASS dos dois, e um gate
+  que falha nunca vira PASS. É por ele que se liga um gate próprio (um radar, uma política) ao servidor. Sem a opção,
+  nada muda.
+- **A imagem OCI** `ghcr.io/marciocar/kg-ssot:4.10.0`: o `kg-mcp` do mesmo wheel do PyPI, sem root, com o armazém em
+  `/data` e o label de posse do MCP Registry, para rodar ao lado do LibreChat (o manual, em "A imagem OCI", traz o
+  compose e o `librechat.yaml`).
+- **Uma mudança de comportamento:** `--allow-remote` passa a exigir `--secret-env`. Quem servia fora do loopback sem
+  segredo, atrás de um proxy, precisa pôr um segredo e mandá-lo no header (`--secret-header`, padrão `X-Api-Key`).
+- **O leitor JS mede os avisos SHOULD,** com os mesmos códigos da referência em todos os casos da suíte, e o pacote npm
+  traz o `should.mjs` pré-compilado.
+- **A suíte ganha 2 casos** (263), sobre o `trace` só com espaço.
+
+Um `update` basta, e o gate não precisa de `--update`.
+
 Da `kg-ssot-v4.9.0` para a `kg-ssot-v4.9.1`, nenhum veredito muda. Muda o armazém e o servidor MCP:
 - **O armazém roda no Windows.** Na 4.9.0 ele recusava abrir lá, e o MCPB no Claude Desktop do Windows subia só com o
   julgamento. No Windows, que não tem `dir_fd`, cada passo do caminho é conferido por `lstat` (link simbólico, junção e
@@ -364,7 +385,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.9.1 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.10.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a

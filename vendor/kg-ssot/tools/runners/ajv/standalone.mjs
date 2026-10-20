@@ -1,7 +1,7 @@
-// Gera o validador MUST pré-compilado (ajv/dist/standalone): um módulo ESM que não chama new Function nem eval,
-// para motores sem geração de código em tempo de execução (o Hermes do React Native).
+// Gera o validador pré-compilado (ajv/dist/standalone) do schema MUST, ou do SHOULD com --should: um módulo ESM que
+// não chama new Function nem eval, para motores sem geração de código em tempo de execução (o Hermes do React Native).
 //
-//   node tools/runners/ajv/standalone.mjs <saída.mjs> [--absolute]
+//   node tools/runners/ajv/standalone.mjs <saída.mjs> [--should] [--absolute]
 //
 // O schema é lido de spec/ na hora, como no run.mjs. O módulo gerado importa só o runtime do ajv
 // (ucs2length): num bundle, ele precisa do pacote ajv instalado, não do compilador. O ajv emite require() mesmo
@@ -14,7 +14,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import standaloneCode from 'ajv/dist/standalone/index.js';
 
 import { AJV_OPTIONS } from './kg.mjs';
-import { CONTRACT_MUST } from './run.mjs';
+import { CONTRACT_MUST, CONTRACT_SHOULD } from './run.mjs';
 
 const out = process.argv[2];
 if (!out) {
@@ -22,7 +22,8 @@ if (!out) {
   process.exit(2);
 }
 const ajv = new Ajv2020({ ...AJV_OPTIONS, code: { source: true, esm: true } });
-const validate = ajv.compile(JSON.parse(readFileSync(CONTRACT_MUST, 'utf8')));
+const schema = process.argv.includes('--should') ? CONTRACT_SHOULD : CONTRACT_MUST;
+const validate = ajv.compile(JSON.parse(readFileSync(schema, 'utf8')));
 const base = process.argv.includes('--absolute') ? pathToFileURL(new URL('./node_modules/', import.meta.url).pathname).href : '';
 const code = standaloneCode(ajv, validate).replace(
   /const (\w+) = require\("(ajv\/dist\/[\w/]+)"\)\.default;/g,
