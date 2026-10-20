@@ -13,7 +13,7 @@
 # `cd /outro/repo` que as quatro ondas deixaram num label.
 #
 # A CLASSE e as ISENÇÕES moram em .claude/utils/kg/machine_path.py — UM lugar, importado também pelo
-# kg-migrate-v3.py e pelo kg-contract-check.sh (grafo NOVO nasce limpo; rastreado não piora). Aqui
+# kg-migrate-v3.py (core-only) e pelo kg-contract-check.sh (grafo NOVO nasce limpo; rastreado não piora). Aqui
 # mora só a CATRACA sobre o corpus.
 #
 # CATRACA (padrão das REGRAS 78/82): `passivo` no baseline = SOFT; caminho fora do baseline = HARD; o

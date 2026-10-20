@@ -43,7 +43,7 @@
 # que não existe. A v4.3 deu a forma do contrato (`external_edges`), e o gate do CI reprova
 # alvo inexistente (`integrity.dangling-external`), conferido contra TODOS os .kg.yaml
 # rastreados. Aceitar a chave velha manteria a porta sem conferência aberta ao lado da
-# conferida; por isso ela NÃO conta mais, e a migração é `kg-migrate-v3.py --external-edges`.
+# conferida; por isso ela NÃO conta mais, e a migração é `kg-migrate-v3.py --external-edges` (core-only).
 # A aresta intra-arquivo conta só dentro do bloco `edges:`; a externa, só no `external_edges:`.
 # ⚠️ O VALOR É OBRIGATÓRIO, e não é preciosismo: na 1ª versão um
 # `supersedes_none:` VAZIO calava a guarda, provado no grafo real. Bastava a

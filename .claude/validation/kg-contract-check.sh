@@ -59,7 +59,7 @@ HINT = {
     "integrity.testimony-in-prod": "nó PROD apoiado em testemunho: rebaixe para DEV ou meça e troque o method para medição/leitura",
     "integrity.verified-before-fact": "verified_at anterior ao valid_from: não se verifica um fato antes de ele valer; corrija uma das datas",
     # aviso do v4.2 (2026-10-09, SAC-97): locality é opcional, mas quando vem tem de estar no vocabulário
-    "form.enum.node.provenance.locality": "provenance.locality fora do vocabulário: use repo, web, host ou pessoa (ou tire a chave; kg-migrate-v3.py --locality a deriva do source)",
+    "form.enum.node.provenance.locality": "provenance.locality fora do vocabulário: use repo, web, host ou pessoa (ou tire a chave; no core, kg-migrate-v3.py --locality (core-only) a deriva do source)",
     # MUST do v4.3 (2026-10-10, SAC-98): external_edges
     "integrity.dangling-external": "external_edges aponta arquivo ou id que não existe entre os .kg.yaml rastreados: corrija o alvo pela origem (nunca invente; arquivo novo precisa de git add)",
     "integrity.dangling-external-local": "external_edges com a ponta LOCAL inexistente: o id sem `#` tem de ser um nó deste arquivo",

@@ -27,6 +27,13 @@
 #           (baseline intocado). TETO: a SKILL cortada (`onion-publish`) não entra — nome de skill não
 #           tem forma de invocação que se distinga de prosa, e acusá-lo seria falso positivo.
 #
+# 3º VOCABULÁRIO (2026-10-20, D_U1_MIGRADOR_NO_KG_SSOT): o `kg-migrate-v3.py` saiu da adoção, e oito linhas que
+#           viajam mandavam o adotante rodá-lo — uma delas a DICA impressa pelo `kg-contract-check.sh` a todo grafo
+#           com `locality` fora do vocabulário. Mesma classe, sem `ops/` nem `/cmd:`: o SCRIPT core-only cortado.
+#           Cada `.py`/`.sh` de `--retired-excludes` fora de `commands/` vira o token do NOME do arquivo (com ou sem
+#           o caminho antes), com as MESMAS três declarações. A planta (`vendor-manifest.sh`) não é varrida para
+#           ele: cita o nome como DADO do transporte (a mesma razão do `_is_anchor` dela).
+#
 # A DECISÃO QUE A GUARDA NÃO TOMA SOZINHA — e por que a catraca existe:
 #   "a citação descreve o destinatário?" é JUÍZO. Um script não sabe. O que ele sabe fazer é obrigar o
 #   autor a DECIDIR na hora de escrever, e deixar a decisão visível. Por isso a regra é: citação de
@@ -101,26 +108,41 @@ fi
 # `.claude/commands/<cat>/<nome>.md` dali vira o token `/<cat>:<nome>` (e a grafia `/<cat>/<nome>`); os
 # próprios arquivos cortados não são varridos para ESTE vocabulário (são a superfície do comando, e na porta
 # source ele existe). Fallback explícito, nunca vazio, pelo mesmo motivo das raízes.
-CUT_CMDS=(); CUT_PATHS=()
+CUT_CMDS=(); CUT_PATHS=(); CUT_FILES=()
 if [ -f "${_VM}" ]; then
   while IFS= read -r _x; do
     _x="${_x#:(exclude)}"; [ -n "${_x}" ] || continue
     CUT_PATHS+=("${_x}")
+    # 3º vocabulário: o script core-only cortado (nome do arquivo; o `.` vira classe para a regex do awk)
+    #   Cada metacaractere de ERE vira classe de um caractere (`.` → `[.]`); nome com `[ ] ^ \` fica de fora,
+    #   DITO em stderr (não há classe honesta para eles e a regex quebraria a guarda inteira).
+    case "${_x}" in .claude/commands/*) : ;; *.py|*.sh)
+      _fb="${_x##*/}"
+      case "${_fb}" in *[]\[^\\]*) echo "AVISO: '${_fb}' tem metacaractere sem escape seguro — fora do 3º vocabulário" >&2 ;;
+        *) _fe=""; _i=0
+           while [ "${_i}" -lt "${#_fb}" ]; do _ch="${_fb:${_i}:1}"
+             case "${_ch}" in [.+?\(\)\{\}\|*\$]) _fe="${_fe}[${_ch}]" ;; *) _fe="${_fe}${_ch}" ;; esac; _i=$((_i+1)); done
+           CUT_FILES+=("${_fe}") ;;
+      esac ;;
+    esac
     _c="${_x#.claude/commands/}"
     if [ "${_c}" != "${_x}" ] && [[ "${_c}" == */*.md ]] && [[ "${_c}" != */*/* ]]; then
       _c="${_c%.md}"; CUT_CMDS+=("${_c%%/*}[:/]${_c#*/}")
     fi
   done < <(bash "${_VM}" --retired-excludes 2>/dev/null || true)
 fi
+_VM_SAID="${#CUT_PATHS[@]}"   # o manifesto respondeu algo? (o fallback dos scripts só vale se NÃO respondeu)
 if [ "${#CUT_CMDS[@]}" -eq 0 ]; then
   # ⚠️ Só o comando e a skill, NUNCA a lente e a doutrina por nome: o derivador de companheiros do
   # vendor-manifest.sh mantém viva a peça que um arquivo que viaja cita pelo nome, e este fallback a
   # citava (r14 do publish_release no CI do PR 1221: a doutrina voltou ao standalone). Sem elas, o
   # fallback acusa um pouco mais (a lente e a doutrina citam o comando), o lado seguro.
-  CUT_CMDS=("meta[:/]publish"); CUT_PATHS=(.claude/commands/meta/publish.md .claude/skills/onion-publish)
+  CUT_CMDS=("meta[:/]publish"); CUT_PATHS=(.claude/commands/meta/publish.md .claude/skills/onion-publish .claude/utils/kg/kg-migrate-v3.py)
+  [ "${_VM_SAID}" -gt 0 ] || CUT_FILES=("kg-migrate-v3[.]py")
 fi
 _CMDRE="$(IFS='|'; printf '%s' "${CUT_CMDS[*]}")"
 _CUTP="$(IFS='|'; printf '%s' "${CUT_PATHS[*]}")"
+_FILERE="$(IFS='|'; printf '%s' "${CUT_FILES[*]:-}")"
 
 # Extrai "<rel>|<ops/token>" — UMA LINHA POR OCORRÊNCIA (a contagem por par alimenta a catraca) — de cada
 # citação NÃO declarada nas raízes que viajam.
@@ -146,7 +168,7 @@ collect_violations() { # <repo_dir>
           -o -name '*.txt' -o -name '*.toml' \) \
        ! -name '*baseline.txt' ! -name 'lint-selftest.sh' ! -name "${SELF_NAME}" \
        ! -path '*/fixtures/*' -print0 2>/dev/null \
-  | xargs -0 -r awk -v prefix="${repo}/" -v cmdre="${_CMDRE}" -v cutp="${_CUTP}" '
+  | xargs -0 -r awk -v prefix="${repo}/" -v cmdre="${_CMDRE}" -v cutp="${_CUTP}" -v filere="${_FILERE}" '
       function flush(   i) {
         if (rel != "" && !(fmcore && fmclosed)) for (i = 1; i <= nc; i++) if (!(cand[i] in gtok) || (i in cmsg)) print rel "|" cand[i]
         nc = 0; split("", cand); split("", cmsg); split("", gtok); split("", vtok)
@@ -179,11 +201,24 @@ collect_violations() { # <repo_dir>
             toks[++n] = t
           }
         }
+        # 3º vocabulário: o script core-only cortado, pelo NOME (`kg-migrate-v3.py`, com ou sem caminho antes). Cala
+        # no nome mais longo dos dois lados (`x-kg-migrate-v3.py`, `kg-migrate-v3.pyc`); a planta não é varrida.
+        if (filere != "" && !cutfile && !plant) {
+          off = 0
+          while (match(substr(s, off + 1), "(" filere ")")) {
+            t = substr(s, off + RSTART, RLENGTH); pre = substr(s, 1, off + RSTART - 1)
+            nx = substr(s, off + RSTART + RLENGTH, 1); off = off + RSTART + RLENGTH - 1
+            c = substr(pre, length(pre), 1)
+            if (c ~ /[A-Za-z0-9_.-]/ || nx ~ /[A-Za-z0-9_-]/) continue
+            toks[++n] = t
+          }
+        }
         return n
       }
       FNR == 1 { flush(); rel = FILENAME; if (index(rel, prefix) == 1) rel = substr(rel, length(prefix) + 1)
                  cutfile = 0; ncp = split(cutp, cps, "|")
                  for (i = 1; i <= ncp; i++) if (cps[i] != "" && (rel == cps[i] || index(rel, cps[i] "/") == 1)) cutfile = 1
+                 plant = (rel == ".claude/utils/adopt/vendor-manifest.sh")
                  fm = 0; isfm = 0; fmclosed = 0; fmcore = 0; indesc = 0; inpaths = 0
                  code = (FILENAME ~ /\.(sh|py|js|mjs|ts)$/); srconly = 0; indoc = 0 }
       { l = $0; sub(/\r$/, "", l); if (FNR == 1) sub(/^\357\273\277/, "", l) }
@@ -232,7 +267,7 @@ collect_violations() { # <repo_dir>
 # SELFTEST (self-contido, à la kb-vendored-link-check.sh) — as polaridades
 # ---------------------------------------------------------------------------
 run_selftest() {
-  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=22
+  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=25
   mkdir -p "${tmp}/.claude/rules" "${tmp}/.claude/hooks" "${tmp}/.claude/validation/fixtures" \
            "${tmp}/.claude/commands/meta" "${tmp}/docs/sdaal" "${tmp}/ops" "${tmp}/docs/evolution/notas"
   local BL="${tmp}/.claude/validation/ops-citation-travel-baseline.txt"
@@ -392,6 +427,29 @@ run_selftest() {
   rm -rf "${tmp}/.claude/skills/onion-publish"
   if _has 'meta/publish.md' || _has 'onion-publish'; then echo "  ✗ (xxii) a superfície cortada não deveria acusar o próprio comando"; fails=$((fails+1)); else echo "  ✅ (xxii) o comando cortado e a skill dele citam /meta:publish sem acusar"; fi
 
+  # ── 3º vocabulário: o script core-only cortado da adoção (2026-10-20, D_U1_MIGRADOR_NO_KG_SSOT) ──
+  # (xxiii) o defeito VERBATIM: a dica que o kg-contract-check.sh imprime ao adotante manda rodar o migrador do core
+  #         => HARD; e o caminho inteiro também conta. Mutante: com o 3º vocabulário desligado, reprova.
+  _reset
+  printf '    "form.enum.node.provenance.locality": "use repo, web, host ou pessoa (ou tire a chave; kg-migrate-v3.py --locality a deriva do source)",\n' > "${tmp}/.claude/hooks/hint.py"
+  printf 'migre com `python3 .claude/utils/kg/kg-migrate-v3.py --external-edges`\n' > "${tmp}/.claude/rules/g.md"
+  _run
+  if _has $'^HARD\tNEW\t.claude/hooks/hint.py\t.*kg-migrate-v3.py' && _has $'^HARD\tNEW\t.claude/rules/g.md\t.*kg-migrate-v3.py'; then echo "  ✅ (xxiii) o script core-only cortado, citado pelo nome ou pelo caminho num arquivo que viaja, reprova"; else echo "  ✗ (xxiii)"; fails=$((fails+1)); fi
+
+  # (xxiv) marcador (core-only) e nome mais longo dos dois lados => calam
+  _reset
+  printf 'no core, kg-migrate-v3.py --locality (core-only) a deriva\no old-kg-migrate-v3.py e o kg-migrate-v3.pyc não são ele\n' > "${tmp}/.claude/rules/h.md"
+  _run
+  if _has 'rules/h.md'; then echo "  ✗ (xxiv) marcador e nome mais longo deveriam calar"; fails=$((fails+1)); else echo "  ✅ (xxiv) marcador (core-only) e nome mais longo calam"; fi
+
+  # (xxv) o próprio script cortado e a planta do transporte não são varridos para este vocabulário
+  _reset; mkdir -p "${tmp}/.claude/utils/kg" "${tmp}/.claude/utils/adopt"
+  printf 'print("kg-migrate-v3.py: uso")\n' > "${tmp}/.claude/utils/kg/kg-migrate-v3.py"
+  printf "_X=(':(exclude).claude/utils/kg/kg-migrate-v3.py')\n" > "${tmp}/.claude/utils/adopt/vendor-manifest.sh"
+  _run
+  rm -rf "${tmp}/.claude/utils"
+  if _has 'kg-migrate-v3.py' ; then echo "  ✗ (xxv) o script cortado e a planta não deveriam acusar"; fails=$((fails+1)); else echo "  ✅ (xxv) o script cortado e a planta citam o nome sem acusar"; fi
+
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1
 }
@@ -465,7 +523,8 @@ else
     case "${tag}" in
       NEW)     case "${k#*|}" in
                  ops/*) _why="ops/ não vai a nenhuma porta nem adotante" ;;
-                 *)     _why="o comando é core-only e a adoção o corta (vendor-manifest.sh --retired-excludes)" ;;
+                 /*)    _why="o comando é core-only e a adoção o corta (vendor-manifest.sh --retired-excludes)" ;;
+                 *)     _why="o script é core-only e a adoção o corta (vendor-manifest.sh --retired-excludes)" ;;
                esac
                say "HARD" "NEW" "${path}" "cita '${k#*|}' (${detail}) num arquivo que VIAJA — ${_why}, e lá a frase descreve um comportamento que o destinatário não tem: ${FIX}" ;;
       PASSIVO) say "SOFT" "PASSIVO" "${path}" "passivo: cita '${k#*|}' (${detail}) — ${FIX}, e remova do baseline" ;;

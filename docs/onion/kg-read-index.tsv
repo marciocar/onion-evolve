@@ -261,6 +261,7 @@
 .claude/utils/adopt/regen-ssot-projections.sh	A_ADOTANTE_GREENFIELD_NASCE_COM_HARD	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/regen-ssot-projections.sh	E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/utils/adopt/regen-ssot-projections.sh	E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
+.claude/utils/adopt/remeasure-contract.sh	E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/utils/adopt/scope-claude-gitignore.sh	D_FIX_GAP2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/adopt/starter-research-seed.sh	E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/transfer-ownership.sh	TX_transfer	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
