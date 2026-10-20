@@ -8,6 +8,8 @@ meta:
   review_after: "2026-11-07"   # 30d: defeito de guarda
   # ═══ TETO: 10 NÓS ═══
   #   6 em 2026-10-08 (+ a cura do SAC-68: o glob julgado pelo bash e pelo disco, o --lint, e dois tetos).
+  #   +4 em 2026-10-20 (U4: o replay dos vetos reais, a decisão que supera o selo de 10-08 no -o de nomes e na
+  #   prosa em arquivo de dados, os dois escapes anteriores achados no caminho, e o residual não curado). 10 de 10: cheio.
 nodes:
   - id: E_ENV_GUARD_VETOU_COMANDO_SEM_ENV
     node_type: evidence
@@ -81,6 +83,67 @@ nodes:
     confidence: 0.7
     verified_against: "cura do SAC-68 em 2026-10-08"
     label: "teto: o glob conferido no disco vê a pasta no momento do veto; um x.env criado na mesma linha por nome montado em runtime, sem citar .env, escaparia"
+  - id: E_U4_REPLAY_VETOS_REAIS_1020
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "replay dos 100 vetos gravados nos transcripts desta máquina (74 comandos distintos), cada um re-julgado com o JSON do PreToolUse e o cwd original: a main de 2026-10-20 barrava 57; a cura, 15 — 12 deles leem valor (grep -n/-c, sed -n, git log + grep|cut, heredoc de SCRIPT citando .env, python com .env por argumento)"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "U4 (sinal de campo do hub brain-granaai, 2026-10-19): de 74 comandos distintos vetados, a main barrava 57 e a cura barra 15, dos quais 12 leem valor"
+    narrative: "As classes medidas: `\\(` do find tomado por operador pelo shlex (o segmento seguinte começava em `-name`/`-prune`); o padrão de um `case` (`*)`) julgado como comando — o laço de rebase desta sessão; grep -o com padrão de NOME de chave; heredoc do relatório de update gravando prosa que citava `.env.test` em arquivo .md por \"$REPORT\"; heredoc de resíduo com SHA=$(…) no prefixo; heredoc para python3 lido como shell; segmento só de atribuição (`E=<caminho>.env`); `bash $H` com H=…/env-check.sh; glob com `$D` de pasta literal. O git grep sobre docs/ já passava na main de 10-20."
+    provenance:
+      source: "⟨os transcripts de sessão do Claude Code desta máquina⟩ (sessões do core, do hub e de 4 adotantes)"
+      locator: "cada tool_result com GUARDA-PRETOOLUSE (.env) e o tool_use correspondente; harness de replay no scratchpad da sessão de 2026-10-20"
+      method: "medição: o hook da main e o da cura rodados com o mesmo JSON do PreToolUse no stdin"
+      locality: "repo"
+  - id: D_U4_LISTAR_NOMEAR_CITAR_PASSAM
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-20"
+    verified_against: "autorização do maestro por /meta:decide em 2026-10-20, repassada pela sessão principal ao agente que executou (o agente não a viu na fonte); bancada env_exposure caso (u): 16 formas medidas passam, 26 leituras de valor e escapes seguem barrados (4 da 2ª passada: opção permutada pelo getopt, arquivo de dados usado como código na mesma linha, .env por variável no prefixo do interpretador), 20 mutantes mordem"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "o veto distingue LISTAR caminho, NOMEAR chave e CITAR em prosa (passam) de LER VALOR (barra): restringe o selo de 10-08 só no grep -o de nomes e na prosa gravada em arquivo de dados (o resto do selo vale)"
+    narrative: "O que muda do selo D_GREP_E_HEREDOC_SEGUEM_VETADOS: grep -o com padrão provado de nome (ancorado, classes só de nome, `=` como último caractere ou palavra literal de 4+) passa; heredoc que grava em .md/.txt/.json/.yaml/.csv/.tsv/.log/.html/.xml com destino resolvido passa mesmo citando .env, e o fecho do \"pode virar script\" vai para o outro lado: `bash x.md`/`source x.txt` passam a ser barrados. O que NÃO muda: grep -c/-q/-l e grep sem -o no .env seguem barrados; heredoc citando .env para arquivo sem extensão de dados (script) segue barrado, com a ferramenta Write como caminho."
+    provenance:
+      source: "a decisão (via sessão principal) e a bancada"
+      locator: "lint-selftest.sh, run_env_exposure_selftests caso (u)"
+      method: "medição: bancada com LC_ALL=C e mutante por cura"
+      locality: "repo"
+  - id: E_U4_ESCAPES_ANTERIORES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "na main de 2026-10-20, com o JSON do PreToolUse: `echo \"$(cat .env)\"` rc 0, `x=\"$(cat .env)\"` rc 0, `echo \"`head .env`\"` rc 0, `find . -name .env | xargs cat` rc 0; na cura, rc 2 nos quatro; e `$(cat <<'E')` com o corpo nas linhas seguintes EXECUTA o corpo em bash 5 (medido)"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "dois escapes ANTERIORES à cura, achados na passada do U4: a substituição entre aspas duplas não era julgada (`echo \"$(cat .env)\"` lia o segredo) e `find … | xargs cat` passava"
+    narrative: "O shlex entrega `\"$(cat .env)\"` como um token só, e o veto julgava tokens: toda substituição fora de aspas simples passa a ser julgada (substitutions). O xargs recebe o nome pela entrada: numa linha que cita um .env, ele só passa se o comando dele for de metadado. E a relaxação do prefixo do heredoc mediu antes de afrouxar: `$(cat <<'E')` fechado na mesma linha ainda captura o corpo, então o `<<` dentro de substituição segue recusado, por dois caminhos (o texto antes do operador e o parêntese aberto)."
+    provenance:
+      source: ".claude/hooks/pretooluse-env-guard.sh da main 3831c4ac e da cura"
+      locator: "casos dq-subst, xargs, subst-heredoc e subsh-pipe do caso (u); mutantes M7, M8 e M9"
+      method: "medição: hook com o JSON do PreToolUse e bash 5 executando o heredoc dentro de $()"
+      locality: "repo"
+  - id: C_TETO_U4_RESIDUAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_against: "replay de 2026-10-20: os 3 vetos restantes que não leem valor"
+    label: "teto do U4: `grep -l` sobre `.env*`, heredoc dentro de `{ … } > arquivo` e `for` sobre glob com pasta desconhecida seguem barrados sem ler valor"
+    narrative: "O grep -l é oráculo de 1 bit como o -c (o selo de 10-08 vale); o grupo `{ }` precisa saber para onde vai a saída do grupo, que vem depois do corpo; o for com `$X/*` depois de cd com parêntese não sabe a pasta. Gatilho: o próximo veto medido de uma dessas formas."
 edges:
   - from: E_ENV_GUARD_VETOU_COMANDO_SEM_ENV
     to: Q_ENV_GUARD_SEM_FALSO_POSITIVO
@@ -96,4 +159,16 @@ edges:
     edge_type: CONSTRAINS
   - from: C_TETO_DISCO_NO_MOMENTO_DO_VETO
     to: E_GLOB_JULGADO_PELO_DISCO
+    edge_type: CONSTRAINS
+  - from: D_U4_LISTAR_NOMEAR_CITAR_PASSAM
+    to: D_GREP_E_HEREDOC_SEGUEM_VETADOS
+    edge_type: CONSTRAINS
+  - from: E_U4_REPLAY_VETOS_REAIS_1020
+    to: D_U4_LISTAR_NOMEAR_CITAR_PASSAM
+    edge_type: SUPPORTS
+  - from: E_U4_ESCAPES_ANTERIORES
+    to: D_U4_LISTAR_NOMEAR_CITAR_PASSAM
+    edge_type: SUPPORTS
+  - from: C_TETO_U4_RESIDUAL
+    to: D_U4_LISTAR_NOMEAR_CITAR_PASSAM
     edge_type: CONSTRAINS
