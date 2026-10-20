@@ -2,7 +2,8 @@
 branch: feat/stt-diarization
 pr: pendente
 date: 2026-10-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b00c01e4109c7425b138dcbe5df7bb2f86bfae309b09d02d4dc1770817fbb66c
+reviewed_code_sha256: e07d18fcd1b83b25b5d11045b6fc45c89ca45db2023c3898d13c0f4278ae4235
 findings_total: 8
 findings_real: 8
 tokens: 163537
