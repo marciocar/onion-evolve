@@ -433,6 +433,9 @@ flow: downstream (core→consumidor / distribuição)
 ## Contrato KG-SSOT do corpus
 <colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$DEST" 2>&1 — medido NO ALVO, com o vendor DELE; rc 1 = dívida MUST (o número e o caminho: migração, a fase seguinte) · rc 4 = não se aplica · rc 3 = NÃO MEDIDO; nunca "lint VERDE" no lugar disto>
 
+## Gate do alvo
+<no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6)>
+
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
 
@@ -771,19 +774,15 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   # No UPDATE o helper PRESERVA adopted_from/mode/integration_branch/adopted_at (adopted_at NUNCA re-carimba),
   # atualiza source_commit/date e escreve updated_at; adopted_at perdido → members.yaml, ou omitido com AVISO.
   ```
+- **Provar que o gate do alvo BARRA, num sandbox descartável** (2026-10-20: em 11 updates seguidos o verificador do passo (6) só provou que o hook EXECUTA; com o lint limpo o bloqueio nunca é exercido). `bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$WORK"` clona o alvo para `mktemp -d` (pendente e hooks do disco inclusos), planta uma linha a mais em `docs/onion/inventory.md` (REGRA 8 (Inventário canônico sincronizado com o filesystem), que todo papel tem), commita pelo pre-commit do alvo e exige rc≠0 com a regra citada; apaga o sandbox e confere que HEAD, branch, status e config do alvo não mudaram (**nunca planta no checkout real**; desenho e rc no cabeçalho do helper).
+  A última linha (`bloqueio PROVADO (REGRA 8 (…), rc N)` ou `bloqueio NÃO PROVADO: <motivo>`) vai inteira na seção "Gate do alvo" do relatório, e rc 1 (fail-open, barra tudo) também ao corpo do PR. Não é gate do update, mas nunca é calada; rc 4 (o checkout real mudou) = PARE.
 - **Auto-emitir o relatório NO ALVO — ANTES do commit durável, que o leva na branch dedicada** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). **Os arquivos aplicados são medidos
   NO ALVO**, nunca pelo delta da fonte acima: `bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$WORK" "$INTEGRATION_BRANCH"` (merge-base..HEAD + o pendente; rc=3 = NÃO MEDIDO). **O diff de hooks é a saída de** `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"` (entrada inteira; rc≠0 = NÃO MEDIDO). **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
   `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO). **O contrato do corpus também é MEDIDO, e o lint não o vê** (o `vendor/kg-ssot` novo julga os grafos do alvo; sinal de 2026-10-19: 1.024 nós reprovando com 0 HARD): `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$WORK"` vai inteiro na seção "Contrato KG-SSOT do corpus". Medir não é gate: rc 1 (dívida MUST) não para o update, só dá o número e o caminho (a migração conduzida é a fase 2 de D_U1_CAMADA_SDAAL_NO_UPDATE, que espera o migrador oficial do kg-ssot).
-- **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
-  já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o
-  `.onion-version` re-carimbado. Aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
-  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `BR=$UPDATE_BR`) **com `ONION_DURABLE_VERIFY=1`**: o alvo já tem
-  o gate do Onion, e pular o hook aqui era pular a única checagem local antes do PR. Se o gate recusar
-  (rc=1, saída dele impressa), a mudança fica aplicada e não commitada na branch dedicada — cure e
-  re-rode. ⚠️ O bundle `adopted` já NASCE com 1 HARD (`rules/dissect-lens.md`, `papel/SEM-OBJETO`;
-  medido no dogfood da F1, cura na F2): recusa só por HARD pré-existente (compare `remeasure-hard.sh`
-  na integração e no `$WORK`) admite `--no-verify` **declarado no corpo do PR** — calado, nunca. Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
+- **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima, já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o `.onion-version` re-carimbado. Aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
+  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `BR=$UPDATE_BR`) **com `ONION_DURABLE_VERIFY=1`**: o alvo já tem o gate do Onion, e pular o hook aqui era pular a única checagem local antes do PR. Se o gate recusar (rc=1, saída dele impressa), a mudança fica aplicada e não commitada na branch dedicada — cure e re-rode.
+  ⚠️ O bundle `adopted` já NASCE com 1 HARD (`rules/dissect-lens.md`, `papel/SEM-OBJETO`; medido no dogfood da F1, cura na F2): recusa só por HARD pré-existente (compare `remeasure-hard.sh` na integração e no `$WORK`) admite `--no-verify` **declarado no corpo do PR** — calado, nunca. Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
 - **Integrar por PR:** push de `$UPDATE_BR` e PR para `$INTEGRATION_BRANCH` com **merge commit** (nunca
   rebase/squash: tira a `onion/vendor` da ancestralidade); com worktree irmã, `git -C "$TARGET" worktree remove "$WORK"` depois; e a da fonte, se houver (`$UPDATE_SOURCE_WORKTREE`, no `$CORE_ROOT`). Fonte fora de `equal`: declare-a no relatório.
 - **Tie com a federação:** o `source_commit` do stamp **é** a versão de cada membro (member-version

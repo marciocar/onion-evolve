@@ -172,8 +172,9 @@ if [ "$FAILED" -eq 0 ] && [ "${BLOQUEIO_PROVADO:-0}" -eq 1 ]; then
 fi
 if [ "$FAILED" -eq 0 ]; then
   echo "⚠️ GATE INSTALADO E EXECUTANDO — mas o BLOQUEIO não foi exercido (o lint do alvo está limpo)."
-  echo "   Isto é DECLARAÇÃO, não prova: rode de novo com uma violação HARD plantada, ou aguarde o"
-  echo "   primeiro commit que reprove. O grafo do alvo deve registrar isto como 'open', não 'confirmed'."
+  echo "   Isto é DECLARAÇÃO, não prova: a prova de bloqueio planta a violação num sandbox descartável,"
+  echo "   sem tocar este checkout — bash .claude/utils/adopt/prove-gate-blocks.sh <alvo> (o --update já a roda)."
+  echo "   O grafo do alvo deve registrar isto como 'open', não 'confirmed'."
   exit 0
 fi
 echo "✗ GATE INERTE OU PARCIAL — os pontos com ✗ acima são o que o git realmente faz"
