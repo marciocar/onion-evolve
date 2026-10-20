@@ -55,7 +55,7 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
      (`integrity.dangling-external`, contra todos os `.kg.yaml` rastreados): alvo inventado reprova.
      Até a v4.2 a aresta do motor era INTRA-ARQUIVO, e a forma era a chave própria
      `meta.x_supersedes_external`, que **não conta mais** na REGRA 89 (não se conferia o alvo);
-     o corpus foi migrado por `kg-migrate-v3.py --external-edges`;
+     o corpus foi migrado por `kg-migrate-v3.py --external-edges` (core-only);
   3. `meta.x_supersedes_none: <razão>`, quando a rodada genuinamente não derrubou nada — desfecho de
      1ª classe. **Forçar `SUPERSEDES` inventado é pior que a dívida**, e a razão tem de dizer
      contra QUAL baseline se mediu (a do eixo, não um corpus qualquer). Exige **valor**: campo vazio

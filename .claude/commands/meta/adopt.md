@@ -284,8 +284,7 @@ fi
 #      rode com `--apply` — as três razões (forge do alvo, minutos da conta dele, dia-1-vermelho) estão
 #      no docstring do helper, que é a autoridade. Nunca aplique por conta própria.
 bash "$SOURCE_ROOT/.claude/utils/adopt/offer-onion-ci.sh" "$DEST" || true
-# ↑ rc≠0 aqui significa "lint do alvo reprovando" — NÃO aborta a adoção (o gate local de (6)
-#   já está vivo); é convite a consertar o lint e reofertar o CI depois.
+# ↑ rc≠0 = "lint do alvo reprovando": NÃO aborta (o gate local de (6) já está vivo); conserte e reoferte. A linha diz também o contrato do corpus, medido.
 
 # (7) .gitattributes: eol=lf nos executáveis (SAC-107; never-clobber, desfechos no helper) e merge=union
 #     nos append-only do doc-bridge (CHANGELOG/_processed; Achado #2: duas pontas apendam → união). Idempotente.
@@ -400,8 +399,7 @@ sessão-fonte **escreve o relatório por path no alvo**, num canal convencionado
 mail" o detecta e a sessão do alvo o "recebe e age". Fecha o gap reportado em
 `docs/evolution/inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`.
 
-> ⚠️ **NÃO** escrever no `inbox/` do alvo: lá é o *outbox dele pro core* (upstream); apareceria como se o
-> consumidor estivesse sinalizando o core. Downstream tem o **próprio** canal (`inbound/`).
+> ⚠️ **NÃO** escrever no `inbox/` do alvo: lá é o *outbox dele pro core* (upstream); apareceria como se o consumidor estivesse sinalizando o core. Downstream tem o **próprio** canal (`inbound/`).
 
 ```bash
 SOURCE_ROOT="<checkout (adoção) | UPDATE_SOURCE_ROOT (--update: re-resolva com --source <pin> num shell novo)>"
@@ -432,6 +430,9 @@ flow: downstream (core→consumidor / distribuição)
 ## Arquivos aplicados
 <colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$DEST" "$INTEGRATION_BRANCH" — medido NO ALVO; rc=3 = NÃO MEDIDO, nunca o delta da fonte>
 
+## Contrato KG-SSOT do corpus
+<colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$DEST" 2>&1 — medido NO ALVO, com o vendor DELE; rc 1 = dívida MUST (o número e o caminho: migração, a fase seguinte) · rc 4 = não se aplica · rc 3 = NÃO MEDIDO; nunca "lint VERDE" no lugar disto>
+
 ## Novidades / capacidades novas
 <resumo do CHANGELOG do core entre ${PREV:-início} e ${PIN}; do que o repo é capaz agora>
 
@@ -443,8 +444,7 @@ flow: downstream (core→consumidor / distribuição)
 EOF
 ```
 
-> **Lido/não-lido git-visível:** ao tratar o relatório, a sessão do alvo faz `git mv` dele para
-> `inbound/_processed/` (mesma doutrina do `inbox/`). O hook deixa de contá-lo.
+> **Lido/não-lido git-visível:** ao tratar o relatório, a sessão do alvo faz `git mv` dele para `inbound/_processed/` (mesma doutrina do `inbox/`). O hook deixa de contá-lo.
 
 ---
 
@@ -774,7 +774,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
 - **Auto-emitir o relatório NO ALVO — ANTES do commit durável, que o leva na branch dedicada** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). **Os arquivos aplicados são medidos
   NO ALVO**, nunca pelo delta da fonte acima: `bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$WORK" "$INTEGRATION_BRANCH"` (merge-base..HEAD + o pendente; rc=3 = NÃO MEDIDO). **O diff de hooks é a saída de** `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"` (entrada inteira; rc≠0 = NÃO MEDIDO). **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
-  `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO).
+  `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO). **O contrato do corpus também é MEDIDO, e o lint não o vê** (o `vendor/kg-ssot` novo julga os grafos do alvo; sinal de 2026-10-19: 1.024 nós reprovando com 0 HARD): `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$WORK"` vai inteiro na seção "Contrato KG-SSOT do corpus". Medir não é gate: rc 1 (dívida MUST) não para o update, só dá o número e o caminho (a migração conduzida é a fase 2 de D_U1_CAMADA_SDAAL_NO_UPDATE, que espera o migrador oficial do kg-ssot).
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
   já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o
   `.onion-version` re-carimbado. Aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)

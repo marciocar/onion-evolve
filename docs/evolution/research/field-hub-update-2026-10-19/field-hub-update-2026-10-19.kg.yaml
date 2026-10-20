@@ -104,6 +104,30 @@ nodes:
       locator: "pergunta com opções de 2026-10-20: «U1: onde entra a camada SDAAL da migração no Onion?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
+  - id: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "remeasure-contract.sh rodado contra o hub em dois pontos: HEAD 66a06c59bdd9 com vendor 4.11.0 e 8b3451bfeb9c com 4.12.0 (26 grafos, 26 passam, igual ao kg_gate.py dele) e o commit 606d6941b, anterior à migração f3738f4aa, numa cópia descartável (25 grafos, 24 reprovam, 1024 nós no MUST provenance)"
+    trace: ".claude/utils/adopt/remeasure-contract.sh"
+    label: "fase 1 de D_U1_CAMADA_SDAAL_NO_UPDATE: o --update mede o contrato do corpus do alvo e relata (sem bloquear), a oferta de CI deixa de chamar de verde o corpus que reprova, e o kg-migrate-v3.py sai da adoção"
+    narrative: "Na cópia pré-migração do hub o helper reproduz o sinal número a número: 1024 nós em 24 grafos no MUST form.required.node.provenance, e na dívida SHOULD 82 labels longos, 52 PROD sem verified_at, 2 verified_at sem verified_against e 24 datas sem aspas. Antes da mudança a offer-onion-ci.sh dizia 'lint do alvo VERDE' nessa mesma cópia. O corte do kg-migrate-v3.py é feito pelo _CORE_ONLY_ADOPTION_EXCLUDES (com --retired-excludes, o --update o remove de quem já o tinha), e a REGRA 100 ganhou o 3º vocabulário (o script core-only cortado), que acusou oito linhas que viajam; todas foram declaradas (core-only)."
+    provenance:
+      source: "remeasure-contract.sh e offer-onion-ci.sh desta branch, contra o clone do hub (só leitura) e uma cópia por git archive do commit 606d6941b"
+      locator: "saída do helper: 'CONTRATO medido: kg-ssot 4.9.1 … 25 grafo(s) · 1 passam no MUST · 24 reprovam' e 'MUST form.required.node.provenance: 1024 ocorrência(s) em 24 grafo(s)'"
+      method: "medição: o helper real rodado nos dois pontos do hub, conferido contra o kg_gate.py do próprio hub e contra os números do sinal"
+      locality: "host"
+  - id: Q_U1_FASE2_MIGRACAO_CONDUZIDA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "fase 2: o --update conduz a migração do corpus quando o remeasure-contract.sh acusa dívida MUST, chamando o kg_migrate.py e o perfil do adotante que o kg-ssot publicar na 4.13.0"
+    narrative: "Gatilho: o kg-ssot publicar o kg_migrate.py e o schema do perfil (D_U1_MIGRADOR_NO_KG_SSOT). Até lá o relatório só diz o número e o caminho. A fase deriva-se fresca contra a ferramenta que sair, sem pré-cozinhar a interface."
 edges:
   - from: E_C8_BASE_CONTRA_A_PADRAO_DO_ORIGIN
     to: C_HUB_FIELD_SIGNALS_1019_CURED
@@ -117,3 +141,15 @@ edges:
   - from: D_U1_CAMADA_SDAAL_NO_UPDATE
     to: E_U1_SINAL_MIGRACAO_CORPUS_V4
     edge_type: TRACES_TO
+  - from: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
+    to: D_U1_CAMADA_SDAAL_NO_UPDATE
+    edge_type: TRACES_TO
+  - from: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
+    to: D_U1_MIGRADOR_NO_KG_SSOT
+    edge_type: TRACES_TO
+  - from: Q_U1_FASE2_MIGRACAO_CONDUZIDA
+    to: D_U1_MIGRADOR_NO_KG_SSOT
+    edge_type: DEPENDS_ON
+  - from: Q_U1_FASE2_MIGRACAO_CONDUZIDA
+    to: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
+    edge_type: DEPENDS_ON

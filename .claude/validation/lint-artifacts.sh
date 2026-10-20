@@ -5131,7 +5131,7 @@ check_radar_aufhebung() {
           : # passivo conhecido, contabilizado no resumo abaixo
         else
           fresh=$((fresh + 1))
-          violation "HARD" "${val}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): rodada selada SEM Aufhebung e FORA do baseline — a catraca SO ENCOLHE. Reconcilie (no novo + SUPERSEDES datado), ou declare no bloco meta 'supersedes_none: <razao>' se nao derrubou nada, ou, se a Aufhebung e cross-file, 'external_edges:' no topo com '- to: <grafo>#<no>' e 'edge_type: SUPERSEDES' (contrato v4.3; a chave velha supersedes_external nao conta mais: migre com kg-migrate-v3.py --external-edges). Declaracao SEM VALOR nao conta"
+          violation "HARD" "${val}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): rodada selada SEM Aufhebung e FORA do baseline — a catraca SO ENCOLHE. Reconcilie (no novo + SUPERSEDES datado), ou declare no bloco meta 'supersedes_none: <razao>' se nao derrubou nada, ou, se a Aufhebung e cross-file, 'external_edges:' no topo com '- to: <grafo>#<no>' e 'edge_type: SUPERSEDES' (contrato v4.3; a chave velha supersedes_external nao conta mais: migre com kg-migrate-v3.py --external-edges (core-only)). Declaracao SEM VALOR nao conta"
         fi
         ;;
     esac

@@ -204,7 +204,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -26014,19 +26014,19 @@ run_role_cut_selftests() {
       grep -q . "${d}/v-ad-${_r}" || { _bad="${_bad} ${_r}:bundle-vazio"; continue; }
       for _x in .claude/skills/onion-publish/SKILL.md .claude/commands/meta/publish.md \
                 .claude/rules/publish-lens.md .claude/commands/common/prompts/publish-doctrine.md \
-                .claude/validation/claude-md-size-ceiling.txt; do
+                .claude/validation/claude-md-size-ceiling.txt .claude/utils/kg/kg-migrate-v3.py; do
         grep -qxF "${_x}" "${d}/v-ad-${_r}" && _bad="${_bad} ${_r}:vazou-na-adocao:${_x}"
         grep -qxF "${_x}" "${d}/v-dr-${_r}" || _bad="${_bad} ${_r}:sumiu-da-porta:${_x}"
       done
       grep -qxF .claude/commands/meta/create-command.md "${d}/v-ad-${_r}" || _bad="${_bad} ${_r}:meta-fabrica-cortada"
-      _diff="$(LC_ALL=C comm -13 <(LC_ALL=C sort "${d}/v-ad-${_r}") <(LC_ALL=C sort "${d}/v-dr-${_r}") | grep -vE '^\.claude/(skills/onion-publish/|commands/meta/publish\.md$|rules/publish-lens\.md$|commands/common/prompts/publish-doctrine\.md$|validation/claude-md-size-ceiling\.txt$)' || true)"
+      _diff="$(LC_ALL=C comm -13 <(LC_ALL=C sort "${d}/v-ad-${_r}") <(LC_ALL=C sort "${d}/v-dr-${_r}") | grep -vE '^\.claude/(skills/onion-publish/|commands/meta/publish\.md$|rules/publish-lens\.md$|commands/common/prompts/publish-doctrine\.md$|validation/claude-md-size-ceiling\.txt$|utils/kg/kg-migrate-v3\.py$)' || true)"
       [ -n "${_diff}" ] && _bad="${_bad} ${_r}:adocao-perdeu-mais:$(head -1 <<< "${_diff}")"
     done
     printf '%s' "${_bad}"
   }
   local _vbad; _vbad="$(_v_check "${vm}")"
   if [ -z "${_vbad}" ]; then
-    record_pass "role-cut: (v) adopted e hub, no destino adoção, não recebem o /meta:publish (comando, skill, lente, doutrina) e mantêm a meta-fábrica; a porta segue com eles"
+    record_pass "role-cut: (v) adopted e hub, no destino adoção, não recebem o /meta:publish (comando, skill, lente, doutrina) nem o kg-migrate-v3.py (o migrador do corpus do core, D_U1_MIGRADOR_NO_KG_SSOT) e mantêm a meta-fábrica; a porta segue com eles"
   else record_fail "role-cut: (v)" "desvio:${_vbad}"; fi
   local _vm_mut="${d}/vm-v-mut.sh"
   sed '/_CORE_ONLY_ADOPTION_EXCLUDES\[@\]/d' "${vm}" > "${_vm_mut}"
@@ -36406,8 +36406,8 @@ run_ops_citation_travel_selftests() {
   local o rc
   # (a) o --selftest próprio: acusa o defeito verbatim e cala nas três declarações + fora do escopo
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 22/22 verdes' <<< "${o}"; then
-    record_pass "ops-citation-travel: (a) --selftest verde (22 casos: o defeito verbatim, as três declarações, fora do escopo, catraca por contagem, os achados da passada adversarial, os 2 da SAC-149 e os 3 do 2º vocabulário, o /meta:publish cortado da adoção, sinal de campo 2026-10-19)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 25/25 verdes' <<< "${o}"; then
+    record_pass "ops-citation-travel: (a) --selftest verde (25 casos: o defeito verbatim, as três declarações, fora do escopo, catraca por contagem, os achados da passada adversarial, os 2 da SAC-149, os 3 do 2º vocabulário, o /meta:publish cortado da adoção, sinal de campo 2026-10-19, e os 3 do 3º, o kg-migrate-v3.py cortado da adoção, 2026-10-20)"
   else record_fail "ops-citation-travel: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --format tsv sai 0, sem HARD, e com o passivo à vista.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -36464,6 +36464,9 @@ if (inpaths) next$(printf '\x1f')if (0) next$(printf '\x1f')(xv)
 if (c ~ /[A-Za-z0-9_.\/-]/ || nx ~ /[A-Za-z0-9_-]/) continue$(printf '\x1f')if (0) continue$(printf '\x1f')(xxi)
 p = index(substr(t, 2), "/"); if (p > 0)$(printf '\x1f')p = 0; if (p > 0)$(printf '\x1f')(xxi)
 if (cmdre != "" && !cutfile) {$(printf '\x1f')if (cmdre != "") {$(printf '\x1f')(xxii)
+-v filere="\${_FILERE}"$(printf '\x1f')-v filere=""$(printf '\x1f')(xxiii)
+if (c ~ /[A-Za-z0-9_.-]/ || nx ~ /[A-Za-z0-9_-]/) continue$(printf '\x1f')if (0) continue$(printf '\x1f')(xxiv)
+if (filere != "" && !cutfile && !plant) {$(printf '\x1f')if (filere != "") {$(printf '\x1f')(xxv)
 EOF_MUT
   rm -rf "${sb}"
 }
@@ -40238,6 +40241,157 @@ run_remeasure_hard_selftests() {
   rm -rf "${d}"
 }
 _family run_remeasure_hard_selftests
+# ── remeasure-contract.sh: o CONTRATO KG-SSOT medido no corpus do alvo, dentro do --update (2026-10-20) ──────
+# O caso medido (sinal do hub, 2026-10-19): o vendor v4.9.1 chegou e 1.024 de 1.268 nós reprovavam no MUST
+# form.required.node.provenance, com o lint do alvo em 0 HARD e o relatório calado. Fase 1 de
+# D_U1_CAMADA_SDAAL_NO_UPDATE: medir e relatar, nunca bloquear. O SUT é o helper REAL, contra um alvo git de
+# mentira com o vendor do core copiado (tools + spec): (a) corpus que passa; (b) dívida MUST, com o número de NÓS
+# e de grafos; (c) sem vendor e sem grafo = não se aplica (rc 4, declarado); (d) gate quebrado e alvo fora do git
+# = NÃO MEDIDO (rc 3, nunca 0); (e) as propostas arquivadas do kg-inbox ficam fora do corpus; (f) o alvo é só
+# LIDO (nenhum __pycache__ no vendor carimbado, árvore limpa). (m) UM MUTANTE POR CURA, na cópia do helper.
+run_remeasure_contract_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/adopt/remeasure-contract.sh"
+  if [ ! -f "${sut}" ]; then record_fail "remeasure-contract" "SUT ausente: ${sut}"; return; fi
+  [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] || { record_skip "remeasure-contract: vendor/kg-ssot ausente nesta árvore (SUT não exercido)"; return; }
+  python3 -c 'import yaml, jsonschema' >/dev/null 2>&1 || { record_skip "remeasure-contract: PyYAML/jsonschema ausentes (SUT não exercido)"; return; }
+  local d rc out; d="$(mktemp -d)"
+  _rc_git() { git -C "$1" -c user.email=t@t -c user.name=t -c commit.gpgsign=false "${@:2}"; }
+  _rc_ok() {  # $1=arquivo $2=id do grafo → grafo que passa no MUST e no SHOULD
+    printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-10-20"\nnodes:\n  - id: C_A\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "aberta"\n  - id: C_B\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "outra aberta"\nedges:\n  - from: C_A\n    to: C_B\n    edge_type: SUPPORTS\n' "$2" > "$1"
+  }
+  _rc_bad() {  # $1=arquivo $2=id → 2 nós sem provenance (um confirmed, um PROD): MUST form.required.node.provenance ×2
+    printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-10-20"\nnodes:\n  - id: C_A\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    label: "confirmada sem fonte"\n  - id: C_B\n    node_type: claim\n    plane: PROD\n    status: open\n    impact: 2\n    confidence: 0.9\n    label: "PROD sem fonte"\nedges:\n  - from: C_A\n    to: C_B\n    edge_type: SUPPORTS\n' "$2" > "$1"
+  }
+  _rc_target() {  # $1=dir → alvo git com o vendor do core (tools + spec + carimbo)
+    mkdir -p "$1/vendor/kg-ssot/tools" "$1/vendor/kg-ssot/spec" "$1/docs/g"
+    cp "${REPO_ROOT}"/vendor/kg-ssot/tools/*.py "$1/vendor/kg-ssot/tools/"
+    cp "${REPO_ROOT}"/vendor/kg-ssot/spec/*.json "$1/vendor/kg-ssot/spec/"
+    cp "${REPO_ROOT}/vendor/kg-ssot/.kg-ssot-version" "$1/vendor/kg-ssot/"
+    git init -q -b main "$1" >/dev/null 2>&1
+  }
+  _rc_commit() { _rc_git "$1" add -A; _rc_git "$1" commit -qm fx >/dev/null 2>&1; }
+  # o veredito de cada caso, para o fluxo normal e para os mutantes: $1=helper → "a b …" dos casos que passam
+  _rc_judge() {
+    local s="$1" ok="" r o
+    r=0; o="$(bash "${s}" "${d}/passa" 2>&1)" || r=$?
+    [ "${r}" -eq 0 ] && grep -q '2 grafo(s) · 2 passam no MUST · 0 reprovam' <<< "${o}" && ok="${ok} a"
+    r=0; o="$(bash "${s}" "${d}/divida" 2>&1)" || r=$?
+    [ "${r}" -eq 1 ] && grep -q 'MUST   form.required.node.provenance: 2 ocorrência(s) em 1 grafo(s)' <<< "${o}" \
+      && grep -q 'seu corpus reprova no contrato vendorizado: 2 nó(s) em 1 grafo(s)' <<< "${o}" \
+      && grep -q 'caminho: migração' <<< "${o}" && grep -q 'o update segue' <<< "${o}" && ok="${ok} b"
+    local r1=0 r2=0 o1 o2
+    o1="$(bash "${s}" "${d}/sem-vendor" 2>&1)" || r1=$?
+    o2="$(bash "${s}" "${d}/sem-grafo" 2>&1)" || r2=$?
+    [ "${r1}" -eq 4 ] && [ "${r2}" -eq 4 ] && grep -q 'CONTRATO não se aplica' <<< "${o1}" \
+      && grep -q 'CONTRATO não se aplica: nenhum .kg.yaml' <<< "${o2}" && ok="${ok} c"
+    r1=0; r2=0
+    o1="$(bash "${s}" "${d}/quebrado" 2>&1)" || r1=$?
+    o2="$(bash "${s}" "${d}/fora-do-git" 2>&1)" || r2=$?
+    [ "${r1}" -eq 3 ] && [ "${r2}" -eq 3 ] && grep -q 'CONTRATO NÃO MEDIDO' <<< "${o1}" && grep -q 'CONTRATO NÃO MEDIDO' <<< "${o2}" && ok="${ok} d"
+    r=0; o="$(bash "${s}" "${d}/arquivado" 2>&1)" || r=$?
+    [ "${r}" -eq 0 ] && grep -q '1 grafo(s) · 1 passam no MUST' <<< "${o}" && ok="${ok} e"
+    # (f) só leitura, medido DEPOIS de rodar no alvo: sem __pycache__ no vendor e sem nada no git status
+    [ -z "$(find "${d}/divida/vendor" -name __pycache__ 2>/dev/null)" ] && [ -z "$(_rc_git "${d}/divida" status --porcelain --ignored 2>/dev/null)" ] && ok="${ok} f"
+    find "${d}/divida/vendor" -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null
+    # (h) vendor com API diferente (where() de 4-tupla), leituras que DISCORDAM, e vendor anterior (sem where):
+    #     os três são NÃO MEDIDO (rc 3) — nunca o rc 1 da dívida (o traceback que se passava por dívida)
+    local r3=0 o3; r1=0; r2=0
+    o1="$(bash "${s}" "${d}/api4" 2>&1)" || r1=$?
+    o2="$(bash "${s}" "${d}/discorda" 2>&1)" || r2=$?
+    o3="$(bash "${s}" "${d}/antigo" 2>&1)" || r3=$?
+    [ "${r1}" -eq 3 ] && [ "${r2}" -eq 3 ] && [ "${r3}" -eq 3 ] && grep -q 'discordam' <<< "${o2}" \
+      && grep -q 'anterior ou incompatível (falta kg_validate.where)' <<< "${o3}" && ok="${ok} h"
+    # (i) um nó com DOIS códigos MUST (sem provenance e órfão) é 1 nó, e nada "fora de nó"
+    r=0; o="$(bash "${s}" "${d}/dois-codigos" 2>&1)" || r=$?
+    [ "${r}" -eq 1 ] && grep -q 'reprova no contrato vendorizado: 1 nó(s) em 1 grafo(s); caminho' <<< "${o}" && ok="${ok} i"
+    printf '%s' "${ok}"
+  }
+  _rc_target "${d}/passa"; _rc_ok "${d}/passa/docs/g/a.kg.yaml" fx-a; _rc_ok "${d}/passa/docs/g/b.kg.yaml" fx-b; _rc_commit "${d}/passa"
+  _rc_target "${d}/divida"; _rc_ok "${d}/divida/docs/g/a.kg.yaml" fx-a; _rc_bad "${d}/divida/docs/g/b.kg.yaml" fx-b; _rc_commit "${d}/divida"
+  mkdir -p "${d}/sem-vendor/docs"; git init -q -b main "${d}/sem-vendor" >/dev/null 2>&1; _rc_bad "${d}/sem-vendor/docs/b.kg.yaml" fx-b; _rc_commit "${d}/sem-vendor"
+  _rc_target "${d}/sem-grafo"; _rc_commit "${d}/sem-grafo"
+  _rc_target "${d}/quebrado"; _rc_bad "${d}/quebrado/docs/g/b.kg.yaml" fx-b
+  printf 'raise ImportError("vendor quebrado de propósito")\n' > "${d}/quebrado/vendor/kg-ssot/tools/kg_gate.py"; _rc_commit "${d}/quebrado"
+  _rc_target "${d}/fora-do-git"; rm -rf "${d}/fora-do-git/.git"; _rc_bad "${d}/fora-do-git/docs/g/b.kg.yaml" fx-b
+  _rc_target "${d}/arquivado"; _rc_ok "${d}/arquivado/docs/g/a.kg.yaml" fx-a
+  mkdir -p "${d}/arquivado/docs/evolution/kg-inbox/_sealed" "${d}/arquivado/docs/evolution/kg-inbox/_rejected"
+  _rc_bad "${d}/arquivado/docs/evolution/kg-inbox/_sealed/p.kg.yaml" fx-p; _rc_bad "${d}/arquivado/docs/evolution/kg-inbox/_rejected/q.kg.yaml" fx-q
+  _rc_commit "${d}/arquivado"
+  local _v
+  for _v in api4 discorda antigo; do
+    _rc_target "${d}/${_v}"; _rc_ok "${d}/${_v}/docs/g/a.kg.yaml" fx-a; _rc_bad "${d}/${_v}/docs/g/b.kg.yaml" fx-b
+  done
+  printf '\n_w0 = where\ndef where(*a, **k):\n    return [x + ("x",) for x in _w0(*a, **k)]\n' >> "${d}/api4/vendor/kg-ssot/tools/kg_validate.py"
+  printf '\n_w0 = where\ndef where(*a, **k):\n    return [x for x in _w0(*a, **k) if x[0] != "MUST"]\n' >> "${d}/discorda/vendor/kg-ssot/tools/kg_validate.py"
+  printf '\ndel where\n' >> "${d}/antigo/vendor/kg-ssot/tools/kg_validate.py"
+  for _v in api4 discorda antigo; do _rc_commit "${d}/${_v}"; done
+  _rc_target "${d}/dois-codigos"
+  printf 'meta:\n  id: fx-dois\n  schema_version: "1"\n  baseline: "2026-10-20"\nnodes:\n  - id: C_ORFA\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    label: "órfã e sem fonte"\nedges: []\n' > "${d}/dois-codigos/docs/g/d.kg.yaml"
+  _rc_commit "${d}/dois-codigos"
+  local got; got="$(_rc_judge "${sut}")"
+  case " ${got} " in *" a "*) record_pass "remeasure-contract: (a) corpus que passa → rc 0, '2 grafo(s) · 2 passam no MUST · 0 reprovam'" ;;
+    *) record_fail "remeasure-contract: (a)" "$(bash "${sut}" "${d}/passa" 2>&1 | head -3 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" b "*) record_pass "remeasure-contract: (b) dívida MUST → rc 1, a regra com ocorrências e grafos, '2 nó(s) em 1 grafo(s)', o caminho (migração) e 'o update segue' (o caso do hub)" ;;
+    *) record_fail "remeasure-contract: (b)" "$(bash "${sut}" "${d}/divida" 2>&1 | head -4 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" c "*) record_pass "remeasure-contract: (c) sem vendor e sem grafo → rc 4, 'não se aplica' declarado (nunca omitido)" ;;
+    *) record_fail "remeasure-contract: (c)" "$(bash "${sut}" "${d}/sem-grafo" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" d "*) record_pass "remeasure-contract: (d) gate quebrado e alvo fora do git → rc 3, NÃO MEDIDO (nunca 0 calado)" ;;
+    *) record_fail "remeasure-contract: (d)" "$(bash "${sut}" "${d}/quebrado" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" e "*) record_pass "remeasure-contract: (e) as propostas arquivadas do kg-inbox (_sealed, _rejected) ficam fora do corpus, como no gate do core" ;;
+    *) record_fail "remeasure-contract: (e)" "$(bash "${sut}" "${d}/arquivado" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  # (f) SÓ LEITURA: o vendor do alvo é carimbado por sha256; um __pycache__ ali reprovaria o kg_vendor.py check dele
+  case " ${got} " in *" f "*) record_pass "remeasure-contract: (f) o alvo é só lido: nenhum __pycache__ no vendor carimbado, git status --ignored vazio" ;;
+    *) record_fail "remeasure-contract: (f)" "o helper escreveu no alvo" ;; esac
+  case " ${got} " in *" h "*) record_pass "remeasure-contract: (h) vendor de API diferente, leituras que discordam e vendor anterior (sem where) → rc 3 NÃO MEDIDO, nunca o rc 1 da dívida" ;;
+    *) record_fail "remeasure-contract: (h)" "$(bash "${sut}" "${d}/api4" 2>&1 | head -2 | tr '\n' '|') / $(bash "${sut}" "${d}/antigo" 2>&1 | head -1)" ;; esac
+  case " ${got} " in *" i "*) record_pass "remeasure-contract: (i) nó com dois códigos MUST conta 1 nó e nada 'fora de nó' (a subtração antiga inventava 1)" ;;
+    *) record_fail "remeasure-contract: (i)" "$(bash "${sut}" "${d}/dois-codigos" 2>&1 | grep reprova | head -1)" ;; esac
+  # (g) a OFERTA DE CI não declara verde o corpus que reprova: lint (stub) verde, forge GitHub, dívida MUST no corpus
+  #     → rc 0 (a dívida não bloqueia a oferta: o CI ofertado roda só o lint), e a linha diz o número do contrato.
+  #     MUTANTE: o ramo rc 1 do contrato some e a frase cai em "NÃO MEDIDO" — (g) reprova.
+  _rc_target "${d}/oferta"; _rc_bad "${d}/oferta/docs/g/b.kg.yaml" fx-b
+  mkdir -p "${d}/oferta/.claude/validation"; printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/oferta/.claude/validation/lint-artifacts.sh"
+  _rc_commit "${d}/oferta"; _rc_git "${d}/oferta" remote add origin https://github.com/example/oferta.git
+  mkdir -p "${d}/oc"; cp "${REPO_ROOT}/.claude/utils/adopt/offer-onion-ci.sh" "${REPO_ROOT}/.claude/utils/adopt/ci-workflow-onion.tpl" "${sut}" "${d}/oc/"
+  _rc_offer() {  # $1=offer-onion-ci.sh → 0 se a oferta relata a dívida sem bloquear
+    local r=0 o; o="$(bash "$1" "${d}/oferta" 2>&1)" || r=$?
+    [ "${r}" -eq 0 ] && grep -q 'lint do alvo VERDE · contrato do corpus REPROVA no MUST (2 nó(s) em 1 grafo(s))' <<< "${o}"
+  }
+  if _rc_offer "${d}/oc/offer-onion-ci.sh"; then
+    record_pass "remeasure-contract: (g) a oferta de CI diz 'lint VERDE · contrato do corpus REPROVA no MUST (2 nó(s) em 1 grafo(s))' e não bloqueia (o caso do hub: 'lint VERDE' com 1.024 nós reprovando)"
+  else record_fail "remeasure-contract: (g)" "$(bash "${d}/oc/offer-onion-ci.sh" "${d}/oferta" 2>&1 | head -2 | tr '\n' '|')"; fi
+  sed -i 's/^    1) CONTRACT="contrato do corpus REPROVA/    9) CONTRACT="contrato do corpus REPROVA/' "${d}/oc/offer-onion-ci.sh"
+  if ! grep -q '^    9) CONTRACT=' "${d}/oc/offer-onion-ci.sh"; then record_fail "remeasure-contract: (g-MUT) mutante não aplicou" "âncora do ramo rc 1 mudou"
+  elif _rc_offer "${d}/oc/offer-onion-ci.sh"; then record_fail "remeasure-contract: (g-MUT) mutante NÃO morde" "sem o ramo rc 1 a oferta ainda relata a dívida"
+  else record_pass "remeasure-contract: (g-MUT) sem o ramo da dívida a oferta não relata o número e (g) cai"; fi
+  # (m) MUTANTES na CÓPIA do helper: cada um reverte uma cura e EXIGE que o caso nomeado caia
+  local m="${d}/mut.sh" old new want
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${sut}" "${m}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' "${m}" "${old}" "${new}"; then
+      record_fail "remeasure-contract: (m) mutante não aplicou" "${want}"; continue
+    fi
+    case " $(_rc_judge "${m}") " in
+      *" ${want} "*) record_fail "remeasure-contract: (m) mutante NÃO morde" "(${want}) segue verde com a cura revertida" ;;
+      *) record_pass "remeasure-contract: (m) mutante morde → (${want}) cai" ;;
+    esac
+  done <<EOF_MUT
+    return 1 if failing else 0$(printf '\x1f')    return 0$(printf '\x1f')b
+place.startswith("nó ")$(printf '\x1f')place.startswith("XX ")$(printf '\x1f')b
+    if not items:$(printf '\x1f')    if False:$(printf '\x1f')c
+  exit 4$(printf '\x1f')  exit 0$(printf '\x1f')c
+    no(f"o leitor do contrato do alvo não carrega$(printf '\x1f')    sys.exit(0); no(f"o leitor do contrato do alvo não carrega$(printf '\x1f')d
+ARCHIVE = ("docs/evolution/kg-inbox/_rejected/*", "docs/evolution/kg-inbox/_sealed/*")$(printf '\x1f')ARCHIVE = ()$(printf '\x1f')e
+python3 -I -B - "\${TOOLS}"$(printf '\x1f')python3 -I - "\${TOOLS}"$(printf '\x1f')f
+except BaseException as e:  # Broken$(printf '\x1f')except ZeroDivisionError as e:  # Broken$(printf '\x1f')h
+        if seen != set(measured[name]["must"]):$(printf '\x1f')        if False:$(printf '\x1f')h
+    if missing:$(printf '\x1f')    if False:$(printf '\x1f')h
+                    must_nodes.add((name, place))$(printf '\x1f')                    must_nodes.add((name, place)); off_node += 1$(printf '\x1f')i
+EOF_MUT
+  rm -rf "${d}"; unset -f _rc_git _rc_ok _rc_bad _rc_target _rc_commit _rc_judge _rc_offer
+}
+_family run_remeasure_contract_selftests
 # ── applied-delta.sh: "Arquivos aplicados" do relatório do --update, MEDIDO NO ALVO (2026-10-20) ──────
 # O caso medido (sinal do hub, 2026-10-19): a fonte disse 239, chegaram 540, porque vendor/kg-ssot já existia
 # no core no pin e só entrou no MANIFESTO depois — chega inteiro no alvo e o delta da fonte não o vê. A fixture

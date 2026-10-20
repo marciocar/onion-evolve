@@ -3,7 +3,7 @@
 Por que existe. Nas ondas O4 a O7 da migração de provenance (SAC-73, 2026-10-09/10) o corpus de `.kg.yaml`
 perdeu centenas de caminhos desta máquina em `provenance`, `verified_against`, `trace`, `label` e
 `narrative`: caminho de máquina não é reverificável por terceiros e vaza na publicação das portas. A régua
-das ondas era uma LISTA de diretórios no `kg-migrate-v3.py`, e a lista errou pelo vocabulário, medido:
+das ondas era uma LISTA de diretórios no `kg-migrate-v3.py` (core-only), e a lista errou pelo vocabulário, medido:
   · falsos negativos: `/outro/repo` (O5, omissão do juiz), `/tmp` e `/proc` sem barra, `/boot` e `/opt`
     fora do brief, a barra dupla `//home/…` da sintaxe de permissão do Claude Code (J-O7-1) e `~<conta>/`;
   · falsos positivos: `/lib/` dentro de caminho relativo, comandos `/meta:*`, endpoints, URLs e globs.

@@ -657,7 +657,12 @@ _CORE_ONLY_ADOPTION_EXCLUDES=(':(exclude).claude/skills/onion-publish'
                               ':(exclude).claude/commands/meta/publish.md'
                               ':(exclude).claude/rules/publish-lens.md'
                               ':(exclude).claude/commands/common/prompts/publish-doctrine.md'
-                              ':(exclude).claude/validation/claude-md-size-ceiling.txt')
+                              ':(exclude).claude/validation/claude-md-size-ceiling.txt'
+                              ':(exclude).claude/utils/kg/kg-migrate-v3.py')
+# 2026-10-20 (D_U1_MIGRADOR_NO_KG_SSOT): o kg-migrate-v3.py é o migrador do corpus DO CORE (routing TSV, planilhas
+# julgadas, METHOD_CLASSES fixo no código) e viajava para todo adotante, onde nenhum corpus tem aquela forma. Um
+# hub migrou o próprio corpus ao contrato v4 à mão sem achá-lo (sinal de 2026-10-20). O migrador de adotante nasce
+# no kg-ssot (kg_migrate.py + perfil); este sai da adoção e o --update o remove de quem já o tinha (--retired-excludes).
 # 2026-10-19 (D_TETO_NAO_VIAJA_NO_TRANSPORTE): o teto em bytes do CLAUDE.md é o número DESTE repositório;
 # no adotante ele não teria objeto (o lint se cala em papel derivado) e diria um tamanho que não é o dele.
 # A guarda (claude-md-size-check.sh) viaja e, sem o arquivo de teto, cala por desenho.
