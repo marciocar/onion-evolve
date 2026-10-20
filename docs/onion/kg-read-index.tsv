@@ -256,6 +256,7 @@
 .claude/utils/adopt/durable-commit.sh	Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/utils/adopt/durable-commit.sh	SY5_adopt_durability_closed	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/adopt/invite-collaborator.sh	TX_invite	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
+.claude/utils/adopt/prove-gate-blocks.sh	E_UPDATE_PROVA_BLOQUEIO_DO_GATE	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	D_ADOPT_MUST_EMIT_MISSING_BASELINES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/regen-ssot-projections.sh	A_ADOTANTE_GREENFIELD_NASCE_COM_HARD	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
