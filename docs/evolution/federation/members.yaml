@@ -286,7 +286,7 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — medido 2026-10-09: o origin do clone é o repo da granaai, na branch onion/develop
     local_path: "/home/marcio/brain-granaai"
-    onion_version: 0d0636f4ca74   # carimbado por ops/registry-pins.sh (remoto onion/develop conferido em 2026-10-14)
+    onion_version: 59ebe7fe1288   # carimbado por ops/registry-pins.sh (remoto onion/develop conferido em 2026-10-20)
                                   # 2º update de 2026-10-13 pela sessão do adotante, mergeado lá no PR #1576 (merge e3dda5fbc
                                   # na onion/develop); o anterior (bd769f168411) foi o PR #1571 (merge dd0ea769a)
     integration_branch: onion/develop   # medido: branch do clone e do carimbo vivo (o carimbo não declara o campo)
@@ -589,7 +589,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/sge   # PRIVADO — medido 2026-10-09 no origin do clone (o registro dizia n/a)
     local_path: "/home/marcio/sge"
-    onion_version: ba0d2d423c17   # conferido no remoto (main) por ops/registry-pins.sh em 2026-10-09
+    onion_version: 6aa5c567f579   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-20)
     adopted_at: 2026-09-24
     mode: regulated             # licitação PÚBLICA: trilha de auditoria desde o dia 1, não camada opcional
     personality_summary: "Mapeia editais de licitação pública brasileira em três etapas encadeadas: mapeamento do objeto (lotes/itens/subitens), ficha de análise técnica (exigência × oferta) e checklist de qualidade da saída. Recorte inicial: veículos. BASE LEGAL: Lei 14.133/2021 por decisão do maestro — a 8.666/93 é regime histórico. Foi o adotante que ACHOU o defeito da REGRA 84 (Índice de leitura do KG em sincronia com os traces): o gate barrava o primeiro commit de TODO adotante porque a guarda lia índice vazio como gerador quebrado, quando no dia 1 isso é o estado normal. Curado na fonte no mesmo dia."
@@ -741,7 +741,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-curation (privado)
     local_path: /home/marcio/onion-curation
-    onion_version: 6687f0d532b8   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-15)
+    onion_version: 6df1646b8c00   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-20)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "Nasceu do pedido do maestro por um estudo profundo que disseca plataformas, aplicativos, sites, perfis, ideias, repositórios, ferramentas, arquiteturas, tecnologias, métodos, funcionalidades, concorrentes, modelos e negócios como CURADORIA para o Onion Evolve. Aqui se disseca e se PROPÕE (absorver | costurar | parquear | rejeitar, com evidência); a palavra final é do core, com a lente de Aristóteles, e a proposta sobe pelo inbox."
