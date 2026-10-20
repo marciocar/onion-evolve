@@ -56,6 +56,54 @@ nodes:
       locator: "casos (h6) e (a)–(m)"
       method: "medição: bancada com LC_ALL=C e mutante por cura"
       locality: "repo"
+  - id: E_U1_SINAL_MIGRACAO_CORPUS_V4
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-20"
+    verified_against: "sinal de campo do hub (2026-10-20) lido inteiro: 24 grafos legados, 1.024 de 1.268 nós sem provenance no MUST do v4.9.1, migrados com classificador avulso e perfil em rascunho; o kg-migrate-v3.py do core viaja ao adotante e o ADOPTING.md não o aponta"
+    trace: "docs/evolution/inbox/_processed/2026-10-20-kg-v4-migration-field-report.md"
+    label: "U1: um hub migrou o corpus ao contrato v4 à mão, sem achar o migrador do core, e propõe migrador e perfil no kg-ssot mais uma camada SDAAL no Onion"
+    narrative: "O sinal pede ao core duas respostas: apontar o kg-migrate-v3.py no guia ou aposentá-lo em favor de um kg_migrate.py oficial, e dizer se a camada SDAAL da migração entra no /meta:adopt --update (fase de migrar o corpus ao contrato vendorizado) ou num /meta:kg-migrate próprio. O migrador do core é específico do corpus do core (routing TSV, planilhas julgadas, METHOD_CLASSES fixo)."
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-20-kg-v4-migration-field-report.md"
+      locator: "§3 item 1 e §4 (Pedidos: core)"
+      method: "leitura: o sinal inteiro, como relato do adotante (testemunho de terceiro sobre o corpus dele)"
+      locality: "repo"
+  - id: D_U1_MIGRADOR_NO_KG_SSOT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Migrador no kg-ssot (o kg_migrate.py e o schema do perfil nascem no kg-ssot; o kg-migrate-v3.py do core vira core-only e sai do que viaja; o guia aponta a ferramenta oficial quando sair; formato do perfil desenhado pelas três sessões)»"
+    label: "o migrador do corpus ao contrato v4 (kg_migrate.py e o schema do perfil) nasce no kg-ssot; o kg-migrate-v3.py do core vira core-only e sai do que viaja; o guia aponta a ferramenta oficial quando sair"
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «Migrador no kg-ssot (o kg_migrate.py e o schema do perfil nascem no kg-ssot; o kg-migrate-v3.py do core vira core-only e sai do que viaja; o guia aponta a ferramenta oficial quando sair; formato do perfil desenhado pelas três sessões)»; descartadas: «Generalizar o do core» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «U1: onde mora o migrador do corpus ao contrato v4?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
+  - id: D_U1_CAMADA_SDAAL_NO_UPDATE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Fase no --update (o /meta:adopt --update ganha a fase \"migrar o corpus ao contrato vendorizado\": mede o contrato no alvo, relata e conduz a migração quando há dívida)»"
+    label: "a camada SDAAL da migração entra como fase do /meta:adopt --update: mede o contrato no alvo, relata e conduz a migração quando há dívida"
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «Fase no --update (o /meta:adopt --update ganha a fase \"migrar o corpus ao contrato vendorizado\": mede o contrato no alvo, relata e conduz a migração quando há dívida)»; descartadas: «/meta:kg-migrate próprio» · «Os dois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «U1: onde entra a camada SDAAL da migração no Onion?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
 edges:
   - from: E_C8_BASE_CONTRA_A_PADRAO_DO_ORIGIN
     to: C_HUB_FIELD_SIGNALS_1019_CURED
@@ -63,3 +111,9 @@ edges:
   - from: E_U5_INDICE_KB_CONTAGEM_SEM_GUARDA
     to: C_HUB_FIELD_SIGNALS_1019_CURED
     edge_type: SUPPORTS
+  - from: D_U1_MIGRADOR_NO_KG_SSOT
+    to: E_U1_SINAL_MIGRACAO_CORPUS_V4
+    edge_type: TRACES_TO
+  - from: D_U1_CAMADA_SDAAL_NO_UPDATE
+    to: E_U1_SINAL_MIGRACAO_CORPUS_V4
+    edge_type: TRACES_TO

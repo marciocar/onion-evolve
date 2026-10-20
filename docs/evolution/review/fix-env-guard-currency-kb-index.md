@@ -1,14 +1,13 @@
 ---
 branch: fix/env-guard-currency-kb-index
-pr: pendente
+pr: 1222
 date: 2026-10-20
-reviewed_diff_sha256: f1d45eacf4af40bd6132eaccde2e55e040c99ff32540a9b70e1fd7798d00805b
-reviewed_code_sha256: 332226fddf1ae5055a728355745a24a3d9a5d0cc53c273517c6acc89958d9922
-findings_total: 20
-findings_real: 17
+reviewed_diff_sha256: pendente
+findings_total: 21
+findings_real: 18
 tokens: 125611
 duration_min: 40
-findings_fixed: 14
+findings_fixed: 15
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: subagente refutador (itens 2 e 3, 18 casos) + passada adversarial da sessão no veto (item 1, 58 casos medidos contra a main e a cura)
@@ -73,3 +72,29 @@ O refutador não chegou a medir este item. A sessão montou 58 casos de ataque e
 
 - **Fronteira do veto:** por chamadas separadas, a ferramenta Write grava qualquer script. Por isso o veto julga a linha, e não o que a sessão faz depois.
 - **Autorização:** o maestro autorizou por `/meta:decide` em 2026-10-20, e o pedido chegou pela sessão principal.
+
+## Retomada (2026-10-20): o CI vermelho e os dois selos
+
+21. **REAL, curado (CI do #1222, faixa 3).** O caso `r22-kb-links/good-valid-links.md` reprovou: "não esperava
+    violação citando a fixture, mas apareceu: REGRA 110 [FORA-DO-INDICE] … concepts/selftest-fixture-probe.md".
+    O harness copia a fixture para `concepts/selftest-fixture-probe.md` no SANDBOX (sem git) e roda o lint com
+    `--only` nela, e a REGRA 110 respondia sobre o índice. A cura não isenta o nome da sonda (código ciente de
+    teste, o que o check das lentes path-scoped já recusou em 2026-09-29). Ela tem duas camadas, cada uma com caso
+    e mutante:
+    - **Gate por relevância sob `--only`** (o molde da REGRA 109): só o próprio `index.md` e a guarda disparam a
+      REGRA 110. O `r22` pergunta sobre os LINKS daquele arquivo, e o índice é outra pergunta. O lint completo (CI,
+      pr-finalize) segue julgando o índice. Caso (g): `--only` na KB plantada não emite, `--only` no índice emite,
+      e o mutante do gate devolve o falso positivo.
+    - **Conjunto rastreado** (o molde do `inventory.sh`, `_tracked_or_find`): conta `git ls-files` (que inclui o
+      stageado), e conta o disco só sem git ou sem nada rastreado. Fixture plantada na árvore viva (não rastreada)
+      não conta. Caso (f): a sonda não rastreada não reprova, o `.md` real rastreado fora do índice reprova, e o
+      mutante `ONION_KB_INDEX_FS=1` devolve o falso positivo.
+
+**Selos do maestro** (`/meta:decide` 2026-10-20, gravados pelo `kg-decide-seal.sh` no grafo deste PR, ligados ao
+nó novo `E_U1_SINAL_MIGRACAO_CORPUS_V4`; o sinal de origem foi movido para `docs/evolution/inbox/_processed/`):
+
+- `D_U1_MIGRADOR_NO_KG_SSOT`: escolhida «Migrador no kg-ssot»; descartadas «Generalizar o do core» e «Pesquisar antes».
+- `D_U1_CAMADA_SDAAL_NO_UPDATE`: escolhida «Fase no --update»; descartadas «/meta:kg-migrate próprio» e «Os dois».
+
+Os selos registram a decisão. A execução (tirar o `kg-migrate-v3.py` do que viaja e a fase nova do `--update`) é
+de outro PR.

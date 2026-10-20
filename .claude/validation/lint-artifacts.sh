@@ -6022,9 +6022,13 @@ check_kb_index_counts() {
   local helper="${SCRIPT_DIR}/kb-index-check.sh"
   [ -f "${helper}" ] || return 0
   [ -f "${REPO_ROOT}/docs/knowledge-base/index.md" ] || return 0
+  # GATE POR RELEVÂNCIA sob --only: a pergunta é sobre o ÍNDICE, então só o índice (e a própria guarda) a
+  # disparam. CI do #1222 (2026-10-20): a bancada lintava uma KB plantada com --only (o caso r22-kb-links, que
+  # pergunta sobre LINKS daquele arquivo) e a REGRA 110 acusava o índice por não listá-la — uma resposta a outra
+  # pergunta. O lint completo (CI, pr-finalize) segue julgando o índice contra os arquivos RASTREADOS.
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in
-      "${REPO_ROOT}"/docs/knowledge-base/*|*/kb-index-check.sh) : ;;
+      "${REPO_ROOT}"/docs/knowledge-base/index.md|*/kb-index-check.sh) : ;;
       *) return 0 ;;
     esac
   fi

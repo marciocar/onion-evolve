@@ -36396,6 +36396,37 @@ KBI
     record_pass "kb-index: (e) o lint de produção (dispatcher) emite a REGRA 110 sobre o índice defasado"
   else record_fail "kb-index: (e) dispatcher" "$(grep -E 'REGRA 110|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
   rm -rf "${sd}"
+  # (g) CI do #1222: o lint com --only sobre uma KB PLANTADA (o caso r22-kb-links) não responde pela REGRA 110 —
+  #     a pergunta é sobre o índice; --only no índice responde. Mutante: o gate volta a aceitar qualquer KB.
+  local sg; sg="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sg}/" 2>/dev/null; cp -a "${f}/docs" "${sg}/" 2>/dev/null
+  : > "${sg}/docs/knowledge-base/concepts/selftest-fixture-probe.md"
+  local ga gb gm
+  ga="$(cd "${sg}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sg}/docs/knowledge-base/concepts/selftest-fixture-probe.md" 2>&1 | grep -c 'REGRA 110' || true)"
+  gb="$(cd "${sg}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sg}/docs/knowledge-base/index.md" 2>&1 | grep -c 'REGRA 110 (Índice da KB conta o que o disco tem): \[FORA-DO-INDICE\]' || true)"
+  sed -i 's#"${REPO_ROOT}"/docs/knowledge-base/index.md|\*/kb-index-check.sh) : ;;#"${REPO_ROOT}"/docs/knowledge-base/*|*/kb-index-check.sh) : ;;#' "${sg}/.claude/validation/lint-artifacts.sh"
+  gm="$(cd "${sg}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sg}/docs/knowledge-base/concepts/selftest-fixture-probe.md" 2>&1 | grep -c 'REGRA 110' || true)"
+  rm -rf "${sg}"
+  if [ "${ga}" = 0 ] && [ "${gb}" -ge 1 ] 2>/dev/null && [ "${gm}" -ge 1 ] 2>/dev/null; then
+    record_pass "kb-index: (g) --only numa KB plantada não responde pela REGRA 110; --only no índice responde; o mutante do gate devolve o falso positivo do r22"
+  else record_fail "kb-index: (g) gate por relevância" "kb=${ga} (esperado 0) índice=${gb} (esperado ≥1) mutante=${gm} (esperado ≥1)"; fi
+  # (f) CI do #1222 (2026-10-20): a bancada PLANTA `concepts/selftest-fixture-probe.md` na árvore viva (o caso r22
+  #     testa o lint, que varre o diretório real) e a REGRA 110 a contava. O conjunto contado é o RASTREADO (molde
+  #     do inventory.sh): a sonda não rastreada não reprova; um .md real RASTREADO fora do índice reprova; e o
+  #     mutante que força o disco (ONION_KB_INDEX_FS=1) devolve o falso positivo.
+  local fg; fg="$(mktemp -d)"; mkdir -p "${fg}/docs/knowledge-base/concepts"
+  : > "${fg}/docs/knowledge-base/concepts/a.md"
+  printf '%s\n' '## C (1)' '- [A](concepts/a.md)' > "${fg}/docs/knowledge-base/index.md"
+  git -C "${fg}" init -q 2>/dev/null; git -C "${fg}" add -A 2>/dev/null
+  : > "${fg}/docs/knowledge-base/concepts/selftest-fixture-probe.md"
+  local fa fm fb
+  fa="$(LC_ALL=C bash "${chk}" "${fg}" --format tsv 2>&1)"
+  fm="$(ONION_KB_INDEX_FS=1 LC_ALL=C bash "${chk}" "${fg}" --format tsv 2>&1)"
+  : > "${fg}/docs/knowledge-base/concepts/real.md"; git -C "${fg}" add docs/knowledge-base/concepts/real.md 2>/dev/null
+  fb="$(LC_ALL=C bash "${chk}" "${fg}" --format tsv 2>&1)"; rm -rf "${fg}"
+  if [ -z "${fa}" ] && grep -q 'FORA-DO-INDICE.*selftest-fixture-probe' <<< "${fm}" && grep -q 'FORA-DO-INDICE.*concepts/real.md' <<< "${fb}" && ! grep -q 'selftest-fixture-probe' <<< "${fb}"; then
+    record_pass "kb-index: (f) sonda da bancada não rastreada não reprova; .md real rastreado fora do índice reprova; o mutante que conta o disco devolve o falso positivo"
+  else record_fail "kb-index: (f) conjunto rastreado" "sonda=${fa:0:120} | mutante=${fm:0:120} | real=${fb:0:120}"; fi
   local m1 m2
   sed "s/    if g\['n'\] != len(files):/    if False:/" "${chk}" > "${f}/m1.sh"
   sed 's/    if falta:/    if False:/' "${chk}" > "${f}/m2.sh"
