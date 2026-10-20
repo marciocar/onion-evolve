@@ -11,14 +11,15 @@ meta:
     texto) e a pergunta aberta da máquina de captura. Os vereditos das ferramentas moram nos grafos de
     dissecação do core: docs/evolution/dissect/vexa-2026-10/ e docs/evolution/dissect/anarlog-2026-10/.
   # kg-backlog-guard: on
-  # ═══ TETO: 13 NÓS. Subiu de 5 para 9 em 2026-10-17 pelo gatilho declarado aqui: a curadoria devolveu a SAC-164, e o maestro selou
+  # ═══ TETO: 14 NÓS. Subiu de 5 para 9 em 2026-10-17 pelo gatilho declarado aqui: a curadoria devolveu a SAC-164, e o maestro selou
   # três decisões (caminho da captura, adaptador de STT e diarização) e abriu uma pergunta (a medição sherpa-onnx × Sortformer). Subiu de
   # 9 para 10 no mesmo dia pela EXECUÇÃO de D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017: o serviço reescrito no core trouxe uma medição nova (a
   # memória do lote com vad_batch=1), que é evidência e não cabe nos nós de decisão. Subiu de 10 para 11 em 2026-10-19 pelo gatilho da
   # medição que volta: a segunda rodada de transcrição (SAC-177) voltou e o maestro selou manter o motor. Cresce de novo quando o ao vivo
   # for re-medido ou o grafo de consolidação entrar em plano. Subiu de 11 para 13 em 2026-10-19 por um gatilho que não estava previsto e
   # fica declarado: com o serviço mergeado (#1184), o maestro selou como ele sobe à VPS (loopback primeiro) e o próximo passo (a diarização
-  # no serviço). São duas decisões de execução e não cabem nos nós já fechados. ═══
+  # no serviço). São duas decisões de execução e não cabem nos nós já fechados. Subiu de 13 para 14 em 2026-10-20: a
+  # execução do degrau loopback trouxe a medição da instalação real (E_MC_STT_INSTALADO_LOOPBACK_1020). ═══
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-19-proposal-asr-second-round.md
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-17-proposal-windows-client-vps-server.md
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md
@@ -214,7 +215,7 @@ nodes:
     confidence: 0.8
     verified_at: "2026-10-17"
     verified_against: "o servidor REESCRITO (ops/stt/server.py) na VPS de 8 vCPU, fora de unit, com o venv do lock e o modelo da revisão fixada; o arquivo de 61,5 min montado como na Emenda 2 da curadoria (30 falas FLEURS pt_br × 7 voltas, Random(164), PCM_16), por POST /v1/listen, um processo novo por braço; e a bancada stt_service (87 verdes com o venv do serviço; sem ele, 78, com a amarração do server.py conferida pela forma) e moat_gate (237 verdes, com os casos s1–s6)"
-    label: "STT em lote reescrito no core (ops/stt/, core-only). Com vad_batch=1, 61,5 min dão RSS 2,31e9 B (6,92e9 com lote de 8) e WER 5,92 % (6,19 %); teto MemoryMax=6G. Instalado na VPS: ainda não."
+    label: "STT em lote reescrito no core (ops/stt/, core-only). Com vad_batch=1, 61,5 min dão RSS 2,31e9 B (6,92e9 com lote de 8) e WER 5,92 % (6,19 %); teto MemoryMax=6G. Instalação real: ver E_MC_STT_INSTALADO_LOOPBACK_1020."
     trace: "ops/stt-service.sh"
     narrative: |-
       Onde mora e por quê: o serviço é código de OPERAÇÃO desta VPS, não framework: vive em ops/stt/ (servidor, núcleo puro, prova do verify, lock com hash e fixture) e o wrapper em ops/stt-service.sh, no molde do bridge-hardening e do chat-runner. ops/ não viaja para adotante; o MOAT ganhou as linhas da unit onion-vps-stt, da área de instalação do serviço, do diretório do token e do backup da unit, e o juiz fecha o modo de teste do wrapper e a cópia dele fora do projeto.
@@ -266,6 +267,25 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-19"
       locality: "pessoa"
 
+  - id: E_MC_STT_INSTALADO_LOOPBACK_1020
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "ops/stt-service.sh verify na VPS em 2026-10-20: unit onion-vps-stt ativa (MainPID 3533022, invocação 9c7b9e3c), 13 propriedades lidas"
+    label: "STT em lote instalado na VPS só em loopback (127.0.0.1:8765), pelo install --apply de 2026-10-20: sandbox efetivo, MemoryMax 6G, token por LoadCredential, rede de saída negada e fixture pt-BR transcrito nas duas rotas (recall 1,00)."
+    trace: "ops/stt-service.sh"
+    narrative: |-
+      Execução de D_MC_STT_SOBE_EM_LOOPBACK_1019, o degrau loopback. O 1º install --apply (2026-10-19) reprovou na prova pré-troca: o LoadCredential= entrega o token 0440 root:root e o servidor só aceitava 0600/0400. O fail-closed do wrapper segurou e a unit de produção não foi tocada. A cura entrou pelo PR #1214, provada numa unit transitória real. O 2º install --apply, a partir da main 02c80353, instalou e passou no verify: código 9518f7a7f626, ambiente 55af7f51f611, modelo 8f23f0c03c87. Re-medido em 2026-10-20 pelo verify (só leitura): verify OK. Fora deste nó: a saída pelo Caddy (TLS, token, subdomínio), que espera o cliente de captura.
+    provenance:
+      source: "ops/stt-service.sh install --apply e verify, nesta VPS"
+      locator: "install --apply de 2026-10-20 00:43 UTC (invocação 9c7b9e3c) e verify de 2026-10-20: 'verify OK — onion-vps-stt vivo (MainPID 3533022), loopback, token exigido, fixture transcrito, MemoryMax 6G (13 propriedades lidas)'"
+      method: "medição: o verify do wrapper lê as propriedades efetivas da unit pelo systemd e prova o cliente numa unit transitória"
+      locality: "host"
+
 edges:
 
   - from: E_MEETING_GRAPH_GATE_1016
@@ -307,3 +327,6 @@ edges:
   - from: D_MC_STT_SOBE_EM_LOOPBACK_1019
     to: D_MC_STT_PARAKEET_ADAPTADOR_CORE_1017
     edge_type: TRACES_TO
+  - from: E_MC_STT_INSTALADO_LOOPBACK_1020
+    to: D_MC_STT_SOBE_EM_LOOPBACK_1019
+    edge_type: SUPPORTS
