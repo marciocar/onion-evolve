@@ -263,6 +263,9 @@ jobs:
         # SUBIDO para v1.0.253 (5eb090f3) em 2026-10-18, pelo aviso do currency-census.sh: o diff
         # v1.0.252..v1.0.253 é um commit só ("bump Claude Code to 2.1.303 and Agent SDK to 0.3.303") e
         # não toca input nem output usado aqui.
+        # SUBIDO para v1.0.254 (db77d4d3; a tag anotada é c335fd6d) em 2026-10-20, pelo mesmo aviso: o diff
+        # v1.0.253..v1.0.254 é um commit só ("bump Claude Code to 2.1.304 and Agent SDK to 0.3.304"), em
+        # action.yml/package.json/bun.lock/run.ts, sem input nem output novo.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
         # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
@@ -270,7 +273,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@5eb090f3c3afd701a0672cd32981197ca27688f6
+        uses: anthropics/claude-code-action@db77d4d3c98f3f6380e7cd45ffba2342a3dbde3c
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -390,6 +393,9 @@ jobs:
         # SUBIDO para v1.0.253 (5eb090f3) em 2026-10-18, pelo aviso do currency-census.sh: o diff
         # v1.0.252..v1.0.253 é um commit só ("bump Claude Code to 2.1.303 and Agent SDK to 0.3.303") e
         # não toca input nem output usado aqui.
+        # SUBIDO para v1.0.254 (db77d4d3; a tag anotada é c335fd6d) em 2026-10-20, pelo mesmo aviso: o diff
+        # v1.0.253..v1.0.254 é um commit só ("bump Claude Code to 2.1.304 and Agent SDK to 0.3.304"), em
+        # action.yml/package.json/bun.lock/run.ts, sem input nem output novo.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
         # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
@@ -397,7 +403,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@5eb090f3c3afd701a0672cd32981197ca27688f6
+        uses: anthropics/claude-code-action@db77d4d3c98f3f6380e7cd45ffba2342a3dbde3c
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
