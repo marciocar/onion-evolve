@@ -8,7 +8,7 @@ para a fonte e uma prov:Derivation qualificada: a atividade carrega o `method`, 
 como propriedades kg:. A fonte é a própria IRI só quando o texto inteiro é uma URL http(s) sem espaço; senão (um
 caminho de repo, um comando, duas URLs juntas), vira um nó em branco rotulado com o texto, um por texto distinto no
 documento, para que nós com a mesma fonte apontem para a mesma entidade. O carimbo de verificação vai como
-kg:verifiedAt (xsd:date quando é uma data) e kg:verifiedAgainst, e não como prov:generatedAtTime: em PROV, o tempo
+kg:verifiedAt (xsd:date quando é uma data), kg:verifiedAgainst e kg:verifiedScope (o alcance, desde o v4.5), e não como prov:generatedAtTime: em PROV, o tempo
 de geração marca a existência da entidade, não a conferência dela.
 
 As IRIs dos nós são <base><meta.id>#<id>, com base urn:kg-ssot:graph: por padrão; o vocabulário kg: mora em
@@ -78,7 +78,7 @@ def export(doc, base):
         if node.get("verified_at") is not None:
             when = str(node["verified_at"])
             entity["kg:verifiedAt"] = {"@value": when, "@type": "xsd:date"} if DATE.fullmatch(when) else when
-        for key, prop in (("verified_against", "kg:verifiedAgainst"), ("plane", "kg:plane")):
+        for key, prop in (("verified_against", "kg:verifiedAgainst"), ("verified_scope", "kg:verifiedScope"), ("plane", "kg:plane")):
             if node.get(key) is not None:
                 entity[prop] = str(node[key])
         prov = node.get("provenance")

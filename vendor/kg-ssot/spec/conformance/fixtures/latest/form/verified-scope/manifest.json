@@ -1,0 +1,52 @@
+{
+  "description": "O alcance da verificação (v4.5): verified_scope, opcional; o MUST só aceita a chave, como na provenance.locality; no SHOULD, o enum fato, mecanismo ou nenhum (fora dele alerta form.enum.node.verified_scope), e verified_scope sem verified_at alerta form.required.node.verified_at.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-verified-scope-fato.kg.yaml",
+      "description": "verified_scope: fato, com verified_at: o que o nó afirma foi conferido",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-verified-scope-mecanismo.kg.yaml",
+      "description": "verified_scope: mecanismo: só o mecanismo foi conferido, e o fato depende de outro ambiente",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-verified-scope-nenhum.kg.yaml",
+      "description": "verified_scope: nenhum: conferido contra o repo na data, e nada ali sustenta nem refuta o fato",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-verified-scope-unknown.kg.yaml",
+      "description": "verified_scope fora do enum: alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.verified_scope"
+      ]
+    },
+    {
+      "file": "warn-verified-scope-without-verified-at.kg.yaml",
+      "description": "verified_scope sem verified_at: o alcance de uma conferência que não tem data não diz nada",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.verified_at"
+      ]
+    },
+    {
+      "file": "warn-verified-scope-integer.kg.yaml",
+      "description": "verified_scope que não é texto: o MUST só aceita a chave, e o valor fora do enum alerta, como na provenance.locality",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.verified_scope"
+      ]
+    }
+  ]
+}

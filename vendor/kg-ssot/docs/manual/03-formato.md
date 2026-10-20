@@ -15,7 +15,7 @@ Convenções: **obr.** = obrigatório; *data* = texto `AAAA-MM-DD` que existe no
   `off` são texto.
 - Chaves comparadas na forma JSON: `1` e `"1"` colidem (`parse.duplicate-key`).
 - `.nan` e `.inf` reprovam em qualquer posição, porque o JSON não os representa.
-- Tab só dentro de aspas (numa linha), de bloco literal (`|` ou `>`) e de comentário. Como espaço (depois de `:`, no fim da linha,
+- Tab só dentro de aspas (fora do espaço inicial de uma linha de continuação), de bloco literal (`|` ou `>`) e de comentário. Como espaço (depois de `:`, no fim da linha,
   entre a data e a hora) ou dentro de um texto sem aspas, reprova (`parse.yaml-error`). Use espaço.
 - A tag `!` sem nome (também `!<!>`) reprova, e o `!!timestamp` explícito só aceita texto na forma de data
   (`AAAA-M-D`, com hora opcional `H:MM:SS`, fração com dígito e fuso `Z` ou `±H[:MM]`, até ±29). A forma é conferida,
@@ -77,6 +77,7 @@ com `.kg.yaml`.
 | `trace` | texto | onde a afirmação aparece (arquivo, caminho) |
 | `verified_at` | *data* | SHOULD em nó PROD |
 | `verified_against` | texto | SHOULD em `claim` com `verified_at` |
+| `verified_scope` | enum | opcional, desde o v4.5: o alcance do `verified_at`. `fato` (o que o nó afirma foi conferido), `mecanismo` (só o mecanismo, como código ou configuração; o fato depende de outro ambiente) ou `nenhum` (conferido contra o repo na data, e nada ali sustenta nem refuta o fato). Fora do enum alerta; sem `verified_at` alerta |
 | `valid_from` | data parcial | `AAAA`, `AAAA-MM` ou `AAAA-MM-DD` |
 | `source_tier` | inteiro | 1 a 10 |
 | `source_kind` | texto | |
@@ -94,7 +95,7 @@ com `.kg.yaml`.
 | `source` | texto | obr. Não vazio e não marcador (`unknown`, `n/a`, `tbd`, `?`...) |
 | `locator` | texto | obr. Não vazio |
 | `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, classe em `medição` `leitura` `juízes` `derivado` `testemunho` |
-| `locality` | enum | opcional. `repo` `web` `host` `pessoa` (fora do enum alerta) |
+| `locality` | enum | opcional. `repo` `web` `host` `pessoa` `privado` (fora do enum alerta). Vale onde está a cópia lida, não a classificação do documento |
 | `x_*` | qualquer | outra chave alerta, não reprova |
 
 `provenance: null` reprova. Ou o objeto vem inteiro, ou não vem.

@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.12.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.12.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -295,6 +295,17 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.11.0` para a `kg-ssot-v4.12.0`, entra o contrato v4.5: um MUST raro do YAML e três ampliações do SHOULD.
+- **O tab no espaço inicial de uma linha de continuação de texto entre aspas** reprova como `parse.yaml-error`.
+- **`verified_scope`**, opcional: `fato`, `mecanismo` ou `nenhum`, o alcance do `verified_at`.
+- **`locality: privado`**, para documento fora do repo, não público e reverificável por quem tem acesso.
+- **Com `--corpus`, a `REFUTES` que chega de outro grafo** a um nó vivo conta para `integrity.refutes-unreconciled`.
+- **A suíte ganha 18 casos** (312).
+
+Medido em 2026-10-20, nenhum dos 1.457 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD. O sha256 dos
+dois schemas muda, então o PR do `update` roda o `kg_gate.py --update` depois de trazer a tag; sem o caso no corpus, sem
+motivo.
+
 Da `kg-ssot-v4.10.0` para a `kg-ssot-v4.11.0`, entra o contrato v4.4: um aviso SHOULD e três vereditos MUST raros do YAML.
 - **`integrity.refutes-unreconciled`:** nó que recebe `REFUTES` e segue vivo (nem `superseded` nem `refuted`; só a
   `question` `done` não alerta). O grafo afirma e refuta a mesma coisa. O radar do core já reprova o caso como
@@ -395,11 +406,13 @@ O que muda no v4:
   Quando uma migração preenche a `provenance` a partir do que o nó já trazia, a classe é a da evidência original, e o
   detalhe diz que a migração não re-verificou, por exemplo `medição: <o que foi medido>; não reverificado na migração`
   (decisão do mantenedor em 2026-10-09).
+  A prosa interna do adotante (um `docs/*.md` escrito por alguém do time) é `testemunho`, não `leitura`: é o relato
+  de quem a escreveu, e assim o radar mostra quais `confirmed` só têm prosa por trás.
   **Atenção:** se o seu CI cobra que grafo novo saia limpo também no SHOULD, este alerta já reprova lá no v4, e não só
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.11.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.12.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -412,7 +425,10 @@ O caminho, num PR só:
 **Onde a fonte mora** (`provenance.locality`, opcional, desde a `contract-v4.2.0`): `repo` (arquivo versionado no
 próprio repo), `web` (endereço público), `host` (só existe numa máquina: um journal local, um caminho fora do repo) ou
 `pessoa` (o relato de alguém). Fora desses valores, alerta como `form.enum.node.provenance.locality`. Serve para medir
-o que um terceiro consegue reverificar e para barrar `host` quando o grafo vai a público.
+o que um terceiro consegue reverificar e para barrar `host` quando o grafo vai a público. Desde o v4.5 entra `privado`:
+documento fora do repo, não público e reverificável por quem tem acesso (Google Drive, wiki interna). O valor segue
+onde está a cópia lida, não a classificação do documento: um PDF que o emissor marca como público, lido de uma cópia
+no Drive, é `privado` até alguém achar a URL pública, quando passa a `web` com o locator novo.
 
 **Referência a nó de outro grafo** (`external_edges`, opcional, desde a `contract-v4.3.0`): uma lista no topo do grafo,
 cada aresta com exatamente uma ponta externa `<caminho relativo à raiz do repo>#<id>` e a outra um id deste arquivo.

@@ -17,8 +17,8 @@ export function verdict(text, { format = 'yaml', corpus = null } = {}) {
 }
 
 /** Os códigos SHOULD (avisos) do texto de um grafo, ordenados e sem repetição; vazio quando não há aviso. */
-export function checkWarnings(text, { format = 'yaml' } = {}) {
-  return warningsWith(text, validateMust, validateShould, { format });
+export function checkWarnings(text, { format = 'yaml', corpus = null } = {}) {
+  return warningsWith(text, validateMust, validateShould, { format, corpus });
 }
 
 /** Os códigos MUST do texto de um grafo, ordenados e sem repetição; vazio quando passa. */

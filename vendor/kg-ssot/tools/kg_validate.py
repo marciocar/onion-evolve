@@ -143,6 +143,9 @@ class Yaml12CoreLoader(Yaml12BoolLoader):
         if (tag == "tag:yaml.org,2002:timestamp" and isinstance(event, yaml.ScalarEvent)
                 and not STRICT_TIMESTAMP.fullmatch(event.value)):
             raise yaml.composer.ComposerError(None, None, f"!!timestamp sem data: {event.value!r}", event.start_mark)
+        if (isinstance(event, yaml.ScalarEvent) and event.style in ("'", '"')
+                and event.start_mark.line != event.end_mark.line and QUOTED_TAB_INDENT(event)):
+            raise yaml.composer.ComposerError(None, None, "tab no começo de uma continuação entre aspas", event.start_mark)
         return super().compose_node(parent, index)
 
 
@@ -151,6 +154,18 @@ class Yaml12CoreLoader(Yaml12BoolLoader):
 # (hora do fuso até 29) e só espaço entre a data e a hora. A data sem tag segue o resolvedor implícito (yaml.unquoted-date).
 STRICT_TIMESTAMP = re.compile(
     r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}(?:(?:[Tt]| +)[0-9]{1,2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?: *(?:Z|[-+][012]?[0-9](?::[0-9]{2})?))?)?")
+
+
+def QUOTED_TAB_INDENT(event):
+    """O texto entre aspas de várias linhas tem tab no espaço inicial de alguma linha de continuação? O perfil a recusa nos
+    dois leitores (decisão de contrato de 2026-10-20, v4.5): o yaml do JS já recusava parte dos casos pela coluna, e a
+    regra explícita, mais estrita, é a mesma nos dois. Lê o texto cru do escalar pelas marcas do parser puro, e só
+    \r e \n quebram linha, como no leitor JS."""
+    buf = getattr(event.start_mark, "buffer", None)
+    if not isinstance(buf, str):  # só o parser puro tem o texto nas marcas; sem ele, falha fechado
+        raise yaml.composer.ComposerError(None, None, "texto entre aspas sem o texto cru para conferir o tab", event.start_mark)
+    raw = buf[event.start_mark.pointer:event.end_mark.pointer]
+    return any("\t" in re.match(r"[ \t]*", line).group() for line in re.split(r"\r\n|\r|\n", raw)[1:])
 
 
 class UnquotedDate(str):
@@ -906,7 +921,7 @@ ISO_PREFIX = re.compile(r"^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$")
 TESTIMONY_METHOD = re.compile(r"^testemunho: ")
 
 
-def coherence_located(doc):
+def coherence_located(doc, corpus=None):
     """Os avisos SHOULD que o schema não exprime, porque cruzam campos ou arestas:
 
     - integrity.testimony-in-prod: nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe
@@ -917,6 +932,8 @@ def coherence_located(doc):
       provenance, nem aresta TRACES_TO saindo dela.
     - integrity.refutes-unreconciled: nó que recebe REFUTES e segue vivo (nem superseded nem refuted; uma question
       done já está respondida): o grafo afirma e refuta a mesma coisa. É a contradição do radar, como aviso no v4.4.
+      Desde o v4.5, com o corpus (corpus_index), conta também a REFUTES que chega de outro grafo pelas external_edges
+      (from externo, to local); sem ele, a ponta externa não foi conferida e a aresta não conta.
     Um campo de tipo errado (from ou id em lista ou mapa) já reprova no MUST: aqui ele é ignorado, nunca quebra.
     """
     out = []
@@ -926,6 +943,11 @@ def coherence_located(doc):
               if isinstance(e, dict) and e.get("edge_type") == "TRACES_TO" and isinstance(e.get("from"), str)}
     refuted = {e.get("to") for e in edges
                if isinstance(e, dict) and e.get("edge_type") == "REFUTES" and isinstance(e.get("to"), str)}
+    if corpus is not None:
+        ext = doc.get("external_edges") if isinstance(doc.get("external_edges"), list) else []
+        refuted |= {e.get("to") for e in ext
+                    if isinstance(e, dict) and e.get("edge_type") == "REFUTES" and is_external(e.get("from"))
+                    and isinstance(e.get("to"), str) and not is_external(e.get("to"))}
     for n, place in _located(doc, "nodes"):
         prov = n.get("provenance") if isinstance(n.get("provenance"), dict) else {}
         method = prov.get("method")
@@ -966,12 +988,12 @@ def yaml_profile_warnings(text, raw):
     return out
 
 
-def coherence_warnings(doc):
+def coherence_warnings(doc, corpus=None):
     """Os avisos de coherence_located() contados por código (Counter)."""
-    return collections.Counter(code for code, _ in coherence_located(doc))
+    return collections.Counter(code for code, _ in coherence_located(doc, corpus))
 
 
-def warning_counts(text, validator, should_validator):
+def warning_counts(text, validator, should_validator, corpus=None):
     """Os códigos SHOULD de warnings() com a contagem de ocorrências (as chaves são as de warnings())."""
     raw, doc, parse_code = parse_v1(text)
     if parse_code:
@@ -982,7 +1004,7 @@ def warning_counts(text, validator, should_validator):
     if _has_unquoted_date(raw):
         out["yaml.unquoted-date"] += 1
     out.update(yaml_profile_warnings(text, raw))
-    out.update(coherence_warnings(doc))
+    out.update(coherence_warnings(doc, corpus))
     return out
 
 
@@ -1003,14 +1025,14 @@ def where(text, validator, should_validator=None, corpus=None):
     return [(level, code, place) for level, code, place, _ in occurrences(text, validator, should_validator, corpus)]
 
 
-def warnings(text, validator, should_validator):
+def warnings(text, validator, should_validator, corpus=None):
     """Os códigos SHOULD: o que o schema SHOULD acusa e o MUST não, mais data sem aspas e os avisos de coerência
     (coherence_warnings).
 
     Arquivo que já reprova no parse não recebe alerta de forma. Chave desconhecida cujo nome não é
     slug (<<, 1.0) alerta como form.pattern.<escopo>.key, o código que o schema SHOULD emite para ela.
     """
-    return sorted(warning_counts(text, validator, should_validator))
+    return sorted(warning_counts(text, validator, should_validator, corpus))
 
 
 VERDICT_SCHEMA_VERSION = "kg-ssot.verdict/1"
@@ -1157,6 +1179,7 @@ MESSAGES = {
     "integrity.verified-before-fact": "A data de verificação (verified_at) é anterior à data do fato (valid_from): "
                                       "ou o fato tem vigência futura, ou as datas estão trocadas.",
     "integrity.untraced-decision": "A decisão não diz de onde veio: falta trace, provenance ou aresta TRACES_TO.",
+    "integrity.refutes-unreconciled": "O nó recebe REFUTES e segue valendo: o grafo afirma e refuta a mesma coisa.",
     "yaml.unquoted-date": "Há uma data sem aspas; leitores YAML diferentes a leem de formas diferentes.",
     "yaml.forbidden-key-on": "A aresta usa a chave on, proibida (em YAML 1.1 ela vira o booleano True).",
     "yaml.unsafe-integer": "Há um número inteiro fora de ±(2^53−1); um leitor JS (double) perde o valor exato dele.",
@@ -1187,6 +1210,7 @@ HINTS = {
                                       "valid_from é quando o fato passou a valer, e verified_at, quando foi conferido.",
     "integrity.duplicate-id": "Dê um id único a cada nó.",
     "integrity.untraced-decision": "Acrescente trace, provenance ou uma aresta TRACES_TO saindo da decisão.",
+    "integrity.refutes-unreconciled": "Se a refutação procede, mude o status do alvo para refuted ou superseded; se não, tire a aresta ou use CONSTRAINS (o dissent que limita sem derrubar).",
     "integrity.testimony-in-prod": "Deixe o nó em DEV, ou apoie-o numa medição ou leitura conferida.",
     "form.required.node.provenance": "Acrescente provenance com source, locator e method; sem fonte recuperável, "
                                      "mude o status para unverifiable.",
@@ -1259,7 +1283,7 @@ def occurrences(text, validator, should_validator=None, corpus=None):
         if _has_unquoted_date(raw):
             out.append(("SHOULD", "yaml.unquoted-date", "arquivo", []))
         out += [("SHOULD", code, "arquivo", []) for code in yaml_profile_warnings(text, raw)]
-        out += [("SHOULD", code, place, place_path(doc, place)) for code, place in coherence_located(doc)]
+        out += [("SHOULD", code, place, place_path(doc, place)) for code, place in coherence_located(doc, corpus)]
     return out
 
 
@@ -1491,7 +1515,7 @@ def main(argv=None):
             continue
         must = code_counts(text, validator, corpus)
         unchecked += corpus is None and uses_external(text)
-        should = warning_counts(text, validator, should_v) if should_v is not None else collections.Counter()
+        should = warning_counts(text, validator, should_v, corpus) if should_v is not None else collections.Counter()
         failed += bool(must)
         warned += bool(should)
         lines += report(name, must, should, isinstance(text, JsonText))

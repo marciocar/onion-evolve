@@ -39,22 +39,23 @@ export function verdict(text: string, options?: Options): Verdict;
 export function check(text: string, options?: Options): string[];
 
 /** Os códigos SHOULD (avisos) do texto de um grafo, ordenados e sem repetição; vazio quando não há aviso. */
-export function checkWarnings(text: string, options?: { format?: Format }): string[];
+export function checkWarnings(text: string, options?: Options): string[];
 
 /** O veredito com um validador MUST qualquer (o núcleo, para quem compila o schema); com validateShould, mede também
  * os avisos. */
 export function verdictOf(text: string, validate: MustValidator,
   options?: Options & { validateShould?: MustValidator }): Verdict;
 
-/** Os avisos de coerência de um documento já lido (integrity.testimony-in-prod, verified-before-fact, untraced-decision, refutes-unreconciled). */
-export function coherenceCodes(doc: Record<string, unknown>): string[];
+/** Os avisos de coerência de um documento já lido (integrity.testimony-in-prod, verified-before-fact, untraced-decision, refutes-unreconciled).
+ * Com o corpus, a REFUTES que chega de outro grafo pelas external_edges também conta. */
+export function coherenceCodes(doc: Record<string, unknown>, corpus?: Corpus | null): string[];
 
 /** Os avisos do perfil JSON num .kg.yaml já lido (yaml.unsafe-integer, yaml.lone-surrogate, yaml.depth-over-128). */
 export function yamlProfileCodes(doc: unknown): string[];
 
 /** Os códigos SHOULD com os validadores MUST e SHOULD quaisquer. */
 export function warnings(text: string, validate: MustValidator, validateShould: MustValidator,
-  options?: { format?: Format }): string[];
+  options?: Options): string[];
 
 /** Os códigos MUST com um validador MUST qualquer. */
 export function codes(text: string, validate: MustValidator, options?: Options): string[];
