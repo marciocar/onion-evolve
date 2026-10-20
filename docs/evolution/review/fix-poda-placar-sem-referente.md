@@ -2,7 +2,7 @@
 branch: fix/poda-placar-sem-referente
 pr: pendente
 date: 2026-10-20
-reviewed_diff_sha256: f4db734e1f8c6c4e38fa42dcf8d5f9c29efe6617b29c687b0e683c7af8794ced
+reviewed_diff_sha256: 2fa5dd4d55d3cc5d56136569f8169c6a753dd431986a840c56957f677739e6ac
 reviewed_code_sha256: d1044c5d75122ec5a1a70bc7f675a46fcb5a12d2a74046f0d439d5185e153d89
 findings_total: 2
 findings_real: 1
