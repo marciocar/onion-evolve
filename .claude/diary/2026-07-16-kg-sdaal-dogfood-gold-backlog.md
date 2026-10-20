@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: [meta:kg, meta:co-evolve, meta:evolve]
 share_with: []
 next_recommended: ""
-review_after: 2026-10-14
+review_after: 2027-01-18
 conflict_class: conditional
 valid_when: "as propostas #1/#2/#3/#4/#6/#7 do sinal rhilo-metagamify dogfood-ouro (2026-07-16) ainda NÃO estão implementadas no core — quando cada uma entrar, riscar do backlog; quando todas, aposentar"
 ---
@@ -18,6 +18,14 @@ Dogfood mais intenso do KG SDAAL até hoje num adotante (rhilo-metagamify, recon
 WRR/Modo Equilíbrio, 165 nós/288 arestas — decidiu arquitetura + gerou código + validação ao vivo).
 Sinal upstream com **7 propostas ao core**, todas verificadas contra o código real na triagem. Só a
 **#5 (footguns YAML na KB)** foi executada nesta sessão; as outras 6 ficam como **backlog priorizado**.
+
+**Estado em 2026-10-20 (re-teste, conditional):** riscados #1 (`RADAR_SCHEMA="1"`, `kg-radar.sh` l.88), #2
+(modos `--freshness`/`--schema`), #3 (campos ancorados em `kg-radar.sh` l.400-409, com os dois vetores
+documentados) e #7 (drive-to-verify na KB `knowledge-graph-sdaal.md` l.378 e no `engineer/work.md`). Do 2º sinal,
+`kg state` virou o modo `--state` e o KG-first está cabeado (`catch-up.md` l.37). **Restam:** #6 (o ledger
+docs-como-evidência como método do modo `map`) e #4 (as conversões `type→node_type`, flow-map→bloco e
+`on:`-bool). O `kg-migrate-v3.py` existe, mas migra outras dívidas (datas, provenance, locality do contrato v3):
+não faz as conversões do #4.
 
 ## Decision — triagem (o que fica pendente)
 Ordem por alavanca × custo (dogfood: barato→caro, helper→fiação→campo):
@@ -70,3 +78,5 @@ Doutrina **SSOT-as-runtime** (read→verify→act→write; LLM=VM, .kg.yaml=byte
 ## Next crumb
 Quando abrir o ADR do #2 (frescor), lembrar de **costurar o #1** (schema_version) — mesma família
 "radar recusa quando a SSOT driftou". Ver KB `[[knowledge-graph-sdaal]]` e o sinal em `_processed/`.
+
+## Re-testada em 2026-10-20 — PARCIAL: (conditional, só o `valid_when`) 4 das 6 propostas entraram, mais as 2 features do sinal irmão. Para o #6 busquei por comportamento: `kg.md` e a KB não têm a classificação canonical/superseded/historical/redundant de docs concorrentes. A prática existe sem nome: o passivo de 92 documentos foi modelado no `federation-research-2026-06-reconciled.kg.yaml`, com nós rotulados "DUPLICATA REAL"/"DUPLICATA PARCIAL", e o `kg-provenance-coverage.sh` garante que todo documento de `docs/analysis` e `docs/evolution/research` tem nó (219/219, rodei). O método nomeado no modo `map` segue aberto. Mudança contra o re-teste de 2026-10-19: ele dava o #4 como parcial pelo `kg-migrate-v3.py`; lido o script, o escopo dele é outro, e o #4 segue aberto.

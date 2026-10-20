@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -24,3 +24,5 @@ Salvar um artefato órfão de merge **não é restaurar por reflexo** — é **c
 
 ## Next crumb
 Ao encontrar branch órfã com trabalho não-landed: `git cherry` para provar unlanded → ler o conteúdo → confrontar contra a fonte canônica atual → escolher veículo pelo limiar Hegel → largar o que fere identidade canônica. Nunca cherry-pick cego.
+
+## Re-testada em 2026-10-20: (static) `docs/knowledge-base/concepts/transformer-architecture.md` existe; `C_HEGEL_THRESHOLD` segue em `coexistence-two-homes-2026-07.kg.yaml` l.129.

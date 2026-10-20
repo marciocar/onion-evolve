@@ -8,7 +8,7 @@ affects: [meta, orchestration]
 breadcrumb_for: []
 share_with: [granaai, metagamify, marcio-pessoal]
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -23,3 +23,5 @@ O ciclo `read(KG)→verify→act→write(KG)` (SSOT-as-runtime) tinha o leg **`w
 
 ## Next crumb
 Ao concluir qualquer pesquisa/auditoria orquestrada: **antes do relatório**, persista a síntese em `docs/**/research/*.md` + materialize o `.kg.yaml` co-locado (radar exit 0) e **nomeie o path**. Se veio do harness (`deep-research`), o output está no `/tmp` e **drifta** — a orquestração Onion é dona do `write(KG)`. "Esqueci de salvar" é o modo-de-falha que o KG-first mata.
+
+## Re-testada em 2026-10-20: (static) `onion-orchestration/SKILL.md` l.91 (passo 7 `write(KG)`), `orchestrate.md` l.188 (Passo 4.5) e `lint-artifacts.sh` l.3705, a REGRA 26 (Pesquisa nasce em KG, não morre em prosa), HARD.

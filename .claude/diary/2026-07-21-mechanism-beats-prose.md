@@ -8,7 +8,7 @@ affects: [meta, product, engineering, compliance]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao FECHAR qualquer decisão que deva durar (identidade, fronteira, invariante), perguntar antes de encerrar: 'que mecanismo carrega isto?' — guarda de lint, campo de frontmatter, SSOT gerada, proibição normativa citável ou critério de auditoria. Decisão que só existe em documento datado tem meia-vida curta MESMO ESTANDO CERTA. E o inverso é o teste barato: para saber se uma decisão antiga ainda vale, não releia o documento — procure o mecanismo. Se não houver, ela já morreu e ninguém avisou."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 significance: "Modelar 92 documentos de 14 meses no grafo revelou a lei que governa a durabilidade de decisões neste core — e ela não é sobre qualidade de argumento, é sobre onde a decisão foi parar."
 ---
@@ -51,3 +51,5 @@ discutir é caro; se não existe, ela já está morta e o documento é arqueolog
 novo, agora com mecanismo. Ver também [[inverted-provenance-ratchet]] (o instrumento que tornou esta lei
 visível) e a doutrina destilada na leva 2: *backlog em prosa datada renasce todo dia e só morre quando vira
 guarda de lint ou SSOT gerada*.
+
+## Re-testada em 2026-10-20: (static) a lei segue de pé: `LICENSE` segue MIT e `architecture.md` §7 (Proibições explícitas, l.337) segue como mecanismo da identidade. Esta rodada a confirma: as decisões do diário que viraram mecanismo (o pre-commit da default branch, o `kg-read-leg.sh`) sobreviveram, e a que ficou em prosa (a nota de brand-voice de `2026-07-19-onion-is-the-hero-platform-is-base`) segue só no diário.

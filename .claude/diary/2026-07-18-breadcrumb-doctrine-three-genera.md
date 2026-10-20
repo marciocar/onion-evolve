@@ -8,7 +8,7 @@ affects: [meta, transformer]
 breadcrumb_for: []
 share_with: [granaai, metagamify]
 next_recommended: "Trilha-no-KG é aspiração não-construída: se um dogfood provar a falta, propor uma aresta/campo forward (NEXT/next_recommended no nó) — não inventar antes (dogfood-gated)."
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -36,3 +36,5 @@ Ao modelar um `.kg.yaml`: distinga **Proveniência** (campo de rastreio → font
 passo, forward — que hoje vive no diário `next_recommended`, não no KG). **Migalha stale MENTE, não corrompe** — o
 veredito é sempre *re-verificar*, nunca *recusar*; `review_after`/⏰ + `conflict_class` guardam contra seguir trilha
 morta. A aresta/campo forward no KG é **dogfood-gated** — só construir quando um uso real provar a falta.
+
+## Re-testada em 2026-10-20: (static) a KB `docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md` l.85-89 diz que a Trilha viva é no diário e que a Trilha no KG é "aspiração não-construída". Medido: as arestas dos `.kg.yaml` do repo são SUPPORTS, TRACES_TO, CONSTRAINS, DEPENDS_ON, SUPERSEDES, CAUSES, REFUTES e as de domínio; nenhuma é de Trilha, e o único `next_recommended:` dentro de um grafo é citação num `locator:` (`graduated-automation-elenxo-2026-07.kg.yaml` l.159).

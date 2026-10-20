@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: [meta:kg, meta:evolve]
 share_with: [rhilo-metagamify]
 next_recommended: ""
-review_after: 2026-10-14
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -40,3 +40,5 @@ reagem (fixtures fresh/stale-missing/stale-old), 282/0. Dogfoodado contra grafo 
 (`onion-identity` → exit 0, só avisos). Espelho de gate: `--schema` (drift de formato, ✗ recusa) —
 mesma família "o radar recusa/avisa quando a SSOT driftou". Loop completo nesta sessão: sinal
 `[[2026-07-16-kg-sdaal-dogfood-gold-backlog]]` → ADR → F1 (#375) → F2 (#376).
+
+## Re-testada em 2026-10-20: (static) `kg-radar.sh` l.39-48 descreve o FRESCOR como "compara duas datas / dois campos do arquivo, sem agora"; o "hoje" só entra no modo `--validade`, injetado como variável. A conclusão sobrevive à fonte atual.

@@ -1,4 +1,4 @@
-# Diário — agent-a387b221ce2f79183
+# Diário — agent-a4fb76de610316551
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
@@ -6,7 +6,7 @@
 
 **Total:** 128 entradas · **Stale:** 0 · **Compartilháveis:** 116 · **Com significância:** 51
 
-Gerado em: 2026-10-14
+Gerado em: 2026-10-20
 
 ---
 
@@ -43,7 +43,7 @@ Gerado em: 2026-10-14
 | 2026-08-17 | error | collective 📤 | minha-auditoria-contou-1-onde-eram-3 | Escrevi um resíduo de revisão auto-auditando meu PR com rigor — e o resíduo CONTAVA ERRADO sobre si mesmo: declarei 1 link morto novo onde eram 3. Quem me pegou foi o revisor do CI, não eu, e o defeito era da MESMA família que o PR estava curando. É evidência empírica, colhida contra o autor, de por que a etapa 1 do Elenxo exige lentes INDEPENDENTES: lente única não vê o próprio ponto cego — nem quando está explicitamente procurando por ele. | 2026-11-17 | static |
 | 2026-08-17 | observation | collective 📤 | cron-da-bancada-e-a-rede-por-provar | RE-TESTADO E FECHADO em 2026-08-18: o cron DISPAROU (run 32100701318, event=schedule, main, 824 asserções / 0 falhas) — a rede debaixo do filtro de path existe e funciona, provada por CONTAGEM e não por exit code. Fica a lição do desenho: a migalha nasceu com review_after de 1 dia porque a capacidade era DECLARADA e não verificada, e o relógio de 1 dia foi o que a trouxe de volta para ser medida. E o cron atrasou 35 min (04:52Z, não 04:17Z) — margem de tolerância é parte do teste, não ruído. | 2026-11-18 | static |
 | 2026-08-16 | error | collective 📤 | elenxo-reduzido-ao-revisor | Chamei o MÉTODO pelo nome de uma das suas jogadas: 'Elenxo' virou, na minha boca, 'subagente que ataca'. Medido: 12 nós criados na sessão, ZERO com review_after; zero entradas de diário numa sessão densa de achados. Rodei o corpo sem o relógio — e quem pegou foi o maestro, gate social, não instrumento. | 2026-11-16 | static |
-| 2026-08-16 | learning | collective 📤 | dogfood-que-refutou-a-propria-cura | Rodei o dogfood que reabriria um NÃO CONSTRUIR de 14 dias e o resultado foi 3/3 NÃO MUDOU — a sessão-controle achou o grafo sozinha nos três casos, uma delas citando nó com arquivo:linha. O gate não reabre. E o desenho do meu teste tinha um limite que eu só vi depois: testei 'acha quando perguntado', não 'consulta enquanto ocupado' — que é o modo de falha real. | 2026-10-16 | dynamic |
+| 2026-08-16 | learning | collective 📤 | dogfood-que-refutou-a-propria-cura | Rodei o dogfood que reabriria um NÃO CONSTRUIR de 14 dias e o resultado foi 3/3 NÃO MUDOU — a sessão-controle achou o grafo sozinha nos três casos, uma delas citando nó com arquivo:linha. O gate não reabre. E o desenho do meu teste tinha um limite que eu só vi depois: testei 'acha quando perguntado', não 'consulta enquanto ocupado' — que é o modo de falha real. | 2027-01-18 | dynamic |
 | 2026-08-04 | innovation | collective 📤 | maestro-aside-side-channel | Maestro's Aside: 1º protocolo de PREFIXOS TIPADOS de steering (gap aberto no estado-da-arte ago/2026). Marcador pt-BR no início da msg → hook injeta a rota canônica (recall, não gate). Dispatcher, cria zero store. No 1º dogfood, o 'dúvida:' pegou um furo no PRÓPRIO protocolo (o nome violava código=inglês). | 2026-11-04 | static |
 | 2026-08-03 | learning | collective 📤 | shell-guard-paid-four-times-same-axis | A guarda anti-fail-open nasceu em 02-08 e no PRIMEIRO dia de uso real por outra sessão me pegou 4 vezes — e as 4 foram o MESMO eixo: eu lendo sinal derivado em vez do vivo. O eixo tem forma, e a forma é medível. | 2026-11-01 | static |
 | 2026-08-03 | learning | collective 📤 | o-revisor-verde-que-nunca-revisou | O onion-review tinha retry E aviso de soft-pass — máquina completa, comentada em 3 blocos — condicionados a um sinal que NUNCA dispara; 11 PRs mergearam num dia sob um revisor que não leu nada, e o CI dizia verde o tempo todo. | 2026-11-01 | dynamic |
@@ -75,42 +75,42 @@ Gerado em: 2026-10-14
 | 2026-07-22 | innovation | collective 📤 | pin-enters-proving-itself | O 'drift silencioso de pin' que o grafo do core registrava só em abstrato ganhou nome (vnextpin), mecanismo de entrada (o pin prova ser commit) e ferramenta de auditoria — porque a capacidade foi exercida contra adotantes reais, não desenhada. | 2026-10-20 | dynamic |
 | 2026-07-22 | learning | collective 📤 | guard-matches-threat-model | Uma guarda não é definida pelo que ela pega, mas pelo threat model que ela encarna — estender a lógica sem estender o modelo transforma proteção em ruído que se auto-desliga. | 2026-10-20 | static |
 | 2026-07-22 | learning | collective 📤 | core-green-adopter-red | Rodar o lint no core não é rodar o lint — o core é estruturalmente o único repo onde as dependências da guarda existem, então é onde ela mente com mais confiança sobre estar verde. | 2026-10-20 | static |
-| 2026-07-21 | learning | collective 📤 | mechanism-beats-prose | Modelar 92 documentos de 14 meses no grafo revelou a lei que governa a durabilidade de decisões neste core — e ela não é sobre qualidade de argumento, é sobre onde a decisão foi parar. | 2026-10-19 | static |
-| 2026-07-21 | innovation | collective 📤 | inverted-provenance-ratchet | Invertemos a pergunta da proveniência — de 'as citações apontam para fontes reais?' para 'toda fonte é alcançável a partir do grafo?' — e a catraca pagou 92 documentos até o piso zero sem uma regressão. | 2026-10-19 | conditional |
-| 2026-07-21 | observation | collective 📤 | capability-never-met-reality | O passivo pago revelou a maior distância entre declarado e verificado do core — não num fato, mas numa CAPACIDADE inteira que passa em todos os testes e nunca tocou a realidade. | 2026-10-19 | dynamic |
-| 2026-07-20 | learning | collective 📤 | admission-rule-blindspot | Achamos, com lastro em oito passadas reais (não teorizado), a forma do próprio ponto cego adversarial — e a regra que ele gerou hoje só vale dentro de um documento; esta migalha é o que a torna reusável no próximo. | 2026-10-18 | static |
-| 2026-07-19 | learning | collective 📤 | verify-external-wired-into-research-flow | — | 2026-10-19 | static |
-| 2026-07-19 | decision | collective 📤 | verify-external-for-current-doctrine | — | 2026-10-19 | static |
-| 2026-07-19 | observation | collective 📤 | runtime-telescope-doctrine-matches-lived-practice | — | 2026-10-15 | static |
-| 2026-07-19 | innovation | collective 📤 | onion-pessoal-app-f1-loop-chat-kg | — | 2026-10-19 | static |
-| 2026-07-19 | decision | collective 📤 | onion-is-the-hero-platform-is-base | — | 2026-10-19 | static |
-| 2026-07-19 | learning | collective 📤 | guardrails-promotion-design-vs-code | — | 2026-10-19 | static |
-| 2026-07-19 | observation | collective 📤 | guard-surfaces-orchestration-clears | — | 2026-10-15 | static |
-| 2026-07-19 | innovation | collective 📤 | farol-organizer-key-by-worktree | — | 2026-10-15 | static |
-| 2026-07-19 | innovation | collective 📤 | constellation-map-landed | — | 2026-10-19 | static |
-| 2026-07-19 | learning | collective 📤 | adopt-kg-life-g1-spike | Primeira vez que um spike do core concluiu NÃO CONSTRUIR — provou que o gap G1 não tem consumidor e economizou a fábrica inteira; é a Modernization Doctrine funcionando como freio, não como slogan. | 2026-10-19 | static |
-| 2026-07-18 | innovation | collective 📤 | write-kg-closing-step-bookend | — | 2026-10-15 | static |
-| 2026-07-18 | innovation | collective 📤 | self-reinforcing-radar-loop | — | 2026-10-15 | static |
+| 2026-07-21 | learning | collective 📤 | mechanism-beats-prose | Modelar 92 documentos de 14 meses no grafo revelou a lei que governa a durabilidade de decisões neste core — e ela não é sobre qualidade de argumento, é sobre onde a decisão foi parar. | 2027-01-18 | static |
+| 2026-07-21 | innovation | collective 📤 | inverted-provenance-ratchet | Invertemos a pergunta da proveniência — de 'as citações apontam para fontes reais?' para 'toda fonte é alcançável a partir do grafo?' — e a catraca pagou 92 documentos até o piso zero sem uma regressão. | 2027-01-18 | conditional |
+| 2026-07-21 | observation | collective 📤 | capability-never-met-reality | O passivo pago revelou a maior distância entre declarado e verificado do core — não num fato, mas numa CAPACIDADE inteira que passa em todos os testes e nunca tocou a realidade. | 2027-01-18 | dynamic |
+| 2026-07-20 | learning | collective 📤 | admission-rule-blindspot | Achamos, com lastro em oito passadas reais (não teorizado), a forma do próprio ponto cego adversarial — e a regra que ele gerou hoje só vale dentro de um documento; esta migalha é o que a torna reusável no próximo. | 2027-01-18 | static |
+| 2026-07-19 | learning | collective 📤 | verify-external-wired-into-research-flow | — | 2027-01-18 | static |
+| 2026-07-19 | decision | collective 📤 | verify-external-for-current-doctrine | — | 2027-01-18 | static |
+| 2026-07-19 | observation | collective 📤 | runtime-telescope-doctrine-matches-lived-practice | — | 2027-01-18 | static |
+| 2026-07-19 | innovation | collective 📤 | onion-pessoal-app-f1-loop-chat-kg | — | 2027-01-18 | static |
+| 2026-07-19 | decision | collective 📤 | onion-is-the-hero-platform-is-base | — | 2027-01-18 | static |
+| 2026-07-19 | learning | collective 📤 | guardrails-promotion-design-vs-code | — | 2027-01-18 | static |
+| 2026-07-19 | observation | collective 📤 | guard-surfaces-orchestration-clears | — | 2027-01-18 | static |
+| 2026-07-19 | innovation | collective 📤 | farol-organizer-key-by-worktree | — | 2027-01-18 | static |
+| 2026-07-19 | innovation | collective 📤 | constellation-map-landed | — | 2027-01-18 | static |
+| 2026-07-19 | learning | collective 📤 | adopt-kg-life-g1-spike | Primeira vez que um spike do core concluiu NÃO CONSTRUIR — provou que o gap G1 não tem consumidor e economizou a fábrica inteira; é a Modernization Doctrine funcionando como freio, não como slogan. | 2027-01-18 | static |
+| 2026-07-18 | innovation | collective 📤 | write-kg-closing-step-bookend | — | 2027-01-18 | static |
+| 2026-07-18 | innovation | collective 📤 | self-reinforcing-radar-loop | — | 2027-01-18 | static |
 | 2026-07-18 | observation | collective 📤 | runtime-drained-safe-backlog | — | 2026-12-26 | static |
-| 2026-07-18 | decision | collective 📤 | perception-instruments-doctrine | — | 2026-10-15 | static |
+| 2026-07-18 | decision | collective 📤 | perception-instruments-doctrine | — | 2027-01-18 | static |
 | 2026-07-18 | learning | public 📤 | method-adopter-has-no-doc-bridge | — | 2026-10-15 | static |
 | 2026-07-18 | reflection | collective 📤 | marathon-close-resume-trail | — | 2026-11-17 | static |
-| 2026-07-18 | decision | collective 📤 | doctrine-ingestor-core-absorbs-field | — | 2026-10-15 | static |
-| 2026-07-18 | decision | collective 📤 | breadcrumb-doctrine-three-genera | — | 2026-10-15 | static |
-| 2026-07-18 | decision | collective 📤 | autonomous-thread-runtime-graduated-ladder | — | 2026-10-15 | static |
-| 2026-07-17 | reflection | public 📤 | worst-truth-is-uncertain | — | 2026-10-15 | static |
-| 2026-07-17 | learning | public 📤 | salvage-transformer-kb-confront-not-restore | — | 2026-10-15 | static |
-| 2026-07-17 | decision | public 📤 | research-first-and-equality-lens | — | 2026-10-15 | static |
-| 2026-07-17 | error | public 📤 | read-full-before-triage | — | 2026-10-15 | static |
-| 2026-07-17 | learning | public 📤 | pr-400-two-homes-under-real-concurrency | — | 2026-10-15 | static |
-| 2026-07-17 | decision | public 📤 | efficiency-over-economy | — | 2026-10-15 | static |
-| 2026-07-17 | error | protected | core-forged-its-own-anti-forgery-doctrine | — | 2026-10-15 | static |
-| 2026-07-17 | error | protected | adopt-update-clobbers-stale-stamped-adopter | — | 2026-10-15 | dynamic |
-| 2026-07-16 | decision | protected | two-homes-origin-and-coexistence | — | 2026-10-14 | static |
-| 2026-07-16 | decision | protected | kg-sdaal-dogfood-gold-backlog | — | 2026-10-14 | conditional |
-| 2026-07-16 | decision | protected | gustavo-omnibus-backlog | — | 2026-10-14 | conditional |
-| 2026-07-16 | innovation | public 📤 | deterministic-freshness-via-in-file-baseline | — | 2026-10-14 | static |
-| 2026-07-16 | learning | public 📤 | avell-rescue-doc-predicted-session | — | 2026-10-14 | static |
+| 2026-07-18 | decision | collective 📤 | doctrine-ingestor-core-absorbs-field | — | 2027-01-18 | static |
+| 2026-07-18 | decision | collective 📤 | breadcrumb-doctrine-three-genera | — | 2027-01-18 | static |
+| 2026-07-18 | decision | collective 📤 | autonomous-thread-runtime-graduated-ladder | — | 2027-01-18 | static |
+| 2026-07-17 | reflection | public 📤 | worst-truth-is-uncertain | — | 2027-01-18 | static |
+| 2026-07-17 | learning | public 📤 | salvage-transformer-kb-confront-not-restore | — | 2027-01-18 | static |
+| 2026-07-17 | decision | public 📤 | research-first-and-equality-lens | — | 2027-01-18 | static |
+| 2026-07-17 | error | public 📤 | read-full-before-triage | — | 2027-01-18 | static |
+| 2026-07-17 | learning | public 📤 | pr-400-two-homes-under-real-concurrency | — | 2027-01-18 | static |
+| 2026-07-17 | decision | public 📤 | efficiency-over-economy | — | 2027-01-18 | static |
+| 2026-07-17 | error | protected | core-forged-its-own-anti-forgery-doctrine | — | 2027-01-18 | static |
+| 2026-07-17 | error | protected | adopt-update-clobbers-stale-stamped-adopter | — | 2027-01-18 | dynamic |
+| 2026-07-16 | decision | protected | two-homes-origin-and-coexistence | — | 2027-01-18 | static |
+| 2026-07-16 | decision | protected | kg-sdaal-dogfood-gold-backlog | — | 2027-01-18 | conditional |
+| 2026-07-16 | decision | protected | gustavo-omnibus-backlog | — | 2027-01-18 | conditional |
+| 2026-07-16 | innovation | public 📤 | deterministic-freshness-via-in-file-baseline | — | 2027-01-18 | static |
+| 2026-07-16 | learning | public 📤 | avell-rescue-doc-predicted-session | — | 2027-01-18 | static |
 | 2026-07-15 | error | protected | projected-scaffold-step-nonexistent | — | 2027-01-12 | static |
 | 2026-07-15 | learning | protected | kg-sdaal-crosses-federation | — | 2027-01-12 | dynamic |
 | 2026-07-15 | learning | protected | kg-audit-layer-generalizes-to-content | — | 2026-10-13 | conditional |

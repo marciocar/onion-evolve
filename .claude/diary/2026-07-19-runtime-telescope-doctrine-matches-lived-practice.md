@@ -8,7 +8,7 @@ affects: [meta]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Evidência p/ os gates: o checkpoint da Fase 2 do runtime autônomo pode citar esta rodada como dogfood de prática-vivida. O gate do telescópio segue aberto — o '1 dogfood de RECALL estrito' (reidentificar invariantes só pelo nome) NÃO foi cumprido aqui (a doutrina foi apontada pelo KG, não recuperada do nome)."
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -32,3 +32,5 @@ teste mais duro segue aberto; não conto como cumprido.
 ## Next crumb
 Surfaced por um estudo, mas é aprendizado do FRAMEWORK → mora aqui (diário coletivo), não no contexto do
 app pessoal (absorver doutrina gated downstream seria pular o gate + MOAT). Ver [[self-reinforcing-radar-loop]].
+
+## Re-testada em 2026-10-20: (static) o ADR `onion-adr-telescope-session-observation-2026-07.md` l.5 segue "GATED até 1 dogfood de recall"; o nó-gate de `telescope-doctrine.kg.yaml` (l.185-190) segue `status: open`.

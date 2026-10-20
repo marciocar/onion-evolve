@@ -8,7 +8,7 @@ affects: [meta, engineering, compliance]
 breadcrumb_for: []
 share_with: []
 next_recommended: "No PRÓXIMO contrato/mecanismo (qualquer camada de guarda, não só inference-mitigation): antes de fechar, perguntar explicitamente 'de que isto depende para valer?' e provar ISSO também — enumerar pressupostos até fechar (mesmo padrão da REGRA DE ADMISSÃO). E desconfiar especificamente do que TODA fixture usa como pano de fundo/dado fixo (matriz, config, política) — é o ponto cego estrutural, não um acaso desta rodada. Aplicar antes da 1ª passada adversarial, não descobrir na 7ª."
-review_after: 2026-10-18
+review_after: 2027-01-18
 conflict_class: static
 significance: "Achamos, com lastro em oito passadas reais (não teorizado), a forma do próprio ponto cego adversarial — e a regra que ele gerou hoje só vale dentro de um documento; esta migalha é o que a torna reusável no próximo."
 ---
@@ -33,12 +33,18 @@ fundo/dado fixo não é observado** — por isso a política escapou sete passad
   regra de admissão foi virada contra a própria política.
 - **A regra de admissão que consolidou o padrão** ("todo mecanismo introduzido para fechar um furo entra
   provando-se — com fixture própria E com a integridade dos seus PRESSUPOSTOS provada pelo mesmo rigor")
-  vive hoje só como cláusula LOCAL desse contrato — em
-  `docs/knowledge-base/concepts/inference-mitigation.md` (seção "🔒 REGRA DE ADMISSÃO"). Por viver só ali,
-  não alcança o próximo contrato/mecanismo que alguém for escrever — é exatamente o motivo desta migalha.
+  nasceu como cláusula LOCAL desse contrato, em
+  `docs/knowledge-base/concepts/inference-mitigation.md` (seção "🔒 REGRA DE ADMISSÃO").
+- **Estado em 2026-10-20 (re-teste):** a regra saiu da cláusula local. Tem 2ª aplicação em `onion-guardrails.md`
+  §8.4 (l.277, "REGRA DE ADMISSÃO — os pressupostos do próprio gate, enumerados"), que a aplica à REGRA 42, e o
+  corolário está em `onion-dogfooding-doctrine.md`. Ainda falta na forja de guardas: `guard-doctrine.md`,
+  `forge-guard.md` e `forge.md` não citam a regra nem os pressupostos (grep = 0). É ali que ela alcançaria o
+  próximo mecanismo por construção.
 
 ## Next crumb
 Ver `next_recommended`. Em resumo: ao escrever ou revisar qualquer novo mecanismo de guarda, perguntar
 "de que isto depende para valer?" recursivamente até fechar a enumeração de pressupostos, e tratar com
 suspeita elevada qualquer coisa que as fixtures tratam como config/dado fixo em vez de como algo a provar —
 esse é precisamente o disfarce que durou sete passadas da última vez.
+
+## Re-testada em 2026-10-20 — PARCIAL: (static) o Signal vale. O Evidence foi atualizado: a regra já tem 2ª aplicação (guardrails §8.4), mas não chegou à forja de guardas.

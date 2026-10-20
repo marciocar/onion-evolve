@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Desenhar o farol-organizador: (1) beacon grava `worktree:` e o `check` compara por ÁRVORE, não por clone — alarme só quando é a MESMA árvore (muito menos ruído); (2) verbo de coordenação com 3 saídas human-gated: 🌿 isolar em worktree (default), 🤝 ceder/read-only, 🧹 sweep; (3) BUG a corrigir junto: o hook periódico de beacon reescreve o hat como `—`, perdendo a intenção de escrita declarada. Candidato de backlog delicado-core (mexe no farol soberano — fixture + selftest + re-dogfood)."
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -42,8 +42,15 @@ sessão alheia fresca, e a skill só avisa *"coordene com o maestro"*. Falta a s
   intenção de escrita que a sessão tinha declarado. A superfície de "declarar o que estou fazendo"
   existe (`up <repo> <sid> [hat]`) mas é apagada pelo próprio refresh.
 
+- **Estado em 2026-10-20 (re-teste):** (1) feito: `session-beacon.sh` l.64-66 resolve a árvore canônica do
+  beacon (key-by-worktree), e a l.216 grava o `hat`. (3) feito: l.193-199 preservam o hat nos refreshes sem arg.
+  O 🧹 sweep foi cabeado no hook (`session-beacon-hook.sh` l.35-38). Do (2) falta o verbo de coordenação
+  🌿 isolar / 🤝 ceder: os subcomandos do script são `up`, `down`, `check` e `sweep`.
+
 ## Next crumb
-Ver `next_recommended`. É mudança no farol SOBERANO (mesma classe de cautela do `kg-radar`): pegar
+Ver `next_recommended`. Em 2026-10-20 resta só o verbo 🌿 isolar / 🤝 ceder. É mudança no farol SOBERANO (mesma classe de cautela do `kg-radar`): pegar
 FRESCO, com fixture + selftest + re-dogfood antes/depois. Origem: pergunta do maestro nesta sessão
 ("quando já tem beacons/sessões abertas, dá pra saber se quer organizar, trazer p/ uma só, ou levar
 p/ worktree?") — a resposta virou esta doutrina de coordenação por árvore.
+
+## Re-testada em 2026-10-20 — PARCIAL: (static) 2 dos 3 itens e o sweep entraram (ver Evidence). Falta o verbo de coordenação.

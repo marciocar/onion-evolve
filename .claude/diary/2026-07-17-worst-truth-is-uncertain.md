@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -25,3 +25,5 @@ Diretiva do maestro (verbatim): **"A pior verdade é aquela que não temos certe
 
 ## Next crumb
 Ao achar caso novo da família: nunca reportar número/veredito sem citar a fonte consultável (id de nó > `arquivo:linha` > grep); na dúvida → `hypothesis`, nunca `confirmed`. A governança da família **manda** atualizar a tabela em `docs/knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md` — e cada membro **pareia com um guard determinístico** (prosa sozinha não é membro).
+
+## Re-testada em 2026-10-20: (static) absorvida na KB `docs/knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md` ("certeza é CAMPO, não TOM"). Correção de caminho: o re-teste anterior citava `concepts/verify-read-path-first.md`, que não existe; o arquivo vive em `agentic-patterns/ai-strategies/`.

@@ -52,6 +52,11 @@ estado em que ela os deixou**:
    viva(s) com proveniência ancorada"*. Advisory aditivo, como a Trilha prescrevia.
 2. **S4 — `onion-orchestration` cabeado no `/meta:kg`: FEITO** (citado no comando).
 3. **Trilha-no-KG — EXISTE** em 2 grafos (campo forward presente).
+   > **Correção em 2026-10-20:** esta afirmação é falsa no vivo. As arestas dos `.kg.yaml` do repo são SUPPORTS,
+   > TRACES_TO, CONSTRAINS, DEPENDS_ON, SUPERSEDES, CAUSES, REFUTES e as de domínio. Nenhuma é de Trilha, e não
+   > há campo forward nos nós: o único `next_recommended:` dentro de um grafo é citação num `locator:`
+   > (`graduated-automation-elenxo-2026-07.kg.yaml` l.159). A KB `breadcrumb-patterns.md` l.87-89 diz o mesmo:
+   > a Trilha no KG é aspiração não-construída. O item 3 segue aberto. O texto original fica para a vitrine do erro.
 
 **Por que a data mudou para 2026-11-17 e não fechei a migalha:** o corpo dela não é só a
 lista de três itens — é o inventário da máquina epistêmica (runtime graduado, doutrina de

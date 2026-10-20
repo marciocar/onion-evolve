@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: ""
-review_after: 2026-10-16
+review_after: 2027-01-18
 conflict_class: dynamic
 significance: "Rodei o dogfood que reabriria um NÃO CONSTRUIR de 14 dias e o resultado foi 3/3 NÃO MUDOU — a sessão-controle achou o grafo sozinha nos três casos, uma delas citando nó com arquivo:linha. O gate não reabre. E o desenho do meu teste tinha um limite que eu só vi depois: testei 'acha quando perguntado', não 'consulta enquanto ocupado' — que é o modo de falha real."
 ---
@@ -52,3 +52,20 @@ muda a **AÇÃO** — não a resposta.
 A/B na forma tarefa-versus-nó (e aí há dado novo), ou o gate continua fechado por ausência de
 evidência — nunca por esquecimento. Se em três meses ninguém rodou, isso também é dado: quer
 dizer que a dor não é grande o bastante para pagar o teste, e o `NÃO CONSTRUIR` vira definitivo.
+
+## Estado em 2026-10-20 (re-teste)
+
+**O A/B de 08-16 segue válido como evidência:** injetar o veredito no `SessionStart` não mudou decisão em pergunta
+dirigida. **O "NÃO CONSTRUIR vira definitivo" está superado.** Uma cura de outra forma foi construída: o
+`.claude/hooks/kg-read-leg.sh` (`5930e7c9`, 2026-09-16), ligado no `PreToolUse` de Read e Bash
+(`settings.json` l.195). Quando a sessão lê um arquivo que algum nó aponta por `trace:`, ele injeta "🗺️ O CORPUS
+JÁ FALA DESTE ARQUIVO" com os ids dos nós. É um ponteiro por arquivo no meio da tarefa, que é justamente o modo de
+falha que o meu A/B não testava ("consulta enquanto ocupado"). Ele nasceu de sinal de campo de 2026-09-11, não do
+A/B tarefa-versus-nó que eu tinha nomeado. Disparou ao vivo várias vezes neste próprio re-teste.
+
+**Selo do maestro (2026-10-20, `/meta:decide`, escolhida «Supera»):** o `kg-read-leg.sh` supera
+`D_build_none_of_three`. O selo é o nó `D_KG_READ_LEG_HOOK_SUPERA_NENHUMA_DAS_TRES`, com aresta SUPERSEDES, em
+`docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml`, entregue pelo PR #1217. Na hora deste
+re-teste o PR estava aberto, e em `origin/main` o `D_build_none_of_three` ainda aparecia `confirmed`.
+
+## Re-testada em 2026-10-20 — PARCIAL: (dynamic, observei o artefato disparar) o hook `kg-read-leg.sh` está ligado e injeta o ponteiro no `PreToolUse`. O maestro selou que ele supera o `D_build_none_of_three` (PR #1217). O A/B de 08-16 fica como evidência do que a injeção no `SessionStart` não faz.

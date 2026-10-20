@@ -8,7 +8,7 @@ affects: [meta, method, federation]
 breadcrumb_for: [meta:co-announce, meta:co-evolve, warm-up, catch-up]
 share_with: []
 next_recommended: "2026-07-16-kg-sdaal-dogfood-gold-backlog"
-review_after: 2026-10-15
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -44,3 +44,5 @@ artefato (`arquivo §seção`), checar que ele existe **no repo** antes de gerar
 DEV↔PROD aplicada ao próprio carteiro. Candidato **gated** (`gated-until-trigger`): este é o **1º**
 near-miss registrado dessa classe no doc-bridge — se repetir, o gatilho disparou e vira guarda
 determinística. Ver `[[2026-07-16-kg-sdaal-dogfood-gold-backlog]]` para a fila do eixo KG.
+
+## Re-testada em 2026-10-20: (static) a seção existe: `knowledge-graph-sdaal.md` l.322 "## SSOT-as-runtime". O next crumb (o co-announce verificar a existência do artefato citado) segue aberto: a REGRA 95 (Anúncio que afirma ZERO sobre classe verificável sem medição), em `lint-artifacts.sh` l.2809, cobre a afirmação de zero, não a existência do artefato.

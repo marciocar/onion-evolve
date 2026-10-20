@@ -8,7 +8,7 @@ affects: [meta, engineering, security]
 breadcrumb_for: []
 share_with: [granaai, metagamify]
 next_recommended: "Guardrails no core: a superfície /meta:guardrails (índice de leitura vs DSL) segue GATED/fora de escopo (fio #4 do promotion-plan). Se um comando de research/produto passar a ingerir conteúdo externo, referenciar common:prompts:untrusted-content-provenance (não recopiar). Ao evoluir a2a-accept/co-relay, preservar o invariante 'a2a-accept nunca inlineia o corpo' — é o que faz C1 ser R15.1-by-construction."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 ---
 
@@ -45,3 +45,5 @@ gated" é sobre **impossível-por-construção**, não sobre aplicar o mesmo mec
 menor-risco→maior (docs→helpers→naming→wire-in→comportamental) permitiu que cada refinação fosse achada e
 registrada sem quebrar transporte vivo. Superfície `/meta:guardrails` segue gated. Doutrina completa:
 `docs/knowledge-base/concepts/onion-guardrails.md` + `onion-r-taxonomy.md`.
+
+## Re-testada em 2026-10-20: (static) a superfície `/meta:guardrails` segue sem existir (gated); `common/prompts/untrusted-content-provenance.md` existe; o invariante do `a2a-accept` foi preservado e endurecido em `e97fe410` ("o aceite reverifica o envelope, e o corpo chega à sessão só como dado").

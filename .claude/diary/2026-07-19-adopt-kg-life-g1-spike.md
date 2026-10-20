@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: "FORK FECHADO (ver ## Resolução): NÃO construir /meta:adopt --mode kg agora — seria mecanismo SEM consumidor. O único adotante-KG real (marcio-pessoal) já roteia AO REDOR do adopt por 2 caminhos vivos: (1) método-por-referência (kg-radar do source contra ~/onion-pessoal/, onion_version:n/a no members.yaml) + (2) o APP com motor PRÓPRIO em JS (kgRadar.ts/kgStore.ts/deid.ts, zero-knowledge provado). O role `personal`+`kg_minimal` fica DESENHADO+TESTADO na prateleira (este diário), gated num 2º adotante-KG real que queira vendor-em-vez-de-app. Modernization Doctrine veta construir p/ adotante hipotético (C_ORBIT_CAVEAT). O que DESTRAVA valor não é adopt-para-KG — é a F2 do core (SSOT 6-camadas de inferência), que o app toca por cima (de-id v1) mas não substitui."
-review_after: 2026-10-19
+review_after: 2027-01-18
 conflict_class: static
 significance: "Primeira vez que um spike do core concluiu NÃO CONSTRUIR — provou que o gap G1 não tem consumidor e economizou a fábrica inteira; é a Modernization Doctrine funcionando como freio, não como slogan."
 ---
@@ -59,3 +59,5 @@ Spike de gap = **construir o alvo mínimo real + rodar a camada determinística 
 teorizar da leitura. E ao propor a extensão, **testar a extensão contra o resolver/guard reais** antes de
 afirmar "encaixa". Régua Aristóteles aplicada: transfere o motor de KG/stamp/federação-pesquisa; desenha
 fresh o instrumento/bundle/durabilidade.
+
+## Re-testada em 2026-10-20: (static) `members.yaml` l.422-423: `marcio-pessoal` segue `role: standalone` e `kind: method` (adota o método, não vendoriza). `roles.yaml` não tem role `personal` nem `kg_minimal`, então o NÃO CONSTRUIR segue de pé. O app tem motor próprio (`~/onion-pessoal-app/kgRadar.ts`), e nenhum 2º adotante-KG apareceu.
