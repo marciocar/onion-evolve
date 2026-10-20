@@ -293,6 +293,121 @@ try:
         finally:
             stop(s, th)
         return st2 == 429 and out == [200], f"segundo={st2} primeiro={out}"
+
+    # ── diarização com um diarizador FALSO (sh, só builtins: o PATH do filho é /nonexistent) ─────────────────
+    def fake_diar(body):
+        d = tempfile.mkdtemp(dir=TMP)
+        p = os.path.join(d, "nemo-speech")
+        with open(p, "w") as f:
+            f.write("#!/bin/sh\n" + body + "\n")
+        os.chmod(p, 0o755)
+        m = os.path.join(d, "model.gguf")
+        open(m, "wb").close()
+        return ["--diar-bin", p, "--diar-model", m]
+
+    OK_RTTM = ('o=""; prev=""; for a in "$@"; do [ "$prev" = -o ] && o="$a"; prev="$a"; done\n'
+               'printf "SPEAKER onion-stt 1 0.000 0.300 <NA> <NA> speaker_1 <NA> <NA>\\n" > "$o"')
+
+    def dg(base, q="diarize=true"):
+        st, b = req(base + "/v1/listen?" + q, wav(1), AUTH)
+        d = json.loads(b) if st == 200 else {}
+        words = d.get("results", {}).get("channels", [{}])[0].get("alternatives", [{}])[0].get("words", []) if d else []
+        decl = (d.get("metadata") or {}).get("onion_diarization") if d else None
+        return st, words, decl
+
+    @case("srv-diarize-deepgram-speaker-por-palavra")
+    def _():
+        s, th, base = serve(fake_diar(OK_RTTM))
+        try:
+            st, words, decl = dg(base)
+            st0, words0, decl0 = dg(base, "x=1")
+        finally:
+            stop(s, th)
+        ok = st == 200 and words and words[0].get("speaker") == 0 and decl and decl[0]["status"] == "ok" \
+            and st0 == 200 and "speaker" not in words0[0] and decl0 is None
+        return ok, f"status={st} words={words} decl={decl} sem-pedido={words0} {decl0}"
+
+    @case("srv-diarize-falha-nao-derruba-a-transcricao")
+    def _():
+        s, th, base = serve(fake_diar("exit 1"))
+        try:
+            st, words, decl = dg(base)
+        finally:
+            stop(s, th)
+        ok = st == 200 and words and words[0]["punctuated_word"] == "Olá." and "speaker" not in words[0] \
+            and decl and decl[0]["status"] == "failed" and "rc=1" in decl[0]["reason"]
+        return ok, f"status={st} words={words} decl={decl}"
+
+    @case("srv-diarize-excecao-nao-derruba-a-transcricao")
+    def _():
+        real = srv.core.diarize
+
+        def boom(*_a, **_k):
+            raise RuntimeError("explodiu")
+        srv.core.diarize = boom
+        s, th, base = serve(fake_diar(OK_RTTM))
+        try:
+            st, words, decl = dg(base)
+        finally:
+            stop(s, th)
+            srv.core.diarize = real
+        return st == 200 and words and decl and decl[0]["status"] == "failed", f"status={st} decl={decl}"
+
+    @case("srv-diarize-openai-verbose-com-falante")
+    def _():
+        s, th, base = serve(fake_diar(OK_RTTM))
+        bnd = "XbndX"
+        def mp(fmt):
+            return (f"--{bnd}\r\nContent-Disposition: form-data; name=\"response_format\"\r\n\r\n{fmt}\r\n"
+                    f"--{bnd}\r\nContent-Disposition: form-data; name=\"diarize\"\r\n\r\ntrue\r\n"
+                    f"--{bnd}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"a.wav\"\r\nContent-Type: audio/wav\r\n\r\n").encode() \
+                + wav(1) + f"\r\n--{bnd}--\r\n".encode()
+        hdr = {"Authorization": "Bearer " + TOK, "Content-Type": f"multipart/form-data; boundary={bnd}"}
+        try:
+            st, b = req(base + "/v1/audio/transcriptions", mp("verbose_json"), hdr)
+            st_json, _ = req(base + "/v1/audio/transcriptions", mp("json"), hdr)
+        finally:
+            stop(s, th)
+        d = json.loads(b) if st == 200 else {}
+        ok = st == 200 and d["diarization"]["status"] == "ok" and d["segments"][0]["speaker"] == 0 \
+            and d["segments"][0]["words"][0]["speaker"] == 0 and st_json == 400
+        return ok, f"status={st} json={st_json} {b[:200]!r}"
+
+    @case("srv-diarize-sem-diarizador-declara-unavailable")
+    def _():
+        s, th, base = serve()
+        try:
+            st, words, decl = dg(base)
+        finally:
+            stop(s, th)
+        return st == 200 and words and decl and decl[0]["status"] == "unavailable", f"status={st} decl={decl}"
+
+    @case("srv-diarize-acima-do-teto-declara-skipped")
+    def _():
+        s, th, base = serve(fake_diar(OK_RTTM) + ["--diar-max-s", "0.5"])
+        try:
+            st, words, decl = dg(base)
+        finally:
+            stop(s, th)
+        return st == 200 and words and "speaker" not in words[0] and decl and decl[0]["status"] == "skipped", f"status={st} decl={decl}"
+
+    @case("srv-diarize-boot-recusa-diarizador-ausente")
+    def _():
+        tf = os.path.join(TMP, "tok")
+        with open(tf, "w") as f:
+            f.write(TOK)
+        os.chmod(tf, 0o600)
+        import contextlib
+        with contextlib.redirect_stderr(io.StringIO()):
+            rc = srv.main(["--model-dir", TMP, "--vad-dir", TMP, "--token-file", tf,
+                           "--diar-bin", os.path.join(TMP, "nao-existe"), "--diar-model", tf])
+        try:
+            with contextlib.redirect_stderr(io.StringIO()):
+                srv.parse_args(["--model-dir", "x", "--vad-dir", "x", "--diar-bin", "y"])
+            pair = False
+        except SystemExit:
+            pair = True
+        return rc == 2 and pair, f"rc={rc} par-exigido={pair}"
 except Stop:
     pass
 

@@ -144,6 +144,78 @@ def run_checks(base, token, fixture, meta, expect_sha, expect_core_sha=""):
         check_words("Deepgram", alt.get("words", []), dur)
 
 
+def speaker_agreement(words, turns, key_start="start", key_end="end"):
+    """Concordância das palavras com os turnos de referência (rótulos A, B…): cada palavra cai no turno que contém o seu
+    ponto médio; o rótulo de referência vira o falante MAIS frequente das palavras dele; devolve (fração das palavras
+    que batem com esse mapa, nº de falantes distintos no mapa, o mapa). Dois rótulos no mesmo falante não contam como
+    acerto: o mapa tem de ser injetivo."""
+    by_ref, placed = {}, []
+    for w in words:
+        mid = (w.get(key_start, 0) + w.get(key_end, 0)) / 2
+        ref = next((t["speaker"] for t in turns if t["start"] - 0.25 <= mid <= t["end"] + 0.25), None)
+        if ref is None:
+            continue
+        placed.append((ref, w.get("speaker")))
+        by_ref.setdefault(ref, {}).setdefault(w.get("speaker"), 0)
+        by_ref[ref][w.get("speaker")] += 1
+    mapping = {r: max(c, key=c.get) for r, c in by_ref.items()}
+    if None in mapping.values() or len(set(mapping.values())) != len(mapping):
+        return 0.0, len(set(v for v in mapping.values() if v is not None)), mapping
+    hit = sum(1 for r, s in placed if mapping.get(r) == s)
+    return (hit / len(placed) if placed else 0.0), len(set(mapping.values())), mapping
+
+
+def run_diar_checks(base, token, fixture, meta):
+    """O fixture de 2 falantes pelas duas rotas com diarize: status ok declarado, falante em cada palavra, os turnos de
+    referência no MESMO falante quando são do mesmo rótulo e em falantes diferentes quando não são."""
+    st, hb = request(f"{base}/health", timeout=10)
+    try:
+        hd = (json.loads(hb).get("diarization") or {}) if st == 200 else {}
+    except ValueError:
+        hd = {}
+    (ok if hd.get("available") is True else bad)(f"/health declara a diarização disponível ({hd.get('engine')}, {hd.get('preset')})")
+    audio = open(fixture, "rb").read()
+    turns, need = meta["turns"], meta["min_speaker_agreement"]
+    n_ref = len({t["speaker"] for t in turns})
+    st, b = request(f"{base}/v1/listen?language=pt-BR&diarize=true", audio,
+                    {"Content-Type": "audio/flac", "Authorization": "Token " + token}, timeout=600)
+    if st != 200:
+        bad(f"Deepgram diarize: HTTP {st}")
+    else:
+        d = json.loads(b)
+        decl = (d.get("metadata") or {}).get("onion_diarization") or [{}]
+        try:
+            alt = d["results"]["channels"][0]["alternatives"][0]
+        except (KeyError, IndexError, TypeError):
+            alt = {}
+        words = alt.get("words", [])
+        rc = recall(meta["reference"], alt.get("transcript", ""))
+        (ok if rc >= meta["min_word_recall"] else bad)(f"Deepgram diarize: recall {rc:.2f} (mínimo {meta['min_word_recall']}): a transcrição segue inteira")
+        if decl[0].get("status") != "ok":
+            bad(f"Deepgram diarize: status {decl[0].get('status')!r} ({decl[0].get('reason', '')[:120]})")
+        elif not words or any(not isinstance(w.get("speaker"), int) for w in words):
+            bad("Deepgram diarize: palavra sem speaker inteiro")
+        else:
+            ag, n, _ = speaker_agreement(words, turns)
+            (ok if ag >= need and n == n_ref else bad)(f"Deepgram diarize: {n} falante(s) (referência {n_ref}), concordância {ag:.2f} (mínimo {need})")
+    body_mp, ctype = multipart({"response_format": "verbose_json", "language": "pt", "diarize": "true"}, os.path.basename(fixture), audio)
+    st, b = request(f"{base}/v1/audio/transcriptions", body_mp, {"Content-Type": ctype, "Authorization": "Bearer " + token}, timeout=600)
+    if st != 200:
+        bad(f"OpenAI diarize: HTTP {st}")
+    else:
+        d = json.loads(b)
+        segs = d.get("segments", [])
+        words = [w for s in segs for w in s.get("words", [])]
+        if (d.get("diarization") or {}).get("status") != "ok":
+            bad(f"OpenAI diarize: status {(d.get('diarization') or {}).get('status')!r}")
+        elif not segs or any(not isinstance(s.get("speaker"), int) for s in segs) \
+                or any(w.get("speaker") != s.get("speaker") for s in segs for w in s.get("words", [])):
+            bad("OpenAI diarize: segmento sem speaker, ou palavra com falante diferente do seu segmento")
+        else:
+            ag, n, _ = speaker_agreement(words, turns)
+            (ok if ag >= need and n == n_ref else bad)(f"OpenAI diarize: {n} falante(s) (referência {n_ref}), concordância {ag:.2f} (mínimo {need})")
+
+
 def check_egress():
     """A unit nega rede de saída: conectar a um IP público TEM de falhar (e rápido, sem DNS)."""
     for ip in ("1.1.1.1", "8.8.8.8"):
@@ -170,6 +242,7 @@ def main(argv=None):
     g.add_argument("--url")
     g.add_argument("--serve", nargs=argparse.REMAINDER)
     ap.add_argument("--fixture", required=True)
+    ap.add_argument("--diar-fixture", default="", help="o fixture de 2 falantes: liga a prova da diarização nas duas rotas")
     ap.add_argument("--expect-sha", default="")
     ap.add_argument("--expect-core-sha", default="")
     ap.add_argument("--token-file", default=None)
@@ -206,6 +279,8 @@ def main(argv=None):
         else:
             base = a.url.rstrip("/")
         run_checks(base, token, a.fixture, meta, a.expect_sha, a.expect_core_sha)
+        if a.diar_fixture:
+            run_diar_checks(base, token, a.diar_fixture, json.load(open(a.diar_fixture.rsplit(".", 1)[0] + ".json", encoding="utf-8")))
         if not a.no_egress_check:
             check_egress()
         return 1 if FAILS else 0

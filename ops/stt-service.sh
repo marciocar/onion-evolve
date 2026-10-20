@@ -17,17 +17,17 @@
 #
 #   install sem --apply é ENSAIO: confere as premissas da máquina (python 3.12, ensurepip, ffmpeg, systemd, disco, a
 #   porta), confere os pins contra as FONTES OFICIAIS (cada hash do ops/stt/requirements.lock existe no PyPI para
-#   aquela versão; cada arquivo do modelo e do VAD tem, na revisão fixada do Hugging Face, o sha256 e o tamanho
-#   fixados aqui), renderiza a unit e mostra a diferença para a instalada. Se a área de instalação já estiver montada
+#   aquela versão; cada arquivo do modelo, do VAD e do diarizador tem, na revisão fixada do Hugging Face, o sha256 e o
+#   tamanho fixados aqui; o asset do NeMo-Speech.cpp tem, no release fixado do GitHub, o digest e o tamanho fixados), renderiza a unit e mostra a diferença para a instalada. Se a área de instalação já estiver montada
 #   (um --apply anterior), roda também a prova completa numa unit TRANSITÓRIA com o sandbox da unit renderizada. Nada
 #   persistente é escrito.
 #   verify é só leitura: a unit ativa e gerada por este wrapper, os limites efetivos (memória, rede, sandbox), a porta
 #   escutando SÓ em loopback, o /health servindo o código do repositório e, numa unit transitória com o token por
 #   LoadCredential= (o operador nunca o segura): 401 sem token, com token errado e com esquema estranho, e o fixture
-#   pt-BR transcrito pelas duas rotas com palavras e tempos.
+#   pt-BR transcrito pelas duas rotas com palavras e tempos, e o fixture de 2 falantes diarizado pelas duas rotas.
 #
 # O QUE O install --apply FAZ: trava → pré-voo → montagem ADITIVA e endereçada por conteúdo em /opt/onion-stt
-# (models/<repo>@<rev12>, venv-<hash do lock>, code-<hash do código>; diretório que já existe com o marcador de
+# (models/<repo>@<rev12>, bin/nemo-speech-<versão>-cpu@<sha12>, venv-<hash do lock>, code-<hash do código>; diretório que já existe com o marcador de
 # completo é reusado, sem marcador é refeito) → o token em /etc/onion-stt/token se ainda não existir (gerado DENTRO do
 # root, 0600, nunca impresso nem em argv) → a prova completa numa unit TRANSITÓRIA com o sandbox novo (falhou: a unit
 # de produção nem foi tocada) → backup da unit anterior → instala, daemon-reload, enable, restart → /health e verify.
@@ -71,8 +71,25 @@ VAD_FILES=(
   "silero_vad.onnx sha256 1a153a22f4509e292a94e67d6f9b85e8deb25b4988682b7e174c65279d8788e3 2327524"
   "config.json gitsha1 b7ef67b9ec211c85993c5f6649bdeeac4b445d1e 30"
 )
-CODE_FILES=( server.py stt_core.py smoke.py fixtures/fleurs-ptbr-8821974356183732066.flac fixtures/fleurs-ptbr-8821974356183732066.json )
+# Diarização (2026-10-20, D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019, selo de 2026-10-19 em Q_DIARIZACAO_SHERPA_X_SORTFORMER_1017):
+# o Nemotron-3-Diarization q8_0 (OpenMDW-1.1, aceita para uso interno) pelo NeMo-Speech.cpp 0.2.0 (NVIDIA, Apache-2.0),
+# preset v3-offline, em CPU, sem token, DEPOIS do Parakeet. O binário é conferido pelo digest que a API do GitHub publica
+# para o asset do release; o gguf, pela revisão fixada do Hugging Face (a mesma régua do Parakeet).
+DIAR_BIN_REPO=NVIDIA/NeMo-Speech.cpp
+DIAR_BIN_TAG=v0.2.0
+DIAR_BIN_ASSET=nemo-speech-0.2.0-linux-x86_64-cpu.tar.gz
+DIAR_BIN_SHA256=f396057150f1b774935c7414fd32ebc04195a795a34120d78d8c9ecefa1b7507
+DIAR_BIN_SIZE=6683477
+DIAR_BIN_REL=nemo-speech-0.2.0-linux-x86_64-cpu/bin/nemo-speech
+DIAR_MODEL_REPO=nvidia/Nemotron-3-Diarization
+DIAR_MODEL_REV=f667ed73aee57d40cc39428eb768b4fd87a0a29e
+DIAR_MODEL_FILES=(
+  "Nemotron-3-Diarization.q8_0.gguf sha256 08456d9e22cd9a323c0364d98375f3746d6e68507ebb705cd46438c534c7a3a1 107012128"
+)
+CODE_FILES=( server.py stt_core.py smoke.py fixtures/fleurs-ptbr-8821974356183732066.flac fixtures/fleurs-ptbr-8821974356183732066.json
+             fixtures/fleurs-ptbr-2spk-aba.flac fixtures/fleurs-ptbr-2spk-aba.json )
 FIXTURE=fixtures/fleurs-ptbr-8821974356183732066.flac
+DIAR_FIXTURE=fixtures/fleurs-ptbr-2spk-aba.flac
 
 # ── a configuração MEDIDA (grafo meeting-capture-2026-10, E_MC_STT_SERVICO_CORE_MEDIDO_1017) ────────────────────
 INTRA_OP=4          # sonda de threads da curadoria: intra 4 / 1 worker é o mais estável nesta VM de 8 vCPU
@@ -83,7 +100,11 @@ MAX_BODY_MB=384
 MAX_AUDIO_S=10800   # teto da duração DECODIFICADA por canal (3 h): 4 MB de FLAC de silêncio eram 6 h e +2,7 GB (refutador)
 MEMORY_MAX=6G       # teto do cgroup; sem swap (MemorySwapMax=0): estourou, o kernel mata e o systemd reinicia
 MEMORY_MAX_BYTES=6442450944
-MIN_FREE_KB=$(( 3 * 1024 * 1024 ))   # disco livre exigido para montar (~0,7 GB de modelo + ~0,2 GB de venv, com folga)
+DIAR_MAX_S=10800    # duração máxima diarizada (= o teto do serviço). O pior caso cabe no MemoryMax: ver DIAR_MEMORY abaixo
+# DIAR_MEMORY (medido em 2026-10-20, fora de unit, nesta VPS): o filho do v3-offline cresce ~0,31 MB por segundo de áudio
+# (3,44e9 B em 3 h); o servidor solta o float32 ANTES de o filho subir. Pico da árvore no pior caso: ver o nó
+# E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020 do grafo meeting-capture-2026-10.
+MIN_FREE_KB=$(( 3 * 1024 * 1024 ))   # disco livre exigido para montar (~0,8 GB de modelos + ~0,2 GB de venv + 7 MB do diarizador, com folga)
 
 say()  { printf '[%s] %s\n' "${NAME}" "$*"; }
 die()  { local rc="$1"; shift; printf '[%s] ERRO: %s\n' "${NAME}" "$*" >&2; exit "${rc}"; }
@@ -144,6 +165,8 @@ CODE_ID="$(for f in "${CODE_FILES[@]}"; do printf '%s %s\n' "${f}" "$(sha256sum 
 LOCK_ID="$( { cat "${SRC}/pip.lock" "${SRC}/requirements.lock"; python3 -c 'import sys; print(sys.version.split()[0])'; } | h12)"
 MODEL_DIR="${ROOT}/models/parakeet-tdt-0.6b-v3-int8@${MODEL_REV:0:12}"
 VAD_DIR="${ROOT}/models/silero-vad@${VAD_REV:0:12}"
+DIAR_MODEL_DIR="${ROOT}/models/nemotron-3-diarization-q8_0@${DIAR_MODEL_REV:0:12}"
+DIAR_BIN_DIR="${ROOT}/bin/nemo-speech-0.2.0-cpu@${DIAR_BIN_SHA256:0:12}"
 VENV_DIR="${ROOT}/venv-${LOCK_ID}"
 CODE_DIR="${ROOT}/code-${CODE_ID}"
 TOKEN_FILE="${ETC}/token"
@@ -151,7 +174,9 @@ UNIT_FILE="${UNIT_DIR}/${UNIT}.service"
 SERVER_SHA="$(sha256sum < "${SRC}/server.py" | cut -d' ' -f1)"
 CORE_SHA="$(sha256sum < "${SRC}/stt_core.py" | cut -d' ' -f1)"
 SERVER_ARGS=( --host 127.0.0.1 --model-dir "${MODEL_DIR}" --vad-dir "${VAD_DIR}" --intra-op "${INTRA_OP}" --workers "${WORKERS}"
-              --queue-max "${QUEUE_MAX}" --vad-batch "${VAD_BATCH}" --max-body-mb "${MAX_BODY_MB}" --max-audio-s "${MAX_AUDIO_S}" )
+              --queue-max "${QUEUE_MAX}" --vad-batch "${VAD_BATCH}" --max-body-mb "${MAX_BODY_MB}" --max-audio-s "${MAX_AUDIO_S}"
+              --diar-bin "${DIAR_BIN_DIR}/${DIAR_BIN_REL}" --diar-model "${DIAR_MODEL_DIR}/Nemotron-3-Diarization.q8_0.gguf"
+              --diar-max-s "${DIAR_MAX_S}" )
 
 # as propriedades do sandbox: a MESMA lista vai para a unit e para a transitória do ensaio (o que se prova é o que roda)
 SANDBOX=(
@@ -174,6 +199,7 @@ ${MARKER}
 # GERADO por ops/stt-service.sh (core-only). Não edite à mão: rode o wrapper (install, depois verify).
 # STT em LOTE do core (Parakeet TDT 0.6b v3 int8 pelo onnx-asr): só 127.0.0.1:${PORT}, token por LoadCredential=,
 # sem rede de saída, modelo local (revisão ${MODEL_REV:0:12}), código ${CODE_ID}, ambiente ${LOCK_ID}.
+# Diarização opt-in por pedido: Nemotron-3-Diarization q8_0 (revisão ${DIAR_MODEL_REV:0:12}) pelo NeMo-Speech.cpp ${DIAR_BIN_TAG} (${DIAR_BIN_SHA256:0:12}).
 # REVERSÃO: sudo systemctl disable --now ${UNIT} && sudo rm ${UNIT_FILE} && sudo systemctl daemon-reload
 [Unit]
 Description=onion-vps-stt — STT em lote (Parakeet TDT 0.6b v3 int8), só em 127.0.0.1:${PORT}
@@ -210,7 +236,7 @@ transient_smoke() {
   local props=() p out rc
   for p in "${SANDBOX[@]}"; do props+=(-p "${p}"); done
   out="$(priv systemd-run --quiet --pipe --wait --collect "${props[@]}" "${VENV_DIR}/bin/python" -I -B "${CODE_DIR}/smoke.py" \
-         --fixture "${CODE_DIR}/${FIXTURE}" "$@" 2>&1)"; rc=$?
+         --fixture "${CODE_DIR}/${FIXTURE}" --diar-fixture "${CODE_DIR}/${DIAR_FIXTURE}" "$@" 2>&1)"; rc=$?
   printf '%s\n' "${out}" | sed 's/^/    /'
   if ! grep -qE '^n_fail=[0-9]+$' <<<"${out}"; then
     grep -q '^FALHA ' <<<"${out}" && { say "${label}: a prova morreu antes do fim (rc ${rc}), mas já tinha medido FALHA"; return 1; }
@@ -266,7 +292,7 @@ verify_live() {
   transient_smoke "verify" --url "http://127.0.0.1:${PORT}" --expect-sha "${SERVER_SHA}" --expect-core-sha "${CORE_SHA}"; vrc=$?
   [ "${vrc}" = 0 ] || return "${vrc}"
   nok="$(grep -c '' <<<"${show}")"
-  say "verify OK — ${UNIT} vivo (MainPID ${pid}), loopback, token exigido, fixture transcrito, MemoryMax ${MEMORY_MAX} (${nok} propriedades lidas)"
+  say "verify OK — ${UNIT} vivo (MainPID ${pid}), loopback, token exigido, fixture transcrito, 2 falantes diarizados, MemoryMax ${MEMORY_MAX} (${nok} propriedades lidas)"
 }
 if [ "${SUB}" = verify ]; then verify_live; exit $?; fi
 
@@ -291,7 +317,7 @@ fi
 
 staged() { priv test -f "$1/${COMPLETE}"; }
 need_stage=0
-for d in "${MODEL_DIR}" "${VAD_DIR}" "${VENV_DIR}" "${CODE_DIR}"; do staged "${d}" || need_stage=1; done
+for d in "${MODEL_DIR}" "${VAD_DIR}" "${DIAR_MODEL_DIR}" "${DIAR_BIN_DIR}" "${VENV_DIR}" "${CODE_DIR}"; do staged "${d}" || need_stage=1; done
 if [ "${need_stage}" = 1 ]; then
   pd="${ROOT}"; while [ ! -d "${pd}" ]; do pd="$(dirname "${pd}")"; done
   free_kb="$(df -Pk "${pd}" 2>/dev/null | awk 'NR==2{print $4}')"
@@ -341,9 +367,30 @@ check_pypi() {  # cada linha do lock: o hash existe no PyPI para aquela versão
   done < "${f}"
   return "${bad}"
 }
-say "pins do modelo (${MODEL_REPO}@${MODEL_REV:0:12}) e do VAD (${VAD_REPO}@${VAD_REV:0:12}) contra o Hugging Face:"
+check_gh_asset() {  # o release fixado publica o asset com o digest e o tamanho fixados (o digest é o da API do GitHub)
+  local api
+  api="$(curl -fsS -m 30 --proto '=https' -H 'Accept: application/vnd.github+json' \
+         "https://api.github.com/repos/${DIAR_BIN_REPO}/releases/tags/${DIAR_BIN_TAG}" 2>/dev/null)" \
+    || { say "NÃO MEDI: a API do GitHub não respondeu para ${DIAR_BIN_REPO}@${DIAR_BIN_TAG}"; return 2; }
+  python3 -c '
+import json, sys
+api, tag, name, digest, size = json.loads(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5])
+got_tag = api.get("tag_name")
+if got_tag != tag or api.get("draft") or api.get("prerelease"):
+    print(f"FALHA o release respondido ({got_tag}) não é o fixado, ou é rascunho/pré-release"); sys.exit(1)
+a = next((x for x in api.get("assets", []) if x.get("name") == name), None)
+if a is None or a.get("digest") != "sha256:" + digest or int(a.get("size") or -1) != size:
+    pub = None if a is None else (a.get("digest"), a.get("size"))
+    print(f"FALHA {name}: publicado {pub} != fixado sha256:{digest[:12]} ({size} B)"); sys.exit(1)
+print(f"OK {name} {digest[:12]} ({size} B)")' "${api}" "${DIAR_BIN_TAG}" "${DIAR_BIN_ASSET}" "${DIAR_BIN_SHA256}" "${DIAR_BIN_SIZE}" | sed 's/^/    /'
+  return "${PIPESTATUS[0]}"
+}
+say "pins do modelo (${MODEL_REPO}@${MODEL_REV:0:12}), do VAD (${VAD_REPO}@${VAD_REV:0:12}) e do diarizador (${DIAR_MODEL_REPO}@${DIAR_MODEL_REV:0:12}) contra o Hugging Face:"
 check_hf "${MODEL_REPO}" "${MODEL_REV}" "${MODEL_FILES[@]}"; r=$?; [ "${r}" = 0 ] || die "${r}" "pin do modelo não confere com a fonte oficial"
 check_hf "${VAD_REPO}" "${VAD_REV}" "${VAD_FILES[@]}"; r=$?; [ "${r}" = 0 ] || die "${r}" "pin do VAD não confere com a fonte oficial"
+check_hf "${DIAR_MODEL_REPO}" "${DIAR_MODEL_REV}" "${DIAR_MODEL_FILES[@]}"; r=$?; [ "${r}" = 0 ] || die "${r}" "pin do modelo de diarização não confere com a fonte oficial"
+say "pin do binário do diarizador (${DIAR_BIN_REPO} ${DIAR_BIN_TAG}, ${DIAR_BIN_ASSET}) contra o GitHub:"
+check_gh_asset; r=$?; [ "${r}" = 0 ] || die "${r}" "pin do binário do diarizador não confere com a fonte oficial"
 say "lock do ambiente contra o PyPI (pip.lock + requirements.lock):"
 check_pypi "${SRC}/pip.lock"; r=$?; [ "${r}" = 0 ] || die "${r}" "pip.lock não confere com o PyPI"
 check_pypi "${SRC}/requirements.lock"; r=$?; [ "${r}" = 0 ] || die "${r}" "requirements.lock não confere com o PyPI"
@@ -431,9 +478,29 @@ stage_code() {
   printf '%s\n' "${CODE_ID}" | priv tee "${CODE_DIR}/${COMPLETE}" >/dev/null
   say "montado ${CODE_DIR}"
 }
-priv install -d -m 0755 "${ROOT}" "${ROOT}/models" || die 2 "não criei ${ROOT}"
+stage_diar_bin() {  # o tarball do release: digest conferido ANTES de abrir; extraído pelo filtro `data` do tarfile
+  # (recusa caminho absoluto, `..`, link para fora e dispositivo; tira setuid e escrita de grupo/outros); o tarball sai
+  local tgz="${DIAR_BIN_DIR}/.download.tar.gz"
+  staged "${DIAR_BIN_DIR}" && { say "reusa ${DIAR_BIN_DIR}"; return 0; }
+  fresh_dir "${DIAR_BIN_DIR}" || return 1
+  priv curl -fsSL --proto '=https' --retry 3 -o "${tgz}" \
+    "https://github.com/${DIAR_BIN_REPO}/releases/download/${DIAR_BIN_TAG}/${DIAR_BIN_ASSET}" \
+    || { say "download falhou: ${DIAR_BIN_ASSET}"; return 1; }
+  digest_ok "${tgz}" sha256 "${DIAR_BIN_SHA256}" || { say "hash NÃO confere: ${tgz}"; return 1; }
+  priv python3 -I -c 'import sys, tarfile; tarfile.open(sys.argv[1], "r:gz").extractall(sys.argv[2], filter="data")' \
+    "${tgz}" "${DIAR_BIN_DIR}" || { say "extração recusada: ${DIAR_BIN_ASSET}"; return 1; }
+  priv rm -f -- "${tgz}"
+  priv chmod -R go-w "${DIAR_BIN_DIR}"
+  [ "$(priv "${DIAR_BIN_DIR}/${DIAR_BIN_REL}" --version 2>/dev/null)" = "nemo-speech ${DIAR_BIN_TAG#v}" ] \
+    || { say "o binário extraído não responde como nemo-speech ${DIAR_BIN_TAG#v}"; return 1; }
+  printf '%s@%s %s\n' "${DIAR_BIN_REPO}" "${DIAR_BIN_TAG}" "${DIAR_BIN_SHA256}" | priv tee "${DIAR_BIN_DIR}/${COMPLETE}" >/dev/null
+  say "montado ${DIAR_BIN_DIR} (digest conferido, extração filtrada)"
+}
+priv install -d -m 0755 "${ROOT}" "${ROOT}/models" "${ROOT}/bin" || die 2 "não criei ${ROOT}"
 stage_hf "${MODEL_DIR}" "${MODEL_REPO}" "${MODEL_REV}" "${MODEL_FILES[@]}" || die 1 "montagem do modelo falhou (a unit de produção não foi tocada)"
 stage_hf "${VAD_DIR}" "${VAD_REPO}" "${VAD_REV}" "${VAD_FILES[@]}" || die 1 "montagem do VAD falhou (a unit de produção não foi tocada)"
+stage_hf "${DIAR_MODEL_DIR}" "${DIAR_MODEL_REPO}" "${DIAR_MODEL_REV}" "${DIAR_MODEL_FILES[@]}" || die 1 "montagem do modelo de diarização falhou (a unit de produção não foi tocada)"
+stage_diar_bin || die 1 "montagem do diarizador falhou (a unit de produção não foi tocada)"
 stage_venv || die 1 "montagem do venv falhou (a unit de produção não foi tocada)"
 stage_code || die 1 "montagem do código falhou (a unit de produção não foi tocada)"
 

@@ -12,6 +12,13 @@ Rotas (todas sob /v1/ exigem o token — `Authorization: Bearer <t>` ou `Token <
                                    PCM cru com encoding=linear16&sample_rate&channels; multichannel=true separa os
                                    canais). É o lote do anarlog.
   GET  /health                     sem token: só prontidão e identidade do código (sha256 deste arquivo e do núcleo).
+DIARIZAÇÃO (opt-in por pedido, D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019): `diarize=true` na query do /v1/listen (como o
+Deepgram: `speaker` int por palavra) ou no campo `diarize` do multipart OpenAI (só com verbose_json: `speaker` por
+palavra e por segmento, e o segmento é cortado onde o falante muda). Roda DEPOIS do Parakeet, sobre o mesmo áudio, o
+Nemotron-3-Diarization q8_0 pelo NeMo-Speech.cpp 0.2.0 (preset v3-offline, CPU) num subprocesso sem PATH e dentro da
+unit sem rede de saída; o gguf é local. Falha, demora ou áudio acima do --diar-max-s NUNCA derrubam a transcrição: ela
+sai sem falante e o bloco `diarization` (OpenAI) ou `metadata.onion_diarization` (Deepgram), mais o cabeçalho
+X-Diarization, declaram ok|failed|skipped|unavailable e o motivo.
 NÃO HÁ ao vivo: o WS /v1/listen do adaptador da curadoria NÃO foi reescrito. A regra pré-registrada do
 VPS-STT-PROTOCOL.md deu N = 0 streams ao vivo nesta VPS sem GPU (D_MC_CAPTURA_WINDOWS_LOTE_VPS_1017); voltar a ele é
 nova medição, não flag a ligar.
@@ -36,6 +43,7 @@ import io
 import ipaddress
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -53,6 +61,7 @@ MODEL_REPO = "istupakov/parakeet-tdt-0.6b-v3-onnx"
 MODEL_UUID = str(uuid.uuid5(uuid.NAMESPACE_URL, MODEL_REPO))
 FFMPEG_FORMATS = "wav,flac,ogg,mp3,matroska,webm,mov,mp4,m4a,3gp,3g2,mj2,aac,opus,w64,caf,aiff"
 FFMPEG_TIMEOUT_S = 600
+DIAR_MAX_S_DEFAULT = 10800.0  # o teto da duração do serviço (3 h); o wrapper o fixa pelo que o MemoryMax comporta
 
 
 def out_size(p: str) -> int:
@@ -87,7 +96,15 @@ def parse_args(argv=None):
     ap.add_argument("--direct-max-s", type=float, default=25.0)
     ap.add_argument("--file-max-speech-s", type=float, default=30.0)
     ap.add_argument("--file-min-silence-ms", type=float, default=500.0)
+    ap.add_argument("--diar-bin", default=None, help="o nemo-speech da área do serviço (sem ele, diarize=true declara unavailable)")
+    ap.add_argument("--diar-model", default=None, help="o GGUF local do Nemotron-3-Diarization (nunca baixado em runtime)")
+    ap.add_argument("--diar-max-s", type=float, default=DIAR_MAX_S_DEFAULT,
+                    help="duração máxima diarizada; acima dela a resposta sai sem falante, declarando skipped")
     a = ap.parse_args(argv)
+    if bool(a.diar_bin) != bool(a.diar_model):
+        ap.error("--diar-bin e --diar-model andam juntos")
+    if a.diar_max_s <= 0:
+        ap.error("--diar-max-s tem de ser > 0")
     try:
         if not ipaddress.ip_address(a.host).is_loopback:
             ap.error(f"--host {a.host}: só loopback (o TLS e a exposição são do proxy)")
@@ -244,9 +261,51 @@ def build_app(a, engine, token: bytes):
             return chans
         return [np.mean(np.stack(chans), axis=0).astype(np.float32) if len(chans) > 1 else chans[0]]
 
+    diar_info = {"available": bool(a.diar_bin), "engine": "nemotron-3-diarization-q8_0" if a.diar_bin else None,
+                 "preset": "v3-offline", "max_s": a.diar_max_s}
+
+    class DiarJob:
+        """Um áudio a diarizar. A ORDEM é a da memória (medida: o filho do v3-offline cresce ~0,31 MB por segundo de
+        áudio, 3,44e9 B em 3 h): o WAV de 16 bits é escrito ANTES da transcrição (prepare), o float32 é solto pelo
+        chamador e só então o filho sobe (run). Nada aqui levanta: a diarização nunca derruba a transcrição."""
+
+        def __init__(self, audio, td: str, idx: int = 0):
+            self.dur = len(audio) / SR
+            self.td, self.wav, self.early = td, os.path.join(td, f"diar-in-{idx}.wav"), None
+            if not a.diar_bin:
+                self.early = core.DiarResult("unavailable", "diarization not configured on this server")
+            elif self.dur > a.diar_max_s:
+                self.early = core.DiarResult("skipped", f"audio longer than the diarization ceiling ({self.dur:.0f} s > {a.diar_max_s:.0f} s)")
+
+        def prepare(self, audio):
+            if self.early is not None:
+                return
+            try:
+                pcm = (np.clip(audio, -1.0, 1.0) * 32767.0).astype("<i2")
+                core.write_wav16(self.wav, memoryview(pcm).cast("B"), SR)
+            except Exception as e:  # noqa: BLE001 — a diarização nunca derruba a transcrição
+                self.early = core.DiarResult("failed", f"{type(e).__name__}: {str(e)[:160]}")
+
+        def run(self):
+            if self.early is not None:
+                return self.early
+            try:
+                return core.diarize(a.diar_bin, a.diar_model, self.wav, self.td, core.diar_timeout_s(self.dur))
+            except Exception as e:  # noqa: BLE001 — exceção do diarizador vira failed, nunca 500
+                return core.DiarResult("failed", f"{type(e).__name__}: {str(e)[:160]}")
+            finally:
+                try:
+                    os.unlink(self.wav)
+                except OSError:
+                    pass
+
+    def diar_requested(value) -> bool:
+        return str(value or "").lower() in core.TRUE_WORDS
+
     async def health(_request: Request):
         return JSONResponse({"ready": True, "engine": engine.info["name"], "live": False, "load_s": round(engine.load_s, 2),
-                             "vad_batch": a.vad_batch, "intra_op": a.intra_op, "workers": a.workers, **code_ids, **state})
+                             "vad_batch": a.vad_batch, "intra_op": a.intra_op, "workers": a.workers, "diarization": diar_info,
+                             **code_ids, **state})
 
     def busy():
         if state["inflight"] >= a.queue_max:
@@ -274,6 +333,12 @@ def build_app(a, engine, token: bytes):
             if fmt not in core.OPENAI_FORMATS:
                 return JSONResponse({"error": {"message": f"response_format {fmt} not supported", "type": "invalid_request_error"}}, status_code=400)
             language = form.get("language") or None
+            # diarização na forma OpenAI: campo `diarize` (extensão deste serviço; o verbose_json é a única forma com
+            # palavras e tempos, então é a única que a aceita). Sai `speaker` em cada palavra e em cada segmento.
+            want_diar = diar_requested(form.get("diarize"))
+            if want_diar and fmt != "verbose_json":
+                return JSONResponse({"error": {"message": "diarize requires response_format=verbose_json",
+                                               "type": "invalid_request_error"}}, status_code=400)
             raw = await f.read()
             try:
                 audio = (await run(decode_mono, raw, {}, False))[0]
@@ -282,13 +347,30 @@ def build_app(a, engine, token: bytes):
             except ValueError as e:
                 return JSONResponse({"error": {"message": str(e), "type": "invalid_request_error"}}, status_code=400)
             del raw
-            text, segments, dur, mode, proc = await run(engine.transcribe, audio)
+            td = tempfile.mkdtemp(prefix="diar-") if want_diar else None
+            try:
+                job = DiarJob(audio, td) if want_diar else None
+                if job is not None:
+                    await run(job.prepare, audio)
+                text, segments, dur, mode, proc = await run(engine.transcribe, audio)
+                del audio  # o float32 sai da memória ANTES de o diarizador subir
+                diar = (await run(job.run)) if job is not None else None
+            finally:
+                if td:
+                    shutil.rmtree(td, ignore_errors=True)
         finally:
             state["inflight"] -= 1
         state["served"] += 1
-        log(event="transcriptions", rid=rid, duration_s=round(dur, 2), proc_s=round(proc, 2), mode=mode, fmt=fmt)
+        log(event="transcriptions", rid=rid, duration_s=round(dur, 2), proc_s=round(proc, 2), mode=mode, fmt=fmt,
+            diar=diar.status if diar else None, diar_s=round(diar.proc_s, 2) if diar else None)
         hdr = {"X-Request-Id": rid, "X-Proc-S": f"{proc:.3f}", "X-Mode": mode}
+        if diar is not None:
+            hdr["X-Diarization"] = diar.status
+            if diar.status == "ok":
+                segments = core.diarize_segments(segments, diar.turns)
         body = core.openai_body(fmt, text, segments, dur, language)
+        if diar is not None:
+            body["diarization"] = diar.public()
         if fmt == "text":
             return PlainTextResponse(body, headers=hdr)
         return JSONResponse(body, headers=hdr)
@@ -305,6 +387,7 @@ def build_app(a, engine, token: bytes):
                 return JSONResponse({"err_code": "Bad Request", "err_msg": "empty body", "request_id": rid}, status_code=400)
             q = request.query_params
             multichannel = (q.get("multichannel") or "").lower() in core.TRUE_WORDS
+            want_diar = diar_requested(q.get("diarize"))  # como no Deepgram: com multichannel, cada canal à parte
             digest = hashlib.sha256(raw).hexdigest()
             try:
                 chans = await run(decode_mono, raw, q, multichannel)
@@ -313,18 +396,41 @@ def build_app(a, engine, token: bytes):
             except ValueError as e:
                 return JSONResponse({"err_code": "Bad Request", "err_msg": str(e), "request_id": rid}, status_code=400)
             del raw
-            out, proc_total, modes, dur = [], 0.0, [], 0.0
-            for audio in chans:
-                text, segments, dur, mode, proc = await run(engine.transcribe, audio)
-                proc_total += proc
-                modes.append(mode)
-                out.append(core.deepgram_channel(text, [w for s in segments for w in s["words"]]))
+            out, proc_total, modes, dur, diars = [], 0.0, [], 0.0, []
+            td = tempfile.mkdtemp(prefix="diar-") if want_diar else None
+            try:
+                for i in range(len(chans)):
+                    audio, chans[i] = chans[i], None
+                    job = DiarJob(audio, td, i) if want_diar else None
+                    if job is not None:
+                        await run(job.prepare, audio)
+                    text, segments, dur, mode, proc = await run(engine.transcribe, audio)
+                    del audio  # o float32 do canal sai da memória ANTES de o diarizador subir
+                    proc_total += proc
+                    modes.append(mode)
+                    words = [w for s in segments for w in s["words"]]
+                    if job is not None:
+                        diar = await run(job.run)
+                        diars.append(diar)
+                        if diar.status == "ok":
+                            words = core.assign_speakers(words, diar.turns)
+                    out.append(core.deepgram_channel(text, words))
+            finally:
+                if td:
+                    shutil.rmtree(td, ignore_errors=True)
         finally:
             state["inflight"] -= 1
         state["served"] += 1
-        log(event="listen", rid=rid, duration_s=round(dur, 2), channels=len(out), proc_s=round(proc_total, 2), mode=",".join(modes))
+        dstat = ",".join(d.status for d in diars) if diars else None
+        log(event="listen", rid=rid, duration_s=round(dur, 2), channels=len(out), proc_s=round(proc_total, 2), mode=",".join(modes),
+            diar=dstat, diar_s=round(sum(d.proc_s for d in diars), 2) if diars else None)
         body = core.deepgram_body(out, dur, rid, digest, datetime.now(timezone.utc).isoformat(), MODEL_UUID, engine.info)
-        return JSONResponse(body, headers={"X-Proc-S": f"{proc_total:.3f}", "X-Mode": ",".join(modes), "dg-request-id": rid})
+        hdr = {"X-Proc-S": f"{proc_total:.3f}", "X-Mode": ",".join(modes), "dg-request-id": rid}
+        if diars:
+            # a declaração mora em metadata (o cliente Deepgram ignora chave que não conhece) e no cabeçalho
+            body["metadata"]["onion_diarization"] = [d.public() for d in diars]
+            hdr["X-Diarization"] = dstat
+        return JSONResponse(body, headers=hdr)
 
     routes = [Route("/health", health, methods=["GET"]),
               Route("/v1/audio/transcriptions", transcriptions, methods=["POST"]),
@@ -344,6 +450,13 @@ def main(argv=None):
     token_path = a.token_file or (os.path.join(cred_dir, "token") if cred_dir else "")
     try:
         token = core.load_token(token_path)
+        if a.diar_bin:
+            # configurado e ausente é defeito de INSTALAÇÃO (o wrapper monta os dois): recusa o boot, o verify o vê. Em
+            # runtime, a falha do diarizador nunca derruba a transcrição (ver DiarJob).
+            if not (os.path.isfile(a.diar_bin) and os.access(a.diar_bin, os.X_OK)):
+                raise core.ConfigError(f"diarizador ausente ou não executável: {a.diar_bin}")
+            if not os.path.isfile(a.diar_model):
+                raise core.ConfigError(f"modelo do diarizador ausente: {a.diar_model} (chega na instalação, nunca em runtime)")
         engine = Engine(a)
     except core.ConfigError as e:
         print(json.dumps({"event": "refused", "reason": str(e)}), file=sys.stderr, flush=True)
