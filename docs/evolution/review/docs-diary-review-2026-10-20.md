@@ -2,7 +2,7 @@
 branch: docs/diary-review-2026-10-20
 pr: pendente
 date: 2026-10-20
-reviewed_diff_sha256: 3fbd07bb6adac1187e5fa695379aa84c1eaf128e06bdf520beb67911c93dd3dc
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: cbed065479bb36ec123e984ac68aa0bff492a48e396b306d456363ce0b8314c7
 findings_total: 2
 findings_real: 2
@@ -51,3 +51,10 @@ foi forjado no PR #1107, em 2026-10-14). O índice foi regenerado.
 
 Não se aplica. A mudança é de prosa e frontmatter do diário e de um ADR, sem código executável. O gate é o
 `diary-index.sh` (128 entradas, 0 stale) e o lint.
+
+## Re-revisão depois do rebase (2026-10-20, sessão principal)
+
+O PR foi rebaseado sobre a `main`, que tinha recebido o #1217. O hash de código mudou por isso: a base trouxe
+código, mas o diff deste PR não mudou de natureza. A única mudança nossa é uma linha na migalha
+`dogfood-que-refutou`, que agora registra o #1217 como mergeado (03:11 UTC) e o `D_build_none_of_three` como
+`superseded` na `main`. Conferido na `main`: o nó está `superseded`. Sem achado novo.
