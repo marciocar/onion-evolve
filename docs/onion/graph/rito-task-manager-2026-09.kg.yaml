@@ -339,6 +339,70 @@ nodes:
     verified_against: "reforco do maestro em 2026-10-01: 'toda onda principal gera oportunidades derivadas, o que e a automacao de hoje gera novos gargalos e necessidades'. Medido contra a doutrina vigente (common/prompts/research-doctrine.md, 10 clausulas): a clausula 4 (Caminho do dinheiro) pergunta ONDE O CAPITAL ESTA HOJE; esta pergunta e outra — o que a onda CRIA como gargalo derivado, e quem JA PAGA pela onda e por isso tem orcamento para o passo seguinte."
     label: "candidata a CLAUSULA 11 da doutrina de pesquisa: ONDA PRINCIPAL -> GARGALO DERIVADO. Capital mostra o escasso de HOJE; a onda derivada mostra o que fica escasso DEPOIS, como consequencia do que esta sendo automatizado agora"
     x_gatilho: "a rodada que o maestro pediu (Onion como ponto de partida / gargalos derivados da automacao) PROVAR que o eixo rende achado que os outros 10 nao renderiam. Se render, vira clausula com mecanismo (worker proprio no fan-out, como o de mercado). Se nao render, fica como pergunta refutada — e isso tambem e resultado."
+  - id: D_TM_PROJECAO_OPT_IN_POR_X_TM_ITEM
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Só nó com x_tm_item»"
+    label: "Só nó com x_tm_item: SAC-N vira issue; a issue leva a linha KG: <grafo>#<NÓ>. Citação de SAC em texto livre continua permitida e NÃO conta como vínculo. Mantém o Linear na escala humana."
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «Só nó com x_tm_item»; descartadas: «Todo nó open canônico» · «Só decision/question de alto impacto»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «Backlog × Linear (2026-10-20, a partir da medição do agente: x_tm_item em 0 nós, 20 drifts nó open × issue Done, 15 de 24 issues abertas sem nó): qual nó vira issue?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
+  - id: D_TM_BACKFILL_TRIAGEM_COM_RESIDUO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Eu trio, você sela o resíduo»"
+    label: "O passado (20 nós open citando issue Done, 15 issues abertas sem nó): a sessão mede cada par contra código e forge, fecha no grafo o provado feito, liga por x_tm_item o 1:1, e traz ao maestro só o resíduo indecidível."
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «Eu trio, você sela o resíduo»; descartadas: «Selo um a um» · «Só daqui para frente»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «Backlog × Linear (2026-10-20, a partir da medição do agente: x_tm_item em 0 nós, 20 drifts nó open × issue Done, 15 de 24 issues abertas sem nó): como tratar o passado?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
+  - id: D_TM_DRIFT_NO_BACKLOG_TM_E_NO_DECIDE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «/meta:backlog --tm + decide»"
+    label: "O check de drift nó×issue mora num modo --tm do /meta:backlog (lê o Linear pelo tm.sh, precisa de rede), consumido pelo /meta:decide como seção do censo. O lint confere só a forma do x_tm_item."
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «/meta:backlog --tm + decide»; descartadas: «Guarda nova pela forja» · «Hook no início da sessão»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «Backlog × Linear (2026-10-20, a partir da medição do agente: x_tm_item em 0 nós, 20 drifts nó open × issue Done, 15 de 24 issues abertas sem nó): onde mora o check de drift?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
+  - id: D_TM_UM_ESCRITOR_A_PROJECAO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "decisão do maestro em 2026-10-20, por pergunta com opções (/meta:decide): escolhida «Só a projeção»"
+    label: "Só a projeção escreve no Linear, em três pontos: nó ganha x_tm_item (cria a issue), PR aberto/mergeado (comenta), nó fecha no grafo (transiciona). Issue Done com nó open vira item de drift, nunca escrita no grafo."
+    narrative: "Selado por /meta:decide em 2026-10-20: escolhida «Só a projeção»; descartadas: «Projeção + ciclo engineer» · «Manual»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-20: «Backlog × Linear (2026-10-20, a partir da medição do agente: x_tm_item em 0 nós, 20 drifts nó open × issue Done, 15 de 24 issues abertas sem nó): quem escreve no Linear?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
 
 edges:
   # o diagnóstico sustenta as decisões
@@ -392,3 +456,15 @@ edges:
   - from: Q_CLAUSULA_11_ONDA_DERIVADA
     to: D_CAPACIDADES_ANALISADAS_ANTES_DE_ABSORVER
     edge_type: CONSTRAINS
+  - from: D_TM_PROJECAO_OPT_IN_POR_X_TM_ITEM
+    to: D_UMA_TASK_POR_FIO
+    edge_type: TRACES_TO
+  - from: D_TM_BACKFILL_TRIAGEM_COM_RESIDUO
+    to: D_UMA_TASK_POR_FIO
+    edge_type: TRACES_TO
+  - from: D_TM_DRIFT_NO_BACKLOG_TM_E_NO_DECIDE
+    to: D_UMA_TASK_POR_FIO
+    edge_type: TRACES_TO
+  - from: D_TM_UM_ESCRITOR_A_PROJECAO
+    to: D_UMA_TASK_POR_FIO
+    edge_type: TRACES_TO
