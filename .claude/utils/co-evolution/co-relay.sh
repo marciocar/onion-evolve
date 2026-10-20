@@ -37,7 +37,8 @@
 #               <signal-file> : basename OU path. Omitido = todos os .md de 1º nível
 #                               da fonte (default docs/evolution/inbox/).
 #               --target <p>  : path LOCAL do CORE (OBRIGATÓRIO — o adotante não tem
-#                               members.yaml para resolver o alvo).
+#                               members.yaml para resolver o alvo), do HUB do adotante
+#                               ou do DONO de um vendor (vendor/<x>/.<x>-version prova).
 #               --from <dir>  : fonte alternativa do(s) sinal(is) (default: o inbox).
 #               --dry-run     : mostra o plano, não escreve nada.
 #
@@ -102,6 +103,79 @@ esac
 [ -e "${TARGET}/.git" ] || { echo "ERRO: --target não parece um repo git: ${TARGET}" >&2; exit 2; }
 TARGET="$(cd "${TARGET}" && pwd)"   # normaliza para path absoluto
 
+_norm_remote() {  # https://h/o/r(.git) · git@h:o/r(.git) · ssh://git@h/o/r → h/o/r
+  printf '%s' "$1" | sed -E 's#^[a-zA-Z+]+://##; s#^[^@/]+@##; s#:#/#; s#\.git/?$##; s#/+$##'
+}
+
+# --- Canal UPSTREAM DE VENDOR (D_CANAL_UPSTREAM_POR_VENDOR, decisão do maestro de 2026-10-20) ---------------
+# O adotante que vendoriza um produto (vendor/<x>/, ex. vendor/kg-ssot/) tem DOIS upstreams: o Onion e o dono
+# do vendor. O dono pode ser, ele mesmo, um adotante do Onion (o onion-kg-ssot carimba `adopted`), e a guarda de
+# canal lateral abaixo o recusava, então o sinal de campo ao kg-ssot só chegava pelo core (sinal de 2026-10-20,
+# §3 item 8). A exceção é ESTREITA e se DERIVA do carimbo, nunca de lista de nomes:
+#   · o remetente tem `vendor/<x>/.<x>-version` (o JSON que o vendorizador do produto grava) com `tag` e `files`
+#     (caminho → sha256 de cada arquivo da release);
+#   · o destino PROVA ser a origem: a árvore de `refs/tags/<tag>` DELE reproduz, byte a byte, todo arquivo do
+#     carimbo. Um par lateral que só vendoriza o mesmo produto tem os arquivos, mas não a tag na história;
+#   · o destino tem `docs/evolution/inbox/` (o dono precisa ter caixa; aqui não se cria canal no repo alheio).
+# Por que CONTEÚDO, e não URL nem commit (medido em 2026-10-20 contra o carimbo real do hub e o onion-kg-ssot):
+# o carimbo não grava URL nenhuma (o kg_vendor.py grava tag, commit e os sha256), e a release vendorizada vem do
+# ESPELHO público (marciocar/kg-ssot). O commit 172c62a do carimbo não existe no repo do dono, cuja tag
+# kg-ssot-v4.12.0 resolve para 2a69199 e cujo origin é outro (marciocar/onion-kg-ssot). URL ou commit recusariam
+# o dono real; os sha256 do carimbo batem com a tag dele, 444 de 444. O remote fica só no rodapé, como dado.
+# Qualquer outro caso cai na guarda de papel abaixo, inalterada. A autorização viaja no sinal entregue.
+VENDOR_AUTH="" ; VENDOR_NAME="" ; VENDOR_TAG="" ; VENDOR_NFILES="" ; VENDOR_REFUSALS=""
+# $1 = carimbo, $2 = destino → stdout "ok<TAB>tag<TAB>N" se a tag do destino reproduz os N arquivos;
+# senão rc 1 e o motivo (pt-BR) no stdout.
+_vendor_proof() {
+  python3 -I -c '
+import hashlib, json, subprocess, sys
+try:
+    d = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    print("carimbo ilegível como JSON"); sys.exit(1)
+tag, files = d.get("tag"), d.get("files")
+if not (isinstance(tag, str) and tag and isinstance(files, dict) and files):
+    print("carimbo fora do formato (sem tag ou files)"); sys.exit(1)
+def run(*a, data=None):
+    return subprocess.run(["git", "-C", sys.argv[2], *a], input=data, capture_output=True)
+if run("rev-parse", "--verify", "--quiet", "refs/tags/" + tag + "^{tree}").returncode != 0:
+    print("o destino não tem a tag " + tag + " (se é o dono, falta git fetch --tags lá)"); sys.exit(1)
+names = sorted(files)
+out = run("cat-file", "--batch", data="".join("refs/tags/%s:%s\n" % (tag, n) for n in names).encode()).stdout
+i, bad = 0, []
+for n in names:
+    nl = out.index(b"\n", i); head = out[i:nl].split(); i = nl + 1
+    if head[-1] == b"missing":
+        bad.append(n); continue
+    size = int(head[2]); blob = out[i:i + size]; i += size + 1
+    if hashlib.sha256(blob).hexdigest() != files[n]:
+        bad.append(n)
+if bad:
+    print("a tag %s do destino diverge do carimbo em %d de %d arquivo(s), ex.: %s" % (tag, len(bad), len(names), bad[0]))
+    sys.exit(1)
+print("ok", tag, len(names), sep="\t")
+' "$1" "$2" 2>/dev/null
+}
+if [ -d "${REPO_ROOT}/vendor" ] && command -v python3 >/dev/null 2>&1; then
+  for vdir in "${REPO_ROOT}"/vendor/*/; do
+    vname="$(basename "${vdir}")"
+    vstamp="${vdir}.${vname}-version"
+    [ -f "${vstamp}" ] || continue
+    proof="$(_vendor_proof "${vstamp}" "${TARGET}")"
+    case "${proof}" in
+      ok$'\t'*) : ;;
+      *) VENDOR_REFUSALS="${VENDOR_REFUSALS}vendor/${vname}: ${proof:-a prova não rodou}. "; continue ;;
+    esac
+    if [ ! -d "${TARGET}/docs/evolution/inbox" ]; then
+      VENDOR_REFUSALS="${VENDOR_REFUSALS}vendor/${vname}: o destino é a origem do carimbo, mas não tem docs/evolution/inbox/ (o dono não abriu caixa; não crio canal no repo alheio). "
+      continue
+    fi
+    IFS=$'\t' read -r _ok VENDOR_TAG VENDOR_NFILES <<< "${proof}"
+    VENDOR_NAME="${vname}"; VENDOR_AUTH="vendor/${vname}/.${vname}-version"
+    break
+  done
+fi
+
 # --- Guarda do DESTINO (F3 do configurador A2A, 2026-10-15): upstream é o core OU o hub do adotante ------
 # A rede do hub nasce junto com a do core: o filho de um hub (T2, carimbo `adopted`) manda sinal ao PRÓPRIO
 # hub, que vive na mesma máquina. Até aqui o destino só precisava ser um repo git, e o carteiro relayava
@@ -115,19 +189,19 @@ TARGET="$(cd "${TARGET}" && pwd)"   # normaliza para path absoluto
 # prova que o carteiro tem é o `adopted_from` do carimbo do remetente: tem de ser o remote `origin` do hub ou
 # o caminho dele. Quem adotou o core (adopted_from = o core) não relaya para hub nenhum.
 T_STAMP="${TARGET}/.claude/.onion-version"
-if [ -f "${T_STAMP}" ]; then
+if [ -n "${VENDOR_AUTH}" ]; then
+  T_LABEL="UPSTREAM DO VENDOR ${VENDOR_NAME}"
+elif [ -f "${T_STAMP}" ]; then
   T_ROLE="$(role_field "${T_STAMP}")"
   if [ "${T_ROLE}" != "hub" ]; then
     echo "ERRO: o destino '${TARGET}' tem carimbo role='${T_ROLE:-vazio}' — não é o core nem um hub. Upstream é o core ou o seu hub; relayar para outro adotante é canal lateral." >&2
+    echo "      Upstream de VENDOR: nenhum carimbo vendor/<x>/.<x>-version deste repo tem a origem provada no destino (a árvore da tag do carimbo, lá, reproduz os sha256 dele).${VENDOR_REFUSALS:+ ${VENDOR_REFUSALS}}" >&2
     exit 2
   fi
   if [ "${ROLE}" != "adopted" ]; then
     echo "ERRO: o destino é um hub, e este repo tem carimbo role='${ROLE}'. Só o filho de um hub (carimbo adopted) relaya para o hub; ${ROLE} fala com o core." >&2
     exit 2
   fi
-  _norm_remote() {  # https://h/o/r(.git) · git@h:o/r(.git) · ssh://git@h/o/r → h/o/r
-    printf '%s' "$1" | sed -E 's#^[a-zA-Z+]+://##; s#^[^@/]+@##; s#:#/#; s#\.git/?$##; s#/+$##'
-  }
   SRC_FROM="$(grep -E '^[[:space:]]*adopted_from:' "${STAMP}" 2>/dev/null | head -1 | sed -E 's/^[[:space:]]*adopted_from:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//; s/"//g; s/'\''//g')"
   HUB_REMOTE="$(git -C "${TARGET}" remote get-url origin 2>/dev/null || true)"
   if [ -z "${SRC_FROM}" ] || { [ "${SRC_FROM%/}" != "${TARGET}" ] && { [ -z "${HUB_REMOTE}" ] || [ "$(_norm_remote "${SRC_FROM}")" != "$(_norm_remote "${HUB_REMOTE}")" ]; }; }; then
@@ -167,8 +241,31 @@ if [ "${DRY}" -eq 1 ]; then
   echo "  fonte    : ${FROM_DIR}/"
   echo "  alvo     : ${TARGET}  (${T_LABEL})"
   echo "  destino  : ${DEST_DIR}/"
+  [ -z "${VENDOR_AUTH}" ] || echo "  autoriza : ${VENDOR_AUTH} (a tag ${VENDOR_TAG} do destino reproduz os ${VENDOR_NFILES} arquivos do carimbo)"
   for f in "${FILES[@]}"; do echo "  relayar  : $(basename "$f")"; done
   exit 0
+fi
+
+# --- Canal de vendor: a autorização VIAJA no sinal entregue ---------------------------------------------------
+# O dono do vendor recebe de um repo que não é o core nem o seu filho; sem dizer por que a entrega passou, a
+# sessão de lá não tem como conferir o canal. O rodapé é determinístico (sem data), então o dedup por conteúdo
+# continua valendo: a mesma entrega, de novo, é byte-idêntica ao que já está no inbox/ ou no _processed/ de lá.
+if [ -n "${VENDOR_AUTH}" ]; then
+  STAGE="$(mktemp -d)" || { echo "ERRO: mktemp falhou." >&2; exit 2; }
+  trap 'rm -rf "${STAGE}"' EXIT
+  SENDER="$(git -C "${REPO_ROOT}" remote get-url origin 2>/dev/null || basename "${REPO_ROOT}")"
+  STAGED=()
+  for f in "${FILES[@]}"; do
+    out="${STAGE}/$(basename "$f")"
+    {
+      cat "$f"
+      printf '\n---\n\n<!-- co-relay: canal upstream de vendor -->\n'
+      printf '> 📨 **Canal upstream de vendor** (co-relay, D_CANAL_UPSTREAM_POR_VENDOR): entregue por `%s`, cujo carimbo\n' "${SENDER}"
+      printf '> `%s` vendoriza a tag `%s`: a árvore dessa tag aqui reproduz os %s arquivos do carimbo (sha256).\n' "${VENDOR_AUTH}" "${VENDOR_TAG}" "${VENDOR_NFILES}"
+    } > "${out}"
+    STAGED+=("${out}")
+  done
+  FILES=("${STAGED[@]}")
 fi
 
 mkdir -p "${DEST_DIR}" 2>/dev/null || { echo "ERRO: não foi possível criar ${DEST_DIR} (permissão?)." >&2; exit 2; }
@@ -225,6 +322,6 @@ for f in "${FILES[@]}"; do
 done
 
 echo "Onion: Carteiro-local upstream concluído — ${relayed} relayado(s), ${skipped} no-op." >&2
-echo "       Próximo (sessão DO CORE): ler 📬, commitar + triar (git mv p/ inbox/_processed/)." >&2
+echo "       Próximo (sessão do destino, ${T_LABEL}): ler 📬, commitar + triar (git mv p/ inbox/_processed/)." >&2
 echo "       (entrega-sem-commit: o adotante NÃO commitou no repo alheio — invariante I3)." >&2
 exit 0
