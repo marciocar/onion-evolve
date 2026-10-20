@@ -2,7 +2,8 @@
 branch: feat/decide-who-executes
 pr: pendente
 date: 2026-10-19
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 04a65976f9cfb143f193f7e205f4b93990d454aa5a6eb1ea8154cd275a6f7dbc
+reviewed_code_sha256: c97c73d2773aff884a469ddc2ce079ecc3afb7504037e345bbceaa0a334a9a4c
 findings_total: 12
 findings_real: 12
 tokens: 147367
