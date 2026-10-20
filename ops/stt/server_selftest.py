@@ -45,6 +45,7 @@ spec.loader.exec_module(srv)
 TOK = "t0k3n-de-teste-com-mais-de-32-caracteres-xyz"
 RESULTS = []
 TMP = tempfile.mkdtemp()
+tempfile.tempdir = TMP  # os temporários do servidor nascem aqui: o caso do vazamento conta o que sobra
 
 
 class Stop(Exception):
@@ -70,7 +71,11 @@ class FakeEngine:
     load_s = 0.0
     delay = 0.0
 
+    seen = []  # weakrefs dos áudios que o motor ouviu (a prova de que o float32 sai antes do diarizador)
+
     def transcribe(self, audio):
+        import weakref
+        FakeEngine.seen.append(weakref.ref(audio))
         time.sleep(self.delay)
         dur = len(audio) / 16000
         words = [{"word": "Olá.", "start": 0.1, "end": 0.4, "probability": 0.9, "_lps": [0.0]}]
@@ -308,8 +313,17 @@ try:
     OK_RTTM = ('o=""; prev=""; for a in "$@"; do [ "$prev" = -o ] && o="$a"; prev="$a"; done\n'
                'printf "SPEAKER onion-stt 1 0.000 0.300 <NA> <NA> speaker_1 <NA> <NA>\\n" > "$o"')
 
-    def dg(base, q="diarize=true"):
-        st, b = req(base + "/v1/listen?" + q, wav(1), AUTH)
+    LAST_HDR = {}
+
+    def dg(base, q="diarize=true", body=None):
+        r = urllib.request.Request(base + "/v1/listen?" + q, data=body if body is not None else wav(1), headers=AUTH, method="POST")
+        try:
+            with urllib.request.urlopen(r, timeout=60) as resp:
+                st, b = resp.status, resp.read()
+                LAST_HDR.clear()
+                LAST_HDR.update({k.lower(): v for k, v in resp.headers.items()})
+        except urllib.error.HTTPError as e:
+            st, b = e.code, e.read()
         d = json.loads(b) if st == 200 else {}
         words = d.get("results", {}).get("channels", [{}])[0].get("alternatives", [{}])[0].get("words", []) if d else []
         decl = (d.get("metadata") or {}).get("onion_diarization") if d else None
@@ -320,11 +334,12 @@ try:
         s, th, base = serve(fake_diar(OK_RTTM))
         try:
             st, words, decl = dg(base)
+            hdr = dict(LAST_HDR)
             st0, words0, decl0 = dg(base, "x=1")
         finally:
             stop(s, th)
         ok = st == 200 and words and words[0].get("speaker") == 0 and decl and decl[0]["status"] == "ok" \
-            and st0 == 200 and "speaker" not in words0[0] and decl0 is None
+            and hdr.get("x-diarization") == "ok" and st0 == 200 and "speaker" not in words0[0] and decl0 is None
         return ok, f"status={st} words={words} decl={decl} sem-pedido={words0} {decl0}"
 
     @case("srv-diarize-falha-nao-derruba-a-transcricao")
@@ -408,6 +423,78 @@ try:
         except SystemExit:
             pair = True
         return rc == 2 and pair, f"rc={rc} par-exigido={pair}"
+    COUNT_RTTM = ('o=""; prev=""; for a in "$@"; do [ "$prev" = -o ] && o="$a"; prev="$a"; done\n'
+                  'printf "x\\n" >> "${0%/*}/calls"\n'
+                  'printf "SPEAKER onion-stt 1 0.000 0.300 <NA> <NA> speaker_1 <NA> <NA>\\n" > "$o"')
+
+    @case("srv-diarize-multicanal-cada-canal")
+    def _():
+        args = fake_diar(COUNT_RTTM)
+        b = io.BytesIO()
+        sf.write(b, np.zeros((16000, 2), dtype=np.float32), 16000, format="WAV", subtype="PCM_16")
+        s, th, base = serve(args)
+        try:
+            st, words, decl = dg(base, "diarize=true&multichannel=true", b.getvalue())
+        finally:
+            stop(s, th)
+        calls = open(os.path.join(os.path.dirname(args[1]), "calls")).read().count("x")
+        return st == 200 and decl and len(decl) == 2 and all(x["status"] == "ok" for x in decl) and calls == 2, \
+            f"status={st} decl={decl} chamadas={calls}"
+
+    def spy_diarize(record):
+        real = srv.core.diarize
+
+        def spy(binary, model, wav_path, td, timeout, run=None):
+            import gc
+            gc.collect()
+            record["alive"] = sum(1 for r in FakeEngine.seen if r() is not None)
+            with __import__("wave").open(wav_path) as w:
+                fr = np.frombuffer(w.readframes(w.getnframes()), dtype="<i2")
+            record["min"], record["max"] = int(fr.min()), int(fr.max())
+            return real(binary, model, wav_path, td, timeout, run)
+        return real, spy
+
+    @case("srv-diarize-float-solto-antes-do-filho")
+    def _():
+        rec = {}
+        real, spy = spy_diarize(rec)
+        srv.core.diarize = spy
+        FakeEngine.seen.clear()
+        b = io.BytesIO()
+        sf.write(b, np.full((16000, 2), 0.25, dtype=np.float32), 16000, format="WAV", subtype="PCM_16")
+        s, th, base = serve(fake_diar(OK_RTTM))
+        try:
+            st, _, decl = dg(base, "diarize=true&multichannel=true", b.getvalue())
+        finally:
+            stop(s, th)
+            srv.core.diarize = real
+        return st == 200 and decl and rec.get("alive") == 0 and len(FakeEngine.seen) == 2, f"status={st} vivos={rec.get('alive')} ouvidos={len(FakeEngine.seen)}"
+
+    @case("srv-diarize-wav-com-clip")
+    def _():
+        rec = {}
+        real, spy = spy_diarize(rec)
+        srv.core.diarize = spy
+        b = io.BytesIO()
+        sf.write(b, np.full(16000, 1.5, dtype=np.float32), 16000, format="WAV", subtype="FLOAT")
+        s, th, base = serve(fake_diar(OK_RTTM))
+        try:
+            st, _, decl = dg(base, "diarize=true", b.getvalue())
+        finally:
+            stop(s, th)
+            srv.core.diarize = real
+        return st == 200 and rec.get("max") == 32767 and rec.get("min") == 32767, f"status={st} amostras={rec}"
+
+    @case("srv-diarize-temporario-limpo")
+    def _():
+        s, th, base = serve(fake_diar(OK_RTTM))
+        try:
+            st, _, _ = dg(base)
+            st2, _, _ = dg(base)
+        finally:
+            stop(s, th)
+        left = [n for n in os.listdir(TMP) if n.startswith("diar-")]
+        return st == 200 and st2 == 200 and not left, f"status={st},{st2} sobrou={left}"
 except Stop:
     pass
 

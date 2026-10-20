@@ -102,8 +102,10 @@ MEMORY_MAX=6G       # teto do cgroup; sem swap (MemorySwapMax=0): estourou, o ke
 MEMORY_MAX_BYTES=6442450944
 DIAR_MAX_S=10800    # duração máxima diarizada (= o teto do serviço). O pior caso cabe no MemoryMax: ver DIAR_MEMORY abaixo
 # DIAR_MEMORY (medido em 2026-10-20, fora de unit, nesta VPS): o filho do v3-offline cresce ~0,31 MB por segundo de áudio
-# (3,44e9 B em 3 h); o servidor solta o float32 ANTES de o filho subir. Pico da árvore no pior caso: ver o nó
-# E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020 do grafo meeting-capture-2026-10.
+# (3,44e9 B em 3 h); o servidor fica em ~2,13e9 B depois de transcrever 3 h e solta todo float32 do pedido ANTES de
+# o filho subir (o pedido inteiro é uma submissão só ao pool). Cota: 2,13e9 + 3,44e9 + 0,40e9 (corpo de um vizinho na
+# fila) ≈ 5,97e9 B < 6,44e9. Se mesmo assim o cgroup estourar, OOMPolicy=continue: o kernel mata o maior (o filho), a
+# diarização sai `failed` e a transcrição segue. Nó E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020 do grafo meeting-capture-2026-10.
 MIN_FREE_KB=$(( 3 * 1024 * 1024 ))   # disco livre exigido para montar (~0,8 GB de modelos + ~0,2 GB de venv + 7 MB do diarizador, com folga)
 
 say()  { printf '[%s] %s\n' "${NAME}" "$*"; }
@@ -182,7 +184,7 @@ SERVER_ARGS=( --host 127.0.0.1 --model-dir "${MODEL_DIR}" --vad-dir "${VAD_DIR}"
 SANDBOX=(
   "DynamicUser=yes" "LoadCredential=token:${TOKEN_FILE}" "WorkingDirectory=/"
   "Environment=HF_HUB_OFFLINE=1 OMP_NUM_THREADS=${INTRA_OP} PYTHONDONTWRITEBYTECODE=1"
-  "MemoryMax=${MEMORY_MAX}" "MemorySwapMax=0" "TasksMax=64" "LimitNOFILE=1024" "UMask=0077"
+  "MemoryMax=${MEMORY_MAX}" "MemorySwapMax=0" "OOMPolicy=continue" "TasksMax=64" "LimitNOFILE=1024" "UMask=0077"
   "NoNewPrivileges=yes" "ProtectSystem=strict" "ProtectHome=yes" "PrivateTmp=yes" "PrivateDevices=yes"
   "ProtectKernelTunables=yes" "ProtectKernelModules=yes" "ProtectKernelLogs=yes" "ProtectControlGroups=yes"
   "ProtectClock=yes" "ProtectHostname=yes" "ProtectProc=invisible" "RestrictNamespaces=yes" "RestrictRealtime=yes"
@@ -250,7 +252,7 @@ transient_smoke() {
 verify_live() {
   local show st pid frag mem cur ipd ipa dpi ldr addrs a h hsha vrc nok
   show="$(systemctl show "${UNIT}" -p ActiveState -p MainPID -p FragmentPath -p DropInPaths -p MemoryMax -p MemorySwapMax \
-          -p MemoryCurrent -p IPAddressDeny -p IPAddressAllow -p DynamicUser -p ProtectHome -p NRestarts -p NeedDaemonReload 2>/dev/null)" \
+          -p MemoryCurrent -p OOMPolicy -p IPAddressDeny -p IPAddressAllow -p DynamicUser -p ProtectHome -p NRestarts -p NeedDaemonReload 2>/dev/null)" \
     || { say "NÃO MEDI: systemctl show ${UNIT} falhou"; return 2; }
   st="$(sed -n 's/^ActiveState=//p' <<<"${show}")"; pid="$(sed -n 's/^MainPID=//p' <<<"${show}")"
   frag="$(sed -n 's/^FragmentPath=//p' <<<"${show}")"; mem="$(sed -n 's/^MemoryMax=//p' <<<"${show}")"
@@ -269,6 +271,10 @@ verify_live() {
   [ "${mem}" = "${MEMORY_MAX_BYTES}" ] || { say "MemoryMax efetivo ${mem:-?} != ${MEMORY_MAX_BYTES}"; return 1; }
   [ "$(sed -n 's/^MemorySwapMax=//p' <<<"${show}")" = 0 ] || { say "MemorySwapMax efetivo diferente de 0"; return 1; }
   say "OK MemoryMax=${mem} (em uso agora: ${cur:-?} B)"
+  # o OOM no cgroup mata o MAIOR processo, que no pior caso é o filho do diarizador: com o padrão (stop) o systemd
+  # derrubava a unit inteira e os pedidos em voo; com continue, o filho morto vira diarização `failed` e a
+  # transcrição sai (refutador, passada 1, medido: DefaultOOMPolicy=stop nesta VPS)
+  [ "$(sed -n 's/^OOMPolicy=//p' <<<"${show}")" = continue ] || { say "OOMPolicy efetivo diferente de continue"; return 1; }
   # `any` é mostrado como as DUAS faixas: só uma delas deixaria a outra família aberta (refutador, passada 2)
   { grep -qE '(^| )any( |$)' <<<"${ipd}" || { grep -qE '(^| )0\.0\.0\.0/0( |$)' <<<"${ipd}" && grep -qE '(^| )::/0( |$)' <<<"${ipd}"; }; } \
     || { say "IPAddressDeny efetivo não nega tudo (${ipd:-vazio})"; return 1; }
@@ -372,9 +378,11 @@ check_gh_asset() {  # o release fixado publica o asset com o digest e o tamanho 
   api="$(curl -fsS -m 30 --proto '=https' -H 'Accept: application/vnd.github+json' \
          "https://api.github.com/repos/${DIAR_BIN_REPO}/releases/tags/${DIAR_BIN_TAG}" 2>/dev/null)" \
     || { say "NÃO MEDI: a API do GitHub não respondeu para ${DIAR_BIN_REPO}@${DIAR_BIN_TAG}"; return 2; }
-  python3 -c '
+  # o JSON vai pelo stdin: pelo argv, um release maior que 128 KiB daria E2BIG e uma mensagem de pin enganosa
+  printf '%s' "${api}" | python3 -c '
 import json, sys
-api, tag, name, digest, size = json.loads(sys.argv[1]), sys.argv[2], sys.argv[3], sys.argv[4], int(sys.argv[5])
+api = json.load(sys.stdin)
+tag, name, digest, size = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
 got_tag = api.get("tag_name")
 if got_tag != tag or api.get("draft") or api.get("prerelease"):
     print(f"FALHA o release respondido ({got_tag}) não é o fixado, ou é rascunho/pré-release"); sys.exit(1)
@@ -382,8 +390,8 @@ a = next((x for x in api.get("assets", []) if x.get("name") == name), None)
 if a is None or a.get("digest") != "sha256:" + digest or int(a.get("size") or -1) != size:
     pub = None if a is None else (a.get("digest"), a.get("size"))
     print(f"FALHA {name}: publicado {pub} != fixado sha256:{digest[:12]} ({size} B)"); sys.exit(1)
-print(f"OK {name} {digest[:12]} ({size} B)")' "${api}" "${DIAR_BIN_TAG}" "${DIAR_BIN_ASSET}" "${DIAR_BIN_SHA256}" "${DIAR_BIN_SIZE}" | sed 's/^/    /'
-  return "${PIPESTATUS[0]}"
+print(f"OK {name} {digest[:12]} ({size} B)")' "${DIAR_BIN_TAG}" "${DIAR_BIN_ASSET}" "${DIAR_BIN_SHA256}" "${DIAR_BIN_SIZE}" | sed 's/^/    /'
+  return "${PIPESTATUS[1]}"
 }
 say "pins do modelo (${MODEL_REPO}@${MODEL_REV:0:12}), do VAD (${VAD_REPO}@${VAD_REV:0:12}) e do diarizador (${DIAR_MODEL_REPO}@${DIAR_MODEL_REV:0:12}) contra o Hugging Face:"
 check_hf "${MODEL_REPO}" "${MODEL_REV}" "${MODEL_FILES[@]}"; r=$?; [ "${r}" = 0 ] || die "${r}" "pin do modelo não confere com a fonte oficial"
@@ -491,7 +499,8 @@ stage_diar_bin() {  # o tarball do release: digest conferido ANTES de abrir; ext
     "${tgz}" "${DIAR_BIN_DIR}" || { say "extração recusada: ${DIAR_BIN_ASSET}"; return 1; }
   priv rm -f -- "${tgz}"
   priv chmod -R go-w "${DIAR_BIN_DIR}"
-  [ "$(priv "${DIAR_BIN_DIR}/${DIAR_BIN_REL}" --version 2>/dev/null)" = "nemo-speech ${DIAR_BIN_TAG#v}" ] \
+  # a sonda roda o binário baixado SEM root (nobody, sem privilégio novo): o digest já confere, mas root não é preciso
+  [ "$(priv setpriv --reuid=65534 --regid=65534 --clear-groups --no-new-privs "${DIAR_BIN_DIR}/${DIAR_BIN_REL}" --version 2>/dev/null)" = "nemo-speech ${DIAR_BIN_TAG#v}" ] \
     || { say "o binário extraído não responde como nemo-speech ${DIAR_BIN_TAG#v}"; return 1; }
   printf '%s@%s %s\n' "${DIAR_BIN_REPO}" "${DIAR_BIN_TAG}" "${DIAR_BIN_SHA256}" | priv tee "${DIAR_BIN_DIR}/${COMPLETE}" >/dev/null
   say "montado ${DIAR_BIN_DIR} (digest conferido, extração filtrada)"
