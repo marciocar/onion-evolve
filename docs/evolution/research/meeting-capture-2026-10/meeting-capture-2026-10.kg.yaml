@@ -278,14 +278,16 @@ nodes:
     impact: 4
     confidence: 0.9
     verified_at: "2026-10-20"
-    verified_against: "ops/stt-service.sh verify na VPS em 2026-10-20: unit onion-vps-stt ativa (MainPID 3533022, invocação 9c7b9e3c), 13 propriedades lidas"
-    label: "STT em lote instalado na VPS só em loopback (127.0.0.1:8765), pelo install --apply de 2026-10-20: sandbox efetivo, MemoryMax 6G, token por LoadCredential, rede de saída negada e fixture pt-BR transcrito nas duas rotas (recall 1,00)."
+    verified_against: "ops/stt-service.sh install --apply e verify na VPS em 2026-10-20 18:3x UTC: unit onion-vps-stt ativa (MainPID 2285263, invocação c41f0675), 14 propriedades lidas"
+    label: "STT em lote na VPS só em loopback, agora com diarização: install --apply de 2026-10-20 (invocação c41f0675) e verify OK, com 2 falantes nas duas rotas (concordância 1,00), transcrição inteira, token exigido e sem rede de saída."
     trace: "ops/stt-service.sh"
     narrative: |-
       Execução de D_MC_STT_SOBE_EM_LOOPBACK_1019, o degrau loopback. O 1º install --apply (2026-10-19) reprovou na prova pré-troca: o LoadCredential= entrega o token 0440 root:root e o servidor só aceitava 0600/0400. O fail-closed do wrapper segurou e a unit de produção não foi tocada. A cura entrou pelo PR #1214, provada numa unit transitória real. O 2º install --apply, a partir da main 02c80353, instalou e passou no verify: código 9518f7a7f626, ambiente 55af7f51f611, modelo 8f23f0c03c87. Re-medido em 2026-10-20 pelo verify (só leitura): verify OK. Fora deste nó: a saída pelo Caddy (TLS, token, subdomínio), que espera o cliente de captura.
+      Re-medido em 2026-10-20, depois do #1230 (diarização no serviço): o 2º degrau trocou o código (9518f7a7f626 → efa51eaabc76) com o mesmo ambiente e modelo do Parakeet; o --apply provou o servidor inteiro numa unit transitória, com o caso de 2 falantes, antes de trocar a de produção; o verify leu 14 propriedades. A memória do pior caso (3 h) é cota calculada, não pico medido (ver E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020).
+      Label anterior, verbatim: STT em lote instalado na VPS só em loopback (127.0.0.1:8765), pelo install --apply de 2026-10-20: sandbox efetivo, MemoryMax 6G, token por LoadCredential, rede de saída negada e fixture pt-BR transcrito nas duas rotas (recall 1,00).
     provenance:
       source: "ops/stt-service.sh install --apply e verify, nesta VPS"
-      locator: "install --apply de 2026-10-20 00:43 UTC (invocação 9c7b9e3c) e verify de 2026-10-20: 'verify OK — onion-vps-stt vivo (MainPID 3533022), loopback, token exigido, fixture transcrito, MemoryMax 6G (13 propriedades lidas)'"
+      locator: "install --apply de 2026-10-20 (invocação c41f0675) e verify: 'verify OK — onion-vps-stt vivo (MainPID 2285263), loopback, token exigido, fixture transcrito, 2 falantes diarizados, MemoryMax 6G (14 propriedades lidas)'; a 1ª instalação (invocação 9c7b9e3c, 13 propriedades) foi sem diarização"
       method: "medição: o verify do wrapper lê as propriedades efetivas da unit pelo systemd e prova o cliente numa unit transitória"
       locality: "host"
 
@@ -361,5 +363,8 @@ edges:
     to: D_MC_STT_SOBE_EM_LOOPBACK_1019
     edge_type: SUPPORTS
   - from: E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020
+    to: D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019
+    edge_type: SUPPORTS
+  - from: E_MC_STT_INSTALADO_LOOPBACK_1020
     to: D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019
     edge_type: SUPPORTS
