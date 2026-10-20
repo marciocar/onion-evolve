@@ -50,7 +50,7 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
   carimbo é outro adotante (canal lateral) e o helper recusa com exit 2.
 - **Upstream de VENDOR (desde 2026-10-20, `D_CANAL_UPSTREAM_POR_VENDOR`).** O adotante que vendoriza um
   produto (`vendor/<x>/`, ex. `vendor/kg-ssot/`) também relaya ao **dono** dele, mesmo quando o dono é um
-  adotante do Onion (o `onion-kg-ssot` carimba `adopted`). A exceção se deriva do carimbo
+  adotante (o repo de desenvolvimento do kg-ssot carimba `adopted`). A exceção se deriva do carimbo
   `vendor/<x>/.<x>-version`, nunca de lista de nomes, e é estreita: a árvore de `refs/tags/<tag>` **do
   destino** tem de reproduzir os sha256 de **todos** os arquivos do carimbo, e o destino tem de ter
   `docs/evolution/inbox/` (o carteiro não abre caixa no repo alheio). A prova é por **conteúdo**, não por
@@ -58,7 +58,11 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
   commit o repo do dono não tem (medido: carimbo `172c62a`, tag do dono `2a69199`, 444 de 444 sha256
   iguais). O sinal entregue por este canal ganha um rodapé que nomeia o remetente, o carimbo e a tag.
   Par que só vendoriza o mesmo produto tem os arquivos, mas não a tag, e segue recusado como canal lateral.
-  Se o dono não tiver a tag (clone desatualizado), a recusa diz: `git fetch --tags` lá.
+  Se o dono não tiver a tag (clone desatualizado), a recusa diz: `git fetch --tags` lá. Dono provado **sem
+  caixa** é recusado mesmo sem carimbo do Onion (não vira "o core"). O remetente aparece no rodapé pelo
+  remote **normalizado** (sem `usuário:token@`), e o dedup compara o **corpo** do sinal, então uma tag nova
+  do vendor não faz voltar sinal já triado. A prova usa `python3`; sem ele o canal de vendor não abre, e a
+  recusa diz isso. `--target` igual ao próprio repo é sempre recusado.
 - `<signal-file>` opcional: basename ou path de UM sinal. Omitido = **todos** os `.md` de 1º nível de
   `docs/evolution/inbox/` (cuidado: pode re-relayar sinais antigos não-arquivados).
 - `--from <dir>` opcional: fonte alternativa (default = o `inbox/` do adotante).

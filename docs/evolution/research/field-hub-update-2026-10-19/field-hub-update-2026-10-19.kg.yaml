@@ -120,6 +120,30 @@ nodes:
       locator: "saída do helper: 'CONTRATO medido: kg-ssot 4.9.1 … 25 grafo(s) · 1 passam no MUST · 24 reprovam' e 'MUST form.required.node.provenance: 1024 ocorrência(s) em 24 grafo(s)'"
       method: "medição: o helper real rodado nos dois pontos do hub, conferido contra o kg_gate.py do próprio hub e contra os números do sinal"
       locality: "host"
+  - id: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-20"
+    verified_against: "co-relay.sh desta branch rodado em --dry-run de um remetente descartável com os carimbos reais do hub (.onion-version e vendor/kg-ssot/.kg-ssot-version) contra ⟨o clone local do onion-kg-ssot⟩: 'alvo UPSTREAM DO VENDOR kg-ssot', 'a tag kg-ssot-v4.12.0 do destino reproduz os 444 arquivos do carimbo'; a main recusa o mesmo alvo ('carimbo role=adopted, canal lateral'); onion-pedro e onion-arthur seguem recusados ('o destino não tem a tag')"
+    trace: ".claude/utils/co-evolution/co-relay.sh"
+    label: "o co-relay entrega ao dono de um vendor quando a tag do carimbo, no destino, reproduz os sha256 dele; a prova é por conteúdo porque o carimbo não grava URL e vem do espelho"
+    narrative: "Executa a decisão D_CANAL_UPSTREAM_POR_VENDOR (selada em 2026-10-20). A prova pedida era por URL do remote, e a medição a derrubou duas vezes: o kg_vendor.py grava tag, commit e os sha256, nenhuma URL; e a release vendorizada vem do espelho público, cujo commit (172c62a) não existe no repo do dono, onde a tag kg-ssot-v4.12.0 resolve para 2a69199 e o origin é marciocar/onion-kg-ssot. URL ou commit recusariam o dono real. Os 444 sha256 do carimbo batem com a árvore da tag do dono, 444 de 444, e um par que só vendoriza o mesmo produto não tem a tag. O destino precisa ter docs/evolution/inbox/, e o sinal entregue leva rodapé determinístico com o remetente, o carimbo e a tag. Entrega real só numa cópia descartável do onion-kg-ssot (untracked, re-entrega no-op)."
+    provenance:
+      source: "co-relay.sh desta branch, os carimbos reais do hub brain-granaai (copiados para um remetente descartável) e o clone local do onion-kg-ssot (só leitura)"
+      locator: "dry-run 'autoriza : vendor/kg-ssot/.kg-ssot-version (a tag kg-ssot-v4.12.0 do destino reproduz os 444 arquivos do carimbo)'; bancada corelay casos (V1)-(V5) e mutantes (V-M1)-(V-M4)"
+      method: "medição: o helper real em dry-run contra o dono real e entrega real numa cópia descartável dele; sha256 dos 444 blobs da tag comparados ao carimbo"
+      locality: "host"
+  - id: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "o co-relay trata qualquer repo git SEM carimbo .onion-version como o core e cria docs/evolution/inbox/ nele; o destino-core não se prova"
+    narrative: "Defeito anterior ao canal de vendor, medido no dogfood dele em 2026-10-20: um clone local defasado do espelho público do kg-ssot (sem a tag 4.12.0, sem carimbo, sem docs/evolution/) passa em --dry-run como alvo CORE, e a entrega criaria a caixa lá. O canal de vendor só fecha o caso em que o destino prova ser o dono (V6 da bancada). A cura é o destino-core se provar (por exemplo, o onion-version.sh que hardcoda role source, ou o members.yaml), e isso muda as fixtures de core da família corelay, que hoje são um git init vazio."
   - id: Q_U1_FASE2_MIGRACAO_CONDUZIDA
     node_type: question
     plane: DEV
@@ -145,6 +169,12 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
 edges:
+  - from: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE
+    to: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
+    edge_type: TRACES_TO
+  - from: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
+    to: E_U1_SINAL_MIGRACAO_CORPUS_V4
+    edge_type: TRACES_TO
   - from: E_C8_BASE_CONTRA_A_PADRAO_DO_ORIGIN
     to: C_HUB_FIELD_SIGNALS_1019_CURED
     edge_type: SUPPORTS

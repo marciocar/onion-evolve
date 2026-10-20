@@ -22663,7 +22663,7 @@ run_corelay_selftests() {
   else record_fail "co-relay: (F3.r3) não-filho relayou ao hub" "rc=${rc}"; fi
 
   # ── Canal UPSTREAM DE VENDOR (D_CANAL_UPSTREAM_POR_VENDOR, 2026-10-20) ─────────────────────────────────────
-  # O dono de um vendor (ex.: onion-kg-ssot, carimbo `adopted`) recebe sinal do adotante que o vendoriza quando a
+  # O dono de um vendor (ex.: o repo de dev do kg-ssot, carimbo `adopted`) recebe sinal do adotante que o vendoriza quando a
   # árvore da tag do carimbo, no destino, reproduz os sha256 do carimbo. Sem rede: o "dono" é um repo local com
   # a tag; o carimbo do remetente é gerado dos blobs dessa tag, como o kg_vendor.py faz.
   if ! command -v python3 >/dev/null 2>&1; then record_skip "co-relay: (V*) canal de vendor" "python3 ausente"; return; fi
@@ -22746,13 +22746,59 @@ open(sys.argv[1] + "/vendor/prod/.prod-version", "w").write(json.dumps(d, indent
   _v_run "${mutd}/m3.sh" "${d}" "${own5}"; local m3="${vrc}"
   _prove_mutation "co-relay: (V-M3) sem a checagem da caixa, o carteiro abriria docs/evolution/ no repo do dono — (V5) morde" \
     "${helper}" "${mutd}/m3.sh" "$([ "${rc_v5_intact}" -eq 2 ] && echo 0 || echo 1)" "$([ "${m3}" -eq 2 ] && echo 0 || echo 1)"
-  # M4: sem o rodapé → o sinal chega sem dizer de onde veio a autorização → (V1) morde
-  sed 's|^      printf .\\n---\\n\\n<!-- co-relay: canal upstream de vendor -->\\n.$|      :|' "${helper}" > "${mutd}/m4.sh"
-  rm -f "${own}/${SIG}"; _v_run "${helper}" "${d}" "${own}"; local foot_i=1; grep -q 'canal upstream de vendor' "${own}/${SIG}" 2>/dev/null && foot_i=0
-  rm -f "${own}/${SIG}"; _v_run "${mutd}/m4.sh" "${d}" "${own}"; local foot_m=1; grep -q 'canal upstream de vendor' "${own}/${SIG}" 2>/dev/null && foot_m=0
+  # M4: sem o rodapé (os três printf entre os marcadores) → o sinal chega sem dizer qual carimbo autorizou
+  sed '/# >>> rodape-vendor/,/# <<< rodape-vendor/d' "${helper}" > "${mutd}/m4.sh"
+  _foot() { grep -q 'vendor/prod/.prod-version' "$1" 2>/dev/null && grep -q 'prod-v1.0.0' "$1" 2>/dev/null; }
+  rm -f "${own}/${SIG}"; _v_run "${helper}" "${d}" "${own}"; local foot_i=1; _foot "${own}/${SIG}" && foot_i=0
+  rm -f "${own}/${SIG}"; _v_run "${mutd}/m4.sh" "${d}" "${own}"; local foot_m=1; _foot "${own}/${SIG}" && foot_m=0
   _prove_mutation "co-relay: (V-M4) sem o rodapé, o dono recebe o sinal sem a autorização declarada — (V1) morde" \
     "${helper}" "${mutd}/m4.sh" "${foot_i}" "${foot_m}"
-  rm -rf "${d}" "${own}" "${own5}" "${v3_d}" "${v3_own}" "${mutd}"
+
+  # ── Achados da passada adversarial (2026-10-20), cada um com o caso e o mutante que o prende ──
+  # (V6) o dono SEM carimbo do Onion e sem caixa (o espelho público, por exemplo): antes caía em "sem carimbo
+  #      = o core" e o carteiro criava docs/evolution/inbox/ lá → exit 2, nada criado
+  local own6; own6="$(mktemp -d)"; _mk_owner "${own6}" "alfa" "c1"; rm -rf "${own6}/.claude" "${own6}/docs/evolution"
+  _v_run "${helper}" "${d}" "${own6}"; local rc_v6="${vrc}"
+  if [ "${vrc}" -eq 2 ] && [ ! -e "${own6}/docs/evolution" ]; then record_pass "co-relay: (V6) dono do vendor sem carimbo do Onion e sem caixa → exit 2, não é tratado como o core"
+  else record_fail "co-relay: (V6) dono sem carimbo virou core" "rc=${vrc}"; fi
+  sed '/^elif \[ -n "${VENDOR_OWNER_NO_BOX}" \]; then$/,/^  exit 2$/d' "${helper}" > "${mutd}/m5.sh"
+  rm -rf "${own6}/docs/evolution"; _v_run "${mutd}/m5.sh" "${d}" "${own6}"; local m5="${vrc}"
+  _prove_mutation "co-relay: (V-M5) sem a recusa do dono-sem-caixa, ele cairia como o core — (V6) morde" \
+    "${helper}" "${mutd}/m5.sh" "$([ "${rc_v6}" -eq 2 ] && echo 0 || echo 1)" "$([ "${m5}" -eq 2 ] && echo 0 || echo 1)"
+  # (V7) o origin do remetente com credencial (`usuário:token@`) não vaza no rodapé do repo alheio
+  git -C "${d}" remote add origin "https://u:ghp_SEGREDO1@github.com/acme/sender.git" 2>/dev/null
+  _leak() { [ -f "$1" ] && ! grep -q 'ghp_SEGREDO1' "$1" && grep -q 'github.com/acme/sender' "$1"; }
+  rm -f "${own}/${SIG}"; _v_run "${helper}" "${d}" "${own}"; local lk_i=1; _leak "${own}/${SIG}" && lk_i=0
+  if [ "${lk_i}" -eq 0 ]; then record_pass "co-relay: (V7) origin com credencial → o rodapé nomeia o remetente sem o token"
+  else record_fail "co-relay: (V7) credencial no rodapé" "$(grep -o 'entregue por `[^`]*`' "${own}/${SIG}" 2>/dev/null)"; fi
+  sed 's|^  SENDER="$(\[ -n "${SENDER}" \] \&\& _norm_remote "${SENDER}" \|\| basename "${REPO_ROOT}")"$|  :|' "${helper}" > "${mutd}/m6.sh"
+  rm -f "${own}/${SIG}"; _v_run "${mutd}/m6.sh" "${d}" "${own}"; local lk_m=1; _leak "${own}/${SIG}" && lk_m=0
+  _prove_mutation "co-relay: (V-M6) com a URL crua do origin, o token iria ao repo do dono — (V7) morde" \
+    "${helper}" "${mutd}/m6.sh" "${lk_i}" "${lk_m}"
+  # (V8) sinal já TRIADO (em _processed/) e o vendor sobe de tag: o rodapé muda, o corpo não → no-op
+  _v8() {  # $1 = helper → 0 se a re-rodada foi no-op
+    rm -rf "${own}/docs/evolution/inbox"; mkdir -p "${own}/docs/evolution/inbox/_processed"
+    _mk_vendor_stamp "${d}" "alfa"; _v_run "$1" "${d}" "${own}"
+    mv "${own}/${SIG}" "${own}/docs/evolution/inbox/_processed/" 2>/dev/null
+    python3 -I -c 'import json,sys; p=sys.argv[1]; d=json.load(open(p)); d["tag"]="prod-v1.1.0"; open(p,"w").write(json.dumps(d))' \
+      "${d}/vendor/prod/.prod-version"
+    _v_run "$1" "${d}" "${own}"; [ "${vrc}" -eq 0 ] && [ ! -f "${own}/${SIG}" ]
+  }
+  git -C "${own}" -c user.name=t -c user.email=t@t tag -a prod-v1.1.0 -m rel >/dev/null 2>&1
+  local v8_i=1; _v8 "${helper}" && v8_i=0
+  if [ "${v8_i}" -eq 0 ]; then record_pass "co-relay: (V8) sinal triado + vendor em tag nova → no-op (o dedup compara o corpo, não o rodapé)"
+  else record_fail "co-relay: (V8) 📬 fantasma pelo rodapé" "re-entregou o sinal já triado"; fi
+  sed 's|^  cmp -s "$2" <(_strip_vendor_footer "$3")$|  return 1|' "${helper}" > "${mutd}/m7.sh"
+  local v8_m=1; _v8 "${mutd}/m7.sh" && v8_m=0
+  _prove_mutation "co-relay: (V-M7) com o dedup pelo arquivo inteiro, a tag nova faria voltar o sinal triado — (V8) morde" \
+    "${helper}" "${mutd}/m7.sh" "${v8_i}" "${v8_m}"
+  # (V9) o próprio repo como destino → exit 2 (o dono relayando para si reescreveria a fonte)
+  mkdir -p "${own}/docs/evolution/inbox"; printf '# sinal de teste\n' > "${own}/${SIG}"
+  local out_v9; vrc=0; out_v9="$( ( cd "${own}" && bash "${helper}" --target "${own}" ) 2>&1)" || vrc=$?
+  if [ "${vrc}" -eq 2 ] && grep -q 'este próprio repo' <<< "${out_v9}" && [ "$(cat "${own}/${SIG}")" = "# sinal de teste" ]; then
+    record_pass "co-relay: (V9) --target = este próprio repo → exit 2, a fonte intocada"
+  else record_fail "co-relay: (V9) relay para si" "rc=${vrc}: ${out_v9}"; fi
+  rm -rf "${d}" "${own}" "${own5}" "${own6}" "${v3_d}" "${v3_own}" "${mutd}"
 }
 
 # ---------------------------------------------------------------------------
