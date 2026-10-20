@@ -2,7 +2,8 @@
 title: 'Resíduo — o relatório do --update mede os arquivos aplicados no alvo'
 date: 2026-10-20
 branch: fix/adopt-update-applied-delta
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: cf0e6fd68715f69d501c583576041f5b007a1a76cecd1e59fb96b840e442e745
+reviewed_code_sha256: 85aa3c2f05f400c770e7f4e1094f7ffaccd63f49a8fd83d5ebe18f3e63f0da2f
 findings_total: 3
 findings_real: 1
 findings_fixed: 1
