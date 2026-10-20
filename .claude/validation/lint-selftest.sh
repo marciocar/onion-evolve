@@ -26845,17 +26845,21 @@ run_prove_gate_blocks_selftests() {
   if [ ! -f "${pg}" ] || [ ! -f "${tpl}" ]; then record_skip "prove-gate-blocks" "script ou template do hook ausente"; return; fi
   local d; d="$(mktemp -d)"; mkdir -p "${d}/tmp"
 
-  _pg_mk() {  # $1=dir · $2=tipo do hook: onion|echo|none|all|ignore|nocite
+  _pg_mk() {  # $1=dir · $2=tipo do hook: onion|echo|none|all|ignore|nocite|lintall
     local r="$1"; mkdir -p "${r}/.claude/validation" "${r}/docs/onion" "${r}/.githooks"
     printf '#!/usr/bin/env bash\nprintf "# inv\\n"\n' > "${r}/.claude/validation/inventory.sh"
     cat > "${r}/.claude/validation/lint-artifacts.sh" <<'LINT'
 #!/usr/bin/env bash
-R="$(git rev-parse --show-toplevel)"
+# espelha a SAÍDA do lint real: SOFT também sai como `VIOLATION:` (no adotante, `[papel/SEM-OBJETO]` é rotina),
+# e só o sumário `Violações HARD : N` diz quantas são HARD
+R="$(git rev-parse --show-toplevel)"; h=0
+echo "VIOLATION: .claude/rules/x.md: REGRA 7 (x): [papel/SEM-OBJETO] soft de rotina"
 if ! bash "${R}/.claude/validation/inventory.sh" --markdown | cmp -s - "${R}/docs/onion/inventory.md"; then
-  echo "VIOLATION: docs/onion/inventory.md: REGRA 8 (Inventário canônico sincronizado com o filesystem): inventário desatualizado vs filesystem"
-  echo "HARD=1"; exit 1
+  echo "VIOLATION: docs/onion/inventory.md: REGRA 8 (Inventário canônico sincronizado com o filesystem): inventário desatualizado vs filesystem"; h=$((h+1))
 fi
-echo "OK ✓"; exit 0
+if [ -e "${R}/.claude/validation/legacy-broken" ]; then echo "VIOLATION: .claude/validation/legacy-broken: REGRA 99 (x): hard pré-existente"; h=$((h+1)); fi
+echo "  Violações HARD : ${h}"
+[ "${h}" -eq 0 ] && { echo "OK ✓"; exit 0; }; exit 1
 LINT
     printf '# inv\n' > "${r}/docs/onion/inventory.md"
     printf 'produto\n' > "${r}/a.txt"
@@ -26864,7 +26868,8 @@ LINT
       echo)   printf '#!/usr/bin/env bash\necho "🧅 Onion pre-commit — tudo certo"\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
       all)    printf '#!/usr/bin/env bash\necho "pre-commit quebrado"\nexit 1\n' > "${r}/.githooks/pre-commit" ;;
       ignore) printf '#!/usr/bin/env bash\nbash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh" || true\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
-      nocite) printf '#!/usr/bin/env bash\ngit diff --cached --name-only | grep -q inventory && { echo "barrado por outro gestor"; exit 1; }\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
+      nocite) printf '#!/usr/bin/env bash\ncase "$(git diff --cached --name-only)" in *inventory*) echo "barrado por outro gestor"; exit 1 ;; esac\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
+      lintall) printf '#!/usr/bin/env bash\nbash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh"\nexit 1\n' > "${r}/.githooks/pre-commit" ;;
       none)   rmdir "${r}/.githooks" ;;
     esac
     [ -f "${r}/.githooks/pre-commit" ] && chmod +x "${r}/.githooks/pre-commit"
@@ -26936,6 +26941,59 @@ LINT
     record_pass "prove-gate-blocks: (h) alvo em worktree ligada → PROVADO; worktree e checkout principal intocados"
   else record_fail "prove-gate-blocks: (h)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
 
+  # ── da passada adversarial (2026-10-20): cada caso abaixo reproduz um achado executado pelo refutador ──
+  # (i) hook que RODA o lint e barra TUDO, com o lint emitindo SOFT (`VIOLATION:` de rotina) → NÃO PROVADO.
+  #     A 1ª versão contava `^VIOLATION:` como HARD, aceitava o controle barrado e dava PROVADO.
+  local ti="${d}/i"; _pg_mk "${ti}" lintall; _pg_run "${pg}" "${ti}"
+  if [ "${_r}" -eq 1 ] && [[ "$(_pg_last)" == *"barra até o commit de controle sem HARD medida"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (i) hook que roda o lint e barra tudo (lint só com SOFT) → NÃO PROVADO (rc 1)"
+  else record_fail "prove-gate-blocks: (i)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (n) HARD pré-existente (não a 8) com o gate certo → NÃO PROVADO por precondição (rc 3), nunca PROVADO
+  local tn="${d}/n"; _pg_mk "${tn}" onion; printf 'x\n' > "${tn}/.claude/validation/legacy-broken"; _pg_run "${pg}" "${tn}"
+  if [ "${_r}" -eq 3 ] && [[ "$(_pg_last)" == *"já reprova com 1 HARD"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (n) alvo que já reprova com HARD → NÃO PROVADO declarado (rc 3), o número vem do sumário do lint"
+  else record_fail "prove-gate-blocks: (n)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (j) pendente SÓ STAGEADO: inventário regenerado e dado `git add`, gerador mudado na working tree → PROVADO.
+  #     Com `ls-files -m` (working tree × índice) o inventário stageado não ia para o sandbox.
+  local tj="${d}/j"; _pg_mk "${tj}" onion
+  printf '#!/usr/bin/env bash\nprintf "# inv2\\n"\n' > "${tj}/.claude/validation/inventory.sh"
+  printf '# inv2\n' > "${tj}/docs/onion/inventory.md"; git -C "${tj}" add docs/onion/inventory.md
+  _pg_run "${pg}" "${tj}"
+  if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (j) pendente só stageado entra no sandbox → PROVADO"
+  else record_fail "prove-gate-blocks: (j)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (m) APAGADO pendente de que o lint depende: o alvo apagou o arquivo que dava HARD → PROVADO
+  local tm="${d}/m"; _pg_mk "${tm}" onion; printf 'x\n' > "${tm}/.claude/validation/legacy-broken"
+  git -C "${tm}" add -A >/dev/null 2>&1; git -C "${tm}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -qm legado --no-verify >/dev/null 2>&1 || true
+  rm -f "${tm}/.claude/validation/legacy-broken"; _pg_run "${pg}" "${tm}"
+  if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (m) apagado pendente é apagado no sandbox → PROVADO"
+  else record_fail "prove-gate-blocks: (m)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (k) worktree ligada SEM hooksPath: o hook mora no gitdir COMUM e delega por "$(dirname "$0")/../../.githooks"
+  #     → PROVADO. Copiado para fora do .git do sandbox, o caminho relativo sumia e a prova dizia "barra tudo".
+  local tk="${d}/k"; _pg_mk "${tk}" onion; git -C "${tk}" config --unset core.hooksPath
+  printf '#!/usr/bin/env bash\nexec "$(dirname "$0")/../../.githooks/pre-commit" "$@"\n' > "${tk}/.git/hooks/pre-commit"; chmod +x "${tk}/.git/hooks/pre-commit"
+  local tkw="${d}/k-wt"; git -C "${tk}" worktree add -q -b wt-k "${tkw}" >/dev/null 2>&1 || true
+  _pg_run "${pg}" "${tkw}"
+  if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (k) worktree com hook no gitdir comum (delegador relativo) → PROVADO"
+  else record_fail "prove-gate-blocks: (k)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (l) hook como SYMLINK absoluto que se localiza por `readlink -f "$0"` e grava um carimbo ao lado → PROVADO,
+  #     e o carimbo NÃO cai no checkout real. Com o symlink preservado, o hook voltava ao alvo e escrevia nele.
+  local tl="${d}/l"; _pg_mk "${tl}" onion; git -C "${tl}" config --unset core.hooksPath
+  printf '#!/usr/bin/env bash\nd="$(dirname "$(readlink -f "$0")")"; date > "${d}/carimbo-do-hook.txt"\nexec bash "$(git rev-parse --show-toplevel)/.githooks/pre-commit"\n' > "${tl}/.githooks/pre-commit-real"
+  chmod +x "${tl}/.githooks/pre-commit-real"; ln -s "${tl}/.githooks/pre-commit-real" "${tl}/.git/hooks/pre-commit"
+  _pg_run "${pg}" "${tl}"
+  if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && [ "${_intact}" = 1 ] && [ ! -e "${tl}/.githooks/carimbo-do-hook.txt" ]; then
+    record_pass "prove-gate-blocks: (l) hook symlink absoluto roda no sandbox (cp -aL) → PROVADO, nada escrito no alvo"
+  else record_fail "prove-gate-blocks: (l)" "rc=${_r} intacto=${_intact} carimbo-no-alvo=$([ -e "${tl}/.githooks/carimbo-do-hook.txt" ] && echo sim || echo não) última='$(_pg_last)'"; fi
+  rm -f "${tl}/.githooks/carimbo-do-hook.txt"
+
   # ── MUTANTES — cada um tira uma decisão e o caso que a mede tem de virar ───────────────────────────
   _pg_mut() {  # $1=nome · $2=sed · $3=alvo · $4=padrão que a última linha do ORIGINAL tem e o mutante perde
     local m="${d}/mut-$1.sh"; sed "$2" "${pg}" > "${m}"
@@ -26949,9 +27007,20 @@ LINT
   # sem exigir a citação, o outro gestor (f) levaria o mérito
   _pg_mut cite 's|if ! grep -Eq "${CITE_RE}" <<< "${P_OUT}"; then|if false; then|' "${tf}" "NÃO PROVADO"
   # sem o controle, barrar tudo (d) deixa de ser nomeado
-  _pg_mut control 's|if \[ "${C_RC}" -ne 0 \] && \[ "${C_HARD}" -eq 0 \]; then|if false; then|' "${td}" "barra até o commit de controle"
+  _pg_mut control 's|^if \[ "${C_RC}" -ne 0 \]; then|if false; then|' "${ti}" "NÃO PROVADO"
+  # sem distinguir HARD pelo sumário, a HARD pré-existente (n) vira "barra tudo"
+  _pg_mut hardsum 's|if \[ -n "${C_HARD}" \] && \[ "${C_HARD}" -gt 0 \]; then|if false; then|' "${tn}" "já reprova com 1 HARD"
+  # com `ls-files -m` no lugar de `diff HEAD`, o stageado (j) some do sandbox
+  _pg_mut staged 's|diff -z --no-renames --name-only HEAD|ls-files -z -m|' "${tj}" "bloqueio PROVADO"
+  # sem apagar no sandbox o que o alvo apagou, (m) volta a reprovar pela HARD apagada
+  _pg_mut deleted 's/|| rm -f -- "${R}\/${f}"/|| true/' "${tm}" "bloqueio PROVADO"
+  # com os hooks do gitdir comum copiados para fora do .git do sandbox, (k) acusa "barra tudo"
+  _pg_mut commonhooks 's|"${COMMON}/"\*) HSB=|"${COMMON}/nunca/"*) HSB=|' "${tkw}" "bloqueio PROVADO"
+  # com o symlink preservado (cp -a), o hook de (l) volta ao checkout real
+  _pg_mut symlink 's|cp -aL -- "${H}/."|cp -a -- "${H}/."|' "${tl}" "bloqueio PROVADO"
+  rm -f "${tl}/.githooks/carimbo-do-hook.txt"
   # sem o pendente da working tree, (g) creditaria ao plantio a violação que já existia
-  _pg_mut overlay 's|ls-files -z -m -o --exclude-standard|ls-files -z -o --exclude-standard|' "${tg}" "JÁ viola"
+  _pg_mut overlay 's|git -C "${T}" diff -z --no-renames --name-only HEAD 2>/dev/null; ||' "${tg}" "JÁ viola"
   # plantando no checkout REAL, a conferência de integridade tem de trocar o veredito (rc 4)
   local m4="${d}/mut-real.sh"; sed 's|>> "${R}/docs/onion/inventory.md"|>> "${T}/docs/onion/inventory.md"|' "${pg}" > "${m4}"
   if cmp -s "${pg}" "${m4}"; then record_fail "prove-gate-blocks: (MUT-real) setup" "a mutação não foi aplicada"
@@ -26963,6 +27032,7 @@ LINT
   fi
 
   git -C "${ta}" worktree remove --force "${th}" >/dev/null 2>&1 || true
+  git -C "${tk}" worktree remove --force "${tkw}" >/dev/null 2>&1 || true
   unset -f _pg_mk _pg_snap _pg_run _pg_last _pg_mut
   rm -rf "${d}" 2>/dev/null || true
 }

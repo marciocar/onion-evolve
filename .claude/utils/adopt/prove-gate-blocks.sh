@@ -15,12 +15,15 @@
 #   2. resolve o pre-commit que o git do alvo roda DE FATO (`rev-parse --git-path hooks`, que honra
 #      `core.hooksPath`, relativo ou absoluto, e a worktree);
 #   3. monta o SANDBOX: `git clone --shared --no-checkout` do repositório do alvo para um diretório
-#      temporário (lê objetos, não escreve nada no alvo; o remoto é removido em seguida), checkout do HEAD
-#      do alvo, e por cima o que está pendente na working tree dele (modificado e não-rastreado que não é
-#      ignorado; apagado é apagado). O diretório de hooks é copiado do DISCO do alvo, e o sandbox aponta o
-#      `core.hooksPath` para a cópia. Um commit-base `--no-verify` fixa esse estado;
-#   4. CONTROLE: commit vazio pelo hook. Sem violação plantada, o gate tem de deixar passar (ou barrar
-#      só por HARD que já existia, citada);
+#      temporário (lê objetos pelos alternates; o único efeito no alvo é o git poder REFRESCAR o mtime de
+#      objetos que já existem, com conteúdo intacto; o remoto é removido em seguida), checkout do HEAD do
+#      alvo, e por cima o que está pendente nele contra o HEAD (stageado, modificado e não-rastreado que
+#      não é ignorado; apagado é apagado). O diretório de hooks é copiado do DISCO do alvo com os symlinks
+#      RESOLVIDOS (`cp -aL`), e o sandbox aponta o `core.hooksPath` para a cópia. Um commit-base
+#      `--no-verify` fixa esse estado;
+#   4. CONTROLE: commit vazio pelo hook. Sem violação plantada, o gate TEM de deixar passar: com o
+#      controle barrado, o rc≠0 do plantado está garantido de antemão e não prova nada (passada
+#      adversarial, 2026-10-20: um hook que barra tudo saía PROVADO);
 #   5. PLANTA: uma linha a mais em `docs/onion/inventory.md`. O inventário é gerado byte a byte do
 #      filesystem pelo `inventory.sh`, e a REGRA 8 o compara byte a byte, então a linha extra é drift
 #      determinístico, com o mesmo resultado em qualquer papel (source, hub, adopted, door) e em qualquer
@@ -34,14 +37,18 @@
 # único arquivo, gerado, que todo papel recebe do `regen-ssot-projections.sh`.
 #
 # NUNCA planta nada no checkout real. Tudo o que se escreve vive em `mktemp -d` e é apagado no trap.
+# TETO declarado: o hook do alvo RODA (é o que se prova). Um hook que faz `cd` para um caminho absoluto
+# fixo do repo real e escreve lá escapa do sandbox, e a foto não vê arquivo IGNORADO (incluí-los daria
+# rc 4 falso a cada log de sessão viva no alvo, a mesma classe das refs abaixo). O symlink absoluto, que
+# levava o hook a lintar o checkout real, está curado pelo `cp -aL`.
 #
 # USO  : prove-gate-blocks.sh <TARGET>
 # SAÍDA: linhas de diagnóstico e, por ÚLTIMO, sempre uma destas duas:
 #          bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc N)
 #          bloqueio NÃO PROVADO: <motivo>
-# EXIT : 0 PROVADO · 1 NÃO PROVADO por defeito do gate (fail-open, barra tudo, barrou sem citar)
+# EXIT : 0 PROVADO · 1 NÃO PROVADO por defeito do gate (fail-open, barra tudo sem HARD, barrou sem citar)
 #        3 NÃO PROVADO por precondição (sem pre-commit, sem HEAD, sem inventário, sandbox falhou, timeout,
-#          baseline já viola a REGRA 8) · 4 INTEGRIDADE: o checkout real mudou (pare tudo) · 2 uso
+#          sinal, o estado do alvo já reprova com HARD) · 4 INTEGRIDADE: o checkout real mudou (pare) · 2 uso
 # ENV  : ONION_GATE_PROBE_TIMEOUT (segundos por commit, default 900)
 # Determinístico, sem LLM, sem jq. Exercitado por lint-selftest.sh (run_prove_gate_blocks_selftests).
 # =============================================================================
@@ -113,6 +120,9 @@ finish() {
   exit "${rc}"
 }
 trap finish EXIT
+# Sinal no meio da prova: o veredito continua sendo a última linha (passada adversarial: sob SIGTERM a
+# última linha era a de diagnóstico).
+trap 'verdict_no 3 "interrompido por sinal durante a prova"' TERM INT HUP
 
 R="${SB}/repo"
 COMMON="$(git -C "${T}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
@@ -122,21 +132,30 @@ git -C "${R}" remote remove origin >/dev/null 2>&1 || true   # nada no sandbox e
 git -C "${R}" -c core.hooksPath=/dev/null checkout -q --detach "${T_HEAD}" >/dev/null 2>&1 \
   || verdict_no 3 "não consegui fazer checkout do HEAD do alvo no sandbox"
 
-# Pendente na working tree do alvo (o update aplica config e carimbo antes de commitá-los).
+# Pendente do alvo CONTRA O HEAD (o update aplica config e carimbo antes de commitá-los). `diff HEAD`, e não
+# `ls-files -m`: este compara a working tree com o ÍNDICE e perdia o que está só stageado (passada
+# adversarial, 2026-10-20: inventário stageado e coerente dava "já viola" num alvo cujo lint passava).
 while IFS= read -r -d '' f; do
   [ -e "${T}/${f}" ] || [ -L "${T}/${f}" ] || continue
   mkdir -p "${R}/$(dirname -- "${f}")" && cp -a -- "${T}/${f}" "${R}/${f}" 2>/dev/null
-done < <(git -C "${T}" ls-files -z -m -o --exclude-standard 2>/dev/null)
-while IFS= read -r -d '' f; do rm -f -- "${R}/${f}"; done < <(git -C "${T}" ls-files -z -d 2>/dev/null)
+done < <(git -C "${T}" diff -z --no-renames --name-only HEAD 2>/dev/null; git -C "${T}" ls-files -z -o --exclude-standard 2>/dev/null)
+while IFS= read -r -d '' f; do
+  [ -e "${T}/${f}" ] || [ -L "${T}/${f}" ] || rm -f -- "${R}/${f}"
+done < <(git -C "${T}" diff -z --no-renames --name-only --diff-filter=D HEAD 2>/dev/null; git -C "${T}" ls-files -z -d 2>/dev/null)
 
-# Hooks: copiados do DISCO do alvo. Dentro da árvore do alvo vão para o mesmo caminho relativo (hook que
-# chama "$(dirname "$0")/../algo" continua achando); fora dela (worktree com hooks no gitdir comum, ou
-# hooksPath absoluto para outro checkout), para um diretório próprio do sandbox.
+# Hooks: copiados do DISCO do alvo, para o MESMO caminho relativo, para que um hook que chama
+# "$(dirname "$0")/../algo" continue achando: dentro da árvore do alvo → mesma posição no sandbox; dentro
+# do gitdir comum (worktree ligada sem hooksPath) → mesma posição no .git do sandbox (passada adversarial:
+# copiado para fora, o `../../.githooks` de um hook delegador sumia e a prova acusava "barra tudo");
+# fora dos dois (hooksPath absoluto para outro checkout) → diretório próprio do sandbox.
+# `-L`: symlink resolvido. Preservado, um hook que faz `readlink -f "$0"` voltava ao checkout real e
+# lintava o ALVO, não o sandbox (medido: veredito errado e escrita no alvo).
 case "${H}/" in
-  "${T}/"*) HSB="${R}/${H#"${T}/"}" ;;
-  *)        HSB="${SB}/hooks" ;;
+  "${T}/"*)      HSB="${R}/${H#"${T}/"}" ;;
+  "${COMMON}/"*) HSB="${R}/.git/${H#"${COMMON}/"}" ;;
+  *)             HSB="${SB}/hooks" ;;
 esac
-mkdir -p "${HSB}" && cp -a -- "${H}/." "${HSB}/" 2>/dev/null \
+mkdir -p "${HSB}" && cp -aL -- "${H}/." "${HSB}/" 2>/dev/null \
   || verdict_no 3 "não consegui copiar os hooks do alvo para o sandbox"
 git -C "${R}" config core.hooksPath "${HSB}"
 
@@ -163,10 +182,16 @@ echo "· controle (sem violação): rc ${C_RC}"
 if grep -Eq "${CITE_RE}" <<< "${C_OUT}"; then
   verdict_no 3 "o estado do alvo JÁ viola a ${RULE_LABEL} sem nada plantado — a prova não é atribuível; regenere o inventário no alvo (/meta:inventory) e rode de novo"
 fi
-C_HARD="$(grep -c '^VIOLATION:' <<< "${C_OUT}")" || C_HARD=0
-if [ "${C_RC}" -ne 0 ] && [ "${C_HARD}" -eq 0 ]; then
+# Controle barrado = prova não atribuível, SEMPRE. A 1ª versão aceitava o controle barrado "por HARD
+# pré-existente" contando `^VIOLATION:`, linha que o lint imprime também para SOFT: um hook que barra tudo
+# saía PROVADO. O número de HARD vem do SUMÁRIO do lint (`Violações HARD : N`) e só escolhe o motivo.
+if [ "${C_RC}" -ne 0 ]; then
+  C_HARD="$(grep -oE 'Violações HARD *: *[0-9]+' <<< "${C_OUT}" | tail -1 | grep -oE '[0-9]+$')" || C_HARD=""
   printf '%s\n' "${C_OUT}" | tail -8 | sed 's/^/    /'
-  verdict_no 1 "o gate barra até o commit de controle, sem violação plantada nem citada (rc ${C_RC}) — barrar tudo não é discriminar HARD"
+  if [ -n "${C_HARD}" ] && [ "${C_HARD}" -gt 0 ]; then
+    verdict_no 3 "o estado do alvo já reprova com ${C_HARD} HARD (controle rc ${C_RC}) — com tudo barrado, a prova não é atribuível; cure as HARD (remeasure-hard.sh) e rode de novo"
+  fi
+  verdict_no 1 "o gate barra até o commit de controle sem HARD medida (rc ${C_RC}) — barrar tudo não é discriminar HARD"
 fi
 
 # ── 5. PLANTA ───────────────────────────────────────────────────────────────────────────────────────
@@ -189,6 +214,5 @@ if ! grep -Eq "${CITE_RE}" <<< "${P_OUT}"; then
   verdict_no 1 "o commit plantado foi barrado (rc ${P_RC}) sem citar a ${RULE_LABEL} — quem barrou não foi o gate do Onion"
 fi
 grep -E "${CITE_RE}" <<< "${P_OUT}" | head -1 | sed 's/^/    /'
-[ "${C_RC}" -ne 0 ] && echo "· aviso: o controle já era barrado por ${C_HARD} HARD pré-existente(s) (rc ${C_RC}) — o alvo não commita sem curá-las"
 echo "bloqueio PROVADO (${RULE_LABEL}, rc ${P_RC})"
 exit 0
