@@ -31141,6 +31141,20 @@ STUB
   if [[ "${_f2}" == 0:*' ok' ]] && [[ "${_f2b}" == 0:*' ok' ]]; then
     record_pass "registry-pins: (f2) registro standalone × carimbo standalone (o corte) e × adopted (compat) ⇒ ok, sem DIVERGE de papel"
   else record_fail "registry-pins: (f2) carimbo do adotante standalone" "standalone×standalone=${_f2} · standalone×adopted=${_f2b}"; fi
+
+  # (f3) CARIMBO SEM `role:` (passada adversarial de 2026-10-20): registro `standalone`, carimbo vivo com
+  #      pin novo e SEM linha de papel ⇒ acusa papel (<sem role>), rc=1, e o --seal NÃO carimba. A 1ª forma
+  #      só comparava com os dois lados preenchidos, e o carimbo mudo passava direto ao pin.
+  #      MUTANTE: voltar a condição para `[ -n "${stamp_role}" ] && [ -n "${regrole}" ]` reprova este caso.
+  rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"
+  printf 'source_commit: %s\n' "${PIN_NEW}" > "${stamps}/dono_alvo_main"
+  _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"
+  sed -i '/^  - id: alvo$/a\    role: standalone' "${REG}"
+  _rp --seal
+  if [ "${_r}" -eq 1 ] && grep -qE '^alvo .*papel: registro standalone × carimbo <sem role>' <<< "${_o}" \
+     && grep -qF "onion_version: ${PIN_OLD}   # comentario antigo do alvo" "${REG}"; then
+    record_pass "registry-pins: (f3) carimbo vivo SEM role ⇒ acusa papel e NÃO carimba (omissão não é compatível)"
+  else record_fail "registry-pins: (f3) carimbo sem role passou direto ao pin" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
   rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"   # devolve o mundo como o (f) o deixou: o (g) parte dele
 
   # (g) membro COM remoto, remoto FALHA, clone parado bate com o registro ⇒ ILEGÍVEL (rc=3), nunca ok.
