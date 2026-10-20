@@ -2,7 +2,8 @@
 branch: fix/env-guard-currency-kb-index
 pr: 1222
 date: 2026-10-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0e66987537d468e8ba01f3bde94a4437286d2887c7f8811a7ed27a5e30a6cb7d
+reviewed_code_sha256: f3e832397bcb6fe3a0ade06f039fa8e80f43e46b7012e6e259b44848f57e8391
 findings_total: 21
 findings_real: 18
 tokens: 125611
