@@ -10,9 +10,9 @@ meta:
                              # qualquer update do Claude Code (migalha cc-version-e-gatilho-de-estrategia +
                              # REGRA 65). Se a plataforma mudar a carga de skills, TODA a recomendação vira pó.
   # kg-backlog-guard: on
-  # ═══ TETO: 20 NÓS. Rodada fechada em 2 fontes externas úteis (1 paper tier 7, 1 analista tier 6) + 1 (2026-09-03: +1 — pre-requisito da decisao RESOLVIDO no binario, E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903)
+  # ═══ TETO: 21 NÓS. Rodada fechada em 2 fontes externas úteis (1 paper tier 7, 1 analista tier 6) + 1 (2026-09-03: +1 — pre-requisito da decisao RESOLVIDO no binario, E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903)
   #     medição local tier 10. Cresce SÓ por: (a) medição própria nova (replay de poda no tier menor, spec
-  #     do hook InstructionsLoaded), ou (b) emenda de Elenxo. Não cresce por mais busca externa. ═══
+  #     do hook InstructionsLoaded), ou (b) emenda de Elenxo. Não cresce por mais busca externa. 2026-10-20: +1 por (b), a emenda do placar sem referente (E_PLACAR_9A1_SEM_REFERENTE_1020). ═══
   # Pergunta do maestro (2026-09-03): o que podar do CLAUDE.md (246 linhas) e das skills do core para curar
   # "agent instruction bloat" (Thoughtworks Radar v34, CAUTION) sem perder doutrina — e como MEDIR o que de
   # fato carrega no contexto. Opções: (A) doutrina em skills/rules por path + CLAUDE.md só identidade e
@@ -168,7 +168,10 @@ nodes:
     status: open
     impact: 5
     confidence: 0.7
-    label: 'OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica opcao que produz MECANISMO VERIFICAVEL (o moat declarado do Onion), o hook existe no binario 2.1.259, e o placar interno ja provou que sensor de ausencia em hook vence secao em markdown por 9 a 1. Contra, e o ponto que o Elenxo emenda: "o que carrega" NAO e a medida certa — carga e barata e a plataforma ja a resolve. A medida certa e COMPORTAMENTO: replay de casos com e sem a instrucao. Restringida por E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO (calibrar no opus pode quebrar o subagente) e por E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO (sem motivo registrado, a delecao futura volta a ser indecidivel).'
+    label: 'OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica opcao que produz MECANISMO VERIFICAVEL (o moat declarado do Onion), o hook existe no binario 2.1.259, e o placar interno (kg-read-leg-2026-08, E_replay_scoreboard) mediu secao em markdown e hook sensor-de-ausencia EMPATADOS em 1/9. Contra, e o ponto que o Elenxo emenda: "o que carrega" NAO e a medida certa — carga e barata e a plataforma ja a resolve. A medida certa e COMPORTAMENTO: replay de casos com e sem a instrucao. Restringida por E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO (calibrar no opus pode quebrar o subagente) e por E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO (sem motivo registrado, a delecao futura volta a ser indecidivel).'
+    narrative: |-
+      Emenda de Elenxo (2026-10-20): o label afirmava que o placar interno provou "sensor de ausencia em hook vence secao em markdown por 9 a 1". O placar citado (E_replay_scoreboard em docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml) diz o contrario: cura A (secao no CLAUDE.md) 1/9, cura B (hook UserPromptSubmit) 1/9, cura C 0/9, e o unico caso que A e B pegam e o mesmo. O "9 a 1" nao tinha referente. O argumento central da opcao (medir antes de podar) nao dependia do numero e fica de pe; o selo D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS nao o cita. Achado de campo de 2026-09-22 (worktree kg-inbox-placar-poda, nunca mergeada), re-derivado contra a main.
+      Label anterior, verbatim: OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica opcao que produz MECANISMO VERIFICAVEL (o moat declarado do Onion), o hook existe no binario 2.1.259, e o placar interno ja provou que sensor de ausencia em hook vence secao em markdown por 9 a 1. Contra, e o ponto que o Elenxo emenda: "o que carrega" NAO e a medida certa — carga e barata e a plataforma ja a resolve. A medida certa e COMPORTAMENTO: replay de casos com e sem a instrucao. Restringida por E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO (calibrar no opus pode quebrar o subagente) e por E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO (sem motivo registrado, a delecao futura volta a ser indecidivel).
     trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml'
 
   - id: C_OPCAO_D_NAO_PODAR
@@ -341,6 +344,23 @@ nodes:
       method: "medição: leitura de strings do binário do Claude Code 2.1.259 em 2026-09-03 (schema Toe/Eoe do InstructionsLoaded, 15 ocorrências), comando não registrado"
       locality: "web"
 
+  - id: E_PLACAR_9A1_SEM_REFERENTE_1020
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-20"
+    verified_against: "E_replay_scoreboard em docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml (origin/main): A 1/9, B 1/9, C 0/9"
+    label: "O \"9 a 1\" de C_OPCAO_C nao tem referente: o placar interno citado (E_replay_scoreboard) mede secao em markdown e hook sensor-de-ausencia empatados em 1/9 (e a cura C em 0/9). O selo D_PODA nao se apoia no numero."
+    trace: "docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml, no E_replay_scoreboard"
+      locator: "label: 'O PLACAR (a regua): cura A (secao no CLAUDE.md) = 1/9; cura B (hook UserPromptSubmit sensor-de-ausencia) = 1/9; cura C (kg-radar --grep cross-grafo) = 0/9'"
+      method: "leitura: o no do placar comparado com a frase do label de C_OPCAO_C"
+      locality: "repo"
+
 edges:
   # ── evidências sustentam a pergunta ──
   - from: E_OSSIFICACAO_DAS_INSTRUCOES_ANTIGAS
@@ -450,3 +470,6 @@ edges:
   - from: E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903
     to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
     edge_type: SUPPORTS
+  - from: E_PLACAR_9A1_SEM_REFERENTE_1020
+    to: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    edge_type: CONSTRAINS
