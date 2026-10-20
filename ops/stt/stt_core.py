@@ -250,8 +250,11 @@ def openai_body(fmt: str, text: str, segments, duration: float, language: str | 
 
 def deepgram_word(w):
     bare = _EDGE_PUNCT.sub("", unicodedata.normalize("NFC", w["word"])).lower()
-    return {"word": bare or w["word"].lower(), "start": w["start"], "end": w["end"], "confidence": w["probability"],
-            "punctuated_word": w["word"]}
+    out = {"word": bare or w["word"].lower(), "start": w["start"], "end": w["end"], "confidence": w["probability"],
+           "punctuated_word": w["word"]}
+    if w.get("speaker") is not None:  # diarize=true: o Deepgram põe `speaker` (int a partir de 0) em cada palavra
+        out["speaker"] = w["speaker"]
+    return out
 
 
 def deepgram_channel(text: str, words):
@@ -313,3 +316,178 @@ def raw_pcm_params(query) -> tuple[int, int] | None:
     if not 1 <= ch <= MAX_CHANNELS:
         raise ValueError(f"channels must be 1..{MAX_CHANNELS}")
     return sr, ch
+
+
+# ── diarização (Nemotron-3-Diarization pelo NeMo-Speech.cpp, num subprocesso) ─────────────────────────────
+# Decisão do maestro D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019: a diarização roda DENTRO do serviço, DEPOIS do Parakeet,
+# sobre o MESMO áudio, e o falante vai para as palavras por sobreposição de tempo. Falha nunca derruba a transcrição: o
+# chamador recebe status e motivo, e a resposta sai sem falante, declarando. Tudo aqui é stdlib (a bancada roda no CI).
+DIAR_MAX_SPEAKERS = 8  # o V3 (Nemotron-3) vai até 8 falantes
+DIAR_RTTM_MAX_BYTES = 8 << 20
+DIAR_STATUSES = ("ok", "failed", "skipped", "unavailable")
+
+
+class DiarResult:
+    """turns: lista de (início, fim, rótulo) ordenada por início, ou None; status em DIAR_STATUSES; reason: texto curto."""
+
+    def __init__(self, status: str, reason: str = "", turns=None, proc_s: float = 0.0):
+        if status not in DIAR_STATUSES:
+            raise ValueError(f"status de diarização fora do vocabulário: {status}")
+        self.status, self.reason, self.turns, self.proc_s = status, reason, turns, proc_s
+
+    def public(self):
+        """O bloco que a resposta declara (nunca o conteúdo do áudio)."""
+        n = len({t[2] for t in self.turns}) if self.turns else 0
+        return {"status": self.status, "reason": self.reason, "speakers": n, "proc_s": round(self.proc_s, 3)}
+
+
+def parse_rttm(text: str, max_speakers: int = DIAR_MAX_SPEAKERS):
+    """RTTM (`SPEAKER <arquivo> <canal> <início> <duração> <NA> <NA> <rótulo> <NA> <NA>`) → [(início, fim, rótulo)]
+    ordenado por início. Linha vazia ou de comentário é pulada; QUALQUER outra coisa fora da forma levanta ValueError
+    (saída truncada ou estranha do binário não vira falante inventado)."""
+    turns = []
+    for ln in text.splitlines():
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        p = ln.split()
+        if len(p) < 8 or p[0] != "SPEAKER":
+            raise ValueError("linha RTTM fora da forma")
+        try:
+            start, dur = float(p[3]), float(p[4])
+        except ValueError:
+            raise ValueError("tempo RTTM não numérico") from None
+        if not (math.isfinite(start) and math.isfinite(dur)) or start < 0 or dur <= 0:
+            raise ValueError("tempo RTTM inválido")
+        if not re.fullmatch(r"[A-Za-z0-9_.-]{1,64}", p[7]):
+            raise ValueError("rótulo de falante fora do alfabeto")
+        turns.append((round(start, 3), round(start + dur, 3), p[7]))
+    if len({t[2] for t in turns}) > max_speakers:
+        raise ValueError(f"mais de {max_speakers} falantes no RTTM")
+    turns.sort(key=lambda t: (t[0], t[1], t[2]))
+    return turns
+
+
+def speaker_ids(turns):
+    """Rótulo do diarizador → inteiro a partir de 0, na ordem da primeira fala (a forma do Deepgram)."""
+    ids = {}
+    for _s, _e, lab in sorted(turns, key=lambda t: (t[0], t[1])):
+        if lab not in ids:
+            ids[lab] = len(ids)
+    return ids
+
+
+def speaker_for(start: float, end: float, turns, ids):
+    """O falante de [start, end]: o de MAIOR sobreposição; sem sobreposição, o do turno mais próximo (a palavra que cai
+    numa pausa curta do diarizador fica com quem falava perto dela). Sem turno nenhum → None."""
+    best, best_ov = None, 0.0
+    for s, e, lab in turns:
+        ov = min(end, e) - max(start, s)
+        if ov > best_ov:
+            best, best_ov = lab, ov
+    if best is None:
+        near = None
+        for s, e, lab in turns:
+            gap = s - end if s >= end else (start - e if start >= e else 0.0)
+            if near is None or gap < near[0]:
+                near = (gap, lab)
+        best = near[1] if near else None
+    return None if best is None else ids[best]
+
+
+def assign_speakers(words, turns):
+    """Cópia das palavras com `speaker` (int a partir de 0). Sem turnos, devolve as palavras sem a chave."""
+    if not turns:
+        return [dict(w) for w in words]
+    ids = speaker_ids(turns)
+    return [dict(w, speaker=speaker_for(w["start"], w["end"], turns, ids)) for w in words]
+
+
+def diarize_segments(segments, turns):
+    """Segmentos do verbose_json com falante: cada palavra ganha `speaker` e o segmento é CORTADO onde o falante muda
+    (um segmento é de um falante só); os ids são renumerados em ordem. O avg_logprob do pedaço é o do segmento de
+    origem (as probabilidades por token não chegam até aqui). Segmento sem palavras herda o falante pelo seu tempo."""
+    if not turns:
+        return [dict(s) for s in segments]
+    ids = speaker_ids(turns)
+    out = []
+    for seg in segments:
+        ws = assign_speakers(seg.get("words") or [], turns)
+        if not ws:
+            out.append(dict(seg, speaker=speaker_for(seg["start"], seg["end"], turns, ids)))
+            continue
+        runs = [[ws[0]]]
+        for w in ws[1:]:
+            if w["speaker"] == runs[-1][-1]["speaker"]:
+                runs[-1].append(w)
+            else:
+                runs.append([w])
+        for r in runs:
+            out.append(dict(seg, start=r[0]["start"], end=r[-1]["end"], text=" ".join(w["word"] for w in r), words=r,
+                            speaker=r[0]["speaker"]))
+    for i, s in enumerate(out):
+        s["id"] = i
+    return out
+
+
+def write_wav16(path: str, pcm16: bytes, sample_rate: int):
+    """O áudio que o diarizador lê: WAV PCM de 16 bits mono, escrito pelo stdlib (o mesmo áudio que o Parakeet ouviu)."""
+    import wave
+    with wave.open(path, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(sample_rate)
+        w.writeframes(pcm16)
+
+
+def diar_command(binary: str, model: str, wav: str, rttm: str):
+    """O comando MEDIDO pela curadoria (DIAR-PROTOCOL, emenda 4, S2): preset v3-offline, CPU, RTTM."""
+    return [binary, "diarize", wav, "-m", model, "--device", "cpu", "--preset", "v3-offline", "--format", "rttm",
+            "--recording-id", "onion-stt", "-o", rttm, "--force"]
+
+
+def diar_env(tmpdir: str):
+    """Ambiente FECHADO do subprocesso: PATH sem nada (o nemo-speech só baixa modelo pelo `curl` do PATH; com o gguf
+    local ele nem tenta, e sem PATH não teria como), cache e HOME dentro do temporário do pedido. A unit nega a rede de
+    saída do cgroup inteiro (IPAddressDeny=any), o que vale também para este filho."""
+    return {"PATH": "/nonexistent", "HOME": tmpdir, "XDG_CACHE_HOME": tmpdir, "NEMO_SPEECH_MODEL_DIR": tmpdir,
+            "LC_ALL": "C", "LANG": "C"}
+
+
+def diarize(binary: str, model: str, wav: str, tmpdir: str, timeout_s: float, run=None):
+    """Roda o diarizador sobre o WAV (escrito por write_wav16 ANTES da transcrição, para o servidor soltar o float32
+    antes de o filho subir) e devolve um DiarResult. NUNCA levanta: binário que falha, demora, some ou escreve RTTM
+    estranho vira status `failed` com o motivo, e quem chamou entrega a transcrição sem falante."""
+    import subprocess
+    import time
+    run = run or subprocess.run
+    t0 = time.perf_counter()
+    try:
+        rttm = os.path.join(tmpdir, "diar-out.rttm")
+        if not os.path.isfile(wav):
+            return DiarResult("failed", "diarization input missing", None, 0.0)
+        try:
+            p = run(diar_command(binary, model, wav, rttm), capture_output=True, timeout=timeout_s, check=False,
+                    env=diar_env(tmpdir), cwd=tmpdir, stdin=subprocess.DEVNULL)
+        except subprocess.TimeoutExpired:
+            return DiarResult("failed", f"timeout ({timeout_s:.0f} s)", None, time.perf_counter() - t0)
+        if p.returncode != 0:
+            tail = (p.stderr or b"")[-160:].decode(errors="replace").replace(tmpdir, "<tmp>").strip()
+            return DiarResult("failed", f"diarizer rc={p.returncode}: {tail}", None, time.perf_counter() - t0)
+        if not os.path.isfile(rttm):
+            return DiarResult("failed", "diarizer wrote no RTTM", None, time.perf_counter() - t0)
+        if os.path.getsize(rttm) > DIAR_RTTM_MAX_BYTES:
+            return DiarResult("failed", "RTTM too large", None, time.perf_counter() - t0)
+        with open(rttm, encoding="utf-8", errors="strict") as f:
+            turns = parse_rttm(f.read())
+        if not turns:
+            return DiarResult("failed", "diarizer found no speech", None, time.perf_counter() - t0)
+        return DiarResult("ok", "", turns, time.perf_counter() - t0)
+    except (OSError, ValueError, UnicodeDecodeError) as e:
+        return DiarResult("failed", f"{type(e).__name__}: {str(e).replace(tmpdir, '<tmp>')[:160]}", None,
+                          time.perf_counter() - t0)
+
+
+def diar_timeout_s(duration_s: float) -> float:
+    """Teto de tempo do diarizador: 2 min fixos + metade da duração (medido: RTF ~0,047 no v3-offline, 10× de folga)."""
+    return 120.0 + 0.5 * max(duration_s, 0.0)

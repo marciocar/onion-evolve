@@ -1,0 +1,17 @@
+{
+  "file": "fleurs-ptbr-2spk-aba.flac",
+  "sha256": "18ce80ca68d4196676ec6282902b9623e4f34d8e39443b8cc9f142cded523963",
+  "duration_s": 24.28,
+  "turns": [
+    {"speaker": "A", "start": 0.0, "end": 7.2, "source": "8821974356183732066.wav", "source_sha256": "bcef14991de63ecc3bedef18a7cd346d7f89811933659b68db3d192115698727"},
+    {"speaker": "B", "start": 8.0, "end": 16.34, "source": "2350591635813132689.wav", "source_sha256": "e0176e96b882ef620e78d564f35688e8f71248c4ca184617a5ec66a47e16fca6"},
+    {"speaker": "A", "start": 17.14, "end": 24.28, "source": "2932522176903992902.wav", "source_sha256": "383170febb463ea2525efaa98252adb74c8b0c30eb9b792ab0b2a63aa1d3326d"}
+  ],
+  "reference": "Logo após o início das hostilidades, a Grã-Bretanha começou um bloqueio naval à Alemanha. O gabinete do governador afirmou que 19 dos feridos eram agentes policiais. O gabinete do governador afirmou que 19 dos feridos eram agentes policiais.",
+  "source": "FLEURS (google/fleurs), pt_br, split test: sentence_id 1907 (A) e 1860 (B e A), três arquivos WAV 16 kHz mono costurados em ordem com 0,8 s de silêncio entre eles (A, B, A)",
+  "speaker_identity": "o FLEURS não publica id de falante (e a coluna de gênero do pt_br diz MALE nas 1.305 linhas de dev e teste): a identidade dos falantes foi MEDIDA por embedding independente do diarizador, o CAM++ 3D-Speaker zh_en_16k-common_advanced pelo sherpa-onnx 1.13.8 (a reserva selada), sobre os 30 arquivos da curadoria: três grupos nítidos (dentro 0,75-0,95, entre 0,10-0,46). Cosseno A×A' 0,80, A×B 0,21, A'×B 0,27",
+  "license": "CC-BY-4.0 (Conneau et al., 2022, FLEURS); recodificado para FLAC 16 kHz mono 16 bits e concatenado, sem outra alteração",
+  "provenance": "cópias locais da curadoria (SAC-177, work/fleurs/wav), montadas em 2026-10-20 por esta sessão; não baixadas do FLEURS por ela",
+  "min_word_recall": 0.8,
+  "min_speaker_agreement": 0.9
+}
