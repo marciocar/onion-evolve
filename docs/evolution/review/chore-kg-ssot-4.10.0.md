@@ -2,7 +2,8 @@
 title: 'Resíduo — o vendor do contrato KG-SSOT sobe para kg-ssot-v4.10.0'
 date: 2026-10-20
 branch: chore/kg-ssot-4.10.0
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 472381ac9cdf4e8b0670992b5d61291be3970f906e7b9ab5ecb06f887b5ec06f
+reviewed_code_sha256: 40c50aff430b25501da4fed14a55ee951af838b8625cd2881a04fbbdff817963
 findings_total: 1
 findings_real: 1
 findings_fixed: 0
