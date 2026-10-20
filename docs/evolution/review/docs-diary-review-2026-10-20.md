@@ -2,8 +2,8 @@
 branch: docs/diary-review-2026-10-20
 pr: pendente
 date: 2026-10-20
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: cbed065479bb36ec123e984ac68aa0bff492a48e396b306d456363ce0b8314c7
+reviewed_diff_sha256: 2a1933c79b86377b2beccab6e8cf17bec4c860ed17dd008bb49db240ba7c42e3
+reviewed_code_sha256: fdd91222d9f2a1064a2e556a86a03b9fccdbf7a71b374e4b3785e1a5ebafa4ac
 findings_total: 2
 findings_real: 2
 tokens: 0
