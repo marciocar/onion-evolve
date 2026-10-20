@@ -15,7 +15,7 @@
 | Sítios de asserção (**não** asserções executadas) | **2333** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **121** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
-| Arquivos de fixture rastreados | **168** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
+| Arquivos de fixture rastreados | **171** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
 | Regras do lint | **102** | `bash .claude/validation/rules-registry.sh --counts` |
 | — das quais HARD | **90** | idem |
 | — das quais SOFT | **42** | idem |
