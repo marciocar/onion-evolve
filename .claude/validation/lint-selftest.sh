@@ -24713,7 +24713,9 @@ run_r16_table_total_selftests() {
   # MUTANTE "só o milhar": a população continua exigida, mas `51.000` volta a ser lido `51`
   sed -e 's#/\[0-9\]+(\[.,\]\[0-9\]\[0-9\]\[0-9\])\*/#/[0-9]+/#' "${lint}" > "${mthou}"
   local rc_i rc_m out
-  _r16_hit() { grep -F 'zz-r16-table-probe' <<< "$1" | grep -qF "${msg}"; }
+  # here-string, nunca `produtor | grep -q` (pipefail + EPIPE quando o leitor fecha cedo)
+  _r16_lines() { grep -F 'zz-r16-table-probe' <<< "$1" || true; }
+  _r16_hit() { local l; l="$(_r16_lines "$1")"; grep -qF "${msg}" <<< "${l}"; }
   # (a) GOOD — tabela de custo: o intacto CALA; o mutante total ACUSA (lê `8`)
   cp "${fxd}/good-table-total-cost.md" "${probe}"
   out="$(bash "${lint}" --only="${probe}" 2>&1 || true)"
@@ -24723,7 +24725,8 @@ run_r16_table_total_selftests() {
   out="$(bash "${mfull}" --only="${probe}" 2>&1 || true)"
   # o mutante precisa acusar EXATAMENTE '8' — só "acusou" provaria a metade da população e deixaria a
   # do milhar sem dente (o sed dela poderia virar no-op e o cmp ainda diferiria pelo outro)
-  if _r16_hit "${out}" && grep -F 'zz-r16-table-probe' <<< "${out}" | grep -qF "'8' ("; then rc_m=1; else rc_m=0; fi
+  local _m8; _m8="$(_r16_lines "${out}")"
+  if _r16_hit "${out}" && grep -qF "'8' (" <<< "${_m8}"; then rc_m=1; else rc_m=0; fi
   _prove_mutation "r16-table-total: (a-MUT) com a régua antiga a tabela de custo volta a ser acusada como '8'" \
     "${lint}" "${mfull}" "${rc_i}" "${rc_m}"
   # (b) BAD — 'Total' com população na célula e número divergente: o intacto ACUSA (a regra ainda morde)

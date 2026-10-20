@@ -3,11 +3,11 @@ branch: fix/r16-cost-total-false-positive
 pr: pendente
 date: 2026-10-20
 reviewed_diff_sha256: pendente
-findings_total: 1
-findings_real: 1
+findings_total: 2
+findings_real: 2
 tokens: 0
 duration_min: 0
-findings_fixed: 1
+findings_fixed: 2
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: a sessão executora; ataques por 2 mutantes executados e pelo lint do core inteiro
@@ -42,6 +42,10 @@ A comparação contra o conjunto dos totais e o 'Total' case-sensitive não muda
    virasse no-op, o `cmp` ainda diferiria pela outra linha, e o caso passaria sem provar o `8`.
    Corrigido: o mutante tem de acusar exatamente `'8'`. A metade do milhar também tem um mutante
    próprio, o (c-MUT).
+
+2. **Veredito por `produtor | grep -q` no caso novo.** O pré-voo do `pr-finalize` reprovou a
+   família `shell_pipefail_robustness`. O motivo: dois sítios do caso fechavam o pipe cedo, e sob
+   pipefail o EPIPE vira falso ✗. Corrigido com here-string. As duas famílias ficaram verdes.
 
 ## Mutantes (executados no sandbox da bancada)
 
