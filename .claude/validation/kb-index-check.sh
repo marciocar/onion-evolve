@@ -16,6 +16,8 @@
 #   · PASTA de docs/knowledge-base/ com conteúdo e SEM seção no índice;
 #   · ESTATÍSTICAS: `**N documentos de conteúdo**` (o total) e cada `**N** em \`pasta/\``;
 #   · ÁRVORE: o `# N` de cada pasta de 1º nível no bloco da estrutura.
+# CONJUNTO CONTADO: os arquivos RASTREADOS (git ls-files, que inclui o stageado); sem git ou sem nada rastreado,
+#   o disco. ONION_KB_INDEX_FS=1 força o disco (a bancada o usa como mutante).
 # Severidade: HARD no core; SOFT no derivado (adotante/porta), onde a KB vendorizada pode ganhar KB local e o
 #   índice é do core — avisa, não trava o lint de quem não o escreve.
 #
@@ -58,22 +60,47 @@ out = []
 def add(sev, code, msg):
     out.append((sev, code, idx_rel, msg))
 
+# ENUMERAÇÃO RASTREADA — o molde do inventory.sh (_tracked_or_find): `git ls-files` vê o MESMO conjunto que o
+# CI (o índice inclui o que está stageado); sem git, ou com a listagem VAZIA num diretório com arquivos (adoção
+# greenfield antes do 1º add), cai na varredura do disco. Medido no CI do PR #1222 (2026-10-20): a bancada planta
+# `concepts/selftest-fixture-probe.md` na árvore viva para testar o lint, e a varredura do disco a contava como KB
+# fora do índice (HARD no caso r22-kb-links). Arquivo não rastreado não viaja nem entra no merge: não é do índice.
+import subprocess
+def _tracked():
+    try:
+        out = subprocess.run(['git', '-C', repo, 'ls-files', '-z', '--', 'docs/knowledge-base'],
+                             capture_output=True, text=True, timeout=30)
+    except Exception:
+        return None
+    if out.returncode != 0:
+        return None
+    rels = [os.path.relpath(x, 'docs/knowledge-base') for x in out.stdout.split('\0') if x]
+    return rels or None
+TRACKED = None if os.environ.get('ONION_KB_INDEX_FS') == '1' else _tracked()
+if TRACKED is None:
+    TRACKED = []
+    for root, _, fs in os.walk(kb):
+        TRACKED += [os.path.relpath(os.path.join(root, f), kb) for f in fs]
+TRACKED = [t for t in TRACKED if os.path.isfile(os.path.join(kb, t))]
+
 def content(d):
     c, r = [], 0
-    for root, _, fs in os.walk(os.path.join(kb, d)):
-        for f in fs:
-            if not f.lower().endswith('.md') or f == 'index.md':
-                continue
-            if f.lower() == 'readme.md':
-                r += 1
-            else:
-                c.append(os.path.relpath(os.path.join(root, f), kb))
+    for rel in TRACKED:
+        if not rel.startswith(d + '/'):
+            continue
+        f = os.path.basename(rel)
+        if not f.lower().endswith('.md') or f == 'index.md':
+            continue
+        if f.lower() == 'readme.md':
+            r += 1
+        else:
+            c.append(rel)
     return sorted(c), r
 
-dirs = sorted(d for d in os.listdir(kb) if os.path.isdir(os.path.join(kb, d)) and not d.startswith('.'))
+dirs = sorted({t.split('/', 1)[0] for t in TRACKED if '/' in t and not t.startswith('.')})
 disk = {d: content(d) for d in dirs}
 disk = {d: v for d, v in disk.items() if v[0] or v[1]}
-solto = sorted(f for f in os.listdir(kb) if f.lower().endswith('.md') and f != 'index.md' and os.path.isfile(os.path.join(kb, f)))
+solto = sorted(f for f in TRACKED if '/' not in f and f.lower().endswith('.md') and f != 'index.md')
 if solto:
     add(SEV, 'ARQUIVO-NA-RAIZ', '%d arquivo(s) de conteúdo na raiz da KB, fora de categoria: %s' % (len(solto), ', '.join(solto)))
 
