@@ -26823,12 +26823,157 @@ run_adopt_update_source_selftests() {
   rm -rf "${d}" "${d%/*}/t10-chore-onion-update-abc" 2>/dev/null || true
 }
 
+# ---------------------------------------------------------------------------
+# prove_gate_blocks — a prova de BLOQUEIO do gate do alvo, num sandbox, com o checkout real intocado
+#
+# Nasceu de uma recorrência medida (2026-10-20): em 11 `--update` seguidos o verificador do gate só provou
+# que o hook EXECUTA; a prova de que ele BARRA ficou com a sessão do adotante, que a fez à mão (commit-sonda
+# barrado pela REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1). O
+# `prove-gate-blocks.sh` é essa prova virada mecanismo, e esta família prova o que ele decide.
+#
+# A fixture usa o TEMPLATE REAL do hook (`githook-pre-commit-onion.tpl`) e um lint que reproduz a regra
+# plantada: compara `docs/onion/inventory.md` byte a byte com a saída do `inventory.sh` e imprime a linha
+# VIOLATION no formato do lint de verdade. O lint inteiro do core custaria minutos por caso, e o que se
+# mede aqui é o veredito do script, não o lint (esse é o dogfood).
+#
+# Todo caso confere, POR FORA do script, que o checkout real ficou igual (HEAD, status com untracked e
+# refs) e que nenhum sandbox sobrou no TMPDIR.
+# ---------------------------------------------------------------------------
+run_prove_gate_blocks_selftests() {
+  local pg="${REPO_ROOT}/.claude/utils/adopt/prove-gate-blocks.sh"
+  local tpl="${REPO_ROOT}/.claude/utils/adopt/githook-pre-commit-onion.tpl"
+  if [ ! -f "${pg}" ] || [ ! -f "${tpl}" ]; then record_skip "prove-gate-blocks" "script ou template do hook ausente"; return; fi
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/tmp"
+
+  _pg_mk() {  # $1=dir · $2=tipo do hook: onion|echo|none|all|ignore|nocite
+    local r="$1"; mkdir -p "${r}/.claude/validation" "${r}/docs/onion" "${r}/.githooks"
+    printf '#!/usr/bin/env bash\nprintf "# inv\\n"\n' > "${r}/.claude/validation/inventory.sh"
+    cat > "${r}/.claude/validation/lint-artifacts.sh" <<'LINT'
+#!/usr/bin/env bash
+R="$(git rev-parse --show-toplevel)"
+if ! bash "${R}/.claude/validation/inventory.sh" --markdown | cmp -s - "${R}/docs/onion/inventory.md"; then
+  echo "VIOLATION: docs/onion/inventory.md: REGRA 8 (Inventário canônico sincronizado com o filesystem): inventário desatualizado vs filesystem"
+  echo "HARD=1"; exit 1
+fi
+echo "OK ✓"; exit 0
+LINT
+    printf '# inv\n' > "${r}/docs/onion/inventory.md"
+    printf 'produto\n' > "${r}/a.txt"
+    case "$2" in
+      onion)  cp "${tpl}" "${r}/.githooks/pre-commit" ;;
+      echo)   printf '#!/usr/bin/env bash\necho "🧅 Onion pre-commit — tudo certo"\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
+      all)    printf '#!/usr/bin/env bash\necho "pre-commit quebrado"\nexit 1\n' > "${r}/.githooks/pre-commit" ;;
+      ignore) printf '#!/usr/bin/env bash\nbash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh" || true\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
+      nocite) printf '#!/usr/bin/env bash\ngit diff --cached --name-only | grep -q inventory && { echo "barrado por outro gestor"; exit 1; }\nexit 0\n' > "${r}/.githooks/pre-commit" ;;
+      none)   rmdir "${r}/.githooks" ;;
+    esac
+    [ -f "${r}/.githooks/pre-commit" ] && chmod +x "${r}/.githooks/pre-commit"
+    git -C "${r}" init -q >/dev/null 2>&1
+    [ "$2" = none ] || git -C "${r}" config core.hooksPath .githooks
+    git -C "${r}" add -A >/dev/null 2>&1
+    git -C "${r}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -qm base --no-verify >/dev/null 2>&1 || true
+    # estado pendente do "maestro": o checkout real tem de sair disto exatamente igual
+    printf 'mudança não commitada\n' >> "${r}/a.txt"; printf 'rascunho\n' > "${r}/notas.txt"
+  }
+  _pg_snap() { { git -C "$1" rev-parse HEAD; git -C "$1" status --porcelain=v1 --untracked-files=all; git -C "$1" for-each-ref; } 2>/dev/null | sha256sum; }
+  _pg_run() {  # $1=script · $2=alvo → define _o (saída), _r (rc), _intact (1/0), _left (sobras no TMPDIR)
+    local before; before="$(_pg_snap "$2")"
+    _r=0; _o="$(TMPDIR="${d}/tmp" bash "$1" "$2" 2>&1)" || _r=$?
+    [ "$(_pg_snap "$2")" = "${before}" ] && _intact=1 || _intact=0
+    _left="$(find "${d}/tmp" -mindepth 1 -maxdepth 1 | wc -l)"
+  }
+  _pg_last() { tail -n1 <<< "${_o}"; }
+
+  # (a) gate que barra → PROVADO, com a regra e o rc citados
+  local ta="${d}/a"; _pg_mk "${ta}" onion; _pg_run "${pg}" "${ta}"
+  if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)" ]] \
+     && [ "${_intact}" = 1 ] && [ "${_left}" = 0 ]; then
+    record_pass "prove-gate-blocks: (a) gate do template real barra a violação plantada → PROVADO (REGRA 8, rc 1); checkout real intocado, sandbox apagado"
+  else record_fail "prove-gate-blocks: (a)" "rc=${_r} intacto=${_intact} sobras=${_left} última='$(_pg_last)'"; fi
+
+  # (b) O MODO DE FALHA: hook que só ecoa e sai 0 → NÃO PROVADO (fail-open)
+  local tb="${d}/b"; _pg_mk "${tb}" echo; _pg_run "${pg}" "${tb}"
+  if [ "${_r}" -eq 1 ] && [[ "$(_pg_last)" == "bloqueio NÃO PROVADO: FAIL-OPEN"* ]] && [ "${_intact}" = 1 ] && [ "${_left}" = 0 ]; then
+    record_pass "prove-gate-blocks: (b) hook que só ecoa e sai 0 → NÃO PROVADO (FAIL-OPEN, rc 1); checkout real intocado"
+  else record_fail "prove-gate-blocks: (b)" "rc=${_r} intacto=${_intact} sobras=${_left} última='$(_pg_last)'"; fi
+
+  # (c) alvo sem pre-commit → NÃO PROVADO declarado (precondição, rc 3), nunca calado
+  local tc="${d}/c"; _pg_mk "${tc}" none; _pg_run "${pg}" "${tc}"
+  if [ "${_r}" -eq 3 ] && [[ "$(_pg_last)" == "bloqueio NÃO PROVADO: o alvo não tem pre-commit"* ]] && [ "${_intact}" = 1 ] && [ "${_left}" = 0 ]; then
+    record_pass "prove-gate-blocks: (c) alvo sem pre-commit → NÃO PROVADO declarado (rc 3); checkout real intocado"
+  else record_fail "prove-gate-blocks: (c)" "rc=${_r} intacto=${_intact} sobras=${_left} última='$(_pg_last)'"; fi
+
+  # (d) hook que barra TUDO → NÃO PROVADO (barrar tudo não é discriminar)
+  local td="${d}/d"; _pg_mk "${td}" all; _pg_run "${pg}" "${td}"
+  if [ "${_r}" -eq 1 ] && [[ "$(_pg_last)" == *"barra até o commit de controle"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (d) hook que barra até o controle → NÃO PROVADO (rc 1)"
+  else record_fail "prove-gate-blocks: (d)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (e) hook que roda o lint e IGNORA o rc → NÃO PROVADO (o lint acusou e o commit passou)
+  local te="${d}/e"; _pg_mk "${te}" ignore; _pg_run "${pg}" "${te}"
+  if [ "${_r}" -eq 1 ] && [[ "$(_pg_last)" == *"ignora o veredito do lint"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (e) hook que roda o lint e ignora o rc → NÃO PROVADO (FAIL-OPEN)"
+  else record_fail "prove-gate-blocks: (e)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (f) outro gestor barra o plantado SEM citar a regra → NÃO PROVADO (o mérito não é do gate do Onion)
+  local tf="${d}/f"; _pg_mk "${tf}" nocite; _pg_run "${pg}" "${tf}"
+  if [ "${_r}" -eq 1 ] && [[ "$(_pg_last)" == *"sem citar a REGRA 8"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (f) barrado sem citar a regra plantada → NÃO PROVADO"
+  else record_fail "prove-gate-blocks: (f)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (g) o PENDENTE da working tree entra no sandbox: inventário já fora de sincronia, não commitado → a prova
+  #     recusa a atribuição (rc 3) em vez de creditar ao plantio uma violação que já existia
+  local tg="${d}/g"; _pg_mk "${tg}" onion; printf 'drift pendente\n' >> "${tg}/docs/onion/inventory.md"; _pg_run "${pg}" "${tg}"
+  if [ "${_r}" -eq 3 ] && [[ "$(_pg_last)" == *"JÁ viola a REGRA 8"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (g) violação PENDENTE na working tree do alvo é vista no sandbox → não atribuível (rc 3)"
+  else record_fail "prove-gate-blocks: (g)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # (h) alvo é WORKTREE ligada (o --update usa worktree irmã com farol vivo) → PROVADO, e as duas árvores intactas
+  local th="${d}/h-wt"; git -C "${ta}" -c core.hooksPath=/dev/null worktree add -q -b wt-probe "${th}" >/dev/null 2>&1 || true
+  local snap_main; snap_main="$(_pg_snap "${ta}")"
+  _pg_run "${pg}" "${th}"
+  if [ "${_r}" -eq 0 ] && [[ "$(_pg_last)" == "bloqueio PROVADO"* ]] && [ "${_intact}" = 1 ] && [ "$(_pg_snap "${ta}")" = "${snap_main}" ]; then
+    record_pass "prove-gate-blocks: (h) alvo em worktree ligada → PROVADO; worktree e checkout principal intocados"
+  else record_fail "prove-gate-blocks: (h)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
+  # ── MUTANTES — cada um tira uma decisão e o caso que a mede tem de virar ───────────────────────────
+  _pg_mut() {  # $1=nome · $2=sed · $3=alvo · $4=padrão que a última linha do ORIGINAL tem e o mutante perde
+    local m="${d}/mut-$1.sh"; sed "$2" "${pg}" > "${m}"
+    if cmp -s "${pg}" "${m}"; then record_fail "prove-gate-blocks: (MUT-$1) setup" "a mutação não foi aplicada (a âncora do sed mudou?)"; return; fi
+    _pg_run "${m}" "$3"
+    if [[ "$(_pg_last)" != *"$4"* ]]; then record_pass "prove-gate-blocks: (MUT-$1) o caso morde: sem a decisão, o veredito muda"
+    else record_fail "prove-gate-blocks: (MUT-$1)" "o mutante manteve o veredito — o caso não mede esta decisão"; fi
+  }
+  # sem exigir rc≠0 do plantado, o hook que ignora o lint (e) passaria por PROVADO
+  _pg_mut rc 's|if \[ "${P_RC}" -eq 0 \]; then|if false; then|' "${te}" "NÃO PROVADO"
+  # sem exigir a citação, o outro gestor (f) levaria o mérito
+  _pg_mut cite 's|if ! grep -Eq "${CITE_RE}" <<< "${P_OUT}"; then|if false; then|' "${tf}" "NÃO PROVADO"
+  # sem o controle, barrar tudo (d) deixa de ser nomeado
+  _pg_mut control 's|if \[ "${C_RC}" -ne 0 \] && \[ "${C_HARD}" -eq 0 \]; then|if false; then|' "${td}" "barra até o commit de controle"
+  # sem o pendente da working tree, (g) creditaria ao plantio a violação que já existia
+  _pg_mut overlay 's|ls-files -z -m -o --exclude-standard|ls-files -z -o --exclude-standard|' "${tg}" "JÁ viola"
+  # plantando no checkout REAL, a conferência de integridade tem de trocar o veredito (rc 4)
+  local m4="${d}/mut-real.sh"; sed 's|>> "${R}/docs/onion/inventory.md"|>> "${T}/docs/onion/inventory.md"|' "${pg}" > "${m4}"
+  if cmp -s "${pg}" "${m4}"; then record_fail "prove-gate-blocks: (MUT-real) setup" "a mutação não foi aplicada"
+  else
+    _pg_run "${m4}" "${ta}"
+    if [ "${_r}" -eq 4 ] && [[ "$(_pg_last)" == *"checkout real do alvo mudou"* ]] && [ "${_intact}" = 0 ]; then
+      record_pass "prove-gate-blocks: (MUT-real) plantar no checkout real é pego pela integridade (rc 4) — a conferência morde"
+    else record_fail "prove-gate-blocks: (MUT-real)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+  fi
+
+  git -C "${ta}" worktree remove --force "${th}" >/dev/null 2>&1 || true
+  unset -f _pg_mk _pg_snap _pg_run _pg_last _pg_mut
+  rm -rf "${d}" 2>/dev/null || true
+}
+
 _family run_license_travels_selftests
 _family run_ssot_projections_selftests
 _family run_role_cut_selftests
 _family run_adopt_robust_selftests
 _family run_adopt_update_source_selftests
 _family run_adopter_gate_selftests
+_family run_prove_gate_blocks_selftests
 _family run_sweep_fixtures_selftests
 _family run_seed_adoption_graph_selftests
 _family run_migrate_seed_graph_selftests
