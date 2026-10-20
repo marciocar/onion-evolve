@@ -46,7 +46,7 @@ export function checkWarnings(text: string, options?: { format?: Format }): stri
 export function verdictOf(text: string, validate: MustValidator,
   options?: Options & { validateShould?: MustValidator }): Verdict;
 
-/** Os avisos de coerência de um documento já lido (integrity.testimony-in-prod, verified-before-fact, untraced-decision). */
+/** Os avisos de coerência de um documento já lido (integrity.testimony-in-prod, verified-before-fact, untraced-decision, refutes-unreconciled). */
 export function coherenceCodes(doc: Record<string, unknown>): string[];
 
 /** Os avisos do perfil JSON num .kg.yaml já lido (yaml.unsafe-integer, yaml.lone-surrogate, yaml.depth-over-128). */

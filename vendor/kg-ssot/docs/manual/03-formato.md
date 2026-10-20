@@ -15,6 +15,11 @@ Convenções: **obr.** = obrigatório; *data* = texto `AAAA-MM-DD` que existe no
   `off` são texto.
 - Chaves comparadas na forma JSON: `1` e `"1"` colidem (`parse.duplicate-key`).
 - `.nan` e `.inf` reprovam em qualquer posição, porque o JSON não os representa.
+- Tab só dentro de aspas (numa linha), de bloco literal (`|` ou `>`) e de comentário. Como espaço (depois de `:`, no fim da linha,
+  entre a data e a hora) ou dentro de um texto sem aspas, reprova (`parse.yaml-error`). Use espaço.
+- A tag `!` sem nome (também `!<!>`) reprova, e o `!!timestamp` explícito só aceita texto na forma de data
+  (`AAAA-M-D`, com hora opcional `H:MM:SS`, fração com dígito e fuso `Z` ou `±H[:MM]`, até ±29). A forma é conferida,
+  o calendário não. Sem tag, escreva a data entre aspas.
 - O perfil JSON vale também no `.kg.yaml`, como aviso: inteiro fora de ±(2^53−1) (`yaml.unsafe-integer`), surrogate
   solto (`yaml.lone-surrogate`) e mais de 128 coleções aninhadas (`yaml.depth-over-128`).
 
@@ -133,5 +138,6 @@ O schema não alcança estas regras, e todo leitor tem de aplicá-las:
 | nó PROD sustentado só por testemunho | SHOULD | `integrity.testimony-in-prod` |
 | `verified_at` anterior a `valid_from` | SHOULD | `integrity.verified-before-fact` |
 | `decision` viva sem `trace`, sem `provenance` e sem `TRACES_TO` saindo dela | SHOULD | `integrity.untraced-decision` |
+| nó que recebe `REFUTES` e segue vivo (nem `superseded` nem `refuted`; a `question` `done` já está respondida) | SHOULD (MUST depois) | `integrity.refutes-unreconciled` |
 
 Uma aresta externa conta como ligação: o nó ligado só por ela não é órfão.

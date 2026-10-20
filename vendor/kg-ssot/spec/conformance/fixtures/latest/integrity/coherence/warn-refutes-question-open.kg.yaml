@@ -1,0 +1,22 @@
+meta:
+  schema_version: "1"
+  id: warn-refutes-question-open
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: C_COUNTER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: "Nó sintético C_COUNTER."
+edges:
+  - from: C_COUNTER
+    to: Q_A
+    edge_type: REFUTES
