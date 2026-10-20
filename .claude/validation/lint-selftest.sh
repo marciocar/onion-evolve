@@ -10808,6 +10808,12 @@ PY
 # compare_digest contra b"" já recusa) e o S_ISLNK do load_token (o lstat do symlink dá 0777 e o teste de modo recusa).
 # O download e o hash dos arquivos do modelo (stage_hf) não rodam aqui: exigiriam o modelo de 0,65 GB; o dogfood do
 # --apply na VPS é a prova deles, e o ensaio confere o pin contra a fonte a cada rodada.
+# DIARIZAÇÃO (2026-10-20, D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019): o núcleo lê o RTTM, põe o falante na palavra por
+# sobreposição, corta o segmento na troca e roda o binário num subprocesso que NUNCA levanta (binários falsos em /bin/sh
+# provam rc≠0, timeout, RTTM ausente, estranho e vazio, e o ambiente fechado); o smoke reprova servidor sem falante, com
+# um falante só, com status failed ou sem a diarização no /health; o server.py real prova que a falha não derruba a
+# transcrição; o wrapper confere o binário no GitHub (w23) e o gguf no HF (w24) e passa o fixture de 2 falantes à prova
+# (w25). A montagem do binário (stage_diar_bin: download, digest, extração filtrada) é do --apply, como o stage_hf.
 # ---------------------------------------------------------------------------
 run_stt_service_selftests() {
   local -; set +e

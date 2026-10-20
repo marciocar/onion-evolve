@@ -19,7 +19,10 @@ meta:
   # for re-medido ou o grafo de consolidação entrar em plano. Subiu de 11 para 13 em 2026-10-19 por um gatilho que não estava previsto e
   # fica declarado: com o serviço mergeado (#1184), o maestro selou como ele sobe à VPS (loopback primeiro) e o próximo passo (a diarização
   # no serviço). São duas decisões de execução e não cabem nos nós já fechados. Subiu de 13 para 14 em 2026-10-20: a
-  # execução do degrau loopback trouxe a medição da instalação real (E_MC_STT_INSTALADO_LOOPBACK_1020). ═══
+  # execução do degrau loopback trouxe a medição da instalação real (E_MC_STT_INSTALADO_LOOPBACK_1020). Subiu de 14 para 15 em
+  # 2026-10-20 pela EXECUÇÃO de D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019: a diarização dentro do serviço trouxe a medição dela na VPS
+  # (E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020), que é evidência e não cabe no nó de decisão. Cresce de novo quando a instalação real da
+  # diarização for medida pelo verify. ═══
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-19-proposal-asr-second-round.md
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-17-proposal-windows-client-vps-server.md
   # Proposta triada: docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md
@@ -286,6 +289,31 @@ nodes:
       method: "medição: o verify do wrapper lê as propriedades efetivas da unit pelo systemd e prova o cliente numa unit transitória"
       locality: "host"
 
+  - id: E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-20"
+    verified_against: "o server.py do branch (venv e modelo do serviço instalado, só leitura) fora de unit nesta VPS de 8 vCPU, com o NeMo-Speech.cpp 0.2.0 e o gguf q8_0 baixados e conferidos pelo sha256; o smoke.py real contra ele (n_fail=0); um arquivo de 3 h por POST /v1/listen?diarize=true; o binário sozinho com o GNU time; a bancada stt_service (131 verdes com o venv do serviço) e o ensaio do wrapper contra as fontes oficiais"
+    label: "Diarização no serviço de STT, medida fora de unit: o fixture de 2 falantes sai A-B-A com concordância 1,00 nas duas rotas; 3 h custam 762 s de diarização depois de 733 s de Parakeet; filho 3,44e9 B e servidor 2,13e9 B durante a diarização cabem nos 6G."
+    trace: "ops/stt-service.sh"
+    narrative: |-
+      Execução de D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019. O desenho: diarização opt-in por pedido, `diarize=true` no /v1/listen (forma Deepgram, `speaker` inteiro por palavra) e o campo `diarize` no multipart OpenAI (só com verbose_json, que é a única forma com palavras; `speaker` por palavra e por segmento, e o segmento é cortado onde o falante muda). O binário roda num subprocesso com PATH vazio e o gguf local, DEPOIS do Parakeet e sobre o mesmo áudio: o WAV de 16 bits é escrito antes da transcrição e o float32 é solto antes de o filho subir. O falante vai para a palavra pela maior sobreposição de tempo com os turnos do RTTM, e a palavra que cai numa pausa fica com o turno mais próximo. Falha, timeout (2 min + metade da duração), RTTM estranho ou áudio acima do teto nunca derrubam a transcrição: ela sai sem falante e a resposta declara ok, failed, skipped ou unavailable, com o motivo. O wrapper confere o binário pelo digest do asset na API do GitHub e o gguf pela revisão do Hugging Face, os dois conferidos nesta rodada contra os pins da curadoria (iguais).
+
+      O fixture de 2 falantes foi MONTADO: três arquivos do FLEURS pt_br (CC-BY-4.0) costurados A, B, A com 0,8 s de silêncio, 24,28 s. O FLEURS não publica id de falante e a coluna de gênero do pt_br diz MALE nas 1.305 linhas de dev e teste, então a identidade foi medida por um embedding independente do diarizador (o CAM++ da reserva selada): nos 30 arquivos da curadoria saem três grupos nítidos, cosseno A×A' 0,80, A×B 0,21 e A'×B 0,27. O diarizador devolve speaker_1 0,32–6,19 s, speaker_2 9,09–13,85 s e speaker_1 17,60–23,09 s, o mesmo RTTM em 3 execuções (determinístico); 1,25 a 1,34 s de parede (RTF ~0,053, quase tudo carga do modelo) e 1,39e8 B de RSS.
+
+      O pior caso de duração (3 h, o teto do serviço), costurado de gravações do NURC-SP só para medir: o binário sozinho levou 668 s (RTF 0,062, carga 2,2 a 5,6) com RSS máximo de 3,44e9 B, na reta medida pela curadoria (~0,31 MB por segundo de áudio). Pelo servidor: Parakeet 733 s, diarização 762 s, 22.385 palavras, 8 falantes (o teto do V3), status ok. O servidor chegou a 4,00e9 B DURANTE a transcrição de 3 h (o nó E_MC_STT_SERVICO_CORE_MEDIDO_1017 tinha 2,31e9 B para 1 h) e ficou em 2,13e9 B durante a diarização. O teto: 2,13e9 + 3,44e9 = 5,57e9 B pela soma dos picos (cota de cima), mais um segundo pedido na fila com o corpo inteiro (até 384 MB) dá ~5,97e9 B, abaixo dos 6,44e9 do MemoryMax=6G, com ~7 % de folga. Por isso o --diar-max-s fica no teto do serviço (10800 s) e o MemoryMax não mudou.
+
+      Não medido aqui: a unit de verdade com o sandbox (o SystemCallFilter=@system-service e o TasksMax=64 contra as threads do OpenMP do binário), que o --apply prova na unit transitória ANTES de trocar a de produção, com o caso de 2 falantes; o pico do filho medido pelo amostrador DENTRO do servidor (o amostrador começou tarde e viu 2,09e9 B; a cota usa o 3,44e9 do o GNU time); áudio real de reunião (o DER em pt-BR é o da curadoria); multicanal com diarização; os clientes reais.
+    provenance:
+      source: "ops/stt/server.py, ops/stt/smoke.py e ops/stt-service.sh deste branch, nesta VPS"
+      locator: "medição de 2026-10-20 16:50–17:50 UTC: smoke n_fail=0 com o fixture de 2 falantes; POST de 3 h com X-Diarization ok e X-Proc-S 732,5; o GNU time do binário sozinho; ensaio do install sem --apply com os pins OK"
+      method: "medição: servidor real por HTTP, RSS do processo e dos filhos pelo procfs, o GNU time -v, e bancada com mutantes"
+      locality: "host"
+
 edges:
 
   - from: E_MEETING_GRAPH_GATE_1016
@@ -329,4 +357,7 @@ edges:
     edge_type: TRACES_TO
   - from: E_MC_STT_INSTALADO_LOOPBACK_1020
     to: D_MC_STT_SOBE_EM_LOOPBACK_1019
+    edge_type: SUPPORTS
+  - from: E_MC_DIARIZACAO_NO_SERVICO_MEDIDA_1020
+    to: D_MC_DIARIZACAO_NO_SERVICO_PROXIMO_1019
     edge_type: SUPPORTS
