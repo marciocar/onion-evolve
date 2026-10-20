@@ -2,7 +2,8 @@
 branch: fix/compliance-docs-field-signals
 pr: 1221
 date: 2026-10-20
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5967af438afd9cb952ae5b666b95cc2daf4fee0012d1a445a032b5492de24288
+reviewed_code_sha256: 2db80789c112afe5653a4f4f437c1ef7d8e68eb85f8da3431ef923543bf4b01c
 findings_total: 24
 findings_real: 11
 tokens: 140696
