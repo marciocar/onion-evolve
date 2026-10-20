@@ -15600,10 +15600,12 @@ run_review_artifact_selftests() {
 
   # (ovo) o PAR guarda × motor: o rótulo da isenção que a guarda EMITE tem de ser o mesmo que o pr-finalize
   # ACEITA. Se um lado mudar o vocabulário, a isenção quebra calada e o motor volta a morrer pedindo hash
-  # que a guarda não dá (o defeito medido no pin v1.0.254, 2026-10-20).
+  # que a guarda não dá (o defeito medido no pin v1.0.254, 2026-10-20). E a isenção vale nos DOIS pontos que
+  # exigem resíduo (o esquema 0a e o _restamp): definição + 2 chamadas de _ovo_exempt (a 1ª cura cobriu só um).
   local _ovo='PR-edita-o-proprio-revisor(ovo-galinha)'
   if grep -qF "_skip \"${_ovo}\"" "${REPO_ROOT}/.claude/validation/review-artifact-check.sh" \
-     && grep -qF "⊘ fora de escopo: ${_ovo}" "${REPO_ROOT}/ops/pr-finalize.sh"; then
+     && grep -qF "⊘ fora de escopo: ${_ovo}" "${REPO_ROOT}/ops/pr-finalize.sh" \
+     && [ "$(grep -c '_ovo_exempt' "${REPO_ROOT}/ops/pr-finalize.sh")" -ge 3 ]; then
     record_pass "review-artifact: (ovo) o pr-finalize aceita a isenção ovo-galinha com o mesmo rótulo que a guarda emite"
   else record_fail "review-artifact: (ovo) par guarda × motor" "o rótulo da isenção diverge entre review-artifact-check.sh e pr-finalize.sh (ou um lado o perdeu)"; fi
 }

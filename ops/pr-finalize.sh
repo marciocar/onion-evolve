@@ -297,6 +297,13 @@ _regen() {  # regenera TODA projeção gerada com catraca no lint e stageia só 
   return 0
 }
 
+_ovo_exempt() {  # rc 0 = a GUARDA declara este PR isento do resíduo (edita SÓ o workflow do revisor: ovo-galinha).
+  # Uma pergunta só, à própria guarda, usada nos DOIS pontos que exigem resíduo (0a e _restamp). A 1ª cura
+  # (#1226) cobriu só o _restamp, e o 0a seguia barrando o mesmo PR antes de chegar lá (medido, 2026-10-20).
+  grep -qF '⊘ fora de escopo: PR-edita-o-proprio-revisor(ovo-galinha)' \
+    <<< "$(_ci bash .claude/validation/review-artifact-check.sh . 2>&1)"
+}
+
 _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo a guarda calcula o hash
   # SOBRE O ÍNDICE (--cached) e exclui o próprio resíduo — então carimbar ANTES do commit faz o
   # pre-commit já encontrar o resíduo casando. A 1ª versão commitava as projeções e SÓ DEPOIS carimbava:
@@ -308,7 +315,7 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   # gateado por ele (ovo-galinha: a action se auto-pula). A guarda sai 0 com "⊘ fora de escopo"; antes o
   # motor morria aqui pedindo hash ou ✅ que a guarda, por desenho, não dá (medido no pin v1.0.254, 2026-10-20).
   # Aceita SÓ esse rótulo, e o declara: qualquer outro "fora de escopo" segue recusado.
-  if grep -qF '⊘ fora de escopo: PR-edita-o-proprio-revisor(ovo-galinha)' <<< "${out}"; then
+  if _ovo_exempt; then
     echo "PR-FINALIZE: isenção declarada pela guarda do resíduo: PR-edita-o-proprio-revisor(ovo-galinha) — sem carimbo; a prova é o PR seguinte" >&2
     return 0
   fi
@@ -349,7 +356,9 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
 #     sempre (SAC-141) cada um passou a custar o pré-voo inteiro (3 min 51 s no caso de 2026-10-15). Sem resíduo:
 #     o esqueleto sai do PRÓPRIO validador (`--skeleton`, as mesmas constantes que julgam o PR) e a rodada para
 #     para ele ser preenchido. Com resíduo: `--schema` confere o frontmatter em milissegundos.
-if [ -f .claude/validation/review-artifact-check.sh ]; then
+if [ -f .claude/validation/review-artifact-check.sh ] && [ ! -f "${RES}" ] && _ovo_exempt; then
+  echo "PR-FINALIZE: isenção declarada pela guarda do resíduo: PR-edita-o-proprio-revisor(ovo-galinha) — sem resíduo e sem esquema a conferir" >&2
+elif [ -f .claude/validation/review-artifact-check.sh ]; then
   if [ ! -f "${RES}" ]; then
     [ "${CHECK}" = 1 ] && die "resíduo ausente: ${RES} — gere com 'bash .claude/validation/review-artifact-check.sh --skeleton > ${RES}' e preencha (o --check não escreve)"
     mkdir -p "$(dirname "${RES}")" && bash .claude/validation/review-artifact-check.sh --skeleton "${BR}" > "${RES}" \
