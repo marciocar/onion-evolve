@@ -2,8 +2,7 @@
 branch: feat/a2a-maestro-peer-test
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: 77a84b1e4eddf93213cd9c5a28d66448dd2fa3cb6aa28e95ce2751a18833a344
-reviewed_code_sha256: 49679fc160fd713481439ee790407ad34607fba30db4b8385e461c1c6e995525
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 tokens: 0
