@@ -41081,7 +41081,9 @@ run_plan_contract_migration_selftests() {
   case " ${got} " in *" j "*) record_pass "plan-contract-migration: (j) id repetido e grafo por symlink → a identidade bate (multiset, caminho real), sem falso 'fora do plano'" ;;
     *) record_fail "plan-contract-migration: (j)" "$(bash "${sut}" "${d}/identidade" --out-dir "${d}/out-j" 2>&1 | grep -E 'plano|fora|NÃO' | head -4 | tr '\n' '|')" ;; esac
   # (m) MUTANTES na CÓPIA do helper (com o remeasure-contract.sh ao lado): cada um reverte uma cura e EXIGE que o
-  #     caso nomeado caia. Pares múltiplos de troca separados por \x1e.
+  #     caso nomeado caia. Pares múltiplos de troca separados por \x1e. Sem mutante para o `-B` do plan: desde a
+  #     kg-ssot 4.13.1 o próprio kg_migrate.py liga sys.dont_write_bytecode, e o mutante ficou equivalente (medido no
+  #     rebase de 2026-10-21); o `-B` fica como cinto para o vendor 4.13.0, e o (c) segue cobrando o __pycache__.
   mkdir -p "${d}/mut"; cp "${REPO_ROOT}/.claude/utils/adopt/remeasure-contract.sh" "${d}/mut/"
   local m="${d}/mut/plan-contract-migration.sh" old new want
   while IFS=$'\x1f' read -r old new want; do
@@ -41103,7 +41105,6 @@ open(p,"w",encoding="utf-8").write(s)' "${m}" "${old}" "${new}"; then
   elif [ "\${#FOUND[@]}" -eq 0 ]; then$(printf '\x1e')    PROFILE="\${T}/\${FOUND[0]}"$(printf '\x1f')  elif false; then$(printf '\x1e')    PROFILE="\${VENDOR}/spec/migrate-examples/company-brain.profile.yaml"$(printf '\x1f')b
 "\${MIG}" plan --profile$(printf '\x1f')"\${MIG}" apply --profile$(printf '\x1f')c
 EXCL=(--exclude '*/**/fixtures/**' --exclude 'docs/materials/**'$(printf '\x1f')EXCL=(--exclude 'nada/**' --exclude 'docs/materials/**'$(printf '\x1f')c
-python3 -I -B "\${MIG}"$(printf '\x1f')python3 -I "\${MIG}"$(printf '\x1f')c
 refused = [r for r in nodes if r["revisar"].startswith("a proposta reprovaria no contrato")]$(printf '\x1f')refused = []$(printf '\x1f')c
 [ -f "\${MIG}" ] || no$(printf '\x1f')[ -f "\${MIG}" ] || true$(printf '\x1f')d
 if [ "\${PRC}" -ne 0 ]; then$(printf '\x1f')if false; then$(printf '\x1f')e

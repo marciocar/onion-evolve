@@ -66,7 +66,8 @@ A fase 2 de D_U1_CAMADA_SDAAL_NO_UPDATE (a migração do corpus ao contrato vend
   - contra a migração à mão f3738f4aa: classe igual em 1.023 de 1.024 e locality igual à HEAD em 1.021 de 1.021. A divergência é a já conhecida da 3ª passada sobre o migrador (`C_D16_NOT_IMPLEMENTED`, trace `apps libs`);
   - com o exemplo cru: 1.007 de 1.024, a medida de por que o helper não copia o exemplo;
   - sha256 dos 12.131 arquivos igual antes e depois, sem `__pycache__`.
+- **Depois do rebase sobre a main**, que subiu o vendor para 4.13.1: os mesmos números (1.024 nós, 1023/1024 e 1021/1021) e o sha256 igual. Um mutante (o `-B` do plan) ficou equivalente porque o `kg_migrate.py` 4.13.1 já liga `sys.dont_write_bytecode`. Foi retirado, com a razão escrita na bancada.
 - **Sem perfil:** rc 2, com a orientação.
 - **Com o vendor 4.9.1:** rc 3, NÃO MEDIDO ("não traz o tools/kg_migrate.py").
 - **O core:** rc 2, sem perfil.
-- **Bancada `plan_contract_migration`:** 27/27 (10 casos, 17 mutantes), e `remeasure_contract` segue verde.
+- **Bancada `plan_contract_migration`:** 26/26 (10 casos, 16 mutantes), e `remeasure_contract` segue verde.
