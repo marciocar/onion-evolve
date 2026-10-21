@@ -6954,6 +6954,35 @@ _research_primaries_anchoring_form() {
   return 0
 }
 
+# ── (o2) o campo de AGENTE chega inteiro ao escritor: acha a função que embrulha cada campo no prompt,
+# monta a definição dela com as dependências de topo (linhas `const X = ...` de uma linha) e a EXECUTA
+# sobre 3000 chars com controles. Imprime OK ou o motivo. Nomes não importam; o comportamento, sim.
+_research_agent_text_whole() {
+  node -e '
+  const fs = require("fs"); const src = fs.readFileSync(process.argv[1], "utf8"); const lines = src.split("\n")
+  const defs = new Map(); lines.forEach(l => { const m = l.match(/^const ([A-Za-z_$][\w$]*) = /); if (m && !defs.has(m[1])) defs.set(m[1], l) })
+  const fields = [["elenxo.recommendation", "Recomendação (INTEIRA"], ["report.market", "### Mercado (do sintetizador)"]]
+  const bad = []
+  for (const [field, anchor] of fields) {
+    const line = lines.find(l => l.includes(anchor) && l.includes(field))
+    if (!line) { bad.push(field + ": a linha do prompt do escritor com a âncora \"" + anchor + "\" sumiu"); continue }
+    const esc = field.replace(/\./g, "\\.")
+    const m = line.match(new RegExp("([A-Za-z_$][\\w$]*)?\\(?" + esc + "\\)?((?:\\s*\\.[A-Za-z]+\\([^)]*\\))*)"))
+    if (/\.(slice|substring|substr)\(/.test(m[2] || "")) { bad.push(field + ": cortado direto no prompt (" + m[2].trim() + ")"); continue }
+    const fn = m[1]; if (!fn || fn === "String") { bad.push(field + ": passado cru ao escritor (sem a sanitização de controles)"); continue }
+    if (!defs.has(fn)) { bad.push(field + ": embrulhado por " + fn + "(), sem definição de topo para executar"); continue }
+    const need = new Set([fn]); let grew = true
+    while (grew) { grew = false; for (const n of [...need]) for (const id of (defs.get(n).match(/[A-Za-z_$][\w$]*/g) || [])) if (defs.has(id) && !need.has(id)) { need.add(id); grew = true } }
+    const code = [...defs.keys()].filter(k => need.has(k)).map(k => defs.get(k)).join("\n")
+    const input = "\u0007inicio " + "x ".repeat(1495) + "FIM_DO_TEXTO"
+    let out; try { out = String(new Function(code + "\nreturn " + fn)()(input)) } catch (e) { bad.push(field + ": " + fn + "() não executou isolada: " + e); continue }
+    if (!out.endsWith("FIM_DO_TEXTO")) bad.push(field + ": " + fn + "() devolveu " + out.length + " de " + input.length + " chars (truncou)")
+    else if (/[\u0000-\u001f]/.test(out)) bad.push(field + ": " + fn + "() deixou passar caractere de controle (sanitização perdida)")
+  }
+  console.log(bad.length ? bad.join(" | ") : "OK")
+' "$1" 2>&1
+}
+
 # ── roda o CORPO do workflow com stubs e IMPRIME o JSON devolvido ──
 # `node --check` sozinho MENTE (o corpo tem `return` de topo; o runtime embrulha em async). Aqui o corpo é
 # embrulhado igual ao runner E o valor de retorno é capturado — é ele que carrega o erro nomeado do fail-loud.
@@ -7834,6 +7863,23 @@ run_research_workflow_selftests() {
   if grep -nE 'JSON\.stringify\((pElenxo|elenxo)[^)]*\)[^+;]*\.slice\(' "${wf}" >/dev/null; then
     record_fail "research-workflow: (o)" "o JSON do Elenxo é cortado antes do write(KG): $(grep -nE 'JSON\.stringify\((pElenxo|elenxo)[^)]*\)[^+;]*\.slice\(' "${wf}" | head -2)"
   else record_pass "research-workflow: (o) o Elenxo chega inteiro ao write(KG) (sem .slice sobre o JSON)"; fi
+  # (o2) a RECOMENDAÇÃO do Elenxo e o MERCADO do sintetizador chegam INTEIROS ao escritor. Medido em
+  #      2026-10-21 (run wf_1b66acda-ac8): o prompt prometia "INTEIRA" e passava webText(...), cujo teto
+  #      de 600 é do dado web; 2786 chars viraram 600 e o escritor marcou TRUNCADO. A cura de 2026-10-11
+  #      tirou um .slice(0, 1500) que nunca mordia, porque o corte real morava DENTRO da função. Por isso
+  #      a guarda não lê nomes: EXECUTA a função que embrulha o campo (com as dependências de topo) sobre
+  #      3000 chars e exige o sentinela do fim; e reprova .slice/.substring/.substr colado no campo.
+  if command -v node >/dev/null 2>&1; then
+    local o2; o2="$(_research_agent_text_whole "${wf}")"
+    if [ "${o2}" = "OK" ]; then record_pass "research-workflow: (o2) recomendação do Elenxo e mercado chegam INTEIROS ao escritor (função executada sobre 3000 chars)"
+    else record_fail "research-workflow: (o2)" "${o2}"; fi
+    local m2; m2="$(mktemp -d)"
+    sed 's/+ agentText(elenxo\.recommendation) +/+ webText(elenxo.recommendation) +/' "${wf}" > "${m2}/wf.js"
+    if cmp -s "${wf}" "${m2}/wf.js"; then record_fail "research-workflow: (o2m)" "o mutante NÃO foi plantado (a linha da recomendação mudou de forma)"
+    elif [ "$(_research_agent_text_whole "${m2}/wf.js")" = "OK" ]; then record_fail "research-workflow: (o2m)" "MUTANTE com webText na recomendação passou em (o2)"
+    else record_pass "research-workflow: (o2m) mutante que devolve o webText à recomendação reprova em (o2)"; fi
+    rm -rf "${m2}"
+  else record_skip "research-workflow: (o2) node ausente → inteireza da recomendação não verificada"; fi
   # (p) o write(KG) nasce no CONTRATO v3 (2026-10-08, SAC-71): desde o #967 o gate do contrato no CI
   #     reprova grafo NOVO que suba a dívida SHOULD, e o escritor saía com data sem aspas, confirmed sem
   #     provenance e label longo (curado à mão no #967 e no #968). Os DOIS prompts de write(KG) — o do modo
