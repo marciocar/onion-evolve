@@ -1,0 +1,279 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "algum data/<versão>.txt (2.1.307) ou o locator de um nó não bate byte a byte com a seção correspondente do CHANGELOG oficial",
+   "check": "for v in 2.1.307; do diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V=\"## $v\" '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-21-r15/data/$v.txt; done"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando ou a leitura citados em verified_against, re-executados no vivo, devolvem outro número ou outro estado",
+   "check": "re-executar o grep, a leitura de linha, o --version ou a sonda citados no nó e comparar com o verified_against"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) o Onion e a superfície nomeada não existe, não é exercitada pelo item, ou existe outra superfície do core ou do /chat que o item alcança e o nó nega",
+   "check": "grep -rn <termo do item> .claude ops .github e leitura do arquivo e linha nomeados no nó (no bridge, como a conta do serviço)"
+  },
+  {
+   "id": "CU4_IMPACTO_DESPROPORCIONAL",
+   "when": "o impacto declarado difere em 2 ou mais pontos do que a medição sustenta, ou a causa afirmada não é a medida",
+   "check": "comparar o impact do nó com a consequência medida no vivo (quem roda o caminho, com que frequência, o que quebra)"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core, do CI ou do /chat em produção com impacto >= 2 medido e a rodada não tem nó para ele",
+   "check": "para cada item de data/2.1.306.txt, grep da superfície correspondente no core, no .github e no bridge"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "CU1_CITACAO_DIVERGE (data/2.1.307.txt)",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V='## 2.1.307' '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-21-r15/data/2.1.307.txt"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Diff vazio contra o CHANGELOG baixado agora (1.070.190 bytes, a 1ª seção é ## 2.1.307). Bate byte a byte, com 46 linhas e 43 itens."
+  },
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "bash .claude/validation/cc-delta-census.sh; claude --version"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz: disco 2.1.307, processo 2.1.307, SDK do bridge 2.1.306 (SDK 0.3.306) lido do binário em /home/onion/onion-bridge, 43 itens."
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "leitura do nó: status open, critério de fechamento pelo juiz"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Pergunta aberta de esqueleto. Fecha com este julgamento."
+  },
+  {
+   "alvo": "E_TETO_DO_WEBSEARCH_CONTRARIA_A_MEMORIA_DO_FALLBACK",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU4_IMPACTO_DESPROPORCIONAL",
+    "comando": "for v in 2.1.304 2.1.305 2.1.306 2.1.307; do LC_ALL=C command grep -a -c 'do not work around the limit by querying search engines' ~/.local/share/claude/versions/$v; done; LC_ALL=C command grep -a -o -E 'Web search was not performed[^`]{0,600}' ~/.local/share/claude/versions/2.1.30{6,7} | sort -u"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "a leitura do aviso real que o modelo recebe, extraído do binário de cada versão instalada, em vez do resumo do CHANGELOG",
+    "medida": "O aviso existe igual em 2.1.304, 2.1.305, 2.1.306 e 2.1.307 (2 ocorrências em cada binário). Na 2.1.306 ele diz: 'do not work around the limit by querying search engines with curl or wget from ${je}, or by searching or fetching through a third-party reader, proxy or archive service'. O ${je} vale 'Bash' no mesmo binário. A 2.1.307 só intercala ', by querying them in a browser or through a computer-use tool'. Nenhuma versão nomeia o WebFetch. Logo o WebFetch sobre html.duckduckgo.com não está, ao pé da letra, nem em 'browser or computer use' nem em 'curl or wget from Bash'. Ele cai no espírito de 'do not work around the limit', que vale desde pelo menos a 2.1.304. Portanto o conflito com a memória NÃO nasceu na 2.1.307."
+   },
+   "nota": "(a) A ligação estica o texto. O item da 2.1.307 cobre navegador e computer use, e WebFetch não é nenhum dos dois. O rótulo 'não consulte buscadores por outro caminho' generaliza uma enumeração fechada. O conflito com o espírito do aviso é real, mas é anterior à rodada: a causa afirmada (a mudança da 2.1.307) não é a medida. CU2 também acha deriva de citação: o corpo da memória está nas l.9-11, não nas l.8-10 (a l.8 é vazia); a l.3 confere. A KB verify-external-for-current.md (l.46-48) receita WebFetch sobre URLs CONHECIDAS (npm, changelog, doc oficial), o que não é consultar buscador. Ela cita a memória, mas já cumpre o aviso, então o 'alinhamento da KB' está superdimensionado. Impacto 3 aceitável só como tensão doutrinária entre a memória do maestro e a instrução do harness. A frequência é baixa: só dispara no teto de 200 buscas por sessão."
+  },
+  {
+   "alvo": "Q_REVER_A_MEMORIA_DO_FALLBACK_DE_BUSCA_NA_2_1_307",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "LC_ALL=C command grep -a -c 'do not work around the limit by querying search engines' ~/.local/share/claude/versions/2.1.304; sed -n 46,48p docs/knowledge-base/concepts/verify-external-for-current.md"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304 (sem curl/wget do Bash, sem leitor/proxy de terceiros e, desde a 2.1.307, sem navegador nem computer use), perguntando se WebFetch direto num buscador conta como contornar o teto",
+    "medida": "O binário 2.1.304 já traz a cláusula anti-contorno (count 2). A KB l.47 limita o fallback a 'URLs conhecidas', então só a memória do usuário (fora do repo) receita WebFetch sobre buscador (l.10 e l.18-19)."
+   },
+   "nota": "A pergunta é legítima e deve seguir aberta. O que está errado é a premissa 'depois que a 2.1.307 passou a pedir'. O objeto a rever é a memória, não a KB."
+  },
+  {
+   "alvo": "E_ARTIFACT_READ_RESET_TOCA_O_PAINEL_DO_DECIDE",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n 'Artifact' .claude/commands/meta/decide.md; sed -n 145,151p .claude/commands/meta/decide.md; sed -n 193,195p .claude/commands/common/prompts/decide-doctrine.md"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "um caminho do /meta:decide --painel que chame a ação read da ferramenta Artifact, a única que o item conserta",
+    "medida": "No decide.md, l.145 PUBLICA pelo Artifact, l.150 LÊ as respostas por 'ArtifactData list' e l.157 grava por ArtifactData batch. Não há nenhuma ação read do Artifact no fluxo. A decide-doctrine l.193-195 declara que a leitura pelo ArtifactData 'não foi medida contra um Artifact publicado', ou seja, o caminho nunca rodou de verdade. Se o conserto da 2.1.307 também cobre o transporte do ArtifactData: NÃO MEDIDO."
+   },
+   "nota": "O item conserta a leitura do Artifact. O painel lê pelo ArtifactData, que é outra ferramenta, num caminho ainda não exercitado. Citação errada pelo CU2: as l.137 e l.145 não leem respostas (a leitura está na l.150). O impacto medido é 1, não 2. Falta só 1 ponto, mas a causa afirmada ('depende dessa leitura') não é a medida."
+  },
+  {
+   "alvo": "E_SDK_DO_BRIDGE_UMA_VERSAO_ATRAS_1021",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "bash .claude/validation/cc-delta-census.sh | grep -i sdk; git -C /home/marcio/onion-bridge-dev grep -n -E 'setModel|createSdkMcpServer' origin/main"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz: SDK do bridge 2.1.306 (0.3.306) contra o host 2.1.307, com o aviso de 1 versão atrás. setModel dá 0 no origin/main (21ae69c, #80). Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL existe na r13 (l.232, open), então a ligação com o fork procede. Ressalva: o 'PR do SDK 0.3.307 em preparo' é declaração. Agora não há PR aberto nem branch sdk/307 no remoto marciocar/onion-bridge (gh pr list --state open: vazio)."
+  },
+  {
+   "alvo": "E_SDK_MCP_FERRAMENTAS_TOCA_O_PILOTO_UI",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rln -i createSdkMcpServer docs .claude ops; git -C /home/marcio/onion-bridge-dev grep -n -i -E 'createSdkMcpServer|mcpServers' origin/main -- src; grep -n -i 'servidor MCP' docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "uma superfície do bridge ou do piloto ui:// que use servidor MCP do SDK (in-process) junto com tarefa de fundo, a condição exata do item",
+    "medida": "'createSdkMcpServer' só aparece no próprio grafo da r15, com 0 ocorrências no resto de docs/, .claude/ e ops/. D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021 (l.651) diz apenas 'servidor MCP só dentro do bridge', sem forma de transporte, e o SYNTHESIS.md também não nomeia o SDK MCP. O bridge tem 0 de createSdkMcpServer e 0 de mcpServers em src/ no origin/main. Além disso, o item exige 'when a background task was running', e não há tarefa de fundo do agente no bridge medida."
+   },
+   "nota": "(b) É especulação, não medição. O nó põe na decisão um 'por createSdkMcpServer' que ela não contém, e declara 'pré-requisito' de um piloto não construído cuja forma de servidor não foi escolhida. Mesmo que fosse, a correção só chega ao /chat com o SDK 0.3.307, que não está em produção. Impacto medido 0, não 2."
+  },
+  {
+   "alvo": "E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -n 'claude-code-action@' .github/workflows/onion-review.yml; gh api repos/anthropics/claude-code-action/commits/v1.0.257 --jq .sha; gh api repos/anthropics/claude-code-action/compare/v1.0.256...v1.0.257 --jq '.total_commits'; gh pr view 1275 --json state,mergedAt"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz: l.282 e l.418 em aa8a7738. A tag v1.0.257 é anotada e aponta para o commit aa8a7738. O compare dá 1 commit 'chore: bump Claude Code to 2.1.307 and Agent SDK to 0.3.307'. O #1275 está MERGED em 2026-10-21T23:26:23Z."
+  },
+  {
+   "alvo": "E_NENHUM_ITEM_TOCA_OTEL_RUNNER_E_IDE_1021",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rn -E 'OTEL_|safety_event' .claude ops .github; grep -rc -E 'output_tokens|input_tokens' .claude ops .github | grep -v ':0$'; cat .mcp.json; python3 -c \"import json;print(json.load(open('/home/marcio/.claude.json'))['projects']['/home/marcio/onion-evolve'].get('mcpServers'))\""
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz. OTel dá 0. A única leitura de output_tokens/input_tokens em .claude/ops/.github é 1 ocorrência no lint-selftest. Não há .mcp.json no core e os mcpServers do projeto/usuário estão vazios. O meter.ts do bridge lê o modelUsage do evento result do SDK, não o transcript. Ressalva que o nó deveria registrar: o defeito do transcript de subagente É real nesta casa (ver omissões), só não tem consumidor. A frase 'o custo das rodadas vem do retorno do Workflow, não do transcript' é inferência: de onde o Workflow tira o totalTokens é NÃO MEDIDO."
+  },
+  {
+   "alvo": "E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_307",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Re-executado no CLI 2.1.307: Pularam 0, Falharam 0, 'OK ✓ — todas as guardas reagiram conforme esperado'."
+  }
+ ],
+ "omissoes": [
+  {
+   "item": "Fixed subagent transcripts recording placeholder token usage and an empty stop reason for streamed responses",
+   "versao": "2.1.307",
+   "superficie": "transcripts de subagente em ~/.claude/projects/-home-marcio-onion-evolve/*/subagents/ e as práticas de custo (memória workflow-cost-recoverable-from-journal; números de custo em .claude/workflows/onion-research.js l.327-329)",
+   "medida": "O defeito é real na casa. Na 2.1.306, 358 de 874 linhas de assistente de subagente têm stop_reason vazio, com input_tokens=2 em 355 delas e output_tokens de 3 a 16 (placeholder). Na 2.1.304 são 2055 de 4544. Na 2.1.307 são 0 de 223. Nos transcripts principais, 0. Nenhum script do core lê output_tokens/input_tokens (só 1 ocorrência, no lint-selftest), e .claude/workflows/*.js só cita custos em comentário. A última linha de cada message.id traz o output real (soma das últimas = soma dos máximos nos 6 runs medidos). O totalTokens dos journals wf_*.json não bate com nenhuma soma dos transcripts (ex.: wf_95b7868c 917.783 contra 861.678 de in+out+cache_write): de onde ele vem é NÃO MEDIDO.",
+   "impacto": 1,
+   "proposta": "Registrar no verified_against do E_NENHUM que o defeito foi medido na casa e não tem consumidor. Somar custo por transcript à mão exige a última linha por message.id e só vale a partir da 2.1.307."
+  },
+  {
+   "item": "Fixed a background command stopped through a connected app ... being reported to Claude as stopped by the user; the notice now names its output file",
+   "versao": "2.1.307",
+   "superficie": ".claude/hooks/background-task-probe.sh l.88-100 (o término só se reconhece por <output-file>…<status>(completed|failed|killed|stopped)</status> ou por 'Successfully stopped task')",
+   "medida": "Antes, o aviso de parada por app conectado não nomeava o arquivo de saída. A sonda então não reconhecia o término e mostrava a tarefa como 'sem processo nem notificação', uma linha informativa falsa, sem veto. Se o aviso novo vem no formato <output-file>/<status> que a regex casa: NÃO MEDIDO (a string não foi isolada no binário). Se o core usa app conectado (desktop/Remote Control), dado que roda em tmux por mosh: NÃO MEDIDO.",
+   "impacto": 1,
+   "proposta": "Na 1ª ocorrência real, capturar o aviso e adicionar um caso em run_background_task_probe_selftests. Não justifica nó agora."
+  },
+  {
+   "item": "Added /claude-api api-version to move Claude API code to API version 2026-10-21",
+   "versao": "2.1.307",
+   "superficie": "chamadas diretas à API com anthropic-version 2023-06-01: .github/workflows/onion-review.yml l.201-202, .github/workflows/onion-review-diagnose.yml l.86 e l.122; app companheiro /home/marcio/onion-pessoal-app/llmAnthropic.ts l.92-98 (repo próprio, fora do core)",
+   "medida": "O bridge não chama a API direto: só importa tipos de @anthropic-ai/sdk/resources (src/chat.ts l.8) e fala pelo Agent SDK, com 0 de new Anthropic/messages.create/anthropic-version. O comando é opt-in e nada quebra hoje. Se a 2023-06-01 será descontinuada: NÃO MEDIDO.",
+   "impacto": 1,
+   "proposta": "Sem nó. Se sair aviso de descontinuação da 2023-06-01, o pre-flight do revisor do CI vira o 1º alvo."
+  },
+  {
+   "item": "Fixed requests failing with a model-not-found error when CLAUDE_CODE_DISABLE_1M_CONTEXT is set and the model is an alias with [1m]",
+   "versao": "2.1.307",
+   "superficie": "campo model: dos agentes, settings do core/usuário e .claude/hooks/premodelswitch-guard.sh",
+   "medida": "O model: dos agentes está só na allowlist sonnet|opus|haiku|fable, sem sufixo [1m]. CLAUDE_CODE_DISABLE_1M_CONTEXT não aparece no env, no .claude/settings.json nem em ~/.claude/settings.json (env só tem AGENT_TEAMS e TODO_TOOLS). O premodelswitch-guard.sh já ignora o sufixo (l.68: to_base=${to%%\\[*}). O bridge usa ONION_MODEL ?? 'claude-opus-5', sem [1m].",
+   "impacto": 0,
+   "proposta": "Nenhuma."
+  },
+  {
+   "item": "Fixed /permissions > Recently denied not showing the denied shell command, and auto mode's local classifier ignoring an approval",
+   "versao": "2.1.307",
+   "superficie": "vetos exit 2 dos hooks e modo de permissão",
+   "medida": "~/.claude/settings.json tem defaultMode bypassPermissions, sem autoMode. O bridge roda bypassPermissions no admin (src/agent-policy.ts l.158). Os vetos do core são exit 2 de hook, não regra de permissão, e a tela interativa não é exercitada.",
+   "impacto": 0,
+   "proposta": "Nenhuma."
+  },
+  {
+   "item": "Changed the axScreenReader setting and CLAUDE_AX_SCREEN_READER to apply only from user, managed or --settings settings (since 2.1.305)",
+   "versao": "2.1.307",
+   "superficie": ".claude/settings.json (também o template que viaja para adotantes)",
+   "medida": "axScreenReader e CLAUDE_AX_SCREEN_READER dão 0 nos dois settings e em .claude.",
+   "impacto": 0,
+   "proposta": "Nenhuma."
+  },
+  {
+   "item": "Improved recovery from unparseable tool calls: retries up to twice before ending the turn",
+   "versao": "2.1.307",
+   "superficie": "turnos do host e do /chat",
+   "medida": "Nenhum consumidor de erro de tool call malformada: 'unparseable' no core só aparece no a2a-verify.sh, sobre corpo JSON, não sobre tool call. No bridge, 0 em src. O ganho é genérico e só chega ao /chat com o SDK 0.3.307.",
+   "impacto": 1,
+   "proposta": "Nenhuma."
+  },
+  {
+   "item": "Improved fork subagents launched together",
+   "versao": "2.1.307",
+   "superficie": "o HOST (as sessões do core já lançam subagent_type fork), não só o /chat",
+   "medida": "O host já está na 2.1.307 (claude --version), então o ganho já vale aqui. O nó do bridge só considerou o /chat.",
+   "impacto": 1,
+   "proposta": "Uma frase no E_SDK_DO_BRIDGE: no host já entrou."
+  }
+ ],
+ "aufhebung": {
+  "supersedes_procede": true,
+  "outros_superados": [
+   {
+    "no": "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml#Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL",
+    "razao": "Ela está open e o critério de fechamento exige o job no pin a5a423f7 com o CLI 2.1.306 no log. O pin agora é aa8a7738 (v1.0.257, CLI 2.1.307), então o critério ficou inalcançável. É o mesmo padrão que a r14 aplicou à pergunta da r13 (SUPERSEDES Q_REVISOR_NO_PIN_NOVO_...). A r15 só cita 'segue estacionada (SAC-181)' e não abriu a pergunta sucessora nem a aresta."
+   },
+   {
+    "no": "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml#E_REVISOR_SEGUE_SEM_PR_COM_A_LABEL_1021",
+    "razao": "O rótulo afirma que 'o pin v1.0.256 segue sem prova'. O pin mudou, então o estado presente que o nó descreve é o do v1.0.257, assunto do E_PIN da r15. Supersede parcial: a falta de PR com a label continua."
+   }
+  ]
+ },
+ "juiz": {
+  "modelo": "opus",
+  "resumo": "A cópia do CHANGELOG bate byte a byte. Pin do revisor, SDK do bridge, guarda cited_directive e o nó de sem-consumidor reproduzem. Três nós esticam a ligação: o aviso anti-contorno do WebSearch já existia desde ≤2.1.304, e o WebFetch não está em 'browser or computer use'; o painel do decide lê pelo ArtifactData, não pela leitura do Artifact; e o createSdkMcpServer não está na decisão do piloto, que é REPROVA. Nenhuma omissão chega a impacto 2 medido. Mas o defeito do transcript de subagente é real na casa (41% das linhas na 2.1.306, 0% na 2.1.307), e a Aufhebung esqueceu a pergunta da r14 presa ao pin v1.0.256."
+ }
+}
