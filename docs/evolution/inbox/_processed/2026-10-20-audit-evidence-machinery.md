@@ -8,6 +8,8 @@ to: [onion-evolve, onion-kg-ssot]
 severity: medium
 ---
 
+> **Redigido no core por ser repo público** (decisão do maestro de 2026-10-20 para sinais com postura de cliente): o nome do cliente, da contraparte, as contagens e as ferramentas internas foram generalizados. O original está no hub.
+
 # Maquinaria de auditoria contínua no core
 
 **Pedido do maestro (2026-10-20):** "isso sempre vai acontecer; temos que criar uma maquinaria para isso em conjunto com o
@@ -16,12 +18,12 @@ comunidades, os fóruns e os padrões de mercado em outubro de 2026, e manter-se
 
 ## O caso real
 
-A GranaAI recebeu um questionário de auditoria de segurança de uma registradora: 20 perguntas e um pedido de
-certificações, com 4 dias de prazo. A triagem no brain mostrou o problema comum a qualquer adotante regulado:
+Um adotante regulado recebeu um questionário de auditoria de segurança de uma contraparte do setor: algumas dezenas
+de perguntas e um pedido de certificações, com prazo curto. A triagem no brain mostrou o problema comum a qualquer adotante regulado:
 
-- **A wiki inteira afirma e não prova.** São 29 documentos de compliance com 0 imagens e 1 anexo. Atas, listas de presença,
-  relatórios e prints são citados e não existem. Das 21 afirmações ligadas às perguntas, 13 contradizem o código ou
-  outro documento, 7 não têm evidência e 1 é intenção.
+- **A wiki inteira afirma e não prova.** Os documentos de compliance quase não têm anexos nem imagens. Atas, listas de presença,
+  relatórios e prints são citados e não existem. A maior parte das afirmações ligadas às perguntas contradiz o
+  código ou outro documento, ou não tem evidência nenhuma.
 - **Cada auditoria recomeça do zero.** Não há catálogo do que precisa ser provado, com que frequência e por quem.
 - **Evidência sensível não pode ir ao git** (pentest, prints de nuvem, NDAs), mas precisa de integridade (hash) e de
   ponteiro rastreável.
@@ -32,10 +34,10 @@ certificações, com 4 dias de prazo. A triagem no brain mostrou o problema comu
 |---|---|
 | `docs/evolution/research/audit-evidence-frameworks-2026-10/` | pesquisa de mercado (grafo + README), out/2026 |
 | `docs/compliance/graph/evidence-requirements.kg.yaml` | 21 regras `R_EVR_*` (`node_type: rule`) que `CONSTRAINS` a afirmação |
-| `docs/compliance/graph/tag-audit-2026-10.kg.yaml` | o questionário como grafo: pergunta → resposta → evidência → pedido ao dono → ClickUp |
-| `docs/compliance/tag-audit-2026-10/evidence-index.md` | índice de evidências: dono, local (repo ou Drive restrito), sha256, estado |
+| `docs/compliance/graph/auditoria-2026-10.kg.yaml` | o questionário como grafo: pergunta → resposta → evidência → pedido ao dono → task manager |
+| `docs/compliance/auditoria-2026-10/evidence-index.md` | índice de evidências: dono, local (repo ou Drive restrito), sha256, estado |
 
-Branch `feature/tag-audit-2026-10`, commits `b319dfd85` e `582937c87`.
+Os artefatos estão numa branch do hub, não versionados no core.
 
 ## O que a pesquisa recomenda
 
@@ -61,7 +63,7 @@ Branch `feature/tag-audit-2026-10`, commits `b319dfd85` e `582937c87`.
 2. **Radar lendo vencimento:** a evidência vence em `verified_at` + `frequency`. Evidência vencida e regra sem
    evidência entram na seção ESTADO.
 3. **Comando de questionário**, por exemplo `/compliance:questionnaire`:
-   - transforma o questionário recebido num grafo como o `tag-audit`;
+   - transforma o questionário recebido num grafo como o `auditoria`;
    - faz a triagem contra as regras e o grafo de compliance;
    - gera os pedidos aos donos e as tarefas no task manager;
    - consolida as respostas, com a regra "nenhum sim sem prova".
@@ -69,20 +71,20 @@ Branch `feature/tag-audit-2026-10`, commits `b319dfd85` e `582937c87`.
 5. **Adaptador SDAAL `document-source`:** `outline`, `gdrive` e um `none` que recusa em vez de degradar. Ele tira um
    snapshot só de leitura dos documentos e anexos, com sha256 e manifesto, e mapeia para os nós de política.
    - Detecta drift pelo `updatedAt` e pelo hash.
-   - Caso real: 29 documentos, 175 citações `P_CMP_WIKI_*`.
+   - Caso real: dezenas de documentos e centenas de citações na wiki.
 6. **Gestão contínua:** cada regra com frequência vira uma tarefa recorrente no task manager, ligada ao nó, e cada coleta
    faz `SUPERSEDES` da anterior.
 7. **Manter-se atualizado:** uma lista do que acompanhar, com `review_after`, no próprio grafo de pesquisa, e um passo no
    `/meta:kg-freshness` que lembra de rever. A lista:
    - releases do OSCAL, do compliance-trestle, do FedRAMP rules, do OCSF e do CycloneDX;
    - as publicações trimestrais do SCF e as da CSA;
-   - as normas do BCB e da ANPD.
+   - as normas dos reguladores locais.
 
-**No adotante:** as regras concretas, o mapeamento das normas locais (CMN 4.893, BCB 85, LGPD) para os controles, a
+**No adotante:** as regras concretas, o mapeamento das normas locais (as normas do regulador e a lei de proteção de dados) para os controles, a
 biblioteca de respostas e os ponteiros privados para as evidências.
 
 ## Pergunta ao core e ao kg-ssot
 
 Os três desenham juntos, como no perfil do migrador? Proponho começar pelo item 1 (vocabulário, que afeta o contrato) e
 pelo 2 (radar). O brain serve de caso real e devolve um antes e depois anonimizado quando pedirem. A fase 6 da sessão
-`tag-audit-2026-10` (gestão contínua) espera esse desenho para não criar maquinaria local que o core depois substitua.
+`auditoria-2026-10` (gestão contínua) espera esse desenho para não criar maquinaria local que o core depois substitua.
