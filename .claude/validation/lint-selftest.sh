@@ -40926,6 +40926,147 @@ EOF_MUT
   rm -rf "${d}"; unset -f _rc_git _rc_ok _rc_bad _rc_target _rc_commit _rc_judge _rc_offer
 }
 _family run_remeasure_contract_selftests
+# ── plan-contract-migration.sh: a migração do corpus PLANEJADA (dry-run) no --update (fase 2, 2026-10-21) ──────
+# Fase 2 de D_U1_CAMADA_SDAAL_NO_UPDATE: com a dívida MUST que a fase 1 mede, o --update roda o kg_migrate.py PLAN do
+# vendor do alvo com o perfil DELE e cola o resumo e a planilha no relatório; nunca o apply. O SUT é o helper REAL
+# (com o remeasure-contract.sh ao lado), contra alvos git de mentira com o vendor do core copiado. (a) sem dívida a
+# fase não roda (nem cria a pasta da planilha); (b) dívida sem perfil = orienta (o exemplo do vendor) e não inventa
+# perfil; (c) dívida com perfil = o plano no relatório (por ação, recusados pelo contrato, o universo igual ao da
+# medição, fixtures e kg-inbox arquivado fora) e NADA escrito no alvo (sha256 de toda a árvore igual, git status
+# --ignored vazio, sem __pycache__); (d) sem kg_migrate.py no vendor = NÃO MEDIDO; (e) perfil fora do schema, dois
+# perfis e planilha dentro do alvo = NÃO MEDIDO; (f) um migrador que ESCREVE é pego pela foto do próprio helper (rc 5).
+# (m) UM MUTANTE POR CURA, na cópia do helper, inclusive o que troca o plan pelo apply.
+run_plan_contract_migration_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/adopt/plan-contract-migration.sh"
+  if [ ! -f "${sut}" ]; then record_fail "plan-contract-migration" "SUT ausente: ${sut}"; return; fi
+  [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_migrate.py" ] || { record_skip "plan-contract-migration: vendor/kg-ssot sem kg_migrate.py nesta árvore (SUT não exercido)"; return; }
+  python3 -c 'import yaml, jsonschema' >/dev/null 2>&1 || { record_skip "plan-contract-migration: PyYAML/jsonschema ausentes (SUT não exercido)"; return; }
+  local d; d="$(mktemp -d)"
+  _pm_git() { git -C "$1" -c user.email=t@t -c user.name=t -c commit.gpgsign=false "${@:2}"; }
+  _pm_target() {  # $1=dir → alvo git com o vendor do core (tools, spec com os exemplos do perfil, carimbo)
+    mkdir -p "$1/vendor/kg-ssot/tools" "$1/vendor/kg-ssot/spec/migrate-examples" "$1/docs/g"
+    cp "${REPO_ROOT}"/vendor/kg-ssot/tools/*.py "$1/vendor/kg-ssot/tools/"
+    cp "${REPO_ROOT}"/vendor/kg-ssot/spec/*.json "$1/vendor/kg-ssot/spec/"
+    cp "${REPO_ROOT}"/vendor/kg-ssot/spec/migrate-examples/*.yaml "$1/vendor/kg-ssot/spec/migrate-examples/"
+    cp "${REPO_ROOT}/vendor/kg-ssot/.kg-ssot-version" "$1/vendor/kg-ssot/"
+    git init -q -b main "$1" >/dev/null 2>&1
+  }
+  _pm_ok() {  # $1=arquivo $2=id → grafo que passa no MUST
+    printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-10-20"\nnodes:\n  - id: C_A\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "aberta"\n  - id: C_B\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "outra aberta"\nedges:\n  - from: C_A\n    to: C_B\n    edge_type: SUPPORTS\n' "$2" > "$1"
+  }
+  _pm_bad() {  # $1=arquivo $2=id → 3 nós sem provenance: 2 sem trace (confirmed, PROD) e 1 com trace "placeholder"
+    printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-10-20"\nnodes:\n  - id: C_A\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    label: "confirmada sem fonte"\n  - id: C_B\n    node_type: claim\n    plane: PROD\n    status: open\n    impact: 2\n    confidence: 0.9\n    verified_at: "2026-10-20"\n    verified_against: "medido"\n    label: "PROD sem fonte"\n  - id: C_C\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    trace: "placeholder da fonte"\n    label: "confirmada com trace que o perfil manda para um placeholder"\nedges:\n  - from: C_A\n    to: C_B\n    edge_type: SUPPORTS\n  - from: C_C\n    to: C_B\n    edge_type: SUPPORTS\n' "$2" > "$1"
+  }
+  _pm_profile() {  # $1=arquivo → perfil válido: o trace "placeholder" gera fonte placeholder (recusada pelo contrato)
+    printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules:\n  - id: placeholder\n    when: {trace_matches: "^placeholder"}\n    then:\n      provenance: {source: "tbd", locator: "x", method: {class: leitura, detail: "teste"}, locality: repo}\n  - id: sem-trace\n    when: {trace_empty: true}\n    then:\n      provenance: {source: "docs/fonte.md", locator: "a seção 1", method: {class: leitura, detail: "documento de teste"}, locality: repo}\n' > "$1"
+  }
+  _pm_commit() { _pm_git "$1" add -A; _pm_git "$1" commit -qm fx >/dev/null 2>&1; }
+  _pm_tree() { (cd "$1" && find . -path ./.git -prune -o -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) | sha256sum | cut -d' ' -f1; }
+  # o veredito de cada caso: $1=helper → "a b …" dos casos que passam
+  _pm_judge() {
+    local s="$1" ok="" r o t0 t1
+    rm -rf "${d}/out-a"
+    r=0; o="$(bash "${s}" "${d}/passa" --out-dir "${d}/out-a" 2>&1)" || r=$?
+    [ "${r}" -eq 4 ] && grep -q 'MIGRAÇÃO não roda: o corpus passa no MUST' <<< "${o}" && [ ! -e "${d}/out-a" ] && ok="${ok} a"
+    t0="$(_pm_tree "${d}/sem-perfil")"
+    r=0; o="$(bash "${s}" "${d}/sem-perfil" --out-dir "${d}/out-b" 2>&1)" || r=$?
+    t1="$(_pm_tree "${d}/sem-perfil")"
+    [ "${r}" -eq 2 ] && grep -q 'MIGRAÇÃO sem perfil: o contrato acusa 3 nó(s) na dívida MUST' <<< "${o}" \
+      && grep -q 'company-brain.profile.yaml' <<< "${o}" && grep -q 'O core não escreve o perfil' <<< "${o}" \
+      && [ "${t0}" = "${t1}" ] && [ ! -e "${d}/sem-perfil/.kg-ssot/migrate-profile.yaml" ] && ok="${ok} b"
+    rm -rf "${d}/out-c"
+    t0="$(_pm_tree "${d}/com-perfil")"
+    r=0; o="$(bash "${s}" "${d}/com-perfil" --out-dir "${d}/out-c" 2>&1)" || r=$?
+    t1="$(_pm_tree "${d}/com-perfil")"
+    [ "${r}" -eq 0 ] && grep -q 'MIGRAÇÃO planejada (dry-run' <<< "${o}" && grep -q 'com o perfil .kg-ssot/migrate-profile.yaml' <<< "${o}" \
+      && grep -q '3 nó(s) no plano: 2 com provenance proposta · 0 rebaixado(s) para unverifiable · 1 sem proposta' <<< "${o}" \
+      && grep -q 'recusados pelo contrato: 1' <<< "${o}" && grep -q 'o plano cobre os 3 nó(s)' <<< "${o}" \
+      && grep -q "planilha: ${d}/out-c/kg-migrate-plan.tsv" <<< "${o}" && [ "$(grep -c 'docs/g/b.kg.yaml' "${d}/out-c/kg-migrate-plan.tsv" 2>/dev/null)" = "3" ] \
+      && grep -q 'Nada foi escrito no alvo' <<< "${o}" && grep -q "kg_migrate.py apply --profile .kg-ssot/migrate-profile.yaml --exclude '\*\*/fixtures/\*\*'" <<< "${o}" \
+      && [ "${t0}" = "${t1}" ] && [ -z "$(_pm_git "${d}/com-perfil" status --porcelain --ignored 2>/dev/null)" ] \
+      && [ -z "$(find "${d}/com-perfil" -name __pycache__ 2>/dev/null)" ] && ok="${ok} c"
+    find "${d}/com-perfil" -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null
+    _pm_git "${d}/com-perfil" checkout -q -- . 2>/dev/null; _pm_git "${d}/com-perfil" clean -qfdx 2>/dev/null
+    r=0; o="$(bash "${s}" "${d}/sem-migrador" --out-dir "${d}/out-d" 2>&1)" || r=$?
+    [ "${r}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o vendor do alvo (kg-ssot .*) não traz o tools/kg_migrate.py' <<< "${o}" \
+      && grep -q '3 nó(s) seguem na dívida MUST' <<< "${o}" && ok="${ok} d"
+    local r1=0 r2=0 r3=0 o1 o2 o3
+    o1="$(bash "${s}" "${d}/perfil-quebrado" --out-dir "${d}/out-e1" 2>&1)" || r1=$?
+    o2="$(bash "${s}" "${d}/dois-perfis" --out-dir "${d}/out-e2" 2>&1)" || r2=$?
+    o3="$(bash "${s}" "${d}/com-perfil" --out-dir "${d}/com-perfil/planilha" 2>&1)" || r3=$?
+    [ "${r1}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o1}" && grep -q 'ENTRADA QUEBRADA' <<< "${o1}" \
+      && [ "${r2}" -eq 3 ] && grep -q 'o alvo tem dois perfis' <<< "${o2}" \
+      && [ "${r3}" -eq 3 ] && grep -q 'fica dentro do alvo' <<< "${o3}" && [ ! -e "${d}/com-perfil/planilha" ] && ok="${ok} e"
+    rm -rf "${d}/com-perfil/planilha"
+    _pm_git "${d}/escreve" checkout -q -- . 2>/dev/null
+    r=0; o="$(bash "${s}" "${d}/escreve" --out-dir "${d}/out-f" 2>&1)" || r=$?
+    [ "${r}" -eq 5 ] && grep -q 'o alvo MUDOU durante o plan' <<< "${o}" && ok="${ok} f"
+    printf '%s' "${ok}"
+  }
+  _pm_target "${d}/passa"; _pm_ok "${d}/passa/docs/g/a.kg.yaml" fx-a; _pm_commit "${d}/passa"
+  _pm_target "${d}/sem-perfil"; _pm_ok "${d}/sem-perfil/docs/g/a.kg.yaml" fx-a; _pm_bad "${d}/sem-perfil/docs/g/b.kg.yaml" fx-b; _pm_commit "${d}/sem-perfil"
+  # com-perfil: a dívida em docs/g/b, MAIS dívida fora do corpus (fixtures e proposta arquivada do kg-inbox), que nem
+  # a medição nem o plano contam; o universo do plano tem de ser o da medição (3 nós)
+  _pm_target "${d}/com-perfil"; _pm_ok "${d}/com-perfil/docs/g/a.kg.yaml" fx-a; _pm_bad "${d}/com-perfil/docs/g/b.kg.yaml" fx-b
+  mkdir -p "${d}/com-perfil/docs/fixtures" "${d}/com-perfil/docs/evolution/kg-inbox/_sealed" "${d}/com-perfil/.kg-ssot"
+  _pm_bad "${d}/com-perfil/docs/fixtures/f.kg.yaml" fx-f; _pm_bad "${d}/com-perfil/docs/evolution/kg-inbox/_sealed/p.kg.yaml" fx-p
+  _pm_profile "${d}/com-perfil/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/com-perfil"
+  _pm_target "${d}/sem-migrador"; _pm_bad "${d}/sem-migrador/docs/g/b.kg.yaml" fx-b; rm -f "${d}/sem-migrador/vendor/kg-ssot/tools/kg_migrate.py"; _pm_commit "${d}/sem-migrador"
+  _pm_target "${d}/perfil-quebrado"; _pm_bad "${d}/perfil-quebrado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado/.kg-ssot"
+  printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/perfil-quebrado"
+  _pm_target "${d}/dois-perfis"; _pm_bad "${d}/dois-perfis/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/dois-perfis/.kg-ssot"
+  _pm_profile "${d}/dois-perfis/.kg-ssot/migrate-profile.yaml"; _pm_profile "${d}/dois-perfis/kg-migrate.profile.yaml"; _pm_commit "${d}/dois-perfis"
+  # escreve: um migrador falso cujo "plan" grava no grafo do alvo — a foto do helper tem de pegar (rc 5)
+  _pm_target "${d}/escreve"; _pm_bad "${d}/escreve/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/escreve/.kg-ssot"; _pm_profile "${d}/escreve/.kg-ssot/migrate-profile.yaml"
+  printf 'import pathlib, sys\na = sys.argv\nroot = a[a.index("--root") + 1]\nout = a[a.index("--out") + 1]\np = pathlib.Path(root, "docs/g/b.kg.yaml")\np.write_text(p.read_text() + "# escrito\\n")\npathlib.Path(out).write_text("arquivo\\tid\\tregra\\tação\\tproposta\\trevisar\\tsupports\\n")\n' > "${d}/escreve/vendor/kg-ssot/tools/kg_migrate.py"
+  _pm_commit "${d}/escreve"
+  local got; got="$(_pm_judge "${sut}")"
+  case " ${got} " in *" a "*) record_pass "plan-contract-migration: (a) corpus sem dívida MUST → rc 4 'não roda', e nem a pasta da planilha nasce" ;;
+    *) record_fail "plan-contract-migration: (a)" "$(bash "${sut}" "${d}/passa" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" b "*) record_pass "plan-contract-migration: (b) dívida sem perfil → rc 2, orienta pelo exemplo do vendor e não inventa perfil (árvore do alvo igual)" ;;
+    *) record_fail "plan-contract-migration: (b)" "$(bash "${sut}" "${d}/sem-perfil" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" c "*) record_pass "plan-contract-migration: (c) dívida com perfil → rc 0, o plano por ação (2 propostas, 1 recusada pelo contrato), o universo da medição (fixtures e kg-inbox arquivado fora), a planilha fora do alvo e NADA escrito nele (sha256 da árvore, git status --ignored, __pycache__)" ;;
+    *) record_fail "plan-contract-migration: (c)" "$(bash "${sut}" "${d}/com-perfil" --out-dir "${d}/out-c" 2>&1 | head -4 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" d "*) record_pass "plan-contract-migration: (d) vendor do alvo sem kg_migrate.py → rc 3 NÃO MEDIDO, com a dívida dita" ;;
+    *) record_fail "plan-contract-migration: (d)" "$(bash "${sut}" "${d}/sem-migrador" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" e "*) record_pass "plan-contract-migration: (e) perfil fora do schema, dois perfis e planilha dentro do alvo → rc 3 NÃO MEDIDO, nunca um plano" ;;
+    *) record_fail "plan-contract-migration: (e)" "$(bash "${sut}" "${d}/perfil-quebrado" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" f "*) record_pass "plan-contract-migration: (f) migrador que escreve no alvo → rc 5 'o alvo MUDOU' (a foto antes/depois do próprio helper)" ;;
+    *) record_fail "plan-contract-migration: (f)" "$(bash "${sut}" "${d}/escreve" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  # (m) MUTANTES na CÓPIA do helper (com o remeasure-contract.sh ao lado): cada um reverte uma cura e EXIGE que o
+  #     caso nomeado caia. Pares múltiplos de troca separados por \x1e.
+  mkdir -p "${d}/mut"; cp "${REPO_ROOT}/.claude/utils/adopt/remeasure-contract.sh" "${d}/mut/"
+  local m="${d}/mut/plan-contract-migration.sh" old new want
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${sut}" "${m}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); A=a.split("\x1e"); B=b.split("\x1e"); sys.exit(3) if len(A)!=len(B) or any(s.count(x)!=1 for x in A) else None
+for x,y in zip(A,B): s=s.replace(x,y)
+open(p,"w",encoding="utf-8").write(s)' "${m}" "${old}" "${new}"; then
+      record_fail "plan-contract-migration: (m) mutante não aplicou" "${want}"; continue
+    fi
+    case " $(_pm_judge "${m}") " in
+      *" ${want} "*) record_fail "plan-contract-migration: (m) mutante NÃO morde" "(${want}) segue verde com a cura revertida: ${new%%$'\x1e'*}" ;;
+      *) record_pass "plan-contract-migration: (m) mutante morde → (${want}) cai" ;;
+    esac
+    find "${d}" -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null
+    _pm_git "${d}/com-perfil" checkout -q -- . 2>/dev/null; _pm_git "${d}/com-perfil" clean -qfdx 2>/dev/null
+  done <<EOF_MUT
+  1) ;;$(printf '\x1f')  1|0) ;;$(printf '\x1f')a
+  elif [ "\${#FOUND[@]}" -eq 0 ]; then$(printf '\x1e')    PROFILE="\${T}/\${FOUND[0]}"$(printf '\x1f')  elif false; then$(printf '\x1e')    PROFILE="\${VENDOR}/spec/migrate-examples/company-brain.profile.yaml"$(printf '\x1f')b
+"\${MIG}" plan --profile$(printf '\x1f')"\${MIG}" apply --profile$(printf '\x1f')c
+EXCL=(--exclude '**/fixtures/**' --exclude 'docs/materials/**'$(printf '\x1f')EXCL=(--exclude 'docs/materials/**'$(printf '\x1f')c
+python3 -I -B "\${MIG}"$(printf '\x1f')python3 -I "\${MIG}"$(printf '\x1f')c
+refused = [r for r in nodes if r["revisar"].startswith("a proposta reprovaria no contrato")]$(printf '\x1f')refused = []$(printf '\x1f')c
+[ -f "\${MIG}" ] || no$(printf '\x1f')[ -f "\${MIG}" ] || true$(printf '\x1f')d
+if [ "\${PRC}" -ne 0 ]; then$(printf '\x1f')if false; then$(printf '\x1f')e
+    no "o alvo tem dois perfis$(printf '\x1f')    : "o alvo tem dois perfis$(printf '\x1f')e
+case "\${OUT_DIR}/" in "\${T}/"*) no$(printf '\x1f')case "\${OUT_DIR}/" in "/nunca/"*) no$(printf '\x1f')e
+if [ "\${BEFORE}" != "\${AFTER}" ]; then$(printf '\x1f')if false; then$(printf '\x1f')f
+EOF_MUT
+  rm -rf "${d}"; unset -f _pm_git _pm_target _pm_ok _pm_bad _pm_profile _pm_commit _pm_tree _pm_judge
+}
+_family run_plan_contract_migration_selftests
 # ── applied-delta.sh: "Arquivos aplicados" do relatório do --update, MEDIDO NO ALVO (2026-10-20) ──────
 # O caso medido (sinal do hub, 2026-10-19): a fonte disse 239, chegaram 540, porque vendor/kg-ssot já existia
 # no core no pin e só entrou no MANIFESTO depois — chega inteiro no alvo e o delta da fonte não o vê. A fixture

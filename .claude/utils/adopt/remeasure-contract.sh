@@ -141,8 +141,8 @@ def run():
     if failing:
         out.append(f"⚠️ seu corpus reprova no contrato vendorizado: {len(must_nodes)} nó(s) em {len(failing)} grafo(s)"
                    + (f" (e {off_node} ocorrência(s) MUST fora de nó: aresta, meta ou arquivo)" if off_node else "")
-                   + "; caminho: migração do corpus ao contrato (a fase seguinte do --update, conduzida quando o migrador"
-                   " oficial do kg-ssot sair). Medir não é gate: o update segue.")
+                   + "; caminho: migração do corpus ao contrato (a fase seguinte do --update planeja com o kg_migrate.py"
+                   " do vendor e o perfil do alvo: plan-contract-migration.sh). Medir não é gate: o update segue.")
         out += [f"    · {name}: {' · '.join(measured[name]['must'])}" for name in failing]
     print("\n".join(out))  # tudo de uma vez: uma exceção no meio não deixa meio relatório no stdout
     return 1 if failing else 0

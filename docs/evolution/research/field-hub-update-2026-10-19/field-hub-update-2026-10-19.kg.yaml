@@ -165,11 +165,34 @@ nodes:
   - id: Q_U1_FASE2_MIGRACAO_CONDUZIDA
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 3
-    confidence: 0.6
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "plan-contract-migration.sh rodado contra a cópia descartável do hub em 606d6941b com o vendor 4.13.0 do core: rc 0, 1.024 nós no plano, a classe igual à migração à mão em 1.023 e a locality em 1.021 de 1.021, sha256 dos 12.131 arquivos igual antes e depois; bancada plan_contract_migration 17/17"
     label: "fase 2: o --update conduz a migração do corpus quando o remeasure-contract.sh acusa dívida MUST, chamando o kg_migrate.py e o perfil do adotante que o kg-ssot publicar na 4.13.0"
-    narrative: "Gatilho: o kg-ssot publicar o kg_migrate.py e o schema do perfil (D_U1_MIGRADOR_NO_KG_SSOT). Até lá o relatório só diz o número e o caminho. A fase deriva-se fresca contra a ferramenta que sair, sem pré-cozinhar a interface."
+    narrative: "Gatilho: o kg-ssot publicar o kg_migrate.py e o schema do perfil (D_U1_MIGRADOR_NO_KG_SSOT). A fase foi derivada fresca contra a ferramenta que saiu na 4.13.0 (E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE). Conduzir é planejar: o --update roda o plan com o perfil do adotante e entrega a planilha; o apply fica com o dono do corpus, por desenho, porque gravar provenance é decisão sobre a verdade do grafo dele."
+    provenance:
+      source: ".claude/utils/adopt/plan-contract-migration.sh e a família plan_contract_migration de .claude/validation/lint-selftest.sh, nesta branch"
+      locator: "E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE deste grafo"
+      method: "derivado: da evidência E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE, que mede a fase contra o hub e a bancada"
+      locality: "repo"
+  - id: E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "plan-contract-migration.sh contra ⟨cópia descartável do hub em 606d6941b, vendor trocado pelo 4.13.0 do core⟩: com o perfil de exemplo do vendor ajustado aos 3 ids e ao glob de pesquisa do hub, 1.024 nós no plano (1.021 propostas, 2 rebaixados, 1 para revisão), classe igual à migração à mão f3738f4aa em 1.023 e locality igual à HEAD em 1.021 de 1.021; com o exemplo cru, 1.007; sem perfil rc 2; com o vendor 4.9.1 da cópia, rc 3 NÃO MEDIDO"
+    trace: ".claude/utils/adopt/plan-contract-migration.sh"
+    label: "fase 2 de D_U1_CAMADA_SDAAL_NO_UPDATE: com dívida MUST, o --update roda o kg_migrate.py plan do vendor do alvo com o perfil dele e cola o resumo e a planilha no relatório; sem perfil orienta, e nunca roda o apply"
+    narrative: "O helper chama o remeasure-contract.sh como gatilho (rc 1 roda, rc 0 ou 4 não roda, rc 3 é NÃO MEDIDO) e procura o perfil em .kg-ssot/migrate-profile.yaml (onde o hub pôs o dele) e kg-migrate.profile.yaml (o nome do exemplo do manual do kg-ssot); dois perfis é ambíguo. O corpus é o da fase 1, com os excluídos traduzidos para o dialeto de glob do perfil, e o plano se confere contra a medição: 1.024 nós nos dois lados. A planilha vai para fora do alvo, e um --out-dir dentro dele é recusado antes de a pasta nascer. O helper fotografa o alvo antes e depois (git status com ignorados e sha256 dos .kg.yaml) e sai rc 5 se algo mudou; o comando de apply sai impresso com os mesmos --exclude, para o dono rodar depois de revisar. A única divergência com o hub é a da 3ª passada do core sobre o migrador (trace 'apps libs', que o migrador manda para revisão). O exemplo cru dá 1.007 porque os ids e o glob de pesquisa são de outro corpus: é a medida de por que o helper nunca copia o exemplo."
+    provenance:
+      source: ".claude/utils/adopt/plan-contract-migration.sh e a família plan_contract_migration de .claude/validation/lint-selftest.sh, nesta branch; o hub brain-granaai em 606d6941b (antes) e f3738f4aa (a migração à mão), lidos por git archive"
+      locator: "saída do helper: 'MIGRAÇÃO planejada (dry-run, kg_migrate.py plan do vendor do alvo, kg-ssot 4.13.0)' e 'o plano cobre os 1024 nó(s) que a medição do contrato acusou no MUST'; bancada: 6 casos e 11 mutantes"
+      method: "medição: o helper real contra a cópia descartável do hub, a planilha comparada nó a nó com a migração à mão, e a bancada com mutante por cura, inclusive o que troca o plan pelo apply"
+      locality: "host"
   - id: D_CANAL_UPSTREAM_POR_VENDOR
     node_type: decision
     layer: audit
@@ -234,6 +257,15 @@ edges:
     to: D_U1_MIGRADOR_NO_KG_SSOT
     edge_type: DEPENDS_ON
   - from: Q_U1_FASE2_MIGRACAO_CONDUZIDA
+    to: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
+    edge_type: DEPENDS_ON
+  - from: E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE
+    to: Q_U1_FASE2_MIGRACAO_CONDUZIDA
+    edge_type: SUPPORTS
+  - from: E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE
+    to: D_U1_CAMADA_SDAAL_NO_UPDATE
+    edge_type: TRACES_TO
+  - from: E_U1_FASE2_MIGRACAO_PLANEJADA_NO_UPDATE
     to: E_U1_FASE1_CONTRATO_MEDIDO_NO_UPDATE
     edge_type: DEPENDS_ON
   - from: D_CANAL_UPSTREAM_POR_VENDOR
