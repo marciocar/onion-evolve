@@ -2,7 +2,8 @@
 branch: feat/audit-evidence-expiry
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4c159741e6606d3ad9fa806f25f6a95bb5d85164da8c41cbc211f6491ef0488d
+reviewed_code_sha256: 69a1ae9367c55633b0d8d5fe85353e2322787baaf8e2cae2e7784fc4c5bb0aab
 findings_total: 8
 findings_real: 8
 tokens: 93878
