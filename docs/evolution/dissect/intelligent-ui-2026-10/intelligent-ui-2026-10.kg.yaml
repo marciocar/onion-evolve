@@ -653,9 +653,7 @@ nodes:
     verified_at: "2026-10-21"
     verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Abrir uma tarefa»"
     label: "O access e o refresh token do /chat saem do localStorage (web/src/auth/oidc.ts:20-25, exposto a XSS com acesso irrestrito ao Agent SDK): vira tarefa no Linear, cura por PR revisado no onion-bridge, merge do maestro"
-    narrative: |-
-      Issue SAC-184 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
-    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «Abrir uma tarefa»; descartadas: «Curar agora» · «Aceitar o risco»."
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «Abrir uma tarefa»; descartadas: «Curar agora» · «Aceitar o risco». Issue SAC-184 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas."
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-21: «O que fazer com o token do /chat em localStorage exposto a XSS?»"
