@@ -1,0 +1,317 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.303 a 2.1.306 contra a baseline 2.1.302.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-21-r14
+  schema_version: "1"
+  baseline: "2026-10-21"
+  review_after: "2026-11-20"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-21) + 9 da rodada + 6 do juiz (4 omissões e 2 perguntas) = 17.
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+#   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
+#   DECIDIDO (2026-10-21): (a), com o juiz. Três nós da r13 superados: o pin do revisor (v1.0.252 → v1.0.256), a pergunta
+#   de prova presa ao v1.0.252 (nova Q no v1.0.256) e o /chat 'igual ao host' (o host foi a 2.1.306, o bridge ficou na 2.1.302).
+external_edges:
+  - from: E_PIN_DO_REVISOR_EM_1_0_256_CLI_2_1_306
+    to: "docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml#E_PIN_DO_REVISOR_SOBE_E_ENTRA_NO_CENSO_1017"
+    edge_type: SUPERSEDES
+  - from: Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL
+    to: "docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml#Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL"
+    edge_type: SUPERSEDES
+  - from: E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021
+    to: "docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml#E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG oficial: seções 2.1.303 (4 linhas, 1 itens), 2.1.304 (79 linhas, 76 itens), 2.1.305 (41 linhas, 38 itens), 2.1.306 (5 linhas, 2 itens); baseline 2.1.302, disco 2.1.306, processo 2.1.306, SDK bridge 2.1.302"
+    label: "o delta desde a baseline 2.1.302 são 4 versão(ões), de 2.1.303 a 2.1.306, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.303 a ## 2.1.306 (cópias em docs/evolution/research/radar-E3-2026-10-21-r14/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "fechada em 2026-10-21 pela rodada r14 depois do juiz (subagente opus/high pedido pela sessão; modelo declarado, não medido): 11 vereditos (5 SUSTENTA, 6 EXAGERA, 0 REPROVA), 13 omissões apontadas (5 de impacto 2 viraram nós, 8 de impacto 1 sem consumidor), 3 nós da r13 superados; data/judge-verdicts.json"
+    label: "quais itens de 2.1.303 a 2.1.306 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_WORKFLOW_RESUME_CORRIGIDO_NA_2_1_305
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.305 (data/2.1.305.txt): 'Fixed Workflow resume re-running already-completed `pipeline()` and `parallel()` agents instead of serving them from the run's journal'. command grep -cE 'pipeline\\(|parallel\\(' .claude/workflows/*.js (contagem de LINHAS): onion-research.js 5, meta-evolve-fanout.js 2. A skill onion-orchestration promete o cache do resume (SKILL.md l.69 e l.310). A migalha .claude/diary/2026-07-24-workflow-resume-after-process-death-reexecutes.md (review_after 2026-10-22) dá DUAS condições: o run morreu no meio E o journal estava noutra sessão; o run de julho (wf_3d0dc434-034) e o script dele são irrecuperáveis (os journals que sobram começam em 2026-09-13), e os dois workflows salvos nasceram depois (2026-09-02 e 2026-10-13)"
+    label: "a 2.1.305 corrige o resume de Workflow que reexecutava agentes concluídos de pipeline() e parallel(), usadas pelos dois workflows salvos; para a migalha de 2026-07-24 é causa candidata não medida, porque ela também culpa o journal noutra sessão"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.305 (data/2.1.305.txt) + .claude/workflows/*.js + .claude/diary/2026-07-24-workflow-resume-after-process-death-reexecutes.md"
+      method: "medição: leitura do CHANGELOG e grep no core"
+      locality: "web"
+  - id: Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "aberta pela r14 em 2026-10-21, critério corrigido pelo juiz: fecha quando um resume for medido no CLI 2.1.305 ou posterior reproduzindo a condição da migalha: (a) matar o processo depois de um pipeline()/parallel() concluído; (b) retomar de OUTRA sessão; (c) medir agent_count, subagent_tokens e o mtime da saída. Um resume limpo na mesma sessão não decide a causa"
+    label: "re-testar a migalha do resume de Workflow (vence 2026-10-22) reproduzindo a condição dela no CLI 2.1.305 ou posterior (processo morto e resume de outra sessão), para decidir entre defeito do CLI, journal fora de alcance ou morte de processo"
+    narrative: |-
+      Issue SAC-180 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
+  - id: E_PIN_DO_REVISOR_EM_1_0_256_CLI_2_1_306
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "grep em .github/workflows/onion-review.yml: os dois jobs usam anthropics/claude-code-action@a5a423f75c251dcbff8a74e99f83b2cb03c72bfa (v1.0.256, l.280 e l.414), mergeado no PR #1252 em 2026-10-21; o delta v1.0.255..v1.0.256 é 1 commit, 'bump Claude Code to 2.1.306 and Agent SDK to 0.3.306' (gh api compare)"
+    label: "o revisor de IA do CI está no pin v1.0.256, que instala o CLI 2.1.306, igual ao host; a r13 o deixou no v1.0.252 (CLI 2.1.302)"
+    provenance:
+      source: ".github/workflows/onion-review.yml"
+      locator: "l.280 e l.414 (uses: claude-code-action@a5a423f7)"
+      method: "medição: grep no core e gh api compare v1.0.255...v1.0.256"
+      locality: "repo"
+  - id: E_REVISOR_SEGUE_SEM_PR_COM_A_LABEL_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "gh pr list --state all --label review:ia: 0 PRs em qualquer estado; gh run list --workflow onion-review.yml --limit 40 + gh run view --json jobs: onion-review-mode success, onion-review-verdict success e onion-review SKIPPED em 40 de 40 runs"
+    label: "o revisor de IA do CI não rodou nenhuma vez nas últimas 40 runs (job pulado em 40/40) e nenhum PR teve a label review:ia, então o pin v1.0.256 segue sem prova e a pergunta da r13, presa ao v1.0.252, é superada por uma nova"
+    provenance:
+      source: "gh pr list / gh run list (marciocar/onion-evolve)"
+      locator: "label review:ia; workflow onion-review.yml, últimas 40 runs"
+      method: "medição: consulta ao forge"
+      locality: "web"
+  - id: E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "cc-delta-census.sh: SDK bridge (ops/cc-sdk-targets.tsv l.24, o clone servido do onion-bridge) com CLI embutido 2.1.302 (SDK 0.3.302) contra o host 2.1.306; o binário em produção é NÃO MEDIDO sem sudo, e o package-lock.json de origin/main do onion-bridge (0.3.302) e a hora do processo (2026-10-17 15:44) apontam essa versão. O bridge usa settingSources project, canUseTool e resume a cada turno (src/chat-query-options.ts l.79 e l.95), sem hooks:, mcpServers: nem interrupt(. O PR do SDK 0.3.306 ainda NÃO está no forge (só o #79 aberto): a bancada está num clone de trabalho do agente da sessão"
+    label: "o /chat em produção roda o CLI 2.1.302, 4 versões atrás do host; nenhum conserto de correção ou segurança do delta alcança o bridge, e o ganho do bump para 0.3.306 é desempenho no resume que ele faz a cada turno (2.1.304)"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh"
+      locator: "tabela de versões, linha SDK bridge; ops/cc-sdk-targets.tsv l.24"
+      method: "medição: binário do CLI embutido --version"
+      locality: "host"
+  - id: E_WORKTREE_DE_SUBAGENTE_COM_COMMITS_NAO_E_LIMPA_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.305: 'unchanged subagent worktrees sometimes not being cleaned up'. git worktree list no core: 4 worktrees .claude/worktrees/agent-*, todas com 0 arquivo sujo e 3 a 5 commits à frente de origin/main (branches dos PRs #1246, #1249, #1251 e #1255, todos MERGED em 2026-10-21); 2 delas estão locked"
+    label: "a correção da 2.1.305 cobre só worktree de subagente SEM mudança; as 4 do core têm commits de PRs já mergeados (2 delas locked) e ficam, então limpá-las depois do merge é da casa"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.305 + git worktree list do core"
+      method: "medição: leitura do CHANGELOG e git status/log por worktree"
+      locality: "web"
+  - id: E_SUBAGENTE_RETOMADO_ESQUECIA_O_TRABALHO_2_1_304
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.304: 'Fixed subagents sometimes forgetting their most recent work when they were messaged or resumed right after finishing'. command grep -rln SendMessage .claude: 1 arquivo, .claude/commands/common/prompts/execution-agent-preamble.md, cuja l.22 manda o agente de execução PARAR, pedir à main por SendMessage e só seguir depois do sim, o roteiro exato do item; nenhuma guarda o exercita (TeamCreate e shutdown_request em .claude: 0)"
+    label: "a 2.1.304 corrige o subagente que esquecia o trabalho recente ao ser retomado por mensagem logo depois de terminar, que é o protocolo prescrito pelo preâmbulo canônico do agente de execução (execution-agent-preamble.md l.22); nenhuma guarda o exercita"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.304 (data/2.1.304.txt)"
+      method: "medição: leitura do CHANGELOG e grep no core"
+      locality: "web"
+  - id: E_NENHUM_ITEM_TOCA_HOOK_SANDBOX_GATEWAY_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "grep no core: 'claude --worktree' 0; hooks em frontmatter de skills, commands e agents 0; sandbox em .claude/settings*.json 0 (o settings.local.json só tem permissions e outputStyle); ANTHROPIC_BASE_URL em .claude ops .github 0; tool.check/settings.read (mods) 0; CLAUDE_CODE_AUTO_COMPACT_WINDOW 0; RETRY_WATCHDOG 0; /loop só em proibições (MOAT W7). No CI, a action carrega settingSources user,project,local, então os vetos exit 2 do core rodam lá, mas ela não registra hook de callback do SDK; o bridge não passa hooks nem mcpServers (git grep em origin/main do onion-bridge); o revisor não carrega plugin (sem input plugins: em onion-review.yml)"
+    label: "o resto do delta (worktree do CLI, hooks de skill, sandbox, gateway com tool search, mods, deny de PreToolUse com callback do SDK, setMcpServers) não tem consumidor no core nem no bridge, medido por busca no vivo"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.304 e ## 2.1.305 + grep em .claude, ops e .github"
+      method: "medição: busca no vivo por consumidor"
+      locality: "web"
+  - id: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_306
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive com claude --version 2.1.306: Falharam 0, 'OK ✓ — todas as guardas reagiram conforme esperado'"
+    label: "a guarda de deriva de binário que o censo manda rodar segue verde no CLI 2.1.306"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família cited_directive"
+      method: "medição: execução da bancada no CLI 2.1.306"
+      locality: "repo"
+  - id: E_COMPACTACAO_REENVIA_A_LISTA_DE_SKILLS_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.304: 'Changed compaction to send Claude the skill list again afterwards; `/reload-skills` now sends only new or changed skills'. A skill language-standards depende da lista de skills no contexto (SKILL.md l.8, 'Ative mesmo sem o usuário mencionar'); a memória chat-ptbr-after-compaction registra respostas em EN depois de compactar em 2026-10-16 e 2026-10-19, antes da 2.1.304; grep reload-skills em .claude ops .github docs/knowledge-base: 0"
+    label: "a partir da 2.1.304 a lista de skills volta ao contexto depois da compactação, o que toca a hipótese da escorregada para EN depois de compactar; a memória culpa o resumo e os avisos em EN, então a hipótese tem de ser re-medida"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.304 + .claude/skills/language-standards/SKILL.md l.8"
+      method: "medição: leitura do CHANGELOG e grep no core"
+      locality: "web"
+  - id: Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "aberta pela r14 em 2026-10-21 (omissão apontada pelo juiz); fecha quando a 1ª compactação de uma sessão do core no CLI 2.1.304 ou posterior for observada: a 1ª resposta depois dela sai em pt-BR ou em EN, e a lista de skills reaparece no contexto"
+    label: "re-medir na 1ª compactação no CLI 2.1.304 ou posterior se a resposta escorrega para EN, agora que a lista de skills volta depois de compactar"
+    narrative: |-
+      Issue SAC-182 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
+  - id: E_AVISO_DE_RESUME_NO_MAX_ENCONTRA_O_RESUME_COMMAND_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.304: 'Added a warning on Pro and Max plans when resuming an inactive conversation would use a noticeable share of your 5-hour usage limit'. O hook .claude/hooks/worklog-capture-session.sh l.36 grava cmd=\"claude --resume ${sid}\" como resume_command; a conta do maestro é de plano Max (organizationType claude_max, lido do perfil local pelo juiz); o /catch-up (.claude/commands/catch-up.md) é a retomada sem resume; o bridge e o CI usam chave de API e ficam de fora"
+    label: "o roteiro de sessões do core leva o maestro, em plano Max, ao novo aviso de custo do resume de conversa inativa; o /catch-up é a alternativa sem resume que o aviso sugere"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.304 + .claude/hooks/worklog-capture-session.sh l.36"
+      method: "medição: leitura do CHANGELOG e do hook"
+      locality: "web"
+  - id: E_TIME_DA_SESSAO_NAO_DERRUBA_A_CLI_NO_SHUTDOWN_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.304: 'Fixed agent teams: approving a shutdown request from the main session no longer exits the whole CLI'. O settings do usuário liga CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 com teammateMode auto, e o diretório de times do usuário tem 95 diretórios de sessão, inclusive o desta; grep TeamCreate/shutdown_request em .claude: 0"
+    label: "as sessões do maestro rodam como time (agent teams ligado no usuário), então a 2.1.304 tira o risco de um shutdown de colega derrubar a CLI inteira; nenhuma guarda do core depende disso"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.304 + settings do usuário (env)"
+      method: "medição: leitura do CHANGELOG e do settings do usuário"
+      locality: "web"
+  - id: E_MODELO_DO_JUIZ_DECLARADO_PODIA_MENTIR_NO_FALLBACK_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.305: 'Fixed Claude naming the wrong model for a subagent's work after the subagent switched to a fallback model'. .claude/settings.json l.255 declara fallbackModel (claude-opus-5-5, claude-opus-5, claude-sonnet-5-5); .claude/commands/meta/cc-update.md l.74 pede o juiz em opus/high; o fechamento da r13 registra 'julgados pelo juiz opus/high' a partir do que a sessão disse"
+    label: "antes da 2.1.305 a sessão podia nomear o modelo errado para um subagente que caiu no fallback; o modelo do juiz gravado nas rodadas é declarado pela sessão, não medido, e deveria vir do journal ou do log do subagente"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.305 + .claude/settings.json l.255"
+      method: "medição: leitura do CHANGELOG e grep no core"
+      locality: "web"
+  - id: Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "aberta pela r14 em 2026-10-21, supera a pergunta da r13 presa ao v1.0.252; fecha quando um PR com a label review:ia mostrar o job onion-review rodando (não skipped) no pin a5a423f7 com o CLI 2.1.306 no log"
+    label: "o revisor de IA do CI no pin v1.0.256 (CLI 2.1.306) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a versão no log"
+    narrative: |-
+      Issue SAC-181 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_WORKFLOW_RESUME_CORRIGIDO_NA_2_1_305
+    to: Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305
+    edge_type: SUPPORTS
+  - from: E_WORKFLOW_RESUME_CORRIGIDO_NA_2_1_305
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_PIN_DO_REVISOR_EM_1_0_256_CLI_2_1_306
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_REVISOR_SEGUE_SEM_PR_COM_A_LABEL_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_WORKTREE_DE_SUBAGENTE_COM_COMMITS_NAO_E_LIMPA_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SUBAGENTE_RETOMADO_ESQUECIA_O_TRABALHO_2_1_304
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_NENHUM_ITEM_TOCA_HOOK_SANDBOX_GATEWAY_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_306
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_REVISOR_SEGUE_SEM_PR_COM_A_LABEL_1021
+    to: Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL
+    edge_type: SUPPORTS
+  - from: E_COMPACTACAO_REENVIA_A_LISTA_DE_SKILLS_1021
+    to: Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304
+    edge_type: SUPPORTS
+  - from: E_COMPACTACAO_REENVIA_A_LISTA_DE_SKILLS_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_AVISO_DE_RESUME_NO_MAX_ENCONTRA_O_RESUME_COMMAND_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_TIME_DA_SESSAO_NAO_DERRUBA_A_CLI_NO_SHUTDOWN_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_MODELO_DO_JUIZ_DECLARADO_PODIA_MENTIR_NO_FALLBACK_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS

@@ -1,0 +1,319 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "algum data/<versão>.txt (2.1.303 a 2.1.306) ou o locator de um nó não bate byte a byte com a seção correspondente do CHANGELOG oficial",
+   "check": "for v in 2.1.303 2.1.304 2.1.305 2.1.306; do diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V=\"## $v\" '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-21-r14/data/$v.txt; done"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando ou a leitura citados em verified_against, re-executados no vivo, devolvem outro número ou outro estado",
+   "check": "re-executar o grep, a leitura de linha, o --version ou a sonda citados no nó e comparar com o verified_against"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) o Onion e a superfície nomeada não existe, não é exercitada pelo item, ou existe outra superfície do core ou do /chat que o item alcança e o nó nega",
+   "check": "grep -rn <termo do item> .claude ops .github e leitura do arquivo e linha nomeados no nó (no bridge, como a conta do serviço)"
+  },
+  {
+   "id": "CU4_IMPACTO_DESPROPORCIONAL",
+   "when": "o impacto declarado difere em 2 ou mais pontos do que a medição sustenta, ou a causa afirmada não é a medida",
+   "check": "comparar o impact do nó com a consequência medida no vivo (quem roda o caminho, com que frequência, o que quebra)"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core, do CI ou do /chat em produção com impacto >= 2 medido e a rodada não tem nó para ele",
+   "check": "para cada item de data/2.1.306.txt, grep da superfície correspondente no core, no .github e no bridge"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "for v in 2.1.303 2.1.304 2.1.305 2.1.306; do diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V=\"## $v\" '$0==V{f=1;print;next} /^## /{f=0} f') data/$v.txt; done; grep -c '^- ' data/*.txt; claude --version; readlink -f /proc/$PPID/exe"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "diff vazio nas 4 seções e cmp do concatenado OK. Linhas/itens: 4/1, 79/76, 41/38, 5/2 (117 itens). O binário em disco e o processo vivo são versions/2.1.306. O SDK do bridge em 2.1.302 está NÃO MEDIDO pelo binário (sem sudo); o package-lock.json de origin/main do onion-bridge (0.3.302 em todos os pacotes do SDK) e o processo da conta onion, nascido em 2026-10-17 15:44, depois do merge do #78, apontam para essa versão"
+   },
+   "nota": "Sustenta. A versão do SDK do bridge vem de declaração cruzada, não de uma medição minha do binário."
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "leitura do nó: status open, fecha depois do juiz"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "a pergunta aberta bate com o estado, porque o juiz ainda não tinha julgado. Ao fechar, ela deve contar as 5 omissões de impacto 2 listadas abaixo"
+   },
+   "nota": "Ao fechar, registrar as omissões de impacto 2 deste juiz, e não '0 omissões'."
+  },
+  {
+   "alvo": "E_WORKFLOW_RESUME_CORRIGIDO_NA_2_1_305",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -c 'pipeline(|parallel(' .claude/workflows/*.js  (GNU grep, BRE: devolve 0 e 0); command grep -cE 'pipeline\\(|parallel\\(' .claude/workflows/*.js (devolve 2 e 5); sed -n 1,40p .claude/diary/2026-07-24-workflow-resume-after-process-death-reexecutes.md; find ~/.claude/projects/-home-marcio-onion-evolve -path '*workflows*' -name 'wf_*.json' -printf '%TY-%Tm-%Td\\n' | sort | head -1"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "journal do run wf_3d0dc434-034 ou o script dele, para saber se os agentes concluídos estavam em pipeline()/parallel()",
+    "medida": "procurei wf_3d0dc434 em todo ~/.claude/projects e no repo, e só a própria migalha o cita. As sessões c5193106 e 6e6d8cc8 não existem mais, e os 40 journals que sobraram começam em 2026-09-13. Os dois workflows salvos nasceram em 2026-09-02 e 2026-10-13 (git log --diff-filter=A), depois do caso de julho. A SKILL.md, na l.229, declara que journal antigo não sobrevive à sessão"
+   },
+   "nota": "(1) O comando citado, como está escrito, devolve 0 e 0 no grep dos scripts (BRE). Os números 5 e 2 só saem com -E (ou com o ugrep da shell interativa), e são contagem de LINHAS: citar 'grep -cE'. (2) A migalha culpa, sim, a morte de processo, mas dá DUAS condições: o run morreu no meio E o journal estava noutra sessão (c5193106 vs 6e6d8cc8). A correção da 2.1.305 pressupõe que o journal está ao alcance ('instead of serving them from the run's journal'), então não explica a parte de outra sessão. Também não explica a síntese ter rodado de novo, se ela era um agent() avulso fora de pipeline()/parallel(): o script de julho não é nenhum dos dois salvos e não dá para recuperá-lo. Reescrever: a 2.1.305 é CAUSA CANDIDATA não medida, não a explicação. O impacto 4 cabe, porque os dois workflows salvos usam as primitivas e a skill promete o cache nas l.69 e l.310."
+  },
+  {
+   "alvo": "Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU4_IMPACTO_DESPROPORCIONAL",
+    "comando": "leitura do valid_when e da Evidence da migalha (.claude/diary/2026-07-24-workflow-resume-after-process-death-reexecutes.md l.10 e l.25-31) contra a regra de fechamento da pergunta"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "um resume já medido no CLI >= 2.1.305 com morte de processo e retomada noutra sessão",
+    "medida": "procurei nos 40 journals de ~/.claude/projects/-home-marcio-onion-evolve/*/workflows/ e no repo um resume medido no 2.1.305 ou no 2.1.306 com agent_count, e não há nenhum. O teste ainda é condição futura"
+   },
+   "nota": "A regra de decisão é uma dicotomia falsa. 'Se só a fase corrigida roda, a causa era o defeito do CLI e a migalha se supera' só vale se o re-teste reproduzir a condição da migalha: processo morto no meio do run e resume a partir de OUTRA sessão. Um resume limpo na mesma sessão passa na 2.1.305 e não diz nada sobre a causa de julho. Corrigir o critério: (a) matar o processo depois de um pipeline()/parallel() concluído; (b) retomar de outra sessão; (c) medir agent_count, subagent_tokens e o mtime da saída. Só então decidir entre defeito do CLI, journal fora de alcance por estar noutra sessão, ou morte de processo."
+  },
+  {
+   "alvo": "E_PIN_DO_REVISOR_EM_1_0_256_CLI_2_1_306",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -n 'claude-code-action@' .github/workflows/onion-review.yml (origin/main 4b0e033f: l.280 e l.414); git show 483283a0:.github/workflows/onion-review.yml | grep -n 'claude-code-action@' (l.278 e l.410)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "locator correto do 2º job",
+    "medida": "a l.410 de origin/main é um comentário ('# rodar o diagnóstico ...'); o uses do 2º job está na l.414. O número 410 vem do arquivo da v1.0.255 (commit 483283a0), ou seja, a leitura foi feita antes do bump. O resto reproduz: gh api commits/v1.0.256 = a5a423f7; o compare v1.0.255...v1.0.256 tem 1 commit, 'chore: bump Claude Code to 2.1.306 and Agent SDK to 0.3.306'; base-action/action.yml l.150 traz CLAUDE_CODE_VERSION=\"2.1.306\"; o PR #1252 está MERGED em 2026-10-21T05:22:15Z"
+   },
+   "nota": "Trocar l.410 por l.414 no verified_against e no locator. O pin e a versão do CLI estão certos."
+  },
+  {
+   "alvo": "E_REVISOR_SEGUE_SEM_PR_COM_A_LABEL_1021",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "gh pr list --state all --label review:ia (vazio); gh run list --workflow onion-review.yml --limit 40 + gh run view <id> --json jobs para cada run"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "0 PRs com a label, em qualquer estado. Nas 40 runs, os jobs foram onion-review-mode:success | onion-review-verdict:success | onion-review:skipped (40/40). O revisor não rodou nenhuma vez, nem pelo modo auto"
+   },
+   "nota": "Sustenta, e o dado é mais forte que o nó: o job onion-review foi PULADO em 40 de 40 runs, não só 'sem PR com a label'. O que está errado é a aresta SUPPORTS para a pergunta da r13 (ver aufhebung)."
+  },
+  {
+   "alvo": "E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU4_IMPACTO_DESPROPORCIONAL",
+    "comando": "git -C /home/marcio/onion-bridge-dev show origin/main:package-lock.json (SDK 0.3.302); git grep -nE 'resume|interrupt\\(|hooks *:|mcpServers *:' origin/main -- src (resume em chat-query-options.ts:79, nenhum interrupt(, hooks: ou mcpServers:); grep -nE 'ANTHROPIC_API_KEY' ops/bridge-backup.sh (l.44)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "item do delta 2.1.303..2.1.306 com consequência de correção ou segurança no /chat",
+    "medida": "cruzei os 117 itens com o que o bridge usa: settingSources project, canUseTool, resume a cada turno, sem hooks:, sem mcpServers:, sem interrupt(, chave de API direta, sem gateway. O que chega é desempenho: 'Improved resume of large compacted sessions in SDK and headless mode' e 'Improved memory use ... resumed conversations'. Nenhum conserto de correção ou de segurança alcança o bridge, e o próprio E_NENHUM_ITEM_TOCA_HOOK_SANDBOX_GATEWAY_1021 da rodada diz isso"
+   },
+   "nota": "Impacto 4 para uma consequência medida de 2: ficar 4 versões atrás custa latência no resume, e nada quebra. Rebaixar para 2 e nomear o ganho real do bump, que é este: cada turno do /chat é um processo novo com resume (chat-query-options.ts:79 e l.95). A versão em produção está NÃO MEDIDA pelo binário (sem sudo); o lockfile e a hora do processo (2026-10-17 15:44) apontam para 0.3.302. O 'PR do SDK 0.3.306 em bancada' não existe no forge, onde só o #79 está aberto. A bancada é o clone de scratch onion-bridge-303: branch chore/sdk-0.3.305, commit 90cf4fd, e package.json em ^0.3.306 ainda sem commit."
+  },
+  {
+   "alvo": "E_WORKTREE_DE_SUBAGENTE_COM_COMMITS_NAO_E_LIMPA_1021",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "git -C /home/marcio/onion-evolve worktree list; para cada .claude/worktrees/agent-*: git status --porcelain | wc -l e git rev-list --count origin/main..HEAD; gh pr list --head <branch> --state all; grep -rn '114 worktree' docs .claude; grep -c '^PODAVEL' <scratchpad>/wt-audit.out"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "artefato que sustente a 'poda de 114 worktrees de 2026-10-20'",
+    "medida": "o núcleo reproduz: 4 worktrees agent-*, 0 arquivo sujo, 5/3/3/4 commits à frente, e os PRs #1249, #1255, #1246 e #1251 MERGED em 2026-10-21; 2 delas estão locked. O número 114 não aparece em nenhum arquivo do repo nem da memória. O único artefato da poda (scratchpad wt-audit.out, 2026-10-19) tem 108 linhas PODAVEL"
+   },
+   "nota": "O verified_against se sustenta, mas o rótulo afirma um número sem fonte. Citar o artefato da poda com o número dele (108 PODAVEL em wt-audit.out) ou tirar o número. Acrescentar que 2 das 4 worktrees estão locked, o que também impede qualquer limpeza automática."
+  },
+  {
+   "alvo": "E_SUBAGENTE_RETOMADO_ESQUECIA_O_TRABALHO_2_1_304",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "command grep -rln SendMessage .claude (1 arquivo: .claude/commands/common/prompts/execution-agent-preamble.md); grep -n SendMessage nesse arquivo (l.22)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "comando ou guarda que exercite o resume por mensagem",
+    "medida": "o único arquivo é o preâmbulo canônico que a sessão principal entrega a TODO agente de execução (descrição na l.2). A l.22 manda o agente PARAR, pedir à main por SendMessage e só instalar depois do sim, que é o roteiro exato de 'messaged or resumed right after finishing'. Nenhuma guarda o exercita: procurei TeamCreate e shutdown_request em .claude (0)"
+   },
+   "nota": "'Nenhuma guarda ou comando depende disso' esconde a superfície: o fragmento canônico do agente de execução (commands/common/prompts) prescreve justamente o protocolo que a 2.1.304 consertou. Nomear o arquivo e a linha. O impacto 2 cabe. Fora do escopo da rodada: o CLAUDE.md ainda diz que 'grep -rn SendMessage .claude devolve ZERO', e hoje devolve 1."
+  },
+  {
+   "alvo": "E_NENHUM_ITEM_TOCA_HOOK_SANDBOX_GATEWAY_1021",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "command grep -rn em .claude ops .github por 'claude --worktree' (0), ANTHROPIC_BASE_URL (0), 'tool\\.check|settings\\.read' (0), CLAUDE_CODE_AUTO_COMPACT_WINDOW (0), sandbox em .claude/settings*.json (0); awk do frontmatter de .claude/skills/*/SKILL.md, commands e agents por '^hooks:' (0); /home/marcio/onion-evolve/.claude/settings.local.json só tem permissions e outputStyle; plugins/onion/hooks/hooks.json do onion-plugins; grep de 'hooks' em base-action/src da claude-code-action v1.0.256; git grep 'hooks *:|mcpServers *:|setMcpServers' em origin/main do onion-bridge"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "cada zero reproduz, e as superfícies a mais deram todas negativo. O settings.local.json não tem hooks, env nem sandbox. O bundle onion-plugins tem hooks de COMANDO (PreToolUse env-guard, PostToolUse, UserPromptSubmit) e nenhum hook de skill, e os 21 plugins onion estão false no settings do usuário. O CI carrega settingSources user,project,local (parse-sdk-options.ts:340), então os vetos exit 2 do core rodam lá; mas a action não registra hook de callback do SDK, e sem esse callback o conserto do deny trocado por timeout não se aplica. Os ops/mcp-onion-* são servidores MCP em Python, sem ANTHROPIC_BASE_URL, e o bridge usa ANTHROPIC_API_KEY direto (ops/bridge-backup.sh:44)"
+   },
+   "nota": "Sustenta. Vale acrescentar ao nó a superfície medida do CI (os vetos do core carregados pela action, sem callback do SDK), porque é ela que o item do PreToolUse poderia alcançar."
+  },
+  {
+   "alvo": "E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_306",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive (CLI 2.1.306)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "Passaram 6, Pularam 0, Falharam 0, 'OK ✓ — todas as guardas reagiram conforme esperado', 24,7 s"
+   },
+   "nota": "Sustenta."
+  }
+ ],
+ "omissoes": [
+  {
+   "item": "Changed compaction to send Claude the skill list again afterwards; `/reload-skills` now sends only new or changed skills",
+   "versao": "2.1.304",
+   "superficie": ".claude/skills/language-standards/SKILL.md:8 ('Ative mesmo sem o usuário mencionar'); .claude/hooks/worklog-precompact-breadcrumb.sh:2 ('a saída do PreCompact é IGNORADA pós-compactação'); memória chat-ptbr-after-compaction (respostas em EN depois de compactar, em 2026-10-16 e 2026-10-19, antes da 2.1.304)",
+   "medida": "grep -rn 'reload-skills' .claude ops .github docs/knowledge-base = 0. A skill de idioma depende da lista de skills no contexto, essa lista agora volta depois da compactação, e o incidente recorrente acontece justamente depois de compactar",
+   "impacto": 2,
+   "proposta": "E_COMPACTACAO_REENVIA_A_LISTA_DE_SKILLS_1021 + Q para re-medir as respostas em EN na 1ª compactação no >= 2.1.304 (a memória culpa o resumo e os system-reminders em EN, então a hipótese pode cair)"
+  },
+  {
+   "item": "Added a warning on Pro and Max plans when resuming an inactive conversation would use a noticeable share of your 5-hour usage limit: resume anyway, or start a new conversation and Claude can look up the previous one if you refer to it",
+   "versao": "2.1.304",
+   "superficie": ".claude/hooks/worklog-capture-session.sh:36 (cmd=\"claude --resume ${sid}\", gravado como resume_command no STATE.md); ~/.claude.json oauthAccount.organizationType = claude_max; processo pai desta sessão = 'claude --resume --dangerously-skip-permissions'; .claude/commands/catch-up.md (a retomada sem resume)",
+   "medida": "python lendo ~/.claude.json: billingType stripe_subscription, organizationType claude_max. ps -o args= -p $PPID mostra --resume. O bridge e o CI usam ANTHROPIC_API_KEY, então ficam de fora",
+   "impacto": 2,
+   "proposta": "E_AVISO_DE_RESUME_NO_MAX_ENCONTRA_O_RESUME_COMMAND_1021: o roteiro de sessões do core leva o maestro (plano Max) ao novo diálogo; decidir se o resume_command do STATE.md passa a apontar o /catch-up como alternativa"
+  },
+  {
+   "item": "Fixed agent teams: approving a shutdown request from the main session no longer exits the whole CLI",
+   "versao": "2.1.304",
+   "superficie": "~/.claude/settings.json com env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 e teammateMode auto; ~/.claude/teams/ com 95 diretórios session-*, inclusive o desta sessão (session-1c3b4688, com config.json e inboxes); docs/knowledge-base/meta/onion-framework-identity.md:224",
+   "medida": "leitura do settings do usuário (valor '1'); ls ~/.claude/teams | wc -l = 95; grep TeamCreate/shutdown_request em .claude = 0. Não há guarda, mas a sessão viva do maestro roda como time",
+   "impacto": 2,
+   "proposta": "E_TIME_DA_SESSAO_NAO_DERRUBA_A_CLI_NO_SHUTDOWN_1021"
+  },
+  {
+   "item": "Fixed Claude naming the wrong model for a subagent's work after the subagent switched to a fallback model",
+   "versao": "2.1.305",
+   "superficie": ".claude/settings.json:255 (fallbackModel: claude-opus-5-5, claude-opus-5, claude-sonnet-5-5); .claude/commands/meta/cc-update.md:74 (juiz model: opus, effort high); o fechamento da Q da r13 registra 'julgados pelo juiz opus/high' a partir do que a sessão disse",
+   "medida": "grep -n fallbackModel .claude/settings.json; sed -n 74p cc-update.md. O modelo do juiz no grafo é DECLARADO pela sessão, e antes da 2.1.305 ela podia nomear o modelo errado se o subagente caísse no fallback",
+   "impacto": 2,
+   "proposta": "E_MODELO_DO_JUIZ_DECLARADO_PODIA_MENTIR_NO_FALLBACK_1021 (medir o modelo do juiz pelo journal ou pelo log do subagente, não pela narração)"
+  },
+  {
+   "item": "Improved resume of large compacted sessions in SDK and headless mode: the first request after resuming is sent sooner",
+   "versao": "2.1.304",
+   "superficie": "onion-bridge origin/main src/chat-query-options.ts:79 ('...(f.sessionId ? { resume: f.sessionId } : {})') e l.95 ('Cada turno do /chat é um processo novo com `resume`')",
+   "medida": "git -C /home/marcio/onion-bridge-dev grep -nE 'resume' origin/main -- src/chat-query-options.ts",
+   "impacto": 2,
+   "proposta": "nomear dentro de E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021 como o ganho concreto do bump para 0.3.306, em vez de 'nada do delta chega'"
+  },
+  {
+   "item": "Fixed a plugin keeping a headless run going past `--max-turns`, Stop, or ended input by spawning subagents or re-running a finished one",
+   "versao": "2.1.304",
+   "superficie": ".github/workflows/onion-review.yml:350 e :484 (--max-turns 60), sem input plugins:",
+   "medida": "grep -nE '^\\s+(plugins|plugin_marketplaces)\\s*:' onion-review.yml = 0; .claude/settings.json sem enabledPlugins; a action não instala plugin sem o input (install-plugins.ts:241); o revisor foi pulado em 40 de 40 runs",
+   "impacto": 1,
+   "proposta": "nenhum nó: sem consumidor medido (acrescentar à lista do E_NENHUM)"
+  },
+  {
+   "item": "Fixed a PreToolUse hook's deny reason being replaced by a timeout error when an Agent SDK callback hook on the same tool call timed out",
+   "versao": "2.1.304",
+   "superficie": ".claude/settings.json PreToolUse: pretooluse-protect-main.sh, pretooluse-merge-gate.sh, pretooluse-moat-gate.sh, pretooluse-direct-provider-api.sh, pretooluse-env-guard.sh, kg-read-leg.sh",
+   "medida": "os vetos exit 2 rodam no CLI interativo (sem SDK) e no CI (settingSources inclui project). Mas não há hook de callback do SDK em nenhum dos dois, nem no bridge: grep 'hooks' em base-action/src = 0; git grep 'hooks *:' no src do bridge = 0",
+   "impacto": 1,
+   "proposta": "nenhum nó novo: já coberto por E_NENHUM_ITEM_TOCA_HOOK_SANDBOX_GATEWAY_1021"
+  },
+  {
+   "item": "Fixed Remote Control leaving empty \"(session)\" entries in `/resume` after switching conversations with `/resume`",
+   "versao": "2.1.305",
+   "superficie": ".claude/validation/session-beacon.sh:23 (Remote Control citado como fonte de farol fantasma); ~/.claude.json com hasUsedRemoteControl=true e remoteControlSurfacesSeen [mobile, desktop, web]",
+   "medida": "o maestro usa Remote Control, mas o farol do core grava os próprios arquivos e não lê a lista do /resume. DISABLE_TELEMETRY e DO_NOT_TRACK estão ausentes do env do usuário, e há uma conta só, então os outros 3 itens de Remote Control não se aplicam",
+   "impacto": 1,
+   "proposta": "nenhum nó: o uso é real, mas nenhuma superfície do core é afetada"
+  },
+  {
+   "item": "Fixed self-paced `/loop` wakeups scheduled at the 1-hour maximum firing just after the 1-hour prompt cache expired, so those wakeups no longer re-read the conversation uncached",
+   "versao": "2.1.304",
+   "superficie": ".claude/commands/meta/drive.md:25, .claude/commands/meta/radar.md:32, .claude/commands/meta/dissect.md:20 (proíbem /loop, MOAT W7)",
+   "medida": "grep -rnE '/loop\\b|ScheduleWakeup' .claude ops .github: 5 linhas, todas de proibição ou de guarda",
+   "impacto": 1,
+   "proposta": "nenhum nó"
+  },
+  {
+   "item": "Added `CLAUDE_CODE_RETRY_WATCHDOG_USAGE_LIMIT_RECHECK_MS` so unattended retry mode (`CLAUDE_CODE_RETRY_WATCHDOG`) notices a usage limit that was lifted before its reset",
+   "versao": "2.1.305",
+   "superficie": "nenhuma",
+   "medida": "grep -rn RETRY_WATCHDOG .claude ops .github = 0; o env do usuário só tem AGENT_TEAMS e ENABLE_TODO_TOOLS",
+   "impacto": 1,
+   "proposta": "nenhum nó"
+  },
+  {
+   "item": "Changed tool search to be on by default behind a custom `ANTHROPIC_BASE_URL`; a 400 or 422 from the gateway is retried without it",
+   "versao": "2.1.304",
+   "superficie": "ops/mcp-onion-kg, ops/mcp-onion-kg-writer, ops/mcp-onion-exec (servidores MCP em Python do LibreChat/brain, não Claude Code)",
+   "medida": "grep -rn ANTHROPIC_BASE_URL .claude ops .github = 0; a config do LibreChat não está no core; o bridge usa a API direta",
+   "impacto": 1,
+   "proposta": "nenhum nó (já está em E_NENHUM)"
+  },
+  {
+   "item": "Fixed `rm -r` of a mounted drive or a folder at its top level (`/Volumes`, `/media`, WSL's `/mnt/c`) not getting the safety prompt that `rm -rf /Applications` gets",
+   "versao": "2.1.304",
+   "superficie": "findmnt: /home/granaai/granaai (bind de /home/marcio/granaai), único ponto de montagem fora do sistema",
+   "medida": "findmnt -rn -o TARGET,FSTYPE,SOURCE; nenhum script do core faz rm -r num ponto de montagem",
+   "impacto": 1,
+   "proposta": "nenhum nó"
+  },
+  {
+   "item": "Improved responsiveness and throughput when many subagents are running at the same time",
+   "versao": "2.1.304",
+   "superficie": "memória agent-concurrency-cap (teto de 5 agentes de execução)",
+   "medida": "o teto foi medido pela CPU da bancada (carga 14-17 em 8 vCPUs, --jobs auto), não pela resposta da CLI; a melhoria não mexe na razão do teto",
+   "impacto": 1,
+   "proposta": "nenhum nó"
+  }
+ ],
+ "aufhebung": {
+  "supersedes_procede": true,
+  "outros_superados": [
+   {
+    "no": "docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml#E_CHAT_EM_PRODUCAO_NO_CLI_2_1_302_1017",
+    "razao": "o rótulo diz 'igual ao host' e 'o delta inteiro chega à produção'. Hoje o host está no 2.1.306 (readlink /proc/$PPID/exe) e o bridge segue no 0.3.302 (lockfile de origin/main, processo de 2026-10-17 15:44). O E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021 afirma o contrário, e a rodada não declarou o SUPERSEDES."
+   },
+   {
+    "no": "docs/evolution/research/radar-E3-2026-10-17-r13/radar-E3-2026-10-17-r13.kg.yaml#Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL",
+    "razao": "a regra de fechamento exige ver o revisor 'rodando na v1.0.252 ... e o CLI 2.1.302 no log', mas o pin agora é a v1.0.256 (CLI 2.1.306), então essa condição não pode mais acontecer. A r14 liga a pergunta com SUPPORTS e diz que ela 'agora vale para o v1.0.256', o que troca o objeto da pergunta. O certo é SUPERSEDES por uma Q nova da v1.0.256, com a mesma prova."
+   }
+  ]
+ },
+ "juiz": {
+  "modelo": "opus",
+  "resumo": "O CU1 passa: as 4 seções batem byte a byte com o CHANGELOG oficial (117 itens), e 5 dos 11 nós se sustentam no vivo. Seis nós exageram: os dois do resume (o grep não reproduz como escrito, e a 2.1.305 é causa candidata, não a explicação, porque a migalha também culpa o journal noutra sessão e o run de julho é irrecuperável), o do pin (a l.410 é do arquivo antigo, hoje é a l.414), o do SDK do bridge (impacto 4 para uma consequência medida de 2), o das worktrees (o número 114 não tem fonte) e o do subagente retomado (o preâmbulo de execução depende do resume por mensagem). Ficaram de fora 5 itens de impacto 2 (lista de skills depois da compactação, aviso de resume no plano Max, shutdown de time, modelo de fallback do juiz e resume do SDK no bridge) e 2 superações da r13 não declaradas (E_CHAT_EM_PRODUCAO e a Q do pin v1.0.252)."
+ }
+}
