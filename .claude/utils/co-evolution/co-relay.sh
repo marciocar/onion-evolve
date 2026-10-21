@@ -26,9 +26,11 @@
 #             branch-agnóstica: como NÃO commita, NÃO existe "commit na branch errada".
 #
 # Guarda de papel: lê o STAMP .claude/.onion-version (campo role:). Só ADOTANTE
-#             (role: adopted) relaya upstream. NUNCA usar onion-version.sh para isto:
-#             aquele script HARDCODA role:source (é a identidade da FONTE) e, sendo
-#             cópia byte-idêntica no adotante, mentiria 'source' → falso-amigo.
+#             (role: adopted) relaya upstream. NUNCA usar onion-version.sh para o papel
+#             do REMETENTE: o stamp é a evidência de adoção, e a cópia vendorizada do
+#             script, num checkout sem stamp, devolve 'source' (o default) → falso-amigo.
+#             No DESTINO o uso é o inverso: sem stamp, o core se PROVA pelo
+#             onion-version.sh dele dizendo source (guarda do destino, mais abaixo).
 #
 # PAPÉIS:     maestro = humano (autoridade final, Ato-3) · maestro principal = core
 #             (onion-evolve, rege a evolução). A sessão home do destino commita.
@@ -187,13 +189,58 @@ fi
 # hub, que vive na mesma máquina. Até aqui o destino só precisava ser um repo git, e o carteiro relayava
 # para qualquer checkout, inclusive o de outro adotante: um canal lateral que a topologia proíbe
 # (standalone não tem canal lateral; consumer só fala com o seu hub). O destino agora se prova:
-#   · sem carimbo .claude/.onion-version = o core (a fonte não tem carimbo; o onion-version.sh o hardcoda);
+#   · sem carimbo .claude/.onion-version = candidato a core, que PROVA o papel pelo onion-version.sh (abaixo);
 #   · carimbo role: hub = um hub, e só o carimbo `adopted` (quem pode ser filho de hub) relaya para ele;
 #   · qualquer outro carimbo (adopted, standalone, porta) = par lateral → recusa.
 # QUAL hub é o pai: o carimbo `adopted` não distingue o filho de um hub do standalone do core (os dois
 # carimbam `adopted`; achado do refutador da F3, medido em adotantes reais desta máquina). Sem o registro, a
 # prova que o carteiro tem é o `adopted_from` do carimbo do remetente: tem de ser o remote `origin` do hub ou
 # o caminho dele. Quem adotou o core (adopted_from = o core) não relaya para hub nenhum.
+# --- Prova do CORE (destino sem carimbo) -----------------------------------------------------------------------
+# $1 = destino → rc 0 se o onion-version.sh dele diz role: source; senão rc 1 e o motivo (pt-BR) no stdout.
+# LÊ o script, não o EXECUTA. Executar seria rodar código de outro repo, com os privilégios desta sessão, só para
+# decidir para onde copiar um markdown; e a pergunta tem resposta estática: o script deriva o papel de um default
+# no nível do arquivo (`role="source"`), que só um carimbo sobrescreve (em linha indentada, dentro do if), e este
+# destino não tem carimbo (o ramo de cima já o tratou). As duas formas de saída que o script já teve são aceitas:
+# `role: ${role}` (desde FED-3-1) e a antiga `role: source` literal. Default ou saída com outro papel recusa;
+# script que não se deixa ler assim também, com o motivo (sem prova, não se presume).
+# LIMITE DECLARADO (passada adversarial de 2026-10-21): a leitura confere a FORMA do script de hoje, não a
+# semântica de qualquer bash. Um script ADULTERADO que reatribua o papel em linha indentada (`  export role=hub`,
+# `declare role=hub`) ou imprima por `echo` passa; e uma cópia byte-idêntica sem carimbo (o `cp -r .claude` à
+# mão, um symlink) passa também, porque pela definição do próprio script ela computa source. Executar não
+# curaria nenhum dos dois (a cópia executada mente igual). O que a prova barra é o caso medido: o repo git
+# qualquer, sem o script, que antes virava o core.
+_core_proof() {
+  local ovs="$1/.claude/validation/onion-version.sh" defaults outs d o
+  if [ ! -f "${ovs}" ]; then
+    echo "não tem .claude/validation/onion-version.sh (sem carimbo e sem o script que o computa, não é o core)"
+    return 1
+  fi
+  # o corte do espaço final (que inclui o \r) nos DOIS: um checkout em CRLF (core.autocrlf) não pode virar
+  # "computa source, não source" (achado da passada adversarial de 2026-10-21)
+  defaults="$(LC_ALL=C grep -E '^role=' "${ovs}" | sed -E 's/^role=//; s/[[:space:]]*#.*$//; s/["'\'']//g; s/[[:space:]]*$//' | LC_ALL=C sort -u)"
+  outs="$(LC_ALL=C grep -E '^role:[[:space:]]' "${ovs}" | sed -E 's/^role:[[:space:]]*//; s/[[:space:]]*$//' | LC_ALL=C sort -u)"
+  if [ -z "${outs}" ]; then
+    echo "o onion-version.sh dele não emite a linha role: (não sei ler o papel sem executá-lo)"
+    return 1
+  fi
+  while IFS= read -r o; do
+    case "${o}" in
+      source) : ;;
+      '${role}'|'$role')
+        if [ -z "${defaults}" ]; then
+          echo "o onion-version.sh dele emite role: \${role} sem default no nível do arquivo"
+          return 1
+        fi
+        while IFS= read -r d; do
+          if [ "${d}" != "source" ]; then echo "o onion-version.sh dele computa role: ${d}, não source"; return 1; fi
+        done <<< "${defaults}" ;;
+      *) echo "o onion-version.sh dele diz role: ${o}, não source"; return 1 ;;
+    esac
+  done <<< "${outs}"
+  return 0
+}
+
 T_STAMP="${TARGET}/.claude/.onion-version"
 if [ -n "${VENDOR_AUTH}" ]; then
   T_LABEL="UPSTREAM DO VENDOR ${VENDOR_NAME}"
@@ -221,6 +268,17 @@ elif [ -f "${T_STAMP}" ]; then
   fi
   T_LABEL="HUB"
 else
+  # Sem carimbo, o destino ainda não provou nada: a falta de carimbo é também a de todo repo git que não
+  # é do Onion (Q_CO_RELAY_SEM_CARIMBO_E_O_CORE, medido em 2026-10-20: um clone defasado do espelho do
+  # kg-ssot, sem carimbo e sem docs/evolution/, passava em --dry-run como o core, e a entrega abriria a
+  # caixa lá). O core não tem carimbo estático: ele o COMPUTA pelo .claude/validation/onion-version.sh,
+  # que, sem o carimbo, devolve role: source. É essa a prova exigida.
+  if ! CORE_WHY="$(_core_proof "${TARGET}")"; then
+    echo "ERRO: o destino '${TARGET}' não tem carimbo .claude/.onion-version e não prova ser o core: ${CORE_WHY}." >&2
+    echo "      Upstream é o core (o onion-version.sh dele diz role: source), o seu hub (carimbo role: hub) ou o dono provado de um vendor." >&2
+    [ -z "${VENDOR_REFUSALS}" ] || echo "      Upstream de VENDOR não provado: ${VENDOR_REFUSALS}" >&2
+    exit 2
+  fi
   T_LABEL="CORE"
 fi
 
