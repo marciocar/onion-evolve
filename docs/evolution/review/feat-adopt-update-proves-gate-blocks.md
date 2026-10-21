@@ -2,7 +2,7 @@
 title: 'Resíduo — o --update prova que o gate do alvo BARRA, num sandbox descartável'
 date: 2026-10-20
 branch: feat/adopt-update-proves-gate-blocks
-reviewed_diff_sha256: bbf3976ea14de16a6e649a4ffee339a01efb14423c57c676e70fade4802720ae
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 925d7c04ee66bd6db7886c6566a156fe39c993e115f1645419b5663405eb9313
 findings_total: 7
 findings_real: 7
@@ -52,3 +52,14 @@ nota: >-
 
 - Bancada `prove_gate_blocks`: 24 de 24, também sob `LC_ALL=C`.
 - Dogfood contra um clone local descartável de um adotante de campo: `bloqueio PROVADO (REGRA 8 (Inventário canônico sincronizado com o filesystem), rc 1)` em 172 s; hook trocado por eco, `NÃO PROVADO` rc 1; sem pre-commit, `NÃO PROVADO` rc 3; o repo real do adotante igual antes e depois.
+
+
+## Re-revisão depois do rebase (2026-10-21, sessão principal)
+
+O PR foi rebaseado sobre a `main`, que tinha recebido o #1240 (a cura do `mkdir` do uutils na faixa paralela) e o
+#1238 (o canal upstream por vendor). Os dois mexem no `lint-selftest.sh`, o mesmo arquivo deste PR. O conflito real
+foi no grafo `field-hub-update-2026-10-19`: a aresta `E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY` SUPPORTS
+`D_CANAL_UPSTREAM_POR_VENDOR`, do #1238, e o bloco `external_edges` deste PR dividiam a última linha. Resolvi
+ficando com os dois inteiros, e o radar `--integrity --schema` sai 0. Na árvore combinada, as famílias
+`prove_gate_blocks`, `selftest_lanes` e `corelay` passam 85/0, com o caso (h) verde. O hash de código mudou porque
+a base trouxe esse código.
