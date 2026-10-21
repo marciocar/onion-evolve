@@ -279,7 +279,6 @@
 .claude/utils/adopt/vendor-branch.sh	Q_VENDOR_ENTRELACADO_COM_PRODUTO	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	A_ROLE_DECORATIVO_NO_TRANSPORTE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
-.claude/utils/adopt/vendor-manifest.sh	D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_ADOPT_JA_E_ALLOWLIST_MEDIDO	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_A_COBERTURA_FALTAVA_ONDE_MAIS_IMPORTAVA	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
@@ -323,7 +322,6 @@
 .claude/utils/kg/machine_path.py	C_TETO_VARIAVEL_WINDOWS_E_FORA_DE_NO	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
 .claude/utils/kg/machine_path.py	C_TETO_VERBOS_DE_SHELL_SAO_LISTA	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
 .claude/utils/kg/machine_path.py	D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
-.claude/utils/kg/stamp-adoption-graph-pin.sh	D_PIN_COM_ESCRITOR_UNICO	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CONTATO_DESACOPLADO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER	docs/onion/graph/residuos-2026-08-18.kg.yaml
@@ -535,7 +533,6 @@
 .claude/validation/lint-artifacts.sh	C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	C_refut_kebab_compliance	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/validation/lint-artifacts.sh	C_vendor_scrub_caught_me_again	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
-.claude/validation/lint-artifacts.sh	D_APLICABILIDADE_POR_PAPEL_DECLARADA	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml
 .claude/validation/lint-artifacts.sh	D_CORRIGIR_R47	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/validation/lint-artifacts.sh	D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/lint-artifacts.sh	D_FASE_F_META_FABRICA_EN	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
@@ -582,7 +579,6 @@
 .claude/validation/lint-selftest.sh	C_TRAVA_POR_BINARIO_EXTERNO_PERDE_ATOMICIDADE_NA_IMAGEM	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_offline_csp	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
-.claude/validation/lint-selftest.sh	D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_36_selftests	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
@@ -630,7 +626,6 @@
 .claude/validation/ops-citation-travel-check.sh	C_TETO_BANCADA_E_CORE_ONLY_FORA	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_CLASSE_SEM_O_TOKEN	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_FORMA_NAO_SENTIDO	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
-.claude/validation/ops-citation-travel-check.sh	D_REGRA_100_NAS_MENSAGENS	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	D_TRES_DECLARACOES_E_O_MARCADOR	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	E_REGRA_100_NAO_VIA_O_COMANDO_CORTADO	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
