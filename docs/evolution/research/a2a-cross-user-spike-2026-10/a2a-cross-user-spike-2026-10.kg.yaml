@@ -244,6 +244,54 @@ nodes:
       locator: "§12 (Emendas datadas, 12.0–12.12)"
       method: "medição: selftests offline dos artefatos novos, smoke do channel sob bun e uma sessão real do Claude Code com o hook carregado por --settings"
       locality: "repo"
+  - id: D_CHAVE_DO_MEMBRO_DE_TESTE_VAI_AO_NOTEBOOK_1021
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «copiar para o notebook (resposta livre: 'COPIAR PARA O NOTEBOOK, mostre o passo a passo com a localização')»"
+    label: "A privada do maestro-notebook-test-1 vai ao notebook do maestro e é apagada da VPS (o P1b do protocolo): fecha a L6 sem revogar o membro, que fica para o degrau B"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «copiar para o notebook (resposta livre: 'COPIAR PARA O NOTEBOOK, mostre o passo a passo com a localização')» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Revogar e recomeçar» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «O que fazer com a chave do membro de teste que ficou na VPS?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
+  - id: D_DEGRAU_A_HOJE_A0_E_A1_1021
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «A0 + A1»"
+    label: "Degrau A hoje: A0 (canal nativo entre dois usuários do SO) e A1 (ida pelo A2A com os negativos no HTTP vivo), com usuário descartável a2a-peer, não o granaai; A2 (volta) fica fora"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «A0 + A1»; descartadas: «Só A0» · «A0 + A1 + A2» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Quanto do degrau A rodar hoje?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
+  - id: D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Corrigir o card»"
+    label: "O Agent Card do bridge deixa de declarar pushNotifications e streaming até o bridge ter tasks/get ou SSE: PR no onion-bridge, merge e deploy do maestro"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «Corrigir o card»; descartadas: «Implementar tasks/get» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «O que fazer com o Agent Card que declara streaming e push que o bridge não tem?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
 edges:
   - from: E_F1_F2_CURADOS_NO_GATE_2026_10_14
@@ -291,6 +339,15 @@ edges:
   - from: D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14
     to: D_RFC0004_CONVERSA_POR_THREAD
     edge_type: CONSTRAINS
+  - from: D_CHAVE_DO_MEMBRO_DE_TESTE_VAI_AO_NOTEBOOK_1021
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: TRACES_TO
+  - from: D_DEGRAU_A_HOJE_A0_E_A1_1021
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: TRACES_TO
+  - from: D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021
+    to: C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET
+    edge_type: TRACES_TO
 
 external_edges:
   - from: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY"
