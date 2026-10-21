@@ -15,14 +15,17 @@
 # Uso:
 #   bash .claude/validation/decide-panel.sh round [<repo>] --compose <arquivo.json> [--ask] [--from-tsv <arq>]
 #                                                [--today AAAA-MM-DD] [argumentos do decide-census...]
-#   bash .claude/validation/decide-panel.sh seal <round.json> <respostas> [--other <qN>]... [--repo <raiz>] [--dry-run]
+#   bash .claude/validation/decide-panel.sh seal <round.json> <respostas> [--other <qN>]... [--only <qN>]... [--repo <raiz>]
+#                                                [--dry-run]
 #
 #   round   roda o medidor (--tsv; ou lê --from-tsv) e monta a rodada a partir do arquivo que a sessão compôs.
 #           A saída padrão é o JSON do PAINEL (schema onion.decide.panel/v1); com --ask, o payload do
 #           AskUserQuestion da MESMA rodada. As duas saem do mesmo modelo, e a bancada exige a paridade.
 #   seal    lê as respostas (um .json, ou o diretório que o ArtifactData grava com out_dir) e, para cada
 #           uma, chama SÓ o kg-decide-seal.sh (lista de argumentos, nunca shell). Nunca abre o grafo para
-#           escrever. Emite o estado por item (schema onion.decide.status/v1), que a sessão devolve ao painel.
+#           escrever. Emite o estado por item (schema onion.decide.status/v1, cada item com o round_id), que a
+#           sessão grava em status/<qN> do painel. `--only qN` (repetível) restringe a passada: a 2ª passada
+#           (a do texto livre lido) vai só nele, para não re-chamar o selador sobre o que já selou.
 #
 # Arquivo de composição (a sessão escreve; é o julgamento do passo 2 e 3 do comando, não do medidor):
 #   {"questions": [
@@ -95,6 +98,8 @@ case "${MODE}" in
 import sys, json, hashlib
 _, census, compose, ask, today = sys.argv[1:6]
 def die(m): print(f'decide-panel: {m}', file=sys.stderr); sys.exit(2)
+import re
+if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', today): die(f'--today inválido ({today}) — AAAA-MM-DD')
 rows = []
 with open(census, encoding='utf-8') as f:
     head = f.readline().rstrip('\n').split('\t')
@@ -166,7 +171,7 @@ for k, r in enumerate(rows): pos.setdefault(r['ref'], k)
 out.sort(key=lambda it: pos[it['ref']])
 rnd, deferred = out[:4], out[4:]
 for k, it in enumerate(rnd): it['id'] = f'q{k + 1}'
-canon = json.dumps(rnd, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+canon = json.dumps({'questions': rnd, 'today': today}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))   # a data do selo também é assinada
 rid = hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
 def ask_desc(o): return o['description'] + (f' · custo: {o["cost"]}' if o['cost'] else '')
 if ask == '1':
@@ -182,10 +187,11 @@ PY
     ;;
   seal)
     ROUND="${1:-}"; ANS="${2:-}"; shift 2 2>/dev/null || { echo "decide-panel: seal exige <round.json> <respostas>" >&2; exit 2; }
-    OTHERS=""; DRY="0"; SREPO="$(pwd)"
+    OTHERS=""; ONLY=""; DRY="0"; SREPO="$(pwd)"
     while [ $# -gt 0 ]; do
       case "$1" in
         --other) _need "$@"; shift; OTHERS="${OTHERS} $1" ;;
+        --only) _need "$@"; shift; ONLY="${ONLY} $1" ;;
         --repo) _need "$@"; shift; SREPO="$1" ;;
         --dry-run) DRY="1" ;;
         *) echo "decide-panel: opção desconhecida: $1" >&2; exit 2 ;;
@@ -195,16 +201,16 @@ PY
     [ -r "${ROUND}" ] || { echo "decide-panel: round ilegível: ${ROUND}" >&2; exit 2; }
     [ -e "${ANS}" ] || { echo "decide-panel: respostas inexistentes: ${ANS}" >&2; exit 2; }
     [ -f "${SEAL}" ] || { echo "decide-panel: selador ausente: ${SEAL} — sem selador não selo" >&2; exit 2; }
-    PYTHONDONTWRITEBYTECODE=1 python3 -I -B - seal "${ROUND}" "${ANS}" "${SEAL}" "${OTHERS}" "${DRY}" "${SREPO}" <<'PY'
+    PYTHONDONTWRITEBYTECODE=1 python3 -I -B - seal "${ROUND}" "${ANS}" "${SEAL}" "${OTHERS}" "${DRY}" "${SREPO}" "${ONLY}" <<'PY'
 import sys, os, json, hashlib, subprocess, glob
-_, roundp, ansp, seal, others, dry, srepo = sys.argv[1:8]
+_, roundp, ansp, seal, others, dry, srepo, only = sys.argv[1:9]
 srepo = os.path.realpath(srepo)
 def die(m): print(f'decide-panel: {m}', file=sys.stderr); sys.exit(2)
 try: rd = json.load(open(roundp, encoding='utf-8'))
 except Exception as e: die(f'round ilegível: {e}')
 if not isinstance(rd, dict) or rd.get('schema') != 'onion.decide.panel/v1': die('round não é onion.decide.panel/v1')
 qs = rd.get('questions') or []
-canon = json.dumps(qs, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+canon = json.dumps({'questions': qs, 'today': rd.get('today')}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
 if hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16] != rd.get('round_id'): die('round adulterado: o round_id não é o hash das perguntas — recuso selar a partir dele')
 byq = {q['id']: q for q in qs}
 for q in qs:   # defesa em profundidade: o grafo do selo é relativo, dentro da raiz, e existe
@@ -214,8 +220,10 @@ for q in qs:   # defesa em profundidade: o grafo do selo é relativo, dentro da 
     if os.path.isabs(g) or not g.endswith('.kg.yaml') or not gp.startswith(srepo + os.sep) or not os.path.isfile(gp):
         die(f"{q.get('id')}: grafo do selo fora da raiz ou inexistente ({g!r} em {srepo}) — passe --repo <raiz do repo medido>")
 allow_other = set(others.split())
-for o in allow_other:
-    if o not in byq: die(f'--other {o}: pergunta inexistente nesta rodada')
+only = set(only.split())
+for o in allow_other | only:
+    if o not in byq: die(f'--other/--only {o}: pergunta inexistente nesta rodada')
+if only and not allow_other <= only: die('--other fora do --only: a flag vale só para pergunta desta passada')
 # respostas: um arquivo (objeto, lista, ou {"answers": [...]}) ou o diretório que o ArtifactData grava com out_dir
 raw = []
 files = sorted(glob.glob(os.path.join(ansp, '**', '*.json'), recursive=True)) if os.path.isdir(ansp) else [ansp]
@@ -240,6 +248,7 @@ for a in raw:
 date = rd.get('today') or ''
 for q in qs:
     qid = q['id']
+    if only and qid not in only: status.pop(qid, None); continue
     if qid in status: continue
     a = ans.get(qid)
     if a is None: status[qid] = {'state': 'sem resposta', 'detail': 'pergunta pulada não sela'}; continue
@@ -272,6 +281,7 @@ for q in qs:
     tail = ' '.join((r.stderr or r.stdout).split())[-300:]
     status[qid] = ({'state': 'selado', 'detail': f"{q['seal']['node']} em {q['seal']['graph']}"} if r.returncode == 0
                    else {'state': 'recusada pelo selador', 'detail': f'rc {r.returncode}: {tail}'})
+for v in status.values(): v['round_id'] = rd['round_id']   # o painel só mostra o estado da rodada dele
 print(json.dumps({'schema': 'onion.decide.status/v1', 'round_id': rd['round_id'], 'items': status}, ensure_ascii=False, indent=2))
 PY
     ;;
