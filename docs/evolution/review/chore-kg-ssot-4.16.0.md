@@ -2,8 +2,7 @@
 branch: chore/kg-ssot-4.16.0
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: 2fe36dad40d3bffe5fd3a534215a0bd19537cd81465dd169f54fa3eb7c5b5a84
-reviewed_code_sha256: 64d616457d57d1a0ca496a847dd21d74cf766b0f94da27589ad57a6453801316
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 tokens: 0
@@ -22,7 +21,9 @@ nota: "tokens 0 = não medido; vendor por kg_vendor.py e base migrada pelo próp
 - O vendor vai da 4.15.1 para a 4.16.0.
 - A base sai do `.kg-ssot/gate.json` e vai para a pasta `.kg-ssot/gate/`, com `contract.json`, `graphs/` e
   `accepted/`: 185 arquivos.
-- Cinco comentários que citavam o arquivo passam a citar a pasta.
+- Cinco comentários que citavam o arquivo passam a citar a pasta, e o `trace:` do nó `E_CONTRATO_V4_ADOTADO`
+  passa a apontar para `.kg-ssot/gate/contract.json` (a REGRA 55 pegou o caminho movido; as `provenance.source`
+  históricas, qualificadas por branch, ficam como estavam)
 
 ## Achados
 
