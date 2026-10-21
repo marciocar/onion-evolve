@@ -65,7 +65,9 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
    nos `args`. O workflow ganha a fase **Elenxo** (refutador opus/high, default REPROVADO): refuta cada achado **e**
    interroga cada descarte — *"por evidência ou por comodismo/hype/orçamento?"*; o descarte por comodismo volta
    como objeção sobrevivente. O `write(KG)` escreve **1 nó `decision` OPEN** (opções nomeadas + recomendação)
-   com `CONSTRAINS` das objeções sobreviventes. **Você nunca sela**: informe ao maestro o id do nó `D_` e a
+   com `CONSTRAINS` das objeções sobreviventes. A recomendação do Elenxo (e o mercado do sintetizador) chega
+   **inteira** ao escritor: é texto de agente, e o teto de 600 caracteres vale só para o dado web
+   (em 2026-10-21, o run `wf_1b66acda-ac8` entregou 600 de 2786 caracteres). **Você nunca sela**: informe ao maestro o id do nó `D_` e a
    tabela de selagem do `/meta:drive` (KIND decision). O retorno traz `decision: {options, objections,
    recommendation}`.
 
