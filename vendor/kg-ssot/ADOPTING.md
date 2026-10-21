@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -303,6 +303,21 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.16.0` para a `kg-ssot-v4.16.1`, entra o contrato v4.10: três pontos do perfil YAML em que o leitor de
+referência e o leitor JS divergiam, achados por fuzz e resolvidos pela especificação do YAML. Nenhum dos grafos reais
+medidos tem os casos, e nenhum veredito do leitor de referência muda.
+- **A ordem dos erros segue o documento.** Uma chave repetida que vem antes de uma âncora repetida ou de um alias sem
+  âncora dá `parse.duplicate-key`, como no leitor JS; antes, a referência dava `parse.yaml-error`. A âncora repetida,
+  o alias sem âncora e o alias seguido de `:` (`*x:`, que no YAML 1.2 é um alias de nome `x:`) seguem recusados.
+- **A linha vazia depois de uma quebra escapada entre aspas duplas vira `\n`**, como pede a especificação e como a
+  referência já lia; o leitor JS (o pacote npm) dobrava como espaço.
+- **O BOM no começo do arquivo não conta como coluna.** O leitor JS recusava o documento indentado depois dele; a
+  referência já aceitava.
+- **A suíte ganha 5 casos** (354). A identidade do contrato muda, e o `kg_gate.py` mostra a linha de identidade com
+  rc 0, sem pedir `--update`. A exceção é um grafo herdado que reprovava com `parse.yaml-error` e passa a reprovar
+  com `parse.duplicate-key`: o veredito é o mesmo, mas o código mudou, e o gate acusa piora até o `--update` registrar
+  a troca. Nenhum dos 1.633 grafos reais medidos em quatro repos tem o caso.
+
 Da `kg-ssot-v4.15.1` para a `kg-ssot-v4.16.0`, o contrato não muda (segue o v4.9, com a mesma identidade). Muda o
 gate, nas duas dores que os três adotantes mediram.
 - **A base vira uma pasta, `.kg-ssot/gate/`, com um registro por grafo.** O arquivo único conflitava em quase todo
@@ -310,6 +325,16 @@ gate, nas duas dores que os três adotantes mediram.
   mergeiam sem conflito, e o gate passa na árvore mergeada. O gate da 4.16.0 ainda lê o `gate.json`, e o primeiro
   `--update` grava a pasta e apaga o arquivo, sem veredito trocado (medido nos três adotantes). Commite a pasta e a
   remoção do arquivo juntos.
+- **O primeiro merge entre uma branch já migrada e outra que ainda mexe no `gate.json` conflita uma vez.** O git vê
+  a remoção do arquivo como um rename para `.kg-ssot/gate/contract.json` (os dois são pequenos e parecidos), ou como
+  modify/delete, e o conflito cai num deles. Medido num adotante: aconteceu no merge da branch longa depois da
+  migração. A cura é a mesma nos dois casos: fique com a pasta da branch migrada (`git checkout --theirs
+  .kg-ssot/gate`, ou `--ours`, conforme o lado), remova o `gate.json` (`git rm .kg-ssot/gate.json`) e rode
+  `kg_gate.py --update`, que regrava os registros com o corpus mergeado. Para não ter o conflito, migre as branches
+  vivas antes de mergear entre elas: com as duas na pasta, o merge não conflita.
+- **Um `trace:` que aponta para `.kg-ssot/gate.json` fica sem alvo depois da migração.** Troque por
+  `.kg-ssot/gate/` (ou `.kg-ssot/gate/contract.json`) no mesmo PR. Achado de um adotante, cujo lint de traces acusou
+  o caminho movido: `git grep -n 'kg-ssot/gate.json' -- '*.kg.yaml' '*.kg.json'` lista os casos antes do update.
 - **A troca de identidade do contrato sem veredito trocado passa com aviso.** O gate segue acusando a identidade
   numa linha `· identidade`, mas o rc vem da comparação, feita com o contrato novo: a regra nova que piora um grafo
   continua reprovando. Uma tag que só muda os schemas sem mudar veredito deixa de pedir um PR só para o `--update`.
@@ -389,7 +414,7 @@ leitor JS) e o migrador por perfil.
 - **A suíte ganha 16 casos** (328).
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --dest
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --dest
   vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
@@ -514,7 +539,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
