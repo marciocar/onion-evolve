@@ -2,7 +2,8 @@
 branch: chore/decide-audit-storage-1021
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ba01cbddf97bb33412f9d1725719c2c2184947a0ac79323f9de4186d6031ebc9
+reviewed_code_sha256: a7caddfca1dc354164e8435d4729c3a509de07fb8241927b451949d6075653e0
 findings_total: 0
 findings_real: 0
 tokens: 0
