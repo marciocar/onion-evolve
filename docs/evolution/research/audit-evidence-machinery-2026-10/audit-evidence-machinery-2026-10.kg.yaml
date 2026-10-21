@@ -1,0 +1,1117 @@
+# Pesquisa em MODO PRIMÁRIAS (2026-10-21): maquinaria de auditoria contínua no core do Onion
+# (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo) e
+# 2 (radar que lê vencimento verified_at + frequency).
+#
+# ⚠️ Proveniência (R15): os label e narrative das evidências de origem web carregam texto extraído de
+#    páginas da web. É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Relação com o corpus: NÃO há grafo anterior sobre vocabulário de evidência de auditoria (medido:
+# kg-corpus-grep.sh devolve 0 nós para oscal e evidence_type, inclusive com --all-status, sobre 180
+# grafos). A decisão que pediu esta pesquisa (D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2, de
+# sinais-de-campo-2026-09) não existia em origin/main@3358788c quando o run escreveu; entrou com o PR #1244
+# (mergeado 2026-10-21T02:38Z) e a aresta externa abaixo foi ligada no fechamento da rodada.
+#
+# Pedido do usuário que acompanha a rodada: "traga no decide". Por isso as cinco perguntas que o
+# Elenxo deixou ao maestro nascem como nós decision OPEN (D_AUDIT_*_1021), com as opções no texto e,
+# na divisão contrato/core, como nós C_OPCAO_* vizinhos. Este escritor NÃO sela nada.
+meta:
+  id: audit-evidence-machinery-2026-10
+  schema_version: "1"
+  baseline: "2026-10-21"
+  review_after: "2026-11-20"   # 30d: FERRAMENTA/versão é o tipo dominante. Trestle (v5.2.0 de 2026-10-05,
+                               # declara OSCAL 1.2.1), OSCAL (v1.2.3 de 2026-08-07), OCSF (1.9.0, 1.10.0-dev
+                               # em curso), CycloneDX (1.7.2 de 2026-09-17), regras do FedRAMP 20x (emendas
+                               # semanais, a última em 2026-10-08) e a numeração do SCF (2026.2 contra 2026.3)
+                               # andam em semanas. Mercado/capital pediria 90d, mas as decisões D_AUDIT_*
+                               # pendem do dado curto. Gatilhos antecipados: (1) rodada de reancoragem do
+                               # OSCAL v1.2.3 e do FedRAMP CPO-CSX-CPM; (2) o maestro selar qualquer D_AUDIT_*;
+                               # (3) release do trestle que declare OSCAL 1.2.3.
+  # kg-backlog-guard: on
+  # ═══ TETO: 57 NÓS ═══
+  #   RODADA 1 (primárias nomeadas, run wf_25b440d5-1f7), EXECUTADA em 2026-10-21 — 57 nós: 1 question raiz
+  #   + 16 evidências ancoradas por verificador independente (compliance-trestle 3, scf-erl 2, csa-caiq-ccm 1,
+  #   ocsf 2, lula 3, ciso-assistant 2, probo-compai 3) + 3 evidências internas medidas no core (contrato
+  #   kg-ssot de chaves fechadas, STALE-OLD do radar por baseline e não por cadência, corpus sem vocabulário)
+  #   + 1 E_LACUNAS_PRIMARIES (30 rejeitadas na ancoragem, 9 lacunas abertas) + 10 objeções sobreviventes do
+  #   Elenxo + 18 superações achadas + 5 decisões OPEN para o /meta:decide + 3 opções da divisão contrato/core.
+  #   O motivo do teto: é o primeiro grafo do tema e cada nó é uma claim, uma objeção, uma superação ou uma
+  #   pergunta ao maestro que o run produziu; nada foi agregado para caber.
+
+external_edges:
+  - from: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2"
+    edge_type: TRACES_TO
+
+nodes:
+  - id: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Quais afirmações de mercado da pesquisa do adotante, verificadas em primária em outubro de 2026, servem de base para o vocabulário de evidência (item 1) e para o radar de vencimento (item 2), e o que fica com o contrato kg-ssot versus com o core?"
+    narrative: |-
+      Pergunta da rodada (2026-10-21), originada pela decisão D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2 (em docs/onion/graph/sinais-de-campo-2026-09.kg.yaml desde o PR #1244) e pelo sinal do hub regulado, redigido em docs/evolution/inbox/_processed/2026-10-20-audit-evidence-machinery.md. Campos propostos pelo sinal para o item 1: evidence_type, oscal_method (EXAMINE/INTERVIEW/TEST), acceptance, frequency, owner_role, location como ponteiro, retention, source_norm, claim_class. Item 2: radar que lê vencimento por verified_at + frequency.
+      RECOMENDAÇÃO DO ELENXO (íntegra; afirmação de UM agente, sem votação): O QUE A RODADA SUSTENTA. (1) Desenho de estado: as três ferramentas de mercado medidas guardam o estado no banco do próprio produto: CISO Assistant em SQLite/Postgres, Probo em Postgres, Comp AI em Postgres+Redis. O Lula v2 saiu do OSCAL como armazenamento para YAML em Git e mantém o OSCAL só na importação. Isso apoia 'grafo YAML em git é o armazenamento, OSCAL é formato de borda (importação/exportação)'. O apoio vem de um único fornecedor, sinal fraco e não convergência de mercado. (2) OCSF 1.9.0, Compliance Finding 2003, é alvo de EXPORTAÇÃO de achado, não base de vocabulário. (3) A licença do SCF (CC BY-ND, derivado só com licença comercial, IA inclusa) VETA montar o vocabulário de evidência a partir do ERL e distribuí-lo nas portas públicas. (4) O trestle (Apache-2.0) é CANDIDATO a validador de exportação, nada mais. O QUE ELA NÃO SUSTENTA. (a) O campo oscal_method (EXAMINE/INTERVIEW/TEST) e 'location como ponteiro' não têm âncora. A versão do OSCAL, v1.2.3 de 2026-08-07, foi medida pela API, mas o texto dos métodos precisa de reancoragem verbatim do reference v1.2.3. 'acceptance' não existe no OSCAL e seria cunhagem do Onion, a declarar como tal. (b) O radar de vencimento (verified_at + frequency) NÃO pode se apoiar no FedRAMP 20x nesta rodada: as seis claims caíram, e a evidência do verificador contraria os '7 dias' como cadência recorrente (FRC-APP-FCP é o pacote inicial; a recorrente é CPO-CSX-CPM, por classe). (c) O trestle não está provado validando AR/POA&M, e declara OSCAL 1.2.1 contra a 1.2.3 vigente. (d) CycloneDX/VEX, formatos do CCM/CAIQ e capital/mercado continuam abertos. O eixo de mercado é invariante da doutrina, então não fecha por comodismo. DIVISÃO kg-ssot contra core. É inferência de desenho, NÃO evidência desta rodada, e vai ao maestro como pergunta. Ao contrato kg-ssot cabem só os campos neutros de domínio que estendem o que ele já tem: frequency/cadência por nó ao lado de verified_at; location como especialização de provenance.locator, que já existe; retention; owner_role. Ao core e ao hub regulado ficam os campos de domínio de auditoria: evidence_type, oscal_method, acceptance, source_norm e claim_class, e o leitor de vencimento no kg-radar.sh, que já tem STALE-OLD por cadência. A exportação OSCAL também fica com eles. Corpus hoje: kg-corpus-grep.sh devolve 0 nós para oscal_method, evidence_type, source_norm, claim_class, owner_role e OSCAL; a lacuna é real e deve virar nó. PARA O /meta:decide (pedido do usuário: 'traga no decide'). Cinco perguntas ao maestro: (i) selar 'grafo = armazenamento, OSCAL = borda' sobre o sinal Lula + três bancos relacionais; (ii) autorizar uma rodada de reancoragem do OSCAL v1.2.3 (methods, relevant-evidence) e do FedRAMP CPO-CSX-CPM antes de escrever os itens 1 e 2; (iii) declarar o SCF/ERL fora da base por licença e escolher a norma de origem alternativa, cuja licença também falta medir (usnistgov/OSCAL dá NOASSERTION); (iv) aprovar a divisão de campos contrato/core acima ou rejeitá-la; (v) aceitar o trestle como candidato de validação condicionado a um dogfood real de trestle validate sobre um AR exportado.
+      NOTA DO ESCRITOR (medida no core, 2026-10-21): duas premissas da recomendação estão erradas e foram corrigidas por evidência interna. (1) O kg-radar.sh NÃO tem STALE-OLD por cadência: ele compara verified_at com meta.baseline (E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE); o item 2 é construção nova, não extensão de um leitor de cadência. (2) O contrato kg-ssot v4 fecha as chaves do nó num enum de 22 (MUST) e já tem owner; campo novo sem x_ reprova (E_CORE_CONTRACT_NODE_KEYS_CLOSED). Isso não muda a divisão proposta, mas muda o caminho: no core, antes de o contrato mudar, os campos só existem como x_.
+    trace: "run wf_25b440d5-1f7 (modo primaries); decisão de origem D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2; síntese em docs/evolution/research/audit-evidence-machinery-2026-10/SYNTHESIS.md"
+
+  # ─── Evidências ANCORADAS por verificador independente (16) ─────────────────────────────────
+
+  - id: E_TRESTLE_COMPLIANCE_AS_CODE_APACHE2
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'An opinionated tooling platform for managing compliance as code, using continuous integration and NIST's OSCAL standard.' — README do GitHub, descrição do projeto e licença; ancorada por verificador independente"
+    source_kind: primary
+    label: "compliance-trestle se declara plataforma opinativa de compliance as code, baseada em CI e no OSCAL do NIST, sob licença Apache-2.0."
+    narrative: "O leitor não declarou tier (tier=?), por isso source_tier fica omitido; é o README do próprio projeto falando de si. Licença Apache-2.0 reconferida pelo Elenxo via API do GitHub. Restringida por E_OBJECAO_01_TRESTLE_AR_POAM_VALIDATION_UNPROVEN: identidade e licença não provam que ele valida exportação AR/POA&M."
+    trace: "https://github.com/oscal-compass/compliance-trestle"
+    provenance:
+      source: "https://github.com/oscal-compass/compliance-trestle"
+      locator: "README, descrição do projeto e licença"
+      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_TRESTLE_V5_SUPPORTS_OSCAL_1_2_1
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'supports NIST OSCAL 1.2.1 as well as previous versions' — README, seções de trilha v5 e v4; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A trilha v5 do compliance-trestle declara suporte ao OSCAL 1.2.1 e versões anteriores."
+    narrative: "Restringida por E_OBJECAO_02_TRESTLE_DECLARES_1_2_1_NOT_1_2_3: o OSCAL vigente é v1.2.3 (2026-08-07, medido pela API) e o README do trestle v5.2.0 (2026-10-05) ainda declara 1.2.1."
+    trace: "https://github.com/oscal-compass/compliance-trestle"
+    provenance:
+      source: "https://github.com/oscal-compass/compliance-trestle"
+      locator: "README, seções de trilha v5 e v4"
+      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_TRESTLE_IMPLICIT_ALL_OSCAL_SCHEMAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'trestle implicitly supports all OSCAL schemas for use within the object model' — oscal-compass.dev/compliance-trestle/latest/ (página inicial) e README; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O trestle diz suportar IMPLICITAMENTE todos os schemas OSCAL no modelo de objetos (o que inclui Assessment Results e POA&M), sem nomeá-los como fluxo validado de ponta a ponta."
+    narrative: "Restringida por E_OBJECAO_03_TRESTLE_IMPLICIT_IS_NOT_END_TO_END: suporte implícito em classes do modelo não mostra geração nem validação de AR/POA&M."
+    trace: "https://oscal-compass.dev/compliance-trestle/latest/"
+    provenance:
+      source: "https://oscal-compass.dev/compliance-trestle/latest/"
+      locator: "página inicial e README"
+      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_SCF_LICENSE_CC_BY_ND_ATTRIBUTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'You must give appropriate credit, provide a link to the license and indicate if changes were made.' — securecontrolsframework.com/terms-conditions/, seção Attribution; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A licença oficial do Secure Controls Framework (SCF) é CC BY-ND 4.0 e exige crédito, link da licença e indicação de mudanças."
+    narrative: "Confirma o que a pesquisa do adotante dizia (CC BY-ND). Objeção do Elenxo não sobreviveu: a quote prova exatamente a parte de licença da lacuna."
+    trace: "https://securecontrolsframework.com/terms-conditions/"
+    provenance:
+      source: "https://securecontrolsframework.com/terms-conditions/"
+      locator: "seção Attribution"
+      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_SCF_DERIVATIVE_NEEDS_COMMERCIAL_LICENSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'An organization needs to purchase a commercial license to offer derivative SCF content.' — securecontrolsframework.com/terms-conditions/, seção Derivatives; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Oferecer conteúdo SCF derivado requer licença comercial; isso pesa contra montar o vocabulário de evidência do core a partir do ERL e distribuí-lo nas portas públicas."
+    narrative: "A rejeitada na ancoragem acrescenta, na mesma página, que a proibição de criar derivados inclui IA ('This prohibition on creating derivative works includes utilizing Artificial Intelligence'). Restringida por E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED: o texto não diz se citar ids SCF/ERL como valor de source_norm é derivado."
+    trace: "https://securecontrolsframework.com/terms-conditions/"
+    provenance:
+      source: "https://securecontrolsframework.com/terms-conditions/"
+      locator: "seção Derivatives"
+      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_CSA_CCM_V4_1_207_CONTROLS_17_DOMAINS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'The Cloud Controls Matrix (CCM) is a cybersecurity control framework made up of 207 controls across 17 security domains.' — cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1, descrição (release date 01/27/2026); ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    valid_from: "2026-01-27"
+    label: "CCM e CAIQ v4.1 da Cloud Security Alliance têm data de lançamento 27/01/2026 e o CCM tem 207 controles em 17 domínios."
+    narrative: "Candidato a catálogo de source_norm, mas a licença do CCM não foi ancorada (claim EXAGERADA) e os formatos legíveis por máquina também não. Restringida por E_OBJECAO_05_CCM_FORMATS_UNANCHORED_197_VS_207: a página research/cloud-controls-matrix ainda diz 197 objetivos de controle."
+    trace: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1"
+    provenance:
+      source: "https://cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1"
+      locator: "descrição do artefato, release date 01/27/2026"
+      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_OCSF_COMPLIANCE_FINDING_IS_FINDING_FORMAT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Industry Frameworks or Security Standards such as `NIST SP 800-53, CIS AWS Foundations Benchmark v1.4.0, ISO/IEC 27001` etc.' — schema.ocsf.io/1.9.0/classes/compliance_finding, descrição da classe; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    valid_from: "2026-08-03"
+    label: "OCSF 1.9.0: a classe Compliance Finding (2003) registra resultado de avaliação contra framework (exemplos NIST SP 800-53 e ISO/IEC 27001); serve de formato de achado para exportar, não de vocabulário de frescor de evidência."
+    narrative: "valid_from é a data da 1.9.0 como Latest (2026-08-03, medida pelo Elenxo na API do GitHub). Restringida por E_OBJECAO_06_OCSF_ABSENCE_NOT_IN_QUOTE: a quote só lista frameworks; a ausência de cadência mora na leitura crua do objeto evidences (C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES). Evidência de log não coberta."
+    trace: "https://schema.ocsf.io/1.9.0/classes/compliance_finding"
+    provenance:
+      source: "https://schema.ocsf.io/1.9.0/classes/compliance_finding"
+      locator: "descrição da classe Compliance Finding [2003]"
+      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_OCSF_FINDINGS_CATEGORY_CLASS_2003
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Compliance Finding [2003]'; 'Detection Finding [2004]'; 'Incident Finding [2005]' — schema.ocsf.io/1.9.0, categoria Findings (2001 marcada D, 2002 a 2008); ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    valid_from: "2026-08-03"
+    label: "A categoria Findings do OCSF 1.9.0 tem oito classes, e a de conformidade é a Compliance Finding, class_uid 2003: o alvo de mapeamento para exportar achados."
+    narrative: "Objeção do Elenxo não sobreviveu: fato de taxonomia literal, basta como alvo de mapeamento. 2001 aparece marcada D (deprecada)."
+    trace: "https://schema.ocsf.io/1.9.0"
+    provenance:
+      source: "https://schema.ocsf.io/1.9.0"
+      locator: "categoria Findings, classes 2002 a 2008"
+      method: "leitura: WebFetch, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_LULA_V2_BUILT_AFTER_OSCAL_LIMITATIONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'We built Lula 2 after discovering key limitations with the OSCAL-based approach:' — README do defenseunicorns/lula, linha 68, seção 'Learning from Lula 1' (o locator informado, 'seção Lula 2', não é o título real); linha 402 para a v1 OSCAL-based; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O Lula (Defense Unicorns) construiu a v2 depois de achar limitações na abordagem baseada em OSCAL, que era a da v1."
+    narrative: "Autodeclaração do fornecedor, um único ponto de mercado. Os motivos são três (complexidade do OSCAL, testes automatizados insuficientes, colaboração e revisão difíceis), não um só (ver C_SUPERACAO_20261021_LULA_THREE_CHALLENGES). A v1 está em maintenance mode, não abandonada."
+    trace: "https://github.com/defenseunicorns/lula"
+    provenance:
+      source: "https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md"
+      locator: "linha 68, seção 'Learning from Lula 1'"
+      method: "leitura: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_LULA_V2_STORAGE_YAML_IN_GIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Storage: YAML files with Git integration' — README do defenseunicorns/lula, linha 383, seção 'Architecture'; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O armazenamento interno do Lula v2 é YAML versionado em Git, não OSCAL: o sinal de mercado mais próximo do desenho do Onion (grafo YAML em git como armazenamento, OSCAL na borda)."
+    narrative: "Fecha a lacuna lula. Repo Apache-2.0 com 49 estrelas (API, 2026-10-21): sinal fraco de tração, não convergência de mercado."
+    trace: "https://github.com/defenseunicorns/lula"
+    provenance:
+      source: "https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md"
+      locator: "linha 383, seção 'Architecture'"
+      method: "leitura: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_LULA_V2_OSCAL_ONLY_ON_CATALOG_IMPORT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Import Data: Use the setup page to import OSCAL catalogs or existing control sets' — README do defenseunicorns/lula, linha 63 (Import Data), linha 64 (Export Reports), linha 49 (Import/Export); ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "No Lula v2 o OSCAL fica na importação de catálogos; o README não declara OSCAL como formato de exportação (a exportação citada são relatórios e planilhas)."
+    narrative: "Escopado ao README lido: não afirma ausência no código."
+    trace: "https://github.com/defenseunicorns/lula"
+    provenance:
+      source: "https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md"
+      locator: "linhas 49, 63 e 64"
+      method: "leitura: curl do README cru, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_CISO_ASSISTANT_AGPL_PLUS_ENTERPRISE_DIR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'All the files outside the top-level 'enterprise' directory are released under the AGPLv3' — README do intuitem/ciso-assistant-community, seção License; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "CISO Assistant: o código comunitário é AGPLv3 e só o diretório enterprise é comercial (monorepo com licença dupla). Copiar código para o core pede cautela; ideia e vocabulário são outra coisa."
+    narrative: "A API do GitHub devolve NOASSERTION para o repo, coerente com licença dupla. Na quote original o nome do diretório vem entre aspas duplas; aqui trocadas por simples só por formato."
+    trace: "https://github.com/intuitem/ciso-assistant-community"
+    provenance:
+      source: "https://github.com/intuitem/ciso-assistant-community"
+      locator: "README, seção License"
+      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_CISO_ASSISTANT_STATE_SQLITE_OR_POSTGRES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'CISO Assistant will use SQLite by default, but you can setup PostgreSQL by declaring these variables.' — README, seção de configuração de banco; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O CISO Assistant guarda o estado em SQLite por padrão, com PostgreSQL opcional: banco do próprio produto, não arquivo versionado."
+    narrative: "Fecha a parte de arquitetura de estado da lacuna ciso-assistant. Capital/mercado segue aberto (a claim de preço foi EXAGERADA; ver C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS)."
+    trace: "https://github.com/intuitem/ciso-assistant-community"
+    provenance:
+      source: "https://github.com/intuitem/ciso-assistant-community"
+      locator: "README, seção de configuração de banco"
+      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_PROBO_SELF_HOSTED_POSTGRES_MIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Run it on your own infrastructure with Docker.' — README do getprobo/probo (Tech Stack; License); ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Probo guarda estado em PostgreSQL próprio (backend Go, GraphQL e MCP), é autohospedável e MIT: banco relacional, não grafo nem arquivo versionado."
+    narrative: "Restringida por E_OBJECAO_07_PROBO_QUOTE_LACKS_POSTGRES_MIT: a quote só prova o autohospedável; PostgreSQL e MIT vêm do locator e foram medidos à parte pelo Elenxo (C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED)."
+    trace: "https://github.com/getprobo/probo"
+    provenance:
+      source: "https://github.com/getprobo/probo"
+      locator: "README, seções Tech Stack e License"
+      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_COMPAI_STATE_POSTGRES_PLUS_REDIS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Key-value store utilities using Upstash Redis.' — README do trycompai/comp (Prerequisites, Built With, packages); ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Comp AI guarda estado em Postgres (Prisma, DATABASE_URL, versão 15 ou superior) mais Redis Upstash para chave-valor: o estado mora no banco do produto."
+    narrative: "Restringida por E_OBJECAO_08_COMPAI_QUOTE_LACKS_POSTGRES: a quote só prova o Redis; o Postgres foi medido à parte pelo Elenxo no schema Prisma (C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED)."
+    trace: "https://github.com/trycompai/comp"
+    provenance:
+      source: "https://github.com/trycompai/comp"
+      locator: "README, seções Prerequisites, Built With e packages"
+      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  - id: E_COMPAI_OPEN_CORE_AGPL_EE_COMMERCIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'the core technology (99%) is fully open source, licensed under AGPLv3' — README do trycompai/comp, seção License / Open Source; ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "Comp AI é open-core: núcleo AGPLv3 e o diretório ee sob licença comercial, com nuvem hospedada. AGPL pede cautela ao copiar código; ideia e vocabulário são outra coisa."
+    narrative: "Objeção do Elenxo não sobreviveu: quote literal, e a API do GitHub devolve AGPL-3.0 (medido pelo Elenxo em 2026-10-21). O capital (rodada de 34M) ficou só em agregador, com a claim EXAGERADA."
+    trace: "https://github.com/trycompai/comp"
+    provenance:
+      source: "https://github.com/trycompai/comp"
+      locator: "README, seção License / Open Source"
+      method: "leitura: WebFetch do README, quote verbatim ancorada por verificador independente (run wf_25b440d5-1f7)"
+      locality: "web"
+
+  # ─── Evidências INTERNAS medidas no core (3) ────────────────────────────────────────────────
+
+  - id: E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "vendor/kg-ssot/spec/kg-contract-v4.schema.json@3358788c (kg-ssot-v4.13.1), $defs.node.propertyNames e $defs.provenance"
+    source_tier: 10
+    source_kind: primary
+    label: "O contrato kg-ssot v4 (MUST) fecha as chaves do nó num enum de 22 e já tem owner (string); chave nova sem prefixo x_ reprova. provenance exige source, locator e method."
+    narrative: "Medido com python3 -I sobre o schema vendorizado: o enum de propertyNames do nó é confidence, drive_kind, evidence_class, id, impact, label, layer, narrative, node_type, owner, plane, provenance, sealed_at, sealed_by, source_kind, source_tier, status, trace, valid_from, verified_against, verified_at, verified_scope; o que casa ^x_ passa. Consequência para o item 1: evidence_type, oscal_method, acceptance, frequency, retention, source_norm e claim_class NÃO existem no contrato; no core, antes de uma versão nova do contrato, só podem nascer como x_. owner_role tem um vizinho pronto (owner). location como ponteiro tem vizinho em provenance.locator, mas o SHOULD fecha as chaves de provenance (source, locator, method, locality e x_). Corrige a premissa da recomendação de que bastaria estender o que o contrato já tem."
+    trace: "vendor/kg-ssot/spec/kg-contract-v4.schema.json"
+    provenance:
+      source: "vendor/kg-ssot/spec/kg-contract-v4.schema.json@3358788c"
+      locator: "$defs.node.propertyNames (enum de 22 chaves, else de ^x_) e $defs.provenance (required source, locator, method)"
+      method: "medição: python3 -I lendo o JSON Schema vendorizado, release.json = 4.13.1"
+      locality: "repo"
+
+  - id: E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: ".claude/validation/kg-radar.sh@3358788c, linhas 38-40 (cabeçalho FRESCOR) e 594 (veredito STALE-OLD)"
+    source_tier: 10
+    source_kind: primary
+    label: "O STALE-OLD do kg-radar.sh compara verified_at com meta.baseline do grafo; não há cadência por nó. O item 2 (vencimento por verified_at + frequency) é leitor NOVO, não extensão de um que já exista."
+    narrative: "Medido: linha 594 faz verdict STALE-OLD quando verifiedAt[id] < metaBaseline; a linha 1061 repete a regra no FRESCOR legível. O cabeçalho (linha 39) define STALE-OLD como 'verified_at anterior à meta.baseline'. A premissa do enunciado e do Elenxo ('STALE-OLD por cadência', 'já tem STALE-OLD por cadência') é inexata: a cadência que existe é a do grafo (meta.review_after, SOFT no lint), não a do nó. O radar também não lê campo de frequência algum."
+    trace: ".claude/validation/kg-radar.sh"
+    provenance:
+      source: ".claude/validation/kg-radar.sh@3358788c"
+      locator: "linhas 38-40 e 594 (e 1061)"
+      method: "medição: grep -n sobre o radar em origin/main"
+      locality: "repo"
+
+  - id: E_CORE_CORPUS_ZERO_AUDIT_EVIDENCE_VOCAB
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh sobre 180 grafos em origin/main@3358788c: oscal_method, oscal e evidence_type = 0 nós (com e sem --all-status)"
+    source_tier: 10
+    source_kind: primary
+    label: "Nenhum dos 180 grafos do core tem vocabulário de evidência de auditoria: oscal_method, oscal e evidence_type devolvem 0 nós no corpus. A lacuna é real e nasce como nó aqui."
+    narrative: "Medido por este escritor (oscal_method; oscal e evidence_type com --all-status). O Elenxo reporta o mesmo zero para source_norm, claim_class, owner_role e trestle. O corpus grep casa id e label por substring, então zero aqui quer dizer que nenhum nó nomeia o tema, não que nenhum arquivo o cite."
+    trace: "bash .claude/validation/kg-corpus-grep.sh oscal --all-status"
+    provenance:
+      source: ".claude/validation/kg-corpus-grep.sh@3358788c"
+      locator: "saída '# corpus: 180 grafos · termos: oscal · 0 nó(s)' e idem para evidence_type e oscal_method"
+      method: "medição: kg-corpus-grep.sh rodado em 2026-10-21"
+      locality: "repo"
+
+  # ─── Contabilidade da rodada ────────────────────────────────────────────────────────────────
+
+  - id: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "contabilidade do run wf_25b440d5-1f7 (modo primaries): 10 chaves de fonte lidas, 0 inalcançáveis; 16 claims ancoradas, 30 rejeitadas na ancoragem (15 AFIRMADA-SEM-CITACAO, 15 EXAGERADA); 10 objeções sobreviventes do Elenxo; 0 recusadas pelo motor; 18 superações"
+    label: "Lacunas da rodada de primárias: 10/10 fontes lidas; 16 claims ancoradas e 30 rejeitadas (15 sem citação, 15 exageradas); 10 objeções sobreviventes; 0 recusadas; 18 superações. Seguem abertas 9 lacunas, entre elas os métodos OSCAL e a cadência FedRAMP."
+    narrative: |-
+      FONTES LIDAS (10 chaves): oscal-releases, compliance-trestle, scf-erl, csa-caiq-ccm, fedramp-20x, ocsf, cyclonedx-vex, lula, ciso-assistant, probo-compai. INALCANÇÁVEIS: 0 (o seedtable deu HTTP 403 dentro da chave probo-compai e por isso o pré-seed de 2,6M do Comp AI ficou sem fonte aberta).
+      ANCORADAS: 16 (compliance-trestle 3, scf-erl 2, csa-caiq-ccm 1, ocsf 2, lula 3, ciso-assistant 2, probo-compai 3; oscal-releases 0, fedramp-20x 0, cyclonedx-vex 0).
+      REJEITADAS NA ANCORAGEM (30, nenhuma virou nó de evidência). AFIRMADA-SEM-CITACAO (15, rebaixadas pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação): oscal-releases (1) OSCAL v1.2.3 de 2026-08-07 é a Latest e a v1.2.2 de 2026-04-30 a anterior (a página não mostra o ano, a API mostra); oscal-releases (2) observation > methods aceita EXAMINE, INTERVIEW, TEST e UNKNOWN só para conversão histórica, com valores locais permitidos; scf-erl (3) ids E-<domínio de 3 letras>-<número> e colunas do ERL sem frequência nem tipo de evidência; csa-caiq-ccm (4) CCM e CAIQ combinados na v4.1, sem número próprio do CAIQ (a mesma página ainda diz 197 objetivos); csa-caiq-ccm (5) bundle legível por máquina em JSON, YAML e OSCAL de 06/03/2024 (3 de junho), sem versão nem licença; csa-caiq-ccm (6) guias de implementação em JSON/YAML e OSCAL, mapeamentos só em JSON/YAML; fedramp-20x (7) FRC-APP-FCP: os 7 dias valem para o pacote INICIAL; fedramp-20x (8) CPO-CSX-CPM: cadência recorrente por classe (A 3 meses SHOULD, B mensal, C 2 semanas, D semanal) com timeframe_type/num estruturados; fedramp-20x (9) FRC-CSX-VVK: validação persistente dos KSIs por número de métodos automatizados (A MAY, B SHOULD 1, C MUST 2, D MUST 4); fedramp-20x (10) FRC-CSO-JSN: dados em JSON válido contra JSON Schema do FedRAMP quando a regra trouxer schema; ocsf (11) 1.9.0 é a estável mais recente (3 ago 2026) e há 1.10.0-dev; cyclonedx-vex (12) CycloneDX corrente é 1.7, de 2025-10-21, adequada a VEX; cyclonedx-vex (13) patch Latest é 1.7.2 (2026-09-17), sem 1.8; cyclonedx-vex (14) VEX é vulnerabilities[] com analysis {state, justification, response}; cyclonedx-vex (15) externalReferenceType 'exploitability-statement' para VEX fora do BOM. EXAGERADA (15): oscal-releases relevant-evidence 'por referência e NÃO por conteúdo' (href é [0 or 1], description é [1] e o back-matter aceita base64); oscal-releases 'EXAMINE/INTERVIEW/TEST sobre assessment objects' e 'justifica acceptance' (INTERVIEW é sobre pessoas; acceptance não existe no OSCAL); oscal-releases observation.subjects confundido com Assessment Subject; compliance-trestle v5.2.0 Latest (quote é glosa do leitor; o fato existe em duas páginas que não se sustentam entre si); compliance-trestle 'viável como validador de exportação do grafo' (inferência); scf-erl 2026.2 'compatível' (o ERL já numera em 2026.3); scf-erl 'uso próprio permitido' (a página não trata de uso interno); csa-caiq-ccm licença 'livre' e 'exige' (o texto diz 'não precisa' e 'permite'); fedramp-20x 'persistentemente = NÃO contínuo e NÃO regular' (o texto diz 'may'); fedramp-20x Rev5 para em 2027 como fato firme (é estimativa da Phase 5); ocsf 'evidences substitui o evidence obsoleto' (só o resumo da UI disse); cyclonedx-vex 'not_affected EXIGE justification' (o schema diz 'should'); lula 'O motivo do abandono é a complexidade' (são três motivos e a v1 está em maintenance mode); ciso-assistant 'Pro/Enterprise com preço por assento' (não há Enterprise no pricing; preço só no Pro SaaS); probo-compai capital (2,6M, OSS Capital e 'sem YC' sem fonte aberta; só os 34M e os 500K do Probo têm agregador).
+      LACUNAS ABERTAS (gapsOpen do Elenxo, 9): (1) oscal-releases: nenhuma claim ancorada; v1.2.3 (2026-08-07) medida pela API, mas os métodos EXAMINE/INTERVIEW/TEST, relevant-evidence e subjects foram rebaixados ou exagerados; (2) compliance-trestle: versão vigente (v5.2.0, 2026-10-05, só pela API) e validação/geração de AR/POA&M abertas; suporte declarado só até OSCAL 1.2.1; (3) scf-erl: versão (2026.2 contra 2026.3) e estrutura do ERL não ancoradas; a fronteira 'id como ponteiro' contra 'derivado' não está resolvida; (4) csa-caiq-ccm: CAIQ como versão própria e formatos JSON/YAML/OSCAL não ancorados; contradição 197/207 na fonte; (5) fedramp-20x: as 6 claims rebaixadas; a evidência do verificador contraria os '7 dias' como cadência recorrente; (6) ocsf: 1.9.0 como Latest só pela API; evidência de log não coberta; (7) cyclonedx-vex: nenhuma claim ancorada; (8) ciso-assistant: capital/mercado aberto; (9) probo-compai: capital/mercado só em agregador. Fechada: lula.
+      RECUSADAS PELO MOTOR: 0. SUPERAÇÕES achadas: 18 (15 das claims rejeitadas na ancoragem, que registram aqui, e 3 das objeções 06, 07 e 08), modeladas como C_SUPERACAO_20261021_*.
+      NÃO-VERIFICADOS (lista de 1ª classe): licença do conteúdo NIST/OSCAL (a API devolve NOASSERTION para usnistgov/OSCAL); notas do trestle v5.2.0 (só tag e data pela API); oscal-cli do NIST (não aberto); pré-seed do Comp AI (seedtable 403); evidência de log no OCSF.
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7"
+      locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, gapsOpen e superações do Elenxo"
+      method: "derivado: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  # ─── Objeções SOBREVIVENTES do Elenxo (10) ──────────────────────────────────────────────────
+
+  - id: E_OBJECAO_01_TRESTLE_AR_POAM_VALIDATION_UNPROVEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo (rodada de primárias) contra a claim 1 [compliance-trestle], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo, 1 agente): identidade e licença do trestle não provam o que a rodada precisa, que ele valide a EXPORTAÇÃO do grafo (AR/POA&M); nenhuma claim ancorada mostra trestle validate sobre assessment-results ou poam."
+    narrative: "Licença Apache-2.0 reconferida via API. Corpus: kg-corpus-grep.sh trestle = 0 nós sobre 180 grafos. Superação não achada (classe nenhuma): procurou-se nas 16 ancoradas e nas rejeitadas um teste de validação de AR/POA&M e não há; o oscal-cli do NIST não foi aberto. Critério: bash .claude/validation/kg-corpus-grep.sh trestle (0 nós)."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 1 [compliance-trestle], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_02_TRESTLE_DECLARES_1_2_1_NOT_1_2_3
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 2 [compliance-trestle], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o trestle v5.2.0 (2026-10-05) declara OSCAL 1.2.1, dois patches atrás da v1.2.3 vigente (2026-08-07); se o grafo exportar para 1.2.3, o suporte declarado não cobre."
+    narrative: "Medido pelo Elenxo: gh api repos/usnistgov/OSCAL/releases/latest dá v1.2.3 de 2026-08-07T03:33:33Z; gh api repos/oscal-compass/compliance-trestle/releases/latest dá v5.2.0 de 2026-10-05T11:19:36Z. Superação não achada: o corpo das notas do v5.2.0 não foi aberto e nenhuma claim cita 1.2.2 ou 1.2.3 no trestle."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 2 [compliance-trestle], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação; medição pela API do GitHub declarada pelo agente"
+      locality: "host"
+
+  - id: E_OBJECAO_03_TRESTLE_IMPLICIT_IS_NOT_END_TO_END
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 3 [compliance-trestle], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): 'implicitly supports all OSCAL schemas' no modelo de objetos não mostra geração nem validação de ponta a ponta de AR e POA&M."
+    narrative: "A própria claim reconhece que a página não nomeia AR nem POA&M. Superação não achada: não há quote do trestle com AR ou POA&M nomeados; oscal-compass.dev foi lido só na página inicial."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 3 [compliance-trestle], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 5 [scf-erl], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o veto a derivado não diz se pendurar ids SCF/ERL (ex.: E-GOV-01) como source_norm e publicar o grafo nas portas públicas é 'derivative SCF content'; a claim não sustenta o ERL como base, no máximo citar por ponteiro, e sem prova."
+    narrative: "A rejeitada mostra que a proibição inclui IA. Critério: kg-corpus-grep.sh source_norm (0 nós). Superação não achada: nenhuma claim abre a licença do conteúdo NIST, e usnistgov/OSCAL devolve license NOASSERTION pela API."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 5 [scf-erl], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_05_CCM_FORMATS_UNANCHORED_197_VS_207
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 6 [csa-caiq-ccm], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a claim prova a versão do CCM, mas os formatos publicados (JSON, YAML, OSCAL) e a versão do CAIQ caíram sem quote, e a própria CSA se contradiz (197 objetivos numa página, 207 controles na do v4.1)."
+    narrative: "Critério: curl da página research/cloud-controls-matrix e grep por '197 control objectives', 'Mappings (JSON/YAML)' e 'Version 4.1 of the CCM and CAIQ'. Superação não achada: o bundle legível por máquina é de 3 de junho de 2024, anterior à v4.1, sem versão nem licença."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 6 [csa-caiq-ccm], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_06_OCSF_ABSENCE_NOT_IN_QUOTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 7 [ocsf], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a quote da Compliance Finding só lista frameworks; 'não é vocabulário de frescor' é ausência que ela não sustenta, e a evidência de LOG não é tratada por nenhuma claim ancorada."
+    narrative: "Superação ACHADA (classe entrega): a leitura crua do objeto evidences (33 atributos, nenhum de cadência ou retenção) mais a 1.9.0 como Latest de 2026-08-03 entregam 'formato de achado, não vocabulário'; NÃO entregam a parte de log. Ver C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 7 [ocsf], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_07_PROBO_QUOTE_LACKS_POSTGRES_MIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 14 [probo-compai], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a quote do Probo ('Run it on your own infrastructure with Docker.') só prova o autohospedável; PostgreSQL e MIT não estão no trecho, vêm só do locator."
+    narrative: "Superação ACHADA (classe entrega): licença MIT e imagem postgres no compose.yaml medidas direto no repo. Ver C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 14 [probo-compai], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_08_COMPAI_QUOTE_LACKS_POSTGRES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 15 [probo-compai], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a quote do Comp AI só prova o Redis Upstash; Postgres, Prisma e DATABASE_URL vêm do locator, sem trecho citado."
+    narrative: "Superação ACHADA (classe entrega): três schema.prisma com provider postgresql no repo. Ver C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a claim 15 [probo-compai], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a afirmação da pesquisa do adotante [fedramp-20x] (estado validado nos últimos 7 dias como base de cadência do radar), critério E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): os '7 dias' do FedRAMP 20x (FRC-APP-FCP) valem para o pacote de certificação INICIAL, não são cadência recorrente; a recorrente é CPO-CSX-CPM, por classe. Nada ancora o radar no FedRAMP nesta rodada."
+    narrative: "Todas as seis claims do FedRAMP foram REBAIXADAS. O verificador mediu no JSON oficial: FRC-APP-FCP diz 'fresh initial FedRAMP Certification Package ... within the previous 7 days'; CPO-CSX-CPM tem a=months/3 SHOULD, b=months/1, c=weeks/2, d=weeks/1 (MUST). Critério: curl do fedramp-consolidated-rules.json e grep -o 'fresh initial FedRAMP Certification Package'. Superação não achada (classe nenhuma): CPO-CSX-CPM como modelo do campo frequency é peça em cura, precisa de reancoragem com quote e locator antes de servir de base."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a afirmação [fedramp-20x] dos 7 dias, critério E1_EVIDENCIA_CONTRARIA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a lacuna oscal-releases (métodos, relevant-evidence e subjects como base de oscal_method e location), critério E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): as cinco claims do OSCAL caíram; sem ancoragem, oscal_method (EXAMINE/INTERVIEW/TEST) não pode ser selado sobre esta rodada. 'location como ponteiro' é o caminho primário, não o único, e 'acceptance' não existe no OSCAL."
+    narrative: "O verificador VIU o texto dos métodos no reference v1.2.3, mas sem quote/locator. href é [0 or 1], description é [1], e o back-matter aceita conteúdo base64 embutido. Critério: kg-corpus-grep.sh oscal_method evidence_type claim_class owner_role (0 nós) e nenhuma claim ancorada com answersGap=oscal-releases. Superação não achada (classe nenhuma): o texto dos métodos precisa ser reaberto com locator verbatim."
+    trace: "journal do run wf_25b440d5-1f7"
+    provenance:
+      source: "journal do run wf_25b440d5-1f7 (resposta do Elenxo)"
+      locator: "objeção contra a lacuna oscal-releases, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  # ─── SUPERAÇÕES achadas (18; SAC-151) ───────────────────────────────────────────────────────
+
+  - id: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "relevant-evidence no OSCAL é description obrigatória + href opcional (URL, relativa ou #uuid de back-matter), e o back-matter aceita rlink ou base64: justifica location como ponteiro PRIMÁRIO sem afirmar que conteúdo é excluído."
+    narrative: "Alvo reprovado: a claim [oscal-releases] 'relevant-evidence é evidência por referência e não por conteúdo' (EXAGERADA). Medida: texto extraído do JSON reference v1.2.3 (posição ~687143 para relevant-evidence; trecho de Resource/base64 no back-matter): 'href uri-reference [0 or 1]', 'description markup-multiline [1]', 'directly included ... using base64 encoding or may point to one or more equivalent internet resources'. Critério A2_CLAIM_ESTICA."
+    trace: "curl -sL https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/ | sed 's/<[^>]*>/ /g' | tr -s ' \\n' ' ' | grep -o 'relevant-evidence array.\\{0,900\\}' ; depois grep -o 'may be directly included in the document using base64 encoding'"
+
+  - id: C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "TEST e EXAMINE operam sobre assessment objects e INTERVIEW sobre pessoas; acceptance é extensão do core, sem lastro no NIST, a declarar como cunhagem do Onion."
+    narrative: "Alvo reprovado: a claim [oscal-releases] 'EXAMINE/INTERVIEW/TEST como processos sobre assessment objects; TEST compara real com esperado, o que justifica acceptance' (EXAGERADA). Medida: texto extraído do JSON reference v1.2.3, posições ~119293 e ~500392: definições verbatim dos três métodos; contagem de 'acceptance' = 0. Critério A2_CLAIM_ESTICA."
+    trace: "curl -sL https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/ | sed 's/<[^>]*>/ /g' | tr -s ' \\n' ' ' | grep -o 'INTERVIEW : The process of holding.\\{0,520\\}' | head -1 ; e grep -c 'acceptance' (0)"
+
+  - id: C_SUPERACAO_20261021_OSCAL_OBSERVATION_VS_ASSESSMENT_SUBJECT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "Observation (página de conceitos) e observation > subjects (JSON reference) são coisas distintas de Assessment Subject (elemento de topo); o modelo de evidência se apoia nos dois primeiros sem confundi-los com o terceiro."
+    narrative: "Alvo reprovado: a claim [oscal-releases] 'Observation é o contêiner de evidência; subjects identifica os elementos em escopo' (EXAGERADA). Medida: nos dois documentos baixados, a página de conceitos tem 'Observation' e 'Assessment Subject' como entradas separadas; o JSON reference tem 'Identifies the Subject' (observation) e 'Subject of Assessment' (resultado/plano). Critério A2_CLAIM_ESTICA."
+    trace: "curl -sL https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/assessment-results/ | sed 's/<[^>]*>/ /g' | tr -s ' \\n' ' ' | grep -o 'Assessment Subject : .\\{0,140\\}' ; e grep -c 'subjects' na mesma página (0)"
+
+  - id: C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e 'stable (maintenance mode)' para v4 no README, entregam juntos o fato da versão e das trilhas."
+    narrative: "Alvo reprovado: a claim [compliance-trestle] 'a versão mais recente é a v5.2.0, de 2026-10-05; v5 ativa e v4 em manutenção' (EXAGERADA: a quote era glosa do leitor). Medida: WebFetch das duas páginas em 2026-10-21; a tabela de releases mostrou v5.2.0 como Latest e o README mostrou os rótulos de trilha. Critério A1_QUOTE_AUSENTE."
+    trace: "WebFetch https://github.com/oscal-compass/compliance-trestle/releases e grep -F 'Latest release: v5.2.0 (2026-10-05), notes header reads v5.2.0 (2026-10-05)' (0 ocorrências; o texto real é 'v5.2.0 (2026-10-05)' com o selo Latest)"
+
+  - id: C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O trestle impõe schema aos documentos OSCAL que gerencia; isso entrega 'schema garantido' sem as inferências de que valida a exportação do grafo ou de que não valida semântica de evidência e vencimento."
+    narrative: "Alvo reprovado: a claim [compliance-trestle] 'garante schema, viável como validador de exportação do grafo, mas não valida semântica' (EXAGERADA). Medida: leitura da lista de três capacidades no README e na página inicial da documentação em 2026-10-21; a lista não cita semântica, evidência, vencimento nem grafo. Critério A2_CLAIM_ESTICA."
+    trace: "WebFetch https://oscal-compass.dev/compliance-trestle/latest/ e grep -iE 'semantic|evidence|expir|graph' no texto da página inicial e do README"
+
+  - id: C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de download aparece desatualizada. A versão corrente em si segue não verificada (exige o GitHub)."
+    narrative: "Alvo reprovado: a claim [scf-erl] 'download cita 2026.2 sem rótulo; a 2026.2 da pesquisa é compatível' (EXAGERADA). Medida: dois WebFetch independentes, scf-download (2026.2 única, sem rótulo de corrente, 0x '2026.3') e evidence-request-list-erl (SCF Control Mappings em 2026.3 e Legacy SCF Control Mappings pré-2026.3). Critério A2_CLAIM_ESTICA."
+    trace: "WebFetch https://securecontrolsframework.com/free-content/evidence-request-list-erl e procurar '2026.3'; WebFetch https://securecontrolsframework.com/scf-download/ e procurar '2026.3' (0) e 'With the 2026.2 release' (1)"
+
+  - id: C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A página do SCF declara: proibição de distribuir derivado, IA incluída na proibição de CRIAR derivados e licença comercial para oferecer; 'produzir e reproduzir sem Share' vem só do texto-base da CC BY-ND. Uso interno não é tratado."
+    narrative: "Alvo reprovado: a claim [scf-erl] 'derivados podem ser feitos para uso próprio mas não distribuídos' (EXAGERADA). Medida: dois WebFetch em terms-conditions, o segundo com pergunta específica sobre uso interno; a página não aborda uso interno e não diz se a proibição da IA cobre uso não distribuído. Critério A2_CLAIM_ESTICA. Pesa contra o core gerar vocabulário a partir do ERL com IA, mesmo sem distribuir."
+    trace: "WebFetch https://securecontrolsframework.com/terms-conditions/ e procurar 'internal', 'own use' e 'personal use' (0 declarações de uso próprio)"
+
+  - id: C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "CSA: 'You do not need a license if you are using the CCM for internal purposes' e 'A CCM license allows organizations to customize the CCM or use it for commercial purposes': a regra de uso por tipo, sem o salto de 'livre' e 'exige'."
+    narrative: "Alvo reprovado: a claim [csa-caiq-ccm] 'licença livre para uso interno; personalizar ou usar comercialmente exige licença' (EXAGERADA). Medida: WebFetch de research/cloud-controls-matrix devolveu as duas frases literais; as páginas do v4.1 e do bundle não declaram licença. Critério A2_CLAIM_ESTICA. Para o core (portas públicas), citar ids do CCM como source_norm segue sem resposta."
+    trace: "WebFetch https://cloudsecurityalliance.org/research/cloud-controls-matrix e localizar as duas frases; conferir que nenhuma contém 'require' nem 'free'"
+
+  - id: C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "FRD-PER (definição + nota) mais o teto estruturado do CPO-CSX-CPM: 'persistente' PODE variar e ser irregular, mas repete em ciclos com intervalo máximo por classe. O radar trata vencimento como estado sempre conhecido, com teto."
+    narrative: "Alvo reprovado: a claim [fedramp-20x] 'persistentemente é definido como NÃO contínuo e NÃO regular; não cron rígido' (EXAGERADA). Medida: linhas 839-840 do fedramp-consolidated-rules.json (versão 2026.10.13.01) com grep -F nas quotes (1 ocorrência cada); o CPO-CSX-CPM, com timeframe_num estruturado, dá o teto de intervalo. Critério A2_CLAIM_ESTICA. É o candidato mais forte a modelo do campo frequency, mas pende de reancoragem."
+    trace: "curl -sL https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json | sed -n 839,840p"
+
+  - id: C_SUPERACAO_20261021_FEDRAMP_20X_DATES_ESTIMATED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "O fedramp.gov/20x ressalva que datas futuras são estimativas ('not firm commitments'): o fim de novas certificações Rev5 em 11/06/2027 é a Phase 5 estimada, não fato firme; a emenda de SDR-CSX-KMT de 2026-10-08 confere."
+    narrative: "Alvo reprovado: a claim [fedramp-20x] 'Rev5 deixa de aceitar novas certificações em 2027' como fato firme (EXAGERADA). Medida: a página reaberta duas vezes via WebFetch confirmou a quote, a data e o disclaimer; o JSON confirmou o updated[0] 2026-10-08 de SDR-CSX-KMT. Critério A2_CLAIM_ESTICA."
+    trace: "WebFetch https://www.fedramp.gov/20x/ e localizar 'Future dates are estimates for public awareness, not firm commitments' junto da entrada Phase 5 com 'June 11, 2027'"
+
+  - id: C_SUPERACAO_20261021_OCSF_EVIDENCES_NO_FRESHNESS_FIELDS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "No OCSF 1.9.0, evidences da Compliance Finding é um array de artefatos (33 atributos) sem frescor, dono nem retenção: o OCSF não serve de base para o frescor da evidência."
+    narrative: "Alvo reprovado: a claim [ocsf] 'evidences substitui o evidence obsoleto e não traz periodicidade, vencimento, dono ou retenção' (EXAGERADA na cláusula da substituição). Medida: JSON cru de compliance_finding (descrição de evidences igual em 1.5.0, 1.7.0, 1.8.0 e 1.9.0) e do objeto evidences (33 atributos, 0 casando freq/due/owner/retent/expir/valid/period). Critério A2_CLAIM_ESTICA."
+    trace: "curl -sL https://schema.ocsf.io/api/1.9.0/classes/compliance_finding | python3 -I -c \"import json,sys;a=json.load(sys.stdin)['attributes'];print(a.get('evidence'),a['evidences']['description'])\" ; e grep -ic supersedes (0)"
+
+  - id: C_SUPERACAO_20261021_CYCLONEDX_JUSTIFICATION_IS_SHOULD
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "No CycloneDX 1.7, 'Justification should be specified' para not_affected é recomendação, sem required, allOf nem if no objeto analysis: o uso pretendido sem inflar o verbo."
+    narrative: "Alvo reprovado: a claim [cyclonedx-vex] 'not_affected exige justification' (EXAGERADA). Medida no schema 1.7 baixado: analysis não tem required, allOf nem if; a única menção é a descrição do meta:enum, com 'should' (linha 2695). Critério A2_CLAIM_ESTICA. VEX é vocabulário de exploitabilidade, não de vencimento."
+    trace: "curl -sL https://raw.githubusercontent.com/CycloneDX/specification/master/schema/bom-1.7.schema.json | python3 -I -c \"import json,sys;s=json.load(sys.stdin);a=s['definitions']['vulnerability']['properties']['analysis'];print('required' in a,'allOf' in a,'if' in a)\" ; e grep -n 'Justification should be specified'"
+
+  - id: C_SUPERACAO_20261021_LULA_THREE_CHALLENGES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O README do Lula lista TRÊS desafios da v1 (complexidade do OSCAL, testes automatizados insuficientes, colaboração e revisão difíceis); a v1 está em maintenance mode e a v2 ainda importa OSCAL."
+    narrative: "Alvo reprovado: a claim [lula] 'o motivo declarado do abandono é a complexidade do OSCAL' (EXAGERADA). Medida: cat -n do README, linhas 68-78, e grep -n -i oscal (linhas 8, 63, 68, 72, 78, 402, 403). Critério A2_CLAIM_ESTICA. Para o Onion, o segundo motivo (teste automatizado não basta) é o argumento para EXAMINE e INTERVIEW conviverem com TEST."
+    trace: "curl -sL https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md | sed -n 66,75p"
+
+  - id: C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "intuitem.com/pricing confirma plano pago do CISO Assistant (Community, Pro SaaS a 39 euros por contribuidor por mês, Pro On-premises, Custom), sem plano Enterprise."
+    narrative: "Alvo reprovado: a claim [ciso-assistant] 'edição Pro/Enterprise com preço por assento de contribuidor' (EXAGERADA). Medida: WebFetch de intuitem.com/pricing em 2026-10-21; a quote da página do produto só fala de assentos de contribuidor, sem valor nem Enterprise. Critério A2_CLAIM_ESTICA. Sinal de mercado: o open-core de GRC monetiza por assento de quem edita."
+    trace: "WebFetch https://intuitem.com/ciso-assistant (quote sem valor nem 'Enterprise'); WebFetch https://intuitem.com/pricing (Community/Pro SaaS/Pro On-premises/Custom)"
+
+  - id: C_SUPERACAO_20261021_MARKET_CAPITAL_AGGREGATOR_ONLY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Capital em GRC open-source, só por agregador secundário: Comp AI levantou 34M em 2026-09-17 (Roo Capital, Grand Ventures; digg) e o Probo tem 500K de pré-seed com Y Combinator (vcbacked)."
+    narrative: "Alvo reprovado: a claim [probo-compai] de capital (EXAGERADA: 2,6M, OSS Capital e 'sem YC' não têm fonte aberta; seedtable deu 403). Medida: WebFetch de digg.com/ai/087n795v (sentença literal dos 34M) e de vcbacked.co/company/probo ('$500K ... Pre-Seed', YC). Critério A2_CLAIM_ESTICA. Eixo mercado/capital é invariante: o sinal é capital fluindo para GRC com estado em banco relacional, o oposto do desenho do Onion. Tier baixo, não serve de base."
+    trace: "WebFetch https://digg.com/ai/087n795v e grep -F 'Comp AI announced on September 17, 2026'; WebFetch https://seedtable.com/companies/comp-ai (HTTP 403)"
+
+  - id: C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A leitura crua do objeto evidences do OCSF 1.9.0 (33 atributos, nenhum de cadência ou retenção) e a 1.9.0 como Latest de 2026-08-03 entregam 'formato de achado, não vocabulário'; a evidência de log segue aberta."
+    narrative: "Alvo reprovado: claim 7 [ocsf] (objeção E_OBJECAO_06_OCSF_ABSENCE_NOT_IN_QUOTE). Medida: o verificador contou 33 atributos (data, file, process, query, resources, verdict e outros) e nenhum de cadência ou retenção; o Elenxo mediu gh api repos/ocsf/ocsf-schema/releases/latest = 1.9.0 de 2026-08-03T14:39:07Z. Critério E2_PROVA_MENOS."
+    trace: "curl -s https://schema.ocsf.io/api/1.9.0/objects/evidences | jq '.attributes|keys'"
+
+  - id: C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "Licença e banco do Probo medidos direto no repo: spdx MIT pela API e imagem postgres na linha 3 do compose.yaml."
+    narrative: "Alvo reprovado: claim 14 [probo-compai] (objeção E_OBJECAO_07_PROBO_QUOTE_LACKS_POSTGRES_MIT). Medida: gh api repos/getprobo/probo --jq .license.spdx_id = MIT; gh api repos/getprobo/probo/contents/compose.yaml, decodificado, tem na linha 3 a imagem postgres@sha256:52e6ffd1... Critério E2_PROVA_MENOS."
+    trace: "gh api repos/getprobo/probo --jq .license.spdx_id ; gh api repos/getprobo/probo/contents/compose.yaml"
+
+  - id: C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "Schema Prisma com provider postgresql no repo do Comp AI, em três pacotes (db, api e app), com pacotes db e kv: o Postgres está medido, não só no locator."
+    narrative: "Alvo reprovado: claim 15 [probo-compai] (objeção E_OBJECAO_08_COMPAI_QUOTE_LACKS_POSTGRES). Medida: gh api search/code com provider postgresql, repo trycompai/comp e extensão prisma devolve packages/db/prisma/schema.prisma, apps/api/prisma/schema/schema.prisma e apps/app/prisma/schema/schema.prisma. Critério E2_PROVA_MENOS."
+    trace: "gh api 'search/code?q=provider+postgresql+repo:trycompai/comp+extension:prisma'"
+
+  # ─── Decisões OPEN para o /meta:decide (5) — o escritor NÃO sela ───────────────────────────
+
+  - id: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA: selar 'grafo YAML em git é o armazenamento, OSCAL é formato de borda (importação/exportação)'? (a) selar agora sobre o sinal Lula + três bancos relacionais, ou (b) pesquisar mais fornecedores antes, ou (c) não selar."
+    narrative: "Pergunta (i) do Elenxo. A favor: Lula v2 saiu do OSCAL como armazenamento para YAML em Git (E_LULA_V2_STORAGE_YAML_IN_GIT) e mantém OSCAL na importação; CISO Assistant, Probo e Comp AI guardam estado em banco relacional próprio, nenhum em OSCAL. OCSF 2003 é alvo de exportação de achado. Contra selar já: o apoio ao desenho git-nativo vem de UM fornecedor (49 estrelas), sinal fraco; os três relacionais só mostram que o OSCAL não é o armazenamento, não que o grafo em git seja o certo. Implicação de (a): destrava escrever o item 1 como campos do grafo e a exportação OSCAL como borda. Implicação de (b): /onion-research em modo decision sobre armazenamento de evidência."
+    trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (i); pedido do usuário 'traga no decide'"
+
+  - id: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA: (a) rodar uma reancoragem do OSCAL v1.2.3 (methods, relevant-evidence) e do FedRAMP CPO-CSX-CPM antes de escrever os itens 1 e 2, ou (b) escrever já, com oscal_method e frequency declarados como cunhagem do Onion até a reancoragem?"
+    narrative: "Pergunta (ii) do Elenxo. Base: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED (as cinco claims do OSCAL caíram, o verificador VIU o texto sem quote) e E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY (os 7 dias são do pacote inicial; a cadência recorrente CPO-CSX-CPM varia por classe). As superações C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING e C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY já trazem os comandos de reancoragem. Medido no core: o radar NÃO tem cadência por nó (E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE), então o item 2 é leitor novo. Custo de (a): uma rodada curta de primárias com 2 chaves (referência: ~42k tokens por nó na rodada de 2026-09-13). Risco de (b): escrever o vocabulário sobre texto não ancorado, o que a casa chama de declarado igual a verificado."
+    trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (ii); pedido do usuário 'traga no decide'"
+
+  - id: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "DECISÃO ABERTA: SCF/ERL fora da base por licença; qual norma alimenta source_norm? (a) NIST SP 800-53/OSCAL depois de medir a licença, ou (b) CCM v4.1 da CSA, ou (c) source_norm só como ponteiro opaco (id + URL), sem catálogo no core?"
+    narrative: "Pergunta (iii) do Elenxo. Base: E_SCF_LICENSE_CC_BY_ND_ATTRIBUTION e E_SCF_DERIVATIVE_NEEDS_COMMERCIAL_LICENSE (derivado só com licença comercial; a proibição de criar derivados inclui IA). Restrição: E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED (não se sabe se id como ponteiro é derivado). Alternativas sem licença medida: usnistgov/OSCAL devolve NOASSERTION pela API; o CCM permite uso interno sem licença e exige licença CCM para customizar ou usar comercialmente (C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE). As portas públicas (onion-core, onion-standalone, onion-plugins) tornam o 'uso interno' do core discutível."
+    trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (iii); pedido do usuário 'traga no decide'"
+
+  - id: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA: como dividir o vocabulário de evidência entre o contrato kg-ssot e o core/hub? Opções vizinhas: C_OPCAO_A (neutros no contrato), C_OPCAO_B (tudo x_ no core até o hub provar), C_OPCAO_C (tudo no contrato)."
+    narrative: "Pergunta (iv) do Elenxo, que é inferência de desenho e não evidência da rodada. Medido no core (E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM): o nó do contrato v4 tem 22 chaves fechadas, com owner já presente; qualquer campo novo sem x_ reprova no MUST, e provenance tem chaves fechadas no SHOULD. Medido também (E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE): o radar compara verified_at com a baseline do grafo, não com uma cadência do nó. Restrição de licença: CISO Assistant e Comp AI são AGPL no núcleo, então o core pode tomar ideia e vocabulário, não código. O leitor de vencimento (item 2) fica no kg-radar.sh em qualquer opção; a exportação OSCAL fica com core e hub."
+    trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (iv); pedido do usuário 'traga no decide'"
+
+  - id: C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO A (recomendação do Elenxo): ao contrato kg-ssot os campos neutros (frequency, retention, owner_role sobre owner, location em provenance.locator); ao core e ao hub evidence_type, oscal_method, acceptance, source_norm e claim_class."
+    narrative: "Custo: uma versão nova do contrato (enum de chaves do nó e de provenance), com o ciclo do kg-ssot (vendor, pin, catraca nos adotantes). Destrava: todo adotante, regulado ou não, ganha cadência por nó e o radar de vencimento genérico. Fica gated: os campos de auditoria vivem no core como x_ até um grafo do hub regulado provar o uso. Ressalva medida: owner já existe e location exigiria chave nova em provenance, fechada no SHOULD."
+    trace: "run wf_25b440d5-1f7, recomendação do Elenxo, divisão kg-ssot contra core"
+
+  - id: C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO B: todos os campos nascem no core como x_ (x_frequency, x_evidence_type, x_oscal_method…), o radar do core lê x_frequency, e só o que o hub regulado provar em dogfood sobe ao contrato."
+    narrative: "Custo: nenhum ciclo de contrato agora; o contrato v4 já aceita x_ (medido). Destrava: o item 2 roda no core já, sobre grafos que declarem x_frequency. Fica gated: outros adotantes leem x_ como extensão local, sem garantia de forma; a promoção ao contrato pede uma segunda decisão. Coerente com a postura de acoplar só quando a capacidade é necessária."
+    trace: "derivado de E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM (medição do escritor, 2026-10-21)"
+
+  - id: C_OPCAO_C_ALL_FIELDS_IN_CONTRACT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "OPÇÃO C: todos os nove campos entram no contrato kg-ssot, inclusive os de domínio de auditoria (oscal_method, source_norm, claim_class)."
+    narrative: "Custo: o contrato, neutro de domínio, passa a carregar vocabulário de auditoria e a dependência de uma norma (OSCAL) cuja licença nem foi medida. Destrava: forma única para todos. Contra: o Elenxo propôs o oposto, e oscal_method/acceptance não têm âncora nesta rodada."
+    trace: "derivado da recomendação do Elenxo (alternativa rejeitada por ela), run wf_25b440d5-1f7"
+
+  - id: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "DECISÃO ABERTA: (a) aceitar o compliance-trestle como candidato a validador da exportação OSCAL, condicionado a um dogfood real de trestle validate sobre um AR exportado, ou (b) avaliar antes o oscal-cli do NIST, ou (c) adiar a validação de exportação?"
+    narrative: "Pergunta (v) do Elenxo. A favor: Apache-2.0, compliance as code em CI, schema imposto aos documentos gerenciados (E_TRESTLE_COMPLIANCE_AS_CODE_APACHE2, C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY). Contra: não há prova de AR/POA&M de ponta a ponta (E_OBJECAO_01, E_OBJECAO_03) e declara OSCAL 1.2.1 contra a 1.2.3 vigente (E_OBJECAO_02). Custo de (a): um dogfood com Python e a dependência do trestle. O oscal-cli não foi aberto nesta rodada."
+    trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (v); pedido do usuário 'traga no decide'"
+
+edges:
+  # decisões nascem da pergunta
+  - from: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+  - from: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+  - from: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+  - from: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+  - from: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+  - from: E_CORE_CORPUS_ZERO_AUDIT_EVIDENCE_VOCAB
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+
+  # D (i) armazenamento = grafo, OSCAL = borda
+  - from: E_LULA_V2_BUILT_AFTER_OSCAL_LIMITATIONS
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+  - from: E_LULA_V2_STORAGE_YAML_IN_GIT
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+  - from: E_LULA_V2_OSCAL_ONLY_ON_CATALOG_IMPORT
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+  - from: E_CISO_ASSISTANT_STATE_SQLITE_OR_POSTGRES
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+  - from: E_PROBO_SELF_HOSTED_POSTGRES_MIT
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+  - from: E_COMPAI_STATE_POSTGRES_PLUS_REDIS
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+  - from: E_OCSF_COMPLIANCE_FINDING_IS_FINDING_FORMAT
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+  - from: E_OCSF_FINDINGS_CATEGORY_CLASS_2003
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+
+  # D (ii) reancorar antes
+  - from: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: SUPPORTS
+  - from: E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: CONSTRAINS
+
+  # D (iii) norma de origem
+  - from: E_SCF_LICENSE_CC_BY_ND_ATTRIBUTION
+    to: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    edge_type: SUPPORTS
+  - from: E_SCF_DERIVATIVE_NEEDS_COMMERCIAL_LICENSE
+    to: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    edge_type: SUPPORTS
+  - from: E_CSA_CCM_V4_1_207_CONTROLS_17_DOMAINS
+    to: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED
+    to: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    edge_type: CONSTRAINS
+
+  # D (iv) divisão contrato/core
+  - from: C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT
+    to: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST
+    to: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    edge_type: SUPPORTS
+  - from: C_OPCAO_C_ALL_FIELDS_IN_CONTRACT
+    to: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    edge_type: SUPPORTS
+  - from: E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM
+    to: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    edge_type: SUPPORTS
+  - from: E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM
+    to: C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST
+    edge_type: SUPPORTS
+  - from: E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM
+    to: C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT
+    edge_type: CONSTRAINS
+  - from: E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE
+    to: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    edge_type: SUPPORTS
+  - from: E_CISO_ASSISTANT_AGPL_PLUS_ENTERPRISE_DIR
+    to: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    edge_type: CONSTRAINS
+  - from: E_COMPAI_OPEN_CORE_AGPL_EE_COMMERCIAL
+    to: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED
+    to: C_OPCAO_C_ALL_FIELDS_IN_CONTRACT
+    edge_type: CONSTRAINS
+
+  # D (v) trestle
+  - from: E_TRESTLE_COMPLIANCE_AS_CODE_APACHE2
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: SUPPORTS
+  - from: E_TRESTLE_V5_SUPPORTS_OSCAL_1_2_1
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: SUPPORTS
+  - from: E_TRESTLE_IMPLICIT_ALL_OSCAL_SCHEMAS
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: SUPPORTS
+
+  # objeções sobreviventes limitam os alvos
+  - from: E_OBJECAO_01_TRESTLE_AR_POAM_VALIDATION_UNPROVEN
+    to: E_TRESTLE_COMPLIANCE_AS_CODE_APACHE2
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_TRESTLE_DECLARES_1_2_1_NOT_1_2_3
+    to: E_TRESTLE_V5_SUPPORTS_OSCAL_1_2_1
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_03_TRESTLE_IMPLICIT_IS_NOT_END_TO_END
+    to: E_TRESTLE_IMPLICIT_ALL_OSCAL_SCHEMAS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_01_TRESTLE_AR_POAM_VALIDATION_UNPROVEN
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED
+    to: E_SCF_DERIVATIVE_NEEDS_COMMERCIAL_LICENSE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_CCM_FORMATS_UNANCHORED_197_VS_207
+    to: E_CSA_CCM_V4_1_207_CONTROLS_17_DOMAINS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_OCSF_ABSENCE_NOT_IN_QUOTE
+    to: E_OCSF_COMPLIANCE_FINDING_IS_FINDING_FORMAT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_PROBO_QUOTE_LACKS_POSTGRES_MIT
+    to: E_PROBO_SELF_HOSTED_POSTGRES_MIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_08_COMPAI_QUOTE_LACKS_POSTGRES
+    to: E_COMPAI_STATE_POSTGRES_PLUS_REDIS
+    edge_type: CONSTRAINS
+
+  # superações rastreiam o nó que registra a reprovação
+  - from: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OSCAL_OBSERVATION_VS_ASSESSMENT_SUBJECT
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_FEDRAMP_20X_DATES_ESTIMATED
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OCSF_EVIDENCES_NO_FRESHNESS_FIELDS
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_CYCLONEDX_JUSTIFICATION_IS_SHOULD
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_LULA_THREE_CHALLENGES
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_MARKET_CAPITAL_AGGREGATOR_ONLY
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES
+    to: E_OBJECAO_06_OCSF_ABSENCE_NOT_IN_QUOTE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED
+    to: E_OBJECAO_07_PROBO_QUOTE_LACKS_POSTGRES_MIT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED
+    to: E_OBJECAO_08_COMPAI_QUOTE_LACKS_POSTGRES
+    edge_type: TRACES_TO
+
+  # superações que sustentam decisões
+  - from: C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED
+    to: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE
+    to: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_LULA_THREE_CHALLENGES
+    to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
