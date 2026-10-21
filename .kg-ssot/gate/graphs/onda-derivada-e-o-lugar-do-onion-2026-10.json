@@ -1,0 +1,11 @@
+{
+  "graph": "docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml",
+  "id": "onda-derivada-e-o-lugar-do-onion-2026-10",
+  "must": [
+    "form.required.node.provenance"
+  ],
+  "should": {
+    "form.range.node.label": 41,
+    "yaml.unquoted-date": 1
+  }
+}

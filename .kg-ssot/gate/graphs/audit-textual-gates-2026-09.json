@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml",
+  "id": "audit-textual-gates-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 24
+  }
+}

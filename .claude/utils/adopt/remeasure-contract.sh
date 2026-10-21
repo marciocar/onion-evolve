@@ -17,7 +17,7 @@
 # propostas arquivadas do kg-inbox (`_rejected/`, `_sealed/`). Esta última é a POLÍTICA DE CORPUS DO CORE (história,
 # não grafo vivo), não necessariamente a do gate do alvo: um `kg_gate.py` rodado no alvo sem `--exclude` veria também
 # os arquivados. A saída imprime os excluídos, para quem compara saber com o quê. A medição é ABSOLUTA: a linha de
-# base do alvo (`.kg-ssot/gate.json`), se existir, só é lida para dizer quanto dela é dívida travada — dívida travada
+# base do alvo (`.kg-ssot/gate/`, ou o `.kg-ssot/gate.json` de antes da 4.16.0), se existir, só é lida para dizer quanto dela é dívida travada — dívida travada
 # continua sendo dívida.
 #
 # USO  : remeasure-contract.sh <TARGET> [--exclude GLOB]...   (cole stdout E stderr: `2>&1`)

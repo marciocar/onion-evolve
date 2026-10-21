@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml",
+  "id": "distribuicao-metodo-vivo-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 55
+  }
+}

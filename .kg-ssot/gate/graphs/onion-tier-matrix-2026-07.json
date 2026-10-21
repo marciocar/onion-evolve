@@ -1,0 +1,11 @@
+{
+  "graph": "docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml",
+  "id": "onion-tier-matrix-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 4,
+    "form.required.node.verified_at": 1,
+    "integrity.untraced-decision": 3,
+    "yaml.unquoted-date": 1
+  }
+}

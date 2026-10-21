@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/perception-instruments-2026-07.kg.yaml",
+  "id": "perception-instruments-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 9,
+    "yaml.unquoted-date": 1
+  }
+}

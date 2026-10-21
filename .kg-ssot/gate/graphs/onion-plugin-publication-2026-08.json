@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml",
+  "id": "onion-plugin-publication-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 18
+  }
+}

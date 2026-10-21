@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/d5-pricing-2026-07.kg.yaml",
+  "id": "d5-pricing-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 14,
+    "yaml.unquoted-date": 1
+  }
+}

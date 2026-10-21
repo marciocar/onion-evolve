@@ -159,13 +159,13 @@ fora de manifesto, pasta desconhecida.
 ## `kg_gate.py`: a catraca por grafo
 
 O gate é para o CI de um repositório que guarda grafos. Ele mede todos os `.kg.yaml` **rastreados pelo git** e
-compara com uma linha de base (`.kg-ssot/gate.json`). A regra: **nada piora**. Um grafo que já reprovava fica
+compara com uma linha de base (a pasta `.kg-ssot/gate/`). A regra: **nada piora**. Um grafo que já reprovava fica
 registrado como dívida herdada; um grafo novo tem de passar.
 
 Sem base, o gate se recusa:
 
 ```text
-GATE QUEBRADO  linha de base ausente (.kg-ssot/gate.json): grave a primeira com --update
+GATE QUEBRADO  linha de base ausente (.kg-ssot/gate): grave a primeira com --update
 ```
 
 rc 2. A primeira base:
@@ -179,7 +179,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
   SHOULD form.required.node.verified_against: 1 grafo
   SHOULD integrity.untraced-decision: 1 grafo
   SHOULD yaml.unquoted-date: 1 grafo
-linha de base gravada: .kg-ssot/gate.json (2 grafos, 1 na dívida herdada)
+linha de base gravada: .kg-ssot/gate (2 grafos, 1 na dívida herdada)
 ```
 
 Um grafo novo que reprova, depois de `git add`:

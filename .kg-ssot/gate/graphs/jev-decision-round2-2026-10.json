@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml",
+  "id": "jev-decision-round2-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 33
+  }
+}

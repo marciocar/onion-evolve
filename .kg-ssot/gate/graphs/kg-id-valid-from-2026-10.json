@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml",
+  "id": "kg-id-valid-from-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 6
+  }
+}

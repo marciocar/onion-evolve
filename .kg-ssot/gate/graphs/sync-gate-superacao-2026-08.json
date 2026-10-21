@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml",
+  "id": "sync-gate-superacao-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 2
+  }
+}

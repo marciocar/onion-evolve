@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml",
+  "id": "plugin-mcp-posture-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 31
+  }
+}

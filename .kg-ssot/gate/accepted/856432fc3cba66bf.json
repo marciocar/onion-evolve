@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-09",
+  "reason": "adoção do contrato v4.1.0 (7543bdf0fdd8): nenhum MUST muda; SHOULD novos medidos no corpus (verified_against 16, testimony-in-prod 34, untraced-decision 19, verified-before-fact 0 grafos); a dívida queima pelas ondas 2-3 do SAC-73",
+  "worse": [
+    "✗ PIOROU  debt.form.required.node.verified_against: 0 → 16",
+    "✗ PIOROU  debt.integrity.testimony-in-prod: 0 → 34",
+    "✗ PIOROU  debt.integrity.untraced-decision: 0 → 19"
+  ]
+}

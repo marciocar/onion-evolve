@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml",
+  "id": "onion-market-kg-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 35,
+    "yaml.unquoted-date": 1
+  }
+}

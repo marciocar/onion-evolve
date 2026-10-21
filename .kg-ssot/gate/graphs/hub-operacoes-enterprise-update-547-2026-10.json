@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml",
+  "id": "hub-operacoes-enterprise-update-547-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 7
+  }
+}

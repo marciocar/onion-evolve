@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/fios-abertos.kg.yaml",
+  "id": "fios-abertos",
+  "must": [],
+  "should": {
+    "form.range.node.label": 15,
+    "integrity.untraced-decision": 2
+  }
+}

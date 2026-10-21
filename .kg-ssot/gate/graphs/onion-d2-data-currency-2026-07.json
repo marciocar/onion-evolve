@@ -1,0 +1,10 @@
+{
+  "graph": "docs/evolution/research/onion-d2-data-currency-2026-07/onion-d2-data-currency-2026-07.kg.yaml",
+  "id": "onion-d2-data-currency-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 2,
+    "integrity.untraced-decision": 1,
+    "yaml.unquoted-date": 1
+  }
+}

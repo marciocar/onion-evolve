@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml",
+  "id": "relay-gustavo-pulga-triage-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 4,
+    "yaml.unquoted-date": 1
+  }
+}

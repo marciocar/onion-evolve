@@ -50,7 +50,9 @@ A lista completa, com a forma de cada código, está em
 
 | Sintoma | Causa | O que fazer |
 |---|---|---|
-| `GATE QUEBRADO  linha de base ausente` | Não há `.kg-ssot/gate.json` | `kg_gate.py --update` e commit da base |
+| `GATE QUEBRADO  linha de base ausente` | Não há `.kg-ssot/gate/` (nem o `.kg-ssot/gate.json` de antes da 4.16.0) | `kg_gate.py --update` e commit da base |
+| `· identidade contract_sha256: a base é de …` | A tag nova mudou os schemas, sem veredito trocado | Nada a fazer; grave a identidade nova com `kg_gate.py --update` quando quiser |
+| Conflito de merge em `.kg-ssot/gate.json` | A base de antes da 4.16.0 é um arquivo só | Suba para a 4.16.0 e rode `kg_gate.py --update`: a base vira a pasta, com um registro por grafo |
 | Um grafo novo não aparece na medição | O gate só mede arquivo rastreado | `git add` no grafo |
 | `✗ PIOROU` num grafo que você não tocou | O contrato mudou de tag e o grafo passou a reprovar | Grave a base nova com `--update`; uma piora pede `--accept-regression "<motivo>"` |
 | As fixtures do vendor entraram no corpus | `--no-default-excludes` foi usado | Tire a opção, ou passe `--exclude` |

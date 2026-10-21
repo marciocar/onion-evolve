@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/session-2026-07-18-evolve-review-triage.kg.yaml",
+  "id": "session-2026-07-18-evolve-review-triage",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 7,
+    "yaml.unquoted-date": 1
+  }
+}

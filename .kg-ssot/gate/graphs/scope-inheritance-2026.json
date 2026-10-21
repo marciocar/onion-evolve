@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/scope-inheritance-2026/scope-inheritance-2026.kg.yaml",
+  "id": "scope-inheritance-2026",
+  "must": [],
+  "should": {
+    "yaml.unquoted-date": 1
+  }
+}

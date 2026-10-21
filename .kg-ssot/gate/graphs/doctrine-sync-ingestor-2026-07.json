@@ -1,0 +1,10 @@
+{
+  "graph": "docs/evolution/research/doctrine-sync-ingestor-2026-07/doctrine-sync-ingestor.kg.yaml",
+  "id": "doctrine-sync-ingestor-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 2,
+    "integrity.untraced-decision": 2,
+    "yaml.unquoted-date": 1
+  }
+}

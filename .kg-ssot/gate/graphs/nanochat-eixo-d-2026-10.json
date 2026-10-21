@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml",
+  "id": "nanochat-eixo-d-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 24
+  }
+}

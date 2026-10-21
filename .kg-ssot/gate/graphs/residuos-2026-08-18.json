@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/residuos-2026-08-18.kg.yaml",
+  "id": "residuos-2026-08-18",
+  "must": [],
+  "should": {
+    "yaml.unquoted-date": 1
+  }
+}

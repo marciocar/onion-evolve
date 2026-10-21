@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/telescope-doctrine-2026-07/telescope-doctrine.kg.yaml",
+  "id": "telescope-doctrine-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 6,
+    "yaml.unquoted-date": 1
+  }
+}

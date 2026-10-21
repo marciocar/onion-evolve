@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml",
+  "id": "autonomous-thread-runtime-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 5,
+    "yaml.unquoted-date": 1
+  }
+}

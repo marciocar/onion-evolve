@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/elenxos-2026-08-07.kg.yaml",
+  "id": "elenxos-2026-08-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 21
+  }
+}

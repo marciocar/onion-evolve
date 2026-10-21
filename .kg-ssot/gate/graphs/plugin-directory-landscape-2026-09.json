@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml",
+  "id": "plugin-directory-landscape-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 7
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/forge-comando-framework-2026-09.kg.yaml",
+  "id": "forge-comando-framework-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 6
+  }
+}

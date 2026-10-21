@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml",
+  "id": "company-brain-e-conducao-como-servico-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 47
+  }
+}

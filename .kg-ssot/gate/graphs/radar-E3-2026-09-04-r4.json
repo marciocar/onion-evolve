@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/radar-E3-2026-09-04-r4/radar-E3-2026-09-04-r4.kg.yaml",
+  "id": "radar-E3-2026-09-04-r4",
+  "must": [],
+  "should": {
+    "form.range.node.label": 10
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml",
+  "id": "kg-diagnose-design-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 5,
+    "yaml.unquoted-date": 1
+  }
+}

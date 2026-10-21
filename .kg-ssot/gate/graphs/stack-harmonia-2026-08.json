@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml",
+  "id": "stack-harmonia-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 17,
+    "yaml.unquoted-date": 1
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml",
+  "id": "cedar-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 10
+  }
+}

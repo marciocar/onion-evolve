@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml",
+  "id": "fable-5-1-superacao-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 34
+  }
+}

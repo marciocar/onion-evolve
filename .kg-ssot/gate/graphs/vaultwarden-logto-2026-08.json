@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml",
+  "id": "vaultwarden-logto-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 9,
+    "yaml.unquoted-date": 1
+  }
+}

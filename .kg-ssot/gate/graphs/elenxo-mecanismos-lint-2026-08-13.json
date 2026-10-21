@@ -1,0 +1,11 @@
+{
+  "graph": "docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml",
+  "id": "elenxo-mecanismos-lint-2026-08-13",
+  "must": [
+    "form.unknown-key.meta.run_id"
+  ],
+  "should": {
+    "form.range.node.label": 10,
+    "yaml.unquoted-date": 1
+  }
+}

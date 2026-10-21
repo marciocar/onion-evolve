@@ -5,7 +5,7 @@
 # porque um label de 538 caracteres subiu a dívida SHOULD de um grafo, e a catraca da dívida é do
 # kg_gate.py, que só o passo "Contrato KG-SSOT" do onion-validate.yml rodava. O pr-finalize julgava o
 # commit com o lint e não com o contrato. Copiar a linha do CI para o pr-finalize duplicaria os
-# --exclude, e eles têm de casar com os da base (.kg-ssot/gate.json); por isso os dois chamam este.
+# --exclude, e eles têm de casar com os da base (.kg-ssot/gate/, uma pasta com um registro por grafo desde a kg-ssot 4.16.0); por isso os dois chamam este.
 #
 # Uso: bash ops/kg-gate-ci.sh [args extras do kg_gate.py, como --update]
 #   rc 0 = vendor íntegro e nenhum grafo piorou · rc 1 = reprovou · rc 2 = entrada quebrada (nunca verde)

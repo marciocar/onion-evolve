@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml",
+  "id": "motores-de-regras-deterministicos-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 30
+  }
+}

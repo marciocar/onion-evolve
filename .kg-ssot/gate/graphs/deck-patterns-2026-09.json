@@ -1,0 +1,10 @@
+{
+  "graph": "docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml",
+  "id": "deck-patterns-2026-09",
+  "must": [
+    "form.unknown-key.node.resolution"
+  ],
+  "should": {
+    "form.range.node.label": 20
+  }
+}

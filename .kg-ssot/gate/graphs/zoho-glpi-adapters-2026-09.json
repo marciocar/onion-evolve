@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml",
+  "id": "zoho-glpi-adapters-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 22
+  }
+}

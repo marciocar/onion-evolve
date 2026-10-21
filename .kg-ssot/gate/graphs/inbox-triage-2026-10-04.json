@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml",
+  "id": "inbox-triage-2026-10-04",
+  "must": [],
+  "should": {
+    "form.range.node.label": 5,
+    "form.required.node.verified_at": 1
+  }
+}
