@@ -138,6 +138,10 @@ VALIDATION=(
   # Motores do /meta:decide (2026-10-14): o medidor que a carga injeta e o selador que grava a resposta.
   ".claude/validation/decide-census.sh"
   ".claude/validation/kg-decide-seal.sh"
+  # o painel OPCIONAL do /meta:decide (2026-10-21, D_INTELLIGENT_UI_1021): a rodada em JSON, a volta das
+  # respostas pelo mesmo selador e a página que a sessão publica como Artifact. A superfície cita os dois.
+  ".claude/validation/decide-panel.sh"
+  ".claude/validation/decide-panel.html"
   # o selador chama o checador do contrato quando o repo tem o vendor kg-ssot (sem ele, só o radar julga);
   # o assemble-plugin recusou o bundle sem ele: "o plugin nasceria morto no adotante".
   ".claude/validation/kg-contract-check.sh"
