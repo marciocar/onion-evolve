@@ -61,13 +61,11 @@
       ]
     },
     {
-      "file": "warn-reverify-every-without-verified-at.kg.yaml",
-      "description": "a cadência conta do carimbo: sem verified_at, alerta (v4.8)",
+      "file": "valid-reverify-every-without-verified-at.kg.yaml",
+      "description": "cadência ainda sem a primeira verificação: é o estado inicial de uma regra de coleta, e não alerta; o --due a lista como sem carimbo (v4.9)",
       "valid": true,
       "codes": [],
-      "warnings": [
-        "form.required.node.verified_at"
-      ]
+      "warnings": []
     },
     {
       "file": "warn-retain-for-free-text.kg.yaml",
