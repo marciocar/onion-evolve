@@ -1,7 +1,7 @@
 {
   "capabilities": {
-    "pushNotifications": true,
-    "streaming": true
+    "pushNotifications": false,
+    "streaming": false
   },
   "defaultInputModes": [
     "application/json"

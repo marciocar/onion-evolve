@@ -65,7 +65,9 @@ pura do SSOT) → libera valor imediato. **Fase 2 é gated na RFC-0004** (transp
   **27 selftests** + drift-guard **REGRA 25**. De-risca o endpoint.
 - **Endpoint vivo — ✅ (2026-07-09, verificado 2026-07-10):** rota `/a2a` no ar atrás do Caddy (401 sem auth =
   gate correto) + Agent Card servido em `app.onionevolve.com/.well-known/agent-card.json` (capabilities
-  streaming/pushNotifications declaradas). **1º handshake real validado ponta-a-ponta** (metagamify→core:
+  streaming/pushNotifications declaradas naquela data, sem implementação no bridge; **deixaram de ser declaradas
+  em 2026-10-21** — o bridge só tem POST `/a2a`, sem tasks/get nem SSE, decisão
+  `D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021`). **1º handshake real validado ponta-a-ponta** (metagamify→core:
   `verified:true` + `input_required`, nada auto-aplicado) — e o dogfood expôs+fechou o gap de kid-binding no
   mesmo loop (diário `2026-07-09-first-live-a2a-handshake`). O endpoint chama o `a2a-verify` do core na
   fronteira transport→ação; `a2a-accept.sh` fecha a outra ponta (fila→inbox sob ato humano).
