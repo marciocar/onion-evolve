@@ -51,7 +51,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.85
     verified_at: "2026-10-17"
@@ -206,7 +206,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 2
     confidence: 0.85
     verified_at: "2026-10-17"
@@ -222,7 +222,7 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: superseded
     impact: 2
     confidence: 0.5
     verified_at: "2026-10-17"
