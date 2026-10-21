@@ -1,0 +1,1456 @@
+{
+  "summary": "Pesquisa Onion: corpus primeiro, eixos fixos (Claude Code atual, mercado/capital, trajetória, analistas, comunidade) + ângulos do tema, tier de fonte, verificação adversarial 3/2, write(KG) bi-temporal com radar",
+  "agentCount": 24,
+  "logs": [
+    "Corpus: fornecido em formato NÃO-CANÔNICO (676 chars, 0 linhas grafo<TAB>ID) — a skill manda o bloco do kg-corpus-grep.sh VERBATIM; entra como prosa no Scope, na síntese, no Elenxo e no write(KG)",
+    "Modo PRIMÁRIAS: 10 fonte(s) NOMEADA(S), leitura integral — sem Scope/Search/Fetch/Verify. Medido 2026-09-13 na mesma pergunta: varredura 291k tokens/nó (19 de 25 claims refutadas, a maioria por fonte fraca) × primárias 42k tokens/nó.",
+    "Leitura: 10/10 fontes alcançadas · inalcançáveis: nenhuma",
+    "Ancoragem: 16 claim(s) ANCORADA(S) · 30 rejeitada(s) (exagerada ou não encontrada) · 0 reprovação(ões) RECUSADA(S) pelo motor sem critério/superação",
+    "Elenxo: 18 objeções (10 sobrevivem) · 0 RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: 1 · abertas: 9",
+    "Superação: 18 achada(s) → nó obrigatório (C_SUPERACAO_20261021_…)",
+    "write(KG): docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml — +57 nós / +71 arestas, total 57, radar exit 0 (pelo motor, 1 tentativa(s))"
+  ],
+  "result": {
+    "mode": "primaries",
+    "question": "Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source_norm, claim_class) e 2 (radar que lê vencimento verified_at + frequency). Verificar contra fonte primária, estado de outubro de 2026, as afirmações de mercado da pesquisa do adotante que o core NÃO verificou, e dizer quais servem de base para o vocabulário e o radar e o que fica com o contrato kg-ssot vs com o core.",
+    "today": "2026-10-21",
+    "kgPath": "docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml",
+    "radarExit": 0,
+    "writeAttempts": [
+      {
+        "attempt": 1,
+        "declaredRadarExit": 0,
+        "radarExit": 0,
+        "contractExit": 0,
+        "overcomingNodes": 18
+      }
+    ],
+    "summary": "Grafo novo com 57 nós e 71 arestas. O radar sai com exit 0 em --integrity --schema e o kg-contract-check com rc 0. Os nós: 1 question raiz; 16 evidências ancoradas (trestle, SCF, CCM, OCSF, Lula, CISO Assistant, Probo/Comp AI); 3 evidências internas medidas em origin/main@3358788c; o E_LACUNAS com a contabilidade (30 rejeitadas: 15 sem citação e 15 exageradas; 9 lacunas abertas; 0 recusadas); 10 objeções sobreviventes; 18 nós C_SUPERACAO_20261021_*; e 5 decisões OPEN D_AUDIT_*_1021 para o /meta:decide, das quais a divisão contrato/core tem 3 opções vizinhas (C_OPCAO_A/B/C). Nada foi selado. As evidências internas corrigem duas premissas da recomendação. O STALE-OLD do kg-radar.sh compara verified_at com meta.baseline, então não existe cadência por nó e o item 2 é um leitor novo. O contrato v4 fecha as chaves do nó num enum de 22, que já inclui owner, e campo novo sem x_ reprova. A decisão de origem D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2 não existe nesta árvore nem em origin/main, por isso ficou citada só em texto, sem external_edges.",
+    "unreachable": [],
+    "anchored": [
+      {
+        "source": "compliance-trestle",
+        "gap": "compliance-trestle: o que é, versão atual, se valida e gera OSCAL AR/POA&M, e se é viável como validador de exportação",
+        "claim": "compliance-trestle e uma plataforma opinativa de compliance as code, baseada em CI e no OSCAL do NIST; licenca Apache-2.0.",
+        "verdict": "ANCORADA",
+        "why": "O README abre com a frase exata da citacao. A pagina lista 'Apache-2.0 license' e o cabecalho do arquivo diz 'Licensed under the Apache License, Version 2.0'. O claim nao passa disso.",
+        "corrected": "",
+        "quote": "An opinionated tooling platform for managing compliance as code, using continuous integration and NIST's OSCAL standard.",
+        "locator": "README do GitHub, descricao do projeto e licenca"
+      },
+      {
+        "source": "compliance-trestle",
+        "gap": "compliance-trestle: o que é, versão atual, se valida e gera OSCAL AR/POA&M, e se é viável como validador de exportação",
+        "claim": "A trilha v5 suporta OSCAL 1.2.1 e versoes anteriores.",
+        "verdict": "ANCORADA",
+        "why": "O README tem 'supports NIST OSCAL 1.2.1 as well as previous versions' na secao v5, que tambem diz 'uses pydantic in v2 mode'. A v4 tem a mesma linha. Ressalva menor: o locator fala em 'tabela', mas o README traz secoes com cabecalho, nao tabela. Isso nao muda o conteudo.",
+        "corrected": "",
+        "quote": "supports NIST OSCAL 1.2.1 as well as previous versions",
+        "locator": "README, secoes de trilha v5 e v4",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "compliance-trestle",
+        "gap": "compliance-trestle: o que é, versão atual, se valida e gera OSCAL AR/POA&M, e se é viável como validador de exportação",
+        "claim": "O trestle diz suportar implicitamente todos os schemas OSCAL no modelo de objetos, o que inclui Assessment Results e POA&M, mas a pagina nao os nomeia como fluxo validado de ponta a ponta.",
+        "verdict": "ANCORADA",
+        "why": "A frase aparece verbatim, tanto no README quanto na pagina inicial da documentacao. A segunda metade tambem confere: a documentacao nomeia POA&M e Assessment Results so na navegacao (tutorial xlsx-to-oscal-poam, modulos trestle.oscal.poam e trestle.oscal.assessment_results) e nao os descreve como fluxo validado de ponta a ponta. O claim e conservador e nao estica o texto. 'Inclui AR e POA&M' e leitura de 'all OSCAL schemas', e a presenca dos modulos a corrobora.",
+        "corrected": "",
+        "quote": "trestle implicitly supports all OSCAL schemas for use within the object model",
+        "locator": "oscal-compass.dev/compliance-trestle/latest/ (pagina inicial) e README",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "scf-erl",
+        "gap": "Secure Controls Framework: versão (a pesquisa diz 2026.2), o Evidence Request List (ERL) e a licença (a pesquisa diz CC BY-ND)",
+        "claim": "A licença oficial é CC BY-ND 4.0 e exige crédito, link da licença e indicação de mudanças",
+        "verdict": "ANCORADA",
+        "why": "Em terms-conditions, seção Attribution: 'You must give appropriate credit, provide a link to the license and indicate if changes were made' (a página não traz o ponto final da quote, irrelevante para a substring). A licença CC BY-ND 4.0 aparece no texto de atribuição de exemplo ('Creative Commons Attribution-NoDerivatives 4.0 International Public License', link creativecommons.org/licenses/by-nd/4.0/legalcode.en) e na página de download. O claim não passa disso. A página ainda dá a forma prática: declarar que controles SCF são usados, com © Secure Controls Framework Council, LLC.",
+        "corrected": "",
+        "quote": "You must give appropriate credit, provide a link to the license and indicate if changes were made.",
+        "locator": "securecontrolsframework.com/terms-conditions/, seção Attribution",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "scf-erl",
+        "gap": "Secure Controls Framework: versão (a pesquisa diz 2026.2), o Evidence Request List (ERL) e a licença (a pesquisa diz CC BY-ND)",
+        "claim": "Oferecer conteúdo SCF derivado requer licença comercial",
+        "verdict": "ANCORADA",
+        "why": "Em terms-conditions, seção NoDerivatives: 'An organization needs to purchase a commercial license to offer derivative SCF content.' O claim repete a frase sem acrescentar nada (não generaliza para 'distribuir' nem para uso próprio).",
+        "corrected": "",
+        "quote": "An organization needs to purchase a commercial license to offer derivative SCF content.",
+        "locator": "securecontrolsframework.com/terms-conditions/, seção Derivatives",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "csa-caiq-ccm",
+        "gap": "CSA CCM e CAIQ: versão atual (a pesquisa diz CAIQ v4.1) e os formatos publicados (JSON, YAML, OSCAL)",
+        "claim": "CCM and CAIQ v4.1 tem data de lançamento 27/01/2026 e 207 controles em 17 domínios.",
+        "verdict": "ANCORADA",
+        "why": "A página artifacts/cloud-controls-matrix-v4-1 traz 'Release date: 01/27/2026' e a frase 'The Cloud Controls Matrix (CCM) is a cybersecurity control framework made up of 207 controls across 17 security domains.' O formato mm/dd é provado pelo próprio '27', então 27/01/2026 está correto. Atenção: a página research/ ainda diz 197, então 207 vale para o artefato v4.1, não para a página-mãe.",
+        "corrected": "",
+        "quote": "The Cloud Controls Matrix (CCM) is a cybersecurity control framework made up of 207 controls across 17 security domains.",
+        "locator": "cloudsecurityalliance.org/artifacts/cloud-controls-matrix-v4-1, descrição (release date 01/27/2026)",
+        "sourceTier": 9,
+        "validFrom": "2026-01-27"
+      },
+      {
+        "source": "ocsf",
+        "gap": "OCSF: versão atual (a pesquisa diz 1.9) e se serve para evidência de log e achado",
+        "claim": "A Compliance Finding (2003) mede resultado de avaliação contra framework, com exemplos NIST SP 800-53 e ISO/IEC 27001; serve como formato de achado, não como vocabulário de frescor de evidência.",
+        "verdict": "ANCORADA",
+        "why": "A descrição crua traz 'various Industry Frameworks or Security Standards such as <code>NIST SP 800-53, CIS AWS Foundations Benchmark v1.4.0, ISO/IEC 27001</code> etc.'. O <code> é renderizado como crases na UI, então a quote casa. O uid da classe é 2003. A conclusão 'não é vocabulário de frescor' é interpretação do leitor, e a mesma leitura confirma que a classe não tem atributo de periodicidade, vencimento ou frescor: seus atributos de contexto só incluem activity_id e evidences. A interpretação não estica o texto.",
+        "corrected": "",
+        "quote": "Industry Frameworks or Security Standards such as `NIST SP 800-53, CIS AWS Foundations Benchmark v1.4.0, ISO/IEC 27001` etc.",
+        "locator": "schema.ocsf.io/1.9.0/classes/compliance_finding, descrição da classe",
+        "sourceTier": 9,
+        "validFrom": "2026-08-03"
+      },
+      {
+        "source": "ocsf",
+        "gap": "OCSF: versão atual (a pesquisa diz 1.9) e se serve para evidência de log e achado",
+        "claim": "O Findings do 1.9.0 tem oito classes e a de conformidade é a 2003.",
+        "verdict": "ANCORADA",
+        "why": "A UI de schema.ocsf.io/1.9.0 e GET /api/1.9.0/categories/findings listam exatamente oito classes: Security Finding [2001], Vulnerability [2002], Compliance [2003], Detection [2004], Incident [2005], Data Security [2006], Application Security Posture [2007] e IAM Analysis [2008]. Só a 2001 está marcada como obsoleta (D). A quote de três captions com uids [2003], [2004] e [2005] está presente no conjunto, nessas palavras. O uid da Compliance Finding é 2003.",
+        "corrected": "",
+        "quote": "\"Compliance Finding [2003]\"; \"Detection Finding [2004]\"; \"Incident Finding [2005]\"",
+        "locator": "schema.ocsf.io/1.9.0, categoria Findings (2001 marcada D, 2002 a 2008)",
+        "sourceTier": 9,
+        "validFrom": "2026-08-03"
+      },
+      {
+        "source": "lula",
+        "gap": "Lula (defenseunicorns): se a versão 2 deixou de usar OSCAL como armazenamento interno, como a pesquisa afirma",
+        "claim": "A v2 do Lula foi construída por causa de limitações da abordagem baseada em OSCAL (a v1 era a OSCAL-based).",
+        "verdict": "ANCORADA",
+        "why": "O grep -F devolve a frase literal na linha 68. A linha 402 descreve a v1 como 'OSCAL-based compliance validator CLI'. O claim não passa disso. Só o nome da seção no locator está errado, e isso não muda o veredito.",
+        "corrected": "",
+        "quote": "We built Lula 2 after discovering key limitations with the OSCAL-based approach:",
+        "locator": "README linha 68, seção 'Learning from Lula 1' (o locator informado, 'seção Lula 2', não é o título real); linha 402 para a v1 OSCAL-based",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "lula",
+        "gap": "Lula (defenseunicorns): se a versão 2 deixou de usar OSCAL como armazenamento interno, como a pesquisa afirma",
+        "claim": "O armazenamento interno da v2 é YAML versionado em Git, não OSCAL.",
+        "verdict": "ANCORADA",
+        "why": "A linha 383 é '- **Storage**: YAML files with Git integration'. O grep -F literal falha só pelos asteriscos do negrito Markdown. O texto renderizado é idêntico à citação. 'Não OSCAL' se apoia em 'Controls as Code: Each control stored as an individual YAML file' (linha 48) e em 'no OSCAL knowledge required' (linha 78). O README não nega o OSCAL em termos explícitos, mas o armazenamento declarado é YAML.",
+        "corrected": "",
+        "quote": "Storage: YAML files with Git integration",
+        "locator": "README linha 383, seção 'Architecture'",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "lula",
+        "gap": "Lula (defenseunicorns): se a versão 2 deixou de usar OSCAL como armazenamento interno, como a pesquisa afirma",
+        "claim": "OSCAL permanece só na importação de catálogos; o README não afirma OSCAL como formato de exportação (a exportação citada são relatórios e planilhas, sem formato OSCAL declarado).",
+        "verdict": "ANCORADA",
+        "why": "A linha 63 é '- **Import Data**: Use the setup page to import OSCAL catalogs or existing control sets'. O grep -F literal falha só pelo negrito Markdown. A linha 64, 'Export Reports: Generate compliance reports and assessments', não cita formato, e nenhuma linha do README liga OSCAL a export. As outras menções a OSCAL (linhas 8, 68-78, 402-403) são históricas ou links para a v1. Ressalva menor: 'planilhas' como saída é inferência da linha 49 ('Import/Export: Import any generic spreadsheet…'), que só detalha o import. Isso não derruba o claim, que é uma ausência verificada no README. Não vale para releases nem para o código.",
+        "corrected": "",
+        "quote": "Import Data: Use the setup page to import OSCAL catalogs or existing control sets",
+        "locator": "README linha 63 (Import Data) e linha 64 (Export Reports); linha 49 (Import/Export)",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "ciso-assistant",
+        "gap": "CISO Assistant: arquitetura de estado (banco próprio?), licença, capital/mercado",
+        "claim": "A licença do código comunitário é AGPLv3; só o diretório enterprise é comercial (monorepo com licença dupla).",
+        "verdict": "ANCORADA",
+        "why": "README, seção License: aparece 'All the files outside the top-level \"enterprise\" directory are released under the AGPLv3' (na página do repo com ponto final; no README cru sem ele, diferença só de pontuação). O mesmo trecho traz 'All the files within the top-level \"enterprise\" directory are released under the intuitem Commercial Software License' e 'This mono-repository approach is adopted for simplicity', o que sustenta 'monorepo com licença dupla'. Nenhuma palavra do claim excede o texto.",
+        "corrected": "",
+        "quote": "All the files outside the top-level \"enterprise\" directory are released under the AGPLv3",
+        "locator": "README, seção License",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "ciso-assistant",
+        "gap": "CISO Assistant: arquitetura de estado (banco próprio?), licença, capital/mercado",
+        "claim": "O estado mora em SQLite por padrão, com PostgreSQL opcional por variáveis de ambiente.",
+        "verdict": "ANCORADA",
+        "why": "O README traz 'CISO Assistant will use SQLite by default, but you can setup PostgreSQL by declaring these variables', seguido do bloco de exports (POSTGRES_NAME, DB_HOST etc.), que são variáveis de ambiente. A única diferença da quote do leitor é a pontuação final. O claim não vai além do trecho.",
+        "corrected": "",
+        "quote": "CISO Assistant will use SQLite by default, but you can setup PostgreSQL by declaring these variables.",
+        "locator": "README, seção de configuração de banco",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "probo-compai",
+        "gap": "Probo e Comp AI: arquitetura de estado (banco próprio?), licença, mercado",
+        "claim": "Probo guarda estado em PostgreSQL próprio (backend Go, GraphQL e MCP), autohospedável, MIT; banco relacional, não grafo nem arquivo versionado.",
+        "verdict": "ANCORADA",
+        "why": "Reabri o README: a citação 'Run it on your own infrastructure with Docker.' aparece literal. A tabela traz '| Backend | Go, PostgreSQL |' e '| API | GraphQL, MCP |', e a licença diz 'Probo is MIT licensed'. A frase 'banco relacional, não grafo nem arquivo versionado' é inferência do leitor a partir de PostgreSQL, razoável e sem esticar o texto. O README não menciona OSCAL, YC nem capital, então nada disso foi afirmado aqui.",
+        "corrected": "",
+        "quote": "Run it on your own infrastructure with Docker.",
+        "locator": "README getprobo/probo (Tech Stack; License)",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "probo-compai",
+        "gap": "Probo e Comp AI: arquitetura de estado (banco próprio?), licença, mercado",
+        "claim": "Comp AI guarda estado em Postgres (Prisma, DATABASE_URL, versão 15 ou superior) mais Redis Upstash para chave-valor; o estado mora no banco do produto.",
+        "verdict": "ANCORADA",
+        "why": "A citação é substring literal da linha '@trycompai/kv - Key-value store utilities using Upstash Redis'. O README traz 'Postgres (Version: >=15.x)', 'DATABASE_URL=\"postgresql://user:password@host:port/database\"' e Prisma em Built With. 'O estado mora no banco do produto' é leitura do leitor, compatível com o texto. O README não menciona OSCAL.",
+        "corrected": "",
+        "quote": "Key-value store utilities using Upstash Redis.",
+        "locator": "README trycompai/comp (Prerequisites, Built With, packages)",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "probo-compai",
+        "gap": "Probo e Comp AI: arquitetura de estado (banco próprio?), licença, mercado",
+        "claim": "Comp AI é open-core: núcleo AGPLv3 e /ee sob licença comercial, com nuvem hospedada; AGPL pede cautela ao copiar código, ideia e vocabulário são outra coisa.",
+        "verdict": "ANCORADA",
+        "why": "O README diz 'Open Core where the core technology (99%) is fully open source, licensed under AGPLv3', 'the last 1% is covered under a commercial license' e lista '/ee Enterprise Edition'. Também há 'Get access to the cloud hosted version of Comp AI'. A cautela com AGPL e a distinção entre código e vocabulário são recomendação do leitor, não afirmação sobre o texto, e não o esticam.",
+        "corrected": "",
+        "quote": "the core technology (99%) is fully open source, licensed under AGPLv3",
+        "locator": "README trycompai/comp, seção License / Open Source",
+        "sourceTier": 9,
+        "validFrom": ""
+      }
+    ],
+    "rejected": [
+      {
+        "source": "oscal-releases",
+        "gap": "OSCAL: versão atual (a pesquisa diz 1.2.3) e o que os modelos Assessment Plan, Assessment Results e POA&M carregam (método EXAMINE/INTERVIEW/TEST, evidência, relevant-evidence, subjects)",
+        "claim": "Versão mais recente do OSCAL é v1.2.3 (2026-08-07); anterior v1.2.2 (30 Abr).",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. Página de releases mostra 'OSCAL v1.2.3 Release' (Latest) com 'released this 07 Aug 03:33' e v1.2.2 com 'released this 30 Apr 19:21'. A API releases/latest devolveu tag_name v1.2.3, published_at 2026-08-07T03:33:33Z; a lista da API traz v1.2.2 em 2026-04-30T19:21:22Z. Ressalva de método: a página não mostra o ano, quem dá o ano é a API.",
+        "corrected": ""
+      },
+      {
+        "source": "oscal-releases",
+        "gap": "OSCAL: versão atual (a pesquisa diz 1.2.3) e o que os modelos Assessment Plan, Assessment Results e POA&M carregam (método EXAMINE/INTERVIEW/TEST, evidência, relevant-evidence, subjects)",
+        "claim": "observation > methods aceita EXAMINE, INTERVIEW, TEST (e UNKNOWN só para conversão histórica); valores locais permitidos; 4 nominais, conjunto extensível.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. No JSON reference v1.2.3 do assessment-results, 'methods array [1] ... Observation Method ... Identifies how the observation was made. Constraint: allowed values The value may be locally defined, or one of the following: EXAMINE : An inspection was performed. INTERVIEW : An interview was performed. TEST : A manual or automated test was performed. UNKNOWN : This is only for use when converting historic content to OSCAL, where the conversion process cannot initially identify the appropriate method(s).' A citação aparece literalmente. Detalhe adicional que o texto confirma: methods é obrigatório na observation (array [1], 1 a ∞ itens).",
+        "corrected": ""
+      },
+      {
+        "source": "oscal-releases",
+        "gap": "OSCAL: versão atual (a pesquisa diz 1.2.3) e o que os modelos Assessment Plan, Assessment Results e POA&M carregam (método EXAMINE/INTERVIEW/TEST, evidência, relevant-evidence, subjects)",
+        "claim": "relevant-evidence é array de objetos com href resolvível, ou seja, evidência por referência e não por conteúdo, o que sustenta location como ponteiro.",
+        "verdict": "EXAGERADA",
+        "why": "A citação existe (com as reticências do leitor, cada trecho está lá). Mas 'por referência e NÃO por conteúdo' estica: no mesmo documento href é [0 or 1] (opcional), o campo 'description' (markup-multiline) é [1] (obrigatório, 'A human-readable description of this evidence'), e o href pode ser '#uuid' apontando para um recurso do back-matter, que o próprio documento diz poder ser 'directly included in the document using base64 encoding'. Ou seja, o OSCAL prevê tanto ponteiro quanto conteúdo embutido; o texto sustenta que o ponteiro é o caminho primário, não que conteúdo é excluído.",
+        "corrected": "relevant-evidence é um array (0 ou 1 ocorrência do array, 1 a ∞ objetos) cujos objetos têm 'description' obrigatória e 'href' opcional (URI absoluta, relativa ou fragmento '#uuid' para um recurso do back-matter); o back-matter pode apontar por rlink ou embutir por base64. Logo location como ponteiro é compatível com o OSCAL, mas o OSCAL não proíbe conteúdo embutido.",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação do próprio documento: relevant-evidence = description obrigatória + href opcional (URL, relativa ou #uuid de back-matter), com back-matter capaz de rlink ou base64. Entrega o que o claim queria (justificar location como ponteiro) sem afirmar exclusão de conteúdo.",
+          "medida": "Medido no texto extraído do JSON reference v1.2.3 (posição ~687143 para relevant-evidence; trecho de Resource/base64 no back-matter): 'href uri-reference [0 or 1]', 'description markup-multiline [1]', 'directly included ... using base64 encoding or may point to one or more equivalent internet resources'."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/ | sed 's/<[^>]*>/ /g' | tr -s ' \\n' ' ' | grep -o 'relevant-evidence array.\\{0,900\\}'  (mostra 'href ... [0 or 1]' e 'description markup-multiline [1]'); depois grep -o 'may be directly included in the document using base64 encoding'"
+        }
+      },
+      {
+        "source": "oscal-releases",
+        "gap": "OSCAL: versão atual (a pesquisa diz 1.2.3) e o que os modelos Assessment Plan, Assessment Results e POA&M carregam (método EXAMINE/INTERVIEW/TEST, evidência, relevant-evidence, subjects)",
+        "claim": "Definições NIST dos métodos descrevem EXAMINE/INTERVIEW/TEST como processos sobre assessment objects; TEST compara real com esperado, o que justifica um campo 'acceptance' separado (OSCAL não o define).",
+        "verdict": "EXAGERADA",
+        "why": "A citação de TEST aparece literal (JSON reference v1.2.3, prop 'method' de parts name='objective', e também de activities): 'The process of exercising one or more assessment objects (i.e., activities or mechanisms) under specified conditions to compare actual with expected behavior.' Porém: (1) só EXAMINE e TEST falam em 'assessment objects'; INTERVIEW é 'holding discussions with individuals or groups of individuals within an organization ... obtain evidence', sem assessment objects; então 'EXAMINE/INTERVIEW/TEST como processos sobre assessment objects' estica. (2) 'o que justifica um campo acceptance' é inferência de desenho do adotante, não afirmação do texto. A parte 'OSCAL não define acceptance' confere: 0 ocorrências da palavra 'acceptance' no reference do assessment-results.",
+        "corrected": "Para a prop 'method' de objetivos, EXAMINE e TEST são definidos como processos sobre 'assessment objects' (TEST: exercitá-los sob condições especificadas para comparar comportamento real com esperado); INTERVIEW é definido como discussão com indivíduos ou grupos. O OSCAL não tem campo 'acceptance'; criá-lo é decisão de desenho do core, motivada pelo critério 'esperado' implícito em TEST, não exigência do NIST.",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação sustentada pelo mesmo trecho: TEST (e EXAMINE) sobre assessment objects, INTERVIEW sobre pessoas; acceptance como extensão do core, sem lastro no NIST. Entrega o valor de usar o vocabulário sem atribuir ao NIST uma justificativa que ele não faz.",
+          "medida": "Texto extraído do JSON reference v1.2.3, posições ~119293 e ~500392: definições verbatim dos três métodos; contagem de 'acceptance' = 0."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/ | sed 's/<[^>]*>/ /g' | tr -s ' \\n' ' ' | grep -o 'INTERVIEW : The process of holding.\\{0,520\\}' | head -1   (INTERVIEW sem 'assessment objects'); e grep -c 'acceptance' => 0"
+        }
+      },
+      {
+        "source": "oscal-releases",
+        "gap": "OSCAL: versão atual (a pesquisa diz 1.2.3) e o que os modelos Assessment Plan, Assessment Results e POA&M carregam (método EXAMINE/INTERVIEW/TEST, evidência, relevant-evidence, subjects)",
+        "claim": "Observation é o contêiner de evidência de conformidade ou não conformidade; subjects identifica os elementos em escopo (locais, componentes, inventário, usuários).",
+        "verdict": "EXAGERADA",
+        "why": "A citação existe na página de conceitos de Assessment Results: 'Observation : Individual observations and related evidence. This may be evidence of compliance or non-compliance.' A primeira metade do claim é fiel. A segunda não: a página usa 'Assessment Subject : Identifies the in-scope elements of the system, including locations, components, inventory items, and users', que é um elemento de topo do resultado, não o campo subjects da observation, e a palavra 'subjects' não aparece na página. No reference, observation > subjects é 'Identifies the Subject: A human-oriented identifier reference to a resource ... component, inventory item, location, user, or something else', sem a palavra 'em escopo' nem a lista exata do claim.",
+        "corrected": "Observation é o registro de 'individual observations and related evidence', que pode ser de conformidade ou de não conformidade. O campo subjects da observation referencia (por UUID/tipo) o recurso observado: componente, inventory item, localização, usuário ou outro. A definição 'in-scope elements ... locations, components, inventory items, and users' pertence ao Assessment Subject do resultado como um todo.",
+        "quote": "Individual observations and related evidence. This may be evidence of compliance or non-compliance.",
+        "locator": "pages.nist.gov/OSCAL, conceitos de Assessment Results, 'Observation'",
+        "sourceTier": 10,
+        "validFrom": "",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A atribuição correta dos dois trechos: conceito 'Observation' (página de conceitos) e descrição de observation > subjects (JSON reference). Entrega o suporte para o modelo de evidência sem confundir observation.subjects com Assessment Subject.",
+          "medida": "Medido nos dois documentos baixados e com texto extraído: a página de conceitos tem 'Observation' e 'Assessment Subject' como entradas separadas; o JSON reference tem 'Identifies the Subject' (observation) e 'Subject of Assessment' (resultado/plano)."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://pages.nist.gov/OSCAL/learn/concepts/layer/assessment/assessment-results/ | sed 's/<[^>]*>/ /g' | tr -s ' \\n' ' ' | grep -o 'Assessment Subject : .\\{0,140\\}'; e grep -c 'subjects' na mesma página => 0"
+        }
+      },
+      {
+        "source": "compliance-trestle",
+        "gap": "compliance-trestle: o que é, versão atual, se valida e gera OSCAL AR/POA&M, e se é viável como validador de exportação",
+        "claim": "A versao mais recente e a v5.2.0, de 2026-10-05; a trilha v5 e a ativa e a v4 esta em manutencao.",
+        "verdict": "EXAGERADA",
+        "why": "A string citada nao esta em nenhum documento. 'Latest release: ... notes header reads ...' e glosa do leitor, entao grep -F nao a encontra. O fato, porem, esta no documento. A pagina de Releases marca v5.2.0 como Latest, com cabecalho 'v5.2.0 (2026-10-05)'. O README diz 'stable (actively developed)' para v5 e 'stable (maintenance mode)' para v4. Nenhuma das duas partes sustenta a outra: a pagina de Releases nao fala de trilhas, e o README (que fala) nao mostra release alguma, pois sua secao Releases esta vazia na captura.",
+        "corrected": "A pagina de Releases marca v5.2.0 como Latest e o cabecalho da release e 'v5.2.0 (2026-10-05)'. Separadamente, o README classifica v5 como 'stable (actively developed)' e v4 como 'stable (maintenance mode)', com 'limited support until December 31, 2026'. As releases anteriores sao v5.1.0 (2026-09-02) e v5.0.0 (2026-08-07).",
+        "quote": "Latest release: v5.2.0 (2026-10-05), notes header reads v5.2.0 (2026-10-05)",
+        "locator": "GitHub Releases (cabecalho da v5.2.0) e README (secoes de trilhas v5/v4)",
+        "sourceTier": 9,
+        "validFrom": "2026-10-05",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "O cabecalho real 'v5.2.0 (2026-10-05)' marcado Latest na pagina de Releases, mais as linhas 'stable (actively developed)' e 'stable (maintenance mode)' do README. Juntos entregam exatamente o fato que o claim promete.",
+          "medida": "WebFetch das duas paginas em 2026-10-21; a tabela de releases mostrou v5.2.0 como Latest e o README mostrou os rotulos de trilha."
+        },
+        "criterio": {
+          "id": "A1_QUOTE_AUSENTE",
+          "comando": "WebFetch https://github.com/oscal-compass/compliance-trestle/releases e grep -F 'Latest release: v5.2.0 (2026-10-05), notes header reads v5.2.0 (2026-10-05)': 0 ocorrencias; o texto real e 'v5.2.0 (2026-10-05)' com o selo Latest"
+        }
+      },
+      {
+        "source": "compliance-trestle",
+        "gap": "compliance-trestle: o que é, versão atual, se valida e gera OSCAL AR/POA&M, e se é viável como validador de exportação",
+        "claim": "A ferramenta garante schema ao gerenciar documentos OSCAL, o que a torna viavel como validador de exportacao do grafo (schema), mas nao valida semantica de evidencia/vencimento.",
+        "verdict": "EXAGERADA",
+        "why": "A citacao e verbatim e sustenta so a primeira oracao: o schema e imposto ao gerenciar documentos OSCAL. 'Viavel como validador de exportacao do grafo' e 'nao valida semantica de evidencia/vencimento' sao inferencias do leitor. O trecho nao fala de exportacao de grafo, nem de semantica, evidencia ou vencimento. A segunda afirma uma ausencia que o texto lido nao estabelece.",
+        "corrected": "O trestle lista como capacidade 'Manage OSCAL documents to allow editing and manipulation while making sure the schemas are enforced', ou seja, impoe schema nos documentos OSCAL que gerencia. O texto lido nao diz nada sobre validar semantica de evidencia ou vencimento, nem sobre servir de validador de exportacao de um grafo externo. Essas duas conclusoes sao inferencia do core e precisam de teste proprio (rodar trestle validate sobre uma exportacao real).",
+        "quote": "Manage OSCAL documents to allow editing and manipulation while making sure the schemas are enforced.",
+        "locator": "README e pagina inicial da documentacao, lista de capacidades",
+        "sourceTier": 9,
+        "validFrom": "",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulacao em 'corrected', que e o que a mesma frase do README sustenta: impoe schema aos documentos OSCAL gerenciados. Isso entrega o valor que o claim promete (schema garantido) sem as duas inferencias.",
+          "medida": "Leitura da lista de tres capacidades no README e na pagina inicial da documentacao em 2026-10-21; a lista nao cita semantica, evidencia, vencimento nem grafo."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://oscal-compass.dev/compliance-trestle/latest/ e grep -iE 'semantic|evidence|expir|graph' no texto da pagina inicial e do README: nenhuma das palavras sustenta 'valida exportacao do grafo' nem 'nao valida semantica'"
+        }
+      },
+      {
+        "source": "scf-erl",
+        "gap": "Secure Controls Framework: versão (a pesquisa diz 2026.2), o Evidence Request List (ERL) e a licença (a pesquisa diz CC BY-ND)",
+        "claim": "Download cita a release 2026.2 sem rotular versão corrente nem data; atualização trimestral; a 2026.2 da pesquisa é compatível mas não confirmada",
+        "verdict": "EXAGERADA",
+        "why": "A quote existe: a página de download diz 'released at no cost under Creative Commons Attribution-NoDerivatives 4.0 International'. Os fatos de página também batem: a única ocorrência de versão é 'With the 2026.2 release, numerous controls now include a list of compensating controls'; 0 ocorrências de '2026.3', '2026.1' e 'current version'; nenhuma data de release; 'The SCF is updated on a quarterly basis'. Mas a palavra 'compatível' estica: a página do ERL, no mesmo site, numera os mapeamentos em '2026.3' e rotula a coluna anterior como 'Legacy' (pré-2026.3). Logo a 2026.2 aparece desatualizada em relação à própria numeração do ERL, e o rótulo de versão corrente só pode vir do GitHub, que o site aponta ('Get the latest version on GitHub'). A quote também sustenta só a licença, não a parte de versão.",
+        "corrected": "A página de download cita só a release 2026.2 (a propósito de controles compensatórios), sem rotular versão corrente nem data, e diz que o SCF é atualizado trimestralmente. A página do ERL já usa numeração 2026.3 de controles e chama a anterior de 'Legacy', então a 2026.2 não deve ser tomada como compatível nem corrente; a versão atual precisa ser lida no GitHub.",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação corrigida, que usa o trecho da página do ERL (mapeamentos em numeração 2026.3, coluna Legacy para o esquema anterior) e a remissão da página de download ao GitHub como fonte da versão corrente.",
+          "medida": "Dois WebFetch independentes, um em scf-download (2026.2 única, sem rótulo de corrente, 0x '2026.3') e outro em evidence-request-list-erl (colunas SCF Control Mappings em 2026.3 e Legacy SCF Control Mappings pré-2026.3). A versão corrente em si segue NÃO verificada, pois exige o GitHub."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://securecontrolsframework.com/free-content/evidence-request-list-erl e procurar '2026.3' (aparece em 'SCF Control Mappings', numeração 2026.3); WebFetch https://securecontrolsframework.com/scf-download/ e procurar '2026.3' (0 ocorrências) e 'With the 2026.2 release' (1 ocorrência)"
+        }
+      },
+      {
+        "source": "scf-erl",
+        "gap": "Secure Controls Framework: versão (a pesquisa diz 2026.2), o Evidence Request List (ERL) e a licença (a pesquisa diz CC BY-ND)",
+        "claim": "Derivados podem ser feitos para uso próprio mas não distribuídos; a proibição inclui geração por IA; distribuir derivado exige licença comercial",
+        "verdict": "EXAGERADA",
+        "why": "A quote existe: 'This prohibition on creating derivative works includes utilizing Artificial Intelligence (AI) (or similar technologies) to leverage SCF content to generate policies, standards, procedures, metrics, risks, threats or other derivative content.' A parte 'não distribuídos' também tem apoio: 'If you remix, transform, or build upon the material, you may not distribute the modified material' e, no texto da licença, 'produce and reproduce, but not Share, Adapted Material'. O que o texto não sustenta é 'podem ser feitos para uso próprio' como afirmação da página: ela não trata de uso interno ou próprio, e a frase da IA fala em 'prohibition on creating derivative works', sem dizer se cobre o que não é distribuído. O uso próprio vem só da leitura do texto-base da CC BY-ND, não de uma declaração do SCF. Além disso, a página diz que a licença comercial é para 'offer derivative SCF content' (oferecer), não 'distribuir' em geral.",
+        "corrected": "A página proíbe distribuir material modificado (remix, transformação) e diz que essa proibição de criar obras derivadas inclui o uso de IA para gerar políticas, padrões, procedimentos, métricas, riscos, ameaças ou outro conteúdo derivado. O texto-base da licença admite produzir e reproduzir material adaptado sem compartilhá-lo, mas a página não declara se o uso próprio não distribuído está coberto pela proibição da IA. Oferecer conteúdo SCF derivado exige licença comercial.",
+        "quote": "This prohibition on creating derivative works includes utilizing Artificial Intelligence (AI)",
+        "locator": "securecontrolsframework.com/terms-conditions/, seção Derivatives",
+        "sourceTier": 9,
+        "validFrom": "",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação corrigida, que separa o que a página declara (proibição de distribuir; IA incluída na proibição de criar derivados; licença comercial para oferecer) do que vem só do texto-base da CC BY-ND (produzir e reproduzir sem Share).",
+          "medida": "Dois WebFetch em terms-conditions, o segundo com a pergunta específica sobre uso interno/próprio; a resposta foi que a página não aborda uso interno e que não diz se a proibição da IA cobre uso não distribuído."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://securecontrolsframework.com/terms-conditions/ e procurar 'internal', 'own use' e 'personal use' (0 ocorrências de declaração de uso próprio); a frase 'produce and reproduce, but not Share, Adapted Material' é do texto da licença, e a frase da IA diz 'prohibition on creating derivative works', sem qualificar distribuição"
+        }
+      },
+      {
+        "source": "scf-erl",
+        "gap": "Secure Controls Framework: versão (a pesquisa diz 2026.2), o Evidence Request List (ERL) e a licença (a pesquisa diz CC BY-ND)",
+        "claim": "O ERL tem ids E-<domínio SCF de 3 letras>-<número>; colunas #, ERL #, Area of Focus, ERL Artifact, Description, SCF Control Mappings, Legacy mappings; sem coluna de frequência nem de tipo de evidência",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página do ERL diz 'The middle letters are the SCF domain identifier (BCD is Business Continuity & Disaster Recovery)', com exemplos E-BCD-13 e E-GOV-01 (3 letras em ambos; a página não declara 'sempre 3', isso se infere dos exemplos). Colunas listadas: #, ERL #, Area of Focus, ERL Artifact, 'Evidence Request List (ERL) Artifact Description', SCF Control Mappings, Legacy SCF Control Mappings. O reaberto confirma que não há coluna de frequência nem de tipo de evidência, e que Area of Focus é rótulo de tema. Ressalva de método: a leitura é via resumo do WebFetch, não da planilha XLSX, então a ausência vale para o que a página descreve, não para a planilha baixável.",
+        "corrected": ""
+      },
+      {
+        "source": "csa-caiq-ccm",
+        "gap": "CSA CCM e CAIQ: versão atual (a pesquisa diz CAIQ v4.1) e os formatos publicados (JSON, YAML, OSCAL)",
+        "claim": "CCM e CAIQ combinados na v4.1; versão atual 4.1; página não traz número separado para o CAIQ.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página research/cloud-controls-matrix traz literalmente 'Version 4.1 of the CCM and CAIQ are now combined!'. Um único número de versão para os dois sustenta que não há versão separada do CAIQ. Ressalva: a mesma página ainda diz que o CCM 'is composed of 197 control objectives ... in 17 domains', texto residual de versão anterior, que diverge dos 207 da página do artefato v4.1.",
+        "corrected": ""
+      },
+      {
+        "source": "csa-caiq-ccm",
+        "gap": "CSA CCM e CAIQ: versão atual (a pesquisa diz CAIQ v4.1) e os formatos publicados (JSON, YAML, OSCAL)",
+        "claim": "Bundle legível por máquina (controles CCM, CAIQ, guias de implementação) em JSON, YAML e OSCAL, lançado em 03/06/2024, sem versão nem licença.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página do bundle começa 'CSA provides in a machine-readable format the CCM Controls, CAIQ Security Questionnaire and Implementation Guidelines', cita JSON/YAML e OSCAL, traz 'Release Date: 06/03/2024', não declara versão e não declara licença. O claim reescreve a data como 03/06/2024 (dia/mês) e diz que a página não informa o formato. Isso é cauteloso e consistente: a mesma CSA usa mm/dd (01/27/2026), logo 06/03/2024 é 3 de junho de 2024. A citação é um recorte inicial da frase; o resto não é afirmado.",
+        "corrected": ""
+      },
+      {
+        "source": "csa-caiq-ccm",
+        "gap": "CSA CCM e CAIQ: versão atual (a pesquisa diz CAIQ v4.1) e os formatos publicados (JSON, YAML, OSCAL)",
+        "claim": "Guias de implementação saem em JSON/YAML e OSCAL; mapeamentos saem só em JSON/YAML, sem OSCAL.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página research/cloud-controls-matrix traz 'Implementation Guidelines (both JSON/YAML and OSCAL) and Mappings (JSON/YAML)'. O 'só ... sem OSCAL' é leitura direta do parêntese de Mappings, que lista apenas JSON/YAML. É omissão explícita na lista, não afirmação negativa literal, mas está dentro do que o texto sustenta.",
+        "corrected": ""
+      },
+      {
+        "source": "csa-caiq-ccm",
+        "gap": "CSA CCM e CAIQ: versão atual (a pesquisa diz CAIQ v4.1) e os formatos publicados (JSON, YAML, OSCAL)",
+        "claim": "A licença do CCM é livre para uso interno; personalizar ou usar comercialmente exige licença da CSA; páginas do bundle e do v4.1 não declaram licença.",
+        "verdict": "EXAGERADA",
+        "why": "A citação existe, mas diz que a licença CCM 'allows organizations to customize the CCM or use it for commercial purposes'. Ela não diz que isso 'exige' licença. A exigência vem só por inferência da outra frase, 'You do not need a license if you are using the CCM for internal purposes'. 'Livre' também estica 'não precisa de licença': o texto não diz que o uso interno está livre de termos ou de atribuição. Já a ausência de licença nas páginas do bundle e do v4.1 é confirmada.",
+        "corrected": "A página da CSA diz que não é preciso licença para usar o CCM para fins internos, e que uma licença CCM permite personalizar o CCM ou usá-lo para fins comerciais. Não declara em termos literais que esses usos exijam licença, nem as condições do uso interno. As páginas do artefato v4.1 e do bundle machine-readable não declaram licença.",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação sustentada (corrected), montada só com as duas frases da mesma página research/cloud-controls-matrix: sem licença para uso interno; licença CCM permite personalização e uso comercial.",
+          "medida": "WebFetch de cloudsecurityalliance.org/research/cloud-controls-matrix devolveu as duas frases literais; WebFetch das páginas artifacts/cloud-controls-matrix-v4-1 e artifacts/ccm-machine-readable-bundle-json-yaml-oscal confirmou ausência de declaração de licença. A formulação entrega o que o claim prometia (regra de uso por tipo), sem o salto de 'exige' e 'livre'."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://cloudsecurityalliance.org/research/cloud-controls-matrix e localizar 'A CCM license allows organizations to customize the CCM or use it for commercial purposes.' e 'You do not need a license if you are using the CCM for internal purposes.'; conferir que nenhuma das duas frases contém 'require/exige' nem 'free'"
+        }
+      },
+      {
+        "source": "fedramp-20x",
+        "gap": "FedRAMP 20x: o que é e se existe exigência de estado validado nos últimos 7 dias (a pesquisa diz que sim) e indicadores lidos por máquina",
+        "claim": "1. FRC-APP-FCP: 7 dias vale para o pacote de certificação INICIAL, não é cadência recorrente.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. Baixei o JSON oficial (raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json) e grep -F devolveu 1 ocorrência da quote. Em FRR/FRC/data/all/APP/FRC-APP-FCP o statement diz 'fresh initial FedRAMP Certification Package ... within the previous 7 days', force MUST, updated 2026-06-24 (lançamento oficial). A palavra 'initial' sustenta a natureza de entrada, não de revalidação.",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x",
+        "gap": "FedRAMP 20x: o que é e se existe exigência de estado validado nos últimos 7 dias (a pesquisa diz que sim) e indicadores lidos por máquina",
+        "claim": "2. CPO-CSX-CPM: cadência recorrente escalonada por classe (A 3 meses SHOULD, B mensal, C 2 semanas, D semanal), sem '7 dias' para B/C, com timeframe_type/num estruturados.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A quote tem 1 ocorrência no JSON. Em FRR/CPO/data/20x/CSX/CPO-CSX-CPM/varies_by_class, os campos medidos são: a=months/3 (SHOULD), b=months/1 (MUST), c=weeks/2 (MUST), d=weeks/1 (MUST). Os valores batem com o claim. Notas da regra, úteis ao radar: manutenção 'using automation as changes occur ... never out of date' e sem revisão humana persistente nessa cadência.",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x",
+        "gap": "FedRAMP 20x: o que é e se existe exigência de estado validado nos últimos 7 dias (a pesquisa diz que sim) e indicadores lidos por máquina",
+        "claim": "3. Validação persistente dos KSIs medida por número de métodos automatizados (A MAY, B SHOULD 1, C MUST 2, D 4).",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A quote tem 1 ocorrência. A regra é FRC-CSX-VVK (FRR/FRC/data/20x/CSX): a=MAY sem número, b=SHOULD 'at least 1 automated method', c=MUST 'at least 2', d=MUST 'at least 4'. O locator do claim não dá o id, mas o conteúdo bate. A parte 'sugere que o vocabulário tenha métodos independentes' é inferência do leitor, marcada como sugestão. Ressalva: a regra fixa o mínimo de métodos, não diz que a frequência seja irrelevante.",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x",
+        "gap": "FedRAMP 20x: o que é e se existe exigência de estado validado nos últimos 7 dias (a pesquisa diz que sim) e indicadores lidos por máquina",
+        "claim": "4. 'Persistentemente' é definido pelo FedRAMP como NÃO contínuo e NÃO regular; vencimento é estado sempre conhecido, não cron rígido.",
+        "verdict": "EXAGERADA",
+        "why": "A quote aparece literal em FRD-PER, linha 839 do JSON. O claim a estica. O texto diz 'may vary', 'may occur irregularly' e 'may include interruptions', ou seja, PODE ser irregular. A nota (linha 840) diz 'may not always occur continuously ... or regularly ... but will repeat frequently in cycles', e a definição abre com 'firm, steady way that is repeated'. Dizer que é definido como 'NÃO contínuo e NÃO regular' vira permissão em proibição. E não é cron frouxo: o mesmo documento fixa teto máximo de intervalo (CPO-CSX-CPM, 'at least once every 2 weeks', MUST).",
+        "corrected": "O FedRAMP define 'persistently' como repetição firme e constante em ciclos, que PODE variar entre atores, ocorrer de forma irregular e ter interrupções ou esperas entre ciclos. Esses atributos devem ser intencionais, entendidos e documentados, e o status sempre conhecido. Nota do FRD: pode não ocorrer sempre de modo contínuo nem regular, mas se repete com frequência em ciclos. Isso convive com tetos explícitos de intervalo (CPO-CSX-CPM). Para o radar: estado sempre conhecido, com ciclo documentado e teto máximo declarado.",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação do próprio FRD-PER, definição mais a nota na linha 840 do mesmo JSON, entrega o valor que o claim prometia: o radar trata vencimento como estado sempre conhecido, com ciclos documentados.",
+          "medida": "Li as linhas 839-840 do fedramp-consolidated-rules.json (versão 2026.10.13.01) e rodei grep -F nas quotes (1 ocorrência cada). O CPO-CSX-CPM, com timeframe_num estruturado, dá o teto de intervalo."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json | sed -n 839,840p   # 'may vary', 'may occur irregularly', 'may not always occur continuously ... or regularly' (nunca 'NÃO contínuo e NÃO regular')"
+        }
+      },
+      {
+        "source": "fedramp-20x",
+        "gap": "FedRAMP 20x: o que é e se existe exigência de estado validado nos últimos 7 dias (a pesquisa diz que sim) e indicadores lidos por máquina",
+        "claim": "5. Leitura por máquina é norma: dados em JSON válido contra JSON Schema do FedRAMP; regras publicadas como JSON com schema no repo oficial.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A quote tem 1 ocorrência, na linha 3729 do JSON, regra FRC-CSO-JSN ('FedRAMP JSON Schemas'), force MUST, com a cláusula 'UNLESS otherwise specified in the rule'. O repo FedRAMP/rules contém fedramp-consolidated-rules.json e schemas/fedramp-consolidated-rules.schema.json, e info.description diz 'structured machine-readable text'. Nota: o escopo é 'when a rule contains a FedRAMP JSON schema', não todo dado.",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x",
+        "gap": "FedRAMP 20x: o que é e se existe exigência de estado validado nos últimos 7 dias (a pesquisa diz que sim) e indicadores lidos por máquina",
+        "claim": "6. Natureza e calendário do 20x: Rev5 deixa de aceitar novas certificações em 2027; SDR-CSX-KMT emendada em 2026-10-08 (MUST->SHOULD Classe B).",
+        "verdict": "EXAGERADA",
+        "why": "A quote 'Security should be continuously enforced, monitored, and reported—not staged for a point-in-time audit.' aparece em fedramp.gov/20x/. A emenda de 2026-10-08 também confere (updated[0] de SDR-CSX-KMT: 'Changed MUST to SHOULD for Class B, added note, clarified persistent validation status should be included'). O que estica é o calendário. 'Rev5 deixa de aceitar em 2027' foi dado como fato firme, mas a frase 'FedRAMP will stop accepting new Rev5 Certifications on June 11, 2027' está na entrada da Phase 5, rotulada FUTURE, janela estimada FY27 Q3-Q4. A seção Phased Implementation ressalva: 'Future dates are estimates for public awareness, not firm commitments.' (o próprio 11/06/2027 não traz tag 'estimated' individual).",
+        "corrected": "O FedRAMP 20x é 'a new approach to cloud security assessment and authorization', com princípio de Automatic Validation. A página afirma que o FedRAMP deixará de aceitar novas certificações Rev5 em 2027-06-11, mas a data está na Phase 5 (FUTURE, FY27 Q3-Q4, estimada), e a página diz que datas futuras são estimativas, não compromissos firmes. A SDR-CSX-KMT foi emendada em 2026-10-08 (MUST para SHOULD na Classe B; nota adicionada; status de validação persistente esclarecido), e a FRC-CSX-VVK teve os controles mapeados em 2026-10-13: a norma ainda se move.",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação com o ressalvamento do próprio fedramp.gov/20x/ (data na Phase 5 estimada, 'not firm commitments') entrega o valor do claim sem esticar.",
+          "medida": "Reabri a página duas vezes via WebFetch e confirmei a quote, a data e o disclaimer. Confirmei no JSON o updated[0] 2026-10-08 de SDR-CSX-KMT."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://www.fedramp.gov/20x/ e localizar 'Future dates are estimates for public awareness, not firm commitments' junto da entrada Phase 5 com 'June 11, 2027'"
+        }
+      },
+      {
+        "source": "ocsf",
+        "gap": "OCSF: versão atual (a pesquisa diz 1.9) e se serve para evidência de log e achado",
+        "claim": "OCSF 1.9.0 é a versão estável mais recente (3 ago 2026); existe 1.10.0-dev em desenvolvimento.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A descrição crua da classe (GET schema.ocsf.io/api/1.9.0/classes/compliance_finding) abre com 'Compliance Finding events describe results of evaluations performed against resources, to check compliance with various', palavra por palavra. A página de releases do GitHub lista 1.9.0 (Latest), publicada em 03 Aug, com changelog 'Aug 3rd, 2026'. A 1.8.0 aparece em Mar 2026. O endpoint /api/versions devolve default=1.9.0 e lista 1.10.0-dev acima dela. A frase de estabilidade é leitura de 'Latest' e do 'default', e o texto a sustenta.",
+        "corrected": ""
+      },
+      {
+        "source": "ocsf",
+        "gap": "OCSF: versão atual (a pesquisa diz 1.9) e se serve para evidência de log e achado",
+        "claim": "A classe tem objeto de evidências (evidences, que substitui o evidence obsoleto). Ele não traz periodicidade, vencimento, dono ou retenção.",
+        "verdict": "EXAGERADA",
+        "why": "A quote 'Describes various evidence artifacts associated with the compliance finding.' é a descrição exata do atributo evidences (caption 'Evidence Artifacts', is_array, optional), nas versões 1.5.0, 1.7.0, 1.8.0 e 1.9.0. O objeto evidences (/api/1.9.0/objects/evidences) tem 33 atributos (data, http_response, process, file, user, uid, query, resources, actor, verdict e outros) e nenhum de frequência, vencimento, dono ou retenção; essa parte está sustentada. A cláusula 'que substitui o evidence obsoleto' só apareceu no resumo do WebFetch da UI ('Supersedes deprecated evidence'). Os dados crus não a confirmam: o JSON da classe 1.9.0 não tem atributo 'evidence' nem 'supersedes', e 'evidence' é None em 1.5.0, 1.7.0 e 1.8.0. O relato do leitor afirma mais do que consegui verificar.",
+        "corrected": "A Compliance Finding (2003) tem o atributo opcional evidences ('Evidence Artifacts', lista de objetos), descrito como 'Describes various evidence artifacts associated with the compliance finding.'. O objeto evidences carrega artefatos (data, process, file, user, resources, actor, verdict e outros) e não tem atributo de periodicidade, vencimento, dono ou retenção. A relação de substituição com um campo 'evidence' obsoleto não foi confirmada nos dados crus do schema 1.9.0.",
+        "quote": "Describes various evidence artifacts associated with the compliance finding.",
+        "locator": "schema.ocsf.io/1.9.0/classes/compliance_finding, atributo evidences (Evidence Artifacts)",
+        "sourceTier": 9,
+        "validFrom": "2026-08-03",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação do campo corrected, que mantém só o que o schema sustenta: evidences é um objeto de artefatos sem frescor, dono nem retenção.",
+          "medida": "Medida no JSON cru de /api/1.9.0/classes/compliance_finding (descrição do atributo evidences, igual em 1.5.0, 1.7.0, 1.8.0 e 1.9.0) e de /api/1.9.0/objects/evidences (33 atributos, 0 casando freq/due/owner/retent/expir/valid/period). Entrega o que o claim prometia para o vocabulário: OCSF não serve de base para o frescor da evidência."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://schema.ocsf.io/api/1.9.0/classes/compliance_finding | python3 -I -c \"import json,sys;a=json.load(sys.stdin)['attributes'];print(a.get('evidence'),a['evidences']['description'])\"; curl -sL https://schema.ocsf.io/api/1.9.0/classes/compliance_finding | grep -ic supersedes  # esperado: None, a descrição de evidences, 0 ocorrências de 'supersedes'"
+        }
+      },
+      {
+        "source": "cyclonedx-vex",
+        "gap": "CycloneDX: versão atual (a pesquisa diz 1.7) e o suporte a VEX",
+        "claim": "CycloneDX corrente é 1.7, publicada em 2025-10-21; página descreve como adequada a VEX",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página overview traz 'Current Version 1.7' e 'Release Date 2025-10-21'. A frase 'making it ideal for both vulnerability disclosure and VEX use cases.' aparece literal. O release 1.7 no GitHub tem published_at 2025-10-21T15:35:08Z, o que confere a data.",
+        "corrected": ""
+      },
+      {
+        "source": "cyclonedx-vex",
+        "gap": "CycloneDX: versão atual (a pesquisa diz 1.7) e o suporte a VEX",
+        "claim": "Patch Latest em outubro de 2026 é 1.7.2 (17 Set); sem 1.8; registrar como 1.7 (patch 1.7.2); ano inferido pela ordem",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A API de releases devolve 1.7.2 com published_at 2026-09-17T12:31:18Z, e /releases/latest devolve 1.7.2. A lista (1.7.2, 1.7.1, 1.6.2, 1.5.1, 1.7, ...) não tem 1.8. O ano 2026 é lido direto da API, então a inferência do leitor se confirma. A quote existe literal no corpo do release 1.7, mas só sustenta o conteúdo da 1.7. O dado do 1.7.2 vem da lista de releases, não desse trecho.",
+        "corrected": ""
+      },
+      {
+        "source": "cyclonedx-vex",
+        "gap": "CycloneDX: versão atual (a pesquisa diz 1.7) e o suporte a VEX",
+        "claim": "VEX no CycloneDX é array vulnerabilities no BOM; cada item tem objeto analysis com state, justification e response",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. O schema 1.7 tem properties.vulnerabilities (title 'Vulnerabilities', type array). A definição vulnerability.analysis tem title 'Impact Analysis' e description igual à quote (schema linha 2995, o leitor disse ~2993). Suas properties são state, justification, response, detail, firstIssued e lastUpdated, e response é array.",
+        "corrected": ""
+      },
+      {
+        "source": "cyclonedx-vex",
+        "gap": "CycloneDX: versão atual (a pesquisa diz 1.7) e o suporte a VEX",
+        "claim": "Seis valores de state; not_affected exige justification; vocabulário de exploitabilidade, não de vencimento",
+        "verdict": "EXAGERADA",
+        "why": "O enum impactAnalysisState tem exatamente os seis valores citados. A quote existe na linha 2695 do schema, mas diz 'Justification should be specified', isto é, recomendação. 'Exige' é mais forte. O objeto analysis não tem required nem if/then no schema (chaves: type, title, description, additionalProperties, properties), então nada obriga justification em not_affected. A parte 'vocabulário de exploitabilidade, não de vencimento' é leitura do leitor e é coerente com os valores do enum.",
+        "corrected": "O estado de análise tem seis valores enumerados (resolved, resolved_with_pedigree, exploitable, in_triage, false_positive, not_affected). Para not_affected a descrição diz que a justification 'should be specified' (deve ser informada), mas o schema 1.7 não a impõe como campo obrigatório. O vocabulário é de exploitabilidade, não de vencimento de evidência.",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação corrigida, tirada da mesma linha 2695 do schema: 'should be specified' (recomendação), sem obrigatoriedade imposta pelo schema",
+          "medida": "Medido no schema 1.7 baixado: o objeto analysis não tem required, allOf nem if. A única menção à justification para not_affected é a descrição do meta:enum, com 'should'. A formulação corrigida sustenta o mesmo uso pretendido (not_affected leva justification) sem inflar o verbo."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://raw.githubusercontent.com/CycloneDX/specification/master/schema/bom-1.7.schema.json | python3 -I -c \"import json,sys;s=json.load(sys.stdin);a=s['definitions']['vulnerability']['properties']['analysis'];print('required' in a, 'allOf' in a, 'if' in a)\" ; e grep -n 'Justification should be specified' do mesmo arquivo (linha 2695, verbo 'should')"
+        }
+      },
+      {
+        "source": "cyclonedx-vex",
+        "gap": "CycloneDX: versão atual (a pesquisa diz 1.7) e o suporte a VEX",
+        "claim": "Schema 1.7 reconhece VEX como tipo de referência externa (exploitability-statement), para VEX publicado fora do BOM",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. O externalReferenceType tem 'exploitability-statement' no enum (linha 1905), e o meta:enum na linha 1954 começa exatamente com a quote ('...do not affect a product, product family, or organization, and optionally the ones that do...'). Que seja VEX publicado fora do BOM é consistente com ser tipo de referência externa.",
+        "corrected": ""
+      },
+      {
+        "source": "lula",
+        "gap": "Lula (defenseunicorns): se a versão 2 deixou de usar OSCAL como armazenamento interno, como a pesquisa afirma",
+        "claim": "O motivo declarado do abandono é a complexidade do OSCAL para equipes.",
+        "verdict": "EXAGERADA",
+        "why": "A citação existe na linha 72, mas é um de três desafios listados. Os outros dois são 'Automated tests alone were insufficient for real compliance verification' (linha 73) e 'The format made collaboration and review difficult' (linha 74). O claim usa 'o motivo' no singular, o que reduz três motivos a um. 'Abandono' também estica: a v1 está em 'maintenance mode' (linha 10), e a v2 ainda importa catálogos OSCAL (linha 63). O README não fala em abandonar o OSCAL.",
+        "corrected": "Entre os desafios declarados da v1, o README lista que o OSCAL se mostrou complexo demais para a maioria das equipes. Lista também que testes automatizados sozinhos não bastam para verificação real de conformidade e que o formato dificultava colaboração e revisão. A v2 troca OSCAL por 'Simple YAML + Spreadsheets' e mantém a importação de catálogos OSCAL. A v1 está em modo de manutenção.",
+        "quote": "OSCAL proved too complex for most teams to work with effectively",
+        "locator": "README linhas 70-74, lista 'Challenges in Lula 1'",
+        "sourceTier": 9,
+        "validFrom": "",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação sustentada pelas linhas 70-74 do mesmo README: três desafios, a complexidade do OSCAL sendo apenas o primeiro, mais a linha 10 (v1 em 'maintenance mode') e a linha 63 (OSCAL ainda importado na v2).",
+          "medida": "cat -n readme.md | sed -n 68,78p, e grep -n -i oscal readme.md (linhas 8, 63, 68, 72, 78, 402, 403). O trecho entrega o que o claim prometia, a razão da mudança, sem reduzi-la a um único motivo."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://raw.githubusercontent.com/defenseunicorns/lula/main/README.md | sed -n 66,75p   # mostra 3 itens em 'Challenges in Lula 1'; o claim cita só o primeiro como 'o motivo'"
+        }
+      },
+      {
+        "source": "ciso-assistant",
+        "gap": "CISO Assistant: arquitetura de estado (banco próprio?), licença, capital/mercado",
+        "claim": "Existe edição comercial Pro/Enterprise sob licença própria, com preço por assento de contribuidor (plano pago confirmado).",
+        "verdict": "EXAGERADA",
+        "why": "A quote existe em intuitem.com/ciso-assistant: 'You need seats only for contributors (editors); readers are free up to 100 readers.' Ela só sustenta que o licenciamento conta assentos de contribuidor. Não traz preço, e a palavra 'Enterprise' não aparece nessa página (WebFetch: 'The page doesn't mention Enterprise'). 'Pro and Enterprise Editions' sob a 'intuitem Commercial Software License' aparece só no README. Em intuitem.com/pricing não há plano Enterprise (Community, Pro SaaS, Pro On-premises, Custom). Lá o preço é por contribuidor só no Pro SaaS (€39/contribuidor/mês); o Pro On-premises é €2400/instância/ano (1-5 assentos). 'Preço por assento' e 'plano pago confirmado' são, portanto, inferência feita a partir de uma citação que não traz valores.",
+        "corrected": "Há edição comercial Pro, SaaS e on-premises, sob a intuitem Commercial Software License. O README chama as edições comerciais de 'Pro and Enterprise Editions', mas a página de preços não lista plano Enterprise. A cobrança conta assentos de contribuidor, e leitores são gratuitos até 100 (intuitem.com/ciso-assistant). Preços em intuitem.com/pricing: Pro SaaS €39 por contribuidor/mês; Pro On-premises €2400 por instância/ano (1-5 assentos); Custom sob cotação; Community €0.",
+        "quote": "You need seats only for contributors (editors); readers are free up to 100 readers.",
+        "locator": "intuitem.com/ciso-assistant, seção de preços/plans (o preço em si está em intuitem.com/pricing)",
+        "sourceTier": 8,
+        "validFrom": "",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A página intuitem.com/pricing entrega o valor que o claim prometia (plano pago confirmado, com preço por assento no SaaS: '€ 39 ... Per contributor / Month'). A formulação corrigida acima é sustentada pelo texto.",
+          "medida": "WebFetch de https://intuitem.com/pricing em 2026-10-21 devolveu os valores e os nomes de plano citados em 'corrected'. Não devolveu plano Enterprise."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://intuitem.com/ciso-assistant e conferir que a quote não contém valor nem a palavra 'Enterprise'; WebFetch https://intuitem.com/pricing e conferir que lista Community/Pro SaaS/Pro On-premises/Custom, sem Enterprise"
+        }
+      },
+      {
+        "source": "probo-compai",
+        "gap": "Probo e Comp AI: arquitetura de estado (banco próprio?), licença, mercado",
+        "claim": "Sinal de capital de agregadores: Comp AI com pré-seed de cerca de 2,6M (Grand Ventures, OSS Capital) e rodada de 34M em 2026-09-17 (Roo Capital, Grand Ventures), sem YC; Probo com YC e cerca de 500K de pré-seed. Não serve de base.",
+        "verdict": "EXAGERADA",
+        "why": "A citação existe: o digg.com/ai/087n795v traz, na seção TLDR, 'Comp AI announced on September 17, 2026, that it had raised $34 million, led by Roo Capital and Grand Ventures.' Ela sustenta só a rodada de 34M. O vcbacked.co/company/probo confirma 'Probo has raised $500K in total funding. The most recent round was Pre-Seed' e lista Y Combinator como investidor. Não consegui verificar o pré-seed de 2,6M, OSS Capital e a ausência de YC no Comp AI, porque o seedtable devolveu HTTP 403. 'Sem YC' é afirmação de ausência, que nenhuma fonte aberta sustenta. A cautela do leitor ('não serve de base') está correta, mas o claim junta itens que a citação não cobre. Os READMEs do GitHub, fonte designada, não trazem sinal algum de capital.",
+        "corrected": "Segundo um agregador secundário (digg.com/ai/087n795v), o Comp AI anunciou em 2026-09-17 uma rodada de 34M liderada por Roo Capital e Grand Ventures, sem confirmação em fonte primária. O vcbacked.co lista o Probo com 500K de pré-seed (junho de 2025) e Y Combinator entre os investidores, também só de agregador. O pré-seed de 2,6M do Comp AI com OSS Capital e a ausência de YC não foram verificados (seedtable deu 403). Os READMEs não trazem sinal de capital. Nada disso serve de base ao vocabulário ou ao radar.",
+        "quote": "Comp AI announced on September 17, 2026, that it had raised $34 million, led by Roo Capital and Grand Ventures.",
+        "locator": "digg.com/ai/087n795v (TLDR); vcbacked.co/company/probo; seedtable.com/companies/comp-ai (403)",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação corrigida, restrita ao que as fontes abertas sustentam: 34M do Comp AI em 2026-09-17 (digg) e 500K de pré-seed com YC para o Probo (vcbacked), ambos rotulados como agregador secundário.",
+          "medida": "WebFetch de digg.com/ai/087n795v devolveu a sentença literal dos 34M; WebFetch de vcbacked.co/company/probo devolveu '$500K ... Pre-Seed' e Y Combinator como investidor; seedtable deu 403 e por isso ficou fora."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "WebFetch https://digg.com/ai/087n795v e grep -F 'Comp AI announced on September 17, 2026' (acha só os 34M); WebFetch https://seedtable.com/companies/comp-ai (HTTP 403, 2,6M, OSS Capital e 'sem YC' sem sustentação aberta); WebFetch https://raw.githubusercontent.com/trycompai/comp/main/README.md e grep -iE 'funding|raised|Y Combinator' (0 ocorrências)"
+        }
+      }
+    ],
+    "elenxo": {
+      "objections": [
+        {
+          "target": "Claim 1 [compliance-trestle]: plataforma opinativa de compliance as code, CI + OSCAL, Apache-2.0",
+          "survives": true,
+          "evidence": "A quote só sustenta a identidade do projeto e a licença. Conferi a licença hoje: gh api repos/oscal-compass/compliance-trestle devolve Apache-2.0. O que a rodada precisa é outra coisa: saber se o trestle serve para validar a EXPORTAÇÃO do grafo (AR/POA&M). Nenhuma claim ancorada mostra trestle validate rodando sobre um assessment-results ou um poam. A claim de viabilidade como validador foi REBAIXADA (EXAGERADA). No corpus: kg-corpus-grep.sh trestle devolveu 0 nós sobre 180 grafos.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh trestle  # 0 nós; e no run nenhuma claim ancorada com saída de 'trestle validate' sobre AR/POA&M"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Validador de exportação OSCAL medido rodando sobre AR/POA&M (trestle validate ou oscal-cli do NIST)",
+            "medida": "Procurei nas 16 claims ancoradas e nas rejeitadas um teste de validação de AR/POA&M: não há nenhum. O oscal-cli (usnistgov) não foi aberto no run. Corpus: kg-corpus-grep.sh trestle e OSCAL devolvem 0 nós."
+          }
+        },
+        {
+          "target": "Claim 2 [compliance-trestle]: a trilha v5 suporta OSCAL 1.2.1 e versões anteriores",
+          "survives": true,
+          "evidence": "Medido hoje: gh api repos/usnistgov/OSCAL/releases/latest devolve v1.2.3, de 2026-08-07T03:33:33Z. E gh api repos/oscal-compass/compliance-trestle/releases/latest devolve v5.2.0, de 2026-10-05T11:19:36Z. O README ainda declara 1.2.1, dois patches atrás da versão vigente, num release que saiu dois meses DEPOIS do OSCAL 1.2.3. A claim prova suporte a 1.2.1, não a 1.2.3. Se o grafo exportar para 1.2.3, o trestle declarado não cobre.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "gh api repos/usnistgov/OSCAL/releases/latest --jq '.tag_name+\" \"+.published_at'  # v1.2.3 2026-08-07 contra o README do trestle, que diz 1.2.1"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Nota de release do trestle v5.2.0 declarando suporte ao OSCAL 1.2.3",
+            "medida": "Li só a tag e a data do v5.2.0 pela API. O corpo das notas não foi aberto no run, e nenhuma claim ancorada cita 1.2.2 ou 1.2.3 no trestle."
+          }
+        },
+        {
+          "target": "Claim 3 [compliance-trestle]: suporta implicitamente todos os schemas OSCAL no modelo de objetos",
+          "survives": true,
+          "evidence": "O texto diz 'implicitly', e a própria claim reconhece que a página não nomeia AR nem POA&M como fluxo validado. A lacuna pergunta se o trestle 'valida e gera OSCAL AR/POA&M'. Suporte implícito no modelo de objetos (classes pydantic) não mostra geração nem validação de ponta a ponta desses modelos.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "no run: nenhuma claim ancorada com answersGap=compliance-trestle que nomeie 'assessment-results' ou 'plan-of-action-and-milestones' como comando/fluxo do trestle"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Documentação ou teste do trestle com AR/POA&M explícitos",
+            "medida": "Procurei nas claims ancoradas e rejeitadas do run, e não há quote do trestle com AR ou POA&M nomeados. O site oscal-compass.dev foi lido só na página inicial."
+          }
+        },
+        {
+          "target": "Claim 4 [scf-erl]: licença CC BY-ND 4.0 com crédito, link e indicação de mudanças",
+          "survives": false,
+          "evidence": "A quote é literal, de securecontrolsframework.com/terms-conditions/ (seção Attribution), e confirma o que a pesquisa do adotante dizia (CC BY-ND). Para a parte de licença da lacuna, ela prova exatamente o necessário."
+        },
+        {
+          "target": "Claim 5 [scf-erl]: oferecer conteúdo SCF derivado requer licença comercial",
+          "survives": true,
+          "evidence": "A claim prova uma restrição, mas não a fronteira que a decisão precisa. Pendurar ids SCF/ERL (ex.: E-GOV-01) como valor de source_norm num nó, e publicar esse grafo nas portas públicas (onion-core, onion-standalone, onion-plugins), conta como 'derivative SCF content'? O texto não diz. A rejeitada mostra ainda que a proibição inclui geração por IA: 'This prohibition on creating derivative works includes utilizing Artificial Intelligence'. Isso pesa contra o core montar vocabulário de evidência a partir do ERL. Logo, a claim NÃO sustenta o ERL como base do vocabulário; no máximo sustenta citar por ponteiro, e mesmo isso sem prova.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh source_norm  # 0 nós; e nenhuma claim ancorada trata citação por id como uso não-derivado"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Base de norma sem restrição de derivação (ex.: NIST SP 800-53/OSCAL, obra do governo dos EUA) para alimentar source_norm",
+            "medida": "Nenhuma claim do run abre a licença do conteúdo NIST. O repo usnistgov/OSCAL devolve license NOASSERTION pela API (medido hoje), então nem isso está fechado."
+          }
+        },
+        {
+          "target": "Claim 6 [csa-caiq-ccm]: CCM e CAIQ v4.1, lançados em 27/01/2026, com 207 controles em 17 domínios",
+          "survives": true,
+          "evidence": "A claim prova a versão do CCM. A lacuna pede também os FORMATOS publicados (JSON, YAML, OSCAL) e a versão do CAIQ. As três claims sobre isso foram REBAIXADAS por falta de quote. Há ainda contradição na própria fonte: a página research/cloud-controls-matrix diz que o CCM 'is composed of 197 control objectives ... in 17 domains', contra os 207 da página do artefato v4.1 (nota do verificador).",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "curl -s https://cloudsecurityalliance.org/research/cloud-controls-matrix | grep -o -E '197 control objectives|Mappings \\(JSON/YAML\\)|Version 4.1 of the CCM and CAIQ'"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Bundle legível por máquina do CCM v4.1 em OSCAL, com versão e licença declaradas",
+            "medida": "O verificador leu a página do bundle: lançamento em 06/03/2024 (3 de junho), anterior à v4.1, sem versão e sem licença. Nada no run liga o bundle OSCAL à v4.1."
+          }
+        },
+        {
+          "target": "Claim 7 [ocsf]: a Compliance Finding (2003) é formato de achado, não vocabulário de frescor",
+          "survives": true,
+          "evidence": "A quote só lista exemplos de frameworks ('NIST SP 800-53, CIS AWS ..., ISO/IEC 27001'). A segunda metade ('não como vocabulário de frescor') é inferência de ausência que a quote não sustenta. O que a sustenta é a leitura do objeto evidences (33 atributos, nenhum de frequência, vencimento, dono ou retenção), feita numa claim REBAIXADA. A lacuna também pergunta por evidência de LOG, e nenhuma claim ancorada trata disso.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "curl -s https://schema.ocsf.io/api/1.9.0/objects/evidences | jq '.attributes|keys'  # a prova da ausência mora aqui, não na quote ancorada"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "Leitura crua de /api/1.9.0/objects/evidences pelo verificador, mais a versão vigente medida hoje",
+            "medida": "O verificador contou 33 atributos (data, file, process, query, resources, verdict e outros) e nenhum de cadência ou retenção. Medi hoje gh api repos/ocsf/ocsf-schema/releases/latest: 1.9.0, de 2026-08-03T14:39:07Z. Isso entrega 'formato de achado, não vocabulário'. NÃO entrega a parte de evidência de log."
+          }
+        },
+        {
+          "target": "Claim 8 [ocsf]: Findings 1.9.0 com oito classes, conformidade = 2003",
+          "survives": false,
+          "evidence": "Fato de taxonomia literal no schema 1.9.0. Basta como alvo de mapeamento (class_uid 2003) para exportar achados. A versão 1.9.0 é a Latest, medida hoje pela API do GitHub (ocsf/ocsf-schema, 2026-08-03)."
+        },
+        {
+          "target": "Claim 9 [lula]: a v2 foi construída por limitações da abordagem OSCAL-based",
+          "survives": false,
+          "evidence": "Quote literal, README linha 68. Prova que a v2 se afastou do OSCAL, que é o que a lacuna pergunta. Ressalva: os motivos são três (complexidade, testes automatizados insuficientes, colaboração difícil), não um só. É autodeclaração do fornecedor, um único ponto de mercado."
+        },
+        {
+          "target": "Claim 10 [lula]: o armazenamento interno da v2 é YAML versionado em Git, não OSCAL",
+          "survives": false,
+          "evidence": "Quote literal ('Storage: YAML files with Git integration', linha 383). Fecha a lacuna lula e é o sinal de mercado mais próximo do desenho do Onion: grafo YAML em git como armazenamento, OSCAL na borda. Repo Apache-2.0, 49 estrelas (API, hoje): um sinal fraco de tração, não de convergência de mercado."
+        },
+        {
+          "target": "Claim 11 [lula]: OSCAL fica só na importação de catálogos; o README não declara exportação OSCAL",
+          "survives": false,
+          "evidence": "A claim está escopada corretamente ao README (linhas 63, 64 e 49). Não afirma ausência no código, só no texto lido."
+        },
+        {
+          "target": "Claim 12 [ciso-assistant]: AGPLv3 fora de enterprise/, comercial dentro",
+          "survives": false,
+          "evidence": "Quote literal da seção License. A API do GitHub devolve NOASSERTION para intuitem/ciso-assistant-community, coerente com licença dupla num monorepo, que o detector não classifica. Fecha a parte de licença."
+        },
+        {
+          "target": "Claim 13 [ciso-assistant]: estado em SQLite por padrão, PostgreSQL opcional",
+          "survives": false,
+          "evidence": "Quote literal. Fecha a parte de arquitetura de estado: banco próprio do produto, não arquivo versionado. A parte de capital/mercado da mesma lacuna continua aberta (a claim de preço foi EXAGERADA)."
+        },
+        {
+          "target": "Claim 14 [probo-compai]: Probo em PostgreSQL próprio, MIT",
+          "survives": true,
+          "evidence": "A quote ('Run it on your own infrastructure with Docker.') só prova que o Probo é autohospedável. PostgreSQL e MIT não estão no trecho citado, vêm só do locator.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "grep -F 'PostgreSQL' <<< 'Run it on your own infrastructure with Docker.'  # 0: a quote não contém o que a claim afirma"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "Licença e banco medidos direto no repo",
+            "medida": "Medido hoje: gh api repos/getprobo/probo --jq .license.spdx_id dá MIT. gh api repos/getprobo/probo/contents/compose.yaml, decodificado, tem na linha 3 a imagem postgres@sha256:52e6ffd1... O valor prometido está entregue por medida, não pela quote."
+          }
+        },
+        {
+          "target": "Claim 15 [probo-compai]: Comp AI em Postgres (Prisma) mais Redis Upstash",
+          "survives": true,
+          "evidence": "A quote só prova o Redis Upstash para chave-valor. Postgres/Prisma/DATABASE_URL vêm do locator, sem trecho citado.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "grep -F -i 'postgres' <<< 'Key-value store utilities using Upstash Redis.'  # 0"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "Schema Prisma com provider postgresql no repo",
+            "medida": "Medido hoje: gh api 'search/code?q=provider+postgresql+repo:trycompai/comp+extension:prisma' devolve packages/db/prisma/schema.prisma, apps/api/prisma/schema/schema.prisma e apps/app/prisma/schema/schema.prisma. O diretório packages/ tem db e kv."
+          }
+        },
+        {
+          "target": "Claim 16 [probo-compai]: Comp AI open-core, núcleo AGPLv3 e /ee comercial",
+          "survives": false,
+          "evidence": "Quote literal, e gh api repos/trycompai/comp devolve AGPL-3.0 (medido hoje). Fecha a parte de licença. O capital (rodada de 34M) ficou só em agregador, com a claim EXAGERADA."
+        },
+        {
+          "target": "Afirmação da pesquisa do adotante [fedramp-20x]: exigência de estado validado nos últimos 7 dias, como base de cadência do radar",
+          "survives": true,
+          "evidence": "A evidência que o próprio verificador levantou CONTRARIA a leitura de cadência recorrente. Em FRC-APP-FCP, o texto diz 'fresh initial FedRAMP Certification Package ... within the previous 7 days': vale para o pacote INICIAL. A cadência recorrente está em CPO-CSX-CPM e varia por classe (A: 3 meses SHOULD; B: mensal; C: 2 semanas; D: semanal). Todas as seis claims do FedRAMP foram REBAIXADAS, então nada ancora o radar no FedRAMP nesta rodada.",
+          "criterio": {
+            "id": "E1_EVIDENCIA_CONTRARIA",
+            "comando": "curl -s https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json | grep -o 'fresh initial FedRAMP Certification Package[^\\\"]*'"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "CPO-CSX-CPM (cadência por classe, com timeframe_type/num estruturados) como modelo do campo frequency",
+            "medida": "O verificador mediu os valores no JSON oficial, mas a claim foi rebaixada sem quote. É peça em cura, não entrega: precisa de reancoragem com quote e locator antes de servir de base."
+          }
+        },
+        {
+          "target": "Lacuna oscal-releases: método EXAMINE/INTERVIEW/TEST, relevant-evidence e subjects, base direta de oscal_method e location",
+          "survives": true,
+          "evidence": "As cinco claims do OSCAL foram rejeitadas: duas sem quote, três EXAGERADAS. O verificador VIU o texto 'EXAMINE : An inspection was performed. INTERVIEW ... TEST ... UNKNOWN' no reference v1.2.3, mas sem ancoragem o campo oscal_method não pode ser selado sobre esta rodada. 'location como ponteiro' também foi esticado: href é [0 or 1] e description é [1], e o back-matter aceita conteúdo base64 embutido. 'acceptance' não existe no OSCAL. O ponteiro é o caminho primário, não o único.",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh oscal_method evidence_type claim_class owner_role  # 0 nós; e nenhuma claim ancorada com answersGap=oscal-releases"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Quote ancorada do reference JSON v1.2.3 (assessment-results > observation > methods; relevant-evidence)",
+            "medida": "Versão confirmada por mim: gh api repos/usnistgov/OSCAL/releases/latest dá v1.2.3, de 2026-08-07. O texto dos métodos precisa ser reaberto com locator verbatim, e isso não entrou como ancorado no run."
+          }
+        }
+      ],
+      "gapsClosed": [
+        "lula"
+      ],
+      "gapsOpen": [
+        "oscal-releases: nenhuma claim ancorada. v1.2.3 (2026-08-07) medida pela API, mas os métodos EXAMINE/INTERVIEW/TEST, relevant-evidence e subjects foram rebaixados ou exagerados",
+        "compliance-trestle: identidade e licença Apache-2.0 fechadas; versão vigente (v5.2.0, 2026-10-05, só medida pela API) e validação/geração de AR/POA&M abertas; suporte declarado só até OSCAL 1.2.1",
+        "scf-erl: licença CC BY-ND e veto a derivado fechados; versão (2026.2 contra 2026.3 na página do ERL) e estrutura do ERL não ancoradas; a fronteira 'id como ponteiro' contra 'derivado' não está resolvida",
+        "csa-caiq-ccm: CCM v4.1 (27/01/2026, 207 controles) fechado; CAIQ como versão própria e formatos JSON/YAML/OSCAL não ancorados; contradição 197/207 na fonte",
+        "fedramp-20x: as 6 claims rebaixadas; a evidência do verificador contraria os '7 dias' como cadência recorrente (é só o pacote inicial)",
+        "ocsf: Compliance Finding 2003 no 1.9.0 ancorada; 1.9.0 como Latest só medida pela API; evidência de log não coberta",
+        "cyclonedx-vex: nenhuma claim ancorada (1.7 / 1.7.2 de 2026-09-17 só medida pela API; VEX via vulnerabilities[].analysis não ancorado)",
+        "ciso-assistant: estado (SQLite/Postgres) e licença (AGPLv3 + enterprise) fechados; capital/mercado aberto (claim de preço exagerada)",
+        "probo-compai: estado e licença fechados por medida direta (MIT/Postgres, AGPL/Prisma-Postgres); capital/mercado só em agregador, claim exagerada"
+      ],
+      "recommendation": "O QUE A RODADA SUSTENTA. (1) Desenho de estado: as três ferramentas de mercado medidas guardam o estado no banco do próprio produto: CISO Assistant em SQLite/Postgres, Probo em Postgres, Comp AI em Postgres+Redis. O Lula v2 saiu do OSCAL como armazenamento para YAML em Git e mantém o OSCAL só na importação. Isso apoia 'grafo YAML em git é o armazenamento, OSCAL é formato de borda (importação/exportação)'. O apoio vem de um único fornecedor, sinal fraco e não convergência de mercado. (2) OCSF 1.9.0, Compliance Finding 2003, é alvo de EXPORTAÇÃO de achado, não base de vocabulário. (3) A licença do SCF (CC BY-ND, derivado só com licença comercial, IA inclusa) VETA montar o vocabulário de evidência a partir do ERL e distribuí-lo nas portas públicas. (4) O trestle (Apache-2.0) é CANDIDATO a validador de exportação, nada mais.\n\nO QUE ELA NÃO SUSTENTA. (a) O campo oscal_method (EXAMINE/INTERVIEW/TEST) e 'location como ponteiro' não têm âncora. A versão do OSCAL, v1.2.3 de 2026-08-07, foi medida pela API, mas o texto dos métodos precisa de reancoragem verbatim do reference v1.2.3. 'acceptance' não existe no OSCAL e seria cunhagem do Onion, a declarar como tal. (b) O radar de vencimento (verified_at + frequency) NÃO pode se apoiar no FedRAMP 20x nesta rodada: as seis claims caíram, e a evidência do verificador contraria os '7 dias' como cadência recorrente (FRC-APP-FCP é o pacote inicial; a recorrente é CPO-CSX-CPM, por classe). (c) O trestle não está provado validando AR/POA&M, e declara OSCAL 1.2.1 contra a 1.2.3 vigente. (d) CycloneDX/VEX, formatos do CCM/CAIQ e capital/mercado continuam abertos. O eixo de mercado é invariante da doutrina, então não fecha por comodismo.\n\nDIVISÃO kg-ssot contra core. É inferência de desenho, NÃO evidência desta rodada, e vai ao maestro como pergunta. Ao contrato kg-ssot cabem só os campos neutros de domínio que estendem o que ele já tem: frequency/cadência por nó ao lado de verified_at; location como especialização de provenance.locator, que já existe; retention; owner_role. Ao core e ao hub regulado ficam os campos de domínio de auditoria: evidence_type, oscal_method, acceptance, source_norm e claim_class, e o leitor de vencimento no kg-radar.sh, que já tem STALE-OLD por cadência. A exportação OSCAL também fica com eles. Corpus hoje: kg-corpus-grep.sh devolve 0 nós para oscal_method, evidence_type, source_norm, claim_class, owner_role e OSCAL; a lacuna é real e deve virar nó.\n\nPARA O /meta:decide (pedido do usuário: 'traga no decide'). Cinco perguntas ao maestro: (i) selar 'grafo = armazenamento, OSCAL = borda' sobre o sinal Lula + três bancos relacionais; (ii) autorizar uma rodada de reancoragem do OSCAL v1.2.3 (methods, relevant-evidence) e do FedRAMP CPO-CSX-CPM antes de escrever os itens 1 e 2; (iii) declarar o SCF/ERL fora da base por licença e escolher a norma de origem alternativa, cuja licença também falta medir (usnistgov/OSCAL dá NOASSERTION); (iv) aprovar a divisão de campos contrato/core acima ou rejeitá-la; (v) aceitar o trestle como candidato de validação condicionado a um dogfood real de trestle validate sobre um AR exportado."
+    },
+    "stats": {
+      "sources": 10,
+      "reached": 10,
+      "anchored": 16,
+      "rejected": 30,
+      "nodesAdded": 57,
+      "edgesAdded": 71,
+      "nodesTotal": 57
+    },
+    "overcoming": {
+      "found": 18,
+      "nodesCounted": 18,
+      "edgesCounted": 18,
+      "base": {
+        "nodes": 0,
+        "edges": 0,
+        "measured": true
+      },
+      "recusedAnchor": 0,
+      "recusedElenxo": 0,
+      "recused": []
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Corpus"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Scope"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Search"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Fetch"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 5,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 6,
+      "title": "Synthesize"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 7,
+      "title": "write(KG)"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 8,
+      "title": "Leitura"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "ler:oscal-releases",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a1ddcbe44c66e16c4",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549665417,
+      "queuedAt": 1792549665360,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "usnistgov/OSCAL GitHub releases + API; pages.nist.gov/OSCAL…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549710321,
+      "tokens": 65342,
+      "toolCalls": 8,
+      "durationMs": 44902,
+      "resultPreview": "{\"source\":\"usnistgov/OSCAL GitHub releases + API; pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/ ; pages.nist.gov/OSCAL assessment-results concept page\",\"reachable\":true,\"claims\":[{\"claim\":\"A versão mais recente publicada do OSCAL é v1.2.3, de 2026-08-07, confirmando a pesquisa do adotante (1.2.3). O release anterior é v1.2.2 (30 Abr).\",\"quote\":\"OSCAL v1.2.3 Releas…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ler:compliance-trestle",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a528bd6cf616bebce",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549665417,
+      "queuedAt": 1792549665360,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://github.com/oscal-compass/compliance-trestle (README…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549713640,
+      "tokens": 66636,
+      "toolCalls": 12,
+      "durationMs": 46144,
+      "resultPreview": "{\"source\":\"https://github.com/oscal-compass/compliance-trestle (README, releases) e https://oscal-compass.dev/compliance-trestle/latest/\",\"reachable\":true,\"claims\":[{\"claim\":\"compliance-trestle e uma plataforma de ferramentas opinativa para compliance as code, baseada em CI e no OSCAL do NIST; licenca Apache-2.0.\",\"quote\":\"An opinionated tooling platform for managing compliance as code, using cont…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "ler:scf-erl",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a9966399b20dc93f5",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549665418,
+      "queuedAt": 1792549665361,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "securecontrolsframework.com (scf-download, terms-conditions…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549713938,
+      "tokens": 64084,
+      "toolCalls": 8,
+      "durationMs": 46440,
+      "resultPreview": "{\"source\":\"securecontrolsframework.com (scf-download, terms-conditions, free-content/evidence-request-list-erl)\",\"reachable\":true,\"claims\":[{\"claim\":\"A página de download cita a release 2026.2 mas não rotula a versão corrente nem dá data; atualização trimestral. A versão 2026.2 da pesquisa é compatível, mas não confirmada como rótulo explícito.\",\"quote\":\"released at no cost under Creative Commons …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "ler:csa-caiq-ccm",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a517fe57f943edae6",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549665418,
+      "queuedAt": 1792549665361,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "cloudsecurityalliance.org (páginas CCM, artefato CCM v4.1, …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549702657,
+      "tokens": 63729,
+      "toolCalls": 6,
+      "durationMs": 35157,
+      "resultPreview": "{\"source\":\"cloudsecurityalliance.org (páginas CCM, artefato CCM v4.1, bundle legível por máquina)\",\"reachable\":true,\"claims\":[{\"claim\":\"A CSA publica CCM e CAIQ combinados na versão 4.1, então a versão atual é a 4.1 e a pesquisa do adotante está certa em dizer v4.1. A página não traz número separado para o CAIQ.\",\"quote\":\"Version 4.1 of the CCM and CAIQ are now combined!\",\"locator\":\"cloudsecuritya…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "ler:fedramp-20x",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a005e2571ceeb8a7c",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549665418,
+      "queuedAt": 1792549665361,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "fedramp.gov Consolidated Rules for 2026 (www.fedramp.gov/20…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549725976,
+      "tokens": 70716,
+      "toolCalls": 9,
+      "durationMs": 58475,
+      "resultPreview": "{\"source\":\"fedramp.gov Consolidated Rules for 2026 (www.fedramp.gov/2026/..., 20x); fonte máquina: github.com/FedRAMP/rules, fedramp-consolidated-rules.json versão 2026.10.13.01 (lido inteiro em 2026-10-21)\",\"reachable\":true,\"claims\":[{\"claim\":\"A exigência de estado validado em 7 dias EXISTE, mas é a regra FRC-APP-FCP: vale para o pacote de certificação INICIAL (na entrada), não é cadência recorre…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "ler:ocsf",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a795a1bee35e16b16",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549665418,
+      "queuedAt": 1792549665361,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "schema.ocsf.io (/1.9.0/ e classes/compliance_finding) e git…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549718443,
+      "tokens": 64084,
+      "toolCalls": 6,
+      "durationMs": 50941,
+      "resultPreview": "{\"source\":\"schema.ocsf.io (/1.9.0/ e classes/compliance_finding) e github.com/ocsf/ocsf-schema/releases\",\"reachable\":true,\"claims\":[{\"claim\":\"OCSF 1.9.0 é a versão estável mais recente (3 ago 2026). A pesquisa do adotante acertou. Existe 1.10.0-dev em desenvolvimento.\",\"quote\":\"Compliance Finding events describe results of evaluations performed against resources, to check compliance with various\",…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "ler:cyclonedx-vex",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a327173b8bc15c2f2",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549702669,
+      "queuedAt": 1792549665361,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "cyclonedx.org/specification/overview, github.com/CycloneDX/…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549763563,
+      "tokens": 64991,
+      "toolCalls": 10,
+      "durationMs": 60893,
+      "resultPreview": "{\"source\":\"cyclonedx.org/specification/overview, github.com/CycloneDX/specification (releases + schema/bom-1.7.schema.json)\",\"reachable\":true,\"claims\":[{\"claim\":\"A versão corrente do CycloneDX é a 1.7 (spec major), publicada em 2025-10-21; a página da especificação a descreve como adequada a VEX. A afirmação da pesquisa do adotante ('1.7') se confirma.\",\"quote\":\"making it ideal for both vulnerabil…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "ler:lula",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a8097e146c49a88e0",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549710335,
+      "queuedAt": 1792549665362,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://github.com/defenseunicorns/lula (README, branch mai…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549745352,
+      "tokens": 63172,
+      "toolCalls": 5,
+      "durationMs": 35017,
+      "resultPreview": "{\"source\":\"https://github.com/defenseunicorns/lula (README, branch main)\",\"reachable\":true,\"claims\":[{\"claim\":\"A v2 do Lula foi construída por causa de limitações da abordagem baseada em OSCAL (a v1 era a OSCAL-based).\",\"quote\":\"We built Lula 2 after discovering key limitations with the OSCAL-based approach:\",\"locator\":\"README, seção Lula 2 (v2)\",\"answersGap\":\"Confirma que a v2 abandonou a abordag…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "ler:ciso-assistant",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "acd6b29189534af5b",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549713645,
+      "queuedAt": 1792549665362,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "github.com/intuitem/ciso-assistant-community (README) e int…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549747469,
+      "tokens": 62761,
+      "toolCalls": 5,
+      "durationMs": 33823,
+      "resultPreview": "{\"source\":\"github.com/intuitem/ciso-assistant-community (README) e intuitem.com/ciso-assistant/\",\"reachable\":true,\"claims\":[{\"claim\":\"A licença do código comunitário é AGPLv3; só o diretório enterprise é comercial (monorepo com licença dupla).\",\"quote\":\"All the files outside the top-level \\\"enterprise\\\" directory are released under the AGPLv3\",\"locator\":\"README, seção License\",\"answersGap\":\"Licenç…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "ler:probo-compai",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "af16808589d2acb05",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549713949,
+      "queuedAt": 1792549665362,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "github.com/getprobo/probo e github.com/trycompai/comp (READ…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549761889,
+      "tokens": 65011,
+      "toolCalls": 6,
+      "durationMs": 47939,
+      "resultPreview": "{\"source\":\"github.com/getprobo/probo e github.com/trycompai/comp (READMEs) + agregadores de capital\",\"reachable\":true,\"claims\":[{\"claim\":\"Probo guarda estado em PostgreSQL próprio (backend Go, GraphQL e MCP), autohospedável, com licença MIT. É banco relacional, não grafo nem arquivo versionado.\",\"quote\":\"Run it on your own infrastructure with Docker.\",\"locator\":\"README getprobo/probo (Tech Stack: …"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 9,
+      "title": "Ancoragem"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "ancorar:csa-caiq-ccm",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "abb32d2d7db4c4b9f",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549718480,
+      "queuedAt": 1792549702699,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "cloudsecurityalliance.org (research/cloud-controls-matrix; …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549755043,
+      "tokens": 62969,
+      "toolCalls": 5,
+      "durationMs": 36563,
+      "resultPreview": "{\"source\":\"cloudsecurityalliance.org (research/cloud-controls-matrix; artifacts/cloud-controls-matrix-v4-1; artifacts/ccm-machine-readable-bundle-json-yaml-oscal), lidos via WebFetch em 2026-10-21\",\"verdicts\":[{\"claim\":\"CCM e CAIQ combinados na v4.1; versão atual 4.1; página não traz número separado para o CAIQ.\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"A página resear…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "ancorar:oscal-releases",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "af957e42211d3183d",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549725980,
+      "queuedAt": 1792549710360,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "usnistgov/OSCAL (releases page + API releases/latest), page…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549814838,
+      "tokens": 82323,
+      "toolCalls": 11,
+      "durationMs": 88858,
+      "resultPreview": "{\"source\":\"usnistgov/OSCAL (releases page + API releases/latest), pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/ (baixado e texto extraído, 596k chars), pages.nist.gov/OSCAL/learn/concepts/layer/assessment/assessment-results/ — reabertos em 2026-10-21\",\"verdicts\":[{\"claim\":\"Versão mais recente do OSCAL é v1.2.3 (2026-08-07); anterior v1.2.2 (30 Abr).\",\"quoteFound\":…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "ancorar:compliance-trestle",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a860133b51169925c",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549745356,
+      "queuedAt": 1792549713670,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "oscal-compass/compliance-trestle (GitHub README, GitHub Rel…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549790245,
+      "tokens": 63604,
+      "toolCalls": 6,
+      "durationMs": 44889,
+      "resultPreview": "{\"source\":\"oscal-compass/compliance-trestle (GitHub README, GitHub Releases, oscal-compass.dev/compliance-trestle/latest/), lido em 2026-10-21\",\"verdicts\":[{\"claim\":\"compliance-trestle e uma plataforma opinativa de compliance as code, baseada em CI e no OSCAL do NIST; licenca Apache-2.0.\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"O README abre com a frase exata da citac…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 14,
+      "label": "ancorar:scf-erl",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a4a986fd74e3e2299",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549747474,
+      "queuedAt": 1792549713974,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "securecontrolsframework.com (scf-download, terms-conditions…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549806429,
+      "tokens": 64701,
+      "toolCalls": 7,
+      "durationMs": 58955,
+      "resultPreview": "{\"source\":\"securecontrolsframework.com (scf-download, terms-conditions, free-content/evidence-request-list-erl), reabertos via WebFetch em 2026-10-21\",\"verdicts\":[{\"claim\":\"Download cita a release 2026.2 sem rotular versão corrente nem data; atualização trimestral; a 2026.2 da pesquisa é compatível mas não confirmada\",\"quoteFound\":true,\"claimMatchesText\":false,\"verdict\":\"EXAGERADA\",\"why\":\"A quote …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 15,
+      "label": "ancorar:ocsf",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a0befda9038ef80e0",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549755049,
+      "queuedAt": 1792549718502,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "schema.ocsf.io (API e UI 1.9.0) e github.com/ocsf/ocsf-sche…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549815977,
+      "tokens": 67276,
+      "toolCalls": 10,
+      "durationMs": 60926,
+      "resultPreview": "{\"source\":\"schema.ocsf.io (API e UI 1.9.0) e github.com/ocsf/ocsf-schema/releases, reabertos em 2026-10-21\",\"verdicts\":[{\"claim\":\"OCSF 1.9.0 é a versão estável mais recente (3 ago 2026); existe 1.10.0-dev em desenvolvimento.\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"A descrição crua da classe (GET schema.ocsf.io/api/1.9.0/classes/compliance_finding) abre com 'Complianc…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 16,
+      "label": "ancorar:fedramp-20x",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a6f8b3aba2e2f994c",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549761892,
+      "queuedAt": 1792549726027,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "fedramp.gov/20x/ + FedRAMP/rules fedramp-consolidated-rules…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549833368,
+      "tokens": 75128,
+      "toolCalls": 10,
+      "durationMs": 71476,
+      "resultPreview": "{\"source\":\"fedramp.gov/20x/ + FedRAMP/rules fedramp-consolidated-rules.json (versão 2026.10.13.01), reabertos em 2026-10-21\",\"verdicts\":[{\"claim\":\"1. FRC-APP-FCP: 7 dias vale para o pacote de certificação INICIAL, não é cadência recorrente.\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"Baixei o JSON oficial (raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 17,
+      "label": "ancorar:lula",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a7494cb0326cbbb1b",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549763568,
+      "queuedAt": 1792549745384,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "defenseunicorns/lula README.md (branch main), baixado de ra…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549792873,
+      "tokens": 68859,
+      "toolCalls": 4,
+      "durationMs": 29305,
+      "resultPreview": "{\"source\":\"defenseunicorns/lula README.md (branch main), baixado de raw.githubusercontent.com em 2026-10-21 e conferido por grep -nF. Só o README foi aberto; releases, notas da v2, issues e ADRs não foram consultados.\",\"verdicts\":[{\"claim\":\"A v2 do Lula foi construída por causa de limitações da abordagem baseada em OSCAL (a v1 era a OSCAL-based).\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 18,
+      "label": "ancorar:ciso-assistant",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a70cdb4f7f5d21eb2",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549790250,
+      "queuedAt": 1792549747499,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "github.com/intuitem/ciso-assistant-community (README raw + …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549835620,
+      "tokens": 64215,
+      "toolCalls": 6,
+      "durationMs": 45370,
+      "resultPreview": "{\"source\":\"github.com/intuitem/ciso-assistant-community (README raw + página do repo), intuitem.com/ciso-assistant, intuitem.com/pricing; reabertos via WebFetch em 2026-10-21\",\"verdicts\":[{\"claim\":\"A licença do código comunitário é AGPLv3; só o diretório enterprise é comercial (monorepo com licença dupla).\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"README, seção License…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 19,
+      "label": "ancorar:probo-compai",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a0f0d9cac8ec55270",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549792877,
+      "queuedAt": 1792549761915,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "README getprobo/probo, README trycompai/comp (raw.githubuse…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549845178,
+      "tokens": 64165,
+      "toolCalls": 7,
+      "durationMs": 52300,
+      "resultPreview": "{\"source\":\"README getprobo/probo, README trycompai/comp (raw.githubusercontent.com, main), digg.com/ai/087n795v, vcbacked.co/company/probo (seedtable.com/companies/comp-ai deu HTTP 403)\",\"verdicts\":[{\"claim\":\"Probo guarda estado em PostgreSQL próprio (backend Go, GraphQL e MCP), autohospedável, MIT; banco relacional, não grafo nem arquivo versionado.\",\"quoteFound\":true,\"claimMatchesText\":true,\"ver…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 20,
+      "label": "ancorar:cyclonedx-vex",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a33b57aaac5a9d0f9",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792549806433,
+      "queuedAt": 1792549763591,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "cyclonedx.org/specification/overview, github.com/CycloneDX/…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792549846791,
+      "tokens": 65934,
+      "toolCalls": 5,
+      "durationMs": 40356,
+      "resultPreview": "{\"source\":\"cyclonedx.org/specification/overview, github.com/CycloneDX/specification (releases via API, schema/bom-1.7.schema.json em master), abertos em 2026-10-21\",\"verdicts\":[{\"claim\":\"CycloneDX corrente é 1.7, publicada em 2025-10-21; página descreve como adequada a VEX\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"A página overview traz 'Current Version 1.7' e 'Release…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 10,
+      "title": "Elenxo"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 21,
+      "label": "elenxo-primarias",
+      "phaseIndex": 10,
+      "phaseTitle": "Elenxo",
+      "agentId": "af1be67a5752aca99",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792549846840,
+      "queuedAt": 1792549846809,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "O QUE A RODADA SUSTENTA. (1) Desenho de estado: as três fer…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792550076517,
+      "tokens": 79359,
+      "toolCalls": 6,
+      "durationMs": 229677,
+      "resultPreview": "{\"objections\":[{\"target\":\"Claim 1 [compliance-trestle]: plataforma opinativa de compliance as code, CI + OSCAL, Apache-2.0\",\"survives\":true,\"evidence\":\"A quote só sustenta a identidade do projeto e a licença. Conferi a licença hoje: gh api repos/oscal-compass/compliance-trestle devolve Apache-2.0. O que a rodada precisa é outra coisa: saber se o trestle serve para validar a EXPORTAÇÃO do grafo (AR…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 22,
+      "label": "count-sup",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a741dd1f091c335ad",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792550076585,
+      "queuedAt": 1792550076552,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Contador do motor — NÃO escreva nada. A partir da raiz do repositório rode e copie os números:\n1. grep -c '^[[:space:]]*- id: C_SUPERACAO_20261021_' \"docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml\" — devolva overcomingNodes = o NÚMERO impresso (0 se nenhum ou arquivo ausente).\n2. awk -v p='C_SUPERACAO_20261021_' '/^[[:space:]]*- from:/{f=index(…",
+      "promptFramed": true,
+      "lastProgressAt": 1792550083130,
+      "tokens": 59061,
+      "toolCalls": 3,
+      "durationMs": 6544,
+      "resultPreview": "{\"overcomingNodes\":0,\"overcomingEdges\":0}"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 23,
+      "label": "write-kg-primarias",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "ae38330cadcccbde4",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792550083173,
+      "queuedAt": 1792550083142,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "docs/evolution/research/audit-evi…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Maquinaria de auditoria contínua no core do Onion (desenho a três: core + kg-ssot + hub regulado), itens 1 (vocabulário de evidência no grafo: evidence_type, oscal_method EXAMINE/INTERVIEW/TEST, acceptance, frequency, owner_role, location como ponteiro, retention, source…",
+      "promptFramed": true,
+      "lastProgressAt": 1792550772293,
+      "tokens": 185408,
+      "toolCalls": 27,
+      "durationMs": 689120,
+      "resultPreview": "{\"kgPath\":\"docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":57,\"edges\":71,\"nodesTotal\":57,\"decisionNodeId\":\"D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021\",\"optionNodeIds\":[\"C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT\",\"C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST\",\"C_OPCAO_C_ALL_FIELDS_IN_CONTRACT\"],\"constrainsEdges\":22…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 24,
+      "label": "verify-kg-1",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a6e510eb41175c42a",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792550772360,
+      "queuedAt": 1792550772298,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\nA partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n1. bash .claude/validation/kg-radar.sh \"docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml\" --integrity --schema; echo \"RC=$?\"\n2. bash …",
+      "promptFramed": true,
+      "lastProgressAt": 1792550780972,
+      "tokens": 59610,
+      "toolCalls": 2,
+      "durationMs": 8609,
+      "resultPreview": "{\"radarExit\":0,\"contractExit\":0,\"overcomingNodes\":18,\"overcomingEdges\":18,\"output\":\"\"}"
+    }
+  ],
+  "totalTokens": 1713138,
+  "totalToolCalls": 184
+}
