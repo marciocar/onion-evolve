@@ -2,7 +2,7 @@
 branch: chore/decide-a2a-1021
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: 7c158ed34d659b717e87c782297199c94eacd902f145f65da9e4837060b68d3a
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: d7c501afbee75b818dd6957682b056b79f927961d51472a9f4f30ec1fd970a35
 findings_total: 0
 findings_real: 0
@@ -19,7 +19,8 @@ nota: "tokens 0 = não medido; três selos do kg-decide-seal.sh"
 
 ## O que muda
 
-Três decisões novas do maestro em `a2a-cross-user-spike-2026-10`.
+Três decisões novas do maestro em `a2a-cross-user-spike-2026-10`, mais a evidência PROD
+`E_P1B_CHAVE_DE_TESTE_SAIU_DA_VPS_1021`: a privada do membro de teste saiu da VPS (listagem só por nomes).
 
 ## Achados
 
