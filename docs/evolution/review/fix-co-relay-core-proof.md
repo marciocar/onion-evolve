@@ -2,7 +2,7 @@
 branch: fix/co-relay-core-proof
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: c5c271a4a9277928f527dd14b0fda75faf3120dde9fa4c260806020c417abe93
+reviewed_diff_sha256: 87f744f8c6f23a58adb99586486657ff7fd6b8fd62465cda59af809ed40236d2
 reviewed_code_sha256: a406fffbfc47d751f6f117f539b00dda391455292b4ad91decd845787a94f517
 findings_total: 10
 findings_real: 4
