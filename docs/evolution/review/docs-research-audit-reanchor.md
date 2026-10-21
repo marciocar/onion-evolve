@@ -2,7 +2,8 @@
 branch: docs/research-audit-reanchor
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a21fa7bac8ec7eaac579ec7dfcc5c6d32f971c74b07b5050fd015e17e7f6cc95
+reviewed_code_sha256: 2d127175cc51f38bd5a21825ed433ec288c2f4cfe235063bfbba6bb22cc8289e
 findings_total: 1
 findings_real: 1
 tokens: 0

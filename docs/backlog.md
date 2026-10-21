@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**587 itens abertos** em 115 grafo(s) com aberto (de 148 no escopo) · 116 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**593 itens abertos** em 115 grafo(s) com aberto (de 148 no escopo) · 116 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -505,6 +505,39 @@
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
 
+## audit-evidence-machinery-2026-10 — 28 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.0 | `Q_AUDIT_EVIDENCE_MACHINERY_2026_10` | audit-evidence-machinery-2026-10 | Quais afirmações de mercado da pesquisa do adotante, verificadas em primária em outubro de 2026, servem de base para o vocabul |
+| 14.4 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY` | audit-evidence-machinery-2026-10 | relevant-evidence no OSCAL é description obrigatória + href opcional (URL, relativa ou #uuid de back-matter), e o back-matter ac |
+| 9.6 | `C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING` | audit-evidence-machinery-2026-10 | FRD-PER (definição + nota) mais o teto estruturado do CPO-CSX-CPM: 'persistente' PODE variar e ser irregular, mas repete em cicl |
+| 9.0 | `C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE` | audit-evidence-machinery-2026-10 | TEST e EXAMINE operam sobre assessment objects e INTERVIEW sobre pessoas; acceptance é extensão do core, sem lastro no NIST, a d |
+| 7.2 | `C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT` | audit-evidence-machinery-2026-10 | Texto literal do CPO-CSX-CPM e do FRC-CSX-VVK (com as datas de updated) mais o default_artifact KSI: sustentam cadência declarada |
+| 7.2 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER` | audit-evidence-machinery-2026-10 | OSCAL v1.2.3, metaschema l.915-924: observation.methods é obrigatório (1..N), aceita valores locais (allow-other=yes) além de E |
+| 6.0 | `C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO A (recomendação do Elenxo): ao contrato kg-ssot os campos neutros (frequency, retention, owner_role sobre owner, locatio |
+| 6.0 | `C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST` | audit-evidence-machinery-2026-10 | OPÇÃO B: todos os campos nascem no core como x_ (x_frequency, x_evidence_type, x_oscal_method…), o radar do core lê x_frequen |
+| 5.4 | `C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE` | audit-evidence-machinery-2026-10 | CSA: 'You do not need a license if you are using the CCM for internal purposes' e 'A CCM license allows organizations to customize |
+| 5.4 | `C_SUPERACAO_20261021_LULA_THREE_CHALLENGES` | audit-evidence-machinery-2026-10 | O README do Lula lista TRÊS desafios da v1 (complexidade do OSCAL, testes automatizados insuficientes, colaboração e revisão d |
+| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS` | audit-evidence-machinery-2026-10 | 'acceptance' tem zero ocorrências nos cinco metaschemas OSCAL v1.2.3 (assessment-common, assessment-results, poam, assessment-pla |
+| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED` | audit-evidence-machinery-2026-10 | Formulação corrigida: o OSCAL v1.2.3 não tem 'acceptance', mas o POA&M tem três construções de aceitação de risco: a prop  |
+| 5.4 | `C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED` | audit-evidence-machinery-2026-10 | A página do SCF declara: proibição de distribuir derivado, IA incluída na proibição de CRIAR derivados e licença comercial  |
+| 5.4 | `C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY` | audit-evidence-machinery-2026-10 | O trestle impõe schema aos documentos OSCAL que gerencia; isso entrega 'schema garantido' sem as inferências de que valida a exp |
+| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_NO_FRESHNESS_FIELDS` | audit-evidence-machinery-2026-10 | No OCSF 1.9.0, evidences da Compliance Finding é um array de artefatos (33 atributos) sem frescor, dono nem retenção: o OCSF n |
+| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES` | audit-evidence-machinery-2026-10 | A leitura crua do objeto evidences do OCSF 1.9.0 (33 atributos, nenhum de cadência ou retenção) e a 1.9.0 como Latest de 2026-0 |
+| 3.6 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL` | audit-evidence-machinery-2026-10 | No metaschema OSCAL v1.2.3 (l.974), a description de relevant-evidence é obrigatória (1..1) e o href é opcional; 'ponteiro prim |
+| 3.0 | `C_SUPERACAO_20261021_MARKET_CAPITAL_AGGREGATOR_ONLY` | audit-evidence-machinery-2026-10 | Capital em GRC open-source, só por agregador secundário: Comp AI levantou 34M em 2026-09-17 (Roo Capital, Grand Ventures; digg)  |
+| 3.0 | `C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM` | audit-evidence-machinery-2026-10 | O oscal-cli v3.2.0 tem subcomandos de validação por modelo (assessmentresults/ValidateSubcommand.java e poam/ValidateSubcommand. |
+| 2.7 | `C_OPCAO_C_ALL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO C: todos os nove campos entram no contrato kg-ssot, inclusive os de domínio de auditoria (oscal_method, source_norm, clai |
+| 2.4 | `C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS` | audit-evidence-machinery-2026-10 | intuitem.com/pricing confirma plano pago do CISO Assistant (Community, Pro SaaS a 39 euros por contribuidor por mês, Pro On-premi |
+| 2.4 | `C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED` | audit-evidence-machinery-2026-10 | Schema Prisma com provider postgresql no repo do Comp AI, em três pacotes (db, api e app), com pacotes db e kv: o Postgres está  |
+| 2.4 | `C_SUPERACAO_20261021_CYCLONEDX_JUSTIFICATION_IS_SHOULD` | audit-evidence-machinery-2026-10 | No CycloneDX 1.7, 'Justification should be specified' para not_affected é recomendação, sem required, allOf nem if no objeto an |
+| 2.4 | `C_SUPERACAO_20261021_FEDRAMP_20X_DATES_ESTIMATED` | audit-evidence-machinery-2026-10 | O fedramp.gov/20x ressalva que datas futuras são estimativas ('not firm commitments'): o fim de novas certificações Rev5 em 11/ |
+| 2.4 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_VS_ASSESSMENT_SUBJECT` | audit-evidence-machinery-2026-10 | Observation (página de conceitos) e observation > subjects (JSON reference) são coisas distintas de Assessment Subject (elemento |
+| 2.4 | `C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED` | audit-evidence-machinery-2026-10 | Licença e banco do Probo medidos direto no repo: spdx MIT pela API e imagem postgres na linha 3 do compose.yaml. |
+| 2.4 | `C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL` | audit-evidence-machinery-2026-10 | A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de downlo |
+| 2.4 | `C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS` | audit-evidence-machinery-2026-10 | O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e  |
+
 ## elenxos-2026-08-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -517,33 +550,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
-
-## audit-evidence-machinery-2026-10 — 22 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 22.5 | `Q_AUDIT_EVIDENCE_MACHINERY_2026_10` | audit-evidence-machinery-2026-10 | Quais afirmações de mercado da pesquisa do adotante, verificadas em primária em outubro de 2026, servem de base para o vocabul |
-| 7.2 | `C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING` | audit-evidence-machinery-2026-10 | FRD-PER (definição + nota) mais o teto estruturado do CPO-CSX-CPM: 'persistente' PODE variar e ser irregular, mas repete em cicl |
-| 6.0 | `C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO A (recomendação do Elenxo): ao contrato kg-ssot os campos neutros (frequency, retention, owner_role sobre owner, locatio |
-| 6.0 | `C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST` | audit-evidence-machinery-2026-10 | OPÇÃO B: todos os campos nascem no core como x_ (x_frequency, x_evidence_type, x_oscal_method…), o radar do core lê x_frequen |
-| 5.4 | `C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE` | audit-evidence-machinery-2026-10 | CSA: 'You do not need a license if you are using the CCM for internal purposes' e 'A CCM license allows organizations to customize |
-| 5.4 | `C_SUPERACAO_20261021_LULA_THREE_CHALLENGES` | audit-evidence-machinery-2026-10 | O README do Lula lista TRÊS desafios da v1 (complexidade do OSCAL, testes automatizados insuficientes, colaboração e revisão d |
-| 5.4 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY` | audit-evidence-machinery-2026-10 | relevant-evidence no OSCAL é description obrigatória + href opcional (URL, relativa ou #uuid de back-matter), e o back-matter ac |
-| 5.4 | `C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED` | audit-evidence-machinery-2026-10 | A página do SCF declara: proibição de distribuir derivado, IA incluída na proibição de CRIAR derivados e licença comercial  |
-| 5.4 | `C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY` | audit-evidence-machinery-2026-10 | O trestle impõe schema aos documentos OSCAL que gerencia; isso entrega 'schema garantido' sem as inferências de que valida a exp |
-| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_NO_FRESHNESS_FIELDS` | audit-evidence-machinery-2026-10 | No OCSF 1.9.0, evidences da Compliance Finding é um array de artefatos (33 atributos) sem frescor, dono nem retenção: o OCSF n |
-| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES` | audit-evidence-machinery-2026-10 | A leitura crua do objeto evidences do OCSF 1.9.0 (33 atributos, nenhum de cadência ou retenção) e a 1.9.0 como Latest de 2026-0 |
-| 3.6 | `C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE` | audit-evidence-machinery-2026-10 | TEST e EXAMINE operam sobre assessment objects e INTERVIEW sobre pessoas; acceptance é extensão do core, sem lastro no NIST, a d |
-| 3.0 | `C_SUPERACAO_20261021_MARKET_CAPITAL_AGGREGATOR_ONLY` | audit-evidence-machinery-2026-10 | Capital em GRC open-source, só por agregador secundário: Comp AI levantou 34M em 2026-09-17 (Roo Capital, Grand Ventures; digg)  |
-| 2.7 | `C_OPCAO_C_ALL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO C: todos os nove campos entram no contrato kg-ssot, inclusive os de domínio de auditoria (oscal_method, source_norm, clai |
-| 2.4 | `C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS` | audit-evidence-machinery-2026-10 | intuitem.com/pricing confirma plano pago do CISO Assistant (Community, Pro SaaS a 39 euros por contribuidor por mês, Pro On-premi |
-| 2.4 | `C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED` | audit-evidence-machinery-2026-10 | Schema Prisma com provider postgresql no repo do Comp AI, em três pacotes (db, api e app), com pacotes db e kv: o Postgres está  |
-| 2.4 | `C_SUPERACAO_20261021_CYCLONEDX_JUSTIFICATION_IS_SHOULD` | audit-evidence-machinery-2026-10 | No CycloneDX 1.7, 'Justification should be specified' para not_affected é recomendação, sem required, allOf nem if no objeto an |
-| 2.4 | `C_SUPERACAO_20261021_FEDRAMP_20X_DATES_ESTIMATED` | audit-evidence-machinery-2026-10 | O fedramp.gov/20x ressalva que datas futuras são estimativas ('not firm commitments'): o fim de novas certificações Rev5 em 11/ |
-| 2.4 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_VS_ASSESSMENT_SUBJECT` | audit-evidence-machinery-2026-10 | Observation (página de conceitos) e observation > subjects (JSON reference) são coisas distintas de Assessment Subject (elemento |
-| 2.4 | `C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED` | audit-evidence-machinery-2026-10 | Licença e banco do Probo medidos direto no repo: spdx MIT pela API e imagem postgres na linha 3 do compose.yaml. |
-| 2.4 | `C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL` | audit-evidence-machinery-2026-10 | A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de downlo |
-| 2.4 | `C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS` | audit-evidence-machinery-2026-10 | O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e  |
 
 ## adopter-shape-bench-2026-10 — 16 item(ns)
 
