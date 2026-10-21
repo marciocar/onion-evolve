@@ -6,7 +6,7 @@ meta:
   baseline: "2026-10-21"
   review_after: "2026-11-20"   # 30d: FERRAMENTA é o tipo dominante (Apps SDK, MCP Apps, visuais do Claude, LibreChat mudam por release); a cadência de ferramenta da doutrina é 30 d
   # kg-backlog-guard: on
-  # ═══ TETO: 31 NÓS ═══   (28 da rodada + 3 do veredito e do plano N4, 2026-10-21)
+  # ═══ TETO: 33 NÓS ═══   (28 da rodada + 3 do veredito e do plano N4 + 2 selos do maestro em 2026-10-21: o piloto ui:// no /chat, medido pela leitura do bridge, e a tarefa do token do /chat)
   #
   # Justificativa do teto: rodada de PRIMÁRIAS NOMEADAS executada em 2026-10-21 (/meta:dissect, régua
   # onion, alvo N4) sobre a "Intelligent UI" do ChatGPT com GPT-6. 14 claims ancoradas viram 14 nós de
@@ -627,6 +627,40 @@ nodes:
     x_absorb_parity: "run_mcp_onion_kg_selftests: caso que pede o recurso ui:// do onion-kg e exige mimeType text/html;profile=mcp-app, conteúdo do grafo tratado como dado não confiável (escapado) e nenhuma tool de escrita exposta pela UI"
     label: "PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL ao padrão MCP Apps; só depois do LibreChat estável com MCP Apps."
     trace: "ops/mcp-onion-kg/server.py"
+  - id: D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Piloto render-only»"
+    label: "O recurso ui:// ganha um piloto render-only no /chat do onion-bridge, só admin e atrás de flag, em origem separada (sandbox.onionevolve.com), com servidor MCP só dentro do bridge e a vista sem tools/call nem ui/message; refina o gate do veredito B"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «Piloto render-only»; descartadas: «Esperar o LibreChat» · «Bidirecional completo» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «O que fazer com o recurso ui:// no /chat do onionevolve, o único host que o Onion controla nas duas pontas?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
+  - id: D_TOKEN_DO_CHAT_FORA_DO_LOCALSTORAGE_VIRA_TAREFA_1021
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Abrir uma tarefa»"
+    label: "O access e o refresh token do /chat saem do localStorage (web/src/auth/oidc.ts:20-25, exposto a XSS com acesso irrestrito ao Agent SDK): vira tarefa no Linear, cura por PR revisado no onion-bridge, merge do maestro"
+    narrative: |-
+      Issue SAC-184 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «Abrir uma tarefa»; descartadas: «Curar agora» · «Aceitar o risco»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «O que fazer com o token do /chat em localStorage exposto a XSS?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
 edges:
 
@@ -743,4 +777,10 @@ edges:
     edge_type: CONSTRAINS
   - from: D_INTELLIGENT_UI_1021
     to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: TRACES_TO
+  - from: D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021
+    to: A_ABSORB_ONION_KG_RECURSO_UI
+    edge_type: TRACES_TO
+  - from: D_TOKEN_DO_CHAT_FORA_DO_LOCALSTORAGE_VIRA_TAREFA_1021
+    to: D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021
     edge_type: TRACES_TO
