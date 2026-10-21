@@ -293,7 +293,25 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
+  - id: E_P1B_CHAVE_DE_TESTE_SAIU_DA_VPS_1021
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "ls do diretório de chaves A2A do maestro na VPS depois do shred -u rodado por ele: restam channel-token e onion-evolve-spike-1.key.pem, e maestro-notebook-test-1.key.pem não existe mais; a cópia no notebook foi feita pelo maestro (scp + chmod 600), com impressão sha256 de referência c1dcd6f48af35183 medida na VPS antes da remoção"
+    label: "a privada do membro de teste maestro-notebook-test-1 saiu da VPS e está no notebook do maestro: o P1b do protocolo rodou e a lacuna L6 (receptor capaz de forjar o remetente de teste) fecha"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+      locator: "P1 b) Leve a privada ao notebook e apague-a da VPS"
+      method: "medição: listagem do diretório de chaves na VPS (só nomes)"
+      locality: "host"
 edges:
+  - from: E_P1B_CHAVE_DE_TESTE_SAIU_DA_VPS_1021
+    to: D_CHAVE_DO_MEMBRO_DE_TESTE_VAI_AO_NOTEBOOK_1021
+    edge_type: SUPPORTS
   - from: E_F1_F2_CURADOS_NO_GATE_2026_10_14
     to: E_F1_CORPO_FORA_DA_ASSINATURA
     edge_type: SUPERSEDES
