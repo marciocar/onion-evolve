@@ -565,13 +565,14 @@ nodes:
     node_type: decision
     x_dissect_level: 3
     x_dissect_verdict: costurar
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.6
-    verified_at: "2026-10-21"
-    verified_against: "rodada de primárias wf_95b7868c-c7d (14 ancoradas, 9 objeções sobreviventes); a fonte da OpenAI ficou inalcançável, então o objeto do veredito é o MECANISMO ABERTO (MCP Apps Stable 2026-01-26, Apache-2.0 nas contribuições novas; visuais e artifacts do Claude; artifacts do LibreChat), não a UI proprietária do GPT-6"
     label: "VEREDITO PROPOSTO: costurar, não absorver a UI do GPT-6 (proprietária e não lida). Costura-se o mecanismo aberto: um painel interativo opcional do /meta:decide como Artifact com estado, e um recurso ui:// do onion-kg para o brain, gated pelo MCP Apps estável no LibreChat."
+    trace: "docs/evolution/dissect/intelligent-ui-2026-10/data/run-wf_95b7868c-c7d.json"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «B: costurar só o painel interativo opcional do /meta:decide, publicado como Artifact com estado e selado pelo mesmo selador; o recurso ui:// do onion-kg fica gated»"
     narrative: |-
       Opções para o maestro: (A) costurar as duas peças abaixo (recomendada); (B) só o painel do /meta:decide,
       que roda no host que o core já tem (os Artifacts do Claude Code, com estado compartilhado); (C) só o recurso
@@ -582,7 +583,14 @@ nodes:
       painel do decide usa Artifact, não MCP Apps; o brain em v0.8.8 não prova render de MCP Apps (E_OBJECAO_06); o
       eixo de mercado e capital está vazio (E_OBJECAO_16). Nome: nenhuma peça usa "Intelligent UI" nem a marca
       OpenAI/GPT.
-    trace: "docs/evolution/dissect/intelligent-ui-2026-10/data/run-wf_95b7868c-c7d.json"
+
+      verified_against anterior: «rodada de primárias wf_95b7868c-c7d (14 ancoradas, 9 objeções sobreviventes); a fonte da OpenAI ficou inalcançável, então o objeto do veredito é o MECANISMO ABERTO (MCP Apps Stable 2026-01-26, Apache-2.0 nas contribuições novas; visuais e artifacts do Claude; artifacts do LibreChat), não a UI proprietária do GPT-6»
+      Selado por /meta:decide em 2026-10-21: escolhida «B: costurar só o painel interativo opcional do /meta:decide, publicado como Artifact com estado e selado pelo mesmo selador; o recurso ui:// do onion-kg fica gated»; descartadas: «A: as duas peças» · «C: só o recurso ui:// do brain» · «D: parquear».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Qual o veredito da dissecação da Intelligent UI do GPT-6?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
   - id: A_ABSORB_DECIDE_PAINEL_INTERATIVO
     node_type: claim
