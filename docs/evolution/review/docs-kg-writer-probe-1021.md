@@ -2,7 +2,8 @@
 branch: docs/kg-writer-probe-1021
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2bdec83f11ce1047b6f531094078fece5d47d45a66735ce2041651c344013da6
+reviewed_code_sha256: 035372ed21a35a36f0637e3132bba8190abb954f3080442440dc7931c1c69cb4
 findings_total: 1
 findings_real: 1
 tokens: 0
