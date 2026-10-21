@@ -2,7 +2,8 @@
 branch: chore/decide-keep-peer-test
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a369e8b0694f8b2bb082dcfbd6a4cba3a2e1ab1bbf7d4ecbebc0a7f301537a39
+reviewed_code_sha256: c10cf55bcd53f0344bb8923d6e39a874ba61c4d437e329a2329186246370c32a
 findings_total: 0
 findings_real: 0
 tokens: 0
