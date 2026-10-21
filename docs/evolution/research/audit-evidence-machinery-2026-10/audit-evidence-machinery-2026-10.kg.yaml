@@ -806,43 +806,83 @@ nodes:
 
   - id: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
     node_type: decision
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.5
     label: "DECISÃO ABERTA: selar 'grafo YAML em git é o armazenamento, OSCAL é formato de borda (importação/exportação)'? (a) selar agora sobre o sinal Lula + três bancos relacionais, ou (b) pesquisar mais fornecedores antes, ou (c) não selar."
-    narrative: "Pergunta (i) do Elenxo. A favor: Lula v2 saiu do OSCAL como armazenamento para YAML em Git (E_LULA_V2_STORAGE_YAML_IN_GIT) e mantém OSCAL na importação; CISO Assistant, Probo e Comp AI guardam estado em banco relacional próprio, nenhum em OSCAL. OCSF 2003 é alvo de exportação de achado. Contra selar já: o apoio ao desenho git-nativo vem de UM fornecedor (49 estrelas), sinal fraco; os três relacionais só mostram que o OSCAL não é o armazenamento, não que o grafo em git seja o certo. Implicação de (a): destrava escrever o item 1 como campos do grafo e a exportação OSCAL como borda. Implicação de (b): /onion-research em modo decision sobre armazenamento de evidência."
     trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (i); pedido do usuário 'traga no decide'"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Pesquisar mais fornecedores antes de selar (varredura /onion-research decision sobre armazenamento de evidência)»"
+    narrative: |-
+      Pergunta (i) do Elenxo. A favor: Lula v2 saiu do OSCAL como armazenamento para YAML em Git (E_LULA_V2_STORAGE_YAML_IN_GIT) e mantém OSCAL na importação; CISO Assistant, Probo e Comp AI guardam estado em banco relacional próprio, nenhum em OSCAL. OCSF 2003 é alvo de exportação de achado. Contra selar já: o apoio ao desenho git-nativo vem de UM fornecedor (49 estrelas), sinal fraco; os três relacionais só mostram que o OSCAL não é o armazenamento, não que o grafo em git seja o certo. Implicação de (a): destrava escrever o item 1 como campos do grafo e a exportação OSCAL como borda. Implicação de (b): /onion-research em modo decision sobre armazenamento de evidência.
+
+      Selado por /meta:decide em 2026-10-21: escolhida «Pesquisar mais fornecedores antes de selar (varredura /onion-research decision sobre armazenamento de evidência)»; descartadas: «Selar agora com a ressalva» · «Não selar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Selar grafo YAML em git como armazenamento e OSCAL como borda?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
   - id: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
     node_type: decision
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.5
     label: "DECISÃO ABERTA: (a) rodar uma reancoragem do OSCAL v1.2.3 (methods, relevant-evidence) e do FedRAMP CPO-CSX-CPM antes de escrever os itens 1 e 2, ou (b) escrever já, com oscal_method e frequency declarados como cunhagem do Onion até a reancoragem?"
-    narrative: "Pergunta (ii) do Elenxo. Base: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED (as cinco claims do OSCAL caíram, o verificador VIU o texto sem quote) e E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY (os 7 dias são do pacote inicial; a cadência recorrente CPO-CSX-CPM varia por classe). As superações C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING e C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY já trazem os comandos de reancoragem. Medido no core: o radar NÃO tem cadência por nó (E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE), então o item 2 é leitor novo. Custo de (a): uma rodada curta de primárias com 2 chaves (referência: ~42k tokens por nó na rodada de 2026-09-13). Risco de (b): escrever o vocabulário sobre texto não ancorado, o que a casa chama de declarado igual a verificado."
     trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (ii); pedido do usuário 'traga no decide'"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Reancorar antes: rodada curta de primárias do OSCAL v1.2.3 (methods, relevant-evidence) e do FedRAMP CPO-CSX-CPM antes de escrever os itens 1 e 2»"
+    narrative: |-
+      Pergunta (ii) do Elenxo. Base: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED (as cinco claims do OSCAL caíram, o verificador VIU o texto sem quote) e E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY (os 7 dias são do pacote inicial; a cadência recorrente CPO-CSX-CPM varia por classe). As superações C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING e C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY já trazem os comandos de reancoragem. Medido no core: o radar NÃO tem cadência por nó (E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE), então o item 2 é leitor novo. Custo de (a): uma rodada curta de primárias com 2 chaves (referência: ~42k tokens por nó na rodada de 2026-09-13). Risco de (b): escrever o vocabulário sobre texto não ancorado, o que a casa chama de declarado igual a verificado.
+
+      Selado por /meta:decide em 2026-10-21: escolhida «Reancorar antes: rodada curta de primárias do OSCAL v1.2.3 (methods, relevant-evidence) e do FedRAMP CPO-CSX-CPM antes de escrever os itens 1 e 2»; descartadas: «Escrever já com cunhagem declarada» · «Tirar oscal_method do item 1».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Reancorar OSCAL e FedRAMP antes de escrever os itens 1 e 2?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
   - id: D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021
     node_type: decision
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.5
     label: "DECISÃO ABERTA: SCF/ERL fora da base por licença; qual norma alimenta source_norm? (a) NIST SP 800-53/OSCAL depois de medir a licença, ou (b) CCM v4.1 da CSA, ou (c) source_norm só como ponteiro opaco (id + URL), sem catálogo no core?"
-    narrative: "Pergunta (iii) do Elenxo. Base: E_SCF_LICENSE_CC_BY_ND_ATTRIBUTION e E_SCF_DERIVATIVE_NEEDS_COMMERCIAL_LICENSE (derivado só com licença comercial; a proibição de criar derivados inclui IA). Restrição: E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED (não se sabe se id como ponteiro é derivado). Alternativas sem licença medida: usnistgov/OSCAL devolve NOASSERTION pela API; o CCM permite uso interno sem licença e exige licença CCM para customizar ou usar comercialmente (C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE). As portas públicas (onion-core, onion-standalone, onion-plugins) tornam o 'uso interno' do core discutível."
     trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (iii); pedido do usuário 'traga no decide'"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «source_norm como ponteiro opaco (id e URL da norma do adotante), sem catálogo no core»"
+    narrative: |-
+      Pergunta (iii) do Elenxo. Base: E_SCF_LICENSE_CC_BY_ND_ATTRIBUTION e E_SCF_DERIVATIVE_NEEDS_COMMERCIAL_LICENSE (derivado só com licença comercial; a proibição de criar derivados inclui IA). Restrição: E_OBJECAO_04_SCF_ID_AS_POINTER_BOUNDARY_UNRESOLVED (não se sabe se id como ponteiro é derivado). Alternativas sem licença medida: usnistgov/OSCAL devolve NOASSERTION pela API; o CCM permite uso interno sem licença e exige licença CCM para customizar ou usar comercialmente (C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE). As portas públicas (onion-core, onion-standalone, onion-plugins) tornam o 'uso interno' do core discutível.
+
+      Selado por /meta:decide em 2026-10-21: escolhida «source_norm como ponteiro opaco (id e URL da norma do adotante), sem catálogo no core»; descartadas: «NIST 800-53/OSCAL» · «CCM v4.1 da CSA».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Qual norma alimenta source_norm, com o SCF/ERL fora por licença?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
   - id: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021
     node_type: decision
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.5
     label: "DECISÃO ABERTA: como dividir o vocabulário de evidência entre o contrato kg-ssot e o core/hub? Opções vizinhas: C_OPCAO_A (neutros no contrato), C_OPCAO_B (tudo x_ no core até o hub provar), C_OPCAO_C (tudo no contrato)."
-    narrative: "Pergunta (iv) do Elenxo, que é inferência de desenho e não evidência da rodada. Medido no core (E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM): o nó do contrato v4 tem 22 chaves fechadas, com owner já presente; qualquer campo novo sem x_ reprova no MUST, e provenance tem chaves fechadas no SHOULD. Medido também (E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE): o radar compara verified_at com a baseline do grafo, não com uma cadência do nó. Restrição de licença: CISO Assistant e Comp AI são AGPL no núcleo, então o core pode tomar ideia e vocabulário, não código. O leitor de vencimento (item 2) fica no kg-radar.sh em qualquer opção; a exportação OSCAL fica com core e hub."
     trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (iv); pedido do usuário 'traga no decide'"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «A: campos neutros no contrato kg-ssot (cadência no eixo da verificação, retenção, papel do dono); evidence_type, oscal_method, source_norm e claim_class no core como x_»"
+    narrative: |-
+      Pergunta (iv) do Elenxo, que é inferência de desenho e não evidência da rodada. Medido no core (E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM): o nó do contrato v4 tem 22 chaves fechadas, com owner já presente; qualquer campo novo sem x_ reprova no MUST, e provenance tem chaves fechadas no SHOULD. Medido também (E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE): o radar compara verified_at com a baseline do grafo, não com uma cadência do nó. Restrição de licença: CISO Assistant e Comp AI são AGPL no núcleo, então o core pode tomar ideia e vocabulário, não código. O leitor de vencimento (item 2) fica no kg-radar.sh em qualquer opção; a exportação OSCAL fica com core e hub.
+
+      Selado por /meta:decide em 2026-10-21: escolhida «A: campos neutros no contrato kg-ssot (cadência no eixo da verificação, retenção, papel do dono); evidence_type, oscal_method, source_norm e claim_class no core como x_»; descartadas: «B: tudo x_ no core primeiro» · «C: tudo no contrato».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Como dividir o vocabulário de evidência entre o contrato kg-ssot e o core?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
   - id: C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT
     node_type: claim
@@ -876,13 +916,23 @@ nodes:
 
   - id: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
     node_type: decision
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
     label: "DECISÃO ABERTA: (a) aceitar o compliance-trestle como candidato a validador da exportação OSCAL, condicionado a um dogfood real de trestle validate sobre um AR exportado, ou (b) avaliar antes o oscal-cli do NIST, ou (c) adiar a validação de exportação?"
-    narrative: "Pergunta (v) do Elenxo. A favor: Apache-2.0, compliance as code em CI, schema imposto aos documentos gerenciados (E_TRESTLE_COMPLIANCE_AS_CODE_APACHE2, C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY). Contra: não há prova de AR/POA&M de ponta a ponta (E_OBJECAO_01, E_OBJECAO_03) e declara OSCAL 1.2.1 contra a 1.2.3 vigente (E_OBJECAO_02). Custo de (a): um dogfood com Python e a dependência do trestle. O oscal-cli não foi aberto nesta rodada."
     trace: "run wf_25b440d5-1f7, recomendação do Elenxo, pergunta (v); pedido do usuário 'traga no decide'"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Adiar a validação de exportação até a pesquisa de armazenamento confirmar o OSCAL como borda»"
+    narrative: |-
+      Pergunta (v) do Elenxo. A favor: Apache-2.0, compliance as code em CI, schema imposto aos documentos gerenciados (E_TRESTLE_COMPLIANCE_AS_CODE_APACHE2, C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY). Contra: não há prova de AR/POA&M de ponta a ponta (E_OBJECAO_01, E_OBJECAO_03) e declara OSCAL 1.2.1 contra a 1.2.3 vigente (E_OBJECAO_02). Custo de (a): um dogfood com Python e a dependência do trestle. O oscal-cli não foi aberto nesta rodada.
+
+      Selado por /meta:decide em 2026-10-21: escolhida «Adiar a validação de exportação até a pesquisa de armazenamento confirmar o OSCAL como borda»; descartadas: «Candidato condicionado a dogfood» · «Avaliar o oscal-cli antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «O compliance-trestle como validador da exportação OSCAL?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 
 edges:
   # decisões nascem da pergunta
