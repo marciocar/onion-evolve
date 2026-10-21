@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**614 itens abertos** em 119 grafo(s) com aberto (de 152 no escopo) · 120 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**613 itens abertos** em 119 grafo(s) com aberto (de 152 no escopo) · 120 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1085,11 +1085,10 @@
 | 4.5 | `Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305` | radar-E3-2026-10-21-r14 | re-testar a migalha do resume de Workflow (vence 2026-10-22) reproduzindo a condição dela no CLI 2.1.305 ou posterior (processo  |
 | 3.0 | `Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304` | radar-E3-2026-10-21-r14 | re-medir na 1ª compactação no CLI 2.1.304 ou posterior se a resposta escorrega para EN, agora que a lista de skills volta depoi |
 
-## radar-E3-2026-10-21-r15 — 4 item(ns)
+## radar-E3-2026-10-21-r15 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 4.5 | `Q_REVER_A_MEMORIA_DO_FALLBACK_DE_BUSCA_NA_2_1_307` | radar-E3-2026-10-21-r15 | decidir se WebFetch direto num buscador conta como contornar o teto do WebSearch, que o Claude Code proíbe desde a 2.1.304, e com |
 | 4.5 | `Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-21-r15 | o revisor de IA do CI no pin v1.0.257 (CLI 2.1.307) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a |
 | 2.8 | `C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO` | radar-E3-2026-10-21-r15 | a leitura do aviso real que o modelo recebe, extraída do binário de cada versão instalada (2.1.304 a 2.1.307), em vez do resumo |
 | 2.8 | `C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA` | radar-E3-2026-10-21-r15 | a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304: WebFetch direto num buscador conta como contornar o teto? |
