@@ -308,7 +308,25 @@ nodes:
       locator: "P1 b) Leve a privada ao notebook e apague-a da VPS"
       method: "medição: listagem do diretório de chaves na VPS (só nomes)"
       locality: "host"
+  - id: E_A0_CANAL_NATIVO_NAO_ATRAVESSA_USUARIO_DO_SO_1021
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "A0 rodado pelo maestro no notebook (WSL, Claude Code 2.1.306), mesma conta do Claude nos dois lados, usuários do SO diferentes (marciocar e o descartável a2a-peer) e Remote Control desligado: no peer-a (a2a-peer) a listagem de sessões só mostrou a própria ('não há nenhuma outra sessão do Claude rodando nesta máquina'); no core-a (marciocar) a listagem mostrou core-a e onion-evolve-82, ambas do mesmo usuário, e não o peer-a"
+    label: "o canal nativo entre sessões não atravessa usuários do SO na mesma máquina, nem com a mesma conta do Claude: cada usuário só enxerga as próprias sessões, então entre usuários o caminho é o A2A"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+      locator: "degrau A, A0 (canal nativo entre dois usuários do SO)"
+      method: "medição: listagem de sessões nos dois lados, colada pelo maestro"
+      locality: "pessoa"
 edges:
+  - from: E_A0_CANAL_NATIVO_NAO_ATRAVESSA_USUARIO_DO_SO_1021
+    to: D_DEGRAU_A_HOJE_A0_E_A1_1021
+    edge_type: SUPPORTS
   - from: E_P1B_CHAVE_DE_TESTE_SAIU_DA_VPS_1021
     to: D_CHAVE_DO_MEMBRO_DE_TESTE_VAI_AO_NOTEBOOK_1021
     edge_type: SUPPORTS
