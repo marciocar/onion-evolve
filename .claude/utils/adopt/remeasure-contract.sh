@@ -21,6 +21,8 @@
 # continua sendo dívida.
 #
 # USO  : remeasure-contract.sh <TARGET> [--exclude GLOB]...   (cole stdout E stderr: `2>&1`)
+#        ONION_CONTRACT_NODES_OUT=<arquivo> grava ali os nós da dívida MUST (JSON lines {file, id, place}), para a fase 2 conferir
+#        o plano da migração por identidade (fora do alvo: quem chama escolhe o caminho)
 # SAÍDA: `CONTRATO medido: …` + uma linha por regra MUST e SHOULD (ocorrências, grafos) e, com dívida MUST, a
 #        frase do caminho (migração). Sem vendor ou sem grafo: `CONTRATO não se aplica: …`.
 # EXIT : 0 = todo grafo passa no MUST (dívida SHOULD, se houver, vai listada)
@@ -54,7 +56,7 @@ command -v python3 >/dev/null 2>&1 || { echo "CONTRATO NÃO MEDIDO: python3 ause
 # O alvo é só LIDO: git ls-files e a leitura dos .kg.yaml; nenhum arquivo dele é escrito.
 # `${EXTRA[@]+…}`: array vazio sob `set -u` derruba o bash 3.2 (o do macOS).
 python3 -I -B - "${TOOLS}" "${T}" ${EXTRA[@]+"${EXTRA[@]}"} <<'PY'
-import collections, json, pathlib, sys
+import collections, json, os, pathlib, sys
 tools, repo, extra = sys.argv[1], sys.argv[2], tuple(sys.argv[3:])
 sys.path.insert(0, tools)
 ARCHIVE = ("docs/evolution/kg-inbox/_rejected/*", "docs/evolution/kg-inbox/_sealed/*")
@@ -144,6 +146,19 @@ def run():
                    + "; caminho: migração do corpus ao contrato (a fase seguinte do --update planeja com o kg_migrate.py"
                    " do vendor e o perfil do alvo: plan-contract-migration.sh). Medir não é gate: o update segue.")
         out += [f"    · {name}: {' · '.join(measured[name]['must'])}" for name in failing]
+    nodes_out = os.environ.get("ONION_CONTRACT_NODES_OUT")
+    if nodes_out:  # a fase 2 confere o plano por IDENTIDADE, não só pelo número: os nós da dívida MUST, um por linha
+        # JSON lines {file, id}: o arquivo pelo caminho REAL relativo ao alvo (o migrador resolve symlink) e o id
+        # pelo place do where() ('nó X', 'nó X (#2)' na repetição, 'nó #5' sem id): uma linha por OCORRÊNCIA
+        import re
+        place_rx, real_repo = re.compile(r"^nó (?:#(\d+)|(.+?))(?: \(#(\d+)\))?$"), os.path.realpath(repo)
+        lines = []
+        for n, p in sorted(must_nodes):
+            m = place_rx.match(p)
+            lines.append(json.dumps({"file": os.path.relpath(os.path.realpath(os.path.join(repo, n)), real_repo),
+                                     "id": (m.group(2) if m and m.group(2) is not None else None),
+                                     "place": p}, ensure_ascii=False))
+        pathlib.Path(nodes_out).write_text("".join(x + "\n" for x in lines), encoding="utf-8")
     print("\n".join(out))  # tudo de uma vez: uma exceção no meio não deixa meio relatório no stdout
     return 1 if failing else 0
 
