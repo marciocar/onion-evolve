@@ -2,7 +2,8 @@
 branch: docs/dissect-intelligent-ui
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 860a3e82e9fe6f30879f50ac7b70e1c6394379367f56452dd8622e9b18299975
+reviewed_code_sha256: bf03f1a60365355eec30c28b7721807993732f0ef1e3ee09f9e725ec451fecae
 findings_total: 1
 findings_real: 1
 tokens: 0

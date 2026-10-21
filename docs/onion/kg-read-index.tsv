@@ -75,6 +75,7 @@
 .claude/commands/meta/create-skill.md	E_DEFEITO_CITACAO_EXECUTADA	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/commands/meta/create-skill.md	E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/commands/meta/create-vertical.md	E_create_vertical_existe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
+.claude/commands/meta/decide.md	A_ABSORB_DECIDE_PAINEL_INTERATIVO	docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml
 .claude/commands/meta/decide.md	D_TOPOLOGIA_DO_DECIDE_SELADA	docs/evolution/research/forge-decide-2026-10/forge-decide-2026-10.kg.yaml
 .claude/commands/meta/diary.md	SY6_ev_diary_conflict_class	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/diary.md	SY6_ev_retestar_nunca_recarimbar	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -1429,6 +1430,7 @@ docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	D_CONDUCTOR_1
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	E_DOGFOOD_CONDUCTOR_ATE_N4	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	E_N3_FAIL_OPEN_NAO_TRANSFERE	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	Q_CONDUCTOR_ABSORVER_OU_NAO_1011	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
+docs/evolution/dissect/intelligent-ui-2026-10/data/run-wf_95b7868c-c7d.json	D_INTELLIGENT_UI_1021	docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_AUTORIDADE_NO_PROBE	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_TRES_SKILLS	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 docs/evolution/federation-roadmap-2026.md	C_naive_admin_platform	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -2444,6 +2446,7 @@ ops/mcp-onion-kg-writer/README.md	Q_CADASTRO_ABERTO_E_DISCO	docs/evolution/resea
 ops/mcp-onion-kg-writer/selftest.py	A_MCP_KG_WRITER_SERVER	docs/evolution/research/mcp-kg-writer-2026-10/mcp-kg-writer-2026-10.kg.yaml
 ops/mcp-onion-kg-writer/server.py	D_MCP_KG_WRITER_CHAT_DA_CASA	docs/evolution/research/mcp-kg-writer-2026-10/mcp-kg-writer-2026-10.kg.yaml
 ops/mcp-onion-kg/README.md	E_DEGRAU1_EM_PRODUCAO_1012	docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml
+ops/mcp-onion-kg/server.py	A_ABSORB_ONION_KG_RECURSO_UI	docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml
 ops/mcp-onion-kg/server.py	E_MEDIDO_LOCAL_PRECEDENTE_MCP_ONION_KG	docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
