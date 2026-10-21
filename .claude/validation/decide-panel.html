@@ -161,7 +161,11 @@
   (async () => {
     try { db = await window.claude?.use?.('db'); } catch (_) { db = null; }
     if (!db) { render(); return; }
-    db.doc('rounds/current').onSnapshot((snap) => { round = snap.exists ? snap.data() : null; render(); }, () => { round = null; render(); });
+    db.doc('rounds/current').onSnapshot((snap) => {
+      const next = snap.exists ? snap.data() : null;
+      // rodada nova zera as escolhas: os rótulos de ato se repetem, e a escolha antiga valeria para outro ato
+      if (!next || !round || next.round_id !== round.round_id) { picks = {}; sent = {}; }
+      round = next; render(); }, () => { round = null; render(); });
     db.collection('status').onSnapshot((qs) => { status = {}; qs.docs.forEach((d) => { status[d.id] = d.data(); }); render(); }, () => {});
     db.collection('answers').onSnapshot((qs) => { sent = {}; qs.docs.forEach((d) => { const a = d.data(); if (round && a.round_id === round.round_id) sent[d.id] = true; }); render(); }, () => {});
   })();
