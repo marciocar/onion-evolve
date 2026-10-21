@@ -58,6 +58,21 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-18"
       locality: "pessoa"
 
+  - id: E_WRITER_2CBE59D9_PROBE_AUTENTICADO_1021
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-21"
+    verified_against: "probe autenticado rodado pelo maestro (token lido por sudo do EnvironmentFile do serviço, sem eco), tools/call kg_my_list em http://172.23.0.1:3037/mcp: served_commit = store_commit = 2cbe59d98b1c42c359828201f17e3e15aaf46f16, sem aviso_codigo; area do maestro com 0 grafos; HEAD da worktree de código core-writer = 2cbe59d98b1c (git rev-parse)"
+    label: "o onion-kg-writer de produção serve o código 2cbe59d98b1c e julga com o mesmo contrato que importou no boot: o probe autenticado deu served_commit igual a store_commit, sem aviso"
+    provenance:
+      source: "ops/mcp-onion-kg-writer/server.py"
+      locator: "executa(): envelope com served_commit, store_commit e aviso_codigo"
+      method: "medição: chamada autenticada tools/call kg_my_list (só leitura)"
+      locality: "host"
 edges:
   - from: A_MCP_KG_WRITER_SERVER
     to: D_MCP_KG_WRITER_CHAT_DA_CASA
@@ -69,6 +84,9 @@ edges:
     to: D_MCP_KG_WRITER_CHAT_DA_CASA
     edge_type: TRACES_TO
 
+  - from: E_WRITER_2CBE59D9_PROBE_AUTENTICADO_1021
+    to: A_MCP_KG_WRITER_SERVER
+    edge_type: SUPPORTS
 external_edges:
   - from: D_MCP_KG_WRITER_CHAT_DA_CASA
     to: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml#D_ONION_BRAIN_MCP_REMOTO"
