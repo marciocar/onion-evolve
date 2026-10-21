@@ -8,7 +8,7 @@ meta:
   baseline: "2026-10-21"
   review_after: "2026-11-20"   # 30d: cadência de ferramenta
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-21) + 9 da rodada + 6 do juiz (4 omissões e 2 perguntas) = 17.
+  #   2 no esqueleto (2026-10-21) + 9 da rodada + 6 do juiz (4 omissões e 2 perguntas) = 17, + 1 do deploy do SDK (2026-10-21) = 18.
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
 #   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
@@ -112,7 +112,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 2
     confidence: 0.9
     verified_at: "2026-10-21"
@@ -267,6 +267,21 @@ nodes:
     label: "o revisor de IA do CI no pin v1.0.256 (CLI 2.1.306) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a versão no log"
     narrative: |-
       Issue SAC-181 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
+  - id: E_SDK_DO_BRIDGE_EM_0_3_306_EM_PRODUCAO_1021
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "cc-delta-census.sh depois do deploy: SDK bridge (CLI embutido, binário --version) = 2.1.306 (SDK 0.3.306); onion-bridge #79 e #80 MERGED (gh pr view), branch base apagada; ops/update-bridge.sh do maestro: 'OK — clone 1aa3f9a7 · bridge 21ae69c0 · health 200+ok:true local+público · auth enforce', verify do runner e da integridade OK; o clone servido do core = origin/main 1aa3f9a7"
+    label: "o /chat em produção roda o CLI 2.1.306 (SDK 0.3.306), igual ao host, depois do merge dos PRs #79 e #80 do onion-bridge e do deploy pelo ops/update-bridge.sh em 2026-10-21"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh"
+      locator: "tabela de versões, linha SDK bridge; saída do ops/update-bridge.sh colada pelo maestro"
+      method: "medição: binário do CLI embutido --version e verify do deploy"
+      locality: "host"
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -316,3 +331,6 @@ edges:
   - from: E_MODELO_DO_JUIZ_DECLARADO_PODIA_MENTIR_NO_FALLBACK_1021
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     edge_type: SUPPORTS
+  - from: E_SDK_DO_BRIDGE_EM_0_3_306_EM_PRODUCAO_1021
+    to: E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021
+    edge_type: SUPERSEDES
