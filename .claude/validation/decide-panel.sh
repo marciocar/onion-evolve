@@ -48,12 +48,15 @@
 #   - choice que não é EXATAMENTE um rótulo oferecido → recusada (fora das opções);
 #   - other (texto livre) só sela com `--other <qN>` passado pela sessão depois de ler o texto, e só em
 #     pergunta de selo; sem a flag volta como pergunta. Choice e other juntos, ou nenhum = ambígua, não sela.
-#   O round.json lido é o LOCAL que este script emitiu: o do painel nunca é fonte (o round_id é o hash das
-#   perguntas, e um round.json adulterado é recusado).
+#   O round.json lido é o LOCAL que este script emitiu: o do painel nunca é fonte. O round_id é o hash das
+#   perguntas, da data e de um nonce da emissão: ele DETECTA a edição que não recalculou o hash, não é
+#   assinatura com chave. Por isso o seal também revalida o que vira argumento (nó e grafo).
 #
 # Env (bancada; NUNCA em produção — o override ativo é declarado em stderr):
 #   DECIDE_PANEL_SEAL=<script>   selador alternativo (a bancada injeta um gravador de argumentos)
 #   DECIDE_PANEL_CENSUS=<script> medidor alternativo
+#   DECIDE_PANEL_NONCE=<texto>   nonce fixo da rodada (a bancada fixa; em produção é aleatório, para que a
+#                                mesma composição no mesmo dia gere OUTRO round_id e uma resposta velha não valha)
 # Exit: 0 = rodada emitida / respostas processadas (o estado por item diz o que selou) ·
 #       2 = entrada quebrada (composição inválida, ref não medido, round adulterado, rótulo com « » ou |).
 # Determinístico, sem LLM, 0 tokens. Exercitado por lint-selftest.sh (run_decide_selftests, casos p*).
@@ -63,6 +66,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SEAL="${DECIDE_PANEL_SEAL:-${HERE}/kg-decide-seal.sh}"
 CENSUS="${DECIDE_PANEL_CENSUS:-${HERE}/decide-census.sh}"
 [ -n "${DECIDE_PANEL_SEAL:-}" ] && echo "decide-panel: ⚠️ override ativo — DECIDE_PANEL_SEAL=${DECIDE_PANEL_SEAL} (não é o selador de produção)" >&2
+[ -n "${DECIDE_PANEL_NONCE:-}" ] && echo "decide-panel: ⚠️ override ativo — DECIDE_PANEL_NONCE fixo (não é o nonce de produção)" >&2
 [ -n "${DECIDE_PANEL_CENSUS:-}" ] && echo "decide-panel: ⚠️ override ativo — DECIDE_PANEL_CENSUS=${DECIDE_PANEL_CENSUS} (não é o medidor de produção)" >&2
 command -v python3 >/dev/null 2>&1 || { echo "decide-panel: python3 ausente" >&2; exit 2; }
 MODE="${1:-}"; shift || true
@@ -94,9 +98,10 @@ case "${MODE}" in
         echo "decide-panel: o medidor saiu com erro — sem censo não há rodada: $(head -2 "${TMPD}/census.err")" >&2; exit 2
       fi
     fi
-    PYTHONDONTWRITEBYTECODE=1 python3 -I -B - round "${TMPD}/census.tsv" "${COMPOSE}" "${ASK}" "${TODAY}" <<'PY'
-import sys, json, hashlib
-_, census, compose, ask, today = sys.argv[1:6]
+    PYTHONDONTWRITEBYTECODE=1 python3 -I -B - round "${TMPD}/census.tsv" "${COMPOSE}" "${ASK}" "${TODAY}" "${DECIDE_PANEL_NONCE:-}" <<'PY'
+import sys, json, hashlib, uuid
+_, census, compose, ask, today, nonce = sys.argv[1:7]
+nonce = nonce or uuid.uuid4().hex
 def die(m): print(f'decide-panel: {m}', file=sys.stderr); sys.exit(2)
 import re
 if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', today): die(f'--today inválido ({today}) — AAAA-MM-DD')
@@ -171,7 +176,7 @@ for k, r in enumerate(rows): pos.setdefault(r['ref'], k)
 out.sort(key=lambda it: pos[it['ref']])
 rnd, deferred = out[:4], out[4:]
 for k, it in enumerate(rnd): it['id'] = f'q{k + 1}'
-canon = json.dumps({'questions': rnd, 'today': today}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))   # a data do selo também é assinada
+canon = json.dumps({'questions': rnd, 'today': today, 'nonce': nonce}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))   # data e nonce entram no hash
 rid = hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16]
 def ask_desc(o): return o['description'] + (f' · custo: {o["cost"]}' if o['cost'] else '')
 if ask == '1':
@@ -179,7 +184,7 @@ if ask == '1':
                                      'options': [{'label': o['label'], 'description': ask_desc(o)} for o in it['options']]} for it in rnd]},
                      ensure_ascii=False, indent=2))
     sys.exit(0)
-panel = {'schema': 'onion.decide.panel/v1', 'round_id': rid, 'today': today, 'questions': rnd,
+panel = {'schema': 'onion.decide.panel/v1', 'round_id': rid, 'today': today, 'nonce': nonce, 'questions': rnd,
          'deferred': [f"{it['kind']}:{it['ref']}" for it in deferred],
          'not_asked': [f"{r['kind']}:{r['ref']} ({r.get('actor', '')})" for r in rows if r['ref'] not in used]}
 print(json.dumps(panel, ensure_ascii=False, indent=2))
@@ -210,11 +215,14 @@ try: rd = json.load(open(roundp, encoding='utf-8'))
 except Exception as e: die(f'round ilegível: {e}')
 if not isinstance(rd, dict) or rd.get('schema') != 'onion.decide.panel/v1': die('round não é onion.decide.panel/v1')
 qs = rd.get('questions') or []
-canon = json.dumps({'questions': qs, 'today': rd.get('today')}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+canon = json.dumps({'questions': qs, 'today': rd.get('today'), 'nonce': rd.get('nonce')}, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
 if hashlib.sha256(canon.encode('utf-8')).hexdigest()[:16] != rd.get('round_id'): die('round adulterado: o round_id não é o hash das perguntas — recuso selar a partir dele')
 byq = {q['id']: q for q in qs}
-for q in qs:   # defesa em profundidade: o grafo do selo é relativo, dentro da raiz, e existe
+import re
+if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', str(rd.get('today'))): die('round sem data AAAA-MM-DD')
+for q in qs:   # defesa em profundidade: o nó é um id (nunca uma flag), e o grafo é relativo, dentro da raiz, e existe
     if q.get('kind') != 'seal': continue
+    if not re.fullmatch(r'[A-Z][A-Z0-9_]*', str((q.get('seal') or {}).get('node'))): die(f"{q.get('id')}: nó do selo fora de [A-Z][A-Z0-9_]* — recuso (viraria flag do selador)")
     g = (q.get('seal') or {}).get('graph') or ''
     gp = os.path.realpath(os.path.join(srepo, g))
     if os.path.isabs(g) or not g.endswith('.kg.yaml') or not gp.startswith(srepo + os.sep) or not os.path.isfile(gp):

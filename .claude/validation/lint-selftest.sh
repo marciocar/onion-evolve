@@ -42642,9 +42642,11 @@ DEC_ORF2
   #   (pn3) ENTRADA NÃO CONFIÁVEL: escolha fora das opções é recusada; texto livre sem --other não sela; com
   #         --other o texto chega como UM argumento (shell nunca o interpreta) e não vira YAML; rodada
   #         adulterada ou velha é recusada.
+  #   (pn4) a rodada se identifica (nonce, data) e o seal revalida nó e grafo; o estado leva o round_id.
   #   Mutantes (ops/mutate-and-restore.sh, um por caso): ask invertido e recomendada fora do 1º lugar (pn1),
   #   escrita direta no grafo em vez do selador (pn2), checagem de opção removida, --other ignorado e
-  #   subprocess por shell (pn3). Cada um reprovou o caso dele na forja.
+  #   subprocess por shell (pn3), nonce fora do hash, data fixa no hash do seal, regex do nó removida,
+  #   checagem de raiz removida, ref repetido aceito e estado sem round_id (pn4). Cada um reprovou o caso dele.
   local pnl="${REPO_ROOT}/.claude/validation/decide-panel.sh" pnd="${sb}/pnl" pnr="${sb}/pnl/repo" _pn="" PT
   PT="$(printf '\t')"
   if [ ! -f "${pnl}" ]; then record_fail "decide: (pn)" "painel ausente: ${pnl}"
@@ -42766,6 +42768,41 @@ sys.exit(0 if "X_INJ" not in ids and len(ids) == int(sys.argv[2]) and n["status"
   if [ -z "${_p3}" ]; then
     record_pass "decide: (pn3) fora das opções recusada; texto livre só sela com --other e chega como UM argumento (sem shell, sem YAML injetado); rodada adulterada ou velha recusada"
   else record_fail "decide: (pn3)" "${_p3}"; fi
+  # (pn4) a rodada se identifica e se revalida (achados do refutador, 2026-10-21): a mesma composição no mesmo
+  #       dia gera OUTRO round_id (nonce); data trocada no round é recusada; nó que começa com `-` (viraria flag
+  #       do selador) e grafo fora da raiz são recusados MESMO com o hash recalculado; ref repetido na
+  #       composição é recusado; e cada item de estado leva o round_id (sem ele o painel não mostra o estado).
+  local _p4="" i1 i2
+  i1="$(bash "${pnl}" round "${r}" --compose "${pnd}/compose.json" --from-tsv "${pnd}/census.tsv" --today 2026-10-12 2>/dev/null | python3 -c 'import sys,json; print(json.load(sys.stdin)["round_id"])' 2>/dev/null)" || i1="x1"
+  i2="$(bash "${pnl}" round "${r}" --compose "${pnd}/compose.json" --from-tsv "${pnd}/census.tsv" --today 2026-10-12 2>/dev/null | python3 -c 'import sys,json; print(json.load(sys.stdin)["round_id"])' 2>/dev/null)" || i2="x2"
+  [ "${i1}" != "${i2}" ] || _p4="${_p4} mesmo-round_id-na-reemissao"
+  _pn_forge() {  # $1=saída  $2=expressão python sobre d (o round), e o hash RECALCULADO como o script calcula
+    python3 - "${pnd}/round.json" "$1" "$2" <<'PN_FORGE'
+import sys, json, hashlib
+d = json.load(open(sys.argv[1])); exec(sys.argv[3])
+c = json.dumps({"questions": d["questions"], "today": d.get("today"), "nonce": d.get("nonce")}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+d["round_id"] = hashlib.sha256(c.encode("utf-8")).hexdigest()[:16]
+json.dump(d, open(sys.argv[2], "w"), ensure_ascii=False)
+PN_FORGE
+  }
+  python3 -c 'import sys,json; d=json.load(open(sys.argv[1])); d["today"]="2020-01-01"; json.dump(d,open(sys.argv[2],"w"))' "${pnd}/round.json" "${pnd}/r-data.json" || _p4="${_p4} sem-r-data"
+  _pn_forge "${pnd}/r-flag.json" 'd["questions"][[q["kind"] for q in d["questions"]].index("seal")]["seal"]["node"] = "--new"' || _p4="${_p4} sem-r-flag"
+  _pn_forge "${pnd}/r-fora.json" 'd["questions"][[q["kind"] for q in d["questions"]].index("seal")]["seal"]["graph"] = "../fora.kg.yaml"' || _p4="${_p4} sem-r-fora"
+  : > "${sb}/pnl/fora.kg.yaml"
+  local rf
+  for rf in r-data r-flag r-fora; do
+    : > "${pnd}/argv.log"
+    if DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${pnl}" seal "${pnd}/${rf}.json" "${pnd}/a2.json" --repo "${pnr}" >/dev/null 2>&1; then rc=0; else rc=$?; fi
+    { [ "${rc}" -eq 2 ] && [ ! -s "${pnd}/argv.log" ]; } || _p4="${_p4} ${rf}-aceito-rc${rc}"
+  done
+  python3 -c 'import sys,json; d=json.load(open(sys.argv[1])); d["questions"].append(dict(d["questions"][0])); json.dump(d,open(sys.argv[2],"w"))' "${pnd}/compose.json" "${pnd}/compose-rep.json" || _p4="${_p4} sem-compose-rep"
+  if bash "${pnl}" round "${r}" --compose "${pnd}/compose-rep.json" --from-tsv "${pnd}/census.tsv" --today 2026-10-12 >/dev/null 2>&1; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 2 ] || _p4="${_p4} ref-repetido-aceito-rc${rc}"
+  st="$(DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${pnl}" seal "${pnd}/round.json" "${pnd}/a2.json" --repo "${pnr}" 2>/dev/null)" || _p4="${_p4} seal-rc$?"
+  python3 -c 'import sys,json; d=json.loads(sys.argv[1]); sys.exit(0 if d["items"] and all(v.get("round_id")==d["round_id"] for v in d["items"].values()) else 1)' "${st}" 2>/dev/null || _p4="${_p4} estado-sem-round_id"
+  if [ -z "${_p4}" ]; then
+    record_pass "decide: (pn4) nonce dá outro round_id na reemissão; data trocada, nó-flag e grafo fora da raiz recusados mesmo com hash recalculado; ref repetido recusado; estado leva o round_id"
+  else record_fail "decide: (pn4)" "${_p4}"; fi
   fi
   fi
   rm -rf "${sb}"
