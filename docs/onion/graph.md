@@ -429,6 +429,12 @@ maestro-notebook-test	pin	n/a
 maestro-notebook-test	specialization	a2a-spike	
 maestro-notebook-test	tier	standalone	
 maestro-notebook-test	trust-advises	onion-evolve	
+maestro-peer-test	adopts	onion-evolve	
+maestro-peer-test	mode	greenfield	
+maestro-peer-test	pin	n/a	
+maestro-peer-test	specialization	a2a-spike	
+maestro-peer-test	tier	standalone	
+maestro-peer-test	trust-advises	onion-evolve	
 marcio-pessoal	adopts	onion-evolve	
 marcio-pessoal	mode	regulated	
 marcio-pessoal	pin	n/a	
