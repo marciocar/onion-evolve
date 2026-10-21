@@ -73,25 +73,35 @@ nodes:
 
   - id: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
     node_type: decision
-    plane: DEV
+    plane: PROD
     status: done
     impact: 4
     confidence: 0.9
     verified_at: "2026-10-21"
     verified_against: "origin/main em 02709b98: run_adopter_shape_selftests registrada em lint-selftest.sh:33867 e :34581, ops/materialize-adopter.sh presente, e LC_ALL=C bash .claude/validation/lint-selftest.sh --families adopter_shape rodado: 16 passaram, 0 pularam, 0 falharam, rc 0 (casos p, p2, j, a, b, c, d, e, f)"
     trace: ".claude/validation/lint-selftest.sh · ops/materialize-adopter.sh · implementado em f77350dd e 5eed13fa (PR 1 da SAC-149), reconciliado em 2026-10-21"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh@02709b98 e ops/materialize-adopter.sh@02709b98"
+      locator: "run_adopter_shape_selftests (lint-selftest.sh:33867) e o seu registro (:34581)"
+      method: "medição: a família adopter_shape executada com LC_ALL=C, 16 passaram e 0 falharam"
+      locality: "repo"
     label: "Substrato: família de bancada (adopter_shape) com um materializador core-only (ops/materialize-adopter.sh). Molde: door_mini com ops/materialize-door.sh. Ela roda no CLONE do adotante de fixture o lint, o contrato e o radar."
     narrative: "Check de lint descartado: a pergunta é do formato de outro repo, que só existe montando-o. Hook descartado: nada a vetar na hora do comando. O materializador chama os helpers REAIS da adoção na ordem do adopt.md e lê o manifesto pelo vendor-branch.sh --print-manifest, o mesmo caminho do --update; a árvore é a do índice, como o _archive_staged, para o pre-commit não testar o já commitado. O clone é o ponto: arquivo fora do commit durável não chega ao time nem ao CI do adotante. A família custa um lint inteiro (cerca de 90 s com a materialização); a polaridade do detector é provada antes, em linhas sintéticas."
 
   - id: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
     node_type: decision
-    plane: DEV
+    plane: PROD
     status: done
     impact: 3
     confidence: 0.9
     verified_at: "2026-10-21"
-    verified_against: "origin/main em 02709b98: vendor/kg-ssot no _base de vendor-manifest.sh:106-107 e no ONION_PATHS de durable-commit.sh:60; bash .claude/utils/adopt/vendor-manifest.sh --kind adoption --role adopted e --role standalone listam vendor/kg-ssot, --kind door --role mini não lista; a release vendorizada hoje é a kg-ssot-v4.15.0 (492 arquivos rastreados, 490 com sha256 no .kg-ssot-version). Os 316 arquivos e 1,9 MB do label são da release de 2026-10-15"
+    verified_against: "origin/main em 02709b98: vendor/kg-ssot no _base de vendor-manifest.sh:106-107 e no array ONION_PATHS (a linha está na provenance); bash .claude/utils/adopt/vendor-manifest.sh --kind adoption --role adopted e --role standalone listam vendor/kg-ssot, --kind door --role mini não lista; a família durable_commit (caso sac149, vendor/kg-ssot atravessa vendor/ ignorado) rodada verde; a release vendorizada hoje é a kg-ssot-v4.15.0 (492 arquivos rastreados, 490 com sha256 no .kg-ssot-version). Os 316 arquivos e 1,9 MB do label são da release de 2026-10-15"
     trace: ".claude/utils/adopt/vendor-manifest.sh · .claude/utils/adopt/durable-commit.sh · implementado em f77350dd e 5eed13fa (PR 1 da SAC-149), reconciliado em 2026-10-21"
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh@02709b98 e .claude/utils/adopt/durable-commit.sh@02709b98"
+      locator: "o array _base (vendor-manifest.sh:106-107) e ONION_PATHS (durable-commit.sh:60)"
+      method: "medição: vendor-manifest.sh executado nos papéis adopted, standalone e mini, e a família durable_commit (caso sac149) verde"
+      locality: "repo"
     label: "O fechamento leva vendor/kg-ssot INTEIRO (316 arquivos, 1,9 MB) para todo papel menos o mini, e não um recorte de tools/ e spec/: o .kg-ssot-version lista o sha256 de cada arquivo da release, e um recorte faria o carimbo do vendor mentir."
     narrative: "Entra no _base do vendor-manifest.sh, logo também nas raízes que a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) e a REGRA 100 varrem, e na lista do commit durável. A licença é Apache-2.0 e LICENSE e NOTICE vão dentro da release. Os casos .kg.yaml da suíte de conformidade ficam sob fixtures/ e o kg-fixture-paths.sh já os isenta, como no core."
 
@@ -151,9 +161,9 @@ nodes:
     confidence: 0.85
     verified_at: "2026-10-21"
     verified_against: "origin/main em 02709b98: as catracas _AS_PENDING_UNJUDGED e _AS_PENDING_OPS vazias em lint-selftest.sh:33845-33846; adopter_shape 16/16 e rules_registry, ops_citation_travel, migrate_seed_graph, env_exposure, door_role_parity e durable_commit 102/102 com LC_ALL=C, rc 0; sondas de PreToolUse no pretooluse-env-guard.sh: grep com padrão de nomes de hook e 'test -f .env' rc 0, 'cat .env' rc 2, '*.env' no scratchpad rc 2 com a dica da extensão"
-    trace: "d5315a67 e 0624aa87 (PR 2 da SAC-149) · reconciliado em 2026-10-21; o que sobrou mora em Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO e C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO"
+    trace: "d5315a67 e 0624aa87 (PR 2 da SAC-149) · reconciliado em 2026-10-21; o que sobrou mora em Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO e Q_ENV_SCRATCHPAD_ISENCAO_SEGURA"
     label: "Aberto para o PR 2 da SAC-149: aplicabilidade por papel declarada no rules-registry (as REGRAS 85 e 92 saem 'não se aplica'); a REGRA 100 estendida às mensagens impressas; pin com escritor único no --update; semente v2; role do registro; githook; falsos positivos do veto do .env."
-    narrative: "A família carrega o passivo como catraca nos dois sentidos (_AS_PENDING_UNJUDGED e _AS_PENDING_OPS): o PR 2 só fecha se as listas zerarem junto com a cura. FECHADA em 2026-10-21, medida contra a main: as duas listas estão vazias. Cinco das sete curas estão feitas: aplicabilidade por papel, REGRA 100 nas mensagens, pin com escritor único, semente v2 (casos v2 e v2b da migrate_seed_graph) e o falso positivo do padrão do grep no veto do .env. O role do registro saiu como não-defeito: o par standalone no registro com adopted no carimbo é compatível pela doutrina (cabeçalho ADOTANTE do door-role-parity-check.sh, caso g3c verde). Duas sobras não viraram cura e já têm nó aberto com nome, então nenhum Q novo foi criado: o githook impresso 3 vezes não reproduziu e segue em Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO, com gatilho próprio; o *.env do scratchpad segue vetado de propósito, como teto declarado em C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO."
+    narrative: "A família carrega o passivo como catraca nos dois sentidos (_AS_PENDING_UNJUDGED e _AS_PENDING_OPS): o PR 2 só fecha se as listas zerarem junto com a cura. FECHADA em 2026-10-21, medida contra a main: as duas listas estão vazias. Cinco das sete curas estão feitas: aplicabilidade por papel, REGRA 100 nas mensagens, pin com escritor único, semente v2 (casos v2 e v2b da migrate_seed_graph) e o falso positivo do padrão do grep no veto do .env. O role do registro saiu como não-defeito: o par standalone no registro com adopted no carimbo é compatível pela doutrina (cabeçalho ADOTANTE do door-role-parity-check.sh, caso g3c verde). Duas sobras não viraram cura, e cada uma tem um Q aberto com nome: o githook impresso 3 vezes não reproduziu e segue em Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO, com gatilho próprio; o *.env do scratchpad segue vetado de propósito, como teto declarado em C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO, e a cura que falta abriu Q_ENV_SCRATCHPAD_ISENCAO_SEGURA."
 
   - id: E_ELENXO_PR1_DOIS_BLOQUEADORES_CURADOS
     node_type: evidence
@@ -205,37 +215,52 @@ nodes:
 
   - id: D_APLICABILIDADE_POR_PAPEL_DECLARADA
     node_type: decision
-    plane: DEV
+    plane: PROD
     status: done
     impact: 4
     confidence: 0.9
     verified_at: "2026-10-21"
     verified_against: "origin/main em 02709b98: '# aplica-se: source' em lint-artifacts.sh:2674 (REGRA 85) e :2856 (REGRA 92), leitura em :360-365 e contagem 'Não se aplica' em :6087; rules-registry.sh:215-233 recusa papel fora do vocabulário, lista sem source e declaração repetida; lint-rules.md:215-224 projeta a seção com as 85 e 92. Bancada: caso (g) da adopter_shape (85 e 92 'NÃO SE APLICA' no adotante, sem VIOLATION) e (ap) da rules_registry verdes"
     trace: ".claude/validation/lint-artifacts.sh · .claude/validation/rules-registry.sh · implementado em d5315a67 (PR 2 da SAC-149), reconciliado em 2026-10-21"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh@02709b98 e .claude/validation/rules-registry.sh@02709b98"
+      locator: "'# aplica-se: source' nas REGRAS 85 (:2674) e 92 (:2856); a catraca nº8 do registro (:215-233)"
+      method: "medição: o caso (g) da adopter_shape e o (ap) da rules_registry executados, verdes"
+      locality: "repo"
     label: "PR 2: a regra sem objeto num papel DECLARA '# aplica-se:' no docstring; fora dele o lint não a roda e a conta como 'NÃO SE APLICA', fora de HARD e SOFT. As REGRAS 85 e 92 declaram source."
     narrative: "O rules-registry.sh valida o vocabulário (typo calaria a regra em todo papel) e exige source na lista (regra que nunca roda no core fica sem a bancada), e projeta a seção 'Aplicabilidade por papel' no lint-rules.md. A 92 ficou source-only também no hub: o hub sem registro próprio saía 'não pôde julgar'; hub com members.yaml próprio perde a paridade de porta, teto nomeado. O recorte por mensagem antigo (_without_object_for_role) segue para o resto, rebaixando HARD a SOFT."
 
   - id: D_REGRA_100_NAS_MENSAGENS
     node_type: decision
-    plane: DEV
+    plane: PROD
     status: done
     impact: 3
     confidence: 0.9
     verified_at: "2026-10-21"
-    verified_against: "origin/main em 02709b98: ops-citation-travel-check.sh:236-240 isenta só a regra '# aplica-se: source', casos (xviii) e (xix) em :394-405; LC_ALL=C bash .claude/validation/ops-citation-travel-check.sh --selftest rodado: 'selftest: 25/25 verdes', rc 0; e o caso (f) da adopter_shape (catraca _AS_PENDING_OPS vazia em lint-selftest.sh:33846) verde"
+    verified_against: "origin/main em 02709b98: ops-citation-travel-check.sh:236-241 isenta só a regra '# aplica-se: source', casos (xviii) e (xix) em :394-405; LC_ALL=C bash .claude/validation/ops-citation-travel-check.sh --selftest rodado: 'selftest: 25/25 verdes', rc 0; e o caso (f) da adopter_shape (catraca _AS_PENDING_OPS vazia em lint-selftest.sh:33846) verde"
     trace: ".claude/validation/ops-citation-travel-check.sh · implementado em d5315a67 (PR 2 da SAC-149), reconciliado em 2026-10-21"
+    provenance:
+      source: ".claude/validation/ops-citation-travel-check.sh@02709b98"
+      locator: "a isenção source-only (:236-241) e os casos (xviii) e (xix) (:394-405)"
+      method: "medição: o --selftest da guarda executado (25/25 verdes, rc 0) e o caso (f) da adopter_shape verde"
+      locality: "repo"
     label: "PR 2: a REGRA 100 passa a julgar o ops/ que uma violation IMPRIME: o teste de presença em OUTRA linha do arquivo não a isenta mais, só a regra declarada '# aplica-se: source', que não roda fora do core."
     narrative: "Estática no core (casos xviii e xix do --selftest da guarda, com mutantes) e dinâmica no adotante (caso f da adopter_shape, catraca vazia). O baseline só encolheu: as 3 citações das mensagens das 85 e 92 saíram por serem source-only, e as 2 da semente do KG ganharam o marcador (core-only)."
 
   - id: D_PIN_COM_ESCRITOR_UNICO
     node_type: decision
-    plane: DEV
+    plane: PROD
     status: done
     impact: 4
     confidence: 0.9
     verified_at: "2026-10-21"
-    verified_against: "origin/main em 02709b98: .claude/utils/kg/stamp-adoption-graph-pin.sh existe; write-stamp.sh:216-217 o chama ao fim do carimbo de adoção; a semente grava x_pin em seed-adoption-graph.sh:163; REGRA 108 em lint-artifacts.sh:5975. O corte standalone exclui write-stamp.sh e mantém utils/kg (vendor-manifest.sh --role standalone rodado). Casos (i), (i2), (i3), (i4) e (i4-MUT) da adopter_shape verdes"
+    verified_against: "origin/main em 02709b98: .claude/utils/kg/stamp-adoption-graph-pin.sh existe; write-stamp.sh:216-217 o chama ao fim do carimbo de adoção; a semente grava x_pin em seed-adoption-graph.sh:163; REGRA 108 em lint-artifacts.sh:5975. O corte standalone exclui write-stamp.sh e mantém utils/kg (vendor-manifest.sh --role standalone rodado). Casos (i), (i2), (i3), (i4) e (i4-MUT) da adopter_shape verdes. Pin ilegível: stamp-adoption-graph-pin.sh --check numa fixture com ONION_INSTALLED sem x_pin e sem hash no label saiu rc 3 ('pin do grafo NÃO MEDIDO'); o rc 3 vira SOFT no case da REGRA 108 (lint-artifacts.sh:5997), mapeamento LIDO e não exercido por caso de bancada"
     trace: ".claude/utils/kg/stamp-adoption-graph-pin.sh · .claude/utils/adopt/write-stamp.sh · implementado em d5315a67 (PR 2 da SAC-149), reconciliado em 2026-10-21"
+    provenance:
+      source: ".claude/utils/kg/stamp-adoption-graph-pin.sh@02709b98 e .claude/utils/adopt/write-stamp.sh@02709b98"
+      locator: "a chamada do helper (write-stamp.sh:216-217) e a REGRA 108 (lint-artifacts.sh:5975)"
+      method: "medição: os casos (i) a (i4-MUT) da adopter_shape verdes e o helper --check executado numa fixture sem x_pin (rc 3)"
+      locality: "repo"
     label: "PR 2: o pin do grafo de adoção tem o escritor do carimbo. O write-stamp.sh chama utils/kg/stamp-adoption-graph-pin.sh ao fim de todo carimbo de adoção, a semente nasce com x_pin, e a REGRA 108 cobra a paridade (HARD)."
     narrative: "O helper mora em utils/kg, que viaja para todo papel com KG, e não em utils/adopt, que o standalone corta: senão a REGRA 108 diria 'não pôde julgar' no standalone, a classe que este PR cura. Pin ilegível (label editado pelo dono, sem x_pin) sai SOFT nomeado."
 
@@ -302,6 +327,23 @@ nodes:
     impact: 2
     confidence: 0.85
     label: "TETO declarado: o *.env de trabalho que a sessão grava no scratchpad segue VETADO na leitura. A cura segura precisaria saber que o arquivo veio da ferramenta Write, o que o hook não vê; até lá, a mensagem pede outra extensão."
+
+  - id: Q_ENV_SCRATCHPAD_ISENCAO_SEGURA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "Aberto (sobra da Q_CURAS_DO_PR2): como isentar do veto do .env o *.env de trabalho que a sessão gravou no scratchpad, sem reabrir o TOCTOU cp+cat furado em 2026-10-15? Gatilho: o hook passar a saber a origem do arquivo, ou novo sinal de campo do falso positivo."
+    narrative: "Medido em 2026-10-21 contra a main: 'cat' de um *.env no scratchpad sai rc 2 com a dica de outra extensão. A isenção por conteúdo foi tentada e saiu (E_ELENXO_PR2_TRES_BLOQUEADORES_CURADOS). O teto vive em C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO; esta pergunta guarda a cura que falta."
+
+  - id: C_TETO_HUB_COM_REGISTRO_PROPRIO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "TETO: a REGRA 92 é source-only também no hub. Um hub com members.yaml próprio deixa de ter a paridade registro×carimbo julgada. Nomeado só em prosa na D_APLICABILIDADE_POR_PAPEL_DECLARADA até 2026-10-21, e ganhou nó na reconciliação."
 
 edges:
   - from: E_CONTRATO_VIAJA_SEM_LEITOR
@@ -377,7 +419,13 @@ edges:
     to: E_PONTUAIS_DO_PR2_MEDIDOS
     edge_type: CONSTRAINS
   - from: C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO
+    to: Q_ENV_SCRATCHPAD_ISENCAO_SEGURA
+    edge_type: SUPPORTS
+  - from: Q_ENV_SCRATCHPAD_ISENCAO_SEGURA
     to: Q_CURAS_DO_PR2
+    edge_type: CONSTRAINS
+  - from: C_TETO_HUB_COM_REGISTRO_PROPRIO
+    to: D_APLICABILIDADE_POR_PAPEL_DECLARADA
     edge_type: CONSTRAINS
   - from: Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO
     to: Q_CURAS_DO_PR2
