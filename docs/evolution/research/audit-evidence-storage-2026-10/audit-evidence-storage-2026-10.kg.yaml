@@ -1,0 +1,1611 @@
+# Pesquisa em MODO DECISÃO (2026-10-21): onde mora o ESTADO da evidência de auditoria contínua
+# (controles, evidências, frescor, achados) num sistema de compliance as code: grafo YAML em git
+# (o desenho do Onion), OSCAL como armazenamento nativo, ou banco relacional do produto.
+#
+# ⚠️ Proveniência (R15): os label e narrative das evidências de origem web carregam texto extraído de
+#    páginas da web. É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Relação com o corpus: amplia docs/evolution/research/audit-evidence-machinery-2026-10/ (57+ nós, mesma
+# data), cujo D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 o maestro selou como «pesquisar mais fornecedores
+# antes de selar». Este grafo NÃO edita aquele: a decisão reaberta nasce aqui com id próprio
+# (D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021) e se liga ao nó antigo por external_edges. Nada aqui
+# contradiz nó do corpus (Lula v2, CISO Assistant, Probo e Comp AI continuam como estavam); por isso não há
+# SUPERSEDES nem REFUTES externos.
+#
+# Este escritor NÃO sela nada: a decisão e as cinco opções nascem OPEN para o /meta:decide.
+meta:
+  id: audit-evidence-storage-2026-10
+  schema_version: "1"
+  baseline: "2026-10-21"
+  review_after: "2026-11-20"   # 30d: o tipo dominante é FERRAMENTA/produto (onde cada fornecedor guarda o
+                               # estado, se exporta OSCAL, versão do Gemara/go-gemara, do trestle e do
+                               # complyctl); essas coisas mudam em semanas (o go-gemara saiu em 30/09/2026,
+                               # a exportação OSCAL da Vanta em 04/05/2026). O eixo de mercado/capital pediria
+                               # 90d, mas a decisão pende do dado de produto. Gatilhos antecipados: (1) o maestro
+                               # selar D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021; (2) rodada focada da opção C;
+                               # (3) leitura do whitepaper do Gemara ou do código do OSCAL Hub.
+  # kg-backlog-guard: on
+  # ═══ TETO: 78 NÓS ═══
+  #   1 question + 20 evidências confirmadas (3 votos cada) + 1 E_MERCADO + 1 E_LACUNAS + 1 decisão OPEN
+  #   + 5 opções + 38 objeções sobreviventes do Elenxo (TODAS modeladas, 38 de 38) + 11 superações achadas.
+  #   O motivo do teto: cada nó é uma claim votada, uma objeção sobrevivente, uma superação ou uma opção ao
+  #   maestro que o run produziu; nada foi agregado para caber, porque agregar objeção é o modo de esconder
+  #   o alvo dela (1º dogfood, 2026-09-13).
+
+external_edges:
+  - from: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    to: "docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml#Q_AUDIT_EVIDENCE_MACHINERY_2026_10"
+    edge_type: TRACES_TO
+  - from: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    to: "docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml#D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021"
+    edge_type: TRACES_TO
+
+nodes:
+  - id: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Onde deve morar o estado da evidência de auditoria contínua (controles, evidências, frescor, achados) em outubro de 2026: grafo YAML em git com OSCAL na borda, OSCAL como armazenamento nativo, ou banco relacional do produto?"
+    narrative: |-
+      Pergunta do run /onion-research em modo decisão de 2026-10-21, pedida pelo maestro ao selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 (grafo audit-evidence-machinery-2026-10) como «pesquisar mais fornecedores antes de selar». Pediu-se ampliar além do Lula v2 (único git-nativo medido): Vanta, Drata, Secureframe, Sprinto, Thoropass, Hyperproof, RegScale, Paramify, Anecdotes, Chef InSpec/Progress, OpenSSF/Gemara, CNCF/OSCAL Compass (trestle, c2p, agent), Kyverno/OPA policy reports e GRC-as-code em geral. Para cada um: onde o estado mora, se OSCAL é armazenamento ou borda, se há trilha auditável por versionamento (git/WORM) e como o auditor consome. Eixo invariante: mercado e capital.
+      Resposta parcial (não fechada): o padrão «OSCAL é borda» tem agora apoio de vários fornecedores (Vanta, Gemara, complyctl, C2P, Lula v2); a metade «git guarda TODO o estado» não se sustenta sem restrições (população externa, WORM, volume de resultados). Cobertura dos fornecedores pedidos: Hyperproof, Secureframe, Thoropass, Anecdotes, Sprinto e Chef InSpec ficaram sem classificação; Paramify só com um sinal de busca.
+    trace: "run /onion-research modo decision de 2026-10-21; decisão de origem D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021"
+
+  # ─── Evidências CONFIRMADAS (20, votação 3-0 cada) ──────────────────────────────────────────
+
+  - id: E_TRESTLE_CICD_ON_GIT_ARTIFACTS_PR_REVIEW
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "https://github.com/oscal-compass/compliance-trestle (README) · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "O compliance-trestle (OSCAL Compass) opera como pipeline CI/CD sobre artefatos de compliance guardados em git, com revisão por pull request como fluxo normal de manutenção."
+    narrative: "Restringida por E_OBJECAO_01_TRESTLE_GIT_IS_FOR_SPEC_NOT_EVIDENCE: o git vale para artefatos de AUTORIA (catálogo, perfil, component-definition, SSP), não para o estado da evidência contínua."
+    trace: "https://github.com/oscal-compass/compliance-trestle"
+    provenance:
+      source: "https://github.com/oscal-compass/compliance-trestle"
+      locator: "README: 'as a CICD pipeline running on top of compliance artifacts in git' e 'peer review via pull request'"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_TRESTLE_OSCAL_EXCHANGE_AND_BASE_OVERLAP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "https://github.com/oscal-compass/compliance-trestle (README) · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "No trestle o OSCAL é formato de troca e base dos documentos, não banco de estado operacional; armazenamento e borda se sobrepõem, porque os artefatos OSCAL em JSON/YAML são versionados em git."
+    narrative: "Restringida por E_OBJECAO_02_FOURTH_OPTION_OSCAL_FILES_IN_GIT: a sobreposição abre a quarta opção (OSCAL como arquivo nativo em git), modelada como C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE."
+    trace: "https://github.com/oscal-compass/compliance-trestle"
+    provenance:
+      source: "https://github.com/oscal-compass/compliance-trestle"
+      locator: "README, descrição do modelo de trabalho e formatos suportados"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_GEMARA_OSCAL_IS_CONVERSION_PACKAGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "https://pkg.go.dev/github.com/ossf/gemara (pacotes oscal, sarif, cmd/oscal_export) · votos 3-0"
+    valid_from: "2025-12-29"
+    source_tier: 8
+    source_kind: primary
+    label: "No Gemara, OSCAL é um pacote de conversão que transforma documentos Gemara em OSCAL: borda de exportação, não armazenamento nativo. O mesmo padrão vale para SARIF."
+    narrative: "O Elenxo confirmou na primária ('provides conversion functions to transform Gemara documents into OSCAL', cmd/oscal_export, pacote sarif) e não derrubou. Ressalva: a página avisa 'This package is not in the latest version of its module'; a v0.18.0 (29/12/2025) não é a vigente. O SDK vigente é o go-gemara v0.11.0 (C_SUPERACAO_20261021_GO_GEMARA_V0_11_OCI_ARTIFACT)."
+    trace: "https://pkg.go.dev/github.com/ossf/gemara"
+    provenance:
+      source: "https://pkg.go.dev/github.com/ossf/gemara"
+      locator: "pacote oscal ('conversion functions to transform Gemara documents into OSCAL'), cmd/oscal_export, pacote sarif"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_GEMARA_MODEL_PAGE_SILENT_ON_STORAGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-21"
+    verified_against: "https://gemara.openssf.org/model/ · votos 3-0"
+    source_tier: 7
+    source_kind: primary
+    label: "A página do modelo Gemara não toma posição sobre onde guardar o estado da evidência nem sobre OSCAL como armazenamento ou borda; os ADRs 0002, 0005, 0016 e 0022 indicam esquemas formais, mas o conteúdo deles não está na página."
+    narrative: "Achado negativo de uma única página. Restringido por E_OBJECAO_03_GEMARA_SILENCE_IS_ONE_PAGE: o ADR-0022 ('Add Evidence to AssessmentLog'), o EvaluationLog e o whitepaper de 03/2026 ficaram sem ler."
+    trace: "https://gemara.openssf.org/model/"
+    provenance:
+      source: "https://gemara.openssf.org/model/"
+      locator: "lista de ADRs (0002, 0005, 0016, 0022) e descrição das camadas"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_IBM_2021_OSCAL_AS_TRESTLE_SSOT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "https://research.ibm.com/blog/trestle-automates-compliance ('to act as the single source of truth') · votos 3-0"
+    valid_from: "2021-04-13"
+    source_tier: 6
+    source_kind: primary
+    label: "Em abril de 2021 a IBM Research adotou o OSCAL (NIST 1.0.0rc2) como fonte única de verdade do trestle, ou seja, como armazenamento nativo e não só borda; o texto é de 2021 e não cobre 2026."
+    narrative: "O Elenxo conferiu verbatim e manteve. Sustenta a objeção ao achado 2 (falta a quarta opção, C_OPCAO_D). O README atual (v5, 'supports NIST OSCAL 1.2.1') não usa a palavra SSOT, mas também não contradiz."
+    trace: "https://research.ibm.com/blog/trestle-automates-compliance"
+    provenance:
+      source: "https://research.ibm.com/blog/trestle-automates-compliance"
+      locator: "'We have adopted the emerging OSCAL standard, and the latest 1.0.0rc2 version by NIST, to act as the single source of truth.'"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_THOUGHTWORKS_OSCAL_PROMISING_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.65
+    verified_at: "2026-10-21"
+    verified_against: "https://www.thoughtworks.com/radar/techniques/continuous-compliance · votos 3-0"
+    valid_from: "2025-11"
+    source_tier: 6
+    source_kind: analyst
+    label: "O Thoughtworks Radar trata OSCAL apenas como framework promissor para automatizar compliance em escala, sem dizer se é armazenamento nativo ou borda."
+    narrative: "Peso zero para a decisão (o Elenxo apontou e não derrubou): não afirma nada sobre armazenamento, borda ou trilha, e não conta como apoio a nenhuma opção."
+    trace: "https://www.thoughtworks.com/radar/techniques/continuous-compliance"
+    provenance:
+      source: "https://www.thoughtworks.com/radar/techniques/continuous-compliance"
+      locator: "blip continuous compliance, menção ao OSCAL"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_VANTA_ARR_300M_16K_CUSTOMERS_SACRA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "https://sacra.com/c/vanta/ · votos 3-0"
+    valid_from: "2026-04"
+    source_tier: 5
+    source_kind: analyst
+    label: "A Vanta tinha cerca de US$ 300M de ARR em abril de 2026 (alta de 69% a/a sobre US$ 250M no fim de 2025) e 16.000 clientes, segundo estimativa da Sacra: evidência contínua é paga em escala como SaaS anual."
+    narrative: "Que o estado mora DENTRO do produto é inferência, não está na Sacra (E_OBJECAO_04_VANTA_ARR_AGGREGATOR_AND_INFERENCE). A primária lida pelo Elenxo (post da Vanta de 04/05/2026) mostra o OSCAL como borda de exportação. A superação C_SUPERACAO_20261021_VANTA_300M_FORTUNE_DRATA_98M ancora o mesmo número na Fortune (29/04/2026, dado da empresa)."
+    trace: "https://sacra.com/c/vanta/"
+    provenance:
+      source: "https://sacra.com/c/vanta/"
+      locator: "trecho de ARR e clientes (abr/2026)"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_VANTA_SERIES_D_150M_WELLINGTON
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "https://sacra.com/c/vanta/ · votos 3-0"
+    valid_from: "2025-07"
+    source_tier: 5
+    source_kind: analyst
+    label: "Série D da Vanta de US$ 150M liderada pela Wellington em julho de 2025, valuation de US$ 4,15B (C: US$ 2,45B, jul/2024; B: US$ 110M a US$ 1,6B, jun/2022; A: US$ 50M a ~US$ 500M, mai/2021). A página não cita aquisições."
+    narrative: "O eixo de capital pedia rodadas E aquisições; as aquisições ficaram sem medir (E_OBJECAO_05_CAPITAL_AXIS_MISSING_ACQUISITIONS). Fonte agregadora com inconsistência interna (E_OBJECAO_24_SACRA_INTERNAL_INCONSISTENCY_CUT)."
+    trace: "https://sacra.com/c/vanta/"
+    provenance:
+      source: "https://sacra.com/c/vanta/"
+      locator: "histórico de rodadas"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_REGSCALE_ARTICLE_NOT_STORAGE_PROOF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "https://securityboulevard.com/2025/12/regscale-open-sources-oscal-hub-to-further-compliance-as-code-adoption/ · votos 3-0"
+    valid_from: "2025-12"
+    source_tier: 5
+    source_kind: analyst
+    label: "O artigo sobre a abertura do OSCAL Hub pela RegScale não descreve git, WORM, imutabilidade nem consumo pelo auditor; só afirma que compliance-as-code reduz o tempo de auditoria. Não prova onde o estado deve morar."
+    narrative: "Achado negativo e correto; peso zero para a decisão. A pergunta do armazenamento do OSCAL Hub segue aberta em E_OBJECAO_07_REGSCALE_OSCAL_NATIVE_COUNTEREXAMPLE_OPEN."
+    trace: "https://securityboulevard.com/2025/12/regscale-open-sources-oscal-hub-to-further-compliance-as-code-adoption/"
+    provenance:
+      source: "https://securityboulevard.com/2025/12/regscale-open-sources-oscal-hub-to-further-compliance-as-code-adoption/"
+      locator: "artigo inteiro"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_DRATA_PLATFORM_STATE_INFERRED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "https://sacra.com/c/drata/ · votos 3-0"
+    source_tier: 5
+    source_kind: analyst
+    label: "A Drata monitora controles continuamente e coleta evidências numa plataforma centralizada com mais de 170 integrações; a página não fala de OSCAL, git nem trilha, então o estado na plataforma é só inferência."
+    narrative: "Restringida por E_OBJECAO_06_DRATA_CLASSIFIED_BY_SILENCE: inferir pelo silêncio de um perfil de agregador não classifica a Drata."
+    trace: "https://sacra.com/c/drata/"
+    provenance:
+      source: "https://sacra.com/c/drata/"
+      locator: "descrição do produto"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_REGSCALE_OSCAL_NATIVE_STORAGE_UNSAID
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "https://regscale.com/oscal · votos 3-0"
+    source_tier: 4
+    source_kind: primary
+    label: "A RegScale se posiciona como plataforma de monitoramento contínuo 'OSCAL-native', mas a página não diz se o OSCAL é o armazenamento primário ou só formato de importação e exportação."
+    narrative: "É o único comercial da lista que se declara OSCAL-native, e por isso o contraexemplo mais forte à tese 'OSCAL é borda' (E_OBJECAO_07_REGSCALE_OSCAL_NATIVE_COUNTEREXAMPLE_OPEN). Tier 4 por ser página de marketing do próprio fornecedor."
+    trace: "https://regscale.com/oscal"
+    provenance:
+      source: "https://regscale.com/oscal"
+      locator: "página de posicionamento OSCAL"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_AUDIT_HISTORY_NEEDS_VERSIONED_RECORDS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view · votos 3-0"
+    source_tier: 4
+    source_kind: engineer
+    label: "Para ciclos históricos de auditoria, a evidência de configuração deve vir de registros versionados (audit-log, exports, histórico de IaC), porque telas de configuração mostram só o estado atual."
+    narrative: "Restringida por E_OBJECAO_08_VERSIONED_RECORDS_NOT_GIT_SPECIFIC: o critério aceita audit-log e exports, então um banco com log de auditoria ou tabela temporal atende igual; não é apoio específico ao git."
+    trace: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
+    provenance:
+      source: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
+      locator: "trecho sobre evidência de configuração para ciclos históricos"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_PR_EVIDENCE_POPULATION_FROM_DEPLOYS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view · votos 3-0"
+    source_tier: 4
+    source_kind: engineer
+    label: "Um PR do GitHub é evidência forte de change management SOC 2, mas sozinho não prova que toda mudança em produção usou o fluxo: a população deve vir dos deploys de produção."
+    narrative: "Vai CONTRA 'o grafo em git basta' (E_OBJECAO_09_POPULATION_COMES_FROM_PRODUCTION): o git só enxerga o que passou por ele; a completude da população vem de fora do repositório."
+    trace: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
+    provenance:
+      source: "https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
+      locator: "trecho sobre população de mudanças e deploys de produção"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_COMPAI_SERIES_A_34M
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "https://cryptobriefing.com/comp-ai-34m-series-a-compliance/ · votos 3-0"
+    valid_from: "2026-09"
+    source_tier: 4
+    source_kind: aggregator
+    label: "A Comp AI fechou uma Series A de US$ 34M liderada por Roo Capital e Grand Ventures, publicada em 17 de setembro de 2026."
+    narrative: "Sem comunicado primário (E_OBJECAO_10_COMPAI_ROUND_TIER4_FAVORS_DB). Se verdadeiro, mostra capital indo para um produto com estado em Postgres+Redis (corpus: E_COMPAI_STATE_POSTGRES_PLUS_REDIS), o que depõe a favor do banco relacional, não do git."
+    trace: "https://cryptobriefing.com/comp-ai-34m-series-a-compliance/"
+    provenance:
+      source: "https://cryptobriefing.com/comp-ai-34m-series-a-compliance/"
+      locator: "notícia da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_GRC_ENGINEERING_OSCAL_AS_OUTPUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "https://github.com/GRCEngClub/claude-grc-engineering · votos 3-0"
+    source_tier: 4
+    source_kind: engineer
+    label: "O repo claude-grc-engineering trata OSCAL como saída e ferramentaria (geração de SSP, SAP, SAR e POA&M), não como armazenamento nativo do estado da evidência."
+    narrative: "Mantida pelo Elenxo (peso baixo, repositório comunitário). Coerente com Vanta, Gemara e complyctl: OSCAL na saída."
+    trace: "https://github.com/GRCEngClub/claude-grc-engineering"
+    provenance:
+      source: "https://github.com/GRCEngClub/claude-grc-engineering"
+      locator: "README, comandos de geração OSCAL"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_GIT_AS_IMMUTABLE_AUDIT_LOG_PREMISE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view · votos 3-0"
+    valid_from: "2026-03"
+    source_tier: 4
+    source_kind: engineer
+    label: "A página trata o repositório Git como log de auditoria imutável das mudanças em produção, como premissa e sem comparar com OSCAL ou banco relacional."
+    narrative: "A mesma página contradiz a premissa (E_GIT_IMMUTABILITY_DEPENDS_ON_HOST_CONFIG); ver E_OBJECAO_11_GIT_IMMUTABLE_PREMISE_SELF_CONTRADICTED."
+    trace: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view"
+    provenance:
+      source: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view"
+      locator: "premissa do GitOps como trilha"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_GIT_IMMUTABILITY_DEPENDS_ON_HOST_CONFIG
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view · votos 3-0"
+    valid_from: "2026-03"
+    source_tier: 4
+    source_kind: engineer
+    label: "A imutabilidade do Git como trilha depende de configuração do host (bloquear force push e push direto em main, inclusive para admins); sem isso o histórico pode ser reescrito, logo não é WORM por natureza."
+    narrative: "O Elenxo agravou (E_OBJECAO_12_NO_EXTERNAL_WORM_ANCHOR): quem configura o host é o próprio auditado, então a configuração não dá independência ao auditor. É a objeção mais forte do run."
+    trace: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view"
+    provenance:
+      source: "https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view"
+      locator: "trecho sobre force push, push direto e admins"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_ATTESTFUL_OSCAL_FIRST_BUT_EXPORTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "https://github.com/clay-good/attestful · votos 3-0"
+    source_tier: 3
+    source_kind: engineer
+    label: "O Attestful (MIT, 7 estrelas, 28 commits) se diz 'OSCAL-First', mas os comandos documentados são exportações pontuais (assessment export, ssp generate, poam generate): OSCAL na borda."
+    narrative: "Peso desprezível; não conta como 'mais um fornecedor'."
+    trace: "https://github.com/clay-good/attestful"
+    provenance:
+      source: "https://github.com/clay-good/attestful"
+      locator: "README, lista de comandos"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_TRESTLE_JSON_YAML_NATIVE_SIGNING_JSON
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "https://github.com/oscal-compass/compliance-trestle (README) · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "O trestle suporta nativamente só JSON e YAML, com markdown e CSV como visões de gestão e assinatura destacada só para JSON; a página não descreve WORM nem consumo de evidência de execução pelo auditor."
+    narrative: "Consequência apontada pelo Elenxo (E_OBJECAO_13_TRESTLE_SIGNING_JSON_ONLY_NOT_YAML): o grafo do Onion é YAML, então o trestle não dá integridade assinada ao armazenamento; quem ficaria assinado seria a borda exportada em JSON."
+    trace: "https://github.com/oscal-compass/compliance-trestle"
+    provenance:
+      source: "https://github.com/oscal-compass/compliance-trestle"
+      locator: "README: 'Detached signing and verification for JSON artifacts'"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: E_TRESTLE_AUTHORING_LAYER_RESULTS_ELSEWHERE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "https://github.com/oscal-compass/compliance-trestle (README) · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "O trestle é camada de autoria e governança de artefatos que passa o resultado a ferramentas que aplicam, medem e reportam; a página não trata de frescor de evidência, achados nem monitoramento contínuo."
+    narrative: "O Elenxo fechou parte da lacuna (E_OBJECAO_14_MEASURED_STATE_GOES_TO_FILES_AND_DB): o complyctl grava os scans no workspace e o kyverno reports-server tira resultados do etcd para Postgres."
+    trace: "https://github.com/oscal-compass/compliance-trestle"
+    provenance:
+      source: "https://github.com/oscal-compass/compliance-trestle"
+      locator: "README, papel do trestle na cadeia"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  # ─── Mercado e capital (eixo invariante) ───────────────────────────────────────────────────
+
+  - id: E_MERCADO_AUDIT_EVIDENCE_STORAGE_1021
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "sacra.com/c/vanta · sacra.com/c/drata · cryptobriefing.com (Comp AI) · fortune.com 2026-04-29 (superação) · síntese do run"
+    source_tier: 5
+    source_kind: analyst
+    label: "Mercado: quem paga evidência contínua é SaaS de assinatura com estado no produto (Vanta ~US$ 300M ARR, 16 mil clientes, US$ 4,15B; Drata ~US$ 98M ARR jan/2025; Comp AI Série A US$ 34M). Nenhum capital medido vai para git-nativo."
+    narrative: |-
+      Do sintetizador: a Vanta tem a maior escala, cerca de US$ 300M de ARR em abril de 2026 (+69% a/a sobre US$ 250M no fim de 2025) e cerca de 16.000 clientes (Sacra, tier 5; reancorado na Fortune de 29/04/2026, número fornecido pela empresa). Rodadas: A US$ 50M (mai/2021, ~US$ 500M), B US$ 110M (jun/2022, US$ 1,6B), C (jul/2024, US$ 2,45B), D US$ 150M liderada pela Wellington (jul/2025, US$ 4,15B). A Comp AI fechou Series A de US$ 34M (Roo Capital, Grand Ventures, 17/09/2026; fonte tier 4). Drata: ARR estimado US$ 98M em jan/2025 (Sacra), sem número mais novo; a líder tem ~3x a segunda.
+      O que NÃO está medido: aquisições e consolidação do setor (E_OBJECAO_05); capital da RegScale, a 'OSCAL-native' (E_OBJECAO_16); quem é o comprador (a claim 'comprador de SOC 2, 3/4 das empresas YC' foi cortada, E_OBJECAO_23); pré-seed e ARR autodeclarado da Comp AI (E_OBJECAO_38, E_OBJECAO_28).
+      Leitura para a decisão: o capital medido vai inteiro para produtos com estado em banco próprio (Vanta, Drata, Comp AI). Isso não refuta o grafo em git como desenho do Onion, mas tira do eixo de mercado qualquer apoio a ele: o mercado paga pelo produto que guarda o estado, e o OSCAL aparece só como exportação (Vanta, 04/05/2026).
+    trace: "https://sacra.com/c/vanta/"
+    provenance:
+      source: "https://sacra.com/c/vanta/ ; https://sacra.com/c/drata/ ; https://cryptobriefing.com/comp-ai-34m-series-a-compliance/"
+      locator: "trechos de ARR, clientes e rodadas; notícia da Série A da Comp AI"
+      method: "derivado: síntese do run sobre claims votadas 3-0"
+      locality: "web"
+
+  # ─── Contabilidade da rodada ────────────────────────────────────────────────────────────────
+
+  - id: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "contabilidade do run /onion-research decision de 2026-10-21: 20 confirmadas, 5 refutadas, 0 não verificadas, 36 fontes e 34 claims cortadas por orçamento; 49 objeções do Elenxo, 38 sobreviventes, 38 modeladas; 0 recusadas; 11 superações"
+    label: "Lacunas: 20 claims confirmadas, 5 refutadas por fonte fraca ou exagero, 0 não verificadas, 36 fontes e 34 claims cortadas por orçamento; 38 de 49 objeções sobreviveram e as 38 estão modeladas; 0 recusadas; 11 superações."
+    narrative: |-
+      REFUTADAS (5, nenhuma virou evidência; cada uma tem superação C_SUPERACAO_* que registra aqui): (1) 'trestle usa git como SSOT de artefatos, histórico e aprovações; no ecossistema OSCAL nativo o armazenamento é git' (PDF NIST 2024-07-17, tier 8: a generalização ao ecossistema não tem suporte); (2) 'C2P normaliza OPA Gatekeeper, Kyverno, Auditree, Ansible e CEL para OSCAL' (tier 8: OPA/Gatekeeper e Ansible só no roadmap, CEL ausente); (3) 'Gemara v0.18.0 ingere YAML/JSON validados por CUE; logo o estado é arquivo' (tier 8: versão desatualizada; o vigente é go-gemara v0.11.0); (4) 'OSCAL Hub posicionado para CI/CD' (tier 5: a primária o posiciona para hospedar e compartilhar conteúdo); (5) 'Drata US$ 98M jan/2025, Vanta ~US$ 100M comparável, ACV ~US$ 13,5K' (tier 5: o número da Vanta é antigo e misturava datas).
+      NÃO VERIFICADAS: 0. RECUSADAS PELO MOTOR (sem critério pré-registrado ou sem superação): 0.
+      CORTADAS POR ORÇAMENTO: 36 fontes e 34 claims. Das cortadas, as que o Elenxo julgou sobreviventes estão modeladas como E_OBJECAO_15 a E_OBJECAO_38 (RegScale assinatura e receita, MCP do OSCAL Compass, Gemara 7 camadas e ADR-0008, manifesto gerado, julgamento do auditor, Vanta por API, comprador SOC 2, Sacra inconsistente, trestle 70.000 linhas e compliance-operator, Comp AI AGPL, pré-seed e ARR, e as fontes não lidas: kyverno reports-server, complyctl, whitepaper Gemara, Hyperproof, paper IBM OSCAL Compass, blog RegScale, elevateconsult, Pivot Point, devops.com Chef).
+      OBJEÇÕES DO ELENXO: 49 julgadas, 38 sobreviventes, 11 não sobreviventes (achados 3, 5, 6, 9, 15 e 18 e os cinco descartes refutados). Modeladas: 38 de 38 (E_OBJECAO_01 a E_OBJECAO_38); nenhuma ficou fora do teto.
+      SUPERAÇÕES ACHADAS: 11 (5 das refutadas, que registram aqui, e 6 de objeções: achado 20, Gemara 7 camadas, Vanta por API, trestle 70.000 linhas, compliance-operator e complyctl), modeladas como C_SUPERACAO_20261021_*.
+      FORNECEDORES PEDIDOS SEM CLASSIFICAÇÃO (de 14): Hyperproof, Secureframe, Thoropass, Anecdotes, Sprinto e Chef InSpec/Progress (0 claims); Paramify só com um sinal de busca (Carahsoft: exporta SSP em OSCAL e eMASS, participante da Fase 2 do 20x), armazenamento não dito; Drata e RegScale com classificação de armazenamento aberta. EIXO DE CONSUMO PELO AUDITOR: nenhuma claim ancorada.
+    trace: "journal do run /onion-research decision de 2026-10-21"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-21"
+      locator: "listas de confirmadas, refutadas, cortadas por orçamento, objeções do Elenxo e superações"
+      method: "derivado: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  # ─── Decisão OPEN (o escritor NÃO sela) ────────────────────────────────────────────────────
+
+  - id: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA (reabre D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021): A selar como está · B selar com escopo dividido (estado declarativo no grafo, evidência bruta fora por hash) · C mais uma passada · D OSCAL em git · E banco próprio. Elenxo recomenda B."
+    narrative: |-
+      Opções: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT, C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS, C_OPCAO_C_ONE_MORE_FOCUSED_PASS, C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE, C_OPCAO_E_PRODUCT_RELATIONAL_DB. A opção D é a quarta que a pergunta omitiu, trazida pela objeção ao achado 2.
+      RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação). O escritor recebeu o texto TRUNCADO em 600 caracteres por um defeito do motor (webText com slice); a íntegra abaixo foi RESTAURADA em 2026-10-21 do journal do run wf_1b66acda-ac8 (resultado do agente Elenxo), byte do agente, só com espaços normalizados: «Recomendo a opção B: selar com escopo dividido, e não o enunciado atual (A). **O que sustenta.** O padrão "OSCAL é borda" agora tem apoio de vários fornecedores e de fontes primárias: - Vanta exporta OSCAL desde 04/05/2026 com o estado dentro do produto. - Gemara converte para OSCAL por pacote dedicado. - complyctl grava EvaluationLog no workspace e só gera OSCAL com '--format oscal'. - C2P produz OSCAL Assessment Results a partir do resultado do motor de política. - Lula v2 trocou OSCAL por YAML em Git. **O que não sustenta.** A metade "grafo em git é o armazenamento de TODO o estado" continua com apoio fraco: - Fora o Lula, só há o complyctl, que é baseado em arquivo, mas em diretório de trabalho e não em histórico git. - O kyverno reports-server mostra o caminho inverso: tirou os relatórios em volume do etcd e levou para PostgreSQL, porque "report data is analytical in nature". **Restrições obrigatórias de B (as objeções sobreviventes):** 1. **Imutabilidade (achados 16, 17, 19).** O git não é WORM por natureza, e quem configura o host é o próprio auditado. No corpus, 'WORM' devolve 0 nós. O selo precisa nomear uma âncora externa (commits e tags assinados com log de transparência, ou espelho em object lock) como condição para o grafo valer como trilha. Até lá, o grafo é armazenamento de estado, não trilha de auditoria. 2. **População (achado 13).** O grafo não é fonte da população. Precisa de um passo de reconciliação com uma população externa, por exemplo os deploys de produção. 3. **Volume (reports-server).** A evidência bruta e os resultados em volume ficam fora do git, e o grafo guarda só um ponteiro com digest. 4. **A quarta opção (achado 2).** O selo registra a opção OSCAL-em-git (modelo trestle) como considerada e rejeitada, com a evidência do Lula v1→v2 e do custo de mais de 70.000 linhas do 800-53. 5. **Assinatura YAML (achado 19).** A assinatura do trestle é só para JSON e não cobre o grafo YAML. 6. **Lacunas abertas, declaradas no selo como não verificadas (sem fingir cobertura):** - RegScale "OSCAL-native" (achado 11) é o contraexemplo mais forte e não foi resolvido. - Consumo pelo auditor: zero claims ancoradas. - Fornecedores sem classificação: Hyperproof, Secureframe, Thoropass, Anecdotes, Paramify e Chef InSpec. - Eixo de capital: sem aquisições, e os números da Vanta são de um agregador com inconsistência interna. **Quando escolher C em vez de B.** Se o maestro exigir que a metade "git como trilha" seja selada já, a resposta honesta é C: falta exatamente a evidência de imutabilidade e de consumo pelo auditor. **As opções que não recomendo:** - **D:** o único sinal de mercado medido vai contra ela (o Lula saiu dela). - **E:** conflita com o KG-SSOT do core sem ganho. O argumento de volume se resolve com a divisão de B.»
+      LEITURA DO ESCRITOR sobre o que as objeções modeladas dizem do trecho perdido (derivado dos nós, não do texto do Elenxo): a metade 'git guarda TODO o estado' esbarra em quatro restrições sobreviventes: (1) a população de mudanças vem dos deploys de produção, fora do git (E_OBJECAO_09); (2) o git não é WORM e quem configura o host é o auditado; não há âncora externa de imutabilidade no core (E_OBJECAO_11, E_OBJECAO_12; 'WORM' devolve 0 nós no corpus); (3) resultado em volume é analítico e o ecossistema policy-as-code o tirou do armazenamento declarativo para Postgres (E_OBJECAO_14, E_OBJECAO_30, kyverno reports-server); (4) o trestle só assina JSON, então o YAML do grafo precisa de integridade própria (E_OBJECAO_13).
+      Nuance não medida por este escritor: a superação do C2P (C_SUPERACAO_20261021_C2P_PLUGINS_KYVERNO_OCM_AUDITREE_GIT_LOCKER) cita o Auditree 'building a long-term store of evidence in an git evidence locker', ou seja, um caso de evidência guardada em git no ecossistema OSCAL Compass. É afirmação de um juiz, confiança ≤ 0,6, e contraria em parte a superação não achada da objeção 1; vale conferir antes de selar A ou B.
+      Lacunas que pesam na escolha entre B e C: seis dos 14 fornecedores pedidos sem classificação, a RegScale 'OSCAL-native' sem armazenamento medido, o eixo de consumo pelo auditor sem nenhuma claim ancorada e aquisições do setor sem medir.
+    trace: "run /onion-research modo decision de 2026-10-21; pergunta Q_AUDIT_EVIDENCE_STORAGE_2026_10; decisão de origem D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 (selada «pesquisar mais fornecedores»); síntese em docs/evolution/research/audit-evidence-storage-2026-10/SYNTHESIS.md"
+
+  - id: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.3
+    label: "OPÇÃO A: selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 como está: o grafo YAML em git é o armazenamento de TODO o estado da evidência, e OSCAL é borda de importação e exportação."
+    narrative: "A favor: a metade 'OSCAL é borda' tem apoio de vários fornecedores. Contra (CONSTRAINS sobreviventes): população externa ao git, git não é WORM, resultado em volume pressiona armazenamento declarativo (kyverno reports-server), versionamento auditável não é exclusivo do git, e o capital medido vai para banco próprio. Destrava: escrever o item 1 já. Risco: selar sobre premissa que a própria fonte contradiz."
+    trace: "opção A da pergunta do run /onion-research decision de 2026-10-21"
+
+  - id: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "OPÇÃO B (recomendada pelo Elenxo): o grafo em git guarda o estado declarativo e de julgamento (controles, mapeamentos, achados, frescor, decisões, ponteiros com digest); evidência bruta fora do git, append-only, por hash; OSCAL, OCSF 2003 e EvaluationLog do Gemara na borda."
+    narrative: "Responde às objeções de volume (kyverno reports-server) e de integridade por digest, e alinha com complyctl (estado medido em arquivo de trabalho, OSCAL opcional) e C2P (resultado nasce no motor). Restrições sobreviventes: o armazenamento append-only e a âncora WORM são desenho proposto, não medido no core; a reconciliação da população externa também é condição futura; RegScale e o Gemara (whitepaper, ADR-0022) seguem sem ler."
+    trace: "opção B da pergunta do run /onion-research decision de 2026-10-21; recomendação do Elenxo"
+
+  - id: C_OPCAO_C_ONE_MORE_FOCUSED_PASS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "OPÇÃO C: não selar ainda; rodar mais uma passada focada em RegScale (OSCAL Hub), Paramify, Hyperproof, Drata, Chef InSpec, o whitepaper do Gemara e o consumo pelo auditor."
+    narrative: "Custo: uma rodada de primárias nomeadas (as lacunas já têm nome, então a forma é 'primaries', ~42k tokens por nó na referência de 2026-09-13). Destrava: fecha o contraexemplo RegScale e o eixo do auditor. Risco: o padrão 'OSCAL é borda' já está forte; a passada pode só confirmar e atrasar o item 1."
+    trace: "opção C da pergunta do run /onion-research decision de 2026-10-21"
+
+  - id: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.25
+    label: "OPÇÃO D: OSCAL como arquivo nativo versionado em git (o modelo do trestle, IBM 2021): a quarta opção que a pergunta omitiu."
+    narrative: "Trazida pela objeção ao achado 2 (E_OBJECAO_02). Contra, medido: o Lula v1 usava esse modelo e o abandonou (corpus E_LULA_V2_BUILT_AFTER_OSCAL_LIMITATIONS, um fornecedor, 49 estrelas); o catálogo 800-53 em JSON passa de 70.000 linhas (IBM 2021); o trestle hoje é camada de autoria e o resultado medido vai para outras ferramentas. Nomear e rejeitar esta opção é parte do veredito, não superação."
+    trace: "opção D da pergunta do run /onion-research decision de 2026-10-21; objeção do Elenxo ao achado 2"
+
+  - id: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.3
+    label: "OPÇÃO E: banco relacional próprio, o padrão de Vanta, CISO Assistant, Probo, Comp AI e do kyverno reports-server para resultados."
+    narrative: "A favor: é onde o mercado põe o capital e onde o policy-as-code levou o resultado em volume. Contra a postura do Onion (framework template sem produto nem servidor): exigiria um serviço de banco que o core não tem, e perde o radar determinístico sobre o grafo. A trilha alternativa por assinatura digital dentro do produto (RegScale) ficou sem ler."
+    trace: "opção E da pergunta do run /onion-research decision de 2026-10-21"
+
+  # ─── Objeções SOBREVIVENTES do Elenxo (38 de 38 modeladas) ──────────────────────────────────
+
+  - id: E_OBJECAO_01_TRESTLE_GIT_IS_FOR_SPEC_NOT_EVIDENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "README do compliance-trestle ('CICD pipeline running on top of compliance artifacts in git') e README do C2P ('in GitOps Pipeline', sem commit do resultado); complyctl grava em .complytime/scan/"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 1: o git do trestle vale para artefatos de AUTORIA, não para o estado da evidência contínua; nenhuma fonte do OSCAL Compass mostra o resultado medido commitado em git."
+    narrative: "Critério E2_PROVA_MENOS: curl -sL https://raw.githubusercontent.com/oscal-compass/compliance-trestle/main/README.md | grep -niE 'git|assessment.results|evidence'. Superação não achada (classe nenhuma): C2P roda em GitOps e produz OSCAL AR, mas não diz que o commita; complyctl grava em diretório de trabalho, não em histórico git."
+    trace: "curl -sL https://raw.githubusercontent.com/oscal-compass/compliance-trestle/main/README.md | grep -niE 'git|assessment.results|evidence'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 1, critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_02_FOURTH_OPTION_OSCAL_FILES_IN_GIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "https://research.ibm.com/blog/trestle-automates-compliance -> 'to act as the single source of truth'"
+    label: "OBJEÇÃO (Elenxo) ao achado 2: no trestle o OSCAL É o armazenamento, em arquivos versionados; 'OSCAL nativo' e 'git' não são exclusivos, e com três opções a decisão compara errado. Falta a quarta opção."
+    narrative: "Critério E1_EVIDENCIA_CONTRARIA: WebFetch do blog da IBM de 13/04/2021. Superação não achada: a única evidência contra a opção é o Lula v1→v2 (um fornecedor, 49 estrelas); nomear e rejeitar a opção é parte do veredito. Modelada como C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE."
+    trace: "WebFetch https://research.ibm.com/blog/trestle-automates-compliance"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 2, critério E1_EVIDENCIA_CONTRARIA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_03_GEMARA_SILENCE_IS_ONE_PAGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'gemara' = 0 nós em 181 grafos; complyctl (mankier.com/1/complyctl): EvaluationLog padrão, OSCAL só com --format oscal"
+    label: "OBJEÇÃO (Elenxo) ao achado 4: silêncio de UMA página; ADR-0022, EvaluationLog e o whitepaper de 03/2026 (primário citado, não lido) ficaram sem ler, e onde o OpenSSF manda guardar o log segue aberto."
+    narrative: "Critério E4_LACUNA_ABERTA: bash .claude/validation/kg-corpus-grep.sh 'gemara' (0 nós em 181 grafos). Superação não achada: o que se mediu foi o complyctl, que mostra o FORMATO nativo, não a política de armazenamento."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'gemara'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 4, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_04_VANTA_ARR_AGGREGATOR_AND_INFERENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "post da Vanta de 04/05/2026 ('export your controls, tests, and evidence in OSCAL'); sacra.com/c/vanta (tabela US$353M contra US$504M no texto)"
+    label: "OBJEÇÃO (Elenxo) ao achado 7: ARR é estimativa de agregador com inconsistência interna, e 'estado dentro do produto' é inferência; a primária da Vanta confirma OSCAL como borda, mas não toca a tese do git."
+    narrative: "Critério E2_PROVA_MENOS: WebFetch do post da comunidade Vanta e da Sacra. Superação não achada: não há ARR primário da própria Vanta; o corpus (d5-pricing-2026-07, E_vanta_drata_pricing) dá só faixa de preço (US$ 7,5k–56,8k/ano)."
+    trace: "WebFetch https://community.vanta.com/x/vanta-product-updates/ghhnzu4hpxom/oscal-export-now-available-for-fedramp-r5-nist-800"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 7, critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_05_CAPITAL_AXIS_MISSING_ACQUISITIONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'aquisicao' 'acquisition' no grafo audit-evidence-machinery-2026-10 = 0 nós; nenhuma claim do run sobre M&A"
+    label: "OBJEÇÃO (Elenxo) ao achado 8: o eixo de capital pedia rodadas E aquisições; nenhuma claim fecha a consolidação do setor (M&A de Vanta, Drata e afins em 2025–2026). O eixo ficou pela metade."
+    narrative: "Critério E4_LACUNA_ABERTA. Superação não achada: não está nos achados nem nos descartados do run, e não foi medido."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'aquisicao' 'acquisition'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 8, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_06_DRATA_CLASSIFIED_BY_SILENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "WebSearch 'Drata OSCAL export' sem anúncio; kg-corpus-grep.sh 'drata' = 4 nós, nenhum sobre armazenamento"
+    label: "OBJEÇÃO (Elenxo) ao achado 10: inferir o armazenamento da Drata pelo silêncio de um perfil de agregador não a classifica; armazenamento, borda, trilha e consumo pelo auditor seguem abertos."
+    narrative: "Critério E2_PROVA_MENOS. A busca não achou exportação OSCAL da Drata nem da Secureframe; a tabela de concorrente (Mycroft, 08/04/2026) é marketing. Superação não achada: a doc primária da Drata (API, Audit Hub) não foi lida."
+    trace: "WebSearch 'Drata OSCAL export' ; bash .claude/validation/kg-corpus-grep.sh 'drata'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 10, critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_07_REGSCALE_OSCAL_NATIVE_COUNTEREXAMPLE_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'regscale' = 0 nós em 181 grafos; WebSearch sobre o código do OSCAL Hub sem banco nem repositório"
+    label: "OBJEÇÃO (Elenxo) ao achado 11: a RegScale, única comercial 'OSCAL-native', é o contraexemplo mais forte a 'OSCAL é borda', e a pergunta segue aberta; o repositório e o banco do OSCAL Hub não foram achados."
+    narrative: "Critério E4_LACUNA_ABERTA. A deck da NIST de 18/02/2026 fala em 'web, CLI, and API' e numa versão hospedada, sem dizer o armazenamento. Fontes que fechariam (regscale.com/blog/oscal-automation-for-fedramp, elevateconsult): primário citado, não lido. Superação não achada."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'regscale'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 11, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_08_VERSIONED_RECORDS_NOT_GIT_SPECIFIC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "oneuptime.com 2026-08-04: lista 'audit-log, exports, IaC history' como registros versionados"
+    label: "OBJEÇÃO (Elenxo) ao achado 12: 'registro versionado' inclui audit-log e exports; um banco com log de auditoria ou tabela temporal atende o mesmo critério, então o achado não apoia o git em particular."
+    narrative: "Critério E2_PROVA_MENOS. Superação não achada: nenhuma fonte do run diz que o auditor PREFERE histórico git a log de auditoria de banco."
+    trace: "WebFetch https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 12, critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_09_POPULATION_COMES_FROM_PRODUCTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "oneuptime.com 2026-08-04: 'sozinho não prova que toda mudança em produção usou o fluxo; a população deve vir dos deploys'"
+    label: "OBJEÇÃO (Elenxo) ao achado 13: o git só enxerga o que passou por ele; se o grafo for o armazenamento, precisa reconciliar com a população externa (deploys), senão a evidência é forte mas incompleta."
+    narrative: "Critério E1_EVIDENCIA_CONTRARIA. Superação não achada: não existe no core mecanismo que reconcilie população externa com os nós; no corpus 'populacao' só aparece em censo do backlog. É condição futura da decisão."
+    trace: "WebFetch https://oneuptime.com/blog/post/2026-08-04-github-pull-requests-change-management-evidence/view"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 13, critério E1_EVIDENCIA_CONTRARIA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_10_COMPAI_ROUND_TIER4_FAVORS_DB
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "cryptobriefing.com (tier 4), sem comunicado primário; corpus: Comp AI em Postgres+Redis"
+    label: "OBJEÇÃO (Elenxo) ao achado 14: a Série A da Comp AI só tem fonte tier 4; e, se verdadeira, mostra capital indo para estado em Postgres+Redis, o que depõe a favor do banco relacional, não do git."
+    narrative: "Critério E2_PROVA_MENOS. Superação não achada: o comunicado primário da rodada não foi procurado."
+    trace: "WebFetch https://cryptobriefing.com/comp-ai-34m-series-a-compliance/"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 14, critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_11_GIT_IMMUTABLE_PREMISE_SELF_CONTRADICTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "oneuptime.com 2026-03-13 (trecho sobre force push e admins); kg-corpus-grep.sh 'WORM' = 0 nós"
+    label: "OBJEÇÃO (Elenxo) ao achado 16: a mesma página diz que a imutabilidade depende de bloquear force push inclusive para admins; a premissa 'log imutável' é contradita pela própria fonte, e o core não tem claim de WORM."
+    narrative: "Critério E1_EVIDENCIA_CONTRARIA. Superação não achada: ancorar commits numa trilha fora do controle do auditado (commits assinados + Sigstore/Rekor, ou réplica com object lock); no corpus, Sigstore só aparece para supply-chain (G2_PROVENANCE_COMMIT_PADRAO, E_AGENT_SIGN_PROVENIENCIA_GRATIS_SIGSTORE)."
+    trace: "WebFetch https://oneuptime.com/blog/post/2026-03-13-soc2-compliance-controls-flux-cd/view ; bash .claude/validation/kg-corpus-grep.sh 'WORM'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 16, critério E1_EVIDENCIA_CONTRARIA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_12_NO_EXTERNAL_WORM_ANCHOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'WORM' = 0 nós em 181 grafos; os nós de 'Sigstore' tratam de supply-chain"
+    label: "OBJEÇÃO (Elenxo) ao achado 17, a mais forte do run: quem configura o host é o próprio auditado, então proteção de branch não dá independência ao auditor; selar git como ARMAZENAMENTO pede âncora externa de imutabilidade que o core não tem."
+    narrative: "Critério E2_PROVA_MENOS. Superação não achada (condição futura): commits ou tags assinados com publicação em log de transparência, ou espelho para armazenamento com object lock. Nada medido no domínio de auditoria."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'WORM'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 17, critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_13_TRESTLE_SIGNING_JSON_ONLY_NOT_YAML
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "README do compliance-trestle: 'Detached signing and verification for JSON artifacts'"
+    label: "OBJEÇÃO (Elenxo) ao achado 19: o trestle assina só JSON e o grafo é YAML; adotá-lo como validador não dá integridade assinada ao armazenamento: ou o grafo ganha mecanismo próprio, ou só a borda exportada fica assinada."
+    narrative: "Critério E2_PROVA_MENOS: curl -sL do README do trestle | grep -n 'signing'. Superação não achada: não há claim no run nem nó no corpus sobre assinatura nativa de YAML ou do commit para o grafo."
+    trace: "curl -sL https://raw.githubusercontent.com/oscal-compass/compliance-trestle/main/README.md | grep -n 'signing'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 19, critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_14_MEASURED_STATE_GOES_TO_FILES_AND_DB
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "github.com/kyverno/reports-server ('report data is analytical in nature and should not be stored in the transactional database'); mankier.com/1/complyctl ('.complytime/scan/')"
+    label: "OBJEÇÃO (Elenxo) ao achado 20: o estado medido no ecossistema vai para arquivos de workspace (complyctl) ou banco (kyverno reports-server levou resultados do etcd para Postgres); é a pressão que o grafo sofreria guardando evidência bruta."
+    narrative: "Critério E1_EVIDENCIA_CONTRARIA. Verbatim lido pelo Elenxo: kyverno reports-server 'It moves reports out of etcd and stores them in a PostgreSQL database instance'; complyctl 'Scan output reports (EvaluationLog, OSCAL, SARIF, Markdown)', EvaluationLog padrão e OSCAL só com '--format oscal'. Superação ACHADA (classe entrega): C_SUPERACAO_20261021_COMPLYCTL_WORKSPACE_STATE_OSCAL_EDGE."
+    trace: "WebFetch https://github.com/kyverno/reports-server ; WebFetch https://www.mankier.com/1/complyctl"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao achado 20, critério E1_EVIDENCIA_CONTRARIA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_15_REGSCALE_SIGNATURE_TRAIL_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'RegScale ... assinatura digital' cortada por orçamento, sem votos"
+    label: "OBJEÇÃO (Elenxo): foi cortada sem refutação a única claim de trilha auditável ALTERNATIVA ao git (assinatura digital de mudanças e exceções dentro da RegScale); regscale.com/oscal e a doc de audit trail: primário citado, não lido."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Atinge diretamente a escolha entre git e banco. Superação não achada."
+    trace: "journal do run: claim 'RegScale assinatura digital' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte por orçamento da trilha por assinatura da RegScale, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_16_REGSCALE_CAPITAL_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'regscale' = 0 nós; claim 'receita triplicou' cortada por orçamento"
+    label: "OBJEÇÃO (Elenxo): o capital da RegScale (rodadas, quem paga) ficou sem ancorar; é o contrapeso de mercado à tese do OSCAL como borda, por ser a 'OSCAL-native' da lista."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação não achada: rodadas de fonte primária não foram procuradas."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'regscale'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim de receita da RegScale, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_17_OSCAL_COMPASS_MCP_AUTHORING_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.3
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'MCP Server ... humano no circuito' cortada por orçamento"
+    label: "OBJEÇÃO (Elenxo, peso baixo): cortada sem votos a claim de autoria por agente no OSCAL Compass via MCP com humano no circuito e trilha em git; apoia a tese, mas é autoria e não evidência medida."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação não achada: a página do agente/MCP do OSCAL Compass não foi lida."
+    trace: "journal do run: claim 'MCP Server humano no circuito' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do MCP do OSCAL Compass, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_18_GEMARA_SEVEN_LAYERS_LOG_SCHEMAS_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'gemara' = 0 nós; complyctl usa EvaluationLog como saída padrão (mankier.com/1/complyctl)"
+    label: "OBJEÇÃO (Elenxo): cortada sem refutação a claim do Gemara de 7 camadas com esquemas de Audit, Enforcement e Evaluation Log, o único esquema ABERTO de log de evidência que concorre com o OSCAL Assessment Results."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação ACHADA (classe entrega): C_SUPERACAO_20261021_GEMARA_EVALUATIONLOG_NATIVE_IN_COMPLYCTL."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'gemara'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do Gemara de 7 camadas, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_19_GEMARA_ADR_0008_EVIDENCE_IN_LOGS_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'ADR-0008' cortada por orçamento"
+    label: "OBJEÇÃO (Elenxo): cortada sem votos a claim de que o modelo lógico do Gemara é estável e fechado (ADR-0008) e a evidência entra nos esquemas de log, não no modelo; ADR-0008 e ADR-0022: primário citado, não lido."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Diz onde a evidência entra no modelo. Superação não achada."
+    trace: "journal do run: claim 'ADR-0008' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do ADR-0008, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_20_GENERATED_MANIFEST_NOT_AUTHORITATIVE_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.3
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'manifesto gerado' cortada por orçamento"
+    label: "OBJEÇÃO (Elenxo, peso baixo): cortada sem votos a claim de que manifesto gerado não substitui evidência autoritativa, a distinção projeção contra armazenamento que a decisão quer selar."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. É analogia, não fornecedor. Superação não achada: a fonte não foi relida."
+    trace: "journal do run: claim 'manifesto gerado' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do manifesto gerado, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_21_AUDITOR_CONSUMPTION_AXIS_EMPTY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "achados 1–20 do run: nenhum descreve o consumo pelo auditor (9, 10 e 19 dizem que a fonte não descreve)"
+    label: "OBJEÇÃO (Elenxo): cortada a única claim sobre COMO O AUDITOR CONSOME a evidência (integração com GitHub não tira dele o julgamento de suficiência); o eixo pedido na pergunta ficou sem nenhuma claim ancorada."
+    narrative: "Critério E4_LACUNA_ABERTA. Superação não achada: doc primária de portal do auditor (Vanta, Drata) ou orientação da AICPA sobre evidência de sistema controlado pelo auditado não foi procurada."
+    trace: "listagem dos achados 1–20 do run: nenhum trata do consumo pelo auditor"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do julgamento do auditor, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_22_VANTA_OSCAL_CUT_WITH_PRIMARY_AVAILABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "post da comunidade Vanta de 04/05/2026: 'export your controls, tests, and evidence in OSCAL (machine-readable) format directly from Vanta'"
+    label: "OBJEÇÃO (Elenxo): a claim 'Vanta coleta por API e não diz se há OSCAL' foi cortada sem medir, quando a resposta primária existia: a Vanta exporta controles, testes e evidência em OSCAL desde 04/05/2026."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação ACHADA (classe entrega): C_SUPERACAO_20261021_VANTA_OSCAL_EXPORT_EDGE. O post não diz quais modelos OSCAL."
+    trace: "WebFetch https://community.vanta.com/x/vanta-product-updates/ghhnzu4hpxom/oscal-export-now-available-for-fedramp-r5-nist-800"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim da Vanta por API, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_23_WHO_PAYS_SOC2_BUYER_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'comprador de SOC 2 ... YC' cortada por orçamento; corpus d5-pricing-2026-07/E_vanta_drata_pricing dá só preço"
+    label: "OBJEÇÃO (Elenxo): cortada sem votos a claim que respondia 'quem paga por evidência contínua' (comprador de SOC 2, 3/4 das empresas YC; consultoria US$ 50–100K; ARR por cliente ~US$ 19K), parte do eixo invariante."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação não achada: não há fonte primária sobre o comprador; o corpus tem só faixa de preço."
+    trace: "journal do run: claim 'comprador de SOC 2 YC' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do comprador, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_24_SACRA_INTERNAL_INCONSISTENCY_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "sacra.com/c/vanta: funding da tabela (US$353M) contra o do texto (US$504M)"
+    label: "OBJEÇÃO (Elenxo): a ressalva das inconsistências internas da Sacra foi cortada enquanto os achados 7 e 8, da mesma fonte, subiam com 3-0; cortar a ressalva e manter o número é viés de confirmação."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação não achada: não existem números primários de ARR; as rodadas têm comunicados próprios, não lidos."
+    trace: "WebFetch https://sacra.com/c/vanta/"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim de inconsistência da Sacra, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_25_TRESTLE_70K_LINES_COST_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "research.ibm.com/blog/trestle-automates-compliance: 'over 70,000 lines'"
+    label: "OBJEÇÃO (Elenxo): cortada sem votos a claim do custo de OSCAL como armazenamento (NIST 800-53 em JSON fragmentado com mais de 70.000 linhas), o melhor dado sobre por que o Lula saiu dele."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação ACHADA (classe entrega): C_SUPERACAO_20261021_IBM_800_53_JSON_70000_LINES."
+    trace: "WebFetch https://research.ibm.com/blog/trestle-automates-compliance"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim das 70.000 linhas, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_26_TRESTLE_TOOL_DATA_TO_AR_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'OpenShift compliance-operator, Tanium' cortada por orçamento; README do C2P lido"
+    label: "OBJEÇÃO (Elenxo): cortada sem votos a claim de que o trestle transforma dados de ferramentas (compliance-operator, Tanium) em OSCAL Assessment Results, o que mostra o AR como formato de PUBLICAÇÃO do resultado medido."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação ACHADA (classe entrega): C_SUPERACAO_20261021_C2P_OSCAL_AR_FROM_PVP_RESULTS."
+    trace: "journal do run: claim 'OpenShift compliance-operator, Tanium' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do compliance-operator, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_27_COMPAI_AGPL_CORE_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.3
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'Comp AI AGPLv3' cortada por orçamento, sem votos"
+    label: "OBJEÇÃO (Elenxo, peso baixo): cortada sem votos a claim de que a Comp AI abre o núcleo sob AGPLv3; o corpus já tem a Comp AI em Postgres+Redis, então ela acrescentaria pouco à decisão."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação não achada: o LICENSE do repositório da Comp AI não foi lido."
+    trace: "journal do run: claim 'Comp AI AGPLv3' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim de licença da Comp AI, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_28_COMPAI_ARR_SELF_DECLARED_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'Comp AI ARR US$5–7M, 680–900 clientes (autodeclarado)' cortada por orçamento"
+    label: "OBJEÇÃO (Elenxo): cortada sem votos a claim de tração da Comp AI (ARR US$ 5–7M, 680–900 clientes, autodeclarado), que mostraria um produto relacional de código aberto crescendo, o eixo contrário à tese do git."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação não achada: não há verificação independente no run."
+    trace: "journal do run: claim 'Comp AI ARR' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim de ARR da Comp AI, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_29_KYVERNO_REPORTS_SERVER_TO_POSTGRES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "github.com/kyverno/reports-server: 'It moves reports out of etcd and stores them in a PostgreSQL database instance' · 'etcd ... maximum size of 8GB' · 'report data is analytical in nature'"
+    label: "OBJEÇÃO (Elenxo): fonte não lida pelo run e lida pelo Elenxo: o kyverno reports-server tira os relatórios do etcd para Postgres porque 'report data is analytical in nature'; resultado em volume saiu do armazenamento declarativo."
+    narrative: "Critério E1_EVIDENCIA_CONTRARIA. Superação não achada: a variante que preserva a tese é o grafo guardar estado e ponteiros com digest e a evidência bruta ficar fora do git; é desenho proposto, não medido no core, e entra como restrição do veredito (é o núcleo da opção B)."
+    trace: "WebFetch https://github.com/kyverno/reports-server"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida kyverno reports-server, critério E1_EVIDENCIA_CONTRARIA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_30_COMPLYCTL_LEFT_OUT_SECOND_FILE_VENDOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "mankier.com/1/complyctl: 'Additional output format(s): oscal, pretty (Markdown), sarif, all'"
+    label: "OBJEÇÃO (Elenxo): o run deixou de fora o complyctl, segundo fornecedor do ecossistema OSCAL Compass/ComplyTime com estado em arquivo e OSCAL opcional; a página não diz que o workspace é git."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação ACHADA (classe entrega): C_SUPERACAO_20261021_COMPLYCTL_SCAN_DIR_EVALUATIONLOG."
+    trace: "WebFetch https://www.mankier.com/1/complyctl"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida complyctl, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_31_GEMARA_WHITEPAPER_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'gemara' = 0 nós; whitepaper OpenSSF 03/2026 não lido"
+    label: "OBJEÇÃO (Elenxo): o whitepaper do Gemara (OpenSSF, 03/2026; primário citado, não lido) poderia dizer onde o OpenSSF manda guardar o EvaluationLog e fechar o achado 4; ficou sem ler."
+    narrative: "Critério E4_LACUNA_ABERTA. Fonte: https://openssf.org/wp-content/uploads/2026/03/04_OpenSSF_Gemara-Project_Whitepaper.pdf. Superação não achada."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'gemara'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida whitepaper do Gemara, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_32_SIX_REQUESTED_VENDORS_UNCLASSIFIED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh para hyperproof, secureframe, thoropass, anecdotes e paramify = 0 nós cada; 0 claims do run sobre Hyperproof"
+    label: "OBJEÇÃO (Elenxo): Hyperproof (hyperproof.io/?p=34860; primário citado, não lido), Secureframe, Thoropass, Anecdotes e Paramify ficaram sem claim; dos 14 fornecedores pedidos, cerca de 6 sem classificação."
+    narrative: "Critério E4_LACUNA_ABERTA: laço do kg-corpus-grep.sh sobre os cinco nomes (0 nós cada). Do Paramify só uma busca: a Carahsoft diz que exporta SSP em 'OSCAL, eMASS' e que é participante da Fase 2 do 20x (fedramp.gov, 10/12/2025); armazenamento não dito. Superação não achada."
+    trace: "for t in hyperproof secureframe thoropass anecdotes paramify; do bash .claude/validation/kg-corpus-grep.sh $t | head -1; done"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida Hyperproof e aos fornecedores sem claim, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_33_IBM_OSCAL_COMPASS_PRODUCTION_PAPER_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "lacuna do Scope 'OSCAL nativo em produção: RegScale, Paramify, OSCAL Compass' sem claim ancorada"
+    label: "OBJEÇÃO (Elenxo): a publicação 'Practical cloud-native compliance automation with OSCAL Compass' (IBM; primário citado, não lido) diria se o OSCAL ainda é SSOT, como em 2021, ou virou borda; ficou sem ler."
+    narrative: "Critério E4_LACUNA_ABERTA. Fonte: https://researchweb.draco.res.ibm.com/publications/practical-cloud-native-compliance-automation-with-oscal-compass. Superação não achada."
+    trace: "lacuna do Scope 'OSCAL nativo em produção' sem claim ancorada"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida paper do OSCAL Compass, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_34_REGSCALE_FEDRAMP_BLOG_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'regscale' = 0 nós; regscale.com/blog/oscal-automation-for-fedramp não lido"
+    label: "OBJEÇÃO (Elenxo): o post da RegScale sobre automação OSCAL para FedRAMP (primário citado, não lido) fecharia se o 'OSCAL-native' é armazenamento; ficou sem ler."
+    narrative: "Critério E4_LACUNA_ABERTA. Fonte: https://regscale.com/blog/oscal-automation-for-fedramp/. Superação não achada."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'regscale'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida blog da RegScale, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_35_FEDRAMP_20X_OSCAL_ADOPTION_UNVERIFIED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.3
+    verified_at: "2026-10-21"
+    verified_against: "WebSearch 'FedRAMP 20x pilot participants did not use OSCAL': nenhuma primária confirma; elevateconsult.com não lido"
+    label: "OBJEÇÃO (Elenxo): relato não verificado de que participantes do piloto FedRAMP 20x não usaram OSCAL nos materiais legíveis por máquina; se confirmar, enfraquece o OSCAL até como borda. elevateconsult: primário citado, não lido."
+    narrative: "Critério E4_LACUNA_ABERTA. Vem de um resumo de busca e de uma busca derivada, sem verificação. Fonte: https://elevateconsult.com/insights/oscal-vs-traditional-fedramp-documentation-choosing-the-right-compliance-approach/. Superação não achada: falta fonte primária do PMO do FedRAMP."
+    trace: "WebFetch https://elevateconsult.com/insights/oscal-vs-traditional-fedramp-documentation-choosing-the-right-compliance-approach/"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida elevateconsult, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_36_ANALYST_COMMUNITY_OSCAL_FUTURE_EMPTY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.3
+    verified_at: "2026-10-21"
+    verified_against: "podcast Pivot Point Security ep. 150 listado como fonte não lida"
+    label: "OBJEÇÃO (Elenxo, peso baixo): o eixo 'analistas e comunidade sobre o futuro do OSCAL' ficou sem claim; o podcast da Pivot Point (ep. 150) não foi ouvido nem transcrito."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Fonte: https://www.pivotpointsecurity.com/podcasts/episode-150-is-oscal-the-future-of-security-documentation/. Superação não achada."
+    trace: "fonte listada como não lida no run (Pivot Point Security, episódio 150)"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida Pivot Point, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_37_CHEF_INSPEC_UNCLASSIFIED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "kg-corpus-grep.sh 'inspec' = 18 nós, todos falsos positivos de 'inspecao'; devops.com sobre Chef não lido"
+    label: "OBJEÇÃO (Elenxo): o Chef InSpec/Progress foi pedido e não há claim sobre onde guarda resultados (Automate, Chef 360) nem se exporta OSCAL; no corpus os 18 nós de 'inspec' são falsos positivos de 'inspecao'."
+    narrative: "Critério E4_LACUNA_ABERTA. Fonte não lida: https://devops.com/chef-extends-scope-of-compliance-automation/. Superação não achada: a doc do Chef Automate sobre persistência de relatórios não foi lida."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'inspec'"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção à fonte não lida devops.com sobre Chef, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_38_COMPAI_PRESEED_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.3
+    verified_at: "2026-10-21"
+    verified_against: "journal do run: claim 'pre-seed US$2,6M' cortada por orçamento, sem votos"
+    label: "OBJEÇÃO (Elenxo, peso baixo): cortado sem votos o dado de capital do pré-seed de US$ 2,6M da Comp AI (OSS Capital, Grand Ventures); pesa pouco no armazenamento, mas o eixo de capital é invariante."
+    narrative: "Critério E3_DESCARTE_SEM_MEDIDA. Superação não achada: o comunicado primário não foi procurado (na rodada anterior o seedtable deu HTTP 403)."
+    trace: "journal do run: claim 'pre-seed US$2,6M' cortada por orçamento"
+    provenance:
+      source: "journal do run /onion-research decision de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção ao corte da claim do pré-seed da Comp AI, critério E3_DESCARTE_SEM_MEDIDA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  # ─── SUPERAÇÕES achadas (11; SAC-151) ───────────────────────────────────────────────────────
+
+  - id: C_SUPERACAO_20261021_TRESTLE_GIT_SSOT_SCOPED_TO_SDK
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O compliance-trestle (SDK do OSCAL Compass) usa um repositório Git como fonte única dos artefatos, do histórico e das aprovações (GitOps), com OSCAL em JSON e Markdown como face humana: escopo de UMA ferramenta, onde OSCAL é armazenamento dentro do Git."
+    narrative: "Alvo reprovado: 'no ecossistema OSCAL nativo o armazenamento é git, não banco relacional' (PDF NIST 2024-07-17, tier 8), refutada. Medida: pdftotext do PDF; grep -n -B12 -A14 'single source of truth' mostra as linhas 174-189 verbatim sob 'Trestle: An open-source OSCAL SDK'; grep -c -i -E 'relational|database|ecosystem' devolve 0. Critério V1_QUOTE_NAO_SUSTENTA. Reforça C_OPCAO_D."
+    trace: "curl -sL 'https://csrc.nist.gov/csrc/media/Projects/open-security-controls-assessment-language/images-media/7.17.2024_oscal-compass-End-to-End.pdf' -o c.pdf && pdftotext c.pdf - | grep -c -i -E 'relational|database|ecosystem'"
+
+  - id: C_SUPERACAO_20261021_C2P_PLUGINS_KYVERNO_OCM_AUDITREE_GIT_LOCKER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O C2P liga compliance-as-code a policy-as-code em GitOps: gera políticas a partir de Component Definitions e produz OSCAL AR dos resultados nativos; plugins Kyverno, OCM e Auditree (OPA e Ansible só no roadmap); o Auditree guarda evidência num 'git evidence locker'."
+    narrative: "Alvo reprovado: 'C2P normaliza OPA Gatekeeper, Kyverno, Auditree, Ansible e CEL para OSCAL' (refutada por exagero). O texto da superação chegou ao escritor truncado em 'O OSCAL fica na borda, com'. Medida: WebFetch do README de oscal-compass/compliance-to-policy ('produces OSCAL Assessment Results from the native assessment results of PVP', 'building a long-term store of evidence in an git evidence locker') e de compliance-to-policy-go (só Kyverno e OCM); PDF do NIST extraído com pdftotext no ⟨scratchpad da sessão⟩. Critério V2_CONTRADITA. O 'git evidence locker' do Auditree é sinal de evidência em git não medido por este escritor."
+    trace: "WebFetch https://raw.githubusercontent.com/oscal-compass/compliance-to-policy/main/README.md (seções Supported Policy Engines e Roadmap; grep -i 'CEL' = 0)"
+
+  - id: C_SUPERACAO_20261021_GO_GEMARA_V0_11_OCI_ARTIFACT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A fonte vigente do Gemara é o go-gemara v0.11.0 (30/09/2026): o artefato é YAML/JSON validado por CUE ('Decode unmarshals raw YAML or JSON bytes into a Gemara type'), empacotado como OCI; sustenta artefato portátil, nada sobre onde o estado mora."
+    narrative: "Alvo reprovado: 'Gemara v0.18.0 ingere YAML/JSON validados por CUE; logo o estado é arquivo, não banco' (refutada por versão). Medida: WebFetch de pkg.go.dev/github.com/gemaraproj/go-gemara (versão, data, Decode/Load, 'Pack into a local OCI layout', 'Push to a remote OCI registry') e de github.com/ossf/gemara, cujo README encaminha ao go-gemara. Critério V4_DESATUALIZADA; grep por banco, database e storage nas duas páginas = 0."
+    trace: "WebFetch https://pkg.go.dev/github.com/ossf/gemara?tab=versions ; WebFetch https://pkg.go.dev/github.com/gemaraproj/go-gemara"
+
+  - id: C_SUPERACAO_20261021_OSCAL_HUB_HOST_AND_SHARE_NOT_CICD
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O OSCAL Hub (deck da RegScale no NIST OSCAL Workshop #40, fev/2026) é plataforma para hospedar e compartilhar artefatos OSCAL (Catalogs, Profiles, Components) com visualizar, validar e converter por Web, CLI e API; não é posicionado como CI/CD nem diz guardar evidência."
+    narrative: "Alvo reprovado: 'OSCAL Hub posicionado para CI/CD e DevOps' (refutada). Medida: PDF primário baixado e extraído com pdftotext; verbatim 'Hub for sharing OSCAL content: Catalogs, Profiles, Components, etc.', 'To make it easier to host and share OSCAL content'; grep 'ci/cd|pipeline' = 0. Critério V1_QUOTE_NAO_SUSTENTA: no artigo da securityboulevard o sujeito de 'embedded into DevOps workflows' é 'validated OSCAL data', não o Hub."
+    trace: "WebFetch https://securityboulevard.com/2025/12/regscale-open-sources-oscal-hub-to-further-compliance-as-code-adoption/ ; pdftotext 02.18.2026_OSCAL_Hub.pdf - | grep -iE 'ci/cd|pipeline'"
+
+  - id: C_SUPERACAO_20261021_VANTA_300M_FORTUNE_DRATA_98M
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Mercado corrigido: a Vanta passou de US$ 300M de ARR com mais de 16.000 clientes (Fortune, 29/04/2026, número da empresa); a Drata tinha ARR estimado de US$ 98M em jan/2025 (Sacra). A líder tem ~3x a segunda, sem paridade."
+    narrative: "Alvo reprovado: 'Drata US$ 98M, Vanta ~US$ 100M comparável, ACV ~US$ 13,5K' (refutada, datas misturadas). Medida: WebFetch da Fortune com citação literal; WebSearch 'Vanta ARR 2025 $200 million' trouxe as páginas da Sacra de US$ 220M e US$ 300M; WebSearch 'Drata ARR 2026' sem número mais novo. Critério V4_DESATUALIZADA."
+    trace: "WebFetch https://www.fortune.com/2026/04/29/exclusive-vanta-arr-300-million-sequoia-shadow-ai-claude-cursor/ ; grep -F 'has crossed $300 million in annual recurring revenue'"
+
+  - id: C_SUPERACAO_20261021_COMPLYCTL_WORKSPACE_STATE_OSCAL_EDGE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "complyctl: o estado medido vai para arquivos no workspace, com o EvaluationLog do Gemara como formato nativo e OSCAL como saída opcional; segundo fornecedor, além do Lula, com 'arquivo estruturado como armazenamento e OSCAL como borda'."
+    narrative: "Alvo reprovado: achado 20 (trestle é camada de autoria). Medida: leitura da página de manual em mankier.com/1/complyctl nesta passada, trechos verbatim na objeção. Critério E1_EVIDENCIA_CONTRARIA. Ressalva: a página não diz que o workspace é git."
+    trace: "WebFetch https://github.com/kyverno/reports-server ; WebFetch https://www.mankier.com/1/complyctl"
+
+  - id: C_SUPERACAO_20261021_GEMARA_EVALUATIONLOG_NATIVE_IN_COMPLYCTL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "complyctl: 'Scan output reports (EvaluationLog, OSCAL, SARIF, Markdown)', com EvaluationLog sempre produzido e OSCAL só com '--format oscal': o EvaluationLog do Gemara está em uso em produção como formato nativo."
+    narrative: "Alvo reprovado: corte por orçamento da claim do Gemara de 7 camadas. Medida: WebFetch de mankier.com/1/complyctl nesta passada. Critério E3_DESCARTE_SEM_MEDIDA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'gemara'"
+
+  - id: C_SUPERACAO_20261021_VANTA_OSCAL_EXPORT_EDGE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A Vanta tem OSCAL como BORDA de exportação de controles, testes e evidência (post de 04/05/2026, planos Plus, Professional, Enterprise e Compliance & Audit Mgmt), com o estado no produto."
+    narrative: "Alvo reprovado: corte por orçamento da claim 'Vanta coleta por API e não diz se há OSCAL'. Medida: leitura do post (04/05/2026, Product Updates) nesta passada; não diz quais modelos OSCAL. Critério E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://community.vanta.com/x/vanta-product-updates/ghhnzu4hpxom/oscal-export-now-available-for-fedramp-r5-nist-800"
+
+  - id: C_SUPERACAO_20261021_IBM_800_53_JSON_70000_LINES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O blog da IBM de 13/04/2021 confirma o catálogo NIST 800-53 em JSON com mais de 70.000 linhas: o custo de tamanho e fragmentação de usar OSCAL como armazenamento."
+    narrative: "Alvo reprovado: corte por orçamento da claim do trestle sobre OSCAL fragmentado. Medida: WebFetch nesta passada ('over 70,000 lines'). Critério E3_DESCARTE_SEM_MEDIDA. Pesa contra C_OPCAO_D."
+    trace: "WebFetch https://research.ibm.com/blog/trestle-automates-compliance"
+
+  - id: C_SUPERACAO_20261021_C2P_OSCAL_AR_FROM_PVP_RESULTS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "C2P: 'produces OSCAL Assessment Results from the native assessment results of PVP': o resultado nasce no motor de política e o OSCAL é a normalização na borda."
+    narrative: "Alvo reprovado: corte por orçamento da claim do trestle sobre compliance-operator e Tanium. Medida: WebFetch de github.com/oscal-compass/compliance-to-policy nesta passada. Critério E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://github.com/oscal-compass/compliance-to-policy"
+
+  - id: C_SUPERACAO_20261021_COMPLYCTL_SCAN_DIR_EVALUATIONLOG
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "complyctl mede e grava em '.complytime/scan/', com EvaluationLog nativo e OSCAL como borda."
+    narrative: "Alvo reprovado: o complyctl listado como fonte não lida pelo run. Medida: WebFetch de mankier.com/1/complyctl nesta passada, trechos verbatim citados. Critério E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://www.mankier.com/1/complyctl"
+
+edges:
+  # ─── evidências apoiam a pergunta ───
+  - from: E_TRESTLE_CICD_ON_GIT_ARTIFACTS_PR_REVIEW
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_TRESTLE_OSCAL_EXCHANGE_AND_BASE_OVERLAP
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_GEMARA_OSCAL_IS_CONVERSION_PACKAGE
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_GEMARA_MODEL_PAGE_SILENT_ON_STORAGE
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_IBM_2021_OSCAL_AS_TRESTLE_SSOT
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_THOUGHTWORKS_OSCAL_PROMISING_ONLY
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_VANTA_ARR_300M_16K_CUSTOMERS_SACRA
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_VANTA_SERIES_D_150M_WELLINGTON
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_REGSCALE_ARTICLE_NOT_STORAGE_PROOF
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_DRATA_PLATFORM_STATE_INFERRED
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_REGSCALE_OSCAL_NATIVE_STORAGE_UNSAID
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_AUDIT_HISTORY_NEEDS_VERSIONED_RECORDS
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_PR_EVIDENCE_POPULATION_FROM_DEPLOYS
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_COMPAI_SERIES_A_34M
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_GRC_ENGINEERING_OSCAL_AS_OUTPUT
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_GIT_AS_IMMUTABLE_AUDIT_LOG_PREMISE
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_GIT_IMMUTABILITY_DEPENDS_ON_HOST_CONFIG
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_ATTESTFUL_OSCAL_FIRST_BUT_EXPORTS
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_TRESTLE_JSON_YAML_NATIVE_SIGNING_JSON
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_TRESTLE_AUTHORING_LAYER_RESULTS_ELSEWHERE
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_MERCADO_AUDIT_EVIDENCE_STORAGE_1021
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: SUPPORTS
+
+  # ─── a decisão nasce da pergunta; as opções são da decisão ───
+  - from: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    to: Q_AUDIT_EVIDENCE_STORAGE_2026_10
+    edge_type: TRACES_TO
+  - from: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: TRACES_TO
+  - from: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: TRACES_TO
+  - from: C_OPCAO_C_ONE_MORE_FOCUSED_PASS
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: TRACES_TO
+  - from: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: TRACES_TO
+  - from: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: TRACES_TO
+
+  # ─── evidências que apoiam opções ───
+  - from: E_GEMARA_OSCAL_IS_CONVERSION_PACKAGE
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: SUPPORTS
+  - from: E_GRC_ENGINEERING_OSCAL_AS_OUTPUT
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: SUPPORTS
+  - from: E_TRESTLE_AUTHORING_LAYER_RESULTS_ELSEWHERE
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: SUPPORTS
+  - from: E_IBM_2021_OSCAL_AS_TRESTLE_SSOT
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: SUPPORTS
+  - from: E_TRESTLE_OSCAL_EXCHANGE_AND_BASE_OVERLAP
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: SUPPORTS
+  - from: E_VANTA_ARR_300M_16K_CUSTOMERS_SACRA
+    to: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    edge_type: SUPPORTS
+  - from: E_COMPAI_SERIES_A_34M
+    to: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    edge_type: SUPPORTS
+  - from: E_MERCADO_AUDIT_EVIDENCE_STORAGE_1021
+    to: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    to: C_OPCAO_C_ONE_MORE_FOCUSED_PASS
+    edge_type: SUPPORTS
+  - from: E_GIT_IMMUTABILITY_DEPENDS_ON_HOST_CONFIG
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_PR_EVIDENCE_POPULATION_FROM_DEPLOYS
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+
+  # ─── objeções sobreviventes LIMITAM (CONSTRAINS) opções e decisão ───
+  - from: E_OBJECAO_01_TRESTLE_GIT_IS_FOR_SPEC_NOT_EVIDENCE
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_01_TRESTLE_GIT_IS_FOR_SPEC_NOT_EVIDENCE
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_FOURTH_OPTION_OSCAL_FILES_IN_GIT
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_03_GEMARA_SILENCE_IS_ONE_PAGE
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_VANTA_ARR_AGGREGATOR_AND_INFERENCE
+    to: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_CAPITAL_AXIS_MISSING_ACQUISITIONS
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_DRATA_CLASSIFIED_BY_SILENCE
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_REGSCALE_OSCAL_NATIVE_COUNTEREXAMPLE_OPEN
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_REGSCALE_OSCAL_NATIVE_COUNTEREXAMPLE_OPEN
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_08_VERSIONED_RECORDS_NOT_GIT_SPECIFIC
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_09_POPULATION_COMES_FROM_PRODUCTION
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_09_POPULATION_COMES_FROM_PRODUCTION
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_COMPAI_ROUND_TIER4_FAVORS_DB
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_GIT_IMMUTABLE_PREMISE_SELF_CONTRADICTED
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_GIT_IMMUTABLE_PREMISE_SELF_CONTRADICTED
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_NO_EXTERNAL_WORM_ANCHOR
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_NO_EXTERNAL_WORM_ANCHOR
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_13_TRESTLE_SIGNING_JSON_ONLY_NOT_YAML
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_14_MEASURED_STATE_GOES_TO_FILES_AND_DB
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15_REGSCALE_SIGNATURE_TRAIL_CUT
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_REGSCALE_CAPITAL_UNANCHORED
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_17_OSCAL_COMPASS_MCP_AUTHORING_CUT
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_18_GEMARA_SEVEN_LAYERS_LOG_SCHEMAS_CUT
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_19_GEMARA_ADR_0008_EVIDENCE_IN_LOGS_CUT
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_20_GENERATED_MANIFEST_NOT_AUTHORITATIVE_CUT
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_21_AUDITOR_CONSUMPTION_AXIS_EMPTY
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_22_VANTA_OSCAL_CUT_WITH_PRIMARY_AVAILABLE
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_23_WHO_PAYS_SOC2_BUYER_CUT
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_24_SACRA_INTERNAL_INCONSISTENCY_CUT
+    to: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_25_TRESTLE_70K_LINES_COST_CUT
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_26_TRESTLE_TOOL_DATA_TO_AR_CUT
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_27_COMPAI_AGPL_CORE_CUT
+    to: C_OPCAO_E_PRODUCT_RELATIONAL_DB
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_28_COMPAI_ARR_SELF_DECLARED_CUT
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_29_KYVERNO_REPORTS_SERVER_TO_POSTGRES
+    to: C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_30_COMPLYCTL_LEFT_OUT_SECOND_FILE_VENDOR
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_31_GEMARA_WHITEPAPER_UNREAD
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_32_SIX_REQUESTED_VENDORS_UNCLASSIFIED
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_33_IBM_OSCAL_COMPASS_PRODUCTION_PAPER_UNREAD
+    to: C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_34_REGSCALE_FEDRAMP_BLOG_UNREAD
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_35_FEDRAMP_20X_OSCAL_ADOPTION_UNVERIFIED
+    to: C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_36_ANALYST_COMMUNITY_OSCAL_FUTURE_EMPTY
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_37_CHEF_INSPEC_UNCLASSIFIED
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_38_COMPAI_PRESEED_CUT
+    to: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021
+    edge_type: CONSTRAINS
+
+  # ─── superações rastreiam a reprovação que as achou ───
+  - from: C_SUPERACAO_20261021_TRESTLE_GIT_SSOT_SCOPED_TO_SDK
+    to: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_C2P_PLUGINS_KYVERNO_OCM_AUDITREE_GIT_LOCKER
+    to: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_GO_GEMARA_V0_11_OCI_ARTIFACT
+    to: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OSCAL_HUB_HOST_AND_SHARE_NOT_CICD
+    to: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_VANTA_300M_FORTUNE_DRATA_98M
+    to: E_LACUNAS_AUDIT_EVIDENCE_STORAGE_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_COMPLYCTL_WORKSPACE_STATE_OSCAL_EDGE
+    to: E_OBJECAO_14_MEASURED_STATE_GOES_TO_FILES_AND_DB
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_GEMARA_EVALUATIONLOG_NATIVE_IN_COMPLYCTL
+    to: E_OBJECAO_18_GEMARA_SEVEN_LAYERS_LOG_SCHEMAS_CUT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_VANTA_OSCAL_EXPORT_EDGE
+    to: E_OBJECAO_22_VANTA_OSCAL_CUT_WITH_PRIMARY_AVAILABLE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_IBM_800_53_JSON_70000_LINES
+    to: E_OBJECAO_25_TRESTLE_70K_LINES_COST_CUT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_C2P_OSCAL_AR_FROM_PVP_RESULTS
+    to: E_OBJECAO_26_TRESTLE_TOOL_DATA_TO_AR_CUT
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_COMPLYCTL_SCAN_DIR_EVALUATIONLOG
+    to: E_OBJECAO_30_COMPLYCTL_LEFT_OUT_SECOND_FILE_VENDOR
+    edge_type: TRACES_TO
