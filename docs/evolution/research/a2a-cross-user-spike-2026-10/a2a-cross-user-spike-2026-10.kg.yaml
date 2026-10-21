@@ -323,7 +323,46 @@ nodes:
       locator: "degrau A, A0 (canal nativo entre dois usuários do SO)"
       method: "medição: listagem de sessões nos dois lados, colada pelo maestro"
       locality: "pessoa"
+  - id: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "a2a-send.sh no usuário descartável a2a-peer do notebook do maestro (WSL, relógio por chrony/PHC0, desvio ≤1 s contra a VPS medido pelo Date do /health) para https://app.onionevolve.com/a2a: http=200, verified:true, gated:true, apply_mode:gated, jti nb-e766f310708605e5a8a8f713; doctor do membro 6 ok/0 falha e do receptor rc 0 (pino maestro-peer-test-1 RSA 3072, topologia autoriza); fila (ops/a2a-queue-live.sh list) com o registro; a2a-accept.sh REVERIFICOU no aceite e gravou o doc em docs/evolution/inbox/_processed/2026-10-21-a2a-maestro-peer-test-793157ea69e0e017.md dentro da moldura R15.2"
+    label: "A1 em produção: um sinal assinado por um membro de teste noutro usuário do SO e noutra máquina passou pelo gate do bridge, entrou na fila gated e foi aceito no inbox do core, reverificado no aceite"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-21-a2a-maestro-peer-test-793157ea69e0e017.md"
+      locator: "frontmatter verificacao (verified, reverificado_no_aceite, recebido_em) e saída do a2a-send colada pelo maestro"
+      method: "medição: envio real pelo HTTP de produção e aceite reverificado"
+      locality: "host"
+  - id: E_P5B_NEGATIVOS_NO_HTTP_VIVO_1021
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "seis negativos pelo HTTP de produção, remetente maestro-peer-test no notebook: replay → 403 replay; kid maestro-peer-test-9 → 403 unknown-kid; --exp-offset -60 → 403 expired; --iat-offset 3600 → 403 future; --exp-offset 7200 → 403 exp-beyond-ceiling; corpo trocado após assinar → 403 body-mismatch. Uma 1ª tentativa do 'expired' com --iat-offset -400 --exp-offset 300 deu 200 por erro do ROTEIRO, não do gate: o a2a-send.sh calcula exp = agora + exp-offset (l.103), então aquele envelope era válido"
+    label: "P5b em produção: os seis negativos do gate (replay, kid não pinado, exp vencido, iat no futuro, exp além do teto, corpo trocado) são recusados pelo HTTP vivo, cada um com o motivo certo"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-send.sh"
+      locator: "flags --resend, --kid, --exp-offset, --iat-offset; l.103 (EXP = NOW + EXP_OFF)"
+      method: "medição: envios negativos reais pelo HTTP de produção, saída colada pelo maestro"
+      locality: "host"
 edges:
+  - from: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
+    to: D_DEGRAU_A_HOJE_A0_E_A1_1021
+    edge_type: SUPPORTS
+  - from: E_P5B_NEGATIVOS_NO_HTTP_VIVO_1021
+    to: D_DEGRAU_A_HOJE_A0_E_A1_1021
+    edge_type: SUPPORTS
+  - from: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: SUPPORTS
   - from: E_A0_CANAL_NATIVO_NAO_ATRAVESSA_USUARIO_DO_SO_1021
     to: D_DEGRAU_A_HOJE_A0_E_A1_1021
     edge_type: SUPPORTS
