@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: []
 share_with: []
 next_recommended: "Ao retomar um Workflow via resumeFromRunId, NÃO afirmar que é 'barato/cacheado' sem VERIFICAR: o cache do resume só é confiável se o run anterior TERMINOU LIMPO. Se o run foi morto por saída de processo (troca de sessão) ou ficou noutra sessão, o journal/cache pode não sobreviver e o resume RE-EXECUTA tudo. Antes de prometer 'não re-faz o caro', cheque: mtime do output (foi reescrito agora?) e o agent_count do run (== total de agentes = re-executou; == só os pendentes = cacheou)."
-review_after: 2026-10-22
+review_after: 2026-11-21
 conflict_class: conditional
 valid_when: "a ferramenta Workflow mantém o cache de resumeFromRunId no journal do run anterior; interrupção por morte de processo pode não persistir/alcançar esse journal (comportamento observado 2026-07-24; re-verificar se a semântica de resume mudar)"
 significance: "Afirmei que retomar um workflow interrompido seria barato ('cacheia as 4 leituras + a síntese') — o maestro cobrou, e a evidência me refutou: agent_count 6 (todos) + 461k tokens + mtime do doc reescrito 42s atrás = o resume RE-EXECUTOU o caro. O cache do resume não sobreviveu à morte do processo."
@@ -35,3 +35,12 @@ ele **re-roda tudo**. Eu afirmei "barato/cacheado" sem verificar; era `declarado
 ## Next crumb
 Ver `next_recommended`. É um caso concreto de [[what-the-maestro-taught-me]] — verificar antes de afirmar,
 inclusive sobre **custo** (não só sobre estado). Antes de dizer "resume é barato", olhe `mtime` + `agent_count`.
+
+## Estacionada (2026-10-21)
+O CLI 2.1.305 corrigiu "Workflow resume re-running already-completed `pipeline()` and `parallel()` agents"
+(radar E3 r14, `E_WORKFLOW_RESUME_CORRIGIDO_NA_2_1_305`), que é causa CANDIDATA deste caso, não provada: a
+migalha também culpa o journal noutra sessão. O re-teste (SAC-180) foi estacionado pelo maestro até o
+**1º resume real** de um workflow com pipeline/parallel que tenha morrido no meio
+(`D_ESTACIONAR_SAC180_ATE_O_1O_RESUME_REAL`). Até lá a lição desta migalha vale: não afirmar que o resume é
+barato sem medir `agent_count` e `subagent_tokens`.
+

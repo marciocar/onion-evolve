@@ -282,6 +282,54 @@ nodes:
       locator: "tabela de versões, linha SDK bridge; saída do ops/update-bridge.sh colada pelo maestro"
       method: "medição: binário do CLI embutido --version e verify do deploy"
       locality: "host"
+  - id: D_ESTACIONAR_SAC180_ATE_O_1O_RESUME_REAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «1º resume real»"
+    label: "SAC-180 estacionada: reabre no primeiro resumeFromRunId real de um workflow com pipeline/parallel que tenha morrido no meio; a migalha do resume ganha +30 dias com o gatilho escrito"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «1º resume real»; descartadas: «Data fixa em +30 dias» · «Estacionar sem gatilho»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Qual gatilho reabre a SAC-180 no estacionamento?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
+  - id: D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «1º PR com review:ia»"
+    label: "SAC-181 estacionada: reabre no primeiro PR com a label review:ia, de onde sai a prova do revisor no pin v1.0.256"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «1º PR com review:ia»; descartadas: «Próximo bump da action» · «Data fixa em +30 dias»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Qual gatilho reabre a SAC-181 no estacionamento?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
+  - id: D_ESTACIONAR_SAC182_SEM_GATILHO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «colocar no estacionamento (sem gatilho)»"
+    label: "SAC-182 estacionada sem gatilho, por decisão do maestro: fica no backlog e só volta se ele a chamar"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «colocar no estacionamento (sem gatilho)» (resposta livre do maestro, fora das opções oferecidas); descartadas: «1ª resposta em EN» · «1ª compactação observada» · «Data fixa em +30 dias»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Qual gatilho reabre a SAC-182 no estacionamento?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -334,3 +382,12 @@ edges:
   - from: E_SDK_DO_BRIDGE_EM_0_3_306_EM_PRODUCAO_1021
     to: E_SDK_DO_BRIDGE_QUATRO_VERSOES_ATRAS_1021
     edge_type: SUPERSEDES
+  - from: D_ESTACIONAR_SAC180_ATE_O_1O_RESUME_REAL
+    to: Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305
+    edge_type: TRACES_TO
+  - from: D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA
+    to: Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL
+    edge_type: TRACES_TO
+  - from: D_ESTACIONAR_SAC182_SEM_GATILHO
+    to: Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304
+    edge_type: TRACES_TO
