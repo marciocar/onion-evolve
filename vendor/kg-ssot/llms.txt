@@ -1,6 +1,6 @@
 # KG-SSOT
 
-> Grafo de conhecimento verificável em arquivo texto (`.kg.yaml` para escrever, ou o mesmo modelo em `.kg.json` para o runtime): cada afirmação traz a fonte, a data em que foi conferida e o que foi conferido, e um contrato formal (JSON Schema, níveis MUST e SHOULD) decide no CI se o arquivo está bem escrito. Release 4.13.0, contrato v4, licença Apache-2.0. O leitor de referência é Python 3.11 ou mais e roda sem nenhum harness de agente.
+> Grafo de conhecimento verificável em arquivo texto (`.kg.yaml` para escrever, ou o mesmo modelo em `.kg.json` para o runtime): cada afirmação traz a fonte, a data em que foi conferida e o que foi conferido, e um contrato formal (JSON Schema, níveis MUST e SHOULD) decide no CI se o arquivo está bem escrito. Release 4.13.1, contrato v4, licença Apache-2.0. O leitor de referência é Python 3.11 ou mais e roda sem nenhum harness de agente.
 
 Para um agente que vai escrever ou validar um `.kg.yaml`: leia o formato (capítulo 3) e o contrato (capítulo 4); valide com `python3 -I -B vendor/kg-ssot/tools/kg_validate.py <arquivo>` (num clone do repositório, `tools/kg_validate.py`) e corrija pelos códigos do capítulo 9. Os schemas mandam: quando o manual e um schema divergirem, vale o schema. O texto completo, num arquivo só, está em [llms-full.txt](llms-full.txt).
 

@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """O migrador oficial do KG-SSOT: propõe a provenance que o contrato pede, pelo perfil declarado do adotante.
 
-  kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]
-  kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [grafo.kg.yaml ...]
+  kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]
+  kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]
 
 O perfil (spec/kg-migrate-profile.schema.json) declara regras em ordem: a primeira cujo when casa decide a ação do nó
 (propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por
 lista de ids. O universo é fixo: nó com status confirmed ou plane PROD, sem provenance, fora o unverifiable. Sem
-grafos na linha de comando, a ferramenta lê os .kg.yaml rastreados de --root (default: o diretório atual), fora
-vendor/** e os globs de --exclude; o grafo dessa lista que não parseia vira linha para quem revisa.
+grafos na linha de comando, a ferramenta lê os .kg.yaml rastreados de --root (default: o diretório atual), fora os
+padrões do kg_gate.py (*/fixtures/*, docs/materials/*), o vendor/* e os globs de --exclude, com a semântica do gate
+(* atravessa /); o grafo dessa lista que não parseia vira linha para quem revisa. O nó cujo verified_scope já é o do
+perfil sai como same, e o apply não o toca.
 
 O plan NÃO escreve nada: imprime a planilha de propostas (uma linha por nó), as contagens por regra e o que ficou
 para quem revisa. Toda provenance proposta é conferida contra o MUST e o SHOULD do contrato vigente antes de virar
@@ -38,6 +40,7 @@ import subprocess
 import sys
 
 TOOLS = pathlib.Path(__file__).resolve().parent
+sys.dont_write_bytecode = True  # sem .pyc em vendor/kg-ssot/tools/__pycache__, que o kg_vendor.py check acusa
 sys.path.insert(0, str(TOOLS))
 import kg_validate  # noqa: E402
 
@@ -267,6 +270,8 @@ def plan(prof, graphs, root):
                 elif n.get("verified_scope") not in (None, s["verified_scope"]):
                     rows.append((g.rel, n["id"], s["id"], "review", None,
                                  f"o nó já tem verified_scope {n['verified_scope']!r}: troque à mão se for o caso"))
+                elif n.get("verified_scope") == s["verified_scope"]:
+                    rows.append((g.rel, n["id"], s["id"], "same", None, None))  # já igual: o apply não toca
                 else:
                     rows.append((g.rel, n["id"], s["id"], "scope", {"verified_scope": s["verified_scope"]}, None))
             if not in_universe(n) or ("applies_to" in prof and not m.when(prof["applies_to"], n, g)):
@@ -533,19 +538,23 @@ def load_graphs(files, root, lenient=False):
     return [g for g, _ in out], [f for _, f in out], broken
 
 
-DEFAULT_EXCLUDE = ["vendor/**"]
+DEFAULT_EXCLUDE = ["vendor/*", "*/fixtures/*", "docs/materials/*"]  # os do kg_gate.py, e o vendor
 
 
-def tracked_graphs(root, exclude=()):
-    """Os .kg.yaml rastreados pelo git, fora os que casam algum glob de exclude (vendor/** sempre: os fixtures da
-    suíte vendorizada são quebrados de propósito)."""
+def tracked_graphs(root, exclude=(), defaults=True):
+    """Os .kg.yaml rastreados pelo git, fora os que casam algum glob, com a semântica do kg_gate.py: fnmatch sobre o
+    caminho relativo, em que * atravessa /. Os padrões são os do gate (as fixtures são quebradas de propósito) e o
+    vendor/*. O dialeto do perfil (**/ casa zero pastas) também vale, como antes da 4.13.1."""
     r = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "*.kg.yaml"], capture_output=True)
     if r.returncode != 0:
         raise Broken(f"{root} não é um repositório git, e nenhum grafo foi dado")
-    globs = DEFAULT_EXCLUDE + list(exclude)
+    globs = (DEFAULT_EXCLUDE if defaults else []) + list(exclude)
     globs = [g[2:] if g.startswith("./") else g for g in globs]
     names = r.stdout.decode("utf-8", "surrogateescape").split("\0")
-    return [str(pathlib.Path(root) / n) for n in names if n and not glob_match(n, globs)]
+    # a união: o fnmatch do gate (* atravessa /) e o dialeto de antes (**/ casa zero pastas), para quem já excluía
+    # com ** não ver o apply gravar no que antes ficava de fora
+    return [str(pathlib.Path(root) / n) for n in names
+            if n and not any(fnmatch.fnmatchcase(n, g) or glob_match(n, g) for g in globs)]
 
 
 def main(argv=None):
@@ -556,17 +565,23 @@ def main(argv=None):
     p.add_argument("--root", default=".")
     p.add_argument("--json", action="store_true")
     p.add_argument("--out", help="grava a planilha de propostas em TSV")
-    p.add_argument("--exclude", action="append", default=[], help="glob a mais para deixar de fora da lista do git")
+    p.add_argument("--exclude", action="append", default=[],
+                   help="glob a mais para deixar de fora da lista do git (fnmatch: * atravessa /, como no kg_gate.py)")
+    p.add_argument("--no-default-excludes", action="store_true",
+                   help="não aplica os padrões: " + ", ".join(DEFAULT_EXCLUDE))
     p.add_argument("graphs", nargs="*")
     a = sub.add_parser("apply", help="grava as propostas, com invariância e gate por arquivo")
     a.add_argument("--profile", required=True)
     a.add_argument("--root", default=".")
-    a.add_argument("--exclude", action="append", default=[], help="glob a mais para deixar de fora da lista do git")
+    a.add_argument("--exclude", action="append", default=[],
+                   help="glob a mais para deixar de fora da lista do git (fnmatch: * atravessa /, como no kg_gate.py)")
+    a.add_argument("--no-default-excludes", action="store_true",
+                   help="não aplica os padrões: " + ", ".join(DEFAULT_EXCLUDE))
     a.add_argument("graphs", nargs="*")
     args = ap.parse_args(argv)
     try:
         prof = load_profile(args.profile)
-        files = args.graphs or tracked_graphs(args.root, args.exclude)
+        files = args.graphs or tracked_graphs(args.root, args.exclude, not args.no_default_excludes)
         graphs, files, broken = load_graphs(files, args.root, lenient=not args.graphs)
     except Broken as exc:
         print(f"ENTRADA QUEBRADA  {exc}")
@@ -599,7 +614,9 @@ def main(argv=None):
         return 0
     for (rule, action), v in sorted(counts.items()):
         print(f"  {v:5d}  {rule} → {action}")
-    print(f"· {sum(1 for r in rows if r[1] is not None)} linhas de nó no plano; {len(review)} para quem revisa; "
+    same = sum(1 for r in rows if r[3] == "same")
+    print(f"· {sum(1 for r in rows if r[1] is not None) - same} linhas de nó no plano; {same} já iguais (same); "
+          f"{len(review)} para quem revisa; "
           f"{len(broken)} grafos fora (não parseiam); nada foi escrito (plan)")
     return 0
 

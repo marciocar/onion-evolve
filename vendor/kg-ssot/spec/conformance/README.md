@@ -45,6 +45,12 @@ manifestos que ele tem de aceitar (`good/`) e os que tem de recusar (`bad/`).
 **igual** ao esperado, tanto em `codes` quanto em `warnings`. Igualdade, não inclusão: um leitor que
 acusa tudo não pode passar. Ordem e repetição não contam.
 
+**A versão do contrato que um caso exige vai marcada na `description`**, do grupo ou do caso, numa destas formas:
+"Desde o v4.6", "(v4.6)" ou "do v4.6". A conferência do mantenedor exige que a maior marca seja a versão que o leitor
+de referência declara (`CONTRACT_VERSION` em `tools/kg_validate.py`), e que a descrição de um dos schemas a declare
+("No v4.6"). Assim, uma regra nova que só o leitor vê também muda os bytes dos schemas, que o `kg_gate.py` guarda como
+a identidade do contrato.
+
 ## Códigos
 
 Cada código é um slug estável por camada, e o metaschema confere a forma.

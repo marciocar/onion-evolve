@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -295,6 +295,19 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.13.0` para a `kg-ssot-v4.13.1`, a identidade do contrato passa a acusar o v4.6. As duas regras novas da
+4.13.0 moram só no leitor, e o sha256 dos schemas, que o `kg_gate.py` guarda como identidade, não mudou: uma base
+gravada na 4.12.0 seguia julgando com regra nova sem que a identidade acusasse. A descrição do schema MUST passa a
+declarar o v4.6, e a higiene da release cobra que toda versão do contrato apareça na descrição de um dos schemas. O
+`kg_gate.py` mostra a identidade nova e pede `--update`; nenhum veredito muda.
+- **O `kg_migrate.py` lê o mesmo corpus que o gate.** Sem lista de grafos, ficam de fora os padrões do `kg_gate.py`
+  (`*/fixtures/*`, `docs/materials/*`) e o `vendor/*`, e o `--exclude` usa a semântica do gate (`*` atravessa `/`),
+  sem perder o `**/` de antes, que casa zero pastas;
+  `--no-default-excludes` tira os padrões. Antes, o plan pegava as fixtures, e `*/fixtures/*` não casava caminho aninhado.
+- **O `kg_migrate.py` não grava bytecode no vendor**, mesmo rodado sem `-B`; antes, o `check` seguinte reprovava pelo
+  `.pyc` do `kg_validate` no `__pycache__`.
+- **O nó cujo `verified_scope` já é o do perfil sai como `same`** no plan, separado do que muda.
+
 Da `kg-ssot-v4.12.0` para a `kg-ssot-v4.13.0`, entram o contrato v4.6 (um MUST raro do YAML e o \r normalizado no
 leitor JS) e o migrador por perfil.
 - **O `kg_migrate.py`** propõe a `provenance` que o v4 pede pelas regras de um perfil que você versiona (manual, cap. 5;
@@ -305,14 +318,15 @@ leitor JS) e o migrador por perfil.
 - **O leitor JS trata o `\r\n` e o `\r` sozinho como quebra de linha**, como a referência, e recusa o texto entre aspas que
   não fecha (a aspa escapada no fim da linha), que ele cortava ali.
 - **A suíte ganha 16 casos** (328).
-- **No Windows, o update para a 4.13.0 roda pelo kit da 4.13.0.** O `kg_vendor.py` das tags anteriores passa ao
+- **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --dest
-  vendor/kg-ssot`). O kit da 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --dest
+  vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
 Medido em 2026-10-20, nenhum dos 1.507 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD. O sha256 dos
-schemas não muda; o `kg_gate.py` não pede `--update` por esta parte.
+schemas não mudou na 4.13.0, e o `kg_gate.py` não pedia `--update`: a identidade não acusava as regras novas do
+leitor. A 4.13.1 corrige isso.
 
 Da `kg-ssot-v4.11.0` para a `kg-ssot-v4.12.0`, entra o contrato v4.5: um MUST raro do YAML e três ampliações do SHOULD.
 - **O tab no espaço inicial de uma linha de continuação de texto entre aspas** reprova como `parse.yaml-error`.
@@ -431,7 +445,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a

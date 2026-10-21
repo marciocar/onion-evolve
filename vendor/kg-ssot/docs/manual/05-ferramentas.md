@@ -713,8 +713,12 @@ python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile kg-migrate.prof
   a do status rebaixado. Um arquivo que ganharia código MUST novo, ou aviso SHOULD que o plan não anunciou, fica como
   estava. A quebra de linha do arquivo é mantida (CRLF fica CRLF), e o arquivo com quebras misturadas é recusado.
   Rodar de novo não muda nada.
-- **Sem lista de grafos, a ferramenta lê os `.kg.yaml` do `git ls-files`.** Ficam de fora `vendor/**` e os globs de
-  `--exclude`. Um grafo da lista que não parseia vira linha de revisão e não aborta a rodada.
+- **Sem lista de grafos, a ferramenta lê os `.kg.yaml` do `git ls-files`.** Ficam de fora os padrões do `kg_gate.py`
+  (`*/fixtures/*` e `docs/materials/*`), o `vendor/*` e os globs de `--exclude`, com a semântica do gate: `fnmatch` sobre
+  o caminho relativo, em que `*` atravessa `/`; o `**/` do dialeto do perfil, que casa zero pastas, também vale.
+  `--no-default-excludes` tira os padrões. Atenção: no `trace_path_glob` do perfil, `*` não atravessa `/`. Um grafo da lista que não
+  parseia vira linha de revisão e não aborta a rodada.
+- **O nó cujo `verified_scope` já é o do perfil sai como `same`**, separado do que muda, e o `apply` não o toca.
 - **O caminho do trace é léxico e fica dentro da raiz do repo.** Ele é normalizado (`./`, `a/../b`), e o que sai da
   raiz com `../` deixa de ser caminho. Um caminho absoluto ou com `~` conta como inexistente, sem consultar o disco da
   máquina.
