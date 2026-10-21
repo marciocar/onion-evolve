@@ -297,6 +297,7 @@
 .claude/utils/census/census-seal.py	Q_REABRIR_CARIMBO_POR_PROBE	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 .claude/utils/census/census-workflow.mjs	Q_PROBE_WORKFLOW_ALIAS	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 .claude/utils/co-evolution/co-relay.sh	E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
+.claude/utils/co-evolution/co-relay.sh	E_CO_RELAY_CORE_SE_PROVA	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/utils/co-evolution/mail-receiver.sh	C_ntfy_default_publico	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
 .claude/utils/co-evolution/resolve-target.sh	REC_SELECTOR_TARGETING_BUILT	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/diagnose/scaffold-diagnose-store.sh	A_helper	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
