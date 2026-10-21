@@ -2,8 +2,7 @@
 branch: chore/decide-ui-pilot
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: 5e8c42859b33f5297876ce7ad47090a896d871429b492a3e35268f4bfd5e56dd
-reviewed_code_sha256: 48d9c8c637a7e12a5a731df9d08e4b0dbda33a63dd34085c1c98bb2d768f056b
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 tokens: 0
