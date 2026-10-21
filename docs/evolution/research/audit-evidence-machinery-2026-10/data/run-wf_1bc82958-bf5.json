@@ -1,0 +1,638 @@
+{
+  "summary": "Pesquisa Onion: corpus primeiro, eixos fixos (Claude Code atual, mercado/capital, trajetória, analistas, comunidade) + ângulos do tema, tier de fonte, verificação adversarial 3/2, write(KG) bi-temporal com radar",
+  "agentCount": 10,
+  "logs": [
+    "Corpus: fornecido em formato NÃO-CANÔNICO (753 chars, 0 linhas grafo<TAB>ID) — a skill manda o bloco do kg-corpus-grep.sh VERBATIM; entra como prosa no Scope, na síntese, no Elenxo e no write(KG)",
+    "Modo PRIMÁRIAS: 3 fonte(s) NOMEADA(S), leitura integral — sem Scope/Search/Fetch/Verify. Medido 2026-09-13 na mesma pergunta: varredura 291k tokens/nó (19 de 25 claims refutadas, a maioria por fonte fraca) × primárias 42k tokens/nó.",
+    "Leitura: 3/3 fontes alcançadas · inalcançáveis: nenhuma",
+    "Ancoragem: 9 claim(s) ANCORADA(S) · 7 rejeitada(s) (exagerada ou não encontrada) · 0 reprovação(ões) RECUSADA(S) pelo motor sem critério/superação",
+    "Elenxo: 12 objeções (6 sobrevivem) · 0 RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: 3 · abertas: 4",
+    "Superação: 6 achada(s) → nó obrigatório (C_SUPERACAO_20261021_…)",
+    "write(KG): docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml — +22 nós / +37 arestas, total 79, radar exit 0 (pelo motor, 1 tentativa(s))"
+  ],
+  "result": {
+    "mode": "primaries",
+    "question": "Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (radar de vencimento). (a) OSCAL v1.2.3: o valor e a cardinalidade de observation.methods (EXAMINE, INTERVIEW, TEST, UNKNOWN, valores locais), relevant-evidence (href, description, back-matter/resource com base64 ou rlink), e se 'acceptance' existe em algum modelo; (b) FedRAMP 20x: a cadência recorrente CPO-CSX-CPM por classe, a validação persistente FRC-CSX-VVK e o FRC-APP-FCP (7 dias do pacote inicial), com o texto literal e a data da regra; (c) oscal-cli do NIST como validador alternativo ao trestle: versão, licença, se valida AR e POA&M.",
+    "today": "2026-10-21",
+    "kgPath": "docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml",
+    "radarExit": 0,
+    "writeAttempts": [
+      {
+        "attempt": 1,
+        "declaredRadarExit": 0,
+        "radarExit": 0,
+        "contractExit": 0,
+        "overcomingNodes": 24
+      }
+    ],
+    "summary": "A reancoragem foi apendada ao grafo sem reescrever nenhum dos 57 nós da rodada 1 (Aufhebung) e o TETO subiu para 79. Foram 22 nós novos: 9 evidências ancoradas (relevant-evidence e back-matter do OSCAL v1.2.3, FRC-APP-FCP de 2026-06-24, e o oscal-cli v3.2.0 do metaschema-framework, com bindings 1.2.1 e licença CC0), o E_LACUNAS_REANCHOR (7 claims rejeitadas e 4 lacunas abertas: methods, acceptance, o texto do CPM/VVK e o oscal-cli validando AR/POA&M), 6 objeções (E_OBJECAO_11 a 16) e 6 superações C_SUPERACAO_20261021_*. Vieram com 37 arestas, 9 delas CONSTRAINS, e nenhuma SUPERSEDES. Nada foi selado e nenhuma decisão done foi tocada. O radar com --integrity --schema saiu com exit 0 e o kg-contract-check com rc 0.",
+    "unreachable": [],
+    "anchored": [
+      {
+        "source": "oscal-v123-assessment",
+        "gap": "OSCAL v1.2.3: observation.methods (valores e cardinalidade), relevant-evidence e back-matter, e se 'acceptance' existe",
+        "claim": "relevant-evidence é array [0 or 1] de 1..N objetos; cada um tem href opcional (uri-reference, aceita #uuid) e description obrigatória (markup-multiline).",
+        "verdict": "ANCORADA",
+        "why": "A citação aparece verbatim (1 ocorrência). O mesmo bloco traz 'href uri-reference [0 or 1]' e 'description markup-multiline [1]' ('A human-readable description of this evidence.'), então a obrigatoriedade da description está sustentada pelo documento, embora fora do recorte citado. O #uuid está nas Remarks do href.",
+        "corrected": "",
+        "quote": "relevant-evidence array [0 or 1] Switch to XML (array member) object [1 to ∞] Relevant Evidence Description Links this observation to relevant evidence. Properties (5) href uri-reference [0 or 1]",
+        "locator": "AR v1.2.3 json-reference: observation/relevant-evidence",
+        "sourceTier": 10,
+        "validFrom": ""
+      },
+      {
+        "source": "oscal-v123-assessment",
+        "gap": "OSCAL v1.2.3: observation.methods (valores e cardinalidade), relevant-evidence e back-matter, e se 'acceptance' existe",
+        "claim": "O href de relevant-evidence pode ser URI absoluto, relativo, ou fragmento #uuid apontando a um resource do back-matter; a description é obrigatória.",
+        "verdict": "ANCORADA",
+        "why": "A citação aparece verbatim (3 ocorrências no AR, uma por observation/relevant-evidence e demais contextos de href). O texto continua 'in this or an imported document'. A description obrigatória vem de 'description markup-multiline [1]' no mesmo bloco.",
+        "corrected": "",
+        "quote": "This value may be one of: an absolute URI that points to a network resolvable resource, a relative reference pointing to a network resolvable resource whose base URI is the URI of the containing document, or a bare URI fragment (i.e., `#uuid`) pointing to a back-matter resource",
+        "locator": "AR v1.2.3 json-reference: observation/relevant-evidence/href (Remarks)",
+        "sourceTier": 10,
+        "validFrom": ""
+      },
+      {
+        "source": "oscal-v123-assessment",
+        "gap": "OSCAL v1.2.3: observation.methods (valores e cardinalidade), relevant-evidence e back-matter, e se 'acceptance' existe",
+        "claim": "Um back-matter resource pode ser apontado por rlink (URL com hash opcional) ou embutido por base64, com várias representações equivalentes.",
+        "verdict": "ANCORADA",
+        "why": "A citação aparece verbatim (1 ocorrência). As Remarks seguintes dizem que um resource pode ter múltiplas entradas rlink e base64 que 'represent alternative download locations (rlink) and attachments (base64) for the same resource' e que 'all items must contain equivalent information'.",
+        "corrected": "",
+        "quote": "1) it may point to an specific retrievable network resource using a rlink , or 2) it may be included as an attachment using a base64 .",
+        "locator": "AR v1.2.3 json-reference: back-matter/resources/resource (Remarks)",
+        "sourceTier": 10,
+        "validFrom": ""
+      },
+      {
+        "source": "oscal-v123-assessment",
+        "gap": "OSCAL v1.2.3: observation.methods (valores e cardinalidade), relevant-evidence e back-matter, e se 'acceptance' existe",
+        "claim": "rlink é um ponteiro URL com hash opcional para verificação e detecção de mudança.",
+        "verdict": "ANCORADA",
+        "why": "A citação aparece verbatim (1 ocorrência), sob 'rlinks array [0 or 1] ... object [1 to ∞] Resource link'. O claim reproduz o texto sem esticar.",
+        "corrected": "",
+        "quote": "A URL-based pointer to an external resource with an optional hash for verification and change detection.",
+        "locator": "AR v1.2.3 json-reference: back-matter/resources/resource/rlinks/rlink",
+        "sourceTier": 10,
+        "validFrom": ""
+      },
+      {
+        "source": "fedramp-20x-rules",
+        "gap": "FedRAMP 20x: cadência recorrente CPO-CSX-CPM por classe, FRC-CSX-VVK, FRC-APP-FCP, com texto literal e data",
+        "claim": "FRC-APP-FCP: pacote inicial deve mostrar status verificado e validado pelo provedor nos 7 dias anteriores (MUST); lançamento 2026-06-24, sem emenda.",
+        "verdict": "ANCORADA",
+        "why": "JSON FRR.FRC.data.all.APP.FRC-APP-FCP: statement idêntico à quote, force MUST; updated tem só 2026-06-24 'Official launch of the FedRAMP Consolidated Rules for 2026.' Sem emenda posterior.",
+        "corrected": "",
+        "quote": "Providers MUST supply a fresh initial FedRAMP Certification Package that shows the current status of the cloud service offering as verified and validated by the provider within the previous 7 days.",
+        "locator": "fedramp-consolidated-rules.json, FRC-APP-FCP.statement; updated 2026-06-24",
+        "sourceTier": 10,
+        "validFrom": "2026-06-24"
+      },
+      {
+        "source": "nist-oscal-cli",
+        "gap": "oscal-cli do NIST como validador alternativo: versão, licença, valida AR e POA&M",
+        "claim": "Latest é v3.2.0, publicada em 2026-05-15, com bindings OSCAL v1.2.1 (não 1.2.3); sem release posterior até 2026-10-21 na listagem lida.",
+        "verdict": "ANCORADA",
+        "why": "Reaberto por gh api. O body da v3.2.0 contém a frase literal sob 'metaschema-java 3.0.0.M4 + liboscal-java 7.2.0'. A listagem de releases tem v3.2.0 (2026-05-15T11:12:51Z, não prerelease, não draft) no topo, a anterior é v3.1.0 (2026-02-10), e releases/latest devolve v3.2.0. O release diz 'bindings v1.2.1', o que sustenta o que o claim afirma sobre a versão do OSCAL. O '(não 1.2.3)' é inferência por ausência: o texto não cita 1.2.3, e a lista de releases não mostra nada além da v3.2.0.",
+        "corrected": "",
+        "quote": "**OSCAL v1.2.1 bindings** with consolidated `select-control-by-id`/`matching` definitions.",
+        "locator": "GitHub release v3.2.0 (published_at 2026-05-15T11:12:51Z), Highlights"
+      },
+      {
+        "source": "nist-oscal-cli",
+        "gap": "oscal-cli do NIST como validador alternativo: versão, licença, valida AR e POA&M",
+        "claim": "O README lista validação de recursos OSCAL como operação, sem enumerar modelos; não menciona assessment-results nem plan-of-action-and-milestones por nome.",
+        "verdict": "ANCORADA",
+        "why": "A linha 8 do README traz a frase literal. grep -n -i -E 'assessment|plan-of-action|poam' README.md devolve só a linha 3, 'Open Security Controls Assessment Language', que é o nome da linguagem e não o modelo assessment-results. O claim é negativo e restrito ao README, e foi escrito assim. Ele não afirma que o validate não cobre AR ou POA&M, só que o README não os nomeia.",
+        "corrected": "",
+        "quote": "Validating an OSCAL resources to ensure it is well-formed and valid.",
+        "locator": "README.md, lista de operações (linha 8)",
+        "validFrom": ""
+      },
+      {
+        "source": "nist-oscal-cli",
+        "gap": "oscal-cli do NIST como validador alternativo: versão, licença, valida AR e POA&M",
+        "claim": "Licença: domínio público mundial (CC0 1.0), herdada do repo NIST; a API do GitHub reporta NOASSERTION/Other, mas README e LICENSE.md declaram domínio público.",
+        "verdict": "ANCORADA",
+        "why": "A linha 23 do README traz a frase literal. A linha 156 cita 'CC0 1.0 Universal' e diz que o conteúdo do NIST foi dedicado ao domínio público. O LICENSE.md abre com 'This work is made available in the public domain worldwide using the CC0 1.0 Universal public domain dedication'. gh api repos/metaschema-framework/oscal-cli devolve license {key: other, spdx_id: NOASSERTION}. Os quatro pontos (CC0, herança do NIST, NOASSERTION, declaração em README e LICENSE.md) estão no texto.",
+        "corrected": "",
+        "quote": "This project is in the worldwide [public domain](LICENSE.md) and as stated in [CONTRIBUTING.md](CONTRIBUTING.md).",
+        "locator": "README.md, seção 'Public domain' (linha 23); linha 156 cita CC0 1.0 Universal",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "nist-oscal-cli",
+        "gap": "oscal-cli do NIST como validador alternativo: versão, licença, valida AR e POA&M",
+        "claim": "O repo metaschema-framework é a continuação mantida do oscal-cli do NIST e suporta modelos OSCAL mais novos que o v1.0.3 do NIST.",
+        "verdict": "ANCORADA",
+        "why": "A linha 158 traz a frase literal. O mesmo parágrafo diz que o repo 'is based on work from' o oscal-cli do NIST, que é 'maintained to be feature compatible with the NIST v1.0.3 release' e que corrige bugs dele. 'Continuação mantida' é paráfrase razoável dessas duas frases. Ressalva: v1.0.3 é a versão do CLI do NIST, não do modelo OSCAL. O texto diz que esta versão suporta releases de modelos OSCAL mais novas que as do predecessor, e o claim não vai além disso.",
+        "corrected": "",
+        "quote": "Unlike its predecessor, this version supports newer releases of the OSCAL models and additional features.",
+        "locator": "README.md, seção 'Relationship to prior work' (linha 158)",
+        "sourceTier": 9,
+        "validFrom": ""
+      }
+    ],
+    "rejected": [
+      {
+        "source": "oscal-v123-assessment",
+        "gap": "OSCAL v1.2.3: observation.methods (valores e cardinalidade), relevant-evidence e back-matter, e se 'acceptance' existe",
+        "claim": "observation.methods é obrigatório (array [1]) de 1 a infinitos strings; aceita valores locais além de EXAMINE, INTERVIEW, TEST, UNKNOWN; UNKNOWN só para conversão de conteúdo histórico.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A citação aparece verbatim (1 ocorrência) no AR json-reference. O texto dá 'methods array [1] ... string [1 to ∞]', 'The value may be locally defined, or one of the following' e 'UNKNOWN: This is only for use when converting historic content to OSCAL'. Tudo o que o claim afirma está no trecho.",
+        "corrected": "",
+        "locator": "AR v1.2.3 json-reference: assessment-results/results/observations/observation/methods"
+      },
+      {
+        "source": "oscal-v123-assessment",
+        "gap": "OSCAL v1.2.3: observation.methods (valores e cardinalidade), relevant-evidence e back-matter, e se 'acceptance' existe",
+        "claim": "'acceptance' não existe em AR nem em POA&M (zero ocorrências); o mais próximo é o valor de prop 'accepted' em risk (POA&M), que é nome de propriedade de risco, não modelo de aceitação.",
+        "verdict": "EXAGERADA",
+        "why": "A parte 'zero ocorrências de acceptance' está sustentada: contagem 0 nas duas páginas, tanto no HTML bruto quanto no texto extraído (grep -ci e count). A citação de 'accepted'/'risk-adjusted' existe verbatim (POA&M, risk, allowed values for prop @name). O esticamento está em 'o mais próximo é': o mesmo documento tem outras construções de aceitação ao menos tão próximas, ignoradas pelo claim. São elas: risk/remediations (Risk Response) com prop type = 'accept: The risk will continue to exist without further efforts to address it. (Sometimes referred to as \"Operationally required\")' e risk/status = 'deviation-approved'. Além disso o claim mistura 'valor de prop' com 'nome de propriedade'; o texto diz que 'accepted' é um dos valores permitidos de prop/@name.",
+        "corrected": "Nem o AR nem o POA&M v1.2.3 contêm a palavra 'acceptance' (0 ocorrências em cada). As construções de aceitação de risco no POA&M são: (1) prop de risk com @name = 'accepted' ('The risk has been accepted. No further action will be taken.'); (2) risk/remediations (Risk Response) com prop type = 'accept' ('The risk will continue to exist without further efforts to address it.'); (3) risk/status = 'deviation-approved' (desvio aprovado, risco aberto). Não há modelo ou fluxo de aceitação dedicado.",
+        "locator": "POA&M v1.2.3 json-reference: risk props allowed values; risk/remediations type; risk/status",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A formulação corrigida, que inclui prop 'accepted', response type 'accept' e status 'deviation-approved', com a ausência de 'acceptance' preservada.",
+          "medida": "Texto do POA&M v1.2.3 extraído do HTML e lido nos offsets ~336234 (accepted), ~551193 (accept) e no bloco risk/status (deviation-approved); contagem de 'acceptance' = 0 nas duas páginas."
+        },
+        "criterio": {
+          "id": "A2_CLAIM_ESTICA",
+          "comando": "curl -sL https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/plan-of-action-and-milestones/json-reference/ | sed 's/<[^>]*>/ /g' | grep -oiE '(accept[a-z]*|deviation-approved) :'  # mostra 'accepted :', 'accept :' e 'deviation-approved :'; o claim só nomeia 'accepted' como o mais próximo"
+        }
+      },
+      {
+        "source": "fedramp-20x-rules",
+        "gap": "FedRAMP 20x: cadência recorrente CPO-CSX-CPM por classe, FRC-CSX-VVK, FRC-APP-FCP, com texto literal e data",
+        "claim": "observation.methods é array 1..N (min-occurs=1, sem teto); EXAMINE, INTERVIEW, TEST, UNKNOWN com allow-other=yes; UNKNOWN só para conversão de conteúdo histórico.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. Reabri oscal_assessment-common_metaschema.xml v1.2.3: l.915 `<define-field name=\"method\" min-occurs=\"1\" max-occurs=\"unbounded\">`, l.916 formal-name Observation Method, l.917 description 'Identifies how the observation was made.', l.918 `<group-as name=\"methods\" in-json=\"ARRAY\"/>`; l.920 allowed-values id=oscal-observation-method-type-values allow-other=\"yes\"; enums EXAMINE/INTERVIEW/TEST/UNKNOWN em l.921-924; UNKNOWN: 'only for use when converting historic content to OSCAL'. A quote casa com whitespace colapsado. Ressalva menor: o locator diz l.917-926, o campo começa em l.915 (desvio de 2 linhas, sem efeito no conteúdo).",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x-rules",
+        "gap": "FedRAMP 20x: cadência recorrente CPO-CSX-CPM por classe, FRC-CSX-VVK, FRC-APP-FCP, com texto literal e data",
+        "claim": "relevant-evidence é array 0..N com href (uri-reference opcional, pode ser fragmento #uuid para back-matter resource) e description obrigatória; 'acceptance' tem 0 ocorrências nos metaschemas assessment-common, metadata, assessment-results, poam e assessment-plan; rlink (l.540) e base64 (l.572) vivem em back-matter resource no metadata metaschema.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. l.958 `<define-assembly name=\"relevant-evidence\" max-occurs=\"unbounded\">` (min-occurs padrão 0 => 0..N); flag href as-type=\"uri-reference\" sem required (opcional), description 'A resolvable URL reference to relevant evidence.' e remarks listando '#uuid' bare fragment para back-matter resource; field description min-occurs=\"1\" max-occurs=\"1\". `grep -c -i acceptance` nos cinco arquivos v1.2.3 (common, metadata, assessment-results, poam, assessment-plan) = 0 em todos (baixei e conferi os cinco). Metadata metaschema: define-assembly rlink em l.540, define-field base64 em l.572, dentro de back-matter resource.",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x-rules",
+        "gap": "FedRAMP 20x: cadência recorrente CPO-CSX-CPM por classe, FRC-CSX-VVK, FRC-APP-FCP, com texto literal e data",
+        "claim": "CPO-CSX-CPM: cadência 20x por classe A SHOULD 3 meses, B MUST 1 mês, C MUST 2 semanas, D MUST 1 semana; vigente desde 2026-06-24, sem emenda registrada; manutenção por automação sem exigir revisão humana persistente.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. No JSON (FRR.CPO.data.20x.CSX.CPO-CSX-CPM) a quote da classe C aparece literal; varies_by_class: a force SHOULD timeframe 3 months, b MUST 1 month, c MUST 2 weeks, d MUST 1 week. notes[0]: 'expected to maintain ... using automation as changes occur'; notes[1]: 'This rule does not require or expect persistent human review of all materials in this cadence.' `updated` tem uma única entrada: 2026-06-24 'Official launch of the FedRAMP Consolidated Rules for 2026.' Nenhuma emenda posterior. Arquivo: info.version 2026.10.13.01, last_updated 2026-10-13 (repo FedRAMP/rules; o repo FedRAMP/docs foi renomeado docs-legacy).",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x-rules",
+        "gap": "FedRAMP 20x: cadência recorrente CPO-CSX-CPM por classe, FRC-CSX-VVK, FRC-APP-FCP, com texto literal e data",
+        "claim": "FRC-CSX-VVK: métodos automatizados mínimos por KSI: A MAY (sem número), B SHOULD >=1, C MUST >=2, D MUST >=4; última emenda 2026-10-13 (mapeamentos cm-2.2, si-6); lançamento 2026-06-24.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. JSON FRR.FRC.data.20x.CSX.FRC-CSX-VVK.varies_by_class: d statement literal igual à quote ('at least 4 automated methods for each Key Security Indicator'); c 'MUST ... at least 2'; b 'SHOULD ... at least 1 automated method'; a 'MAY implement' sem número. updated: 2026-10-13 'Updated control mappings: added cm-2.2, si-6.' e 2026-06-24 'Official launch'. controls: [cm-2.2, si-6].",
+        "corrected": ""
+      },
+      {
+        "source": "fedramp-20x-rules",
+        "gap": "FedRAMP 20x: cadência recorrente CPO-CSX-CPM por classe, FRC-CSX-VVK, FRC-APP-FCP, com texto literal e data",
+        "claim": "oscal-cli do NIST: última release v1.0.3 (2024-02-02); licença domínio público (US) + CC0 1.0; README só afirma validação genérica de recursos OSCAL, sem nomear AR ou POA&M.",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. Releases API: v1.0.3 publicada 2024-02-02T20:51:47Z, não-prerelease, é a mais recente (v1.0.2 2023-09-29, v1.0.1 2023-08-17); último commit 2024-02-02. LICENSE.md: 'this project is in the public domain within the United States' e 'this work is made available in the public domain worldwide using the [CC0 1.0 Universal public domain dedication]' (o texto renderizado casa; no markdown cru a frase tem o colchete do link). README l.8: 'Validating an OSCAL resources to ensure it is well-formed and valid.'; grep por poam/plan-of-action/result/assessment só acha o nome 'Open Security Controls Assessment Language' (l.3); AR e POA&M não são nomeados. Logo o claim negativo é correto, e também significa que o README não prova validação de AR/POA&M (isso exige teste).",
+        "corrected": ""
+      }
+    ],
+    "elenxo": {
+      "objections": [
+        {
+          "target": "Claim 1 [oscal-v123-assessment]: relevant-evidence é array 0..1 de 1..N; href opcional; description obrigatória",
+          "survives": true,
+          "evidence": "A citação ancorada mostra 'relevant-evidence array [0 or 1] ... object [1 to ∞] ... href uri-reference [0 or 1]'. Ela NÃO contém a cardinalidade da description, então 'description obrigatória' está afirmado sem citação. Há um ponto mais grave para o item 1: o href é opcional. O OSCAL permite relevant-evidence só com description, sem ponteiro nenhum, então C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY ('ponteiro primário') é escolha LOCAL, não exigência do padrão. Reabri oscal_assessment-common_metaschema.xml@v1.2.3: na l.958 está `<define-assembly name=\"relevant-evidence\" max-occurs=\"unbounded\">`, o flag href não tem required, e a l.974 traz `<define-field name=\"description\" min-occurs=\"1\" max-occurs=\"1\" ... as-type=\"markup-multiline\">`.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "curl -sL https://raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema/oscal_assessment-common_metaschema.xml | sed -n '958,980p'  # a quote ancorada não tem a description; o href não tem required"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "Fonte primária no tag v1.2.3, l.974: description min-occurs=1 max-occurs=1 (a parte que faltava). Ela confirma também que o href é opcional, e por isso o 'ponteiro primário' tem de ser declarado como regra local do Onion, não atribuído ao OSCAL.",
+            "medida": "curl do metaschema no tag v1.2.3 e sed -n 958,980p, conferido em 2026-10-21"
+          }
+        },
+        {
+          "target": "Claim 2 [oscal-v123-assessment]: href aceita URI absoluto, relativo ou #uuid apontando ao back-matter",
+          "survives": false,
+          "evidence": "A quote casa com as remarks do flag href no metaschema v1.2.3 (l.965-970). O trecho cortado diz 'in this or an imported document', ou seja, o #uuid pode resolver num documento importado. Isso amplia o alcance sem contrariar o claim."
+        },
+        {
+          "target": "Claim 3 [oscal-v123-assessment]: back-matter resource por rlink ou base64",
+          "survives": false,
+          "evidence": "Corroborado por oscal_metadata_metaschema.xml@v1.2.3: na l.502, 'A resource may be directly included in the document using base64 encoding or may point to one or more equivalent internet resources'; rlink está na l.540 e base64 na l.572."
+        },
+        {
+          "target": "Claim 4 [oscal-v123-assessment]: rlink com hash opcional para verificação e detecção de mudança",
+          "survives": false,
+          "evidence": "A quote é exata. Uma ressalva para o item 2: o hash é OPCIONAL, e o padrão não garante detecção de mudança. Se o radar de vencimento depender de hash, essa exigência é local e deve ser declarada como tal. Isso não reprova o claim, que diz 'optional'."
+        },
+        {
+          "target": "Claim 5 [fedramp-20x-rules]: FRC-APP-FCP, 7 dias, só para o pacote INICIAL, de 2026-06-24 e sem emenda",
+          "survives": false,
+          "evidence": "Reabri https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json (info.version 2026.10.13.01, last_updated 2026-10-13). Em FRR/FRC/data/all/APP/FRC-APP-FCP, o statement é idêntico à quote, force MUST, e 'updated' tem uma única entrada: 2026-06-24 'Official launch'. O texto confirma E_OBJECAO_09: os 7 dias valem para o pacote INICIAL e não são cadência recorrente."
+        },
+        {
+          "target": "Claim 6 [nist-oscal-cli]: v3.2.0 (2026-05-15) com bindings OSCAL v1.2.1",
+          "survives": true,
+          "evidence": "O claim é verdadeiro e confere com a API: v3.2.0 publicada em 2026-05-15T11:12:51Z, a mais recente, seguida de v3.1.0 e v3.0.0. Ele prova MENOS do que a rodada precisa. O corpus mira o OSCAL v1.2.3 (publicado em 2026-08-07T03:33:33Z, último tag de usnistgov/OSCAL), e bindings 1.2.1 não provam que o oscal-cli valida documento 1.2.3: restrições acrescentadas em 1.2.2 e 1.2.3 ficariam de fora, ou o campo metadata.oscal-version 1.2.3 seria recusado. Também há ambiguidade no nome: o 'oscal-cli do NIST' (usnistgov/oscal-cli) parou em v1.0.3, de 2024-02-02 (claim rejeitada), e o mantido é o fork metaschema-framework (claim 9).",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh 'oscal-cli'  # 1 nó (D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021), nenhum com dogfood de validação de AR 1.2.3"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "A superação seria um dogfood: `oscal-cli ar validate` sobre um AR com oscal-version 1.2.3. Ela não foi executada.",
+            "medida": "Procurei nas releases da API (metaschema-framework/oscal-cli, per_page=3) uma versão com bindings 1.2.2 ou 1.2.3: não há nenhuma depois de v3.2.0. O corpus (kg-corpus-grep 'oscal-cli') não tem nenhum nó de execução."
+          }
+        },
+        {
+          "target": "Claim 7 [nist-oscal-cli]: o README não nomeia AR nem POA&M",
+          "survives": true,
+          "evidence": "O README ser silencioso não responde à lacuna 'valida AR e POA&M?'. A claim prova só a ausência de menção, e a lacuna fica aberta na rodada. Medi fora do run: no tag v3.2.0, src/main/java/dev/metaschema/oscal/tools/cli/core/commands/assessmentresults/ e commands/poam/ têm cada um 3 arquivos, entre eles ValidateSubcommand.java. Em develop, PlanOfActionsAndMilestonesCommand.java l.22 traz `addCommandHandler(new ValidateSubcommand());`.",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "curl -sL 'https://api.github.com/repos/metaschema-framework/oscal-cli/contents/src/main/java/dev/metaschema/oscal/tools/cli/core/commands/poam?ref=v3.2.0' | grep '\"name\"'  # nenhuma claim ancorada do run responde AR/POA&M; a evidência está só no código"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "Os subcomandos de validação existem por modelo no tag v3.2.0 (assessmentresults/ValidateSubcommand.java e poam/ValidateSubcommand.java). Isso é capacidade no código-fonte, não execução: a compatibilidade com 1.2.3 continua aberta (objeção ao claim 6).",
+            "medida": "API de contents do GitHub com ref=v3.2.0 para os dois pacotes (3 arquivos cada) e raw de PlanOfActionsAndMilestonesCommand.java em develop, em 2026-10-21"
+          }
+        },
+        {
+          "target": "Claim 8 [nist-oscal-cli]: licença de domínio público mundial (CC0 1.0)",
+          "survives": false,
+          "evidence": "Para escolher um validador, basta o README e o LICENSE.md declararem domínio público e CC0 1.0. O NOASSERTION da API é uma limitação da detecção do GitHub e não contraria a declaração."
+        },
+        {
+          "target": "Claim 9 [nist-oscal-cli]: metaschema-framework/oscal-cli é a continuação do oscal-cli do NIST",
+          "survives": false,
+          "evidence": "A quote 'Unlike its predecessor, this version supports newer releases of the OSCAL models' sustenta o claim. Ele resolve a ambiguidade do nome: o validador alternativo ao trestle é o fork mantido, não o usnistgov v1.0.3."
+        },
+        {
+          "target": "Lacuna [oscal-v123-assessment], parte observation.methods: valores e cardinalidade",
+          "survives": true,
+          "evidence": "Nenhuma claim ANCORADA do run responde a methods: as duas caíram por 'ANCORADA sem quote/locator'. A lacuna fica aberta NA RODADA. Medi a primária: oscal_assessment-common_metaschema.xml@v1.2.3, l.915 `<define-field name=\"method\" min-occurs=\"1\" max-occurs=\"unbounded\">`; l.918 `<group-as name=\"methods\" in-json=\"ARRAY\"/>`; l.920 `allowed-values id=\"oscal-observation-method-type-values\" ... allow-other=\"yes\"`; l.921-924 EXAMINE 'An inspection was performed.', INTERVIEW 'An interview was performed.', TEST 'A manual or automated test was performed.', UNKNOWN 'This is only for use when converting historic content to OSCAL, where the conversion process cannot initially identify the appropriate method(s).'",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh 'observation.methods'  # 0 nós; o run não tem claim ancorada com answersGap sobre methods"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "Citação verbatim do metaschema v1.2.3, l.915-924: obrigatório (1..N), valores locais permitidos (allow-other=yes), e UNKNOWN restrito à conversão histórica. É o que o oscal_method do item 1 precisa.",
+            "medida": "curl -sL https://raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema/oscal_assessment-common_metaschema.xml | grep -n 'name=\"method\"' -A10, em 2026-10-21"
+          }
+        },
+        {
+          "target": "Lacuna [oscal-v123-assessment], parte 'acceptance' existe em algum modelo?",
+          "survives": true,
+          "evidence": "A claim do run foi rebaixada como EXAGERADA ('o mais próximo é accepted' ignorava risk-response). Medi: `grep -ci acceptance` dá 0 em oscal_assessment-common, assessment-results, poam, assessment-plan e metadata (todos @v1.2.3). A construção mais próxima é o valor de prop de risk response em assessment-common l.1896: `<enum value=\"accept\">The risk will continue to exist without further efforts to address it. (Sometimes referred to as \"Operationally required\")</enum>`. Logo, 'acceptance' não é termo do OSCAL, e um campo com esse nome seria cunhagem local, a declarar (declare-onion-coinages).",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "for f in assessment-common assessment-results poam assessment-plan metadata; do curl -sL https://raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema/oscal_${f}_metaschema.xml | grep -ci acceptance; done  # 0 em todos; o run não ancorou a lacuna"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "Contagem zero nos cinco metaschemas v1.2.3. O análogo é o risk response 'accept' (l.1896 do common), não um modelo de aceitação.",
+            "medida": "curl e grep -ci acceptance nos 5 arquivos do tag v1.2.3, mais grep do enum 'accept', em 2026-10-21"
+          }
+        },
+        {
+          "target": "Lacuna [fedramp-20x-rules], partes CPO-CSX-CPM e FRC-CSX-VVK",
+          "survives": true,
+          "evidence": "Nenhuma claim ancorada do run responde a elas: as duas caíram por 'sem quote/locator'. Medi em fedramp-consolidated-rules.json (versão 2026.10.13.01). CPO-CSX-CPM: A 'SHOULD persistently maintain ... at least once every 3 months', B 'MUST ... at least once every month', C 'MUST ... at least once every 2 weeks', D 'MUST ... at least once every week'. Notes: 'using automation as changes occur' e 'This rule does not require or expect persistent human review of all materials in this cadence.' Updated: só 2026-06-24. FRC-CSX-VVK: A 'MAY implement automated methods to persistently verify and validate...', B 'SHOULD ... at least 1 automated method for each Key Security Indicator', C 'MUST ... at least 2 automated methods', D 'MUST ... at least 4 automated methods'. Updated: 2026-10-13 'Updated control mappings: added cm-2.2, si-6.' e 2026-06-24. PROVA MENOS para o item 1: o CPM é teto de MANUTENÇÃO DO PACOTE, não cadência de VERIFICAÇÃO. O VVK fixa a QUANTIDADE de métodos automáticos e não fixa intervalo. O ciclo da verificação é DECLARADO pelo provedor (info.default_artifacts.KSI: 'Explanation of the cycle for any measures that are implemented persistently (if applicable).'). Na classe A, o teto de 3 meses é SHOULD e não obriga.",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh 'FRC-CSX-VVK'  # 0 nós; e o run não tem claim ancorada com o texto literal do CPO-CSX-CPM"
+          },
+          "superacao": {
+            "classe": "entrega",
+            "achada": true,
+            "o_que": "O texto literal das duas regras, com as datas de 'updated', mais o default_artifact KSI que localiza a cadência de verificação como ciclo declarado por medida. Isso sustenta um campo de cadência declarado por nó, com o CPM como teto de frescor do pacote, e não como cadência imposta pelo FedRAMP.",
+            "medida": "curl -sL https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json e extração por chave em Python (FRR/CPO/data/20x/CSX/CPO-CSX-CPM, FRR/FRC/data/20x/CSX/FRC-CSX-VVK, info), em 2026-10-21"
+          }
+        }
+      ],
+      "gapsClosed": [
+        "oscal-v123-assessment, parte relevant-evidence e back-matter: href opcional (absoluto, relativo ou #uuid), rlink com hash opcional, base64 (claims 1 a 4). Falta a cardinalidade da description, que só a medida do refutador traz (l.974).",
+        "fedramp-20x-rules, parte FRC-APP-FCP: 7 dias, só para o pacote inicial, MUST, de 2026-06-24 e sem emenda (claim 5, reconferida).",
+        "nist-oscal-cli, partes versão e licença: o mantido é o metaschema-framework/oscal-cli v3.2.0 (2026-05-15, bindings 1.2.1), em domínio público (CC0 1.0); o usnistgov é o antecessor (claims 6, 8 e 9)."
+      ],
+      "gapsOpen": [
+        "oscal-v123-assessment, parte observation.methods: sem claim ancorada no run. Fechável pela medida do refutador no metaschema v1.2.3, l.915-924 (1..N, allow-other=yes, UNKNOWN só na conversão histórica), que precisa ser apendada como nó com locator.",
+        "oscal-v123-assessment, parte 'acceptance': a claim foi rebaixada como EXAGERADA. A medida do refutador dá 0 ocorrências nos 5 metaschemas v1.2.3; o análogo é o risk response 'accept' (common l.1896).",
+        "fedramp-20x-rules, partes CPO-CSX-CPM e FRC-CSX-VVK: sem claim ancorada no run. O texto literal foi medido pelo refutador na versão 2026.10.13.01. Fica de pé a objeção de que o CPM é teto de manutenção do pacote, não cadência de verificação.",
+        "nist-oscal-cli, parte 'valida AR e POA&M': o README é silencioso. O código no tag v3.2.0 tem ValidateSubcommand em assessmentresults/ e poam/, mas nada foi executado, e a compatibilidade com documento OSCAL 1.2.3 (bindings 1.2.1) não foi provada."
+      ],
+      "recommendation": "A rodada SUSTENTA, por citação ancorada:\n- o vocabulário do relevant-evidence do OSCAL v1.2.3: href opcional (absoluto, relativo ou #uuid para o back-matter), resource por rlink com hash opcional ou por base64;\n- o FRC-APP-FCP como 7 dias do pacote INICIAL, de 2026-06-24 e sem emenda, o que confirma E_OBJECAO_09;\n- a identidade, a versão e a licença do validador alternativo: metaschema-framework/oscal-cli v3.2.0, em CC0.\n\nA rodada NÃO sustenta, porque as claims caíram na ancoragem:\n- observation.methods;\n- a inexistência de 'acceptance';\n- o texto do CPO-CSX-CPM e do FRC-CSX-VVK;\n- a validação de AR e POA&M pelo oscal-cli.\n\nMedi as quatro fontes primárias em 2026-10-21 com comandos re-rodáveis (curl do metaschema no tag v1.2.3, l.915-924 e l.958-980; grep -ci acceptance = 0 em cinco arquivos; fedramp-consolidated-rules.json 2026.10.13.01; a API de contents do oscal-cli no ref v3.2.0). Elas fecham essas partes, mas são medida do refutador, não do run. Apende-as como nós novos, com provenance e locator (Aufhebung), antes de escrever os itens 1 e 2. Não as trate como já ancoradas.\n\nTrês consequências de desenho que o texto primário impõe:\n1. O href é opcional e o hash do rlink também. 'Ponteiro primário' (C_SUPERACAO_..._POINTER_PRIMARY) e o hash obrigatório para o radar de vencimento são regras LOCAIS e devem ser declaradas como tal. 'acceptance' seria cunhagem do Onion, não termo OSCAL.\n2. A 'cadência no eixo da verificação' NÃO vem do FedRAMP como número. O CPO-CSX-CPM é teto de manutenção do PACOTE (classe A só SHOULD), o FRC-CSX-VVK fixa a quantidade de métodos automáticos sem intervalo, e o ciclo é declarado pelo provedor (default_artifacts KSI). Então o item 2 deve ler uma cadência declarada por nó, com o CPM como teto opcional por classe, e não codificar 3m/1m/2s/1s como cadência de verificação. A nota 'does not require or expect persistent human review' também diz que vencimento é de automação, não de revisão humana.\n3. Para o oscal-cli como alternativa ao trestle, falta um dogfood: `oscal-cli ar validate` e `poam validate` sobre documentos com oscal-version 1.2.3, porque os bindings são 1.2.1. Sem isso, a escolha fica condicionada, como já está a D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021."
+    },
+    "stats": {
+      "sources": 3,
+      "reached": 3,
+      "anchored": 9,
+      "rejected": 7,
+      "nodesAdded": 22,
+      "edgesAdded": 37,
+      "nodesTotal": 79
+    },
+    "overcoming": {
+      "found": 6,
+      "nodesCounted": 24,
+      "edgesCounted": 24,
+      "base": {
+        "nodes": 18,
+        "edges": 18,
+        "measured": true
+      },
+      "recusedAnchor": 0,
+      "recusedElenxo": 0,
+      "recused": []
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Corpus"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Scope"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Search"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Fetch"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 5,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 6,
+      "title": "Synthesize"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 7,
+      "title": "write(KG)"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 8,
+      "title": "Leitura"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "ler:oscal-v123-assessment",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a94da09e965fb114e",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792553406387,
+      "queuedAt": 1792553406348,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assess…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553455085,
+      "tokens": 67624,
+      "toolCalls": 9,
+      "durationMs": 48697,
+      "resultPreview": "{\"source\":\"https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/ (e plan-of-action-and-milestones/json-reference/)\",\"reachable\":true,\"claims\":[{\"claim\":\"observation.methods é obrigatório (cardinalidade [1]) e é um array de 1 a infinitos strings; aceita valores locais além de EXAMINE, INTERVIEW, TEST e UNKNOWN; UNKNOWN só para conversão de conteúdo histórico.\",\"quo…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ler:fedramp-20x-rules",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a9c5f52e1112068a9",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792553406387,
+      "queuedAt": 1792553406348,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "NIST OSCAL v1.2.3 metaschema (usnistgov/OSCAL tag v1.2.3, o…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553485158,
+      "tokens": 76696,
+      "toolCalls": 14,
+      "durationMs": 76783,
+      "resultPreview": "{\"source\":\"NIST OSCAL v1.2.3 metaschema (usnistgov/OSCAL tag v1.2.3, oscal_assessment-common_metaschema.xml) + FedRAMP/rules fedramp-consolidated-rules.json (v2026.10.13.01) + usnistgov/oscal-cli GitHub\",\"reachable\":true,\"claims\":[{\"claim\":\"observation.methods e array com cardinalidade 1..N (min-occurs=1, sem teto); valores EXAMINE, INTERVIEW, TEST, UNKNOWN com allow-other=yes, logo valores locais…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "ler:nist-oscal-cli",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a27adbd65c44914ca",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792553406388,
+      "queuedAt": 1792553406348,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://github.com/metaschema-framework/oscal-cli (README, …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553441855,
+      "tokens": 65909,
+      "toolCalls": 6,
+      "durationMs": 33476,
+      "resultPreview": "{\"source\":\"https://github.com/metaschema-framework/oscal-cli (README, releases API, LICENSE) e https://github.com/usnistgov/oscal-cli\",\"reachable\":true,\"claims\":[{\"claim\":\"A versão mais recente (Latest) é v3.2.0, publicada em 2026-05-15, com bindings OSCAL v1.2.1 (não 1.2.3). Não há release posterior até 2026-10-21 na listagem lida.\",\"quote\":\"**OSCAL v1.2.1 bindings** with consolidated `select-con…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 9,
+      "title": "Ancoragem"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "ancorar:nist-oscal-cli",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a67a200ba71457559",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792553441903,
+      "queuedAt": 1792553441862,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "metaschema-framework/oscal-cli (GitHub): README.md (158 lin…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553476141,
+      "tokens": 65974,
+      "toolCalls": 4,
+      "durationMs": 34238,
+      "resultPreview": "{\"source\":\"metaschema-framework/oscal-cli (GitHub): README.md (158 linhas), release v3.2.0 via gh api, LICENSE.md, metadados do repo\",\"verdicts\":[{\"claim\":\"Latest é v3.2.0, publicada em 2026-05-15, com bindings OSCAL v1.2.1 (não 1.2.3); sem release posterior até 2026-10-21 na listagem lida.\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"locator\":\"GitHub release v3.2.0 (published_…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "ancorar:oscal-v123-assessment",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "af79909234a841bcd",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792553455091,
+      "queuedAt": 1792553455088,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "pages.nist.gov/OSCAL-Reference/models/v1.2.3/ (assessment-r…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553528178,
+      "tokens": 70792,
+      "toolCalls": 9,
+      "durationMs": 73086,
+      "resultPreview": "{\"source\":\"pages.nist.gov/OSCAL-Reference/models/v1.2.3/ (assessment-results e plan-of-action-and-milestones, json-reference), baixados via curl, texto extraído e checado com grep -F e contagem literal\",\"verdicts\":[{\"claim\":\"observation.methods é obrigatório (array [1]) de 1 a infinitos strings; aceita valores locais além de EXAMINE, INTERVIEW, TEST, UNKNOWN; UNKNOWN só para conversão de conteúdo …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "ancorar:fedramp-20x-rules",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a73f8fa6b31a65cb2",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792553485180,
+      "queuedAt": 1792553485177,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "OSCAL v1.2.3 metaschemas (raw.githubusercontent.com/usnistg…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553543807,
+      "tokens": 78522,
+      "toolCalls": 10,
+      "durationMs": 58627,
+      "resultPreview": "{\"source\":\"OSCAL v1.2.3 metaschemas (raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema); FedRAMP/rules fedramp-consolidated-rules.json (versão 2026.10.13.01, last_updated 2026-10-13); usnistgov/oscal-cli (LICENSE.md, README.md, releases API)\",\"verdicts\":[{\"claim\":\"observation.methods é array 1..N (min-occurs=1, sem teto); EXAMINE, INTERVIEW, TEST, UNKNOWN com allow-other=yes; UNKNOWN…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 10,
+      "title": "Elenxo"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "elenxo-primarias",
+      "phaseIndex": 10,
+      "phaseTitle": "Elenxo",
+      "agentId": "ad4972d3518f6d3a4",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792553543849,
+      "queuedAt": 1792553543820,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "A rodada SUSTENTA, por citação ancorada: - o vocabulário do…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553778159,
+      "tokens": 78058,
+      "toolCalls": 11,
+      "durationMs": 234310,
+      "resultPreview": "{\"objections\":[{\"target\":\"Claim 1 [oscal-v123-assessment]: relevant-evidence é array 0..1 de 1..N; href opcional; description obrigatória\",\"survives\":true,\"evidence\":\"A citação ancorada mostra 'relevant-evidence array [0 or 1] ... object [1 to ∞] ... href uri-reference [0 or 1]'. Ela NÃO contém a cardinalidade da description, então 'description obrigatória' está afirmado sem citação. Há um ponto m…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "count-sup",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a858e110b69f44fe9",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792553778185,
+      "queuedAt": 1792553778164,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Contador do motor — NÃO escreva nada. A partir da raiz do repositório rode e copie os números:\n1. grep -c '^[[:space:]]*- id: C_SUPERACAO_20261021_' \"docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml\" — devolva overcomingNodes = o NÚMERO impresso (0 se nenhum ou arquivo ausente).\n2. awk -v p='C_SUPERACAO_20261021_' '/^[[:space:]]*- from:/{f=index(…",
+      "promptFramed": true,
+      "lastProgressAt": 1792553782600,
+      "tokens": 58670,
+      "toolCalls": 2,
+      "durationMs": 4414,
+      "resultPreview": "{\"overcomingNodes\":18,\"overcomingEdges\":18}"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "write-kg-primarias",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a6fdcfe203aa4c779",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792553782624,
+      "queuedAt": 1792553782604,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "docs/evolution/research/audit-evi…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (2026-10-21): fechar com citação verbatim as lacunas que caíram na rodada wf_25b440d5-1f7, antes de escrever os itens 1 (vocabulário de evidência: oscal_method, cadência no eixo da verificação) e 2 (r…",
+      "promptFramed": true,
+      "lastProgressAt": 1792554276169,
+      "tokens": 156772,
+      "toolCalls": 17,
+      "durationMs": 493544,
+      "resultPreview": "{\"kgPath\":\"docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":22,\"edges\":37,\"nodesTotal\":79,\"constrainsEdges\":9,\"summary\":\"A reancoragem foi apendada ao grafo sem reescrever nenhum dos 57 nós da rodada 1 (Aufhebung) e o TETO subiu para 79. Foram 22 nós novos: 9 evidências ancoradas (relevant-evidence e …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "verify-kg-1",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "af0cbca6bee9b77dd",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792554276196,
+      "queuedAt": 1792554276171,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\nA partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n1. bash .claude/validation/kg-radar.sh \"docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml\" --integrity --schema; echo \"RC=$?\"\n2. bash …",
+      "promptFramed": true,
+      "lastProgressAt": 1792554283705,
+      "tokens": 59475,
+      "toolCalls": 2,
+      "durationMs": 7508,
+      "resultPreview": "{\"radarExit\":0,\"contractExit\":0,\"overcomingNodes\":24,\"overcomingEdges\":24,\"output\":\"\"}"
+    }
+  ],
+  "totalTokens": 778492,
+  "totalToolCalls": 84
+}

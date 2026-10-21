@@ -27,7 +27,13 @@ meta:
                                # OSCAL v1.2.3 e do FedRAMP CPO-CSX-CPM; (2) o maestro selar qualquer D_AUDIT_*;
                                # (3) release do trestle que declare OSCAL 1.2.3.
   # kg-backlog-guard: on
-  # ═══ TETO: 57 NÓS ═══
+  # ═══ TETO: 79 NÓS ═══
+  #   RODADA 2 (reancoragem de primárias, selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021), EXECUTADA
+  #   em 2026-10-21 — +22 nós APENDADOS (Aufhebung, nenhum nó da rodada 1 reescrito): 9 evidências ancoradas
+  #   por verificador independente (oscal-v123-assessment 4, fedramp-20x-rules 1, nist-oscal-cli 4)
+  #   + 1 E_LACUNAS_REANCHOR (7 rejeitadas na ancoragem, 4 lacunas abertas) + 6 objeções sobreviventes do
+  #   Elenxo (E_OBJECAO_11 a 16) + 6 superações achadas. O teto sobe porque cada nó novo é uma claim ancorada,
+  #   uma objeção, uma superação ou a contabilidade que a rodada produziu; nada foi agregado para caber.
   #   RODADA 1 (primárias nomeadas, run wf_25b440d5-1f7), EXECUTADA em 2026-10-21 — 57 nós: 1 question raiz
   #   + 16 evidências ancoradas por verificador independente (compliance-trestle 3, scf-erl 2, csa-caiq-ccm 1,
   #   ocsf 2, lula 3, ciso-assistant 2, probo-compai 3) + 3 evidências internas medidas no core (contrato
@@ -934,6 +940,376 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 
+  # ═══ RODADA 2 (reancoragem selada em D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021), 2026-10-21 ═══
+  # Aufhebung: os 57 nós da rodada 1 ficam como estão; o que segue é APENDADO.
+
+  # ─── Evidências ANCORADAS por verificador independente (9) ─────────────────────────────────
+
+  - id: E_OSCAL_V123_RELEVANT_EVIDENCE_CARDINALITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'relevant-evidence array [0 or 1] ... object [1 to ∞] Relevant Evidence Description Links this observation to relevant evidence. Properties (5) href uri-reference [0 or 1]' — AR v1.2.3 json-reference, observation/relevant-evidence; ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "No OSCAL v1.2.3 (Assessment Results), observation.relevant-evidence é array opcional de 1..N objetos; cada um tem href opcional (uri-reference, aceita #uuid) e description."
+    narrative: "A quote ancorada traz a cardinalidade do array e do href, mas NÃO a da description: 'description obrigatória' vem da medida do refutador no metaschema v1.2.3, l.974 (min-occurs=1 max-occurs=1), registrada em C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL. Restringida por E_OBJECAO_11_OSCAL_HREF_OPTIONAL_POINTER_IS_LOCAL: como o href é opcional, o padrão aceita relevant-evidence só com description, e 'ponteiro primário' é regra local do Onion."
+    trace: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+    provenance:
+      source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+      locator: "observation/relevant-evidence (cardinalidade do array, do objeto e do flag href)"
+      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_OSCAL_V123_RELEVANT_EVIDENCE_HREF_FORMS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'This value may be one of: an absolute URI that points to a network resolvable resource, a relative reference pointing to a network resolvable resource whose base URI is the URI of the containing document, or a bare URI fragment (i.e., `#uuid`) pointing to a back-matter resource' — AR v1.2.3 json-reference, observation/relevant-evidence/href (Remarks); ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "O href de relevant-evidence no OSCAL v1.2.3 pode ser URI absoluto, referência relativa ao documento, ou fragmento #uuid apontando a um resource do back-matter."
+    narrative: "O Elenxo reabriu o metaschema v1.2.3 (l.965-970, remarks do flag href) e a quote casa. O trecho cortado diz 'in this or an imported document': o #uuid pode resolver num documento importado, o que amplia o alcance sem contrariar o claim. Objeção não sobreviveu."
+    trace: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+    provenance:
+      source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+      locator: "observation/relevant-evidence/href, Remarks"
+      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_OSCAL_V123_BACK_MATTER_RLINK_OR_BASE64
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: '1) it may point to an specific retrievable network resource using a rlink , or 2) it may be included as an attachment using a base64 .' — AR v1.2.3 json-reference, back-matter/resources/resource (Remarks); ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "Um resource do back-matter no OSCAL v1.2.3 pode apontar um recurso de rede por rlink ou ser embutido como anexo por base64, com várias representações equivalentes."
+    narrative: "Corroborado pelo Elenxo em oscal_metadata_metaschema.xml@v1.2.3: l.502 'A resource may be directly included in the document using base64 encoding or may point to one or more equivalent internet resources'; rlink na l.540, base64 na l.572. Consequência para o item 1: o padrão aceita conteúdo embutido, então 'location como ponteiro' é escolha do Onion, não exclusão de conteúdo pelo OSCAL."
+    trace: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+    provenance:
+      source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+      locator: "back-matter/resources/resource, Remarks"
+      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_OSCAL_V123_RLINK_OPTIONAL_HASH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'A URL-based pointer to an external resource with an optional hash for verification and change detection.' — AR v1.2.3 json-reference, back-matter/resources/resource/rlinks/rlink; ancorada por verificador independente"
+    source_tier: 10
+    source_kind: primary
+    label: "No OSCAL v1.2.3, rlink é um ponteiro por URL a um recurso externo com hash OPCIONAL para verificação e detecção de mudança."
+    narrative: "Ressalva do Elenxo para o item 2: o hash é opcional, e o padrão não garante detecção de mudança. Se o radar de vencimento depender de hash, a exigência é LOCAL do Onion e se declara como tal. Não reprova o claim, que já diz 'optional'."
+    trace: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+    provenance:
+      source: "https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/assessment-results/json-reference/"
+      locator: "back-matter/resources/resource/rlinks/rlink, descrição"
+      method: "leitura: fonte inteira lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_FEDRAMP_FRC_APP_FCP_7_DAYS_INITIAL_PACKAGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Providers MUST supply a fresh initial FedRAMP Certification Package that shows the current status of the cloud service offering as verified and validated by the provider within the previous 7 days.' — fedramp-consolidated-rules.json (info.version 2026.10.13.01), FRR/FRC/data/all/APP/FRC-APP-FCP.statement, updated 2026-06-24; ancorada por verificador independente"
+    valid_from: "2026-06-24"
+    source_tier: 10
+    source_kind: primary
+    label: "FedRAMP FRC-APP-FCP (MUST): o pacote de certificação INICIAL mostra o estado verificado e validado pelo provedor nos 7 dias anteriores. Lançada em 2026-06-24, sem emenda."
+    narrative: "O Elenxo reabriu o JSON (info.version 2026.10.13.01, last_updated 2026-10-13): statement idêntico, force MUST, 'updated' com uma só entrada, 2026-06-24 'Official launch'. Confirma E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY: os 7 dias valem para o pacote INICIAL e não são cadência recorrente do radar."
+    trace: "https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json"
+    provenance:
+      source: "https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json"
+      locator: "FRR/FRC/data/all/APP/FRC-APP-FCP: statement e updated (2026-06-24)"
+      method: "leitura: JSON oficial lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_OSCAL_CLI_V3_2_0_BINDINGS_1_2_1
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: '**OSCAL v1.2.1 bindings** with consolidated `select-control-by-id`/`matching` definitions.' — GitHub release v3.2.0 de metaschema-framework/oscal-cli (published_at 2026-05-15T11:12:51Z), Highlights; ancorada por verificador independente"
+    valid_from: "2026-05-15"
+    source_kind: primary
+    label: "A release mais recente do oscal-cli mantido (metaschema-framework) é a v3.2.0, de 2026-05-15, com bindings do OSCAL v1.2.1, não do 1.2.3; nenhuma release posterior até 2026-10-21."
+    narrative: "O leitor não declarou tier (tier=?), por isso source_tier fica omitido; é a página de release do próprio projeto. O Elenxo conferiu pela API: v3.2.0 é a mais recente, seguida de v3.1.0 e v3.0.0. Restringida por E_OBJECAO_12_OSCAL_CLI_BINDINGS_1_2_1_PROVE_LESS: bindings 1.2.1 não provam que ele valida documento 1.2.3."
+    trace: "https://github.com/metaschema-framework/oscal-cli/releases/tag/v3.2.0"
+    provenance:
+      source: "https://github.com/metaschema-framework/oscal-cli/releases/tag/v3.2.0"
+      locator: "Highlights da release v3.2.0 (published_at 2026-05-15T11:12:51Z)"
+      method: "leitura: página de release lida no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_OSCAL_CLI_README_VALIDATES_GENERIC_RESOURCES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Validating an OSCAL resources to ensure it is well-formed and valid.' — README.md de metaschema-framework/oscal-cli, lista de operações (linha 8); ancorada por verificador independente"
+    source_kind: primary
+    label: "O README do oscal-cli lista a validação de recursos OSCAL como operação genérica, sem nomear assessment-results nem plan-of-action-and-milestones."
+    narrative: "O leitor não declarou tier (tier=?), por isso source_tier fica omitido. O silêncio do README não responde se ele valida AR e POA&M. Restringida por E_OBJECAO_13_OSCAL_CLI_README_SILENT_ON_AR_POAM; a capacidade no código está em C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM."
+    trace: "https://github.com/metaschema-framework/oscal-cli"
+    provenance:
+      source: "https://github.com/metaschema-framework/oscal-cli"
+      locator: "README.md, lista de operações (linha 8)"
+      method: "leitura: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_OSCAL_CLI_PUBLIC_DOMAIN_CC0
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'This project is in the worldwide [public domain](LICENSE.md) and as stated in [CONTRIBUTING.md](CONTRIBUTING.md).' — README.md de metaschema-framework/oscal-cli, seção 'Public domain' (linha 23; a linha 156 cita CC0 1.0 Universal); ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O oscal-cli mantido está em domínio público mundial (CC0 1.0), herdado do repo do NIST; a API do GitHub reporta NOASSERTION/Other, mas README e LICENSE.md declaram domínio público."
+    narrative: "Para escolher validador basta a declaração do README e do LICENSE.md; o NOASSERTION da API é limite da detecção do GitHub e não a contraria. Objeção não sobreviveu. Diferente do OSCAL em si: a licença do conteúdo usnistgov/OSCAL segue não verificada (NOASSERTION, rodada 1)."
+    trace: "https://github.com/metaschema-framework/oscal-cli"
+    provenance:
+      source: "https://github.com/metaschema-framework/oscal-cli"
+      locator: "README.md, seção 'Public domain' (linha 23) e linha 156 (CC0 1.0 Universal)"
+      method: "leitura: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  - id: E_OSCAL_CLI_METASCHEMA_FRAMEWORK_IS_SUCCESSOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Unlike its predecessor, this version supports newer releases of the OSCAL models and additional features.' — README.md de metaschema-framework/oscal-cli, seção 'Relationship to prior work' (linha 158); ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "O repo metaschema-framework/oscal-cli é a continuação mantida do oscal-cli do NIST e suporta modelos OSCAL mais novos que o antecessor (usnistgov/oscal-cli, parado em v1.0.3)."
+    narrative: "Resolve a ambiguidade do nome 'oscal-cli do NIST': o validador alternativo ao trestle é o fork mantido, não o usnistgov v1.0.3 de 2024-02-02 (esse dado veio de uma claim rejeitada na ancoragem por falta de citação e fica só na contabilidade). Objeção não sobreviveu."
+    trace: "https://github.com/metaschema-framework/oscal-cli"
+    provenance:
+      source: "https://github.com/metaschema-framework/oscal-cli"
+      locator: "README.md, seção 'Relationship to prior work' (linha 158)"
+      method: "leitura: README lido no modo primaries, quote verbatim ancorada por verificador independente (rodada de reancoragem de 2026-10-21)"
+      locality: "web"
+
+  # ─── Contabilidade da rodada 2 ──────────────────────────────────────────────────────────────
+
+  - id: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "contabilidade da rodada de reancoragem (modo primaries, 2026-10-21): 3 chaves de fonte lidas, 0 inalcançáveis; 9 claims ancoradas, 7 rejeitadas na ancoragem (6 AFIRMADA-SEM-CITACAO, 1 EXAGERADA); 12 objeções do Elenxo, 6 sobreviventes; 0 recusadas pelo motor; 6 superações"
+    label: "Lacunas da reancoragem: 3/3 fontes lidas; 9 claims ancoradas e 7 rejeitadas (6 sem citação, 1 exagerada); 6 objeções sobreviventes, 0 recusadas, 6 superações. Seguem abertas: methods, acceptance, texto do CPM/VVK e o oscal-cli validando AR/POA&M."
+    narrative: |-
+      ORIGEM: decisão selada D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021 (reancorar antes de escrever os itens 1 e 2).
+      FONTES LIDAS (3 chaves): oscal-v123-assessment (AR v1.2.3 json-reference), fedramp-20x-rules (fedramp-consolidated-rules.json), nist-oscal-cli (releases e README do metaschema-framework/oscal-cli). INALCANÇÁVEIS: 0.
+      ANCORADAS: 9 (oscal-v123-assessment 4, fedramp-20x-rules 1, nist-oscal-cli 4), modeladas como E_OSCAL_V123_*, E_FEDRAMP_FRC_APP_FCP_7_DAYS_INITIAL_PACKAGE e E_OSCAL_CLI_*.
+      REJEITADAS NA ANCORAGEM (7, nenhuma virou nó de evidência). AFIRMADA-SEM-CITACAO (6, rebaixadas pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação): (1) [oscal-v123-assessment] observation.methods obrigatório (array [1]) de 1..N strings, valores locais além de EXAMINE, INTERVIEW, TEST e UNKNOWN, UNKNOWN só para conversão histórica; o verificador achou o texto verbatim no AR json-reference, mas o motor exige quote/locator no veredito. (2) [fedramp-20x-rules] observation.methods 1..N, allow-other=yes, UNKNOWN só para conversão histórica (metaschema v1.2.3 l.915-924). (3) [fedramp-20x-rules] relevant-evidence 0..N, href opcional com #uuid, description obrigatória; 'acceptance' com 0 ocorrências em cinco metaschemas; rlink l.540 e base64 l.572 no metadata. (4) [fedramp-20x-rules] CPO-CSX-CPM por classe: A SHOULD 3 meses, B MUST 1 mês, C MUST 2 semanas, D MUST 1 semana; desde 2026-06-24, sem emenda; manutenção por automação sem revisão humana persistente. (5) [fedramp-20x-rules] FRC-CSX-VVK: métodos automatizados mínimos por KSI, A MAY, B SHOULD >=1, C MUST >=2, D MUST >=4; última emenda 2026-10-13 (cm-2.2, si-6). (6) [fedramp-20x-rules] usnistgov/oscal-cli: última release v1.0.3 (2024-02-02), domínio público (US) + CC0 1.0, README só com validação genérica. Note que (2), (3) e (6) foram produzidas sob a chave fedramp-20x-rules mas falam de OSCAL e do oscal-cli: o leitor saiu da chave. EXAGERADA (1): [oscal-v123-assessment] 'acceptance não existe em AR nem em POA&M; o mais próximo é a prop accepted em risk'. A contagem zero se sustenta; o exagero é 'o mais próximo', que ignora risk/remediations com type 'accept' e risk/status 'deviation-approved' (superação em C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED). Os motivos de (2) a (6) vieram truncados no repasse ao escritor; o que está aqui é o que chegou.
+      ELENXO: 12 objeções, 6 sobreviventes (modeladas como E_OBJECAO_11 a E_OBJECAO_16), 6 não sobreviveram (claims 2, 3, 4, 5, 8 e 9). RECUSADAS PELO MOTOR: 0. SUPERAÇÕES achadas: 6 (1 da claim rejeitada sobre acceptance, que registra aqui, e 5 de objeções sobreviventes), modeladas como C_SUPERACAO_20261021_* desta rodada.
+      LACUNAS FECHADAS (gapsClosed, 3): relevant-evidence e back-matter (href opcional absoluto/relativo/#uuid, rlink com hash opcional, base64; a cardinalidade da description só pela medida do refutador, l.974); FRC-APP-FCP (7 dias, só o pacote inicial, MUST, 2026-06-24, sem emenda); versão e licença do oscal-cli (metaschema-framework v3.2.0, 2026-05-15, bindings 1.2.1, CC0; o usnistgov é o antecessor).
+      LACUNAS QUE CONTINUAM ABERTAS (gapsOpen, 4): (1) observation.methods sem claim ancorada; fechável pela medida do refutador no metaschema v1.2.3 l.915-924 (1..N, allow-other=yes, UNKNOWN só na conversão histórica), apendada como superação, ainda não como evidência ancorada. (2) 'acceptance': a claim caiu como EXAGERADA; a medida do refutador dá 0 ocorrências em cinco metaschemas v1.2.3 e o análogo é o risk response 'accept' (common l.1896). (3) CPO-CSX-CPM e FRC-CSX-VVK sem claim ancorada; o texto literal foi medido pelo refutador na versão 2026.10.13.01, e fica de pé que o CPM é teto de manutenção do PACOTE, não cadência de verificação. (4) oscal-cli validando AR e POA&M: README silencioso; o código do tag v3.2.0 tem ValidateSubcommand em assessmentresults/ e poam/, mas nada foi executado, e a compatibilidade com documento OSCAL 1.2.3 (bindings 1.2.1) não foi provada.
+      NÃO-VERIFICADOS (lista de 1ª classe): o texto de methods, CPM e VVK como evidência ancorada (só medida de um juiz); o oscal-cli rodando sobre AR/POA&M 1.2.3 (sem dogfood); a licença do conteúdo usnistgov/OSCAL (NOASSERTION, herdado da rodada 1).
+      CONSEQUÊNCIAS DE DESENHO que o Elenxo tirou do texto primário (afirmação de UM agente): href e hash do rlink são opcionais, então 'ponteiro primário' e hash obrigatório são regras LOCAIS a declarar; 'acceptance' é cunhagem do Onion; a cadência do item 2 é declarada por nó, com o CPM como teto opcional por classe, e vencimento é de automação, não de revisão humana ('does not require or expect persistent human review').
+    trace: "rodada de reancoragem de 2026-10-21 (modo primaries), aberta por D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021"
+    provenance:
+      source: "journal da rodada de reancoragem de 2026-10-21 (modo primaries), repassado ao escritor"
+      locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, gapsClosed, gapsOpen e superações do Elenxo"
+      method: "derivado: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  # ─── Objeções SOBREVIVENTES do Elenxo, rodada 2 (6) ─────────────────────────────────────────
+
+  - id: E_OBJECAO_11_OSCAL_HREF_OPTIONAL_POINTER_IS_LOCAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo (rodada de reancoragem) contra a claim 1 [oscal-v123-assessment], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a quote da claim 1 não traz a cardinalidade da description, e o href é opcional; o OSCAL aceita relevant-evidence sem ponteiro, então 'ponteiro primário' é escolha LOCAL do Onion, não exigência do padrão."
+    narrative: "Medida do refutador: oscal_assessment-common_metaschema.xml@v1.2.3, l.958 define relevant-evidence com max-occurs=unbounded, o flag href não tem required, e a l.974 define description com min-occurs=1 max-occurs=1 (markup-multiline). Critério E2_PROVA_MENOS. Superação achada (classe entrega): C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL."
+    trace: "curl -sL https://raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema/oscal_assessment-common_metaschema.xml | sed -n '958,980p'"
+    provenance:
+      source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 1 [oscal-v123-assessment], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_12_OSCAL_CLI_BINDINGS_1_2_1_PROVE_LESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo (rodada de reancoragem) contra a claim 6 [nist-oscal-cli], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): oscal-cli v3.2.0 com bindings OSCAL 1.2.1 não prova que ele valida documento 1.2.3; restrições de 1.2.2 e 1.2.3 ficariam de fora, ou oscal-version 1.2.3 seria recusado. Falta dogfood."
+    narrative: "Claim verdadeira (v3.2.0, 2026-05-15T11:12:51Z, a mais recente, conferida pela API), mas prova menos: o corpus mira OSCAL v1.2.3 (2026-08-07T03:33:33Z, último tag de usnistgov/OSCAL). Ambiguidade de nome resolvida por E_OSCAL_CLI_METASCHEMA_FRAMEWORK_IS_SUCCESSOR. Superação NÃO achada (classe nenhuma): seria um 'oscal-cli ar validate' sobre AR com oscal-version 1.2.3, não executado; não há release com bindings 1.2.2/1.2.3 depois de v3.2.0 (API, per_page=3), e o corpus tem 1 nó sobre oscal-cli, sem execução. Critério: bash .claude/validation/kg-corpus-grep.sh 'oscal-cli'."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'oscal-cli'"
+    provenance:
+      source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 6 [nist-oscal-cli], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_13_OSCAL_CLI_README_SILENT_ON_AR_POAM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo (rodada de reancoragem) contra a claim 7 [nist-oscal-cli], critério E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): o README silencioso não responde 'o oscal-cli valida AR e POA&M?'; nenhuma claim ancorada fecha a lacuna, e a evidência está só no código-fonte."
+    narrative: "Medida do refutador fora do run: no tag v3.2.0, os pacotes commands/assessmentresults/ e commands/poam/ têm 3 arquivos cada, entre eles ValidateSubcommand.java; em develop, PlanOfActionsAndMilestonesCommand.java l.22 registra addCommandHandler(new ValidateSubcommand()). Critério E4_LACUNA_ABERTA. Superação achada (classe entrega): C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM, capacidade no código e não execução."
+    trace: "curl -sL 'https://api.github.com/repos/metaschema-framework/oscal-cli/contents/src/main/java/dev/metaschema/oscal/tools/cli/core/commands/poam?ref=v3.2.0' | grep '\"name\"'"
+    provenance:
+      source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 7 [nist-oscal-cli], critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_14_OSCAL_METHODS_GAP_STILL_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo (rodada de reancoragem) contra a lacuna [oscal-v123-assessment], parte observation.methods, critério E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): nenhuma claim ancorada da reancoragem responde a observation.methods (as duas caíram por falta de quote/locator); a lacuna segue aberta NA RODADA, e oscal_method do item 1 não se escreve sobre evidência ancorada."
+    narrative: "Medida do refutador: oscal_assessment-common_metaschema.xml@v1.2.3, l.915 define-field method min-occurs=1 max-occurs=unbounded; l.918 group-as methods in-json=ARRAY; l.920 allowed-values oscal-observation-method-type-values allow-other=yes; l.921-924 EXAMINE 'An inspection was performed.', INTERVIEW 'An interview was performed.', TEST 'A manual or automated test was performed.', UNKNOWN 'This is only for use when converting historic content to OSCAL, where the conversion process cannot initially identify the appropriate method(s).' Critério E4_LACUNA_ABERTA. Superação achada: C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'observation.methods'"
+    provenance:
+      source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a lacuna oscal-v123-assessment, parte observation.methods, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_15_OSCAL_ACCEPTANCE_GAP_EXAGGERATED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo (rodada de reancoragem) contra a lacuna [oscal-v123-assessment], parte 'acceptance existe em algum modelo?', critério E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): a claim sobre 'acceptance' caiu como EXAGERADA; a lacuna fica aberta na rodada. 'acceptance' não é termo do OSCAL, e um campo com esse nome seria cunhagem local, a declarar como do Onion."
+    narrative: "Medida do refutador: grep -ci acceptance = 0 em oscal_assessment-common, assessment-results, poam, assessment-plan e metadata (todos @v1.2.3). A construção mais próxima é o valor de risk response em assessment-common l.1896: enum 'accept', 'The risk will continue to exist without further efforts to address it. (Sometimes referred to as \"Operationally required\")'. Critério E4_LACUNA_ABERTA. Superação achada: C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS."
+    trace: "for f in assessment-common assessment-results poam assessment-plan metadata; do curl -sL https://raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema/oscal_${f}_metaschema.xml | grep -ci acceptance; done"
+    provenance:
+      source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a lacuna oscal-v123-assessment, parte acceptance, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_16_FEDRAMP_CPM_IS_PACKAGE_CEILING_NOT_VERIFICATION_CADENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo (rodada de reancoragem) contra a lacuna [fedramp-20x-rules], partes CPO-CSX-CPM e FRC-CSX-VVK, critério E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): CPO-CSX-CPM é teto de MANUTENÇÃO DO PACOTE, não cadência de VERIFICAÇÃO; FRC-CSX-VVK fixa quantos métodos automáticos, sem intervalo. O ciclo de verificação é declarado pelo provedor; o item 2 não codifica 3m/1m/2s/1s."
+    narrative: "Medida do refutador em fedramp-consolidated-rules.json 2026.10.13.01. CPO-CSX-CPM: A 'SHOULD persistently maintain ... at least once every 3 months', B 'MUST ... at least once every month', C 'MUST ... at least once every 2 weeks', D 'MUST ... at least once every week'; notes 'using automation as changes occur' e 'This rule does not require or expect persistent human review of all materials in this cadence.'; updated só 2026-06-24. FRC-CSX-VVK: A 'MAY implement automated methods to persistently verify and validate...', B 'SHOULD ... at least 1 automated method for each Key Security Indicator', C 'MUST ... at least 2', D 'MUST ... at least 4'; updated 2026-10-13 'Updated control mappings: added cm-2.2, si-6.' e 2026-06-24. info.default_artifacts.KSI: 'Explanation of the cycle for any measures that are implemented persistently (if applicable).' Na classe A o teto é só SHOULD. Nenhuma claim ancorada do run tem esse texto. Superação achada: C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'FRC-CSX-VVK'"
+    provenance:
+      source: "journal da rodada de reancoragem de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a lacuna fedramp-20x-rules, partes CPO-CSX-CPM e FRC-CSX-VVK, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  # ─── SUPERAÇÕES achadas na rodada 2 (6; SAC-151) ────────────────────────────────────────────
+
+  - id: C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida: o OSCAL v1.2.3 não tem 'acceptance', mas o POA&M tem três construções de aceitação de risco: a prop 'accepted', o response type 'accept' e o status 'deviation-approved'."
+    narrative: "Alvo reprovado: a claim [oscal-v123-assessment] ''acceptance' não existe em AR nem em POA&M; o mais próximo é a prop accepted em risk' (EXAGERADA na ancoragem). Medida: texto do POA&M v1.2.3 extraído do HTML e lido nos offsets ~336234 (accepted), ~551193 (accept) e no bloco risk/status (deviation-approved); contagem de 'acceptance' = 0 nas duas páginas. Critério A2_CLAIM_ESTICA. Registro: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021."
+    trace: "curl -sL https://pages.nist.gov/OSCAL-Reference/models/v1.2.3/plan-of-action-and-milestones/json-reference/ | sed 's/<[^>]*>/ /g' | grep -oiE '(accept[a-z]*|deviation-approved) :'"
+
+  - id: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "No metaschema OSCAL v1.2.3 (l.974), a description de relevant-evidence é obrigatória (1..1) e o href é opcional; 'ponteiro primário' no Onion é regra local, não atribuível ao OSCAL."
+    narrative: "Alvo reprovado: claim 1 [oscal-v123-assessment] 'relevant-evidence é array 0..1 de 1..N; href opcional; description obrigatória' (objeção E_OBJECAO_11_OSCAL_HREF_OPTIONAL_POINTER_IS_LOCAL). Medida: curl do metaschema no tag v1.2.3 e sed -n 958,980p, conferido em 2026-10-21. Critério E2_PROVA_MENOS."
+    trace: "curl -sL https://raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema/oscal_assessment-common_metaschema.xml | sed -n '958,980p'"
+
+  - id: C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O oscal-cli v3.2.0 tem subcomandos de validação por modelo (assessmentresults/ValidateSubcommand.java e poam/ValidateSubcommand.java): capacidade no código, não execução; a compatibilidade com OSCAL 1.2.3 segue aberta."
+    narrative: "Alvo reprovado: claim 7 [nist-oscal-cli] 'o README não nomeia AR nem POA&M' (objeção E_OBJECAO_13_OSCAL_CLI_README_SILENT_ON_AR_POAM). Medida: API de contents do GitHub com ref=v3.2.0 para os dois pacotes (3 arquivos cada) e raw de PlanOfActionsAndMilestonesCommand.java em develop, em 2026-10-21. Critério E4_LACUNA_ABERTA. A objeção ao claim 6 (E_OBJECAO_12) continua: bindings 1.2.1."
+    trace: "curl -sL 'https://api.github.com/repos/metaschema-framework/oscal-cli/contents/src/main/java/dev/metaschema/oscal/tools/cli/core/commands/poam?ref=v3.2.0' | grep '\"name\"'"
+
+  - id: C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "OSCAL v1.2.3, metaschema l.915-924: observation.methods é obrigatório (1..N), aceita valores locais (allow-other=yes) além de EXAMINE, INTERVIEW e TEST, e UNKNOWN fica restrito à conversão de conteúdo histórico."
+    narrative: "Alvo reprovado: a lacuna [oscal-v123-assessment], parte observation.methods (objeção E_OBJECAO_14_OSCAL_METHODS_GAP_STILL_UNANCHORED). É o que o oscal_method do item 1 precisa. Medida: curl -sL do metaschema assessment-common no tag v1.2.3 e grep -n 'name=\"method\"' -A10, em 2026-10-21. Critério E4_LACUNA_ABERTA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'observation.methods'"
+
+  - id: C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "'acceptance' tem zero ocorrências nos cinco metaschemas OSCAL v1.2.3 (assessment-common, assessment-results, poam, assessment-plan, metadata); o análogo é o risk response 'accept' (common l.1896), não um modelo de aceitação."
+    narrative: "Alvo reprovado: a lacuna [oscal-v123-assessment], parte 'acceptance existe em algum modelo?' (objeção E_OBJECAO_15_OSCAL_ACCEPTANCE_GAP_EXAGGERATED). Medida: curl e grep -ci acceptance nos 5 arquivos do tag v1.2.3, mais grep do enum 'accept', em 2026-10-21. Critério E4_LACUNA_ABERTA."
+    trace: "for f in assessment-common assessment-results poam assessment-plan metadata; do curl -sL https://raw.githubusercontent.com/usnistgov/OSCAL/v1.2.3/src/metaschema/oscal_${f}_metaschema.xml | grep -ci acceptance; done"
+
+  - id: C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Texto literal do CPO-CSX-CPM e do FRC-CSX-VVK (com as datas de updated) mais o default_artifact KSI: sustentam cadência declarada por nó, com o CPM como teto de frescor do pacote, não como cadência imposta pelo FedRAMP."
+    narrative: "Alvo reprovado: a lacuna [fedramp-20x-rules], partes CPO-CSX-CPM e FRC-CSX-VVK (objeção E_OBJECAO_16_FEDRAMP_CPM_IS_PACKAGE_CEILING_NOT_VERIFICATION_CADENCE). Medida: curl -sL do fedramp-consolidated-rules.json e extração por chave em Python (FRR/CPO/data/20x/CSX/CPO-CSX-CPM, FRR/FRC/data/20x/CSX/FRC-CSX-VVK, info), em 2026-10-21. Critério E4_LACUNA_ABERTA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'FRC-CSX-VVK'"
+
 edges:
   # decisões nascem da pergunta
   - from: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
@@ -1164,4 +1540,130 @@ edges:
     edge_type: SUPPORTS
   - from: C_SUPERACAO_20261021_LULA_THREE_CHALLENGES
     to: D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021
+    edge_type: SUPPORTS
+
+  # ═══ RODADA 2 (reancoragem, 2026-10-21) ═══
+  # a contabilidade nasce da decisão selada e continua a da rodada 1
+  - from: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    to: E_LACUNAS_PRIMARIES_AUDIT_EVIDENCE_1021
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    to: Q_AUDIT_EVIDENCE_MACHINERY_2026_10
+    edge_type: TRACES_TO
+
+  # OSCAL v1.2.3: relevant-evidence e back-matter ancorados
+  - from: E_OSCAL_V123_RELEVANT_EVIDENCE_CARDINALITY
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: TRACES_TO
+  - from: E_OSCAL_V123_RELEVANT_EVIDENCE_CARDINALITY
+    to: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    edge_type: SUPPORTS
+  - from: E_OSCAL_V123_RELEVANT_EVIDENCE_HREF_FORMS
+    to: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    edge_type: SUPPORTS
+  - from: E_OSCAL_V123_BACK_MATTER_RLINK_OR_BASE64
+    to: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    edge_type: SUPPORTS
+  - from: E_OSCAL_V123_RLINK_OPTIONAL_HASH
+    to: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    edge_type: SUPPORTS
+  - from: E_OSCAL_V123_BACK_MATTER_RLINK_OR_BASE64
+    to: E_OBJECAO_10_OSCAL_METHODS_AND_POINTER_UNANCHORED
+    edge_type: SUPPORTS
+  - from: E_OSCAL_V123_RLINK_OPTIONAL_HASH
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: TRACES_TO
+  - from: E_OSCAL_V123_RELEVANT_EVIDENCE_HREF_FORMS
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: TRACES_TO
+  - from: E_OSCAL_V123_BACK_MATTER_RLINK_OR_BASE64
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: TRACES_TO
+
+  # FedRAMP: FRC-APP-FCP ancorada confirma a objeção 09
+  - from: E_FEDRAMP_FRC_APP_FCP_7_DAYS_INITIAL_PACKAGE
+    to: E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY
+    edge_type: SUPPORTS
+  - from: E_FEDRAMP_FRC_APP_FCP_7_DAYS_INITIAL_PACKAGE
+    to: D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021
+    edge_type: TRACES_TO
+
+  # oscal-cli: identidade, versão e licença do validador alternativo
+  - from: E_OSCAL_CLI_METASCHEMA_FRAMEWORK_IS_SUCCESSOR
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: TRACES_TO
+  - from: E_OSCAL_CLI_PUBLIC_DOMAIN_CC0
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: TRACES_TO
+  - from: E_OSCAL_CLI_README_VALIDATES_GENERIC_RESOURCES
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: TRACES_TO
+  - from: E_OSCAL_CLI_V3_2_0_BINDINGS_1_2_1
+    to: D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021
+    edge_type: CONSTRAINS
+  - from: E_OSCAL_CLI_METASCHEMA_FRAMEWORK_IS_SUCCESSOR
+    to: E_OSCAL_CLI_V3_2_0_BINDINGS_1_2_1
+    edge_type: SUPPORTS
+
+  # objeções sobreviventes da rodada 2 limitam os alvos
+  - from: E_OBJECAO_11_OSCAL_HREF_OPTIONAL_POINTER_IS_LOCAL
+    to: E_OSCAL_V123_RELEVANT_EVIDENCE_CARDINALITY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_OSCAL_HREF_OPTIONAL_POINTER_IS_LOCAL
+    to: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_OSCAL_CLI_BINDINGS_1_2_1_PROVE_LESS
+    to: E_OSCAL_CLI_V3_2_0_BINDINGS_1_2_1
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_13_OSCAL_CLI_README_SILENT_ON_AR_POAM
+    to: E_OSCAL_CLI_README_VALIDATES_GENERIC_RESOURCES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_14_OSCAL_METHODS_GAP_STILL_UNANCHORED
+    to: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15_OSCAL_ACCEPTANCE_GAP_EXAGGERATED
+    to: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_FEDRAMP_CPM_IS_PACKAGE_CEILING_NOT_VERIFICATION_CADENCE
+    to: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_FEDRAMP_CPM_IS_PACKAGE_CEILING_NOT_VERIFICATION_CADENCE
+    to: C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING
+    edge_type: CONSTRAINS
+
+  # superações da rodada 2 rastreiam o nó que registra a reprovação
+  - from: C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED
+    to: E_LACUNAS_REANCHOR_OSCAL_FEDRAMP_1021
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL
+    to: E_OBJECAO_11_OSCAL_HREF_OPTIONAL_POINTER_IS_LOCAL
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM
+    to: E_OBJECAO_13_OSCAL_CLI_README_SILENT_ON_AR_POAM
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER
+    to: E_OBJECAO_14_OSCAL_METHODS_GAP_STILL_UNANCHORED
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS
+    to: E_OBJECAO_15_OSCAL_ACCEPTANCE_GAP_EXAGGERATED
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT
+    to: E_OBJECAO_16_FEDRAMP_CPM_IS_PACKAGE_CEILING_NOT_VERIFICATION_CADENCE
+    edge_type: TRACES_TO
+
+  # superações da rodada 2 sustentam o que a rodada 1 já afirmava
+  - from: C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED
+    to: C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS
+    to: C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER
+    to: C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT
+    to: E_OBJECAO_09_FEDRAMP_7_DAYS_IS_INITIAL_PACKAGE_ONLY
     edge_type: SUPPORTS
