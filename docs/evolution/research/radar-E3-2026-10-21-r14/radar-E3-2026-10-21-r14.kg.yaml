@@ -50,6 +50,7 @@ nodes:
     verified_at: "2026-10-21"
     verified_against: "fechada em 2026-10-21 pela rodada r14 depois do juiz (subagente opus/high pedido pela sessão; modelo declarado, não medido): 11 vereditos (5 SUSTENTA, 6 EXAGERA, 0 REPROVA), 13 omissões apontadas (5 de impacto 2 viraram nós, 8 de impacto 1 sem consumidor), 3 nós da r13 superados; data/judge-verdicts.json"
     label: "quais itens de 2.1.303 a 2.1.306 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+    trace: "docs/evolution/research/radar-E3-2026-10-21-r14/SYNTHESIS.md e data/judge-verdicts.json"
   - id: E_WORKFLOW_RESUME_CORRIGIDO_NA_2_1_305
     node_type: evidence
     layer: audit
