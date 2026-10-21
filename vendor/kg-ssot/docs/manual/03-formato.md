@@ -79,7 +79,7 @@ com `.kg.yaml`.
 | `verified_at` | *data* | SHOULD em nó PROD |
 | `verified_against` | texto | SHOULD em `claim` com `verified_at` |
 | `verified_scope` | enum | opcional, desde o v4.5: o alcance do `verified_at`. `fato` (o que o nó afirma foi conferido), `mecanismo` (só o mecanismo, como código ou configuração; o fato depende de outro ambiente) ou `nenhum` (conferido contra o repo na data, e nada ali sustenta nem refuta o fato). Fora do enum alerta; sem `verified_at` alerta |
-| `reverify_every` | duração | opcional, desde o v4.8: de quanto em quanto tempo a verificação tem de ser refeita, em duração ISO 8601 só com data (`P3M`, `P1Y`, `P2W`, `P1Y6M`). Fora da forma alerta; sem `verified_at` alerta, porque a cadência conta do carimbo. O vencimento nunca muda o veredito: `kg_validate.py --due` o lista |
+| `reverify_every` | duração | opcional, desde o v4.8: de quanto em quanto tempo a verificação tem de ser refeita, em duração ISO 8601 só com data (`P3M`, `P1Y`, `P2W`, `P1Y6M`). Fora da forma alerta. Sem `verified_at` não alerta desde o v4.9: é a regra que ainda não teve a primeira verificação, e o `--due` a lista como sem carimbo. O vencimento nunca muda o veredito: `kg_validate.py --due` o lista |
 | `reverify_on` | texto | opcional, desde o v4.8: o gatilho por evento ("a cada mudança de configuração", "por admissão") |
 | `retain_for` | duração | opcional, desde o v4.8: por quanto tempo a evidência tem de ser guardada, na mesma duração |
 | `valid_from` | data parcial | `AAAA`, `AAAA-MM` ou `AAAA-MM-DD` |

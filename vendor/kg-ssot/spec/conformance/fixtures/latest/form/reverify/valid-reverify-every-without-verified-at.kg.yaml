@@ -1,6 +1,6 @@
 meta:
   schema_version: "1"
-  id: warn-reverify-every-without-verified-at
+  id: valid-reverify-every-without-verified-at
 nodes:
   - id: Q_A
     node_type: question

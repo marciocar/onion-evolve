@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -295,10 +295,19 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.15.0` para a `kg-ssot-v4.15.1`, entra o contrato v4.9, que corrige um defeito do desenho da 4.15.0
+achado por um adotante ao gravar regras de coleta de evidência.
+- **`reverify_every` sem `verified_at` deixa de alertar.** Uma regra com cadência e ainda sem coleta está no estado
+  inicial dela, e não em dívida: na 4.15.0, o `kg_gate.py` acusava piora em `form.required.node.verified_at` a cada
+  regra nova. Quem lista esse caso é o relatório de vencimento (`kg_validate.py --due`, na lista `unstamped`), fora
+  do veredito. O nó PROD sem `verified_at` segue alertando.
+- **A suíte segue com 349 casos**, e o caso da cadência sem carimbo passa a ser válido, sem aviso. A identidade do
+  contrato muda (o `kg_gate.py` pede `--update`). A dívida SHOULD só pode cair, e nenhum veredito MUST muda.
+
 Da `kg-ssot-v4.14.0` para a `kg-ssot-v4.15.0`, entra o contrato v4.8: as chaves da verificação, desenhadas com dois
 adotantes a partir de um caso real de auditoria contínua. Todas são opcionais, e quem não usa não ganha dívida.
 - **`reverify_every`**: de quanto em quanto tempo a verificação de um nó tem de ser refeita, em duração ISO 8601 só com
-  data (`P3M`, `P1Y`). Sem `verified_at`, alerta, porque a cadência conta do carimbo; zerada (`P0D`), também.
+  data (`P3M`, `P1Y`). Zerada (`P0D`), alerta. Na 4.15.0, alertava também sem `verified_at`; a 4.15.1 tirou esse aviso.
 - **`reverify_on`**: o gatilho por evento, em texto ("por admissão", "a cada mudança de configuração").
 - **`retain_for`**: por quanto tempo a evidência tem de ser guardada, na mesma duração.
 - **O `owner`** é o papel que responde pelo nó, e não uma pessoa. Não muda nada no veredito.
@@ -344,7 +353,7 @@ leitor JS) e o migrador por perfil.
 - **A suíte ganha 16 casos** (328).
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --dest
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --dest
   vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
@@ -469,7 +478,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
