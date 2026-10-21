@@ -42720,7 +42720,8 @@ PN_ANS
   if st="$(DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${pnl}" seal "${pnd}/round.json" "${pnd}/a2.json" --repo "${pnr}" 2>/dev/null)"; then :; else _p2="${_p2} rc$?"; fi
   [ "$(sha256sum "${pnr}/docs/a/a.kg.yaml" | cut -d' ' -f1)" = "${h0p}" ] || _p2="${_p2} helper-escreveu-o-grafo"
   [ "$(tr -cd '\n' < "${pnd}/argv.log" | wc -c)" -eq 1 ] || _p2="${_p2} chamadas=$(tr -cd '\n' < "${pnd}/argv.log" | wc -c)"
-  tr '\0' '\n' < "${pnd}/argv.log" | head -10 | paste -sd'|' - | grep -qxF 'docs/a/a.kg.yaml|Q_CITADO|--chosen|caminho dois|--rejected|caminho um|pesquisar antes|--date|2026-10-12|--question|Qual caminho seguimos?' || _p2="${_p2} argv:$(tr '\0' '|' < "${pnd}/argv.log" | head -c 200)"
+  local _av; _av="$(tr '\0' '\n' < "${pnd}/argv.log" | head -10 | paste -sd'|' -)"
+  grep -qxF 'docs/a/a.kg.yaml|Q_CITADO|--chosen|caminho dois|--rejected|caminho um|pesquisar antes|--date|2026-10-12|--question|Qual caminho seguimos?' <<< "${_av}" || _p2="${_p2} argv:$(tr '\0' '|' < "${pnd}/argv.log" | head -c 200)"
   grep -q '"state": "executar"' <<< "${st}" || _p2="${_p2} ato-sem-executar"
   # o selo REAL, pelo selador de produção: grava e passa pelo radar
   if st="$(bash "${pnl}" seal "${pnd}/round.json" "${pnd}/a2.json" --repo "${pnr}" 2>&1)"; then :; else _p2="${_p2} real-rc$?"; fi
@@ -42750,8 +42751,9 @@ sys.exit(" ".join(bad) if bad else 0)' "${st}" "${pnd}/round.json" 2>/dev/null |
   : > "${pnd}/argv.log"
   DECIDE_PANEL_SEAL="${pnd}/seal-rec.sh" bash "${pnl}" seal "${pnd}/round.json" "${pnd}/a3.json" --repo "${pnr}" --other "${qc}" >/dev/null 2>&1 || _p3="${_p3} seal-other-rc$?"
   [ -e "${pnd}/PWNED" ] || [ -e "${pnd}/PWNED2" ] && _p3="${_p3} SHELL-INTERPRETOU-O-TEXTO"
-  tr '\0' '\n' < "${pnd}/argv.log" | sed -n '4p' | grep -qxF "$(printf '%s' "${evil}" | tr '\n' ' ' | tr -s ' ')" || _p3="${_p3} chosen-nao-e-um-argumento-literal"
-  tr '\0' '\n' < "${pnd}/argv.log" | grep -qx -- '--other' || _p3="${_p3} sem-marca-other"
+  local _al; _al="$(tr '\0' '\n' < "${pnd}/argv.log")"
+  grep -qxF "$(printf '%s' "${evil}" | tr '\n' ' ' | tr -s ' ')" <<< "$(sed -n '4p' <<< "${_al}")" || _p3="${_p3} chosen-nao-e-um-argumento-literal"
+  grep -qx -- '--other' <<< "${_al}" || _p3="${_p3} sem-marca-other"
   bash "${pnl}" seal "${pnd}/round.json" "${pnd}/a3.json" --repo "${pnr}" --other "${qc}" >/dev/null 2>&1 || _p3="${_p3} real-other-rc$?"
   python3 -c '
 import sys, yaml; d = yaml.safe_load(open(sys.argv[1])); ids = [n["id"] for n in d["nodes"]]
