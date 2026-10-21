@@ -22489,9 +22489,17 @@ run_corelay_selftests() {
     printf 'role: %s\n' "$2" > "$1/.claude/.onion-version"
     printf '# sinal de teste\n' > "$1/${SIG}"
   }
+  # builder: um CORE de verdade em $1 — git, sem carimbo, e o onion-version.sh real (que, sem carimbo, diz
+  # source). Até 2026-10-21 a fixture de core era um `git init` vazio, e era exatamente isso que o carteiro
+  # aceitava como core (Q_CO_RELAY_SEM_CARIMBO_E_O_CORE): a bancada provava o defeito como contrato.
+  _mk_core() {
+    git -C "$1" init -q
+    mkdir -p "$1/.claude/validation"
+    cp "${REPO_ROOT}/.claude/validation/onion-version.sh" "$1/.claude/validation/onion-version.sh"
+  }
 
   # (a) stamp role:source → exit 2 (rejeita CORE)
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" source
   rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ]; then record_pass "co-relay: stamp source → exit 2 (rejeita core)"
@@ -22499,7 +22507,7 @@ run_corelay_selftests() {
   rm -rf "${d}" "${core}"
 
   # (b) stamp role:adopted + alvo válido → relay ocorre (sinal aparece no inbox do core)
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ]; then record_pass "co-relay: adopted + alvo → relaya"
@@ -22507,7 +22515,7 @@ run_corelay_selftests() {
   rm -rf "${d}" "${core}"
 
   # (c) ANTI-REGRESSÃO: onion-version.sh presente (emite 'source') MAS stamp 'adopted' → DEVE seguir
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   mkdir -p "${d}/.claude/validation"; cp "${REPO_ROOT}/.claude/validation/onion-version.sh" "${d}/.claude/validation/" 2>/dev/null || true
   rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
@@ -22530,7 +22538,7 @@ run_corelay_selftests() {
   rm -rf "${d}" "${core}"
 
   # (f) --target sem docs/evolution/inbox → mkdir -p + AVISO, não falha hard (entrega ocorre)
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q   # core sem o canal
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"   # core sem o canal
   mk_adopter "${d}" adopted
   rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ]; then record_pass "co-relay: canal ausente → mkdir -p + entrega (simetria co-deliver)"
@@ -22538,7 +22546,7 @@ run_corelay_selftests() {
   rm -rf "${d}" "${core}"
 
   # (g) PROVA DO INVARIANTE: pós-relay, sinal é UNTRACKED no core e NÃO há commit novo
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || true
   local st commits
@@ -22550,7 +22558,7 @@ run_corelay_selftests() {
 
   # (h) never-clobber do que o core JÁ COMMITOU: mesmo nome, conteúdo diferente, TRACKED → no-op
   #     (desde 2026-10-07 a colisão decide por conteúdo; o que nunca se sobrescreve é a árvore do core)
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   printf '# já existe (versão do core)\n' > "${core}/${SIG}"
   git -C "${core}" add -A >/dev/null 2>&1
@@ -22564,7 +22572,7 @@ run_corelay_selftests() {
   # (h2) sinal ATUALIZADO sobre a entrega anterior ainda UNTRACKED → entrega por cima (sinal de
   #      um adotante, 2026-10-07: a checagem de existência saía "já relayado" antes do dedup e a
   #      versão nova nunca chegava). MUTANTE: voltar ao `[ -e ] → no-op` reprova este caso.
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   printf '# entrega anterior, ainda nao triada\n' > "${core}/${SIG}"
   rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
@@ -22574,7 +22582,7 @@ run_corelay_selftests() {
   rm -rf "${d}" "${core}"
 
   # (h3) mesmo nome, conteúdo IDÊNTICO → no-op (a cura não virou re-entrega a cada rodada)
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   cp "${d}/${SIG}" "${core}/${SIG}"
   local out_h3; rc=0; out_h3="$( ( cd "${d}" && bash "${helper}" --target "${core}" ) 2>&1)" || rc=$?
@@ -22584,7 +22592,7 @@ run_corelay_selftests() {
   rm -rf "${d}" "${core}"
 
   # (i) --dry-run não escreve nada
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" --dry-run ) >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ] && [ ! -f "${core}/${SIG}" ]; then record_pass "co-relay: --dry-run não escreve"
@@ -22593,7 +22601,7 @@ run_corelay_selftests() {
 
   # (j) DEDUP por conteúdo: sinal IDÊNTICO já triado em _processed/ (nome diferente) → no-op
   #     (regressão do incidente 2026-07-03: carteiro re-entregou 3 sinais pós-triagem → 📬 fantasma)
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"
   mkdir -p "${core}/docs/evolution/inbox/_processed"
   mk_adopter "${d}" adopted
   printf '# sinal de teste\n' > "${core}/docs/evolution/inbox/_processed/2025-12-31-outro-nome.md"
@@ -22605,7 +22613,7 @@ run_corelay_selftests() {
 
   # (k) sinal ATUALIZADO: mesmo nome em _processed mas conteúdo DIFERENTE → DEVE entregar
   #     (a pergunta do maestro "elas não foram atualizadas?" virou guarda: update ≠ duplicata)
-  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q
+  d="$(mktemp -d)"; core="$(mktemp -d)"; _mk_core "${core}"
   mkdir -p "${core}/docs/evolution/inbox/_processed"
   mk_adopter "${d}" adopted
   printf '# versão antiga já triada\n' > "${core}/docs/evolution/inbox/_processed/2026-01-01-sinal-teste.md"
@@ -22614,6 +22622,105 @@ run_corelay_selftests() {
     record_pass "co-relay: mesmo nome, conteúdo novo → entrega (sinal atualizado ≠ duplicata)"
   else record_fail "co-relay: sinal atualizado" "exit ${rc} — dedup bloqueou uma atualização legítima?"; fi
   rm -rf "${d}" "${core}"
+
+  # ── O destino-CORE se PROVA (Q_CO_RELAY_SEM_CARIMBO_E_O_CORE, 2026-10-21) ────────────────────────────────
+  # Sem carimbo, só é core quem tem o onion-version.sh e ele diz role: source (lido, não executado). Antes,
+  # qualquer repo git sem carimbo era o core: um clone do espelho do kg-ssot passava e ganharia a caixa.
+  local cmut c_out; cmut="$(mktemp -d)"
+  _c_run() {  # $1 = helper; $2 = remetente; $3 = destino → rc em ${rc}, saída em ${c_out}
+    rc=0; c_out="$( ( cd "$2" && bash "$1" --target "$3" ) 2>&1)" || rc=$?
+  }
+  # (C1) repo git sem carimbo e SEM onion-version.sh (o caso medido do espelho) → exit 2, nada criado lá
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mk_adopter "${d}" adopted
+  _c_run "${helper}" "${d}" "${core}"; local rc_c1="${rc}"
+  if [ "${rc}" -eq 2 ] && [ ! -e "${core}/docs" ] && grep -q 'não prova ser o core' <<< "${c_out}" && grep -q 'onion-version.sh' <<< "${c_out}"; then
+    record_pass "co-relay: (C1) destino git sem carimbo e sem onion-version.sh → exit 2, nada criado, e diz por quê"
+  else record_fail "co-relay: (C1) repo qualquer virou core" "rc=${rc} docs=$([ -e "${core}/docs" ] && echo criado || echo não): ${c_out}"; fi
+  sed 's|^  if ! CORE_WHY="$(_core_proof "${TARGET}")"; then$|  if false; then|' "${helper}" > "${cmut}/c1.sh"
+  rm -rf "${core}/docs"; _c_run "${cmut}/c1.sh" "${d}" "${core}"; local m_c1="${rc}"
+  _prove_mutation "co-relay: (C-M1) sem a prova do core, o repo sem carimbo volta a ser o core (e ganha a caixa) — (C1) morde" \
+    "${helper}" "${cmut}/c1.sh" "$([ "${rc_c1}" -eq 2 ] && echo 0 || echo 1)" "$([ "${m_c1}" -eq 2 ] && echo 0 || echo 1)"
+  rm -rf "${core}"
+  # (C2) onion-version.sh que computa OUTRO papel (default role="adopted") ou diz outro papel literal → exit 2
+  local okc2=1 c2form rc_c2=0 c2_core=""
+  for c2form in default literal; do
+    core="$(mktemp -d)"; _mk_core "${core}"; mkdir -p "${core}/docs/evolution/inbox"
+    if [ "${c2form}" = default ]; then sed -i 's/^role="source"$/role="adopted"/' "${core}/.claude/validation/onion-version.sh"
+    else sed -i 's/^role: ${role}$/role: hub/' "${core}/.claude/validation/onion-version.sh"; fi
+    grep -qE '^role="adopted"$|^role: hub$' "${core}/.claude/validation/onion-version.sh" || okc2=0   # a fixture foi aplicada
+    _c_run "${helper}" "${d}" "${core}"
+    { [ "${rc}" -eq 2 ] && [ ! -f "${core}/${SIG}" ] && grep -q 'não source' <<< "${c_out}"; } || { okc2=0; rc_c2="${rc}"; }
+    [ "${c2form}" = literal ] || c2_core="${core}"
+    [ "${c2form}" = default ] || rm -rf "${core}"
+  done
+  if [ "${okc2}" -eq 1 ]; then record_pass "co-relay: (C2) onion-version.sh que computa ou diz outro papel (adopted, hub) → exit 2, nada entregue"
+  else record_fail "co-relay: (C2) papel ≠ source aceito como core" "rc=${rc_c2}: ${c_out}"; fi
+  sed 's|^          if \[ "${d}" != "source" \]; then|          if false; then|' "${helper}" > "${cmut}/c2.sh"
+  _c_run "${cmut}/c2.sh" "${d}" "${c2_core}"; local m_c2="${rc}"
+  _prove_mutation "co-relay: (C-M2) sem conferir o default, um script que computa adopted passaria como o core — (C2) morde" \
+    "${helper}" "${cmut}/c2.sh" "$([ "${okc2}" -eq 1 ] && echo 0 || echo 1)" "$([ "${m_c2}" -eq 2 ] && echo 0 || echo 1)"
+  rm -rf "${c2_core}"
+  # (C3) o core de verdade (o onion-version.sh real, forma `role: ${role}`) e um core antigo (`role: source`
+  #      literal, a forma de antes de FED-3-1) → entregam
+  local okc3=1 c3form c3_core=""
+  for c3form in atual antigo; do
+    core="$(mktemp -d)"; _mk_core "${core}"
+    if [ "${c3form}" = antigo ]; then
+      sed -i 's/^role: ${role}$/role: source/' "${core}/.claude/validation/onion-version.sh"
+      grep -q '^role: source$' "${core}/.claude/validation/onion-version.sh" || okc3=0
+    fi
+    _c_run "${helper}" "${d}" "${core}"
+    { [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ]; } || okc3=0
+    [ "${c3form}" = antigo ] || c3_core="${core}"
+    [ "${c3form}" = atual ] || rm -rf "${core}"
+  done
+  if [ "${okc3}" -eq 1 ]; then record_pass "co-relay: (C3) core de verdade (onion-version.sh real, e a forma antiga role: source) → entrega"
+  else record_fail "co-relay: (C3) o core real foi recusado" "rc=${rc}: ${c_out}"; fi
+  sed "s#^      '\${role}'|'\$role')\$#      __never__)#" "${helper}" > "${cmut}/c3.sh"
+  rm -f "${c3_core}/${SIG}"; _c_run "${cmut}/c3.sh" "${d}" "${c3_core}"; local m_c3=1
+  { [ "${rc}" -eq 0 ] && [ -f "${c3_core}/${SIG}" ]; } && m_c3=0
+  _prove_mutation "co-relay: (C-M3) sem ler a forma role: \${role}, o core real seria recusado — (C3) morde" \
+    "${helper}" "${cmut}/c3.sh" "$([ "${okc3}" -eq 1 ] && echo 0 || echo 1)" "${m_c3}"
+  rm -rf "${c3_core}"
+  # (C4) achado da passada adversarial (2026-10-21): os laços conferem TODO default e TODA saída, não só o 1º.
+  #      O papel extra é `standalone`, que ordena DEPOIS de `source` (e `${role}` antes de `standalone`): um laço
+  #      que lesse só o 1º elemento do sort aceitaria os dois. → exit 2
+  _c4_run() {  # $1 = helper; $2 = forma (defaults|outs) → 0 se recusou com o motivo e nada entregue
+    core="$(mktemp -d)"; _mk_core "${core}"
+    if [ "$2" = defaults ]; then sed -i 's/^role="source"$/role="source"\nrole=standalone/' "${core}/.claude/validation/onion-version.sh"
+    else sed -i 's/^role: ${role}$/role: ${role}\nrole: standalone/' "${core}/.claude/validation/onion-version.sh"; fi
+    grep -qE '^role(=|: )standalone$' "${core}/.claude/validation/onion-version.sh" || { rm -rf "${core}"; return 1; }
+    _c_run "$1" "${d}" "${core}"
+    local ok=1; { [ "${rc}" -eq 2 ] && [ ! -e "${core}/docs" ] && grep -q 'standalone, não source' <<< "${c_out}"; } && ok=0
+    rm -rf "${core}"; return "${ok}"
+  }
+  local c4d=1 c4o=1; _c4_run "${helper}" defaults && c4d=0; _c4_run "${helper}" outs && c4o=0
+  if [ "${c4d}" -eq 0 ] && [ "${c4o}" -eq 0 ]; then record_pass "co-relay: (C4) um 2º default ou uma 2ª saída com outro papel (standalone) → exit 2, nada entregue"
+  else record_fail "co-relay: (C4) só o 1º default/saída conferido" "defaults=${c4d} outs=${c4o}: ${c_out}"; fi
+  sed 's|^        done <<< "${defaults}" ;;$|        done <<< "$(head -1 <<< "${defaults}")" ;;|' "${helper}" > "${cmut}/c4.sh"
+  local m_c4=1; _c4_run "${cmut}/c4.sh" defaults && m_c4=0
+  _prove_mutation "co-relay: (C-M4) lendo só o 1º default, role=standalone depois de role=\"source\" passaria — (C4) morde" \
+    "${helper}" "${cmut}/c4.sh" "${c4d}" "${m_c4}"
+  sed 's|^  done <<< "${outs}"$|  done <<< "$(head -1 <<< "${outs}")"|' "${helper}" > "${cmut}/c5.sh"
+  local m_c5=1; _c4_run "${cmut}/c5.sh" outs && m_c5=0
+  _prove_mutation "co-relay: (C-M5) lendo só a 1ª saída, role: standalone depois de role: \${role} passaria — (C4) morde" \
+    "${helper}" "${cmut}/c5.sh" "${c4o}" "${m_c5}"
+  # (C5) achado da passada adversarial: o core num checkout CRLF (core.autocrlf) segue sendo o core → entrega
+  _c5_run() {  # $1 = helper → 0 se entregou
+    core="$(mktemp -d)"; _mk_core "${core}"; sed -i 's/$/\r/' "${core}/.claude/validation/onion-version.sh"
+    grep -q $'^role="source"\r$' "${core}/.claude/validation/onion-version.sh" || { rm -rf "${core}"; return 1; }
+    _c_run "$1" "${d}" "${core}"
+    local ok=1; { [ "${rc}" -eq 0 ] && [ -f "${core}/${SIG}" ]; } && ok=0
+    rm -rf "${core}"; return "${ok}"
+  }
+  local c5=1; _c5_run "${helper}" && c5=0
+  if [ "${c5}" -eq 0 ]; then record_pass "co-relay: (C5) o core num checkout CRLF → entrega (o \\r não vira 'computa source, não source')"
+  else record_fail "co-relay: (C5) core em CRLF recusado" "${c_out}"; fi
+  sed '/^  defaults=/s|; s/\[\[:space:\]\]\*\$//'"'"' \| LC_ALL=C sort -u)"$|'"'"' \| LC_ALL=C sort -u)"|' "${helper}" > "${cmut}/c6.sh"
+  local m_c6=1; _c5_run "${cmut}/c6.sh" && m_c6=0
+  _prove_mutation "co-relay: (C-M6) sem o corte do espaço final no default, o \\r do CRLF faria o core ser recusado — (C5) morde" \
+    "${helper}" "${cmut}/c6.sh" "${c5}" "${m_c6}"
+  rm -rf "${d}" "${cmut}"
 
   # ── F3 (SAC-124): o destino se prova — o core (sem carimbo) ou um hub (carimbo role: hub) ─────────────
   local hubd peer
@@ -22756,15 +22863,20 @@ open(sys.argv[1] + "/vendor/prod/.prod-version", "w").write(json.dumps(d, indent
 
   # ── Achados da passada adversarial (2026-10-20), cada um com o caso e o mutante que o prende ──
   # (V6) o dono SEM carimbo do Onion e sem caixa (o espelho público, por exemplo): antes caía em "sem carimbo
-  #      = o core" e o carteiro criava docs/evolution/inbox/ lá → exit 2, nada criado
-  local own6; own6="$(mktemp -d)"; _mk_owner "${own6}" "alfa" "c1"; rm -rf "${own6}/.claude" "${own6}/docs/evolution"
-  _v_run "${helper}" "${d}" "${own6}"; local rc_v6="${vrc}"
-  if [ "${vrc}" -eq 2 ] && [ ! -e "${own6}/docs/evolution" ]; then record_pass "co-relay: (V6) dono do vendor sem carimbo do Onion e sem caixa → exit 2, não é tratado como o core"
-  else record_fail "co-relay: (V6) dono sem carimbo virou core" "rc=${vrc}"; fi
+  #      = o core" e o carteiro criava docs/evolution/inbox/ lá → exit 2, nada criado, com o DIAGNÓSTICO certo.
+  #      Desde 2026-10-21 a prova do core (C1) também o recusa, então o rc sozinho não prende mais a recusa do
+  #      dono-sem-caixa: o que ela entrega a mais é dizer que o destino É o dono e falta a caixa (o remédio
+  #      certo), em vez de "não é o core". O caso e o mutante cobram a mensagem.
+  local own6 out_v6 v6_i=1 v6_m=1; own6="$(mktemp -d)"; _mk_owner "${own6}" "alfa" "c1"; rm -rf "${own6}/.claude" "${own6}/docs/evolution"
+  vrc=0; out_v6="$( ( cd "${d}" && bash "${helper}" --target "${own6}" ) 2>&1)" || vrc=$?
+  { [ "${vrc}" -eq 2 ] && [ ! -e "${own6}/docs/evolution" ] && grep -q 'é o dono de vendor/prod' <<< "${out_v6}"; } && v6_i=0
+  if [ "${v6_i}" -eq 0 ]; then record_pass "co-relay: (V6) dono do vendor sem carimbo do Onion e sem caixa → exit 2, nada criado, e o diagnóstico é 'o dono não tem caixa'"
+  else record_fail "co-relay: (V6) dono sem carimbo" "rc=${vrc}: ${out_v6}"; fi
   sed '/^elif \[ -n "${VENDOR_OWNER_NO_BOX}" \]; then$/,/^  exit 2$/d' "${helper}" > "${mutd}/m5.sh"
-  rm -rf "${own6}/docs/evolution"; _v_run "${mutd}/m5.sh" "${d}" "${own6}"; local m5="${vrc}"
-  _prove_mutation "co-relay: (V-M5) sem a recusa do dono-sem-caixa, ele cairia como o core — (V6) morde" \
-    "${helper}" "${mutd}/m5.sh" "$([ "${rc_v6}" -eq 2 ] && echo 0 || echo 1)" "$([ "${m5}" -eq 2 ] && echo 0 || echo 1)"
+  rm -rf "${own6}/docs/evolution"; vrc=0; out_v6="$( ( cd "${d}" && bash "${mutd}/m5.sh" --target "${own6}" ) 2>&1)" || vrc=$?
+  { [ "${vrc}" -eq 2 ] && [ ! -e "${own6}/docs/evolution" ] && grep -q 'é o dono de vendor/prod' <<< "${out_v6}"; } && v6_m=0
+  _prove_mutation "co-relay: (V-M5) sem a recusa do dono-sem-caixa, o dono provado ouviria 'não é o core' em vez de 'falta a caixa' — (V6) morde" \
+    "${helper}" "${mutd}/m5.sh" "${v6_i}" "${v6_m}"
   # (V7) o origin do remetente com credencial (`usuário:token@`) não vaza no rodapé do repo alheio
   git -C "${d}" remote add origin "https://u:ghp_SEGREDO1@github.com/acme/sender.git" 2>/dev/null
   _leak() { [ -f "$1" ] && ! grep -q 'ghp_SEGREDO1' "$1" && grep -q 'github.com/acme/sender' "$1"; }

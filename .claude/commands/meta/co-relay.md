@@ -45,7 +45,10 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
 `$ARGUMENTS` = `[<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run]`.
 - `--target <path>` é o **path local do repo core** — **obrigatório** (o adotante não tem `members.yaml`
   para resolver o alvo; o stamp traz `adopted_from` = remote, não path local).
-  **Desde a F3 do configurador A2A** o destino se prova: sem carimbo `.claude/.onion-version` é o core;
+  **Desde a F3 do configurador A2A** o destino se prova. Sem carimbo `.claude/.onion-version`, só é o core
+  se tiver `.claude/validation/onion-version.sh` e ele disser `role: source` (desde 2026-10-21: o helper
+  **lê** o script, não o executa; antes, todo repo git sem carimbo passava como core, e um clone do espelho
+  do kg-ssot ganharia a caixa). Sem o script, ou com ele computando outro papel, recusa com exit 2 e o motivo;
   com carimbo `role: hub` é um hub, e só o filho dele (carimbo `adopted`) relaya para lá; qualquer outro
   carimbo é outro adotante (canal lateral) e o helper recusa com exit 2.
 - **Upstream de VENDOR (desde 2026-10-20, `D_CANAL_UPSTREAM_POR_VENDOR`).** O adotante que vendoriza um

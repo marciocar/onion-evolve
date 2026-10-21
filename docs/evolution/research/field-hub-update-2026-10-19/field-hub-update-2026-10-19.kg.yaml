@@ -139,11 +139,29 @@ nodes:
   - id: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "fechada por E_CO_RELAY_CORE_SE_PROVA (branch fix/co-relay-core-proof): o co-relay recusa em --dry-run o clone do espelho do kg-ssot ('não tem .claude/validation/onion-version.sh') e segue aceitando o core real como CORE; família corelay 46 de 46, com os casos C1 a C5 e seis mutantes"
     label: "o co-relay trata qualquer repo git SEM carimbo .onion-version como o core e cria docs/evolution/inbox/ nele; o destino-core não se prova"
     narrative: "Defeito anterior ao canal de vendor, medido no dogfood dele em 2026-10-20: um clone local defasado do espelho público do kg-ssot (sem a tag 4.12.0, sem carimbo, sem docs/evolution/) passa em --dry-run como alvo CORE, e a entrega criaria a caixa lá. O canal de vendor só fecha o caso em que o destino prova ser o dono (V6 da bancada). A cura é o destino-core se provar (por exemplo, o onion-version.sh que hardcoda role source, ou o members.yaml), e isso muda as fixtures de core da família corelay, que hoje são um git init vazio."
+  - id: E_CO_RELAY_CORE_SE_PROVA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "co-relay.sh desta branch em --dry-run de um remetente descartável (carimbo adopted): contra ⟨o clone local defasado do espelho do kg-ssot, HEAD 146689f⟩ rc 2 com 'não prova ser o core: não tem .claude/validation/onion-version.sh'; contra ⟨o checkout do core⟩ rc 0, 'alvo … (CORE)'. O helper da main, no mesmo remetente, aceitava o clone do espelho como CORE (rc 0). O clone ficou byte a byte como estava"
+    trace: ".claude/utils/co-evolution/co-relay.sh"
+    label: "o destino sem carimbo só é o core se o onion-version.sh dele disser role: source; o co-relay LÊ o script em vez de executá-lo, e recusa com o motivo quando não há script ou ele computa outro papel"
+    narrative: "Executa a cura pedida em Q_CO_RELAY_SEM_CARIMBO_E_O_CORE. O core não tem carimbo estático: o onion-version.sh deriva o papel de um default no nível do arquivo (role=\"source\") que só um carimbo sobrescreve, em linha indentada dentro do if. Como o ramo sem carimbo já sabe que o destino não tem carimbo, a resposta do script é estática, e o helper a lê sem rodar código de outro repo com os privilégios da sessão do remetente. Aceita as duas formas de saída que o script já teve: role: ${role} (desde FED-3-1) e a antiga role: source literal. As fixtures de core da família corelay deixaram de ser um git init vazio (era o defeito escrito como contrato) e passaram a carregar o onion-version.sh real. A recusa do dono-de-vendor-sem-caixa (V6) virou também segunda linha de defesa; o caso e o mutante V-M5 passaram a cobrar o diagnóstico ('é o dono, falta a caixa'), não só o rc. A passada adversarial achou o core em CRLF recusado ('computa source, não source') e dois laços sem caso que os prendesse (2º default, 2ª saída); os três curados com caso e mutante (C4, C5). Limite declarado no helper: a leitura confere a forma do script de hoje, não a semântica de qualquer bash; um script adulterado (reatribuição indentada, echo) e uma cópia byte-idêntica sem carimbo passam como core, e executar não curaria nenhum dos dois."
+    provenance:
+      source: "co-relay.sh e a família corelay de .claude/validation/lint-selftest.sh, branch fix/co-relay-core-proof; o clone local do espelho do kg-ssot e o checkout do core, só leitura"
+      locator: "dry-run: 'ERRO: o destino … não tem carimbo .claude/.onion-version e não prova ser o core: não tem .claude/validation/onion-version.sh'; bancada: (C1) a (C5) e os mutantes (C-M1) a (C-M6)"
+      method: "medição: o helper da branch e o da main em --dry-run contra os dois alvos reais, e a bancada com mutante por decisão"
+      locality: "host"
   - id: Q_U1_FASE2_MIGRACAO_CONDUZIDA
     node_type: question
     plane: DEV
@@ -188,6 +206,9 @@ edges:
   - from: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE
     to: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
     edge_type: TRACES_TO
+  - from: E_CO_RELAY_CORE_SE_PROVA
+    to: Q_CO_RELAY_SEM_CARIMBO_E_O_CORE
+    edge_type: SUPPORTS
   - from: E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY
     to: E_U1_SINAL_MIGRACAO_CORPUS_V4
     edge_type: TRACES_TO
