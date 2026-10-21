@@ -574,6 +574,7 @@
 .claude/validation/lint-selftest.sh	C_OS_TESTES_DO_BYTECODE_EXISTEM	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+.claude/validation/lint-selftest.sh	C_TRAVA_POR_BINARIO_EXTERNO_PERDE_ATOMICIDADE_NA_IMAGEM	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_offline_csp	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml

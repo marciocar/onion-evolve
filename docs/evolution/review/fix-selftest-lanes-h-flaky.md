@@ -3,7 +3,8 @@ title: "Revisão — o (h) da selftest_lanes caía no CI porque o mkdir do uutil
 date: 2026-10-20
 branch: fix/selftest-lanes-h-flaky
 reviewer: "duas passadas adversariais com lentes distintas (maquinaria/shell · o artefato mente?), cada uma medindo em scratch próprio; todo achado re-medido pelo condutor antes de entrar"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 855df22b21309559857e3acddfa68fa0899d8ac16285e58b3d10756254f7e5a7
+reviewed_code_sha256: dcd7ad00cdc6bf802175847ece5dfe5cf684f49366765ff5e010a3fdcab9f430
 findings_total: 10
 findings_real: 8
 verdict: APROVADO
