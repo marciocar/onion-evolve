@@ -6,7 +6,7 @@
 // O caso pode ser .kg.yaml (ou .yaml) ou .kg.json. Os schemas MUST e SHOULD do contrato vigente são lidos de spec/
 // a cada execução, sem cópia, e compilados pelo ajv; com --precompiled e --precompiled-should, os validadores vêm de
 // módulos gerados por standalone.mjs (ajv/dist/standalone), sem compilar nada em tempo de execução. --corpus DIR
-// liga a conferência da ponta externa das external_edges contra os .kg.yaml sob DIR (vazio: o caso não é de corpus).
+// liga a conferência da ponta externa das external_edges contra os .kg.yaml e .kg.json sob DIR (vazio: o caso não é de corpus).
 // warnings são os avisos SHOULD, como os da referência.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -34,10 +34,11 @@ export async function compileMust(schema = CONTRACT_MUST) {
 
 export const compileShould = () => compileMust(CONTRACT_SHOULD);
 
-// Os .kg.yaml do corpus: os rastreados, se DIR é repo git (como o gate); senão, todo .kg.yaml sob DIR (corpus_index).
+// Os grafos do corpus (.kg.yaml e, desde o v4.7, .kg.json): os rastreados, se DIR é repo git (como o gate); senão, todo
+// grafo sob DIR (corpus_index).
 function corpusFiles(root) {
   try {
-    const out = execFileSync('git', ['-C', root, 'ls-files', '-z', '--', '*.kg.yaml'], { stdio: ['ignore', 'pipe', 'ignore'] });
+    const out = execFileSync('git', ['-C', root, 'ls-files', '-z', '--', '*.kg.yaml', '*.kg.json'], { stdio: ['ignore', 'pipe', 'ignore'] });
     return out.toString('utf8').split('\0').filter(Boolean);
   } catch {
     const found = [];
@@ -46,7 +47,7 @@ function corpusFiles(root) {
         if (ent.name === '.git') continue;
         const p = join(dir, ent.name);
         if (ent.isDirectory()) walk(p);
-        else if (ent.name.endsWith('.kg.yaml')) found.push(relative(root, p).split(sep).join('/'));
+        else if (ent.name.endsWith('.kg.yaml') || ent.name.endsWith('.kg.json')) found.push(relative(root, p).split(sep).join('/'));
       }
     };
     walk(root);

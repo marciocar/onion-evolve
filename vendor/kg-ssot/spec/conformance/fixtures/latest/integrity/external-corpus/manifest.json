@@ -58,6 +58,45 @@
       "valid": true,
       "codes": [],
       "corpus": "."
+    },
+    {
+      "file": "alvo-json.kg.json",
+      "description": "o grafo-alvo em .kg.json (v4.7); válido sozinho",
+      "valid": true,
+      "codes": [],
+      "corpus": "."
+    },
+    {
+      "file": "valid-corpus-target-json.kg.yaml",
+      "description": "a ponta externa num .kg.json: o arquivo e o id existem no corpus (v4.7)",
+      "valid": true,
+      "codes": [],
+      "corpus": "."
+    },
+    {
+      "file": "bad-corpus-target-json-id-missing.kg.yaml",
+      "description": "o .kg.json existe no corpus, o id não (v4.7)",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-external"
+      ],
+      "corpus": "."
+    },
+    {
+      "file": "valid-corpus-json-to-json.kg.json",
+      "description": "um .kg.json que aponta para outro .kg.json (v4.7)",
+      "valid": true,
+      "codes": [],
+      "corpus": "."
+    },
+    {
+      "file": "bad-corpus-json-only-yaml-exists.kg.yaml",
+      "description": "a referência a alvo.kg.json quando só existe alvo.kg.yaml: a extensão não se normaliza (v4.7)",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-external"
+      ],
+      "corpus": "."
     }
   ]
 }

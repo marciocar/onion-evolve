@@ -105,7 +105,7 @@ Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `
 
 | Código | Quando reprova |
 |---|---|
-| `form.pattern.top.external_edges.to` (ou `.from`) | as duas pontas externas, as duas locais, ou a referência fora da forma (caminho absoluto, sem `.kg.yaml#`) |
+| `form.pattern.top.external_edges.to` (ou `.from`) | as duas pontas externas, as duas locais, ou a referência fora da forma (caminho absoluto, sem `.kg.yaml#` nem `.kg.json#`) |
 | `form.enum.top.external_edges.edge_type` | tipo fora dos seis (os da camada domain não cruzam grafos) |
 | `integrity.dangling-external-local` | a ponta local não existe neste arquivo |
 | `integrity.dangling-external` | **com o corpus**: o arquivo ou o id da ponta externa não existe |
@@ -196,7 +196,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 328 casos contra o contrato v4, 30 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 349 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito

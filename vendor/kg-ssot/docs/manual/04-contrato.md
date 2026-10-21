@@ -52,7 +52,7 @@ As versões menores da linha 4 acrescentaram sem mudar o veredito MUST de um gra
 registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções raras do YAML (o perfil estrito), e foram menores
 porque nenhum dos grafos reais medidos em quatro repos adotantes mudou de veredito. Mesmo assim, contam como MUST novo
 para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem rótulo próprio
-(v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0), que não é o número da release.
+(v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -69,6 +69,8 @@ para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.
 | 4.11 | Contrato v4.4: o aviso `integrity.refutes-unreconciled` e o perfil YAML estrito em três construções raras (MUST novo) |
 | 4.12 | Contrato v4.5: `verified_scope`, `locality: privado`, a `REFUTES` externa contando com o corpus e o tab no começo de continuação entre aspas (MUST novo) |
 | 4.13 | Contrato v4.6: a continuação entre aspas mais indentada que a coleção dona (MUST novo) e o `\r` como quebra de linha no leitor JS; na 4.13.1, a identidade do contrato acusa a versão que só o leitor muda, e o migrador lê o corpus do gate |
+| 4.14 | Contrato v4.7: a ponta externa pode ser um `.kg.json`; o armazém grava um conjunto de grafos de uma vez (`write_many`) |
+| 4.15 | Contrato v4.8: a cadência da verificação (`reverify_every`, `reverify_on`), a retenção (`retain_for`), o `owner` como papel e o relatório de vencimento (`kg_validate.py --due`), fora do veredito |
 
 ## Versões e tags
 

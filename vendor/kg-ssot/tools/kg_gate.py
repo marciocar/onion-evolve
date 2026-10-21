@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.
 
-A ponta externa das external_edges (v4.3) é conferida contra TODOS os .kg.yaml rastreados, inclusive os excluídos do
-corpus: alvo inexistente ou apagado reprova quem aponta (integrity.dangling-external).
+A ponta externa das external_edges (v4.3) é conferida contra TODOS os .kg.yaml e .kg.json rastreados, inclusive os
+excluídos do corpus: alvo inexistente ou apagado reprova quem aponta (integrity.dangling-external). O .kg.json é alvo
+desde o v4.7.
 
-Um .kg.json no repo fica fora do gate: a 4.8.0 lê .kg.json no kg_validate, no armazém e no MCP, mas o gate e as
-external_edges seguem só com .kg.yaml.
+Um .kg.json no repo fica fora da medição do gate: a 4.8.0 lê .kg.json no kg_validate, no armazém e no MCP, e o gate
+mede só os .kg.yaml.
 
 Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/* e docs/materials/*, os
 excluídos padrão, ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
@@ -97,9 +98,9 @@ def corpus(repo, exclude=DEFAULT_EXCLUDE):
 
 
 def tracked_graphs(repo):
-    """Todos os .kg.yaml rastreados, sem os filtros do corpus: é contra eles que a ponta externa é conferida (um alvo
-    num grafo excluído do gate continua sendo alvo válido)."""
-    out = subprocess.run(["git", "-C", str(repo), "ls-files", "-z", "--", "*.kg.yaml"], capture_output=True)
+    """Todos os .kg.yaml e .kg.json rastreados, sem os filtros do corpus: é contra eles que a ponta externa é conferida
+    (um alvo num grafo excluído do gate continua sendo alvo válido; desde o v4.7, o alvo pode ser um .kg.json)."""
+    out = subprocess.run(["git", "-C", str(repo), "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json"], capture_output=True)
     if out.returncode != 0:
         raise Broken(f"{repo} não é um repositório git: {out.stderr.decode('utf-8', 'replace').strip()[:200]}")
     return [n for n in out.stdout.decode("utf-8").split("\0") if n and (pathlib.Path(repo) / n).is_file()]

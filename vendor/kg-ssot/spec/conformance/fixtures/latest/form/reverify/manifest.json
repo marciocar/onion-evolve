@@ -1,0 +1,118 @@
+{
+  "description": "As chaves da verificação no nó (v4.8): reverify_every, a cadência em duração ISO 8601 só com data; reverify_on, o gatilho por evento; retain_for, a retenção. O valor é julgado pelo SHOULD, e o vencimento não entra no veredito.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-reverify-fields.kg.yaml",
+      "description": "a cadência, o gatilho por evento e a retenção, com o carimbo (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-reverify-every-weeks-and-combined.kg.yaml",
+      "description": "duração com ano, mês, semana e dia (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-reverify-on-alone.kg.yaml",
+      "description": "o gatilho por evento sozinho não pede carimbo (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-reverify-every-free-text.kg.yaml",
+      "description": "a cadência em texto livre: só a duração ISO 8601 (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.reverify_every"
+      ]
+    },
+    {
+      "file": "warn-reverify-every-with-time.kg.yaml",
+      "description": "duração com hora: a cadência é só de data (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.reverify_every"
+      ]
+    },
+    {
+      "file": "warn-reverify-every-bare-p.kg.yaml",
+      "description": "P sem nenhum componente (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.reverify_every"
+      ]
+    },
+    {
+      "file": "warn-reverify-every-integer.kg.yaml",
+      "description": "número em vez de duração (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.reverify_every"
+      ]
+    },
+    {
+      "file": "warn-reverify-every-without-verified-at.kg.yaml",
+      "description": "a cadência conta do carimbo: sem verified_at, alerta (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.verified_at"
+      ]
+    },
+    {
+      "file": "warn-retain-for-free-text.kg.yaml",
+      "description": "a retenção em texto livre (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.retain_for"
+      ]
+    },
+    {
+      "file": "warn-reverify-on-empty.kg.yaml",
+      "description": "gatilho vazio (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.reverify_on"
+      ]
+    },
+    {
+      "file": "warn-reverify-every-lowercase.kg.yaml",
+      "description": "a duração é em maiúsculas (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.reverify_every"
+      ]
+    },
+    {
+      "file": "warn-reverify-every-zero.kg.yaml",
+      "description": "cadência zerada: venceria no próprio dia do carimbo, para sempre (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.reverify_every"
+      ]
+    },
+    {
+      "file": "warn-retain-for-zero.kg.yaml",
+      "description": "retenção zerada (v4.8)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.retain_for"
+      ]
+    }
+  ]
+}

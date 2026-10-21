@@ -205,7 +205,7 @@ def schema_help():
                                 "format: json; kg_write lê pela extensão do nome."},
             "integrity": ["um único documento (YAML, ou um objeto JSON no .kg.json), com a raiz em mapa",
                           "ids de nó únicos; toda aresta liga dois ids que existem; nenhum nó fica sem aresta",
-                          "a ponta externa (outro.kg.yaml#ID) tem de existir no armazém",
+                          "a ponta externa (outro.kg.yaml#ID ou outro.kg.json#ID) tem de existir no armazém",
                           "datas entre aspas (\"2026-10-13\"), nunca soltas"],
             "example": example,
             "hints": dict(sorted(kg_validate.HINTS.items())),

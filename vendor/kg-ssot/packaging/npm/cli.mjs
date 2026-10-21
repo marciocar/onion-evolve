@@ -5,7 +5,7 @@
 //
 // rc 0 quando todos passam no MUST, 1 quando algum reprova, 2 com entrada quebrada (arquivo ilegível, UTF-8
 // inválido). Os avisos SHOULD saem numa linha AVISO e não mudam o rc. --json imprime uma linha JSON por arquivo, no contrato de runner da suíte. --corpus confere a ponta
-// externa das external_edges contra os .kg.yaml sob DIR.
+// externa das external_edges contra os .kg.yaml e .kg.json sob DIR.
 import { readFileSync } from 'node:fs';
 
 import { verdict } from './index.mjs';
