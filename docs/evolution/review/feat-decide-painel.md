@@ -2,7 +2,8 @@
 branch: feat/decide-painel
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8f1a4130e2c32f0ff85d183b3615f853316547bc97f49933242805a6f737a863
+reviewed_code_sha256: 0cabf10d45b722b7fb035e413bffe2306c823d0e2ad1059ea82a89dd9b7b8ebc
 findings_total: 8
 findings_real: 6
 tokens: 118601
