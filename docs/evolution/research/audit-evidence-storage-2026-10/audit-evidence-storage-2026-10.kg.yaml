@@ -44,7 +44,7 @@ nodes:
   - id: Q_AUDIT_EVIDENCE_STORAGE_2026_10
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.5
     label: "Onde deve morar o estado da evidência de auditoria contínua (controles, evidências, frescor, achados) em outubro de 2026: grafo YAML em git com OSCAL na borda, OSCAL como armazenamento nativo, ou banco relacional do produto?"
@@ -52,6 +52,8 @@ nodes:
       Pergunta do run /onion-research em modo decisão de 2026-10-21, pedida pelo maestro ao selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 (grafo audit-evidence-machinery-2026-10) como «pesquisar mais fornecedores antes de selar». Pediu-se ampliar além do Lula v2 (único git-nativo medido): Vanta, Drata, Secureframe, Sprinto, Thoropass, Hyperproof, RegScale, Paramify, Anecdotes, Chef InSpec/Progress, OpenSSF/Gemara, CNCF/OSCAL Compass (trestle, c2p, agent), Kyverno/OPA policy reports e GRC-as-code em geral. Para cada um: onde o estado mora, se OSCAL é armazenamento ou borda, se há trilha auditável por versionamento (git/WORM) e como o auditor consome. Eixo invariante: mercado e capital.
       Resposta parcial (não fechada): o padrão «OSCAL é borda» tem agora apoio de vários fornecedores (Vanta, Gemara, complyctl, C2P, Lula v2); a metade «git guarda TODO o estado» não se sustenta sem restrições (população externa, WORM, volume de resultados). Cobertura dos fornecedores pedidos: Hyperproof, Secureframe, Thoropass, Anecdotes, Sprinto e Chef InSpec ficaram sem classificação; Paramify só com um sinal de busca.
     trace: "run /onion-research modo decision de 2026-10-21; decisão de origem D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021"
+    verified_at: "2026-10-21"
+    verified_against: "respondida em 2026-10-21: D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021 selada pelo maestro como B (escopo dividido) no PR #1254"
 
   # ─── Evidências CONFIRMADAS (20, votação 3-0 cada) ──────────────────────────────────────────
 
