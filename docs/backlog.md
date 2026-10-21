@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**610 itens abertos** em 117 grafo(s) com aberto (de 150 no escopo) · 118 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**606 itens abertos** em 117 grafo(s) com aberto (de 150 no escopo) · 118 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -539,27 +539,6 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## adopter-shape-bench-2026-10 — 16 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 21.6 | `D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA` | adopter-shape-bench-2026-10 | O fechamento leva vendor/kg-ssot INTEIRO (316 arquivos, 1,9 MB) para todo papel menos o mini, e não um recorte de tools/ e spec/: |
-| 20.4 | `D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR` | adopter-shape-bench-2026-10 | Substrato: família de bancada (adopter_shape) com um materializador core-only (ops/materialize-adopter.sh). Molde: door_mini com  |
-| 19.2 | `Q_CURAS_DO_PR2` | adopter-shape-bench-2026-10 | Aberto para o PR 2 da SAC-149: aplicabilidade por papel declarada no rules-registry (as REGRAS 85 e 92 saem 'não se aplica'); a R |
-| 17.0 | `D_APLICABILIDADE_POR_PAPEL_DECLARADA` | adopter-shape-bench-2026-10 | PR 2: a regra sem objeto num papel DECLARA '# aplica-se:' no docstring; fora dele o lint não a roda e a conta como 'NÃO SE APLIC |
-| 10.2 | `D_PIN_COM_ESCRITOR_UNICO` | adopter-shape-bench-2026-10 | PR 2: o pin do grafo de adoção tem o escritor do carimbo. O write-stamp.sh chama utils/kg/stamp-adoption-graph-pin.sh ao fim de  |
-| 5.1 | `C_TETO_CONTRATO_SEM_DEPENDENCIAS_PYTHON` | adopter-shape-bench-2026-10 | TETO: numa máquina sem PyYAML e jsonschema o kg-contract-check segue saindo rc 2, e a família só mede onde eles existem. O temp |
-| 5.1 | `C_TETO_SO_O_PAPEL_ADOPTED` | adopter-shape-bench-2026-10 | TETO: a família mede o papel adopted, o mais comum. hub e standalone cortam diferente (o standalone perde adoção e federação) |
-| 4.8 | `C_TETO_DETECTOR_E_LEXICAL` | adopter-shape-bench-2026-10 | TETO: o detector de 'não pude julgar' é LEXICAL (uma lista de frases) e só vê dependência citada pelo CAMINHO ou pelo nome do |
-| 4.8 | `C_TETO_PASSOS_COPIADOS_DO_ADOPT` | adopter-shape-bench-2026-10 | TETO: o materializador copia os passos DETERMINÍSTICOS do adopt.md, numa lista dele. Passo novo no procedimento (que é markdown) |
-| 4.8 | `D_REGRA_100_NAS_MENSAGENS` | adopter-shape-bench-2026-10 | PR 2: a REGRA 100 passa a julgar o ops/ que uma violation IMPRIME: o teste de presença em OUTRA linha do arquivo não a isenta ma |
-| 3.4 | `C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO` | adopter-shape-bench-2026-10 | TETO declarado: o *.env de trabalho que a sessão grava no scratchpad segue VETADO na leitura. A cura segura precisaria saber que  |
-| 3.2 | `C_TETO_GITIGNORE_DO_USUARIO` | adopter-shape-bench-2026-10 | TETO: um .gitignore local que o usuário nunca commitou entra INTEIRO no commit da adoção, com as linhas dele; e no .gitignore j |
-| 3.0 | `C_TETO_GO_VENDOR_NAO_MEDIDO` | adopter-shape-bench-2026-10 | NÃO MEDIDO: num projeto Go, um vendor/kg-ssot pode ativar o -mod=vendor e quebrar o build, e o go mod vendor pode apagá-lo. Sem  |
-| 2.8 | `C_TETO_BUNDLE_DE_PLUGIN` | adopter-shape-bench-2026-10 | TETO: o bundle de plugin (onion.manifest.sh) também leva o kg-contract-check.sh e não leva vendor/kg-ssot. Lá o selador do /met |
-| 2.8 | `C_TETO_VENDOR_PROPRIO_IGNORADO` | adopter-shape-bench-2026-10 | TETO: um vendor/kg-ssot PRÓPRIO do alvo e ignorado de propósito também seria forçado no commit da adoção. Nenhum adotante me |
-| 2.0 | `Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO` | adopter-shape-bench-2026-10 | Aberto: de onde veio o bloco da prova do gate impresso 3 vezes e com aspas escapadas no update do adotante? Os scripts o imprimem  |
-
 ## guardas-revisao-2026-08 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1038,6 +1017,23 @@
 |--:|---|---|---|
 | 5.4 | `Q_MERGE_VERIFICADO_EM_REPO_SEM_CI` | guard-pre-push-2026-10 | LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). R |
 | 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
+
+## adopter-shape-bench-2026-10 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.1 | `C_TETO_CONTRATO_SEM_DEPENDENCIAS_PYTHON` | adopter-shape-bench-2026-10 | TETO: numa máquina sem PyYAML e jsonschema o kg-contract-check segue saindo rc 2, e a família só mede onde eles existem. O temp |
+| 5.1 | `C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO` | adopter-shape-bench-2026-10 | TETO declarado: o *.env de trabalho que a sessão grava no scratchpad segue VETADO na leitura. A cura segura precisaria saber que  |
+| 5.1 | `C_TETO_SO_O_PAPEL_ADOPTED` | adopter-shape-bench-2026-10 | TETO: a família mede o papel adopted, o mais comum. hub e standalone cortam diferente (o standalone perde adoção e federação) |
+| 4.8 | `C_TETO_DETECTOR_E_LEXICAL` | adopter-shape-bench-2026-10 | TETO: o detector de 'não pude julgar' é LEXICAL (uma lista de frases) e só vê dependência citada pelo CAMINHO ou pelo nome do |
+| 4.8 | `C_TETO_PASSOS_COPIADOS_DO_ADOPT` | adopter-shape-bench-2026-10 | TETO: o materializador copia os passos DETERMINÍSTICOS do adopt.md, numa lista dele. Passo novo no procedimento (que é markdown) |
+| 3.6 | `Q_ENV_SCRATCHPAD_ISENCAO_SEGURA` | adopter-shape-bench-2026-10 | Aberto (sobra da Q_CURAS_DO_PR2): como isentar do veto do .env o *.env de trabalho que a sessão gravou no scratchpad, sem reabrir |
+| 3.2 | `C_TETO_GITIGNORE_DO_USUARIO` | adopter-shape-bench-2026-10 | TETO: um .gitignore local que o usuário nunca commitou entra INTEIRO no commit da adoção, com as linhas dele; e no .gitignore j |
+| 3.0 | `C_TETO_GO_VENDOR_NAO_MEDIDO` | adopter-shape-bench-2026-10 | NÃO MEDIDO: num projeto Go, um vendor/kg-ssot pode ativar o -mod=vendor e quebrar o build, e o go mod vendor pode apagá-lo. Sem  |
+| 3.0 | `Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO` | adopter-shape-bench-2026-10 | Aberto: de onde veio o bloco da prova do gate impresso 3 vezes e com aspas escapadas no update do adotante? Os scripts o imprimem  |
+| 2.8 | `C_TETO_BUNDLE_DE_PLUGIN` | adopter-shape-bench-2026-10 | TETO: o bundle de plugin (onion.manifest.sh) também leva o kg-contract-check.sh e não leva vendor/kg-ssot. Lá o selador do /met |
+| 2.8 | `C_TETO_HUB_COM_REGISTRO_PROPRIO` | adopter-shape-bench-2026-10 | TETO: a REGRA 92 é source-only também no hub. Um hub com members.yaml próprio deixa de ter a paridade registro×carimbo julgada |
+| 2.8 | `C_TETO_VENDOR_PROPRIO_IGNORADO` | adopter-shape-bench-2026-10 | TETO: um vendor/kg-ssot PRÓPRIO do alvo e ignorado de propósito também seria forçado no commit da adoção. Nenhum adotante me |
 
 ## kg-id-valid-from-2026-10 — 2 item(ns)
 

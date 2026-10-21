@@ -2,7 +2,7 @@
 branch: docs/reconcile-adopter-shape-pr2
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: 1821693a62bd68c2a688507e89cae2a21386e4124f4ca394424e18c7d6554365
+reviewed_diff_sha256: 0732cb1172f4920d608d8830d7f3b942e546f772de15d529a655a8041986b7a2
 reviewed_code_sha256: 496c1a66308a902eeeb073b196ccc15480ff9bbcd9936ad0d8126cff4d8900d5
 findings_total: 7
 findings_real: 4
