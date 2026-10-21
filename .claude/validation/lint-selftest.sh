@@ -40934,7 +40934,9 @@ _family run_remeasure_contract_selftests
 # perfil; (c) dívida com perfil = o plano no relatório (por ação, recusados pelo contrato, o universo igual ao da
 # medição, fixtures e kg-inbox arquivado fora) e NADA escrito no alvo (sha256 de toda a árvore igual, git status
 # --ignored vazio, sem __pycache__); (d) sem kg_migrate.py no vendor = NÃO MEDIDO; (e) perfil fora do schema, dois
-# perfis e planilha dentro do alvo = NÃO MEDIDO; (f) um migrador que ESCREVE é pego pela foto do próprio helper (rc 5).
+# perfis e planilha dentro do alvo = NÃO MEDIDO; (f) um migrador que ESCREVE é pego pela foto do próprio helper (rc 5),
+# também sem sha256sum no PATH; (g) TMPDIR dentro do alvo; (h) planilha-symlink para dentro do alvo; (i) universos
+# que divergem, conferidos por identidade (os quatro últimos vêm da passada adversarial de 2026-10-21).
 # (m) UM MUTANTE POR CURA, na cópia do helper, inclusive o que troca o plan pelo apply.
 run_plan_contract_migration_selftests() {
   local sut="${REPO_ROOT}/.claude/utils/adopt/plan-contract-migration.sh"
@@ -40980,13 +40982,13 @@ run_plan_contract_migration_selftests() {
     t1="$(_pm_tree "${d}/com-perfil")"
     [ "${r}" -eq 0 ] && grep -q 'MIGRAÇÃO planejada (dry-run' <<< "${o}" && grep -q 'com o perfil .kg-ssot/migrate-profile.yaml' <<< "${o}" \
       && grep -q '3 nó(s) no plano: 2 com provenance proposta · 0 rebaixado(s) para unverifiable · 1 sem proposta' <<< "${o}" \
-      && grep -q 'recusados pelo contrato: 1' <<< "${o}" && grep -q 'o plano cobre os 3 nó(s)' <<< "${o}" \
+      && grep -q 'recusados pelo contrato: 1' <<< "${o}" && grep -q 'o plano cobre, nó a nó, os 3 nó(s)' <<< "${o}" \
       && grep -q "planilha: ${d}/out-c/kg-migrate-plan.tsv" <<< "${o}" && [ "$(grep -c 'docs/g/b.kg.yaml' "${d}/out-c/kg-migrate-plan.tsv" 2>/dev/null)" = "3" ] \
-      && grep -q 'Nada foi escrito no alvo' <<< "${o}" && grep -q "kg_migrate.py apply --profile .kg-ssot/migrate-profile.yaml --exclude '\*\*/fixtures/\*\*'" <<< "${o}" \
-      && [ "${t0}" = "${t1}" ] && [ -z "$(_pm_git "${d}/com-perfil" status --porcelain --ignored 2>/dev/null)" ] \
+      && grep -q 'Nada rastreado nem não rastreado do alvo mudou' <<< "${o}" && grep -qF 'kg_migrate.py apply --profile .kg-ssot/migrate-profile.yaml --exclude \*/\*\*/fixtures/\*\* --exclude docs/materials/\*\*' <<< "${o}" \
+      && [ "${t0}" = "${t1}" ] && [ "$(_pm_git "${d}/com-perfil" status --porcelain --ignored 2>/dev/null)" = '!! segredo.local' ] \
       && [ -z "$(find "${d}/com-perfil" -name __pycache__ 2>/dev/null)" ] && ok="${ok} c"
     find "${d}/com-perfil" -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null
-    _pm_git "${d}/com-perfil" checkout -q -- . 2>/dev/null; _pm_git "${d}/com-perfil" clean -qfdx 2>/dev/null
+    _pm_git "${d}/com-perfil" checkout -q -- . 2>/dev/null; _pm_git "${d}/com-perfil" clean -qfd 2>/dev/null
     r=0; o="$(bash "${s}" "${d}/sem-migrador" --out-dir "${d}/out-d" 2>&1)" || r=$?
     [ "${r}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o vendor do alvo (kg-ssot .*) não traz o tools/kg_migrate.py' <<< "${o}" \
       && grep -q '3 nó(s) seguem na dívida MUST' <<< "${o}" && ok="${ok} d"
@@ -41000,7 +41002,31 @@ run_plan_contract_migration_selftests() {
     rm -rf "${d}/com-perfil/planilha"
     _pm_git "${d}/escreve" checkout -q -- . 2>/dev/null
     r=0; o="$(bash "${s}" "${d}/escreve" --out-dir "${d}/out-f" 2>&1)" || r=$?
-    [ "${r}" -eq 5 ] && grep -q 'o alvo MUDOU durante o plan' <<< "${o}" && ok="${ok} f"
+    # e sem sha256sum no PATH (o macOS não o tem): a foto é do Python e continua vendo a escrita
+    _pm_git "${d}/escreve" checkout -q -- . 2>/dev/null
+    r1=0; o1="$(env PATH="${d}/bin" "${d}/bin/bash" "${s}" "${d}/escreve" --out-dir "${d}/out-f2" 2>&1)" || r1=$?
+    [ "${r}" -eq 5 ] && grep -q 'o alvo MUDOU durante o plan' <<< "${o}" && [ "${r1}" -eq 5 ] && grep -q 'o alvo MUDOU' <<< "${o1}" && ok="${ok} f"
+    _pm_git "${d}/escreve" checkout -q -- . 2>/dev/null
+    # (g) TMPDIR dentro do alvo, sem --out-dir: recusado antes de qualquer mktemp (nada nasce na pasta)
+    mkdir -p "${d}/com-perfil/tmpdentro"
+    r=0; o="$(TMPDIR="${d}/com-perfil/tmpdentro" bash "${s}" "${d}/com-perfil" 2>&1)" || r=$?
+    [ "${r}" -eq 3 ] && grep -q 'o TMPDIR (.*) fica dentro do alvo' <<< "${o}" && [ -z "$(ls -A "${d}/com-perfil/tmpdentro")" ] && ok="${ok} g"
+    rm -rf "${d}/com-perfil/tmpdentro"
+    # (h) a planilha pré-existente é um SYMLINK para um arquivo ignorado do alvo: apagada, nunca seguida
+    rm -rf "${d}/out-h"; mkdir -p "${d}/out-h"; ln -s "${d}/com-perfil/segredo.local" "${d}/out-h/kg-migrate-plan.tsv"
+    r=0; o="$(bash "${s}" "${d}/com-perfil" --out-dir "${d}/out-h" 2>&1)" || r=$?
+    [ "${r}" -eq 0 ] && [ "$(cat "${d}/com-perfil/segredo.local")" = "segredo" ] && [ ! -L "${d}/out-h/kg-migrate-plan.tsv" ] \
+      && [ -s "${d}/out-h/kg-migrate-plan.tsv" ] && ok="${ok} h"
+    # (i) universos que divergem: grafo em vendor/outra (a fase 1 mede, o migrador sempre exclui) e fixtures/ na RAIZ
+    #     (fora do */fixtures/* da fase 1, logo dentro dos dois): o nó da dívida fora do plano sai listado, por nome
+    rm -rf "${d}/out-i"
+    r=0; o="$(bash "${s}" "${d}/universo" --out-dir "${d}/out-i" 2>&1)" || r=$?
+    [ "${r}" -eq 0 ] && grep -q '6 nó(s) no plano' <<< "${o}" && grep -q '3 nó(s) da dívida MUST fora do plano, 0 no plano fora da dívida' <<< "${o}" \
+      && grep -q 'fora do plano: vendor/outra/x.kg.yaml · C_A — vendor/\*\*' <<< "${o}" && ! grep -q 'fora do plano: fixtures/' <<< "${o}" && ok="${ok} i"
+    # (j) identidade sem falso "fora do plano": id repetido num grafo (2 ocorrências dos dois lados) e grafo por symlink
+    rm -rf "${d}/out-j"
+    r=0; o="$(bash "${s}" "${d}/identidade" --out-dir "${d}/out-j" 2>&1)" || r=$?
+    [ "${r}" -eq 0 ] && grep -q 'o plano cobre, nó a nó' <<< "${o}" && ! grep -q 'fora do plano' <<< "${o}" && ok="${ok} j"
     printf '%s' "${ok}"
   }
   _pm_target "${d}/passa"; _pm_ok "${d}/passa/docs/g/a.kg.yaml" fx-a; _pm_commit "${d}/passa"
@@ -41010,7 +41036,20 @@ run_plan_contract_migration_selftests() {
   _pm_target "${d}/com-perfil"; _pm_ok "${d}/com-perfil/docs/g/a.kg.yaml" fx-a; _pm_bad "${d}/com-perfil/docs/g/b.kg.yaml" fx-b
   mkdir -p "${d}/com-perfil/docs/fixtures" "${d}/com-perfil/docs/evolution/kg-inbox/_sealed" "${d}/com-perfil/.kg-ssot"
   _pm_bad "${d}/com-perfil/docs/fixtures/f.kg.yaml" fx-f; _pm_bad "${d}/com-perfil/docs/evolution/kg-inbox/_sealed/p.kg.yaml" fx-p
-  _pm_profile "${d}/com-perfil/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/com-perfil"
+  _pm_profile "${d}/com-perfil/.kg-ssot/migrate-profile.yaml"; printf '*.local\n' > "${d}/com-perfil/.gitignore"; _pm_commit "${d}/com-perfil"
+  printf 'segredo' > "${d}/com-perfil/segredo.local"
+  _pm_target "${d}/universo"; _pm_bad "${d}/universo/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/universo/vendor/outra" "${d}/universo/fixtures" "${d}/universo/.kg-ssot"
+  _pm_bad "${d}/universo/vendor/outra/x.kg.yaml" fx-v; _pm_bad "${d}/universo/fixtures/root.kg.yaml" fx-r
+  _pm_profile "${d}/universo/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/universo"
+  _pm_target "${d}/identidade"; mkdir -p "${d}/identidade/docs/g2" "${d}/identidade/.kg-ssot"; _pm_bad "${d}/identidade/docs/g2/real.kg.yaml" fx-real
+  ln -s g2/real.kg.yaml "${d}/identidade/docs/link.kg.yaml"
+  printf 'meta:\n  id: fx-dup\n  schema_version: "1"\n  baseline: "2026-10-20"\nnodes:\n  - id: C_DUP\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    label: "primeira"\n  - id: C_DUP\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    label: "repetida"\nedges:\n  - from: C_DUP\n    to: C_DUP\n    edge_type: SUPPORTS\n' > "${d}/identidade/docs/g/dup.kg.yaml"
+  _pm_profile "${d}/identidade/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/identidade"
+  # um PATH sem sha256sum, com o resto do que o helper e a fase 1 chamam
+  mkdir -p "${d}/bin"; local _c
+  for _c in bash env git python3 sed head tail mktemp rm mkdir cut grep paste ls dirname cat tr sort find xargs; do
+    command -v "${_c}" >/dev/null 2>&1 && ln -sf "$(command -v "${_c}")" "${d}/bin/${_c}"
+  done
   _pm_target "${d}/sem-migrador"; _pm_bad "${d}/sem-migrador/docs/g/b.kg.yaml" fx-b; rm -f "${d}/sem-migrador/vendor/kg-ssot/tools/kg_migrate.py"; _pm_commit "${d}/sem-migrador"
   _pm_target "${d}/perfil-quebrado"; _pm_bad "${d}/perfil-quebrado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado/.kg-ssot"
   printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/perfil-quebrado"
@@ -41033,6 +41072,14 @@ run_plan_contract_migration_selftests() {
     *) record_fail "plan-contract-migration: (e)" "$(bash "${sut}" "${d}/perfil-quebrado" 2>&1 | head -2 | tr '\n' '|')" ;; esac
   case " ${got} " in *" f "*) record_pass "plan-contract-migration: (f) migrador que escreve no alvo → rc 5 'o alvo MUDOU' (a foto antes/depois do próprio helper)" ;;
     *) record_fail "plan-contract-migration: (f)" "$(bash "${sut}" "${d}/escreve" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" g "*) record_pass "plan-contract-migration: (g) TMPDIR dentro do alvo → rc 3 antes de qualquer mktemp, nada nasce nele" ;;
+    *) record_fail "plan-contract-migration: (g)" "TMPDIR dentro do alvo não foi recusado limpo" ;; esac
+  case " ${got} " in *" h "*) record_pass "plan-contract-migration: (h) planilha pré-existente que é symlink para arquivo ignorado do alvo → apagada, nunca seguida (o arquivo do alvo intacto)" ;;
+    *) record_fail "plan-contract-migration: (h)" "o symlink da planilha foi seguido ou o plano não saiu" ;; esac
+  case " ${got} " in *" i "*) record_pass "plan-contract-migration: (i) universos divergentes (vendor/outra, fixtures/ na raiz) → a conferência por identidade lista o nó da dívida fora do plano, por nome" ;;
+    *) record_fail "plan-contract-migration: (i)" "$(bash "${sut}" "${d}/universo" --out-dir "${d}/out-i" 2>&1 | grep -E 'plano|fora' | head -4 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" j "*) record_pass "plan-contract-migration: (j) id repetido e grafo por symlink → a identidade bate (multiset, caminho real), sem falso 'fora do plano'" ;;
+    *) record_fail "plan-contract-migration: (j)" "$(bash "${sut}" "${d}/identidade" --out-dir "${d}/out-j" 2>&1 | grep -E 'plano|fora|NÃO' | head -4 | tr '\n' '|')" ;; esac
   # (m) MUTANTES na CÓPIA do helper (com o remeasure-contract.sh ao lado): cada um reverte uma cura e EXIGE que o
   #     caso nomeado caia. Pares múltiplos de troca separados por \x1e.
   mkdir -p "${d}/mut"; cp "${REPO_ROOT}/.claude/utils/adopt/remeasure-contract.sh" "${d}/mut/"
@@ -41050,19 +41097,25 @@ open(p,"w",encoding="utf-8").write(s)' "${m}" "${old}" "${new}"; then
       *) record_pass "plan-contract-migration: (m) mutante morde → (${want}) cai" ;;
     esac
     find "${d}" -name __pycache__ -prune -exec rm -rf {} + 2>/dev/null
-    _pm_git "${d}/com-perfil" checkout -q -- . 2>/dev/null; _pm_git "${d}/com-perfil" clean -qfdx 2>/dev/null
+    _pm_git "${d}/com-perfil" checkout -q -- . 2>/dev/null; _pm_git "${d}/com-perfil" clean -qfd 2>/dev/null
   done <<EOF_MUT
   1) ;;$(printf '\x1f')  1|0) ;;$(printf '\x1f')a
   elif [ "\${#FOUND[@]}" -eq 0 ]; then$(printf '\x1e')    PROFILE="\${T}/\${FOUND[0]}"$(printf '\x1f')  elif false; then$(printf '\x1e')    PROFILE="\${VENDOR}/spec/migrate-examples/company-brain.profile.yaml"$(printf '\x1f')b
 "\${MIG}" plan --profile$(printf '\x1f')"\${MIG}" apply --profile$(printf '\x1f')c
-EXCL=(--exclude '**/fixtures/**' --exclude 'docs/materials/**'$(printf '\x1f')EXCL=(--exclude 'docs/materials/**'$(printf '\x1f')c
+EXCL=(--exclude '*/**/fixtures/**' --exclude 'docs/materials/**'$(printf '\x1f')EXCL=(--exclude 'nada/**' --exclude 'docs/materials/**'$(printf '\x1f')c
 python3 -I -B "\${MIG}"$(printf '\x1f')python3 -I "\${MIG}"$(printf '\x1f')c
 refused = [r for r in nodes if r["revisar"].startswith("a proposta reprovaria no contrato")]$(printf '\x1f')refused = []$(printf '\x1f')c
 [ -f "\${MIG}" ] || no$(printf '\x1f')[ -f "\${MIG}" ] || true$(printf '\x1f')d
 if [ "\${PRC}" -ne 0 ]; then$(printf '\x1f')if false; then$(printf '\x1f')e
     no "o alvo tem dois perfis$(printf '\x1f')    : "o alvo tem dois perfis$(printf '\x1f')e
-case "\${OUT_DIR}/" in "\${T}/"*) no$(printf '\x1f')case "\${OUT_DIR}/" in "/nunca/"*) no$(printf '\x1f')e
+inside "\${OUT_DIR}" && no$(printf '\x1f')false && no$(printf '\x1f')e
 if [ "\${BEFORE}" != "\${AFTER}" ]; then$(printf '\x1f')if false; then$(printf '\x1f')f
+print(h.hexdigest())$(printf '\x1e')BEFORE="\$(snapshot)" && [ -n "\${BEFORE}" ] ||$(printf '\x1e')AFTER="\$(snapshot)" && [ -n "\${AFTER}" ] ||$(printf '\x1f')print("")$(printf '\x1e')BEFORE="\$(snapshot)" ||$(printf '\x1e')AFTER="\$(snapshot)" ||$(printf '\x1f')f
+inside "\${TMPBASE}" && no$(printf '\x1f')false && no$(printf '\x1f')g
+rm -f -- "\${SHEET}" || no$(printf '\x1f'): || no$(printf '\x1f')h
+missing, extra = sorted((debt - planned).elements()), sorted((planned - debt).elements())$(printf '\x1f')missing, extra = [], []$(printf '\x1f')i
+EXCL=(--exclude '*/**/fixtures/**'$(printf '\x1f')EXCL=(--exclude '**/fixtures/**'$(printf '\x1f')i
+planned = collections.Counter((r["arquivo"], r["id"]) for r in nodes)$(printf '\x1f')planned = collections.Counter(set((r["arquivo"], r["id"]) for r in nodes))$(printf '\x1f')j
 EOF_MUT
   rm -rf "${d}"; unset -f _pm_git _pm_target _pm_ok _pm_bad _pm_profile _pm_commit _pm_tree _pm_judge
 }
