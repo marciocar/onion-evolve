@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml",
+  "id": "onion-vps-consolidation-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 4,
+    "yaml.unquoted-date": 1
+  }
+}

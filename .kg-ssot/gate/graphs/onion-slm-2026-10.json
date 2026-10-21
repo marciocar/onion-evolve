@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml",
+  "id": "onion-slm-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 39
+  }
+}

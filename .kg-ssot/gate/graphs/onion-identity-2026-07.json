@@ -1,0 +1,11 @@
+{
+  "graph": "docs/onion/graph/onion-identity-2026-07.kg.yaml",
+  "id": "onion-identity-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 25,
+    "form.required.node.verified_against": 6,
+    "form.required.node.verified_at": 4,
+    "yaml.unquoted-date": 1
+  }
+}

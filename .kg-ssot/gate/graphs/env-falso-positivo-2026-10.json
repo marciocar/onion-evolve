@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml",
+  "id": "env-falso-positivo-2026-10",
+  "must": [],
+  "should": {
+    "integrity.untraced-decision": 1
+  }
+}

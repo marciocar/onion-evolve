@@ -1,0 +1,7 @@
+{
+  "date": "2026-10-09",
+  "reason": "testimony-in-prod 34→36 GRAFOS é efeito da contagem por grafo: os NÓS PROD com method testemunho caíram de 107 para 103 nos 91 grafos tocados pelas ondas 2 e 3 da O3; os 11 grafos novos vêm de testemunho em PROD selado pelo maestro em 2026-10-09 (dev-dúvida mantido em PROD com fonte, e testemunho com origem explícita no lugar de DEV); a queima segue o insumo testimony-in-prod do v4.1 (SAC-73)",
+  "worse": [
+    "✗ PIOROU  debt.integrity.testimony-in-prod: 34 → 36"
+  ]
+}

@@ -27,7 +27,7 @@ git add vendor/kg-ssot .gitignore docs/          # e os seus .kg.yaml, onde esti
 .venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
 
 # 3. commitar o vendor, com o carimbo, e a base
-git add .kg-ssot/gate.json && git commit -m "adota o contrato KG-SSOT"
+git add .kg-ssot/gate && git commit -m "adota o contrato KG-SSOT"
 ```
 
 Os grafos que já reprovam viram dívida herdada, nomeada por caminho. O passo 4 é o CI, em todo PR: o workflow

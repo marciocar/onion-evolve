@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml",
+  "id": "guard-forge-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 10,
+    "integrity.untraced-decision": 1
+  }
+}

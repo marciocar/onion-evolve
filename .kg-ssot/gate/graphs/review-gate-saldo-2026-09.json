@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/review-gate-saldo-2026-09.kg.yaml",
+  "id": "review-gate-saldo-2026-09",
+  "must": [],
+  "should": {
+    "yaml.unquoted-date": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml",
+  "id": "waha-adapter-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 24,
+    "yaml.unquoted-date": 1
+  }
+}

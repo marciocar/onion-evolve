@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml",
+  "id": "kg-freshness-dogfood-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 32
+  }
+}

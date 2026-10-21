@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml",
+  "id": "poda-instruction-bloat-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 20
+  }
+}

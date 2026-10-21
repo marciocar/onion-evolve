@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/constellation.kg.yaml",
+  "id": "constellation-overlay",
+  "must": [],
+  "should": {
+    "yaml.unquoted-date": 1
+  }
+}

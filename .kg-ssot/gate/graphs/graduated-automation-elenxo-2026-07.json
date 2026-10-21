@@ -1,0 +1,10 @@
+{
+  "graph": "docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml",
+  "id": "graduated-automation-elenxo-2026-07",
+  "must": [
+    "form.unknown-key.meta.title"
+  ],
+  "should": {
+    "form.range.node.label": 2
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/onion-family-topology-2026-07.kg.yaml",
+  "id": "onion-family-topology-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 1,
+    "yaml.unquoted-date": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml",
+  "id": "maestro-vivo-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 50,
+    "integrity.untraced-decision": 1
+  }
+}

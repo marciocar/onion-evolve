@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/breadcrumb-doctrine-2026-07/breadcrumb-doctrine.kg.yaml",
+  "id": "breadcrumb-doctrine-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 9,
+    "yaml.unquoted-date": 1
+  }
+}

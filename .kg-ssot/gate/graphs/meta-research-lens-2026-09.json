@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml",
+  "id": "meta-research-lens-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 26
+  }
+}

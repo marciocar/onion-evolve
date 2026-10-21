@@ -1,0 +1,10 @@
+{
+  "graph": "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml",
+  "id": "m2-bridge-logto-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 112,
+    "form.required.node.verified_at": 1,
+    "yaml.unquoted-date": 1
+  }
+}

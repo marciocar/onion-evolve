@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml",
+  "id": "forge-evolve-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 9
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/coexistence-two-homes-2026-07.kg.yaml",
+  "id": "coexistence-two-homes-2026-07",
+  "must": [],
+  "should": {
+    "form.required.node.verified_against": 2,
+    "yaml.unquoted-date": 1
+  }
+}

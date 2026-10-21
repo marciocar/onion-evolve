@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml",
+  "id": "infra-vps-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 20
+  }
+}

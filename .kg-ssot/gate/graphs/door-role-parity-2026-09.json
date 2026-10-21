@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/door-role-parity-2026-09.kg.yaml",
+  "id": "door-role-parity-2026-09",
+  "must": [],
+  "should": {
+    "yaml.unquoted-date": 1
+  }
+}

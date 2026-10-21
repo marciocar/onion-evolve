@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml",
+  "id": "ocr-local-sei-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 25
+  }
+}

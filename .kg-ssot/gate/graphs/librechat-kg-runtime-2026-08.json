@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml",
+  "id": "librechat-kg-runtime-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 9,
+    "yaml.unquoted-date": 1
+  }
+}

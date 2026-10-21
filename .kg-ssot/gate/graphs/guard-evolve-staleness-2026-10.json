@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml",
+  "id": "guard-evolve-staleness-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 8
+  }
+}

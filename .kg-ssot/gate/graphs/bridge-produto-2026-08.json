@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml",
+  "id": "bridge-produto-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 34,
+    "yaml.unquoted-date": 1
+  }
+}

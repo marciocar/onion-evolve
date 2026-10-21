@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml",
+  "id": "guard-pre-push-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 8
+  }
+}

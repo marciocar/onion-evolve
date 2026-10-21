@@ -162,13 +162,13 @@ jobs:
 
       - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
         # O radar (kg-radar.sh) é o leitor de semântica e integridade; a FORMA do .kg.yaml é julgada pelo
-        # contrato v4.9 vendorizado por pin (tag kg-ssot-v4.15.1 do adotante dedicado ao KG-SSOT; o v4.1 trouxe
+        # contrato v4.9 vendorizado por pin (tag kg-ssot-v4.16.0 do adotante dedicado ao KG-SSOT; o v4.1 trouxe
         # 4 avisos SHOULD ao v4.0, o v4.2 traz a dívida POR NÓ e o `provenance.locality` opcional, adotado em
         # 2026-10-09, SAC-97; o v4.3 traz `external_edges`, a aresta para nó de outro grafo, conferida contra
         # TODOS os .kg.yaml rastreados, inclusive os do --exclude; adotado em 2026-10-10, SAC-98). Medido em
         # 2026-10-08: o radar sozinho aceitava 55 casos da suíte que o contrato reprova. O vendor não se
         # edita aqui (o check reprova qualquer byte alterado); mudança no contrato volta como sinal.
-        # Catraca contra .kg-ssot/gate.json: no MUST, POR GRAFO (grafo novo ou que passou a falhar reprova);
+        # Catraca contra a base .kg-ssot/gate/ (pasta, desde a 4.16.0): no MUST, POR GRAFO (grafo novo ou que passou a falhar reprova);
         # a dívida SHOULD só pode descer e, desde o v4.2, é contada POR OCORRÊNCIA (código × nó). A base
         # GUARDA a granularidade ("granularity": "node"), por isso este passo NÃO passa --granularity: o
         # gate lê a da base. rc 2 = entrada quebrada, nunca verde.
@@ -184,7 +184,7 @@ jobs:
           python3 -m pip install --quiet --require-hashes -r vendor/kg-ssot/tools/requirements.txt
           # O vendor check, os --exclude (fora do corpus, política selada pelo maestro em 2026-10-08) e o
           # gate vivem em ops/kg-gate-ci.sh, que o pr-finalize também chama: um lugar só para os --exclude,
-          # que têm de casar com os da base (.kg-ssot/gate.json; regrave com `bash ops/kg-gate-ci.sh --update`).
+          # que têm de casar com os da base (.kg-ssot/gate/; regrave com `bash ops/kg-gate-ci.sh --update`).
           bash ops/kg-gate-ci.sh
 
       - name: Lembrete — checagens semânticas são locais

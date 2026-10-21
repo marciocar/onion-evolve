@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml",
+  "id": "canal-vivo-sessoes-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 14
+  }
+}

@@ -29,7 +29,7 @@
 #
 # ONDE O PERFIL É PROCURADO (nesta ordem; os dois achados = ambíguo, rc 3; `--profile` vence, e o relativo é
 # resolvido contra o ALVO, não contra o cwd):
-#   .kg-ssot/migrate-profile.yaml  — ao lado do `.kg-ssot/gate.json`, onde o hub de campo pôs o dele
+#   .kg-ssot/migrate-profile.yaml  — ao lado da base `.kg-ssot/gate/`, onde o hub de campo pôs o dele
 #   kg-migrate.profile.yaml        — o nome do exemplo de comando do manual do kg-ssot (cap. 5)
 #
 # O UNIVERSO: o migrador lê os .kg.yaml rastreados fora de `vendor/**` (default fixo dele) e dos `--exclude`, que aqui

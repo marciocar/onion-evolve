@@ -1,0 +1,10 @@
+{
+  "graph": "docs/onion/graph/colaboracao-onion-2026-07.kg.yaml",
+  "id": "colaboracao-onion-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 3,
+    "form.required.node.verified_at": 7,
+    "yaml.unquoted-date": 1
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "graph": "docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml",
+  "id": "claude-code-2.1-onion-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 33,
+    "integrity.untraced-decision": 1,
+    "yaml.unquoted-date": 1
+  }
+}

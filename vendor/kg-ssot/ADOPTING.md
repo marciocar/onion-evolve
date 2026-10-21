@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -95,7 +95,7 @@ Na raiz do adotante, **nesta ordem**:
 ```bash
 pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
 git add vendor/kg-ssot                                       # antes do gate: ele só mede arquivo rastreado
-python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava .kg-ssot/gate.json
+python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava a pasta .kg-ssot/gate/
 ```
 
 O gate mede os `.kg.yaml` rastreados por git (`git ls-files`, lidos da árvore de trabalho). Um arquivo que
@@ -165,11 +165,16 @@ ganho e pede para travar com `--update`.
 atravessa `/`. `--no-default-excludes` desliga os padrões, e aí as fixtures do vendor, quebradas de propósito,
 entram no corpus.
 
-A linha de base guarda o contrato (o nome do schema MUST e o sha256 dos dois schemas) e mais duas coisas:
-- `failing`: os grafos que hoje falham no MUST, por caminho. É a dívida herdada.
-- `debt`: quantos grafos carregam cada aviso SHOULD.
+A linha de base é a pasta `.kg-ssot/gate/`:
+- `contract.json`: a identidade do contrato (o nome do schema MUST e o sha256 dos dois schemas).
+- `graphs/<meta.id>.json`: um registro por grafo, com os códigos MUST que ele carrega (a dívida herdada) e a contagem
+  de cada aviso SHOULD. O nome é o `meta.id`, e por isso um `git mv` não troca o registro. Um `meta.id` repetido
+  (inclusive só na caixa, como `Foo` e `foo`, que o macOS e o Windows não distinguem), que não cabe num nome de
+  arquivo ou que é dispositivo do Windows (`con`, `com1`) vai pelo hash do caminho.
+- `accepted/`: uma regressão aceita por arquivo, com o motivo.
 
-Commite o `.kg-ssot/gate.json`.
+Nada agregado é gravado: a contagem de grafos e a dívida por código saem dos registros. Duas branches que mexem em
+grafos diferentes mexem em arquivos diferentes, e o merge do git não conflita. Commite a pasta inteira.
 
 ## 3. O passo de CI
 
@@ -239,15 +244,17 @@ travar, rode `kg_gate.py --update` no mesmo PR.
 Sobre `--update`:
 - sem base ainda, ele grava a primeira (rc 0);
 - com uma piora e sem `--accept-regression "<motivo>"`, ele recusa (rc 1) e não grava nada;
-- com o motivo, ele grava, e o motivo fica na base (`accepted_regressions`, que se acumula).
+- com o motivo, ele grava, e o motivo fica na base (um arquivo em `accepted/`; as regressões aceitas se acumulam).
 
 **rc 0:** nada piorou, ou o vendor está íntegro. **rc 1:** algo piorou, ou o vendor diverge do carimbo.
 **rc 2:** entrada quebrada, que nunca passa como verde:
 - no `kg_gate.py`:
   - `--repo` não é um repo git;
-  - a base está ausente (sem `--update`), ilegível ou fora do formato. O formato é `contract` como texto,
-    `failing` como caminho → [códigos], `debt` como código → inteiro ≥ 0, `accepted_regressions` como lista e,
-    opcional, `granularity` como `graph` ou `node`;
+  - a base está ausente (sem `--update`), ilegível ou fora do formato. Na pasta: `contract.json` com `contract` e
+    `contract_sha256` como texto e, opcional, `granularity` como `graph` ou `node`; cada registro de `graphs/` com
+    `graph` (o caminho), `id` (texto ou null), `must` como [códigos] e `should` como código → inteiro > 0. No arquivo
+    de antes da 4.16.0: `contract` como texto, `failing` como caminho → [códigos], `debt` como código → inteiro ≥ 0,
+    `accepted_regressions` como lista e, opcional, `granularity`;
   - um `.kg.yaml` não pôde ser lido.
 - no `kg_vendor.py`:
   - o `--source` não é repo git, a tag não existe, ou o `spec/release.json` dela está ausente, ilegível ou
@@ -265,7 +272,8 @@ O PR que muda a tag faz três coisas:
    traz o próprio `.gitattributes` (`* -text`), para a regra de fim de linha do repositório não reescrever os bytes
    da release no índice. Quem sai de uma tag anterior à 4.8.1 roda o `update` duas vezes (a nota abaixo explica);
 2. roda `kg_gate.py` e explica no PR a diferença que aparecer;
-3. grava a base com `--update`, porque um contrato novo muda a identidade.
+3. grava a base com `--update` quando o contrato muda a identidade. Desde a 4.16.0, isso não é obrigatório: sem
+   veredito trocado, o gate passa com um aviso `· identidade`, e o `--update` pode vir depois.
 
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
@@ -294,6 +302,34 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 índice guarda os bytes da release. Outra saída é rodar o update uma vez só, pelo clone da tag
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
+
+Da `kg-ssot-v4.15.1` para a `kg-ssot-v4.16.0`, o contrato não muda (segue o v4.9, com a mesma identidade). Muda o
+gate, nas duas dores que os três adotantes mediram.
+- **A base vira uma pasta, `.kg-ssot/gate/`, com um registro por grafo.** O arquivo único conflitava em quase todo
+  merge entre branches que regravavam a base: num adotante, os 4 merges da semana. Refeitos com a pasta, os mesmos 4
+  mergeiam sem conflito, e o gate passa na árvore mergeada. O gate da 4.16.0 ainda lê o `gate.json`, e o primeiro
+  `--update` grava a pasta e apaga o arquivo, sem veredito trocado (medido nos três adotantes). Commite a pasta e a
+  remoção do arquivo juntos.
+- **A troca de identidade do contrato sem veredito trocado passa com aviso.** O gate segue acusando a identidade
+  numa linha `· identidade`, mas o rc vem da comparação, feita com o contrato novo: a regra nova que piora um grafo
+  continua reprovando. Uma tag que só muda os schemas sem mudar veredito deixa de pedir um PR só para o `--update`.
+  Quem quiser o comportamento antigo passa `--strict-identity`. O que a troca de identidade protegia, o schema do
+  vendor editado à mão, o gate passa a conferir sozinho: rodando de um vendor, ele compara o sha256 dos dois schemas
+  com o carimbo (`.kg-ssot-version`) e reprova quando divergem ou quando o carimbo sumiu, e o `--update` recusa gravar
+  a base, mesmo com `--accept-regression`. Quem edita o schema e reescreve o carimbo junto passa pelo gate, como antes
+  passava editando o schema e a base: a defesa aí é o diff do PR, que mostra o carimbo mexido.
+- **A base guarda a versão do kit** (`kit` no `contract.json`). Medir com um kit mais antigo que o da base reprova: uma
+  regra que só a release nova tinha deixaria de ser medida. Uma volta consciente passa com `--update
+  --accept-regression "<motivo>"`.
+- **O registro segue o `meta.id` num `git mv`.** O gate acusa a tradução numa linha `· A → B: o registro da base
+  seguiu pelo meta.id`. Ele não distingue um `git mv` de "apagar um grafo e criar outro com o mesmo `meta.id`", e por
+  isso a linha existe: quem revisa o PR vê de onde veio a dívida herdada. Um `meta.id` repetido na base nunca é
+  seguido.
+- **Depois de um merge, o `contract.json` pode vir de um lado e um registro do outro**, medido com o contrato antigo.
+  O veredito segue certo, porque a comparação é sempre feita com o contrato de agora. O que pode ficar velho é a
+  identidade gravada; o próximo `--update` a acerta.
+- **Um script que passa `--baseline <arquivo>.json`** continua lendo e gravando o arquivo único. Sem `--baseline`, o
+  padrão é a pasta.
 
 Da `kg-ssot-v4.15.0` para a `kg-ssot-v4.15.1`, entra o contrato v4.9, que corrige um defeito do desenho da 4.15.0
 achado por um adotante ao gravar regras de coleta de evidência.
@@ -353,7 +389,7 @@ leitor JS) e o migrador por perfil.
 - **A suíte ganha 16 casos** (328).
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --dest
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --dest
   vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
@@ -478,7 +514,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.1 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a

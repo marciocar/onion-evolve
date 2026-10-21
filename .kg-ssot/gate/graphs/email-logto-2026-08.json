@@ -1,0 +1,9 @@
+{
+  "graph": "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml",
+  "id": "email-logto-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 19,
+    "yaml.unquoted-date": 1
+  }
+}

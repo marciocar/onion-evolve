@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/drive-superacao-2026-08.kg.yaml",
+  "id": "drive-superacao-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 3
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml",
+  "id": "cited-directive-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 6
+  }
+}

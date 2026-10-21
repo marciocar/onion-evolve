@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml",
+  "id": "passada-adversarial-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 54
+  }
+}

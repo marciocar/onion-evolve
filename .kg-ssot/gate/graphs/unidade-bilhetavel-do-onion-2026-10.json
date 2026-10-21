@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml",
+  "id": "unidade-bilhetavel-do-onion-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 30
+  }
+}

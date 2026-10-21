@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml",
+  "id": "vendor-multi-branch-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 10
+  }
+}

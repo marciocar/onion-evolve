@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml",
+  "id": "slm-frameworks-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 49
+  }
+}

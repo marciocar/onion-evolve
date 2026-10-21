@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/websearch-cap-2026-09/websearch-cap-2026-09.kg.yaml",
+  "id": "websearch-cap-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 6
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "graph": "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml",
+  "id": "interface-state-of-art",
+  "must": [],
+  "should": {
+    "integrity.untraced-decision": 3,
+    "yaml.unquoted-date": 1
+  }
+}

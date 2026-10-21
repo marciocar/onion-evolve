@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/onion-evolution-2026-07-30.kg.yaml",
+  "id": "onion-evolution-2026-07-30",
+  "must": [],
+  "should": {
+    "form.range.node.label": 4,
+    "yaml.unquoted-date": 1
+  }
+}

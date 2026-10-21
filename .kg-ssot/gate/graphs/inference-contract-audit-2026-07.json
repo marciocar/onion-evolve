@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/inference-contract-audit-2026-07.kg.yaml",
+  "id": "inference-contract-audit-2026-07",
+  "must": [
+    "form.required.node.provenance",
+    "form.unknown-key.meta.title"
+  ],
+  "should": {}
+}

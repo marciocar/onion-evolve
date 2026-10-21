@@ -1,0 +1,10 @@
+{
+  "graph": "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml",
+  "id": "federation-research-2026-06-reconciled",
+  "must": [],
+  "should": {
+    "form.range.node.label": 45,
+    "form.required.node.verified_against": 74,
+    "yaml.unquoted-date": 1
+  }
+}

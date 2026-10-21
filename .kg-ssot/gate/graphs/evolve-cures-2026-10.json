@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml",
+  "id": "evolve-cures-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 6
+  }
+}

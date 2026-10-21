@@ -52,7 +52,7 @@ As versões menores da linha 4 acrescentaram sem mudar o veredito MUST de um gra
 registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções raras do YAML (o perfil estrito), e foram menores
 porque nenhum dos grafos reais medidos em quatro repos adotantes mudou de veredito. Mesmo assim, contam como MUST novo
 para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem rótulo próprio
-(v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1), que não é o número da release.
+(v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na 4.16.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -71,6 +71,7 @@ para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.
 | 4.13 | Contrato v4.6: a continuação entre aspas mais indentada que a coleção dona (MUST novo) e o `\r` como quebra de linha no leitor JS; na 4.13.1, a identidade do contrato acusa a versão que só o leitor muda, e o migrador lê o corpus do gate |
 | 4.14 | Contrato v4.7: a ponta externa pode ser um `.kg.json`; o armazém grava um conjunto de grafos de uma vez (`write_many`) |
 | 4.15 | Contrato v4.8: a cadência da verificação (`reverify_every`, `reverify_on`), a retenção (`retain_for`), o `owner` como papel e o relatório de vencimento (`kg_validate.py --due`), fora do veredito; na 4.15.1, o contrato v4.9 deixa de alertar a cadência sem `verified_at`, que é o estado inicial de uma regra de coleta |
+| 4.16 | Contrato v4.9, sem mudança. O gate sem atrito: a base vira uma pasta com um registro por grafo, e a troca de identidade do contrato sem veredito trocado passa com aviso |
 
 ## Versões e tags
 
@@ -84,8 +85,12 @@ existindo). Pelo histórico das releases:
 | **Z**, patch | Correção ou melhoria do kit, do guia ou dos casos, com o mesmo contrato |
 
 O gate guarda o sha256 dos dois schemas como a identidade do contrato. Uma tag que muda os bytes dos schemas,
-mesmo que só no texto das descrições (a 4.7.2) ou no `$id` (a 4.7.3), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
-que nenhum veredito mudou. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) também entra na descrição
+mesmo que só no texto das descrições (a 4.7.2) ou no `$id` (a 4.7.3), muda a identidade. Desde a 4.16.0, a
+identidade é composta: o gate acusa a troca numa linha `· identidade`, mas quem decide o rc é a comparação, feita
+com o contrato novo. A troca sem veredito trocado passa com rc 0, e o `--update` grava a identidade nova quando o
+adotante quiser. A regra nova que piora um grafo reprova pela comparação. `--strict-identity` volta ao rc 1 em
+toda troca, como antes da 4.16.0. Rodando de um vendor, o gate confere o sha256 dos dois schemas contra o carimbo e
+reprova o schema editado à mão. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) também entra na descrição
 do schema MUST, como "No v4.6 ...": desde a 4.13.1, a higiene da release cobra essa linha para a versão que o leitor
 declara, e assim toda versão do contrato move a identidade.
 

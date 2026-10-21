@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/company-brain-market-2026-07.kg.yaml",
+  "id": "company-brain-market-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 19,
+    "yaml.unquoted-date": 1
+  }
+}

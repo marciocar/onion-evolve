@@ -1,0 +1,8 @@
+{
+  "graph": "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml",
+  "id": "sinais-de-campo-2026-09",
+  "must": [],
+  "should": {
+    "form.range.node.label": 4
+  }
+}

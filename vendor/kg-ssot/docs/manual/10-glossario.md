@@ -17,7 +17,7 @@
 | **Dívida SHOULD** | Quantos grafos (ou ocorrências) carregam cada aviso |
 | **Grafo** | Um arquivo `.kg.yaml` |
 | **Leitor** | Qualquer programa que lê `.kg.yaml`. O leitor de referência é o `kg_validate.py` |
-| **Linha de base** | O `.kg-ssot/gate.json` com a dívida que o gate compara |
+| **Linha de base** | A pasta `.kg-ssot/gate/` com a dívida que o gate compara: a identidade do contrato e um registro por grafo (até a 4.15.1, o arquivo `.kg-ssot/gate.json`) |
 | **MUST** | Nível do contrato que reprova |
 | **Nó** | Uma afirmação tipada do grafo |
 | **Órfão** | Um nó sem nenhuma aresta. Reprova |

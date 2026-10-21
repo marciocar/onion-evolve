@@ -1,0 +1,10 @@
+{
+  "graph": "docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml",
+  "id": "identidade-onion-vps-2026-08",
+  "must": [],
+  "should": {
+    "form.range.node.label": 27,
+    "integrity.untraced-decision": 2,
+    "yaml.unquoted-date": 1
+  }
+}

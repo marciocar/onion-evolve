@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml",
+  "id": "vetos-por-tokens-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 12
+  }
+}

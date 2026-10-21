@@ -1,0 +1,10 @@
+{
+  "graph": "docs/onion/graph/federation-health-2026-07.kg.yaml",
+  "id": "federation-health-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 8,
+    "form.required.node.verified_against": 4,
+    "yaml.unquoted-date": 1
+  }
+}

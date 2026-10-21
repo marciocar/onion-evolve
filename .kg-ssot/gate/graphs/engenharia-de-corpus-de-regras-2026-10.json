@@ -1,0 +1,8 @@
+{
+  "graph": "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml",
+  "id": "engenharia-de-corpus-de-regras-2026-10",
+  "must": [],
+  "should": {
+    "form.range.node.label": 43
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "graph": "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml",
+  "id": "backlog-grafo-2026-08",
+  "must": [
+    "form.unknown-key.meta.label",
+    "form.unknown-key.meta.trace"
+  ],
+  "should": {
+    "form.range.node.label": 19
+  }
+}

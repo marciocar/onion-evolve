@@ -1,0 +1,9 @@
+{
+  "graph": "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml",
+  "id": "m3-federation-admin-2026-07",
+  "must": [],
+  "should": {
+    "form.range.node.label": 17,
+    "yaml.unquoted-date": 1
+  }
+}
