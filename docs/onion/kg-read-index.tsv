@@ -695,7 +695,6 @@
 .github/workflows/onion-selftest.yml	E_BANCADA_COMPLETA_VERDE_NO_2604	docs/evolution/research/ci-runner-2604-2026-10/ci-runner-2604-2026-10.kg.yaml
 .github/workflows/onion-selftest.yml	E_RUNNER_2604_DERRUBA_GUARDAS_POR_AMBIENTE	docs/evolution/research/ci-runner-2604-2026-10/ci-runner-2604-2026-10.kg.yaml
 .github/workflows/onion-validate.yml	E_GATE_DO_CONTRATO_NO_CI	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
-.kg-ssot/gate.json	E_CONTRATO_V4_ADOTADO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 CLAUDE.md	C_IDENTITY_CANON	docs/onion/graph/onion-identity-2026-07.kg.yaml
 CLAUDE.md	C_p4_gate_visibility	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 CLAUDE.md	D_FAMILIA_TEM_DOIS_REGIMES_2026_09	docs/onion/graph/onion-identity-2026-07.kg.yaml
