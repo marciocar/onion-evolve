@@ -353,6 +353,22 @@ nodes:
       locator: "flags --resend, --kid, --exp-offset, --iat-offset; l.103 (EXP = NOW + EXP_OFF)"
       method: "medição: envios negativos reais pelo HTTP de produção, saída colada pelo maestro"
       locality: "host"
+  - id: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «manter para o degrau B»"
+    label: "O membro maestro-peer-test, o pino e a chave no notebook ficam para o degrau B (duas máquinas, com volta); o convite vence em 2026-10-22 21:00 UTC e se renova pelo a2a-invite-live; a limpeza (revogar, tirar o kid, remover membro e usuário) é ao fim do degrau B"
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «manter para o degrau B»; descartadas: «revogar agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Revogar o convite e o membro de teste agora ou mantê-los para o degrau B?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
 edges:
   - from: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
     to: D_DEGRAU_A_HOJE_A0_E_A1_1021
@@ -422,6 +438,9 @@ edges:
     edge_type: TRACES_TO
   - from: D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021
     to: C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET
+    edge_type: TRACES_TO
+  - from: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
+    to: D_DEGRAU_A_HOJE_A0_E_A1_1021
     edge_type: TRACES_TO
 
 external_edges:
