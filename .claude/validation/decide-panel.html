@@ -1,0 +1,169 @@
+<title>Cédula do decide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--
+  Página do modo opcional `--painel` do /meta:decide. A sessão publica este arquivo como Artifact privado
+  com capabilities {db: {rules: [{path: "", read: "view", write: "owner"}]}, user: {}} e grava a rodada em
+  rounds/current (o JSON do decide-panel.sh round). O maestro responde aqui; a página grava answers/<qN>.
+  A sessão lê as respostas pelo ArtifactData e sela pelo kg-decide-seal.sh (via decide-panel.sh seal); a
+  página NUNCA escreve no grafo, e todo texto da rodada é renderizado como texto (dado não confiável).
+  Estado por item: status/<qN>, gravado pela sessão (selado, executar, card pendente, volta como pergunta).
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: uma cédula por pergunta, em coluna única; a barra de envio fica fixa no pé. */
+  :root {
+    --paper: #f5f6f8; --sheet: #ffffff; --ink: #1d2330; --muted: #5d6578; --rule: #d9dde5;
+    --accent: #2f4fb3; --accent-ink: #ffffff; --good: #1f7a4d; --warn: #9a5b00; --bad: #b3261e;
+    --chip-good: #e3f3ea; --chip-warn: #fbefd9; --chip-bad: #fbe4e2; --chip-neutral: #eceef3;
+    --display: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --paper: #12151c; --sheet: #1a1f29; --ink: #e6e9f0; --muted: #a0a8ba; --rule: #2d3442;
+    --accent: #8aa2ff; --accent-ink: #10131a; --good: #6fd19d; --warn: #f0b75a; --bad: #ff8a80;
+    --chip-good: #17382a; --chip-warn: #3d2e12; --chip-bad: #42201d; --chip-neutral: #252b37; color-scheme: dark } }
+  :root[data-theme="dark"] {
+    --paper: #12151c; --sheet: #1a1f29; --ink: #e6e9f0; --muted: #a0a8ba; --rule: #2d3442;
+    --accent: #8aa2ff; --accent-ink: #10131a; --good: #6fd19d; --warn: #f0b75a; --bad: #ff8a80;
+    --chip-good: #17382a; --chip-warn: #3d2e12; --chip-bad: #42201d; --chip-neutral: #252b37; color-scheme: dark }
+  body { background: var(--paper); color: var(--ink); font: 15px/1.5 var(--body);
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 120px; }
+  main { max-width: 720px; margin: 0 auto; display: grid; gap: 16px; }
+  header { display: grid; gap: 4px; }
+  h1 { font: 650 1.6rem/1.2 var(--display); margin: 0; text-wrap: balance; }
+  .meta { color: var(--muted); font-size: .85rem; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .mono { font-family: var(--mono); font-size: .82rem; overflow-wrap: anywhere; }
+  .notice { background: var(--sheet); border: 1px dashed var(--rule); border-radius: 8px; padding: 14px 16px; color: var(--muted); }
+  .ballot { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+  .ballot-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; }
+  .tag { font: 600 .72rem/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .q { font: 500 1.12rem/1.35 var(--display); margin: 0; text-wrap: balance; }
+  .opts { display: grid; gap: 8px; }
+  .opt { text-align: left; width: 100%; background: transparent; color: var(--ink); border: 1px solid var(--rule);
+    border-radius: 8px; padding: 10px 12px; font: inherit; cursor: pointer; display: grid; gap: 2px; }
+  .opt:hover { border-color: var(--accent); }
+  .opt:focus-visible, textarea:focus-visible, .send:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .opt[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .opt-label { font-weight: 600; }
+  .opt-desc, .opt-cost { color: var(--muted); font-size: .88rem; }
+  .opt-cost::before { content: "custo: "; }
+  label.free { display: grid; gap: 4px; font-size: .85rem; color: var(--muted); }
+  textarea { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; min-height: 3.2em; resize: vertical; }
+  .card { background: var(--paper); border-radius: 6px; padding: 8px 10px; }
+  .chip { font-size: .78rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--chip-neutral); color: var(--muted); }
+  .chip.good { background: var(--chip-good); color: var(--good); }
+  .chip.warn { background: var(--chip-warn); color: var(--warn); }
+  .chip.bad { background: var(--chip-bad); color: var(--bad); }
+  .later { color: var(--muted); font-size: .85rem; }
+  .later ul { margin: 4px 0 0; padding-left: 18px; }
+  footer.bar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--sheet); border-top: 1px solid var(--rule);
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-top: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .bar-in { max-width: 720px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+  .send { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 8px; padding: 10px 18px; font: 600 .95rem var(--body); cursor: pointer; }
+  .send[disabled] { opacity: .5; cursor: not-allowed; }
+  #msg { color: var(--muted); font-size: .88rem; }
+  @media (prefers-reduced-motion: no-preference) { .opt { transition: border-color .12s ease; } }
+</style>
+
+<main>
+  <header>
+    <span class="tag">/meta:decide · painel opcional</span>
+    <h1>Rodada de decisões</h1>
+    <div class="meta"><span id="rmeta">aguardando a rodada</span></div>
+  </header>
+  <div id="notice" class="notice">Nenhuma rodada ainda. A sessão grava a rodada aqui quando você roda o /meta:decide com o painel. Até lá, as perguntas seguem no terminal.</div>
+  <section id="list" class="opts" aria-live="polite"></section>
+  <div id="later" class="later" hidden></div>
+</main>
+<footer class="bar"><div class="bar-in">
+  <span id="msg">Escolha uma opção por cédula, ou escreva a sua resposta.</span>
+  <button id="send" class="send" type="button" disabled>Enviar rodada</button>
+</div></footer>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = String(text); return e; };
+  const STATE = {   // estado por item, gravado pela sessão em status/<qN>
+    'selado': ['good', 'selado'], 'executado': ['good', 'executado'], 'executar': ['neutral', 'a sessão executa'],
+    'card pendente': ['warn', 'card pendente'], 'conferir': ['neutral', 'a sessão confere'], 'depois': ['neutral', 'depois'],
+    'aguarda leitura': ['neutral', 'a sessão lê sua resposta'], 'ensaio': ['neutral', 'ensaio'],
+    'ambígua': ['bad', 'volta como pergunta'], 'recusada': ['bad', 'volta como pergunta'],
+    'recusada pelo selador': ['bad', 'o selador recusou'], 'sem resposta': ['neutral', 'sem resposta'] };
+  let db = null, round = null, status = {}, sent = {}, picks = {};
+
+  function render() {
+    const list = $('list'); list.replaceChildren();
+    if (!round || !Array.isArray(round.questions)) { $('notice').hidden = false; $('send').disabled = true; return; }
+    $('notice').hidden = true;
+    $('rmeta').replaceChildren(el('span', null, `rodada ${round.round_id || '?'}`), el('span', null, round.today || ''),
+      el('span', null, `${round.questions.length} pergunta(s)`));
+    for (const q of round.questions) {
+      const box = el('article', 'ballot'); box.setAttribute('aria-labelledby', `t-${q.id}`);
+      const top = el('div', 'ballot-top');
+      top.append(el('span', 'tag', `${q.header || ''} · ${q.kind === 'act' ? 'ato' : 'selo'}`));
+      const st = status[q.id] && status[q.id].round_id === round.round_id ? status[q.id] : null;
+      const s = st ? (STATE[st.state] || ['neutral', st.state]) : (sent[q.id] ? ['neutral', 'enviada'] : null);
+      if (s) top.append(el('span', `chip ${s[0]}`, s[1]));
+      box.append(top);
+      const h = el('h2', 'q', q.question); h.id = `t-${q.id}`; box.append(h);
+      box.append(el('span', 'mono', q.ref));
+      const opts = el('div', 'opts');
+      const pick = picks[q.id] || {};
+      for (const o of q.options || []) {
+        const b = el('button', 'opt'); b.type = 'button'; b.id = `o-${q.id}-${(q.options || []).indexOf(o)}`;
+        b.setAttribute('aria-pressed', pick.choice === o.label ? 'true' : 'false');
+        b.append(el('span', 'opt-label', o.label), el('span', 'opt-desc', o.description));
+        if (o.cost) b.append(el('span', 'opt-cost', o.cost));
+        b.addEventListener('click', () => { picks[q.id] = { choice: o.label, other: '' }; render(); });
+        opts.append(b);
+      }
+      box.append(opts);
+      if (q.allow_other) {
+        const lab = el('label', 'free', 'Outra resposta (a sessão lê antes de selar)');
+        const ta = document.createElement('textarea'); ta.id = `f-${q.id}`; ta.maxLength = 500; ta.value = pick.other || '';
+        ta.addEventListener('change', () => { const v = ta.value.trim(); picks[q.id] = v ? { choice: '', other: v } : {}; render(); });
+        lab.append(ta); box.append(lab);
+      }
+      if (q.card) box.append(el('div', 'card mono', q.card));
+      if (st && st.detail) box.append(el('div', 'later', st.detail));
+      list.append(box);
+    }
+    const later = [...(round.deferred || [])];
+    $('later').hidden = !later.length;
+    if (later.length) { const ul = el('ul'); later.forEach((x) => ul.append(el('li', 'mono', x))); $('later').replaceChildren(el('span', null, 'Ficam para a próxima rodada:'), ul); }
+    const n = Object.values(picks).filter((p) => p.choice || p.other).length;
+    $('send').disabled = !db || n === 0;
+    if (!db) $('msg').textContent = 'Este painel não guarda respostas nesta visão. Responda no terminal.';
+  }
+
+  async function send() {
+    if (!db || !round) return;
+    $('send').disabled = true; $('msg').textContent = 'Enviando…';
+    try {
+      for (const q of round.questions) {
+        const p = picks[q.id]; if (!p || !(p.choice || p.other)) continue;
+        await db.doc(`answers/${q.id}`).set({ schema: 'onion.decide.answer/v1', round_id: round.round_id, qid: q.id,
+          choice: p.choice || '', other: p.other || '', at: new Date().toISOString() });
+        sent[q.id] = true;
+      }
+      $('msg').textContent = 'Rodada enviada. A sessão sela pelo selador e devolve o estado de cada item aqui.';
+    } catch (e) {
+      $('msg').textContent = e && e.code === 'invalid_argument' ? 'Só o dono deste painel envia respostas.' : 'O envio falhou. Tente de novo em instantes.';
+    }
+    render();
+  }
+  $('send').addEventListener('click', send);
+  render();
+
+  (async () => {
+    try { db = await window.claude?.use?.('db'); } catch (_) { db = null; }
+    if (!db) { render(); return; }
+    db.doc('rounds/current').onSnapshot((snap) => { round = snap.exists ? snap.data() : null; render(); }, () => { round = null; render(); });
+    db.collection('status').onSnapshot((qs) => { status = {}; qs.docs.forEach((d) => { status[d.id] = d.data(); }); render(); }, () => {});
+    db.collection('answers').onSnapshot((qs) => { sent = {}; qs.docs.forEach((d) => { const a = d.data(); if (round && a.round_id === round.round_id) sent[d.id] = true; }); render(); }, () => {});
+  })();
+})();
+</script>

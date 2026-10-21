@@ -596,11 +596,23 @@ nodes:
     node_type: claim
     x_dissect_level: 4
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
-    confidence: 0.5
+    confidence: 0.7
     verified_at: "2026-10-21"
-    verified_against: "proposta do dissect, não medida: o /meta:decide hoje pergunta por AskUserQuestion no terminal (E_OBJECAO_04: o terminal não é host MCP Apps); o host interativo que o core já tem é o Artifact do Claude Code, com capacidades de estado (artifact-capabilities) e leitura pela sessão (ArtifactData)"
+    verified_against: "forjado pelo /meta:forge (peças 2, 3 e 7): run_decide_selftests casos pn1 (paridade painel × AskUserQuestion do mesmo censo), pn2 (selo só pelo kg-decide-seal.sh, argv exato, o helper nunca escreve o grafo) e pn3 (fora das opções recusada, texto livre só com --other, sem shell e sem YAML injetado, rodada adulterada ou velha recusada) verdes, e 6 mutantes reprovando o caso deles; dogfood do round sobre o censo real de 2026-10-21. NÃO medido: a página publicada e a leitura pelo ArtifactData"
+    narrative: |-
+      Executado em 2026-10-21 pela forja do alvo decide: cláusula 9 em .claude/commands/common/prompts/decide-doctrine.md,
+      .claude/validation/decide-panel.sh (round emite o painel e o payload do AskUserQuestion da mesma rodada; seal lê as
+      respostas e chama só o kg-decide-seal.sh) e a página .claude/validation/decide-panel.html, que a sessão publica como
+      Artifact com estado. O E_OBJECAO_04 segue de pé na parte que não se mediu: nenhum Artifact real foi publicado no
+      dogfood (o ato de publicar é da sessão com o maestro), então a forma do envelope do ArtifactData é aceita nas duas
+      formas conhecidas e declarada não medida.
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_decide_selftests, casos (pn1), (pn2), (pn3)"
+      method: "medição: bancada verde e mutantes por caso via mutate-and-restore"
+      locality: "repo"
     x_absorb_target: decide
     x_absorb_pieces: "2,3,7"
     x_absorb_origin: "https://github.com/modelcontextprotocol/ext-apps/blob/82221c0c8ce7661efa6771c9d461511b1650495f/specification/2026-01-26/apps.mdx"
