@@ -1,7 +1,8 @@
 ---
 branch: feat/u1-update-migrate-plan
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: af7529c2253e2beb1f471098d6eb8169368a9785f15665e0ede486ef397cb8e3
+reviewed_code_sha256: 0c27a7cb264fed6dd614c4487e306c6eb4ad830421b927e804c2a7ebc5580ba0
 tokens: 321968
 duration_min: 16
 findings_total: 14
