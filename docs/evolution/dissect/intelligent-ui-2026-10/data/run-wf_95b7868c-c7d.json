@@ -1,0 +1,828 @@
+{
+  "summary": "Pesquisa Onion: corpus primeiro, eixos fixos (Claude Code atual, mercado/capital, trajetória, analistas, comunidade) + ângulos do tema, tier de fonte, verificação adversarial 3/2, write(KG) bi-temporal com radar",
+  "agentCount": 13,
+  "logs": [
+    "Corpus: fornecido em formato NÃO-CANÔNICO (616 chars, 0 linhas grafo<TAB>ID) — a skill manda o bloco do kg-corpus-grep.sh VERBATIM; entra como prosa no Scope, na síntese, no Elenxo e no write(KG)",
+    "Modo PRIMÁRIAS: 5 fonte(s) NOMEADA(S), leitura integral — sem Scope/Search/Fetch/Verify. Medido 2026-09-13 na mesma pergunta: varredura 291k tokens/nó (19 de 25 claims refutadas, a maioria por fonte fraca) × primárias 42k tokens/nó.",
+    "Leitura: 4/5 fontes alcançadas · inalcançáveis: openai-gpt6-intelligent-ui",
+    "Ancoragem: 14 claim(s) ANCORADA(S) · 7 rejeitada(s) (exagerada ou não encontrada) · 0 reprovação(ões) RECUSADA(S) pelo motor sem critério/superação",
+    "Elenxo: 16 objeções (9 sobrevivem) · 0 RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: 3 · abertas: 6",
+    "Superação: 1 achada(s) → nó obrigatório (C_SUPERACAO_20261021_…)",
+    "write(KG): docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml — +28 nós / +30 arestas, total 28, radar exit 0 (pelo motor, 1 tentativa(s))"
+  ],
+  "result": {
+    "mode": "primaries",
+    "question": "Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietária, datada), N1 capacidade (os VERBOS: que tipos de componente visual/interativo, quando o modelo decide usar, como o usuário interage, como é o streaming antes do fim do raciocínio), N2 mecanismo (como é feito: o modelo emite componentes declarativos? HTML em sandbox? widgets do Apps SDK? template server-side?), e o mecanismo ABERTO equivalente que o Onion poderia usar (Apps SDK da OpenAI, extensão MCP Apps / MCP-UI, artifacts do Claude, suporte no LibreChat). N3: o que transfere para o Onion (superfícies: /meta:decide e seus cards, o /chat do onion-bridge, o LibreChat do brain, os Artifacts do Claude Code) e o que é diferente. Eixo invariante de mercado e capital.",
+    "today": "2026-10-21",
+    "kgPath": "docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml",
+    "radarExit": 0,
+    "writeAttempts": [
+      {
+        "attempt": 1,
+        "declaredRadarExit": 0,
+        "radarExit": 0,
+        "contractExit": 0,
+        "overcomingNodes": 1
+      }
+    ],
+    "summary": "Grafo novo (28 nós e 30 arestas, TETO 28, review_after 2026-11-20 pela cadência de ferramenta de 30 dias). Nele estão 14 evidências ancoradas, E_LACUNAS_PRIMARIES_1021, a superação C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM (TRACES_TO para E_LACUNAS) e as 9 objeções sobreviventes do Elenxo como E_OBJECAO_*, ligadas aos alvos por CONSTRAINS. Somam-se a pergunta que marca a Intelligent UI do GPT-6 como NÃO VERIFICADA, a hipótese de piloto MCP Apps para o /meta:decide (aberta, nada foi selado) e a afirmação de convergência de mercado. O radar --integrity --schema saiu com exit 0 e o kg-contract-check com rc 0. O dissect-census ainda não enxerga o grafo porque o arquivo não está commitado.",
+    "unreachable": [
+      "openai-gpt6-intelligent-ui"
+    ],
+    "anchored": [
+      {
+        "source": "openai-apps-sdk",
+        "gap": "N2: o mecanismo aberto da OpenAI para UI dentro do chat (componentes, sandbox, protocolo)",
+        "claim": "Componente renderiza a partir de structuredContent do resultado da ferramenta, tratado como entrada não confiável",
+        "verdict": "ANCORADA",
+        "why": "Frase reaberta: 'Render from `toolResult?.structuredContent`, and treat it as untrusted input.' O claim reproduz o texto sem esticar.",
+        "corrected": "",
+        "quote": "Render from `toolResult?.structuredContent`, and treat it as untrusted input.",
+        "locator": "chatgpt-ui: 'React helper hooks'",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "mcp-apps-extension",
+        "gap": "N2/N3: o padrão ABERTO de UI interativa em MCP (MCP Apps / MCP-UI), estado em outubro de 2026",
+        "claim": "O tipo MIME e o esquema de URI são fixados pela especificação (MIME text/html;profile=mcp-app; prefixo ui:// reservado).",
+        "verdict": "ANCORADA",
+        "why": "A spec 2026-01-26 traz '`mimeType` MUST be `text/html;profile=mcp-app` (other types reserved for future extensions)' verbatim. O ui:// é exigido na mesma spec ('MUST use the `ui://` URI scheme to distinguish UI resources from other MCP resource types'). A palavra 'reservado' é paráfrase de MUST, não termo literal, mas a fixação pela spec se sustenta.",
+        "corrected": "",
+        "quote": "`mimeType` MUST be `text/html;profile=mcp-app` (other types reserved for future extensions)",
+        "locator": "ext-apps specification 2026-01-26 (apps.mdx), seção UI Resource Format; ui:// reservado na mesma seção",
+        "sourceTier": 9,
+        "validFrom": "2026-01-26"
+      },
+      {
+        "source": "mcp-apps-extension",
+        "gap": "N2/N3: o padrão ABERTO de UI interativa em MCP (MCP Apps / MCP-UI), estado em outubro de 2026",
+        "claim": "A especificação está Stable na versão 2026-01-26 e exige sandbox com origem distinta do host, mediado por proxy.",
+        "verdict": "ANCORADA",
+        "why": "Aparecem na spec: 'Status: Stable (2026-01-26)', a quote 'If the Host is a web page, it MUST wrap the View and communicate with it through an intermediate Sandbox proxy.' e 'The Host and the Sandbox MUST have different origins.' Ressalva: o proxy é exigido só quando o Host é uma página web, condição que a própria quote traz.",
+        "corrected": "",
+        "quote": "If the Host is a web page, it MUST wrap the View and communicate with it through an intermediate Sandbox proxy.",
+        "locator": "ext-apps specification 2026-01-26, seção Sandbox proxy (Status: Stable 2026-01-26; Host e Sandbox MUST ter origens diferentes)",
+        "sourceTier": 9,
+        "validFrom": "2026-01-26"
+      },
+      {
+        "source": "mcp-apps-extension",
+        "gap": "N2/N3: o padrão ABERTO de UI interativa em MCP (MCP Apps / MCP-UI), estado em outubro de 2026",
+        "claim": "A comunicação app-host é JSON-RPC sobre postMessage; o app pode chamar tools do servidor e atualizar o contexto do modelo (bidirecional), o que serve cards interativos como os do /meta:decide.",
+        "verdict": "ANCORADA",
+        "why": "Passo 4 (Bidirectional communication) traz a quote verbatim. JSON-RPC e postMessage estão no mesmo passo e em 'Framework support'. O overview lista 'Multi-step workflows' (aprovar, triar, botões de ação, estado persistente) como caso de uso, o que sustenta o encaixe em cards de decisão. A menção a /meta:decide é inferência do dissect, não afirmação do documento. Aqui ela é aplicação do claim, não parte do que a fonte diz.",
+        "corrected": "",
+        "quote": "The app can request tool calls, send messages, update the model's context, and receive data from the host.",
+        "locator": "MCP Apps overview, 'How MCP Apps work', passo 4 (Bidirectional communication)",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "mcp-apps-extension",
+        "gap": "N2/N3: o padrão ABERTO de UI interativa em MCP (MCP Apps / MCP-UI), estado em outubro de 2026",
+        "claim": "Hosts com suporte a MCP Apps listados oficialmente (sem ChatGPT nem LibreChat nessa lista oficial).",
+        "verdict": "ANCORADA",
+        "why": "A seção 'Client support' do overview lista Claude, Claude Desktop, VS Code GitHub Copilot, Microsoft 365 Copilot, Goose, Postman, MCPJam e Archestra.AI, sem ChatGPT nem LibreChat. A quote difere do original só em quebras de linha dentro do markdown (whitespace). O texto diz 'currently supported by' e remete à client-matrix para a lista completa, então 'lista oficial' vale para esta página.",
+        "corrected": "",
+        "quote": "MCP Apps are currently supported by [Claude](https://claude.ai), [Claude Desktop](https://claude.ai/download), [VS Code GitHub Copilot](https://code.visualstudio.com/), [Microsoft 365 Copilot]",
+        "locator": "MCP Apps overview, seção 'Client support' (página lida em 2026-10-21)",
+        "sourceTier": 9,
+        "validFrom": "2026-10-21"
+      },
+      {
+        "source": "mcp-apps-extension",
+        "gap": "N2/N3: o padrão ABERTO de UI interativa em MCP (MCP Apps / MCP-UI), estado em outubro de 2026",
+        "claim": "O MCP-UI implementa o padrão MCP Apps; LibreChat aparece como host (apps e legado) e o ChatGPT só via adaptador do Apps SDK.",
+        "verdict": "ANCORADA",
+        "why": "O README de idosal/mcp-ui traz '`mcp-ui` is an SDK implementing the MCP Apps standard for UI over MCP.' verbatim. LibreChat consta nas listas de hosts MCP Apps e de hosts MCP-UI legado. O ChatGPT consta em 'hosts requiring adapters' (Apps SDK, adaptador que traduz postMessage para window.openai). Ressalva: a parte de hosts veio resumida pelo fetcher, não verbatim. A quote em si é literal.",
+        "corrected": "",
+        "quote": "`mcp-ui` is an SDK implementing the MCP Apps standard for UI over MCP.",
+        "locator": "README github.com/idosal/mcp-ui, seções de hosts suportados (LibreChat em MCP Apps e legado; ChatGPT requer adaptador Apps SDK)",
+        "sourceTier": 7,
+        "validFrom": "2026-10-21"
+      },
+      {
+        "source": "claude-artifacts-visuals",
+        "gap": "N3: o que o Claude (claude.ai e Claude Code) já faz de equivalente: artifacts, visuais inline, imagine/visualizações",
+        "claim": "Claude já gera visuais interativos inline na conversa (beta, web e desktop), sem painel lateral.",
+        "verdict": "ANCORADA",
+        "why": "A quote aparece verbatim na introdução do artigo (artigo datado de 22 de abril de 2026). A nota de abertura diz: 'Custom visuals are currently in beta and available to all Claude users on web and desktop, in both chat and Cowork.' O 'sem painel lateral' não está nessa frase, mas vem do post do blog (claim 4: 'appear in-line, rather than in a side panel'). O claim junta duas fontes, sem esticar nenhuma.",
+        "corrected": "",
+        "quote": "Claude can generate custom diagrams, charts, and interactive visuals directly in your conversation.",
+        "locator": "support.claude.com/en/articles/13979539-custom-visuals-in-chat, abertura",
+        "sourceTier": 9,
+        "validFrom": "2026-03-12"
+      },
+      {
+        "source": "claude-artifacts-visuals",
+        "gap": "N3: o que o Claude (claude.ai e Claude Code) já faz de equivalente: artifacts, visuais inline, imagine/visualizações",
+        "claim": "O modelo decide quando usar visual; o usuário pode pedir; há interação (botões, sliders, tela cheia) e follow-up.",
+        "verdict": "ANCORADA",
+        "why": "A quote está verbatim na seção 'How it works' (o locator dizia 'how Claude decides', que não é heading; a seção real é 'How it works', diferença só de rótulo). A mesma seção traz 'try phrases like \"draw this as a diagram,\" ... \"chart this data\"' (o usuário pode pedir), 'you can interact with it—click buttons, adjust sliders, expand it to full screen' e 'Claude can update or rebuild the visual as the conversation continues'. Todos os componentes do claim estão no texto.",
+        "corrected": "",
+        "quote": "Claude decides when a visual would help based on what you’re asking.",
+        "locator": "support.claude.com custom-visuals-in-chat, seção 'how Claude decides'",
+        "sourceTier": 9,
+        "validFrom": "2026-03-12"
+      },
+      {
+        "source": "claude-artifacts-visuals",
+        "gap": "N3: o que o Claude (claude.ai e Claude Code) já faz de equivalente: artifacts, visuais inline, imagine/visualizações",
+        "claim": "Visuais são efêmeros, não salvos por padrão; podem virar artifact, SVG/HTML ou imagem.",
+        "verdict": "ANCORADA",
+        "why": "A quote está verbatim na seção 'Limitations' (o locator dizia 'keep a visual'). A seção 'Keep a visual' sustenta o restante: snapshot estático (imagem), 'save the visual as an .svg or .html file' e 'convert it into an artifact you can keep, publish, and iterate on over time'. 'Efêmeros' está explícito no post do blog ('temporary').",
+        "corrected": "",
+        "quote": "Visuals aren’t saved automatically. To keep one, use one of the options described above.",
+        "locator": "support.claude.com custom-visuals-in-chat, seção 'keep a visual'",
+        "sourceTier": 9,
+        "validFrom": "2026-03-12"
+      },
+      {
+        "source": "claude-artifacts-visuals",
+        "gap": "N3: o que o Claude (claude.ai e Claude Code) já faz de equivalente: artifacts, visuais inline, imagine/visualizações",
+        "claim": "Lançamento datado: visuais aparecem inline e são temporários, distintos de artifacts permanentes.",
+        "verdict": "ANCORADA",
+        "why": "O post tem a data 'March 12, 2026' e a nota 'Update: Now available in Claude Cowork on all paid plans (April 22, 2026)'. A frase completa é 'They appear in-line, rather than in a side panel, and they're temporary—they change or disappear as the conversation evolves', que contém a quote. O post descreve os artifacts existentes como 'permanent tools and documents created by Claude' e diz que os novos visuais 'serve a different purpose'.",
+        "corrected": "",
+        "quote": "appear in-line, rather than in a side panel",
+        "locator": "claude.com/blog/claude-builds-visuals, post de 12 de março de 2026 (atualização de 22 de abril de 2026 para Cowork)",
+        "sourceTier": 9,
+        "validFrom": "2026-03-12"
+      },
+      {
+        "source": "claude-artifacts-visuals",
+        "gap": "N3: o que o Claude (claude.ai e Claude Code) já faz de equivalente: artifacts, visuais inline, imagine/visualizações",
+        "claim": "Artifacts abrangem documentos, páginas, dashboards e ferramentas interativas e começam privados.",
+        "verdict": "ANCORADA",
+        "why": "A quote é o início da frase 'Claude can make an artifact out of almost anything, including documents, code snippets, single-page websites...', que continua com imagens, diagramas e dashboards. É um prefixo verbatim, truncado. A página também diz 'Artifacts start private to you', cita 'The Dashboards template is in beta' e fala em 'a small interactive tool'. O locator 'Types of content' não foi confirmado como heading, só o conteúdo.",
+        "corrected": "",
+        "quote": "Claude can make an artifact out of almost anything, including documents, code snippets, single-page websites",
+        "locator": "support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them, 'Types of content'",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "claude-artifacts-visuals",
+        "gap": "N3: o que o Claude (claude.ai e Claude Code) já faz de equivalente: artifacts, visuais inline, imagine/visualizações",
+        "claim": "Artifacts conectam-se a apps/conectores do usuário e podem chamar Claude, virando mini-apps; legados anteriores a 2026-09-16.",
+        "verdict": "ANCORADA",
+        "why": "A quote está verbatim: 'You can build artifacts that call Claude directly, turning them into small apps' (o usuário entra com a própria conta Claude, sem chave de API). O texto diz 'Artifacts can connect to the apps you've connected to Claude'. Diz também 'Legacy artifacts are artifacts made in a chat before September 16, 2026'. Ressalva sem desmentir o claim: conectores cujas ferramentas exigem aprovação a cada ação não estão disponíveis para artifacts, e a página não menciona MCP.",
+        "corrected": "",
+        "quote": "You can build artifacts that call Claude directly, turning them into small apps",
+        "locator": "support.claude.com artifacts, seções 'AI-powered artifacts' e 'Dates'",
+        "sourceTier": 9,
+        "validFrom": "2026-09-16"
+      },
+      {
+        "source": "librechat-ui",
+        "gap": "N3: se o LibreChat (o brain do Onion) renderiza artifacts ou MCP-UI",
+        "claim": "O LibreChat renderiza Artifacts de React/HTML e Mermaid; a doc não numera versão (seletor 'Latest (dev)').",
+        "verdict": "ANCORADA",
+        "why": "Reaberta a página librechat.ai/docs/features/artifacts: a frase 'Interactive React components and HTML pages' aparece verbatim. A página lista React, HTML e Mermaid (também SVG e Markdown), descreve o Mermaid como 'compact inline cards that can open in the artifact panel' e não traz número de versão, só o seletor 'Latest (dev)'. O claim não passa disso.",
+        "corrected": "",
+        "quote": "Interactive React components and HTML pages",
+        "locator": "librechat.ai/docs/features/artifacts, lista de tipos renderizados",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "librechat-ui",
+        "gap": "N3: se o LibreChat (o brain do Onion) renderiza artifacts ou MCP-UI",
+        "claim": "Artifacts seguem ativos nos releases recentes (v0.8.8 de 2026-10-01 e RCs): gatilhos unificados como linhas de ferramenta, preview de SVG, falhas de entrega em sandbox.",
+        "verdict": "ANCORADA",
+        "why": "A página do release v0.8.8-rc3 (publicado em 15 Sep, rodapé 2026) traz verbatim 'feat: Unify Artifact Triggers as Tool Rows' e também 'fix: Surface Sandbox Artifact Delivery Failures'. O 'preview de SVG' vem do v0.8.8-rc4 ('fix: Preview SVG Artifacts From Their Edited Source'). A página do v0.8.8 (01 Oct) traz 'fix: Keep Historical Artifacts Closed During Regeneration'. O claim agrega vários releases sob 'v0.8.8 e RCs', e o texto sustenta isso. Ressalva menor: o preview de SVG e as falhas de sandbox não estão no v0.8.8 final, mas nos RCs, e o claim já diz 'e RCs'.",
+        "corrected": "",
+        "quote": "feat: Unify Artifact Triggers as Tool Rows",
+        "locator": "GitHub releases danny-avila/LibreChat, v0.8.8-rc3 (15 Sep 2026); rc4; v0.8.8 (01 Oct)",
+        "sourceTier": 9,
+        "validFrom": "2026-09-15"
+      }
+    ],
+    "rejected": [
+      {
+        "source": "openai-apps-sdk",
+        "gap": "N2: o mecanismo aberto da OpenAI para UI dentro do chat (componentes, sandbox, protocolo)",
+        "claim": "UI declarada como recurso MCP ligada à ferramenta por _meta.ui.resourceUri (MCP Apps); openai/outputTemplate é só alias de compatibilidade",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página 'Build your UI' traz 'Declare the UI resource with `_meta.ui.resourceUri`.' sob 'Start with MCP Apps', e 'ChatGPT also honors `_meta[\"openai/outputTemplate\"]` as a compatibility alias.' O claim não passa do que o texto diz.",
+        "corrected": "",
+        "locator": "chatgpt-ui: 'Start with MCP Apps'; 'Embed the component in the server response'"
+      },
+      {
+        "source": "openai-apps-sdk",
+        "gap": "N2: o mecanismo aberto da OpenAI para UI dentro do chat (componentes, sandbox, protocolo)",
+        "claim": "Componente roda em iframe isolado no ChatGPT, frames aninhados bloqueados por padrão, domínios via CSP",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. Aparecem 'Components run inside an iframe in ChatGPT', 'Nested frames are blocked by default.' e, em 'Manage state', 'UI runs in an isolated iframe'. O CSP declara connectDomains e resourceDomains, o que sustenta 'domínios declarados via CSP'.",
+        "corrected": "",
+        "locator": "chatgpt-ui: 'Start with MCP Apps'; 'Content security policy (CSP)'; 'Store cross-session state on your server'"
+      },
+      {
+        "source": "openai-apps-sdk",
+        "gap": "N2: o mecanismo aberto da OpenAI para UI dentro do chat (componentes, sandbox, protocolo)",
+        "claim": "Conversa componente-host por JSON-RPC ui/* sobre postMessage; window.openai só para o que a especificação compartilhada não cobre",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. O texto diz 'Use the `ui/*` JSON-RPC bridge over `postMessage` for initialization...' (a frase continua além da citação, o que não altera o sentido) e 'use `window.openai` only for capabilities that the shared specification does not cover.'",
+        "corrected": "",
+        "locator": "chatgpt-ui: 'Start with MCP Apps'; 'Layer on ChatGPT extensions'"
+      },
+      {
+        "source": "openai-apps-sdk",
+        "gap": "N2: o mecanismo aberto da OpenAI para UI dentro do chat (componentes, sandbox, protocolo)",
+        "claim": "Componente informa o modelo por ui/update-model-context; widget state é por instância e não é durável; dados de negócio no servidor via ferramenta MCP",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. O texto traz 'send that information through `ui/update-model-context`', 'Widget state belongs to one rendered UI instance.', 'Do not use it as the source of truth for business data or as durable storage.' e o passo '1. The UI calls an MCP tool.' sob 'Keep business data on the server'.",
+        "corrected": "",
+        "locator": "chatgpt-ui: 'Manage state' e subseções"
+      },
+      {
+        "source": "openai-apps-sdk",
+        "gap": "N2: o mecanismo aberto da OpenAI para UI dentro do chat (componentes, sandbox, protocolo)",
+        "claim": "Tipos: card inline, carrossel, fullscreen, PiP; inline aparece antes da resposta do modelo; o doc não descreve como o modelo decide mostrar UI",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. A página ui-guidelines traz 'Inline surfaces currently always appear before the generated model response.' e define inline card, carousel, fullscreen e PiP. O WebFetch afirmou que a página não explica como o modelo escolhe ou dispara o modo de exibição; ela só orienta o desenvolvedor sobre quando usar cada modo. A parte negativa depende de um resumo de WebFetch e não de uma leitura integral da página, então vale conferir no documento. A citação está em ui-guidelines, não em chatgpt-ui, mas o locator já a aponta corretamente.",
+        "corrected": "",
+        "locator": "concepts/ui-guidelines: 'Component types', 'Inline card'"
+      },
+      {
+        "source": "mcp-apps-extension",
+        "gap": "N2/N3: o padrão ABERTO de UI interativa em MCP (MCP Apps / MCP-UI), estado em outubro de 2026",
+        "claim": "O servidor MCP entrega UI declarando na descrição da tool um ponteiro _meta.ui.resourceUri para um recurso ui://, que o host pode pré-carregar antes da chamada (habilita streaming de inputs da tool para o app).",
+        "verdict": "AFIRMADA-SEM-CITACAO",
+        "why": "REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. Overview, 'How MCP Apps work', passo 1 (UI preloading): a frase aparece palavra por palavra. O claim não passa dela: 'habilita streaming de inputs' é o 'enabling features like streaming tool inputs to the app' do texto. Não há esticamento.",
+        "corrected": ""
+      },
+      {
+        "source": "librechat-ui",
+        "gap": "N3: se o LibreChat (o brain do Onion) renderiza artifacts ou MCP-UI",
+        "claim": "MCP Apps (UI interativa de resultados de ferramenta MCP, protocolo estável 2026-01-26) foi mergeado no LibreChat na branch canary em 2026-09-24, opt-in via mcpSettings.apps. Nenhum release v0.8.8 listado cita MCP Apps; a versão exata não está confirmada.",
+        "verdict": "NAO-ENCONTRADA",
+        "why": "A citação entre aspas não existe nessas palavras no PR #13831. O texto real é 'MCP Apps require explicit `mcpSettings.apps: true`. Omitting the setting keeps new Apps disabled and preserves legacy HTML; explicit `false` disables both.' O leitor admite que é paráfrase do resumo, mas a apresentou como citação verbatim. Pela regra de default na dúvida, é NAO-ENCONTRADA. O conteúdo é verdadeiro: opt-in por mcpSettings.apps, PR 'feat: MCP Apps support' (#13831) com estado Merged e base canary, data 'Sep 24, 2026' no topo da página (a página não rotula essa data como a do merge). A página de releases e a do v0.8.8 não mencionam MCP Apps, o que confere com a ressalva do claim. Não verifiquei o trecho 'protocolo estável 2026-01-26' neste documento.",
+        "corrected": "A descrição do PR #13831 diz: \"MCP Apps require explicit `mcpSettings.apps: true`. Omitting the setting keeps new Apps disabled and preserves legacy HTML; explicit `false` disables both.\" O PR consta como Merged na branch canary, com a data \"Sep 24, 2026\" no topo, não rotulada como data de merge. Nenhum release v0.8.8 visível cita MCP Apps, então a versão que o inclui não está confirmada.",
+        "quote": "the setting \"mcpSettings.apps: true\" must be set explicitly, and omitting it keeps new Apps disabled and preserves legacy HTML",
+        "locator": "PR #13831 'feat: MCP Apps support', descrição; merged into canary, Sep 24, 2026",
+        "sourceTier": 9,
+        "validFrom": "2026-09-24",
+        "superacao": {
+          "classe": "entrega",
+          "achada": true,
+          "o_que": "A frase verbatim do mesmo PR #13831 ('MCP Apps require explicit `mcpSettings.apps: true`. Omitting the setting keeps new Apps disabled and preserves legacy HTML; explicit `false` disables both.') entrega o valor que o claim prometia, o fato do opt-in.",
+          "medida": "WebFetch do PR #13831 duas vezes, com prompt pedindo as frases com 'mcpSettings.apps'. Ambas devolveram essa formulação, junto com Merged, base canary e a data 'Sep 24, 2026'."
+        },
+        "criterio": {
+          "id": "A1_QUOTE_AUSENTE",
+          "comando": "WebFetch https://github.com/danny-avila/LibreChat/pull/13831 e grep -F 'the setting \"mcpSettings.apps: true\" must be set explicitly': 0 ocorrências (o texto real é 'MCP Apps require explicit `mcpSettings.apps: true`. Omitting the setting keeps new Apps disabled and preserves legacy HTML; explicit `false` disables both.')"
+        }
+      }
+    ],
+    "elenxo": {
+      "objections": [
+        {
+          "target": "Premissa da rodada: N0/N1 da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07; componentes, quando o modelo os usa, streaming antes do fim do raciocínio)",
+          "survives": true,
+          "evidence": "A fonte openai-gpt6-intelligent-ui ficou inalcançável, e nenhuma das 14 claims ancoradas tem answersGap=openai-gpt6-intelligent-ui. A existência, a data (2026-10-07), os planos, o catálogo de componentes, o critério de decisão do modelo e o streaming antes do fim do raciocínio estão todos sem âncora. O mais perto que a rodada chega é a frase de ui-guidelines 'Inline surfaces currently always appear before the generated model response.', e ela foi REBAIXADA na ancoragem. Mesmo se valesse, descreve apps de terceiros do Apps SDK, não a UI nativa do GPT-6. No corpus, kg-corpus-grep 'Intelligent UI' só devolve nós de vps-shared-tools-2026-07 que casaram 'UI' por OR, nenhum sobre o produto.",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh 'Intelligent UI' ; conferir na lista do prompt que nenhuma claim ancorada tem answersGap=openai-gpt6-intelligent-ui (fonte listada em 'Fontes inalcançáveis')"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Nenhuma fonte primária da OpenAI sobre a Intelligent UI do GPT-6 foi lida nesta rodada",
+            "medida": "Procurei nas 14 claims ancoradas e nas 7 rejeitadas e rodei o corpus com kg-corpus-grep 'Intelligent UI'. Não há nó nem claim. O análogo mais próximo, os visuais inline do Claude (claims 7-10), é de outro fornecedor e não mede o objeto."
+          }
+        },
+        {
+          "target": "Claim 1 [openai-apps-sdk]: componente renderiza de toolResult.structuredContent, tratado como entrada não confiável",
+          "survives": true,
+          "evidence": "A claim prova uma coisa: que o componente lê structuredContent e deve tratá-lo como não confiável. A lacuna pede o mecanismo inteiro (componentes, sandbox, protocolo). As partes de sandbox (iframe isolado, CSP connectDomains/resourceDomains), protocolo (ponte JSON-RPC ui/* sobre postMessage, window.openai só como resto) e declaração (_meta.ui.resourceUri, openai/outputTemplate como alias) foram TODAS rebaixadas por falta de quote/locator. A claim também não liga o Apps SDK à Intelligent UI nativa do GPT-6, e os visuais de primeira parte podem ter outro mecanismo. kg-corpus-grep 'structuredContent' devolve 0 nós.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh 'structuredContent' (0 nós); e conferir na lista 'Claims REJEITADAS' as 5 claims openai-apps-sdk sobre iframe, ui/*, resourceUri, update-model-context e modos de exibição"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "O mecanismo de sandbox e protocolo vem ancorado só pela spec MCP Apps (claims 2-4). A ligação ChatGPT↔MCP Apps estava nas claims rejeitadas.",
+            "medida": "Comparei as claims 2-4 (ext-apps 2026-01-26) com a lacuna openai-apps-sdk. Elas descrevem o padrão aberto, não o que o ChatGPT implementa. A frase que faria a ponte ('Start with MCP Apps... Declare the UI resource with _meta.ui.resourceUri') está entre as rebaixadas."
+          }
+        },
+        {
+          "target": "Claim 2 [mcp-apps-extension]: MIME text/html;profile=mcp-app e prefixo ui:// reservado",
+          "survives": false,
+          "evidence": "A quote é verbatim e está datada pela spec 2026-01-26, seção UI Resource Format, e prova exatamente o formato. Para a forja isso basta: o recurso de UI é HTML com perfil fixo, e não há componente declarativo nativo no padrão. Isso responde ao N2 ('HTML em sandbox' no lado aberto). Não achei evidência contrária."
+        },
+        {
+          "target": "Claim 3 [mcp-apps-extension]: spec Stable 2026-01-26, sandbox com origem distinta e proxy intermediário obrigatório para host web",
+          "survives": false,
+          "evidence": "Há quote verbatim com o MUST e locator na seção Sandbox proxy. Para o N3 a claim fixa um custo concreto: o /chat do onion-bridge, sendo host web, teria de servir um proxy de sandbox numa ORIGEM diferente. Isso é requisito de implementação, não refutação. Fica uma ressalva: a lacuna pede o 'estado em outubro de 2026', e a rodada não mostra se existe revisão posterior a 2026-01-26. Como a página overview foi lida em 2026-10-21 sem citar revisão nova, a objeção não se sustenta com evidência."
+        },
+        {
+          "target": "Claim 4 [mcp-apps-extension]: JSON-RPC sobre postMessage, app chama tools e atualiza contexto do modelo, 'o que serve cards interativos como os do /meta:decide'",
+          "survives": true,
+          "evidence": "A primeira metade está ancorada: 'The app can request tool calls, send messages, update the model's context, and receive data from the host.' A segunda, que isso 'serve os cards do /meta:decide', é inferência sem âncora. O /meta:decide roda no Claude Code (terminal, AskUserQuestion), e a lista oficial de hosts da claim 5 nomeia Claude, Claude Desktop, VS Code GitHub Copilot e Microsoft 365 Copilot, sem o Claude Code CLI. Num terminal não há host MCP Apps para renderizar o card, então a transferência para o /meta:decide não está provada.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "conferir a quote da claim 5 (lista 'Client support' do MCP Apps overview): o Claude Code CLI não aparece como host; bash .claude/validation/kg-corpus-grep.sh 'MCP Apps' devolve só nós sem relação (PR_651, vendor-multi-branch)"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Página publicada pelo Artifact tool do Claude Code com runtime capabilities (input/db/perguntar ao Claude), como superfície de card interativo do /meta:decide",
+            "medida": "A descrição do Artifact tool nesta sessão declara capacidades de coletar input e guardar estado compartilhado, mas nenhum /meta:decide foi medido devolvendo uma resposta selada no grafo por essa via. É peça possível, não entrega medida."
+          }
+        },
+        {
+          "target": "Claim 5 [mcp-apps-extension]: hosts oficiais sem ChatGPT nem LibreChat",
+          "survives": true,
+          "evidence": "A parte NEGATIVA ('sem ChatGPT nem LibreChat') não está na quote. A citação termina truncada em '[Microsoft 365 Copilot]', então a lista pode continuar. A rodada traz ainda evidência contrária a essa negativa. (a) A página 'Build your UI' da OpenAI, sob 'Start with MCP Apps', diz 'Declare the UI resource with `_meta.ui.resourceUri`.' e 'ChatGPT also honors `_meta[\"openai/outputTemplate\"]` as a compatibility alias'. O ChatGPT, portanto, consome MCP Apps. (b) O PR #13831 'feat: MCP Apps support' do LibreChat consta como Merged na base canary. As duas evidências foram rebaixadas só por formato de citação, não por falsidade: o verificador achou os trechos no documento.",
+          "criterio": {
+            "id": "E1_EVIDENCIA_CONTRARIA",
+            "comando": "developers.openai.com Apps SDK 'Build your UI' §'Start with MCP Apps': 'Declare the UI resource with `_meta.ui.resourceUri`.' ; github.com/danny-avila/LibreChat/pull/13831: 'MCP Apps require explicit `mcpSettings.apps: true`.'"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Leitura integral da seção 'Client support' para saber se a lista oficial continua após Microsoft 365 Copilot",
+            "medida": "A quote da claim 5 termina truncada e nenhuma outra claim ancorada reproduz a lista completa. Não houve releitura nesta rodada."
+          }
+        },
+        {
+          "target": "Claim 6 [mcp-apps-extension]: mcp-ui implementa MCP Apps; LibreChat é host; ChatGPT só via adaptador do Apps SDK",
+          "survives": true,
+          "evidence": "Duas partes provam menos ou são contrariadas. (1) 'LibreChat é host' vem do README de um SDK de terceiro (idosal/mcp-ui), não de release do LibreChat. A única evidência do lado do LibreChat é o PR #13831, mergeado na canary em 2026-09-24 e opt-in por mcpSettings.apps, e a claim rejeitada registra que nenhum release v0.8.8 cita MCP Apps. O brain do Onion roda LibreChat v0.8.8 (corpus/memória librechat-vps-state), logo a rodada NÃO prova que o brain renderiza MCP Apps. (2) 'ChatGPT só via adaptador' choca com a doc da OpenAI de que o ChatGPT honra _meta.ui.resourceUri ('Start with MCP Apps').",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "bash .claude/validation/kg-corpus-grep.sh 'mcpSettings.apps' (0 nós); e conferir em github.com/danny-avila/LibreChat/releases que v0.8.8 (01 Oct 2026) não lista MCP Apps, só o PR #13831 com base canary"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Subir o brain para um build com o PR #13831 e ligar mcpSettings.apps: true",
+            "medida": "É condição futura: nenhum build do brain com MCP Apps foi medido renderizando um recurso ui:// do onion-kg. A versão de produção conhecida é v0.8.8 estável."
+          }
+        },
+        {
+          "target": "Claim 7 [claude-artifacts-visuals]: Claude gera visuais interativos inline na conversa (beta, web e desktop)",
+          "survives": true,
+          "evidence": "A capacidade (N1) está provada: 'Claude can generate custom diagrams, charts, and interactive visuals directly in your conversation.' A lacuna, porém, é de N3 (o que o Claude Code já faz), e a rodada precisa também de N2 (como é feito). Nenhuma claim ancorada diz como os visuais inline são gerados (HTML? SVG? sandbox?), se fazem streaming antes do fim do raciocínio ou se existem no Claude Code CLI. O próprio locator restringe o recurso a web e desktop. Para as superfícies do Onion (terminal, bridge, LibreChat) o recurso é de primeira parte e fechado, sem protocolo aberto para costurar.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "conferir nas claims 7-10 que nenhuma quote descreve o mecanismo de renderização nem a disponibilidade no Claude Code; bash .claude/validation/kg-corpus-grep.sh 'custom visuals' (sem nó de mecanismo)"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Artifact tool do Claude Code (páginas HTML publicadas, skills artifact-design/dataviz) como equivalente persistente no terminal",
+            "medida": "O corpus registra o uso do Artifact tool, mas ele publica página fora da conversa e não renderiza inline nem faz streaming junto da resposta. Não entrega o valor 'visual inline durante a resposta'. É status quo, não superação."
+          }
+        },
+        {
+          "target": "Claim 8 [claude-artifacts-visuals]: o modelo decide quando usar visual; usuário pode pedir; há interação e follow-up",
+          "survives": false,
+          "evidence": "A quote é verbatim ('Claude decides when a visual would help based on what you're asking.') e prova o verbo N1 do análogo: decisão do modelo mais pedido explícito. Não prova o critério interno da decisão, mas a claim não o afirma. Sem evidência contrária."
+        },
+        {
+          "target": "Claim 9 [claude-artifacts-visuals]: visuais efêmeros, não salvos por padrão",
+          "survives": false,
+          "evidence": "Quote verbatim ('Visuals aren't saved automatically.'). Para o Onion a claim é útil e suficiente: um visual efêmero não serve de registro de decisão. No /meta:decide o selo continua no grafo, e o visual seria só projeção. Sem objeção de pé."
+        },
+        {
+          "target": "Claim 10 [claude-artifacts-visuals]: lançamento datado (12-mar-2026), inline e temporário",
+          "survives": false,
+          "evidence": "A quote ('appear in-line, rather than in a side panel') e o locator datado (post de 12 de março de 2026, atualizado em 22 de abril para o Cowork) sustentam a data. Para o eixo de mercado ela é o dado mais forte da rodada: a Anthropic lançou visuais inline cerca de 7 meses antes da data alegada da Intelligent UI do GPT-6. Isso desloca a narrativa 'a OpenAI inventou' para 'convergência de mercado'. A conclusão sobre a OpenAI, porém, depende da premissa não verificada (ver 1ª objeção)."
+        },
+        {
+          "target": "Claim 11 [claude-artifacts-visuals]: Artifacts abrangem documentos, páginas, dashboards e ferramentas, e começam privados",
+          "survives": true,
+          "evidence": "A quote cobre os tipos de conteúdo ('documents, code snippets, single-page websites'). A afirmação 'começam privados' não está no trecho citado e fica sem âncora. A parte provada é a menos relevante. O que importa para o N3, a privacidade e o compartilhamento de um card de decisão, é justamente o que não foi ancorado.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "comparar a QUOTE da claim 11 com o enunciado: 'começam privados' não aparece no trecho de support.claude.com/en/articles/9487310 §'Types of content'"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Contrato do Artifact tool do Claude Code ('artifacts start private')",
+            "medida": "A descrição do Artifact tool desta sessão declara que artifacts começam privados, mas isso é do Claude Code, não do claude.ai que a claim cita. É declaração de ferramenta, não fonte ancorada da rodada."
+          }
+        },
+        {
+          "target": "Claim 12 [claude-artifacts-visuals]: Artifacts chamam o Claude e viram mini-apps; 'legados anteriores a 2026-09-16'",
+          "survives": true,
+          "evidence": "A quote prova que há artifacts que chamam o Claude ('You can build artifacts that call Claude directly, turning them into small apps'). A cláusula de data 'legados anteriores a 2026-09-16' não aparece na quote e o seu sentido fica indefinido: não se sabe o que é legado, nem se é o recurso ou o formato. A claim fala do claude.ai e não prova o equivalente no Claude Code, que é a superfície do /meta:decide.",
+          "criterio": {
+            "id": "E2_PROVA_MENOS",
+            "comando": "comparar a QUOTE da claim 12 com o enunciado: '2026-09-16' e 'legados' estão fora do trecho citado (support.claude.com artifacts §'Dates')"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Capacidade 'ask Claude' das páginas do Artifact tool no Claude Code",
+            "medida": "Ela existe declarada no contrato do Artifact tool desta sessão, mas nenhuma página do Onion foi medida usando-a. É peça possível, não entrega."
+          }
+        },
+        {
+          "target": "Claim 13 [librechat-ui]: LibreChat renderiza artifacts React/HTML e Mermaid (doc sem versão)",
+          "survives": false,
+          "evidence": "A quote é verbatim ('Interactive React components and HTML pages'). A falta de versão na doc ('Latest (dev)') é compensada pela claim 14, que mostra artifacts ativos na linha v0.8.8. Ressalva para a forja: artifacts do LibreChat são código que o MODELO gera e o cliente renderiza. Não são UI empurrada pelos MCPs do brain (onion-kg, onion-kg-writer), e essa parte da lacuna (MCP-UI) continua aberta."
+        },
+        {
+          "target": "Claim 14 [librechat-ui]: Artifacts ativos em v0.8.8 e RCs",
+          "survives": false,
+          "evidence": "A quote 'feat: Unify Artifact Triggers as Tool Rows' (v0.8.8-rc3, 15-set-2026) e o release v0.8.8 de 01-out sustentam que o recurso está vivo na versão do brain. A rodada não mediu se o librechat.yaml do brain habilita artifacts, mas a claim não afirma isso."
+        },
+        {
+          "target": "Eixo invariante de mercado e capital",
+          "survives": true,
+          "evidence": "Nenhuma claim ancorada trata de mercado ou capital: preço e planos da Intelligent UI, adoção do MCP Apps por fornecedor, investimento, quem paga o sandbox. O único dado de mercado é a cronologia, inferida das claims 10 e 5 (Anthropic em março, padrão MCP Apps Stable em janeiro com Claude e Microsoft como hosts). Isso é cronologia de produto, não eixo de capital.",
+          "criterio": {
+            "id": "E4_LACUNA_ABERTA",
+            "comando": "conferir nas 14 claims ancoradas que nenhuma traz preço, plano, financiamento ou adoção de mercado; a lacuna openai-gpt6-intelligent-ui (que incluía 'planos') está sem fonte"
+          },
+          "superacao": {
+            "classe": "nenhuma",
+            "achada": false,
+            "o_que": "Fonte de mercado (planos do ChatGPT, adoção de MCP Apps por hosts) que preenchesse o eixo",
+            "medida": "Procurei nas claims ancoradas e nas rejeitadas: só a claim 5 lista hosts, e sem número de adoção nem capital. Nenhuma fonte de mercado aparece em 'Fontes inalcançáveis' nem nas lidas."
+          }
+        }
+      ],
+      "gapsClosed": [
+        "mcp-apps-extension: formato (text/html;profile=mcp-app, ui://), status Stable 2026-01-26, sandbox de origem distinta com proxy obrigatório para host web e ponte JSON-RPC/postMessage bidirecional, ancorados nas claims 2-4. Ressalva: a lista de hosts (claim 5) e o suporte do LibreChat (claim 6) não ficaram fechados, ver objeções",
+        "claude-artifacts-visuals (metade claude.ai): visuais inline datados (12-mar-2026), decididos pelo modelo, interativos e efêmeros, e artifacts como mini-apps que chamam o Claude, nas claims 7-12",
+        "librechat-ui (metade artifacts): o LibreChat renderiza artifacts React/HTML/Mermaid, ativos na linha v0.8.8 (claims 13-14)"
+      ],
+      "gapsOpen": [
+        "openai-gpt6-intelligent-ui: fonte inalcançável e zero claims ancoradas. A existência, a data 2026-10-07, os planos, os componentes, o critério de uso e o streaming antes do fim do raciocínio ficam sem prova",
+        "openai-apps-sdk: só structuredContent está ancorado (claim 1). Iframe/CSP, a ponte ui/*, _meta.ui.resourceUri, update-model-context e os modos inline/carrossel/fullscreen/PiP foram rebaixados por falta de quote",
+        "librechat-ui (metade MCP-UI/MCP Apps): o suporte está só na canary (PR #13831, opt-in mcpSettings.apps), a claim foi rejeitada na ancoragem por citação não verbatim, e não há prova no v0.8.8 do brain",
+        "claude-artifacts-visuals (metade Claude Code): nenhuma claim ancorada sobre o que o Claude Code faz inline. O mecanismo dos visuais inline (N2) também está sem âncora",
+        "eixo de mercado e capital: nenhuma claim ancorada",
+        "N2 do objeto: se a Intelligent UI usa componentes declarativos, HTML em sandbox, widgets do Apps SDK ou template server-side. Nada ancorado"
+      ],
+      "recommendation": "O QUE A RODADA SUSTENTA:\n(1) O mecanismo ABERTO equivalente existe, é estável e está especificado. É o MCP Apps (ext-apps 2026-01-26): um recurso ui:// com MIME text/html;profile=mcp-app, renderizado em sandbox de origem distinta com proxy obrigatório para host web, e uma ponte JSON-RPC sobre postMessage pela qual o app chama tools e atualiza o contexto do modelo. Como o padrão é HTML em sandbox, o equivalente aberto não é componente declarativo nativo.\n(2) A Anthropic já entrega o análogo de primeira parte desde 12-mar-2026, com visuais inline decididos pelo modelo, interativos e efêmeros. No claude.ai, os artifacts viram mini-apps que chamam o Claude.\n(3) O LibreChat v0.8.8 do brain renderiza artifacts React/HTML/Mermaid gerados pelo modelo.\n\nO QUE A RODADA NÃO SUSTENTA, e não deve entrar no /meta:forge como fato:\n(a) A Intelligent UI do GPT-6 em si: data, componentes, critério e, sobretudo, o streaming antes do fim do raciocínio. A fonte ficou inalcançável e não há nenhuma âncora. O dossiê não pode apresentar o objeto como dissecado em N0-N2. Ou se re-busca a fonte primária da OpenAI, ou o objeto fica rotulado como NÃO VERIFICADO.\n(b) O mecanismo do ChatGPT: só structuredContent está ancorado. A ponte ChatGPT↔MCP Apps (resourceUri, alias outputTemplate) foi rebaixada por formato de citação. O verificador achou os trechos, então vale reancorar com quote, porque eles também derrubam a negativa da claim 5.\n(c) MCP Apps no brain: o suporte está só na canary (PR #13831, opt-in). Para forjar UI vinda dos MCPs onion-kg/onion-kg-writer é preciso subir o brain para além do v0.8.8, o que é condição futura não medida.\n(d) MCP Apps nos cards do /meta:decide: o Claude Code CLI não aparece como host, então a costura direta não está provada. Os caminhos plausíveis, não medidos, são o Artifact tool com capabilities para o card persistente e o /chat do onion-bridge como host MCP Apps próprio, que paga o custo de uma segunda origem para o proxy de sandbox.\n(e) O eixo de mercado e capital está vazio.\n\nProposta defensável para o /meta:decide, rotulada como hipótese: abrir um piloto ÚNICO de MCP Apps num host que o Onion controla, o /chat do onion-bridge ou o brain em canary, com um recurso ui:// servido pelo onion-kg, e medir antes de generalizar. O streaming antes do fim do raciocínio e a paridade com o GPT-6 ficam fora até a fonte primária ser lida. Nenhum descarte desta rodada foi por orçamento. As lacunas abertas são falta de evidência e voltam como objeções sobreviventes."
+    },
+    "stats": {
+      "sources": 5,
+      "reached": 4,
+      "anchored": 14,
+      "rejected": 7,
+      "nodesAdded": 28,
+      "edgesAdded": 30,
+      "nodesTotal": 28
+    },
+    "overcoming": {
+      "found": 1,
+      "nodesCounted": 1,
+      "edgesCounted": 1,
+      "base": {
+        "nodes": 0,
+        "edges": 0,
+        "measured": true
+      },
+      "recusedAnchor": 0,
+      "recusedElenxo": 0,
+      "recused": []
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Corpus"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Scope"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Search"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Fetch"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 5,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 6,
+      "title": "Synthesize"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 7,
+      "title": "write(KG)"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 8,
+      "title": "Leitura"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "ler:openai-gpt6-intelligent-ui",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a79b23cccd61e8b1b",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605401258,
+      "queuedAt": 1792605401203,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "help.openai.com/en/articles/6825453-chatgpt-release-notes; …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605422549,
+      "tokens": 63418,
+      "toolCalls": 7,
+      "durationMs": 21287,
+      "resultPreview": "{\"source\":\"help.openai.com/en/articles/6825453-chatgpt-release-notes; openai.com/index/gpt-6-for-everyone/\",\"reachable\":false,\"claims\":[],\"notes\":\"As duas fontes primárias devolveram HTTP 403 ao WebFetch: help.openai.com/en/articles/6825453-chatgpt-release-notes, openai.com/index/gpt-6-for-everyone/ e as versões localizadas da mesma página (openai.com/da-DK/... e openai.com/vi-VN/...). Não li nenh…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ler:openai-apps-sdk",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a387dcd4f88881f15",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605401258,
+      "queuedAt": 1792605401204,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://developers.openai.com/apps-sdk/build/chatgpt-ui (+ …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605432338,
+      "tokens": 62946,
+      "toolCalls": 4,
+      "durationMs": 28641,
+      "resultPreview": "{\"source\":\"https://developers.openai.com/apps-sdk/build/chatgpt-ui (+ /apps-sdk/concepts/ui-guidelines)\",\"reachable\":true,\"claims\":[{\"claim\":\"A UI é declarada como recurso MCP e ligada à ferramenta por _meta.ui.resourceUri (padrão MCP Apps); openai/outputTemplate é só alias de compatibilidade do ChatGPT.\",\"quote\":\"Declare the UI resource with `_meta.ui.resourceUri`.\",\"locator\":\"Seção 'Start with M…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "ler:mcp-apps-extension",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "ad7dbac9c75ce7431",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605401259,
+      "queuedAt": 1792605401204,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "modelcontextprotocol.io/extensions/apps/overview; github.co…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605442809,
+      "tokens": 67560,
+      "toolCalls": 5,
+      "durationMs": 39111,
+      "resultPreview": "{\"source\":\"modelcontextprotocol.io/extensions/apps/overview; github.com/idosal/mcp-ui (README); github.com/modelcontextprotocol/ext-apps specification/2026-01-26/apps.mdx\",\"reachable\":true,\"claims\":[{\"claim\":\"Um servidor MCP entrega UI declarando na descrição da tool um ponteiro _meta.ui.resourceUri para um recurso ui://, que o host pode pré-carregar antes da chamada (habilita streaming de inputs …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "ler:claude-artifacts-visuals",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "aa56e8a52f8ca1d3d",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605401259,
+      "queuedAt": 1792605401204,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "support.claude.com (artifacts; custom visuals in chat) + cl…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605445644,
+      "tokens": 64278,
+      "toolCalls": 6,
+      "durationMs": 41944,
+      "resultPreview": "{\"source\":\"support.claude.com (artifacts; custom visuals in chat) + claude.com/blog/claude-builds-visuals\",\"reachable\":true,\"claims\":[{\"claim\":\"Claude já gera visuais interativos inline na conversa (beta, web e desktop), sem painel lateral.\",\"quote\":\"Claude can generate custom diagrams, charts, and interactive visuals directly in your conversation.\",\"locator\":\"support.claude.com/en/articles/139795…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "ler:librechat-ui",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "accdbd116cf7d354e",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605401259,
+      "queuedAt": 1792605401204,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "librechat.ai/docs/features/artifacts; api.github.com/repos/…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605470990,
+      "tokens": 66609,
+      "toolCalls": 8,
+      "durationMs": 67289,
+      "resultPreview": "{\"source\":\"librechat.ai/docs/features/artifacts; api.github.com/repos/danny-avila/LibreChat/releases; github.com/danny-avila/LibreChat/pull/13831\",\"reachable\":true,\"claims\":[{\"claim\":\"O LibreChat renderiza Artifacts de React/HTML e Mermaid; a doc não numera versão (seletor 'Latest (dev)').\",\"quote\":\"Interactive React components and HTML pages\",\"locator\":\"librechat.ai/docs/features/artifacts, lista…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 9,
+      "title": "Ancoragem"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "ancorar:openai-apps-sdk",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a25497385ec61bc16",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605432372,
+      "queuedAt": 1792605432343,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "developers.openai.com/apps-sdk/build/chatgpt-ui e developer…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605473287,
+      "tokens": 64675,
+      "toolCalls": 5,
+      "durationMs": 40914,
+      "resultPreview": "{\"source\":\"developers.openai.com/apps-sdk/build/chatgpt-ui e developers.openai.com/apps-sdk/concepts/ui-guidelines (WebFetch, 2026-10-21)\",\"verdicts\":[{\"claim\":\"UI declarada como recurso MCP ligada à ferramenta por _meta.ui.resourceUri (MCP Apps); openai/outputTemplate é só alias de compatibilidade\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"A página 'Build your UI' traz…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "ancorar:mcp-apps-extension",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a076f250583057c01",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605442829,
+      "queuedAt": 1792605442824,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "modelcontextprotocol.io/extensions/apps/overview; github.co…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605472079,
+      "tokens": 67949,
+      "toolCalls": 5,
+      "durationMs": 29250,
+      "resultPreview": "{\"source\":\"modelcontextprotocol.io/extensions/apps/overview; github.com/modelcontextprotocol/ext-apps specification/2026-01-26/apps.mdx; github.com/idosal/mcp-ui (todos reabertos via WebFetch em 2026-10-21)\",\"verdicts\":[{\"claim\":\"O servidor MCP entrega UI declarando na descrição da tool um ponteiro _meta.ui.resourceUri para um recurso ui://, que o host pode pré-carregar antes da chamada (habilita …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "ancorar:claude-artifacts-visuals",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a89e5ba2b49ea5f6e",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605445653,
+      "queuedAt": 1792605445648,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "support.claude.com custom-visuals-in-chat (reaberto); claud…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605485790,
+      "tokens": 65413,
+      "toolCalls": 6,
+      "durationMs": 40137,
+      "resultPreview": "{\"source\":\"support.claude.com custom-visuals-in-chat (reaberto); claude.com/blog/claude-builds-visuals (reaberto); support.claude.com artifacts 9487310 (reaberto)\",\"verdicts\":[{\"claim\":\"Claude já gera visuais interativos inline na conversa (beta, web e desktop), sem painel lateral.\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"A quote aparece verbatim na introdução do arti…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "ancorar:librechat-ui",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "aeced4a523a745093",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605470996,
+      "queuedAt": 1792605470992,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "LibreChat: librechat.ai/docs/features/artifacts; github.com…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605543252,
+      "tokens": 66291,
+      "toolCalls": 9,
+      "durationMs": 72256,
+      "resultPreview": "{\"source\":\"LibreChat: librechat.ai/docs/features/artifacts; github.com/danny-avila/LibreChat releases (v0.8.8-rc3, v0.8.8-rc4, v0.8.8); PR #13831\",\"verdicts\":[{\"claim\":\"O LibreChat renderiza Artifacts de React/HTML e Mermaid; a doc não numera versão (seletor 'Latest (dev)').\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"why\":\"Reaberta a página librechat.ai/docs/features/artifact…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 10,
+      "title": "Elenxo"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "elenxo-primarias",
+      "phaseIndex": 10,
+      "phaseTitle": "Elenxo",
+      "agentId": "a146d2ba37debfaaa",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792605543312,
+      "queuedAt": 1792605543271,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "O QUE A RODADA SUSTENTA: (1) O mecanismo ABERTO equivalente…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605705496,
+      "tokens": 66906,
+      "toolCalls": 2,
+      "durationMs": 162184,
+      "resultPreview": "{\"objections\":[{\"target\":\"Premissa da rodada: N0/N1 da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07; componentes, quando o modelo os usa, streaming antes do fim do raciocínio)\",\"survives\":true,\"evidence\":\"A fonte openai-gpt6-intelligent-ui ficou inalcançável, e nenhuma das 14 claims ancoradas tem answersGap=openai-gpt6-intelligent-ui. A existência, a data (2026-10-07), os planos, o…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "count-sup",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "ae7f259a99da99f23",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792605705530,
+      "queuedAt": 1792605705504,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Contador do motor — NÃO escreva nada. A partir da raiz do repositório rode e copie os números:\n1. grep -c '^[[:space:]]*- id: C_SUPERACAO_20261021_' \"docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml\" — devolva overcomingNodes = o NÚMERO impresso (0 se nenhum ou arquivo ausente).\n2. awk -v p='C_SUPERACAO_20261021_' '/^[[:space:]]*- from:/{f=index($0,p)>0} /^[[:space:]…",
+      "promptFramed": true,
+      "lastProgressAt": 1792605713364,
+      "tokens": 58792,
+      "toolCalls": 2,
+      "durationMs": 7833,
+      "resultPreview": "{\"overcomingNodes\":0,\"overcomingEdges\":0}"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "write-kg-primarias",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a4f584b6df46a293e",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792605713396,
+      "queuedAt": 1792605713369,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "docs/evolution/dissect/intelligen…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Dissecação (/meta:dissect, régua onion, alvo N4) da 'Intelligent UI' do ChatGPT com GPT-6 (lançada em 2026-10-07): respostas que misturam texto com visuais e ferramentas interativas e começam a sair antes de o modelo terminar de pensar. N0 identidade (OpenAI, proprietári…",
+      "promptFramed": true,
+      "lastProgressAt": 1792606074098,
+      "tokens": 143589,
+      "toolCalls": 19,
+      "durationMs": 360701,
+      "resultPreview": "{\"kgPath\":\"docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":28,\"edges\":30,\"nodesTotal\":28,\"summary\":\"Grafo novo (28 nós e 30 arestas, TETO 28, review_after 2026-11-20 pela cadência de ferramenta de 30 dias). Nele estão 14 evidências ancoradas, E_LACUNAS_PRIMARIES_1021, a superação C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_O…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "verify-kg-1",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a71d8273e431687af",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1792606074140,
+      "queuedAt": 1792606074103,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\nA partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n1. bash .claude/validation/kg-radar.sh \"docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml\" --integrity --schema; echo \"RC=$?\"\n2. bash .claude/validation/kg…",
+      "promptFramed": true,
+      "lastProgressAt": 1792606082437,
+      "tokens": 59357,
+      "toolCalls": 2,
+      "durationMs": 8296,
+      "resultPreview": "{\"radarExit\":0,\"contractExit\":0,\"output\":\"\",\"overcomingNodes\":1,\"overcomingEdges\":1}"
+    }
+  ],
+  "totalTokens": 917783,
+  "totalToolCalls": 80
+}
