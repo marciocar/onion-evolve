@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**611 itens abertos** em 116 grafo(s) com aberto (de 149 no escopo) · 117 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**610 itens abertos** em 116 grafo(s) com aberto (de 149 no escopo) · 117 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -199,12 +199,11 @@
 | 9.6 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
-## audit-evidence-storage-2026-10 — 18 item(ns)
+## audit-evidence-storage-2026-10 — 17 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 62.5 | `Q_AUDIT_EVIDENCE_STORAGE_2026_10` | audit-evidence-storage-2026-10 | Onde deve morar o estado da evidência de auditoria contínua (controles, evidências, frescor, achados) em outubro de 2026: grafo |
-| 52.5 | `D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021` | audit-evidence-storage-2026-10 | DECISÃO ABERTA (reabre D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021): A selar como está · B selar com escopo dividido (estado de |
 | 38.5 | `C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS` | audit-evidence-storage-2026-10 | OPÇÃO B (recomendada pelo Elenxo): o grafo em git guarda o estado declarativo e de julgamento (controles, mapeamentos, achados,  |
 | 24.0 | `C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT` | audit-evidence-storage-2026-10 | OPÇÃO A: selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 como está: o grafo YAML em git é o armazenamento de TODO o estado d |
 | 9.6 | `C_OPCAO_E_PRODUCT_RELATIONAL_DB` | audit-evidence-storage-2026-10 | OPÇÃO E: banco relacional próprio, o padrão de Vanta, CISO Assistant, Probo, Comp AI e do kyverno reports-server para resultad |
