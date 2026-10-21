@@ -2,7 +2,7 @@
 branch: docs/research-audit-storage
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: 8851d45b45c2f3324a645684f2a393d77781d7711026812cd8e65bff72da2894
+reviewed_diff_sha256: 678285560984481071de215d159cadd89e4ab2cade3b768b83ffd754f3947958
 reviewed_code_sha256: 736ac022c9e52d090808fd511ad90defaab47c225cc5a065723f43ca3193c476
 findings_total: 2
 findings_real: 2

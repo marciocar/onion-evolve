@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**593 itens abertos** em 115 grafo(s) com aberto (de 148 no escopo) · 116 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**611 itens abertos** em 116 grafo(s) com aberto (de 149 no escopo) · 117 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -198,6 +198,29 @@
 | 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
 | 9.6 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
+
+## audit-evidence-storage-2026-10 — 18 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 62.5 | `Q_AUDIT_EVIDENCE_STORAGE_2026_10` | audit-evidence-storage-2026-10 | Onde deve morar o estado da evidência de auditoria contínua (controles, evidências, frescor, achados) em outubro de 2026: grafo |
+| 52.5 | `D_AUDIT_STORAGE_SEAL_AFTER_VENDOR_SWEEP_1021` | audit-evidence-storage-2026-10 | DECISÃO ABERTA (reabre D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021): A selar como está · B selar com escopo dividido (estado de |
+| 38.5 | `C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS` | audit-evidence-storage-2026-10 | OPÇÃO B (recomendada pelo Elenxo): o grafo em git guarda o estado declarativo e de julgamento (controles, mapeamentos, achados,  |
+| 24.0 | `C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT` | audit-evidence-storage-2026-10 | OPÇÃO A: selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 como está: o grafo YAML em git é o armazenamento de TODO o estado d |
+| 9.6 | `C_OPCAO_E_PRODUCT_RELATIONAL_DB` | audit-evidence-storage-2026-10 | OPÇÃO E: banco relacional próprio, o padrão de Vanta, CISO Assistant, Probo, Comp AI e do kyverno reports-server para resultad |
+| 7.5 | `C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE` | audit-evidence-storage-2026-10 | OPÇÃO D: OSCAL como arquivo nativo versionado em git (o modelo do trestle, IBM 2021): a quarta opção que a pergunta omitiu. |
+| 4.8 | `C_OPCAO_C_ONE_MORE_FOCUSED_PASS` | audit-evidence-storage-2026-10 | OPÇÃO C: não selar ainda; rodar mais uma passada focada em RegScale (OSCAL Hub), Paramify, Hyperproof, Drata, Chef InSpec, o wh |
+| 3.6 | `C_SUPERACAO_20261021_C2P_OSCAL_AR_FROM_PVP_RESULTS` | audit-evidence-storage-2026-10 | C2P: 'produces OSCAL Assessment Results from the native assessment results of PVP': o resultado nasce no motor de política e o OS |
+| 3.6 | `C_SUPERACAO_20261021_C2P_PLUGINS_KYVERNO_OCM_AUDITREE_GIT_LOCKER` | audit-evidence-storage-2026-10 | O C2P liga compliance-as-code a policy-as-code em GitOps: gera políticas a partir de Component Definitions e produz OSCAL AR dos  |
+| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_SCAN_DIR_EVALUATIONLOG` | audit-evidence-storage-2026-10 | complyctl mede e grava em '.complytime/scan/', com EvaluationLog nativo e OSCAL como borda. |
+| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_WORKSPACE_STATE_OSCAL_EDGE` | audit-evidence-storage-2026-10 | complyctl: o estado medido vai para arquivos no workspace, com o EvaluationLog do Gemara como formato nativo e OSCAL como saída o |
+| 3.6 | `C_SUPERACAO_20261021_GEMARA_EVALUATIONLOG_NATIVE_IN_COMPLYCTL` | audit-evidence-storage-2026-10 | complyctl: 'Scan output reports (EvaluationLog, OSCAL, SARIF, Markdown)', com EvaluationLog sempre produzido e OSCAL só com '--fo |
+| 3.6 | `C_SUPERACAO_20261021_GO_GEMARA_V0_11_OCI_ARTIFACT` | audit-evidence-storage-2026-10 | A fonte vigente do Gemara é o go-gemara v0.11.0 (30/09/2026): o artefato é YAML/JSON validado por CUE ('Decode unmarshals raw YA |
+| 3.6 | `C_SUPERACAO_20261021_IBM_800_53_JSON_70000_LINES` | audit-evidence-storage-2026-10 | O blog da IBM de 13/04/2021 confirma o catálogo NIST 800-53 em JSON com mais de 70.000 linhas: o custo de tamanho e fragmentaçã |
+| 3.6 | `C_SUPERACAO_20261021_OSCAL_HUB_HOST_AND_SHARE_NOT_CICD` | audit-evidence-storage-2026-10 | O OSCAL Hub (deck da RegScale no NIST OSCAL Workshop #40, fev/2026) é plataforma para hospedar e compartilhar artefatos OSCAL (Ca |
+| 3.6 | `C_SUPERACAO_20261021_TRESTLE_GIT_SSOT_SCOPED_TO_SDK` | audit-evidence-storage-2026-10 | O compliance-trestle (SDK do OSCAL Compass) usa um repositório Git como fonte única dos artefatos, do histórico e das aprovaç |
+| 3.6 | `C_SUPERACAO_20261021_VANTA_300M_FORTUNE_DRATA_98M` | audit-evidence-storage-2026-10 | Mercado corrigido: a Vanta passou de US$ 300M de ARR com mais de 16.000 clientes (Fortune, 29/04/2026, número da empresa); a Drat |
+| 3.6 | `C_SUPERACAO_20261021_VANTA_OSCAL_EXPORT_EDGE` | audit-evidence-storage-2026-10 | A Vanta tem OSCAL como BORDA de exportação de controles, testes e evidência (post de 04/05/2026, planos Plus, Professional, Ent |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
