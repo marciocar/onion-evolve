@@ -1,0 +1,738 @@
+meta:
+  id: intelligent-ui-2026-10
+  schema_version: "1"
+  x_dissect_tool: chatgpt-intelligent-ui
+  x_dissect_against: onion
+  baseline: "2026-10-21"
+  review_after: "2026-11-20"   # 30d: FERRAMENTA é o tipo dominante (Apps SDK, MCP Apps, visuais do Claude, LibreChat mudam por release); a cadência de ferramenta da doutrina é 30 d
+  # kg-backlog-guard: on
+  # ═══ TETO: 31 NÓS ═══   (28 da rodada + 3 do veredito e do plano N4, 2026-10-21)
+  #
+  # Justificativa do teto: rodada de PRIMÁRIAS NOMEADAS executada em 2026-10-21 (/meta:dissect, régua
+  # onion, alvo N4) sobre a "Intelligent UI" do ChatGPT com GPT-6. 14 claims ancoradas viram 14 nós de
+  # evidência; 1 nó de contabilidade (E_LACUNAS_PRIMARIES_1021); 1 superação achada (C_SUPERACAO_…);
+  # 9 objeções SOBREVIVENTES do Elenxo, cada uma um nó E_OBJECAO_… com CONSTRAINS ao alvo; 3 nós de
+  # pergunta/afirmação que as amarram (o objeto NÃO VERIFICADO, a proposta-hipótese para o /meta:decide
+  # e a convergência de mercado). Cresce só quando: (a) a fonte primária da OpenAI for lida; (b) as
+  # claims do Apps SDK rebaixadas forem reancoradas com quote; (c) o eixo de mercado/capital ganhar fonte.
+  #
+  # ⚠️ O OBJETO DA DISSECAÇÃO NÃO FOI LIDO: a fonte openai-gpt6-intelligent-ui ficou inalcançável e
+  # ZERO claims a ancoram. Este grafo disseca o MECANISMO ABERTO equivalente e os análogos (MCP Apps,
+  # visuais/artifacts do Claude, LibreChat), não a UI do GPT-6. Nada aqui é selado: esta sessão NUNCA sela.
+
+nodes:
+
+  # ─── O objeto, a proposta e a leitura de mercado (perguntas/afirmações abertas) ─────────────
+
+  - id: Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021
+    node_type: question
+    x_dissect_level: 0
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.2
+    label: "NÃO VERIFICADO: a Intelligent UI do ChatGPT com GPT-6 (lançamento alegado em 2026-10-07; componentes, critério de uso, streaming antes do fim do raciocínio) não tem nenhuma âncora primária nesta rodada."
+    narrative: "N0 (identidade OpenAI, proprietária, datada), N1 (os verbos) e N2 (o mecanismo: declarativo, HTML em sandbox, widget do Apps SDK ou template server-side) do objeto ficam todos em aberto. A fonte openai-gpt6-intelligent-ui ficou inalcançável e nenhuma das 14 claims ancoradas responde a essa lacuna. A frase mais próxima ('Inline surfaces currently always appear before the generated model response.', ui-guidelines do Apps SDK) foi rebaixada na ancoragem e, mesmo se valesse, descreve apps de terceiros, não a UI nativa do GPT-6. Fecha quando uma fonte primária da OpenAI sobre o produto for lida e ancorada com quote + locator."
+    trace: "pergunta do /meta:dissect de 2026-10-21: 'a funcionalidade ultimas respostas do chatgpt', fonte openai-gpt6-intelligent-ui (inalcançável)"
+
+  - id: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    node_type: question
+    x_dissect_level: 4
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "HIPÓTESE para o /meta:decide: abrir um piloto ÚNICO de MCP Apps num host que o Onion controla (o /chat do onion-bridge ou o brain em canary), com um recurso ui:// servido pelo onion-kg, e medir antes de generalizar."
+    narrative: "Proposta do Elenxo, rotulada como hipótese, não como decisão. Sustentada pelo mecanismo aberto ancorado (MIME text/html;profile=mcp-app, ui://, spec Stable 2026-01-26, sandbox de origem distinta com proxy, ponte JSON-RPC/postMessage bidirecional). Fora do piloto até a fonte primária da OpenAI ser lida: streaming antes do fim do raciocínio e paridade com o GPT-6. Caminhos plausíveis NÃO medidos para os cards do /meta:decide: o Artifact tool com capabilities (card persistente) ou o /chat do onion-bridge como host MCP Apps próprio, pagando uma segunda origem para o proxy de sandbox. A forja (/meta:forge) só começa depois que o maestro escolher no /meta:decide."
+    trace: "recommendation do Elenxo da rodada de primárias de 2026-10-21 (/meta:dissect intelligent-ui)"
+
+  - id: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
+    node_type: claim
+    x_dissect_level: 3
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    label: "Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03-12, cerca de 7 meses antes da data alegada da Intelligent UI, e o padrão MCP Apps está Stable desde 2026-01-26."
+    narrative: "Cronologia de produto inferida das evidências ancoradas (blog da Anthropic de 12-mar-2026; spec ext-apps 2026-01-26). A metade sobre a OpenAI depende da premissa não verificada (Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021). Não é eixo de capital: nenhuma fonte de preço, plano, adoção ou investimento foi lida."
+    trace: "https://claude.com/blog/claude-builds-visuals"
+
+  # ─── Evidência ANCORADA (14 claims, verificador independente) ──────────────────────────────
+
+  - id: E_APPS_SDK_STRUCTUREDCONTENT_UNTRUSTED
+    node_type: evidence
+    x_dissect_level: 2
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Render from `toolResult?.structuredContent`, and treat it as untrusted input.' · LOCATOR: Apps SDK, página chatgpt-ui ('Add UI to your MCP server'), seção 'React helper hooks' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No Apps SDK da OpenAI o componente renderiza a partir do structuredContent do resultado da ferramenta, e esse conteúdo é tratado como entrada não confiável."
+    trace: "https://developers.openai.com/apps-sdk/build/chatgpt-ui"
+    provenance:
+      source: "https://developers.openai.com/apps-sdk/build/chatgpt-ui"
+      locator: "seção 'React helper hooks': 'Render from `toolResult?.structuredContent`, and treat it as untrusted input.'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_APPS_MIME_AND_UI_SCHEME
+    node_type: evidence
+    x_dissect_level: 2
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: '`mimeType` MUST be `text/html;profile=mcp-app` (other types reserved for future extensions)' · LOCATOR: ext-apps specification 2026-01-26 (apps.mdx), seção UI Resource Format; ui:// reservado na mesma seção · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    valid_from: "2026-01-26"
+    label: "Na extensão MCP Apps o recurso de UI tem MIME fixado pela spec (text/html;profile=mcp-app) e o prefixo ui:// é reservado: o equivalente aberto é HTML com perfil fixo, não componente declarativo nativo."
+    trace: "https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx"
+    provenance:
+      source: "https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx"
+      locator: "seção UI Resource Format: '`mimeType` MUST be `text/html;profile=mcp-app` (other types reserved for future extensions)'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_APPS_STABLE_SANDBOX_PROXY
+    node_type: evidence
+    x_dissect_level: 2
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'If the Host is a web page, it MUST wrap the View and communicate with it through an intermediate Sandbox proxy.' · LOCATOR: ext-apps specification 2026-01-26, seção Sandbox proxy (Status: Stable 2026-01-26; Host e Sandbox MUST ter origens diferentes) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    valid_from: "2026-01-26"
+    label: "A spec MCP Apps está Stable na versão 2026-01-26 e exige, para host web, um proxy de sandbox intermediário com origem distinta do host."
+    narrative: "Custo concreto para o N3: o /chat do onion-bridge, sendo host web, teria de servir o proxy de sandbox numa ORIGEM diferente da sua. É requisito de implementação, não refutação. Revisão da spec posterior a 2026-01-26 não foi vista nesta rodada."
+    trace: "https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx"
+    provenance:
+      source: "https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx"
+      locator: "seção Sandbox proxy: 'If the Host is a web page, it MUST wrap the View and communicate with it through an intermediate Sandbox proxy.'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_APPS_BIDIRECTIONAL_JSONRPC
+    node_type: evidence
+    x_dissect_level: 2
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'The app can request tool calls, send messages, update the model's context, and receive data from the host.' · LOCATOR: MCP Apps overview, 'How MCP Apps work', passo 4 (Bidirectional communication) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A comunicação app-host do MCP Apps é JSON-RPC sobre postMessage e é bidirecional: o app pede chamadas de tool, envia mensagens, atualiza o contexto do modelo e recebe dados do host."
+    narrative: "O claim original acrescentava 'o que serve cards interativos como os do /meta:decide'. Essa parte é inferência e o Elenxo a deixou de pé como objeção (E_OBJECAO_04_DECIDE_CARDS_NOT_PROVEN): o nó guarda só a metade ancorada."
+    trace: "https://modelcontextprotocol.io/docs/extensions/apps"
+    provenance:
+      source: "https://modelcontextprotocol.io/docs/extensions/apps"
+      locator: "'How MCP Apps work', passo 4 (Bidirectional communication)"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_APPS_OFFICIAL_HOSTS
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'MCP Apps are currently supported by [Claude](https://claude.ai), [Claude Desktop](https://claude.ai/download), [VS Code GitHub Copilot](https://code.visualstudio.com/), [Microsoft 365 Copilot]' · LOCATOR: MCP Apps overview, seção 'Client support' (página lida em 2026-10-21) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: primary
+    label: "A lista oficial de hosts do MCP Apps começa por Claude, Claude Desktop, VS Code GitHub Copilot e Microsoft 365 Copilot; o Claude Code CLI não aparece no trecho ancorado."
+    narrative: "O claim original afirmava a negativa 'sem ChatGPT nem LibreChat'. Ela NÃO está na quote (truncada) e a rodada traz evidência contrária: o Elenxo a deixou de pé (E_OBJECAO_05_HOSTS_NEGATIVE_UNANCHORED). O nó guarda só a parte positiva."
+    trace: "https://modelcontextprotocol.io/docs/extensions/apps"
+    provenance:
+      source: "https://modelcontextprotocol.io/docs/extensions/apps"
+      locator: "seção 'Client support'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_UI_IMPLEMENTS_MCP_APPS
+    node_type: evidence
+    x_dissect_level: 2
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: '`mcp-ui` is an SDK implementing the MCP Apps standard for UI over MCP.' · LOCATOR: README github.com/idosal/mcp-ui, seções de hosts suportados (LibreChat em MCP Apps e legado; ChatGPT requer adaptador Apps SDK) · ancorada por verificador independente"
+    source_tier: 7
+    source_kind: repo
+    label: "O MCP-UI é um SDK que implementa o padrão MCP Apps; o README dele lista o LibreChat como host (apps e legado) e o ChatGPT só via adaptador do Apps SDK."
+    narrative: "Fonte de terceiro (SDK), não release do LibreChat nem doc da OpenAI: por isso tier 7. As duas afirmações sobre hosts estão sob objeção (E_OBJECAO_06_LIBRECHAT_HOST_NOT_IN_BRAIN)."
+    trace: "https://github.com/idosal/mcp-ui"
+    provenance:
+      source: "https://github.com/idosal/mcp-ui"
+      locator: "README, abertura e seções de hosts suportados"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_CLAUDE_INLINE_VISUALS
+    node_type: evidence
+    x_dissect_level: 1
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Claude can generate custom diagrams, charts, and interactive visuals directly in your conversation.' · LOCATOR: support.claude.com/en/articles/13979539-custom-visuals-in-chat, abertura · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Claude já gera diagramas, gráficos e visuais interativos inline na conversa (beta, web e desktop), sem painel lateral."
+    trace: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
+    provenance:
+      source: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
+      locator: "abertura do artigo"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_CLAUDE_VISUALS_MODEL_DECIDES
+    node_type: evidence
+    x_dissect_level: 1
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Claude decides when a visual would help based on what you’re asking.' · LOCATOR: support.claude.com custom-visuals-in-chat, seção 'how Claude decides' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No análogo da Anthropic o modelo decide quando um visual ajuda; o usuário também pode pedir, e há interação (botões, sliders, tela cheia) e follow-up."
+    trace: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
+    provenance:
+      source: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
+      locator: "seção 'how Claude decides'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_CLAUDE_VISUALS_EPHEMERAL
+    node_type: evidence
+    x_dissect_level: 1
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Visuals aren’t saved automatically. To keep one, use one of the options described above.' · LOCATOR: support.claude.com custom-visuals-in-chat, seção 'keep a visual' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Os visuais inline do Claude são efêmeros: não são salvos por padrão e só persistem se o usuário os converter em artifact, SVG/HTML ou imagem."
+    narrative: "Consequência para o Onion: um visual efêmero não serve de registro de decisão. No /meta:decide o selo continua no grafo; o visual seria só projeção."
+    trace: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
+    provenance:
+      source: "https://support.claude.com/en/articles/13979539-custom-visuals-in-chat"
+      locator: "seção 'keep a visual'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_CLAUDE_VISUALS_LAUNCH_DATED
+    node_type: evidence
+    x_dissect_level: 0
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'appear in-line, rather than in a side panel' · LOCATOR: claude.com/blog/claude-builds-visuals, post de 12 de março de 2026 (atualização de 22 de abril de 2026 para Cowork) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: "2026-03-12"
+    label: "Lançamento datado: em 2026-03-12 a Anthropic lançou visuais que aparecem inline, e não num painel lateral, temporários e distintos dos artifacts permanentes."
+    trace: "https://claude.com/blog/claude-builds-visuals"
+    provenance:
+      source: "https://claude.com/blog/claude-builds-visuals"
+      locator: "post de 12 de março de 2026 (atualizado em 22 de abril de 2026 para o Cowork)"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_CLAUDE_ARTIFACTS_CONTENT_TYPES
+    node_type: evidence
+    x_dissect_level: 1
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Claude can make an artifact out of almost anything, including documents, code snippets, single-page websites' · LOCATOR: support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them, 'Types of content' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No claude.ai os artifacts abrangem documentos, trechos de código, sites de página única, dashboards e ferramentas interativas."
+    narrative: "O claim original acrescentava 'começam privados'; isso não está na quote e o Elenxo deixou a objeção de pé (E_OBJECAO_11_ARTIFACTS_PRIVATE_UNANCHORED)."
+    trace: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
+    provenance:
+      source: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
+      locator: "seção 'Types of content'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_CLAUDE_ARTIFACTS_CALL_CLAUDE
+    node_type: evidence
+    x_dissect_level: 1
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'You can build artifacts that call Claude directly, turning them into small apps' · LOCATOR: support.claude.com artifacts, seções 'AI-powered artifacts' e 'Dates' · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No claude.ai os artifacts podem chamar o Claude diretamente e se conectar a apps/conectores do usuário, virando mini-apps."
+    narrative: "A cláusula 'legados anteriores a 2026-09-16' do claim original está fora da quote e tem sentido indefinido: fica sob objeção (E_OBJECAO_12_ARTIFACTS_DATE_AND_CLI_UNANCHORED)."
+    trace: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
+    provenance:
+      source: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
+      locator: "seção 'AI-powered artifacts'"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_LIBRECHAT_ARTIFACTS_RENDER
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'Interactive React components and HTML pages' · LOCATOR: librechat.ai/docs/features/artifacts, lista de tipos renderizados (doc sem versão, seletor 'Latest (dev)') · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O LibreChat renderiza artifacts de componentes React interativos, páginas HTML e Mermaid gerados pelo modelo."
+    narrative: "Ressalva para a forja: artifacts do LibreChat são código que o MODELO gera e o cliente renderiza; não são UI empurrada pelos MCPs do brain (onion-kg, onion-kg-writer). Essa metade (MCP-UI/MCP Apps) segue aberta."
+    trace: "https://www.librechat.ai/docs/features/artifacts"
+    provenance:
+      source: "https://www.librechat.ai/docs/features/artifacts"
+      locator: "lista de tipos renderizados"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  - id: E_LIBRECHAT_ARTIFACTS_ACTIVE_V088
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "QUOTE: 'feat: Unify Artifact Triggers as Tool Rows' · LOCATOR: GitHub releases danny-avila/LibreChat, v0.8.8-rc3 (15 Sep 2026); rc4; v0.8.8 (01 Oct) · ancorada por verificador independente"
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: "2026-10-01"
+    label: "Os artifacts seguem ativos na linha v0.8.8 do LibreChat (release de 2026-10-01 e RCs): gatilhos unificados como linhas de ferramenta, preview de SVG e correções de entrega em sandbox."
+    narrative: "É a versão de produção do brain. A rodada não mediu se o librechat.yaml do brain habilita artifacts; a claim não afirma isso."
+    trace: "https://github.com/danny-avila/LibreChat/releases"
+    provenance:
+      source: "https://github.com/danny-avila/LibreChat/releases"
+      locator: "v0.8.8-rc3 (15 Sep 2026), rc4 e v0.8.8 (01 Oct 2026)"
+      method: "leitura: leitor da rodada de primárias + ancoragem por verificador independente"
+      locality: "web"
+
+  # ─── CONTABILIDADE DESTA RODADA (cláusula 8: lacuna vira nó) ───────────────────────────────
+
+  - id: E_LACUNAS_PRIMARIES_1021
+    node_type: evidence
+    x_dissect_level: 4
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "contagem do payload desta rodada de primárias repassado ao write(KG): 5 fontes nomeadas (openai-gpt6-intelligent-ui, openai-apps-sdk, mcp-apps-extension, claude-artifacts-visuals, librechat-ui) · 1 inalcançável · 21 claims recebidas · 14 ANCORADAS · 7 REJEITADAS na ancoragem (6 AFIRMADA-SEM-CITACAO, 1 NAO-ENCONTRADA) · 16 objeções do Elenxo, 9 sobreviventes, 0 recusadas pelo motor · 1 superação achada"
+    source_tier: 10
+    source_kind: measurement
+    label: "PRIMÁRIAS 2026-10-21: 5 fontes nomeadas, 1 inalcançável (a da própria OpenAI sobre o GPT-6); 14 claims ancoradas, 7 rejeitadas na ancoragem (6 sem citação, 1 não encontrada); 9 de 16 objeções sobrevivem, 0 recusadas; o objeto segue NÃO VERIFICADO."
+    narrative: |-
+      FONTES LIDAS (4): openai-apps-sdk (developers.openai.com, Apps SDK: chatgpt-ui, 'Build your UI', ui-guidelines), mcp-apps-extension (spec ext-apps 2026-01-26 apps.mdx, overview em modelcontextprotocol.io, README do mcp-ui), claude-artifacts-visuals (support.claude.com custom-visuals e artifacts; blog claude-builds-visuals), librechat-ui (librechat.ai docs de artifacts; releases e PR #13831 do GitHub). INALCANÇÁVEL (1): openai-gpt6-intelligent-ui, a fonte primária do objeto.
+
+      ANCORADAS: 14 (openai-apps-sdk 1, mcp-apps-extension 5, claude-artifacts-visuals 6, librechat-ui 2), cada uma um nó de evidência.
+
+      REJEITADAS NA ANCORAGEM: 7, nenhuma virou nó de evidência.
+      (1) [openai-apps-sdk] UI declarada como recurso MCP por _meta.ui.resourceUri, com openai/outputTemplate como alias de compatibilidade: AFIRMADA-SEM-CITACAO (veredito ANCORADA sem quote/locator; o verificador achou 'Declare the UI resource with `_meta.ui.resourceUri`.' e o alias na página 'Build your UI').
+      (2) [openai-apps-sdk] componente em iframe isolado, frames aninhados bloqueados, domínios via CSP: AFIRMADA-SEM-CITACAO (trechos achados: 'Components run inside an iframe in ChatGPT', 'Nested frames are blocked by default.').
+      (3) [openai-apps-sdk] ponte JSON-RPC ui/* sobre postMessage, window.openai só para o resto: AFIRMADA-SEM-CITACAO.
+      (4) [openai-apps-sdk] ui/update-model-context, widget state por instância e não durável, dados de negócio no servidor: AFIRMADA-SEM-CITACAO.
+      (5) [openai-apps-sdk] modos inline/carrossel/fullscreen/PiP, inline antes da resposta, doc sem critério de decisão do modelo: AFIRMADA-SEM-CITACAO (a parte negativa veio de resumo de WebFetch, não de leitura integral).
+      (6) [mcp-apps-extension] _meta.ui.resourceUri com pré-carga do recurso ui:// antes da chamada (streaming de inputs da tool): AFIRMADA-SEM-CITACAO (frase existe palavra por palavra no passo 1 do overview).
+      (7) [librechat-ui] MCP Apps mergeado na canary em 2026-09-24, opt-in por mcpSettings.apps, ausente dos releases v0.8.8: NAO-ENCONTRADA (a citação era paráfrase; o texto real do PR #13831 é outro; ver C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM).
+      As seis rebaixadas por formato não são falsas: são ANCORAGEM PENDENTE, a reancorar com quote + locator.
+
+      OBJEÇÕES RECUSADAS PELO MOTOR (sem critério pré-registrado ou sem superação): 0.
+
+      LACUNAS QUE CONTINUAM ABERTAS (gapsOpen do Elenxo):
+      (a) openai-gpt6-intelligent-ui: zero claims; existência, data 2026-10-07, planos, componentes, critério de uso e streaming antes do fim do raciocínio sem prova.
+      (b) openai-apps-sdk: só structuredContent ancorado; iframe/CSP, ponte ui/*, _meta.ui.resourceUri, update-model-context e os modos de exibição rebaixados.
+      (c) librechat-ui, metade MCP-UI/MCP Apps: suporte só na canary (PR #13831, opt-in), sem prova no v0.8.8 do brain.
+      (d) claude-artifacts-visuals, metade Claude Code: nenhuma claim sobre o que o Claude Code faz inline; mecanismo dos visuais inline (N2) sem âncora.
+      (e) eixo de mercado e capital: nenhuma claim ancorada.
+      (f) N2 do objeto: componente declarativo, HTML em sandbox, widget do Apps SDK ou template server-side, nada ancorado.
+      Nenhum descarte foi por orçamento: as lacunas são falta de evidência.
+    trace: "payload do write(KG) da rodada de primárias de 2026-10-21 do /meta:dissect intelligent-ui"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (/meta:dissect intelligent-ui), journal do workflow da sessão"
+      locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, objeções do Elenxo e gapsOpen"
+      method: "derivado: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM
+    node_type: claim
+    x_dissect_level: 3
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true explícito; omitir mantém as Apps desligadas e o HTML legado; false desliga os dois."
+    narrative: "Alvo reprovado: a claim [librechat-ui] 'MCP Apps mergeado no LibreChat na canary em 2026-09-24, opt-in via mcpSettings.apps; nenhum release v0.8.8 cita MCP Apps' (NAO-ENCONTRADA, registrada em E_LACUNAS_PRIMARIES_1021). Medida: WebFetch do PR #13831 duas vezes, com prompt pedindo as frases com 'mcpSettings.apps'; ambas devolveram 'MCP Apps require explicit `mcpSettings.apps: true`. Omitting the setting keeps new Apps disabled and preserves legacy HTML; explicit `false` disables both.', junto com estado Merged, base canary e a data 'Sep 24, 2026' no topo (a página não rotula essa data como a do merge). Critério A1_QUOTE_AUSENTE. Afirmação de UM juiz: não é selo."
+    trace: "WebFetch https://github.com/danny-avila/LibreChat/pull/13831 e grep -F 'the setting \"mcpSettings.apps: true\" must be set explicitly': 0 ocorrências (o texto real é 'MCP Apps require explicit `mcpSettings.apps: true`. Omitting the setting keeps new Apps disabled and preserves legacy HTML; explicit `false` disables both.')"
+
+  # ─── Objeções SOBREVIVENTES do Elenxo (9; CONSTRAINS ao alvo, nunca REFUTES) ──────────────
+
+  - id: E_OBJECAO_01_GPT6_PREMISE_UNANCHORED
+    node_type: evidence
+    x_dissect_level: 0
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a premissa da rodada (N0/N1 da Intelligent UI do GPT-6), critério E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): nenhuma das 14 claims ancora a Intelligent UI do GPT-6; existência, data, planos, componentes, critério do modelo e streaming antes do fim do raciocínio estão sem âncora."
+    narrative: "A frase de ui-guidelines sobre superfícies inline antes da resposta foi rebaixada e, mesmo se valesse, descreve apps de terceiros. No corpus, kg-corpus-grep 'Intelligent UI' só devolve nós de vps-shared-tools-2026-07 que casaram 'UI' por OR. Superação não achada (classe nenhuma): o análogo mais próximo, os visuais inline do Claude, é de outro fornecedor e não mede o objeto. Critério: bash .claude/validation/kg-corpus-grep.sh 'Intelligent UI' e conferir que nenhuma claim ancorada tem answersGap=openai-gpt6-intelligent-ui."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Intelligent UI'"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a premissa da rodada, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_02_APPS_SDK_MECHANISM_PARTIAL
+    node_type: evidence
+    x_dissect_level: 2
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 1 [openai-apps-sdk], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): structuredContent prova só uma peça; sandbox, protocolo e declaração do ChatGPT foram rebaixados, e nada liga o Apps SDK à Intelligent UI nativa do GPT-6."
+    narrative: "O mecanismo de sandbox/protocolo só está ancorado pela spec MCP Apps, que descreve o padrão aberto e não o que o ChatGPT implementa. A frase que faria a ponte ('Start with MCP Apps... Declare the UI resource with _meta.ui.resourceUri') está entre as rebaixadas. kg-corpus-grep 'structuredContent' devolve 0 nós. Superação não achada (classe nenhuma). Critério: bash .claude/validation/kg-corpus-grep.sh 'structuredContent' e conferir as 5 claims openai-apps-sdk rejeitadas."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'structuredContent'"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 1 [openai-apps-sdk], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_04_DECIDE_CARDS_NOT_PROVEN
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 4 [mcp-apps-extension], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): que a ponte bidirecional 'serve os cards do /meta:decide' é inferência sem âncora; o /meta:decide roda no terminal do Claude Code, que não aparece como host MCP Apps."
+    narrative: "Num terminal não há host MCP Apps para renderizar o card. Superação não achada (classe nenhuma): o Artifact tool do Claude Code com capabilities (input, db, perguntar ao Claude) é peça possível, mas nenhum /meta:decide foi medido devolvendo resposta selada no grafo por essa via. Critério: conferir a lista 'Client support' do overview (sem o Claude Code CLI); kg-corpus-grep 'MCP Apps' devolve só nós sem relação (PR_651, vendor-multi-branch)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'MCP Apps'"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 4 [mcp-apps-extension], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_05_HOSTS_NEGATIVE_UNANCHORED
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 5 [mcp-apps-extension], critério E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): a negativa 'sem ChatGPT nem LibreChat' não está na quote truncada, e a rodada traz evidência contrária: a OpenAI manda declarar _meta.ui.resourceUri e o LibreChat mergeou MCP Apps na canary."
+    narrative: 'Evidência contrária, rebaixada só por formato de citação: (a) Apps SDK ''Build your UI'' §''Start with MCP Apps'': ''Declare the UI resource with `_meta.ui.resourceUri`.'' e ''ChatGPT also honors `_meta["openai/outputTemplate"]` as a compatibility alias''; (b) PR #13831 do LibreChat, Merged na canary: ''MCP Apps require explicit `mcpSettings.apps: true`.'' Superação não achada: a seção ''Client support'' não foi relida integralmente pela rodada. Nota do escritor, NÃO ancorada por verificador independente: na releitura de 2026-10-21 a frase continua com Goose, Postman, MCPJam e Archestra.AI e remete a uma client matrix; a lista não cita ChatGPT nem LibreChat, o que não prova ausência deles na matriz.'
+    trace: "https://modelcontextprotocol.io/docs/extensions/apps"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 5 [mcp-apps-extension], critério E1_EVIDENCIA_CONTRARIA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_06_LIBRECHAT_HOST_NOT_IN_BRAIN
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 6 [mcp-apps-extension], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): 'LibreChat é host' vem do README de um SDK de terceiro; o suporte do LibreChat está só na canary (PR #13831, opt-in), e a rodada não prova que o brain em v0.8.8 renderiza MCP Apps."
+    narrative: "E 'ChatGPT só via adaptador' choca com a doc da OpenAI, que manda declarar _meta.ui.resourceUri ('Start with MCP Apps'). Superação não achada (classe nenhuma): subir o brain para um build com o PR #13831 e ligar mcpSettings.apps: true é condição futura, nenhum build foi medido renderizando um recurso ui:// do onion-kg. Critério: bash .claude/validation/kg-corpus-grep.sh 'mcpSettings.apps' (0 nós) e conferir que o release v0.8.8 (01-out-2026) não lista MCP Apps."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'mcpSettings.apps'"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 6 [mcp-apps-extension], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_07_CLAUDE_VISUALS_NO_MECHANISM
+    node_type: evidence
+    x_dissect_level: 2
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 7 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): os visuais inline do Claude provam a capacidade (N1), não o mecanismo (N2), nem streaming antes do fim do raciocínio, nem existência no Claude Code CLI; é recurso fechado de 1ª parte, restrito a web e desktop."
+    narrative: "Para as superfícies do Onion (terminal, bridge, LibreChat) não há protocolo aberto para costurar. Superação não achada (classe nenhuma): o Artifact tool do Claude Code publica página fora da conversa e não renderiza inline nem faz streaming junto da resposta; é status quo. Critério: conferir nas claims 7-10 que nenhuma quote descreve o mecanismo; kg-corpus-grep 'custom visuals' sem nó de mecanismo."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'custom visuals'"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 7 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_11_ARTIFACTS_PRIVATE_UNANCHORED
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 11 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): 'artifacts começam privados' não está no trecho citado; a parte provada (tipos de conteúdo) é a menos relevante e a que importa ao N3 (privacidade e compartilhamento de um card de decisão) ficou sem âncora."
+    narrative: "Superação não achada (classe nenhuma): o contrato do Artifact tool do Claude Code declara que artifacts começam privados, mas isso é declaração de ferramenta do Claude Code, não fonte ancorada da rodada sobre o claude.ai. Critério: comparar a quote da claim 11 com o enunciado (support.claude.com/en/articles/9487310 §'Types of content')."
+    trace: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 11 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_12_ARTIFACTS_DATE_AND_CLI_UNANCHORED
+    node_type: evidence
+    x_dissect_level: 3
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra a claim 12 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a cláusula 'legados anteriores a 2026-09-16' está fora da quote e tem sentido indefinido; a claim fala do claude.ai e não prova o equivalente no Claude Code, a superfície do /meta:decide."
+    narrative: "Superação não achada (classe nenhuma): a capacidade 'ask Claude' das páginas do Artifact tool do Claude Code existe declarada no contrato da ferramenta, mas nenhuma página do Onion foi medida usando-a. Critério: comparar a quote da claim 12 com o enunciado (support.claude.com artifacts §'Dates')."
+    trace: "https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra a claim 12 [claude-artifacts-visuals], critério E2_PROVA_MENOS"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_16_MARKET_CAPITAL_AXIS_EMPTY
+    node_type: evidence
+    x_dissect_level: 4
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "objeção do Elenxo contra o eixo invariante de mercado e capital, critério E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): o eixo invariante de mercado e capital está vazio; nenhuma claim traz preço ou plano da Intelligent UI, adoção do MCP Apps por fornecedor, investimento ou quem paga o sandbox."
+    narrative: "O único dado de mercado é cronologia de produto inferida (Anthropic em março, MCP Apps Stable em janeiro com Claude e Microsoft como hosts), o que não é eixo de capital. Superação não achada (classe nenhuma): nenhuma fonte de mercado aparece entre as lidas nem entre as inalcançáveis. Critério: conferir nas 14 claims ancoradas que nenhuma traz preço, plano, financiamento ou adoção; a lacuna openai-gpt6-intelligent-ui (que incluía planos) está sem fonte."
+    trace: "invariante follow-the-money da doutrina de pesquisa (cláusula 4), rodada de primárias de 2026-10-21"
+    provenance:
+      source: "payload do write(KG) da rodada de primárias de 2026-10-21 (resposta do Elenxo)"
+      locator: "objeção contra o eixo invariante de mercado e capital, critério E4_LACUNA_ABERTA"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  # ─── Veredito proposto e plano de absorção (N4) — a sessão propõe, o maestro sela ─────────────
+
+  - id: D_INTELLIGENT_UI_1021
+    node_type: decision
+    x_dissect_level: 3
+    x_dissect_verdict: costurar
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "rodada de primárias wf_95b7868c-c7d (14 ancoradas, 9 objeções sobreviventes); a fonte da OpenAI ficou inalcançável, então o objeto do veredito é o MECANISMO ABERTO (MCP Apps Stable 2026-01-26, Apache-2.0 nas contribuições novas; visuais e artifacts do Claude; artifacts do LibreChat), não a UI proprietária do GPT-6"
+    label: "VEREDITO PROPOSTO: costurar, não absorver a UI do GPT-6 (proprietária e não lida). Costura-se o mecanismo aberto: um painel interativo opcional do /meta:decide como Artifact com estado, e um recurso ui:// do onion-kg para o brain, gated pelo MCP Apps estável no LibreChat."
+    narrative: |-
+      Opções para o maestro: (A) costurar as duas peças abaixo (recomendada); (B) só o painel do /meta:decide,
+      que roda no host que o core já tem (os Artifacts do Claude Code, com estado compartilhado); (C) só o recurso
+      ui:// do onion-kg no brain, gated pelo LibreChat estável com mcpSettings.apps; (D) parquear até a fonte da
+      OpenAI ser lida, gatilho: a primária do GPT-6 ancorada. Rejeitar não cabe: a capacidade é convergência de
+      mercado (C_INLINE_VISUALS_MARKET_CONVERGENCE_1021), e o mecanismo aberto é Stable.
+      Limites que CONSTRAINEM a recomendação: o terminal do Claude Code não é host MCP Apps (E_OBJECAO_04), então o
+      painel do decide usa Artifact, não MCP Apps; o brain em v0.8.8 não prova render de MCP Apps (E_OBJECAO_06); o
+      eixo de mercado e capital está vazio (E_OBJECAO_16). Nome: nenhuma peça usa "Intelligent UI" nem a marca
+      OpenAI/GPT.
+    trace: "docs/evolution/dissect/intelligent-ui-2026-10/data/run-wf_95b7868c-c7d.json"
+
+  - id: A_ABSORB_DECIDE_PAINEL_INTERATIVO
+    node_type: claim
+    x_dissect_level: 4
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "proposta do dissect, não medida: o /meta:decide hoje pergunta por AskUserQuestion no terminal (E_OBJECAO_04: o terminal não é host MCP Apps); o host interativo que o core já tem é o Artifact do Claude Code, com capacidades de estado (artifact-capabilities) e leitura pela sessão (ArtifactData)"
+    x_absorb_target: decide
+    x_absorb_pieces: "2,3,7"
+    x_absorb_origin: "https://github.com/modelcontextprotocol/ext-apps/blob/82221c0c8ce7661efa6771c9d461511b1650495f/specification/2026-01-26/apps.mdx"
+    x_absorb_license: Apache-2.0
+    x_absorb_form: reescrita
+    x_absorb_parity: "run_decide_selftests: caso que monta o painel a partir do mesmo censo e exige, para cada pergunta, as mesmas opções na mesma ordem (recomendada primeiro) que o AskUserQuestion receberia; e que uma resposta gravada no painel só vira selo pelo kg-decide-seal.sh, nunca por escrita direta no grafo"
+    label: "PLANO N4: o /meta:decide ganha um painel interativo OPCIONAL, publicado como Artifact com estado, cujas respostas a sessão lê e sela pelo mesmo selador. Conceito do MCP Apps (UI bidirecional, entrada não confiável), não o código."
+    trace: ".claude/commands/meta/decide.md"
+
+  - id: A_ABSORB_ONION_KG_RECURSO_UI
+    node_type: claim
+    x_dissect_level: 4
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-21"
+    verified_against: "proposta do dissect, não medida: o LibreChat só tem MCP Apps na canary, com opt-in mcpSettings.apps: true (C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM), e o brain roda v0.8.8 (E_OBJECAO_06); gatilho: release estável do LibreChat com MCP Apps"
+    x_absorb_target: "novo:onion-kg-ui-resource"
+    x_absorb_pieces: "1,7"
+    x_absorb_origin: "https://github.com/idosal/mcp-ui/tree/2b10490910943640deeb2d9012ad417d4c0e9025"
+    x_absorb_license: Apache-2.0
+    x_absorb_form: adapter-sdaal
+    x_absorb_parity: "run_mcp_onion_kg_selftests: caso que pede o recurso ui:// do onion-kg e exige mimeType text/html;profile=mcp-app, conteúdo do grafo tratado como dado não confiável (escapado) e nenhuma tool de escrita exposta pela UI"
+    label: "PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL ao padrão MCP Apps; só depois do LibreChat estável com MCP Apps."
+    trace: "ops/mcp-onion-kg/server.py"
+
+edges:
+
+  # mecanismo aberto e análogos sustentam a hipótese do piloto
+  - from: E_APPS_SDK_STRUCTUREDCONTENT_UNTRUSTED
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_MCP_APPS_MIME_AND_UI_SCHEME
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_MCP_APPS_STABLE_SANDBOX_PROXY
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_MCP_APPS_BIDIRECTIONAL_JSONRPC
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_MCP_APPS_OFFICIAL_HOSTS
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: CONSTRAINS
+  - from: E_MCP_UI_IMPLEMENTS_MCP_APPS
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_ARTIFACTS_CONTENT_TYPES
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_ARTIFACTS_CALL_CLAUDE
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_LIBRECHAT_ARTIFACTS_RENDER
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+  - from: E_LIBRECHAT_ARTIFACTS_ACTIVE_V088
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: SUPPORTS
+
+  # visuais inline do Claude sustentam a leitura de convergência de mercado
+  - from: E_CLAUDE_INLINE_VISUALS
+    to: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_VISUALS_MODEL_DECIDES
+    to: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_VISUALS_EPHEMERAL
+    to: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_VISUALS_LAUNCH_DATED
+    to: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
+    edge_type: SUPPORTS
+
+  # contabilidade e superação
+  - from: E_LACUNAS_PRIMARIES_1021
+    to: Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_PRIMARIES_1021
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM
+    to: E_LACUNAS_PRIMARIES_1021
+    edge_type: TRACES_TO
+
+  # o objeto não verificado limita a proposta (paridade com o GPT-6 fica fora)
+  - from: Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: CONSTRAINS
+
+  # objeções sobreviventes: limitam, não derrubam
+  - from: E_OBJECAO_01_GPT6_PREMISE_UNANCHORED
+    to: Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_01_GPT6_PREMISE_UNANCHORED
+    to: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_APPS_SDK_MECHANISM_PARTIAL
+    to: E_APPS_SDK_STRUCTUREDCONTENT_UNTRUSTED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_DECIDE_CARDS_NOT_PROVEN
+    to: E_MCP_APPS_BIDIRECTIONAL_JSONRPC
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_DECIDE_CARDS_NOT_PROVEN
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_HOSTS_NEGATIVE_UNANCHORED
+    to: E_MCP_APPS_OFFICIAL_HOSTS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_LIBRECHAT_HOST_NOT_IN_BRAIN
+    to: E_MCP_UI_IMPLEMENTS_MCP_APPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_CLAUDE_VISUALS_NO_MECHANISM
+    to: E_CLAUDE_INLINE_VISUALS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_ARTIFACTS_PRIVATE_UNANCHORED
+    to: E_CLAUDE_ARTIFACTS_CONTENT_TYPES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_ARTIFACTS_DATE_AND_CLI_UNANCHORED
+    to: E_CLAUDE_ARTIFACTS_CALL_CLAUDE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_MARKET_CAPITAL_AXIS_EMPTY
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_MARKET_CAPITAL_AXIS_EMPTY
+    to: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
+    edge_type: CONSTRAINS
+  - from: A_ABSORB_DECIDE_PAINEL_INTERATIVO
+    to: D_INTELLIGENT_UI_1021
+    edge_type: SUPPORTS
+  - from: A_ABSORB_ONION_KG_RECURSO_UI
+    to: D_INTELLIGENT_UI_1021
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_04_DECIDE_CARDS_NOT_PROVEN
+    to: A_ABSORB_DECIDE_PAINEL_INTERATIVO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_LIBRECHAT_HOST_NOT_IN_BRAIN
+    to: A_ABSORB_ONION_KG_RECURSO_UI
+    edge_type: CONSTRAINS
+  - from: D_INTELLIGENT_UI_1021
+    to: Q_MCP_APPS_PILOT_PROPOSAL_1021
+    edge_type: TRACES_TO
