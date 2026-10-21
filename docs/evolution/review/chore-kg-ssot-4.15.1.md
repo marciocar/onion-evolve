@@ -2,7 +2,8 @@
 branch: chore/kg-ssot-4.15.1
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 176a12b8a0ec4d15b29b18e13e1d68e47d6cfe2af7dc5dda6c51dfc66a0fcf93
+reviewed_code_sha256: cc6bc7326f3daa0a1e12a290f1aca73ab058e1c6815cd5ee38c9f97f6b18b470
 findings_total: 0
 findings_real: 0
 tokens: 0
