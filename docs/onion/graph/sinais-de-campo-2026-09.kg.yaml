@@ -158,22 +158,36 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-10-21"
+    verified_against: "PR #1235 (remeasure-contract.sh no --update, mergeado em 2026-10-20) e Q_U1_FASE2_MIGRACAO_CONDUZIDA em docs/evolution/research/field-hub-update-2026-10-19/"
     impact: 4
     confidence: 0.8
     label: "U1 (onda B, primeiro): o --update mede o contrato KG no corpus do alvo e o escreve no relatório, com caminho de migração do provenance a partir do trace — GATILHO: a onda A mergeada"
-    narrative: "No hub, o vendor/kg-ssot v4.9.1 chegou e o kg-contract-check.sh reprovou 24 de 24 grafos no MUST (form.required.node.provenance), enquanto o lint dava 0 HARD porque o gate do corpus (ops/kg-gate-ci.sh) não viaja. Números do sinal, não remedidos no core."
+    narrative: |-
+      No hub, o vendor/kg-ssot v4.9.1 chegou e o kg-contract-check.sh reprovou 24 de 24 grafos no MUST (form.required.node.provenance), enquanto o lint dava 0 HARD porque o gate do corpus (ops/kg-gate-ci.sh) não viaja. Números do sinal, não remedidos no core.
+      Fechado em 2026-10-21 pelo fluxo normal do /meta:decide (derivado, não selado de novo): a fase 1 da U1 (o --update mede o contrato no corpus do alvo e relata) entrou no #1235; a migração conduzida segue como Q_U1_FASE2_MIGRACAO_CONDUZIDA, que é a mesma pergunta daqui para frente.
     trace: "docs/evolution/inbox/_processed/2026-10-19-dogfood-update-59ebe7fe1288.md"
   - id: Q_HUB_1019_ONDA_B_GRAFO_NOS_BUILD_DOCS
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.8
     label: "C1 com C2 e C7 (onda B, depois do U1): fase de grafo nos build-*-docs, controle marcado prod, dev ou policy, e escritor de grafo vendorizado conforme ao contrato — GATILHO: U1 entregue"
-    narrative: "Cada controle seria medido contra a branch de produção (resolve-production-branch.sh), e o escritor já sairia legível pelo radar. O hub montou docs/compliance/graph/compliance.kg.yaml (275 nós) por fora do comando e caiu nas três armadilhas do C7, uma por vez. O sinal sugere que o contrato talvez precise de um campo para 'onde o código está' (o hub usou x_delivery), porque o plane diz contra o que a afirmação foi verificada."
     trace: "docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Junto com a auditoria: a fase de grafo nos build-*-docs, a marca prod/dev/policy e o escritor entram no mesmo desenho dos itens 1 e 2 da maquinaria de auditoria contínua, porque o grafo de compliance e o vocabulário de evidência são o mesmo objeto»"
+    narrative: |-
+      Cada controle seria medido contra a branch de produção (resolve-production-branch.sh), e o escritor já sairia legível pelo radar. O hub montou docs/compliance/graph/compliance.kg.yaml (275 nós) por fora do comando e caiu nas três armadilhas do C7, uma por vez. O sinal sugere que o contrato talvez precise de um campo para 'onde o código está' (o hub usou x_delivery), porque o plane diz contra o que a afirmação foi verificada.
+
+      Selado por /meta:decide em 2026-10-21: escolhida «Junto com a auditoria: a fase de grafo nos build-*-docs, a marca prod/dev/policy e o escritor entram no mesmo desenho dos itens 1 e 2 da maquinaria de auditoria contínua, porque o grafo de compliance e o vocabulário de evidência são o mesmo objeto»; descartadas: «Agora, separada» · «Depois».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Onda B (fase de grafo nos build-*-docs, prod/dev/policy, escritor): o gatilho U1 disparou; quando, sendo a base da maquinaria de auditoria?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
   - id: Q_HUB_1019_BACKLOG_COM_GATILHO
     node_type: question
     layer: audit
@@ -199,6 +213,22 @@ nodes:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-20: «O sinal de compliance do hub traz postura de segurança real do cliente e o core é público: o que fazer com o arquivo?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
+      locality: "pessoa"
+  - id: D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Pesquisar e depois 1+2»"
+    label: "Maquinaria de auditoria contínua (sinal do hub de 2026-10-20): pesquisar antes (/onion-research em modo decision, conferindo os padrões citados) e depois desenhar a três (core, kg-ssot, hub) os itens 1 (vocabulário de evidência) e 2 (radar de vencimento), junto com a onda B."
+    narrative: "Selado por /meta:decide em 2026-10-21: escolhida «Pesquisar e depois 1+2»; descartadas: «Desenhar 1+2 já» · «Só no adotante por ora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «Maquinaria de auditoria contínua pedida pelo hub (x_evidence_*, radar de vencimento, questionário, OSCAL, fonte documental, coleta recorrente), com padrões de mercado não verificados: como seguimos?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
 edges:
   - from: E_RADAR_IGNORAVA_O_SEGUNDO_MODO
@@ -230,4 +260,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_SINAL_COMPLIANCE_REDIGIDO_NO_CORE_PUBLICO
     to: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
+    edge_type: TRACES_TO
+  - from: D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2
+    to: Q_HUB_1019_ONDA_B_GRAFO_NOS_BUILD_DOCS
     edge_type: TRACES_TO
