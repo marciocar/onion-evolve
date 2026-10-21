@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**613 itens abertos** em 118 grafo(s) com aberto (de 151 no escopo) · 119 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**612 itens abertos** em 118 grafo(s) com aberto (de 151 no escopo) · 119 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -479,12 +479,11 @@
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
 
-## intelligent-ui-2026-10 — 7 item(ns)
+## intelligent-ui-2026-10 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 25.6 | `Q_MCP_APPS_PILOT_PROPOSAL_1021` | intelligent-ui-2026-10 | HIPÓTESE para o /meta:decide: abrir um piloto ÚNICO de MCP Apps num host que o Onion controla (o /chat do onion-bridge ou o brai |
-| 9.6 | `D_INTELLIGENT_UI_1021` | intelligent-ui-2026-10 | VEREDITO PROPOSTO: costurar, não absorver a UI do GPT-6 (proprietária e não lida). Costura-se o mecanismo aberto: um painel int |
 | 8.4 | `C_INLINE_VISUALS_MARKET_CONVERGENCE_1021` | intelligent-ui-2026-10 | Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03 |
 | 4.5 | `A_ABSORB_DECIDE_PAINEL_INTERATIVO` | intelligent-ui-2026-10 | PLANO N4: o /meta:decide ganha um painel interativo OPCIONAL, publicado como Artifact com estado, cujas respostas a sessão lê e  |
 | 4.0 | `Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021` | intelligent-ui-2026-10 | NÃO VERIFICADO: a Intelligent UI do ChatGPT com GPT-6 (lançamento alegado em 2026-10-07; componentes, critério de uso, streamin |
