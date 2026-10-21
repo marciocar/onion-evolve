@@ -24,6 +24,11 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # o script passa a procurar tudo no lugar errado e emite vazio (medido 2026-08-04).
 ROOT="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || (cd "${HERE}/../.." && pwd))"
 MEMBERS="${A2A_MEMBERS_FILE:-${ROOT}/docs/evolution/federation/members.yaml}"
+# Marcador explícito da volta das capacidades assíncronas (streaming/pushNotifications). VAZIO = o bridge
+# NÃO serve tasks/get nem SSE (medido 2026-10-21 em 21ae69c). Só se preenche com o sha do onion-bridge
+# em que tasks/get ou SSE foi CONFERIDO NO CÓDIGO; a bancada lê esta linha literal (limite: ela não
+# verifica o sha contra o bridge — o marcador é a palavra de quem mediu, não a medição).
+A2A_BRIDGE_ASYNC_VERIFIED=""
 command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
   || { echo "a2a-agent-card: python3+yaml ausente (exit 3)." >&2; exit 3; }
 
@@ -47,7 +52,13 @@ card = {
                     "da federação; nunca conversa autônoma agente-a-agente. Aceitação sempre sob gate humano."),
     "url": "https://app.onionevolve.com/a2a",   # endpoint GATED (servido pelo onion-bridge na VPS — fase-2)
     "version": "1.0.0",
-    "capabilities": {"streaming": True, "pushNotifications": True},
+    # Capacidades HONESTAS (D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021, 2026-10-21): o card só
+    # declara o que o bridge serve. Medido no onion-bridge origin/main 21ae69c: só há POST /a2a e
+    # /a2a/:receiver (src/server.ts:687, src/a2a-routes.ts:12) — sem tasks/get, sem SSE, sem webhook de
+    # push. GATILHO para voltar a True: o bridge passar a servir tasks/get (push) ou SSE (streaming),
+    # CONFERIDO NO CÓDIGO DELE; então preencha A2A_BRIDGE_ASYNC_VERIFIED (topo do script) com o sha
+    # medido. A bancada (run_agent_card_selftests) reprova True enquanto o marcador estiver vazio.
+    "capabilities": {"streaming": False, "pushNotifications": False},
     "defaultInputModes": ["application/json"],
     "defaultOutputModes": ["application/json"],
     "securitySchemes": {

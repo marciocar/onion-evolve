@@ -13777,7 +13777,7 @@ YML
 # Modo agent-card — gerador do Agent Card A2A do core (F2.2 fundação). Projeção
 # read-only do members.yaml FILTRADA ao próprio core (confidencialidade). Cobre:
 # JSON válido, confidencialidade (adotante não vaza), signals-only, securitySchemes,
-# determinismo e o exit-3 gracioso (core ausente). Sandbox via A2A_MEMBERS_FILE.
+# capacidades honestas (streaming/push só com marcador), determinismo e o exit-3 gracioso (core ausente). Sandbox via A2A_MEMBERS_FILE.
 # ---------------------------------------------------------------------------
 run_agent_card_selftests() {
   local gen="${REPO_ROOT}/.claude/validation/a2a-agent-card.sh"
@@ -13815,6 +13815,18 @@ YML
   if grep -q '"oauth2"' <<< "${out}"&& grep -q '"mtls"' <<< "${out}"; then
     record_pass "agent-card: securitySchemes oauth2 + mtls"
   else record_fail "agent-card: schemes" "faltou oauth2/mtls"; fi
+
+  # Capacidades honestas (D_AGENT_CARD_DEIXA_DE_DECLARAR_O_QUE_NAO_FAZ_1021): sem o marcador
+  # A2A_BRIDGE_ASYNC_VERIFIED preenchido no gerador, streaming/pushNotifications=true reprova — no card
+  # gerado E na projeção versionada. LIMITE: o caso lê a linha literal do marcador; não confere o sha
+  # contra o código do bridge (isso é medição humana/agente, registrada no marcador).
+  local marker caps proj_caps
+  marker="$(grep -E '^A2A_BRIDGE_ASYNC_VERIFIED="[^"]+"' "${gen}" || true)"
+  caps="$(printf '%s' "${out}" | python3 -c 'import sys,json;c=json.load(sys.stdin).get("capabilities",{});print("%s/%s"%(c.get("streaming") is True,c.get("pushNotifications") is True))' 2>/dev/null)"
+  proj_caps="$(python3 -c 'import sys,json;c=json.load(open(sys.argv[1])).get("capabilities",{});print("%s/%s"%(c.get("streaming") is True,c.get("pushNotifications") is True))' "${REPO_ROOT}/docs/onion/agent-card.json" 2>/dev/null || echo "False/False")"
+  if [ -n "${marker}" ] || { [ "${caps}" = "False/False" ] && [ "${proj_caps}" = "False/False" ]; }; then
+    record_pass "agent-card: capacidades honestas (sem streaming/push enquanto o bridge não tiver tasks/get nem SSE)"
+  else record_fail "agent-card: capacidades" "card declara streaming/push (gerado=${caps} projeção=${proj_caps}) sem A2A_BRIDGE_ASYNC_VERIFIED no gerador"; fi
 
   a="$(A2A_MEMBERS_FILE="${mf}" bash "${gen}" 2>/dev/null | sha256sum)"
   b="$(A2A_MEMBERS_FILE="${mf}" bash "${gen}" 2>/dev/null | sha256sum)"
