@@ -31,7 +31,7 @@ const MAX_DEPTH = 1000; // coleções abertas de uma vez (MAX_DEPTH da referênc
 // só aviso (yaml.depth-over-128), medido por warnings().
 const PROFILE_DEPTH = 128;
 const SLUG = /^[A-Za-z_][A-Za-z0-9_-]*$/;
-const EXTERNAL_REF = /^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml#[A-Za-z][A-Za-z0-9_]*$/;
+const EXTERNAL_REF = /^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)#[A-Za-z][A-Za-z0-9_]*$/;
 const isExternal = (ref) => typeof ref === 'string' && EXTERNAL_REF.test(ref); // is_external da referência
 const CORE_INT = /^(?:[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+)$/;
 const Y = 'tag:yaml.org,2002:';
@@ -618,7 +618,7 @@ export function codes(text, validate, { format = 'yaml', corpus = null } = {}) {
 export function indexTexts(items) {
   const index = new Map();
   for (const [name, text] of items) {
-    const { doc } = parseYaml(text);
+    const { doc } = parse(text, name.endsWith('.json') ? 'json' : 'yaml'); // o .kg.json pelo perfil JSON (v4.7)
     const nodes = doc && Array.isArray(doc.nodes) ? doc.nodes : [];
     index.set(name, new Set(nodes.filter((n) => isObj(n) && present(get(n, 'id'))).map((n) => pyStr(n.id))));
   }

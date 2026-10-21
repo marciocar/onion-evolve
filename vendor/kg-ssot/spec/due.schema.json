@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:due.schema.json",
+  "title": "Relatório de vencimento (kg-ssot.due/1)",
+  "description": "Saída de `kg_validate.py --due AAAA-MM-DD --format json` (desde a 4.15.0, contrato v4.8). Não é veredito: lista o nó com reverify_every cujo verified_at somado à cadência vence na data ou antes (due), o que tem cadência e não tem carimbo (unstamped), o que só tem reverify_on (event) e o arquivo que não parseia (broken). O relatório não julga o grafo: o gate continua sendo o kg_gate.py.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "as_of",
+    "due",
+    "unstamped",
+    "event",
+    "broken"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.due/1"
+    },
+    "as_of": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "due": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "id",
+          "verified_at",
+          "reverify_every",
+          "due_on",
+          "days_late",
+          "reverify_on"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "verified_at": {
+            "type": "string"
+          },
+          "reverify_every": {
+            "type": "string"
+          },
+          "due_on": {
+            "type": "string"
+          },
+          "days_late": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reverify_on": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "unstamped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "id",
+          "reverify_every"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "reverify_every": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "event": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "id",
+          "reverify_on"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "reverify_on": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "broken": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "error"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

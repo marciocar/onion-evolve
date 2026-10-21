@@ -54,12 +54,13 @@ Opções úteis:
 | Opção | Efeito |
 |---|---|
 | `--where` | Uma linha por ocorrência, com o nó ou a aresta; numa ocorrência MUST, a correção vem logo abaixo |
-| `--corpus DIR` | Confere a ponta externa das `external_edges` contra os `.kg.yaml` rastreados pelo git sob `DIR` (fora de um repo git, todos) |
+| `--corpus DIR` | Confere a ponta externa das `external_edges` contra os `.kg.yaml` e `.kg.json` rastreados pelo git sob `DIR` (fora de um repo git, todos) |
 | `--schema F` | Valida contra outro MUST (o SHOULD vizinho vem junto, se existir) |
 | `--format json` | O veredito estruturado em stdout (ver abaixo), para ferramentas e servidores MCP |
 | `--limit N` | Com `--format json`, quantas ocorrências por arquivo (default 50); o resumo conta todas |
 | `-` no lugar do arquivo | Lê o grafo do stdin, sem gravar arquivo temporário |
 | `--should-schema F` | Com `--schema`, o SHOULD que acompanha (no lugar do vizinho) |
+| `--due AAAA-MM-DD` | No lugar do veredito, o relatório de vencimento na data (desde a 4.15.0): o nó com `reverify_every` cujo `verified_at` somado à cadência vence na data ou antes, o que tem cadência sem carimbo e o que só tem `reverify_on`. O rc é 0 (ou 2 com entrada quebrada): o vencimento nunca reprova, e o relatório não julga o grafo (o gate segue sendo o `kg_gate.py`). Um arquivo que não parseia sai como `NÃO LIDO`; num job agendado, olhe essa lista, porque o rc não a acusa. A cadência fora da forma ou zerada não entra no relatório (o aviso SHOULD a acusa), nem o vencimento depois do ano 9999. Com `--format json`, sai no formato `kg-ssot.due/1` (`spec/due.schema.json`) |
 
 As opções `--json OUT`, `--spike`, `--git`, `--rev` e `--list` são do instrumento de medição que deu origem ao
 contrato (o "spike"): gravam e reproduzem um formato legado, congelado, e não fazem parte da interface estável. Para
@@ -299,6 +300,21 @@ o substitui). O `DiskStore` e o `VersionedStore` recusam uma raiz dentro
 de um repo git, onde o gate leria o rastreado e o armazém leria o disco. E a cabeça só fica trocada com o registro
 feito: se o commit ou o evento falha, ela volta ao que era, e a exceção sobe para quem chamou.
 
+Para regenerar grafos que se citam, use `write_many` (desde a 4.14.0). Um a um, a troca do primeiro deixaria a aresta
+externa do segundo sem ponta, e o rejulgamento barraria. O conjunto, inclusive com remoções (texto `None`), é julgado
+inteiro, com todas as mudanças no lugar, e entra num registro só (um commit, ou um bloco de eventos), ou nada entra:
+
+```python
+r = store.write_many([("caso.kg.yaml", caso), ("cruzamento.kg.json", cruzamento), ("velho.kg.yaml", None)],
+                     message="regenera o caso", expected={"caso.kg.yaml": sha_lido})
+if not r["written"]:
+    print(r["reason"], [x["reason"] for x in r["results"]])
+```
+
+Em `conflict` e `missing`, o nome que barrou leva o motivo e os outros saem como `skipped`. Em `gate` e `not_judged`, o
+julgamento é do conjunto, e todos saem com esse motivo. O gate externo (`--gate-cmd`), se houver, julga cada mudança
+isolada, como no `write`. Nomes do conjunto que só diferem pela caixa são recusados, como no armazém.
+
 O CLI tem um subcomando por operação, com a saída em JSON no stdout:
 
 ```text
@@ -306,6 +322,7 @@ kg_store.py --backend disk|git|versioned --root DIR [--init] [--gate-cmd CMD [--
 kg_store.py ... read NOME [--ref REF]
 kg_store.py ... write NOME [ARQUIVO|-] [--message M] [--author "Nome <email>"] [--expected-sha256 S|new]
 kg_store.py ... delete NOME [--message M] [--author A] [--expected-sha256 S]
+kg_store.py ... write-many CONJUNTO.json [--message M] [--author A]
 kg_store.py ... history NOME
 ```
 

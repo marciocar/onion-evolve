@@ -92,6 +92,28 @@
       "codes": [
         "form.type.top.external_edges.item"
       ]
+    },
+    {
+      "file": "valid-external-json-target.kg.yaml",
+      "description": "a ponta externa pode ser um .kg.json, o formato JSON do mesmo modelo (v4.7); antes, reprovava no pattern",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-external-yml-ext.kg.yaml",
+      "description": "a extensão .kg.yml não é do contrato: só .kg.yaml e .kg.json (v4.7)",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-json-uppercase.kg.yaml",
+      "description": "a extensão em maiúsculas não casa: o nome é sensível à caixa (v4.7)",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
     }
   ]
 }

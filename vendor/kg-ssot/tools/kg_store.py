@@ -11,10 +11,13 @@ O gate (o que nenhum dos três pula):
     armazém, já com o candidato no lugar; e julga de novo cada grafo do armazém que aponta para o nome gravado,
     porque trocar um grafo pode deixar a aresta externa de outro sem ponta;
   - delete() julga os grafos que apontam para o nome removido, contra o armazém sem ele;
+  - write_many() grava um conjunto (inclusive remoções) de uma vez, ou nada: o contrato julga o conjunto inteiro com
+    todas as mudanças no lugar, e o registro é um só. É o caminho para regenerar grafos que se citam: um a um, o
+    rejulgamento de quem aponta barraria o estado intermediário;
   - só grava com PASS em todos. Nada reprovado é escrito;
   - o formato vem do nome: o .kg.json é julgado pelo perfil JSON do contrato (kg_validate.as_source), e o .kg.yaml
-    pelo perfil YAML. O corpus da ponta externa segue só com os .kg.yaml, como o do gate (corpus_index), porque a
-    referência externa (<caminho>.kg.yaml#<id>) só aponta para .kg.yaml;
+    pelo perfil YAML. O corpus da ponta externa tem os dois formatos, como o do gate (corpus_index): desde o v4.7, a
+    referência externa (<caminho>.kg.yaml#<id> ou <caminho>.kg.json#<id>) aponta para qualquer um deles;
   - o corpus é o mesmo que o gate do repo (kg_validate.corpus_index) veria: no GitStore, só o RASTREADO (list() e o
     julgamento ignoram o .kg.yaml não rastreado); disco e versionado recusam uma raiz dentro de worktree git, onde os
     dois corpus divergiriam;
@@ -48,6 +51,9 @@ CLI (saída JSON no stdout):
   kg_store.py ... read NAME [--ref REF]
   kg_store.py ... write NAME [FILE|-] [--message M] [--author "Nome <email>"] [--expected-sha256 S|new]
   kg_store.py ... delete NAME [--message M] [--author A] [--expected-sha256 S]
+  kg_store.py ... write-many CONJUNTO.json [--message M] [--author A]
+    o conjunto é {"changes": [{"name": N, "file": F} | {"name": N, "text": T} | {"name": N, "delete": true}],
+    "expected": {N: S|new}}, com file relativo ao CONJUNTO.json; grava tudo ou nada (write_many)
   kg_store.py ... history NAME
 rc: 0 ok · 1 recusado (gate, conflict, missing, nome inexistente) · 2 entrada quebrada ou not_judged.
 """
@@ -749,18 +755,23 @@ class DiskStore:
 
     @staticmethod
     def corpus_of(items):
-        """O corpus da ponta externa a partir de [(nome, texto)]: só os .kg.yaml, como o corpus_index do gate."""
-        return kg_validate.index_texts([(n, t) for n, t in items if n.endswith(".kg.yaml")])
+        """O corpus da ponta externa a partir de [(nome, texto)]: os .kg.yaml e os .kg.json, como o corpus_index do gate."""
+        return kg_validate.index_texts(items)
 
     def _judge(self, name, text):
         """(doc, erro): julga o candidato (text None = remoção) e os grafos que apontam para name, contra o armazém
         com o candidato no lugar. doc None com erro = não julgado."""
+        return self._judge_set({name: text})
+
+    def _judge_set(self, changes):
+        """(doc, erro): julga um conjunto de mudanças {nome: texto, ou None para remover} de uma vez, contra o armazém
+        com TODAS no lugar: os candidatos e os grafos que ficam e apontam para algum dos nomes. É o que deixa uma
+        regeneração trocar dois grafos que se citam sem passar por um estado intermediário sem ponta."""
         try:
-            others = self._texts(skip=name)
-            text = kg_validate.as_source(name, text) if text is not None else None
-            corpus = self.corpus_of(others + ([(name, text)] if text is not None else []))
-            sources = [(name, text)] if text is not None else []
-            sources += [(n, t) for n, t in others if name in kg_validate.external_targets(t)]
+            others = [(n, t) for n, t in self._texts() if n not in changes]
+            cands = [(n, kg_validate.as_source(n, t)) for n, t in changes.items() if t is not None]
+            corpus = self.corpus_of(others + cands)
+            sources = cands + [(n, t) for n, t in others if kg_validate.external_targets(t) & set(changes)]
             doc = kg_validate.judge(sources, self.schema, corpus=corpus)
         except Exception as exc:  # noqa: BLE001 - qualquer falha do julgamento é "não julgado", nunca PASS
             return None, f"{type(exc).__name__}: {exc}"
@@ -771,20 +782,27 @@ class DiskStore:
     def _judge_all(self, name, text):
         """(doc, erro, de_fora): o contrato e, se ele aprova, o gate externo. de_fora diz que o FAIL veio do gate
         externo. Uma falha do gate externo, ou um gate que levanta, é "não julgado", nunca PASS."""
-        doc, err = self._judge(name, text)
+        return self._judge_set_all({name: text})
+
+    def _judge_set_all(self, changes):
+        """_judge_all para um conjunto: o contrato sobre o conjunto inteiro e, se ele aprova, o gate externo em cada
+        mudança, na ordem dada. O primeiro FAIL ou falha do gate decide."""
+        # uma mudança só passa por _judge, o ponto que write() e delete() sempre usaram
+        doc, err = self._judge(*next(iter(changes.items()))) if len(changes) == 1 else self._judge_set(changes)
         if doc is None or self.gate is None or any(r["verdict"] == "FAIL" for r in doc["results"]):
             return doc, err, False
-        try:
-            gdoc, gerr = self.gate(name, text, "write" if text is not None else "delete")
-        except Exception as exc:  # noqa: BLE001 - o gate de quem adota não derruba o armazém nem vira PASS
-            return None, f"o gate externo levantou {type(exc).__name__}: {exc}", False
-        if gdoc is not None and _verdict_ok(gdoc) and not gdoc["results"]:
-            gdoc, gerr = None, "veredito sem resultado"
-        if gdoc is None or not _verdict_ok(gdoc):
-            gerr = gerr or "veredito fora de spec/verdict.schema.json"
-            return None, gerr if "gate externo" in gerr else f"gate externo: {gerr}", False
-        if any(r["verdict"] == "FAIL" for r in gdoc["results"]):
-            return gdoc, None, True
+        for name, text in changes.items():
+            try:
+                gdoc, gerr = self.gate(name, text, "write" if text is not None else "delete")
+            except Exception as exc:  # noqa: BLE001 - o gate de quem adota não derruba o armazém nem vira PASS
+                return None, f"o gate externo levantou {type(exc).__name__}: {exc}", False
+            if gdoc is not None and _verdict_ok(gdoc) and not gdoc["results"]:
+                gdoc, gerr = None, "veredito sem resultado"
+            if gdoc is None or not _verdict_ok(gdoc):
+                gerr = gerr or "veredito fora de spec/verdict.schema.json"
+                return None, gerr if "gate externo" in gerr else f"gate externo: {gerr}", False
+            if any(r["verdict"] == "FAIL" for r in gdoc["results"]):
+                return gdoc, None, True
         return doc, None, False
 
     def _result(self, name, written, reason=None, sha=None, ref=None, verdict=None, error=None, unchanged=False):
@@ -862,6 +880,116 @@ class DiskStore:
             return self._result(name, True, None, None, ref, doc)
         finally:
             self._unlock(lock)
+
+    def write_many(self, changes, message=None, author=None, expected=None, max_names=None):
+        """Grava um conjunto de mudanças de uma vez, ou nenhuma: changes é [(nome, texto)], com texto None para remover.
+        O contrato julga o conjunto inteiro contra o armazém com todas as mudanças no lugar (_judge_set), e só grava
+        com PASS em tudo. expected é {nome: sha256 da cabeça lida, ou NEW}, a trava otimista por nome. Resultado:
+        {written, reason, results: [um por nome, na ordem dada, como o de write()/delete()], ref, verdict, error}.
+        reason é o do primeiro nome que barrou, ou null. Em conflict e missing, o nome que barrou leva o motivo e os
+        outros saem como skipped; em gate e not_judged, o julgamento é do conjunto, e todos saem com esse motivo. O gate
+        externo, se houver, julga cada mudança isolada, como no write(). A mudança que repete a última versão registrada sai com unchanged; o resto entra num registro
+        só (um commit no git, um bloco de eventos no versionado). Se o registro falha, todas as cabeças voltam."""
+        if not isinstance(changes, (list, tuple)) or not changes:
+            raise StoreError("changes tem de ser uma lista não vazia de (nome, texto)")
+        if any(not isinstance(c, (list, tuple)) or len(c) != 2 for c in changes):
+            raise StoreError("cada mudança é um par (nome, texto)")
+        changes = [tuple(c) for c in changes]
+        names = [n for n, _ in changes]
+        if len(set(names)) != len(names):
+            raise StoreError("o mesmo nome aparece duas vezes no conjunto")
+        for n, t in changes:
+            check_name(n)
+            if t is not None and not isinstance(t, str):
+                raise StoreError(f"o texto de {n} tem de ser str (ou None para remover)")
+        check_author(author)
+        message = check_message(message, f"grava {len(changes)} grafos")
+        expected = dict(expected or {})
+        if set(expected) - set(names):
+            raise StoreError("expected cita nome fora do conjunto")
+        lock = self._lock()
+        try:
+            self._precheck()
+            self._check_set_case(names)
+            heads, current, out = {}, {}, {}
+            for n, t in changes:
+                self._check_case(n)
+                heads[n] = self._read_head(n)
+                if heads[n] is None and t is not None:
+                    check_portable(n)
+                visible = self._visible(n, heads[n])
+                current[n] = sha256(visible) if visible is not None else None
+                if t is None and visible is None:
+                    out[n] = self._result(n, False, "missing")
+                elif n in expected and expected[n] != (current[n] or NEW):
+                    out[n] = self._result(n, False, "conflict", current[n])
+            new_names = [n for n, t in changes if t is not None and current[n] is None]
+            if max_names is not None and new_names and len(self.list()) + len(new_names) > max_names:
+                raise StoreError(f"o armazém já tem {len(self.list())} grafos, e o limite deste servidor é {max_names}")
+            if out:
+                return self._many(changes, out, current, next(r["reason"] for r in out.values()))
+            doc, err, external = self._judge_set_all(dict(changes))
+            if doc is None:
+                return self._many(changes, {n: self._result(n, False, "not_judged", current[n], error=err)
+                                            for n in names}, current, "not_judged", error=err)
+            if any(r["verdict"] == "FAIL" for r in doc["results"]):
+                error = "reprovado pelo gate externo" if external else None
+                return self._many(changes, {n: self._result(n, False, "gate", current[n], verdict=doc, error=error)
+                                            for n in names}, current, "gate", verdict=doc, error=error)
+            todo, touched = [], []
+            ref = None
+            try:
+                for n, t in changes:
+                    new = sha256(t) if t is not None else None
+                    if t is not None and new == self._recorded_sha(n):  # a última versão registrada: sem registro
+                        if new != current[n]:
+                            touched.append(n)
+                            self._write_head(n, t)
+                        out[n] = self._result(n, True, None, new, None, doc, unchanged=True)
+                    else:
+                        todo.append((n, t, new))
+                for n, t, _ in todo:
+                    touched.append(n)
+                    if t is None:
+                        self._remove_head(n)
+                    else:
+                        self._write_head(n, t)
+                if todo:
+                    ref = self._commit_many(todo, message, author)
+            except BaseException:
+                for n in reversed(touched):  # desfaz tudo o que tocou, mesmo que um _restore falhe no meio
+                    try:
+                        self._restore(n, heads[n])
+                    except Exception:  # noqa: BLE001 - a exceção que sobe é a original
+                        pass
+                raise
+            for n, t, new in todo:
+                out[n] = self._result(n, True, None, new, ref, doc)
+            return self._many(changes, out, current, None, ref=ref, verdict=doc)
+        finally:
+            self._unlock(lock)
+
+    def _check_set_case(self, names):
+        """O _check_case olha o disco; dois nomes do conjunto que só diferem pela caixa passariam juntos. Recusa o par,
+        menos quando os dois já existem no armazém com a caixa exata (num disco que distingue), como no write()."""
+        seen = {}
+        for n in names:
+            parts = n.split("/")
+            for k in range(1, len(parts) + 1):
+                prefix = "/".join(parts[:k])
+                first, owner = seen.setdefault(prefix.casefold(), (prefix, n))
+                if first != prefix and not (self._read_head(n) is not None and self._read_head(owner) is not None):
+                    raise StoreError(f"nome inválido: {n!r} só difere de {owner!r} pela caixa, no mesmo conjunto (no "
+                                     "Windows e no macOS os dois são o mesmo arquivo)")
+
+    def _many(self, changes, out, current, reason, ref=None, verdict=None, error=None):
+        results = [out.get(n) or self._result(n, False, "skipped", current.get(n)) for n, _ in changes]
+        return {"written": reason is None, "reason": reason, "results": results, "ref": ref, "verdict": verdict,
+                "error": error}
+
+    def _commit_many(self, todo, message, author):
+        """O registro de um conjunto [(nome, texto ou None, sha)]. No disco não há registro."""
+        return None
 
     def _precheck(self):
         """O registro está legível? Falha aqui, antes de tocar a cabeça."""
@@ -1002,6 +1130,16 @@ class GitStore(DiskStore):
         self._git(*args, "--", name)
         return self._git("rev-parse", "HEAD").stdout.decode().strip()
 
+    def _commit_many(self, todo, message, author):
+        """Um commit só para o conjunto inteiro."""
+        names = [n for n, _, _ in todo]
+        self._git("add", "-f", "-A", "--", *names)
+        args = ["commit", "-q", "--no-verify", "-m", message]
+        if author:
+            args += ["--author", author]
+        self._git(*args, "--", *names)
+        return self._git("rev-parse", "HEAD").stdout.decode().strip()
+
     def _read_ref(self, name, ref):
         if not re.fullmatch(r"[0-9a-fA-F]{4,64}", str(ref)):  # fullmatch: o $ aceitaria um \n final
             raise StoreError(f"ref inválida: {ref!r} (um sha de commit)")
@@ -1070,6 +1208,29 @@ class VersionedStore(DiskStore):
             raise StoreError(f"não deu para registrar o evento: {exc}") from exc
         return seq
 
+    def _commit_many(self, todo, message, author):
+        """As versões primeiro, depois todos os eventos num append só. ref é o seq do último evento do bloco. Um disco
+        cheio no meio do append pode truncar a última linha, como no write(): o events.jsonl fica corrompido e o
+        armazém recusa tudo até o conserto, sem gravar por cima."""
+        for n, t, new in todo:
+            if new is not None:
+                try:
+                    self._write_file([META, "blobs", f"{new}.yaml"], t.encode("utf-8"))
+                except OSError as exc:
+                    raise StoreError(f"não deu para gravar a versão {new}: {exc}") from exc
+        seq = len(self._events())
+        ts = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
+        lines = []
+        for n, t, new in todo:
+            seq += 1
+            lines.append(json.dumps({"seq": seq, "op": "write" if t is not None else "delete", "name": n, "sha256": new,
+                                     "author": author, "message": message, "ts": ts}, ensure_ascii=False) + "\n")
+        try:
+            self._append([META, "events.jsonl"], "".join(lines).encode("utf-8"))
+        except OSError as exc:
+            raise StoreError(f"não deu para registrar os eventos: {exc}") from exc
+        return seq
+
     def history(self, name):
         check_name(name)
         self._check_case(name)
@@ -1116,6 +1277,34 @@ def _utf8_stdio():
                 stream.reconfigure(encoding="utf-8", errors="replace")
 
 
+def read_set(path):
+    """(changes, expected) de um conjunto em JSON para write_many. Um file é lido relativo ao conjunto."""
+    path = pathlib.Path(path)
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise StoreError(f"{path.name} não é JSON: {exc}") from exc
+    if not isinstance(doc, dict) or not isinstance(doc.get("changes"), list):
+        raise StoreError(f"{path.name}: falta a lista changes")
+    changes = []
+    for c in doc["changes"]:
+        if not isinstance(c, dict) or not isinstance(c.get("name"), str) or \
+                sum(k in c for k in ("file", "text", "delete")) != 1:
+            raise StoreError(f"{path.name}: cada mudança tem name e exatamente um de file, text ou delete")
+        if "delete" in c:
+            if c["delete"] is not True:
+                raise StoreError(f"{path.name}: delete só aceita true")
+            changes.append((c["name"], None))
+        elif "text" in c:
+            changes.append((c["name"], c["text"]))
+        else:
+            changes.append((c["name"], (path.parent / c["file"]).read_text(encoding="utf-8")))
+    expected = doc.get("expected")
+    if expected is not None and not isinstance(expected, dict):
+        raise StoreError(f"{path.name}: expected é um objeto nome → sha256")
+    return changes, expected
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--backend", choices=sorted(BACKENDS), default="disk")
@@ -1137,6 +1326,10 @@ def main(argv=None):
         p.add_argument("--message")
         p.add_argument("--author")
         p.add_argument("--expected-sha256")
+    p = sub.add_parser("write-many")
+    p.add_argument("file", help="o conjunto em JSON (veja o uso acima)")
+    p.add_argument("--message")
+    p.add_argument("--author")
     p = sub.add_parser("history")
     p.add_argument("name")
     args = ap.parse_args(argv)
@@ -1163,6 +1356,10 @@ def main(argv=None):
         if args.cmd == "history":
             emit({"name": args.name, "history": store.history(args.name)})
             return 0
+        if args.cmd == "write-many":
+            res = store.write_many(*read_set(args.file), args.message, args.author)
+            emit(res)
+            return 0 if res["written"] else 2 if res["reason"] == "not_judged" else 1
         if args.cmd == "write":
             if args.file == "-":
                 stream = getattr(sys.stdin, "buffer", None)

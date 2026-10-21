@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -295,6 +295,30 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.14.0` para a `kg-ssot-v4.15.0`, entra o contrato v4.8: as chaves da verificação, desenhadas com dois
+adotantes a partir de um caso real de auditoria contínua. Todas são opcionais, e quem não usa não ganha dívida.
+- **`reverify_every`**: de quanto em quanto tempo a verificação de um nó tem de ser refeita, em duração ISO 8601 só com
+  data (`P3M`, `P1Y`). Sem `verified_at`, alerta, porque a cadência conta do carimbo; zerada (`P0D`), também.
+- **`reverify_on`**: o gatilho por evento, em texto ("por admissão", "a cada mudança de configuração").
+- **`retain_for`**: por quanto tempo a evidência tem de ser guardada, na mesma duração.
+- **O `owner`** é o papel que responde pelo nó, e não uma pessoa. Não muda nada no veredito.
+- **`kg_validate.py --due AAAA-MM-DD`**: o relatório de vencimento, que nunca muda o veredito do gate. Um veredito que
+  mudasse com o calendário, sem commit, quebraria a base e a catraca. Rode o relatório num job agendado, se quiser
+  cobrar a cadência.
+- **A suíte ganha 13 casos** (349). A identidade do contrato muda (o `kg_gate.py` pede `--update`), sem veredito
+  trocado.
+
+Da `kg-ssot-v4.13.1` para a `kg-ssot-v4.14.0`, entra o contrato v4.7 e a gravação de conjunto no armazém. As duas
+lacunas foram achadas por um adotante que grava parte dos grafos em `.kg.json`.
+- **A ponta externa das `external_edges` pode ser um `.kg.json`** (`<caminho>.kg.json#<id>`), o formato JSON do mesmo
+  modelo. O corpus que confere a ponta (o `kg_gate.py`, o `--corpus` dos dois leitores e o `kg_store.py`) passa a ler
+  os dois formatos. É ampliação: nada que passava reprova. A identidade do contrato muda (o `kg_gate.py` pede
+  `--update`), sem veredito trocado.
+- **`kg_store.write_many`** (e `kg_store.py write-many`) grava um conjunto de grafos de uma vez, ou nada. É o caminho
+  para regenerar grafos que se citam.
+- **A suíte ganha 8 casos** (336), três deles para recusar a extensão fora da forma (`.kg.yml`, `.KG.JSON`) e o
+  `.kg.json` que não existe quando só existe o `.kg.yaml` de mesmo nome-base.
+
 Da `kg-ssot-v4.13.0` para a `kg-ssot-v4.13.1`, a identidade do contrato passa a acusar o v4.6. As duas regras novas da
 4.13.0 moram só no leitor, e o sha256 dos schemas, que o `kg_gate.py` guarda como identidade, não mudou: uma base
 gravada na 4.12.0 seguia julgando com regra nova sem que a identidade acusasse. A descrição do schema MUST passa a
@@ -320,7 +344,7 @@ leitor JS) e o migrador por perfil.
 - **A suíte ganha 16 casos** (328).
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --dest
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --dest
   vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
@@ -412,8 +436,8 @@ contrato: RFC 8259 com um BOM inicial aceito, I-JSON (RFC 7493, sem surrogate so
 ±(2^53−1)), no máximo 128 coleções aninhadas e chave única. No `.kg.json`, esses pontos reprovam (MUST).
 `kg_validate.py`, `kg_conformance.py`, `kg_store.py` e `kg_mcp.py` leem os dois formatos pela extensão (sensível a
 maiúsculas: `.kg.json`). **O gate continua só com `.kg.yaml`**: um `.kg.json` commitado no repositório não é medido
-pelo `kg_gate.py`, e as `external_edges` só apontam para `.kg.yaml`. Quem guarda `.kg.json` no repo e quer o CI
-cobrando roda `kg_validate.py` neles num passo próprio.
+pelo `kg_gate.py`. Desde a 4.14.0 (contrato v4.7), as `external_edges` apontam também para `.kg.json`, e o gate os lê
+como alvo. Quem guarda `.kg.json` no repo e quer o CI cobrando roda `kg_validate.py` neles num passo próprio.
 
 ## 5. Do v3 para o v4
 
@@ -445,7 +469,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.15.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -477,10 +501,10 @@ external_edges:
 ```
 
 Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. O gate confere o alvo contra
-os `.kg.yaml` rastreados do repo, inclusive os que o `--exclude` tira do corpus, e lê só os que alguma referência cita: alvo que não existe, ou grafo-alvo
+os `.kg.yaml` e `.kg.json` rastreados do repo, inclusive os que o `--exclude` tira do corpus, e lê só os que alguma referência cita: alvo que não existe, ou grafo-alvo
 apagado, reprova quem aponta (`integrity.dangling-external`). Fora do gate, `kg_validate.py --corpus <raiz do repo>`
-faz a mesma conferência: num repo git, contra os `.kg.yaml` rastreados; fora de um repo, contra todo `.kg.yaml` sob o
-diretório. Sem `--corpus`, o leitor confere só a forma e a ponta local, e diz quantos arquivos ficaram com a ponta externa
+faz a mesma conferência: num repo git, contra os `.kg.yaml` e `.kg.json` rastreados; fora de um repo, contra todo
+grafo sob o diretório. Sem `--corpus`, o leitor confere só a forma e a ponta local, e diz quantos arquivos ficaram com a ponta externa
 sem conferir. Uma referência ao próprio arquivo passa como externa; use `edges` para isso. Uma chave `x_` própria que fazia esse papel migra para cá; a que só declara algo, sem ser
 aresta, segue como `x_`.
 
@@ -508,7 +532,7 @@ Para provar que um leitor próprio concorda com o contrato, rode a suíte com o 
 python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
-A ordem importa: os casos de corpus conferem a ponta externa contra os `.kg.yaml` rastreados quando a suíte mora num
+A ordem importa: os casos de corpus conferem a ponta externa contra os grafos rastreados quando a suíte mora num
 repo git, e com o vendor ainda fora do git um caso falha (`latest: 260/261`). Depois compare com os códigos que o seu
 leitor emite. O formato dos casos e como rodar a suíte com um leitor em outra linguagem estão em
 `spec/conformance/README.md`.
