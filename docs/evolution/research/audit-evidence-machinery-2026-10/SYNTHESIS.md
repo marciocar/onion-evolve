@@ -79,3 +79,41 @@ ganho principal foi negativo e barato: a ancoragem derrubou as três afirmaçõe
 desenho mais se apoiava (métodos OSCAL, 7 dias do FedRAMP, ERL do SCF), antes de virarem campo de contrato.
 
 Retorno integral do run: `data/run-wf_25b440d5-1f7.json`.
+
+## Reancoragem 2026-10-21 (apêndice datado, run `wf_1bc82958-bf5`)
+
+> Selada em `D_AUDIT_REANCHOR_OSCAL_FEDRAMP_BEFORE_ITEMS_1021`. São 3 fontes e 22 nós APENDADOS (o
+> grafo vai a 79), sem reescrever nenhum dos 57 da rodada 1. Custo: 778.492 tokens, 10 agentes,
+> ~15 min, ≈35k por nó.
+
+**Ancorado (verbatim, tier 10):**
+- **OSCAL v1.2.3, `relevant-evidence`:** é array opcional de 1..N. Cada item tem `href` opcional (URI
+  absoluto, relativo ou `#uuid` para um resource do back-matter) e `description`. O back-matter aceita
+  `rlink` (URL com hash **opcional**) ou `base64`. Logo, "location como ponteiro" é **regra local do
+  Onion**, não exigência do OSCAL (`E_OBJECAO_11`).
+- **FedRAMP FRC-APP-FCP (MUST):** os 7 dias valem para o pacote **inicial**. Regra lançada em
+  2026-06-24 e sem emenda.
+- **oscal-cli:** v3.2.0 (2026-05-15), mantido em `metaschema-framework`, domínio público (CC0), com
+  bindings **OSCAL 1.2.1**.
+
+**Superações achadas (abertas, leitura do metaschema e do código, sem âncora de verificador separado):**
+- `observation.methods` é **obrigatório (1..N)** e aceita valores locais (`allow-other=yes`) além de
+  EXAMINE, INTERVIEW e TEST. UNKNOWN fica só para conversão histórica
+  (`C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER`).
+- **`acceptance` tem zero ocorrências** nos cinco metaschemas do v1.2.3. A aceitação de risco existe no
+  POA&M como prop `accepted`, response `accept` e status `deviation-approved`. Se o campo entrar, é
+  **cunhagem do Onion**, declarada como tal.
+- **O CPO-CSX-CPM é teto de manutenção do pacote, não cadência de verificação**, e o FRC-CSX-VVK fixa
+  quantos métodos automáticos, sem intervalo. A cadência por nó é **declarada pelo dono**, e o radar
+  **não** codifica 3m/1m/2s/1s do FedRAMP (`E_OBJECAO_16`).
+- O oscal-cli tem subcomandos `validate` para assessment-results e poam **no código**, mas falta executar,
+  e a compatibilidade com 1.2.3 segue aberta.
+
+**Efeito no desenho (insumo, nada selado aqui):** a cadência no eixo da verificação (o
+`reverify_every` da 4.15.0 do kg-ssot) é **declarada por nó**, sem tabela do FedRAMP. O `oscal_method`
+do core pode espelhar `methods` com valores locais. `acceptance` só entra como cunhagem declarada.
+
+**NÃO-VERIFICADOS desta rodada:** 7 rejeitadas na ancoragem (6 sem citação e 1 exagerada). As 4
+lacunas seguem abertas na rodada: `methods` e `acceptance` só têm leitura de metaschema, sem âncora
+independente; o texto do CPM/VVK veio da superação; e falta o oscal-cli validando AR e POA&M de verdade.
+Retorno integral: `data/run-wf_1bc82958-bf5.json`.
