@@ -78,13 +78,13 @@ flowchart TD
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `7fd9392cd43b` |
-| onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `b52f41437ea0` |
-| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `b52f41437ea0` |
+| onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `eb598aa5bcdd` |
+| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `eb598aa5bcdd` |
 | hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `8278fee79d1c` |
 | brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `59ebe7fe1288` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `4299290b73d4` |
-| onion-core | source | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `b52f41437ea0` |
-| onion-plugins | plugins | greenfield | plugin-marketplace, public-distribution, claude-code | `b52f41437ea0` |
+| onion-core | source | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `eb598aa5bcdd` |
+| onion-plugins | plugins | greenfield | plugin-marketplace, public-distribution, claude-code | `eb598aa5bcdd` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
