@@ -488,7 +488,7 @@
 | 4.5 | `A_ABSORB_DECIDE_PAINEL_INTERATIVO` | intelligent-ui-2026-10 | PLANO N4: o /meta:decide ganha um painel interativo OPCIONAL, publicado como Artifact com estado, cujas respostas a sessão lê e  |
 | 4.0 | `Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021` | intelligent-ui-2026-10 | NÃO VERIFICADO: a Intelligent UI do ChatGPT com GPT-6 (lançamento alegado em 2026-10-07; componentes, critério de uso, streamin |
 | 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
-| 2.4 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
+| 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 
