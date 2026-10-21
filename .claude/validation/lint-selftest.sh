@@ -2024,7 +2024,8 @@ PYEOF
     record_pass "kg-freshness: (g-due) due/1 fixo ⇒ STALE-EXPIRED formatado, superseded contado e fora, MALFORMED do contrato (1 por nó), rc 0"
   else record_fail "kg-freshness: (g-due) lado awk" "rc=${rc} out=${out}"; fi
 
-  if ! python3 -I -B "${dv}" --help 2>/dev/null | grep -q -- '--due'; then
+  local dhelp; dhelp="$(python3 -I -B "${dv}" --help 2>/dev/null || true)"
+  if ! grep -q -- '--due' <<< "${dhelp}"; then
     record_skip "kg-freshness: (a-due)/(b-due)/mutantes — o vendor/kg-ssot deste repo não tem --due (anterior à 4.15.0): a leitura real não foi exercida"
   else
     # (a-due) vencido ⇒ STALE-EXPIRED, e o exit NÃO muda (--all e --freshness, rc 0).
