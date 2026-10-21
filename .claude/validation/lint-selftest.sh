@@ -29414,6 +29414,9 @@ run_realign_selftests() {
     "drift-c-unreconciled|REALINHAR: (c)=1|1"
     "drift-b-costly|(b)=1|0"
     "drift-a-benign|(a)=1|0"
+    # ESPAÇO no verified_against e no trace (o caso real do corpus): o feed de frescor é por TAB, e lido
+    # por espaço o veredito vira texto e a camada 2 cega (2026-10-21: 3 STALE no fios-abertos, (a)=0).
+    "drift-a-spaced|(a)=1|0"
     "drift-northstar|commit=1 bind=1|0"
     "bind-fp-supported-decision|bind=0|0"
     # PAR que fixa o critério do SUPERADOR MORTO (2026-09-06). O radar já ignora superador
