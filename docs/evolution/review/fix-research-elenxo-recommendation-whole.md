@@ -2,7 +2,7 @@
 branch: fix/research-elenxo-recommendation-whole
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: b242de08efc0ea3bd13b9865ada47f8285294b3f3c48426370606c13d7785a9b
+reviewed_diff_sha256: 20e3f160a702715666a1b2c41f305383801dd91aeb20625e2e3d9e3d6e67b468
 reviewed_code_sha256: df8590fea146f37e5d6ec469dd9c786da1b276c26cad5f3bd1c87ab0a969894b
 findings_total: 4
 findings_real: 2
