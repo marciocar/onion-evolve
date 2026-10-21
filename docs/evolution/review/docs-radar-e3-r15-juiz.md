@@ -2,7 +2,8 @@
 branch: docs/radar-e3-r15-juiz
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8145d31918a64dccd8290333d67bfee11ddfa59368ed6c48c4d488a22fde95bb
+reviewed_code_sha256: 0b9a4ffbcde0af862b613fbbdbd592b5efa06ed3011ec5504d531242ff5b7c91
 findings_total: 2
 findings_real: 2
 tokens: 201105
