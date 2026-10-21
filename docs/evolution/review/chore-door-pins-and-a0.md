@@ -2,7 +2,8 @@
 branch: chore/door-pins-and-a0
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d92e4fb2306d561fa1929ea7818760547ee25c5062981c4871771a6915bf12b1
+reviewed_code_sha256: e0e3b2d8ff8408ba5260571322d2cc8b9dbf72c25a5869f2212f60da5d13cbb4
 findings_total: 0
 findings_real: 0
 tokens: 0
