@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: "2026-10-21"
   review_after: "2026-11-20"   # 30d: cadência de ferramenta
-  # ═══ TETO: 25 NÓS ═══
+  # ═══ TETO: 25 NÓS ═══   (2º juiz da sessão interativa em 2026-10-21: +1 omissão de impacto 2, a sonda de tarefas de fundo)
   #   2 no esqueleto (2026-10-21) + 8 da rodada + 3 do juiz (2 superações e a pergunta do pin) = 13.
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
@@ -63,7 +63,7 @@ nodes:
     confidence: 0.8
     verified_at: "2026-10-21"
     verified_against: "lido no BINÁRIO de cada versão instalada (pelo juiz, LC_ALL=C grep -a): o aviso de teto do WebSearch já diz 'do not work around the limit by querying search engines with curl or wget from Bash, or by searching or fetching through a third-party reader, proxy or archive service' desde a 2.1.304 (2 ocorrências em 2.1.304, 2.1.305, 2.1.306 e 2.1.307); a 2.1.307 só acrescenta 'by querying them in a browser or through a computer-use tool'; nenhuma versão nomeia o WebFetch. A memória search-is-sdaal-fallback-when-capped (l.9-11 e l.18-19) receita WebFetch sobre html.duckduckgo.com/Bing no teto; a KB verify-external-for-current.md (l.46-48) só receita WebFetch sobre URLs CONHECIDAS e já cumpre o aviso"
-    label: "a memória do fallback de busca (WebFetch sobre buscador quando o WebSearch bate no teto) contraria o espírito do aviso anti-contorno que o Claude Code dá desde a 2.1.304; a 2.1.307 só estendeu a lista ao navegador e ao computer use, sem nomear o WebFetch"
+    label: "a memória do fallback de busca (WebFetch sobre buscador no teto do WebSearch) contraria a LETRA do aviso do Claude Code desde a 2.1.304, que manda 'continue with the information already gathered instead of searching again'; a 2.1.307 só somou navegador e computer use"
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seção ## 2.1.307 + memória search-is-sdaal-fallback-when-capped"
@@ -72,15 +72,23 @@ nodes:
   - id: Q_REVER_A_MEMORIA_DO_FALLBACK_DE_BUSCA_NA_2_1_307
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-21"
-    verified_against: "aberta pela r15 em 2026-10-21, premissa corrigida pelo juiz: o aviso anti-contorno existe desde a 2.1.304; o objeto a rever é só a memória do usuário (a KB já se limita a URLs conhecidas); fecha quando o maestro decidir se WebFetch direto num buscador conta como contornar o teto, e a memória for revogada, restrita ou mantida"
     label: "decidir se WebFetch direto num buscador conta como contornar o teto do WebSearch, que o Claude Code proíbe desde a 2.1.304, e com isso revogar, restringir ou manter a memória do fallback de busca"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-21"
+    verified_against: "decisão do maestro em 2026-10-21, por pergunta com opções (/meta:decide): escolhida «Reescrever: no teto, parar de buscar, declarar o NÃO VERIFICADO e usar WebFetch só em URL conhecida; tirar a premissa 200/200 (reescrita feita em 2026-10-21 na memória do projeto)»"
     narrative: |-
       Issue SAC-185 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
+
+      verified_against anterior: «aberta pela r15 em 2026-10-21, premissa corrigida pelo juiz: o aviso anti-contorno existe desde a 2.1.304; o objeto a rever é só a memória do usuário (a KB já se limita a URLs conhecidas); fecha quando o maestro decidir se WebFetch direto num buscador conta como contornar o teto, e a memória for revogada, restrita ou mantida»
+      Selado por /meta:decide em 2026-10-21: escolhida «Reescrever: no teto, parar de buscar, declarar o NÃO VERIFICADO e usar WebFetch só em URL conhecida; tirar a premissa 200/200 (reescrita feita em 2026-10-21 na memória do projeto)»; descartadas: «Revogar» · «Manter».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-21: «O que fazer com a memória do fallback de busca no teto do WebSearch (SAC-185)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
+      locality: "pessoa"
   - id: E_ARTIFACT_READ_RESET_TOCA_O_PAINEL_DO_DECIDE
     node_type: evidence
     layer: audit
@@ -201,6 +209,21 @@ nodes:
     verified_at: "2026-10-21"
     verified_against: "aberta pela r15 em 2026-10-21, supera a pergunta da r14 presa ao v1.0.256; fecha quando um PR com a label review:ia mostrar o job onion-review rodando no pin aa8a7738 com o CLI 2.1.307 no log; segue estacionada como a SAC-181 (D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA)"
     label: "o revisor de IA do CI no pin v1.0.257 (CLI 2.1.307) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a versão no log"
+  - id: E_SONDA_DE_FUNDO_NAO_FECHAVA_TAREFA_PARADA_ATE_2_1_306
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "2º juiz (opus/high, data/judge-verdicts-2o-juiz.json): .claude/hooks/background-task-probe.sh l.97 só fecha a tarefa ao achar output-file + status (completed|failed|killed|stopped); no binário 2.1.306 a notificação de tarefa parada pelo usuário ou pelo app conectado sai sem outputFile, e na 2.1.307 sai com ele (CHANGELOG 2.1.307: 'the notice now names its output file')"
+    label: "até a 2.1.306 a sonda de tarefas de fundo do core nunca fechava uma tarefa parada pelo usuário ou pelo app conectado, porque a notificação vinha sem output-file; na 2.1.307 ela fecha, e a bancada da sonda não tem caso para nenhuma das duas formas"
+    provenance:
+      source: ".claude/hooks/background-task-probe.sh"
+      locator: "l.97 (regex de fechamento) + CHANGELOG 2.1.307"
+      method: "medição: leitura do hook e das duas formas da notificação nos binários 2.1.306 e 2.1.307, pelo 2º juiz"
+      locality: "repo"
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -237,4 +260,7 @@ edges:
     edge_type: TRACES_TO
   - from: E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307
     to: Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL
+    edge_type: SUPPORTS
+  - from: E_SONDA_DE_FUNDO_NAO_FECHAVA_TAREFA_PARADA_ATE_2_1_306
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     edge_type: SUPPORTS
