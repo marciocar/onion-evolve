@@ -828,6 +828,31 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  # Membro de TESTE do degrau A do A2A entre usuários do SO (2026-10-21, D_DEGRAU_A_HOJE_A0_E_A1_1021):
+  # a chave nasceu no usuário descartável a2a-peer do notebook do maestro e nunca passou pela VPS.
+  # Revogar ao fim do degrau A (SPIKE-PROTOCOL.md §11): convite, depois o kid por PR, depois o membro.
+  - id: maestro-peer-test
+    name: maestro-peer-test (membro de TESTE do degrau A do A2A entre usuários do SO, 2026-10)
+    role: standalone            # tier 3: fala só com o core
+    kind: method                # provisório, como o maestro-notebook-test (lacuna L7)
+    parent: onion-evolve
+    onion_version: n/a          # não vendoriza o framework; só assina sinais
+    adopted_at: 2026-10-21
+    mode: greenfield            # não regulado
+    personality_summary: "Usuário descartável a2a-peer no notebook do maestro, para o degrau A do A2A entre usuários do SO; sem repo, sem adoção; revogado ao fim do degrau."
+    specializations: [a2a-spike]
+    personality_last_sync: 2026-10-21
+    a2a:
+      sends_to: onion-evolve
+      keys: [maestro-peer-test-1]   # pinado em jwks/maestro-peer-test-1.pem (sha256:346a2bfc…35de, RSA 3072); a privada fica no a2a-peer (0600)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
