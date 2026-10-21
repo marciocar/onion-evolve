@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**610 itens abertos** em 116 grafo(s) com aberto (de 149 no escopo) · 117 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**613 itens abertos** em 117 grafo(s) com aberto (de 150 no escopo) · 118 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1073,6 +1073,14 @@
 | 4.5 | `Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE` | fios-abertos | PERGUNTA (classe B, estreitada em 2026-09-04 pelo /meta:drive): por que o caso (e) da familia kg_backlog — que monta um sandbox  |
 | 3.6 | `I_ADOPT_CAMADA_COLABORADOR` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ram |
 | 2.4 | `I_KB_GAMIFICACAO_RAMPA_GATED` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/educat |
+
+## radar-E3-2026-10-21-r14 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-21-r14 | o revisor de IA do CI no pin v1.0.256 (CLI 2.1.306) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a |
+| 3.0 | `Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305` | radar-E3-2026-10-21-r14 | re-testar a migalha do resume de Workflow (vence 2026-10-22) reproduzindo a condição dela no CLI 2.1.305 ou posterior (processo  |
+| 2.0 | `Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304` | radar-E3-2026-10-21-r14 | re-medir na 1ª compactação no CLI 2.1.304 ou posterior se a resposta escorrega para EN, agora que a lista de skills volta depoi |
 
 ## rea-method-2026-10 — 2 item(ns)
 
