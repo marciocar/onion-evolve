@@ -79,7 +79,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.9"
+CONTRACT_VERSION = "4.10"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -729,6 +729,69 @@ def _expands_beyond(value, budget):
     return False
 
 
+
+class _AnchorRedefLoader(Yaml12CoreLoader):
+    """Só para ordenar os erros (v4.10): a âncora repetida e o alias sem âncora seguem recusados pelo perfil, mas a chave
+    repetida que vem antes deles no documento dá parse.duplicate-key, como no leitor JS, que confere a chave antes de
+    descer no valor dela. Aqui a âncora pode ser redefinida e o alias sem âncora vale null, só para achar a chave."""
+
+    def compose_node(self, parent, index):
+        event = self.peek_event()
+        if isinstance(event, yaml.AliasEvent) and event.anchor not in self.anchors:
+            m = event.end_mark
+            if m.buffer[m.pointer:m.pointer + 1] == ":":  # *x: é um alias de nome "x:" no YAML 1.2 (erro de sintaxe no JS)
+                raise yaml.composer.ComposerError(None, None, "alias seguido de :", event.start_mark)
+            self.get_event()
+            return yaml.ScalarNode("tag:yaml.org,2002:null", "", event.start_mark, event.end_mark)
+        anchor = getattr(event, "anchor", None)
+        if anchor is not None and not isinstance(event, yaml.AliasEvent) and anchor in self.anchors:
+            del self.anchors[anchor]
+        return super().compose_node(parent, index)
+
+
+def _duplicate_key_first(text, exc):
+    """A âncora repetida ou o alias sem âncora (exc) tem antes dele, na ordem do documento, uma chave repetida?"""
+    why = f"{exc.context} {exc.problem}"
+    if ("duplicate anchor" not in why and "undefined alias" not in why) or exc.problem_mark is None:
+        return False
+    loader = _AnchorRedefLoader(text)
+    try:
+        roots = []
+        while loader.check_node():  # o stream inteiro antes: o erro de sintaxe em qualquer documento vence, como no JS
+            roots.append(loader.get_node())
+        for root in roots:
+            idx = _first_dup(loader, root, set())
+            if idx is not None:
+                return idx < exc.problem_mark.index
+    except Exception:  # noqa: BLE001 — qualquer outro erro deixa o parse.yaml-error da âncora
+        return False
+    return False
+
+
+def _first_dup(loader, node, seen):
+    """O índice da primeira chave repetida dentro de node, na ordem do documento; None se não há."""
+    stack = [node]
+    while stack:
+        n = stack.pop()
+        if id(n) in seen:
+            continue
+        seen.add(id(n))
+        if isinstance(n, yaml.SequenceNode):
+            stack.extend(reversed(n.value))
+        elif isinstance(n, yaml.MappingNode):
+            keys = set()
+            for key_node, value_node in n.value:
+                if not isinstance(key_node, yaml.ScalarNode):
+                    raise ValueError("chave composta")
+                jk = json_key(loader.construct_object(key_node, deep=True))
+                if jk in keys:
+                    return key_node.start_mark.index
+                keys.add(jk)
+                sub = _first_dup(loader, value_node, seen)
+                if sub is not None:
+                    return sub
+    return None
+
 def loader_for(text):
     return Yaml12CoreLoader if FAST_LOADER is Yaml12CoreLoader or RISKY.search(text) else FAST_LOADER
 
@@ -776,6 +839,8 @@ def _parse(text, loader):
         raw = list(yaml.load_all(text, Loader=loader))
     except DuplicateKeyError:
         return None, None, "parse.duplicate-key", None
+    except yaml.composer.ComposerError as exc:  # âncora repetida ou alias sem âncora depois de chave repetida (v4.10)
+        return None, None, "parse.duplicate-key" if _duplicate_key_first(text, exc) else "parse.yaml-error", None
     except (yaml.YAMLError, UnicodeEncodeError, RecursionError):
         # UnicodeEncodeError: texto com surrogate que o parser em C recusa; RecursionError: aninhamento além da pilha
         return None, None, "parse.yaml-error", None

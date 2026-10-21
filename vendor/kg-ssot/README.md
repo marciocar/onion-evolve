@@ -6,8 +6,8 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.16.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.16.0-6f42c1)](spec/release.json)
-[![Suíte: 349/349](https://img.shields.io/badge/su%C3%ADte-349%2F349-2ea44f)](spec/conformance/README.md)
+[![Contrato: v4 · release 4.16.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.16.1-6f42c1)](spec/release.json)
+[![Suíte: 354/354](https://img.shields.io/badge/su%C3%ADte-354%2F354-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
@@ -48,7 +48,7 @@ python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/require
 ```
 
 ```text
-latest: 349/349 (reprova)
+latest: 354/354 (reprova)
 optional: 10/24 (só reporta)
 PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
 REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
@@ -146,7 +146,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.16.0`. O leitor de referência passa em 349 de 349 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.16.1`. O leitor de referência passa em 354 de 354 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre. O relógio zera a cada release com MUST novo (a última

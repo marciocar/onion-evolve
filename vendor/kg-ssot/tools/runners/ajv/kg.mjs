@@ -154,7 +154,24 @@ function tooDeep(root) {
 // Converte a árvore de um documento no valor que a referência constrói. Alias compartilha o valor (como o
 // PyYAML), âncora repetida e alias sem âncora são erro de composição, chave composta é erro, e chave repetida
 // é comparada na forma JSON (1 e "1" colidem; 1 e 1.0, não).
-function convertDocument(doc, marks = {}) {
+// A quebra escapada seguida de linha vazia num texto entre aspas duplas (v4.10): pela especificação do YAML, cada linha
+// vazia depois da quebra escapada vira um \n, e a referência dá "x\ny"; o yaml 2.x dobra como espaço. O valor é relido
+// de um texto equivalente, com as linhas vazias trocadas pelo escape \n antes da quebra escapada, que o yaml lê certo.
+const ESCAPED_BREAK_THEN_EMPTY = /(?<!\\)((?:\\\\)*)\\\n((?:[ \t]*\n)+)/g;
+
+function fixEscapedBreak(node, src) {
+  if (src === null || node.type !== 'QUOTE_DOUBLE' || !Array.isArray(node.range)) return;
+  const raw = src.slice(node.range[0], node.range[1]);
+  if (!raw.includes('\\\n')) return;
+  const fixed = raw.replace(ESCAPED_BREAK_THEN_EMPTY, (_, bs, empty) => `${bs}${'\\n'.repeat(empty.split('\n').length - 1)}\\\n`);
+  if (fixed === raw) return;
+  const [d] = Array.from(new Composer({ version: '1.2', schema: 'core' }).compose(new Parser().parse(`k: ${fixed.replace(/\n/g, '\n ')}\n`)));
+  const v = d && !d.errors.length && isMap(d.contents) ? d.contents.items[0].value : null;
+  if (!isScalar(v) || typeof v.value !== 'string') throw new ParseError('parse.yaml-error'); // nunca o valor velho em silêncio
+  node.value = v.value;
+}
+
+function convertDocument(doc, marks = {}, src = null) {
   const anchors = new Map();
   const built = new Map();
   // a data sem aspas, em chave ou valor: escalar plain na forma do timestamp 1.1, ou com a tag !!timestamp
@@ -176,6 +193,7 @@ function convertDocument(doc, marks = {}) {
       anchors.set(node.anchor, node);
     }
     if (isScalar(node)) {
+      fixEscapedBreak(node, src);
       noteDate(node);
       const v = scalarOf(node).value;
       built.set(node, v);
@@ -204,6 +222,7 @@ function convertDocument(doc, marks = {}) {
         let key = 'null';
         if (keyNode !== null && keyNode !== undefined) {
           if (!isScalar(keyNode)) throw new ParseError('parse.yaml-error'); // chave composta (mapa ou lista)
+          fixEscapedBreak(keyNode, src);
           noteDate(keyNode);
           key = scalarOf(keyNode).key;
         }
@@ -271,7 +290,10 @@ export function parseYaml(text) {
   let docs;
   // O \r\n e o \r sozinho viram \n antes do parse, como na especificação do YAML e no leitor de referência (decisão
   // de contrato de 2026-10-20): sem isso, o \r ficava como caractere dentro das aspas, e o CRLF entre aspas reprovava.
-  const src = text.includes('\r') ? text.replace(/\r\n?/g, '\n') : text;
+  let src = text.includes('\r') ? text.replace(/\r\n?/g, '\n') : text;
+  // O BOM no começo do stream é permitido pelo YAML e não conta como coluna (v4.10): o yaml 2.x o contava, e o documento
+  // indentado depois dele reprovava com BAD_INDENT; a referência aceita.
+  if (src.charCodeAt(0) === 0xfeff && src.charCodeAt(1) !== 0xfeff) src = src.slice(1);
   try {
     const tokens = Array.from(new Parser().parse(src));
     if (strictTokenError(tokens)) return { code: 'parse.yaml-error' };
@@ -287,7 +309,7 @@ export function parseYaml(text) {
     for (const d of docs) {
       if (d.errors.length) return { code: 'parse.yaml-error' };
       if (d.contents && tooDeep(d.contents)) return { code: 'parse.yaml-error' };
-      raw.push(convertDocument(d, marks));
+      raw.push(convertDocument(d, marks, src));
     }
   } catch (exc) {
     if (exc instanceof ParseError) return { code: exc.code };

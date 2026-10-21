@@ -1,5 +1,5 @@
 {
-  "description": "Perfil YAML do contrato v1: YAML 1.2 core, chaves únicas, documento único, chave on proibida, datas como string entre aspas em SHOULD.",
+  "description": "Perfil YAML do contrato v1: YAML 1.2 core, chaves únicas, documento único, chave on proibida, datas como string entre aspas em SHOULD. Desde o v4.10, a ordem dos erros segue o documento: a chave repetida que vem antes de uma âncora repetida ou de um alias sem âncora dá parse.duplicate-key (depois deles, parse.yaml-error); a linha vazia depois de uma quebra escapada entre aspas duplas vira \\n, como pede a especificação; e o BOM no começo não conta como coluna.",
   "layer": "yaml",
   "pending_on": [],
   "cases": [
@@ -84,6 +84,44 @@
       "warnings": [
         "yaml.unquoted-date"
       ]
+    },
+    {
+      "file": "bad-duplicate-key-before-duplicate-anchor.yaml",
+      "description": "a chave repetida vem antes da âncora repetida (o valor dela): vale a chave, como na ordem do documento",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "bad-duplicate-anchor-before-duplicate-key.yaml",
+      "description": "a âncora repetida vem antes da chave repetida: o perfil recusa a âncora repetida",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-duplicate-key-before-undefined-alias.yaml",
+      "description": "a chave repetida vem antes do alias sem âncora (o valor dela): vale a chave",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "bad-escaped-break-empty-line-duplicate-key.yaml",
+      "description": "a quebra escapada seguida de linha vazia entre aspas duplas vale \\n (especificação do YAML): a chave é a mesma que \"a\\nb\" e repete",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "valid-bom-indented-document.kg.yaml",
+      "description": "o BOM no começo do stream não conta como coluna: o documento inteiro indentado depois dele é válido",
+      "valid": true,
+      "codes": []
     }
   ]
 }
