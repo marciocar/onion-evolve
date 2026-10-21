@@ -1,4 +1,4 @@
-# KG-SSOT 4.13.0 (tag kg-ssot-v4.13.0): o texto completo para agentes de IA
+# KG-SSOT 4.13.1 (tag kg-ssot-v4.13.1): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,7 +14,7 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.13.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.13.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.13.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.13.1-6f42c1)](spec/release.json)
 [![Suíte: 328/328](https://img.shields.io/badge/su%C3%ADte-328%2F328-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
@@ -154,7 +154,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.13.0`. O leitor de referência passa em 328 de 328 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.13.1`. O leitor de referência passa em 328 de 328 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre. O relógio zera a cada release com MUST novo (a última
@@ -259,14 +259,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -497,6 +497,19 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.13.0` para a `kg-ssot-v4.13.1`, a identidade do contrato passa a acusar o v4.6. As duas regras novas da
+4.13.0 moram só no leitor, e o sha256 dos schemas, que o `kg_gate.py` guarda como identidade, não mudou: uma base
+gravada na 4.12.0 seguia julgando com regra nova sem que a identidade acusasse. A descrição do schema MUST passa a
+declarar o v4.6, e a higiene da release cobra que toda versão do contrato apareça na descrição de um dos schemas. O
+`kg_gate.py` mostra a identidade nova e pede `--update`; nenhum veredito muda.
+- **O `kg_migrate.py` lê o mesmo corpus que o gate.** Sem lista de grafos, ficam de fora os padrões do `kg_gate.py`
+  (`*/fixtures/*`, `docs/materials/*`) e o `vendor/*`, e o `--exclude` usa a semântica do gate (`*` atravessa `/`),
+  sem perder o `**/` de antes, que casa zero pastas;
+  `--no-default-excludes` tira os padrões. Antes, o plan pegava as fixtures, e `*/fixtures/*` não casava caminho aninhado.
+- **O `kg_migrate.py` não grava bytecode no vendor**, mesmo rodado sem `-B`; antes, o `check` seguinte reprovava pelo
+  `.pyc` do `kg_validate` no `__pycache__`.
+- **O nó cujo `verified_scope` já é o do perfil sai como `same`** no plan, separado do que muda.
+
 Da `kg-ssot-v4.12.0` para a `kg-ssot-v4.13.0`, entram o contrato v4.6 (um MUST raro do YAML e o \r normalizado no
 leitor JS) e o migrador por perfil.
 - **O `kg_migrate.py`** propõe a `provenance` que o v4 pede pelas regras de um perfil que você versiona (manual, cap. 5;
@@ -507,14 +520,15 @@ leitor JS) e o migrador por perfil.
 - **O leitor JS trata o `\r\n` e o `\r` sozinho como quebra de linha**, como a referência, e recusa o texto entre aspas que
   não fecha (a aspa escapada no fim da linha), que ele cortava ali.
 - **A suíte ganha 16 casos** (328).
-- **No Windows, o update para a 4.13.0 roda pelo kit da 4.13.0.** O `kg_vendor.py` das tags anteriores passa ao
+- **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --dest
-  vendor/kg-ssot`). O kit da 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --dest
+  vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
 Medido em 2026-10-20, nenhum dos 1.507 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD. O sha256 dos
-schemas não muda; o `kg_gate.py` não pede `--update` por esta parte.
+schemas não mudou na 4.13.0, e o `kg_gate.py` não pedia `--update`: a identidade não acusava as regras novas do
+leitor. A 4.13.1 corrige isso.
 
 Da `kg-ssot-v4.11.0` para a `kg-ssot-v4.12.0`, entra o contrato v4.5: um MUST raro do YAML e três ampliações do SHOULD.
 - **O tab no espaço inicial de uma linha de continuação de texto entre aspas** reprova como `parse.yaml-error`.
@@ -633,7 +647,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.13.1 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -1212,7 +1226,7 @@ para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.
 | 4.10 | O servidor MCP pronto para produção: perfil atrás de proxy, as duas eras do protocolo, o gate externo por comando e a imagem OCI |
 | 4.11 | Contrato v4.4: o aviso `integrity.refutes-unreconciled` e o perfil YAML estrito em três construções raras (MUST novo) |
 | 4.12 | Contrato v4.5: `verified_scope`, `locality: privado`, a `REFUTES` externa contando com o corpus e o tab no começo de continuação entre aspas (MUST novo) |
-| 4.13 | Contrato v4.6: a continuação entre aspas mais indentada que a coleção dona (MUST novo) e o `\r` como quebra de linha no leitor JS |
+| 4.13 | Contrato v4.6: a continuação entre aspas mais indentada que a coleção dona (MUST novo) e o `\r` como quebra de linha no leitor JS; na 4.13.1, a identidade do contrato acusa a versão que só o leitor muda, e o migrador lê o corpus do gate |
 
 ## Versões e tags
 
@@ -1227,7 +1241,9 @@ existindo). Pelo histórico das releases:
 
 O gate guarda o sha256 dos dois schemas como a identidade do contrato. Uma tag que muda os bytes dos schemas,
 mesmo que só no texto das descrições (a 4.7.2) ou no `$id` (a 4.7.3), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
-que nenhum veredito mudou.
+que nenhum veredito mudou. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) também entra na descrição
+do schema MUST, como "No v4.6 ...": desde a 4.13.1, a higiene da release cobra essa linha para a versão que o leitor
+declara, e assim toda versão do contrato move a identidade.
 
 Um aviso SHOULD novo pode subir a dívida medida pelo gate. Isso é intencional: a rampa de um contrato é alertar
 numa versão e reprovar na seguinte, e o adotante vê a dívida antes de ela virar erro.
@@ -1959,8 +1975,12 @@ python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile kg-migrate.prof
   a do status rebaixado. Um arquivo que ganharia código MUST novo, ou aviso SHOULD que o plan não anunciou, fica como
   estava. A quebra de linha do arquivo é mantida (CRLF fica CRLF), e o arquivo com quebras misturadas é recusado.
   Rodar de novo não muda nada.
-- **Sem lista de grafos, a ferramenta lê os `.kg.yaml` do `git ls-files`.** Ficam de fora `vendor/**` e os globs de
-  `--exclude`. Um grafo da lista que não parseia vira linha de revisão e não aborta a rodada.
+- **Sem lista de grafos, a ferramenta lê os `.kg.yaml` do `git ls-files`.** Ficam de fora os padrões do `kg_gate.py`
+  (`*/fixtures/*` e `docs/materials/*`), o `vendor/*` e os globs de `--exclude`, com a semântica do gate: `fnmatch` sobre
+  o caminho relativo, em que `*` atravessa `/`; o `**/` do dialeto do perfil, que casa zero pastas, também vale.
+  `--no-default-excludes` tira os padrões. Atenção: no `trace_path_glob` do perfil, `*` não atravessa `/`. Um grafo da lista que não
+  parseia vira linha de revisão e não aborta a rodada.
+- **O nó cujo `verified_scope` já é o do perfil sai como `same`**, separado do que muda, e o `apply` não o toca.
 - **O caminho do trace é léxico e fica dentro da raiz do repo.** Ele é normalizado (`./`, `a/../b`), e o que sai da
   raiz com `../` deixa de ser caminho. Um caminho absoluto ou com `~` conta como inexistente, sem consultar o disco da
   máquina.
@@ -2626,6 +2646,12 @@ manifestos que ele tem de aceitar (`good/`) e os que tem de recusar (`bad/`).
 **igual** ao esperado, tanto em `codes` quanto em `warnings`. Igualdade, não inclusão: um leitor que
 acusa tudo não pode passar. Ordem e repetição não contam.
 
+**A versão do contrato que um caso exige vai marcada na `description`**, do grupo ou do caso, numa destas formas:
+"Desde o v4.6", "(v4.6)" ou "do v4.6". A conferência do mantenedor exige que a maior marca seja a versão que o leitor
+de referência declara (`CONTRACT_VERSION` em `tools/kg_validate.py`), e que a descrição de um dos schemas a declare
+("No v4.6"). Assim, uma regra nova que só o leitor vê também muda os bytes dos schemas, que o `kg_gate.py` guarda como
+a identidade do contrato.
+
 ## Códigos
 
 Cada código é um slug estável por camada, e o metaschema confere a forma.
@@ -2837,7 +2863,7 @@ de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos d
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:kg-contract-v4.schema.json",
   "title": "kg.yaml — contrato v4, nível MUST",
-  "description": "O contrato v4 do .kg.yaml, nível MUST (reprova), o vigente (substitui o v3). É o v3 com três promoções a MUST. (1) Proveniência estruturada: nó confirmed ou PROD exige provenance com source, locator e method (form.required.node.provenance), que no v3 só alertava; status unverifiable não exige, mesmo em PROD, porque é o destino do nó sem fonte recuperável. (2) Fonte que não é placeholder: provenance.source não pode ser placeholder: só espaço, ou um destes sozinho, sem distinguir maiúscula e com pontuação final (. ou :) e espaço em volta (inclusive NBSP, espaço ideográfico, BOM e espaço de largura zero) ignorados: desconhecida, desconhecido, unknown, n/a, n / a, na, n.a., none, null, sem fonte, tbd, um ou mais hífens, travessão, meia-risca, ?. A regra é um not+pattern sem lookahead, portável a leitores RE2: form.pattern.node.provenance.source. O vazio segue form.range.node.provenance.source, como no v3. Origem que é uma pessoa ou sessão recuperável é fonte válida, com method de testemunho. (3) Política de extensão: chave desconhecida sem o prefixo x_ no topo, no meta, no nó e na aresta reprova (form.unknown-key.<escopo>.<chave>), com a mesma lista de chaves conhecidas que o SHOULD v3 usava; nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key. Chave x_ segue livre, e x_ com nome que não é slug só alerta. A chave on da aresta segue na lista porque já reprova como yaml.forbidden-key-on. Dentro de provenance, a chave desconhecida segue SHOULD. O resto é o v3: escrito à mão em JSON Schema 2020-12; PROD sem verified_at é SHOULD e o gatilho de TRANSITIONS é trigger; narrative no nó, note e purpose no meta, data no calendário (format: date é ASSERÇÃO) e .nan ou .inf reprovando como tipo; provenance, quando presente, com os três campos não vazios, e provenance: null reprova. O par SHOULD é kg-contract-v4.should.schema.json; as regras de perfil YAML (chave on proibida, chave duplicada, documento único) são do leitor, porque o JSON não as vê. No v4.3 entra external_edges, opcional, no topo: arestas entre grafos com uma ponta externa <caminho>#<id> e a outra local (ou o grafo inteiro, com from ausente), nos tipos SUPERSEDES, CONSTRAINS, SUPPORTS, REFUTES, TRACES_TO e DEPENDS_ON. A ponta local tem de existir (integrity.dangling-external-local); com o corpus, o arquivo e o id da ponta externa também (integrity.dangling-external). A chave é opcional: um grafo que não a usa tem o mesmo veredito do v4.2. No v4.5 entra a chave verified_scope, opcional: o alcance do que o verified_at conferiu. O valor é julgado pelo SHOULD (o enum fato, mecanismo, nenhum), como a provenance.locality.",
+  "description": "O contrato v4 do .kg.yaml, nível MUST (reprova), o vigente (substitui o v3). É o v3 com três promoções a MUST. (1) Proveniência estruturada: nó confirmed ou PROD exige provenance com source, locator e method (form.required.node.provenance), que no v3 só alertava; status unverifiable não exige, mesmo em PROD, porque é o destino do nó sem fonte recuperável. (2) Fonte que não é placeholder: provenance.source não pode ser placeholder: só espaço, ou um destes sozinho, sem distinguir maiúscula e com pontuação final (. ou :) e espaço em volta (inclusive NBSP, espaço ideográfico, BOM e espaço de largura zero) ignorados: desconhecida, desconhecido, unknown, n/a, n / a, na, n.a., none, null, sem fonte, tbd, um ou mais hífens, travessão, meia-risca, ?. A regra é um not+pattern sem lookahead, portável a leitores RE2: form.pattern.node.provenance.source. O vazio segue form.range.node.provenance.source, como no v3. Origem que é uma pessoa ou sessão recuperável é fonte válida, com method de testemunho. (3) Política de extensão: chave desconhecida sem o prefixo x_ no topo, no meta, no nó e na aresta reprova (form.unknown-key.<escopo>.<chave>), com a mesma lista de chaves conhecidas que o SHOULD v3 usava; nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key. Chave x_ segue livre, e x_ com nome que não é slug só alerta. A chave on da aresta segue na lista porque já reprova como yaml.forbidden-key-on. Dentro de provenance, a chave desconhecida segue SHOULD. O resto é o v3: escrito à mão em JSON Schema 2020-12; PROD sem verified_at é SHOULD e o gatilho de TRANSITIONS é trigger; narrative no nó, note e purpose no meta, data no calendário (format: date é ASSERÇÃO) e .nan ou .inf reprovando como tipo; provenance, quando presente, com os três campos não vazios, e provenance: null reprova. O par SHOULD é kg-contract-v4.should.schema.json; as regras de perfil YAML (chave on proibida, chave duplicada, documento único) são do leitor, porque o JSON não as vê. No v4.3 entra external_edges, opcional, no topo: arestas entre grafos com uma ponta externa <caminho>#<id> e a outra local (ou o grafo inteiro, com from ausente), nos tipos SUPERSEDES, CONSTRAINS, SUPPORTS, REFUTES, TRACES_TO e DEPENDS_ON. A ponta local tem de existir (integrity.dangling-external-local); com o corpus, o arquivo e o id da ponta externa também (integrity.dangling-external). A chave é opcional: um grafo que não a usa tem o mesmo veredito do v4.2. No v4.5 entra a chave verified_scope, opcional: o alcance do que o verified_at conferiu. O valor é julgado pelo SHOULD (o enum fato, mecanismo, nenhum), como a provenance.locality. No v4.6 entram duas regras do leitor, que o JSON não vê: a linha de continuação de um texto entre aspas tem de ser mais indentada que o mapa ou a lista que o contém (menos que isso é parse.yaml-error), e o \\r\\n e o \\r sozinho são quebra de linha. Elas entram aqui para mover a identidade do contrato que o gate guarda.",
   "type": "object",
   "required": [
     "meta",

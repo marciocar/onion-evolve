@@ -69,6 +69,10 @@ _ROOT = _home()
 # O contrato VIGENTE, num lugar só: a suíte, o gate e as outras ferramentas leem daqui.
 CONTRACT_MUST = _ROOT / "spec" / "kg-contract-v4.schema.json"
 CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
+# A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
+# os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
+# move o sha256 que o gate guarda como identidade.
+CONTRACT_VERSION = "4.6"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):

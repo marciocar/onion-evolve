@@ -68,7 +68,7 @@ para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.
 | 4.10 | O servidor MCP pronto para produção: perfil atrás de proxy, as duas eras do protocolo, o gate externo por comando e a imagem OCI |
 | 4.11 | Contrato v4.4: o aviso `integrity.refutes-unreconciled` e o perfil YAML estrito em três construções raras (MUST novo) |
 | 4.12 | Contrato v4.5: `verified_scope`, `locality: privado`, a `REFUTES` externa contando com o corpus e o tab no começo de continuação entre aspas (MUST novo) |
-| 4.13 | Contrato v4.6: a continuação entre aspas mais indentada que a coleção dona (MUST novo) e o `\r` como quebra de linha no leitor JS |
+| 4.13 | Contrato v4.6: a continuação entre aspas mais indentada que a coleção dona (MUST novo) e o `\r` como quebra de linha no leitor JS; na 4.13.1, a identidade do contrato acusa a versão que só o leitor muda, e o migrador lê o corpus do gate |
 
 ## Versões e tags
 
@@ -83,7 +83,9 @@ existindo). Pelo histórico das releases:
 
 O gate guarda o sha256 dos dois schemas como a identidade do contrato. Uma tag que muda os bytes dos schemas,
 mesmo que só no texto das descrições (a 4.7.2) ou no `$id` (a 4.7.3), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
-que nenhum veredito mudou.
+que nenhum veredito mudou. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) também entra na descrição
+do schema MUST, como "No v4.6 ...": desde a 4.13.1, a higiene da release cobra essa linha para a versão que o leitor
+declara, e assim toda versão do contrato move a identidade.
 
 Um aviso SHOULD novo pode subir a dívida medida pelo gate. Isso é intencional: a rampa de um contrato é alertar
 numa versão e reprovar na seguinte, e o adotante vê a dívida antes de ela virar erro.

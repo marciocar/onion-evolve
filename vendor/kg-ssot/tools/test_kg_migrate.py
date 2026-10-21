@@ -7,6 +7,7 @@ import csv
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,7 @@ from unittest import mock
 
 TOOLS = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(TOOLS))
+import kg_gate  # noqa: E402
 import kg_migrate  # noqa: E402
 import kg_validate  # noqa: E402
 
@@ -59,6 +61,7 @@ class Base(unittest.TestCase):
 
     def graph(self, text, name="g.kg.yaml"):
         p = self.root / name
+        p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(text.encode("utf-8"))
         return p
 
@@ -427,6 +430,39 @@ class PlanContract(Base):
         self.assertIn("C_A", ids)
         self.assertNotIn("C_X", ids)
 
+    def test_fixtures_aninhadas_saem_por_padrao_como_no_gate(self):
+        """Achado do adotante hub na 4.13.0: o plan pegava as fixtures que o gate não mede, e */fixtures/* não casava
+        o caminho aninhado."""
+        self.graph(HEAD + claim("C_A", "src/a.ts:1") + QZ + EDGES)
+        self.graph(HEAD + claim("C_F", "src/a.ts:1") + QZ + EDGES, "pkg/validation/fixtures/x/f.kg.yaml")
+        self.graph(HEAD + claim("C_M", "src/a.ts:1") + QZ + EDGES, "docs/materials/m.kg.yaml")
+        self.graph(HEAD + claim("C_O", "src/a.ts:1") + QZ + EDGES, "docs/a/b/o.kg.yaml")
+        subprocess.run(["git", "-C", str(self.root), "init", "-q"], check=True)
+        subprocess.run(["git", "-C", str(self.root), "add", "-A"], check=True)
+
+        def ids(*extra):
+            out = self.run_cmd("plan", "--json", "--profile", self.profile, "--root", self.root, *extra)[1]
+            return {r["id"] for r in json.loads(out)["rows"]}
+        self.assertEqual(ids() & {"C_A", "C_F", "C_M", "C_O"}, {"C_A", "C_O"})
+        self.assertNotIn("C_O", ids("--exclude", "docs/*"))  # * atravessa /, como no kg_gate.py
+        self.assertNotIn("C_O", ids("--exclude", "**/b/**"))
+        self.assertNotIn("C_A", ids("--exclude", "**/g.kg.yaml"))  # o **/ do glob antigo casa zero pastas: segue valendo
+        self.assertTrue({"C_F", "C_M"} <= ids("--no-default-excludes"))
+        self.assertEqual(kg_migrate.DEFAULT_EXCLUDE[1:], list(kg_gate.DEFAULT_EXCLUDE))
+
+    def test_rodar_sem_menos_b_nao_deixa_pycache_no_vendor(self):
+        """Achado do adotante hub: python3 -I kg_migrate.py importava o kg_validate e gravava o .pyc no vendor."""
+        dest = self.root / "vendor" / "kg-ssot"
+        shutil.copytree(TOOLS.parent / "spec", dest / "spec")
+        (dest / "tools").mkdir()
+        for name in ("kg_migrate.py", "kg_validate.py"):
+            shutil.copy(TOOLS / name, dest / "tools" / name)
+        env = {k: v for k, v in os.environ.items() if k != "PYTHONDONTWRITEBYTECODE"}
+        r = subprocess.run([sys.executable, "-I", str(dest / "tools" / "kg_migrate.py"), "--help"], capture_output=True,
+                           env=env)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(list(dest.rglob("__pycache__")), [])
+
     def test_grafo_rastreado_nao_utf8_vai_para_revisao(self):
         self.graph(HEAD + claim("C_A", "src/a.ts:1") + QZ + EDGES)
         (self.root / "latin.kg.yaml").write_bytes("meta: {id: \xe7}\n".encode("latin-1"))
@@ -483,6 +519,14 @@ class ApplyGuards(Base):
         rc, out = self.apply(p)
         self.assertEqual(rc, 1, out)
         self.assertIn("status fora da forma", out)
+
+    def test_scope_igual_sai_como_same_no_plan(self):
+        """Sugestão do adotante hub: o scope que já bate não conta como proposta."""
+        self.profile.write_text(PROFILE + "scopes:\n  - {id: s, id_in: [C_A], verified_scope: fato}\n", encoding="utf-8")
+        p = self.graph(HEAD + claim("C_A", "src/a.ts:1", '    verified_at: "2026-10-01"\n    verified_scope: fato\n'
+                                    '    provenance: {source: s, locator: l, method: "leitura: x"}\n') + QZ + EDGES)
+        rows = json.loads(self.run_cmd("plan", "--json", "--profile", self.profile, str(p))[1])["rows"]
+        self.assertEqual([r["action"] for r in rows if r["id"] == "C_A"], ["same"])
 
     def test_scope_igual_ja_gravado_nao_regrava(self):
         self.profile.write_text(PROFILE + "scopes:\n  - {id: s, id_in: [C_A], verified_scope: fato}\n", encoding="utf-8")
