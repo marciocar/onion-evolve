@@ -2,8 +2,8 @@
 branch: chore/decide-a2a-1021
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: d7c501afbee75b818dd6957682b056b79f927961d51472a9f4f30ec1fd970a35
+reviewed_diff_sha256: b66860202ece0cb97e7bc5840bff61215df9337081c61af402cac670090ce8f7
+reviewed_code_sha256: a41c5ee7776d28557e358d18064eb1ad5aced10fa9140ad13e3c9ba63fe55a65
 findings_total: 0
 findings_real: 0
 tokens: 0
