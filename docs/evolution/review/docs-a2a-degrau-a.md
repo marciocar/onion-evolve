@@ -2,7 +2,8 @@
 branch: docs/a2a-degrau-a
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1404f945205721686f2e683d883982ac130305ec279e2b69d43c02d367ddf474
+reviewed_code_sha256: 77942b1bea44c53bfd4faa773b0f19772463fc76a578cc1b5baec55c275af9a8
 findings_total: 1
 findings_real: 1
 tokens: 0
