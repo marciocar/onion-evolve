@@ -221,7 +221,7 @@ nodes:
     verified_against: "worktree feat/kg-ssot-contract-v4: kg_vendor.py update --tag contract-v4.0.0 (93f61ac9ba2a, 239 arquivos) e check íntegro; kg_gate.py --update com --accept-regression e os mesmos --exclude do CI: 138 grafos, 7 passam no MUST, 131 na dívida herdada; famílias drive, dissect, kg_migrate_v3, kg_contract_check, cc_delta_census, census_seal e seed_graph verdes, com mutante de cada caso novo"
     label: "o core adotou o contrato v4: provenance é MUST com a dívida herdada travada na base, e os geradores passam a escrever extensão com x_ e method na forma canônica"
     narrative: "Medido no corpus, três escritores fariam todo grafo novo reprovar no v4: o checkpoint do /meta:drive, os marcadores do /meta:dissect e o supersedes do /meta:radar, todos sem x_. Os leitores aceitam as duas formas, para o grafo herdado. Os dados do corpus foram migrados. Seis geradores emitiam method fora de '<classe>: <detalhe>', que no v4 é SHOULD e reprova grafo novo pelo kg-contract-check. O demo fictício foi para fixtures/, e kg-inbox arquivado e proto pessoais saem por --exclude explícito no CI (D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE)."
-    trace: ".kg-ssot/gate.json"
+    trace: ".kg-ssot/gate/contract.json"
     provenance:
       source: "vendor/kg-ssot/.kg-ssot-version e .kg-ssot/gate.json na branch feat/kg-ssot-contract-v4"
       locator: "tag contract-v4.0.0 e a base com 131 grafos na dívida herdada"
