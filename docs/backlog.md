@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**613 itens abertos** em 117 grafo(s) com aberto (de 150 no escopo) · 118 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**610 itens abertos** em 117 grafo(s) com aberto (de 150 no escopo) · 118 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -199,28 +199,6 @@
 | 9.6 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 8.4 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
-## audit-evidence-storage-2026-10 — 17 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 62.5 | `Q_AUDIT_EVIDENCE_STORAGE_2026_10` | audit-evidence-storage-2026-10 | Onde deve morar o estado da evidência de auditoria contínua (controles, evidências, frescor, achados) em outubro de 2026: grafo |
-| 38.5 | `C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS` | audit-evidence-storage-2026-10 | OPÇÃO B (recomendada pelo Elenxo): o grafo em git guarda o estado declarativo e de julgamento (controles, mapeamentos, achados,  |
-| 24.0 | `C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT` | audit-evidence-storage-2026-10 | OPÇÃO A: selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 como está: o grafo YAML em git é o armazenamento de TODO o estado d |
-| 9.6 | `C_OPCAO_E_PRODUCT_RELATIONAL_DB` | audit-evidence-storage-2026-10 | OPÇÃO E: banco relacional próprio, o padrão de Vanta, CISO Assistant, Probo, Comp AI e do kyverno reports-server para resultad |
-| 7.5 | `C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE` | audit-evidence-storage-2026-10 | OPÇÃO D: OSCAL como arquivo nativo versionado em git (o modelo do trestle, IBM 2021): a quarta opção que a pergunta omitiu. |
-| 4.8 | `C_OPCAO_C_ONE_MORE_FOCUSED_PASS` | audit-evidence-storage-2026-10 | OPÇÃO C: não selar ainda; rodar mais uma passada focada em RegScale (OSCAL Hub), Paramify, Hyperproof, Drata, Chef InSpec, o wh |
-| 3.6 | `C_SUPERACAO_20261021_C2P_OSCAL_AR_FROM_PVP_RESULTS` | audit-evidence-storage-2026-10 | C2P: 'produces OSCAL Assessment Results from the native assessment results of PVP': o resultado nasce no motor de política e o OS |
-| 3.6 | `C_SUPERACAO_20261021_C2P_PLUGINS_KYVERNO_OCM_AUDITREE_GIT_LOCKER` | audit-evidence-storage-2026-10 | O C2P liga compliance-as-code a policy-as-code em GitOps: gera políticas a partir de Component Definitions e produz OSCAL AR dos  |
-| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_SCAN_DIR_EVALUATIONLOG` | audit-evidence-storage-2026-10 | complyctl mede e grava em '.complytime/scan/', com EvaluationLog nativo e OSCAL como borda. |
-| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_WORKSPACE_STATE_OSCAL_EDGE` | audit-evidence-storage-2026-10 | complyctl: o estado medido vai para arquivos no workspace, com o EvaluationLog do Gemara como formato nativo e OSCAL como saída o |
-| 3.6 | `C_SUPERACAO_20261021_GEMARA_EVALUATIONLOG_NATIVE_IN_COMPLYCTL` | audit-evidence-storage-2026-10 | complyctl: 'Scan output reports (EvaluationLog, OSCAL, SARIF, Markdown)', com EvaluationLog sempre produzido e OSCAL só com '--fo |
-| 3.6 | `C_SUPERACAO_20261021_GO_GEMARA_V0_11_OCI_ARTIFACT` | audit-evidence-storage-2026-10 | A fonte vigente do Gemara é o go-gemara v0.11.0 (30/09/2026): o artefato é YAML/JSON validado por CUE ('Decode unmarshals raw YA |
-| 3.6 | `C_SUPERACAO_20261021_IBM_800_53_JSON_70000_LINES` | audit-evidence-storage-2026-10 | O blog da IBM de 13/04/2021 confirma o catálogo NIST 800-53 em JSON com mais de 70.000 linhas: o custo de tamanho e fragmentaçã |
-| 3.6 | `C_SUPERACAO_20261021_OSCAL_HUB_HOST_AND_SHARE_NOT_CICD` | audit-evidence-storage-2026-10 | O OSCAL Hub (deck da RegScale no NIST OSCAL Workshop #40, fev/2026) é plataforma para hospedar e compartilhar artefatos OSCAL (Ca |
-| 3.6 | `C_SUPERACAO_20261021_TRESTLE_GIT_SSOT_SCOPED_TO_SDK` | audit-evidence-storage-2026-10 | O compliance-trestle (SDK do OSCAL Compass) usa um repositório Git como fonte única dos artefatos, do histórico e das aprovaç |
-| 3.6 | `C_SUPERACAO_20261021_VANTA_300M_FORTUNE_DRATA_98M` | audit-evidence-storage-2026-10 | Mercado corrigido: a Vanta passou de US$ 300M de ARR com mais de 16.000 clientes (Fortune, 29/04/2026, número da empresa); a Drat |
-| 3.6 | `C_SUPERACAO_20261021_VANTA_OSCAL_EXPORT_EDGE` | audit-evidence-storage-2026-10 | A Vanta tem OSCAL como BORDA de exportação de controles, testes e evidência (post de 04/05/2026, planos Plus, Professional, Ent |
-
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -381,6 +359,27 @@
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
 | 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
 
+## audit-evidence-storage-2026-10 — 16 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 38.5 | `C_OPCAO_B_SPLIT_SCOPE_DIGEST_POINTERS` | audit-evidence-storage-2026-10 | OPÇÃO B (recomendada pelo Elenxo): o grafo em git guarda o estado declarativo e de julgamento (controles, mapeamentos, achados,  |
+| 24.0 | `C_OPCAO_A_SEAL_AS_IS_ALL_STATE_IN_GIT` | audit-evidence-storage-2026-10 | OPÇÃO A: selar D_AUDIT_GRAPH_IS_STORAGE_OSCAL_IS_EDGE_1021 como está: o grafo YAML em git é o armazenamento de TODO o estado d |
+| 9.6 | `C_OPCAO_E_PRODUCT_RELATIONAL_DB` | audit-evidence-storage-2026-10 | OPÇÃO E: banco relacional próprio, o padrão de Vanta, CISO Assistant, Probo, Comp AI e do kyverno reports-server para resultad |
+| 7.5 | `C_OPCAO_D_OSCAL_FILES_IN_GIT_TRESTLE` | audit-evidence-storage-2026-10 | OPÇÃO D: OSCAL como arquivo nativo versionado em git (o modelo do trestle, IBM 2021): a quarta opção que a pergunta omitiu. |
+| 4.8 | `C_OPCAO_C_ONE_MORE_FOCUSED_PASS` | audit-evidence-storage-2026-10 | OPÇÃO C: não selar ainda; rodar mais uma passada focada em RegScale (OSCAL Hub), Paramify, Hyperproof, Drata, Chef InSpec, o wh |
+| 3.6 | `C_SUPERACAO_20261021_C2P_OSCAL_AR_FROM_PVP_RESULTS` | audit-evidence-storage-2026-10 | C2P: 'produces OSCAL Assessment Results from the native assessment results of PVP': o resultado nasce no motor de política e o OS |
+| 3.6 | `C_SUPERACAO_20261021_C2P_PLUGINS_KYVERNO_OCM_AUDITREE_GIT_LOCKER` | audit-evidence-storage-2026-10 | O C2P liga compliance-as-code a policy-as-code em GitOps: gera políticas a partir de Component Definitions e produz OSCAL AR dos  |
+| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_SCAN_DIR_EVALUATIONLOG` | audit-evidence-storage-2026-10 | complyctl mede e grava em '.complytime/scan/', com EvaluationLog nativo e OSCAL como borda. |
+| 3.6 | `C_SUPERACAO_20261021_COMPLYCTL_WORKSPACE_STATE_OSCAL_EDGE` | audit-evidence-storage-2026-10 | complyctl: o estado medido vai para arquivos no workspace, com o EvaluationLog do Gemara como formato nativo e OSCAL como saída o |
+| 3.6 | `C_SUPERACAO_20261021_GEMARA_EVALUATIONLOG_NATIVE_IN_COMPLYCTL` | audit-evidence-storage-2026-10 | complyctl: 'Scan output reports (EvaluationLog, OSCAL, SARIF, Markdown)', com EvaluationLog sempre produzido e OSCAL só com '--fo |
+| 3.6 | `C_SUPERACAO_20261021_GO_GEMARA_V0_11_OCI_ARTIFACT` | audit-evidence-storage-2026-10 | A fonte vigente do Gemara é o go-gemara v0.11.0 (30/09/2026): o artefato é YAML/JSON validado por CUE ('Decode unmarshals raw YA |
+| 3.6 | `C_SUPERACAO_20261021_IBM_800_53_JSON_70000_LINES` | audit-evidence-storage-2026-10 | O blog da IBM de 13/04/2021 confirma o catálogo NIST 800-53 em JSON com mais de 70.000 linhas: o custo de tamanho e fragmentaçã |
+| 3.6 | `C_SUPERACAO_20261021_OSCAL_HUB_HOST_AND_SHARE_NOT_CICD` | audit-evidence-storage-2026-10 | O OSCAL Hub (deck da RegScale no NIST OSCAL Workshop #40, fev/2026) é plataforma para hospedar e compartilhar artefatos OSCAL (Ca |
+| 3.6 | `C_SUPERACAO_20261021_TRESTLE_GIT_SSOT_SCOPED_TO_SDK` | audit-evidence-storage-2026-10 | O compliance-trestle (SDK do OSCAL Compass) usa um repositório Git como fonte única dos artefatos, do histórico e das aprovaç |
+| 3.6 | `C_SUPERACAO_20261021_VANTA_300M_FORTUNE_DRATA_98M` | audit-evidence-storage-2026-10 | Mercado corrigido: a Vanta passou de US$ 300M de ARR com mais de 16.000 clientes (Fortune, 29/04/2026, número da empresa); a Drat |
+| 3.6 | `C_SUPERACAO_20261021_VANTA_OSCAL_EXPORT_EDGE` | audit-evidence-storage-2026-10 | A Vanta tem OSCAL como BORDA de exportação de controles, testes e evidência (post de 04/05/2026, planos Plus, Professional, Ent |
+
 ## machine-path-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -526,39 +525,6 @@
 | 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
-
-## audit-evidence-machinery-2026-10 — 28 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 25.0 | `Q_AUDIT_EVIDENCE_MACHINERY_2026_10` | audit-evidence-machinery-2026-10 | Quais afirmações de mercado da pesquisa do adotante, verificadas em primária em outubro de 2026, servem de base para o vocabul |
-| 14.4 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY` | audit-evidence-machinery-2026-10 | relevant-evidence no OSCAL é description obrigatória + href opcional (URL, relativa ou #uuid de back-matter), e o back-matter ac |
-| 9.6 | `C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING` | audit-evidence-machinery-2026-10 | FRD-PER (definição + nota) mais o teto estruturado do CPO-CSX-CPM: 'persistente' PODE variar e ser irregular, mas repete em cicl |
-| 9.0 | `C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE` | audit-evidence-machinery-2026-10 | TEST e EXAMINE operam sobre assessment objects e INTERVIEW sobre pessoas; acceptance é extensão do core, sem lastro no NIST, a d |
-| 7.2 | `C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT` | audit-evidence-machinery-2026-10 | Texto literal do CPO-CSX-CPM e do FRC-CSX-VVK (com as datas de updated) mais o default_artifact KSI: sustentam cadência declarada |
-| 7.2 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER` | audit-evidence-machinery-2026-10 | OSCAL v1.2.3, metaschema l.915-924: observation.methods é obrigatório (1..N), aceita valores locais (allow-other=yes) além de E |
-| 6.0 | `C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO A (recomendação do Elenxo): ao contrato kg-ssot os campos neutros (frequency, retention, owner_role sobre owner, locatio |
-| 6.0 | `C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST` | audit-evidence-machinery-2026-10 | OPÇÃO B: todos os campos nascem no core como x_ (x_frequency, x_evidence_type, x_oscal_method…), o radar do core lê x_frequen |
-| 5.4 | `C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE` | audit-evidence-machinery-2026-10 | CSA: 'You do not need a license if you are using the CCM for internal purposes' e 'A CCM license allows organizations to customize |
-| 5.4 | `C_SUPERACAO_20261021_LULA_THREE_CHALLENGES` | audit-evidence-machinery-2026-10 | O README do Lula lista TRÊS desafios da v1 (complexidade do OSCAL, testes automatizados insuficientes, colaboração e revisão d |
-| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS` | audit-evidence-machinery-2026-10 | 'acceptance' tem zero ocorrências nos cinco metaschemas OSCAL v1.2.3 (assessment-common, assessment-results, poam, assessment-pla |
-| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED` | audit-evidence-machinery-2026-10 | Formulação corrigida: o OSCAL v1.2.3 não tem 'acceptance', mas o POA&M tem três construções de aceitação de risco: a prop  |
-| 5.4 | `C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED` | audit-evidence-machinery-2026-10 | A página do SCF declara: proibição de distribuir derivado, IA incluída na proibição de CRIAR derivados e licença comercial  |
-| 5.4 | `C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY` | audit-evidence-machinery-2026-10 | O trestle impõe schema aos documentos OSCAL que gerencia; isso entrega 'schema garantido' sem as inferências de que valida a exp |
-| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_NO_FRESHNESS_FIELDS` | audit-evidence-machinery-2026-10 | No OCSF 1.9.0, evidences da Compliance Finding é um array de artefatos (33 atributos) sem frescor, dono nem retenção: o OCSF n |
-| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES` | audit-evidence-machinery-2026-10 | A leitura crua do objeto evidences do OCSF 1.9.0 (33 atributos, nenhum de cadência ou retenção) e a 1.9.0 como Latest de 2026-0 |
-| 3.6 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL` | audit-evidence-machinery-2026-10 | No metaschema OSCAL v1.2.3 (l.974), a description de relevant-evidence é obrigatória (1..1) e o href é opcional; 'ponteiro prim |
-| 3.0 | `C_SUPERACAO_20261021_MARKET_CAPITAL_AGGREGATOR_ONLY` | audit-evidence-machinery-2026-10 | Capital em GRC open-source, só por agregador secundário: Comp AI levantou 34M em 2026-09-17 (Roo Capital, Grand Ventures; digg)  |
-| 3.0 | `C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM` | audit-evidence-machinery-2026-10 | O oscal-cli v3.2.0 tem subcomandos de validação por modelo (assessmentresults/ValidateSubcommand.java e poam/ValidateSubcommand. |
-| 2.7 | `C_OPCAO_C_ALL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO C: todos os nove campos entram no contrato kg-ssot, inclusive os de domínio de auditoria (oscal_method, source_norm, clai |
-| 2.4 | `C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS` | audit-evidence-machinery-2026-10 | intuitem.com/pricing confirma plano pago do CISO Assistant (Community, Pro SaaS a 39 euros por contribuidor por mês, Pro On-premi |
-| 2.4 | `C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED` | audit-evidence-machinery-2026-10 | Schema Prisma com provider postgresql no repo do Comp AI, em três pacotes (db, api e app), com pacotes db e kv: o Postgres está  |
-| 2.4 | `C_SUPERACAO_20261021_CYCLONEDX_JUSTIFICATION_IS_SHOULD` | audit-evidence-machinery-2026-10 | No CycloneDX 1.7, 'Justification should be specified' para not_affected é recomendação, sem required, allOf nem if no objeto an |
-| 2.4 | `C_SUPERACAO_20261021_FEDRAMP_20X_DATES_ESTIMATED` | audit-evidence-machinery-2026-10 | O fedramp.gov/20x ressalva que datas futuras são estimativas ('not firm commitments'): o fim de novas certificações Rev5 em 11/ |
-| 2.4 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_VS_ASSESSMENT_SUBJECT` | audit-evidence-machinery-2026-10 | Observation (página de conceitos) e observation > subjects (JSON reference) são coisas distintas de Assessment Subject (elemento |
-| 2.4 | `C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED` | audit-evidence-machinery-2026-10 | Licença e banco do Probo medidos direto no repo: spdx MIT pela API e imagem postgres na linha 3 do compose.yaml. |
-| 2.4 | `C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL` | audit-evidence-machinery-2026-10 | A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de downlo |
-| 2.4 | `C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS` | audit-evidence-machinery-2026-10 | O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e  |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 
@@ -767,6 +733,38 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 15.0 | `Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR` | review-gate-saldo-2026-09 | enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico  |
+
+## audit-evidence-machinery-2026-10 — 27 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.4 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_POINTER_PRIMARY` | audit-evidence-machinery-2026-10 | relevant-evidence no OSCAL é description obrigatória + href opcional (URL, relativa ou #uuid de back-matter), e o back-matter ac |
+| 9.6 | `C_SUPERACAO_20261021_FEDRAMP_PERSISTENT_CYCLES_WITH_CEILING` | audit-evidence-machinery-2026-10 | FRD-PER (definição + nota) mais o teto estruturado do CPO-CSX-CPM: 'persistente' PODE variar e ser irregular, mas repete em cicl |
+| 9.0 | `C_SUPERACAO_20261021_OSCAL_METHODS_SCOPED_ACCEPTANCE_IS_COINAGE` | audit-evidence-machinery-2026-10 | TEST e EXAMINE operam sobre assessment objects e INTERVIEW sobre pessoas; acceptance é extensão do core, sem lastro no NIST, a d |
+| 7.2 | `C_SUPERACAO_20261021_FEDRAMP_CPM_PACKAGE_CEILING_VVK_COUNT` | audit-evidence-machinery-2026-10 | Texto literal do CPO-CSX-CPM e do FRC-CSX-VVK (com as datas de updated) mais o default_artifact KSI: sustentam cadência declarada |
+| 7.2 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_METHODS_1_N_ALLOW_OTHER` | audit-evidence-machinery-2026-10 | OSCAL v1.2.3, metaschema l.915-924: observation.methods é obrigatório (1..N), aceita valores locais (allow-other=yes) além de E |
+| 6.0 | `C_OPCAO_A_NEUTRAL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO A (recomendação do Elenxo): ao contrato kg-ssot os campos neutros (frequency, retention, owner_role sobre owner, locatio |
+| 6.0 | `C_OPCAO_B_ALL_X_PREFIX_IN_CORE_FIRST` | audit-evidence-machinery-2026-10 | OPÇÃO B: todos os campos nascem no core como x_ (x_frequency, x_evidence_type, x_oscal_method…), o radar do core lê x_frequen |
+| 5.4 | `C_SUPERACAO_20261021_CCM_LICENSE_BY_USE_TYPE` | audit-evidence-machinery-2026-10 | CSA: 'You do not need a license if you are using the CCM for internal purposes' e 'A CCM license allows organizations to customize |
+| 5.4 | `C_SUPERACAO_20261021_LULA_THREE_CHALLENGES` | audit-evidence-machinery-2026-10 | O README do Lula lista TRÊS desafios da v1 (complexidade do OSCAL, testes automatizados insuficientes, colaboração e revisão d |
+| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPTANCE_ZERO_IN_FIVE_METASCHEMAS` | audit-evidence-machinery-2026-10 | 'acceptance' tem zero ocorrências nos cinco metaschemas OSCAL v1.2.3 (assessment-common, assessment-results, poam, assessment-pla |
+| 5.4 | `C_SUPERACAO_20261021_OSCAL_ACCEPT_ACCEPTED_DEVIATION_APPROVED` | audit-evidence-machinery-2026-10 | Formulação corrigida: o OSCAL v1.2.3 não tem 'acceptance', mas o POA&M tem três construções de aceitação de risco: a prop  |
+| 5.4 | `C_SUPERACAO_20261021_SCF_DERIVATIVE_SCOPE_SEPARATED` | audit-evidence-machinery-2026-10 | A página do SCF declara: proibição de distribuir derivado, IA incluída na proibição de CRIAR derivados e licença comercial  |
+| 5.4 | `C_SUPERACAO_20261021_TRESTLE_SCHEMA_ENFORCED_ONLY` | audit-evidence-machinery-2026-10 | O trestle impõe schema aos documentos OSCAL que gerencia; isso entrega 'schema garantido' sem as inferências de que valida a exp |
+| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_NO_FRESHNESS_FIELDS` | audit-evidence-machinery-2026-10 | No OCSF 1.9.0, evidences da Compliance Finding é um array de artefatos (33 atributos) sem frescor, dono nem retenção: o OCSF n |
+| 3.6 | `C_SUPERACAO_20261021_OCSF_EVIDENCES_RAW_33_ATTRIBUTES` | audit-evidence-machinery-2026-10 | A leitura crua do objeto evidences do OCSF 1.9.0 (33 atributos, nenhum de cadência ou retenção) e a 1.9.0 como Latest de 2026-0 |
+| 3.6 | `C_SUPERACAO_20261021_OSCAL_RELEVANT_EVIDENCE_DESCRIPTION_REQUIRED_HREF_LOCAL` | audit-evidence-machinery-2026-10 | No metaschema OSCAL v1.2.3 (l.974), a description de relevant-evidence é obrigatória (1..1) e o href é opcional; 'ponteiro prim |
+| 3.0 | `C_SUPERACAO_20261021_MARKET_CAPITAL_AGGREGATOR_ONLY` | audit-evidence-machinery-2026-10 | Capital em GRC open-source, só por agregador secundário: Comp AI levantou 34M em 2026-09-17 (Roo Capital, Grand Ventures; digg)  |
+| 3.0 | `C_SUPERACAO_20261021_OSCAL_CLI_VALIDATE_SUBCOMMANDS_AR_POAM` | audit-evidence-machinery-2026-10 | O oscal-cli v3.2.0 tem subcomandos de validação por modelo (assessmentresults/ValidateSubcommand.java e poam/ValidateSubcommand. |
+| 2.7 | `C_OPCAO_C_ALL_FIELDS_IN_CONTRACT` | audit-evidence-machinery-2026-10 | OPÇÃO C: todos os nove campos entram no contrato kg-ssot, inclusive os de domínio de auditoria (oscal_method, source_norm, clai |
+| 2.4 | `C_SUPERACAO_20261021_CISO_ASSISTANT_PRICING_PRO_SAAS` | audit-evidence-machinery-2026-10 | intuitem.com/pricing confirma plano pago do CISO Assistant (Community, Pro SaaS a 39 euros por contribuidor por mês, Pro On-premi |
+| 2.4 | `C_SUPERACAO_20261021_COMPAI_PRISMA_POSTGRESQL_MEASURED` | audit-evidence-machinery-2026-10 | Schema Prisma com provider postgresql no repo do Comp AI, em três pacotes (db, api e app), com pacotes db e kv: o Postgres está  |
+| 2.4 | `C_SUPERACAO_20261021_CYCLONEDX_JUSTIFICATION_IS_SHOULD` | audit-evidence-machinery-2026-10 | No CycloneDX 1.7, 'Justification should be specified' para not_affected é recomendação, sem required, allOf nem if no objeto an |
+| 2.4 | `C_SUPERACAO_20261021_FEDRAMP_20X_DATES_ESTIMATED` | audit-evidence-machinery-2026-10 | O fedramp.gov/20x ressalva que datas futuras são estimativas ('not firm commitments'): o fim de novas certificações Rev5 em 11/ |
+| 2.4 | `C_SUPERACAO_20261021_OSCAL_OBSERVATION_VS_ASSESSMENT_SUBJECT` | audit-evidence-machinery-2026-10 | Observation (página de conceitos) e observation > subjects (JSON reference) são coisas distintas de Assessment Subject (elemento |
+| 2.4 | `C_SUPERACAO_20261021_PROBO_MIT_POSTGRES_MEASURED` | audit-evidence-machinery-2026-10 | Licença e banco do Probo medidos direto no repo: spdx MIT pela API e imagem postgres na linha 3 do compose.yaml. |
+| 2.4 | `C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL` | audit-evidence-machinery-2026-10 | A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de downlo |
+| 2.4 | `C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS` | audit-evidence-machinery-2026-10 | O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e  |
 
 ## radar-E3-2026-10-03-r6 — 5 item(ns)
 
@@ -1197,12 +1195,11 @@
 |--:|---|---|---|
 | 2.0 | `Q_live_narration` | kg-console-rich-design-2026-07 | Narração LIVE opcional (POST a um LLM 'explique esta seleção') como enhancement que degrada gracioso offline — gated; a pré |
 
-## radar-E3-2026-10-17-r13 — 2 item(ns)
+## radar-E3-2026-10-17-r13 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.0 | `Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL` | radar-E3-2026-10-17-r13 | medir um turno real do admin do /chat com o fork ligado (custo da cópia de contexto e saída em segundo plano antes do fim do tur |
-| 2.0 | `Q_REVISOR_NO_PIN_NOVO_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-17-r13 | o revisor de IA do CI no pin novo (v1.0.252, CLI 2.1.302) tem de ser provado num PR seguinte com a label review:ia |
 
 ## vendor-multi-branch-2026-07 — 1 item(ns)
 
