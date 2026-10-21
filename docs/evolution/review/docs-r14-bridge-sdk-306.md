@@ -2,7 +2,8 @@
 branch: docs/r14-bridge-sdk-306
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3ae154bd0a2b534f9dc31ae9fde1e9e66b4ef39b670259031aa0bae0270890f5
+reviewed_code_sha256: 08ae0f06d7ffee0e3d86d2e5eec39f28edfe765cda429b096874b289af9b541d
 findings_total: 0
 findings_real: 0
 tokens: 0
