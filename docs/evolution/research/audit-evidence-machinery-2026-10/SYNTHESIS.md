@@ -53,9 +53,10 @@ mode: primaries
 | `D_AUDIT_SOURCE_NORM_EXCLUDE_SCF_ERL_1021` | qual norma alimenta `source_norm` | ponteiro opaco até medir licença |
 | `D_AUDIT_TRESTLE_EXPORT_VALIDATOR_CANDIDATE_1021` | trestle como validador da exportação | candidato, condicionado a dogfood |
 
-O nome do campo de cadência ainda não está fixado. A sessão do kg-ssot aceitou que ele pertence ao eixo
-da **verificação** (como `verified_at`), não ao do fato (`valid_from`), e propôs `reverify_every` como
-candidato. O aviso de vencimento entra no radar **fora do veredito**.
+> **Fora do grafo (insumo de conversa, não nó):** em troca de mensagens de 2026-10-21, a sessão do
+> kg-ssot aceitou que o campo de cadência pertence ao eixo da **verificação** (como `verified_at`), não
+> ao do fato (`valid_from`), propôs `reverify_every` como candidato e deixou a escolha para depois desta
+> pesquisa. O nome não está fixado e não é afirmação desta rodada.
 
 ## NÃO-VERIFICADOS
 
