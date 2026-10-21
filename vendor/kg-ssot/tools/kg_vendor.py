@@ -207,18 +207,25 @@ def update(dest, tag, source, force=False, profile=None):
         files = release_files(listed, release["files"])
         if profile:
             files = profile_files(release, files, listed, profile)
-        tar = tarfile.open(fileobj=io.BytesIO(git(repo, "archive", "--format=tar", commit, "--", *files, binary=True)))
+        # o archive vai pelas entradas da release, não arquivo a arquivo: a lista inteira passa do limite da linha de
+        # comando do Windows (32.767 caracteres, WinError 206) desde a 4.13.0; o que a entrada cobre e o perfil tira
+        # é descartado abaixo
+        specs = sorted({e.rstrip("/") for e in release["files"]})
+        tar = tarfile.open(fileobj=io.BytesIO(git(repo, "archive", "--format=tar", commit, "--", *specs, binary=True)))
+        wanted = set(files)
         staged = pathlib.Path(tmp) / "staged"
         staged.mkdir()
         hashes = {}
         for member in tar.getmembers():
             if member.isdir() or member.type == tarfile.XGLTYPE:  # o pax global do git archive (o commit)
                 continue
-            if not member.isfile():
-                raise Broken(f"{member.name} na tag não é arquivo regular (symlink?): a release só leva arquivos")
             target = staged / member.name
             if staged.resolve() not in target.resolve().parents:
                 raise Broken(f"caminho fora do destino no arquivo da tag: {member.name}")
+            if member.name not in wanted:
+                continue
+            if not member.isfile():
+                raise Broken(f"{member.name} na tag não é arquivo regular (symlink?): a release só leva arquivos")
             data = tar.extractfile(member).read()
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(data)

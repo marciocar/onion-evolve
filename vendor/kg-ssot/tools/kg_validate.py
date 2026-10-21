@@ -144,8 +144,27 @@ class Yaml12CoreLoader(Yaml12BoolLoader):
                 and not STRICT_TIMESTAMP.fullmatch(event.value)):
             raise yaml.composer.ComposerError(None, None, f"!!timestamp sem data: {event.value!r}", event.start_mark)
         if (isinstance(event, yaml.ScalarEvent) and event.style in ("'", '"')
-                and event.start_mark.line != event.end_mark.line and QUOTED_TAB_INDENT(event)):
-            raise yaml.composer.ComposerError(None, None, "tab no começo de uma continuação entre aspas", event.start_mark)
+                and event.start_mark.line != event.end_mark.line):
+            if QUOTED_TAB_INDENT(event):
+                raise yaml.composer.ComposerError(None, None, "tab no começo de uma continuação entre aspas", event.start_mark)
+            cols = getattr(self, "_block_cols", [])
+            if QUOTED_SHORT_INDENT(event, cols[-1] if cols else -1):
+                raise yaml.composer.ComposerError(None, None, "continuação entre aspas menos indentada que a coleção dona",
+                                                  event.start_mark)
+        if isinstance(event, (yaml.MappingStartEvent, yaml.SequenceStartEvent)) and not event.flow_style:
+            # a coluna da coleção em bloco que contém o que vem dentro dela (para a indentação da continuação)
+            if not hasattr(self, "_block_cols"):
+                self._block_cols = []
+            # a coluna do bloco vem do end_mark: o start_mark aponta a âncora ou a tag, quando há (achado da revisão)
+            end = event.end_mark
+            col = end.column
+            if isinstance(event, yaml.SequenceStartEvent) and end.buffer[end.pointer:end.pointer + 1] != "-":
+                col -= 1
+            self._block_cols.append(col)
+            try:
+                return super().compose_node(parent, index)
+            finally:
+                self._block_cols.pop()
         return super().compose_node(parent, index)
 
 
@@ -166,6 +185,22 @@ def QUOTED_TAB_INDENT(event):
         raise yaml.composer.ComposerError(None, None, "texto entre aspas sem o texto cru para conferir o tab", event.start_mark)
     raw = buf[event.start_mark.pointer:event.end_mark.pointer]
     return any("\t" in re.match(r"[ \t]*", line).group() for line in re.split(r"\r\n|\r|\n", raw)[1:])
+
+
+def QUOTED_SHORT_INDENT(event, column):
+    """A linha de continuação do texto entre aspas tem indentação menor ou igual à coluna da coleção em bloco que o
+    contém (column; -1 na raiz)? A especificação do YAML 1.2 pede a continuação mais indentada que o bloco, o yaml do
+    JS a recusa, e o perfil recusa nos dois (decisão de contrato de 2026-10-20, v4.6). Linha só de espaço não conta (é
+    linha vazia). Lê o texto cru pelas marcas do parser puro; sem ele, falha fechado."""
+    buf = getattr(event.start_mark, "buffer", None)
+    if not isinstance(buf, str):
+        raise yaml.composer.ComposerError(None, None, "texto entre aspas sem o texto cru para conferir a indentação",
+                                          event.start_mark)
+    raw = buf[event.start_mark.pointer:event.end_mark.pointer]
+    for line in re.split(r"\r\n|\r|\n", raw)[1:]:
+        if line.strip(" \t") and len(line) - len(line.lstrip(" ")) <= column:
+            return True
+    return False
 
 
 class UnquotedDate(str):
@@ -872,9 +907,25 @@ def parse_v1(text):
         return None, None, "parse.yaml-error"
     loader = loader_for(text)
     raw_doc, doc, code, raw = _parse(text, loader)
-    if loader is not Yaml12CoreLoader and raw is not None and _depth(raw) > SAFE_DEPTH:
+    if loader is not Yaml12CoreLoader and (raw is not None or code == "parse.duplicate-key") and (
+            (raw is not None and _depth(raw) > SAFE_DEPTH) or _multiline_quoted(text)):
         raw_doc, doc, code, raw = _parse(text, Yaml12CoreLoader)
     return raw_doc, doc, code
+
+
+def _multiline_quoted(text):
+    """O texto tem algum escalar entre aspas de várias linhas? As regras da continuação entre aspas (o tab e a
+    indentação) são conferidas só no parser puro; este teste, feito pelos tokens do scanner em C, manda ao puro só
+    o texto que as precisa. Medido em 2026-10-20 no maior grafo do SGE (454 KB): 0,03 s, contra 0,7 s do puro."""
+    if "'" not in text and '"' not in text:
+        return False
+    try:
+        for tok in yaml.scan(text, Loader=FAST_LOADER):
+            if isinstance(tok, yaml.ScalarToken) and tok.style in ("'", '"') and tok.start_mark.line != tok.end_mark.line:
+                return True
+    except yaml.YAMLError:
+        return True  # o C não leu: o puro decide
+    return False
 
 
 def code_counts(text, validator, corpus=None):

@@ -158,6 +158,16 @@ O v4.5 acrescenta quatro coisas:
 - O tab no espaço inicial de uma linha de continuação de texto entre aspas reprova como `parse.yaml-error`, nos dois
   leitores e pela mesma regra explícita (`latest/yaml/strict-profile/`).
 Medido em 2026-10-20: nenhum dos 1.457 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD.
+
+O v4.6 fecha mais duas diferenças do YAML entre os leitores (`latest/yaml/strict-profile/`):
+- a linha de continuação de um texto entre aspas tem de ser mais indentada que a coleção em bloco que o contém (a
+  coluna do mapa ou do `-` da lista; na raiz, ao menos um espaço), como pede a especificação; menos que isso reprova
+  como `parse.yaml-error`. Linha só de espaço não conta;
+- o `\r\n` e o `\r` sozinho são quebra de linha nos dois leitores, como na especificação: o leitor JS deixou de
+  guardar o `\r` como caractere dentro das aspas;
+- o texto entre aspas tem de fechar: a aspa escapada (`''` ou `\"`) no fim de uma linha não fecha o texto, e o leitor JS
+  deixou de cortar o escalar ali.
+Medido em 2026-10-20: nenhum dos 1.507 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD.
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
 caso, não do código.
 
@@ -180,7 +190,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 312 casos contra o contrato v4, 30 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 328 casos contra o contrato v4, 30 deles
 `.kg.json`. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito

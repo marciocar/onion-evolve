@@ -42,7 +42,7 @@ verdict(texto, { format: 'json' });  // .kg.json
   `external_edges`. Os schemas ficam em `kg-ssot/spec/*`.
 
 Desde a 4.10.0, este leitor também mede os avisos SHOULD, com os mesmos códigos do leitor de referência em todos os
-casos da suíte. Desde a 4.11.0, as três construções raras do YAML em que ele divergia da referência (a tag `!` sem
+casos da suíte, e desde a 4.13.0 trata o `\r` como quebra de linha, como a referência. Desde a 4.11.0, as três construções raras do YAML em que ele divergia da referência (a tag `!` sem
 nome, o `!!timestamp` com texto que não é data e o tab fora de aspas) reprovam nos dois, com casos na suíte. A linha de cada ocorrência e as dicas de correção continuam só no leitor de referência em Python.
 
 ## TypeScript e CommonJS

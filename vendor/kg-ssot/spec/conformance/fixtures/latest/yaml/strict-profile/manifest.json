@@ -1,5 +1,5 @@
 {
-  "description": "O perfil YAML estrito do v4.4 (decisão de contrato de 2026-10-19, «o mais estrito nos três»): a tag ! sem nome (também !<!>), em escalar ou coleção, reprova; o !!timestamp explícito só aceita a data na forma estrita, a interseção do PyYAML com o yaml do JS (minuto e segundo com 2 dígitos, fração com dígito, fuso até ±29, só espaço entre a data e a hora); e o tab fora de aspas, de bloco literal e de comentário reprova, como no parser puro do PyYAML. Os casos que reprovam no parse usam a extensão .yaml, como bad-yaml-syntax.yaml. Desde o v4.5, o tab no espaço inicial de uma linha de continuação de texto entre aspas também reprova, nos dois leitores, pela mesma regra explícita.",
+  "description": "O perfil YAML estrito do v4.4 (decisão de contrato de 2026-10-19, «o mais estrito nos três»): a tag ! sem nome (também !<!>), em escalar ou coleção, reprova; o !!timestamp explícito só aceita a data na forma estrita, a interseção do PyYAML com o yaml do JS (minuto e segundo com 2 dígitos, fração com dígito, fuso até ±29, só espaço entre a data e a hora); e o tab fora de aspas, de bloco literal e de comentário reprova, como no parser puro do PyYAML. Os casos que reprovam no parse usam a extensão .yaml, como bad-yaml-syntax.yaml. Desde o v4.5, o tab no espaço inicial de uma linha de continuação de texto entre aspas também reprova, nos dois leitores, pela mesma regra explícita. Desde o v4.6, a linha de continuação de texto entre aspas tem de ser mais indentada que a coleção em bloco que o contém, como pede a especificação, e o \\r\\n e o \\r sozinho são quebra de linha nos dois leitores.",
   "layer": "yaml",
   "pending_on": [],
   "cases": [
@@ -220,6 +220,114 @@
       "codes": [
         "parse.yaml-error"
       ]
+    },
+    {
+      "file": "bad-quoted-continuation-short-top.yaml",
+      "description": "chave do topo com a continuação entre aspas na coluna 0: tem de ser mais indentada que o mapa raiz (v4.6)",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-quoted-continuation-short-node.yaml",
+      "description": "campo do nó com a continuação na coluna do próprio mapa do nó: tem de ser mais indentada",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-quoted-continuation-short-seq.yaml",
+      "description": "item de lista com a continuação na coluna do -: tem de ser mais indentada que a lista",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "valid-quoted-continuation-indented.kg.yaml",
+      "description": "continuação mais indentada que o mapa dono: passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-quoted-continuation-crlf.kg.yaml",
+      "description": "continuação entre aspas com CRLF, bem indentada: o \\r\\n é quebra de linha nos dois leitores, e passa (v4.6)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-quoted-continuation-cr.kg.yaml",
+      "description": "continuação entre aspas com \\r sozinho, bem indentada: o \\r é quebra de linha nos dois leitores, e passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-anchor-block-continuation.kg.yaml",
+      "description": "âncora num mapa em bloco: a coluna do bloco é a das chaves, não a da âncora, e a continuação bem indentada passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-tag-map-continuation.kg.yaml",
+      "description": "tag !!map num mapa em bloco: a coluna vem do bloco, não da tag",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-anchor-seq-continuation.kg.yaml",
+      "description": "âncora numa lista em bloco: a coluna é a do -",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-duplicate-key-short-continuation.yaml",
+      "description": "chave repetida junto com continuação curta: um só código, parse.yaml-error, com ou sem a libyaml",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "valid-flow-in-block-continuation.kg.yaml",
+      "description": "lista flow dentro de um mapa em bloco: a flow não conta, e a continuação só precisa passar a coluna do bloco",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-quoted-unclosed-escaped-single.yaml",
+      "description": "aspa simples escapada ('') no fim da linha: o texto não fecha ali, e a continuação curta reprova nos dois leitores",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "valid-quoted-escaped-single-continuation.kg.yaml",
+      "description": "aspa simples escapada dentro do texto, com a continuação bem indentada: passa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-structural-cr.kg.yaml",
+      "description": "um \\r sozinho como quebra entre duas chaves: o leitor JS antigo recusava, e agora é quebra de linha nos dois",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-quoted-unclosed-escaped-double.yaml",
+      "description": "aspa dupla escapada (\\\") no fim da linha: o texto não fecha ali, e a continuação na coluna 0 reprova nos dois leitores",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "valid-unindented-seq-continuation.kg.yaml",
+      "description": "lista sem indentação sob a chave: a coluna da lista é a do -, e a continuação mais indentada passa",
+      "valid": true,
+      "codes": []
     }
   ]
 }

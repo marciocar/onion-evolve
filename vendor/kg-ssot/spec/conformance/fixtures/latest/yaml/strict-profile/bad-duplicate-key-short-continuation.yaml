@@ -1,0 +1,25 @@
+meta:
+  schema_version: "1"
+  id: bad-duplicate-key-short-continuation
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+    x_d: 1
+    x_d: 'abc
+    def'
+  - id: Q_B
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética B."
+edges:
+  - from: Q_A
+    to: Q_B
+    edge_type: DEPENDS_ON

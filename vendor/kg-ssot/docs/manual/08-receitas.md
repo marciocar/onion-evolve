@@ -115,6 +115,27 @@ PASSA   testemunho.kg.yaml
 Não escreva `source: desconhecida`: isso reprova. Marque o nó como `unverifiable`, e ele fica válido sem
 `provenance`, mesmo em PROD. O grafo passa a dizer a verdade: aquilo não tem origem recuperável.
 
+## Entregar um nó a um agente sem perder o status
+
+O label de um nó é uma afirmação, e o `status` diz em que pé ela está. Um label como `O fornecedor não atende o item
+4.2` num nó `open` é uma afirmação em julgamento. Se a ferramenta que serve o grafo a um agente entrega só o label, o
+agente lê aquilo como fato. Um adotante achou esse defeito no teste do chat: a leitura do grafo mandava o label de uma
+`claim` `open`, e o modelo respondeu que o fornecedor não atendia.
+
+**A afirmação nunca viaja sem o status dela.** Quem resume um nó para outra ferramenta (uma tool de MCP, um prompt, um
+relatório) leva junto ao menos o `status`. Quando a resposta depende da força da evidência, leva também a classe do
+`method`. E diz nas instruções do agente o que cada status quer dizer:
+
+```text
+C_ITEM_42 [claim · open] O fornecedor não atende o item 4.2.
+  → em julgamento: não afirme; diga que está em análise.
+C_ITEM_17 [claim · confirmed · leitura] O fornecedor atende o item 1.7.
+  → confirmado por leitura do documento.
+```
+
+O `kg_get` do `kg_mcp.py` devolve o grafo inteiro, com o `status` de cada nó. O risco está na camada que o adotante
+escreve em cima dele, quando resume.
+
 ## Ligar uma decisão a uma pergunta de outro grafo
 
 ```yaml

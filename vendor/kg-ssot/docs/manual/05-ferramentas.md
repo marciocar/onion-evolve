@@ -2,7 +2,7 @@
 
 [← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
 
-As sete ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3.11 ou mais com as versões fixadas, e com hash, em
+As oito ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3.11 ou mais com as versões fixadas, e com hash, em
 [`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
 
 ```bash
@@ -678,3 +678,49 @@ O exportador não valida o grafo: rode o `kg_validate.py` antes. `--base IRI` tr
 (o default é `urn:kg-ssot:graph:`, e cada nó fica em `<base><meta.id>#<id>`); o vocabulário `kg:` mora em
 `urn:kg-ssot:vocab#`, fora desse espaço. rc 2 quando o arquivo é ilegível, não é um documento YAML único ou tem
 `meta` ou `nodes` fora da forma.
+
+## `kg_migrate.py`: o migrador por perfil
+
+Propõe a `provenance` que o contrato v4 pede aos nós `confirmed` ou PROD que ainda não a têm, a partir de um **perfil**
+que o adotante escreve e versiona: uma lista de regras em ordem (`spec/kg-migrate-profile.schema.json`), em que a
+primeira que casa decide. Há um exemplo comentado em `spec/migrate-examples/company-brain.profile.yaml`, medido sobre
+um corpus real de 25 grafos e 1.024 nós.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py plan  --profile kg-migrate.profile.yaml --out propostas.tsv
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile kg-migrate.profile.yaml
+```
+
+- **O `plan` não escreve nada.** Imprime as contagens por regra e grava, com `--out`, a planilha de propostas, uma
+  linha por nó, com o que vai para quem revisa e por quê. Leia a planilha antes do `apply`.
+- **Cada regra faz uma de três coisas:** propor a `provenance`, rebaixar o nó para `unverifiable` (a fonte é
+  irrecuperável, que é o padrão do contrato) ou só mandar o nó para revisão. O nó que nenhuma regra casa também vai para
+  revisão e não recebe nada.
+- **O `when` casa pelo que o nó já traz.** São o trace (vazio, URL, caminho, glob, existência na árvore, expressão
+  regular), o tipo, o status, o plano, o `verified_against`, o `source_kind` e as arestas `SUPPORTS` que chegam ao nó,
+  com `not` e `any_of`.
+- **Os templates usam os campos do nó:** `{trace}`, `{trace_path}`, `{trace_line}`, `{verified_against}`, `{supports}` e
+  `{source_kind}`, e `{a|b}` pega o primeiro que não for vazio. O `note` do perfil vai no fim de todo detalhe do
+  `method`, por exemplo `não reverificado na migração de 2026-10-20`.
+- **O `scopes` dá `verified_scope` só por lista de ids**, nunca por padrão de texto.
+- **O perfil escolhe dentro do contrato e nunca o relaxa.** Toda proposta é conferida contra o MUST e o SHOULD de forma
+  antes de virar proposta. A que reprovaria vai para revisão com o motivo, e o template que resolve para vazio também.
+  Um aviso de coerência que a proposta acende não barra, porque ele diz a verdade sobre o nó. Por exemplo, um
+  `testemunho` num nó PROD acende `integrity.testimony-in-prod`: a proposta segue, e o nó vai para quem revisa com o
+  aviso nomeado.
+- **O `apply` grava arquivo por arquivo, por texto, e os comentários ficam.** Depois ele relê o arquivo e confere a
+  invariância: cada nó fica igual ao de antes, fora as chaves que a ação autoriza, e o diff só acrescenta linhas, fora
+  a do status rebaixado. Um arquivo que ganharia código MUST novo, ou aviso SHOULD que o plan não anunciou, fica como
+  estava. A quebra de linha do arquivo é mantida (CRLF fica CRLF), e o arquivo com quebras misturadas é recusado.
+  Rodar de novo não muda nada.
+- **Sem lista de grafos, a ferramenta lê os `.kg.yaml` do `git ls-files`.** Ficam de fora `vendor/**` e os globs de
+  `--exclude`. Um grafo da lista que não parseia vira linha de revisão e não aborta a rodada.
+- **O caminho do trace é léxico e fica dentro da raiz do repo.** Ele é normalizado (`./`, `a/../b`), e o que sai da
+  raiz com `../` deixa de ser caminho. Um caminho absoluto ou com `~` conta como inexistente, sem consultar o disco da
+  máquina.
+
+O que fica fora, de propósito, porque é julgamento: reescrever label, mudar plano, re-medir, refutar, reconciliar com
+`SUPERSEDES` e promover um `unverifiable`. rc 0 quando o plano sai ou o apply termina; rc 1 quando o apply recusou
+algum arquivo, que fica como estava e com o motivo no relatório; rc 2 com entrada quebrada (perfil fora do schema,
+regra ou id repetido, expressão regular inválida, `when` que casaria todo nó, grafo dado na linha de comando que não
+parseia). O migrador viaja no vendor e não no pacote do PyPI nem no do npm.
