@@ -84,7 +84,12 @@ FINDINGS="$(awk -v thr="$THRESH" '
   }
   # ---- passada 3: frescor (id type plane status impact conf att vat vagainst trace verdict) ----
   {
-    id=$1; typ=$2; st=$4; imp=$5+0; att=$7+0; trace=$10; verdict=$11
+    # O --freshness-tsv é separado por TAB, e verified_against e trace têm espaços. Com o FS padrão do
+    # awk (espaço) as colunas deslocam, o veredito vira um pedaço do texto e a camada 2 sai cega: medido
+    # em 2026-10-21, o fios-abertos tinha 3 STALE-MISSING e o realign contava (a)=0. As passadas 1 e 2
+    # seguem no FS padrão: --status-tsv não tem espaço nos campos e --triples é separado por espaço.
+    nf=split($0, f, "\t")
+    id=f[1]; typ=f[2]; st=f[4]; imp=f[5]+0; att=f[7]+0; trace=f[10]; verdict=f[11]
     down = (id in downstream) ? downstream[id] : 0
     hasTrace = (trace != "" && trace != "-")   # vínculo a artefato via campo trace: (não só aresta)
     unrec = ((id in supTarget) || (id in refTarget)) && (st=="confirmed" || st=="open")

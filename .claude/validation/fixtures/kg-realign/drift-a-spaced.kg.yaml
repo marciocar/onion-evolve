@@ -1,0 +1,30 @@
+# Fixture kg-realign: drift tipo (a) com ESPAÇO no verified_against e no trace — o caso real do corpus.
+# O --freshness-tsv do radar é separado por TAB; ler por espaço (o FS padrão do awk) desloca as colunas,
+# o veredito vira um pedaço do texto e a camada 2 sai cega. Medido em 2026-10-21: o fios-abertos tinha
+# 3 nós STALE-MISSING e o realign contava (a)=0. Esta fixture prende esse caso: o nó é PROD, sem
+# verified_at, com verified_against de várias palavras, e nada depende dele.
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: Q_STALE_COM_TEXTO_LONGO
+    node_type: question
+    label: "pergunta em PROD sem carimbo, com o alvo descrito em várias palavras"
+    plane: PROD
+    impact: 2
+    confidence: 0.5
+    status: open
+    verified_against: "medido no vivo com o comando de sempre, contra a bancada inteira"
+    trace: "docs/sinal antigo com espaço.md"
+  - id: E_UNRELATED
+    node_type: evidence
+    label: "evidencia solta so para o grafo nao ser trivial"
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-08-15
+    verified_against: "x"
+    trace: "e.sh"
+edges:
+  - from: E_UNRELATED
+    edge_type: SUPPORTS
+    to: Q_STALE_COM_TEXTO_LONGO
