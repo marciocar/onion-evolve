@@ -2,8 +2,8 @@
 title: 'Resíduo — o --update prova que o gate do alvo BARRA, num sandbox descartável'
 date: 2026-10-20
 branch: feat/adopt-update-proves-gate-blocks
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: 925d7c04ee66bd6db7886c6566a156fe39c993e115f1645419b5663405eb9313
+reviewed_diff_sha256: 39839c8af23ba7de77bffa5f2ddf6a826066d337249ab6c5531160b45db89972
+reviewed_code_sha256: 33c8db82e4f50df1a99d9409d53f253891634b8c6b555e770d689e5b438a6f92
 findings_total: 7
 findings_real: 7
 findings_fixed: 7
