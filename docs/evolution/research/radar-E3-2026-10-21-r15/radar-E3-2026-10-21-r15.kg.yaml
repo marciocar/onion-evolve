@@ -1,0 +1,240 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.307 a 2.1.307 contra a baseline 2.1.306.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-21-r15
+  schema_version: "1"
+  baseline: "2026-10-21"
+  review_after: "2026-11-20"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-21) + 8 da rodada + 3 do juiz (2 superações e a pergunta do pin) = 13.
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+# external_edges:
+#   - to: "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml#<NO_DERRUBADO>"
+#     edge_type: SUPERSEDES
+#   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
+#   DECIDIDO (2026-10-21): (a). Dois nós da r14 superados: o pin do revisor (v1.0.256 → v1.0.257) e o /chat
+#   "igual ao host" (o host foi a 2.1.307, o bridge ficou na 2.1.306).
+external_edges:
+  - from: E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307
+    to: "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml#E_PIN_DO_REVISOR_EM_1_0_256_CLI_2_1_306"
+    edge_type: SUPERSEDES
+  - from: E_SDK_DO_BRIDGE_UMA_VERSAO_ATRAS_1021
+    to: "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml#E_SDK_DO_BRIDGE_EM_0_3_306_EM_PRODUCAO_1021"
+    edge_type: SUPERSEDES
+  - from: Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL
+    to: "docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml#Q_REVISOR_NO_PIN_1_0_256_PROVADO_NUM_PR_COM_A_LABEL"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG oficial: seções 2.1.307 (46 linhas, 43 itens); baseline 2.1.306, disco 2.1.307, processo 2.1.307, SDK bridge 2.1.306"
+    label: "o delta desde a baseline 2.1.306 são 1 versão(ões), de 2.1.307 a 2.1.307, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.307 a ## 2.1.307 (cópias em docs/evolution/research/radar-E3-2026-10-21-r15/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "fechada em 2026-10-21 pela r15 depois do juiz (subagente opus/high pedido pela sessão; modelo declarado): 11 vereditos (7 SUSTENTA, 3 EXAGERA, 1 REPROVA), 8 omissões (nenhuma de impacto 2 medido; o defeito do transcript de subagente medido e sem consumidor), 2 superações achadas, 3 nós da r14 superados; data/judge-verdicts.json"
+    label: "quais itens de 2.1.307 a 2.1.307 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+    trace: "docs/evolution/research/radar-E3-2026-10-21-r15/SYNTHESIS.md e data/judge-verdicts.json"
+  - id: E_TETO_DO_WEBSEARCH_CONTRARIA_A_MEMORIA_DO_FALLBACK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "lido no BINÁRIO de cada versão instalada (pelo juiz, LC_ALL=C grep -a): o aviso de teto do WebSearch já diz 'do not work around the limit by querying search engines with curl or wget from Bash, or by searching or fetching through a third-party reader, proxy or archive service' desde a 2.1.304 (2 ocorrências em 2.1.304, 2.1.305, 2.1.306 e 2.1.307); a 2.1.307 só acrescenta 'by querying them in a browser or through a computer-use tool'; nenhuma versão nomeia o WebFetch. A memória search-is-sdaal-fallback-when-capped (l.9-11 e l.18-19) receita WebFetch sobre html.duckduckgo.com/Bing no teto; a KB verify-external-for-current.md (l.46-48) só receita WebFetch sobre URLs CONHECIDAS e já cumpre o aviso"
+    label: "a memória do fallback de busca (WebFetch sobre buscador quando o WebSearch bate no teto) contraria o espírito do aviso anti-contorno que o Claude Code dá desde a 2.1.304; a 2.1.307 só estendeu a lista ao navegador e ao computer use, sem nomear o WebFetch"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.307 + memória search-is-sdaal-fallback-when-capped"
+      method: "medição: leitura do CHANGELOG e grep na memória e nas KBs"
+      locality: "web"
+  - id: Q_REVER_A_MEMORIA_DO_FALLBACK_DE_BUSCA_NA_2_1_307
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "aberta pela r15 em 2026-10-21, premissa corrigida pelo juiz: o aviso anti-contorno existe desde a 2.1.304; o objeto a rever é só a memória do usuário (a KB já se limita a URLs conhecidas); fecha quando o maestro decidir se WebFetch direto num buscador conta como contornar o teto, e a memória for revogada, restrita ou mantida"
+    label: "decidir se WebFetch direto num buscador conta como contornar o teto do WebSearch, que o Claude Code proíbe desde a 2.1.304, e com isso revogar, restringir ou manter a memória do fallback de busca"
+    narrative: |-
+      Issue SAC-185 no Linear, criada pelo tm.sh em 2026-10-21 no projeto Onion — core: próximas levas.
+  - id: E_ARTIFACT_READ_RESET_TOCA_O_PAINEL_DO_DECIDE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "CHANGELOG 2.1.307: 'Fixed Artifact tool reads failing with a connection reset when the server had closed a reused connection'. O /meta:decide --painel publica pelo Artifact (.claude/commands/meta/decide.md l.145), mas LÊ as respostas pelo ArtifactData list (l.150) e grava por ArtifactData batch (l.157): não há ação read do Artifact no fluxo, e a doutrina (decide-doctrine.md l.193-195) declara que a leitura nunca rodou contra um Artifact publicado; se o conserto cobre o transporte do ArtifactData é NÃO MEDIDO"
+    label: "a 2.1.307 corrige a leitura do Artifact que caía por conexão reaproveitada, mas o painel do /meta:decide lê pelo ArtifactData, outra ferramenta, num caminho ainda não exercitado: ligação fraca, impacto 1"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.307 + .claude/commands/meta/decide.md l.18, l.137, l.145"
+      method: "medição: leitura do CHANGELOG e grep no core"
+      locality: "web"
+  - id: E_SDK_DO_BRIDGE_UMA_VERSAO_ATRAS_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "cc-delta-census.sh: SDK bridge 2.1.306 (SDK 0.3.306) contra o host 2.1.307; o PR do SDK 0.3.307 no onion-bridge ainda NÃO está no forge (gh pr list vazio): a bancada roda no clone de um agente da sessão; com ele chega ao /chat 'Improved fork subagents launched together' (toca Q_FORK_NO_ADMIN_MEDIR_UM_TURNO_REAL da r13), que no HOST já vale (claude --version 2.1.307); setModel no bridge: 0"
+    label: "o /chat em produção fica 1 versão atrás do host: o que entra na 2.1.307 só chega lá com o SDK 0.3.307, cujo PR está em preparo; o ganho que toca a casa é o fork de subagentes lançados juntos"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh"
+      locator: "tabela de versões, linha SDK bridge"
+      method: "medição: binário do CLI embutido --version"
+      locality: "host"
+  - id: E_SDK_MCP_FERRAMENTAS_TOCA_O_PILOTO_UI
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.6
+    verified_at: "2026-10-21"
+    verified_against: "REPROVADO pelo juiz e rebaixado: 'createSdkMcpServer' tem 0 ocorrências fora deste grafo em docs, .claude e ops; D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021 só diz 'servidor MCP só dentro do bridge', sem escolher a forma; o bridge tem 0 de createSdkMcpServer e mcpServers em src; o item exige tarefa de fundo, que o bridge não tem medida"
+    label: "a correção do servidor MCP do SDK na 2.1.307 não tem consumidor: o bridge não usa servidor MCP do SDK, e o piloto ui:// ainda não escolheu a forma do servidor; fica como nota para quando o piloto for desenhado"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.307 + D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021"
+      method: "medição: leitura do CHANGELOG e git grep no bridge"
+      locality: "web"
+  - id: E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "PR #1275 MERGED em 2026-10-21: .github/workflows/onion-review.yml nos dois jobs em anthropics/claude-code-action@aa8a7738e48bf30a40ee499ce818bef081c5ab5e (v1.0.257); compare v1.0.256..v1.0.257 = 1 commit 'bump Claude Code to 2.1.307 and Agent SDK to 0.3.307'"
+    label: "o revisor de IA do CI está no pin v1.0.257, que instala o CLI 2.1.307, igual ao host; a prova num PR com a label review:ia segue estacionada (SAC-181)"
+    provenance:
+      source: ".github/workflows/onion-review.yml"
+      locator: "uses: claude-code-action@aa8a7738 (2 jobs)"
+      method: "medição: grep no core e gh api compare"
+      locality: "repo"
+  - id: E_NENHUM_ITEM_TOCA_OTEL_RUNNER_E_IDE_1021
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-21"
+    verified_against: "grep no core: OTEL_/safety_event em .claude ops .github 0; setModel e createSdkMcpServer no bridge 0; leitura de output_tokens/input_tokens só 1 ocorrência, no lint-selftest; sem .mcp.json no core e mcpServers do projeto vazios; o meter.ts do bridge lê o modelUsage do evento result do SDK. O defeito do transcript de subagente é REAL na casa (medido pelo juiz: 358 de 874 linhas de assistente de subagente com stop_reason vazio e tokens de placeholder na 2.1.306, 0 de 223 na 2.1.307), mas não tem consumidor; de onde o Workflow tira o totalTokens é NÃO MEDIDO"
+    label: "o resto do delta (evento OTel de segurança, setModel do SDK, token usage em transcript de subagente, retry de HTTP MCP, runner self-hosted, VSCode e cloud) não tem consumidor medido no core nem no bridge"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.307 + grep em .claude, ops e .github"
+      method: "medição: busca no vivo por consumidor"
+      locality: "web"
+  - id: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_307
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-21"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive com claude --version 2.1.307: Falharam 0, 'OK ✓ — todas as guardas reagiram conforme esperado'"
+    label: "a guarda de deriva de binário que o censo manda rodar segue verde no CLI 2.1.307"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família cited_directive"
+      method: "medição: execução da bancada no CLI 2.1.307"
+      locality: "repo"
+  - id: C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "superação achada pelo juiz da r15 (data/judge-verdicts.json, judge-verdict-check rc 0)"
+    label: "a leitura do aviso real que o modelo recebe, extraída do binário de cada versão instalada (2.1.304 a 2.1.307), em vez do resumo do CHANGELOG: o aviso anti-contorno é anterior à 2.1.307"
+  - id: C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-21"
+    verified_against: "superação achada pelo juiz da r15 (data/judge-verdicts.json, judge-verdict-check rc 0)"
+    label: "a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304: WebFetch direto num buscador conta como contornar o teto?"
+  - id: Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-21"
+    verified_against: "aberta pela r15 em 2026-10-21, supera a pergunta da r14 presa ao v1.0.256; fecha quando um PR com a label review:ia mostrar o job onion-review rodando no pin aa8a7738 com o CLI 2.1.307 no log; segue estacionada como a SAC-181 (D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA)"
+    label: "o revisor de IA do CI no pin v1.0.257 (CLI 2.1.307) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a versão no log"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_TETO_DO_WEBSEARCH_CONTRARIA_A_MEMORIA_DO_FALLBACK
+    to: Q_REVER_A_MEMORIA_DO_FALLBACK_DE_BUSCA_NA_2_1_307
+    edge_type: SUPPORTS
+  - from: E_TETO_DO_WEBSEARCH_CONTRARIA_A_MEMORIA_DO_FALLBACK
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ARTIFACT_READ_RESET_TOCA_O_PAINEL_DO_DECIDE
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SDK_DO_BRIDGE_UMA_VERSAO_ATRAS_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SDK_MCP_FERRAMENTAS_TOCA_O_PILOTO_UI
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_NENHUM_ITEM_TOCA_OTEL_RUNNER_E_IDE_1021
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_307
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO
+    to: E_TETO_DO_WEBSEARCH_CONTRARIA_A_MEMORIA_DO_FALLBACK
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA
+    to: Q_REVER_A_MEMORIA_DO_FALLBACK_DE_BUSCA_NA_2_1_307
+    edge_type: TRACES_TO
+  - from: E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307
+    to: Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL
+    edge_type: SUPPORTS

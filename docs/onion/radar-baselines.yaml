@@ -14,13 +14,13 @@ axes:
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
     last_run: 2026-10-21
-    cc_version: "2.1.306"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "0/11 reprovados no juiz, 6 exagerados (reescritos), 13 omissões (5 de impacto 2 viraram nós, 8 de impacto 1 sem consumidor); Aufhebung: SUPERSEDES de 3 nós da r13 (pin do revisor, a pergunta de prova no v1.0.252 e o /chat igual ao host)"
-                            # rodada 14 (2.1.302->2.1.306, quatro versões, 117 itens). O delta NÃO chega à produção:
-                            # o /chat segue no CLI 2.1.302 (SDK 0.3.302), e o ganho do bump é desempenho no resume.
-                            # Toca o resume de Workflow (SAC-180), o revisor do CI que não rodou em 40/40 (SAC-181) e a
-                            # lista de skills reenviada depois da compactação (SAC-182). Histórico da r13 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-21-r14/radar-E3-2026-10-21-r14.kg.yaml
+    cc_version: "2.1.307"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "1/11 reprovado no juiz (o servidor MCP do SDK não tem consumidor), 3 exagerados (reescritos), 8 omissões sem impacto 2 medido; Aufhebung: SUPERSEDES de 3 nós da r14 (pin do revisor, a pergunta de prova no v1.0.256 e o /chat igual ao host)"
+                            # rodada 15 (2.1.306->2.1.307, uma versão, 43 itens). O delta não chega ao /chat até o SDK
+                            # 0.3.307 (PR em preparo). O juiz leu o aviso de teto do WebSearch no BINÁRIO: o anti-contorno
+                            # existe desde a 2.1.304 e contraria a memória do fallback de busca (SAC-185).
+                            # Histórico da r14 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-21-r15/radar-E3-2026-10-21-r15.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
