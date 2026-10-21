@@ -488,6 +488,7 @@
 .claude/validation/kg-radar.sh	D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	D_S2_ABSORBED	docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml
 .claude/validation/kg-radar.sh	D_m1_avisa_nao_reprova	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
+.claude/validation/kg-radar.sh	E_CORE_RADAR_STALE_OLD_IS_BASELINE_NOT_CADENCE	docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	E_DECISAO_SELADA_DEV_CURADA_1064	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	E_DOIS_LEITORES_DIVERGIAM	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/kg-radar.sh	E_LABEL_ESCONDE_NO_FANTASMA_DO_CENSO	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
@@ -2493,3 +2494,4 @@ ops/verify-adopter-gate.sh	E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR	do
 ops/verify-adopter-gate.sh	E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 site/src/pages	Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 vendor/kg-ssot/spec/kg-contract-v4.schema.json	C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
+vendor/kg-ssot/spec/kg-contract-v4.schema.json	E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM	docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml

@@ -2,7 +2,8 @@
 branch: docs/research-audit-evidence
 pr: pendente
 date: 2026-10-21
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 992a9aee20066324fa709ab5f3f15f0710cdfb6006940ec3531b50f502130e5c
+reviewed_code_sha256: d20edc814ca5b89a3daf0d5e52777ee6e6c6c47b20997623fe8fbe7c033c4352
 findings_total: 3
 findings_real: 3
 tokens: 0
