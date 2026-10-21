@@ -1029,6 +1029,15 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-21"
     verified_against: "QUOTE: 'Providers MUST supply a fresh initial FedRAMP Certification Package that shows the current status of the cloud service offering as verified and validated by the provider within the previous 7 days.' — fedramp-consolidated-rules.json (info.version 2026.10.13.01), FRR/FRC/data/all/APP/FRC-APP-FCP.statement, updated 2026-06-24; ancorada por verificador independente"
+    reverify_every: "P30D"
+    reverify_on: "nova info.version do fedramp-consolidated-rules.json"
+    x_evidence_type: "regra publicada (JSON oficial)"
+    x_oscal_method:
+      - EXAMINE
+    x_source_norm:
+      id: "FedRAMP FRC-APP-FCP"
+      url: "https://raw.githubusercontent.com/FedRAMP/rules/main/fedramp-consolidated-rules.json"
+    x_claim_class: "obrigação normativa"
     valid_from: "2026-06-24"
     source_tier: 10
     source_kind: primary
@@ -1049,6 +1058,8 @@ nodes:
     confidence: 0.8
     verified_at: "2026-10-21"
     verified_against: "QUOTE: '**OSCAL v1.2.1 bindings** with consolidated `select-control-by-id`/`matching` definitions.' — GitHub release v3.2.0 de metaschema-framework/oscal-cli (published_at 2026-05-15T11:12:51Z), Highlights; ancorada por verificador independente"
+    reverify_every: "P30D"
+    reverify_on: "nova release do oscal-cli"
     valid_from: "2026-05-15"
     source_kind: primary
     label: "A release mais recente do oscal-cli mantido (metaschema-framework) é a v3.2.0, de 2026-05-15, com bindings do OSCAL v1.2.1, não do 1.2.3; nenhuma release posterior até 2026-10-21."
