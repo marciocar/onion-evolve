@@ -1,0 +1,80 @@
+# Fixture: cadência por nó (reverify_every, contrato kg-ssot v4.8). O vencimento é calculado pelo
+# kg_validate.py --due (kg-ssot.due/1), nunca pelo radar. Espera: --all exit 0 (fora do veredito),
+# STALE-EXPIRED em E_VENCIDO, nada em E_EM_DIA, CADENCE-UNSTAMPED em E_SEM_CARIMBO, E_EVENTO só
+# contado como evento, E_MORTO (superseded) não cobrado e contado.
+meta:
+  id: fixture-reverify-due
+  schema_version: "1"
+  baseline: "2020-01-01"
+nodes:
+  - id: E_VENCIDO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2020-01-01"
+    verified_against: "regra de norma que muda (fixture)"
+    reverify_every: "P30D"
+    label: "evidência com cadência P30D carimbada em 2020: vencida"
+  - id: E_EM_DIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2020-01-01"
+    verified_against: "regra de norma estável (fixture)"
+    reverify_every: "P900Y"
+    label: "evidência com cadência longa: não vencida"
+  - id: E_SEM_CARIMBO
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    reverify_every: "P1M"
+    label: "evidência com cadência e sem verified_at"
+  - id: E_EVENTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2020-01-01"
+    verified_against: "norma (fixture)"
+    reverify_on: "nova versão da norma"
+    label: "evidência que só vence por evento"
+  - id: E_MORTO
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.5
+    verified_at: "2020-01-01"
+    verified_against: "norma antiga (fixture)"
+    reverify_every: "P30D"
+    label: "evidência superada com cadência vencida: história, não cobrada"
+  - id: C_HUB
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "a afirmação que as evidências sustentam"
+edges:
+  - from: E_VENCIDO
+    to: C_HUB
+    edge_type: SUPPORTS
+  - from: E_EM_DIA
+    to: C_HUB
+    edge_type: SUPPORTS
+  - from: E_SEM_CARIMBO
+    to: C_HUB
+    edge_type: SUPPORTS
+  - from: E_EVENTO
+    to: C_HUB
+    edge_type: SUPPORTS
+  - from: C_HUB
+    to: E_MORTO
+    edge_type: SUPERSEDES

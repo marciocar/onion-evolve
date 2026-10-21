@@ -1961,6 +1961,113 @@ run_kg_freshness_selftests() {
     record_fail "kg-freshness: (k) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
 
+  # ── STALE-EXPIRED: vencimento por cadência, CONSUMIDO do kg-ssot --due (kg-ssot.due/1) ──────
+  # Decisão de origem: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021 (opção A). O radar não calcula a
+  # data: lê o relatório do leitor de referência. Fora do veredito; fail-closed como NÃO MEDIDO.
+  # Os casos com STUB rodam sempre (independem da versão do vendor); os com o leitor REAL pulam,
+  # declarados, quando o vendor/kg-ssot do repo não tem --due.
+  local dv="${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py"
+  local fxd="${fx}/reverify-due.kg.yaml" fxf="${fx}/reverify-fresh.kg.yaml"
+  local dsb; dsb="$(mktemp -d)"
+  # (d-due) vendor sem --due: stub com a recusa EXATA do argparse da 4.13.1 (medida).
+  printf 'import sys\nsys.stderr.write("usage: kg_validate.py [-h]\\nkg_validate.py: error: unrecognized arguments: --due\\n")\nsys.exit(2)\n' > "${dsb}/old.py"
+  rc=0; out=$(ONION_KG_DUE_VALIDATOR="${dsb}/old.py" bash "${radar}" "${fxd}" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'STALE-EXPIRED NÃO MEDIDO' <<<"${out}" \
+     && grep -q 'vendor anterior à 4.15.0, sem --due' <<<"${out}" \
+     && ! grep -q 'STALE-EXPIRED: ' <<<"${out}" && ! grep -q 'cadência por nó' <<<"${out}"; then
+    record_pass "kg-freshness: (d-due) vendor sem --due ⇒ STALE-EXPIRED NÃO MEDIDO com o porquê, nunca 0 vencidos"
+  else record_fail "kg-freshness: (d-due) vendor sem --due" "rc=${rc} out=${out}"; fi
+  # (d2-due) leitor que morre MUDO (rc 1, stderr vazio — SIGKILL/OOM): sob set -e + pipefail o grep -v
+  #          vazio matava o radar com rc 1 e saída zero (achado do refutador, 2026-10-21).
+  printf 'import sys\nsys.exit(1)\n' > "${dsb}/silent.py"
+  rc=0; out=$(ONION_KG_DUE_VALIDATOR="${dsb}/silent.py" bash "${radar}" "${fxd}" --all 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'STALE-EXPIRED NÃO MEDIDO.*rc 1.*stderr vazio' <<<"${out}" && grep -q '══ INTEGRIDADE' <<<"${out}"; then
+    record_pass "kg-freshness: (d2-due) leitor que morre mudo ⇒ NÃO MEDIDO e o radar segue inteiro (rc 0, INTEGRIDADE impressa)"
+  else record_fail "kg-freshness: (d2-due) leitor mudo" "rc=${rc} out=${out}"; fi
+  # (e-due) forma nova (due/2) e due/1 sem as listas do schema não são lidos no chute.
+  printf 'import json\nprint(json.dumps({"schema_version": "kg-ssot.due/2", "as_of": "2026-10-21", "due": [], "unstamped": [], "event": [], "broken": []}))\n' > "${dsb}/due2.py"
+  printf 'import json\nprint(json.dumps({"schema_version": "kg-ssot.due/1"}))\n' > "${dsb}/nolists.py"
+  local o2 o3
+  o2=$(ONION_KG_DUE_VALIDATOR="${dsb}/due2.py" bash "${radar}" "${fxd}" --freshness 2>&1 || true)
+  o3=$(ONION_KG_DUE_VALIDATOR="${dsb}/nolists.py" bash "${radar}" "${fxd}" --freshness 2>&1 || true)
+  if grep -q 'STALE-EXPIRED NÃO MEDIDO.*kg-ssot.due/2' <<<"${o2}" && grep -q 'STALE-EXPIRED NÃO MEDIDO.*sem a lista' <<<"${o3}" \
+     && ! grep -q '✅' <<<"${o3}"; then
+    record_pass "kg-freshness: (e-due) relatório due/2 ou due/1 sem as listas ⇒ NÃO MEDIDO nomeando o porquê (nunca ✅)"
+  else record_fail "kg-freshness: (e-due) formato" "due2=${o2} nolists=${o3}"; fi
+  # (c-due) grafo SEM reverify_*: o leitor nem é chamado (stub que acusaria) e nada muda.
+  rc=0; out=$(ONION_KG_DUE_VALIDATOR="${dsb}/old.py" bash "${radar}" "${fx}/fresh-verified.kg.yaml" --all 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -qE 'STALE-EXPIRED|CADENCE-|cadência por nó' <<<"${out}"; then
+    record_pass "kg-freshness: (c-due) grafo sem reverify_every ⇒ nenhuma linha nova e o leitor não é chamado"
+  else record_fail "kg-freshness: (c-due) sem cadência" "rc=${rc} out=${out}"; fi
+  # (g-due) o LADO AWK com um due/1 fixo (stub): formato da linha, superseded fora e contado,
+  #          MALFORMED vindo do veredito do contrato, exit intacto. Roda sem depender do vendor.
+  cat > "${dsb}/happy.py" <<'PYEOF'
+import json, sys
+if "--due" in sys.argv:
+    print(json.dumps({"schema_version": "kg-ssot.due/1", "as_of": sys.argv[sys.argv.index("--due") + 1],
+        "due": [{"file": "f", "id": i, "verified_at": "2020-01-01", "reverify_every": "P30D", "due_on": "2020-01-31", "days_late": 9, "reverify_on": None} for i in ("E_VENCIDO", "E_MORTO")],
+        "unstamped": [{"file": "f", "id": "E_SEM_CARIMBO", "reverify_every": "P1M"}],
+        "event": [{"file": "f", "id": "E_EVENTO", "reverify_on": "x"}], "broken": []}))
+else:
+    print(json.dumps({"schema_version": "kg-ssot.verdict/1", "results": [{"occurrences": [
+        {"code": "form.pattern.node.reverify_every", "place": "nó E_EM_DIA"},
+        {"code": "form.type.node.reverify_every", "place": "nó E_EM_DIA"}]}]}))
+    sys.exit(1)
+PYEOF
+  rc=0; out=$(ONION_KG_DUE_VALIDATOR="${dsb}/happy.py" bash "${radar}" "${fxd}" --all 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] \
+     && grep -q 'STALE-EXPIRED: E_VENCIDO (verificado em 2020-01-01, reverify_every P30D, venceu em 2020-01-31, 9 dia(s) de atraso' <<<"${out}" \
+     && ! grep -q 'STALE-EXPIRED: E_MORTO' <<<"${out}" \
+     && [ "$(grep -c 'CADENCE-MALFORMED: E_EM_DIA' <<<"${out}")" = "1" ] \
+     && grep -q '1 vencido(s) · 1 sem carimbo · 1 fora da forma (não medido) · 1 só por evento' <<<"${out}" \
+     && grep -q '1 em nó superseded/refuted, não cobrado' <<<"${out}"; then
+    record_pass "kg-freshness: (g-due) due/1 fixo ⇒ STALE-EXPIRED formatado, superseded contado e fora, MALFORMED do contrato (1 por nó), rc 0"
+  else record_fail "kg-freshness: (g-due) lado awk" "rc=${rc} out=${out}"; fi
+
+  if ! python3 -I -B "${dv}" --help 2>/dev/null | grep -q -- '--due'; then
+    record_skip "kg-freshness: (a-due)/(b-due)/mutantes — o vendor/kg-ssot deste repo não tem --due (anterior à 4.15.0): a leitura real não foi exercida"
+  else
+    # (a-due) vencido ⇒ STALE-EXPIRED, e o exit NÃO muda (--all e --freshness, rc 0).
+    local rca=0 rcf=0 outf
+    out=$(ONION_KG_DUE_VALIDATOR="${dv}" bash "${radar}" "${fxd}" --all 2>&1) || rca=$?
+    outf=$(ONION_KG_DUE_VALIDATOR="${dv}" bash "${radar}" "${fxd}" --freshness 2>&1) || rcf=$?
+    if [ "${rca}" -eq 0 ] && [ "${rcf}" -eq 0 ] \
+       && grep -q 'STALE-EXPIRED: E_VENCIDO (verificado em 2020-01-01, reverify_every P30D, venceu em 2020-01-31' <<<"${out}" \
+       && grep -q 'CADENCE-UNSTAMPED: E_SEM_CARIMBO' <<<"${out}" \
+       && ! grep -qE 'STALE-EXPIRED: (E_EM_DIA|E_EVENTO|E_MORTO)' <<<"${out}" \
+       && grep -q '1 vencido(s) · 1 sem carimbo · 0 fora da forma (não medido) · 1 só por evento' <<<"${out}" \
+       && grep -q '1 em nó superseded/refuted, não cobrado' <<<"${out}" \
+       && grep -q 'STALE-EXPIRED: E_VENCIDO' <<<"${outf}"; then
+      record_pass "kg-freshness: (a-due) vencido ⇒ STALE-EXPIRED (data do kg-ssot), exit 0 em --all e --freshness; em-dia/evento/superseded fora"
+    else record_fail "kg-freshness: (a-due) vencido" "rc_all=${rca} rc_fresh=${rcf} out=${out}"; fi
+    # (b-due) cadência declarada e nada vencido ⇒ nenhuma linha de cadência.
+    rc=0; out=$(ONION_KG_DUE_VALIDATOR="${dv}" bash "${radar}" "${fxf}" --freshness 2>&1) || rc=$?
+    if [ "${rc}" -eq 0 ] && ! grep -qE 'STALE-EXPIRED|CADENCE-|cadência por nó' <<<"${out}" && grep -q '✅ 1 nó(s)' <<<"${out}"; then
+      record_pass "kg-freshness: (b-due) cadência não vencida ⇒ nada (✅ intacto)"
+    else record_fail "kg-freshness: (b-due) não vencido" "rc=${rc} out=${out}"; fi
+
+    # (MUT-due-1) desligada a leitura, o vencido SOME — (a-due) é load-bearing. O mutante tem de
+    #             RODAR (rc 0, FRESCOR impresso): sumir por queda não prova nada.
+    cp "${radar}" "${dsb}/m1.sh"; _lib_beside "${dsb}"
+    sed -i 's/^case "\$MODE" in --all|--freshness)$/case "$MODE" in --nunca)/' "${dsb}/m1.sh"
+    if ! grep -q '^case "\$MODE" in --all|--freshness)$' "${dsb}/m1.sh"; then
+      rc=0; out="$(ONION_KG_DUE_VALIDATOR="${dv}" bash "${dsb}/m1.sh" "${fxd}" --freshness 2>&1)" || rc=$?
+      if [ "${rc}" -eq 0 ] && grep -q '══ FRESCOR' <<<"${out}" && ! grep -q 'STALE-EXPIRED: E_VENCIDO' <<<"${out}"; then
+        record_pass "kg-freshness: (MUT-due-1) sem a leitura do --due o STALE-EXPIRED some (mutante roda, rc 0) — a guarda morde"
+      else record_fail "kg-freshness: (MUT-due-1)" "rc=${rc} — mutante caiu ou a leitura é vacuidade; out=${out}"; fi
+    else record_fail "kg-freshness: (MUT-due-1)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+    # (MUT-due-2) vencimento como VEREDITO (problems++) ⇒ rc 1 — (a-due) pega pelo exit.
+    cp "${radar}" "${dsb}/m2.sh"
+    sed -i 's/ndue++; fwarns++/ndue++; fwarns++; problems++/' "${dsb}/m2.sh"
+    if grep -q 'ndue++; fwarns++; problems++' "${dsb}/m2.sh"; then
+      rc=0; ONION_KG_DUE_VALIDATOR="${dv}" bash "${dsb}/m2.sh" "${fxd}" --all >/dev/null 2>&1 || rc=$?
+      if [ "${rc}" -eq 1 ]; then
+        record_pass "kg-freshness: (MUT-due-2) vencimento como veredito vira rc 1 — (a-due) o barraria"
+      else record_fail "kg-freshness: (MUT-due-2)" "esperava rc 1, veio rc=${rc}"; fi
+    else record_fail "kg-freshness: (MUT-due-2)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  fi
+  rm -rf "${dsb}"
+
   # ── --freshness-tsv: a FILA de re-verificação (insumo de /meta:kg-freshness) ──────────────
   # Contrato de máquina: se as colunas variarem, o consumidor quebra em silêncio.
   local tsv; tsv="$(bash "${radar}" "${fxu}" --freshness-tsv 2>/dev/null || true)"

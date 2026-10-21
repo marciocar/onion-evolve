@@ -1,0 +1,27 @@
+# Fixture: cadência declarada e NADA vencido (P900Y). Espera: nenhuma linha de cadência, exit 0.
+meta:
+  id: fixture-reverify-fresh
+  schema_version: "1"
+  baseline: "2020-01-01"
+nodes:
+  - id: E_EM_DIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2020-01-01"
+    verified_against: "regra de norma estável (fixture)"
+    reverify_every: "P900Y"
+    label: "evidência com cadência longa: não vencida"
+  - id: C_HUB
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "a afirmação que a evidência sustenta"
+edges:
+  - from: E_EM_DIA
+    to: C_HUB
+    edge_type: SUPPORTS

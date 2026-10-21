@@ -47,6 +47,11 @@
 #                     `provenance.method: testemunho: …` — contrato v4.1, SAC-96).
 #                     Determinístico: compara duas datas / dois campos do arquivo, sem "agora"
 #                     (ADR onion-adr-kg-freshness-gate, proposta #2 (dogfood de campo)).
+#                     STALE-EXPIRED (2026-10-21) é a EXCEÇÃO declarada, e usa hoje: nó com
+#                     reverify_every (contrato kg-ssot v4.8) cujo verified_at + cadência já passou.
+#                     A data vem do `kg_validate.py --due` (kg-ssot.due/1), nunca deste radar;
+#                     NÃO MEDIDO quando o leitor falta ou não tem --due. Ver o bloco VENCIMENTO.
+#                     O --freshness-tsv NÃO o carrega (11 colunas exatas, consumidores por coluna).
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
 #                     meta.schema_version ≠ a versão que o radar entende → recusa; ausente → ⚠
 #                     retrocompat (ADR onion-adr-kg-freshness-gate, proposta #1).
@@ -145,7 +150,113 @@ fi
 # tem systime/strftime". Medido na passada adversarial: este radar NÃO RODA sob mawk — morre em
 # `asorti never defined`, rc=2, saída zero. A razão da portabilidade era verdadeira sobre o awk e
 # FALSA sobre este script; ficou só a que o artefato sustenta.)
-awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" -v hoje="$(date -u +%Y-%m-%d)" "${STATUS_FACTOR}"'
+HOJE="$(date -u +%Y-%m-%d)"
+
+# ══ VENCIMENTO POR CADÊNCIA (STALE-EXPIRED) — CONSUMIDO do kg-ssot, NUNCA reimplementado ═══════
+# O contrato v4.8 (kg-ssot 4.15.0) trouxe `reverify_every` (duração ISO 8601 só com data) e
+# `reverify_on`, e o leitor de referência calcula o vencimento: `kg_validate.py --due <hoje>
+# --format json`, formato kg-ssot.due/1 (vendor/kg-ssot/spec/due.schema.json). A regra de soma
+# (meses pelo calendário, 31/jan + P1M = fim de fevereiro) mora LÁ: um segundo cálculo aqui seria o
+# terceiro leitor discordando do mesmo byte. Combinado com a sessão do kg-ssot: a forma só muda
+# com due/2, avisada antes, e due/2 aqui vira NÃO MEDIDO (nunca leitura chutada).
+# Decisão de origem: D_AUDIT_VOCAB_CONTRACT_VS_CORE_SPLIT_1021 (opção A, maestro, 2026-10-21) em
+# docs/evolution/research/audit-evidence-machinery-2026-10/.
+#
+# FORA DO VEREDITO: o vencimento é aviso do FRESCOR, nunca exit não-zero (nó vencido mente, não
+# corrompe — o mesmo racional da seção inteira).
+# ZERO RUÍDO: grafo que não declara `reverify_every`/`reverify_on` não paga o processo Python nem
+# ganha linha nova. O pré-filtro é grep de chave em bloco (a única forma que este radar lê); um
+# falso positivo (a chave citada no começo de linha de uma narrativa) só custa a chamada, porque
+# relatório vazio não imprime nada.
+# FAIL-CLOSED DECLARADO: leitor ausente, sem `--due` (vendor anterior à 4.15.0), rc != 0, JSON
+# ilegível, schema_version diferente de kg-ssot.due/1 ou arquivo que o leitor não parseia ⇒ a
+# linha diz NÃO MEDIDO e o porquê. Nunca "0 vencidos" por ausência de medição.
+# ONION_KG_DUE_VALIDATOR troca o leitor (bancada e cópia mutante do radar, que mora fora do repo).
+DUE_STATE="skip"; DUE_REPORT=""; DUE_FILE=""
+case "$MODE" in --all|--freshness)
+  if grep -qE '^[[:space:]]*(-[[:space:]]+)?reverify_(every|on)[[:space:]]*:' -- "$FILE"; then
+    _due_v="${ONION_KG_DUE_VALIDATOR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/vendor/kg-ssot/tools/kg_validate.py}"
+    if [ ! -f "${_due_v}" ]; then
+      DUE_STATE="unmeasured"; DUE_REPORT="leitor do contrato ausente (${_due_v})"
+    elif ! command -v python3 >/dev/null 2>&1; then
+      DUE_STATE="unmeasured"; DUE_REPORT="python3 ausente"
+    else
+      _due_tmp="$(mktemp -d)"; trap 'rm -rf "${_due_tmp}"' EXIT
+      _due_rc=0
+      python3 -I -B "${_due_v}" --due "${HOJE}" --format json -- "$FILE" >"${_due_tmp}/due.json" 2>"${_due_tmp}/due.err" || _due_rc=$?
+      if [ "${_due_rc}" -ne 0 ]; then
+        # `|| true` DENTRO do grupo: stderr mudo (leitor morto por SIGKILL/OOM) faz o grep -v sair 1, e
+        # sob set -e + pipefail isso matava o radar inteiro com rc 1 e saída vazia (refutador, 2026-10-21).
+        DUE_STATE="unmeasured"
+        _due_last="$( { grep -v '^[[:space:]]*$' "${_due_tmp}/due.err" || true; } | tail -n 1 | head -c 200 | tr '\n\t' '  ')"
+        _due_hint=""; case "${_due_last}" in *"unrecognized arguments"*--due*) _due_hint="; vendor anterior à 4.15.0, sem --due" ;; esac
+        DUE_REPORT="o leitor do contrato falhou no --due (rc ${_due_rc}${_due_hint}): ${_due_last:-stderr vazio}"
+      else
+        # A cadência FORA DA FORMA (`"30 dias"`, `30`) o --due descarta calado, e quem a julga é o SHOULD
+        # do mesmo leitor. Sem esta 2ª leitura o nó sumia e a contagem parecia completa (refutador,
+        # 2026-10-21). rc 0/1 é veredito (passa/reprova); outro rc é leitura que não aconteceu.
+        _ver_rc=0
+        python3 -I -B "${_due_v}" --format json -- "$FILE" >"${_due_tmp}/verdict.json" 2>/dev/null || _ver_rc=$?
+        _tr_rc=0
+        # Só TRADUZ os dois JSON para linhas TAB (o awk não lê JSON); não decide vencimento algum.
+        python3 -I -B -c '
+import json, re, sys
+due_path, ver_path, ver_rc, today, out_path = sys.argv[1:6]
+lines = []
+def err(msg):
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write("ERR\t%s\n" % msg)
+    sys.exit(0)
+clean = lambda v: str(v).replace("\t", " ").replace("\n", " ")
+try:
+    rep = json.load(open(due_path, encoding="utf-8"))
+except (OSError, ValueError) as exc:
+    err("JSON ilegível do --due: %s" % clean(exc))
+if not isinstance(rep, dict) or rep.get("schema_version") != "kg-ssot.due/1":
+    err("formato %r, este radar lê só kg-ssot.due/1" % (rep.get("schema_version") if isinstance(rep, dict) else type(rep).__name__))
+for key in ("due", "unstamped", "event", "broken"):
+    if not isinstance(rep.get(key), list):
+        err("relatório kg-ssot.due/1 sem a lista %r (fora do due.schema.json)" % key)
+if rep.get("as_of") != today:
+    err("relatório para %r, pedido para %s" % (rep.get("as_of"), today))
+for b in rep["broken"]:
+    err("o leitor do contrato não parseou o arquivo: %s" % clean(b.get("error")))
+if ver_rc not in ("0", "1"):
+    err("o veredito do contrato não rodou (rc %s): a cadência fora da forma não foi lida" % ver_rc)
+try:
+    ver = json.load(open(ver_path, encoding="utf-8"))
+    occ = [o for r in ver["results"] for o in r.get("occurrences", [])]
+except (OSError, ValueError, KeyError, TypeError) as exc:
+    err("veredito do contrato ilegível: %s" % clean(exc))
+for d in rep["due"]:
+    lines.append("\t".join(["DUE"] + [clean(d.get(k)) for k in ("id", "verified_at", "reverify_every", "due_on", "days_late")]))
+for d in rep["unstamped"]:
+    lines.append("UNSTAMPED\t%s\t%s" % (clean(d.get("id")), clean(d.get("reverify_every"))))
+for d in rep["event"]:
+    lines.append("EVENT\t%s" % clean(d.get("id")))
+for o in occ:
+    code = str(o.get("code", ""))
+    m = re.match(r"^nó (.+)$", str(o.get("place", "")))
+    if re.match(r"^form\.[a-z_]+\.node\.reverify_every$", code) and m:
+        lines.append("MALFORMED\t%s\t%s" % (clean(m.group(1)), code))
+with open(out_path, "w", encoding="utf-8") as fh:
+    fh.write("".join(l + "\n" for l in lines))
+' "${_due_tmp}/due.json" "${_due_tmp}/verdict.json" "${_ver_rc}" "${HOJE}" "${_due_tmp}/report.tsv" || _tr_rc=$?
+        if [ "${_tr_rc}" -ne 0 ] || [ ! -f "${_due_tmp}/report.tsv" ]; then
+          DUE_STATE="unmeasured"; DUE_REPORT="tradução do --due falhou (rc ${_tr_rc})"
+        elif grep -q $'^ERR\t' "${_due_tmp}/report.tsv"; then
+          DUE_STATE="unmeasured"; DUE_REPORT="$(grep -m1 $'^ERR\t' "${_due_tmp}/report.tsv" | cut -f2-)"
+        else DUE_STATE="ok"; DUE_FILE="${_due_tmp}/report.tsv"; fi
+      fi
+    fi
+  fi ;;
+esac
+# Por ARQUIVO e não por ENVIRON: string de ambiente tem teto de 128 KiB (MAX_ARG_STRLEN), e um grafo
+# com ~2.100 nós vencidos derrubava o awk com rc 126 (refutador, 2026-10-21). A razão do NÃO MEDIDO
+# é uma linha curta e segue por -v.
+DUE_REPORT="$(printf '%s' "${DUE_REPORT}" | tr '\\' '/' | head -c 400)"
+
+awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" -v hoje="${HOJE}" -v dueState="${DUE_STATE}" -v dueFile="${DUE_FILE}" -v dueWhy="${DUE_REPORT}" "${STATUS_FACTOR}"'
 /^---[ \t]*$/ { docSeps++ }
 # ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────
 # Quando `drifted`/`unverifiable` entraram (2026-08-06), os predicados escritos como ALLOWLIST
@@ -1105,7 +1216,34 @@ END {
         print "  ⚠ MISPLANED: " id " (plane:PROD mas verified_against: " verifiedAgainst[id] " — o nó afirma sobre o VIVO e declara ter olhado a FONTE; reclassifique para plane:DEV ou re-verifique contra o artefato vivo)"; fwarns++
       }
     }
-    if (ntracked == 0) print "  (nenhum nó com frescor rastreado — nada a verificar)"
+    # ── VENCIMENTO POR CADÊNCIA — STALE-EXPIRED (o bloco VENCIMENTO do shell, acima do awk) ─────
+    # O cálculo é do kg-ssot (--due). Aqui só se tira a história (superseded/refuted, o mesmo
+    # racional do laço acima, CONTADA) e se imprime. Fora do veredito: nada aqui toca em problems.
+    # Escopo diferente do laço acima DE PROPÓSITO: a cadência é opt-in do dono do nó, então vale
+    # para nó DEV sem verified_against também — quem declarou reverify_every pediu a cobrança.
+    if (dueState == "unmeasured") {
+      # O pré-filtro é TEXTO (grep de chave em começo de linha): uma narrativa que cite a chave também
+      # cai aqui. Por isso a linha diz o que se sabe, e não "o grafo declara cadência".
+      print "  ⚠ STALE-EXPIRED NÃO MEDIDO: o arquivo cita reverify_every/reverify_on e o vencimento não foi lido — " dueWhy " (isto NÃO é 0 vencidos)"; fwarns++
+    } else if (dueState == "ok") {
+      ndue = 0; nuns = 0; nev = 0; nhist = 0; nmal = 0
+      while ((getline dl < dueFile) > 0) {
+        if (dl == "") continue
+        split(dl, dc, "\t")
+        if ((dc[2] in nodeSeen) && (nstatus[dc[2]] == "superseded" || nstatus[dc[2]] == "refuted")) { nhist++; continue }
+        if (dc[1] == "DUE") {
+          print "  ⚠ STALE-EXPIRED: " dc[2] " (verificado em " dc[3] ", reverify_every " dc[4] ", venceu em " dc[5] (dc[6] + 0 > 0 ? ", " dc[6] " dia(s) de atraso" : ", hoje") " — re-verifique contra o alvo e carimbe; vencido avisa, não reprova)"; ndue++; fwarns++
+        } else if (dc[1] == "UNSTAMPED") {
+          print "  ⚠ CADENCE-UNSTAMPED: " dc[2] " (reverify_every " dc[3] " sem verified_at: legível — a cadência não tem de onde contar)"; nuns++; fwarns++
+        } else if (dc[1] == "MALFORMED") {
+          # Um aviso por nó, mesmo quando o contrato acusa forma E tipo.
+          if (!(dc[2] in malSeen)) { malSeen[dc[2]] = 1; print "  ⚠ CADENCE-MALFORMED: " dc[2] " (reverify_every recusado pelo contrato, " dc[3] " — o vencimento NÃO foi medido; use duração ISO 8601 só com data e não nula: P30D, P3M, P1Y)"; nmal++; fwarns++ }
+        } else if (dc[1] == "EVENT") nev++
+      }
+      close(dueFile)
+      if (ndue + nuns + nev + nhist + nmal > 0) print "  ℹ cadência por nó (kg-ssot --due em " hoje ", fora do veredito): " ndue " vencido(s) · " nuns " sem carimbo · " nmal " fora da forma (não medido) · " nev " só por evento (reverify_on não vence por data)" (nhist > 0 ? " · " nhist " em nó superseded/refuted, não cobrado(s)" : "")
+    }
+    if (ntracked == 0 && fwarns == 0) print "  (nenhum nó com frescor rastreado — nada a verificar)"
     else if (fwarns == 0) print "  ✅ " ntracked " nó(s) com frescor declarado" (metaBaseline != "" ? " (baseline " metaBaseline ")" : "")
     # `if` próprio, FORA da cadeia else-if: a supressão tem de aparecer mesmo quando fwarns==0.
     # Uma linha no lugar de N, e o filtro fica auditável em vez de mágico.
