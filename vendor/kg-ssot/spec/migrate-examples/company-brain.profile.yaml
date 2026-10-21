@@ -1,0 +1,79 @@
+# Exemplo: o perfil de migração de um Company Brain adotante, medido sobre um corpus real de 25 grafos e 1.024 nós
+# (2026-10-20). O plan concordou com a migração feita à mão em 1.023 nós na classe do method e em todos na locality.
+# A ordem importa: a primeira regra que casa decide. Os ids de nó são de exemplo; troque-os pelos do seu grafo.
+profile_version: "1"
+contract: kg-ssot-v4.12.0
+note: "não reverificado na migração de 2026-10-20"
+trace_placeholders: ["nunca versionad[oa]"]
+rules:
+  - id: fonte-irrecuperavel
+    why: "fonte irrecuperável: o padrão do ADOPTING é rebaixar"
+    when: {id_in: [E_SCRIPT_DE_CARGA, C_ENDPOINT_SO_NA_POC]}
+    then: {status: unverifiable}
+  - id: conversa
+    when: {trace_matches: "^(conversa|sessão)"}
+    then:
+      provenance: {source: "{trace}", locator: "a sessão citada no trace", method: {class: testemunho, detail: "decisão ou pedido do maestro em sessão"}, locality: pessoa}
+  - id: sem-trace-com-suporte
+    when: {trace_empty: true, has_supports: true}
+    then:
+      provenance: {source: "este grafo", locator: "{verified_against|supports}", method: {class: derivado, detail: "das evidências {supports} deste grafo"}, locality: repo}
+  - id: sem-trace-sem-suporte
+    when: {trace_empty: true}
+    then: {review: "sem trace e sem SUPPORTS: quem revisa decide"}
+  - id: url-de-terceiro
+    when: {trace_is_url: true, source_kind_in: [press, aggregator, sponsored-content, vendor-on-competitor, self-declared, company-site, industry-association]}
+    then:
+      provenance: {source: "{trace}", locator: "{trace}", method: {class: testemunho, detail: "fonte de terceiro ({source_kind})"}, locality: web}
+  - id: url
+    when: {trace_is_url: true}
+    then:
+      provenance: {source: "{trace}", locator: "{trace}", method: {class: leitura, detail: "documento público ({source_kind|trace})"}, locality: web}
+  - id: drive
+    when: {trace_matches: "^drive", match_case: false}
+    then:
+      provenance: {source: "{trace}", locator: "{trace}", method: {class: leitura, detail: "documento no Drive"}, locality: privado}
+  - id: caminho-inexistente
+    when: {trace_is_path: true, trace_path_exists: false}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: leitura, detail: "documento citado"}, locality: repo}
+      review: "o caminho do trace não existe na árvore: confira a fonte"
+  - id: outro-grafo
+    when: {trace_path_glob: "**/*.kg.yaml"}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: derivado, detail: "de outro grafo do corpus"}, locality: repo}
+  - id: codigo
+    when:
+      trace_path_glob: ["**/*.ts", "**/*.tsx", "**/*.py", "**/*.sql", "**/*.prisma", "**/*.tf", "**/*.yml", "**/*.json", "**/*.sh", "**/*.cjs", "**/*.properties"]
+      not: {trace_path_glob: "docs/**"}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: leitura, detail: "código-fonte, conferido contra {verified_against|trace}"}, locality: repo}
+  - id: diretorio
+    when: {trace_path_is_dir: true}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: leitura, detail: "código-fonte"}, locality: repo}
+  - id: reuniao
+    when: {trace_path_glob: "docs/meetings/**"}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: testemunho, detail: "transcrição ou ata de reunião"}, locality: repo}
+  - id: fonte-versionada
+    when: {trace_path_glob: ["docs/knowledge-base/**", "**/fontes/**", "docs/**/*.csv", "docs/**/*.json"]}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: leitura, detail: "documento-fonte versionado"}, locality: repo}
+  - id: pesquisa
+    when: {trace_path_glob: "docs/research/**"}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: derivado, detail: "síntese de pesquisa"}, locality: repo}
+  - id: prosa-interna
+    when: {trace_path_glob: "**/*.md"}
+    then:
+      provenance: {source: "{trace_path}", locator: "{trace}", method: {class: testemunho, detail: "prosa interna do Company Brain"}, locality: repo}
+scopes:
+  - id: so-o-mecanismo
+    why: "o mecanismo foi conferido no código; o fato depende de produção"
+    id_in: [C_MECANISMO_A, C_MECANISMO_B]
+    verified_scope: mecanismo
+  - id: nada-no-repo
+    why: "conferido contra o repo; nada ali sustenta nem refuta o fato"
+    id_in: [E_SCRIPT_DE_CARGA, Q_JANELA_REAL, C_SALDO_DO_DIA_8]
+    verified_scope: nenhum

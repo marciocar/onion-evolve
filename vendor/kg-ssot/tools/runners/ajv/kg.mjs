@@ -256,6 +256,10 @@ function strictTokenError(tokens) {
       if (t.type === 'tag' && (t.source === '!' || t.source === '!<!>')) return true;
       if ((t.type === 'single-quoted-scalar' || t.type === 'double-quoted-scalar')
           && t.source.split(/\r\n|\r|\n/).slice(1).some((line) => /^[ \t]*/.exec(line)[0].includes('\t'))) return true;
+      // o texto entre aspas que não fecha no próprio token: o yaml corta o escalar na quebra e lê o resto como outra
+      // coisa (aspa '' ou \" no fim da linha); o perfil recusa, como a referência
+      if (t.type === 'single-quoted-scalar' && !/^'(?:[^']|'')*'$/.test(t.source)) return true;
+      if (t.type === 'double-quoted-scalar' && !/^"(?:[^"\\]|\\[\s\S])*"$/.test(t.source)) return true;
     }
     for (const v of Object.values(t)) if (v !== null && typeof v === 'object') stack.push(v);
   }
@@ -265,8 +269,11 @@ function strictTokenError(tokens) {
 /** O parse do .kg.yaml no perfil do contrato: { doc, unquotedDate } ou { code: 'parse.*' }. */
 export function parseYaml(text) {
   let docs;
+  // O \r\n e o \r sozinho viram \n antes do parse, como na especificação do YAML e no leitor de referência (decisão
+  // de contrato de 2026-10-20): sem isso, o \r ficava como caractere dentro das aspas, e o CRLF entre aspas reprovava.
+  const src = text.includes('\r') ? text.replace(/\r\n?/g, '\n') : text;
   try {
-    const tokens = Array.from(new Parser().parse(text));
+    const tokens = Array.from(new Parser().parse(src));
     if (strictTokenError(tokens)) return { code: 'parse.yaml-error' };
     docs = Array.from(new Composer({
       version: '1.2', schema: 'core', uniqueKeys: false, merge: false, maxAliasCount: -1,

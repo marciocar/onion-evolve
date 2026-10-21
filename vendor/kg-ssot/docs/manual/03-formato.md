@@ -15,6 +15,7 @@ Convenções: **obr.** = obrigatório; *data* = texto `AAAA-MM-DD` que existe no
   `off` são texto.
 - Chaves comparadas na forma JSON: `1` e `"1"` colidem (`parse.duplicate-key`).
 - `.nan` e `.inf` reprovam em qualquer posição, porque o JSON não os representa.
+- Texto entre aspas em várias linhas: cada linha de continuação mais indentada que o mapa ou a lista que o contém.
 - Tab só dentro de aspas (fora do espaço inicial de uma linha de continuação), de bloco literal (`|` ou `>`) e de comentário. Como espaço (depois de `:`, no fim da linha,
   entre a data e a hora) ou dentro de um texto sem aspas, reprova (`parse.yaml-error`). Use espaço.
 - A tag `!` sem nome (também `!<!>`) reprova, e o `!!timestamp` explícito só aceita texto na forma de data

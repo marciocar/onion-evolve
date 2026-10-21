@@ -6,8 +6,8 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.12.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.12.0-6f42c1)](spec/release.json)
-[![Suíte: 312/312](https://img.shields.io/badge/su%C3%ADte-312%2F312-2ea44f)](spec/conformance/README.md)
+[![Contrato: v4 · release 4.13.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.13.0-6f42c1)](spec/release.json)
+[![Suíte: 328/328](https://img.shields.io/badge/su%C3%ADte-328%2F328-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
@@ -48,7 +48,7 @@ python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/require
 ```
 
 ```text
-latest: 312/312 (reprova)
+latest: 328/328 (reprova)
 optional: 10/24 (só reporta)
 PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
 REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
@@ -91,7 +91,7 @@ O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `med
 flowchart LR
   subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
     C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>312 casos em dados puros"]
+    S["Suíte de conformidade<br/>328 casos em dados puros"]
     R["Leitor de referência<br/>kg_validate.py"]
     S -- "todo leitor passa" --> R
     C --> R
@@ -128,9 +128,10 @@ flowchart LR
 | **Dois formatos, um modelo** | O `.kg.yaml` para escrever e revisar no diff, e o `.kg.json` para o runtime (um app, um servidor), lido por um parser JSON no perfil JSON do contrato (RFC 8259, I-JSON, até 128 níveis, chave única). O gate e as `external_edges` seguem só com `.kg.yaml` |
 | **Armazém com gate** | `kg_store.py` grava `.kg.yaml` ou `.kg.json` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
 | **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
-| **Suíte em dados puros** | 312 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
+| **Suíte em dados puros** | 328 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
+| **Migrador por perfil** | `kg_migrate.py` propõe a `provenance` que o contrato pede por regras que o adotante declara, mostra o plano antes e grava com invariância nó a nó |
 | **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
 | **Sem plataforma** | Python 3.11 ou mais, PyYAML e jsonschema, instalados com hash conferido (`--require-hashes`). Nenhum servidor, nenhum editor, nenhum assistente obrigatório |
 
@@ -145,11 +146,11 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.12.0`. O leitor de referência passa em 312 de 312 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.13.0`. O leitor de referência passa em 328 de 328 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre. O relógio zera a cada release com MUST novo (a última
-  foi a 4.12.0, com o tab de continuação entre aspas) e conta 30 dias a partir dela.
+  foi a 4.13.0, com a indentação de continuação entre aspas) e conta 30 dias a partir dela.
 - **Próximo:** o v5 passa a reprovar o `method` fora da forma `<classe>: <detalhe>`, que hoje só alerta.
 - **Aberto:** a camada semântica (frescor, contradição, completude de domínio) está em `optional/`, e o leitor de
   referência não a implementa: passa só nos 10 casos válidos, e os 14 que esperam um aviso ou uma reprovação

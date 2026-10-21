@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:kg-migrate-profile.schema.json",
+  "title": "Perfil de migração do adotante (kg_migrate.py)",
+  "description": "Versão 1 (2026-10-20), revisada por dois adotantes contra um corpus real. O perfil declara como o kg_migrate.py propõe a provenance que o contrato pede. O universo é fixo no código, não no perfil: nó com status confirmed ou plane PROD, sem provenance, fora o unverifiable. As regras de rules[] são lidas em ordem e a primeira cujo when casa decide; o nó que nenhuma regra casa vai para a lista de quem revisa, nunca recebe nada. O bloco scopes[] é ortogonal à cadeia: dá verified_scope a nós listados por id, que já têm ou passam a ter provenance, e o núcleo recusa (e lista) o nó sem verified_at, porque o contrato alerta o alcance sem carimbo. O perfil só escolhe dentro do contrato, nunca o relaxa: toda provenance proposta é validada contra o MUST e o SHOULD de forma do contrato antes de virar proposta (classe do method, locality, source placeholder, caminho de máquina na fonte, no locator ou no method), e o template que resolve para vazio é recusado e listado, nunca gravado. O aviso de coerência que a proposta acende no nó (integrity.testimony-in-prod, por exemplo) não barra: ele diz a verdade sobre o nó, e o nó vai para quem revisa com o aviso nomeado; o apply recusa o arquivo que ganharia qualquer aviso SHOULD que o plan não anunciou. O apply mantém a quebra de linha do arquivo (CRLF fica CRLF), recusa o arquivo com quebras misturadas e mantém o modo do arquivo. O caminho do trace é léxico: normalizado, e o que sai da raiz (../) não é caminho. Invariância: o apply relê o arquivo e compara nó a nó (o dict de cada nó igual ao de antes, fora as chaves que a ação autoriza: provenance; status, quando a ação é rebaixar; verified_scope, pelo scopes[]), e o diff de texto só pode ter linhas acrescentadas, fora a linha do status rebaixado; os comentários ficam. O apply é por arquivo, atômico, e o segundo apply não muda nada. Fora do escopo (julgamento, que fica na camada SDAAL ou com quem revisa): reescrever label, mudar plane, re-medir, refutar, reconciliar com SUPERSEDES e promover unverifiable; e as migrações de versão do contrato (acrescentar locality ou external_edges), que seriam outro modo da ferramenta. O código também recusa: ids de regra repetidos; locality privado ou verified_scope num perfil cujo contract é anterior a kg-ssot-v4.12.0. O contrato v5, em que o method vira MUST, pede profile_version 2. Semântica: trace_matches e verified_against_matches são busca (casam em qualquer ponto do texto), sensíveis a caixa a menos que o when diga match_case: false, o que vale também para os not e any_of dentro dele. O trace_path é o primeiro segmento do trace antes de ' · ', ';' ou espaço, cortado no primeiro ':'; só é caminho se tem / ou . e não começa com um esquema (http:, https:, drive:, ...). O caminho perde a âncora (#...) e o ./ do começo, e o trace_path_exists e o trace_path_is_dir o resolvem dentro da raiz do repo: absoluto, ~ ou ../ que sai dela conta como inexistente, sem consultar o disco do host. Um when que só tem match_case o código recusa, porque casaria todo nó. Sem lista de grafos, a ferramenta lê os .kg.yaml do git ls-files fora de vendor/** (e dos globs de --exclude), e o grafo dessa lista que não parseia vira linha para quem revisa, em vez de abortar. O applies_to, opcional, restringe o universo fixo pelo mesmo formato do when. O any_of casa se algum dos when internos casar. Os scopes valem para o nó que tem verified_at no estado lido; o nó sem ele é listado (rode de novo depois da re-medição). Um id em dois scopes, ou id de scope repetido, o código recusa. Os marcadores do template são conferidos pelo código, e não pelo schema, para o schema ficar portável (sem lookahead).",
+  "type": "object",
+  "required": [
+    "profile_version",
+    "contract",
+    "rules"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "profile_version": {
+      "const": "1"
+    },
+    "contract": {
+      "description": "A tag do kg-ssot para a qual o perfil foi escrito. O kg_migrate.py valida as propostas contra o contrato que ele mesmo traz (o da tag em que ele veio) e recusa o perfil que usa um recurso posterior à tag declarada (locality privado e verified_scope pedem kg-ssot-v4.12.0 ou depois).",
+      "type": "string",
+      "pattern": "^kg-ssot-v4\\.[0-9]+\\.[0-9]+$"
+    },
+    "note": {
+      "description": "Texto acrescentado ao detalhe do method de toda provenance proposta, por exemplo 'não reverificado na migração de 2026-10-20' (ADOPTING.md: a classe é a da evidência original, e o detalhe diz que a migração não re-verificou).",
+      "type": "string",
+      "minLength": 1
+    },
+    "trace_placeholders": {
+      "description": "Expressões regulares no subconjunto comum ao re do Python e ao ECMA-262 (sem lookbehind de tamanho variável nem grupos nomeados): o trace que casa alguma delas é tratado como vazio em toda a cadeia (o trace_empty casa, e o {trace} não é usado), por exemplo 'nunca versionado'.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "regex"
+      }
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    },
+    "scopes": {
+      "description": "Ortogonal às rules: verified_scope por lista explícita de ids, nunca por padrão de texto.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/scope"
+      }
+    },
+    "applies_to": {
+      "description": "Opcional: restringe o universo fixo (status confirmed ou plane PROD, sem provenance, fora o unverifiable) por um when.",
+      "$ref": "#/$defs/when"
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "nodeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nodeId"
+      }
+    },
+    "template": {
+      "description": "Texto com marcadores trocados pelo valor do nó: {trace}, {trace_path} (o trace sem o :linha), {trace_line}, {verified_against}, {supports} (os ids que chegam por SUPPORTS, separados por vírgula) e {source_kind} (a chave source_kind do nó). Um marcador com alternativas, {a|b}, vale o primeiro não vazio. Marcador desconhecido reprova o perfil (conferido pelo código); resultado vazio é recusado e listado.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?:[^{}]|\\{[a-z_|]+\\})*$"
+    },
+    "rule": {
+      "type": "object",
+      "required": [
+        "id",
+        "when",
+        "then"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "why": {
+          "description": "Por que a regra existe, em uma frase; vai para a planilha de propostas.",
+          "type": "string"
+        },
+        "when": {
+          "$ref": "#/$defs/when"
+        },
+        "then": {
+          "$ref": "#/$defs/then"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "id",
+        "id_in",
+        "verified_scope"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/slug"
+        },
+        "why": {
+          "type": "string"
+        },
+        "id_in": {
+          "$ref": "#/$defs/ids"
+        },
+        "verified_scope": {
+          "enum": [
+            "fato",
+            "mecanismo",
+            "nenhum"
+          ]
+        }
+      }
+    },
+    "globs": {
+      "description": "Um glob ou uma lista (casa se algum casar), sobre o caminho do trace relativo à raiz do repo. Dialeto: ** atravessa zero ou mais pastas, * não atravessa /, ? é um caractere, e não há chaves {a,b}: use a lista.",
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^{}]*$"
+        },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[^{}]*$"
+          }
+        }
+      ]
+    },
+    "when": {
+      "description": "Todos os predicados presentes têm de casar (E lógico); pelo menos um é obrigatório. O not casa quando o when interno não casa.",
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "id_in": {
+          "$ref": "#/$defs/ids"
+        },
+        "node_type_in": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "entity",
+              "claim",
+              "decision",
+              "question",
+              "evidence",
+              "artifact",
+              "state",
+              "event",
+              "rule",
+              "invariant",
+              "policy"
+            ]
+          }
+        },
+        "status_in": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "open",
+              "confirmed",
+              "drifted",
+              "unverifiable",
+              "refuted",
+              "superseded",
+              "done"
+            ]
+          }
+        },
+        "plane": {
+          "enum": [
+            "DEV",
+            "PROD"
+          ]
+        },
+        "trace_empty": {
+          "description": "true: o nó não tem trace, só espaço, ou um trace que casa trace_placeholders.",
+          "type": "boolean"
+        },
+        "trace_matches": {
+          "description": "Expressão regular (o mesmo subconjunto de trace_placeholders), por busca: casa em qualquer ponto do trace.",
+          "type": "string",
+          "format": "regex"
+        },
+        "trace_is_url": {
+          "type": "boolean"
+        },
+        "trace_is_path": {
+          "description": "true: o trace tem um caminho de arquivo (a extração do trace_path deu algo).",
+          "type": "boolean"
+        },
+        "trace_is_self": {
+          "description": "true: o trace aponta o próprio arquivo do grafo (fonte circular).",
+          "type": "boolean"
+        },
+        "trace_path_exists": {
+          "description": "true: o caminho do trace (sem o :linha) existe na árvore do repo.",
+          "type": "boolean"
+        },
+        "trace_path_is_dir": {
+          "type": "boolean"
+        },
+        "trace_path_glob": {
+          "$ref": "#/$defs/globs"
+        },
+        "verified_against_matches": {
+          "description": "Expressão regular (o mesmo subconjunto), por busca, sobre o verified_against.",
+          "type": "string",
+          "format": "regex"
+        },
+        "match_case": {
+          "description": "false: trace_matches e verified_against_matches ignoram a caixa. Default true.",
+          "type": "boolean"
+        },
+        "has_supports": {
+          "description": "true: chega ao nó pelo menos uma aresta SUPPORTS (das edges do arquivo, não das external_edges) de um nó que não é unverifiable no estado de ANTES da rodada.",
+          "type": "boolean"
+        },
+        "source_kind_in": {
+          "description": "Sobre a chave source_kind do nó.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "not": {
+          "$ref": "#/$defs/when"
+        },
+        "any_of": {
+          "description": "Casa se algum dos when internos casar.",
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/when"
+          }
+        }
+      }
+    },
+    "then": {
+      "description": "Uma ação: propor provenance, rebaixar para unverifiable, ou só listar (review sozinho). O review junto de uma das duas primeiras aplica e também lista o nó para quem revisa.",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "provenance": {
+          "type": "object",
+          "required": [
+            "source",
+            "locator",
+            "method"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "$ref": "#/$defs/template"
+            },
+            "locator": {
+              "$ref": "#/$defs/template"
+            },
+            "method": {
+              "type": "object",
+              "required": [
+                "class",
+                "detail"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "class": {
+                  "enum": [
+                    "medição",
+                    "leitura",
+                    "juízes",
+                    "derivado",
+                    "testemunho"
+                  ]
+                },
+                "detail": {
+                  "$ref": "#/$defs/template"
+                }
+              }
+            },
+            "locality": {
+              "description": "Omitida: a provenance sai sem a chave (o núcleo não deriva).",
+              "enum": [
+                "repo",
+                "web",
+                "host",
+                "pessoa",
+                "privado"
+              ]
+            }
+          }
+        },
+        "status": {
+          "description": "Rebaixar: o nó cuja fonte é irrecuperável vira unverifiable (ADOPTING.md) e não ganha provenance.",
+          "const": "unverifiable"
+        },
+        "review": {
+          "description": "O motivo com que o nó vai para a lista de quem revisa.",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "not": {
+        "required": [
+          "provenance",
+          "status"
+        ]
+      }
+    }
+  }
+}

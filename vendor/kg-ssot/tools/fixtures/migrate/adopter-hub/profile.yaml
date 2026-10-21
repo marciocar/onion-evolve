@@ -1,0 +1,218 @@
+# O perfil da migração medida no corpus.tgz ao lado: as regras de spec/migrate-examples/company-brain.profile.yaml com
+# os ids reais (em hash) dos nós rebaixados e dos scopes.
+profile_version: '1'
+contract: kg-ssot-v4.12.0
+note: não reverificado na migração de 2026-10-20
+trace_placeholders:
+- nunca versionad[oa]
+rules:
+- id: fonte-irrecuperavel
+  why: 'fonte irrecuperável: o padrão do ADOPTING é rebaixar'
+  when:
+    id_in:
+    - N_3DD659BE5305
+    - N_79BB50DE896A
+  then:
+    status: unverifiable
+- id: conversa
+  when:
+    trace_matches: ^(conversa|sessão)
+  then:
+    provenance:
+      source: '{trace}'
+      locator: a sessão citada no trace
+      method:
+        class: testemunho
+        detail: decisão ou pedido do maestro em sessão
+      locality: pessoa
+- id: sem-trace-com-suporte
+  when:
+    trace_empty: true
+    has_supports: true
+  then:
+    provenance:
+      source: este grafo
+      locator: '{verified_against|supports}'
+      method:
+        class: derivado
+        detail: das evidências {supports} deste grafo
+      locality: repo
+- id: sem-trace-sem-suporte
+  when:
+    trace_empty: true
+  then:
+    review: 'sem trace e sem SUPPORTS: quem revisa decide'
+- id: url-de-terceiro
+  when:
+    trace_is_url: true
+    source_kind_in:
+    - press
+    - aggregator
+    - sponsored-content
+    - vendor-on-competitor
+    - self-declared
+    - company-site
+    - industry-association
+  then:
+    provenance:
+      source: '{trace}'
+      locator: '{trace}'
+      method:
+        class: testemunho
+        detail: fonte de terceiro ({source_kind})
+      locality: web
+- id: url
+  when:
+    trace_is_url: true
+  then:
+    provenance:
+      source: '{trace}'
+      locator: '{trace}'
+      method:
+        class: leitura
+        detail: documento público ({source_kind|trace})
+      locality: web
+- id: drive
+  when:
+    trace_matches: ^drive
+    match_case: false
+  then:
+    provenance:
+      source: '{trace}'
+      locator: '{trace}'
+      method:
+        class: leitura
+        detail: documento no Drive
+      locality: privado
+- id: caminho-inexistente
+  when:
+    trace_is_path: true
+    trace_path_exists: false
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: leitura
+        detail: documento citado
+      locality: repo
+    review: 'o caminho do trace não existe na árvore: confira a fonte'
+- id: outro-grafo
+  when:
+    trace_path_glob: '**/*.kg.yaml'
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: derivado
+        detail: de outro grafo do corpus
+      locality: repo
+- id: codigo
+  when:
+    trace_path_glob:
+    - '**/*.ts'
+    - '**/*.tsx'
+    - '**/*.py'
+    - '**/*.sql'
+    - '**/*.prisma'
+    - '**/*.tf'
+    - '**/*.yml'
+    - '**/*.json'
+    - '**/*.sh'
+    - '**/*.cjs'
+    - '**/*.properties'
+    not:
+      trace_path_glob: docs/**
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: leitura
+        detail: código-fonte, conferido contra {verified_against|trace}
+      locality: repo
+- id: diretorio
+  when:
+    trace_path_is_dir: true
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: leitura
+        detail: código-fonte
+      locality: repo
+- id: reuniao
+  when:
+    trace_path_glob: docs/meetings/**
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: testemunho
+        detail: transcrição ou ata de reunião
+      locality: repo
+- id: fonte-versionada
+  when:
+    trace_path_glob:
+    - docs/knowledge-base/**
+    - '**/fontes/**'
+    - docs/**/*.csv
+    - docs/**/*.json
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: leitura
+        detail: documento-fonte versionado
+      locality: repo
+- id: pesquisa
+  when:
+    trace_path_glob: docs/research/**
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: derivado
+        detail: síntese de pesquisa
+      locality: repo
+- id: prosa-interna
+  when:
+    trace_path_glob: '**/*.md'
+  then:
+    provenance:
+      source: '{trace_path}'
+      locator: '{trace}'
+      method:
+        class: testemunho
+        detail: prosa interna do Company Brain
+      locality: repo
+scopes:
+- id: so-o-mecanismo
+  id_in:
+  - N_2A475FF8B19B
+  - N_31DA319236B6
+  - N_33E8A7E769FA
+  - N_46BEC22092A7
+  - N_569BE057E8DC
+  - N_5CA47AF13284
+  - N_710B2B5F22A9
+  - N_A459B0D9C938
+  - N_B8966AF3D68A
+  - N_CDF828602868
+  - N_E7254431D320
+  - N_E99BF4287FE7
+  - N_EF76CFB32CF0
+  - N_F1F0AE848B9B
+  - N_FCB48517D915
+  verified_scope: mecanismo
+- id: nada-no-repo
+  id_in:
+  - N_02CB61C4D8CB
+  - N_3DD659BE5305
+  - N_75B17070022A
+  verified_scope: nenhum
