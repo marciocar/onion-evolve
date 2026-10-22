@@ -71,6 +71,14 @@
 #   (sem aspas, sem normalização Unicode). A forma de escape no transporte (é vs é) não entra no hash —
 #   o mesmo efeito que a JCS (RFC 8785) busca, e o bridge re-serializa o envelope (JSON.parse/stringify) antes
 #   do gate, então hash sobre os bytes crus quebraria. Corpo não-string → body-not-string.
+# DESTINO DO TRUST-LOG (2026-10-22): A2A_TRUST_LOG=<arquivo absoluto> grava a trilha de auditoria (as linhas de
+#   sucesso, via trust-check, e as de veto rotulado) FORA do --repo. Sem ela, segue em
+#   <repo>/docs/evolution/trust-log.md. Motivo medido: o onion-bridge roda este gate com o REPO = o CLONE SERVIDO
+#   do core, e a trilha caía num arquivo RASTREADO desse clone; cada update-bridge a guardava num stash (7 stashes,
+#   16 eventos que nunca chegaram ao repo). O destino é julgado pelo trust-topology-check.sh --check-log-dest (um
+#   juiz só, o dono do log) ANTES de qualquer camada, inclusive em --dry-run e na reverificação: destino inseguro
+#   (relativo, diretório ausente, symlink, de outro dono, gravável/legível por outros) → veto
+#   trust-log-unsafe:<motivo>, layer trust-log. Nunca cai em silêncio no caminho antigo.
 # Exit: 0 = verified · 1 = vetoed · 2 = uso incorreto
 # Exercitado por lint-selftest.sh (run_a2a_verify_selftests).
 # =============================================================================
@@ -126,13 +134,29 @@ veto() {  # <reason> <layer>
 FROM_SHAPED=""
 _log_declared_veto() {
   [ -z "${DRY}" ] && [ -z "${REVERIFY_AT}" ] && [ -n "${FROM_SHAPED}" ] || return 0
-  local log="${REPO}/docs/evolution/trust-log.md" why
-  [ -f "${log}" ] || return 0   # o cabeçalho é do trust-topology-check.sh; sem o arquivo, não o invento
+  local log="${TRUST_LOG}" why
+  if [ -n "${TRUST_LOG_DEST}" ]; then
+    # destino explícito: o cabeçalho continua do trust-topology-check.sh, que o cria 0600 se faltar
+    bash "${TRUST_CHECK}" --ensure-log >/dev/null 2>&1 \
+      || { echo "a2a-verify: AVISO: não preparei o destino do trust-log (${log})" >&2; return 0; }
+  else
+    [ -f "${log}" ] || return 0   # o cabeçalho é do trust-topology-check.sh; sem o arquivo, não o invento
+  fi
   why="$(printf '%s' "$1" | tr -cd 'A-Za-z0-9._:-' | cut -c1-80)"
   printf '| %s | %s (declarado, não provado) | %s | relay | BLOQUEADO | veto do gate a2a-verify: %s |\n' \
     "$(date '+%F %H:%M')" "${FROM_SHAPED}" "${RECEIVER}" "${why}" >> "${log}" 2>/dev/null \
     || echo "a2a-verify: AVISO: não gravei o veto no trust-log (${log})" >&2
 }
+
+# --- Destino do trust-log (A2A_TRUST_LOG, 2026-10-22): julgado ANTES de toda camada ---------------------
+# FROM_SHAPED ainda vazio: o veto daqui nunca tenta gravar no destino recusado.
+TRUST_LOG_DEST="${A2A_TRUST_LOG:-}"
+TRUST_LOG="${REPO}/docs/evolution/trust-log.md"
+if [ -n "${TRUST_LOG_DEST}" ]; then
+  [ -f "${TRUST_CHECK}" ] || veto "trust-check-absent" "trust-log"
+  TL_WHY="$(bash "${TRUST_CHECK}" --check-log-dest 2>/dev/null)" || veto "trust-log-unsafe:${TL_WHY:-unjudged}" "trust-log"
+  TRUST_LOG="${TRUST_LOG_DEST}"
+fi
 
 # --- Camada 0b (forma): o receptor vira nome de arquivo (estado de jti) e é ecoado no veredito ---------
 # Forma fechada ANTES de qualquer uso, casada em LC_ALL=C (faixa de caractere em outro locale casaria letra

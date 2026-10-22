@@ -226,7 +226,16 @@ log "backup: $(tail -1 <<<"${BK_OUT}")"
 #       clone; o /a2a spawna o gate do core — reescrever sob leitor vivo é corrida) ───────
 sudo systemctl stop "${UNIT}"
 trap 'sudo systemctl start '"${UNIT}"' || echo "[update-bridge] ATENÇÃO: religamento automático FALHOU — serviço PARADO" >&2' EXIT
-if [ -n "$(sudo -u onion git -C "${CLONE}" status --porcelain)" ]; then
+RESIDUE="$(sudo -u onion git -C "${CLONE}" status --porcelain)"
+if [ -n "${RESIDUE}" ]; then
+  # TRUST-LOG NO RESÍDUO (2026-10-22): a trilha de auditoria do A2A não tem mais por que cair no clone — o
+  # bridge passa A2A_TRUST_LOG=<data/>a2a-trust-log.md ao gate. Se ela aparece aqui, o bridge servido ainda
+  # é anterior a essa cura (ou perdeu a env), e as linhas vão para o stash como antes: o stash NÃO muda
+  # (o resíduo segue recuperável), só deixa de ser silencioso. Medido: 7 stashes, 16 eventos presos.
+  if grep -qE '^.. docs/evolution/trust-log\.md$' <<<"${RESIDUE}"; then
+    log "AVISO: o resíduo inclui docs/evolution/trust-log.md — o gate gravou a auditoria A2A no clone servido;" \
+        "confira se o bridge passa A2A_TRUST_LOG e colha as linhas do stash para o repo"
+  fi
   # STASH, não diff-para-arquivo: git diff não carrega o CONTEÚDO de untracked (só o nome),
   # e o clean -fd apagaria o resto; e arquivo em claro em ${DEST} é BACKUP-EM-CLARO (HARD
   # no vps-exposure-check) nascendo root na home do maestro. O stash guarda rastreado E

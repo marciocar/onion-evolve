@@ -84,6 +84,12 @@ Até 2026-10-14 a assinatura cobria **só os claims**: trocar `signal.body` depo
   repo de cada remetente, pela sessão dele: o core não escreve lá.
 - **O trust-log recebe a linha DEPOIS da assinatura** (SAC-150 N4): a camada 1 decide em `--dry-run`, e só o
   envelope que passou em tudo grava a linha, com o `from` já provado. Veto antes da assinatura não vira fato no log.
+- **Onde o trust-log mora** (2026-10-22): `A2A_TRUST_LOG=<arquivo absoluto>` tira a trilha do `--repo`. O bridge
+  a aponta para o `data/` dele, porque o `--repo` dele é o clone servido do core e o arquivo rastreado de lá ia
+  parar num stash a cada update (7 stashes, 16 eventos medidos). Sem a env, o log segue em
+  `docs/evolution/trust-log.md`. Destino inseguro (relativo, diretório ausente, symlink, de outro dono, gravável
+  ou legível por outros) veta `trust-log-unsafe:<motivo>` antes de qualquer camada; o juiz é o
+  `trust-topology-check.sh --check-log-dest`, e o arquivo nasce 0600.
 - **O relógio:** a medição vence o atestado. `A2A_CLOCK_TRUST=attested` vale só onde nenhuma fonte mediu
   dessincronia (timedatectl `NTPSynchronized=no`, chronyc sem `Leap Normal`, ntpstat rc 1 vencem o atestado).
 - **A reverificação do aceite** (`--reverify-at <epoch>`, SAC-150 N1): o `a2a-accept.sh` passa o envelope
