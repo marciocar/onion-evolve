@@ -2,7 +2,8 @@
 branch: docs/a2a-degrau-b-canary-restore
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: cd199121208fb44756810251c7735f681246c5875aea58b0b0df0f4e8dc46809
+reviewed_code_sha256: aeff33ca203c4c43d387d4c92a0a43e53c41f37dbfa0ba2df9e6fac53c3dc8b7
 findings_total: 1
 findings_real: 1
 tokens: 0
