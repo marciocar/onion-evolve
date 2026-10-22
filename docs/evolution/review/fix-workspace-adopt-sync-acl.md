@@ -2,7 +2,8 @@
 branch: fix/workspace-adopt-sync-acl
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ecf410dec37283049c7c17df57f139657f8d2911a7c53e8e536136ce760c660f
+reviewed_code_sha256: a08494c25688cd0492ecb7948ce3f16ca041384826adfeea4859786f149255f9
 findings_total: 2
 findings_real: 2
 tokens: 0
