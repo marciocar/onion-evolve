@@ -2,7 +2,8 @@
 branch: docs/trust-log-harvest-2
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e6fb510feace914fe8a5c409ef8c855b4d18ffc7a9f0aa22083cfe6aa4156369
+reviewed_code_sha256: 10e1c9882f6d8328b18173354390d90c35ac3d60cf07dfdff1cffa19d5f19d7a
 findings_total: 0
 findings_real: 0
 tokens: 0
