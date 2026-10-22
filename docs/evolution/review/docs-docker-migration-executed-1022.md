@@ -2,7 +2,8 @@
 branch: docs/docker-migration-executed-1022
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8e497d1cd43b83a776c299d21870c446ad53433f413ed7eafb25bf0ed6b57716
+reviewed_code_sha256: 1222bb485d011f5164052051c653ed033471113f2e8c874825c4749010b1d49f
 findings_total: 0
 findings_real: 0
 tokens: 0
