@@ -20,6 +20,7 @@
 # Uso:
 #   bash ops/workspace-adopt-sync.sh stage  /var/lib/onion-bridge/workspaces/<id> [<pai>]   # imprime o staging
 #   bash ops/workspace-adopt-sync.sh apply  /var/lib/onion-bridge/workspaces/<id> <staging>
+#   bash ops/workspace-adopt-sync.sh reapply /var/lib/onion-bridge/workspaces/<id> <staging>   # só metadados (dono, modo, ACL)
 #   bash ops/workspace-adopt-sync.sh verify /var/lib/onion-bridge/workspaces/<id>
 #   bash ops/workspace-adopt-sync.sh --selftest        # sandbox mktemp, sem sudo, nunca toca o real
 #   bash ops/workspace-adopt-sync.sh --selftest-mutants  # cada guarda derrubada numa cópia tem de reprovar
@@ -92,18 +93,42 @@ cmd_apply() {
   done < <(find "$st/ws" -type l)
   echo "── nomes que mudam no vivo (rsync --dry-run) ──"
   sudo_do rsync -aAX --delete --dry-run --itemize-changes "${ENV_EXCLUDES[@]}" "$st/ws/" "$ws/" | grep -v '^\.[dfL] ' | head -n 200 || true
+  sync_to_live "$st" "$ws"
+  echo "workspace-adopt-sync: apply ok — $ws"
+}
+
+# sync_to_live <staging> <ws>: backup com ACL, rsync SEM --chown, e o dono devolvido por find.
+# POR QUE SEM --chown (medido no 1º apply real, 2026-10-22): o `--chown=U:G` do rsync é `--usermap=*:U
+# --groupmap=*:G`, e o mapa vale também para os grupos NOMEADOS do ACL — o `group:onion-chat` (o grupo do runner do
+# convidado, posto pelo ops/chat-runner.sh) virou `group:onion` no workspace inteiro. O staging estava certo.
+sync_to_live() {
+  local st="$1" ws="$2" ts id bk suid
+  need_path "$ws"; need_path "$st"
   ts="$(date -u +%Y%m%d-%H%M%S)"; id="$(basename "$ws")"
   sudo_do mkdir -p "$BACKUP_DIR"
   bk="$BACKUP_DIR/$id-$ts.tar.gz"
-  sudo_do tar -C "$(dirname "$ws")" -czf "$bk" "$id"
+  sudo_do tar --acls --xattrs --numeric-owner -C "$(dirname "$ws")" -czpf "$bk" "$id"
   echo "backup: $bk"
-  echo "rollback: sudo rm -rf '$ws' && sudo tar -C '$(dirname "$ws")' -xzpf '$bk'"
+  echo "rollback: sudo rm -rf '$ws' && sudo tar --acls --xattrs --numeric-owner -C '$(dirname "$ws")' -xzpf '$bk'"
+  sudo_do rsync -aAX --numeric-ids --delete "${ENV_EXCLUDES[@]}" "$st/ws/" "$ws/"   # guard:aclmap
   if [ -n "$OWNER" ]; then
-    sudo_do rsync -aAX --delete --chown="$OWNER" "${ENV_EXCLUDES[@]}" "$st/ws/" "$ws/"
-  else
-    sudo_do rsync -aAX --delete "${ENV_EXCLUDES[@]}" "$st/ws/" "$ws/"
+    suid="$(stat -c %u "$st/ws")"
+    sudo_do find "$ws" -xdev -uid "$suid" -exec chown -h "$OWNER" {} +
   fi
-  echo "workspace-adopt-sync: apply ok — $ws (backup $bk)"
+}
+
+# reapply <ws> <staging>: refaz SÓ os metadados (dono, modo, ACL) a partir do staging, quando o CONTEÚDO do vivo já é
+# o do staging — o conserto de um apply que acertou o conteúdo e errou o metadado. Conteúdo diferente recusa.
+cmd_reapply() {
+  local ws st diffs
+  ws="$(check_target "$1")" || exit 2; st="${2%/}"
+  [ -f "$st/.wsync-stage" ] || die "reapply sem stage: $st não tem o marcador"
+  [ "$(cat "$st/target")" = "$ws" ] || die "o staging é de outro workspace ($(cat "$st/target"))"
+  need_path "$ws"; need_path "$st"
+  diffs="$(sudo_do rsync -rlc --dry-run --delete --itemize-changes --exclude=/.git/index "${ENV_EXCLUDES[@]}" "$st/ws/" "$ws/" | grep -E '^(\*deleting|[<>ch])' || true)"
+  [ -z "$diffs" ] || die "o conteúdo do vivo difere do staging ($(printf '%s\n' "$diffs" | head -n 3 | tr '\n' ' ')): reapply só corrige metadados"   # guard:reapply
+  sync_to_live "$st" "$ws"
+  echo "workspace-adopt-sync: reapply ok — $ws"
 }
 
 cmd_verify() {
@@ -135,7 +160,7 @@ cmd_verify() {
 selftest() {
   local pass=0 fail=0 SB ws st out rc
   SB="$(mktemp -d)"; trap 'rm -rf "${SB:-}"' EXIT
-  PREFIX="$SB/workspaces"; BACKUP_DIR="$SB/backups"; OWNER=""; SUDO_CMD=""; RUN_AS_SERVICE=()
+  PREFIX="$SB/workspaces"; BACKUP_DIR="$SB/backups"; OWNER="$(id -un):$(id -gn)"; SUDO_CMD=""; RUN_AS_SERVICE=()
   ok() { echo "  ✓ $1"; pass=$((pass+1)); }
   ko() { echo "  ✗ $1"; fail=$((fail+1)); }
   mkws() { rm -rf "$PREFIX"; mkdir -p "$PREFIX/0123abcd/.claude/commands/meta" "$PREFIX/0123abcd/docs"
@@ -146,9 +171,20 @@ selftest() {
   mkws; st="$(cmd_stage "$ws" "$SB" 2>/dev/null)"
   if [ -f "$st/ws/CLAUDE.md" ] && [ ! -e "$st/ws/.env" ] && [ ! -e "$st/ws/.env.local" ]; then ok "stage copia o workspace e deixa os .env de fora"; else ko "stage: cópia ou .env"; fi
   echo novo > "$st/ws/.claude/commands/meta/decide.md"; rm "$st/ws/docs/sai.md"
+  # grupo NOMEADO no ACL (no vivo, o do runner do convidado): um gid que não é o primário de quem roda
+  local xg; xg="$(id -G | tr ' ' '\n' | grep -vx "$(id -g)" | head -n 1)"; [ -n "$xg" ] || xg=987
+  setfacl -m "g:${xg}:rwx" "$st/ws/CLAUDE.md"
   if (cmd_apply "$ws" "$st" >/dev/null 2>&1) && [ -f "$ws/.claude/commands/meta/decide.md" ] && [ ! -e "$ws/docs/sai.md" ]; then ok "apply leva o novo e tira o que o update tirou"; else ko "apply feliz"; fi
   if [ "$(cat "$ws/.env")" = SEGREDO ] && [ -f "$ws/.env.local" ]; then ok ".env do vivo sobrevive ao --delete"; else ko ".env apagado ou trocado"; fi
   if ls "$BACKUP_DIR"/0123abcd-*.tar.gz >/dev/null 2>&1; then ok "backup timestampado criado"; else ko "sem backup"; fi
+  if getfacl -n -p --omit-header "$ws/CLAUDE.md" 2>/dev/null | grep -qx "group:${xg}:rwx"; then ok "o grupo nomeado do ACL chega intacto (sem o remapeio do --chown)"; else ko "ACL remapeado no apply"; fi
+
+  # reapply: só metadados — com o conteúdo igual ao staging restaura o ACL; com conteúdo diferente recusa
+  setfacl -b "$ws/CLAUDE.md"
+  if (cmd_reapply "$ws" "$st" >/dev/null 2>&1) && getfacl -n -p --omit-header "$ws/CLAUDE.md" | grep -qx "group:${xg}:rwx"; then ok "reapply restaura o ACL com o conteúdo igual"; else ko "reapply não restaurou"; fi
+  echo outro > "$ws/CLAUDE.md"
+  rc=0; (cmd_reapply "$ws" "$st" >/dev/null 2>&1) || rc=$?
+  if [ "$rc" = 2 ] && [ "$(cat "$ws/CLAUDE.md")" = outro ]; then ok "reapply com conteúdo diferente → recusa, nada escrito"; else ko "reapply aceitou conteúdo diferente (rc=$rc)"; fi
 
   mkws; st="$(cmd_stage "$ws" "$SB" 2>/dev/null)"; echo novo > "$st/ws/n.md"; sleep 0.01; echo mudou > "$ws/CLAUDE.md"
   rc=0; (cmd_apply "$ws" "$st" >/dev/null 2>&1) || rc=$?
@@ -195,9 +231,11 @@ selftest() {
 mutants() {
   local self tmp g killed=0 total=0
   self="$(realpath "${BASH_SOURCE[0]}")"; tmp="$(mktemp -d)"
-  for g in symlink prefix stagemark stagetarget manifest stagelink envstage; do
+  for g in symlink prefix stagemark stagetarget manifest stagelink envstage aclmap reapply; do
     total=$((total+1))
-    if [ "$g" = envstage ]; then
+    if [ "$g" = aclmap ]; then
+      sed 's/rsync -aAX --numeric-ids --delete "${ENV_EXCLUDES\[@\]}" "\$st\/ws\/" "\$ws\/"   # guard:aclmap/rsync -aAX --delete --chown="$OWNER" "${ENV_EXCLUDES[@]}" "$st\/ws\/" "$ws\/"/' "$self" > "$tmp/m.sh"
+    elif [ "$g" = envstage ]; then
       sed 's/"${ENV_EXCLUDES\[@\]}" "\$ws\/" "\$st\/ws\/"   # guard:envstage/"$ws\/" "$st\/ws\/"/' "$self" > "$tmp/m.sh"
     else
       sed "/# guard:${g}\$/s/|| die /|| : /; /# guard:${g}\$/s/&& die /\&\& : /; /# guard:${g}\$/s/) die /) : /" "$self" > "$tmp/m.sh"
@@ -213,6 +251,7 @@ mutants() {
 case "${1:-}" in
   stage)  [ $# -ge 2 ] || die "uso: stage <workspace> [<pai>]"; cmd_stage "$2" "${3:-}" ;;
   apply)  [ $# -eq 3 ] || die "uso: apply <workspace> <staging>"; cmd_apply "$2" "$3" ;;
+  reapply) [ $# -eq 3 ] || die "uso: reapply <workspace> <staging>"; cmd_reapply "$2" "$3" ;;
   verify) [ $# -eq 2 ] || die "uso: verify <workspace>"; cmd_verify "$2" ;;
   --selftest) selftest ;;
   --selftest-mutants) mutants ;;
