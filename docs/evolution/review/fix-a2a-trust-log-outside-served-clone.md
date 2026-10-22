@@ -3,7 +3,8 @@ title: "Revisão — o trust-log do gate A2A ganha destino explícito fora do cl
 date: 2026-10-22
 branch: fix/a2a-trust-log-outside-served-clone
 reviewer: "subagente refutador de contexto limpo, com o diff e a lente do transporte A2A, medindo em sandbox (mktemp) e rodando a bancada"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4d88b46d1f8b64a2a94393cf7f4e664694bd41967e30b40bd217ffb790720936
+reviewed_code_sha256: 8f016bf52a6b7ba1bc1455e0ea9add3ff79226063abfb1144cf01e808d5c1a2a
 findings_total: 5
 findings_real: 5
 verdict: APROVADO
