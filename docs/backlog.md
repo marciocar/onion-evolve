@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**614 itens abertos** em 119 grafo(s) com aberto (de 152 no escopo) · 120 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**616 itens abertos** em 120 grafo(s) com aberto (de 153 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1093,6 +1093,13 @@
 | 4.5 | `Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-21-r15 | o revisor de IA do CI no pin v1.0.257 (CLI 2.1.307) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a |
 | 2.8 | `C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO` | radar-E3-2026-10-21-r15 | a leitura do aviso real que o modelo recebe, extraída do binário de cada versão instalada (2.1.304 a 2.1.307), em vez do resumo |
 | 2.8 | `C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA` | radar-E3-2026-10-21-r15 | a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304: WebFetch direto num buscador conta como contornar o teto? |
+
+## radar-E3-2026-10-22-r16 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_REVISOR_NO_PIN_1_0_258_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-22-r16 | o revisor de IA do CI no pin v1.0.258 (CLI 2.1.308) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a |
+| 2.4 | `Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022` | radar-E3-2026-10-22-r16 | o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda |
 
 ## rea-method-2026-10 — 2 item(ns)
 
