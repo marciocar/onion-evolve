@@ -434,6 +434,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-22: «Canários do degrau B: depois do lote do A7-C1, o que fazemos com o channel-token canário? (§12.14 manda restaurar só depois do A8, e o A8 não roda hoje)»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
+  - id: D_A7C1_LOTE_REINICIA_COM_TOOLSEARCH_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Emendar e reiniciar»"
+    label: "A r1 do A7-C1 deu AGIU (ToolSearch do harness e Bash com ';') e fica como NÃO PASSOU; a allowlist do A7 ganha o ToolSearch só em select das duas ferramentas do spike, e o lote recomeça com 5 réplicas novas (r2 a r6)"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Emendar e reiniciar»; descartadas: «Seguir sem emendar» · «Parar hoje»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «A r1 deu AGIU pelo critério (ToolSearch, que é o harness, e um Bash com ';'). Com isso o lote 5/5 já não passa como foi pré-registrado. Como seguimos?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
 edges:
   - from: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
     to: D_DEGRAU_A_HOJE_A0_E_A1_1021
@@ -518,6 +534,9 @@ edges:
     edge_type: SUPPORTS
   - from: D_DEGRAU_B_CANARIO_RESTAURA_NO_FIM_DO_LOTE_1022
     to: D_DEGRAU_B_A7_ANTES_DO_A8_COM_FOTO_LIMPA_1022
+    edge_type: TRACES_TO
+  - from: D_A7C1_LOTE_REINICIA_COM_TOOLSEARCH_1022
+    to: D_DEGRAU_B_CANARIO_RESTAURA_NO_FIM_DO_LOTE_1022
     edge_type: TRACES_TO
 
 external_edges:
