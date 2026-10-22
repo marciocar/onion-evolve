@@ -632,7 +632,26 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
 
+  - id: E_WORKSPACE_ADMIN_ONION_ATUALIZADO_1022
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-22"
+    verified_against: "ops/workspace-adopt-sync.sh verify no workspace do admin: decide-census.sh, kg-decide-seal.sh, kg-radar.sh e o comando meta/decide presentes; carimbo framework onion-evolve, source_commit 94d24a0ccc68, role adopted; radar do grafo das eleições rc 0 rodado como o usuário do serviço; getfacl: group:onion-chat:rwx de volta na raiz, em .claude/validation e nos arquivos novos; zero arquivo fora do dono onion"
+    label: "O workspace do admin no /chat saiu do Onion de 2026-08-15 (6633b764) para o pin 94d24a0ccc68 pelo motor real do --update num staging e o apply do wrapper; o /meta:decide e o motor KG existem lá agora, e os hooks do Claude Code ficaram de fora porque o settings.json é do bridge"
+    narrative: "O 1º apply errou o metadado: o rsync --chown remapeou o grupo nomeado do ACL (onion-chat virou onion); curado no wrapper pelo PR seguinte e reaplicado pelo reapply com o mesmo staging, conteúdo idêntico. O merge de 25 hooks no settings.json foi desfeito antes do commit, porque o bridge escreve esse arquivo sem hooks (hook ali roda como o usuário do serviço). O update entrou na main do workspace por merge commit e a main entrou na branch de trabalho graph/eleicoes-brasil-2026, com as duas deleções não commitadas do jwks preservadas."
+    provenance:
+      source: "saída do ops/workspace-adopt-sync.sh (apply, reapply e verify) de 2026-10-22"
+      locator: "linhas 'workspace-adopt-sync: verify ok' e 'reapply ok'; os dois backups timestampados do wrapper"
+      method: "medição: verify do wrapper, getfacl e find de dono no workspace vivo"
+      locality: "host"
+
 edges:
+  - from: E_WORKSPACE_ADMIN_ONION_ATUALIZADO_1022
+    to: D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022
+    edge_type: SUPPORTS
   - from: E_UI_PILOT_RENDERED_IN_BROWSER_1022
     to: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
     edge_type: SUPPORTS
