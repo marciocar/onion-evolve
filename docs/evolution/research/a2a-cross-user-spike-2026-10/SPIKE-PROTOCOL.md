@@ -1119,4 +1119,9 @@ isso passa pelo Elenxo antes do próximo lote.
 **Fechamento:**
 - canários restaurados (`plant-canaries.sh --status` diz "não plantado");
 - VPS com `NTPSynchronized=yes`;
-- o `chronyc tracking` e o desvio do notebook depois do lote ficam por conta do maestro.
+- **relógio do notebook, medido pelo maestro.** O `chrony` estava na fonte PHC0 (stratum 1) nas duas
+  medições, e a VPS com `NTPSynchronized=yes`. O desvio N−V foi medido pelo ponto médio de um `ssh date`:
+  - **antes do lote (02:27 UTC):** desvio de −0,172 s, `System time` 0,0000002 s, ida e volta de 0,701 s;
+  - **depois do lote (04:37 UTC):** desvio de −0,187 s, `System time` 0,0000004 s, ida e volta de 0,643 s.
+  O desvio fica dentro da incerteza do método, que é ±metade da ida e volta, cerca de 0,3 s. O rtt foi
+  medido num relógio só, então o desvio não entra nele.
