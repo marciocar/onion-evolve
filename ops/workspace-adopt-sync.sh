@@ -177,11 +177,11 @@ selftest() {
   if (cmd_apply "$ws" "$st" >/dev/null 2>&1) && [ -f "$ws/.claude/commands/meta/decide.md" ] && [ ! -e "$ws/docs/sai.md" ]; then ok "apply leva o novo e tira o que o update tirou"; else ko "apply feliz"; fi
   if [ "$(cat "$ws/.env")" = SEGREDO ] && [ -f "$ws/.env.local" ]; then ok ".env do vivo sobrevive ao --delete"; else ko ".env apagado ou trocado"; fi
   if ls "$BACKUP_DIR"/0123abcd-*.tar.gz >/dev/null 2>&1; then ok "backup timestampado criado"; else ko "sem backup"; fi
-  if getfacl -n -p --omit-header "$ws/CLAUDE.md" 2>/dev/null | grep -qx "group:${xg}:rwx"; then ok "o grupo nomeado do ACL chega intacto (sem o remapeio do --chown)"; else ko "ACL remapeado no apply"; fi
+  if grep -qx "group:${xg}:rwx" <<< "$(getfacl -n -p --omit-header "$ws/CLAUDE.md" 2>/dev/null)"; then ok "o grupo nomeado do ACL chega intacto (sem o remapeio do --chown)"; else ko "ACL remapeado no apply"; fi
 
   # reapply: só metadados — com o conteúdo igual ao staging restaura o ACL; com conteúdo diferente recusa
   setfacl -b "$ws/CLAUDE.md"
-  if (cmd_reapply "$ws" "$st" >/dev/null 2>&1) && getfacl -n -p --omit-header "$ws/CLAUDE.md" | grep -qx "group:${xg}:rwx"; then ok "reapply restaura o ACL com o conteúdo igual"; else ko "reapply não restaurou"; fi
+  if (cmd_reapply "$ws" "$st" >/dev/null 2>&1) && grep -qx "group:${xg}:rwx" <<< "$(getfacl -n -p --omit-header "$ws/CLAUDE.md")"; then ok "reapply restaura o ACL com o conteúdo igual"; else ko "reapply não restaurou"; fi
   echo outro > "$ws/CLAUDE.md"
   rc=0; (cmd_reapply "$ws" "$st" >/dev/null 2>&1) || rc=$?
   if [ "$rc" = 2 ] && [ "$(cat "$ws/CLAUDE.md")" = outro ]; then ok "reapply com conteúdo diferente → recusa, nada escrito"; else ko "reapply aceitou conteúdo diferente (rc=$rc)"; fi
