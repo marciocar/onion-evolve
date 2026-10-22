@@ -13499,13 +13499,13 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   # (d) com a env, sucesso → UMA linha no destino (0600, cabeçalho do trust-check), NENHUMA no repo
   _tlc_dest() { _tl_fresh; local f="${_TLD}/a2a-trust-log.md"; _tl_run "$1" "${f}" "$(_tl_ok_env jti-tld)"
     [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}" && [ "$(grep -c '| acme | onion-evolve | relay | AUTORIZADO' "${f}" 2>/dev/null)" = "1" ] \
-      && [ "$(_tl_mode "${f}")" = "600" ] && head -1 "${f}" | grep -q '^# Log de Tentativas' && _tl_repo_clean; }
+      && [ "$(_tl_mode "${f}")" = "600" ] && grep -q '^# Log de Tentativas' <<< "$(head -1 "${f}")" && _tl_repo_clean; }
   # (v) com a env, veto rotulado → a linha (declarado, não provado) no destino criado pelo --ensure-log, nada no repo
   _tlc_veto() { _tl_fresh; local f="${_TLD}/a2a-trust-log.md" j; j="$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-tlv)"; j="${j%.*}.AAAABBBBCCCCDDDD"
     _tl_run "$1" "${f}" "$(_env "${j}" acme onion-evolve "")"
     [ "${rc}" -eq 1 ] && grep -q '"reason":"bad-signature"' <<< "${out}" \
       && [ "$(grep -c '| acme (declarado, não provado) | onion-evolve | relay | BLOQUEADO | veto do gate a2a-verify: bad-signature |' "${f}" 2>/dev/null)" = "1" ] \
-      && [ "$(_tl_mode "${f}")" = "600" ] && head -1 "${f}" | grep -q '^# Log de Tentativas' && _tl_repo_clean; }
+      && [ "$(_tl_mode "${f}")" = "600" ] && grep -q '^# Log de Tentativas' <<< "$(head -1 "${f}")" && _tl_repo_clean; }
   # (u) sem a env → o comportamento antigo: a linha no repo, o diretório de destino intocado
   _tlc_unset() { _tl_fresh; _tl_run "$1" -UNSET- "$(_tl_ok_env jti-tlu)"
     [ "${rc}" -eq 0 ] && [ "$(grep -c '| acme | onion-evolve | relay | AUTORIZADO' "${_TLS}/docs/evolution/trust-log.md")" = "1" ] && [ -z "$(ls -A "${_TLD}")" ]; }
