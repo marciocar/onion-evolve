@@ -13,6 +13,7 @@ This package ships the formal KG-SSOT contract and the tools that enforce it:
 - the **per-graph gate** for CI, with a ratchet: existing debt stays named and can't get worse;
 - the **store**, which only writes what passes the contract;
 - the **reference MCP server**, which gives a model the contract and the store over stdio or local HTTP;
+- the **domain vocabulary**, with the source and verification date of each synonym, exported to SKOS-XL and Apache Ossie;
 - the **provenance exporter** to PROV-O in JSON-LD.
 
 The contract, the suite, and the verdict schema ship inside the package. The reader depends on no agent harness.
@@ -56,7 +57,7 @@ kg-conformance | tail -2
 ```
 
 ```text
-latest: 356/356 (gates the rc)
+latest: 390/390 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -70,9 +71,10 @@ Only `latest/` sets the exit code. The `optional/` cases are reported and never 
 | `kg-conformance` | Runs the bundled conformance suite against the reference reader |
 | `kg-gate` | Per-graph gate for CI: records a baseline (`--update`) and fails if anything gets worse |
 | `kg-store` | A store on disk, in git, or versioned, that only writes what passes the contract |
-| `kg-mcp` (and the `kg-ssot` alias) | Reference MCP server (stdio, or `--http` on loopback) with the tools `kg_validate`, `kg_write`, `kg_get`, `kg_list`, `kg_query`, `kg_history`, `kg_delete`, and `kg_schema_help` |
+| `kg-mcp` (and the `kg-ssot` alias) | Reference MCP server (stdio, or `--http` on loopback) with the tools `kg_validate`, `kg_write`, `kg_get`, `kg_list`, `kg_query`, `kg_terms`, `kg_history`, `kg_delete`, and `kg_schema_help` |
 | `kg-query` | Queries and projects a corpus of graphs, with edges resolved to their labels |
 | `kg-diff` | Diff by id between two graphs or between git revisions |
+| `kg-vocab` | The domain vocabulary (the `x_term` profile): lists the terms and what is due, resolves a text to its term, and exports to SKOS-XL and Apache Ossie |
 | `kg-prov-export` | Exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD |
 
 As a library, the modules live under `kg_ssot`: `kg_ssot.kg_validate`, `kg_ssot.kg_store`, `kg_ssot.kg_mcp`, and the

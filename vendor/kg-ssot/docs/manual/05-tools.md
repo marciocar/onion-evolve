@@ -92,7 +92,7 @@ Useful options:
 | `--limit N` | With `--format json`, how many occurrences per file (default 50); the summary counts all of them |
 | `-` in place of the file | Reads the graph from stdin, with no temporary file; `--stdin-format json` reads a `.kg.json` graph (default `yaml`) |
 | `--should-schema F` | With `--schema`, the SHOULD schema that goes with it (in place of the one next to it) |
-| `--due YYYY-MM-DD` | Instead of the verdict, the due report on that date (since 4.15.0): each node with `reverify_every` whose `verified_at` plus the cadence falls on or before the date, each node that has a cadence but no stamp, and each node that has only `reverify_on`. The rc is 0 (or 2 on broken input): being due never fails, and the report does not judge the graph (the gate is still `kg_gate.py`). A file that does not parse shows up as `UNREADABLE`; in a scheduled job, check that list, because the rc does not flag it. A malformed or zero cadence stays out of the report (the SHOULD warning flags it), and so does a due date after the year 9999. With `--format json`, the output uses the `kg-ssot.due/1` format (`spec/due.schema.json`) |
+| `--due YYYY-MM-DD` | Instead of the verdict, the due report on that date (since 4.15.0): each node with `reverify_every` whose `verified_at` plus the cadence falls on or before the date, each node that has a cadence but no stamp, and each node that has only `reverify_on`. Since 4.19.0 it also lists the canonical profiles with a cadence: each synonym of an `x_term` that is not retired, `x_mirror` (`synced_at` plus `resync_every`), and `x_doc_cycle` (`checked_at` plus `recheck_every`), with `subject` and `detail` in the JSON. The rc is 0 (or 2 on broken input): being due never fails, and the report does not judge the graph (the gate is still `kg_gate.py`). A file that does not parse shows up as `UNREADABLE`; in a scheduled job, check that list, because the rc does not flag it. A malformed or zero cadence stays out of the report (the SHOULD warning flags it), and so does a due date after the year 9999. With `--format json`, the output uses the `kg-ssot.due/1` format (`spec/due.schema.json`) |
 
 The `--json OUT`, `--spike`, `--git`, `--rev`, and `--list` options belong to the measurement instrument that gave
 rise to the contract (the "spike"). They write and replay a frozen legacy format and are not part of the stable
@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.18.0",
+  "release": "kg-ssot-v4.19.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 356/356 (gates the rc)
+latest: 390/390 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -509,10 +509,11 @@ adapter: the product does not depend on it, and it does not depend on any partic
 | `kg_list` | Lists the graphs in the store |
 | `kg_history` | The operations on a graph, newest first |
 | `kg_query` | The `kg_query.py` query and projection over the store: filters, the open queue, the neighborhood, and `fields`, paginated by cursor |
+| `kg_terms` | Since 4.19.0: resolves a domain term by its preferred name or a synonym (the `x_term` profile), with the source, version, and verification date of each synonym and the term that replaces a superseded one; without `text`, lists the terms |
 | `kg_schema_help` | The current contract, for a model: the full MUST and SHOULD schemas, a minimal example that passes, the integrity rules, and the fix for the most common codes |
 
 Since 4.17.2, each tool announces the MCP annotations in `tools/list`: the read tools (`kg_validate`, `kg_get`,
-`kg_list`, `kg_query`, `kg_history`, `kg_schema_help`) with `readOnlyHint` and `idempotentHint`, and `kg_write` and
+`kg_list`, `kg_query`, `kg_terms`, `kg_history`, `kg_schema_help`) with `readOnlyHint` and `idempotentHint`, and `kg_write` and
 `kg_delete` with `destructiveHint`; all of them with `openWorldHint: false`, because the store is local. They are
 hints for the client to ask for or skip confirmation; the store's gate still decides what gets written.
 
@@ -614,7 +615,7 @@ write or a name that does not exist comes with `isError: true`, so the model can
     it runs.
   - **The root of the areas:** checked at startup. An empty value, a missing root without `--init`, a file, or a link
     gives rc 2, unless you pass `--store-optional`, as with a root outside the profile.
-  - **The `untrusted_data` envelope:** `kg_get`, `kg_list`, and `kg_history` return `{"untrusted_data": ...,
+  - **The `untrusted_data` envelope:** `kg_get`, `kg_list`, `kg_history`, `kg_query`, and `kg_terms` return `{"untrusted_data": ...,
     "notice": ...}`, so the model treats text written by others as data, never as instructions.
   - **What the profile is not:** it is "behind a proxy", on a private network. It is not the OAuth profile of the MCP
     specification, which waits until there is a measured matrix of clients.
@@ -793,6 +794,41 @@ removes all three; in the meta, `meta.date`): a `verified_at` that a generator r
 and the summary counts nodes per changed field to show it. `--format json` gives `kg-ssot.diff/1`
 (`spec/diff.schema.json`). rc 0 with no difference, 1 with a difference, 2 on broken input.
 
+## `kg_vocab.py`: the domain vocabulary
+
+Reads the terms of the `x_term` profile (chapter 3) from a corpus, with `--root` or the files, and does three things:
+lists them, resolves a text to its term, and exports them.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py terms --root . --as-of 2027-05-01      # terms, synonyms, what is due
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "codigo de barras" --root .     # the term behind a text
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "cod barras" --case "edital 12" --root .
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to skos --root . > vocab.ttl
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > vocab.ossie.json
+```
+
+- **`lookup` compares without case, accents, or repeated spaces.** It matches the preferred term or a synonym. A
+  synonym scoped to a case only matches with `--case` set to that case. A retired synonym still matches, marked as
+  retired, and a superseded term comes with the terms that replace it. rc 1 when nothing matches.
+- **`terms` shows when each synonym is due** (`verified_at` plus `reverify_every`, on the `--as-of` date, today by
+  default). A retired synonym is never due.
+- **`export --to skos`** writes Turtle in SKOS-XL with the ISO 25964 names (iso-thes). The concept gets
+  `skos:prefLabel`, plus `skos:altLabel` and `skos:hiddenLabel` for the current domain synonyms, so a plain SKOS reader
+  sees them. Each label becomes an `skosxl:Label` with its literal form and its provenance (`dc:source`, `kg:locator`,
+  `kg:sourceVersion`, `kg:verifiedAt`, `kg:reverifyEvery`). A case-scoped synonym is linked by `kg:caseLabel`, with
+  `kg:scope` and `kg:case`, and not by `skosxl:altLabel`, which would imply an `skos:altLabel` valid for the whole
+  concept. A scope that cannot be read counts as a case that never matches. A retired one goes as `isothes:status "retired"`
+  and an `skos:historyNote`. A synonym that repeats a literal already said in the concept goes by `kg:repeatedLabel`, so the concept
+  never has the same label twice. A superseded term gets `dct:isReplacedBy`. The concept IRI is `<base><meta.id>#<id>`, the
+  same one `kg_prov_export.py` gives the node (`--base`, `urn:kg-ssot:graph:` by default); without `meta.id`, the
+  relative path given, or the file name, never an absolute path.
+- **`export --to ossie`** writes one item per live term for [Apache Ossie](https://github.com/open-semantic-interchange/OSI):
+  `name` (the preferred term), `description`, `ai_context.synonyms` (the current domain synonyms), and a
+  `custom_extensions` entry from `KG_SSOT` with the provenance of each synonym, because Ossie has no field for it. You
+  merge each item into the entity of your semantic model (dataset, field, or metric) by name.
+- With `--format json`, `terms` and `lookup` use the `kg-ssot.vocab/1` format (`spec/vocab.schema.json`). The tool does
+  not judge: an `x_term` outside the profile is read as far as it can be, and the SHOULD flags the rest.
+
 ## `kg_prov_export.py`: provenance in PROV-O
 
 Exports a `.kg.yaml` to [PROV-O](https://www.w3.org/TR/prov-o/) in JSON-LD, for anyone who already uses tools from the
@@ -894,3 +930,20 @@ finishes; rc 1 when `apply` refused a file, which stays as it was, with the reas
 (a profile outside the schema, a repeated rule or id, an invalid regular expression, a `when` that would match every
 node, a graph given on the command line that does not parse). The migrator travels in the vendor, not in the PyPI or
 npm package.
+
+### `keys`: a foreign key becomes `x_<key>` (4.19.0)
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py keys            # the plan: what would be renamed, and what goes to review
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py keys --apply    # writes the renames
+```
+
+A key the contract does not know fails in the MUST. `keys` renames it to `x_<key>`, the extension prefix, in the top
+level, `meta`, nodes, edges, and external edges, by text, so comments stay. The known keys come from the MUST schema of
+the release, never from a list in the code. A key goes to the reviewer instead when it is not a slug, when `x_<key>`
+already exists in the same mapping, or when the new name is a canonical profile (`severity` would become `x_severity`,
+whose value the profile judges). With `--apply`, each file is written only if the reread document equals the old one
+with only the renamed keys, the diff touches only those lines, and the file gains no MUST code or SHOULD warning. The
+line ending is kept, a file with mixed line endings is refused, and running it again changes nothing. Measured on a copy
+of the 15 graphs of the core that failed the MUST on a foreign key: with `meta.title` known since v4.11 and 76 keys
+renamed in 12 files, 14 of them pass; the one left also lacks provenance.

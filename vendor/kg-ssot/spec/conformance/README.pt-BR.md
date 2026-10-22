@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:e133365c2634eeb1 -->
+<!-- translation-of: spec/conformance/README.md sha256:9554220eb35d4420 -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -235,7 +235,7 @@ estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `sp
 (por exemplo, `trigger` em `integrity-trigger`). O PR da promoção esvazia `pending_on` e cita o nó selado. Nada
 antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 356 casos contra o contrato v4, 32 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 390 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 cujo veredito o
 v4 muda viraram casos `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
@@ -260,7 +260,7 @@ locale `pt_BR`. Hoje, a rodada termina assim:
 
 ```text
 —
-latest: 356/356 (reprova)
+latest: 390/390 (reprova)
 optional: 10/24 (só reporta)
 ```
 

@@ -88,7 +88,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.10"
+CONTRACT_VERSION = "4.11"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -666,7 +666,10 @@ def form_codes(error):
     # O erro é de um VALOR. Um item de lista que não é mapa (nodes: [a]) vira o campo `item`.
     scope = scope_of(path) if len(path) >= 2 else "top"
     if path and isinstance(path[-1], int):
-        lead = [p for p in path[:-1] if not isinstance(p, int)] if scope == "top" else []
+        # Num item de lista DENTRO do nó (x_term.labels, v4.11), o código leva o caminho até a lista; o item da lista
+        # nodes (ou edges) segue form.<tipo>.node.item, porque o caminho dentro do escopo é vazio.
+        lead = ([p for p in path[:-1] if not isinstance(p, int)] if scope == "top"
+                else inner_names(path[:-1]) if len(path) > 2 else [])
         return [f"form.{kind}.{scope}.{'.'.join(lead + ['item'])}"]
     names = inner_names(path) if scope != "top" else [p for p in path if not isinstance(p, int)]
     return [f"form.{kind}.{scope}.{'.'.join(names) if names else 'root'}"]
@@ -1377,6 +1380,25 @@ KIND_TEXT = {"required": 'Missing required field "{field}" {scope}.',
 SCOPE_TEXT = {"node": "in the node", "edge": "in the edge", "meta": "in meta", "top": "at the top level"}
 
 
+# A dica por perfil canônico (v4.11): o perfil é SHOULD, e o aviso de qualquer campo dele ensina a forma inteira.
+PROFILE_HINTS = {
+    ("node", "x_term"): "x_term is the vocabulary profile (v4.11): pref is required; each item of labels needs literal, "
+                        "kind (alt or hidden), and source, and a label with reverify_every needs verified_at.",
+    ("node", "x_mirror"): "x_mirror copies a record of another system (v4.11): system, ref, state, and synced_at are "
+                          "required; resync_every is the cadence that the due report checks.",
+    ("node", "x_doc_cycle"): "x_doc_cycle is the life cycle of an external document (v4.11): issuer and state are "
+                             "required; state is draft, enacted, in_force, suspended, revoked, expired, or "
+                             "superseded, and recheck_every needs checked_at.",
+    ("node", "x_questionnaire"): "x_questionnaire links the node to an external questionnaire (v4.11): name and questions "
+                                 "(a list that is not empty) are required; verdict is meets, partial, does_not_meet, "
+                                 "not_applicable, or unknown.",
+    ("node", "x_severity"): "x_severity is critical, high, medium, low, or info (v4.11).",
+    ("edge", "x_confidence"): "x_confidence on an edge is a number from 0 to 1 (v4.11).",
+    ("edge", "x_provisional"): "x_provisional on an edge is true or false (v4.11).",
+    ("meta", "slug"): "slug is lowercase words joined by hyphens, like my-graph (v4.11).",
+}
+
+
 def message_of(code, json_text=False):
     """A frase humana de um código, na língua do ambiente: a específica, ou a montada da forma
     form.<tipo>.<escopo>.<campo>. json_text: o texto foi lido como .kg.json, e a frase de parse diz isso
@@ -1405,6 +1427,9 @@ def hint_of(code, place=None):
                  "node.").format(id=nid)
     if code in HINTS:
         return _(HINTS[code])
+    parts = code.split(".")
+    if parts[0] == "form" and len(parts) >= 4 and (parts[2], parts[3]) in PROFILE_HINTS:
+        return _(PROFILE_HINTS[(parts[2], parts[3])])
     if code.startswith("form.unknown-key."):
         return _("Rename the key with the x_ prefix (an extension that readers ignore) or remove it.")
     return None
@@ -1575,11 +1600,33 @@ def _as_date(value):
 ROOT_NOT_MAP = "a raiz não é um mapa"
 
 
+def cadence_subjects(n):
+    """O que tem cadência num nó: o próprio nó (verified_at + reverify_every) e, desde o v4.11, os perfis canônicos:
+    cada sinônimo do x_term que não está aposentado (verified_at + reverify_every), o x_mirror (synced_at +
+    resync_every) e o x_doc_cycle (checked_at + recheck_every). Itens (subject, detail, carimbo, cadência); o subject do
+    nó é None, para a entrada dele ficar exatamente como no kg-ssot.due/1 de antes."""
+    yield None, None, n.get("verified_at"), n.get("reverify_every")
+    term = n.get("x_term")
+    labels = term.get("labels") if isinstance(term, dict) else None
+    for lab in labels if isinstance(labels, list) else []:
+        if (isinstance(lab, dict) and "reverify_every" in lab and lab.get("retired", False) is False
+                and lab.get("status", "current") == "current"):
+            detail = lab.get("literal") if isinstance(lab.get("literal"), str) else ""
+            yield "x_term.label", detail, lab.get("verified_at"), lab.get("reverify_every")
+    for key, subject, stamp, every, ref in (("x_mirror", "x_mirror", "synced_at", "resync_every", "ref"),
+                                            ("x_doc_cycle", "x_doc_cycle", "checked_at", "recheck_every", "ref")):
+        obj = n.get(key)
+        if isinstance(obj, dict) and every in obj:
+            detail = obj.get(ref) if isinstance(obj.get(ref), str) else ""
+            yield subject, detail, obj.get(stamp), obj.get(every)
+
+
 def due_report(sources, as_of):
     """O relatório de vencimento (v4.8), fora do veredito: {as_of, due, unstamped, event, broken}. due: o nó com
     reverify_every válido cujo verified_at + a cadência é igual ou anterior a as_of; unstamped: cadência válida sem
     verified_at legível; event: só reverify_on; broken: o arquivo que não parseia. A cadência fora da forma não entra
-    (o SHOULD já alerta form.pattern.node.reverify_every)."""
+    (o SHOULD já alerta form.pattern.node.reverify_every). Desde o v4.11 entram também os perfis com cadência
+    (cadence_subjects): a entrada deles leva subject e detail, e a do nó segue sem essas chaves."""
     out = {"as_of": as_of.isoformat(), "due": [], "unstamped": [], "event": [], "broken": []}
     for name, text in sources:
         _, doc, err = parse_v1(text)
@@ -1590,25 +1637,33 @@ def due_report(sources, as_of):
         for n in nodes:
             if not isinstance(n, dict) or n.get("id") is None:
                 continue
-            nid, every = str(n["id"]), n.get("reverify_every")
-            duration = parse_duration(every)
-            if duration is None:
-                if isinstance(n.get("reverify_on"), str) and n["reverify_on"].strip():
-                    out["event"].append({"file": name, "id": nid, "reverify_on": n["reverify_on"]})
-                continue
-            stamped = _as_date(n.get("verified_at"))
-            if stamped is None:
-                out["unstamped"].append({"file": name, "id": nid, "reverify_every": every})
-                continue
-            try:
-                due_on = add_duration(stamped, duration)
-            except (OverflowError, ValueError):
-                continue  # vence depois do ano 9999: não vence na data pedida
-            if due_on <= as_of:
-                out["due"].append({"file": name, "id": nid, "verified_at": stamped.isoformat(), "reverify_every": every,
-                                   "due_on": due_on.isoformat(), "days_late": (as_of - due_on).days,
-                                   "reverify_on": n.get("reverify_on") if isinstance(n.get("reverify_on"), str) else None})
+            nid = str(n["id"])
+            for subject, detail, stamp, every in cadence_subjects(n):
+                extra = {} if subject is None else {"subject": subject, "detail": detail}
+                duration = parse_duration(every)
+                if duration is None:
+                    if subject is None and isinstance(n.get("reverify_on"), str) and n["reverify_on"].strip():
+                        out["event"].append({"file": name, "id": nid, "reverify_on": n["reverify_on"]})
+                    continue
+                stamped = _as_date(stamp)
+                if stamped is None:
+                    out["unstamped"].append({"file": name, "id": nid, "reverify_every": every, **extra})
+                    continue
+                try:
+                    due_on = add_duration(stamped, duration)
+                except (OverflowError, ValueError):
+                    continue  # vence depois do ano 9999: não vence na data pedida
+                if due_on <= as_of:
+                    on = n.get("reverify_on") if subject is None and isinstance(n.get("reverify_on"), str) else None
+                    out["due"].append({"file": name, "id": nid, "verified_at": stamped.isoformat(),
+                                       "reverify_every": every, "due_on": due_on.isoformat(),
+                                       "days_late": (as_of - due_on).days, "reverify_on": on, **extra})
     return out
+
+
+def _subject(d):
+    """O id do nó, e o perfil com o detalhe quando a entrada é de um perfil (v4.11): T_GTIN x_term.label "EAN"."""
+    return d["id"] if "subject" not in d else f'{d["id"]} {d["subject"]} "{d["detail"]}"'
 
 
 def due_lines(rep):
@@ -1618,12 +1673,19 @@ def due_lines(rep):
     w = max(len(v) for v in labels.values()) + 1
     for d in rep["due"]:
         late = (_(" ({n} days late)").format(n=d["days_late"]) if d["days_late"] else _(" (today)"))
-        lines.append(f"{labels['due']:<{w}} {d['file']}  {d['id']}: "
-                     + _("verified on {verified_at}, every {every}, due on {due_on}").format(
-                         verified_at=d["verified_at"], every=d["reverify_every"], due_on=d["due_on"]) + late)
+        if d.get("subject") == "x_mirror":
+            when = _("synced on {verified_at}, every {every}, due on {due_on}")
+        elif d.get("subject") == "x_doc_cycle":
+            when = _("checked on {verified_at}, every {every}, due on {due_on}")
+        else:
+            when = _("verified on {verified_at}, every {every}, due on {due_on}")
+        lines.append(f"{labels['due']:<{w}} {d['file']}  {_subject(d)}: "
+                     + when.format(verified_at=d["verified_at"], every=d["reverify_every"], due_on=d["due_on"]) + late)
     for d in rep["unstamped"]:
-        lines.append(f"{labels['unstamped']:<{w}} {d['file']}  {d['id']}: "
-                     + _("cadence {every} without verified_at").format(every=d["reverify_every"]))
+        lines.append(f"{labels['unstamped']:<{w}} {d['file']}  {_subject(d)}: "
+                     + {"x_mirror": _("cadence {every} without synced_at"),
+                        "x_doc_cycle": _("cadence {every} without checked_at")}.get(
+                         d.get("subject"), _("cadence {every} without verified_at")).format(every=d["reverify_every"]))
     for d in rep["event"]:
         lines.append(f"{labels['event']:<{w}} {d['file']}  {d['id']}: {d['reverify_on']}")
     for d in rep["broken"]:

@@ -13,7 +13,7 @@ ARG VERSION
 # o registro MCP confere a posse da imagem por este label, igual ao name do server.json
 LABEL io.modelcontextprotocol.server.name="io.github.marciocar/kg-ssot" \
       org.opencontainers.image.title="kg-ssot" \
-      org.opencontainers.image.description="Servidor MCP do KG-SSOT: julga e grava .kg.yaml e .kg.json pelo contrato." \
+      org.opencontainers.image.description="The KG-SSOT MCP server: validates and stores .kg.yaml and .kg.json graphs against the contract." \
       org.opencontainers.image.source="https://github.com/marciocar/kg-ssot" \
       org.opencontainers.image.documentation="https://github.com/marciocar/kg-ssot/tree/main/docs/manual" \
       org.opencontainers.image.version="${VERSION}" \

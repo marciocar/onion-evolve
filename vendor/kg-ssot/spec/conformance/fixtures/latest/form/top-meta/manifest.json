@@ -137,6 +137,40 @@
       "codes": [
         "form.type.top.meta"
       ]
+    },
+    {
+      "file": "valid-meta-title-slug.kg.yaml",
+      "description": "o título e o slug no meta (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-meta-slug-pattern.kg.yaml",
+      "description": "o slug fora da forma em minúsculas com hífen (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.meta.slug"
+      ]
+    },
+    {
+      "file": "bad-meta-title-empty.kg.yaml",
+      "description": "o título vazio (v4.11)",
+      "valid": false,
+      "codes": [
+        "form.range.meta.title"
+      ],
+      "warnings": []
+    },
+    {
+      "file": "bad-meta-title-integer.kg.yaml",
+      "description": "o título como número (v4.11)",
+      "valid": false,
+      "codes": [
+        "form.type.meta.title"
+      ],
+      "warnings": []
     }
   ]
 }

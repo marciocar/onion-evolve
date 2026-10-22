@@ -57,6 +57,7 @@ class Corpus:
         self.unreadable = []  # [{file, code}]
         self.files = []
         self.root = None  # a raiz do --root, contra a qual os caminhos (file) e a ponta externa se resolvem
+        self.meta_ids = {}  # arquivo -> meta.id (o kg_vocab monta o IRI do termo com ele, como o kg_prov_export)
 
     def add(self, name, text):
         if name in self.files:  # o mesmo arquivo dado duas vezes não duplica as arestas
@@ -67,6 +68,9 @@ class Corpus:
         if code or not isinstance(doc, dict):
             self.unreadable.append({"file": name, "code": code or "parse.root-not-mapping"})
             return
+        meta = doc.get("meta")
+        if isinstance(meta, dict) and isinstance(meta.get("id"), str):
+            self.meta_ids[name] = meta["id"]
         for n in doc.get("nodes") if isinstance(doc.get("nodes"), list) else []:
             if isinstance(n, dict) and isinstance(n.get("id"), str) and (name, n["id"]) not in self.nodes:
                 self.nodes[(name, n["id"])] = n

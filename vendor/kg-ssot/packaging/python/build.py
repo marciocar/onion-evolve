@@ -21,13 +21,13 @@ import tempfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 HERE = pathlib.Path(__file__).resolve().parent
-# os módulos que viajam no pacote: o leitor, a suíte, o gate, o armazém, a consulta, o diff, o servidor MCP e o exportador
+# os módulos que viajam no pacote: o leitor, a suíte, o gate, o armazém, a consulta, o diff, o vocabulário, o servidor MCP e o exportador
 # PROV-O.
 # O kg_vendor.py fica de fora: ele serve ao vendor por pin, que é outro canal.
-MODULES = ["kg_validate", "kg_conformance", "kg_gate", "kg_store", "kg_query", "kg_diff", "kg_mcp", "kg_prov_export"]
+MODULES = ["kg_validate", "kg_conformance", "kg_gate", "kg_store", "kg_query", "kg_diff", "kg_vocab", "kg_mcp", "kg_prov_export"]
 # kg-ssot é o servidor MCP (o mesmo kg-mcp): o MCP Registry e os clientes rodam `uvx kg-ssot` pelo nome do pacote
 SCRIPTS = {"kg-ssot": "kg_mcp", "kg-validate": "kg_validate", "kg-conformance": "kg_conformance", "kg-gate": "kg_gate",
-           "kg-store": "kg_store", "kg-query": "kg_query", "kg-diff": "kg_diff", "kg-mcp": "kg_mcp", "kg-prov-export": "kg_prov_export"}
+           "kg-store": "kg_store", "kg-query": "kg_query", "kg-diff": "kg_diff", "kg-vocab": "kg_vocab", "kg-mcp": "kg_mcp", "kg-prov-export": "kg_prov_export"}
 MIRROR = "https://github.com/marciocar/kg-ssot"
 
 PYPROJECT = """[build-system]
@@ -79,11 +79,12 @@ packages = ["src/kg_ssot"]
 include = ["src/kg_ssot", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
 """
 
-INIT = '''"""KG-SSOT: o contrato formal do grafo de conhecimento verificável.
+INIT = '''"""KG-SSOT: the formal contract of the verifiable knowledge graph.
 
-Os módulos são os do kit de adoção (kg_validate, kg_conformance, kg_gate, kg_store, kg_query, kg_diff, kg_mcp,
-kg_prov_export), e o contrato, a suíte e os schemas das saídas ficam em kg_ssot/spec. Os comandos kg-validate,
-kg-conformance, kg-gate, kg-store, kg-query, kg-diff, kg-mcp e kg-prov-export são os mesmos scripts do kit. Manual: {mirror}/tree/main/docs/manual
+The modules are the adoption kit's (kg_validate, kg_conformance, kg_gate, kg_store, kg_query, kg_diff, kg_vocab, kg_mcp,
+kg_prov_export), and the contract, the suite and the output schemas live in kg_ssot/spec. The commands kg-validate,
+kg-conformance, kg-gate, kg-store, kg-query, kg-diff, kg-vocab, kg-mcp and kg-prov-export are the same scripts as the
+kit's. Manual: {mirror}/tree/main/docs/manual
 """
 __version__ = "{version}"
 '''

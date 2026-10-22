@@ -1,6 +1,6 @@
 # KG-SSOT
 
-> Verifiable knowledge graphs in plain text (`.kg.yaml` to write, or the same model in `.kg.json` for runtime use): a confirmed or production claim must carry its source, and can carry the date it was last verified and what it was verified against; a formal contract (JSON Schema, MUST and SHOULD levels) decides in CI whether the file is well formed. Release 4.18.0, contract v4, license Apache-2.0. The reference reader is Python 3.11 or later and runs without any agent harness.
+> Verifiable knowledge graphs in plain text (`.kg.yaml` to write, or the same model in `.kg.json` for runtime use): a confirmed or production claim must carry its source, and can carry the date it was last verified and what it was verified against; a formal contract (JSON Schema, MUST and SHOULD levels) decides in CI whether the file is well formed. Release 4.19.0, contract v4, license Apache-2.0. The reference reader is Python 3.11 or later and runs without any agent harness.
 
 For an agent that will write or validate a `.kg.yaml`: read the format (chapter 3) and the contract (chapter 4); validate with `python3 -I -B vendor/kg-ssot/tools/kg_validate.py <file>` (in a clone of the repository, `tools/kg_validate.py`; from the PyPI package, `kg-validate <file>`) and fix by the codes in chapter 9. The schemas rule: when the manual and a schema disagree, the schema wins. Use `--format json` for a machine-readable verdict and decide by `code`: codes, keys and exit codes never change with the output language, while the `message` and `hint` text follows it. The whole text, in one file, is in [llms-full.txt](llms-full.txt).
 
@@ -20,7 +20,7 @@ For an agent that will write or validate a `.kg.yaml`: read the format (chapter 
 
 ## Tools and integration
 
-- [Tools](docs/manual/05-tools.md): `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_query`, `kg_diff`, `kg_mcp` (the reference MCP server), `kg_migrate`, `kg_prov_export`
+- [Tools](docs/manual/05-tools.md): `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_query`, `kg_diff`, `kg_vocab` (the domain vocabulary, with exports to SKOS-XL and Apache Ossie), `kg_mcp` (the reference MCP server), `kg_migrate`, `kg_prov_export`
 - [Adoption and CI](docs/manual/06-adoption-and-ci.md): the short path to bring the contract into a repository, and how to use it in an app
 
 ## Contract (the sources of truth)

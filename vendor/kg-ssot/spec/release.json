@@ -1,6 +1,6 @@
 {
-  "version": "4.18.0",
-  "tag": "kg-ssot-v4.18.0",
+  "version": "4.19.0",
+  "tag": "kg-ssot-v4.19.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -24,6 +24,8 @@
     "spec/due.schema.json",
     "spec/query.schema.json",
     "spec/diff.schema.json",
+    "spec/vocab.schema.json",
+    "spec/vocab-examples/",
     "spec/conformance/README.md",
     "spec/conformance/README.pt-BR.md",
     "spec/conformance/manifest.schema.json",
@@ -39,6 +41,7 @@
     "tools/kg_store.py",
     "tools/kg_query.py",
     "tools/kg_diff.py",
+    "tools/kg_vocab.py",
     "tools/kg_release_notes.py",
     "tools/kg_mcp.py",
     "tools/kg_migrate.py",

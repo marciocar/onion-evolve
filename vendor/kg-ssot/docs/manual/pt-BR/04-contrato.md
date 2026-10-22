@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:17826e5a306e2b2c -->
+<!-- translation-of: docs/manual/04-contract.md sha256:38c27a7a146390d8 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -58,7 +58,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 desde a 4.16.1), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 desde a 4.19.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -80,6 +80,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.16 | Contrato v4.9, sem mudança. O gate sem atrito: a base vira uma pasta com um registro por grafo, e a troca de identidade do contrato sem veredito trocado passa com aviso; na 4.16.1, o contrato v4.10 alinha os dois leitores em três pontos do perfil YAML, sem veredito trocado na referência |
 | 4.17 | Contrato v4.10, sem mudança. A consulta e a projeção (`kg_query.py`, e a ferramenta `kg_query` no MCP) e o diff por id entre revisões (`kg_diff.py`); na 4.17.1, o código vendorizado e os fixtures fora do corpus por padrão, e os campos renomeados detectados pelo `kg_diff`; na 4.17.2, as anotações de ferramenta no servidor MCP |
 | 4.18 | Contrato v4.10, sem mudança. O inglês passa a ser a língua-fonte da documentação, com a tradução pt-BR completa ao lado; as ferramentas imprimem a saída humana em inglês por padrão, e em pt-BR com `KG_SSOT_LANG=pt-BR` ou um locale `pt_BR` |
+| 4.19 | Contrato v4.11: `meta.title` e `meta.slug` viram chaves conhecidas, e o SHOULD ganha os perfis canônicos de `x_` (`x_term` para o vocabulário de domínio, `x_mirror`, `x_doc_cycle`, `x_questionnaire`, `x_severity`, e `x_confidence` e `x_provisional` na aresta); a ferramenta do vocabulário (`kg_vocab.py`, com exportação para SKOS-XL e Apache Ossie, e a ferramenta `kg_terms` no servidor MCP) e o `kg_migrate.py keys`, que renomeia chave estranha para `x_` |
 
 ## Versões e tags
 

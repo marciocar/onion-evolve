@@ -233,7 +233,7 @@ sealed, that is, merged into the product graph, **and** the schema in `spec/` al
 (for example, `trigger` in `integrity-trigger`). The promotion PR empties `pending_on` and cites the sealed node.
 Nothing gets ahead of an open decision.
 
-**Today's score.** The reference reader passes 100% of `latest/`: 356 cases against contract v4, 32 of them
+**Today's score.** The reference reader passes 100% of `latest/`: 390 cases against contract v4, 32 of them
 `.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
 verdict v4 changes became `bad-*` cases. Every case uses a canonical `method` (`medição: caso de conformidade`), so
@@ -258,7 +258,7 @@ or a `pt_BR` locale. Today the run ends like this:
 
 ```text
 —
-latest: 356/356 (gates the rc)
+latest: 390/390 (gates the rc)
 optional: 10/24 (report only)
 ```
 

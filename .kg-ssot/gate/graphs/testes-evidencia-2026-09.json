@@ -2,8 +2,6 @@
   "graph": "docs/onion/graph/testes-evidencia-2026-09.kg.yaml",
   "id": "testes-evidencia-2026-09",
   "must": [
-    "form.unknown-key.meta.slug",
-    "form.unknown-key.meta.title",
     "form.unknown-key.top.kind",
     "form.unknown-key.top.version"
   ],

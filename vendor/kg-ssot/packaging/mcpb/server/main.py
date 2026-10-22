@@ -37,8 +37,8 @@ def backend_for(root):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--root", required=True, help="o diretório do armazém de grafos")
-    ap.add_argument("--read-only", default="false", help="true deixa o servidor sem kg_write nem kg_delete")
+    ap.add_argument("--root", required=True, help="the directory of the graph store")
+    ap.add_argument("--read-only", default="false", help="true leaves the server without kg_write and kg_delete")
     a = ap.parse_args(argv)
     read_only = a.read_only.strip().lower() in ("true", "1", "yes", "sim")
     if "${" in a.root:  # o host não expandiu a variável: um armazém ali nasceria dentro da pasta da extensão

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:due.schema.json",
   "title": "Relatório de vencimento (kg-ssot.due/1)",
-  "description": "Saída de `kg_validate.py --due AAAA-MM-DD --format json` (desde a 4.15.0, contrato v4.8). Não é veredito: lista o nó com reverify_every cujo verified_at somado à cadência vence na data ou antes (due), o que tem cadência e não tem carimbo (unstamped), o que só tem reverify_on (event) e o arquivo que não parseia (broken). O relatório não julga o grafo: o gate continua sendo o kg_gate.py.",
+  "description": "Saída de `kg_validate.py --due AAAA-MM-DD --format json` (desde a 4.15.0, contrato v4.8). Não é veredito: lista o nó com reverify_every cujo verified_at somado à cadência vence na data ou antes (due), o que tem cadência e não tem carimbo (unstamped), o que só tem reverify_on (event) e o arquivo que não parseia (broken). O relatório não julga o grafo: o gate continua sendo o kg_gate.py. Desde a 4.19.0 (contrato v4.11), due e unstamped trazem também os perfis canônicos com cadência, com as chaves opcionais subject e detail: o sinônimo do x_term, o x_mirror e o x_doc_cycle. A entrada do nó segue sem essas chaves, e o schema_version não muda: quem lia o relatório lê o mesmo.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -60,7 +60,27 @@
               "string",
               "null"
             ]
+          },
+          "subject": {
+            "enum": [
+              "x_doc_cycle",
+              "x_mirror",
+              "x_term.label"
+            ],
+            "description": "Desde o v4.11: o perfil de onde vem a cadência. x_term.label é um sinônimo do x_term (verified_at e reverify_every do sinônimo; o aposentado não entra), x_mirror usa synced_at e resync_every, x_doc_cycle usa checked_at e recheck_every. Ausente na entrada do próprio nó, que segue como antes."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Desde o v4.11, com subject: o literal do sinônimo ou o ref do x_mirror e do x_doc_cycle (vazio quando falta)."
           }
+        },
+        "dependentRequired": {
+          "subject": [
+            "detail"
+          ],
+          "detail": [
+            "subject"
+          ]
         }
       }
     },
@@ -83,7 +103,27 @@
           },
           "reverify_every": {
             "type": "string"
+          },
+          "subject": {
+            "enum": [
+              "x_doc_cycle",
+              "x_mirror",
+              "x_term.label"
+            ],
+            "description": "Desde o v4.11: o perfil de onde vem a cadência. x_term.label é um sinônimo do x_term (verified_at e reverify_every do sinônimo; o aposentado não entra), x_mirror usa synced_at e resync_every, x_doc_cycle usa checked_at e recheck_every. Ausente na entrada do próprio nó, que segue como antes."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Desde o v4.11, com subject: o literal do sinônimo ou o ref do x_mirror e do x_doc_cycle (vazio quando falta)."
           }
+        },
+        "dependentRequired": {
+          "subject": [
+            "detail"
+          ],
+          "detail": [
+            "subject"
+          ]
         }
       }
     },

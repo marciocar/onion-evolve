@@ -1,9 +1,7 @@
 {
   "graph": "docs/onion/graph/doctrine-behavior-over-declaration-2026-07.kg.yaml",
   "id": "doctrine-behavior-over-declaration-2026-07",
-  "must": [
-    "form.unknown-key.meta.title"
-  ],
+  "must": [],
   "should": {
     "form.range.node.label": 4,
     "yaml.unquoted-date": 1

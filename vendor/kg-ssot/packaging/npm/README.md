@@ -101,18 +101,11 @@ The human output is in English. The CLI speaks Brazilian Portuguese when you set
 locale is `pt_BR`):
 
 ```bash
-KG_SSOT_LANG=pt-BR npx kg-ssot-validate decisions.kg.yaml graph.kg.yaml other.kg.json
+KG_SSOT_LANG=pt-BR npx kg-ssot-validate graph.kg.yaml
 ```
 
-```text
-PASSA   decisions.kg.yaml
-PASSA   graph.kg.yaml
-  AVISO  yaml.unquoted-date
-REPROVA other.kg.json
-  MUST   form.range.node.impact · form.type.node.impact
-```
-
-The codes and the `--json` output are data, so they never change language.
+The codes and the `--json` output are data, so they never change language. The documentation in Portuguese is in
+[README.pt-BR](https://github.com/marciocar/kg-ssot/blob/main/README.pt-BR.md).
 
 ## Use it in a React Native or Expo app
 

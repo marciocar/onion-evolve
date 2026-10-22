@@ -64,14 +64,14 @@ first time, clone it outside your repository and run the vendor tool from the ro
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --dest vendor/kg-ssot
 ```
 
 To update, run it from the vendor, with `--source` required. It takes a path or a URL, and a URL becomes a
 throwaway bare clone. Inside the vendor, the git repository is the adopter's, which does not have the tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 The published tags are listed by `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -326,6 +326,26 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.18.0` to `kg-ssot-v4.19.0`, contract v4.11 comes in. The gate reports the new identity on the
+`· identity` line and decides by what each graph gets, as since 4.16.0:
+- **`meta.title` and `meta.slug` become known keys.** A graph that failed the MUST only because of one of them now
+  passes; the gate shows the gain and asks you to lock it in with `--update`.
+- **The canonical `x_` profiles are SHOULD,** and they only judge a key that is present: `x_term`, `x_mirror`,
+  `x_doc_cycle`, `x_questionnaire`, and `x_severity` on the node, `x_confidence` and `x_provisional` on the edge
+  ([manual, chapter 3](docs/manual/03-format.md)). If you already use one of these names with another shape, the new
+  warning is a new debt code, and the gate fails. Either convert the values (an `x_severity` written in another
+  language becomes `critical`, `high`, `medium`, `low`, or `info`) or accept it once with
+  `kg_gate.py --update --accept-regression "<reason>"`. Measured before the tag on the three adopters: one uses one of
+  the names (`x_severity` with values in Portuguese, already converted); the other graphs keep their verdict and their codes.
+- **`kg_migrate.py keys`** renames to `x_<key>` each key the contract does not know, which is what kept most of the
+  inherited MUST debt in one adopter. Run the plan first, then `--apply`.
+- **The due report** (`--due`) also lists the synonyms of `x_term`, `x_mirror`, and `x_doc_cycle`, with `subject` and
+  `detail` in the JSON; a node's entry is unchanged, and so is `schema_version`.
+- **The release brings** `tools/kg_vocab.py`, `spec/vocab.schema.json`, and `spec/vocab-examples/`; the `gate` profile
+  does not change. The MCP server gets the read tool `kg_terms`.
+
+One `update` is enough. The gate needs `--update` only to lock in a gain, or to accept a profile warning.
+
 From `kg-ssot-v4.17.2` to `kg-ssot-v4.18.0`, the contract does not change (still v4.10, with the same identity), and
 no verdict or code changes. What changes is the language of the human output:
 - **The tools print in English by default.** They pick the language the gettext way: `KG_SSOT_LANG`, then
@@ -342,6 +362,9 @@ no verdict or code changes. What changes is the language of the human output:
 - **The vendor brings two more files:** `tools/kg_i18n.py` and the catalog `locale/pt_BR/LC_MESSAGES/kg-ssot.po`. Both
   are in the `gate` profile, which now has 12 files. The vendored tools do not start without `kg_i18n.py`, and without
   the catalog they print only in English.
+- **A partial vendor takes both files too.** `kg_store.py` imports `kg_i18n` since 4.18.0, so a harness that copies
+  only `kg_store.py` (or any single tool) fails with `ModuleNotFoundError`: copy `tools/kg_i18n.py` and `locale/`
+  along with it.
 
 One `update` is enough, and the gate does not need `--update`.
 
@@ -493,7 +516,7 @@ and the profile-driven migrator come in.
 - **On Windows, the update to 4.13.0 or later runs through the new tag's kit.** The `kg_vendor.py` of earlier tags
   passes `git archive` the whole list of release files, and in 4.13.0 that list exceeds the Windows command-line limit
   (`WinError 206`). Run the update from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag
-  kg-ssot-v4.18.0 --dest vendor/kg-ssot`). Since 4.13.0, the kit passes only the release entries. On Linux and macOS
+  kg-ssot-v4.19.0 --dest vendor/kg-ssot`). Since 4.13.0, the kit passes only the release entries. On Linux and macOS
   the limit is much higher, and the usual update works.
 
 Measured on 2026-10-20, none of the 1,507 `.kg.yaml` files in four adopter repositories changes at the MUST or SHOULD
@@ -624,7 +647,7 @@ What changes in v4:
   there in v4, not only in v5. Adjust the generators that write `provenance` first.
 
 The path, in a single PR:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot`
    twice (the v3 kit does not write the vendor's `.gitattributes`, and the second update, now with the new kit,
    does), `git add vendor/kg-ssot`, and `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` shows the new contract identity and the graphs that start failing
@@ -692,6 +715,6 @@ python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
 The order matters: the corpus cases check the external end against the tracked graphs when the suite lives in a git
-repository, and with the vendor still outside git, those cases fail (`latest: 350/356`). Then compare with the codes
+repository, and with the vendor still outside git, those cases fail (`latest: 384/390`). Then compare with the codes
 your reader emits. The case format, and how to run the suite with a reader in another language, are in
 [`spec/conformance/README.md`](spec/conformance/README.md).

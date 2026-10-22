@@ -668,5 +668,114 @@ class PlanJsonBroken(unittest.TestCase):
         self.assertIn("--profile", err)
 
 
+
+
+KEYS = """# comentário do topo
+meta:
+  schema_version: "1"
+  id: chaves
+  title: "Título, que o v4.11 conhece"
+  revisited: "2026-01-01"  # comentário na linha da chave
+kind: grafo
+"version": "2"
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta."
+    resolution: "respondida"
+    x_resolution: "já existe"
+    severity: alta
+  - {id: Q_B, node_type: question, plane: DEV, status: open, impact: 3, confidence: 0.5, label: "B.", nota: "flow"}
+edges:
+  - from: Q_A
+    to: Q_B
+    edge_type: TRACES_TO
+    provenance: "da aresta"
+    confidence: 0.4
+"""
+
+
+class Keys(unittest.TestCase):
+    """kg_migrate.py keys (4.19.0): a chave fora do contrato vira x_<chave>, pelo texto, com invariância."""
+
+    def run_main(self, argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = kg_migrate.main(argv)
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def write(self, tmp, text=KEYS, name="g.kg.yaml", newline="\n"):
+        p = pathlib.Path(tmp) / name
+        p.write_bytes(text.replace("\n", newline).encode("utf-8"))
+        return p
+
+    def test_plano_por_escopo(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self.write(tmp)
+            rc, out, _ = self.run_main(["keys", "--json", "--root", tmp, str(p)])
+        rows = {(r["place"], r["key"]): (r["action"], r["new_key"]) for r in json.loads(out)["rows"]}
+        self.assertEqual(rc, 0)
+        self.assertEqual(rows[("meta", "revisited")], ("rename", "x_revisited"))
+        self.assertEqual(rows[("topo", "kind")], ("rename", "x_kind"))
+        self.assertEqual(rows[("topo", "version")], ("rename", "x_version"))  # chave entre aspas
+        self.assertEqual(rows[("nó Q_A", "resolution")][0], "review")  # x_resolution já existe
+        self.assertEqual(rows[("nó Q_A", "severity")][0], "review")  # viraria o perfil x_severity
+        self.assertEqual(rows[("nó Q_B", "nota")], ("rename", "x_nota"))  # mapa em flow
+        self.assertEqual(rows[("edges #1", "provenance")], ("rename", "x_provenance"))
+        self.assertEqual(rows[("edges #1", "confidence")][0], "review")  # x_confidence é perfil da aresta
+        self.assertNotIn(("meta", "title"), rows)  # o v4.11 conhece title
+
+    def test_apply_mantem_comentario_e_crlf_e_e_idempotente(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            text = KEYS.replace("    confidence: 0.4\n", "")  # sem a renomeação que cairia no perfil da aresta
+            p = self.write(tmp, text, newline="\r\n")
+            rc, out, _ = self.run_main(["keys", "--apply", "--root", tmp, str(p)])
+            self.assertEqual(rc, 0, out)
+            new = p.read_bytes().decode("utf-8")
+            self.assertIn("\r\n", new)
+            self.assertEqual(new.count("\n"), new.count("\r\n"))
+            self.assertIn("  x_revisited: \"2026-01-01\"  # comentário na linha da chave", new)
+            self.assertIn('"x_version": "2"', new)
+            self.assertIn("# comentário do topo", new)
+            self.assertIn("    resolution: \"respondida\"", new)  # a que vai para quem revisa fica como estava
+            rc, out, _ = self.run_main(["keys", "--apply", "--root", tmp, str(p)])
+            self.assertEqual(p.read_bytes().decode("utf-8"), new)
+            codes = kg_validate.codes(new.replace("\r\n", "\n"), kg_validate.make_validator(
+                json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8"))))
+            self.assertEqual([c for c in codes if c.startswith("form.unknown-key")],
+                             ["form.unknown-key.node.resolution", "form.unknown-key.node.severity"])
+
+    def test_recusa_o_que_ganharia_aviso_should(self):
+        """A chave x_ livre não é julgada, mas uma renomeação que criasse aviso SHOULD seria recusada: medido com um
+        nome de chave que não é slug depois do x_ (o nome original com ponto, escrito entre aspas, vai para quem revisa)."""
+        with tempfile.TemporaryDirectory() as tmp:
+            text = KEYS.replace('kind: grafo\n', 'kind: grafo\n"a.b": 1\n')
+            p = self.write(tmp, text)
+            rc, out, _ = self.run_main(["keys", "--json", "--root", tmp, str(p)])
+            row, = [r for r in json.loads(out)["rows"] if r["key"] == "a.b"]
+            self.assertEqual(row["action"], "review")
+
+    def test_quebras_misturadas_e_entrada_quebrada(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            p = self.write(tmp, KEYS.replace("kind: grafo\n", "kind: grafo\r\n"))
+            rc, out, _ = self.run_main(["keys", "--apply", "--root", tmp, str(p)])
+            self.assertEqual(rc, 1)
+            rc, out, _ = self.run_main(["keys", "--json", "--root", tmp, str(pathlib.Path(tmp) / "nao.kg.yaml")])
+            self.assertEqual((rc, json.loads(out)["reason"]), (2, "broken_input"))
+
+    def test_chaves_conhecidas_vem_do_schema(self):
+        known = kg_migrate.known_keys(json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8")))
+        self.assertIn("title", known["meta"])
+        self.assertIn("trigger", known["edge"])
+        self.assertNotIn("provenance", known["edge"])
+
+
 if __name__ == "__main__":
     unittest.main()

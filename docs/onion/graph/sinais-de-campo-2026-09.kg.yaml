@@ -230,7 +230,35 @@ nodes:
       locator: "pergunta com opções de 2026-10-21: «Maquinaria de auditoria contínua pedida pelo hub (x_evidence_*, radar de vencimento, questionário, OSCAL, fonte documental, coleta recorrente), com padrões de mercado não verificados: como seguimos?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
+  - id: E_KG_SSOT_419_ADOTADA_1022
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "ops/kg-gate-ci.sh antes e depois do vendor 4.19.0 (rc 0 nos dois): linhas MUST de 16 para 14; doctrine-behavior-over-declaration e graduated-automation-elenxo passam o MUST; inbox-sinais, inference-contract-audit e testes-evidencia perdem form.unknown-key.meta.title/slug; nenhuma linha SHOULD mudou; base regravada com --update (184 grafos, 14 na dívida herdada)"
+    label: "A kg-ssot-v4.19.0 (contrato v4.11) entrou no core pelo kg_vendor.py update; cinco grafos melhoram (dois saem do MUST, três perdem as chaves meta.title e meta.slug) e nenhum código novo aparece"
+    narrative: "Sinal da sessão par onion-kg-ssot em 2026-10-22: a 4.19.0 traz os perfis SHOULD dos x_ recorrentes, o kg_vocab.py (exporta SKOS-XL e Apache Ossie), a ferramenta kg_terms no MCP e o kg_migrate.py keys. A par disse que cinco grafos saem do MUST; a medição do core mostra que cinco MELHORAM, mas só dois saem do MUST inteiro: os outros três ainda carregam top.kind/top.version ou provenance faltante."
+    provenance:
+      source: "ops/kg-gate-ci.sh no core, antes e depois do vendor 4.19.0"
+      locator: "linhas MUST e '↑ improved' da saída do gate; .kg-ssot/gate/ regravado"
+      method: "medição: gate do contrato contra o corpus rastreado, comparado antes e depois"
+      locality: "repo"
+  - id: Q_KG_MIGRATE_KEYS_NO_CORPUS_1022
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Rodar o kg_migrate.py keys da 4.19.0 no corpus do core, renomeando para x_ as chaves estranhas que hoje reprovam no MUST? Decisão do maestro, fora da adoção do vendor"
+    narrative: "A par mediu numa cópia dos 15 grafos do core que reprovavam por chave estranha: 76 chaves renomeadas e 14 grafos passaram. Não rodado na adoção (renomear em massa muda o que leitores do core e a catraca leem). GATILHO: o /meta:decide da próxima rodada, com a medição refeita no corpus vivo antes de perguntar."
 edges:
+  - from: E_KG_SSOT_419_ADOTADA_1022
+    to: Q_KG_MIGRATE_KEYS_NO_CORPUS_1022
+    edge_type: SUPPORTS
   - from: E_RADAR_IGNORAVA_O_SEGUNDO_MODO
     to: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
     edge_type: SUPPORTS

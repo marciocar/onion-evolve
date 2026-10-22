@@ -10,6 +10,44 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.19.0] - 2026-10-22
+
+Um vocabulário de domínio que se confere sinônimo por sinônimo, e uma forma para as chaves `x_` que os adotantes
+repetem. Contrato v4.11.
+
+### Added
+
+- **O perfil `x_term` (contrato v4.11, SHOULD):** um termo é um nó com o rótulo preferido (`pref`) e os sinônimos,
+  cada um com `kind` (`alt` ou `hidden`, como no SKOS), `source`, `locator`, a `version` do documento, `verified_at`,
+  `reverify_every`, `scope` (`domain`, ou `case` com o caso nomeado, e uma jurisdição opcional) e `retired` (`true`
+  para o nome antigo). O termo aposentado é o nó com `status: superseded` e uma aresta `SUPERSEDES` do termo que o
+  substitui. Um exemplo real, tirado do dicionário de dados aberto da CMED/ANVISA, vai em
+  `spec/vocab-examples/cmed-dictionary.kg.yaml`.
+- **O `kg_vocab.py`:** o `terms` lista os termos e o que vence, o `lookup` resolve um texto para o termo (sem
+  maiúscula, acento nem espaço repetido; o sinônimo de caso só com `--case`), e o `export` grava SKOS-XL com os nomes
+  da ISO 25964 em Turtle (`--to skos`) ou um item por termo para o Apache Ossie, com o `ai_context.synonyms` e a
+  proveniência de cada sinônimo em `custom_extensions` (`--to ossie`). Saída JSON: `kg-ssot.vocab/1`
+  (`spec/vocab.schema.json`). Vai também como o comando `kg-vocab` no pacote do PyPI.
+- **A ferramenta `kg_terms` no servidor MCP:** a mesma resolução sobre o armazém, só de leitura, com a proveniência
+  dos sinônimos e o termo que substitui um termo substituído.
+- **Os outros perfis canônicos de `x_` (SHOULD, julgados só quando a chave está presente):** `x_mirror` (um registro
+  copiado de outro sistema, com `synced_at` e `resync_every`), `x_doc_cycle` (o ciclo de vida de um documento
+  externo), `x_questionnaire` (o elo com as perguntas de um questionário externo), `x_severity` (de `critical` a
+  `info`), e `x_confidence` e `x_provisional` na aresta.
+- **O `kg_migrate.py keys`:** renomeia para `x_<chave>` cada chave que o contrato não conhece, pelo texto e com
+  conferência de invariância; as chaves conhecidas vêm do schema MUST. Medido numa cópia dos 15 grafos do core que
+  reprovavam no MUST por chave estranha: 14 passam depois.
+- **O `meta.title` e o `meta.slug`** viram chaves conhecidas (MUST, uma ampliação: nada que passava reprova).
+
+### Changed
+
+- **O relatório de vencimento** (`kg_validate.py --due`) lista também os sinônimos do `x_term`, o `x_mirror` e o
+  `x_doc_cycle`, com `subject` e `detail`; a entrada do nó e o `schema_version` ficam iguais.
+- **Um item de lista dentro do nó leva o caminho no código** (`form.type.node.x_term.labels.item`), nos dois leitores.
+- **Nota de atualização:** se você já usa um dos nomes de perfil com outra forma, o gate mostra um código SHOULD
+  novo. Medido antes da tag nos três adotantes: um usa (`x_severity` com valores em português, já convertidos). Converta os
+  valores ou aceite uma vez com `--accept-regression`. A suíte vai a 390 casos.
+
 ## [4.18.0] - 2026-10-22
 
 O KG-SSOT passa a falar inglês primeiro. As ferramentas, a documentação e os cadastros estão em inglês, e a tradução
@@ -123,7 +161,8 @@ O gate sem atrito. Contrato v4.9, sem mudança.
 - A troca de identidade do contrato sem veredito trocado passa com aviso (rc 0); `--strict-identity` volta ao
   comportamento antigo. O vendor confere os schemas contra o carimbo.
 
-[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.18.0...HEAD
+[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.0...HEAD
+[4.19.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.18.0...kg-ssot-v4.19.0
 [4.18.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.2...kg-ssot-v4.18.0
 [4.17.2]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.1...kg-ssot-v4.17.2
 [4.17.1]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.0...kg-ssot-v4.17.1

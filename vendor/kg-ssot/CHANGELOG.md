@@ -10,6 +10,44 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.19.0] - 2026-10-22
+
+A domain vocabulary you can verify, synonym by synonym, and a shape for the `x_` keys that adopters repeat. Contract
+v4.11.
+
+### Added
+
+- **The `x_term` profile (contract v4.11, SHOULD):** a term is a node with the preferred label (`pref`) and its
+  synonyms, each with `kind` (`alt` or `hidden`, as in SKOS), `source`, `locator`, the `version` of the document,
+  `verified_at`, `reverify_every`, `scope` (`domain`, or `case` with the case named, and an optional jurisdiction)
+  and `retired` (`true` for the old name). A retired term is the node with `status: superseded` and a `SUPERSEDES` edge
+  from the term that replaces it. A real example from the open data dictionary of the Brazilian drug price regulator
+  ships in `spec/vocab-examples/cmed-dictionary.kg.yaml`.
+- **`kg_vocab.py`:** `terms` lists the terms and what is due, `lookup` resolves a text to its term (without case,
+  accents or repeated spaces; a case-scoped synonym only with `--case`), and `export` writes SKOS-XL with the
+  ISO 25964 names in Turtle (`--to skos`) or one item per term for Apache Ossie, with `ai_context.synonyms` and the
+  provenance of each synonym in `custom_extensions` (`--to ossie`). JSON output: `kg-ssot.vocab/1`
+  (`spec/vocab.schema.json`). It also ships as the `kg-vocab` command in the PyPI package.
+- **The `kg_terms` tool in the MCP server:** the same lookup over the store, read-only, with the synonyms' provenance
+  and the term that replaces a superseded one.
+- **The other canonical `x_` profiles (SHOULD, judged only when the key is present):** `x_mirror` (a record copied
+  from another system, with `synced_at` and `resync_every`), `x_doc_cycle` (the life cycle of an external document),
+  `x_questionnaire` (the link to the questions of an external questionnaire), `x_severity` (`critical` to `info`), and
+  `x_confidence` and `x_provisional` on the edge.
+- **`kg_migrate.py keys`:** renames each key the contract does not know to `x_<key>`, by text and with invariance
+  checks; the known keys come from the MUST schema. Measured on a copy of the core's 15 graphs that failed the MUST on
+  a foreign key: 14 pass afterwards.
+- **`meta.title` and `meta.slug`** become known keys (MUST, a widening: nothing that passed fails).
+
+### Changed
+
+- **The due report** (`kg_validate.py --due`) also lists the synonyms of `x_term`, `x_mirror` and `x_doc_cycle`,
+  with `subject` and `detail`; a node's entry and `schema_version` stay the same.
+- **A list item inside a node keeps its path in the code** (`form.type.node.x_term.labels.item`), in both readers.
+- **Upgrade note:** if you already use one of the profile names with another shape, the gate shows a new SHOULD code.
+  Measured before the tag on the three adopters: one does (`x_severity` with values in Portuguese, already converted). Convert
+  the values or accept it once with `--accept-regression`. The suite goes to 390 cases.
+
 ## [4.18.0] - 2026-10-22
 
 KG-SSOT now speaks English first. The tools, the documentation and the listings are in English, and the full
@@ -121,7 +159,8 @@ The frictionless gate. Contract v4.9, unchanged.
 - A contract identity change with no verdict change passes with a notice (rc 0); `--strict-identity` restores the old
   behavior. The vendor checks the schemas against their stamp.
 
-[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.18.0...HEAD
+[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.0...HEAD
+[4.19.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.18.0...kg-ssot-v4.19.0
 [4.18.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.2...kg-ssot-v4.18.0
 [4.17.2]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.1...kg-ssot-v4.17.2
 [4.17.1]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.0...kg-ssot-v4.17.1

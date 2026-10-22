@@ -493,7 +493,8 @@ export function formCodes(err, doc) {
   }
   scope = path.length >= 2 ? scopeOf(path) : 'top';
   if (path.length && typeof path[path.length - 1] === 'number') {
-    const lead = scope === 'top' ? path.slice(0, -1).filter(notIndex) : [];
+    // num item de lista dentro do nó (x_term.labels, v4.11), o caminho até a lista entra no código
+    const lead = scope === 'top' ? path.slice(0, -1).filter(notIndex) : path.length > 2 ? innerNames(path.slice(0, -1)) : [];
     return [`form.${kind}.${scope}.${[...lead, 'item'].join('.')}`];
   }
   const names = scope !== 'top' ? innerNames(path) : path.filter(notIndex);
