@@ -508,13 +508,18 @@ nodes:
   - id: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
     node_type: claim
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
-    confidence: 0.8
+    confidence: 0.9
     verified_at: "2026-10-22"
-    verified_against: "caddy validate do Caddyfile mais conf.d num estágio local (Valid configuration); corpo do vhost num Caddy descartável em loopback: /sandbox.html 200 com o CSP, /qualquer 404, sem o arquivo 404; bancada do update-bridge u26-u33 com mutante"
+    verified_against: "caddy validate do Caddyfile mais conf.d num estágio local (Valid configuration); corpo do vhost num Caddy descartável em loopback: /sandbox.html 200 com o CSP, /qualquer 404, sem o arquivo 404; bancada do update-bridge u26-u33 com mutante. Fechada no vivo em 2026-10-22: install-caddy-config com os dois verify, sandbox.html publicado, e a vista renderizada no navegador do maestro (E_UI_PILOT_RENDERED_IN_BROWSER_1022)"
     label: "A origem sandbox.onionevolve.com do piloto ui:// está versionada (ops/caddy/conf.d/sandbox.caddy, frame-src no CSP do app) e o ops/update-bridge.sh publica o sandbox.html do bridge servido; falta instalar no vivo e medir o CSP num navegador"
-    narrative: "Fecha quando: o install-caddy-config.sh roda no vivo com o verify do 404, o update-bridge publica o sandbox.html depois do merge do onion-bridge#83, e o dogfood do passo 4 do deploy/sandbox/README.md do bridge confirma no navegador que o default-src 'none' não barra o srcdoc interno. O verify do 200 entra no vhost só depois da 1ª publicação."
+    narrative: "Fecha quando: o install-caddy-config.sh roda no vivo com o verify do 404, o update-bridge publica o sandbox.html depois do merge do onion-bridge#83, e o dogfood do passo 4 do deploy/sandbox/README.md do bridge confirma no navegador que o default-src 'none' não barra o srcdoc interno. O verify do 200 entra no vhost só depois da 1ª publicação. Fechada em 2026-10-22 pelas três condições."
+    provenance:
+      source: "ops/caddy/conf.d/sandbox.caddy e a saída do ops/install-caddy-config.sh de 2026-10-22"
+      locator: "linhas '✓ https://sandbox.onionevolve.com/sandbox.html = 200' e '/qualquer = 404'; E_UI_PILOT_RENDERED_IN_BROWSER_1022"
+      method: "medição: verify do instalador contra o vivo e o render no navegador do maestro"
+      locality: "host"
 
   - id: E_UI_SANDBOX_ORIGIN_LIVE_1022
     node_type: evidence
@@ -546,8 +551,75 @@ nodes:
       locator: "comentário do vhost e o verify da escuta local"
       method: "medição: curl contra o Logto em loopback e contra um Caddy descartável com o mesmo bloco"
       locality: "host"
+  - id: D_UI_PILOT_RESPOSTA_POR_ASKUSERQUESTION_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «AskUserQuestion nativo»"
+    label: "No /chat do bridge o maestro responde a rodada do decide pelo AskUserQuestion nativo, renderizado pelo bridge como botões cuja escolha volta ao modelo; a vista ui:// segue só leitura"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «AskUserQuestion nativo»; descartadas: «Vista interativa (MCP Apps)» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «Por onde o maestro responde a uma rodada do decide dentro do /chat?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+  - id: D_UI_PILOT_RODADA_GUARDADA_NO_SERVIDOR_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Guardar só no servidor»"
+    label: "A rodada exibida pela vista ui:// passa a ser guardada no thread-store do servidor e reenviada ao reabrir a conversa, sem entrar no localStorage nem no link de compartilhamento"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Guardar só no servidor»; descartadas: «Manter efêmero» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «A vista some ao recarregar a página; o que fazer?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+  - id: D_UI_PILOT_MOTOR_KG_NO_WORKSPACE_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Instalar no workspace»"
+    label: "O workspace do admin no /chat recebe o motor KG pelo caminho da casa (/meta:adopt --update), para o /meta:decide e o selador existirem lá em vez de emprestados do clone do core"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Instalar no workspace»; descartadas: «A tool gera a rodada» · «Deixar emprestado»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «Como a rodada nasce no workspace do /chat, que não tem .claude/validation/?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+
+  - id: E_UI_PILOT_RENDERED_IN_BROWSER_1022
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-22"
+    verified_against: "capturas de tela do maestro no /chat de app.onionevolve.com: a chamada decide_panel_view com a rodada 5ad98b3ed4eb0ea7 (2 perguntas) abriu o quadro da sandbox com título, id, data e as opções do Q1 na ordem, a recomendada primeiro; sem relato de bloqueio de CSP da sandbox ou do frame-src"
+    label: "A vista ui:// do piloto renderizou no navegador dentro do quadro da sandbox; o uso mostrou que o modelo a chama de painel ao lado (é inline), que o AskUserQuestion vira chip Permitir/Negar e que a vista some ao recarregar"
+    narrative: "1ª medição em navegador real. O render-only funcionou como desenhado (sem botões). Os achados viraram D_UI_PILOT_RESPOSTA_POR_ASKUSERQUESTION_1022, D_UI_PILOT_RODADA_GUARDADA_NO_SERVIDOR_1022 e D_UI_PILOT_MOTOR_KG_NO_WORKSPACE_1022. O Console mostrou só dois avisos alheios ao piloto: o script de tema inline (curado no onion-bridge#85) e fontes de uma extensão do navegador."
+    provenance:
+      source: "capturas de tela e Console colados pelo maestro na sessão de 2026-10-22"
+      locator: "turno do /chat que chamou decide_panel_view com a rodada 5ad98b3ed4eb0ea7 gerada no workspace"
+      method: "testemunho: capturas de tela do maestro, 2026-10-22"
+      locality: "pessoa"
 
 edges:
+  - from: E_UI_PILOT_RENDERED_IN_BROWSER_1022
+    to: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
+    edge_type: SUPPORTS
   # o token M2M do bridge passa pela escuta local do tenant admin do Logto
   - from: E_LOGTO_ADMIN_LOCAL_LISTENER_1022
     to: ENT_logto
@@ -658,6 +730,15 @@ edges:
   - from: E_CENSO0901_Q_tunneling
     to: Q_tunneling
     edge_type: SUPERSEDES
+  - from: D_UI_PILOT_RESPOSTA_POR_ASKUSERQUESTION_1022
+    to: E_UI_SANDBOX_ORIGIN_LIVE_1022
+    edge_type: TRACES_TO
+  - from: D_UI_PILOT_RODADA_GUARDADA_NO_SERVIDOR_1022
+    to: E_UI_SANDBOX_ORIGIN_LIVE_1022
+    edge_type: TRACES_TO
+  - from: D_UI_PILOT_MOTOR_KG_NO_WORKSPACE_1022
+    to: E_UI_SANDBOX_ORIGIN_LIVE_1022
+    edge_type: TRACES_TO
 
 external_edges:
   - from: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
