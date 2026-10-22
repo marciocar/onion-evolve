@@ -749,6 +749,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-20: «D_N2: com os degraus 1 e 2 em produção, só resta o admin do /chat escrevendo no data/ e no trust-log; como fecha?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-20"
       locality: "pessoa"
+  - id: C_TRUST_LOG_PRESO_NO_CLONE_SERVIDO_1022
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-22"
+    verified_against: "bancada do core em 2026-10-22, LC_ALL=C, famílias a2a_verify e federation_a2a: 235 passaram, 0 falharam (18 casos novos de A2A_TRUST_LOG com 12 mutantes provados) e update_bridge 50/0 (u24 e u25 com mutante); a medição dos 7 stashes é da sessão principal, repassada e não refeita aqui"
+    label: "a trilha de auditoria do A2A caía no trust-log RASTREADO do clone servido e o update-bridge a prendia em stash; a cura é o destino explícito A2A_TRUST_LOG, julgado fail-closed, que o bridge aponta para o data/ dele"
+    narrative: "Medido pela sessão principal em 2026-10-22: 7 stashes no clone servido (15/10, 16/10 e 22/10) com 16 eventos que nunca chegaram ao repo; é o resíduo 'trust-log gravável no clone' que o D_N2 declarou. Cura no core: o a2a-verify.sh e o trust-topology-check.sh aceitam A2A_TRUST_LOG (arquivo absoluto) e, com ela, gravam lá; sem ela, o comportamento antigo. O juiz do destino é um só (trust-topology-check.sh --check-log-dest): relativo, não normalizado, diretório ausente, symlink no arquivo ou no diretório, dono diferente, diretório gravável por grupo/outros ou arquivo com escrita de grupo ou bit de outros → veto trust-log-unsafe:<motivo> antes de qualquer camada; o arquivo nasce 0600 com o cabeçalho do trust-check (--ensure-log). O update-bridge mantém o stash e passa a AVISAR quando o resíduo é o trust-log. No bridge: o handler passa A2A_TRUST_LOG=data/a2a-trust-log.md ao gate e garante o diretório. Fica aberto até o deploy: o RW_NESTED do bridge-hardening ainda deixa o trust-log do clone gravável (remover é medição pós-deploy), e o doctor não nomeia o veto novo com cura própria."
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-verify.sh, .claude/validation/trust-topology-check.sh, ops/update-bridge.sh, .claude/validation/lint-selftest.sh"
+      locator: "o bloco 'Destino do trust-log' do a2a-verify.sh; trust_log_dest_problem do trust-check; o RESIDUE do update-bridge; os casos (A2A_TRUST_LOG) da família a2a_verify"
+      method: "medição: bancada com mutantes; os 7 stashes são testemunho da sessão principal"
+      locality: "repo"
   - id: Q_ESTADO_DE_JTI_SO_CRESCE
     node_type: question
     layer: audit
@@ -988,6 +1004,9 @@ edges:
   - from: C_ACEITE_CONFIAVA_NO_JSON_DA_FILA
     to: D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A
     edge_type: CONSTRAINS
+  - from: C_TRUST_LOG_PRESO_NO_CLONE_SERVIDO_1022
+    to: D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A
+    edge_type: TRACES_TO
   - from: D_SAC150_CURAS_DA_SESSAO
     to: C_ACEITE_CONFIAVA_NO_JSON_DA_FILA
     edge_type: TRACES_TO

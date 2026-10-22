@@ -11513,7 +11513,8 @@ EOF
   local r g="git -c user.name=ub -c user.email=ub@bench -c init.defaultBranch=main -c advice.detachedHead=false"
   for r in clone bridge; do
     ${g} init -q "${d}/seed-${r}" && printf 'node_modules/\n' > "${d}/seed-${r}/.gitignore" && echo 1 > "${d}/seed-${r}/v" \
-      && { [ "${r}" != clone ] || { mkdir -p "${d}/seed-${r}/ops" && cp "${d}/ops/bridge-hardening.sh" "${d}/ops/chat-runner.sh" "${d}/seed-${r}/ops/"; }; } \
+      && { [ "${r}" != clone ] || { mkdir -p "${d}/seed-${r}/ops" "${d}/seed-${r}/docs/evolution" && cp "${d}/ops/bridge-hardening.sh" "${d}/ops/chat-runner.sh" "${d}/seed-${r}/ops/" \
+             && printf '| Timestamp | FROM | TO | ACTION | STATUS | Razão |\n' > "${d}/seed-${r}/docs/evolution/trust-log.md"; }; } \
       && ${g} -C "${d}/seed-${r}" add -A && ${g} -C "${d}/seed-${r}" commit -qm um && echo 2 > "${d}/seed-${r}/v" \
       && ${g} -C "${d}/seed-${r}" commit -qam dois && ${g} clone -q --bare "${d}/seed-${r}" "${d}/origin-${r}.git" \
       || { record_fail "update-bridge: sandbox" "não montei a origem git ${r}"; rm -rf "${d}"; return; }
@@ -11665,6 +11666,21 @@ PY
     '    1) n="$(grep -cE' '    1|2) n="$(grep -cE' _ub_both_nomeasure
   _ubcase "(u23) NOOP: o JWKS OK vem datado do boot vivo e declarado instantâneo, nunca 'medido agora'" \
     '--no-pager -o short-iso 2>/dev/null' '--no-pager 2>/dev/null' _ub_noop_jwks_age
+  # TRUST-LOG NO RESÍDUO (2026-10-22): o gate gravava a auditoria A2A no clone servido e o stash a prendia em
+  # silêncio (7 stashes, 16 eventos). O stash não muda (o resíduo segue recuperável); o aviso nomeia o arquivo.
+  # O stash cria commit: a identidade vai no ambiente do caso (GIT_CONFIG_GLOBAL=/dev/null não tem user).
+  _ubid() { GIT_AUTHOR_NAME=ub GIT_AUTHOR_EMAIL=ub@bench GIT_COMMITTER_NAME=ub GIT_COMMITTER_EMAIL=ub@bench _ubr "$1"; }
+  _ub_tl_residue() { echo '| 2026-10-22 00:00 | acme | onion-evolve | relay | AUTORIZADO | t |' >> "${d}/srv/onion-evolve/docs/evolution/trust-log.md"
+    local r; r="$(_ubid "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "AVISO: o resíduo inclui docs/evolution/trust-log.md" && _ubhas "${r}" "guardado no stash" \
+      && [ "$(git -C "${d}/srv/onion-evolve" stash list | wc -l)" = 1 ]; }
+  _ub_other_residue() { echo x > "${d}/srv/onion-evolve/v"
+    local r; r="$(_ubid "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "guardado no stash" && ! _ubhas "${r}" "AVISO: o resíduo inclui docs/evolution/trust-log.md"; }
+  _ubcase "(u24) o trust-log no resíduo do clone → AVISO nomeado, e o stash segue guardando (recuperável)" \
+    "  if grep -qE '^.. docs/evolution/trust-log\.md\$' <<<\"\${RESIDUE}\"; then" '  if false; then' _ub_tl_residue
+  _ubcase "(u25) resíduo SEM o trust-log → stash sem o aviso (o aviso não é ruído em todo update)" \
+    "  if grep -qE '^.. docs/evolution/trust-log\.md\$' <<<\"\${RESIDUE}\"; then" '  if true; then' _ub_other_residue
   rm -rf "${d}"
 }
 
@@ -13449,6 +13465,108 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   if [ "${rc}" -eq 1 ] && ! grep -qF 'acme|x' "${sbt}/docs/evolution/trust-log.md"; then record_pass "a2a-verify: (SAC-150 N4) from fora da forma → veto sem linha no trust-log"
   else record_fail "a2a-verify: (SAC-150 N4) from malformado no log" "rc=${rc}"; fi
   rm -rf "${sbt}"
+  # ── DESTINO DO TRUST-LOG (A2A_TRUST_LOG, 2026-10-22) ──────────────────────────────────────────────
+  # Defeito medido: o bridge roda o gate com --repo = o CLONE SERVIDO do core, e a trilha de auditoria caía num
+  # arquivo RASTREADO dele (7 stashes do update-bridge, 16 eventos presos). Com A2A_TRUST_LOG o gate grava no
+  # destino e NÃO no repo; sem ela, o comportamento antigo; destino inseguro veta antes de qualquer camada.
+  # Cada caso roda contra uma RAIZ copiada (a2a-verify + trust-check + ssrf), sem --dry-run, com umask 022 fixo
+  # (o 0600 do destino tem de vir do motor, não da umask do host). Cada cura tem MUTANTE na sua linha.
+  local tcs="${REPO_ROOT}/.claude/validation/trust-topology-check.sh" _TL="" _TLS="" _TLD="" _TLR=()
+  _tl_root() {  # $1 = sed p/ o a2a-verify ('' = intacto) · $2 = sed p/ o trust-check ('' = intacto) → _TL
+    local d; d="$(mktemp -d)"; _TLR+=("${d}")
+    mkdir -p "${d}/.claude/validation" "${d}/.claude/utils/federation-transport"
+    cp "${REPO_ROOT}/.claude/utils/federation-transport/a2a-ssrf-check.sh" "${d}/.claude/utils/federation-transport/"
+    if [ -n "$1" ]; then sed -e "$1" "${helper}"; else cat "${helper}"; fi > "${d}/.claude/utils/federation-transport/a2a-verify.sh"
+    if [ -n "$2" ]; then sed -e "$2" "${tcs}"; else cat "${tcs}"; fi > "${d}/.claude/validation/trust-topology-check.sh"
+    _TL="${d}"
+  }
+  _tl_fresh() {  # repo sandbox com trust-log RASTREADO (o do clone servido) + diretório de destino 0700
+    _TLS="$(mktemp -d)"; _TLR+=("${_TLS}"); cp -r "${sb}/docs" "${_TLS}/docs"
+    printf '| Timestamp | FROM | TO | ACTION | STATUS | Razão |\n|---|---|---|---|---|---|\n' > "${_TLS}/docs/evolution/trust-log.md"
+    _TLD="$(mktemp -d)"; _TLR+=("${_TLD}"); chmod 700 "${_TLD}"
+  }
+  _tl_run() {  # $1 raiz · $2 valor de A2A_TRUST_LOG ou -UNSET- · $3 envelope
+    rc=0
+    if [ "$2" = "-UNSET-" ]; then
+      out="$(umask 022; env -u A2A_TRUST_LOG PATH="${_A2A_SYNC}:${PATH}" A2A_JWKS_DIR="${sb}/jwks" bash "$1/.claude/utils/federation-transport/a2a-verify.sh" --receiver onion-evolve --repo "${_TLS}" --envelope - <<<"$3" 2>/dev/null)" || rc=$?
+    else
+      out="$(umask 022; env PATH="${_A2A_SYNC}:${PATH}" A2A_JWKS_DIR="${sb}/jwks" A2A_TRUST_LOG="$2" bash "$1/.claude/utils/federation-transport/a2a-verify.sh" --receiver onion-evolve --repo "${_TLS}" --envelope - <<<"$3" 2>/dev/null)" || rc=$?
+    fi
+  }
+  _tl_ok_env() { _env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" "$1")" acme onion-evolve ""; }
+  _tl_repo_clean() { [ "$(grep -c 'acme' "${_TLS}/docs/evolution/trust-log.md")" = "0" ]; }
+  _tl_mode() { stat -c '%a' "$1" 2>/dev/null || stat -f '%Lp' "$1" 2>/dev/null; }
+  # (d) com a env, sucesso → UMA linha no destino (0600, cabeçalho do trust-check), NENHUMA no repo
+  _tlc_dest() { _tl_fresh; local f="${_TLD}/a2a-trust-log.md"; _tl_run "$1" "${f}" "$(_tl_ok_env jti-tld)"
+    [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}" && [ "$(grep -c '| acme | onion-evolve | relay | AUTORIZADO' "${f}" 2>/dev/null)" = "1" ] \
+      && [ "$(_tl_mode "${f}")" = "600" ] && head -1 "${f}" | grep -q '^# Log de Tentativas' && _tl_repo_clean; }
+  # (v) com a env, veto rotulado → a linha (declarado, não provado) no destino criado pelo --ensure-log, nada no repo
+  _tlc_veto() { _tl_fresh; local f="${_TLD}/a2a-trust-log.md" j; j="$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-tlv)"; j="${j%.*}.AAAABBBBCCCCDDDD"
+    _tl_run "$1" "${f}" "$(_env "${j}" acme onion-evolve "")"
+    [ "${rc}" -eq 1 ] && grep -q '"reason":"bad-signature"' <<< "${out}" \
+      && [ "$(grep -c '| acme (declarado, não provado) | onion-evolve | relay | BLOQUEADO | veto do gate a2a-verify: bad-signature |' "${f}" 2>/dev/null)" = "1" ] \
+      && [ "$(_tl_mode "${f}")" = "600" ] && head -1 "${f}" | grep -q '^# Log de Tentativas' && _tl_repo_clean; }
+  # (u) sem a env → o comportamento antigo: a linha no repo, o diretório de destino intocado
+  _tlc_unset() { _tl_fresh; _tl_run "$1" -UNSET- "$(_tl_ok_env jti-tlu)"
+    [ "${rc}" -eq 0 ] && [ "$(grep -c '| acme | onion-evolve | relay | AUTORIZADO' "${_TLS}/docs/evolution/trust-log.md")" = "1" ] && [ -z "$(ls -A "${_TLD}")" ]; }
+  # (x) destino inseguro → veto trust-log-unsafe:<motivo>, layer trust-log, e nada gravado em lugar nenhum
+  _tlc_unsafe() { _tl_fresh; local f="${_TLD}/a2a-trust-log.md" want="$2"
+    case "$2" in
+      relative) f="rel-onion-tl/a2a-trust-log.md" ;;
+      dir-missing) f="${_TLD}/nope/a2a-trust-log.md" ;;
+      symlink) : > "${_TLD}/real.md"; chmod 600 "${_TLD}/real.md"; ln -s "${_TLD}/real.md" "${f}" ;;
+      file-mode-unsafe) : > "${f}"; chmod 644 "${f}" ;;
+      dir-writable-by-others) chmod 777 "${_TLD}" ;;
+    esac
+    _tl_run "$1" "${f}" "$(_tl_ok_env jti-tlx)"
+    [ "${rc}" -eq 1 ] && grep -q "\"reason\":\"trust-log-unsafe:${want}\",\"layer_failed\":\"trust-log\"" <<< "${out}" \
+      && _tl_repo_clean && ! grep -rqs 'acme' "${_TLD}" && [ ! -e "${PWD}/rel-onion-tl" ]; }
+  # (t) o trust-check sozinho (relay) com destino inseguro → exit 2 e nada gravado (nem pelo symlink)
+  _tlc_tc() { _tl_fresh; : > "${_TLD}/real.md"; chmod 600 "${_TLD}/real.md"; ln -s "${_TLD}/real.md" "${_TLD}/a2a-trust-log.md"
+    rc=0; (umask 022; A2A_TRUST_LOG="${_TLD}/a2a-trust-log.md" bash "$1/.claude/validation/trust-topology-check.sh" --from acme --to onion-evolve --action relay --repo "${_TLS}" >/dev/null 2>&1) || rc=$?
+    [ "${rc}" -eq 2 ] && [ ! -s "${_TLD}/real.md" ] && _tl_repo_clean; }
+  _tl_case() {  # $1 rótulo · $2 função · $3 arg — no intacto
+    _tl_root "" ""; if "$2" "${_TL}" "${3:-}"; then record_pass "a2a-verify: (A2A_TRUST_LOG) $1"
+    else record_fail "a2a-verify: (A2A_TRUST_LOG) $1" "rc=${rc} out='${out}'"; fi; }
+  _tl_mut() {  # $1 rótulo · $2 v|t (qual motor muta) · $3 sed · $4 função · $5 arg
+    local ri=1 rmu=1 f intact
+    _tl_root "" ""; intact="${_TL}"; "$4" "${intact}" "${5:-}" && ri=0
+    if [ "$2" = v ]; then _tl_root "$3" ""; f=.claude/utils/federation-transport/a2a-verify.sh
+    else _tl_root "" "$3"; f=.claude/validation/trust-topology-check.sh; fi
+    [ "$(grep -c '# MUTANTE' "${_TL}/${f}")" = "1" ] \
+      || record_fail "a2a-verify: (A2A_TRUST_LOG MUT) âncora $1" "o sed não trocou EXATAMENTE uma linha (a linha da cura mudou?)"
+    "$4" "${_TL}" "${5:-}" && rmu=0
+    _prove_mutation "a2a-verify: (A2A_TRUST_LOG MUT) $1" "${intact}/${f}" "${_TL}/${f}" "${ri}" "${rmu}"; }
+  _tl_case "com a env, o sucesso grava UMA linha no destino (0600, com cabeçalho) e NENHUMA no trust-log do repo" _tlc_dest
+  _tl_case "com a env, o veto rotulado vai ao destino (criado pelo --ensure-log, 0600), nada no repo" _tlc_veto
+  _tl_case "sem a env, o comportamento antigo: a linha no trust-log do repo, o destino intocado" _tlc_unset
+  local _tlk; for _tlk in relative dir-missing symlink file-mode-unsafe dir-writable-by-others; do
+    _tl_case "destino ${_tlk} → veto trust-log-unsafe:${_tlk}, nada gravado" _tlc_unsafe "${_tlk}"
+  done
+  _tl_case "trust-check sozinho com destino symlink → exit 2, nada gravado pelo link" _tlc_tc
+  _tl_mut "o trust-check ignora a env → a linha do sucesso volta ao repo" t \
+    's|^TRUST_LOG="\${TRUST_LOG_DEST:-\$REPO/docs/evolution/trust-log.md}"$|TRUST_LOG="$REPO/docs/evolution/trust-log.md" # MUTANTE|' _tlc_dest
+  _tl_mut "o veto rotulado ignora a env → a linha do veto volta ao repo" v \
+    's|^  local log="\${TRUST_LOG}" why$|  local log="${REPO}/docs/evolution/trust-log.md" why # MUTANTE|' _tlc_veto
+  _tl_mut "o --ensure-log sem umask 077 → destino nasce legível por outros" t \
+    's@^    ( umask 077; write_log_header "\$TRUST_LOG_DEST" ) || { echo "create-failed"; exit 1; }$@    write_log_header "$TRUST_LOG_DEST" || { echo "create-failed"; exit 1; } # MUTANTE@' _tlc_veto
+  _tl_mut "a env vazia deixa de valer como ausente → o comportamento antigo some" v \
+    's|^TRUST_LOG_DEST="\${A2A_TRUST_LOG:-}"$|TRUST_LOG_DEST="${A2A_TRUST_LOG:-/nonexistent-onion-tl/a2a-trust-log.md}" # MUTANTE|' _tlc_unset
+  _tl_mut "o gate não veta o destino inseguro (symlink) → verifica e segue" v \
+    '/^  TL_WHY="\$(bash "\${TRUST_CHECK}" --check-log-dest 2>\/dev\/null)" || veto/c\  TL_WHY=ok # MUTANTE' _tlc_unsafe symlink
+  _tl_mut "sem o caso relativo no juiz → o motivo deixa de ser 'relative'" t \
+    '/^  case "\$p" in \/\*) ;; \*) echo "relative"; return 1 ;; esac$/c\  true # MUTANTE' _tlc_unsafe relative
+  _tl_mut "sem o -L no juiz → o motivo deixa de ser 'symlink'" t \
+    '/^  if \[ -L "\$p" \]; then echo "symlink"; return 1; fi$/c\  true # MUTANTE' _tlc_unsafe symlink
+  _tl_mut "sem o teste do diretório → dir-missing deixa de vetar por nome" t \
+    '/^  if \[ ! -d "\$d" \]; then echo "dir-missing"; return 1; fi$/c\  true # MUTANTE' _tlc_unsafe dir-missing
+  _tl_mut "sem a máscara do arquivo → um destino 0644 é aceito e gravado" t \
+    '/echo "file-mode-unsafe"; return 1; fi$/c\    true # MUTANTE' _tlc_unsafe file-mode-unsafe
+  _tl_mut "sem a máscara do diretório → um diretório 0777 é aceito e gravado" t \
+    '/echo "dir-writable-by-others"; return 1; fi$/c\  true # MUTANTE' _tlc_unsafe dir-writable-by-others
+  _tl_mut "o trust-check sozinho não sai no destino inseguro → grava pelo symlink" t \
+    '/A2A_TRUST_LOG inseguro/{n;s/^    exit 2$/    true # MUTANTE/;}' _tlc_tc
+  rm -rf "${_TLR[@]}"
   # chronyc: leap pendente é sincronizado; "Not synchronised" vence o atestado (paridade com o doctor)
   local chb; chb="$(mktemp -d)"
   for t in jq date mktemp mkdir python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum openssl; do
@@ -13977,6 +14095,29 @@ YML
   _fa_gate "${env}"
   if [ "${rc}" -eq 0 ] && _fa_has "${out}" '"verified":true'; then record_pass "federation-a2a: o gate REAL aceita o envelope do remetente assinado pela chave do keygen"
   else record_fail "federation-a2a: send→gate" "rc=${rc} out='${out}'"; fi
+  # A2A_TRUST_LOG (2026-10-22): o envelope do remetente REAL, julgado sem --dry-run com a env, deixa a linha
+  # no destino fora do repo e nenhuma no trust-log do --repo (o caso do bridge, que roda no clone servido).
+  # MUTANTE: o trust-check que ignora a env devolve a linha ao repo, e o caso tem de reprová-lo.
+  local tld; tld="$(mktemp -d)"; chmod 700 "${tld}"
+  _fa_tl() {  # $1 = raiz do motor (a2a-verify + trust-check) · $2 = jti-sufixo → 0 se a linha foi ao destino e não ao repo
+    rm -f "${tld}/a2a-trust-log.md" "${sb}/repo/docs/evolution/trust-log.md"
+    local e r=0 o; e="$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --body "trust-log $2" 2>/dev/null)"
+    o="$(PATH="${_A2A_SYNC}:${PATH}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${jwks}" A2A_TRUST_LOG="${tld}/a2a-trust-log.md" \
+      bash "$1/.claude/utils/federation-transport/a2a-verify.sh" --receiver core-x --repo "${sb}/repo" --envelope - <<<"${e}" 2>/dev/null)" || r=$?
+    [ "${r}" -eq 0 ] && _fa_has "${o}" '"verified":true' && [ "$(grep -c '| acme | core-x | relay | AUTORIZADO' "${tld}/a2a-trust-log.md" 2>/dev/null)" = "1" ] \
+      && ! grep -qs 'acme' "${sb}/repo/docs/evolution/trust-log.md"; }
+  local fai fam fri=1 frm=1; fai="$(mktemp -d)"; fam="$(mktemp -d)"
+  for f in "${fai}" "${fam}"; do mkdir -p "${f}/.claude/validation" "${f}/.claude/utils/federation-transport"
+    cp "${gate}" "${ft}/a2a-ssrf-check.sh" "${f}/.claude/utils/federation-transport/"; done
+  cp "${REPO_ROOT}/.claude/validation/trust-topology-check.sh" "${fai}/.claude/validation/"
+  sed -e 's|^TRUST_LOG="\${TRUST_LOG_DEST:-\$REPO/docs/evolution/trust-log.md}"$|TRUST_LOG="$REPO/docs/evolution/trust-log.md" # MUTANTE|' \
+    "${REPO_ROOT}/.claude/validation/trust-topology-check.sh" > "${fam}/.claude/validation/trust-topology-check.sh"
+  if _fa_tl "${fai}" i; then fri=0; record_pass "federation-a2a: send→gate com A2A_TRUST_LOG → a linha vai ao destino fora do repo, nenhuma no --repo"
+  else record_fail "federation-a2a: send→gate com A2A_TRUST_LOG" "destino: $(grep -c acme "${tld}/a2a-trust-log.md" 2>/dev/null) repo: $(grep -c acme "${sb}/repo/docs/evolution/trust-log.md" 2>/dev/null)"; fi
+  _fa_tl "${fam}" m && frm=0
+  _prove_mutation "federation-a2a: (MUT) o trust-check que ignora A2A_TRUST_LOG devolve a linha ao repo" \
+    "${fai}/.claude/validation/trust-topology-check.sh" "${fam}/.claude/validation/trust-topology-check.sh" "${fri}" "${frm}"
+  rm -rf "${tld}" "${fai}" "${fam}" "${sb}/repo/docs/evolution/trust-log.md"
   printf 'linha 1\nlinha 2\n\n' > "${sb}/body.txt"
   env="$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --body-file "${sb}/body.txt" 2>/dev/null)"
   local bsh; bsh="$(sha256sum "${sb}/body.txt" | cut -d' ' -f1)"
