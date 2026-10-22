@@ -891,7 +891,7 @@ cp "$SPK/hooks/record-tool-attempts.sh" ~/.local/share/onion/a2a-spike-channel/
 cp "$SPK/hooks/receiver-settings.json" ~/.config/onion/a2a/receiver-settings.json
 sha256sum ~/.local/share/onion/a2a-spike-channel/record-tool-attempts.sh ~/.config/onion/a2a/receiver-settings.json
 bash "$SPK/hooks/record-tool-attempts.selftest.sh"     # 78/78 antes de qualquer cenário
-bash "$SPK/vps/accept-to-channel.selftest.sh"          # 12/12
+bash "$SPK/vps/accept-to-channel.selftest.sh"          # 13/13 (desde 2026-10-22: o caso das duas raízes)
 ( cd ~/.local/share/onion/a2a-spike-channel && cp "$SPK/channel/a2a-channel.smoke.ts" . && bun a2a-channel.smoke.ts )  # 12/12
 ```
 Antes do A2, rode `bash "$SPK/vps/plant-canaries.sh" --plant`. Toda sessão receptora abre com
