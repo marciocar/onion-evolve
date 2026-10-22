@@ -104,7 +104,7 @@ else
     echo "  O core não escreve o perfil: as regras (que trace é código, que pasta é pesquisa, que nó tem fonte irrecuperável) são julgamento do dono do corpus."
     echo "  Para criar: copie um exemplo do vendor (vendor/kg-ssot/spec/migrate-examples/: ${EXAMPLES:-nenhum exemplo no vendor}) para ${CANDIDATES[0]},"
     echo "  troque os ids de exemplo pelos do seu grafo e os globs pelas suas pastas (schema: vendor/kg-ssot/spec/kg-migrate-profile.schema.json;"
-    echo "  manual: vendor/kg-ssot/docs/manual/05-ferramentas.md, seção do kg_migrate.py), versione-o e rode o --update (ou este passo) de novo."
+    echo "  manual: vendor/kg-ssot/docs/manual/pt-BR/05-ferramentas.md, seção do kg_migrate.py), versione-o e rode o --update (ou este passo) de novo."
     exit 2
   else
     PROFILE="${T}/${FOUND[0]}"
@@ -156,14 +156,47 @@ EXCL=(--exclude '*/**/fixtures/**' --exclude 'docs/materials/**'
       --exclude 'docs/evolution/kg-inbox/_rejected/**' --exclude 'docs/evolution/kg-inbox/_sealed/**')
 # -I: nada do cwd nem do diretório do script no sys.path; -B: sem bytecode no vendor carimbado do alvo. O cwd é a
 # pasta da planilha, fora do alvo.
-PLAN_OUT="$(cd "${OUT_DIR}" && python3 -I -B "${MIG}" plan --profile "${PROFILE}" --root "${T}" --out "${SHEET}" "${EXCL[@]}" 2>&1)"; PRC=$?
+# A RECUSA SE LÊ POR MÁQUINA, NÃO POR FRASE (diretriz do maestro de 2026-10-22: decisão lê rc, JSON ou código). Desde
+# a kg-ssot 4.18.0 a prosa do migrador segue a língua do ambiente (inglês por padrão), e o `plan --json` separa os
+# dois rc 2: entrada quebrada escreve {"error":…,"reason":"broken_input"} no stdout; erro de uso (argparse) deixa o
+# stdout vazio. Quem decide se o migrador tem o --json é o carimbo do vendor do ALVO (.kg-ssot-version, JSON), nunca
+# a ajuda dele. Vendor entre 4.13.0 e 4.17.x não tem o --json nem o i18n: a frase dele é só pt-BR, e ela só é
+# repassada, como antes. O TSV da planilha segue com cabeçalho e células em pt-BR em qualquer língua (lido abaixo).
+JSON_ARGS=()
+if [ -n "${VERSION}" ] && [ "$(printf '%s\n%s\n' 4.18.0 "${VERSION}" | sort -V | sed -n 1p)" = 4.18.0 ]; then JSON_ARGS=(--json); fi
+PLAN_ERR="$(mktemp "${TMPBASE}/onion-migrate-err.XXXXXX")" || no "mktemp falhou em ${TMPBASE}."
+trap 'rm -f "${NODES}" "${PLAN_ERR}"' EXIT
+PLAN_OUT="$(cd "${OUT_DIR}" && python3 -I -B "${MIG}" plan --profile "${PROFILE}" --root "${T}" --out "${SHEET}" "${EXCL[@]}" ${JSON_ARGS[@]+"${JSON_ARGS[@]}"} 2>"${PLAN_ERR}")"; PRC=$?
 AFTER="$(snapshot)" && [ -n "${AFTER}" ] || no "a foto do alvo depois do plan falhou: sem foto, não há prova de que nada foi escrito."
 if [ "${BEFORE}" != "${AFTER}" ]; then
   echo "MIGRAÇÃO: o alvo MUDOU durante o plan (git status ou conteúdo dos .kg.yaml, dos não rastreados ou do perfil) — PARE e investigue; o plan não escreve, isto não deveria acontecer." >&2
   exit 5
 fi
 if [ "${PRC}" -ne 0 ]; then
-  no "o kg_migrate.py plan do alvo saiu rc ${PRC} com o perfil ${PROFILE#"${T}/"}: $(printf '%s\n' "${PLAN_OUT}" | grep -v '^ *$' | tail -1 | cut -c1-300)"
+  _last="$(printf '%s\n%s\n' "${PLAN_OUT}" "$(cat "${PLAN_ERR}" 2>/dev/null)" | grep -v '^ *$' | tail -1 | cut -c1-300)"
+  if [ "${#JSON_ARGS[@]}" -eq 0 ]; then
+    no "o kg_migrate.py plan do alvo saiu rc ${PRC} com o perfil ${PROFILE#"${T}/"}: ${_last}"
+  fi
+  # a classe sai do rc e do campo `reason`; o `error` (prosa, na língua do ambiente) só é repassado
+  _cls="$(printf '%s' "${PLAN_OUT}" | python3 -I -B -c '
+import json, sys
+rc, raw = int(sys.argv[1]), sys.stdin.read()
+if rc == 2 and not raw.strip():
+    print("usage"); sys.exit(0)
+try:
+    doc = json.loads(raw.strip().splitlines()[-1])
+except Exception:
+    print("unknown"); sys.exit(0)
+if rc == 2 and isinstance(doc, dict) and doc.get("reason") == "broken_input":
+    print("broken_input\t" + " ".join(str(doc.get("error", "")).split())[:300])
+else:
+    print("unknown")
+' "${PRC}" 2>/dev/null)" || _cls="unknown"
+  case "${_cls}" in
+    broken_input*) no "o kg_migrate.py plan do alvo saiu rc 2 com o perfil ${PROFILE#"${T}/"}: entrada recusada pelo migrador (reason broken_input): ${_cls#broken_input?}" ;;
+    usage) no "o kg_migrate.py plan do alvo saiu rc 2 com o perfil ${PROFILE#"${T}/"}: erro de uso (stdout vazio, sem o objeto do --json; o migrador não aceitou a chamada): ${_last}" ;;
+    *) no "o kg_migrate.py plan do alvo saiu rc ${PRC} com o perfil ${PROFILE#"${T}/"} (saída fora do contrato do --json): ${_last}" ;;
+  esac
 fi
 [ -f "${SHEET}" ] && [ ! -L "${SHEET}" ] && [ -s "${SHEET}" ] || no "o plan saiu rc 0 sem gravar a planilha ${SHEET}."
 

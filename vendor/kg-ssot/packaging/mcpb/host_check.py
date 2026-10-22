@@ -69,7 +69,7 @@ def main(bundle, wheels, work):
     bare = [t["name"] for t in out.get(1, {}).get("result", {}).get("tools", [])]
     note = out.get(0, {}).get("result", {}).get("instructions", "")
     checks.append(("raiz que não abre: só o julgamento, com o motivo ao modelo",
-                   sorted(bare) == ["kg_schema_help", "kg_validate"] and "ARMAZÉM INDISPONÍVEL" in note))
+                   sorted(bare) == ["kg_schema_help", "kg_validate"] and "STORE UNAVAILABLE" in note))
     for name, ok in checks:
         print(("✓ " if ok else "✗ ") + name)
         if not ok:

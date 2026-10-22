@@ -57,8 +57,8 @@
                 "place": {"type": "string", "description": "o lugar legível: 'nó X', 'aresta #3 (A -> B)', 'meta', 'topo' ou 'arquivo'"},
                 "path": {"type": "string", "description": "o caminho no documento, como nodes[7].provenance.method; vazio quando é o arquivo inteiro"},
                 "line": {"type": ["integer", "null"], "minimum": 1, "description": "a linha (contando de 1) do ponto mais fundo do caminho que existe: no objeto ou mapa, a linha da chave; na lista, o início do item. Vale para o .kg.yaml e, desde a 4.8.2, para o .kg.json; null quando o documento não varre, quando a ocorrência não tem caminho (a chave desconhecida no topo, por exemplo) e no erro de parse sem marca"},
-                "message": {"type": "string", "description": "a frase em pt-BR para pessoas; pode mudar entre versões"},
-                "hint": {"type": "string", "description": "a correção canônica, quando o código tem uma"}
+                "message": {"type": "string", "description": "a frase para pessoas, na língua do ambiente (inglês por padrão, pt-BR com KG_SSOT_LANG=pt-BR ou locale pt_BR; desde a 4.18.0); pode mudar entre versões e línguas: compare pelo code"},
+                "hint": {"type": "string", "description": "a correção canônica, quando o código tem uma, na língua do ambiente como o message"}
               }
             }
           },

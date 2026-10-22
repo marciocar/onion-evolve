@@ -34,10 +34,12 @@ import sys
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_validate
+    from . import kg_i18n, kg_validate
 else:  # script ou vendor
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_i18n  # noqa: E402
     import kg_validate  # noqa: E402
+_ = kg_i18n._
 
 SCHEMA_VERSION = "kg-ssot.diff/1"
 GRAPH_GLOBS = ("*.kg.yaml", "*.kg.json")
@@ -54,7 +56,7 @@ class Broken(Exception):
 def _rev(rev):
     """Uma revisão que vai ao git: a que começa com '-' seria lida como opção (--output=ARQ grava um arquivo)."""
     if not isinstance(rev, str) or not rev or rev.startswith("-"):
-        raise Broken(f"revisão {rev!r} inválida: não pode ser vazia nem começar com '-'")
+        raise Broken(_("invalid revision {rev}: it cannot be empty or start with '-'").format(rev=repr(rev)))
     return rev
 
 
@@ -70,7 +72,7 @@ def _jsonable(v):
     """O default do json.dumps: o .nan/.inf do YAML (kg_validate.NonFinite) sai como o texto dele."""
     if isinstance(v, kg_validate.NonFinite):
         return v.text
-    raise TypeError(f"{type(v).__name__} não serializa")
+    raise TypeError(_("{type} is not JSON serializable").format(type=type(v).__name__))
 
 
 def _canon(v):
@@ -96,7 +98,7 @@ def read_spec(spec, repo):
     rev, name = spec.split(":", 1)
     text, code = _decode(_git(repo, "show", f"{_rev(rev)}:{name}"))
     if code:
-        raise Broken(f"{spec}: não é UTF-8")
+        raise Broken(_("{spec}: not UTF-8").format(spec=spec))
     return name, text
 
 
@@ -298,7 +300,7 @@ def changed_paths(repo, rev_from, rev_to, paths, exclude=()):
     try:
         raw = _git(repo, *args).decode("utf-8").split("\0")
     except UnicodeDecodeError:
-        raise Broken("um caminho mudado não é UTF-8") from None
+        raise Broken(_("a changed path is not UTF-8")) from None
     out = []
     for status, name in zip(raw[0::2], raw[1::2]):
         if name.endswith((".kg.yaml", ".kg.json")):
@@ -308,7 +310,7 @@ def changed_paths(repo, rev_from, rev_to, paths, exclude=()):
         try:
             new = _git(repo, "ls-files", "-z", "--others", "--exclude-standard", "--", *spec).decode("utf-8").split("\0")
         except UnicodeDecodeError:
-            raise Broken("um caminho novo não é UTF-8") from None
+            raise Broken(_("a new path is not UTF-8")) from None
         out += [("A", n) for n in new if n.endswith((".kg.yaml", ".kg.json"))]
     named = {pathlib.PurePosixPath(p).as_posix() for p in paths}
     return [(s, n) for s, n in out if n in named or not any(fnmatch.fnmatchcase(n, pat) for pat in exclude)]
@@ -356,21 +358,25 @@ def _short(v, n=80):
 def _field(f, n):
     """Um campo mudado no texto humano: o caminho com o antes e o depois, ou a renomeação com o valor que ficou."""
     if "renamed_from" in f:
-        return f"{f['renamed_from']} → {f['path']} (renomeado): {_short(f['after'], n)}"
+        return _("{old} → {new} (renamed): {value}").format(old=f["renamed_from"], new=f["path"],
+                                                            value=_short(f["after"], n))
     return f"{f['path']}: {_short(f['before'], n)} → {_short(f['after'], n)}"
 
 
-STATUS_PT = {"modified": "modificado", "added": "acrescentado", "removed": "removido", "unchanged": "igual",
-             "unreadable": "não lido"}
+# a linha de título de cada grafo, por status: o texto humano se traduz na hora (o status do JSON fica em inglês)
+STATUS_LINE = {"modified": lambda: _("{name} (modified)"), "added": lambda: _("{name} (added)"),
+               "removed": lambda: _("{name} (removed)"), "unchanged": lambda: _("{name} (unchanged)"),
+               "unreadable": lambda: _("{name} (unreadable)")}
 
 
 def human(res):
     lines = []
     for g in res["graphs"]:
         name = g["after"] or g["before"]
-        lines.append(f"{name} ({STATUS_PT[g['status']]})")
+        lines.append(STATUS_LINE[g["status"]]().format(name=name))
         if g["status"] == "unreadable":
-            lines += [f"  NÃO LIDO  {side}: {code}" for side, code in g["unreadable"].items()]
+            lines += ["  " + _("UNREADABLE  {side}: {code}").format(side=side, code=code)
+                      for side, code in g["unreadable"].items()]
             continue
         d = g["diff"]
         for f in (f for f in d["meta"] if "renamed_to" not in f):  # o --ignore vale com o prefixo meta. (meta.date)
@@ -382,36 +388,42 @@ def human(res):
         for n in d["nodes"]["changed"]:
             lines.append(f"  ~ {n['id']}  " + "; ".join(_field(f, 40)
                                                        for f in n["fields"] if "renamed_to" not in f))
-        for key, word in (("edges", "aresta"), ("external_edges", "aresta externa")):
+        for key, word in (("edges", _("edge")), ("external_edges", _("external edge"))):
             for sign, part in (("+", "added"), ("-", "removed"), ("~", "changed")):
                 for e in d[key][part]:
                     what = "; ".join(_field(f, 40)
                                      for f in e.get("fields", []) if "renamed_to" not in f)
-                    lines.append(f"  {sign} {word} {e['from'] or '(o grafo)'} -{e['edge_type']}-> {e['to']}"
+                    lines.append(f"  {sign} {word} {e['from'] or _('(the graph)')} -{e['edge_type']}-> {e['to']}"
                                  + (f"  ({what})" if what else ""))
     s = res["summary"]
-    lines.append(f"· {len(res['graphs'])} grafo(s): {s['modified']} modificado(s), {s['added']} acrescentado(s),"
-                 f" {s['removed']} removido(s), {s['unreadable']} não lido(s); nós +{s['nodes_added']} -{s['nodes_removed']} ~{s['nodes_changed']};"
-                 f" arestas +{s['edges_added']} -{s['edges_removed']} ~{s['edges_changed']}")
+    lines.append("· " + _("{graphs} graph(s): {modified} modified, {added} added, {removed} removed, {unreadable}"
+                          " unreadable; nodes +{nodes_added} -{nodes_removed} ~{nodes_changed};"
+                          " edges +{edges_added} -{edges_removed} ~{edges_changed}").format(graphs=len(res["graphs"]), **{
+        k: s[k] for k in ("modified", "added", "removed", "unreadable", "nodes_added", "nodes_removed", "nodes_changed",
+                          "edges_added", "edges_removed", "edges_changed")}))
     if s["fields"]:
-        lines.append("· campos mudados nos nós: " + " · ".join(f"{p}: {n}" for p, n in list(s["fields"].items())[:12]))
+        lines.append("· " + _("changed node fields: {fields}").format(
+            fields=" · ".join(f"{p}: {n}" for p, n in list(s["fields"].items())[:12])))
     if res["ignored"]:
-        lines.append("· ignorados: " + ", ".join(res["ignored"]))
+        lines.append("· " + _("ignored: {paths}").format(paths=", ".join(res["ignored"])))
     return "\n".join(lines)
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    ap.add_argument("specs", nargs="*", help="ANTES DEPOIS (arquivos ou REV:CAMINHO), ou os caminhos com --from")
-    ap.add_argument("--repo", default=".", help="o repositório git das revisões (default: o diretório atual)")
-    ap.add_argument("--from", dest="rev_from", help="a revisão de antes: compara todos os grafos que mudaram")
-    ap.add_argument("--to", dest="rev_to", help="a revisão de depois (sem ela, a árvore de trabalho)")
-    ap.add_argument("--ignore", action="append", default=[], metavar="CAMPO",
-                    help="tira o campo da comparação (repetível): verified_at, provenance.locator, meta.x_gerado_em")
+    ap = argparse.ArgumentParser(description=_("Diff by id between two revisions of .kg.yaml and .kg.json graphs "
+                                               "(release 4.17)."))
+    ap.add_argument("specs", nargs="*", help=_("BEFORE AFTER (files or REV:PATH), or the paths with --from"))
+    ap.add_argument("--repo", default=".", help=_("the git repository of the revisions (default: the current directory)"))
+    ap.add_argument("--from", dest="rev_from", help=_("the before revision: compares every graph that changed"))
+    ap.add_argument("--to", dest="rev_to", help=_("the after revision (without it, the working tree)"))
+    ap.add_argument("--ignore", action="append", default=[], metavar=_("FIELD"),
+                    help=_("leaves the field out of the comparison (repeatable): verified_at, provenance.locator,"
+                           " meta.x_generated_at"))
     ap.add_argument("--exclude", action="append", default=[], metavar="GLOB",
-                    help="com --from, caminhos que ficam de fora (repetível), somados aos padrões: "
-                    + ", ".join(DEFAULT_EXCLUDE))
-    ap.add_argument("--no-default-excludes", action="store_true", help="com --from, compara também o vendor e os fixtures")
+                    help=_("with --from, paths left out (repeatable), added to the defaults: {defaults}").format(
+                        defaults=", ".join(DEFAULT_EXCLUDE)))
+    ap.add_argument("--no-default-excludes", action="store_true",
+                    help=_("with --from, also compares the vendor and the fixtures"))
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_args(argv)
     global IGNORE
@@ -432,12 +444,12 @@ def _run(args):
                                         + tuple(args.exclude)))
         else:
             if args.rev_to or len(args.specs) != 2:
-                raise Broken("dê ANTES e DEPOIS, ou --from REV [--to REV] [CAMINHO...]")
+                raise Broken(_("give BEFORE and AFTER, or --from REV [--to REV] [PATH...]"))
             nb, tb = read_spec(args.specs[0], args.repo)
             na, ta = read_spec(args.specs[1], args.repo)
             res = result(args.specs[0], args.specs[1], [diff_pair(nb, tb, na, ta)])
     except Broken as exc:
-        print(f"ENTRADA QUEBRADA  {exc}", file=sys.stderr)
+        print(_("BROKEN INPUT  {error}").format(error=exc), file=sys.stderr)
         return 2
     text = json.dumps(res, ensure_ascii=False, indent=1, default=_jsonable) if args.format == "json" else human(res)
     # o surrogate solto (\ud800, que o contrato só avisa) não é UTF-8: sai como o escape \ud800, que no JSON é o mesmo valor

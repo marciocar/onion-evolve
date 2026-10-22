@@ -2,87 +2,111 @@
 
 <!-- mcp-name: io.github.marciocar/kg-ssot -->
 
-**O grafo de conhecimento verificável: toda afirmação diz de onde veio, quando foi conferida e o que depende dela,
-e o CI recusa a que não diz.**
+**A verifiable knowledge graph: every claim says where it came from, when it was verified, and what depends on it.
+Your CI rejects the claims that don't.**
 
-Este pacote traz o contrato formal do KG-SSOT e as ferramentas que o aplicam:
-- o **leitor de referência**, que julga um grafo `.kg.yaml` ou `.kg.json` contra o contrato, nos níveis MUST, que
-  reprova, e SHOULD, que alerta;
-- a **suíte de conformidade**, em dados puros, que todo leitor tem de passar;
-- o **gate por grafo** para o CI, com catraca: a dívida que já existe fica nomeada e não pode piorar;
-- o **armazém**, que só grava o que passa no contrato;
-- o **servidor MCP de referência**, que dá o contrato e o armazém a um modelo, por stdio ou por HTTP local;
-- o **exportador de proveniência** para PROV-O em JSON-LD.
+This package ships the formal KG-SSOT contract and the tools that enforce it:
 
-O contrato, a suíte e o schema do veredito viajam dentro do pacote, e o leitor não depende de nenhum harness de
-agente. Python 3.11 ou mais, com PyYAML e jsonschema.
+- the **reference reader**, which checks a `.kg.yaml` or `.kg.json` graph against the contract at two levels: MUST,
+  which fails, and SHOULD, which warns;
+- the **conformance suite**, as plain data, that every reader must pass;
+- the **per-graph gate** for CI, with a ratchet: existing debt stays named and can't get worse;
+- the **store**, which only writes what passes the contract;
+- the **reference MCP server**, which gives a model the contract and the store over stdio or local HTTP;
+- the **provenance exporter** to PROV-O in JSON-LD.
 
-## Instalar
+The contract, the suite, and the verdict schema ship inside the package. The reader depends on no agent harness.
+It needs Python 3.11 or later, PyYAML, and jsonschema.
+
+## Install
 
 ```bash
 pip install kg-ssot
 ```
 
-Para usar os comandos sem instalar no seu ambiente, use `pipx install kg-ssot` ou `uvx --from kg-ssot kg-validate`.
+To run the commands without installing them into your environment, use `pipx install kg-ssot` or
+`uvx --from kg-ssot kg-validate`.
 
-## Validar um grafo
+## Quickstart
+
+Check your graphs against the current contract:
 
 ```bash
-kg-validate grafo.kg.yaml outro.kg.json
+kg-validate graph.kg.yaml other.kg.json
 ```
 
 ```text
-PASSA   grafo.kg.yaml
-REPROVA outro.kg.json
+PASS graph.kg.yaml
+FAIL other.kg.json
   MUST   form.range.node.impact ×1 · integrity.orphan-node ×1
-· 2 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 2 files; 1 pass the MUST; 0 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
 ```
 
-O rc é 0 quando todos passam no MUST e 1 quando algum reprova. Alguns modos úteis:
-- `kg-validate --where` mostra o nó ou a aresta de cada ocorrência e, numa ocorrência MUST, a correção logo abaixo;
-- `kg-validate --format json` devolve o veredito estruturado, com código, caminho, linha, mensagem e dica, no
-  formato versionado `kg-ssot.verdict/1`.
+The exit code is 0 when every file passes the MUST, 1 when any file fails, and 2 on broken input. Two useful modes:
 
-## Os comandos
+- `kg-validate --where` shows the node or edge of each occurrence and, for a MUST occurrence that has a canonical fix,
+  the fix right below it;
+- `kg-validate --format json` returns the structured verdict (code, path, line, message, and hint) in the versioned
+  `kg-ssot.verdict/1` format.
 
-| Comando | O que faz |
-|---|---|
-| `kg-validate` | Julga grafos `.kg.yaml` e `.kg.json` contra o contrato vigente |
-| `kg-conformance` | Roda a suíte de conformidade que vem no pacote contra o leitor de referência |
-| `kg-gate` | Gate por grafo para o CI: grava uma linha de base (`--update`) e reprova se algo piorar |
-| `kg-store` | Armazém em disco, git ou versionado, que só grava o que passa no contrato |
-| `kg-mcp` (e o atalho `kg-ssot`) | Servidor MCP de referência (stdio, ou `--http` em loopback), com as ferramentas `kg_validate`, `kg_write`, `kg_get`, `kg_list`, `kg_query`, `kg_history`, `kg_delete` e `kg_schema_help` |
-| `kg-query` | Consulta e projeção de um corpus de grafos, com as arestas resolvidas para o label |
-| `kg-diff` | Diff por id entre dois grafos ou entre revisões do git |
-| `kg-prov-export` | Exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD |
-
-Como biblioteca, os módulos ficam em `kg_ssot`: `kg_ssot.kg_validate`, `kg_ssot.kg_store`, `kg_ssot.kg_mcp` e os
-demais.
-
-## O servidor MCP
+Run the bundled conformance suite against the reference reader:
 
 ```bash
-kg-mcp --root ./grafos --init
-uvx kg-ssot --root ./grafos --init   # o mesmo servidor, sem instalar: kg-ssot é um atalho para kg-mcp
+kg-conformance | tail -2
 ```
 
-O servidor fala MCP por stdio. Com `--http PORTA`, ele serve HTTP só em loopback, sem autenticação nem TLS: é para
-uso local. Para um servidor exposto, ponha um proxy com autenticação na frente.
+```text
+latest: 356/356 (gates the rc)
+optional: 10/24 (report only)
+```
 
-## Pacote ou vendor
+Only `latest/` sets the exit code. The `optional/` cases are reported and never change it.
 
-O pacote é o caminho para usar o leitor como biblioteca, como comando ou como servidor MCP. Para o gate no CI de um
-repositório, o canal recomendado continua o **vendor por tag**: o `kg_vendor.py` traz a release para dentro do seu
-repositório, com o sha256 de cada arquivo conferido. Assim o contrato que julga o seu grafo fica no seu diff. O
-[guia de adoção](https://github.com/marciocar/kg-ssot/blob/main/ADOPTING.md) explica os dois caminhos.
+## Commands
 
-## Documentação
+| Command | What it does |
+|---|---|
+| `kg-validate` | Checks `.kg.yaml` and `.kg.json` graphs against the current contract |
+| `kg-conformance` | Runs the bundled conformance suite against the reference reader |
+| `kg-gate` | Per-graph gate for CI: records a baseline (`--update`) and fails if anything gets worse |
+| `kg-store` | A store on disk, in git, or versioned, that only writes what passes the contract |
+| `kg-mcp` (and the `kg-ssot` alias) | Reference MCP server (stdio, or `--http` on loopback) with the tools `kg_validate`, `kg_write`, `kg_get`, `kg_list`, `kg_query`, `kg_history`, `kg_delete`, and `kg_schema_help` |
+| `kg-query` | Queries and projects a corpus of graphs, with edges resolved to their labels |
+| `kg-diff` | Diff by id between two graphs or between git revisions |
+| `kg-prov-export` | Exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD |
 
-- [Manual](https://github.com/marciocar/kg-ssot/tree/main/docs/manual): o formato, o contrato, as ferramentas, a adoção e os problemas comuns
-- [Guia de adoção](https://github.com/marciocar/kg-ssot/blob/main/ADOPTING.md)
-- [Suíte de conformidade](https://github.com/marciocar/kg-ssot/blob/main/spec/conformance/README.md)
-- [Para agentes de IA (llms.txt)](https://github.com/marciocar/kg-ssot/blob/main/llms.txt)
+As a library, the modules live under `kg_ssot`: `kg_ssot.kg_validate`, `kg_ssot.kg_store`, `kg_ssot.kg_mcp`, and the
+rest.
 
-## Licença
+## MCP server
 
-Apache-2.0. Veja `LICENSE` e `NOTICE`.
+```bash
+kg-mcp --root ./graphs --init
+uvx kg-ssot --root ./graphs --init   # the same server, no install: kg-ssot is an alias for kg-mcp
+```
+
+The server speaks MCP over stdio. With `--http PORT`, it serves HTTP on loopback (`127.0.0.1`) by default, with no
+TLS. To listen beyond loopback, you need `--allow-remote` plus a shared secret (`--secret-env`), and you still put a
+proxy that handles TLS in front of it.
+
+## Package or vendor
+
+Use the package to run the reader as a library, a command, or an MCP server. For the gate in a repository's CI, the
+recommended channel is still **vendoring by tag**: `kg_vendor.py` brings the release into your repository and verifies
+the sha256 of every file. That way, the contract that judges your graph shows up in your diff. The
+[adoption guide](https://github.com/marciocar/kg-ssot/blob/main/ADOPTING.md) covers both paths.
+
+## Documentation
+
+- [Manual](https://github.com/marciocar/kg-ssot/blob/main/docs/manual/README.md): the format, the contract, the tools,
+  adoption, and troubleshooting
+- [Adoption guide](https://github.com/marciocar/kg-ssot/blob/main/ADOPTING.md)
+- [Conformance suite](https://github.com/marciocar/kg-ssot/blob/main/spec/conformance/README.md)
+- [For AI agents (llms.txt)](https://github.com/marciocar/kg-ssot/blob/main/llms.txt)
+- [Source and releases](https://github.com/marciocar/kg-ssot)
+
+## License
+
+Apache-2.0. See `LICENSE` and `NOTICE`.
+
+Documentação em português: [README.pt-BR](https://github.com/marciocar/kg-ssot/blob/main/README.pt-BR.md).

@@ -76,10 +76,12 @@ import time
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_validate
+    from . import kg_i18n, kg_validate
 else:  # script ou vendor
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_i18n  # noqa: E402
     import kg_validate  # noqa: E402
+_ = kg_i18n._
 
 try:
     import fcntl
@@ -123,15 +125,21 @@ class NotFound(StoreError):
     """O nome (ou a versão pedida) não existe no armazém."""
 
 
+class InsideGitWorktree(StoreError):
+    """A raiz do disco ou do versionado mora dentro de uma worktree git: ali vale o GitStore. Classe própria para quem
+    escolhe o backend decidir pelo tipo, e não pela frase (que segue a língua do ambiente desde a 4.18.0)."""
+
+
 def sha256(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def check_name(name):
     if not isinstance(name, str) or not NAME.fullmatch(name):
-        raise StoreError(f"nome inválido: {name!r} (relativo, termina em .kg.yaml ou .kg.json, sem '..' nem segmento oculto)")
+        raise StoreError(_("invalid name: {name!r} (relative, ends in .kg.yaml or .kg.json, no '..' or hidden segment)")
+                         .format(name=name))
     if any(len(seg.encode("utf-8")) > SEGMENT_MAX for seg in name.split("/")):
-        raise StoreError(f"nome inválido: segmento com mais de {SEGMENT_MAX} bytes")
+        raise StoreError(_("invalid name: a segment has more than {max} bytes").format(max=SEGMENT_MAX))
     return name
 
 
@@ -139,7 +147,8 @@ def check_portable(name):
     """Um nome NOVO tem de existir em todo sistema: nenhum segmento reservado do Windows (CON, NUL, COM1...) nem que
     termina em ponto. O nome que já está no armazém segue lendo, gravando e removendo."""
     if any(seg.endswith(".") or _WIN_RESERVED.fullmatch(seg) for seg in name.split("/")):
-        raise StoreError(f"nome inválido: {name!r} (segmento reservado no Windows, como CON ou NUL, ou que termina em ponto)")
+        raise StoreError(_("invalid name: {name!r} (a segment reserved on Windows, such as CON or NUL, or one that ends "
+                           "in a period)").format(name=name))
     return name
 
 
@@ -176,7 +185,7 @@ def _same(a, b):
 
 def check_author(author):
     if author is not None and (not isinstance(author, str) or not AUTHOR.fullmatch(author)):
-        raise StoreError(f"autor inválido: {author!r} (a forma é 'Nome <email>')")
+        raise StoreError(_("invalid author: {author!r} (the form is 'Name <email>')").format(author=author))
     return author
 
 
@@ -185,7 +194,7 @@ def check_message(message, default):
     if message is None:
         return default
     if not isinstance(message, str) or not message.strip() or "\x00" in message:
-        raise StoreError("mensagem inválida: vazia ou com NUL")
+        raise StoreError(_("invalid message: empty or contains NUL"))
     return message
 
 
@@ -197,7 +206,7 @@ def _verdict_ok(doc):
     global _verdict_validator
     if _verdict_validator is None:
         _verdict_validator = kg_validate.make_validator(json.loads(VERDICT_SCHEMA.read_text(encoding="utf-8")))
-    return not any(True for _ in _verdict_validator.iter_errors(doc))
+    return not any(True for _err in _verdict_validator.iter_errors(doc))
 
 
 def _win_retry(op, tries=6):
@@ -219,7 +228,7 @@ def split_command(cmd):
             return shlex.split(cmd)
         return [t[1:-1] if len(t) >= 2 and t[0] == t[-1] == '"' else t for t in shlex.split(cmd, posix=False)]
     except ValueError as exc:  # aspas sem fechar
-        raise StoreError(f"o comando do gate externo não se lê: {exc}") from exc
+        raise StoreError(_("the external gate command cannot be parsed: {error}").format(error=exc)) from exc
 
 
 _LIVE_GATES = set()  # os gates rodando agora, para um SIGTERM ao processo não deixá-los órfãos
@@ -276,9 +285,10 @@ class CommandGate:
     def __init__(self, argv, timeout=60, drop_env=()):
         argv = split_command(argv) if isinstance(argv, str) else list(argv or [])
         if not argv:
-            raise StoreError("gate externo vazio: diga o comando")
+            raise StoreError(_("empty external gate: give the command"))
         if not (isinstance(timeout, (int, float)) and 0 < timeout <= self.MAX_TIMEOUT):  # recusa também NaN
-            raise StoreError(f"o tempo do gate externo tem de ser de mais de 0 até {self.MAX_TIMEOUT} segundos")
+            raise StoreError(_("the external gate timeout must be more than 0 and up to {max} seconds")
+                             .format(max=self.MAX_TIMEOUT))
         self.argv, self.timeout, self.drop_env = argv, timeout, frozenset(drop_env)
 
     @staticmethod
@@ -309,22 +319,25 @@ class CommandGate:
                 pass
             if os.fstat(stdout.fileno()).st_size > self.MAX_OUTPUT:
                 self._kill(p)
-                return None, f"a saída do gate externo passou de {self.MAX_OUTPUT} bytes"
+                return None, _("the external gate output exceeded {max} bytes").format(max=self.MAX_OUTPUT)
             if time.monotonic() >= deadline:
                 self._kill(p)
-                return None, f"o gate externo passou de {self.timeout} s"
+                return None, _("the external gate timed out after {timeout} s").format(timeout=self.timeout)
 
     def __call__(self, name, text, op):
         fold = str.upper if os.name == "nt" else str  # no Windows, o nome da variável não distingue caixa
         drop = {fold(k) for k in self.drop_env}
         env = {k: v for k, v in os.environ.items() if fold(k) not in drop}
+        if kg_i18n.machine_active():  # chamado pelo MCP: o veredito do gate vai ao modelo, e o protocolo é inglês
+            env["KG_SSOT_LANG"] = "en"
         env.update(KG_GATE_NAME=name, KG_GATE_OP=op)
         group = ({"creationflags": subprocess.CREATE_NEW_PROCESS_GROUP} if os.name == "nt"
                  else {"start_new_session": True})
         try:
             stdin, stdout = tempfile.TemporaryFile(), tempfile.TemporaryFile()
         except OSError as exc:  # sem diretório temporário: não julgado, sem o caminho dele na mensagem
-            return None, f"o gate externo não rodou (sem arquivo temporário: {exc.strerror or type(exc).__name__})"
+            return None, _("the external gate did not run (no temporary file: {error})").format(
+                error=exc.strerror or type(exc).__name__)
         with stdin, stdout:
             stdin.write((text or "").encode("utf-8"))
             stdin.seek(0)
@@ -336,15 +349,15 @@ class CommandGate:
             try:
                 with _LIVE_LOCK:
                     if _TERM["stopping"]:
-                        return None, "o gate externo não rodou (o processo está encerrando)"
+                        return None, _("the external gate did not run (the process is shutting down)")
                     if main:
                         _TERM["spawning"] = True
                     try:
                         p = subprocess.Popen(self.argv, stdin=stdin, stdout=stdout, stderr=subprocess.DEVNULL, env=env,
                                              **group)
                     except (OSError, ValueError) as exc:
-                        return None, (f"o gate externo não rodou ({type(exc).__name__}: "
-                                      f"{getattr(exc, 'strerror', None) or exc})")
+                        return None, _("the external gate did not run ({kind}: {error})").format(
+                            kind=type(exc).__name__, error=getattr(exc, 'strerror', None) or exc)
                     _LIVE_GATES.add(p)
             finally:
                 if main:
@@ -368,21 +381,21 @@ class CommandGate:
                 except OSError:
                     pass
             if rc not in (0, 1):
-                return None, f"o gate externo saiu com rc {rc}"
+                return None, _("the external gate exited with rc {rc}").format(rc=rc)
             if stdout.seek(0, os.SEEK_END) > self.MAX_OUTPUT:  # o que ele escreveu entre a última conferência e o fim
-                return None, f"a saída do gate externo passou de {self.MAX_OUTPUT} bytes"
+                return None, _("the external gate output exceeded {max} bytes").format(max=self.MAX_OUTPUT)
             stdout.seek(0)
             raw = stdout.read()
         try:
             doc = json.loads(raw.decode("utf-8"))
         except (UnicodeDecodeError, ValueError):
-            return None, "o gate externo não devolveu um veredito JSON"
+            return None, _("the external gate did not return a JSON verdict")
         if not _verdict_ok(doc):
-            return None, "o veredito do gate externo saiu fora de spec/verdict.schema.json"
+            return None, _("the external gate verdict does not conform to spec/verdict.schema.json")
         if not doc["results"]:
-            return None, "o veredito do gate externo veio sem resultado"
+            return None, _("the external gate verdict has no result")
         if any(r["verdict"] == "FAIL" for r in doc["results"]) != (rc == 1):
-            return None, "o rc do gate externo não bate com o veredito dele"
+            return None, _("the external gate rc does not match its verdict")
         return doc, None
 
 
@@ -393,28 +406,28 @@ class DiskStore:
     def __init__(self, root, schema=None, init=False, gate=None):
         self.gate = gate  # o gate externo (CommandGate ou um chamável (name, text, op) -> (doc, erro)), depois do contrato
         if PATH_MODE not in ("posix", "win"):
-            raise StoreError("o armazém exige POSIX (os.open com dir_fd e O_NOFOLLOW) ou Windows")
+            raise StoreError(_("the store requires POSIX (os.open with dir_fd and O_NOFOLLOW) or Windows"))
         self._posix = PATH_MODE == "posix"
         if not str(root).strip():
-            raise StoreError("raiz vazia: diga o diretório do armazém")
+            raise StoreError(_("empty root: give the store directory"))
         self.root = pathlib.Path(root)
         if init and not os.path.lexists(self.root):
             ancestor = self.root.absolute()
             while not os.path.lexists(ancestor):
                 if ancestor.parent == ancestor:  # um drive ou compartilhamento que não existe: nada acima para criar
-                    raise StoreError(f"a raiz {self.root} está num drive ou compartilhamento que não existe")
+                    raise StoreError(_("the root {root} is on a drive or share that does not exist").format(root=self.root))
                 ancestor = ancestor.parent
             self._check_root(ancestor)  # recusa antes de criar a pasta, não depois
             try:
                 self.root.mkdir(parents=True)
             except OSError as exc:
-                raise StoreError(f"não deu para criar a raiz {self.root}: {exc}") from exc
+                raise StoreError(_("could not create the root {root}: {error}").format(root=self.root, error=exc)) from exc
         try:
             st = os.lstat(self.root)
         except OSError as exc:
-            raise StoreError(f"raiz ilegível: {exc}") from exc
+            raise StoreError(_("unreadable root: {error}").format(error=exc)) from exc
         if _is_link(st) or not stat.S_ISDIR(st.st_mode):
-            raise StoreError(f"a raiz {self.root} tem de ser um diretório, não symlink")
+            raise StoreError(_("the root {root} must be a directory, not a symlink").format(root=self.root))
         self.root = self.root.resolve()
         self.schema = schema or kg_validate.CONTRACT_MUST
         self._check_root(self.root)
@@ -429,7 +442,9 @@ class DiskStore:
         except OSError:  # sem git instalado: nenhum gate vê um repo aqui
             return
         if out.returncode == 0 and out.stdout.strip() == b"true":
-            raise StoreError(f"{path} está dentro de um repo git: use o GitStore (o corpus do gate é o rastreado)")
+            raise InsideGitWorktree(_("{path} is inside a git repo: use the GitStore (the gate corpus is the tracked "
+                                      "files)")
+                             .format(path=path))
 
     # --- caminho seguro: nada segue symlink (POSIX por dir_fd; Windows por lstat antes e depois) --------------
     def _dir(self, parts, create=False):
@@ -444,9 +459,9 @@ class DiskStore:
                 try:
                     nxt = os.open(part, os.O_RDONLY | _DIRECTORY | _NOFOLLOW, dir_fd=fd)
                 except FileNotFoundError:
-                    raise NotFound(f"pasta inexistente: {part}")
+                    raise NotFound(_("missing folder: {part}").format(part=part))
                 except OSError as exc:  # ELOOP/ENOTDIR: symlink ou arquivo no lugar da pasta
-                    raise StoreError(f"pasta recusada (symlink ou não-diretório): {part}") from exc
+                    raise StoreError(_("folder refused (symlink or not a directory): {part}").format(part=part)) from exc
                 os.close(fd)
                 fd = nxt
             return fd
@@ -470,11 +485,11 @@ class DiskStore:
             try:
                 st = os.lstat(path)
             except FileNotFoundError:
-                raise NotFound(f"pasta inexistente: {part}")
+                raise NotFound(_("missing folder: {part}").format(part=part))
             except OSError as exc:
-                raise StoreError(f"pasta ilegível: {path}: {exc}") from exc
+                raise StoreError(_("unreadable folder: {path}: {error}").format(path=path, error=exc)) from exc
             if _redirects(path, st) or not stat.S_ISDIR(st.st_mode):
-                raise StoreError(f"pasta recusada (link, junção ou não-diretório): {part or path}")
+                raise StoreError(_("folder refused (link, junction, or not a directory): {part}").format(part=part or path))
             steps.append((path, st))
         return path, steps
 
@@ -485,9 +500,9 @@ class DiskStore:
             try:
                 st = os.lstat(path)
             except OSError as exc:
-                raise StoreError(f"o caminho mudou durante a operação: {path}") from exc
+                raise StoreError(_("the path changed during the operation: {path}").format(path=path)) from exc
             if _is_link(st) or not _same(st, before):
-                raise StoreError(f"o caminho mudou durante a operação: {path}")
+                raise StoreError(_("the path changed during the operation: {path}").format(path=path))
 
     @staticmethod
     def _win_open(path, flags, mode=0o644, exists=True):
@@ -500,14 +515,14 @@ class DiskStore:
                 raise
             before = None
         if before is not None and (_redirects(path, before) or not stat.S_ISREG(before.st_mode)):
-            raise StoreError(f"arquivo recusado (link, junção ou não regular): {path.name}")
+            raise StoreError(_("file refused (link, junction, or not regular): {name}").format(name=path.name))
         fd = os.open(path, flags | _BINARY, mode)
         try:
             opened = os.fstat(fd)
             after = os.lstat(path)
             if (_is_link(after) or not stat.S_ISREG(opened.st_mode) or not _same(opened, after)
                     or (before is not None and not _same(opened, before))):
-                raise StoreError(f"arquivo recusado (trocado durante a abertura): {path.name}")
+                raise StoreError(_("file refused (replaced while opening): {name}").format(name=path.name))
         except BaseException:
             os.close(fd)
             raise
@@ -527,7 +542,7 @@ class DiskStore:
             except FileNotFoundError:
                 return None
             except OSError as exc:
-                raise StoreError(f"arquivo recusado: {leaf}: {exc}") from exc
+                raise StoreError(_("file refused: {name}: {error}").format(name=leaf, error=exc)) from exc
             with os.fdopen(fd, "rb") as fh:
                 data = fh.read()
             self._win_recheck(steps)
@@ -542,10 +557,10 @@ class DiskStore:
             except FileNotFoundError:
                 return None
             except OSError as exc:
-                raise StoreError(f"arquivo recusado (symlink?): {leaf}") from exc
+                raise StoreError(_("file refused (symlink?): {name}").format(name=leaf)) from exc
             with os.fdopen(fd, "rb") as fh:
                 if not stat.S_ISREG(os.fstat(fh.fileno()).st_mode):
-                    raise StoreError(f"não é arquivo regular: {leaf}")
+                    raise StoreError(_("not a regular file: {name}").format(name=leaf))
                 return fh.read()
         finally:
             os.close(dfd)
@@ -558,13 +573,13 @@ class DiskStore:
         try:
             return data.decode("utf-8")
         except UnicodeDecodeError as exc:
-            raise StoreError(f"{name} não é UTF-8") from exc
+            raise StoreError(_("{name} is not UTF-8").format(name=name)) from exc
 
     def _write_head(self, name, text):
         try:
             self._write_file(name.split("/"), text.encode("utf-8"))
         except OSError as exc:
-            raise StoreError(f"não deu para gravar {name}: {exc}") from exc
+            raise StoreError(_("could not write {name}: {error}").format(name=name, error=exc)) from exc
 
     def _write_file(self, parts, data):
         """Grava parts (pastas + folha) sob a raiz por tmp + replace, sem seguir symlink."""
@@ -634,14 +649,14 @@ class DiskStore:
             try:
                 _win_retry(lambda: os.unlink(path / leaf))  # o unlink de um link remove o link, nunca o alvo
             except OSError as exc:
-                raise StoreError(f"não deu para remover {name}: {exc}") from exc
+                raise StoreError(_("could not remove {name}: {error}").format(name=name, error=exc)) from exc
             self._win_recheck(steps)
             return
         dfd = self._dir(parts)
         try:
             os.unlink(leaf, dir_fd=dfd)
         except OSError as exc:
-            raise StoreError(f"não deu para remover {name}: {exc}") from exc
+            raise StoreError(_("could not remove {name}: {error}").format(name=name, error=exc)) from exc
         finally:
             os.close(dfd)
 
@@ -658,7 +673,7 @@ class DiskStore:
             try:
                 fd = self._win_open(self.root / LOCK, os.O_RDWR | os.O_CREAT, exists=False)
             except OSError as exc:
-                raise StoreError(f"trava recusada ({LOCK}): {exc}") from exc
+                raise StoreError(_("lock refused ({lock}): {error}").format(lock=LOCK, error=exc)) from exc
             if msvcrt is None:  # o caminho do Windows fora do Windows (a bancada): confere o arquivo, sem trava
                 return ("none", fd)
             while True:  # LK_NBLCK não espera: a espera é este laço, sem o limite de 10 s do LK_LOCK
@@ -674,7 +689,7 @@ class DiskStore:
         try:
             fd = os.open(LOCK, os.O_RDWR | os.O_CREAT | _NOFOLLOW, 0o644, dir_fd=rfd)
         except OSError as exc:
-            raise StoreError(f"trava recusada ({LOCK} é symlink?): {exc}") from exc
+            raise StoreError(_("lock refused (is {lock} a symlink?): {error}").format(lock=LOCK, error=exc)) from exc
         finally:
             os.close(rfd)
         fcntl.flock(fd, fcntl.LOCK_EX)
@@ -728,11 +743,11 @@ class DiskStore:
             return self._read_ref(check_name(name), ref)
         text = self._visible(name, self._read_head(name))
         if text is None:
-            raise NotFound(f"{name} não existe")
+            raise NotFound(_("{name} does not exist").format(name=name))
         return text
 
     def _read_ref(self, name, ref):
-        raise StoreError(f"o armazém {self.backend} não guarda versão anterior")
+        raise StoreError(_("the {backend} store keeps no earlier version").format(backend=self.backend))
 
     def history(self, name):
         check_name(name)
@@ -776,7 +791,7 @@ class DiskStore:
         except Exception as exc:  # noqa: BLE001 - qualquer falha do julgamento é "não julgado", nunca PASS
             return None, f"{type(exc).__name__}: {exc}"
         if not _verdict_ok(doc):
-            return None, "o julgamento saiu fora de spec/verdict.schema.json"
+            return None, _("the judgment does not conform to spec/verdict.schema.json")
         return doc, None
 
     def _judge_all(self, name, text):
@@ -795,12 +810,13 @@ class DiskStore:
             try:
                 gdoc, gerr = self.gate(name, text, "write" if text is not None else "delete")
             except Exception as exc:  # noqa: BLE001 - o gate de quem adota não derruba o armazém nem vira PASS
-                return None, f"o gate externo levantou {type(exc).__name__}: {exc}", False
+                return None, _("the external gate raised {kind}: {error}").format(kind=type(exc).__name__, error=exc), False
             if gdoc is not None and _verdict_ok(gdoc) and not gdoc["results"]:
-                gdoc, gerr = None, "veredito sem resultado"
+                gdoc, gerr = None, _("verdict has no result")
             if gdoc is None or not _verdict_ok(gdoc):
-                gerr = gerr or "veredito fora de spec/verdict.schema.json"
-                return None, gerr if "gate externo" in gerr else f"gate externo: {gerr}", False
+                gerr = gerr or _("verdict does not conform to spec/verdict.schema.json")
+                # a mensagem que já nomeia o gate externo (na língua em uso) vai como está; as outras ganham o prefixo
+                return None, gerr if _("external gate") in gerr else _("external gate: {error}").format(error=gerr), False
             if any(r["verdict"] == "FAIL" for r in gdoc["results"]):
                 return gdoc, None, True
         return doc, None, False
@@ -816,7 +832,7 @@ class DiskStore:
         check_author(author)
         message = check_message(message, f"grava {name}")
         if not isinstance(text, str):
-            raise StoreError("o texto do grafo tem de ser str")
+            raise StoreError(_("the graph text must be a str"))
         lock = self._lock()
         try:
             self._precheck()
@@ -825,7 +841,7 @@ class DiskStore:
             if head is None:
                 check_portable(name)
                 if max_names is not None and len(self.list()) >= max_names:
-                    raise StoreError(f"o armazém já tem {max_names} grafos, o limite deste servidor")
+                    raise StoreError(_("the store already has {n} graphs, the limit on this server").format(n=max_names))
             visible = self._visible(name, head)
             current = sha256(visible) if visible is not None else None
             if expected_sha256 is not None and expected_sha256 != (current or NEW):
@@ -835,7 +851,7 @@ class DiskStore:
                 return self._result(name, False, "not_judged", current, error=err)
             if any(r["verdict"] == "FAIL" for r in doc["results"]):
                 return self._result(name, False, "gate", current, verdict=doc,
-                                    error="reprovado pelo gate externo" if external else None)
+                                    error=_("rejected by the external gate") if external else None)
             new = sha256(text)
             if new == self._recorded_sha(name):  # o mesmo texto da última versão registrada: sem commit nem evento
                 if new != current:
@@ -870,7 +886,7 @@ class DiskStore:
                 return self._result(name, False, "not_judged", current, error=err)
             if any(r["verdict"] == "FAIL" for r in doc["results"]):
                 return self._result(name, False, "gate", current, verdict=doc,
-                                    error="reprovado pelo gate externo" if external else None)
+                                    error=_("rejected by the external gate") if external else None)
             self._remove_head(name)
             try:
                 ref = self._commit("delete", name, None, message, author, None)
@@ -891,22 +907,22 @@ class DiskStore:
         externo, se houver, julga cada mudança isolada, como no write(). A mudança que repete a última versão registrada sai com unchanged; o resto entra num registro
         só (um commit no git, um bloco de eventos no versionado). Se o registro falha, todas as cabeças voltam."""
         if not isinstance(changes, (list, tuple)) or not changes:
-            raise StoreError("changes tem de ser uma lista não vazia de (nome, texto)")
+            raise StoreError(_("changes must be a non-empty list of (name, text)"))
         if any(not isinstance(c, (list, tuple)) or len(c) != 2 for c in changes):
-            raise StoreError("cada mudança é um par (nome, texto)")
+            raise StoreError(_("each change is a (name, text) pair"))
         changes = [tuple(c) for c in changes]
-        names = [n for n, _ in changes]
+        names = [n for n, _text in changes]
         if len(set(names)) != len(names):
-            raise StoreError("o mesmo nome aparece duas vezes no conjunto")
+            raise StoreError(_("the same name appears twice in the set"))
         for n, t in changes:
             check_name(n)
             if t is not None and not isinstance(t, str):
-                raise StoreError(f"o texto de {n} tem de ser str (ou None para remover)")
+                raise StoreError(_("the text of {name} must be a str (or None to remove)").format(name=n))
         check_author(author)
         message = check_message(message, f"grava {len(changes)} grafos")
         expected = dict(expected or {})
         if set(expected) - set(names):
-            raise StoreError("expected cita nome fora do conjunto")
+            raise StoreError(_("expected has a name outside the set"))
         lock = self._lock()
         try:
             self._precheck()
@@ -925,7 +941,8 @@ class DiskStore:
                     out[n] = self._result(n, False, "conflict", current[n])
             new_names = [n for n, t in changes if t is not None and current[n] is None]
             if max_names is not None and new_names and len(self.list()) + len(new_names) > max_names:
-                raise StoreError(f"o armazém já tem {len(self.list())} grafos, e o limite deste servidor é {max_names}")
+                raise StoreError(_("the store already has {n} graphs, and the limit on this server is {max}")
+                                 .format(n=len(self.list()), max=max_names))
             if out:
                 return self._many(changes, out, current, next(r["reason"] for r in out.values()))
             doc, err, external = self._judge_set_all(dict(changes))
@@ -933,7 +950,7 @@ class DiskStore:
                 return self._many(changes, {n: self._result(n, False, "not_judged", current[n], error=err)
                                             for n in names}, current, "not_judged", error=err)
             if any(r["verdict"] == "FAIL" for r in doc["results"]):
-                error = "reprovado pelo gate externo" if external else None
+                error = _("rejected by the external gate") if external else None
                 return self._many(changes, {n: self._result(n, False, "gate", current[n], verdict=doc, error=error)
                                             for n in names}, current, "gate", verdict=doc, error=error)
             todo, touched = [], []
@@ -948,7 +965,7 @@ class DiskStore:
                         out[n] = self._result(n, True, None, new, None, doc, unchanged=True)
                     else:
                         todo.append((n, t, new))
-                for n, t, _ in todo:
+                for n, t, _sha in todo:
                     touched.append(n)
                     if t is None:
                         self._remove_head(n)
@@ -979,11 +996,11 @@ class DiskStore:
                 prefix = "/".join(parts[:k])
                 first, owner = seen.setdefault(prefix.casefold(), (prefix, n))
                 if first != prefix and not (self._read_head(n) is not None and self._read_head(owner) is not None):
-                    raise StoreError(f"nome inválido: {n!r} só difere de {owner!r} pela caixa, no mesmo conjunto (no "
-                                     "Windows e no macOS os dois são o mesmo arquivo)")
+                    raise StoreError(_("invalid name: {name!r} differs from {other!r} only by case, in the same set "
+                                       "(on Windows and macOS they are the same file)").format(name=n, other=owner))
 
     def _many(self, changes, out, current, reason, ref=None, verdict=None, error=None):
-        results = [out.get(n) or self._result(n, False, "skipped", current.get(n)) for n, _ in changes]
+        results = [out.get(n) or self._result(n, False, "skipped", current.get(n)) for n, _text in changes]
         return {"written": reason is None, "reason": reason, "results": results, "ref": ref, "verdict": verdict,
                 "error": error}
 
@@ -1023,8 +1040,8 @@ class DiskStore:
     def _check_case(self, name):
         clash = self._case_clash(name)
         if clash is not None:
-            raise StoreError(f"nome inválido: {name!r} só difere de {clash!r} pela caixa (no Windows e no macOS os dois "
-                             "são o mesmo arquivo)")
+            raise StoreError(_("invalid name: {name!r} differs from {other!r} only by case (on Windows and macOS they "
+                               "are the same file)").format(name=name, other=clash))
 
     def _visible(self, name, head):
         """A cabeça como o armazém a enxerga (no disco, o próprio arquivo); a trava e o missing usam esta régua."""
@@ -1050,23 +1067,23 @@ class GitStore(DiskStore):
         git = self.root / ".git"
         if not os.path.lexists(git):
             if not init:
-                raise StoreError(f"{self.root} não tem .git (use init=True para criar)")
+                raise StoreError(_("{root} has no .git (use init=True to create it)").format(root=self.root))
             self._git("init", "-q", setup=True)
         st = os.lstat(git)
         if _is_link(st) or not stat.S_ISDIR(st.st_mode):
-            raise StoreError(f"{git} tem de ser um diretório, não symlink nem gitfile")
+            raise StoreError(_("{path} must be a directory, not a symlink or a gitfile").format(path=git))
         exclude = git / "info" / "exclude"  # a trava do armazém não é conteúdo: fica fora do status
         try:
             for p in (git / "info", exclude):
                 if os.path.lexists(p) and _is_link(os.lstat(p)):
-                    raise StoreError(f"{p} é symlink")
+                    raise StoreError(_("{path} is a symlink").format(path=p))
             current = exclude.read_text(encoding="utf-8") if exclude.is_file() else ""
             if LOCK not in current.split("\n"):
                 exclude.parent.mkdir(exist_ok=True)
                 exclude.write_text(current + ("" if current.endswith("\n") or not current else "\n") + LOCK + "\n",
                                    encoding="utf-8")
         except OSError as exc:
-            raise StoreError(f"não deu para escrever {exclude}: {exc}") from exc
+            raise StoreError(_("could not write to {path}: {error}").format(path=exclude, error=exc)) from exc
 
     def _check_root(self, path):
         """O GitStore é o armazém que mora num repo: o próprio, na raiz (o __init__ confere o .git)."""
@@ -1088,9 +1105,10 @@ class GitStore(DiskStore):
         try:
             out = subprocess.run(["git", *hardening, *args], cwd=self.root, env=env, capture_output=True)
         except (OSError, ValueError) as exc:
-            raise StoreError(f"git {args[0]} não rodou: {exc}") from exc
+            raise StoreError(_("git {cmd} did not run: {error}").format(cmd=args[0], error=exc)) from exc
         if check and out.returncode != 0:
-            raise StoreError(f"git {args[0]} falhou: {out.stderr.decode('utf-8', 'replace').strip()}")
+            raise StoreError(_("git {cmd} failed: {error}").format(cmd=args[0],
+                                                                  error=out.stderr.decode('utf-8', 'replace').strip()))
         return out
 
     def list(self):
@@ -1132,7 +1150,7 @@ class GitStore(DiskStore):
 
     def _commit_many(self, todo, message, author):
         """Um commit só para o conjunto inteiro."""
-        names = [n for n, _, _ in todo]
+        names = [n for n, _text, _sha in todo]
         self._git("add", "-f", "-A", "--", *names)
         args = ["commit", "-q", "--no-verify", "-m", message]
         if author:
@@ -1142,10 +1160,10 @@ class GitStore(DiskStore):
 
     def _read_ref(self, name, ref):
         if not re.fullmatch(r"[0-9a-fA-F]{4,64}", str(ref)):  # fullmatch: o $ aceitaria um \n final
-            raise StoreError(f"ref inválida: {ref!r} (um sha de commit)")
+            raise StoreError(_("invalid ref: {ref!r} (a commit sha)").format(ref=ref))
         out = self._git("show", f"{ref}:{name}", check=False)
         if out.returncode != 0:
-            raise NotFound(f"{name} não existe em {ref}")
+            raise NotFound(_("{name} does not exist at {ref}").format(name=name, ref=ref))
         return out.stdout.decode("utf-8")
 
     def history(self, name):
@@ -1175,7 +1193,7 @@ class VersionedStore(DiskStore):
         try:
             return [json.loads(line) for line in text.splitlines() if line.strip()] if text else []
         except ValueError as exc:  # registro corrompido: falha alto, nunca grava por cima
-            raise StoreError(f"{META}/events.jsonl corrompido: {exc}") from exc
+            raise StoreError(_("{path} is corrupted: {error}").format(path=f"{META}/events.jsonl", error=exc)) from exc
 
     def _precheck(self):
         self._events()
@@ -1191,21 +1209,21 @@ class VersionedStore(DiskStore):
         try:
             return data.decode("utf-8")
         except UnicodeDecodeError as exc:
-            raise StoreError(f"{META}/{rel} não é UTF-8") from exc
+            raise StoreError(_("{name} is not UTF-8").format(name=f"{META}/{rel}")) from exc
 
     def _commit(self, op, name, sha, message, author, text):
         if sha is not None:
             try:
                 self._write_file([META, "blobs", f"{sha}.yaml"], text.encode("utf-8"))
             except OSError as exc:
-                raise StoreError(f"não deu para gravar a versão {sha}: {exc}") from exc
+                raise StoreError(_("could not write the version {sha}: {error}").format(sha=sha, error=exc)) from exc
         seq = len(self._events()) + 1
         event = {"seq": seq, "op": op, "name": name, "sha256": sha, "author": author, "message": message,
                  "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")}
         try:
             self._append([META, "events.jsonl"], (json.dumps(event, ensure_ascii=False) + "\n").encode("utf-8"))
         except OSError as exc:
-            raise StoreError(f"não deu para registrar o evento: {exc}") from exc
+            raise StoreError(_("could not record the event: {error}").format(error=exc)) from exc
         return seq
 
     def _commit_many(self, todo, message, author):
@@ -1217,7 +1235,7 @@ class VersionedStore(DiskStore):
                 try:
                     self._write_file([META, "blobs", f"{new}.yaml"], t.encode("utf-8"))
                 except OSError as exc:
-                    raise StoreError(f"não deu para gravar a versão {new}: {exc}") from exc
+                    raise StoreError(_("could not write the version {sha}: {error}").format(sha=new, error=exc)) from exc
         seq = len(self._events())
         ts = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
         lines = []
@@ -1228,7 +1246,7 @@ class VersionedStore(DiskStore):
         try:
             self._append([META, "events.jsonl"], "".join(lines).encode("utf-8"))
         except OSError as exc:
-            raise StoreError(f"não deu para registrar os eventos: {exc}") from exc
+            raise StoreError(_("could not record the events: {error}").format(error=exc)) from exc
         return seq
 
     def history(self, name):
@@ -1241,24 +1259,43 @@ class VersionedStore(DiskStore):
         try:
             seq = int(ref)
         except (TypeError, ValueError):
-            raise StoreError(f"ref inválida: {ref!r} (o seq de um evento)")
+            raise StoreError(_("invalid ref: {ref!r} (the seq of an event)").format(ref=ref))
         event = next((e for e in self._events() if e["seq"] == seq and e["name"] == name), None)
         if event is None or event["sha256"] is None:
-            raise NotFound(f"{name} não tem versão no evento {ref}")
+            raise NotFound(_("{name} has no version at event {ref}").format(name=name, ref=ref))
         text = self._meta_read(f"blobs/{event['sha256']}.yaml")
         if text is None:
-            raise NotFound(f"a versão {event['sha256']} sumiu de {META}/blobs")
+            raise NotFound(_("the version {sha} is missing from {path}").format(sha=event['sha256'], path=f"{META}/blobs"))
         if sha256(text) != event["sha256"]:
-            raise StoreError(f"a versão {event['sha256']} em {META}/blobs não confere com o sha256 do evento")
+            raise StoreError(_("the version {sha} in {path} does not match the event sha256")
+                             .format(sha=event['sha256'], path=f"{META}/blobs"))
         return text
 
 
 BACKENDS = {"disk": DiskStore, "git": GitStore, "versioned": VersionedStore}
 
+# a descrição do --help, em inglês (a fonte); a tradução vem do catálogo. O docstring do módulo segue em pt-BR
+USAGE = """A store of .kg.yaml and .kg.json files that writes only what the contract passes.
+
+Three backends with the same interface: disk (the head on disk, no history), git (one commit per write or delete)
+and versioned (the head on disk plus an event log and the versions in .kg-store/, no git). Every write and delete
+is judged by the contract, and by the external gate when there is one; nothing that fails is written.
+
+CLI (JSON output on stdout):
+  kg_store.py --backend disk|git|versioned --root DIR [--init] list
+  kg_store.py ... read NAME [--ref REF]
+  kg_store.py ... write NAME [FILE|-] [--message M] [--author "Name <email>"] [--expected-sha256 S|new]
+  kg_store.py ... delete NAME [--message M] [--author A] [--expected-sha256 S]
+  kg_store.py ... write-many SET.json [--message M] [--author A]
+    the set is {"changes": [{"name": N, "file": F} | {"name": N, "text": T} | {"name": N, "delete": true}],
+    "expected": {N: S|new}}, with file relative to SET.json; writes all or nothing (write_many)
+  kg_store.py ... history NAME
+rc: 0 ok · 1 refused (gate, conflict, missing, name that does not exist) · 2 broken input or not_judged."""
+
 
 def open_store(backend, root, **kw):
     if backend not in BACKENDS:
-        raise StoreError(f"backend desconhecido: {backend!r} ({', '.join(BACKENDS)})")
+        raise StoreError(_("unknown backend: {backend!r} ({choices})").format(backend=backend, choices=', '.join(BACKENDS)))
     return BACKENDS[backend](root, **kw)
 
 
@@ -1283,17 +1320,17 @@ def read_set(path):
     try:
         doc = json.loads(path.read_text(encoding="utf-8"))
     except ValueError as exc:
-        raise StoreError(f"{path.name} não é JSON: {exc}") from exc
+        raise StoreError(_("{name} is not JSON: {error}").format(name=path.name, error=exc)) from exc
     if not isinstance(doc, dict) or not isinstance(doc.get("changes"), list):
-        raise StoreError(f"{path.name}: falta a lista changes")
+        raise StoreError(_("{name}: the changes list is missing").format(name=path.name))
     changes = []
     for c in doc["changes"]:
         if not isinstance(c, dict) or not isinstance(c.get("name"), str) or \
                 sum(k in c for k in ("file", "text", "delete")) != 1:
-            raise StoreError(f"{path.name}: cada mudança tem name e exatamente um de file, text ou delete")
+            raise StoreError(_("{name}: each change has name and exactly one of file, text, or delete").format(name=path.name))
         if "delete" in c:
             if c["delete"] is not True:
-                raise StoreError(f"{path.name}: delete só aceita true")
+                raise StoreError(_("{name}: delete only accepts true").format(name=path.name))
             changes.append((c["name"], None))
         elif "text" in c:
             changes.append((c["name"], c["text"]))
@@ -1301,18 +1338,18 @@ def read_set(path):
             changes.append((c["name"], (path.parent / c["file"]).read_text(encoding="utf-8")))
     expected = doc.get("expected")
     if expected is not None and not isinstance(expected, dict):
-        raise StoreError(f"{path.name}: expected é um objeto nome → sha256")
+        raise StoreError(_("{name}: expected must be an object that maps name → sha256").format(name=path.name))
     return changes, expected
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(description=_(USAGE), formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--backend", choices=sorted(BACKENDS), default="disk")
     ap.add_argument("--root", required=True)
-    ap.add_argument("--init", action="store_true", help="cria a raiz (e o repo, no git) se não existe")
-    ap.add_argument("--gate-cmd", help="um gate externo, depois do contrato: o comando recebe o texto no stdin e devolve "
-                                       "um kg-ssot.verdict/1 (veja CommandGate)")
-    ap.add_argument("--gate-timeout", type=float, help="segundos para o gate externo (default 60)")
+    ap.add_argument("--init", action="store_true", help=_("create the root (and the repo, with git) if it does not exist"))
+    ap.add_argument("--gate-cmd", help=_("an external gate, after the contract: the command reads the text on stdin and "
+                                         "returns a kg-ssot.verdict/1 (see CommandGate)"))
+    ap.add_argument("--gate-timeout", type=float, help=_("timeout in seconds for the external gate (default 60)"))
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("list")
     p = sub.add_parser("read")
@@ -1322,12 +1359,12 @@ def main(argv=None):
         p = sub.add_parser(cmd)
         p.add_argument("name")
         if cmd == "write":
-            p.add_argument("file", nargs="?", default="-", help="o grafo; '-' (default) lê o stdin")
+            p.add_argument("file", nargs="?", default="-", help=_("the graph; '-' (default) reads stdin"))
         p.add_argument("--message")
         p.add_argument("--author")
         p.add_argument("--expected-sha256")
     p = sub.add_parser("write-many")
-    p.add_argument("file", help="o conjunto em JSON (veja o uso acima)")
+    p.add_argument("file", help=_("the set in JSON (see the usage above)"))
     p.add_argument("--message")
     p.add_argument("--author")
     p = sub.add_parser("history")
@@ -1340,7 +1377,7 @@ def main(argv=None):
     try:
         # --gate-cmd "" (uma variável vazia) é recusado, nunca "sem gate" calado
         if args.gate_timeout is not None and args.gate_cmd is None:
-            raise StoreError("--gate-timeout sem --gate-cmd: não há gate para o tempo")
+            raise StoreError(_("--gate-timeout without --gate-cmd: there is no gate for the timeout"))
         gate = (CommandGate(args.gate_cmd, 60 if args.gate_timeout is None else args.gate_timeout)
                 if args.gate_cmd is not None else None)
         if gate is not None:
@@ -1373,7 +1410,7 @@ def main(argv=None):
         emit({"error": str(exc)})
         return 1
     except (StoreError, OSError, UnicodeDecodeError) as exc:
-        print(f"ENTRADA QUEBRADA  {exc}", file=sys.stderr)
+        print(_("BROKEN INPUT  {error}").format(error=exc), file=sys.stderr)
         return 2
     emit(res)
     return 0 if res["written"] else 2 if res["reason"] == "not_judged" else 1

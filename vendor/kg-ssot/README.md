@@ -2,69 +2,85 @@
 
 # KG-SSOT
 
-**O grafo de conhecimento verificável: toda afirmação diz de onde veio, quando foi conferida e o que depende
-dela, e o CI recusa a que não diz.**
+**Verifiable knowledge graphs in plain text: every claim says where it came from, when it was last verified and
+what depends on it, and your CI rejects the ones that don't.**
 
-[![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.17.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.17.2-6f42c1)](spec/release.json)
-[![Suíte: 356/356](https://img.shields.io/badge/su%C3%ADte-356%2F356-2ea44f)](spec/conformance/README.md)
+**English** | [Português (Brasil)](README.pt-BR.md)
+
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
+[![Contract: v4 · release 4.18.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.18.0-6f42c1)](spec/release.json)
+[![Conformance: 356/356](https://img.shields.io/badge/conformance-356%2F356-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
+[![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
+[![npm](https://img.shields.io/npm/v/kg-ssot)](https://www.npmjs.com/package/kg-ssot)
 
-[Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
+[Manual](docs/manual/README.md) · [Adopt it](ADOPTING.md) · [The contract](docs/manual/04-contract.md) · [Conformance suite](spec/conformance/README.md) · [Changelog](CHANGELOG.md) · [For AI agents](llms.txt)
 
 </div>
 
 ---
 
-## Por que
+## Why
 
-Equipes, de pessoas ou de agentes, acumulam conclusões: "o retry é idempotente", "decidimos três tentativas".
-Elas moram em atas, tickets e memórias de conversa, e perdem três coisas pelo caminho: **a fonte**, **a data da
-conferência** e **o que depende delas**. Um texto convincente sem nenhuma das três passa em qualquer revisão
-apressada.
+Teams, of people or of agents, pile up conclusions: "the retry is idempotent", "we decided on three attempts".
+They live in meeting notes, tickets and chat memories, and on the way they lose three things: **the source**, **the
+date it was last verified** and **what depends on it**. A convincing sentence without any of the three passes a
+hurried review.
 
-O KG-SSOT trata isso como problema de **formato**, não de disciplina. O conhecimento vive num grafo `.kg.yaml`,
-versionado junto do código, e um **contrato formal** decide no CI o que reprova:
+KG-SSOT treats this as a **format** problem, not a discipline problem. Knowledge lives in a `.kg.yaml` graph,
+versioned next to the code, and a **formal contract** decides in CI what fails:
 
-- um nó `confirmed` ou de produção **sem proveniência** reprova (o que não tem fonte recuperável se declara
-  `unverifiable`);
-- uma fonte que é só um marcador (`unknown`, `n/a`, `tbd`) reprova;
-- uma aresta que aponta para o nada reprova, e um nó solto também;
-- um carimbo de verificação sem alvo, uma decisão sem origem e uma produção apoiada só em relato **alertam**.
+- a `confirmed` or production node **without provenance** fails (a claim with no recoverable source is declared
+  `unverifiable` instead);
+- a source that is only a placeholder (`unknown`, `n/a`, `tbd`) fails;
+- an edge that points nowhere fails, and so does a node with no edges;
+- a verification stamp with nothing to check against, a decision with no origin and a production claim backed only by
+  testimony **raise warnings**.
 
-## Comece em 60 segundos
+## Get started in 60 seconds
+
+```bash
+pip install kg-ssot
+
+# the conformance suite against the reference reader, from the installed package
+kg-conformance | tail -2
+
+# one valid graph and one that fails
+kg-validate valid.kg.yaml broken.kg.yaml
+```
+
+Or straight from the repository, with hash-checked dependencies:
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot && cd kg-ssot
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/requirements.txt
-
-# a suíte de conformidade contra o leitor de referência
-.venv/bin/python3 -I tools/kg_conformance.py | tail -2
-
-# um grafo válido e um que reprova
 .venv/bin/python3 -I tools/kg_validate.py \
   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml \
   spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
 ```
 
 ```text
-latest: 356/356 (reprova)
-optional: 10/24 (só reporta)
-PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
-REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
+PASS spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
+FAIL spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
   MUST   form.required.node.label ×1
-· 2 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 2 files; 1 pass the MUST; 0 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
 ```
 
-Para usar como comando, biblioteca ou servidor MCP, o mesmo kit sai no PyPI: `pip install kg-ssot` traz os comandos
-`kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
-do pacote. Em JavaScript, `npm install kg-ssot` traz o leitor JS, com o validador pré-compilado que roda também
-no React Native e no Expo. Para um cliente de MCP como o Claude Desktop, o servidor sai também como MCP Bundle
-(`.mcpb`), e para rodar como serviço ao lado de um cliente sem Python, como o LibreChat, há a imagem OCI
-`ghcr.io/marciocar/kg-ssot` ([manual, "A imagem OCI"](docs/manual/05-ferramentas.md)). Para levar o gate a um repositório seu, o caminho é o vendor por tag, no
-[capítulo 6 do manual](docs/manual/06-adocao-e-ci.md).
+The tools print in English by default and in Brazilian Portuguese when your locale is `pt_BR` (or
+`KG_SSOT_LANG=pt-BR`). Codes, exit codes and JSON keys never change with the language; only the human text does.
 
-## Um nó, por dentro
+## Install
+
+| Channel | Command | What you get |
+|---|---|---|
+| PyPI | `pip install kg-ssot` | The commands `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-mcp` and `kg-prov-export`, with the contract and the suite inside |
+| npm | `npm install kg-ssot` | The JavaScript reader with a precompiled validator, which also runs in React Native and Expo |
+| Claude Desktop | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
+| MCP Registry | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
+| Container | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
+| Your repository | `kg_vendor.py update --tag kg-ssot-v4.18.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
+
+## A node, inside
 
 ```yaml
 - id: C_RETRY_SAFE
@@ -73,119 +89,127 @@ no React Native e no Expo. Para um cliente de MCP como o Claude Desktop, o servi
   status: confirmed
   impact: 4
   confidence: 0.8
-  label: O retry do pagamento é idempotente.
+  label: The payment retry is idempotent.
   verified_at: "2026-10-01"
   verified_against: tests/payment_retry_test.py
   provenance:
     source: tests/payment_retry_test.py
     locator: test_retry_is_idempotent
-    method: "medição: teste de integração no CI"
+    method: "medição: integration test in CI"
 ```
 
-O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `medição`, `leitura`, `juízes`,
-`derivado` ou `testemunho`. O carimbo diz quando foi conferido e contra o quê.
+The `label` is the claim, short. The `provenance` says where it came from and **how**: one of five method classes,
+`medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived) or `testemunho` (testimony).
+The stamp says when it was verified and against what. The method classes are literal values of the contract and stay
+as written.
 
-## Como funciona
+## Use it from an AI agent
+
+The reference MCP server gives a model the contract and a store: it validates a graph, writes only what passes,
+reads, lists, queries with every edge resolved to the label on the other end, and shows history. Read-only tools are
+annotated as such, so a client can skip confirmation for them.
+
+```bash
+kg-mcp --root ./graphs          # stdio, for Claude Desktop, Claude Code and other MCP clients
+```
+
+`kg_schema_help` returns the current contract, a minimal passing example and the fixes for the most common codes, so a
+model can write a passing graph on the first try. [llms.txt](llms.txt) indexes the documentation for agents, and
+[llms-full.txt](llms-full.txt) has all of it in one file.
+
+## How it works
 
 ```mermaid
 flowchart LR
-  subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
-    C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>356 casos em dados puros"]
-    R["Leitor de referência<br/>kg_validate.py"]
-    S -- "todo leitor passa" --> R
+  subgraph product["Product (one tag kg-ssot-vX.Y.Z)"]
+    C["Contract<br/>JSON Schema MUST + SHOULD<br/>+ integrity rules"]
+    S["Conformance suite<br/>356 cases as plain data"]
+    R["Reference reader<br/>kg_validate.py"]
+    S -- "every reader passes" --> R
     C --> R
   end
-  subgraph adotante["Repositório adotante"]
-    V["vendor/kg-ssot<br/>+ carimbo sha256"]
-    G["kg_gate.py no CI<br/>catraca por grafo"]
-    K[".kg.yaml do time"]
+  subgraph adopter["Adopter repository"]
+    V["vendor/kg-ssot<br/>+ sha256 stamp"]
+    G["kg_gate.py in CI<br/>per-graph ratchet"]
+    K["the team's .kg.yaml"]
     V --> G
     K --> G
   end
-  produto -- "kg_vendor.py update --tag" --> V
-  G -- "nada piora:<br/>grafo novo passa,<br/>dívida só encolhe" --> PR["PR aprovado"]
+  product -- "kg_vendor.py update --tag" --> V
+  G -- "nothing gets worse:<br/>a new graph passes,<br/>debt only shrinks" --> PR["PR approved"]
 ```
 
-1. **O contrato** é JSON Schema 2020-12 em dois níveis: **MUST** reprova, **SHOULD** alerta. As regras que o
-   schema não alcança (ids únicos, pontas existentes, nó órfão) são parte dele.
-2. **A suíte** é a prova de compatibilidade: cada caso é um arquivo YAML real com o veredito e os códigos
-   esperados, e o leitor passa só se emitir **exatamente** os mesmos códigos.
-3. **O kit** leva o contrato a um repositório por tag, com um carimbo que reprova edição local, e roda a
-   **catraca por grafo** no CI: o que já reprovava vira dívida nomeada, um grafo novo tem de passar, e a dívida
-   só encolhe.
+1. **The contract** is JSON Schema 2020-12 at two levels: **MUST** fails, **SHOULD** warns. The rules a schema
+   cannot express (unique ids, existing edge ends, orphan nodes) are part of it.
+2. **The suite** is the compatibility proof: each case is a real YAML file with the expected verdict and codes, and a
+   reader passes only if it emits **exactly** the same codes.
+3. **The kit** brings the contract to a repository by tag, with a stamp that fails local edits, and runs the
+   **per-graph ratchet** in CI: what already failed becomes named debt, a new graph has to pass, and the debt only
+   shrinks.
 
-## Recursos
+## Features
 
 | | |
 |---|---|
-| **Contrato em dois níveis** | MUST reprova, SHOULD alerta, com uma rampa: o que alerta numa versão pode reprovar na seguinte, e o adotante vê antes |
-| **Proveniência estruturada** | `source`, `locator` e `method`, com cinco classes de evidência e a localidade da fonte (`repo`, `web`, `host`, `pessoa`, `privado`) |
-| **Carimbo de verificação** | `verified_at` e `verified_against`, com aviso para carimbo sem alvo e verificação anterior ao fato |
-| **Arestas entre grafos** | `external_edges` com a ponta externa conferida no corpus |
-| **Códigos estáveis** | Toda violação tem um código como `form.required.node.provenance`, e `--where` diz o nó |
-| **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
-| **Dois formatos, um modelo** | O `.kg.yaml` para escrever e revisar no diff, e o `.kg.json` para o runtime (um app, um servidor), lido por um parser JSON no perfil JSON do contrato (RFC 8259, I-JSON, até 128 níveis, chave única). O gate e as `external_edges` seguem só com `.kg.yaml` |
-| **Armazém com gate** | `kg_store.py` grava `.kg.yaml` ou `.kg.json` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
-| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, consultar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
-| **Consulta e diff** | `kg_query.py` seleciona nós num corpus inteiro e projeta cada aresta com o label da outra ponta, local ou externa, paginado (`kg-ssot.query/1`); `kg_diff.py` compara revisões pelo id, campo a campo, lendo o git sem checkout (`kg-ssot.diff/1`) |
-| **Suíte em dados puros** | 356 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
-| **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
-| **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
-| **Migrador por perfil** | `kg_migrate.py` propõe a `provenance` que o contrato pede por regras que o adotante declara, mostra o plano antes e grava com invariância nó a nó |
-| **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
-| **Sem plataforma** | Python 3.11 ou mais, PyYAML e jsonschema, instalados com hash conferido (`--require-hashes`). Nenhum servidor, nenhum editor, nenhum assistente obrigatório |
+| **Two-level contract** | MUST fails, SHOULD warns, with a ramp: what warns in one version can fail in the next, and the adopter sees it coming |
+| **Structured provenance** | `source`, `locator` and `method`, with five evidence classes and the source locality (`repo`, `web`, `host`, `pessoa`, `privado`) |
+| **Verification stamp** | `verified_at` and `verified_against`, with a warning for a stamp with no target and for a verification dated before the fact |
+| **Edges between graphs** | `external_edges`, with the far end checked against the corpus |
+| **Stable codes** | Every violation has a code such as `form.required.node.provenance`, and `--where` names the node |
+| **Structured verdict** | `kg_validate.py --format json` returns the verdict with code, document path, line, message and fix hint, in a versioned format (`spec/verdict.schema.json`) for tools and MCP servers |
+| **Two formats, one model** | `.kg.yaml` to write and review in a diff, and `.kg.json` for runtime use (an app, a server), read by a JSON parser under the contract's JSON profile (RFC 8259, I-JSON, up to 128 levels, unique keys) |
+| **Gated store** | `kg_store.py` writes `.kg.yaml` or `.kg.json` to disk, a git repository or a versioned store, only after the contract passes, with external edges checked in the store and optimistic locking for concurrent writers |
+| **Reference MCP server** | `kg_mcp.py` serves the contract and the store over MCP (stdio, or HTTP behind a proxy with per-identity areas), with tool annotations |
+| **Query and diff** | `kg_query.py` selects nodes across a whole corpus and projects every edge with the label on the other end, paginated (`kg-ssot.query/1`); `kg_diff.py` compares revisions by id, field by field, reading git without a checkout (`kg-ssot.diff/1`) |
+| **Data-only suite** | 356 cases with their own metaschema, in the style of the JSON-Schema-Test-Suite |
+| **Per-graph ratchet** | Adopt without a big-bang migration: inherited debt stays named and only shrinks |
+| **Vendor by tag** | No copy-paste, no shared code: one sha256 stamp per file |
+| **Profile-driven migrator** | `kg_migrate.py` proposes the `provenance` the contract asks for, from rules the adopter declares, shows the plan first and writes with node-by-node invariance |
+| **PROV-O bridge** | `kg_prov_export.py` exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD, for the W3C PROV ecosystem |
+| **No platform** | Python 3.11 or later, PyYAML and jsonschema, installed with checked hashes (`--require-hashes`). No server, editor or assistant required |
 
-## O que o KG-SSOT não é
+## What KG-SSOT is not
 
-| Se você precisa de... | ...use outra coisa | O KG-SSOT oferece |
+| If you need... | ...use something else | What KG-SSOT gives you |
 |---|---|---|
-| Consultar um grafo grande com uma linguagem de consulta | Um banco de grafos | Um formato de arquivo e um contrato, sem servidor |
-| Interoperar com a web semântica | RDF, OWL, SHACL | Um vocabulário YAML pequeno e fechado, legível no diff |
-| Busca corporativa sobre documentos | Uma plataforma de busca | Nenhum conector nem índice: só o grafo que o time escreve |
-| Garantir que uma afirmação é **verdadeira** | Revisão humana, testes | A garantia de que ela **diz** de onde veio e quando foi conferida |
+| A query language over a large graph | A graph database | A file format and a contract, with no server |
+| Semantic web interoperability | RDF, OWL, SHACL | A small, closed YAML vocabulary that reads well in a diff, and a PROV-O export |
+| Enterprise search over documents | A search platform | No connectors or index: only the graph the team writes |
+| A guarantee that a claim is **true** | Human review, tests | The guarantee that it **says** where it came from and when it was verified |
 
-## Estado e próximos passos
+## Status
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.17.2`. O leitor de referência passa em 356 de 356 casos de
-  `latest/`.
-- **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
-  dias de uso contínuo sem mudança que quebre. O relógio zera a cada release com MUST novo (a última
-  foi a 4.13.0, com a indentação de continuação entre aspas) e conta 30 dias a partir dela.
-- **Próximo:** o v5 passa a reprovar o `method` fora da forma `<classe>: <detalhe>`, que hoje só alerta.
-- **Aberto:** a camada semântica (frescor, contradição, completude de domínio) está em `optional/`, e o leitor de
-  referência não a implementa: passa só nos 10 casos válidos, e os 14 que esperam um aviso ou uma reprovação
-  semântica falham.
+- **Current:** contract v4, release `kg-ssot-v4.18.0`. The reference reader passes 356 of 356 cases in `latest/`.
+- **In use:** three adopters run the gate in CI, one of them in production.
+- **Next:** v5 will fail a `method` outside the `<class>: <detail>` form, which only warns today.
+- **Open:** the semantic layer (freshness, contradiction, domain completeness) lives in `optional/`, and the reference
+  reader does not implement it: it passes only the 10 valid cases there.
 
-## Documentação
+## Documentation
 
 | | |
 |---|---|
-| [Manual](docs/manual/README.md) | Conceitos, formato, contrato, ferramentas, receitas e solução de problemas |
-| [ADOPTING.md](ADOPTING.md) | O guia completo de adoção, com cada caso de borda |
-| [Contrato](docs/manual/04-contrato.md) | O contrato v4: os dois níveis, os códigos e o que muda entre versões |
-| [spec/conformance/](spec/conformance/README.md) | O formato da suíte, os códigos e como medir um leitor em outra linguagem |
-| [llms.txt](llms.txt) · [llms-full.txt](llms-full.txt) | Para agentes de IA: o índice com links, e a documentação inteira num texto só |
+| [Manual](docs/manual/README.md) | Concepts, format, contract, tools, recipes and troubleshooting |
+| [ADOPTING.md](ADOPTING.md) | The complete adoption guide, with every edge case |
+| [The contract](docs/manual/04-contract.md) | Contract v4: the two levels, the codes and what changes between versions |
+| [spec/conformance/](spec/conformance/README.md) | The suite format, the codes and how to measure a reader in another language |
+| [CHANGELOG.md](CHANGELOG.md) | Every release, newest first |
+| [llms.txt](llms.txt) · [llms-full.txt](llms-full.txt) | For AI agents: the index with links, and the whole documentation in one file |
 
-## Contribuir
+## Contributing
 
-Uma mudança no contrato começa por um **caso de conformidade**: o `.kg.yaml` que mostra o comportamento e o
-veredito esperado. As releases saem como tags `kg-ssot-vX.Y.Z` do repositório de desenvolvimento, onde todo PR que
-toca `spec/` ou `tools/` roda a suíte e os testes do kit no CI. O espelho das releases guarda só o que cada tag leva,
-um commit por tag, e não recebe PR: uma proposta ou um defeito entra como
-[issue](https://github.com/marciocar/kg-ssot/issues), de preferência com o caso que o mostra. Um leitor em outra linguagem é bem-vindo: o [capítulo 7 do manual](docs/manual/07-conformidade-e-leitores.md) diz como medi-lo.
+A contract change starts with a **conformance case**: the `.kg.yaml` that shows the behavior and the expected verdict.
+Releases are tags `kg-ssot-vX.Y.Z` of the development repository, where every pull request that touches `spec/` or
+`tools/` runs the suite and the kit tests in CI. The release mirror holds only what each tag ships, one commit per
+tag, and does not take pull requests: a proposal or a bug goes in as an
+[issue](https://github.com/marciocar/kg-ssot/issues), ideally with the case that shows it. A reader in another
+language is welcome: [chapter 7 of the manual](docs/manual/07-conformance-and-readers.md) explains how to measure it.
 
-## Licença
+## License
 
-O produto (o que a release leva, listado em [`spec/release.json`](spec/release.json): o contrato, a suíte, os
-casos `.kg.yaml`, o kit em `tools/`, o `ADOPTING.md`, este README e o manual) é **Apache-2.0**:
-[`LICENSE`](LICENSE), com o escopo no [`NOTICE`](NOTICE).
+The product (what the release ships, listed in [`spec/release.json`](spec/release.json): the contract, the suite, the
+`.kg.yaml` cases, the kit in `tools/`, `ADOPTING.md`, this README and the manual) is **Apache-2.0**:
+[`LICENSE`](LICENSE), with the scope in [`NOTICE`](NOTICE).
 
-Os casos `.kg.yaml` da suíte são parte do contrato e seguem a Apache-2.0.
-
-O repositório de desenvolvimento guarda também o framework Onion vendorizado, com licença própria: o código que
-executa segue MIT e o material de método segue CC BY-NC 4.0, cada um no seu arquivo de licença na raiz daquele
-repositório. Nada disso viaja na release.
-
-<sub>O KG-SSOT nasceu dentro do framework Onion, que hoje o adota por tag, como qualquer outro adotante. O produto
-não depende dele.</sub>
+<sub>KG-SSOT was born inside the Onion framework, which now adopts it by tag like any other adopter. The product does
+not depend on it.</sub>

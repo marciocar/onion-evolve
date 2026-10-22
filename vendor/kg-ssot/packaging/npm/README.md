@@ -1,85 +1,145 @@
 # kg-ssot
 
-**O leitor JavaScript do contrato do KG-SSOT, o grafo de conhecimento verificável: toda afirmação diz de onde veio,
-quando foi conferida e o que depende dela.**
+[![npm](https://img.shields.io/npm/v/kg-ssot)](https://www.npmjs.com/package/kg-ssot)
+[![license](https://img.shields.io/npm/l/kg-ssot)](https://github.com/marciocar/kg-ssot/blob/main/LICENSE)
+[![node](https://img.shields.io/node/v/kg-ssot)](https://github.com/marciocar/kg-ssot)
 
-Este pacote julga um grafo `.kg.yaml` ou `.kg.json` contra o contrato vigente e devolve o veredito MUST e os avisos
-SHOULD, com os códigos estáveis da suíte de conformidade. Ele traz:
-- o **núcleo do leitor**, sem `fs` e sem processo;
-- os **validadores do contrato pré-compilados**, MUST e SHOULD, que não usam `new Function` nem `eval`. Por isso rodam
-  em motores sem geração de código, como o Hermes do React Native e do Expo, e no Node;
-- os **schemas** do contrato e do veredito.
+**The JavaScript reader for the KG-SSOT contract, the verifiable knowledge graph. Every claim says where it came
+from, when someone verified it, and what depends on it.**
 
-O leitor de referência é o pacote Python [`kg-ssot`](https://pypi.org/project/kg-ssot/). Este leitor passa em todos
-os casos da suíte de conformidade (`latest/`), com o veredito, os códigos e os avisos esperados. O CI confere isso
-pelo pacote instalado a cada mudança no leitor.
+`kg-ssot` checks a `.kg.yaml` or `.kg.json` graph against the current contract (v4). It returns the MUST verdict and
+the SHOULD warnings, with the stable codes of the conformance suite. The package ships:
 
-## Instalar
+- **The reader core**, which uses neither `fs` nor `process`.
+- **Precompiled contract validators**, MUST and SHOULD, that never call `new Function` or `eval`. They run on engines
+  without runtime code generation, like Hermes in React Native and Expo, and on Node.
+- **The schemas** of the contract and of the verdict.
+
+The reference reader is the Python package [`kg-ssot`](https://pypi.org/project/kg-ssot/). This reader passes every
+case in the conformance suite (`latest/`) with the expected verdict, codes, and warnings. On every change to the
+reader, CI runs the whole suite against the installed tarball.
+
+## Install
 
 ```bash
 npm install kg-ssot
 ```
 
-## No código
+On Node, you need version 22.12 or later. The package is ESM and ships its own TypeScript types.
+
+## Use it in code
 
 ```js
 import { verdict } from 'kg-ssot';
 
-verdict(texto);                      // .kg.yaml (o default)
-verdict(texto, { format: 'json' });  // .kg.json
+verdict(text);                      // .kg.yaml (the default)
+verdict(text, { format: 'json' });  // .kg.json
 // { verdict: 'accept', codes: [], warnings: [], detail: '' }
 // { verdict: 'accept', codes: [], warnings: ['yaml.unquoted-date'], detail: '' }
-// { verdict: 'reject', codes: ['form.range.node.impact'], warnings: [], detail: '' }
+// { verdict: 'reject', codes: ['form.range.node.impact', 'form.type.node.impact'], warnings: [], detail: '' }
 ```
 
-- `verdict(texto, { format, corpus })` devolve o veredito no contrato de runner da suíte: `verdict` é `accept` ou
-  `reject`, `codes` traz os códigos MUST e `warnings` os avisos SHOULD, os dois ordenados e sem repetição. Um aviso
-  não reprova: o grafo com aviso continua `accept`.
-- `check(texto, { format, corpus })` devolve só os códigos MUST (vazio quando passa), e `checkWarnings(texto,
-  { format })` só os avisos.
-- `kg-ssot/core` é o núcleo sem o validador, para quem compila o schema por conta própria. `kg-ssot/node` traz os
-  auxiliares de Node, como `corpusIndex(dir)`, que indexa os `.kg.yaml` de um diretório para conferir as
-  `external_edges`. Os schemas ficam em `kg-ssot/spec/*`.
+- `verdict(text, { format, corpus })` returns the verdict in the suite's runner contract. `verdict` is `accept` or
+  `reject`, `codes` lists the MUST codes, and `warnings` lists the SHOULD codes. Both lists are sorted, with no
+  duplicates. A warning never fails a graph: a graph with warnings is still `accept`.
+- `check(text, { format, corpus })` returns only the MUST codes (empty when the graph passes).
+  `checkWarnings(text, { format, corpus })` returns only the warnings.
+- `corpus` lets the reader verify the far end of each `external_edges` entry. It is a
+  `Map<path, Set<nodeId>>`. Build it with `corpusIndex(dir)` from `kg-ssot/node`, or, without a file system, with
+  `indexTexts([[path, text], ...])` from the main entry.
 
-Desde a 4.10.0, este leitor também mede os avisos SHOULD, com os mesmos códigos do leitor de referência em todos os
-casos da suíte, e desde a 4.13.0 trata o `\r` como quebra de linha, como a referência. Desde a 4.11.0, as três construções raras do YAML em que ele divergia da referência (a tag `!` sem
-nome, o `!!timestamp` com texto que não é data e o tab fora de aspas) reprovam nos dois, com casos na suíte. A linha de cada ocorrência e as dicas de correção continuam só no leitor de referência em Python.
+### Entry points
 
-## TypeScript e CommonJS
+| Import | What you get |
+|---|---|
+| `kg-ssot` | `verdict`, `check`, `checkWarnings`, the precompiled `validateMust` and `validateShould`, and the core |
+| `kg-ssot/core` | The core without the validators, for when you compile the schema yourself (`verdictOf`, `codes`, `warnings`, `parse`, `indexTexts`) |
+| `kg-ssot/must`, `kg-ssot/should` | The precompiled MUST and SHOULD validators alone |
+| `kg-ssot/node` | Node helpers: `corpusIndex(dir)` indexes the `.kg.yaml` and `.kg.json` graphs under a directory (the tracked ones, in a git repository); `compileMust()` compiles the schema with `ajv` at runtime |
+| `kg-ssot/spec/*` | The contract and verdict schemas |
 
-O pacote traz os tipos (`index.d.mts`, `core.d.mts` e `node.d.mts`) e funciona com `moduleResolution` `bundler` ou
-`nodenext`, o que cobre o template TypeScript do Expo. É um pacote ESM. Num projeto CommonJS, o `require('kg-ssot')`
-funciona a partir do Node 22.12, que é o mínimo declarado em `engines`.
+Since 4.10.0, this reader also measures the SHOULD warnings, with the same codes as the reference reader on every
+suite case. Since 4.13.0, it treats `\r` as a line break, like the reference. Since 4.11.0, the three rare YAML
+constructs where it used to diverge from the reference (the unnamed `!` tag, a `!!timestamp` whose text is not a
+date, and a tab outside quotes) now fail in both, and the suite has cases for them. Only the Python reference reader
+reports the line of each finding and the fix hints.
 
-## Na linha de comando
+## TypeScript and CommonJS
+
+The package ships types (`index.d.mts`, `core.d.mts`, `node.d.mts`, and `validator.d.mts`). It works with
+`moduleResolution` set to `bundler` or `nodenext`, which covers the Expo TypeScript template. It is an ESM package.
+In a CommonJS project, `require('kg-ssot')` works from Node 22.12, the minimum declared in `engines`.
+
+## Use it from the command line
 
 ```bash
-npx kg-ssot-validate grafo.kg.yaml outro.kg.json
+npx kg-ssot-validate decisions.kg.yaml graph.kg.yaml other.kg.json
 ```
 
 ```text
-PASSA   grafo.kg.yaml
-  AVISO  yaml.unquoted-date
-REPROVA outro.kg.json
-  MUST   form.range.node.impact · integrity.orphan-node
+PASS    decisions.kg.yaml
+PASS    graph.kg.yaml
+  WARNING  yaml.unquoted-date
+FAIL    other.kg.json
+  MUST   form.range.node.impact · form.type.node.impact
 ```
 
-O rc é 0 quando todos passam, 1 quando algum reprova e 2 com arquivo ilegível ou opção desconhecida. Os avisos não
-mudam o rc. Com `--json`, sai uma linha JSON por
-arquivo. Com `--corpus DIR`, a ponta externa das `external_edges` é conferida contra os `.kg.yaml` sob `DIR`.
+The exit code is 0 when every file passes, 1 when any file fails, and 2 on broken input: an unreadable file, invalid
+UTF-8, an unknown option, or a `--corpus` that is not a directory. Warnings never change the exit code.
 
-## Num app React Native ou Expo
+- `--json` prints one JSON line per file, in the suite's runner contract:
 
-O pacote é ESM e a entrada não importa nada do Node. Um bundler (Metro, esbuild) resolve as dependências, `yaml` e o
-runtime do `ajv`. O validador já vem compilado, então nada precisa gerar código no aparelho. O comportamento foi
-medido no Hermes: os mesmos vereditos do Node.
+  ```text
+  {"file":"graph.kg.yaml","verdict":"accept","codes":[],"warnings":["yaml.unquoted-date"],"detail":""}
+  {"file":"other.kg.json","verdict":"reject","codes":["form.range.node.impact","form.type.node.impact"],"warnings":[],"detail":""}
+  ```
 
-## Documentação
+- `--corpus DIR` verifies the far end of each `external_edges` entry against the `.kg.yaml` and `.kg.json` graphs
+  under `DIR`.
 
-- [Manual](https://github.com/marciocar/kg-ssot/tree/main/docs/manual): o formato, o contrato, as ferramentas e os problemas comuns
-- [Suíte de conformidade](https://github.com/marciocar/kg-ssot/blob/main/spec/conformance/README.md)
-- [Guia de adoção](https://github.com/marciocar/kg-ssot/blob/main/ADOPTING.md)
+The human output is in English. The CLI speaks Brazilian Portuguese when you set `KG_SSOT_LANG=pt-BR` (or when your
+locale is `pt_BR`):
 
-## Licença
+```bash
+KG_SSOT_LANG=pt-BR npx kg-ssot-validate decisions.kg.yaml graph.kg.yaml other.kg.json
+```
 
-Apache-2.0. Veja `LICENSE` e `NOTICE`.
+```text
+PASSA   decisions.kg.yaml
+PASSA   graph.kg.yaml
+  AVISO  yaml.unquoted-date
+REPROVA other.kg.json
+  MUST   form.range.node.impact · form.type.node.impact
+```
+
+The codes and the `--json` output are data, so they never change language.
+
+## Use it in a React Native or Expo app
+
+The package is ESM, and the main entry imports nothing from Node. Your bundler (Metro, esbuild) resolves the two
+dependencies, `yaml` and the `ajv` runtime. The validators come precompiled, so nothing has to generate code on the
+device. We ran the conformance suite on Hermes, and it returns the same verdicts as Node.
+
+```js
+import { verdict, indexTexts } from 'kg-ssot';
+
+const corpus = indexTexts([['other.kg.yaml', otherText]]); // optional, for external_edges
+const result = verdict(graphText, { corpus });
+if (result.verdict === 'reject') console.warn(result.codes);
+```
+
+## Documentation
+
+- [Manual](https://github.com/marciocar/kg-ssot/tree/main/docs/manual): the format, the contract, the tools, and
+  common problems
+- [Conformance suite](https://github.com/marciocar/kg-ssot/blob/main/spec/conformance/README.md)
+- [Adoption guide](https://github.com/marciocar/kg-ssot/blob/main/ADOPTING.md)
+- [Changelog](https://github.com/marciocar/kg-ssot/blob/main/CHANGELOG.md)
+- [Issues](https://github.com/marciocar/kg-ssot/issues)
+
+## License
+
+Apache-2.0. See [`LICENSE`](https://github.com/marciocar/kg-ssot/blob/main/LICENSE) and
+[`NOTICE`](https://github.com/marciocar/kg-ssot/blob/main/NOTICE).
+
+Documentação em português: [README.pt-BR](https://github.com/marciocar/kg-ssot/blob/main/README.pt-BR.md).

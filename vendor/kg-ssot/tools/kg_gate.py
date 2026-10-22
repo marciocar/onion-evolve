@@ -62,10 +62,13 @@ import sys
 
 sys.dont_write_bytecode = True  # num vendor, rodar o gate não pode sujar o diretório carimbado
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_validate
+    from . import kg_i18n, kg_validate
 else:  # script ou vendor
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_i18n  # noqa: E402
     import kg_validate  # noqa: E402
+_ = kg_i18n._
+N_ = kg_i18n.N_  # marca para o catálogo; traduz depois, no _(msgid) do worse()
 
 DEFAULT_BASELINE = ".kg-ssot/gate"  # a pasta, desde a 4.16.0: um registro por grafo
 LEGACY_BASELINE = ".kg-ssot/gate.json"  # o arquivo único de antes da 4.16.0, ainda lido; o --update troca pela pasta
@@ -110,7 +113,8 @@ def selected(name, exclude):
 def corpus(repo, exclude=DEFAULT_EXCLUDE):
     out = subprocess.run(["git", "-C", str(repo), "ls-files", "-z"], capture_output=True)
     if out.returncode != 0:
-        raise Broken(f"{repo} não é um repositório git: {out.stderr.decode('utf-8', 'replace').strip()[:200]}")
+        raise Broken(_("{repo} is not a git repository: {err}").format(
+            repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
     names = sorted(n for n in out.stdout.decode("utf-8").split("\0") if n and selected(n, exclude))
     items = []
     for n in names:
@@ -125,7 +129,8 @@ def tracked_graphs(repo):
     (um alvo num grafo excluído do gate continua sendo alvo válido; desde o v4.7, o alvo pode ser um .kg.json)."""
     out = subprocess.run(["git", "-C", str(repo), "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json"], capture_output=True)
     if out.returncode != 0:
-        raise Broken(f"{repo} não é um repositório git: {out.stderr.decode('utf-8', 'replace').strip()[:200]}")
+        raise Broken(_("{repo} is not a git repository: {err}").format(
+            repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
     return [n for n in out.stdout.decode("utf-8").split("\0") if n and (pathlib.Path(repo) / n).is_file()]
 
 
@@ -163,21 +168,21 @@ def stamp_problems():
     stamp = root / ".kg-ssot-version"
     if not stamp.is_file():
         if root.parent.name == "vendor":  # um vendor sem o carimbo: apagado, e com ele a conferência
-            return [f"✗ vendor sem carimbo: {stamp} ausente (rode kg_vendor.py check; o gate não tem contra o que"
-                    " conferir o contrato)"]
+            return [_("✗ vendor without a stamp: {stamp} is missing (run kg_vendor.py check; the gate has nothing to"
+                      " verify the contract against)").format(stamp=stamp)]
         return []
     try:
         files = json.loads(stamp.read_text(encoding="utf-8")).get("files")
     except (OSError, json.JSONDecodeError, AttributeError) as exc:
-        raise Broken(f"carimbo do vendor ilegível ({stamp}): {exc}") from exc
+        raise Broken(_("unreadable vendor stamp ({stamp}): {exc}").format(stamp=stamp, exc=exc)) from exc
     if not isinstance(files, dict):
-        raise Broken(f"carimbo do vendor fora do formato ({stamp}): files")
+        raise Broken(_("vendor stamp out of format ({stamp}): files").format(stamp=stamp))
     out = []
     for schema in (kg_validate.CONTRACT_MUST, kg_validate.CONTRACT_SHOULD):
         rel = schema.resolve().relative_to(root).as_posix()
         if files.get(rel) != hashlib.sha256(schema.read_bytes()).hexdigest():
-            out.append(f"✗ contrato do vendor diverge do carimbo: {rel} (rode kg_vendor.py check; o schema não é o da"
-                       " release carimbada)")
+            out.append(_("✗ vendor contract differs from the stamp: {rel} (run kg_vendor.py check; the schema is not"
+                         " the one from the stamped release)").format(rel=rel))
     return out
 
 
@@ -203,9 +208,23 @@ def numbers(measured, granularity="graph"):
     return out
 
 
-def compare(base, now, present=None, debt_now=None, strict_identity=False):
+# A piora fica gravada na base (accepted_regressions[].worse) sempre em pt-BR, a língua de antes da 4.18.0: o conteúdo
+# da base é dado, não saída humana, e não pode mudar com a língua de quem roda o --update.
+_RECORDED = {
+    "{name} fails MUST: {codes}": "{name} falha no MUST: {codes}",
+    "{name} gained a MUST code: {codes}": "{name} ganhou código MUST: {codes}",
+    "debt.{code}: {want} → {got}": "debt.{code}: {want} → {got}",
+    "kit {kit} is older than the baseline's ({base_kit}): a rule only the new release had would stop being measured"
+    " (roll the kit back, or accept with --update --accept-regression)":
+        "kit {kit} é mais antigo que o da base ({base_kit}): uma regra que só a release nova tinha deixaria de ser"
+        " medida (volte o kit, ou aceite com --update --accept-regression)",
+}
+
+
+def compare(base, now, present=None, debt_now=None, strict_identity=False, recorded=None):
     """(rc, linhas, piorou), por grafo em failing e por código em debt. present: os grafos medidos agora. debt_now: a
     dívida de agora medida na granularidade da BASE, para a passada que troca a granularidade comparar maçã com maçã.
+    recorded: uma lista que recebe cada piora no texto que a base grava (pt-BR, independente da língua da saída).
 
     A identidade do contrato (nome do schema MUST e sha256 dos schemas) é composta desde a 4.16.0: ela segue gravada e
     acusada quando muda, mas quem decide o rc é a comparação, feita com o contrato de agora. A troca sem veredito
@@ -213,58 +232,71 @@ def compare(base, now, present=None, debt_now=None, strict_identity=False):
     de antes em toda troca de identidade."""
     rc, lines, worse_any = 0, [], False
 
-    def worse(msg):
+    def worse(msgid, **kw):
         nonlocal rc, worse_any
         rc, worse_any = 1, True
-        lines.append("✗ PIOROU  " + msg)
+        lines.append(_("✗ WORSE  {what}").format(what=_(msgid).format(**kw)))
+        if recorded is not None:
+            recorded.append("✗ PIOROU  " + _RECORDED[msgid].format(**kw))
 
     for key in ("contract", "contract_sha256"):
         if base.get(key) != now[key]:
             if strict_identity:
                 rc = 1
-                lines.append(f"✗ identidade {key}: a base é de {base.get(key)!r}, a medição é de {now[key]!r} — a"
-                             " comparação abaixo é contra a base antiga; grave a base nova com --update no mesmo PR")
+                lines.append(_("✗ identity {key}: the baseline is from {old}, the measurement is from {new} — the"
+                               " comparison below is against the old baseline; write the new baseline with --update in"
+                               " the same PR").format(key=key, old=repr(base.get(key)), new=repr(now[key])))
             else:
-                lines.append(f"· identidade {key}: a base é de {base.get(key)!r}, a medição é de {now[key]!r} — o"
-                             " veredito decide pela comparação abaixo, medida com o contrato de agora; grave a"
-                             " identidade nova com --update quando quiser")
+                lines.append(_("· identity {key}: the baseline is from {old}, the measurement is from {new} — the"
+                               " comparison below decides the verdict, measured with the current contract; write the"
+                               " new identity with --update whenever you want").format(
+                                   key=key, old=repr(base.get(key)), new=repr(now[key])))
     old_kit, new_kit = _vtuple(base.get("kit")), _vtuple(now.get("kit"))
     if old_kit and new_kit and new_kit < old_kit:
-        worse(f"kit {now['kit']} é mais antigo que o da base ({base['kit']}): uma regra que só a release nova tinha"
-              " deixaria de ser medida (volte o kit, ou aceite com --update --accept-regression)")
+        worse(N_("kit {kit} is older than the baseline's ({base_kit}): a rule only the new release had would stop "
+                 "being measured (roll the kit back, or accept with --update --accept-regression)"),
+              kit=now["kit"], base_kit=base["kit"])
     for old, new, gid in base.get("moved", ()):
-        lines.append(f"· {old} → {new}: o registro da base seguiu pelo meta.id {gid!r} (git mv); se {new} é um grafo"
-                     " novo com o mesmo meta.id, a dívida herdada dele veio do grafo apagado — confira no PR")
+        lines.append(_("· {old} → {new}: the baseline record followed meta.id {gid} (git mv); if {new} is a new graph"
+                       " with the same meta.id, its inherited debt came from the deleted graph — check it in the PR")
+                     .format(old=old, new=new, gid=repr(gid)))
     want_f, got_f = base.get("failing", {}), now["failing"]
     for name in sorted(set(want_f) | set(got_f)):
         want, got = set(want_f.get(name, ())), set(got_f.get(name, ()))
         if name not in want_f:
-            worse(f"{name} falha no MUST: {', '.join(sorted(got))}")
+            worse(N_("{name} fails MUST: {codes}"), name=name, codes=", ".join(sorted(got)))
         elif got - want:
-            worse(f"{name} ganhou código MUST: {', '.join(sorted(got - want))}")
+            worse(N_("{name} gained a MUST code: {codes}"), name=name, codes=", ".join(sorted(got - want)))
         elif present is not None and name not in present:
-            lines.append(f"· {name} saiu do corpus (estava na dívida herdada; trave com kg_gate.py --update)")
+            lines.append(_("· {name} left the corpus (it was in the inherited debt; lock it in with kg_gate.py --update)")
+                         .format(name=name))
         elif got < want:
-            lines.append(f"↑ melhorou {name}: " + (f"saiu {', '.join(sorted(want - got))}" if got else "passa no MUST")
-                         + " (trave o ganho: kg_gate.py --update)")
+            if got:
+                lines.append(_("↑ improved {name}: {codes} gone (lock in the gain: kg_gate.py --update)")
+                             .format(name=name, codes=", ".join(sorted(want - got))))
+            else:
+                lines.append(_("↑ improved {name}: passes MUST (lock in the gain: kg_gate.py --update)").format(name=name))
     want_d, got_d = base.get("debt", {}), now["debt"]
     g_base, g_now = base.get("granularity", "graph"), now.get("granularity", "graph")
     if g_base != g_now:
         if debt_now is None:
-            raise ValueError("granularidade trocada sem a dívida medida na granularidade da base")
+            raise ValueError(_("granularity changed without the debt measured at the baseline's granularity"))
         got_d = debt_now  # compara na unidade da base: trocar não é piora, mas a piora que vier junto aparece
-        lines.append(f"· granularidade da dívida trocada: base por {g_base}, nova por {g_now} — a dívida é comparada por"
-                     f" {g_base}, e a base nova é gravada por {g_now}")
+        lines.append(_("· debt granularity changed: baseline by {old}, new by {new} — the debt is compared by {old},"
+                       " and the new baseline is written by {new}").format(old=g_base, new=g_now))
     for code in sorted(set(want_d) | set(got_d)):
         want, got = want_d.get(code, 0), got_d.get(code, 0)
         if got > want:
-            worse(f"debt.{code}: {want} → {got}")
+            worse(N_("debt.{code}: {want} → {got}"), code=code, want=want, got=got)
         elif got < want:
-            lines.append(f"↑ melhorou debt.{code}: {want} → {got} (trave o ganho: kg_gate.py --update)")
+            lines.append(_("↑ improved debt.{code}: {want} → {got} (lock in the gain: kg_gate.py --update)")
+                         .format(code=code, want=want, got=got))
     if isinstance(base.get("graphs"), int) and now["graphs"] < base["graphs"]:
-        lines.append(f"· o corpus encolheu: {base['graphs']} → {now['graphs']} grafos (apagado ou excluído; confira no PR)")
+        lines.append(_("· the corpus shrank: {old} → {new} graphs (deleted or excluded; check it in the PR)")
+                     .format(old=base["graphs"], new=now["graphs"]))
     held = len(want_f.keys() & got_f.keys())
-    lines.append(f"· {now['graphs']} grafos; {now['graphs'] - len(got_f)} passam no MUST; {held} na dívida herdada")
+    lines.append(_("· {graphs} graphs; {passing} pass MUST; {held} in the inherited debt").format(
+        graphs=now["graphs"], passing=now["graphs"] - len(got_f), held=held))
     return rc, lines, worse_any
 
 
@@ -279,15 +311,19 @@ def detail(base, now):
     lines = []
     for name, got in now["failing"].items():
         if base is not None and name not in want_f:
-            kind = "novo"
+            kind = _("new")
         elif set(got) - set(want_f.get(name, got)):
-            kind = "regredido"
+            kind = _("regressed")
         else:
-            kind = "herdado"
-        lines.append(f"  MUST   {name} ({kind}): {' · '.join(got)}")
-    one, many = ("ocorrência", "ocorrências") if now.get("granularity") == "node" else ("grafo", "grafos")
+            kind = _("inherited")
+        lines.append(_("  MUST   {name} ({kind}): {codes}").format(name=name, kind=kind, codes=" · ".join(got)))
+    node = now.get("granularity") == "node"
     for code, count in now["debt"].items():
-        lines.append(f"  SHOULD {code}: {count} {one if count == 1 else many}")
+        if node:
+            text = _("  SHOULD {code}: {count} occurrence") if count == 1 else _("  SHOULD {code}: {count} occurrences")
+        else:
+            text = _("  SHOULD {code}: {count} graph") if count == 1 else _("  SHOULD {code}: {count} graphs")
+        lines.append(text.format(code=code, count=count))
     return lines
 
 
@@ -307,7 +343,7 @@ def read_file(path):
     try:
         base = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise Broken(f"linha de base ilegível ({path}): {exc}") from exc
+        raise Broken(_("unreadable baseline ({path}): {exc}").format(path=path, exc=exc)) from exc
     ok = (isinstance(base, dict) and isinstance(base.get("contract"), str)
           and isinstance(base.get("failing"), dict) and all(_strings(v) for v in base["failing"].values())
           and isinstance(base.get("debt"), dict)
@@ -316,8 +352,8 @@ def read_file(path):
           and all(isinstance(i, dict) for i in base.get("accepted_regressions", []))
           and base.get("granularity", "graph") in GRANULARITIES)
     if not ok:
-        raise Broken(f"linha de base fora do formato ({path}): contract texto, failing caminho → [códigos],"
-                     " debt código → inteiro ≥ 0, accepted_regressions lista, granularity graph ou node")
+        raise Broken(_("baseline out of format ({path}): contract text, failing path → [codes], debt code →"
+                       " integer ≥ 0, accepted_regressions list, granularity graph or node").format(path=path))
     return base
 
 
@@ -325,7 +361,7 @@ def _read_json(path):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
-        raise Broken(f"linha de base ilegível ({path}): {exc}") from exc
+        raise Broken(_("unreadable baseline ({path}): {exc}").format(path=path, exc=exc)) from exc
 
 
 def _record_ok(rec):
@@ -339,21 +375,21 @@ def read_dir(path, measured=None):
     head = _read_json(path / "contract.json")
     if not (isinstance(head, dict) and isinstance(head.get("contract"), str)
             and isinstance(head.get("contract_sha256", ""), str) and head.get("granularity", "graph") in GRANULARITIES):
-        raise Broken(f"linha de base fora do formato ({path / 'contract.json'}): contract texto, contract_sha256 texto,"
-                     " granularity graph ou node")
+        raise Broken(_("baseline out of format ({path}): contract text, contract_sha256 text, granularity graph or"
+                       " node").format(path=path / "contract.json"))
     records = []
     for f in sorted((path / "graphs").glob("*.json")):
         rec = _read_json(f)
         if not _record_ok(rec):
-            raise Broken(f"linha de base fora do formato ({f}): graph caminho, id texto ou null, must [códigos],"
-                         " should código → inteiro > 0")
+            raise Broken(_("baseline out of format ({path}): graph path, id text or null, must [codes], should code"
+                           " → integer > 0").format(path=f))
         rec["_by_id"] = f.name == f"{rec['id']}.json"  # gravado pelo meta.id: o id era único quando a base foi gravada
         records.append(rec)
     accepted = []
     for f in sorted((path / "accepted").glob("*.json")):
         item = _read_json(f)
         if not isinstance(item, dict):
-            raise Broken(f"linha de base fora do formato ({f}): a regressão aceita é um objeto")
+            raise Broken(_("baseline out of format ({path}): an accepted regression is an object").format(path=f))
         accepted.append(item)
     measured = measured or {}
     by_id = _paths_by_id(measured)
@@ -436,7 +472,7 @@ def write_dir(path, measured, now, accepted, new_accepted=None):
     registros e a identidade, cada um por temporário, e só no fim a limpeza dos registros que saíram."""
     items = list(accepted) + ([new_accepted] if new_accepted else [])
     if any(not isinstance(i, dict) for i in items):
-        raise Broken("regressão aceita fora do formato: cada uma é um objeto")
+        raise Broken(_("accepted regression out of format: each one is an object"))
     head = {"contract": now["contract"], "contract_sha256": now["contract_sha256"]}
     if now.get("kit"):
         head["kit"] = now["kit"]
@@ -494,29 +530,55 @@ def _utf8_stdio():
                 stream.reconfigure(encoding="utf-8", errors="replace")
 
 
+HELP = """The adopter's gate: a repository's graphs against the contract, with a per-graph ratchet.
+
+It measures the git-tracked .kg.yaml files (outside */fixtures/* and docs/materials/*, the default excludes, or what
+--exclude says) against the MUST and the SHOULD of the current contract, and compares them with the baseline:
+  failing - graph → MUST codes it carries today (the inherited debt, named by path);
+  debt    - SHOULD code → how many graphs carry it (granularity graph, the default) or how many occurrences
+            (granularity node).
+
+It fails (rc 1) when a graph outside failing fails MUST (a new graph included), when a graph in failing gains a MUST
+code, or when a debt code rises or appears. A contract identity different from the baseline's is reported on a
+"· identity" line and does not decide the rc (--strict-identity makes it fail). A gain passes, with a hint to lock it
+in with --update.
+
+The baseline is the .kg-ssot/gate/ folder: contract.json, graphs/<meta.id>.json (one record per graph) and accepted/
+(one accepted regression per file). --update shows the comparison before writing; if something got worse, it only
+writes with --accept-regression "<reason>", and the reason stays in the baseline. rc 2: broken input (not a git
+repository, unreadable or out-of-format baseline, missing baseline without --update, unreadable .kg.yaml).
+
+Usage:
+  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]
+             [--strict-identity] [--update [--accept-regression REASON] [--granularity graph|node]]
+"""
+
+
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--repo", default=".", help="o repo cujos grafos são medidos (default: .)")
-    ap.add_argument("--baseline", help=f"a linha de base (default: a pasta <repo>/{DEFAULT_BASELINE}; o arquivo"
-                                        f" <repo>/{LEGACY_BASELINE}, de antes da 4.16.0, é lido e trocado pela pasta no"
-                                        " --update). Um caminho terminado em .json lê e grava o arquivo único")
+    ap = argparse.ArgumentParser(description=_(HELP), formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--repo", default=".", help=_("the repository whose graphs are measured (default: .)"))
+    ap.add_argument("--baseline", help=_("the baseline (default: the folder <repo>/{folder}; the file <repo>/{legacy},"
+                                         " from before 4.16.0, is read and replaced by the folder on --update). A path"
+                                         " ending in .json reads and writes the single file").format(
+                                             folder=DEFAULT_BASELINE, legacy=LEGACY_BASELINE))
     ap.add_argument("--exclude", action="append", default=[], metavar="GLOB",
-                    help="glob de caminho fora do corpus, somado aos defaults (" + ", ".join(DEFAULT_EXCLUDE)
-                         + "); repetível; fnmatch sobre o caminho relativo, * atravessa /")
+                    help=_("path glob left out of the corpus, added to the defaults ({defaults}); repeatable; fnmatch"
+                           " on the relative path, * crosses /").format(defaults=", ".join(DEFAULT_EXCLUDE)))
     ap.add_argument("--no-default-excludes", action="store_true",
-                    help="não aplica os defaults (cuidado: as fixtures do vendor entram no corpus)")
-    ap.add_argument("--update", action="store_true", help="grava a linha de base (mostra a comparação antes)")
+                    help=_("does not apply the defaults (careful: the vendor's fixtures enter the corpus)"))
+    ap.add_argument("--update", action="store_true", help=_("writes the baseline (shows the comparison first)"))
     ap.add_argument("--strict-identity", action="store_true",
-                    help="reprova (rc 1) toda troca de identidade do contrato, mesmo sem veredito trocado, como antes da"
-                         " 4.16.0")
-    ap.add_argument("--accept-regression", metavar="MOTIVO", help="com --update: aceita uma piora, com o motivo na base")
+                    help=_("fails (rc 1) on every change of contract identity, even without a changed verdict, as"
+                           " before 4.16.0"))
+    ap.add_argument("--accept-regression", metavar="REASON",
+                    help=_("with --update: accepts a regression, with the reason in the baseline"))
     ap.add_argument("--granularity", choices=GRANULARITIES,
-                    help="com --update: troca a granularidade da dívida SHOULD (graph, o padrão, ou node); sem ela, vale"
-                         " a da base")
+                    help=_("with --update: changes the granularity of the SHOULD debt (graph, the default, or node);"
+                           " without it, the baseline's applies"))
     args = ap.parse_args(argv)
     _utf8_stdio()
     if args.granularity and not args.update:
-        print("GATE QUEBRADO  --granularity só vale com --update (a base lembra a granularidade)")
+        print(_("GATE BROKEN  --granularity only works with --update (the baseline remembers the granularity)"))
         return 2
     if args.baseline:
         path = pathlib.Path(args.baseline)
@@ -539,34 +601,36 @@ def main(argv=None):
         elif args.update:
             base = None
         else:
-            raise Broken(f"linha de base ausente ({path}): grave a primeira com --update")
+            raise Broken(_("missing baseline ({path}): write the first one with --update").format(path=path))
         g_base = (base or {}).get("granularity", "graph")
         now = numbers(measured, args.granularity or g_base)
         debt_now = numbers(measured, g_base)["debt"] if base is not None and args.granularity not in (None, g_base) else None
     except (Broken, OSError, ValueError) as exc:
-        print(f"GATE QUEBRADO  {exc}")
+        print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
-    rc, lines, worse = (compare(base, now, set(measured), debt_now, args.strict_identity) if base is not None
+    recorded = []  # as pioras no texto que a base grava (pt-BR), independente da língua da saída
+    rc, lines, worse = (compare(base, now, set(measured), debt_now, args.strict_identity, recorded) if base is not None
                         else (0, [], False))
     try:
         tampered = stamp_problems()
     except Broken as exc:
-        print(f"GATE QUEBRADO  {exc}")
+        print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
     if tampered:
         rc, worse, lines = 1, True, tampered + lines
         if args.update:  # contrato adulterado não vira base, nem com --accept-regression
-            print("\n".join(lines + ["✗ --update recusado: o contrato do vendor diverge do carimbo"]))
+            print("\n".join(lines + [_("✗ --update refused: the vendor contract differs from the stamp")]))
             return 1
     print("\n".join(lines + detail(base, now)))
     if not args.update:
         return rc
     if worse and not args.accept_regression:
-        print("✗ --update recusado: algo piorou. Corrija, ou aceite com --accept-regression \"<motivo>\" (fica na base)")
+        print(_("✗ --update refused: something got worse. Fix it, or accept it with --accept-regression \"<reason>\""
+                " (it stays in the baseline)"))
         return 1
     accepted = list((base or {}).get("accepted_regressions", []))
     added = ({"date": datetime.date.today().isoformat(), "reason": args.accept_regression,
-              "worse": [l for l in lines if l.startswith("✗ PIOROU")]} if worse else None)
+              "worse": recorded} if worse else None)
     try:
         if single:
             new = dict(now)
@@ -577,15 +641,17 @@ def main(argv=None):
             path.write_text(json.dumps(new, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         else:
             if path.exists() and not path.is_dir():
-                raise Broken(f"{path} existe e não é uma pasta: a base da 4.16.0 é uma pasta")
+                raise Broken(_("{path} exists and is not a folder: the 4.16.0 baseline is a folder").format(path=path))
             write_dir(path, measured, now, accepted, added)
             if read_from != path and read_from.is_file():
                 read_from.unlink()  # a migração: o arquivo único sai, e a pasta passa a ser a base
-                print(f"· base migrada: {read_from} → {path}/ (um registro por grafo; o veredito não muda)")
+                print(_("· baseline migrated: {old} → {new}/ (one record per graph; the verdict does not change)")
+                      .format(old=read_from, new=path))
     except (Broken, OSError) as exc:
-        print(f"GATE QUEBRADO  {exc}")
+        print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
-    print(f"linha de base gravada: {path} ({now['graphs']} grafos, {len(now['failing'])} na dívida herdada)")
+    print(_("baseline written: {path} ({graphs} graphs, {held} in the inherited debt)").format(
+        path=path, graphs=now["graphs"], held=len(now["failing"])))
     return 0
 
 

@@ -19,6 +19,14 @@ import pathlib
 import re
 import sys
 
+if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
+    from . import kg_i18n
+else:  # script ou vendor
+    sys.dont_write_bytecode = True  # sem .pyc do kg_i18n no vendor
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_i18n  # noqa: E402
+_ = kg_i18n._
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 MIRROR = "https://github.com/marciocar/kg-ssot"
 REGISTRY_NAME = "io.github.marciocar/kg-ssot"
@@ -28,7 +36,11 @@ CONTRACT = re.compile(r"[Cc]ontra(?:ct|to) (v4\.\d+)")
 
 
 class Broken(Exception):
-    """Entrada quebrada: rc 2."""
+    """Entrada quebrada: rc 2 (rc 1 no --check quando missing_section: falta a seção da versão)."""
+
+    def __init__(self, message, missing_section=False):
+        super().__init__(message)
+        self.missing_section = missing_section
 
 
 def section(text, version):
@@ -66,9 +78,10 @@ def notes(version, root=ROOT, ref=None):
     en, pt = section(texts["CHANGELOG.md"], version), section(texts["CHANGELOG.pt-BR.md"], version)
     if en is None or pt is None:
         missing = [n for n, s in (("CHANGELOG.md", en), ("CHANGELOG.pt-BR.md", pt)) if s is None]
-        raise Broken(f"a versão {version} não tem seção em {', '.join(missing)}")
+        raise Broken(_("version {version} has no section in {files}").format(version=version, files=", ".join(missing)),
+                     missing_section=True)
     date, en_body = en
-    _, pt_body = pt
+    pt_body = pt[1]
     en_summary, en_changes = split_summary(en_body)
     pt_summary, pt_changes = split_summary(pt_body)
     contract = CONTRACT.search(en_summary)
@@ -118,20 +131,21 @@ def current_version(root=ROOT):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    ap.add_argument("--version", help="X.Y.Z (default: a versão de spec/release.json)")
-    ap.add_argument("--root", default=str(ROOT), help="a raiz com os CHANGELOGs e o spec/ (default: a deste kit)")
-    ap.add_argument("--check", action="store_true", help="só confere que a versão tem seção nos dois CHANGELOGs")
-    ap.add_argument("--ref", help="a revisão dos links do espelho (default: a tag da versão)")
+    ap = argparse.ArgumentParser(description=_("Builds the GitHub release body from the version's section in both "
+                                                 "CHANGELOGs."))
+    ap.add_argument("--version", help=_("X.Y.Z (default: the version in spec/release.json)"))
+    ap.add_argument("--root", default=str(ROOT), help=_("the root with the CHANGELOGs and spec/ (default: this kit's root)"))
+    ap.add_argument("--check", action="store_true", help=_("only check that the version has a section in both CHANGELOGs"))
+    ap.add_argument("--ref", help=_("the revision for the mirror links (default: the version's tag)"))
     args = ap.parse_args(argv)
     try:
         version = args.version or current_version(args.root)
         text = notes(version, args.root, args.ref)
     except Broken as exc:
-        print(f"{'✗' if args.check else 'ENTRADA QUEBRADA'}  {exc}", file=sys.stderr)
-        return 1 if args.check and "não tem seção" in str(exc) else 2
+        print(f"{'✗' if args.check else _('BROKEN INPUT')}  {exc}", file=sys.stderr)
+        return 1 if args.check and exc.missing_section else 2
     if args.check:
-        print(f"✓ {version}: seção nos dois CHANGELOGs")
+        print(_("✓ {version}: section in both CHANGELOGs").format(version=version))
         return 0
     print(text)
     return 0

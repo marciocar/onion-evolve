@@ -46,8 +46,8 @@ def manifest(version, deps):
     return {
         "name": "kg-ssot",
         "version": version,
-        "description": "Leitor JS do contrato do grafo de conhecimento verificável KG-SSOT (.kg.yaml e .kg.json): "
-                       "validador pré-compilado, sem eval, para Node e React Native/Expo.",
+        "description": "JavaScript reader for the KG-SSOT verifiable knowledge graph contract (.kg.yaml and .kg.json): "
+                       "a precompiled validator, no eval, for Node and React Native/Expo.",
         "keywords": ["knowledge-graph", "provenance", "json-schema", "conformance", "yaml", "json", "validator",
                      "react-native", "expo", "verifiable"],
         "homepage": MIRROR,

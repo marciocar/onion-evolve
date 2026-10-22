@@ -37,7 +37,7 @@ build-backend = "hatchling.build"
 [project]
 name = "kg-ssot"
 version = "{version}"
-description = "Contrato formal do grafo de conhecimento verificável (.kg.yaml e .kg.json): leitor de referência, suíte de conformidade, gate por grafo, armazém e servidor MCP."
+description = "Verifiable knowledge graphs in plain text (.kg.yaml and .kg.json): the formal contract, reference reader, conformance suite, per-graph CI gate, gated store and MCP server."
 readme = "README.md"
 requires-python = ">=3.11"
 license = "Apache-2.0"
@@ -48,6 +48,7 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
+    "Natural Language :: English",
     "Natural Language :: Portuguese (Brazilian)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -108,8 +109,10 @@ def stage(dest):
     version = rel["version"]
     pkg = dest / "src" / "kg_ssot"
     pkg.mkdir(parents=True)
-    for m in MODULES:
+    for m in MODULES + ["kg_i18n"]:
         shutil.copy2(ROOT / "tools" / f"{m}.py", pkg / f"{m}.py")
+    # o catálogo da tradução, ao lado do módulo (o kg_i18n procura em kg_ssot/locale/)
+    shutil.copytree(ROOT / "locale", pkg / "locale", ignore=shutil.ignore_patterns("*.mo"))
     # o spec/ que a release leva (arquivos e diretórios listados), e nada além dele
     spec_entries = [e for e in rel["files"] if e.startswith("spec/")]
     if not spec_entries:

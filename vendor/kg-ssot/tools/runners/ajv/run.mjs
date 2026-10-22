@@ -56,7 +56,13 @@ function corpusFiles(root) {
 }
 
 export function corpusIndex(root) {
-  if (!statSync(root, { throwIfNoEntry: false })?.isDirectory()) throw new Error(`corpus ${root} não é um diretório`);
+  if (!statSync(root, { throwIfNoEntry: false })?.isDirectory()) {
+    // a mensagem sai em inglês (a língua-fonte); o msgid e os argumentos vão junto, para o cli.mjs traduzir
+    const exc = new Error(`corpus ${root} is not a directory`);
+    exc.kgMsgid = 'corpus {root} is not a directory';
+    exc.kgArgs = { root };
+    throw exc;
+  }
   const items = [];
   for (const name of corpusFiles(root)) {
     const p = join(root, name);
