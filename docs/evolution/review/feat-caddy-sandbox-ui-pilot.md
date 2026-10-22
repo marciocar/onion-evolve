@@ -2,8 +2,7 @@
 branch: feat/caddy-sandbox-ui-pilot
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: 5f5c00a36deb3d5bc1fd9e856d1287daee233f1f47f1c277581ccf46fa571f5b
-reviewed_code_sha256: 2e79490afa0c3138372e80a7b2809f34727f59055b19b4128644282ec51c4082
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 3
 tokens: 0
@@ -31,7 +30,10 @@ nota: >-
   `deploy/sandbox/sandbox.html` do bridge servido em `/var/www/onion-sandbox/sandbox.html`, root:root 0644,
   atômico, só se mudou. Recusa symlink na origem, no diretório e no destino. Sem o arquivo, avisa e segue.
 - Bancada: casos u26 a u33 na família do update-bridge, cada um com mutante.
-- Nó `C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022` (open) no grafo da dissecação intelligent-ui.
+- Nó `C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022` (open) em `vps-shared-tools-2026-07.kg.yaml`, ao lado das
+  outras rotas do Caddy, com aresta externa para a decisão no grafo da dissecação intelligent-ui. Esse grafo
+  está no teto de nós declarado no `meta:` (REGRA 58 (O backlog cumpre as promessas do próprio `meta:`)
+  reprovou a 1ª redação, que punha o nó lá).
 
 ## Achados
 

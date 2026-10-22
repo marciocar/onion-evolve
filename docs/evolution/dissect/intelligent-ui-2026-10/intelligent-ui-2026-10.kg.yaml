@@ -671,17 +671,6 @@ nodes:
       locator: "pergunta com opções de 2026-10-21: «O que fazer com o token do /chat em localStorage exposto a XSS?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
-  - id: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
-    node_type: claim
-    layer: audit
-    plane: DEV
-    status: open
-    impact: 3
-    confidence: 0.8
-    verified_at: "2026-10-22"
-    verified_against: "caddy validate do Caddyfile mais conf.d num estágio local (Valid configuration); corpo do vhost num Caddy descartável em loopback: /sandbox.html 200 com o CSP, /qualquer 404, sem o arquivo 404; bancada do update-bridge u26-u33 com mutante"
-    label: "A origem sandbox.onionevolve.com do piloto ui:// está versionada (ops/caddy/conf.d/sandbox.caddy, frame-src no CSP do app) e o ops/update-bridge.sh publica o sandbox.html do bridge servido; falta instalar no vivo e medir o CSP num navegador"
-    narrative: "Fecha quando: o install-caddy-config.sh roda no vivo com o verify do 404, o update-bridge publica o sandbox.html depois do merge do onion-bridge#83, e o dogfood do passo 4 do deploy/sandbox/README.md do bridge confirma no navegador que o default-src 'none' não barra o srcdoc interno. O verify do 200 entra no vhost só depois da 1ª publicação."
 
 edges:
 
@@ -803,8 +792,5 @@ edges:
     to: A_ABSORB_ONION_KG_RECURSO_UI
     edge_type: TRACES_TO
   - from: D_TOKEN_DO_CHAT_FORA_DO_LOCALSTORAGE_VIRA_TAREFA_1021
-    to: D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021
-    edge_type: TRACES_TO
-  - from: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
     to: D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021
     edge_type: TRACES_TO

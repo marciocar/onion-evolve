@@ -504,6 +504,18 @@ nodes:
       method: "leitura: docs/evolution/research/census-2026-09-01/data/rodada1.json medidos[18] (node_id Q_tunneling, verdict DRIFTED, claims 3/3, divergence = texto do label), run wf_90dd73fe-cd2"
       locality: "repo"
 
+
+  - id: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-22"
+    verified_against: "caddy validate do Caddyfile mais conf.d num estágio local (Valid configuration); corpo do vhost num Caddy descartável em loopback: /sandbox.html 200 com o CSP, /qualquer 404, sem o arquivo 404; bancada do update-bridge u26-u33 com mutante"
+    label: "A origem sandbox.onionevolve.com do piloto ui:// está versionada (ops/caddy/conf.d/sandbox.caddy, frame-src no CSP do app) e o ops/update-bridge.sh publica o sandbox.html do bridge servido; falta instalar no vivo e medir o CSP num navegador"
+    narrative: "Fecha quando: o install-caddy-config.sh roda no vivo com o verify do 404, o update-bridge publica o sandbox.html depois do merge do onion-bridge#83, e o dogfood do passo 4 do deploy/sandbox/README.md do bridge confirma no navegador que o default-src 'none' não barra o srcdoc interno. O verify do 200 entra no vhost só depois da 1ª publicação."
+
 edges:
   # o LibreChat entra como CONSUMIDOR do catalogo (Logto/Caddy), sob o framing decidido
   - from: E_librechat_install_started
@@ -608,3 +620,8 @@ edges:
   - from: E_CENSO0901_Q_tunneling
     to: Q_tunneling
     edge_type: SUPERSEDES
+
+external_edges:
+  - from: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
+    to: "docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml#D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021"
+    edge_type: TRACES_TO
