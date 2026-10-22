@@ -3,11 +3,11 @@ branch: feat/docker-engine-migrate
 pr: pendente
 date: 2026-10-22
 reviewed_diff_sha256: pendente
-findings_total: 4
-findings_real: 4
+findings_total: 5
+findings_real: 5
 tokens: 0
 duration_min: 60
-findings_fixed: 4
+findings_fixed: 5
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: "fork da sessão principal (claude-opus-5-5), passada própria"
@@ -35,6 +35,8 @@ nota: "tokens não medidos (passada no próprio fork, sem subagente)"
    como o real.
 2. O template do Go não interpreta `\t`: o `engine.tsv` saía com a barra literal. Trocado por espaço.
 3. O teste de "plan só lê" acusava `systemctl is-enabled` como mutação: a régua agora separa leitura de escrita.
+5. Dois `produtor | grep -q` no apply (madison e dpkg-query) eram sítios novos da classe EPIPE que o pré-voo acusa:
+   viraram here-string e comparação direta.
 4. Duas guardas (plan de outro alvo e image store trocado) não tinham caso nem mutante: ganharam os dois.
 
 ## Mutantes
