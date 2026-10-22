@@ -1,4 +1,4 @@
-# KG-SSOT 4.17.0 (tag kg-ssot-v4.17.0): o texto completo para agentes de IA
+# KG-SSOT 4.17.2 (tag kg-ssot-v4.17.2): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,7 +14,7 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.17.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.17.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.17.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.17.2-6f42c1)](spec/release.json)
 [![Suíte: 356/356](https://img.shields.io/badge/su%C3%ADte-356%2F356-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
@@ -155,7 +155,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.17.0`. O leitor de referência passa em 356 de 356 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.17.2`. O leitor de referência passa em 356 de 356 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre. O relógio zera a cada release com MUST novo (a última
@@ -260,14 +260,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -506,6 +506,22 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.17.1` para a `kg-ssot-v4.17.2`, o contrato não muda (segue o v4.10), nem o gate. O servidor MCP passa a
+anunciar as anotações de ferramenta: as seis de leitura saem como só leitura e idempotentes, e o `kg_write` e o
+`kg_delete` como destrutivas, todas sem mundo aberto. O cliente MCP pode dispensar a confirmação do que só lê.
+
+Da `kg-ssot-v4.17.0` para a `kg-ssot-v4.17.1`, o contrato não muda (segue o v4.10), e o gate não muda de veredito nem
+de identidade. Duas correções de campo nas ferramentas de leitura, achadas pelos adotantes no primeiro uso:
+- **O `kg_query --root` deixa de fora o vendor e os fixtures por padrão** (`vendor/*`, `fixtures/*`, `*/fixtures/*`,
+  `docs/materials/*`). Num adotante, o `--root` lia 411 grafos para 29 reais, e 35 dos
+  50 primeiros abertos vinham de fixtures. `--no-default-excludes` volta a ler tudo. O `kg_diff --from` sem caminhos
+  ganha o mesmo padrão, para a atualização do vendor não afogar o diff do grafo. O JSON da consulta passa a dizer a
+  raiz lida (`root`).
+- **O campo renomeado com o mesmo valor aparece como renomeação** no `kg_diff`, e não mais como remoção e acréscimo
+  soltos: num adotante, duas renomeações de chave apareciam 21 vezes cada. No JSON as duas entradas ficam, ligadas
+  por `renamed_to` e `renamed_from`, então quem já lia o formato `kg-ssot.diff/1` não perde nada; só o valor não
+  trivial e único dos dois lados é pareado. Os testes da consulta e do diff passam a rodar no CI.
+
 Da `kg-ssot-v4.16.1` para a `kg-ssot-v4.17.0`, o contrato não muda (segue o v4.10, com a mesma identidade). Entram
 duas ferramentas de leitura, que não julgam nem gravam:
 - **`kg_query.py`, a consulta e a projeção.** Seleciona nós num corpus inteiro (id, prefixo, tipo, status, plano,
@@ -630,7 +646,7 @@ leitor JS) e o migrador por perfil.
 - **A suíte ganha 16 casos** (328).
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --dest
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --dest
   vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
@@ -755,7 +771,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -1342,7 +1358,7 @@ para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.
 | 4.14 | Contrato v4.7: a ponta externa pode ser um `.kg.json`; o armazém grava um conjunto de grafos de uma vez (`write_many`) |
 | 4.15 | Contrato v4.8: a cadência da verificação (`reverify_every`, `reverify_on`), a retenção (`retain_for`), o `owner` como papel e o relatório de vencimento (`kg_validate.py --due`), fora do veredito; na 4.15.1, o contrato v4.9 deixa de alertar a cadência sem `verified_at`, que é o estado inicial de uma regra de coleta |
 | 4.16 | Contrato v4.9, sem mudança. O gate sem atrito: a base vira uma pasta com um registro por grafo, e a troca de identidade do contrato sem veredito trocado passa com aviso; na 4.16.1, o contrato v4.10 alinha os dois leitores em três pontos do perfil YAML, sem veredito trocado na referência |
-| 4.17 | Contrato v4.10, sem mudança. A consulta e a projeção (`kg_query.py`, e a ferramenta `kg_query` no MCP) e o diff por id entre revisões (`kg_diff.py`) |
+| 4.17 | Contrato v4.10, sem mudança. A consulta e a projeção (`kg_query.py`, e a ferramenta `kg_query` no MCP) e o diff por id entre revisões (`kg_diff.py`); na 4.17.1, o vendor e os fixtures fora do corpus por padrão e o campo renomeado; na 4.17.2, as anotações de ferramenta no servidor MCP |
 
 ## Versões e tags
 
@@ -1848,6 +1864,11 @@ produto não depende dele, e ele não depende de um cliente específico.
 | `kg_query` | a consulta e a projeção do `kg_query.py` sobre o armazém: filtros, fila dos abertos, vizinhança e `fields`, paginada por cursor |
 | `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
+Desde a 4.17.2, cada ferramenta anuncia no `tools/list` as anotações do MCP: as de leitura (`kg_validate`, `kg_get`,
+`kg_list`, `kg_query`, `kg_history`, `kg_schema_help`) com `readOnlyHint` e `idempotentHint`, e o `kg_write` e o
+`kg_delete` com `destructiveHint`; todas com `openWorldHint: false`, porque o armazém é local. São dicas para o cliente
+pedir ou dispensar a confirmação; o gate do armazém segue decidindo o que é gravado.
+
 Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
 
 Com `--store-optional`, uma raiz que não abre (um arquivo no lugar da pasta, uma pasta sem permissão) não derruba o
@@ -2053,7 +2074,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 
 | Opção | O que faz |
 |---|---|
-| `--root DIR` ou arquivos | O corpus. `--exclude GLOB` (repetível) tira caminhos do `--root`, como o export duplicado de um armazém |
+| `--root DIR` ou arquivos | O corpus. Com `--root`, o vendor e os fixtures ficam de fora por padrão (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*`); `--exclude GLOB` (repetível) tira mais caminhos, e `--no-default-excludes` lê tudo. O arquivo dado um a um nunca é excluído |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filtros, todos em E |
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem distinguir maiúscula; `--in-narrative` procura também na narrative |
 | `--open` | A fila dos abertos (status `open`) |
@@ -2098,7 +2119,12 @@ valid-node-touched-only-as-target.kg.yaml (modificado)
 · 1 grafo(s): 1 modificado(s), 0 acrescentado(s), 0 removido(s), 0 não lido(s); nós +1 -1 ~0; arestas +1 -1 ~0
 ```
 
-O meta sai junto com as outras chaves da raiz, os valores se comparam na forma JSON do contrato, um arquivo renomeado
+O campo que sai de um caminho e entra noutro com o mesmo valor, num nó, numa aresta ou no meta, aparece como
+renomeação (`x_location → x_storage (renomeado)`) quando o valor não é trivial e é único dos dois lados. No JSON as
+duas entradas ficam, cada uma com o valor do seu caminho, ligadas por `renamed_to` e `renamed_from`; o texto humano e
+o resumo por campo mostram uma linha só. Com `--from` e sem caminhos, o vendor e os
+fixtures ficam de fora (também uma pasta `fixtures/` na raiz), como no `kg_query`: uma atualização do vendor muda os fixtures da suíte aos centos;
+`--exclude` e `--no-default-excludes` valem igual. O meta sai junto com as outras chaves da raiz, os valores se comparam na forma JSON do contrato, um arquivo renomeado
 sai como remoção mais acréscimo, e sem `--to` entram também os grafos novos ainda não adicionados ao git. O lado que
 não se lê (não é UTF-8, ou não parseia) sai em `unreadable` e conta como diferença; a revisão que começa com `-` é
 entrada quebrada. Num argumento, o caminho que existe no disco vence a leitura `REV:CAMINHO`.

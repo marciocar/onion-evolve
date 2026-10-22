@@ -11,13 +11,14 @@ Não ranqueia por atenção: --sort impact ordena pelo impacto declarado, e a f�
 Saída humana, ou JSON no formato kg-ssot.query/1 (spec/query.schema.json).
 
 Uso:
-  kg_query.py [--root DIR [--exclude GLOB]... | ARQ...] [filtros] [--around ID [--depth N] [--edge-type T]...
+  kg_query.py [--root DIR [--exclude GLOB]... [--no-default-excludes] | ARQ...] [filtros] [--around ID [--depth N] [--edge-type T]...
               [--direction out|in|both]] [--sort corpus|impact] [--limit N] [--cursor C] [--narrative]
               [--fields GLOB]... [--format human|json]
   filtros (todos juntos, em E): --id ID... --id-prefix P --type T --status S --plane P --layer L --file TRECHO
                                 --text PALAVRAS [--in-narrative] --open --verified-before AAAA-MM-DD
-  --root DIR lê os .kg.yaml e .kg.json rastreados pelo git sob DIR (sem git, todos sob DIR); os caminhos saem
-  relativos a DIR, que é a raiz contra a qual a ponta externa <caminho>#<id> se resolve.
+  --root DIR lê os .kg.yaml e .kg.json rastreados pelo git sob DIR (sem git, todos sob DIR), menos o vendor e os
+  fixtures (vendor/*, fixtures/*, */fixtures/*, docs/materials/*); os caminhos saem relativos a DIR, que
+  é a raiz contra a qual a ponta externa <caminho>#<id> se resolve.
 rc: 0 consultou (mesmo sem nenhum nó) · 2 entrada quebrada.
 """
 import argparse
@@ -53,6 +54,7 @@ class Corpus:
         self.into = collections.defaultdict(list)
         self.unreadable = []  # [{file, code}]
         self.files = []
+        self.root = None  # a raiz do --root, contra a qual os caminhos (file) e a ponta externa se resolvem
 
     def add(self, name, text):
         if name in self.files:  # o mesmo arquivo dado duas vezes não duplica as arestas
@@ -93,14 +95,22 @@ class Corpus:
             self.into[dst].append((et, src, src_ref))
 
 
-def load(root=None, files=(), exclude=()):
+# os mesmos do kg_migrate.py: o vendor e os fixtures (os da suíte e os de qualquer ferramenta) não são o grafo do
+# adotante; um --root sem eles leu 411 grafos para 29 reais no primeiro adotante que usou (achado de campo, 4.17.1)
+DEFAULT_EXCLUDE = ("vendor/*", "fixtures/*", "*/fixtures/*", "docs/materials/*")
+
+
+def load(root=None, files=(), exclude=(), defaults=True):
     """O corpus de --root (os rastreados pelo git, ou todos sob a pasta) ou dos arquivos dados. exclude: padrões glob
-    sobre o caminho relativo (export/*, *.kg.yaml) que ficam de fora. ValueError: entrada quebrada."""
+    sobre o caminho relativo (export/*, *.kg.yaml) que ficam de fora, somados aos DEFAULT_EXCLUDE quando defaults.
+    Os arquivos dados um a um nunca são excluídos. ValueError: entrada quebrada."""
+    exclude = (DEFAULT_EXCLUDE if defaults else ()) + tuple(exclude)
     corpus = Corpus()
     if root is not None:
         base = pathlib.Path(root)
         if not base.is_dir():
             raise ValueError(f"--root {root} não é um diretório")
+        corpus.root = str(root)
         out = subprocess.run(["git", "-C", str(base), "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json"], capture_output=True)
         if out.returncode == 0:
             names = [n for n in out.stdout.decode("utf-8").split("\0") if n]
@@ -278,7 +288,7 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                "direction": direction if around is not None else None, "sort": sort, "limit": limit, "cursor": cursor,
                "fields": list(fields)}
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
-    return {"schema_version": SCHEMA_VERSION, "query": request, "graphs": len(corpus.files),
+    return {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
             "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
             "nodes": page}
 
@@ -339,7 +349,9 @@ def main(argv=None):
     ap.add_argument("--fields", action="append", default=[], metavar="GLOB",
                     help="chaves do nó que saem em extra (repetível): x_*, owner")
     ap.add_argument("--exclude", action="append", default=[], metavar="GLOB",
-                    help="com --root, caminhos que ficam de fora (repetível): export/*")
+                    help="com --root, caminhos que ficam de fora (repetível), somados aos padrões: "
+                    + ", ".join(DEFAULT_EXCLUDE))
+    ap.add_argument("--no-default-excludes", action="store_true", help="com --root, lê também o vendor e os fixtures")
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_args(argv)
 
@@ -354,7 +366,7 @@ def main(argv=None):
         if before is None:
             return broken(f"--verified-before {args.verified_before!r}: a data é AAAA-MM-DD")
     try:
-        corpus = load(args.root, args.files, args.exclude)
+        corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
         res = query(corpus, ids=args.ids, id_prefix=args.id_prefix, node_type=args.node_type, status=args.status,
                     plane=args.plane, layer=args.layer, file=args.file, text=args.text, in_narrative=args.in_narrative,
                     open_only=args.open_only, verified_before=before, around=args.around, depth=args.depth,

@@ -72,7 +72,7 @@ para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.
 | 4.14 | Contrato v4.7: a ponta externa pode ser um `.kg.json`; o armazém grava um conjunto de grafos de uma vez (`write_many`) |
 | 4.15 | Contrato v4.8: a cadência da verificação (`reverify_every`, `reverify_on`), a retenção (`retain_for`), o `owner` como papel e o relatório de vencimento (`kg_validate.py --due`), fora do veredito; na 4.15.1, o contrato v4.9 deixa de alertar a cadência sem `verified_at`, que é o estado inicial de uma regra de coleta |
 | 4.16 | Contrato v4.9, sem mudança. O gate sem atrito: a base vira uma pasta com um registro por grafo, e a troca de identidade do contrato sem veredito trocado passa com aviso; na 4.16.1, o contrato v4.10 alinha os dois leitores em três pontos do perfil YAML, sem veredito trocado na referência |
-| 4.17 | Contrato v4.10, sem mudança. A consulta e a projeção (`kg_query.py`, e a ferramenta `kg_query` no MCP) e o diff por id entre revisões (`kg_diff.py`) |
+| 4.17 | Contrato v4.10, sem mudança. A consulta e a projeção (`kg_query.py`, e a ferramenta `kg_query` no MCP) e o diff por id entre revisões (`kg_diff.py`); na 4.17.1, o vendor e os fixtures fora do corpus por padrão e o campo renomeado; na 4.17.2, as anotações de ferramenta no servidor MCP |
 
 ## Versões e tags
 

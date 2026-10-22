@@ -466,6 +466,11 @@ produto não depende dele, e ele não depende de um cliente específico.
 | `kg_query` | a consulta e a projeção do `kg_query.py` sobre o armazém: filtros, fila dos abertos, vizinhança e `fields`, paginada por cursor |
 | `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
+Desde a 4.17.2, cada ferramenta anuncia no `tools/list` as anotações do MCP: as de leitura (`kg_validate`, `kg_get`,
+`kg_list`, `kg_query`, `kg_history`, `kg_schema_help`) com `readOnlyHint` e `idempotentHint`, e o `kg_write` e o
+`kg_delete` com `destructiveHint`; todas com `openWorldHint: false`, porque o armazém é local. São dicas para o cliente
+pedir ou dispensar a confirmação; o gate do armazém segue decidindo o que é gravado.
+
 Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
 
 Com `--store-optional`, uma raiz que não abre (um arquivo no lugar da pasta, uma pasta sem permissão) não derruba o
@@ -671,7 +676,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 
 | Opção | O que faz |
 |---|---|
-| `--root DIR` ou arquivos | O corpus. `--exclude GLOB` (repetível) tira caminhos do `--root`, como o export duplicado de um armazém |
+| `--root DIR` ou arquivos | O corpus. Com `--root`, o vendor e os fixtures ficam de fora por padrão (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*`); `--exclude GLOB` (repetível) tira mais caminhos, e `--no-default-excludes` lê tudo. O arquivo dado um a um nunca é excluído |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filtros, todos em E |
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem distinguir maiúscula; `--in-narrative` procura também na narrative |
 | `--open` | A fila dos abertos (status `open`) |
@@ -716,7 +721,12 @@ valid-node-touched-only-as-target.kg.yaml (modificado)
 · 1 grafo(s): 1 modificado(s), 0 acrescentado(s), 0 removido(s), 0 não lido(s); nós +1 -1 ~0; arestas +1 -1 ~0
 ```
 
-O meta sai junto com as outras chaves da raiz, os valores se comparam na forma JSON do contrato, um arquivo renomeado
+O campo que sai de um caminho e entra noutro com o mesmo valor, num nó, numa aresta ou no meta, aparece como
+renomeação (`x_location → x_storage (renomeado)`) quando o valor não é trivial e é único dos dois lados. No JSON as
+duas entradas ficam, cada uma com o valor do seu caminho, ligadas por `renamed_to` e `renamed_from`; o texto humano e
+o resumo por campo mostram uma linha só. Com `--from` e sem caminhos, o vendor e os
+fixtures ficam de fora (também uma pasta `fixtures/` na raiz), como no `kg_query`: uma atualização do vendor muda os fixtures da suíte aos centos;
+`--exclude` e `--no-default-excludes` valem igual. O meta sai junto com as outras chaves da raiz, os valores se comparam na forma JSON do contrato, um arquivo renomeado
 sai como remoção mais acréscimo, e sem `--to` entram também os grafos novos ainda não adicionados ao git. O lado que
 não se lê (não é UTF-8, ou não parseia) sai em `unreadable` e conta como diferença; a revisão que começa com `-` é
 entrada quebrada. Num argumento, o caminho que existe no disco vence a leitura `REV:CAMINHO`.

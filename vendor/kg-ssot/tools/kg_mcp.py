@@ -170,7 +170,25 @@ TOOLS = {
 
 
 
-UNTRUSTED_TOOLS = ("kg_get", "kg_list", "kg_history", "kg_query")  # devolvem texto gravado por usuários: no perfil, envelopados
+UNTRUSTED_TOOLS = ("kg_get", "kg_list", "kg_history", "kg_query")
+
+# As dicas de comportamento de cada ferramenta (annotations do MCP, desde a 2025-03-26), anunciadas no tools/list
+# (4.17.2): o cliente pode pular a confirmação do que só lê e pedir a do que apaga ou sobrescreve. Nenhuma fala com o
+# mundo de fora: o armazém é local (openWorldHint false). Gravar o mesmo texto de novo é idempotente (unchanged);
+# remover de novo não é (o nome já não existe). São dicas, não garantia: o gate do armazém segue valendo.
+_READ = {"readOnlyHint": True, "idempotentHint": True, "openWorldHint": False}
+ANNOTATIONS = {
+    "kg_validate": {"title": "Validate a graph against the contract", **_READ},
+    "kg_write": {"title": "Write a graph to the store", "readOnlyHint": False, "destructiveHint": True,
+                 "idempotentHint": True, "openWorldHint": False},
+    "kg_delete": {"title": "Delete a graph from the store", "readOnlyHint": False, "destructiveHint": True,
+                  "idempotentHint": False, "openWorldHint": False},
+    "kg_get": {"title": "Read a graph from the store", **_READ},
+    "kg_list": {"title": "List the graphs in the store", **_READ},
+    "kg_query": {"title": "Query and project the graphs in the store", **_READ},
+    "kg_history": {"title": "Show the history of a graph", **_READ},
+    "kg_schema_help": {"title": "Get the contract and how to write a passing graph", **_READ},
+}  # devolvem texto gravado por usuários: no perfil, envelopados
 
 
 class ToolError(Exception):
@@ -368,7 +386,7 @@ class Server:
         ctx = ctx or self.default_context()
         note = self.store_note(ctx)
         return [{"name": n, "description": t["description"] + (f" {note}" if note else ""),
-                 "inputSchema": t["inputSchema"]}
+                 "inputSchema": t["inputSchema"], "annotations": ANNOTATIONS[n]}
                 for n, t in TOOLS.items()
                 if (ctx.store is not None or not t["needs_store"]) and not (self.read_only and t["writes"])]
 

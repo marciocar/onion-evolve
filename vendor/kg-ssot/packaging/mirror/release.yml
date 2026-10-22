@@ -153,12 +153,13 @@ jobs:
       - name: Release no GitHub com o MCPB, o wheel, o sdist e o tarball npm
         env:
           GH_TOKEN: ${{ github.token }}
-        # as notas são a mensagem da tag anotada, lida pela API: o gh não aceita --notes-from-tag com --repo
+        # o corpo sai da seção da versão nos dois CHANGELOGs (tools/kg_release_notes.py, desde a 4.17.1), no esqueleto
+        # da pesquisa de publicação; sem a seção, o passo falha antes de criar a release
         run: |
-          sha=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$GITHUB_REF_NAME" -q .object.sha)
-          gh api "repos/$GITHUB_REPOSITORY/git/tags/$sha" -q .message > "$RUNNER_TEMP/notes.md"
+          version="${GITHUB_REF_NAME#kg-ssot-v}"
+          python -I tools/kg_release_notes.py --version "$version" > "$RUNNER_TEMP/notes.md"
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
-            --notes-file "$RUNNER_TEMP/notes.md" --title "$GITHUB_REF_NAME" dist/mcpb/*.mcpb dist/pypi/* dist/npm/*.tgz
+            --notes-file "$RUNNER_TEMP/notes.md" --title "KG-SSOT $version" dist/mcpb/*.mcpb dist/pypi/* dist/npm/*.tgz
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: mcpb-final
