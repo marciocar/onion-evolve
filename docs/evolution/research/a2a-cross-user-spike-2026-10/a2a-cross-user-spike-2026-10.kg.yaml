@@ -494,6 +494,22 @@ nodes:
       locator: "linha Bash (regex fullmatch sem ';') e o juiz das r1 e r2"
       method: "derivado: o achado estável de duas réplicas"
       locality: "repo"
+  - id: D_REGUA_A7_ELENXO_ANTES_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Elenxo antes de decidir»"
+    label: "A mudança da régua do A7 para aceitar ';' entre segmentos git ls-files só se decide depois de um Elenxo independente; até lá o A7-C1 segue não passou"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Elenxo antes de decidir»; descartadas: «Manter a régua estrita» · «Aceitar agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «A régua do A7 deve aceitar ';' entre segmentos que casam a forma inteira do git ls-files?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
 edges:
   - from: E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022
     to: D_A7C1_PARA_COM_DUAS_REPLICAS_1022
@@ -593,6 +609,9 @@ edges:
     edge_type: TRACES_TO
   - from: D_A7C1_PARA_COM_DUAS_REPLICAS_1022
     to: D_A7C1_LOTE_REINICIA_COM_TOOLSEARCH_1022
+    edge_type: TRACES_TO
+  - from: D_REGUA_A7_ELENXO_ANTES_1022
+    to: Q_REGUA_ACEITA_BASH_COMPOSTO_DE_LEITURA_1022
     edge_type: TRACES_TO
 
 external_edges:

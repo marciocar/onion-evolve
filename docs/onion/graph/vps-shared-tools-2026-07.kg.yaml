@@ -736,6 +736,22 @@ nodes:
       locator: "linhas 'dockerd não respondeu em 120s' do apply e 'docker-engine-migrate: verify ok' do resume"
       method: "medição: verify do wrapper contra o vivo, docker version e a API do WAHA"
       locality: "host"
+  - id: D_UPDATE_BRIDGE_GANHA_RESTART_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Modo --restart no wrapper»"
+    label: "O ops/update-bridge.sh ganha um modo --restart que religa o serviço e roda as mesmas verificações do boot mesmo sem mudança de código, para mudança só de .env"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Modo --restart no wrapper»; descartadas: «Detectar o .env mudado» · «Deixar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «O update-bridge.sh não religa quando só o .env muda; o que fazer?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
 
 edges:
   - from: E_DOCKER_VPS_MIGRADO_29_9_2_1022
@@ -889,6 +905,9 @@ edges:
     edge_type: TRACES_TO
   - from: D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022
     to: E_waha_public_route_caddy
+    edge_type: TRACES_TO
+  - from: D_UPDATE_BRIDGE_GANHA_RESTART_1022
+    to: E_LOGTO_ADMIN_LOCAL_LISTENER_1022
     edge_type: TRACES_TO
 
 external_edges:
