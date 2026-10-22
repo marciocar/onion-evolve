@@ -12,8 +12,14 @@
 # body_sha256 == sha256(body) e in_reply_to ∈ jtis que ESTE notebook enviou (sent.tsv). Mede no relógio
 # DO NOTEBOOK: rtt = t_recebido − t_envio do jti original (um relógio só: sem comparar relógios).
 #
-# Uso : fetch-replies.sh [--host H] [--watch [--until-reply JTI] [--interval S] [--timeout S]] [--local-dir D]
+# Uso : fetch-replies.sh [--host H] [--me ID] [--sent-tsv F] [--watch [--until-reply JTI] [--interval S] [--timeout S]]
+#                         [--local-dir D]
 #       --host       alias ssh da VPS (default onion-kvm8) · --local-dir: lê um outbox local (ensaio offline)
+#       --me ID      o membro que este fetch É: o aud que o channel assina = o `from` da ida (env A2A_SPIKE_ME;
+#                    default maestro-notebook-test, o do ensaio de 14/10; o degrau B usa maestro-peer-test)
+#       --sent-tsv F o sent.tsv do REMETENTE (default ~/.local/state/onion/a2a-spike/sent.tsv). No degrau B o
+#                    envio roda como outro usuário (a2a-peer), e o sent.tsv dele não está nesta home
+#                    (Emenda 12.14). Teste offline: notebook/fetch-replies.selftest.sh
 # Saída: uma linha por envelope + ~/.local/state/onion/a2a-spike/recv.tsv
 #        (t_recv_ms, kind, in_reply_to, rtt_ms, thread, jti_resposta, veredito)
 # Exit: 0 ok · 1 algum envelope REPROVOU a verificação · 2 uso/tooling · 3 timeout sem a resposta pedida
@@ -23,8 +29,9 @@ set -euo pipefail
 HOST="onion-kvm8"; WATCH=""; UNTIL=""; INTERVAL=1; TIMEOUT=300; LOCAL_DIR=""
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PUB="${A2A_SPIKE_CORE_PUB:-${HERE}/../keys/onion-evolve-spike-1.pub.pem}"
-ME="maestro-notebook-test"
+ME="${A2A_SPIKE_ME:-maestro-notebook-test}"
 STATE_DIR="${HOME}/.local/state/onion/a2a-spike"
+SENT_TSV="${STATE_DIR}/sent.tsv"
 REMOTE_OUTBOX='.local/state/onion/a2a-spike/outbox'
 
 die() { echo "ERRO: $*" >&2; exit 2; }
@@ -35,12 +42,17 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --interval) INTERVAL="$2"; shift 2 ;;
   --timeout) TIMEOUT="$2"; shift 2 ;;
   --local-dir) LOCAL_DIR="$2"; shift 2 ;;
-  -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
+  --me) ME="$2"; shift 2 ;;
+  --sent-tsv) SENT_TSV="$2"; shift 2 ;;
+  -h|--help) sed -n '2,26p' "$0"; exit 0 ;;
   *) die "argumento desconhecido: $1" ;;
 esac; done
 for t in openssl jq; do command -v "$t" >/dev/null 2>&1 || die "ferramenta ausente: $t"; done
 [ -n "${LOCAL_DIR}" ] || command -v ssh >/dev/null 2>&1 || die "ssh ausente"
 [ -f "${PUB}" ] || die "pubkey do core-spike ausente: ${PUB}"
+[ -n "${ME}" ] || die "--me vazio: o aud esperado não pode ser vazio"
+# sent.tsv ilegível NÃO é erro de uso: cada envelope sai in_reply_to-desconhecido (a verificação reprova, exit 1)
+[ -r "${SENT_TSV}" ] || echo "aviso: sent.tsv ilegível (${SENT_TSV}): toda resposta sairá in_reply_to-desconhecido" >&2
 mkdir -p "${STATE_DIR}/inbox"; chmod 700 "${STATE_DIR}" 2>/dev/null || true
 touch "${STATE_DIR}/seen.txt"
 
@@ -84,7 +96,7 @@ verify_one() {  # $1 = nome; imprime veredito e grava recv.tsv
   cl_sha="$(printf '%s' "${pl}" | jq -r '.body_sha256 // ""')"
   body_sha="$(jq -j '.signal.body // ""' "${f}" | openssl dgst -sha256 | awk '{print $NF}')"
   [ "${verdict}" = ok ] && [ "${body_sha}" != "${cl_sha}" ] && verdict="corpo-adulterado"
-  t_send="$(awk -F'\t' -v j="${irt}" '$3==j {print $1; exit}' "${STATE_DIR}/sent.tsv" 2>/dev/null || true)"
+  t_send="$(awk -F'\t' -v j="${irt}" '$3==j {print $1; exit}' "${SENT_TSV}" 2>/dev/null || true)"
   if [ -z "${t_send}" ]; then [ "${verdict}" = ok ] && verdict="in_reply_to-desconhecido"; rtt="?"; else rtt=$(( t_recv - t_send )); fi
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${t_recv}" "${kind}" "${irt}" "${rtt}" "${thread}" "${rj}" "${verdict}" >> "${STATE_DIR}/recv.tsv"
   echo "${name}" >> "${STATE_DIR}/seen.txt"

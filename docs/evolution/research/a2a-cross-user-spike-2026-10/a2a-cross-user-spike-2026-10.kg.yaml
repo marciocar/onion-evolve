@@ -369,6 +369,55 @@ nodes:
       locator: "pergunta com opções de 2026-10-21: «Revogar o convite e o membro de teste agora ou mantê-los para o degrau B?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
+  - id: D_DEGRAU_B_A7_ANTES_DO_A8_COM_FOTO_LIMPA_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «A7 antes, com compensação»"
+    label: "No degrau B a ordem da Emenda 5 (§12.5, A8 antes do A7) é desviada por decisão do maestro: o A7-C1 roda antes, com snapshot-permissions.sh --assert-clean --strict antes de cada réplica como compensação, e o A8 só depois, com a foto limpa"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «A7 antes, com compensação»; descartadas: «A8 antes, como manda»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «No degrau B, o A7-C1 roda antes do A8 (desviando a ordem da Emenda 5, com a foto limpa antes de cada réplica como compensação) ou o A8 roda antes, como o protocolo manda?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+  - id: D_DEGRAU_B_SEM_B0_NEM_C2_HOJE_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Só o A7 hoje»"
+    label: "No degrau B de 2026-10-22 só o A7-C1 roda: o B0 (linha de base nativa) e o C2 (lease por thread) ficam fora por decisão do maestro, e o veredito «igual ao nativo» fica INCONCLUSIVO pela Emenda 4 (§12.4)"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Só o A7 hoje»; descartadas: «A7 + B0 hoje» · «A7 + B0 + assinar o C2»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «O que roda hoje no degrau B: só o A7, o A7 com o B0, ou o A7 com o B0 e a assinatura do C2?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+  - id: E_DEGRAU_B_VOLTA_TINHA_DOIS_BLOQUEIOS_1022
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "leitura do código em origin/main 46f733b5: notebook/fetch-replies.sh fixava ME=maestro-notebook-test (l.26) e lia ${HOME}/.local/state/onion/a2a-spike/sent.tsv (l.87); só notebook/send-a2a.sh grava o sent.tsv (l.132), o a2a-send.sh canônico não grava (grep sent.tsv = 0 em .claude/utils/federation-transport/a2a-send.sh). Cura medida por notebook/fetch-replies.selftest.sh 10/10 offline (chave descartável, ack e reply sintéticos assinados como o channel): ok com --me maestro-peer-test e --sent-tsv; aud-errado sem --me; in_reply_to-desconhecido sem --sent-tsv; corpo-adulterado; mutante que ignora o --me reprova o caso ok; arquivo restaurado com o mesmo sha256"
+    label: "A volta do degrau B não fechava: o fetch fixava o membro de 14/10 (aud-errado contra maestro-peer-test) e lia o sent.tsv da própria home, mas o envio roda como a2a-peer e o fetch como marciocar (in_reply_to-desconhecido). Cura: --me e --sent-tsv, defaults intactos"
+    narrative: "O defeito só aparece com dois usuários do SO no mesmo notebook: no ensaio de 14/10 remetente e fetch eram o mesmo usuário e o mesmo membro. O envio do degrau B usa o notebook/send-a2a.sh (com --key/--kid/--from) e não o a2a-send.sh, porque só ele grava o sent.tsv que dá o t_send do rtt. NÃO MEDIDO: o fetch vivo por ssh contra o outbox real da VPS com estas flags."
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.sh"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.selftest.sh"
+      locator: "casos --me/--sent-tsv e o mutante «--me ignorado»"
+      method: "medição: selftest offline com chave descartável e mutate-and-restore conferido por sha256"
+      locality: "repo"
 edges:
   - from: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
     to: D_DEGRAU_A_HOJE_A0_E_A1_1021
@@ -442,6 +491,15 @@ edges:
   - from: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
     to: D_DEGRAU_A_HOJE_A0_E_A1_1021
     edge_type: TRACES_TO
+  - from: D_DEGRAU_B_A7_ANTES_DO_A8_COM_FOTO_LIMPA_1022
+    to: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
+    edge_type: TRACES_TO
+  - from: D_DEGRAU_B_SEM_B0_NEM_C2_HOJE_1022
+    to: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
+    edge_type: TRACES_TO
+  - from: E_DEGRAU_B_VOLTA_TINHA_DOIS_BLOQUEIOS_1022
+    to: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
+    edge_type: SUPPORTS
 
 external_edges:
   - from: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY"
