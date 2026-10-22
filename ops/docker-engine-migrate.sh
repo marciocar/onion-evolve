@@ -137,7 +137,8 @@ cmd_apply() {
     "$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")" "$(dpkg --print-architecture)" "$KEYRING" \
     | sudo_do tee "$SOURCES" >/dev/null
   sudo_do apt-get update -qq
-  apt-cache madison docker-ce | grep -qF "$TARGET_ENGINE" \
+  local madison; madison="$(apt-cache madison docker-ce 2>/dev/null || true)"
+  grep -qF "$TARGET_ENGINE" <<< "$madison" \
     || { sudo_do rm -f "$SOURCES"; die "o repositório não oferece docker-ce ${TARGET_ENGINE}: fonte removida, nada trocado"; }   # guard:available
   # o modo do image store do plan, fixado ANTES de o Engine novo subir (daemon.json só é criado se não existir)
   drv="$(sudo_do cat "$p/driver.txt")"
@@ -148,7 +149,7 @@ cmd_apply() {
   fi
   # uma transação só: instala o oficial e remove o do Ubuntu (o sufixo - do apt remove sem purge; /var/lib fica)
   local rm_pkgs=() x
-  for x in "${UBUNTU_PKGS[@]}"; do dpkg-query -W -f='${db:Status-Status}' "$x" 2>/dev/null | grep -qx installed && rm_pkgs+=("${x}-"); done
+  for x in "${UBUNTU_PKGS[@]}"; do [ "$(dpkg-query -W -f='${db:Status-Status}' "$x" 2>/dev/null || true)" = installed ] && rm_pkgs+=("${x}-"); done
   sudo_do env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     "docker-ce=${TARGET_ENGINE}" "docker-ce-cli=${TARGET_ENGINE}" "containerd.io=${TARGET_CONTAINERD}" \
     "docker-buildx-plugin=${TARGET_BUILDX}" "docker-compose-plugin=${TARGET_COMPOSE}" "${rm_pkgs[@]}"
