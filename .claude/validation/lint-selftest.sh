@@ -12270,6 +12270,10 @@ run_pre_push_selftests() {
       && mkdir -p ops && printf '%s\n' '#!/bin/bash' \
            '# stub do gate do contrato KG-SSOT (ops/kg-gate-ci.sh): reprova quando o arquivo kgverdict diz "piorou"' \
            'if [ "$(cat kgverdict 2>/dev/null)" = piorou ]; then echo "✗ PIOROU  debt.form.range.node.label: 1 → 2"; exit 1; fi' \
+           '# kgverdict=lang: fala a língua do AMBIENTE, na precedência da kg-ssot 4.18.0 (inglês fora de pt*)' \
+           'if [ "$(cat kgverdict 2>/dev/null)" = lang ]; then l="${KG_SSOT_LANG:-${LANGUAGE:-${LC_ALL:-${LC_MESSAGES:-${LANG:-}}}}}"' \
+           '  case "$l" in pt*) printf "%s\n" "✗ PIOROU  debt.form.range.node.label: 1 → 2" "  MUST   docs/velho.kg.yaml (herdado): form.required.node.provenance · carimbo ausente" "GATE QUEBRADO  base ilegível" ;;' \
+           '  *) printf "%s\n" "✗ WORSE  debt.form.range.node.label: 1 → 2" "  MUST   docs/velho.kg.yaml (inherited): form.required.node.provenance · stamp missing" "GATE BROKEN  unreadable baseline" ;; esac; exit 1; fi' \
            'echo "✓ gate"; exit 0' > ops/kg-gate-ci.sh \
       && chmod +x .claude/utils/adopt/*.sh .claude/validation/*.sh ops/kg-gate-ci.sh \
       && echo base > docs/backlog.md && echo v0 > a.txt && echo 0 > verdict && seq 1 60 > c.txt \
@@ -12309,6 +12313,27 @@ run_pre_push_selftests() {
       record_pass "pr-finalize: contrato KG-SSOT reprova o commit → rc 1 com a causa nomeada"
     else record_fail "pr-finalize: contrato KG-SSOT reprova" "esperava rc 1 + 'contrato KG-SSOT' + 'PIOROU'; rc=${g}: $(tail -2 "${sb}/out" 2>/dev/null)"; fi
   fi
+  # a kg-ssot 4.18.0 imprime em INGLÊS por padrão (KG_SSOT_LANG, LANGUAGE, LC_ALL, LC_MESSAGES, LANG). O stub
+  # acima fala a língua do ambiente, e o caso roda nos DOIS: a decisão é o rc 1, e o digest que só EXIBE
+  # (_kg_gate_digest) mostra a causa e o gate quebrado e esconde a dívida herdada, em qualquer língua.
+  # Mutante medido: o filtro de antes ('^✗|ausente|Error|erro' menos '(herdado)') reprova o ramo en.
+  local _klang _kout _kwant _kbroke _kinh
+  for _klang in en pt; do
+    _new "kg_gate_lang_${_klang}" || continue
+    ( cd "${sb}/w" && echo lang > kgverdict && git add kgverdict ) >/dev/null 2>&1
+    case "${_klang}" in
+      en) g="$(unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; export LANG=C.UTF-8 LC_ALL=C.UTF-8; _pf "${sb}" -m t1)" ;;
+      pt) g="$(unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; export LANG=pt_BR.UTF-8 LC_ALL=pt_BR.UTF-8; _pf "${sb}" -m t1)" ;;
+    esac
+    _kout="$(sed -n '/o contrato KG-SSOT reprovou o commit/,$p' "${sb}/out" 2>/dev/null)"
+    case "${_klang}" in
+      en) _kwant='WORSE' _kbroke='GATE BROKEN' _kinh='(inherited)' ;;
+      pt) _kwant='PIOROU' _kbroke='GATE QUEBRADO' _kinh='(herdado)' ;;
+    esac
+    if [ "${g}" = 1 ] && grep -qF "${_kwant}" <<< "${_kout}" && grep -qF "${_kbroke}" <<< "${_kout}" && ! grep -qF "${_kinh}" <<< "${_kout}"; then
+      record_pass "pr-finalize: contrato KG-SSOT em ${_klang} → rc 1, o digest mostra a causa e o gate quebrado e esconde a dívida herdada"
+    else record_fail "pr-finalize: contrato KG-SSOT em ${_klang}" "esperava rc 1 + '${_kwant}' + '${_kbroke}' sem '${_kinh}'; rc=${g}: $(printf '%s' "${_kout}" | tr '\n' '|' | cut -c1-300)"; fi
+  done
   # B1 reaberto pelo Elenxo 2: hash entre aspas / com espaço no fim NÃO é "pendente"
   local form
   # 'semcodigo' é REDUNDANTE por construção desde o Elenxo 2 (o hash de código é validado em 64 hex, logo
@@ -39104,12 +39129,17 @@ assert a==b
   h1="$(sha256sum "${gs}" | cut -d' ' -f1)"
   LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --external-edges "${gs}" >/dev/null 2>&1 || true
   h2="$(sha256sum "${gs}" | cut -d' ' -f1)"
-  contrato="$(cd "${lr}" && python3 -I -B "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" --corpus . docs/src.kg.yaml 2>&1)" || true
+  # o veredito do contrato é o rc do kg_validate (0 passa · 1 reprova · 2 entrada quebrada), nunca a prosa: a
+  # kg-ssot 4.18.0 imprime PASS/FAIL em inglês por padrão, e o '^PASSA' de antes reprovaria um grafo conforme.
+  # O predicado mora numa função só, que o (xl) abaixo exercita nas duas línguas (e o mutante dele é a prosa).
+  _kmv_contract_ok() { [ "$1" -eq 0 ]; }  # $1=rc do kg_validate · $2=a saída, de propósito NÃO lida
+  local crc=0
+  contrato="$(cd "${lr}" && python3 -I -B "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" --corpus . docs/src.kg.yaml 2>&1)" || crc=$?
   hb1="$(sha256sum "${gb}" | cut -d' ' -f1)"
   local outb rcb
   if outb="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --external-edges "${gb}" 2>&1)"; then rcb=0; else rcb=$?; fi
   hb2="$(sha256sum "${gb}" | cut -d' ' -f1)"
-  if [ "${rc}" -eq 0 ] && [ "${h1}" = "${h2}" ] && grep -q '^PASSA' <<< "${contrato}" \
+  if [ "${rc}" -eq 0 ] && [ "${h1}" = "${h2}" ] && _kmv_contract_ok "${crc}" "${contrato}" \
      && grep -q 'TOTAL · CONSTRAINS 1 · SUPERSEDES 2' <<< "${out}" \
      && [ "${rcb}" -eq 2 ] && [ "${hb1}" = "${hb2}" ] && grep -q 'ALVO QUEBRADO docs/alvo.kg.yaml#D_NAO_EXISTE (id ausente)' <<< "${outb}" \
      && python3 -I -B -c '
@@ -39123,7 +39153,27 @@ assert "x_constrained_by" not in n["D_LIMITADA"]
 assert n["D_LIMITADA"]["narrative"].endswith(" · desde o contrato v4.3 (SAC-98), a aresta mora em external_edges, no topo do grafo")
 ' "${gs}" 2>/dev/null; then
     record_pass "kg-migrate-v3: (x) --external-edges: x_supersedes_external vira SUPERSEDES por alvo, x_constrained_by vira CONSTRAINS de fora para o nó, narrative anotada, x_supersedes_none fica, contrato com --corpus aprova, 2ª passada no-op; alvo inexistente → rc 2 e arquivo intocado"
-  else record_fail "kg-migrate-v3: (x)" "tradução errada, alvo inventado ou sem idempotência: rc=${rc} rcb=${rcb} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) intocado=$([ "${hb1}" = "${hb2}" ] && echo sim || echo NÃO) ${out} ${outb} ${contrato}"; fi
+  else record_fail "kg-migrate-v3: (x)" "tradução errada, alvo inventado ou sem idempotência: rc=${rc} rcb=${rcb} crc=${crc} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) intocado=$([ "${hb1}" = "${hb2}" ] && echo sim || echo NÃO) ${out} ${outb} ${contrato}"; fi
+  # (xl) o predicado do contrato do (x) é robusto à LÍNGUA: o kg_validate real (a 4.17.2 fala português) e um shim
+  #      que reescreve a saída dele como a 4.18.0 (inglês por padrão: PASS/FAIL, o rc intacto), cada um em C.UTF-8
+  #      e em pt_BR.UTF-8 → o grafo conforme passa e o reprovado reprova, nas oito leituras. Simulação declarada:
+  #      o inglês real só existe a partir da 4.18.0. Mutante medido: o predicado de prosa ('^PASSA') cai no shim.
+  local gf="${lr}/docs/reprova.kg.yaml" kshim="${d}/kg_validate_en.py" _xe _xi _xv _xr _xo _xn=0 _xbad=""
+  printf 'meta:\n  id: reprova\n  schema_version: "1"\nnodes:\n  - id: C_SEM_TIPO\n    plane: DEV\n    status: open\n    label: "sem node_type"\n' > "${gf}"
+  printf 'import subprocess, sys\nr = subprocess.run([sys.executable, "-I", "-B", %s] + sys.argv[1:], capture_output=True, text=True)\ntr = lambda t: t.replace("REPROVA", "FAIL").replace("PASSA", "PASS")\nsys.stdout.write(tr(r.stdout)); sys.stderr.write(tr(r.stderr)); sys.exit(r.returncode)\n' \
+    "'${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py'" > "${kshim}"
+  for _xe in C.UTF-8 pt_BR.UTF-8; do
+    for _xi in "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" "${kshim}"; do
+      for _xv in "docs/src.kg.yaml:0" "docs/reprova.kg.yaml:1"; do
+        _xr=0; _xo="$(cd "${lr}" && unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; LANG="${_xe}" LC_ALL="${_xe}" python3 -I -B "${_xi}" --corpus . "${_xv%%:*}" 2>&1)" || _xr=$?
+        if _kmv_contract_ok "${_xr}" "${_xo}"; then _xo=0; else _xo=1; fi
+        if [ "${_xo}" = "${_xv##*:}" ]; then _xn=$((_xn + 1)); else _xbad="${_xbad} ${_xe}/${_xi##*/}/${_xv%%:*}(rc=${_xr})"; fi
+      done
+    done
+  done
+  if [ "${_xn}" -eq 8 ]; then
+    record_pass "kg-migrate-v3: (xl) o veredito do contrato é o rc: português (4.17.2) e inglês (4.18.0 simulada), em C.UTF-8 e pt_BR.UTF-8, o conforme passa e o reprovado reprova (8 de 8)"
+  else record_fail "kg-migrate-v3: (xl)" "o predicado do contrato dependeu da língua ou do locale (${_xn} de 8):${_xbad}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests
@@ -41280,6 +41330,9 @@ run_plan_contract_migration_selftests() {
   [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_migrate.py" ] || { record_skip "plan-contract-migration: vendor/kg-ssot sem kg_migrate.py nesta árvore (SUT não exercido)"; return; }
   python3 -c 'import yaml, jsonschema' >/dev/null 2>&1 || { record_skip "plan-contract-migration: PyYAML/jsonschema ausentes (SUT não exercido)"; return; }
   local d; d="$(mktemp -d)"
+  # a recusa da entrada pelo kg_migrate.py é PROSA (o rc 2 dele é o mesmo do argparse): aceita as duas línguas, porque
+  # a kg-ssot 4.18.0 fala inglês por padrão. Dívida: trocar por um código de máquina quando o migrador tiver um.
+  local _pm_broken_re='ENTRADA QUEBRADA|BROKEN INPUT'
   _pm_git() { git -C "$1" -c user.email=t@t -c user.name=t -c commit.gpgsign=false "${@:2}"; }
   _pm_target() {  # $1=dir → alvo git com o vendor do core (tools, spec com os exemplos do perfil, carimbo)
     mkdir -p "$1/vendor/kg-ssot/tools" "$1/vendor/kg-ssot/spec/migrate-examples" "$1/docs/g"
@@ -41332,7 +41385,7 @@ run_plan_contract_migration_selftests() {
     o1="$(bash "${s}" "${d}/perfil-quebrado" --out-dir "${d}/out-e1" 2>&1)" || r1=$?
     o2="$(bash "${s}" "${d}/dois-perfis" --out-dir "${d}/out-e2" 2>&1)" || r2=$?
     o3="$(bash "${s}" "${d}/com-perfil" --out-dir "${d}/com-perfil/planilha" 2>&1)" || r3=$?
-    [ "${r1}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o1}" && grep -q 'ENTRADA QUEBRADA' <<< "${o1}" \
+    [ "${r1}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o1}" && grep -qE "${_pm_broken_re}" <<< "${o1}" \
       && [ "${r2}" -eq 3 ] && grep -q 'o alvo tem dois perfis' <<< "${o2}" \
       && [ "${r3}" -eq 3 ] && grep -q 'fica dentro do alvo' <<< "${o3}" && [ ! -e "${d}/com-perfil/planilha" ] && ok="${ok} e"
     rm -rf "${d}/com-perfil/planilha"
@@ -41363,6 +41416,18 @@ run_plan_contract_migration_selftests() {
     rm -rf "${d}/out-j"
     r=0; o="$(bash "${s}" "${d}/identidade" --out-dir "${d}/out-j" 2>&1)" || r=$?
     [ "${r}" -eq 0 ] && grep -q 'o plano cobre, nó a nó' <<< "${o}" && ! grep -q 'fora do plano' <<< "${o}" && ok="${ok} j"
+    # (k) a língua do migrador não muda o desfecho: o perfil quebrado lido pelo kg_migrate.py real (a 4.17.2 fala
+    #     português) e pelo falso que fala como a 4.18.0 (inglês por padrão), cada um em C.UTF-8 e em pt_BR.UTF-8 →
+    #     rc 3 NÃO MEDIDO com o rc 2 do migrador dito e a linha dele repassada, nas quatro combinações
+    local _kt _ke _kn=0
+    for _kt in perfil-quebrado perfil-quebrado-en; do
+      for _ke in C.UTF-8 pt_BR.UTF-8; do
+        r=0; o="$(unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; LANG="${_ke}" LC_ALL="${_ke}" bash "${s}" "${d}/${_kt}" --out-dir "${d}/out-k" 2>&1)" || r=$?
+        [ "${r}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o}" \
+          && grep -qE "${_pm_broken_re}" <<< "${o}" && _kn=$((_kn + 1))
+      done
+    done
+    [ "${_kn}" -eq 4 ] && ok="${ok} k"
     printf '%s' "${ok}"
   }
   _pm_target "${d}/passa"; _pm_ok "${d}/passa/docs/g/a.kg.yaml" fx-a; _pm_commit "${d}/passa"
@@ -41389,6 +41454,12 @@ run_plan_contract_migration_selftests() {
   _pm_target "${d}/sem-migrador"; _pm_bad "${d}/sem-migrador/docs/g/b.kg.yaml" fx-b; rm -f "${d}/sem-migrador/vendor/kg-ssot/tools/kg_migrate.py"; _pm_commit "${d}/sem-migrador"
   _pm_target "${d}/perfil-quebrado"; _pm_bad "${d}/perfil-quebrado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado/.kg-ssot"
   printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/perfil-quebrado"
+  # perfil-quebrado-en: o mesmo alvo, com um migrador falso que recusa a entrada como a kg-ssot 4.18.0 (inglês por
+  # padrão, rc 2 igual). Simulação declarada: a 4.17.2 vendorizada ainda fala português.
+  _pm_target "${d}/perfil-quebrado-en"; _pm_bad "${d}/perfil-quebrado-en/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado-en/.kg-ssot"
+  printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado-en/.kg-ssot/migrate-profile.yaml"
+  printf 'import sys\nprint("BROKEN INPUT  profile .kg-ssot/migrate-profile.yaml: rules: [] should be non-empty")\nsys.exit(2)\n' > "${d}/perfil-quebrado-en/vendor/kg-ssot/tools/kg_migrate.py"
+  _pm_commit "${d}/perfil-quebrado-en"
   _pm_target "${d}/dois-perfis"; _pm_bad "${d}/dois-perfis/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/dois-perfis/.kg-ssot"
   _pm_profile "${d}/dois-perfis/.kg-ssot/migrate-profile.yaml"; _pm_profile "${d}/dois-perfis/kg-migrate.profile.yaml"; _pm_commit "${d}/dois-perfis"
   # escreve: um migrador falso cujo "plan" grava no grafo do alvo — a foto do helper tem de pegar (rc 5)
@@ -41414,6 +41485,8 @@ run_plan_contract_migration_selftests() {
     *) record_fail "plan-contract-migration: (h)" "o symlink da planilha foi seguido ou o plano não saiu" ;; esac
   case " ${got} " in *" i "*) record_pass "plan-contract-migration: (i) universos divergentes (vendor/outra, fixtures/ na raiz) → a conferência por identidade lista o nó da dívida fora do plano, por nome" ;;
     *) record_fail "plan-contract-migration: (i)" "$(bash "${sut}" "${d}/universo" --out-dir "${d}/out-i" 2>&1 | grep -E 'plano|fora' | head -4 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" k "*) record_pass "plan-contract-migration: (k) perfil quebrado pelo migrador em português (4.17.2) e em inglês (4.18.0 simulada), em C.UTF-8 e pt_BR.UTF-8 → rc 3 NÃO MEDIDO nas quatro" ;;
+    *) record_fail "plan-contract-migration: (k)" "$(bash "${sut}" "${d}/perfil-quebrado-en" --out-dir "${d}/out-k" 2>&1 | head -2 | tr '\n' '|')" ;; esac
   case " ${got} " in *" j "*) record_pass "plan-contract-migration: (j) id repetido e grafo por symlink → a identidade bate (multiset, caminho real), sem falso 'fora do plano'" ;;
     *) record_fail "plan-contract-migration: (j)" "$(bash "${sut}" "${d}/identidade" --out-dir "${d}/out-j" 2>&1 | grep -E 'plano|fora|NÃO' | head -4 | tr '\n' '|')" ;; esac
   # (m) MUTANTES na CÓPIA do helper (com o remeasure-contract.sh ao lado): cada um reverte uma cura e EXIGE que o
