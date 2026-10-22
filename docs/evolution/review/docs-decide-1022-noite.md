@@ -2,7 +2,8 @@
 branch: docs/decide-1022-noite
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e73fdf8f0d246b6246abfbdb2fe03f7916a784d040fccb80d08240d0eb38b06a
+reviewed_code_sha256: 978f6aa1b8af8597b05b9fccd8b97f82d0ceb331b8b3961362b1adaf1a3f2e7e
 findings_total: 0
 findings_real: 0
 tokens: 0
