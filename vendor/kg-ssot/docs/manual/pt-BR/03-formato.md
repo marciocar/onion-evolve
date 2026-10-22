@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:ea011aaa84a9398d -->
+<!-- translation-of: docs/manual/03-format.md sha256:a0ead6ec04f1c510 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -70,6 +70,8 @@ No topo, no `meta`, no nó, na aresta e na aresta externa, qualquer outra chave 
 | `review_after` | *data* | quando o grafo deve ser revisto |
 | `layer` | `audit` · `domain` | |
 | `note` · `purpose` | texto | a narrativa do grafo |
+| `title` | texto | desde o v4.11: o título humano do grafo. Não vazio |
+| `slug` | texto | desde o v4.11: o nome curto. Não vazio; SHOULD: palavras em minúsculas ligadas por hífen (`meu-grafo`) |
 | `x_*` | qualquer | |
 
 ## Nó
@@ -138,6 +140,97 @@ No topo, no `meta`, no nó, na aresta e na aresta externa, qualquer outra chave 
 Uma referência externa é `<caminho>.kg.yaml#<id>`, ou `<caminho>.kg.json#<id>` desde o v4.7, com o caminho relativo
 à raiz do repositório e escrito com `/`. Cada segmento começa por letra, dígito ou `_`. Caminho absoluto, `..`, `\`
 e `:` reprovam.
+
+## Perfis canônicos de `x_` (v4.11)
+
+A chave `x_` segue livre no MUST: nunca reprova. Algumas chaves `x_` se repetem nos adotantes com o mesmo sentido, e
+desde o v4.11 o SHOULD dá uma forma a cada uma. O perfil só é julgado quando a chave está presente, e só alerta. Um
+valor fora do perfil alerta com o caminho dentro dele (`form.enum.node.x_term.labels.kind`), e um item de lista dentro
+do nó também leva o caminho (`form.type.node.x_term.labels.item`). Dentro do objeto de um perfil, outra chave `x_` é
+livre, e qualquer outra chave alerta. Os valores de enum são códigos, em inglês, em qualquer língua da saída.
+
+| Chave | Onde | O que é |
+|---|---|---|
+| `x_term` | nó | um termo de um vocabulário de domínio, com os sinônimos e a fonte de cada um |
+| `x_mirror` | nó | a cópia de um registro guardado em outro sistema (um chamado, uma tarefa, um card) |
+| `x_doc_cycle` | nó | o ciclo de vida de um documento externo de que o nó depende (uma norma, uma política, um contrato) |
+| `x_questionnaire` | nó | o elo entre o nó e as perguntas de um questionário externo |
+| `x_severity` | nó | `critical` · `high` · `medium` · `low` · `info` |
+| `x_confidence` | aresta | a certeza da ligação, de 0 a 1 |
+| `x_provisional` | aresta | `true` quando a ligação ainda espera conferência |
+
+### `x_term`
+
+O termo é um nó (um `entity`) com `x_term`. Os nomes seguem o SKOS: `pref` é o rótulo preferido, e cada sinônimo é
+`alt` (um rótulo alternativo) ou `hidden` (uma forma que se busca mas não se mostra, como um erro de digitação ou o
+nome antigo de uma coluna). O que o KG-SSOT acrescenta é a verificação por sinônimo: a fonte, a versão do documento, a
+data em que foi conferido e quando conferir de novo.
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `pref` | texto | obr. O termo preferido |
+| `lang` | texto | uma etiqueta BCP 47 (`pt-BR`, `en`) |
+| `definition` | texto | |
+| `notation` | texto | um código que identifica o termo (`GTIN`, um número de catálogo) |
+| `labels` | lista | os sinônimos, cada um um objeto com as chaves abaixo |
+
+| Chave do sinônimo | Tipo | Regra |
+|---|---|---|
+| `literal` | texto | obr. O sinônimo como se escreve |
+| `kind` | enum | obr. `alt` · `hidden` |
+| `source` | texto | obr. De onde vem o sinônimo: uma URL, um documento, um caminho |
+| `locator` | texto | onde, dentro da fonte |
+| `version` | texto | a versão do documento (ou o hash dele, quando o documento não tem versão) |
+| `verified_at` | *data* | quando o sinônimo foi conferido contra a fonte |
+| `reverify_every` | duração | a cadência; pede `verified_at`, e o `--due` lista o sinônimo quando vence |
+| `scope` | mapa | `level`: `domain` (vale no domínio inteiro) ou `case` (vale só num caso, nomeado em `case`); `jurisdiction`, opcional (`BR`, `BR-SP`) |
+| `retired` | booleano | `true` para o nome antigo: o sinônimo aposentado ainda resolve, marcado como aposentado. O `kg_vocab.py` lê um valor que não é booleano como aposentado, e um `status` diferente de `current` também |
+| `lang` | texto | quando difere da do termo |
+
+O termo aposentado é o nó com `status: superseded` e uma aresta `SUPERSEDES` do termo que o substitui. O
+`kg_vocab.py` lista os termos, resolve um texto para o termo dele e exporta para o SKOS-XL e o Apache Ossie
+(capítulo 5).
+
+```yaml
+  - id: T_EAN
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "Código EAN: o código de 13 dígitos que identifica o país, o fabricante e o produto."
+    x_term:
+      pref: "Código EAN"
+      lang: pt-BR
+      labels:
+        - literal: "GTIN"
+          kind: alt
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "itens 9, 10 e 11"
+          version: "sha256:44e8af589f6a0860"
+          verified_at: "2026-10-22"
+          reverify_every: P6M
+          scope: {level: domain, jurisdiction: BR}
+        - literal: "CO_EAN"
+          kind: hidden
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "tabela De/Para: CO_EAN (anterior) para EAN 1 (atual)"
+          retired: true
+```
+
+O exemplo inteiro, tirado do dicionário de dados aberto da CMED/ANVISA, está em
+[`spec/vocab-examples/cmed-dictionary.kg.yaml`](../../../spec/vocab-examples/cmed-dictionary.kg.yaml).
+
+### `x_mirror`, `x_doc_cycle` e `x_questionnaire`
+
+| Perfil | Obrigatório | Opcional |
+|---|---|---|
+| `x_mirror` | `system`, `ref`, `state` (o estado como foi copiado), `synced_at` (*data*) | `url`, `resync_every` (duração) |
+| `x_doc_cycle` | `issuer`, `state`: `draft` `enacted` (publicado, em vigor a partir de um `effective_from` futuro) `in_force` `suspended` `revoked` `expired` `superseded` | `ref`, `version`, `effective_from`, `effective_to`, `updated_at`, `checked_at` (*datas*), `recheck_every` (duração, pede `checked_at`) |
+| `x_questionnaire` | `name`, `questions` (uma lista não vazia) | `answer_draft`, `verdict`: `meets` `partial` `does_not_meet` `not_applicable` `unknown`, `answered_at` (*data*) |
+
+Uma cópia envelhece sem aviso: `synced_at` mais `resync_every` a põe no relatório de vencimento, e o mesmo vale para
+`checked_at` mais `recheck_every` num documento.
 
 ## Integridade (fora do schema)
 

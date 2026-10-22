@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:966fce90de3aaf60 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:5236145e9b921f55 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -95,7 +95,7 @@ Opções úteis:
 | `--limit N` | Com `--format json`, quantas ocorrências por arquivo (default 50); o resumo conta todas |
 | `-` no lugar do arquivo | Lê o grafo do stdin, sem arquivo temporário; `--stdin-format json` lê um grafo `.kg.json` (default `yaml`) |
 | `--should-schema F` | Com `--schema`, o schema SHOULD que acompanha (no lugar do vizinho) |
-| `--due AAAA-MM-DD` | No lugar do veredito, o relatório de vencimento na data (desde a 4.15.0): cada nó com `reverify_every` cujo `verified_at` somado à cadência cai na data ou antes, cada nó que tem cadência e não tem carimbo, e cada nó que só tem `reverify_on`. O rc é 0 (ou 2 com entrada quebrada): o vencimento nunca reprova, e o relatório não julga o grafo (o gate segue sendo o `kg_gate.py`). Um arquivo que não parseia sai como `NÃO LIDO`; num job agendado, olhe essa lista, porque o rc não a acusa. A cadência fora da forma ou zerada fica fora do relatório (o aviso SHOULD a acusa), e o vencimento depois do ano 9999 também. Com `--format json`, a saída usa o formato `kg-ssot.due/1` (`spec/due.schema.json`) |
+| `--due AAAA-MM-DD` | No lugar do veredito, o relatório de vencimento na data (desde a 4.15.0): cada nó com `reverify_every` cujo `verified_at` somado à cadência cai na data ou antes, cada nó que tem cadência e não tem carimbo, e cada nó que só tem `reverify_on`. Desde a 4.19.0 lista também os perfis canônicos com cadência: cada sinônimo de um `x_term` que não está aposentado, o `x_mirror` (`synced_at` mais `resync_every`) e o `x_doc_cycle` (`checked_at` mais `recheck_every`), com `subject` e `detail` no JSON. O rc é 0 (ou 2 com entrada quebrada): o vencimento nunca reprova, e o relatório não julga o grafo (o gate segue sendo o `kg_gate.py`). Um arquivo que não parseia sai como `NÃO LIDO`; num job agendado, olhe essa lista, porque o rc não a acusa. A cadência fora da forma ou zerada fica fora do relatório (o aviso SHOULD a acusa), e o vencimento depois do ano 9999 também. Com `--format json`, a saída usa o formato `kg-ssot.due/1` (`spec/due.schema.json`) |
 
 As opções `--json OUT`, `--spike`, `--git`, `--rev` e `--list` são do instrumento de medição que deu origem ao
 contrato (o "spike"). Elas gravam e reproduzem um formato legado, congelado, e não fazem parte da interface estável.
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.18.0",
+  "release": "kg-ssot-v4.19.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 356/356 (reprova)
+latest: 390/390 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -506,10 +506,11 @@ produto não depende dele, e ele não depende de nenhum cliente específico.
 | `kg_list` | Lista os grafos do armazém |
 | `kg_history` | As operações de um grafo, da mais nova para a mais antiga |
 | `kg_query` | A consulta e a projeção do `kg_query.py` sobre o armazém: filtros, a fila dos abertos, a vizinhança e `fields`, paginada por cursor |
+| `kg_terms` | Desde a 4.19.0: resolve um termo de domínio pelo nome preferido ou por um sinônimo (o perfil `x_term`), com a fonte, a versão e a data de conferência de cada sinônimo e o termo que substitui um termo substituído; sem `text`, lista os termos |
 | `kg_schema_help` | O contrato vigente, para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
 Desde a 4.17.2, cada ferramenta anuncia no `tools/list` as anotações do MCP: as de leitura (`kg_validate`, `kg_get`,
-`kg_list`, `kg_query`, `kg_history`, `kg_schema_help`) com `readOnlyHint` e `idempotentHint`, e o `kg_write` e o
+`kg_list`, `kg_query`, `kg_terms`, `kg_history`, `kg_schema_help`) com `readOnlyHint` e `idempotentHint`, e o `kg_write` e o
 `kg_delete` com `destructiveHint`; todas com `openWorldHint: false`, porque o armazém é local. São dicas para o cliente
 pedir ou dispensar a confirmação; o gate do armazém segue decidindo o que é gravado.
 
@@ -607,7 +608,7 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     nova (o modelo de confiança acima), e o servidor guarda as áreas abertas em memória enquanto roda.
   - **A raiz das áreas:** é conferida ao subir. Valor vazio, raiz inexistente sem `--init`, arquivo ou link dá rc 2,
     a menos que você passe `--store-optional`, como na raiz fora do perfil.
-  - **O envelope `untrusted_data`:** `kg_get`, `kg_list` e `kg_history` devolvem `{"untrusted_data": ...,
+  - **O envelope `untrusted_data`:** `kg_get`, `kg_list`, `kg_history`, `kg_query` e `kg_terms` devolvem `{"untrusted_data": ...,
     "notice": ...}`, para o modelo tratar o texto gravado por outros como dado, nunca como instrução.
   - **O que o perfil não é:** é "atrás de proxy", numa rede privada. Não é o perfil OAuth da especificação MCP, que
     espera até haver uma matriz medida de clientes.
@@ -784,6 +785,41 @@ no meta, `meta.date`): o `verified_at` que um gerador recarimba a cada execuçã
 nós por campo mudado para mostrar isso. `--format json` dá o `kg-ssot.diff/1` (`spec/diff.schema.json`). rc 0 sem
 diferença, 1 com diferença, 2 na entrada quebrada.
 
+## `kg_vocab.py`: o vocabulário de domínio
+
+Lê os termos do perfil `x_term` (capítulo 3) de um corpus, com `--root` ou com os arquivos, e faz três coisas: lista,
+resolve um texto para o termo e exporta.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py terms --root . --as-of 2027-05-01      # termos, sinônimos, o que vence
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "codigo de barras" --root .     # o termo por trás de um texto
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "cod barras" --case "edital 12" --root .
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to skos --root . > vocab.ttl
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > vocab.ossie.json
+```
+
+- **O `lookup` compara sem maiúscula, acento nem espaço repetido.** Casa o termo preferido ou um sinônimo. O sinônimo
+  com escopo de caso só casa com `--case` igual ao caso dele. O sinônimo aposentado ainda casa, marcado como
+  aposentado, e o termo substituído vem com os termos que o substituem. rc 1 quando nada casa.
+- **O `terms` mostra quando cada sinônimo vence** (`verified_at` mais `reverify_every`, na data do `--as-of`, hoje por
+  padrão). O sinônimo aposentado nunca vence.
+- **O `export --to skos`** grava Turtle em SKOS-XL com os nomes da ISO 25964 (iso-thes). O conceito ganha
+  `skos:prefLabel`, mais `skos:altLabel` e `skos:hiddenLabel` para os sinônimos atuais de domínio, para um leitor de
+  SKOS simples enxergá-los. Cada rótulo vira um `skosxl:Label` com a forma literal e a proveniência (`dc:source`,
+  `kg:locator`, `kg:sourceVersion`, `kg:verifiedAt`, `kg:reverifyEvery`). O sinônimo de caso é ligado por `kg:caseLabel`, com
+  `kg:scope` e `kg:case`, e não por `skosxl:altLabel`, que implicaria um `skos:altLabel` válido para o conceito
+  inteiro. Um escopo que não se lê conta como um caso que nunca casa. O aposentado sai como `isothes:status "retired"` e uma
+  `skos:historyNote`. O sinônimo que repete um literal já dito no conceito vai por `kg:repeatedLabel`, e o conceito nunca
+  tem o mesmo rótulo duas vezes. O termo substituído ganha `dct:isReplacedBy`. O IRI do conceito é `<base><meta.id>#<id>`, o mesmo
+  que o `kg_prov_export.py` dá ao nó (`--base`, `urn:kg-ssot:graph:` por padrão); sem `meta.id`, o caminho relativo
+  dado, ou o nome do arquivo, nunca um caminho absoluto.
+- **O `export --to ossie`** grava um item por termo vivo para o [Apache Ossie](https://github.com/open-semantic-interchange/OSI):
+  `name` (o termo preferido), `description`, `ai_context.synonyms` (os sinônimos atuais de domínio) e uma entrada de
+  `custom_extensions` do `KG_SSOT` com a proveniência de cada sinônimo, porque o Ossie não tem campo para ela. Você
+  junta cada item à entidade do seu modelo semântico (dataset, field ou metric) pelo nome.
+- Com `--format json`, o `terms` e o `lookup` usam o formato `kg-ssot.vocab/1` (`spec/vocab.schema.json`). A ferramenta
+  não julga: o `x_term` fora do perfil é lido no que dá para ler, e o SHOULD acusa o resto.
+
 ## `kg_prov_export.py`: a proveniência em PROV-O
 
 Exporta um `.kg.yaml` para [PROV-O](https://www.w3.org/TR/prov-o/) em JSON-LD, para quem já usa ferramentas do
@@ -883,3 +919,20 @@ O que fica fora, de propósito, porque é julgamento: reescrever label, mudar pl
 recusou algum arquivo, que fica como estava e com o motivo no relatório; rc 2 com entrada quebrada (perfil fora do
 schema, regra ou id repetido, expressão regular inválida, `when` que casaria todo nó, grafo dado na linha de comando
 que não parseia). O migrador viaja no vendor e não no pacote do PyPI nem no do npm.
+
+### `keys`: a chave estranha vira `x_<chave>` (4.19.0)
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py keys            # o plano: o que seria renomeado e o que vai para revisão
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py keys --apply    # grava as renomeações
+```
+
+Uma chave que o contrato não conhece reprova no MUST. O `keys` a renomeia para `x_<chave>`, o prefixo de extensão, no
+topo, no `meta`, nos nós, nas arestas e nas arestas externas, pelo texto, então os comentários ficam. As chaves
+conhecidas vêm do schema MUST da release, nunca de uma lista no código. A chave vai para quem revisa quando não é slug,
+quando `x_<chave>` já existe no mesmo mapa, ou quando o nome novo é um perfil canônico (`severity` viraria
+`x_severity`, cujo valor o perfil julga). Com `--apply`, cada arquivo só é gravado se a releitura for o documento de
+antes com só as chaves renomeadas, se o diff tocar só essas linhas e se o arquivo não ganhar código MUST nem aviso
+SHOULD. A quebra de linha fica como estava, o arquivo com quebras misturadas é recusado, e rodar de novo não muda nada.
+Medido numa cópia dos 15 grafos do core que reprovavam no MUST por chave estranha: com o `meta.title` conhecido desde o
+v4.11 e 76 chaves renomeadas em 12 arquivos, 14 passam; o que sobra também não tem proveniência.

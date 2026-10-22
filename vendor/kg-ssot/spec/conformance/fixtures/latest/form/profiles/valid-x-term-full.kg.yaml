@@ -1,0 +1,45 @@
+meta:
+  schema_version: "1"
+  id: valid-x-term-full
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EN_A
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A entidade sintética A."
+    x_term:
+      pref: "GTIN"
+      lang: pt-BR
+      definition: "O número global do item comercial."
+      notation: "GTIN"
+      labels:
+        - literal: "Código de Barras"
+          kind: alt
+          source: "dicionário sintético"
+          locator: "item 9"
+          version: "2026-01"
+          verified_at: "2026-10-01"
+          reverify_every: P1Y
+          scope: {level: domain, jurisdiction: BR}
+        - literal: "cod barras"
+          kind: hidden
+          source: "planilha sintética do caso"
+          scope: {level: case, case: "caso sintético 1"}
+        - literal: "EAN"
+          kind: alt
+          source: "tabela De/Para sintética"
+          retired: true
+          x_note: "extensão livre dentro do perfil"
+edges:
+  - from: EN_A
+    to: Q_A
+    edge_type: TRACES_TO

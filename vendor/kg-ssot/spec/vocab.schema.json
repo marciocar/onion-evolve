@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:vocab.schema.json",
+  "title": "Vocabulário de domínio (kg-ssot.vocab/1)",
+  "description": "Saída de kg_vocab.py terms e lookup com --format json (desde a 4.19.0, contrato v4.11): os termos do perfil x_term de um corpus. Cada termo traz o preferido, os sinônimos legíveis (o sinônimo sem literal ou com kind fora do enum fica de fora; o SHOULD já avisa), o vencimento de cada sinônimo atual na data as_of (due_on e due) e quem substitui o termo aposentado (superseded_by, as pontas <arquivo>#<id> das arestas SUPERSEDES que chegam nele). No lookup, matches diz por onde o texto casou (pref, alt ou hidden), com a comparação sem maiúscula, acento nem espaço repetido; o sinônimo com escopo de caso só casa com o case pedido. Não é veredito: o grafo que não parseia sai em unreadable.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "as_of",
+    "unreadable"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.vocab/1"
+    },
+    "as_of": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "terms": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/term"
+      }
+    },
+    "query": {
+      "type": "string"
+    },
+    "case": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "matches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "via",
+          "literal",
+          "retired",
+          "scope",
+          "term"
+        ],
+        "properties": {
+          "via": {
+            "enum": [
+              "alt",
+              "hidden",
+              "pref"
+            ]
+          },
+          "literal": {
+            "type": "string"
+          },
+          "retired": {
+            "type": "boolean"
+          },
+          "scope": {
+            "$ref": "#/$defs/scope"
+          },
+          "term": {
+            "$ref": "#/$defs/term"
+          }
+        }
+      }
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "code"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Na ferramenta kg_terms do servidor MCP: quantos termos (ou casamentos) há antes do corte do limit."
+    }
+  },
+  "oneOf": [
+    {
+      "required": [
+        "terms"
+      ]
+    },
+    {
+      "required": [
+        "query",
+        "case",
+        "matches"
+      ]
+    }
+  ],
+  "$defs": {
+    "scope": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "required": [
+        "level"
+      ],
+      "properties": {
+        "level": {
+          "enum": [
+            "case",
+            "domain"
+          ]
+        },
+        "case": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "type": "string"
+        }
+      }
+    },
+    "label": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "literal",
+        "kind",
+        "status",
+        "due_on",
+        "due"
+      ],
+      "properties": {
+        "literal": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "alt",
+            "hidden"
+          ]
+        },
+        "status": {
+          "enum": [
+            "current",
+            "retired"
+          ]
+        },
+        "lang": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "locator": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "verified_at": {
+          "type": "string"
+        },
+        "reverify_every": {
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "due_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "due": {
+          "type": "boolean"
+        }
+      }
+    },
+    "term": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "id",
+        "status",
+        "pref",
+        "labels",
+        "superseded_by"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pref": {
+          "type": "string"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "definition": {
+          "type": "string"
+        },
+        "notation": {
+          "type": "string"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/label"
+          }
+        },
+        "superseded_by": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

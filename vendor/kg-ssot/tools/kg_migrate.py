@@ -520,6 +520,194 @@ def apply(prof, graphs, root, files):
     return report
 
 
+# --- keys (4.19.0): a chave fora do contrato vira x_<chave> --------------------------------------------------------
+
+# As chaves x_ com perfil canônico no SHOULD (v4.11): renomear para uma delas faz o valor ser julgado pelo perfil, e
+# isso é decisão de quem revisa, não do migrador.
+PROFILE_KEYS = {"node": {"x_term", "x_mirror", "x_doc_cycle", "x_questionnaire", "x_severity"},
+                "edge": {"x_confidence", "x_provisional"}}
+
+
+def known_keys(must):
+    """As chaves que o contrato conhece em cada escopo, lidas do schema MUST (o enum do propertyNames), nunca de uma
+    lista no código: a versão do contrato que muda a lista muda o migrador junto."""
+    def enum(pn):
+        return set(pn["else"]["allOf"][1]["enum"])
+    d = must["$defs"]
+    return {"top": enum(must["propertyNames"]), "meta": enum(d["meta"]["propertyNames"]),
+            "node": enum(d["node"]["propertyNames"]), "edge": enum(d["edge"]["propertyNames"]),
+            "external_edge": enum(d["externalEdge"]["propertyNames"])}
+
+
+def key_targets(text, known):
+    """As chaves fora do contrato e sem x_ no topo, no meta, nos nós, nas arestas e nas external_edges:
+    [(escopo, lugar, índice, chave, nó-chave do YAML, chaves irmãs)]. O índice é a posição na lista (None no topo e
+    no meta); o lugar é o que a pessoa lê (o id do nó, ou #n)."""
+    import yaml
+    root = yaml.compose(text, Loader=kg_validate.Yaml12CoreLoader)
+    out = []
+    if not isinstance(root, yaml.MappingNode):
+        return out
+
+    def scan(scope, place, index, m):
+        if not isinstance(m, yaml.MappingNode):
+            return
+        names = {k.value for k, _v in m.value if isinstance(k, yaml.ScalarNode)}
+        for k, _v in m.value:
+            if isinstance(k, yaml.ScalarNode) and not k.value.startswith("x_") and k.value not in known[scope]:
+                out.append((scope, place, index, k.value, k, names))
+
+    scan("top", "topo", None, root)
+    for k, v in root.value:
+        name = getattr(k, "value", None)
+        if name == "meta":
+            scan("meta", "meta", None, v)
+        elif name in ("nodes", "edges", "external_edges") and isinstance(v, yaml.SequenceNode):
+            scope = {"nodes": "node", "edges": "edge", "external_edges": "external_edge"}[name]
+            for i, item in enumerate(v.value):
+                nid = None
+                if scope == "node" and isinstance(item, yaml.MappingNode):
+                    nid = next((iv.value for ik, iv in item.value if getattr(ik, "value", None) == "id"
+                                and isinstance(iv, yaml.ScalarNode)), None)
+                scan(scope, f"nó {nid}" if nid else f"{name} #{i + 1}", i, item)  # #n a partir de 1, como o kg_validate
+    return out
+
+
+def key_plan(text, known):
+    """O plano de um arquivo: [(escopo, lugar, índice, chave, nova, ação, motivo, (linha, coluna))], ação rename ou
+    review. A coluna é onde o x_ entra no texto."""
+    lines = text.splitlines()
+    rows = []
+    for scope, place, index, key, knode, siblings in key_targets(text, known):
+        new = "x_" + key
+        start, end = knode.start_mark, knode.end_mark
+        why, at = None, None
+        if not kg_validate.SLUG.fullmatch(key):
+            why = _("the key is not a slug: rename it by hand")
+        elif new in siblings:
+            why = _("{new} already exists in the same mapping").format(new=new)
+        elif new in PROFILE_KEYS.get(scope, ()):
+            why = _("{new} is a canonical profile (v4.11): its value would be judged by the profile").format(new=new)
+        elif start.line != end.line or start.line >= len(lines):
+            why = _("the key spans more than one line")
+        else:
+            line, col = lines[start.line], start.column
+            if knode.style is None and line[col:col + len(key)] == key:
+                at = (start.line, col)
+            elif knode.style in ("'", '"') and line[col:col + 1] == knode.style and line[col + 1:col + 1 + len(key)] == key:
+                at = (start.line, col + 1)
+            else:
+                why = _("the key is written in a form the migrator does not edit")
+        rows.append((scope, place, index, key, new, "review" if why else "rename", why, at))
+    return rows
+
+
+def _renamed(doc, renames):
+    """O documento com as renomeações aplicadas no dado: renames = [(escopo, índice, chave, nova)]."""
+    import copy
+    out = copy.deepcopy(doc)
+
+    def ren(m, key, new):
+        if isinstance(m, dict) and key in m:
+            m[new] = m.pop(key)
+    for scope, index, key, new in renames:
+        if scope == "top":
+            ren(out, key, new)
+        elif scope == "meta":
+            ren(out.get("meta"), key, new)
+        else:
+            lst = out.get({"node": "nodes", "edge": "edges", "external_edge": "external_edges"}[scope])
+            if isinstance(lst, list) and index < len(lst):
+                ren(lst[index], key, new)
+    return out
+
+
+def keys_apply_text(text, rows):
+    """O texto com o x_ inserido em cada chave renomeável, e o motivo se a releitura não for a de antes com só as
+    renomeações (o dado e o diff, linha a linha)."""
+    lines = text.splitlines(keepends=True)
+    todo = [r for r in rows if r[5] == "rename"]
+    for r in sorted(todo, key=lambda r: r[7], reverse=True):  # da direita para a esquerda numa mesma linha
+        ln, col = r[7]
+        lines[ln] = lines[ln][:col] + "x_" + lines[ln][col:]
+    new = "".join(lines)
+    _t, old_doc, c1 = kg_validate.parse_v1(text)
+    _t, new_doc, c2 = kg_validate.parse_v1(new)
+    if c2 is not None:
+        return new, _("the edited text does not parse ({code})").format(code=c2)
+    if new_doc != _renamed(old_doc, [(r[0], r[2], r[3], r[4]) for r in todo]):
+        return new, _("the reread document differs from the old one beyond the renamed keys")
+    edited = {r[7][0] for r in todo}
+    old_lines, new_lines = text.splitlines(), new.splitlines()
+    if len(old_lines) != len(new_lines) or any(a != b for i, (a, b) in enumerate(zip(old_lines, new_lines))
+                                               if i not in edited):
+        return new, _("the text diff touched a line without a renamed key")
+    return new, None
+
+
+def keys_command(args):
+    """kg_migrate.py keys: o plano (ou, com --apply, a gravação) da chave fora do contrato renomeada para x_."""
+    must_schema = json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8"))
+    must = kg_validate.make_validator(must_schema)
+    should = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_SHOULD.read_text(encoding="utf-8")))
+    known = known_keys(must_schema)
+    files = args.graphs or tracked_graphs(args.root, args.exclude, not args.no_default_excludes)
+    graphs, files, broken = load_graphs(files, args.root, lenient=not args.graphs)
+    report, all_rows = [], []
+    for g, f in zip(graphs, files):
+        path = pathlib.Path(f).resolve()
+        text = path.read_bytes().decode("utf-8")
+        crlf = "\r\n" in text
+        if (crlf and text.count("\n") != text.count("\r\n")) or "\r" in text.replace("\r\n", ""):
+            report.append((g.rel, False, [_("mixed line endings (\\r\\n with \\n or a lone \\r): normalize first")]))
+            continue
+        old = text.replace("\r\n", "\n") if crlf else text
+        rows = key_plan(old, known)
+        all_rows.extend((g.rel,) + r for r in rows)
+        if not args.apply or not any(r[5] == "rename" for r in rows):
+            continue
+        new, problem = keys_apply_text(old, rows)
+        if problem is None:
+            before, after = set(kg_validate.codes(old, must)), set(kg_validate.codes(new, must))
+            if after - before:
+                problem = _("the file would gain a new MUST code: {codes}").format(codes=", ".join(sorted(after - before)))
+        if problem is None:
+            grown = kg_validate.warning_counts(new, must, should) - kg_validate.warning_counts(old, must, should)
+            if grown:
+                problem = _("the file would gain a SHOULD warning: {codes}").format(codes=", ".join(sorted(grown)))
+        if problem:
+            report.append((g.rel, False, [problem]))
+            continue
+        tmp = path.with_name(path.name + ".kg-migrate.tmp")
+        tmp.write_bytes((new.replace("\n", "\r\n") if crlf else new).encode("utf-8"))
+        try:
+            os.chmod(tmp, path.stat().st_mode & 0o7777)
+        except OSError:
+            pass
+        tmp.replace(path)
+        report.append((g.rel, True, []))
+    if args.json:
+        print(json.dumps({"rows": [dict(zip(("file", "scope", "place", "key", "new_key", "action", "review"),
+                                            (r[0], r[1], r[2], r[4], r[5], r[6], r[7]))) for r in all_rows],
+                          "unreadable": [{"file": rel, "code": code} for rel, code in broken],
+                          "applied": [{"file": rel, "written": ok, "reasons": why} for rel, ok, why in report]
+                          if args.apply else None}, ensure_ascii=False))
+    else:
+        for r in all_rows:
+            mark = _("RENAME") if r[6] == "rename" else _("REVIEW")
+            print(f"{mark:8}  {r[0]}  {r[2]}  {r[4]} → {r[5]}" + (f"  ({r[7]})" if r[7] else ""))
+        for rel, code in broken:
+            print(_("REVIEW").ljust(8) + "  " + rel + "  " + _("graph that does not parse ({code}): left out").format(code=code))
+        for rel, ok, why in report:
+            print(f"{(_('WRITTEN') if ok else _('REFUSED')):8}  {rel}" + "".join(f"\n    {w}" for w in why))
+        renames = sum(1 for r in all_rows if r[6] == "rename")
+        print(_("· {renames} key(s) to rename, {review} for the reviewer, in {files} file(s){written}").format(
+            renames=renames, review=len(all_rows) - renames, files=len({r[0] for r in all_rows}),
+            written=(_("; {n} file(s) written").format(n=sum(1 for _r, ok, _w in report if ok)) if args.apply
+                     else _("; nothing was written (without --apply)"))))
+    return 1 if any(not ok for _r, ok, _w in report) else 0
+
+
 def load_graphs(files, root, lenient=False):
     """Os grafos lidos. Com lenient (a lista veio do git), o grafo que não parseia volta à parte, para quem revisa."""
     out, broken = [], []
@@ -568,7 +756,7 @@ def tracked_graphs(root, exclude=(), defaults=True):
 def broken_input(args, exc):
     """Entrada quebrada (rc 2). No plan --json, o objeto no stdout, que o erro de uso do argparse (rc 2, só no stderr)
     nunca escreve: quem lê a máquina distingue os dois sem casar frase."""
-    if args.cmd == "plan" and args.json:
+    if args.cmd in ("plan", "keys") and args.json:
         print(json.dumps({"error": str(exc), "reason": "broken_input"}, ensure_ascii=False))
     else:
         print(_("BROKEN INPUT  {error}").format(error=exc))
@@ -581,6 +769,13 @@ def main(argv=None):
         "\n"
         "  kg_migrate.py plan  --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out SHEET.tsv] [graph.kg.yaml ...]\n"
         "  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "\n"
+        "keys (4.19.0) renames each key the contract does not know in the top level, meta, nodes, edges and external_edges\n"
+        "to x_<key>, the extension prefix, by text (comments stay). The known keys come from the MUST schema itself. A key\n"
+        "that is not a slug, that would collide with an existing x_<key>, or that would become a canonical profile (x_severity,\n"
+        "x_term...) goes to the reviewer. With --apply, each file is written only if the reread document equals the old one\n"
+        "with only the renamed keys, the diff touches only those lines, and the file gains no MUST code or SHOULD warning.\n"
         "\n"
         "The profile (spec/kg-migrate-profile.schema.json) declares rules in order: the first one whose when matches decides the\n"
         "node's action (propose provenance, demote to unverifiable, or only list it for the reviewer), and the scopes block sets\n"
@@ -622,7 +817,21 @@ def main(argv=None):
     a.add_argument("--no-default-excludes", action="store_true",
                    help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
     a.add_argument("graphs", nargs="*")
+    k = sub.add_parser("keys", help=_("renames the keys outside the contract to x_<key> (4.19.0)"))
+    k.add_argument("--apply", action="store_true", help=_("writes the renames; without it, only the plan"))
+    k.add_argument("--root", default=".")
+    k.add_argument("--json", action="store_true")
+    k.add_argument("--exclude", action="append", default=[],
+                   help=_("extra glob to leave out of the git list (fnmatch: * crosses /, as in kg_gate.py)"))
+    k.add_argument("--no-default-excludes", action="store_true",
+                   help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
+    k.add_argument("graphs", nargs="*")
     args = ap.parse_args(argv)
+    if args.cmd == "keys":
+        try:
+            return keys_command(args)
+        except Broken as exc:
+            return broken_input(args, exc)
     try:
         prof = load_profile(args.profile)
         files = args.graphs or tracked_graphs(args.root, args.exclude, not args.no_default_excludes)

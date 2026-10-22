@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Roda o MCPB desempacotado como um host o roda (o comando do mcp_config, com uv run) e confere o servidor:
-initialize, as 8 ferramentas, kg_write de um grafo válido e recusa de um inválido, kg_history com a gravação, o modo
+initialize, as ferramentas do manifesto (as mesmas que o servidor lista), kg_write de um grafo válido e recusa de um inválido, kg_history com a gravação, o modo
 só leitura sem kg_write nem kg_delete, uma raiz dentro de um repo git (o armazém passa ao git) e uma raiz que não abre
 (o servidor sobe só com o julgamento e diz o motivo ao modelo).
 
@@ -51,7 +51,9 @@ def main(bundle, wheels, work):
                       ("kg_write", {"name": "b.kg.yaml", "text": INVALID}),
                       ("kg_history", {"name": "a.kg.yaml"})])
     tools = [t["name"] for t in out.get(1, {}).get("result", {}).get("tools", [])]
-    checks = [("8 ferramentas", len(tools) == 8),
+    # as ferramentas do servidor são as que o manifesto anuncia ao host: nem uma a mais, nem uma a menos
+    declared = sorted(t["name"] for t in json.loads((pathlib.Path(bundle) / "manifest.json").read_text(encoding="utf-8"))["tools"])
+    checks = [(f"as {len(declared)} ferramentas do manifesto", sorted(tools) == declared),
               ("grava o válido", text(out[2]).get("written") is True),
               ("recusa o inválido", text(out[3]).get("reason") == "gate"),
               ("kg_history com a gravação", len(text(out[4]).get("history", [])) == 1)]

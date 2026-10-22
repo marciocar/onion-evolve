@@ -4,7 +4,7 @@
   "display_name": "KG-SSOT — verifiable knowledge graphs",
   "version": "@VERSION@",
   "description": "Validates and stores .kg.yaml and .kg.json knowledge graphs under the KG-SSOT contract: every claim says where it came from and when it was last verified.",
-  "long_description": "The reference KG-SSOT MCP server gives a model the formal contract of the verifiable knowledge graph and a store that only writes what passes it.\n\n- **kg_validate** checks a .kg.yaml or .kg.json text and returns the structured verdict, with code, path, line, message and fix hint.\n- **kg_write** writes to the store only what passes the contract; **kg_get**, **kg_list**, **kg_query**, **kg_history** and **kg_delete** complete the store; **kg_query** queries the graphs with every edge resolved to its label.\n- **kg_schema_help** returns the current contract, a minimal example and the most common fixes.\n\nThe store lives in the folder you choose, on your computer. The server runs locally over stdio and talks to no external service. Read-only tools are annotated as such. Manual: https://github.com/marciocar/kg-ssot/tree/main/docs/manual · Em português: https://github.com/marciocar/kg-ssot/blob/main/README.pt-BR.md",
+  "long_description": "The reference KG-SSOT MCP server gives a model the formal contract of the verifiable knowledge graph and a store that only writes what passes it.\n\n- **kg_validate** checks a .kg.yaml or .kg.json text and returns the structured verdict, with code, path, line, message and fix hint.\n- **kg_write** writes to the store only what passes the contract; **kg_get**, **kg_list**, **kg_query**, **kg_terms**, **kg_history** and **kg_delete** complete the store; **kg_query** queries the graphs with every edge resolved to its label. **kg_terms** resolves a domain term by a synonym, with the source and the verification date of each synonym.\n- **kg_schema_help** returns the current contract, a minimal example and the most common fixes.\n\nThe store lives in the folder you choose, on your computer. The server runs locally over stdio and talks to no external service. Read-only tools are annotated as such. Manual: https://github.com/marciocar/kg-ssot/tree/main/docs/manual · Em português: https://github.com/marciocar/kg-ssot/blob/main/README.pt-BR.md",
   "author": {
     "name": "Marcio Carvalho"
   },
@@ -57,6 +57,10 @@
     {
       "name": "kg_query",
       "description": "Queries the graphs in the store: filters, the open queue and neighborhoods, with every edge resolved to its label."
+    },
+    {
+      "name": "kg_terms",
+      "description": "Resolves a domain term by its preferred name or a synonym, with the source and the date each synonym was verified."
     },
     {
       "name": "kg_history",

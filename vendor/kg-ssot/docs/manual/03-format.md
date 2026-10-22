@@ -67,6 +67,8 @@ In the top level, in `meta`, in a node, in an edge, and in an external edge, any
 | `review_after` | *date* | when the graph should be reviewed |
 | `layer` | `audit` · `domain` | |
 | `note` · `purpose` | string | the graph's narrative |
+| `title` | string | since v4.11: the human title of the graph. Not empty |
+| `slug` | string | since v4.11: the short name. Not empty; SHOULD: lowercase words joined by hyphens (`my-graph`) |
 | `x_*` | any | |
 
 ## Node
@@ -135,6 +137,96 @@ In the top level, in `meta`, in a node, in an edge, and in an external edge, any
 An external reference is `<path>.kg.yaml#<id>`, or `<path>.kg.json#<id>` since v4.7, with the path relative to the
 repository root and written with `/`. Each segment starts with a letter, a digit, or `_`. An absolute path, `..`,
 `\`, and `:` fail.
+
+## Canonical `x_` profiles (v4.11)
+
+An `x_` key stays free in the MUST: it never fails. Some `x_` keys repeat across adopters with the same meaning, and
+since v4.11 the SHOULD gives each one a shape. The profile is judged only when the key is present, and only warns. A
+value outside the profile warns with the path inside it (`form.enum.node.x_term.labels.kind`), and an item of a list
+inside the node carries the path too (`form.type.node.x_term.labels.item`). Inside a profile object, another `x_` key
+is free, and any other key warns. Enum values are codes, in English, whatever the output language.
+
+| Key | Where | What it is |
+|---|---|---|
+| `x_term` | node | a term of a domain vocabulary, with its synonyms and the source of each one |
+| `x_mirror` | node | a copy of a record kept in another system (a ticket, a task, a card) |
+| `x_doc_cycle` | node | the life cycle of an external document the node depends on (a rule, a policy, a contract) |
+| `x_questionnaire` | node | the link between the node and the questions of an external questionnaire |
+| `x_severity` | node | `critical` · `high` · `medium` · `low` · `info` |
+| `x_confidence` | edge | how sure the link is, from 0 to 1 |
+| `x_provisional` | edge | `true` when the link still waits for a check |
+
+### `x_term`
+
+The term is a node (an `entity`) with `x_term`. The names follow SKOS: `pref` is the preferred label, and each synonym
+is `alt` (an alternative label) or `hidden` (a form you search for but do not show, like a typo or an old column
+name). What KG-SSOT adds is the verification per synonym: the source, the version of the document, the date it was
+verified, and when to verify it again.
+
+| Key | Type | Rule |
+|---|---|---|
+| `pref` | string | req. The preferred term |
+| `lang` | string | a BCP 47 tag (`pt-BR`, `en`) |
+| `definition` | string | |
+| `notation` | string | a code that identifies the term (`GTIN`, a catalog number) |
+| `labels` | list | the synonyms, each an object with the keys below |
+
+| Key of a synonym | Type | Rule |
+|---|---|---|
+| `literal` | string | req. The synonym as written |
+| `kind` | enum | req. `alt` · `hidden` |
+| `source` | string | req. Where the synonym comes from: a URL, a document, a path |
+| `locator` | string | where in the source |
+| `version` | string | the version of the document (or its hash, when the document has no version) |
+| `verified_at` | *date* | when the synonym was verified against the source |
+| `reverify_every` | duration | the cadence; it needs `verified_at`, and `--due` lists the synonym when it is due |
+| `scope` | map | `level`: `domain` (valid in the whole domain) or `case` (valid in one case only, named in `case`); `jurisdiction`, optional (`BR`, `BR-SP`) |
+| `retired` | boolean | `true` for the old name: a retired synonym still resolves, marked as retired. `kg_vocab.py` reads a value that is not a boolean as retired, and so does a `status` other than `current` |
+| `lang` | string | when it differs from the term's |
+
+A retired term is the node with `status: superseded` and a `SUPERSEDES` edge from the term that replaces it.
+`kg_vocab.py` lists the terms, resolves a text to its term, and exports to SKOS-XL and Apache Ossie (chapter 5).
+
+```yaml
+  - id: T_EAN
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "EAN code: the 13-digit code that identifies the country, the maker and the product."
+    x_term:
+      pref: "Código EAN"
+      lang: pt-BR
+      labels:
+        - literal: "GTIN"
+          kind: alt
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "items 9, 10 and 11"
+          version: "sha256:44e8af589f6a0860"
+          verified_at: "2026-10-22"
+          reverify_every: P6M
+          scope: {level: domain, jurisdiction: BR}
+        - literal: "CO_EAN"
+          kind: hidden
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "De/Para table: CO_EAN (previous) to EAN 1 (current)"
+          retired: true
+```
+
+The whole example, from the open data dictionary of the Brazilian drug price regulator, is in
+[`spec/vocab-examples/cmed-dictionary.kg.yaml`](../../spec/vocab-examples/cmed-dictionary.kg.yaml).
+
+### `x_mirror`, `x_doc_cycle` and `x_questionnaire`
+
+| Profile | Required | Optional |
+|---|---|---|
+| `x_mirror` | `system`, `ref`, `state` (the status as copied), `synced_at` (*date*) | `url`, `resync_every` (duration) |
+| `x_doc_cycle` | `issuer`, `state`: `draft` `enacted` (published, in force from a future `effective_from`) `in_force` `suspended` `revoked` `expired` `superseded` | `ref`, `version`, `effective_from`, `effective_to`, `updated_at`, `checked_at` (*dates*), `recheck_every` (duration, needs `checked_at`) |
+| `x_questionnaire` | `name`, `questions` (a list that is not empty) | `answer_draft`, `verdict`: `meets` `partial` `does_not_meet` `not_applicable` `unknown`, `answered_at` (*date*) |
+
+A mirror goes stale without warning: `synced_at` plus `resync_every` puts it in the due report, and so does
+`checked_at` plus `recheck_every` for a document.
 
 ## Integrity (outside the schema)
 

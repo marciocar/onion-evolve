@@ -1,0 +1,150 @@
+meta:
+  schema_version: "1"
+  id: cmed-dictionary
+  title: "Vocabulário do dicionário de dados de preços de medicamentos da CMED/ANVISA"
+  slug: cmed-dictionary
+  date: "2026-10-22"
+  purpose: "Exemplo real do perfil x_term (contrato v4.11): termos, sinônimos com fonte e sinônimos aposentados, tirados do dicionário de dados aberto da CMED/ANVISA. Os rótulos ficam na língua da fonte."
+  note: "O PDF da fonte não traz versão nem data; a versão de cada sinônimo é o sha256 do arquivo baixado em 2026-10-22."
+nodes:
+  - id: E_CMED_DICTIONARY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "O dicionário de dados TA_PRECO_MEDICAMENTO da ANVISA define os campos do conjunto aberto de preços de medicamentos e traz a tabela De/Para dos nomes anteriores."
+    verified_at: "2026-10-22"
+    verified_against: "download do PDF (5 páginas, sha256 44e8af589f6a0860...), pdftotext -layout e leitura dos itens 6, 9 a 12 e da tabela De/Para"
+    reverify_every: P6M
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "itens 6, 9, 10, 11 e 12; tabela De/Para (TA_PRECOS_MEDICAMENTOS anterior, TA_PRECO_MEDICAMENTO e TA_PRECO_MEDICAMENTO_GOV atuais)"
+      method: "leitura: o PDF baixado e convertido em texto, verbete a verbete"
+      locality: web
+  - id: T_EAN
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "Código EAN: o código de 13 dígitos que identifica o país de origem, o fabricante e o produto, com um dígito verificador."
+    x_term:
+      pref: "Código EAN"
+      lang: pt-BR
+      definition: "Composto por 13 dígitos; nele se identifica o país de origem do produto, a empresa fabricante, o produto por ela produzido e um dígito verificador."
+      labels:
+        - literal: "Código de Barras"
+          kind: alt
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "itens 9, 10 e 11: «O Código EAN é também conhecido como Código de Barras ou GTIN»"
+          version: "sha256:44e8af589f6a0860"
+          verified_at: "2026-10-22"
+          reverify_every: P6M
+          scope: {level: domain, jurisdiction: BR}
+        - literal: "GTIN"
+          kind: alt
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "itens 9, 10 e 11: «O Código EAN é também conhecido como Código de Barras ou GTIN»"
+          version: "sha256:44e8af589f6a0860"
+          verified_at: "2026-10-22"
+          reverify_every: P6M
+          scope: {level: domain, jurisdiction: BR}
+        - literal: "CO_EAN"
+          kind: hidden
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "tabela De/Para: CO_EAN (anterior) para EAN 1 (atual)"
+          version: "sha256:44e8af589f6a0860"
+          verified_at: "2026-10-22"
+          retired: true
+  - id: T_GGREM
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "Código GGREM: o identificador de cada apresentação, gerado só pela CMED e único por apresentação."
+    x_term:
+      pref: "Código GGREM"
+      lang: pt-BR
+      definition: "Campo específico de identificação de determinada apresentação, cujo fornecimento e geração são exclusivos da CMED e são únicos para cada apresentação."
+      labels:
+        - literal: "CO_GGREM"
+          kind: hidden
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "tabela De/Para: CO_GGREM (anterior) para CÓDIGO GGREM (atual)"
+          version: "sha256:44e8af589f6a0860"
+          verified_at: "2026-10-22"
+          retired: true
+  - id: T_LABORATORIO
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "Laboratório: o nome da empresa detentora do registro sanitário."
+    x_term:
+      pref: "Laboratório"
+      lang: pt-BR
+      definition: "O nome da empresa detentora do registro sanitário."
+      labels:
+        - literal: "NO_RAZAO_SOCIAL"
+          kind: hidden
+          source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+          locator: "tabela De/Para: NO_RAZAO_SOCIAL (anterior) para LABORATÓRIO (atual)"
+          version: "sha256:44e8af589f6a0860"
+          verified_at: "2026-10-22"
+          retired: true
+  - id: T_TA_PRECOS_MEDICAMENTOS
+    node_type: entity
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.9
+    label: "TA_PRECOS_MEDICAMENTOS: o conjunto anterior de preços de medicamentos, separado em dois conjuntos atuais."
+    x_term:
+      pref: "TA_PRECOS_MEDICAMENTOS"
+      definition: "O conjunto de dados de preços de medicamentos antes da separação entre os preços ao consumidor e os preços ao governo."
+  - id: T_TA_PRECO_MEDICAMENTO
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "TA_PRECO_MEDICAMENTO: o conjunto atual de preços de medicamentos ao consumidor em geral."
+    x_term:
+      pref: "TA_PRECO_MEDICAMENTO"
+      definition: "O conjunto atual com os preços ao consumidor em geral."
+  - id: T_TA_PRECO_MEDICAMENTO_GOV
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "TA_PRECO_MEDICAMENTO_GOV: o conjunto atual de preços de medicamentos ao governo."
+    x_term:
+      pref: "TA_PRECO_MEDICAMENTO_GOV"
+      definition: "O conjunto atual com os preços ao governo."
+edges:
+  - from: E_CMED_DICTIONARY
+    to: T_EAN
+    edge_type: SUPPORTS
+  - from: E_CMED_DICTIONARY
+    to: T_GGREM
+    edge_type: SUPPORTS
+  - from: E_CMED_DICTIONARY
+    to: T_LABORATORIO
+    edge_type: SUPPORTS
+  - from: T_TA_PRECO_MEDICAMENTO
+    to: T_TA_PRECOS_MEDICAMENTOS
+    edge_type: SUPERSEDES
+    label: "a primeira alteração foi a separação entre preços do consumidor em geral e preços do Governo Federal"
+  - from: T_TA_PRECO_MEDICAMENTO_GOV
+    to: T_TA_PRECOS_MEDICAMENTOS
+    edge_type: SUPERSEDES
+  - from: E_CMED_DICTIONARY
+    to: T_TA_PRECO_MEDICAMENTO
+    edge_type: SUPPORTS
+  - from: E_CMED_DICTIONARY
+    to: T_TA_PRECO_MEDICAMENTO_GOV
+    edge_type: SUPPORTS

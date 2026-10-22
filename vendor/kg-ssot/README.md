@@ -8,11 +8,13 @@ what depends on it, and your CI rejects the ones that don't.**
 **English** | [Português (Brasil)](README.pt-BR.md)
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Contract: v4 · release 4.18.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.18.0-6f42c1)](spec/release.json)
-[![Conformance: 356/356](https://img.shields.io/badge/conformance-356%2F356-2ea44f)](spec/conformance/README.md)
+[![Contract: v4 · release 4.19.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.19.0-6f42c1)](spec/release.json)
+[![Conformance: 390/390](https://img.shields.io/badge/conformance-390%2F390-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
 [![npm](https://img.shields.io/npm/v/kg-ssot)](https://www.npmjs.com/package/kg-ssot)
+[![GHCR](https://img.shields.io/badge/ghcr.io-kg--ssot-2496ed)](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-kg--ssot-0a0a0a)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot)
 
 [Manual](docs/manual/README.md) · [Adopt it](ADOPTING.md) · [The contract](docs/manual/04-contract.md) · [Conformance suite](spec/conformance/README.md) · [Changelog](CHANGELOG.md) · [For AI agents](llms.txt)
 
@@ -73,12 +75,12 @@ The tools print in English by default and in Brazilian Portuguese when your loca
 
 | Channel | Command | What you get |
 |---|---|---|
-| PyPI | `pip install kg-ssot` | The commands `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-mcp` and `kg-prov-export`, with the contract and the suite inside |
-| npm | `npm install kg-ssot` | The JavaScript reader with a precompiled validator, which also runs in React Native and Expo |
-| Claude Desktop | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
-| MCP Registry | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
-| Container | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
-| Your repository | `kg_vendor.py update --tag kg-ssot-v4.18.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
+| [PyPI](https://pypi.org/project/kg-ssot/) | `pip install kg-ssot` | The commands `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-vocab`, `kg-mcp` and `kg-prov-export`, with the contract and the suite inside |
+| [npm](https://www.npmjs.com/package/kg-ssot) | `npm install kg-ssot` | The JavaScript reader with a precompiled validator, which also runs in React Native and Expo |
+| [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
+| [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
+| [Container](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
+| Your repository | `kg_vendor.py update --tag kg-ssot-v4.19.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
 
 ## A node, inside
 
@@ -123,7 +125,7 @@ model can write a passing graph on the first try. [llms.txt](llms.txt) indexes t
 flowchart LR
   subgraph product["Product (one tag kg-ssot-vX.Y.Z)"]
     C["Contract<br/>JSON Schema MUST + SHOULD<br/>+ integrity rules"]
-    S["Conformance suite<br/>356 cases as plain data"]
+    S["Conformance suite<br/>390 cases as plain data"]
     R["Reference reader<br/>kg_validate.py"]
     S -- "every reader passes" --> R
     C --> R
@@ -161,7 +163,8 @@ flowchart LR
 | **Gated store** | `kg_store.py` writes `.kg.yaml` or `.kg.json` to disk, a git repository or a versioned store, only after the contract passes, with external edges checked in the store and optimistic locking for concurrent writers |
 | **Reference MCP server** | `kg_mcp.py` serves the contract and the store over MCP (stdio, or HTTP behind a proxy with per-identity areas), with tool annotations |
 | **Query and diff** | `kg_query.py` selects nodes across a whole corpus and projects every edge with the label on the other end, paginated (`kg-ssot.query/1`); `kg_diff.py` compares revisions by id, field by field, reading git without a checkout (`kg-ssot.diff/1`) |
-| **Data-only suite** | 356 cases with their own metaschema, in the style of the JSON-Schema-Test-Suite |
+| **Domain vocabulary** | The `x_term` profile gives each synonym its source, document version and verification date; `kg_vocab.py` resolves a text to its term, lists what is due, and exports to SKOS-XL and Apache Ossie (`kg-ssot.vocab/1`); the MCP server serves it as `kg_terms` |
+| **Data-only suite** | 390 cases with their own metaschema, in the style of the JSON-Schema-Test-Suite |
 | **Per-graph ratchet** | Adopt without a big-bang migration: inherited debt stays named and only shrinks |
 | **Vendor by tag** | No copy-paste, no shared code: one sha256 stamp per file |
 | **Profile-driven migrator** | `kg_migrate.py` proposes the `provenance` the contract asks for, from rules the adopter declares, shows the plan first and writes with node-by-node invariance |
@@ -179,7 +182,7 @@ flowchart LR
 
 ## Status
 
-- **Current:** contract v4, release `kg-ssot-v4.18.0`. The reference reader passes 356 of 356 cases in `latest/`.
+- **Current:** contract v4, release `kg-ssot-v4.19.0`. The reference reader passes 390 of 390 cases in `latest/`.
 - **In use:** three adopters run the gate in CI, one of them in production.
 - **Next:** v5 will fail a `method` outside the `<class>: <detail>` form, which only warns today.
 - **Open:** the semantic layer (freshness, contradiction, domain completeness) lives in `optional/`, and the reference

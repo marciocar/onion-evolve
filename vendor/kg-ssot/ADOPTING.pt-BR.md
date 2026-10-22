@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:68bad7e038f320db -->
+<!-- translation-of: ADOPTING.md sha256:6ce8199ab44f9812 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -66,14 +66,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -325,6 +325,26 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
 
+Da `kg-ssot-v4.18.0` para a `kg-ssot-v4.19.0`, entra o contrato v4.11. O gate acusa a identidade nova na linha
+`· identidade` e decide pelo que cada grafo ganha, como desde a 4.16.0:
+- **O `meta.title` e o `meta.slug` viram chaves conhecidas.** Um grafo que reprovava no MUST só por uma delas passa;
+  o gate mostra o ganho e pede para travá-lo com `--update`.
+- **Os perfis canônicos de `x_` são SHOULD** e só julgam a chave presente: `x_term`, `x_mirror`, `x_doc_cycle`,
+  `x_questionnaire` e `x_severity` no nó, `x_confidence` e `x_provisional` na aresta
+  ([manual, capítulo 3](docs/manual/pt-BR/03-formato.md)). Se você já usa um desses nomes com outra forma, o aviso novo
+  é um código de dívida novo, e o gate reprova. Ou converta os valores (um `x_severity` escrito em outra língua vira
+  `critical`, `high`, `medium`, `low` ou `info`), ou aceite uma vez com
+  `kg_gate.py --update --accept-regression "<motivo>"`. Medido antes da tag nos três adotantes: um usa um dos nomes
+  (`x_severity` com valores em português, já convertidos); os outros grafos ficam com o mesmo veredito e os mesmos códigos.
+- **O `kg_migrate.py keys`** renomeia para `x_<chave>` cada chave que o contrato não conhece, que era o que segurava
+  a maior parte da dívida MUST herdada de um adotante. Rode o plano primeiro, depois o `--apply`.
+- **O relatório de vencimento** (`--due`) lista também os sinônimos do `x_term`, o `x_mirror` e o `x_doc_cycle`, com
+  `subject` e `detail` no JSON; a entrada do nó não muda, nem o `schema_version`.
+- **A release traz** `tools/kg_vocab.py`, `spec/vocab.schema.json` e `spec/vocab-examples/`; o perfil `gate` não muda.
+  O servidor MCP ganha a ferramenta de leitura `kg_terms`.
+
+Um `update` basta. O gate só precisa de `--update` para travar um ganho, ou para aceitar um aviso de perfil.
+
 Da `kg-ssot-v4.17.2` para a `kg-ssot-v4.18.0`, o contrato não muda (segue o v4.10, com a mesma identidade), e nenhum
 veredito nem código muda. Muda a língua da saída humana:
 - **As ferramentas falam inglês por padrão.** Elas escolhem a língua do jeito do gettext: `KG_SSOT_LANG`, depois
@@ -340,6 +360,9 @@ veredito nem código muda. Muda a língua da saída humana:
 - **O vendor traz dois arquivos a mais:** `tools/kg_i18n.py` e o catálogo `locale/pt_BR/LC_MESSAGES/kg-ssot.po`. Os
   dois estão no perfil `gate`, que passa a ter 12 arquivos. As ferramentas do vendor não sobem sem o `kg_i18n.py`, e
   sem o catálogo só falam inglês.
+- **O vendor parcial também leva os dois.** O `kg_store.py` importa o `kg_i18n` desde a 4.18.0, então um harness que
+  copie só o `kg_store.py` (ou qualquer ferramenta avulsa) quebra com `ModuleNotFoundError`: copie junto o
+  `tools/kg_i18n.py` e o `locale/`.
 
 Um `update` basta, e o gate não precisa de `--update`.
 
@@ -486,7 +509,7 @@ leitor JS) e o migrador por perfil.
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores
   passa ao `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do
   Windows (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag
-  kg-ssot-v4.18.0 --dest vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS
+  kg-ssot-v4.19.0 --dest vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS
   o limite é bem maior, e o update de sempre funciona.
 
 Medido em 2026-10-20, nenhum dos 1.507 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD. O sha256 dos
@@ -611,7 +634,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -678,6 +701,6 @@ python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
 A ordem importa: os casos de corpus conferem a ponta externa contra os grafos rastreados quando a suíte mora num
-repo git, e com o vendor ainda fora do git esses casos falham (`latest: 350/356`). Depois compare com os códigos que o
+repo git, e com o vendor ainda fora do git esses casos falham (`latest: 384/390`). Depois compare com os códigos que o
 seu leitor emite. O formato dos casos e como rodar a suíte com um leitor em outra linguagem estão em
 [`spec/conformance/README.pt-BR.md`](spec/conformance/README.pt-BR.md).

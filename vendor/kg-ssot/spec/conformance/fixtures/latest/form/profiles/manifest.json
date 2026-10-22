@@ -1,0 +1,261 @@
+{
+  "description": "Os perfis canônicos das chaves x_ recorrentes (v4.11): x_term, x_mirror, x_doc_cycle, x_questionnaire e x_severity no nó, x_confidence e x_provisional na aresta. São SHOULD: julgados só quando a chave está presente, nunca reprovam.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-x-term-full.kg.yaml",
+      "description": "o termo com preferido, definição e três sinônimos: alt com fonte, versão, carimbo, cadência e escopo de domínio; hidden com escopo de caso; alt aposentado (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-term-pref-only.kg.yaml",
+      "description": "o termo só com o preferido (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-mirror.kg.yaml",
+      "description": "a cópia de um registro de outro sistema, com cadência (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-doc-cycle.kg.yaml",
+      "description": "o ciclo de vida de um documento externo (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-questionnaire.kg.yaml",
+      "description": "o elo com um questionário externo (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-severity.kg.yaml",
+      "description": "a severidade no enum (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-edge-confidence.kg.yaml",
+      "description": "a confiança e o provisório na aresta (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-x-term-missing-pref.kg.yaml",
+      "description": "o termo sem o preferido (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_term.pref"
+      ]
+    },
+    {
+      "file": "warn-x-term-not-object.kg.yaml",
+      "description": "o termo como texto solto (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_term"
+      ]
+    },
+    {
+      "file": "warn-x-term-lang.kg.yaml",
+      "description": "a língua fora da forma BCP 47 (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_term.lang"
+      ]
+    },
+    {
+      "file": "warn-x-term-labels-not-list.kg.yaml",
+      "description": "os sinônimos fora de lista (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_term.labels"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-not-object.kg.yaml",
+      "description": "um sinônimo como texto solto: o código leva o caminho da lista (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_term.labels.item"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-missing-source.kg.yaml",
+      "description": "o sinônimo sem fonte (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_term.labels.source"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-kind.kg.yaml",
+      "description": "o tipo do sinônimo fora de alt e hidden (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_term.labels.kind"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-empty-literal.kg.yaml",
+      "description": "o sinônimo vazio (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.x_term.labels.literal"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-cadence-without-stamp.kg.yaml",
+      "description": "o sinônimo com cadência e sem carimbo (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_term.labels.verified_at"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-bad-date.kg.yaml",
+      "description": "o carimbo do sinônimo fora do calendário (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_term.labels.verified_at"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-scope-case-without-case.kg.yaml",
+      "description": "o escopo de caso sem dizer o caso (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_term.labels.scope.case"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-retired.kg.yaml",
+      "description": "o aposentado do sinônimo fora de booleano (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_term.labels.retired"
+      ]
+    },
+    {
+      "file": "warn-x-term-label-unknown-key.kg.yaml",
+      "description": "chave sem x_ dentro do sinônimo (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.x_term.labels.fonte"
+      ]
+    },
+    {
+      "file": "warn-x-mirror-missing-synced-at.kg.yaml",
+      "description": "a cópia sem a data da sincronização (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_mirror.synced_at"
+      ]
+    },
+    {
+      "file": "warn-x-mirror-resync-zero.kg.yaml",
+      "description": "a cadência zerada da cópia (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_mirror.resync_every"
+      ]
+    },
+    {
+      "file": "warn-x-doc-cycle-state.kg.yaml",
+      "description": "o estado do documento em texto livre (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_doc_cycle.state"
+      ]
+    },
+    {
+      "file": "warn-x-doc-cycle-recheck-without-checked.kg.yaml",
+      "description": "a cadência da reconferência sem a última conferência (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_doc_cycle.checked_at"
+      ]
+    },
+    {
+      "file": "warn-x-questionnaire-empty.kg.yaml",
+      "description": "o questionário sem pergunta (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.x_questionnaire.questions"
+      ]
+    },
+    {
+      "file": "warn-x-questionnaire-verdict.kg.yaml",
+      "description": "o veredito proposto em texto livre (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_questionnaire.verdict"
+      ]
+    },
+    {
+      "file": "warn-x-severity-free-text.kg.yaml",
+      "description": "a severidade fora do enum: o valor é código, em inglês (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_severity"
+      ]
+    },
+    {
+      "file": "warn-edge-confidence-range.kg.yaml",
+      "description": "a confiança da aresta acima de 1 (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.edge.x_confidence"
+      ]
+    },
+    {
+      "file": "warn-edge-provisional-type.kg.yaml",
+      "description": "o provisório da aresta em texto (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.edge.x_provisional"
+      ]
+    },
+    {
+      "file": "valid-x-doc-cycle-enacted.kg.yaml",
+      "description": "a norma publicada com vigência futura (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    }
+  ]
+}

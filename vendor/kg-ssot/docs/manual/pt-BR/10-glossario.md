@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/10-glossary.md sha256:fefc4ae36e1999b3 -->
+<!-- translation-of: docs/manual/10-glossary.md sha256:3f8d21b4af32459e -->
 # 10. Glossário
 
 [English](../10-glossary.md) | **Português (Brasil)**
@@ -26,6 +26,7 @@
 | **MUST** | O nível do contrato que reprova |
 | **Nó** | Uma afirmação tipada do grafo |
 | **Órfão** | Um nó sem nenhuma aresta. Reprova |
+| **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11. Só julga a chave presente, e só alerta |
 | **Perfil `gate`** | A parte mínima da release: o suficiente para rodar o gate e o check |
 | **Plano** | `DEV` ou `PROD` |
 | **Proveniência** | O objeto `provenance` (`source`, `locator`, `method`): de onde veio a afirmação |
@@ -34,6 +35,8 @@
 | **Runner** | O comando que expõe um leitor à suíte: `runner <caso>` imprime um JSON com o veredito |
 | **SHOULD** | O nível do contrato que só alerta |
 | **Suíte de conformidade** | Os casos em `spec/conformance/` que todo leitor tem de passar |
+| **Sinônimo** | Um item de `x_term.labels`: outro jeito de escrever o termo, `alt` ou `hidden`, com fonte, versão do documento e data de conferência próprias |
+| **Termo** | Um nó com o perfil `x_term`: o rótulo preferido de um conceito num vocabulário de domínio, com os sinônimos |
 | **Testemunho** | A classe `testemunho`: o relato de alguém, ou a medição de terceiro que você só leu |
 | **Vendor** | A cópia da release dentro do adotante, em `vendor/kg-ssot`, conferida pelo `check` |
 | **`x_`** | O prefixo de extensão: chaves que começam com ele passam livres |

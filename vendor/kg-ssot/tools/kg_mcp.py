@@ -41,6 +41,7 @@ rc: 0 saída normal · 2 entrada quebrada (raiz inválida, opção inválida).
 """
 import argparse
 import contextlib
+import datetime
 import hashlib
 import hmac
 import http.server
@@ -56,13 +57,14 @@ import urllib.parse
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_i18n, kg_query, kg_store, kg_validate
+    from . import kg_i18n, kg_query, kg_store, kg_validate, kg_vocab
 else:  # script ou vendor
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
     import kg_i18n  # noqa: E402
     import kg_query  # noqa: E402
     import kg_store  # noqa: E402
     import kg_validate  # noqa: E402
+    import kg_vocab  # noqa: E402
 _ = kg_i18n._
 # o protocolo MCP (descrições, instruções, erros, resultados) é texto de máquina e prompt de modelo: fica em inglês,
 # qualquer que seja o locale do servidor; só a ajuda da linha de comando e o stderr seguem a língua do ambiente
@@ -165,6 +167,25 @@ TOOLS = {
                             "fields": {"type": "array", "items": {"type": "string", "maxLength": 64}, "maxItems": 20,
                                        "description": P_("node keys that go out in extra, as globs: x_*, owner")}}},
         "needs_store": True, "writes": False},
+    "kg_terms": {
+        "description": P_("Resolves a domain term in the vocabulary of the store (the x_term profile, contract v4.11): "
+                         "text matches the preferred term or a synonym, ignoring case, accents and repeated spaces, and "
+                         "a synonym scoped to a case only matches with the same case. Each match carries the term, how "
+                         "it matched (pref, alt or hidden), whether that synonym is retired, the synonyms with source, "
+                         "document version, verification date and due date, and, for a superseded term, the terms that "
+                         "replace it. Use the term that replaces a superseded one, and treat a retired or due synonym "
+                         "as unconfirmed. Without text, lists the terms."),
+        "inputSchema": {"type": "object", "additionalProperties": False,
+                        "properties": {
+                            "text": {"type": "string", "minLength": 1, "maxLength": 500,
+                                     "description": P_("the text to resolve; without it, the terms are listed")},
+                            "case": {"type": "string", "maxLength": 200,
+                                     "description": P_("the case whose case-scoped synonyms count")},
+                            "as_of": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                                      "description": P_("the date for the due synonyms (today by default)")},
+                            "limit": {"type": "integer", "minimum": 1, "maximum": 200,
+                                      "description": P_("terms or matches returned (default 50)")}}},
+        "needs_store": True, "writes": False},
     "kg_history": {
         "description": P_("The operations on a graph in the store, newest first (ref, op, author, date)."),
         "inputSchema": {"type": "object", "additionalProperties": False, "required": ["name"],
@@ -181,7 +202,7 @@ TOOLS = {
 
 
 
-UNTRUSTED_TOOLS = ("kg_get", "kg_list", "kg_history", "kg_query")
+UNTRUSTED_TOOLS = ("kg_get", "kg_list", "kg_history", "kg_query", "kg_terms")
 
 # As dicas de comportamento de cada ferramenta (annotations do MCP, desde a 2025-03-26), anunciadas no tools/list
 # (4.17.2): o cliente pode pular a confirmação do que só lê e pedir a do que apaga ou sobrescreve. Nenhuma fala com o
@@ -197,6 +218,7 @@ ANNOTATIONS = {
     "kg_get": {"title": "Read a graph from the store", **_READ},
     "kg_list": {"title": "List the graphs in the store", **_READ},
     "kg_query": {"title": "Query and project the graphs in the store", **_READ},
+    "kg_terms": {"title": "Resolve a domain term in the store", **_READ},
     "kg_history": {"title": "Show the history of a graph", **_READ},
     "kg_schema_help": {"title": "Get the contract and how to write a passing graph", **_READ},
 }  # devolvem texto gravado por usuários: no perfil, envelopados
@@ -604,6 +626,26 @@ class Server:
             except ValueError as exc:
                 raise ToolError(str(exc)) from None
             return res, False
+        if name == "kg_terms":
+            corpus = kg_query.Corpus()
+            for gname, text in store._texts():
+                corpus.add(gname, text)
+            as_of = datetime.date.today()
+            if args.get("as_of") is not None:
+                as_of = kg_validate.iso_date(args["as_of"])
+                if as_of is None:
+                    raise ToolError(P_("as_of {value}: the date is YYYY-MM-DD").format(value=repr(args["as_of"])))
+            limit = args.get("limit", 50)
+            terms = kg_vocab.terms(corpus, as_of)
+            res = {"schema_version": kg_vocab.SCHEMA_VERSION, "as_of": as_of.isoformat(), "unreadable": corpus.unreadable}
+            if args.get("text") is None:
+                res.update(terms=terms[:limit], total=len(terms))
+            else:
+                hits = kg_vocab.lookup(terms, args["text"], args.get("case"))
+                res.update(query=args["text"], case=args.get("case"), total=len(hits),
+                           matches=[{"via": h["via"], "literal": h["literal"], "retired": h["retired"],
+                                     "scope": h["scope"], "term": h["term"]} for h in hits[:limit]])
+            return res, False
         raise ToolError(P_("tool without implementation: {name}").format(name=name))
 
 
@@ -887,7 +929,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=_(
         "Reference MCP server of KG-SSOT: the contract and the store for a model, over stdio (one JSON-RPC message per "
         "line) or HTTP (POST /mcp).\n\n"
-        "Tools: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_history, kg_schema_help.\n"
+        "Tools: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_terms, kg_history, kg_schema_help.\n"
         "Without --root, only kg_validate and kg_schema_help are available. With --store-optional, a root that does not\n"
         "open does not bring the server down: it starts with only kg_validate and kg_schema_help and tells the model why.\n"
         "rc: 0 normal exit · 2 broken input (invalid root, invalid option)."),

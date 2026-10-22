@@ -590,14 +590,14 @@ msgstr "PORTA"
 msgid ""
 "Reference MCP server of KG-SSOT: the contract and the store for a model, over stdio (one JSON-RPC message per line) or HTTP (POST /mcp).\n"
 "\n"
-"Tools: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_history, kg_schema_help.\n"
+"Tools: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_terms, kg_history, kg_schema_help.\n"
 "Without --root, only kg_validate and kg_schema_help are available. With --store-optional, a root that does not\n"
 "open does not bring the server down: it starts with only kg_validate and kg_schema_help and tells the model why.\n"
 "rc: 0 normal exit · 2 broken input (invalid root, invalid option)."
 msgstr ""
 "Servidor MCP de referência do KG-SSOT: o contrato e o armazém para um modelo, por stdio (uma mensagem JSON-RPC por linha) ou HTTP (POST /mcp).\n"
 "\n"
-"Ferramentas: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_history, kg_schema_help.\n"
+"Ferramentas: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_terms, kg_history, kg_schema_help.\n"
 "Sem --root, só kg_validate e kg_schema_help ficam disponíveis. Com --store-optional, uma raiz que não abre não\n"
 "derruba o servidor: ele sobe só com kg_validate e kg_schema_help e diz o motivo ao modelo.\n"
 "rc: 0 saída normal · 2 entrada quebrada (raiz inválida, opção inválida)."
@@ -704,6 +704,13 @@ msgid ""
 "\n"
 "  kg_migrate.py plan  --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out SHEET.tsv] [graph.kg.yaml ...]\n"
 "  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"\n"
+"keys (4.19.0) renames each key the contract does not know in the top level, meta, nodes, edges and external_edges\n"
+"to x_<key>, the extension prefix, by text (comments stay). The known keys come from the MUST schema itself. A key\n"
+"that is not a slug, that would collide with an existing x_<key>, or that would become a canonical profile (x_severity,\n"
+"x_term...) goes to the reviewer. With --apply, each file is written only if the reread document equals the old one\n"
+"with only the renamed keys, the diff touches only those lines, and the file gains no MUST code or SHOULD warning.\n"
 "\n"
 "The profile (spec/kg-migrate-profile.schema.json) declares rules in order: the first one whose when matches decides the\n"
 "node's action (propose provenance, demote to unverifiable, or only list it for the reviewer), and the scopes block sets\n"
@@ -731,6 +738,13 @@ msgstr ""
 "\n"
 "  kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]\n"
 "  kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"\n"
+"keys (4.19.0) renomeia para x_<chave>, o prefixo de extensão, cada chave que o contrato não conhece no topo, no meta,\n"
+"nos nós, nas arestas e nas external_edges, pelo texto (os comentários ficam). As chaves conhecidas vêm do próprio schema\n"
+"MUST. A chave que não é slug, que colidiria com um x_<chave> existente ou que viraria um perfil canônico (x_severity,\n"
+"x_term...) vai para quem revisa. Com --apply, cada arquivo só é gravado se a releitura for o documento de antes com só\n"
+"as chaves renomeadas, se o diff tocar só essas linhas e se o arquivo não ganhar código MUST nem aviso SHOULD.\n"
 "\n"
 "O perfil (spec/kg-migrate-profile.schema.json) declara regras em ordem: a primeira cujo when casa decide a ação do nó\n"
 "(propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por\n"
@@ -889,6 +903,62 @@ msgstr "· {files} arquivos tocados; {refused} recusados"
 #: tools/kg_migrate.py
 msgid "· {rows} node row(s) in the plan; {same} already equal (same); {review} for the reviewer; {broken} graph(s) left out (do not parse); nothing was written (plan)"
 msgstr "· {rows} linhas de nó no plano; {same} já iguais (same); {review} para quem revisa; {broken} grafos fora (não parseiam); nada foi escrito (plan)"
+
+#: tools/kg_migrate.py
+msgid "renames the keys outside the contract to x_<key> (4.19.0)"
+msgstr "renomeia as chaves fora do contrato para x_<chave> (4.19.0)"
+
+#: tools/kg_migrate.py
+msgid "writes the renames; without it, only the plan"
+msgstr "grava as renomeações; sem ele, só o plano"
+
+#: tools/kg_migrate.py
+msgid "the key is not a slug: rename it by hand"
+msgstr "a chave não é slug: renomeie à mão"
+
+#: tools/kg_migrate.py
+msgid "{new} already exists in the same mapping"
+msgstr "{new} já existe no mesmo mapa"
+
+#: tools/kg_migrate.py
+msgid "{new} is a canonical profile (v4.11): its value would be judged by the profile"
+msgstr "{new} é um perfil canônico (v4.11): o valor passaria a ser julgado pelo perfil"
+
+#: tools/kg_migrate.py
+msgid "the key spans more than one line"
+msgstr "a chave ocupa mais de uma linha"
+
+#: tools/kg_migrate.py
+msgid "the key is written in a form the migrator does not edit"
+msgstr "a chave está escrita numa forma que o migrador não edita"
+
+#: tools/kg_migrate.py
+msgid "the reread document differs from the old one beyond the renamed keys"
+msgstr "a releitura difere do documento de antes além das chaves renomeadas"
+
+#: tools/kg_migrate.py
+msgid "the text diff touched a line without a renamed key"
+msgstr "o diff do texto tocou uma linha sem chave renomeada"
+
+#: tools/kg_migrate.py
+msgid "the file would gain a SHOULD warning: {codes}"
+msgstr "o arquivo ganharia aviso SHOULD: {codes}"
+
+#: tools/kg_migrate.py
+msgid "RENAME"
+msgstr "RENOMEAR"
+
+#: tools/kg_migrate.py
+msgid "; {n} file(s) written"
+msgstr "; {n} arquivo(s) gravado(s)"
+
+#: tools/kg_migrate.py
+msgid "; nothing was written (without --apply)"
+msgstr "; nada foi gravado (sem --apply)"
+
+#: tools/kg_migrate.py
+msgid "· {renames} key(s) to rename, {review} for the reviewer, in {files} file(s){written}"
+msgstr "· {renames} chave(s) a renomear, {review} para quem revisa, em {files} arquivo(s){written}"
 
 #: tools/kg_prov_export.py
 msgid ""
@@ -1909,6 +1979,54 @@ msgstr "· {files} arquivos; {passed} passam no MUST; {warned} com aviso SHOULD 
 msgid "· {n} file(s) with external_edges: the external end was NOT verified (run with --corpus <repository root>)"
 msgstr "· {n} arquivo(s) com external_edges: a ponta externa NÃO foi conferida (rode com --corpus <raiz do repo>)"
 
+#: tools/kg_validate.py
+msgid "x_term is the vocabulary profile (v4.11): pref is required; each item of labels needs literal, kind (alt or hidden), and source, and a label with reverify_every needs verified_at."
+msgstr "x_term é o perfil de vocabulário (v4.11): pref é obrigatório; cada item de labels precisa de literal, kind (alt ou hidden) e source, e o rótulo com reverify_every precisa de verified_at."
+
+#: tools/kg_validate.py
+msgid "x_mirror copies a record of another system (v4.11): system, ref, state, and synced_at are required; resync_every is the cadence that the due report checks."
+msgstr "x_mirror copia um registro de outro sistema (v4.11): system, ref, state e synced_at são obrigatórios; resync_every é a cadência que o relatório de vencimento confere."
+
+#: tools/kg_validate.py
+msgid "x_doc_cycle is the life cycle of an external document (v4.11): issuer and state are required; state is draft, enacted, in_force, suspended, revoked, expired, or superseded, and recheck_every needs checked_at."
+msgstr "x_doc_cycle é o ciclo de vida de um documento externo (v4.11): issuer e state são obrigatórios; state é draft, enacted, in_force, suspended, revoked, expired ou superseded, e recheck_every precisa de checked_at."
+
+#: tools/kg_validate.py
+msgid "x_questionnaire links the node to an external questionnaire (v4.11): name and questions (a list that is not empty) are required; verdict is meets, partial, does_not_meet, not_applicable, or unknown."
+msgstr "x_questionnaire liga o nó a um questionário externo (v4.11): name e questions (uma lista não vazia) são obrigatórios; verdict é meets, partial, does_not_meet, not_applicable ou unknown."
+
+#: tools/kg_validate.py
+msgid "x_severity is critical, high, medium, low, or info (v4.11)."
+msgstr "x_severity é critical, high, medium, low ou info (v4.11)."
+
+#: tools/kg_validate.py
+msgid "x_confidence on an edge is a number from 0 to 1 (v4.11)."
+msgstr "x_confidence na aresta é um número de 0 a 1 (v4.11)."
+
+#: tools/kg_validate.py
+msgid "x_provisional on an edge is true or false (v4.11)."
+msgstr "x_provisional na aresta é true ou false (v4.11)."
+
+#: tools/kg_validate.py
+msgid "slug is lowercase words joined by hyphens, like my-graph (v4.11)."
+msgstr "slug é feito de palavras em minúsculas ligadas por hífen, como meu-grafo (v4.11)."
+
+#: tools/kg_validate.py
+msgid "synced on {verified_at}, every {every}, due on {due_on}"
+msgstr "sincronizado em {verified_at}, a cada {every}, venceu em {due_on}"
+
+#: tools/kg_validate.py
+msgid "checked on {verified_at}, every {every}, due on {due_on}"
+msgstr "conferido em {verified_at}, a cada {every}, venceu em {due_on}"
+
+#: tools/kg_validate.py
+msgid "cadence {every} without synced_at"
+msgstr "cadência {every} sem synced_at"
+
+#: tools/kg_validate.py
+msgid "cadence {every} without checked_at"
+msgstr "cadência {every} sem checked_at"
+
 #: tools/kg_vendor.py
 msgid "--source {source} is not a git repository"
 msgstr "--source {source} não é um repositório git"
@@ -2155,3 +2273,95 @@ msgstr "✗ faltando {path} (o carimbo da {version} foi gravado por um kg_vendor
 #: tools/kg_vendor.py
 msgid "✗ symlink  {path}"
 msgstr "✗ symlink  {path}"
+
+#: tools/kg_vocab.py
+msgid "The domain vocabulary of a corpus: the terms of the x_term profile (contract v4.11)."
+msgstr "O vocabulário de domínio de um corpus: os termos do perfil x_term (contrato v4.11)."
+
+#: tools/kg_vocab.py
+msgid "for lookup, the text first; then .kg.yaml or .kg.json files (or --root)"
+msgstr "no lookup, primeiro o texto; depois os arquivos .kg.yaml ou .kg.json (ou --root)"
+
+#: tools/kg_vocab.py
+msgid "with --root, paths to leave out (repeatable), added to the defaults"
+msgstr "com --root, caminhos que ficam de fora (repetível), somados aos padrões"
+
+#: tools/kg_vocab.py
+msgid "the date for the due labels (today by default)"
+msgstr "a data do vencimento dos sinônimos (hoje, por padrão)"
+
+#: tools/kg_vocab.py
+msgid "lookup: the case whose case-scoped labels count"
+msgstr "lookup: o caso cujos sinônimos de escopo de caso valem"
+
+#: tools/kg_vocab.py
+msgid "export: the target format"
+msgstr "export: o formato de destino"
+
+#: tools/kg_vocab.py
+msgid "export --to skos: the base of the concept IRIs"
+msgstr "export --to skos: a base dos IRIs dos conceitos"
+
+#: tools/kg_vocab.py
+msgid "lookup needs the text to resolve"
+msgstr "o lookup precisa do texto a resolver"
+
+#: tools/kg_vocab.py
+msgid "export needs --to skos or --to ossie"
+msgstr "o export precisa de --to skos ou --to ossie"
+
+#: tools/kg_vocab.py
+msgid "--as-of {value}: the date must be YYYY-MM-DD"
+msgstr "--as-of {value}: a data tem de ser AAAA-MM-DD"
+
+#: tools/kg_vocab.py
+msgid "retired"
+msgstr "aposentado"
+
+#: tools/kg_vocab.py
+msgid "case {case}"
+msgstr "caso {case}"
+
+#: tools/kg_vocab.py
+msgid "domain"
+msgstr "domínio"
+
+#: tools/kg_vocab.py
+msgid "source {source}"
+msgstr "fonte {source}"
+
+#: tools/kg_vocab.py
+msgid "verified on {date}"
+msgstr "conferido em {date}"
+
+#: tools/kg_vocab.py
+msgid "DUE on {date}"
+msgstr "VENCIDO em {date}"
+
+#: tools/kg_vocab.py
+msgid "due on {date}"
+msgstr "vence em {date}"
+
+#: tools/kg_vocab.py
+msgid "(superseded by {ids})"
+msgstr "(substituído por {ids})"
+
+#: tools/kg_vocab.py
+msgid "· {terms} terms, {labels} labels, {due} due on {as_of}"
+msgstr "· {terms} termos, {labels} sinônimos, {due} vencidos em {as_of}"
+
+#: tools/kg_vocab.py
+msgid "NOT FOUND  {text}"
+msgstr "NÃO ACHADO  {text}"
+
+#: tools/kg_vocab.py
+msgid "preferred"
+msgstr "preferido"
+
+#: tools/kg_vocab.py
+msgid "RETIRED label"
+msgstr "sinônimo APOSENTADO"
+
+#: tools/kg_vocab.py
+msgid "SUPERSEDED term; use {ids}"
+msgstr "termo SUBSTITUÍDO; use {ids}"
