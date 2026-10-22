@@ -647,8 +647,62 @@ nodes:
       locator: "linhas 'workspace-adopt-sync: verify ok' e 'reapply ok'; os dois backups timestampados do wrapper"
       method: "medição: verify do wrapper, getfacl e find de dono no workspace vivo"
       locality: "host"
+  - id: D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Migrar p/ docker-ce 29.9.2»"
+    label: "O Docker da VPS sai do docker.io 29.1.3 do Ubuntu para o docker-ce 29.9.2 do repositório oficial, por wrapper em ops/ com backup, ensaio e prova, numa janela do maestro; fecha as correções do Engine até 20/10/2026"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Migrar p/ docker-ce 29.9.2»; descartadas: «Esperar o backport do Ubuntu» · «Só registrar o risco»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «O Docker da VPS (29.1.3 do Ubuntu) fica atrás de todas as correções até o 29.9.2; o que fazer?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+  - id: D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Trocar pela última versão vigente e marcar revisão periódica»"
+    label: "O WAHA troca a tag flutuante latest pela última versão publicada, fixada, e ganha revisão periódica para subir de versão"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Trocar pela última versão vigente e marcar revisão periódica» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Fixar no digest atual» · «Deixar latest»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «O container do WAHA roda com devlikeapro/waha:latest; fixar a versão?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+
+  - id: E_SEC_SCAN_PHP_DOCKER_SEMANA_1022
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-22"
+    verified_against: "PHP: zero no host, nos 22 containers ativos (php -r por docker exec) e nos 51 repos locais (git ls-files, 0 .php/composer.json). Kernel 6.8.0-147 >= 6.8.0-117 corrigido do Copy Fail e algif_aead bloqueado em modprobe.d. docker info: plugins de Authorization nulos; API sem TCP. docker.io 29.1.3-0ubuntu3~24.04.2 com backport só de CVE-2026-33747/33748; containerd 2.2.1; notas oficiais do Engine 29: CVE-2026-17106 em 29.7.0, o lote BuildKit/92543/92542/53493 em 29.8.2, HTTP/2 do Go em 29.9.0, 95839 em 29.9.1, eMudhra 111943 em 29.9.2 (2026-10-20)"
+    label: "Varredura da semana de 2026-10-22: a VPS e a família não têm PHP nem WordPress (PHP2Shell não se aplica) e o kernel está corrigido; o Docker 29.1.3 do Ubuntu fica, no papel, atrás de todas as correções do Engine até a 29.9.2, sem nada explorável de fora medido"
+    narrative: "Pedido do maestro, cruzando a pesquisa da sessão brain-granaai (lista de 13 CVEs de PHP, 29 do Docker e 3 GHSAs do containerd, com primárias) com a medição local. Viraram D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022 e D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022."
+    provenance:
+      source: "https://docs.docker.com/engine/release-notes/29/"
+      locator: "seções 29.7.0, 29.8.2, 29.9.0, 29.9.1 e 29.9.2; e a medição local da sessão do core em 2026-10-22"
+      method: "medição: inventário de versões na VPS e varredura dos repos, cruzados com as notas oficiais de versão"
+      locality: "host"
 
 edges:
+  - from: E_SEC_SCAN_PHP_DOCKER_SEMANA_1022
+    to: D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022
+    edge_type: SUPPORTS
+  - from: E_SEC_SCAN_PHP_DOCKER_SEMANA_1022
+    to: D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022
+    edge_type: SUPPORTS
   - from: E_WORKSPACE_ADMIN_ONION_ATUALIZADO_1022
     to: D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022
     edge_type: SUPPORTS
@@ -776,6 +830,12 @@ edges:
     edge_type: TRACES_TO
   - from: D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022
     to: D_UI_PILOT_MOTOR_KG_NO_WORKSPACE_1022
+    edge_type: TRACES_TO
+  - from: D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022
+    to: ENT_logto
+    edge_type: TRACES_TO
+  - from: D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022
+    to: E_waha_public_route_caddy
     edge_type: TRACES_TO
 
 external_edges:
