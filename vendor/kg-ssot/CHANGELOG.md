@@ -10,6 +10,17 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.19.1] - 2026-10-22
+
+The gate leaves the KG-SSOT vendor out of the adopter's corpus. Contract v4.11, unchanged.
+
+### Fixed
+
+- **`kg_gate.py` counted the vendor's example graph as an adopter graph.** The 4.19.0 vendor brings
+  `spec/vocab-examples/cmed-dictionary.kg.yaml` outside `fixtures/`, and a `--update` would write it into the baseline
+  (found by an adopter before any `--update`). The gate now leaves out, by default, every file in a folder with the
+  `.kg-ssot-version` stamp, wherever the vendor lives; `--no-default-excludes` brings it back.
+
 ## [4.19.0] - 2026-10-22
 
 A domain vocabulary you can verify, synonym by synonym, and a shape for the `x_` keys that adopters repeat. Contract
@@ -159,7 +170,8 @@ The frictionless gate. Contract v4.9, unchanged.
 - A contract identity change with no verdict change passes with a notice (rc 0); `--strict-identity` restores the old
   behavior. The vendor checks the schemas against their stamp.
 
-[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.0...HEAD
+[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.1...HEAD
+[4.19.1]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.0...kg-ssot-v4.19.1
 [4.19.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.18.0...kg-ssot-v4.19.0
 [4.18.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.2...kg-ssot-v4.18.0
 [4.17.2]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.1...kg-ssot-v4.17.2

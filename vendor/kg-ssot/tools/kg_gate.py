@@ -8,8 +8,8 @@ desde o v4.7.
 Um .kg.json no repo fica fora da medição do gate: a 4.8.0 lê .kg.json no kg_validate, no armazém e no MCP, e o gate
 mede só os .kg.yaml.
 
-Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/* e docs/materials/*, os
-excluídos padrão, ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
+Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/*, docs/materials/* e o vendor
+do KG-SSOT, qualquer pasta com o carimbo .kg-ssot-version: os excluídos padrão; ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
   failing — grafo → códigos MUST que ele carrega hoje (a dívida herdada, nomeada por caminho);
   debt    — código SHOULD → quantos grafos o carregam (granularity graph, o padrão) ou quantas ocorrências, somadas
             em todos os grafos (granularity node). A base guarda a granularidade; --granularity a troca num --update.
@@ -110,12 +110,22 @@ def selected(name, exclude):
     return name.endswith(".kg.yaml") and not any(fnmatch.fnmatchcase(name, g) for g in exclude)
 
 
-def corpus(repo, exclude=DEFAULT_EXCLUDE):
+VENDOR_STAMP = ".kg-ssot-version"  # o carimbo que o kg_vendor.py grava na raiz do vendor
+
+
+def corpus(repo, exclude=DEFAULT_EXCLUDE, skip_vendor=True):
+    """Os .kg.yaml do adotante. Com skip_vendor (o padrão, que o --no-default-excludes desliga), fica de fora tudo o que
+    está numa pasta com o carimbo do vendor do KG-SSOT, onde quer que ela esteja: desde a 4.19.0 a release leva um
+    exemplo real (spec/vocab-examples/), que não é grafo do adotante e entraria na base num --update (achado de campo
+    do brain na 4.19.0)."""
     out = subprocess.run(["git", "-C", str(repo), "ls-files", "-z"], capture_output=True)
     if out.returncode != 0:
         raise Broken(_("{repo} is not a git repository: {err}").format(
             repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
-    names = sorted(n for n in out.stdout.decode("utf-8").split("\0") if n and selected(n, exclude))
+    listed = [n for n in out.stdout.decode("utf-8").split("\0") if n]
+    vendors = [n[: -len(VENDOR_STAMP)] for n in listed if n == VENDOR_STAMP or n.endswith("/" + VENDOR_STAMP)]
+    names = sorted(n for n in listed if selected(n, exclude)
+                   and not (skip_vendor and any(n.startswith(v) for v in vendors)))
     items = []
     for n in names:
         path = pathlib.Path(repo) / n
@@ -532,8 +542,8 @@ def _utf8_stdio():
 
 HELP = """The adopter's gate: a repository's graphs against the contract, with a per-graph ratchet.
 
-It measures the git-tracked .kg.yaml files (outside */fixtures/* and docs/materials/*, the default excludes, or what
---exclude says) against the MUST and the SHOULD of the current contract, and compares them with the baseline:
+It measures the git-tracked .kg.yaml files (outside */fixtures/*, docs/materials/* and the KG-SSOT vendor, any folder
+with the .kg-ssot-version stamp: the default excludes; or what --exclude says) against the MUST and the SHOULD of the current contract, and compares them with the baseline:
   failing - graph → MUST codes it carries today (the inherited debt, named by path);
   debt    - SHOULD code → how many graphs carry it (granularity graph, the default) or how many occurrences
             (granularity node).
@@ -588,7 +598,8 @@ def main(argv=None):
         legacy = pathlib.Path(args.repo) / LEGACY_BASELINE
         read_from, single = (legacy if not path.exists() and legacy.is_file() else path), False
     try:
-        items = corpus(args.repo, (() if args.no_default_excludes else DEFAULT_EXCLUDE) + tuple(args.exclude))
+        items = corpus(args.repo, (() if args.no_default_excludes else DEFAULT_EXCLUDE) + tuple(args.exclude),
+                       skip_vendor=not args.no_default_excludes)
         # o índice só lê os grafos que alguma referência externa cita (rastreados, inclusive fora do corpus do gate):
         # o alvo que não está lá fica fora do índice e reprova como dangling-external, igual a antes
         info = [kg_validate.external_info(t) for _, t in items]  # um parse por texto que pode citar, e só esses

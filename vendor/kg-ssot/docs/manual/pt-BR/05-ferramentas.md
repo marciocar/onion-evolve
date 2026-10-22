@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:5236145e9b921f55 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:66b0502befc8dfe2 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.19.0",
+  "release": "kg-ssot-v4.19.1",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -248,7 +248,7 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 |---|---|
 | `--update` | Grava a base. Se algo piorou, recusa, a menos que você passe `--accept-regression` |
 | `--accept-regression "<motivo>"` | Aceita uma piora; o motivo fica gravado na base |
-| `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*` e `docs/materials/*` já saem por padrão |
+| `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*`, `docs/materials/*` e o vendor do KG-SSOT (qualquer pasta com o carimbo `.kg-ssot-version`, desde a 4.19.1) já saem por padrão; o `--no-default-excludes` os traz de volta |
 | `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
 | `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
