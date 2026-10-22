@@ -1,0 +1,25 @@
+# Escuta LOCAL do tenant admin do Logto, para o token M2M do bridge (decidido pelo maestro em 2026-10-22).
+#
+# POR QUÊ: o bridge pede o token M2M (app m-default, tenant admin) em LOGTO_ADMIN_TOKEN_ORIGIN. O default é
+# https://console.onionevolve.com, mas esse vhost público está desligado desde 2026-09-06
+# (logto-console.caddy.disabled no conf.d vivo), e a página de identidades do admin dava 502. O Logto escolhe
+# o tenant pelo Host e pelo X-Forwarded-Proto, não pela porta. Medido em 127.0.0.1:3012 com o secret do banco:
+# sem cabeçalho = 400 "invalid client m-default"; Host console + proto http = 400; Host console + proto
+# https = 200 com token. O fetch do Node não deixa impor o Host, então quem põe os cabeçalhos é o Caddy. E o
+# X-Forwarded-Host também: o Caddy o preenche com o host original e o Logto o prefere ao Host (num Caddy de
+# teste sem ele, o issuer saiu auth.onionevolve.com e o token deu 400; com ele, issuer console e token 200).
+#
+# SÓ LOCAL: bind 127.0.0.1, http puro, sem DNS e sem certificado. O console continua fora da internet.
+# O bridge aponta LOGTO_ADMIN_TOKEN_ORIGIN para http://127.0.0.1:3013 na configuração dele (ato do maestro).
+#
+# Desligar = remover este arquivo do repo, rodar ops/install-caddy-config.sh e tirar a variável do bridge.
+#
+# verify: http://127.0.0.1:3013/oidc/.well-known/openid-configuration 200
+http://127.0.0.1:3013 {
+	bind 127.0.0.1
+	reverse_proxy 127.0.0.1:3012 {
+		header_up Host console.onionevolve.com
+		header_up X-Forwarded-Host console.onionevolve.com
+		header_up X-Forwarded-Proto https
+	}
+}
