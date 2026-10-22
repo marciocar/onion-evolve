@@ -2,7 +2,8 @@
 branch: docs/a2a-a7-allowlist-toolsearch
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d9e807db96961ff73268f94a338d68cbef1c8c4da4ea14c1b5d2ce7e1ea3fcb2
+reviewed_code_sha256: 065a8001dce62ead4be966de00401bfe503999b486325027d0a65198d44d9fc4
 findings_total: 0
 findings_real: 0
 tokens: 0
