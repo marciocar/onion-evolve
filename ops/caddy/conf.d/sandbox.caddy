@@ -20,12 +20,12 @@
 # LIMITE DECLARADO: o CSP não foi medido num navegador (a bancada do bridge roda no happy-dom, que não aplica
 # CSP). É o dogfood do passo 4 do deploy/sandbox/README.md do bridge.
 #
-# O verify só cobra o 404: o /sandbox.html 200 só passa depois que o update-bridge publicar o arquivo, e o
-# instalador reprovaria a instalação antes disso. Acrescente `# verify: https://sandbox.onionevolve.com/sandbox.html 200`
-# depois da 1ª publicação.
+# O verify cobra os dois lados: /sandbox.html 200 (publicado pela 1ª vez pelo update-bridge em 2026-10-22, bridge
+# 63542508, sha256 igual ao deploy/sandbox/sandbox.html servido) e qualquer outro caminho 404.
 #
 # Desligar = remover este arquivo do repo e rodar ops/install-caddy-config.sh (ele remove o vivo gerido).
 #
+# verify: https://sandbox.onionevolve.com/sandbox.html 200
 # verify: https://sandbox.onionevolve.com/qualquer 404
 sandbox.onionevolve.com {
     root * /var/www/onion-sandbox
