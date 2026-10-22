@@ -2,7 +2,8 @@
 branch: feat/workspace-adopt-sync
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6378e1df4c6cc6c460aee3e143494fc09a14847794c1ed33863efc50d3545750
+reviewed_code_sha256: 94e3a44cafbcbaf43b37ec35a5e23098fadee59acb877a73bd5ce398212be3d9
 findings_total: 4
 findings_real: 4
 tokens: 0
