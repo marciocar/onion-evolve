@@ -81,8 +81,9 @@ cmd_plan() {
   ts="$(date -u +%Y%m%d-%H%M%S)"; d="$STATE_DIR/plan-$ts"
   sudo_do mkdir -p "$d"
   put() { sudo_do tee "$d/$1" >/dev/null; }
-  dpkg-query -W -f='${Package}\t${Version}\t${db:Status-Status}\n' "${UBUNTU_PKGS[@]}" docker-ce docker-ce-cli containerd.io \
-    docker-buildx-plugin docker-compose-plugin 2>/dev/null | awk -F'\t' '$3=="installed"' | put packages.tsv
+  # o dpkg-query sai 1 quando algum nome da lista não existe na base (o caso normal aqui): o rc dele não é o dado
+  { dpkg-query -W -f='${Package}\t${Version}\t${db:Status-Status}\n' "${UBUNTU_PKGS[@]}" docker-ce docker-ce-cli containerd.io \
+    docker-buildx-plugin docker-compose-plugin 2>/dev/null || true; } | awk -F'\t' '$3=="installed"' | put packages.tsv
   sudo_do docker version --format '{{.Client.Version}}\t{{.Server.Version}}' | put engine.tsv
   sudo_do docker info --format '{{range .DriverStatus}}{{index . 0}}={{index . 1}} {{end}}|{{.CgroupDriver}}|{{.FirewallBackend.Driver}}' | put driver.txt
   sudo_do docker ps -a --format '{{.Names}}' | while read -r n; do
@@ -253,7 +254,8 @@ S
   for c in apt-get apt-mark systemctl dpkg; do printf '#!/usr/bin/env bash\necho "%s $*" >> "$DKSB/calls"\n[ "$1" = --print-architecture ] && echo amd64\nexit 0\n' "$c" > "$SB/bin/$c"; done
   cat > "$SB/bin/dpkg-query" <<'S'
 #!/usr/bin/env bash
-case "$*" in *docker.io*containerd*) printf 'docker.io\t29.1.3-0ubuntu3~24.04.2\tinstalled\ncontainerd\t2.2.1-0ubuntu1\tinstalled\n';; *docker.io*) echo installed;; *containerd) echo installed;; *) echo not-installed;; esac
+# como o real: sai 1 quando algum pacote pedido não existe na base (a lista do plan sempre tem nomes ausentes)
+case "$*" in *docker.io*containerd*) printf 'docker.io\t29.1.3-0ubuntu3~24.04.2\tinstalled\ncontainerd\t2.2.1-0ubuntu1\tinstalled\n'; exit 1;; *docker.io*) echo installed;; *containerd) echo installed;; *) echo "dpkg-query: no packages found matching $*" >&2; exit 1;; esac
 S
   cat > "$SB/bin/apt-cache" <<'S'
 #!/usr/bin/env bash
