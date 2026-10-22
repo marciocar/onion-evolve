@@ -11486,10 +11486,11 @@ run_update_bridge_selftests() {
 F="$UB_ST"; echo "systemctl $*" >> "$F/calls"
 case "$1" in
   show) case "$*" in
-          *InvocationID*) echo inv-ub ;;
+          *InvocationID*) cat "$F/inv" 2>/dev/null || echo inv-ub ;;
           *NRestarts*) [ -f "$F/nr-bad" ] && { echo ""; exit 0; }; cat "$F/nrestarts" 2>/dev/null || echo 0 ;;
         esac ;;
-  start) if [ -f "$F/crash" ]; then echo 1; else echo 0; fi > "$F/nrestarts" ;;   # o start manual ZERA (systemd 255, medido)
+  start) if [ -f "$F/crash" ]; then echo 1; else echo 0; fi > "$F/nrestarts"   # o start manual ZERA (systemd 255, medido)
+         [ -f "$F/same-inv" ] || echo "inv-$(date +%s%N)" > "$F/inv" ;;   # cada start é uma invocação nova
 esac
 exit 0
 EOF
@@ -11528,10 +11529,10 @@ EOF
     mkdir -p "${d}/srv/onion-bridge/node_modules"
     printf '[Service]\n' > "${d}/unit/onion-vps-bridge.service.d/30-integrity.conf"; printf '[Socket]\n' > "${d}/unit/onion-chat.socket"
   }
-  # _ubr <wrapper> → "rc|saída"
+  # _ubr <wrapper> [args do wrapper] → "rc|saída"
   _ubr() {
     local rc=0 out
-    out="$(cd "${d}" && env PATH="${d}/fake:${PATH}" LC_ALL=C UB_ST="${d}/st" GIT_CONFIG_GLOBAL=/dev/null bash "$1" 2>&1)" || rc=$?
+    out="$(cd "${d}" && env PATH="${d}/fake:${PATH}" LC_ALL=C UB_ST="${d}/st" GIT_CONFIG_GLOBAL=/dev/null bash "$@" 2>&1)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
   # _ubcase <nome> <ANTIGO> <NOVO> <função-de-caso>: intacto e mutante (cópia com ANTIGO→NOVO, 1ª ocorrência)
@@ -11733,6 +11734,34 @@ PY
   _ubcase "(u33) NOOP também publica (re-rodar depois de uma falha cura), sem stop/start" \
     $'  post_update_checks noop\n  run_sandbox_phase' '  post_update_checks noop' _ub_sbx_noop
   unset -f _ubsbx _ub_sbx_pub _ub_sbx_same _ub_sbx_changed _ub_sbx_absent _ub_sbx_dstlink _ub_sbx_dirlink _ub_sbx_srclink _ub_sbx_noop
+  # --restart (D_UPDATE_BRIDGE_GANHA_RESTART_1022): com tudo em dia, religa para reler a configuração e prova o boot NOVO
+  # pelas mesmas checagens; sem a flag o NOOP segue sem tocar no serviço.
+  _ub_rst_ok() { _ubnoop; echo inv-velho > "${d}/st/inv"; local r; r="$(_ubr "$1" --restart)"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "RESTART OK" && _ubhas "${r}" "(invocação inv-velh → " \
+      && grep -qx "systemctl stop onion-vps-bridge" "${d}/st/calls" && grep -qx "systemctl start onion-vps-bridge" "${d}/st/calls" \
+      && grep -qx "bh verify" "${d}/st/calls" && grep -qx "cr verify" "${d}/st/calls" && _ubrunning \
+      && ! grep -q '^npm' "${d}/st/calls"; }
+  _ub_rst_noflag() { _ubnoop; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "NOOP OK" && ! _ubhas "${r}" "RESTART" && ! grep -qE '^systemctl (stop|start)' "${d}/st/calls"; }
+  _ub_rst_sameinv() { _ubnoop; echo inv-velho > "${d}/st/inv"; : > "${d}/st/same-inv"; local r; r="$(_ubr "$1" --restart)"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "o restart não trouxe um boot NOVO" && ! _ubhas "${r}" "RESTART OK"; }
+  _ub_rst_unproven() { _ubnoop; echo 1 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1" --restart)"; UB_WHY="${r:0:700}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "RESTART feito (sem mudança de código) e o boot NOVO NÃO está provado" \
+      && _ubhas "${r}" "  - integridade (30-integrity.conf): o verify REPROVOU" && ! _ubhas "${r}" "ROLLBACK MANUAL" \
+      && ! _ubhas "${r}" "RESTART OK" && _ubrunning; }
+  _ub_rst_badarg() { local r; r="$(_ubr "$1" --reinicia)"; UB_WHY="${r:0:300}"
+    _ubrc "${r}" 2 && _ubhas "${r}" "argumento desconhecido" && ! grep -qE '^systemctl (stop|start)' "${d}/st/calls" 2>/dev/null; }
+  _ubcase "(u34) --restart com tudo em dia → religa (stop+start), boot NOVO provado pelos dois verifies, rc 0, sem npm" \
+    $'    restart_in_place\n    exit 0' '    exit 0' _ub_rst_ok
+  _ubcase "(u35) NOOP SEM --restart → serviço intocado (nenhum stop/start), a flag não é o padrão" \
+    'RESTART=0' 'RESTART=1' _ub_rst_noflag
+  _ubcase "(u36) --restart cujo start não trouxe InvocationID novo → rc 1 nomeado, nunca 'RESTART OK' sobre o boot antigo" \
+    '[ "${INV}" != "${old_inv}" ]' 'true' _ub_rst_sameinv
+  _ubcase "(u37) --restart com verify reprovando → rc 1 'RESTART feito… NÃO provado', serviço rodando, sem rollback de código" \
+    '  post_update_checks restart' '  : post_update_checks restart' _ub_rst_unproven
+  _ubcase "(u38) argumento desconhecido → rc 2, nada feito (um typo nunca vira update nem NOOP silencioso)" \
+    'NADA foi feito." >&2; exit 2 ;;' 'NADA foi feito." >&2; exit 0 ;;' _ub_rst_badarg
+  unset -f _ub_rst_ok _ub_rst_noflag _ub_rst_sameinv _ub_rst_unproven _ub_rst_badarg
   rm -rf "${d}"
 }
 
