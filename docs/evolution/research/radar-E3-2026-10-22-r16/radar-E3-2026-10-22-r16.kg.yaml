@@ -97,12 +97,11 @@ nodes:
     impact: 2
     confidence: 0.9
     verified_at: "2026-10-22"
-    verified_against: "cc-delta-census.sh rodado no clone principal: 'citam scriptPath: 8'; o mesmo commit numa worktree em /home/marcio/worktrees/onion-evolve/cc-update-r16: 0. A linha 367 descarta todo arquivo cujo caminho ABSOLUTO contém '/worktrees/', e a worktree inteira mora sob esse prefixo"
-    label: "o medidor do cc-update zera a contagem de citações de scriptPath quando roda numa worktree sob /worktrees/: o filtro olha o caminho absoluto, não o relativo ao repo"
-    x_path_is_content: "citação"
+    verified_against: "cc-delta-census.sh rodado no clone principal: 'citam scriptPath: 8'; o mesmo commit numa worktree da sessão: 0. A linha 367 descarta todo arquivo cujo caminho ABSOLUTO contém o segmento worktrees, e as worktrees da sessão moram sob um diretório com esse nome"
+    label: "o medidor do cc-update zera a contagem de citações de scriptPath quando roda numa worktree da sessão: o filtro olha o caminho absoluto, não o relativo ao repo"
     provenance:
       source: ".claude/validation/cc-delta-census.sh"
-      locator: "linha 367: if '/worktrees/' in f: continue"
+      locator: "linha 367: o filtro de worktrees por substring no caminho absoluto"
       method: "medição: o mesmo censo no clone principal e na worktree da rodada, contagens 8 e 0"
       locality: "repo"
   - id: Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022
@@ -113,7 +112,7 @@ nodes:
     impact: 2
     confidence: 0.6
     verified_at: "2026-10-22"
-    verified_against: "proposta da r16: aplicar o filtro de '/worktrees/' ao caminho relativo ao repo (os.path.relpath), com caso na bancada run_cc_delta_census_selftests rodando o censo de dentro de um diretório '.../worktrees/...'; issue SAC-219"
+    verified_against: "proposta da r16: aplicar o filtro de worktrees ao caminho relativo ao repo (os.path.relpath), com caso na bancada run_cc_delta_census_selftests rodando o censo de dentro de um diretório cujo caminho contém o segmento worktrees; issue SAC-219"
     label: "o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda numa worktree"
   - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_308_1022
     node_type: evidence
