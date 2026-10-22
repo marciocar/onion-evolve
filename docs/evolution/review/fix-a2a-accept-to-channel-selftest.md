@@ -2,7 +2,8 @@
 branch: fix/a2a-accept-to-channel-selftest
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: dc13b273812141b23f02fd9cae83b17e8bd03b97349c6e0decf32dee569080fa
+reviewed_code_sha256: 6d6a03fc15f89b1d4573aedc8e75debf3a2fbf039f3c5b1016c6f4eb5ed12eca
 findings_total: 11
 findings_real: 4
 tokens: 172218
