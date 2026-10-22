@@ -41,8 +41,18 @@
 # TETO DECLARADO: /health é código HTTP + corpo com ok:true — durante queda do IdP ele
 # segue 200 com todo /chat em 401 (fio Q_JWKS_REFETCH_STORM no grafo m2-bridge-logto).
 #
-# Uso: ops/update-bridge.sh   (chama sudo onde precisa; concorrência barrada por flock)
+# Uso: ops/update-bridge.sh [--restart]   (chama sudo onde precisa; concorrência barrada por flock)
+#   --restart (D_UPDATE_BRIDGE_GANHA_RESTART_1022): com clone e bridge já em dia (o caso NOOP), RELIGA o serviço para
+#   ele reler a configuração (mudança só no .env, que o NOOP nunca recarregava — em 2026-10-22 precisou de
+#   `systemctl restart` à mão) e prova o boot NOVO com as mesmas checagens do update (fases 5, 6 e 7). Não toca em
+#   código, deps nem PWA. Com mudança a atualizar, a flag é redundante: o update completo já religa.
 set -euo pipefail
+RESTART=0
+case "${1:-}" in
+  "") ;;
+  --restart) RESTART=1 ;;
+  *) echo "[update-bridge] ERRO: argumento desconhecido '${1}' — uso: ops/update-bridge.sh [--restart]. NADA foi feito." >&2; exit 2 ;;
+esac
 
 BRIDGE=/home/onion/onion-bridge
 CLONE=/home/onion/onion-evolve
@@ -185,6 +195,8 @@ esac
 if [ "${#NOT_PROVEN[@]}" -gt 0 ]; then
   if [ "${mode}" = noop ]; then
     printf '[update-bridge] ERRO: NOOP (nada foi atualizado) e o boot VIVO NÃO está provado — %s checagem(ns) falharam:\n' "${#NOT_PROVEN[@]}" >&2
+  elif [ "${mode}" = restart ]; then
+    printf '[update-bridge] ERRO: RESTART feito (sem mudança de código) e o boot NOVO NÃO está provado — %s checagem(ns) falharam:\n' "${#NOT_PROVEN[@]}" >&2
   else
     printf '[update-bridge] ERRO: update NO AR e NÃO PROVADO — %s checagem(ns) pós-update falharam:\n' "${#NOT_PROVEN[@]}" >&2
   fi
@@ -192,6 +204,11 @@ if [ "${#NOT_PROVEN[@]}" -gt 0 ]; then
   for _m in "${NOT_PROVEN[@]}"; do printf '  - %s\n' "${_m}" >&2; done
   if [ "${mode}" = noop ]; then
     printf '[update-bridge] serviço intocado. Cure pela cura de cada item e rode de novo: o NOOP re-verifica o boot vivo.\n' >&2
+    exit 1
+  fi
+  if [ "${mode}" = restart ]; then
+    # sem rollback de código: o código não mudou. O que mudou foi a configuração relida no boot (a do maestro).
+    printf '[update-bridge] o serviço segue RODANDO no boot novo. Nada de código mudou: a causa provável é a configuração que o boot releu — corrija-a e rode de novo com --restart.\n' >&2
     exit 1
   fi
   printf '[update-bridge] serviço deixado RODANDO de propósito (/health 200 e auth enforce no momento da medida, não prova de estabilidade): parar seria pior. Corrija para a frente pela cura de cada item (rodar o update-bridge de novo, já em dia, cai no NOOP e re-verifica), ou rode o rollback abaixo.\n' >&2
@@ -261,6 +278,41 @@ run_sandbox_phase() {
   exit 1
 }
 
+# ── RESTART (só no caso NOOP, com --restart) ──────────────────────────────────────────────────────────────
+# O MESMO caminho de serviço do update: stop, o trap de religamento enquanto parado, reset-failed (o crashloop
+# consome o StartLimitBurst), start; depois a fase 5 (health local e público, auth enforce no boot DESTA invocação)
+# e as fases 6 e 7. A prova de que houve boot novo é o InvocationID diferente do de antes — sem ela, "OK" provaria
+# o boot antigo (a lição da fase 5). O NRestarts da fase 6 é absoluto e o start manual o zera: vale igual aqui.
+restart_in_place() {
+  local old_inv up=0 _
+  old_inv="$(systemctl show "${UNIT}" -p InvocationID --value)"
+  NEW_CLONE_HEAD="${OLD_CLONE_HEAD}"; NEW_BRIDGE_HEAD="${OLD_BRIDGE_HEAD}"
+  sudo systemctl stop "${UNIT}"
+  trap 'sudo systemctl start '"${UNIT}"' || echo "[update-bridge] ATENÇÃO: religamento automático FALHOU — serviço PARADO" >&2' EXIT
+  sudo systemctl reset-failed "${UNIT}" || true
+  sudo systemctl start "${UNIT}" || fail "systemctl start recusou"
+  trap - EXIT
+  for _ in $(seq 1 15); do
+    if grep -q '"ok":true' <<< "$(curl -fsS -m 3 "${HEALTH_LOCAL}" 2>/dev/null)"; then up=1; break; fi
+    sleep 2
+  done
+  [ "${up}" = 1 ] || fail "/health local não voltou em ~30s depois do restart"
+  grep -q '"ok":true' <<< "$(curl -fsS -m 10 "${HEALTH_PUBLIC}")" || fail "/health via Caddy não voltou depois do restart"
+  INV="$(systemctl show "${UNIT}" -p InvocationID --value)"
+  [ -n "${INV}" ] && [ "${INV}" != "${old_inv}" ] \
+    || fail "o restart não trouxe um boot NOVO (InvocationID '${INV:0:8}' = o de antes): nada aqui provaria a configuração relida"
+  BOOT=""
+  for _ in $(seq 1 10); do
+    BOOT="$(sudo journalctl "_SYSTEMD_INVOCATION_ID=${INV}" --no-pager 2>/dev/null || true)"
+    grep -q "auth: enforce" <<<"${BOOT}" && break
+    sleep 2
+  done
+  grep -q "auth: enforce" <<<"${BOOT}" || fail "boot DESTA invocação sem 'auth: enforce' — a configuração relida mudou a superfície de auth"
+  post_update_checks restart
+  run_sandbox_phase
+  log "RESTART OK — clone ${NEW_CLONE_HEAD:0:8} · bridge ${NEW_BRIDGE_HEAD:0:8} (sem mudança de código) · health 200+ok:true local+público · auth enforce (invocação ${old_inv:0:8} → ${INV:0:8})"
+}
+
 # ── 1. pré-voo ────────────────────────────────────────────────────────────────────────────
 grep -q '"ok":true' <<< "$(curl -fsS -m 5 "${HEALTH_LOCAL}")" \
   || { echo "[update-bridge] ERRO: /health já está doente ANTES do update — triagem primeiro, update depois." >&2; exit 1; }
@@ -276,6 +328,11 @@ BRIDGE_REMOTE="$(sudo -u onion git -C "${BRIDGE}" rev-parse origin/main)"
 if [ "${OLD_CLONE_HEAD}" = "${CLONE_REMOTE}" ] && [ "${OLD_BRIDGE_HEAD}" = "${BRIDGE_REMOTE}" ] \
    && [ -z "$(sudo -u onion git -C "${CLONE}" status --porcelain)" ] \
    && [ -z "$(sudo -u onion git -C "${BRIDGE}" status --porcelain)" ]; then
+  if [ "${RESTART}" = 1 ]; then
+    log "RESTART — clone e bridge já em origin/main (${OLD_CLONE_HEAD:0:8} / ${OLD_BRIDGE_HEAD:0:8}); religando o serviço para reler a configuração, sem tocar em código."
+    restart_in_place
+    exit 0
+  fi
   log "NOOP — clone e bridge já em origin/main (${OLD_CLONE_HEAD:0:8} / ${OLD_BRIDGE_HEAD:0:8}), árvores limpas. Serviço intocado; re-verificando o boot vivo."
   NEW_CLONE_HEAD="${OLD_CLONE_HEAD}"
   INV="$(systemctl show "${UNIT}" -p InvocationID --value)"
@@ -287,6 +344,8 @@ if [ "${OLD_CLONE_HEAD}" = "${CLONE_REMOTE}" ] && [ "${OLD_BRIDGE_HEAD}" = "${BR
   log "NOOP OK — boot vivo (invocação ${INV:0:8}) verificado, nada a atualizar."
   exit 0
 fi
+
+[ "${RESTART}" = 1 ] && log "--restart: há mudança a atualizar, e o update completo abaixo já religa o serviço"
 
 # ── 2. backup rotulado (estado irreversível), artefato NOMEADO ────────────────────────────
 BK_OUT="$(sudo "${SELF_DIR}/bridge-backup.sh" "pre-update")" || fail "backup falhou — sem rede de segurança não se atualiza"
