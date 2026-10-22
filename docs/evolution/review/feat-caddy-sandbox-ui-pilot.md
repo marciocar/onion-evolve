@@ -2,7 +2,8 @@
 branch: feat/caddy-sandbox-ui-pilot
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5f5c00a36deb3d5bc1fd9e856d1287daee233f1f47f1c277581ccf46fa571f5b
+reviewed_code_sha256: 2e79490afa0c3138372e80a7b2809f34727f59055b19b4128644282ec51c4082
 findings_total: 4
 findings_real: 3
 tokens: 0
