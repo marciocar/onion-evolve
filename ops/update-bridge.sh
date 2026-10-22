@@ -29,9 +29,12 @@
 #   6. verificações pós-update FAIL-CLOSED (JWKS, reinícios, verify do degrau 1 e do runner):
 #      qualquer uma que reprove ou não meça sai rc 1 nomeando-as, com o serviço deixado
 #      RODANDO e o rollback impresso — nunca rollback automático (ver a fase 6).
+#   7. publica a sandbox do piloto ui:// (deploy/sandbox/sandbox.html do bridge servido → /var/www/onion-sandbox),
+#      SÓ depois da fase 6 provada, também no NOOP; atômico, só se mudou, recusa symlink (ver a fase 7)
 #
 # EXIT: 0 ok, ou NOOP com o boot vivo verificado · 1 falha (rollback impresso; na fase 6, update NO AR e não
 #       provado; no NOOP, boot vivo não provado, serviço intocado) · 2 trava ocupada, nada foi feito
+#       (rc 1 também: fase 7 recusou publicar a sandbox — o bridge segue no ar e provado, nada de rollback)
 #
 # O QUE ELE NÃO FAZ (one-off da rodada 2026-08-13): editar .env, mexer na unit/drop-in
 # (precedente 08-10: ProtectHome derrubou o serviço), varrer .bak, trocar lockfile.
@@ -50,6 +53,10 @@ LOCK=/tmp/onion-update-bridge.lock
 HEALTH_LOCAL="http://127.0.0.1:8787/health"
 HEALTH_PUBLIC="https://app.onionevolve.com/health"
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Sandbox do piloto ui:// (D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021): o arquivo que o vhost ops/caddy/conf.d/sandbox.caddy serve.
+SANDBOX_DIR=/var/www/onion-sandbox
+SANDBOX_SRC_REL=deploy/sandbox/sandbox.html
+SANDBOX_OWNER=root:root
 NOT_PROVEN=()
 
 # Duas execuções concorrentes fariam stop/start cruzados sobre o mesmo checkout.
@@ -192,6 +199,68 @@ if [ "${#NOT_PROVEN[@]}" -gt 0 ]; then
 fi
 }
 
+# ── 7. (definida aqui, chamada depois da fase 6, no update E no NOOP) ──────────────────────────────────────────
+# A sandbox do piloto ui:// (vhost ops/caddy/conf.d/sandbox.caddy) serve UM arquivo, o deploy/sandbox/sandbox.html
+# do bridge SERVIDO. Publicar à mão seria o passo que evapora (temporário-evapora-vira-incidente): ele sai daqui, depois
+# do deploy provado, para a cópia pública nunca ser de um bridge que não está no ar.
+# POR QUE TAMBÉM NO NOOP: uma publicação que falhou (ou o 1º update depois deste passo existir, com o bridge já em dia)
+# cairia no NOOP para sempre e nunca publicaria. Compara antes: no NOOP com a cópia em dia, nada é tocado.
+# RECUSA (rc 1, nunca "segue"): origem symlink (o sudo leria o ALVO e o publicaria na web), diretório ou destino
+# symlink (o mv/install escreveria fora de ${SANDBOX_DIR}), destino que não é arquivo regular, diretório de outro dono.
+# AUSENTE no bridge servido é AVISO e segue: é o estado antes do merge do onion-bridge#83.
+# A ORIGEM SE LÊ COMO onion, nunca como root (2ª passada, 2026-10-22): o bridge servido é do onion, e um `install` de
+# root leria o que o onion apontasse. Trocar o arquivo por symlink DEPOIS do test -L (corrida) publicaria na web um
+# arquivo só de root. Lido como onion, o pior caso é publicar o que o onion já lê: não há escalada.
+# Atômico: o conteúdo lido como onion vai para um temporário NO MESMO diretório (mktemp, O_EXCL, de root), ganha dono
+# e modo, e o mv o põe por cima — o Caddy nunca serve meio arquivo. Depois, cmp prova que o publicado é byte a byte o
+# do bridge servido.
+SANDBOX_ERR=""
+publish_sandbox() {
+  local src="${BRIDGE}/${SANDBOX_SRC_REL}" dst="${SANDBOX_DIR}/sandbox.html" tmp want got
+  if sudo test -L "${src}"; then SANDBOX_ERR="a origem ${src} é symlink — recusado (publicaria o alvo do link)"; return 1; fi
+  if ! sudo test -f "${src}"; then
+    if sudo test -d "${BRIDGE}"; then
+      log "AVISO: sandbox: o bridge servido não tem ${SANDBOX_SRC_REL} — nada publicado (antes do merge do onion-bridge#83 é o esperado)"
+      return 0
+    fi
+    SANDBOX_ERR="não pude ler ${BRIDGE} (sudo?) para saber se há ${SANDBOX_SRC_REL}"; return 1
+  fi
+  if sudo test -L "${SANDBOX_DIR}"; then SANDBOX_ERR="${SANDBOX_DIR} é symlink — recusado"; return 1; fi
+  if ! sudo test -e "${SANDBOX_DIR}"; then
+    sudo install -d -m 0755 -o "${SANDBOX_OWNER%%:*}" -g "${SANDBOX_OWNER#*:}" "${SANDBOX_DIR}" \
+      || { SANDBOX_ERR="não pude criar ${SANDBOX_DIR}"; return 1; }
+    log "sandbox: ${SANDBOX_DIR} criado (0755 ${SANDBOX_OWNER})"
+  elif ! sudo test -d "${SANDBOX_DIR}"; then
+    SANDBOX_ERR="${SANDBOX_DIR} existe e não é diretório — recusado"; return 1
+  fi
+  got="$(sudo stat -c '%U' "${SANDBOX_DIR}" 2>/dev/null || true)"
+  [ "${got}" = "${SANDBOX_OWNER%%:*}" ] || { SANDBOX_ERR="${SANDBOX_DIR} é de '${got}', esperado ${SANDBOX_OWNER%%:*} — recusado"; return 1; }
+  if sudo test -L "${dst}"; then SANDBOX_ERR="${dst} é symlink — recusado (o mv por cima trocaria o link, mas quem o pôs lá não é este script)"; return 1; fi
+  if sudo test -e "${dst}" && ! sudo test -f "${dst}"; then SANDBOX_ERR="${dst} existe e não é arquivo regular — recusado"; return 1; fi
+  # "mudou" é conteúdo, dono OU modo: um 0666 deixado à mão também se cura aqui
+  want="${SANDBOX_OWNER} 644"
+  if sudo test -f "${dst}" && sudo -u onion cat -- "${src}" | sudo cmp -s - "${dst}" \
+     && [ "$(sudo stat -c '%U:%G %a' "${dst}" 2>/dev/null || true)" = "${want}" ]; then
+    log "sandbox: ${dst} já é o do bridge servido (${want}) — intocado"
+    return 0
+  fi
+  tmp="$(sudo mktemp "${SANDBOX_DIR}/.sandbox.html.XXXXXX")" || { SANDBOX_ERR="mktemp em ${SANDBOX_DIR} falhou"; return 1; }
+  if ! sudo -u onion cat -- "${src}" | sudo tee "${tmp}" >/dev/null \
+     || ! sudo chown "${SANDBOX_OWNER}" "${tmp}" || ! sudo chmod 0644 "${tmp}" \
+     || ! sudo mv -f "${tmp}" "${dst}"; then
+    sudo rm -f "${tmp}" || true
+    SANDBOX_ERR="cópia/mv para ${dst} falhou (o publicado anterior, se havia, segue intacto)"; return 1
+  fi
+  sudo -u onion cat -- "${src}" | sudo cmp -s - "${dst}" || { SANDBOX_ERR="${dst} não é byte a byte o do bridge servido depois do mv"; return 1; }
+  log "sandbox: ${dst} publicado do bridge servido ($(sudo stat -c '%U:%G %a %s bytes' "${dst}" 2>/dev/null || echo '?'))"
+}
+run_sandbox_phase() {
+  publish_sandbox && return 0
+  printf '[update-bridge] ERRO: sandbox do piloto ui:// NÃO publicada — %s.\n' "${SANDBOX_ERR}" >&2
+  printf '[update-bridge] o bridge segue NO AR e provado pela fase 6: nada de rollback. Corrija o caminho e rode de novo (o NOOP republica).\n' >&2
+  exit 1
+}
+
 # ── 1. pré-voo ────────────────────────────────────────────────────────────────────────────
 grep -q '"ok":true' <<< "$(curl -fsS -m 5 "${HEALTH_LOCAL}")" \
   || { echo "[update-bridge] ERRO: /health já está doente ANTES do update — triagem primeiro, update depois." >&2; exit 1; }
@@ -214,6 +283,7 @@ if [ "${OLD_CLONE_HEAD}" = "${CLONE_REMOTE}" ] && [ "${OLD_BRIDGE_HEAD}" = "${BR
   BOOT="$(sudo journalctl "_SYSTEMD_INVOCATION_ID=${INV}" --no-pager -o short-iso 2>/dev/null || true)"
   grep -q "auth: enforce" <<<"${BOOT}" || NOT_PROVEN+=("o boot vivo (invocação ${INV:0:8}) não tem 'auth: enforce' no journal")
   post_update_checks noop
+  run_sandbox_phase
   log "NOOP OK — boot vivo (invocação ${INV:0:8}) verificado, nada a atualizar."
   exit 0
 fi
@@ -311,5 +381,7 @@ grep -q "auth: enforce" <<<"${BOOT}" || fail "boot DESTA invocação sem 'auth: 
 # o install do runner, não desfazer o bridge; (4) o rollback não pode ser provado sem o serviço real, e
 # deploy é do maestro. Então: para, nomeia, imprime o rollback, e o maestro decide.
 post_update_checks update
+# ── 7. sandbox do piloto ui:// (só depois da fase 6 provada) ──────────────────────────────────────────────
+run_sandbox_phase
 log "OK — clone ${NEW_CLONE_HEAD:0:8} · bridge ${NEW_BRIDGE_HEAD:0:8} · health 200+ok:true local+público · auth enforce (invocação ${INV:0:8})"
 log "prova independente: compare um artefato novo do core no clone (ex.: ls ${CLONE}/.claude/rules/)"
