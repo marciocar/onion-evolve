@@ -23,3 +23,4 @@
 | 2026-10-21 22:22 | maestro-peer-test (declarado, não provado) | onion-evolve | relay | BLOQUEADO | veto do gate a2a-verify: exp-beyond-ceiling |
 | 2026-10-21 22:22 | maestro-peer-test (declarado, não provado) | onion-evolve | relay | BLOQUEADO | veto do gate a2a-verify: body-mismatch |
 | 2026-10-21 22:25 | maestro-peer-test (declarado, não provado) | onion-evolve | relay | BLOQUEADO | veto do gate a2a-verify: expired |
+| 2026-10-22 02:37 | maestro-peer-test | onion-evolve | relay | AUTORIZADO | inbox do core é aberto para relay e advise |
