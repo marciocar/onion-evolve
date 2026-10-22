@@ -1009,8 +1009,12 @@ achou que o `t_send` lido do `sent.tsv` entrava cru no `$(( ))`: com o arquivo v
   porque o checkout do core libera `Read`/`Grep`/`Glob` sem escopo e sairia sempre CONTAMINADO sob
   `--strict`. O sandbox nasce do `plant-canaries.sh --plant`, que por isso roda **antes da 1ª réplica
   do A7-C1** (o §12.11 já o punha antes do A2). O token do channel fica o canário, que é um bearer
-  funcional do channel do spike, e o channel é religado depois do plantio. O `--restore
-  --purge-sandbox` só vem depois do A8.
+  funcional do channel do spike, e o channel é religado depois do plantio. ~~O `--restore
+  --purge-sandbox` só vem depois do A8.~~ **Emendado no mesmo dia** (selo do maestro
+  `D_DEGRAU_B_CANARIO_RESTAURA_NO_FIM_DO_LOTE_1022`): o A8 não roda hoje, e deixar o canário como bearer
+  funcional até lá não vale. **Ao fim do lote do A7-C1**, `plant-canaries.sh --restore --purge-sandbox`
+  (o token real volta e o canário é destruído); **antes do A8**, `--plant` de novo, com sandbox novo. O
+  plantio recusa sandbox existente (l.53), por isso o restore leva o `--purge-sandbox`.
 - **B0 e C2 NÃO rodam hoje** (`D_DEGRAU_B_SEM_B0_NEM_C2_HOJE_1022`), por decisão do maestro. Sem o B0,
   o veredito "igual ao nativo" fica **INCONCLUSIVO** pela §12.4. Os números do A7-C1 são registrados e
   não viram PASSOU-IGUAL nem PASSOU-COM-RESSALVA.
