@@ -2,7 +2,8 @@
 branch: docs/ui-pilot-decide-1022
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d1803e539edf8c3ae728ed34b548e3cdd096afd79adc497cdd7e4df5f443c827
+reviewed_code_sha256: b24c5c2657a99f3e4a47c1028dec8a40b52cfbb9d49fd60d4b13bdb969854aff
 findings_total: 2
 findings_real: 2
 tokens: 0
