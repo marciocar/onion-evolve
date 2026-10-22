@@ -480,13 +480,12 @@
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
 
-## intelligent-ui-2026-10 — 6 item(ns)
+## intelligent-ui-2026-10 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 25.6 | `Q_MCP_APPS_PILOT_PROPOSAL_1021` | intelligent-ui-2026-10 | HIPÓTESE para o /meta:decide: abrir um piloto ÚNICO de MCP Apps num host que o Onion controla (o /chat do onion-bridge ou o brai |
 | 8.4 | `C_INLINE_VISUALS_MARKET_CONVERGENCE_1021` | intelligent-ui-2026-10 | Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03 |
-| 4.8 | `C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022` | intelligent-ui-2026-10 | A origem sandbox.onionevolve.com do piloto ui:// está versionada (ops/caddy/conf.d/sandbox.caddy, frame-src no CSP do app) e o op |
 | 4.0 | `Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021` | intelligent-ui-2026-10 | NÃO VERIFICADO: a Intelligent UI do ChatGPT com GPT-6 (lançamento alegado em 2026-10-07; componentes, critério de uso, streamin |
 | 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
 | 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
@@ -1072,6 +1071,13 @@
 |--:|---|---|---|
 | 4.8 | `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2` | vetos-por-tokens-2026-10 | TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se  |
 
+## vps-shared-tools-2026-07 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022` | vps-shared-tools-2026-07 | A origem sandbox.onionevolve.com do piloto ui:// está versionada (ops/caddy/conf.d/sandbox.caddy, frame-src no CSP do app) e o op |
+| 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
+
 ## fios-abertos — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1115,12 +1121,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.2 | `Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO` | radar-E3-2026-10-05-r7 | A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting |
-
-## vps-shared-tools-2026-07 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
 
 ## guardrails-2nd-pr-state-2026-07 — 1 item(ns)
 
