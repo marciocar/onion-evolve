@@ -2,13 +2,12 @@
 branch: chore/kg-ssot-4.18.0
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: 60a5a1488e043b58128851159d2bfe5053957c0e1dae2eee1a10880227e8f16c
-reviewed_code_sha256: 21c33024a61be23f81beb56fca9902b36e70c0a98dcafb6d25343532cc64811e
-findings_total: 4
-findings_real: 4
+reviewed_diff_sha256: pendente
+findings_total: 5
+findings_real: 5
 tokens: 0
 duration_min: 25
-findings_fixed: 4
+findings_fixed: 5
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: agente-execucao
@@ -58,3 +57,14 @@ dependência era só da língua.
 - O `--json` do `plan` num corpus grande (a saída JSON inteira fica em memória no bash): medido só nos fixtures.
 - O stub do pre_push simula a língua do gate; o `_kg_gate_digest` com o `kg_gate.py` real em inglês reprovando
   não foi exercitado (ele só exibe; quem decide é o rc).
+
+## Achado 5 (CI do PR, curado pela sessão principal)
+
+O selftest do kg-writer (`ops/mcp-onion-kg-writer/selftest.py`) monta um vendor FALSO e copiava só o
+`kg_store.py`. Desde a 4.18.0 o armazém importa o `kg_i18n`, que lê o catálogo em `vendor/kg-ssot/locale/`,
+e o caso (a) caiu no CI com `ModuleNotFoundError: No module named 'kg_i18n'`. É harness incompleto, não
+produção: o servidor real carrega o vendor inteiro. A cura copia o `kg_i18n.py` e o `locale/` quando existem
+(vendor antigo segue funcionando). `LC_ALL=C bash .claude/validation/lint-selftest.sh --families
+mcp_onion_kg_writer`: 65/0, com o (a) em 62 casos. Varredura de outro harness que copie ferramenta do
+vendor peça a peça: só este (`git grep` por cópia de `kg_*.py` fora do vendor).
+
