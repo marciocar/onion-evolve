@@ -2,7 +2,8 @@
 branch: feat/docker-engine-migrate
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5c14755b277955a77374edb00e0ee1d9b7a975310a5f8ece3914e745eb5f35b3
+reviewed_code_sha256: 2c6233767dbd086e7c1ddf629a5e85678bc0a12bc66a4d369a046cf600dbe706
 findings_total: 5
 findings_real: 5
 tokens: 0
