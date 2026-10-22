@@ -1,4 +1,4 @@
-# KG-SSOT 4.16.1 (tag kg-ssot-v4.16.1): o texto completo para agentes de IA
+# KG-SSOT 4.17.0 (tag kg-ssot-v4.17.0): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,8 +14,8 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.16.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.16.1-6f42c1)](spec/release.json)
-[![Suíte: 354/354](https://img.shields.io/badge/su%C3%ADte-354%2F354-2ea44f)](spec/conformance/README.md)
+[![Contrato: v4 · release 4.17.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.17.0-6f42c1)](spec/release.json)
+[![Suíte: 356/356](https://img.shields.io/badge/su%C3%ADte-356%2F356-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
@@ -56,7 +56,7 @@ python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/require
 ```
 
 ```text
-latest: 354/354 (reprova)
+latest: 356/356 (reprova)
 optional: 10/24 (só reporta)
 PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
 REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
@@ -65,7 +65,7 @@ REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.
 ```
 
 Para usar como comando, biblioteca ou servidor MCP, o mesmo kit sai no PyPI: `pip install kg-ssot` traz os comandos
-`kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
+`kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
 do pacote. Em JavaScript, `npm install kg-ssot` traz o leitor JS, com o validador pré-compilado que roda também
 no React Native e no Expo. Para um cliente de MCP como o Claude Desktop, o servidor sai também como MCP Bundle
 (`.mcpb`), e para rodar como serviço ao lado de um cliente sem Python, como o LibreChat, há a imagem OCI
@@ -99,7 +99,7 @@ O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `med
 flowchart LR
   subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
     C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>349 casos em dados puros"]
+    S["Suíte de conformidade<br/>356 casos em dados puros"]
     R["Leitor de referência<br/>kg_validate.py"]
     S -- "todo leitor passa" --> R
     C --> R
@@ -135,8 +135,9 @@ flowchart LR
 | **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
 | **Dois formatos, um modelo** | O `.kg.yaml` para escrever e revisar no diff, e o `.kg.json` para o runtime (um app, um servidor), lido por um parser JSON no perfil JSON do contrato (RFC 8259, I-JSON, até 128 níveis, chave única). O gate e as `external_edges` seguem só com `.kg.yaml` |
 | **Armazém com gate** | `kg_store.py` grava `.kg.yaml` ou `.kg.json` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
-| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
-| **Suíte em dados puros** | 349 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
+| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, consultar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
+| **Consulta e diff** | `kg_query.py` seleciona nós num corpus inteiro e projeta cada aresta com o label da outra ponta, local ou externa, paginado (`kg-ssot.query/1`); `kg_diff.py` compara revisões pelo id, campo a campo, lendo o git sem checkout (`kg-ssot.diff/1`) |
+| **Suíte em dados puros** | 356 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Migrador por perfil** | `kg_migrate.py` propõe a `provenance` que o contrato pede por regras que o adotante declara, mostra o plano antes e grava com invariância nó a nó |
@@ -154,7 +155,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.16.1`. O leitor de referência passa em 354 de 354 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.17.0`. O leitor de referência passa em 356 de 356 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre. O relógio zera a cada release com MUST novo (a última
@@ -259,14 +260,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -505,6 +506,19 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.16.1` para a `kg-ssot-v4.17.0`, o contrato não muda (segue o v4.10, com a mesma identidade). Entram
+duas ferramentas de leitura, que não julgam nem gravam:
+- **`kg_query.py`, a consulta e a projeção.** Seleciona nós num corpus inteiro (id, prefixo, tipo, status, plano,
+  camada, palavras do label, a fila dos abertos, os sem carimbo ou conferidos antes de uma data, a vizinhança de um
+  nó) e projeta cada aresta com o label da outra ponta, local ou externa, paginado, no formato `kg-ssot.query/1`. No
+  servidor MCP, é a ferramenta `kg_query`, sobre a área do armazém; no perfil atrás de proxy, só a área da identidade.
+- **`kg_diff.py`, o diff por id.** Compara dois grafos, ou tudo o que mudou entre duas revisões do git, nó a nó e campo
+  a campo, no formato `kg-ssot.diff/1`; `--ignore` tira da comparação o campo que um gerador recarimba.
+- **A suíte ganha 2 casos** (356), dois achados da revisão do v4.10 que só tinham teste de unidade: duas chaves
+  repetidas na ordem do documento, e a quebra escapada num mapa de fluxo na raiz. Nenhum veredito da referência muda,
+  e o gate não muda de identidade. Na 4.16.1, o README e o `llms-full.txt` ainda diziam 349 casos em dois lugares; a
+  4.17.0 corrige.
+
 Da `kg-ssot-v4.16.0` para a `kg-ssot-v4.16.1`, entra o contrato v4.10: três pontos do perfil YAML em que o leitor de
 referência e o leitor JS divergiam, achados por fuzz e resolvidos pela especificação do YAML. Nenhum dos grafos reais
 medidos tem os casos, e nenhum veredito do leitor de referência muda.
@@ -616,7 +630,7 @@ leitor JS) e o migrador por perfil.
 - **A suíte ganha 16 casos** (328).
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --dest
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --dest
   vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
@@ -741,7 +755,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
@@ -828,7 +842,7 @@ Release descrita aqui: **4.10.0** (tag `kg-ssot-v4.10.0`). O contrato vigente de
 | 2 | [Conceitos](02-conceitos.md) | Grafo, nó, tipos, status, planos, arestas, proveniência, carimbo de verificação |
 | 3 | [Referência do formato](03-formato.md) | Todos os campos do `.kg.yaml`, tirados do schema |
 | 4 | [O contrato](04-contrato.md) | MUST × SHOULD, códigos de erro, versões e tags |
-| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_prov_export`, `kg_migrate`, com saídas reais |
+| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_query`, `kg_diff`, `kg_prov_export`, `kg_migrate`, com saídas reais |
 | 6 | [Adoção e CI](06-adocao-e-ci.md) | O caminho curto para levar o contrato a um repositório |
 | 7 | [Conformidade e leitores](07-conformidade-e-leitores.md) | A suíte de casos e como escrever um leitor próprio |
 | 8 | [Receitas](08-receitas.md) | Tarefas comuns, passo a passo |
@@ -891,11 +905,12 @@ O resultado é um arquivo que uma máquina consegue julgar no CI, como julga có
 | Peça | O que é |
 |---|---|
 | O contrato | Dois JSON Schemas, MUST (reprova) e SHOULD (alerta), mais as regras de integridade que o schema não alcança |
-| A suíte de conformidade | 225 casos em `latest/`, em dados puros, com o veredito e os códigos esperados de cada um |
+| A suíte de conformidade | 356 casos em `latest/`, em dados puros, com o veredito e os códigos esperados de cada um |
 | O leitor de referência | `kg_validate.py`, em Python 3.11 ou mais com PyYAML e jsonschema, sem outra dependência |
 | O kit de adoção | `kg_vendor.py`, que traz uma release por tag, e `kg_gate.py`, a catraca por grafo no CI |
 | O armazém com gate | `kg_store.py`, que grava grafos em disco, num repo git ou num armazém versionado, só depois do PASS do contrato |
 | O servidor MCP de referência | `kg_mcp.py`, que dá a um modelo o contrato e o armazém por MCP, por stdio ou HTTP local |
+| A consulta e o diff | `kg_query.py`, que seleciona nós e projeta as arestas com o label da outra ponta, e `kg_diff.py`, o diff por id entre revisões |
 | O exportador PROV-O | `kg_prov_export.py`, que leva a proveniência de cada nó para o ecossistema W3C PROV, em JSON-LD |
 
 ## Para quem
@@ -1327,6 +1342,7 @@ para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.
 | 4.14 | Contrato v4.7: a ponta externa pode ser um `.kg.json`; o armazém grava um conjunto de grafos de uma vez (`write_many`) |
 | 4.15 | Contrato v4.8: a cadência da verificação (`reverify_every`, `reverify_on`), a retenção (`retain_for`), o `owner` como papel e o relatório de vencimento (`kg_validate.py --due`), fora do veredito; na 4.15.1, o contrato v4.9 deixa de alertar a cadência sem `verified_at`, que é o estado inicial de uma regra de coleta |
 | 4.16 | Contrato v4.9, sem mudança. O gate sem atrito: a base vira uma pasta com um registro por grafo, e a troca de identidade do contrato sem veredito trocado passa com aviso; na 4.16.1, o contrato v4.10 alinha os dois leitores em três pontos do perfil YAML, sem veredito trocado na referência |
+| 4.17 | Contrato v4.10, sem mudança. A consulta e a projeção (`kg_query.py`, e a ferramenta `kg_query` no MCP) e o diff por id entre revisões (`kg_diff.py`) |
 
 ## Versões e tags
 
@@ -1829,6 +1845,7 @@ produto não depende dele, e ele não depende de um cliente específico.
 | `kg_get` | lê um grafo, ou uma versão anterior com `ref` |
 | `kg_list` | lista os grafos do armazém |
 | `kg_history` | as operações de um grafo, da mais nova para a mais antiga |
+| `kg_query` | a consulta e a projeção do `kg_query.py` sobre o armazém: filtros, fila dos abertos, vizinhança e `fields`, paginada por cursor |
 | `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
 Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
@@ -2011,6 +2028,85 @@ gravação recusada ou um nome inexistente vem com `isError: true`, para o model
     versão pedida quando a conhece. O servidor nunca emite `Mcp-Session-Id`, e GET e DELETE dão 405.
   - **Medido com clientes oficiais:** o SDK Python `mcp` 2.3.0, que é o v2, na era nova, por stdio e por HTTP; e os SDKs
     TypeScript 1.30.0, o do LibreChat, e 1.32.1 na era antiga. O CI roda os três.
+
+## `kg_query.py`: a consulta e a projeção do corpus
+
+Lê muitos grafos de uma vez e seleciona nós, sem julgar (o veredito é do `kg_validate.py`). Cada nó sai projetado: as
+arestas de saída e de entrada com a outra ponta resolvida para o label, local ou externa, e se a ponta existe no
+corpus lido. Com `--root`, o corpus são os `.kg.yaml` e `.kg.json` rastreados pelo git sob a pasta (fora do git, todos
+sob ela), e os caminhos saem relativos a ela, que é a raiz contra a qual a ponta externa `<caminho>#<id>` se resolve.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --open --sort impact          # a fila dos abertos
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --around alvo.kg.yaml#EV_A    # a vizinhança de um nó
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --text "gate base" --type decision --format json
+```
+
+Saída real, na pasta `external-corpus` da suíte (cortada):
+
+```text
+alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que sustenta A.
+    → SUPPORTS Q_A  A pergunta sintética A.
+    ← REFUTES valid-corpus-external-refutes-outgoing.kg.yaml#EV_A  A evidência sintética que sustenta A.
+    ← SUPERSEDES valid-corpus-target-exists.kg.yaml (o grafo inteiro)
+```
+
+| Opção | O que faz |
+|---|---|
+| `--root DIR` ou arquivos | O corpus. `--exclude GLOB` (repetível) tira caminhos do `--root`, como o export duplicado de um armazém |
+| `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filtros, todos em E |
+| `--text PALAVRAS` | Palavras que o label contém, todas, sem distinguir maiúscula; `--in-narrative` procura também na narrative |
+| `--open` | A fila dos abertos (status `open`) |
+| `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
+| `--around ID` | A vizinhança: `<caminho>#<id>`, ou o id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
+| `--sort corpus\|impact` | A ordem do corpus, ou o impacto declarado. A fórmula de atenção fica com o radar de quem a usa |
+| `--limit N` e `--cursor C` | A página (até 1000) e o cursor da próxima, que vale para a mesma consulta sobre o mesmo corpus |
+| `--fields GLOB` | Chaves do nó que saem em `extra`, como estão no grafo: `--fields 'x_*'` |
+| `--narrative` | Inclui a narrative de cada nó |
+| `--format json` | O formato estável `kg-ssot.query/1` (`spec/query.schema.json`) |
+
+O grafo que não parseia sai em `unreadable`, com o código `parse.*`, e não derruba a consulta. O label da outra ponta
+de cada aresta sai cortado em 200 caracteres: um nó de label longo citado por milhares de arestas não multiplica a
+resposta. rc 0 quando consultou, mesmo sem nó; 2 na entrada quebrada. No servidor MCP, a mesma consulta é a ferramenta
+`kg_query`, sobre o armazém: a página para no teto de bytes do servidor (com ao menos um nó), e o `next_cursor`
+continua de onde ela parou. Cada chamada relê e reparseia o armazém da área, e num armazém de dezenas de MB a
+primeira leva dezenas de segundos; o cache do julgamento é da 4.19.
+
+## `kg_diff.py`: o diff por id entre revisões
+
+Compara dois grafos, ou todos os grafos que mudaram entre duas revisões do git, alinhando os nós pelo id e as arestas
+pelas pontas e o tipo: o que só existe de um lado foi acrescentado ou removido, e o que existe nos dois sai com cada
+campo que mudou, antes e depois. A ordem dos nós no arquivo não conta; uma troca de id é remoção mais acréscimo; uma
+lista dentro do nó é comparada inteira; a aresta que troca de tipo com as mesmas pontas sai como mudança de
+`edge_type`. A revisão é lida pelo `git show`, sem checkout. Não é patch: o diff informa, não se aplica.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_diff.py edital.kg.yaml errata.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_diff.py HEAD~1:docs/x.kg.yaml HEAD:docs/x.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_diff.py --from origin/main --ignore verified_at      # tudo o que mudou na branch
+```
+
+Saída real, entre dois casos da suíte:
+
+```text
+valid-node-touched-only-as-target.kg.yaml (modificado)
+  ~ meta.id: valid-chain → valid-node-touched-only-as-target
+  + C_ALVO  Nó sintético C_ALVO.
+  - C_B  Nó sintético C_B.
+  + aresta EV_A -SUPPORTS-> C_ALVO
+  - aresta C_B -SUPPORTS-> EV_A
+· 1 grafo(s): 1 modificado(s), 0 acrescentado(s), 0 removido(s), 0 não lido(s); nós +1 -1 ~0; arestas +1 -1 ~0
+```
+
+O meta sai junto com as outras chaves da raiz, os valores se comparam na forma JSON do contrato, um arquivo renomeado
+sai como remoção mais acréscimo, e sem `--to` entram também os grafos novos ainda não adicionados ao git. O lado que
+não se lê (não é UTF-8, ou não parseia) sai em `unreadable` e conta como diferença; a revisão que começa com `-` é
+entrada quebrada. Num argumento, o caminho que existe no disco vence a leitura `REV:CAMINHO`.
+
+`--ignore CAMPO` (repetível) tira um campo da comparação, com o que fica abaixo dele (`provenance` tira os três; no meta,
+`meta.date`): o `verified_at` que um gerador recarimba a cada processamento esconde o sinal, e o resumo conta os nós
+por campo mudado para mostrar isso. `--format json` dá o `kg-ssot.diff/1` (`spec/diff.schema.json`). rc 0 sem
+diferença, 1 com diferença, 2 na entrada quebrada.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 
@@ -2921,7 +3017,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 354 casos contra o contrato v4, 32 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 356 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito

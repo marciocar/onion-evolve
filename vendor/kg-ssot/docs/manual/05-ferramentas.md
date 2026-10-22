@@ -463,6 +463,7 @@ produto não depende dele, e ele não depende de um cliente específico.
 | `kg_get` | lê um grafo, ou uma versão anterior com `ref` |
 | `kg_list` | lista os grafos do armazém |
 | `kg_history` | as operações de um grafo, da mais nova para a mais antiga |
+| `kg_query` | a consulta e a projeção do `kg_query.py` sobre o armazém: filtros, fila dos abertos, vizinhança e `fields`, paginada por cursor |
 | `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
 Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
@@ -645,6 +646,85 @@ gravação recusada ou um nome inexistente vem com `isError: true`, para o model
     versão pedida quando a conhece. O servidor nunca emite `Mcp-Session-Id`, e GET e DELETE dão 405.
   - **Medido com clientes oficiais:** o SDK Python `mcp` 2.3.0, que é o v2, na era nova, por stdio e por HTTP; e os SDKs
     TypeScript 1.30.0, o do LibreChat, e 1.32.1 na era antiga. O CI roda os três.
+
+## `kg_query.py`: a consulta e a projeção do corpus
+
+Lê muitos grafos de uma vez e seleciona nós, sem julgar (o veredito é do `kg_validate.py`). Cada nó sai projetado: as
+arestas de saída e de entrada com a outra ponta resolvida para o label, local ou externa, e se a ponta existe no
+corpus lido. Com `--root`, o corpus são os `.kg.yaml` e `.kg.json` rastreados pelo git sob a pasta (fora do git, todos
+sob ela), e os caminhos saem relativos a ela, que é a raiz contra a qual a ponta externa `<caminho>#<id>` se resolve.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --open --sort impact          # a fila dos abertos
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --around alvo.kg.yaml#EV_A    # a vizinhança de um nó
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --text "gate base" --type decision --format json
+```
+
+Saída real, na pasta `external-corpus` da suíte (cortada):
+
+```text
+alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que sustenta A.
+    → SUPPORTS Q_A  A pergunta sintética A.
+    ← REFUTES valid-corpus-external-refutes-outgoing.kg.yaml#EV_A  A evidência sintética que sustenta A.
+    ← SUPERSEDES valid-corpus-target-exists.kg.yaml (o grafo inteiro)
+```
+
+| Opção | O que faz |
+|---|---|
+| `--root DIR` ou arquivos | O corpus. `--exclude GLOB` (repetível) tira caminhos do `--root`, como o export duplicado de um armazém |
+| `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filtros, todos em E |
+| `--text PALAVRAS` | Palavras que o label contém, todas, sem distinguir maiúscula; `--in-narrative` procura também na narrative |
+| `--open` | A fila dos abertos (status `open`) |
+| `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
+| `--around ID` | A vizinhança: `<caminho>#<id>`, ou o id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
+| `--sort corpus\|impact` | A ordem do corpus, ou o impacto declarado. A fórmula de atenção fica com o radar de quem a usa |
+| `--limit N` e `--cursor C` | A página (até 1000) e o cursor da próxima, que vale para a mesma consulta sobre o mesmo corpus |
+| `--fields GLOB` | Chaves do nó que saem em `extra`, como estão no grafo: `--fields 'x_*'` |
+| `--narrative` | Inclui a narrative de cada nó |
+| `--format json` | O formato estável `kg-ssot.query/1` (`spec/query.schema.json`) |
+
+O grafo que não parseia sai em `unreadable`, com o código `parse.*`, e não derruba a consulta. O label da outra ponta
+de cada aresta sai cortado em 200 caracteres: um nó de label longo citado por milhares de arestas não multiplica a
+resposta. rc 0 quando consultou, mesmo sem nó; 2 na entrada quebrada. No servidor MCP, a mesma consulta é a ferramenta
+`kg_query`, sobre o armazém: a página para no teto de bytes do servidor (com ao menos um nó), e o `next_cursor`
+continua de onde ela parou. Cada chamada relê e reparseia o armazém da área, e num armazém de dezenas de MB a
+primeira leva dezenas de segundos; o cache do julgamento é da 4.19.
+
+## `kg_diff.py`: o diff por id entre revisões
+
+Compara dois grafos, ou todos os grafos que mudaram entre duas revisões do git, alinhando os nós pelo id e as arestas
+pelas pontas e o tipo: o que só existe de um lado foi acrescentado ou removido, e o que existe nos dois sai com cada
+campo que mudou, antes e depois. A ordem dos nós no arquivo não conta; uma troca de id é remoção mais acréscimo; uma
+lista dentro do nó é comparada inteira; a aresta que troca de tipo com as mesmas pontas sai como mudança de
+`edge_type`. A revisão é lida pelo `git show`, sem checkout. Não é patch: o diff informa, não se aplica.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_diff.py edital.kg.yaml errata.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_diff.py HEAD~1:docs/x.kg.yaml HEAD:docs/x.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_diff.py --from origin/main --ignore verified_at      # tudo o que mudou na branch
+```
+
+Saída real, entre dois casos da suíte:
+
+```text
+valid-node-touched-only-as-target.kg.yaml (modificado)
+  ~ meta.id: valid-chain → valid-node-touched-only-as-target
+  + C_ALVO  Nó sintético C_ALVO.
+  - C_B  Nó sintético C_B.
+  + aresta EV_A -SUPPORTS-> C_ALVO
+  - aresta C_B -SUPPORTS-> EV_A
+· 1 grafo(s): 1 modificado(s), 0 acrescentado(s), 0 removido(s), 0 não lido(s); nós +1 -1 ~0; arestas +1 -1 ~0
+```
+
+O meta sai junto com as outras chaves da raiz, os valores se comparam na forma JSON do contrato, um arquivo renomeado
+sai como remoção mais acréscimo, e sem `--to` entram também os grafos novos ainda não adicionados ao git. O lado que
+não se lê (não é UTF-8, ou não parseia) sai em `unreadable` e conta como diferença; a revisão que começa com `-` é
+entrada quebrada. Num argumento, o caminho que existe no disco vence a leitura `REV:CAMINHO`.
+
+`--ignore CAMPO` (repetível) tira um campo da comparação, com o que fica abaixo dele (`provenance` tira os três; no meta,
+`meta.date`): o `verified_at` que um gerador recarimba a cada processamento esconde o sinal, e o resumo conta os nós
+por campo mudado para mostrar isso. `--format json` dá o `kg-ssot.diff/1` (`spec/diff.schema.json`). rc 0 sem
+diferença, 1 com diferença, 2 na entrada quebrada.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 

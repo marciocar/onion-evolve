@@ -4,7 +4,7 @@
   "display_name": "KG-SSOT — grafo de conhecimento verificável",
   "version": "@VERSION@",
   "description": "Julga e grava grafos de conhecimento .kg.yaml e .kg.json pelo contrato do KG-SSOT: toda afirmação diz de onde veio e quando foi conferida.",
-  "long_description": "O servidor MCP de referência do KG-SSOT dá a um modelo o contrato formal do grafo de conhecimento verificável e um armazém que só grava o que passa nele.\n\n- **kg_validate** julga um texto .kg.yaml ou .kg.json e devolve o veredito estruturado, com código, caminho, linha, mensagem e dica de correção.\n- **kg_write** grava no armazém só o que passa no contrato; **kg_get**, **kg_list**, **kg_history** e **kg_delete** completam o armazém.\n- **kg_schema_help** devolve o contrato vigente, um exemplo mínimo e as correções mais comuns.\n\nO armazém fica no diretório que você escolher, no seu computador. O servidor roda localmente, por stdio, e não fala com nenhum serviço externo. Manual: https://github.com/marciocar/kg-ssot/tree/main/docs/manual",
+  "long_description": "O servidor MCP de referência do KG-SSOT dá a um modelo o contrato formal do grafo de conhecimento verificável e um armazém que só grava o que passa nele.\n\n- **kg_validate** julga um texto .kg.yaml ou .kg.json e devolve o veredito estruturado, com código, caminho, linha, mensagem e dica de correção.\n- **kg_write** grava no armazém só o que passa no contrato; **kg_get**, **kg_list**, **kg_query**, **kg_history** e **kg_delete** completam o armazém; **kg_query** consulta os grafos com as arestas resolvidas para o label.\n- **kg_schema_help** devolve o contrato vigente, um exemplo mínimo e as correções mais comuns.\n\nO armazém fica no diretório que você escolher, no seu computador. O servidor roda localmente, por stdio, e não fala com nenhum serviço externo. Manual: https://github.com/marciocar/kg-ssot/tree/main/docs/manual",
   "author": {
     "name": "Marcio Carvalho"
   },
@@ -29,6 +29,7 @@
     {"name": "kg_write", "description": "Grava um grafo no armazém, só se ele passar no contrato."},
     {"name": "kg_get", "description": "Lê um grafo do armazém."},
     {"name": "kg_list", "description": "Lista os grafos do armazém."},
+    {"name": "kg_query", "description": "Consulta os grafos do armazém: filtros, fila dos abertos e vizinhança, com as arestas resolvidas para o label."},
     {"name": "kg_history", "description": "Mostra o histórico de gravações de um grafo."},
     {"name": "kg_delete", "description": "Remove um grafo, só se nenhum outro deixar de passar por isso."},
     {"name": "kg_schema_help", "description": "Devolve o contrato vigente, um exemplo mínimo e as correções mais comuns."}

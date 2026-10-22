@@ -57,14 +57,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -303,6 +303,19 @@ já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git ad
 (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
 pode ficar.
 
+Da `kg-ssot-v4.16.1` para a `kg-ssot-v4.17.0`, o contrato não muda (segue o v4.10, com a mesma identidade). Entram
+duas ferramentas de leitura, que não julgam nem gravam:
+- **`kg_query.py`, a consulta e a projeção.** Seleciona nós num corpus inteiro (id, prefixo, tipo, status, plano,
+  camada, palavras do label, a fila dos abertos, os sem carimbo ou conferidos antes de uma data, a vizinhança de um
+  nó) e projeta cada aresta com o label da outra ponta, local ou externa, paginado, no formato `kg-ssot.query/1`. No
+  servidor MCP, é a ferramenta `kg_query`, sobre a área do armazém; no perfil atrás de proxy, só a área da identidade.
+- **`kg_diff.py`, o diff por id.** Compara dois grafos, ou tudo o que mudou entre duas revisões do git, nó a nó e campo
+  a campo, no formato `kg-ssot.diff/1`; `--ignore` tira da comparação o campo que um gerador recarimba.
+- **A suíte ganha 2 casos** (356), dois achados da revisão do v4.10 que só tinham teste de unidade: duas chaves
+  repetidas na ordem do documento, e a quebra escapada num mapa de fluxo na raiz. Nenhum veredito da referência muda,
+  e o gate não muda de identidade. Na 4.16.1, o README e o `llms-full.txt` ainda diziam 349 casos em dois lugares; a
+  4.17.0 corrige.
+
 Da `kg-ssot-v4.16.0` para a `kg-ssot-v4.16.1`, entra o contrato v4.10: três pontos do perfil YAML em que o leitor de
 referência e o leitor JS divergiam, achados por fuzz e resolvidos pela especificação do YAML. Nenhum dos grafos reais
 medidos tem os casos, e nenhum veredito do leitor de referência muda.
@@ -414,7 +427,7 @@ leitor JS) e o migrador por perfil.
 - **A suíte ganha 16 casos** (328).
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
   `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --dest
+  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --dest
   vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
   update de sempre funciona.
 
@@ -539,7 +552,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.16.1 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.0 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a

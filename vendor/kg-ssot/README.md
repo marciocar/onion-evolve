@@ -6,8 +6,8 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.16.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.16.1-6f42c1)](spec/release.json)
-[![Suíte: 354/354](https://img.shields.io/badge/su%C3%ADte-354%2F354-2ea44f)](spec/conformance/README.md)
+[![Contrato: v4 · release 4.17.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.17.0-6f42c1)](spec/release.json)
+[![Suíte: 356/356](https://img.shields.io/badge/su%C3%ADte-356%2F356-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 
 [Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
@@ -48,7 +48,7 @@ python3 -m venv .venv && .venv/bin/pip install --require-hashes -r tools/require
 ```
 
 ```text
-latest: 354/354 (reprova)
+latest: 356/356 (reprova)
 optional: 10/24 (só reporta)
 PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
 REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
@@ -57,7 +57,7 @@ REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.
 ```
 
 Para usar como comando, biblioteca ou servidor MCP, o mesmo kit sai no PyPI: `pip install kg-ssot` traz os comandos
-`kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
+`kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro
 do pacote. Em JavaScript, `npm install kg-ssot` traz o leitor JS, com o validador pré-compilado que roda também
 no React Native e no Expo. Para um cliente de MCP como o Claude Desktop, o servidor sai também como MCP Bundle
 (`.mcpb`), e para rodar como serviço ao lado de um cliente sem Python, como o LibreChat, há a imagem OCI
@@ -91,7 +91,7 @@ O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `med
 flowchart LR
   subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
     C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
-    S["Suíte de conformidade<br/>349 casos em dados puros"]
+    S["Suíte de conformidade<br/>356 casos em dados puros"]
     R["Leitor de referência<br/>kg_validate.py"]
     S -- "todo leitor passa" --> R
     C --> R
@@ -127,8 +127,9 @@ flowchart LR
 | **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
 | **Dois formatos, um modelo** | O `.kg.yaml` para escrever e revisar no diff, e o `.kg.json` para o runtime (um app, um servidor), lido por um parser JSON no perfil JSON do contrato (RFC 8259, I-JSON, até 128 níveis, chave única). O gate e as `external_edges` seguem só com `.kg.yaml` |
 | **Armazém com gate** | `kg_store.py` grava `.kg.yaml` ou `.kg.json` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
-| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
-| **Suíte em dados puros** | 349 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
+| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, consultar, histórico e o resumo do contrato, com a biblioteca padrão no protocolo e o leitor (PyYAML e jsonschema) na validação; sem autenticação nem TLS, só para uso local |
+| **Consulta e diff** | `kg_query.py` seleciona nós num corpus inteiro e projeta cada aresta com o label da outra ponta, local ou externa, paginado (`kg-ssot.query/1`); `kg_diff.py` compara revisões pelo id, campo a campo, lendo o git sem checkout (`kg-ssot.diff/1`) |
+| **Suíte em dados puros** | 356 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
 | **Migrador por perfil** | `kg_migrate.py` propõe a `provenance` que o contrato pede por regras que o adotante declara, mostra o plano antes e grava com invariância nó a nó |
@@ -146,7 +147,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.16.1`. O leitor de referência passa em 354 de 354 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.17.0`. O leitor de referência passa em 356 de 356 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre. O relógio zera a cada release com MUST novo (a última

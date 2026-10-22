@@ -122,6 +122,22 @@
       "description": "o BOM no começo do stream não conta como coluna: o documento inteiro indentado depois dele é válido",
       "valid": true,
       "codes": []
+    },
+    {
+      "file": "bad-two-duplicate-keys-document-order.yaml",
+      "description": "duas chaves repetidas, a primeira dentro de um mapa de fluxo antes de uma âncora repetida: vale a primeira na ordem do documento (achado da revisão do v4.10)",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "bad-escaped-break-flow-map-duplicate-key.yaml",
+      "description": "a quebra escapada seguida de linha vazia num mapa de fluxo na raiz, com a continuação na coluna 0, também vale \\n: a chave repete \"a\\nb\" (achado da revisão do v4.10; o leitor JS lia \"a b\" em silêncio)",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
     }
   ]
 }

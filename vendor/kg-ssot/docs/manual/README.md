@@ -14,7 +14,7 @@ Release descrita aqui: **4.10.0** (tag `kg-ssot-v4.10.0`). O contrato vigente de
 | 2 | [Conceitos](02-conceitos.md) | Grafo, nó, tipos, status, planos, arestas, proveniência, carimbo de verificação |
 | 3 | [Referência do formato](03-formato.md) | Todos os campos do `.kg.yaml`, tirados do schema |
 | 4 | [O contrato](04-contrato.md) | MUST × SHOULD, códigos de erro, versões e tags |
-| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_prov_export`, `kg_migrate`, com saídas reais |
+| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_query`, `kg_diff`, `kg_prov_export`, `kg_migrate`, com saídas reais |
 | 6 | [Adoção e CI](06-adocao-e-ci.md) | O caminho curto para levar o contrato a um repositório |
 | 7 | [Conformidade e leitores](07-conformidade-e-leitores.md) | A suíte de casos e como escrever um leitor próprio |
 | 8 | [Receitas](08-receitas.md) | Tarefas comuns, passo a passo |
