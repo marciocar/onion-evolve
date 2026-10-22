@@ -33,6 +33,9 @@
 #     aperto de mão pelo socket e liga o runner no bridge pelo drop-in 40-chat-runner.conf. O estado do bridge
 #     (/var/lib/onion-bridge: workspaces e repos de org) é escrito pelo SERVIÇO; pela sessão, só o wrapper (as HOMEs do
 #     CLI, a sonda e as ACLs) — o resto é do maestro.
+#   · os WORKSPACES do /chat (2026-10-22, D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022) se atualizam por
+#     workspace-adopt-sync.sh: stage para um staging da sessão, o /meta:adopt --update roda no staging, e o apply
+#     confere o manifesto do vivo, faz backup e devolve como o dono do serviço, sem tocar nos .env.
 #   · a CERCA DE REDE do runner (opção A do degrau 3, 2026-10-16): o drop-in onion-chat@.service.d/60-egress-fence.conf
 #     nasce só pelo chat-runner.sh (install --egress-fence), renderizado do modelo do bridge servido com os endereços do
 #     host medidos na instalação; um drop-in nesse diretório mudaria toda instância do runner sem passar pela allowlist.
@@ -69,6 +72,7 @@ deploy	path	/etc/onion-stt	ops/stt-service.sh
 deploy	path	/var/backups/onion-stt	ops/stt-service.sh
 deploy	path	/var/lib/onion-bridge	-
 deploy	path	/var/lib/onion-bridge/chat-homes	ops/chat-runner.sh
+deploy	path	/var/lib/onion-bridge/workspaces	ops/workspace-adopt-sync.sh
 deploy	path	/home/onion	ops/update-bridge.sh
 deploy	path	/home/onion/onion-bridge/data/a2a-invites.json	ops/a2a-invite-live.sh
 deploy	path	/home/onion/onion-bridge/data/a2a-pending	ops/a2a-queue-live.sh
