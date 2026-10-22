@@ -539,7 +539,7 @@ nodes:
     confidence: 0.85
     verified_at: "2026-10-22"
     verified_against: "curl no 127.0.0.1:3012 com o secret do m-default lido do banco (nunca impresso): sem cabeçalho 400 invalid client; Host console + X-Forwarded-Proto http 400; + https 200. Caddy descartável em 127.0.0.1:3014 com o bloco versionado: sem X-Forwarded-Host issuer auth e token 400; com ele issuer console e token 200"
-    label: "O /admin/identities do bridge dava 502 porque o token M2M do tenant admin era pedido em console.onionevolve.com, vhost desligado desde 2026-09-06. O Logto escolhe o tenant por Host, X-Forwarded-Host e X-Forwarded-Proto; a cura escolhida pelo maestro é uma escuta só local no Caddy (127.0.0.1:3013) que põe os três cabeçalhos"
+    label: "O token M2M do bridge sai por uma escuta só local no Caddy (127.0.0.1:3013) que põe Host, X-Forwarded-Host e X-Forwarded-Proto do tenant admin; o console público está desligado desde 2026-09-06"
     narrative: "Decidido pelo maestro em 2026-10-22 entre escuta local no Caddy, mudança no código do bridge e religar o console público. Fecha o ciclo quando a origem do token do bridge apontar para http://127.0.0.1:3013, o serviço religar e a tela de identidades do admin listar sem 502."
     provenance:
       source: "medição ao vivo na VPS em 2026-10-22, ops/caddy/conf.d/logto-admin-local.caddy"

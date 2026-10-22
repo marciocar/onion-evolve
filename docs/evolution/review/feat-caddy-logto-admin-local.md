@@ -2,8 +2,7 @@
 branch: feat/caddy-logto-admin-local
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: cf2dd84829cb28c1ed5f3d1534712bae80d411ff5ce0c2c6d22d02860cfc58ea
-reviewed_code_sha256: 27937f43b3950d63b2729bed5da852f501541aef960ddef6832611c508d4dda3
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 tokens: 0
