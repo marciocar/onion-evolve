@@ -696,11 +696,45 @@ nodes:
       method: "medição: inventário de versões na VPS e varredura dos repos, cruzados com as notas oficiais de versão"
       locality: "host"
 
+  - id: E_WAHA_FIXADA_2026_9_2_1022
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-22"
+    verified_against: "docker image inspect: o vivo roda o digest 65e593e3, igual a devlikeapro/waha:latest-2026.7.2 no Docker Hub, com revisão 79233e09 (tag 2026.7.2 no GitHub). Última release: 2026.9.2 de 2026-10-02 (gh api repos/devlikeapro/waha/releases), digest 280bdc8f…5e3b. Changelog de 2026.8.1 a 2026.9.2 lido: sem quebra para NOWEB, API local e rota pelo Caddy. docker compose config resolve a imagem fixada"
+    label: "O WAHA passa da tag flutuante latest (rodando a 2026.7.2) para latest-2026.9.2 fixada por tag e digest, no compose do repo onion-waha (PR #1 de lá); o deploy é do maestro"
+    narrative: "Executa D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022 (decisão do maestro, 2026-10-22). O PR do onion-waha também registra três mudanças que rodavam no vivo desde 2026-08-10 sem commit (nome do projeto, container_name onion-vps-waha, chave da API em sha512)."
+    provenance:
+      source: "https://github.com/devlikeapro/waha/releases/tag/2026.9.2"
+      locator: "releases 2026.8.1 a 2026.9.2; Docker Hub devlikeapro/waha tags latest-2026.7.2 e latest-2026.9.2; PR marciocar/onion-waha#1"
+      method: "medição: digest do container vivo contra as tags publicadas e leitura do changelog"
+      locality: "web"
+
+  - id: Q_WAHA_REVISAO_MENSAL_DA_VERSAO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "Revisão periódica do WAHA (mensal; a próxima em 2026-11-22): há release mais nova que a fixada (2026.9.2)? Se houver, ler o changelog, trocar tag e digest juntos no compose do onion-waha e reabrir esta pergunta com a data seguinte"
+    narrative: "Mecanismo: pergunta open, projetada no docs/backlog.md pelo /meta:backlog, porque o radar só lê review_after do meta do grafo inteiro, não por nó (medido em kg-radar.sh). Fonte para conferir: gh api repos/devlikeapro/waha/releases e as tags latest-<versão> do Docker Hub."
+
 edges:
   - from: E_SEC_SCAN_PHP_DOCKER_SEMANA_1022
     to: D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022
     edge_type: SUPPORTS
   - from: E_SEC_SCAN_PHP_DOCKER_SEMANA_1022
+    to: D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022
+    edge_type: SUPPORTS
+  - from: E_WAHA_FIXADA_2026_9_2_1022
+    to: E_waha_public_route_caddy
+    edge_type: TRACES_TO
+  - from: Q_WAHA_REVISAO_MENSAL_DA_VERSAO
+    to: E_WAHA_FIXADA_2026_9_2_1022
+    edge_type: DEPENDS_ON
+  - from: E_WAHA_FIXADA_2026_9_2_1022
     to: D_WAHA_ULTIMA_VERSAO_COM_REVISAO_PERIODICA_1022
     edge_type: SUPPORTS
   - from: E_WORKSPACE_ADMIN_ONION_ATUALIZADO_1022
