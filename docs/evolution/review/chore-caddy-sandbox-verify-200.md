@@ -2,7 +2,8 @@
 branch: chore/caddy-sandbox-verify-200
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5ffcc8f20cb423dc177ff30a786682fafdb6a1bd4248cf2e5f5ed25a8eb92d23
+reviewed_code_sha256: bfd481d43b89eb46af84a478bf0053aa6e02d649b44faf4e19d233861e743643
 findings_total: 2
 findings_real: 2
 tokens: 0
