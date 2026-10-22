@@ -33,6 +33,10 @@
 #     aperto de mão pelo socket e liga o runner no bridge pelo drop-in 40-chat-runner.conf. O estado do bridge
 #     (/var/lib/onion-bridge: workspaces e repos de org) é escrito pelo SERVIÇO; pela sessão, só o wrapper (as HOMEs do
 #     CLI, a sonda e as ACLs) — o resto é do maestro.
+#   · o ENGINE do Docker (2026-10-22, D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022) troca de pacote só por
+#     docker-engine-migrate.sh: plan (inventário só leitura), apply (chave com fingerprint, fonte deb822, versões fixas
+#     numa transação, hold, contenção DOCKER-USER reaplicada) e verify contra o plan. Units docker/containerd e a
+#     onion-vps-docker-firewall, mais /etc/docker e a fonte e a chave do apt, são escritos só por ele.
 #   · os WORKSPACES do /chat (2026-10-22, D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022) se atualizam por
 #     workspace-adopt-sync.sh: stage para um staging da sessão, o /meta:adopt --update roda no staging, e o apply
 #     confere o manifesto do vivo, faz backup e devolve como o dono do serviço, sem tocar nos .env.
@@ -49,6 +53,9 @@
 deploy	unit	onion-vps-bridge	ops/update-bridge.sh
 deploy	unit	onion-vps-mcp-kg-writer	ops/update-kg-writer.sh
 deploy	unit	caddy	ops/install-caddy-config.sh
+deploy	unit	docker	ops/docker-engine-migrate.sh
+deploy	unit	containerd	ops/docker-engine-migrate.sh
+deploy	unit	onion-vps-docker-firewall	ops/docker-engine-migrate.sh
 deploy	unit	onion-vps-*	-
 deploy	unit	onion-adopt-*	-
 deploy	unit	onion-chat.socket	ops/chat-runner.sh
@@ -56,6 +63,10 @@ deploy	unit	onion-chat@*	ops/chat-runner.sh
 deploy	unit	onion-vps-stt	ops/stt-service.sh
 deploy	path	/var/www/onion-landing	ops/deploy-site.sh
 deploy	path	/var/www	-
+deploy	path	/etc/docker	ops/docker-engine-migrate.sh
+deploy	path	/etc/apt/sources.list.d/docker.sources	ops/docker-engine-migrate.sh
+deploy	path	/etc/apt/keyrings/docker.asc	ops/docker-engine-migrate.sh
+deploy	path	/var/backups/onion-docker-migrate	ops/docker-engine-migrate.sh
 deploy	path	/etc/caddy	ops/install-caddy-config.sh
 deploy	path	/etc/systemd	-
 deploy	path	/etc/systemd/system/onion-vps-bridge.service.d/30-integrity.conf	ops/bridge-hardening.sh
