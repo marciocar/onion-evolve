@@ -516,7 +516,25 @@ nodes:
     label: "A origem sandbox.onionevolve.com do piloto ui:// está versionada (ops/caddy/conf.d/sandbox.caddy, frame-src no CSP do app) e o ops/update-bridge.sh publica o sandbox.html do bridge servido; falta instalar no vivo e medir o CSP num navegador"
     narrative: "Fecha quando: o install-caddy-config.sh roda no vivo com o verify do 404, o update-bridge publica o sandbox.html depois do merge do onion-bridge#83, e o dogfood do passo 4 do deploy/sandbox/README.md do bridge confirma no navegador que o default-src 'none' não barra o srcdoc interno. O verify do 200 entra no vhost só depois da 1ª publicação."
 
+  - id: E_UI_SANDBOX_ORIGIN_LIVE_1022
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "curl -sI https://sandbox.onionevolve.com/sandbox.html = HTTP/2 200 com o CSP do vhost e nosniff; sha256 da página servida igual ao de onion-bridge@63542508:deploy/sandbox/sandbox.html (bd412290…); bridge servido 63542508 (onion-bridge#83 e #84 mergeados pelo maestro); CLI embutido do SDK 0.3.308 = 2.1.308"
+    label: "A sandbox do piloto ui:// está no ar: o update-bridge publicou o sandbox.html (2980 bytes, root:root 0644) e a origem responde 200 com o CSP; o vhost passa a cobrar o 200 no verify. Falta só o teste no navegador"
+    provenance:
+      source: "saída do ops/update-bridge.sh de 2026-10-22 12:2x UTC (invocação 8e630b44) e curl ao vivo"
+      locator: "linhas '[update-bridge] sandbox: ... publicado' e 'OK — clone 7fc418ed · bridge 63542508'"
+      method: "medição: curl -sI e sha256sum da página servida contra o arquivo do bridge servido; claude --version do binário do SDK"
+      locality: "host"
+
 edges:
+  - from: E_UI_SANDBOX_ORIGIN_LIVE_1022
+    to: C_UI_SANDBOX_ORIGIN_VERSIONED_NOT_LIVE_1022
+    edge_type: SUPPORTS
   # o LibreChat entra como CONSUMIDOR do catalogo (Logto/Caddy), sob o framing decidido
   - from: E_librechat_install_started
     to: D_framing_catalogo
