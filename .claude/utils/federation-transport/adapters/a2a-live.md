@@ -87,7 +87,7 @@ Até 2026-10-14 a assinatura cobria **só os claims**: trocar `signal.body` depo
 - **Onde o trust-log mora** (2026-10-22): `A2A_TRUST_LOG=<arquivo absoluto>` tira a trilha do `--repo`. O bridge
   a aponta para o `data/` dele, porque o `--repo` dele é o clone servido do core e o arquivo rastreado de lá ia
   parar num stash a cada update (7 stashes, 16 eventos medidos). Sem a env, o log segue em
-  `docs/evolution/trust-log.md`. Destino inseguro (relativo, diretório ausente, symlink, de outro dono, gravável
+  `docs/evolution/trust-log.md`. Destino inseguro (relativo, diretório ausente, symlink em qualquer componente, de outro dono, ancestral aberto, hardlink, gravável
   ou legível por outros) veta `trust-log-unsafe:<motivo>` antes de qualquer camada; o juiz é o
   `trust-topology-check.sh --check-log-dest`, e o arquivo nasce 0600.
 - **O relógio:** a medição vence o atestado. `A2A_CLOCK_TRUST=attested` vale só onde nenhuma fonte mediu

@@ -13517,6 +13517,16 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
       symlink) : > "${_TLD}/real.md"; chmod 600 "${_TLD}/real.md"; ln -s "${_TLD}/real.md" "${f}" ;;
       file-mode-unsafe) : > "${f}"; chmod 644 "${f}" ;;
       dir-writable-by-others) chmod 777 "${_TLD}" ;;
+      # 2ª forma (refutador de 2026-10-22): cada motivo do juiz tem caso, e o mutante que apaga a linha dele reprova
+      control-char) f="${_TLD}/a"$'\n'"b.md" ;;
+      not-normalized) f="${_TLD}//a2a-trust-log.md" ;;
+      dir-symlink) mkdir "${_TLD}/d"; ln -s "${_TLD}/d" "${_TLD}/dl"; f="${_TLD}/dl/a2a-trust-log.md" ;;
+      dir-path-has-symlink) mkdir -p "${_TLD}/d/sub"; ln -s "${_TLD}/d" "${_TLD}/dl"; f="${_TLD}/dl/sub/a2a-trust-log.md" ;;
+      dir-not-owned) f="/a2a-trust-log.md" ;;
+      ancestor-writable-by-others) mkdir -p "${_TLD}/open/mine"; chmod 777 "${_TLD}/open"; chmod 700 "${_TLD}/open/mine"; f="${_TLD}/open/mine/a2a-trust-log.md" ;;
+      not-regular) mkdir "${f}" ;;
+      hardlinked) : > "${_TLD}/real.md"; chmod 600 "${_TLD}/real.md"; ln "${_TLD}/real.md" "${f}" ;;
+      not-writable) : > "${f}"; chmod 400 "${f}" ;;
     esac
     _tl_run "$1" "${f}" "$(_tl_ok_env jti-tlx)"
     [ "${rc}" -eq 1 ] && grep -q "\"reason\":\"trust-log-unsafe:${want}\",\"layer_failed\":\"trust-log\"" <<< "${out}" \
@@ -13540,7 +13550,15 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   _tl_case "com a env, o sucesso grava UMA linha no destino (0600, com cabeçalho) e NENHUMA no trust-log do repo" _tlc_dest
   _tl_case "com a env, o veto rotulado vai ao destino (criado pelo --ensure-log, 0600), nada no repo" _tlc_veto
   _tl_case "sem a env, o comportamento antigo: a linha no trust-log do repo, o destino intocado" _tlc_unset
-  local _tlk; for _tlk in relative dir-missing symlink file-mode-unsafe dir-writable-by-others; do
+  # (w) sem a env, trust-log do repo não gravável → o relay AUTORIZADO sai exit 2 (configuração), nunca o 1 de bloqueado
+  _tlc_tc_write() { _tl_fresh; chmod 400 "${_TLS}/docs/evolution/trust-log.md"
+    rc=0; (env -u A2A_TRUST_LOG bash "$1/.claude/validation/trust-topology-check.sh" --from onion-evolve --to acme --action relay --repo "${_TLS}" >/dev/null 2>&1) || rc=$?
+    [ "${rc}" -eq 2 ]; }
+  # como root, dono e permissão não separam nada (o root lê e grava tudo): esses casos não têm SUT
+  local _tl_root_skip=""; [ "$(id -u)" != "0" ] || _tl_root_skip=1
+  local _tlk; for _tlk in relative dir-missing symlink file-mode-unsafe dir-writable-by-others \
+      control-char not-normalized dir-symlink dir-path-has-symlink dir-not-owned ancestor-writable-by-others not-regular hardlinked not-writable; do
+    case "${_tlk}" in dir-not-owned|not-writable) [ -z "${_tl_root_skip}" ] || { record_skip "a2a-verify: (A2A_TRUST_LOG) ${_tlk} → como root não há SUT"; continue; } ;; esac
     _tl_case "destino ${_tlk} → veto trust-log-unsafe:${_tlk}, nada gravado" _tlc_unsafe "${_tlk}"
   done
   _tl_case "trust-check sozinho com destino symlink → exit 2, nada gravado pelo link" _tlc_tc
@@ -13566,6 +13584,17 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
     '/echo "dir-writable-by-others"; return 1; fi$/c\  true # MUTANTE' _tlc_unsafe dir-writable-by-others
   _tl_mut "o trust-check sozinho não sai no destino inseguro → grava pelo symlink" t \
     '/A2A_TRUST_LOG inseguro/{n;s/^    exit 2$/    true # MUTANTE/;}' _tlc_tc
+  for _tlk in control-char not-normalized dir-symlink dir-path-has-symlink dir-not-owned ancestor-writable-by-others not-regular hardlinked not-writable; do
+    case "${_tlk}" in dir-not-owned|not-writable) [ -z "${_tl_root_skip}" ] || continue ;; esac
+    _tl_mut "sem a linha '${_tlk}' no juiz → o motivo deixa de ser '${_tlk}'" t \
+      "/echo \"${_tlk}\"; return 1/c\\    true # MUTANTE" _tlc_unsafe "${_tlk}"
+  done
+  if [ -z "${_tl_root_skip}" ]; then
+    _tl_case "sem a env, trust-log do repo não gravável → o relay autorizado sai exit 2, não o 1 de bloqueado" _tlc_tc_write
+    _tl_mut "a gravação sem o if → o relay autorizado volta a sair 1 (bloqueado)" t \
+      's@^  if ! echo "| \${TIMESTAMP} | \${FROM_ID} | \${TO_ID} | \${ACTION} | \${STATUS} | \${REASON} |" >> "\$TRUST_LOG"; then$@  echo "| ${TIMESTAMP} | ${FROM_ID} | ${TO_ID} | ${ACTION} | ${STATUS} | ${REASON} |" >> "$TRUST_LOG"; if false; then # MUTANTE@' _tlc_tc_write
+  else record_skip "a2a-verify: (A2A_TRUST_LOG) trust-log não gravável → como root não há SUT"; fi
+  chmod -R u+rwx "${_TLR[@]}" 2>/dev/null
   rm -rf "${_TLR[@]}"
   # chronyc: leap pendente é sincronizado; "Not synchronised" vence o atestado (paridade com o doctor)
   local chb; chb="$(mktemp -d)"

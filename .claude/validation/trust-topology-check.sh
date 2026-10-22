@@ -12,9 +12,10 @@
 # em <repo>/docs/evolution/trust-log.md (o comportamento de sempre). Medido em 2026-10-22: o onion-bridge roda
 # o gate dentro do CLONE SERVIDO do core, e a trilha de auditoria caía num arquivo RASTREADO desse clone, que
 # cada update-bridge guardava num stash (7 stashes, 16 eventos que nunca chegaram ao repo). O destino é julgado
-# FAIL-CLOSED: caminho relativo ou não normalizado, diretório ausente, symlink (no arquivo ou no diretório),
-# dono diferente de quem roda, diretório gravável por grupo/outros, ou arquivo com escrita de grupo ou qualquer
-# bit de outros → recusa (exit 2 no relay; rc 1 no --check-log-dest), sem gravar no lugar errado em silêncio.
+# FAIL-CLOSED: caminho relativo, não normalizado ou com caractere de controle; diretório ausente, symlink em
+# qualquer componente, dono diferente de quem roda, diretório gravável por grupo/outros, ancestral de outro dono
+# (que não o root) ou gravável por outros sem sticky; arquivo com escrita de grupo ou qualquer bit de outros,
+# não gravável ou com mais de um link → recusa (exit 2 no relay; rc 1 no --check-log-dest), sem gravar no lugar errado em silêncio.
 # A2A_TRUST_LOG vazia vale como ausente (o idioma ${X:-} dos outros env do transporte).
 #
 # Exit:
@@ -55,29 +56,44 @@ done
 
 # --- Destino do log: julgamento fail-closed de A2A_TRUST_LOG (ver cabeçalho) ---
 TRUST_LOG_DEST="${A2A_TRUST_LOG:-}"
-_mode_uid() {  # <path> → "<modo octal> <uid>" (GNU stat; o -f é o do BSD/macOS)
-  stat -c '%a %u' -- "$1" 2>/dev/null || stat -f '%Lp %u' -- "$1" 2>/dev/null
+_mode_uid() {  # <path> → "<modo octal> <uid> <nlink>" (GNU stat; o -f é o do BSD/macOS)
+  stat -c '%a %u %h' -- "$1" 2>/dev/null || stat -f '%Lp %u %l' -- "$1" 2>/dev/null
 }
-# imprime o motivo e devolve 1 quando o destino é inseguro; 0 quando serve
+# imprime o motivo e devolve 1 quando o destino é inseguro; 0 quando serve. Ordem: forma do texto → o diretório
+# (literal, físico, do dono, fechado) → os ancestrais (do dono ou do root, sem escrita alheia salvo sticky) → o
+# arquivo, se existir (regular, do dono, sem bit de outros, gravável, um link só). Refutador de 2026-10-22: o
+# symlink num componente do MEIO e o ancestral 777 passavam (o -L só olhava as duas pontas).
 trust_log_dest_problem() {
-  local p="$1" d m u me
+  local p="$1" d a m u n me
   case "$p" in /*) ;; *) echo "relative"; return 1 ;; esac
+  case "$p" in *[[:cntrl:]]*) echo "control-char"; return 1 ;; esac
   case "$p/" in */../*|*/./*|*//*) echo "not-normalized"; return 1 ;; esac
   d="$(dirname "$p")"
   if [ -L "$p" ]; then echo "symlink"; return 1; fi
   if [ -L "$d" ]; then echo "dir-symlink"; return 1; fi
   if [ ! -d "$d" ]; then echo "dir-missing"; return 1; fi
+  if [ "$(cd -P -- "$d" 2>/dev/null && pwd -P)" != "$d" ]; then echo "dir-path-has-symlink"; return 1; fi
   me="$(id -u)"
-  read -r m u <<<"$(_mode_uid "$d")" || true
+  read -r m u n <<<"$(_mode_uid "$d")" || true
   case "${m:-}" in ''|*[!0-7]*) echo "dir-unstattable"; return 1 ;; esac
   if [ "${u:-}" != "$me" ]; then echo "dir-not-owned"; return 1; fi
   if (( (8#$m & 8#022) != 0 )); then echo "dir-writable-by-others"; return 1; fi
+  a="$d"
+  while [ "$a" != "/" ]; do
+    a="$(dirname "$a")"
+    read -r m u n <<<"$(_mode_uid "$a")" || true
+    case "${m:-}" in ''|*[!0-7]*) echo "ancestor-unstattable"; return 1 ;; esac
+    if [ "${u:-}" != "$me" ] && [ "${u:-}" != "0" ]; then echo "ancestor-not-owned"; return 1; fi
+    if (( (8#$m & 8#022) != 0 && (8#$m & 8#1000) == 0 )); then echo "ancestor-writable-by-others"; return 1; fi
+  done
   if [ -e "$p" ]; then
     if [ ! -f "$p" ]; then echo "not-regular"; return 1; fi
-    read -r m u <<<"$(_mode_uid "$p")" || true
+    read -r m u n <<<"$(_mode_uid "$p")" || true
     case "${m:-}" in ''|*[!0-7]*) echo "unstattable"; return 1 ;; esac
     if [ "${u:-}" != "$me" ]; then echo "not-owned"; return 1; fi
     if (( (8#$m & 8#027) != 0 )); then echo "file-mode-unsafe"; return 1; fi
+    if [ "${n:-}" != "1" ]; then echo "hardlinked"; return 1; fi
+    if [ ! -w "$p" ]; then echo "not-writable"; return 1; fi
   fi
   return 0
 }
@@ -224,7 +240,12 @@ log_attempt() {
     [ -f "$TRUST_LOG" ] || write_log_header "$TRUST_LOG"
   fi
 
-  echo "| ${TIMESTAMP} | ${FROM_ID} | ${TO_ID} | ${ACTION} | ${STATUS} | ${REASON} |" >> "$TRUST_LOG"
+  # falha ao gravar é erro de CONFIGURAÇÃO (exit 2), nunca o 1 de "bloqueado" que o set -e daria a um relay
+  # AUTORIZADO (refutador de 2026-10-22: arquivo 0400 aceito pelo juiz saía rc 1)
+  if ! echo "| ${TIMESTAMP} | ${FROM_ID} | ${TO_ID} | ${ACTION} | ${STATUS} | ${REASON} |" >> "$TRUST_LOG"; then
+    echo "ERROR: não gravei a tentativa em ${TRUST_LOG}" >&2
+    exit 2
+  fi
 }
 
 # --- Lógica principal de autorização ---
