@@ -274,7 +274,8 @@ S
 
   # 2. plan só lê: nenhuma chamada de apt, systemctl ou mudança no docker
   : > "$SB/calls"; out="$(cmd_plan 2>&1)" || true
-  if ! grep -q -E '^(apt-get|apt-mark|systemctl|dpkg) ' "$SB/calls" && ! grep -q -E '^docker (rm|stop|start|restart|pull|run|system)' "$SB/calls"; then ok "plan não muda o sistema (só lê)"; else ko "plan chamou mutação: $(grep -E '^(apt|systemctl|docker (rm|stop|start))' "$SB/calls" | head -2 | tr '\n' ' ')"; fi
+  local mut='^(apt-get|apt-mark|dpkg |systemctl (start|stop|restart|reload|enable|disable|mask)|docker (rm|stop|start|restart|pull|run|system|kill|update))'
+  if ! grep -q -E "$mut" "$SB/calls"; then ok "plan não muda o sistema (só lê)"; else ko "plan chamou mutação: $(grep -E "$mut" "$SB/calls" | head -2 | tr '\n' ' ')"; fi
   if grep -q 'containers: 3 (rodando 2; healthy 1)' <<< "$out"; then ok "plan inventaria containers, rodando e healthy"; else ko "inventário do plan: $(grep containers: <<< "$out")"; fi
 
   # 3. versão alvo diferente da fixada recusa
