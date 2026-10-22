@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**616 itens abertos** em 120 grafo(s) com aberto (de 153 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**617 itens abertos** em 120 grafo(s) com aberto (de 153 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1140,6 +1140,13 @@
 |--:|---|---|---|
 | 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
 
+## sinais-de-campo-2026-09 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `Q_KG_MIGRATE_KEYS_NO_CORPUS_1022` | sinais-de-campo-2026-09 | Rodar o kg_migrate.py keys da 4.19.0 no corpus do core, renomeando para x_ as chaves estranhas que hoje reprovam no MUST? Decisão |
+| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
+
 ## task-progress-story-points-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1178,12 +1185,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.8 | `Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO` | inbox-triage-2026-10-04 | LACUNA que o proprio hub declarou: clickup_delete_task pelo MCP oficial nao foi medido (exige servidor MCP conectado). O transport |
-
-## sinais-de-campo-2026-09 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
 ## catraca-regra49-2026-08 — 1 item(ns)
 
