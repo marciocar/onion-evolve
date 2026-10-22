@@ -2,7 +2,8 @@
 branch: feat/update-bridge-restart
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9a9a8cffa921df23782d4775be962ab2eff8de24f2f398ec8b61b841e7a0102e
+reviewed_code_sha256: 8f2d86072d914f12496db683a8d54bdd341fa0357ecdd2147f3e9300a2f32a3f
 findings_total: 2
 findings_real: 2
 tokens: 0
