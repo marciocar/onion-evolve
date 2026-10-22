@@ -55,9 +55,10 @@ import urllib.parse
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_store, kg_validate
+    from . import kg_query, kg_store, kg_validate
 else:  # script ou vendor
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_query  # noqa: E402
     import kg_store  # noqa: E402
     import kg_validate  # noqa: E402
 
@@ -119,6 +120,40 @@ TOOLS = {
         "description": "Lista os nomes dos grafos do armazém.",
         "inputSchema": {"type": "object", "additionalProperties": False, "properties": {}},
         "needs_store": True, "writes": False},
+    "kg_query": {
+        "description": "Consulta os grafos do armazém sem julgar: filtra nós por id, prefixo, tipo, status, plano, "
+                       "camada, trecho do nome do grafo e palavras do label; open=true traz a fila dos abertos; around "
+                       "traz a vizinhança de um nó (nome#id, ou o id único) por profundidade, tipo de aresta e direção. "
+                       "Cada nó vem com as arestas de saída e de entrada e a outra ponta resolvida para o label (local "
+                       "ou externa, e se existe). Pagina por cursor: repita com o next_cursor até ele vir null.",
+        "inputSchema": {"type": "object", "additionalProperties": False,
+                        "properties": {
+                            "ids": {"type": "array", "items": {"type": "string", "maxLength": 200}, "maxItems": 200},
+                            "id_prefix": {"type": "string", "maxLength": 200},
+                            "node_type": {"type": "string", "maxLength": 64},
+                            "status": {"type": "string", "maxLength": 64},
+                            "plane": {"type": "string", "maxLength": 64},
+                            "layer": {"type": "string", "maxLength": 64},
+                            "graph": {"type": "string", "maxLength": 256,
+                                      "description": "só os grafos cujo nome contém este trecho"},
+                            "text": {"type": "string", "maxLength": 500,
+                                     "description": "palavras que o label contém, todas, sem distinguir maiúscula"},
+                            "in_narrative": {"type": "boolean"},
+                            "open": {"type": "boolean", "description": "a fila dos abertos (status open)"},
+                            "verified_before": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                                                "description": "sem verified_at, ou conferido antes da data"},
+                            "around": {"type": "string", "maxLength": 300},
+                            "depth": {"type": "integer", "minimum": 0, "maximum": 5},
+                            "edge_types": {"type": "array", "items": {"type": "string", "maxLength": 64}, "maxItems": 20},
+                            "direction": {"enum": ["out", "in", "both"]},
+                            "sort": {"enum": ["corpus", "impact"]},
+                            "limit": {"type": "integer", "minimum": 1, "maximum": 200,
+                                      "description": "nós por página (default 50)"},
+                            "cursor": {"type": "string", "maxLength": 12},
+                            "narrative": {"type": "boolean", "description": "inclui a narrative de cada nó"},
+                            "fields": {"type": "array", "items": {"type": "string", "maxLength": 64}, "maxItems": 20,
+                                       "description": "chaves do nó que saem em extra, em glob: x_*, owner"}}},
+        "needs_store": True, "writes": False},
     "kg_history": {
         "description": "As operações de um grafo no armazém, da mais nova para a mais antiga (ref, op, autor, data).",
         "inputSchema": {"type": "object", "additionalProperties": False, "required": ["name"],
@@ -135,7 +170,7 @@ TOOLS = {
 
 
 
-UNTRUSTED_TOOLS = ("kg_get", "kg_list", "kg_history")  # devolvem texto gravado por usuários: no perfil, envelopados
+UNTRUSTED_TOOLS = ("kg_get", "kg_list", "kg_history", "kg_query")  # devolvem texto gravado por usuários: no perfil, envelopados
 
 
 class ToolError(Exception):
@@ -513,6 +548,27 @@ class Server:
             return {"names": store.list()}, False
         if name == "kg_history":
             return {"name": args["name"], "history": store.history(args["name"])}, False
+        if name == "kg_query":
+            corpus = kg_query.Corpus()
+            for gname, text in store._texts():
+                corpus.add(gname, text)
+            before = args.get("verified_before")
+            day = kg_validate.iso_date(before) if before is not None else None
+            if before is not None and day is None:
+                raise ToolError(f"verified_before {before!r}: a data é AAAA-MM-DD")
+            try:
+                res = kg_query.query(corpus, ids=args.get("ids", ()), id_prefix=args.get("id_prefix"),
+                                     node_type=args.get("node_type"), status=args.get("status"), plane=args.get("plane"),
+                                     layer=args.get("layer"), file=args.get("graph"), text=args.get("text"),
+                                     in_narrative=args.get("in_narrative", False), open_only=args.get("open", False),
+                                     verified_before=day, around=args.get("around"), depth=args.get("depth", 1),
+                                     edge_types=args.get("edge_types", ()), direction=args.get("direction", "both"),
+                                     sort=args.get("sort", "corpus"), limit=args.get("limit", 50),
+                                     cursor=args.get("cursor"), narrative=args.get("narrative", False),
+                                     fields=args.get("fields", ()), max_bytes=self.max_bytes)
+            except ValueError as exc:
+                raise ToolError(str(exc)) from None
+            return res, False
         raise ToolError(f"ferramenta sem implementação: {name}")
 
 

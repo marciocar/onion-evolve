@@ -51,7 +51,9 @@ O rc é 0 quando todos passam no MUST e 1 quando algum reprova. Alguns modos út
 | `kg-conformance` | Roda a suíte de conformidade que vem no pacote contra o leitor de referência |
 | `kg-gate` | Gate por grafo para o CI: grava uma linha de base (`--update`) e reprova se algo piorar |
 | `kg-store` | Armazém em disco, git ou versionado, que só grava o que passa no contrato |
-| `kg-mcp` (e o atalho `kg-ssot`) | Servidor MCP de referência (stdio, ou `--http` em loopback), com as ferramentas `kg_validate`, `kg_write`, `kg_get`, `kg_list`, `kg_history`, `kg_delete` e `kg_schema_help` |
+| `kg-mcp` (e o atalho `kg-ssot`) | Servidor MCP de referência (stdio, ou `--http` em loopback), com as ferramentas `kg_validate`, `kg_write`, `kg_get`, `kg_list`, `kg_query`, `kg_history`, `kg_delete` e `kg_schema_help` |
+| `kg-query` | Consulta e projeção de um corpus de grafos, com as arestas resolvidas para o label |
+| `kg-diff` | Diff por id entre dois grafos ou entre revisões do git |
 | `kg-prov-export` | Exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD |
 
 Como biblioteca, os módulos ficam em `kg_ssot`: `kg_ssot.kg_validate`, `kg_ssot.kg_store`, `kg_ssot.kg_mcp` e os

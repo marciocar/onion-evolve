@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:query.schema.json",
+  "title": "Consulta e projeção de um corpus de grafos (kg-ssot.query/1)",
+  "description": "Saída de `kg_query.py --format json` e da ferramenta kg_query do servidor MCP. A consulta não julga: o veredito é do kg_validate.py, e o grafo que não parseia sai em `unreadable` com o código parse.*. Cada nó sai projetado: os campos do contrato que interessam a quem lê e as arestas de saída (`out`) e de entrada (`in`) com a outra ponta resolvida de id para label (o label da outra ponta sai cortado em 200 caracteres, com …; o do próprio nó sai inteiro). No servidor MCP a página também corta pelo tamanho (o --max-bytes do servidor), sempre com ao menos um nó, e o next_cursor segue de onde ela parou. Uma ponta pode ser externa (external_edges, `<caminho>#<id>`) e pode faltar no corpus (`found: false`, `label: null`); a origem ausente de uma aresta externa (o grafo inteiro) sai com o `file` do grafo e `id` nulo. `total` conta todos os nós que a consulta acha; `nodes` traz uma página, e `next_cursor` é o cursor da próxima, ou null na última. O cursor vale para a mesma consulta sobre o mesmo corpus. `query` ecoa o pedido normalizado.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "query",
+    "graphs",
+    "unreadable",
+    "total",
+    "next_cursor",
+    "nodes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.query/1"
+    },
+    "query": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ids",
+        "id_prefix",
+        "node_type",
+        "status",
+        "plane",
+        "layer",
+        "file",
+        "text",
+        "in_narrative",
+        "verified_before",
+        "around",
+        "depth",
+        "edge_types",
+        "direction",
+        "sort",
+        "limit",
+        "cursor",
+        "fields"
+      ],
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id_prefix": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "node_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "open quando a consulta pediu a fila dos abertos"
+        },
+        "plane": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "layer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "file": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "trecho do caminho do grafo"
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "palavras que o label contém, todas, sem distinguir maiúscula"
+        },
+        "in_narrative": {
+          "type": "boolean"
+        },
+        "verified_before": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "around": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "depth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "edge_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "direction": {
+          "enum": [
+            "out",
+            "in",
+            "both",
+            null
+          ]
+        },
+        "sort": {
+          "enum": [
+            "corpus",
+            "impact"
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "padrões glob de chaves do nó pedidas em extra"
+        }
+      }
+    },
+    "graphs": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "os grafos lidos, inclusive os que não parsearam"
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "code"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    }
+  },
+  "$defs": {
+    "end": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "id",
+        "label",
+        "external",
+        "found"
+      ],
+      "properties": {
+        "file": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "external": {
+          "type": "boolean",
+          "description": "a ponta veio escrita como <caminho>#<id>"
+        },
+        "found": {
+          "type": "boolean",
+          "description": "o nó da ponta existe no corpus lido"
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "id",
+        "label",
+        "node_type",
+        "status",
+        "plane",
+        "layer",
+        "impact",
+        "confidence",
+        "verified_at",
+        "out",
+        "in"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "node_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "plane": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "layer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "impact": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "verified_at": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "narrative": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "só quando a consulta pede a narrative"
+        },
+        "out": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "edge_type",
+              "to"
+            ],
+            "properties": {
+              "edge_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "to": {
+                "$ref": "#/$defs/end"
+              }
+            }
+          }
+        },
+        "in": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "edge_type",
+              "from"
+            ],
+            "properties": {
+              "edge_type": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "from": {
+                "$ref": "#/$defs/end"
+              }
+            }
+          }
+        },
+        "extra": {
+          "type": "object",
+          "description": "só quando a consulta pede fields: as chaves do nó que casam, com o valor como está no grafo"
+        }
+      }
+    }
+  }
+}
