@@ -159,13 +159,13 @@ selftest() {
   [ "$rc" = 2 ] && ok "workspace por symlink → recusa" || ko "symlink aceito (rc=$rc)"
   rm -f "$PREFIX/deadbeef"
 
-  mkdir -p "$SB/fora/0123abcd"; local antes depois
-  antes="$(find "$SB" -maxdepth 1 -name 'wsync-*' | wc -l)"
+  mkdir -p "$SB/fora/0123abcd"; local before after
+  before="$(find "$SB" -maxdepth 1 -name 'wsync-*' | wc -l)"
   rc=0; (cmd_stage "$SB/fora/0123abcd" "$SB" >/dev/null 2>&1) || rc=$?
-  depois="$(find "$SB" -maxdepth 1 -name 'wsync-*' | wc -l)"
+  after="$(find "$SB" -maxdepth 1 -name 'wsync-*' | wc -l)"
   [ "$rc" = 2 ] && ok "fora do prefixo → recusa" || ko "fora do prefixo aceito (rc=$rc)"
   # contexto testado: a recusa do check_target não pode ser engolida e seguir para a cópia
-  [ "$antes" = "$depois" ] && ok "recusa num contexto testado não cria staging" || ko "staging criado depois da recusa"
+  [ "$before" = "$after" ] && ok "recusa num contexto testado não cria staging" || ko "staging criado depois da recusa"
 
   mkws; mkdir -p "$SB/falso/ws"; printf '%s\n' "$ws" > "$SB/falso/target"; manifest "$ws" > "$SB/falso/manifest"; echo x > "$SB/falso/ws/n.md"
   rc=0; (cmd_apply "$ws" "$SB/falso" >/dev/null 2>&1) || rc=$?
