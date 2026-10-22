@@ -1,0 +1,151 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.308 a 2.1.308 contra a baseline 2.1.307.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-22-r16
+  schema_version: "1"
+  baseline: "2026-10-22"
+  review_after: "2026-11-21"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-22); 6 da rodada.
+# ═══ AUFHEBUNG ═══
+#   DECIDIDO (2026-10-22): (a). Três nós da r15 superados: o /chat uma versão atrás do host (agora em paridade),
+#   o pin do revisor em v1.0.257 (agora v1.0.258) e a pergunta de prova presa ao v1.0.257.
+external_edges:
+  - from: E_TRES_SUPERFICIES_EM_PARIDADE_2_1_308_1022
+    to: "docs/evolution/research/radar-E3-2026-10-21-r15/radar-E3-2026-10-21-r15.kg.yaml#E_SDK_DO_BRIDGE_UMA_VERSAO_ATRAS_1021"
+    edge_type: SUPERSEDES
+  - from: E_TRES_SUPERFICIES_EM_PARIDADE_2_1_308_1022
+    to: "docs/evolution/research/radar-E3-2026-10-21-r15/radar-E3-2026-10-21-r15.kg.yaml#E_PIN_DO_REVISOR_EM_1_0_257_CLI_2_1_307"
+    edge_type: SUPERSEDES
+  - from: Q_REVISOR_NO_PIN_1_0_258_PROVADO_NUM_PR_COM_A_LABEL
+    to: "docs/evolution/research/radar-E3-2026-10-21-r15/radar-E3-2026-10-21-r15.kg.yaml#Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "CHANGELOG oficial: seções 2.1.308 (4 linhas, 1 itens); baseline 2.1.307, disco 2.1.308, processo 2.1.308, SDK bridge 2.1.308"
+    label: "o delta desde a baseline 2.1.307 são 1 versão(ões), de 2.1.308 a 2.1.308, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.308 a ## 2.1.308 (cópias em docs/evolution/research/radar-E3-2026-10-22-r16/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-22"
+    verified_against: "fechada em 2026-10-22 pela r16: 1 item no delta, genérico e sem superfície; 8 vereditos SUSTENTA, 0 negativos, 0 superações achadas (data/judge-verdicts.json, juiz NÃO independente: rodada feita por um fork da sessão, que não pode lançar subagente); 3 nós da r15 superados"
+    label: "quais itens de 2.1.308 a 2.1.308 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+    trace: "docs/evolution/research/radar-E3-2026-10-22-r16/SYNTHESIS.md e data/judge-verdicts.json"
+  - id: E_ITEM_UNICO_SEM_SUPERFICIE_NOMEADA_1022
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-22"
+    verified_against: "data/2.1.308.txt: 4 linhas, o único item é 'Bug fixes and reliability improvements'; o texto não nomeia ferramenta, hook, flag nem campo, então não há termo a medir no core"
+    label: "o único item da 2.1.308 é genérico (correções e confiabilidade) e não nomeia superfície: a rodada não liga nada dele à casa"
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-22-r16/data/2.1.308.txt"
+      locator: "seção ## 2.1.308, linha única de item"
+      method: "leitura: cópia byte a byte do CHANGELOG oficial feita pelo medidor"
+      locality: "repo"
+  - id: E_TRES_SUPERFICIES_EM_PARIDADE_2_1_308_1022
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-22"
+    verified_against: "claude --version no host = 2.1.308; binário do CLI embutido no SDK do bridge servido (0.3.308) --version = 2.1.308; .github/workflows/onion-review.yml usa anthropics/claude-code-action@6b6870e6, que é o commit da tag v1.0.258 (gh api git/tags) e cujo package.json pede @anthropic-ai/claude-agent-sdk ^0.3.308"
+    label: "pela 1ª vez as três superfícies que rodam o Claude Code estão na mesma versão: o host, o /chat do bridge (SDK 0.3.308) e o revisor do CI (action v1.0.258); o delta da 2.1.308 chega às três"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh e .github/workflows/onion-review.yml"
+      locator: "tabela de versões do censo; uses: da claude-code-action nas duas etapas do workflow"
+      method: "medição: --version dos binários e leitura do package.json da action no commit fixado"
+      locality: "host"
+  - id: Q_REVISOR_NO_PIN_1_0_258_PROVADO_NUM_PR_COM_A_LABEL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-22"
+    verified_against: "aberta pela r16 em 2026-10-22, supera a da r15 presa ao v1.0.257; o pin mudou para v1.0.258 no #1292; fecha quando um PR com a label review:ia mostrar o job onion-review rodando no pin 6b6870e6 com o CLI 2.1.308 no log; segue estacionada como a SAC-181 (D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA), sem issue nova"
+    label: "o revisor de IA do CI no pin v1.0.258 (CLI 2.1.308) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a versão no log"
+  - id: E_CENSO_ZERA_SCRIPTPATH_EM_WORKTREE_1022
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "cc-delta-census.sh rodado no clone principal: 'citam scriptPath: 8'; o mesmo commit numa worktree em /home/marcio/worktrees/onion-evolve/cc-update-r16: 0. A linha 367 descarta todo arquivo cujo caminho ABSOLUTO contém '/worktrees/', e a worktree inteira mora sob esse prefixo"
+    label: "o medidor do cc-update zera a contagem de citações de scriptPath quando roda numa worktree sob /worktrees/: o filtro olha o caminho absoluto, não o relativo ao repo"
+    x_path_is_content: "citação"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh"
+      locator: "linha 367: if '/worktrees/' in f: continue"
+      method: "medição: o mesmo censo no clone principal e na worktree da rodada, contagens 8 e 0"
+      locality: "repo"
+  - id: Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-22"
+    verified_against: "proposta da r16: aplicar o filtro de '/worktrees/' ao caminho relativo ao repo (os.path.relpath), com caso na bancada run_cc_delta_census_selftests rodando o censo de dentro de um diretório '.../worktrees/...'; issue SAC-219"
+    label: "o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda numa worktree"
+  - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_308_1022
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-22"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive no host com 2.1.308: 'OK ✓ — todas as guardas reagiram conforme esperado'"
+    label: "a guarda de deriva de binário (cited_directive) segue verde contra o CLI 2.1.308 instalado"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família cited_directive"
+      method: "medição: execução da família da bancada no host"
+      locality: "host"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITEM_UNICO_SEM_SUPERFICIE_NOMEADA_1022
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_TRES_SUPERFICIES_EM_PARIDADE_2_1_308_1022
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_TRES_SUPERFICIES_EM_PARIDADE_2_1_308_1022
+    to: Q_REVISOR_NO_PIN_1_0_258_PROVADO_NUM_PR_COM_A_LABEL
+    edge_type: SUPPORTS
+  - from: E_CENSO_ZERA_SCRIPTPATH_EM_WORKTREE_1022
+    to: Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022
+    edge_type: SUPPORTS
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_308_1022
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
