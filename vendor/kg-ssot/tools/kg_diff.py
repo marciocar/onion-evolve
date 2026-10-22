@@ -26,6 +26,7 @@ rc: 0 sem diferença · 1 com diferença · 2 entrada quebrada.
 """
 import argparse
 import collections
+import fnmatch
 import json
 import pathlib
 import subprocess
@@ -40,6 +41,9 @@ else:  # script ou vendor
 
 SCHEMA_VERSION = "kg-ssot.diff/1"
 GRAPH_GLOBS = ("*.kg.yaml", "*.kg.json")
+# os do kg_query.py e do kg_migrate.py: numa atualização do vendor, os fixtures da suíte mudam aos centos e afogam o diff
+# do grafo do adotante; valem só no --from sem caminhos dados
+DEFAULT_EXCLUDE = ("vendor/*", "fixtures/*", "*/fixtures/*", "docs/materials/*")
 EDGE_KEY = ("from", "to", "edge_type")
 
 
@@ -127,7 +131,20 @@ def field_changes(before, after):
             continue
         b, a = fb.get(key), fa.get(key)
         if _canon(b) != _canon(a) or (key in fb) != (key in fa):
-            out.append({"path": path, "before": b, "after": a})
+            out.append({"path": path, "before": b, "after": a, "_side": "b" if key not in fa else "a" if key not in fb else ""})
+    # o campo que saiu de um caminho e entrou noutro com o mesmo valor é uma renomeação (x_old → x_new): os dois lados
+    # ficam, cada um com o valor do seu caminho (o ausente segue null), ligados por renamed_to e renamed_from. Só pareia
+    # o valor que não é trivial e que é o único dos dois lados, para não inventar renomeação
+    gone, new = ([f for f in out if f["_side"] == s] for s in ("b", "a"))
+    for f in new:
+        v = f["after"]
+        if v is None or isinstance(v, bool) or v in ("", [], {}):
+            continue
+        twins = [g for g in gone if _canon(g["before"]) == _canon(v)]
+        if len(twins) == 1 and sum(_canon(h["after"]) == _canon(v) for h in new) == 1:
+            twins[0]["renamed_to"], f["renamed_from"] = f["path"], twins[0]["path"]
+    for f in out:
+        del f["_side"]
     return out
 
 
@@ -266,13 +283,15 @@ def summarize(graphs):
             s[f"edges_{k}"] += len(d["edges"][k]) + len(d["external_edges"][k])
     keys = ("modified", "added", "removed", "unchanged", "unreadable", "nodes_added", "nodes_removed", "nodes_changed",
             "edges_added", "edges_removed", "edges_changed")
-    fields = collections.Counter(f["path"] for g in graphs if g["diff"] for n in g["diff"]["nodes"]["changed"]
-                                 for f in n["fields"])
+    fields = collections.Counter(f"{f['renamed_from']} → {f['path']}" if "renamed_from" in f else f["path"]
+                                 for g in graphs if g["diff"] for n in g["diff"]["nodes"]["changed"] for f in n["fields"]
+                                 if "renamed_to" not in f)
     return {**{k: s[k] for k in keys}, "fields": dict(sorted(fields.items(), key=lambda kv: (-kv[1], kv[0])))}
 
 
-def changed_paths(repo, rev_from, rev_to, paths):
-    """Os grafos que mudaram entre as revisões (rev_to None: a árvore de trabalho), com o status do git."""
+def changed_paths(repo, rev_from, rev_to, paths, exclude=()):
+    """Os grafos que mudaram entre as revisões (rev_to None: a árvore de trabalho), com o status do git, menos os que
+    casam com exclude (globs sobre o caminho)."""
     args = ["diff", "--name-status", "-z", "--no-renames", "--end-of-options", _rev(rev_from)] + \
         ([_rev(rev_to)] if rev_to else []) + ["--"]
     args += list(paths) if paths else list(GRAPH_GLOBS)
@@ -291,7 +310,8 @@ def changed_paths(repo, rev_from, rev_to, paths):
         except UnicodeDecodeError:
             raise Broken("um caminho novo não é UTF-8") from None
         out += [("A", n) for n in new if n.endswith((".kg.yaml", ".kg.json"))]
-    return out
+    named = {pathlib.PurePosixPath(p).as_posix() for p in paths}
+    return [(s, n) for s, n in out if n in named or not any(fnmatch.fnmatchcase(n, pat) for pat in exclude)]
 
 
 def _show(repo, rev, name):
@@ -299,9 +319,12 @@ def _show(repo, rev, name):
     return Unreadable(code) if code else text
 
 
-def diff_revisions(repo, rev_from, rev_to=None, paths=()):
+def diff_revisions(repo, rev_from, rev_to=None, paths=(), exclude=None):
+    """exclude None: os DEFAULT_EXCLUDE quando nenhum caminho foi dado; os caminhos dados nunca são excluídos."""
+    if exclude is None:
+        exclude = () if paths else DEFAULT_EXCLUDE
     graphs = []
-    for status, name in changed_paths(repo, rev_from, rev_to, paths):
+    for status, name in changed_paths(repo, rev_from, rev_to, paths, exclude):
         text_b = None if status == "A" else _show(repo, rev_from, name)
         if status == "D":
             text_a = None
@@ -330,6 +353,13 @@ def _short(v, n=80):
     return s if len(s) <= n else s[:n - 1] + "…"
 
 
+def _field(f, n):
+    """Um campo mudado no texto humano: o caminho com o antes e o depois, ou a renomeação com o valor que ficou."""
+    if "renamed_from" in f:
+        return f"{f['renamed_from']} → {f['path']} (renomeado): {_short(f['after'], n)}"
+    return f"{f['path']}: {_short(f['before'], n)} → {_short(f['after'], n)}"
+
+
 STATUS_PT = {"modified": "modificado", "added": "acrescentado", "removed": "removido", "unchanged": "igual",
              "unreadable": "não lido"}
 
@@ -343,20 +373,20 @@ def human(res):
             lines += [f"  NÃO LIDO  {side}: {code}" for side, code in g["unreadable"].items()]
             continue
         d = g["diff"]
-        for f in d["meta"]:  # o --ignore vale para o meta com o prefixo meta. (meta.date)
-            lines.append(f"  ~ {f['path']}: {_short(f['before'])} → {_short(f['after'])}")
+        for f in (f for f in d["meta"] if "renamed_to" not in f):  # o --ignore vale com o prefixo meta. (meta.date)
+            lines.append(f"  ~ {_field(f, 80)}")
         for n in d["nodes"]["added"]:
             lines.append(f"  + {n['id']}  {_short(n['label'], 100)}")
         for n in d["nodes"]["removed"]:
             lines.append(f"  - {n['id']}  {_short(n['label'], 100)}")
         for n in d["nodes"]["changed"]:
-            lines.append(f"  ~ {n['id']}  " + "; ".join(f"{f['path']}: {_short(f['before'], 40)} → {_short(f['after'], 40)}"
-                                                       for f in n["fields"]))
+            lines.append(f"  ~ {n['id']}  " + "; ".join(_field(f, 40)
+                                                       for f in n["fields"] if "renamed_to" not in f))
         for key, word in (("edges", "aresta"), ("external_edges", "aresta externa")):
             for sign, part in (("+", "added"), ("-", "removed"), ("~", "changed")):
                 for e in d[key][part]:
-                    what = "; ".join(f"{f['path']}: {_short(f['before'], 40)} → {_short(f['after'], 40)}"
-                                     for f in e.get("fields", []))
+                    what = "; ".join(_field(f, 40)
+                                     for f in e.get("fields", []) if "renamed_to" not in f)
                     lines.append(f"  {sign} {word} {e['from'] or '(o grafo)'} -{e['edge_type']}-> {e['to']}"
                                  + (f"  ({what})" if what else ""))
     s = res["summary"]
@@ -378,6 +408,10 @@ def main(argv=None):
     ap.add_argument("--to", dest="rev_to", help="a revisão de depois (sem ela, a árvore de trabalho)")
     ap.add_argument("--ignore", action="append", default=[], metavar="CAMPO",
                     help="tira o campo da comparação (repetível): verified_at, provenance.locator, meta.x_gerado_em")
+    ap.add_argument("--exclude", action="append", default=[], metavar="GLOB",
+                    help="com --from, caminhos que ficam de fora (repetível), somados aos padrões: "
+                    + ", ".join(DEFAULT_EXCLUDE))
+    ap.add_argument("--no-default-excludes", action="store_true", help="com --from, compara também o vendor e os fixtures")
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_args(argv)
     global IGNORE
@@ -392,7 +426,10 @@ def _run(args):
     try:
         if args.rev_from:
             res = result(args.rev_from, args.rev_to or "(árvore de trabalho)",
-                         diff_revisions(args.repo, args.rev_from, args.rev_to, args.specs))
+                         diff_revisions(args.repo, args.rev_from, args.rev_to, args.specs,
+                                        None if not (args.exclude or args.no_default_excludes) else
+                                        (() if args.no_default_excludes or args.specs else DEFAULT_EXCLUDE)
+                                        + tuple(args.exclude)))
         else:
             if args.rev_to or len(args.specs) != 2:
                 raise Broken("dê ANTES e DEPOIS, ou --from REV [--to REV] [CAMINHO...]")

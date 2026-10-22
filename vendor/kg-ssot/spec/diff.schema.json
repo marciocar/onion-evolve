@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:diff.schema.json",
   "title": "Diff por id entre revisões de grafos (kg-ssot.diff/1)",
-  "description": "Saída de `kg_diff.py --format json`. Os nós são alinhados pelo id e as arestas pelas pontas e o tipo (from, to, edge_type): o que só existe de um lado foi acrescentado ou removido, e o que existe nos dois sai em `changed` com cada campo que mudou, em caminho pontuado (`provenance.source`), antes e depois; o campo ausente de um lado vale null. Uma lista é comparada inteira. A aresta que troca de tipo com as mesmas pontas sai em `changed` com o campo edge_type, não como remoção e acréscimo. O meta e as outras chaves da raiz (o contrato não fecha a raiz) saem em `meta`, com o caminho a partir da raiz: `meta.title`, `meta` quando ele não é mapa, `x_algo`. Os valores comparam pelo tipo também (1, 1.0 e true diferem), e o id repetido conta cada ocorrência, na ordem. A ordem dos nós no arquivo não conta, e uma troca de id é remoção mais acréscimo. Não é patch: o diff informa, não se aplica. `status` é modified, added, removed, unchanged ou unreadable; no unreadable, `unreadable` traz o código parse.* de cada lado que não parseou e `diff` é null.",
+  "description": "Saída de `kg_diff.py --format json`. Os nós são alinhados pelo id e as arestas pelas pontas e o tipo (from, to, edge_type): o que só existe de um lado foi acrescentado ou removido, e o que existe nos dois sai em `changed` com cada campo que mudou, em caminho pontuado (`provenance.source`), antes e depois; o campo ausente de um lado vale null. Uma lista é comparada inteira. A aresta que troca de tipo com as mesmas pontas sai em `changed` com o campo edge_type, não como remoção e acréscimo. O meta e as outras chaves da raiz (o contrato não fecha a raiz) saem em `meta`, com o caminho a partir da raiz: `meta.title`, `meta` quando ele não é mapa, `x_algo`. Os valores comparam pelo tipo também (1, 1.0 e true diferem), e o id repetido conta cada ocorrência, na ordem. A ordem dos nós no arquivo não conta, e uma troca de id é remoção mais acréscimo. Não é patch: o diff informa, não se aplica. `status` é modified, added, removed, unchanged ou unreadable; no unreadable, `unreadable` traz o código parse.* de cada lado que não parseou e `diff` é null. Desde a 4.17.1, o campo que sai de um caminho e entra noutro com o mesmo valor (num nó, numa aresta ou no meta), não trivial e único dos dois lados, é marcado como renomeação: as duas entradas ficam, cada uma com o valor do seu caminho (o lado ausente segue null), a que sai com renamed_to e a que entra com renamed_from; o texto humano e o summary.fields mostram uma linha só. O --from sem caminhos deixa de fora o vendor e os fixtures.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -125,7 +125,15 @@
           "type": "string"
         },
         "before": true,
-        "after": true
+        "after": true,
+        "renamed_from": {
+          "type": "string",
+          "description": "desde a 4.17.1: no campo que entrou (before null), o caminho de onde o mesmo valor saiu"
+        },
+        "renamed_to": {
+          "type": "string",
+          "description": "desde a 4.17.1: no campo que saiu (after null), o caminho onde o mesmo valor entrou"
+        }
       }
     },
     "node": {

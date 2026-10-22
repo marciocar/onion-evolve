@@ -18,6 +18,13 @@
     "schema_version": {
       "const": "kg-ssot.query/1"
     },
+    "root": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "a raiz do --root (os caminhos dos nós são relativos a ela), ou null quando os grafos vieram um a um; desde a 4.17.1"
+    },
     "query": {
       "type": "object",
       "additionalProperties": false,
