@@ -29947,6 +29947,29 @@ run_workspace_adopt_sync_selftests() {
   fi
 }
 
+# Troca do Engine do Docker da VPS (ops/docker-engine-migrate.sh) — bancada embutida (--selftest, stubs no PATH, sem
+# sudo, nunca toca o real) e os mutantes de cada guarda (--selftest-mutants): apply sem plan, plan velho, alvo não
+# fixado, plan de outro alvo, chave com fingerprint errado, versão indisponível, container que não voltou, healthy
+# que caiu, Engine fora da versão, image store trocado, contenção DOCKER-USER perdida e rota diferente do plan.
+# Nasceu da decisão D_DOCKER_VPS_MIGRA_PARA_DOCKER_CE_29_9_2_1022 (2026-10-22).
+run_docker_engine_migrate_selftests() {
+  local dm="${REPO_ROOT}/ops/docker-engine-migrate.sh"
+  if [ ! -f "${dm}" ]; then record_skip "docker-engine-migrate: ops/docker-engine-migrate.sh ausente"; return; fi
+  local rc=0 out
+  out="$(bash "${dm}" --selftest 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "docker-engine-migrate: bancada sandbox verde ($(printf '%s' "${out}" | grep -o 'selftest: [0-9]* pass' | head -1))"
+  else
+    record_fail "docker-engine-migrate: --selftest" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+  rc=0; out="$(bash "${dm}" --selftest-mutants 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "docker-engine-migrate: $(printf '%s' "${out}" | grep '^mutantes:' | head -1)"
+  else
+    record_fail "docker-engine-migrate: mutante sobrevivente" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+}
+
 # /meta:realign — o motor de revisão em camadas (kg-realign-project.sh) classifica drift
 # em (a)/(b)/(c) + commitment/binding sobre fixtures com um drift plantado de cada tipo.
 # GUARDA-DA-GUARDA: o `--check` só sai rc=1 no tipo-(c) (o dente); os demais informam sem bloquear.
@@ -34498,6 +34521,7 @@ _family run_plugin_private_url_selftests
 _family run_deploy_site_selftests
 _family run_install_caddy_config_selftests
 _family run_workspace_adopt_sync_selftests
+_family run_docker_engine_migrate_selftests
 _family run_realign_selftests
 _family run_harvest_residue_selftests
 _family run_compose_exposure_selftests

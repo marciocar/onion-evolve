@@ -227,7 +227,7 @@ selftest() {
 echo "docker $*" >> "$DKSB/calls"
 case "$1" in
   version) v=$(cat "$DKSB/ver"); echo "$v $v" | { [[ "$*" == *'\t'* ]] && tr ' ' '\t' || cat; } ;;
-  info) case "$*" in *DriverStatus*CgroupDriver*) echo "driver-type=io.containerd.snapshotter.v1 |systemd|iptables";; *DriverStatus*) echo "driver-type=io.containerd.snapshotter.v1 ";; *) echo ok;; esac ;;
+  info) case "$*" in *DriverStatus*CgroupDriver*) echo "driver-type=io.containerd.snapshotter.v1 |systemd|iptables";; *DriverStatus*) echo "${DKDRV:-driver-type=io.containerd.snapshotter.v1 }";; *) echo ok;; esac ;;
   ps) cut -f1 "$DKSB/ctr" ;;
   inspect) n=$2; l=$(awk -F'\t' -v n="$n" '$1==n' "$DKSB/ctr"); [ -n "$l" ] || exit 1
            st=$(cut -f2 <<< "$l"); h=$(cut -f3 <<< "$l")
@@ -288,6 +288,12 @@ S
   [ "$rc" = 2 ] && ok "plan velho → recusa" || ko "plan velho aceito (rc=$rc)"
   touch "$pl/.complete"
 
+  # 4b. plan feito para outro alvo recusa
+  cp "$pl/targets.txt" "$SB/t.bak"; echo "engine=5:29.8.2-1~ubuntu.24.04~noble containerd=x buildx=x compose=x" > "$pl/targets.txt"
+  : > "$SB/calls"; rc=0; (cmd_apply >/dev/null 2>&1) || rc=$?
+  if [ "$rc" = 2 ] && ! grep -q '^apt-get' "$SB/calls"; then ok "plan de outro alvo → recusa"; else ko "plan de outro alvo aceito (rc=$rc)"; fi
+  cp "$SB/t.bak" "$pl/targets.txt"
+
   # 5. chave com fingerprint errado recusa antes do apt
   : > "$SB/calls"; rc=0; (DKFPR=DEADBEEF cmd_apply >/dev/null 2>&1) || rc=$?
   if [ "$rc" = 2 ] && ! grep -q '^apt-get' "$SB/calls"; then ok "fingerprint errado da chave → recusa"; else ko "chave errada aceita (rc=$rc)"; fi
@@ -319,7 +325,10 @@ S
   echo 200 > "$SB/http"; echo 29.1.3 > "$SB/ver"
   rc=0; out="$(cmd_verify 2>&1)" || rc=$?
   if [ "$rc" = 1 ] && grep -q 'Engine cliente=29.1.3' <<< "$out"; then ok "verify reprova: Engine fora da versão fixada"; else ko "verify com versão velha (rc=$rc)"; fi
-  echo 29.9.2 > "$SB/ver"
+  echo 29.9.2 > "$SB/ver"; export DKDRV="driver-type=io.containerd.snapshotter.v0 "
+  rc=0; out="$(cmd_verify 2>&1)" || rc=$?
+  if [ "$rc" = 1 ] && grep -q 'image store mudou' <<< "$out"; then ok "verify reprova: image store diferente do plan"; else ko "verify com store trocado (rc=$rc)"; fi
+  unset DKDRV
   rc=0; cmd_verify >/dev/null 2>&1 || rc=$?
   [ "$rc" = 0 ] && ok "verify passa com tudo como no plan" || ko "verify verde (rc=$rc)"
 
@@ -331,11 +340,11 @@ S
 mutants() {
   local self tmp g killed=0 total=0
   self="$(realpath "${BASH_SOURCE[0]}")"; tmp="$(mktemp -d)"
-  for g in noplan planage pinned gpg available running healthy version fw routes; do
+  for g in noplan planage pinned plantarget gpg available running healthy version store fw routes; do
     total=$((total+1))
     case "$g" in
       running|healthy) sed "/# guard:${g}\$/s/printf '%s ' \"\$name\"/:/" "$self" > "$tmp/m.sh" ;;
-      version|fw|routes) sed "/# guard:${g}\$/s/fail=1/:/" "$self" > "$tmp/m.sh" ;;
+      version|store|fw|routes) sed "/# guard:${g}\$/s/fail=1/:/" "$self" > "$tmp/m.sh" ;;
       *) sed "/# guard:${g}\$/s/|| die /|| : /; /# guard:${g}\$/s/|| { /|| : \&\& { /" "$self" > "$tmp/m.sh" ;;
     esac
     if cmp -s "$self" "$tmp/m.sh"; then echo "  ✗ mutante $g: não aplicado"; continue; fi
