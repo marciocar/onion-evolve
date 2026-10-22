@@ -7,6 +7,8 @@
 #   · o envelope normal passa (--no-push), e a linha TRUST registra o sha do members.yaml e do .pem usados;
 #   · iat no futuro além do skew, vida (exp − iat) acima do teto e exp ≤ iat são RECUSADOS;
 #   · sem iat é RECUSADO; corpo adulterado continua RECUSADO (a cura de F1 do receptor não regrediu);
+#   · DUAS RAÍZES (2026-10-22): a chave pinada só na raiz servida, ausente da 2ª (a do checkout, que o a2a-accept
+#     reverifica), é RECUSADA; o registro tem receivedAt, como o que o bridge grava;
 #   · o default da raiz de confiança é o clone SERVIDO (/home/onion/onion-evolve), não o checkout;
 #   · um MUTANTE sem a checagem de vida tem de deixar passar o envelope longo (prova que o caso morde).
 # Uso : bash vps/accept-to-channel.selftest.sh      Exit: 0 tudo passou · 1 algum caso falhou
@@ -22,7 +24,15 @@ mkdir -p "${A2A_SPIKE_JWKS}"
 KEY="${T}/k.pem"; KID="selftest-1"; FROM="selftest-member"
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "${KEY}" 2>/dev/null
 openssl pkey -in "${KEY}" -pubout -out "${A2A_SPIKE_JWKS}/${KID}.pem" 2>/dev/null
-printf 'members:\n  - id: %s\n    a2a:\n      keys: [%s]\n' "${FROM}" "${KID}" > "${A2A_SPIKE_MEMBERS}"
+# o receptor (fonte) e o membro com role: o a2a-accept REVERIFICA contra este registro (receptor, trust policy,
+# kid-binding), não contra o do checkout
+printf 'members:\n  - id: onion-evolve\n    role: source\n    kind: source\n  - id: %s\n    role: standalone\n    kind: adopter\n    parent: onion-evolve\n    a2a:\n      keys: [%s]\n' \
+  "${FROM}" "${KID}" > "${A2A_SPIKE_MEMBERS}"
+# a 2ª raiz (a da reverificação do a2a-accept, default o checkout): um repo de confiança SEPARADO, com a mesma chave
+export A2A_SPIKE_ACCEPT_TRUST_REPO="${T}/acctrust"
+mkdir -p "${A2A_SPIKE_ACCEPT_TRUST_REPO}/docs/evolution/federation" "${A2A_SPIKE_ACCEPT_TRUST_REPO}/.claude/utils/federation-transport/jwks"
+cp "${A2A_SPIKE_MEMBERS}" "${A2A_SPIKE_ACCEPT_TRUST_REPO}/docs/evolution/federation/members.yaml"
+cp "${A2A_SPIKE_JWKS}/${KID}.pem" "${A2A_SPIKE_ACCEPT_TRUST_REPO}/.claude/utils/federation-transport/jwks/"
 PASS=0; FAIL=0
 ok() { PASS=$((PASS+1)); echo "  ✓ $1"; }
 ko() { FAIL=$((FAIL+1)); echo "  ✗ $1"; }
@@ -30,7 +40,8 @@ ko() { FAIL=$((FAIL+1)); echo "  ✗ $1"; }
 mkrec() {  # mkrec <saída> [opções do send-a2a.sh]
   local out="$1"; shift
   bash "${SEND}" --dry-run --key "${KEY}" --kid "${KID}" --from "${FROM}" --body "quantos grafos?" "$@" 2>/dev/null \
-    | jq --arg from "${FROM}" '{verdict:{verified:true}, from:$from, taskId:"t-1", envelope:.}' > "${out}"
+    | jq --arg from "${FROM}" --arg at "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
+      '{verdict:{verified:true}, from:$from, taskId:"t-1", receivedAt:$at, envelope:.}' > "${out}"   # receivedAt: o bridge grava, e o a2a-accept exige desde e97fe410
 }
 case_rc() {  # case_rc <rc esperado> <nome> <registro> [grep da saída]
   local want="$1" name="$2" rec="$3" pat="${4:-}"
@@ -43,7 +54,8 @@ echo "── accept-to-channel: relógio e raiz de confiança"
 mkrec "${T}/ok.json"
 case_rc 0 "envelope normal (exp +300) passa" "${T}/ok.json" "aceito e entregue"
 grep -q "	TRUST	${A2A_SPIKE_MEMBERS}	$(openssl dgst -sha256 < "${A2A_SPIKE_MEMBERS}" | awk '{print $NF}')	" "${A2A_SPIKE_STATE}/accept.tsv" \
-  && ok "linha TRUST com o sha256 do members.yaml usado" || ko "linha TRUST ausente ou errada"
+  && grep -q "	ACC-TRUST-OVERRIDE	${A2A_SPIKE_ACCEPT_TRUST_REPO}	" "${A2A_SPIKE_STATE}/accept.tsv" \
+  && ok "linha TRUST com o sha256 do members.yaml usado, e o override da 2ª raiz registrado" || ko "linha TRUST (ou ACC-TRUST-OVERRIDE) ausente ou errada"
 mkrec "${T}/fut.json" --iat-offset 3600 --exp-offset 3700
 case_rc 1 "iat no futuro (+3600) recusado" "${T}/fut.json" "iat no futuro"
 mkrec "${T}/long.json" --exp-offset 3600
@@ -70,12 +82,20 @@ case_rc 1 "corpo adulterado segue recusado (F1 no receptor)" "${T}/tamper2.json"
 A2A_SPIKE_MAX_LIFE=4000 bash "${ATC}" "${T}/long.json" --no-push >/dev/null 2>&1 \
   && ok "o teto de vida é o do env (A2A_SPIKE_MAX_LIFE=4000 aceita os 3600 s)" || ko "A2A_SPIKE_MAX_LIFE não respeitado"
 
+# duas raízes (refutador 2026-10-22): a chave plantada SÓ na raiz servida (a do UID do bridge) não basta — a 2ª
+# raiz, a do checkout, tem de concordar
+mkdir -p "${T}/acctrust-sem-chave/docs/evolution/federation"
+cp "${A2A_SPIKE_MEMBERS}" "${T}/acctrust-sem-chave/docs/evolution/federation/members.yaml"
+mkrec "${T}/so-servido.json"
+A2A_SPIKE_ACCEPT_TRUST_REPO="${T}/acctrust-sem-chave" case_rc 1 "chave só na raiz servida (a 2ª raiz não a tem) recusada" "${T}/so-servido.json" "a2a-accept recusou"
+
 echo "── default da raiz de confiança"
 ( unset A2A_SPIKE_JWKS A2A_SPIKE_MEMBERS; A2A_SPIKE_SERVED_ROOT="${T}/served-inexistente" bash "${ATC}" "${T}/ok.json" --no-push ) >"${T}/out" 2>&1
 grep -q "${T}/served-inexistente/.claude/utils/federation-transport/jwks" "${T}/out" \
   && ok "sem override, a confiança vem de A2A_SPIKE_SERVED_ROOT (e recusa se ilegível)" || { ko "default da raiz não é o clone servido"; cat "${T}/out"; }
 grep -q 'SERVED="${A2A_SPIKE_SERVED_ROOT:-/home/onion/onion-evolve}"' "${ATC}" \
-  && ok "o default literal é o clone servido pelo bridge" || ko "default literal mudou"
+  && grep -q 'ACC_TRUST="${A2A_SPIKE_ACCEPT_TRUST_REPO:-${ROOT}}"' "${ATC}" \
+  && ok "os defaults literais: 1ª raiz o clone servido, 2ª raiz (reverificação) o checkout" || ko "default literal mudou"
 
 echo "── mutante (sem a checagem de vida): tem de deixar passar o envelope longo"
 MUT="${T}/atc-mutant.sh"; sed '/vida longa demais/d' "${ATC}" > "${MUT}"

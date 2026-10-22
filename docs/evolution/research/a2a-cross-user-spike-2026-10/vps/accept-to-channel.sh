@@ -27,6 +27,8 @@
 #       A2A_SPIKE_JWKS (default: jwks/ do clone servido) · A2A_SPIKE_MEMBERS (default: members.yaml do servido)
 #       A2A_SPIKE_STATE (~/.local/state/onion/a2a-spike) · A2A_SPIKE_CHANNEL_TOKEN (~/.config/onion/a2a/channel-token)
 #       A2A_SPIKE_MAX_SKEW (default 60 s: iat no futuro tolerado) · A2A_SPIKE_MAX_LIFE (default 900 s: exp − iat)
+#       A2A_SPIKE_ACCEPT_TRUST_REPO (default: o checkout deste script — a 2ª raiz, a da reverificação do a2a-accept;
+#       override só para o selftest)
 # Raiz de confiança (Emenda 7, 2026-10-14): a curadoria apontou que o default era o checkout ~/onion-evolve,
 #   que NÃO é o que o gate leu. O default agora é o clone SERVIDO; a leitura cai para `sudo -n cat` quando a
 #   conta do maestro não lê direto, e cada aceitação grava uma linha TRUST com o sha256 do members.yaml e
@@ -175,7 +177,20 @@ command -v flock >/dev/null 2>&1 && flock 8
 if grep -qxF "${JTI}" "${STATE}/delivered.jti" 2>/dev/null; then echo "já entregue (jti ${JTI}) — nada a fazer" >&2; exit 0; fi
 
 # registro humano da aceitação (o a2a-accept do core, idempotente, num inbox do spike)
-bash "${ACCEPT}" "${LOCAL}" --inbox "${STATE}/inbox" >/dev/null || refuse "a2a-accept recusou"
+# DUAS RAÍZES, NÃO UMA (2026-10-22): desde a SAC-150 N1 o a2a-accept REVERIFICA o envelope contra o --trust-repo,
+# cujo default é o CHECKOUT onde este script mora (conta do maestro). É de propósito que ela NÃO é a raiz servida
+# lida acima: o clone servido é da conta onion, o mesmo UID que escreve a fila, e um UID do bridge comprometido
+# que plantasse chave no servido e forjasse o registro passaria se as duas camadas lessem os mesmos bytes
+# (refutador desta cura). Aceitar exige que as duas raízes concordem. A2A_SPIKE_ACCEPT_TRUST_REPO só existe para
+# o selftest (sandbox) e, quando usado, avisa. O razão de aceites vai para o estado do spike, ao lado do inbox que
+# ele deduplica: no checkout, um jti do spike suprimiria o aceite real do mesmo jti no inbox do core.
+ACC_TRUST="${A2A_SPIKE_ACCEPT_TRUST_REPO:-${ROOT}}"
+if [ "${ACC_TRUST}" != "${ROOT}" ]; then   # override deixa rastro DURÁVEL, não só o stderr (2ª passada do refutador)
+  echo "AVISO: a reverificação do a2a-accept usa A2A_SPIKE_ACCEPT_TRUST_REPO=${ACC_TRUST}, não o checkout" >&2
+  printf '%s\tACC-TRUST-OVERRIDE\t%s\t%s\n' "$(now_ms)" "${ACC_TRUST}" "${JTI}" >> "${STATE}/accept.tsv"
+fi
+bash "${ACCEPT}" "${LOCAL}" --inbox "${STATE}/inbox" --receiver "${RECEIVER}" --trust-repo "${ACC_TRUST}" \
+  --ledger "${STATE}/accept.ledger" >/dev/null || refuse "a2a-accept recusou (a reverificação lê a 2ª raiz: ${ACC_TRUST})"
 
 TASK="$(jq -r '.taskId // ""' "${LOCAL}")"
 if [ -z "${NOPUSH}" ]; then
