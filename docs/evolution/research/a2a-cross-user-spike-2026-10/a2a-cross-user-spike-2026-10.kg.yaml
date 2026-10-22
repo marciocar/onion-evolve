@@ -418,6 +418,22 @@ nodes:
       locator: "casos --me/--sent-tsv e o mutante «--me ignorado»"
       method: "medição: selftest offline com chave descartável e mutate-and-restore conferido por sha256"
       locality: "repo"
+  - id: D_DEGRAU_B_CANARIO_RESTAURA_NO_FIM_DO_LOTE_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Restaurar e replantar»"
+    label: "Ao fim do lote do A7-C1 os canários são restaurados (plant-canaries.sh --restore --purge-sandbox) e replantados com sandbox novo antes do A8; o canário não fica como bearer funcional até lá"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Restaurar e replantar»; descartadas: «Seguir a letra» · «Plantar só para o A8»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «Canários do degrau B: depois do lote do A7-C1, o que fazemos com o channel-token canário? (§12.14 manda restaurar só depois do A8, e o A8 não roda hoje)»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
 edges:
   - from: E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021
     to: D_DEGRAU_A_HOJE_A0_E_A1_1021
@@ -500,6 +516,9 @@ edges:
   - from: E_DEGRAU_B_VOLTA_TINHA_DOIS_BLOQUEIOS_1022
     to: D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021
     edge_type: SUPPORTS
+  - from: D_DEGRAU_B_CANARIO_RESTAURA_NO_FIM_DO_LOTE_1022
+    to: D_DEGRAU_B_A7_ANTES_DO_A8_COM_FOTO_LIMPA_1022
+    edge_type: TRACES_TO
 
 external_edges:
   - from: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY"
