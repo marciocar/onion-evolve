@@ -393,6 +393,13 @@ elif [ -f ops/testing/preflight-run.sh ]; then
   [ "${_pf_rc}" = 0 ] || die "pré-voo reprovou no ambiente do runner (rc=${_pf_rc}) — nada commitado; o CI quebraria igual"
 fi
 
+_kg_gate_digest() {  # <saída do ops/kg-gate-ci.sh> → as linhas que dizem POR QUE reprovou. Só EXIBE: quem decide é o rc.
+  # A kg-ssot 4.18.0 fala inglês por padrão (a língua vem de KG_SSOT_LANG, LANGUAGE, LC_ALL, LC_MESSAGES e LANG),
+  # e o kg_gate.py não tem saída de máquina; por isso o filtro aceita as duas línguas. Dívida: trocar por JSON
+  # quando o gate tiver um. GATE/VENDOR QUEBRADO entrou aqui também: rc 2 do gate não mostrava linha nenhuma.
+  grep -E '^✗|QUEBRAD|BROKEN|divergente|divergent|ausente|missing|Error|erro' "$1" \
+    | grep -vE '\((herdado|inherited)\)' | head -20
+}
 _lint_in() {  # <worktree com o commit a julgar> <arquivo de HARD> → _rc e _hard; o env do CI, como o runner
   _lint="$(cd "$1" && _ci env LC_ALL=C ONION_LINT_HARD_FILE="$2" bash .claude/validation/lint-artifacts.sh 2>&1)"; _rc=$?
   _hard="$(grep -oE 'Violações HARD : [0-9]+' <<< "${_lint}" | grep -oE '[0-9]+$' | tail -1)"
@@ -427,7 +434,7 @@ if [ "${CHECK}" = 1 ]; then
       echo "  lint do commit resultante: 0 HARD · contrato KG-SSOT verde — a rodada real passaria"; exit 0
     fi
     echo "  lint 0 HARD, mas o contrato KG-SSOT reprovaria o commit (o mesmo passo do CI):"
-    grep -E '^✗|ausente|Error|erro' "${_ck}/kggate.txt" | grep -v '(herdado)' | head -20 | sed 's/^/    /'
+    _kg_gate_digest "${_ck}/kggate.txt" | sed 's/^/    /'
     exit 1
   fi
   echo "  lint do commit resultante: rc=${_rc}, HARD=${_hard:-?} — a rodada real recusaria:"
@@ -471,7 +478,7 @@ fi
 _step "4 contrato KG-SSOT"
 if ! (cd "${_tmp}/wt" && bash ops/kg-gate-ci.sh) > "${_tmp}/kggate.txt" 2>&1; then
   echo "PR-FINALIZE: o contrato KG-SSOT reprovou o commit (o mesmo passo do CI):" >&2
-  grep -E '^✗|ausente|Error|erro' "${_tmp}/kggate.txt" | grep -v '(herdado)' | head -20 | sed 's/^/  /' >&2
+  _kg_gate_digest "${_tmp}/kggate.txt" | sed 's/^/  /' >&2
   die "contrato KG-SSOT do COMMIT reprovou — nada enviado (os commits locais ficam; o resíduo volta como estava)."
 fi
 _DONE=1   # daqui em diante o carimbo é legítimo: o commit que o carrega passou no lint e no contrato
