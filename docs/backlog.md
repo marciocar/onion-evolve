@@ -1122,11 +1122,12 @@
 |--:|---|---|---|
 | 4.2 | `Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO` | radar-E3-2026-10-05-r7 | A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting |
 
-## vps-shared-tools-2026-07 — 1 item(ns)
+## vps-shared-tools-2026-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.2 | `C_dissent_auth_transversal` | vps-shared-tools-2026-07 | DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como da |
+| 2.4 | `Q_WAHA_REVISAO_MENSAL_DA_VERSAO` | vps-shared-tools-2026-07 | Revisão periódica do WAHA (mensal; a próxima em 2026-11-22): há release mais nova que a fixada (2026.9.2)? Se houver, ler o ch |
 
 ## guardrails-2nd-pr-state-2026-07 — 1 item(ns)
 
