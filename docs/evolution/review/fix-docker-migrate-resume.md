@@ -2,7 +2,8 @@
 branch: fix/docker-migrate-resume
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 041cda55c4df8300f02ed17a73bc4bdae86bcaad04b793646673647df580ac4f
+reviewed_code_sha256: cfeb5defae412868076fb587e7d8fa78e218b2e28b47ee752676c1f074dbfa4a
 findings_total: 1
 findings_real: 1
 tokens: 0
