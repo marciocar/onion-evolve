@@ -2,14 +2,13 @@
 branch: docs/radar-e3-r16
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: 828252859471759dc1015ffd4f4333c9369633f119729d9238b64dd4e1dc9c6a
-reviewed_code_sha256: 77e316e2e5b5552b1a92c4b94ce487172fab813524ec14a3f4ff4a2dd34a2f23
-findings_total: 1
-findings_real: 1
+reviewed_diff_sha256: pendente
+findings_total: 2
+findings_real: 2
 tokens: 0
 duration_min: 20
-findings_fixed: 0
-verdict: APROVADO
+findings_fixed: 1
+verdict: CORRIGIDO
 elenxo: nao
 reviewer: "fork da sessão (claude-opus-5-5), passada própria"
 nota: "tokens não medidos (fork); o achado é do medidor e virou issue, não foi curado aqui (o cc-update não implementa ações)"
@@ -28,6 +27,10 @@ nota: "tokens não medidos (fork); o achado é do medidor e virou issue, não fo
 1. O `cc-delta-census.sh` filtra `/worktrees/` pelo caminho absoluto e zera a contagem de `scriptPath` numa
    worktree (8 contra 0, medido). Fica como `Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022` e SAC-219, por
    desenho do comando, que não implementa ações.
+
+2. O 1º push reprovou no CI (família kg-machine-path, ISENCAO-NOVA): o nó do achado isentava um caminho de
+   máquina por `x_path_is_content`. Re-revisado: o caminho não era o conteúdo; o nó passou a citar o filtro pela
+   forma, sem caminho, e a família roda verde localmente.
 
 ## Mutantes
 
