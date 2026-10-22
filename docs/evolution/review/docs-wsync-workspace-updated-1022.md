@@ -2,7 +2,8 @@
 branch: docs/wsync-workspace-updated-1022
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 53f008453d8b68ed8bc041e9c691e50139421c08e0a8ab0eec27008994ca756d
+reviewed_code_sha256: cbc142a489a0af1bae90185677cd46a8182f3c58343b50ef7b5f2104dd61b23f
 findings_total: 1
 findings_real: 1
 tokens: 0
