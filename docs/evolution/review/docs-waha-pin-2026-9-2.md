@@ -2,7 +2,8 @@
 branch: docs/waha-pin-2026-9-2
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c58c196b4990dff65a84420094d83c465ce1800777dd302294a6a282d34f31b9
+reviewed_code_sha256: 578b11508fa0ccb9b4a46ca9b1c415c65947bf1b994a8da27cdbf727de9031d2
 findings_total: 2
 findings_real: 2
 tokens: 0
