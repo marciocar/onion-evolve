@@ -2,7 +2,8 @@
 branch: fix/a2a-spike-fetch-replies-member
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0fe93416dfbc10750b4236383b1ea2fe7d539aeacfe57a778d40d89ddbbb751d
+reviewed_code_sha256: 433a6dc6a074257aa538cbc9da368787604f005473eab602c642bbfaa4015d9e
 findings_total: 11
 findings_real: 8
 tokens: 80480
