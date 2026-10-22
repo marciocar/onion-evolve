@@ -152,6 +152,13 @@ def fake_code_root(base):
         fh.write('#!/usr/bin/env bash\nexit 0\n')
     real_tools = os.path.join(CODE_ROOT, 'vendor', 'kg-ssot', 'tools')
     shutil.copy(os.path.join(real_tools, 'kg_store.py'), tools)
+    # desde a 4.18.0 o kg_store importa o kg_i18n, que lê o catálogo em vendor/kg-ssot/locale/: sem os dois o
+    # armazém não sobe (o harness copiava só o kg_store e caiu no CI com ModuleNotFoundError)
+    if os.path.exists(os.path.join(real_tools, 'kg_i18n.py')):
+        shutil.copy(os.path.join(real_tools, 'kg_i18n.py'), tools)
+    real_locale = os.path.join(CODE_ROOT, 'vendor', 'kg-ssot', 'locale')
+    if os.path.isdir(real_locale):
+        shutil.copytree(real_locale, os.path.join(fr, 'vendor', 'kg-ssot', 'locale'))
     with open(os.path.join(tools, 'kg_validate.py'), 'w') as fh:
         fh.write(FAKE_VALIDATE)
     with open(os.path.join(tools, 'real_path'), 'w') as fh:
