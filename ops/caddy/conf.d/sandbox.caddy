@@ -1,0 +1,41 @@
+# Origem da sandbox do piloto ui:// render-only (D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021, decidido pelo maestro em
+# 2026-10-21; DNS e este vhost autorizados por ele em 2026-10-22, só este subdomínio, só para o piloto).
+#
+# POR QUE UMA ORIGEM À PARTE: a vista ui:// (MCP Apps, spec 2026-01-26) nunca abre na origem do app. O token do
+# /chat mora no localStorage de app.onionevolve.com (SAC-184), e a mesma origem daria acesso a ele à vista. A spec
+# pede, para host web, um proxy de sandbox numa ORIGEM DISTINTA. Esse proxy é o deploy/sandbox/sandbox.html do
+# onion-bridge (PR #83), e este vhost serve só ele.
+#
+# QUEM PUBLICA O ARQUIVO: o ops/update-bridge.sh, depois do deploy verificado do bridge, instala
+# deploy/sandbox/sandbox.html do bridge servido em /var/www/onion-sandbox/sandbox.html (root:root 0644, atômico,
+# só se mudou). Sem passo à mão. Enquanto o bridge servido não tiver o arquivo, /sandbox.html dá 404 (o
+# file_server não acha) e o resto também.
+#
+# O CSP É O DA VISTA: o srcdoc do iframe interno HERDA este CSP, então a vista roda com ele.
+#   default-src 'none'            sem rede: nem fetch, nem imagem remota, nem fonte (connect-src cai aqui)
+#   script-src 'unsafe-inline'    o script do proxy e o da vista são inline (o dado nunca vira HTML: textContent)
+#   frame-ancestors               só o app pode emoldurar a sandbox
+# O app, do lado dele, ganhou `frame-src https://sandbox.onionevolve.com` no ops/caddy/Caddyfile.
+#
+# LIMITE DECLARADO: o CSP não foi medido num navegador (a bancada do bridge roda no happy-dom, que não aplica
+# CSP). É o dogfood do passo 4 do deploy/sandbox/README.md do bridge.
+#
+# O verify só cobra o 404: o /sandbox.html 200 só passa depois que o update-bridge publicar o arquivo, e o
+# instalador reprovaria a instalação antes disso. Acrescente `# verify: https://sandbox.onionevolve.com/sandbox.html 200`
+# depois da 1ª publicação.
+#
+# Desligar = remover este arquivo do repo e rodar ops/install-caddy-config.sh (ele remove o vivo gerido).
+#
+# verify: https://sandbox.onionevolve.com/qualquer 404
+sandbox.onionevolve.com {
+    root * /var/www/onion-sandbox
+    @notpage not path /sandbox.html
+    respond @notpage 404
+
+    header Content-Security-Policy "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; frame-ancestors https://app.onionevolve.com; base-uri 'none'; form-action 'none'"
+    header X-Content-Type-Options "nosniff"
+    header Referrer-Policy "no-referrer"
+    header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    header Cache-Control "no-cache"
+    file_server
+}

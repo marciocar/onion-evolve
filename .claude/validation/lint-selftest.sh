@@ -11521,7 +11521,7 @@ EOF
   done
   _ubreset() {
     _ubstubs "${d}/ops"
-    rm -rf "${d}/srv" "${d}/unit" "${d}/bk" "${d}/st" "${d}/lock"; mkdir -p "${d}/srv" "${d}/st" "${d}/bk" \
+    rm -rf "${d}/srv" "${d}/unit" "${d}/bk" "${d}/st" "${d}/lock" "${d}/www" "${d}/victim"; mkdir -p "${d}/srv" "${d}/st" "${d}/bk" "${d}/www" \
       "${d}/unit/onion-vps-bridge.service.d"
     ${g} clone -q "${d}/origin-clone.git" "${d}/srv/onion-evolve" && ${g} -C "${d}/srv/onion-evolve" reset -q --hard HEAD~1
     ${g} clone -q "${d}/origin-bridge.git" "${d}/srv/onion-bridge" && ${g} -C "${d}/srv/onion-bridge" reset -q --hard HEAD~1
@@ -11538,10 +11538,11 @@ EOF
   _ubcase() {
     local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
     sed -e "s#^BRIDGE=.*#BRIDGE=${d}/srv/onion-bridge#" -e "s#^CLONE=.*#CLONE=${d}/srv/onion-evolve#" -e "s#^DEST=.*#DEST=${d}/bk#" \
-        -e "s#^UNIT_DIR=.*#UNIT_DIR=${d}/unit#" -e "s#^LOCK=.*#LOCK=${d}/lock#" "${wr}" > "${d}/ops/w.sh"
+        -e "s#^UNIT_DIR=.*#UNIT_DIR=${d}/unit#" -e "s#^LOCK=.*#LOCK=${d}/lock#" \
+        -e "s#^SANDBOX_DIR=.*#SANDBOX_DIR=${d}/www/onion-sandbox#" -e "s#^SANDBOX_OWNER=.*#SANDBOX_OWNER=$(id -un):$(id -gn)#" "${wr}" > "${d}/ops/w.sh"
     # a cópia nunca roda com caminho de produção: se o sed não pegou (constante renomeada), o caso REPROVA sem rodar
-    if grep -nE '^[^#]*(/home/onion|/etc/systemd|/tmp/onion-update-bridge\.lock|/home/marcio)' "${d}/ops/w.sh" >/dev/null; then
-      record_fail "update-bridge: ${name}" "a cópia da bancada ainda tem caminho de produção: $(grep -nE '^[^#]*(/home/onion|/etc/systemd|/tmp/onion-update-bridge\.lock|/home/marcio)' "${d}/ops/w.sh" | head -1 | cut -c1-120)"
+    if grep -nE '^[^#]*(/home/onion|/etc/systemd|/tmp/onion-update-bridge\.lock|/home/marcio|/var/www)' "${d}/ops/w.sh" >/dev/null; then
+      record_fail "update-bridge: ${name}" "a cópia da bancada ainda tem caminho de produção: $(grep -nE '^[^#]*(/home/onion|/etc/systemd|/tmp/onion-update-bridge\.lock|/home/marcio|/var/www)' "${d}/ops/w.sh" | head -1 | cut -c1-120)"
       return
     fi
     _ubreset; UB_WHY=""; "${fn}" "${d}/ops/w.sh" && rc_i=0
@@ -11681,6 +11682,57 @@ PY
     "  if grep -qE '^.. docs/evolution/trust-log\.md\$' <<<\"\${RESIDUE}\"; then" '  if false; then' _ub_tl_residue
   _ubcase "(u25) resíduo SEM o trust-log → stash sem o aviso (o aviso não é ruído em todo update)" \
     "  if grep -qE '^.. docs/evolution/trust-log\.md\$' <<<\"\${RESIDUE}\"; then" '  if true; then' _ub_other_residue
+  # SANDBOX DO PILOTO ui:// (2026-10-22, fase 7): o update publica deploy/sandbox/sandbox.html do bridge SERVIDO em
+  # SANDBOX_DIR, depois da fase 6 provada (também no NOOP), atômico, só se mudou, e recusa symlink. O arquivo entra
+  # na árvore do bridge servido como não-rastreado (o pull --ff-only não o toca); o exclude o tira do status do NOOP.
+  _ubsbx() { mkdir -p "${d}/srv/onion-bridge/deploy/sandbox"; printf '<!doctype html>\n<p>sandbox %s</p>\n' "${1:-v1}" > "${d}/srv/onion-bridge/deploy/sandbox/sandbox.html"
+    echo deploy/ >> "${d}/srv/onion-bridge/.git/info/exclude"; }
+  _ubsd="${d}/www/onion-sandbox"
+  _ub_sbx_pub() { _ubsbx; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "sandbox: ${_ubsd} criado (0755" && _ubhas "${r}" "sandbox.html publicado do bridge servido" && _ubhas "${r}" "OK — clone" \
+      && cmp -s "${d}/srv/onion-bridge/deploy/sandbox/sandbox.html" "${_ubsd}/sandbox.html" && [ ! -L "${_ubsd}/sandbox.html" ] \
+      && [ "$(stat -c '%a' "${_ubsd}/sandbox.html")" = 644 ] && [ "$(stat -c '%a' "${_ubsd}")" = 755 ] \
+      && [ -z "$(find "${_ubsd}" -name '.sandbox.html.*')" ]; }
+  _ub_sbx_same() { _ubsbx; mkdir -p "${_ubsd}"; cp "${d}/srv/onion-bridge/deploy/sandbox/sandbox.html" "${_ubsd}/sandbox.html"; chmod 0644 "${_ubsd}/sandbox.html"
+    local ino0 r; ino0="$(stat -c '%i %Y' "${_ubsd}/sandbox.html")"; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "já é o do bridge servido" && ! _ubhas "${r}" "publicado do bridge servido" \
+      && [ "$(stat -c '%i %Y' "${_ubsd}/sandbox.html")" = "${ino0}" ]; }
+  _ub_sbx_changed() { _ubsbx v2; mkdir -p "${_ubsd}"; printf 'velho\n' > "${_ubsd}/sandbox.html"; chmod 0644 "${_ubsd}/sandbox.html"
+    local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "publicado do bridge servido" && grep -q 'sandbox v2' "${_ubsd}/sandbox.html"; }
+  _ub_sbx_absent() { local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "AVISO: sandbox: o bridge servido não tem deploy/sandbox/sandbox.html" && _ubhas "${r}" "OK — clone" && [ ! -e "${_ubsd}" ]; }
+  _ub_sbx_dstlink() { _ubsbx; mkdir -p "${_ubsd}"; printf 'alvo\n' > "${d}/victim"; ln -s "${d}/victim" "${_ubsd}/sandbox.html"
+    local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "sandbox.html é symlink — recusado" && _ubhas "${r}" "segue NO AR e provado" && ! _ubhas "${r}" "OK — clone" \
+      && ! _ubhas "${r}" "ROLLBACK MANUAL" && [ -L "${_ubsd}/sandbox.html" ] && [ "$(cat "${d}/victim")" = alvo ] && _ubrunning; }
+  _ub_sbx_dirlink() { _ubsbx; mkdir -p "${d}/victim"; ln -s "${d}/victim" "${_ubsd}"
+    local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "onion-sandbox é symlink — recusado" && [ -z "$(ls -A "${d}/victim")" ]; }
+  _ub_sbx_srclink() { mkdir -p "${d}/srv/onion-bridge/deploy/sandbox"; printf 'SEGREDO\n' > "${d}/victim"
+    ln -s "${d}/victim" "${d}/srv/onion-bridge/deploy/sandbox/sandbox.html"; echo deploy/ >> "${d}/srv/onion-bridge/.git/info/exclude"
+    local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "é symlink — recusado (publicaria o alvo do link)" && [ ! -e "${_ubsd}/sandbox.html" ]; }
+  _ub_sbx_noop() { _ubnoop; _ubsbx; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "NOOP OK" && _ubhas "${r}" "publicado do bridge servido" && [ -f "${_ubsd}/sandbox.html" ] \
+      && ! grep -qE '^systemctl (stop|start)' "${d}/st/calls"; }
+  _ubcase "(u26) sandbox presente no bridge servido → publicada (dir 0755 criado, arquivo 0644, byte a byte, sem temporário largado)" \
+    '     || ! sudo mv -f "${tmp}" "${dst}"; then' '     ; then' _ub_sbx_pub
+  _ubcase "(u27) sandbox já em dia (conteúdo, dono e modo) → intocada (mesmo inode e mtime)" \
+    '  if sudo test -f "${dst}" && sudo -u onion cat -- "${src}" | sudo cmp -s - "${dst}" \' '  if false && sudo test -f "${dst}" \' _ub_sbx_same
+  _ubcase "(u28) sandbox do bridge mudou → a cópia publicada é trocada" \
+    '  if sudo test -f "${dst}" && sudo -u onion cat -- "${src}" | sudo cmp -s - "${dst}" \' '  if sudo test -f "${dst}" \' _ub_sbx_changed
+  _ubcase "(u29) bridge servido SEM o sandbox.html (antes do onion-bridge#83) → AVISO e rc 0, nada criado" \
+    $'é o esperado)"\n      return 0' $'é o esperado)"\n      return 1' _ub_sbx_absent
+  _ubcase "(u30) destino é SYMLINK → recusa rc 1 nomeada, o alvo intocado, bridge no ar sem rollback" \
+    '  if sudo test -L "${dst}"; then' '  if false; then' _ub_sbx_dstlink
+  _ubcase "(u31) diretório da sandbox é SYMLINK → recusa rc 1, nada escrito no alvo" \
+    '  if sudo test -L "${SANDBOX_DIR}"; then' '  if false; then' _ub_sbx_dirlink
+  _ubcase "(u32) origem no bridge é SYMLINK → recusa rc 1 (o sudo publicaria o alvo do link na web)" \
+    '  if sudo test -L "${src}"; then' '  if false; then' _ub_sbx_srclink
+  _ubcase "(u33) NOOP também publica (re-rodar depois de uma falha cura), sem stop/start" \
+    $'  post_update_checks noop\n  run_sandbox_phase' '  post_update_checks noop' _ub_sbx_noop
+  unset -f _ubsbx _ub_sbx_pub _ub_sbx_same _ub_sbx_changed _ub_sbx_absent _ub_sbx_dstlink _ub_sbx_dirlink _ub_sbx_srclink _ub_sbx_noop
   rm -rf "${d}"
 }
 
