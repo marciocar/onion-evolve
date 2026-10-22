@@ -2,7 +2,8 @@
 branch: fix/door-kg-read-index
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0aa45af438432577756437091ad97466115b5a971b676405b8ffe2e6caa9b2f8
+reviewed_code_sha256: 7069e6144a546c8b8e9774f4678ac5728a191ddb291857a1161e5391cebf21f7
 findings_total: 1
 findings_real: 1
 tokens: 0
