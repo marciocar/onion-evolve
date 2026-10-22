@@ -10,6 +10,17 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.19.1] - 2026-10-22
+
+O gate deixa o vendor do KG-SSOT fora do corpus do adotante. Contrato v4.11, sem mudança.
+
+### Fixed
+
+- **O `kg_gate.py` contava o grafo de exemplo do vendor como grafo do adotante.** O vendor da 4.19.0 traz
+  `spec/vocab-examples/cmed-dictionary.kg.yaml` fora de `fixtures/`, e um `--update` o gravaria na base (achado por um
+  adotante antes de qualquer `--update`). O gate passa a deixar fora, por padrão, todo arquivo numa pasta com o
+  carimbo `.kg-ssot-version`, onde quer que o vendor esteja; o `--no-default-excludes` o traz de volta.
+
 ## [4.19.0] - 2026-10-22
 
 Um vocabulário de domínio que se confere sinônimo por sinônimo, e uma forma para as chaves `x_` que os adotantes
@@ -161,7 +172,8 @@ O gate sem atrito. Contrato v4.9, sem mudança.
 - A troca de identidade do contrato sem veredito trocado passa com aviso (rc 0); `--strict-identity` volta ao
   comportamento antigo. O vendor confere os schemas contra o carimbo.
 
-[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.0...HEAD
+[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.1...HEAD
+[4.19.1]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.19.0...kg-ssot-v4.19.1
 [4.19.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.18.0...kg-ssot-v4.19.0
 [4.18.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.2...kg-ssot-v4.18.0
 [4.17.2]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.1...kg-ssot-v4.17.2

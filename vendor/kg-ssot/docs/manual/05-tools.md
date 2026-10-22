@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.19.0",
+  "release": "kg-ssot-v4.19.1",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -245,7 +245,7 @@ rc 0, with a request to lock in the gain. Run `--update` in the same PR so the d
 |---|---|
 | `--update` | Writes the baseline. If something got worse, it refuses unless you pass `--accept-regression` |
 | `--accept-regression "<reason>"` | Accepts a regression; the reason is recorded in the baseline |
-| `--exclude GLOB` | Removes paths from the corpus (repeatable). `*/fixtures/*` and `docs/materials/*` are excluded by default |
+| `--exclude GLOB` | Removes paths from the corpus (repeatable). `*/fixtures/*`, `docs/materials/*`, and the KG-SSOT vendor (any folder with the `.kg-ssot-version` stamp, since 4.19.1) are excluded by default; `--no-default-excludes` brings them back |
 | `--granularity node` | With `--update`: counts the SHOULD debt per occurrence, not per graph |
 | `--no-default-excludes` | Turns off the default excludes (and then the vendor fixtures enter the corpus) |
 | `--repo DIR` · `--baseline FILE` | Another repository, another baseline |

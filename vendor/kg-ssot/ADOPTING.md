@@ -64,14 +64,14 @@ first time, clone it outside your repository and run the vendor tool from the ro
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.1 --dest vendor/kg-ssot
 ```
 
 To update, run it from the vendor, with `--source` required. It takes a path or a URL, and a URL becomes a
 throwaway bare clone. Inside the vendor, the git repository is the adopter's, which does not have the tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 The published tags are listed by `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -108,8 +108,9 @@ python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # writes the .kg-sso
 ```
 
 The gate measures the `.kg.yaml` files that git tracks (`git ls-files`, read from the working tree). A file that is
-not in git yet is left out. By default, `*/fixtures/*` and `docs/materials/*` are excluded, and that already excludes
-the vendor's own fixtures: every `.kg.yaml` in the vendor lives under `*/fixtures/*`. That is why
+not in git yet is left out. By default, `*/fixtures/*` and `docs/materials/*` are excluded, and so is the KG-SSOT vendor
+itself, any folder with the `.kg-ssot-version` stamp (since 4.19.1; the 4.19.0 vendor brings an example graph outside
+`fixtures/`). That is why
 `git add vendor/kg-ssot` comes before `--update`: with the vendor tracked, the baseline you write is the same one CI
 measures after the commit. A graph of yours that you have not added yet also needs `git add` first.
 
@@ -326,6 +327,12 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.19.0` to `kg-ssot-v4.19.1`, the contract does not change (still v4.11). The gate leaves out of its
+corpus, by default, every file in a folder with the vendor stamp `.kg-ssot-version`, wherever the vendor lives. The
+4.19.0 vendor brings an example graph (`spec/vocab-examples/cmed-dictionary.kg.yaml`) outside `fixtures/`, and the
+gate counted it as one of your graphs: a `--update` on 4.19.0 would write it into your baseline. If you already ran
+`--update` on 4.19.0, run it again on 4.19.1: the example leaves the corpus, and the gate reports that graph as gone.
+
 From `kg-ssot-v4.18.0` to `kg-ssot-v4.19.0`, contract v4.11 comes in. The gate reports the new identity on the
 `· identity` line and decides by what each graph gets, as since 4.16.0:
 - **`meta.title` and `meta.slug` become known keys.** A graph that failed the MUST only because of one of them now
@@ -516,7 +523,7 @@ and the profile-driven migrator come in.
 - **On Windows, the update to 4.13.0 or later runs through the new tag's kit.** The `kg_vendor.py` of earlier tags
   passes `git archive` the whole list of release files, and in 4.13.0 that list exceeds the Windows command-line limit
   (`WinError 206`). Run the update from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag
-  kg-ssot-v4.19.0 --dest vendor/kg-ssot`). Since 4.13.0, the kit passes only the release entries. On Linux and macOS
+  kg-ssot-v4.19.1 --dest vendor/kg-ssot`). Since 4.13.0, the kit passes only the release entries. On Linux and macOS
   the limit is much higher, and the usual update works.
 
 Measured on 2026-10-20, none of the 1,507 `.kg.yaml` files in four adopter repositories changes at the MUST or SHOULD
@@ -647,7 +654,7 @@ What changes in v4:
   there in v4, not only in v5. Adjust the generators that write `provenance` first.
 
 The path, in a single PR:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.1 --source https://github.com/marciocar/kg-ssot`
    twice (the v3 kit does not write the vendor's `.gitattributes`, and the second update, now with the new kit,
    does), `git add vendor/kg-ssot`, and `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` shows the new contract identity and the graphs that start failing

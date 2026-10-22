@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:409640ee665ceb88 -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:b805a7577bff7a23 -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.11 ou mais (o `rpds-py`, dep
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.1 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt

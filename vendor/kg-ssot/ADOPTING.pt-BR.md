@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:6ce8199ab44f9812 -->
+<!-- translation-of: ADOPTING.md sha256:4f76f5d1ae80a34d -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -66,14 +66,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.1 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.1 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -109,8 +109,9 @@ python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava a pasta .kg-
 ```
 
 O gate mede os `.kg.yaml` rastreados por git (`git ls-files`, lidos da árvore de trabalho). Um arquivo que
-ainda não está no git não entra. Por padrão, `*/fixtures/*` e `docs/materials/*` ficam de fora, e isso já
-exclui as fixtures do próprio vendor: os `.kg.yaml` do vendor moram todos em `*/fixtures/*`. Por isso o
+ainda não está no git não entra. Por padrão, `*/fixtures/*` e `docs/materials/*` ficam de fora, e o próprio vendor do
+KG-SSOT também, qualquer pasta com o carimbo `.kg-ssot-version` (desde a 4.19.1; o vendor da 4.19.0 traz um grafo de
+exemplo fora de `fixtures/`). Por isso o
 `git add vendor/kg-ssot` vem antes do `--update`: com o vendor rastreado, a base gravada é a mesma que o CI vai
 medir depois do commit. Um grafo seu ainda não adicionado também precisa de `git add` antes.
 
@@ -325,6 +326,12 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
 
+Da `kg-ssot-v4.19.0` para a `kg-ssot-v4.19.1`, o contrato não muda (segue o v4.11). O gate deixa fora do corpus,
+por padrão, todo arquivo numa pasta com o carimbo do vendor, `.kg-ssot-version`, onde quer que o vendor esteja. O
+vendor da 4.19.0 traz um grafo de exemplo (`spec/vocab-examples/cmed-dictionary.kg.yaml`) fora de `fixtures/`, e o
+gate o contava como um grafo seu: um `--update` na 4.19.0 o gravaria na sua base. Se você já rodou o `--update` na
+4.19.0, rode de novo na 4.19.1: o exemplo sai do corpus, e o gate acusa esse grafo como saído.
+
 Da `kg-ssot-v4.18.0` para a `kg-ssot-v4.19.0`, entra o contrato v4.11. O gate acusa a identidade nova na linha
 `· identidade` e decide pelo que cada grafo ganha, como desde a 4.16.0:
 - **O `meta.title` e o `meta.slug` viram chaves conhecidas.** Um grafo que reprovava no MUST só por uma delas passa;
@@ -509,7 +516,7 @@ leitor JS) e o migrador por perfil.
 - **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores
   passa ao `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do
   Windows (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag
-  kg-ssot-v4.19.0 --dest vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS
+  kg-ssot-v4.19.1 --dest vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS
   o limite é bem maior, e o update de sempre funciona.
 
 Medido em 2026-10-20, nenhum dos 1.507 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD. O sha256 dos
@@ -634,7 +641,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.0 --source https://github.com/marciocar/kg-ssot`
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.19.1 --source https://github.com/marciocar/kg-ssot`
    duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
    `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
