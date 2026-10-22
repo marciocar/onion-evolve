@@ -84,7 +84,7 @@ cmd_plan() {
   # o dpkg-query sai 1 quando algum nome da lista não existe na base (o caso normal aqui): o rc dele não é o dado
   { dpkg-query -W -f='${Package}\t${Version}\t${db:Status-Status}\n' "${UBUNTU_PKGS[@]}" docker-ce docker-ce-cli containerd.io \
     docker-buildx-plugin docker-compose-plugin 2>/dev/null || true; } | awk -F'\t' '$3=="installed"' | put packages.tsv
-  sudo_do docker version --format '{{.Client.Version}}\t{{.Server.Version}}' | put engine.tsv
+  sudo_do docker version --format '{{.Client.Version}} {{.Server.Version}}' | put engine.tsv
   sudo_do docker info --format '{{range .DriverStatus}}{{index . 0}}={{index . 1}} {{end}}|{{.CgroupDriver}}|{{.FirewallBackend.Driver}}' | put driver.txt
   sudo_do docker ps -a --format '{{.Names}}' | while read -r n; do
     sudo_do docker inspect "$n" --format '{{.Name}}	{{.State.Status}}	{{.HostConfig.RestartPolicy.Name}}	{{if .State.Health}}{{.State.Health.Status}}{{else}}-{{end}}	{{.Config.Image}}	{{.Image}}	{{index .Config.Labels "com.docker.compose.project"}}	{{index .Config.Labels "com.docker.compose.project.working_dir"}}	{{range .Mounts}}{{if eq .Source "/var/run/docker.sock"}}SOCK{{end}}{{end}}'
