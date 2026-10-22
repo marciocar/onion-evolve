@@ -2,7 +2,8 @@
 branch: docs/sec-scan-php-docker-1022
 pr: pendente
 date: 2026-10-22
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 097321846990dd7370ceb869e4a7717b6354706d6bd66cc950bd1f09dd156d3a
+reviewed_code_sha256: 698de8112e052e5f0bd6fb091d20dbd8dfb4b37b869dfacf1b8394b19b385380
 findings_total: 1
 findings_real: 1
 tokens: 0
