@@ -615,6 +615,22 @@ nodes:
       locator: "turno do /chat que chamou decide_panel_view com a rodada 5ad98b3ed4eb0ea7 gerada no workspace"
       method: "testemunho: capturas de tela do maestro, 2026-10-22"
       locality: "pessoa"
+  - id: D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "decisão do maestro em 2026-10-22, por pergunta com opções (/meta:decide): escolhida «Staging + wrapper»"
+    label: "O workspace do admin no /chat se atualiza pelo /meta:adopt --update rodado do core num staging, e um wrapper em ops/ confere o diff, faz backup e devolve como usuário do serviço"
+    narrative: "Selado por /meta:decide em 2026-10-22: escolhida «Staging + wrapper»; descartadas: «Fase no update-bridge» · «Uma vez, à mão»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-22: «Como o workspace do admin recebe o motor KG e os comandos atuais, se o --update roda do core e o workspace só aceita escrita do serviço?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
 
 edges:
   - from: E_UI_PILOT_RENDERED_IN_BROWSER_1022
@@ -738,6 +754,9 @@ edges:
     edge_type: TRACES_TO
   - from: D_UI_PILOT_MOTOR_KG_NO_WORKSPACE_1022
     to: E_UI_SANDBOX_ORIGIN_LIVE_1022
+    edge_type: TRACES_TO
+  - from: D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022
+    to: D_UI_PILOT_MOTOR_KG_NO_WORKSPACE_1022
     edge_type: TRACES_TO
 
 external_edges:

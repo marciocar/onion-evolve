@@ -29925,6 +29925,28 @@ run_install_caddy_config_selftests() {
   fi
 }
 
+# Sync do Onion num workspace do /chat (ops/workspace-adopt-sync.sh) — bancada embutida (--selftest, sandbox
+# mktemp, sem sudo, nunca toca o diretório servido) e os mutantes de cada guarda (--selftest-mutants): vivo mudado
+# depois do stage, symlink, fora do prefixo, apply sem stage, staging alheio, symlink de fuga e segredo no staging.
+# Nasceu da decisão D_UI_PILOT_WORKSPACE_ATUALIZA_POR_STAGING_E_WRAPPER_1022 (2026-10-22).
+run_workspace_adopt_sync_selftests() {
+  local ws="${REPO_ROOT}/ops/workspace-adopt-sync.sh"
+  if [ ! -f "${ws}" ]; then record_skip "workspace-adopt-sync: ops/workspace-adopt-sync.sh ausente"; return; fi
+  local rc=0 out
+  out="$(bash "${ws}" --selftest 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "workspace-adopt-sync: bancada sandbox verde ($(printf '%s' "${out}" | grep -o 'selftest: [0-9]* pass' | head -1))"
+  else
+    record_fail "workspace-adopt-sync: --selftest" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+  rc=0; out="$(bash "${ws}" --selftest-mutants 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "workspace-adopt-sync: $(printf '%s' "${out}" | grep '^mutantes:' | head -1)"
+  else
+    record_fail "workspace-adopt-sync: mutante sobrevivente" "rc=${rc}: $(printf '%s' "${out}" | grep '✗' | head -3)"
+  fi
+}
+
 # /meta:realign — o motor de revisão em camadas (kg-realign-project.sh) classifica drift
 # em (a)/(b)/(c) + commitment/binding sobre fixtures com um drift plantado de cada tipo.
 # GUARDA-DA-GUARDA: o `--check` só sai rc=1 no tipo-(c) (o dente); os demais informam sem bloquear.
@@ -34475,6 +34497,7 @@ _family run_site_deeplink_selftests
 _family run_plugin_private_url_selftests
 _family run_deploy_site_selftests
 _family run_install_caddy_config_selftests
+_family run_workspace_adopt_sync_selftests
 _family run_realign_selftests
 _family run_harvest_residue_selftests
 _family run_compose_exposure_selftests
