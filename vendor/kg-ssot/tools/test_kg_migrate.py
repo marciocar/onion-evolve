@@ -3,7 +3,12 @@
 invariância, gate, idempotência). Os casos do apply vieram da revisão do core sobre o rascunho do perfil (2026-10-20):
 o mapa em bloco como último campo do nó (o end_mark que engoliu um '- id:' na migração de um adotante), o bloco | e >
 no fim do nó, o comentário entre nós, o último nó sem quebra final, o nó em flow e o '- id:' na coluna 0."""
+import os
+os.environ.setdefault("KG_SSOT_LANG", "pt-BR")  # as asserções destes testes são da tradução pt-BR
+
+import contextlib
 import csv
+import io
 import json
 import os
 import pathlib
@@ -455,7 +460,7 @@ class PlanContract(Base):
         dest = self.root / "vendor" / "kg-ssot"
         shutil.copytree(TOOLS.parent / "spec", dest / "spec")
         (dest / "tools").mkdir()
-        for name in ("kg_migrate.py", "kg_validate.py"):
+        for name in ("kg_migrate.py", "kg_validate.py", "kg_i18n.py"):  # o kg_i18n viaja com eles desde a 4.18.0
             shutil.copy(TOOLS / name, dest / "tools" / name)
         env = {k: v for k, v in os.environ.items() if k != "PYTHONDONTWRITEBYTECODE"}
         r = subprocess.run([sys.executable, "-I", str(dest / "tools" / "kg_migrate.py"), "--help"], capture_output=True,
@@ -537,6 +542,34 @@ class ApplyGuards(Base):
         self.assertEqual((rc, p.read_text(encoding="utf-8")), (0, text), out)
 
 
+class English(Base):
+    """A saída humana em inglês (a língua-fonte); a planilha TSV segue em português, porque é dado que o core lê."""
+
+    def main_en(self, *args):
+        import contextlib
+        buf = io.StringIO()
+        with mock.patch.dict(os.environ, {"KG_SSOT_LANG": "en"}), contextlib.redirect_stdout(buf):
+            rc = kg_migrate.main([str(a) for a in args])
+        return rc, buf.getvalue()
+
+    def test_plan_apply_e_entrada_quebrada_em_ingles(self):
+        p = self.graph(HEAD + claim("C_A", "src/a.ts:1") + QZ + EDGES)
+        tsv = self.root / "plano.tsv"
+        rc, out = self.main_en("plan", "--profile", self.profile, "--root", self.root, "--out", tsv, p)
+        self.assertEqual(rc, 0, out)
+        self.assertIn("node row(s) in the plan", out)
+        self.assertIn("nothing was written (plan)", out)
+        self.assertTrue(tsv.read_text(encoding="utf-8").startswith("arquivo\tid\tregra\tação\tproposta\trevisar\t"))
+        rc, out = self.main_en("apply", "--profile", self.profile, "--root", self.root, p)
+        self.assertEqual(rc, 0, out)
+        self.assertIn("WRITTEN ", out)
+        self.assertIn("· 1 file(s) touched; 0 refused", out)
+        self.profile.write_text(PROFILE.replace("id: drive", "id: codigo"), encoding="utf-8")
+        rc, out = self.main_en("plan", "--profile", self.profile, p)
+        self.assertEqual(rc, 2, out)
+        self.assertIn("BROKEN INPUT  repeated rule id in the profile: codigo", out)
+
+
 class AdopterHub(unittest.TestCase):
     """A aceitação contra o corpus real anonimizado de um adotante hub (tools/fixtures/migrate/adopter-hub/README.md)."""
     FIX = TOOLS / "fixtures" / "migrate" / "adopter-hub"
@@ -595,6 +628,44 @@ class AdopterHub(unittest.TestCase):
         rc, out = self.cmd("apply")
         self.assertEqual(rc, 0, out)
         self.assertEqual({g: pathlib.Path(g).read_bytes() for g in self.graphs}, before)
+
+
+class PlanJsonBroken(unittest.TestCase):
+    """4.18.0, pedido do core: no plan --json, a entrada quebrada sai em JSON (rc 2), distinta do erro de uso do argparse."""
+
+    def run_main(self, argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = kg_migrate.main(argv)
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def test_entrada_quebrada_em_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rc, out, _err = self.run_main(["plan", "--json", "--profile", str(pathlib.Path(tmp) / "nao-existe.yaml")])
+        self.assertEqual(rc, 2)
+        doc = json.loads(out)
+        self.assertEqual(doc["reason"], "broken_input")
+        self.assertTrue(doc["error"])
+
+    def test_out_que_nao_se_grava_e_entrada_quebrada(self):
+        """Achado do Elenxo (4.18.0): o --out num diretório que não existe era traceback com rc 1."""
+        profile = TOOLS.parent / "spec/migrate-examples/company-brain.profile.yaml"
+        graph = next((TOOLS.parent / "spec/conformance/fixtures/latest/form/minimal").glob("valid-*.kg.yaml"))
+        with tempfile.TemporaryDirectory() as tmp:
+            out = str(pathlib.Path(tmp) / "nao-existe" / "x.tsv")
+            rc, stdout, _err = self.run_main(["plan", "--json", "--profile", str(profile), "--out", out, str(graph)])
+            self.assertEqual((rc, json.loads(stdout)["reason"]), (2, "broken_input"))
+            rc, stdout, _err = self.run_main(["plan", "--profile", str(profile), "--out", out, str(graph)])
+            self.assertEqual(rc, 2)
+            self.assertIn("nao-existe", stdout)
+
+    def test_erro_de_uso_nao_escreve_no_stdout(self):
+        rc, out, err = self.run_main(["plan", "--json"])  # falta o --profile
+        self.assertEqual((rc, out), (2, ""))
+        self.assertIn("--profile", err)
 
 
 if __name__ == "__main__":

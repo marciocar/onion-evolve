@@ -6,9 +6,52 @@ As mudanças relevantes do KG-SSOT ficam aqui, no formato do [Keep a Changelog](
 com as releases marcadas como `kg-ssot-vX.Y.Z`. A versão do contrato (`v4.N`) é a do contrato do `.kg.yaml` e do
 `.kg.json` que a release leva; ela só muda quando o contrato muda. Cada seção é também o corpo da release no GitHub.
 Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As releases anteriores à 4.16.0 estão no
-[ADOPTING.md](ADOPTING.md).
+[ADOPTING.pt-BR.md](ADOPTING.pt-BR.md).
 
 ## [Unreleased]
+
+## [4.18.0] - 2026-10-22
+
+O KG-SSOT passa a falar inglês primeiro. As ferramentas, a documentação e os cadastros estão em inglês, e a tradução
+completa para o português do Brasil vai ao lado. Contrato v4.10, sem mudança.
+
+### Changed
+
+- **As ferramentas imprimem em inglês por padrão.** `kg_validate`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_migrate`,
+  `kg_query`, `kg_diff`, `kg_conformance`, `kg_mcp`, `kg_prov_export`, `kg_release_notes` e a CLI do npm escolhem a
+  língua como o gettext: `KG_SSOT_LANG`, depois `LANGUAGE`, `LC_ALL`, `LC_MESSAGES` e `LANG`. Um locale `pt_BR` (ou
+  `KG_SSOT_LANG=pt-BR`) dá o português do Brasil; `C`, `POSIX` e o que não tem catálogo dão o inglês.
+- **Nota de atualização:** o dado para máquina não muda com a língua: as chaves e a estrutura do JSON, os códigos de
+  erro, os códigos de saída, o `place` (`nó X`, `aresta #n`) e o `path` do veredito, o lugar do `--where` e o TSV do
+  `kg_migrate`. O texto para pessoas muda: a saída de terminal e, dentro do JSON, as frases de `message`, `hint` e
+  `error`, que antes eram sempre em português e agora saem em inglês, a menos que o locale seja `pt_BR` (um runner de
+  CI com `LANG=C.UTF-8` recebe o inglês). Compare pelo código, nunca pela mensagem. Se o seu CI procura texto na saída
+  humana (`PASSA`, `✗ PIOROU`, `ENTRADA QUEBRADA`), fixe `KG_SSOT_LANG=pt-BR` ou case as duas línguas (`PASS`,
+  `✗ WORSE`, `BROKEN INPUT`); melhor ainda, decida pelo código de saída.
+- O servidor MCP fala inglês em qualquer locale: as descrições das ferramentas, as instruções, os erros e o texto dentro
+  dos resultados são protocolo (e prompt para o modelo), e por isso não dependem mais do ambiente do servidor. Um gate
+  externo (`--gate-cmd`) chamado pelo servidor recebe `KG_SSOT_LANG=en` pelo mesmo motivo. A vitrine do Claude Desktop
+  é traduzida pela localização da extensão.
+- Como no gettext, o `LANGUAGE` só vale quando o locale efetivo não é o `C`: `LC_ALL=C` força o inglês mesmo num
+  desktop com `LANGUAGE=pt_BR:en`.
+- A documentação é escrita em inglês e traduzida para o português do Brasil: `README.md` e `README.pt-BR.md`,
+  `ADOPTING.md` e `ADOPTING.pt-BR.md`, `spec/conformance/README.md` e o `.pt-BR.md` dele, e o manual em `docs/manual/`,
+  com a tradução em `docs/manual/pt-BR/`. Os capítulos do manual passam a ter nome de arquivo em inglês
+  (`04-contract.md`, `05-tools.md`, ...); os capítulos em português ficam com os nomes de antes em `pt-BR/`.
+- Os cadastros estão em inglês: os README do PyPI e do npm, a descrição no MCP Registry e a extensão do Claude Desktop
+  (`.mcpb`), que leva a localização pt-BR (`mcpb-resources/pt-BR.json`) para o cliente configurado em português.
+- O `llms.txt` e o `llms-full.txt` estão em inglês e leem a documentação em inglês.
+
+### Added
+
+- `tools/kg_i18n.py` e o catálogo `locale/pt_BR/LC_MESSAGES/kg-ssot.po` (formato gettext, 446 mensagens). Eles vão na
+  release, no perfil `gate` e no pacote Python; o `kg_vendor.py update` os traz com a tag. Sem eles, as ferramentas
+  vendoradas não iniciam.
+- O `kg_migrate plan --json` informa a entrada quebrada também em JSON (`{"error": ..., "reason": "broken_input"}`,
+  saída 2). O erro de uso do parser de argumentos também sai 2, mas não escreve nada no stdout, então um script
+  distingue os dois sem casar texto.
+- `kg_store.InsideGitWorktree`, uma subclasse de `StoreError` para a raiz do disco ou do versionado dentro de uma
+  worktree git, para quem escolhe o backend decidir pelo tipo, e não pela mensagem.
 
 ## [4.17.2] - 2026-10-22
 
@@ -80,7 +123,8 @@ O gate sem atrito. Contrato v4.9, sem mudança.
 - A troca de identidade do contrato sem veredito trocado passa com aviso (rc 0); `--strict-identity` volta ao
   comportamento antigo. O vendor confere os schemas contra o carimbo.
 
-[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.2...HEAD
+[Unreleased]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.18.0...HEAD
+[4.18.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.2...kg-ssot-v4.18.0
 [4.17.2]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.1...kg-ssot-v4.17.2
 [4.17.1]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.17.0...kg-ssot-v4.17.1
 [4.17.0]: https://github.com/marciocar/kg-ssot/compare/kg-ssot-v4.16.1...kg-ssot-v4.17.0

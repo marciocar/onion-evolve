@@ -1,38 +1,39 @@
 # KG-SSOT
 
-> Grafo de conhecimento verificável em arquivo texto (`.kg.yaml` para escrever, ou o mesmo modelo em `.kg.json` para o runtime): cada afirmação traz a fonte, a data em que foi conferida e o que foi conferido, e um contrato formal (JSON Schema, níveis MUST e SHOULD) decide no CI se o arquivo está bem escrito. Release 4.17.2, contrato v4, licença Apache-2.0. O leitor de referência é Python 3.11 ou mais e roda sem nenhum harness de agente.
+> Verifiable knowledge graphs in plain text (`.kg.yaml` to write, or the same model in `.kg.json` for runtime use): a confirmed or production claim must carry its source, and can carry the date it was last verified and what it was verified against; a formal contract (JSON Schema, MUST and SHOULD levels) decides in CI whether the file is well formed. Release 4.18.0, contract v4, license Apache-2.0. The reference reader is Python 3.11 or later and runs without any agent harness.
 
-Para um agente que vai escrever ou validar um `.kg.yaml`: leia o formato (capítulo 3) e o contrato (capítulo 4); valide com `python3 -I -B vendor/kg-ssot/tools/kg_validate.py <arquivo>` (num clone do repositório, `tools/kg_validate.py`) e corrija pelos códigos do capítulo 9. Os schemas mandam: quando o manual e um schema divergirem, vale o schema. O texto completo, num arquivo só, está em [llms-full.txt](llms-full.txt).
+For an agent that will write or validate a `.kg.yaml`: read the format (chapter 3) and the contract (chapter 4); validate with `python3 -I -B vendor/kg-ssot/tools/kg_validate.py <file>` (in a clone of the repository, `tools/kg_validate.py`; from the PyPI package, `kg-validate <file>`) and fix by the codes in chapter 9. The schemas rule: when the manual and a schema disagree, the schema wins. Use `--format json` for a machine-readable verdict and decide by `code`: codes, keys and exit codes never change with the output language, while the `message` and `hint` text follows it. The whole text, in one file, is in [llms-full.txt](llms-full.txt).
 
-## Comece aqui
+## Start here
 
-- [README](README.md): o que é, por que, e a primeira validação em 60 segundos
-- [Adotar](ADOPTING.md): trazer a release para um repositório, fixar a versão e rodar o gate no CI
-- [Manual](docs/manual/README.md): o índice dos capítulos
+- [README](README.md): what it is, why, and your first validation in 60 seconds
+- [Adopting](ADOPTING.md): bring the release into a repository, pin the version and run the gate in CI
+- [Manual](docs/manual/README.md): the chapter index
 
-## Escrever um grafo
+## Write a graph
 
-- [Conceitos](docs/manual/02-conceitos.md): nó, tipos, status, planos, arestas, proveniência, carimbo de verificação
-- [Formato](docs/manual/03-formato.md): todos os campos do `.kg.yaml`, tirados do schema
-- [Contrato](docs/manual/04-contrato.md): MUST × SHOULD, códigos de erro, versões
-- [Problemas](docs/manual/09-problemas.md): o que cada código de erro quer dizer e como resolver
-- [Receitas](docs/manual/08-receitas.md): tarefas comuns, passo a passo
+- [Concepts](docs/manual/02-concepts.md): node, types, status, planes, edges, provenance, verification stamp
+- [Format](docs/manual/03-format.md): every field of `.kg.yaml`, taken from the schema
+- [Contract](docs/manual/04-contract.md): MUST vs SHOULD, error codes, versions
+- [Troubleshooting](docs/manual/09-troubleshooting.md): what each error code means and how to fix it
+- [Recipes](docs/manual/08-recipes.md): common tasks, step by step
 
-## Ferramentas e integração
+## Tools and integration
 
-- [Ferramentas](docs/manual/05-ferramentas.md): `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp` (servidor MCP de referência), `kg_prov_export`
-- [Adoção e CI](docs/manual/06-adocao-e-ci.md): o caminho curto para levar o contrato a um repositório, e como usar num app (o que vai para o grafo, o import do kit em tempo de execução)
+- [Tools](docs/manual/05-tools.md): `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_query`, `kg_diff`, `kg_mcp` (the reference MCP server), `kg_migrate`, `kg_prov_export`
+- [Adoption and CI](docs/manual/06-adoption-and-ci.md): the short path to bring the contract into a repository, and how to use it in an app
 
-## Contrato (as fontes da verdade)
+## Contract (the sources of truth)
 
-- [MUST](spec/kg-contract-v4.schema.json): o que reprova
-- [SHOULD](spec/kg-contract-v4.should.schema.json): o que só avisa
-- [Veredito](spec/verdict.schema.json): a forma do veredito JSON (`kg-ssot.verdict/1`)
-- [Release](spec/release.json): a versão, a tag e a lista de arquivos que viajam
+- [MUST](spec/kg-contract-v4.schema.json): what fails
+- [SHOULD](spec/kg-contract-v4.should.schema.json): what only warns
+- [Verdict](spec/verdict.schema.json): the shape of the JSON verdict (`kg-ssot.verdict/1`)
+- [Release](spec/release.json): the version, the tag and the list of files that ship
 
 ## Optional
 
-- [Conformidade e leitores](docs/manual/07-conformidade-e-leitores.md): a suíte de casos e como escrever um leitor em outra linguagem
-- [Suíte de conformidade](spec/conformance/README.md): o formato dos casos e o runner
-- [O que é e para quem](docs/manual/01-o-que-e.md): o problema e a tese
-- [Glossário](docs/manual/10-glossario.md)
+- [Conformance and readers](docs/manual/07-conformance-and-readers.md): the case suite and how to write a reader in another language
+- [Conformance suite](spec/conformance/README.md): the case format and the runner
+- [What it is and who it is for](docs/manual/01-what-it-is.md): the problem and the thesis
+- [Glossary](docs/manual/10-glossary.md)
+- [Documentação em português (Brasil)](README.pt-BR.md): the full pt-BR translation of the README, the adoption guide and the manual

@@ -1,10 +1,15 @@
+<!-- translation-of: docs/manual/01-what-it-is.md sha256:86e39310c6948793 -->
 # 1. O que é e para quem
+
+[English](../01-what-it-is.md) | **Português (Brasil)**
+
+<sub>Tradução do original em inglês; quando os dois divergirem, vale o inglês.</sub>
 
 [← Índice](README.md) · [Conceitos →](02-conceitos.md)
 
 ## O problema
 
-Uma equipe, humana ou de agentes, acumula conclusões: "o retry é idempotente", "o cache precisa de TTL",
+Uma equipe, de pessoas ou de agentes, acumula conclusões: "o retry é idempotente", "o cache precisa de TTL",
 "decidimos três tentativas". Elas costumam morar em atas, em tickets e em memórias de conversa. Três coisas se
 perdem nesse caminho:
 
@@ -12,47 +17,48 @@ perdem nesse caminho:
 2. **Quando foi conferida.** Um fato verdadeiro em março pode ser falso em outubro, e nada avisa.
 3. **O que depende do quê.** Quando uma evidência cai, ninguém sabe quais decisões caem junto.
 
-Uma ferramenta que escreve conhecimento, seja pessoa ou modelo, consegue produzir texto convincente sem nenhuma
+Quem escreve conhecimento, seja pessoa ou modelo, consegue produzir texto convincente sem nenhuma
 das três. O KG-SSOT trata isso como um problema de **formato verificável**, não de boa vontade.
 
 ## A tese
 
-Conhecimento operacional cabe num **grafo em arquivo texto**, versionado junto do código, em que:
+Conhecimento operacional cabe num **grafo guardado em arquivo texto**, versionado junto do código, em que:
 
 - cada nó é uma afirmação curta e tipada (pergunta, evidência, decisão, artefato...);
-- todo nó `confirmed` ou de produção diz **de onde veio** (`provenance`), e o carimbo de verificação diz
-  **quando** e **contra o quê** (`verified_at`, `verified_against`);
+- todo nó `confirmed` ou de produção (salvo o `unverifiable`) diz **de onde veio** (`provenance`), e o carimbo de verificação diz
+  **quando** e **contra o quê** foi conferido (`verified_at`, `verified_against`);
 - as arestas dizem **o que sustenta, refuta, substitui ou depende** de quê;
 - um **contrato formal** (JSON Schema 2020-12 mais regras de integridade) decide o que reprova e o que só alerta,
   e qualquer leitor, em qualquer linguagem, prova que segue o contrato passando numa **suíte de conformidade**.
 
-O resultado é um arquivo que uma máquina consegue julgar no CI, como julga código.
+O resultado é um arquivo que uma máquina consegue julgar no CI, do mesmo jeito que julga código.
 
 ## O que vem no produto
 
 | Peça | O que é |
 |---|---|
 | O contrato | Dois JSON Schemas, MUST (reprova) e SHOULD (alerta), mais as regras de integridade que o schema não alcança |
-| A suíte de conformidade | 356 casos em `latest/`, em dados puros, com o veredito e os códigos esperados de cada um |
+| A suíte de conformidade | 356 casos em `latest/`, em dados puros, cada um com o veredito e os códigos esperados |
 | O leitor de referência | `kg_validate.py`, em Python 3.11 ou mais com PyYAML e jsonschema, sem outra dependência |
 | O kit de adoção | `kg_vendor.py`, que traz uma release por tag, e `kg_gate.py`, a catraca por grafo no CI |
-| O armazém com gate | `kg_store.py`, que grava grafos em disco, num repo git ou num armazém versionado, só depois do PASS do contrato |
+| O armazém com gate | `kg_store.py`, que grava grafos em disco, num repositório git ou num armazém versionado, só depois do PASS do contrato |
 | O servidor MCP de referência | `kg_mcp.py`, que dá a um modelo o contrato e o armazém por MCP, por stdio ou HTTP local |
 | A consulta e o diff | `kg_query.py`, que seleciona nós e projeta as arestas com o label da outra ponta, e `kg_diff.py`, o diff por id entre revisões |
-| O exportador PROV-O | `kg_prov_export.py`, que leva a proveniência de cada nó para o ecossistema W3C PROV, em JSON-LD |
+| O exportador PROV-O | `kg_prov_export.py`, que exporta a proveniência de cada nó para o ecossistema W3C PROV em JSON-LD |
 
 ## Para quem
 
 - **Equipes de engenharia** que registram decisões e evidências e querem que o CI recuse uma afirmação sem fonte.
-- **Quem constrói agentes** e precisa de uma memória que o agente lê primeiro e que não aceita escrita sem origem.
+- **Quem constrói agentes** e precisa de uma memória que o agente lê primeiro e que recusa escrita sem origem.
 - **Quem escreve ferramentas de grafo** (visualizadores, extratores, ports em outra linguagem) e quer provar
   compatibilidade com uma suíte, não com um "funciona na minha máquina".
 
 ## O que o KG-SSOT não é
 
-- **Não é um banco de grafos.** Não há servidor, consulta nem índice. É um formato de arquivo com um contrato.
-- **Não é um padrão da web semântica.** Não é RDF nem OWL. O formato é YAML com um vocabulário fechado e pequeno.
+- **Não é um banco de grafos.** Não há motor de banco, linguagem de consulta nem índice para rodar. É um formato de
+  arquivo com um contrato, e o `kg_query.py` e o `kg_mcp.py` leem os arquivos direto.
+- **Não é um padrão da web semântica.** Não é RDF nem OWL. O formato é YAML com um vocabulário pequeno e fechado.
 - **Não decide se a afirmação é verdadeira.** O contrato confere que a afirmação **diz** de onde veio e quando foi
   conferida. Conferir a fonte de novo é trabalho de quem revisa.
 - **Não depende de um editor, de um assistente ou de uma plataforma.** O contrato e o leitor de referência rodam
-  com Python e nada mais.
+  com Python e duas bibliotecas, PyYAML e jsonschema.

@@ -1,0 +1,2157 @@
+# Tradução para o português do Brasil da saída humana das ferramentas do KG-SSOT.
+# A fonte é o inglês (o msgid); este arquivo é a tradução. Valores literais do contrato (códigos, chaves, enums) não se traduzem.
+msgid ""
+msgstr ""
+"Project-Id-Version: kg-ssot\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: packaging/npm/cli.mjs
+msgid "--corpus without a directory"
+msgstr "--corpus sem diretório"
+
+#: packaging/npm/cli.mjs
+msgid "ERROR"
+msgstr "ERRO"
+
+#: packaging/npm/cli.mjs
+msgid "WARNING"
+msgstr "AVISO"
+
+#: packaging/npm/cli.mjs
+msgid "unknown option: {option}"
+msgstr "opção desconhecida: {option}"
+
+#: packaging/npm/cli.mjs
+msgid "usage: kg-ssot-validate <file.kg.yaml|file.kg.json>... [--json] [--corpus DIR]"
+msgstr "uso: kg-ssot-validate <arquivo.kg.yaml|arquivo.kg.json>... [--json] [--corpus DIR]"
+
+#: tools/kg_conformance.py
+msgid "--proposals-schema and --proposals-should-schema go together"
+msgstr "--proposals-schema e --proposals-should-schema vão juntos"
+
+#: tools/kg_conformance.py
+msgid "BROKEN SUITE  {line}"
+msgstr "SUÍTE QUEBRADA  {line}"
+
+#: tools/kg_conformance.py
+msgid ""
+"Conformance suite runner for .kg.yaml and .kg.json, for the reference reader (kg_validate.py).\n"
+"\n"
+"It needs only Python 3, PyYAML and jsonschema, with no agent harness. It is the mold a reader in another language\n"
+"copies: for each case, the set of codes it emits must EQUAL the expected set, in codes (MUST) and in warnings (SHOULD).\n"
+"\n"
+"Steps:\n"
+"  1. metaschema self-test: it accepts metaschema-tests/good/ and rejects metaschema-tests/bad/;\n"
+"  2. each manifest.json (in fixtures/) validates against manifest.schema.json, follows its folder's pending_on rule\n"
+"     (empty in latest/, non-empty in proposals/) and points only to files that exist;\n"
+"  3. each case runs in the reader and is compared as a set; a .kg.json case is read by the JSON profile (as_source).\n"
+"\n"
+"rc: 0 if all of latest/ passes · 1 if a latest/ case fails (including when the reader crashes on it)\n"
+"· 2 if the suite itself is broken: unreadable or invalid metaschema or manifest, pending_on outside the rule,\n"
+"unknown folder, a missing or repeated file or one outside every manifest, empty latest/.\n"
+"optional/ and proposals/ report and never change the rc.\n"
+"\n"
+"Usage:\n"
+"  kg_conformance.py [--suite spec/conformance] [--schema spec/kg-contract-v4.schema.json]\n"
+"                    [--should-schema spec/kg-contract-v4.should.schema.json] [--json OUT]\n"
+"                    [--proposals-schema F --proposals-should-schema F]\n"
+"\n"
+"--proposals-schema and --proposals-should-schema (together) measure only proposals/ against a candidate contract\n"
+"(e.g., the draft of a future version), and latest/ and optional/ stay on --schema; without them, everything runs on\n"
+"--schema. They do not change the rc.\n"
+msgstr ""
+"Runner da suíte de conformidade do .kg.yaml e do .kg.json para o leitor de referência (kg_validate.py).\n"
+"\n"
+"Depende só de Python 3, PyYAML e jsonschema, sem nenhum harness de agente. É o molde que um leitor\n"
+"em outra linguagem imita: para cada caso, o conjunto de códigos emitidos tem de ser IGUAL ao\n"
+"esperado, em codes (MUST) e em warnings (SHOULD).\n"
+"\n"
+"Passos:\n"
+"  1. auto-teste do metaschema: aceita metaschema-tests/good/ e recusa metaschema-tests/bad/;\n"
+"  2. cada manifest.json (em fixtures/) valida contra manifest.schema.json, cumpre a regra de pending_on da pasta\n"
+"     (vazio em latest/, não vazio em proposals/) e aponta só para arquivos que existem;\n"
+"  3. cada caso roda no leitor e é comparado por conjunto; o caso .kg.json é lido pelo perfil JSON (as_source).\n"
+"\n"
+"rc: 0 se latest/ passa inteiro · 1 se algum caso de latest/ falha (inclusive o leitor caindo nele)\n"
+"· 2 se a própria suíte está quebrada: metaschema ou manifesto ilegível ou inválido, pending_on fora\n"
+"da regra, pasta desconhecida, arquivo ausente, repetido ou fora de todo manifesto, latest/ vazia.\n"
+"optional/ e proposals/ reportam e nunca mudam o rc.\n"
+"\n"
+"Uso:\n"
+"  kg_conformance.py [--suite spec/conformance] [--schema spec/kg-contract-v4.schema.json]\n"
+"                    [--should-schema spec/kg-contract-v4.should.schema.json] [--json OUT]\n"
+"                    [--proposals-schema F --proposals-should-schema F]\n"
+"\n"
+"--proposals-schema e --proposals-should-schema (juntos) medem só proposals/ contra um contrato candidato (ex.: o\n"
+"rascunho de uma versão futura), e latest/ e optional/ seguem no --schema; sem eles, tudo roda no --schema. Não mudam o rc.\n"
+
+#: tools/kg_conformance.py
+msgid "candidate MUST, only for proposals/"
+msgstr "MUST candidato, só para proposals/"
+
+#: tools/kg_conformance.py
+msgid "candidate SHOULD, only for proposals/"
+msgstr "SHOULD candidato, só para proposals/"
+
+#: tools/kg_conformance.py
+msgid "expected {expected}  ERROR {error}"
+msgstr "esperado {expected}  ERRO {error}"
+
+#: tools/kg_conformance.py
+msgid "expected {expected}  emitted {emitted}"
+msgstr "esperado {expected}  emitido {emitted}"
+
+#: tools/kg_conformance.py
+msgid "latest/ has no cases: the suite would pass vacuously"
+msgstr "latest/ sem nenhum caso: a suíte passaria por vacuidade"
+
+#: tools/kg_conformance.py
+msgid "manifest.schema.json is not a valid JSON Schema: {message}"
+msgstr "manifest.schema.json não é JSON Schema válido: {message}"
+
+#: tools/kg_conformance.py
+msgid "metaschema: no tests in metaschema-tests/{kind}/"
+msgstr "metaschema: nenhum teste em metaschema-tests/{kind}/"
+
+#: tools/kg_conformance.py
+msgid "metaschema: {file} is outside good/ and bad/"
+msgstr "metaschema: {file} está fora de good/ e bad/"
+
+#: tools/kg_conformance.py
+msgid "metaschema: {file} was accepted"
+msgstr "metaschema: {file} foi aceito"
+
+#: tools/kg_conformance.py
+msgid "metaschema: {file} was rejected"
+msgstr "metaschema: {file} foi recusado"
+
+#: tools/kg_conformance.py
+msgid "{file}: case file outside every manifest"
+msgstr "{file}: arquivo de caso fora de todo manifesto"
+
+#: tools/kg_conformance.py
+msgid "{folder}: {ok}/{total} (gates the rc)"
+msgstr "{folder}: {ok}/{total} (reprova)"
+
+#: tools/kg_conformance.py
+msgid "{folder}: {ok}/{total} (report only)"
+msgstr "{folder}: {ok}/{total} (só reporta)"
+
+#: tools/kg_conformance.py
+msgid "{folder}: {ok}/{total} (report only, against {schema})"
+msgstr "{folder}: {ok}/{total} (só reporta, contra {schema})"
+
+#: tools/kg_conformance.py
+msgid "{path}: could not be read as JSON ({kind}: {exc})"
+msgstr "{path}: não deu para ler como JSON ({kind}: {exc})"
+
+#: tools/kg_conformance.py
+msgid "{path}: is not a valid JSON Schema: {message}"
+msgstr "{path}: não é JSON Schema válido: {message}"
+
+#: tools/kg_conformance.py
+msgid "{rel}: corpus {corpus} of {file} is not a directory"
+msgstr "{rel}: corpus {corpus} de {file} não é um diretório"
+
+#: tools/kg_conformance.py
+msgid "{rel}: file repeated in the manifest: {file}"
+msgstr "{rel}: arquivo repetido no manifesto: {file}"
+
+#: tools/kg_conformance.py
+msgid "{rel}: folder '{folder}' outside {folders}"
+msgstr "{rel}: pasta '{folder}' fora de {folders}"
+
+#: tools/kg_conformance.py
+msgid "{rel}: latest/ cannot depend on an open decision ({pending})"
+msgstr "{rel}: latest/ não pode depender de decisão aberta ({pending})"
+
+#: tools/kg_conformance.py
+msgid "{rel}: missing case file {file}"
+msgstr "{rel}: caso sem arquivo {file}"
+
+#: tools/kg_conformance.py
+msgid "{rel}: proposals/ requires a non-empty pending_on"
+msgstr "{rel}: proposals/ exige pending_on não vazio"
+
+#: tools/kg_diff.py
+msgid "(the graph)"
+msgstr "(o grafo)"
+
+#: tools/kg_diff.py
+msgid "BEFORE AFTER (files or REV:PATH), or the paths with --from"
+msgstr "ANTES DEPOIS (arquivos ou REV:CAMINHO), ou os caminhos com --from"
+
+#: tools/kg_diff.py tools/kg_migrate.py tools/kg_query.py tools/kg_store.py
+msgid "BROKEN INPUT  {error}"
+msgstr "ENTRADA QUEBRADA  {error}"
+
+#: tools/kg_diff.py
+msgid "Diff by id between two revisions of .kg.yaml and .kg.json graphs (release 4.17)."
+msgstr "O diff por id entre duas revisões de grafos .kg.yaml e .kg.json (release 4.17, O3 do roteiro)."
+
+#: tools/kg_diff.py
+msgid "FIELD"
+msgstr "CAMPO"
+
+#: tools/kg_diff.py
+msgid "UNREADABLE  {side}: {code}"
+msgstr "NÃO LIDO  {side}: {code}"
+
+#: tools/kg_diff.py
+msgid "a changed path is not UTF-8"
+msgstr "um caminho mudado não é UTF-8"
+
+#: tools/kg_diff.py
+msgid "a new path is not UTF-8"
+msgstr "um caminho novo não é UTF-8"
+
+#: tools/kg_diff.py
+msgid "changed node fields: {fields}"
+msgstr "campos mudados nos nós: {fields}"
+
+#: tools/kg_diff.py
+msgid "edge"
+msgstr "aresta"
+
+#: tools/kg_diff.py
+msgid "external edge"
+msgstr "aresta externa"
+
+#: tools/kg_diff.py
+msgid "give BEFORE and AFTER, or --from REV [--to REV] [PATH...]"
+msgstr "dê ANTES e DEPOIS, ou --from REV [--to REV] [CAMINHO...]"
+
+#: tools/kg_diff.py
+msgid "ignored: {paths}"
+msgstr "ignorados: {paths}"
+
+#: tools/kg_diff.py
+msgid "invalid revision {rev}: it cannot be empty or start with '-'"
+msgstr "revisão {rev} inválida: não pode ser vazia nem começar com '-'"
+
+#: tools/kg_diff.py
+msgid "leaves the field out of the comparison (repeatable): verified_at, provenance.locator, meta.x_generated_at"
+msgstr "tira o campo da comparação (repetível): verified_at, provenance.locator, meta.x_gerado_em"
+
+#: tools/kg_diff.py
+msgid "the after revision (without it, the working tree)"
+msgstr "a revisão de depois (sem ela, a árvore de trabalho)"
+
+#: tools/kg_diff.py
+msgid "the before revision: compares every graph that changed"
+msgstr "a revisão de antes: compara todos os grafos que mudaram"
+
+#: tools/kg_diff.py
+msgid "the git repository of the revisions (default: the current directory)"
+msgstr "o repositório git das revisões (default: o diretório atual)"
+
+#: tools/kg_diff.py
+msgid "with --from, also compares the vendor and the fixtures"
+msgstr "com --from, compara também o vendor e os fixtures"
+
+#: tools/kg_diff.py
+msgid "with --from, paths left out (repeatable), added to the defaults: {defaults}"
+msgstr "com --from, caminhos que ficam de fora (repetível), somados aos padrões: {defaults}"
+
+#: tools/kg_diff.py
+msgid "{graphs} graph(s): {modified} modified, {added} added, {removed} removed, {unreadable} unreadable; nodes +{nodes_added} -{nodes_removed} ~{nodes_changed}; edges +{edges_added} -{edges_removed} ~{edges_changed}"
+msgstr "{graphs} grafo(s): {modified} modificado(s), {added} acrescentado(s), {removed} removido(s), {unreadable} não lido(s); nós +{nodes_added} -{nodes_removed} ~{nodes_changed}; arestas +{edges_added} -{edges_removed} ~{edges_changed}"
+
+#: tools/kg_diff.py
+msgid "{name} (added)"
+msgstr "{name} (acrescentado)"
+
+#: tools/kg_diff.py
+msgid "{name} (modified)"
+msgstr "{name} (modificado)"
+
+#: tools/kg_diff.py
+msgid "{name} (removed)"
+msgstr "{name} (removido)"
+
+#: tools/kg_diff.py
+msgid "{name} (unchanged)"
+msgstr "{name} (igual)"
+
+#: tools/kg_diff.py
+msgid "{name} (unreadable)"
+msgstr "{name} (não lido)"
+
+#: tools/kg_diff.py
+msgid "{old} → {new} (renamed): {value}"
+msgstr "{old} → {new} (renomeado): {value}"
+
+#: tools/kg_diff.py
+msgid "{spec}: not UTF-8"
+msgstr "{spec}: não é UTF-8"
+
+#: tools/kg_diff.py
+msgid "{type} is not JSON serializable"
+msgstr "{type} não serializa"
+
+#: tools/kg_gate.py
+msgid "  MUST   {name} ({kind}): {codes}"
+msgstr "  MUST   {name} ({kind}): {codes}"
+
+#: tools/kg_gate.py
+msgid "  SHOULD {code}: {count} graph"
+msgstr "  SHOULD {code}: {count} grafo"
+
+#: tools/kg_gate.py
+msgid "  SHOULD {code}: {count} graphs"
+msgstr "  SHOULD {code}: {count} grafos"
+
+#: tools/kg_gate.py
+msgid "  SHOULD {code}: {count} occurrence"
+msgstr "  SHOULD {code}: {count} ocorrência"
+
+#: tools/kg_gate.py
+msgid "  SHOULD {code}: {count} occurrences"
+msgstr "  SHOULD {code}: {count} ocorrências"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  --granularity only works with --update (the baseline remembers the granularity)"
+msgstr "GATE QUEBRADO  --granularity só vale com --update (a base lembra a granularidade)"
+
+#: tools/kg_gate.py
+msgid "GATE BROKEN  {error}"
+msgstr "GATE QUEBRADO  {error}"
+
+#: tools/kg_gate.py
+msgid ""
+"The adopter's gate: a repository's graphs against the contract, with a per-graph ratchet.\n"
+"\n"
+"It measures the git-tracked .kg.yaml files (outside */fixtures/* and docs/materials/*, the default excludes, or what\n"
+"--exclude says) against the MUST and the SHOULD of the current contract, and compares them with the baseline:\n"
+"  failing - graph → MUST codes it carries today (the inherited debt, named by path);\n"
+"  debt    - SHOULD code → how many graphs carry it (granularity graph, the default) or how many occurrences\n"
+"            (granularity node).\n"
+"\n"
+"It fails (rc 1) when a graph outside failing fails MUST (a new graph included), when a graph in failing gains a MUST\n"
+"code, or when a debt code rises or appears. A contract identity different from the baseline's is reported on a\n"
+"\"· identity\" line and does not decide the rc (--strict-identity makes it fail). A gain passes, with a hint to lock it\n"
+"in with --update.\n"
+"\n"
+"The baseline is the .kg-ssot/gate/ folder: contract.json, graphs/<meta.id>.json (one record per graph) and accepted/\n"
+"(one accepted regression per file). --update shows the comparison before writing; if something got worse, it only\n"
+"writes with --accept-regression \"<reason>\", and the reason stays in the baseline. rc 2: broken input (not a git\n"
+"repository, unreadable or out-of-format baseline, missing baseline without --update, unreadable .kg.yaml).\n"
+"\n"
+"Usage:\n"
+"  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]\n"
+"             [--strict-identity] [--update [--accept-regression REASON] [--granularity graph|node]]\n"
+msgstr ""
+"O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.\n"
+"\n"
+"Mede os .kg.yaml rastreados por git (fora */fixtures/* e docs/materials/*, os excluídos padrão, ou o que\n"
+"--exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:\n"
+"  failing - grafo → códigos MUST que ele carrega hoje (a dívida herdada, nomeada por caminho);\n"
+"  debt    - código SHOULD → quantos grafos o carregam (granularity graph, o padrão) ou quantas ocorrências\n"
+"            (granularity node).\n"
+"\n"
+"Reprova (rc 1) quando um grafo fora de failing falha no MUST (grafo novo inclusive), quando um grafo de failing\n"
+"ganha código MUST, ou quando a dívida de um código sobe ou aparece. A identidade do contrato diferente da da base é\n"
+"acusada numa linha \"· identidade\" e não decide o rc (--strict-identity faz reprovar). Um ganho passa, com a dica de\n"
+"travar com --update.\n"
+"\n"
+"A base é a pasta .kg-ssot/gate/: contract.json, graphs/<meta.id>.json (um registro por grafo) e accepted/ (uma\n"
+"regressão aceita por arquivo). --update mostra a comparação antes de gravar; se algo piorou, só grava com\n"
+"--accept-regression \"<motivo>\", e o motivo fica na base. rc 2: entrada quebrada (não é repo git, base ilegível ou\n"
+"fora do formato, base ausente sem --update, .kg.yaml ilegível).\n"
+"\n"
+"Uso:\n"
+"  kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]\n"
+"             [--strict-identity] [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
+
+#: tools/kg_gate.py
+msgid "accepted regression out of format: each one is an object"
+msgstr "regressão aceita fora do formato: cada uma é um objeto"
+
+#: tools/kg_gate.py
+msgid "baseline out of format ({path}): an accepted regression is an object"
+msgstr "linha de base fora do formato ({path}): a regressão aceita é um objeto"
+
+#: tools/kg_gate.py
+msgid "baseline out of format ({path}): contract text, contract_sha256 text, granularity graph or node"
+msgstr "linha de base fora do formato ({path}): contract texto, contract_sha256 texto, granularity graph ou node"
+
+#: tools/kg_gate.py
+msgid "baseline out of format ({path}): contract text, failing path → [codes], debt code → integer ≥ 0, accepted_regressions list, granularity graph or node"
+msgstr "linha de base fora do formato ({path}): contract texto, failing caminho → [códigos], debt código → inteiro ≥ 0, accepted_regressions lista, granularity graph ou node"
+
+#: tools/kg_gate.py
+msgid "baseline out of format ({path}): graph path, id text or null, must [codes], should code → integer > 0"
+msgstr "linha de base fora do formato ({path}): graph caminho, id texto ou null, must [códigos], should código → inteiro > 0"
+
+#: tools/kg_gate.py
+msgid "baseline written: {path} ({graphs} graphs, {held} in the inherited debt)"
+msgstr "linha de base gravada: {path} ({graphs} grafos, {held} na dívida herdada)"
+
+#: tools/kg_gate.py
+msgid "debt.{code}: {want} → {got}"
+msgstr "debt.{code}: {want} → {got}"
+
+#: tools/kg_gate.py
+msgid "does not apply the defaults (careful: the vendor's fixtures enter the corpus)"
+msgstr "não aplica os defaults (cuidado: as fixtures do vendor entram no corpus)"
+
+#: tools/kg_gate.py
+msgid "fails (rc 1) on every change of contract identity, even without a changed verdict, as before 4.16.0"
+msgstr "reprova (rc 1) toda troca de identidade do contrato, mesmo sem veredito trocado, como antes da 4.16.0"
+
+#: tools/kg_gate.py
+msgid "granularity changed without the debt measured at the baseline's granularity"
+msgstr "granularidade trocada sem a dívida medida na granularidade da base"
+
+#: tools/kg_gate.py
+msgid "inherited"
+msgstr "herdado"
+
+#: tools/kg_gate.py
+msgid "kit {kit} is older than the baseline's ({base_kit}): a rule only the new release had would stop being measured (roll the kit back, or accept with --update --accept-regression)"
+msgstr "kit {kit} é mais antigo que o da base ({base_kit}): uma regra que só a release nova tinha deixaria de ser medida (volte o kit, ou aceite com --update --accept-regression)"
+
+#: tools/kg_gate.py
+msgid "missing baseline ({path}): write the first one with --update"
+msgstr "linha de base ausente ({path}): grave a primeira com --update"
+
+#: tools/kg_gate.py
+msgid "new"
+msgstr "novo"
+
+#: tools/kg_gate.py
+msgid "path glob left out of the corpus, added to the defaults ({defaults}); repeatable; fnmatch on the relative path, * crosses /"
+msgstr "glob de caminho fora do corpus, somado aos defaults ({defaults}); repetível; fnmatch sobre o caminho relativo, * atravessa /"
+
+#: tools/kg_gate.py
+msgid "regressed"
+msgstr "regredido"
+
+#: tools/kg_gate.py
+msgid "the baseline (default: the folder <repo>/{folder}; the file <repo>/{legacy}, from before 4.16.0, is read and replaced by the folder on --update). A path ending in .json reads and writes the single file"
+msgstr "a linha de base (default: a pasta <repo>/{folder}; o arquivo <repo>/{legacy}, de antes da 4.16.0, é lido e trocado pela pasta no --update). Um caminho terminado em .json lê e grava o arquivo único"
+
+#: tools/kg_gate.py
+msgid "the repository whose graphs are measured (default: .)"
+msgstr "o repo cujos grafos são medidos (default: .)"
+
+#: tools/kg_gate.py
+msgid "unreadable baseline ({path}): {exc}"
+msgstr "linha de base ilegível ({path}): {exc}"
+
+#: tools/kg_gate.py
+msgid "unreadable vendor stamp ({stamp}): {exc}"
+msgstr "carimbo do vendor ilegível ({stamp}): {exc}"
+
+#: tools/kg_gate.py
+msgid "vendor stamp out of format ({stamp}): files"
+msgstr "carimbo do vendor fora do formato ({stamp}): files"
+
+#: tools/kg_gate.py
+msgid "with --update: accepts a regression, with the reason in the baseline"
+msgstr "com --update: aceita uma piora, com o motivo na base"
+
+#: tools/kg_gate.py
+msgid "with --update: changes the granularity of the SHOULD debt (graph, the default, or node); without it, the baseline's applies"
+msgstr "com --update: troca a granularidade da dívida SHOULD (graph, o padrão, ou node); sem ela, vale a da base"
+
+#: tools/kg_gate.py
+msgid "writes the baseline (shows the comparison first)"
+msgstr "grava a linha de base (mostra a comparação antes)"
+
+#: tools/kg_gate.py
+msgid "{name} fails MUST: {codes}"
+msgstr "{name} falha no MUST: {codes}"
+
+#: tools/kg_gate.py
+msgid "{name} gained a MUST code: {codes}"
+msgstr "{name} ganhou código MUST: {codes}"
+
+#: tools/kg_gate.py
+msgid "{path} exists and is not a folder: the 4.16.0 baseline is a folder"
+msgstr "{path} existe e não é uma pasta: a base da 4.16.0 é uma pasta"
+
+#: tools/kg_gate.py
+msgid "{repo} is not a git repository: {err}"
+msgstr "{repo} não é um repositório git: {err}"
+
+#: tools/kg_gate.py
+msgid "· baseline migrated: {old} → {new}/ (one record per graph; the verdict does not change)"
+msgstr "· base migrada: {old} → {new}/ (um registro por grafo; o veredito não muda)"
+
+#: tools/kg_gate.py
+msgid "· debt granularity changed: baseline by {old}, new by {new} — the debt is compared by {old}, and the new baseline is written by {new}"
+msgstr "· granularidade da dívida trocada: base por {old}, nova por {new} — a dívida é comparada por {old}, e a base nova é gravada por {new}"
+
+#: tools/kg_gate.py
+msgid "· identity {key}: the baseline is from {old}, the measurement is from {new} — the comparison below decides the verdict, measured with the current contract; write the new identity with --update whenever you want"
+msgstr "· identidade {key}: a base é de {old}, a medição é de {new} — o veredito decide pela comparação abaixo, medida com o contrato de agora; grave a identidade nova com --update quando quiser"
+
+#: tools/kg_gate.py
+msgid "· the corpus shrank: {old} → {new} graphs (deleted or excluded; check it in the PR)"
+msgstr "· o corpus encolheu: {old} → {new} grafos (apagado ou excluído; confira no PR)"
+
+#: tools/kg_gate.py
+msgid "· {graphs} graphs; {passing} pass MUST; {held} in the inherited debt"
+msgstr "· {graphs} grafos; {passing} passam no MUST; {held} na dívida herdada"
+
+#: tools/kg_gate.py
+msgid "· {name} left the corpus (it was in the inherited debt; lock it in with kg_gate.py --update)"
+msgstr "· {name} saiu do corpus (estava na dívida herdada; trave com kg_gate.py --update)"
+
+#: tools/kg_gate.py
+msgid "· {old} → {new}: the baseline record followed meta.id {gid} (git mv); if {new} is a new graph with the same meta.id, its inherited debt came from the deleted graph — check it in the PR"
+msgstr "· {old} → {new}: o registro da base seguiu pelo meta.id {gid} (git mv); se {new} é um grafo novo com o mesmo meta.id, a dívida herdada dele veio do grafo apagado — confira no PR"
+
+#: tools/kg_gate.py
+msgid "↑ improved debt.{code}: {want} → {got} (lock in the gain: kg_gate.py --update)"
+msgstr "↑ melhorou debt.{code}: {want} → {got} (trave o ganho: kg_gate.py --update)"
+
+#: tools/kg_gate.py
+msgid "↑ improved {name}: passes MUST (lock in the gain: kg_gate.py --update)"
+msgstr "↑ melhorou {name}: passa no MUST (trave o ganho: kg_gate.py --update)"
+
+#: tools/kg_gate.py
+msgid "↑ improved {name}: {codes} gone (lock in the gain: kg_gate.py --update)"
+msgstr "↑ melhorou {name}: saiu {codes} (trave o ganho: kg_gate.py --update)"
+
+#: tools/kg_gate.py
+msgid "✗ --update refused: something got worse. Fix it, or accept it with --accept-regression \"<reason>\" (it stays in the baseline)"
+msgstr "✗ --update recusado: algo piorou. Corrija, ou aceite com --accept-regression \"<motivo>\" (fica na base)"
+
+#: tools/kg_gate.py
+msgid "✗ --update refused: the vendor contract differs from the stamp"
+msgstr "✗ --update recusado: o contrato do vendor diverge do carimbo"
+
+#: tools/kg_gate.py
+msgid "✗ WORSE  {what}"
+msgstr "✗ PIOROU  {what}"
+
+#: tools/kg_gate.py
+msgid "✗ identity {key}: the baseline is from {old}, the measurement is from {new} — the comparison below is against the old baseline; write the new baseline with --update in the same PR"
+msgstr "✗ identidade {key}: a base é de {old}, a medição é de {new} — a comparação abaixo é contra a base antiga; grave a base nova com --update no mesmo PR"
+
+#: tools/kg_gate.py
+msgid "✗ vendor contract differs from the stamp: {rel} (run kg_vendor.py check; the schema is not the one from the stamped release)"
+msgstr "✗ contrato do vendor diverge do carimbo: {rel} (rode kg_vendor.py check; o schema não é o da release carimbada)"
+
+#: tools/kg_gate.py
+msgid "✗ vendor without a stamp: {stamp} is missing (run kg_vendor.py check; the gate has nothing to verify the contract against)"
+msgstr "✗ vendor sem carimbo: {stamp} ausente (rode kg_vendor.py check; o gate não tem contra o que conferir o contrato)"
+
+#: tools/kg_mcp.py
+msgid "--allow-remote without --secret-env: outside the loopback, every request must carry the secret"
+msgstr "--allow-remote sem --secret-env: fora do loopback, toda requisição tem de trazer o segredo"
+
+#: tools/kg_mcp.py
+msgid "--gate-cmd with --read-only: without writes, the gate would never run"
+msgstr "--gate-cmd com --read-only: sem gravação, o gate nunca rodaria"
+
+#: tools/kg_mcp.py
+msgid "--gate-cmd without --root: without a store there is no write for the gate to judge"
+msgstr "--gate-cmd sem --root: sem armazém não há gravação para o gate julgar"
+
+#: tools/kg_mcp.py
+msgid "--gate-timeout without --gate-cmd: there is no gate to time"
+msgstr "--gate-timeout sem --gate-cmd: não há gate para o tempo"
+
+#: tools/kg_mcp.py
+msgid "--host {host} leaves the loopback: use --allow-remote, with --secret-env, behind a proxy with TLS"
+msgstr "--host {host} sai do loopback: use --allow-remote, com --secret-env, atrás de um proxy com TLS"
+
+#: tools/kg_mcp.py
+msgid "--identity-header without --secret-env: a header identity is never enough on its own"
+msgstr "--identity-header sem --secret-env: a identidade por header nunca vale sozinha"
+
+#: tools/kg_mcp.py
+msgid "--identity-header, --secret-env and --max-concurrent only apply with --http"
+msgstr "--identity-header, --secret-env e --max-concurrent valem só com --http"
+
+#: tools/kg_mcp.py
+msgid "--{option} must be 1 or more"
+msgstr "--{option} tem de ser 1 ou mais"
+
+#: tools/kg_mcp.py
+msgid "BROKEN INPUT  {msg}"
+msgstr "ENTRADA QUEBRADA  {msg}"
+
+#: tools/kg_mcp.py
+msgid "HTTP requests at the same time (503 beyond that)"
+msgstr "requisições HTTP ao mesmo tempo (503 além)"
+
+#: tools/kg_mcp.py
+msgid "PORT"
+msgstr "PORTA"
+
+#: tools/kg_mcp.py
+msgid ""
+"Reference MCP server of KG-SSOT: the contract and the store for a model, over stdio (one JSON-RPC message per line) or HTTP (POST /mcp).\n"
+"\n"
+"Tools: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_history, kg_schema_help.\n"
+"Without --root, only kg_validate and kg_schema_help are available. With --store-optional, a root that does not\n"
+"open does not bring the server down: it starts with only kg_validate and kg_schema_help and tells the model why.\n"
+"rc: 0 normal exit · 2 broken input (invalid root, invalid option)."
+msgstr ""
+"Servidor MCP de referência do KG-SSOT: o contrato e o armazém para um modelo, por stdio (uma mensagem JSON-RPC por linha) ou HTTP (POST /mcp).\n"
+"\n"
+"Ferramentas: kg_validate, kg_write, kg_delete, kg_get, kg_list, kg_query, kg_history, kg_schema_help.\n"
+"Sem --root, só kg_validate e kg_schema_help ficam disponíveis. Com --store-optional, uma raiz que não abre não\n"
+"derruba o servidor: ele sobe só com kg_validate e kg_schema_help e diz o motivo ao modelo.\n"
+"rc: 0 saída normal · 2 entrada quebrada (raiz inválida, opção inválida)."
+
+#: tools/kg_mcp.py
+msgid "a root that does not open does not bring the server down: it starts without a store and tells the model why"
+msgstr "raiz que não abre não derruba o servidor: ele sobe sem armazém e diz o motivo ao modelo"
+
+#: tools/kg_mcp.py
+msgid "accepts --host outside the loopback (no auth or TLS: only behind a proxy that does both)"
+msgstr "aceita --host fora do loopback (sem auth nem TLS: só atrás de um proxy que faça os dois)"
+
+#: tools/kg_mcp.py
+msgid "an external gate, after the contract, on every write and removal: the command (no shell) gets the text on stdin and returns a kg-ssot.verdict/1; it is how an adopter plugs in its own gate"
+msgstr "um gate externo, depois do contrato, em toda gravação e remoção: o comando (sem shell) recebe o texto no stdin e devolve um kg-ssot.verdict/1; é por ele que quem adota liga o próprio gate"
+
+#: tools/kg_mcp.py
+msgid "behind-proxy profile (HTTP only): the identity of each request comes from this header (an email, e.g. X-User-Email); each identity writes in its own area under --root and signs the writes. Requires --secret-env"
+msgstr "perfil atrás de proxy (só HTTP): a identidade de cada requisição vem deste header (um e-mail, ex.: X-User-Email); cada identidade grava na própria área sob --root e assina as gravações. Exige --secret-env"
+
+#: tools/kg_mcp.py
+msgid "empty root: name the directory of the areas"
+msgstr "raiz vazia: diga o diretório das áreas"
+
+#: tools/kg_mcp.py
+msgid "graphs per store (per area, in the profile)"
+msgstr "grafos por armazém (por área, no perfil)"
+
+#: tools/kg_mcp.py
+msgid "kg-ssot MCP at http://{host}:{port}/mcp"
+msgstr "kg-ssot MCP em http://{host}:{port}/mcp"
+
+#: tools/kg_mcp.py
+msgid "kg-ssot: {error}; the server starts with only kg_validate and kg_schema_help"
+msgstr "kg-ssot: {error}; o servidor sobe só com kg_validate e kg_schema_help"
+
+#: tools/kg_mcp.py
+msgid "seconds for the external gate (default 60)"
+msgstr "segundos para o gate externo (padrão 60)"
+
+#: tools/kg_mcp.py
+msgid "serves HTTP instead of stdio"
+msgstr "serve HTTP em vez de stdio"
+
+#: tools/kg_mcp.py
+msgid "store root; without it, only kg_validate and kg_schema_help"
+msgstr "raiz do armazém; sem ela, só kg_validate e kg_schema_help"
+
+#: tools/kg_mcp.py
+msgid "the areas root {root} does not exist (use --init to create it)"
+msgstr "a raiz das áreas {root} não existe (use --init para criá-la)"
+
+#: tools/kg_mcp.py
+msgid "the areas root {root} is a link: point to the real directory"
+msgstr "a raiz das áreas {root} é um link: aponte para o diretório real"
+
+#: tools/kg_mcp.py
+msgid "the areas root {root} is not a directory"
+msgstr "a raiz das áreas {root} não é um diretório"
+
+#: tools/kg_mcp.py
+msgid "the environment variable with the shared secret that each HTTP request carries in --secret-header (compared by hmac); required by --identity-header and by --allow-remote"
+msgstr "a variável de ambiente com o segredo compartilhado que cada requisição HTTP traz em --secret-header (comparado por hmac); exigido por --identity-header e por --allow-remote"
+
+#: tools/kg_mcp.py tools/kg_query.py
+msgid "the queue of open nodes (status open)"
+msgstr "a fila dos abertos (status open)"
+
+#: tools/kg_mcp.py
+msgid "the variable {var} (the --secret-env secret) is missing or empty"
+msgstr "a variável {var} (o segredo de --secret-env) está ausente ou vazia"
+
+#: tools/kg_mcp.py
+msgid "who signs the writes, as 'Name <email>'"
+msgstr "quem assina as gravações, na forma 'Nome <email>'"
+
+#: tools/kg_mcp.py
+msgid "with --identity-header, the authenticated identity signs: remove --author"
+msgstr "com --identity-header, quem assina é a identidade autenticada: tire o --author"
+
+#: tools/kg_mcp.py
+msgid "without kg_write or kg_delete"
+msgstr "sem kg_write nem kg_delete"
+
+#: tools/kg_mcp.py tools/kg_query.py
+msgid "words the label contains, all of them, case-insensitive"
+msgstr "palavras que o label contém, todas, sem distinguir maiúscula"
+
+#: tools/kg_migrate.py
+msgid "(no rule)"
+msgstr "(nenhuma)"
+
+#: tools/kg_migrate.py
+msgid "REFUSED"
+msgstr "RECUSADO"
+
+#: tools/kg_migrate.py
+msgid "REVIEW"
+msgstr "REVISAR"
+
+#: tools/kg_migrate.py
+msgid ""
+"The official KG-SSOT migrator: proposes the provenance the contract asks for, from the adopter's declared profile.\n"
+"\n"
+"  kg_migrate.py plan  --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out SHEET.tsv] [graph.kg.yaml ...]\n"
+"  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"\n"
+"The profile (spec/kg-migrate-profile.schema.json) declares rules in order: the first one whose when matches decides the\n"
+"node's action (propose provenance, demote to unverifiable, or only list it for the reviewer), and the scopes block sets\n"
+"verified_scope by a list of ids. The universe is fixed: nodes with status confirmed or plane PROD, without provenance,\n"
+"except unverifiable ones. With no graphs on the command line, the tool reads the tracked .kg.yaml files under --root\n"
+"(default: the current directory), except the kg_gate.py defaults (*/fixtures/*, docs/materials/*), vendor/* and the\n"
+"--exclude globs, with the gate's semantics (* crosses /); a graph in that list that does not parse becomes a row for\n"
+"the reviewer. A node whose verified_scope already matches the profile comes out as same, and apply leaves it alone.\n"
+"\n"
+"plan writes nothing: it prints the proposal sheet (one row per node), the counts per rule and what is left for the\n"
+"reviewer. Every proposed provenance is checked against the MUST and SHOULD of the current contract before it becomes a\n"
+"proposal; one that would fail, or whose template resolves to empty, goes to review with the reason.\n"
+"\n"
+"apply writes the plan's proposals, one file at a time: it inserts by text (comments stay), rereads the file and verifies\n"
+"invariance node by node (each node's dict equals the one before, except the keys the action allows) and line by line\n"
+"(the diff only adds lines, except the line of the demoted status), and writes only if the file gains no new MUST code.\n"
+"A file that fails any check stays as it was, and the reason goes in the report. Running apply again changes nothing.\n"
+"A node in flow style ({...}) is not touched: it goes to review.\n"
+"\n"
+"rc: 0 the plan came out or apply finished (refused files show in the report) · 1 apply refused some file ·\n"
+"2 broken input (profile outside the schema, repeated rule, invalid regex, a graph given on the command line that does\n"
+"not parse).\n"
+msgstr ""
+"O migrador oficial do KG-SSOT: propõe a provenance que o contrato pede, pelo perfil declarado do adotante.\n"
+"\n"
+"  kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]\n"
+"  kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"\n"
+"O perfil (spec/kg-migrate-profile.schema.json) declara regras em ordem: a primeira cujo when casa decide a ação do nó\n"
+"(propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por\n"
+"lista de ids. O universo é fixo: nó com status confirmed ou plane PROD, sem provenance, fora o unverifiable. Sem\n"
+"grafos na linha de comando, a ferramenta lê os .kg.yaml rastreados de --root (default: o diretório atual), fora os\n"
+"padrões do kg_gate.py (*/fixtures/*, docs/materials/*), o vendor/* e os globs de --exclude, com a semântica do gate\n"
+"(* atravessa /); o grafo dessa lista que não parseia vira linha para quem revisa. O nó cujo verified_scope já é o do\n"
+"perfil sai como same, e o apply não o toca.\n"
+"\n"
+"O plan NÃO escreve nada: imprime a planilha de propostas (uma linha por nó), as contagens por regra e o que ficou\n"
+"para quem revisa. Toda provenance proposta é conferida contra o MUST e o SHOULD do contrato vigente antes de virar\n"
+"proposta; a que reprovaria, ou cujo template resolve para vazio, vai para revisão com o motivo.\n"
+"\n"
+"O apply grava as propostas do plan, um arquivo por vez: insere por texto (os comentários ficam), relê e confere a\n"
+"invariância nó a nó (o dict de cada nó igual ao de antes, fora as chaves que a ação autoriza) e linha a linha (o diff\n"
+"só acrescenta linhas, fora a do status rebaixado), e só grava se o arquivo não ganha código MUST novo. O arquivo que\n"
+"falha em qualquer conferência fica como estava, e o motivo sai no relatório. Rodar o apply de novo não muda nada.\n"
+"O nó em estilo flow ({...}) não é tocado: vai para revisão.\n"
+"\n"
+"rc: 0 o plano saiu ou o apply terminou (arquivos recusados aparecem no relatório) · 1 o apply recusou algum arquivo ·\n"
+"2 entrada quebrada (perfil fora do schema, regra repetida, regex inválida, grafo dado na linha de comando que não\n"
+"parseia).\n"
+
+#: tools/kg_migrate.py
+msgid "WRITTEN"
+msgstr "GRAVADO"
+
+#: tools/kg_migrate.py
+msgid "a when in the profile has only match_case and would match every node: say what it matches"
+msgstr "um when do perfil só tem match_case, e casaria todo nó: diga o que ele casa"
+
+#: tools/kg_migrate.py
+msgid "an item of nodes changed"
+msgstr "um item de nodes mudou"
+
+#: tools/kg_migrate.py
+msgid "does not apply the defaults: {globs}"
+msgstr "não aplica os padrões: {globs}"
+
+#: tools/kg_migrate.py
+msgid "extra glob to leave out of the git list (fnmatch: * crosses /, as in kg_gate.py)"
+msgstr "glob a mais para deixar de fora da lista do git (fnmatch: * atravessa /, como no kg_gate.py)"
+
+#: tools/kg_migrate.py
+msgid "graph that does not parse ({code}): left out"
+msgstr "grafo que não parseia ({code}): ficou de fora"
+
+#: tools/kg_migrate.py
+msgid "graph that does not parse ({code}): {file}"
+msgstr "grafo que não parseia ({code}): {file}"
+
+#: tools/kg_migrate.py
+msgid "invalid regular expression in the profile: {pattern}: {exc}"
+msgstr "expressão regular inválida no perfil: {pattern}: {exc}"
+
+#: tools/kg_migrate.py
+msgid "mixed line endings (\\r\\n with \\n or a lone \\r): normalize first"
+msgstr "quebras de linha misturadas (\\r\\n com \\n ou \\r sozinho): normalize antes"
+
+#: tools/kg_migrate.py
+msgid "node in flow style ({...}): edit it by hand"
+msgstr "nó em estilo flow ({...}): edite à mão"
+
+#: tools/kg_migrate.py
+msgid "node in two scopes: {ids}"
+msgstr "nó em dois scopes: {ids}"
+
+#: tools/kg_migrate.py
+msgid "node not found in the text"
+msgstr "o nó não foi achado no texto"
+
+#: tools/kg_migrate.py
+msgid "node {id} changed beyond what the action allows"
+msgstr "o nó {id} mudou além do que a ação autoriza"
+
+#: tools/kg_migrate.py
+msgid "profile outside the schema at {where}: {message}"
+msgstr "perfil fora do schema em {where}: {message}"
+
+#: tools/kg_migrate.py
+msgid "proposes without writing anything"
+msgstr "propõe sem escrever nada"
+
+#: tools/kg_migrate.py
+msgid "repeated rule id in the profile: {ids}"
+msgstr "id de regra repetido no perfil: {ids}"
+
+#: tools/kg_migrate.py
+msgid "root"
+msgstr "raiz"
+
+#: tools/kg_migrate.py
+msgid "status is not on a single line"
+msgstr "status fora da forma de uma linha"
+
+#: tools/kg_migrate.py
+msgid "the edited text does not parse ({code})"
+msgstr "o texto editado não parseia ({code})"
+
+#: tools/kg_migrate.py
+msgid "the edited text is not a map"
+msgstr "o texto editado não é um mapa"
+
+#: tools/kg_migrate.py
+msgid "the file would gain a SHOULD warning the plan did not announce: {codes}"
+msgstr "o arquivo ganharia aviso SHOULD que o plan não anunciou: {codes}"
+
+#: tools/kg_migrate.py
+msgid "the file would gain a new MUST code: {codes}"
+msgstr "o arquivo ganharia código MUST novo: {codes}"
+
+#: tools/kg_migrate.py
+msgid "the number of nodes changed"
+msgstr "o número de nós mudou"
+
+#: tools/kg_migrate.py
+msgid "the profile uses locality privado or verified_scope, which exist only since kg-ssot-v4.12.0 (the profile declares {contract})"
+msgstr "o perfil usa locality privado ou verified_scope, que só existem desde a kg-ssot-v4.12.0 (o perfil declara {contract})"
+
+#: tools/kg_migrate.py
+msgid "the text diff removed or replaced a line other than the demoted status line"
+msgstr "o diff de texto tirou ou trocou uma linha que não é a do status rebaixado"
+
+#: tools/kg_migrate.py
+msgid "top-level field {key} changed"
+msgstr "o campo {key} do topo mudou"
+
+#: tools/kg_migrate.py
+msgid "unknown marker in rule {rule}: {marker}"
+msgstr "marcador desconhecido na regra {rule}: {marker}"
+
+#: tools/kg_migrate.py
+msgid "unreadable graph: {file}: {exc}"
+msgstr "grafo ilegível: {file}: {exc}"
+
+#: tools/kg_migrate.py
+msgid "unreadable profile: {path}: {exc}"
+msgstr "perfil ilegível: {path}: {exc}"
+
+#: tools/kg_migrate.py
+msgid "writes the proposal sheet as TSV"
+msgstr "grava a planilha de propostas em TSV"
+
+#: tools/kg_migrate.py
+msgid "writes the proposals, with invariance and gate per file"
+msgstr "grava as propostas, com invariância e gate por arquivo"
+
+#: tools/kg_migrate.py
+msgid "{root} is not a git repository, and no graph was given"
+msgstr "{root} não é um repositório git, e nenhum grafo foi dado"
+
+#: tools/kg_migrate.py
+msgid "· {files} file(s) touched; {refused} refused"
+msgstr "· {files} arquivos tocados; {refused} recusados"
+
+#: tools/kg_migrate.py
+msgid "· {rows} node row(s) in the plan; {same} already equal (same); {review} for the reviewer; {broken} graph(s) left out (do not parse); nothing was written (plan)"
+msgstr "· {rows} linhas de nó no plano; {same} já iguais (same); {review} para quem revisa; {broken} grafos fora (não parseiam); nada foi escrito (plan)"
+
+#: tools/kg_prov_export.py
+msgid ""
+"Export the provenance of a .kg.yaml graph to PROV-O in JSON-LD.\n"
+"\n"
+"  kg_prov_export.py <graph.kg.yaml> [--base IRI]\n"
+"\n"
+"Each node becomes a prov:Entity, with its label, type and status. A node with `provenance` gets prov:wasDerivedFrom\n"
+"to the source and a qualified prov:Derivation: the activity carries the `method`, and the `locator` and the\n"
+"`locality` go as kg: properties. The source is the IRI itself only when the whole text is an http(s) URL with no\n"
+"space; otherwise (a repository path, a command, two URLs together), it becomes a blank node labeled with the text,\n"
+"one per distinct text in the document, so nodes with the same source point to the same entity. The verification\n"
+"stamp goes as kg:verifiedAt (xsd:date when it is a date), kg:verifiedAgainst and kg:verifiedScope (the scope, since\n"
+"v4.5), and not as prov:generatedAtTime: in PROV, the generation time marks when the entity exists, not when someone\n"
+"verified it.\n"
+"\n"
+"Node IRIs are <base><meta.id>#<id>, with the base urn:kg-ssot:graph: by default; the kg: vocabulary lives at\n"
+"urn:kg-ssot:vocab#, outside the graph space, so a meta.id cannot collide with it.\n"
+"\n"
+"The edges (SUPPORTS, REFUTES, SUPERSEDES...) are NOT exported: derivation in PROV is a production relation, not\n"
+"evidential support. Exporting them as wasDerivedFrom would say something the graph does not say.\n"
+"\n"
+"The exporter reads the graph with the reference reader's parser and does not validate it: run kg_validate.py first.\n"
+"Output: JSON-LD on stdout. rc: 0 ok, 2 broken input (an unreadable file, one that is not a single YAML document, or\n"
+"one with meta or nodes out of shape)."
+msgstr ""
+"Exporta a proveniência de um .kg.yaml para PROV-O em JSON-LD.\n"
+"\n"
+"  kg_prov_export.py <grafo.kg.yaml> [--base IRI]\n"
+"\n"
+"Cada nó vira uma prov:Entity, com o rótulo, o tipo e o status. Um nó com `provenance` ganha prov:wasDerivedFrom\n"
+"para a fonte e uma prov:Derivation qualificada: a atividade carrega o `method`, e o `locator` e a `locality` vão\n"
+"como propriedades kg:. A fonte é a própria IRI só quando o texto inteiro é uma URL http(s) sem espaço; senão (um\n"
+"caminho de repo, um comando, duas URLs juntas), vira um nó em branco rotulado com o texto, um por texto distinto no\n"
+"documento, para que nós com a mesma fonte apontem para a mesma entidade. O carimbo de verificação vai como\n"
+"kg:verifiedAt (xsd:date quando é uma data), kg:verifiedAgainst e kg:verifiedScope (o alcance, desde o v4.5), e não como prov:generatedAtTime: em PROV, o tempo\n"
+"de geração marca a existência da entidade, não a conferência dela.\n"
+"\n"
+"As IRIs dos nós são <base><meta.id>#<id>, com base urn:kg-ssot:graph: por padrão; o vocabulário kg: mora em\n"
+"urn:kg-ssot:vocab#, fora do espaço dos grafos, para um meta.id não colidir com ele.\n"
+"\n"
+"As arestas (SUPPORTS, REFUTES, SUPERSEDES…) NÃO são exportadas: derivação em PROV é relação de produção, e não de\n"
+"suporte evidencial. Exportá-las como wasDerivedFrom diria algo que o grafo não diz.\n"
+"\n"
+"O exportador lê o grafo com o parse do leitor de referência e não o valida: rode kg_validate.py antes.\n"
+"Saída: JSON-LD em stdout. rc: 0 ok · 2 entrada quebrada (arquivo ilegível, que não é um documento YAML único, ou\n"
+"com meta ou nodes fora da forma)."
+
+#: tools/kg_prov_export.py
+msgid "meta is not a mapping"
+msgstr "meta não é um mapeamento"
+
+#: tools/kg_prov_export.py
+msgid "nodes is not a list"
+msgstr "nodes não é uma lista"
+
+#: tools/kg_prov_export.py
+msgid "the .kg.yaml graph to export"
+msgstr "o grafo .kg.yaml a exportar"
+
+#: tools/kg_prov_export.py
+msgid "the prefix of the node IRIs (default: urn:kg-ssot:graph:)"
+msgstr "prefixo das IRIs dos nós (default: urn:kg-ssot:graph:)"
+
+#: tools/kg_query.py
+msgid "(outside the corpus)"
+msgstr "(fora do corpus)"
+
+#: tools/kg_query.py
+msgid ", showing {first} to {last}"
+msgstr ", mostrando {first} a {last}"
+
+#: tools/kg_query.py
+msgid "--around {ref}: the id exists in {n} graphs; use <path>#{ref}"
+msgstr "--around {ref}: o id existe em {n} grafos; use <caminho>#{ref}"
+
+#: tools/kg_query.py
+msgid "--around {ref}: the node does not exist in the corpus"
+msgstr "--around {ref}: o nó não existe no corpus"
+
+#: tools/kg_query.py
+msgid "--cursor {cursor} is invalid: use the next_cursor of a previous query"
+msgstr "--cursor {cursor} inválido: use o next_cursor de uma consulta anterior"
+
+#: tools/kg_query.py
+msgid "--depth must be 0 or more"
+msgstr "--depth tem de ser 0 ou mais"
+
+#: tools/kg_query.py
+msgid "--direction must be out, in or both"
+msgstr "--direction é out, in ou both"
+
+#: tools/kg_query.py
+msgid "--limit must be between 1 and {max}"
+msgstr "--limit tem de estar entre 1 e {max}"
+
+#: tools/kg_query.py
+msgid "--open and --status ask for different statuses"
+msgstr "--open e --status pedem status diferentes"
+
+#: tools/kg_query.py
+msgid "--root {root} is not a directory"
+msgstr "--root {root} não é um diretório"
+
+#: tools/kg_query.py
+msgid "--sort must be corpus or impact"
+msgstr "--sort é corpus ou impact"
+
+#: tools/kg_query.py
+msgid "--text also searches the narrative"
+msgstr "--text procura também na narrative"
+
+#: tools/kg_query.py
+msgid "--verified-before {value}: the date must be YYYY-MM-DD"
+msgstr "--verified-before {value}: a data é AAAA-MM-DD"
+
+#: tools/kg_query.py
+msgid ".kg.yaml or .kg.json files (or --root)"
+msgstr "arquivos .kg.yaml ou .kg.json (ou --root)"
+
+#: tools/kg_query.py
+msgid "; next page: --cursor {cursor}"
+msgstr "; próxima página: --cursor {cursor}"
+
+#: tools/kg_query.py
+msgid "Query a corpus of .kg.yaml and .kg.json graphs and project the nodes for reading (release 4.17)."
+msgstr "A consulta e a projeção legível de um corpus de grafos .kg.yaml e .kg.json (release 4.17)."
+
+#: tools/kg_query.py
+msgid "UNREADABLE  and {n} more graph(s) (--format json shows the full list)"
+msgstr "NÃO LIDO  e mais {n} grafo(s) (a lista inteira sai em --format json)"
+
+#: tools/kg_query.py
+msgid "UNREADABLE  {file}: {code}"
+msgstr "NÃO LIDO  {file}: {code}"
+
+#: tools/kg_query.py tools/kg_validate.py
+msgid "YYYY-MM-DD"
+msgstr "AAAA-MM-DD"
+
+#: tools/kg_query.py
+msgid "exact id (repeatable)"
+msgstr "id exato (repetível)"
+
+#: tools/kg_query.py
+msgid "give either --root or the files"
+msgstr "dê --root ou os arquivos, um dos dois"
+
+#: tools/kg_query.py
+msgid "include the narrative of each node"
+msgstr "inclui a narrative de cada nó"
+
+#: tools/kg_query.py
+msgid "node keys to return in extra (repeatable): x_*, owner"
+msgstr "chaves do nó que saem em extra (repetível): x_*, owner"
+
+#: tools/kg_query.py
+msgid "only the graphs whose path contains this text"
+msgstr "só os grafos cujo caminho contém este trecho"
+
+#: tools/kg_query.py
+msgid "the corpus root: the graphs git tracks under it"
+msgstr "a raiz do corpus: os grafos rastreados pelo git sob ela"
+
+#: tools/kg_query.py
+msgid "the neighborhood of the node (<path>#<id>, or an id unique in the corpus)"
+msgstr "a vizinhança do nó (<caminho>#<id>, ou o id único no corpus)"
+
+#: tools/kg_query.py
+msgid "with --root, also read the vendor and the fixtures"
+msgstr "com --root, lê também o vendor e os fixtures"
+
+#: tools/kg_query.py
+msgid "with --root, paths to leave out (repeatable), added to the defaults: "
+msgstr "com --root, caminhos que ficam de fora (repetível), somados aos padrões: "
+
+#: tools/kg_query.py
+msgid "without verified_at, or verified before the date"
+msgstr "sem verified_at, ou conferido antes da data"
+
+#: tools/kg_query.py
+msgid "{file} (the whole graph)"
+msgstr "{file} (o grafo inteiro)"
+
+#: tools/kg_query.py
+msgid "· {total} node(s) in {graphs} graph(s)"
+msgstr "· {total} nó(s) em {graphs} grafo(s)"
+
+#: packaging/npm/cli.mjs tools/kg_release_notes.py tools/kg_validate.py
+msgid "BROKEN INPUT"
+msgstr "ENTRADA QUEBRADA"
+
+#: tools/kg_release_notes.py
+msgid "Builds the GitHub release body from the version's section in both CHANGELOGs."
+msgstr "O corpo da release no GitHub, montado da seção da versão nos dois CHANGELOGs."
+
+#: tools/kg_release_notes.py
+msgid "X.Y.Z (default: the version in spec/release.json)"
+msgstr "X.Y.Z (default: a versão de spec/release.json)"
+
+#: tools/kg_release_notes.py
+msgid "only check that the version has a section in both CHANGELOGs"
+msgstr "só confere que a versão tem seção nos dois CHANGELOGs"
+
+#: tools/kg_release_notes.py
+msgid "the revision for the mirror links (default: the version's tag)"
+msgstr "a revisão dos links do espelho (default: a tag da versão)"
+
+#: tools/kg_release_notes.py
+msgid "the root with the CHANGELOGs and spec/ (default: this kit's root)"
+msgstr "a raiz com os CHANGELOGs e o spec/ (default: a deste kit)"
+
+#: tools/kg_release_notes.py
+msgid "version {version} has no section in {files}"
+msgstr "a versão {version} não tem seção em {files}"
+
+#: tools/kg_release_notes.py
+msgid "✓ {version}: section in both CHANGELOGs"
+msgstr "✓ {version}: seção nos dois CHANGELOGs"
+
+#: tools/kg_store.py
+msgid "--gate-timeout without --gate-cmd: there is no gate for the timeout"
+msgstr "--gate-timeout sem --gate-cmd: não há gate para o tempo"
+
+#: tools/kg_store.py
+msgid ""
+"A store of .kg.yaml and .kg.json files that writes only what the contract passes.\n"
+"\n"
+"Three backends with the same interface: disk (the head on disk, no history), git (one commit per write or delete)\n"
+"and versioned (the head on disk plus an event log and the versions in .kg-store/, no git). Every write and delete\n"
+"is judged by the contract, and by the external gate when there is one; nothing that fails is written.\n"
+"\n"
+"CLI (JSON output on stdout):\n"
+"  kg_store.py --backend disk|git|versioned --root DIR [--init] list\n"
+"  kg_store.py ... read NAME [--ref REF]\n"
+"  kg_store.py ... write NAME [FILE|-] [--message M] [--author \"Name <email>\"] [--expected-sha256 S|new]\n"
+"  kg_store.py ... delete NAME [--message M] [--author A] [--expected-sha256 S]\n"
+"  kg_store.py ... write-many SET.json [--message M] [--author A]\n"
+"    the set is {\"changes\": [{\"name\": N, \"file\": F} | {\"name\": N, \"text\": T} | {\"name\": N, \"delete\": true}],\n"
+"    \"expected\": {N: S|new}}, with file relative to SET.json; writes all or nothing (write_many)\n"
+"  kg_store.py ... history NAME\n"
+"rc: 0 ok · 1 refused (gate, conflict, missing, name that does not exist) · 2 broken input or not_judged."
+msgstr ""
+"O armazém de .kg.yaml e .kg.json que só grava o que o contrato aprova.\n"
+"\n"
+"Três armazéns com a mesma interface: disk (a cabeça em disco, sem histórico), git (um commit por gravação ou remoção)\n"
+"e versioned (a cabeça em disco mais um registro de eventos e as versões em .kg-store/, sem git). Toda gravação e\n"
+"remoção é julgada pelo contrato, e pelo gate externo quando há um; nada reprovado é escrito.\n"
+"\n"
+"CLI (saída JSON no stdout):\n"
+"  kg_store.py --backend disk|git|versioned --root DIR [--init] list\n"
+"  kg_store.py ... read NAME [--ref REF]\n"
+"  kg_store.py ... write NAME [FILE|-] [--message M] [--author \"Nome <email>\"] [--expected-sha256 S|new]\n"
+"  kg_store.py ... delete NAME [--message M] [--author A] [--expected-sha256 S]\n"
+"  kg_store.py ... write-many CONJUNTO.json [--message M] [--author A]\n"
+"    o conjunto é {\"changes\": [{\"name\": N, \"file\": F} | {\"name\": N, \"text\": T} | {\"name\": N, \"delete\": true}],\n"
+"    \"expected\": {N: S|new}}, com file relativo ao CONJUNTO.json; grava tudo ou nada (write_many)\n"
+"  kg_store.py ... history NAME\n"
+"rc: 0 ok · 1 recusado (gate, conflict, missing, nome inexistente) · 2 entrada quebrada ou not_judged."
+
+#: tools/kg_store.py
+msgid "an external gate, after the contract: the command reads the text on stdin and returns a kg-ssot.verdict/1 (see CommandGate)"
+msgstr "um gate externo, depois do contrato: o comando recebe o texto no stdin e devolve um kg-ssot.verdict/1 (veja CommandGate)"
+
+#: tools/kg_store.py
+msgid "changes must be a non-empty list of (name, text)"
+msgstr "changes tem de ser uma lista não vazia de (nome, texto)"
+
+#: tools/kg_store.py
+msgid "could not create the root {root}: {error}"
+msgstr "não deu para criar a raiz {root}: {error}"
+
+#: tools/kg_store.py
+msgid "could not record the event: {error}"
+msgstr "não deu para registrar o evento: {error}"
+
+#: tools/kg_store.py
+msgid "could not record the events: {error}"
+msgstr "não deu para registrar os eventos: {error}"
+
+#: tools/kg_store.py
+msgid "could not remove {name}: {error}"
+msgstr "não deu para remover {name}: {error}"
+
+#: tools/kg_store.py
+msgid "could not write the version {sha}: {error}"
+msgstr "não deu para gravar a versão {sha}: {error}"
+
+#: tools/kg_store.py
+msgid "could not write to {path}: {error}"
+msgstr "não deu para escrever {path}: {error}"
+
+#: tools/kg_store.py
+msgid "could not write {name}: {error}"
+msgstr "não deu para gravar {name}: {error}"
+
+#: tools/kg_store.py
+msgid "create the root (and the repo, with git) if it does not exist"
+msgstr "cria a raiz (e o repo, no git) se não existe"
+
+#: tools/kg_store.py
+msgid "each change is a (name, text) pair"
+msgstr "cada mudança é um par (nome, texto)"
+
+#: tools/kg_store.py
+msgid "empty external gate: give the command"
+msgstr "gate externo vazio: diga o comando"
+
+#: tools/kg_store.py
+msgid "empty root: give the store directory"
+msgstr "raiz vazia: diga o diretório do armazém"
+
+#: tools/kg_store.py
+msgid "expected has a name outside the set"
+msgstr "expected cita nome fora do conjunto"
+
+#: tools/kg_store.py
+msgid "external gate"
+msgstr "gate externo"
+
+#: tools/kg_store.py
+msgid "external gate: {error}"
+msgstr "gate externo: {error}"
+
+#: tools/kg_store.py
+msgid "file refused (link, junction, or not regular): {name}"
+msgstr "arquivo recusado (link, junção ou não regular): {name}"
+
+#: tools/kg_store.py
+msgid "file refused (replaced while opening): {name}"
+msgstr "arquivo recusado (trocado durante a abertura): {name}"
+
+#: tools/kg_store.py
+msgid "file refused (symlink?): {name}"
+msgstr "arquivo recusado (symlink?): {name}"
+
+#: tools/kg_store.py
+msgid "file refused: {name}: {error}"
+msgstr "arquivo recusado: {name}: {error}"
+
+#: tools/kg_store.py
+msgid "folder refused (link, junction, or not a directory): {part}"
+msgstr "pasta recusada (link, junção ou não-diretório): {part}"
+
+#: tools/kg_store.py
+msgid "folder refused (symlink or not a directory): {part}"
+msgstr "pasta recusada (symlink ou não-diretório): {part}"
+
+#: tools/kg_store.py
+msgid "git {cmd} did not run: {error}"
+msgstr "git {cmd} não rodou: {error}"
+
+#: tools/kg_store.py
+msgid "git {cmd} failed: {error}"
+msgstr "git {cmd} falhou: {error}"
+
+#: tools/kg_store.py
+msgid "invalid author: {author!r} (the form is 'Name <email>')"
+msgstr "autor inválido: {author!r} (a forma é 'Nome <email>')"
+
+#: tools/kg_store.py
+msgid "invalid message: empty or contains NUL"
+msgstr "mensagem inválida: vazia ou com NUL"
+
+#: tools/kg_store.py
+msgid "invalid name: a segment has more than {max} bytes"
+msgstr "nome inválido: segmento com mais de {max} bytes"
+
+#: tools/kg_store.py
+msgid "invalid name: {name!r} (a segment reserved on Windows, such as CON or NUL, or one that ends in a period)"
+msgstr "nome inválido: {name!r} (segmento reservado no Windows, como CON ou NUL, ou que termina em ponto)"
+
+#: tools/kg_store.py
+msgid "invalid name: {name!r} (relative, ends in .kg.yaml or .kg.json, no '..' or hidden segment)"
+msgstr "nome inválido: {name!r} (relativo, termina em .kg.yaml ou .kg.json, sem '..' nem segmento oculto)"
+
+#: tools/kg_store.py
+msgid "invalid name: {name!r} differs from {other!r} only by case (on Windows and macOS they are the same file)"
+msgstr "nome inválido: {name!r} só difere de {other!r} pela caixa (no Windows e no macOS os dois são o mesmo arquivo)"
+
+#: tools/kg_store.py
+msgid "invalid name: {name!r} differs from {other!r} only by case, in the same set (on Windows and macOS they are the same file)"
+msgstr "nome inválido: {name!r} só difere de {other!r} pela caixa, no mesmo conjunto (no Windows e no macOS os dois são o mesmo arquivo)"
+
+#: tools/kg_store.py
+msgid "invalid ref: {ref!r} (a commit sha)"
+msgstr "ref inválida: {ref!r} (um sha de commit)"
+
+#: tools/kg_store.py
+msgid "invalid ref: {ref!r} (the seq of an event)"
+msgstr "ref inválida: {ref!r} (o seq de um evento)"
+
+#: tools/kg_store.py
+msgid "lock refused (is {lock} a symlink?): {error}"
+msgstr "trava recusada ({lock} é symlink?): {error}"
+
+#: tools/kg_store.py
+msgid "lock refused ({lock}): {error}"
+msgstr "trava recusada ({lock}): {error}"
+
+#: tools/kg_store.py
+msgid "missing folder: {part}"
+msgstr "pasta inexistente: {part}"
+
+#: tools/kg_store.py
+msgid "not a regular file: {name}"
+msgstr "não é arquivo regular: {name}"
+
+#: tools/kg_store.py
+msgid "rejected by the external gate"
+msgstr "reprovado pelo gate externo"
+
+#: tools/kg_store.py
+msgid "the external gate command cannot be parsed: {error}"
+msgstr "o comando do gate externo não se lê: {error}"
+
+#: tools/kg_store.py
+msgid "the external gate did not return a JSON verdict"
+msgstr "o gate externo não devolveu um veredito JSON"
+
+#: tools/kg_store.py
+msgid "the external gate did not run (no temporary file: {error})"
+msgstr "o gate externo não rodou (sem arquivo temporário: {error})"
+
+#: tools/kg_store.py
+msgid "the external gate did not run (the process is shutting down)"
+msgstr "o gate externo não rodou (o processo está encerrando)"
+
+#: tools/kg_store.py
+msgid "the external gate did not run ({kind}: {error})"
+msgstr "o gate externo não rodou ({kind}: {error})"
+
+#: tools/kg_store.py
+msgid "the external gate exited with rc {rc}"
+msgstr "o gate externo saiu com rc {rc}"
+
+#: tools/kg_store.py
+msgid "the external gate output exceeded {max} bytes"
+msgstr "a saída do gate externo passou de {max} bytes"
+
+#: tools/kg_store.py
+msgid "the external gate raised {kind}: {error}"
+msgstr "o gate externo levantou {kind}: {error}"
+
+#: tools/kg_store.py
+msgid "the external gate rc does not match its verdict"
+msgstr "o rc do gate externo não bate com o veredito dele"
+
+#: tools/kg_store.py
+msgid "the external gate timed out after {timeout} s"
+msgstr "o gate externo passou de {timeout} s"
+
+#: tools/kg_store.py
+msgid "the external gate timeout must be more than 0 and up to {max} seconds"
+msgstr "o tempo do gate externo tem de ser de mais de 0 até {max} segundos"
+
+#: tools/kg_store.py
+msgid "the external gate verdict does not conform to spec/verdict.schema.json"
+msgstr "o veredito do gate externo saiu fora de spec/verdict.schema.json"
+
+#: tools/kg_store.py
+msgid "the external gate verdict has no result"
+msgstr "o veredito do gate externo veio sem resultado"
+
+#: tools/kg_store.py
+msgid "the graph text must be a str"
+msgstr "o texto do grafo tem de ser str"
+
+#: tools/kg_store.py
+msgid "the graph; '-' (default) reads stdin"
+msgstr "o grafo; '-' (default) lê o stdin"
+
+#: tools/kg_store.py
+msgid "the judgment does not conform to spec/verdict.schema.json"
+msgstr "o julgamento saiu fora de spec/verdict.schema.json"
+
+#: tools/kg_store.py
+msgid "the path changed during the operation: {path}"
+msgstr "o caminho mudou durante a operação: {path}"
+
+#: tools/kg_store.py
+msgid "the root {root} is on a drive or share that does not exist"
+msgstr "a raiz {root} está num drive ou compartilhamento que não existe"
+
+#: tools/kg_store.py
+msgid "the root {root} must be a directory, not a symlink"
+msgstr "a raiz {root} tem de ser um diretório, não symlink"
+
+#: tools/kg_store.py
+msgid "the same name appears twice in the set"
+msgstr "o mesmo nome aparece duas vezes no conjunto"
+
+#: tools/kg_store.py
+msgid "the set in JSON (see the usage above)"
+msgstr "o conjunto em JSON (veja o uso acima)"
+
+#: tools/kg_store.py
+msgid "the store already has {n} graphs, and the limit on this server is {max}"
+msgstr "o armazém já tem {n} grafos, e o limite deste servidor é {max}"
+
+#: tools/kg_store.py
+msgid "the store already has {n} graphs, the limit on this server"
+msgstr "o armazém já tem {n} grafos, o limite deste servidor"
+
+#: tools/kg_store.py
+msgid "the store requires POSIX (os.open with dir_fd and O_NOFOLLOW) or Windows"
+msgstr "o armazém exige POSIX (os.open com dir_fd e O_NOFOLLOW) ou Windows"
+
+#: tools/kg_store.py
+msgid "the text of {name} must be a str (or None to remove)"
+msgstr "o texto de {name} tem de ser str (ou None para remover)"
+
+#: tools/kg_store.py
+msgid "the version {sha} in {path} does not match the event sha256"
+msgstr "a versão {sha} em {path} não confere com o sha256 do evento"
+
+#: tools/kg_store.py
+msgid "the version {sha} is missing from {path}"
+msgstr "a versão {sha} sumiu de {path}"
+
+#: tools/kg_store.py
+msgid "the {backend} store keeps no earlier version"
+msgstr "o armazém {backend} não guarda versão anterior"
+
+#: tools/kg_store.py
+msgid "timeout in seconds for the external gate (default 60)"
+msgstr "segundos para o gate externo (default 60)"
+
+#: tools/kg_store.py
+msgid "unknown backend: {backend!r} ({choices})"
+msgstr "backend desconhecido: {backend!r} ({choices})"
+
+#: tools/kg_store.py
+msgid "unreadable folder: {path}: {error}"
+msgstr "pasta ilegível: {path}: {error}"
+
+#: tools/kg_store.py
+msgid "unreadable root: {error}"
+msgstr "raiz ilegível: {error}"
+
+#: tools/kg_store.py
+msgid "verdict does not conform to spec/verdict.schema.json"
+msgstr "veredito fora de spec/verdict.schema.json"
+
+#: tools/kg_store.py
+msgid "verdict has no result"
+msgstr "veredito sem resultado"
+
+#: tools/kg_store.py
+msgid "{name} does not exist"
+msgstr "{name} não existe"
+
+#: tools/kg_store.py
+msgid "{name} does not exist at {ref}"
+msgstr "{name} não existe em {ref}"
+
+#: tools/kg_store.py
+msgid "{name} has no version at event {ref}"
+msgstr "{name} não tem versão no evento {ref}"
+
+#: tools/kg_store.py
+msgid "{name} is not JSON: {error}"
+msgstr "{name} não é JSON: {error}"
+
+#: tools/kg_store.py
+msgid "{name} is not UTF-8"
+msgstr "{name} não é UTF-8"
+
+#: tools/kg_store.py
+msgid "{name}: delete only accepts true"
+msgstr "{name}: delete só aceita true"
+
+#: tools/kg_store.py
+msgid "{name}: each change has name and exactly one of file, text, or delete"
+msgstr "{name}: cada mudança tem name e exatamente um de file, text ou delete"
+
+#: tools/kg_store.py
+msgid "{name}: expected must be an object that maps name → sha256"
+msgstr "{name}: expected é um objeto nome → sha256"
+
+#: tools/kg_store.py
+msgid "{name}: the changes list is missing"
+msgstr "{name}: falta a lista changes"
+
+#: tools/kg_store.py
+msgid "{path} is a symlink"
+msgstr "{path} é symlink"
+
+#: tools/kg_store.py
+msgid "{path} is corrupted: {error}"
+msgstr "{path} corrompido: {error}"
+
+#: tools/kg_store.py
+msgid "{path} is inside a git repo: use the GitStore (the gate corpus is the tracked files)"
+msgstr "{path} está dentro de um repo git: use o GitStore (o corpus do gate é o rastreado)"
+
+#: tools/kg_store.py
+msgid "{path} must be a directory, not a symlink or a gitfile"
+msgstr "{path} tem de ser um diretório, não symlink nem gitfile"
+
+#: tools/kg_store.py
+msgid "{root} has no .git (use init=True to create it)"
+msgstr "{root} não tem .git (use init=True para criar)"
+
+#: tools/kg_validate.py
+msgid " (today)"
+msgstr " (hoje)"
+
+#: tools/kg_validate.py
+msgid " ({n} days late)"
+msgstr " ({n} dias)"
+
+#: tools/kg_validate.py
+msgid "--due does not combine with --spike, --json, --where, or --corpus"
+msgstr "--due não se combina com --spike, --json, --where nem --corpus"
+
+#: tools/kg_validate.py
+msgid "--due {value}: the date is YYYY-MM-DD"
+msgstr "--due {value}: a data é AAAA-MM-DD"
+
+#: tools/kg_validate.py
+msgid "--format json does not combine with --spike, --json, or --where"
+msgstr "--format json não se combina com --spike, --json nem --where"
+
+#: tools/kg_validate.py
+msgid "--limit must be 1 or more"
+msgstr "--limit tem de ser 1 ou mais"
+
+#: tools/kg_validate.py
+msgid "--where does not work with --spike (the spike has its own frozen output)"
+msgstr "--where não vale com --spike (o spike tem saída própria, congelada)"
+
+#: tools/kg_validate.py
+msgid ".kg.yaml or .kg.json files; '-' reads the graph from stdin"
+msgstr "arquivos .kg.yaml ou .kg.json; '-' lê o grafo do stdin"
+
+#: tools/kg_validate.py
+msgid "A date has no quotes; different YAML readers read it in different ways."
+msgstr "Há uma data sem aspas; leitores YAML diferentes a leem de formas diferentes."
+
+#: tools/kg_validate.py
+msgid "A key or a text has a lone surrogate (U+D800 to U+DFFF without its pair)."
+msgstr "Há um surrogate solto (U+D800 a U+DFFF sem o par) numa chave ou num texto."
+
+#: tools/kg_validate.py
+msgid "A key repeats in the same JSON object (compared after escapes are resolved)."
+msgstr "Há uma chave repetida no mesmo objeto JSON (comparada depois de resolvidos os escapes)."
+
+#: tools/kg_validate.py
+msgid "A key repeats in the same map."
+msgstr "Há uma chave repetida no mesmo mapa."
+
+#: tools/kg_validate.py
+msgid "Add label: the node's short claim, up to 280 characters."
+msgstr "Acrescente label: a afirmação curta do nó, até 280 caracteres."
+
+#: tools/kg_validate.py
+msgid "Add provenance with source, locator, and method; with no recoverable source, change the status to unverifiable."
+msgstr "Acrescente provenance com source, locator e method; sem fonte recuperável, mude o status para unverifiable."
+
+#: tools/kg_validate.py
+msgid "Add trace, provenance, or a TRACES_TO edge leaving the decision."
+msgstr "Acrescente trace, provenance ou uma aresta TRACES_TO saindo da decisão."
+
+#: tools/kg_validate.py
+msgid "An integer is outside ±(2^53−1); a JS reader (double) loses its exact value."
+msgstr "Há um número inteiro fora de ±(2^53−1); um leitor JS (double) perde o valor exato dele."
+
+#: tools/kg_validate.py
+msgid "BY EVENT"
+msgstr "POR EVENTO"
+
+#: tools/kg_validate.py
+msgid "DUE"
+msgstr "VENCIDO"
+
+#: tools/kg_validate.py
+msgid "Every node needs at least one edge. Link it to another node in edges (from: its id, to: the other id, edge_type: TRACES_TO, SUPPORTS, or DEPENDS_ON, whichever states the relation), or remove the node."
+msgstr "Todo nó precisa de pelo menos uma aresta. Ligue-o a outro nó em edges (from: o id dele, to: o id do outro, edge_type: TRACES_TO, SUPPORTS ou DEPENDS_ON, o que disser a relação), ou remova o nó."
+
+#: tools/kg_validate.py
+msgid "Every node needs at least one edge. Link {id} to another node in edges (from: {id}, to: the other id, edge_type: TRACES_TO, SUPPORTS, or DEPENDS_ON, whichever states the relation), or remove the node."
+msgstr "Todo nó precisa de pelo menos uma aresta. Ligue {id} a outro nó em edges (from: {id}, to: o id do outro, edge_type: TRACES_TO, SUPPORTS ou DEPENDS_ON, o que disser a relação), ou remova o nó."
+
+#: packaging/npm/cli.mjs tools/kg_validate.py
+msgid "FAIL"
+msgstr "REPROVA"
+
+#: tools/kg_validate.py
+msgid "Flatten the structure: a real graph stays within 3 or 4 levels."
+msgstr "Achate a estrutura: um grafo de verdade fica em 3 ou 4 níveis."
+
+#: tools/kg_validate.py
+msgid "Give each node a unique id."
+msgstr "Dê um id único a cada nó."
+
+#: tools/kg_validate.py
+msgid "If the fact takes effect in the future (a rule read before it comes into force), the warning is expected and can stay in the gate baseline. If not, the dates are swapped: valid_from is when the fact started to hold, and verified_at is when it was verified."
+msgstr "Se o fato tem vigência futura (uma norma lida antes de entrar em vigor), o aviso é esperado e pode ficar na linha de base do gate. Se não, as datas estão trocadas: valid_from é quando o fato passou a valer, e verified_at, quando foi conferido."
+
+#: tools/kg_validate.py
+msgid "If the refutation holds, change the status of the target to refuted or superseded; if not, remove the edge or use CONSTRAINS (the dissent that limits without overturning)."
+msgstr "Se a refutação procede, mude o status do alvo para refuted ou superseded; se não, tire a aresta ou use CONSTRAINS (o dissent que limita sem derrubar)."
+
+#: tools/kg_validate.py
+msgid "Keep the node in DEV, or back it with a verified measurement or reading."
+msgstr "Deixe o nó em DEV, ou apoie-o numa medição ou leitura conferida."
+
+#: tools/kg_validate.py
+msgid "Key outside the grammar (no x_ prefix): \"{field}\" {scope}."
+msgstr "Chave fora da gramática (sem prefixo x_): «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "Missing required field \"{field}\" {scope}."
+msgstr "Falta o campo obrigatório «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid ""
+"NEUTRAL reference reader of the .kg.yaml: validates graphs against a JSON Schema.\n"
+"\n"
+"It depends only on Python 3, PyYAML, and jsonschema, and on no agent harness. It is also the instrument of the\n"
+"measurement that gave rise to the contract (the \"spike\", options --spike and --json).\n"
+"\n"
+"Layers measured per file:\n"
+"  1. parse     — valid YAML, a single document, the root is a map;\n"
+"  2. schema    — the canonical JSON (dates in ISO, keys as strings) meets the schema;\n"
+"  3. integrity — unique ids, edges with no orphan end, and no node of degree 0 (what JSON Schema cannot reach).\n"
+"\n"
+"Human output: per file, the verdict and the codes, in the SAME vocabulary as the gate (kg_gate.py) and the\n"
+"conformance suite (parse.*, form.*, integrity.*, yaml.*), with the occurrence count:\n"
+"  FAIL <file>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7\n"
+"                SHOULD form.required.node.verified_at ×33\n"
+"  PASS <file>   (SHOULD only warns, it does not fail)\n"
+"Without --schema, the contract is the current one and the warnings come from its SHOULD schema. With --schema S, the\n"
+"SHOULD schema is --should-schema, or the sibling S.should.schema.json when it exists, or none.\n"
+"\n"
+"A .kg.json (the same data model in JSON) is read by the JSON parser in the contract profile (RFC 8259 and I-JSON): a\n"
+"*.json file is read as JSON, and '-' follows --stdin-format yaml|json.\n"
+"\n"
+"--corpus DIR enables the check of the external end of external_edges against the graphs under DIR.\n"
+"--due YYYY-MM-DD replaces the verdict with the due report: nodes whose verified_at plus the reverify_every cadence\n"
+"has passed on the date, nodes with a cadence and no stamp, and nodes with only reverify_on. It never changes the\n"
+"verdict: rc is 0, or 2 on broken input. With --format json, the report uses the kg-ssot.due/1 format.\n"
+"--where adds, per file, one line per occurrence with the node or edge.\n"
+"--spike replaces the human output and the rc with those of the spike; --json OUT ALWAYS writes the frozen spike format.\n"
+"\n"
+"rc: 0 every file passes the MUST · 1 some file fails · 2 broken input (unreadable schema or file, failing git show).\n"
+"\n"
+"Usage:\n"
+"  kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...\n"
+"  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]\n"
+"  kg_validate.py --due YYYY-MM-DD [--format json] FILE...\n"
+msgstr ""
+"Leitor de referência NEUTRO do .kg.yaml: valida grafos contra um JSON Schema.\n"
+"\n"
+"Depende só de Python 3, PyYAML e jsonschema, e não depende de nenhum harness de agente. Também é o instrumento\n"
+"da medição que deu origem ao contrato (o \"spike\", opções --spike e --json).\n"
+"\n"
+"Camadas medidas por arquivo:\n"
+"  1. parse     — YAML válido, um documento só, raiz é mapa;\n"
+"  2. schema    — o JSON canônico (datas em ISO, chaves em string) cumpre o schema;\n"
+"  3. integrity — ids únicos, arestas sem ponta órfã e nenhum nó de grau 0 (o que JSON Schema não alcança).\n"
+"\n"
+"Saída humana: por arquivo, o veredito e os códigos com o MESMO vocabulário do gate (kg_gate.py) e da suíte\n"
+"(parse.*, form.*, integrity.*, yaml.*), com a contagem de ocorrências:\n"
+"  REPROVA <arquivo>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7\n"
+"                      SHOULD form.required.node.verified_at ×33\n"
+"  PASSA   <arquivo>   (SHOULD só avisa, não reprova)\n"
+"Sem --schema, o contrato é o vigente e os avisos são do SHOULD dele. Com --schema S, o SHOULD é --should-schema,\n"
+"ou o vizinho S.should.schema.json quando existe, ou nenhum.\n"
+"\n"
+"O .kg.json (o mesmo modelo de dados em JSON) é lido pelo parser JSON no perfil do contrato (RFC 8259 e I-JSON): um\n"
+"arquivo *.json é lido como JSON, e '-' segue --stdin-format yaml|json.\n"
+"\n"
+"--corpus DIR liga a conferência da ponta externa das external_edges contra os grafos sob DIR.\n"
+"--due AAAA-MM-DD troca o veredito pelo relatório de vencimento: o nó cujo verified_at somado à cadência\n"
+"reverify_every já passou na data, o que tem cadência e não tem carimbo, e o que só tem reverify_on. Nunca muda o\n"
+"veredito: o rc é 0, ou 2 com entrada quebrada. Com --format json, o relatório sai no formato kg-ssot.due/1.\n"
+"--where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta.\n"
+"--spike troca a saída humana e o rc pelos do spike; --json OUT grava SEMPRE o formato do spike, congelado.\n"
+"\n"
+"rc: 0 todo arquivo passa no MUST · 1 algum reprova · 2 entrada quebrada (schema ou arquivo ilegível, git show que falha).\n"
+"\n"
+"Uso:\n"
+"  kg_validate.py [--schema S [--should-schema S2]] [--stdin-format yaml|json] FILE...\n"
+"  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]\n"
+"  kg_validate.py --due AAAA-MM-DD [--format json] FILE...\n"
+
+#: tools/kg_validate.py
+msgid "UNREADABLE"
+msgstr "NÃO LIDO"
+
+#: packaging/npm/cli.mjs tools/kg_validate.py
+msgid "PASS"
+msgstr "PASSA"
+
+#: tools/kg_validate.py
+msgid "Put the date in quotes, for example verified_at: \"2026-10-13\"."
+msgstr "Ponha a data entre aspas, por exemplo verified_at: \"2026-10-13\"."
+
+#: tools/kg_validate.py
+msgid "Rename the key with the x_ prefix (an extension that readers ignore) or remove it."
+msgstr "Renomeie a chave com o prefixo x_ (extensão que os leitores ignoram) ou remova-a."
+
+#: tools/kg_validate.py
+msgid "Replace on: with trigger:."
+msgstr "Troque on: por trigger:."
+
+#: tools/kg_validate.py
+msgid "Replace the lone escape with the whole character (the high and low pair) or remove it."
+msgstr "Troque o escape solto pelo caractere inteiro (o par alto e baixo) ou remova-o."
+
+#: tools/kg_validate.py
+msgid "Shorten the label to 280 characters and move the rest to narrative."
+msgstr "Encurte o label até 280 caracteres e leve o resto para narrative."
+
+#: tools/kg_validate.py
+msgid "The JSON file is empty, has only whitespace, or is null."
+msgstr "O arquivo JSON está vazio, só tem espaço em branco ou é null."
+
+#: tools/kg_validate.py
+msgid "The decision does not say where it came from: it lacks trace, provenance, or a TRACES_TO edge."
+msgstr "A decisão não diz de onde veio: falta trace, provenance ou aresta TRACES_TO."
+
+#: tools/kg_validate.py
+msgid "The document nests more than 128 collections (maps and lists)."
+msgstr "O documento aninha mais de 128 coleções (mapas e listas)."
+
+#: tools/kg_validate.py
+msgid "The edge uses the key on, which is forbidden (in YAML 1.1 it becomes the boolean True)."
+msgstr "A aresta usa a chave on, proibida (em YAML 1.1 ela vira o booleano True)."
+
+#: tools/kg_validate.py
+msgid "The external end points to a file or an id that does not exist in the corpus."
+msgstr "A ponta externa aponta para um arquivo ou um id que não existe no corpus."
+
+#: tools/kg_validate.py
+msgid "The file has more than one YAML document; it must have exactly one."
+msgstr "O arquivo tem mais de um documento YAML; deve ter um só."
+
+#: tools/kg_validate.py
+msgid "The file is empty or has only comments."
+msgstr "O arquivo está vazio ou só tem comentário."
+
+#: tools/kg_validate.py
+msgid "The file is not valid JSON in the .kg.json profile: RFC 8259 syntax (no comments, trailing commas, single quotes, NaN, or Infinity), a BOM only at the start, no lone surrogate, and at most 128 nested collections."
+msgstr "O arquivo não é JSON válido no perfil do .kg.json: sintaxe da RFC 8259 (sem comentário, vírgula sobrando, aspas simples, NaN nem Infinity), um BOM só no início, nenhum surrogate solto e até 128 coleções aninhadas."
+
+#: tools/kg_validate.py
+msgid "The file is not valid YAML."
+msgstr "O arquivo não é YAML válido."
+
+#: tools/kg_validate.py
+msgid "The local end of the external edge does not exist in this file."
+msgstr "A ponta local da aresta externa não existe neste arquivo."
+
+#: tools/kg_validate.py
+msgid "The node has no edge: it stands alone in the graph."
+msgstr "O nó não tem nenhuma aresta: está solto no grafo."
+
+#: tools/kg_validate.py
+msgid "The node is in PROD, but its only basis is testimony."
+msgstr "O nó está em PROD, mas a única base dele é testemunho."
+
+#: tools/kg_validate.py
+msgid "The node receives REFUTES and still stands: the graph asserts and refutes the same thing."
+msgstr "O nó recebe REFUTES e segue valendo: o grafo afirma e refuta a mesma coisa."
+
+#: tools/kg_validate.py
+msgid "The root of the JSON file is not an object (meta, nodes, edges)."
+msgstr "A raiz do arquivo JSON não é um objeto (meta, nodes, edges)."
+
+#: tools/kg_validate.py
+msgid "The root of the file is not a map (meta, nodes, edges)."
+msgstr "A raiz do arquivo não é um mapa (meta, nodes, edges)."
+
+#: tools/kg_validate.py
+msgid "The verification date (verified_at) is earlier than the date of the fact (valid_from): either the fact takes effect in the future, or the dates are swapped."
+msgstr "A data de verificação (verified_at) é anterior à data do fato (valid_from): ou o fato tem vigência futura, ou as datas estão trocadas."
+
+#: tools/kg_validate.py
+msgid "Two nodes have the same id."
+msgstr "Dois nós têm o mesmo id."
+
+#: tools/kg_validate.py
+msgid "UNSTAMPED"
+msgstr "SEM CARIMBO"
+
+#: tools/kg_validate.py
+msgid "Use the form '<class>: <detail>', with class medição, leitura, juízes, derivado, or testemunho."
+msgstr "Use a forma '<classe>: <detalhe>', com classe medição, leitura, juízes, derivado ou testemunho."
+
+#: tools/kg_validate.py
+msgid "Value differs from the required one in \"{field}\" {scope}."
+msgstr "Valor diferente do exigido em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "Value does not match the expected form in \"{field}\" {scope}."
+msgstr "Valor fora da forma esperada em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "Value out of bounds in \"{field}\" {scope}."
+msgstr "Valor fora do limite em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "Value outside the allowed list in \"{field}\" {scope}."
+msgstr "Valor fora da lista permitida em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "Violation {code}."
+msgstr "Violação {code}."
+
+#: tools/kg_validate.py
+msgid "Write the number in quotes, as text, or use a value within ±9007199254740991."
+msgstr "Escreva o número entre aspas, como texto, ou use um valor dentro de ±9007199254740991."
+
+#: tools/kg_validate.py
+msgid "Write the source of truth (URL, path, command); with no recoverable source, remove provenance and change the status to unverifiable."
+msgstr "Escreva a fonte de verdade (URL, caminho, comando); sem fonte recuperável, tire a provenance e mude o status para unverifiable."
+
+#: tools/kg_validate.py
+msgid "Wrong type in \"{field}\" {scope}."
+msgstr "Tipo errado em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "at the top level"
+msgstr "no topo"
+
+#: tools/kg_validate.py
+msgid "cadence {every} without verified_at"
+msgstr "cadência {every} sem verified_at"
+
+#: packaging/npm/cli.mjs tools/kg_validate.py
+msgid "corpus {root} is not a directory"
+msgstr "corpus {root} não é um diretório"
+
+#: tools/kg_validate.py
+msgid "files: {files}  parse: {parse}  schema: {schema}  schema+integrity: {full}"
+msgstr "arquivos: {files}  parse: {parse}  schema: {schema}  schema+integridade: {full}"
+
+#: tools/kg_validate.py
+msgid "human output and rc of the spike (check/classify)"
+msgstr "saída humana e rc do spike (check/classify)"
+
+#: tools/kg_validate.py
+msgid "in meta"
+msgstr "no meta"
+
+#: tools/kg_validate.py
+msgid "in the edge"
+msgstr "na aresta"
+
+#: tools/kg_validate.py
+msgid "in the node"
+msgstr "no nó"
+
+#: tools/kg_validate.py
+msgid "integrity {code}: {n}"
+msgstr "integridade {code}: {n}"
+
+#: tools/kg_validate.py
+msgid "json: the structured verdict kg-ssot.verdict/1 (spec/verdict.schema.json) on stdout"
+msgstr "json: o veredito estruturado kg-ssot.verdict/1 (spec/verdict.schema.json) em stdout"
+
+#: tools/kg_validate.py
+msgid "lists each occurrence with the node or edge where it appears"
+msgstr "lista cada ocorrência com o nó ou a aresta em que ela sai"
+
+#: tools/kg_validate.py
+msgid "repository root: verifies the external end of external_edges against the .kg.yaml and .kg.json files under DIR (without it, only the form and the local end)"
+msgstr "raiz do repo: confere a ponta externa das external_edges contra os .kg.yaml e .kg.json sob DIR (sem ela, só a forma e a ponta local)"
+
+#: tools/kg_validate.py
+msgid "the MUST schema (default: the current contract)"
+msgstr "o MUST (default: o contrato vigente)"
+
+#: tools/kg_validate.py
+msgid "the SHOULD schema for warnings (default: the one that goes with --schema)"
+msgstr "o SHOULD dos avisos (default: o que acompanha --schema)"
+
+#: tools/kg_validate.py
+msgid "the due report on the date (v4.8), instead of the verdict"
+msgstr "o relatório de vencimento na data (v4.8), no lugar do veredito"
+
+#: tools/kg_validate.py
+msgid "the format of the graph read from '-' (default yaml); a file follows its extension (.json is JSON)"
+msgstr "o formato do grafo lido de '-' (default yaml); um arquivo segue a extensão (.json é JSON)"
+
+#: tools/kg_validate.py
+msgid "the root is not a map"
+msgstr "a raiz não é um mapa"
+
+#: tools/kg_validate.py
+msgid "verified on {verified_at}, every {every}, due on {due_on}"
+msgstr "verificado em {verified_at}, a cada {every}, venceu em {due_on}"
+
+#: tools/kg_validate.py
+msgid "with --format json, occurrences per file (default 50)"
+msgstr "no --format json, ocorrências por arquivo (default 50)"
+
+#: tools/kg_validate.py
+msgid "writes the spike format ({summary, results})"
+msgstr "grava o formato do spike ({summary, results})"
+
+#: tools/kg_validate.py
+msgid "{files} files  {occurrences} occurrences  +{alone} alone  {cls}"
+msgstr "{files} arq  {occurrences} ocorr  +{alone} sozinho  {cls}"
+
+#: tools/kg_validate.py
+msgid "· on {as_of}: {due} due, {unstamped} unstamped, {event} by event; the report does not change the verdict"
+msgstr "· em {as_of}: {due} vencido(s), {unstamped} sem carimbo, {event} por evento; o relatório não muda o veredito"
+
+#: tools/kg_validate.py
+msgid "· {files} files; {passed} pass the MUST; {warned} with a SHOULD warning ({contract})"
+msgstr "· {files} arquivos; {passed} passam no MUST; {warned} com aviso SHOULD ({contract})"
+
+#: tools/kg_validate.py
+msgid "· {n} file(s) with external_edges: the external end was NOT verified (run with --corpus <repository root>)"
+msgstr "· {n} arquivo(s) com external_edges: a ponta externa NÃO foi conferida (rode com --corpus <raiz do repo>)"
+
+#: tools/kg_vendor.py
+msgid "--source {source} is not a git repository"
+msgstr "--source {source} não é um repositório git"
+
+#: tools/kg_vendor.py
+msgid "BROKEN VENDOR  {error}"
+msgstr "VENDOR QUEBRADO  {error}"
+
+#: tools/kg_vendor.py
+msgid ""
+"Vendor KG-SSOT by pin: the adopter brings in the release by TAG, never by hand.\n"
+"\n"
+"  update --tag T [--dest DIR] [--source REPO] [--force] [--profile P]\n"
+"      Reads from the TAG (git archive, never the working tree) the files that the spec/release.json OF THAT tag\n"
+"      lists, and replaces DIR entirely (a file that left the release goes away). Writes the vendor stamp\n"
+"      DIR/.kg-ssot-version: tag, commit, version, contract and the sha256 of each file. From 4.8.1 on, writes\n"
+"      DIR/.gitattributes with `* -text`: a nested attribute beats the repo's, and the adopter's line-ending rule\n"
+"      (`*.json text eol=lf`, autocrlf) does not rewrite the release bytes in the index (the fixtures with CRLF on\n"
+"      purpose). It does not commit: the adopter commits.\n"
+"      DIR is replaced only if it does not exist, or if it has the stamp AND is intact (check rc 0); an edited\n"
+"      vendor is replaced only with --force, so the local edit does not vanish silently.\n"
+"      --source is the git repo (path or URL, such as the public repository https://github.com/marciocar/kg-ssot)\n"
+"      that has the tag; the default is this script's repo, and it only works when that is the root of a\n"
+"      KG-SSOT clone (inside a vendor, pass --source).\n"
+"      --profile P brings only profile P from the tag's release.json: `gate` is the minimum to run the gate and\n"
+"      the check (contract, reader, gate, vendor, requirements, guide and license), without the suite. The stamp\n"
+"      records the profile, check verifies only what the profile brought, and the next update INHERITS the\n"
+"      profile from the stamp; --profile full goes back to the whole release.\n"
+"  check [--dest DIR] [--index]\n"
+"      Recomputes the sha256 values and compares them with the stamp: a file edited, missing or extra (including\n"
+"      bytecode in __pycache__ and symlinks) → rc 1. With --index, verifies the blobs in the git index (the stamp\n"
+"      is also read from the index) instead of the working tree: that is what the commit will carry, and it\n"
+"      catches, before the commit, a line-ending normalization that the working tree hides. You do not customize\n"
+"      the contract in the adopter; a needed change goes back to the product as an issue in the public\n"
+"      repository. LIMIT: the stamp vouches for itself; check catches an accidental edit, not someone who edits a\n"
+"      file AND recomputes the stamp. The review of the adopter's PR catches that (the stamp diff is in plain\n"
+"      view).\n"
+"\n"
+"rc: 0 ok · 1 vendor diverges from the stamp · 2 broken input (tag does not exist, release.json missing or not\n"
+"matching the tag, release entry with no file, tag member that is not a regular file, stamp missing, unreadable\n"
+"or malformed, DIR without a stamp or edited without --force).\n"
+"The kit's scripts do not write bytecode (sys.dont_write_bytecode): RUNNING the gate as a script does not dirty\n"
+"the vendor. IMPORTING a kit module from another process does: Python writes the module's .pyc before it runs the\n"
+"module's code. That is why the guide runs everything with `python3 -I -B`, and whoever imports the kit uses -B or\n"
+"PYTHONDONTWRITEBYTECODE=1.\n"
+msgstr ""
+"O vendor do KG-SSOT por pin: o adotante traz a release por TAG, nunca à mão.\n"
+"\n"
+"  update --tag T [--dest DIR] [--source REPO] [--force] [--profile P]\n"
+"      Lê da TAG (git archive, nunca a árvore de trabalho) os arquivos que o spec/release.json DESSA tag lista,\n"
+"      e substitui DIR inteiro (arquivo que saiu da release some). Grava o carimbo DIR/.kg-ssot-version: tag,\n"
+"      commit, versão, contrato e o sha256 de cada arquivo. Da 4.8.1 em diante, grava DIR/.gitattributes com `* -text`: um\n"
+"      atributo aninhado vence o do repo, e a regra de fim de linha do adotante (`*.json text eol=lf`, autocrlf)\n"
+"      não reescreve no índice os bytes da release (as fixtures com CRLF de propósito). Não commita: quem\n"
+"      commita é o adotante.\n"
+"      DIR só é substituído se não existir, ou se tiver o carimbo E estiver íntegro (check rc 0); um vendor\n"
+"      editado só é substituído com --force, para a edição local não sumir em silêncio.\n"
+"      --source é o repo git (caminho ou URL, como o repositório público https://github.com/marciocar/kg-ssot) que\n"
+"      tem a tag; o default é o repo deste script, e só vale quando\n"
+"      ele é a raiz de um clone do KG-SSOT (dentro de um vendor, passe --source).\n"
+"      --profile P traz só o perfil P do release.json da tag: `gate` é o mínimo para\n"
+"      rodar o gate e o check (contrato, leitor, gate, vendor, requirements, guia e licença), sem a suíte. O carimbo\n"
+"      registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;\n"
+"      --profile full volta à release inteira.\n"
+"  check [--dest DIR] [--index]\n"
+"      Recalcula os sha256 e compara com o carimbo: arquivo editado, faltando ou sobrando (inclusive bytecode em\n"
+"      __pycache__ e symlink) → rc 1. Com --index, confere os blobs do índice do git (o carimbo também lido do\n"
+"      índice) em vez da árvore de trabalho: é o que o commit vai levar, e pega antes do commit uma normalização\n"
+"      de fim de linha que a árvore de trabalho esconde. O contrato não se customiza no adotante; uma mudança necessária volta ao produto\n"
+"      como issue no repositório público. LIMITE: o carimbo atesta a si mesmo; o check pega edição acidental, não quem edita um\n"
+"      arquivo E recalcula o carimbo. Isso o review do PR do adotante pega (o diff do carimbo fica à vista).\n"
+"\n"
+"rc: 0 ok · 1 vendor divergente do carimbo · 2 entrada quebrada (tag inexistente, release.json ausente ou que\n"
+"não bate com a tag, entrada da release sem arquivo, membro da tag que não é arquivo regular, carimbo ausente,\n"
+"ilegível ou fora do formato, DIR sem carimbo ou editado sem --force).\n"
+"Os scripts do kit não gravam bytecode (sys.dont_write_bytecode): RODAR o gate como script não suja o vendor.\n"
+"IMPORTAR um módulo do kit a partir de outro processo suja: o Python grava o .pyc do módulo antes de executar o\n"
+"código dele. Por isso o guia roda tudo com `python3 -I -B`, e quem importa o kit usa -B ou PYTHONDONTWRITEBYTECODE=1.\n"
+
+#: tools/kg_vendor.py
+msgid "brings only one profile of the release (e.g. gate, without the suite)"
+msgstr "traz só um perfil da release (ex.: gate, sem a suíte)"
+
+#: tools/kg_vendor.py
+msgid "brings the release from the tag into the destination"
+msgstr "traz a release da tag para o destino"
+
+#: tools/kg_vendor.py
+msgid "empty --profile: name the profile, or full for the whole release"
+msgstr "--profile vazio: diga o perfil, ou full para a release inteira"
+
+#: tools/kg_vendor.py
+msgid "entry {entry} in {release} covers no file"
+msgstr "a entrada {entry} do {release} não cobre nenhum arquivo"
+
+#: tools/kg_vendor.py
+msgid "git repo (path or URL) that has the tag (default: this script's clone)"
+msgstr "repo git (caminho ou URL) que tem a tag (default: o clone deste script)"
+
+#: tools/kg_vendor.py
+msgid "path outside the destination in the tag archive: {name}"
+msgstr "caminho fora do destino no arquivo da tag: {name}"
+
+#: tools/kg_vendor.py
+msgid "profile {profile} carries what the release does not: {files}"
+msgstr "o perfil {profile} leva o que a release não leva: {files}"
+
+#: tools/kg_vendor.py
+msgid "profile {profile} does not carry {files}"
+msgstr "o perfil {profile} não leva {files}"
+
+#: tools/kg_vendor.py
+msgid "profile {profile} inherited from the stamp (--profile {full} brings the whole release)"
+msgstr "perfil {profile} herdado do carimbo (--profile {full} traz a release inteira)"
+
+#: tools/kg_vendor.py
+msgid "release {tag} has no profile {profile} (no profiles)"
+msgstr "a release {tag} não tem o perfil {profile} (perfis: nenhum)"
+
+#: tools/kg_vendor.py
+msgid "release {tag} has no profile {profile} (profiles: {profiles})"
+msgstr "a release {tag} não tem o perfil {profile} (perfis: {profiles})"
+
+#: tools/kg_vendor.py
+msgid "replaces a vendor that diverges from the stamp"
+msgstr "substitui um vendor que diverge do carimbo"
+
+#: tools/kg_vendor.py
+msgid "stamp {path} malformed: files must map path → sha256"
+msgstr "carimbo {path} fora do formato: files tem de mapear caminho → sha256"
+
+#: tools/kg_vendor.py
+msgid "stamp {path} malformed: missing tag, commit or {release}"
+msgstr "carimbo {path} fora do formato: falta tag, commit ou o {release}"
+
+#: tools/kg_vendor.py
+msgid "stamp {path} missing from the index: run git add on the vendor before check --index"
+msgstr "carimbo {path} ausente do índice: rode git add no vendor antes do check --index"
+
+#: tools/kg_vendor.py
+msgid "stamp {path} missing or unreadable: {exc}"
+msgstr "carimbo {path} ausente ou ilegível: {exc}"
+
+#: tools/kg_vendor.py
+msgid "tag {tag} does not exist in {source}"
+msgstr "a tag {tag} não existe em {source}"
+
+#: tools/kg_vendor.py
+msgid "the index returned {path} outside {prefix}"
+msgstr "o índice devolveu {path} fora de {prefix}"
+
+#: tools/kg_vendor.py
+msgid "the tag brought {got} files and the release lists {want}: {diff}"
+msgstr "a tag trouxe {got} arquivos e a release lista {want}: {diff}"
+
+#: tools/kg_vendor.py
+msgid "the {release} of tag {tag} declares tag {declared}: mislabeled release"
+msgstr "o {release} da tag {tag} declara a tag {declared}: release mal rotulada"
+
+#: tools/kg_vendor.py
+msgid "vendor diverges from tag {tag}: do not customize the contract in the adopter — redo the update, and if you need the change, send it to the product as a signal"
+msgstr "vendor divergente da tag {tag}: o contrato não se customiza no adotante — refaça o update, e se a mudança é necessária, mande-a como sinal ao produto"
+
+#: tools/kg_vendor.py
+msgid "vendor updated: {dest} ← {tag} ({commit}), {n} files"
+msgstr "vendor atualizado: {dest} ← {tag} ({commit}), {n} arquivos"
+
+#: tools/kg_vendor.py
+msgid "vendor updated: {dest} ← {tag} ({commit}), {n} files, profile {profile}"
+msgstr "vendor atualizado: {dest} ← {tag} ({commit}), {n} arquivos, perfil {profile}"
+
+#: tools/kg_vendor.py
+msgid "verifies the destination against the stamp"
+msgstr "confere o destino contra o carimbo"
+
+#: tools/kg_vendor.py
+msgid "verifies the git index blobs, not the working tree"
+msgstr "confere os blobs do índice do git, não a árvore de trabalho"
+
+#: tools/kg_vendor.py
+msgid "{dest} diverges from the stamp (run check): the local edit would be lost; use --force if you mean it"
+msgstr "{dest} diverge do carimbo (rode check): a edição local sumiria; use --force se é isso"
+
+#: tools/kg_vendor.py
+msgid "{dest} does not exist"
+msgstr "{dest} não existe"
+
+#: tools/kg_vendor.py
+msgid "{dest} exists and has no stamp {stamp}: not replacing a directory that is not a vendor"
+msgstr "{dest} existe e não tem o carimbo {stamp}: não substituo um diretório que não é vendor"
+
+#: tools/kg_vendor.py
+msgid "{dest} is not in a git repo: --index needs the index ({exc})"
+msgstr "{dest} não está num repo git: --index precisa do índice ({exc})"
+
+#: tools/kg_vendor.py
+msgid "{name} in the tag is not a regular file (symlink?): the release carries only files"
+msgstr "{name} na tag não é arquivo regular (symlink?): a release só leva arquivos"
+
+#: tools/kg_vendor.py
+msgid "{release} at {where}: contract must have must and should"
+msgstr "{release} em {where}: contract tem de ter must e should"
+
+#: tools/kg_vendor.py
+msgid "{release} at {where}: files must be a non-empty list of paths"
+msgstr "{release} em {where}: files tem de ser uma lista não vazia de caminhos"
+
+#: tools/kg_vendor.py
+msgid "{release} at {where}: must be an object"
+msgstr "{release} em {where}: tem de ser um objeto"
+
+#: tools/kg_vendor.py
+msgid "{release} at {where}: profiles must map name → non-empty list of paths"
+msgstr "{release} em {where}: profiles tem de mapear nome → lista não vazia de caminhos"
+
+#: tools/kg_vendor.py
+msgid "{release} unreadable at {where}: {exc}"
+msgstr "{release} ilegível em {where}: {exc}"
+
+#: tools/kg_vendor.py
+msgid "{root} is not the root of a KG-SSOT clone (a vendor?): pass --source <path or URL>"
+msgstr "{root} não é a raiz de um clone do KG-SSOT (é um vendor?): passe --source <caminho ou URL>"
+
+#: tools/kg_vendor.py
+msgid "✓ vendor intact: {dest} = {tag} ({commit}), {n} files"
+msgstr "✓ vendor íntegro: {dest} = {tag} ({commit}), {n} arquivos"
+
+#: tools/kg_vendor.py
+msgid "✗ edited   {path}"
+msgstr "✗ editado  {path}"
+
+#: tools/kg_vendor.py
+msgid "✗ extra    {path}"
+msgstr "✗ sobrando {path}"
+
+#: tools/kg_vendor.py
+msgid "✗ missing  {path}"
+msgstr "✗ faltando {path}"
+
+#: tools/kg_vendor.py
+msgid "✗ missing  {path} (the stamp for {version} was written by an earlier kg_vendor: run the update again, now with the new kit)"
+msgstr "✗ faltando {path} (o carimbo da {version} foi gravado por um kg_vendor anterior: rode o update de novo, agora com o kit novo)"
+
+#: tools/kg_vendor.py
+msgid "✗ symlink  {path}"
+msgstr "✗ symlink  {path}"

@@ -39130,7 +39130,7 @@ assert a==b
   LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --external-edges "${gs}" >/dev/null 2>&1 || true
   h2="$(sha256sum "${gs}" | cut -d' ' -f1)"
   # o veredito do contrato é o rc do kg_validate (0 passa · 1 reprova · 2 entrada quebrada), nunca a prosa: a
-  # kg-ssot 4.18.0 imprime PASS/FAIL em inglês por padrão, e o '^PASSA' de antes reprovaria um grafo conforme.
+  # kg-ssot 4.18.0 (vendorizada) imprime PASS/FAIL em inglês fora de pt*, e o '^PASSA' de antes reprovava um conforme.
   # O predicado mora numa função só, que o (xl) abaixo exercita nas duas línguas (e o mutante dele é a prosa).
   _kmv_contract_ok() { [ "$1" -eq 0 ]; }  # $1=rc do kg_validate · $2=a saída, de propósito NÃO lida
   local crc=0
@@ -39154,26 +39154,26 @@ assert n["D_LIMITADA"]["narrative"].endswith(" · desde o contrato v4.3 (SAC-98)
 ' "${gs}" 2>/dev/null; then
     record_pass "kg-migrate-v3: (x) --external-edges: x_supersedes_external vira SUPERSEDES por alvo, x_constrained_by vira CONSTRAINS de fora para o nó, narrative anotada, x_supersedes_none fica, contrato com --corpus aprova, 2ª passada no-op; alvo inexistente → rc 2 e arquivo intocado"
   else record_fail "kg-migrate-v3: (x)" "tradução errada, alvo inventado ou sem idempotência: rc=${rc} rcb=${rcb} crc=${crc} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) intocado=$([ "${hb1}" = "${hb2}" ] && echo sim || echo NÃO) ${out} ${outb} ${contrato}"; fi
-  # (xl) o predicado do contrato do (x) é robusto à LÍNGUA: o kg_validate real (a 4.17.2 fala português) e um shim
-  #      que reescreve a saída dele como a 4.18.0 (inglês por padrão: PASS/FAIL, o rc intacto), cada um em C.UTF-8
-  #      e em pt_BR.UTF-8 → o grafo conforme passa e o reprovado reprova, nas oito leituras. Simulação declarada:
-  #      o inglês real só existe a partir da 4.18.0. Mutante medido: o predicado de prosa ('^PASSA') cai no shim.
-  local gf="${lr}/docs/reprova.kg.yaml" kshim="${d}/kg_validate_en.py" _xe _xi _xv _xr _xo _xn=0 _xbad=""
+  # (xl) o predicado do contrato do (x) é robusto à LÍNGUA, com o vendor REAL: a kg-ssot 4.18.0 fala a língua do
+  #      ambiente (KG_SSOT_LANG, LANGUAGE, LC_ALL, LC_MESSAGES, LANG; inglês fora de pt*). O kg_validate vendorizado em
+  #      C.UTF-8 e em pt_BR.UTF-8, cada um sem KG_SSOT_LANG, com KG_SSOT_LANG=en e com KG_SSOT_LANG=pt-BR → o grafo
+  #      conforme passa e o reprovado reprova, nas doze leituras. E o caso EXIGE ter visto as duas línguas (a 1ª palavra
+  #      PASS e PASSA): sem isso o eixo da língua seria vácuo. Mutante medido: o predicado de prosa ('^PASSA') cai.
+  local gf="${lr}/docs/reprova.kg.yaml" _xe _xl _xv _xr _xo _xw _xn=0 _xbad="" _xseen=""
   printf 'meta:\n  id: reprova\n  schema_version: "1"\nnodes:\n  - id: C_SEM_TIPO\n    plane: DEV\n    status: open\n    label: "sem node_type"\n' > "${gf}"
-  printf 'import subprocess, sys\nr = subprocess.run([sys.executable, "-I", "-B", %s] + sys.argv[1:], capture_output=True, text=True)\ntr = lambda t: t.replace("REPROVA", "FAIL").replace("PASSA", "PASS")\nsys.stdout.write(tr(r.stdout)); sys.stderr.write(tr(r.stderr)); sys.exit(r.returncode)\n' \
-    "'${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py'" > "${kshim}"
   for _xe in C.UTF-8 pt_BR.UTF-8; do
-    for _xi in "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" "${kshim}"; do
+    for _xl in - en pt-BR; do
       for _xv in "docs/src.kg.yaml:0" "docs/reprova.kg.yaml:1"; do
-        _xr=0; _xo="$(cd "${lr}" && unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; LANG="${_xe}" LC_ALL="${_xe}" python3 -I -B "${_xi}" --corpus . "${_xv%%:*}" 2>&1)" || _xr=$?
+        _xr=0; _xo="$(cd "${lr}" && unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; [ "${_xl}" = - ] || export KG_SSOT_LANG="${_xl}"; LANG="${_xe}" LC_ALL="${_xe}" python3 -I -B "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" --corpus . "${_xv%%:*}" 2>&1)" || _xr=$?
+        _xw="$(printf '%s\n' "${_xo}" | head -1 | cut -d' ' -f1)"; _xseen="${_xseen} ${_xw}"
         if _kmv_contract_ok "${_xr}" "${_xo}"; then _xo=0; else _xo=1; fi
-        if [ "${_xo}" = "${_xv##*:}" ]; then _xn=$((_xn + 1)); else _xbad="${_xbad} ${_xe}/${_xi##*/}/${_xv%%:*}(rc=${_xr})"; fi
+        if [ "${_xo}" = "${_xv##*:}" ]; then _xn=$((_xn + 1)); else _xbad="${_xbad} ${_xe}/${_xl}/${_xv%%:*}(rc=${_xr})"; fi
       done
     done
   done
-  if [ "${_xn}" -eq 8 ]; then
-    record_pass "kg-migrate-v3: (xl) o veredito do contrato é o rc: português (4.17.2) e inglês (4.18.0 simulada), em C.UTF-8 e pt_BR.UTF-8, o conforme passa e o reprovado reprova (8 de 8)"
-  else record_fail "kg-migrate-v3: (xl)" "o predicado do contrato dependeu da língua ou do locale (${_xn} de 8):${_xbad}"; fi
+  if [ "${_xn}" -eq 12 ] && [[ " ${_xseen} " == *" PASS "* ]] && [[ " ${_xseen} " == *" PASSA "* ]]; then
+    record_pass "kg-migrate-v3: (xl) o veredito do contrato é o rc: kg_validate real 4.18.0 em inglês e em português (C.UTF-8 e pt_BR.UTF-8 × KG_SSOT_LANG ausente, en e pt-BR), o conforme passa e o reprovado reprova (12 de 12, as duas línguas vistas)"
+  else record_fail "kg-migrate-v3: (xl)" "o predicado do contrato dependeu da língua ou do locale (${_xn} de 12):${_xbad}; 1ª palavra vista:${_xseen}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests
@@ -41330,9 +41330,10 @@ run_plan_contract_migration_selftests() {
   [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_migrate.py" ] || { record_skip "plan-contract-migration: vendor/kg-ssot sem kg_migrate.py nesta árvore (SUT não exercido)"; return; }
   python3 -c 'import yaml, jsonschema' >/dev/null 2>&1 || { record_skip "plan-contract-migration: PyYAML/jsonschema ausentes (SUT não exercido)"; return; }
   local d; d="$(mktemp -d)"
-  # a recusa da entrada pelo kg_migrate.py é PROSA (o rc 2 dele é o mesmo do argparse): aceita as duas línguas, porque
-  # a kg-ssot 4.18.0 fala inglês por padrão. Dívida: trocar por um código de máquina quando o migrador tiver um.
-  local _pm_broken_re='ENTRADA QUEBRADA|BROKEN INPUT'
+  # desde a kg-ssot 4.18.0 a recusa da entrada se lê por MÁQUINA: o helper chama o `plan --json`, e o rc 2 com
+  # {"reason":"broken_input"} no stdout (entrada quebrada) se distingue do rc 2 com stdout vazio (erro de uso). O caso
+  # cobra a frase do HELPER que nomeia o `reason`, nunca a prosa do migrador, que segue a língua do ambiente.
+  local _pm_broken_tag='entrada recusada pelo migrador (reason broken_input)'
   _pm_git() { git -C "$1" -c user.email=t@t -c user.name=t -c commit.gpgsign=false "${@:2}"; }
   _pm_target() {  # $1=dir → alvo git com o vendor do core (tools, spec com os exemplos do perfil, carimbo)
     mkdir -p "$1/vendor/kg-ssot/tools" "$1/vendor/kg-ssot/spec/migrate-examples" "$1/docs/g"
@@ -41385,7 +41386,7 @@ run_plan_contract_migration_selftests() {
     o1="$(bash "${s}" "${d}/perfil-quebrado" --out-dir "${d}/out-e1" 2>&1)" || r1=$?
     o2="$(bash "${s}" "${d}/dois-perfis" --out-dir "${d}/out-e2" 2>&1)" || r2=$?
     o3="$(bash "${s}" "${d}/com-perfil" --out-dir "${d}/com-perfil/planilha" 2>&1)" || r3=$?
-    [ "${r1}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o1}" && grep -qE "${_pm_broken_re}" <<< "${o1}" \
+    [ "${r1}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o1}" && grep -qF "${_pm_broken_tag}" <<< "${o1}" \
       && [ "${r2}" -eq 3 ] && grep -q 'o alvo tem dois perfis' <<< "${o2}" \
       && [ "${r3}" -eq 3 ] && grep -q 'fica dentro do alvo' <<< "${o3}" && [ ! -e "${d}/com-perfil/planilha" ] && ok="${ok} e"
     rm -rf "${d}/com-perfil/planilha"
@@ -41416,18 +41417,29 @@ run_plan_contract_migration_selftests() {
     rm -rf "${d}/out-j"
     r=0; o="$(bash "${s}" "${d}/identidade" --out-dir "${d}/out-j" 2>&1)" || r=$?
     [ "${r}" -eq 0 ] && grep -q 'o plano cobre, nó a nó' <<< "${o}" && ! grep -q 'fora do plano' <<< "${o}" && ok="${ok} j"
-    # (k) a língua do migrador não muda o desfecho: o perfil quebrado lido pelo kg_migrate.py real (a 4.17.2 fala
-    #     português) e pelo falso que fala como a 4.18.0 (inglês por padrão), cada um em C.UTF-8 e em pt_BR.UTF-8 →
-    #     rc 3 NÃO MEDIDO com o rc 2 do migrador dito e a linha dele repassada, nas quatro combinações
+    # (k) a língua do migrador não muda o desfecho: o perfil quebrado lido pelo kg_migrate.py REAL (4.18.0, que fala a
+    #     língua do ambiente) em C.UTF-8 e em pt_BR.UTF-8 → rc 3 com o `reason broken_input` lido do --json; e o vendor
+    #     LEGADO (carimbo 4.17.2, sem --json nem i18n, prosa só pt-BR) → rc 3 com a linha dele repassada, sem o --json
+    #     na chamada. Quatro combinações.
     local _kt _ke _kn=0
-    for _kt in perfil-quebrado perfil-quebrado-en; do
-      for _ke in C.UTF-8 pt_BR.UTF-8; do
-        r=0; o="$(unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; LANG="${_ke}" LC_ALL="${_ke}" bash "${s}" "${d}/${_kt}" --out-dir "${d}/out-k" 2>&1)" || r=$?
-        [ "${r}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o}" \
-          && grep -qE "${_pm_broken_re}" <<< "${o}" && _kn=$((_kn + 1))
-      done
+    for _ke in C.UTF-8 pt_BR.UTF-8; do
+      r=0; o="$(unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; LANG="${_ke}" LC_ALL="${_ke}" bash "${s}" "${d}/perfil-quebrado" --out-dir "${d}/out-k" 2>&1)" || r=$?
+      [ "${r}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2' <<< "${o}" \
+        && grep -qF "${_pm_broken_tag}" <<< "${o}" && _kn=$((_kn + 1))
+      r=0; o="$(unset KG_SSOT_LANG LANGUAGE LC_MESSAGES; LANG="${_ke}" LC_ALL="${_ke}" bash "${s}" "${d}/perfil-quebrado-legado" --out-dir "${d}/out-k" 2>&1)" || r=$?
+      [ "${r}" -eq 3 ] && grep -q 'MIGRAÇÃO NÃO MEDIDA: o kg_migrate.py plan do alvo saiu rc 2 com o perfil .kg-ssot/migrate-profile.yaml: ENTRADA QUEBRADA' <<< "${o}" \
+        && ! grep -q 'argv-com-json' <<< "${o}" && _kn=$((_kn + 1))
     done
     [ "${_kn}" -eq 4 ] && ok="${ok} k"
+    # (l) os dois rc 2 que a prosa confundia: o migrador 4.18.0 que sai rc 2 com o stdout VAZIO (o argparse recusou a
+    #     chamada) → 'erro de uso', nunca 'entrada recusada'; e o que sai rc 2 com prosa no stdout em vez do objeto do
+    #     --json → 'saída fora do contrato', nunca 'entrada recusada' (mesmo dizendo BROKEN INPUT)
+    local _ln=0
+    r=0; o="$(bash "${s}" "${d}/uso-errado" --out-dir "${d}/out-l" 2>&1)" || r=$?
+    [ "${r}" -eq 3 ] && grep -q 'saiu rc 2 com o perfil .*: erro de uso (stdout vazio' <<< "${o}" && ! grep -qF "${_pm_broken_tag}" <<< "${o}" && _ln=$((_ln + 1))
+    r=0; o="$(bash "${s}" "${d}/perfil-quebrado-en" --out-dir "${d}/out-l" 2>&1)" || r=$?
+    [ "${r}" -eq 3 ] && grep -q 'saiu rc 2 com o perfil .* (saída fora do contrato do --json): BROKEN INPUT' <<< "${o}" && ! grep -qF "${_pm_broken_tag}" <<< "${o}" && _ln=$((_ln + 1))
+    [ "${_ln}" -eq 2 ] && ok="${ok} l"
     printf '%s' "${ok}"
   }
   _pm_target "${d}/passa"; _pm_ok "${d}/passa/docs/g/a.kg.yaml" fx-a; _pm_commit "${d}/passa"
@@ -41454,12 +41466,22 @@ run_plan_contract_migration_selftests() {
   _pm_target "${d}/sem-migrador"; _pm_bad "${d}/sem-migrador/docs/g/b.kg.yaml" fx-b; rm -f "${d}/sem-migrador/vendor/kg-ssot/tools/kg_migrate.py"; _pm_commit "${d}/sem-migrador"
   _pm_target "${d}/perfil-quebrado"; _pm_bad "${d}/perfil-quebrado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado/.kg-ssot"
   printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/perfil-quebrado"
-  # perfil-quebrado-en: o mesmo alvo, com um migrador falso que recusa a entrada como a kg-ssot 4.18.0 (inglês por
-  # padrão, rc 2 igual). Simulação declarada: a 4.17.2 vendorizada ainda fala português.
+  # perfil-quebrado-en: o mesmo alvo (carimbo 4.18.0), com um migrador falso que recusa em PROSA inglesa e ignora o
+  # --json (rc 2 igual): sem o objeto no stdout, o helper não pode dizer 'entrada recusada'.
   _pm_target "${d}/perfil-quebrado-en"; _pm_bad "${d}/perfil-quebrado-en/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado-en/.kg-ssot"
   printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado-en/.kg-ssot/migrate-profile.yaml"
   printf 'import sys\nprint("BROKEN INPUT  profile .kg-ssot/migrate-profile.yaml: rules: [] should be non-empty")\nsys.exit(2)\n' > "${d}/perfil-quebrado-en/vendor/kg-ssot/tools/kg_migrate.py"
   _pm_commit "${d}/perfil-quebrado-en"
+  # perfil-quebrado-legado: vendor com carimbo 4.17.2 (sem --json): o falso recusa em pt-BR e acusa se recebeu --json
+  _pm_target "${d}/perfil-quebrado-legado"; _pm_bad "${d}/perfil-quebrado-legado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado-legado/.kg-ssot"
+  printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado-legado/.kg-ssot/migrate-profile.yaml"
+  sed -i 's/"version": *"[^"]*"/"version": "4.17.2"/' "${d}/perfil-quebrado-legado/vendor/kg-ssot/.kg-ssot-version"
+  printf 'import sys\nprint("ENTRADA QUEBRADA  perfil: rules vazio" + (" argv-com-json" if "--json" in sys.argv else ""))\nsys.exit(2)\n' > "${d}/perfil-quebrado-legado/vendor/kg-ssot/tools/kg_migrate.py"
+  _pm_commit "${d}/perfil-quebrado-legado"
+  # uso-errado: carimbo 4.18.0, o migrador sai rc 2 com o stdout vazio e o uso no stderr (o caminho do argparse)
+  _pm_target "${d}/uso-errado"; _pm_bad "${d}/uso-errado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/uso-errado/.kg-ssot"; _pm_profile "${d}/uso-errado/.kg-ssot/migrate-profile.yaml"
+  printf 'import sys\nsys.stderr.write("usage: kg_migrate.py plan [-h]\\nkg_migrate.py: error: unrecognized arguments\\n")\nsys.exit(2)\n' > "${d}/uso-errado/vendor/kg-ssot/tools/kg_migrate.py"
+  _pm_commit "${d}/uso-errado"
   _pm_target "${d}/dois-perfis"; _pm_bad "${d}/dois-perfis/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/dois-perfis/.kg-ssot"
   _pm_profile "${d}/dois-perfis/.kg-ssot/migrate-profile.yaml"; _pm_profile "${d}/dois-perfis/kg-migrate.profile.yaml"; _pm_commit "${d}/dois-perfis"
   # escreve: um migrador falso cujo "plan" grava no grafo do alvo — a foto do helper tem de pegar (rc 5)
@@ -41485,8 +41507,10 @@ run_plan_contract_migration_selftests() {
     *) record_fail "plan-contract-migration: (h)" "o symlink da planilha foi seguido ou o plano não saiu" ;; esac
   case " ${got} " in *" i "*) record_pass "plan-contract-migration: (i) universos divergentes (vendor/outra, fixtures/ na raiz) → a conferência por identidade lista o nó da dívida fora do plano, por nome" ;;
     *) record_fail "plan-contract-migration: (i)" "$(bash "${sut}" "${d}/universo" --out-dir "${d}/out-i" 2>&1 | grep -E 'plano|fora' | head -4 | tr '\n' '|')" ;; esac
-  case " ${got} " in *" k "*) record_pass "plan-contract-migration: (k) perfil quebrado pelo migrador em português (4.17.2) e em inglês (4.18.0 simulada), em C.UTF-8 e pt_BR.UTF-8 → rc 3 NÃO MEDIDO nas quatro" ;;
-    *) record_fail "plan-contract-migration: (k)" "$(bash "${sut}" "${d}/perfil-quebrado-en" --out-dir "${d}/out-k" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" k "*) record_pass "plan-contract-migration: (k) perfil quebrado pelo migrador real 4.18.0 (reason broken_input do --json) e pelo legado 4.17.2 (prosa repassada, sem --json), em C.UTF-8 e pt_BR.UTF-8 → rc 3 NÃO MEDIDO nas quatro" ;;
+    *) record_fail "plan-contract-migration: (k)" "$(LANG=C.UTF-8 LC_ALL=C.UTF-8 bash "${sut}" "${d}/perfil-quebrado" --out-dir "${d}/out-k" 2>&1 | head -2 | tr '\n' '|')" ;; esac
+  case " ${got} " in *" l "*) record_pass "plan-contract-migration: (l) rc 2 com stdout vazio → 'erro de uso'; rc 2 com prosa no lugar do JSON → 'fora do contrato do --json'; nenhum dos dois vira 'entrada recusada'" ;;
+    *) record_fail "plan-contract-migration: (l)" "$(bash "${sut}" "${d}/uso-errado" --out-dir "${d}/out-l" 2>&1 | head -2 | tr '\n' '|')" ;; esac
   case " ${got} " in *" j "*) record_pass "plan-contract-migration: (j) id repetido e grafo por symlink → a identidade bate (multiset, caminho real), sem falso 'fora do plano'" ;;
     *) record_fail "plan-contract-migration: (j)" "$(bash "${sut}" "${d}/identidade" --out-dir "${d}/out-j" 2>&1 | grep -E 'plano|fora|NÃO' | head -4 | tr '\n' '|')" ;; esac
   # (m) MUTANTES na CÓPIA do helper (com o remeasure-contract.sh ao lado): cada um reverte uma cura e EXIGE que o
@@ -41526,6 +41550,10 @@ rm -f -- "\${SHEET}" || no$(printf '\x1f'): || no$(printf '\x1f')h
 missing, extra = sorted((debt - planned).elements()), sorted((planned - debt).elements())$(printf '\x1f')missing, extra = [], []$(printf '\x1f')i
 EXCL=(--exclude '*/**/fixtures/**'$(printf '\x1f')EXCL=(--exclude '**/fixtures/**'$(printf '\x1f')i
 planned = collections.Counter((r["arquivo"], r["id"]) for r in nodes)$(printf '\x1f')planned = collections.Counter(set((r["arquivo"], r["id"]) for r in nodes))$(printf '\x1f')j
+then JSON_ARGS=(--json); fi$(printf '\x1f')then JSON_ARGS=(); fi$(printf '\x1f')e
+if rc == 2 and isinstance(doc, dict) and doc.get("reason") == "broken_input":$(printf '\x1f')if rc == 2 and ("BROKEN INPUT" in raw or "ENTRADA QUEBRADA" in raw):$(printf '\x1f')e
+    print("usage"); sys.exit(0)$(printf '\x1f')    print("broken_input\t"); sys.exit(0)$(printf '\x1f')l
+then JSON_ARGS=(--json); fi$(printf '\x1f')then JSON_ARGS=(--json); fi; JSON_ARGS=(--json)$(printf '\x1f')k
 EOF_MUT
   rm -rf "${d}"; unset -f _pm_git _pm_target _pm_ok _pm_bad _pm_profile _pm_commit _pm_tree _pm_judge
 }

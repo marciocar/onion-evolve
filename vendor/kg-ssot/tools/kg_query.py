@@ -31,10 +31,12 @@ import sys
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_validate
+    from . import kg_i18n, kg_validate
 else:  # script ou vendor
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_i18n  # noqa: E402
     import kg_validate  # noqa: E402
+_ = kg_i18n._
 
 SCHEMA_VERSION = "kg-ssot.query/1"
 MAX_LIMIT = 1000
@@ -60,7 +62,7 @@ class Corpus:
         if name in self.files:  # o mesmo arquivo dado duas vezes não duplica as arestas
             return
         self.files.append(name)
-        _, doc, code = kg_validate.parse_v1(kg_validate.as_source(name, text) if not isinstance(text, kg_validate.JsonText)
+        _tree, doc, code = kg_validate.parse_v1(kg_validate.as_source(name, text) if not isinstance(text, kg_validate.JsonText)
                                             else text)
         if code or not isinstance(doc, dict):
             self.unreadable.append({"file": name, "code": code or "parse.root-not-mapping"})
@@ -109,7 +111,7 @@ def load(root=None, files=(), exclude=(), defaults=True):
     if root is not None:
         base = pathlib.Path(root)
         if not base.is_dir():
-            raise ValueError(f"--root {root} não é um diretório")
+            raise ValueError(_("--root {root} is not a directory").format(root=root))
         corpus.root = str(root)
         out = subprocess.run(["git", "-C", str(base), "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json"], capture_output=True)
         if out.returncode == 0:
@@ -138,13 +140,14 @@ def resolve(corpus, ref):
     if "#" in ref:
         path, nid = ref.rsplit("#", 1)
         if (path, nid) not in corpus.nodes:
-            raise ValueError(f"--around {ref}: o nó não existe no corpus")
+            raise ValueError(_("--around {ref}: the node does not exist in the corpus").format(ref=ref))
         return (path, nid)
     hits = [k for k in corpus.order if k[1] == ref]
     if not hits:
-        raise ValueError(f"--around {ref}: o nó não existe no corpus")
+        raise ValueError(_("--around {ref}: the node does not exist in the corpus").format(ref=ref))
     if len(hits) > 1:
-        raise ValueError(f"--around {ref}: o id existe em {len(hits)} grafos; use <caminho>#{ref}")
+        raise ValueError(_("--around {ref}: the id exists in {n} graphs; use <path>#{ref}")
+                         .format(ref=ref, n=len(hits)))
     return hits[0]
 
 
@@ -152,14 +155,14 @@ def neighborhood(corpus, start, depth, edge_types, direction):
     """As chaves alcançadas a partir de start (inclusive) em até depth saltos, pelos tipos e na direção pedidos. Só
     entra nó que existe no corpus; a ponta que falta aparece na projeção, como found: false."""
     seen, frontier = {start}, [start]
-    for _ in range(depth):
+    for _hop in range(depth):
         if not frontier:  # nada mais a alcançar: um --depth enorme não gira em vão
             break
         nxt = []
         for key in frontier:
             hops = (corpus.out[key] if direction in ("out", "both") else []) + \
                    (corpus.into[key] if direction in ("in", "both") else [])
-            for et, other, _ in hops:
+            for et, other, _ref in hops:
                 if other in seen or other not in corpus.nodes:
                     continue
                 if edge_types and et not in edge_types:
@@ -243,23 +246,23 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
     de JSON (o servidor MCP passa o dele); a página corta antes do limit quando o passa, sempre com ao menos um nó, e o
     next_cursor continua de onde ela parou."""
     if not 1 <= limit <= MAX_LIMIT:
-        raise ValueError(f"--limit tem de estar entre 1 e {MAX_LIMIT}")
+        raise ValueError(_("--limit must be between 1 and {max}").format(max=MAX_LIMIT))
     if depth < 0:
-        raise ValueError("--depth tem de ser 0 ou mais")
+        raise ValueError(_("--depth must be 0 or more"))
     if direction not in ("out", "in", "both"):
-        raise ValueError("--direction é out, in ou both")
+        raise ValueError(_("--direction must be out, in or both"))
     if sort not in ("corpus", "impact"):
-        raise ValueError("--sort é corpus ou impact")
+        raise ValueError(_("--sort must be corpus or impact"))
     offset = 0
     if cursor is not None:
         if not (isinstance(cursor, str) and cursor.isascii() and cursor.isdigit() and len(cursor) <= 9):
-            raise ValueError(f"--cursor {cursor!r} inválido: use o next_cursor de uma consulta anterior")
+            raise ValueError(_("--cursor {cursor} is invalid: use the next_cursor of a previous query").format(cursor=repr(cursor)))
         offset = int(cursor)
     f = {"ids": set(ids), "id_prefix": id_prefix, "node_type": node_type, "status": "open" if open_only else status,
          "plane": plane, "layer": layer, "file": file, "text": text, "in_narrative": in_narrative,
          "verified_before": verified_before}
     if open_only and status not in (None, "open"):
-        raise ValueError("--open e --status pedem status diferentes")
+        raise ValueError(_("--open and --status ask for different statuses"))
     keys = corpus.order
     if around is not None:
         reach = neighborhood(corpus, resolve(corpus, around), depth, set(edge_types), direction)
@@ -303,68 +306,71 @@ def human(res):
         for e in n["out"]:
             t = e["to"]
             where = "" if t["file"] == n["file"] else f"{t['file']}#"
-            miss = "" if t["found"] else "  (fora do corpus)"
+            miss = "" if t["found"] else "  " + _("(outside the corpus)")
             lines.append(f"    → {e['edge_type']} {where}{t['id']}{miss}  {(t['label'] or '')[:100]}")
         for e in n["in"]:
             s = e["from"]
             where = "" if s["file"] == n["file"] else f"{s['file']}#"
-            src = f"{s['file']} (o grafo inteiro)" if s["id"] is None else where + s["id"]
-            miss = "" if s["found"] else "  (fora do corpus)"
+            src = _("{file} (the whole graph)").format(file=s["file"]) if s["id"] is None else where + s["id"]
+            miss = "" if s["found"] else "  " + _("(outside the corpus)")
             lines.append(f"    ← {e['edge_type']} {src}{miss}  {(s['label'] or '')[:100]}")
     for u in res["unreadable"][:5]:
-        lines.append(f"NÃO LIDO  {u['file']}: {u['code']}")
+        lines.append(_("UNREADABLE  {file}: {code}").format(file=u["file"], code=u["code"]))
     if len(res["unreadable"]) > 5:
-        lines.append(f"NÃO LIDO  e mais {len(res['unreadable']) - 5} grafo(s) (a lista inteira sai em --format json)")
+        lines.append(_("UNREADABLE  and {n} more graph(s) (--format json shows the full list)")
+                     .format(n=len(res["unreadable"]) - 5))
     shown = len(res["nodes"])
     first = int(res["query"]["cursor"] or 0)
-    tail = f"; próxima página: --cursor {res['next_cursor']}" if res["next_cursor"] else ""
-    lines.append(f"· {res['total']} nó(s) em {res['graphs']} grafo(s)"
-                 + (f", mostrando {first + 1} a {first + shown}" if shown else "") + tail)
+    tail = _("; next page: --cursor {cursor}").format(cursor=res["next_cursor"]) if res["next_cursor"] else ""
+    lines.append(_("· {total} node(s) in {graphs} graph(s)").format(total=res["total"], graphs=res["graphs"])
+                 + (_(", showing {first} to {last}").format(first=first + 1, last=first + shown) if shown else "")
+                 + tail)
     return "\n".join(lines)
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
-    ap.add_argument("files", nargs="*", help="arquivos .kg.yaml ou .kg.json (ou --root)")
-    ap.add_argument("--root", help="a raiz do corpus: os grafos rastreados pelo git sob ela")
-    ap.add_argument("--id", action="append", default=[], dest="ids", help="id exato (repetível)")
+    ap = argparse.ArgumentParser(description=_("Query a corpus of .kg.yaml and .kg.json graphs and project the nodes "
+                                               "for reading (release 4.17)."))
+    ap.add_argument("files", nargs="*", help=_(".kg.yaml or .kg.json files (or --root)"))
+    ap.add_argument("--root", help=_("the corpus root: the graphs git tracks under it"))
+    ap.add_argument("--id", action="append", default=[], dest="ids", help=_("exact id (repeatable)"))
     ap.add_argument("--id-prefix")
     ap.add_argument("--type", dest="node_type")
     ap.add_argument("--status")
     ap.add_argument("--plane")
     ap.add_argument("--layer")
-    ap.add_argument("--file", help="só os grafos cujo caminho contém este trecho")
-    ap.add_argument("--text", help="palavras que o label contém, todas, sem distinguir maiúscula")
-    ap.add_argument("--in-narrative", action="store_true", help="--text procura também na narrative")
-    ap.add_argument("--open", action="store_true", dest="open_only", help="a fila dos abertos (status open)")
-    ap.add_argument("--verified-before", metavar="AAAA-MM-DD", help="sem verified_at, ou conferido antes da data")
-    ap.add_argument("--around", metavar="ID", help="a vizinhança do nó (<caminho>#<id>, ou o id único no corpus)")
+    ap.add_argument("--file", help=_("only the graphs whose path contains this text"))
+    ap.add_argument("--text", help=_("words the label contains, all of them, case-insensitive"))
+    ap.add_argument("--in-narrative", action="store_true", help=_("--text also searches the narrative"))
+    ap.add_argument("--open", action="store_true", dest="open_only", help=_("the queue of open nodes (status open)"))
+    ap.add_argument("--verified-before", metavar=_("YYYY-MM-DD"), help=_("without verified_at, or verified before the date"))
+    ap.add_argument("--around", metavar="ID", help=_("the neighborhood of the node (<path>#<id>, or an id unique in the corpus)"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
     ap.add_argument("--sort", default="corpus", choices=("corpus", "impact"))
     ap.add_argument("--limit", type=int, default=50)
     ap.add_argument("--cursor")
-    ap.add_argument("--narrative", action="store_true", help="inclui a narrative de cada nó")
+    ap.add_argument("--narrative", action="store_true", help=_("include the narrative of each node"))
     ap.add_argument("--fields", action="append", default=[], metavar="GLOB",
-                    help="chaves do nó que saem em extra (repetível): x_*, owner")
+                    help=_("node keys to return in extra (repeatable): x_*, owner"))
     ap.add_argument("--exclude", action="append", default=[], metavar="GLOB",
-                    help="com --root, caminhos que ficam de fora (repetível), somados aos padrões: "
+                    help=_("with --root, paths to leave out (repeatable), added to the defaults: ")
                     + ", ".join(DEFAULT_EXCLUDE))
-    ap.add_argument("--no-default-excludes", action="store_true", help="com --root, lê também o vendor e os fixtures")
+    ap.add_argument("--no-default-excludes", action="store_true", help=_("with --root, also read the vendor and the fixtures"))
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_args(argv)
 
     def broken(msg):
-        print(f"ENTRADA QUEBRADA  {msg}", file=sys.stderr)
+        print(_("BROKEN INPUT  {error}").format(error=msg), file=sys.stderr)
         return 2
     if bool(args.root) == bool(args.files):
-        return broken("dê --root ou os arquivos, um dos dois")
+        return broken(_("give either --root or the files"))
     before = None
     if args.verified_before is not None:
         before = kg_validate.iso_date(args.verified_before)
         if before is None:
-            return broken(f"--verified-before {args.verified_before!r}: a data é AAAA-MM-DD")
+            return broken(_("--verified-before {value}: the date must be YYYY-MM-DD").format(value=repr(args.verified_before)))
     try:
         corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
         res = query(corpus, ids=args.ids, id_prefix=args.id_prefix, node_type=args.node_type, status=args.status,

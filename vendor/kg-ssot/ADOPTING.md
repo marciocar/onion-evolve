@@ -1,184 +1,202 @@
-# Adotar o contrato KG-SSOT
+# Adopt the KG-SSOT contract
 
-Este guia é para um repo que guarda grafos `.kg.yaml` e quer validá-los contra o contrato formal: o JSON Schema
-2020-12 em dois níveis (MUST e SHOULD), a suíte de conformidade e o leitor de referência. O adotante fixa uma
-**tag** deste repo e traz a superfície da release por script. O contrato nunca é copiado à mão nem é código
-compartilhado.
+**English** | [Português (Brasil)](ADOPTING.pt-BR.md)
 
-## O que vem na release
+This guide is for a repository that keeps `.kg.yaml` graphs and wants to validate them against the formal contract:
+the two-level JSON Schema 2020-12 (MUST and SHOULD), the conformance suite, and the reference reader. As an adopter,
+you pin a **tag** of this repository and vendor the release surface with a script. You never copy the contract by
+hand, and it is never shared code.
 
-A lista está em [`spec/release.json`](spec/release.json):
-- o contrato v4, o vigente (`spec/kg-contract-v4.schema.json` e `spec/kg-contract-v4.should.schema.json`);
-- a suíte (`spec/conformance/`);
-- o leitor de referência (`tools/kg_validate.py`, `tools/kg_conformance.py`);
-- o gate (`tools/kg_gate.py`) e o vendor (`tools/kg_vendor.py`);
-- o armazém com gate (`tools/kg_store.py`), para quem grava grafo por programa: só escreve o que o contrato aprova
-  ([cap. 5 do manual](docs/manual/05-ferramentas.md));
-- o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
-  HTTP local;
-- o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
-- as dependências fixadas (`tools/requirements.txt`, Python 3.11 ou mais com PyYAML e jsonschema, cada arquivo com o sha256, que o pip confere ao instalar; o `--require-hashes` faz a instalação falhar se um dia o arquivo perder os hashes);
-- a receita do pacote PyPI (`packaging/python/`): o script de build, o README do cadastro e as ferramentas de build
-  fixadas por hash. O mesmo kit sai no PyPI como `kg-ssot`, para usar como biblioteca, comando ou servidor MCP; para o
-  gate no CI, o vendor por tag continua o canal recomendado;
-- o leitor JS (`tools/runners/ajv/`) e a receita do pacote npm (`packaging/npm/`): o mesmo leitor sai no npm como
-  `kg-ssot`, com o validador do contrato pré-compilado, para Node e React Native/Expo. No vendor, eles viajam como
-  receita: para usar o leitor JS, instale o pacote (`npm install kg-ssot`). Um `npm install` ou um build dentro do
-  vendor deixa arquivos que o `kg_vendor.py check` acusa como sobrando;
-- a receita do MCP Bundle (`packaging/mcpb/`): o servidor MCP de referência empacotado para clientes como o Claude
-  Desktop, que instalam o pacote `kg-ssot` pelo `uv`, e o modelo do `server.json` do MCP Registry
-  (`packaging/mcp-registry/`). Também são receitas no vendor;
-- este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
-- o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
-  arquivos da release);
-- a licença (`LICENSE`, Apache-2.0) e o `NOTICE`, que dizem o escopo dela.
+## What the release contains
 
-Tudo isso é **Apache-2.0**, inclusive os casos `.kg.yaml` da suíte. A Apache-2.0 dá, além do direito autoral,
-uma licença das patentes do autor e dos contribuidores sobre o que eles contribuíram. Essa licença termina para
-quem processar alegando que o contrato infringe patente. Quem escreve um leitor próprio pode usar o contrato e a
-suíte, inclusive comercialmente, mantendo o `LICENSE` e o `NOTICE`.
+The list lives in [`spec/release.json`](spec/release.json):
+- contract v4, the current one (`spec/kg-contract-v4.schema.json` and `spec/kg-contract-v4.should.schema.json`);
+- the conformance suite (`spec/conformance/`);
+- the reference reader (`tools/kg_validate.py`, `tools/kg_conformance.py`);
+- the gate (`tools/kg_gate.py`) and the vendor tool (`tools/kg_vendor.py`);
+- the language of the human output (`tools/kg_i18n.py` and the pt-BR catalog in `locale/`): English by default,
+  Brazilian Portuguese with `KG_SSOT_LANG=pt-BR` or a `pt_BR` locale;
+- the gated store (`tools/kg_store.py`), for programs that write graphs: it only writes what the contract passes
+  ([manual, chapter 5](docs/manual/05-tools.md));
+- the reference MCP server (`tools/kg_mcp.py`), so a model can judge and write graphs through the contract, over stdio
+  or local HTTP;
+- the provenance exporter to PROV-O in JSON-LD (`tools/kg_prov_export.py`);
+- the pinned dependencies (`tools/requirements.txt`: Python 3.11 or later with PyYAML and jsonschema). Each file
+  carries its sha256, and pip checks it at install time; `--require-hashes` makes the install fail if the file ever
+  loses its hashes;
+- the PyPI package recipe (`packaging/python/`): the build script, the listing README, and the build tools pinned by
+  hash. The same kit ships on PyPI as `kg-ssot`, to use as a library, a command, or an MCP server. For the gate in CI,
+  vendoring by tag is still the recommended channel;
+- the JS reader (`tools/runners/ajv/`) and the npm package recipe (`packaging/npm/`): the same reader ships on npm as
+  `kg-ssot`, with the contract validator precompiled, for Node and React Native/Expo. In the vendor they travel as a
+  recipe: to use the JS reader, install the package (`npm install kg-ssot`). An `npm install` or a build inside the
+  vendor leaves extra files, and `kg_vendor.py check` reports them;
+- the MCP Bundle recipe (`packaging/mcpb/`): the reference MCP server packaged for clients such as Claude Desktop,
+  which install the `kg-ssot` package with `uv`, and the `server.json` template for the MCP Registry
+  (`packaging/mcp-registry/`). These are recipes in the vendor too;
+- this guide, `README.md`, and the product manual (`docs/manual/`), which explains the format, the contract, and the
+  tools;
+- `llms.txt` (an index for AI agents) and `llms-full.txt` (the whole documentation in one text, generated from the
+  release files);
+- the license (`LICENSE`, Apache-2.0) and `NOTICE`, which states its scope.
 
-Do lado do mantenedor deste repo, uma conferência de higiene que não viaja confere essa lista no CI:
-- toda entrada é coberta por arquivo rastreado;
-- a tag é `kg-ssot-v<version>` (até a 4.3.0, `contract-v<version>`; as tags antigas continuam valendo);
-- o contrato citado é o vigente;
-- nenhum arquivo da release tem referência privada.
+All of it is **Apache-2.0**, including the suite's `.kg.yaml` cases. Beyond copyright, Apache-2.0 grants a patent
+license from the author and the contributors over what they contributed. That license ends for anyone who sues
+claiming that the contract infringes a patent. If you write your own reader, you can use the contract and the suite,
+commercially too, as long as you keep `LICENSE` and `NOTICE`.
 
-O adotante usa só `update` e `check`.
+On the maintainer's side, a hygiene check that does not ship verifies this list in CI:
+- every entry is covered by a tracked file;
+- the tag is `kg-ssot-v<version>` (up to 4.3.0, `contract-v<version>`; the old tags remain valid);
+- the contract it names is the current one;
+- no release file has a private reference.
 
-## 1. Trazer a release
+As an adopter, you only use `update` and `check`.
 
-> **O nome da tag mudou na 4.3.1:** de `contract-vX.Y.Z` para `kg-ssot-vX.Y.Z`, para a tag dizer o produto também
-> no carimbo do adotante. Nada mais muda: as tags antigas seguem existindo, e o próximo update só troca a string do
-> `--tag`.
+## 1. Vendor the release
 
-O repositório público é `https://github.com/marciocar/kg-ssot`: cada commit dele é uma release, com a tag. A
-primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu repo (o adotante):
+> **The tag name changed in 4.3.1:** from `contract-vX.Y.Z` to `kg-ssot-vX.Y.Z`, so the tag names the product in the
+> adopter's stamp too. Nothing else changes: the old tags still exist, and your next update only changes the `--tag`
+> string.
+
+The public repository is `https://github.com/marciocar/kg-ssot`: each of its commits is a release, with its tag. The
+first time, clone it outside your repository and run the vendor tool from the root of your repository (the adopter):
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --dest vendor/kg-ssot
 ```
 
-Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
-vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
+To update, run it from the vendor, with `--source` required. It takes a path or a URL, and a URL becomes a
+throwaway bare clone. Inside the vendor, the git repository is the adopter's, which does not have the tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --source https://github.com/marciocar/kg-ssot
 ```
 
-As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
+The published tags are listed by `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
 
-- **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
-  num nome de arquivo não vira glob.
-- **O que a release aceita:** só arquivos regulares. Um symlink na tag é entrada quebrada.
-- **Troca:** o `--dest` padrão é `vendor/kg-ssot`. O diretório é trocado por rename e nunca fica pela metade.
-  Um arquivo que saiu da release some.
-- **O que o vendor recusa substituir:**
-  - um diretório sem carimbo, porque nunca apaga um diretório alheio;
-  - um vendor que diverge do carimbo, a menos que venha `--force`. Isso evita que uma edição local suma em
-    silêncio.
-- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 10 arquivos:
-  o contrato (MUST e SHOULD), o `release.json`, o leitor, o gate, o vendor, o `requirements.txt`, este guia, a
-  `LICENSE` e o `NOTICE`. A suíte de conformidade fica de fora, e por isso o `kg_conformance.py` e o
-  `spec/conformance/README.md` que este guia cita não vêm. O carimbo registra o perfil, o `check` confere só o que ele
-  trouxe, e o update seguinte **herda** o perfil do carimbo (`--profile full` volta à release inteira).
-  Quem está numa tag anterior à `contract-v4.1.1` migra em dois passos, porque o vendor antigo não conhece
-  `--profile`: primeiro o update normal para a 4.1.1, depois o update com `--profile gate`.
-- **Carimbo:** `vendor/kg-ssot/.kg-ssot-version` guarda a tag, o commit e o sha256 de cada arquivo.
-- **Commit:** o vendor não commita. Num PR próprio, o adotante commita o diretório inteiro com o carimbo.
+- **Reading:** the vendor tool reads the tag with `git archive`, never the working tree. Names are literal: a `*` in a
+  file name does not become a glob.
+- **What the release accepts:** regular files only. A symlink in the tag is broken input.
+- **Swap:** the default `--dest` is `vendor/kg-ssot`. The directory is swapped by rename and is never left half
+  written. A file that left the release disappears.
+- **What the vendor tool refuses to replace:**
+  - a directory without a stamp, because it never deletes someone else's directory;
+  - a vendor that differs from its stamp, unless you pass `--force`. This keeps a local edit from vanishing
+    silently.
+- **Minimal profile:** if you only run the gate and the check, you can vendor the `gate` profile with
+  `--profile gate`. It has 12 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the vendor
+  tool, the language module and its catalog (`tools/kg_i18n.py` and `locale/pt_BR/LC_MESSAGES/kg-ssot.po`),
+  `requirements.txt`, this guide, `LICENSE`, and `NOTICE`. The conformance suite stays out, so `kg_conformance.py` and
+  the `spec/conformance/README.md` that this guide cites do not come along. The stamp records the profile, `check`
+  verifies only what the profile brought, and the next update **inherits** the profile from the stamp
+  (`--profile full` goes back to the whole release).
+  If you are on a tag earlier than `contract-v4.1.1`, migrate in two steps, because the old vendor tool does not know
+  `--profile`: first the normal update to 4.1.1, then the update with `--profile gate`.
+- **Stamp:** `vendor/kg-ssot/.kg-ssot-version` keeps the tag, the commit, and the sha256 of each file.
+- **Commit:** the vendor tool does not commit. In a PR of its own, you commit the whole directory with the stamp.
 
-## 2. Gravar a linha de base
+## 2. Write the baseline
 
-Na raiz do adotante, **nesta ordem**:
+At the adopter's root, **in this order**:
 
 ```bash
-pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
-git add vendor/kg-ssot                                       # antes do gate: ele só mede arquivo rastreado
-python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava a pasta .kg-ssot/gate/
+pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt         # or the venv from the environment note below
+git add vendor/kg-ssot                                       # before the gate: it only measures tracked files
+python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # writes the .kg-ssot/gate/ folder
 ```
 
-O gate mede os `.kg.yaml` rastreados por git (`git ls-files`, lidos da árvore de trabalho). Um arquivo que
-ainda não está no git não entra. Por padrão, `*/fixtures/*` e `docs/materials/*` ficam de fora, e isso já
-exclui as fixtures do próprio vendor: os `.kg.yaml` do vendor moram todos em `*/fixtures/*`. Por isso o
-`git add vendor/kg-ssot` vem antes do `--update`: com o vendor rastreado, a base gravada é a mesma que o CI vai
-medir depois do commit, e um grafo seu ainda não adicionado também precisa de `git add` antes.
+The gate measures the `.kg.yaml` files that git tracks (`git ls-files`, read from the working tree). A file that is
+not in git yet is left out. By default, `*/fixtures/*` and `docs/materials/*` are excluded, and that already excludes
+the vendor's own fixtures: every `.kg.yaml` in the vendor lives under `*/fixtures/*`. That is why
+`git add vendor/kg-ssot` comes before `--update`: with the vendor tracked, the baseline you write is the same one CI
+measures after the commit. A graph of yours that you have not added yet also needs `git add` first.
 
-**Nota de ambiente.** Num sistema com PEP 668 (Ubuntu 24.04 em diante, entre outros), o `pip install` fora de um
-venv é recusado (`externally-managed-environment`). Instale as dependências num venv e rode o kit com o Python
-dele:
+`--exclude GLOB` is repeatable and adds to those patterns. The glob is `fnmatch` over the relative path, and `*`
+crosses `/`. `--no-default-excludes` turns the patterns off, and then the vendor's fixtures, broken on purpose, enter
+the corpus.
+
+The baseline is the `.kg-ssot/gate/` folder:
+- `contract.json`: the contract identity (the name of the MUST schema and the sha256 of both schemas).
+- `graphs/<meta.id>.json`: one record per graph, with the MUST codes it carries (the inherited debt) and the count of
+  each SHOULD warning. The name is the `meta.id`, so a `git mv` does not change the record. A `meta.id` that repeats
+  (even only in case, like `Foo` and `foo`, which macOS and Windows do not tell apart), that does not fit in a file
+  name, or that is a Windows device name (`con`, `com1`) goes by the hash of the path.
+- `accepted/`: one accepted regression per file, with its reason.
+
+Nothing aggregated is written: the graph count and the debt per code come from the records. Two branches that touch
+different graphs touch different files, and the git merge does not conflict. Commit the whole folder.
+
+**Environment note.** On a system with PEP 668 (Ubuntu 24.04 and later, among others), `pip install` outside a venv
+is refused (`externally-managed-environment`). Install the dependencies in a venv and run the kit with its Python:
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
-echo .venv/ >> .gitignore                                    # o venv não entra no git
+echo .venv/ >> .gitignore                                    # the venv stays out of git
 .venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
 ```
 
-No GitHub Actions com `actions/setup-python`, o `pip install` do passo de CI funciona sem venv.
+On GitHub Actions with `actions/setup-python`, the `pip install` in the CI step works without a venv.
 
-### Ler o que reprova
+### Read what fails
 
-O gate lista, depois da comparação, cada grafo que reprova no MUST com os códigos dele (`novo`, `regredido` ou
-`herdado`) e a dívida SHOULD por código. Para ver as ocorrências de um grafo, rode o leitor de referência sem
-`--schema`: ele usa o mesmo contrato e o mesmo vocabulário do gate (`parse.*`, `form.*`, `integrity.*`, `yaml.*`),
-com a contagem de cada código:
+After the comparison, the gate lists each graph that fails the MUST level with its codes (`new`, `regressed`, or
+`inherited`) and the SHOULD debt per code. To see the occurrences in one graph, run the reference reader without
+`--schema`: it uses the same contract and the same vocabulary as the gate (`parse.*`, `form.*`, `integrity.*`,
+`yaml.*`), with the count of each code:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/meu-grafo.kg.yaml
-# REPROVA docs/meu-grafo.kg.yaml
-#   MUST   form.required.node.provenance ×33 · yaml.forbidden-key-on ×7
-#   SHOULD form.required.node.verified_at ×33
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/my-graph.kg.yaml
+# FAIL docs/my-graph.kg.yaml
+#   MUST   form.required.node.provenance ×1 · yaml.forbidden-key-on ×1
+#   SHOULD form.required.node.verified_at ×1 · integrity.testimony-in-prod ×1
+# · 1 files; 0 pass the MUST; 1 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
 ```
 
-Para saber **em qual nó ou aresta** cada código sai, acrescente `--where`. A saída padrão não muda; cada ocorrência
-ganha uma linha com o lugar:
+To find out **which node or edge** each code comes from, add `--where`. The default output stays the same; each
+occurrence gets a line with its place, and each MUST occurrence gets the fix below it:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/meu-grafo.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/my-graph.kg.yaml
+# FAIL docs/my-graph.kg.yaml
+#   MUST   form.required.node.provenance ×1 · yaml.forbidden-key-on ×1
+#   SHOULD form.required.node.verified_at ×1 · integrity.testimony-in-prod ×1
 #     MUST   form.required.node.provenance  nó C_RETRY_SAFE
-#     MUST   yaml.forbidden-key-on  aresta #6 (C_X -> Q_A)
+#            → Add provenance with source, locator, and method; with no recoverable source, change the status to unverifiable.
+#     MUST   yaml.forbidden-key-on  aresta #2 (C_X -> Q_A)
+#            → Replace on: with trigger:.
+#     SHOULD form.required.node.verified_at  nó C_RETRY_SAFE
 #     SHOULD integrity.testimony-in-prod  nó C_SLA_99
+# · 1 files; 0 pass the MUST; 1 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
 ```
 
-O que não tem lugar mais fino sai como `arquivo`: o erro de parse, o `.nan`/`.inf` e a data sem aspas.
+The place is data, so it does not change with the output language: `nó <id>`, `aresta #<n> (<from> -> <to>)`,
+`meta`, `topo` (the top level), or `arquivo` for what has no finer place (the parse error, `.nan`/`.inf`, and the
+unquoted date).
 
-rc 0 todo arquivo passa no MUST, 1 algum reprova, 2 entrada quebrada.
+rc 0 means every file passes the MUST level, 1 means some file fails, and 2 means broken input.
 
-### A chave `on:` em aresta vira `trigger:`
+### The `on:` key on an edge becomes `trigger:`
 
-`yaml.forbidden-key-on` é uma aresta com a chave `on:`. Ela é proibida desde o v1 porque um leitor YAML 1.1 (o
-PyYAML padrão, entre outros) lê `on` como o booleano `true`, e o evento referenciado parece órfão para esse leitor
-enquanto outro o aprova. O gatilho de uma `TRANSITIONS` se escreve `trigger:`, e a integridade aceita `trigger`
-como referência ao evento:
+`yaml.forbidden-key-on` is an edge with the `on:` key. It has been forbidden since v1 because a YAML 1.1 reader (the
+default PyYAML, among others) reads `on` as the boolean `true`, so the referenced event looks orphaned to that reader
+while another reader passes it. The trigger of a `TRANSITIONS` edge is written `trigger:`, and the integrity check
+accepts `trigger` as a reference to the event:
 
 ```yaml
 - from: ST_IDLE
   to: ST_BUSY
   edge_type: TRANSITIONS
-  trigger: EV_START      # era: on: EV_START
+  trigger: EV_START      # was: on: EV_START
 ```
 
-A troca é mecânica (só o nome da chave) e tira o código do grafo. Se ela vier depois da base, o gate mostra o
-ganho e pede para travar com `--update`.
+The change is mechanical (only the key name), and it removes the code from the graph. If it comes after the baseline,
+the gate shows the gain and asks you to lock it in with `--update`.
 
-`--exclude GLOB` é repetível e se soma a esses padrões. O glob é `fnmatch` sobre o caminho relativo, e `*`
-atravessa `/`. `--no-default-excludes` desliga os padrões, e aí as fixtures do vendor, quebradas de propósito,
-entram no corpus.
+## 3. The CI step
 
-A linha de base é a pasta `.kg-ssot/gate/`:
-- `contract.json`: a identidade do contrato (o nome do schema MUST e o sha256 dos dois schemas).
-- `graphs/<meta.id>.json`: um registro por grafo, com os códigos MUST que ele carrega (a dívida herdada) e a contagem
-  de cada aviso SHOULD. O nome é o `meta.id`, e por isso um `git mv` não troca o registro. Um `meta.id` repetido
-  (inclusive só na caixa, como `Foo` e `foo`, que o macOS e o Windows não distinguem), que não cabe num nome de
-  arquivo ou que é dispositivo do Windows (`con`, `com1`) vai pelo hash do caminho.
-- `accepted/`: uma regressão aceita por arquivo, com o motivo.
-
-Nada agregado é gravado: a contagem de grafos e a dívida por código saem dos registros. Duas branches que mexem em
-grafos diferentes mexem em arquivos diferentes, e o merge do git não conflita. Commite a pasta inteira.
-
-## 3. O passo de CI
-
-No GitHub Actions, o workflow inteiro, em `.github/workflows/kg-ssot.yml`:
+On GitHub Actions, the whole workflow, in `.github/workflows/kg-ssot.yml`:
 
 ```yaml
 name: KG-SSOT
@@ -196,442 +214,484 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
+      - name: KG-SSOT contract (intact vendor + per-graph gate)
         run: |
           pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
           python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
           python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
 
-Em outro CI, o passo é o mesmo: Python 3.11 ou mais, as dependências fixadas com `--require-hashes` e os dois comandos.
+On another CI, the step is the same: Python 3.11 or later, the pinned dependencies with `--require-hashes`, and the
+two commands.
 
-**`check`** reprova (rc 1) quando um arquivo do vendor foi editado, apagado ou acrescentado. Isso inclui
-bytecode num `__pycache__`, que trocaria o leitor sem mudar a fonte, e symlink. Os scripts do kit não gravam
-bytecode quando rodam como script. Mas uma ferramenta sua que **importa** um módulo do kit grava o `.pyc` dele
-no `__pycache__` do vendor, porque o Python compila antes de executar o módulo, e o próximo `check` reprova.
-Por isso todo comando deste guia usa `python3 -I -B`, e quem importa o kit roda com `-B` ou
+**`check`** fails (rc 1) when a vendor file was edited, deleted, or added. That includes bytecode in a
+`__pycache__`, which would swap the reader without changing the source, and symlinks. The kit's scripts do not write
+bytecode when they run as scripts. But a tool of yours that **imports** a kit module writes that module's `.pyc` into
+the vendor's `__pycache__`, because Python compiles a module before running it, and the next `check` fails. That is
+why every command in this guide uses `python3 -I -B`, and why code that imports the kit should run with `-B` or
 `PYTHONDONTWRITEBYTECODE=1`.
 
-O contrato não se customiza no adotante: uma mudança necessária volta ao produto como issue no repositório público
-e vira caso ou decisão de contrato.
+You do not customize the contract in your repository: a change you need goes back to the product as an issue in the
+public repository and becomes a case or a contract decision.
 
-Limite: o carimbo atesta a si mesmo. O `check` pega uma edição acidental, mas não quem edita um arquivo e
-recalcula o carimbo. Isso o review do PR do adotante pega, porque o diff do carimbo fica à vista.
+Limit: the stamp vouches for itself. `check` catches an accidental edit, but not someone who edits a file and
+recomputes the stamp. Review of the adopter's PR catches that, because the stamp diff is in plain sight.
 
-**O gate** reprova (rc 1) quando:
-- um grafo fora de `failing` falha no MUST, inclusive um grafo novo;
-- um grafo de `failing` ganha um código MUST que não tinha;
-- a dívida de um código SHOULD sobe, ou aparece um código novo;
-- o contrato mudou: o nome do schema MUST, ou o sha256 dos schemas por uma tag nova. A comparação continua
-  sendo feita contra a base antiga, e a base nova se grava com `--update` no mesmo PR.
+**The gate** fails (rc 1) when:
+- a graph outside `failing` fails the MUST level, including a new graph;
+- a graph in `failing` gains a MUST code it did not have;
+- the debt of a SHOULD code goes up, or a new code appears;
+- the contract changed: the name of the MUST schema, or the sha256 of the schemas because of a new tag. The comparison
+  still runs against the old baseline, and you write the new baseline with `--update` in the same PR.
 
-No MUST, a comparação é por grafo: consertar um grafo não compensa quebrar outro. A dívida SHOULD é por código,
-um total de grafos. Tirar um aviso de um grafo e pôr o mesmo em outro empata.
+At the MUST level, the comparison is per graph: fixing one graph does not make up for breaking another. The SHOULD
+debt is per code, a total across graphs. Removing a warning from one graph and adding the same warning to another is
+a tie.
 
-**Dívida por nó.** Por grafo, uma melhora espalhada aparece como piora: consertar 3 ocorrências num grafo e criar 1
-em outro conta como +1 grafo. Desde a `contract-v4.2.0`, `kg_gate.py --update --granularity node` passa a contar e
-travar a dívida SHOULD por ocorrência, somada em todos os grafos. A base guarda a granularidade, e o gate a usa sem
-precisar da opção outra vez; `--granularity graph` volta ao padrão. Trocar não é piora: na passada que troca, a
-dívida é comparada na granularidade da base, e o `--update` só pede motivo se ela piorou de verdade. O MUST segue por
-grafo nas duas granularidades. Ocorrência é por nó ou aresta na maioria dos códigos; os que valem para o arquivo
-inteiro (`yaml.unquoted-date`, `form.range.top.nodes`) contam 1 por grafo.
+**Debt per node.** Per graph, a spread-out improvement shows up as a regression: fixing 3 occurrences in one graph and
+creating 1 in another counts as +1 graph. Since `contract-v4.2.0`, `kg_gate.py --update --granularity node` counts and
+locks the SHOULD debt per occurrence, summed across all graphs. The baseline keeps the granularity, and the gate uses
+it without the option again; `--granularity graph` goes back to the default. Switching is not a regression: on the run
+that switches, the debt is compared at the baseline's granularity, and `--update` only asks for a reason if it really
+got worse. The MUST level stays per graph at both granularities. An occurrence is per node or edge for most codes; the
+ones that apply to the whole file (`yaml.unquoted-date`, `form.range.top.nodes`) count 1 per graph.
 
-Um ganho passa e pede para travar: o grafo saiu de `failing` porque foi consertado, ou a dívida caiu. Um grafo
-apagado não conta como conserto: o gate diz que ele saiu do corpus, e diz quando o corpus encolhe, para o PR
-mostrar a remoção. Para
-travar, rode `kg_gate.py --update` no mesmo PR.
+A gain passes and asks you to lock it in: the graph left `failing` because it was fixed, or the debt went down. A
+deleted graph does not count as a fix: the gate says it left the corpus, and it says when the corpus shrinks, so the
+PR shows the removal. To lock it in, run `kg_gate.py --update` in the same PR.
 
-Sobre `--update`:
-- sem base ainda, ele grava a primeira (rc 0);
-- com uma piora e sem `--accept-regression "<motivo>"`, ele recusa (rc 1) e não grava nada;
-- com o motivo, ele grava, e o motivo fica na base (um arquivo em `accepted/`; as regressões aceitas se acumulam).
+About `--update`:
+- with no baseline yet, it writes the first one (rc 0);
+- with a regression and no `--accept-regression "<reason>"`, it refuses (rc 1) and writes nothing;
+- with the reason, it writes, and the reason stays in the baseline (one file in `accepted/`; accepted regressions
+  accumulate).
 
-**rc 0:** nada piorou, ou o vendor está íntegro. **rc 1:** algo piorou, ou o vendor diverge do carimbo.
-**rc 2:** entrada quebrada, que nunca passa como verde:
-- no `kg_gate.py`:
-  - `--repo` não é um repo git;
-  - a base está ausente (sem `--update`), ilegível ou fora do formato. Na pasta: `contract.json` com `contract` e
-    `contract_sha256` como texto e, opcional, `granularity` como `graph` ou `node`; cada registro de `graphs/` com
-    `graph` (o caminho), `id` (texto ou null), `must` como [códigos] e `should` como código → inteiro > 0. No arquivo
-    de antes da 4.16.0: `contract` como texto, `failing` como caminho → [códigos], `debt` como código → inteiro ≥ 0,
-    `accepted_regressions` como lista e, opcional, `granularity`;
-  - um `.kg.yaml` não pôde ser lido.
-- no `kg_vendor.py`:
-  - o `--source` não é repo git, a tag não existe, ou o `spec/release.json` dela está ausente, ilegível ou
-    declara outra tag;
-  - uma entrada da release não cobre nenhum arquivo, ou um membro da tag não é arquivo regular;
-  - o carimbo está ausente, ilegível ou fora do formato;
-  - no `update`: o destino não é um vendor, ou é um vendor editado sem `--force`, ou faltou `--source` dentro
-    de um vendor.
+**rc 0:** nothing got worse, or the vendor is intact. **rc 1:** something got worse, or the vendor differs from its
+stamp. **rc 2:** broken input, which never passes as green:
+- in `kg_gate.py`:
+  - `--repo` is not a git repository;
+  - the baseline is missing (without `--update`), unreadable, or out of format. In the folder: `contract.json` with
+    `contract` and `contract_sha256` as text and, optionally, `granularity` as `graph` or `node`; each record in
+    `graphs/` with `graph` (the path), `id` (text or null), `must` as [codes], and `should` as code → integer > 0. In
+    the file from before 4.16.0: `contract` as text, `failing` as path → [codes], `debt` as code → integer ≥ 0,
+    `accepted_regressions` as a list and, optionally, `granularity`;
+  - a `.kg.yaml` could not be read.
+- in `kg_vendor.py`:
+  - `--source` is not a git repository, the tag does not exist, or its `spec/release.json` is missing, unreadable, or
+    declares another tag;
+  - a release entry covers no file, or a member of the tag is not a regular file;
+  - the stamp is missing, unreadable, or out of format;
+  - in `update`: the destination is not a vendor, or it is an edited vendor without `--force`, or `--source` is
+    missing inside a vendor.
 
-## 4. Atualizar a tag
+## 4. Update the tag
 
-O PR que muda a tag faz três coisas:
-1. roda `kg_vendor.py update` com a tag nova, `git add vendor/kg-ssot` (o gate mede só arquivo rastreado) e
-   `kg_vendor.py check --dest vendor/kg-ssot --index`, que confere o que o commit vai levar. Desde a 4.8.1, o vendor
-   traz o próprio `.gitattributes` (`* -text`), para a regra de fim de linha do repositório não reescrever os bytes
-   da release no índice. Quem sai de uma tag anterior à 4.8.1 roda o `update` duas vezes (a nota abaixo explica);
-2. roda `kg_gate.py` e explica no PR a diferença que aparecer;
-3. grava a base com `--update` quando o contrato muda a identidade. Desde a 4.16.0, isso não é obrigatório: sem
-   veredito trocado, o gate passa com um aviso `· identidade`, e o `--update` pode vir depois.
+The PR that changes the tag does three things:
+1. runs `kg_vendor.py update` with the new tag, `git add vendor/kg-ssot` (the gate only measures tracked files), and
+   `kg_vendor.py check --dest vendor/kg-ssot --index`, which verifies what the commit will carry. Since 4.8.1, the
+   vendor brings its own `.gitattributes` (`* -text`), so the repository's line-ending rule does not rewrite the
+   release bytes in the index. If you come from a tag earlier than 4.8.1, run `update` twice (the note below
+   explains);
+2. runs `kg_gate.py` and explains in the PR any difference that shows up;
+3. writes the baseline with `--update` when the contract changes its identity. Since 4.16.0, this is not required:
+   with no changed verdict, the gate passes with a `· identity` warning, and the `--update` can come later.
 
-Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
-como compromisso medido.
+A new SHOULD warning raises the debt by design. The contract's ramps (SHOULD today, MUST later) arrive this way, as a
+measured commitment.
 
-Da `contract-v4.0.x` para a `contract-v4.1.x`, nenhum veredito muda: entram quatro avisos SHOULD (carimbo sem alvo,
-testemunho em PROD, verificação antes do fato e decisão sem origem; a tabela está em `spec/conformance/README.md`).
-Se a dívida SHOULD subir (por desenho, quando o corpus tem o que os avisos novos acusam), o `--update` desse PR vai com
-`--accept-regression "<motivo>"`; se não subir, o `--update` grava a identidade nova sem motivo.
+From `contract-v4.0.x` to `contract-v4.1.x`, no verdict changes: four SHOULD warnings come in (a stamp without a
+target, testimony in PROD, verification before the fact, and a decision without an origin; the table is in
+[`spec/conformance/README.md`](spec/conformance/README.md)). If the SHOULD debt goes up (by design, when the corpus has
+what the new warnings flag), that PR's `--update` goes with `--accept-regression "<reason>"`; if it does not, the
+`--update` writes the new identity without a reason.
 
-Da `kg-ssot-v4.7.x` para a `kg-ssot-v4.8.0`, o sha256 dos schemas não muda, e nenhum veredito MUST de `.kg.yaml` muda.
-Entram três avisos SHOULD no `.kg.yaml`, os pontos do perfil JSON em rampa: `yaml.unsafe-integer` (inteiro fora de
-±(2^53−1)), `yaml.lone-surrogate` (surrogate solto) e `yaml.depth-over-128` (mais de 128 coleções aninhadas). Um
-grafo que tenha um desses ganha um código de dívida novo, e o `kg_gate.py` reprova até o `--update` com
-`--accept-regression "<motivo>"`, ou até o grafo ser corrigido. A 4.8.0 foi medida nos 454 `.kg.yaml` do core e
-nos deste repositório, e nenhum dispara os avisos novos.
+From `kg-ssot-v4.7.x` to `kg-ssot-v4.8.0`, the sha256 of the schemas does not change, and no MUST verdict on a
+`.kg.yaml` changes. Three SHOULD warnings come into `.kg.yaml`, the points of the JSON profile on a ramp:
+`yaml.unsafe-integer` (an integer outside ±(2^53−1)), `yaml.lone-surrogate` (a lone surrogate), and
+`yaml.depth-over-128` (more than 128 nested collections). A graph that has one of them gains a new debt code, and
+`kg_gate.py` fails until the `--update` with `--accept-regression "<reason>"`, or until the graph is fixed. 4.8.0 was
+measured on the 454 `.kg.yaml` files of one adopter repository and on this repository's, and none of them triggers
+the new warnings.
 
-Da `kg-ssot-v4.8.0` para a `kg-ssot-v4.8.1`, nem o contrato nem o leitor mudam. Muda o vendor: o `update` grava
-`vendor/kg-ssot/.gitattributes` com `* -text`, e o carimbo passa a conferi-lo. Na 4.8.0, um repositório com regra de
-fim de linha para `*.json` (`*.json text eol=lf`, por exemplo) normalizava no índice as duas fixtures da suíte que
-têm CRLF de propósito, e o `kg_vendor.py check` reprovava num checkout novo, como o do CI, embora passasse na árvore
-de trabalho.
+From `kg-ssot-v4.8.0` to `kg-ssot-v4.8.1`, neither the contract nor the reader changes. The vendor tool changes:
+`update` writes `vendor/kg-ssot/.gitattributes` with `* -text`, and the stamp starts verifying it. In 4.8.0, a
+repository with a line-ending rule for `*.json` (`*.json text eol=lf`, for example) normalized in the index the two
+suite fixtures that have CRLF on purpose, and `kg_vendor.py check` failed on a fresh checkout, like CI's, even though
+it passed on the working tree.
 
-**De qualquer tag anterior à 4.8.1, rode o update duas vezes.** O `update` roda pelo `kg_vendor.py` que já está no
-vendor, e o de uma tag anterior traz a 4.8.1 sem gravar o `.gitattributes`. O `check` da 4.8.1 acusa isso ("rode o update de novo"). O segundo `update`,
-já com o kit novo, grava o arquivo sem precisar de `--force`. Depois do `git add`, o `check --index` confirma que o
-índice guarda os bytes da release. Outra saída é rodar o update uma vez só, pelo clone da tag
-(`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e
-pode ficar.
+**From any tag earlier than 4.8.1, run the update twice.** `update` runs through the `kg_vendor.py` already in the
+vendor, and the one from an earlier tag brings 4.8.1 without writing `.gitattributes`. The 4.8.1 `check` reports
+this ("run the update again"). The second `update`, now with the new kit, writes the file without needing `--force`.
+After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
+once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
+A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
-Da `kg-ssot-v4.17.1` para a `kg-ssot-v4.17.2`, o contrato não muda (segue o v4.10), nem o gate. O servidor MCP passa a
-anunciar as anotações de ferramenta: as seis de leitura saem como só leitura e idempotentes, e o `kg_write` e o
-`kg_delete` como destrutivas, todas sem mundo aberto. O cliente MCP pode dispensar a confirmação do que só lê.
+From `kg-ssot-v4.17.2` to `kg-ssot-v4.18.0`, the contract does not change (still v4.10, with the same identity), and
+no verdict or code changes. What changes is the language of the human output:
+- **The tools print in English by default.** They pick the language the gettext way: `KG_SSOT_LANG`, then
+  `LANGUAGE`, `LC_ALL`, `LC_MESSAGES`, and `LANG`. A `pt_BR` locale or `KG_SSOT_LANG=pt-BR` gives Brazilian
+  Portuguese; `C`, `POSIX`, and any language without a catalog give English. A CI runner with `LANG=C.UTF-8` gets
+  English.
+- **If your CI searches the human output for text**, set `KG_SSOT_LANG=pt-BR` on that step, or match both languages:
+  `PASS` or `PASSA`, `FAIL` or `REPROVA`, `✗ WORSE` or `✗ PIOROU`, `BROKEN INPUT` or `ENTRADA QUEBRADA`. Better yet,
+  decide on the exit code.
+- **Data does not change language.** JSON keys and structure, codes, exit codes, the verdict `place` (`nó X`,
+  `aresta #n`, `arquivo`) and `path`, and the `kg_migrate` TSV stay exactly as before. The `message`, `hint` and
+  `error` strings inside JSON are text for people: they were always Portuguese and now follow the language, so compare
+  by code, never by message. The MCP server speaks English in every locale.
+- **The vendor brings two more files:** `tools/kg_i18n.py` and the catalog `locale/pt_BR/LC_MESSAGES/kg-ssot.po`. Both
+  are in the `gate` profile, which now has 12 files. The vendored tools do not start without `kg_i18n.py`, and without
+  the catalog they print only in English.
 
-Da `kg-ssot-v4.17.0` para a `kg-ssot-v4.17.1`, o contrato não muda (segue o v4.10), e o gate não muda de veredito nem
-de identidade. Duas correções de campo nas ferramentas de leitura, achadas pelos adotantes no primeiro uso:
-- **O `kg_query --root` deixa de fora o vendor e os fixtures por padrão** (`vendor/*`, `fixtures/*`, `*/fixtures/*`,
-  `docs/materials/*`). Num adotante, o `--root` lia 411 grafos para 29 reais, e 35 dos
-  50 primeiros abertos vinham de fixtures. `--no-default-excludes` volta a ler tudo. O `kg_diff --from` sem caminhos
-  ganha o mesmo padrão, para a atualização do vendor não afogar o diff do grafo. O JSON da consulta passa a dizer a
-  raiz lida (`root`).
-- **O campo renomeado com o mesmo valor aparece como renomeação** no `kg_diff`, e não mais como remoção e acréscimo
-  soltos: num adotante, duas renomeações de chave apareciam 21 vezes cada. No JSON as duas entradas ficam, ligadas
-  por `renamed_to` e `renamed_from`, então quem já lia o formato `kg-ssot.diff/1` não perde nada; só o valor não
-  trivial e único dos dois lados é pareado. Os testes da consulta e do diff passam a rodar no CI.
+One `update` is enough, and the gate does not need `--update`.
 
-Da `kg-ssot-v4.16.1` para a `kg-ssot-v4.17.0`, o contrato não muda (segue o v4.10, com a mesma identidade). Entram
-duas ferramentas de leitura, que não julgam nem gravam:
-- **`kg_query.py`, a consulta e a projeção.** Seleciona nós num corpus inteiro (id, prefixo, tipo, status, plano,
-  camada, palavras do label, a fila dos abertos, os sem carimbo ou conferidos antes de uma data, a vizinhança de um
-  nó) e projeta cada aresta com o label da outra ponta, local ou externa, paginado, no formato `kg-ssot.query/1`. No
-  servidor MCP, é a ferramenta `kg_query`, sobre a área do armazém; no perfil atrás de proxy, só a área da identidade.
-- **`kg_diff.py`, o diff por id.** Compara dois grafos, ou tudo o que mudou entre duas revisões do git, nó a nó e campo
-  a campo, no formato `kg-ssot.diff/1`; `--ignore` tira da comparação o campo que um gerador recarimba.
-- **A suíte ganha 2 casos** (356), dois achados da revisão do v4.10 que só tinham teste de unidade: duas chaves
-  repetidas na ordem do documento, e a quebra escapada num mapa de fluxo na raiz. Nenhum veredito da referência muda,
-  e o gate não muda de identidade. Na 4.16.1, o README e o `llms-full.txt` ainda diziam 349 casos em dois lugares; a
-  4.17.0 corrige.
+From `kg-ssot-v4.17.1` to `kg-ssot-v4.17.2`, the contract does not change (still v4.10), and neither does the gate.
+The MCP server starts announcing tool annotations: the six read tools are marked read-only and idempotent, and
+`kg_write` and `kg_delete` as destructive, all of them without an open world. An MCP client can skip the confirmation
+for what only reads.
 
-Da `kg-ssot-v4.16.0` para a `kg-ssot-v4.16.1`, entra o contrato v4.10: três pontos do perfil YAML em que o leitor de
-referência e o leitor JS divergiam, achados por fuzz e resolvidos pela especificação do YAML. Nenhum dos grafos reais
-medidos tem os casos, e nenhum veredito do leitor de referência muda.
-- **A ordem dos erros segue o documento.** Uma chave repetida que vem antes de uma âncora repetida ou de um alias sem
-  âncora dá `parse.duplicate-key`, como no leitor JS; antes, a referência dava `parse.yaml-error`. A âncora repetida,
-  o alias sem âncora e o alias seguido de `:` (`*x:`, que no YAML 1.2 é um alias de nome `x:`) seguem recusados.
-- **A linha vazia depois de uma quebra escapada entre aspas duplas vira `\n`**, como pede a especificação e como a
-  referência já lia; o leitor JS (o pacote npm) dobrava como espaço.
-- **O BOM no começo do arquivo não conta como coluna.** O leitor JS recusava o documento indentado depois dele; a
-  referência já aceitava.
-- **A suíte ganha 5 casos** (354). A identidade do contrato muda, e o `kg_gate.py` mostra a linha de identidade com
-  rc 0, sem pedir `--update`. A exceção é um grafo herdado que reprovava com `parse.yaml-error` e passa a reprovar
-  com `parse.duplicate-key`: o veredito é o mesmo, mas o código mudou, e o gate acusa piora até o `--update` registrar
-  a troca. Nenhum dos 1.633 grafos reais medidos em quatro repos tem o caso.
+From `kg-ssot-v4.17.0` to `kg-ssot-v4.17.1`, the contract does not change (still v4.10), and the gate changes neither
+verdict nor identity. Two field fixes in the read tools, found by adopters on first use:
+- **`kg_query --root` leaves out the vendor and the fixtures by default** (`vendor/*`, `fixtures/*`, `*/fixtures/*`,
+  `docs/materials/*`). In one adopter, `--root` read 411 graphs for 29 real ones, and 35 of the first 50 open nodes came
+  from fixtures. `--no-default-excludes` reads everything again. `kg_diff --from` without paths gets the same default,
+  so the vendor update does not drown the graph diff. The query JSON now states the root it read (`root`).
+- **A renamed field with the same value shows up as a rename** in `kg_diff`, and no longer as a separate removal and
+  addition: in one adopter, two key renames showed up 21 times each. In the JSON both entries stay, linked by
+  `renamed_to` and `renamed_from`, so anyone who already read the `kg-ssot.diff/1` format loses nothing; only a
+  non-trivial value that is unique on both sides is paired. The query and diff tests now run in CI.
 
-Da `kg-ssot-v4.15.1` para a `kg-ssot-v4.16.0`, o contrato não muda (segue o v4.9, com a mesma identidade). Muda o
-gate, nas duas dores que os três adotantes mediram.
-- **A base vira uma pasta, `.kg-ssot/gate/`, com um registro por grafo.** O arquivo único conflitava em quase todo
-  merge entre branches que regravavam a base: num adotante, os 4 merges da semana. Refeitos com a pasta, os mesmos 4
-  mergeiam sem conflito, e o gate passa na árvore mergeada. O gate da 4.16.0 ainda lê o `gate.json`, e o primeiro
-  `--update` grava a pasta e apaga o arquivo, sem veredito trocado (medido nos três adotantes). Commite a pasta e a
-  remoção do arquivo juntos.
-- **O primeiro merge entre uma branch já migrada e outra que ainda mexe no `gate.json` conflita uma vez.** O git vê
-  a remoção do arquivo como um rename para `.kg-ssot/gate/contract.json` (os dois são pequenos e parecidos), ou como
-  modify/delete, e o conflito cai num deles. Medido num adotante: aconteceu no merge da branch longa depois da
-  migração. A cura é a mesma nos dois casos: fique com a pasta da branch migrada (`git checkout --theirs
-  .kg-ssot/gate`, ou `--ours`, conforme o lado), remova o `gate.json` (`git rm .kg-ssot/gate.json`) e rode
-  `kg_gate.py --update`, que regrava os registros com o corpus mergeado. Para não ter o conflito, migre as branches
-  vivas antes de mergear entre elas: com as duas na pasta, o merge não conflita.
-- **Um `trace:` que aponta para `.kg-ssot/gate.json` fica sem alvo depois da migração.** Troque por
-  `.kg-ssot/gate/` (ou `.kg-ssot/gate/contract.json`) no mesmo PR. Achado de um adotante, cujo lint de traces acusou
-  o caminho movido: `git grep -n 'kg-ssot/gate.json' -- '*.kg.yaml' '*.kg.json'` lista os casos antes do update.
-- **A troca de identidade do contrato sem veredito trocado passa com aviso.** O gate segue acusando a identidade
-  numa linha `· identidade`, mas o rc vem da comparação, feita com o contrato novo: a regra nova que piora um grafo
-  continua reprovando. Uma tag que só muda os schemas sem mudar veredito deixa de pedir um PR só para o `--update`.
-  Quem quiser o comportamento antigo passa `--strict-identity`. O que a troca de identidade protegia, o schema do
-  vendor editado à mão, o gate passa a conferir sozinho: rodando de um vendor, ele compara o sha256 dos dois schemas
-  com o carimbo (`.kg-ssot-version`) e reprova quando divergem ou quando o carimbo sumiu, e o `--update` recusa gravar
-  a base, mesmo com `--accept-regression`. Quem edita o schema e reescreve o carimbo junto passa pelo gate, como antes
-  passava editando o schema e a base: a defesa aí é o diff do PR, que mostra o carimbo mexido.
-- **A base guarda a versão do kit** (`kit` no `contract.json`). Medir com um kit mais antigo que o da base reprova: uma
-  regra que só a release nova tinha deixaria de ser medida. Uma volta consciente passa com `--update
-  --accept-regression "<motivo>"`.
-- **O registro segue o `meta.id` num `git mv`.** O gate acusa a tradução numa linha `· A → B: o registro da base
-  seguiu pelo meta.id`. Ele não distingue um `git mv` de "apagar um grafo e criar outro com o mesmo `meta.id`", e por
-  isso a linha existe: quem revisa o PR vê de onde veio a dívida herdada. Um `meta.id` repetido na base nunca é
-  seguido.
-- **Depois de um merge, o `contract.json` pode vir de um lado e um registro do outro**, medido com o contrato antigo.
-  O veredito segue certo, porque a comparação é sempre feita com o contrato de agora. O que pode ficar velho é a
-  identidade gravada; o próximo `--update` a acerta.
-- **Um script que passa `--baseline <arquivo>.json`** continua lendo e gravando o arquivo único. Sem `--baseline`, o
-  padrão é a pasta.
+From `kg-ssot-v4.16.1` to `kg-ssot-v4.17.0`, the contract does not change (still v4.10, with the same identity). Two
+read tools come in, and they neither judge nor write:
+- **`kg_query.py`, the query and the projection.** It selects nodes across a whole corpus (id, prefix, type, status,
+  plane, layer, words in the label, the queue of open nodes, nodes without a stamp or verified before a date, the
+  neighborhood of a node) and projects each edge with the label of the other end, local or external, paginated, in the
+  `kg-ssot.query/1` format. In the MCP server, it is the `kg_query` tool, over the store's area; in the behind-proxy
+  profile, only the identity's area.
+- **`kg_diff.py`, the diff by id.** It compares two graphs, or everything that changed between two git revisions, node
+  by node and field by field, in the `kg-ssot.diff/1` format; `--ignore` drops from the comparison a field that a
+  generator restamps.
+- **The suite gains 2 cases** (356), two findings from the v4.10 review that only had unit tests: two repeated keys in
+  document order, and the escaped line break in a flow mapping at the root. No reference verdict changes, and the gate
+  keeps its identity. In 4.16.1, the README and `llms-full.txt` still said 349 cases in two places; 4.17.0 fixes that.
 
-Da `kg-ssot-v4.15.0` para a `kg-ssot-v4.15.1`, entra o contrato v4.9, que corrige um defeito do desenho da 4.15.0
-achado por um adotante ao gravar regras de coleta de evidência.
-- **`reverify_every` sem `verified_at` deixa de alertar.** Uma regra com cadência e ainda sem coleta está no estado
-  inicial dela, e não em dívida: na 4.15.0, o `kg_gate.py` acusava piora em `form.required.node.verified_at` a cada
-  regra nova. Quem lista esse caso é o relatório de vencimento (`kg_validate.py --due`, na lista `unstamped`), fora
-  do veredito. O nó PROD sem `verified_at` segue alertando.
-- **A suíte segue com 349 casos**, e o caso da cadência sem carimbo passa a ser válido, sem aviso. A identidade do
-  contrato muda (o `kg_gate.py` pede `--update`). A dívida SHOULD só pode cair, e nenhum veredito MUST muda.
+From `kg-ssot-v4.16.0` to `kg-ssot-v4.16.1`, contract v4.10 comes in: three points of the YAML profile where the
+reference reader and the JS reader disagreed, found by fuzzing and settled by the YAML specification. None of the real
+graphs measured has these cases, and no verdict of the reference reader changes.
+- **Error order follows the document.** A repeated key that comes before a repeated anchor or an undefined alias gives
+  `parse.duplicate-key`, as in the JS reader; before, the reference gave `parse.yaml-error`. The repeated anchor, the
+  undefined alias, and the alias followed by `:` (`*x:`, which in YAML 1.2 is an alias named `x:`) are still refused.
+- **An empty line after an escaped line break inside double quotes becomes `\n`**, as the specification requires and
+  as the reference already read it; the JS reader (the npm package) folded it into a space.
+- **The BOM at the start of the file does not count as a column.** The JS reader refused a document indented after
+  it; the reference already accepted it.
+- **The suite gains 5 cases** (354). The contract identity changes, and `kg_gate.py` shows the identity line with rc 0,
+  without asking for `--update`. The exception is an inherited graph that failed with `parse.yaml-error` and now fails
+  with `parse.duplicate-key`: the verdict is the same, but the code changed, and the gate reports a regression until
+  `--update` records the switch. None of the 1,633 real graphs measured across four repositories has the case.
 
-Da `kg-ssot-v4.14.0` para a `kg-ssot-v4.15.0`, entra o contrato v4.8: as chaves da verificação, desenhadas com dois
-adotantes a partir de um caso real de auditoria contínua. Todas são opcionais, e quem não usa não ganha dívida.
-- **`reverify_every`**: de quanto em quanto tempo a verificação de um nó tem de ser refeita, em duração ISO 8601 só com
-  data (`P3M`, `P1Y`). Zerada (`P0D`), alerta. Na 4.15.0, alertava também sem `verified_at`; a 4.15.1 tirou esse aviso.
-- **`reverify_on`**: o gatilho por evento, em texto ("por admissão", "a cada mudança de configuração").
-- **`retain_for`**: por quanto tempo a evidência tem de ser guardada, na mesma duração.
-- **O `owner`** é o papel que responde pelo nó, e não uma pessoa. Não muda nada no veredito.
-- **`kg_validate.py --due AAAA-MM-DD`**: o relatório de vencimento, que nunca muda o veredito do gate. Um veredito que
-  mudasse com o calendário, sem commit, quebraria a base e a catraca. Rode o relatório num job agendado, se quiser
-  cobrar a cadência.
-- **A suíte ganha 13 casos** (349). A identidade do contrato muda (o `kg_gate.py` pede `--update`), sem veredito
-  trocado.
+From `kg-ssot-v4.15.1` to `kg-ssot-v4.16.0`, the contract does not change (still v4.9, with the same identity). The
+gate changes, on the two pains that the three adopters measured.
+- **The baseline becomes a folder, `.kg-ssot/gate/`, with one record per graph.** The single file conflicted in
+  almost every merge between branches that rewrote the baseline: in one adopter, all 4 merges of the week. Redone with
+  the folder, the same 4 merge without conflict, and the gate passes on the merged tree. The 4.16.0 gate still reads
+  `gate.json`, and the first `--update` writes the folder and deletes the file, with no changed verdict (measured in
+  the three adopters). Commit the folder and the file removal together.
+- **The first merge between an already migrated branch and one that still touches `gate.json` conflicts once.** Git
+  sees the file removal as a rename to `.kg-ssot/gate/contract.json` (both are small and similar), or as
+  modify/delete, and the conflict lands on one of them. Measured in one adopter: it happened when merging the long
+  branch after the migration. The cure is the same in both cases: keep the migrated branch's folder
+  (`git checkout --theirs .kg-ssot/gate`, or `--ours`, depending on the side), remove `gate.json`
+  (`git rm .kg-ssot/gate.json`), and run `kg_gate.py --update`, which rewrites the records with the merged corpus. To
+  avoid the conflict, migrate the live branches before merging between them: with both on the folder, the merge does
+  not conflict.
+- **A `trace:` that points to `.kg-ssot/gate.json` loses its target after the migration.** Change it to
+  `.kg-ssot/gate/` (or `.kg-ssot/gate/contract.json`) in the same PR. Found by an adopter whose trace lint flagged the
+  moved path: `git grep -n 'kg-ssot/gate.json' -- '*.kg.yaml' '*.kg.json'` lists the cases before the update.
+- **A change of contract identity with no changed verdict passes with a warning.** The gate still reports the identity
+  on a `· identity` line, but the rc comes from the comparison, made with the new contract: a new rule that makes a
+  graph worse still fails. A tag that only changes the schemas without changing a verdict no longer requires a PR just
+  for the `--update`. If you want the old behavior, pass `--strict-identity`. What the identity change used to protect,
+  a vendored schema edited by hand, the gate now verifies on its own: when it runs from a vendor, it compares the sha256
+  of both schemas with the stamp (`.kg-ssot-version`) and fails when they differ or when the stamp is gone, and
+  `--update` refuses to write the baseline, even with `--accept-regression`. Someone who edits the schema and rewrites
+  the stamp along with it gets past the gate, as they used to by editing the schema and the baseline: the defense there
+  is the PR diff, which shows the touched stamp.
+- **The baseline keeps the kit version** (`kit` in `contract.json`). Measuring with a kit older than the baseline's
+  fails: a rule that only the new release had would stop being measured. A deliberate rollback passes with
+  `--update --accept-regression "<reason>"`.
+- **The record follows the `meta.id` through a `git mv`.** The gate reports the mapping on a line
+  `· A → B: the baseline record followed meta.id`. It cannot tell a `git mv` from "delete a graph and create another
+  with the same `meta.id`", and that is why the line exists: whoever reviews the PR sees where the inherited debt came
+  from. A `meta.id` that repeats in the baseline is never followed.
+- **After a merge, `contract.json` can come from one side and a record from the other**, measured with the old
+  contract. The verdict stays correct, because the comparison is always made with the current contract. What can go
+  stale is the recorded identity; the next `--update` fixes it.
+- **A script that passes `--baseline <file>.json`** still reads and writes the single file. Without `--baseline`, the
+  default is the folder.
 
-Da `kg-ssot-v4.13.1` para a `kg-ssot-v4.14.0`, entra o contrato v4.7 e a gravação de conjunto no armazém. As duas
-lacunas foram achadas por um adotante que grava parte dos grafos em `.kg.json`.
-- **A ponta externa das `external_edges` pode ser um `.kg.json`** (`<caminho>.kg.json#<id>`), o formato JSON do mesmo
-  modelo. O corpus que confere a ponta (o `kg_gate.py`, o `--corpus` dos dois leitores e o `kg_store.py`) passa a ler
-  os dois formatos. É ampliação: nada que passava reprova. A identidade do contrato muda (o `kg_gate.py` pede
-  `--update`), sem veredito trocado.
-- **`kg_store.write_many`** (e `kg_store.py write-many`) grava um conjunto de grafos de uma vez, ou nada. É o caminho
-  para regenerar grafos que se citam.
-- **A suíte ganha 8 casos** (336), três deles para recusar a extensão fora da forma (`.kg.yml`, `.KG.JSON`) e o
-  `.kg.json` que não existe quando só existe o `.kg.yaml` de mesmo nome-base.
+From `kg-ssot-v4.15.0` to `kg-ssot-v4.15.1`, contract v4.9 comes in. It fixes a design flaw in 4.15.0 that an adopter
+found while writing evidence-collection rules.
+- **`reverify_every` without `verified_at` no longer warns.** A rule with a cadence and no collection yet is in its
+  initial state, not in debt: in 4.15.0, `kg_gate.py` reported a regression in `form.required.node.verified_at` for
+  every new rule. The due report (`kg_validate.py --due`, in the `unstamped` list) lists this case, outside the
+  verdict. A PROD node without `verified_at` still warns.
+- **The suite stays at 349 cases**, and the case of a cadence without a stamp becomes valid, with no warning. The
+  contract identity changes (`kg_gate.py` asks for `--update`). The SHOULD debt can only go down, and no MUST verdict
+  changes.
 
-Da `kg-ssot-v4.13.0` para a `kg-ssot-v4.13.1`, a identidade do contrato passa a acusar o v4.6. As duas regras novas da
-4.13.0 moram só no leitor, e o sha256 dos schemas, que o `kg_gate.py` guarda como identidade, não mudou: uma base
-gravada na 4.12.0 seguia julgando com regra nova sem que a identidade acusasse. A descrição do schema MUST passa a
-declarar o v4.6, e a higiene da release cobra que toda versão do contrato apareça na descrição de um dos schemas. O
-`kg_gate.py` mostra a identidade nova e pede `--update`; nenhum veredito muda.
-- **O `kg_migrate.py` lê o mesmo corpus que o gate.** Sem lista de grafos, ficam de fora os padrões do `kg_gate.py`
-  (`*/fixtures/*`, `docs/materials/*`) e o `vendor/*`, e o `--exclude` usa a semântica do gate (`*` atravessa `/`),
-  sem perder o `**/` de antes, que casa zero pastas;
-  `--no-default-excludes` tira os padrões. Antes, o plan pegava as fixtures, e `*/fixtures/*` não casava caminho aninhado.
-- **O `kg_migrate.py` não grava bytecode no vendor**, mesmo rodado sem `-B`; antes, o `check` seguinte reprovava pelo
-  `.pyc` do `kg_validate` no `__pycache__`.
-- **O nó cujo `verified_scope` já é o do perfil sai como `same`** no plan, separado do que muda.
+From `kg-ssot-v4.14.0` to `kg-ssot-v4.15.0`, contract v4.8 comes in: the verification keys, designed with two adopters
+from a real continuous-audit case. All of them are optional, and if you do not use them you gain no debt.
+- **`reverify_every`**: how often a node's verification has to be redone, as an ISO 8601 date-only duration (`P3M`,
+  `P1Y`). Zero (`P0D`) warns. In 4.15.0 it also warned without `verified_at`; 4.15.1 removed that warning.
+- **`reverify_on`**: the event trigger, as text ("on hire", "on every configuration change").
+- **`retain_for`**: how long the evidence has to be kept, in the same duration format.
+- **`owner`** is the role answerable for the node, not a person. It changes nothing in the verdict.
+- **`kg_validate.py --due YYYY-MM-DD`**: the due report, which never changes the gate's verdict. A verdict that changed
+  with the calendar, without a commit, would break the baseline and the ratchet. Run the report in a scheduled job if
+  you want to enforce the cadence.
+- **The suite gains 13 cases** (349). The contract identity changes (`kg_gate.py` asks for `--update`), with no
+  changed verdict.
 
-Da `kg-ssot-v4.12.0` para a `kg-ssot-v4.13.0`, entram o contrato v4.6 (um MUST raro do YAML e o \r normalizado no
-leitor JS) e o migrador por perfil.
-- **O `kg_migrate.py`** propõe a `provenance` que o v4 pede pelas regras de um perfil que você versiona (manual, cap. 5;
-  exemplo em `spec/migrate-examples/`). O `plan` não grava nada, e o `apply` grava só o que o plano propôs. A fixture
-  de aceitação, um corpus real anonimizado de 1.024 nós, fica em `tools/fixtures/migrate/adopter-hub/`.
-- **A linha de continuação de texto entre aspas** tem de ser mais indentada que o mapa ou a lista que o contém; menos
-  que isso reprova como `parse.yaml-error`, como a especificação pede.
-- **O leitor JS trata o `\r\n` e o `\r` sozinho como quebra de linha**, como a referência, e recusa o texto entre aspas que
-  não fecha (a aspa escapada no fim da linha), que ele cortava ali.
-- **A suíte ganha 16 casos** (328).
-- **No Windows, o update para a 4.13.0 ou posterior roda pelo kit da tag nova.** O `kg_vendor.py` das tags anteriores passa ao
-  `git archive` a lista inteira de arquivos da release, e na 4.13.0 ela passa do limite da linha de comando do Windows
-  (`WinError 206`). Rode o update pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --dest
-  vendor/kg-ssot`). O kit desde a 4.13.0 passa só as entradas da release. No Linux e no macOS o limite é bem maior, e o
-  update de sempre funciona.
+From `kg-ssot-v4.13.1` to `kg-ssot-v4.14.0`, contract v4.7 and set writes in the store come in. Both gaps were found
+by an adopter that writes part of its graphs as `.kg.json`.
+- **The external end of `external_edges` can be a `.kg.json`** (`<path>.kg.json#<id>`), the JSON format of the same
+  model. The corpus that verifies the end (`kg_gate.py`, the `--corpus` of both readers, and `kg_store.py`) now reads
+  both formats. It is a widening: nothing that passed fails. The contract identity changes (`kg_gate.py` asks for
+  `--update`), with no changed verdict.
+- **`kg_store.write_many`** (and `kg_store.py write-many`) writes a set of graphs at once, or nothing. It is the way to
+  regenerate graphs that cite each other.
+- **The suite gains 8 cases** (336), three of them to refuse an extension out of shape (`.kg.yml`, `.KG.JSON`) and a
+  `.kg.json` that does not exist when only the `.kg.yaml` with the same base name exists.
 
-Medido em 2026-10-20, nenhum dos 1.507 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD. O sha256 dos
-schemas não mudou na 4.13.0, e o `kg_gate.py` não pedia `--update`: a identidade não acusava as regras novas do
-leitor. A 4.13.1 corrige isso.
+From `kg-ssot-v4.13.0` to `kg-ssot-v4.13.1`, the contract identity starts reporting v4.6. The two new rules of 4.13.0
+live only in the reader, and the sha256 of the schemas, which `kg_gate.py` keeps as the identity, did not change: a
+baseline written on 4.12.0 kept judging with a new rule without the identity reporting it. The description of the
+MUST schema now declares v4.6, and the release hygiene requires every contract version to appear in the description
+of one of the schemas. `kg_gate.py` shows the new identity and asks for `--update`; no verdict changes.
+- **`kg_migrate.py` reads the same corpus as the gate.** Without a list of graphs, the `kg_gate.py` patterns
+  (`*/fixtures/*`, `docs/materials/*`) and `vendor/*` are left out, and `--exclude` uses the gate's semantics (`*`
+  crosses `/`), without losing the earlier `**/`, which matches zero folders;
+  `--no-default-excludes` removes the patterns. Before, the plan picked up the fixtures, and `*/fixtures/*` did not
+  match a nested path.
+- **`kg_migrate.py` does not write bytecode into the vendor**, even when run without `-B`; before, the next `check`
+  failed because of the `kg_validate` `.pyc` in `__pycache__`.
+- **A node whose `verified_scope` already matches the profile shows up as `same`** in the plan, apart from what
+  changes.
 
-Da `kg-ssot-v4.11.0` para a `kg-ssot-v4.12.0`, entra o contrato v4.5: um MUST raro do YAML e três ampliações do SHOULD.
-- **O tab no espaço inicial de uma linha de continuação de texto entre aspas** reprova como `parse.yaml-error`.
-- **`verified_scope`**, opcional: `fato`, `mecanismo` ou `nenhum`, o alcance do `verified_at`.
-- **`locality: privado`**, para documento fora do repo, não público e reverificável por quem tem acesso.
-- **Com `--corpus`, a `REFUTES` que chega de outro grafo** a um nó vivo conta para `integrity.refutes-unreconciled`.
-- **A suíte ganha 18 casos** (312).
+From `kg-ssot-v4.12.0` to `kg-ssot-v4.13.0`, contract v4.6 (a rare YAML MUST and `\r` normalized in the JS reader)
+and the profile-driven migrator come in.
+- **`kg_migrate.py`** proposes the `provenance` that v4 requires, from the rules of a profile you keep under version
+  control ([manual, chapter 5](docs/manual/05-tools.md); example in `spec/migrate-examples/`). `plan` writes nothing,
+  and `apply` writes only what the plan proposed. The acceptance fixture, an anonymized real corpus of 1,024 nodes,
+  lives in `tools/fixtures/migrate/adopter-hub/`.
+- **The continuation line of a quoted string** has to be indented more than the mapping or list that contains it;
+  less than that fails as `parse.yaml-error`, as the specification requires.
+- **The JS reader treats `\r\n` and a lone `\r` as line breaks**, like the reference, and refuses a quoted string that
+  does not close (an escaped quote at the end of the line), which it used to cut there.
+- **The suite gains 16 cases** (328).
+- **On Windows, the update to 4.13.0 or later runs through the new tag's kit.** The `kg_vendor.py` of earlier tags
+  passes `git archive` the whole list of release files, and in 4.13.0 that list exceeds the Windows command-line limit
+  (`WinError 206`). Run the update from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag
+  kg-ssot-v4.18.0 --dest vendor/kg-ssot`). Since 4.13.0, the kit passes only the release entries. On Linux and macOS
+  the limit is much higher, and the usual update works.
 
-Medido em 2026-10-20, nenhum dos 1.457 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD. O sha256 dos
-dois schemas muda, então o PR do `update` roda o `kg_gate.py --update` depois de trazer a tag; sem o caso no corpus, sem
-motivo.
+Measured on 2026-10-20, none of the 1,507 `.kg.yaml` files in four adopter repositories changes at the MUST or SHOULD
+level. The sha256 of the schemas did not change in 4.13.0, and `kg_gate.py` did not ask for `--update`: the identity
+did not report the reader's new rules. 4.13.1 fixes that.
 
-Da `kg-ssot-v4.10.0` para a `kg-ssot-v4.11.0`, entra o contrato v4.4: um aviso SHOULD e três vereditos MUST raros do YAML.
-- **`integrity.refutes-unreconciled`:** nó que recebe `REFUTES` e segue vivo (nem `superseded` nem `refuted`; só a
-  `question` `done` não alerta). O grafo afirma e refuta a mesma coisa. O radar do core já reprova o caso como
-  contradição; aqui ele alerta agora e vira MUST numa versão futura.
-- **O perfil YAML estrito:** a tag `!` sem nome (também `!<!>`), o `!!timestamp` cujo texto não é data e o tab fora
-  de aspas, de bloco e de comentário reprovam como `parse.yaml-error`, na referência e no leitor JS. O tab já
-  reprovava na referência; mudam a tag `!` e o `!!timestamp`. Medido em 2026-10-20, nenhum dos 1.391 `.kg.yaml` de
-  quatro repos adotantes muda de veredito.
-- **A suíte ganha 31 casos** (294): 10 em `latest/integrity/coherence/` e 21 em `latest/yaml/strict-profile/`.
+From `kg-ssot-v4.11.0` to `kg-ssot-v4.12.0`, contract v4.5 comes in: a rare YAML MUST and three SHOULD widenings.
+- **A tab in the leading whitespace of a quoted string's continuation line** fails as `parse.yaml-error`.
+- **`verified_scope`**, optional: `fato`, `mecanismo`, or `nenhum`, the reach of `verified_at`.
+- **`locality: privado`**, for a document outside the repository, not public, and re-verifiable by whoever has access.
+- **With `--corpus`, a `REFUTES` that arrives from another graph** at a live node counts toward
+  `integrity.refutes-unreconciled`.
+- **The suite gains 18 cases** (312).
 
-O sha256 do SHOULD muda, então o PR do `update` roda o `kg_gate.py --update` depois de trazer a tag. Se o corpus não
-tem o caso, ele grava a identidade nova sem motivo. Se tem, a dívida sobe por desenho, e o `--update` vai com
-`--accept-regression "<motivo>"`; ou reconcilie antes o alvo (`refuted` ou `superseded`).
+Measured on 2026-10-20, none of the 1,457 `.kg.yaml` files in four adopter repositories changes at the MUST or SHOULD
+level. The sha256 of both schemas changes, so the `update` PR runs `kg_gate.py --update` after vendoring the tag;
+without the case in the corpus, no reason is needed.
 
-Da `kg-ssot-v4.9.1` para a `kg-ssot-v4.10.0`, nenhum veredito MUST muda. Muda o servidor MCP e o leitor JS:
-- **O perfil "atrás de proxy" do `kg_mcp.py`** (`--identity-header`, `--secret-env`): identidade por header que
-  recusa por padrão, segredo comparado por hmac, uma área e um autor por identidade, por requisição, os limites
-  `--max-graphs` e `--max-concurrent`, e o envelope `untrusted_data`. Fora do perfil, nada muda.
-- **As duas eras do protocolo MCP:** o `kg_mcp.py` fala a 2026-07-28, sem estado (`server/discover` e o `_meta` por
-  requisição), e segue falando a 2025-11-25, com `initialize` e sem sessão. A era é escolhida por requisição.
-- **O gate externo** (`--gate-cmd`, no `kg_store.py` e no `kg_mcp.py`): um comando seu, sem shell, que julga depois do
-  contrato em cada gravação e remoção e devolve um `kg-ssot.verdict/1`. O armazém só grava com PASS dos dois, e um gate
-  que falha nunca vira PASS. É por ele que se liga um gate próprio (um radar, uma política) ao servidor. Sem a opção,
-  nada muda.
-- **A imagem OCI** `ghcr.io/marciocar/kg-ssot:4.10.0`: o `kg-mcp` do mesmo wheel do PyPI, sem root, com o armazém em
-  `/data` e o label de posse do MCP Registry, para rodar ao lado do LibreChat (o manual, em "A imagem OCI", traz o
-  compose e o `librechat.yaml`).
-- **Uma mudança de comportamento:** `--allow-remote` passa a exigir `--secret-env`. Quem servia fora do loopback sem
-  segredo, atrás de um proxy, precisa pôr um segredo e mandá-lo no header (`--secret-header`, padrão `X-Api-Key`).
-- **O leitor JS mede os avisos SHOULD,** com os mesmos códigos da referência em todos os casos da suíte, e o pacote npm
-  traz o `should.mjs` pré-compilado.
-- **A suíte ganha 2 casos** (263), sobre o `trace` só com espaço.
+From `kg-ssot-v4.10.0` to `kg-ssot-v4.11.0`, contract v4.4 comes in: one SHOULD warning and three rare YAML MUST
+verdicts.
+- **`integrity.refutes-unreconciled`:** a node that receives `REFUTES` and stays live (neither `superseded` nor
+  `refuted`; only a `question` that is `done` does not warn). The graph asserts and refutes the same thing. One
+  adopter's radar already fails this case as a contradiction; here it warns now and becomes MUST in a future version.
+- **The strict YAML profile:** the unnamed `!` tag (also `!<!>`), a `!!timestamp` whose text is not a date, and a tab
+  outside quotes, blocks, and comments fail as `parse.yaml-error`, in the reference and in the JS reader. The tab
+  already failed in the reference; the `!` tag and `!!timestamp` change. Measured on 2026-10-20, none of the 1,391
+  `.kg.yaml` files in four adopter repositories changes verdict.
+- **The suite gains 31 cases** (294): 10 in `latest/integrity/coherence/` and 21 in `latest/yaml/strict-profile/`.
 
-Um `update` basta, e o gate não precisa de `--update`.
+The sha256 of the SHOULD schema changes, so the `update` PR runs `kg_gate.py --update` after vendoring the tag. If the
+corpus does not have the case, it writes the new identity without a reason. If it does, the debt goes up by design,
+and the `--update` goes with `--accept-regression "<reason>"`; or reconcile the target first (`refuted` or
+`superseded`).
 
-Da `kg-ssot-v4.9.0` para a `kg-ssot-v4.9.1`, nenhum veredito muda. Muda o armazém e o servidor MCP:
-- **O armazém roda no Windows.** Na 4.9.0 ele recusava abrir lá, e o MCPB no Claude Desktop do Windows subia só com o
-  julgamento. No Windows, que não tem `dir_fd`, cada passo do caminho é conferido por `lstat` (link simbólico, junção e
-  ponto de montagem são recusados; o arquivo do OneDrive sob demanda passa), o arquivo aberto tem de ser o que o
-  `lstat` viu, e o caminho é conferido de novo depois da leitura e antes da troca final na gravação. A trava entre
-  processos é a do `msvcrt`. É mais fraco que no POSIX, e o manual diz onde.
-- **Nomes portáveis.** O armazém recusa criar um nome com segmento reservado do Windows (`CON`, `NUL`, `COM1`...) ou que
-  termina em ponto; um nome assim que já está no armazém continua lendo, gravando e sendo removido. Nenhuma operação
-  (ler, gravar, remover, histórico) aceita um nome que só difere pela caixa de um que está no armazém: no Windows e no
-  macOS os dois seriam o mesmo arquivo, e remover `ALVO.kg.yaml` apagaria `alvo.kg.yaml` sem julgar quem aponta para
-  ele. Um par antigo com as duas caixas, num disco que as distingue, segue funcionando pela caixa exata.
-- **O servidor diz por que subiu sem armazém.** Com `--store-optional`, uma raiz que não abre não derruba o
-  `kg_mcp.py`: ele sobe só com `kg_validate` e `kg_schema_help` e põe o motivo nas instruções, na descrição das duas
-  ferramentas e no `kg_schema_help`. Sem a opção, uma raiz sem permissão agora dá rc 2 com a mensagem, em vez de
-  traceback. O MCPB usa a opção, e uma raiz que chega com `${...}` sem expandir não cria armazém.
-- **Os módulos acham o `spec/` pelo próprio caminho.** O `kg_store.py`, o `kg_mcp.py` e o `kg_conformance.py` deixam de
-  usar o `_ROOT` do `kg_validate` importado; um `kg_validate` falso num teste não desvia mais o spec dos vizinhos.
+From `kg-ssot-v4.9.1` to `kg-ssot-v4.10.0`, no MUST verdict changes. The MCP server and the JS reader change:
+- **The "behind proxy" profile of `kg_mcp.py`** (`--identity-header`, `--secret-env`): a header identity that refuses
+  by default, a secret compared with hmac, one area and one author per identity, per request, the limits
+  `--max-graphs` and `--max-concurrent`, and the `untrusted_data` envelope. Outside the profile, nothing changes.
+- **The two eras of the MCP protocol:** `kg_mcp.py` speaks 2026-07-28, stateless (`server/discover` and the
+  per-request `_meta`), and still speaks 2025-11-25, with `initialize` and no session. The era is chosen per request.
+- **The external gate** (`--gate-cmd`, in `kg_store.py` and `kg_mcp.py`): a command of yours, without a shell, that
+  judges after the contract on every write and delete and returns a `kg-ssot.verdict/1`. The store only writes with a
+  PASS from both, and a gate that crashes never becomes a PASS. This is how you plug a gate of your own (a radar, a
+  policy) into the server. Without the option, nothing changes. Since 4.18.0, a gate that `kg_mcp.py` runs gets
+  `KG_SSOT_LANG=en`, because its verdict goes to the model; from `kg_store.py` it inherits your language.
+- **The OCI image** `ghcr.io/marciocar/kg-ssot:4.10.0`: the `kg-mcp` from the same PyPI wheel, without root, with the
+  store in `/data` and the MCP Registry ownership label, to run next to LibreChat (the manual, under "The OCI image",
+  has the compose file and `librechat.yaml`).
+- **A behavior change:** `--allow-remote` now requires `--secret-env`. If you served beyond loopback without a secret,
+  behind a proxy, you need to set a secret and send it in the header (`--secret-header`, default `X-Api-Key`).
+- **The JS reader measures the SHOULD warnings,** with the same codes as the reference on every suite case, and the
+  npm package carries `should.mjs` precompiled.
+- **The suite gains 2 cases** (263), about a `trace` that is only whitespace.
 
-Um `update` basta, e o gate não precisa de `--update`.
+One `update` is enough, and the gate does not need `--update`.
 
-Da `kg-ssot-v4.8.2` para a `kg-ssot-v4.9.0`, nenhum veredito muda. Num valor com `\n` no fim, a referência deixa de
-emitir um código redundante: ela passou a casar os regex por inteiro, como o ECMA-262 dos patterns do contrato. O kit passa a sair também no PyPI
-como `kg-ssot`, o leitor JS no npm como `kg-ssot` e o servidor MCP como MCP Bundle (as receitas em `packaging/`
-viajam na release), e os módulos acham o `spec/` ao lado de si no
-pacote instalado ou no diretório pai no vendor. Para quem usa o vendor, nada muda: um `update` basta, e o gate não
-precisa de `--update`.
+From `kg-ssot-v4.9.0` to `kg-ssot-v4.9.1`, no verdict changes. The store and the MCP server change:
+- **The store runs on Windows.** In 4.9.0 it refused to open there, and the MCPB in Claude Desktop on Windows started
+  with judging only. On Windows, which has no `dir_fd`, each step of the path is checked with `lstat` (symlinks,
+  junctions, and mount points are refused; an on-demand OneDrive file passes), the opened file has to be the one that
+  `lstat` saw, and the path is checked again after the read and before the final swap on a write. The cross-process
+  lock is `msvcrt`'s. It is weaker than on POSIX, and the manual says where.
+- **Portable names.** The store refuses to create a name with a reserved Windows segment (`CON`, `NUL`, `COM1`...) or
+  one that ends in a dot; a name like that already in the store still reads, writes, and can be removed. No operation
+  (read, write, delete, history) accepts a name that differs only in case from one in the store: on Windows and macOS
+  the two would be the same file, and deleting `ALVO.kg.yaml` would erase `alvo.kg.yaml` without judging who points to
+  it. An old pair with both cases, on a disk that tells them apart, keeps working by exact case.
+- **The server says why it started without a store.** With `--store-optional`, a root that does not open does not
+  bring `kg_mcp.py` down: it starts with only `kg_validate` and `kg_schema_help` and puts the reason in the
+  instructions, in the description of both tools, and in `kg_schema_help`. Without the option, a root without
+  permission now gives rc 2 with the message, instead of a traceback. The MCPB uses the option, and a root that arrives
+  with an unexpanded `${...}` does not create a store.
+- **The modules find `spec/` from their own path.** `kg_store.py`, `kg_mcp.py`, and `kg_conformance.py` stop using
+  the `_ROOT` of the imported `kg_validate`; a fake `kg_validate` in a test no longer diverts its neighbors' spec.
 
-Da `kg-ssot-v4.8.1` para a `kg-ssot-v4.8.2`, nenhum veredito nem código muda. Só a saída melhora: o veredito do
-`.kg.json` passa a trazer a linha de cada ocorrência, a dica do `integrity.orphan-node` traz o id do nó e a aresta
-que o conserta, a mensagem e a dica do `integrity.verified-before-fact` dizem as duas leituras (vigência futura ou
-datas trocadas), e o `--where` mostra a correção abaixo de cada ocorrência MUST. Um `update` basta, e o gate não
-precisa de `--update`.
+One `update` is enough, and the gate does not need `--update`.
 
-**O `.kg.json`.** A 4.8.0 lê o mesmo modelo de dados num arquivo `.kg.json`, por um parser JSON, no perfil JSON do
-contrato: RFC 8259 com um BOM inicial aceito, I-JSON (RFC 7493, sem surrogate solto e com inteiro dentro de
-±(2^53−1)), no máximo 128 coleções aninhadas e chave única. No `.kg.json`, esses pontos reprovam (MUST).
-`kg_validate.py`, `kg_conformance.py`, `kg_store.py` e `kg_mcp.py` leem os dois formatos pela extensão (sensível a
-maiúsculas: `.kg.json`). **O gate continua só com `.kg.yaml`**: um `.kg.json` commitado no repositório não é medido
-pelo `kg_gate.py`. Desde a 4.14.0 (contrato v4.7), as `external_edges` apontam também para `.kg.json`, e o gate os lê
-como alvo. Quem guarda `.kg.json` no repo e quer o CI cobrando roda `kg_validate.py` neles num passo próprio.
+From `kg-ssot-v4.8.2` to `kg-ssot-v4.9.0`, no verdict changes. On a value that ends with `\n`, the reference stops
+emitting a redundant code: it now matches regexes in full, like the ECMA-262 of the contract's patterns. The kit also
+ships on PyPI as `kg-ssot`, the JS reader on npm as `kg-ssot`, and the MCP server as an MCP Bundle (the recipes in
+`packaging/` travel with the release), and the modules find `spec/` next to themselves in the installed package or in
+the parent directory in the vendor. If you use the vendor, nothing changes: one `update` is enough, and the gate does
+not need `--update`.
 
-## 5. Do v3 para o v4
+From `kg-ssot-v4.8.1` to `kg-ssot-v4.8.2`, no verdict or code changes. Only the output improves: the `.kg.json`
+verdict now carries the line of each occurrence, the hint for `integrity.orphan-node` carries the node id and the edge
+that fixes it, the message and hint for `integrity.verified-before-fact` state both readings (future validity or
+swapped dates), and `--where` shows the fix below each MUST occurrence. One `update` is enough, and the gate does not
+need `--update`.
 
-O v4 é uma versão maior: o que alertava no v3 passa a reprovar. Quem está numa tag `contract-v3.x` (anterior à
-publicação do repositório público, que começa no v4) sobe pela **rampa** do gate, sem truque de data no schema e sem
-consertar o corpus inteiro de uma vez. Quem adota agora começa no v4 e pode pular para a lista do que muda, que vale
-como resumo do contrato.
+**`.kg.json`.** 4.8.0 reads the same data model from a `.kg.json` file, with a JSON parser, under the contract's JSON
+profile: RFC 8259 with a leading BOM accepted, I-JSON (RFC 7493, no lone surrogate and integers within ±(2^53−1)), at
+most 128 nested collections, and unique keys. In `.kg.json`, these points fail (MUST). `kg_validate.py`,
+`kg_conformance.py`, `kg_store.py`, and `kg_mcp.py` read both formats by extension (case-sensitive: `.kg.json`).
+**The gate still measures only `.kg.yaml`**: a `.kg.json` committed to the repository is not measured by
+`kg_gate.py`. Since 4.14.0 (contract v4.7), `external_edges` can also point to `.kg.json`, and the gate reads those as
+targets. If you keep `.kg.json` in the repository and want CI to enforce it, run `kg_validate.py` on them in a step of
+its own.
 
-O que muda no v4:
-- **`provenance` é MUST** em nó `confirmed` ou PROD (`form.required.node.provenance`), com `source`, `locator` e
-  `method` não vazios. O nó `unverifiable` não exige, nem em PROD.
-- **`provenance.source` placeholder reprova** (`form.pattern.node.provenance.source`): só espaço, `desconhecida`,
-  `desconhecido`, `unknown`, `n/a`, `na`, `n.a.`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão ou `?`,
-  sem distinguir maiúscula e ignorando pontuação final e espaço em volta.
-- **Chave desconhecida sem o prefixo `x_` reprova** no topo, no `meta`, no nó e na aresta
-  (`form.unknown-key.<escopo>.<chave>`), e o nome sem `x_` que nem é slug reprova como
-  `form.pattern.<escopo>.key`. Dentro de `provenance`, a chave desconhecida segue só alertando.
-- **`provenance.method` tem vocabulário** (SHOULD no v4, MUST no v5): `'<classe>: <detalhe>'`. A classe diz **de que
-  tipo é a evidência que sustenta a afirmação**: `medição` (quem estabeleceu a afirmação executou e registrou o
-  comando), `leitura` (documento primário), `juízes` (painel de agentes ou juízes), `testemunho` (uma pessoa ou sessão
-  afirmou; inclui a medição de terceiro lida aqui) ou `derivado` (a afirmação é concluída de outras afirmações ou
-  campos, sem evidência própria). Fora disso alerta como `form.pattern.node.provenance.method`.
-  Quando uma migração preenche a `provenance` a partir do que o nó já trazia, a classe é a da evidência original, e o
-  detalhe diz que a migração não re-verificou, por exemplo `medição: <o que foi medido>; não reverificado na migração`
-  (decisão do mantenedor em 2026-10-09).
-  A prosa interna do adotante (um `docs/*.md` escrito por alguém do time) é `testemunho`, não `leitura`: é o relato
-  de quem a escreveu, e assim o radar mostra quais `confirmed` só têm prosa por trás.
-  **Atenção:** se o seu CI cobra que grafo novo saia limpo também no SHOULD, este alerta já reprova lá no v4, e não só
-  no v5. Ajuste antes os geradores que escrevem `provenance`.
+## 5. From v3 to v4
 
-O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.17.2 --source https://github.com/marciocar/kg-ssot`
-   duas vezes (o kit do v3 não grava o `.gitattributes` do vendor, e o segundo update, já com o kit novo, grava),
-   `git add vendor/kg-ssot` e `kg_vendor.py check --dest vendor/kg-ssot --index`;
-2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
-   falhar no MUST;
-3. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "<motivo>"` grava esses grafos em
-   `failing`, como **dívida herdada**. Sem o motivo, o `--update` recusa, porque grafo que passava e falha é
-   piora. Daí em diante vale a catraca: grafo novo tem de passar no v4, grafo de `failing` não ganha código MUST
-   novo, e a dívida só encolhe, com `--update` a cada conserto.
+v4 is a major version: what warned in v3 now fails. If you are on a `contract-v3.x` tag (earlier than the public
+repository, which starts at v4), you move up through the gate's **ramp**, with no date trick in the schema and without
+fixing the whole corpus at once. If you are adopting now, you start on v4 and can skip to the list of what changes,
+which also works as a summary of the contract.
 
-**Onde a fonte mora** (`provenance.locality`, opcional, desde a `contract-v4.2.0`): `repo` (arquivo versionado no
-próprio repo), `web` (endereço público), `host` (só existe numa máquina: um journal local, um caminho fora do repo) ou
-`pessoa` (o relato de alguém). Fora desses valores, alerta como `form.enum.node.provenance.locality`. Serve para medir
-o que um terceiro consegue reverificar e para barrar `host` quando o grafo vai a público. Desde o v4.5 entra `privado`:
-documento fora do repo, não público e reverificável por quem tem acesso (Google Drive, wiki interna). O valor segue
-onde está a cópia lida, não a classificação do documento: um PDF que o emissor marca como público, lido de uma cópia
-no Drive, é `privado` até alguém achar a URL pública, quando passa a `web` com o locator novo.
+What changes in v4:
+- **`provenance` is MUST** on a `confirmed` or PROD node (`form.required.node.provenance`), with non-empty `source`,
+  `locator`, and `method`. An `unverifiable` node does not require it, not even in PROD.
+- **A placeholder `provenance.source` fails** (`form.pattern.node.provenance.source`): only whitespace,
+  `desconhecida`, `desconhecido`, `unknown`, `n/a`, `na`, `n.a.`, `none`, `null`, `sem fonte`, `tbd`, hyphens, a dash,
+  or `?`, case-insensitive and ignoring trailing punctuation and surrounding whitespace.
+- **An unknown key without the `x_` prefix fails** at the top level, in `meta`, in a node, and in an edge
+  (`form.unknown-key.<scope>.<key>`), and a name without `x_` that is not even a slug fails as
+  `form.pattern.<scope>.key`. Inside `provenance`, an unknown key still only warns.
+- **`provenance.method` has a vocabulary** (SHOULD in v4, MUST in v5): `'<class>: <detail>'`. The class says **what
+  kind of evidence supports the claim**: `medição` (measurement: whoever established the claim ran and recorded the
+  command), `leitura` (reading: a primary document), `juízes` (judges: a panel of agents or judges), `testemunho`
+  (testimony: a person or session stated it; this includes a third party's measurement read here), or `derivado`
+  (derived: the claim is concluded from other claims or fields, with no evidence of its own). Anything else warns as
+  `form.pattern.node.provenance.method`.
+  When a migration fills `provenance` from what the node already had, the class is that of the original evidence, and
+  the detail says the migration did not re-verify, for example
+  `medição: <what was measured>; não reverificado na migração` (maintainer decision, 2026-10-09).
+  Your team's internal prose (a `docs/*.md` written by someone on the team) is `testemunho`, not `leitura`: it is the
+  account of whoever wrote it, and that way the radar shows which `confirmed` nodes have only prose behind them.
+  **Watch out:** if your CI requires new graphs to come out clean at the SHOULD level too, this warning already fails
+  there in v4, not only in v5. Adjust the generators that write `provenance` first.
 
-**Referência a nó de outro grafo** (`external_edges`, opcional, desde a `contract-v4.3.0`): uma lista no topo do grafo,
-cada aresta com exatamente uma ponta externa `<caminho relativo à raiz do repo>#<id>` e a outra um id deste arquivo.
-Sem `from`, quem aponta é o grafo inteiro.
+The path, in a single PR:
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.18.0 --source https://github.com/marciocar/kg-ssot`
+   twice (the v3 kit does not write the vendor's `.gitattributes`, and the second update, now with the new kit,
+   does), `git add vendor/kg-ssot`, and `kg_vendor.py check --dest vendor/kg-ssot --index`;
+2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` shows the new contract identity and the graphs that start failing
+   the MUST level;
+3. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "<reason>"` writes those graphs into
+   `failing`, as **inherited debt**. Without the reason, `--update` refuses, because a graph that passed and now fails
+   is a regression. From then on the ratchet applies: a new graph has to pass v4, a graph in `failing` gains no new MUST
+   code, and the debt only shrinks, with an `--update` after each fix.
+
+**Where the source lives** (`provenance.locality`, optional, since `contract-v4.2.0`): `repo` (a versioned file in
+the repository itself), `web` (a public address), `host` (exists only on one machine: a local journal, a path outside
+the repository), or `pessoa` (someone's account). Any other value warns as `form.enum.node.provenance.locality`. It
+lets you measure what a third party can re-verify and block `host` when the graph goes public. Since v4.5 there is
+also `privado`: a document outside the repository, not public, and re-verifiable by whoever has access (Google Drive,
+an internal wiki). The value follows where the copy you read lives, not the document's classification: a PDF that the
+issuer marks as public, read from a copy in Drive, is `privado` until someone finds the public URL, when it becomes
+`web` with the new locator.
+
+**A reference to a node in another graph** (`external_edges`, optional, since `contract-v4.3.0`): a list at the top of
+the graph, each edge with exactly one external end `<path relative to the repository root>#<id>` and the other end an
+id in this file. Without `from`, the whole graph is what points.
 
 ```yaml
 external_edges:
-  - to: docs/pesquisa/outra.kg.yaml#C_ANTIGA      # este grafo supera um nó de outro grafo
+  - to: docs/research/other.kg.yaml#C_OLD          # this graph supersedes a node in another graph
     edge_type: SUPERSEDES
-  - from: docs/graph/portas.kg.yaml#D_MATRIZ       # um nó de fora limita um nó daqui
-    to: D_CORTE
+  - from: docs/graph/ports.kg.yaml#D_MATRIX        # a node from outside constrains a node here
+    to: D_CUT
     edge_type: CONSTRAINS
 ```
 
-Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. O gate confere o alvo contra
-os `.kg.yaml` e `.kg.json` rastreados do repo, inclusive os que o `--exclude` tira do corpus, e lê só os que alguma referência cita: alvo que não existe, ou grafo-alvo
-apagado, reprova quem aponta (`integrity.dangling-external`). Fora do gate, `kg_validate.py --corpus <raiz do repo>`
-faz a mesma conferência: num repo git, contra os `.kg.yaml` e `.kg.json` rastreados; fora de um repo, contra todo
-grafo sob o diretório. Sem `--corpus`, o leitor confere só a forma e a ponta local, e diz quantos arquivos ficaram com a ponta externa
-sem conferir. Uma referência ao próprio arquivo passa como externa; use `edges` para isso. Uma chave `x_` própria que fazia esse papel migra para cá; a que só declara algo, sem ser
-aresta, segue como `x_`.
+The types are `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO`, and `DEPENDS_ON`. The gate checks the
+target against the repository's tracked `.kg.yaml` and `.kg.json` files, including the ones `--exclude` removes from
+the corpus, and reads only the ones some reference cites: a target that does not exist, or a deleted target graph,
+fails the graph that points (`integrity.dangling-external`). Outside the gate, `kg_validate.py --corpus <repository
+root>` does the same check: in a git repository, against the tracked `.kg.yaml` and `.kg.json` files; outside one,
+against every graph under the directory. Without `--corpus`, the reader checks only the shape and the local end, and
+it says how many files were left with an unchecked external end. A reference to the same file passes as external; use
+`edges` for that. A custom `x_` key that played this role migrates here; one that only declares something, without
+being an edge, stays as `x_`.
 
-**Label corrigido.** Quando uma revisão troca o label de um nó, o label anterior vai para a `narrative`, começando
-por `label anterior: …`. O git guarda o resto do histórico; o contrato não tem campo próprio para isso.
+**Corrected label.** When a revision changes a node's label, the previous label goes into `narrative`, starting with
+`label anterior: …`. Git keeps the rest of the history; the contract has no dedicated field for it.
 
-O que fazer com um nó `confirmed` ou PROD **sem fonte recuperável**:
-- **o padrão é rebaixar** o `status` para `unverifiable`, que não exige `provenance`: o que não se rastreia não
-  está confirmado;
-- **quando a origem é uma pessoa ou sessão recuperável**, a `provenance` aponta essa origem, com `method` de
-  `testemunho`, e o nó segue `confirmed`;
-- **nunca um placeholder** em `source`: ele reprova.
+What to do with a `confirmed` or PROD node **with no recoverable source**:
+- **the default is to downgrade** the `status` to `unverifiable`, which does not require `provenance`: what cannot be
+  traced is not confirmed;
+- **when the origin is a recoverable person or session**, `provenance` points to that origin, with a `method` of
+  class `testemunho`, and the node stays `confirmed`;
+- **never a placeholder** in `source`: it fails.
 
-Trocar o `status` de um nó é decisão sobre a verdade do grafo, e fica com quem é dono dele. A migração pode
-propor `provenance` a partir de campos que o nó já tem, mas o `method` é declarado por quem revisa, nunca
-inventado. O `kg_migrate.py` faz isso por um perfil que você escreve: o `plan` mostra a proposta de cada nó sem gravar
-nada, e o `apply` grava só o que o plano propôs, conferindo que nada mais mudou (manual, cap. 5). Uma chave própria sem `x_` se resolve renomeando para `x_<nome>`.
+Changing a node's `status` is a decision about the truth of the graph, and it belongs to whoever owns the graph. A
+migration can propose `provenance` from fields the node already has, but the `method` is declared by whoever reviews
+it, never invented. `kg_migrate.py` does this from a profile you write: `plan` shows the proposal for each node
+without writing anything, and `apply` writes only what the plan proposed, verifying that nothing else changed
+([manual, chapter 5](docs/manual/05-tools.md)). A custom key without `x_` is resolved by renaming it to `x_<name>`.
 
-## Conformidade de outro leitor
+## Conformance of another reader
 
-Para provar que um leitor próprio concorda com o contrato, rode a suíte com o leitor de referência, **depois** do
+To prove that a reader of your own agrees with the contract, run the suite with the reference reader, **after**
 `git add vendor/kg-ssot`:
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
-A ordem importa: os casos de corpus conferem a ponta externa contra os grafos rastreados quando a suíte mora num
-repo git, e com o vendor ainda fora do git um caso falha (`latest: 260/261`). Depois compare com os códigos que o seu
-leitor emite. O formato dos casos e como rodar a suíte com um leitor em outra linguagem estão em
-`spec/conformance/README.md`.
+The order matters: the corpus cases check the external end against the tracked graphs when the suite lives in a git
+repository, and with the vendor still outside git, those cases fail (`latest: 350/356`). Then compare with the codes
+your reader emits. The case format, and how to run the suite with a reader in another language, are in
+[`spec/conformance/README.md`](spec/conformance/README.md).

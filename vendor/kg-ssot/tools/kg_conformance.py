@@ -34,10 +34,12 @@ from jsonschema.exceptions import SchemaError
 
 sys.dont_write_bytecode = True  # num vendor, rodar a suíte não pode sujar o diretório carimbado
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_validate
+    from . import kg_i18n, kg_validate
 else:  # script ou vendor: o leitor de referência mora ao lado
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import kg_i18n  # noqa: E402
     import kg_validate  # noqa: E402
+_ = kg_i18n._
 
 FOLDERS = ("latest", "optional", "proposals")
 
@@ -50,7 +52,8 @@ def load_json(path):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise SuiteBroken(f"{path}: não deu para ler como JSON ({exc.__class__.__name__}: {exc})") from exc
+        raise SuiteBroken(_("{path}: could not be read as JSON ({kind}: {exc})").format(
+            path=path, kind=exc.__class__.__name__, exc=exc)) from exc
 
 
 def suite_errors(suite, meta_validator):
@@ -61,13 +64,14 @@ def suite_errors(suite, meta_validator):
     for f in sorted(tests.glob("*/*.json")):
         kind = f.parent.name
         if kind not in found:
-            out.append(f"metaschema: {f.relative_to(suite)} está fora de good/ e bad/")
+            out.append(_("metaschema: {file} is outside good/ and bad/").format(file=f.relative_to(suite)))
             continue
         found[kind] += 1
         accepted = not list(meta_validator.iter_errors(load_json(f)))
         if accepted != (kind == "good"):
-            out.append(f"metaschema: {f.relative_to(suite)} foi {'aceito' if accepted else 'recusado'}")
-    out += [f"metaschema: nenhum teste em metaschema-tests/{k}/" for k, n in found.items() if not n]
+            msg = _("metaschema: {file} was accepted") if accepted else _("metaschema: {file} was rejected")
+            out.append(msg.format(file=f.relative_to(suite)))
+    out += [_("metaschema: no tests in metaschema-tests/{kind}/").format(kind=k) for k, n in found.items() if not n]
 
     cases_root = suite / "fixtures"
     referenced, latest_cases = set(), 0
@@ -75,7 +79,8 @@ def suite_errors(suite, meta_validator):
         rel = m.relative_to(cases_root)
         folder = rel.parts[0]
         if folder not in FOLDERS:
-            out.append(f"{rel}: pasta '{folder}' fora de {', '.join(FOLDERS)}")
+            out.append(_("{rel}: folder '{folder}' outside {folders}").format(
+                rel=rel, folder=folder, folders=", ".join(FOLDERS)))
             continue
         data = load_json(m)
         errs = list(meta_validator.iter_errors(data))
@@ -83,23 +88,26 @@ def suite_errors(suite, meta_validator):
             out += [f"{rel}: {e.message}" for e in errs]
             continue
         if folder == "latest" and data["pending_on"]:
-            out.append(f"{rel}: latest/ não pode depender de decisão aberta ({', '.join(data['pending_on'])})")
+            out.append(_("{rel}: latest/ cannot depend on an open decision ({pending})").format(
+                rel=rel, pending=", ".join(data["pending_on"])))
         if folder == "proposals" and not data["pending_on"]:
-            out.append(f"{rel}: proposals/ exige pending_on não vazio")
+            out.append(_("{rel}: proposals/ requires a non-empty pending_on").format(rel=rel))
         files = [c["file"] for c in data["cases"]]
-        out += [f"{rel}: arquivo repetido no manifesto: {f}" for f in sorted({f for f in files if files.count(f) > 1})]
-        out += [f"{rel}: caso sem arquivo {f}" for f in files if not (m.parent / f).is_file()]
+        out += [_("{rel}: file repeated in the manifest: {file}").format(rel=rel, file=f)
+                for f in sorted({f for f in files if files.count(f) > 1})]
+        out += [_("{rel}: missing case file {file}").format(rel=rel, file=f) for f in files if not (m.parent / f).is_file()]
         # um corpus que não existe faria o caso bad-* passar por vacuidade (toda ponta externa sumiria)
-        out += [f"{rel}: corpus {c['corpus']!r} de {c['file']} não é um diretório" for c in data["cases"]
+        out += [_("{rel}: corpus {corpus} of {file} is not a directory").format(rel=rel, corpus=repr(c["corpus"]),
+                                                                               file=c["file"]) for c in data["cases"]
                 if "corpus" in c and not (m.parent / c["corpus"]).is_dir()]
         referenced |= {(m.parent / f).resolve() for f in files}
         latest_cases += len(files) if folder == "latest" else 0
     # Um arquivo de caso fora de todo manifesto nunca roda, e ninguém fica sabendo.
     for f in sorted(list(cases_root.rglob("*.yaml")) + list(cases_root.rglob("*.kg.json"))):
         if f.resolve() not in referenced:
-            out.append(f"{f.relative_to(cases_root)}: arquivo de caso fora de todo manifesto")
+            out.append(_("{file}: case file outside every manifest").format(file=f.relative_to(cases_root)))
     if not latest_cases:
-        out.append("latest/ sem nenhum caso: a suíte passaria por vacuidade")
+        out.append(_("latest/ has no cases: the suite would pass vacuously"))
     return out
 
 
@@ -157,26 +165,54 @@ def _utf8_stdio():
                 stream.reconfigure(encoding="utf-8", errors="replace")
 
 
+HELP = """Conformance suite runner for .kg.yaml and .kg.json, for the reference reader (kg_validate.py).
+
+It needs only Python 3, PyYAML and jsonschema, with no agent harness. It is the mold a reader in another language
+copies: for each case, the set of codes it emits must EQUAL the expected set, in codes (MUST) and in warnings (SHOULD).
+
+Steps:
+  1. metaschema self-test: it accepts metaschema-tests/good/ and rejects metaschema-tests/bad/;
+  2. each manifest.json (in fixtures/) validates against manifest.schema.json, follows its folder's pending_on rule
+     (empty in latest/, non-empty in proposals/) and points only to files that exist;
+  3. each case runs in the reader and is compared as a set; a .kg.json case is read by the JSON profile (as_source).
+
+rc: 0 if all of latest/ passes · 1 if a latest/ case fails (including when the reader crashes on it)
+· 2 if the suite itself is broken: unreadable or invalid metaschema or manifest, pending_on outside the rule,
+unknown folder, a missing or repeated file or one outside every manifest, empty latest/.
+optional/ and proposals/ report and never change the rc.
+
+Usage:
+  kg_conformance.py [--suite spec/conformance] [--schema spec/kg-contract-v4.schema.json]
+                    [--should-schema spec/kg-contract-v4.should.schema.json] [--json OUT]
+                    [--proposals-schema F --proposals-should-schema F]
+
+--proposals-schema and --proposals-should-schema (together) measure only proposals/ against a candidate contract
+(e.g., the draft of a future version), and latest/ and optional/ stay on --schema; without them, everything runs on
+--schema. They do not change the rc.
+"""
+
+
 def main(argv=None):
     root = _spec_home()  # o spec/ do pacote instalado ou o do repo, pelo caminho deste módulo
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(description=_(HELP), formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--suite", default=str(root / "spec" / "conformance"))
     ap.add_argument("--schema", default=str(kg_validate.CONTRACT_MUST))
     ap.add_argument("--should-schema", default=str(kg_validate.CONTRACT_SHOULD))
     ap.add_argument("--json")
-    ap.add_argument("--proposals-schema", help="MUST candidato, só para proposals/")
-    ap.add_argument("--proposals-should-schema", help="SHOULD candidato, só para proposals/")
+    ap.add_argument("--proposals-schema", help=_("candidate MUST, only for proposals/"))
+    ap.add_argument("--proposals-should-schema", help=_("candidate SHOULD, only for proposals/"))
     args = ap.parse_args(argv)
     _utf8_stdio()
     if bool(args.proposals_schema) != bool(args.proposals_should_schema):
-        ap.error("--proposals-schema e --proposals-should-schema vão juntos")
+        ap.error(_("--proposals-schema and --proposals-should-schema go together"))
     suite = pathlib.Path(args.suite)
     try:
         meta = load_json(suite / "manifest.schema.json")
         try:
             Draft202012Validator.check_schema(meta)
         except SchemaError as exc:
-            raise SuiteBroken(f"manifest.schema.json não é JSON Schema válido: {exc.message}") from exc
+            raise SuiteBroken(_("manifest.schema.json is not a valid JSON Schema: {message}").format(
+                message=exc.message)) from exc
         broken = suite_errors(suite, Draft202012Validator(meta))
         if broken:
             raise SuiteBroken("\n".join(broken))
@@ -189,29 +225,39 @@ def main(argv=None):
             try:
                 Draft202012Validator.check_schema(data)
             except SchemaError as exc:
-                raise SuiteBroken(f"{path}: não é JSON Schema válido: {exc.message}") from exc
+                raise SuiteBroken(_("{path}: is not a valid JSON Schema: {message}").format(
+                    path=path, message=exc.message)) from exc
             schemas.append(kg_validate.make_validator(data))
         validator, should_validator = schemas[:2]
         proposals = tuple(schemas[2:]) or None
     except SuiteBroken as exc:
         for line in str(exc).splitlines():
-            print(f"SUÍTE QUEBRADA  {line}")
+            print(_("BROKEN SUITE  {line}").format(line=line))
         return 2
     results = run_cases(suite, validator, should_validator, proposals)
     for r in results:
         line = f"{'PASS' if r['pass'] else 'FAIL'}  {r['case']}"
         if not r["pass"]:
-            line += f"  esperado {r['expected']}  " + (f"ERRO {r['error']}" if "error" in r else f"emitido {r['emitted']}")
+            if "error" in r:
+                line += "  " + _("expected {expected}  ERROR {error}").format(expected=r["expected"], error=r["error"])
+            else:
+                line += "  " + _("expected {expected}  emitted {emitted}").format(expected=r["expected"],
+                                                                                 emitted=r["emitted"])
         print(line)
     print("—")
     for folder in FOLDERS:
         rows = [r for r in results if r["folder"] == folder]
         if rows:
             ok = sum(r["pass"] for r in rows)
-            gate = "reprova" if folder == "latest" else "só reporta"
-            if folder == "proposals" and proposals:
-                gate += f", contra {pathlib.Path(args.proposals_schema).name}"
-            print(f"{folder}: {ok}/{len(rows)} ({gate})")
+            # o prefixo "<pasta>: N/M" é o mesmo nas duas línguas: o CI e quem lê a saída procuram "latest:"
+            if folder == "latest":
+                msg = _("{folder}: {ok}/{total} (gates the rc)")
+            elif folder == "proposals" and proposals:
+                msg = _("{folder}: {ok}/{total} (report only, against {schema})")
+            else:
+                msg = _("{folder}: {ok}/{total} (report only)")
+            print(msg.format(folder=folder, ok=ok, total=len(rows),
+                             schema=pathlib.Path(args.proposals_schema or "").name))
     if args.json:
         def shown(path):
             path = pathlib.Path(path).resolve()

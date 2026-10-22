@@ -1,10 +1,10 @@
 {
   "manifest_version": "0.4",
   "name": "kg-ssot",
-  "display_name": "KG-SSOT — grafo de conhecimento verificável",
+  "display_name": "KG-SSOT — verifiable knowledge graphs",
   "version": "@VERSION@",
-  "description": "Julga e grava grafos de conhecimento .kg.yaml e .kg.json pelo contrato do KG-SSOT: toda afirmação diz de onde veio e quando foi conferida.",
-  "long_description": "O servidor MCP de referência do KG-SSOT dá a um modelo o contrato formal do grafo de conhecimento verificável e um armazém que só grava o que passa nele.\n\n- **kg_validate** julga um texto .kg.yaml ou .kg.json e devolve o veredito estruturado, com código, caminho, linha, mensagem e dica de correção.\n- **kg_write** grava no armazém só o que passa no contrato; **kg_get**, **kg_list**, **kg_query**, **kg_history** e **kg_delete** completam o armazém; **kg_query** consulta os grafos com as arestas resolvidas para o label.\n- **kg_schema_help** devolve o contrato vigente, um exemplo mínimo e as correções mais comuns.\n\nO armazém fica no diretório que você escolher, no seu computador. O servidor roda localmente, por stdio, e não fala com nenhum serviço externo. Manual: https://github.com/marciocar/kg-ssot/tree/main/docs/manual",
+  "description": "Validates and stores .kg.yaml and .kg.json knowledge graphs under the KG-SSOT contract: every claim says where it came from and when it was last verified.",
+  "long_description": "The reference KG-SSOT MCP server gives a model the formal contract of the verifiable knowledge graph and a store that only writes what passes it.\n\n- **kg_validate** checks a .kg.yaml or .kg.json text and returns the structured verdict, with code, path, line, message and fix hint.\n- **kg_write** writes to the store only what passes the contract; **kg_get**, **kg_list**, **kg_query**, **kg_history** and **kg_delete** complete the store; **kg_query** queries the graphs with every edge resolved to its label.\n- **kg_schema_help** returns the current contract, a minimal example and the most common fixes.\n\nThe store lives in the folder you choose, on your computer. The server runs locally over stdio and talks to no external service. Read-only tools are annotated as such. Manual: https://github.com/marciocar/kg-ssot/tree/main/docs/manual · Em português: https://github.com/marciocar/kg-ssot/blob/main/README.pt-BR.md",
   "author": {
     "name": "Marcio Carvalho"
   },
@@ -16,28 +16,78 @@
   "documentation": "https://github.com/marciocar/kg-ssot/tree/main/docs/manual",
   "support": "https://github.com/marciocar/kg-ssot/issues",
   "icon": "icon.png",
+  "localization": {
+    "resources": "mcpb-resources/${locale}.json",
+    "default_locale": "en-US"
+  },
   "server": {
     "type": "uv",
     "entry_point": "server/main.py",
     "mcp_config": {
       "command": "uv",
-      "args": ["run", "--directory", "${__dirname}", "server/main.py", "--root", "${user_config.root}", "--read-only", "${user_config.read_only}"]
+      "args": [
+        "run",
+        "--directory",
+        "${__dirname}",
+        "server/main.py",
+        "--root",
+        "${user_config.root}",
+        "--read-only",
+        "${user_config.read_only}"
+      ]
     }
   },
   "tools": [
-    {"name": "kg_validate", "description": "Julga um grafo .kg.yaml ou .kg.json pelo contrato e devolve o veredito estruturado."},
-    {"name": "kg_write", "description": "Grava um grafo no armazém, só se ele passar no contrato."},
-    {"name": "kg_get", "description": "Lê um grafo do armazém."},
-    {"name": "kg_list", "description": "Lista os grafos do armazém."},
-    {"name": "kg_query", "description": "Consulta os grafos do armazém: filtros, fila dos abertos e vizinhança, com as arestas resolvidas para o label."},
-    {"name": "kg_history", "description": "Mostra o histórico de gravações de um grafo."},
-    {"name": "kg_delete", "description": "Remove um grafo, só se nenhum outro deixar de passar por isso."},
-    {"name": "kg_schema_help", "description": "Devolve o contrato vigente, um exemplo mínimo e as correções mais comuns."}
+    {
+      "name": "kg_validate",
+      "description": "Checks a .kg.yaml or .kg.json graph against the contract and returns the structured verdict."
+    },
+    {
+      "name": "kg_write",
+      "description": "Writes a graph to the store, only if it passes the contract."
+    },
+    {
+      "name": "kg_get",
+      "description": "Reads a graph from the store."
+    },
+    {
+      "name": "kg_list",
+      "description": "Lists the graphs in the store."
+    },
+    {
+      "name": "kg_query",
+      "description": "Queries the graphs in the store: filters, the open queue and neighborhoods, with every edge resolved to its label."
+    },
+    {
+      "name": "kg_history",
+      "description": "Shows the write history of a graph."
+    },
+    {
+      "name": "kg_delete",
+      "description": "Removes a graph, only if no other graph stops passing because of it."
+    },
+    {
+      "name": "kg_schema_help",
+      "description": "Returns the current contract, a minimal example and the most common fixes."
+    }
   ],
-  "keywords": ["knowledge-graph", "provenance", "verifiable", "json-schema", "yaml", "audit", "kg-ssot"],
+  "keywords": [
+    "knowledge-graph",
+    "provenance",
+    "verifiable",
+    "json-schema",
+    "yaml",
+    "audit",
+    "mcp",
+    "kg-ssot"
+  ],
   "license": "Apache-2.0",
   "compatibility": {
-    "platforms": ["darwin", "linux", "win32"],
+    "platforms": [
+      "darwin",
+      "linux",
+      "win32"
+    ],
     "runtimes": {
       "python": ">=3.11"
     }
@@ -45,15 +95,15 @@
   "user_config": {
     "root": {
       "type": "directory",
-      "title": "Diretório do armazém",
-      "description": "Onde os grafos ficam gravados. Se a pasta não abrir, o servidor só julga e o Claude diz por quê; dentro de um repositório git, cada gravação vira um commit.",
+      "title": "Store folder",
+      "description": "Where the graphs are written. If the folder cannot be opened, the server only validates and Claude says why; inside a git repository, every write becomes a commit.",
       "required": true,
       "default": "${DOCUMENTS}/kg-ssot"
     },
     "read_only": {
       "type": "boolean",
-      "title": "Só leitura",
-      "description": "Sem kg_write nem kg_delete: o modelo só julga e lê.",
+      "title": "Read only",
+      "description": "No kg_write or kg_delete: the model only validates and reads.",
       "required": false,
       "default": false
     }

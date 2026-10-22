@@ -2,7 +2,7 @@
   "name": "kg-ssot-ajv-runner",
   "private": true,
   "version": "0.0.0",
-  "description": "Leitor JS do contrato do KG-SSOT (.kg.yaml e .kg.json): ajv 2020-12, yaml 1.2 core restrito e integridade.",
+  "description": "JavaScript reader for the KG-SSOT contract (.kg.yaml and .kg.json): ajv 2020-12, strict YAML 1.2 core and integrity rules.",
   "type": "module",
   "dependencies": {
     "ajv": "8.20.0",

@@ -1,17 +1,19 @@
-# Suíte de conformidade do `.kg.yaml` e do `.kg.json`
+# Conformance suite for `.kg.yaml` and `.kg.json`
 
-> Os casos medem o contrato v4: `spec/kg-contract-v4.schema.json` (MUST) e
+**English** | [Português (Brasil)](README.pt-BR.md)
+
+> The cases measure contract v4: `spec/kg-contract-v4.schema.json` (MUST) and
 > `spec/kg-contract-v4.should.schema.json` (SHOULD).
 
-Todo leitor de `.kg.yaml` tem de passar nesta suíte: o leitor de referência `tools/kg_validate.py`, um
-visualizador, um extrator de grafos ou um port em outra linguagem. Os casos são **dados puros**, no molde da
-[JSON-Schema-Test-Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), e não dependem de nenhum
-harness de agente.
+Every `.kg.yaml` reader must pass this suite: the reference reader `tools/kg_validate.py`, a viewer, a graph
+extractor, or a port to another language. The cases are **pure data**, modeled on the
+[JSON-Schema-Test-Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), and they do not depend on any
+agent harness.
 
-## Formato
+## Format
 
-Um **grupo** é uma pasta com um `manifest.json` e um `.kg.yaml` (ou `.kg.json`) real por caso. O arquivo é real, e não
-texto embutido no JSON, para que qualquer CLI receba o caminho e leia como leria um grafo de verdade.
+A **group** is a folder with a `manifest.json` and one real `.kg.yaml` (or `.kg.json`) file per case. Each case is a
+real file, not text embedded in the JSON, so any CLI can take the path and read it the way it reads a real graph.
 
 ```json
 {
@@ -19,7 +21,7 @@ texto embutido no JSON, para que qualquer CLI receba o caminho e leia como leria
   "layer": "form",
   "pending_on": [],
   "cases": [
-    { "file": "bad-node-type.kg.yaml",
+    { "file": "bad-node-type-enum.kg.yaml",
       "description": "node_type fora do enum",
       "valid": false,
       "codes": ["form.enum.node.node_type"],
@@ -28,229 +30,272 @@ texto embutido no JSON, para que qualquer CLI receba o caminho e leia como leria
 }
 ```
 
-| Campo | Regra |
+| Field | Rule |
 |---|---|
-| `layer` | `parse`, `form`, `integrity`, `yaml` ou `semantic`: a camada que o grupo exercita. `semantic` só existe em `optional/`. |
-| `pending_on` | Ids das decisões abertas de que o veredito depende. Vazio em `latest/`, não vazio em `proposals/`. |
-| `corpus` | Opcional (v4.3): diretório, relativo ao manifesto, que faz de raiz do repo para conferir a ponta externa das `external_edges`. |
-| `valid` | `true` exige `codes: []`. `false` exige pelo menos um código. |
-| `codes` | Violações de **MUST**: reprovam o arquivo. |
-| `warnings` | Violações de **SHOULD**: só alertam, e o arquivo continua válido. É opcional, e ausente vale `[]`. |
+| `description` | Group and case. Required, non-empty text. It can carry the contract-version mark described below. |
+| `layer` | Group. `parse`, `form`, `integrity`, `yaml`, or `semantic`: the layer the group exercises. `semantic` exists only in `optional/`. |
+| `pending_on` | Group. Ids of the open decisions the verdict depends on. Empty in `latest/`, non-empty in `proposals/`. |
+| `cases` | Group. The list of cases, with at least one. |
+| `file` | Case. The case file, next to the manifest: a lowercase slug ending in `.kg.yaml`, `.yaml`, or `.kg.json`. |
+| `corpus` | Case, optional (v4.3). A directory, relative to the manifest, that acts as the repository root when the reader checks the external end of `external_edges`. |
+| `valid` | Case. `true` requires `codes: []`. `false` requires at least one code. |
+| `codes` | Case. **MUST** violations: they fail the file. |
+| `warnings` | Case. **SHOULD** violations: they only warn, and the file stays valid. Optional; when absent, it counts as `[]`. |
 
-O `manifest.schema.json` (JSON Schema 2020-12) valida todo manifesto. A própria suíte se valida com a
-mesma tecnologia do contrato, como a JSON-Schema-Test-Suite faz no CI dela. Em `metaschema-tests/` há os
-manifestos que ele tem de aceitar (`good/`) e os que tem de recusar (`bad/`).
+`manifest.schema.json` (JSON Schema 2020-12) validates every manifest. The suite validates itself with the same
+technology as the contract, the way the JSON-Schema-Test-Suite does in its own CI. `metaschema-tests/` holds the
+manifests the metaschema must accept (`good/`) and the ones it must reject (`bad/`).
 
-**Um caso, um defeito.** O leitor passa num caso quando o **conjunto** de códigos que emite é
-**igual** ao esperado, tanto em `codes` quanto em `warnings`. Igualdade, não inclusão: um leitor que
-acusa tudo não pode passar. Ordem e repetição não contam.
+**One case, one defect.** A reader passes a case when the **set** of codes it emits **equals** the expected set, in
+both `codes` and `warnings`. Equality, not inclusion: a reader that flags everything cannot pass. Order and repetition
+do not count.
 
-**A versão do contrato que um caso exige vai marcada na `description`**, do grupo ou do caso, numa destas formas:
-"Desde o v4.6", "(v4.6)" ou "do v4.6". A conferência do mantenedor exige que a maior marca seja a versão que o leitor
-de referência declara (`CONTRACT_VERSION` em `tools/kg_validate.py`), e que a descrição de um dos schemas a declare
-("No v4.6"). Assim, uma regra nova que só o leitor vê também muda os bytes dos schemas, que o `kg_gate.py` guarda como
-a identidade do contrato.
+**The description marks the contract version a case requires**, at the group or case level, in one of these forms:
+"Desde o v4.6", "(v4.6)", or "do v4.6". The maintainer's check requires the highest mark to equal the version the
+reference reader declares (`CONTRACT_VERSION` in `tools/kg_validate.py`), and requires the description of one of the
+schemas to declare it ("No v4.6"). This way, a new rule that only the reader sees still changes the bytes of the
+schemas, which `kg_gate.py` keeps as the contract identity.
 
-## Códigos
+## Codes
 
-Cada código é um slug estável por camada, e o metaschema confere a forma.
+Each code is a stable slug per layer, and the metaschema checks its shape.
 
-| Camada | Forma | Exemplos |
+| Layer | Shape | Examples |
 |---|---|---|
-| parse | `parse.<motivo>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
-| form | `form.<tipo>.<escopo>.<campo>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
-| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` (SHOULD) |
-| yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
-| semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked` e os `semantic.domain-*` da camada domain (SHOULD) — só em `optional/` |
+| parse | `parse.<reason>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
+| form | `form.<kind>.<scope>.<field>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
+| integrity | `integrity.<rule>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` (SHOULD) |
+| yaml | `yaml.<rule>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
+| semantic | `semantic.<rule>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked`, and the `semantic.domain-*` codes of the domain layer (SHOULD), only in `optional/` |
 
-`<tipo>` ∈ `required enum type pattern range const unknown-key`. `<escopo>` ∈ `top meta node edge`.
-Num objeto aninhado, `<campo>` é o caminho com ponto: `form.required.node.provenance.locator`.
-`range` cobre também o tamanho de texto: `label: ""` (MUST) e `label` acima de 280 caracteres
-(SHOULD, a narrativa vai para `narrative`). O tamanho conta code points, como o `maxLength` do JSON
-Schema: um emoji vale 1, não 2 unidades UTF-16 (`str.length` de JS erraria), e não há normalização.
-Data completa tem de existir no calendário, e o código é `form.pattern`: o `format: date` do schema é
-**asserção**, e todo leitor tem de checá-lo. `.nan` e `.inf` reprovam como `form.type` em qualquer
-posição, também em chave `x_` e dentro de lista, porque o JSON não os representa. Um item de lista que não é mapa usa o
-campo `item` (`form.type.node.item`). Nome de chave que não é slug (`<<`, `1.0`, `a.b`) reprova como
-`form.pattern.<escopo>.key` e, com o prefixo `x_`, só alerta. As chaves são comparadas na forma JSON: `1` e `"1"` colidem
-(`parse.duplicate-key`), `true` vira `true`, não `True`. Uma aresta com `on` reprova por
-`yaml.forbidden-key-on`; se o alvo de `on` não existir, sai também `integrity.dangling-on`. Os `pattern` têm a
-semântica do ECMA-262, a do JSON Schema: `$` não casa antes de uma quebra de linha final.
+`<kind>` ∈ `required enum type pattern range const unknown-key`. `<scope>` ∈ `top meta node edge`.
+In a nested object, `<field>` is the dotted path: `form.required.node.provenance.locator`.
+`range` also covers text length: `label: ""` (MUST) and a `label` longer than 280 characters (SHOULD, because the
+narrative goes in `narrative`). Length counts code points, like JSON Schema's `maxLength`: an emoji counts as 1, not
+as 2 UTF-16 units (JavaScript's `str.length` would get it wrong), and there is no normalization.
+A full date must exist on the calendar, and the code is `form.pattern`: the schema's `format: date` is an
+**assertion**, and every reader must check it. `.nan` and `.inf` fail as `form.type` in any position, including under
+an `x_` key and inside a list, because JSON cannot represent them. A list item that is not a mapping uses the `item`
+field (`form.type.node.item`). A key name that is not a slug (`<<`, `1.0`, `a.b`) fails as `form.pattern.<scope>.key`;
+with the `x_` prefix, it only warns. Keys are compared in their JSON form: `1` and `"1"` collide
+(`parse.duplicate-key`), and `true` becomes `true`, not `True`. An edge with `on` fails with `yaml.forbidden-key-on`;
+if the target of `on` does not exist, `integrity.dangling-on` comes out too. The `pattern` keywords follow ECMA-262
+semantics, as in JSON Schema: `$` does not match before a final line break.
 
-O que o v4 mudou de severidade, e o que entrou:
+What v4 changed in severity, and what it added:
 
-| Código | No v3 | No v4 |
+| Code | In v3 | In v4 |
 |---|---|---|
-| `form.required.node.provenance` (nó `confirmed` ou PROD sem `provenance`; o `unverifiable` não exige) | SHOULD | **MUST** |
-| `form.unknown-key.<escopo>.<chave>` (chave fora da gramática e sem `x_`, no topo, no meta, no nó e na aresta) | SHOULD | **MUST** |
-| `form.pattern.<escopo>.key` (nome que não é slug, sem `x_`) | SHOULD | **MUST** (com `x_`, segue SHOULD) |
-| `form.pattern.node.provenance.source` (`source` placeholder: só espaço, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão, `?`...) | — | **MUST** (o vazio segue `form.range`) |
-| `form.pattern.node.provenance.method` (fora de `'<classe>: <detalhe>'`, classe em `medição`, `leitura`, `juízes`, `derivado`, `testemunho`) | — | SHOULD (MUST no v5) |
-| `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
+| `form.required.node.provenance` (a `confirmed` or PROD node without `provenance`; `unverifiable` does not require it) | SHOULD | **MUST** |
+| `form.unknown-key.<scope>.<key>` (a key outside the grammar and without `x_`, at the top level, in meta, in a node, or in an edge) | SHOULD | **MUST** |
+| `form.pattern.<scope>.key` (a name that is not a slug, without `x_`) | SHOULD | **MUST** (with `x_`, still SHOULD) |
+| `form.pattern.node.provenance.source` (a placeholder `source`: whitespace only, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hyphens, an em dash, `?`...) | — | **MUST** (an empty value still gives `form.range`) |
+| `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived), or `testemunho` (testimony)) | — | SHOULD (MUST in v5) |
+| `form.unknown-key.node.provenance.<key>` (an unknown key inside `provenance`) | SHOULD | SHOULD |
 
-O v4.1 acrescenta quatro avisos SHOULD (não muda veredito; `latest/form/unanchored/` e `latest/integrity/coherence/`).
-Os três `integrity.*` cruzam campos ou arestas, por isso o leitor os computa fora do schema:
+v4.1 adds four SHOULD warnings (no verdict changes; `latest/form/unanchored/` and `latest/integrity/coherence/`).
+The three `integrity.*` codes cross fields or edges, so the reader computes them outside the schema:
 
-| Código | Quando alerta |
+| Code | When it warns |
 |---|---|
-| `form.required.node.verified_against` | `claim` com `verified_at` e sem `verified_against`: carimbo sem alvo (os outros tipos já se ancoram por outro campo) |
-| `integrity.testimony-in-prod` | nó PROD cuja base é testemunho (`evidence_class: testimony` ou `method` da classe `testemunho`) |
-| `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`, comparados na granularidade do mais curto (`AAAA`, `AAAA-MM`, `AAAA-MM-DD`); data fora dessa forma não é comparada |
-| `integrity.untraced-decision` | `decision` que não é `superseded` nem `refuted` sem `trace`, sem `provenance` e sem aresta `TRACES_TO` saindo dela |
+| `form.required.node.verified_against` | a `claim` with `verified_at` and without `verified_against`: a stamp with no target (the other node types already anchor themselves through another field) |
+| `integrity.testimony-in-prod` | a PROD node whose basis is testimony (`evidence_class: testimony` or a `method` of class `testemunho`) |
+| `integrity.verified-before-fact` | `verified_at` earlier than `valid_from`, compared at the granularity of the shorter one (`YYYY`, `YYYY-MM`, `YYYY-MM-DD`); a date outside these forms is not compared |
+| `integrity.untraced-decision` | a `decision` that is neither `superseded` nor `refuted`, with no `trace`, no `provenance`, and no outgoing `TRACES_TO` edge |
 
-O v4.3 acrescenta `external_edges`, opcional, no topo: arestas entre grafos com **exatamente uma** ponta externa
-`<caminho relativo à raiz do repo>#<id>`, e a outra um id deste arquivo ou ausente (`from` ausente vale o grafo inteiro).
-Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. Os casos estão em
-`latest/form/external-edges/`, `latest/integrity/external-local/` e `latest/integrity/external-corpus/`.
+v4.3 adds `external_edges`, optional, at the top level: edges between graphs with **exactly one** external end,
+`<path relative to the repository root>#<id>`, while the other end is an id in this file or absent (an absent `from`
+stands for the whole graph). The types are `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO`, and
+`DEPENDS_ON`. The cases live in `latest/form/external-edges/`, `latest/integrity/external-local/`, and
+`latest/integrity/external-corpus/`.
 
-| Código | Quando reprova |
+| Code | When it fails |
 |---|---|
-| `form.pattern.top.external_edges.to` (ou `.from`) | as duas pontas externas, as duas locais, ou a referência fora da forma (caminho absoluto, sem `.kg.yaml#` nem `.kg.json#`) |
-| `form.enum.top.external_edges.edge_type` | tipo fora dos seis (os da camada domain não cruzam grafos) |
-| `integrity.dangling-external-local` | a ponta local não existe neste arquivo |
-| `integrity.dangling-external` | **com o corpus**: o arquivo ou o id da ponta externa não existe |
+| `form.pattern.top.external_edges.to` (or `.from`) | both ends external, both ends local, or a reference outside the form (an absolute path, or no `.kg.yaml#` or `.kg.json#`) |
+| `form.enum.top.external_edges.edge_type` | a type outside the six (the domain-layer types do not cross graphs) |
+| `integrity.dangling-external-local` | the local end does not exist in this file |
+| `integrity.dangling-external` | **with the corpus**: the file or the id of the external end does not exist |
 
-A aresta externa conta como ligação: o nó ligado só por ela não é órfão. Sem o corpus, a ponta externa não é conferida, e
-o leitor diz isso na saída. A referência é relativa e com `/`: segmentos começam por letra, dígito ou `_`, sem `.` ou
-`..`, sem `\` e sem `:`.
+An external edge counts as a link: a node linked only by one is not an orphan. Without the corpus, the reader does
+not check the external end, and it says so in its output. The reference is relative and uses `/`: segments start with
+a letter, a digit, or `_`, with no `.` or `..` segments, no `\`, and no `:`.
 
-**O `.kg.json`.** O mesmo modelo de dados pode vir em JSON, num arquivo `.kg.json`, lido por um parser JSON no
-**perfil JSON** do contrato (`latest/json/`). Nele, estes pontos são **MUST**:
+**The `.kg.json` format.** The same data model can come as JSON, in a `.kg.json` file, read by a JSON parser under
+the contract's **JSON profile** (`latest/json/`). In it, these points are **MUST**:
 
-| Ponto | O que reprova | Código |
+| Point | What fails | Code |
 |---|---|---|
-| Números pelo I-JSON (RFC 7493) | número de valor inteiro com módulo acima de 2^53−1, escrito como inteiro ou como float (`9007199254740992`, `1e20`); o que estoura o double (`1e400`, um inteiro de 401 dígitos) já é não finito | `form.type.<escopo>.<campo>`, o caminho do `.nan` |
-| Strings sem surrogate solto (I-JSON) | `\ud800` sem o par, em chave ou em valor; o par `\ud83d\ude00` é um caractere só | `parse.yaml-error` |
-| Profundidade | mais de 128 coleções aninhadas (a raiz conta 1) | `parse.yaml-error` |
-| Espaço em branco da RFC 8259 | só espaço, tab, LF e CR; um BOM inicial é aceito e descartado, e qualquer outro reprova (NBSP e `\x1c` não são espaço) | `parse.yaml-error` |
-| Sintaxe da RFC 8259 | comentário, vírgula sobrando, chave sem aspas, aspas simples, `NaN`, `Infinity` | `parse.yaml-error` |
-| Chave única (ADR 002) | a mesma chave duas vezes no objeto, comparada depois de resolvidos os escapes | `parse.duplicate-key` |
+| Numbers per I-JSON (RFC 7493) | an integer-valued number with magnitude above 2^53−1, written as an integer or as a float (`9007199254740992`, `1e20`); a value that overflows a double (`1e400`, a 401-digit integer) is already non-finite | `form.type.<scope>.<field>`, the same path as `.nan` |
+| Strings without a lone surrogate (I-JSON) | `\ud800` without its pair, in a key or a value; the pair `😀` is a single character | `parse.yaml-error` |
+| Depth | more than 128 nested collections (the root counts as 1) | `parse.yaml-error` |
+| RFC 8259 whitespace | only space, tab, LF, and CR; a leading BOM is accepted and dropped, and anything else fails (NBSP and `\x1c` are not whitespace) | `parse.yaml-error` |
+| RFC 8259 syntax | a comment, a trailing comma, an unquoted key, single quotes, `NaN`, `Infinity` | `parse.yaml-error` |
+| Unique keys (ADR 002) | the same key twice in an object, compared after escapes are resolved | `parse.duplicate-key` |
 
-O documento vazio, só com espaço da RFC ou `null` é `parse.empty-document`. A sintaxe JSON inválida usa
-`parse.yaml-error`: o vocabulário não tem um `parse.json-error`. No `.kg.yaml`, os três primeiros pontos são **SHOULD**,
-e o veredito MUST do YAML não muda (`latest/yaml/json-profile/`):
+An empty document, one with only RFC whitespace, or `null` is `parse.empty-document`. Invalid JSON syntax uses
+`parse.yaml-error`: the vocabulary has no `parse.json-error`. In `.kg.yaml`, the first three points are **SHOULD**, and
+the YAML MUST verdict does not change (`latest/yaml/json-profile/`):
 
-| Código | Quando alerta |
+| Code | When it warns |
 |---|---|
-| `yaml.unsafe-integer` | número de valor inteiro fora de ±(2^53−1) |
-| `yaml.lone-surrogate` | surrogate solto numa chave ou num texto |
-| `yaml.depth-over-128` | mais de 128 coleções aninhadas (o teto de parse do YAML segue em 1000) |
+| `yaml.unsafe-integer` | an integer-valued number outside ±(2^53−1) |
+| `yaml.lone-surrogate` | a lone surrogate in a key or a text value |
+| `yaml.depth-over-128` | more than 128 nested collections (the YAML parse limit stays at 1000) |
 
-O v4.2 acrescenta `provenance.locality`, opcional, com o enum `repo`, `web`, `host` ou `pessoa`. O valor fora do enum
-alerta como `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), e nenhum veredito muda.
+v4.2 adds `provenance.locality`, optional, with the enum `repo`, `web`, `host`, or `pessoa`. A value outside the enum
+warns as `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), and no verdict changes.
 
-O v4.4 acrescenta `integrity.refutes-unreconciled` (`latest/integrity/coherence/`): nó que recebe `REFUTES` e segue
-vivo, isto é, nem `superseded` nem `refuted`. A `question` `done` não alerta, porque já está respondida. O grafo afirma e
-refuta a mesma coisa. Em `optional/semantic/`, o mesmo grafo reprova como `semantic.contradiction`, que é o que o radar
-faz; no contrato o caso é SHOULD agora e vira MUST numa versão futura, depois que os adotantes medirem a própria dívida.
+v4.4 adds `integrity.refutes-unreconciled` (`latest/integrity/coherence/`): a node that receives `REFUTES` and stays
+alive, that is, neither `superseded` nor `refuted`. A `question` that is `done` does not warn, because it is already
+answered. The graph asserts and refutes the same thing. In `optional/semantic/`, the same graph fails as
+`semantic.contradiction`, which is what the radar does; in the contract the case is SHOULD for now, and it becomes
+MUST in a future version, after adopters measure their own debt.
 
-O v4.4 também fecha três construções raras do YAML em que os leitores discordavam (`latest/yaml/strict-profile/`),
-com o veredito mais estrito nos três, por decisão de contrato de 2026-10-19. Todas reprovam como `parse.yaml-error`:
-- a tag `!` sem nome, também na forma `!<!>`, em escalar ou coleção;
-- o `!!timestamp` explícito cujo texto não é data na forma estrita: a interseção do construtor do PyYAML com o do
-  `yaml` do JS (minuto e segundo com 2 dígitos, fração com pelo menos um dígito, fuso até ±29, só espaço entre a
-  data e a hora);
-- o tab fora de aspas, de bloco literal e de comentário (como espaço ou dentro de um texto sem aspas), como no parser
-  puro do PyYAML.
-Medido em 2026-10-20: nenhum dos 1.391 `.kg.yaml` de quatro repos adotantes muda de veredito.
+v4.4 also closes three rare YAML constructs where readers disagreed (`latest/yaml/strict-profile/`), taking the
+strictest verdict in all three, by a contract decision of 2026-10-19. All of them fail as `parse.yaml-error`:
+- the unnamed `!` tag, also in the form `!<!>`, on a scalar or a collection;
+- an explicit `!!timestamp` whose text is not a date in the strict form: the intersection of PyYAML's constructor and
+  the one in the JavaScript `yaml` package (two-digit minute and second, a fraction with at least one digit, a time
+  zone up to ±29, and only a space between the date and the time);
+- a tab outside quotes, a literal block, or a comment (as whitespace or inside an unquoted text value), as in PyYAML's
+  pure parser.
 
-O v4.5 acrescenta quatro coisas:
-- `verified_scope`, opcional, o alcance do `verified_at` (`latest/form/verified-scope/`). O MUST só aceita a chave; no
-  SHOULD, o enum é `fato`, `mecanismo` ou `nenhum` (fora dele alerta `form.enum.node.verified_scope`), e
-  `verified_scope` sem `verified_at` alerta `form.required.node.verified_at`.
-- `privado` no enum de `provenance.locality`: documento fora do repo, não público e reverificável por quem tem acesso.
-- Com o corpus, a `REFUTES` que chega de outro grafo pelas `external_edges` a um nó vivo conta para
-  `integrity.refutes-unreconciled` (`latest/integrity/external-corpus/`); sem o corpus, não conta.
-- O tab no espaço inicial de uma linha de continuação de texto entre aspas reprova como `parse.yaml-error`, nos dois
-  leitores e pela mesma regra explícita (`latest/yaml/strict-profile/`).
-Medido em 2026-10-20: nenhum dos 1.457 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD.
+Measured on 2026-10-20: none of the 1,391 `.kg.yaml` files in four adopter repositories changes its verdict.
 
-O v4.6 fecha mais duas diferenças do YAML entre os leitores (`latest/yaml/strict-profile/`):
-- a linha de continuação de um texto entre aspas tem de ser mais indentada que a coleção em bloco que o contém (a
-  coluna do mapa ou do `-` da lista; na raiz, ao menos um espaço), como pede a especificação; menos que isso reprova
-  como `parse.yaml-error`. Linha só de espaço não conta;
-- o `\r\n` e o `\r` sozinho são quebra de linha nos dois leitores, como na especificação: o leitor JS deixou de
-  guardar o `\r` como caractere dentro das aspas;
-- o texto entre aspas tem de fechar: a aspa escapada (`''` ou `\"`) no fim de uma linha não fecha o texto, e o leitor JS
-  deixou de cortar o escalar ali.
-Medido em 2026-10-20: nenhum dos 1.507 `.kg.yaml` de quatro repos adotantes muda no MUST nem no SHOULD.
-O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
-caso, não do código.
+v4.5 adds four things:
+- `verified_scope`, optional, the reach of `verified_at` (`latest/form/verified-scope/`). The MUST level only accepts
+  the key; at the SHOULD level, the enum is `fato`, `mecanismo`, or `nenhum` (a value outside it warns as
+  `form.enum.node.verified_scope`), and `verified_scope` without `verified_at` warns as
+  `form.required.node.verified_at`.
+- `privado` in the `provenance.locality` enum: a document outside the repository, not public, and re-verifiable by
+  whoever has access.
+- With the corpus, a `REFUTES` that arrives from another graph through `external_edges` at a live node counts toward
+  `integrity.refutes-unreconciled` (`latest/integrity/external-corpus/`); without the corpus, it does not count.
+- A tab in the leading whitespace of a continuation line of a quoted text value fails as `parse.yaml-error`, in both
+  readers and by the same explicit rule (`latest/yaml/strict-profile/`).
 
-## Pastas
+Measured on 2026-10-20: none of the 1,457 `.kg.yaml` files in four adopter repositories changes at the MUST or SHOULD
+level.
 
-Os casos moram em `fixtures/`, a convenção de diretório de teste que validadores de repositório
-costumam isentar. Sem isso, os grafos quebrados de propósito reprovariam o próprio repo. A exceção
-é `latest/parse/document/bad-yaml-syntax.yaml`: há validador que varre todo `.kg.yaml` rastreado sem
-respeitar a convenção, e o único caso não parseável usa a extensão `.yaml` (o metaschema aceita as
-duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>/<grupo>/`.
+v4.6 closes three more YAML differences between the readers (`latest/yaml/strict-profile/`):
+- the continuation line of a quoted text value must be indented more than the block collection that contains it (the
+  column of the mapping or of the list's `-`; at the root, at least one space), as the specification requires; less
+  than that fails as `parse.yaml-error`. A whitespace-only line does not count;
+- `\r\n` and a lone `\r` are line breaks in both readers, as in the specification: the JavaScript reader no longer
+  keeps `\r` as a character inside quotes;
+- a quoted text value must close: an escaped quote (`''` or `\"`) at the end of a line does not close it, and the
+  JavaScript reader no longer cuts the scalar there.
 
-| Pasta | O que vale |
+Measured on 2026-10-20: none of the 1,507 `.kg.yaml` files in four adopter repositories changes at the MUST or SHOULD
+level.
+
+v4.7 lets the external end of an edge point to a `.kg.json` file (`latest/form/external-edges/` and
+`latest/integrity/external-corpus/`). Only `.kg.yaml` and `.kg.json` belong to the contract: `.kg.yml` and an
+uppercase extension fail as `form.pattern.top.external_edges.to`. With the corpus, the extension is not normalized: a
+reference to `alvo.kg.json` when only `alvo.kg.yaml` exists fails as `integrity.dangling-external`.
+
+v4.8 adds three optional node keys for verification (`latest/form/reverify/`): `reverify_every`, the cadence;
+`reverify_on`, the event trigger; and `retain_for`, the retention. The SHOULD level judges the values, and being due
+never enters the verdict:
+- `reverify_every` and `retain_for` warn when they are not an ISO 8601 duration with date parts only (uppercase, with
+  at least one component), or when they are zero, like `P0D` (`form.pattern.node.reverify_every`,
+  `form.pattern.node.retain_for`); a number instead of a duration warns as `form.type.node.reverify_every`;
+- an empty `reverify_on` warns as `form.range.node.reverify_on`.
+
+v4.9 stops warning about `reverify_every` without `verified_at`: a cadence with no verification yet is the starting
+state of a collection rule. The due report lists it (`kg_validate.py --due`, in the `unstamped` list), outside the
+verdict. A PROD node without `verified_at` still warns.
+
+v4.10 aligns the reference reader and the JavaScript reader on three rare YAML points (`latest/yaml/profile/`):
+- errors follow document order: a duplicate key that comes before a duplicate anchor or an undefined alias gives
+  `parse.duplicate-key` (after them, `parse.yaml-error`);
+- an empty line after an escaped line break inside double quotes becomes `\n`, as the specification requires;
+- a leading BOM does not count as a column.
+
+The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
+
+## Folders
+
+The cases live in `fixtures/`, the test-directory convention that repository validators usually exempt. Without that,
+the graphs that are broken on purpose would fail the repository itself. The exception is
+`latest/parse/document/bad-yaml-syntax.yaml`: some validators scan every tracked `.kg.yaml` file without honoring the
+convention, so the only unparseable case uses the `.yaml` extension (the metaschema accepts both). Inside each folder,
+you can lay out groups freely; by convention, `latest/<layer>/<group>/`.
+
+| Folder | What it means |
 |---|---|
-| `fixtures/latest/` | O contrato vigente. O leitor **tem** de passar em todos os casos. |
-| `fixtures/optional/` | Comportamento que um leitor **pode** implementar; hoje, `semantic/`, a camada semântica do radar (o leitor do framework onde o formato nasceu). Roda e reporta, mas não reprova. |
-| `fixtures/proposals/` | O veredito depende de decisão aberta (`pending_on`). Roda e reporta, mas não reprova. |
+| `fixtures/latest/` | The current contract. A reader **must** pass every case. |
+| `fixtures/optional/` | Behavior a reader **may** implement; today, `semantic/`, the semantic layer of the radar (the reader in the framework where the format was born). It runs and reports, but never fails the run. |
+| `fixtures/proposals/` | The verdict depends on an open decision (`pending_on`). It runs and reports, but never fails the run. |
 
-**Regra de promoção.** Um grupo sai de `proposals/` para `latest/` só quando **todas** as decisões em
-`pending_on` estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `spec/` já
-aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
-`pending_on` e cita o nó selado. Nada antecipa decisão aberta.
+**Promotion rule.** A group moves from `proposals/` to `latest/` only when **all** the decisions in `pending_on` are
+sealed, that is, merged into the product graph, **and** the schema in `spec/` already accepts what the group requires
+(for example, `trigger` in `integrity-trigger`). The promotion PR empties `pending_on` and cites the sealed node.
+Nothing gets ahead of an open decision.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 356 casos contra o contrato v4, 32 deles
-`.kg.json`. Os grupos do
-rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
-`unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
-viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
-vocabulário só apareça onde o caso o pede. `proposals/` está vazia.
+**Today's score.** The reference reader passes 100% of `latest/`: 356 cases against contract v4, 32 of them
+`.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
+`placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
+verdict v4 changes became `bad-*` cases. Every case uses a canonical `method` (`medição: caso de conformidade`), so
+the vocabulary warning shows up only where a case asks for it. `proposals/` is empty.
 
-## Rodar
+## Run
 
 ```bash
-pip install --require-hashes -r tools/requirements.txt          # PyYAML e jsonschema, versões exatas
+pip install --require-hashes -r tools/requirements.txt          # PyYAML and jsonschema, exact versions
 python3 -I tools/kg_conformance.py             # --suite DIR, --schema F, --should-schema F, --json OUT
-# proposals/ contra um contrato candidato, quando houver um rascunho de versão futura
-python3 -I tools/kg_conformance.py --proposals-schema <candidato>.schema.json \
-  --proposals-should-schema <candidato>.should.schema.json
+# proposals/ against a candidate contract, when there is a draft of a future version
+python3 -I tools/kg_conformance.py --proposals-schema <candidate>.schema.json \
+  --proposals-should-schema <candidate>.should.schema.json
 ```
 
-As duas opções `--proposals-*` vão juntas e medem só `proposals/` contra um contrato candidato; `latest/` e
-`optional/` seguem no `--schema`, e o rc não muda.
+The two `--proposals-*` options go together and measure only `proposals/` against a candidate contract; `latest/` and
+`optional/` stay on `--schema`, and the rc does not change.
 
-rc `0` se `latest/` passa inteiro, `1` se algum caso de `latest/` falha e `2` se a própria suíte está
-quebrada: metaschema ou manifesto ilegível ou inválido, `pending_on` fora da regra, pasta
-desconhecida, arquivo ausente, repetido ou fora de todo manifesto, ou `latest/` vazia. Um leitor que
-cai num caso conta como falha daquele caso. `optional/` (hoje só a camada `semantic`, que o leitor de referência
-não implementa) e `proposals/` reportam
-e nunca mudam o rc.
+The tool prints one `PASS` or `FAIL` line per case, with the expected and emitted codes for each failure, and ends
+with one summary line per folder. The human output is in English by default, and in pt-BR with `KG_SSOT_LANG=pt-BR`
+or a `pt_BR` locale. Today the run ends like this:
 
-## Um leitor em outra linguagem
+```text
+—
+latest: 356/356 (gates the rc)
+optional: 10/24 (report only)
+```
 
-O `kg_conformance.py` roda só o leitor de referência. Um leitor em outra linguagem roda a suíte com o próprio
-código: itera os `manifest.json` de `fixtures/latest/`, julga cada caso (com a raiz do repo em
-`<pasta do manifesto>/<corpus>` quando o caso declara `corpus`) e compara os conjuntos de `codes` e de
-`warnings` por igualdade. Quem não expõe códigos compara só o veredito: `valid: true` aceita, `valid: false`
-reprova.
+The rc is `0` if all of `latest/` passes, `1` if any `latest/` case fails, and `2` if the suite itself is broken: an
+unreadable or invalid metaschema or manifest, a `pending_on` that breaks the rule, an unknown folder, a case file that
+is missing, repeated, or outside every manifest, a `corpus` that is not a directory, a contract schema that is not a
+valid JSON Schema, or an empty `latest/`. Each defect of a broken suite prints as a `BROKEN SUITE` line. A reader
+that crashes on a case counts as a failure of that case. `optional/` (today only the `semantic` layer, which the
+reference reader does not implement) and `proposals/` report and never change the rc.
 
-Para comparar leitores lado a lado, o mantenedor usa um **contrato de runner**, e um leitor que o implementa
-pode ser medido da mesma forma: `runner <caso>` imprime, na última linha do stdout, UM objeto JSON, e sai com
-rc 0:
+## A reader in another language
+
+`kg_conformance.py` runs only the reference reader. A reader in another language runs the suite with its own code: it
+iterates over the `manifest.json` files in `fixtures/latest/`, judges each case (with the repository root at
+`<manifest folder>/<corpus>` when the case declares `corpus`), and compares the sets of `codes` and `warnings` for
+equality. A reader that does not expose codes compares only the verdict: `valid: true` accepts, `valid: false`
+rejects.
+
+To compare readers side by side, the maintainer uses a **runner contract**, and any reader that implements it can be
+measured the same way: `runner <case>` prints ONE JSON object on the last line of stdout and exits with rc 0:
 
 ```json
 {"verdict": "accept" | "reject" | "error", "codes": [...] | null, "warnings": [...] | null, "detail": "..."}
 ```
 
-- `verdict` é o nível 1, e todo leitor o tem: o arquivo é aceito ou reprovado? Um caso com `codes` MUST
-  espera `reject`; um caso válido, mesmo com `warnings`, espera `accept`.
-- `codes` é o nível 2, só para quem expõe motivo, comparado por conjunto nas camadas
-  que o leitor implementa. `null` quer dizer que o leitor não diz o porquê.
-- **Caso de corpus** (v4.3): o caso que declara `corpus` no manifesto é julgado com a raiz desse diretório como o
-  repo, e o runner recebe `runner <caso> --corpus <dir>`. Um leitor que não confere a ponta externa das
-  `external_edges` fica `n/a` nesses casos.
-- `error` quer dizer que o leitor caiu. Saída que não é JSON, `verdict` desconhecido, rc diferente de 0 ou
-  tempo estourado também viram `error`. É divergência, não ausência de opinião.
+- `verdict` is level 1, and every reader has it: does it accept or reject the file? A case with MUST `codes` expects
+  `reject`; a valid case, even one with `warnings`, expects `accept`.
+- `codes` is level 2, only for readers that expose a reason, compared as a set in the layers the reader implements.
+  `null` means the reader does not say why.
+- **Corpus case** (v4.3): a case that declares `corpus` in the manifest is judged with that directory as the
+  repository root, and the runner gets `runner <case> --corpus <dir>`. A reader that does not check the external end
+  of `external_edges` is `n/a` on these cases.
+- `error` means the reader crashed. Output that is not JSON, an unknown `verdict`, a non-zero rc, or a timeout also
+  becomes `error`. It is a divergence, not an absence of opinion.
 
-## Higiene
+## Hygiene
 
-Os casos são escritos aqui, sem copiar grafos de terceiros, e usam ids sintéticos (`Q_A`, `EV_A`...), sem
-caminho de máquina e sem id de nó privado. Este arquivo viaja na release (`spec/release.json`), e a conferência
-de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos da release.
+The cases are written here, without copying third-party graphs, and they use synthetic ids (`Q_A`, `EV_A`...), with no
+machine paths and no private node ids. This file ships in the release (`spec/release.json`), and the maintainer's
+hygiene check fails any private reference in `spec/` and in the release files.

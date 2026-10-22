@@ -31,10 +31,13 @@ import urllib.parse
 sys.dont_write_bytecode = True
 HERE = pathlib.Path(__file__).resolve().parent
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
-    from . import kg_validate
+    from . import kg_i18n, kg_validate
 else:  # script ou vendor
     sys.path.insert(0, str(HERE))
+    import kg_i18n  # noqa: E402
     import kg_validate  # noqa: E402
+
+_ = kg_i18n._
 
 CONTEXT = {
     "prov": "http://www.w3.org/ns/prov#",
@@ -46,6 +49,31 @@ IRI = re.compile(r"https?://[^\s<>\"{}|\\^`]+")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
+# O help em inglês, a língua-fonte; a docstring acima é a versão pt-BR, que o catálogo traz de volta.
+DESCRIPTION = """Export the provenance of a .kg.yaml graph to PROV-O in JSON-LD.
+
+  kg_prov_export.py <graph.kg.yaml> [--base IRI]
+
+Each node becomes a prov:Entity, with its label, type and status. A node with `provenance` gets prov:wasDerivedFrom
+to the source and a qualified prov:Derivation: the activity carries the `method`, and the `locator` and the
+`locality` go as kg: properties. The source is the IRI itself only when the whole text is an http(s) URL with no
+space; otherwise (a repository path, a command, two URLs together), it becomes a blank node labeled with the text,
+one per distinct text in the document, so nodes with the same source point to the same entity. The verification
+stamp goes as kg:verifiedAt (xsd:date when it is a date), kg:verifiedAgainst and kg:verifiedScope (the scope, since
+v4.5), and not as prov:generatedAtTime: in PROV, the generation time marks when the entity exists, not when someone
+verified it.
+
+Node IRIs are <base><meta.id>#<id>, with the base urn:kg-ssot:graph: by default; the kg: vocabulary lives at
+urn:kg-ssot:vocab#, outside the graph space, so a meta.id cannot collide with it.
+
+The edges (SUPPORTS, REFUTES, SUPERSEDES...) are NOT exported: derivation in PROV is a production relation, not
+evidential support. Exporting them as wasDerivedFrom would say something the graph does not say.
+
+The exporter reads the graph with the reference reader's parser and does not validate it: run kg_validate.py first.
+Output: JSON-LD on stdout. rc: 0 ok, 2 broken input (an unreadable file, one that is not a single YAML document, or
+one with meta or nodes out of shape)."""
+
+
 class Broken(Exception):
     """Entrada quebrada: rc 2."""
 
@@ -54,9 +82,9 @@ def export(doc, base):
     meta = doc.get("meta", {})
     nodes = doc.get("nodes", [])
     if not isinstance(meta, dict):
-        raise Broken("meta não é um mapeamento")
+        raise Broken(_("meta is not a mapping"))
     if not isinstance(nodes, list):
-        raise Broken("nodes não é uma lista")
+        raise Broken(_("nodes is not a list"))
     prefix = f"{base}{urllib.parse.quote(str(meta.get('id') or 'grafo'))}#"
     sources, out = {}, []
 
@@ -112,10 +140,10 @@ def _utf8_stdio():
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("graph")
+    ap = argparse.ArgumentParser(description=_(DESCRIPTION), formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("graph", help=_("the .kg.yaml graph to export"))
     ap.add_argument("--base", default="urn:kg-ssot:graph:",
-                    help="prefixo das IRIs dos nós (default: urn:kg-ssot:graph:)")
+                    help=_("the prefix of the node IRIs (default: urn:kg-ssot:graph:)"))
     args = ap.parse_args(argv)
     _utf8_stdio()
     try:
@@ -123,7 +151,7 @@ def main(argv=None):
     except (OSError, UnicodeDecodeError) as exc:
         print(f"✗ {args.graph}: {exc}", file=sys.stderr)
         return 2
-    _, doc, error = kg_validate.parse_v1(text)
+    _version, doc, error = kg_validate.parse_v1(text)
     if error:
         print(f"✗ {args.graph}: {error}", file=sys.stderr)
         return 2

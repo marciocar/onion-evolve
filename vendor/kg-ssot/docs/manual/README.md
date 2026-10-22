@@ -1,40 +1,47 @@
-# Manual do KG-SSOT
+# KG-SSOT manual
 
-O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada afirmação traz a fonte dela, a data
-em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
-manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
+**English** | [Português (Brasil)](pt-BR/README.md)
 
-Release descrita aqui: **4.10.0** (tag `kg-ssot-v4.10.0`). O contrato vigente dessa release é o **v4**.
+KG-SSOT is a **verifiable knowledge graph** in a plain text file. Each claim can carry its source, the date it was
+verified, and what it was verified against. A formal contract decides whether the file is well formed. This manual
+covers the `.kg.yaml` format, the contract, the tools, and how to adopt KG-SSOT in a repository.
 
-## Capítulos
+This manual describes release **4.18.0** (tag `kg-ssot-v4.18.0`). The current contract in this release is **v4**.
 
-| # | Capítulo | Para quê |
+The manual is also available in Brazilian Portuguese, in [`docs/manual/pt-BR/`](pt-BR/README.md). When the two
+differ, the English text wins.
+
+## Chapters
+
+| # | Chapter | What it covers |
 |---|---|---|
-| 1 | [O que é e para quem](01-o-que-e.md) | O problema, a tese e quem ganha com isso |
-| 2 | [Conceitos](02-conceitos.md) | Grafo, nó, tipos, status, planos, arestas, proveniência, carimbo de verificação |
-| 3 | [Referência do formato](03-formato.md) | Todos os campos do `.kg.yaml`, tirados do schema |
-| 4 | [O contrato](04-contrato.md) | MUST × SHOULD, códigos de erro, versões e tags |
-| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_query`, `kg_diff`, `kg_prov_export`, `kg_migrate`, com saídas reais |
-| 6 | [Adoção e CI](06-adocao-e-ci.md) | O caminho curto para levar o contrato a um repositório |
-| 7 | [Conformidade e leitores](07-conformidade-e-leitores.md) | A suíte de casos e como escrever um leitor próprio |
-| 8 | [Receitas](08-receitas.md) | Tarefas comuns, passo a passo |
-| 9 | [Solução de problemas](09-problemas.md) | O que cada erro quer dizer e como resolver |
-| 10 | [Glossário](10-glossario.md) | Os termos do manual |
+| 1 | [What it is and who it is for](01-what-it-is.md) | The problem, the thesis, and who benefits |
+| 2 | [Concepts](02-concepts.md) | Graph, node, types, status, planes, edges, provenance, verification stamp |
+| 3 | [Format reference](03-format.md) | Every `.kg.yaml` field, taken from the schema |
+| 4 | [The contract](04-contract.md) | MUST vs. SHOULD, error codes, versions, and tags |
+| 5 | [Tools](05-tools.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_query`, `kg_diff`, `kg_prov_export`, `kg_migrate`, with real output |
+| 6 | [Adoption and CI](06-adoption-and-ci.md) | The short path to bring the contract into a repository |
+| 7 | [Conformance and readers](07-conformance-and-readers.md) | The case suite and how to write your own reader |
+| 8 | [Recipes](08-recipes.md) | Common tasks, step by step |
+| 9 | [Troubleshooting](09-troubleshooting.md) | What each error means and how to fix it |
+| 10 | [Glossary](10-glossary.md) | The terms used in this manual |
 
-## Leitura rápida
+## Quick start
 
-- **Vai escrever um grafo?** Leia os capítulos 2 e 3, e use o 9 quando o leitor reprovar.
-- **Vai adotar num repositório?** Comece pelo capítulo 6 e siga para o [`ADOPTING.md`](../../ADOPTING.md).
-- **Vai escrever um leitor em outra linguagem?** O capítulo 7 e o [`spec/conformance/README.md`](../../spec/conformance/README.md).
+- **Writing a graph?** Read chapters 2 and 3, and turn to chapter 9 when the reader fails your file.
+- **Adopting KG-SSOT in a repository?** Start with chapter 6, then move on to [`ADOPTING.md`](../../ADOPTING.md).
+- **Writing a reader in another language?** Read chapter 7 and [`spec/conformance/README.md`](../../spec/conformance/README.md).
 
-## Fontes da verdade
+## Sources of truth
 
-Este manual explica, mas não manda. Quando ele e um destes arquivos divergirem, valem os arquivos:
+This manual is explanatory, not normative. When it differs from one of these files, the files win:
 
-- o contrato: [`spec/kg-contract-v4.schema.json`](../../spec/kg-contract-v4.schema.json) (MUST) e
+- the contract: [`spec/kg-contract-v4.schema.json`](../../spec/kg-contract-v4.schema.json) (MUST) and
   [`spec/kg-contract-v4.should.schema.json`](../../spec/kg-contract-v4.should.schema.json) (SHOULD);
-- a suíte: [`spec/conformance/`](../../spec/conformance/README.md);
-- a superfície da release: [`spec/release.json`](../../spec/release.json).
+- the suite: [`spec/conformance/`](../../spec/conformance/README.md);
+- the release surface: [`spec/release.json`](../../spec/release.json).
 
-Todas as saídas de comando deste manual foram coladas de uma execução real, em Python 3.12 com as versões de
-[`tools/requirements.txt`](../../tools/requirements.txt).
+Every command output in this manual was pasted from a real run, on Python 3.12 with the versions pinned in
+[`tools/requirements.txt`](../../tools/requirements.txt). The tools print human-readable output in English by default,
+and in Brazilian Portuguese when you set `KG_SSOT_LANG=pt-BR` or run under a `pt_BR` locale. Error codes, exit codes
+and JSON keys never change language; only the human text does.

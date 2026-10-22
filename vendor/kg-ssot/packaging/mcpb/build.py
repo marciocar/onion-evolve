@@ -50,6 +50,8 @@ def stage(dest):
     (dest / "server").mkdir()
     shutil.copy2(HERE / "server" / "main.py", dest / "server" / "main.py")
     shutil.copy2(HERE / "icon.png", dest / "icon.png")
+    # a tradução pt-BR da vitrine (localization do manifest: só os campos que mudam; o padrão é o en-US do manifest)
+    shutil.copytree(HERE / "mcpb-resources", dest / "mcpb-resources")
     for name in ("LICENSE", "NOTICE"):
         shutil.copy2(ROOT / name, dest / name)
     return v
