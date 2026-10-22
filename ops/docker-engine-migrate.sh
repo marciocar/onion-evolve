@@ -154,11 +154,35 @@ cmd_apply() {
     "docker-ce=${TARGET_ENGINE}" "docker-ce-cli=${TARGET_ENGINE}" "containerd.io=${TARGET_CONTAINERD}" \
     "docker-buildx-plugin=${TARGET_BUILDX}" "docker-compose-plugin=${TARGET_COMPOSE}" "${rm_pkgs[@]}"
   sudo_do apt-mark hold docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin >/dev/null
-  sudo_do systemctl enable --now containerd.service docker.service
+  start_engine "$p"
+}
+
+# start_engine <plan>: sobe o Engine novo. O docker-ce sobe o dockerd com -H fd:// e depende do docker.socket;
+# na troca de pacotes o socket do docker.io muda de configuração com a unit rodando, fica sem descritor e bate o
+# limite de reinícios ("no sockets found via socket activation", medido no vivo em 2026-10-22). Por isso:
+# reset-failed e restart do socket ANTES do serviço.
+start_engine() {
+  local p="$1"
+  sudo_do systemctl daemon-reload
+  sudo_do systemctl reset-failed docker.socket docker.service containerd.service 2>/dev/null || true
+  sudo_do systemctl enable containerd.service docker.socket docker.service
+  sudo_do systemctl restart containerd.service
+  sudo_do systemctl restart docker.socket                                                            # guard:socket
+  sudo_do systemctl restart docker.service
   local t=0; until sudo_do docker info >/dev/null 2>&1; do t=$((t+5)); [ "$t" -le "$WAIT_DOCKER_S" ] || die "dockerd não respondeu em ${WAIT_DOCKER_S}s (rollback acima)"; sleep 5; done
   sudo_do systemctl restart "$FW_UNIT"
   wait_containers "$p"
   cmd_verify
+}
+
+# resume: retoma depois de um apply que instalou os pacotes e não conseguiu subir o Engine. Só roda com o docker-ce
+# fixado JÁ instalado (nunca instala nada) e usa o plan mais recente para esperar os containers.
+cmd_resume() {
+  local p
+  p="$(latest_plan)" || die "resume sem plan: rode 'plan' antes"
+  [ "$(dpkg-query -W -f='${Version}' docker-ce 2>/dev/null || true)" = "$TARGET_ENGINE" ] \
+    || die "resume só retoma o docker-ce ${TARGET_ENGINE} já instalado"                                  # guard:resumepin
+  start_engine "$p"
 }
 
 # wait_containers <plan>: espera os que estavam rodando voltarem (e healthy, se eram)
@@ -362,6 +386,7 @@ case "${1:-}" in
   plan)   cmd_plan ;;
   apply)  cmd_apply ;;
   verify) cmd_verify ;;
+  resume) cmd_resume ;;
   --selftest) selftest ;;
   --selftest-mutants) mutants ;;
   *) sed -n '2,32p' "${BASH_SOURCE[0]}"; exit 2 ;;
