@@ -11,10 +11,12 @@
 #   · ok com --me maestro-peer-test e --sent-tsv do remetente (rc 0, [ok] ack e [ok] reply);
 #   · sem --me o default (maestro-notebook-test) segue valendo e o envelope sai aud-errado (rc 1);
 #   · A2A_SPIKE_ME faz o mesmo que --me;
-#   · sem --sent-tsv o sent.tsv da HOME não tem o jti e o envelope sai in_reply_to-desconhecido (rc 1);
+#   · sem --sent-tsv o sent.tsv da HOME (que existe, com OUTRO jti) não tem o da ida → in_reply_to-desconhecido;
+#   · sent.tsv de outro usuário com `a[$(cmd)]` na coluna 1 NÃO executa nada (rc 1, sem o arquivo-prova);
+#   · flag de valor sem o valor sai rc 2 (uso), não rc 1;
 #   · corpo adulterado depois de assinado sai corpo-adulterado (rc 1), e o corpo não é impresso;
-#   · MUTANTE que ignora o --me: o caso ok tem de reprovar (prova que morde). Mutate-and-restore NO PRÓPRIO
-#     arquivo, conferido por sha256 antes e depois.
+#   · MUTANTES (o --me ignorado; o --sent-tsv ignorado; a validação numérica do t_send removida): cada um
+#     tem de reprovar o seu caso. Mutate-and-restore NO PRÓPRIO arquivo, conferido por sha256 no fim.
 # Uso : bash notebook/fetch-replies.selftest.sh      Exit: 0 tudo passou · 1 algum caso falhou
 # =============================================================================
 set -uo pipefail
@@ -61,7 +63,9 @@ printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$((NOWMS - 1500))" "$((NOWMS - 1400))" "$
 
 N=0; rc=0
 run() {  # run <outbox> [flags do fetch]; deixa rc e a saída em ${T}/out; HOME nova a cada rodada
-  local dir="$1"; shift; N=$((N+1)); mkdir -p "${T}/home${N}"
+  local dir="$1"; shift; N=$((N+1)); mkdir -p "${T}/home${N}/.local/state/onion/a2a-spike"
+  # a HOME de quem busca já tem um sent.tsv próprio, com OUTRO jti (o caso real do marciocar)
+  printf '1\t2\tnb-outro-jti\tth-x\t200\tadhoc\t/dev/null\n' > "${T}/home${N}/.local/state/onion/a2a-spike/sent.tsv"
   rc=0; HOME="${T}/home${N}" bash "${FETCH}" --local-dir "${dir}" "$@" >"${T}/out" 2>&1 || rc=$?
 }
 expect() {  # expect <rc> <nome> <padrão>...
@@ -81,21 +85,46 @@ expect 1 "sem --me: default maestro-notebook-test intacto → aud-errado" "[aud-
 A2A_SPIKE_ME="${MEMBER}" run "${OUTBOX}" --sent-tsv "${SENT}"
 expect 0 "A2A_SPIKE_ME=${MEMBER} equivale a --me" "[ok] ack" "[ok] reply"
 run "${OUTBOX}" --me "${MEMBER}"
-expect 1 "sem --sent-tsv: a HOME de quem busca não tem o jti → in_reply_to-desconhecido" \
-  "[in_reply_to-desconhecido] ack" "[in_reply_to-desconhecido] reply" "aviso: sent.tsv ilegível"
+expect 1 "sem --sent-tsv: o sent.tsv da HOME de quem busca tem outro jti → in_reply_to-desconhecido" \
+  "[in_reply_to-desconhecido] ack" "[in_reply_to-desconhecido] reply"
+run "${OUTBOX}" --me "${MEMBER}" --sent-tsv "${T}/inexistente.tsv"
+expect 1 "--sent-tsv ilegível avisa e reprova (não é erro de uso)" "aviso: sent.tsv ilegível" "[in_reply_to-desconhecido] reply"
+EVIL="${T}/evil-sent.tsv"; PWNED="${T}/PWNED"
+# `t_recv[...]` e não `a[...]`: sob set -u um nome NÃO definido morre antes do índice; um definido executa o índice
+# (medido em bash 5.2.21: o `a[$(touch)]` só deu unbound variable, o `t_recv[$(touch)]` criou o arquivo)
+printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "t_recv[\$(touch ${PWNED})]" 0 "${JTI}" "${THREAD}" 200 A7-C1 /dev/null > "${EVIL}"
+run "${OUTBOX}" --me "${MEMBER}" --sent-tsv "${EVIL}"
+if [ "${rc}" = 1 ] && [ ! -e "${PWNED}" ] && grep -qF "[in_reply_to-desconhecido] reply" "${T}/out"; then
+  ok "sent.tsv com a[\$(cmd)] na coluna 1: nada executa, vira in_reply_to-desconhecido (rc 1)"
+else ko "injeção pelo sent.tsv: rc ${rc}, PWNED $([ -e "${PWNED}" ] && echo CRIADO || echo ausente)"; sed 's/^/      /' "${T}/out"; fi
 run "${TAMPER}" --me "${MEMBER}" --sent-tsv "${SENT}"
 expect 1 "corpo adulterado depois de assinado → corpo-adulterado" "[corpo-adulterado] reply"
 if grep -q "são 43" "${T}/out"; then ko "o corpo adulterado foi impresso"; else ok "o corpo adulterado não é impresso"; fi
 run "${OUTBOX}" --me ""
 expect 2 "--me vazio é erro de uso" "--me vazio"
+run "${OUTBOX}" --sent-tsv
+expect 2 "--sent-tsv sem valor é erro de uso, não unbound variable" "falta o valor de --sent-tsv"
 
-echo "── mutante: o fetch IGNORA o --me (mutate-and-restore no próprio arquivo, conferido por sha256)"
-sed -i 's/^  --me) ME="\$2"; shift 2 ;;$/  --me) shift 2 ;;  # MUTANTE: --me ignorado/' "${FETCH}"
-if grep -q 'MUTANTE: --me ignorado' "${FETCH}"; then
+echo "── mutantes (mutate-and-restore no próprio arquivo, conferido por sha256 no fim)"
+mutant() {  # mutant <nome> <expressão sed> <marca> ; deixa o fetch mutado (o próximo restore desfaz)
+  cp "${T}/fetch.orig" "${FETCH}"; sed -i "$2" "${FETCH}"
+  grep -q "$3" "${FETCH}" || { ko "mutante «$1» não se aplicou: a âncora mudou"; return 1; }
+}
+if mutant "--me ignorado" 's/^  --me) ME="\$2"; shift 2 ;;$/  --me) shift 2 ;;  # MUTANTE: --me ignorado/' 'MUTANTE: --me ignorado'; then
   run "${OUTBOX}" --me "${MEMBER}" --sent-tsv "${SENT}"
-  if [ "${rc}" = 1 ] && grep -qF "[aud-errado] reply" "${T}/out"; then ok "mutante reprovou (rc 1, aud-errado): o caso ok morde o --me"
-  else ko "mutante passou (rc ${rc}): o caso ok não prova o --me"; sed 's/^/      /' "${T}/out"; fi
-else ko "o mutante não se aplicou: a âncora do --me mudou"; fi
+  if [ "${rc}" = 1 ] && grep -qF "[aud-errado] reply" "${T}/out"; then ok "mutante «--me ignorado» reprovou o caso ok (rc 1, aud-errado)"
+  else ko "mutante «--me ignorado» passou (rc ${rc}): o caso ok não prova o --me"; fi
+fi
+if mutant "--sent-tsv ignorado" 's/^  --sent-tsv) SENT_TSV="\$2"; shift 2 ;;$/  --sent-tsv) shift 2 ;;  # MUTANTE: --sent-tsv ignorado/' 'MUTANTE: --sent-tsv ignorado'; then
+  run "${OUTBOX}" --me "${MEMBER}" --sent-tsv "${SENT}"
+  if [ "${rc}" = 1 ] && grep -qF "[in_reply_to-desconhecido] reply" "${T}/out"; then ok "mutante «--sent-tsv ignorado» reprovou o caso ok (rc 1, in_reply_to-desconhecido)"
+  else ko "mutante «--sent-tsv ignorado» passou (rc ${rc}): o caso ok não prova o --sent-tsv"; fi
+fi
+if mutant "t_send sem validação" 's/^  case "\${t_send}" in \*\[!0-9\]\*) t_send="" ;; esac$/  : # MUTANTE: t_send cru/' 'MUTANTE: t_send cru'; then
+  rm -f "${PWNED}"; run "${OUTBOX}" --me "${MEMBER}" --sent-tsv "${EVIL}"
+  if [ -e "${PWNED}" ]; then ok "mutante «t_send sem validação» EXECUTOU o a[\$(cmd)]: o caso da injeção morde"
+  else ko "mutante «t_send sem validação» não executou: o caso da injeção não prova nada"; fi
+fi
 cp "${T}/fetch.orig" "${FETCH}"
 SHA1="$(openssl dgst -sha256 < "${FETCH}" | awk '{print $NF}')"
 if [ "${SHA0}" = "${SHA1}" ]; then ok "fetch-replies.sh restaurado (sha256 ${SHA0:0:12}… antes = depois)"

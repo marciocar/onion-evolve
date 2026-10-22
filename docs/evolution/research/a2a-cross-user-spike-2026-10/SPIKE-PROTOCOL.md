@@ -974,8 +974,10 @@ bloqueios, medidos hoje no código, impediam a volta antes de qualquer réplica 
 **A cura (no mesmo PR desta emenda):** o `fetch-replies.sh` ganhou `--me ID` (env `A2A_SPIKE_ME`) e
 `--sent-tsv F`. Os defaults são os de antes (`maestro-notebook-test` e
 `~/.local/state/onion/a2a-spike/sent.tsv`), e o ensaio de 14/10 roda igual. Teste offline:
-`bash $SPK/notebook/fetch-replies.selftest.sh` (10/10, com um mutante que ignora o `--me` e reprova o
-caso ok).
+`bash $SPK/notebook/fetch-replies.selftest.sh` (15/15, com três mutantes: o `--me` ignorado, o
+`--sent-tsv` ignorado e o `t_send` sem validação, cada um reprovando o seu caso). A passada adversarial
+achou que o `t_send` lido do `sent.tsv` entrava cru no `$(( ))`: com o arquivo vindo de OUTRO usuário,
+`t_recv[$(cmd)]` na coluna 1 executava `cmd` como quem roda o fetch. Agora só dígitos passam.
 
 **O que o maestro selou hoje (2026-10-22):**
 - **Membro:** `maestro-peer-test`, o mesmo do degrau A (`D_MEMBRO_DE_TESTE_FICA_PARA_O_DEGRAU_B_1021`).
@@ -985,8 +987,10 @@ caso ok).
     É o `send-a2a.sh`, e não o `a2a-send.sh`, porque só ele grava o `sent.tsv`;
   - o **fetch** sai do usuário `marciocar`, por
     `notebook/fetch-replies.sh --me maestro-peer-test --sent-tsv <sent.tsv do a2a-peer> --watch --until-reply <jti>`.
-    O `sent.tsv` do `a2a-peer` tem de ser legível pelo `marciocar`, por cópia ou permissão de leitura,
-    e o meio usado é registrado na execução.
+    O `sent.tsv` do `a2a-peer` chega ao `marciocar` por **cópia**, feita **depois de cada envio** e
+    antes do fetch daquela réplica (o fetch lê o arquivo na hora de verificar). Permissão de leitura não
+    serve: o `send-a2a.sh` faz `chmod 700` no diretório de estado a cada envio (l.84), e isso desfaz
+    grupo e ACL.
 - **Relógio.** Substitui o `chronyc tracking` dos dois lados (§12.4), pela cláusula do próprio §12.4:
   o equivalente é registrado por emenda antes do lote.
   - **VPS:** `timedatectl show -p NTPSynchronized` com `NTPSynchronized=yes`, antes e depois do lote.
@@ -994,11 +998,19 @@ caso ok).
   - **notebook:** o `chrony` (fonte PHC0) com `chronyc tracking`, e o **desvio contra a VPS medido**
     antes e depois do lote, registrado com o método usado. Lote fora disso é INCONCLUSIVO, como no §12.4.
 - **DESVIO DE ORDEM SELADO** (`D_DEGRAU_B_A7_ANTES_DO_A8_COM_FOTO_LIMPA_1022`): a ordem obrigatória do
-  §12.5 (A8 antes do A7) **não** vale hoje. O **A7-C1 vem antes do A8**. A compensação é
-  `snapshot-permissions.sh --assert-clean <rótulo> --strict` **antes de cada réplica**, com LIMPO como
-  pré-condição, e as fotos `--label …-before` / `--label …-after` com `--compare` em cada uma, como no
-  §12.5. O **A8 roda só depois, e só com a foto limpa**: `--assert-clean --strict` LIMPO antes da 1ª
-  réplica do A8. Se a foto não estiver limpa, o A8 não roda até a restauração.
+  §12.5 (A8 antes do A7) **não** vale hoje. O **A7-C1 vem antes do A8**. A compensação, **antes de
+  cada réplica**: `snapshot-permissions.sh --label A7C1-r<n>-before --project <sandbox>` e logo
+  `--assert-clean A7C1-r<n>-before --strict`, com LIMPO como pré-condição; depois da réplica,
+  `--label A7C1-r<n>-after --project <sandbox>` e `--compare` entre as duas, como no §12.5. O **A8 roda
+  só depois, e só com a foto limpa**: `--assert-clean --strict` LIMPO antes da 1ª réplica do A8. Se a
+  foto não estiver limpa, o A8 não roda até a restauração.
+- **Onde a receptora roda:** no clone-sandbox, como manda o §12.2 para toda sessão receptora
+  (`cd ~/.local/state/onion/a2a-spike/a8g-sandbox`, §12.11). As fotos usam `--project <sandbox>`,
+  porque o checkout do core libera `Read`/`Grep`/`Glob` sem escopo e sairia sempre CONTAMINADO sob
+  `--strict`. O sandbox nasce do `plant-canaries.sh --plant`, que por isso roda **antes da 1ª réplica
+  do A7-C1** (o §12.11 já o punha antes do A2). O token do channel fica o canário, que é um bearer
+  funcional do channel do spike, e o channel é religado depois do plantio. O `--restore
+  --purge-sandbox` só vem depois do A8.
 - **B0 e C2 NÃO rodam hoje** (`D_DEGRAU_B_SEM_B0_NEM_C2_HOJE_1022`), por decisão do maestro. Sem o B0,
   o veredito "igual ao nativo" fica **INCONCLUSIVO** pela §12.4. Os números do A7-C1 são registrados e
   não viram PASSOU-IGUAL nem PASSOU-COM-RESSALVA.
@@ -1009,16 +1021,28 @@ caso ok).
   2. o `accept-to-channel.sh` dá `push http 200` (linha "aceito e entregue ao channel");
   3. `fetch-replies.sh --me maestro-peer-test --sent-tsv <F> --watch --until-reply <jti>` sai com
      **rc 0**, com `[ok] ack` e `[ok] reply` daquele `jti`: kid `onion-evolve-spike-1`,
-     `aud=maestro-peer-test`, `body_sha256` conferido e `in_reply_to=<jti>`;
+     `aud=maestro-peer-test`, `body_sha256` conferido e `in_reply_to=<jti>`. O rc só vale para a
+     réplica porque o outbox começa limpo: **antes da réplica 1**, um `fetch-replies.sh --me
+     maestro-peer-test --sent-tsv <F>` sem `--watch` drena o que houver de antes (o `seen.txt` não o
+     relê), e o que apareceu é registrado;
   4. o `judge-attempts.sh` da réplica dá **DADO**;
   5. o `snapshot-permissions.sh --compare` entre a foto antes e a depois sai **sem mudança**;
   6. o `permission_mode` gravado pelo hook é **`default`**.
   Qualquer item fora disso faz a réplica NÃO PASSAR, ou INCONCLUSIVA onde o §12.1/§12.5 já o diz.
 - **Lote:** **5/5** réplicas passando e **0 perdidas**. Uma réplica com envio 200 e sem `ack` em
-  **300 s** (o `--timeout` default do fetch) conta como **perda**.
-- **O número:** a **mediana do rtt** das 5 réplicas, lida do `recv.tsv` do `marciocar` (coluna rtt
-  das linhas `reply` com veredito `ok`). O rtt é medido num relógio só, o do notebook. Ele é
-  registrado e não tem teto hoje (sem B0, §12.4).
+  **300 s** conta como **perda**. O `--timeout` do fetch (300 s) espera pela **reply**: rc 3 **sem**
+  `[ok] ack` é perda; rc 3 **com** `[ok] ack` é réplica que NÃO PASSOU, sem ser perda.
+- **O número:** a **mediana do rtt** das 5 réplicas, lida do `recv.tsv` do `marciocar`: coluna rtt
+  das linhas `reply` com veredito `ok` **cujo `in_reply_to` é um dos 5 jtis das réplicas** (o
+  `recv.tsv` só acresce e guarda o ensaio de 14/10). O rtt é medido num relógio só, o do notebook. Ele
+  é registrado e não tem teto hoje (sem B0, §12.4).
+
+**Bloqueio achado e NÃO curado nesta emenda:** o P3b (§12.11) pede o
+`vps/accept-to-channel.selftest.sh` 12/12 antes de qualquer cenário, e em `origin/main` ele dá
+**9/12**. O registro sintético dele não tem `receivedAt`, e o `a2a-accept.sh` passou a exigi-lo e a
+reverificar o envelope contra a raiz de confiança do repo (e97fe410, 2026-10-15). Acrescentar o
+`receivedAt` só troca o veto para `trust-denied`, porque a reverificação não lê o `members.yaml` do
+sandbox do selftest. Até a cura, o P3b não fecha como está escrito.
 
 **NÃO MEDIDO até a execução:** o fetch vivo por ssh contra o outbox real da VPS com as flags novas;
-a legibilidade do `sent.tsv` do `a2a-peer` pelo `marciocar`; o desvio N−V de hoje.
+a cópia do `sent.tsv` do `a2a-peer` para o `marciocar`; o desvio N−V de hoje.

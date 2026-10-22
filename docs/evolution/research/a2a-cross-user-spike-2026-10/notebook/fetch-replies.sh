@@ -35,7 +35,11 @@ SENT_TSV="${STATE_DIR}/sent.tsv"
 REMOTE_OUTBOX='.local/state/onion/a2a-spike/outbox'
 
 die() { echo "ERRO: $*" >&2; exit 2; }
-while [ "$#" -gt 0 ]; do case "$1" in
+while [ "$#" -gt 0 ]; do
+  # flag de valor sem o valor é erro de USO (rc 2), não "unbound variable" do set -u (rc 1 = envelope reprovou)
+  case "$1" in --host|--until-reply|--interval|--timeout|--local-dir|--me|--sent-tsv)
+    [ "$#" -ge 2 ] || die "falta o valor de $1" ;; esac
+  case "$1" in
   --host) HOST="$2"; shift 2 ;;
   --watch) WATCH=1; shift ;;
   --until-reply) UNTIL="$2"; shift 2 ;;
@@ -97,6 +101,9 @@ verify_one() {  # $1 = nome; imprime veredito e grava recv.tsv
   body_sha="$(jq -j '.signal.body // ""' "${f}" | openssl dgst -sha256 | awk '{print $NF}')"
   [ "${verdict}" = ok ] && [ "${body_sha}" != "${cl_sha}" ] && verdict="corpo-adulterado"
   t_send="$(awk -F'\t' -v j="${irt}" '$3==j {print $1; exit}' "${SENT_TSV}" 2>/dev/null || true)"
+  # o sent.tsv pode ser de OUTRO usuário (--sent-tsv, degrau B): t_send cru no $(( )) executaria
+  # `a[$(cmd)]` como quem roda o fetch. Só dígitos; o resto vira jti desconhecido (passada adversarial 2026-10-22)
+  case "${t_send}" in *[!0-9]*) t_send="" ;; esac
   if [ -z "${t_send}" ]; then [ "${verdict}" = ok ] && verdict="in_reply_to-desconhecido"; rtt="?"; else rtt=$(( t_recv - t_send )); fi
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${t_recv}" "${kind}" "${irt}" "${rtt}" "${thread}" "${rj}" "${verdict}" >> "${STATE_DIR}/recv.tsv"
   echo "${name}" >> "${STATE_DIR}/seen.txt"
