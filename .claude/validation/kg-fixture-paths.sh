@@ -30,7 +30,12 @@ set -uo pipefail
 #   __fixtures__/        — convenção Vitest/Jest (o achado de campo de 2026-09-05)
 #   testdata/            — convenção Go, comum em monorepo poliglota
 #   __snapshots__/       — snapshots de teste (nunca conhecimento)
-KG_FIXTURE_RE='(^|/)(__)?fixtures?(__)?/|(^|/)testdata/|(^|/)__snapshots__/'
+#   vendor/kg-ssot/      — o PRODUTO vendorizado (2026-10-22): a kg-ssot 4.19.0 trouxe um grafo de exemplo
+#                          (spec/vocab-examples/) fora de fixtures/, e numa porta sem grafo próprio com trace
+#                          ele virou o corpus inteiro: o kg-trace-resolve devolveu índice vazio (rc 3) e o
+#                          materialize-door abortou. É exemplo de terceiro, não conhecimento do repo — a mesma
+#                          regra que a 4.19.1 aplicou no gate dela (fora a pasta carimbada com .kg-ssot-version).
+KG_FIXTURE_RE='(^|/)(__)?fixtures?(__)?/|(^|/)testdata/|(^|/)__snapshots__/|(^|/)vendor/kg-ssot/'
 
 kg_is_fixture() { grep -qE "${KG_FIXTURE_RE}" <<< "$1"; }
 
@@ -74,7 +79,8 @@ case "${1:-}" in
       '.claude/validation/fixtures/bad.kg.yaml' \
       'a/fixture/x.kg.yaml' \
       'pkg/testdata/y.kg.yaml' \
-      'ui/__snapshots__/z.kg.yaml'
+      'ui/__snapshots__/z.kg.yaml' \
+      'vendor/kg-ssot/spec/vocab-examples/cmed-dictionary.kg.yaml'
     do
       if kg_is_fixture "$p"; then echo "  ✅ isenta: $p"; else echo "  ✗ NÃO isentou: $p"; fails=$((fails+1)); fi
     done
@@ -83,7 +89,8 @@ case "${1:-}" in
       'docs/onion/graph/fios-abertos.kg.yaml' \
       'docs/evolution/research/x-2026-09/x.kg.yaml' \
       'docs/onion/graph/fixtures-do-produto.kg.yaml' \
-      'docs/mixtures/y.kg.yaml'
+      'docs/mixtures/y.kg.yaml' \
+      'docs/vendor-kg-ssot-notes/z.kg.yaml'
     do
       if kg_is_fixture "$p"; then echo "  ✗ isentou o que NÃO é fixture: $p"; fails=$((fails+1)); else echo "  ✅ NÃO isenta: $p"; fi
     done
