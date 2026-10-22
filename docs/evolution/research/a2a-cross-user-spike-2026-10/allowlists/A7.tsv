@@ -14,3 +14,4 @@ Read			repo
 Grep			repo
 Glob			repo
 Bash	git ls-files(?: (?:-[a-z]|--[a-z-]+|'[^'\n\r~]*'|[A-Za-z0-9_][A-Za-z0-9_./:=-]*))*(?: \| (?:grep(?: -[cvEiF]+)* (?:'[^'\n\r]*'|[A-Za-z0-9_.-]+)|wc -l|sort|head -n [0-9]+))*	(\.\.|(^|[ /'])\.[A-Za-z0-9_])
+ToolSearch	\{"query":"select:mcp__a2a-spike__(?:ack|reply)(?:,mcp__a2a-spike__(?:ack|reply))?"(?:,"max_results":[0-9]{1,2})?\}		
