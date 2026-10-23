@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**617 itens abertos** em 120 grafo(s) com aberto (de 153 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**618 itens abertos** em 120 grafo(s) com aberto (de 153 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1161,6 +1161,13 @@
 |--:|---|---|---|
 | 3.0 | `Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO` | radar-E3-2026-10-14-r11 | o _cleanup do pr-finalize deve abortar o rebase que ele mesmo começou, para a morte no meio do --rebase não deixar a worktree em |
 
+## sinais-de-campo-2026-09 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
+| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
+
 ## superpowers-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1179,12 +1186,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.8 | `Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO` | inbox-triage-2026-10-04 | LACUNA que o proprio hub declarou: clickup_delete_task pelo MCP oficial nao foi medido (exige servidor MCP conectado). O transport |
-
-## sinais-de-campo-2026-09 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
 ## catraca-regra49-2026-08 — 1 item(ns)
 
