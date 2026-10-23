@@ -30,12 +30,32 @@ set -uo pipefail
 #   __fixtures__/        — convenção Vitest/Jest (o achado de campo de 2026-09-05)
 #   testdata/            — convenção Go, comum em monorepo poliglota
 #   __snapshots__/       — snapshots de teste (nunca conhecimento)
-#   vendor/kg-ssot/      — o PRODUTO vendorizado (2026-10-22): a kg-ssot 4.19.0 trouxe um grafo de exemplo
-#                          (spec/vocab-examples/) fora de fixtures/, e numa porta sem grafo próprio com trace
-#                          ele virou o corpus inteiro: o kg-trace-resolve devolveu índice vazio (rc 3) e o
-#                          materialize-door abortou. É exemplo de terceiro, não conhecimento do repo — a mesma
-#                          regra que a 4.19.1 aplicou no gate dela (fora a pasta carimbada com .kg-ssot-version).
-KG_FIXTURE_RE='(^|/)(__)?fixtures?(__)?/|(^|/)testdata/|(^|/)__snapshots__/|(^|/)vendor/kg-ssot/'
+#   vendor do KG-SSOT    — toda pasta com o carimbo `.kg-ssot-version` rastreado (regra pública da kg-ssot 4.20.0,
+#                          ADOPTING: "uma pasta com .kg-ssot-version é o vendor, onde quer que ela esteja"; o
+#                          carimbo na RAIZ do que se lê não conta). Até 2026-10-23 era o caminho fixo
+#                          `vendor/kg-ssot/`, nascido do incidente de 2026-10-22: o grafo de exemplo da 4.19.0
+#                          (spec/vocab-examples/) virou o corpus inteiro de uma porta sem grafo próprio com trace,
+#                          o kg-trace-resolve devolveu índice vazio e o materialize-door abortou. O carimbo cobre o
+#                          vendor em qualquer pasta, como as ferramentas do próprio KG-SSOT.
+#                          CUSTO: UMA chamada de git ao carregar este arquivo (nunca por grafo). Fora de um repo git
+#                          não há carimbo rastreado, e só as convenções acima valem.
+KG_FIXTURE_BASE_RE='(^|/)(__)?fixtures?(__)?/|(^|/)testdata/|(^|/)__snapshots__/'
+
+_kg_vendor_re() {   # imprime "(^|/)(d1|d2)/" com as pastas carimbadas, relativas à raiz do repo; nada se não houver
+  local top f d alts=""
+  top="$(git rev-parse --show-toplevel 2>/dev/null)" || return 0
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    d="${f%/*}"
+    [ "$d" = "$f" ] && continue                                   # carimbo na raiz do que se lê não conta
+    d="$(printf '%s' "$d" | sed 's/[][\.*^$+?(){}|]/\\&/g')"
+    alts="${alts:+${alts}|}${d}"
+  done < <(git -C "$top" ls-files -- '*.kg-ssot-version' 2>/dev/null)
+  [ -n "$alts" ] && printf '(^|/)(%s)/' "$alts"
+  return 0
+}
+KG_VENDOR_RE="$(_kg_vendor_re)"
+KG_FIXTURE_RE="${KG_FIXTURE_BASE_RE}${KG_VENDOR_RE:+|${KG_VENDOR_RE}}"
 
 kg_is_fixture() { grep -qE "${KG_FIXTURE_RE}" <<< "$1"; }
 
@@ -79,8 +99,7 @@ case "${1:-}" in
       '.claude/validation/fixtures/bad.kg.yaml' \
       'a/fixture/x.kg.yaml' \
       'pkg/testdata/y.kg.yaml' \
-      'ui/__snapshots__/z.kg.yaml' \
-      'vendor/kg-ssot/spec/vocab-examples/cmed-dictionary.kg.yaml'
+      'ui/__snapshots__/z.kg.yaml'
     do
       if kg_is_fixture "$p"; then echo "  ✅ isenta: $p"; else echo "  ✗ NÃO isentou: $p"; fails=$((fails+1)); fi
     done
@@ -89,8 +108,7 @@ case "${1:-}" in
       'docs/onion/graph/fios-abertos.kg.yaml' \
       'docs/evolution/research/x-2026-09/x.kg.yaml' \
       'docs/onion/graph/fixtures-do-produto.kg.yaml' \
-      'docs/mixtures/y.kg.yaml' \
-      'docs/vendor-kg-ssot-notes/z.kg.yaml'
+      'docs/mixtures/y.kg.yaml'
     do
       if kg_is_fixture "$p"; then echo "  ✗ isentou o que NÃO é fixture: $p"; fails=$((fails+1)); else echo "  ✅ NÃO isenta: $p"; fi
     done
@@ -100,6 +118,22 @@ case "${1:-}" in
     if [ "${_k}" = "docs/onion/graph/fios-abertos.kg.yaml" ] && [ -n "${_v}" ]; then
       echo "  ✅ material didático: fora do --filter-knowledge, dentro do --filter (segue validado)"
     else echo "  ✗ material didático mal classificado (knowledge='${_k}' validação='${_v}')"; fails=$((fails+1)); fi
+    # O CARIMBO do vendor (regra pública da kg-ssot 4.20.0): num repo de mentira, o vendor fora de vendor/ é isento,
+    # a pasta sem carimbo não é, e o carimbo na raiz do repo não isenta o repo inteiro.
+    _self="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+    _sb="$(mktemp -d)"
+    (
+      cd "${_sb}" && git init -q . && mkdir -p lib/terceiros/kgs/spec docs/kg docs/vendor-kg-ssot-notes \
+        && : > lib/terceiros/kgs/.kg-ssot-version && : > .kg-ssot-version \
+        && for f in lib/terceiros/kgs/spec/ex.kg.yaml docs/kg/real.kg.yaml docs/vendor-kg-ssot-notes/z.kg.yaml; do echo 'meta: {}' > "$f"; done \
+        && git add -A >/dev/null 2>&1
+    )
+    _out="$(cd "${_sb}" && git ls-files '*.kg.yaml' | bash "${_self}" --filter | tr '\n' ' ')"
+    _want='docs/kg/real.kg.yaml docs/vendor-kg-ssot-notes/z.kg.yaml '
+    if [ "${_out}" = "${_want}" ]; then
+      echo "  ✅ carimbo: vendor fora de vendor/ isento; pasta sem carimbo e carimbo na raiz não isentam"
+    else echo "  ✗ carimbo mal aplicado (saiu '${_out}', esperado '${_want}')"; fails=$((fails+1)); fi
+    rm -rf "${_sb}"
     [ "${fails}" -eq 0 ] && { echo "kg-fixture-paths selftest: OK"; exit 0; }
     echo "kg-fixture-paths selftest: ${fails} falha(s)"; exit 1 ;;
   "")

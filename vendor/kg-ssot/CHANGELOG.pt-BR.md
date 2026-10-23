@@ -10,6 +10,42 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.20.0] - 2026-10-23
+
+O armazém deixa de julgar de novo o grafo que não mudou, o carimbo do vendor vira regra pública em todas as
+ferramentas, e o `kg_diff` dá nome à árvore de trabalho. Contrato v4.11, sem mudança.
+
+### Added
+
+- **O `kg_diff.py` compara com a árvore de trabalho pelo nome.** `--to WORKTREE` é o mesmo que omitir o `--to`, e
+  `WORKTREE:CAMINHO` lê o arquivo da árvore de trabalho, então `HEAD:x.kg.yaml WORKTREE:x.kg.yaml` revisa uma edição
+  antes do commit (pedido de um adotante; `--to WORKTREE` era revisão inválida). O `WORKTREE:CAMINHO` parte da raiz do
+  repositório, como o `REV:CAMINHO`, e o caminho que sai do repositório é entrada quebrada. No JSON, o `after` passa a
+  ser `WORKTREE`, no lugar do rótulo em português que a árvore de trabalho tinha. Uma branch ou tag chamada `WORKTREE`
+  passa a ser alcançada por `refs/heads/WORKTREE` ou `refs/tags/WORKTREE`.
+
+### Changed
+
+- **O armazém não rejulga mais o grafo que aponta para o gravado e não mudou.** O `kg_store` guarda na memória o
+  veredito de cada grafo julgado (`kg_validate.JudgeCache`), pela chave do texto, dos dois schemas, da língua, do limit
+  e de se cada ponta externa resolve. Com 50 apontadores de 820 KB, a segunda gravação do alvo foi de 41 s para 3,3 s,
+  e gravar o mesmo texto de novo, de 44 s para 0,35 s; a primeira gravação de um processo custa o mesmo. Uma ponta
+  externa quebrada ainda reprova, e um contrato novo julga tudo de novo. O `kg_validate.judge()` aceita o cache no
+  argumento opcional `cache=`.
+- **Uma pasta com o carimbo `.kg-ssot-version` é o vendor, em toda ferramenta que lê um repositório.** Desde a 4.19.1,
+  só o `kg_gate.py` a deixava fora do corpus; o `kg_query.py`, o `kg_vocab.py`, o `kg_migrate.py` e o
+  `kg_diff.py --from` excluíam só o `vendor/*` na raiz, e um vendor em outra pasta trazia os grafos de exemplo dele. O
+  carimbo na raiz do que se lê não conta, em toda ferramenta, inclusive no gate: ler uma pasta que é o vendor lê os
+  grafos dela. A regra agora é pública (`kg_validate.VENDOR_STAMP`, `vendor_dirs`, `in_vendor`, `find_vendor_dirs`)
+  e está no ADOPTING, para as ferramentas de quem adota seguirem (pedido de um adotante cujo resolvedor de trace
+  contou o grafo de exemplo do vendor).
+
+### Fixed
+
+- **Um teste do gate dependia da data.** Cada regressão aceita mora em `accepted/<hash>.json`, e o hash leva a data,
+  então a ordem de leitura mudava de um dia para o outro. O teste agora confere que as regressões se acumulam, não a
+  ordem delas.
+
 ## [4.19.1] - 2026-10-22
 
 O gate deixa o vendor do KG-SSOT fora do corpus do adotante. Contrato v4.11, sem mudança.

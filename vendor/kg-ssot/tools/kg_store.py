@@ -15,6 +15,9 @@ O gate (o que nenhum dos três pula):
     todas as mudanças no lugar, e o registro é um só. É o caminho para regenerar grafos que se citam: um a um, o
     rejulgamento de quem aponta barraria o estado intermediário;
   - só grava com PASS em todos. Nada reprovado é escrito;
+  - o veredito de cada grafo julgado fica num cache do objeto (kg_validate.JudgeCache), pela chave de tudo de que ele
+    depende (texto, schemas, língua, limit e se cada ponta externa resolve): quem aponta e não mudou não é julgado de
+    novo num processo longo, e o resultado é o mesmo que sem cache;
   - o formato vem do nome: o .kg.json é julgado pelo perfil JSON do contrato (kg_validate.as_source), e o .kg.yaml
     pelo perfil YAML. O corpus da ponta externa tem os dois formatos, como o do gate (corpus_index): desde o v4.7, a
     referência externa (<caminho>.kg.yaml#<id> ou <caminho>.kg.json#<id>) aponta para qualquer um deles;
@@ -430,6 +433,8 @@ class DiskStore:
             raise StoreError(_("the root {root} must be a directory, not a symlink").format(root=self.root))
         self.root = self.root.resolve()
         self.schema = schema or kg_validate.CONTRACT_MUST
+        # o julgamento já feito neste processo: o grafo que aponta para o gravado e não mudou não é julgado de novo
+        self._cache = kg_validate.JudgeCache()
         self._check_root(self.root)
 
     def _check_root(self, path):
@@ -785,9 +790,10 @@ class DiskStore:
         try:
             others = [(n, t) for n, t in self._texts() if n not in changes]
             cands = [(n, kg_validate.as_source(n, t)) for n, t in changes.items() if t is not None]
-            corpus = self.corpus_of(others + cands)
-            sources = cands + [(n, t) for n, t in others if kg_validate.external_targets(t) & set(changes)]
-            doc = kg_validate.judge(sources, self.schema, corpus=corpus)
+            corpus = kg_validate.index_texts(others + cands, cache=self._cache)
+            sources = cands + [(n, t) for n, t in others
+                               if {path for path, _ in self._cache.facts(t)[1]} & set(changes)]
+            doc = kg_validate.judge(sources, self.schema, corpus=corpus, cache=self._cache)
         except Exception as exc:  # noqa: BLE001 - qualquer falha do julgamento é "não julgado", nunca PASS
             return None, f"{type(exc).__name__}: {exc}"
         if not _verdict_ok(doc):

@@ -95,6 +95,14 @@ The published tags are listed by `git ls-remote --tags https://github.com/marcio
   If you are on a tag earlier than `contract-v4.1.1`, migrate in two steps, because the old vendor tool does not know
   `--profile`: first the normal update to 4.1.1, then the update with `--profile gate`.
 - **Stamp:** `vendor/kg-ssot/.kg-ssot-version` keeps the tag, the commit, and the sha256 of each file.
+- **The stamp marks the vendor (public rule since 4.20.0):** a folder with `.kg-ssot-version` is the KG-SSOT vendor,
+  wherever it lives, and no file inside it is one of your graphs. The tools that read a repository (`kg_gate.py`,
+  `kg_query.py`, `kg_vocab.py`, `kg_migrate.py`, and `kg_diff.py --from`) leave it out by default, and
+  `--no-default-excludes` brings it back; a stamp at the root of what is read does not count, so reading the vendor
+  folder itself reads its graphs. The store
+  (`kg_store.py`, and the MCP server over it) reads its own area, where no vendor lives, and does not apply the rule.
+  A tool of your own that walks your graphs can follow the same rule with `kg_validate.find_vendor_dirs(root)` and
+  `kg_validate.in_vendor(path, dirs)`, instead of a fixed `vendor/` path.
 - **Commit:** the vendor tool does not commit. In a PR of its own, you commit the whole directory with the stamp.
 
 ## 2. Write the baseline
@@ -326,6 +334,14 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.19.1` to `kg-ssot-v4.20.0`, the contract does not change (still v4.11), and nothing in your graphs
+needs editing. A folder with the `.kg-ssot-version` stamp is now left out by `kg_query.py`, `kg_vocab.py`,
+`kg_migrate.py`, and `kg_diff.py --from` too, not only by the gate; a stamp at the root of what is read no longer counts
+in any tool. If a tool of your own walks your graphs with a fixed `vendor/` path, it can switch to
+`kg_validate.find_vendor_dirs(root)` and `kg_validate.in_vendor(path, dirs)`. A long process that keeps a `kg_store`
+object open (the MCP server, an app) now judges a pointing graph once while it does not change. In `kg_diff --format
+json` without `--to`, `after` is now `WORKTREE`.
 
 From `kg-ssot-v4.19.0` to `kg-ssot-v4.19.1`, the contract does not change (still v4.11). The gate leaves out of its
 corpus, by default, every file in a folder with the vendor stamp `.kg-ssot-version`, wherever the vendor lives. The

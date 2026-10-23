@@ -173,6 +173,17 @@ class Discovery(Base):
         rc, out = self.run_cmd("plan", "--profile", self.profile, "--root", self.root, self.root / "docs" / "quebrado.kg.yaml")
         self.assertEqual(rc, 2, out)  # o grafo dado à mão que não parseia segue sendo entrada quebrada
 
+    def test_vendor_carimbado_fora_de_vendor_fica_de_fora(self):
+        """Pedido do core (2026-10-22): a pasta com o carimbo .kg-ssot-version é o vendor, mesmo fora de vendor/."""
+        self.graph(HEAD + claim("C_A", "src/a.ts:1") + QZ + EDGES)
+        self.graph("nodes: [\n", "lib/kg/spec/x/bad.kg.yaml")
+        (self.root / "lib" / "kg" / ".kg-ssot-version").write_text("{}", encoding="utf-8")
+        self.git("init", "-q")
+        self.git("add", "-A")
+        rows = json.loads(self.run_cmd("plan", "--profile", self.profile, "--root", self.root, "--json")[1])["rows"]
+        self.assertEqual({r["file"] for r in rows}, {"g.kg.yaml"})
+        self.assertEqual(kg_migrate.tracked_graphs(self.root, (), False)[-1], str(self.root / "lib/kg/spec/x/bad.kg.yaml"))
+
     def test_caminho_fora_da_raiz_nao_consulta_o_host(self):
         """N10 da 3ª passada do core: absoluto, ~ ou ../ não pode olhar o disco fora da raiz."""
         m = kg_migrate.Matcher(kg_migrate.load_profile(self.profile), self.root)

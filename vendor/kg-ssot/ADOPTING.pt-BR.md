@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:4f76f5d1ae80a34d -->
+<!-- translation-of: ADOPTING.md sha256:d456479cd89bfb56 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -96,6 +96,14 @@ As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/
   Quem está numa tag anterior à `contract-v4.1.1` migra em dois passos, porque o vendor antigo não conhece
   `--profile`: primeiro o update normal para a 4.1.1, depois o update com `--profile gate`.
 - **Carimbo:** `vendor/kg-ssot/.kg-ssot-version` guarda a tag, o commit e o sha256 de cada arquivo.
+- **O carimbo marca o vendor (regra pública desde a 4.20.0):** uma pasta com `.kg-ssot-version` é o vendor do
+  KG-SSOT, onde quer que ela esteja, e nenhum arquivo dentro dela é grafo seu. As ferramentas que leem um repositório
+  (`kg_gate.py`, `kg_query.py`, `kg_vocab.py`, `kg_migrate.py` e `kg_diff.py --from`) a deixam de fora por padrão, e o
+  `--no-default-excludes` a traz de volta; o carimbo na raiz do que se lê não conta, e ler a própria pasta do vendor
+  lê os grafos dela. O
+  armazém (`kg_store.py`, e o servidor MCP por cima dele) lê a área dele, onde não mora vendor, e não aplica a regra. Uma ferramenta sua que percorre os seus grafos pode seguir a mesma regra com
+  `kg_validate.find_vendor_dirs(raiz)` e `kg_validate.in_vendor(caminho, pastas)`, no lugar de um caminho fixo
+  `vendor/`.
 - **Commit:** o vendor não commita. Num PR próprio, o adotante commita o diretório inteiro com o carimbo.
 
 ## 2. Gravar a linha de base
@@ -325,6 +333,14 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.19.1` para a `kg-ssot-v4.20.0`, o contrato não muda (segue o v4.11), e nada nos seus grafos precisa
+de edição. Uma pasta com o carimbo `.kg-ssot-version` passa a ficar de fora também no `kg_query.py`, no `kg_vocab.py`,
+no `kg_migrate.py` e no `kg_diff.py --from`, não só no gate; o carimbo na raiz do que se lê não conta mais em nenhuma
+ferramenta. Se uma ferramenta sua percorre os seus grafos com um caminho fixo `vendor/`, ela pode passar a usar
+`kg_validate.find_vendor_dirs(raiz)` e `kg_validate.in_vendor(caminho, pastas)`. Um processo longo que mantém um
+objeto do `kg_store` aberto (o servidor MCP, um app) passa a julgar uma vez o grafo que aponta, enquanto ele não muda.
+No `kg_diff --format json` sem `--to`, o `after` passa a ser `WORKTREE`.
 
 Da `kg-ssot-v4.19.0` para a `kg-ssot-v4.19.1`, o contrato não muda (segue o v4.11). O gate deixa fora do corpus,
 por padrão, todo arquivo numa pasta com o carimbo do vendor, `.kg-ssot-version`, onde quer que o vendor esteja. O

@@ -110,7 +110,7 @@ def selected(name, exclude):
     return name.endswith(".kg.yaml") and not any(fnmatch.fnmatchcase(name, g) for g in exclude)
 
 
-VENDOR_STAMP = ".kg-ssot-version"  # o carimbo que o kg_vendor.py grava na raiz do vendor
+VENDOR_STAMP = kg_validate.VENDOR_STAMP  # o carimbo que o kg_vendor.py grava na raiz do vendor
 
 
 def corpus(repo, exclude=DEFAULT_EXCLUDE, skip_vendor=True):
@@ -123,9 +123,8 @@ def corpus(repo, exclude=DEFAULT_EXCLUDE, skip_vendor=True):
         raise Broken(_("{repo} is not a git repository: {err}").format(
             repo=repo, err=out.stderr.decode("utf-8", "replace").strip()[:200]))
     listed = [n for n in out.stdout.decode("utf-8").split("\0") if n]
-    vendors = [n[: -len(VENDOR_STAMP)] for n in listed if n == VENDOR_STAMP or n.endswith("/" + VENDOR_STAMP)]
-    names = sorted(n for n in listed if selected(n, exclude)
-                   and not (skip_vendor and any(n.startswith(v) for v in vendors)))
+    vendors = kg_validate.vendor_dirs(listed)
+    names = sorted(n for n in listed if selected(n, exclude) and not (skip_vendor and kg_validate.in_vendor(n, vendors)))
     items = []
     for n in names:
         path = pathlib.Path(repo) / n

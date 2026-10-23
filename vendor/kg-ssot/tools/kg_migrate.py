@@ -8,7 +8,8 @@ O perfil (spec/kg-migrate-profile.schema.json) declara regras em ordem: a primei
 (propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por
 lista de ids. O universo é fixo: nó com status confirmed ou plane PROD, sem provenance, fora o unverifiable. Sem
 grafos na linha de comando, a ferramenta lê os .kg.yaml rastreados de --root (default: o diretório atual), fora os
-padrões do kg_gate.py (*/fixtures/*, docs/materials/*), o vendor/* e os globs de --exclude, com a semântica do gate
+padrões do kg_gate.py (*/fixtures/*, docs/materials/*), o vendor/*, toda pasta com o carimbo .kg-ssot-version e os
+globs de --exclude, com a semântica do gate
 (* atravessa /); o grafo dessa lista que não parseia vira linha para quem revisa. O nó cujo verified_scope já é o do
 perfil sai como same, e o apply não o toca.
 
@@ -740,17 +741,20 @@ DEFAULT_EXCLUDE = ["vendor/*", "*/fixtures/*", "docs/materials/*"]  # os do kg_g
 def tracked_graphs(root, exclude=(), defaults=True):
     """Os .kg.yaml rastreados pelo git, fora os que casam algum glob, com a semântica do kg_gate.py: fnmatch sobre o
     caminho relativo, em que * atravessa /. Os padrões são os do gate (as fixtures são quebradas de propósito) e o
-    vendor/*. O dialeto do perfil (**/ casa zero pastas) também vale, como antes da 4.13.1."""
+    vendor/*, e, com defaults, toda pasta com o carimbo do vendor (kg_validate.vendor_dirs), onde quer que ela esteja. O
+    dialeto do perfil (**/ casa zero pastas) também vale, como antes da 4.13.1."""
     r = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "*.kg.yaml"], capture_output=True)
     if r.returncode != 0:
         raise Broken(_("{root} is not a git repository, and no graph was given").format(root=root))
     globs = (DEFAULT_EXCLUDE if defaults else []) + list(exclude)
     globs = [g[2:] if g.startswith("./") else g for g in globs]
     names = r.stdout.decode("utf-8", "surrogateescape").split("\0")
+    vendors = kg_validate.find_vendor_dirs(root) if defaults else ()
     # a união: o fnmatch do gate (* atravessa /) e o dialeto de antes (**/ casa zero pastas), para quem já excluía
     # com ** não ver o apply gravar no que antes ficava de fora
     return [str(pathlib.Path(root) / n) for n in names
-            if n and not any(fnmatch.fnmatchcase(n, g) or glob_match(n, g) for g in globs)]
+            if n and not kg_validate.in_vendor(n, vendors)
+            and not any(fnmatch.fnmatchcase(n, g) or glob_match(n, g) for g in globs)]
 
 
 def broken_input(args, exc):
@@ -781,7 +785,7 @@ def main(argv=None):
         "node's action (propose provenance, demote to unverifiable, or only list it for the reviewer), and the scopes block sets\n"
         "verified_scope by a list of ids. The universe is fixed: nodes with status confirmed or plane PROD, without provenance,\n"
         "except unverifiable ones. With no graphs on the command line, the tool reads the tracked .kg.yaml files under --root\n"
-        "(default: the current directory), except the kg_gate.py defaults (*/fixtures/*, docs/materials/*), vendor/* and the\n"
+        "(default: the current directory), except the kg_gate.py defaults (*/fixtures/*, docs/materials/*), vendor/*, any folder with the .kg-ssot-version stamp and the\n"
         "--exclude globs, with the gate's semantics (* crosses /); a graph in that list that does not parse becomes a row for\n"
         "the reviewer. A node whose verified_scope already matches the profile comes out as same, and apply leaves it alone.\n"
         "\n"

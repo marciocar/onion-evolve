@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.19.1",
+  "release": "kg-ssot-v4.20.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -330,6 +330,14 @@ The gate judges more than the candidate. The external end of each `external_edge
 store itself, with the candidate already in place. Every graph that points to the written name is judged again,
 because replacing or deleting a graph can leave another graph's external edge without an end. The store writes only
 when all of them PASS.
+
+Since 4.20.0, a store object keeps, in memory, the verdict of each graph it has judged, keyed by everything the verdict
+depends on: the text and its format, the two schemas, `limit`, the language of the messages, whether there is a
+corpus, and, for each external end, whether the cited id exists. A graph that points to the written name and has not
+changed is not judged again while its ends still resolve, so a long process (the MCP server, an app that keeps the
+store open) pays the cost once. Writing the same text again does not re-judge it against the contract either; the
+external gate (`--gate-cmd`), if there is one, still runs on every write. A new process starts with an empty cache,
+and the first write pays the full cost.
 
 The corpus is the same one the repository gate would see. In `GitStore`, that means only what is tracked: a
 `.kg.yaml` file on disk with no commit does not count, not in the list, not in the judgment, and not in the lock (for
@@ -732,7 +740,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 
 | Option | What it does |
 |---|---|
-| `--root DIR` or files | The corpus. With `--root`, the vendor and the fixtures stay out by default (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*`); `--exclude GLOB` (repeatable) removes more paths, and `--no-default-excludes` reads everything. A file you name one by one is never excluded |
+| `--root DIR` or files | The corpus. With `--root`, the vendor and the fixtures stay out by default (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*`, and, since 4.20.0, any folder with the `.kg-ssot-version` stamp); `--exclude GLOB` (repeatable) removes more paths, and `--no-default-excludes` reads everything. A file you name one by one is never excluded |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filters, all combined with AND |
 | `--text WORDS` | Words that the label contains, all of them, case-insensitive; `--in-narrative` also searches the narrative |
 | `--open` | The open queue (status `open`) |
@@ -782,12 +790,17 @@ A field that leaves one path and enters another with the same value, in a node, 
 rename (`x_location → x_storage (renamed)`) when the value is not trivial and is unique on both sides. In the JSON,
 both entries stay, each with the value at its own path, linked by `renamed_to` and `renamed_from`; the human text and
 the per-field summary show a single line. With `--from` and no paths, the vendor and the fixtures stay out (also a
-`fixtures/` folder at the root), as in `kg_query`: a vendor update changes the suite fixtures by the hundreds.
+`fixtures/` folder at the root, and, since 4.20.0, any folder with the `.kg-ssot-version` stamp on either side), as in
+`kg_query`: a vendor update changes the suite fixtures by the hundreds.
 `--exclude` and `--no-default-excludes` work the same way. The meta comes out together with the other root keys,
 values are compared in the contract's JSON form, a renamed file comes out as a removal plus an addition, and without
-`--to` the new graphs not yet added to git come in too. A side that cannot be read (not UTF-8, or does not parse)
-shows up in `unreadable` and counts as a difference; a revision that starts with `-` is broken input. In an argument,
-a path that exists on disk wins over a `REV:PATH` read.
+`--to` (or with `--to WORKTREE`, since 4.20.0) the working tree is the after side, and the new graphs not yet added to
+git come in too. `WORKTREE:PATH` reads the working-tree file, from the repository root like `REV:PATH` and never
+outside it (git's `./` and `../`, relative to the current directory, do not apply), to review an edit before the
+commit
+(`HEAD:docs/x.kg.yaml WORKTREE:docs/x.kg.yaml`); a branch named `WORKTREE` is read as `refs/heads/WORKTREE`. A
+side that cannot be read (not UTF-8, or does not parse) shows up in `unreadable` and counts as a difference; a
+revision that starts with `-` is broken input. In an argument, a path that exists on disk wins over a `REV:PATH` read.
 
 `--ignore FIELD` (repeatable) removes a field from the comparison, together with everything below it (`provenance`
 removes all three; in the meta, `meta.date`): a `verified_at` that a generator restamps on every run hides the signal,
@@ -914,7 +927,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile kg-migrate.prof
   announce, stays as it was. The file's line ending is kept (CRLF stays CRLF), and a file with mixed line endings is
   refused. Running it again changes nothing.
 - **Without a list of graphs, the tool reads the `.kg.yaml` files from `git ls-files`.** It leaves out the
-  `kg_gate.py` patterns (`*/fixtures/*` and `docs/materials/*`), `vendor/*`, and the `--exclude` globs, with the
+  `kg_gate.py` patterns (`*/fixtures/*` and `docs/materials/*`), `vendor/*`, any folder with the `.kg-ssot-version`
+  stamp (since 4.20.0), and the `--exclude` globs, with the
   gate's semantics: `fnmatch` on the relative path, where `*` crosses `/`; the profile dialect's `**/`, which matches
   zero folders, also works. `--no-default-excludes` removes the patterns. Note: in the profile's `trace_path_glob`,
   `*` does not cross `/`. A listed graph that does not parse becomes a review row and does not abort the run.

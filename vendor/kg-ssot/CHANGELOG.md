@@ -10,6 +10,42 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.20.0] - 2026-10-23
+
+The store stops re-judging graphs that did not change, the vendor stamp becomes a public rule in every tool, and
+`kg_diff` names the working tree. Contract v4.11, unchanged.
+
+### Added
+
+- **`kg_diff.py` compares with the working tree by name.** `--to WORKTREE` is the same as leaving `--to` out, and
+  `WORKTREE:PATH` reads the working-tree file, so `HEAD:x.kg.yaml WORKTREE:x.kg.yaml` reviews an edit before the commit
+  (requested by an adopter; `--to WORKTREE` was a bad revision). `WORKTREE:PATH` starts from the repository root, like
+  `REV:PATH`, and a path that leaves the repository is broken input. In the JSON, `after` is now `WORKTREE` instead of
+  the Portuguese label the working tree had. A branch or tag named `WORKTREE` is now reached as `refs/heads/WORKTREE` or
+  `refs/tags/WORKTREE`.
+
+### Changed
+
+- **The store no longer re-judges a graph that points to the written one and has not changed.** `kg_store` keeps the
+  verdict of each judged graph in memory (`kg_validate.JudgeCache`), keyed by the text, both schemas, the language,
+  the limit, and whether each external end resolves. With 50 pointing graphs of 820 KB, the second write of the target
+  went from 41 s to 3.3 s, and writing the same text again from 44 s to 0.35 s; the first write in a process costs the
+  same. A broken external end still fails, and a new contract judges everything again. `kg_validate.judge()` takes the
+  cache as an optional `cache=` argument.
+- **A folder with the `.kg-ssot-version` stamp is the vendor, in every tool that reads a repository.** Since 4.19.1
+  only `kg_gate.py` left it out of the corpus; `kg_query.py`, `kg_vocab.py`, `kg_migrate.py`, and `kg_diff.py --from`
+  excluded only `vendor/*` at the root, so a vendor elsewhere brought its example graphs in. A stamp at the root of
+  what is read does not count, in every tool, the gate included: reading a folder that is the vendor reads its graphs.
+  The rule is now public (`kg_validate.VENDOR_STAMP`, `vendor_dirs`, `in_vendor`, `find_vendor_dirs`) and documented
+  in ADOPTING, for an adopter's own tools to follow
+  (requested by an adopter whose trace resolver counted the vendor's example graph).
+
+### Fixed
+
+- **A gate test depended on the date.** Each accepted regression lives in `accepted/<hash>.json`, and the hash
+  includes the date, so the reading order changed from one day to the next. The test now checks that the regressions
+  accumulate, not their order.
+
 ## [4.19.1] - 2026-10-22
 
 The gate leaves the KG-SSOT vendor out of the adopter's corpus. Contract v4.11, unchanged.
