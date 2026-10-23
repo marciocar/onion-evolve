@@ -1,6 +1,6 @@
 {
-  "version": "4.21.0",
-  "tag": "kg-ssot-v4.21.0",
+  "version": "4.21.1",
+  "tag": "kg-ssot-v4.21.1",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"

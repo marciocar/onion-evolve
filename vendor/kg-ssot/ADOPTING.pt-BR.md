@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:5298330e0f7e0b33 -->
+<!-- translation-of: ADOPTING.md sha256:d6cc72c59510772e -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -333,6 +333,12 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.21.0` para a `kg-ssot-v4.21.1`, o contrato não muda (segue o v4.12), e o gate não pede `--update`. Só
+o `kg_criterion.py check` muda: o que ele não consegue conferir agora sai como `integrity.criterion-malformed`, com rc 1,
+em vez de deixar o check em silêncio. O caso típico é um `sha256` só de dígitos sem aspas, que o YAML lê como número. Se
+você roda o check no CI e ele falha depois da atualização, ponha o `sha256` entre aspas e dê a cada versão exatamente um
+de `ref` e `text`.
 
 Da `kg-ssot-v4.20.0` para a `kg-ssot-v4.21.0`, o contrato vai ao v4.12, e só o nível SHOULD muda: nada que passava
 reprova, e o gate registra a identidade nova do contrato sem pedir `--update` enquanto nenhum veredito muda. O que você

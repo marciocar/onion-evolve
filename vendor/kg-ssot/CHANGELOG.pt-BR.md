@@ -10,6 +10,19 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.21.1] - 2026-10-23
+
+O `kg_criterion.py check` acusa o que não consegue conferir em vez de pulá-lo. Contrato v4.12, sem mudança.
+
+### Corrigido
+
+- **O `kg_criterion.py check` não pula mais o critério que não consegue conferir.** Um `sha256` só de dígitos sem
+  aspas vira número no YAML, e a versão saía do check com rc 0 e nenhum achado. Agora a versão cujo `sha256` não é
+  texto, ou que não tem exatamente um de `ref` e `text` em texto, o `x_measured_under` que não é um mapa com uma lista
+  de citações em mapa, e a citação de outro grafo cujo `sha256` não é texto (mesmo quando esse grafo não foi dado)
+  saem como `integrity.criterion-malformed`, com rc 1. O leitor já alertava o tipo (`form.type`); só o check passava em
+  silêncio. Achado pela bancada de um adotante.
+
 ## [4.21.0] - 2026-10-23
 
 A régua fixada antes do dado entra no contrato, e as chaves `x_` próprias de um adotante vão para os perfis canônicos.

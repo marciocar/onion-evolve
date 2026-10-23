@@ -2257,6 +2257,14 @@ msgstr "O critério citado não é um nó com x_criterion no grafo que ele nomei
 msgid "The dates cannot tell whether the result was measured before or after its criterion version was registered: the same day, or a day apart with a time zone that a date alone does not give."
 msgstr "As datas não dizem se o resultado foi medido antes ou depois do registro da versão do critério: o mesmo dia, ou um dia de distância com um fuso que a data sozinha não dá."
 
+#: tools/kg_validate.py
+msgid "Quote the sha256 (a hash of digits alone reads as a number) and give exactly one of ref and text, in text."
+msgstr "Ponha o sha256 entre aspas (um hash só de dígitos vira número) e dê exatamente um de ref e text, em texto."
+
+#: tools/kg_validate.py
+msgid "The criterion version, or a result's citation of it, cannot be checked: the version is not a map, its sha256 is not text, or it lacks exactly one of ref and text in text; or x_measured_under is not a map with a list of citation maps, or a citation of another graph has a sha256 that is not text."
+msgstr "A versão do critério, ou a citação dela num resultado, não se confere: a versão não é um mapa, o sha256 dela não é texto, ou falta exatamente um de ref e text em texto; ou o x_measured_under não é um mapa com uma lista de citações em mapa, ou uma citação de outro grafo tem sha256 que não é texto."
+
 #: tools/kg_vendor.py
 msgid "--source {source} is not a git repository"
 msgstr "--source {source} não é um repositório git"
@@ -2723,3 +2731,35 @@ msgstr "{ref}: o caminho está vazio"
 #: tools/kg_criterion.py
 msgid "· {n} citation(s) of a graph that was not given left unchecked: give it too, or use --root"
 msgstr "· {n} citação(ões) de um grafo que não foi dado ficaram sem conferir: dê ele também, ou use o --root"
+
+#: tools/kg_criterion.py
+msgid "exactly one of ref and text is needed"
+msgstr "é preciso exatamente um de ref e text"
+
+#: tools/kg_criterion.py
+msgid "sha256 is not text (quote it: a hash of digits alone reads as a number)"
+msgstr "o sha256 não é texto (ponha entre aspas: um hash só de dígitos vira número)"
+
+#: tools/kg_criterion.py
+msgid "x_criterion is not a map"
+msgstr "o x_criterion não é um mapa"
+
+#: tools/kg_criterion.py
+msgid "{key} is not text"
+msgstr "{key} não é texto"
+
+#: tools/kg_criterion.py
+msgid "{ref}: the cited sha256 is not text"
+msgstr "{ref}: o sha256 citado não é texto"
+
+#: tools/kg_criterion.py
+msgid "an item of criteria is not a map: {item}"
+msgstr "um item de criteria não é um mapa: {item}"
+
+#: tools/kg_criterion.py
+msgid "x_measured_under is not a map with a criteria list"
+msgstr "o x_measured_under não é um mapa com uma lista criteria"
+
+#: tools/kg_criterion.py
+msgid "an item of criteria has no criterion in text: {item}"
+msgstr "um item de criteria não tem criterion em texto: {item}"

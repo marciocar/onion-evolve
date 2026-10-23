@@ -46,6 +46,7 @@
             "enum": [
               "integrity.criterion-digest",
               "integrity.criterion-ref-unreadable",
+              "integrity.criterion-malformed",
               "integrity.criterion-unknown",
               "integrity.criterion-sha-mismatch",
               "integrity.measured-post-hoc",

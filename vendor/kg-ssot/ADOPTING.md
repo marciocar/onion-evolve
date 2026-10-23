@@ -335,6 +335,12 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.21.0` to `kg-ssot-v4.21.1`, the contract does not change (still v4.12), and the gate asks for no
+`--update`. Only `kg_criterion.py check` changes: what it cannot check now comes out as `integrity.criterion-malformed`,
+with rc 1, instead of leaving the check in silence. The typical case is a `sha256` of digits alone without quotes,
+which YAML reads as a number. If you run the check in CI and it fails after the update, quote the `sha256` and give
+each version exactly one of `ref` and `text`.
+
 From `kg-ssot-v4.20.0` to `kg-ssot-v4.21.0`, the contract goes to v4.12, and only the SHOULD level changes: nothing that
 passed fails, and the gate notes the new contract identity without asking for `--update` while no verdict changes.
 What you may see and do:

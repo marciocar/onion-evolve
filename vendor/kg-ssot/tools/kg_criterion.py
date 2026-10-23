@@ -9,7 +9,10 @@ o sha256 citado que não é o da versão e a medição post-hoc. Esta ferramenta
   check    confere cada x_criterion dos grafos (integrity.criterion-digest quando o sha256 não bate com o texto ou o
            arquivo; integrity.criterion-ref-unreadable quando o ref não se lê) e cada citação <caminho>#<id> de um
            x_measured_under (integrity.criterion-unknown, integrity.criterion-sha-mismatch,
-           integrity.measured-post-hoc e integrity.measured-order-unknown, pela mesma regra do leitor).
+           integrity.measured-post-hoc e integrity.measured-order-unknown, pela mesma regra do leitor). A versão, o
+           x_measured_under ou a citação que ele não consegue conferir sai como integrity.criterion-malformed, nunca
+           em silêncio (desde a 4.21.1). Fica com o leitor, que a alerta (form.type), só a citação local com sha256
+           que não é texto, e a lista criteria vazia (form.range), em que não há citação a perder.
 
 A forma do sha256:
 - text: o texto em UTF-8, com CRLF e CR sozinho trocados por LF e sem o espaço (U+0020) no fim de cada linha; o TAB
@@ -251,17 +254,43 @@ def ref_digest(root, ref):
     return hashlib.sha256(jcs(item).encode("utf-8")).hexdigest()
 
 
+def _cut(value, limit=80):
+    text = json.dumps(kg_query._plain(value), ensure_ascii=False, default=str)
+    return text if len(text) <= limit else text[:limit - 1] + "…"
+
+
+def _malformed(crit, source):
+    """Por que a versão do critério não se confere, ou None quando se confere."""
+    if not isinstance(crit, dict):
+        return _("x_criterion is not a map")
+    if not isinstance(crit.get("sha256"), str):
+        return _("sha256 is not text (quote it: a hash of digits alone reads as a number)")
+    if len(source) != 1:
+        return _("exactly one of ref and text is needed")
+    if not isinstance(crit[source[0]], str):
+        return _("{key} is not text").format(key=source[0])
+    return None
+
+
 def check(corpus, root):
     """Os achados do corpus: [{code, file, id, detail}], quantas versões e citações externas foram conferidas, e quantas
     citações apontam para um grafo fora do que foi lido (com os arquivos dados um a um), que ficam sem conferir.
 
-    Só a versão com exatamente um de ref e text, em texto, e com sha256 em texto é conferida; a outra o leitor já
-    alerta (form.exclusive, form.required, form.type)."""
+    Só a versão com exatamente um de ref e text, em texto, e com sha256 em texto é conferida. A outra sai como
+    integrity.criterion-malformed, e não em silêncio: um sha256 só de dígitos sem aspas vira número no YAML, e o
+    critério sumiria do check com rc 0. O mesmo vale para o x_measured_under que não é mapa ou cujo criteria não é
+    lista, para o item de criteria que não é mapa, e para a citação de outro grafo com sha256 que não é texto, mesmo
+    quando o grafo citado não foi lido (o sha256 se julga pelo próprio item). A citação local com sha256 que não é
+    texto segue do leitor, que a alerta (form.type)."""
     findings, n_criteria, n_external, n_unchecked = [], 0, 0, 0
     for key in corpus.order:
         node = corpus.nodes[key]
         crit = node.get("x_criterion")
         source = [k for k in ("ref", "text") if k in crit] if isinstance(crit, dict) else []
+        if "x_criterion" in node:
+            why = _malformed(crit, source)
+            if why:
+                findings.append({"code": "integrity.criterion-malformed", "file": key[0], "id": key[1], "detail": why})
         if isinstance(crit, dict) and isinstance(crit.get("sha256"), str) and len(source) == 1 \
                 and isinstance(crit[source[0]], str):
             want, n_criteria = None, n_criteria + 1
@@ -274,13 +303,29 @@ def check(corpus, root):
                 findings.append({"code": "integrity.criterion-digest", "file": key[0], "id": key[1],
                                  "detail": _("declared {declared}, computed {computed}").format(
                                      declared=crit["sha256"], computed=want)})
-        under = node.get("x_measured_under")
+        if "x_measured_under" not in node:
+            continue
+        under = node["x_measured_under"]
         if not isinstance(under, dict) or not isinstance(under.get("criteria"), list):
+            findings.append({"code": "integrity.criterion-malformed", "file": key[0], "id": key[1],
+                             "detail": _("x_measured_under is not a map with a criteria list")})
             continue
         for item in under["criteria"]:
-            ref = item.get("criterion") if isinstance(item, dict) else None
+            if not isinstance(item, dict):  # uma citação escrita como texto some do check se ninguém a acusa
+                findings.append({"code": "integrity.criterion-malformed", "file": key[0], "id": key[1],
+                                 "detail": _("an item of criteria is not a map: {item}").format(item=_cut(item))})
+                continue
+            ref = item.get("criterion")
+            if not isinstance(ref, str) or not ref:  # sem o criterion não se sabe nem se a citação é local
+                findings.append({"code": "integrity.criterion-malformed", "file": key[0], "id": key[1],
+                                 "detail": _("an item of criteria has no criterion in text: {item}").format(
+                                     item=_cut(item))})
+                continue
             if not kg_validate.is_external(ref):
                 continue  # a citação local é do leitor (kg_validate)
+            if not isinstance(item.get("sha256"), str):  # antes do n_unchecked: o sha256 se julga pelo próprio item
+                findings.append({"code": "integrity.criterion-malformed", "file": key[0], "id": key[1],
+                                 "detail": _("{ref}: the cited sha256 is not text").format(ref=ref)})
             target_key = tuple(ref.rsplit("#", 1))
             if corpus.root is None and target_key[0] not in corpus.files:
                 n_unchecked += 1  # com os arquivos dados um a um, o grafo citado não foi lido: não há como conferir
