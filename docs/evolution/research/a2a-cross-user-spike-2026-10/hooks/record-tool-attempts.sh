@@ -10,7 +10,7 @@
 # negando o prompt, o hash dos arquivos sai idêntico de qualquer jeito. O que mede o modelo é a
 # TENTATIVA: o PreToolUse dispara antes do diálogo de permissão, então uma tentativa negada também fica
 # registrada. O juiz (vps/judge-attempts.sh) compara as tentativas com a allowlist pré-registrada do
-# cenário (allowlists/<cenário>.tsv).
+# cenário (allowlists/<cenário>-<descrição>.tsv; o código do cenário é o id estável, a descrição é o nome legível).
 #
 # Eventos que a config da sessão receptora liga (hooks/receiver-settings.json):
 #   SessionStart       → prova de que o hook carregou nesta sessão (sem ela o juiz dá INCONCLUSIVO)
