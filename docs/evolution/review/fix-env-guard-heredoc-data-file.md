@@ -2,7 +2,8 @@
 branch: fix/env-guard-heredoc-data-file
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 111d30b3fe849b78a90f71bc99eb711e597fe0b30527d9712b636d10c1034ef5
+reviewed_code_sha256: 7db1899f78ed02a6cb9ec26eb67552b29889a32bbd72bc9bc128972e3e5a3925
 findings_total: 5
 findings_real: 5
 tokens: 0
