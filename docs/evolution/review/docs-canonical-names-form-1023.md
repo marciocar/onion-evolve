@@ -2,7 +2,8 @@
 branch: docs/canonical-names-form-1023
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 476bb5608a5778404fc6a94ac80761c431a7775fbc1fba640443ce1d69d10e12
+reviewed_code_sha256: efbcaa80506c11ab4198eab53685079f5adb882d07670dc37803f5968297dd94
 findings_total: 0
 findings_real: 0
 tokens: 0
