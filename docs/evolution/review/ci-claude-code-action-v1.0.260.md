@@ -2,7 +2,8 @@
 branch: ci/claude-code-action-v1.0.260
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fb7c44929e1c12de73436f89b2434619ee281f46853c230a9d592cc78c6da285
+reviewed_code_sha256: 66a51eb77cc1fdb2db848150cf105b39633e5d6a75f896bc55a410291098c382
 findings_total: 1
 findings_real: 1
 tokens: 0
