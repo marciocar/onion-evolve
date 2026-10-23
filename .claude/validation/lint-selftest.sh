@@ -12178,7 +12178,7 @@ C = {
  'data-then-pipe': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\ncat x.md | bash", SEM),
  'py-env-prefix': (2, "F=.env python3 -I - <<" + Q + "P" + Q + "\nimport os;print(open(os.environ[" + Q + "F" + Q + "]).read())\nP", SEM),
  'residue-noext':(2, "SHA=$(git diff | sha256sum); cat > r <<" + Q + "E" + Q + "\n- **x:** .env\nE", SEM),
- # A1/A5 (2026-10-23, passada adversarial do adotante onion-curation): programa por arquivo, cópia por
+ # A1/A5 (2026-10-23, passada adversarial de um adotante de campo): programa por arquivo, cópia por
  # redirecionamento para nome executável, e o helper aceito só pelo caminho canônico
  'data-awk-f': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\nawk -f x.md", SEM),
  'data-make-f': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\nmake -f x.md", SEM),

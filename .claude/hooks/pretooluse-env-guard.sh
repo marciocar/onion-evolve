@@ -754,7 +754,7 @@ def judge_heredocs(docs, depth):
 # separadas o vetor já existia: a ferramenta Write grava qualquer script — é a fronteira declarada no topo.
 RENAMERS = {'mv', 'cp', 'ln', 'install', 'rename', 'chmod'}
 CODE_RUNNERS = SHELLS | INTERP | {'eval', 'source', '.', 'exec'}
-# A1 (2026-10-23, passada adversarial do adotante onion-curation, provada com segredo falso): o arquivo de dados
+# A1 (2026-10-23, passada adversarial de um adotante de campo, provada com segredo falso): o arquivo de dados
 # também vira programa por quem lê um ARQUIVO DE PROGRAMA (`awk -f r.md`, `make -f r.md`, `sed -f`, `m4`, que
 # tem syscmd) e por CÓPIA via redirecionamento para um nome não-dados (`cat r.md > r.sh; bash r.sh`,
 # `tee r.sh < r.md`). Nesta linha (heredoc de dados citando o arquivo de segredos), qualquer menção ao arquivo
