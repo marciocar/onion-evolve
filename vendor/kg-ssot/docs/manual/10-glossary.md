@@ -8,7 +8,7 @@
 |---|---|
 | **Adopter** | A repository that brings in the contract by tag and runs the gate in CI |
 | **Baseline** | The `.kg-ssot/gate/` folder with the debt the gate compares against: the contract identity and one record per graph (through 4.15.1, the single file `.kg-ssot/gate.json`) |
-| **Canonical profile** | The shape the SHOULD gives to an `x_` key that adopters repeat (`x_term`, `x_mirror`, `x_severity`...), since v4.11. It only judges a key that is present, and only warns |
+| **Canonical profile** | The shape the SHOULD gives to an `x_` key that adopters repeat (`x_term`, `x_mirror`, `x_severity`...), since v4.11; `x_criterion` and `x_measured_under` since v4.12. It only judges a key that is present, and only warns |
 | **Class (of `method`)** | `medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived), or `testemunho` (testimony) |
 | **Code** | The stable identifier of a violation, such as `form.required.node.label` |
 | **Conformance suite** | The cases in `spec/conformance/` that every reader must pass |
@@ -22,6 +22,7 @@
 | **Node** | A typed claim in the graph |
 | **Orphan** | A node with no edges. It fails |
 | **Plane** | `DEV` or `PROD` |
+| **Pre-registered criterion** | A yardstick fixed before the data, one node per version (`x_criterion`, with its `sha256`); a result cites the version it was measured under (`x_measured_under`), and a change after seeing the data is a dated amendment, since v4.12 |
 | **Provenance** | The `provenance` object (`source`, `locator`, `method`): where the claim came from |
 | **Ramp** | Two senses: (1) in the contract, a warning in one version about what will fail in the next; (2) in adoption, moving up a major version by recording what started to fail as debt, and paying it down over time |
 | **Ratchet** | A check that only lets the measure improve or stay the same. The gate is the per-graph ratchet |

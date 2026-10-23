@@ -48,6 +48,7 @@ Uso:
 import argparse
 import bisect
 import calendar
+import ast
 import collections
 import datetime
 import functools
@@ -89,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.11"
+CONTRACT_VERSION = "4.12"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -683,6 +684,21 @@ def inner_names(path):
     return [p for p in rest if not isinstance(p, int)]
 
 
+_REQUIRED_MESSAGE = re.compile(r"^('(?:[^'\\]|\\.)*'|\"(?:[^\"\\]|\\.)*\") is a required property$", re.S)
+
+
+def _required_name(message):
+    """O campo de um erro required do jsonschema, tirado da mensagem (o repr do nome); None quando ela não tem a forma."""
+    m = _REQUIRED_MESSAGE.match(message)
+    if not m:
+        return None
+    try:
+        name = ast.literal_eval(m.group(1))
+    except (ValueError, SyntaxError):
+        return None
+    return name if isinstance(name, str) else None
+
+
 def form_codes(error):
     """Erro do jsonschema -> códigos da suíte de conformidade: form.<tipo>.<escopo>.<campo>.
 
@@ -702,10 +718,16 @@ def form_codes(error):
     kind = FORM_TYPE.get(error.validator, error.validator)
     if error.validator == "not" and isinstance(error.validator_value, dict) and "pattern" in error.validator_value:
         kind = "pattern"  # o v4 diz "não pode casar com placeholder" por not+pattern, sem lookahead (portável a RE2)
+    if error.validator == "not" and isinstance(error.validator_value, dict) and "required" in error.validator_value:
+        kind = "exclusive"  # v4.12: campos que se excluem (ref e text no x_criterion), por not+required
     if error.validator in ("additionalProperties", "required"):
         # O erro é do OBJETO (o topo, o meta, um nó, uma aresta ou um objeto dentro deles).
         if error.validator == "required":
-            return [f"form.{kind}.{scope}.{'.'.join(prefix + [p])}" for p in error.validator_value if p not in error.instance]
+            # o jsonschema dá um erro por campo ausente, com o nome só na mensagem ('x' is a required property): listar
+            # todos os ausentes em cada erro contava N vezes cada um, num objeto com N campos faltando
+            missing = [p for p in error.validator_value if p not in error.instance]
+            named = _required_name(error.message)
+            return [f"form.{kind}.{scope}.{'.'.join(prefix + [p])}" for p in ([named] if named in missing else missing)]
         extra = sorted(set(error.instance) - set(error.schema.get("properties", {})))
         return [f"form.{kind}.{scope}.{'.'.join(prefix + [k])}" for k in extra]
     # O erro é de um VALOR. Um item de lista que não é mapa (nodes: [a]) vira o campo `item`.
@@ -1120,6 +1142,7 @@ def coherence_located(doc, corpus=None):
       done já está respondida): o grafo afirma e refuta a mesma coisa. É a contradição do radar, como aviso no v4.4.
       Desde o v4.5, com o corpus (corpus_index), conta também a REFUTES que chega de outro grafo pelas external_edges
       (from externo, to local); sem ele, a ponta externa não foi conferida e a aresta não conta.
+    - desde o v4.12, os avisos do critério pré-registrado entre nós do mesmo grafo (criterion_located).
     Um campo de tipo errado (from ou id em lista ou mapa) já reprova no MUST: aqui ele é ignorado, nunca quebra.
     """
     out = []
@@ -1154,6 +1177,140 @@ def coherence_located(doc, corpus=None):
         if (isinstance(n.get("id"), str) and n["id"] in refuted and status not in ("superseded", "refuted")
                 and not (status == "done" and n.get("node_type") == "question")):
             out.append(("integrity.refutes-unreconciled", place))
+    return out + criterion_located(doc)
+
+
+# A data ou a data-hora RFC 3339 dos perfis do critério (v4.12), a mesma regex do schema SHOULD.
+STAMP = re.compile(r"([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])"
+                   r"(?:[Tt]([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(?:\.([0-9]+))?([Zz]|([+-])([01][0-9]|2[0-3]):([0-5][0-9])))?")
+
+
+def _days(y, m, d):
+    """Os dias desde 1970-01-01 no calendário gregoriano proléptico (days_from_civil), só com inteiros."""
+    y -= m <= 2
+    era = (y if y >= 0 else y - 399) // 400
+    yoe = y - era * 400
+    doy = (153 * (m + (-3 if m > 2 else 9)) + 2) // 5 + d - 1
+    return era * 146097 + yoe * 365 + yoe // 4 - yoe // 100 + doy - 719468
+
+
+def _stamp(value):
+    """O match de STAMP de uma data ou data-hora com o dia que existe no calendário; None fora da forma ou no dia que
+    não existe (2026-02-30), que não é comparado."""
+    mt = STAMP.fullmatch(value) if isinstance(value, str) else None
+    if not mt:
+        return None
+    y, m, d = int(mt.group(1)), int(mt.group(2)), int(mt.group(3))
+    leap = y % 4 == 0 and (y % 100 != 0 or y % 400 == 0)
+    return mt if d <= (31, 29 if leap else 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)[m - 1] else None
+
+
+def _instant(mt):
+    """(segundos desde 1970 em UTC, fração em dígitos sem zero à direita) de uma data-hora de STAMP."""
+    y, mo, d, h, mi, sec = (int(mt.group(i)) for i in range(1, 7))
+    off = 0 if mt.group(9) is None else (1 if mt.group(9) == "+" else -1) * (int(mt.group(10)) * 60 + int(mt.group(11)))
+    return _days(y, mo, d) * 86400 + h * 3600 + mi * 60 + sec - off * 60, (mt.group(7) or "").rstrip("0")
+
+
+def measured_order(measured, registered):
+    """"post-hoc", "unknown" ou None entre o measured_at de um resultado e o registered_at da versão que ele cita.
+
+    - As duas com hora: o instante em UTC (a fração como dígitos, sem float); antes do registro é post-hoc.
+    - As duas só data: o dia escrito; antes é post-hoc, o mesmo dia é indecidível.
+    - Uma só data: o fuso dela é desconhecido (até ±14 h), então a data-hora vale pelo dia em UTC e a diferença de até
+      um dia é indecidível; post-hoc só a dois dias ou mais.
+    Fora da forma, ou num dia que não existe, nada é comparado (None)."""
+    mm, mr = _stamp(measured), _stamp(registered)
+    if not mm or not mr:
+        return None
+    if mm.group(4) is not None and mr.group(4) is not None:
+        im, ir = _instant(mm), _instant(mr)
+        if im[0] != ir[0]:
+            return "post-hoc" if im[0] < ir[0] else None
+        fm, fr = im[1].ljust(len(ir[1]), "0"), ir[1].ljust(len(im[1]), "0")
+        return "post-hoc" if fm < fr else None
+
+    def day(mt):
+        return _instant(mt)[0] // 86400 if mt.group(4) is not None else _days(*(int(mt.group(i)) for i in (1, 2, 3)))
+    gap = day(mm) - day(mr)
+    if mm.group(4) is None and mr.group(4) is None:
+        return "post-hoc" if gap < 0 else "unknown" if gap == 0 else None
+    return "post-hoc" if gap <= -2 else "unknown" if gap <= 1 else None
+
+
+def criterion_located(doc):
+    """Os avisos do critério pré-registrado (v4.12), só entre nós do mesmo grafo: o leitor não calcula hash nem lê o
+    corpus (a citação <caminho>#<id> e o sha256 contra o texto são do kg_criterion.py).
+
+    - integrity.criterion-unknown: o criterion de um x_measured_under, ou o amends de um x_criterion, não é o id de um
+      nó deste grafo com x_criterion;
+    - integrity.criterion-amends-mismatch: o nó do amends tem outro x_criterion.id (a emenda aponta outro critério), ou
+      a cadeia de amends volta ao próprio nó;
+    - integrity.criterion-sha-mismatch: o sha256 citado difere do x_criterion.sha256 do nó citado;
+    - integrity.measured-post-hoc: medido antes do registro da versão citada (measured_order), ou no mesmo round dela
+      (a rodada que motivou a emenda);
+    - integrity.measured-order-unknown: a ordem entre a medição e o registro é indecidível (measured_order).
+    Um aviso por citação. Valor de tipo errado já alerta no perfil e aqui é ignorado.
+    """
+    out = []
+    criteria = {}
+    for n, _ in _located(doc, "nodes"):
+        if isinstance(n.get("id"), str) and isinstance(n.get("x_criterion"), dict):
+            criteria.setdefault(n["id"], n["x_criterion"])
+    cycles = _amends_cycles(criteria)
+    for n, place in _located(doc, "nodes"):
+        crit = n.get("x_criterion")
+        if isinstance(crit, dict) and isinstance(crit.get("amends"), str):
+            prior = criteria.get(crit["amends"])
+            if prior is None:
+                out.append(("integrity.criterion-unknown", place))
+            elif (isinstance(crit.get("id"), str) and isinstance(prior.get("id"), str) and crit["id"] != prior["id"]) \
+                    or n.get("id") in cycles:
+                out.append(("integrity.criterion-amends-mismatch", place))
+        under = n.get("x_measured_under")
+        if not isinstance(under, dict) or not isinstance(under.get("criteria"), list):
+            continue
+        for item in under["criteria"]:
+            ref = item.get("criterion") if isinstance(item, dict) else None
+            if not isinstance(ref, str) or is_external(ref):
+                continue  # a citação externa é do kg_criterion.py
+            target = criteria.get(ref)
+            if target is None:
+                out.append(("integrity.criterion-unknown", place))
+                continue
+            out += [(code, place) for code in citation_codes(under, item, target)]
+    return out
+
+
+def _amends_cycles(criteria):
+    """Os ids das versões que estão num ciclo de amends (a emenda de si mesma é um ciclo de um). Cada versão tem no
+    máximo um amends, então um passeio por versão, sem repetir as já vistas, acha todos os ciclos em tempo linear (a
+    busca por versão era quadrática numa cadeia longa)."""
+    seen, cycles = set(), set()
+    for start in criteria:
+        path, pos, cur = [], {}, start
+        while isinstance(cur, str) and cur in criteria and cur not in seen:
+            seen.add(cur)
+            pos[cur] = len(path)
+            path.append(cur)
+            cur = criteria[cur].get("amends")
+        if isinstance(cur, str) and cur in pos:
+            cycles.update(path[pos[cur]:])
+    return cycles
+
+
+def citation_codes(under, item, target):
+    """Os avisos de uma citação já resolvida: under é o x_measured_under, item a citação ({criterion, sha256}) e target
+    o x_criterion citado. A mesma regra no leitor (citação local) e no kg_criterion.py (citação externa)."""
+    out = []
+    if isinstance(item.get("sha256"), str) and isinstance(target.get("sha256"), str) and item["sha256"] != target["sha256"]:
+        out.append("integrity.criterion-sha-mismatch")
+    same_round = isinstance(under.get("round"), str) and under.get("round") == target.get("round")
+    order = measured_order(under.get("measured_at"), target.get("registered_at"))
+    if same_round or order == "post-hoc":  # o round só decide quando é o mesmo: rounds diferentes não têm ordem
+        out.append("integrity.measured-post-hoc")
+    elif order == "unknown":
+        out.append("integrity.measured-order-unknown")
     return out
 
 
@@ -1370,6 +1527,19 @@ MESSAGES = {
                                    "TRACES_TO edge.",
     "integrity.refutes-unreconciled": "The node receives REFUTES and still stands: the graph asserts and refutes the "
                                       "same thing.",
+    "integrity.criterion-unknown": "The cited criterion is not a node with x_criterion in the graph it names.",
+    "integrity.criterion-amends-mismatch": "The amendment points to a version of another criterion (a different "
+                                           "x_criterion.id), or its chain of amends comes back to itself.",
+    "integrity.criterion-sha-mismatch": "The cited sha256 differs from the sha256 of the criterion version: the "
+                                        "criterion changed after the measurement, or the result cites another text.",
+    "integrity.measured-post-hoc": "The result was measured before the criterion version it cites was registered, or "
+                                   "in the round that motivated that version.",
+    "integrity.measured-order-unknown": "The dates cannot tell whether the result was measured before or after its "
+                                        "criterion version was registered: the same day, or a day apart with a time "
+                                        "zone that a date alone does not give.",
+    "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
+    "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
+                                          "a value with no JSON form.",
     "yaml.unquoted-date": "A date has no quotes; different YAML readers read it in different ways.",
     "yaml.forbidden-key-on": "The edge uses the key on, which is forbidden (in YAML 1.1 it becomes the boolean True).",
     "yaml.unsafe-integer": "An integer is outside ±(2^53−1); a JS reader (double) loses its exact value.",
@@ -1405,6 +1575,21 @@ HINTS = {
                                       "not, remove the edge or use CONSTRAINS (the dissent that limits without "
                                       "overturning).",
     "integrity.testimony-in-prod": "Keep the node in DEV, or back it with a verified measurement or reading.",
+    "integrity.criterion-unknown": "Cite the id of the node that holds the criterion version (x_criterion); a "
+                                   "criterion in another graph is <path>#<id>, which kg_criterion.py check verifies.",
+    "integrity.criterion-amends-mismatch": "Point amends to the previous version of the same criterion (never to itself "
+                                           "or to a later one), with the same x_criterion.id.",
+    "integrity.criterion-sha-mismatch": "Do not edit a criterion in place: register an amendment (a new node with "
+                                        "amends, reason, and SUPERSEDES to the old one) and keep the old result tied "
+                                        "to the old sha256.",
+    "integrity.measured-post-hoc": "The criterion was set after seeing the data. Measure again under it, or keep the "
+                                   "result and say so in the narrative.",
+    "integrity.criterion-digest": "If the criterion changed, register an amendment (a new node with amends and "
+                                  "reason) instead of editing it in place; if not, write the sha256 that "
+                                  "kg_criterion.py digest prints.",
+    "integrity.criterion-ref-unreadable": "Point ref to a file under the root; a fragment is a JSON Pointer (/a/0) or "
+                                          "the id of a list item, in a .json, .yaml, or .yml file.",
+    "integrity.measured-order-unknown": "Give registered_at and measured_at a time with a time zone (RFC 3339).",
     "form.required.node.provenance": "Add provenance with source, locator, and method; with no recoverable source, "
                                      "change the status to unverifiable.",
     "form.required.node.label": "Add label: the node's short claim, up to 280 characters.",
@@ -1421,7 +1606,8 @@ KIND_TEXT = {"required": 'Missing required field "{field}" {scope}.',
              "pattern": 'Value does not match the expected form in "{field}" {scope}.',
              "range": 'Value out of bounds in "{field}" {scope}.',
              "const": 'Value differs from the required one in "{field}" {scope}.',
-             "unknown-key": 'Key outside the grammar (no x_ prefix): "{field}" {scope}.'}
+             "unknown-key": 'Key outside the grammar (no x_ prefix): "{field}" {scope}.',
+             "exclusive": 'Fields that exclude each other in "{field}" {scope}.'}
 SCOPE_TEXT = {"node": "in the node", "edge": "in the edge", "meta": "in meta", "top": "at the top level"}
 
 
@@ -1438,6 +1624,12 @@ PROFILE_HINTS = {
                                  "(a list that is not empty) are required; verdict is meets, partial, does_not_meet, "
                                  "not_applicable, or unknown.",
     ("node", "x_severity"): "x_severity is critical, high, medium, low, or info (v4.11).",
+    ("node", "x_criterion"): "x_criterion is a version of a pre-registered criterion (v4.12): id, version, "
+                             "registered_at (a date or an RFC 3339 date-time), sha256, and either ref or text are "
+                             "required; amends (the node of the previous version) needs reason.",
+    ("node", "x_measured_under"): "x_measured_under ties a result to the criteria it was measured under (v4.12): "
+                                  "measured_at and criteria (a list of {criterion, sha256} that is not empty) are "
+                                  "required; subject, verdict, and round are optional.",
     ("edge", "x_confidence"): "x_confidence on an edge is a number from 0 to 1 (v4.11).",
     ("edge", "x_provisional"): "x_provisional on an edge is true or false (v4.11).",
     ("meta", "slug"): "slug is lowercase words joined by hyphens, like my-graph (v4.11).",

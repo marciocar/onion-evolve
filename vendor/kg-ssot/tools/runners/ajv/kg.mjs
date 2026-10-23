@@ -487,6 +487,7 @@ export function formCodes(err, doc) {
   }
   let kind = FORM_TYPE[err.keyword] || err.keyword;
   if (err.keyword === 'not' && isObj(err.schema) && 'pattern' in err.schema) kind = 'pattern';
+  if (err.keyword === 'not' && isObj(err.schema) && 'required' in err.schema) kind = 'exclusive'; // v4.12: ref e text
   if (err.keyword === 'required') return [`form.${kind}.${scope}.${[...prefix, err.params.missingProperty].join('.')}`];
   if (err.keyword === 'additionalProperties') {
     return [`form.${kind}.${scope}.${[...prefix, err.params.additionalProperty].join('.')}`];
@@ -670,7 +671,7 @@ function containsValue(value, hit) {
 
 /** Os avisos de coerência, que cruzam campos ou arestas (coherence_located da referência), um por ocorrência:
  * integrity.testimony-in-prod, integrity.verified-before-fact, integrity.untraced-decision e
- * integrity.refutes-unreconciled. */
+ * integrity.refutes-unreconciled; desde o v4.12, os do critério pré-registrado (criterionCodes). */
 export function coherenceCodes(doc, corpus = null) {
   const out = [];
   const edges = Array.isArray(doc.edges) ? doc.edges : [];
@@ -708,6 +709,112 @@ export function coherenceCodes(doc, corpus = null) {
     if (typeof get(n, 'id') === 'string' && refuted.has(n.id) && !['superseded', 'refuted'].includes(status)
         && !(status === 'done' && get(n, 'node_type') === 'question')) {
       out.push('integrity.refutes-unreconciled');
+    }
+  }
+  return out.concat(criterionCodes(doc));
+}
+
+// A data ou a data-hora RFC 3339 dos perfis do critério (v4.12), a mesma regex do schema SHOULD (STAMP da referência).
+const STAMP = new RegExp('^([0-9]{4})-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])'
+  + '(?:[Tt]([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(?:\\.([0-9]+))?([Zz]|([+-])([01][0-9]|2[0-3]):([0-5][0-9])))?$');
+
+/** Os dias desde 1970-01-01 no calendário gregoriano proléptico (_days da referência), só com inteiros. */
+function civilDays(y0, m, d) {
+  const y = y0 - (m <= 2 ? 1 : 0);
+  const era = Math.floor((y >= 0 ? y : y - 399) / 400);
+  const yoe = y - era * 400;
+  const doy = Math.floor((153 * (m + (m > 2 ? -3 : 9)) + 2) / 5) + d - 1;
+  return era * 146097 + yoe * 365 + Math.floor(yoe / 4) - Math.floor(yoe / 100) + doy - 719468;
+}
+
+/** O match de STAMP com o dia que existe no calendário; null fora da forma ou num dia que não existe (_stamp). */
+function stamp(value) {
+  const mt = typeof value === 'string' ? STAMP.exec(value) : null;
+  if (!mt) return null;
+  const [y, m, d] = [1, 2, 3].map((i) => Number(mt[i]));
+  const leap = y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0);
+  return d <= [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1] ? mt : null;
+}
+
+/** [segundos desde 1970 em UTC, fração em dígitos sem zero à direita] de uma data-hora de STAMP (_instant). */
+function instant(mt) {
+  const [y, mo, d, h, mi, sec] = [1, 2, 3, 4, 5, 6].map((i) => Number(mt[i]));
+  const off = mt[9] === undefined ? 0 : (mt[9] === '+' ? 1 : -1) * (Number(mt[10]) * 60 + Number(mt[11]));
+  return [civilDays(y, mo, d) * 86400 + h * 3600 + mi * 60 + sec - off * 60, (mt[7] || '').replace(/0+$/, '')];
+}
+
+/** 'post-hoc', 'unknown' ou null entre o measured_at de um resultado e o registered_at da versão citada
+ * (measured_order da referência): as duas com hora, o instante; as duas só data, o dia escrito; uma só data, o dia em
+ * UTC com um dia de folga, que é indecidível. */
+export function measuredOrder(measured, registered) {
+  const mm = stamp(measured);
+  const mr = stamp(registered);
+  if (!mm || !mr) return null;
+  if (mm[4] !== undefined && mr[4] !== undefined) {
+    const im = instant(mm);
+    const ir = instant(mr);
+    if (im[0] !== ir[0]) return im[0] < ir[0] ? 'post-hoc' : null;
+    return im[1].padEnd(ir[1].length, '0') < ir[1].padEnd(im[1].length, '0') ? 'post-hoc' : null;
+  }
+  const day = (mt) => (mt[4] !== undefined ? Math.floor(instant(mt)[0] / 86400) : civilDays(Number(mt[1]), Number(mt[2]), Number(mt[3])));
+  const gap = day(mm) - day(mr);
+  if (mm[4] === undefined && mr[4] === undefined) return gap < 0 ? 'post-hoc' : gap === 0 ? 'unknown' : null;
+  return gap <= -2 ? 'post-hoc' : gap <= 1 ? 'unknown' : null;
+}
+
+/** Os ids das versões num ciclo de amends, em tempo linear (_amends_cycles da referência). */
+function amendsCycles(criteria) {
+  const seen = new Set();
+  const cycles = new Set();
+  for (const start of criteria.keys()) {
+    const path = [];
+    const pos = new Map();
+    let cur = start;
+    while (typeof cur === 'string' && criteria.has(cur) && !seen.has(cur)) {
+      seen.add(cur);
+      pos.set(cur, path.length);
+      path.push(cur);
+      cur = get(criteria.get(cur), 'amends');
+    }
+    if (typeof cur === 'string' && pos.has(cur)) for (const id of path.slice(pos.get(cur))) cycles.add(id);
+  }
+  return cycles;
+}
+
+/** Os avisos do critério pré-registrado (v4.12), só entre nós do mesmo grafo (criterion_located da referência):
+ * integrity.criterion-unknown, integrity.criterion-amends-mismatch, integrity.criterion-sha-mismatch,
+ * integrity.measured-post-hoc e integrity.measured-order-unknown. O leitor não calcula hash nem lê o corpus. */
+export function criterionCodes(doc) {
+  const out = [];
+  const criteria = new Map();
+  for (const n of located(doc, 'nodes')) {
+    if (typeof get(n, 'id') === 'string' && isObj(get(n, 'x_criterion')) && !criteria.has(n.id)) criteria.set(n.id, n.x_criterion);
+  }
+  const cycles = amendsCycles(criteria);
+  for (const n of located(doc, 'nodes')) {
+    const crit = get(n, 'x_criterion');
+    if (isObj(crit) && typeof get(crit, 'amends') === 'string') {
+      const prior = criteria.get(crit.amends);
+      if (prior === undefined) out.push('integrity.criterion-unknown');
+      else if ((typeof get(crit, 'id') === 'string' && typeof get(prior, 'id') === 'string' && crit.id !== prior.id)
+               || cycles.has(get(n, 'id'))) {
+        out.push('integrity.criterion-amends-mismatch');
+      }
+    }
+    const under = get(n, 'x_measured_under');
+    if (!isObj(under) || !Array.isArray(get(under, 'criteria'))) continue;
+    for (const item of under.criteria) {
+      const ref = isObj(item) ? get(item, 'criterion') : null;
+      if (typeof ref !== 'string' || isExternal(ref)) continue; // a citação externa é do kg_criterion.py
+      const target = criteria.get(ref);
+      if (target === undefined) { out.push('integrity.criterion-unknown'); continue; }
+      if (typeof get(item, 'sha256') === 'string' && typeof get(target, 'sha256') === 'string' && item.sha256 !== target.sha256) {
+        out.push('integrity.criterion-sha-mismatch');
+      }
+      const sameRound = typeof get(under, 'round') === 'string' && get(under, 'round') === get(target, 'round');
+      const order = measuredOrder(get(under, 'measured_at'), get(target, 'registered_at'));
+      if (sameRound || order === 'post-hoc') out.push('integrity.measured-post-hoc');
+      else if (order === 'unknown') out.push('integrity.measured-order-unknown');
     }
   }
   return out;

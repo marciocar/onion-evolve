@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/01-what-it-is.md sha256:476842528e9acd02 -->
+<!-- translation-of: docs/manual/01-what-it-is.md sha256:83efba1bbd7fde8f -->
 # 1. O que é e para quem
 
 [English](../01-what-it-is.md) | **Português (Brasil)**
@@ -38,7 +38,7 @@ O resultado é um arquivo que uma máquina consegue julgar no CI, do mesmo jeito
 | Peça | O que é |
 |---|---|
 | O contrato | Dois JSON Schemas, MUST (reprova) e SHOULD (alerta), mais as regras de integridade que o schema não alcança |
-| A suíte de conformidade | 390 casos em `latest/`, em dados puros, cada um com o veredito e os códigos esperados |
+| A suíte de conformidade | 438 casos em `latest/`, em dados puros, cada um com o veredito e os códigos esperados |
 | O leitor de referência | `kg_validate.py`, em Python 3.11 ou mais com PyYAML e jsonschema, sem outra dependência |
 | O kit de adoção | `kg_vendor.py`, que traz uma release por tag, e `kg_gate.py`, a catraca por grafo no CI |
 | O armazém com gate | `kg_store.py`, que grava grafos em disco, num repositório git ou num armazém versionado, só depois do PASS do contrato |

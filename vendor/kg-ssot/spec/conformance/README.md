@@ -64,11 +64,11 @@ Each code is a stable slug per layer, and the metaschema checks its shape.
 |---|---|---|
 | parse | `parse.<reason>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
 | form | `form.<kind>.<scope>.<field>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
-| integrity | `integrity.<rule>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` (SHOULD) |
+| integrity | `integrity.<rule>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled`, and the five `integrity.criterion-*` and `integrity.measured-*` codes of v4.12 (SHOULD) |
 | yaml | `yaml.<rule>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 | semantic | `semantic.<rule>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked`, and the `semantic.domain-*` codes of the domain layer (SHOULD), only in `optional/` |
 
-`<kind>` ∈ `required enum type pattern range const unknown-key`. `<scope>` ∈ `top meta node edge`.
+`<kind>` ∈ `required enum type pattern range const unknown-key exclusive`. `<scope>` ∈ `top meta node edge`.
 In a nested object, `<field>` is the dotted path: `form.required.node.provenance.locator`.
 `range` also covers text length: `label: ""` (MUST) and a `label` longer than 280 characters (SHOULD, because the
 narrative goes in `narrative`). Length counts code points, like JSON Schema's `maxLength`: an emoji counts as 1, not
@@ -212,6 +212,28 @@ v4.10 aligns the reference reader and the JavaScript reader on three rare YAML p
 - an empty line after an escaped line break inside double quotes becomes `\n`, as the specification requires;
 - a leading BOM does not count as a column.
 
+v4.12 adds the pre-registered criterion, so that changing the yardstick after seeing the data becomes a dated
+amendment instead of a rewrite. Two SHOULD profiles (`latest/form/profiles/`): `x_criterion` on the node of each
+criterion version (`id`, `version`, `registered_at`, `sha256`, and either `ref` or `text`; `amends` needs `reason`;
+`ref` and `text` together warn as `form.exclusive.node.x_criterion`), and `x_measured_under` on the result
+(`measured_at` and `criteria`, a list of `{criterion, sha256}`). Five coherence warnings between nodes of the same
+graph (`latest/integrity/criterion/`):
+- `integrity.criterion-unknown`: the cited criterion, or the `amends`, is not a node of this graph with `x_criterion`;
+- `integrity.criterion-amends-mismatch`: the amendment points to a version of another criterion, or its chain of
+  `amends` comes back to itself;
+- `integrity.criterion-sha-mismatch`: the cited `sha256` is not the one of the version;
+- `integrity.measured-post-hoc`: measured in the same `round` as the cited version (the round that motivated it), or
+  before it was registered;
+- `integrity.measured-order-unknown`: the dates cannot tell the order.
+
+How the dates compare: both with a time, the instant in UTC; both only dates, the written day (the same day is
+`measured-order-unknown`); one only a date, whose time zone is unknown, the day in UTC with a day of slack, so a gap of
+up to one day is `measured-order-unknown` and `measured-post-hoc` takes two days or more. A different `round` does not
+tell the order, because rounds are labels. A date on a day that does not exist (February 30) is not compared.
+
+A reader computes no hash and reads no corpus for these: a `<path>#<id>` citation and the `sha256` against the text
+or the file belong to `kg_criterion.py`, which is not part of the suite. No verdict changes.
+
 The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
 
 ## Folders
@@ -233,7 +255,7 @@ sealed, that is, merged into the product graph, **and** the schema in `spec/` al
 (for example, `trigger` in `integrity-trigger`). The promotion PR empties `pending_on` and cites the sealed node.
 Nothing gets ahead of an open decision.
 
-**Today's score.** The reference reader passes 100% of `latest/`: 390 cases against contract v4, 32 of them
+**Today's score.** The reference reader passes 100% of `latest/`: 438 cases against contract v4, 32 of them
 `.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
 verdict v4 changes became `bad-*` cases. Every case uses a canonical `method` (`medição: caso de conformidade`), so
@@ -258,7 +280,7 @@ or a `pt_BR` locale. Today the run ends like this:
 
 ```text
 —
-latest: 390/390 (gates the rc)
+latest: 438/438 (gates the rc)
 optional: 10/24 (report only)
 ```
 

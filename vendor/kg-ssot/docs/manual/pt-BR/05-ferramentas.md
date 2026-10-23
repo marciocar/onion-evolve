@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:caeb414de429b829 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:341bba3f6ca0ace9 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.20.0",
+  "release": "kg-ssot-v4.21.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 390/390 (reprova)
+latest: 438/438 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -834,6 +834,52 @@ python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > voca
 - Com `--format json`, o `terms` e o `lookup` usam o formato `kg-ssot.vocab/1` (`spec/vocab.schema.json`). A ferramenta
   não julga: o `x_term` fora do perfil é lido no que dá para ler, e o SHOULD acusa o resto.
 
+## `kg_criterion.py`: o critério pré-registrado (4.21.0)
+
+O leitor já avisa, entre nós do mesmo grafo, o critério que não existe, o `sha256` citado que não é o da versão e o
+resultado medido depois de ver o dado (capítulo 3, `x_criterion` e `x_measured_under`). Ele não calcula hash nem lê
+corpus, para que um leitor JavaScript fique sem criptografia. Esta ferramenta faz o resto, a partir da raiz do
+repositório:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py digest --text "Passes with 9 of 10 replicas."
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py digest --ref criteria/a7.tsv                  # o arquivo inteiro
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py digest --ref data/judge-verdicts.json#CU1      # um item de lista
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
+```
+
+- **`digest`** imprime o `sha256` a escrever no `x_criterion`. As formas:
+  - `text`: UTF-8, com CRLF e CR sozinho trocados por LF, e sem o espaço (U+0020) no fim de cada linha. O TAB fica.
+  - `ref` sem fragmento: os bytes do arquivo com CRLF trocado por LF, e mais nada. Um TSV guarda as colunas vazias, com
+    TAB no fim da linha.
+  - `ref` com fragmento: o item na forma canônica JCS ([RFC 8785](https://www.rfc-editor.org/rfc/rfc8785)), de um
+    arquivo `.json`, `.yaml` ou `.yml`. O fragmento é um JSON Pointer (`#/criteria/0`) ou o `id` de um item de lista
+    (`#CU1`), único no arquivo.
+- **`check`** confere cada `x_criterion` com exatamente um de `ref` e `text` contra ele:
+  - `integrity.criterion-digest` quando o `sha256` não bate;
+  - `integrity.criterion-ref-unreadable` quando o arquivo, o fragmento ou um valor não se lê: um NaN no JSON, um
+    inteiro além de ±(2^53−1), uma chave repetida, uma chave de mapa YAML que não é texto, ou um caminho que não é
+    arquivo comum ou passa de 64 MiB.
+- **Citações de outro grafo.** O `check` segue também cada citação `<caminho>#<id>` de um `x_measured_under`, pela
+  mesma regra do leitor: `integrity.criterion-unknown`, `integrity.criterion-sha-mismatch`,
+  `integrity.measured-post-hoc` e `integrity.measured-order-unknown`.
+- **O que ele lê.** Só com o `--root`, o `check` lê os grafos que o git rastreia sob ele, sem o vendor. Com arquivos,
+  lê só eles, cada um pelo caminho relativo ao `--root` (a pasta atual, sem ele), que é também de onde parte cada `ref`,
+  então `g/a.kg.yaml#C1` acha o arquivo como quer que ele tenha sido digitado; a citação de um grafo que não foi dado é
+  contada como sem conferir, não como achado, e o `--exclude` dado vale para os arquivos também.
+- **Caminhos.** O `ref` não pode sair da raiz. O último `#` separa o caminho do fragmento, e o fragmento vazio
+  (`a.json#`) é o documento inteiro. Um `.yaml` pede um mapa na raiz. A marca de ordem de bytes no começo do
+  `--text-file` não faz parte do texto.
+- **Saída e rc.** `--format json` dá o `kg-ssot.criterion/1` (`spec/criterion.schema.json`). rc 0 sem achado, 1 com
+  achado ou com grafo que não se lê, e 2 na entrada quebrada.
+- **O que ele não confere.** O `check` confere que cada versão bate hoje com o texto dela, não o histórico: editar um
+  critério no lugar e escrever o `sha256` novo passa, e só um resultado que cite o `sha256` antigo mostra a troca.
+  Revise no `kg_diff` um `x_criterion.sha256` que mudou (ele aparece como campo mudado do nó): uma régua nova é uma
+  emenda, um nó novo com `amends`.
+- **No CI.** O leitor não calcula hash, então o critério editado no lugar sem `sha256` novo só é pego aqui: se os seus
+  grafos usam `x_criterion`, ponha `python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .` ao lado do
+  gate.
+
 ## `kg_prov_export.py`: a proveniência em PROV-O
 
 Exporta um `.kg.yaml` para [PROV-O](https://www.w3.org/TR/prov-o/) em JSON-LD, para quem já usa ferramentas do
@@ -950,4 +996,56 @@ quando `x_<chave>` já existe no mesmo mapa, ou quando o nome novo é um perfil 
 antes com só as chaves renomeadas, se o diff tocar só essas linhas e se o arquivo não ganhar código MUST nem aviso
 SHOULD. A quebra de linha fica como estava, o arquivo com quebras misturadas é recusado, e rodar de novo não muda nada.
 Medido numa cópia dos 15 grafos do core que reprovavam no MUST por chave estranha: com o `meta.title` conhecido desde o
-v4.11 e 76 chaves renomeadas em 12 arquivos, 14 passam; o que sobra também não tem proveniência.
+v4.11 e 76 chaves renomeadas em 12 arquivos, 14 passam; o que sobra também não tem proveniência. Rodado pelo core no
+próprio corpus (2026-10-23), com os excludes do gate: o gate foi de 170 para 182 de 184 grafos no MUST, e a dívida
+herdada de 14 grafos para 2, os dois sem proveniência.
+
+### `nest`: as suas chaves `x_` viram um perfil canônico (4.21.0)
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py nest --map mapa-nest.yaml            # o plano
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py nest --map mapa-nest.yaml --apply    # grava os perfis
+```
+
+O `keys` dá o prefixo `x_` à chave estranha; o `nest` vai um passo além e leva as chaves `x_` que um adotante inventou
+para os perfis canônicos de nó do [capítulo 3](03-formato.md), `x_mirror`, `x_doc_cycle` e `x_questionnaire`. O mapa
+(`spec/kg-migrate-nest.schema.json`) tem uma regra por perfil. A regra vale para o nó que tem a chave `when`, e cada
+campo do perfil vem de uma fonte: `const` (um valor fixo), `move` (uma chave `x_` que sai do nó) ou `copy` (qualquer
+chave, que fica, como `verified_at`). A fonte pode passar por `match` (uma regex com um grupo, lida como o ECMA-262 a
+lê: `\w` e `\d` em ASCII, `\s` com os espaços Unicode, `.` sem quebra de linha, `$` só no fim do texto; o que os dois
+motores leem diferente é entrada quebrada, e o valor com caractere além de U+FFFF vai para quem revisa) e por uma tabela
+de valores, `values` para o valor exato e `prefixes` para o prefixo mais longo que casa. Com `raw: true`, o valor
+original de cada chave movida que tinha texto além do código (entrou por prefixo, ou a regex cortou parte dele) fica em
+`<perfil>.x_raw`; o valor exato da tabela não fica. A chave movida por `match` ou `prefixes` perde o texto que o código
+deixa de fora, então essa regra pede `raw: true` (sem ele, o mapa é entrada quebrada):
+
+```yaml
+nest_version: "1"
+nest:
+  - into: x_mirror
+    when: x_board_status
+    fields:
+      system: {const: board}
+      state: {move: x_board_status}
+      ref: {copy: verified_against, match: "/t/([a-z0-9]+)$"}
+      url: {copy: verified_against}
+      synced_at: {copy: verified_at}
+  - into: x_doc_cycle
+    when: x_issuer
+    raw: true
+    fields:
+      issuer: {move: x_issuer}
+      state: {move: x_in_force, values: {vigente: in_force}, prefixes: {"vigente (": in_force}}
+```
+
+Nada é chutado. O nó vai para quem revisa, sem ser tocado, quando um valor não tem código na tabela, quando falta a
+fonte de um campo obrigatório, quando o nó já tem o perfil, quando o perfil que ele ganharia não passa no schema SHOULD
+do perfil (um `synced_at` que não é data, um `state` fora do enum) quando o nó está em estilo de fluxo (`{...}`), quando
+a chave `when` dele é null, quando um valor é `.nan` ou `.inf`, ou quando a edição do texto daquele nó não releria igual
+(um valor movido com âncora `&x` ou alias `*x`). O plano ensaia a edição do arquivo inteiro uma vez, e só a divide
+quando ela falha, então o nó que ela não sabe editar vai para quem revisa ali, e o `--apply` grava os outros. O
+`--apply` grava cada arquivo sob as mesmas conferências do `keys`: a releitura tem de ser o documento de antes com só as
+chaves movidas e os perfis novos, e o arquivo não pode ganhar código MUST nem aviso SHOULD. A quebra de linha fica, os
+comentários fora das chaves movidas ficam, e rodar de novo não muda nada. Medido numa cópia dos dois grafos de um
+adotante (108 nós com 168 dessas chaves): 106 perfis montados, 2 para quem revisa (dois `x_in_force` com texto livre que
+o mapa não cobria), os dois arquivos gravados com o mesmo veredito de antes.

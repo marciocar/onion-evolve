@@ -35,7 +35,7 @@ The result is a file that a machine can judge in CI, the same way it judges code
 | Piece | What it is |
 |---|---|
 | The contract | Two JSON Schemas, MUST (fails) and SHOULD (warns), plus the integrity rules the schema cannot reach |
-| The conformance suite | 390 cases in `latest/`, as plain data, each with its expected verdict and codes |
+| The conformance suite | 438 cases in `latest/`, as plain data, each with its expected verdict and codes |
 | The reference reader | `kg_validate.py`, on Python 3.11 or later with PyYAML and jsonschema, and no other dependency |
 | The adoption kit | `kg_vendor.py`, which brings in a release by tag, and `kg_gate.py`, the per-graph ratchet in CI |
 | The gated store | `kg_store.py`, which writes graphs to disk, to a git repository, or to a versioned store, only after the contract returns PASS |

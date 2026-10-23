@@ -138,7 +138,7 @@ An external reference is `<path>.kg.yaml#<id>`, or `<path>.kg.json#<id>` since v
 repository root and written with `/`. Each segment starts with a letter, a digit, or `_`. An absolute path, `..`,
 `\`, and `:` fail.
 
-## Canonical `x_` profiles (v4.11)
+## Canonical `x_` profiles (v4.11 and v4.12)
 
 An `x_` key stays free in the MUST: it never fails. Some `x_` keys repeat across adopters with the same meaning, and
 since v4.11 the SHOULD gives each one a shape. The profile is judged only when the key is present, and only warns. A
@@ -153,6 +153,8 @@ is free, and any other key warns. Enum values are codes, in English, whatever th
 | `x_doc_cycle` | node | the life cycle of an external document the node depends on (a rule, a policy, a contract) |
 | `x_questionnaire` | node | the link between the node and the questions of an external questionnaire |
 | `x_severity` | node | `critical` · `high` · `medium` · `low` · `info` |
+| `x_criterion` | node | one version of a pre-registered criterion (v4.12) |
+| `x_measured_under` | node | the criterion versions a result was measured under (v4.12) |
 | `x_confidence` | edge | how sure the link is, from 0 to 1 |
 | `x_provisional` | edge | `true` when the link still waits for a check |
 
@@ -228,6 +230,64 @@ The whole example, from the open data dictionary of the Brazilian drug price reg
 A mirror goes stale without warning: `synced_at` plus `resync_every` puts it in the due report, and so does
 `checked_at` plus `recheck_every` for a document.
 
+### `x_criterion` and `x_measured_under` (v4.12)
+
+A criterion fixed before the data is a pre-registration, as in
+[OSF Preregistration](https://www.cos.io/initiatives/prereg) and in the versioned amendments of a clinical trial
+registry. Changing it after seeing the data is an amendment with a date and a reason, never a rewrite. Each version is
+a node, and the result cites the node of the version it was measured under, with that version's `sha256`. An old
+result stays tied to the old version, so the old verdict never changes in silence.
+
+| Profile | Required | Optional |
+|---|---|---|
+| `x_criterion` | `id` (stable across versions), `version` (text or integer), `registered_at` (a date, or an RFC 3339 date-time with a time zone), `sha256` (64 lowercase hex), and either `ref` or `text` | `amends` (the id of the node of the previous version; needs `reason`), `reason`, `round` (text: the round that motivated the amendment) |
+| `x_measured_under` | `measured_at` (a date or a date-time), `criteria` (a list of `{criterion, sha256}` that is not empty) | `subject` (a free map: scenario, replica, target), `verdict`, `round` (text) |
+
+`criterion` is the id of a node of the same graph with `x_criterion`, or `<path>#<id>` for a criterion in another
+graph. `ref` is a path from the repository root, optionally with a fragment (`#/criteria/0` or the `id` of a list
+item); `text` is the criterion itself. The amendment also gets a `SUPERSEDES` edge to the previous version.
+
+```yaml
+  - id: C_A7_V2
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "Criterion A7, version 2: passes with 8 of 10 replicas."
+    x_criterion:
+      id: A7
+      version: 2
+      registered_at: "2026-10-22T10:00:00-03:00"
+      sha256: "7fb806ea1c06b6816ad43681d179143472b3c2a48b69f422c05b08339b48305a"
+      text: "Passes with 8 of 10 replicas."
+      amends: C_A7_V1
+      reason: "Replica 3 showed that the limit was wrong."
+      round: r3
+  - id: E_A7_R4
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "Round r4 passes criterion A7 with 9 of 10 replicas."
+    x_measured_under:
+      measured_at: "2026-10-23T09:00:00Z"
+      round: r4
+      criteria:
+        - criterion: C_A7_V2
+          sha256: "7fb806ea1c06b6816ad43681d179143472b3c2a48b69f422c05b08339b48305a"
+      verdict: passes
+```
+
+The reader compares dates and rounds without computing a hash. Both with a time compare as instants in UTC; both only
+dates compare by the written day, which assumes both were written in the same time zone, and the same day cannot
+tell the order; with one only a date, whose time zone is
+unknown, the other counts by its day in UTC, and a gap of up to one day cannot tell the order either. Only the same
+`round` decides (the round that motivated the amendment): rounds are labels, not an order. A date on a day that does
+not exist (February 30) is not compared. The `sha256` against the text or the file, and a
+citation of another graph, are checked by `kg_criterion.py` (chapter 5).
+
 ## Integrity (outside the schema)
 
 The schema cannot express these rules, and every reader must apply them:
@@ -243,5 +303,10 @@ The schema cannot express these rules, and every reader must apply them:
 | `verified_at` earlier than `valid_from` | SHOULD | `integrity.verified-before-fact` |
 | a live `decision` with no `trace`, no `provenance`, and no outgoing `TRACES_TO` | SHOULD | `integrity.untraced-decision` |
 | a node that receives `REFUTES` and stays live (neither `superseded` nor `refuted`; a `done` `question` is already answered) | SHOULD (MUST later) | `integrity.refutes-unreconciled` |
+| a cited criterion, or an `amends`, that is not a node of this graph with `x_criterion` | SHOULD | `integrity.criterion-unknown` |
+| an amendment that points to a version of another criterion (another `x_criterion.id`), or whose chain of `amends` comes back to itself | SHOULD | `integrity.criterion-amends-mismatch` |
+| a cited `sha256` that is not the one of the cited version | SHOULD | `integrity.criterion-sha-mismatch` |
+| measured in the same `round` as the cited version, or before it was registered (see below) | SHOULD | `integrity.measured-post-hoc` |
+| the dates cannot tell whether the result came before or after the cited version | SHOULD | `integrity.measured-order-unknown` |
 
 An external edge counts as a link: a node linked only by one is not an orphan.

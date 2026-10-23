@@ -713,6 +713,13 @@ msgid ""
 "  kg_migrate.py plan  --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out SHEET.tsv] [graph.kg.yaml ...]\n"
 "  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
 "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"  kg_migrate.py nest --map MAP.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+"\n"
+"nest (4.21.0) moves the adopter's own x_ keys into a canonical node profile (x_mirror, x_doc_cycle, x_questionnaire),\n"
+"by text, as the map says (spec/kg-migrate-nest.schema.json): each profile field comes from a constant, from an x_ key\n"
+"that leaves the node, or from a key that stays, through an optional regex and value table. A value with no code in\n"
+"the table, a missing required source, a node that already has the profile, or a profile that fails its SHOULD schema\n"
+"goes to the reviewer; nothing is guessed. With --apply, the same checks as keys hold.\n"
 "\n"
 "keys (4.19.0) renames each key the contract does not know in the top level, meta, nodes, edges and external_edges\n"
 "to x_<key>, the extension prefix, by text (comments stay). The known keys come from the MUST schema itself. A key\n"
@@ -747,6 +754,13 @@ msgstr ""
 "  kg_migrate.py plan  --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out PLANILHA.tsv] [grafo.kg.yaml ...]\n"
 "  kg_migrate.py apply --profile PERFIL.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
 "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"  kg_migrate.py nest --map MAPA.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [grafo.kg.yaml ...]\n"
+"\n"
+"nest (4.21.0) leva as chaves x_ próprias do adotante para um perfil canônico de nó (x_mirror, x_doc_cycle,\n"
+"x_questionnaire), pelo texto, como o mapa diz (spec/kg-migrate-nest.schema.json): cada campo do perfil vem de uma\n"
+"constante, de uma chave x_ que sai do nó ou de uma chave que fica, por uma regex e uma tabela de valores opcionais. O\n"
+"valor sem código na tabela, a fonte obrigatória ausente, o nó que já tem o perfil ou o perfil que não passa no schema\n"
+"SHOULD dele vão para quem revisa; nada é chutado. Com --apply, valem as mesmas conferências do keys.\n"
 "\n"
 "keys (4.19.0) renomeia para x_<chave>, o prefixo de extensão, cada chave que o contrato não conhece no topo, no meta,\n"
 "nos nós, nas arestas e nas external_edges, pelo texto (os comentários ficam). As chaves conhecidas vêm do próprio schema\n"
@@ -967,6 +981,146 @@ msgstr "; nada foi gravado (sem --apply)"
 #: tools/kg_migrate.py
 msgid "· {renames} key(s) to rename, {review} for the reviewer, in {files} file(s){written}"
 msgstr "· {renames} chave(s) a renomear, {review} para quem revisa, em {files} arquivo(s){written}"
+
+#: tools/kg_migrate.py
+msgid "NEST"
+msgstr "ANINHA"
+
+#: tools/kg_migrate.py
+msgid "invalid regex in {into}.{field}: {exc}"
+msgstr "regex inválida em {into}.{field}: {exc}"
+
+#: tools/kg_migrate.py
+msgid "map outside spec/kg-migrate-nest.schema.json at {path}: {msg}"
+msgstr "mapa fora de spec/kg-migrate-nest.schema.json em {path}: {msg}"
+
+#: tools/kg_migrate.py
+msgid "moves the adopter's own x_ keys into a canonical node profile (4.21.0)"
+msgstr "leva as chaves x_ próprias do adotante para um perfil canônico de nó (4.21.0)"
+
+#: tools/kg_migrate.py
+msgid "node {n} is in flow style: edit it by hand"
+msgstr "o nó {n} está em estilo de fluxo: edite à mão"
+
+#: tools/kg_migrate.py
+msgid "the built {into} does not pass the profile at {path}: {msg}"
+msgstr "o {into} montado não passa no perfil em {path}: {msg}"
+
+#: tools/kg_migrate.py
+msgid "the map does not parse ({code}): {file}"
+msgstr "o mapa não parseia ({code}): {file}"
+
+#: tools/kg_migrate.py
+msgid "the match of {into}.{field} needs exactly one group"
+msgstr "o match de {into}.{field} precisa de exatamente um grupo"
+
+#: tools/kg_migrate.py
+msgid "the nest map (spec/kg-migrate-nest.schema.json)"
+msgstr "o mapa do nest (spec/kg-migrate-nest.schema.json)"
+
+#: tools/kg_migrate.py
+msgid "the node already has {into}"
+msgstr "o nó já tem {into}"
+
+#: tools/kg_migrate.py
+msgid "the reread document differs from the old one beyond the nested keys"
+msgstr "o documento relido difere do anterior além das chaves aninhadas"
+
+#: tools/kg_migrate.py
+msgid "the value is not text, and match needs text"
+msgstr "o valor não é texto, e o match pede texto"
+
+#: tools/kg_migrate.py
+msgid "the value is not text, and the value table needs text"
+msgstr "o valor não é texto, e a tabela de valores pede texto"
+
+#: tools/kg_migrate.py
+msgid "the value {value} does not match {rx}"
+msgstr "o valor {value} não casa {rx}"
+
+#: tools/kg_migrate.py
+msgid "the value {value} has no code in the table: map it or edit it by hand"
+msgstr "o valor {value} não tem código na tabela: mapeie ou edite à mão"
+
+#: tools/kg_migrate.py
+msgid "two edits overlap in the same lines: edit them by hand"
+msgstr "duas edições se sobrepõem nas mesmas linhas: edite à mão"
+
+#: tools/kg_migrate.py
+msgid "two rules build {into}"
+msgstr "duas regras montam {into}"
+
+#: tools/kg_migrate.py
+msgid "unreadable map: {file}: {exc}"
+msgstr "mapa ilegível: {file}: {exc}"
+
+#: tools/kg_migrate.py
+msgid "writes the profiles; without it, only the plan"
+msgstr "grava os perfis; sem ele, só o plano"
+
+#: tools/kg_migrate.py
+msgid "x_raw is filled by raw: true, not by a field"
+msgstr "o x_raw é preenchido pelo raw: true, não por um campo"
+
+#: tools/kg_migrate.py
+msgid "{field} is not a field of {into}"
+msgstr "{field} não é campo de {into}"
+
+#: tools/kg_migrate.py
+msgid "{into} lacks the required field(s) {fields}"
+msgstr "falta(m) a {into} o(s) campo(s) obrigatório(s) {fields}"
+
+#: tools/kg_migrate.py
+msgid "{key} is missing, and {into}.{field} is required"
+msgstr "falta {key}, e {into}.{field} é obrigatório"
+
+#: tools/kg_migrate.py
+msgid "{key} is moved by two fields"
+msgstr "{key} é movida por dois campos"
+
+#: tools/kg_migrate.py
+msgid "· {nested} node profile(s) to build, {review} for the reviewer, in {files} file(s){written}"
+msgstr "· {nested} perfil(is) de nó a montar, {review} para quem revisa, em {files} arquivo(s){written}"
+
+#: tools/kg_migrate.py
+msgid "(root)"
+msgstr "(raiz)"
+
+#: tools/kg_migrate.py
+msgid "node {n}: {key} is an alias (*): edit it by hand"
+msgstr "nó {n}: {key} é um alias (*): edite à mão"
+
+#: tools/kg_migrate.py
+msgid "the marker {key} is null"
+msgstr "o marcador {key} é null"
+
+#: tools/kg_migrate.py
+msgid "the text edit does not reread the same ({problem}): edit it by hand"
+msgstr "a edição do texto não relê igual ({problem}): edite à mão"
+
+#: tools/kg_migrate.py
+msgid "the value has .nan or .inf, which no profile field takes"
+msgstr "o valor tem .nan ou .inf, que nenhum campo de perfil aceita"
+
+#: tools/kg_migrate.py
+msgid "{into}.{field} moves {key} through match or prefixes, which cut text: the rule needs raw: true to keep the original"
+msgstr "{into}.{field} move {key} por match ou prefixes, que cortam texto: a regra pede raw: true para guardar o original"
+
+#: tools/kg_migrate.py
+msgid "{keys} is moved and copied: a copied key stays in the node, so it cannot also leave it"
+msgstr "{keys} é movida e copiada: a chave copiada fica no nó, então não pode também sair dele"
+
+#: tools/kg_migrate.py
+msgid "the match of {into}.{field} uses {what}, which ECMA-262 reads otherwise or not at all"
+msgstr "o match de {into}.{field} usa {what}, que o ECMA-262 lê de outro jeito ou não lê"
+
+#: tools/kg_migrate.py
+msgid "{key} has an anchor (&) or an alias (*)"
+msgstr "{key} tem uma âncora (&) ou um alias (*)"
+
+#: tools/kg_migrate.py
+msgid "the value has a character beyond U+FFFF, which a regex reads differently in ECMA-262"
+msgstr "o valor tem um caractere além de U+FFFF, que uma regex lê de outro jeito no ECMA-262"
 
 #: tools/kg_prov_export.py
 msgid ""
@@ -2035,6 +2189,74 @@ msgstr "cadência {every} sem synced_at"
 msgid "cadence {every} without checked_at"
 msgstr "cadência {every} sem checked_at"
 
+#: tools/kg_validate.py
+msgid "Cite the id of the node that holds the criterion version (x_criterion); a criterion in another graph is <path>#<id>, which kg_criterion.py check verifies."
+msgstr "Cite o id do nó que guarda a versão do critério (x_criterion); um critério de outro grafo é <caminho>#<id>, que o kg_criterion.py check confere."
+
+#: tools/kg_validate.py
+msgid "Do not edit a criterion in place: register an amendment (a new node with amends, reason, and SUPERSEDES to the old one) and keep the old result tied to the old sha256."
+msgstr "Não edite o critério no lugar: registre uma emenda (um nó novo com amends, reason e SUPERSEDES para o antigo) e deixe o resultado antigo preso ao sha256 antigo."
+
+#: tools/kg_validate.py
+msgid "Fields that exclude each other in \"{field}\" {scope}."
+msgstr "Campos que se excluem em «{field}» {scope}."
+
+#: tools/kg_validate.py
+msgid "If the criterion changed, register an amendment (a new node with amends and reason) instead of editing it in place; if not, write the sha256 that kg_criterion.py digest prints."
+msgstr "Se o critério mudou, registre uma emenda (um nó novo com amends e reason) em vez de editá-lo no lugar; se não, escreva o sha256 que o kg_criterion.py digest imprime."
+
+#: tools/kg_validate.py
+msgid "Point ref to a file under the root; a fragment is a JSON Pointer (/a/0) or the id of a list item, in a .json, .yaml, or .yml file."
+msgstr "Aponte o ref para um arquivo dentro da raiz; o fragmento é um JSON Pointer (/a/0) ou o id de um item de lista, num .json, .yaml ou .yml."
+
+#: tools/kg_validate.py
+msgid "The cited sha256 differs from the sha256 of the criterion version: the criterion changed after the measurement, or the result cites another text."
+msgstr "O sha256 citado difere do sha256 da versão do critério: o critério mudou depois da medição, ou o resultado cita outro texto."
+
+#: tools/kg_validate.py
+msgid "The criterion was set after seeing the data. Measure again under it, or keep the result and say so in the narrative."
+msgstr "O critério foi fixado depois de ver o dado. Meça de novo sob ele, ou mantenha o resultado e diga isso na narrativa."
+
+#: tools/kg_validate.py
+msgid "The ref of the criterion version does not read: the file, the fragment, or a value with no JSON form."
+msgstr "O ref da versão do critério não se lê: o arquivo, o fragmento ou um valor sem forma JSON."
+
+#: tools/kg_validate.py
+msgid "The result was measured before the criterion version it cites was registered, or in the round that motivated that version."
+msgstr "O resultado foi medido antes do registro da versão do critério que ele cita, ou na rodada que motivou essa versão."
+
+#: tools/kg_validate.py
+msgid "The sha256 of the criterion version does not match its text or its file."
+msgstr "O sha256 da versão do critério não bate com o texto ou o arquivo dela."
+
+#: tools/kg_validate.py
+msgid "x_criterion is a version of a pre-registered criterion (v4.12): id, version, registered_at (a date or an RFC 3339 date-time), sha256, and either ref or text are required; amends (the node of the previous version) needs reason."
+msgstr "x_criterion é uma versão de um critério pré-registrado (v4.12): id, version, registered_at (uma data ou uma data-hora RFC 3339), sha256 e ref ou text são obrigatórios; amends (o nó da versão anterior) pede reason."
+
+#: tools/kg_validate.py
+msgid "x_measured_under ties a result to the criteria it was measured under (v4.12): measured_at and criteria (a list of {criterion, sha256} that is not empty) are required; subject, verdict, and round are optional."
+msgstr "x_measured_under prende um resultado aos critérios sob os quais ele foi medido (v4.12): measured_at e criteria (uma lista não vazia de {criterion, sha256}) são obrigatórios; subject, verdict e round são opcionais."
+
+#: tools/kg_validate.py
+msgid "Give registered_at and measured_at a time with a time zone (RFC 3339)."
+msgstr "Dê ao registered_at e ao measured_at uma hora com fuso (RFC 3339)."
+
+#: tools/kg_validate.py
+msgid "Point amends to the previous version of the same criterion (never to itself or to a later one), with the same x_criterion.id."
+msgstr "Aponte o amends para a versão anterior do mesmo critério (nunca para si mesma nem para uma posterior), com o mesmo x_criterion.id."
+
+#: tools/kg_validate.py
+msgid "The amendment points to a version of another criterion (a different x_criterion.id), or its chain of amends comes back to itself."
+msgstr "A emenda aponta a versão de outro critério (outro x_criterion.id), ou a cadeia de amends volta a ela mesma."
+
+#: tools/kg_validate.py
+msgid "The cited criterion is not a node with x_criterion in the graph it names."
+msgstr "O critério citado não é um nó com x_criterion no grafo que ele nomeia."
+
+#: tools/kg_validate.py
+msgid "The dates cannot tell whether the result was measured before or after its criterion version was registered: the same day, or a day apart with a time zone that a date alone does not give."
+msgstr "As datas não dizem se o resultado foi medido antes ou depois do registro da versão do critério: o mesmo dia, ou um dia de distância com um fuso que a data sozinha não dá."
+
 #: tools/kg_vendor.py
 msgid "--source {source} is not a git repository"
 msgstr "--source {source} não é um repositório git"
@@ -2373,3 +2595,131 @@ msgstr "sinônimo APOSENTADO"
 #: tools/kg_vocab.py
 msgid "SUPERSEDED term; use {ids}"
 msgstr "termo SUBSTITUÍDO; use {ids}"
+
+#: tools/kg_criterion.py
+msgid "FILE"
+msgstr "ARQ"
+
+#: tools/kg_criterion.py
+msgid "NaN and Infinity have no JCS form"
+msgstr "NaN e Infinity não têm forma JCS"
+
+#: tools/kg_criterion.py
+msgid "The pre-registered criterion (contract v4.12): the sha256 of each version against its text or file, and the citations of another graph."
+msgstr "O critério pré-registrado (contrato v4.12): o sha256 de cada versão contra o texto ou o arquivo, e as citações de outro grafo."
+
+#: tools/kg_criterion.py
+msgid "UNREADABLE  {file}  {code}"
+msgstr "ILEGÍVEL  {file}  {code}"
+
+#: tools/kg_criterion.py
+msgid "a lone surrogate has no JCS form"
+msgstr "um surrogate solto não tem forma JCS"
+
+#: tools/kg_criterion.py
+msgid "a map key that is not text has no JSON form"
+msgstr "uma chave de mapa que não é texto não tem forma JSON"
+
+#: tools/kg_criterion.py
+msgid "a value of type {type} has no JSON form"
+msgstr "um valor do tipo {type} não tem forma JSON"
+
+#: tools/kg_criterion.py
+msgid "check: .kg.yaml or .kg.json files (or --root)"
+msgstr "check: arquivos .kg.yaml ou .kg.json (ou --root)"
+
+#: tools/kg_criterion.py
+msgid "declared {declared}, computed {computed}"
+msgstr "declarado {declared}, calculado {computed}"
+
+#: tools/kg_criterion.py
+msgid "digest takes exactly one of --text, --text-file, and --ref"
+msgstr "o digest recebe exatamente um de --text, --text-file e --ref"
+
+#: tools/kg_criterion.py
+msgid "digest: <path>[#<JSON Pointer or item id>], from the root"
+msgstr "digest: <caminho>[#<JSON Pointer ou id do item>], a partir da raiz"
+
+#: tools/kg_criterion.py
+msgid "digest: a UTF-8 file with the text of the criterion"
+msgstr "digest: um arquivo UTF-8 com o texto do critério"
+
+#: tools/kg_criterion.py
+msgid "digest: the text of the criterion"
+msgstr "digest: o texto do critério"
+
+#: tools/kg_criterion.py
+msgid "no list item has the id {id}"
+msgstr "nenhum item de lista tem o id {id}"
+
+#: tools/kg_criterion.py
+msgid "the integer {n} is outside ±(2^53−1): JCS cannot represent it exactly"
+msgstr "o inteiro {n} está fora de ±(2^53−1): o JCS não o representa exato"
+
+#: tools/kg_criterion.py
+msgid "the key {key} repeats in the same object"
+msgstr "a chave {key} se repete no mesmo objeto"
+
+#: tools/kg_criterion.py
+msgid "the pointer {pointer} does not exist in the file"
+msgstr "o ponteiro {pointer} não existe no arquivo"
+
+#: tools/kg_criterion.py
+msgid "{n} list items have the id {id}"
+msgstr "{n} itens de lista têm o id {id}"
+
+#: tools/kg_criterion.py
+msgid "{path}: a fragment needs a .json, .yaml, or .yml file"
+msgstr "{path}: o fragmento pede um arquivo .json, .yaml ou .yml"
+
+#: tools/kg_criterion.py
+msgid "{path}: not readable in the YAML profile ({code})"
+msgstr "{path}: não se lê no perfil YAML ({code})"
+
+#: tools/kg_criterion.py
+msgid "{path}: not valid JSON ({error})"
+msgstr "{path}: não é JSON válido ({error})"
+
+#: tools/kg_criterion.py
+msgid "{ref}: the file does not read ({error})"
+msgstr "{ref}: o arquivo não se lê ({error})"
+
+#: tools/kg_criterion.py
+msgid "{ref}: the path does not resolve ({error})"
+msgstr "{ref}: o caminho não se resolve ({error})"
+
+#: tools/kg_criterion.py
+msgid "{ref}: the path is outside the root"
+msgstr "{ref}: o caminho sai da raiz"
+
+#: tools/kg_criterion.py
+msgid "· {criteria} criterion version(s) and {external} citation(s) of another graph checked; {n} finding(s)"
+msgstr "· {criteria} versão(ões) de critério e {external} citação(ões) de outro grafo conferidas; {n} achado(s)"
+
+#: tools/kg_criterion.py
+msgid "give --root, the files, or both"
+msgstr "dê o --root, os arquivos, ou os dois"
+
+#: tools/kg_criterion.py
+msgid "the repository root, where ref paths start; without files, check reads the graphs git tracks under it"
+msgstr "a raiz do repositório, de onde partem os caminhos do ref; sem arquivos, o check lê os grafos que o git rastreia sob ela"
+
+#: tools/kg_criterion.py
+msgid "{path}: a map key that is not text has no JSON form"
+msgstr "{path}: uma chave de mapa que não é texto não tem forma JSON"
+
+#: tools/kg_criterion.py
+msgid "{ref}: not a regular file"
+msgstr "{ref}: não é um arquivo comum"
+
+#: tools/kg_criterion.py
+msgid "{ref}: the file is larger than {mib} MiB"
+msgstr "{ref}: o arquivo passa de {mib} MiB"
+
+#: tools/kg_criterion.py
+msgid "{ref}: the path is empty"
+msgstr "{ref}: o caminho está vazio"
+
+#: tools/kg_criterion.py
+msgid "· {n} citation(s) of a graph that was not given left unchecked: give it too, or use --root"
+msgstr "· {n} citação(ões) de um grafo que não foi dado ficaram sem conferir: dê ele também, ou use o --root"

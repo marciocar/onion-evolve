@@ -56,7 +56,7 @@ recorded exception: 4.11.0, 4.12.0 and 4.13.0 started to fail rare YAML construc
 were minor because none of the real graphs measured in four adopter repositories changed its verdict. Even so, they
 count as new MUST rules for the stability criterion, and each one reset the 30-day clock. Since 4.11.0, the contract
 has its own version label (v4.4 in 4.11.0, v4.5 in 4.12.0, v4.6 in 4.13.0, v4.7 in 4.14.0, v4.8 in 4.15.0, v4.9 in 4.15.1
-and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 since 4.19.0), which is not the release number.
+and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 since 4.21.0), which is not the release number.
 
 | Release | What it added |
 |---|---|
@@ -79,6 +79,8 @@ and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 since 4.19.0), which is not the r
 | 4.17 | Contract v4.10, unchanged. Query and projection (`kg_query.py`, and the `kg_query` tool in the MCP server) and the diff by id between revisions (`kg_diff.py`); in 4.17.1, vendored code and fixtures left out of the corpus by default, and renamed fields detected by `kg_diff`; in 4.17.2, the tool annotations in the MCP server |
 | 4.18 | Contract v4.10, unchanged. English becomes the source language of the docs, with the full pt-BR translation beside it; the tools print human output in English by default, and in pt-BR with `KG_SSOT_LANG=pt-BR` or a `pt_BR` locale |
 | 4.19 | Contract v4.11: `meta.title` and `meta.slug` become known keys, and the SHOULD gets the canonical `x_` profiles (`x_term` for the domain vocabulary, `x_mirror`, `x_doc_cycle`, `x_questionnaire`, `x_severity`, and `x_confidence` and `x_provisional` on the edge); the vocabulary tool (`kg_vocab.py`, with exports to SKOS-XL and Apache Ossie, and the `kg_terms` tool in the MCP server) and `kg_migrate.py keys`, which renames a foreign key to `x_` |
+| 4.20 | Contract v4.11, unchanged. The store keeps the verdict of each judged graph and stops judging again what did not change; the `.kg-ssot-version` stamp becomes the public vendor rule in every tool; `kg_diff.py` names the working tree (`WORKTREE`) |
+| 4.21 | Contract v4.12: the pre-registered criterion, with the SHOULD profiles `x_criterion` and `x_measured_under`, five coherence warnings in both readers, and `kg_criterion.py`, which checks the `sha256` against the text or the file and follows a citation of another graph; `kg_migrate.py nest`, which moves an adopter's own `x_` keys into a canonical profile |
 
 ## Versions and tags
 

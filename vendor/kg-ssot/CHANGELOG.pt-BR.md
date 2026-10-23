@@ -10,6 +10,53 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.21.0] - 2026-10-23
+
+A régua fixada antes do dado entra no contrato, e as chaves `x_` próprias de um adotante vão para os perfis canônicos.
+Contrato v4.12: dois perfis SHOULD e cinco avisos, e nada que passava reprova.
+
+### Added
+
+- **O critério pré-registrado (contrato v4.12).** Trocar a régua depois de ver o dado vira uma emenda datada em vez
+  de uma reescrita, como no OSF Preregistration e nas emendas versionadas de um registro de ensaio clínico. Dois perfis
+  SHOULD: `x_criterion`, um nó por versão do critério (`id`, `version`, `registered_at`, `sha256` e `ref` ou `text`;
+  `amends` com `reason` na emenda), e `x_measured_under`, no resultado (`measured_at` e `criteria`, uma lista de
+  `{criterion, sha256}`). Os dois leitores, Python e JavaScript, avisam cinco coisas entre nós do mesmo grafo, sem
+  calcular hash:
+  - `integrity.criterion-unknown`: o critério citado, ou o `amends`, não é um nó de critério do grafo;
+  - `integrity.criterion-amends-mismatch`: a emenda aponta a versão de outro critério, ou volta a ela mesma;
+  - `integrity.criterion-sha-mismatch`: o `sha256` citado não é o da versão;
+  - `integrity.measured-post-hoc`: medido na rodada que motivou a versão, ou antes do registro dela;
+  - `integrity.measured-order-unknown`: as datas não dizem a ordem (o mesmo dia, ou um dia de distância quando uma
+    delas não tem fuso).
+
+  `ref` e `text` juntos alertam `form.exclusive.node.x_criterion`, um tipo novo de forma. Pedido de um adotante cujo
+  próprio revisor pegou uma régua trocada depois do dado.
+- **O `kg_criterion.py`** imprime o `sha256` de um critério (`digest`):
+  - do `text`: UTF-8, LF, sem espaço no fim da linha;
+  - de um arquivo inteiro: os bytes, com CRLF trocado por LF;
+  - de um item de lista num JSON ou YAML: a forma JCS (RFC 8785), escolhido por JSON Pointer ou pelo `id`.
+
+  O `check` confere cada versão contra o texto ou o arquivo, e cada citação `<caminho>#<id>` de outro grafo
+  (`kg-ssot.criterion/1`, `spec/criterion.schema.json`); ele reprova com achado ou com grafo que não se lê, e vai ao
+  lado do gate no CI, porque o leitor não calcula hash. É também o comando `kg-criterion` do pacote PyPI.
+- A suíte vai de 390 a 438 casos (`latest/form/profiles/` e a nova `latest/integrity/criterion/`).
+- **O `kg_migrate.py nest` leva as chaves `x_` próprias de um adotante para um perfil canônico de nó** (`x_mirror`,
+  `x_doc_cycle`, `x_questionnaire`), como um mapa diz (`spec/kg-migrate-nest.schema.json`): cada campo de uma
+  constante, de uma chave `x_` que sai do nó ou de uma chave que fica, por uma regex e uma tabela de valores
+  opcionais. A chave movida por regex ou por prefixo pede `raw: true`, que guarda o valor original em `x_raw`, e nenhum
+  texto se perde. O valor sem código, a fonte obrigatória ausente, o perfil que não passa no schema, o alias e o nó em
+  estilo de fluxo vão para quem revisa já no plano, nunca são chutados. Pedido de um adotante; numa cópia dos dois
+  grafos dele (108 nós, 168 chaves), 106 perfis montados e 2 para revisão.
+
+### Fixed
+
+- **O campo obrigatório ausente conta uma vez.** No leitor de referência, um objeto com N campos obrigatórios faltando
+  contava cada um N vezes: o `meta` sem `schema_version` e sem `id` mostrava `form.required.meta.id ×2`, e o nó com três
+  campos ausentes, `×3` em cada. O leitor JavaScript já contava certo. O veredito, o conjunto de códigos e a suíte não
+  mudam; as contagens no resumo, no `--where`, no veredito JSON e na base do gate por ocorrência caem para o número real.
+  Achado da bancada de um adotante.
+
 ## [4.20.0] - 2026-10-23
 
 O armazém deixa de julgar de novo o grafo que não mudou, o carimbo do vendor vira regra pública em todas as

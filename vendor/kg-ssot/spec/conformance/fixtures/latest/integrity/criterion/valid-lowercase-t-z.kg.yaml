@@ -1,0 +1,43 @@
+meta:
+  schema_version: "1"
+  id: valid-lowercase-t-z
+nodes:
+  - id: "Q_A"
+    node_type: "question"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: "C_A7_V1"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.8
+    label: "A régua sintética A7, versão 1."
+    x_criterion:
+      id: "A7"
+      version: 1
+      registered_at: "2026-10-20T10:00:00Z"
+      sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      text: "Passa com 9 de 10 réplicas."
+  - id: "E_R"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.8
+    label: "O resultado sintético R."
+    x_measured_under:
+      measured_at: "2026-10-21t10:00:00z"
+      criteria:
+        - criterion: "C_A7_V1"
+          sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+edges:
+  - from: C_A7_V1
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: E_R
+    to: Q_A
+    edge_type: TRACES_TO

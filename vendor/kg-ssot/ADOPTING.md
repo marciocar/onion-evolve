@@ -335,6 +335,20 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.20.0` to `kg-ssot-v4.21.0`, the contract goes to v4.12, and only the SHOULD level changes: nothing that
+passed fails, and the gate notes the new contract identity without asking for `--update` while no verdict changes.
+What you may see and do:
+
+- If your graphs record a yardstick and results measured under it, use `x_criterion` (one node per version, with its
+  `sha256` from `kg_criterion.py digest`) and `x_measured_under` on the result. Then add
+  `python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .` next to the gate in CI: the reader computes no
+  hash, so a criterion edited in place is caught only there.
+- If your graphs carry `x_` keys of your own that match a canonical profile (`x_mirror`, `x_doc_cycle`,
+  `x_questionnaire`), `kg_migrate.py nest --map <map>` shows the plan and, with `--apply`, moves them.
+- The reference reader now counts a missing required field once; counts in a per-occurrence baseline only go down.
+- Since 4.20.0, `kg_store` calls `kg_validate.judge(..., cache=...)`. A test double that replaces `judge` with the old
+  signature fails with `TypeError`, and the store answers "not judged": accept `cache=None` in the double.
+
 From `kg-ssot-v4.19.1` to `kg-ssot-v4.20.0`, the contract does not change (still v4.11), and nothing in your graphs
 needs editing. A folder with the `.kg-ssot-version` stamp is now left out by `kg_query.py`, `kg_vocab.py`,
 `kg_migrate.py`, and `kg_diff.py --from` too, not only by the gate; a stamp at the root of what is read no longer counts

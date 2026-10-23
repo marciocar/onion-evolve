@@ -1,0 +1,65 @@
+meta:
+  schema_version: "1"
+  id: warn-order-unknown-zone
+nodes:
+  - id: "Q_A"
+    node_type: "question"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: "C_A7_V1"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.8
+    label: "A régua sintética A7, versão 1."
+    x_criterion:
+      id: "A7"
+      version: 1
+      registered_at: "2026-10-20"
+      sha256: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      text: "Passa com 9 de 10 réplicas."
+  - id: "C_A7_V2"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.8
+    label: "A régua sintética A7, versão 2."
+    x_criterion:
+      id: "A7"
+      version: 2
+      registered_at: "2026-10-22"
+      sha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      ref: "criteria/a7.tsv"
+      amends: "C_A7_V1"
+      reason: "A réplica 3 mostrou o limite errado."
+      round: "r3"
+  - id: "E_R"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.8
+    label: "O resultado sintético R."
+    x_measured_under:
+      measured_at: "2026-10-21T23:30:00-03:00"
+      criteria:
+        - criterion: "C_A7_V2"
+          sha256: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+edges:
+  - from: C_A7_V1
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: C_A7_V2
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: E_R
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: C_A7_V2
+    to: C_A7_V1
+    edge_type: SUPERSEDES

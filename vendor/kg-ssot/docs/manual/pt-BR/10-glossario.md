@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/10-glossary.md sha256:3f8d21b4af32459e -->
+<!-- translation-of: docs/manual/10-glossary.md sha256:aa66bdf081311d8a -->
 # 10. Glossário
 
 [English](../10-glossary.md) | **Português (Brasil)**
@@ -18,6 +18,7 @@
 | **Código** | O identificador estável de uma violação, como `form.required.node.label` |
 | **Contrato** | Os schemas MUST e SHOULD, mais as regras de perfil YAML e as regras de integridade |
 | **Corpus** | O conjunto de grafos (`.kg.yaml` e `.kg.json`) de um repositório |
+| **Critério pré-registrado** | Uma régua fixada antes do dado, um nó por versão (`x_criterion`, com o `sha256` dela); o resultado cita a versão sob a qual foi medido (`x_measured_under`), e a mudança depois de ver o dado é uma emenda datada, desde o v4.12 |
 | **Dívida herdada** | Os grafos que já reprovavam no MUST quando a base foi gravada |
 | **Dívida SHOULD** | Quantos grafos (ou ocorrências) carregam cada aviso |
 | **Grafo** | Um arquivo `.kg.yaml`, ou a forma JSON dele, um arquivo `.kg.json` |
@@ -26,7 +27,7 @@
 | **MUST** | O nível do contrato que reprova |
 | **Nó** | Uma afirmação tipada do grafo |
 | **Órfão** | Um nó sem nenhuma aresta. Reprova |
-| **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11. Só julga a chave presente, e só alerta |
+| **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11; `x_criterion` e `x_measured_under` desde o v4.12. Só julga a chave presente, e só alerta |
 | **Perfil `gate`** | A parte mínima da release: o suficiente para rodar o gate e o check |
 | **Plano** | `DEV` ou `PROD` |
 | **Proveniência** | O objeto `provenance` (`source`, `locator`, `method`): de onde veio a afirmação |

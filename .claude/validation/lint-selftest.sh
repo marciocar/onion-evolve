@@ -29536,6 +29536,51 @@ _family run_upstream_portal_fixes_selftests
 # inválidos de um adotante viraram 5 HARD da REGRA 52 no dia 1 dele, e as saídas eram apagar o teste
 # ou desligar a guarda. Aqui se prova (a) o predicado, (b) que os SEIS consumidores o usam, e (c) que
 # a isenção não virou fail-open por substring.
+run_kg_criterion_ci_selftests() {
+  # ops/kg-criterion-ci.sh (2026-10-23, kg-ssot 4.21.0): o critério pré-registrado conferido por HASH, ao lado do
+  # gate. O leitor não calcula hash; editar a régua no lugar só reprova aqui. Mundo falso: repo git com o vendor
+  # REAL copiado, um arquivo de critério e um grafo que o cita. Core-only (ops/ não viaja).
+  local root; root="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+  local sut="${root}/ops/kg-criterion-ci.sh"
+  if [ ! -f "${sut}" ] || [ ! -f "${root}/vendor/kg-ssot/tools/kg_criterion.py" ]; then record_skip "kg-criterion-ci: script ou kg_criterion.py ausente"; return; fi
+  local sb; sb="$(mktemp -d)"; trap 'rm -rf "${sb}"' RETURN
+  mkdir -p "${sb}/vendor" "${sb}/crit" "${sb}/docs/g"
+  cp -r "${root}/vendor/kg-ssot" "${sb}/vendor/kg-ssot"
+  printf 'regra\tA\t\t\nregra\tB\t\t\n' > "${sb}/crit/regua.tsv"
+  local sha; sha="$(cd "${sb}" && python3 -I -B vendor/kg-ssot/tools/kg_criterion.py digest --root . --ref crit/regua.tsv 2>/dev/null)"
+  _kgc_graph() {   # _kgc_graph <sha a declarar>
+    printf 'meta:\n  title: "bancada"\nnodes:\n  - id: K_REGUA_V1\n    node_type: rule\n    status: confirmed\n    label: "régua"\n    x_criterion:\n      id: REGUA\n      version: "1"\n      registered_at: "2026-10-23"\n      sha256: \"%s\"\n      ref: crit/regua.tsv\nedges: []\n' "$1" > "${sb}/docs/g/b.kg.yaml"
+    (cd "${sb}" && git add -A >/dev/null 2>&1)
+  }
+  (cd "${sb}" && git init -q && git config user.email t@t && git config user.name t)
+  local rc out
+  # (a) hash certo → rc 0
+  _kgc_graph "${sha}"
+  if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && grep -q 'criterios=1 achados=0' <<< "${out}"; then record_pass "kg-criterion-ci: (a) critério íntegro passa (rc 0, 1 critério conferido)"
+  else record_fail "kg-criterion-ci: (a) critério íntegro" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (b) MUTANTE: a régua editada no lugar (o arquivo muda, o sha declarado fica) → rc 1 com o achado do digest
+  printf 'regra\tC\t\t\n' >> "${sb}/crit/regua.tsv"; (cd "${sb}" && git add -A >/dev/null 2>&1)
+  if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'integrity.criterion-digest' <<< "${out}"; then record_pass "kg-criterion-ci: (b) régua editada no lugar REPROVA (rc 1, criterion-digest)"
+  else record_fail "kg-criterion-ci: (b) régua editada no lugar" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (c) sha declarado errado (64 hex de outro conteúdo) → rc 1. Entre ASPAS: sem elas, 64 dígitos viram inteiro no YAML
+  #     e o nó some calado como critério (fail-open do vendor, reportado à par em 2026-10-23)
+  printf 'regra\tA\t\t\nregra\tB\t\t\n' > "${sb}/crit/regua.tsv"; _kgc_graph "$(printf '%064d' 0)"
+  if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ]; then record_pass "kg-criterion-ci: (c) sha declarado errado REPROVA (rc 1)"
+  else record_fail "kg-criterion-ci: (c) sha declarado errado" "rc=${rc}"; fi
+  # (d) fail-closed: sem o vendor não julga (rc 2), nunca verde
+  rm -rf "${sb}/vendor"
+  if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 2 ]; then record_pass "kg-criterion-ci: (d) sem o vendor sai rc 2 (não julgou), nunca verde"
+  else record_fail "kg-criterion-ci: (d) fail-closed" "rc=${rc}"; fi
+  # (e) o gate do CI chama este script (sem a chamada, a guarda não vale no CI nem no pr-finalize)
+  if grep -q 'kg-criterion-ci.sh' "${root}/ops/kg-gate-ci.sh"; then record_pass "kg-criterion-ci: (e) o ops/kg-gate-ci.sh chama a conferência por hash"
+  else record_fail "kg-criterion-ci: (e) ligação no gate" "ops/kg-gate-ci.sh não chama ops/kg-criterion-ci.sh"; fi
+  unset -f _kgc_graph
+}
+
 run_kg_fixture_paths_selftests() {
   local h="${SCRIPT_DIR}/kg-fixture-paths.sh"
   if [ ! -f "${h}" ]; then record_skip "kg-fixture-paths: helper ausente"; return; fi
@@ -29684,6 +29729,7 @@ run_kg_fixture_paths_selftests() {
   fi
 }
 _family run_kg_fixture_paths_selftests
+_family run_kg_criterion_ci_selftests
 
 # Aviso de hook roteado pelo ARTEFATO, não pelo papel (sinal de campo de um repo PRÉ-ADOÇÃO,
 # 2026-09-05): o guard mandava ler o check `onion-review-verdict` num repo que não o tem — texto certo,
