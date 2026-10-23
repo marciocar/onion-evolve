@@ -7,6 +7,7 @@
 | Term | Meaning |
 |---|---|
 | **Adopter** | A repository that brings in the contract by tag and runs the gate in CI |
+| **Audit package** | One row per questionnaire item, with the question, the answer, the verdict, the dated evidence, the evidence requests, the owner, and the computed gaps, in CSV, XLSX, or JSON (`kg_audit.py`), since 4.22.0 |
 | **Baseline** | The `.kg-ssot/gate/` folder with the debt the gate compares against: the contract identity and one record per graph (through 4.15.1, the single file `.kg-ssot/gate.json`) |
 | **Canonical profile** | The shape the SHOULD gives to an `x_` key that adopters repeat (`x_term`, `x_mirror`, `x_severity`...), since v4.11; `x_criterion` and `x_measured_under` since v4.12. It only judges a key that is present, and only warns |
 | **Class (of `method`)** | `medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived), or `testemunho` (testimony) |

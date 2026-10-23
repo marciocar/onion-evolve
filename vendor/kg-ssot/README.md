@@ -8,7 +8,7 @@ what depends on it, and your CI rejects the ones that don't.**
 **English** | [Português (Brasil)](README.pt-BR.md)
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Contract: v4 · release 4.21.1](https://img.shields.io/badge/contract-v4%20%C2%B7%204.21.1-6f42c1)](spec/release.json)
+[![Contract: v4 · release 4.22.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.22.0-6f42c1)](spec/release.json)
 [![Conformance: 438/438](https://img.shields.io/badge/conformance-438%2F438-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -75,12 +75,12 @@ The tools print in English by default and in Brazilian Portuguese when your loca
 
 | Channel | Command | What you get |
 |---|---|---|
-| [PyPI](https://pypi.org/project/kg-ssot/) | `pip install kg-ssot` | The commands `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-vocab`, `kg-criterion`, `kg-mcp` and `kg-prov-export`, with the contract and the suite inside |
+| [PyPI](https://pypi.org/project/kg-ssot/) | `pip install kg-ssot` | The commands `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-vocab`, `kg-criterion`, `kg-audit`, `kg-mcp` and `kg-prov-export`, with the contract and the suite inside |
 | [npm](https://www.npmjs.com/package/kg-ssot) | `npm install kg-ssot` | The JavaScript reader with a precompiled validator, which also runs in React Native and Expo |
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
 | [Container](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
-| Your repository | `kg_vendor.py update --tag kg-ssot-v4.21.1` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
+| Your repository | `kg_vendor.py update --tag kg-ssot-v4.22.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
 
 ## A node, inside
 
@@ -165,6 +165,7 @@ flowchart LR
 | **Query and diff** | `kg_query.py` selects nodes across a whole corpus and projects every edge with the label on the other end, paginated (`kg-ssot.query/1`); `kg_diff.py` compares revisions by id, field by field, reading git without a checkout (`kg-ssot.diff/1`) |
 | **Domain vocabulary** | The `x_term` profile gives each synonym its source, document version and verification date; `kg_vocab.py` resolves a text to its term, lists what is due, and exports to SKOS-XL and Apache Ossie (`kg-ssot.vocab/1`); the MCP server serves it as `kg_terms` |
 | **Pre-registered criterion** | `x_criterion` gives each version of a yardstick a node and a `sha256`, and `x_measured_under` ties a result to the version it was measured under; changing the yardstick after seeing the data shows up as a post-hoc warning, and `kg_criterion.py` checks the `sha256` against the text or the file (`kg-ssot.criterion/1`) |
+| **Audit package by question** | `kg_audit.py` exports one row per questionnaire item (the `x_questionnaire` profile), with the question, the answer, the verdict, the required and the given evidence with its date and due date, the evidence requests (`role: evidence_request` and `evidence_requirement`), the contradictions, the owner, and the gaps it computes, in CSV, XLSX (no dependency), or JSON (`kg-ssot.audit/1`) |
 | **Data-only suite** | 438 cases with their own metaschema, in the style of the JSON-Schema-Test-Suite |
 | **Per-graph ratchet** | Adopt without a big-bang migration: inherited debt stays named and only shrinks |
 | **Vendor by tag** | No copy-paste, no shared code: one sha256 stamp per file |
@@ -183,7 +184,7 @@ flowchart LR
 
 ## Status
 
-- **Current:** contract v4, release `kg-ssot-v4.21.1`. The reference reader passes 424 of 438 cases in `latest/`.
+- **Current:** contract v4, release `kg-ssot-v4.22.0`. The reference reader passes 424 of 438 cases in `latest/`.
 - **In use:** three adopters run the gate in CI, one of them in production.
 - **Next:** v5 will fail a `method` outside the `<class>: <detail>` form, which only warns today.
 - **Open:** the semantic layer (freshness, contradiction, domain completeness) lives in `optional/`, and the reference

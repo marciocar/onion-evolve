@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:0899b60f0b61d968 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:501642872725376c -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.21.1",
+  "release": "kg-ssot-v4.22.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -883,6 +883,61 @@ python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
 - **No CI.** O leitor não calcula hash, então o critério editado no lugar sem `sha256` novo só é pego aqui: se os seus
   grafos usam `x_criterion`, ponha `python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .` ao lado do
   gate.
+
+## `kg_audit.py`: o pacote de auditoria por pergunta (4.22.0)
+
+O auditor pede o pacote por pergunta: a resposta, as afirmações, a evidência com data, a lacuna e o dono, numa planilha.
+O grafo já guarda tudo isso; esta ferramenta o dispõe, uma linha por item de questionário, em CSV, XLSX ou JSON. Ela
+não julga a forma (isso é do `kg_validate.py`) e não escreve nada no grafo.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --questionnaire "Q-2026" --as-of 2026-10-23
+python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format xlsx --output pacote.xlsx
+python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format csv --view evidence > evidencia.csv
+```
+
+- **O item** é o par (questionário, número) que o `x_questionnaire` nomeia (`name` e `questions`). Quem entra:
+  - a pergunta: o nó `question` com o perfil;
+  - a resposta: o nó (não `question`) com o perfil do item, e o nó sem perfil ligado à pergunta por `DEPENDS_ON`, numa
+    direção ou na outra (as duas convivem nos grafos reais; a resposta sai uma vez). O nó com perfil já disse a que
+    item responde, então uma aresta nunca o puxa para outro item;
+  - a evidência: o nó com `SUPPORTS` para uma resposta, ou com `SUPPORTS` ou `TRACES_TO` para a pergunta, para um pedido
+    ou para um requisito de evidência do item, local ou de outro grafo (`external_edges`); uma pergunta, um pedido ou um
+    requisito nunca é evidência;
+  - a contradição: o nó com `REFUTES` para a resposta ou a pergunta. Só a resposta viva traz evidência e contradição:
+    a `superseded` ou a `refuted` (uma refutação já reconciliada) não fecha nem abre lacuna do item;
+  - o pedido de evidência (`role: evidence_request`) e o requisito de evidência (`role: evidence_requirement`, "que
+    evidência este item exige", em coluna própria): nunca são tomados por pergunta nem por resposta. Cada evidência diz
+    de que pedido veio (o pedido para o qual ela aponta por `SUPPORTS` ou `TRACES_TO`). O item que só um pedido ou um
+    requisito cita também sai, com as lacunas do que falta.
+- **As lacunas** são calculadas, nunca escritas à mão:
+  - `no-answer`: sem resposta viva (a resposta `refuted` ou `superseded` entra na lista, com o status, mas não conta);
+  - `contradicted`: um `REFUTES` de um nó que não é `refuted` nem `superseded`;
+  - `no-confirmed-evidence`: nenhuma evidência com `status: confirmed` (a evidência não confirmada entra na lista, mas
+    não fecha lacuna);
+  - `evidence-unstamped`: evidência confirmada sem `verified_at` válido;
+  - `evidence-cadence-invalid`: evidência confirmada cujo `reverify_every` não é duração, e que por isso nunca venceria;
+  - `evidence-due`: evidência confirmada cujo `verified_at` mais o `reverify_every` cai no `--as-of` ou antes (hoje, por
+    padrão);
+  - `verdict-open`: sem veredito vivo, ou um que não é `meets` nem `not_applicable`.
+- **Nada some em silêncio.** O nó cujo `x_questionnaire` não tem `name` ou uma lista `questions` não vazia, o nó com `role` fora do
+  enum e o número de `questions` que não é texto (`questions: [7]` sem aspas) não entram: saem em `skipped`, no próprio
+  pacote (a planilha Pulados do XLSX, o `--view skipped` no CSV, o JSON), no stderr e na listagem humana, e o
+  `--fail-on-gap` dá rc 1 com eles.
+- **As suas colunas.** `--column <chave>` traz uma chave do nó de resposta (uma `x_` sua, como a lista de cards de
+  remediação) como mais uma coluna. Uma lista vira itens separados por `; `.
+- **Os formatos.**
+  - `csv`: as perguntas (uma linha por item) ou, com `--view evidence`, a evidência (uma linha por item e evidência,
+    com os problemas do carimbo) ou, com `--view skipped`, o que foi pulado, em UTF-8 com a marca de ordem de bytes para o Excel ler. A célula que começa com `=`,
+    `+`, `-`, `@`, tab ou retorno de carro ganha um apóstrofo na frente, para nunca rodar como fórmula (a regra da OWASP
+    contra injeção em CSV).
+  - `xlsx`: as três planilhas (perguntas, evidência, pulados) num arquivo, escrito só com a biblioteca padrão, todo valor como texto, o cabeçalho
+    congelado e a célula cortada no teto do Excel, de 32.767 unidades UTF-16. O mesmo pacote dá os mesmos bytes.
+  - `json`: `kg-ssot.audit/1` (`spec/audit.schema.json`), com tudo aninhado.
+  - `human`: uma listagem curta para o terminal.
+- **Saída e rc.** rc 0 quando exportou, 1 quando um grafo não se lê (o pacote ficaria incompleto em silêncio) ou, com
+  `--fail-on-gap`, quando um item tem lacuna ou algo foi pulado, e 2 com entrada quebrada. O `xlsx` pede `--output`. Dê o corpus com
+  `--root`: a aresta para outro grafo se resolve pelo caminho a partir da raiz.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 

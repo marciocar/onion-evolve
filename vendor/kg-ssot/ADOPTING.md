@@ -335,6 +335,19 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.21.1` to `kg-ssot-v4.22.0`, the contract goes to v4.13, and only the SHOULD level changes: nothing that
+passed fails, and the gate notes the new contract identity without asking for `--update` while no verdict changes
+(measured on the core's 184 graphs before the tag). What you may see and do:
+
+- `x_questionnaire` gets `role`: `item` (the default), `evidence_request` (a request to a person for evidence), or
+  `evidence_requirement` (the evidence an item requires). Another value warns as `form.enum.node.x_questionnaire.role`.
+  If you tell requests or requirements apart by an id prefix, give them the `role` (`kg_migrate.py nest` with a `const`
+  field does it).
+- If an auditor asks for the package by question, `kg_audit.py --root .` exports it (CSV, XLSX, or JSON). Write the
+  numbers in `questions` as text (`["7"]`, not `[7]`): a number that is not text is skipped and reported. Set
+  `KG_SSOT_LANG=pt-BR` for headers in Portuguese. In CI, `--fail-on-gap` gives rc 1 when an item has a gap or something
+  was skipped.
+
 From `kg-ssot-v4.21.0` to `kg-ssot-v4.21.1`, the contract does not change (still v4.12), and the gate asks for no
 `--update`. Only `kg_criterion.py check` changes: what it cannot check now comes out as `integrity.criterion-malformed`,
 with rc 1, instead of leaving the check in silence. The typical case is a `sha256` of digits alone without quotes,

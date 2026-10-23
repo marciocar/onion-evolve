@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:79985312aa833f39 -->
+<!-- translation-of: spec/conformance/README.md sha256:3f30eb224da08c8c -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -234,6 +234,11 @@ ordem, porque rodadas são rótulos. A data num dia que não existe (30 de fever
 
 Para estes, o leitor não calcula hash nem lê corpus: a citação `<caminho>#<id>` e o `sha256` contra o texto ou o
 arquivo são do `kg_criterion.py`, que não faz parte da suíte. Nenhum veredito muda.
+
+O v4.13 põe o `role` no perfil `x_questionnaire`, no SHOULD (`latest/form/profiles/`): `item`, o padrão,
+`evidence_request` (o pedido de evidência a uma pessoa) ou `evidence_requirement` (a evidência que um item exige), que
+os separam do item do questionário. Outro valor alerta como
+`form.enum.node.x_questionnaire.role`, e nada que passava reprova.
 
 O mesmo código pode ser MUST num caso e SHOULD em outro, porque a severidade é do caso, não do código.
 

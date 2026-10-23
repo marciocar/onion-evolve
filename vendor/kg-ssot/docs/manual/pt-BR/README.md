@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/README.md sha256:f666e83c53d4f63e -->
+<!-- translation-of: docs/manual/README.md sha256:0871fe30587aa6f5 -->
 # Manual do KG-SSOT
 
 [English](../README.md) | **Português (Brasil)**
@@ -9,7 +9,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** num arquivo texto. Cada a
 em que foi conferida e contra o que foi conferida. Um contrato formal decide se o arquivo está bem escrito. Este manual
 cobre o formato `.kg.yaml`, o contrato, as ferramentas e como adotar o KG-SSOT num repositório.
 
-Este manual descreve a release **4.21.1** (tag `kg-ssot-v4.21.1`). O contrato vigente dessa release é o **v4**.
+Este manual descreve a release **4.22.0** (tag `kg-ssot-v4.22.0`). O contrato vigente dessa release é o **v4**.
 
 O manual também existe em português do Brasil, em [`docs/manual/pt-BR/`](README.md): esta tradução. Quando os
 dois divergirem, vale o texto em inglês.

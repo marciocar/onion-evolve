@@ -10,6 +10,34 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.22.0] - 2026-10-23
+
+O pacote de auditoria por pergunta: uma linha por item de questionário, com a resposta, a evidência datada e as lacunas
+que ele calcula, em CSV, XLSX ou JSON. Contrato v4.13: o `x_questionnaire.role` no SHOULD, e nada que passava reprova.
+
+### Adicionado
+
+- **O pacote de auditoria por pergunta (`kg_audit.py`).** O auditor pede o pacote por pergunta, e até aqui um adotante
+  o mantinha à mão ao lado do grafo. A ferramenta exporta uma linha por item de questionário (o par de nome e número
+  que o `x_questionnaire` dá): a pergunta, a resposta (pelo perfil, e o nó sem perfil pelo `DEPENDS_ON` numa direção ou
+  na outra), o veredito, a evidência exigida, a evidência (`SUPPORTS` para a resposta, ou `SUPPORTS` ou `TRACES_TO` para
+  a pergunta, um pedido ou um requisito, também de outro grafo) com a data, o alcance e o vencimento, as contradições
+  (`REFUTES`), os pedidos de evidência, o dono e as lacunas que ela calcula: `no-answer` (sem resposta viva: a
+  `refuted` ou `superseded` não conta, nem a evidência dela), `contradicted`, `no-confirmed-evidence`, `evidence-unstamped`,
+  `evidence-cadence-invalid`, `evidence-due` e `verdict-open`. O que ela não pode usar (um `role` fora do enum, um
+  número de pergunta que não é texto, um perfil malformado) sai em `skipped`, no próprio pacote, nunca em silêncio.
+  Formatos:
+  - CSV, com as perguntas ou com a evidência, e um apóstrofo na frente da célula que rodaria como fórmula;
+  - XLSX com as perguntas, a evidência e o que foi pulado, escrito só com a biblioteca padrão, com bytes estáveis;
+  - JSON, `kg-ssot.audit/1` (`spec/audit.schema.json`).
+
+  O `--column` traz uma chave própria do adotante na resposta como coluna, o `--as-of` fixa o dia contra o qual a
+  evidência vence, e o `--fail-on-gap` dá rc 1 para o CI. Um grafo que não se lê dá rc 1, porque o pacote ficaria
+  incompleto em silêncio. Também no PyPI, como `kg-audit`. Medido nos grafos de um adotante antes do corte.
+- **O `x_questionnaire.role` (contrato v4.13).** `item`, o padrão; `evidence_request`, o pedido de evidência a uma
+  pessoa; ou `evidence_requirement`, a evidência que um item exige. Sem ele, só o prefixo do id os separava. Só SHOULD:
+  outro valor alerta como `form.enum.node.x_questionnaire.role`, e nada que passava reprova.
+
 ## [4.21.1] - 2026-10-23
 
 O `kg_criterion.py check` acusa o que não consegue conferir em vez de pulá-lo. Contrato v4.12, sem mudança.

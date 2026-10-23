@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.21.1",
+  "release": "kg-ssot-v4.22.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -893,6 +893,63 @@ python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
 - **In CI.** The reader does not hash, so a criterion edited in place without a new `sha256` is caught only here: if
   your graphs use `x_criterion`, add `python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .` next to the
   gate.
+
+## `kg_audit.py`: the audit package by question (4.22.0)
+
+An auditor asks for the package by question: the answer, the claims, the dated evidence, the gap, and the owner, in a
+spreadsheet. The graph already holds all of it; this tool lays it out, one row per questionnaire item, in CSV, XLSX, or
+JSON. It does not judge the form (that is `kg_validate.py`) and writes nothing to the graph.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --questionnaire "Q-2026" --as-of 2026-10-23
+python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format xlsx --output package.xlsx
+python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format csv --view evidence > evidence.csv
+```
+
+- **The item** is the pair (questionnaire, number) that `x_questionnaire` names (`name` and `questions`). Who comes in:
+  - the question: the `question` node with the profile;
+  - the answer: a node (not `question`) with the profile for the item, and a node without the profile tied to the
+    question by `DEPENDS_ON`, in either direction (both live in real graphs; the answer comes out once). A node with
+    the profile has already said which item it answers, so an edge never pulls it into another item;
+  - the evidence: a node with `SUPPORTS` to an answer, or with `SUPPORTS` or `TRACES_TO` to the question, to an evidence
+    request, or to an evidence requirement of the item, local or from another graph (`external_edges`); a question, a
+    request, or a requirement is never evidence;
+  - the contradiction: a node with `REFUTES` to the answer or the question. Only a live answer brings evidence and
+    contradictions: one that is `superseded` or `refuted` (a refutation already reconciled) neither closes nor opens a
+    gap of the item;
+  - the evidence request (`role: evidence_request`) and the evidence requirement (`role: evidence_requirement`, "what
+    evidence this item requires", in its own column): never taken for a question or an answer. Each piece of evidence
+    says which request it came from (the request it points to by `SUPPORTS` or `TRACES_TO`). An item that only a
+    request or a requirement cites comes out too, with the gaps of what is missing.
+- **The gaps** are computed, never written by hand:
+  - `no-answer`: no live answer (an answer that is `refuted` or `superseded` is listed, with its status, but does not
+    count);
+  - `contradicted`: a `REFUTES` from a node that is neither `refuted` nor `superseded`;
+  - `no-confirmed-evidence`: no evidence with `status: confirmed` (evidence that is not confirmed is listed, but does
+    not close a gap);
+  - `evidence-unstamped`: confirmed evidence without a valid `verified_at`;
+  - `evidence-cadence-invalid`: confirmed evidence whose `reverify_every` is not a duration, so it would never be due;
+  - `evidence-due`: confirmed evidence whose `verified_at` plus `reverify_every` falls on or before `--as-of` (today by
+    default);
+  - `verdict-open`: no live verdict, or one other than `meets` and `not_applicable`.
+- **Nothing drops in silence.** A node whose `x_questionnaire` lacks `name` or a `questions` list that is not empty, a node whose `role`
+  is outside the enum, and a number in `questions` that is not text (`questions: [7]` without quotes) do not come in:
+  they come out in `skipped`, in the package itself (the Skipped sheet of the XLSX, `--view skipped` in CSV, the JSON),
+  on standard error, and in the human listing, and `--fail-on-gap` gives rc 1 with them.
+- **Your own columns.** `--column <key>` adds a key of the answer node (an `x_` key of yours, such as a list of
+  remediation cards) as one more column. A list becomes items separated by `; `.
+- **The formats.**
+  - `csv`: the questions (one row per item) or, with `--view evidence`, the evidence (one row per item and piece of
+    evidence, with the problems of its stamp), or, with `--view skipped`, what was skipped, in UTF-8 with a byte-order mark so that Excel reads it. A cell that starts
+    with `=`, `+`, `-`, `@`, a tab, or a carriage return gets a leading apostrophe, so it never runs as a formula (the
+    OWASP rule for CSV injection).
+  - `xlsx`: the three sheets (questions, evidence, skipped) in one workbook, written with the standard library only, every value as text, the header
+    frozen, and a cell cut at Excel's limit of 32,767 UTF-16 units. The same package gives the same bytes.
+  - `json`: `kg-ssot.audit/1` (`spec/audit.schema.json`), with everything nested.
+  - `human`: a short listing for the terminal.
+- **Output and rc.** rc 0 when it exported, 1 when a graph does not read (the package would be incomplete in silence)
+  or, with `--fail-on-gap`, when an item has a gap or something was skipped, and 2 on broken input. `xlsx` needs `--output`. Give the corpus with
+  `--root`: an edge to another graph resolves by its path from the root.
 
 ## `kg_prov_export.py`: provenance in PROV-O
 

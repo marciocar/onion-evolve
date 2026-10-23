@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:7fcc9c7390dd8847 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:efb296dd5682fcb5 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -58,7 +58,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 desde a 4.21.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 desde a 4.22.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -83,6 +83,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.19 | Contrato v4.11: `meta.title` e `meta.slug` viram chaves conhecidas, e o SHOULD ganha os perfis canônicos de `x_` (`x_term` para o vocabulário de domínio, `x_mirror`, `x_doc_cycle`, `x_questionnaire`, `x_severity`, e `x_confidence` e `x_provisional` na aresta); a ferramenta do vocabulário (`kg_vocab.py`, com exportação para SKOS-XL e Apache Ossie, e a ferramenta `kg_terms` no servidor MCP) e o `kg_migrate.py keys`, que renomeia chave estranha para `x_` |
 | 4.20 | Contrato v4.11, sem mudança. O armazém guarda o veredito de cada grafo julgado e deixa de julgar de novo o que não mudou; o carimbo `.kg-ssot-version` vira a regra pública do vendor em toda ferramenta; o `kg_diff.py` dá nome à árvore de trabalho (`WORKTREE`) |
 | 4.21 | Contrato v4.12: o critério pré-registrado, com os perfis SHOULD `x_criterion` e `x_measured_under`, cinco avisos de coerência nos dois leitores, e o `kg_criterion.py`, que confere o `sha256` contra o texto ou o arquivo e segue a citação de outro grafo; o `kg_migrate.py nest`, que leva as chaves `x_` próprias de um adotante para um perfil canônico |
+| 4.22 | Contrato v4.13: o `x_questionnaire.role` (`item`, `evidence_request` ou `evidence_requirement`) no SHOULD; o pacote de auditoria por pergunta, `kg_audit.py`, em CSV, XLSX ou JSON |
 
 ## Versões e tags
 

@@ -2154,10 +2154,6 @@ msgid "x_doc_cycle is the life cycle of an external document (v4.11): issuer and
 msgstr "x_doc_cycle é o ciclo de vida de um documento externo (v4.11): issuer e state são obrigatórios; state é draft, enacted, in_force, suspended, revoked, expired ou superseded, e recheck_every precisa de checked_at."
 
 #: tools/kg_validate.py
-msgid "x_questionnaire links the node to an external questionnaire (v4.11): name and questions (a list that is not empty) are required; verdict is meets, partial, does_not_meet, not_applicable, or unknown."
-msgstr "x_questionnaire liga o nó a um questionário externo (v4.11): name e questions (uma lista não vazia) são obrigatórios; verdict é meets, partial, does_not_meet, not_applicable ou unknown."
-
-#: tools/kg_validate.py
 msgid "x_severity is critical, high, medium, low, or info (v4.11)."
 msgstr "x_severity é critical, high, medium, low ou info (v4.11)."
 
@@ -2258,6 +2254,9 @@ msgid "The dates cannot tell whether the result was measured before or after its
 msgstr "As datas não dizem se o resultado foi medido antes ou depois do registro da versão do critério: o mesmo dia, ou um dia de distância com um fuso que a data sozinha não dá."
 
 #: tools/kg_validate.py
+msgid "x_questionnaire links the node to an external questionnaire (v4.11): name and questions (a list that is not empty) are required; verdict is meets, partial, does_not_meet, not_applicable, or unknown; role (v4.13) is item, evidence_request, or evidence_requirement."
+msgstr "o x_questionnaire liga o nó a um questionário externo (v4.11): name e questions (uma lista não vazia) são obrigatórios; verdict é meets, partial, does_not_meet, not_applicable ou unknown; role (v4.13) é item, evidence_request ou evidence_requirement."
+
 msgid "Quote the sha256 (a hash of digits alone reads as a number) and give exactly one of ref and text, in text."
 msgstr "Ponha o sha256 entre aspas (um hash só de dígitos vira número) e dê exatamente um de ref e text, em texto."
 
@@ -2731,6 +2730,198 @@ msgstr "{ref}: o caminho está vazio"
 #: tools/kg_criterion.py
 msgid "· {n} citation(s) of a graph that was not given left unchecked: give it too, or use --root"
 msgstr "· {n} citação(ões) de um grafo que não foi dado ficaram sem conferir: dê ele também, ou use o --root"
+
+#: tools/kg_audit.py
+msgid "--as-of {value} is not a YYYY-MM-DD date"
+msgstr "--as-of {value} não é uma data AAAA-MM-DD"
+
+#: tools/kg_audit.py
+msgid "Answer"
+msgstr "Resposta"
+
+#: tools/kg_audit.py
+msgid "Answer text"
+msgstr "Texto da resposta"
+
+#: tools/kg_audit.py
+msgid "Contradictions"
+msgstr "Contradições"
+
+#: tools/kg_audit.py
+msgid "Due"
+msgstr "Vence em"
+
+#: tools/kg_audit.py
+msgid "Evidence"
+msgstr "Evidência"
+
+#: tools/kg_audit.py
+msgid "Evidence dates"
+msgstr "Datas da evidência"
+
+#: tools/kg_audit.py
+msgid "Evidence requests"
+msgstr "Pedidos de evidência"
+
+#: tools/kg_audit.py
+msgid "File"
+msgstr "Arquivo"
+
+#: tools/kg_audit.py
+msgid "Gaps"
+msgstr "Lacunas"
+
+#: tools/kg_audit.py
+msgid "KEY"
+msgstr "CHAVE"
+
+#: tools/kg_audit.py
+msgid "Label"
+msgstr "Rótulo"
+
+#: tools/kg_audit.py
+msgid "Overdue"
+msgstr "Vencida"
+
+#: tools/kg_audit.py
+msgid "Owner"
+msgstr "Dono"
+
+#: tools/kg_audit.py
+msgid "Question"
+msgstr "Pergunta"
+
+#: tools/kg_audit.py
+msgid "Question text"
+msgstr "Texto da pergunta"
+
+#: tools/kg_audit.py
+msgid "Questionnaire"
+msgstr "Questionário"
+
+#: tools/kg_audit.py
+msgid "Questions"
+msgstr "Perguntas"
+
+#: tools/kg_audit.py
+msgid "Reverify every"
+msgstr "Reconferir a cada"
+
+#: tools/kg_audit.py
+msgid "Source item"
+msgstr "Item de origem"
+
+#: tools/kg_audit.py
+msgid "Status"
+msgstr "Status"
+
+#: tools/kg_audit.py
+msgid "The audit package by question: one row per questionnaire item, with the answer, the verdict, the dated evidence, the gaps, and the owner."
+msgstr "O pacote de auditoria por pergunta: uma linha por item de questionário, com a resposta, o veredito, a evidência datada, as lacunas e o dono."
+
+#: tools/kg_audit.py
+msgid "Trace"
+msgstr "Trace"
+
+#: tools/kg_audit.py
+msgid "Verdict"
+msgstr "Veredito"
+
+#: tools/kg_audit.py
+msgid "Verified against"
+msgstr "Conferido contra"
+
+#: tools/kg_audit.py
+msgid "Verified at"
+msgstr "Conferido em"
+
+#: tools/kg_audit.py
+msgid "Verified scope"
+msgstr "Alcance da conferência"
+
+#: tools/kg_audit.py
+msgid "a key of the answer node to add as a column (repeatable)"
+msgstr "uma chave do nó de resposta para virar coluna (repetível)"
+
+#: tools/kg_audit.py
+msgid "due"
+msgstr "vence"
+
+#: tools/kg_audit.py
+msgid "gaps: {gaps}"
+msgstr "lacunas: {gaps}"
+
+#: tools/kg_audit.py
+msgid "no gap"
+msgstr "sem lacuna"
+
+#: tools/kg_audit.py
+msgid "only the items of this questionnaire (x_questionnaire.name)"
+msgstr "só os itens deste questionário (x_questionnaire.name)"
+
+#: tools/kg_audit.py
+msgid "the day the evidence is due against (default: today)"
+msgstr "o dia contra o qual a evidência vence (padrão: hoje)"
+
+#: tools/kg_audit.py
+msgid "unstamped"
+msgstr "sem carimbo"
+
+#: tools/kg_audit.py
+msgid "write here instead of the standard output (required for xlsx)"
+msgstr "grava aqui em vez da saída padrão (obrigatório no xlsx)"
+
+#: tools/kg_audit.py
+msgid "xlsx needs --output"
+msgstr "o xlsx pede --output"
+
+#: tools/kg_audit.py
+msgid "yes"
+msgstr "sim"
+
+#: tools/kg_audit.py
+msgid "· {n} item(s); {gap} with a gap"
+msgstr "· {n} item(ns); {gap} com lacuna"
+
+#: tools/kg_audit.py
+msgid "Problems"
+msgstr "Problemas"
+
+#: tools/kg_audit.py
+msgid "Required evidence"
+msgstr "Evidência exigida"
+
+#: tools/kg_audit.py
+msgid "SKIPPED  {file}#{id}  {reason}  {detail}"
+msgstr "PULADO  {file}#{id}  {reason}  {detail}"
+
+#: tools/kg_audit.py
+msgid "Detail"
+msgstr "Detalhe"
+
+#: tools/kg_audit.py
+msgid "Node"
+msgstr "Nó"
+
+#: tools/kg_audit.py
+msgid "Reason"
+msgstr "Motivo"
+
+#: tools/kg_audit.py
+msgid "Skipped"
+msgstr "Pulados"
+
+#: tools/kg_audit.py
+msgid "csv: the questions (one row per item), the evidence (one row per item and evidence), or what was skipped"
+msgstr "csv: as perguntas (uma linha por item), a evidência (uma linha por item e evidência) ou o que foi pulado"
+
+#: tools/kg_audit.py
+msgid "rc 1 when an item has a gap or something was skipped"
+msgstr "rc 1 quando um item tem lacuna ou algo foi pulado"
+
+#: tools/kg_audit.py
+msgid "· {n} skipped: see --view skipped"
+msgstr "· {n} pulado(s): veja --view skipped"
 
 #: tools/kg_criterion.py
 msgid "exactly one of ref and text is needed"
