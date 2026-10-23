@@ -1,4 +1,6 @@
 meta:
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "Lote do /meta:drive de 2026-10-23 (AUDIT): Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE pesquisada — causa medida (EPIPE no lint inflava o CONTROLE; liga/desliga 4/150→0/150), evidência E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT no grafo da passada adversarial (fios-abertos no teto 19/19), cura proposta (julgar o conjunto de HARD) sem aplicar; status da pergunta NÃO mexido (selo do maestro). I_KB_GAMIFICACAO_RAMPA_GATED segue gated (D_IP_LICENSE do adotante open, medido). I_ADOPT_CAMADA_COLABORADOR segue gated (nenhum 2º adotante pediu, medido). Nenhum flip auto-selado."
   id: fios-abertos
   schema_version: "1"
   baseline: "2026-08-08"
