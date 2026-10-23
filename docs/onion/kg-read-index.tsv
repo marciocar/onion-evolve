@@ -525,6 +525,7 @@
 .claude/validation/kg-verification-coverage.sh	E_CINCO_CLASSES_ESTADO_MEDIDO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/kg-verification-coverage.sh	E_FAIL_OPEN_DA_CATRACA_REPRODUZIDO_NOS_DOIS	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/kg-verification-coverage.sh	E_GRANAAI_NOBASELINE_PREEXISTING	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+.claude/validation/kg-verification-coverage.sh	E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/kg-verification-coverage.sh	E_MEDICAO_NAO_OBSERVADA_ERA_MINHA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/kg-verification-coverage.sh	E_MEMOIZACAO_MORTA_EM_SUBSHELL	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/kg-verification-coverage.sh	E_SHA1SUM_POR_NO_2486_SPAWNS	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
