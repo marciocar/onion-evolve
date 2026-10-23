@@ -2,7 +2,8 @@
 branch: docs/inbox-env-guard-signal-processed
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a5f9bf4d982ec8d8868d14ee6f3be5647b656fc42506859d4bb180a6b9a3f62f
+reviewed_code_sha256: df60d87e6b32f50e2918c294bbdf21e0679a4d36fc86f7f417d17702ff253d44
 findings_total: 0
 findings_real: 0
 tokens: 0
