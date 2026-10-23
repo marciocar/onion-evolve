@@ -1309,6 +1309,22 @@ msgstr "{file} (o grafo inteiro)"
 msgid "· {total} node(s) in {graphs} graph(s)"
 msgstr "· {total} nó(s) em {graphs} grafo(s)"
 
+#: tools/kg_query.py
+msgid "no node has every word of --text in its label or narrative: try fewer words, or a term of the vocabulary (kg_vocab.py lookup)"
+msgstr "nenhum nó tem todas as palavras do --text no label nem na narrativa: tente menos palavras, ou um termo do vocabulário (kg_vocab.py lookup)"
+
+#: tools/kg_query.py
+msgid "no node has every word of --text in its label: try fewer words, --in-narrative, or a term of the vocabulary (kg_vocab.py lookup)"
+msgstr "nenhum nó tem todas as palavras do --text no label: tente menos palavras, o --in-narrative, ou um termo do vocabulário (kg_vocab.py lookup)"
+
+#: tools/kg_query.py
+msgid "· --text is the term {pref} ({file}#{id}): it also matched {forms}"
+msgstr "· o --text é o termo {pref} ({file}#{id}): casou também {forms}"
+
+#: tools/kg_query.py
+msgid "nodes match --text, but not the other filters: the zero comes from them"
+msgstr "há nós que casam o --text, mas não os outros filtros: o zero vem deles"
+
 #: packaging/npm/cli.mjs tools/kg_release_notes.py tools/kg_validate.py
 msgid "BROKEN INPUT"
 msgstr "ENTRADA QUEBRADA"
@@ -2264,6 +2280,14 @@ msgstr "Ponha o sha256 entre aspas (um hash só de dígitos vira número) e dê 
 msgid "The criterion version, or a result's citation of it, cannot be checked: the version is not a map, its sha256 is not text, or it lacks exactly one of ref and text in text; or x_measured_under is not a map with a list of citation maps, or a citation of another graph has a sha256 that is not text."
 msgstr "A versão do critério, ou a citação dela num resultado, não se confere: a versão não é um mapa, o sha256 dela não é texto, ou falta exatamente um de ref e text em texto; ou o x_measured_under não é um mapa com uma lista de citações em mapa, ou uma citação de outro grafo tem sha256 que não é texto."
 
+#: tools/kg_validate.py
+msgid "Two live terms have the same notation in the same scheme: a code names one concept per scheme."
+msgstr "Dois termos vivos têm a mesma notation no mesmo esquema: um código nomeia um conceito só por esquema."
+
+#: tools/kg_validate.py
+msgid "Give one of them another notation, put them in different schemes (x_term.scheme), or retire the old term (status superseded, with SUPERSEDES from the new one)."
+msgstr "Dê a um deles outra notation, ponha os dois em esquemas diferentes (x_term.scheme) ou aposente o termo antigo (status superseded, com SUPERSEDES do novo)."
+
 #: tools/kg_vendor.py
 msgid "--source {source} is not a git repository"
 msgstr "--source {source} não é um repositório git"
@@ -2512,10 +2536,6 @@ msgid "✗ symlink  {path}"
 msgstr "✗ symlink  {path}"
 
 #: tools/kg_vocab.py
-msgid "The domain vocabulary of a corpus: the terms of the x_term profile (contract v4.11)."
-msgstr "O vocabulário de domínio de um corpus: os termos do perfil x_term (contrato v4.11)."
-
-#: tools/kg_vocab.py
 msgid "for lookup, the text first; then .kg.yaml or .kg.json files (or --root)"
 msgstr "no lookup, primeiro o texto; depois os arquivos .kg.yaml ou .kg.json (ou --root)"
 
@@ -2602,6 +2622,78 @@ msgstr "sinônimo APOSENTADO"
 #: tools/kg_vocab.py
 msgid "SUPERSEDED term; use {ids}"
 msgstr "termo SUBSTITUÍDO; use {ids}"
+
+#: tools/kg_vocab.py
+msgid "--baseline {file}: not a {version} file"
+msgstr "--baseline {file}: não é um arquivo {version}"
+
+#: tools/kg_vocab.py
+msgid "--baseline {file}: {error}"
+msgstr "--baseline {file}: {error}"
+
+#: tools/kg_vocab.py
+msgid "--external {spec}: write SCHEME=REGEX, with the scheme as a slug"
+msgstr "--external {spec}: escreva ESQUEMA=REGEX, com o esquema em forma de slug"
+
+#: tools/kg_vocab.py
+msgid "--update needs --baseline"
+msgstr "o --update pede --baseline"
+
+#: tools/kg_vocab.py
+msgid "; baseline written"
+msgstr "; base gravada"
+
+#: tools/kg_vocab.py
+msgid "; {new} new against the baseline"
+msgstr "; {new} novo(s) contra a base"
+
+#: tools/kg_vocab.py
+msgid "SCHEME=REGEX"
+msgstr "ESQUEMA=REGEX"
+
+#: tools/kg_vocab.py
+msgid "invalid regex: {error}"
+msgstr "regex inválida: {error}"
+
+#: tools/kg_vocab.py
+msgid "lint: codes of an outside system (SOC2, CVE, ISO) that resolve without a term (repeatable)"
+msgstr "lint: códigos de um sistema de fora (SOC2, CVE, ISO) que resolvem sem termo (repetível)"
+
+#: tools/kg_vocab.py
+msgid "lint: fail only on findings that are new or above this base"
+msgstr "lint: reprova só pelos achados novos ou acima desta base"
+
+#: tools/kg_vocab.py
+msgid "lint: the regex of a code in prose"
+msgstr "lint: a regex de um código na prosa"
+
+#: tools/kg_vocab.py
+msgid "lint: write the current findings to --baseline"
+msgstr "lint: grava os achados de agora na --baseline"
+
+#: tools/kg_vocab.py
+msgid "· {codes} code(s) in prose: {resolved} resolved, {external} external; {findings} finding(s)"
+msgstr "· {codes} código(s) na prosa: {resolved} resolvido(s), {external} externo(s); {findings} achado(s)"
+
+#: tools/kg_vocab.py
+msgid "--baseline {file} was written with another --pattern: run --update with this one"
+msgstr "a --baseline {file} foi gravada com outro --pattern: rode o --update com este"
+
+#: tools/kg_vocab.py
+msgid "--pattern, --external, --baseline, and --update belong to lint"
+msgstr "--pattern, --external, --baseline e --update são do lint"
+
+#: tools/kg_vocab.py
+msgid "The domain vocabulary of a corpus: the terms of the x_term profile, and the codes in prose checked against them (contract v4.14)."
+msgstr "O vocabulário de domínio de um corpus: os termos do perfil x_term, e os códigos da prosa conferidos contra eles (contrato v4.14)."
+
+#: tools/kg_vocab.py
+msgid "the regex {regex} matches the empty text"
+msgstr "a regex {regex} casa o texto vazio"
+
+#: tools/kg_vocab.py
+msgid ", {n} reclassified (no name yet ↔ ambiguous)"
+msgstr ", {n} reclassificado(s) (sem nome ↔ ambíguo)"
 
 #: tools/kg_criterion.py
 msgid "FILE"

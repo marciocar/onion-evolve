@@ -64,7 +64,7 @@ Each code is a stable slug per layer, and the metaschema checks its shape.
 |---|---|---|
 | parse | `parse.<reason>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
 | form | `form.<kind>.<scope>.<field>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
-| integrity | `integrity.<rule>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled`, and the five `integrity.criterion-*` and `integrity.measured-*` codes of v4.12 (SHOULD) |
+| integrity | `integrity.<rule>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled`, the five `integrity.criterion-*` and `integrity.measured-*` codes of v4.12, and `integrity.term-notation-duplicate` of v4.14 (SHOULD) |
 | yaml | `yaml.<rule>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 | semantic | `semantic.<rule>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked`, and the `semantic.domain-*` codes of the domain layer (SHOULD), only in `optional/` |
 
@@ -238,6 +238,11 @@ v4.13 adds `role` to the `x_questionnaire` profile, in the SHOULD (`latest/form/
 `evidence_request` (a request to a person for evidence), or `evidence_requirement` (the evidence an item requires), which
 tell those apart from a questionnaire item. Another value warns as
 `form.enum.node.x_questionnaire.role`, and nothing that passed fails.
+
+v4.14 adds `scheme` to the `x_term` profile (a slug; without it, the scheme is the graph) and the warning
+`integrity.term-notation-duplicate` (`latest/integrity/term/`): two live terms (status neither `superseded` nor
+`refuted`) with the same `notation` in the same scheme, between nodes of the same graph. The notation compares exactly.
+The corpus as a whole and the codes in prose belong to `kg_vocab.py lint`, which is not part of the suite.
 
 The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
 

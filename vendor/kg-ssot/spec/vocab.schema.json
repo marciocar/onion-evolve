@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:vocab.schema.json",
   "title": "Vocabulário de domínio (kg-ssot.vocab/1)",
-  "description": "Saída de kg_vocab.py terms e lookup com --format json (desde a 4.19.0, contrato v4.11): os termos do perfil x_term de um corpus. Cada termo traz o preferido, os sinônimos legíveis (o sinônimo sem literal ou com kind fora do enum fica de fora; o SHOULD já avisa), o vencimento de cada sinônimo atual na data as_of (due_on e due) e quem substitui o termo aposentado (superseded_by, as pontas <arquivo>#<id> das arestas SUPERSEDES que chegam nele). No lookup, matches diz por onde o texto casou (pref, alt ou hidden), com a comparação sem maiúscula, acento nem espaço repetido; o sinônimo com escopo de caso só casa com o case pedido. Não é veredito: o grafo que não parseia sai em unreadable.",
+  "description": "Saída de kg_vocab.py terms e lookup com --format json (desde a 4.19.0, contrato v4.11): os termos do perfil x_term de um corpus. Cada termo traz o preferido, os sinônimos legíveis (o sinônimo sem literal ou com kind fora do enum fica de fora; o SHOULD já avisa), o vencimento de cada sinônimo atual na data as_of (due_on e due) e quem substitui o termo aposentado (superseded_by, as pontas <arquivo>#<id> das arestas SUPERSEDES que chegam nele). No lookup, matches diz por onde o texto casou (pref, alt ou hidden), com a comparação sem maiúscula, acento nem espaço repetido; o sinônimo com escopo de caso só casa com o case pedido. Não é veredito: o grafo que não parseia sai em unreadable. Desde a 4.23 (contrato v4.14): cada termo traz o esquema efetivo (scheme, o x_term.scheme ou o grafo, e scheme_declared); o lookup casa também a notation exata, sozinha ou como esquema:notation (via notation); e o lint confere a prosa do corpus contra o vocabulário: vocab.notation-duplicate (a mesma notation em dois termos vivos do mesmo esquema), vocab.code-unresolved (o código da prosa, pela regex pattern, que não é notation de termo nenhum nem de um esquema externo) e vocab.code-ambiguous (o código sem esquema que é notation em mais de um esquema do próprio grafo ou, sem nenhum do próprio grafo, em mais de um esquema do corpus; a ordem é o próprio grafo, o sistema externo, o corpus). Com baseline, new lista só os achados novos ou acima da base, e é por eles que o rc sai 1.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -50,6 +50,7 @@
             "enum": [
               "alt",
               "hidden",
+              "notation",
               "pref"
             ]
           },
@@ -91,6 +92,92 @@
       "type": "integer",
       "minimum": 0,
       "description": "Na ferramenta kg_terms do servidor MCP: quantos termos (ou casamentos) há antes do corte do limit."
+    },
+    "lint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "externals",
+        "baseline",
+        "updated",
+        "codes",
+        "resolved",
+        "external",
+        "findings",
+        "new",
+        "reclassified"
+      ],
+      "properties": {
+        "pattern": {
+          "type": "string"
+        },
+        "externals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "scheme",
+              "pattern"
+            ],
+            "properties": {
+              "scheme": {
+                "type": "string"
+              },
+              "pattern": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "baseline": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "updated": {
+          "type": "boolean"
+        },
+        "codes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "external": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "new": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "reclassified": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/finding"
+          },
+          "description": "Com baseline: as ocorrências que a base já tinha no outro estado do mesmo código (vocab.code-unresolved ↔ vocab.code-ambiguous, mesmo arquivo e código). Não reprovam."
+        }
+      }
     }
   },
   "oneOf": [
@@ -104,6 +191,11 @@
         "query",
         "case",
         "matches"
+      ]
+    },
+    {
+      "required": [
+        "lint"
       ]
     }
   ],
@@ -199,7 +291,9 @@
         "status",
         "pref",
         "labels",
-        "superseded_by"
+        "superseded_by",
+        "scheme",
+        "scheme_declared"
       ],
       "properties": {
         "file": {
@@ -237,6 +331,53 @@
           "items": {
             "type": "string"
           }
+        },
+        "scheme": {
+          "type": "string",
+          "description": "Desde a 4.23: o esquema efetivo do termo (o x_term.scheme declarado, ou o grafo: o meta.id, ou o caminho)."
+        },
+        "scheme_declared": {
+          "type": "boolean"
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "file",
+        "id",
+        "field",
+        "token",
+        "detail"
+      ],
+      "properties": {
+        "code": {
+          "enum": [
+            "vocab.code-ambiguous",
+            "vocab.code-unresolved",
+            "vocab.notation-duplicate"
+          ]
+        },
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "field": {
+          "enum": [
+            "label",
+            "narrative",
+            "x_term"
+          ]
+        },
+        "token": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
         }
       }
     }

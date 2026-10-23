@@ -53,6 +53,9 @@ export function coherenceCodes(doc: Record<string, unknown>, corpus?: Corpus | n
 /** Os avisos do critério pré-registrado (v4.12), só entre nós do mesmo grafo: integrity.criterion-unknown,
  * criterion-amends-mismatch, criterion-sha-mismatch, measured-post-hoc e measured-order-unknown. Sem hash e sem corpus. */
 export function criterionCodes(doc: Record<string, unknown>): string[];
+/** integrity.term-notation-duplicate (v4.14), só entre nós do mesmo grafo: dois nós vivos com x_term no mesmo esquema
+ * e com a mesma notation. */
+export function termCodes(doc: Record<string, unknown>): string[];
 
 /** A ordem entre o measured_at de um resultado e o registered_at da versão citada: 'post-hoc' (antes), 'unknown'
  * (indecidível: o mesmo dia só com datas, ou até um dia quando uma é só data) ou null (depois, ou fora da forma). */

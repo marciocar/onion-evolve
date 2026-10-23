@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:query.schema.json",
   "title": "Consulta e projeção de um corpus de grafos (kg-ssot.query/1)",
-  "description": "Saída de `kg_query.py --format json` e da ferramenta kg_query do servidor MCP. A consulta não julga: o veredito é do kg_validate.py, e o grafo que não parseia sai em `unreadable` com o código parse.*. Cada nó sai projetado: os campos do contrato que interessam a quem lê e as arestas de saída (`out`) e de entrada (`in`) com a outra ponta resolvida de id para label (o label da outra ponta sai cortado em 200 caracteres, com …; o do próprio nó sai inteiro). No servidor MCP a página também corta pelo tamanho (o --max-bytes do servidor), sempre com ao menos um nó, e o next_cursor segue de onde ela parou. Uma ponta pode ser externa (external_edges, `<caminho>#<id>`) e pode faltar no corpus (`found: false`, `label: null`); a origem ausente de uma aresta externa (o grafo inteiro) sai com o `file` do grafo e `id` nulo. `total` conta todos os nós que a consulta acha; `nodes` traz uma página, e `next_cursor` é o cursor da próxima, ou null na última. O cursor vale para a mesma consulta sobre o mesmo corpus. `query` ecoa o pedido normalizado.",
+  "description": "Saída de `kg_query.py --format json` e da ferramenta kg_query do servidor MCP. A consulta não julga: o veredito é do kg_validate.py, e o grafo que não parseia sai em `unreadable` com o código parse.*. Cada nó sai projetado: os campos do contrato que interessam a quem lê e as arestas de saída (`out`) e de entrada (`in`) com a outra ponta resolvida de id para label (o label da outra ponta sai cortado em 200 caracteres, com …; o do próprio nó sai inteiro). No servidor MCP a página também corta pelo tamanho (o --max-bytes do servidor), sempre com ao menos um nó, e o next_cursor segue de onde ela parou. Uma ponta pode ser externa (external_edges, `<caminho>#<id>`) e pode faltar no corpus (`found: false`, `label: null`); a origem ausente de uma aresta externa (o grafo inteiro) sai com o `file` do grafo e `id` nulo. `total` conta todos os nós que a consulta acha; `nodes` traz uma página, e `next_cursor` é o cursor da próxima, ou null na última. O cursor vale para a mesma consulta sobre o mesmo corpus. `query` ecoa o pedido normalizado. Desde a 4.23, o --text compara sem acento nem maiúscula (verificação casa com VERIFICACAO), se expande pelo vocabulário (expanded) quando o texto inteiro é um termo do x_term, e o total vazio traz hint.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -202,6 +202,48 @@
       "items": {
         "$ref": "#/$defs/node"
       }
+    },
+    "expanded": {
+      "type": "array",
+      "description": "Desde a 4.23, com --text: os termos vivos do vocabulário (perfil x_term) cujo pref ou sinônimo de domínio atual, dobrado (sem acento nem maiúscula), é o texto inteiro, ou cuja notation é o texto exato; os nós que têm uma das formas dobradas, ou a notation exata, como palavra inteira, também casam.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "id",
+          "pref",
+          "forms",
+          "notation"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "pref": {
+            "type": "string"
+          },
+          "forms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "hint": {
+      "type": "string",
+      "description": "Desde a 4.23: com --text e nenhum nó, o que tentar, para o zero não passar por \"não há\"."
     }
   },
   "$defs": {

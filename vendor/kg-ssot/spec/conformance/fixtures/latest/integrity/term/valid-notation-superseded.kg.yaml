@@ -1,0 +1,41 @@
+meta:
+  schema_version: "1"
+  id: valid-notation-superseded
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EN_OLD
+    node_type: entity
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.8
+    label: "O termo sintético EN_OLD."
+    x_term:
+      pref: "Opção 1 antiga"
+      notation: "O1"
+  - id: EN_NEW
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O termo sintético EN_NEW."
+    x_term:
+      pref: "Opção 1"
+      notation: "O1"
+edges:
+  - from: EN_OLD
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: EN_NEW
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: EN_NEW
+    to: EN_OLD
+    edge_type: SUPERSEDES

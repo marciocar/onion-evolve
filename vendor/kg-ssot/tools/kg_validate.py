@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.13"
+CONTRACT_VERSION = "4.14"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1142,7 +1142,8 @@ def coherence_located(doc, corpus=None):
       done já está respondida): o grafo afirma e refuta a mesma coisa. É a contradição do radar, como aviso no v4.4.
       Desde o v4.5, com o corpus (corpus_index), conta também a REFUTES que chega de outro grafo pelas external_edges
       (from externo, to local); sem ele, a ponta externa não foi conferida e a aresta não conta.
-    - desde o v4.12, os avisos do critério pré-registrado entre nós do mesmo grafo (criterion_located).
+    - desde o v4.12, os avisos do critério pré-registrado entre nós do mesmo grafo (criterion_located);
+    - desde o v4.14, a notation repetida no mesmo esquema do vocabulário (term_located).
     Um campo de tipo errado (from ou id em lista ou mapa) já reprova no MUST: aqui ele é ignorado, nunca quebra.
     """
     out = []
@@ -1177,7 +1178,30 @@ def coherence_located(doc, corpus=None):
         if (isinstance(n.get("id"), str) and n["id"] in refuted and status not in ("superseded", "refuted")
                 and not (status == "done" and n.get("node_type") == "question")):
             out.append(("integrity.refutes-unreconciled", place))
-    return out + criterion_located(doc)
+    return out + criterion_located(doc) + term_located(doc)
+
+
+def term_located(doc):
+    """integrity.term-notation-duplicate (v4.14): dois nós vivos (status que não é superseded nem refuted) com x_term, no
+    mesmo esquema e com a mesma notation, só entre nós do mesmo grafo; o aviso cai em cada nó depois do primeiro. É a
+    convenção do SKOS (§6.5.3): a notation identifica o conceito dentro do esquema. O esquema é o x_term.scheme ou, sem
+    ele, o próprio grafo, cujo nome é o meta.id: o esquema declarado igual ao meta.id é o mesmo esquema. A notation se
+    compara exata, porque código é código. O corpus inteiro é do kg_vocab.py lint."""
+    out, seen = [], set()
+    meta = doc.get("meta") if isinstance(doc.get("meta"), dict) else {}
+    graph = meta.get("id") if isinstance(meta.get("id"), str) and meta.get("id") else None
+    for n, place in _located(doc, "nodes"):
+        term = n.get("x_term")
+        if not isinstance(term, dict) or n.get("status") in ("superseded", "refuted"):
+            continue
+        notation, scheme = term.get("notation"), term.get("scheme")
+        if not isinstance(notation, str) or not notation:
+            continue
+        key = (scheme if isinstance(scheme, str) and scheme else graph, notation)
+        if key in seen:
+            out.append(("integrity.term-notation-duplicate", place))
+        seen.add(key)
+    return out
 
 
 # A data ou a data-hora RFC 3339 dos perfis do critério (v4.12), a mesma regex do schema SHOULD.
@@ -1537,6 +1561,8 @@ MESSAGES = {
     "integrity.measured-order-unknown": "The dates cannot tell whether the result was measured before or after its "
                                         "criterion version was registered: the same day, or a day apart with a time "
                                         "zone that a date alone does not give.",
+    "integrity.term-notation-duplicate": "Two live terms have the same notation in the same scheme: a code names one "
+                                         "concept per scheme.",
     "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
     "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
                                           "a value with no JSON form.",
@@ -1595,6 +1621,9 @@ HINTS = {
                                           "the id of a list item, in a .json, .yaml, or .yml file.",
     "integrity.criterion-malformed": "Quote the sha256 (a hash of digits alone reads as a number) and give exactly one of "
                                      "ref and text, in text.",
+    "integrity.term-notation-duplicate": "Give one of them another notation, put them in different schemes "
+                                         "(x_term.scheme), or retire the old term (status superseded, with SUPERSEDES "
+                                         "from the new one).",
     "integrity.measured-order-unknown": "Give registered_at and measured_at a time with a time zone (RFC 3339).",
     "form.required.node.provenance": "Add provenance with source, locator, and method; with no recoverable source, "
                                      "change the status to unverifiable.",

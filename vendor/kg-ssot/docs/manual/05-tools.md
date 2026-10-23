@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.22.0",
+  "release": "kg-ssot-v4.23.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -742,7 +742,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 |---|---|
 | `--root DIR` or files | The corpus. With `--root`, the vendor and the fixtures stay out by default (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*`, and, since 4.20.0, any folder with the `.kg-ssot-version` stamp); `--exclude GLOB` (repeatable) removes more paths, and `--no-default-excludes` reads everything. A file you name one by one is never excluded |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filters, all combined with AND |
-| `--text WORDS` | Words that the label contains, all of them, case-insensitive; `--in-narrative` also searches the narrative |
+| `--text WORDS` | Words that the label contains, all of them, without case or accents (`verificacao` matches `Verificação`, since 4.23); `--in-narrative` also searches the narrative. When the whole text is a term of the vocabulary (its `pref` or a current domain synonym, folded, or its `notation`, exactly), the term and every node that has any of its forms as a whole word match too, and `expanded` says which term; a case-scoped or retired synonym does not expand. No match gives a `hint`, which says when the zero comes from the other filters, so a zero does not pass for "there is none" |
 | `--open` | The open queue (status `open`) |
 | `--verified-before YYYY-MM-DD` | Nodes with no `verified_at`, or verified before the date |
 | `--around ID` | The neighborhood: `<path>#<id>`, or an id that is unique in the corpus; `--depth`, `--edge-type` (repeatable), `--direction out\|in\|both` |
@@ -809,8 +809,8 @@ and the summary counts nodes per changed field to show it. `--format json` gives
 
 ## `kg_vocab.py`: the domain vocabulary
 
-Reads the terms of the `x_term` profile (chapter 3) from a corpus, with `--root` or the files, and does three things:
-lists them, resolves a text to its term, and exports them.
+Reads the terms of the `x_term` profile (chapter 3) from a corpus, with `--root` or the files, and does four things:
+lists them, resolves a text or a code to its term, exports them, and checks the codes written in prose against them.
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py terms --root . --as-of 2027-05-01      # terms, synonyms, what is due
@@ -818,6 +818,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "codigo de barras" --root 
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "cod barras" --case "edital 12" --root .
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to skos --root . > vocab.ttl
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > vocab.ossie.json
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup rodada:O1 --root .              # a code, qualified by scheme
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lint --root . --baseline .kg-ssot/vocab-lint.json --external soc2='CC[0-9]+'
 ```
 
 - **`lookup` compares without case, accents, or repeated spaces.** It matches the preferred term or a synonym. A
@@ -839,7 +841,33 @@ python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > voca
   `name` (the preferred term), `description`, `ai_context.synonyms` (the current domain synonyms), and a
   `custom_extensions` entry from `KG_SSOT` with the provenance of each synonym, because Ossie has no field for it. You
   merge each item into the entity of your semantic model (dataset, field, or metric) by name.
-- With `--format json`, `terms` and `lookup` use the `kg-ssot.vocab/1` format (`spec/vocab.schema.json`). The tool does
+- **The scheme and the code (4.23, contract v4.14).** `terms` gives each term its effective `scheme` (the declared
+  `x_term.scheme`, or the graph) and `scheme_declared`. `lookup` also matches a `notation`, exactly (a code is a code:
+  `o1` is not `O1`), alone or qualified as `scheme:notation`. `export --to skos` writes `skos:inScheme` for each concept
+  and each scheme once as an `skos:ConceptScheme`.
+- **`lint` checks the codes in prose against the vocabulary.** It reads the label and the narrative of every node, finds
+  the codes by a regex (`--pattern`; the default takes one to three capitals and one to three digits, like `A7`, `O1`,
+  `S14`, and `r` with digits, like `r16`; it does not take `RULE 87`, `SAC-234`, or node ids, which have their own
+  mechanisms), and reports:
+  - `vocab.notation-duplicate`: the same notation in two live terms of the same scheme, across the corpus;
+  - `vocab.code-unresolved`: a code that is the notation of no live term (a `scheme:code` looks only in that scheme);
+  - `vocab.code-ambiguous`: a code without a scheme that is a notation in two or more schemes of the graph's own, or,
+    with none of its own, in two or more schemes of the corpus. Write `scheme:code`.
+
+  A code resolves in this order: a term of the graph itself, then an outside system, then the corpus. The scheme of a
+  `scheme:code` is a slug right before the code, on a word border (`my_sa:T7` and `urn:kg:E5` are not qualified). A
+  declared scheme and a graph's own scheme (its `meta.id`) share one namespace, here, in the SKOS export, and in both
+  readers. The rules for a duplicate are the reader's, and a term's own code resolves in its own label.
+
+  `--external soc2='CC[0-9]+'` (repeatable) declares the codes of an outside system (SOC 2, CVE, ISO) that resolve
+  without a term. A regex that matches the empty text is refused. The ratchet is the gate's: `--baseline <file> --update` writes the findings of today, and from then on
+  `--baseline <file>` fails only on a finding that is new or above the count in the base, so the codes that already
+  exist do not block and the new ones are born with a name; a base written with another `--pattern` is refused. An
+  occurrence the base already had in the other state of the same code (no term ↔ ambiguous, same file and code) comes
+  out as `reclassified` and does not fail: naming the first term of a colliding code changes the state of the old
+  mentions, and whoever names it does not pay for them. rc 1 with a failing finding or a graph that does not read,
+  2 on broken input.
+- With `--format json`, `terms`, `lookup`, and `lint` use the `kg-ssot.vocab/1` format (`spec/vocab.schema.json`). The tool does
   not judge: an `x_term` outside the profile is read as far as it can be, and the SHOULD flags the rest.
 
 ## `kg_criterion.py`: the pre-registered criterion (4.21.0)
