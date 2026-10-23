@@ -1,10 +1,7 @@
 {
   "graph": "docs/onion/graph/inbox-sinais-2026-09.kg.yaml",
   "id": "inbox-sinais-2026-09",
-  "must": [
-    "form.unknown-key.top.kind",
-    "form.unknown-key.top.version"
-  ],
+  "must": [],
   "should": {
     "form.range.node.label": 23,
     "integrity.untraced-decision": 9

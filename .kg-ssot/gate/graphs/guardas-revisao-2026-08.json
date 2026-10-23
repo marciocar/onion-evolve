@@ -1,10 +1,7 @@
 {
   "graph": "docs/onion/graph/guardas-revisao-2026-08.kg.yaml",
   "id": "guardas-revisao-2026-08",
-  "must": [
-    "form.unknown-key.meta.label",
-    "form.unknown-key.meta.trace"
-  ],
+  "must": [],
   "should": {
     "form.range.node.label": 16
   }

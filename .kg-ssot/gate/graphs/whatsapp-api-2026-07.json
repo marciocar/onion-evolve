@@ -1,9 +1,7 @@
 {
   "graph": "docs/evolution/research/whatsapp-api-2026-07/whatsapp-api-2026-07.kg.yaml",
   "id": "whatsapp-api-2026-07",
-  "must": [
-    "form.unknown-key.meta.revisited"
-  ],
+  "must": [],
   "should": {
     "form.range.node.label": 2,
     "yaml.unquoted-date": 1

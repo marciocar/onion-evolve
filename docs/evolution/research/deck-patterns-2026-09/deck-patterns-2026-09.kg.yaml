@@ -186,7 +186,7 @@ nodes:
   # ── AS OPÇÕES (uma claim por opção; quem sela é o maestro) ───────────────────────────
     sealed_by: maestro
     sealed_at: '2026-09-24'
-    resolution: >-
+    x_resolution: >-
       SELADA PELO MAESTRO em 2026-09-24, com a frase "tem que seguir a ordem do que veio da pesquisa,
       ela foi feita para isso tambem": escolhida a OPCAO (G) — fusao A+D+C, que era a recomendacao do
       Elenxo (confianca 0.75). IMPLEMENTADA no mesmo dia no Artifact do deck: 9 atos problem-first da

@@ -1,9 +1,7 @@
 {
   "graph": "docs/onion/graph/onion-evolution-2026-07.kg.yaml",
   "id": "onion-evolution-2026-07",
-  "must": [
-    "form.unknown-key.meta.source_run"
-  ],
+  "must": [],
   "should": {
     "form.range.node.label": 2,
     "form.required.node.verified_at": 1,

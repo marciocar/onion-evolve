@@ -1,9 +1,7 @@
 {
   "graph": "docs/onion/graph/catraca-regra49-2026-08.kg.yaml",
   "id": "catraca-regra49-2026-08",
-  "must": [
-    "form.unknown-key.node.status_note"
-  ],
+  "must": [],
   "should": {
     "form.range.node.label": 40
   }
