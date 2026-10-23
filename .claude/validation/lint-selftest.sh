@@ -12187,6 +12187,25 @@ C = {
  'helper-fake': (2, "bash " + FAKE + " .env", ROOT),
  'helper-repo-var': (0, "REPO=\"$(git rev-parse --show-toplevel)\"; bash \"$REPO/.claude/utils/task-manager/env-check.sh\" --env \"$REPO/.env\" --provider", ROOT),
  'helper-cd-first': (2, "cd " + os.path.dirname(os.path.dirname(FAKE)) + " && REPO=\"$(git rev-parse --show-toplevel)\"; bash \"$REPO/.claude/utils/task-manager/env-check.sh\" .env", ROOT),
+ # COMPOSTO (2026-10-23, relatório de update de um adotante vetado sem ler nada): o heredoc dentro de `{ … } > $R`,
+ # `if … fi > f`, dois heredocs reusando $R e o `tee … >/dev/null` gravam DADO; o mesmo composto gravando script,
+ # função, `exec >` ou o .md executado depois seguem barrados (quatro destes passavam na main: grp-exec, grp-awk,
+ # func-nl, exec-redir)
+ 'grp-md': (0, "R=/x/r.md\n{ cat <<" + Q + "EOF" + Q + "\n# t\nEOF\necho x; cat /x/log\ncat <<" + Q + "EOF" + Q + "\n- o veto do `.env` barrou\nEOF\n} > $R; wc -l $R", SEM),
+ 'if-md': (0, "if true; then cat <<" + Q + "E" + Q + "\no veto do .env\nE\nfi > r.md", SEM),
+ 'two-var': (0, "R=r.md\ncat > $R <<" + Q + "E" + Q + "\n# a\nE\ncat >> $R <<" + Q + "E" + Q + "\no veto do .env\nE", SEM),
+ 'tee-devnull': (0, "tee r.md <<" + Q + "E" + Q + " >/dev/null\no veto do .env\nE", SEM),
+ 'grp-exec': (2, "{ true; cat <<" + Q + "E" + Q + "\ncat .env\nE\n} > run.sh; bash run.sh", SEM),
+ 'grp-awk': (2, "{ cat <<" + Q + "E" + Q + "\nBEGIN{system(\"cat .env\")}\nE\n} > r.md; awk -f r.md", SEM),
+ 'grp-pipe-md': (2, "{ cat <<" + Q + "E" + Q + "\ncat .env\nE\n} 2>&1 | bash", SEM),
+ 'func-nl': (2, "f()\n{\ncat <<" + Q + "E" + Q + "\ncat .env\nE\n}\nf > run.sh", SEM),
+ 'exec-redir': (2, "exec > run.sh\ncat <<" + Q + "E" + Q + "\ncat .env\nE\nbash run.sh", SEM),
+ 'two-var-for': (2, "R=r.md\nfor R in r.sh; do cat >> $R <<" + Q + "E" + Q + "\ncat .env\nE\ndone", SEM),
+ 'grp-md-mv': (2, "{ cat <<" + Q + "E" + Q + "\ncat .env\nE\n} > r.md && mv r.md r.sh", SEM),
+ # find com -exec de METADADO (2026-10-23, vetado numa sessão do core): o `(` da linha deixa a pasta do cd
+ # desconhecida e o glob do -not -path fechava como leitura; `-exec cat` (find-exec, acima) segue barrado
+ 'find-exec-wc': (0, "cd /tmp && grep -n 'a\\(b\\)' x; find . -name CLAUDE.md -not -path " + Q + "./node_modules/*" + Q + " -exec wc -c {} \\; | sort -n", SEM),
+ 'find-exec-mix': (2, "find . -name .env -exec wc -c {} \\; -exec cat {} \\;", SEM),
 }
 # mutantes: (rótulo, trecho da cura, trecho revertido, casos que TÊM de inverter)
 M = [
@@ -12214,6 +12233,16 @@ M = [
  ('M22 cópia por redirecionamento', "if any(not is_data_file(o) for o in _outs) and any(hit(t) for t in seg if t not in _outs):", "if False:", ['data-redir-copy', 'data-tee-copy']),
  ('M23 helper só pelo nome', "if os.path.basename(_a1) == HELPER and is_canonical_helper(_a1):", "if os.path.basename(_a1) == HELPER:", ['helper-fake']),
  ('M24 cd antes do topo git', "or re.search(r'(?:^|[;&|\\s(])(?:cd|pushd)\\s', _cmd[:_at.start()])", "or False", ['helper-cd-first']),
+ ('M25 composto não decide o destino', "    docs = attach_groups(cmd, docs)\n", "\n", ['grp-exec', 'func-nl', 'exec-redir']),
+ ('M26 palavra do composto tomada pelo consumidor', "    while seg and seg[0] in GROUP_LEAD:", "    while False:", ['grp-md', 'if-md']),
+ ('M27 atribuição de antes do heredoc anterior', "_dests(seg, name, list(pre) + toks[:k])", "_dests(seg, name, toks[:k])", ['two-var']),
+ ('M28 for/read trocam a variável', "if any(toks_before[i] in ('for', 'select', 'read')", "if False and any(toks_before[i] in ('for', 'select', 'read')", ['two-var-for']),
+ ('M29 /dev/null como destino', "        if d != '/dev/null':\n            res.append(d)", "        if True:\n            res.append(d)", ['tee-devnull']),
+ ('M30 pipe depois do composto', "                g['piped'] = True\n", "                pass\n", ['grp-pipe-md']),
+ ('M31 corpo de função', "func = t == '{' and (fn_next", "func = False and (fn_next", ['func-nl']),
+ ('M32 exec desvia a saída', "        if at_cmd and t in ('exec', 'coproc'):\n            return None", "        if False:\n            return None", ['exec-redir']),
+ ('M33 find com -exec de metadado', "            if _ex and all(x in METADATA and x not in ('source', '.') for x in _ex):", "            if False:", ['find-exec-wc']),
+ ('M34 qualquer -exec aceito', "            if _ex and all(x in METADATA and x not in ('source', '.') for x in _ex):", "            if _ex:", ['find-exec', 'find-exec-mix']),
 ]
 bad = []
 for k, (e, c, w) in C.items():
@@ -12235,7 +12264,7 @@ print(' '.join(bad + ['VIVO ' + a for a in alive]))
 U4PY
 )" || u4_out="o harness do caso (u) não rodou"
     if [ -z "${u4_out}" ]; then
-      record_pass "env-exposure: (u) U4: as 19 formas medidas que não leem valor passam; 33 leituras de valor e escapes seguem barrados; os 24 mutantes de cura mordem (A1/A5 de 2026-10-23 inclusos)"
+      record_pass "env-exposure: (u) U4: as 24 formas medidas que não leem valor passam (heredoc em composto gravando dado e find com -exec de metadado inclusos); 41 leituras de valor e escapes seguem barrados; os 34 mutantes de cura mordem (A1/A5 e composto de 2026-10-23 inclusos)"
     else record_fail "env-exposure: (u) U4 (listar/nome de chave/prosa × ler valor)" "${u4_out}"; fi
   fi
   # (m) o caminho sancionado para a pergunta "a chave tem \r?": --lint fala por NOME, nunca pelo valor; e o

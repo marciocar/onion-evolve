@@ -421,6 +421,24 @@ nodes:
       method: "medição: hook com o JSON do PreToolUse antes e depois da cura"
       locality: "repo"
 
+  - id: E_ENV_GUARD_HEREDOC_COMPOSTO_CURADO_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-23"
+    verified_against: "replay dos vetos do veto do .env gravados nos transcripts desta máquina em 2026-10-23, re-julgados pela main e pela cura com o JSON do PreToolUse: o relatório de update de um adotante gravado por `{ cat <<'EOF' … } > $R` (.md) dava rc 2 sem ler nada (uma crase em volta do nome do arquivo de segredos no markdown julgada como substituição), e com a cura dá rc 0; na main davam rc 0 cinco escapes, o grupo gravando run.sh e o executando, o grupo gravando .md lido por awk -f, a função com a chave na linha seguinte chamada com > run.sh, exec > run.sh seguido de heredoc e coproc; com a cura, rc 2 nos cinco; e o `find . -name CLAUDE.md -not -path './node_modules/*' -exec wc -c {} \\;` (vetado numa sessão do core depois de um cd numa linha com parêntese) dá rc 0, com `-exec cat {}` em rc 2; caso (u) da família env_exposure 17/17 com 34 mutantes mortos, e as 44 famílias afetadas pelo hook 650/0"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "O veto do .env julga o heredoc dentro de um composto pelo destino do composto: o relatório .md gravado por grupo passa, e o grupo, laço, função ou exec que grava um script (escape da main) passa a ser vetado"
+    narrative: "Falso positivo medido hoje no update de um adotante: o `{` do grupo era tomado pelo consumidor do heredoc, o corpo virava comando, e o markdown que só citava o arquivo de segredos era vetado. Na mesma medição, o escape oposto: o heredoc sem redirecionamento próprio dentro de um composto era tido como saída padrão, e o composto redirecionado para um script o gravava e rodava. A cura é group_outputs: o destino do heredoc é o do composto mais interno que redireciona a saída; pipe, função, exec, coproc ou estrutura que não fecha deixam o corpo que cita o .env vetado. Junto: dois heredocs que reusam $R resolvem a variável pela atribuição de antes (a não ser que um for, select ou read a troque), o tee para /dev/null não conta como cópia e o tee só toma por destino os argumentos antes do 1º operador. E o find cujos -exec/-ok rodam só comando de metadado (wc, ls, stat) passa, pelo mesmo critério do `wc` direto. Nada afrouxa para a leitura de valor: as 33 leituras e escapes que já existiam continuam rc 2."
+    provenance:
+      source: "transcripts da máquina (vetos de 2026-10-23) e a medição no core"
+      locator: "casos grp-md, if-md, two-var, tee-devnull, grp-exec, grp-awk, grp-pipe-md, func-nl, exec-redir, two-var-for e grp-md-mv; find-exec-wc e find-exec-mix; mutantes M25 a M34 (o M34 aceita qualquer -exec e prova que o cat segue barrado)"
+      method: "medição: hook com o JSON do PreToolUse antes e depois da cura"
+      locality: "repo"
+
   - id: E_FORK_VS_AGENTE_NOVO_PAR_1_KG_SSOT_422_1023
     node_type: evidence
     plane: DEV
@@ -446,6 +464,9 @@ edges:
     edge_type: CONSTRAINS
   - from: E_ENV_GUARD_A1_A5_CURADOS_1023
     to: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
+    edge_type: TRACES_TO
+  - from: E_ENV_GUARD_HEREDOC_COMPOSTO_CURADO_1023
+    to: E_ENV_GUARD_A1_A5_CURADOS_1023
     edge_type: TRACES_TO
   - from: E_KG_SSOT_419_ADOTADA_1022
     to: Q_KG_MIGRATE_KEYS_NO_CORPUS_1022
