@@ -421,7 +421,26 @@ nodes:
       method: "medição: hook com o JSON do PreToolUse antes e depois da cura"
       locality: "repo"
 
+  - id: E_FORK_VS_AGENTE_NOVO_PAR_1_KG_SSOT_422_1023
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-23"
+    verified_against: "task-notifications da sessão: agente novo (general-purpose, brief próprio) da adoção da kg-ssot 4.22.0 (#1326) = 98.635 tokens, 31 chamadas, ~60 min, 0 cura, 0 CI reprovado, 2 rebases do merge verificado; forks das adoções anteriores = 4.19.0 492.319 tokens/48 chamadas/~46 min, 4.20.0 715.373/28/~98 min (1 cura de harness), 4.21.0+update do curation 790.764/57/~92 min, 4.21.1+renome do A7 812.626+/33+/~60 min"
+    label: "1º par medido: a adoção da kg-ssot 4.22.0 por agente novo com brief custou ~99k tokens contra ~490k a ~810k dos forks de adoções parecidas, sem retrabalho nem CI reprovado; o tempo foi da mesma ordem, dominado por CI e rebase"
+    narrative: "Par de Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS. Ressalva: as adoções por fork variaram de escopo (a 4.20.0 trocou o predicado; a 4.21.0 juntou o update do onion-curation; a 4.21.1 juntou o renome do A7), então o par mais limpo é a 4.19.0 (fork, 492k) contra a 4.22.0 (novo, 99k), as duas só adoção. Faltam 2 pares."
+    provenance:
+      source: "relatórios dos agentes nas task-notifications da sessão do core, 2026-10-22/23"
+      locator: "campo usage (subagent_tokens, tool_uses, duration_ms) de cada notificação final"
+      method: "medição: contagem de tokens e chamadas reportada pelo harness por agente"
+      locality: "host"
+
 edges:
+  - from: E_FORK_VS_AGENTE_NOVO_PAR_1_KG_SSOT_422_1023
+    to: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
+    edge_type: SUPPORTS
   - from: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
     to: D_FORK_VS_AGENTE_NOVO_MEDIR_ANTES_1023
     edge_type: CONSTRAINS
