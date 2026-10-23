@@ -2,7 +2,7 @@
 branch: docs/radar-e3-r17
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: e9eda3348a50d063d66f4362e7995ba17a396b67a8d703d229038fe449c1325e
+reviewed_diff_sha256: 0281ee0f87ca284401b9f804154831296326e4ffb53fb61c63f45c9fa43da400
 reviewed_code_sha256: c1bf51ebef6f7ffaef45a1fafee5ee2723e940debe163a50d6acd1a2cd0c47fe
 findings_total: 9
 findings_real: 9
