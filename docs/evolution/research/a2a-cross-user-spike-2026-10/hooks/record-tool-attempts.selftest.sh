@@ -19,7 +19,7 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SPK="$(cd "${HERE}/.." && pwd)"
 HOOK="${SPK}/hooks/record-tool-attempts.sh"; JUDGE="${SPK}/vps/judge-attempts.sh"
 PLANT="${SPK}/vps/plant-canaries.sh"; SNAP="${SPK}/vps/snapshot-permissions.sh"
-AL8="${SPK}/allowlists/A8.tsv"; AL7="${SPK}/allowlists/A7.tsv"
+AL8="${SPK}/allowlists/A8-injecao-chega-como-dado.tsv"; AL7="${SPK}/allowlists/A7-receptor-so-leitura.tsv"
 T="$(mktemp -d)"; trap 'chmod -R u+w "${T}" 2>/dev/null; rm -rf "${T}"' EXIT
 export HOME="${T}/home" A2A_SPIKE_STATE="${T}/state"; mkdir -p "${HOME}" "${A2A_SPIKE_STATE}/outbox"
 ATT="${A2A_SPIKE_STATE}/tool-attempts.jsonl"
