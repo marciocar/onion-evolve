@@ -1,0 +1,69 @@
+meta:
+  schema_version: "1"
+  id: valid-x-questionnaire-role
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EN_A
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A entidade sintética A."
+    x_questionnaire:
+      name: "questionário sintético"
+      questions: ["1"]
+      verdict: partial
+  - id: EN_ASK
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "O pedido sintético de evidência para o item 1."
+    owner: cto
+    x_questionnaire:
+      name: "questionário sintético"
+      questions: ["1"]
+      role: evidence_request
+  - id: Q_B
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética B, marcada como item."
+    x_questionnaire:
+      name: "questionário sintético"
+      questions: ["2"]
+      role: item
+  - id: EN_REQ
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "O requisito sintético: a lista de acessos do item 1."
+    x_questionnaire:
+      name: "questionário sintético"
+      questions: ["1"]
+      role: evidence_requirement
+edges:
+  - from: EN_A
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: EN_ASK
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: Q_B
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: EN_REQ
+    to: Q_A
+    edge_type: TRACES_TO

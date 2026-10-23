@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/10-glossary.md sha256:aa66bdf081311d8a -->
+<!-- translation-of: docs/manual/10-glossary.md sha256:c532eae5bd6ff412 -->
 # 10. Glossário
 
 [English](../10-glossary.md) | **Português (Brasil)**
@@ -27,6 +27,7 @@
 | **MUST** | O nível do contrato que reprova |
 | **Nó** | Uma afirmação tipada do grafo |
 | **Órfão** | Um nó sem nenhuma aresta. Reprova |
+| **Pacote de auditoria** | Uma linha por item de questionário, com a pergunta, a resposta, o veredito, a evidência datada, os pedidos de evidência, o dono e as lacunas calculadas, em CSV, XLSX ou JSON (`kg_audit.py`), desde a 4.22.0 |
 | **Perfil canônico** | A forma que o SHOULD dá a uma chave `x_` que os adotantes repetem (`x_term`, `x_mirror`, `x_severity`...), desde o v4.11; `x_criterion` e `x_measured_under` desde o v4.12. Só julga a chave presente, e só alerta |
 | **Perfil `gate`** | A parte mínima da release: o suficiente para rodar o gate e o check |
 | **Plano** | `DEV` ou `PROD` |

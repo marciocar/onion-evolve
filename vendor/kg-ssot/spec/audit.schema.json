@@ -1,0 +1,429 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:audit.schema.json",
+  "title": "Saída de kg_audit.py --format json",
+  "description": "Desde a 4.22.0, contrato v4.13. O pacote de auditoria por pergunta: um item por par (questionário, número) do perfil x_questionnaire. A pergunta é o nó question com o perfil; a resposta, o nó (não question) com o perfil, e o nó SEM perfil ligado à pergunta por DEPENDS_ON numa direção ou na outra (live: false quando o status é refuted ou superseded, e aí ela não vale); a evidência, o nó com SUPPORTS para a resposta, ou com SUPPORTS ou TRACES_TO para a pergunta, para um pedido (role evidence_request) ou para um requisito (role evidence_requirement) do item, com os ids dos pedidos para os quais ela aponta (requests) e os problemas do carimbo (problems); a contradição, o nó com REFUTES para a resposta ou a pergunta. Não é veredito do contrato. As lacunas são calculadas: no-answer (sem resposta viva), contradicted (REFUTES de um nó que não é refuted nem superseded), no-confirmed-evidence, evidence-unstamped (evidência confirmed sem verified_at válido), evidence-cadence-invalid (evidência confirmed com reverify_every que não é duração), evidence-due (verified_at + reverify_every igual ou anterior a as_of) e verdict-open (sem veredito vivo, ou um que não é meets nem not_applicable). skipped lista o que não entrou: o nó com x_questionnaire sem name ou sem a lista questions, o nó com role fora do enum e o número de questions que não é texto. Só a resposta viva traz evidência e contradição. O rc é 1 com grafo ilegível (unreadable), e com lacuna ou pulado quando --fail-on-gap.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "as_of",
+    "questionnaire",
+    "columns",
+    "items",
+    "skipped",
+    "unreadable"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.audit/1"
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date"
+    },
+    "questionnaire": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    },
+    "skipped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "id",
+          "reason",
+          "detail"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "profile-invalid",
+              "question-not-text",
+              "role-invalid"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "code"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "questionnaire",
+        "question",
+        "questions",
+        "answers",
+        "verdicts",
+        "evidence",
+        "requirements",
+        "contradictions",
+        "requests",
+        "owners",
+        "gaps"
+      ],
+      "properties": {
+        "questionnaire": {
+          "type": "string"
+        },
+        "question": {
+          "type": "string"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "label",
+              "trace"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "trace": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "label",
+              "status",
+              "live",
+              "answer_draft",
+              "verdict",
+              "answered_at",
+              "owner",
+              "columns"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "live": {
+                "type": "boolean"
+              },
+              "answer_draft": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "verdict": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "answered_at": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "owner": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "columns": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "verdicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "label",
+              "status",
+              "verified_at",
+              "verified_scope",
+              "verified_against",
+              "reverify_every",
+              "due",
+              "overdue",
+              "owner",
+              "trace",
+              "requests",
+              "problems"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "verified_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "verified_scope": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "verified_against": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "reverify_every": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "due": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date"
+              },
+              "overdue": {
+                "type": "boolean"
+              },
+              "owner": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "trace": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "requests": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "problems": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "verified-at-invalid",
+                    "reverify-every-invalid"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "label",
+              "owner"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "owner": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "contradictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "label",
+              "status"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "requests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "label",
+              "owner"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "owner": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "owners": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "no-answer",
+              "contradicted",
+              "no-confirmed-evidence",
+              "evidence-unstamped",
+              "evidence-cadence-invalid",
+              "evidence-due",
+              "verdict-open"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

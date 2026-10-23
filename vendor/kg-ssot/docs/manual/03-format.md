@@ -225,10 +225,16 @@ The whole example, from the open data dictionary of the Brazilian drug price reg
 |---|---|---|
 | `x_mirror` | `system`, `ref`, `state` (the status as copied), `synced_at` (*date*) | `url`, `resync_every` (duration) |
 | `x_doc_cycle` | `issuer`, `state`: `draft` `enacted` (published, in force from a future `effective_from`) `in_force` `suspended` `revoked` `expired` `superseded` | `ref`, `version`, `effective_from`, `effective_to`, `updated_at`, `checked_at` (*dates*), `recheck_every` (duration, needs `checked_at`) |
-| `x_questionnaire` | `name`, `questions` (a list that is not empty) | `answer_draft`, `verdict`: `meets` `partial` `does_not_meet` `not_applicable` `unknown`, `answered_at` (*date*) |
+| `x_questionnaire` | `name`, `questions` (a list that is not empty) | `answer_draft`, `verdict`: `meets` `partial` `does_not_meet` `not_applicable` `unknown`, `answered_at` (*date*), `role`: `item` `evidence_request` `evidence_requirement` (v4.13) |
 
 A mirror goes stale without warning: `synced_at` plus `resync_every` puts it in the due report, and so does
 `checked_at` plus `recheck_every` for a document.
+
+`x_questionnaire.role` tells a questionnaire item from the evidence around it. `item`, the default, is the question
+node or the answer to it; `evidence_request` is a request to a person for evidence, and `evidence_requirement` says what
+evidence an item requires. The `questions` of both are the items they serve. Without the field, only an id prefix
+tells them apart, and a prefix is one adopter's convention, not part of the contract. The audit package
+(`kg_audit.py`, chapter 5) reads it.
 
 ### `x_criterion` and `x_measured_under` (v4.12)
 

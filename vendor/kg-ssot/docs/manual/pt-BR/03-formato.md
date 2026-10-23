@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:be15f7e5a422bd06 -->
+<!-- translation-of: docs/manual/03-format.md sha256:d32560d49c4e0e25 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -229,10 +229,15 @@ O exemplo inteiro, tirado do dicionário de dados aberto da CMED/ANVISA, está e
 |---|---|---|
 | `x_mirror` | `system`, `ref`, `state` (o estado como foi copiado), `synced_at` (*data*) | `url`, `resync_every` (duração) |
 | `x_doc_cycle` | `issuer`, `state`: `draft` `enacted` (publicado, em vigor a partir de um `effective_from` futuro) `in_force` `suspended` `revoked` `expired` `superseded` | `ref`, `version`, `effective_from`, `effective_to`, `updated_at`, `checked_at` (*datas*), `recheck_every` (duração, pede `checked_at`) |
-| `x_questionnaire` | `name`, `questions` (uma lista não vazia) | `answer_draft`, `verdict`: `meets` `partial` `does_not_meet` `not_applicable` `unknown`, `answered_at` (*data*) |
+| `x_questionnaire` | `name`, `questions` (uma lista não vazia) | `answer_draft`, `verdict`: `meets` `partial` `does_not_meet` `not_applicable` `unknown`, `answered_at` (*data*), `role`: `item` `evidence_request` `evidence_requirement` (v4.13) |
 
 Uma cópia envelhece sem aviso: `synced_at` mais `resync_every` a põe no relatório de vencimento, e o mesmo vale para
 `checked_at` mais `recheck_every` num documento.
+
+O `x_questionnaire.role` separa o item do questionário da evidência em volta dele. `item`, o padrão, é o nó da pergunta
+ou a resposta a ela; `evidence_request` é o pedido de evidência a uma pessoa, e `evidence_requirement` diz que evidência
+um item exige. As `questions` dos dois são os itens a que servem. Sem o campo, só o prefixo do id os separa, e um prefixo
+é convenção de um adotante, não do contrato. O pacote de auditoria (`kg_audit.py`, capítulo 5) o lê.
 
 ### `x_criterion` e `x_measured_under` (v4.12)
 

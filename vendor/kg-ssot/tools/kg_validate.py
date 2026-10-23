@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.12"
+CONTRACT_VERSION = "4.13"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1628,7 +1628,8 @@ PROFILE_HINTS = {
                              "superseded, and recheck_every needs checked_at.",
     ("node", "x_questionnaire"): "x_questionnaire links the node to an external questionnaire (v4.11): name and questions "
                                  "(a list that is not empty) are required; verdict is meets, partial, does_not_meet, "
-                                 "not_applicable, or unknown.",
+                                 "not_applicable, or unknown; role (v4.13) is item, evidence_request, or "
+                                 "evidence_requirement.",
     ("node", "x_severity"): "x_severity is critical, high, medium, low, or info (v4.11).",
     ("node", "x_criterion"): "x_criterion is a version of a pre-registered criterion (v4.12): id, version, "
                              "registered_at (a date or an RFC 3339 date-time), sha256, and either ref or text are "

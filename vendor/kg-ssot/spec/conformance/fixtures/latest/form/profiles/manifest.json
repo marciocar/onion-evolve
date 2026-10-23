@@ -39,6 +39,13 @@
       "warnings": []
     },
     {
+      "file": "valid-x-questionnaire-role.kg.yaml",
+      "description": "o pedido de evidência (evidence_request), o requisito (evidence_requirement) e a pergunta marcada como item (v4.13)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
       "file": "valid-x-severity.kg.yaml",
       "description": "a severidade no enum (v4.11)",
       "valid": true,
@@ -221,6 +228,15 @@
       "codes": [],
       "warnings": [
         "form.enum.node.x_questionnaire.verdict"
+      ]
+    },
+    {
+      "file": "warn-x-questionnaire-role.kg.yaml",
+      "description": "o papel fora do enum: o valor é código, em inglês (v4.13)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.x_questionnaire.role"
       ]
     },
     {

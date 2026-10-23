@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:8533629979656791 -->
+<!-- translation-of: README.md sha256:a5049cd603276399 -->
 <div align="center">
 
 # KG-SSOT
@@ -11,7 +11,7 @@
 <sub>Tradução do original em inglês; quando os dois divergirem, vale o inglês.</sub>
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.21.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.21.1-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.22.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.22.0-6f42c1)](spec/release.json)
 [![Conformidade: 438/438](https://img.shields.io/badge/conformidade-438%2F438-2ea44f)](spec/conformance/README.pt-BR.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -77,12 +77,12 @@ As ferramentas imprimem em inglês por padrão e em português do Brasil quando 
 
 | Canal | Comando | O que você recebe |
 |---|---|---|
-| [PyPI](https://pypi.org/project/kg-ssot/) | `pip install kg-ssot` | Os comandos `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-vocab`, `kg-criterion`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro |
+| [PyPI](https://pypi.org/project/kg-ssot/) | `pip install kg-ssot` | Os comandos `kg-validate`, `kg-conformance`, `kg-gate`, `kg-store`, `kg-query`, `kg-diff`, `kg-vocab`, `kg-criterion`, `kg-audit`, `kg-mcp` e `kg-prov-export`, com o contrato e a suíte dentro |
 | [npm](https://www.npmjs.com/package/kg-ssot) | `npm install kg-ssot` | O leitor JavaScript com um validador pré-compilado, que roda também no React Native e no Expo |
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | o arquivo `.mcpb` da [última release](https://github.com/marciocar/kg-ssot/releases/latest) | O servidor MCP como extensão de um clique |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | O mesmo servidor para qualquer cliente MCP |
 | [Contêiner](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | O servidor MCP como serviço ao lado de um cliente sem Python, como o LibreChat |
-| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.21.1` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
+| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.22.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
 
 ## Um nó, por dentro
 
@@ -165,6 +165,7 @@ flowchart LR
 | **Consulta e diff** | `kg_query.py` seleciona nós num corpus inteiro e projeta cada aresta com o label da outra ponta, paginado (`kg-ssot.query/1`); `kg_diff.py` compara revisões pelo id, campo a campo, lendo o git sem checkout (`kg-ssot.diff/1`) |
 | **Vocabulário de domínio** | O perfil `x_term` dá a cada sinônimo a fonte, a versão do documento e a data de conferência; o `kg_vocab.py` resolve um texto para o termo, lista o que vence e exporta para SKOS-XL e Apache Ossie (`kg-ssot.vocab/1`); o servidor MCP o serve como `kg_terms` |
 | **Critério pré-registrado** | O `x_criterion` dá a cada versão de uma régua um nó e um `sha256`, e o `x_measured_under` prende o resultado à versão sob a qual foi medido; trocar a régua depois de ver o dado aparece como aviso post-hoc, e o `kg_criterion.py` confere o `sha256` contra o texto ou o arquivo (`kg-ssot.criterion/1`) |
+| **Pacote de auditoria por pergunta** | O `kg_audit.py` exporta uma linha por item de questionário (o perfil `x_questionnaire`), com a pergunta, a resposta, o veredito, a evidência exigida e a dada, com a data e o vencimento, os pedidos de evidência (`role: evidence_request` e `evidence_requirement`), as contradições, o dono e as lacunas que ele calcula, em CSV, XLSX (sem dependência) ou JSON (`kg-ssot.audit/1`) |
 | **Suíte em dados puros** | 438 casos com metaschema próprio, no estilo da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adote sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar e colar, sem código compartilhado: um carimbo sha256 por arquivo |
@@ -183,7 +184,7 @@ flowchart LR
 
 ## Estado
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.21.1`. O leitor de referência passa em 424 de 438 casos de `latest/`.
+- **Vigente:** contrato v4, release `kg-ssot-v4.22.0`. O leitor de referência passa em 424 de 438 casos de `latest/`.
 - **Em uso:** três adotantes rodam o gate no CI, um deles em produção.
 - **Próximo:** o v5 vai reprovar um `method` fora da forma `<classe>: <detalhe>`, que hoje só avisa.
 - **Aberto:** a camada semântica (frescor, contradição, completude de domínio) vive em `optional/`, e o leitor de

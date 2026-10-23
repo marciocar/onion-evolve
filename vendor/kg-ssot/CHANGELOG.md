@@ -10,6 +10,34 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.22.0] - 2026-10-23
+
+The audit package by question: one row per questionnaire item, with the answer, the dated evidence, and the gaps it
+computes, in CSV, XLSX, or JSON. Contract v4.13: `x_questionnaire.role` in the SHOULD, nothing that passed fails.
+
+### Added
+
+- **The audit package by question (`kg_audit.py`).** An auditor asks for the package by question; until now an adopter
+  kept it by hand next to the graph. The tool exports one row per questionnaire item (the pair of name and number that
+  `x_questionnaire` gives): the question, the answer (by the profile, and a node without the profile by `DEPENDS_ON` in
+  either direction), the verdict, the required evidence, the evidence (`SUPPORTS` to the answer, or `SUPPORTS` or
+  `TRACES_TO` to the question, a request, or a requirement, also from another graph) with its date, scope, and due
+  date, the contradictions (`REFUTES`), the evidence requests, the owner, and the gaps it computes: `no-answer` (no live
+  answer: a `refuted` or `superseded` one does not count, nor does its evidence), `contradicted`, `no-confirmed-evidence`,
+  `evidence-unstamped`, `evidence-cadence-invalid`, `evidence-due`, and `verdict-open`. What it cannot use (a `role`
+  outside the enum, a question number that is not text, a malformed profile) comes out in `skipped`, in the package
+  itself, never in silence. Formats:
+  - CSV, with the questions or the evidence, and a leading apostrophe on a cell that would run as a formula;
+  - XLSX with the questions, the evidence, and what was skipped, written with the standard library only, with stable bytes;
+  - JSON, `kg-ssot.audit/1` (`spec/audit.schema.json`).
+
+  `--column` brings an adopter's own key of the answer as a column, `--as-of` sets the day the evidence is due against,
+  and `--fail-on-gap` gives rc 1 for CI. A graph that does not read gives rc 1, because the package would be incomplete
+  in silence. Also on PyPI as `kg-audit`. Measured on an adopter's graphs before the cut.
+- **`x_questionnaire.role` (contract v4.13).** `item`, the default; `evidence_request`, a request to a person for
+  evidence; or `evidence_requirement`, the evidence an item requires. Without it, only an id prefix told them apart.
+  SHOULD only: another value warns as `form.enum.node.x_questionnaire.role`, and nothing that passed fails.
+
 ## [4.21.1] - 2026-10-23
 
 `kg_criterion.py check` reports what it cannot check instead of skipping it. Contract v4.12, unchanged.

@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:d6cc72c59510772e -->
+<!-- translation-of: ADOPTING.md sha256:26887e82f5729581 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -333,6 +333,19 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.21.1` para a `kg-ssot-v4.22.0`, o contrato vai ao v4.13, e só o nível SHOULD muda: nada que passava
+reprova, e o gate registra a identidade nova do contrato sem pedir `--update` enquanto nenhum veredito muda (medido nos
+184 grafos do core antes da tag). O que você pode ver e fazer:
+
+- O `x_questionnaire` ganha o `role`: `item` (o padrão), `evidence_request` (o pedido de evidência a uma pessoa) ou
+  `evidence_requirement` (a evidência que um item exige). Outro valor alerta como `form.enum.node.x_questionnaire.role`.
+  Se você separa pedidos ou requisitos pelo prefixo do id, dê a eles o `role` (o `kg_migrate.py nest` com um campo
+  `const` faz isso).
+- Se um auditor pede o pacote por pergunta, o `kg_audit.py --root .` o exporta (CSV, XLSX ou JSON). Escreva os números
+  de `questions` como texto (`["7"]`, não `[7]`): o número que não é texto é pulado e relatado. Use
+  `KG_SSOT_LANG=pt-BR` para os cabeçalhos em português. No CI, o `--fail-on-gap` dá rc 1 quando um item tem lacuna ou
+  algo foi pulado.
 
 Da `kg-ssot-v4.21.0` para a `kg-ssot-v4.21.1`, o contrato não muda (segue o v4.12), e o gate não pede `--update`. Só
 o `kg_criterion.py check` muda: o que ele não consegue conferir agora sai como `integrity.criterion-malformed`, com rc 1,

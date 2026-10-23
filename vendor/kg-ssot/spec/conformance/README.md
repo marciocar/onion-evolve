@@ -234,6 +234,11 @@ tell the order, because rounds are labels. A date on a day that does not exist (
 A reader computes no hash and reads no corpus for these: a `<path>#<id>` citation and the `sha256` against the text
 or the file belong to `kg_criterion.py`, which is not part of the suite. No verdict changes.
 
+v4.13 adds `role` to the `x_questionnaire` profile, in the SHOULD (`latest/form/profiles/`): `item`, the default,
+`evidence_request` (a request to a person for evidence), or `evidence_requirement` (the evidence an item requires), which
+tell those apart from a questionnaire item. Another value warns as
+`form.enum.node.x_questionnaire.role`, and nothing that passed fails.
+
 The same code can be MUST in one case and SHOULD in another, because severity belongs to the case, not to the code.
 
 ## Folders
