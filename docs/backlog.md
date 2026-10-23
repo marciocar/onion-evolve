@@ -958,6 +958,14 @@
 | 7.2 | `C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE` | forge-cc-update-2026-10 | teto declarado: o medidor não decide se um item do CHANGELOG toca o Onion; casar por palavra-chave fabricaria as ligações que a |
 | 3.6 | `Q_ISSUE_PELO_ADAPTER_EXECUTAVEL` | forge-cc-update-2026-10 | quando o adapter executável do task manager existir (SAC-65), o passo de ação vira chamada, não prosa seguida pela sessão? |
 
+## radar-E3-2026-10-23-r17 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.2 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023` | radar-E3-2026-10-23-r17 | o SDK do bridge deve subir para 0.3.309 e o pin do revisor do CI para v1.0.260, para o delta da 2.1.309 chegar a quem serve |
+| 2.4 | `Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023` | radar-E3-2026-10-23-r17 | a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum |
+| 2.0 | `Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023` | radar-E3-2026-10-23-r17 | a guarda de isolamento de worktree endurecida na 2.1.309 aceita o padrão LC_ALL=C bash .claude/validation/... que a casa usa nos  |
+
 ## rito-task-manager-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1020,14 +1028,6 @@
 |--:|---|---|---|
 | 5.4 | `Q_MERGE_VERIFICADO_EM_REPO_SEM_CI` | guard-pre-push-2026-10 | LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). R |
 | 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
-
-## radar-E3-2026-10-23-r17 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 5.4 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023` | radar-E3-2026-10-23-r17 | o SDK do bridge deve subir para 0.3.309 e o pin do revisor do CI para v1.0.260, para o delta da 2.1.309 chegar a quem serve |
-| 2.4 | `Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023` | radar-E3-2026-10-23-r17 | a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum |
-| 2.0 | `Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023` | radar-E3-2026-10-23-r17 | a guarda de isolamento de worktree endurecida na 2.1.309 aceita o padrão LC_ALL=C bash .claude/validation/... que a casa usa nos  |
 
 ## adopter-shape-bench-2026-10 — 12 item(ns)
 
