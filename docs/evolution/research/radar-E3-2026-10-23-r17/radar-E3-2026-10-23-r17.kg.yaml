@@ -1,0 +1,338 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.309 a 2.1.309 contra a baseline 2.1.308.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-23-r17
+  schema_version: "1"
+  baseline: "2026-10-23"
+  review_after: "2026-11-22"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-23); 9 da rodada; 7 após o juiz (3 superações, 2 omissões, 2 perguntas).
+# ═══ AUFHEBUNG ═══
+#   DECIDIDO (2026-10-23): (a). Dois nós da r16 superados: a paridade das três superfícies na 2.1.308
+#   (o host subiu para 2.1.309 e o bridge e o revisor ficaram) e o censo que "zera numa worktree" (zera só
+#   com a raiz absoluta ou sem argumento; com "." conta 8 na mesma worktree).
+external_edges:
+  - from: E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023
+    to: "docs/evolution/research/radar-E3-2026-10-22-r16/radar-E3-2026-10-22-r16.kg.yaml#E_TRES_SUPERFICIES_EM_PARIDADE_2_1_308_1022"
+    edge_type: SUPERSEDES
+  - from: E_CENSO_ZERA_SCRIPTPATH_SO_COM_RAIZ_ABSOLUTA_1023
+    to: "docs/evolution/research/radar-E3-2026-10-22-r16/radar-E3-2026-10-22-r16.kg.yaml#E_CENSO_ZERA_SCRIPTPATH_EM_WORKTREE_1022"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "CHANGELOG oficial: seções 2.1.309 (82 linhas, 79 itens); baseline 2.1.308, disco 2.1.309, processo 2.1.309, SDK bridge 2.1.308"
+    label: "o delta desde a baseline 2.1.308 são 1 versão(ões), de 2.1.309 a 2.1.309, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.309 a ## 2.1.309 (cópias em docs/evolution/research/radar-E3-2026-10-23-r17/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-23"
+    verified_against: "fechada em 2026-10-23 pela r17: 79 itens medidos no vivo nos candidatos (sandbox, permissões, sed -i, transcript, contraste, CLAUDE.md aninhado, worktree, menções, add-dir); juiz independente (subagente opus não-fork): 10 SUSTENTA, 2 EXAGERA, 1 REPROVA, 3 superações, 6 omissões (data/judge-verdicts.json, judge-verdict-check rc 0); o que toca: a subida do bridge e do revisor (SAC-239), o ponto cego do sed -i na perna de leitura (SAC-240) e a guarda de isolamento por medir (SAC-241)"
+    label: "quais itens de 2.1.309 a 2.1.309 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+    trace: "docs/evolution/research/radar-E3-2026-10-23-r17/SYNTHESIS.md e data/judge-verdicts.json"
+  - id: E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-23"
+    verified_against: "claude --version no host = 2.1.309; censo: binário do CLI embutido no SDK do bridge (0.3.308) --version = 2.1.308; npm view @anthropic-ai/claude-agent-sdk version = 0.3.309; .github/workflows/onion-review.yml fixa anthropics/claude-code-action@6b6870e6 (tag v1.0.258), e as tags v1.0.259 (ae68417a) e v1.0.260 (8d70a0dd) já existem, as duas pedindo @anthropic-ai/claude-agent-sdk ^0.3.309 no package.json"
+    label: "a paridade da r16 acabou: o host está na 2.1.309, mas o /chat do bridge (SDK 0.3.308) e o revisor do CI (pin v1.0.258) seguem na 2.1.308; o delta da 2.1.309 ainda não chega a quem serve"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh, .github/workflows/onion-review.yml e o registro npm"
+      locator: "tabela de versões do censo; uses: da claude-code-action; tags da action pela API do GitHub"
+      method: "medição: --version dos binários, npm view e leitura do package.json da action em cada tag"
+      locality: "host"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023
+    node_type: question
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-23"
+    verified_against: "proposta da r17: subir o Agent SDK do bridge para 0.3.309 pelo caminho de deploy do repo e o pin do revisor para a tag v1.0.260; executa a decisão D_SUBIDAS_2_1_309_NA_PROXIMA_SESSAO_1022 da r16, que esta rodada não cumpre por ordem (só registrar); issue SAC-239"
+    label: "o SDK do bridge deve subir para 0.3.309 e o pin do revisor do CI para v1.0.260, para o delta da 2.1.309 chegar a quem serve"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-239"
+      locator: "issue SAC-239 do projeto Onion — core: próximas levas"
+      method: "derivado: proposta da rodada a partir de E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023"
+      locality: "web"
+  - id: E_CENSO_ZERA_SCRIPTPATH_SO_COM_RAIZ_ABSOLUTA_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "na worktree da r17: cc-delta-census.sh . conta 8 arquivos citando scriptPath; com a raiz absoluta da worktree, ou sem argumento, conta 0. A linha 367 testa a substring /worktrees/ no caminho que o glob devolve, e o glob só traz o prefixo absoluto quando a raiz é absoluta; medição comentada na SAC-219"
+    label: "o censo zera scriptPath numa worktree só quando recebe a raiz absoluta ou nenhuma; com '.' conta certo; o defeito da SAC-219 continua, com o gatilho mais estreito do que a r16 escreveu"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh"
+      locator: "linha 367: if '/worktrees/' in f: continue"
+      method: "medição: o mesmo censo na mesma worktree com três formas de raiz, contagens 8, 0 e 0"
+      locality: "repo"
+  - id: E_ITENS_DE_SANDBOX_E_PERMISSAO_SEM_CONFIG_NO_CORE_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-23"
+    verified_against: ".claude/settings.json: sem chave sandbox; permissions só com allow (12 entradas), nenhuma deny; grep por --mcp-config em .claude, ops e .github = zero. A única superfície com regras deny Edit/Write e permission-mode default é ops/chat-runner.sh (linhas 618 a 625), o runner do convidado do /chat, que põe Bash em --disallowedTools e roda pelo SDK 0.3.308. Reescrito após o EXAGERA do juiz (a versão anterior dizia que o core não usa deny)"
+    label: "as correções de sandbox, de regra deny Edit(path), de --mcp-config e da checagem de permissão do Bash (linhas 3 a 9, 42 e 57 da 2.1.309) não mudam nada no core: o settings não usa sandbox nem deny, e o único uso de deny (o runner do convidado do /chat) desabilita o Bash"
+    provenance:
+      source: ".claude/settings.json e ops/chat-runner.sh"
+      locator: "chaves permissions e sandbox; linhas 618 a 625 do runner"
+      method: "medição: leitura do JSON por python e grep no core"
+      locality: "repo"
+  - id: E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-23"
+    verified_against: "pretooluse-env-guard.sh alimentado com tool_name Bash e o comando sed -i sobre o arquivo de segredos da raiz sai rc 2 (ramo geral de leitores); o controle num arquivo temporário sai rc 0. kg-read-leg.sh com Edit em .claude/hooks/pretooluse-env-guard.sh devolve 988 bytes de aviso (10 nós); o mesmo arquivo por sed -i devolve 0 bytes: no ramo Bash o hook só extrai alvos .kg.yaml. Reescrito após o EXAGERA do juiz (a versão anterior dizia que a perna de leitura dispara no sed -i)"
+    label: "o sed -i vira Bash comum na 2.1.309: a guarda do arquivo de segredos segue barrando, mas a perna de leitura do grafo é surda ao sed -i em arquivo rastreado comum (o Edit avisa, o sed -i passa calado)"
+    provenance:
+      source: ".claude/hooks/pretooluse-env-guard.sh e .claude/hooks/kg-read-leg.sh"
+      locator: "ramo geral de leitores do env-guard; ramo Bash do kg-read-leg (só .kg.yaml)"
+      method: "medição: o hook executado com JSON de entrada sintético, alvo e controle"
+      locality: "repo"
+  - id: E_TRANSCRIPTS_DO_PROJETO_PARSEIAM_E_LEITORES_TOLERAM_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-23"
+    verified_against: "jq -c . sobre os 12 transcripts .jsonl do projeto: 12 rc 0, nenhum quebrado. Os dois hooks Stop leem o transcript por lib/transcript-tail.py com json.loads dentro de try/except e errors=replace; background-task-probe.sh lê por grep"
+    label: "a correção da prévia cortada no meio de um emoji (transcript que o jq não lia) não muda nada no core: os transcripts deste projeto parseiam e os leitores do core já toleram linha quebrada"
+    provenance:
+      source: ".claude/hooks/lib/transcript-tail.py e os transcripts da conta"
+      locator: "linhas 42 a 69 do transcript-tail.py"
+      method: "medição: jq sobre cada transcript e leitura dos leitores"
+      locality: "host"
+  - id: E_GATE_DE_CONTRASTE_DO_CORE_SEGUE_WCAG_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-23"
+    verified_against: ".claude/validation/lint-design-tokens.sh linha 10: o contraste é WCAG por par de governance/contrast-pairs.json; grep -i apca em .claude só casa o vendor cytoscape.min.js. A skill dataviz embutida passa a aceitar APCA, mas mantém WCAG 2 onde a conformidade AA é exigida"
+    label: "a skill dataviz embutida aceita APCA na 2.1.309; o gate de contraste do core segue WCAG e nada nele lê a skill, então não há conflito a resolver"
+    provenance:
+      source: ".claude/validation/lint-design-tokens.sh"
+      locator: "cabeçalho, item (3) Contraste WCAG"
+      method: "medição: grep no core"
+      locality: "repo"
+  - id: E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-23"
+    verified_against: "git ls-files: um único CLAUDE.md, o da raiz (25.918 bytes), nenhum aninhado, então a linha 14 não tem superfície. Já isolation worktree é PRESCRITO em .claude/skills/onion-orchestration/SKILL.md, .claude/commands/meta/orchestrate.md e .claude/skills/onion-validation/SKILL.md (8 ocorrências), e a conta tem 3 sessões de agente isoladas em worktree. Reescrito após o REPROVA do juiz (a versão anterior dizia 'só exemplo em comentário'); o comportamento da guarda endurecida dentro de agente isolado não foi medido"
+    label: "a linha 14 (CLAUDE.md aninhado) não toca o core; as linhas 10 a 12 e 58 tocam a worktree isolada que a doutrina de orquestração prescreve, e o efeito da guarda endurecida sobre o padrão LC_ALL=C da casa está por medir"
+    provenance:
+      source: "git ls-files e grep no core"
+      locator: "CLAUDE.md da raiz; isolation worktree nas skills onion-orchestration e onion-validation e em meta/orchestrate.md"
+      method: "medição: listagem do repo e grep"
+      locality: "repo"
+  - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_309_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-23"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive no host com 2.1.309: 'OK ✓ — todas as guardas reagiram conforme esperado.'"
+    label: "a guarda de deriva de binário (cited_directive) segue verde contra o CLI 2.1.309 instalado"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família cited_directive"
+      method: "medição: execução da família da bancada no host"
+      locality: "host"
+  - id: E_REVISOR_POSTA_TEXTO_DO_MODELO_SEM_SANITIZAR_ARROBA_1023
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-23"
+    verified_against: "omissão apontada pelo juiz (linha 41 da 2.1.309, menções a usuários do GitHub): .claude/utils/forge/post-review-comment.sh posta o corpo do parecer por gh api -F body=@<arquivo> (linhas 113 e 119) sem tratar '@'; o revisor do CI roda o CLI 2.1.308 (pin v1.0.258), anterior à correção"
+    label: "o revisor do CI posta como comentário de PR o texto escrito pelo modelo sem sanitizar '@'; a correção das menções indevidas da 2.1.309 só chega a ele quando o pin subir"
+    provenance:
+      source: ".claude/utils/forge/post-review-comment.sh"
+      locator: "linhas 113 e 119, gh api com body=@arquivo"
+      method: "medição: grep no core, re-executado pela rodada"
+      locality: "repo"
+  - id: E_ADD_DIR_DO_ADOPT_EFEMERO_E_SKILL_HOMONIMA_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-23"
+    verified_against: "omissão apontada pelo juiz (linha 29 da 2.1.309): .claude/commands/meta/adopt.md (linhas 650 e 670) orienta /add-dir no modo efêmero; num alvo já adotado, as skills dele têm o mesmo nome das do core e passam a aparecer como <pasta>:<nome> em vez de ficarem inalcançáveis"
+    label: "na adoção efêmera por /add-dir sobre um repo já adotado, as skills homônimas do adotante passam a ser oferecidas com prefixo de pasta; o texto do adopt não prevê o caso"
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: "linhas 650 e 670"
+      method: "medição: grep no core, re-executado pela rodada"
+      locality: "repo"
+  - id: Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-23"
+    verified_against: "proposta da r17 após o EXAGERA do juiz: estender o ramo Bash do kg-read-leg.sh às escritas in-place sobre arquivos rastreados, com caso na bancada (Edit e sed -i no mesmo arquivo dão o mesmo aviso); issue SAC-240"
+    label: "a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-240"
+      locator: "issue SAC-240 do projeto Onion — core: próximas levas"
+      method: "derivado: proposta da rodada a partir de E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023"
+      locality: "web"
+  - id: Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-23"
+    verified_against: "proposta da r17 após o REPROVA do juiz: num clone descartável, um Agent com isolation worktree roda LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive e registra se a guarda endurecida o recusa; issue SAC-241"
+    label: "a guarda de isolamento de worktree endurecida na 2.1.309 aceita o padrão LC_ALL=C bash .claude/validation/... que a casa usa nos agentes isolados?"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-241"
+      locator: "issue SAC-241 do projeto Onion — core: próximas levas"
+      method: "derivado: proposta da rodada a partir de E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023"
+      locality: "web"
+  - id: C_SUPERACAO_20261023_DENY_MORA_NO_RUNNER_DO_CONVIDADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-23"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), medida em ops/chat-runner.sh linhas 618 a 625"
+    label: "o core usa regra deny Edit/Write num só lugar, o runner do convidado do /chat, que desabilita o Bash; por isso as correções de permissão do Bash da 2.1.309 não o alcançam"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA de E_ITENS_DE_SANDBOX_E_PERMISSAO_SEM_CONFIG_NO_CORE_1023"
+      method: "juízes: subagente opus independente, critério CU3"
+      locality: "repo"
+  - id: C_SUPERACAO_20261023_PERNA_DE_LEITURA_SURDA_AO_SED_I
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-23"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: kg-read-leg 988 bytes no Edit, 0 no sed -i do mesmo arquivo"
+    label: "a perna de leitura do grafo só olha .kg.yaml dentro de comandos Bash, então a edição por sed -i de um arquivo rastreado não recebe o aviso do corpus"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA de E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023"
+      method: "juízes: subagente opus independente, critério CU2"
+      locality: "repo"
+  - id: C_SUPERACAO_20261023_WORKTREE_ISOLADA_E_PRESCRITA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-23"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO): 8 prescrições de isolation worktree em três artefatos e 3 sessões isoladas na conta"
+    label: "a worktree isolada de agente é prescrita pela doutrina de orquestração e usada pela casa, então as correções da guarda de isolamento tocam o core"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito REPROVA de E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023"
+      method: "juízes: subagente opus independente, critério CU3"
+      locality: "repo"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023
+    to: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITENS_DE_SANDBOX_E_PERMISSAO_SEM_CONFIG_NO_CORE_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_TRANSCRIPTS_DO_PROJETO_PARSEIAM_E_LEITORES_TOLERAM_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GATE_DE_CONTRASTE_DO_CORE_SEGUE_WCAG_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_309_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_REVISOR_POSTA_TEXTO_DO_MODELO_SEM_SANITIZAR_ARROBA_1023
+    to: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023
+    edge_type: SUPPORTS
+  - from: E_ADD_DIR_DO_ADOPT_EFEMERO_E_SKILL_HOMONIMA_1023
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023
+    to: Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023
+    edge_type: SUPPORTS
+  - from: E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023
+    to: Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261023_DENY_MORA_NO_RUNNER_DO_CONVIDADO
+    to: E_ITENS_DE_SANDBOX_E_PERMISSAO_SEM_CONFIG_NO_CORE_1023
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261023_PERNA_DE_LEITURA_SURDA_AO_SED_I
+    to: E_SED_I_VIRA_BASH_COMUM_E_A_GUARDA_DO_ENV_COBRE_1023
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261023_WORKTREE_ISOLADA_E_PRESCRITA
+    to: E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023
+    edge_type: TRACES_TO
