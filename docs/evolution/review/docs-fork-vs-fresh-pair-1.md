@@ -2,7 +2,8 @@
 branch: docs/fork-vs-fresh-pair-1
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 88b4ec102d2490b51f79c5b5c87b98024a140ef1618ce5f4dcf6f2bff1fdf022
+reviewed_code_sha256: 1876b3b3203844cf687147455b56a21afb3c7b64989ab8fd21bb5663160a54f3
 findings_total: 0
 findings_real: 0
 tokens: 0

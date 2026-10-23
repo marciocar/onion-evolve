@@ -1108,6 +1108,13 @@
 | 4.5 | `Q_REABRIR_AUTORIDADE_NO_PROBE` | rea-method-2026-10 | Gatilho (b): quando o probe estruturado existir, o verificador deve nomear o id que fecha e a autoridade que provou? Esta é a ide |
 | 3.0 | `Q_REABRIR_PARIDADE_POS_FORGE` | rea-method-2026-10 | Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexis |
 
+## sinais-de-campo-2026-09 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
+| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
+
 ## env-falso-positivo-2026-10 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1160,13 +1167,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 3.0 | `Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO` | radar-E3-2026-10-14-r11 | o _cleanup do pr-finalize deve abortar o rebase que ele mesmo começou, para a morte no meio do --rebase não deixar a worktree em |
-
-## sinais-de-campo-2026-09 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.0 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
-| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
 ## superpowers-2026-10 — 2 item(ns)
 
