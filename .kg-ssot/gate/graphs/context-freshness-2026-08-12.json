@@ -1,9 +1,7 @@
 {
   "graph": "docs/onion/graph/context-freshness-2026-08-12.kg.yaml",
   "id": "context-freshness-2026-08-12",
-  "must": [
-    "form.unknown-key.meta.run_id"
-  ],
+  "must": [],
   "should": {
     "form.range.node.label": 13,
     "yaml.unquoted-date": 1

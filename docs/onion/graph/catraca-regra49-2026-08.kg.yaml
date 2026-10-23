@@ -436,7 +436,7 @@ nodes:
     status: done
     verified_at: "2026-08-24"
     verified_against: "dogfood REAL 2026-08-24 (clone descartavel): com a cura o update da granaai NAO contamina mais (vendor 0 chaves estrangeiras). MAS a granaai segue com lint HARD — nao por REMOVIDO (curado), e sim por NO-BASELINE (46 HARD): ela nunca teve baseline de catraca proprio (estado PRE-catraca, medido no develop aa7732e6 ANTES de qualquer update). Ou seja: a contaminacao esta curada; o bloqueio remanescente e OUTRO (E_GRANAAI_NOBASELINE_PREEXISTING) e independe do update."
-    status_note: "RESOLVIDA 2026-08-25"
+    x_status_note: "RESOLVIDA 2026-08-25"
     label: "RESOLVIDA: os DOIS bloqueios curados e provados no dogfood real do clone da granaai — (1) CONTAMINACAO (chave estrangeira → REMOVIDO) por D_CURE_PRESERVE_ADOPTER_BASELINE; (2) NO-BASELINE (pre-catraca) por D_ADOPT_MUST_EMIT_MISSING_BASELINES (--ensure-from emite do corpus dela). Update da granaai agora fecha limpo (kg-verification rc=0). Falta so o maestro RODAR o update real na granaai quando quiser (a maquinaria esta pronta)."
     provenance:
       source: "docs/evolution/review/fix-adopt-emit-missing-baselines.md"

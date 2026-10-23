@@ -6,9 +6,9 @@ meta:
   id: backlog-grafo-2026-08
   schema_version: '1'
   layer: audit
-  label: 'Onda 1 — o que "gerir trabalho aberto" significa quando a FONTE e grafo e a projecao e pura'
+  x_label: 'Onda 1 — o que "gerir trabalho aberto" significa quando a FONTE e grafo e a projecao e pura'
   baseline: "2026-08-28"
-  trace: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml"
+  x_trace: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml"
   note: >
     Projecao humana deste grafo: SYNTHESIS.md (derivacao, nunca fonte — divergiu, o grafo ganha).
 

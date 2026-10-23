@@ -1,8 +1,6 @@
 {
   "graph": "docs/onion/graph/pr-decision-history-2026-08.kg.yaml",
   "id": "pr-decision-history-2026-08",
-  "must": [
-    "form.unknown-key.edge.provenance"
-  ],
+  "must": [],
   "should": {}
 }

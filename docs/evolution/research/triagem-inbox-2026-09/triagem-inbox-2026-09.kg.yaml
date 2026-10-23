@@ -195,7 +195,7 @@ nodes:
     narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAI (quando a F3 tornar o workflow informativo): a cobranca bloqueante da defasagem da porta na main. Ate la ela segue no vivo; sobrevive a fronteira SEM-BASELINE/PIN-DESCONHECIDO/ERRO como HARD. · desde o contrato v4.3 (SAC-98), a aresta mora em external_edges, no topo do grafo"
     sealed_by: maestro
     sealed_at: '2026-09-24'
-    resolution: >-
+    x_resolution: >-
       SELADA PELO MAESTRO em 2026-09-24, com a palavra "aceito a recomendacao": escolhida a OPCAO (2) —
       MOVER A COBRANCA PARA DEPOIS DO MERGE. Implementado no mesmo movimento, e a fronteira foi
       desenhada em vez de afrouxada em bloco: no lint de PR o `ANDOU-PARA-TRAS` virou SOFT com rotulo

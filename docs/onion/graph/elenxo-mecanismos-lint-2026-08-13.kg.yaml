@@ -4,7 +4,7 @@ meta:
   layer: audit
   baseline: "2026-08-13"
   date: 2026-08-13
-  run_id: wf_167fa138-c0a
+  x_run_id: wf_167fa138-c0a
   note: >
     Elenxo dos mecanismos de validação, pedido pelo maestro: "muitas automações .sh para lint com
     tempo e custo elevados, 700+ conferências num arquivo". Quatro lentes adversariais

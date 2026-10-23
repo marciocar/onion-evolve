@@ -11,7 +11,7 @@ meta:
   # que aviso em massa treina o leitor a ignorar. O carimbo da revisita vive em `revisited:` e no
   # `verified_at` de cada nó efetivamente tocado.
   baseline: "2026-07-17"
-  revisited: 2026-09-03
+  x_revisited: 2026-09-03
   date: 2026-07-17
   review_after: "2026-10-03"   # cadência FERRAMENTA/PREÇO = 30d (cláusula 8 da doutrina de pesquisa): o tipo
                              # DOMINANTE deste grafo é preço/limite/política de plataforma comercial (Meta

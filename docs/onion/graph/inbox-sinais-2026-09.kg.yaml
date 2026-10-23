@@ -1,5 +1,5 @@
-version: 1
-kind: plan
+x_version: 1
+x_kind: plan
 meta:
   id: inbox-sinais-2026-09
   slug: inbox-sinais-2026-09

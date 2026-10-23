@@ -4,7 +4,7 @@ meta:
   layer: audit
   baseline: "2026-08-12"
   date: 2026-08-12
-  run_id: wf_23de8ab6-81b
+  x_run_id: wf_23de8ab6-81b
   note: >
     Auditoria de frescor dos contextos de domínio do CORE — a fase Manage do ciclo CRUD+
     (/meta:context-freshness). 19 arquivos auditados (13 business + 6 technical + 0 compliance,
