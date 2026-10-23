@@ -57,7 +57,7 @@ kg-conformance | tail -2
 ```
 
 ```text
-latest: 390/390 (gates the rc)
+latest: 438/438 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -75,6 +75,7 @@ Only `latest/` sets the exit code. The `optional/` cases are reported and never 
 | `kg-query` | Queries and projects a corpus of graphs, with edges resolved to their labels |
 | `kg-diff` | Diff by id between two graphs or between git revisions |
 | `kg-vocab` | The domain vocabulary (the `x_term` profile): lists the terms and what is due, resolves a text to its term, and exports to SKOS-XL and Apache Ossie |
+| `kg-criterion` | The pre-registered criterion: prints the `sha256` of a criterion version and checks each version against its text or file, and each citation of another graph |
 | `kg-prov-export` | Exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD |
 
 As a library, the modules live under `kg_ssot`: `kg_ssot.kg_validate`, `kg_ssot.kg_store`, `kg_ssot.kg_mcp`, and the

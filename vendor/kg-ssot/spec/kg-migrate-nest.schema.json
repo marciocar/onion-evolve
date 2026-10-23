@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:kg-migrate-nest.schema.json",
+  "title": "Mapa do kg_migrate.py nest",
+  "description": "Versão 1 (desde a 4.21.0, contrato v4.11). O mapa diz como as chaves x_ próprias de um adotante viram um perfil canônico de nó (x_mirror, x_doc_cycle, x_questionnaire). Cada regra de nest[] vale para o nó que tem a chave when; o nó sem ela não aparece no plano. Cada campo do perfil vem de uma fonte só: const (um valor fixo), move (uma chave x_ do nó, que sai do nó) ou copy (qualquer chave do nó, que fica). A fonte pode passar por match (uma expressão regular com um grupo: o valor é o grupo, e o texto que não casa vai para quem revisa) e por values e prefixes (a tabela de valores: o exato vence, depois o prefixo mais longo; o valor que nenhum dos dois cobre vai para quem revisa, nunca é chutado). Com raw, o valor original de cada chave movida que tinha texto além do código (entrou por prefixo, ou a regex tirou parte dele) fica em <perfil>.x_raw.<chave>; o valor exato da tabela não vai ao x_raw. O nó que já tem o perfil, ou em que falta a fonte de um campo obrigatório do perfil, ou cujo perfil montado não passa no schema SHOULD do perfil, vai para quem revisa. O código confere o que o schema não exprime: o campo existe no perfil, a expressão regular compila, tem um grupo e tem o mesmo sentido no ECMA-262, a chave das tabelas é texto, duas regras não montam o mesmo perfil, uma chave não é movida por duas regras nem movida e copiada, e o move por match ou prefixes (que corta texto) pede raw: true. O marcador when com valor null e o valor movido com âncora ou alias vão para quem revisa.",
+  "type": "object",
+  "required": [
+    "nest_version",
+    "nest"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "nest_version": {
+      "const": "1"
+    },
+    "nest": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/rule"
+      }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "required": [
+        "into",
+        "when",
+        "fields"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "into": {
+          "description": "O perfil canônico de nó que a regra monta.",
+          "enum": [
+            "x_doc_cycle",
+            "x_mirror",
+            "x_questionnaire"
+          ]
+        },
+        "when": {
+          "description": "A chave x_ cuja presença no nó dispara a regra.",
+          "type": "string",
+          "pattern": "^x_[A-Za-z0-9_-]+$"
+        },
+        "raw": {
+          "description": "Guarda em <perfil>.x_raw o valor original de cada chave movida que tinha texto além do código: o que entrou por prefixo ou que a regex cortou. O valor exato da tabela não vai ao x_raw.",
+          "type": "boolean"
+        },
+        "fields": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/source"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "const": {
+          "description": "Um valor fixo, texto ou lista de textos."
+        },
+        "move": {
+          "description": "A chave x_ do nó que dá o valor e sai do nó.",
+          "type": "string",
+          "pattern": "^x_[A-Za-z0-9_-]+$"
+        },
+        "copy": {
+          "description": "A chave do nó que dá o valor e fica no nó (por exemplo, verified_at).",
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        },
+        "match": {
+          "description": "Expressão regular lida como o ECMA-262 a lê sem a flag u: \\w, \\d e \\b em ASCII, \\s e \\S com o espaço Unicode, o . sem casar \\n, \\r, U+2028 e U+2029, o $ no fim do texto, e a classe [...] lida como classe. O que não tem o mesmo sentido nos dois motores é recusado: \\A, \\Z, \\z, \\G, \\N, \\U, \\a, \\c, \\p, \\P, \\S dentro de classe, (?P, (?<nome>, (?#, (?(, (?>, flag em linha, quantificador possessivo, {,n}, [] e [^], e o quantificador num lookbehind. O valor com caractere além de U+FFFF (o ECMA-262 sem a flag u conta unidades UTF-16) vai para quem revisa. Exatamente um grupo: o valor passa a ser o grupo da primeira ocorrência; o grupo que não participa ou que casa vazio vai para quem revisa.",
+          "type": "string",
+          "format": "regex"
+        },
+        "values": {
+          "description": "A tabela de valores exatos: valor da fonte → valor no perfil.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "prefixes": {
+          "description": "A tabela por prefixo, depois da exata: o prefixo mais longo que casa decide. O prefixo vazio, que casaria tudo, não vale.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "propertyNames": {
+            "minLength": 1
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "const"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "move"
+                ]
+              },
+              {
+                "required": [
+                  "copy"
+                ]
+              },
+              {
+                "required": [
+                  "match"
+                ]
+              },
+              {
+                "required": [
+                  "values"
+                ]
+              },
+              {
+                "required": [
+                  "prefixes"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "move"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "const"
+                ]
+              },
+              {
+                "required": [
+                  "copy"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "copy"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "const"
+                ]
+              },
+              {
+                "required": [
+                  "move"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:criterion.schema.json",
+  "title": "Saída de kg_criterion.py check --format json",
+  "description": "Desde a 4.21.0, contrato v4.12. Não é veredito do contrato: o leitor já avisa, entre nós do mesmo grafo, o critério desconhecido, o sha256 citado que não é o da versão e a medição post-hoc. O check confere o que o leitor não confere: o sha256 de cada x_criterion contra o text (UTF-8, LF, sem U+0020 no fim da linha) ou o arquivo do ref (os bytes com CRLF trocado por LF; com fragmento, o item na forma JCS do RFC 8785), e cada citação <caminho>#<id> de um x_measured_under, pela mesma regra do leitor. criteria conta as versões conferidas (com sha256 e exatamente um de ref e text); external_citations, as citações de outro grafo conferidas; unchecked_citations, as que apontam para um grafo que não foi lido. O rc é 1 com achado ou com grafo ilegível (unreadable).",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "criteria",
+    "external_citations",
+    "unchecked_citations",
+    "findings",
+    "unreadable"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.criterion/1"
+    },
+    "criteria": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "external_citations": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unchecked_citations": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Com os arquivos dados um a um, as citações de um grafo que não foi dado: ficam sem conferir."
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "file",
+          "id",
+          "detail"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "integrity.criterion-digest",
+              "integrity.criterion-ref-unreadable",
+              "integrity.criterion-unknown",
+              "integrity.criterion-sha-mismatch",
+              "integrity.measured-post-hoc",
+              "integrity.measured-order-unknown"
+            ]
+          },
+          "file": {
+            "type": "string",
+            "description": "O grafo do nó, relativo à raiz."
+          },
+          "id": {
+            "type": "string",
+            "description": "O id do nó: a versão do critério, ou o resultado que cita."
+          },
+          "detail": {
+            "type": "string",
+            "description": "O sha256 declarado e o calculado, o motivo de o ref não se ler, ou a citação."
+          }
+        }
+      }
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "code"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

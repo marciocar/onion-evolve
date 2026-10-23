@@ -10,6 +10,54 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.21.0] - 2026-10-23
+
+A yardstick fixed before the data becomes part of the contract, and an adopter's own `x_` keys move into the
+canonical profiles. Contract v4.12: two SHOULD profiles and five warnings, nothing that passed fails.
+
+### Added
+
+- **The pre-registered criterion (contract v4.12).** Changing a yardstick after seeing the data becomes a dated
+  amendment instead of a rewrite, as in OSF Preregistration and the versioned amendments of a clinical trial registry.
+  Two SHOULD profiles: `x_criterion`, one node per version of a criterion (`id`, `version`, `registered_at`, `sha256`,
+  and either `ref` or `text`; `amends` with `reason` for an amendment), and `x_measured_under`, on the result
+  (`measured_at`, and `criteria`, a list of `{criterion, sha256}`). Both readers, Python and JavaScript, warn about
+  five things between nodes of the same graph, without computing a hash:
+  - `integrity.criterion-unknown`: the cited criterion, or the `amends`, is not a criterion node of the graph;
+  - `integrity.criterion-amends-mismatch`: the amendment points to a version of another criterion, or comes back to
+    itself;
+  - `integrity.criterion-sha-mismatch`: the cited `sha256` is not the one of the version;
+  - `integrity.measured-post-hoc`: measured in the round that motivated the version, or before it was registered;
+  - `integrity.measured-order-unknown`: the dates cannot tell the order (the same day, or a day apart when one of them
+    has no time zone).
+
+  `ref` and `text` together warn as `form.exclusive.node.x_criterion`, a new form kind. Requested by an adopter whose
+  own reviewer caught a yardstick changed after the data.
+- **`kg_criterion.py`** prints the `sha256` of a criterion (`digest`):
+  - for `text`: UTF-8, LF, without trailing spaces;
+  - for a whole file: the bytes, with CRLF turned into LF;
+  - for a list item in a JSON or YAML file: its JCS form (RFC 8785), selected by JSON Pointer or by `id`.
+
+  `check` verifies every version against its text or file, and every `<path>#<id>` citation of another graph
+  (`kg-ssot.criterion/1`, `spec/criterion.schema.json`); it fails on a finding or on a graph that does not read, and
+  belongs next to the gate in CI, because the reader computes no hash. It is also the `kg-criterion` command of the PyPI package.
+- The suite goes from 390 to 438 cases (`latest/form/profiles/` and the new `latest/integrity/criterion/`).
+- **`kg_migrate.py nest` moves an adopter's own `x_` keys into a canonical node profile** (`x_mirror`, `x_doc_cycle`,
+  `x_questionnaire`), as a map says (`spec/kg-migrate-nest.schema.json`): each field from a constant, from an `x_` key
+  that leaves the node, or from a key that stays, through an optional regex and value table. A key moved through a
+  regex or a prefix needs `raw: true`, which keeps its original value in `x_raw`, so no text is lost. A value with no
+  code, a missing required source, a profile that fails its schema, an alias, or a node in flow style goes to the
+  reviewer in the plan, never guessed. Requested by an adopter; on a copy of their two graphs (108 nodes, 168 keys),
+  106 profiles built and 2 left for review.
+
+### Fixed
+
+- **A missing required field counts once.** In the reference reader, an object with N required fields missing counted
+  each of them N times: a `meta` with neither `schema_version` nor `id` showed `form.required.meta.id ×2`, and a node
+  with three missing fields, `×3` for each. The JavaScript reader already counted right. The verdict, the set of codes,
+  and the suite do not change; the counts in the summary, in `--where`, in the JSON verdict, and in the gate's
+  per-occurrence baseline go down to the real number. Found by an adopter's test bench.
+
 ## [4.20.0] - 2026-10-23
 
 The store stops re-judging graphs that did not change, the vendor stamp becomes a public rule in every tool, and

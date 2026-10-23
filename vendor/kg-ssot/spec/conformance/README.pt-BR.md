@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:9554220eb35d4420 -->
+<!-- translation-of: spec/conformance/README.md sha256:79985312aa833f39 -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -67,11 +67,11 @@ Cada código é um slug estável por camada, e o metaschema confere a forma.
 |---|---|---|
 | parse | `parse.<motivo>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
 | form | `form.<tipo>.<escopo>.<campo>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
-| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` (SHOULD) |
+| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` e os cinco códigos `integrity.criterion-*` e `integrity.measured-*` do v4.12 (SHOULD) |
 | yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 | semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked` e os `semantic.domain-*` da camada domain (SHOULD), só em `optional/` |
 
-`<tipo>` ∈ `required enum type pattern range const unknown-key`. `<escopo>` ∈ `top meta node edge`.
+`<tipo>` ∈ `required enum type pattern range const unknown-key exclusive`. `<escopo>` ∈ `top meta node edge`.
 Num objeto aninhado, `<campo>` é o caminho com ponto: `form.required.node.provenance.locator`.
 `range` cobre também o tamanho de texto: `label: ""` (MUST) e `label` acima de 280 caracteres (SHOULD, porque a
 narrativa vai para `narrative`). O tamanho conta code points, como o `maxLength` do JSON Schema: um emoji vale 1, não
@@ -214,6 +214,27 @@ O v4.10 alinha o leitor de referência e o leitor JavaScript em três pontos rar
 - a linha vazia depois de uma quebra escapada entre aspas duplas vira `\n`, como pede a especificação;
 - o BOM no começo não conta como coluna.
 
+O v4.12 traz o critério pré-registrado, para que trocar a régua depois de ver o dado vire uma emenda datada em vez de
+uma reescrita. Dois perfis SHOULD (`latest/form/profiles/`): `x_criterion` no nó de cada versão do critério (`id`,
+`version`, `registered_at`, `sha256` e `ref` ou `text`; `amends` pede `reason`; `ref` e `text` juntos alertam
+`form.exclusive.node.x_criterion`), e `x_measured_under` no resultado (`measured_at` e `criteria`, uma lista de
+`{criterion, sha256}`). Cinco avisos de coerência entre nós do mesmo grafo (`latest/integrity/criterion/`):
+- `integrity.criterion-unknown`: o critério citado, ou o `amends`, não é um nó deste grafo com `x_criterion`;
+- `integrity.criterion-amends-mismatch`: a emenda aponta a versão de outro critério, ou a cadeia de `amends` volta a
+  ela mesma;
+- `integrity.criterion-sha-mismatch`: o `sha256` citado não é o da versão;
+- `integrity.measured-post-hoc`: medido no mesmo `round` da versão citada (a rodada que a motivou), ou antes do registro
+  dela;
+- `integrity.measured-order-unknown`: as datas não dizem a ordem.
+
+Como as datas se comparam: as duas com hora, o instante em UTC; as duas só data, o dia escrito (o mesmo dia é
+`measured-order-unknown`); uma só data, cujo fuso é desconhecido, o dia em UTC com um dia de folga, então a distância
+de até um dia é `measured-order-unknown`, e o `measured-post-hoc` pede dois dias ou mais. O `round` diferente não diz a
+ordem, porque rodadas são rótulos. A data num dia que não existe (30 de fevereiro) não é comparada.
+
+Para estes, o leitor não calcula hash nem lê corpus: a citação `<caminho>#<id>` e o `sha256` contra o texto ou o
+arquivo são do `kg_criterion.py`, que não faz parte da suíte. Nenhum veredito muda.
+
 O mesmo código pode ser MUST num caso e SHOULD em outro, porque a severidade é do caso, não do código.
 
 ## Pastas
@@ -235,7 +256,7 @@ estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `sp
 (por exemplo, `trigger` em `integrity-trigger`). O PR da promoção esvazia `pending_on` e cita o nó selado. Nada
 antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 390 casos contra o contrato v4, 32 deles
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 438 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 cujo veredito o
 v4 muda viraram casos `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
@@ -260,7 +281,7 @@ locale `pt_BR`. Hoje, a rodada termina assim:
 
 ```text
 —
-latest: 390/390 (reprova)
+latest: 438/438 (reprova)
 optional: 10/24 (só reporta)
 ```
 

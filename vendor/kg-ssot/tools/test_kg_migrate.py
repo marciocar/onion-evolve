@@ -6,6 +6,7 @@ no fim do nó, o comentário entre nós, o último nó sem quebra final, o nó e
 import os
 os.environ.setdefault("KG_SSOT_LANG", "pt-BR")  # as asserções destes testes são da tradução pt-BR
 
+import collections
 import contextlib
 import csv
 import io
@@ -786,6 +787,510 @@ class Keys(unittest.TestCase):
         self.assertIn("title", known["meta"])
         self.assertIn("trigger", known["edge"])
         self.assertNotIn("provenance", known["edge"])
+
+
+NEST_GRAPH = """meta:
+  schema_version: "1"
+  id: nest
+nodes:
+  - id: A_TASK
+    node_type: artifact
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "Tarefa espelhada."
+    provenance:
+      source: "https://tasks.example.org/t/abc123"
+      locator: "a tarefa"
+      method: "leitura: o quadro"
+      locality: web
+    # o estado no quadro
+    x_board_status: backlog
+    verified_at: "2026-10-19"
+    verified_against: https://tasks.example.org/t/abc123
+  - id: R_NORM
+    node_type: rule
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "Norma de exemplo."
+    x_issuer: CMN
+    x_in_force: vigente
+    x_questions:
+      - '1'
+      - '6'
+    x_verdict: parcial
+  - id: R_FUTURE
+    node_type: rule
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "Norma futura."
+    x_issuer: BCB
+    x_in_force: futura (2027)
+edges:
+  - from: A_TASK
+    to: R_NORM
+    edge_type: SUPPORTS
+  - from: R_FUTURE
+    to: R_NORM
+    edge_type: TRACES_TO
+"""
+
+NEST_MAP = """nest_version: "1"
+nest:
+  - into: x_mirror
+    when: x_board_status
+    fields:
+      system: {const: board}
+      state: {move: x_board_status}
+      ref: {copy: verified_against, match: "/t/([a-z0-9]+)$"}
+      url: {copy: verified_against}
+      synced_at: {copy: verified_at}
+  - into: x_doc_cycle
+    when: x_issuer
+    raw: true
+    fields:
+      issuer: {move: x_issuer}
+      state: {move: x_in_force, values: {vigente: in_force}}
+  - into: x_questionnaire
+    when: x_questions
+    raw: true
+    fields:
+      name: {const: Q}
+      questions: {move: x_questions}
+      verdict: {move: x_verdict, values: {sim: meets, parcial: partial}}
+"""
+
+
+class Nest(unittest.TestCase):
+    """kg_migrate.py nest (4.21.0): as chaves x_ próprias viram um perfil canônico, pelo texto, com invariância."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.dir = pathlib.Path(self.tmp.name)
+        self.map = self.dir / "map.yaml"
+        self.map.write_text(NEST_MAP, encoding="utf-8")
+        from unittest import mock
+        env = mock.patch.dict(os.environ, {"KG_SSOT_LANG": "en"})  # as frases conferidas são as da língua-fonte
+        env.start()
+        self.addCleanup(env.stop)
+
+    def write(self, text=NEST_GRAPH, newline="\n"):
+        p = self.dir / "g.kg.yaml"
+        p.write_bytes(text.replace("\n", newline).encode("utf-8"))
+        return p
+
+    def run_main(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            try:
+                rc = kg_migrate.main([str(a) for a in argv])
+            except SystemExit as exc:
+                rc = exc.code
+        return rc, out.getvalue(), err.getvalue()
+
+    def plan(self, *extra):
+        rc, out, err = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json", *extra, self.write())
+        return rc, json.loads(out) if out.strip() else None, err
+
+    def test_plano_monta_o_perfil_e_manda_o_valor_sem_codigo_para_revisao(self):
+        rc, res, _ = self.plan()
+        self.assertEqual(rc, 0)
+        rows = {(r["id"], r["into"]): r for r in res["rows"]}
+        self.assertEqual(rows[("A_TASK", "x_mirror")]["profile"],
+                         {"system": "board", "state": "backlog", "ref": "abc123",
+                          "url": "https://tasks.example.org/t/abc123", "synced_at": "2026-10-19"})
+        self.assertEqual(rows[("A_TASK", "x_mirror")]["moved"], ["x_board_status"])
+        # o valor exato da tabela não tem texto além do código: sem x_raw (pedido do brain)
+        self.assertEqual(rows[("R_NORM", "x_doc_cycle")]["profile"], {"issuer": "CMN", "state": "in_force"})
+        self.assertEqual(rows[("R_NORM", "x_questionnaire")]["profile"],
+                         {"name": "Q", "questions": ["1", "6"], "verdict": "partial"})
+        future = rows[("R_FUTURE", "x_doc_cycle")]
+        self.assertEqual((future["action"], future["profile"]), ("review", None))
+        self.assertIn("futura (2027)", future["review"])
+        self.assertIsNone(res["applied"])
+        self.assertEqual((self.dir / "g.kg.yaml").read_text(encoding="utf-8"), NEST_GRAPH)  # o plano não grava
+
+    def test_apply_grava_com_invariancia_e_e_idempotente(self):
+        rc, res, _ = self.plan("--apply")
+        self.assertEqual(rc, 0, res)
+        self.assertEqual(res["applied"], [{"file": "g.kg.yaml", "written": True, "reasons": []}])
+        text = (self.dir / "g.kg.yaml").read_text(encoding="utf-8")
+        self.assertIn("    # o estado no quadro\n    x_mirror:\n", text)  # o comentário fica
+        self.assertNotIn("x_board_status", text)
+        self.assertIn("    x_in_force: futura (2027)\n", text)  # o nó em revisão não é tocado
+        doc = kg_validate.parse_v1(text)[1]
+        self.assertEqual(doc["nodes"][1]["x_questionnaire"]["questions"], ["1", "6"])
+        self.assertNotIn("x_questions", doc["nodes"][1])
+        rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--apply", self.dir / "g.kg.yaml")
+        self.assertEqual(rc, 0)
+        self.assertIn("· 0 node profile(s) to build, 1 for the reviewer", out)
+        self.assertEqual((self.dir / "g.kg.yaml").read_text(encoding="utf-8"), text)
+
+    def test_prefixo_guarda_o_texto_e_o_mais_longo_que_comeca_vence(self):
+        self.map.write_text(NEST_MAP.replace("values: {vigente: in_force}",
+                                             'values: {vigente: in_force}, prefixes: {"vigente (": in_force, futura: enacted}'),
+                            encoding="utf-8")
+        both = "vigente (BCB 540 desde 05/01/2026); obrigatoriedade futura (jul/2027)"
+        self.write(NEST_GRAPH.replace("x_in_force: futura (2027)", "x_in_force: " + both))
+        rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json", self.dir / "g.kg.yaml")
+        rows = {(r["id"], r["into"]): r for r in json.loads(out)["rows"]}
+        self.assertEqual(rows[("R_FUTURE", "x_doc_cycle")]["profile"],
+                         {"issuer": "BCB", "state": "in_force", "x_raw": {"x_in_force": both}})
+        self.write()
+        rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json", self.dir / "g.kg.yaml")
+        rows = {(r["id"], r["into"]): r for r in json.loads(out)["rows"]}
+        self.assertEqual(rows[("R_FUTURE", "x_doc_cycle")]["profile"],
+                         {"issuer": "BCB", "state": "enacted", "x_raw": {"x_in_force": "futura (2027)"}})
+
+    def test_crlf_fica_crlf(self):
+        p = self.write(newline="\r\n")
+        rc, _out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--apply", p)
+        self.assertEqual(rc, 0)
+        raw = p.read_bytes()
+        self.assertIn(b"x_mirror:\r\n", raw)
+        self.assertEqual(raw.count(b"\n"), raw.count(b"\r\n"))
+
+    def test_revisao_por_fonte_ausente_perfil_existente_e_data_invalida(self):
+        g = NEST_GRAPH.replace('    verified_at: "2026-10-19"\n', "")
+        g = g.replace("    x_issuer: CMN\n", "    x_issuer: CMN\n    x_doc_cycle: {issuer: CMN, state: in_force}\n")
+        g = g.replace("    x_issuer: BCB\n    x_in_force: futura (2027)\n", "    x_issuer: BCB\n    x_in_force: vigente\n")
+        self.write(g)
+        rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json", self.dir / "g.kg.yaml")
+        rows = {(r["id"], r["into"]): r for r in json.loads(out)["rows"]}
+        self.assertIn("verified_at is missing", rows[("A_TASK", "x_mirror")]["review"])
+        self.assertIn("already has x_doc_cycle", rows[("R_NORM", "x_doc_cycle")]["review"])
+        self.assertEqual(rows[("R_FUTURE", "x_doc_cycle")]["action"], "nest")
+        self.map.write_text(NEST_MAP.replace("synced_at: {copy: verified_at}", "synced_at: {const: ontem}"), encoding="utf-8")
+        rc, res, _ = self.plan()
+        bad = [r for r in res["rows"] if r["into"] == "x_mirror"][0]
+        self.assertIn("synced_at", bad["review"])
+
+    def test_no_em_estilo_de_fluxo_vai_para_revisao_e_o_resto_e_gravado(self):
+        g = NEST_GRAPH.replace("""  - id: R_FUTURE
+    node_type: rule
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "Norma futura."
+    x_issuer: BCB
+    x_in_force: futura (2027)
+""", """  - {id: R_FUTURE, node_type: rule, layer: domain, plane: DEV, status: open, impact: 4, confidence: 0.8,
+     label: "Norma futura.", x_issuer: BCB, x_in_force: vigente}
+""")
+        p = self.write(g)
+        rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--apply", p)
+        self.assertEqual(rc, 0, out)
+        self.assertIn("R_FUTURE  → x_doc_cycle  (node 3 is in flow style: edit it by hand)", out)
+        text = p.read_text(encoding="utf-8")
+        self.assertIn("x_in_force: vigente}", text)
+        self.assertIn("    x_mirror:\n", text)
+
+    def test_mapa_quebrado_e_entrada_quebrada(self):
+        bad = {
+            "duas regras": NEST_MAP.replace("into: x_questionnaire", "into: x_doc_cycle"),
+            "campo de fora": NEST_MAP.replace("system: {const: board}", "system: {const: board}\n      owner: {const: x}"),
+            "regex sem grupo": NEST_MAP.replace('match: "/t/([a-z0-9]+)$"', 'match: "/t/[a-z0-9]+$"'),
+            "chave movida duas vezes": NEST_MAP.replace("verdict: {move: x_verdict", "verdict: {move: x_questions"),
+            "fora do schema": NEST_MAP.replace("move: x_issuer", "move: issuer"),
+        }
+        for name, text in bad.items():
+            self.map.write_text(text, encoding="utf-8")
+            rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json", self.write())
+            self.assertEqual(rc, 2, name)
+            self.assertEqual(json.loads(out)["reason"], "broken_input", name)
+
+    # --- achados do Elenxo de 2026-10-23 ---------------------------------------------------------------------------
+
+    def run_map(self, map_text, graph_text, *extra):
+        self.map.write_text(map_text, encoding="utf-8")
+        p = self.write(graph_text)
+        rc, out, err = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json", *extra, p)
+        return rc, (json.loads(out) if out.strip() else None), p.read_text(encoding="utf-8"), err
+
+    def rows(self, res):
+        return {(r["id"], r["into"]): r for r in res["rows"]}
+
+    def test_mapa_quebrado_pelo_que_o_schema_nao_ve(self):
+        bad = {
+            "regex invalida": NEST_MAP.replace('match: "/t/([a-z0-9]+)$"', 'match: "/t/(["'),
+            "regex so do python": NEST_MAP.replace('match: "/t/([a-z0-9]+)$"', 'match: "/t/(?P<id>[a-z0-9]+)$"'),
+            "x_raw com raw": NEST_MAP.replace("issuer: {move: x_issuer}", "issuer: {move: x_issuer}\n      x_raw: {const: x}"),
+            "move com tabela sem raw": NEST_MAP.replace("    when: x_issuer\n    raw: true\n", "    when: x_issuer\n")
+                                       .replace("values: {vigente: in_force}", 'values: {vigente: in_force}, prefixes: {vig: in_force}'),
+            "move com regex sem raw": NEST_MAP.replace("    when: x_issuer\n    raw: true\n", "    when: x_issuer\n")
+                                      .replace("issuer: {move: x_issuer}", 'issuer: {move: x_issuer, match: "^(C.*)$"}'),
+            "movida e copiada": NEST_MAP.replace("synced_at: {copy: verified_at}", "synced_at: {copy: verified_at}\n      x_s: {copy: x_board_status}"),
+            "prefixo vazio": NEST_MAP.replace("values: {vigente: in_force}", 'values: {vigente: in_force}, prefixes: {"": in_force}'),
+        }
+        for name, text in bad.items():
+            rc, res, _t, _e = self.run_map(text, NEST_GRAPH)
+            self.assertEqual((rc, res["reason"]), (2, "broken_input"), name)
+
+    def test_raiz_do_mapa_em_ingles(self):
+        self.map.write_text('nest_version: "1"\n', encoding="utf-8")
+        rc, out, err = self.run_main("nest", "--map", self.map, "--root", self.dir, self.write())
+        self.assertEqual(rc, 2)
+        self.assertIn("at (root):", out + err)
+
+    def test_layouts_que_a_edicao_sabe_fazer(self):
+        """A chave movida como primeira do item, a lista de mapas e de listas, a coleção vazia e o arquivo sem quebra
+        final: o plano diz NEST, o --apply grava, e a releitura é o plano."""
+        m = NEST_MAP.replace("verdict: {move: x_verdict, values: {sim: meets, parcial: partial}}",
+                             "verdict: {move: x_verdict, values: {sim: meets, parcial: partial}}\n      x_extra: {move: x_e}")
+        g = NEST_GRAPH.replace("  - id: R_NORM\n", "  - x_issuer: CMN\n    id: R_NORM\n", 1).replace("    x_issuer: CMN\n", "", 1)
+        g = g.replace("    x_verdict: parcial\n", "    x_verdict: parcial\n    x_e:\n      - {k: 1, l: [2, []]}\n      - []\n      - - a\n        - {}\n")
+        rc, res, text, _ = self.run_map(m, g.rstrip("\n"), "--apply")
+        self.assertEqual(rc, 0, res)
+        self.assertEqual(res["applied"], [{"file": "g.kg.yaml", "written": True, "reasons": []}])
+        doc = kg_validate.parse_v1(text)[1]
+        norm = next(n for n in doc["nodes"] if n["id"] == "R_NORM")
+        self.assertEqual(norm["x_doc_cycle"], {"issuer": "CMN", "state": "in_force"})
+        self.assertEqual(norm["x_questionnaire"]["x_extra"], [{"k": 1, "l": [2, []]}, [], ["a", {}]])
+        self.assertTrue(text.endswith("\n"))
+        self.assertIn("  - x_doc_cycle:\n      issuer: \"CMN\"\n", text)
+
+    def test_alias_e_ancora_vao_para_revisao_no_plano(self):
+        g = NEST_GRAPH.replace('label: "Tarefa espelhada."', 'label: &iss "CMN"').replace("    x_issuer: CMN\n", "    x_issuer: *iss\n")
+        rc, res, text, _ = self.run_map(NEST_MAP, g, "--apply")
+        rows = self.rows(res)
+        self.assertEqual(rows[("R_NORM", "x_doc_cycle")]["action"], "review")
+        self.assertIn("alias", rows[("R_NORM", "x_doc_cycle")]["review"])
+        self.assertEqual((rc, rows[("A_TASK", "x_mirror")]["action"]), (0, "nest"))  # o resto do arquivo é gravado
+        self.assertIn("x_issuer: *iss", text)
+        g = NEST_GRAPH.replace("    x_issuer: CMN\n", "    x_issuer: &iss CMN\n").replace("    x_issuer: BCB\n", "    x_issuer: *iss\n")
+        rc, res, text, _ = self.run_map(NEST_MAP, g, "--apply")
+        self.assertEqual(self.rows(res)[("R_NORM", "x_doc_cycle")]["action"], "review")
+        self.assertIn("x_issuer: &iss CMN", text)
+        self.assertEqual(rc, 0)
+
+    def test_linha_em_branco_depois_do_bloco_fica(self):
+        g = NEST_GRAPH.replace("    x_issuer: CMN\n", "    x_issuer: |-\n      CMN\n\n    # comentario\n")
+        rc, res, text, _ = self.run_map(NEST_MAP, g, "--apply")
+        self.assertEqual(rc, 0, res)
+        self.assertIn("\n\n    # comentario\n", text)
+
+    def test_valor_nao_finito_vai_para_revisao_sem_quebrar_o_json(self):
+        m = NEST_MAP.replace("verdict: {move: x_verdict, values: {sim: meets, parcial: partial}}",
+                             "verdict: {move: x_verdict, values: {sim: meets, parcial: partial}}\n      x_extra: {move: x_e}")
+        rc, res, _t, _e = self.run_map(m, NEST_GRAPH.replace("    x_verdict: parcial\n", "    x_verdict: parcial\n    x_e: [1, .inf]\n"), "--apply")
+        row = self.rows(res)[("R_NORM", "x_questionnaire")]
+        self.assertEqual((row["action"], row["profile"]), ("review", None))
+        self.assertIn(".nan or .inf", row["review"])
+
+    def test_tabela_e_regex(self):
+        cases = [  # (fonte, valor, (valor, tinha texto além do código, vai para revisão))
+            ({"match": "(a)|b", "prefixes": {"b": "x"}}, "b", (None, False, True)),
+            ({"match": "^(x*)"}, "yz", (None, False, True)),  # o grupo vazio não é código
+            ({"match": "^([a-z]+)"}, "ab12", ("ab", True, False)),
+            ({"match": "^([a-z]+)"}, "ab", ("ab", False, False)),
+            ({"prefixes": {"vig": "suspended", "vigente": "in_force"}}, "vigente (x)", ("in_force", True, False)),
+            ({"prefixes": {"vig": "suspended"}}, "vig", ("suspended", False, False)),
+            ({"values": {"vig": "in_force"}, "prefixes": {"v": "suspended"}}, "vig", ("in_force", False, False)),
+            ({"match": "(a)"}, 7, (None, False, True)),
+            ({"values": {"7": "x"}, "prefixes": {"7": "x"}}, 7, (None, False, True)),
+        ]
+        for src, value, (want, extra, review) in cases:
+            out, got_extra, why = kg_migrate._map_value(value, src)
+            self.assertEqual((out, got_extra, why is not None), (want, extra, review), (src, value))
+
+    def test_raw_guarda_o_que_a_regex_cortou(self):
+        m = NEST_MAP.replace("issuer: {move: x_issuer}", 'issuer: {move: x_issuer, match: "^([A-Z]+)"}')
+        rc, res, _t, _e = self.run_map(m, NEST_GRAPH.replace("    x_issuer: CMN\n", "    x_issuer: CMN (Res. 4.966)\n"))
+        self.assertEqual(self.rows(res)[("R_NORM", "x_doc_cycle")]["profile"],
+                         {"issuer": "CMN", "state": "in_force", "x_raw": {"x_issuer": "CMN (Res. 4.966)"}})
+
+    def test_marcador_null_vai_para_revisao(self):
+        m = NEST_MAP.replace("issuer: {move: x_issuer}", "issuer: {const: CMN}")
+        rc, res, _t, _e = self.run_map(m, NEST_GRAPH.replace("    x_issuer: CMN\n", "    x_issuer: null\n"))
+        row = self.rows(res)[("R_NORM", "x_doc_cycle")]
+        self.assertEqual(row["action"], "review")
+        self.assertIn("null", row["review"])
+
+    def test_recusa_do_arquivo_da_rc_1_e_nao_grava(self):
+        p = self.dir / "g.kg.yaml"
+        mixed = NEST_GRAPH.replace("\n", "\r\n", 3)
+        p.write_bytes(mixed.encode("utf-8"))
+        rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--apply", p)
+        self.assertEqual(rc, 1)
+        self.assertIn("REFUSED", out)
+        self.assertEqual(p.read_bytes(), mixed.encode("utf-8"))
+
+    def test_codigo_must_ou_aviso_should_novo_recusa(self):
+        from unittest import mock
+        real_codes, real_warn = kg_validate.codes, kg_validate.warning_counts
+        fake_codes = lambda text, v, corpus=None: real_codes(text, v, corpus) + (["form.x"] if "x_mirror:" in text else [])
+        fake_warn = lambda text, m, s, corpus=None: real_warn(text, m, s, corpus) + (
+            collections.Counter({"form.y": 1}) if "x_mirror:" in text else collections.Counter())
+        for name, patch, want in (("codes", fake_codes, "MUST"), ("warning_counts", fake_warn, "SHOULD")):
+            with mock.patch.object(kg_validate, name, patch):
+                rc, res, text, _ = self.run_map(NEST_MAP, NEST_GRAPH, "--apply")
+            self.assertEqual(rc, 1, name)
+            self.assertIn(want, res["applied"][0]["reasons"][0])
+            self.assertEqual(text, NEST_GRAPH)
+
+    def test_releitura_sobreposicao_e_fluxo_na_edicao(self):
+        """As guardas da edição de texto, chamadas direto: a releitura que difere, duas edições nas mesmas linhas e o
+        nó em fluxo (o plano já os manda para revisão; a edição não confia nisso)."""
+        from unittest import mock
+        doc = kg_validate.parse_v1(NEST_GRAPH)[1]
+        rows = kg_migrate.nest_plan(doc, kg_migrate.load_nest_map(self.map))
+        row = next(r for r in rows if r[1] == "R_NORM" and r[2] == "x_doc_cycle")
+        self.assertIsNone(kg_migrate.nest_apply_text(NEST_GRAPH, doc, [row])[1])
+        with mock.patch.object(kg_validate, "canonical", lambda obj, json_keys=False: {"outro": 1}):
+            self.assertIn("reread", kg_migrate.nest_apply_text(NEST_GRAPH, doc, [row])[1])
+        twin = row[:2] + ("x_mirror",) + row[3:]
+        self.assertIn("overlap", kg_migrate.nest_apply_text(NEST_GRAPH, doc, [row, twin])[1])
+        flow = NEST_GRAPH.replace("  - id: R_FUTURE\n", "  - {id: R_FLOW, x_issuer: X}\n  - id: R_FUTURE\n")
+        fdoc = kg_validate.parse_v1(flow)[1]
+        frow = (2, "R_FLOW", "x_doc_cycle", "nest", None, ["x_issuer"], {"issuer": "X", "state": "in_force"})
+        self.assertIn("flow style", kg_migrate.nest_apply_text(flow, fdoc, [frow])[1])
+
+    def test_plano_de_arquivo_grande_custa_uma_edicao(self):
+        """O ensaio da edição é do arquivo inteiro, e só bisseca quando falha (2a passada do Elenxo: nó a nó, o plano
+        do brain foi de 1 s a 71 s). 400 nós, um deles um alias que vai para revisão."""
+        import time
+        head, rest = NEST_GRAPH.split("nodes:\n", 1)
+        body, edges = rest.split("edges:\n", 1)
+        nodes = "".join(f"  - id: R_{i}\n    node_type: rule\n    plane: DEV\n    status: open\n    impact: 2\n"
+                        f"    confidence: 0.8\n    label: \"Norma {i}.\"\n    x_issuer: CMN\n    x_in_force: vigente\n"
+                        for i in range(400))
+        edge = "".join(f"  - from: R_{i}\n    to: R_NORM\n    edge_type: TRACES_TO\n" for i in range(400))
+        g = head + "nodes:\n" + body + nodes.replace("    x_issuer: CMN\n", "    x_issuer: *iss\n", 1) + "edges:\n" + edges + edge
+        g = g.replace("    x_issuer: CMN\n", "    x_issuer: &iss CMN\n", 1)
+        started = time.monotonic()
+        rc, res, _t, _e = self.run_map(NEST_MAP, g)
+        elapsed = time.monotonic() - started
+        rows = self.rows(res)
+        self.assertEqual((rc, rows[("R_0", "x_doc_cycle")]["action"]), (0, "review"))
+        self.assertIn("alias", rows[("R_0", "x_doc_cycle")]["review"])
+        self.assertEqual(rows[("R_NORM", "x_doc_cycle")]["action"], "review")  # a âncora que o R_0 usa
+        # A_TASK, o x_questionnaire do R_NORM e R_1..R_399
+        self.assertEqual(sum(1 for r in res["rows"] if r["action"] == "nest"), 1 + 1 + 399)
+        self.assertLess(elapsed, 30, "o plano voltou a custar uma edição por nó")
+
+    def test_plano_com_todos_os_nos_em_alias_nao_bisseca(self):
+        """O filtro de âncora e alias, de um compose só, tira os nós antes da bissecção (3a passada do Elenxo: 400 nós
+        com alias levavam 146 s)."""
+        import time
+        head, rest = NEST_GRAPH.split("nodes:\n", 1)
+        body, edges = rest.split("edges:\n", 1)
+        nodes = "".join(f"  - id: R_{i}\n    node_type: rule\n    plane: DEV\n    status: open\n    impact: 2\n"
+                        f"    confidence: 0.8\n    label: \"Norma {i}.\"\n    x_issuer: *cmn\n    x_in_force: vigente\n"
+                        for i in range(400))
+        edge = "".join(f"  - from: R_{i}\n    to: R_NORM\n    edge_type: TRACES_TO\n" for i in range(400))
+        g = (head + "nodes:\n" + body.replace("    x_issuer: CMN\n", "    x_issuer: &cmn CMN\n", 1) + nodes
+             + "edges:\n" + edges + edge)
+        # metade dos nós com a âncora na própria chave movida, usada por outra chave (escapava do filtro na 4a passada)
+        for i in range(200):
+            g = g.replace(f'"Norma {i}."\n    x_issuer: *cmn\n', f'"Norma {i}."\n    &k{i} x_issuer: CMN\n    x_other: *k{i}\n', 1)
+        started = time.monotonic()
+        rc, res, _t, _e = self.run_map(NEST_MAP, g)
+        elapsed = time.monotonic() - started
+        rows = self.rows(res)
+        self.assertEqual((rc, rows[("R_7", "x_doc_cycle")]["action"], rows[("R_NORM", "x_doc_cycle")]["action"]),
+                         (0, "review", "review"))
+        self.assertIn("anchor (&) or an alias (*)", rows[("R_7", "x_doc_cycle")]["review"])
+        self.assertLess(elapsed, 15, "a bissecção voltou a rodar uma edição por nó ruim")
+
+    def test_linhas_que_so_falham_juntas_vao_todas_para_revisao(self):
+        """O ramo da bissecção em que cada metade passa e o todo não (uma interação entre nós): as linhas que só falham
+        juntas vão para revisão, e as outras seguem."""
+        from unittest import mock
+        real = kg_migrate.nest_apply_text
+        fake = lambda text, doc, rows: (text, "juntas") if len(rows) >= 2 else real(text, doc, rows)
+        doc = kg_validate.parse_v1(NEST_GRAPH)[1]
+        rows = kg_migrate.nest_plan(doc, kg_migrate.load_nest_map(self.map))
+        with mock.patch.object(kg_migrate, "nest_apply_text", fake):
+            out = kg_migrate.dry_run(NEST_GRAPH, doc, rows)
+        got = {(r[1], r[2]): (r[3], r[4] or "") for r in out}
+        # a metade [A_TASK] passa; a metade com as duas linhas do R_NORM falha junta e passa separada: vão as duas
+        self.assertEqual(got[("A_TASK", "x_mirror")][0], "nest")
+        for into in ("x_doc_cycle", "x_questionnaire"):
+            self.assertEqual(got[("R_NORM", into)][0], "review")
+            self.assertIn("juntas", got[("R_NORM", into)][1])
+
+    def test_o_resto_e_ensaiado_de_novo_depois_da_bisseccao(self):
+        """Depois de tirar as culpadas, o que sobrou é ensaiado junto: uma interação que a bissecção separou em metades
+        diferentes manda o resto para revisão."""
+        from unittest import mock
+        g = NEST_GRAPH.replace("edges:\n", "  - id: R_N2\n    node_type: rule\n    plane: DEV\n    status: open\n"
+                               "    impact: 2\n    confidence: 0.8\n    label: \"Outra norma.\"\n    x_issuer: CMN\n"
+                               "    x_in_force: vigente\nedges:\n  - from: R_N2\n    to: R_NORM\n    edge_type: TRACES_TO\n", 1)
+        doc = kg_validate.parse_v1(g)[1]
+        rows = kg_migrate.nest_plan(doc, kg_migrate.load_nest_map(self.map))
+        real = kg_migrate.nest_apply_text
+
+        def fake(text, d, group):
+            ids = {(r[1], r[2]) for r in group}
+            if ("A_TASK", "x_mirror") in ids or {("R_NORM", "x_doc_cycle"), ("R_N2", "x_doc_cycle")} <= ids:
+                return text, "junto"
+            return real(text, d, group)
+        with mock.patch.object(kg_migrate, "nest_apply_text", fake):
+            got = {(r[1], r[2]): r[3] for r in kg_migrate.dry_run(g, doc, rows)}
+        self.assertEqual(got, {("A_TASK", "x_mirror"): "review", ("R_NORM", "x_doc_cycle"): "review",
+                               ("R_NORM", "x_questionnaire"): "review", ("R_FUTURE", "x_doc_cycle"): "review",
+                               ("R_N2", "x_doc_cycle"): "review"})
+
+    def test_regex_com_a_semantica_do_ecma(self):
+        """\\w só em ASCII e o $ só no fim do texto, como num leitor ECMA-262; a sintaxe só do Python é recusada."""
+        cases = [({"match": r"^(\w+)"}, "vigência", ("vig", True, False)),
+                 ({"match": "/t/([a-z0-9]+)$"}, "x/t/abc\n", (None, False, True)),
+                 ({"match": "/t/([a-z0-9]+)$"}, "x/t/abc", ("abc", True, False))]
+        for src, value, want in cases:
+            out, extra, why = kg_migrate._map_value(value, src)
+            self.assertEqual((out, extra, why is not None), want, (src, value))
+        for rx in ("(a)?(?(1)b|c)", "((?>a+))", "(a++)", "(a{,3})", r"(\N{DIGIT ONE})", r"(\U0001F600)", "(?<n>a)",
+                   "(?i)(a)", r"([\S])", "([]a)", "([^]a)", "([]a])", r"(\pL)", "(a)(?<=a)+", "(a)(?<!b){2}"):
+            m = NEST_MAP.replace('match: "/t/([a-z0-9]+)$"', "match: " + json.dumps(rx))
+            rc, res, _t, _e = self.run_map(m, NEST_GRAPH)
+            self.assertEqual((rc, res["reason"]), (2, "broken_input"), rx)
+        for rx in (r"(\++)", r"(a\$)", "(a{2})", "([$])", "([^$]+)", "(a$)", "(a|b$)", "([*+]+)", "([{,])", "(x{)", "(a+?)",
+                   r"(?<=a)\d+(x)", "(?<=a)[a-z]+(x)", r"(?<=a)\w{2}(x)", r"(?<=a)\(+(x)", "((?<=a)x)+", "(?<=a)(x)+", "(?<=a){{2}(x)"):
+            kg_migrate.ecma_regex(rx)  # o $ e o (?P dentro de classe são literais; o $ fora dela é o fim do texto
+        # o \s e o . do ECMA: o NBSP é espaço, e o . não casa \r nem U+2028
+        self.assertEqual(kg_migrate.ecma_regex(r"(\S+)").search("CMN\u00a0BCB").group(1), "CMN")
+        self.assertTrue(kg_migrate.ecma_regex(r"a(\s)b").search("a\u2028b"))
+        self.assertEqual(kg_migrate.ecma_regex("^(.+)").search("ab\rcd").group(1), "ab")
+        self.assertIsNone(kg_migrate.ecma_regex("(a$)").search("xa\n"))
+        self.assertEqual(kg_migrate.ecma_regex(r"([\s]+)").search("a\u00a0b").group(1), "\u00a0")  # \s numa classe
+        kg_migrate.ecma_regex("(a)(?=b)*")  # o lookahead quantificado é Annex B no ECMA: os dois leem
+        # fora do BMP, o ECMA sem a flag u conta unidades UTF-16: o valor vai para quem revisa
+        self.assertIsNotNone(kg_migrate._map_value("😀x", {"match": "(.{2})"})[2])
+
+    def test_chave_especial_vai_entre_aspas(self):
+        m = NEST_MAP.replace("verdict: {move: x_verdict, values: {sim: meets, parcial: partial}}",
+                             "verdict: {move: x_verdict, values: {sim: meets, parcial: partial}}\n      x_extra: {move: x_e}")
+        g = NEST_GRAPH.replace("    x_verdict: parcial\n", "    x_verdict: parcial\n    x_e: {'null': 1, 'True': 2, 'a b': 3, ok: 4}\n")
+        rc, res, text, _ = self.run_map(m, g, "--apply")
+        self.assertEqual(rc, 0, res)
+        self.assertIn('"null": 1', text)
+        self.assertIn('"True": 2', text)
+        self.assertIn('"a b": 3', text)
+        self.assertIn(" ok: 4", text)
+        norm = next(n for n in kg_validate.parse_v1(text)[1]["nodes"] if n["id"] == "R_NORM")
+        self.assertEqual(norm["x_questionnaire"]["x_extra"], {"null": 1, "True": 2, "a b": 3, "ok": 4})
+
+    def test_vendor_fica_de_fora_pelo_carimbo(self):
+        vendor = self.dir / "third_party" / "kit"
+        vendor.mkdir(parents=True)
+        (vendor / ".kg-ssot-version").write_text("kg-ssot-v4.21.0\n", encoding="utf-8")
+        (vendor / "v.kg.yaml").write_text(NEST_GRAPH, encoding="utf-8")
+        self.write()
+        for cmd in (["init", "-q"], ["add", "-A"]):  # sem os grafos dados, o nest lê os rastreados pelo git
+            subprocess.run(["git", "-C", str(self.dir), *cmd], check=True, capture_output=True)
+        rc, out, _ = self.run_main("nest", "--map", self.map, "--root", self.dir, "--json")
+        files = {r["file"] for r in json.loads(out)["rows"]}
+        self.assertEqual((rc, files), (0, {"g.kg.yaml"}))
 
 
 if __name__ == "__main__":

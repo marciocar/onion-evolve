@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:d456479cd89bfb56 -->
+<!-- translation-of: ADOPTING.md sha256:5298330e0f7e0b33 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -333,6 +333,21 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.20.0` para a `kg-ssot-v4.21.0`, o contrato vai ao v4.12, e só o nível SHOULD muda: nada que passava
+reprova, e o gate registra a identidade nova do contrato sem pedir `--update` enquanto nenhum veredito muda. O que você
+pode ver e fazer:
+
+- Se os seus grafos registram uma régua e resultados medidos sob ela, use o `x_criterion` (um nó por versão, com o
+  `sha256` que o `kg_criterion.py digest` dá) e o `x_measured_under` no resultado. Depois ponha
+  `python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .` ao lado do gate no CI: o leitor não calcula hash,
+  então o critério editado no lugar só é pego ali.
+- Se os seus grafos têm chaves `x_` próprias que correspondem a um perfil canônico (`x_mirror`, `x_doc_cycle`,
+  `x_questionnaire`), o `kg_migrate.py nest --map <mapa>` mostra o plano e, com `--apply`, as move.
+- O leitor de referência passa a contar uma vez o campo obrigatório ausente; as contagens de uma base por ocorrência
+  só descem.
+- Desde a 4.20.0, o `kg_store` chama `kg_validate.judge(..., cache=...)`. Um dublê de teste que troca o `judge` pela
+  assinatura antiga cai com `TypeError`, e o armazém responde "não julgado": aceite `cache=None` no dublê.
 
 Da `kg-ssot-v4.19.1` para a `kg-ssot-v4.20.0`, o contrato não muda (segue o v4.11), e nada nos seus grafos precisa
 de edição. Uma pasta com o carimbo `.kg-ssot-version` passa a ficar de fora também no `kg_query.py`, no `kg_vocab.py`,

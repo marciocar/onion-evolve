@@ -46,9 +46,17 @@ export function checkWarnings(text: string, options?: Options): string[];
 export function verdictOf(text: string, validate: MustValidator,
   options?: Options & { validateShould?: MustValidator }): Verdict;
 
-/** Os avisos de coerência de um documento já lido (integrity.testimony-in-prod, verified-before-fact, untraced-decision, refutes-unreconciled).
- * Com o corpus, a REFUTES que chega de outro grafo pelas external_edges também conta. */
+/** Os avisos de coerência de um documento já lido (integrity.testimony-in-prod, verified-before-fact, untraced-decision, refutes-unreconciled,
+ * e desde o v4.12 os de criterionCodes). Com o corpus, a REFUTES que chega de outro grafo pelas external_edges também conta. */
 export function coherenceCodes(doc: Record<string, unknown>, corpus?: Corpus | null): string[];
+
+/** Os avisos do critério pré-registrado (v4.12), só entre nós do mesmo grafo: integrity.criterion-unknown,
+ * criterion-amends-mismatch, criterion-sha-mismatch, measured-post-hoc e measured-order-unknown. Sem hash e sem corpus. */
+export function criterionCodes(doc: Record<string, unknown>): string[];
+
+/** A ordem entre o measured_at de um resultado e o registered_at da versão citada: 'post-hoc' (antes), 'unknown'
+ * (indecidível: o mesmo dia só com datas, ou até um dia quando uma é só data) ou null (depois, ou fora da forma). */
+export function measuredOrder(measured: unknown, registered: unknown): 'post-hoc' | 'unknown' | null;
 
 /** Os avisos do perfil JSON num .kg.yaml já lido (yaml.unsafe-integer, yaml.lone-surrogate, yaml.depth-over-128). */
 export function yamlProfileCodes(doc: unknown): string[];

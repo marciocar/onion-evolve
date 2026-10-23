@@ -1,5 +1,5 @@
 {
-  "description": "Os perfis canônicos das chaves x_ recorrentes (v4.11): x_term, x_mirror, x_doc_cycle, x_questionnaire e x_severity no nó, x_confidence e x_provisional na aresta. São SHOULD: julgados só quando a chave está presente, nunca reprovam.",
+  "description": "Os perfis canônicos das chaves x_ recorrentes (v4.11): x_term, x_mirror, x_doc_cycle, x_questionnaire e x_severity no nó, x_confidence e x_provisional na aresta. São SHOULD: julgados só quando a chave está presente, nunca reprovam. Desde o v4.12, também x_criterion (a versão de um critério pré-registrado) e x_measured_under (o resultado medido sob ele); a coerência entre eles está em latest/integrity/criterion/.",
   "layer": "form",
   "pending_on": [],
   "cases": [
@@ -256,6 +256,153 @@
       "valid": true,
       "codes": [],
       "warnings": []
+    },
+    {
+      "file": "valid-x-criterion-text.kg.yaml",
+      "description": "a versão do critério com o texto, version inteiro e registered_at só data (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-criterion-amends.kg.yaml",
+      "description": "a emenda: ref, amends, reason, round e registered_at com fuso, e SUPERSEDES para a versão anterior (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-measured-under.kg.yaml",
+      "description": "o resultado com measured_at em UTC, as duas citações, subject, verdict e round (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-x-criterion-ref-and-text.kg.yaml",
+      "description": "ref e text juntos: os dois se excluem (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.exclusive.node.x_criterion"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-no-content.kg.yaml",
+      "description": "nem ref nem text: falta o text (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_criterion.text"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-amends-without-reason.kg.yaml",
+      "description": "a emenda sem reason (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_criterion.reason"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-sha-uppercase.kg.yaml",
+      "description": "sha256 em hex maiúsculo (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_criterion.sha256"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-time-without-zone.kg.yaml",
+      "description": "registered_at com hora e sem fuso (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_criterion.registered_at"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-round-number.kg.yaml",
+      "description": "round como número: é texto, para os leitores compararem igual (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_criterion.round"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-version-boolean.kg.yaml",
+      "description": "version booleano: é texto ou inteiro (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_criterion.version"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-unknown-key.kg.yaml",
+      "description": "chave desconhecida sem x_ no perfil (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.x_criterion.note"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-not-object.kg.yaml",
+      "description": "x_criterion em lista, não mapa: só o tipo alerta (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_criterion"
+      ]
+    },
+    {
+      "file": "warn-x-criterion-missing-id.kg.yaml",
+      "description": "a versão sem o id estável (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_criterion.id"
+      ]
+    },
+    {
+      "file": "warn-x-measured-under-no-measured-at.kg.yaml",
+      "description": "o resultado sem measured_at (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_measured_under.measured_at"
+      ]
+    },
+    {
+      "file": "warn-x-measured-under-empty-criteria.kg.yaml",
+      "description": "criteria vazia (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.x_measured_under.criteria"
+      ]
+    },
+    {
+      "file": "warn-x-measured-under-item-without-sha.kg.yaml",
+      "description": "a citação sem sha256 (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.x_measured_under.criteria.sha256"
+      ]
+    },
+    {
+      "file": "warn-x-measured-under-subject-text.kg.yaml",
+      "description": "subject em texto, não mapa (v4.12)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.type.node.x_measured_under.subject"
+      ]
     }
   ]
 }

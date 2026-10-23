@@ -1,0 +1,264 @@
+{
+  "description": "O critério pré-registrado (v4.12): avisos SHOULD de coerência entre o nó do critério (x_criterion) e o resultado (x_measured_under), só entre nós do mesmo grafo e sem hash. integrity.criterion-unknown: o criterion citado, ou o amends, não é um nó deste grafo com x_criterion; integrity.criterion-amends-mismatch: a emenda aponta a versão de outro critério, ou a cadeia de amends volta ao próprio nó; integrity.criterion-sha-mismatch: o sha256 citado difere do da versão; integrity.measured-post-hoc: medido no mesmo round da versão citada, ou antes do registro dela (as duas com hora: o instante em UTC; as duas só data: o dia escrito; uma só data: o dia em UTC, a dois dias ou mais); integrity.measured-order-unknown: a ordem é indecidível (o mesmo dia só com datas, ou até um dia de distância quando uma é só data, cujo fuso é desconhecido). O round diferente não decide a ordem, e a data num dia que não existe não é comparada. A citação <caminho>#<id> e o sha256 contra o texto ou o arquivo são do kg_criterion.py, não do leitor.",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-measured-after.kg.yaml",
+      "description": "medido no dia seguinte ao registro: nada a alertar",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-same-instant-other-zone.kg.yaml",
+      "description": "a mesma hora em dois fusos (10:00-03:00 e 13:00Z): não é anterior",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-fraction-later.kg.yaml",
+      "description": "a fração de segundo decide: 0,5 s depois de 0,25 s",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-old-version-cited.kg.yaml",
+      "description": "o resultado antigo segue citando a versão 1 e o sha256 dela depois da emenda",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-external-criterion.kg.yaml",
+      "description": "a citação <caminho>#<id> não é conferida pelo leitor (é do kg_criterion.py)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-lowercase-t-z.kg.yaml",
+      "description": "o t e o z minúsculos do RFC 3339: 10:00 do dia 21 é depois de 10:00 do dia 20",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-mixed-two-days-after.kg.yaml",
+      "description": "uma só data, três dias depois do registro: fora da folga do fuso, nada a alertar",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-impossible-date-not-compared.kg.yaml",
+      "description": "registered_at num dia que não existe (30 de fevereiro): a forma passa, e a data não é comparada",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-mixed-gap-plus-two.kg.yaml",
+      "description": "uma só data, exatamente dois dias depois do registro em UTC: fora da folga",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-order-unknown-gap-minus-one.kg.yaml",
+      "description": "uma só data, um dia antes do registro em UTC: ainda dentro da folga do fuso",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-order-unknown"
+      ]
+    },
+    {
+      "file": "valid-before-1970-floor.kg.yaml",
+      "description": "antes de 1970 o dia em UTC arredonda para baixo: 30/12/1969 às 23:30Z é o dia -2, e 01/01/1970 fica dois dias depois",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-1900-not-leap.kg.yaml",
+      "description": "1900 não é bissexto: 29/02/1900 não existe e não é comparado",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-measured-post-hoc-2000-leap.kg.yaml",
+      "description": "2000 é bissexto: 29/02/2000 existe, e 28/02 vem antes",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-post-hoc"
+      ]
+    },
+    {
+      "file": "warn-order-unknown-rounds-differ.kg.yaml",
+      "description": "o mesmo dia, só datas, com rounds diferentes: o round é texto sem ordem, e a ordem segue indecidível",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-order-unknown"
+      ]
+    },
+    {
+      "file": "warn-criterion-unknown.kg.yaml",
+      "description": "a citação de um id que não existe",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.criterion-unknown"
+      ]
+    },
+    {
+      "file": "warn-criterion-not-a-criterion.kg.yaml",
+      "description": "a citação de um nó sem x_criterion",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.criterion-unknown"
+      ]
+    },
+    {
+      "file": "warn-criterion-amends-unknown.kg.yaml",
+      "description": "o amends de um nó que não existe",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.criterion-unknown"
+      ]
+    },
+    {
+      "file": "warn-criterion-amends-mismatch.kg.yaml",
+      "description": "a emenda aponta a versão de outro critério",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.criterion-amends-mismatch"
+      ]
+    },
+    {
+      "file": "warn-criterion-sha-mismatch.kg.yaml",
+      "description": "o sha256 citado não é o da versão: o critério mudou no lugar",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.criterion-sha-mismatch"
+      ]
+    },
+    {
+      "file": "warn-measured-post-hoc-date.kg.yaml",
+      "description": "medido no dia anterior ao registro da versão citada",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-post-hoc"
+      ]
+    },
+    {
+      "file": "warn-measured-post-hoc-zone.kg.yaml",
+      "description": "12:59:59Z é antes de 10:00-03:00 (13:00Z)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-post-hoc"
+      ]
+    },
+    {
+      "file": "warn-measured-post-hoc-fraction.kg.yaml",
+      "description": "0,25 s é antes de 0,5 s no mesmo segundo",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-post-hoc"
+      ]
+    },
+    {
+      "file": "warn-order-unknown-zone.kg.yaml",
+      "description": "uma só data: 21 às 23:30-03:00 é 02:30Z do dia 22, o dia do registro sem fuso; a ordem é indecidível",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-order-unknown"
+      ]
+    },
+    {
+      "file": "warn-order-unknown-day-apart.kg.yaml",
+      "description": "uma só data, um dia depois do registro em UTC (20 às 23:00-05:00 é 04:00Z do dia 21): ainda dentro da folga do fuso",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-order-unknown"
+      ]
+    },
+    {
+      "file": "warn-measured-post-hoc-two-days.kg.yaml",
+      "description": "uma só data, dois dias antes do registro em UTC: fora da folga do fuso, é anterior",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-post-hoc"
+      ]
+    },
+    {
+      "file": "warn-measured-post-hoc-lowercase.kg.yaml",
+      "description": "o t e o z minúsculos são lidos: 09:00 é antes de 10:00 no mesmo dia",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-post-hoc"
+      ]
+    },
+    {
+      "file": "warn-criterion-amends-self.kg.yaml",
+      "description": "a versão que emenda a si mesma",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.criterion-amends-mismatch"
+      ]
+    },
+    {
+      "file": "warn-criterion-amends-cycle.kg.yaml",
+      "description": "duas versões que emendam uma à outra: a cadeia volta ao começo",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.criterion-amends-mismatch"
+      ]
+    },
+    {
+      "file": "warn-measured-post-hoc-round.kg.yaml",
+      "description": "medido na rodada que motivou a emenda",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-post-hoc"
+      ]
+    },
+    {
+      "file": "warn-order-unknown-same-day.kg.yaml",
+      "description": "o mesmo dia, só datas: a ordem é indecidível",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-order-unknown"
+      ]
+    },
+    {
+      "file": "warn-order-unknown-one-time.kg.yaml",
+      "description": "o mesmo dia, o resultado com hora e o registro só com data",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.measured-order-unknown"
+      ]
+    }
+  ]
+}

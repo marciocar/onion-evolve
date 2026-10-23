@@ -709,6 +709,490 @@ def keys_command(args):
     return 1 if any(not ok for _r, ok, _w in report) else 0
 
 
+# --- nest (4.21.0): a chave x_ própria para um perfil canônico de nó -----------------------------------------------
+NEST_SCHEMA = ROOT / "spec" / "kg-migrate-nest.schema.json"
+
+
+def _profile_schema(into):
+    """O subschema SHOULD do perfil canônico de nó (o properties.nodes.items.properties.<into>)."""
+    should = json.loads(kg_validate.CONTRACT_SHOULD.read_text(encoding="utf-8"))
+    return should["properties"]["nodes"]["items"]["properties"][into]
+
+
+def load_nest_map(path):
+    """O mapa do nest, validado pelo schema e pelo que o schema não exprime (Broken: entrada quebrada)."""
+    try:
+        text = pathlib.Path(path).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        raise Broken(_("unreadable map: {file}: {exc}").format(file=path, exc=exc))
+    _t, doc, code = kg_validate.parse_v1(kg_validate.as_source(str(path), text))
+    if code or not isinstance(doc, dict):
+        raise Broken(_("the map does not parse ({code}): {file}").format(code=code or "parse.not-a-map", file=path))
+    v = kg_validate.make_validator(json.loads(NEST_SCHEMA.read_text(encoding="utf-8")))
+    errors = sorted(v.iter_errors(doc), key=lambda e: list(e.absolute_path))
+    if errors:
+        e = errors[0]
+        raise Broken(_("map outside spec/kg-migrate-nest.schema.json at {path}: {msg}").format(
+            path="/".join(map(str, e.absolute_path)) or _("(root)"), msg=e.message))
+    seen_into, moved, copied = set(), set(), set()
+    for rule in doc["nest"]:
+        into = rule["into"]
+        if into in seen_into:
+            raise Broken(_("two rules build {into}").format(into=into))
+        seen_into.add(into)
+        prof = _profile_schema(into)
+        allowed = set(prof["propertyNames"]["allOf"][1]["anyOf"][0]["enum"])
+        for field, src in rule["fields"].items():
+            if field not in allowed and not field.startswith("x_"):
+                raise Broken(_("{field} is not a field of {into}").format(field=field, into=into))
+            if field == "x_raw" and rule.get("raw"):
+                raise Broken(_("x_raw is filled by raw: true, not by a field"))
+            if "move" in src:
+                if src["move"] in moved:
+                    raise Broken(_("{key} is moved by two fields").format(key=src["move"]))
+                moved.add(src["move"])
+                if ("match" in src or "prefixes" in src) and not rule.get("raw"):
+                    # a regex e o prefixo cortam texto da chave que sai do nó: sem o x_raw, o texto some
+                    raise Broken(_("{into}.{field} moves {key} through match or prefixes, which cut text: the rule "
+                                   "needs raw: true to keep the original").format(into=into, field=field, key=src["move"]))
+            if "copy" in src:
+                copied.add(src["copy"])
+            if "match" in src:
+                try:
+                    rx = ecma_regex(src["match"])
+                except ValueError as exc:
+                    raise Broken(_("the match of {into}.{field} uses {what}, which ECMA-262 reads otherwise or not at "
+                                   "all").format(into=into, field=field, what=exc))
+                except re.error as exc:
+                    raise Broken(_("invalid regex in {into}.{field}: {exc}").format(into=into, field=field, exc=exc))
+                if rx.groups != 1:
+                    raise Broken(_("the match of {into}.{field} needs exactly one group").format(into=into, field=field))
+    both = sorted(moved & copied)
+    if both:
+        raise Broken(_("{keys} is moved and copied: a copied key stays in the node, so it cannot also leave it").format(
+            keys=", ".join(both)))
+    return doc
+
+
+# O \s do ECMA-262: o espaço Unicode, mesmo sem a flag u (o re.ASCII do Python o deixaria só em ASCII).
+_ECMA_SPACE = "\\t\\n\\x0b\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff"
+_QUANT = re.compile(r"\{([0-9]*)(,?)([0-9]*)\}")
+
+
+def ecma_to_python(pattern):
+    r"""A regex do mapa reescrita para o re do Python com a semântica do ECMA-262 sem a flag u; ValueError diz o que
+    não tem o mesmo sentido nos dois. Fora de classe, o . não casa \n, \r, U+2028 nem U+2029, o $ é o fim do texto (\Z)
+    e o \s e o \S são o espaço Unicode do ECMA; o \w, o \d e o \b ficam em ASCII pelo re.ASCII. A classe [...] é lida
+    como classe (um $ ou um (?P dentro dela é literal). Recusa: \A, \Z, \z, \G, \N, \U, \a, \c, \p, \P, \S dentro de
+    classe, (?P, (?<nome>, (?#, (?(, (?>, flag em linha, quantificador possessivo, {,n}, [] e [^]."""
+    out, i, n, in_class, quant = [], 0, len(pattern), False, False
+    groups, behind = [], False  # a pilha diz se cada ( aberto é um lookbehind; behind: o ) que acabou de fechar era um
+    while i < n:
+        c = pattern[i]
+        if c not in "*+?{":
+            behind = False  # só o quantificador logo depois do ) de um lookbehind é recusado
+        if c == "\\":
+            if i + 1 >= n:
+                raise ValueError("\\")
+            e = pattern[i + 1]
+            if e in "AZzGNUacpP":
+                raise ValueError("\\" + e)
+            if e == "s":
+                out.append(_ECMA_SPACE if in_class else "[" + _ECMA_SPACE + "]")
+            elif e == "S":
+                if in_class:
+                    raise ValueError("\\S inside [...]")
+                out.append("[^" + _ECMA_SPACE + "]")
+            else:
+                out.append(c + e)
+            i, quant = i + 2, False
+            continue
+        if in_class:
+            in_class = c != "]"
+            out.append(c)
+            i += 1
+            continue
+        if c == "[":
+            start = i + 2 if pattern.startswith("^", i + 1) else i + 1
+            if pattern.startswith("]", start):
+                raise ValueError(pattern[i:start + 1])  # [] e [^] são classe vazia no ECMA e outra coisa no Python
+            out.append(pattern[i:start])
+            i, in_class, quant = start, True, False
+            continue
+        if c == "(" and pattern.startswith("(?", i):
+            rest = pattern[i + 2:i + 4]
+            if not (rest[:1] in (":", "=", "!") or rest in ("<=", "<!")):
+                raise ValueError(pattern[i:i + 4])
+        if c == "(":
+            groups.append(pattern.startswith(("(?<=", "(?<!"), i))
+        if c == ")":
+            out.append(c)
+            i, quant, behind = i + 1, False, groups.pop() if groups else False
+            continue
+        if c in "*+?" or (c == "{" and _QUANT.match(pattern, i)):
+            if behind:  # o ECMA-262 não deixa quantificar um lookbehind; o Python deixa
+                raise ValueError(pattern[i - 1:i + 1])
+        if c in "*+?":
+            if quant and c == "+":
+                raise ValueError(pattern[i - 1:i + 1])
+            out.append(c)
+            i, quant = i + 1, c != "?" or not quant  # o ? depois de quantificador é o preguiçoso, que os dois leem
+            continue
+        if c == "{":
+            m = _QUANT.match(pattern, i)
+            if m and (m.group(1) or not m.group(2)) and (m.group(1) or m.group(3)):
+                out.append(m.group(0))
+                i, quant = m.end(), True
+                continue
+            if m and m.group(2) and not m.group(1):
+                raise ValueError(m.group(0))
+        out.append({".": "[^\\n\\r\\u2028\\u2029]", "$": "\\Z"}.get(c, c))
+        i, quant, behind = i + 1, False, False  # o { literal é um átomo: o quantificador seguinte vale para ele
+    return "".join(out)
+
+
+def ecma_regex(pattern):
+    """A regex do mapa compilada com a semântica do ECMA-262 sem a flag u (ecma_to_python): ValueError no que não tem o
+    mesmo sentido nos dois, re.error na regex inválida."""
+    return re.compile(ecma_to_python(pattern), re.ASCII)
+
+
+def _map_value(value, src):
+    """(valor, tinha texto além do código, motivo): o valor da fonte depois do match e da tabela; motivo não vazio vai
+    para quem revisa. Só o valor exato da tabela (values) não tem texto além do código: o que passou pela regex ou
+    entrou por prefixo tem, e é o que o raw guarda (pedido do brain: o "vigente" puro no x_raw é ruído)."""
+    out, extra = value, False
+    if kg_validate._contains(value, lambda x: isinstance(x, kg_validate.NonFinite)):
+        return None, False, _("the value has .nan or .inf, which no profile field takes")
+    if "match" in src:
+        if not isinstance(out, str):
+            return None, False, _("the value is not text, and match needs text")
+        if any(ord(ch) > 0xFFFF for ch in out):  # o ECMA-262 sem a flag u conta unidades UTF-16; o Python, caracteres
+            return None, False, _("the value has a character beyond U+FFFF, which a regex reads differently in ECMA-262")
+        m = ecma_regex(src["match"]).search(out)
+        if not m or not m.group(1):  # o grupo que não participa, ou que casa vazio, não dá código
+            return None, False, _("the value {value} does not match {rx}").format(value=_yaml_str(out), rx=src["match"])
+        out, extra = m.group(1), m.group(1) != value
+    if "values" in src or "prefixes" in src:
+        if not isinstance(out, str):
+            return None, False, _("the value is not text, and the value table needs text")
+        if out in src.get("values", {}):
+            out = src["values"][out]
+        else:
+            hits = [p for p in src.get("prefixes", {}) if out.startswith(p)]
+            if not hits:
+                return None, False, _("the value {value} has no code in the table: map it or edit it by hand").format(
+                    value=_yaml_str(out))
+            best = max(hits, key=len)
+            out, extra = src["prefixes"][best], extra or out != best
+    return out, extra, None
+
+
+def nest_node(node, rule):
+    """(perfil montado, chaves movidas, motivo) de um nó para uma regra; perfil None com motivo vai para quem revisa."""
+    into = rule["into"]
+    if into in node:
+        return None, [], _("the node already has {into}").format(into=into)
+    prof = _profile_schema(into)
+    required = set(prof.get("required", ()))
+    obj, moved, raw = {}, [], {}
+    for field, src in rule["fields"].items():
+        if "const" in src:
+            obj[field] = src["const"]
+            continue
+        key = src.get("move") or src.get("copy")
+        if key not in node:
+            if field in required:
+                return None, [], _("{key} is missing, and {into}.{field} is required").format(key=key, into=into, field=field)
+            continue
+        value, changed, why = _map_value(node[key], src)
+        if why:
+            return None, [], f"{key}: {why}"
+        obj[field] = value
+        if "move" in src:
+            moved.append(key)
+            if changed and rule.get("raw"):
+                raw[key] = node[key]
+    if raw:
+        obj["x_raw"] = raw
+    missing = sorted(required - set(obj))
+    if missing:
+        return None, [], _("{into} lacks the required field(s) {fields}").format(into=into, fields=", ".join(missing))
+    errs = sorted(kg_validate.make_validator(prof).iter_errors(obj), key=lambda e: list(e.absolute_path))
+    if errs:
+        e = errs[0]
+        return None, [], _("the built {into} does not pass the profile at {path}: {msg}").format(
+            into=into, path="/".join(map(str, e.absolute_path)) or into, msg=e.message)
+    return obj, moved, None
+
+
+def flow_nodes(text):
+    """Os índices dos nós em estilo de fluxo ({...}), que o nest não edita por texto."""
+    import yaml
+    root = yaml.compose(text, Loader=kg_validate.Yaml12CoreLoader)
+    if not isinstance(root, yaml.MappingNode):
+        return set()
+    seq = next((v for k, v in root.value if getattr(k, "value", None) == "nodes"), None)
+    if not isinstance(seq, yaml.SequenceNode):
+        return set()
+    return {i for i, m in enumerate(seq.value) if isinstance(m, yaml.MappingNode) and m.flow_style}
+
+
+def nest_plan(doc, nest_map, flow=frozenset()):
+    """[(índice do nó, id, perfil, ação, motivo, chaves movidas, perfil montado)] de um documento. flow: os índices dos
+    nós em estilo de fluxo, que vão para quem revisa."""
+    rows = []
+    nodes = doc.get("nodes") if isinstance(doc.get("nodes"), list) else []
+    for i, node in enumerate(nodes):
+        if not isinstance(node, dict):
+            continue
+        for rule in nest_map["nest"]:
+            if rule["when"] not in node:
+                continue
+            obj, moved, why = nest_node(node, rule)
+            if node[rule["when"]] is None:  # o marcador vazio não diz que o nó é do perfil
+                obj, moved, why = None, [], _("the marker {key} is null").format(key=rule["when"])
+            if not why and i in flow:
+                obj, moved, why = None, [], _("node {n} is in flow style: edit it by hand").format(n=i + 1)
+            rows.append((i, node.get("id"), rule["into"], "review" if why else "nest", why, moved, obj))
+    return rows
+
+
+def _yaml_inline(value):
+    """Um valor YAML numa linha só: texto entre aspas duplas, a coleção vazia ([] ou {}), número, booleano ou null."""
+    if isinstance(value, str):
+        return _yaml_str(value)
+    if isinstance(value, list):
+        return "[]"
+    if isinstance(value, dict):
+        return "{}"
+    return json.dumps(value)
+
+
+def _yaml_block(value, indent):
+    """As linhas YAML de uma coleção não vazia, em bloco, na indentação dada: mapa e lista aninhados em qualquer
+    nível, e a coleção vazia ou o escalar na mesma linha da chave ou do traço."""
+    out = []
+    items = value.items() if isinstance(value, dict) else ((None, v) for v in value)
+    for k, v in items:
+        plain = k is not None and kg_validate.SLUG.fullmatch(k) and k.lower() not in ("null", "true", "false")
+        head = " " * indent + ((k if plain else _yaml_str(k)) + ":" if k is not None else "-")
+        if isinstance(v, (dict, list)) and v:
+            sub = _yaml_block(v, indent + 2)
+            if k is None and isinstance(v, dict):  # o mapa num item de lista começa na linha do traço
+                out.append(head + " " + sub[0].lstrip())
+                out.extend(sub[1:])
+            else:
+                out.append(head)
+                out.extend(sub)
+        else:
+            out.append(head + " " + _yaml_inline(v))
+    return out
+
+
+def _scalar_end(node, lines=None):
+    """A última linha (0-based) com conteúdo de um nó YAML composto. Com as linhas do texto, a linha em branco no fim de
+    um escalar (o bloco | ou > guarda a quebra seguinte no end_mark) não conta: ela fica no arquivo."""
+    import yaml
+    if isinstance(node, yaml.ScalarNode):
+        m = node.end_mark
+        end = m.line - 1 if m.column == 0 and m.line > node.start_mark.line else m.line
+        while lines is not None and end > node.start_mark.line and end < len(lines) and not lines[end].strip():
+            end -= 1
+        return end
+    kids = [v for pair in node.value for v in pair] if isinstance(node, yaml.MappingNode) else list(node.value)
+    return max([node.start_mark.line] + [_scalar_end(k, lines) for k in kids])
+
+
+def nest_apply_text(text, doc, rows):
+    """(texto novo, motivo): as chaves movidas saem por texto e o perfil entra no lugar da primeira; o motivo diz por
+    que o arquivo não pode ser gravado (a releitura difere do documento esperado)."""
+    import copy
+    import yaml
+    todo = [r for r in rows if r[3] == "nest"]
+    if not text.endswith("\n"):
+        text += "\n"  # o bloco do perfil no fim do arquivo não cola na última linha; o arquivo ganha a quebra final
+    root = yaml.compose(text, Loader=kg_validate.Yaml12CoreLoader)
+    seq = next((v for k, v in root.value if getattr(k, "value", None) == "nodes"), None)
+    lines = text.splitlines(keepends=True)
+    edits = []  # (início, fim exclusivo, linhas novas)
+    for idx, _nid, into, _a, _w, moved, obj in todo:
+        m = seq.value[idx]
+        if not isinstance(m, yaml.MappingNode) or m.flow_style:
+            return text, _("node {n} is in flow style: edit it by hand").format(n=idx + 1)
+        pairs = [(k, v) for k, v in m.value if isinstance(k, yaml.ScalarNode)]
+        moving = [(k, v) for k, v in pairs if k.value in moved]
+        for k, v in moving:
+            if (v.start_mark.line, v.start_mark.column) < (k.end_mark.line, k.end_mark.column):
+                return text, _("node {n}: {key} is an alias (*): edit it by hand").format(n=idx + 1, key=k.value)
+        spans = sorted((k.start_mark.line, _scalar_end(v, lines) + 1) for k, v in moving)
+        if spans:  # o perfil entra no lugar da primeira chave movida, com o que vem antes dela na linha (o "- " do item)
+            anchor_line = spans[0][0]
+            col = next(k for k, _v in moving if k.start_mark.line == anchor_line).start_mark.column
+            lead = lines[anchor_line][:col]
+        else:  # nada se move (só const e copy): o perfil entra no fim do nó
+            anchor_line, col = _scalar_end(m, lines) + 1, pairs[0][0].start_mark.column
+            lead = " " * col
+        block = [lead + f"{into}:\n"] + [ln + "\n" for ln in _yaml_block(obj, col + 2)]
+        edits += [(s, e, block if s == anchor_line else []) for s, e in spans]
+        if not spans:
+            edits.append((anchor_line, anchor_line, block))
+    edits.sort()
+    for (s1, e1, _b1), (s2, _e2, _b2) in zip(edits, edits[1:]):
+        if s2 < e1:
+            return text, _("two edits overlap in the same lines: edit them by hand")
+    for s, e, block in reversed(edits):
+        lines[s:e] = block
+    new = "".join(lines)
+    _t, old_doc, _c = kg_validate.parse_v1(text)
+    _t, new_doc, c2 = kg_validate.parse_v1(new)
+    if c2 is not None:
+        return new, _("the edited text does not parse ({code})").format(code=c2)
+    want = copy.deepcopy(old_doc)
+    for idx, _nid, into, _a, _w, moved, obj in todo:
+        for k in moved:
+            want["nodes"][idx].pop(k, None)
+        want["nodes"][idx][into] = kg_validate.canonical(obj, json_keys=True)
+    if new_doc != want:
+        return new, _("the reread document differs from the old one beyond the nested keys")
+    return new, None
+
+
+def _shared_nodes(text):
+    """A raiz composta e os nós YAML que aparecem em mais de um lugar dela: o valor com âncora usada por um alias, e o
+    próprio alias (o compose devolve o mesmo objeto nos dois)."""
+    import yaml
+    root = yaml.compose(text, Loader=kg_validate.Yaml12CoreLoader)
+    seen, shared, stack = set(), set(), [root]
+    while stack:
+        node = stack.pop()
+        if id(node) in seen:
+            shared.add(id(node))
+            continue
+        seen.add(id(node))
+        if isinstance(node, yaml.MappingNode):
+            stack.extend(v for pair in node.value for v in pair)
+        elif isinstance(node, yaml.SequenceNode):
+            stack.extend(node.value)
+    return root, shared
+
+
+def dry_run(text, doc, rows):
+    """As linhas do plano depois de ensaiar a edição de texto: o nó que a edição não sabe fazer vai para quem revisa
+    já no plano, e não derruba o arquivo inteiro no --apply.
+
+    Primeiro um filtro de um compose só: a chave movida cujo valor tem âncora usada por um alias, ou é um alias (direto
+    ou dentro de uma lista), vai para revisão. Depois, um ensaio da edição combinada; só quando ela falha as linhas são
+    divididas ao meio até achar as culpadas, e o resto é ensaiado de novo. Um arquivo bom custa um compose e uma
+    edição (o ensaio nó a nó levava o plano do brain de 1 s a 71 s, e a bissecção sem o filtro, com 400 aliases, 146 s)."""
+    import yaml
+
+    def review(row, problem):
+        return row[:3] + ("review", _("the text edit does not reread the same ({problem}): edit it by hand").format(
+            problem=problem), [], None)
+    todo = [r for r in rows if r[3] == "nest"]
+    if not todo:
+        return rows
+    culprits = {}
+    root, shared = _shared_nodes(text)
+    seq = next((v for k, v in root.value if getattr(k, "value", None) == "nodes"), None)
+    for r in todo:
+        m = seq.value[r[0]]
+        for k, v in (m.value if isinstance(m, yaml.MappingNode) else ()):
+            if k.value not in r[5]:
+                continue
+            stack = [k, v]  # a âncora pode estar na própria chave (&a x_issuer: CMN), e não só no valor
+            while stack and id(r) not in culprits:
+                node = stack.pop()
+                if id(node) in shared:
+                    culprits[id(r)] = _("{key} has an anchor (&) or an alias (*)").format(key=k.value)
+                elif isinstance(node, yaml.MappingNode):
+                    stack.extend(x for pair in node.value for x in pair)
+                elif isinstance(node, yaml.SequenceNode):
+                    stack.extend(node.value)
+
+    def bad(group):
+        problem = nest_apply_text(text, doc, group)[1]
+        if problem is None:
+            return {}
+        if len(group) == 1:
+            return {id(group[0]): problem}
+        half = len(group) // 2
+        found = {**bad(group[:half]), **bad(group[half:])}
+        return found or {id(r): problem for r in group}  # cada metade passa e o todo não: as linhas juntas vão revisar
+    rest = [r for r in todo if id(r) not in culprits]
+    if rest:
+        culprits.update(bad(rest))
+        rest = [r for r in rest if id(r) not in culprits]
+        problem = nest_apply_text(text, doc, rest)[1] if rest else None
+        if problem is not None:  # o que sobrou não passa junto (uma interação que a bissecção separou): tudo vai revisar
+            culprits.update({id(r): problem for r in rest})
+    return [review(r, culprits[id(r)]) if id(r) in culprits else r for r in rows]
+
+
+def nest_command(args):
+    """kg_migrate.py nest: o plano (ou, com --apply, a gravação) das chaves x_ levadas a um perfil canônico."""
+    nest_map = load_nest_map(args.map)
+    must = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_MUST.read_text(encoding="utf-8")))
+    should = kg_validate.make_validator(json.loads(kg_validate.CONTRACT_SHOULD.read_text(encoding="utf-8")))
+    files = args.graphs or tracked_graphs(args.root, args.exclude, not args.no_default_excludes)
+    graphs, files, broken = load_graphs(files, args.root, lenient=not args.graphs)
+    report, all_rows = [], []
+    for g, f in zip(graphs, files):
+        path = pathlib.Path(f).resolve()
+        text = path.read_bytes().decode("utf-8")
+        crlf = "\r\n" in text
+        if (crlf and text.count("\n") != text.count("\r\n")) or "\r" in text.replace("\r\n", ""):
+            report.append((g.rel, False, [_("mixed line endings (\\r\\n with \\n or a lone \\r): normalize first")]))
+            continue
+        old = text.replace("\r\n", "\n") if crlf else text
+        _t, doc, _c = kg_validate.parse_v1(old)
+        rows = dry_run(old, doc, nest_plan(doc, nest_map, flow_nodes(old)))
+        all_rows.extend((g.rel,) + r for r in rows)
+        if not args.apply or not any(r[3] == "nest" for r in rows):
+            continue
+        new, problem = nest_apply_text(old, doc, rows)
+        if problem is None:
+            before, after = set(kg_validate.codes(old, must)), set(kg_validate.codes(new, must))
+            if after - before:
+                problem = _("the file would gain a new MUST code: {codes}").format(codes=", ".join(sorted(after - before)))
+        if problem is None:
+            grown = kg_validate.warning_counts(new, must, should) - kg_validate.warning_counts(old, must, should)
+            if grown:
+                problem = _("the file would gain a SHOULD warning: {codes}").format(codes=", ".join(sorted(grown)))
+        if problem:
+            report.append((g.rel, False, [problem]))
+            continue
+        tmp = path.with_name(path.name + ".kg-migrate.tmp")
+        tmp.write_bytes((new.replace("\n", "\r\n") if crlf else new).encode("utf-8"))
+        try:
+            os.chmod(tmp, path.stat().st_mode & 0o7777)
+        except OSError:
+            pass
+        tmp.replace(path)
+        report.append((g.rel, True, []))
+    if args.json:
+        print(json.dumps({"rows": [{"file": r[0], "id": r[2], "into": r[3], "action": r[4], "review": r[5],
+                                    "moved": r[6], "profile": r[7]} for r in all_rows],
+                          "unreadable": [{"file": rel, "code": code} for rel, code in broken],
+                          "applied": [{"file": rel, "written": ok, "reasons": why} for rel, ok, why in report]
+                          if args.apply else None}, ensure_ascii=False))
+    else:
+        for r in all_rows:
+            mark = _("NEST") if r[4] == "nest" else _("REVIEW")
+            print(f"{mark:8}  {r[0]}  {r[2]}  → {r[3]}" + (f"  ({r[5]})" if r[5] else ""))
+        for rel, code in broken:
+            print(_("REVIEW").ljust(8) + "  " + rel + "  " + _("graph that does not parse ({code}): left out").format(code=code))
+        for rel, ok, why in report:
+            print(f"{(_('WRITTEN') if ok else _('REFUSED')):8}  {rel}" + "".join(f"\n    {w}" for w in why))
+        nested = sum(1 for r in all_rows if r[4] == "nest")
+        print(_("· {nested} node profile(s) to build, {review} for the reviewer, in {files} file(s){written}").format(
+            nested=nested, review=len(all_rows) - nested, files=len({r[0] for r in all_rows}),
+            written=(_("; {n} file(s) written").format(n=sum(1 for _r, ok, _w in report if ok)) if args.apply
+                     else _("; nothing was written (without --apply)"))))
+    return 1 if any(not ok for _r, ok, _w in report) else 0
+
+
 def load_graphs(files, root, lenient=False):
     """Os grafos lidos. Com lenient (a lista veio do git), o grafo que não parseia volta à parte, para quem revisa."""
     out, broken = [], []
@@ -760,7 +1244,7 @@ def tracked_graphs(root, exclude=(), defaults=True):
 def broken_input(args, exc):
     """Entrada quebrada (rc 2). No plan --json, o objeto no stdout, que o erro de uso do argparse (rc 2, só no stderr)
     nunca escreve: quem lê a máquina distingue os dois sem casar frase."""
-    if args.cmd in ("plan", "keys") and args.json:
+    if args.cmd in ("plan", "keys", "nest") and args.json:
         print(json.dumps({"error": str(exc), "reason": "broken_input"}, ensure_ascii=False))
     else:
         print(_("BROKEN INPUT  {error}").format(error=exc))
@@ -774,6 +1258,13 @@ def main(argv=None):
         "  kg_migrate.py plan  --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [--json] [--out SHEET.tsv] [graph.kg.yaml ...]\n"
         "  kg_migrate.py apply --profile PROFILE.yaml [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
         "  kg_migrate.py keys [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "  kg_migrate.py nest --map MAP.yaml [--apply] [--json] [--root DIR] [--exclude GLOB] [--no-default-excludes] [graph.kg.yaml ...]\n"
+        "\n"
+        "nest (4.21.0) moves the adopter's own x_ keys into a canonical node profile (x_mirror, x_doc_cycle, x_questionnaire),\n"
+        "by text, as the map says (spec/kg-migrate-nest.schema.json): each profile field comes from a constant, from an x_ key\n"
+        "that leaves the node, or from a key that stays, through an optional regex and value table. A value with no code in\n"
+        "the table, a missing required source, a node that already has the profile, or a profile that fails its SHOULD schema\n"
+        "goes to the reviewer; nothing is guessed. With --apply, the same checks as keys hold.\n"
         "\n"
         "keys (4.19.0) renames each key the contract does not know in the top level, meta, nodes, edges and external_edges\n"
         "to x_<key>, the extension prefix, by text (comments stay). The known keys come from the MUST schema itself. A key\n"
@@ -830,7 +1321,22 @@ def main(argv=None):
     k.add_argument("--no-default-excludes", action="store_true",
                    help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
     k.add_argument("graphs", nargs="*")
+    n = sub.add_parser("nest", help=_("moves the adopter's own x_ keys into a canonical node profile (4.21.0)"))
+    n.add_argument("--map", required=True, help=_("the nest map (spec/kg-migrate-nest.schema.json)"))
+    n.add_argument("--apply", action="store_true", help=_("writes the profiles; without it, only the plan"))
+    n.add_argument("--root", default=".")
+    n.add_argument("--json", action="store_true")
+    n.add_argument("--exclude", action="append", default=[],
+                   help=_("extra glob to leave out of the git list (fnmatch: * crosses /, as in kg_gate.py)"))
+    n.add_argument("--no-default-excludes", action="store_true",
+                   help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
+    n.add_argument("graphs", nargs="*")
     args = ap.parse_args(argv)
+    if args.cmd == "nest":
+        try:
+            return nest_command(args)
+        except Broken as exc:
+            return broken_input(args, exc)
     if args.cmd == "keys":
         try:
             return keys_command(args)

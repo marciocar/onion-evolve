@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:a0ead6ec04f1c510 -->
+<!-- translation-of: docs/manual/03-format.md sha256:be15f7e5a422bd06 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -141,7 +141,7 @@ Uma referência externa é `<caminho>.kg.yaml#<id>`, ou `<caminho>.kg.json#<id>`
 à raiz do repositório e escrito com `/`. Cada segmento começa por letra, dígito ou `_`. Caminho absoluto, `..`, `\`
 e `:` reprovam.
 
-## Perfis canônicos de `x_` (v4.11)
+## Perfis canônicos de `x_` (v4.11 e v4.12)
 
 A chave `x_` segue livre no MUST: nunca reprova. Algumas chaves `x_` se repetem nos adotantes com o mesmo sentido, e
 desde o v4.11 o SHOULD dá uma forma a cada uma. O perfil só é julgado quando a chave está presente, e só alerta. Um
@@ -156,6 +156,8 @@ livre, e qualquer outra chave alerta. Os valores de enum são códigos, em ingl�
 | `x_doc_cycle` | nó | o ciclo de vida de um documento externo de que o nó depende (uma norma, uma política, um contrato) |
 | `x_questionnaire` | nó | o elo entre o nó e as perguntas de um questionário externo |
 | `x_severity` | nó | `critical` · `high` · `medium` · `low` · `info` |
+| `x_criterion` | nó | uma versão de um critério pré-registrado (v4.12) |
+| `x_measured_under` | nó | as versões de critério sob as quais um resultado foi medido (v4.12) |
 | `x_confidence` | aresta | a certeza da ligação, de 0 a 1 |
 | `x_provisional` | aresta | `true` quando a ligação ainda espera conferência |
 
@@ -232,6 +234,62 @@ O exemplo inteiro, tirado do dicionário de dados aberto da CMED/ANVISA, está e
 Uma cópia envelhece sem aviso: `synced_at` mais `resync_every` a põe no relatório de vencimento, e o mesmo vale para
 `checked_at` mais `recheck_every` num documento.
 
+### `x_criterion` e `x_measured_under` (v4.12)
+
+Um critério fixado antes do dado é um pré-registro, como no
+[OSF Preregistration](https://www.cos.io/initiatives/prereg) e nas emendas versionadas de um registro de ensaio
+clínico. Mudá-lo depois de ver o dado é uma emenda com data e motivo, nunca uma reescrita. Cada versão é um nó, e o
+resultado cita o nó da versão sob a qual foi medido, com o `sha256` dessa versão. O resultado antigo fica preso à versão
+antiga, e o veredito antigo nunca muda em silêncio.
+
+| Perfil | Obrigatório | Opcional |
+|---|---|---|
+| `x_criterion` | `id` (estável entre as versões), `version` (texto ou inteiro), `registered_at` (uma data, ou uma data-hora RFC 3339 com fuso), `sha256` (64 hex minúsculos) e `ref` ou `text` | `amends` (o id do nó da versão anterior; pede `reason`), `reason`, `round` (texto: a rodada que motivou a emenda) |
+| `x_measured_under` | `measured_at` (uma data ou uma data-hora), `criteria` (uma lista não vazia de `{criterion, sha256}`) | `subject` (um mapa livre: cenário, réplica, alvo), `verdict`, `round` (texto) |
+
+O `criterion` é o id de um nó do mesmo grafo com `x_criterion`, ou `<caminho>#<id>` para um critério de outro grafo.
+O `ref` é um caminho a partir da raiz do repositório, com fragmento opcional (`#/criteria/0` ou o `id` de um item de
+lista); o `text` é o próprio critério. A emenda leva também uma aresta `SUPERSEDES` para a versão anterior.
+
+```yaml
+  - id: C_A7_V2
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "Criterion A7, version 2: passes with 8 of 10 replicas."
+    x_criterion:
+      id: A7
+      version: 2
+      registered_at: "2026-10-22T10:00:00-03:00"
+      sha256: "7fb806ea1c06b6816ad43681d179143472b3c2a48b69f422c05b08339b48305a"
+      text: "Passes with 8 of 10 replicas."
+      amends: C_A7_V1
+      reason: "Replica 3 showed that the limit was wrong."
+      round: r3
+  - id: E_A7_R4
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "Round r4 passes criterion A7 with 9 of 10 replicas."
+    x_measured_under:
+      measured_at: "2026-10-23T09:00:00Z"
+      round: r4
+      criteria:
+        - criterion: C_A7_V2
+          sha256: "7fb806ea1c06b6816ad43681d179143472b3c2a48b69f422c05b08339b48305a"
+      verdict: passes
+```
+
+O leitor compara datas e rodadas sem calcular hash. As duas com hora comparam o instante em UTC; as duas só data
+comparam o dia escrito, o que supõe as duas escritas no mesmo fuso, e o mesmo dia não diz a ordem; com uma só data, cujo fuso é desconhecido, a outra vale pelo
+dia em UTC, e a distância de até um dia também não diz a ordem. Só o mesmo `round` decide (a rodada que motivou a
+emenda): rodadas são rótulos, não uma ordem. A data num dia que não existe (30 de fevereiro) não é comparada. O `sha256` contra o texto ou o arquivo, e a citação de outro
+grafo, são conferidos pelo `kg_criterion.py` (capítulo 5).
+
 ## Integridade (fora do schema)
 
 O schema não alcança estas regras, e todo leitor tem de aplicá-las:
@@ -247,5 +305,10 @@ O schema não alcança estas regras, e todo leitor tem de aplicá-las:
 | `verified_at` anterior a `valid_from` | SHOULD | `integrity.verified-before-fact` |
 | `decision` viva sem `trace`, sem `provenance` e sem `TRACES_TO` saindo dela | SHOULD | `integrity.untraced-decision` |
 | nó que recebe `REFUTES` e segue vivo (nem `superseded` nem `refuted`; a `question` `done` já está respondida) | SHOULD (MUST depois) | `integrity.refutes-unreconciled` |
+| critério citado, ou `amends`, que não é um nó deste grafo com `x_criterion` | SHOULD | `integrity.criterion-unknown` |
+| emenda que aponta a versão de outro critério (outro `x_criterion.id`), ou cuja cadeia de `amends` volta a ela mesma | SHOULD | `integrity.criterion-amends-mismatch` |
+| `sha256` citado que não é o da versão citada | SHOULD | `integrity.criterion-sha-mismatch` |
+| medido no mesmo `round` da versão citada, ou antes do registro dela (veja abaixo) | SHOULD | `integrity.measured-post-hoc` |
+| as datas não dizem se o resultado veio antes ou depois da versão citada | SHOULD | `integrity.measured-order-unknown` |
 
 Uma aresta externa conta como ligação: o nó ligado só por ela não é órfão.

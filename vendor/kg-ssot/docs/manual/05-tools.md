@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.20.0",
+  "release": "kg-ssot-v4.21.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 390/390 (gates the rc)
+latest: 438/438 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -842,6 +842,53 @@ python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > voca
 - With `--format json`, `terms` and `lookup` use the `kg-ssot.vocab/1` format (`spec/vocab.schema.json`). The tool does
   not judge: an `x_term` outside the profile is read as far as it can be, and the SHOULD flags the rest.
 
+## `kg_criterion.py`: the pre-registered criterion (4.21.0)
+
+The reader already warns, between nodes of the same graph, about a criterion that is not there, a cited `sha256` that
+is not the one of the version, and a result measured after seeing the data (chapter 3, `x_criterion` and
+`x_measured_under`). It computes no hash and reads no corpus, so that a JavaScript reader stays free of crypto. This
+tool does the rest, from the repository root:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py digest --text "Passes with 9 of 10 replicas."
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py digest --ref criteria/a7.tsv                  # the whole file
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py digest --ref data/judge-verdicts.json#CU1      # one list item
+python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
+```
+
+- **`digest`** prints the `sha256` to write in `x_criterion`. The forms:
+  - `text`: UTF-8, with CRLF and a lone CR turned into LF, and without the space (U+0020) at the end of each line. A
+    tab stays.
+  - `ref` without a fragment: the bytes of the file with CRLF turned into LF, and nothing else. A TSV keeps its empty
+    columns, with a tab at the end of the line.
+  - `ref` with a fragment: the item in the canonical JCS form ([RFC 8785](https://www.rfc-editor.org/rfc/rfc8785)),
+    from a `.json`, `.yaml`, or `.yml` file. The fragment is a JSON Pointer (`#/criteria/0`) or the `id` of a list
+    item (`#CU1`), unique in the file.
+- **`check`** checks every `x_criterion` with exactly one of `ref` and `text` against it:
+  - `integrity.criterion-digest` when the `sha256` does not match;
+  - `integrity.criterion-ref-unreadable` when the file, the fragment, or a value does not read: a JSON NaN, an integer
+    beyond ±(2^53−1), a repeated key, a YAML map key that is not text, or a path that is not a regular file or is
+    larger than 64 MiB.
+- **Citations of another graph.** `check` also follows each `<path>#<id>` citation in an `x_measured_under`, with the
+  same rule as the reader: `integrity.criterion-unknown`, `integrity.criterion-sha-mismatch`,
+  `integrity.measured-post-hoc`, and `integrity.measured-order-unknown`.
+- **What it reads.** With `--root` alone, `check` reads the graphs git tracks under it, without the vendor. With files,
+  it reads only those, each by its path relative to `--root` (the current folder without it), which is also where each
+  `ref` starts, so `g/a.kg.yaml#C1` finds the file however it was typed; a citation of a graph that was not given is
+  counted as unchecked, not as a finding, and a given `--exclude` applies to the files too.
+- **Paths.** A `ref` cannot leave the root. The last `#` splits the path from the fragment, and an empty fragment
+  (`a.json#`) is the whole document. A `.yaml` file needs a map at its root. A byte-order mark at the start of
+  `--text-file` is not part of the text.
+- **Output and rc.** `--format json` gives `kg-ssot.criterion/1` (`spec/criterion.schema.json`). rc 0 with no
+  finding, 1 with a finding or a graph that does not read, and 2 on broken input.
+- **What it does not check.** `check` checks that each version matches its text today, not its history: editing a
+  criterion in place and writing the new `sha256` passes, and only a result that cites the old `sha256` shows it. Review
+  a changed `x_criterion.sha256` in `kg_diff` (it shows as a changed field of the node): a new rule is an amendment, a
+  new node with `amends`.
+- **In CI.** The reader does not hash, so a criterion edited in place without a new `sha256` is caught only here: if
+  your graphs use `x_criterion`, add `python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .` next to the
+  gate.
+
 ## `kg_prov_export.py`: provenance in PROV-O
 
 Exports a `.kg.yaml` to [PROV-O](https://www.w3.org/TR/prov-o/) in JSON-LD, for anyone who already uses tools from the
@@ -960,4 +1007,56 @@ whose value the profile judges). With `--apply`, each file is written only if th
 with only the renamed keys, the diff touches only those lines, and the file gains no MUST code or SHOULD warning. The
 line ending is kept, a file with mixed line endings is refused, and running it again changes nothing. Measured on a copy
 of the 15 graphs of the core that failed the MUST on a foreign key: with `meta.title` known since v4.11 and 76 keys
-renamed in 12 files, 14 of them pass; the one left also lacks provenance.
+renamed in 12 files, 14 of them pass; the one left also lacks provenance. Run by the core on its own corpus
+(2026-10-23), with the gate's excludes: the gate went from 170 to 182 of 184 graphs in the MUST, and the inherited debt
+from 14 graphs to 2, both lacking provenance.
+
+### `nest`: your own `x_` keys become a canonical profile (4.21.0)
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py nest --map nest-map.yaml            # the plan
+python3 -I -B vendor/kg-ssot/tools/kg_migrate.py nest --map nest-map.yaml --apply    # writes the profiles
+```
+
+`keys` gives a foreign key the `x_` prefix; `nest` goes one step further and moves the `x_` keys an adopter invented
+into the canonical node profiles of [chapter 3](03-format.md), `x_mirror`, `x_doc_cycle`, and `x_questionnaire`. The map
+(`spec/kg-migrate-nest.schema.json`) has one rule per profile. A rule applies to the node that has its `when` key, and
+each field of the profile comes from one source: `const` (a fixed value), `move` (an `x_` key that leaves the node), or
+`copy` (any key, which stays, such as `verified_at`). A source can go through `match` (a regex with one group, read as
+ECMA-262 reads it: `\w` and `\d` in ASCII, `\s` with the Unicode spaces, `.` without line breaks, `$` only at the end of
+the text; what the two engines read differently is broken input, and a value with a character beyond U+FFFF goes to the
+reviewer) and through a value table, `values` for exact values and `prefixes` for the longest matching prefix. With
+`raw: true`, the original value of each moved key that had text beyond the code (it came in by a prefix, or the regex
+cut part of it) stays in `<profile>.x_raw`; an exact value of the table does not. A key moved through `match` or
+`prefixes` loses the text the code leaves out, so such a rule needs `raw: true` (the map is broken input without it):
+
+```yaml
+nest_version: "1"
+nest:
+  - into: x_mirror
+    when: x_board_status
+    fields:
+      system: {const: board}
+      state: {move: x_board_status}
+      ref: {copy: verified_against, match: "/t/([a-z0-9]+)$"}
+      url: {copy: verified_against}
+      synced_at: {copy: verified_at}
+  - into: x_doc_cycle
+    when: x_issuer
+    raw: true
+    fields:
+      issuer: {move: x_issuer}
+      state: {move: x_in_force, values: {in force: in_force}, prefixes: {"in force (": in_force}}
+```
+
+Nothing is guessed. A node goes to the reviewer, untouched, when a value has no code in the table, when the source of a
+required field is missing, when the node already has the profile, when the profile it would get fails the profile's
+SHOULD schema (a `synced_at` that is not a date, a `state` outside the enum), when the node is written in flow style
+(`{...}`), when its `when` key is null, when a value is `.nan` or `.inf`, or when the text edit of that node would not
+reread the same (a moved value with an anchor `&x` or an alias `*x`). The plan tries the text edit of the whole file
+once, and splits it only when it fails, so a node it cannot edit goes to the reviewer there, and `--apply` writes the
+others. `--apply` writes each file under the same checks as `keys`: the reread document must equal the old one with only
+the moved keys and the new profiles, and the file must gain no MUST code or SHOULD warning. The line ending is kept,
+comments outside the moved keys stay, and running it again changes nothing. Measured on a copy of an adopter's two
+graphs (108 nodes with 168 such keys): 106 profiles built, 2 left for the reviewer (two `x_in_force` values with free
+text the map did not cover), both files written with the same verdict as before.

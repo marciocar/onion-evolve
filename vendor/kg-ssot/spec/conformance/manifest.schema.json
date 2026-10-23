@@ -23,7 +23,7 @@
       "type": "string",
       "anyOf": [
         { "pattern": "^parse\\.[a-z][a-z0-9-]*$" },
-        { "pattern": "^form\\.(required|enum|type|pattern|range|const|unknown-key)\\.(top|meta|node|edge)\\.[A-Za-z_][A-Za-z0-9_-]*(\\.[A-Za-z_][A-Za-z0-9_-]*)*$" },
+        { "pattern": "^form\\.(required|enum|type|pattern|range|const|unknown-key|exclusive)\\.(top|meta|node|edge)\\.[A-Za-z_][A-Za-z0-9_-]*(\\.[A-Za-z_][A-Za-z0-9_-]*)*$" },
         { "pattern": "^integrity\\.[a-z][a-z0-9-]*$" },
         { "pattern": "^yaml\\.[a-z][a-z0-9-]*$" },
         { "pattern": "^semantic\\.[a-z][a-z0-9-]*$" }

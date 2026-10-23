@@ -1,0 +1,24 @@
+meta:
+  schema_version: "1"
+  id: warn-x-criterion-not-object
+nodes:
+  - id: "Q_A"
+    node_type: "question"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: "C_A7_V1"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.8
+    label: "A régua sintética A7, versão 1."
+    x_criterion:
+      - 1
+edges:
+  - from: C_A7_V1
+    to: Q_A
+    edge_type: TRACES_TO

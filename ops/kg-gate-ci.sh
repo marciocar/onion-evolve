@@ -23,3 +23,11 @@ python3 -I vendor/kg-ssot/tools/kg_gate.py \
   --exclude 'docs/evolution/kg-inbox/_rejected/*' \
   --exclude 'docs/evolution/kg-inbox/_sealed/*' \
   "$@"
+gate_rc=$?
+
+# O critério pré-registrado por HASH (kg-ssot 4.21.0): o leitor não calcula hash, então a régua editada no lugar
+# só é pega aqui. Roda sempre (inclusive com --update), e o rc final é o pior dos dois; 2 (não julgou) vence.
+bash "$(dirname "${BASH_SOURCE[0]}")/kg-criterion-ci.sh"; crit_rc=$?
+[ "$gate_rc" -eq 2 ] || [ "$crit_rc" -eq 2 ] && exit 2
+[ "$gate_rc" -ne 0 ] && exit "$gate_rc"
+exit "$crit_rc"
