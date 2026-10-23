@@ -2,7 +2,8 @@
 branch: chore/kg-migrate-keys
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 76799ba61a6d35f0753f598b440d28c034acb3a916c1bd4b0f7b59330c4fbac0
+reviewed_code_sha256: 01e43fa2d311781e6c9ec8b9b898003819c5a4f0d9d592853d646206582c6936
 findings_total: 0
 findings_real: 0
 tokens: 0
