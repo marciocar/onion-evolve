@@ -41,7 +41,11 @@
 #   · (U4) a pasta de um glob com `$D` usa a ÚLTIMA atribuição literal da linha, sem ver ramos (`if …; then D=a;
 #     else D=b; fi`); o heredoc de dados prova o arquivo pela EXTENSÃO, e o `bash x.md` que o executaria é barrado,
 #     mas `python3 x.md` não (é a fronteira do script que lê por dentro, acima);
-#   · (U4) residual medido no replay e NÃO curado: `{ cat <<'EOF' … } > $R` (grupo) e `grep -l` sobre `.env*`.
+#   · (U4) residual medido no replay e NÃO curado: `grep -l` sobre `.env*`. O grupo `{ cat <<'EOF' … } > $R` foi
+#     curado em 2026-10-23 (ver group_outputs): o heredoc dentro de um composto grava onde o composto grava;
+#   · (2026-10-23) composto que o veto não prova (`case` com parêntese de abertura, chaves desbalanceadas, função,
+#     `exec`, `coproc`) trata como gravado em arquivo não-dados todo heredoc de saída padrão: o corpo que cita
+#     o .env é vetado, mesmo quando só iria para a tela.
 # SAC-68 (2026-10-08): 7 vetos numa leva em comando que não lia .env. Glob passou a ser julgado pela regra
 # do bash e pelo disco (ver glob_reaches_env); o grep no .env segue vetado e ganhou caminho sancionado
 # (`env-check.sh --lint`). Bancada: casos (l) e (m) de run_env_exposure_selftests, 7 mutantes.
@@ -55,7 +59,7 @@ input="$(cat)"
 # heredoc ERA a entrada padrão: o JSON nunca chegava e o veto passava tudo (18 de 18 vetos falharam na 1ª
 # bateria — fail-open total, pego antes de registrar o hook).
 GUARD_PY=$(cat <<'PY'
-import fnmatch, glob, json, os, re, shlex, sys
+import fnmatch, glob, itertools, json, os, re, shlex, sys
 
 # ── shlex LINEAR (fix/vetos-fail-closed, 2026-10-11) ───────────────────────────────────────────
 # O shlex da stdlib monta cada token com `self.token += nextchar`. Num ATRIBUTO o CPython não otimiza a
@@ -647,18 +651,28 @@ def _dests(seg, name, toks_before):
     if name == 'tee':
         k = seg.index('<<') if '<<' in seg else len(seg)
         out += [t for t in seg[1:k] if not t.startswith('-') and t not in REDIRS and t not in out]
+    return _resolve_dests(out, toks_before)
+
+def _resolve_dests(out, toks_before):
+    """`$VAR` pela última atribuição LITERAL antes; None se não se resolve. (2026-10-23) A variável que um `for`,
+    `select` ou `read` pode ter trocado não se resolve; `/dev/null` não é destino (o texto some)."""
     res = []
     for d in out:
         m = re.match(r'^\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?$', d)
         if m:
-            vals = [t.split('=', 1)[1] for t in toks_before if t.startswith(m.group(1) + '=')]
+            v = m.group(1)
+            if any(toks_before[i] in ('for', 'select', 'read') and v in toks_before[i + 1:i + 8]
+                   for i in range(len(toks_before) - 1)):
+                return None
+            vals = [t.split('=', 1)[1] for t in toks_before if t.startswith(v + '=')]
             if not vals:
                 return None
             d = vals[-1]
-        res.append(d)
+        if d != '/dev/null':
+            res.append(d)
     return res
 
-def split_heredocs(cmd):
+def split_heredocs(cmd, pre=()):
     """Devolve (comando sem o corpo PROVADO como dado, [(entre aspas?, gravado em arquivo?, corpo, tipo, dado?)])."""
     lines = cmd.split('\n')
     idx = next((i for i, l in enumerate(lines) if HEREDOC_ANY.search(l)), None)
@@ -702,6 +716,10 @@ def split_heredocs(cmd):
         return cmd, []                                   # o corpo seguiria para outro comando
     b = max([i for i, t in enumerate(toks[:k]) if t and set(t) <= set(';&|()\n')] or [-1]) + 1
     seg = toks[b:]
+    # a palavra que ABRE um composto antes do consumidor (`{ cat <<'E'`, `do cat <<E`, `then cat <<E`) não é o
+    # consumidor: para onde a saída vai, quem decide é o fecho do composto (group_outputs, em judge).
+    while seg and seg[0] in GROUP_LEAD:
+        seg = seg[1:]
     name = _consumer_ok(seg[:seg.index('<<')])
     if not name:
         return cmd, []
@@ -722,13 +740,13 @@ def split_heredocs(cmd):
         return cmd, []                                   # terminador ausente
     body = '\n'.join(lines[idx + 1:j])
     # DADO (U4): gravado só em arquivo(s) de dados com destino resolvido, sem descritor >= 3
-    dests = _dests(seg, name, toks[:k]) if written and name in ('cat', 'tee') else None
+    dests = _dests(seg, name, list(pre) + toks[:k]) if written and name in ('cat', 'tee') else None
     data = bool(dests) and all(is_data_file(d) for d in dests) and not re.search(r'>&\s*[3-9]', _around)
     # as REFERÊNCIAS ao arquivo de dados (nome, caminho, e a variável do destino), para saber se a linha o reusa
     if data:
         _raw = [seg[i + 1] for i, t in enumerate(seg) if t in REDIRS and i + 1 < len(seg)]
         data = sorted({os.path.basename(d) for d in dests} | {'$' + re.sub(r'^\$\{?|\}$', '', r) for r in _raw if r.startswith('$')})
-    rest_cmd, rest_docs = split_heredocs('\n'.join(lines[j + 1:]))
+    rest_cmd, rest_docs = split_heredocs('\n'.join(lines[j + 1:]), list(pre) + toks)
     return ('\n'.join(lines[:idx + 1] + ([rest_cmd] if j + 1 < len(lines) else [])),
             [(quoted, written, body, ('interp-env' if any(cites_env(t) or is_env_token(t.split('=', 1)[-1]) for t in seg[:seg.index('<<')]
                                       if re.match(r'^[A-Za-z_][A-Za-z0-9_]*=', t)) else 'interp') if name == 'interp' else 'text', data)]
@@ -792,9 +810,10 @@ def data_used_as_code(cmd, refs):
             return True
         # o próprio arquivo de dados como destino é o heredoc gravando a si mesmo (`cat > x.md`), não cópia
         _outs = [seg[i + 1] for i in range(len(seg) - 1) if seg[i] in OUT_REDIRS]
-        if name == 'tee':
-            _outs += [a for a in args[1:] if not a.startswith('-')]
-        _outs = [o for o in _outs if not hit(o)]
+        if name == 'tee':                            # os arquivos do tee vão até o 1º operador (`<<`, `>`): o resto não é destino
+            _ta = list(itertools.takewhile(lambda a: not a.startswith(('<', '>')) and a not in REDIRS, args[1:]))
+            _outs += [a for a in _ta if not a.startswith('-')]
+        _outs = [o for o in _outs if not hit(o) and o != '/dev/null']          # /dev/null descarta, não copia
         if any(not is_data_file(o) for o in _outs) and any(hit(t) for t in seg if t not in _outs):
             return True
         if name in CODE_RUNNERS:
@@ -812,11 +831,101 @@ def data_used_as_code(cmd, refs):
             return True
     return False
 
+# ── COMPOSTO (2026-10-23, falso positivo medido no relatório do update de um adotante) ─────────────────────
+# `{ cat <<'EOF' … EOF; echo; cat log; cat <<'EOF' … EOF; } > "$R"` grava UM relatório .md a partir de vários
+# heredocs. O `{` era tomado pelo consumidor, o corpo virava comando, e uma crase em volta do nome do arquivo de
+# segredos no markdown era julgada como substituição: veto sem leitura nenhuma. Na outra direção, um ESCAPE da main:
+# o heredoc DENTRO de um composto ia para a saída do composto, e o veto o tomava por saída padrão —
+# `{ true; cat <<'E' … E; } > run.sh; bash run.sh` (o mesmo com `do … done > f`, `if … fi > f`) gravava e rodava um
+# script que lia o segredo. A cura: o destino de um heredoc sem redirecionamento próprio é o do composto que o
+# fecha (o mais interno com saída redirecionada); composto com pipe, função, `exec >` ou estrutura que não fecha →
+# o corpo que cita o arquivo de segredos é vetado. Dado (.md, .txt…) vale; o resto do veto julga o uso.
+GROUP_LEAD = ('{', 'do', 'then', 'else')
+GROUP_OPEN = {'{': '}', 'do': 'done', 'if': 'fi', 'case': 'esac'}
+GROUP_CLOSE = {'}', 'done', 'fi', 'esac'}
+
+def group_outputs(cmd, ndocs):
+    """Para cada heredoc separado, em ordem: None (saída padrão), ('pipe',) (vai para um pipe/função/exec — não
+    prova), ou ('file', [destinos resolvidos] | None). Devolve None se a estrutura não se prova."""
+    try:
+        toks = _tokens(cmd)
+    except ValueError:
+        return None
+    stack, at_cmd, snaps, fn_next, i = [], True, [], False, 0
+    while i < len(toks):
+        t = toks[i]
+        if t == '<<':
+            snaps.append(list(stack)); at_cmd = False; i += 1; continue
+        if _is_sep(t):
+            at_cmd = True; i += 1; continue
+        if at_cmd and t in ('exec', 'coproc'):
+            return None                                   # `exec > f` desvia a saída de tudo o que vem depois; coproc a manda a um pipe
+        if at_cmd and t == 'function':
+            fn_next = True; at_cmd = False; i += 1; continue
+        if at_cmd and t in GROUP_OPEN:
+            _pv = next((x.replace('\n', '') for x in reversed(toks[:i]) if x.replace('\n', '')), '')
+            func = t == '{' and (fn_next or (_pv.endswith(')') and '(' in _pv))     # corpo de função: a saída é de quem a chama
+            stack.append({'close': GROUP_OPEN[t], 'outs': [], 'fd': False, 'piped': func, 'pre': None})
+            fn_next = False; i += 1; continue
+        if at_cmd and t in GROUP_CLOSE:
+            if not stack or stack[-1]['close'] != t:
+                return None
+            g = stack.pop(); g['pre'] = toks[:i]; j = i + 1
+            while j < len(toks) and not _is_sep(toks[j]):
+                if toks[j] in REDIRS and j + 1 < len(toks):
+                    g['outs'].append(toks[j + 1]); j += 2; continue
+                if toks[j] == '>&' and j + 1 < len(toks):
+                    if not re.match(r'^[12]$', toks[j + 1]):
+                        g['fd'] = True
+                    j += 2; continue
+                j += 1
+            if j < len(toks) and '|' in toks[j] and not toks[j].startswith('||'):
+                g['piped'] = True
+            i = j; continue
+        if at_cmd and t in ('then', 'else', 'elif', '!', 'while', 'until', 'time'):
+            i += 1; continue
+        at_cmd = False; i += 1
+    if stack or len(snaps) != ndocs:
+        return None
+    res = []
+    for snap in snaps:
+        out = None
+        for g in reversed(snap):
+            if g['outs'] or g['fd']:
+                out = ('file', None if g['fd'] else _resolve_dests(g['outs'], g['pre']), g['outs'])
+                break
+            if g['piped']:
+                out = ('pipe',)
+                break
+        res.append(out)
+    return res
+
+def attach_groups(cmd, docs):
+    """Reescreve o (gravado?, dado?) de cada heredoc pela saída do composto que o contém."""
+    if not docs:
+        return docs
+    outs = group_outputs(cmd, len(docs))
+    new = []
+    for n, (quoted, written, body, kind, data) in enumerate(docs):
+        if kind == 'text' and not written:
+            o = 'pipe' if outs is None else outs[n]
+            if o == 'pipe' or (o and o[0] == 'pipe'):
+                written, data = True, False
+            elif o:
+                dests, raw = o[1], o[2]
+                written = True
+                data = (sorted({os.path.basename(d) for d in dests}
+                               | {'$' + re.sub(r'^\$\{?|\}$', '', r) for r in raw if r.startswith('$')})
+                        if dests and all(is_data_file(d) for d in dests) else False)
+        new.append((quoted, written, body, kind, data))
+    return new
+
 def judge(cmd, depth=0):
     """None = passa; str = motivo do veto."""
     if depth > 4:
         return 'aninhamento de shell profundo demais para provar'
     cmd, docs = split_heredocs(cmd)
+    docs = attach_groups(cmd, docs)
     r = judge_heredocs(docs, depth)
     if r:
         return r
@@ -942,6 +1051,14 @@ def judge(cmd, depth=0):
             return "'git %s' sobre um arquivo .env mostra o conteúdo" % sub
         if name == 'find' and not any(a.startswith(('-exec', '-ok')) for a in args):
             continue
+        # (2026-10-23, medido numa sessão do core) `find . -name CLAUDE.md -not -path './node_modules/*' -exec wc -c {} \;`
+        # era vetado: depois de um `cd` numa linha com `(`, a pasta fica desconhecida e o glob do -path fecha como
+        # leitura. Quem lê é o comando do -exec: se TODOS os -exec/-ok rodam um comando de METADADO (wc, ls, stat…,
+        # o mesmo critério do `wc .env` direto), o find não entrega conteúdo. `-exec cat {}` segue barrado.
+        if name == 'find':
+            _ex = [os.path.basename(args[i + 1]) for i, a in enumerate(args[:-1]) if a in ('-exec', '-execdir', '-ok', '-okdir')]
+            if _ex and all(x in METADATA and x not in ('source', '.') for x in _ex):
+                continue
         if name in METADATA:
             continue
         if name in WRITERS and all(is_env_token(a) for a in files if not a.startswith('-')):
