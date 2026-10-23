@@ -2,7 +2,8 @@
 branch: docs/coevo-kg-ssot-1023
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0bfe09e59c35d59aa9ca7bf9cf418ceb620c2541637c5977847def587999cd93
+reviewed_code_sha256: fba5422f656c54bced5364169b0e7b75a3092f5c96005ffb62add07d02c435d5
 findings_total: 0
 findings_real: 0
 tokens: 0
