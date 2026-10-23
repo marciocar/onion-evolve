@@ -13,13 +13,13 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-22
-    cc_version: "2.1.308"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "0 reprovados (juiz não independente: rodada num fork da sessão), 1 item genérico sem ligação; Aufhebung: SUPERSEDES de 3 nós da r15 (o /chat uma versão atrás, o pin v1.0.257 e a pergunta de prova presa a ele)"
-                            # rodada 16 (2.1.307->2.1.308, uma versão, 1 item). Host, /chat (SDK 0.3.308) e revisor do CI
-                            # (action v1.0.258) na mesma versão pela 1ª vez. Achado: o censo zera scriptPath numa
-                            # worktree (SAC-219). Histórico da r15 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-22-r16/radar-E3-2026-10-22-r16.kg.yaml
+    last_run: 2026-10-23
+    cc_version: "2.1.309"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "juiz independente (opus não-fork): 1 reprovado e 2 exagerados, reescritos com 3 superações; 6 omissões (2 viraram nós); Aufhebung: SUPERSEDES de 2 nós da r16 (a paridade das três superfícies e o censo que zera numa worktree)"
+                            # rodada 17 (2.1.308->2.1.309, uma versão, 79 itens). Host na 2.1.309; /chat (SDK 0.3.308) e
+                            # revisor (v1.0.258) uma atrás (SAC-239). Achados: perna de leitura surda ao sed -i
+                            # (SAC-240), guarda de isolamento por medir (SAC-241). Histórico da r16 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-23-r17/radar-E3-2026-10-23-r17.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
