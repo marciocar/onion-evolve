@@ -2,7 +2,8 @@
 branch: refactor/radar-integrity-contract
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 326d4bfca07e087fb7c39a5bc2e35deb2425b1392d3ee14b55a3785c40ddbb51
+reviewed_code_sha256: 9897e4f5fe0f8c3e7098fec3649f83de9e596ec67942307d6eb9d5b40c048c59
 findings_total: 3
 findings_real: 3
 tokens: 0
