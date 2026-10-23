@@ -265,6 +265,70 @@ nodes:
       locator: "pergunta com opções de 2026-10-22: «Rodar o kg_migrate keys no corpus do core?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
       locality: "pessoa"
+  - id: D_RADAR_CONSOME_INTEGRIDADE_DO_CONTRATO_1023
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «Radar consome o contrato»"
+    label: "O kg-radar-integrity deixa de reimplementar a integridade do grafo e consome o kg_validate --format json; o caminho de máquina fica no core; o trace que não resolve é proposto ao kg-ssot como integridade portátil"
+    narrative: "Selado por /meta:decide em 2026-10-23: escolhida «Radar consome o contrato»; descartadas: «Manter como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «Integridade do grafo: o que o core faz com a sobreposição com o contrato?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      locality: "pessoa"
+  - id: D_KG_QUERY_DIFF_SO_COM_MEDICAO_1023
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «Medir e decidir com números»"
+    label: "A adoção do kg_query e do kg_diff no lugar de grep e awk sobre .kg.yaml só se decide com a medição das linhas cobertas e da latência num hook quente"
+    narrative: "Selado por /meta:decide em 2026-10-23: escolhida «Medir e decidir com números»; descartadas: «Adotar já onde couber» · «Não adotar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «Adotar kg_query e kg_diff onde o core usa grep/awk?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      locality: "pessoa"
+  - id: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «Formalizar leve»"
+    label: "O canal core↔kg-ssot se formaliza leve: bancada do core antes da tag no checklist de release, achado de adotante vira tarefa e nó, fronteira método/harness no Onion e contrato/leitores/armazém no kg-ssot por pin, métricas por release"
+    narrative: "Selado por /meta:decide em 2026-10-23: escolhida «Formalizar leve»; descartadas: «Manter ad hoc»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «Formalizar o canal de aprendizado core ↔ kg-ssot?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      locality: "pessoa"
+  - id: D_LICOES_ADOTANTES_NO_CORE_1023
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «Critérios dos juízes em x_criterion e kg_diff --ignore verified_at nos PRs»"
+    label: "O core traz duas lições dos outros adotantes: os critérios dos juízes (SAC-151) e o A7 passam a x_criterion e x_measured_under depois da 4.21.1, e o ruído de carimbo nos PRs é medido e tratado com kg_diff --ignore verified_at"
+    narrative: "Selado por /meta:decide em 2026-10-23: escolhida «Critérios dos juízes em x_criterion e kg_diff --ignore verified_at nos PRs»; descartadas: «Nenhuma por agora»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «Trazer as lições dos outros adotantes para o core?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      locality: "pessoa"
 edges:
   - from: E_KG_SSOT_419_ADOTADA_1022
     to: Q_KG_MIGRATE_KEYS_NO_CORPUS_1022
@@ -301,4 +365,16 @@ edges:
     edge_type: TRACES_TO
   - from: D_AUDITORIA_CONTINUA_PESQUISA_ANTES_DE_1_2
     to: Q_HUB_1019_ONDA_B_GRAFO_NOS_BUILD_DOCS
+    edge_type: TRACES_TO
+  - from: D_RADAR_CONSOME_INTEGRIDADE_DO_CONTRATO_1023
+    to: E_KG_SSOT_419_ADOTADA_1022
+    edge_type: TRACES_TO
+  - from: D_KG_QUERY_DIFF_SO_COM_MEDICAO_1023
+    to: E_KG_SSOT_419_ADOTADA_1022
+    edge_type: TRACES_TO
+  - from: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    to: E_KG_SSOT_419_ADOTADA_1022
+    edge_type: TRACES_TO
+  - from: D_LICOES_ADOTANTES_NO_CORE_1023
+    to: E_KG_SSOT_419_ADOTADA_1022
     edge_type: TRACES_TO
