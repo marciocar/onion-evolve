@@ -4,7 +4,10 @@ meta:
   baseline: "2026-09-14"
   review_after: "2027-01-12"   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 56 NOS (era 55: +1 pela CLASSE trava-por-binario-externo, medida em 2026-10-20 com o
+  # ═══ TETO: 57 NOS (era 56: +1 pela INSTANCIA C da classe EPIPE-acusa-o-vivo, medida em 2026-10-23:
+  #     o empate HARD 9->9 do caso (e) da kg_backlog era HARD espurio no CONTROLE, vindo de leitor
+  #     que fecha cedo dentro do lint. Cresce por recorrencia medida da mesma classe.)
+  #     (era 55: +1 pela CLASSE trava-por-binario-externo, medida em 2026-10-20 com o
   #     caso (h) da selftest_lanes caindo 3x num dia SO no runner: a imagem trocou o coreutils pelo
   #     uutils e o `mkdir` deixou de ser atomico. Classe nova de bancada, com a mesma assinatura do
   #     EPIPE (verde local, vermelho no CI de 2 nucleos) e causa OUTRA — por isso o no.)
@@ -964,6 +967,24 @@ nodes:
       method: "medição: corrida de reivindicação com o binário real do uutils extraído da imagem ubuntu:26.04 e reprodução do (h) com taskset em 2 núcleos, com e sem carga, sobre main, a branch do #1238, a cura e o mutante; duas passadas adversariais (maquinaria e o artefato mente?)"
       locality: "repo"
 
+  - id: E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: '2026-10-23'
+    verified_against: 'lint INTEIRO do commit 980bdbe3 (a arvore das 2 falhas de 2026-09-03) em 28 sandboxes git, ate 8 concorrentes: controle 8 HARD em 11, 9 em 2, 10 em 1, 8 HARD na serie (2 de 2); mutante 10 em 11, 11 em 1; o par controle 10 x mutante 10 reproduziu a falha do (e). Helper da REGRA 49 de 980bdbe3, 6x25 concorrentes: 4 de 150 execucoes com HARD espurio (1 com 2); o mesmo helper com os 4 leitores trocados por here-string: 0 de 150; o de HEAD: 0 de 150. Matcher de glob na forma antiga (ls-files com grep -q), 4x100 concorrentes: 84 de 400 falsos mortos; capturado em variavel: 0 de 400. Lint de HEAD, 3 controles e 3 mutantes concorrentes: 0 e 2 HARD nos 6'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'INSTANCIA C, e ela responde Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE (fios-abertos): o (e) da kg_backlog nao falhava porque o mutante deixava de contar, e sim porque o CONTROLE ganhava HARD espurio da mesma corrida de EPIPE, so que DENTRO do lint e dos helpers dele, e nao na bancada. A cura de 2026-09-04 trocou 496 vereditos da bancada; o lint de 980bdbe3 ainda tinha 21 sitios `| grep -q`, e dois deles produzem HARD: o matcher de glob da regra path-scoped (`[nenhum glob casa]`, curado no PR #827 em 2026-09-14) e os `printf "$known" | grep -qxF` da REGRA 49 (`[kg-verificacao/NOVO]` e `FUGA-DE-ESCOPO`, curados nas ondas 1 e 2 do EPIPE em 2026-10-19). O espurio no controle empata com o +1 real do mutante e da HARD 9->9. O diagnostico que o (e) imprime e CEGO: ele faz `grep HARD` em linhas `VIOLATION:` que nao carregam a severidade, entao "HARD so-no-mutante: []" sai vazio sempre, e foi essa leitura que sustentou a cura do `edges:` em 2026-09-03.'
+    trace: '.claude/validation/kg-verification-coverage.sh'
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "980bdbe3 l.356/410/413/470 (pipe para grep -q) contra HEAD (here-string); lint-artifacts.sh de 980bdbe3 l.961/963 contra HEAD l.1228-1264; lint-selftest.sh run_kg_backlog_selftests, caso (e), mensagem de FAIL-OPEN"
+      method: "medição: harness em diretório temporário (lint inteiro por sandbox git archive; helper isolado; probe do matcher), serie contra concorrencia, com o liga-desliga feito pela troca do leitor e nada mais"
+      locality: "repo"
+
 edges:
   - from: C_TRAVA_POR_BINARIO_EXTERNO_PERDE_ATOMICIDADE_NA_IMAGEM
     to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
@@ -1133,4 +1154,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_LISTA_4_A_REGRA60_ERA_CEGA_PELO_PROPRIO_VOCABULARIO
     to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    edge_type: SUPPORTS
+  - from: E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT
+    to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
     edge_type: SUPPORTS
