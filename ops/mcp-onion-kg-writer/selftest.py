@@ -111,7 +111,9 @@ import pathlib as _pl
 _ROOT = _pl.Path(HERE).parent
 
 
-def judge(sources, schema=None, should_schema=None, corpus=None, limit=50):
+# cache= (kg-ssot 4.20.0, JudgeCache do kg_store): aceito e IGNORADO de propósito — o julgamento falso conta as
+# chamadas (modo raise-2nd) e cada uma tem de julgar de verdade; repassar o cache esconderia a 2ª chamada.
+def judge(sources, schema=None, should_schema=None, corpus=None, limit=50, cache=None):
     mode = open(os.path.join(HERE, 'mode')).read().strip()
     if mode == 'raise':
         raise RuntimeError('julgamento falso quebrou')
