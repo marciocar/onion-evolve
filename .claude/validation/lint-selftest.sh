@@ -29610,6 +29610,28 @@ run_kg_criterion_ci_selftests() {
   if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" = 1 ]; then record_pass "kg-criterion-ci: (c) sha declarado errado REPROVA (rc 1)"
   else record_fail "kg-criterion-ci: (c) sha declarado errado" "rc=${rc}"; fi
+  # (f)–(h) critério MALFORMADO (kg-ssot 4.21.1, integrity.criterion-malformed): a 4.21.0 deixava os três calados
+  #     (criterios=0, rc 0). Cada um grava o grafo cru, sem passar pelo _kgc_graph.
+  _kgc_raw() { printf '%s\n' "$@" > "${sb}/docs/g/b.kg.yaml"; (cd "${sb}" && git add -A >/dev/null 2>&1); }
+  local _hd='meta:' _t='  title: "bancada"' _n='nodes:' _i='  - id: K_REGUA_V1' _y='    node_type: rule' _s='    status: confirmed' _l='    label: "régua"'
+  # (f) sha256 SEM aspas e só com dígitos: o YAML o lê como inteiro
+  _kgc_raw "${_hd}" "${_t}" "${_n}" "${_i}" "${_y}" "${_s}" "${_l}" '    x_criterion:' '      id: REGUA' '      version: "1"' \
+    '      registered_at: "2026-10-23"' "      sha256: $(printf '%064d' 7)" '      ref: crit/regua.tsv' 'edges: []'
+  if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'integrity.criterion-malformed' <<< "${out}"; then record_pass "kg-criterion-ci: (f) sha256 numérico (sem aspas) REPROVA (rc 1, criterion-malformed)"
+  else record_fail "kg-criterion-ci: (f) sha256 numérico" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (g) x_criterion que não é mapa
+  _kgc_raw "${_hd}" "${_t}" "${_n}" "${_i}" "${_y}" "${_s}" "${_l}" '    x_criterion: "REGUA v1"' 'edges: []'
+  if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'integrity.criterion-malformed' <<< "${out}"; then record_pass "kg-criterion-ci: (g) x_criterion que não é mapa REPROVA (rc 1, criterion-malformed)"
+  else record_fail "kg-criterion-ci: (g) x_criterion não-mapa" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (h) ref E text juntos (tem de ser exatamente um dos dois)
+  _kgc_raw "${_hd}" "${_t}" "${_n}" "${_i}" "${_y}" "${_s}" "${_l}" '    x_criterion:' '      id: REGUA' '      version: "1"' \
+    '      registered_at: "2026-10-23"' "      sha256: \"${sha}\"" '      ref: crit/regua.tsv' '      text: "regra A"' 'edges: []'
+  if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'integrity.criterion-malformed' <<< "${out}"; then record_pass "kg-criterion-ci: (h) ref e text juntos REPROVA (rc 1, criterion-malformed)"
+  else record_fail "kg-criterion-ci: (h) ref e text juntos" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  unset -f _kgc_raw
   # (d) fail-closed: sem o vendor não julga (rc 2), nunca verde
   rm -rf "${sb}/vendor"
   if out="$(cd "${sb}" && bash "${sut}" 2>&1)"; then rc=0; else rc=$?; fi

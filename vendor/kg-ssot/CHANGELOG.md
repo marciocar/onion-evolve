@@ -10,6 +10,19 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.21.1] - 2026-10-23
+
+`kg_criterion.py check` reports what it cannot check instead of skipping it. Contract v4.12, unchanged.
+
+### Fixed
+
+- **`kg_criterion.py check` no longer skips a criterion it cannot check.** A `sha256` of digits alone without quotes
+  reads as a number in YAML, and the version left the check with rc 0 and no finding. Now a version whose `sha256` is
+  not text, or that lacks exactly one of `ref` and `text` in text, an `x_measured_under` that is not a map with a list
+  of citation maps, and a citation of another graph whose `sha256` is not text (even when that graph was not given)
+  come out as `integrity.criterion-malformed`, with rc 1. The reader already warned about the type
+  (`form.type`); only the check passed in silence. Found by an adopter's test bench.
+
 ## [4.21.0] - 2026-10-23
 
 A yardstick fixed before the data becomes part of the contract, and an adopter's own `x_` keys move into the

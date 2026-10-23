@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.21.0",
+  "release": "kg-ssot-v4.21.1",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -868,7 +868,12 @@ python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
   - `integrity.criterion-digest` when the `sha256` does not match;
   - `integrity.criterion-ref-unreadable` when the file, the fragment, or a value does not read: a JSON NaN, an integer
     beyond ±(2^53−1), a repeated key, a YAML map key that is not text, or a path that is not a regular file or is
-    larger than 64 MiB.
+    larger than 64 MiB;
+  - `integrity.criterion-malformed` when the version cannot be checked: the `sha256` is not text (a hash of digits
+    alone, without quotes, reads as a number), or there is not exactly one of `ref` and `text`, in text. An
+    `x_measured_under` that is not a map with a list of citation maps, and a citation of another graph whose `sha256`
+    is not text (even when that graph was not given), come out the same way. Since 4.21.1; before, the check skipped
+    them.
 - **Citations of another graph.** `check` also follows each `<path>#<id>` citation in an `x_measured_under`, with the
   same rule as the reader: `integrity.criterion-unknown`, `integrity.criterion-sha-mismatch`,
   `integrity.measured-post-hoc`, and `integrity.measured-order-unknown`.

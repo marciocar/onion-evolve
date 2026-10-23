@@ -6,7 +6,7 @@ KG-SSOT is a **verifiable knowledge graph** in a plain text file. Each claim can
 verified, and what it was verified against. A formal contract decides whether the file is well formed. This manual
 covers the `.kg.yaml` format, the contract, the tools, and how to adopt KG-SSOT in a repository.
 
-This manual describes release **4.21.0** (tag `kg-ssot-v4.21.0`). The current contract in this release is **v4**.
+This manual describes release **4.21.1** (tag `kg-ssot-v4.21.1`). The current contract in this release is **v4**.
 
 The manual is also available in Brazilian Portuguese, in [`docs/manual/pt-BR/`](pt-BR/README.md). When the two
 differ, the English text wins.

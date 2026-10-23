@@ -1540,6 +1540,10 @@ MESSAGES = {
     "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
     "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
                                           "a value with no JSON form.",
+    "integrity.criterion-malformed": "The criterion version, or a result's citation of it, cannot be checked: the "
+                                     "version is not a map, its sha256 is not text, or it lacks exactly one of ref and "
+                                     "text in text; or x_measured_under is not a map with a list of citation maps, or "
+                                     "a citation of another graph has a sha256 that is not text.",
     "yaml.unquoted-date": "A date has no quotes; different YAML readers read it in different ways.",
     "yaml.forbidden-key-on": "The edge uses the key on, which is forbidden (in YAML 1.1 it becomes the boolean True).",
     "yaml.unsafe-integer": "An integer is outside ±(2^53−1); a JS reader (double) loses its exact value.",
@@ -1589,6 +1593,8 @@ HINTS = {
                                   "kg_criterion.py digest prints.",
     "integrity.criterion-ref-unreadable": "Point ref to a file under the root; a fragment is a JSON Pointer (/a/0) or "
                                           "the id of a list item, in a .json, .yaml, or .yml file.",
+    "integrity.criterion-malformed": "Quote the sha256 (a hash of digits alone reads as a number) and give exactly one of "
+                                     "ref and text, in text.",
     "integrity.measured-order-unknown": "Give registered_at and measured_at a time with a time zone (RFC 3339).",
     "form.required.node.provenance": "Add provenance with source, locator, and method; with no recoverable source, "
                                      "change the status to unverifiable.",

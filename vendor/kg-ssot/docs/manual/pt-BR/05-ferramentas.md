@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:341bba3f6ca0ace9 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:0899b60f0b61d968 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.21.0",
+  "release": "kg-ssot-v4.21.1",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -859,7 +859,11 @@ python3 -I -B vendor/kg-ssot/tools/kg_criterion.py check --root .
   - `integrity.criterion-digest` quando o `sha256` não bate;
   - `integrity.criterion-ref-unreadable` quando o arquivo, o fragmento ou um valor não se lê: um NaN no JSON, um
     inteiro além de ±(2^53−1), uma chave repetida, uma chave de mapa YAML que não é texto, ou um caminho que não é
-    arquivo comum ou passa de 64 MiB.
+    arquivo comum ou passa de 64 MiB;
+  - `integrity.criterion-malformed` quando a versão não se confere: o `sha256` não é texto (um hash só de dígitos, sem
+    aspas, vira número), ou não há exatamente um de `ref` e `text`, em texto. O `x_measured_under` que não é um mapa com
+    uma lista de citações em mapa, e a citação de outro grafo cujo `sha256` não é texto (mesmo quando esse grafo não foi
+    dado), saem do mesmo jeito. Desde a 4.21.1; antes, o check os pulava.
 - **Citações de outro grafo.** O `check` segue também cada citação `<caminho>#<id>` de um `x_measured_under`, pela
   mesma regra do leitor: `integrity.criterion-unknown`, `integrity.criterion-sha-mismatch`,
   `integrity.measured-post-hoc` e `integrity.measured-order-unknown`.
