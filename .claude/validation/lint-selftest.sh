@@ -18395,6 +18395,46 @@ run_kg_radar_integrity_selftests() {
     record_pass "kg-integridade: (l) trace único + 'trace:' dentro de texto em bloco → silêncio"
   else record_fail "kg-integridade: (l)" "falso-positivo com texto em bloco: ${out}"; fi
   rm -rf "$d"
+
+  # (m)–(p) CAMINHO DO CONTRATO (D_RADAR_CONSOME_INTEGRIDADE_DO_CONTRATO_1023). Os casos acima rodam num
+  #     sandbox SEM vendor, logo exercitam o radar próprio (o caminho de quem não tem o leitor). Aqui o
+  #     vendor está ao lado e a integridade vem dos códigos do kg_validate.
+  if [ ! -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" ]; then
+    record_skip "kg-integridade: (m)-(p) vendor/kg-ssot ausente neste repo → caminho do contrato não exercitável"
+    return
+  fi
+  _mkiv() { _mki "$1" "$2"; mkdir -p "$1/vendor"; cp -r "${REPO_ROOT}/vendor/kg-ssot" "$1/vendor/kg-ssot"; }
+  # (m) contraditório → HARD pelo CONTRATO (refutes-unreconciled, SHOULD lá, escalado aqui: a casa é mais rígida)
+  d="$(mktemp -d)"; _mkiv "$d" contraditorio
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  hum="$(bash "${helper}" "$d" 2>/dev/null || true)"
+  if grep -q '^HARD.*CONTRADICAO.*integrity.refutes-unreconciled' <<< "${out}" && grep -q 'lida do contrato KG-SSOT' <<< "${hum}"; then
+    record_pass "kg-integridade: (m) com o vendor, a contradição vem do contrato (refutes-unreconciled escalado a HARD) e a saída o declara"
+  else record_fail "kg-integridade: (m)" "caminho do contrato não reprovou ou não se declarou: ${out} / ${hum}"; fi
+  # (o) MUTANTE: sem a escalada, o mesmo grafo passaria — prova que a escalada sustenta a catraca
+  local mut="$d/mut-integrity.sh"
+  sed 's/^ESCALATE = {"integrity.refutes-unreconciled"}/ESCALATE = set()/' "${helper}" > "${mut}"
+  if cmp -s "${helper}" "${mut}"; then record_fail "kg-integridade: (o)" "âncora do mutante não casou (ESCALATE)"
+  else
+    out="$(cd "$d" && bash "${mut}" "$d" --format tsv 2>/dev/null || true)"
+    if ! grep -q '^HARD' <<< "${out}"; then record_pass "kg-integridade: (o) mutante sem a escalada deixa a contradição passar (a escalada é carga, não enfeite)"
+    else record_fail "kg-integridade: (o)" "mutante sobreviveu: ${out}"; fi
+  fi
+  rm -rf "$d"
+  # (n) reconciliado → silêncio também pelo contrato (não reprova sempre)
+  d="$(mktemp -d)"; _mkiv "$d" sao
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then record_pass "kg-integridade: (n) com o vendor, grafo reconciliado → silêncio"
+  else record_fail "kg-integridade: (n)" "falso-positivo pelo contrato: ${out}"; fi
+  rm -rf "$d"
+  # (p) leitor indisponível → o radar próprio, declarado, e a MESMA régua (contradição segue HARD)
+  d="$(mktemp -d)"; _mkiv "$d" contraditorio
+  out="$(ONION_KG_INTEGRITY_VALIDATOR=/nao/existe bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  hum="$(ONION_KG_INTEGRITY_VALIDATOR=/nao/existe bash "${helper}" "$d" 2>/dev/null || true)"
+  if grep -q '^HARD.*CONTRADICAO' <<< "${out}" && grep -q 'leitor do contrato indisponível' <<< "${hum}"; then
+    record_pass "kg-integridade: (p) sem o leitor, o radar próprio reprova igual e a saída declara a troca"
+  else record_fail "kg-integridade: (p)" "fallback não reprovou ou não se declarou: ${out} / ${hum}"; fi
+  rm -rf "$d"
 }
 
 run_kg_census_parity_selftests() {
