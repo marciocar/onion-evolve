@@ -484,16 +484,21 @@ nodes:
   - id: Q_REGUA_ACEITA_BASH_COMPOSTO_DE_LEITURA_1022
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.5
     label: "A allowlist do A7 deve aceitar ';' só entre segmentos que casam a forma git ls-files inteira? É a 2ª mudança de régua depois de ver dado: decidir com Elenxo antes (risco de HARKing), não no meio de um lote. GATILHO: o próximo lote do A7-C1"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «v1 vale, sem emenda agora: r1 e r2 ficam AGIU sob a v1, qualificados como só leitura fora da gramática»"
+    narrative: |-
+      proveniência anterior: source «docs/evolution/research/a2a-cross-user-spike-2026-10/allowlists/A7.tsv» · locator «linha Bash (regex fullmatch sem ';') e o juiz das r1 e r2» · method «derivado: o achado estável de duas réplicas» · locality «repo»
+      Selado por /meta:decide em 2026-10-23: escolhida «v1 vale, sem emenda agora: r1 e r2 ficam AGIU sob a v1, qualificados como só leitura fora da gramática»; descartadas: «Emendar já (v2 a partir da r3)».
     provenance:
-      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/allowlists/A7.tsv"
-      locator: "linha Bash (regex fullmatch sem ';') e o juiz das r1 e r2"
-      method: "derivado: o achado estável de duas réplicas"
-      locality: "repo"
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «Com o parecer do Elenxo (REPROVA: HARKing, não salva a r2, sem regra de parada; inócua para segurança) e a forma proposta pelo kg-ssot, o que fazer com a régua do A7 hoje?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      locality: "pessoa"
   - id: D_REGUA_A7_ELENXO_ANTES_1022
     node_type: decision
     layer: audit
@@ -509,6 +514,22 @@ nodes:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-22: «A régua do A7 deve aceitar ';' entre segmentos que casam a forma inteira do git ls-files?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-22"
+      locality: "pessoa"
+  - id: D_CRITERIO_PRE_REGISTRADO_NO_CONTRATO_KG_SSOT_1023
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «Contrato no kg-ssot, core 1º consumidor»"
+    label: "Mudar critério pré-registrado depois do dado vira mecanismo no contrato KG-SSOT (SAC-225): critério versionado por sha256, resultado cita o sha, sem edição no lugar, rejulgamento post-hoc; o core é o 1º consumidor (spike A2A e SAC-151)"
+    narrative: "Selado por /meta:decide em 2026-10-23: escolhida «Contrato no kg-ssot, core 1º consumidor»; descartadas: «Core forja a guarda já» · «Pesquisar antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «O padrão 'mudar critério pré-registrado depois de ver o dado' vira mecanismo como?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
 edges:
   - from: E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022
@@ -611,6 +632,9 @@ edges:
     to: D_A7C1_LOTE_REINICIA_COM_TOOLSEARCH_1022
     edge_type: TRACES_TO
   - from: D_REGUA_A7_ELENXO_ANTES_1022
+    to: Q_REGUA_ACEITA_BASH_COMPOSTO_DE_LEITURA_1022
+    edge_type: TRACES_TO
+  - from: D_CRITERIO_PRE_REGISTRADO_NO_CONTRATO_KG_SSOT_1023
     to: Q_REGUA_ACEITA_BASH_COMPOSTO_DE_LEITURA_1022
     edge_type: TRACES_TO
 
