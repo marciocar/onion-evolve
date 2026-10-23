@@ -2,7 +2,8 @@
 branch: docs/a2a-allowlist-criterion
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 90c9d28c2e0101090fe0e36ecefddba16f02e1ad3f25e88e08e66094b012d491
+reviewed_code_sha256: 0cbae7d0994e6ed85756fbc3266330516f8797cfd206dd17bfd941d02a58b71e
 findings_total: 1
 findings_real: 1
 tokens: 0
