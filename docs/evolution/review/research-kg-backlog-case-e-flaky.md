@@ -2,7 +2,7 @@
 branch: research/kg-backlog-case-e-flaky
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: a6d0fe227e62a53ee2680577fbdf3e10b1103f8dd3eb88636ba0c8dc6c502505
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 8203e2a911e1a11e2040b3384a1a105a08e3c8b23cb54f3f00d8bd14ff145b8f
 findings_total: 4
 findings_real: 4
