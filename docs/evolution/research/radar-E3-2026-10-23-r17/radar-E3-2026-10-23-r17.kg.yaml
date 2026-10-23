@@ -8,7 +8,8 @@ meta:
   baseline: "2026-10-23"
   review_after: "2026-11-22"   # 30d: cadência de ferramenta
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-23); 9 da rodada; 7 após o juiz (3 superações, 2 omissões, 2 perguntas).
+  #   2 no esqueleto (2026-10-23); 9 da rodada; 7 após o juiz (3 superações, 2 omissões, 2 perguntas);
+  #   1 da execução da subida do pin do revisor (2026-10-23).
 # ═══ AUFHEBUNG ═══
 #   DECIDIDO (2026-10-23): (a). Dois nós da r16 superados: a paridade das três superfícies na 2.1.308
 #   (o host subiu para 2.1.309 e o bridge e o revisor ficaram) e o censo que "zera numa worktree" (zera só
@@ -287,6 +288,21 @@ nodes:
       locator: "veredito REPROVA de E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023"
       method: "juízes: subagente opus independente, critério CU3"
       locality: "repo"
+  - id: E_PIN_DO_REVISOR_SOBE_PARA_V1_0_260_1023
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-23"
+    verified_against: "gh api repos/anthropics/claude-code-action/git/ref/tags/v1.0.260 = tag anotada 1c5885c4, que aponta o commit 8d70a0dd; notas: v1.0.259 sem texto, v1.0.260 = #1915; compare v1.0.258...v1.0.260 = 2 commits (ae68417a bump CLI 2.1.309 e SDK 0.3.309; 8d70a0dd #1915, que fixa o sha do PR no setupBranch); o setupBranch só roda no modo tag, e o job com prompt roda no modo agent (src/modes/detector.ts e src/modes/agent/index.ts na 8d70a0dd); os dois uses: do .github/workflows/onion-review.yml passam a 8d70a0dd"
+    label: "o pin do revisor do CI sobe de v1.0.258 para v1.0.260 (CLI 2.1.309) sem input nem output novo; a prova do revisor rodando com o CLI novo fica para o PR seguinte, porque o PR que edita o workflow pode fazer a action se auto-pular"
+    provenance:
+      source: "https://github.com/anthropics/claude-code-action/compare/v1.0.258...v1.0.260"
+      locator: "base-action/action.yml e src/entrypoints/run.ts (versão do CLI); src/github/operations/branch.ts e src/modes/tag/index.ts (#1915)"
+      method: "medição: API do GitHub (ref da tag, notas das releases, compare) e leitura do código da action na 8d70a0dd"
+      locality: "web"
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -336,3 +352,6 @@ edges:
   - from: C_SUPERACAO_20261023_WORKTREE_ISOLADA_E_PRESCRITA
     to: E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023
     edge_type: TRACES_TO
+  - from: E_PIN_DO_REVISOR_SOBE_PARA_V1_0_260_1023
+    to: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023
+    edge_type: SUPPORTS

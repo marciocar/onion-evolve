@@ -274,6 +274,10 @@ jobs:
         # ("bump Claude Code to 2.1.307 and Agent SDK to 0.3.307"), nos mesmos 6 arquivos, sem input nem output novo.
         # SUBIDO para v1.0.258 (6b6870e6; a tag anotada é cb4685f8) em 2026-10-22, pelo mesmo aviso: 1 commit só
         # ("bump Claude Code to 2.1.308 and Agent SDK to 0.3.308"), nos mesmos 6 arquivos, sem input nem output novo.
+        # SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
+        # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
+        # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
+        # roda no modo agent, que não chama o setupBranch. Nenhum input nem output usado aqui muda.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
         # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
@@ -281,7 +285,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@6b6870e649b5ff408753befeaee5fc7989d4e6a9
+        uses: anthropics/claude-code-action@8d70a0dd265122bd65b8e09d3d959e65373ae2a1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -412,6 +416,10 @@ jobs:
         # ("bump Claude Code to 2.1.307 and Agent SDK to 0.3.307"), nos mesmos 6 arquivos, sem input nem output novo.
         # SUBIDO para v1.0.258 (6b6870e6; a tag anotada é cb4685f8) em 2026-10-22, pelo mesmo aviso: 1 commit só
         # ("bump Claude Code to 2.1.308 and Agent SDK to 0.3.308"), nos mesmos 6 arquivos, sem input nem output novo.
+        # SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
+        # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
+        # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
+        # roda no modo agent, que não chama o setupBranch. Nenhum input nem output usado aqui muda.
         # ⚠️ Nota epistêmica, porque este comentário já mentiu duas vezes: "o pin curou" (07-18)
         # e "sobra o eixo action-no-runner" (08-03) foram as duas conclusões erradas escritas
         # AQUI com confiança. Ambas caíram por medição. Não reescreva causa neste bloco sem
@@ -419,7 +427,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@6b6870e649b5ff408753befeaee5fc7989d4e6a9
+        uses: anthropics/claude-code-action@8d70a0dd265122bd65b8e09d3d959e65373ae2a1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
