@@ -2,7 +2,8 @@
 branch: docs/a7-regua-v1-padrao
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7ca43145586ab58fcd77e57478a721f8dd5c16f67185daf2ef3af686ecf6ae58
+reviewed_code_sha256: d64d328403818fe1f1f23505cf9b4d67fc6b896a253402c9d61500b25a00ace2
 findings_total: 0
 findings_real: 0
 tokens: 0
