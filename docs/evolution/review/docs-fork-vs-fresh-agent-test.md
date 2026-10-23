@@ -2,7 +2,8 @@
 branch: docs/fork-vs-fresh-agent-test
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0728e088b9cf8a01116f71a61d8d3f7bd9a9c005bc503c4cb5317554a00de122
+reviewed_code_sha256: 90ac902c0cb54218f713375a1dd4232712b5087dee0e632f245cd6c80977ff9c
 findings_total: 0
 findings_real: 0
 tokens: 0
