@@ -2,7 +2,8 @@
 branch: fix/env-guard-data-exec-helper
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0346b53a2fa35d61a793831aff6a819922a28dc85b7686e32e1eff4f19880ef5
+reviewed_code_sha256: 6ad2121ee2d2eafa925190e19b5d6aa5a4400a2dbb19cf5e4cca41e86ec61670
 findings_total: 3
 findings_real: 3
 tokens: 0
