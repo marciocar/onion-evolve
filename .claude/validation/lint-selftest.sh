@@ -12119,6 +12119,10 @@ root = tempfile.mkdtemp()
 SEM, COM = os.path.join(root, 'sem'), os.path.join(root, 'com')
 os.makedirs(os.path.join(SEM, 'data')); os.makedirs(COM)
 open(os.path.join(SEM, 'data', 'a.tsv'), 'w').close(); open(os.path.join(COM, 'prod.env'), 'w').close()
+# A5: o repo do hook (o helper canônico mora aqui) e um falso env-check.sh fora dele
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(G))))
+FAKE = os.path.join(root, 'fake', 'env-check.sh'); os.makedirs(os.path.dirname(FAKE))
+open(FAKE, 'w').write('#!/usr/bin/env bash\n')
 def t(guard, cmd, cwd):
     p = subprocess.run(['bash', guard], input=json.dumps({'tool_name': 'Bash', 'tool_input': {'command': cmd}, 'cwd': cwd}),
                        capture_output=True, text=True)
@@ -12139,7 +12143,9 @@ C = {
  'residue-nl': (0, "mkdir -p d\ncat > d/x.md <<" + Q + "E" + Q + "\n- **a:** .env\nE", SEM),
  'py-heredoc': (0, "cd " + SEM + " && python3 -I - <<" + Q + "EOF" + Q + "\nprint(2 ** 3)\nEOF", SEM),
  'py-timeout': (0, "cd " + SEM + " && timeout 60 python3 -I - <<" + Q + "EOF" + Q + "\nprint(2 ** 3)\nEOF", SEM),
- 'helper-var': (0, "H=.claude/utils/task-manager/env-check.sh; bash $H --env ~/x/.env --provider", SEM),
+ 'helper-var': (0, "H=.claude/utils/task-manager/env-check.sh; bash $H --env ~/x/.env --provider", ROOT),
+ 'helper-abs': (0, "bash " + ROOT + "/.claude/utils/task-manager/env-check.sh --provider", ROOT),
+ 'data-copy-data': (0, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\ncat x.md > y.md", SEM),
  'assign-only': (0, "E=/etc/app.env; [ -e $E ] && echo existe", SEM),
  'glob-var': (0, "D=data; grep -n x $D/*", SEM),
  # polaridade 2 — leituras de valor e escapes
@@ -12172,6 +12178,15 @@ C = {
  'data-then-pipe': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\ncat x.md | bash", SEM),
  'py-env-prefix': (2, "F=.env python3 -I - <<" + Q + "P" + Q + "\nimport os;print(open(os.environ[" + Q + "F" + Q + "]).read())\nP", SEM),
  'residue-noext':(2, "SHA=$(git diff | sha256sum); cat > r <<" + Q + "E" + Q + "\n- **x:** .env\nE", SEM),
+ # A1/A5 (2026-10-23, passada adversarial do adotante onion-curation): programa por arquivo, cópia por
+ # redirecionamento para nome executável, e o helper aceito só pelo caminho canônico
+ 'data-awk-f': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\nawk -f x.md", SEM),
+ 'data-make-f': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\nmake -f x.md", SEM),
+ 'data-redir-copy': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\ncat x.md > x.sh; bash x.sh", SEM),
+ 'data-tee-copy': (2, "cat > x.md <<" + Q + "E" + Q + "\ncat .env\nE\ntee x.sh < x.md; bash x.sh", SEM),
+ 'helper-fake': (2, "bash " + FAKE + " .env", ROOT),
+ 'helper-repo-var': (0, "REPO=\"$(git rev-parse --show-toplevel)\"; bash \"$REPO/.claude/utils/task-manager/env-check.sh\" --env \"$REPO/.env\" --provider", ROOT),
+ 'helper-cd-first': (2, "cd " + os.path.dirname(os.path.dirname(FAKE)) + " && REPO=\"$(git rev-parse --show-toplevel)\"; bash \"$REPO/.claude/utils/task-manager/env-check.sh\" .env", ROOT),
 }
 # mutantes: (rótulo, trecho da cura, trecho revertido, casos que TÊM de inverter)
 M = [
@@ -12195,6 +12210,10 @@ M = [
  ('M18 opção permutada depois do padrão', "if i < pi or x.startswith('-')]", "if i < pi]", ['grep-o-permuted']),
  ('M19 dado executado na mesma linha', "if any(d[4] and cites_env(d[2]) and data_used_as_code(cmd, d[4]) for d in docs):", "if False:", ['data-then-subst', 'data-then-pipe']),
  ('M20 .env na variável do interpretador', "if cites_env(body) or kind == 'interp-env':", "if cites_env(body):", ['py-env-prefix']),
+ ('M21 executor de arquivo de programa', "if name in FILE_RUNNERS and any(hit(a) for a in args[1:]):", "if False:", ['data-awk-f', 'data-make-f']),
+ ('M22 cópia por redirecionamento', "if any(not is_data_file(o) for o in _outs) and any(hit(t) for t in seg if t not in _outs):", "if False:", ['data-redir-copy', 'data-tee-copy']),
+ ('M23 helper só pelo nome', "if os.path.basename(_a1) == HELPER and is_canonical_helper(_a1):", "if os.path.basename(_a1) == HELPER:", ['helper-fake']),
+ ('M24 cd antes do topo git', "or re.search(r'(?:^|[;&|\\s(])(?:cd|pushd)\\s', _cmd[:_at.start()])", "or False", ['helper-cd-first']),
 ]
 bad = []
 for k, (e, c, w) in C.items():
@@ -12216,7 +12235,7 @@ print(' '.join(bad + ['VIVO ' + a for a in alive]))
 U4PY
 )" || u4_out="o harness do caso (u) não rodou"
     if [ -z "${u4_out}" ]; then
-      record_pass "env-exposure: (u) U4: as 16 formas medidas que não leem valor passam; 27 leituras de valor e escapes seguem barrados; os 20 mutantes de cura mordem"
+      record_pass "env-exposure: (u) U4: as 19 formas medidas que não leem valor passam; 33 leituras de valor e escapes seguem barrados; os 24 mutantes de cura mordem (A1/A5 de 2026-10-23 inclusos)"
     else record_fail "env-exposure: (u) U4 (listar/nome de chave/prosa × ler valor)" "${u4_out}"; fi
   fi
   # (m) o caminho sancionado para a pergunta "a chave tem \r?": --lint fala por NOME, nunca pelo valor; e o

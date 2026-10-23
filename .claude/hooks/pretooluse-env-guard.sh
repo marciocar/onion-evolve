@@ -196,6 +196,45 @@ INTERP = {'python', 'python3', 'node', 'ruby', 'perl', 'php', 'deno', 'bun'}
 DUMPERS = {'env', 'printenv'}
 VALUE_FLAGS = {'--exclude', '--exclude-dir', '--env-file', '-e', '--regexp', '-f'}   # o valor seguinte não é arquivo lido
 HELPER = 'env-check.sh'
+HELPER_REL = os.path.join('.claude', 'utils', 'task-manager', HELPER)
+
+def is_canonical_helper(path):
+    """A5 (2026-10-23): o nome sozinho não basta — qualquer arquivo chamado env-check.sh, em qualquer pasta, era
+    aceito como o helper. Só vale o helper do repo do hook (ONION_GUARD_ROOT) ou do topo git do cwd da sessão,
+    por realpath (symlink para fora não engana), e ele tem de existir."""
+    base = CTX.get('base') or os.getcwd()
+    p0 = path.strip().strip('"\'')
+    # a forma documentada (recover.md): REPO="$(git rev-parse --show-toplevel)" e `bash "$REPO/.claude/…/env-check.sh"`.
+    # Vale só se a MESMA linha atribui a variável ao topo git e não muda de pasta antes da atribuição; o caminho
+    # então é o do topo git do cwd da sessão, conferido abaixo.
+    _mv = re.match(r'^\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?/(.+)$', p0)
+    if _mv:
+        _cmd = RAW.get('cmd', '')
+        _at = re.search(r'(?<![A-Za-z0-9_])' + _mv.group(1) + r'="?\$\(git rev-parse --show-toplevel', _cmd)
+        if not _at or _mv.group(2) != HELPER_REL or re.search(r'(?:^|[;&|\s(])(?:cd|pushd)\s', _cmd[:_at.start()]):
+            return False
+        try:
+            import subprocess
+            _t = subprocess.run(['git', '-C', base, 'rev-parse', '--show-toplevel'], capture_output=True, text=True, timeout=3)
+        except Exception:
+            return False
+        if _t.returncode != 0:
+            return False
+        p0 = os.path.join(_t.stdout.strip(), HELPER_REL)
+    try:
+        rp = os.path.realpath(os.path.join(base, os.path.expanduser(p0)))
+    except Exception:
+        return False
+    if not os.path.isfile(rp):
+        return False
+    roots = [os.environ.get('ONION_GUARD_ROOT') or '']
+    try:
+        import subprocess
+        _t = subprocess.run(['git', '-C', base, 'rev-parse', '--show-toplevel'], capture_output=True, text=True, timeout=3)
+        roots.append(_t.stdout.strip() if _t.returncode == 0 else '')
+    except Exception:
+        pass
+    return any(r and rp == os.path.realpath(os.path.join(r, HELPER_REL)) for r in roots)
 # SAC-149 (2026-10-15, medido no --update de um adotante): um grep cujo PADRÃO era a regex dos nomes de hook (pasta
 # de hooks seguida de `[A-Za-z0-9_.-]*`), numa linha que também rodava `test -f .env`,
 # era vetado. O `.env` literal da linha liga o modo estrito, e o veto julgava o PADRÃO do grep como um glob que
@@ -715,6 +754,13 @@ def judge_heredocs(docs, depth):
 # separadas o vetor já existia: a ferramenta Write grava qualquer script — é a fronteira declarada no topo.
 RENAMERS = {'mv', 'cp', 'ln', 'install', 'rename', 'chmod'}
 CODE_RUNNERS = SHELLS | INTERP | {'eval', 'source', '.', 'exec'}
+# A1 (2026-10-23, passada adversarial do adotante onion-curation, provada com segredo falso): o arquivo de dados
+# também vira programa por quem lê um ARQUIVO DE PROGRAMA (`awk -f r.md`, `make -f r.md`, `sed -f`, `m4`, que
+# tem syscmd) e por CÓPIA via redirecionamento para um nome não-dados (`cat r.md > r.sh; bash r.sh`,
+# `tee r.sh < r.md`). Nesta linha (heredoc de dados citando o arquivo de segredos), qualquer menção ao arquivo
+# nesses executores, ou um redirecionamento de saída para arquivo não-dados no segmento que o menciona, é barrado.
+FILE_RUNNERS = {'awk', 'gawk', 'mawk', 'nawk', 'make', 'gmake', 'bmake', 'sed', 'gsed', 'm4'}
+OUT_REDIRS = {'>', '>>', '>|', '&>', '&>>'}
 
 def _mentions(text, ref):
     if ref.startswith('$'):
@@ -741,6 +787,15 @@ def data_used_as_code(cmd, refs):
         name = os.path.basename(args[0])
         hit = lambda t: any(_mentions(t, r) for r in refs)
         if name in RENAMERS and any(hit(a) for a in args[1:]):
+            return True
+        if name in FILE_RUNNERS and any(hit(a) for a in args[1:]):
+            return True
+        # o próprio arquivo de dados como destino é o heredoc gravando a si mesmo (`cat > x.md`), não cópia
+        _outs = [seg[i + 1] for i in range(len(seg) - 1) if seg[i] in OUT_REDIRS]
+        if name == 'tee':
+            _outs += [a for a in args[1:] if not a.startswith('-')]
+        _outs = [o for o in _outs if not hit(o)]
+        if any(not is_data_file(o) for o in _outs) and any(hit(t) for t in seg if t not in _outs):
             return True
         if name in CODE_RUNNERS:
             if name == 'eval' and any(hit(a) for a in args[1:]):
@@ -844,7 +899,7 @@ def judge(cmd, depth=0):
             _m1 = re.match(r'^\$\{?([A-Za-z_][A-Za-z0-9_]*)\}?$', _a1)
             if _m1 and _m1.group(1) in assigned:
                 _a1 = assigned[_m1.group(1)]
-            if os.path.basename(_a1) == HELPER:
+            if os.path.basename(_a1) == HELPER and is_canonical_helper(_a1):
                 continue
             if '<<<' in seg:
                 k = seg.index('<<<')
@@ -920,7 +975,7 @@ elif tool == 'Bash':
 print(reason or '')
 PY
 )
-out="$(printf '%s' "$input" | python3 -c "$GUARD_PY")" || out="o analisador do veto falhou — fechado por segurança"
+out="$(printf '%s' "$input" | ONION_GUARD_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." 2>/dev/null && pwd)" python3 -c "$GUARD_PY")" || out="o analisador do veto falhou — fechado por segurança"
 [ -z "${out}" ] && exit 0
 echo "GUARDA-PRETOOLUSE (.env): ${out} — o conteúdo do .env (os segredos) entraria no contexto e no transcript. Use: 'bash .claude/utils/task-manager/env-check.sh --provider|--check|--get <CHAVE-NÃO-SECRETA>', ou carregue no ambiente com 'set -a; source .env; set +a'. Se precisar ver o arquivo, o maestro o abre fora da sessão." >&2
 exit 2

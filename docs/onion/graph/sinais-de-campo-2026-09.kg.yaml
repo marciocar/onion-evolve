@@ -403,10 +403,31 @@ nodes:
     label: "Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4.22 por agente novo contra os forks #1302, #1306, #1316 e #1317) e selar ou refutar (Linear SAC-237)"
     narrative: "Gatilho: a próxima tarefa de execução sem dependência do histórico (a adoção da kg-ssot 4.22 é o 1º par). Medir por agente: tokens, duração, retomadas, CI reprovado e achados da passada adversarial. Ponto de partida, de 2026-10-22/23, não comparável por ser de tarefas diferentes: forks de execução de ~400k a ~810k tokens; agentes novos de ~114k (Elenxo do A7) e ~131k (pesquisa de nomes canônicos). Fecha com 3 pares medidos."
 
+  - id: E_ENV_GUARD_A1_A5_CURADOS_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "hook com o JSON do PreToolUse na main de 2026-10-23: heredoc de dados citando o arquivo de segredos seguido de `awk -f`, `gawk -f`, `make -f`, `sed -f`, `cat r.md > r.sh; bash r.sh` e `tee r.sh < r.md` davam rc 0, e `bash ⟨pasta fora do repo⟩/env-check.sh` com o arquivo de segredos também; com a cura, rc 2 nos sete, e o helper canônico (relativo, absoluto e por REPO do topo git) segue rc 0; caso (u) da família env_exposure com 24 mutantes mortos"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "A passada adversarial do adotante onion-curation achou a regressão A1 (arquivo de dados virando programa por awk/make/sed -f e por cópia via redirecionamento) e o furo A5 (helper aceito pelo nome); os dois curados no core"
+    narrative: "A1: o veto do dado usado como código conhecia só shell, interpretador, eval e renomeação; entram os executores de arquivo de programa (awk, make, sed, m4) e a cópia por redirecionamento ou tee para nome não-dados, sem contar o próprio heredoc gravando o arquivo. A5: o helper vale só pelo caminho canônico do repo do hook ou do topo git do cwd, por realpath, inclusive a forma documentada REPO=$(git rev-parse --show-toplevel) sem cd antes. Origem: resíduo do PR #61 do onion-curation, recebido por mensagem entre sessões."
+    provenance:
+      source: "resíduo onion-curation@7709caa:docs/evolution/review/chore-onion-update-ca3c622d33e8.md e a medição no core"
+      locator: "achados 2 (A1) e 6 (A5) do resíduo; casos data-awk-f, data-make-f, data-redir-copy, data-tee-copy, helper-fake e helper-cd-first; mutantes M21 a M24"
+      method: "medição: hook com o JSON do PreToolUse antes e depois da cura"
+      locality: "repo"
+
 edges:
   - from: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
     to: D_FORK_VS_AGENTE_NOVO_MEDIR_ANTES_1023
     edge_type: CONSTRAINS
+  - from: E_ENV_GUARD_A1_A5_CURADOS_1023
+    to: E_HUB_1019_DEZESSEIS_FRICCOES_EM_DOIS_SINAIS
+    edge_type: TRACES_TO
   - from: E_KG_SSOT_419_ADOTADA_1022
     to: Q_KG_MIGRATE_KEYS_NO_CORPUS_1022
     edge_type: SUPPORTS
