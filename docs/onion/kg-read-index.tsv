@@ -192,6 +192,7 @@
 .claude/hooks/pretooluse-direct-provider-api.sh	E_REEXECUCAO_CONTRA_O_USO_REAL	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	D_U4_LISTAR_NOMEAR_CITAR_PASSAM	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_A1_A5_CURADOS_1023	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_LINEAR	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_VETOU_COMANDO_SEM_ENV	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_GLOB_JULGADO_PELO_DISCO	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
