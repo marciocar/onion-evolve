@@ -57,6 +57,7 @@ import math
 import pathlib
 import subprocess
 import sys
+import threading
 
 import re
 
@@ -478,14 +479,28 @@ def _located(doc, key):
     return [(x, item_place(key, i, x)) for i, x in enumerate(raw) if isinstance(x, dict)] if isinstance(raw, list) else []
 
 
-def index_texts(items):
-    """[(caminho, texto)] → {caminho: {ids}}: o corpus montado de textos já lidos (por exemplo, por git show)."""
+def index_texts(items, cache=None):
+    """[(caminho, texto)] → {caminho: {ids}}: o corpus montado de textos já lidos (por exemplo, por git show).
+    cache (JudgeCache): os ids de um texto já visto vêm dele, sem parse."""
     index = {}
     for name, text in items:
-        _, doc, _ = parse_v1(text if isinstance(text, JsonText) else as_source(name, text))  # o .kg.json pelo perfil JSON
-        nodes = doc.get("nodes") if doc and isinstance(doc.get("nodes"), list) else []
-        index[name] = {str(n["id"]) for n in nodes if isinstance(n, dict) and n.get("id") is not None}
+        source = text if isinstance(text, JsonText) else as_source(name, text)  # o .kg.json pelo perfil JSON
+        index[name] = set((cache.facts(source) if cache is not None else text_facts(source))[0])
     return index
+
+
+def text_facts(text):
+    """(ids, pontas externas) de um texto já na forma do leitor (as_source): os ids dos nós, como o corpus os indexa,
+    e as pontas externas bem formadas das external_edges, [(caminho, id)], que são tudo o que o veredito lê do corpus
+    (integrity_located). Texto que não parseia não tem nenhum dos dois."""
+    _, doc, err = parse_v1(text)
+    if not doc or err:
+        return frozenset(), ()
+    nodes = doc.get("nodes") if isinstance(doc.get("nodes"), list) else []
+    ids = frozenset(str(n["id"]) for n in nodes if isinstance(n, dict) and n.get("id") is not None)
+    ends = {tuple(ref.rsplit("#", 1)) for e, _ in _located(doc, "external_edges") for end in ("from", "to")
+            for ref in (e.get(end),) if isinstance(ref, str) and "#" in ref and is_external(ref)}
+    return ids, tuple(sorted(ends))
 
 
 def external_info(text):
@@ -510,6 +525,36 @@ def external_targets(text):
 def uses_external(text):
     """O documento tem external_edges no topo, inclusive com a chave entre aspas (external_info)?"""
     return external_info(text)[0]
+
+
+VENDOR_STAMP = ".kg-ssot-version"  # o carimbo que o kg_vendor.py grava na raiz do vendor
+
+
+def vendor_dirs(paths):
+    """As pastas do vendor do KG-SSOT entre caminhos relativos (com /): cada pasta abaixo da raiz que tem o carimbo
+    VENDOR_STAMP, com a barra final. É a regra pública desde a 4.20.0: uma pasta com o carimbo é o vendor, e nada dentro
+    dela é grafo do adotante, onde quer que ela esteja. O carimbo na própria raiz não conta: quem lê uma raiz que é o
+    vendor quer ler os grafos dela, e o corpus não fica vazio em silêncio."""
+    return tuple(sorted({p[: -len(VENDOR_STAMP)] for p in paths if p.endswith("/" + VENDOR_STAMP)}))
+
+
+def in_vendor(name, dirs):
+    """O caminho relativo name está dentro de uma das pastas de vendor_dirs()?"""
+    return any(name.startswith(d) for d in dirs)
+
+
+def find_vendor_dirs(root):
+    """vendor_dirs() de uma raiz: os carimbos rastreados, se root está num repo git; senão, os do disco sob root. A lista
+    do git vem sem pathspec e é filtrada aqui, como no gate: GIT_GLOB_PATHSPECS e GIT_LITERAL_PATHSPECS mudariam o que
+    um pathspec casa."""
+    out = subprocess.run(["git", "-C", str(root), "ls-files", "-z"], capture_output=True)
+    if out.returncode == 0:
+        paths = [n for n in out.stdout.decode("utf-8", "surrogateescape").split("\0") if n]
+    else:
+        base = pathlib.Path(root)
+        paths = [p.relative_to(base).as_posix() for p in base.rglob(VENDOR_STAMP)
+                 if ".git" not in p.relative_to(base).parts]
+    return vendor_dirs(paths)
 
 
 def corpus_index(root, files=None):
@@ -1520,20 +1565,93 @@ def _validator_at(path):
         return make_validator(json.load(fh))
 
 
-def judge(sources, schema=CONTRACT_MUST, should_schema=None, corpus=None, limit=50):
+class JudgeCache:
+    """O que judge() já calculou num processo, para não julgar de novo o mesmo texto contra o mesmo corpus.
+
+    Duas tabelas LRU com até maxsize entradas cada:
+      - os fatos de um texto (text_facts), pelo tipo e pelo sha256 do texto: os ids que o corpus indexa e as pontas
+        externas que o veredito confere;
+      - o relatório de um texto, por tudo de que o veredito depende: o sha256 e o tipo do texto, o sha256 dos dois
+        schemas, o limit, a língua das mensagens, se há corpus e, para cada ponta externa, se o id existe nele.
+    Trocar o contrato, a língua ou o alvo de uma ponta muda a chave, e o texto é julgado de novo. O relatório guardado
+    é copiado na saída, e quem o recebe pode alterá-lo. hits e misses contam os relatórios. As tabelas têm trava
+    própria: o servidor MCP compartilha o armazém, e o cache dele, entre as threads."""
+
+    def __init__(self, maxsize=4096):
+        self.maxsize = maxsize
+        self._guard = threading.Lock()
+        self._facts = collections.OrderedDict()
+        self._reports = collections.OrderedDict()
+        self.hits = self.misses = 0
+
+    def _get(self, table, key):
+        with self._guard:
+            value = table.get(key)
+            if value is not None:
+                table.move_to_end(key)
+            return value
+
+    def _put(self, table, key, value):
+        with self._guard:
+            table[key] = value
+            table.move_to_end(key)
+            while len(table) > self.maxsize:
+                table.popitem(last=False)
+
+    @staticmethod
+    def _text_key(text):
+        return isinstance(text, JsonText), hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest()
+
+    def facts(self, text):
+        """text_facts(text), guardado."""
+        key = self._text_key(text)
+        value = self._get(self._facts, key)
+        if value is None:
+            value = text_facts(text)
+            self._put(self._facts, key, value)
+        return value
+
+    def report_key(self, text, contract, corpus, limit):
+        ends = self.facts(text)[1]
+        resolved = None if corpus is None else tuple(nid in corpus.get(path, ()) for path, nid in ends)
+        return (self._text_key(text), contract["sha256"]["must"], contract["sha256"]["should"], limit,
+                kg_i18n.language(), kg_i18n.machine_active(), resolved)
+
+    def report(self, key):
+        value = self._get(self._reports, key)
+        with self._guard:
+            if value is None:
+                self.misses += 1
+                return None
+            self.hits += 1
+        return json.loads(value)
+
+    def keep(self, key, report):
+        self._put(self._reports, key, json.dumps(report))
+
+
+def judge(sources, schema=CONTRACT_MUST, should_schema=None, corpus=None, limit=50, cache=None):
     """O documento kg-ssot.verdict/1 inteiro para [(source, text), ...]: o que o CLI imprime com --format json, como
     biblioteca (o armazém em kg_store.py e quem adota chamam isto em vez de raspar o stdout). corpus é o índice de
-    corpus_index()/index_texts(), ou None. Schema ilegível sobe OSError/ValueError: é entrada quebrada de quem chama."""
+    corpus_index()/index_texts(), ou None. cache (JudgeCache) reaproveita o relatório de um texto já julgado com as
+    mesmas dependências; o resultado é o mesmo sem ele. Schema ilegível sobe OSError/ValueError: é entrada quebrada
+    de quem chama."""
     should_schema = should_schema or should_for(schema)
     validator = _validator_at(str(schema))
     should_v = _validator_at(str(should_schema)) if should_schema else None
+    contract = contract_info(schema, should_schema)
     reports = []
     for name, text in sources:
-        r = verdict(text, validator, should_v, corpus, source=name, limit=limit)
-        r["external_checked"] = corpus is not None or not uses_external(text)
+        key = cache.report_key(text, contract, corpus, limit) if cache is not None else None
+        r = cache.report(key) if key is not None else None
+        if r is None:
+            r = verdict(text, validator, should_v, corpus, source=None, limit=limit)
+            r["external_checked"] = corpus is not None or not uses_external(text)
+            if key is not None:
+                cache.keep(key, r)
+        r["source"] = name
         reports.append(r)
-    return {"schema_version": VERDICT_SCHEMA_VERSION, "contract": contract_info(schema, should_schema),
-            "results": reports}
+    return {"schema_version": VERDICT_SCHEMA_VERSION, "contract": contract, "results": reports}
 
 
 def load_sources(args):

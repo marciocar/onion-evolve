@@ -12,15 +12,20 @@ diferentes), e o id repetido no mesmo grafo conta cada cópia.
 Não é patch: o diff informa, não se aplica. Uma troca de id é remoção mais acréscimo, porque o id é a identidade do nó,
 e um arquivo renomeado também (o git é lido com --no-renames). Uma lista dentro do nó (um x_ com lista, por exemplo) é
 comparada inteira, antes e depois. A ordem dos nós no arquivo não conta. Uma revisão do git é lida pelo object store
-(git show), sem checkout; sem --to, entra a árvore de trabalho, com os grafos novos ainda não adicionados ao git. O
+(git show), sem checkout; sem --to, ou com --to WORKTREE, entra a árvore de trabalho, com os grafos novos ainda não
+adicionados ao git, e WORKTREE:CAMINHO é o arquivo da árvore de trabalho, a partir da raiz do repo como o REV:CAMINHO e
+sem sair dela (pedido de um adotante, para revisar
+uma edição antes do commit; uma branch chamada WORKTREE se lê como refs/heads/WORKTREE). O
 lado que existe mas não se lê (não é UTF-8, ou não parseia) sai em unreadable, com o código io.* ou parse.*, e conta
 como diferença (rc 1). Num argumento ANTES ou DEPOIS, o caminho que existe no disco vence a leitura REV:CAMINHO.
 
 Uso:
   kg_diff.py ANTES DEPOIS [--repo DIR] [--format human|json]
-      ANTES e DEPOIS são arquivos, ou REV:CAMINHO lido do git em --repo (default: o diretório atual)
-  kg_diff.py --from REV [--to REV] [--repo DIR] [CAMINHO...] [--format human|json]
-      todos os .kg.yaml e .kg.json que mudaram entre as revisões (sem --to, a árvore de trabalho), ou só os caminhos
+      ANTES e DEPOIS são arquivos, ou REV:CAMINHO lido do git em --repo (default: o diretório atual), ou
+      WORKTREE:CAMINHO, o arquivo da árvore de trabalho em --repo
+  kg_diff.py --from REV [--to REV|WORKTREE] [--repo DIR] [CAMINHO...] [--format human|json]
+      todos os .kg.yaml e .kg.json que mudaram entre as revisões (sem --to ou com WORKTREE, a árvore de trabalho), ou
+      só os caminhos
 Saída humana, ou JSON no formato kg-ssot.diff/1 (spec/diff.schema.json).
 rc: 0 sem diferença · 1 com diferença · 2 entrada quebrada.
 """
@@ -44,9 +49,10 @@ _ = kg_i18n._
 SCHEMA_VERSION = "kg-ssot.diff/1"
 GRAPH_GLOBS = ("*.kg.yaml", "*.kg.json")
 # os do kg_query.py e do kg_migrate.py: numa atualização do vendor, os fixtures da suíte mudam aos centos e afogam o diff
-# do grafo do adotante; valem só no --from sem caminhos dados
+# do grafo do adotante; valem só no --from sem caminhos dados, junto com a pasta carimbada do vendor (desde a 4.20.0)
 DEFAULT_EXCLUDE = ("vendor/*", "fixtures/*", "*/fixtures/*", "docs/materials/*")
 EDGE_KEY = ("from", "to", "edge_type")
+WORKTREE = "WORKTREE"  # a árvore de trabalho, no --to e no REV de REV:CAMINHO
 
 
 class Broken(Exception):
@@ -90,12 +96,33 @@ def _git(repo, *args):
 def read_spec(spec, repo):
     """(nome, texto) de um arquivo, ou de REV:CAMINHO no git de repo. Caminho que existe no disco vence o REV:."""
     path = pathlib.Path(spec)
-    if path.is_file() or ":" not in spec:
+    try:
+        on_disk = path.is_file()
+    except OSError:  # o nome longo demais (ENAMETOOLONG) não é arquivo; o REV:CAMINHO decide
+        on_disk = False
+    if on_disk or ":" not in spec:
         try:
             return spec, path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError) as exc:
             raise Broken(f"{spec}: {exc}") from None
     rev, name = spec.split(":", 1)
+    if rev == WORKTREE:
+        # da raiz do repo, como o REV:CAMINHO do git show, e sem sair dela (achado do Elenxo da 4.20.0)
+        top = pathlib.Path(_git(repo, "rev-parse", "--show-toplevel").decode("utf-8", "surrogateescape").rstrip("\n"))
+        try:
+            target = (top / name).resolve()
+        except (OSError, RuntimeError) as exc:  # o link em laço (RuntimeError até o 3.12) é entrada quebrada, nunca rc 1
+            raise Broken(f"{spec}: {exc}") from None
+        if not target.is_relative_to(top.resolve()):
+            raise Broken(_("{spec}: the path is outside the repository").format(spec=spec))
+        try:
+            raw = target.read_bytes()
+        except OSError as exc:
+            raise Broken(f"{spec}: {exc}") from None
+        text, code = _decode(raw)
+        if code:
+            raise Broken(_("{spec}: not UTF-8").format(spec=spec))
+        return name, text
     text, code = _decode(_git(repo, "show", f"{_rev(rev)}:{name}"))
     if code:
         raise Broken(_("{spec}: not UTF-8").format(spec=spec))
@@ -308,7 +335,9 @@ def changed_paths(repo, rev_from, rev_to, paths, exclude=()):
     if not rev_to:  # na árvore de trabalho, o grafo novo ainda não adicionado também mudou (o git diff não o lista)
         spec = list(paths) if paths else list(GRAPH_GLOBS)
         try:
-            new = _git(repo, "ls-files", "-z", "--others", "--exclude-standard", "--", *spec).decode("utf-8").split("\0")
+            # --full-name: da raiz do repo, como os caminhos do git diff, mesmo com --repo numa subpasta
+            new = _git(repo, "ls-files", "-z", "--full-name", "--others", "--exclude-standard", "--",
+                       *spec).decode("utf-8").split("\0")
         except UnicodeDecodeError:
             raise Broken(_("a new path is not UTF-8")) from None
         out += [("A", n) for n in new if n.endswith((".kg.yaml", ".kg.json"))]
@@ -321,12 +350,43 @@ def _show(repo, rev, name):
     return Unreadable(code) if code else text
 
 
-def diff_revisions(repo, rev_from, rev_to=None, paths=(), exclude=None):
-    """exclude None: os DEFAULT_EXCLUDE quando nenhum caminho foi dado; os caminhos dados nunca são excluídos."""
+def _vendor_dirs_at(repo, rev_from, rev_to):
+    """As pastas carimbadas do vendor (kg_validate.vendor_dirs) nos dois lados: na revisão de antes e na de depois, ou na
+    árvore de trabalho, com o carimbo ainda não adicionado ao git. Uma atualização do vendor que o muda de pasta tem o
+    carimbo num lado só, e os dois contam. Os caminhos saem da raiz do repo, como os do git diff, mesmo com --repo
+    numa subpasta (achado do Elenxo da 4.20.0)."""
+    names = _git(repo, "ls-tree", "-r", "-z", "--full-tree", "--name-only", "--end-of-options", _rev(rev_from))
+    if rev_to:
+        names += b"\0" + _git(repo, "ls-tree", "-r", "-z", "--full-tree", "--name-only", "--end-of-options", _rev(rev_to))
+    else:
+        # sem pathspec (o :/ seria magia, que o GIT_LITERAL_PATHSPECS desliga): a lista inteira, a partir da raiz
+        top = _git(repo, "rev-parse", "--show-toplevel").decode("utf-8", "surrogateescape").rstrip("\n")
+        names += b"\0" + _git(top, "ls-files", "-z", "--cached", "--others", "--exclude-standard")
+    paths = [n for n in names.decode("utf-8", "surrogateescape").split("\0") if n]
+    return kg_validate.vendor_dirs(paths)
+
+
+def diff_revisions(repo, rev_from, rev_to=None, paths=(), exclude=None, skip_vendor=None):
+    """exclude None: os DEFAULT_EXCLUDE quando nenhum caminho foi dado; os caminhos dados nunca são excluídos.
+    skip_vendor None: como exclude None, fica de fora toda pasta com o carimbo do vendor (kg_validate.vendor_dirs),
+    onde quer que ela esteja, quando nenhum caminho foi dado. rev_to None ou WORKTREE: a árvore de trabalho."""
+    if rev_from == WORKTREE:
+        raise Broken(_("WORKTREE is the working tree: it goes in --to, not in --from"))
+    if rev_to == WORKTREE:
+        rev_to = None
+    if skip_vendor is None:
+        skip_vendor = exclude is None and not paths
     if exclude is None:
         exclude = () if paths else DEFAULT_EXCLUDE
+    vendors = _vendor_dirs_at(repo, rev_from, rev_to) if skip_vendor else ()
+    # os caminhos do git diff saem da raiz do repo: a árvore de trabalho se lê a partir dela, não de --repo; entre duas
+    # revisões nada se lê do disco, e o repo bare (sem árvore de trabalho) segue funcionando
+    top = None if rev_to else pathlib.Path(
+        _git(repo, "rev-parse", "--show-toplevel").decode("utf-8", "surrogateescape").rstrip("\n"))
     graphs = []
     for status, name in changed_paths(repo, rev_from, rev_to, paths, exclude):
+        if kg_validate.in_vendor(name, vendors):
+            continue
         text_b = None if status == "A" else _show(repo, rev_from, name)
         if status == "D":
             text_a = None
@@ -334,7 +394,7 @@ def diff_revisions(repo, rev_from, rev_to=None, paths=(), exclude=None):
             text_a = _show(repo, rev_to, name)
         else:
             try:
-                text_a, code = _decode((pathlib.Path(repo) / name).read_bytes())
+                text_a, code = _decode((top / name).read_bytes())
                 text_a = Unreadable(code) if code else text_a
             except FileNotFoundError:
                 text_a = None
@@ -415,7 +475,7 @@ def main(argv=None):
     ap.add_argument("specs", nargs="*", help=_("BEFORE AFTER (files or REV:PATH), or the paths with --from"))
     ap.add_argument("--repo", default=".", help=_("the git repository of the revisions (default: the current directory)"))
     ap.add_argument("--from", dest="rev_from", help=_("the before revision: compares every graph that changed"))
-    ap.add_argument("--to", dest="rev_to", help=_("the after revision (without it, the working tree)"))
+    ap.add_argument("--to", dest="rev_to", help=_("the after revision (without it, or with WORKTREE, the working tree)"))
     ap.add_argument("--ignore", action="append", default=[], metavar=_("FIELD"),
                     help=_("leaves the field out of the comparison (repeatable): verified_at, provenance.locator,"
                            " meta.x_generated_at"))
@@ -437,11 +497,12 @@ def main(argv=None):
 def _run(args):
     try:
         if args.rev_from:
-            res = result(args.rev_from, args.rev_to or "(árvore de trabalho)",
+            res = result(args.rev_from, args.rev_to or WORKTREE,
                          diff_revisions(args.repo, args.rev_from, args.rev_to, args.specs,
                                         None if not (args.exclude or args.no_default_excludes) else
                                         (() if args.no_default_excludes or args.specs else DEFAULT_EXCLUDE)
-                                        + tuple(args.exclude)))
+                                        + tuple(args.exclude),
+                                        skip_vendor=not (args.no_default_excludes or args.specs)))
         else:
             if args.rev_to or len(args.specs) != 2:
                 raise Broken(_("give BEFORE and AFTER, or --from REV [--to REV] [PATH...]"))

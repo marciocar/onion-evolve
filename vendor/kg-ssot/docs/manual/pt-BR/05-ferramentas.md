@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:66b0502befc8dfe2 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:caeb414de429b829 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.19.1",
+  "release": "kg-ssot-v4.20.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -331,6 +331,14 @@ if not r["written"]:
 O gate julga mais que o candidato. A ponta externa de cada entrada de `external_edges` é conferida contra o próprio
 armazém, já com o candidato no lugar. Cada grafo que aponta para o nome gravado é julgado de novo, porque trocar ou
 apagar um grafo pode deixar a aresta externa de outro sem ponta. O armazém só grava com PASS em todos.
+
+Desde a 4.20.0, um objeto de armazém guarda, na memória, o veredito de cada grafo que já julgou, pela chave de tudo de
+que o veredito depende: o texto e o formato dele, os dois schemas, o `limit`, a língua das mensagens, se há corpus e,
+para cada ponta externa, se o id citado existe. Um grafo que aponta para o nome gravado e não mudou não é julgado de
+novo enquanto as pontas dele seguem resolvidas, e um processo longo (o servidor MCP, um app que mantém o armazém
+aberto) paga o custo uma vez. Gravar o mesmo texto de novo também não o rejulga pelo contrato; o gate externo
+(`--gate-cmd`), se houver, roda em toda gravação. Um processo novo começa com o cache vazio, e a primeira gravação paga
+o custo inteiro.
 
 O corpus é o mesmo que o gate do repositório veria. No `GitStore`, isso quer dizer só o rastreado: um `.kg.yaml` que
 está no disco sem commit não conta, nem na lista, nem no julgamento, nem na trava (para a trava, o nome está livre, e
@@ -724,7 +732,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 
 | Opção | O que faz |
 |---|---|
-| `--root DIR` ou arquivos | O corpus. Com `--root`, o vendor e as fixtures ficam de fora por padrão (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*`); `--exclude GLOB` (repetível) tira mais caminhos, e `--no-default-excludes` lê tudo. Um arquivo que você nomeia um a um nunca é excluído |
+| `--root DIR` ou arquivos | O corpus. Com `--root`, o vendor e as fixtures ficam de fora por padrão (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*` e, desde a 4.20.0, toda pasta com o carimbo `.kg-ssot-version`); `--exclude GLOB` (repetível) tira mais caminhos, e `--no-default-excludes` lê tudo. Um arquivo que você nomeia um a um nunca é excluído |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filtros, todos combinados em E |
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem distinguir maiúscula; `--in-narrative` procura também na narrative |
 | `--open` | A fila dos abertos (status `open`) |
@@ -773,10 +781,16 @@ O campo que sai de um caminho e entra noutro com o mesmo valor, num nó, numa ar
 renomeação (`x_location → x_storage (renomeado)`) quando o valor não é trivial e é único dos dois lados. No JSON, as
 duas entradas ficam, cada uma com o valor do seu caminho, ligadas por `renamed_to` e `renamed_from`; o texto humano e
 o resumo por campo mostram uma linha só. Com `--from` e sem caminhos, o vendor e as fixtures ficam de fora (também uma
-pasta `fixtures/` na raiz), como no `kg_query`: uma atualização do vendor muda as fixtures da suíte às centenas.
+pasta `fixtures/` na raiz e, desde a 4.20.0, toda pasta com o carimbo `.kg-ssot-version` em qualquer dos lados), como
+no `kg_query`: uma atualização do vendor muda as fixtures da suíte às centenas.
 `--exclude` e `--no-default-excludes` valem do mesmo jeito. O meta sai junto com as outras chaves da raiz, os valores
-se comparam na forma JSON do contrato, um arquivo renomeado sai como remoção mais acréscimo, e sem `--to` entram
-também os grafos novos ainda não adicionados ao git. O lado que não se lê (não é UTF-8, ou não parseia) sai em
+se comparam na forma JSON do contrato, um arquivo renomeado sai como remoção mais acréscimo, e sem `--to` (ou com
+`--to WORKTREE`, desde a 4.20.0) o lado de depois é a árvore de trabalho, e entram também os grafos novos ainda não
+adicionados ao git. `WORKTREE:CAMINHO` lê o arquivo da árvore de trabalho, a partir da raiz do repositório como o
+`REV:CAMINHO` e nunca fora dele (o `./` e o `../` do git, relativos ao diretório atual, não valem), para revisar uma
+edição antes
+do commit (`HEAD:docs/x.kg.yaml WORKTREE:docs/x.kg.yaml`); uma branch chamada `WORKTREE` se lê como
+`refs/heads/WORKTREE`. O lado que não se lê (não é UTF-8, ou não parseia) sai em
 `unreadable` e conta como diferença; a revisão que começa com `-` é entrada quebrada. Num argumento, o caminho que
 existe no disco vence a leitura `REV:CAMINHO`.
 
@@ -905,7 +919,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile kg-migrate.prof
   anunciou, fica como estava. A quebra de linha do arquivo é mantida (CRLF fica CRLF), e o arquivo com quebras
   misturadas é recusado. Rodar de novo não muda nada.
 - **Sem lista de grafos, a ferramenta lê os `.kg.yaml` do `git ls-files`.** Ficam de fora os padrões do `kg_gate.py`
-  (`*/fixtures/*` e `docs/materials/*`), o `vendor/*` e os globs de `--exclude`, com a semântica do gate: `fnmatch`
+  (`*/fixtures/*` e `docs/materials/*`), o `vendor/*`, toda pasta com o carimbo `.kg-ssot-version` (desde a 4.20.0) e
+  os globs de `--exclude`, com a semântica do gate: `fnmatch`
   sobre o caminho relativo, em que `*` atravessa `/`; o `**/` do dialeto do perfil, que casa zero pastas, também
   vale. `--no-default-excludes` tira os padrões. Atenção: no `trace_path_glob` do perfil, `*` não atravessa `/`. Um
   grafo da lista que não parseia vira linha de revisão e não aborta a rodada.

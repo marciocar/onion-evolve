@@ -237,8 +237,8 @@ msgid "leaves the field out of the comparison (repeatable): verified_at, provena
 msgstr "tira o campo da comparação (repetível): verified_at, provenance.locator, meta.x_gerado_em"
 
 #: tools/kg_diff.py
-msgid "the after revision (without it, the working tree)"
-msgstr "a revisão de depois (sem ela, a árvore de trabalho)"
+msgid "the after revision (without it, or with WORKTREE, the working tree)"
+msgstr "a revisão de depois (sem ela, ou com WORKTREE, a árvore de trabalho)"
 
 #: tools/kg_diff.py
 msgid "the before revision: compares every graph that changed"
@@ -291,6 +291,14 @@ msgstr "{spec}: não é UTF-8"
 #: tools/kg_diff.py
 msgid "{type} is not JSON serializable"
 msgstr "{type} não serializa"
+
+#: tools/kg_diff.py
+msgid "WORKTREE is the working tree: it goes in --to, not in --from"
+msgstr "WORKTREE é a árvore de trabalho: vai no --to, não no --from"
+
+#: tools/kg_diff.py
+msgid "{spec}: the path is outside the repository"
+msgstr "{spec}: o caminho está fora do repositório"
 
 #: tools/kg_gate.py
 msgid "  MUST   {name} ({kind}): {codes}"
@@ -716,7 +724,7 @@ msgid ""
 "node's action (propose provenance, demote to unverifiable, or only list it for the reviewer), and the scopes block sets\n"
 "verified_scope by a list of ids. The universe is fixed: nodes with status confirmed or plane PROD, without provenance,\n"
 "except unverifiable ones. With no graphs on the command line, the tool reads the tracked .kg.yaml files under --root\n"
-"(default: the current directory), except the kg_gate.py defaults (*/fixtures/*, docs/materials/*), vendor/* and the\n"
+"(default: the current directory), except the kg_gate.py defaults (*/fixtures/*, docs/materials/*), vendor/*, any folder with the .kg-ssot-version stamp and the\n"
 "--exclude globs, with the gate's semantics (* crosses /); a graph in that list that does not parse becomes a row for\n"
 "the reviewer. A node whose verified_scope already matches the profile comes out as same, and apply leaves it alone.\n"
 "\n"
@@ -750,7 +758,7 @@ msgstr ""
 "(propor provenance, rebaixar para unverifiable, ou só listar para quem revisa), e o bloco scopes dá verified_scope por\n"
 "lista de ids. O universo é fixo: nó com status confirmed ou plane PROD, sem provenance, fora o unverifiable. Sem\n"
 "grafos na linha de comando, a ferramenta lê os .kg.yaml rastreados de --root (default: o diretório atual), fora os\n"
-"padrões do kg_gate.py (*/fixtures/*, docs/materials/*), o vendor/* e os globs de --exclude, com a semântica do gate\n"
+"padrões do kg_gate.py (*/fixtures/*, docs/materials/*), o vendor/*, toda pasta com o carimbo .kg-ssot-version e os globs de --exclude, com a semântica do gate\n"
 "(* atravessa /); o grafo dessa lista que não parseia vira linha para quem revisa. O nó cujo verified_scope já é o do\n"
 "perfil sai como same, e o apply não o toca.\n"
 "\n"

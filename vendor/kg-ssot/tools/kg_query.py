@@ -17,7 +17,8 @@ Uso:
   filtros (todos juntos, em E): --id ID... --id-prefix P --type T --status S --plane P --layer L --file TRECHO
                                 --text PALAVRAS [--in-narrative] --open --verified-before AAAA-MM-DD
   --root DIR lê os .kg.yaml e .kg.json rastreados pelo git sob DIR (sem git, todos sob DIR), menos o vendor e os
-  fixtures (vendor/*, fixtures/*, */fixtures/*, docs/materials/*); os caminhos saem relativos a DIR, que
+  fixtures (vendor/*, fixtures/*, */fixtures/*, docs/materials/* e, desde a 4.20.0, toda pasta com o carimbo
+  .kg-ssot-version abaixo de DIR); os caminhos saem relativos a DIR, que
   é a raiz contra a qual a ponta externa <caminho>#<id> se resolve.
 rc: 0 consultou (mesmo sem nenhum nó) · 2 entrada quebrada.
 """
@@ -109,7 +110,8 @@ DEFAULT_EXCLUDE = ("vendor/*", "fixtures/*", "*/fixtures/*", "docs/materials/*")
 def load(root=None, files=(), exclude=(), defaults=True):
     """O corpus de --root (os rastreados pelo git, ou todos sob a pasta) ou dos arquivos dados. exclude: padrões glob
     sobre o caminho relativo (export/*, *.kg.yaml) que ficam de fora, somados aos DEFAULT_EXCLUDE quando defaults.
-    Os arquivos dados um a um nunca são excluídos. ValueError: entrada quebrada."""
+    Com defaults, fica de fora também toda pasta com o carimbo do vendor (kg_validate.vendor_dirs), onde quer que ela
+    esteja. Os arquivos dados um a um nunca são excluídos. ValueError: entrada quebrada."""
     exclude = (DEFAULT_EXCLUDE if defaults else ()) + tuple(exclude)
     corpus = Corpus()
     if root is not None:
@@ -123,8 +125,9 @@ def load(root=None, files=(), exclude=(), defaults=True):
         else:
             names = sorted(p.relative_to(base).as_posix() for g in ("*.kg.yaml", "*.kg.json") for p in base.rglob(g)
                            if ".git" not in p.relative_to(base).parts)
+        vendors = kg_validate.find_vendor_dirs(base) if defaults else ()
         for name in names:
-            if any(fnmatch.fnmatchcase(name, pat) for pat in exclude):
+            if any(fnmatch.fnmatchcase(name, pat) for pat in exclude) or kg_validate.in_vendor(name, vendors):
                 continue
             path = base / name
             if not path.is_file():
