@@ -170,7 +170,8 @@ verified, and when to verify it again.
 | `pref` | string | req. The preferred term |
 | `lang` | string | a BCP 47 tag (`pt-BR`, `en`) |
 | `definition` | string | |
-| `notation` | string | a code that identifies the term (`GTIN`, a catalog number) |
+| `notation` | string | a code that identifies the term (`GTIN`, a catalog number, `O1`) |
+| `scheme` | slug | the vocabulary the term belongs to (v4.14): lowercase letters, digits, and hyphens. Without it, the scheme is the graph |
 | `labels` | list | the synonyms, each an object with the keys below |
 
 | Key of a synonym | Type | Rule |
@@ -187,6 +188,16 @@ verified, and when to verify it again.
 | `lang` | string | when it differs from the term's |
 
 A retired term is the node with `status: superseded` and a `SUPERSEDES` edge from the term that replaces it.
+
+**A short code with a readable name (v4.14).** A code like `O1`, `V3`, or `r16` is fine as long as it has a name. Give
+it a term: the code is the `notation`, the name is the `pref`, and the `scheme` says which vocabulary it belongs to, as
+`skos:notation`, `skos:prefLabel`, and `skos:inScheme` do in SKOS. The id of the node stays short and stable. The same
+code may mean two things in two schemes (the option `O1` of a decision and the wave `O1` of a recovery): outside its own
+graph, cite it as `scheme:code`. Within one scheme a code names one concept, so two live terms with the same notation in
+the same scheme warn as `integrity.term-notation-duplicate`; the graph's own scheme is named by its `meta.id`, so a
+declared scheme with that name is the same scheme. `kg_vocab.py lint` checks the codes written in labels and
+narratives against the vocabulary (chapter 5).
+
 `kg_vocab.py` lists the terms, resolves a text to its term, and exports to SKOS-XL and Apache Ossie (chapter 5).
 
 ```yaml

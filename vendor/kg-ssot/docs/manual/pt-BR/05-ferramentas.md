@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:501642872725376c -->
+<!-- translation-of: docs/manual/05-tools.md sha256:2972e3ae88b98f49 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.22.0",
+  "release": "kg-ssot-v4.23.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -734,7 +734,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 |---|---|
 | `--root DIR` ou arquivos | O corpus. Com `--root`, o vendor e as fixtures ficam de fora por padrão (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*` e, desde a 4.20.0, toda pasta com o carimbo `.kg-ssot-version`); `--exclude GLOB` (repetível) tira mais caminhos, e `--no-default-excludes` lê tudo. Um arquivo que você nomeia um a um nunca é excluído |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filtros, todos combinados em E |
-| `--text PALAVRAS` | Palavras que o label contém, todas, sem distinguir maiúscula; `--in-narrative` procura também na narrative |
+| `--text PALAVRAS` | Palavras que o label contém, todas, sem maiúscula nem acento (`verificacao` casa `Verificação`, desde a 4.23); `--in-narrative` procura também na narrative. Quando o texto inteiro é um termo do vocabulário (o `pref` ou um sinônimo de domínio atual, dobrados, ou a `notation`, exata), casam também o termo e todo nó que tenha qualquer forma dele como palavra inteira, e o `expanded` diz qual termo; o sinônimo de caso ou aposentado não expande. Nenhum nó dá um `hint`, que diz quando o zero vem dos outros filtros, para o zero não passar por "não há" |
 | `--open` | A fila dos abertos (status `open`) |
 | `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
 | `--around ID` | A vizinhança: `<caminho>#<id>`, ou um id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
@@ -801,8 +801,8 @@ diferença, 1 com diferença, 2 na entrada quebrada.
 
 ## `kg_vocab.py`: o vocabulário de domínio
 
-Lê os termos do perfil `x_term` (capítulo 3) de um corpus, com `--root` ou com os arquivos, e faz três coisas: lista,
-resolve um texto para o termo e exporta.
+Lê os termos do perfil `x_term` (capítulo 3) de um corpus, com `--root` ou com os arquivos, e faz quatro coisas: lista,
+resolve um texto ou um código para o termo, exporta e confere contra eles os códigos escritos na prosa.
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py terms --root . --as-of 2027-05-01      # termos, sinônimos, o que vence
@@ -810,6 +810,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "codigo de barras" --root 
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup "cod barras" --case "edital 12" --root .
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to skos --root . > vocab.ttl
 python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > vocab.ossie.json
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lookup rodada:O1 --root .              # um código, qualificado pelo esquema
+python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lint --root . --baseline .kg-ssot/vocab-lint.json --external soc2='CC[0-9]+'
 ```
 
 - **O `lookup` compara sem maiúscula, acento nem espaço repetido.** Casa o termo preferido ou um sinônimo. O sinônimo
@@ -831,7 +833,33 @@ python3 -I -B vendor/kg-ssot/tools/kg_vocab.py export --to ossie --root . > voca
   `name` (o termo preferido), `description`, `ai_context.synonyms` (os sinônimos atuais de domínio) e uma entrada de
   `custom_extensions` do `KG_SSOT` com a proveniência de cada sinônimo, porque o Ossie não tem campo para ela. Você
   junta cada item à entidade do seu modelo semântico (dataset, field ou metric) pelo nome.
-- Com `--format json`, o `terms` e o `lookup` usam o formato `kg-ssot.vocab/1` (`spec/vocab.schema.json`). A ferramenta
+- **O esquema e o código (4.23, contrato v4.14).** O `terms` dá a cada termo o `scheme` efetivo (o `x_term.scheme`
+  declarado, ou o grafo) e o `scheme_declared`. O `lookup` casa também uma `notation`, exata (código é código: `o1` não
+  é `O1`), sozinha ou qualificada como `esquema:notation`. O `export --to skos` escreve o `skos:inScheme` de cada
+  conceito e cada esquema uma vez como `skos:ConceptScheme`.
+- **O `lint` confere os códigos da prosa contra o vocabulário.** Ele lê o label e a narrativa de todo nó, acha os
+  códigos por uma regex (`--pattern`; a padrão pega de uma a três maiúsculas e de um a três dígitos, como `A7`, `O1` e
+  `S14`, e `r` com dígitos, como `r16`; não pega `REGRA 87`, `SAC-234` nem ids de nó, que têm mecanismo próprio) e
+  aponta:
+  - `vocab.notation-duplicate`: a mesma notation em dois termos vivos do mesmo esquema, no corpus inteiro;
+  - `vocab.code-unresolved`: um código que não é notation de nenhum termo vivo (um `esquema:código` procura só naquele
+    esquema);
+  - `vocab.code-ambiguous`: um código sem esquema que é notation em dois ou mais esquemas do próprio grafo ou, sem
+    nenhum do próprio grafo, em dois ou mais esquemas do corpus. Escreva `esquema:código`.
+
+  Um código resolve nesta ordem: um termo do próprio grafo, depois um sistema de fora, depois o corpus. O esquema de um
+  `esquema:código` é um slug colado antes do código, com borda de palavra (`my_sa:T7` e `urn:kg:E5` não são
+  qualificados). O esquema declarado e o esquema do grafo (o `meta.id`) dividem um espaço de nomes, aqui, no export
+  SKOS e nos dois leitores. As regras da repetição são as do leitor, e o código do próprio termo resolve no label dele.
+
+  O `--external soc2='CC[0-9]+'` (repetível) declara os códigos de um sistema de fora (SOC 2, CVE, ISO), que resolvem
+  sem termo. A regex que casa o texto vazio é recusada. A catraca é a do gate: `--baseline <arquivo> --update` grava os achados de hoje, e daí em diante
+  `--baseline <arquivo>` reprova só pelo achado novo ou acima da contagem da base, para os códigos que já existem não
+  travarem e os novos nascerem com nome; a base gravada com outro `--pattern` é recusada. A ocorrência que a base já
+  tinha no outro estado do mesmo código (sem termo ↔ ambíguo, mesmo arquivo e código) sai como `reclassified` e não
+  reprova: nomear o primeiro termo de um código que colide muda o estado das menções antigas, e quem nomeia não paga
+  por elas. rc 1 com achado que reprova ou com grafo que não se lê, 2 com entrada quebrada.
+- Com `--format json`, o `terms`, o `lookup` e o `lint` usam o formato `kg-ssot.vocab/1` (`spec/vocab.schema.json`). A ferramenta
   não julga: o `x_term` fora do perfil é lido no que dá para ler, e o SHOULD acusa o resto.
 
 ## `kg_criterion.py`: o critério pré-registrado (4.21.0)

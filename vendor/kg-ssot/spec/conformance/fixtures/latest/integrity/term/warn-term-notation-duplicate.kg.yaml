@@ -1,0 +1,40 @@
+meta:
+  schema_version: "1"
+  id: warn-term-notation-duplicate
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EN_A
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O termo sintético EN_A."
+    x_term:
+      pref: "Opção 1"
+      notation: "O1"
+      scheme: "rodada"
+  - id: EN_B
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O termo sintético EN_B."
+    x_term:
+      pref: "Onda 1"
+      notation: "O1"
+      scheme: "rodada"
+edges:
+  - from: EN_A
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: EN_B
+    to: Q_A
+    edge_type: TRACES_TO

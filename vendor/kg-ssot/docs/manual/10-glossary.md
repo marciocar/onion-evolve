@@ -30,6 +30,7 @@
 | **Reader** | Any program that reads `.kg.yaml` (or `.kg.json`). The reference reader is `kg_validate.py` |
 | **Release** | A `kg-ssot-vX.Y.Z` tag with the surface listed in `spec/release.json` |
 | **Runner** | The command that exposes a reader to the suite: `runner <case>` prints a JSON object with the verdict |
+| **Scheme** | The vocabulary a term belongs to (`x_term.scheme`, the `skos:inScheme`), since v4.14; without it, the graph. Within a scheme a notation names one concept, and outside it a code is cited as `scheme:code` |
 | **SHOULD** | The contract level that only warns |
 | **SHOULD debt** | How many graphs (or occurrences) carry each warning |
 | **Synonym** | An item of `x_term.labels`: another way to write the term, `alt` or `hidden`, with its own source, document version, and verification date |

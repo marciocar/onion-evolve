@@ -3,12 +3,15 @@
 
 Um termo é um nó com x_term: o preferido (pref) e os sinônimos (labels), cada um com fonte, versão do documento,
 carimbo, cadência, escopo e estado. O termo aposentado é o nó com status superseded, e o termo novo aponta para ele
-por SUPERSEDES. Três comandos:
+por SUPERSEDES. Quatro comandos:
 
   terms    lista os termos, com os sinônimos e o vencimento de cada um na data (--as-of, hoje por padrão);
   lookup   resolve um texto para o termo: casa o preferido ou um sinônimo, sem distinguir maiúscula, acento nem
            espaço repetido. O sinônimo com escopo de caso só casa com --case igual; o aposentado casa e sai marcado,
            e o termo aposentado sai com o termo que o substitui;
+  lint     confere os códigos da prosa (label e narrative) contra o vocabulário: a notation repetida no corpus, o
+           código sem termo e o código ambíguo entre esquemas (desde a 4.23, contrato v4.14), com --pattern, --external
+           e a catraca --baseline/--update;
   export   exporta para o SKOS-XL com o iso-thes, em Turtle (--to skos), ou para o Apache Ossie (--to ossie): uma
            camada por termo com o ai_context.synonyms e a proveniência de cada sinônimo em custom_extensions, para
            juntar pelo nome à entidade do modelo semântico.
@@ -20,7 +23,9 @@ Uso:
   kg_vocab.py terms  [--root DIR [--exclude GLOB]... [--no-default-excludes] | ARQ...] [--as-of AAAA-MM-DD] [--format human|json]
   kg_vocab.py lookup TEXTO [--case CASO] [--root DIR | ARQ...] [--as-of AAAA-MM-DD] [--format human|json]
   kg_vocab.py export --to skos|ossie [--base IRI] [--root DIR | ARQ...]
-rc: 0 · 1 lookup sem nenhum termo · 2 entrada quebrada.
+  kg_vocab.py lint   [--root DIR | ARQ...] [--pattern REGEX] [--external ESQUEMA=REGEX]... [--baseline ARQ [--update]]
+                     [--format human|json]
+rc: 0 · 1 lookup sem nenhum termo, ou lint com achado (novo, com --baseline) ou grafo ilegível · 2 entrada quebrada.
 """
 import argparse
 import datetime
@@ -56,10 +61,13 @@ def _date(v):
     return d.isoformat() if d else None
 
 
-def fold(text):
-    """A forma de comparar: NFKD sem as marcas de acento, minúsculas pelo casefold, espaço repetido em um."""
-    plain = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
-    return " ".join(plain.casefold().split())
+fold = kg_query.fold  # a mesma forma de comparar do --text do kg_query
+SCHEME = re.compile(r"[a-z0-9][a-z0-9-]*")  # a forma do x_term.scheme no SHOULD (v4.14)
+LIVE_OUT = ("superseded", "refuted")
+# o código opaco na prosa: uma a três maiúsculas e um a três dígitos (A7, O1, V3, S14, CC6b) ou r e dígitos (r1, r16).
+# Não cobre REGRA N, SAC-N nem ids de nó, que têm mecanismo próprio; o --pattern troca a regex.
+DEFAULT_CODE = r"(?<![\w-])(?:[A-Z]{1,3}[0-9]{1,3}[a-z]?|r[0-9]{1,3})(?![\w-])"
+LINT_BASELINE_VERSION = "kg-ssot.vocab-lint-baseline/1"
 
 
 def _scope(v):
@@ -113,8 +121,12 @@ def terms(corpus, as_of):
         if not isinstance(term, dict) or not _text(term.get("pref")):
             continue
         file, nid = key
+        declared = isinstance(term.get("scheme"), str) and term["scheme"] != ""  # a mesma regra do leitor
         t = {"file": file, "id": nid, "status": node.get("status") if isinstance(node.get("status"), str) else None,
-             "pref": term["pref"]}
+             "pref": term["pref"],
+             # o esquema efetivo (v4.14): o declarado ou, sem ele, o próprio grafo (o meta.id); os dois são o mesmo
+             # espaço de nomes (o esquema declarado gb e o grafo de meta.id gb são um esquema só)
+             "scheme": term["scheme"] if declared else graph_name(corpus.meta_ids, file), "scheme_declared": declared}
         for k in ("lang", "definition", "notation"):
             if _text(term.get(k)):
                 t[k] = term[k]
@@ -128,10 +140,15 @@ def terms(corpus, as_of):
 
 
 def lookup(all_terms, text, case=None):
-    """Os termos que o texto resolve: [{term, via, literal, retired, scope}]. via é pref, alt ou hidden."""
+    """Os termos que o texto resolve: [{term, via, literal, retired, scope}]. via é pref, alt, hidden ou notation. A
+    notation casa exata (código é código), sozinha ou qualificada pelo esquema (esquema:notation, desde a 4.23)."""
     want = fold(text)
     hits = []
     for t in all_terms:
+        notation = t.get("notation")
+        if notation is not None and (text == notation or text == f"{t['scheme']}:{notation}"):
+            hits.append({"term": t, "via": "notation", "literal": notation, "retired": False, "scope": None})
+            continue
         if fold(t["pref"]) == want:
             hits.append({"term": t, "via": "pref", "literal": t["pref"], "retired": False, "scope": None})
         for lab in t["labels"]:
@@ -143,6 +160,142 @@ def lookup(all_terms, text, case=None):
             hits.append({"term": t, "via": lab["kind"], "literal": lab["literal"],
                          "retired": lab["status"] == "retired", "scope": scope})
     return hits
+
+
+# --- lint: o código na prosa e a notation repetida no corpus (desde a 4.23) ----------------------------------------
+
+QUALIFIER = re.compile(r"(?<![\w:/.-])([a-z0-9][a-z0-9-]*):$")  # o esquema colado antes do código, com a borda
+
+
+def _notations(corpus):
+    """Os termos com notation pela regra do leitor (term_located): nó vivo com x_term mapa e notation em texto não
+    vazio; o esquema é o x_term.scheme em texto não vazio ou, sem ele, o grafo. [(esquema, notation, chave)]."""
+    out = []
+    for key in corpus.order:
+        node = corpus.nodes[key]
+        term = node.get("x_term")
+        if not isinstance(term, dict) or node.get("status") in LIVE_OUT:
+            continue
+        notation, scheme = term.get("notation"), term.get("scheme")
+        if not isinstance(notation, str) or not notation:
+            continue
+        out.append((scheme if isinstance(scheme, str) and scheme else graph_name(corpus.meta_ids, key[0]), notation, key))
+    return out
+
+
+def lint(corpus, all_terms, pattern=DEFAULT_CODE, externals=()):
+    """O vocabulário contra a prosa do corpus. Devolve {codes, resolved, external, findings}. Achados:
+
+    - vocab.notation-duplicate: a mesma notation em dois termos vivos do mesmo esquema, no corpus inteiro, pela regra
+      do leitor (que só vê o grafo: integrity.term-notation-duplicate); o achado cai em cada termo depois do primeiro;
+    - vocab.code-unresolved: um código do label ou do narrative, pela regex, que não é a notation de nenhum termo vivo
+      nem casa um esquema externo; o código qualificado esquema:código procura só naquele esquema;
+    - vocab.code-ambiguous: o código sem qualificação que é notation em mais de um esquema do próprio grafo, ou, sem
+      nenhum do próprio grafo, em mais de um esquema do corpus: quem lê não sabe qual (escreva esquema:código).
+    A ordem da resolução: o termo do próprio grafo, depois o esquema externo (externals: [(esquema, regex)], o código que
+    casa a regex inteira é de um sistema de fora, como SOC2, CVE e ISO, e resolve sem termo), depois o corpus. O
+    qualificador é um slug colado antes do código, com borda (my_sa:T7 e urn:kg:E5 não são qualificados). Um achado por
+    nó, campo e código."""
+    code_re = re.compile(pattern)
+    ext = [(name, re.compile(rx)) for name, rx in externals]
+    by_code = {}
+    for scheme, notation, key in _notations(corpus):
+        by_code.setdefault(notation, {}).setdefault(scheme, []).append(key)
+    findings = []
+    for code, schemes in sorted(by_code.items()):
+        for scheme, keys in sorted(schemes.items()):
+            for key in keys[1:]:
+                findings.append({"code": "vocab.notation-duplicate", "file": key[0], "id": key[1], "field": "x_term",
+                                 "token": f"{scheme}:{code}", "detail": f"{keys[0][0]}#{keys[0][1]}"})
+    local = {}
+    for scheme, _notation, key in _notations(corpus):
+        local.setdefault(key[0], set()).add(scheme)
+    n_codes = n_resolved = n_external = 0
+    for key in corpus.order:
+        node = corpus.nodes[key]
+        for field in ("label", "narrative"):
+            text = node.get(field)
+            if not isinstance(text, str):
+                continue
+            seen = set()
+            for m in code_re.finditer(text):
+                token = m.group(0)
+                if not token:
+                    continue
+                qual = QUALIFIER.search(text[:m.start()])
+                scheme = qual.group(1) if qual else None
+                full = f"{scheme}:{token}" if scheme else token
+                if full in seen:
+                    continue
+                seen.add(full)
+                n_codes += 1
+                where = set(by_code.get(token, {}))
+                if scheme is not None:
+                    if scheme in where:
+                        n_resolved += 1
+                    elif any(name == scheme and rx.fullmatch(token) for name, rx in ext):
+                        n_external += 1
+                    else:
+                        findings.append({"code": "vocab.code-unresolved", "file": key[0], "id": key[1], "field": field,
+                                         "token": full, "detail": ""})
+                    continue
+                own = node.get("x_term")
+                if isinstance(own, dict) and own.get("notation") == token:  # o termo cita o próprio código
+                    n_resolved += 1
+                    continue
+                mine = where & local.get(key[0], set())
+                if len(mine) == 1:
+                    n_resolved += 1
+                elif len(mine) > 1:
+                    findings.append({"code": "vocab.code-ambiguous", "file": key[0], "id": key[1], "field": field,
+                                     "token": token, "detail": ", ".join(sorted(mine))})
+                elif any(rx.fullmatch(token) for _name, rx in ext):
+                    n_external += 1
+                elif len(where) == 1:
+                    n_resolved += 1
+                elif where:
+                    findings.append({"code": "vocab.code-ambiguous", "file": key[0], "id": key[1], "field": field,
+                                     "token": token, "detail": ", ".join(sorted(where))})
+                else:
+                    findings.append({"code": "vocab.code-unresolved", "file": key[0], "id": key[1], "field": field,
+                                     "token": token, "detail": ""})
+    return {"codes": n_codes, "resolved": n_resolved, "external": n_external, "findings": findings}
+
+
+def lint_counts(findings):
+    """A base da catraca: quantas vezes cada (achado, arquivo, código) aparece; o nó e o campo ficam de fora, para a
+    base não quebrar quando um nó muda de id ou o texto passa do label ao narrative."""
+    out = {}
+    for f in findings:
+        k = "\t".join((f["code"], f["file"], f["token"]))
+        out[k] = out.get(k, 0) + 1
+    return dict(sorted(out.items()))
+
+
+CODE_FAMILY = ("vocab.code-unresolved", "vocab.code-ambiguous")  # o mesmo código sem nome único, em dois estados
+
+
+def lint_new(findings, baseline):
+    """(novos, reclassificados) contra a base. Novo é o achado de uma chave que a base não tem, ou acima da contagem
+    dela (os excedentes, na ordem do corpus). Reclassificado é a ocorrência que a base já tinha no outro estado da
+    família do código (sem termo ↔ ambíguo, no mesmo arquivo e com o mesmo código): criar o primeiro termo de um código
+    que colide muda o estado do legado, e quem nomeia não paga por ele (achado da bancada do core na 4.23)."""
+    left = dict(baseline)
+    new, reclassified = [], []
+    for f in findings:
+        k = "\t".join((f["code"], f["file"], f["token"]))
+        if left.get(k, 0) > 0:
+            left[k] -= 1
+            continue
+        if f["code"] in CODE_FAMILY:
+            other = CODE_FAMILY[1 - CODE_FAMILY.index(f["code"])]
+            ko = "\t".join((other, f["file"], f["token"]))
+            if left.get(ko, 0) > 0:
+                left[ko] -= 1
+                reclassified.append(f)
+                continue
+        new.append(f)
+    return new, reclassified
 
 
 # --- SKOS-XL + iso-thes, em Turtle ---------------------------------------------------------------------------------
@@ -186,16 +339,29 @@ def iri(base, graph, nid, suffix=""):
     return "<" + base + urllib.parse.quote(graph) + "#" + urllib.parse.quote(nid + suffix, safe="_-") + ">"
 
 
+def scheme_iri(base, name):
+    return "<" + base + "scheme/" + urllib.parse.quote(name, safe="") + ">"
+
+
 def skos(all_terms, base=DEFAULT_BASE, meta_ids=None):
     """O vocabulário em Turtle. O conceito leva o skos:prefLabel e, para o leitor de SKOS simples, o skos:altLabel e
     o skos:hiddenLabel dos sinônimos atuais de domínio; cada rótulo vira um skosxl:Label com a forma literal e a
     proveniência (dc:source, kg:locator, kg:sourceVersion, kg:verifiedAt, kg:reverifyEvery). O sinônimo de caso é
     ligado por kg:caseLabel (kg:scope e kg:case), nunca por skosxl:altLabel, que implicaria um skos:altLabel do
     conceito inteiro; o aposentado, por kg:retiredLabel (isothes:status "retired" e uma skos:historyNote). O sinônimo
-    que repete um literal já dito no conceito vai por kg:repeatedLabel (S13 do SKOS). O termo aposentado ganha dct:isReplacedBy."""
+    que repete um literal já dito no conceito vai por kg:repeatedLabel (S13 do SKOS). O termo aposentado ganha dct:isReplacedBy.
+    Desde a 4.23, cada conceito diz o seu esquema (skos:inScheme), <base>scheme/<nome>, com o nome escapado inteiro (a
+    barra também): o declarado e o do grafo (o meta.id) são o mesmo espaço de nomes; cada esquema sai uma vez como
+    skos:ConceptScheme."""
     meta_ids = meta_ids or {}
     graph_of = lambda file: graph_name(meta_ids, file)  # noqa: E731
     out = [PREFIXES]
+    schemes = {}
+    for t in all_terms:
+        if "scheme" in t:
+            schemes.setdefault(scheme_iri(base, t["scheme"]), t["scheme"])
+    for s_iri, name in schemes.items():
+        out.append(f"{s_iri} a skos:ConceptScheme ;\n    dct:title {_lit(name)} .\n")
     for t in all_terms:
         g = graph_of(t["file"])
         c = iri(base, g, t["id"])
@@ -206,6 +372,8 @@ def skos(all_terms, base=DEFAULT_BASE, meta_ids=None):
             lines.append(f"skos:definition {_lit(t['definition'], lang)}")
         if "notation" in t:
             lines.append(f"skos:notation {_lit(t['notation'])}")
+        if "scheme" in t:
+            lines.append("skos:inScheme " + scheme_iri(base, t["scheme"]))
         if t["status"] == "superseded":
             lines.append("isothes:status " + _lit("superseded"))
         for ref in t["superseded_by"]:
@@ -336,10 +504,63 @@ def human_lookup(text, hits):
     return "\n".join(lines)
 
 
+def run_lint(corpus, all_terms, args, externals, as_of, broken):
+    """O lint com a catraca opcional: sem --baseline, todo achado conta; com ela, só o novo; --update grava a base."""
+    res = lint(corpus, all_terms, args.pattern, externals)
+    counts = lint_counts(res["findings"])
+    new = reclassified = None
+    if args.baseline and not args.update:
+        try:
+            raw = json.loads(pathlib.Path(args.baseline).read_text(encoding="utf-8"))
+        except FileNotFoundError:
+            raw = {"schema_version": LINT_BASELINE_VERSION, "counts": {}}  # sem base, tudo é novo (falha fechada)
+        except (OSError, ValueError, UnicodeDecodeError) as exc:
+            return broken(_("--baseline {file}: {error}").format(file=args.baseline, error=exc))
+        base = raw.get("counts") if isinstance(raw, dict) and raw.get("schema_version") == LINT_BASELINE_VERSION else None
+        if not isinstance(base, dict) or not all(isinstance(v, int) and not isinstance(v, bool) for v in base.values()):
+            return broken(_("--baseline {file}: not a {version} file").format(file=args.baseline,
+                                                                               version=LINT_BASELINE_VERSION))
+        if "pattern" in raw and raw["pattern"] != args.pattern:  # outra regex mede outra coisa: a base não serve
+            return broken(_("--baseline {file} was written with another --pattern: run --update with this one")
+                          .format(file=args.baseline))
+        new, reclassified = lint_new(res["findings"], base)
+    if args.update:
+        try:
+            pathlib.Path(args.baseline).write_text(json.dumps({"schema_version": LINT_BASELINE_VERSION,
+                                                               "pattern": args.pattern, "counts": counts},
+                                                              ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        except OSError as exc:
+            return broken(exc)
+    failing = res["findings"] if new is None else new
+    doc = {"schema_version": SCHEMA_VERSION, "as_of": as_of.isoformat(),
+           "lint": {"pattern": args.pattern, "externals": [{"scheme": n, "pattern": rx} for n, rx in externals],
+                    "baseline": args.baseline, "updated": bool(args.update), **res, "new": new,
+                    "reclassified": reclassified},
+           "unreadable": corpus.unreadable}
+    if args.format == "json":
+        out = json.dumps(doc, ensure_ascii=False, indent=1)
+    else:
+        lines = [f"{f['code']}  {f['file']}#{f['id']}  {f['field']}  {f['token']}" + (f"  ({f['detail']})" if f["detail"] else "")
+                 for f in failing]
+        lines += [_("UNREADABLE  {file}  {code}").format(file=u["file"], code=u["code"]) for u in corpus.unreadable]
+        lines.append(_("· {codes} code(s) in prose: {resolved} resolved, {external} external; {findings} finding(s)")
+                     .format(codes=res["codes"], resolved=res["resolved"], external=res["external"],
+                             findings=len(res["findings"]))
+                     + (_("; {new} new against the baseline").format(new=len(new)) if new is not None else "")
+                     + (_(", {n} reclassified (no name yet ↔ ambiguous)").format(n=len(reclassified))
+                        if reclassified else "")
+                     + (_("; baseline written") if args.update else ""))
+        out = "\n".join(lines)
+    print(out.encode("utf-8", "backslashreplace").decode("utf-8"))
+    if corpus.unreadable:
+        return 1  # um grafo ilegível pode guardar o código que ninguém conferiu
+    return 0 if args.update or not failing else 1
+
+
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=_("The domain vocabulary of a corpus: the terms of the x_term profile "
-                                               "(contract v4.11)."))
-    ap.add_argument("command", choices=("terms", "lookup", "export"))
+    ap = argparse.ArgumentParser(description=_("The domain vocabulary of a corpus: the terms of the x_term profile, "
+                                               "and the codes in prose checked against them (contract v4.14)."))
+    ap.add_argument("command", choices=("terms", "lookup", "export", "lint"))
     ap.add_argument("files", nargs="*", help=_("for lookup, the text first; then .kg.yaml or .kg.json files (or --root)"))
     ap.add_argument("--root", help=_("the corpus root: the graphs git tracks under it"))
     ap.add_argument("--exclude", action="append", default=[], metavar="GLOB",
@@ -349,6 +570,11 @@ def main(argv=None):
     ap.add_argument("--case", help=_("lookup: the case whose case-scoped labels count"))
     ap.add_argument("--to", choices=("skos", "ossie"), help=_("export: the target format"))
     ap.add_argument("--base", default=DEFAULT_BASE, help=_("export --to skos: the base of the concept IRIs"))
+    ap.add_argument("--pattern", default=DEFAULT_CODE, help=_("lint: the regex of a code in prose"))
+    ap.add_argument("--external", action="append", default=[], metavar=_("SCHEME=REGEX"),
+                    help=_("lint: codes of an outside system (SOC2, CVE, ISO) that resolve without a term (repeatable)"))
+    ap.add_argument("--baseline", metavar=_("FILE"), help=_("lint: fail only on findings that are new or above this base"))
+    ap.add_argument("--update", action="store_true", help=_("lint: write the current findings to --baseline"))
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_intermixed_args(argv)
     kg_validate._utf8_stdio()
@@ -366,6 +592,22 @@ def main(argv=None):
         return broken(_("give either --root or the files"))
     if args.command == "export" and not args.to:
         return broken(_("export needs --to skos or --to ossie"))
+    if args.command != "lint" and (args.baseline or args.update or args.external or args.pattern != DEFAULT_CODE):
+        return broken(_("--pattern, --external, --baseline, and --update belong to lint"))
+    if args.update and not args.baseline:
+        return broken(_("--update needs --baseline"))
+    externals = []
+    for spec in args.external:
+        name, eq, rx = spec.partition("=")
+        if not eq or not SCHEME.fullmatch(name) or not rx:
+            return broken(_("--external {spec}: write SCHEME=REGEX, with the scheme as a slug").format(spec=repr(spec)))
+        externals.append((name, rx))
+    try:
+        for rx in [args.pattern] + [rx for _n, rx in externals]:
+            if re.compile(rx).fullmatch(""):
+                return broken(_("the regex {regex} matches the empty text").format(regex=repr(rx)))
+    except re.error as exc:
+        return broken(_("invalid regex: {error}").format(error=exc))
     as_of = datetime.date.today()
     if args.as_of is not None:
         as_of = kg_validate.iso_date(args.as_of)
@@ -377,6 +619,8 @@ def main(argv=None):
         return broken(exc)
     all_terms = terms(corpus, as_of)
     rc = 0
+    if args.command == "lint":
+        return run_lint(corpus, all_terms, args, externals, as_of, broken)
     if args.command == "export":
         out = skos(all_terms, args.base, corpus.meta_ids) if args.to == "skos" else json.dumps(ossie(all_terms, corpus.meta_ids), ensure_ascii=False, indent=1)
     elif args.command == "terms":

@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/10-glossary.md sha256:c532eae5bd6ff412 -->
+<!-- translation-of: docs/manual/10-glossary.md sha256:0f421704592e83ac -->
 # 10. Glossário
 
 [English](../10-glossary.md) | **Português (Brasil)**
@@ -21,6 +21,7 @@
 | **Critério pré-registrado** | Uma régua fixada antes do dado, um nó por versão (`x_criterion`, com o `sha256` dela); o resultado cita a versão sob a qual foi medido (`x_measured_under`), e a mudança depois de ver o dado é uma emenda datada, desde o v4.12 |
 | **Dívida herdada** | Os grafos que já reprovavam no MUST quando a base foi gravada |
 | **Dívida SHOULD** | Quantos grafos (ou ocorrências) carregam cada aviso |
+| **Esquema** | O vocabulário a que um termo pertence (`x_term.scheme`, o `skos:inScheme`), desde o v4.14; sem ele, o grafo. Dentro de um esquema, uma notation nomeia um conceito só, e fora dele um código se cita como `esquema:código` |
 | **Grafo** | Um arquivo `.kg.yaml`, ou a forma JSON dele, um arquivo `.kg.json` |
 | **Leitor** | Qualquer programa que lê `.kg.yaml` (ou `.kg.json`). O leitor de referência é o `kg_validate.py` |
 | **Linha de base** | A pasta `.kg-ssot/gate/` com a dívida contra a qual o gate compara: a identidade do contrato e um registro por grafo (até a 4.15.1, o arquivo único `.kg-ssot/gate.json`) |

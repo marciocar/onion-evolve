@@ -27,8 +27,10 @@ import collections
 import fnmatch
 import json
 import pathlib
+import re
 import subprocess
 import sys
+import unicodedata
 
 sys.dont_write_bytecode = True
 if __package__:  # no pacote kg_ssot, o vizinho vem pelo pacote, sem mexer no sys.path de quem importa
@@ -180,6 +182,54 @@ def neighborhood(corpus, start, depth, edge_types, direction):
     return seen
 
 
+def fold(text):
+    """A forma de comparar texto: NFKD sem as marcas de acento, minúsculas pelo casefold, espaço repetido em um.
+    «verificação» e «VERIFICACAO» dobram para o mesmo texto (desde a 4.23)."""
+    plain = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
+    return " ".join(plain.casefold().split())
+
+
+def domain_label(raw):
+    """O sinônimo que vale no domínio inteiro: literal em texto, kind alt ou hidden, não aposentado (retired false ou
+    ausente, e status current ou ausente) e sem escopo de caso. O escopo ilegível conta como caso: falha fechada, a
+    mesma regra do kg_vocab.py (que importa esta)."""
+    if not isinstance(raw, dict) or not isinstance(raw.get("literal"), str) or not raw["literal"].strip() or \
+            raw.get("kind") not in ("alt", "hidden"):
+        return False
+    if raw.get("retired", False) is not False or raw.get("status", "current") != "current":
+        return False
+    scope = raw.get("scope")
+    return "scope" not in raw or (isinstance(scope, dict) and scope.get("level") == "domain")
+
+
+def term_forms(corpus, text):
+    """O vocabulário que o --text nomeia (desde a 4.23): os termos vivos (status que não é superseded nem refuted) do
+    perfil x_term cujo pref ou sinônimo de domínio atual (domain_label), dobrado, é o texto inteiro dobrado, ou cuja
+    notation é o texto exato (código é código: sem dobrar caixa). Devolve [{file, id, pref, forms, notation}], com as
+    formas dobradas; vazio quando nenhum casa. O nó do termo casa sempre; os outros nós casam por uma forma dobrada ou
+    pela notation exata, sempre como palavra inteira, nunca dentro de outra palavra."""
+    want = fold(text)
+    out = []
+    for key in corpus.order:
+        node = corpus.nodes[key]
+        term = node.get("x_term")
+        if not isinstance(term, dict) or not isinstance(term.get("pref"), str) or \
+                node.get("status") in ("superseded", "refuted"):
+            continue
+        forms = [term["pref"]] + [lab["literal"] for lab in (term.get("labels") if isinstance(term.get("labels"), list)
+                                                             else []) if domain_label(lab)]
+        folded = [f for f in dict.fromkeys(fold(x) for x in forms) if f]
+        notation = term["notation"] if isinstance(term.get("notation"), str) and term["notation"].strip() else None
+        if want in folded or (notation is not None and text.strip() == notation):
+            out.append({"file": key[0], "id": key[1], "pref": term["pref"], "forms": folded, "notation": notation})
+    return out
+
+
+def _word(form):
+    """A forma como palavra inteira: sem letra, dígito ou sublinhado colados antes ou depois."""
+    return re.compile(r"(?<!\w)" + re.escape(form) + r"(?!\w)")
+
+
 def _text(node, key):
     v = node.get(key)
     return v if isinstance(v, str) else ""
@@ -196,9 +246,11 @@ def matches(node, key, f):
     if f["file"] and f["file"] not in key[0]:
         return False
     if f["text"]:
-        hay = _text(node, "label") + ("\n" + _text(node, "narrative") if f["in_narrative"] else "")
-        hay = hay.casefold()
-        if not all(w in hay for w in f["text"].casefold().split()):
+        raw = _text(node, "label") + ("\n" + _text(node, "narrative") if f["in_narrative"] else "")
+        hay = fold(raw)
+        if not all(w in hay for w in fold(f["text"]).split()) and key not in f.get("terms", ()) and \
+                not any(rx.search(hay) for rx in f.get("forms", ())) and \
+                not any(rx.search(raw) for rx in f.get("notations", ())):  # o termo nomeado e as suas formas também
             return False
     if f["verified_before"] is not None:
         day = kg_validate.iso_date(node.get("verified_at")) if isinstance(node.get("verified_at"), str) else None
@@ -268,6 +320,10 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
     f = {"ids": set(ids), "id_prefix": id_prefix, "node_type": node_type, "status": "open" if open_only else status,
          "plane": plane, "layer": layer, "file": file, "text": text, "in_narrative": in_narrative,
          "verified_before": verified_before}
+    expanded = term_forms(corpus, text) if text else []
+    f["forms"] = [_word(form) for form in dict.fromkeys(form for t in expanded for form in t["forms"])]
+    f["notations"] = [_word(n) for n in dict.fromkeys(t["notation"] for t in expanded if t["notation"])]
+    f["terms"] = {(t["file"], t["id"]) for t in expanded}
     if open_only and status not in (None, "open"):
         raise ValueError(_("--open and --status ask for different statuses"))
     keys = corpus.order
@@ -298,9 +354,23 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                "direction": direction if around is not None else None, "sort": sort, "limit": limit, "cursor": cursor,
                "fields": list(fields)}
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
-    return {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
-            "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
-            "nodes": page}
+    res = {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
+           "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
+           "nodes": page}
+    if text:
+        res["expanded"] = expanded
+        if not hits:  # o zero de uma busca por texto não pode passar por "não há"
+            only_text = {k: f[k] for k in ("text", "in_narrative", "forms", "notations", "terms")}
+            loose = {"ids": set(), "id_prefix": None, "node_type": None, "status": None, "plane": None, "layer": None,
+                     "file": None, "verified_before": None, **only_text}
+            if any(matches(corpus.nodes[k], k, loose) for k in corpus.order):
+                res["hint"] = _("nodes match --text, but not the other filters: the zero comes from them")
+            else:
+                res["hint"] = (_("no node has every word of --text in its label: try fewer words, --in-narrative, or a "
+                                 "term of the vocabulary (kg_vocab.py lookup)") if not in_narrative else
+                               _("no node has every word of --text in its label or narrative: try fewer words, or a "
+                                 "term of the vocabulary (kg_vocab.py lookup)"))
+    return res
 
 
 def human(res):
@@ -326,6 +396,11 @@ def human(res):
     if len(res["unreadable"]) > 5:
         lines.append(_("UNREADABLE  and {n} more graph(s) (--format json shows the full list)")
                      .format(n=len(res["unreadable"]) - 5))
+    for t in res.get("expanded", []):
+        lines.append(_("· --text is the term {pref} ({file}#{id}): it also matched {forms}").format(
+            pref=t["pref"], file=t["file"], id=t["id"], forms=", ".join(t["forms"])))
+    if res.get("hint"):
+        lines.append("· " + res["hint"])
     shown = len(res["nodes"])
     first = int(res["query"]["cursor"] or 0)
     tail = _("; next page: --cursor {cursor}").format(cursor=res["next_cursor"]) if res["next_cursor"] else ""

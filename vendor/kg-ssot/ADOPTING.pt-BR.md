@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:26887e82f5729581 -->
+<!-- translation-of: ADOPTING.md sha256:0b7b20e28fac3756 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -333,6 +333,22 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.22.0` para a `kg-ssot-v4.23.0`, o contrato vai ao v4.14, e só o nível SHOULD muda: nada que passava
+reprova, e o gate registra a identidade nova do contrato sem pedir `--update` enquanto nenhum veredito muda (medido nos
+185 grafos do core antes da tag). O que você pode ver e fazer:
+
+- O `x_term` ganha o `scheme`, o vocabulário a que o termo pertence (um slug; sem ele, o grafo, de nome `meta.id`).
+  Dois termos vivos com a mesma `notation` no mesmo esquema alertam como `integrity.term-notation-duplicate`.
+- Para dar nome legível aos seus códigos curtos (`A7`, `O1`, `r16`), escreva um nó com `x_term` por código: o código é
+  a `notation`, o nome é o `pref`, e o `scheme` é a família de códigos. O id do nó fica como está.
+- O `kg_vocab.py lint` confere os códigos escritos nos labels e nas narrativas. Comece pela catraca, para os códigos
+  que existem não travarem e os novos nascerem com nome:
+  `python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lint --root . --baseline .kg-ssot/vocab-lint.json --update`, depois o
+  mesmo sem `--update` no CI. Declare um sistema de códigos de fora com `--external soc2='CC[0-9]+'`. A regex padrão
+  não pega `REGRA N`, `SAC-N` nem ids de nó, que têm mecanismo próprio; o `--pattern` a troca.
+- O `kg_query.py --text` agora compara sem acento e se expande pelo vocabulário; um script que contava com a busca
+  sensível a maiúscula, ou com o zero de uma grafia sem acento, vê mais resultados.
 
 Da `kg-ssot-v4.21.1` para a `kg-ssot-v4.22.0`, o contrato vai ao v4.13, e só o nível SHOULD muda: nada que passava
 reprova, e o gate registra a identidade nova do contrato sem pedir `--update` enquanto nenhum veredito muda (medido nos

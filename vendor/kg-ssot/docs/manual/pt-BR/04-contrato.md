@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:efb296dd5682fcb5 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:cd2be7e4f0bc485e -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -58,7 +58,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 desde a 4.22.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 desde a 4.23.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -84,6 +84,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.20 | Contrato v4.11, sem mudança. O armazém guarda o veredito de cada grafo julgado e deixa de julgar de novo o que não mudou; o carimbo `.kg-ssot-version` vira a regra pública do vendor em toda ferramenta; o `kg_diff.py` dá nome à árvore de trabalho (`WORKTREE`) |
 | 4.21 | Contrato v4.12: o critério pré-registrado, com os perfis SHOULD `x_criterion` e `x_measured_under`, cinco avisos de coerência nos dois leitores, e o `kg_criterion.py`, que confere o `sha256` contra o texto ou o arquivo e segue a citação de outro grafo; o `kg_migrate.py nest`, que leva as chaves `x_` próprias de um adotante para um perfil canônico |
 | 4.22 | Contrato v4.13: o `x_questionnaire.role` (`item`, `evidence_request` ou `evidence_requirement`) no SHOULD; o pacote de auditoria por pergunta, `kg_audit.py`, em CSV, XLSX ou JSON |
+| 4.23 | Contrato v4.14: o `x_term.scheme` e o aviso `integrity.term-notation-duplicate`, para um código curto levar nome legível no próprio vocabulário; o `kg_vocab.py` resolve um código (`esquema:código`) e ganha o `lint`, com catraca, para os códigos da prosa; o `kg_query.py --text` sem acento, pelo vocabulário e com aviso no zero |
 
 ## Versões e tags
 

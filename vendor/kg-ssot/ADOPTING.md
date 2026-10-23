@@ -335,6 +335,22 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.22.0` to `kg-ssot-v4.23.0`, the contract goes to v4.14, and only the SHOULD level changes: nothing that
+passed fails, and the gate notes the new contract identity without asking for `--update` while no verdict changes
+(measured on the core's 185 graphs before the tag). What you may see and do:
+
+- `x_term` gets `scheme`, the vocabulary a term belongs to (a slug; without it, the graph, named by its `meta.id`).
+  Two live terms with the same `notation` in the same scheme warn as `integrity.term-notation-duplicate`.
+- To give your short codes (`A7`, `O1`, `r16`) a readable name, write one `x_term` node per code: the code is the
+  `notation`, the name is the `pref`, and the `scheme` is the family of codes. The node id stays as it is.
+- `kg_vocab.py lint` checks the codes written in labels and narratives. Start with the ratchet, so that the codes
+  that exist do not block and the new ones must be born with a name:
+  `python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lint --root . --baseline .kg-ssot/vocab-lint.json --update`, then the
+  same without `--update` in CI. Declare an outside code system with `--external soc2='CC[0-9]+'`. The default regex
+  does not take `RULE N`, `SAC-N`, or node ids, which have their own mechanisms; `--pattern` replaces it.
+- `kg_query.py --text` now compares without accents and expands through the vocabulary; a script that counted on a
+  case-sensitive match, or on an empty result for an accent-free spelling, sees more matches.
+
 From `kg-ssot-v4.21.1` to `kg-ssot-v4.22.0`, the contract goes to v4.13, and only the SHOULD level changes: nothing that
 passed fails, and the gate notes the new contract identity without asking for `--update` while no verdict changes
 (measured on the core's 184 graphs before the tag). What you may see and do:

@@ -1,0 +1,64 @@
+{
+  "description": "A notation do vocabulário (v4.14): aviso SHOULD integrity.term-notation-duplicate quando dois nós vivos (status que não é superseded nem refuted) com x_term têm a mesma notation no mesmo esquema, só entre nós do mesmo grafo. O esquema é o x_term.scheme ou, sem ele, o próprio grafo, de nome meta.id (o esquema declarado igual ao meta.id é o mesmo); a notation se compara exata. É a convenção do SKOS (§6.5.3). O corpus inteiro, a citação esquema:código e o código na prosa são do kg_vocab.py lint, não do leitor.",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-notation-two-schemes.kg.yaml",
+      "description": "a mesma notation em dois esquemas: é a colisão que o esquema existe para separar",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-notation-superseded.kg.yaml",
+      "description": "a notation reusada pelo termo que substitui o aposentado",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-notation-case-differs.kg.yaml",
+      "description": "a notation se compara exata: O1 e o1 são códigos diferentes",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-term-notation-duplicate.kg.yaml",
+      "description": "dois termos vivos com a mesma notation no mesmo esquema declarado",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.term-notation-duplicate"
+      ]
+    },
+    {
+      "file": "warn-term-notation-duplicate-graph-scheme.kg.yaml",
+      "description": "dois termos vivos com a mesma notation e sem esquema declarado: o esquema é o grafo",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.term-notation-duplicate"
+      ]
+    },
+    {
+      "file": "warn-term-notation-duplicate-three.kg.yaml",
+      "description": "três termos com a mesma notation no mesmo esquema: o aviso cai nos dois depois do primeiro",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.term-notation-duplicate"
+      ]
+    },
+    {
+      "file": "warn-term-notation-duplicate-declared-is-graph.kg.yaml",
+      "description": "um termo declara o esquema com o nome do meta.id e o outro não declara: é o mesmo esquema, o do grafo",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.term-notation-duplicate"
+      ]
+    }
+  ]
+}

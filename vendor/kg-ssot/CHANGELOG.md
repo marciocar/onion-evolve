@@ -10,6 +10,37 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.23.0] - 2026-10-23
+
+A short code gets a readable name in its own vocabulary, and the codes in prose are checked against it, with a
+ratchet. Contract v4.14: `x_term.scheme` and one warning in the SHOULD, nothing that passed fails.
+
+### Added
+
+- **A short code with a readable name (contract v4.14).** A code like `O1` or `r16` keeps its short, stable id and
+  gets a name in a vocabulary: the code is the `notation` of an `x_term`, the name is the `pref`, and the new
+  `x_term.scheme` (a slug) says which vocabulary it belongs to, as `skos:notation`, `skos:prefLabel`, and
+  `skos:inScheme` do in SKOS. Without a scheme, the scheme is the graph. Both readers warn
+  `integrity.term-notation-duplicate` when two live terms share a notation in the same scheme (SKOS §6.5.3). SHOULD
+  only: nothing that passed fails. Measured before the design: 71 opaque codes in the product's own graphs, with two
+  real collisions (`O1` and `V1` each meant two things), and hundreds in an adopter's.
+- **`kg_vocab.py` resolves codes and checks them in prose.** `lookup` matches a `notation` exactly, alone or as
+  `scheme:notation`; `terms` gives each term its effective `scheme`; `export --to skos` writes `skos:inScheme` and the
+  `skos:ConceptScheme`. The new `lint` reads labels and narratives, finds codes by a regex (`--pattern`), and reports
+  `vocab.notation-duplicate` across the corpus, `vocab.code-unresolved`, and `vocab.code-ambiguous` (a code in two
+  schemes, none of them the graph's own). `--external soc2='CC[0-9]+'` declares an outside code system, and
+  `--baseline <file> [--update]` is the gate's ratchet: the codes that exist do not block, a new one must be born with
+  a name, and naming the first term of a colliding code does not charge for the old mentions (`reclassified`).
+
+### Changed
+
+- **`kg_query.py --text` no longer gives a silent zero.** It compares without case or accents (`verificacao` matches
+  `Verificação`); when the whole text is a term of the vocabulary (its `pref`, a current synonym, or its `notation`),
+  the term and every node with any of its forms as a whole word match too (`expanded`; a case-scoped or retired synonym
+  does not expand, and a notation matches exactly); and an empty result carries a `hint` that says when the zero comes
+  from the other filters. Requested
+  by an adopter that measured «PDF digitalizado», «reconhecimento óptico», and «verificacao» each giving 0 in silence.
+
 ## [4.22.0] - 2026-10-23
 
 The audit package by question: one row per questionnaire item, with the answer, the dated evidence, and the gaps it

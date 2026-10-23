@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:3f30eb224da08c8c -->
+<!-- translation-of: spec/conformance/README.md sha256:d04b66fd5cbfdacd -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -67,7 +67,7 @@ Cada código é um slug estável por camada, e o metaschema confere a forma.
 |---|---|---|
 | parse | `parse.<motivo>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
 | form | `form.<tipo>.<escopo>.<campo>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
-| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` e os cinco códigos `integrity.criterion-*` e `integrity.measured-*` do v4.12 (SHOULD) |
+| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision`, `integrity.refutes-unreconciled` os cinco códigos `integrity.criterion-*` e `integrity.measured-*` do v4.12 e o `integrity.term-notation-duplicate` do v4.14 (SHOULD) |
 | yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
 | semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked` e os `semantic.domain-*` da camada domain (SHOULD), só em `optional/` |
 
@@ -239,6 +239,11 @@ O v4.13 põe o `role` no perfil `x_questionnaire`, no SHOULD (`latest/form/profi
 `evidence_request` (o pedido de evidência a uma pessoa) ou `evidence_requirement` (a evidência que um item exige), que
 os separam do item do questionário. Outro valor alerta como
 `form.enum.node.x_questionnaire.role`, e nada que passava reprova.
+
+O v4.14 põe o `scheme` no perfil `x_term` (um slug; sem ele, o esquema é o grafo) e o aviso
+`integrity.term-notation-duplicate` (`latest/integrity/term/`): dois termos vivos (status que não é `superseded` nem
+`refuted`) com a mesma `notation` no mesmo esquema, entre nós do mesmo grafo. A notation se compara exata. O corpus
+inteiro e os códigos da prosa são do `kg_vocab.py lint`, que não faz parte da suíte.
 
 O mesmo código pode ser MUST num caso e SHOULD em outro, porque a severidade é do caso, não do código.
 

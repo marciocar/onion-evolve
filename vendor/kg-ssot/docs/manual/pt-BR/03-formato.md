@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:d32560d49c4e0e25 -->
+<!-- translation-of: docs/manual/03-format.md sha256:017fe4cd71efc6ff -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -173,7 +173,8 @@ data em que foi conferido e quando conferir de novo.
 | `pref` | texto | obr. O termo preferido |
 | `lang` | texto | uma etiqueta BCP 47 (`pt-BR`, `en`) |
 | `definition` | texto | |
-| `notation` | texto | um código que identifica o termo (`GTIN`, um número de catálogo) |
+| `notation` | texto | um código que identifica o termo (`GTIN`, um número de catálogo, `O1`) |
+| `scheme` | slug | o vocabulário a que o termo pertence (v4.14): minúsculas, dígitos e hífen. Sem ele, o esquema é o grafo |
 | `labels` | lista | os sinônimos, cada um um objeto com as chaves abaixo |
 
 | Chave do sinônimo | Tipo | Regra |
@@ -192,6 +193,15 @@ data em que foi conferido e quando conferir de novo.
 O termo aposentado é o nó com `status: superseded` e uma aresta `SUPERSEDES` do termo que o substitui. O
 `kg_vocab.py` lista os termos, resolve um texto para o termo dele e exporta para o SKOS-XL e o Apache Ossie
 (capítulo 5).
+
+**Um código curto com nome legível (v4.14).** Um código como `O1`, `V3` ou `r16` vale desde que tenha nome. Dê a ele um
+termo: o código é a `notation`, o nome é o `pref`, e o `scheme` diz a que vocabulário ele pertence, como o
+`skos:notation`, o `skos:prefLabel` e o `skos:inScheme` no SKOS. O id do nó continua curto e estável. O mesmo código
+pode querer dizer duas coisas em dois esquemas (a opção `O1` de uma decisão e a onda `O1` de uma recuperação): fora do
+grafo dele, cite como `esquema:código`. Dentro de um esquema, um código nomeia um conceito só, então dois termos vivos
+com a mesma notation no mesmo esquema alertam como `integrity.term-notation-duplicate`; o esquema do grafo tem o
+nome do `meta.id`, então um esquema declarado com esse nome é o mesmo esquema. O `kg_vocab.py lint` confere os
+códigos escritos nos labels e nas narrativas contra o vocabulário (capítulo 5).
 
 ```yaml
   - id: T_EAN

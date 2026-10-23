@@ -10,6 +10,37 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.23.0] - 2026-10-23
+
+Um código curto ganha nome legível no próprio vocabulário, e os códigos da prosa são conferidos contra ele, com
+catraca. Contrato v4.14: o `x_term.scheme` e um aviso no SHOULD, e nada que passava reprova.
+
+### Adicionado
+
+- **Um código curto com nome legível (contrato v4.14).** Um código como `O1` ou `r16` mantém o id curto e estável e ganha
+  um nome num vocabulário: o código é a `notation` de um `x_term`, o nome é o `pref`, e o novo `x_term.scheme` (um slug)
+  diz a que vocabulário ele pertence, como o `skos:notation`, o `skos:prefLabel` e o `skos:inScheme` no SKOS. Sem
+  esquema, o esquema é o grafo. Os dois leitores alertam `integrity.term-notation-duplicate` quando dois termos vivos
+  têm a mesma notation no mesmo esquema (SKOS §6.5.3). Só SHOULD: nada que passava reprova. Medido antes do desenho: 71
+  códigos opacos nos grafos do próprio produto, com duas colisões reais (`O1` e `V1` queriam dizer duas coisas cada), e
+  centenas nos de um adotante.
+- **O `kg_vocab.py` resolve códigos e os confere na prosa.** O `lookup` casa uma `notation` exata, sozinha ou como
+  `esquema:notation`; o `terms` dá a cada termo o `scheme` efetivo; o `export --to skos` escreve o `skos:inScheme` e o
+  `skos:ConceptScheme`. O novo `lint` lê labels e narrativas, acha códigos por uma regex (`--pattern`) e aponta
+  `vocab.notation-duplicate` no corpus inteiro, `vocab.code-unresolved` e `vocab.code-ambiguous` (um código em dois
+  esquemas, nenhum do próprio grafo). O `--external soc2='CC[0-9]+'` declara um sistema de códigos de fora, e o
+  `--baseline <arquivo> [--update]` é a catraca do gate: os códigos que existem não travam, o novo tem de nascer com
+  nome, e nomear o primeiro termo de um código que colide não cobra pelas menções antigas (`reclassified`).
+
+### Mudado
+
+- **O `kg_query.py --text` não dá mais zero calado.** Ele compara sem maiúscula nem acento (`verificacao` casa
+  `Verificação`); quando o texto inteiro é um termo do vocabulário (o `pref`, um sinônimo atual ou a `notation`),
+  casam também o termo e todo nó com qualquer forma dele como palavra inteira (`expanded`; o sinônimo de caso ou
+  aposentado não expande, e a notation casa exata); e o resultado vazio traz um `hint` que diz quando o zero vem dos
+  outros filtros. Pedido de um
+  adotante que mediu «PDF digitalizado», «reconhecimento óptico» e «verificacao» dando 0 em silêncio.
+
 ## [4.22.0] - 2026-10-23
 
 O pacote de auditoria por pergunta: uma linha por item de questionário, com a resposta, a evidência datada e as lacunas

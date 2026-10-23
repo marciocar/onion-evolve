@@ -671,7 +671,8 @@ function containsValue(value, hit) {
 
 /** Os avisos de coerência, que cruzam campos ou arestas (coherence_located da referência), um por ocorrência:
  * integrity.testimony-in-prod, integrity.verified-before-fact, integrity.untraced-decision e
- * integrity.refutes-unreconciled; desde o v4.12, os do critério pré-registrado (criterionCodes). */
+ * integrity.refutes-unreconciled; desde o v4.12, os do critério pré-registrado (criterionCodes); desde o v4.14, a
+ * notation repetida no mesmo esquema (termCodes). */
 export function coherenceCodes(doc, corpus = null) {
   const out = [];
   const edges = Array.isArray(doc.edges) ? doc.edges : [];
@@ -711,7 +712,28 @@ export function coherenceCodes(doc, corpus = null) {
       out.push('integrity.refutes-unreconciled');
     }
   }
-  return out.concat(criterionCodes(doc));
+  return out.concat(criterionCodes(doc), termCodes(doc));
+}
+
+/** integrity.term-notation-duplicate (v4.14), só entre nós do mesmo grafo (term_located da referência): dois nós vivos
+ * com x_term no mesmo esquema (x_term.scheme ou, sem ele, o grafo, de nome meta.id) e com a mesma notation; o aviso cai em cada nó
+ * depois do primeiro. A notation se compara exata. */
+export function termCodes(doc) {
+  const out = [];
+  const seen = new Set();
+  const meta = isObj(get(doc, 'meta')) ? doc.meta : {};
+  const graph = typeof get(meta, 'id') === 'string' && meta.id ? meta.id : null; // o esquema do grafo tem o nome do meta.id
+  for (const n of located(doc, 'nodes')) {
+    const term = get(n, 'x_term');
+    if (!isObj(term) || ['superseded', 'refuted'].includes(get(n, 'status'))) continue;
+    const notation = get(term, 'notation');
+    const scheme = get(term, 'scheme');
+    if (typeof notation !== 'string' || !notation) continue;
+    const key = JSON.stringify([typeof scheme === 'string' && scheme ? scheme : graph, notation]);
+    if (seen.has(key)) out.push('integrity.term-notation-duplicate');
+    seen.add(key);
+  }
+  return out;
 }
 
 // A data ou a data-hora RFC 3339 dos perfis do critério (v4.12), a mesma regex do schema SHOULD (STAMP da referência).

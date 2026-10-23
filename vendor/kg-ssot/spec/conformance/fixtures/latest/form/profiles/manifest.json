@@ -1,5 +1,5 @@
 {
-  "description": "Os perfis canônicos das chaves x_ recorrentes (v4.11): x_term, x_mirror, x_doc_cycle, x_questionnaire e x_severity no nó, x_confidence e x_provisional na aresta. São SHOULD: julgados só quando a chave está presente, nunca reprovam. Desde o v4.12, também x_criterion (a versão de um critério pré-registrado) e x_measured_under (o resultado medido sob ele); a coerência entre eles está em latest/integrity/criterion/.",
+  "description": "Os perfis canônicos das chaves x_ recorrentes (v4.11): x_term, x_mirror, x_doc_cycle, x_questionnaire e x_severity no nó, x_confidence e x_provisional na aresta. São SHOULD: julgados só quando a chave está presente, nunca reprovam. Desde o v4.12, também x_criterion (a versão de um critério pré-registrado) e x_measured_under (o resultado medido sob ele); a coerência entre eles está em latest/integrity/criterion/. Desde o v4.14, o x_term ganha scheme (o esquema do vocabulário, em forma de slug; sem ele, o esquema é o grafo); a notation repetida no mesmo esquema está em latest/integrity/term/.",
   "layer": "form",
   "pending_on": [],
   "cases": [
@@ -13,6 +13,13 @@
     {
       "file": "valid-x-term-pref-only.kg.yaml",
       "description": "o termo só com o preferido (v4.11)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-x-term-scheme.kg.yaml",
+      "description": "o termo com notation e o esquema declarado em forma de slug (v4.14)",
       "valid": true,
       "codes": [],
       "warnings": []
@@ -75,6 +82,15 @@
       "codes": [],
       "warnings": [
         "form.type.node.x_term"
+      ]
+    },
+    {
+      "file": "warn-x-term-scheme-pattern.kg.yaml",
+      "description": "o esquema fora da forma de slug (maiúscula, espaço, acento) (v4.14)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.x_term.scheme"
       ]
     },
     {
