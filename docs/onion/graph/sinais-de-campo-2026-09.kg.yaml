@@ -345,6 +345,38 @@ nodes:
       locator: "pergunta com opções de 2026-10-23: «Nomear as convenções aprovadas (A7.tsv, A1, r1, N0–N4) com nome canônico e glossário comum facilita o entendimento do core, do kg-ssot e do maestro?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
       locality: "pessoa"
+  - id: D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «Id curto + termo x_term»"
+    label: "Forma dos nomes canônicos: o id curto fica estável e vira notation num nó x_term com pref legível dentro de um esquema; prefixo de escopo só na citação; arquivos com nome-código ganham sufixo descritivo"
+    narrative: "Selado por /meta:decide em 2026-10-23: escolhida «Id curto + termo x_term»; descartadas: «Prefixo obrigatório na escrita» · «Só sufixo em arquivos»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «Nomes canônicos: qual forma?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      locality: "pessoa"
+  - id: D_NOMES_NASCEM_CERTOS_NAS_TRES_CAMADAS_1023
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "decisão do maestro em 2026-10-23, por pergunta com opções (/meta:decide): escolhida «Nas três camadas»"
+    label: "O nascer certo dos nomes mora em três camadas: kg-ssot (esquema, lookup por notation, notation repetida, citação entre grafos, kg_vocab lint), core (selador e forja exigem nome e esquema; glossário do hook vira projeção) e o core como bancada antes da tag"
+    narrative: "Selado por /meta:decide em 2026-10-23: escolhida «Nas três camadas»; descartadas: «Só no core»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-23: «Onde mora o nascer e usar certo dos nomes canônicos?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-23"
+      locality: "pessoa"
 edges:
   - from: E_KG_SSOT_419_ADOTADA_1022
     to: Q_KG_MIGRATE_KEYS_NO_CORPUS_1022
@@ -396,4 +428,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_NOMES_CANONICOS_NASCEM_CERTOS_1023
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: TRACES_TO
+  - from: D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023
+    to: D_NOMES_CANONICOS_NASCEM_CERTOS_1023
+    edge_type: TRACES_TO
+  - from: D_NOMES_NASCEM_CERTOS_NAS_TRES_CAMADAS_1023
+    to: D_NOMES_CANONICOS_NASCEM_CERTOS_1023
     edge_type: TRACES_TO
