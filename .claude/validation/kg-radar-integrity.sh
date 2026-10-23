@@ -92,6 +92,117 @@ cd "${REPO_ROOT}" || exit 2
 [ -f "${RADAR}" ] || exit 0
 
 hard=0; total=0; proposta=0; fora=0
+
+# ══ INTEGRIDADE CONSUMIDA DO CONTRATO (D_RADAR_CONSOME_INTEGRIDADE_DO_CONTRATO_1023) ══════════════
+# A forma e a integridade do grafo são do contrato KG-SSOT; este gate não as reimplementa quando o
+# leitor de referência está vendorizado. UMA chamada do `kg_validate.py --format json` sobre o corpus
+# inteiro (medido em 2026-10-23: 187 grafos em ~9 s, contra ~75 s do laço de um radar por grafo) e o
+# veredito sai dos CÓDIGOS, nunca da prosa. Mapa medido, defeito a defeito, contra o radar:
+#   · DUPLICADAS (vêm do contrato, MUST): id repetido, chave repetida, aresta solta (from/to/trigger),
+#     ponta local de external_edges, nó órfão, edge_type, node_type, plane, layer, status, impact,
+#     confidence, alfabeto do id;
+#   · MAIS RÍGIDA NA CASA (catraca: nada afrouxa): REFUTES sobre alvo pendente é SHOULD no contrato
+#     (integrity.refutes-unreconciled) e HARD aqui — escalada;
+#   · MAIS FROUXA NA CASA, de propósito: `on:` legado e `valid_from` inteiro são MUST no contrato e só
+#     AVISO aqui (os adotantes carregam o passivo) — viram SOFT, nunca HARD;
+#   · DA CASA, sem par no contrato: o MODO PROPOSTA (grau 0 e referência para fora relaxados num
+#     fragmento) — aplicado aqui por cima dos códigos.
+# Arquivo que o contrato não PARSEIA (parse.*) não foi julgado no resto: vai para o radar próprio.
+# Sem o leitor (plugin sem vendor, python3 ausente, rc fora de 0/1 ou JSON ilegível), o laço antigo
+# de um radar por grafo segue inteiro — a mesma régua de antes, declarada, nunca verde por ausência.
+VAL="${ONION_KG_INTEGRITY_VALIDATOR:-${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py}"
+GRAPHS="$(git ls-files '*.kg.yaml' | bash "${_KFP}" --filter)"
+CONTRACT_TSV=""
+if [ -n "${GRAPHS}" ] && [ -f "${VAL}" ] && command -v python3 >/dev/null 2>&1; then
+  _ct="$(mktemp -d)"; trap 'rm -rf "${_ct}"' EXIT
+  _vrc=0
+  # shellcheck disable=SC2086
+  python3 -I -B "${VAL}" --format json -- ${GRAPHS} >"${_ct}/v.json" 2>"${_ct}/v.err" || _vrc=$?
+  if [ "${_vrc}" -eq 0 ] || [ "${_vrc}" -eq 1 ]; then
+    _trc=0
+    python3 -I -B - "${_ct}/v.json" "${_ct}/out.tsv" <<'PY' || _trc=$?
+import json, re, sys
+src, out = sys.argv[1], sys.argv[2]
+HARD_MUST = {
+    "integrity.duplicate-id", "parse.duplicate-key", "integrity.dangling-from", "integrity.dangling-to",
+    "integrity.dangling-trigger", "integrity.dangling-external-local", "integrity.orphan-node",
+    "form.enum.edge.edge_type", "form.enum.top.external_edges.edge_type", "form.enum.node.node_type",
+    "form.enum.node.plane", "form.enum.node.layer", "form.enum.node.status", "form.range.node.impact",
+    "form.range.node.confidence", "form.pattern.node.id", "form.pattern.edge.from", "form.pattern.edge.to",
+}
+RELAXABLE = {"integrity.orphan-node", "integrity.dangling-from", "integrity.dangling-to",
+             "integrity.dangling-trigger", "integrity.dangling-external-local"}
+ESCALATE = {"integrity.refutes-unreconciled"}
+SOFT_MAP = {"yaml.forbidden-key-on": "ON-LEGADO", "form.type.node.valid_from": "VALID-FROM-INTEIRO"}
+rep = json.load(open(src, encoding="utf-8"))
+if not isinstance(rep, dict) or rep.get("schema_version") != "kg-ssot.verdict/1":
+    sys.exit(3)
+clean = lambda v: str(v).replace("\t", " ").replace("\n", " ")
+rows = []
+for r in rep["results"]:
+    path = r["source"]
+    occ = r.get("occurrences", [])
+    if r.get("truncated"):
+        rows.append(("RADAR", path, "veredito truncado"))
+        continue
+    if any(str(o.get("code", "")).startswith("parse.") and o.get("code") != "parse.duplicate-key" for o in occ):
+        rows.append(("RADAR", path, "o contrato não parseou o arquivo"))
+        continue
+    text = open(path, encoding="utf-8").read()
+    proposal = path.endswith(".proposal.kg.yaml") or re.search(r"(?m)^  target:[ \t]*\S", text) is not None
+    hard, relaxed, soft = [], 0, {}
+    for o in occ:
+        code, lvl = str(o.get("code", "")), o.get("level")
+        if code in SOFT_MAP:
+            soft[SOFT_MAP[code]] = soft.get(SOFT_MAP[code], 0) + 1
+        elif (lvl == "MUST" and code in HARD_MUST) or code in ESCALATE:
+            if proposal and code in RELAXABLE:
+                relaxed += 1
+            else:
+                hard.append("%s (%s)" % (code, clean(o.get("place", o.get("path", "")))))
+    if hard:
+        rows.append(("HARD", path, "; ".join(hard[:2]) + (" …+%d" % (len(hard) - 2) if len(hard) > 2 else "")))
+    elif proposal:
+        rows.append(("PROPOSTA", path, "%d referência(s) de grafo fechado relaxada(s) pelo contrato" % relaxed))
+    else:
+        rows.append(("OK", path, ""))
+    for tag, n in soft.items():
+        rows.append((tag, path, str(n)))
+with open(out, "w", encoding="utf-8") as fh:
+    fh.write("".join("\t".join(x) + "\n" for x in rows))
+PY
+    [ "${_trc}" -eq 0 ] && [ -f "${_ct}/out.tsv" ] && CONTRACT_TSV="${_ct}/out.tsv"
+  fi
+fi
+
+if [ -n "${CONTRACT_TSV}" ]; then
+  RADAR_LIST=""
+  while IFS=$'\t' read -r kind g msg; do
+    [ -n "${kind}" ] || continue
+    case "${kind}" in
+      OK) total=$(( total + 1 )) ;;
+      HARD)
+        total=$(( total + 1 ))
+        emit HARD CONTRADICAO "${g}" "grafo REPROVA na integridade do contrato KG-SSOT — reconcilie antes de seguir: ${msg} (detalhe: python3 -I -B vendor/kg-ssot/tools/kg_validate.py ${g})"
+        hard=$(( hard + 1 )) ;;
+      PROPOSTA)
+        total=$(( total + 1 )); proposta=$(( proposta + 1 ))
+        case "${g}" in *docs/evolution/kg-inbox/*) continue ;; esac
+        fora=$(( fora + 1 ))
+        emit SOFT MODO-PROPOSTA "${g}" "grafo passou em MODO PROPOSTA — grau 0 e referência para fora do arquivo NÃO foram cobrados aqui (${msg}). Isto é legítimo num fragmento da fila de propostas e SUSPEITO em qualquer outro lugar: o gate do grafo fechado é a SELAGEM" ;;
+      VALID-FROM-INTEIRO)
+        emit SOFT VALID-FROM-INTEIRO "${g}" "${msg} nó(s) com valid_from inteiro sem aspas (ex.: valid_from: 2026) — leitor YAML tipado lê NÚMERO, não data parcial; escreva \"2026\"" ;;
+      ON-LEGADO)
+        emit SOFT ON-LEGADO "${g}" "${msg} aresta(s) TRANSITIONS com a chave on: (legado) — YAML 1.1 lê on como booleano e o evento parece órfão para leitor tipado; renomeie para trigger:" ;;
+      RADAR) RADAR_LIST="${RADAR_LIST}${g}"$'\n' ;;
+    esac
+  done < "${CONTRACT_TSV}"
+  GRAPHS="${RADAR_LIST}"
+  [ "${FMT}" != "tsv" ] && printf '  [kg-integridade] integridade lida do contrato KG-SSOT (%s)\n' "$(basename "$(dirname "$(dirname "${VAL}")")")"
+else
+  [ "${FMT}" != "tsv" ] && [ -n "${GRAPHS}" ] && printf '  [kg-integridade] leitor do contrato indisponível (%s): integridade pelo radar próprio, grafo a grafo\n' "${VAL}"
+fi
+
 while IFS= read -r g; do
   [ -n "${g}" ] || continue
   total=$(( total + 1 ))
@@ -140,7 +251,7 @@ while IFS= read -r g; do
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
 #    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
 #    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
-done < <(git ls-files '*.kg.yaml' | bash "${_KFP}" --filter)
+done <<< "${GRAPHS}"
 
 if [ "${FMT}" != "tsv" ]; then
   printf '  [kg-integridade] grafos verificados: %s · reprovando: %s\n' "${total}" "${hard}"
