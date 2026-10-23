@@ -2,7 +2,7 @@
 branch: fix/env-guard-data-exec-helper
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: ba39067d84878f1fa315cfd00a2a9b8f574a797cfe235d7f93cfd1eec8ba38bf
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 6ad2121ee2d2eafa925190e19b5d6aa5a4400a2dbb19cf5e4cca41e86ec61670
 findings_total: 3
 findings_real: 3
@@ -12,7 +12,7 @@ findings_fixed: 3
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: "sessão principal (claude-opus-5-5), passada própria; achado de origem: passada adversarial do adotante onion-curation"
-nota: "tokens não medidos (passada na própria sessão)"
+nota: "tokens não medidos (passada na própria sessão); re-revisão depois do 2º rebase: as linhas +/- do patch de código (.claude e ops) são idênticas às revisadas, medido por diff dos dois patches; o hash mudou só pelo contexto e pelo grafo, cujo conflito foi resolvido mantendo os dois lados"
 ---
 
 # Passada adversarial: `fix/env-guard-data-exec-helper`
