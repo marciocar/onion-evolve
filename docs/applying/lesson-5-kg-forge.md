@@ -239,7 +239,7 @@ Se o grafo tem uma pergunta do tipo "onde fica o código?", respondam-na e recon
 ```bash
 bash .claude/validation/kg-radar.sh docs/onion/graph/<dominio>.kg.yaml --integrity --schema   # exit 0
 grep -cE 'trace: (apps|packages)/' docs/onion/graph/<dominio>.kg.yaml                         # >= 3
-bash .claude/validation/kg-trace-resolve.sh .                                                 # toda âncora resolve
+bash .claude/validation/kg-trace.sh .                                                          # toda âncora resolve
 ```
 
 **Erros comuns e saída.**
@@ -790,7 +790,7 @@ Fragmento canônico. A skill `domain-anchor` referencia este arquivo; ninguém o
 ## O que esta doutrina NÃO promete
 
 O medidor confere para ONDE a âncora aponta, não se o código faz o que a regra diz, nem se o
-arquivo existe (isso é do `kg-trace-resolve.sh`). Ler o código e julgar continua sendo trabalho
+arquivo existe (isso é do `kg-trace.sh`). Ler o código e julgar continua sendo trabalho
 de gente.
 ```
 
@@ -882,7 +882,7 @@ da gramática e ganhe 10 minutos para o bloco F). Confira que o PyYAML está ins
 |---|---|---|
 | bloco A | apagaram um `---` dentro de texto | `git diff` e restaurar a linha |
 | bloco B | não acham a regra no código | é resultado: vira `question`, não âncora inventada |
-| bloco B | `kg-trace-resolve.sh` reprova | a âncora aponta para arquivo que não existe; confiram o caminho relativo à raiz |
+| bloco B | `kg-trace.sh` reprova | a âncora aponta para arquivo que não existe; confiram o caminho relativo à raiz |
 | bloco C | nós longos demais | `label` curto, o resto em `narrative:` |
 | bloco D | querem selar decisão do cliente | não selem; escrevam de quem depende |
 | bloco E | sem Docker na máquina | worktree descartável; nunca rodar na árvore de trabalho |
@@ -906,7 +906,7 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
 | validar um grafo | `bash .claude/validation/kg-radar.sh <g> --integrity --schema` |
 | lacunas do domínio | `bash .claude/validation/kg-radar.sh <g> --domain` |
 | frescor | `bash .claude/validation/kg-radar.sh <g> --freshness` |
-| âncoras que não resolvem | `bash .claude/validation/kg-trace-resolve.sh .` (o repositório inteiro) |
+| âncoras que não resolvem | `bash .claude/validation/kg-trace.sh .` (o repositório inteiro) |
 | ver o grafo | `bash .claude/validation/kg-view.sh <g> --markdown` |
 | console visual | `bash .claude/validation/kg-console.sh <g> > kg-console.html` |
 | mapear uma área | `/meta:kg map <área>` |

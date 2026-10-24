@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 # kg-trace-resolve.sh — a âncora foi DECLARADA, mas ela RESOLVE?
 #
+# ═══ RESTRITO AO ÍNDICE DE LEITURA DESDE 2026-10-24 (declarado, com gatilho) ═══
+# A REGRA 55 (O `trace:` de um nó APONTA para alvo que EXISTE) é julgada pelo `kg_trace.py` do kg-ssot, via
+# kg-trace.sh. Este script ficou SÓ para `--emit-index` (docs/onion/kg-read-index.tsv), chamado pelo kg-trace.sh,
+# porque o JSON `kg-ssot.trace/1` da 4.25.0 não traz os traces que resolvem, e depender da API interna do vendor
+# (`kg_trace.classify`) foi recusado. Qualquer outro modo sai rc 2.
+# GATILHO: kg-ssot 4.25.1 adotada (o trace/1 ganha os resolvidos) → o kg-trace.sh gera o índice pelo JSON do produto
+# e este script é removido (nó Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251 em docs/onion/graph/sinais-de-campo-2026-09.kg.yaml).
+# Defeitos conhecidos que ficam até lá, todos no índice: id entre aspas entra COM as aspas (5 nós), alvo da 2ª raiz
+# sai sem normalizar (1), e a 3ª raiz (pasta pai do grafo) não é indexada.
+#
 # ═══ POR QUE EXISTE (medido 2026-08-06) ═══
 # O bloco PROVENIÊNCIA do kg-radar.sh cobra que uma decisão APONTE para a origem — aresta
 # TRACES_TO ou campo `trace:` inline. Ele verifica que a âncora foi **declarada**; nunca que ela
@@ -86,6 +96,7 @@ REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)
 FORMAT=human
 EMIT_INDEX=0; INDEX=""
 for a in "$@"; do case "$a" in --format) : ;; tsv) FORMAT=tsv ;; --format=tsv) FORMAT=tsv ;; --emit-index) EMIT_INDEX=1 ;; esac; done
+[ "${EMIT_INDEX}" -eq 1 ] || { printf 'kg-trace-resolve: só --emit-index desde 2026-10-24 — a REGRA 55 é julgada por: bash .claude/validation/kg-trace.sh\n' >&2; exit 2; }
 
 cd "${REPO_ROOT}"
 

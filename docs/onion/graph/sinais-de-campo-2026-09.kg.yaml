@@ -488,7 +488,39 @@ nodes:
       locator: "saída do gate antes e depois do --update; casos (a) a (d) da família e os três mutantes"
       method: "medição: gate do contrato contra o corpus rastreado e bancada com vendor de bancada sintético"
       locality: "repo"
+  - id: E_REGRA_55_PASSA_AO_KG_TRACE_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-24"
+    verified_against: "na main edcda44b: o resolvedor da casa (kg-trace-resolve.sh) e o kg_trace.py check --external-root memory/ do vendor 4.25.0 julgam os mesmos 2.501 traces (188 grafos), 2.501 resolvem, 0 TARGET-MISSING nos dois; um protótipo do índice pela API interna do produto (classify) diferia do versionado em 6 linhas, todas curas (5 ids sem as aspas, 1 caminho sem ../), e não foi adotado; na fixture trace-mixed os dois acusam os mesmos 2 mortos; família kg_trace_resolve da bancada 11/11, com 5 mutantes do kg-trace.sh mortos (vacuidade, 3ª raiz no índice, marcador de produto ausente, --external-root, vendor sem kg_query.py) e 2 produtos-stub (cego e quebrado)"
+    trace: ".claude/validation/kg-trace.sh"
+    label: "A REGRA 55 (O trace: de um nó APONTA para alvo que EXISTE) passou ao kg_trace.py do kg-ssot; o resolvedor awk da casa ficou só para o índice de leitura até a 4.25.1: o core consome o produto em vez de manter cópia da gramática"
+    narrative: "Paridade medida antes da troca: 2.501/2.501/0 no corpus e o mesmo par de mortos na fixture. As contagens dos não julgados mudam de balde sem mudar o total (2.551): o produto põe em absolute o que começa por esquema de URL antes de cortar no primeiro dois-pontos, a casa punha em não-caminho. Divergências, todas defeito da casa e nenhuma do produto, com a cura do índice adiada à 4.25.1: (1) id entre aspas entrava no índice com as aspas (5 nós do playbook-sdaal que o hook kg-read-leg nunca casava pelo id); (2) alvo resolvido pela pasta do grafo saía sem normalizar (docs/onion/graph/../../x.md); (3) a 3ª raiz (pasta pai do grafo) era julgada mas não indexada, cega para o adotante que organiza por vertical. O que só a casa fazia e ficou: o TSV para o lint e a guarda de vacuidade, no kg-trace.sh, e a emissão do índice, que o trace/1 da 4.25.0 não permite (só traz os missing). Por orientação da sessão do kg-ssot, o índice não depende da API interna classify: o kg-trace.sh --emit-index delega ao kg-trace-resolve.sh, que recusa qualquer outro modo (rc 2), com os três defeitos dele no índice até a 4.25.1 (Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251). Os dois achados enviados ao kg-ssot procedem e saem na 4.25.1: o trace/1 ganha os resolvidos, e o perfil gate passa a levar kg_trace.py e kg_query.py. Mudança de escopo nomeada: a isenção de fixture passa a ser a do produto (FIXTURE_SEGMENTS, carimbo do vendor e docs/materials/), e .kg.json entra; no corpus do core isso não muda nenhum nó. Sem o produto (vendor < 4.25 próprio do alvo, o perfil gate do release.json, que não leva kg_trace.py nem kg_query.py, ou python3 ausente) a REGRA 55 e a REGRA 84 dizem que não julgaram (SOFT), nunca verde. A própria troca foi pega pela regra: com o script apagado (a 1ª redação), 5 nós com trace nele viraram TARGET-MISSING; foram reapontados ao kg-trace.sh, porta única do trace."
+    provenance:
+      source: ".claude/validation/kg-trace.sh, check_kg_trace_resolve de .claude/validation/lint-artifacts.sh e a família kg_trace_resolve de .claude/validation/lint-selftest.sh"
+      locator: "diff dos índices emitidos pelos dois parsers; casos (a) a (j) da família e os mutantes"
+      method: "medição: os dois resolvedores contra o corpus rastreado e contra a fixture, e bancada com produto-stub"
+      locality: "repo"
+  - id: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    trace: ".claude/validation/kg-trace.sh"
+    label: "O índice de leitura (docs/onion/kg-read-index.tsv) passa a ser gerado pelo JSON do kg_trace.py, e o kg-trace-resolve.sh é removido?"
+    narrative: "Gatilho: kg-ssot 4.25.1 adotada (o kg-ssot.trace/1 ganha, como campo aditivo, a lista dos traces que resolvem, com o caminho resolvido relativo à raiz; e o perfil gate passa a levar kg_trace.py e kg_query.py). Ato: o kg-trace.sh --emit-index lê os resolvidos do JSON; o kg-trace-resolve.sh sai; o índice regenerado cura os três defeitos conhecidos (5 ids com aspas no playbook-sdaal-2026-10, 1 caminho com ../, a 3ª raiz não indexada); os casos (g) e (j) da família kg_trace_resolve, que hoje PRENDEM esses defeitos, invertem; o ramo NAO-JULGOU da REGRA 84 (Índice de leitura do KG em sincronia com os traces), pronto e sem uso hoje, passa a valer. Pré-condições da troca (medidas na bancada da 4.25.1 pela sessão do kg-ssot): o resolved_targets dá o caminho de diretório SEM a barra final (26 linhas do índice atual têm dir/), e o kg-read-leg.sh casa a 1ª coluna por igualdade exata, então o gerador novo mantém a barra quando o alvo é diretório ou o hook normaliza; e o índice é regenerado no mesmo commit da troca, senão a REGRA 84 dá HARD. Fecha com o índice sem nenhum dos três e o grep -w kg-trace-resolve zero fora de histórico."
 edges:
+  - from: E_REGRA_55_PASSA_AO_KG_TRACE_1024
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
+  - from: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
+    to: E_REGRA_55_PASSA_AO_KG_TRACE_1024
+    edge_type: DEPENDS_ON
   - from: E_KG_SSOT_425_ADOTADA_1024
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
