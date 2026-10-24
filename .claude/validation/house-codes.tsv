@@ -8,7 +8,10 @@
 # FORMATO: TAB entre as colunas; linha que começa com # é comentário.
 #   1 kind      static (glosa daqui) | rule (R<N> → "REGRA N (Título)", título do lint) |
 #               node (id de nó de grafo, só se existir em algum .kg.yaml; glosa = o título do nó) |
-#               issue (id de tarefa; a glosa é o assunto, que só quem escreve sabe)
+#               issue (id de tarefa; a glosa é o assunto, que só quem escreve sabe) |
+#               scheme (à mão: dá a um ESQUEMA do vocabulário a opacidade, o accept e o domínio; a coluna 2
+#               é o slug do esquema e a 4 o nome dele) |
+#               term (GERADO, nunca à mão: um x_term vivo dos grafos cujo esquema tem linha scheme; ver abaixo)
 #   2 code      regex do MOTOR PYTHON (re), casada como palavra inteira, sensível a caixa
 #   3 opacity   alta = o maestro não reconstrói sozinho (a rede do Stop pode barrar) |
 #               baixa = cunhagem dele ou rótulo local do texto (só entra no lembrete, nunca barra)
@@ -18,9 +21,19 @@
 #               sigla dentro de um parêntese que explica algo).
 #   6 domain    regex python: a sigla só é a da casa se isto aparecer no MESMO BLOCO de texto; sem o
 #               domínio ela é palavra comum ou rótulo local ("o teste E3 do formulário") e cala. "-" = sempre.
+#   7 scheme    só nas linhas term: o esquema do termo (a forma qualificada esquema:código glosa sempre).
 #
 # O que a glosa estrutural aceita vale para TODA linha; o accept só acrescenta palavras.
-# Para acrescentar uma sigla: uma linha aqui + um caso na bancada (run_house_code_gloss_selftests).
+# Para acrescentar uma sigla que NÃO é termo: uma linha aqui + um caso na bancada (run_house_code_gloss_selftests).
+#
+# O CÓDIGO DA CASA COM NOME é termo, não linha à mão (desde 2026-10-23, D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023):
+# o nome mora num x_term de grafo (notation = o código, pref = o nome, scheme = a família), e o bloco gerado
+# abaixo é PROJEÇÃO dele — `bash .claude/validation/house-codes-gen.sh --write` regenera, e a REGRA 62
+# (Projeção GERADA em sincronia com a fonte (docs/backlog.md)) barra o bloco velho no lint. Para dar a um esquema
+# a glosa do hook, escreva a linha scheme dele; esquema sem linha scheme fica só no lint de nomes. A mesma
+# notation em dois esquemas (r1 = rodada do radar e réplica do spike A2A) é resolvida pelo domínio de cada
+# esquema no bloco; sem domínio, ou com dois, o hook pede a forma qualificada. Os níveis do dissect, que eram
+# linhas static aqui, viraram termos do esquema dissect.
 #
 # kind	code	opacity	gloss	accept	domain
 static	I3	alta	o invariante "um escritor por repo" (só a sessão dona do repositório commita nele)	escritor|commita no repo|repo alheio	-
@@ -31,11 +44,6 @@ static	E3	alta	o eixo E3 do radar de mundo (o que muda a cada versão do Claude 
 static	E4	alta	o eixo E4 do radar de mundo (capital e mercado)	capital|mercado|invest	radar|eixo
 static	E5	alta	o eixo E5 do radar de mundo (gates determinísticos)	determin	radar|eixo
 static	E6	alta	o eixo E6 do radar de mundo (a fronteira de modelos e a escada de modelos da sessão)	modelo|lineup	radar|eixo
-static	N0	alta	o nível N0 do /meta:dissect (identidade: quem mantém, licença, trajetória)	identidade|dissec	dissec|n[ií]vel
-static	N1	alta	o nível N1 do /meta:dissect (capacidade: o que a ferramenta faz e o Onion não)	capacidade|dissec	dissec|n[ií]vel
-static	N2	alta	o nível N2 do /meta:dissect (mecanismo: como ela faz)	mecanismo|dissec	dissec|n[ií]vel
-static	N3	alta	o nível N3 do /meta:dissect (transferibilidade: o que se transfere para o Onion)	transfer|dissec	dissec|n[ií]vel
-static	N4	alta	o nível N4 do /meta:dissect (absorção: o plano de trazer para o Onion)	absor|dissec	dissec|n[ií]vel
 static	D10	alta	a dimensão D10 do /meta:evolve (frescor da memória de sessão)	memória|dimens|evolve	evolve|dimens|mem[oó]ria
 static	W7	alta	a cláusula W7 do MOAT (o Onion é invocado pelo maestro, nunca agendado: sem cron)	agend|cron|invocad	-
 static	NS1	alta	o norte NS1 (o grafo de conhecimento como norte do Onion)	norte|grafo|conhecimento	-
@@ -48,3 +56,74 @@ static	AUTOMATE|AUDIT|ADVISE	baixa	o degrau da escada de automação	degrau|esca
 rule	R\d{2,3}	alta	REGRA N (título)	-	-
 node	[A-Z][A-Z0-9]{0,3}_[A-Z][A-Z0-9_]{2,}	alta	o título do nó	-	-
 issue	SAC-\d+	baixa	a tarefa do task manager (diga o assunto)	-	-
+#
+# os esquemas do vocabulário que o hook glosa. "rodada" solta é domínio do radar (é como o maestro fala), e foi
+# a palavra que deu ao r1 do spike A2A a glosa do radar em 2026-10-23: com o esquema a2a-spike, os dois
+# domínios ficam no bloco e o accept perto da menção desempata ("a réplica r1"); sem desempate, pede a forma
+# qualificada
+scheme	radar-cc	alta	rodada do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+
+scheme	a2a-spike	alta	réplica do spike A2A	r[ée]plica|spike|A2A	A2A|spike|r[ée]plica
+scheme	dissect	alta	nível do /meta:dissect	dissec|identidade|capacidade|mecanismo|transfer|absor	dissec|n[ií]vel
+scheme	bench-case	alta	caso da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest
+scheme	refutation-finding	alta	achado da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo
+scheme	selfconsistency-claim	baixa	afirmação do teste de autoconsistência	autoconsist|afirma|distribui	autoconsist
+# >>> GERADO por .claude/validation/house-codes-gen.sh a partir dos x_term dos grafos: nao edite a mao (REGRA 62)
+term	r1	alta	réplica 1 do spike A2A	r[ée]plica|spike|A2A	A2A|spike|r[ée]plica	a2a-spike
+term	r2	alta	réplica 2 do spike A2A	r[ée]plica|spike|A2A	A2A|spike|r[ée]plica	a2a-spike
+term	r3	alta	réplica 3 do spike A2A	r[ée]plica|spike|A2A	A2A|spike|r[ée]plica	a2a-spike
+term	r4	alta	réplica 4 do spike A2A	r[ée]plica|spike|A2A	A2A|spike|r[ée]plica	a2a-spike
+term	r5	alta	réplica 5 do spike A2A	r[ée]plica|spike|A2A	A2A|spike|r[ée]plica	a2a-spike
+term	r6	alta	réplica 6 do spike A2A	r[ée]plica|spike|A2A	A2A|spike|r[ée]plica	a2a-spike
+term	r1	alta	caso 1 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r2	alta	caso 2 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r3	alta	caso 3 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r4	alta	caso 4 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r5	alta	caso 5 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r6	alta	caso 6 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r7	alta	caso 7 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r8	alta	caso 8 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r9	alta	caso 9 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r10	alta	caso 10 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r11	alta	caso 11 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r12	alta	caso 12 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r13	alta	caso 13 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r16	alta	caso 16 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	r20	alta	caso 20 da bancada	bancada|selftest|caso|fam[ií]lia|mutante	bancada|selftest|mutante|lint-selftest	bench-case
+term	N0	alta	nível 0 do /meta:dissect (identidade)	dissec|identidade|capacidade|mecanismo|transfer|absor	dissec|n[ií]vel	dissect
+term	N1	alta	nível 1 do /meta:dissect (capacidade)	dissec|identidade|capacidade|mecanismo|transfer|absor	dissec|n[ií]vel	dissect
+term	N2	alta	nível 2 do /meta:dissect (mecanismo)	dissec|identidade|capacidade|mecanismo|transfer|absor	dissec|n[ií]vel	dissect
+term	N3	alta	nível 3 do /meta:dissect (transferibilidade)	dissec|identidade|capacidade|mecanismo|transfer|absor	dissec|n[ií]vel	dissect
+term	N4	alta	nível 4 do /meta:dissect (absorção)	dissec|identidade|capacidade|mecanismo|transfer|absor	dissec|n[ií]vel	dissect
+term	r1	alta	rodada 1 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r2	alta	rodada 2 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r3	alta	rodada 3 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r4	alta	rodada 4 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r5	alta	rodada 5 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r6	alta	rodada 6 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r7	alta	rodada 7 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r8	alta	rodada 8 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r9	alta	rodada 9 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r10	alta	rodada 10 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r11	alta	rodada 11 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r12	alta	rodada 12 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r13	alta	rodada 13 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r14	alta	rodada 14 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r15	alta	rodada 15 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r16	alta	rodada 16 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	r17	alta	rodada 17 do radar do Claude Code	radar|Claude Code|cc-update	rodada|radar|Claude Code|cc-update|2\.1\.\d+	radar-cc
+term	N1	alta	achado 1 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N2	alta	achado 2 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N3	alta	achado 3 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N4	alta	achado 4 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N5	alta	achado 5 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N6	alta	achado 6 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N7	alta	achado 7 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N8	alta	achado 8 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N9	alta	achado 9 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N10	alta	achado 10 da passada de refutação	achado|refut|Elenxo|cura	refut|Elenxo	refutation-finding
+term	N1	baixa	afirmação 1 do teste de autoconsistência	autoconsist|afirma|distribui	autoconsist	selfconsistency-claim
+term	N2	baixa	afirmação 2 do teste de autoconsistência	autoconsist|afirma|distribui	autoconsist	selfconsistency-claim
+term	N3	baixa	afirmação 3 do teste de autoconsistência	autoconsist|afirma|distribui	autoconsist	selfconsistency-claim
+term	N4	baixa	afirmação 4 do teste de autoconsistência	autoconsist|afirma|distribui	autoconsist	selfconsistency-claim
+term	N5	baixa	afirmação 5 do teste de autoconsistência	autoconsist|afirma|distribui	autoconsist	selfconsistency-claim
+# <<< fim do bloco gerado

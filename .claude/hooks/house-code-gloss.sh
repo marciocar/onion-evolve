@@ -267,8 +267,8 @@ def blockers(cur, state, exempt, policy=None):
     if policy == "alta":
         return hi
     toks = {t for t, _, _ in state}
-    rows = {r for _, r, k in state if k == "static"}
-    return [d for d in hi if d["token"] in toks or (d["kind"] == "static" and d["row"] in rows)]
+    rows = {r for _, r, k in state if k in ("static", "term")}   # term: a linha é o esquema (r12 lembrada, r13 reincide)
+    return [d for d in hi if d["token"] in toks or (d["kind"] in ("static", "term") and d["row"] in rows)]
 
 if mode == "text":
     for d in find([open(tp, encoding="utf-8", errors="replace").read()]):
@@ -416,6 +416,42 @@ TXT
   # (s) COLISÃO com palavra comum cala: sem o domínio da sigla no bloco, ela não é a da casa
   out="$(_t 'O teste E3, E4 e E5 do formulário passou. Vamos ver o r1. Custou R$ 10. O D10 do meu relatório.')"
   if [ -z "${out}" ]; then _ok "(s) colisão com palavra comum (sem o domínio no bloco) cala"; else _ko "(s) colisão acusada: [${out}]"; fi
+  # (vt) o TERMO do vocabulário (linhas term, projetadas dos x_term): a mesma notation em dois esquemas. O caso
+  #     que errou em 2026-10-23 — "a réplica r1 ... do spike A2A rodou; a rodada seguinte" — ganhava a glosa do
+  #     radar (o domínio "rodada" casava e o radar era o único sentido de r1). Agora: (v1) o literal não sugere o
+  #     radar (o accept "réplica" perto da menção desempata e glosa); (v2) só o domínio do spike → a glosa é a
+  #     réplica; (v3) só o do radar → a rodada; (v4) os dois sem desempate → pede a forma qualificada (baixa,
+  #     lembra e nunca barra); (v5) a forma qualificada glosa; (v6) a rodada sem termo (r18) ainda cai na linha
+  #     static genérica; (v7) o nível do dissect é termo do esquema dissect; (v8) dissect:N2 (qualificada, sem
+  #     hífen que a faça passar por caminho) glosa; (v9) o termo vence a static genérica (glossário mínimo); (v10) xq:r2 glosa pelo qualificador;
+  #     (v11) dois accepts perto não desempatam; (v12) prefixo que não é esquema não glosa
+  v1="$(_t 'A réplica r1 do cenário A7-C1 do spike A2A rodou; a rodada seguinte mediu.')"
+  v2="$(_t 'Fechamos o spike A2A. O r1 rodou.')"
+  v3="$(_t 'Na 2.1.300 a r1 mediu o delta.')"
+  v4="$(_t 'Fechamos o spike A2A. Na rodada seguinte, o r1 mediu.')"
+  v5="$(_t 'Fechamos o spike A2A. Na rodada seguinte, o a2a-spike:r1 mediu.')"
+  v6="$(_t 'Na 2.1.400 a r18 mediu.')"
+  v7="$(_t 'Rodei o dissect. O N2 ficou caro.')"
+  v8="$(_t 'Rodei o dissect. O dissect:N2 ficou caro.')"
+  # (v9) o termo vence a linha static genérica: glossário mínimo em que só a static teria domínio no bloco
+  _g9="$(mktemp)"; printf 'static\tr\\d{1,3}\talta\tSTATIC\t-\trelat\nterm\tr1\talta\tTERMO\t-\tzzz\tx\n' > "${_g9}"
+  v9="$(GLOSSARY="${_g9}"; _t 'O r1 do relatório.')"
+  # (v10) a forma qualificada glosa por si, sem accept nenhum (esquema xq, domínio relat): sem o qualificador acusa
+  printf 'term\tr2\talta\tTERMO\t-\trelat\txq\n' >> "${_g9}"
+  v10="$(GLOSSARY="${_g9}"; _t 'O xq:r2 do relatório.')"; v10b="$(GLOSSARY="${_g9}"; _t 'O r2 do relatório.')"; rm -f "${_g9}"
+  # (v11) DOIS accepts casando perto da menção não desempatam: é ambígua (sem isto, "o 1º que casar" escolhia um)
+  v11="$(_t 'O radar e a réplica do spike mediram o r1.')"
+  # (v12) prefixo que NÃO é esquema conhecido não glosa (sem isto, qualquer "foo:" viraria glosa)
+  v12="$(_t 'Fechamos o spike A2A. Depois, o foo:r1 mediu nada.')"
+  if [ -z "${v1}" ] && grep -q '^r1|alta|r\\d{1,3}|réplica 1 do spike A2A$' <<< "${v2}" \
+     && grep -q '^r1|alta|r\\d{1,3}|rodada 1 do radar do Claude Code$' <<< "${v3}" \
+     && grep -q '^r1|baixa|r\\d{1,3}|ambígua entre esquemas: escreva a2a-spike:r1 (.*) ou radar-cc:r1 (' <<< "${v4}" \
+     && [ -z "${v5}" ] && grep -q '^r18|alta|r\\d{1,3}|a rodada N do radar' <<< "${v6}" \
+     && grep -q '^N2|alta|dissect|nível 2 do /meta:dissect (mecanismo)$' <<< "${v7}" && [ -z "${v8}" ] && [ -z "${v9}" ] \
+     && [ -z "${v10}" ] && grep -q '^r2|alta|r\\d{1,3}|TERMO$' <<< "${v10b}" \
+     && grep -q '^r1|baixa|r\\d{1,3}|ambígua entre esquemas' <<< "${v11}" && grep -q '^r1|' <<< "${v12}"; then
+    _ok "(vt) termo do vocabulário: r1 é réplica no contexto do spike, rodada no do radar, e ambígua pede esquema:código"
+  else _ko "(vt) termo: v1=[${v1}] v2=[${v2}] v3=[${v3}] v4=[${v4}] v5=[${v5}] v6=[${v6}] v7=[${v7}] v8=[${v8}] v9=[${v9}] v10=[${v10}] v10b=[${v10b}] v11=[${v11}] v12=[${v12}]"; fi
 
   # ══ PONTA-A-PONTA, como o harness invoca (stdin JSON + transcript + estado da sessão) ══
   _d="$(mktemp -d)"; _tp="${_d}/t.jsonl"; _in="${_d}/in.json"
@@ -456,10 +492,18 @@ PY
   # (h) o LEMBRETE antes de escrever: o turno anterior usou r12 sem glosa → additionalContext com a glosa
   _mk "u:e a rodada?" "a:A rodada r12 terminou." "u:e agora?"
   _rc=0; _o="$(_hook prompt 2>&1)" || _rc=$?
-  if [ "${_rc}" -eq 0 ] && grep -q '"additionalContext"' <<< "${_o}" && grep -q 'r12 → a rodada N do radar' <<< "${_o}" && grep -q '^r12' "${ONION_HOUSE_CODE_STATE_DIR}/st1.tsv"; then _ok "(h) UserPromptSubmit injeta a glosa da sigla em uso e grava o lembrado (rc 0, nunca barra)"; else _ko "(h) rc=${_rc} [${_o}]"; fi
+  if [ "${_rc}" -eq 0 ] && grep -q '"additionalContext"' <<< "${_o}" && grep -q 'r12 → rodada 12 do radar' <<< "${_o}" && grep -q '^r12' "${ONION_HOUSE_CODE_STATE_DIR}/st1.tsv"; then _ok "(h) UserPromptSubmit injeta a glosa da sigla em uso e grava o lembrado (rc 0, nunca barra)"; else _ko "(h) rc=${_rc} [${_o}]"; fi
   # (i) o caso LITERAL do maestro como REINCIDÊNCIA: lembrado r12 neste turno, a frase com r13 barra
   _rc=0; _o="$(_cycle "u:e a rodada?" "a:A rodada r12 terminou." "u:e agora?" -- "a:Processo, disco e SDK do bridge estão todos em 2.1.302, então a rodada r13 pode medir. Lanço os dois agentes." "a:Os dois agentes estão rodando." 2>&1)" || _rc=$?
-  if [ "${_rc}" -eq 2 ] && grep -q 'r13 → a rodada N do radar do Claude Code' <<< "${_o}"; then _ok "(i) frase literal do maestro após lembrete: Stop barra por r13 (rc 2) com a glosa"; else _ko "(i) rc=${_rc} [${_o}]"; fi
+  if [ "${_rc}" -eq 2 ] && grep -q 'r13 → rodada 13 do radar do Claude Code' <<< "${_o}"; then _ok "(i) frase literal do maestro após lembrete: Stop barra por r13 (rc 2) com a glosa"; else _ko "(i) rc=${_rc} [${_o}]"; fi
+  # (vf) a REINCIDÊNCIA do termo é por FAMÍLIA, não por esquema: lembrado r12 (que é termo do radar), a rodada
+  #      SEGUINTE sem termo (r18) e o caso da bancada (r20) barram igual — é a mesma família de sigla para quem lê.
+  #      Sem isto (a reincidência guardando o esquema), o lembrete do r12 deixava passar justo a rodada nova.
+  _rcf=0; _of="$(_cycle "u:e a rodada?" "a:A rodada r12 terminou." "u:e agora?" -- "a:Na 2.1.400 a r18 mediu o delta." 2>&1)" || _rcf=$?
+  #      E a fronteira: OUTRA família (o N2 do dissect) não barra pelo lembrete do r12
+  _rcf2=0; _cycle "u:e a rodada?" "a:A rodada r12 terminou." "u:e agora?" -- "a:Rodei o dissect e o N2 ficou caro." >/dev/null 2>&1 || _rcf2=$?
+  if [ "${_rcf}" -eq 2 ] && [ "${_rcf2}" -eq 0 ]; then _ok "(vf) lembrado um código que é termo, a reincidência barra o da mesma família sem termo (r18) e não a de outra família (N2)"
+  else _ko "(vf) reincidência por família: r18 rc=${_rcf} [${_of}] · N2 rc=${_rcf2} (esperados 2 e 0)"; fi
   # (j) resposta NORMAL depois do lembrete — com glosa, ou sem sigla — NUNCA trava
   _rc=0; _o="$(_cycle "u:e a rodada?" "a:A rodada r12 terminou." "u:e agora?" -- "a:A rodada r13 do radar do Claude Code pode medir." "a:Abri o PR; o CI está verde." 2>&1)" || _rc=$?
   _rc2=0; _o2="$(_cycle "u:e a rodada?" "a:A rodada r12 terminou." "u:e agora?" -- "a:Abri o PR e o CI está verde." 2>&1)" || _rc2=$?
