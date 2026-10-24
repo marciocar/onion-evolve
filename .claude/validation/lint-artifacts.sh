@@ -1452,8 +1452,12 @@ check_generated_projection_sync() {
   #       para não ser.
   # Por isso Q_INDICE_DO_DIARIO_SEM_CATRACA segue ABERTO, com o gatilho refinado pelo que
   # se mediu, em vez de fechado por decreto. Ver o nó em guardas-revisao-2026-08.kg.yaml.
+  # O glossário da glosa (2026-10-23): as linhas `term` do house-codes.tsv são projeção dos x_term dos grafos
+  # (D_NOMES_NASCEM_CERTOS_NAS_TRES_CAMADAS_1023); o gerador regrava só o bloco entre os marcadores e mantém as
+  # linhas à mão. O hook não pode chamar o vendor (carga de milissegundos), por isso a projeção é versionada.
   local -a projections=(
     "docs/backlog.md|${SCRIPT_DIR}/kg-backlog-project.sh|/meta:backlog"
+    ".claude/validation/house-codes.tsv|${SCRIPT_DIR}/house-codes-gen.sh|bash .claude/validation/house-codes-gen.sh --write"
   )
 
   local row tracked gen fixcmd tmp

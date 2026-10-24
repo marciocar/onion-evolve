@@ -13,6 +13,15 @@
 #     "E3/E4" e "E3-E5" NÃO são caminho: as duas siglas contam;
 #   · "REGRA N (Título)": o título de regra é glosa de REGRA — e glosa também o "RN" da mesma resposta.
 #
+# ── O TERMO DO VOCABULÁRIO (kind term, desde 2026-10-23) ─────────────────────────────────────────────
+#   As linhas `term` do glossário são PROJEÇÃO dos x_term dos grafos (o gerador as escreve; ver o cabeçalho do
+#   house-codes.tsv). A mesma notation pode ter um termo por esquema (r1 = rodada do radar do Claude Code e
+#   réplica do spike A2A): o domínio de cada esquema decide de quem é a menção no bloco; com dois, desempata o
+#   accept perto da menção; sem desempate ela é AMBÍGUA e a glosa sugerida é a forma qualificada (radar-cc:r1
+#   ou a2a-spike:r1), que glosa sempre; sem domínio nenhum, cala como sempre. A ambígua tem opacidade baixa:
+#   lembra, nunca barra. O termo vence a linha static genérica (r\d+), mas a REINCIDÊNCIA conta pela família
+#   dela: lembrar r12 (termo) barra r18 (ainda sem termo), que é a mesma família de sigla para quem lê.
+#
 # ── QUANDO A SIGLA CONTA (o DOMÍNIO) ────────────────────────────────────────────────────────────────
 #   A coluna `domain` do glossário: a sigla só é a da casa se o domínio aparecer no BLOCO. Sem ele, é
 #   palavra comum ou rótulo local ("o teste E3 do formulário", "o r1 do relatório") e cala. E rótulo
@@ -52,6 +61,9 @@ def load_glossary(path):
         if len(cols) < 6 or cols[0] == "kind":
             continue
         kind, code, opacity, gloss, accept, domain = cols[:6]
+        if kind == "scheme":          # a linha que dá domínio a um esquema: entrada do GERADOR, não sigla
+            continue
+        scheme = cols[6].strip() if len(cols) > 6 else ""
         try:
             rx = re.compile(r"(?<![\w.`$])(?:%s)(?![\w`]|\.\w)" % code)
             acc = None if accept.strip() in ("", "-") else re.compile(accept, re.I)
@@ -59,7 +71,7 @@ def load_glossary(path):
         except re.error:
             continue
         rows.append({"kind": kind, "code": code, "opacity": opacity, "gloss": gloss,
-                     "rx": rx, "accept": acc, "domain": dom})
+                     "rx": rx, "accept": acc, "domain": dom, "scheme": scheme})
     return rows
 
 
@@ -190,13 +202,74 @@ def _local_families(t, glossary):
     """Letras de rótulo LOCAL: a resposta usa a mesma letra com número que o glossário não tem."""
     known = set()
     for row in glossary:
-        if row["kind"] == "static":
+        # o termo só conta como conhecido se o domínio do esquema dele está NESTE bloco: N8 é achado de
+        # refutação, e num bloco que só fala de dissect ele é rótulo local como qualquer outro
+        if row["kind"] == "static" or (row["kind"] == "term" and (row["domain"] is None or row["domain"].search(t))):
             known.update(re.findall(r"^[A-Z]\d+$", row["code"]))
     fams = set()
     for m in re.finditer(r"(?<![\w.`])([A-Z])(\d{1,3})(?![\w`]|\.\w)", t):
         if m.group(0) not in known and any(k[0] == m.group(1) for k in known):
             fams.add(m.group(1))
     return fams
+
+
+_QUAL = re.compile(r"(?<![\w:/.-])([a-z0-9][a-z0-9-]*):$")   # o esquema colado antes do código (radar-cc:r7)
+
+
+def _family_row(tok, glossary):
+    """A linha static genérica que casa este código, se existir. É ela que a reincidência guarda: lembrar r12
+    (que hoje é termo) tem de barrar r18 (que ainda não é), porque para quem lê é a mesma família de sigla."""
+    for row in glossary:
+        if row["kind"] == "static" and row["rx"].fullmatch(tok) and row["code"] != tok:
+            return row["code"]
+    return None
+
+
+def _term_findings(t, spans, fams, note, rows, codes_rx, seen, glossary):
+    """As menções de UMA notation do vocabulário. Cada esquema dela traz o seu domínio: com UM esquema cujo
+    domínio está no bloco, a sigla é dele (a glosa sugerida é o pref dele); notation de um esquema só, sem o
+    domínio, cala (é palavra comum ou rótulo local, como sempre). Com dois domínios no bloco, desempata o
+    accept de UM esquema perto da menção ("a réplica r1 ... e a rodada seguinte": réplica decide); dois e
+    nenhum desempate é AMBÍGUA: a glosa pede a forma qualificada (esquema:código), que glosa sempre. Nenhum
+    domínio no bloco cala, mesmo com a notation em dois esquemas: é a palavra comum do caso (s)."""
+    act = [r for r in rows if r["domain"] is None or r["domain"].search(t)]
+    if len(rows) == 1 and not act:
+        return
+    schemes = {r["scheme"] for r in rows if r["scheme"]}
+    fam_row = _family_row(note, glossary)
+    for m in rows[0]["rx"].finditer(t):
+        chosen = act[0] if len(act) == 1 else None
+        if any(a <= m.start() < b for a, b in spans):
+            continue
+        tok = m.group(0)
+        q = _QUAL.search(t[:m.start()])
+        if q and q.group(1) in schemes:
+            ok = True
+        else:
+            if re.match(r"^[A-Z]\d+$", tok) and tok[0] in fams:
+                continue
+            ch = _chunk(t, m.start(), m.end())
+            if ch != tok and _is_path(ch):
+                continue
+            before, after = _sentence(t, m.start(), m.end())
+            near = _near(before, after)
+            if len(act) > 1:          # dois domínios no bloco: desempata o accept PERTO da menção, se só um casa
+                hits = [r for r in act if r["accept"] is not None and r["accept"].search(near)]
+                chosen = hits[0] if len(hits) == 1 else None
+            ok = _structural(t, m.start(), m.end(), after, codes_rx)
+            if not ok and chosen is not None and chosen["accept"] is not None:
+                ok = bool(chosen["accept"].search(near))
+        if chosen is not None:
+            d = seen.setdefault(tok, {"token": tok, "row": fam_row or chosen["scheme"], "kind": "term", "opacity": chosen["opacity"],
+                                      "gloss": chosen["gloss"], "glossed": False})
+        elif not act:                 # nenhum domínio no bloco: palavra comum ou rótulo local, cala (caso s)
+            continue
+        else:
+            d = seen.setdefault(tok, {"token": tok, "row": fam_row or tok, "kind": "term", "opacity": "baixa", "glossed": False,
+                                      "gloss": "ambígua entre esquemas: escreva "
+                                      + " ou ".join("%s:%s (%s)" % (r["scheme"], tok, r["gloss"])
+                                                    for r in sorted(rows, key=lambda r: r["scheme"]))})
+        d["glossed"] = d["glossed"] or ok
 
 
 def findings(text, glossary, titles=None, root=None, glossed_out=None, already=()):
@@ -207,13 +280,23 @@ def findings(text, glossary, titles=None, root=None, glossed_out=None, already=(
     fams = _local_families(t, glossary)
     codes_rx = re.compile("|".join("(?:%s)" % r["code"] for r in glossary))
     seen = {}
+    terms = {}                        # notation -> as linhas de termo (uma por esquema), projetadas do vocabulário
     for row in glossary:
+        if row["kind"] == "term":
+            terms.setdefault(row["code"], []).append(row)
+    for note, rows in terms.items():
+        _term_findings(t, spans, fams, note, rows, codes_rx, seen, glossary)
+    for row in glossary:
+        if row["kind"] == "term":
+            continue
         if row["domain"] is not None and not row["domain"].search(t):
             continue
         for m in row["rx"].finditer(t):
             if any(a <= m.start() < b for a, b in spans):
                 continue
             tok = m.group(0)
+            if row["kind"] == "static" and tok in terms:   # o termo do vocabulário vence a linha genérica
+                continue
             if row["kind"] == "static" and re.match(r"^[A-Z]\d+$", tok) and tok[0] in fams:
                 continue
             ch = _chunk(t, m.start(), m.end())

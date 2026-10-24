@@ -1,0 +1,1358 @@
+meta:
+  schema_version: "1"
+  id: vocabulario-da-casa-2026-10
+  slug: vocabulario-da-casa-2026-10
+  title: "Vocabulário da casa: os códigos curtos do core com nome legível"
+  date: "2026-10-23"
+  purpose: "Os termos x_term (contrato v4.14 da kg-ssot 4.23.0) dos códigos curtos que colidem no corpus do core. O id curto fica estável e vira a notation; o pref é o nome legível; o scheme é a família do código (D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023). O kg_vocab lint confere a prosa contra estes termos, e o glossário do hook house-code-gloss projeta daqui as linhas de termo."
+  note: "Notation repetida entre esquemas é a colisão medida, e é de propósito: a menção sem qualificador fica ambígua (escreva esquema:código, como radar-cc:r7). TETO, medido na passada adversarial: cada esquema traz só os códigos que o corpus de HOJE usa, e um código que existe em um esquema só resolve para aquele sentido mesmo num texto de outro (o caso r14 da bancada resolve como rodada do radar, porque a bancada não tem termo r14). O lint pega o código sem nome e o ambíguo, não o sentido errado com nome único; a segunda rede é o hook da glosa, onde o domínio do bloco decide."
+nodes:
+  - id: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "O kg_vocab lint sobre o corpus do core mediu 2194 códigos na prosa, 301 distintos, nenhum com termo; as famílias de rodada e de nível colidem entre sentidos (radar, spike, bancada, refutação, autoconsistência e dissect)"
+    verified_at: "2026-10-23"
+    verified_against: "python3 -I -B vendor/kg-ssot/tools/kg_vocab.py lint --root . --format json na origin/main de 2026-10-23, com a leitura do contexto de cada menção das famílias de rodada e de nível"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0)"
+      locator: "o JSON do lint, campo findings, agrupado por token"
+      method: "medição: o lint rodado no corpus inteiro e as menções lidas no grafo de cada uma"
+      locality: repo
+  - id: T_RADAR_CC_R1
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r1 do radar do Claude Code: a re-medição número 1 do que as versões novas do Claude Code mudam no Onion, de 2026-09-02."
+    x_term:
+      pref: "rodada 1 do radar do Claude Code"
+      notation: "r1"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 1 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-09-02."
+  - id: T_RADAR_CC_R2
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r2 do radar do Claude Code: a re-medição número 2 do que as versões novas do Claude Code mudam no Onion, de 2026-09-03."
+    x_term:
+      pref: "rodada 2 do radar do Claude Code"
+      notation: "r2"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 2 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-09-03."
+  - id: T_RADAR_CC_R3
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r3 do radar do Claude Code: a re-medição número 3 do que as versões novas do Claude Code mudam no Onion, de 2026-09-04."
+    x_term:
+      pref: "rodada 3 do radar do Claude Code"
+      notation: "r3"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 3 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-09-04."
+  - id: T_RADAR_CC_R4
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r4 do radar do Claude Code: a re-medição número 4 do que as versões novas do Claude Code mudam no Onion, de 2026-09-04."
+    x_term:
+      pref: "rodada 4 do radar do Claude Code"
+      notation: "r4"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 4 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-09-04-r4."
+  - id: T_RADAR_CC_R5
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r5 do radar do Claude Code: a re-medição número 5 do que as versões novas do Claude Code mudam no Onion, de 2026-09-21."
+    x_term:
+      pref: "rodada 5 do radar do Claude Code"
+      notation: "r5"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 5 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-09-21-r5."
+  - id: T_RADAR_CC_R6
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r6 do radar do Claude Code: a re-medição número 6 do que as versões novas do Claude Code mudam no Onion, de 2026-10-03."
+    x_term:
+      pref: "rodada 6 do radar do Claude Code"
+      notation: "r6"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 6 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-03-r6."
+  - id: T_RADAR_CC_R7
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r7 do radar do Claude Code: a re-medição número 7 do que as versões novas do Claude Code mudam no Onion, de 2026-10-05."
+    x_term:
+      pref: "rodada 7 do radar do Claude Code"
+      notation: "r7"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 7 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-05-r7."
+  - id: T_RADAR_CC_R8
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r8 do radar do Claude Code: a re-medição número 8 do que as versões novas do Claude Code mudam no Onion, de 2026-10-08."
+    x_term:
+      pref: "rodada 8 do radar do Claude Code"
+      notation: "r8"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 8 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-08-r8."
+  - id: T_RADAR_CC_R9
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r9 do radar do Claude Code: a re-medição número 9 do que as versões novas do Claude Code mudam no Onion, de 2026-10-11."
+    x_term:
+      pref: "rodada 9 do radar do Claude Code"
+      notation: "r9"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 9 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-11-r9."
+  - id: T_RADAR_CC_R10
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r10 do radar do Claude Code: a re-medição número 10 do que as versões novas do Claude Code mudam no Onion, de 2026-10-14."
+    x_term:
+      pref: "rodada 10 do radar do Claude Code"
+      notation: "r10"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 10 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-14-r10."
+  - id: T_RADAR_CC_R11
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r11 do radar do Claude Code: a re-medição número 11 do que as versões novas do Claude Code mudam no Onion, de 2026-10-14."
+    x_term:
+      pref: "rodada 11 do radar do Claude Code"
+      notation: "r11"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 11 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-14-r11."
+  - id: T_RADAR_CC_R12
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r12 do radar do Claude Code: a re-medição número 12 do que as versões novas do Claude Code mudam no Onion, de 2026-10-16."
+    x_term:
+      pref: "rodada 12 do radar do Claude Code"
+      notation: "r12"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 12 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-16-r12."
+  - id: T_RADAR_CC_R13
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r13 do radar do Claude Code: a re-medição número 13 do que as versões novas do Claude Code mudam no Onion, de 2026-10-17."
+    x_term:
+      pref: "rodada 13 do radar do Claude Code"
+      notation: "r13"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 13 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-17-r13."
+  - id: T_RADAR_CC_R14
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r14 do radar do Claude Code: a re-medição número 14 do que as versões novas do Claude Code mudam no Onion, de 2026-10-21."
+    x_term:
+      pref: "rodada 14 do radar do Claude Code"
+      notation: "r14"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 14 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-21-r14."
+  - id: T_RADAR_CC_R15
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r15 do radar do Claude Code: a re-medição número 15 do que as versões novas do Claude Code mudam no Onion, de 2026-10-21."
+    x_term:
+      pref: "rodada 15 do radar do Claude Code"
+      notation: "r15"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 15 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-21-r15."
+  - id: T_RADAR_CC_R16
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r16 do radar do Claude Code: a re-medição número 16 do que as versões novas do Claude Code mudam no Onion, de 2026-10-22."
+    x_term:
+      pref: "rodada 16 do radar do Claude Code"
+      notation: "r16"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 16 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-22-r16."
+  - id: T_RADAR_CC_R17
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Rodada r17 do radar do Claude Code: a re-medição número 17 do que as versões novas do Claude Code mudam no Onion, de 2026-10-23."
+    x_term:
+      pref: "rodada 17 do radar do Claude Code"
+      notation: "r17"
+      scheme: radar-cc
+      lang: pt-BR
+      definition: "A rodada 17 do eixo do Claude Code no radar de mundo (/meta:radar e /meta:cc-update): mede o delta do CHANGELOG oficial contra a baseline datada da rodada anterior. O grafo dela é radar-E3-2026-10-23-r17."
+  - id: T_A2A_SPIKE_R1
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Réplica r1 do spike A2A entre usuários: a execução número 1 de um cenário do spike, julgada pela régua anti-ação."
+    x_term:
+      pref: "réplica 1 do spike A2A"
+      notation: "r1"
+      scheme: a2a-spike
+      lang: pt-BR
+      definition: "A réplica 1 de um cenário do spike A2A entre usuários do SO (o cenário a qualifica, como em A7-C1); medida no grafo a2a-cross-user-spike-2026-10, onde o lote do A7-C1 recomeçou com as réplicas 2 a 6."
+  - id: T_A2A_SPIKE_R2
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Réplica r2 do spike A2A entre usuários: a execução número 2 de um cenário do spike, julgada pela régua anti-ação."
+    x_term:
+      pref: "réplica 2 do spike A2A"
+      notation: "r2"
+      scheme: a2a-spike
+      lang: pt-BR
+      definition: "A réplica 2 de um cenário do spike A2A entre usuários do SO (o cenário a qualifica, como em A7-C1); medida no grafo a2a-cross-user-spike-2026-10, onde o lote do A7-C1 recomeçou com as réplicas 2 a 6."
+  - id: T_A2A_SPIKE_R3
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Réplica r3 do spike A2A entre usuários: a execução número 3 de um cenário do spike, julgada pela régua anti-ação."
+    x_term:
+      pref: "réplica 3 do spike A2A"
+      notation: "r3"
+      scheme: a2a-spike
+      lang: pt-BR
+      definition: "A réplica 3 de um cenário do spike A2A entre usuários do SO (o cenário a qualifica, como em A7-C1); medida no grafo a2a-cross-user-spike-2026-10, onde o lote do A7-C1 recomeçou com as réplicas 2 a 6."
+  - id: T_A2A_SPIKE_R4
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Réplica r4 do spike A2A entre usuários: a execução número 4 de um cenário do spike, julgada pela régua anti-ação."
+    x_term:
+      pref: "réplica 4 do spike A2A"
+      notation: "r4"
+      scheme: a2a-spike
+      lang: pt-BR
+      definition: "A réplica 4 de um cenário do spike A2A entre usuários do SO (o cenário a qualifica, como em A7-C1); medida no grafo a2a-cross-user-spike-2026-10, onde o lote do A7-C1 recomeçou com as réplicas 2 a 6."
+  - id: T_A2A_SPIKE_R5
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Réplica r5 do spike A2A entre usuários: a execução número 5 de um cenário do spike, julgada pela régua anti-ação."
+    x_term:
+      pref: "réplica 5 do spike A2A"
+      notation: "r5"
+      scheme: a2a-spike
+      lang: pt-BR
+      definition: "A réplica 5 de um cenário do spike A2A entre usuários do SO (o cenário a qualifica, como em A7-C1); medida no grafo a2a-cross-user-spike-2026-10, onde o lote do A7-C1 recomeçou com as réplicas 2 a 6."
+  - id: T_A2A_SPIKE_R6
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Réplica r6 do spike A2A entre usuários: a execução número 6 de um cenário do spike, julgada pela régua anti-ação."
+    x_term:
+      pref: "réplica 6 do spike A2A"
+      notation: "r6"
+      scheme: a2a-spike
+      lang: pt-BR
+      definition: "A réplica 6 de um cenário do spike A2A entre usuários do SO (o cenário a qualifica, como em A7-C1); medida no grafo a2a-cross-user-spike-2026-10, onde o lote do A7-C1 recomeçou com as réplicas 2 a 6."
+  - id: T_BENCH_CASE_R1
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r1 da bancada: o caso número 1 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 1 da bancada"
+      notation: "r1"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 1 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R2
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r2 da bancada: o caso número 2 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 2 da bancada"
+      notation: "r2"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 2 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R3
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r3 da bancada: o caso número 3 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 3 da bancada"
+      notation: "r3"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 3 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R4
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r4 da bancada: o caso número 4 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 4 da bancada"
+      notation: "r4"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 4 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R5
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r5 da bancada: o caso número 5 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 5 da bancada"
+      notation: "r5"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 5 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R6
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r6 da bancada: o caso número 6 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 6 da bancada"
+      notation: "r6"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 6 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R7
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r7 da bancada: o caso número 7 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 7 da bancada"
+      notation: "r7"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 7 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R8
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r8 da bancada: o caso número 8 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 8 da bancada"
+      notation: "r8"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 8 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R9
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r9 da bancada: o caso número 9 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 9 da bancada"
+      notation: "r9"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 9 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R10
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r10 da bancada: o caso número 10 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 10 da bancada"
+      notation: "r10"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 10 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R11
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r11 da bancada: o caso número 11 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 11 da bancada"
+      notation: "r11"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 11 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R12
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r12 da bancada: o caso número 12 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 12 da bancada"
+      notation: "r12"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 12 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R13
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r13 da bancada: o caso número 13 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 13 da bancada"
+      notation: "r13"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 13 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R16
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r16 da bancada: o caso número 16 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 16 da bancada"
+      notation: "r16"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 16 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_BENCH_CASE_R20
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Caso r20 da bancada: o caso número 20 de uma família do lint-selftest, com o mutante que ele mata."
+    x_term:
+      pref: "caso 20 da bancada"
+      notation: "r20"
+      scheme: bench-case
+      lang: pt-BR
+      definition: "O caso 20 de uma família da bancada determinística (.claude/validation/lint-selftest.sh); a família o qualifica, porque cada família numera os casos do zero. Medido nos grafos door-role-parity-2026-09, pr-decision-history-2026-08, elenxo-mecanismos-lint-2026-08-13 e a2a-configurator-2026-10."
+  - id: T_DISSECT_N0
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nível N0 do /meta:dissect: identidade, quem mantém a ferramenta, a licença e a trajetória datada."
+    x_term:
+      pref: "nível 0 do /meta:dissect (identidade)"
+      notation: "N0"
+      scheme: dissect
+      lang: pt-BR
+      definition: "O nível 0 da escada do /meta:dissect, identidade: quem mantém a ferramenta, a licença e a trajetória datada. A tabela dos níveis mora em .claude/commands/meta/dissect.md; nível reprovado não sobe."
+  - id: T_DISSECT_N1
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nível N1 do /meta:dissect: capacidade, os verbos que a ferramenta faz e o Onion não, lidos da superfície executável."
+    x_term:
+      pref: "nível 1 do /meta:dissect (capacidade)"
+      notation: "N1"
+      scheme: dissect
+      lang: pt-BR
+      definition: "O nível 1 da escada do /meta:dissect, capacidade: os verbos que a ferramenta faz e o Onion não, lidos da superfície executável. A tabela dos níveis mora em .claude/commands/meta/dissect.md; nível reprovado não sobe."
+  - id: T_DISSECT_N2
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nível N2 do /meta:dissect: mecanismo, como a ferramenta faz: substrato, estrutura de dados e onde mora o determinismo."
+    x_term:
+      pref: "nível 2 do /meta:dissect (mecanismo)"
+      notation: "N2"
+      scheme: dissect
+      lang: pt-BR
+      definition: "O nível 2 da escada do /meta:dissect, mecanismo: como a ferramenta faz: substrato, estrutura de dados e onde mora o determinismo. A tabela dos níveis mora em .claude/commands/meta/dissect.md; nível reprovado não sobe."
+  - id: T_DISSECT_N3
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nível N3 do /meta:dissect: transferibilidade, o que se transfere para o Onion (igual transfere, diferente se desenha), com evidência e refutador."
+    x_term:
+      pref: "nível 3 do /meta:dissect (transferibilidade)"
+      notation: "N3"
+      scheme: dissect
+      lang: pt-BR
+      definition: "O nível 3 da escada do /meta:dissect, transferibilidade: o que se transfere para o Onion (igual transfere, diferente se desenha), com evidência e refutador. A tabela dos níveis mora em .claude/commands/meta/dissect.md; nível reprovado não sobe."
+  - id: T_DISSECT_N4
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nível N4 do /meta:dissect: absorção, o plano de trazer para o Onion: artefato, costura SDAAL, guarda que cobra e caso de bancada."
+    x_term:
+      pref: "nível 4 do /meta:dissect (absorção)"
+      notation: "N4"
+      scheme: dissect
+      lang: pt-BR
+      definition: "O nível 4 da escada do /meta:dissect, absorção: o plano de trazer para o Onion: artefato, costura SDAAL, guarda que cobra e caso de bancada. A tabela dos níveis mora em .claude/commands/meta/dissect.md; nível reprovado não sobe."
+  - id: T_REFUTATION_FINDING_N1
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N1 da passada de refutação: o achado número 1 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 1 da passada de refutação"
+      notation: "N1"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 1 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N2
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N2 da passada de refutação: o achado número 2 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 2 da passada de refutação"
+      notation: "N2"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 2 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N3
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N3 da passada de refutação: o achado número 3 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 3 da passada de refutação"
+      notation: "N3"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 3 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N4
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N4 da passada de refutação: o achado número 4 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 4 da passada de refutação"
+      notation: "N4"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 4 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N5
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N5 da passada de refutação: o achado número 5 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 5 da passada de refutação"
+      notation: "N5"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 5 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N6
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N6 da passada de refutação: o achado número 6 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 6 da passada de refutação"
+      notation: "N6"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 6 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N7
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N7 da passada de refutação: o achado número 7 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 7 da passada de refutação"
+      notation: "N7"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 7 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N8
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N8 da passada de refutação: o achado número 8 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 8 da passada de refutação"
+      notation: "N8"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 8 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N9
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N9 da passada de refutação: o achado número 9 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 9 da passada de refutação"
+      notation: "N9"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 9 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_REFUTATION_FINDING_N10
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Achado N10 da passada de refutação: o achado número 10 que um refutador independente devolveu."
+    x_term:
+      pref: "achado 10 da passada de refutação"
+      notation: "N10"
+      scheme: refutation-finding
+      lang: pt-BR
+      definition: "O achado 10 de uma passada de refutação (Elenxo); a passada o qualifica. Medido nos grafos a2a-configurator-2026-10 e chat-agent-isolation-2026-10, que numeram as curas da SAC-150 assim."
+  - id: T_SELFCONSISTENCY_CLAIM_N1
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nó N1 do teste de autoconsistência: a afirmação número 1 re-verificada por distribuição empírica no estudo typesafe-ai."
+    x_term:
+      pref: "afirmação 1 do teste de autoconsistência"
+      notation: "N1"
+      scheme: selfconsistency-claim
+      lang: pt-BR
+      definition: "A afirmação 1 do experimento de autoconsistência do grafo typesafe-ai-2026-09 (veredito por distribuição empírica e confiança 1-H/ln4)."
+  - id: T_SELFCONSISTENCY_CLAIM_N2
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nó N2 do teste de autoconsistência: a afirmação número 2 re-verificada por distribuição empírica no estudo typesafe-ai."
+    x_term:
+      pref: "afirmação 2 do teste de autoconsistência"
+      notation: "N2"
+      scheme: selfconsistency-claim
+      lang: pt-BR
+      definition: "A afirmação 2 do experimento de autoconsistência do grafo typesafe-ai-2026-09 (veredito por distribuição empírica e confiança 1-H/ln4)."
+  - id: T_SELFCONSISTENCY_CLAIM_N3
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nó N3 do teste de autoconsistência: a afirmação número 3 re-verificada por distribuição empírica no estudo typesafe-ai."
+    x_term:
+      pref: "afirmação 3 do teste de autoconsistência"
+      notation: "N3"
+      scheme: selfconsistency-claim
+      lang: pt-BR
+      definition: "A afirmação 3 do experimento de autoconsistência do grafo typesafe-ai-2026-09 (veredito por distribuição empírica e confiança 1-H/ln4)."
+  - id: T_SELFCONSISTENCY_CLAIM_N4
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nó N4 do teste de autoconsistência: a afirmação número 4 re-verificada por distribuição empírica no estudo typesafe-ai."
+    x_term:
+      pref: "afirmação 4 do teste de autoconsistência"
+      notation: "N4"
+      scheme: selfconsistency-claim
+      lang: pt-BR
+      definition: "A afirmação 4 do experimento de autoconsistência do grafo typesafe-ai-2026-09 (veredito por distribuição empírica e confiança 1-H/ln4)."
+  - id: T_SELFCONSISTENCY_CLAIM_N5
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-23"
+    verified_against: "o contexto de cada menção do código nos grafos citados na definition, lido no kg_vocab lint de 2026-10-23"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint (kg-ssot 4.23.0) e os grafos citados na definition"
+      locator: "as menções do código no label e no narrative dos grafos citados"
+      method: "medição: o lint rodado no corpus e cada menção lida no grafo dela"
+      locality: repo
+    label: "Nó N5 do teste de autoconsistência: a afirmação número 5 re-verificada por distribuição empírica no estudo typesafe-ai."
+    x_term:
+      pref: "afirmação 5 do teste de autoconsistência"
+      notation: "N5"
+      scheme: selfconsistency-claim
+      lang: pt-BR
+      definition: "A afirmação 5 do experimento de autoconsistência do grafo typesafe-ai-2026-09 (veredito por distribuição empírica e confiança 1-H/ln4)."
+edges:
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R1
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R2
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R3
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R4
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R5
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R6
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R7
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R8
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R9
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R10
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R11
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R12
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R13
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R14
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R15
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R16
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_RADAR_CC_R17
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_A2A_SPIKE_R1
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_A2A_SPIKE_R2
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_A2A_SPIKE_R3
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_A2A_SPIKE_R4
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_A2A_SPIKE_R5
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_A2A_SPIKE_R6
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R1
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R2
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R3
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R4
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R5
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R6
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R7
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R8
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R9
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R10
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R11
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R12
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R13
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R16
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_BENCH_CASE_R20
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_DISSECT_N0
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_DISSECT_N1
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_DISSECT_N2
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_DISSECT_N3
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_DISSECT_N4
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N1
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N2
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N3
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N4
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N5
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N6
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N7
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N8
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N9
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_REFUTATION_FINDING_N10
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_SELFCONSISTENCY_CLAIM_N1
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_SELFCONSISTENCY_CLAIM_N2
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_SELFCONSISTENCY_CLAIM_N3
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_SELFCONSISTENCY_CLAIM_N4
+    edge_type: SUPPORTS
+  - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
+    to: T_SELFCONSISTENCY_CLAIM_N5
+    edge_type: SUPPORTS

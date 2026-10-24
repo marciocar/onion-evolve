@@ -8,7 +8,7 @@
 # --exclude, e eles têm de casar com os da base (.kg-ssot/gate/, uma pasta com um registro por grafo desde a kg-ssot 4.16.0); por isso os dois chamam este.
 #
 # Uso: bash ops/kg-gate-ci.sh [args extras do kg_gate.py, como --update]
-#   rc 0 = vendor íntegro e nenhum grafo piorou · rc 1 = reprovou · rc 2 = entrada quebrada (nunca verde)
+#   rc 0 = vendor íntegro, nenhum grafo piorou e nenhum código novo sem nome · rc 1 = reprovou · rc 2 = entrada quebrada (nunca verde)
 # Roda da raiz do repo que se quer julgar (o pr-finalize a chama dentro da worktree do HEAD).
 set -uo pipefail
 
@@ -28,6 +28,12 @@ gate_rc=$?
 # O critério pré-registrado por HASH (kg-ssot 4.21.0): o leitor não calcula hash, então a régua editada no lugar
 # só é pega aqui. Roda sempre (inclusive com --update), e o rc final é o pior dos dois; 2 (não julgou) vence.
 bash "$(dirname "${BASH_SOURCE[0]}")/kg-criterion-ci.sh"; crit_rc=$?
-[ "$gate_rc" -eq 2 ] || [ "$crit_rc" -eq 2 ] && exit 2
+
+# O lint de NOMES (kg-ssot 4.23.0, contrato v4.14): código novo na prosa sem x_term reprova; o legado está na
+# base .kg-ssot/vocab-lint.json, com as externas de .kg-ssot/vocab-externals.tsv. Roda sempre e SEM --update
+# (a base dele se regrava só por `bash ops/kg-vocab-ci.sh --update`, no PR que nomeia).
+bash "$(dirname "${BASH_SOURCE[0]}")/kg-vocab-ci.sh"; vocab_rc=$?
+[ "$gate_rc" -eq 2 ] || [ "$crit_rc" -eq 2 ] || [ "$vocab_rc" -eq 2 ] && exit 2
 [ "$gate_rc" -ne 0 ] && exit "$gate_rc"
-exit "$crit_rc"
+[ "$crit_rc" -ne 0 ] && exit "$crit_rc"
+exit "$vocab_rc"

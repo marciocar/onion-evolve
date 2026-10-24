@@ -68,6 +68,10 @@ _PROJ=(
   "inventory.sh --markdown|docs/onion/inventory.md|20|linhas"
   "harness-inventory.sh --markdown|docs/onion/testing-inventory.md|20|linhas"
   "testing-state.sh --markdown|docs/onion/testing-state.md|20|linhas"
+  # E o glossário da glosa (2026-10-23): as linhas `term` dele são projeção dos x_term dos grafos, e a REGRA 62
+  # (Projeção GERADA em sincronia com a fonte (docs/backlog.md)) as cobra. Entra aqui pela MESMA lição da leva
+  # anterior: fechar a projeção não pode depender de alguém lembrar de rodar o gerador.
+  "house-codes-gen.sh --markdown|.claude/validation/house-codes.tsv|20|linhas"
 )
 
 _fail=0 _n=0

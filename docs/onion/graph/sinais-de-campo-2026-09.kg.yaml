@@ -455,6 +455,22 @@ nodes:
       method: "medição: contagem de tokens e chamadas reportada pelo harness por agente"
       locality: "host"
 
+  - id: E_FASES_1_E_2_DO_CORE_ENTREGUES_1024
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-24"
+    verified_against: "o lint de nomes rodado no corpus (2250 códigos, 65 resolvidos, 37 externos, 0 novos), o glossário projetado em dia byte a byte, a bancada das três famílias e o caso do r1 medido contra o hook da origin/main"
+    label: "A camada do core das fases 1 e 2 está no lugar: o kg_vocab lint com catraca e externas medidas roda no gate (ops/kg-vocab-ci.sh dentro do ops/kg-gate-ci.sh), 58 termos x_term nasceram em 6 esquemas (docs/onion/graph/vocabulario-da-casa-2026-10.kg.yaml) e as linhas de termo do glossário da glosa viraram projeção com catraca da REGRA 62; o a2a-spike:r1 que ganhava a glosa do radar num bloco do spike A2A agora cala, e a passada adversarial devolveu 1 bloqueador (a reincidência do hook por esquema deixava passar a rodada nova) e 5 correções, todos curados no mesmo loop"
+    narrative: "Fase 1: a base .kg-ssot/vocab-lint.json guarda o legado (2155 achados na gravação), .kg-ssot/vocab-externals.tsv declara 6 sistemas de fora medidos no corpus (JOSE, PKCE, NIST AAL, SOC2, Creative Commons, regra do GitHub) e .kg-ssot/vocab-externals.sha256 é a catraca delas — alargar a externa sem regravar a base sai rc 2, e uma externa que engole código da casa sai rc 2 nos dois modos. Os primeiros termos nomearam as colisões medidas: rN como rodada do radar (radar-cc, 17 rodadas datadas), como réplica do spike A2A (a2a-spike) e como caso da bancada (bench-case); N0-N4 como níveis do dissect; N1-N10 como achados de refutação e N1-N5 como afirmações do teste de autoconsistência. Nomear os 3 primeiros reclassificou 106 menções do legado sem reprovar nada. Fase 2: o gerador .claude/validation/house-codes-gen.sh projeta as linhas term do .claude/validation/house-codes.tsv (scheme->domínio, notation->regex, pref->glosa), mantendo as linhas à mão; o hook segue sem chamar o vendor (carga medida em 0,29 ms). Dogfood no transcript real desta sessão (569 turnos, 189 do maestro): a taxa de bloqueio ficou em 0,5% (3 turnos) contra 0,0% do hook da origin/main, e os 3 bloqueios são exatamente as réplicas a2a-spike:r2 e a2a-spike:r3 do spike, que o hook velho glosava calado como rodada do radar — o defeito que o maestro teve de apontar à mão. A fase 3 (o selador e a forja exigindo nome) fica para depois, por decisão do pedido. Resíduo: docs/evolution/review/feat-canonical-names-core-layer.md."
+    provenance:
+      source: "a sessão que executou as fases 1 e 2 na worktree feat/canonical-names-core-layer"
+      locator: "ops/kg-vocab-ci.sh, .claude/validation/house-codes-gen.sh, docs/onion/graph/vocabulario-da-casa-2026-10.kg.yaml e as famílias kg_vocab_ci, house_codes_gen e house_code_gloss da bancada"
+      method: "medição: o gate, o lint, a bancada e o hook rodados; o caso do r1 comparado com o hook da origin/main"
+      locality: repo
 edges:
   - from: E_FORK_VS_AGENTE_NOVO_PAR_1_KG_SSOT_422_1023
     to: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
@@ -528,3 +544,9 @@ edges:
   - from: D_FORK_VS_AGENTE_NOVO_MEDIR_ANTES_1023
     to: E_KG_SSOT_419_ADOTADA_1022
     edge_type: TRACES_TO
+  - from: E_FASES_1_E_2_DO_CORE_ENTREGUES_1024
+    to: D_NOMES_NASCEM_CERTOS_NAS_TRES_CAMADAS_1023
+    edge_type: TRACES_TO
+  - from: E_FASES_1_E_2_DO_CORE_ENTREGUES_1024
+    to: D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023
+    edge_type: SUPPORTS

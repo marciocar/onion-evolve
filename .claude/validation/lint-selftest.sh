@@ -29841,6 +29841,197 @@ run_kg_fixture_paths_selftests() {
 _family run_kg_fixture_paths_selftests
 _family run_kg_criterion_ci_selftests
 
+run_kg_vocab_ci_selftests() {
+  # ops/kg-vocab-ci.sh (2026-10-23, kg-ssot 4.23.0): o lint de NOMES com catraca, ao lado do gate. Mundo falso:
+  # repo git com o vendor REAL copiado, a base e as externas em .kg-ssot/ e um grafo com prosa. Core-only.
+  local root; root="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+  local sut="${root}/ops/kg-vocab-ci.sh"
+  if [ ! -f "${sut}" ] || [ ! -f "${root}/vendor/kg-ssot/tools/kg_vocab.py" ]; then record_skip "kg-vocab-ci: script ou kg_vocab.py ausente"; return; fi
+  local sb; sb="$(mktemp -d)"; trap 'rm -rf "${sb}"' RETURN
+  mkdir -p "${sb}/vendor" "${sb}/.kg-ssot" "${sb}/docs/g" "${sb}/ops"
+  cp -r "${root}/vendor/kg-ssot" "${sb}/vendor/kg-ssot"; cp "${sut}" "${sb}/ops/"
+  printf '# externas\nsoc2\tSOC2\n' > "${sb}/.kg-ssot/vocab-externals.tsv"
+  (cd "${sb}" && git init -q && git config user.email t@t && git config user.name t)
+  _kgv_prose() {   # _kgv_prose <label do nó de prosa> [nós extras YAML]
+    printf 'meta:\n  id: banco\n  title: "bancada"\nnodes:\n  - id: E_PROSA\n    node_type: evidence\n    status: open\n    label: "%s"\n%sedges: []\n' "$1" "${2:-}" > "${sb}/docs/g/b.kg.yaml"
+    (cd "${sb}" && git add -A >/dev/null 2>&1)
+  }
+  _kgv_stamp() {   # regrava só o carimbo das externas (a base fica como está)
+    python3 -I -c '
+import hashlib, sys
+open(sys.argv[2], "w").write(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest() + "\n")
+' "${sb}/.kg-ssot/vocab-externals.tsv" "${sb}/.kg-ssot/vocab-externals.sha256"
+  }
+  _kgv_term() {    # _kgv_term <id> <notation> <scheme>
+    printf '  - id: %s\n    node_type: entity\n    status: open\n    label: "termo"\n    x_term:\n      pref: "nome de %s"\n      notation: "%s"\n      scheme: %s\n' "$1" "$2" "$2" "$3"
+  }
+  local rc out
+  # (a) o legado: r7 sem termo gravado na base → rc 0
+  _kgv_prose "A rodada r7 mediu."
+  (cd "${sb}" && bash ops/kg-vocab-ci.sh --update >/dev/null 2>&1)
+  if out="$(cd "${sb}" && bash ops/kg-vocab-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && grep -q 'novos=0' <<< "${out}"; then record_pass "kg-vocab-ci: (a) código do legado na base passa (rc 0)"
+  else record_fail "kg-vocab-ci: (a) legado" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (b) MUTANTE do legado: um código NOVO sem termo (r8) → rc 1, com o achado nomeado
+  _kgv_prose "A rodada r7 mediu e a r8 também."
+  if out="$(cd "${sb}" && bash ops/kg-vocab-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'vocab.code-unresolved .*r8' <<< "${out}"; then record_pass "kg-vocab-ci: (b) código novo sem termo REPROVA (rc 1, code-unresolved r8)"
+  else record_fail "kg-vocab-ci: (b) código novo" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (c) nomear o legado em DOIS esquemas muda o estado dele (sem termo → ambíguo): reclassificado, rc 0
+  _kgv_prose "A rodada r7 mediu." "$(_kgv_term T_A r7 radar-cc)
+$(_kgv_term T_B r7 a2a-spike)
+"
+  if out="$(cd "${sb}" && bash ops/kg-vocab-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && grep -q 'reclassificados=1' <<< "${out}"; then record_pass "kg-vocab-ci: (c) o 1º termo de código que colide reclassifica o legado sem reprovar (rc 0, reclassificados=1)"
+  else record_fail "kg-vocab-ci: (c) reclassificado" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (d) a externa declarada resolve sem termo; MUTANTE sem a linha da externa → rc 1
+  _kgv_prose "A rodada r7 mediu o SOC2."
+  if out="$(cd "${sb}" && bash ops/kg-vocab-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  # tirar a externa é APERTAR: a TSV e o carimbo mudam juntos, a base fica a mesma (é o que um PR que
+  # aperta faz à mão); sem a externa o SOC2 não resolve e não está na base, então reprova
+  printf '# externas\n' > "${sb}/.kg-ssot/vocab-externals.tsv"
+  _kgv_stamp
+  local rc2; if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then rc2=0; else rc2=$?; fi
+  if [ "${rc}" = 0 ] && grep -q 'externos=1' <<< "${out}" && [ "${rc2}" = 1 ]; then record_pass "kg-vocab-ci: (d) externa declarada resolve (rc 0); sem ela o mesmo código REPROVA (rc 1)"
+  else record_fail "kg-vocab-ci: (d) externa" "rc=${rc} sem-externa rc=${rc2} $(tail -1 <<< "${out}")"; fi
+  # (h) a CATRACA DAS EXTERNAS e a SONDA: alargar as externas sem regravar a base sai rc 2, e uma externa que
+  #     engole código DA CASA sai rc 2 nos DOIS modos (julgar e --update) — achado da passada adversarial de
+  #     2026-10-23: a linha larga mandava o corpus inteiro para "externos" e deixava rc 0, sem achado nenhum
+  printf '# externas\nsoc2\tSOC2\n' > "${sb}/.kg-ssot/vocab-externals.tsv"
+  _kgv_prose "A rodada r7 mediu o SOC2."
+  (cd "${sb}" && bash ops/kg-vocab-ci.sh --update >/dev/null 2>&1) || true
+  local h1 h2 h3 h4
+  printf '# externas\nsoc2\tSOC2\ncve\tCVE[0-9]{4}\n' > "${sb}/.kg-ssot/vocab-externals.tsv"
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then h1=0; else h1=$?; fi
+  printf '# externas\ntudo\t[A-Za-z]{1,3}[0-9]{1,3}[a-z]?\n' > "${sb}/.kg-ssot/vocab-externals.tsv"
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then h2=0; else h2=$?; fi
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh --update >/dev/null 2>&1); then h3=0; else h3=$?; fi
+  rm -f "${sb}/.kg-ssot/vocab-externals.sha256"
+  printf '# externas\nsoc2\tSOC2\n' > "${sb}/.kg-ssot/vocab-externals.tsv"
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then h4=0; else h4=$?; fi
+  if [ "${h1}" = 2 ] && [ "${h2}" = 2 ] && [ "${h3}" = 2 ] && [ "${h4}" = 2 ]; then
+    record_pass "kg-vocab-ci: (h) externa nova sem regravar a base, externa que engole código da casa (nos dois modos) e carimbo ausente saem rc 2"
+  else record_fail "kg-vocab-ci: (h) catraca das externas e sonda" "externa-nova=${h1} larga=${h2} larga--update=${h3} sem-carimbo=${h4} (todos 2)"; fi
+  (cd "${sb}" && bash ops/kg-vocab-ci.sh --update >/dev/null 2>&1) || true
+  # (i) o VENDOR MENTINDO: um kg_vocab.py de mentira prova os três ramos fail-closed que nenhum grafo
+  #     consegue provocar — rc do lint acima de 1, JSON de outra forma, e rc 0 com achado novo no JSON
+  #     (o rc e o JSON discordando). Sem eles, o veredito do script podia virar verde por acidente.
+  cp "${sb}/vendor/kg-ssot/tools/kg_vocab.py" "${sb}/kg_vocab.real"
+  _kgv_fake() { printf '#!/usr/bin/env python3\nimport sys\nprint(%s)\nsys.exit(%s)\n' "$1" "$2" > "${sb}/vendor/kg-ssot/tools/kg_vocab.py"; }
+  local f1 f2 f3 f4
+  _kgv_fake "'{\"schema_version\": \"kg-ssot.vocab/1\", \"unreadable\": [], \"lint\": {\"codes\": 0, \"findings\": [], \"new\": [], \"reclassified\": []}}'" 3
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then f1=0; else f1=$?; fi
+  _kgv_fake "'{\"schema_version\": \"outra/9\"}'" 0
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then f2=0; else f2=$?; fi
+  _kgv_fake "'{\"schema_version\": \"kg-ssot.vocab/1\", \"unreadable\": [], \"lint\": {\"codes\": 1, \"findings\": [], \"new\": [{\"code\": \"vocab.code-unresolved\", \"file\": \"x\", \"id\": \"y\", \"field\": \"label\", \"token\": \"r9\"}], \"reclassified\": []}}'" 0
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then f3=0; else f3=$?; fi
+  _kgv_fake "'{\"schema_version\": \"kg-ssot.vocab/1\", \"unreadable\": [], \"lint\": {\"codes\": 1, \"findings\": []}}'" 0
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then f4=0; else f4=$?; fi
+  cp "${sb}/kg_vocab.real" "${sb}/vendor/kg-ssot/tools/kg_vocab.py"
+  if [ "${f1}" = 2 ] && [ "${f2}" = 2 ] && [ "${f3}" = 2 ] && [ "${f4}" = 2 ]; then
+    record_pass "kg-vocab-ci: (i) vendor com rc acima de 1, JSON de outra forma, rc discordando do JSON e base não lida saem rc 2"
+  else record_fail "kg-vocab-ci: (i) fail-closed do veredito" "rc3=${f1} schema=${f2} rc-discorda=${f3} sem-new=${f4} (todos 2)"; fi
+  unset -f _kgv_fake
+  # (j) GRAFO ILEGÍVEL reprova e o veredito DIZ que é ilegibilidade (não "código sem termo", que enganava)
+  printf 'nodes:\n  - id: [isto\n   nao: fecha\n' > "${sb}/docs/g/b.kg.yaml"; (cd "${sb}" && git add -A >/dev/null 2>&1)
+  if out="$(cd "${sb}" && bash ops/kg-vocab-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'ilegível' <<< "${out}" && grep -q 'ILEGÍVEL' <<< "${out}"; then
+    record_pass "kg-vocab-ci: (j) grafo ilegível reprova (rc 1) e o veredito nomeia a ilegibilidade"
+  else record_fail "kg-vocab-ci: (j) grafo ilegível" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  _kgv_prose "A rodada r7 mediu o SOC2."
+  # (e) fail-closed: externa malformada, base ausente e vendor ausente saem rc 2 (não julgou), nunca verde
+  printf 'soc2\tSOC2\textra\n' > "${sb}/.kg-ssot/vocab-externals.tsv"
+  local r1 r2 r3
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then r1=0; else r1=$?; fi
+  printf 'soc2\tSOC2\n' > "${sb}/.kg-ssot/vocab-externals.tsv"; mv "${sb}/.kg-ssot/vocab-lint.json" "${sb}/base.bak"
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then r2=0; else r2=$?; fi
+  mv "${sb}/base.bak" "${sb}/.kg-ssot/vocab-lint.json"; rm -rf "${sb}/vendor"
+  if (cd "${sb}" && bash ops/kg-vocab-ci.sh >/dev/null 2>&1); then r3=0; else r3=$?; fi
+  if [ "${r1}" = 2 ] && [ "${r2}" = 2 ] && [ "${r3}" = 2 ]; then record_pass "kg-vocab-ci: (e) externa malformada, base ausente e vendor ausente saem rc 2"
+  else record_fail "kg-vocab-ci: (e) fail-closed" "malformada=${r1} sem-base=${r2} sem-vendor=${r3}"; fi
+  # (f) o gate do CI chama o lint de nomes (sem a chamada, a catraca não vale no CI nem no pr-finalize)
+  if grep -q '^bash .*kg-vocab-ci.sh"; vocab_rc=\$?' "${root}/ops/kg-gate-ci.sh" && grep -q 'exit "\$vocab_rc"' "${root}/ops/kg-gate-ci.sh"; then
+    record_pass "kg-vocab-ci: (f) o ops/kg-gate-ci.sh chama o lint de nomes e propaga o rc dele"
+  else record_fail "kg-vocab-ci: (f) ligação no gate" "ops/kg-gate-ci.sh não chama ops/kg-vocab-ci.sh ou engole o rc"; fi
+  # (g) o corpus REAL do core passa contra a base versionada (a base e as externas casam com o que está no disco)
+  if out="$(cd "${root}" && bash ops/kg-vocab-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ]; then record_pass "kg-vocab-ci: (g) o corpus do core passa contra .kg-ssot/vocab-lint.json"
+  else record_fail "kg-vocab-ci: (g) corpus do core" "rc=${rc} $(tail -3 <<< "${out}" | tr '\n' ' ')"; fi
+  unset -f _kgv_prose _kgv_term _kgv_stamp
+}
+_family run_kg_vocab_ci_selftests
+
+run_house_codes_gen_selftests() {
+  # .claude/validation/house-codes-gen.sh (2026-10-23): as linhas term do glossário da glosa são projeção dos
+  # x_term. Mundo falso: repo git com o vendor real, um TSV com linhas à mão, linha scheme e os marcadores.
+  local root; root="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+  local gen="${SCRIPT_DIR}/house-codes-gen.sh"
+  if [ ! -f "${gen}" ] || [ ! -f "${root}/vendor/kg-ssot/tools/kg_vocab.py" ]; then record_skip "house-codes-gen: gerador ou vendor ausente"; return; fi
+  local sb; sb="$(mktemp -d)"; trap 'rm -rf "${sb}"' RETURN
+  mkdir -p "${sb}/vendor" "${sb}/docs/g"
+  cp -r "${root}/vendor/kg-ssot" "${sb}/vendor/kg-ssot"
+  (cd "${sb}" && git init -q)
+  local B='# >>> GERADO por .claude/validation/house-codes-gen.sh a partir dos x_term dos grafos: nao edite a mao (REGRA 62)'
+  local E='# <<< fim do bloco gerado'
+  _hcg_tsv() { printf '# cabeçalho\nstatic\tI3\talta\tum escritor por repo\t-\t-\n%sscheme\tradar-cc\talta\trodada do radar\tradar\tradar\n%s\n%s%s\n' "${2:-}" "${B}" "${1:-}" "${E}" > "${sb}/h.tsv"; }
+  _hcg_term() { printf '  - id: %s\n    node_type: entity\n    status: %s\n    label: "termo"\n    x_term:\n      pref: "%s"\n      notation: "%s"\n      scheme: %s\n' "$1" "$2" "$3" "$4" "$5"; }
+  printf 'meta:\n  id: v\n  title: "v"\nnodes:\n%s%s%sedges: []\n' \
+    "$(_hcg_term T_A open 'rodada 7 do radar' r7 radar-cc)
+" "$(_hcg_term T_B open 'réplica 7' r7 a2a-spike)
+" "$(_hcg_term T_C superseded 'rodada velha' r9 radar-cc)
+" > "${sb}/docs/g/v.kg.yaml"
+  (cd "${sb}" && git add -A >/dev/null 2>&1)
+  local out rc
+  # (a) projeta só o esquema com linha scheme, só o termo vivo, e mantém as linhas à mão byte a byte
+  _hcg_tsv "term	velho	alta	lixo	-	-	radar-cc
+"
+  export ONION_VOCAB_ROOT="${sb}" ONION_HOUSE_CODES_TSV="${sb}/h.tsv"
+  out="$(bash "${gen}" --markdown 2>&1)"; rc=$?
+  if [ "${rc}" = 0 ] && grep -qx 'term	r7	alta	rodada 7 do radar	radar	radar	radar-cc' <<< "${out}" \
+     && ! grep -q 'a2a-spike\|r9\|velho' <<< "${out}" && grep -qx 'static	I3	alta	um escritor por repo	-	-' <<< "${out}"; then
+    record_pass "house-codes-gen: (a) projeta o termo vivo do esquema declarado, descarta o bloco velho e mantém as linhas à mão"
+  else record_fail "house-codes-gen: (a) projeção" "rc=${rc} [$(tr '\n' '~' <<< "${out}" | head -c 400)]"; fi
+  # (b) --write é idempotente: regravar e regerar dá os mesmos bytes (a catraca da REGRA 62 compara assim).
+  #     A invocação do --write fica NUA (as variáveis exportadas antes), para a REGRA 59 (Modo que a produção
+  #     consome é exercitado pela bancada) enxergar que o modo que o maestro roda está coberto aqui
+  export ONION_VOCAB_ROOT="${sb}" ONION_HOUSE_CODES_TSV="${sb}/h.tsv"
+  bash "${gen}" --write >/dev/null 2>&1
+  if bash "${gen}" --markdown 2>/dev/null | cmp -s - "${sb}/h.tsv"; then
+    record_pass "house-codes-gen: (b) --write seguido de --markdown dá os mesmos bytes (com a quebra final)"
+  else record_fail "house-codes-gen: (b) idempotência" "o --markdown difere do arquivo que o --write gravou"; fi
+  # (c) MUTANTES de entrada: linha scheme sem termo, marcadores ausentes e pref com TAB saem rc 1 (nunca projeção vazia)
+  local r1 r2
+  _hcg_tsv "" "scheme	digitado-errado	alta	x	x	x
+"
+  if bash "${gen}" --markdown >/dev/null 2>&1; then r1=0; else r1=$?; fi
+  printf 'static\tI3\talta\tx\t-\t-\n' > "${sb}/h.tsv"
+  if bash "${gen}" --markdown >/dev/null 2>&1; then r2=0; else r2=$?; fi
+  if [ "${r1}" = 1 ] && [ "${r2}" = 1 ]; then record_pass "house-codes-gen: (c) esquema sem termo e marcadores ausentes saem rc 1"
+  else record_fail "house-codes-gen: (c) entrada quebrada" "esquema-sem-termo rc=${r1} sem-marcadores rc=${r2}"; fi
+  unset ONION_VOCAB_ROOT ONION_HOUSE_CODES_TSV   # daqui para baixo, o corpus REAL do core
+  # (d) o filtro por git grep dá a MESMA resposta que o --root do vendor no corpus real (nenhum termo some)
+  local want got
+  want="$(cd "${root}" && python3 -I -B vendor/kg-ssot/tools/kg_vocab.py terms --root . --format json 2>/dev/null | python3 -I -c '
+import json, sys
+sch = {l.split("\t")[1] for l in open(sys.argv[1], encoding="utf-8") if l.startswith("scheme\t")}
+print(sorted((t["scheme"], t["notation"]) for t in json.load(sys.stdin)["terms"] if t.get("scheme") in sch and t.get("notation") and t.get("status") not in ("superseded", "refuted")))
+' "${SCRIPT_DIR}/house-codes.tsv")"
+  got="$(bash "${gen}" --markdown 2>/dev/null | python3 -I -c '
+import re, sys
+print(sorted((c[6], re.sub(r"\\\\(.)", r"\1", c[1])) for c in (l.rstrip("\n").split("\t") for l in sys.stdin) if c[0] == "term"))
+')"
+  if [ -n "${want}" ] && [ "${want}" != "[]" ] && [ "${want}" = "${got}" ]; then record_pass "house-codes-gen: (d) o filtro do gerador devolve os mesmos termos que o kg_vocab --root"
+  else record_fail "house-codes-gen: (d) filtro × --root" "root=${want:0:160} gerador=${got:0:160}"; fi
+  # (e) a projeção rastreada está em dia, e a REGRA 62 a lista (sem a linha, o bloco velho passaria calado)
+  if bash "${gen}" --markdown 2>/dev/null | cmp -s - "${SCRIPT_DIR}/house-codes.tsv" \
+     && grep -q '"\.claude/validation/house-codes\.tsv|\${SCRIPT_DIR}/house-codes-gen\.sh|' "${SCRIPT_DIR}/lint-artifacts.sh"; then
+    record_pass "house-codes-gen: (e) house-codes.tsv em dia com o vocabulário e listado na REGRA 62 (Projeção GERADA em sincronia com a fonte (docs/backlog.md))"
+  else record_fail "house-codes-gen: (e) catraca" "house-codes.tsv defasado (rode house-codes-gen.sh --write) ou ausente da lista da REGRA 62"; fi
+  unset -f _hcg_tsv _hcg_term
+  unset ONION_VOCAB_ROOT ONION_HOUSE_CODES_TSV
+}
+_family run_house_codes_gen_selftests
+
 # Aviso de hook roteado pelo ARTEFATO, não pelo papel (sinal de campo de um repo PRÉ-ADOÇÃO,
 # 2026-09-05): o guard mandava ler o check `onion-review-verdict` num repo que não o tem — texto certo,
 # contexto errado, e aviso que manda caçar fantasma gasta a confiança do canal.
