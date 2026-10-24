@@ -83,7 +83,7 @@ rows=""
 while IFS= read -r _t; do
   [ -n "${_t}" ] || continue
   # `./X` (um ou mais) normaliza para `X` — o MESMO corte que o gerador aplica ao índice
-  # (kg-trace-resolve.sh, SAC-81). Os dois lados têm de concordar, senão nada casa.
+  # (kg-trace.sh --emit-index, SAC-81). Os dois lados têm de concordar, senão nada casa.
   _rel="${_t#"${root}/"}"
   while :; do case "${_rel}" in ./*) _rel="${_rel#./}" ;; *) break ;; esac; done
   # `grep -F` com âncora de campo: o target é a 1ª coluna inteira, nunca um prefixo (senão

@@ -342,7 +342,7 @@ nodes:
     impact: 5
     confidence: 0.75
     label: 'OPCAO O5: referencia cross-arquivo como PONTEIRO tipado (proxy-node / campo `xref:` no padrao do `trace:`) + resolver-irmao HARD que reprova ponteiro morto; o motor de atencao NUNCA atravessa arquivo. Confianca 0.75: e a recomendacao do Elenxo para a sub-pergunta (2), com sustentacao dupla — o incumbente do mercado usa exatamente essa forma (proxy node, E_NEO4J_ARESTA_NAO_ATRAVESSA_PROXY_NODE) e o Onion ja tem o padrao construido e provado (kg-trace-resolve.sh: guarda HARD, nascida sem baseline, sobre 1.659 ponteiros `trace:`). CONDICAO INEGOCIAVEL: o resolver e METADE DA OPCAO, nao um extra. Ponteiro sem resolver nao tem integridade referencial e reproduz os 13 ponteiros mortos ja medidos (E_OBJECAO_4); a sintaxe [[Vault::Nota]] do Obsidian contribui a FORMA e zero da GARANTIA, e a garantia e a parte cara (E_OBJECAO_8). Adotar O5 sem o resolver e adotar behavior-over-declaration ao contrario.'
-    trace: '.claude/validation/kg-trace-resolve.sh'
+    trace: '.claude/validation/kg-trace.sh'
 
   - id: C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS
     node_type: claim
@@ -383,7 +383,7 @@ nodes:
     source_tier: 10
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 1 — o achado 1 e argumento-de-ausencia e NAO discrimina nenhuma das 4 decisoes: "nao ha solucao unica" e compativel com O1, O2, O3, O5 e O6 simultaneamente. Pior: o proprio achado 10 mostra que o documento ENUMERA semanticas candidatas (secao 3.2 merge, named-graph-as-context), logo "nao tem solucao" e falso no nivel que importa — tem varias, catalogadas. Citado como suporte a "manter o radar de arquivo unico" seria RACIONALIZACAO. O que de fato sustenta O2 e local e medido: o kg-radar.sh tem ZERO acesso a filesystem (0 chamadas system()/getline<); e awk puro sobre um arquivo, e essa pureza e load-bearing — e o que o faz rodar sob `env -i` (kg-trace-resolve.sh l.19-23). A indecisao do W3C nao entra na fundamentacao.'
-    trace: '.claude/validation/kg-trace-resolve.sh'
+    trace: '.claude/validation/kg-trace.sh'
     provenance:
       source: ".claude/validation/kg-trace-resolve.sh"
       locator: "E_W3C_SEM_SEMANTICA_UNICA_DATASETS (https://www.w3.org/TR/rdf11-datasets/) cruzada com E_W3C_MERGE_E_ESCOLHA_EXPLICITA (mesma fonte, secao 3.2) e com a medicao local: grep -c \"system(|getline <|getline<\" .claude/validation/kg-radar.sh -> 0 (executado 2026-09-04); kg-trace-resolve.sh l.19-23"
@@ -437,7 +437,7 @@ nodes:
     source_tier: 10
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 4 — a mais decisiva e a mais perigosa se lida como licenca: proxy node NAO tem integridade referencial; e convencao documentada como CONTORNO, nao mecanismo. Medido nesta casa que a classe custa caro: kg-trace-resolve.sh l.10-12 registra 54 grafos, 1.659 nos com `trace:` -> 13 PONTEIROS MORTOS (arquivo movido, prefixo perdido, reorganizacao). E o unico guard de orfao do motor e INTRA-arquivo (kg-radar.sh l.744, grau 0). Logo a objecao sobrevive como CONSTRAINT dura: qualquer `file:id` so entra ACOMPANHADO de um resolver-irmao HARD (padrao kg-trace-resolve.sh), senao nasce a mesma mentira silenciosa ja medida — behavior-over-declaration aplicado a propria ancora.'
-    trace: '.claude/validation/kg-trace-resolve.sh'
+    trace: '.claude/validation/kg-trace.sh'
     provenance:
       source: ".claude/validation/kg-trace-resolve.sh"
       locator: "E_NEO4J_ARESTA_NAO_ATRAVESSA_PROXY_NODE (https://neo4j.com/docs/operations-manual/current/fabric/) cruzada com medicao local: kg-trace-resolve.sh l.10-12 registra \"54 grafos, 1.659 nos com trace: -> 13 ponteiros mortos (7 por arquivo movido para _processed/, 4 por prefixo perdido, 2 por reorganizacao)\"; e grep -n orfao .claude/validation/kg-radar.sh -> l.744 `if (deg[id] == 0) print \"✗ no orfao (grau 0)\"` — unico guard de orfao do motor, INTRA-arquivo"

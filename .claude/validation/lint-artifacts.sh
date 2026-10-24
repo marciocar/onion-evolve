@@ -794,32 +794,48 @@ check_kg_radar_integrity() {
 #   mandado — `--freshness-tsv` — cobre 2 dos 13 casos, nasceria vendo 15% e DECLARANDO
 #   cobertura; (2) o kg-radar tem ZERO acesso a filesystem, e essa pureza é o que o faz
 #   rodar sob `env -i` (portabilidade medida no M3) — embutir I/O custaria a propriedade
-#   para cobrir menos. Toda a lógica (duas raízes, 3 classes não-julgáveis, guarda de
-#   vacuidade) vive em kg-trace-resolve.sh.
+#   para cobrir menos.
+#   DESDE 2026-10-24 QUEM JULGA É O PRODUTO: o `kg_trace.py check` do kg-ssot (4.25,
+#   `kg-ssot.trace/1`), que é a gramática do resolvedor da casa promovida — paridade medida na
+#   main: 2.501/2.501/0. O kg-trace.sh só traduz o JSON do produto para o TSV abaixo e mantém a
+#   guarda de vacuidade; sem o produto (vendor < 4.25, python3 ausente) a regra DECLARA que não
+#   julgou (SOFT), nunca cala.
 # ===========================================================================
 check_kg_trace_resolve() {
-  local helper="${SCRIPT_DIR}/kg-trace-resolve.sh"
+  local helper="${SCRIPT_DIR}/kg-trace.sh"
   [ -f "${helper}" ] || return 0
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in
-      *.kg.yaml|*/kg-trace-resolve.sh) : ;;
+      *.kg.yaml|*.kg.json|*/kg-trace.sh) : ;;
       *) return 0 ;;
     esac
   fi
-  local out g nid ntype target verdict
-  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  local out g nid ntype target verdict rc=0 err
+  err="$(mktemp)"
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${err}")" || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    # Sem o juiz não há veredito — e calar seria declarar verde. O rc 2 do helper é "produto ausente".
+    violation "SOFT" "${SCRIPT_DIR}/kg-trace.sh" \
+      "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/NAO-JULGOU] o juiz é o kg_trace.py do vendor kg-ssot >= 4.25, e ele não rodou — ESTA REGRA NÃO VERIFICOU os traces. $(head -c 200 "${err}" | tr '\n' ' ')"
+    rm -f "${err}"; return
+  fi
+  rm -f "${err}"
   [ -n "${out}" ] || return 0
   while IFS=$'\t' read -r g nid ntype target verdict; do
     [ -n "${nid}" ] || continue
-    # VACUIDADE não é um nó com âncora quebrada — é o PARSER morto. Mensagem própria, senão o
-    # aviso sairia como "o nó PARSER aponta para (nenhum nó lido)", que confunde quem lê.
-    if [ "${verdict}" = "VACUIDADE" ]; then
-      violation "HARD" "${SCRIPT_DIR}/kg-trace-resolve.sh" \
-        "[trace-resolve/VACUIDADE] existe \`trace:\` no corpus e o parser não leu NADA — nem julgável, nem excluído. A guarda está cega: ela reportaria verde sem verificar coisa alguma (detalhe: bash .claude/validation/kg-trace-resolve.sh)"
-      continue
-    fi
+    case "${verdict}" in
+      VACUIDADE)
+        # Não é um nó com âncora quebrada — é o leitor que não leu NADA. Mensagem própria.
+        violation "HARD" "${SCRIPT_DIR}/kg-trace.sh" \
+          "[trace-resolve/VACUIDADE] existe \`trace:\` no corpus e o juiz não leu NADA — nem julgável, nem excluído. A guarda está cega: ela reportaria verde sem verificar coisa alguma (detalhe: bash .claude/validation/kg-trace.sh)"
+        continue ;;
+      ENTRADA-QUEBRADA|ILEGIVEL)
+        violation "HARD" "${REPO_ROOT}/${g}" \
+          "[trace-resolve/${verdict}] o kg_trace.py não leu ${g} ${target} — sem leitura não há veredito (detalhe: bash .claude/validation/kg-trace.sh)"
+        continue ;;
+    esac
     violation "HARD" "${REPO_ROOT}/${g}" \
-      "[trace-resolve/${verdict}] ${nid} (${ntype}): \`trace:\` aponta para '${target}', que não existe — arquivo movido/renomeado? cite o caminho real (detalhe: bash .claude/validation/kg-trace-resolve.sh)"
+      "[trace-resolve/${verdict}] ${nid} (${ntype}): \`trace:\` aponta para '${target}', que não existe — arquivo movido/renomeado? cite o caminho real (detalhe: bash .claude/validation/kg-trace.sh)"
   done <<< "${out}"
 }
 
@@ -2607,16 +2623,16 @@ check_kg_edit_saw_confirmed() {
 # ===========================================================================
 check_kg_read_index_sync() {
   local idx="${REPO_ROOT}/docs/onion/kg-read-index.tsv"
-  local gen="${SCRIPT_DIR}/kg-trace-resolve.sh"
+  local gen="${SCRIPT_DIR}/kg-trace.sh"
   [ -f "${gen}" ] || return 0
   if [ ! -f "${idx}" ]; then
-    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv"
     return
   fi
   # ⚠️ O `2>/dev/null || true` DA 1a VERSAO COLAPSAVA DOIS MUNDOS, e o preco foi medido em 2026-09-24
   # adotando um repo novo: o gate do adotante BARROU O PRIMEIRO COMMIT dele por este HARD. A causa nao
   # era defeito nenhum do adotante — o corpus dele tem UM grafo (a semente da adocao) cujo `trace:` e
-  # PROSA, e prosa e LEGITIMA pelo contrato do proprio resolvedor (kg-trace-resolve.sh:33-34: "nao
+  # PROSA, e prosa e LEGITIMA pelo contrato do proprio resolvedor (kg-trace-resolve.sh:33-34; hoje também o `not_path` do kg_trace.py, que julga a REGRA 55: "nao
   # parece caminho → nome solto, chave de config, comando, prosa. `trace:` aceita mais que arquivo").
   # Indice vazio ali e o estado NORMAL do dia 1, nao falha de ambiente.
   # E o gerador JA DISTINGUE os dois casos: sai 3 com "indice VAZIO (parser leu 0 nos com trace
@@ -2630,7 +2646,12 @@ check_kg_read_index_sync() {
   if [ -z "${new_index}" ]; then
     # `grep -F` com termo ASCII: o hook roda em locale C e acento nao casa classe multibyte (licao
     # `bancada-mede-no-locale-do-hook`). "VAZIO" e "resolv" bastam e sao ASCII.
-    if [ "${gen_rc}" -eq 3 ] && grep -qF 'VAZIO' "${gen_err}" && grep -qF 'resolv' "${gen_err}"; then
+    if [ "${gen_rc}" -eq 2 ] && grep -qF 'kg_trace.py ausente' "${gen_err}"; then
+      # Ramo PRONTO PARA A kg-ssot 4.25.1, quando o gerador passa a ser o parser do PRODUTO (nó
+      # Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251). Hoje o --emit-index delega ao kg-trace-resolve.sh e não emite
+      # este marcador. Sem o vendor não haveria gerador, e isso é dito como não-julgado, nunca como defasado.
+      violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/NAO-JULGOU] o gerador é o kg_trace.py do vendor kg-ssot >= 4.25, e ele está ausente — ESTA REGRA NÃO VERIFICOU o índice. Suba o vendor (/meta:adopt --update)."
+    elif [ "${gen_rc}" -eq 3 ] && grep -qF 'VAZIO' "${gen_err}" && grep -qF 'resolv' "${gen_err}"; then
       violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/CORPUS-SEM-TRACE-DE-ARQUIVO] o corpus nao tem NENHUM nó cujo \`trace:\` resolva para arquivo — índice vazio LEGÍTIMO (é o dia 1 de todo adotante: a semente da adoção tem trace em prosa, e prosa é válida). A perna de leitura nada tem a indexar ainda; ela liga sozinha quando o primeiro nó com trace de ARQUIVO nascer. Nada a corrigir."
     else
       violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): o gerador devolveu vazio SEM declarar corpus-sem-trace (rc=${gen_rc}) — isto é falha de ambiente ou parser, não estado legítimo. NÃO regenere por cima (sobrescreveria o índice bom). stderr: $(head -c 200 "${gen_err}" | tr '\n' ' ')"
@@ -2643,7 +2664,7 @@ check_kg_read_index_sync() {
     # ⚠️ COMMIT COM PATHSPEC NÃO PODE SER JULGADO AQUI — sinal de campo de um adotante hub,
     # 2026-10-02, com causa VERIFICADA por ele: `git commit -- <pathspec>` monta um índice
     # TEMPORÁRIO só com os caminhos do pathspec. O hook roda o lint sob esse índice, e o
-    # `kg-trace-resolve.sh --emit-index` enumera o corpus por `git ls-files` — então todo `.kg.yaml`
+    # `kg-trace.sh --emit-index` enumera o corpus por `git ls-files` — então todo `.kg.yaml`
     # novo que ficou FORA do pathspec desaparece do corpus, o índice gerado fica menor que o
     # commitado, e a regra acusa DEFASADO. Ele mediu 4 de 4 tentativas reprovando com pathspec e
     # passando num commit único. O lint rodado à mão dava 0 HARD — ou seja, a guarda contradizia o
@@ -2667,7 +2688,7 @@ check_kg_read_index_sync() {
         violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/PATHSPEC-NAO-JULGAVEL] commit com pathspec usa índice TEMPORÁRIO (GIT_INDEX_FILE=${GIT_INDEX_FILE}), e o gerador enumera o corpus por \`git ls-files\` — um \`.kg.yaml\` novo fora do pathspec desaparece e o índice PODE parecer defasado sem estar. ESTA GUARDA NÃO VERIFICOU se há defeito — ela declara que NÃO PODE JULGAR aqui, e isso NÃO é \"sem divergência\". NÃO regenere sob este índice (encurtaria o índice bom): faça um commit ÚNICO, sem pathspec, que é onde o veredito vale."
         return ;;
     esac
-    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv"
   fi
 }
 

@@ -270,7 +270,7 @@ _regen() {  # regenera TODA projeção gerada com catraca no lint e stageia só 
   bash .claude/utils/adopt/regen-ssot-projections.sh "${ROOT}" >/dev/null || die "regen-ssot-projections.sh falhou"
   bash .claude/validation/kg-backlog-project.sh --write >/dev/null || die "kg-backlog-project.sh falhou"
   local idx; idx="$(mktemp)"
-  bash .claude/validation/kg-trace-resolve.sh . --emit-index > "${idx}" || { rm -f "${idx}"; die "kg-trace-resolve.sh falhou"; }
+  bash .claude/validation/kg-trace.sh . --emit-index > "${idx}" || { rm -f "${idx}"; die "kg-trace.sh --emit-index falhou"; }
   [ -s "${idx}" ] || { rm -f "${idx}"; die "índice de leitura saiu VAZIO — não sobrescrevo o vivo"; }
   mv "${idx}" docs/onion/kg-read-index.tsv
   if [ -f .claude/validation/federation-console.sh ]; then

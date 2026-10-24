@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**622 itens abertos** em 122 grafo(s) com aberto (de 156 no escopo) · 123 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**621 itens abertos** em 121 grafo(s) com aberto (de 155 no escopo) · 122 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1073,13 +1073,6 @@
 |--:|---|---|---|
 | 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
 
-## radar-E3-2026-10-24-r18 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.8 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024` | radar-E3-2026-10-24-r18 | o SDK do bridge deve subir para 0.3.310, pela compactação não interativa das linhas 6 e 11, e o pin do revisor do CI para v1.0. |
-| 1.2 | `Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024` | radar-E3-2026-10-24-r18 | a SAC-239 deve fechar com o revisor provado num PR com a label review:ia, ou com a metade do revisor declarada como pin sem execu |
-
 ## vetos-por-tokens-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1115,11 +1108,12 @@
 | 4.5 | `Q_REABRIR_AUTORIDADE_NO_PROBE` | rea-method-2026-10 | Gatilho (b): quando o probe estruturado existir, o verificador deve nomear o id que fecha e a autoridade que provou? Esta é a ide |
 | 3.0 | `Q_REABRIR_PARIDADE_POS_FORGE` | rea-method-2026-10 | Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexis |
 
-## sinais-de-campo-2026-09 — 2 item(ns)
+## sinais-de-campo-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
+| 3.6 | `Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251` | sinais-de-campo-2026-09 | O índice de leitura (docs/onion/kg-read-index.tsv) passa a ser gerado pelo JSON do kg_trace.py, e o kg-trace-resolve.sh é removi |
 | 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
 ## env-falso-positivo-2026-10 — 3 item(ns)

@@ -224,7 +224,7 @@ nodes:
     impact: 3
     confidence: 0.8
     verified_against: "sinal 2026-10-08-kg-trace-root-file-unwatched do onion-curation; conferido no core: kg-trace-resolve.sh condição (b) exige barra no alvo e kg-read-leg.sh tira o ./ do caminho lido antes de casar"
-    trace: ".claude/validation/kg-trace-resolve.sh"
+    trace: ".claude/validation/kg-trace.sh"
     label: "trace para arquivo da raiz, como o CLAUDE.md, fica fora do índice de leitura do KG e o hook nunca avisa; cura selada: aceitar alvo sem barra que exista na raiz e normalizar o ./ dos dois lados (SAC-81)"
   - id: D_KG_READ_LEG_HOOK_SUPERA_NENHUMA_DAS_TRES
     node_type: decision
