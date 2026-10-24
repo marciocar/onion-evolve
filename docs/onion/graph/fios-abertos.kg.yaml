@@ -1,6 +1,5 @@
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "Lote do /meta:drive de 2026-10-23 (AUDIT): Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE pesquisada — causa medida (EPIPE no lint inflava o CONTROLE; liga/desliga 4/150→0/150), evidência E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT no grafo da passada adversarial (fios-abertos no teto 19/19), cura proposta (julgar o conjunto de HARD) sem aplicar; status da pergunta NÃO mexido (selo do maestro). I_KB_GAMIFICACAO_RAMPA_GATED segue gated (D_IP_LICENSE do adotante open, medido). I_ADOPT_CAMADA_COLABORADOR segue gated (nenhum 2º adotante pediu, medido). Nenhum flip auto-selado."
+  x_drive_checkpoint: sealed
   id: fios-abertos
   schema_version: "1"
   baseline: "2026-08-08"
@@ -158,12 +157,21 @@ nodes:
 
   - id: Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE
     node_type: question
-    plane: DEV
     impact: 3
     confidence: 0.5
-    status: open
     label: 'PERGUNTA (classe B, estreitada em 2026-09-04 pelo /meta:drive): por que o caso (e) da familia kg_backlog — que monta um sandbox `git archive HEAD`, roda o lint INTEIRO duas vezes (controle e mutante com um no `done` sem verified_at) e exige `h_mut > h_ctrl` — ja falhou 2 vezes em paralelo com o CONTADOR IGUAL (HARD 9->9), e nunca em serie? O que esta pergunta NAO e: a classe A (veredito por `_emit|grep -q`, que devolve falso sob leitor multi-thread) foi medida e curada em 2026-09-04 (here-string em 496 sitios + guarda de reintroducao) — e o (e) NAO decide por grep -q: ele extrai dois contadores com `_emit | sed -n | tail -1`, sem fechador precoce. Duas curas anteriores foram aplicadas e a classe recorreu: (1) a fixture caia sob `edges:` em vez de `nodes:` (curada, e recorreu no gate do adopt); (2) a cura do ESCRITOR (`_emit` imune a EPIPE) nao toca este caminho. Suspeitos vivos: subshell/escopo do contador no dispatcher do lint sob concorrencia; arquivo mutado fora do escopo da varredura no sandbox. GATILHO: proxima ocorrencia — a mensagem de falha JA imprime as HARD so-do-mutante (diff controle x mutante), que e o dado que abre a causa; sem ela, nao ha o que medir. Reproducao deliberada pos-cura: 0 falha(s) em 20 tentativas sob 4 concorrentes (nao reproduziu no volume testado — logo a classe B e RARA, nao inexistente: ela ja apareceu 2x em gate real).'
-    verified_against: 'reproducao 2026-09-04: 20 tentativas do caso (e) sob 4 concorrentes, 0 falha(s); ocorrencias reais: f-par.log (2026-09-03) e gate do /meta:adopt (2026-09-03)'
+    status: done
+    plane: DEV
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro em 2026-10-24, por pergunta com opções (/meta:decide): escolhida «Eu faço agora: selar o lote — o mutante sempre contou; o empate 9->9 era HARD espúrio no controle (EPIPE do lint), evidência E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT»"
+    narrative: |-
+      verified_against anterior: «reproducao 2026-09-04: 20 tentativas do caso (e) sob 4 concorrentes, 0 falha(s); ocorrencias reais: f-par.log (2026-09-03) e gate do /meta:adopt (2026-09-03)»
+      Selado por /meta:decide em 2026-10-24: escolhida «Eu faço agora: selar o lote — o mutante sempre contou; o empate 9->9 era HARD espúrio no controle (EPIPE do lint), evidência E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT»; descartadas: «Me dê o passo a passo» · «Depois».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-24: «Lote do drive #1332: selo do checkpoint + merge?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-24"
+      locality: "pessoa"
 
   - id: I_KB_GAMIFICACAO_RAMPA_GATED
     node_type: decision
