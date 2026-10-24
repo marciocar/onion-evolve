@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:6cd3ab30f95e59b1 -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:aeb01ae50693cc8e -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ Rode isto na raiz do seu repositório, com Python 3.11 ou mais (o `rpds-py`, dep
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.23.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.25.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -99,6 +99,19 @@ Faça tudo num PR só:
 
 Se uma versão menor trouxe um aviso SHOULD que o seu corpus já tinha, a dívida sobe por desenho. Nesse caso, rode o
 `--update` com `--accept-regression "<motivo>"`.
+
+## Testar um commit antes da tag (desde a 4.24)
+
+Para testar o que vai virar release, antes de a tag existir, traga um commit com
+`kg_vendor.py update --ref <commit> --source <clone ou URL>`. Você precisa de um repositório onde esse commit se
+alcança: o espelho público guarda só os commits com tag, então isto é para quem chega à branch (um clone do produto,
+um fork, um CI que faz checkout do PR). Ele leva a árvore desse commit com o `spec/release.json`
+que ela tiver (a versão ali pode ainda ser a anterior, que o `--tag` recusaria como release mal rotulada). O carimbo
+diz `unreleased` no lugar da tag e guarda o commit. O `kg_vendor.py check` então reprova com `VENDOR FORA DE RELEASE`, a
+não ser que você passe `--allow-unreleased`, para um vendor de bancada nunca passar por release no seu CI. O mesmo vale
+para o `kg_gate.py`, que também reprova o vendor de bancada sem `--allow-unreleased` e nunca grava a base a partir de
+um: deixe a opção no comando da bancada, nunca no CI que guarda as suas releases. Quando a tag sair, o `update --tag` o
+substitui sem `--force`.
 
 ## Subir de uma versão maior (v3 → v4)
 

@@ -17,7 +17,12 @@
       rodar o gate e o check (contrato, leitor, gate, vendor, requirements, guia e licença), sem a suíte. O carimbo
       registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;
       --profile full volta à release inteira.
-  check [--dest DIR] [--index]
+  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]
+      Só para a bancada antes da tag (desde a 4.24): traz a árvore de um commit que ainda não é release, com o
+      spec/release.json que ele tiver (a versão dele pode ser a anterior). O carimbo diz "unreleased" no lugar da
+      tag e guarda o commit, e o check recusa esse vendor (rc 1) sem --allow-unreleased: um vendor de bancada nunca
+      passa por release no CI do adotante.
+  check [--dest DIR] [--index] [--allow-unreleased]
       Recalcula os sha256 e compara com o carimbo: arquivo editado, faltando ou sobrando (inclusive bytecode em
       __pycache__ e symlink) → rc 1. Com --index, confere os blobs do índice do git (o carimbo também lido do
       índice) em vez da árvore de trabalho: é o que o commit vai levar, e pega antes do commit uma normalização
@@ -170,9 +175,12 @@ def default_source():
 FULL = "full"
 
 
-def update(dest, tag, source, force=False, profile=None):
+UNRELEASED = "unreleased"
+
+
+def update(dest, tag, source, force=False, profile=None, ref=None):
     """profile None herda o perfil do carimbo que já existe (um update não tira o adotante do perfil em silêncio);
-    'full' traz a release inteira."""
+    'full' traz a release inteira. ref (no lugar de tag): o commit de bancada, que o carimbo marca como unreleased."""
     dest = pathlib.Path(dest)
     if profile is not None and not profile.strip():
         raise Broken(_("empty --profile: name the profile, or full for the whole release"))
@@ -195,7 +203,7 @@ def update(dest, tag, source, force=False, profile=None):
             with io.StringIO() as sink:
                 stdout, sys.stdout = sys.stdout, sink
                 try:
-                    clean = check(dest, legacy_ok=True) == 0
+                    clean = check(dest, legacy_ok=True, allow_unreleased=True) == 0
                 finally:
                     sys.stdout = stdout
             if not clean:
@@ -212,15 +220,25 @@ def update(dest, tag, source, force=False, profile=None):
             git(repo, "rev-parse", "--git-dir")
         except Broken:
             raise Broken(_("--source {source} is not a git repository").format(source=source)) from None
-        try:
-            git(repo, "rev-parse", "--verify", "--quiet", f"refs/tags/{tag}")
-        except Broken:
-            raise Broken(_("tag {tag} does not exist in {source}").format(tag=tag, source=source)) from None
-        commit = git(repo, "rev-parse", f"refs/tags/{tag}^{{commit}}").strip()
-        release = read_release(git(repo, "show", f"{commit}:{RELEASE}"), tag)
-        if release.get("tag") != tag:
-            raise Broken(_("the {release} of tag {tag} declares tag {declared}: mislabeled release").format(
-                release=RELEASE, tag=tag, declared=repr(release.get("tag"))))
+        if ref is not None:
+            if not ref.strip() or ref.startswith("-"):
+                raise Broken(_("--ref {ref}: give a commit").format(ref=repr(ref)))
+            try:
+                commit = git(repo, "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}").strip()
+            except Broken:
+                raise Broken(_("commit {ref} does not exist in {source}").format(ref=ref, source=source)) from None
+            release = read_release(git(repo, "show", f"{commit}:{RELEASE}"), commit[:12])
+            tag = UNRELEASED  # a bancada antes da tag: nenhuma release declara este commit
+        else:
+            try:
+                git(repo, "rev-parse", "--verify", "--quiet", f"refs/tags/{tag}")
+            except Broken:
+                raise Broken(_("tag {tag} does not exist in {source}").format(tag=tag, source=source)) from None
+            commit = git(repo, "rev-parse", f"refs/tags/{tag}^{{commit}}").strip()
+            release = read_release(git(repo, "show", f"{commit}:{RELEASE}"), tag)
+            if release.get("tag") != tag:
+                raise Broken(_("the {release} of tag {tag} declares tag {declared}: mislabeled release").format(
+                    release=RELEASE, tag=tag, declared=repr(release.get("tag"))))
         listed = git(repo, "ls-tree", "-r", "--name-only", commit).splitlines()
         files = release_files(listed, release["files"])
         if profile:
@@ -257,6 +275,8 @@ def update(dest, tag, source, force=False, profile=None):
                  "files": dict(sorted(hashes.items()))}
         if profile:
             stamp["profile"] = profile
+        if ref is not None:
+            stamp["unreleased"] = True
         if _version(release.get("version")) >= ATTRS_SINCE:
             # só nas releases que o conhecem: o kit vendorizado de uma tag anterior acusaria o arquivo como sobrando
             (staged / ATTRS).write_bytes(ATTRS_TEXT.encode("utf-8"))
@@ -272,6 +292,8 @@ def update(dest, tag, source, force=False, profile=None):
             if old.exists():
                 old.rename(dest)  # devolve o vendor anterior
             raise
+    if ref is not None:
+        print(_("BENCH ONLY  the stamp says unreleased: check fails on this vendor without --allow-unreleased"))
     done = (_("vendor updated: {dest} ← {tag} ({commit}), {n} files, profile {profile}") if profile
             else _("vendor updated: {dest} ← {tag} ({commit}), {n} files"))
     print(done.format(dest=dest, tag=tag, commit=commit[:12], n=len(hashes), profile=profile))
@@ -311,8 +333,9 @@ def _version(text):
         return ()
 
 
-def check(dest, index=False, legacy_ok=False):
-    """legacy_ok: o update aceita refazer um vendor da 4.8.1 gravado por um kit anterior (sem o .gitattributes)."""
+def check(dest, index=False, legacy_ok=False, allow_unreleased=False):
+    """legacy_ok: o update aceita refazer um vendor da 4.8.1 gravado por um kit anterior (sem o .gitattributes).
+    allow_unreleased: aceita o vendor de bancada (update --ref); sem ele, esse vendor dá rc 1."""
     dest = pathlib.Path(dest)
     if index:
         tree, links = _index_tree(dest)
@@ -331,6 +354,10 @@ def check(dest, index=False, legacy_ok=False):
                 links.append(rel)
             elif p.is_file():
                 tree[rel] = p.read_bytes()
+    if (stamp.get("unreleased") or stamp.get("tag") == UNRELEASED) and not allow_unreleased:
+        print(_("UNRELEASED VENDOR  {dest} came from commit {commit} (update --ref, the bench before a tag), not from a "
+                "release: bring a tag with update --tag").format(dest=dest, commit=str(stamp.get("commit"))[:12]))
+        return 1
     want = stamp["files"]
     attrs = tree.pop(ATTRS, None)
     tree.pop(STAMP, None)
@@ -397,7 +424,12 @@ DESCRIPTION = """Vendor KG-SSOT by pin: the adopter brings in the release by TAG
       the check (contract, reader, gate, vendor, requirements, guide and license), without the suite. The stamp
       records the profile, check verifies only what the profile brought, and the next update INHERITS the
       profile from the stamp; --profile full goes back to the whole release.
-  check [--dest DIR] [--index]
+  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]
+      Only for the bench before a tag (since 4.24): brings the tree of a commit that is not a release yet, with
+      whatever spec/release.json it has (its version may still be the previous one). The stamp says "unreleased"
+      in place of the tag and keeps the commit, and check refuses that vendor (rc 1) without --allow-unreleased:
+      a bench vendor never passes for a release in an adopter's CI.
+  check [--dest DIR] [--index] [--allow-unreleased]
       Recomputes the sha256 values and compares them with the stamp: a file edited, missing or extra (including
       bytecode in __pycache__ and symlinks) → rc 1. With --index, verifies the blobs in the git index (the stamp
       is also read from the index) instead of the working tree: that is what the commit will carry, and it
@@ -421,7 +453,9 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=_(DESCRIPTION), formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     up = sub.add_parser("update", help=_("brings the release from the tag into the destination"))
-    up.add_argument("--tag", required=True)
+    which = up.add_mutually_exclusive_group(required=True)
+    which.add_argument("--tag")
+    which.add_argument("--ref", help=_("a commit that is not a release yet, only for the bench before a tag"))
     up.add_argument("--dest", default=DEFAULT_DEST)
     up.add_argument("--source", help=_("git repo (path or URL) that has the tag (default: this script's clone)"))
     up.add_argument("--force", action="store_true", help=_("replaces a vendor that diverges from the stamp"))
@@ -429,12 +463,14 @@ def main(argv=None):
     ck = sub.add_parser("check", help=_("verifies the destination against the stamp"))
     ck.add_argument("--dest", default=DEFAULT_DEST)
     ck.add_argument("--index", action="store_true", help=_("verifies the git index blobs, not the working tree"))
+    ck.add_argument("--allow-unreleased", action="store_true",
+                    help=_("accepts a bench vendor (update --ref); without it, that vendor fails"))
     args = ap.parse_args(argv)
     _utf8_stdio()
     try:
         if args.cmd == "update":
-            return update(args.dest, args.tag, args.source, args.force, args.profile)
-        return check(args.dest, args.index)
+            return update(args.dest, args.tag, args.source, args.force, args.profile, args.ref)
+        return check(args.dest, args.index, allow_unreleased=args.allow_unreleased)
     except (Broken, OSError, tarfile.TarError) as exc:
         print(_("BROKEN VENDOR  {error}").format(error=exc))
         return 2
