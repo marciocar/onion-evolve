@@ -2442,6 +2442,7 @@ ops/bridge-auth/logto-provision.sh	E_p1p3_provisioned	docs/onion/graph/m2-bridge
 ops/bridge-auth/logto-provision.sh	E_slice1_revocation_isolated	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	I_PROVISION_FICOU_PARA_TRAS_NO_RENAME	docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml
 ops/chat-runner.sh	E_VERIFY_DO_BRIDGE_SEPARA_NAO_MEDIU_DE_REPROVOU_1016	docs/evolution/research/radar-E3-2026-10-16-r12/radar-E3-2026-10-16-r12.kg.yaml
+ops/kg-gate-ci.sh	E_KG_SSOT_425_ADOTADA_1024	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 ops/materialize-door.sh	E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE	docs/onion/graph/federation-health-2026-07.kg.yaml
 ops/materialize-door.sh	E_MATERIALIZE_DOOR_FAIL_OPEN_NO_REGEN	docs/onion/graph/federation-health-2026-07.kg.yaml
 ops/mcp-onion-exec/server.py	E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
