@@ -1,0 +1,6 @@
+{
+  "graph": ".claude/validation/dissect-families.kg.yaml",
+  "id": "dissect-families",
+  "must": [],
+  "should": {}
+}

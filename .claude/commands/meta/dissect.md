@@ -1,16 +1,18 @@
 ---
-description: Disseca uma ferramenta de terceiro em niveis selecionaveis (identidade, capacidade, mecanismo, transferibilidade, absorcao) e propoe absorver, costurar, parquear ou rejeitar.
+description: Disseca um objeto (ferramenta, pratica, ator, app, categoria ou ideia) em niveis selecionaveis, com Etapa 0 pre-registrada e veredito da familia (absorver, costurar, perseguir, parquear ou rejeitar).
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch, TodoWrite
 ---
 
-# 🦑 /meta:dissect — dissecar uma ferramenta em níveis selecionáveis
+# 🦑 /meta:dissect — dissecar um objeto em níveis selecionáveis
 
-Mapeia uma ferramenta de terceiro, entende **o que ela faz** e decide o que o Onion **absorve**,
-**costura**, **parqueia como técnica a investigar** ou **rejeita com razão escrita**. O nome de
+Mapeia um objeto — ferramenta de terceiro, prática, ator, app, categoria de produto ou ideia (as
+**famílias** do registro) —, entende **o que ele faz** e decide o que o Onion **absorve**,
+**costura**, **persegue**, **parqueia como técnica a investigar** ou **rejeita com razão escrita**,
+no vocabulário da família. O nome de
 casa é cunhagem do maestro: **chupa-cabra de ferramentas** (2026-10-01).
 
-A doutrina inteira — a escada de 5 níveis, os 4 vereditos, a regra de evidência e o que ela NÃO
-promete — vive em [`common:prompts:dissect-doctrine`](../common/prompts/dissect-doctrine.md).
+A doutrina inteira — a escada de 5 níveis, os vereditos, a regra de evidência, as famílias com a
+Etapa 0 (§6) e o que ela NÃO promete — vive em [`common:prompts:dissect-doctrine`](../common/prompts/dissect-doctrine.md).
 **Referencie, não copie.**
 
 ## Degrau e limites
@@ -29,6 +31,9 @@ promete — vive em [`common:prompts:dissect-doctrine`](../common/prompts/dissec
 **Hoje:** !`date +%F`
 **Dissecações que o corpus já pagou:**
 !`bash .claude/validation/dissect-census.sh . --markdown`
+
+**Famílias registradas e estudos por família** (o checador de forma, peça 3 da §6 da doutrina):
+!`bash .claude/validation/dissect-object-check.sh --context 2>&1 || echo "(checador de forma ausente ou sem medir nesta instalação: rc acima; sem ele, a família e a Etapa 0 não se conferem aqui)"`
 
 Leia o censo como ele se declara: ele mede o que o corpus **DECLARA**, não sabe de ferramenta que
 ninguém anotou, e **não confere se a medição do nível de fato ocorreu** — o marcador é
@@ -90,6 +95,16 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
 
 ## Procedimento
 
+0. **ETAPA 0 (pré-registro, antes de qualquer dado do objeto)** — escolha a **família** pela ordem de
+   predicados da §6 da doutrina (a 1ª que responder "sim") e escreva o plano em
+   `docs/evolution/dissect/<objeto>-<AAAA-MM>/STAGE0.md` com os 8 elementos (`## 1.` a `## 8.`); o grafo
+   nasce com o nó `S_STAGE0` (`x_criterion` com o sha256 do plano) e os marcadores da família
+   (`meta.x_dissect_family`, a `external_edges` `TRACES_TO` para o nó da família no registro,
+   `meta.x_study_destination`). **Commite o plano antes do primeiro nó `x_dissect_level: 0`** — ancestral
+   estrito, e a ordem é conferida no git:
+   `bash .claude/validation/dissect-object-check.sh <grafo> --stage plan` (rc 0). Família que não está no
+   registro **não se inventa no meio**: entra por PR no core antes do N0. Objeto que é ferramenta de
+   terceiro é a família `ferramenta`, e a escada é a de sempre.
 1. **MEDIR** — o censo acima. Ferramenta com nível **fresco** entra no nível **seguinte**; não
    repague nível. Dissecação **VENCIDA** é re-medida, nunca citada como de hoje.
 2. **ENQUADRAR** — para cada ferramenta, o nível de entrada (do censo) e o nível-alvo (`--level`).
@@ -101,7 +116,11 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    implementação**. Até existir, a escada é conduzida pela sessão (direto, nível a nível, sem
    subir o reprovado), e o grafo **declara** que foi assim. Sessão que já é subagente não
    orquestra: disseca direto.
-4. **VEREDITO** — um dos quatro, com razão escrita. `parquear` **exige gatilho nomeado**.
+4. **VEREDITO** — um dos **vereditos da família** (o registro os lista; `ator` não absorve, `categoria` e
+   `ideia` perseguem com `x_dissect_pursue: estudo | projeto-novo`), com razão escrita. Declare
+   `meta.x_who_pays` e `meta.x_unverified`. A superação de um negativo é buscada **também na web**
+   (`x_dissect_overcoming_search` com ao menos uma `where: web` quando ela é `nenhuma`), e o parque leva
+   `x_dissect_trigger` (consulta `kg_query` em lista branca que lê o que persiste, abaixo de `min_count`). `parquear` **exige gatilho nomeado**.
    `rejeitar` e `parquear` são **negativos** e exigem, no nó do veredito, `x_dissect_criterion:` (o
    comando que checa a reprovação) e `x_dissect_overcoming:` (o id do nó deste grafo com o que SUPERA,
    com aresta para a decisão, ou `nenhuma` + `x_dissect_overcoming_measure:` com o que se procurou e
@@ -129,15 +148,23 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    `docs/evolution/dissect/<ferramenta>-<AAAA-MM>/<ferramenta>-<AAAA-MM>.kg.yaml` com os
    marcadores que o censo lê (`meta.x_dissect_tool:`, `x_dissect_level:` por nó, `x_dissect_verdict:` no
    nó de decisão; `meta.x_dissect_against:` sempre; e, quando houver, `meta.x_dissect_scope:` e
-   `meta.x_dissect_mode: study`), `meta.review_after` pela cadência (ferramenta/preço 30d), `# kg-backlog-guard:
+   `meta.x_dissect_mode: study`; e os da família, §6 da doutrina: `meta.x_dissect_family` com a aresta ao
+   registro, `meta.x_study_destination`, `meta.x_who_pays`, `meta.x_unverified` e o `S_STAGE0` apontando o
+   `STAGE0.md` da mesma pasta), `meta.review_after` pela cadência (ferramenta/preço 30d), `# kg-backlog-guard:
    on` e `# ═══ TETO: N NÓS ═══`. **`kg-radar` exit 0 é obrigatório** antes de qualquer prosa.
    O `SYNTHESIS.md` é **projeção**, com o **contrato de custo** no frontmatter: `kg:` · `run_id` ·
    `tokens` · `agents` · `duration_min`.
-6. **GATE** — `lint-artifacts.sh` 0 HARD · família `run_dissect_selftests` verde · resíduo da
+6. **GATE** — `bash .claude/validation/dissect-object-check.sh <grafo>` rc 0 (estudo por família;
+   rc 3 é "não mediu", nunca aprovação) · `lint-artifacts.sh` 0 HARD · famílias `run_dissect_selftests` e
+   `run_dissect_object_selftests` verdes · resíduo da
    REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) no PR.
 
 ## O que este comando NÃO faz
 
+- **Não roda o motor do protótipo de dissecação de qualquer objeto** (o workflow de 3 agentes de um
+  adotante de curadoria). Ele ficou **parqueado** por decisão do maestro de 2026-10-24; o gatilho é 1
+  objeto decisório a mais com o protocolo corrigido (§6 da doutrina). A escada segue conduzida pela
+  sessão, como no passo 3.
 - **Não julga qualidade de software** — decide **encaixe no Onion**. Ferramenta excelente sem
   consumidor aqui reprova no N1, e isso não é demérito dela.
 - **Não absorve.** Produz o plano e o nó `decision` **open**; a implementação é o fluxo normal.
@@ -148,8 +175,10 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
 ## 🔗 Referências
 
 - Doutrina (peça 2): [`common:prompts:dissect-doctrine`](../common/prompts/dissect-doctrine.md)
-- Medidor (peça 3): `.claude/validation/dissect-census.sh`
+- Medidor (peça 3): `.claude/validation/dissect-census.sh` · checador de forma por família:
+  `.claude/validation/dissect-object-check.sh`, com o registro `.claude/validation/dissect-families.kg.yaml`
 - Motor reusado (peça 4): `.claude/workflows/onion-research.js` (`mode: 'decision'`)
-- Lente (peça 6): `.claude/rules/dissect-lens.md` · Bancada (peça 7): `run_dissect_selftests`
+- Lente (peça 6): `.claude/rules/dissect-lens.md` · Bancada (peça 7): `run_dissect_selftests` e
+  `run_dissect_object_selftests`
 - Forja que o emitiu: [`/meta:forge`](forge.md) · régua de transferência:
   [`transfer-heuristic-aristotle`](../../../docs/knowledge-base/concepts/transfer-heuristic-aristotle.md)

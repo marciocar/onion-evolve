@@ -1,0 +1,272 @@
+meta:
+  id: dissect-families
+  schema_version: "1"
+  baseline: "2026-10-24"
+  review_after: "2027-01-21"
+  purpose: "Registro das famílias de objeto do /meta:dissect, no perfil x_term: cada família declara o que prova cada nível (N0 a N4), os vereditos válidos e o destino padrão. Todo estudo cita a sua família por external_edges, e o .claude/validation/dissect-object-check.sh confere contra este registro."
+  note: "Sinônimos ancorados na §6 da doutrina do dissect; os legados A, B e C são labels hidden, lidos pelo checador como apelidos. O destino padrão é do enum da §6, exceto ideia, que declara na Etapa 0. Família nova entra por PR no core antes do N0 do estudo que a pede, nunca durante. Origem: protótipo de um adotante de curadoria, absorvido por decisão do maestro de 2026-10-24."
+  # kg-backlog-guard: on
+  # ═══ TETO: 16 NÓS ═══
+
+nodes:
+
+  - id: T_FAMILY_FERRAMENTA
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Família ferramenta da dissecação."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro de 2026-10-24 (absorver as peças determinísticas), sobre o desenho do adotante revisado duas vezes pelo Elenxo; a família se prova no 1º estudo que a usa"
+    x_term:
+      pref: "ferramenta"
+      lang: pt-BR
+      definition: "Software de terceiro com superfície executável aberta (código, CLI, API, schema)."
+      labels:
+        - literal: "ferramenta de terceiro"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "tool"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "A"
+          kind: hidden
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, regras de família: legado x_dissect_family A|B|C"
+          verified_at: "2026-10-24"
+    x_dissect_family_spec:
+      levels:
+        N0: "trajetória datada (commits, releases, licença)"
+        N1: "verbos da superfície executável"
+        N2: "rodar isolado ou ler o código-fonte"
+        N3: "régua de transferência com evidência"
+        N4: "plano x_absorb_*"
+      verdicts: ["absorver", "costurar", "parquear", "rejeitar"]
+      default_destination: "core"
+
+  - id: T_FAMILY_PRATICA
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Família pratica da dissecação."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro de 2026-10-24 (absorver as peças determinísticas), sobre o desenho do adotante revisado duas vezes pelo Elenxo; a família se prova no 1º estudo que a usa"
+    x_term:
+      pref: "pratica"
+      lang: pt-BR
+      definition: "Prescrição de trabalho de terceiro (passos, regras) para o Onion adotar."
+      labels:
+        - literal: "método"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "metodologia"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "B"
+          kind: hidden
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, regras de família: legado x_dissect_family A|B|C"
+          verified_at: "2026-10-24"
+    x_dissect_family_spec:
+      levels:
+        N0: "quem prescreve, desde quando"
+        N1: "a prescrição escrita"
+        N2: "dogfood em tarefa real do Onion contra controle"
+        N3: "régua de transferência com evidência do dogfood"
+        N4: "plano x_absorb_*"
+      verdicts: ["absorver", "costurar", "parquear", "rejeitar"]
+      default_destination: "core"
+
+  - id: T_FAMILY_ATOR
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Família ator da dissecação."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro de 2026-10-24 (absorver as peças determinísticas), sobre o desenho do adotante revisado duas vezes pelo Elenxo; a família se prova no 1º estudo que a usa"
+    x_term:
+      pref: "ator"
+      lang: pt-BR
+      definition: "Empresa, perfil ou modelo de negócio, estudado pelo dinheiro e pelo lugar no mercado; não admite absorver."
+      labels:
+        - literal: "empresa"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "modelo de negócio"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "perfil"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "C"
+          kind: hidden
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, regras de família: legado x_dissect_family A|B|C"
+          verified_at: "2026-10-24"
+    x_dissect_family_spec:
+      levels:
+        N0: "identidade datada"
+        N1: "a oferta: produtos e preços públicos"
+        N2: "o dinheiro: filing, preço, rodada, receita"
+        N3: "o que muda no panorama competitivo do core"
+        N4: "sinal ao panorama"
+      verdicts: ["costurar", "parquear", "rejeitar"]
+      default_destination: "panorama"
+
+  - id: T_FAMILY_APP
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Família app da dissecação."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro de 2026-10-24 (absorver as peças determinísticas), sobre o desenho do adotante revisado duas vezes pelo Elenxo; a família se prova no 1º estudo que a usa"
+    x_term:
+      pref: "app"
+      lang: pt-BR
+      definition: "Produto fechado estudado só pelo mecanismo; o negócio do app é estudo da família ator."
+      labels:
+        - literal: "aplicativo"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "app de consumo"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+    x_dissect_family_spec:
+      levels:
+        N0: "identidade datada"
+        N1: "verbos da superfície observável: docs públicas, artigos, artefatos abertos"
+        N2: "artefato aberto do próprio app ou uso observado com protocolo e artefato commitado; sem isso o estudo fica no nível 1 e o veredito em parquear"
+        N3: "régua de transferência do mecanismo"
+        N4: "plano x_absorb_* (só mecanismo)"
+      verdicts: ["absorver", "costurar", "parquear", "rejeitar"]
+      default_destination: "core"
+
+  - id: T_FAMILY_CATEGORIA
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Família categoria da dissecação."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro de 2026-10-24 (absorver as peças determinísticas), sobre o desenho do adotante revisado duas vezes pelo Elenxo; a família se prova no 1º estudo que a usa"
+    x_term:
+      pref: "categoria"
+      lang: pt-BR
+      definition: "Mercado com três ou mais atores, estudado pela régua de funcionalidades."
+      labels:
+        - literal: "categoria de produto"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "mercado"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+    x_dissect_family_spec:
+      levels:
+        N0: "o recorte e os atores candidatos"
+        N1: "régua de funcionalidades com ≥ 3 atores e capital datado"
+        N2: "ler ou rodar a implementação de referência aberta"
+        N3: "o que um projeto precisaria ter"
+        N4: "x_dissect_pursue"
+      verdicts: ["perseguir", "costurar", "parquear", "rejeitar"]
+      default_destination: "projeto-novo"
+
+  - id: T_FAMILY_IDEIA
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Família ideia da dissecação."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro de 2026-10-24 (absorver as peças determinísticas), sobre o desenho do adotante revisado duas vezes pelo Elenxo; a família se prova no 1º estudo que a usa"
+    x_term:
+      pref: "ideia"
+      lang: pt-BR
+      definition: "Tese que ainda não existe como objeto, avaliada pelos análogos, pelo menor experimento e pela viabilidade."
+      labels:
+        - literal: "tese"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+        - literal: "hipótese"
+          kind: alt
+          source: ".claude/commands/common/prompts/dissect-doctrine.md"
+          locator: "§6, coluna Sinônimos"
+          verified_at: "2026-10-24"
+    x_dissect_family_spec:
+      levels:
+        N0: "análogos: quem fez, onde, resultado"
+        N1: "o valor alegado e para quem"
+        N2: "o menor experimento pré-registrado que mede a tese"
+        N3: "viabilidade e quem paga"
+        N4: "x_dissect_pursue"
+      verdicts: ["perseguir", "parquear", "rejeitar"]
+      default_destination: "declarado na Etapa 0"
+
+  - id: C_FAMILIES_REGISTRY_V1
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 do estudo que a pede, nunca durante."
+    trace: ".claude/commands/common/prompts/dissect-doctrine.md"
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro de 2026-10-24; a bancada run_dissect_object_selftests cobra a pertença de família e de veredito"
+
+edges:
+  - from: T_FAMILY_FERRAMENTA
+    to: C_FAMILIES_REGISTRY_V1
+    edge_type: TRACES_TO
+  - from: T_FAMILY_PRATICA
+    to: C_FAMILIES_REGISTRY_V1
+    edge_type: TRACES_TO
+  - from: T_FAMILY_ATOR
+    to: C_FAMILIES_REGISTRY_V1
+    edge_type: TRACES_TO
+  - from: T_FAMILY_APP
+    to: C_FAMILIES_REGISTRY_V1
+    edge_type: TRACES_TO
+  - from: T_FAMILY_CATEGORIA
+    to: C_FAMILIES_REGISTRY_V1
+    edge_type: TRACES_TO
+  - from: T_FAMILY_IDEIA
+    to: C_FAMILIES_REGISTRY_V1
+    edge_type: TRACES_TO
