@@ -2,7 +2,8 @@
 branch: feat/canonical-names-core-layer
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9b12d5dcbafc066f7734dd2f5bb337d8bb8e5d849b3e407c43844186fba5c2eb
+reviewed_code_sha256: f610c0d6c677ae37e7959e54f1b22e6d8373f854059153cd1932a9ad820d2b85
 findings_total: 7
 findings_real: 6
 findings_fixed: 6
