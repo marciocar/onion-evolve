@@ -2,7 +2,8 @@
 branch: refactor/rule-55-kg-trace
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2390c65137c31897c2e412a06d6b08bb5b0cac1b9ab26a0d2808574502a87b9a
+reviewed_code_sha256: 33d200381fe7d4ad7497c3ee51d7a031657e62b3c11bedcbaad15e4fd746281f
 findings_total: 9
 findings_real: 4
 tokens: 0
