@@ -8,7 +8,8 @@ meta:
   baseline: "2026-10-24"
   review_after: "2026-11-23"   # 30d: cadência de ferramenta
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-24); 9 da rodada; 5 após o juiz (3 superações, 1 omissão de superação, 1 pergunta).
+  #   2 no esqueleto (2026-10-24); 9 da rodada; 5 após o juiz (3 superações, 1 omissão de superação, 1 pergunta);
+  #   1 da execução das subidas do SDK do bridge e do pin do revisor (2026-10-24).
 # ═══ AUFHEBUNG ═══
 #   DECIDIDO (2026-10-24): (a). Três nós da r17 superados: as versões de quem serve (bridge e revisor
 #   saíram da 2.1.308 para a 2.1.309), a pergunta da subida para a 2.1.309 (respondida no vivo, ponta
@@ -260,6 +261,21 @@ nodes:
       locator: "veredito EXAGERA da superação de r17#Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023"
       method: "juízes: subagente opus independente, critério CU4"
       locality: "repo"
+  - id: E_SDK_DO_BRIDGE_NA_0_3_310_E_PIN_DO_REVISOR_EM_V1_0_261_1024
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-24"
+    verified_against: "onion-bridge PR #91 mergeado em 2026-10-24T14:14:00Z e servido por ops/update-bridge.sh --restart (rc 0, health 200 local e público); censo: SDK bridge (binário --version) = 2.1.310 (SDK 0.3.310); gh api repos/anthropics/claude-code-action/git/ref/tags/v1.0.261 = tag anotada af7730b4, que aponta o commit 16f9f71a; compare v1.0.260...v1.0.261 = 1 commit (16f9f71a, bump CLI 2.1.310 e SDK 0.3.310) em 6 arquivos, só versões; os dois uses: do .github/workflows/onion-review.yml passam a 16f9f71a"
+    label: "o /chat do bridge passa a servir o CLI 2.1.310 (SDK 0.3.310) e o pin do revisor do CI sobe para v1.0.261 sem input nem output novo; a prova do revisor rodando segue com a SAC-239, porque ele está desligado (sem a label review:ia)"
+    provenance:
+      source: "https://github.com/anthropics/claude-code-action/compare/v1.0.260...v1.0.261"
+      locator: "base-action/action.yml e src/entrypoints/run.ts (versão do CLI); tabela de versões do cc-delta-census.sh"
+      method: "medição: --version do binário servido pelo censo e API do GitHub (ref da tag e compare)"
+      locality: "host"
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -309,3 +325,6 @@ edges:
   - from: C_SUPERACAO_20261024_A_PERGUNTA_DA_R17_FOI_RESPONDIDA
     to: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
     edge_type: TRACES_TO
+  - from: E_SDK_DO_BRIDGE_NA_0_3_310_E_PIN_DO_REVISOR_EM_V1_0_261_1024
+    to: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024
+    edge_type: SUPPORTS
