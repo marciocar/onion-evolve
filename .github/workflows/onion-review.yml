@@ -274,8 +274,9 @@ jobs:
         # ("bump Claude Code to 2.1.307 and Agent SDK to 0.3.307"), nos mesmos 6 arquivos, sem input nem output novo.
         # SUBIDO para v1.0.258 (6b6870e6; a tag anotada é cb4685f8) em 2026-10-22, pelo mesmo aviso: 1 commit só
         # ("bump Claude Code to 2.1.308 and Agent SDK to 0.3.308"), nos mesmos 6 arquivos, sem input nem output novo.
-        # SUBIDO para v1.0.261 (16f9f71a; a tag anotada é af7730b4) em 2026-10-24, pela rodada 18 do radar E3: o compare
-        # v1.0.260..v1.0.261 tem 1 commit, só o bump (CLI 2.1.310, SDK 0.3.310), em 6 arquivos; nada mais muda.
+        # SUBIDO para v1.0.262 (925afb53; a tag anotada é 70f88a9f) em 2026-10-24, pela rodada 18 do radar E3: o compare
+        # v1.0.260..v1.0.262 tem 2 commits. 16f9f71a (v1.0.261) só troca versões (CLI 2.1.310, SDK 0.3.310); 925afb53
+        # (#1916) sobe o Bun do runner de 1.3.14 para 1.4.4 (setup-bun e @types/bun). Nenhum input nem output usado aqui muda.
         # Antes: SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
         # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
         # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
@@ -287,7 +288,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@16f9f71ab9c490faf367f94dd294897edc25be33
+        uses: anthropics/claude-code-action@925afb53776cf1a2b738c6bdbed37b4d4000ef13
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -418,8 +419,9 @@ jobs:
         # ("bump Claude Code to 2.1.307 and Agent SDK to 0.3.307"), nos mesmos 6 arquivos, sem input nem output novo.
         # SUBIDO para v1.0.258 (6b6870e6; a tag anotada é cb4685f8) em 2026-10-22, pelo mesmo aviso: 1 commit só
         # ("bump Claude Code to 2.1.308 and Agent SDK to 0.3.308"), nos mesmos 6 arquivos, sem input nem output novo.
-        # SUBIDO para v1.0.261 (16f9f71a; a tag anotada é af7730b4) em 2026-10-24, pela rodada 18 do radar E3: o compare
-        # v1.0.260..v1.0.261 tem 1 commit, só o bump (CLI 2.1.310, SDK 0.3.310), em 6 arquivos; nada mais muda.
+        # SUBIDO para v1.0.262 (925afb53; a tag anotada é 70f88a9f) em 2026-10-24, pela rodada 18 do radar E3: o compare
+        # v1.0.260..v1.0.262 tem 2 commits. 16f9f71a (v1.0.261) só troca versões (CLI 2.1.310, SDK 0.3.310); 925afb53
+        # (#1916) sobe o Bun do runner de 1.3.14 para 1.4.4 (setup-bun e @types/bun). Nenhum input nem output usado aqui muda.
         # Antes: SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
         # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
         # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
@@ -431,7 +433,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@16f9f71ab9c490faf367f94dd294897edc25be33
+        uses: anthropics/claude-code-action@925afb53776cf1a2b738c6bdbed37b4d4000ef13
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
