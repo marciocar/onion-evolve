@@ -10,6 +10,24 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.25.1] - 2026-10-24
+
+O `kg_trace.py` passa a dizer onde cada trace resolve, e o perfil `gate` leva o que ele precisa para rodar. Contrato
+v4.14, sem mudança.
+
+### Adicionado
+
+- **O `kg_trace.py` diz onde cada trace resolve.** O JSON (`kg-ssot.trace/1`) ganha `resolved_targets`: para cada
+  trace que resolve, o arquivo, o id e o tipo do nó, o alvo julgado, o `path` do que o check viu existir, relativo à
+  raiz e com os links seguidos, e o `kind` (`file` ou `dir`). Quem monta um índice de leitura a partir dos traces não precisa mais de um resolvedor
+  próprio. O campo é aditivo e não obrigatório, e a saída da 4.25.0 segue válida.
+
+### Corrigido
+
+- **O perfil `gate` leva o que o `kg_trace.py` importa.** O perfil passa a ter 15 arquivos: o `tools/kg_trace.py`, o
+  `tools/kg_query.py`, que ele importa, e o `spec/trace.schema.json`, que define a saída dele, vêm junto. Antes, um adotante no `--profile gate` não conseguia rodar o check
+  do trace. A conferência da release passa a exigir que cada ferramenta de um perfil leve os módulos `kg_*` que importa.
+
 ## [4.25.0] - 2026-10-24
 
 O `trace:` de um nó que aponta para um arquivo movido não passa mais em silêncio: o `kg_trace.py` confere cada âncora

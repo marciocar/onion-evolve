@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.25.0",
+  "release": "kg-ssot-v4.25.1",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -290,7 +290,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 |---|---|
 | `--source REPO` | The repository (a path or a URL, such as `https://github.com/marciocar/kg-ssot`) that has the tag. Required when you run it from inside a vendor |
 | `--dest DIR` | Where the vendor lives (default `vendor/kg-ssot`) |
-| `--profile gate` | Brings only the minimum to run the gate and the check (12 files since 4.18.0, without the suite); `--profile full` goes back to the whole release |
+| `--profile gate` | Brings only the minimum to run the gate and the check (15 files since 4.25.1, without the suite); `--profile full` goes back to the whole release |
 | `--force` | Replaces a locally edited vendor |
 | `--index` (on `check`) | Verifies the git index instead of the working tree |
 | `--ref COMMIT` (on `update`) | The bench before a tag (4.24): brings a commit that is not a release yet, from a repository where you can reach it. The stamp says `unreleased` |
@@ -1013,7 +1013,14 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   graph is not at the root). A target that leaves the root (`../sibling/x`) does not resolve: the CI clone does not
   have it.
 - **Output and rc.** Each target that does not resolve is `integrity.trace-target-missing`. `--format json` gives
-  `kg-ssot.trace/1` (`spec/trace.schema.json`). rc 0 when every judged trace resolves, 1 with a missing target or a
+  `kg-ssot.trace/1` (`spec/trace.schema.json`). Since 4.25.1 it also lists `resolved_targets`: for each trace that
+  resolves, the file and the node id, the judged target, the `path` of what the check saw exist, relative to the root
+  and with links followed (so a link followed by `..` cannot point to another file), and its `kind`, `file` or `dir`,
+  which is what a read index needs. When the trace goes through a link, `path` is the real destination, not the text (on Windows the system resolves
+  `..` on the text before the link, so `link/../x` is judged as `x`); a
+  trace that lands on the root itself is the directory `.`; `path` never ends in a slash, not even for a directory
+  (`kind` says it is one); and `path` keeps the case that the file system returns. The field is additive, and the output of
+  4.25.0 stays valid. rc 0 when every judged trace resolves, 1 with a missing target or a
   graph that does not read, 2 on broken input. These rules come from an adopter's resolver measured on thousands of
   traces; each cut was paid for by a false positive.
 

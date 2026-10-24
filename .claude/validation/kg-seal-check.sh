@@ -32,7 +32,7 @@
 #   REFUTED      → SOFT. Cobre 2 das 6 clausulas do Passo 4 (falta o no `evidence` com PROD,
 #                  verified_at, verified_against e trace), tem ZERO linhas no ledger real e nunca
 #                  foi exercitado pelo teste de aceite. HARD aqui seria poder emprestado da
-#                  evidencia dos outros ramos — o vexame do kg-trace-resolve.sh:50-56 em especie.
+#                  evidencia dos outros ramos — o vexame do kg-trace-resolve.sh (removido em 2026-10-24) em especie.
 #   UNVERIFIABLE → verified_at != data do run  E  (confidence < 1.0 OU question+DEPENDS_ON)
 #
 #   PRECEDENCIA: se o no tem verified_at MAIS NOVO que o run, pula. Sem isso a regra vira CATRACA
@@ -51,7 +51,7 @@
 # SILENCIO POR ESCOPO, NUNCA POR SORTE: repo sem nenhuma SYNTHESIS declarando `ledger:` no
 # FRONTMATTER (entre as duas primeiras linhas ---, nao no corpo: um bloco ```yaml de DOCUMENTACAO
 # disparava a regra) emite ISENCAO CONTADA. E o caminho do adotante que nunca rodou
-# /meta:kg-freshness — e o precedente esta escrito em kg-trace-resolve.sh: "shipei como HARD sem
+# /meta:kg-freshness — e o precedente esta escrito no kg-trace-resolve.sh (removido em 2026-10-24): "shipei como HARD sem
 # baseline tendo verificado so que o CORE tinha zero; no primeiro adotante acusou 11 ponteiros,
 # TODOS falsos. O CORE E O PIOR ORACULO DO QUE VIAJA". Aqui a superficie e fechada, por isso HARD
 # nos tres ramos que o aceite EXERCITOU (CONFIRMED, DRIFTED, UNVERIFIABLE) e SOFT no que nao.
@@ -194,7 +194,7 @@ for syn in ${SYNS}; do
           # REFUTED (falta o no `evidence` com plane PROD, verified_at, verified_against e trace).
           # O ledger real tem ZERO linhas REFUTED e o teste de aceite nunca exercitou este ramo —
           # subir HARD aqui seria poder emprestado da evidencia dos outros. E o vexame do
-          # kg-trace-resolve.sh:50-56 em especie. Sobe a HARD quando cobrir o contrato e tiver caso.
+          # kg-trace-resolve.sh (removido em 2026-10-24) em especie. Sobe a HARD quando cobrir o contrato e tiver caso.
           if (st[id] != "refuted" || refIn[id] == "")
             print "SOFT\tREFUTACAO-NAO-SELADA\t" id "\tveredito REFUTED exige aresta REFUTES entrando E status refuted (tem status " (st[id] == "" ? "vazio" : st[id]) ", REFUTES entrando: " (refIn[id] == "" ? "nao" : "sim") ") — SOFT: cobre 2 das 6 clausulas do Passo 4 e nunca foi exercitado por ledger real"
           applied++

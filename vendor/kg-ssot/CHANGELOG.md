@@ -10,6 +10,24 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.25.1] - 2026-10-24
+
+`kg_trace.py` now says where each trace resolves, and the `gate` profile carries what it needs to run. Contract v4.14,
+unchanged.
+
+### Added
+
+- **`kg_trace.py` lists where each trace resolves.** The JSON (`kg-ssot.trace/1`) gains `resolved_targets`: for each
+  trace that resolves, the file, the node id and type, the judged target, the `path` of what the check saw exist,
+  relative to the root and with links followed, and its `kind` (`file` or `dir`). An adopter that builds a read index from the traces no longer needs
+  its own resolver. The field is additive and not required, so the output of 4.25.0 stays valid.
+
+### Fixed
+
+- **The `gate` profile carries what `kg_trace.py` imports.** The profile now has 15 files: `tools/kg_trace.py`,
+  `tools/kg_query.py`, which it imports, and `spec/trace.schema.json`, which defines its output, come along. Before, an adopter on `--profile gate` could not run the trace
+  check. The release check now requires every tool of a profile to bring the `kg_*` modules it imports.
+
 ## [4.25.0] - 2026-10-24
 
 A node's `trace:` that points to a moved file no longer passes in silence: `kg_trace.py` checks each anchor against the

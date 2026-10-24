@@ -67,19 +67,26 @@ def tracked_root_files(root):
 
 def classify(trace, graph_dir, root, root_files, external_roots=()):
     """(classe, alvo): classe é absolute, external_root, not_path, resolved ou missing; o alvo é o texto julgado."""
+    return locate(trace, graph_dir, root, root_files, external_roots)[:2]
+
+
+def locate(trace, graph_dir, root, root_files, external_roots=()):
+    """(classe, alvo, caminho), desde a 4.25.1: o de classify() e, só no resolved, o arquivo que o check viu existir,
+    relativo à raiz, com os links seguidos (um link seguido de .. não pode apontar para outro arquivo), e se ele é
+    file ou dir."""
     text = trace.strip().strip("\"'").strip()
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
-        return "absolute", text
+        return "absolute", text, None
     original = re.split(r"[#:]", text, 1)[0].strip().strip("\"'").strip()
     if any(original.startswith(p) for p in external_roots):
-        return "external_root", original
+        return "external_root", original, None
     if not original or not PATH_CHARS.fullmatch(original):
-        return "not_path", original
+        return "not_path", original, None
     target = original
     while target.startswith("./"):
         target = target[2:]
     if not target:
-        return "not_path", original
+        return "not_path", original, None
     gdir = pathlib.PurePosixPath(graph_dir)
     root_file = False
     if "/" not in original:  # nome solto: só o arquivo rastreado da raiz, com o nome exato, e sem homônimo vizinho
@@ -88,10 +95,10 @@ def classify(trace, graph_dir, root, root_files, external_roots=()):
             if str(gdir) != "." and ((root / gdir / target).exists() or (root / gdir.parent / target).exists()):
                 root_file = False
         if not root_file:
-            return "not_path", original
+            return "not_path", original, None
     first = original.split("/", 1)[0]
     if not root_file and not first.startswith(".") and "." in first:
-        return "not_path", original  # um hostname: support.example.com/...
+        return "not_path", original, None  # um hostname: support.example.com/...
     base = root.resolve()
     candidates = [root / target, root / gdir / target]
     if str(gdir) != ".":
@@ -102,16 +109,19 @@ def classify(trace, graph_dir, root, root_files, external_roots=()):
         except (OSError, RuntimeError):
             continue
         if (full == base or base in full.parents) and full.exists():  # fora da raiz não resolve: o CI não o tem
-            return "resolved", target
-    return "missing", target
+            return "resolved", target, (full.relative_to(base).as_posix() or ".", "dir" if full.is_dir() else "file")
+    return "missing", target, None
 
 
 def check(corpus, root, external_roots=()):
-    """{graphs, judged, resolved, missing: [...], skipped: {absolute, external_root, not_path, not_text}}. O trace que
-    não é texto (lista, mapa, número) entra em not_text: o gate já o reprova (form.type), e aqui ele não some."""
+    """{graphs, judged, resolved, resolved_targets: [...], missing: [...], skipped: {absolute, external_root, not_path,
+    not_text}}. O trace que não é texto (lista, mapa, número) entra em not_text: o gate já o reprova (form.type), e
+    aqui ele não some. resolved_targets (desde a 4.25.1) diz onde cada trace resolvido mora, para quem monta um índice
+    de leitura a partir dele."""
     root = pathlib.Path(root)
     root_files = tracked_root_files(root)
-    res = {"graphs": len(corpus.files) - len(corpus.unreadable), "judged": 0, "resolved": 0, "missing": [],
+    res = {"graphs": len(corpus.files) - len(corpus.unreadable), "judged": 0, "resolved": 0, "resolved_targets": [],
+           "missing": [],
            "skipped": {"absolute": 0, "external_root": 0, "not_path": 0, "not_text": 0}}
     for key in corpus.order:
         node = corpus.nodes[key]
@@ -123,18 +133,20 @@ def check(corpus, root, external_roots=()):
             continue
         if not trace.strip():
             continue
-        kind, target = classify(trace, pathlib.PurePosixPath(key[0]).parent.as_posix(), root, root_files,
+        kind, target, path = locate(trace, pathlib.PurePosixPath(key[0]).parent.as_posix(), root, root_files,
                                 external_roots)
         if kind in res["skipped"]:
             res["skipped"][kind] += 1
             continue
         res["judged"] += 1
+        node_type = node.get("node_type") if isinstance(node.get("node_type"), str) else None
         if kind == "resolved":
             res["resolved"] += 1
+            res["resolved_targets"].append({"file": key[0], "id": key[1], "node_type": node_type, "target": target,
+                                            "path": path[0], "kind": path[1]})
         else:
-            res["missing"].append({"code": CODE, "file": key[0], "id": key[1],
-                                   "node_type": node.get("node_type") if isinstance(node.get("node_type"), str)
-                                   else None, "target": target})
+            res["missing"].append({"code": CODE, "file": key[0], "id": key[1], "node_type": node_type,
+                                   "target": target})
     return res
 
 
