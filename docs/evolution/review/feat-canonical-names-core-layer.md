@@ -2,17 +2,16 @@
 branch: feat/canonical-names-core-layer
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: 9b12d5dcbafc066f7734dd2f5bb337d8bb8e5d849b3e407c43844186fba5c2eb
-reviewed_code_sha256: f610c0d6c677ae37e7959e54f1b22e6d8373f854059153cd1932a9ad820d2b85
-findings_total: 7
-findings_real: 6
-findings_fixed: 6
+reviewed_diff_sha256: pendente
+findings_total: 8
+findings_real: 7
+findings_fixed: 7
 tokens: 170036
 duration_min: 23
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 reviewer: "refutador independente (ferramenta Agent, subagent_type general-purpose, mandato REFUTAR; 56 chamadas de ferramenta, cópia própria em /tmp)"
-nota: "tokens e duração são do refutador (medidos pela ferramenta); os da sessão condutora vão no relatório do PR"
+nota: "tokens e duração são do refutador (medidos pela ferramenta); os da sessão condutora vão no relatório do PR. O achado 8 veio do CI depois da passada e foi re-revisado pela sessão condutora (mudança mecânica da bancada, sem código de produção)"
 ---
 
 # Passada adversarial: `feat/canonical-names-core-layer`
@@ -52,6 +51,15 @@ nota: "tokens e duração são do refutador (medidos pela ferramenta); os da ses
    `"x_term":`; a bancada `(d)` (filtro × `--root`) pegava, a catraca da REGRA 62 (Projeção GERADA em sincronia
    com a fonte (docs/backlog.md)) não. **Cura:** o filtro passou a `-lE '^[[:space:]]*"?x_term"?[[:space:]]*:'`
    e a varredura inclui `*.kg.json`.
+
+8. **O CI achou o que a passada não viu: as famílias novas mandavam a seleção da bancada para o failsafe**
+   (curado, re-revisado pela sessão condutora). O `selftest_selection` reprovou a faixa 4: a seleção de
+   famílias por bloco lê a fronteira pelo `}` na coluna 0, e as duas famílias novas tinham strings
+   multilinha com linhas na coluna 0 (python de `-c` e YAML montado entre aspas). Bissecção medida: cada
+   família, sozinha, mandava o seletor para "tudo"; sem as duas, a seleção é a da `origin/main`.
+   **Cura:** as strings viraram linha única (`$'...\n'` e python de uma linha). **Re-revisão:** a mudança só
+   toca a bancada (nenhum código de produção), a seleção do caso (c1) volta a ser igual à da `origin/main`,
+   e as famílias seguem verdes com o `selftest_selection` (60/60).
 
 ## Tetos declarados (não curados por desenho)
 
