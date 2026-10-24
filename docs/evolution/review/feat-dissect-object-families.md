@@ -2,7 +2,8 @@
 branch: feat/dissect-object-families
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0b3fa98c94b409bdec2c220ec01860487d3a6f1cc227fff1a33f5a1109dc354b
+reviewed_code_sha256: fb66526f8a6ae75978cd7ec0f2875fe43d923485dcf72dba8249da550cea4f75
 findings_total: 6
 findings_real: 4
 tokens: 0
