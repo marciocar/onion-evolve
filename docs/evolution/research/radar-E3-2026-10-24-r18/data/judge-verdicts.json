@@ -1,0 +1,307 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "data/2.1.310.txt não bate byte a byte com a seção ## 2.1.310 do CHANGELOG oficial, ou um label/verified_against cita texto ou número de linha do item que não está lá",
+   "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V='## 2.1.310' '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-24-r18/data/2.1.310.txt; grep -n '' no arquivo para as linhas citadas"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+   "check": "re-executar a medição do nó (claude --version; o censo com raiz '.'; npm view do SDK; gh api do compare v1.0.260...v1.0.261; tm.sh item.read SAC-239 --lean; python sobre os settings.json; sysctl e bwrap; grep no core; a família cited_directive)"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+   "check": "ler o label e o verified_against e conferir no core (grep/ls/leitura do hook) que a superfície existe e se comporta como afirmado"
+  },
+  {
+   "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+   "when": "a rodada propõe superar um nó da r17 que não existe, ou cujo estado afirmado ainda vale; ou deixa de superar um nó da r17 cujo estado a medição de hoje derrubou",
+   "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-10-23-r17/radar-E3-2026-10-23-r17.kg.yaml e comparar o estado que ele afirma com a medição de hoje"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core (hook, guarda, settings, comando, CI, bridge, adotante) e a rodada não o mediu nem o listou",
+   "check": "para cada item de data/2.1.310.txt, grep do termo-chave no core (.claude, ops, .github) e leitura da superfície achada"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "CU1 — cópia data/2.1.310.txt",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V='## 2.1.310' '$0==V{f=1;print;next} /^## /{f=0} f' > sec.txt; cmp sec.txt data/2.1.310.txt (rc 0); diff (rc 0); wc -l = 29; grep -c '^- ' = 26"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Byte a byte idêntica: 29 linhas, 26 itens; ## 2.1.310 é a 1ª seção do CHANGELOG (linha 3), ## 2.1.309 na linha 32. As 'linhas N' citadas (3, 4, 5, 9, 10, 11, 12, 13, 14, 24-26, 27-28) batem com a cópia contada a partir de 1."
+  },
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "bash .claude/validation/cc-delta-census.sh . (baseline 2.1.309, disco 2.1.310, processo 2.1.310, SDK bridge 2.1.309/0.3.309; 2.1.310 = 29 linhas, 26 itens)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Todos os números reproduzem."
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "cruzamento das linhas citadas nos nós contra data/2.1.310.txt: cobertas 3,4,5,9,10,11,12,13,14,24-28 (14 itens); sem nó: 6,7,8,15,16,17,18,19,20,21,22,23 (12 itens)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Aberta corretamente, mas NÃO pode fechar como está: a condição de fecho dela ('ligar cada item a superfície medida') falha em 12 dos 26 itens, que nenhum nó cita. Ver `omissoes`."
+  },
+  {
+   "alvo": "E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "claude --version (2.1.310); cc-delta-census.sh . (SDK bridge 2.1.309/0.3.309); npm view @anthropic-ai/claude-agent-sdk version (0.3.310) e @0.3.310 claudeCodeVersion (2.1.310); grep -n claude-code-action@ .github/workflows/onion-review.yml (l.288 e l.430 = 8d70a0dd); gh api repos/anthropics/claude-code-action/tags (v1.0.261 = 16f9f71a, v1.0.260 = 8d70a0dd); gh api .../compare/v1.0.260...v1.0.261 (1 commit, 6 arquivos, só strings de versão; base-action/action.yml na 8d70a0dd l.150 CLAUDE_CODE_VERSION=2.1.309)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz em tudo. Ressalva de leitura: 'o revisor está na 2.1.309' é o que o pin INSTALA quando roda; desde o pin (704c8ebf) o job onion-review foi skipped em todas as 25 últimas execuções (review-mode-decide: modo off, ONION_REVIEW_MODE ausente, sem a label review:ia). O label diz 'pin v1.0.260', então não afirma execução."
+  },
+  {
+   "alvo": "Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -c ISSUE_SUBIR radar-E3-2026-10-24-r18.kg.yaml (= 3: provenance.source 'ISSUE_SUBIR_URL', locator e verified_against); tm.sh search.query '2.1.310' e '0.3.310' (count 0); grep -rniE elicit ops/mcp-onion-* .claude (zero, o próprio E_COMPACTACAO_...); gh run list --workflow onion-review.yml --limit 25 + gh run view <id> --json jobs (onion-review=skipped 25/25)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "a justificativa medida da subida: linhas 6 e 11 (compactação não interativa) alcançam o /chat do bridge e o runner de convidado (mesmo binário, ops/cc-sdk-targets.tsv); a 14 não tem superfície; o revisor só serve com a label review:ia (modo off, 25/25 skipped); a issue precisa ser criada antes do selo",
+    "medida": "grep -rniE elicit ops/mcp-onion-* .claude = 0; cmp das linhas 6/11/14 em data/2.1.310.txt; gh run view das 25 últimas execuções do onion-review.yml; tm.sh search.query = 0 issues; grep -c ISSUE_SUBIR = 3"
+   },
+   "nota": "A proposta em si é sã, mas o nó justifica o impacto 2 com 'o delta que alcança quem serve se resume às linhas 11 e 14', e a linha 14 NÃO tem superfície pela medição da própria rodada (nenhum servidor MCP da casa pede elicitação), enquanto a linha 6 (compactação após 'Prompt is too long' com texto denso) alcança as mesmas superfícies não interativas e ficou de fora. A issue citada é placeholder não preenchido (ISSUE_SUBIR/ISSUE_SUBIR_URL): a provenance aponta um objeto que não existe. E 'quem serve' no revisor é condicional: ele está desligado por padrão."
+  },
+  {
+   "alvo": "E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "tm.sh item.read SAC-239 --lean (state Backlog, updatedAt 2026-10-23T17:09:57Z); git log -S 8d70a0dd -- .github/workflows/onion-review.yml (704c8ebf); cc-delta-census.sh . (bridge 2.1.309); gh run list --workflow onion-review.yml --limit 25 + gh run view <id> --json jobs (onion-review=skipped em 25/25, inclusive todas desde 2026-10-23T18:08Z); gh run view 40051286967 --log | grep review-mode-decide: ('run=false (modo off) — variável ausente ou vazia ⇒ padrão off; sem a label review:ia')"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "cumprida em configuração nas duas metades, medida por execução só no bridge; o revisor com v1.0.260 nunca executou (25/25 skipped, modo off) — fechar a SAC-239 exige rodar um PR com a label review:ia ou declarar a metade do revisor como pin sem prova",
+    "medida": "gh run view <id> --json jobs nas 25 últimas execuções do onion-review.yml; linha review-mode-decide: do log da 40051286967"
+   },
+   "nota": "Os fatos citados reproduzem (Backlog, 704c8ebf, nó da r17 open). O que exagera é 'cumprida NO VIVO' para a metade do revisor: o pin está no main, mas o revisor nunca rodou com ele — o próprio E_PIN_DO_REVISOR_SOBE_PARA_V1_0_260_1023 da r17 adiou 'a prova do revisor rodando com o CLI novo para o PR seguinte', e essa prova não aconteceu (todo PR desde então teve o job skipped). Só a metade do bridge é medida por execução (--version do binário)."
+  },
+  {
+   "alvo": "E_HOOKS_DO_CORE_E_ADOTANTES_NAO_SAO_SO_ASPAS_1024",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "python sobre .claude/settings.json (25 hooks, todos 'bash \"$CLAUDE_PROJECT_DIR/...\"', 0 começam por aspas, nenhum PermissionRequest); python sobre /home/marcio/*/.claude/settings.json e /home/marcio/*/*/.claude/settings.json (41 arquivos legíveis, 624 comandos, 0 começam por aspas, 0 PermissionRequest); ~/.claude/settings.json (Notification e Stop começam por curl); assemble-plugin.sh l.259 (gera 'bash \"${CLAUDE_PLUGIN_ROOT}/hooks/<bn>\"')"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "A conclusão reproduz e se fortalece numa população maior. O número '20 settings.json' não reproduz (ls /home/marcio/*/.claude/settings.json = 37; com o 2º nível, 41 legíveis) e o filtro 'adotantes e portas' não está escrito; o 0 vale nos 41. O nó não mediu o bundle de plugins, que é a superfície que de fato chega a Windows pelo marketplace público: o gerador emite o bash nu, então nada muda."
+  },
+  {
+   "alvo": "E_SANDBOX_FORA_DO_CORE_E_BWRAP_BARRADO_NO_HOST_1024",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "python sobre .claude/settings.json (chaves: $schema, attribution, fallbackModel, hooks, permissions; sem sandbox); grep -rln '/sandbox\\b|sandbox\\.enabled|\"sandbox\"|bwrap' .claude ops docs/meta-specs docs/knowledge-base (só o vhost do piloto ui:// e o sandbox.html do bridge, sem relação); sysctl kernel.apparmor_restrict_unprivileged_userns (= 1); /etc/os-release (Ubuntu 24.04.4 LTS); bwrap --ro-bind / / true (rc 1, 'setting up uid map: Permission denied'); grep -n sandbox_props ops/chat-runner.sh (l.437)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz. 45 settings.json/settings.local.json de adotantes também não têm chave sandbox."
+  },
+  {
+   "alvo": "E_MONITOR_E_SONO_LONGO_SEM_EFEITO_NO_HOST_DE_API_DIRETA_1024",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "python sobre ~/.claude/settings.json (env: CLAUDE_CODE_ENABLE_TODO_TOOLS, CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS); grep -n anthropic_api_key .github/workflows/onion-review.yml (l.290, l.432); grep -rn 'TELEMETRY|NONESSENTIAL|ANTHROPIC_BASE_URL|BEDROCK|VERTEX|FOUNDRY' .claude ops .github (zero em config); grep -n 'BASE_URL|EXEC_TOOLS' /usr/local/libexec/onion-chat/launcher.py; systemctl cat onion-chat@.service | grep Environment"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz para o que o label afirma (host e revisor). A rodada não mediu a 3ª superfície, o runner do /chat de convidado: o launcher instalado (vindo do bridge, fora do grep de ops/) TEM um botão de gateway (ONION_CHAT_BASE_URL → ANTHROPIC_BASE_URL, l.88 e l.247-248), hoje não ligado na unit; e o convidado já nega Monitor (ops/chat-runner.sh l.619, launcher l.53). A conclusão de impacto nulo hoje sobrevive. Ver `omissoes`."
+  },
+  {
+   "alvo": "E_COMPACTACAO_E_ELICITACAO_NAO_INTERATIVAS_SO_COM_A_SUBIDA_1024",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rniE elicit ops/mcp-onion-* .claude (zero); grep -rnE 'claude +(-p|--print)' .claude ops .github (nenhum chamador vivo de claude -p no core, só exemplo em agent-skills-specialist.md e comentários datados); cc-delta-census.sh . (bridge 2.1.309); ops/cc-sdk-targets.tsv (o runner de convidado liga o MESMO binário do SDK do bridge)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz: as superfícies não interativas são o SDK do bridge (com o runner de convidado, mesmo binário) e o revisor. Ressalva: o revisor está desligado por padrão (25/25 skipped), então 'chega ao revisor com a subida' é condicional à label review:ia. A linha 6 pertence à mesma família (compactação) e ficou fora deste nó."
+  },
+  {
+   "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1024",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "python sobre .claude/settings.json e ~/.claude/settings.json (cleanupPeriodDays ausente; defaultMode ausente no core, bypassPermissions no de usuário); python sobre 45 settings(.local).json de adotantes (defaultMode nenhum, cleanupPeriodDays nenhum); ls ~/.claude/mods (inexistente); grep -rli 'Claude Tag|install-slack-app' .claude ops .github docs/meta-specs docs/knowledge-base (zero) e nos adotantes granaai, granaa-ai, brain-granaai, gmill (zero, embora o granaai use Slack); grep -n claude-code-action@ .github/workflows/onion-review.yml"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz, inclusive nos adotantes (que a rodada não mediu para estes itens)."
+  },
+  {
+   "alvo": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_310_1024",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive (Falharam: 0; 'OK ✓ — todas as guardas reagiram conforme esperado.')"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "Reproduz no host com 2.1.310."
+  },
+  {
+   "alvo": "SUPERSEDES r17#E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023' r17.kg.yaml (l.51); estado afirmado: bridge SDK 0.3.308 e pin v1.0.258 na 2.1.308; hoje: censo bridge 0.3.309/2.1.309 e uses: 8d70a0dd (v1.0.260)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "O alvo existe e o estado que ele afirma caiu. Superação correta."
+  },
+  {
+   "alvo": "SUPERSEDES r17#Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023' r17.kg.yaml (l.66, status open); git show --stat 704c8ebf (pin v1.0.260); git -C /home/marcio/onion-bridge-dev-sdk310 log --oneline -1 (35c5187, SDK 0.3.309, bridge #90); cc-delta-census.sh . (bridge 2.1.309)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "a ponta local da SUPERSEDES deve ser E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024 (a evidência que responde a pergunta), com a ressalva de que a metade do revisor é pin sem execução; e a SAC-239 precisa de fecho no Linear",
+    "medida": "704c8ebf no main; bridge 0.3.309 medido por --version pelo censo; onion-review skipped 25/25 desde o pin"
+   },
+   "nota": "O alvo existe e o estado dele (pergunta aberta pela subida 2.1.309) caiu, mas caiu por RESPOSTA, não por substituição: a subida foi executada. Superá-lo com a nova pergunta da 2.1.310 grava 'a pergunta mudou de versão' e apaga que a anterior foi cumprida — exatamente o que o E_SAC_239_CUMPRIDA_... desta rodada diz ('respondida sem ninguém fechá-la')."
+  }
+ ],
+ "omissoes": [
+  {
+   "item": "Fixed compaction after a 'Prompt is too long' error keeping too much of a conversation with dense text, such as base64 or SVG",
+   "linha": 6,
+   "superficie": "as mesmas superfícies não interativas das linhas 11/14 (SDK do bridge 0.3.309 e runner de convidado com o mesmo binário; revisor do CI quando ligado) e o hook PreCompact worklog-precompact-breadcrumb.sh do .claude/settings.json; o /chat serve o piloto ui:// (deploy/sandbox/sandbox.html), conteúdo denso típico",
+   "comando": "sed -n 6p data/2.1.310.txt; grep -n PreCompact .claude/settings.json; cat ops/cc-sdk-targets.tsv; grep -n sandbox.html ops/update-bridge.sh",
+   "impacto": "baixo; mas é a 2ª razão real para a subida e a Q_SUBIR a omite enquanto cita a linha 14, que não tem superfície"
+  },
+  {
+   "item": "Fixed file read permission prompts not showing where a symbolic link leads",
+   "linha": 7,
+   "superficie": "o /chat de convidado roda com '--tools Read --permission-mode default --permission-prompt-tool stdio' (ops/chat-runner.sh l.624-626): é a única superfície da casa onde um pedido de permissão de Read acontece (o host usa bypassPermissions); se o payload ao canUseTool do bridge muda com a correção não foi medido",
+   "comando": "sed -n 618,627p ops/chat-runner.sh; python sobre ~/.claude/settings.json (defaultMode=bypassPermissions)",
+   "impacto": "baixo, NÃO MEDIDO (provavelmente só a UI do terminal)"
+  },
+  {
+   "item": "Fixed a question's auto-continue timeout firing the moment the external editor closed after a long edit",
+   "linha": 8,
+   "superficie": "AskUserQuestion é prescrito em 10 arquivos de .claude (meta/decide.md, decide-doctrine.md, meta/publish.md, meta/federation-a2a.md, skills onion-publish, onion-wizard, onion-onboarding, decide-panel.sh, invite-collaborator.sh); o /meta:decide faz rodadas de perguntas ao maestro",
+   "comando": "grep -rln AskUserQuestion .claude",
+   "impacto": "baixo; o host já está na 2.1.310, a correção já chegou; só registrar"
+  },
+  {
+   "item": "Added the Monitor tool ... when telemetry or nonessential traffic is disabled / Fixed requests failing behind some gateways ... effort-2025-11-24",
+   "linha": 4,
+   "superficie": "o launcher do /chat de convidado instalado por ops/chat-runner.sh (/usr/local/libexec/onion-chat/launcher.py, l.88 e l.247-248) aceita ONION_CHAT_BASE_URL e o exporta como ANTHROPIC_BASE_URL: é um botão de gateway/servidor compatível que o grep do nó (só .claude, ops, .github) não alcança porque o fonte vive no repo do bridge; hoje não ligado (systemctl cat onion-chat@.service: Environment sem BASE_URL). O convidado já nega Monitor (chat-runner.sh l.619; launcher l.53)",
+   "comando": "grep -n 'BASE_URL\\|EXEC_TOOLS' /usr/local/libexec/onion-chat/launcher.py; systemctl cat onion-chat@.service | grep Environment",
+   "impacto": "nulo hoje; se o botão for ligado, o recuo do beta de effort atrás de gateway só chega com a subida do SDK"
+  },
+  {
+   "item": "Windows: Fixed PreToolUse and PermissionRequest hooks letting a tool call through when Git Bash is missing and the hook's command is only quoted strings",
+   "linha": 9,
+   "superficie": "o bundle do marketplace público (onion-plugins), que é o que chega a máquinas Windows, gerado por .claude/utils/marketplace/assemble-plugin.sh l.259; e os hooks de usuário em ~/.claude/settings.json",
+   "comando": "sed -n 259p .claude/utils/marketplace/assemble-plugin.sh; python sobre ~/.claude/settings.json (Notification/Stop começam por curl)",
+   "impacto": "nulo (o gerador emite 'bash \"${CLAUDE_PLUGIN_ROOT}/hooks/<bn>\"'); a superfície certa ficou sem medição"
+  },
+  {
+   "item": "[Cloud sessions] Remote Control permissions in Enterprise custom roles / confirmation when turning on Remote Control",
+   "linha": 17,
+   "superficie": "o maestro usa Remote Control (~/.claude/settings.json remoteControlAtStartup=true); o farol de sessão (.claude/hooks/session-beacon-hook.sh, .claude/validation/session-beacon.sh l.23) trata reconexão de Remote Control; ~/.claude/remote-settings.json vazio (sem política gerenciada). Vale também para a linha 22",
+   "comando": "python sobre ~/.claude/settings.json (remoteControlAtStartup); grep -rn -i 'Remote Control' .claude",
+   "impacto": "baixo (só pesa se a conta virar Enterprise com papéis); a superfície existe e nenhum nó a nomeia"
+  },
+  {
+   "item": "[Cloud sessions] setup script, routines, edit dialogs (linhas 18-21 e 23); [VSCode] (linhas 15-16)",
+   "linha": 18,
+   "superficie": "nenhuma medida: grep CLAUDE_CODE_REMOTE, 'cloud environment' e 'setup script' em .claude ops .github = zero; routines rejeitadas pelo ADR work-models (W7); ~/.claude/ide existe (VSCode)",
+   "comando": "grep -rn 'CLAUDE_CODE_REMOTE\\|cloud environment\\|setup script' .claude ops .github; grep -rn routine docs/knowledge-base/decisions/onion-adr-work-models-session-topologies-2026-07.md",
+   "impacto": "nulo; omissão de COBERTURA (a Q_O_QUE_O_DELTA_TOCA_NO_ONION exige ligar cada item), não de impacto"
+  },
+  {
+   "item": "alcance das linhas 6, 11 e 14 no revisor do CI",
+   "linha": 11,
+   "superficie": ".github/workflows/onion-review.yml: o job onion-review só roda com ONION_REVIEW_MODE=on|auto ou a label review:ia; a variável está ausente (padrão off) e o job foi skipped nas 25 últimas execuções, inclusive todas desde o pin v1.0.260",
+   "comando": "gh run list --workflow onion-review.yml --limit 25; gh run view <id> --json jobs; gh run view 40051286967 --log | grep 'review-mode-decide:'",
+   "impacto": "médio para a leitura: 'o delta chega a quem serve' no revisor é condicional, e a SAC-239 está 'cumprida' só em pin"
+  }
+ ],
+ "aufhebung": {
+  "veredito": "PARCIAL",
+  "nota": "(1) SUPERSEDES r17#E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023 por E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024: CORRETA (o estado bridge 0.3.308 / pin v1.0.258 caiu). (2) SUPERSEDES r17#Q_SUBIR_..._2_1_309_1023 por Q_SUBIR_..._2_1_310_1024: alvo certo, ponta local errada — a pergunta foi RESPONDIDA (704c8ebf e bridge #90), não substituída; a ponta deve ser E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024, com a ressalva de que a metade do revisor é pin nunca executado. (3) FALTA: r17#E_REVISOR_POSTA_TEXTO_DO_MODELO_SEM_SANITIZAR_ARROBA_1023 afirma 'o revisor do CI roda o CLI 2.1.308 (pin v1.0.258), anterior à correção' — hoje o pin é v1.0.260 (CLI 2.1.309, que traz a correção da linha 41 da 2.1.309, CHANGELOG l.72); a parte 'post-review-comment.sh posta sem tratar @' (l.113/119) segue verdadeira, então cabe um nó novo que a supere com o estado de hoje. Não caem: E_CENSO_ZERA_SCRIPTPATH_SO_COM_RAIZ_ABSOLUTA_1023 (censo com '.' = 8, com raiz absoluta ou sem argumento = 0; SAC-219 Backlog), Q_PERNA_DE_LEITURA_..._1023 (SAC-240 Backlog) e Q_GUARDA_DE_ISOLAMENTO_..._1023 (SAC-241 Backlog); E_GUARDA_DE_DERIVA_..._2_1_309_1023 é datado e segue verdadeiro. x_supersedes_none não se aplica: há estado derrubado."
+ },
+ "juiz": {
+  "modelo": "claude-opus-5-5 (subagente general-purpose independente, não-fork)",
+  "resumo": "14 vereditos: 11 SUSTENTA, 3 EXAGERA, 0 REPROVA; 8 omissões. Todos os números reproduzem (cópia byte a byte, censo, npm, compare da action, SAC-239, bwrap/sysctl, hooks, cited_directive). Caem três afirmações: a Q_SUBIR justifica o impacto pela linha 14, que a própria rodada mediu sem superfície, omite a linha 6 e cita issue placeholder (ISSUE_SUBIR); o E_SAC_239 chama de 'cumprida no vivo' uma metade (revisor) que é pin nunca executado — onion-review skipped 25/25, modo off; e a SUPERSEDES da Q da r17 aponta a nova pergunta em vez da evidência que a respondeu. Falta superar r17#E_REVISOR_POSTA_TEXTO_DO_MODELO_SEM_SANITIZAR_ARROBA_1023 (afirma pin v1.0.258). 12 dos 26 itens (linhas 6-8, 15-23) não têm nó; os de maior peso: linha 6 (compactação não interativa), Remote Control (linhas 17/22, usado pelo maestro) e o botão de gateway do launcher do /chat de convidado (linha 4)."
+ }
+}
