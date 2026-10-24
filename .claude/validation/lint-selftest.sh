@@ -4377,11 +4377,11 @@ KGEOF
 # antes da regra entrar (por isso HARD sem baseline).
 #
 # DESDE 2026-10-24 O JUIZ É O PRODUTO: o kg-trace-resolve.sh (o resolvedor awk da casa) saiu da REGRA 55
-# (fica só para o índice, até a kg-ssot 4.25.1), e o kg-trace.sh chama o `kg_trace.py check` do vendor kg-ssot (4.25) — paridade medida na main:
+# e, com a kg-ssot 4.25.1, foi removido também do índice; o kg-trace.sh chama o `kg_trace.py check` do vendor kg-ssot (4.25) — paridade medida na main:
 # 2.501/2.501/0. Os casos (a)–(d) seguem os mesmos, agora contra o produto; o (e), que mutava o awk,
 # virou um PRODUTO-STUB (não há mais awk a mutar): o leitor que devolve zero de tudo tem de dar VACUIDADE.
 # Os casos (g)–(k) cobrem o que a troca mudou: id entre aspas, o produto ausente/quebrado/incompleto e o
-# índice, que até a kg-ssot 4.25.1 segue no resolvedor da casa, restrito a esse uso.
+# índice, que desde a kg-ssot 4.25.1 sai do `resolved_targets` do produto (os (j*) prendem a forma e os mutantes).
 run_kg_trace_resolve_selftests() {
   local helper="${SCRIPT_DIR}/kg-trace.sh"
   local fix="${FIX_DIR}/kg-trace/trace-mixed.kg.yaml"
@@ -4466,19 +4466,18 @@ run_kg_trace_resolve_selftests() {
   else record_fail "kg-trace: (f) vacuidade falsa" "rc=${rc} out=${out}"; fi
 
   # (g) ID ENTRE ASPAS — o defeito que só o resolvedor da casa tinha (medido 2026-10-24: 85 linhas
-  #     `- id: "…"` num grafo do core). Na REGRA 55 ele some já: o morto é acusado pelo id SEM aspas. No ÍNDICE
-  #     ele fica até a kg-ssot 4.25.1 (o --emit-index ainda é o resolvedor da casa): o caso PRENDE o defeito
-  #     conhecido, para que a troca da 4.25.1 inverta esta asserção em vez de passar despercebida
-  #     (Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251).
+  #     `- id: "…"` num grafo do core). Na REGRA 55 ele sumiu com a 4.25; no ÍNDICE, com a 4.25.1 (o --emit-index
+  #     lê o `resolved_targets` do produto): a asserção que prendia o defeito foi INVERTIDA, como o nó
+  #     Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251 mandava — o índice grava o id LIMPO.
   local d4; d4="$(mktemp -d)"; mkdir -p "${d4}/docs/onion/graph"; : > "${d4}/docs/onion/graph/vivo.md"
   printf 'meta:\n  id: q\n  schema_version: "1"\nnodes:\n  - id: "C_ASPAS_VIVO"\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "docs/onion/graph/vivo.md"\n  - id: '"'"'C_ASPAS_MORTO'"'"'\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "docs/onion/graph/morto.md"\nedges: []\n' \
     > "${d4}/docs/onion/graph/q.kg.yaml"
   ( cd "${d4}" && git init -q . && git add -A ) >/dev/null 2>&1
   local idx4 tsv4
   idx4="$(_kt "${d4}" --emit-index 2>&1 || true)"; tsv4="$(_kt "${d4}" --format tsv 2>&1 || true)"
-  if grep -q $'^docs/onion/graph/vivo.md\t"C_ASPAS_VIVO"\t' <<< "${idx4}" \
+  if grep -q $'^docs/onion/graph/vivo.md\tC_ASPAS_VIVO\t' <<< "${idx4}" && ! grep -q '"' <<< "${idx4}" \
      && grep -q $'\tC_ASPAS_MORTO\t.*TARGET-MISSING' <<< "${tsv4}" && ! grep -q "'" <<< "${tsv4}"; then
-    record_pass "kg-trace: (g) id entre aspas → a REGRA 55 acusa com o id LIMPO; o índice ainda o grava COM aspas (defeito conhecido até a 4.25.1)"
+    record_pass "kg-trace: (g) id entre aspas → a REGRA 55 acusa e o índice grava com o id LIMPO (sem aspas desde a 4.25.1)"
   else record_fail "kg-trace: (g) id entre aspas" "idx=${idx4:0:160} · tsv=${tsv4:0:160}"; fi
 
   # (h) PRODUTO AUSENTE → rc 2 (nunca 0), e o lint DECLARA que não julgou (SOFT NAO-JULGOU), não cala.
@@ -4515,18 +4514,63 @@ run_kg_trace_resolve_selftests() {
     record_pass "kg-trace: (i) (MUT) juiz quebrado (rc 2) → ENTRADA-QUEBRADA + exit 1, nunca verde"
   else record_fail "kg-trace: (i) juiz quebrado" "rc=${rc} out=${out:0:160}"; fi
 
-  # (j) O --emit-index É A PORTA ÚNICA e, até a 4.25.1, delega ao resolvedor da casa: emite os pares das duas
-  #     primeiras raízes e NÃO a 3ª (pasta pai do grafo) — defeito conhecido, preso aqui para a troca o inverter.
-  #     E o resolvedor restrito recusa os outros modos (rc 2): ninguém volta a julgar a REGRA 55 por ele.
+  # (j) O --emit-index É A PORTA ÚNICA e, desde a kg-ssot 4.25.1, lê o `resolved_targets` do PRODUTO: emite as TRÊS
+  #     raízes (a 3ª, pasta pai do grafo, ficava fora no resolvedor da casa) com o caminho NORMALIZADO (sem `../`),
+  #     e o resolvedor da casa não existe mais — ninguém volta a gerar o índice por um 2º parser.
   out="$(_kt "${d}" --emit-index 2>&1 || true)"
-  local rr=0; bash "${SCRIPT_DIR}/kg-trace-resolve.sh" "${d}" --format tsv >/dev/null 2>&1 || rr=$?
-  if grep -q $'\tC_VIVO_RAIZ\t' <<< "${out}" && grep -q $'\tC_VIVO_RELATIVO\t' <<< "${out}" \
-     && ! grep -q $'\tC_VIVO_PAI\t' <<< "${out}" && [ "${rr}" -eq 2 ]; then
-    record_pass "kg-trace: (j) --emit-index delega ao resolvedor restrito (3ª raiz fora: defeito conhecido até a 4.25.1) e ele recusa julgar (rc 2)"
-  else record_fail "kg-trace: (j) índice pelo resolvedor restrito" "rr=${rr} out=${out:0:200}"; fi
+  if grep -q $'^docs/onion/graph/trace-mixed.kg.yaml\tC_VIVO_RAIZ\t' <<< "${out}" \
+     && grep -q $'^docs/onion/graph/sub/alvo-vivo.md\tC_VIVO_RELATIVO\t' <<< "${out}" \
+     && grep -q $'^docs/onion/vizinho/alvo-no-pai.md\tC_VIVO_PAI\t' <<< "${out}" && ! grep -q '\.\./' <<< "${out}" \
+     && [ ! -e "${SCRIPT_DIR}/kg-trace-resolve.sh" ]; then
+    record_pass "kg-trace: (j) --emit-index pelo produto: as 3 raízes, caminho normalizado (sem ../), resolvedor da casa aposentado"
+  else record_fail "kg-trace: (j) índice pelo produto" "out=${out:0:240}"; fi
+
+  # (j2) DIRETÓRIO SEM BARRA — o contrato da 4.25.1: o `path` NUNCA termina em barra (o `kind` é o sinal). O
+  #      resolvedor da casa gravava `dir/` quando o trace tinha barra, e o hook só casava a forma exata.
+  local d5; d5="$(mktemp -d)"; mkdir -p "${d5}/docs/onion/graph" "${d5}/docs/pasta"; : > "${d5}/docs/pasta/x.md"
+  printf 'meta:\n  id: q\n  schema_version: "1"\nnodes:\n  - id: C_DIR_BARRA\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "docs/pasta/"\n  - id: C_DIR_SEM\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "docs/pasta"\nedges: []\n' \
+    > "${d5}/docs/onion/graph/q.kg.yaml"
+  ( cd "${d5}" && git init -q . && git add -A ) >/dev/null 2>&1
+  out="$(_kt "${d5}" --emit-index 2>&1 || true)"
+  if grep -q $'^docs/pasta\tC_DIR_BARRA\t' <<< "${out}" && grep -q $'^docs/pasta\tC_DIR_SEM\t' <<< "${out}" \
+     && ! grep -q $'/\t' <<< "${out}"; then
+    record_pass "kg-trace: (j2) diretório com E sem barra no trace → a MESMA linha sem barra no índice"
+  else record_fail "kg-trace: (j2) diretório" "out=${out:0:200}"; fi
+
+  # (j3) (MUT) VENDOR ANTERIOR À 4.25.1 — o JSON sem `resolved_targets` (a forma exata da 4.25.0) não pode virar
+  #      índice VAZIO calado: rc 2, stdout vazio e o marcador que a REGRA 84 lê como NAO-JULGOU (nunca HARD).
+  printf '%s\n' 'import json' 'print(json.dumps({"schema_version":"kg-ssot.trace/1","graphs":1,"judged":1,"resolved":1,"missing":[],"skipped":{"absolute":0,"external_root":0,"not_path":0,"not_text":0},"unreadable":[]}))' > "${mut}/k4250.py"
+  local so3 se3; se3="$(mktemp)"; rc=0
+  so3="$(ONION_KG_TRACE="${mut}/k4250.py" bash "${helper}" "${d}" --emit-index 2>"${se3}")" || rc=$?
+  lo="$(bash -c '
+    set -euo pipefail
+    SCRIPT_DIR="'"${SCRIPT_DIR}"'"; REPO_ROOT="'"${d}"'"
+    export ONION_KG_TRACE="'"${mut}"'/k4250.py"
+    violation() { echo "V[$1] $3"; }
+    : > "'"${d}"'/docs/onion/kg-read-index.tsv"
+    source <(sed -n "/^check_kg_read_index_sync()/,/^}$/p" "'"${SCRIPT_DIR}/lint-artifacts.sh"'")
+    check_kg_read_index_sync
+  ' 2>&1 || true)"
+  if [ "${rc}" -eq 2 ] && [ -z "${so3}" ] && grep -qF 'NAO-GEROU' "${se3}" \
+     && grep -q 'V\[SOFT\].*NAO-JULGOU' <<< "${lo}" && ! grep -q 'V\[HARD\]' <<< "${lo}"; then
+    record_pass "kg-trace: (j3) (MUT) vendor 4.25.0 (sem resolved_targets) → rc 2, nada no stdout, REGRA 84 SOFT NAO-JULGOU"
+  else record_fail "kg-trace: (j3) (MUT) vendor sem resolved_targets" "rc=${rc} so=${so3:0:80} err=$(head -c 160 "${se3}") lint=${lo:0:200}"; fi
+
+  # (j4) (MUT) PRODUTO QUE RESOLVE ZERO (`resolved_targets: []`) → rc 3 com VAZIO, o contrato do dia 1 do adotante.
+  #      E o produto quebrado (rc fora de 0/1) → rc 2 NAO-GEROU, nunca stdout parcial.
+  printf '%s\n' 'import json' 'print(json.dumps({"schema_version":"kg-ssot.trace/1","graphs":1,"judged":0,"resolved":0,"resolved_targets":[],"missing":[],"skipped":{"absolute":0,"external_root":0,"not_path":1,"not_text":0},"unreadable":[]}))' > "${mut}/k0.py"
+  local rc4=0 rc5=0 so5
+  ONION_KG_TRACE="${mut}/k0.py" bash "${helper}" "${d}" --emit-index >/dev/null 2>"${se3}" || rc4=$?
+  local e4; e4="$(cat "${se3}")"
+  so5="$(ONION_KG_TRACE="${mut}/quebrado.py" bash "${helper}" "${d}" --emit-index 2>"${se3}")" || rc5=$?
+  if [ "${rc4}" -eq 3 ] && grep -qF 'VAZIO' <<< "${e4}" && grep -qF 'resolv' <<< "${e4}" \
+     && [ "${rc5}" -eq 2 ] && [ -z "${so5}" ] && grep -qF 'NAO-GEROU' "${se3}"; then
+    record_pass "kg-trace: (j4) (MUT) zero resolvidos → rc 3 VAZIO; produto quebrado → rc 2 NAO-GEROU, stdout vazio"
+  else record_fail "kg-trace: (j4) (MUT) vazio/quebrado" "rc4=${rc4} e4=${e4:0:120} rc5=${rc5} so5=${so5:0:80}"; fi
+  rm -f "${se3}"
 
   unset -f _kt _mk_trace_sandbox
-  rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${mut}"
+  rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${d5}" "${mut}"
 }
 
 # ---------------------------------------------------------------------------
@@ -29816,13 +29860,13 @@ run_kg_fixture_paths_selftests() {
   # CANCELA a semente do KG, em vez de afrouxar um gate.
   local _obrig _missing=""
   for _obrig in .claude/utils/adopt/seed-adoption-graph.sh .claude/validation/kg-radar-integrity.sh \
-                .claude/validation/kg-trace-resolve.sh .claude/validation/kg-backlog-project.sh \
+                .claude/validation/kg-backlog-project.sh \
                 .claude/validation/kg-corpus-grep.sh .claude/validation/kg-verification-coverage.sh; do
     (cd "${_root2}" && grep -q 'kg-fixture-paths\.sh' "${_obrig}" 2>/dev/null) || _missing="${_missing} ${_obrig}"
   done
   [ -z "${_missing}" ] || cmiss="${cmiss} sítio-obrigatório-sem-o-predicado:${_missing}"
   if [ -z "${cmiss}" ]; then
-    record_pass "kg-fixture-paths: (c) os ${_n_cons} consumidores DERIVADOS (6 obrigatórios conferidos por nome) invocam o predicado e nenhum guardou o grep próprio"
+    record_pass "kg-fixture-paths: (c) os ${_n_cons} consumidores DERIVADOS (5 obrigatórios conferidos por nome) invocam o predicado e nenhum guardou o grep próprio"
   else
     record_fail "kg-fixture-paths: (c) consumidores" "seis listas, um vocabulário —${cmiss}"
   fi
@@ -29833,7 +29877,7 @@ run_kg_fixture_paths_selftests() {
   #      verde por vacuidade em qualquer repo. Duas exigências, uma por sítio: caminho resolvido ANTES
   #      de qualquer cd, e ausência do predicado = exit != 0, nunca silêncio.
   local c fmiss=""
-  for c in kg-radar-integrity.sh kg-corpus-grep.sh kg-trace-resolve.sh kg-backlog-project.sh kg-verification-coverage.sh; do
+  for c in kg-radar-integrity.sh kg-corpus-grep.sh kg-backlog-project.sh kg-verification-coverage.sh; do
     [ -f "${SCRIPT_DIR}/${c}" ] || continue
     grep -q '_KFP="\$(cd "\$(dirname "\${BASH_SOURCE\[0\]}")" && pwd)/kg-fixture-paths.sh"' "${SCRIPT_DIR}/${c}" \
       || fmiss="${fmiss} ${c}:caminho-não-absoluto(morre após cd)"
@@ -33248,7 +33292,7 @@ run_kg_read_leg_selftests() {
   # vazia e o script prefere abortar) — o harness tem de copiar o motor INTEIRO, não só o topo.
   # É a classe `fail-closed-exposes-incomplete-harness`: trocar uma dependência para fail-closed
   # quebra todo harness que copiava o motor sem ela.
-  cp "${REPO_ROOT}/.claude/validation/kg-trace.sh" "${REPO_ROOT}/.claude/validation/kg-trace-resolve.sh" "${sbi}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/kg-trace.sh" "${sbi}/.claude/validation/"
   cp "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "${sbi}/.claude/validation/" 2>/dev/null || true
   printf '# alvo\n' > "${sbi}/src/alvo.ts"
   printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n  - id: C_X\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "src/alvo.ts"\nedges: []\n' > "${sbi}/docs/onion/graph/g.kg.yaml"
@@ -33350,6 +33394,23 @@ run_kg_read_leg_selftests() {
   else record_fail "kg-read-leg: (k)" "apontou nó de OUTRO arquivo por prefixo frouxo: ${ok:0:200}"; fi
   rm -rf "${sbk}"
 
+  # (l) DIRETÓRIO COM E SEM BARRA — desde a kg-ssot 4.25.1 o índice grava o diretório SEM barra (o contrato do
+  #     `resolved_targets`), e quem consulta escreve das duas formas (`ls .claude/skills/` e `.claude/skills`). O hook
+  #     tira a barra final do caminho consultado; sem isso a forma com barra ficava MUDA. E o (k) segue valendo: a
+  #     barra tirada não abre prefixo (`.claude/skills-old/` não casa `.claude/skills`).
+  local sbl; sbl="$(mktemp -d)"
+  mkdir -p "${sbl}/.claude/hooks" "${sbl}/docs/onion"
+  cp "${REPO_ROOT}/.claude/hooks/kg-read-leg.sh" "${sbl}/.claude/hooks/"
+  printf '.claude/skills\tC_NO_DO_DIR\tdocs/onion/graph/g.kg.yaml\n' > "${sbl}/docs/onion/kg-read-index.tsv"
+  local l1 l2 l3
+  l1="$(printf '{"tool_name":"Read","tool_input":{"file_path":"%s/.claude/skills/"}}' "${sbl}" | bash "${sbl}/.claude/hooks/kg-read-leg.sh" 2>&1 || true)"
+  l2="$(printf '{"tool_name":"Read","tool_input":{"file_path":"%s/.claude/skills"}}' "${sbl}" | bash "${sbl}/.claude/hooks/kg-read-leg.sh" 2>&1 || true)"
+  l3="$(printf '{"tool_name":"Read","tool_input":{"file_path":"%s/.claude/skills-old/"}}' "${sbl}" | bash "${sbl}/.claude/hooks/kg-read-leg.sh" 2>&1 || true)"
+  if grep -q 'C_NO_DO_DIR' <<< "${l1}" && grep -q 'C_NO_DO_DIR' <<< "${l2}" && [ -z "${l3}" ]; then
+    record_pass "kg-read-leg: (l) diretório com E sem barra casam a linha sem barra; a barra tirada não abre prefixo"
+  else record_fail "kg-read-leg: (l)" "com=${l1:0:80} sem=${l2:0:80} prefixo=${l3:0:80}"; fi
+  rm -rf "${sbl}"
+
   # (i) MÚLTIPLOS caminhos num só comando (`diff a.kg.yaml b.kg.yaml`). A 1ª redação tratava o
   #     alvo como string única: com dois caminhos ela casaria ZERO e o hook voltaria a ser mudo —
   #     a cura teria trocado um silêncio por outro.
@@ -33372,7 +33433,7 @@ run_kg_trace_root_file_selftests() {
   local sb out
   sb="$(mktemp -d)"
   mkdir -p "${sb}/.claude/validation" "${sb}/.claude/hooks" "${sb}/docs/onion/graph" "${sb}/pasta"
-  cp "${REPO_ROOT}/.claude/validation/kg-trace.sh" "${REPO_ROOT}/.claude/validation/kg-trace-resolve.sh" "${sb}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/kg-trace.sh" "${sb}/.claude/validation/"
   cp "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "${sb}/.claude/validation/" 2>/dev/null || true
   cp "${REPO_ROOT}/.claude/hooks/kg-read-leg.sh" "${sb}/.claude/hooks/"
   printf '# raiz\n' > "${sb}/CLAUDE.md"

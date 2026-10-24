@@ -1,6 +1,6 @@
 {
-  "version": "4.25.0",
-  "tag": "kg-ssot-v4.25.0",
+  "version": "4.25.1",
+  "tag": "kg-ssot-v4.25.1",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -80,6 +80,9 @@
       "tools/kg_i18n.py",
       "locale/",
       "tools/kg_validate.py",
+      "tools/kg_query.py",
+      "tools/kg_trace.py",
+      "spec/trace.schema.json",
       "tools/kg_gate.py",
       "tools/kg_vendor.py",
       "tools/requirements.txt"

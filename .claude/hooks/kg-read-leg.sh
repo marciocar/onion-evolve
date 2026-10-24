@@ -86,6 +86,10 @@ while IFS= read -r _t; do
   # (kg-trace.sh --emit-index, SAC-81). Os dois lados têm de concordar, senão nada casa.
   _rel="${_t#"${root}/"}"
   while :; do case "${_rel}" in ./*) _rel="${_rel#./}" ;; *) break ;; esac; done
+  # A barra final sai pelo mesmo motivo: desde a kg-ssot 4.25.1 o índice vem do `resolved_targets` do produto, cujo
+  # `path` NUNCA termina em barra (diretório inclusive), e quem consulta escreve `ls .claude/skills/` e
+  # `.claude/skills`. Só o sufixo: o casamento continua por igualdade de campo, então não abre prefixo.
+  while :; do case "${_rel}" in ?*/) _rel="${_rel%/}" ;; *) break ;; esac; done
   # `grep -F` com âncora de campo: o target é a 1ª coluna inteira, nunca um prefixo (senão
   # `kg.sh` casaria `kg.sh.bak` e o aviso apontaria nós de outro arquivo).
   _r="$(LC_ALL=C grep -F "$(printf '%s\t' "${_rel}")" "${IDX}" 2>/dev/null | LC_ALL=C awk -F'\t' -v a="${_rel}" '$1 == a' || true)"

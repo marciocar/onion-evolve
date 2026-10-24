@@ -508,13 +508,58 @@ nodes:
   - id: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
     node_type: question
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-10-24"
+    verified_against: "E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024: o kg-trace.sh --emit-index lê o resolved_targets da kg-ssot 4.25.1, o kg-trace-resolve.sh foi removido e o índice regenerado não tem nenhum dos três defeitos"
     impact: 3
     confidence: 0.6
     trace: ".claude/validation/kg-trace.sh"
     label: "O índice de leitura (docs/onion/kg-read-index.tsv) passa a ser gerado pelo JSON do kg_trace.py, e o kg-trace-resolve.sh é removido?"
-    narrative: "Gatilho: kg-ssot 4.25.1 adotada (o kg-ssot.trace/1 ganha, como campo aditivo, a lista dos traces que resolvem, com o caminho resolvido relativo à raiz; e o perfil gate passa a levar kg_trace.py e kg_query.py). Ato: o kg-trace.sh --emit-index lê os resolvidos do JSON; o kg-trace-resolve.sh sai; o índice regenerado cura os três defeitos conhecidos (5 ids com aspas no playbook-sdaal-2026-10, 1 caminho com ../, a 3ª raiz não indexada); os casos (g) e (j) da família kg_trace_resolve, que hoje PRENDEM esses defeitos, invertem; o ramo NAO-JULGOU da REGRA 84 (Índice de leitura do KG em sincronia com os traces), pronto e sem uso hoje, passa a valer. Pré-condições da troca (medidas na bancada da 4.25.1 pela sessão do kg-ssot): o resolved_targets dá o caminho de diretório SEM a barra final (26 linhas do índice atual têm dir/), e o kg-read-leg.sh casa a 1ª coluna por igualdade exata, então o gerador novo mantém a barra quando o alvo é diretório ou o hook normaliza; e o índice é regenerado no mesmo commit da troca, senão a REGRA 84 dá HARD. Fecha com o índice sem nenhum dos três e o grep -w kg-trace-resolve zero fora de histórico."
+    narrative: "Gatilho: kg-ssot 4.25.1 adotada (o kg-ssot.trace/1 ganha, como campo aditivo, a lista dos traces que resolvem, com o caminho resolvido relativo à raiz; e o perfil gate passa a levar kg_trace.py e kg_query.py). Ato: o kg-trace.sh --emit-index lê os resolvidos do JSON; o kg-trace-resolve.sh sai; o índice regenerado cura os três defeitos conhecidos (5 ids com aspas no playbook-sdaal-2026-10, 1 caminho com ../, a 3ª raiz não indexada); os casos (g) e (j) da família kg_trace_resolve, que hoje PRENDEM esses defeitos, invertem; o ramo NAO-JULGOU da REGRA 84 (Índice de leitura do KG em sincronia com os traces), pronto e sem uso hoje, passa a valer. Pré-condições da troca (medidas na bancada da 4.25.1 pela sessão do kg-ssot): o resolved_targets dá o caminho de diretório SEM a barra final (26 linhas do índice atual têm dir/), e o kg-read-leg.sh casa a 1ª coluna por igualdade exata, então o gerador novo mantém a barra quando o alvo é diretório ou o hook normaliza; e o índice é regenerado no mesmo commit da troca, senão a REGRA 84 dá HARD. Fecha com o índice sem nenhum dos três e o grep -w kg-trace-resolve zero fora de histórico. Fechado em 2026-10-24 (E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024): das duas saídas da pré-condição da barra, ficou a do hook, que tira a barra final do caminho consultado; o gerador segue o contrato do produto e não recoloca barra."
+  - id: E_KG_SSOT_4251_ADOTADA_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-24"
+    verified_against: "kg_vendor.py update --tag kg-ssot-v4.25.1 rc 0 (8980b95e6ad7, 627 arquivos; mudaram kg_trace.py, kg_vendor.py, spec/trace.schema.json, spec/release.json e a documentação); ops/kg-gate-ci.sh rc 0 sem --update; kg_trace.py check: 2.504 julgados, 2.504 resolvem, 0 missing; o perfil gate do spec/release.json passa a listar tools/kg_query.py e tools/kg_trace.py"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.25.1 (o kg-ssot.trace/1 ganha resolved_targets, aditivo, e o perfil gate leva kg_trace.py e kg_query.py) entrou no core pelo kg_vendor.py update, com o gate do contrato verde"
+    narrative: "Os dois achados que o core enviou ao kg-ssot na adoção da 4.25.0 saíram nesta versão e foram medidos aqui: o JSON do check traz, para cada trace que resolve, {file, id, node_type, target, path, kind}, com o path relativo à raiz, sem barra final e com kind file|dir; e o perfil gate do release.json passa a levar kg_trace.py e kg_query.py, então o adotante com esse perfil deixa de cair no NAO-JULGOU da REGRA 55 (O trace: de um nó APONTA para alvo que EXISTE) ao subir para a 4.25.1. No mesmo PR o índice de leitura passou ao produto (E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024)."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version, vendor/kg-ssot/spec/trace.schema.json e vendor/kg-ssot/spec/release.json"
+      locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
+      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
+      locality: "repo"
+  - id: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-24"
+    verified_against: "na branch chore/kg-ssot-4-25-1 sobre origin/main fbd4f76c: índice gerado do resolved_targets = 2.504 linhas, o versionado antes = 2.504; 2.473 iguais e 31 diferentes, todas curas (26 diretórios dir/ → dir, 5 ids sem as aspas do playbook-sdaal-2026-10, 1 caminho sem ../ do D_NO_VENDOR_RADAR); normalizadas as três formas, 2.504/2.504; bancada kg_trace_resolve, kg_fixture_paths, kg_read_leg e kg_trace_root_file 42/42, com 5 mutantes mortos (hook sem tirar a barra, gerador sem recusar JSON da 4.25.0, lint sem ler o marcador resolved_targets, gerador emitindo target em vez de path, índice vazio com rc 0)"
+    trace: ".claude/validation/kg-trace.sh"
+    label: "O índice de leitura do KG (docs/onion/kg-read-index.tsv) é gerado pelo resolved_targets do kg_trace.py, o hook kg-read-leg.sh tira a barra final do caminho consultado, e o resolvedor awk da casa (kg-trace-resolve.sh) foi removido"
+    narrative: "O kg-trace.sh --emit-index lê o JSON do produto e emite path·id·file, ordenado em bytes (o mesmo LC_ALL=C sort -u de antes), sem API interna do vendor. Os três defeitos que o índice carregava sumiram de uma vez: id entre aspas, o ../ da 2ª raiz e a 3ª raiz (pasta pai do grafo) fora do índice. O contrato do produto diz que o path nunca termina em barra, nem em diretório; o hook passou a tirar a barra final do caminho consultado, e a igualdade de campo segue, então a barra tirada não abre prefixo (caso l da bancada). O que o gerador recusa em vez de esconder: vendor sem o kg_trace.py ou sem os vizinhos (rc 2, o marcador 'kg_trace.py ausente'), JSON sem resolved_targets, que é a forma da 4.25.0 (rc 2, NAO-GEROU, com 'resolved_targets' no stderr), produto com rc fora de 0 e 1 (rc 2, NAO-GEROU) e zero resolvidos (rc 3, VAZIO). A REGRA 84 (Índice de leitura do KG em sincronia com os traces) lê os dois marcadores do rc 2 como NAO-JULGOU, SOFT, nunca HARD nem verde; grafo ilegível vai ao stderr como aviso e fica com a REGRA 55. Externas: memory/ segue fora do índice, como antes (o produto a declara com --external-root e não a lista nos resolvidos). Resto nomeado do nome antigo: menções datadas como lição em comentários de guardas (kg-seal-check.sh, consumed-mode-check.sh, kg-fixture-paths.sh, injected-cut-check.sh, lint-artifacts.sh), o fallback do regen-ssot-projections.sh para o arquivo do ALVO num pin anterior a 2026-10-24, e o histórico (resíduos de review, pesquisa e inbox processado)."
+    provenance:
+      source: ".claude/validation/kg-trace.sh, .claude/hooks/kg-read-leg.sh, check_kg_read_index_sync de .claude/validation/lint-artifacts.sh e as famílias kg_trace_resolve e kg_read_leg de .claude/validation/lint-selftest.sh"
+      locator: "comparação do índice antes e depois; casos (g), (j), (j2), (j3), (j4) da família kg_trace_resolve e (l) da kg_read_leg; os cinco mutantes"
+      method: "medição: geração do índice pelos dois caminhos, diff com normalização e bancada com mutantes"
+      locality: "repo"
 edges:
+  - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
+    to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
+    edge_type: SUPPORTS
+  - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
+    to: E_KG_SSOT_4251_ADOTADA_1024
+    edge_type: DEPENDS_ON
+  - from: E_KG_SSOT_4251_ADOTADA_1024
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
   - from: E_REGRA_55_PASSA_AO_KG_TRACE_1024
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS

@@ -51,7 +51,7 @@ mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs
 # sai do laço — mas pertence à mesma lista por natureza: projeção GERADA com catraca no lint.
 # O gerador é o do ALVO, e o alvo pode ser de antes de 2026-10-24 (a porta materializada de origin/main, o adotante
 # num pin velho), quando a porta única kg-trace.sh ainda não existia: cai no kg-trace-resolve.sh, que tem o mesmo
-# `--emit-index`. Medido: sem o fallback a porta standalone nascia SEM o índice e o materialize-door abortava.
+# `--emit-index` (o arquivo do ALVO; no core ele foi removido em 2026-10-24). Medido: sem o fallback a porta standalone nascia SEM o índice e o materialize-door abortava.
 _kgi="${DEST}/.claude/validation/kg-trace.sh"
 [ -f "${_kgi}" ] || _kgi="${DEST}/.claude/validation/kg-trace-resolve.sh"
 if [ -f "${_kgi}" ]; then

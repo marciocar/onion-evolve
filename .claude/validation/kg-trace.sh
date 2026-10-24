@@ -2,18 +2,17 @@
 # kg-trace.sh — a REGRA 55 e o índice de leitura do KG, julgados pelo PARSER DO PRODUTO (kg-ssot `kg_trace.py`).
 #
 # ═══ POR QUE EXISTE (2026-10-24) ═══
-# Até a 4.25 do kg-ssot, a casa mantinha o próprio resolvedor de `trace:` (o kg-trace-resolve.sh, ~290 linhas de
-# awk, que nesta data saiu do julgamento e ficou só para o índice): ele julgava a REGRA 55 (O `trace:` de um nó APONTA para alvo que EXISTE) e emitia o
+# Até a 4.25 do kg-ssot, a casa mantinha o próprio resolvedor de `trace:` (~290 linhas de
+# awk, que em 2026-10-24 saiu do julgamento e, com a 4.25.1, foi removido): ele julgava a REGRA 55 (O `trace:` de um nó APONTA para alvo que EXISTE) e emitia o
 # índice de leitura. A 4.25 trouxe o `kg_trace.py` (`kg-ssot.trace/1`), que é aquela gramática promovida ao produto.
 # Medido na main de 2026-10-24: 2.501 julgados nos dois, 2.501 resolvem, 0 a mais e 0 a menos.
 # Este script NÃO tem parser: o julgamento é o `kg_trace.py check`. O que fica aqui é só o que o produto não faz:
 # (1) o TSV que o lint consome, (2) a guarda de vacuidade da casa e (3) a porta única do índice de leitura.
-# O ÍNDICE AINDA NÃO É DO PRODUTO: o `kg-ssot.trace/1` da 4.25.0 não traz os traces que resolvem, e a API interna
-# do vendor (`kg_trace.classify`) não é contrato. Até a kg-ssot 4.25.1 (que traz os resolvidos no JSON), o
-# `--emit-index` delega ao kg-trace-resolve.sh, restrito a esse uso — com os defeitos dele no índice: id entre
-# aspas COM as aspas (5 nós), alvo da 2ª raiz sem normalizar (1), 3ª raiz não indexada. Gatilho no nó
-# Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251 (sinais-de-campo-2026-09). Os consumidores já chamam este script, então a
-# troca será só aqui.
+# O ÍNDICE TAMBÉM É DO PRODUTO desde a kg-ssot 4.25.1: o `--emit-index` lê o `resolved_targets` do JSON
+# `kg-ssot.trace/1` (`{file, id, node_type, target, path, kind}`) e emite `path·id·file`. O `path` NUNCA termina
+# em barra (nem diretório; `kind` file|dir é o sinal), e o hook kg-read-leg.sh tira a barra do caminho consultado
+# para casar. O resolvedor antigo da casa foi removido nesta troca, e com ele os defeitos que o índice
+# carregava: id entre aspas COM as aspas, alvo da 2ª raiz com `../` e 3ª raiz não indexada.
 #
 # A raiz externa `memory/` (a memória da sessão, fora do repo) é declarada ao produto com --external-root.
 #
@@ -23,7 +22,8 @@
 # Exit : 0 = todo `trace:` julgável resolve / índice emitido · 1 = TARGET-MISSING, grafo ilegível ou VACUIDADE
 #        2 = sem o produto (kg_trace.py, seus vizinhos ou python3 ausentes) ou entrada quebrada
 #        3 = (--emit-index) índice VAZIO: nenhum nó com trace resolvível — legítimo no dia 1 do adotante
-#        (o --emit-index devolve o rc do kg-trace-resolve.sh, que tem o mesmo contrato)
+#        (--emit-index) 2 também quando o vendor é anterior à 4.25.1 (JSON sem `resolved_targets`): NAO-GEROU,
+#        nunca índice vazio
 # Env  : ONION_KG_TRACE — caminho do kg_trace.py (default: <repo_root>/vendor/kg-ssot/tools/kg_trace.py; a bancada
 #        aponta o do core quando roda numa caixa de areia sem vendor).
 set -euo pipefail
@@ -32,13 +32,6 @@ REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)
   printf 'kg-trace: repo_root inválido\n' >&2; exit 2; }
 MODE=human
 for a in "$@"; do case "$a" in tsv|--format=tsv) MODE=tsv ;; --emit-index) MODE=index ;; esac; done
-if [ "${MODE}" = index ]; then
-  # ATÉ A kg-ssot 4.25.1: o índice segue no resolvedor da casa, restrito a este uso (ver o cabeçalho dele). O
-  # trace/1 da 4.25.0 não traz os traces que resolvem, e a API interna do vendor (classify) não é contrato.
-  _R="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-trace-resolve.sh"
-  [ -f "${_R}" ] || { echo "ERRO kg-trace --emit-index: gerador do índice ausente (${_R})" >&2; exit 2; }
-  exec bash "${_R}" "${REPO_ROOT}" --emit-index
-fi
 KT="${ONION_KG_TRACE:-${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py}"
 # o próprio produto KG-SSOT (tools/ na raiz, sem vendor de si mesmo) se julga pelo kg_trace.py dele
 [ -n "${ONION_KG_TRACE:-}" ] || [ -f "${KT}" ] || [ ! -f "${REPO_ROOT}/tools/kg_trace.py" ] || KT="${REPO_ROOT}/tools/kg_trace.py"
@@ -49,6 +42,35 @@ _KTD="$(dirname "${KT}")"
 { [ -f "${KT}" ] && [ -f "${_KTD}/kg_query.py" ] && [ -f "${_KTD}/kg_validate.py" ]; } || {
   echo "ERRO kg-trace: kg_trace.py ausente ou incompleto (${KT}, com kg_query.py e kg_validate.py ao lado) — o vendor kg-ssot >= 4.25, perfil completo, é quem julga o trace" >&2; exit 2; }
 
+
+if [ "${MODE}" = index ]; then
+  # O rc do produto é lido, nunca a prosa: 0|1 trazem o JSON (1 = há missing ou grafo ilegível, que a REGRA 55
+  # acusa; o índice segue com o que resolve). Outro rc, JSON ilegível ou sem `resolved_targets` = NAO-GEROU, rc 2.
+  _kj="$(mktemp)"; trap 'rm -f "${_kj}"' EXIT
+  _krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ --format json >"${_kj}" 2>/dev/null || _krc=$?
+  case "${_krc}" in 0|1) : ;; *) echo "ERRO kg-trace --emit-index NAO-GEROU: kg_trace.py rc=${_krc}" >&2; exit 2 ;; esac
+  _irc=0
+  python3 -I -B - "${_kj}" <<'PY' || _irc=$?
+import json, sys
+try:
+    d = json.load(open(sys.argv[1], encoding="utf-8"))
+except (OSError, ValueError):
+    print("ERRO kg-trace --emit-index NAO-GEROU: JSON do kg_trace.py ilegível", file=sys.stderr); sys.exit(2)
+rt = d.get("resolved_targets")
+if not isinstance(rt, list):
+    print("ERRO kg-trace --emit-index NAO-GEROU: o JSON não traz resolved_targets — o vendor kg-ssot é anterior à "
+          "4.25.1 (suba o vendor)", file=sys.stderr); sys.exit(2)
+if d.get("unreadable"):
+    # Não esconde: o grafo ilegível fica fora do índice, e a REGRA 55 o acusa como ILEGIVEL.
+    print(f"AVISO kg-trace --emit-index: {len(d['unreadable'])} grafo(s) ilegível(is) fora do índice", file=sys.stderr)
+rows = sorted({f"{r['path']}\t{r['id']}\t{r['file']}" for r in rt}, key=lambda x: x.encode("utf-8"))
+if not rows:
+    print("ERRO kg-trace --emit-index: índice VAZIO (o produto leu 0 nós com trace resolvível)", file=sys.stderr)
+    sys.exit(3)
+sys.stdout.write("\n".join(rows) + "\n")
+PY
+  exit "${_irc}"
+fi
 
 if [ "${MODE}" = human ]; then
   python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/

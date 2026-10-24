@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:trace.schema.json",
   "title": "Saída de kg_trace.py check --format json",
-  "description": "Desde a 4.25.0. Não é veredito do contrato: o leitor não toca o disco. O check confere, a partir da raiz do repo, a âncora trace: de cada nó: o texto até o primeiro : ou #, julgado só quando parece caminho do repo (absoluto ou URL, prefixo externo declarado e não-caminho são contados à parte, nunca em silêncio; o nome sem barra só entra quando é um arquivo rastreado na raiz com o nome exato e sem homônimo ao lado do grafo). Resolve quando existe na raiz, na pasta do grafo ou na pasta pai dele (esta só quando o grafo não está na raiz); um alvo fora da raiz não resolve. missing traz integrity.trace-target-missing. graphs conta os grafos lidos; skipped.not_text, o trace que não é texto. O rc é 1 com missing ou com grafo ilegível.",
+  "description": "Desde a 4.25.0. Não é veredito do contrato: o leitor não toca o disco. O check confere, a partir da raiz do repo, a âncora trace: de cada nó: o texto até o primeiro : ou #, julgado só quando parece caminho do repo (absoluto ou URL, prefixo externo declarado e não-caminho são contados à parte, nunca em silêncio; o nome sem barra só entra quando é um arquivo rastreado na raiz com o nome exato e sem homônimo ao lado do grafo). Resolve quando existe na raiz, na pasta do grafo ou na pasta pai dele (esta só quando o grafo não está na raiz); um alvo fora da raiz não resolve. resolved_targets (desde a 4.25.1, aditivo e fora do required, para que a saída da 4.25.0 siga válida) diz, para cada trace resolvido, o arquivo e o id do nó, o alvo julgado, o path do que o check viu existir (relativo à raiz, com os links seguidos, para que um link seguido de .. não aponte para outro arquivo) e o kind, file ou dir (o path nunca termina em barra, nem no diretório: quem casa por igualdade usa o kind, não a barra); é a lista de que um índice de leitura precisa. missing traz integrity.trace-target-missing. graphs conta os grafos lidos; skipped.not_text, o trace que não é texto. O rc é 1 com missing ou com grafo ilegível.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -29,6 +29,47 @@
     "resolved": {
       "type": "integer",
       "minimum": 0
+    },
+    "resolved_targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "id",
+          "node_type",
+          "target",
+          "path",
+          "kind"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "node_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "file",
+              "dir"
+            ]
+          }
+        }
+      }
     },
     "missing": {
       "type": "array",

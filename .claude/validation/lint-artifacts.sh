@@ -1079,7 +1079,7 @@ check_kg_backlog() {
 #   4 casos reais e contradiria a própria emenda.
 #   ESCOPO FECHADO, e é o que autoriza HARD com N=1: só julga run que DECLARA `ledger:` no
 #   frontmatter da SYNTHESIS. Repo sem nenhum (o adotante que nunca rodou /meta:kg-freshness)
-#   emite ISENÇÃO CONTADA. É a lição do vexame escrito em kg-trace-resolve.sh: aquela regra
+#   emite ISENÇÃO CONTADA. É a lição do vexame escrito no kg-trace-resolve.sh (removido em 2026-10-24): aquela regra
 #   varria TODOS os grafos e acusou 11 falsos no 1º adotante — "o CORE É O PIOR ORÁCULO DO QUE
 #   VIAJA". Aqui a superfície é fechada e conhecida.
 #   TETO DECLARADO: julga se o veredito virou ESCRITA no grafo, nunca se a medição estava
@@ -2632,7 +2632,7 @@ check_kg_read_index_sync() {
   # ⚠️ O `2>/dev/null || true` DA 1a VERSAO COLAPSAVA DOIS MUNDOS, e o preco foi medido em 2026-09-24
   # adotando um repo novo: o gate do adotante BARROU O PRIMEIRO COMMIT dele por este HARD. A causa nao
   # era defeito nenhum do adotante — o corpus dele tem UM grafo (a semente da adocao) cujo `trace:` e
-  # PROSA, e prosa e LEGITIMA pelo contrato do proprio resolvedor (kg-trace-resolve.sh:33-34; hoje também o `not_path` do kg_trace.py, que julga a REGRA 55: "nao
+  # PROSA, e prosa e LEGITIMA pelo contrato do proprio resolvedor (o kg-trace-resolve.sh, removido em 2026-10-24; hoje o `not_path` do kg_trace.py, que julga a REGRA 55: "nao
   # parece caminho → nome solto, chave de config, comando, prosa. `trace:` aceita mais que arquivo").
   # Indice vazio ali e o estado NORMAL do dia 1, nao falha de ambiente.
   # E o gerador JA DISTINGUE os dois casos: sai 3 com "indice VAZIO (parser leu 0 nos com trace
@@ -2646,11 +2646,10 @@ check_kg_read_index_sync() {
   if [ -z "${new_index}" ]; then
     # `grep -F` com termo ASCII: o hook roda em locale C e acento nao casa classe multibyte (licao
     # `bancada-mede-no-locale-do-hook`). "VAZIO" e "resolv" bastam e sao ASCII.
-    if [ "${gen_rc}" -eq 2 ] && grep -qF 'kg_trace.py ausente' "${gen_err}"; then
-      # Ramo PRONTO PARA A kg-ssot 4.25.1, quando o gerador passa a ser o parser do PRODUTO (nó
-      # Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251). Hoje o --emit-index delega ao kg-trace-resolve.sh e não emite
-      # este marcador. Sem o vendor não haveria gerador, e isso é dito como não-julgado, nunca como defasado.
-      violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/NAO-JULGOU] o gerador é o kg_trace.py do vendor kg-ssot >= 4.25, e ele está ausente — ESTA REGRA NÃO VERIFICOU o índice. Suba o vendor (/meta:adopt --update)."
+    if [ "${gen_rc}" -eq 2 ] && { grep -qF 'kg_trace.py ausente' "${gen_err}" || grep -qF 'resolved_targets' "${gen_err}"; }; then
+      # Desde a kg-ssot 4.25.1 o gerador é o `resolved_targets` do PRODUTO. Vendor ausente (perfil `gate`) ou
+      # anterior à 4.25.1 (JSON sem o campo) não tem gerador, e isso é dito como não-julgado, nunca como defasado.
+      violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/NAO-JULGOU] o gerador é o \`resolved_targets\` do kg_trace.py do vendor kg-ssot >= 4.25.1, perfil completo, e ele está ausente ou é anterior — ESTA REGRA NÃO VERIFICOU o índice. Suba o vendor (/meta:adopt --update)."
     elif [ "${gen_rc}" -eq 3 ] && grep -qF 'VAZIO' "${gen_err}" && grep -qF 'resolv' "${gen_err}"; then
       violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/CORPUS-SEM-TRACE-DE-ARQUIVO] o corpus nao tem NENHUM nó cujo \`trace:\` resolva para arquivo — índice vazio LEGÍTIMO (é o dia 1 de todo adotante: a semente da adoção tem trace em prosa, e prosa é válida). A perna de leitura nada tem a indexar ainda; ela liga sozinha quando o primeiro nó com trace de ARQUIVO nascer. Nada a corrigir."
     else
