@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:2972e3ae88b98f49 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:633f39db35cd54a1 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.23.0",
+  "release": "kg-ssot-v4.25.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -295,6 +295,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 | `--profile gate` | Traz só o mínimo para rodar o gate e o check (12 arquivos desde a 4.18.0, sem a suíte); `--profile full` volta à release inteira |
 | `--force` | Substitui um vendor editado localmente |
 | `--index` (no `check`) | Confere o índice do git em vez da árvore de trabalho |
+| `--ref COMMIT` (no `update`) | A bancada antes da tag (4.24): traz um commit que ainda não é release, de um repositório a que você chega. O carimbo diz `unreleased` |
+| `--allow-unreleased` (no `check` e no `kg_gate.py`) | Aceita um vendor de bancada. Sem ele, o check e o gate reprovam esse vendor (e o `kg_gate.py` nunca grava a base a partir de um) |
 
 **Por que `-B`?** Os scripts do kit não gravam bytecode, mas uma ferramenta sua que **importa** um módulo do kit
 grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `python3 -I -B`, ou com
@@ -966,6 +968,40 @@ python3 -I -B vendor/kg-ssot/tools/kg_audit.py --root . --format csv --view evid
 - **Saída e rc.** rc 0 quando exportou, 1 quando um grafo não se lê (o pacote ficaria incompleto em silêncio) ou, com
   `--fail-on-gap`, quando um item tem lacuna ou algo foi pulado, e 2 com entrada quebrada. O `xlsx` pede `--output`. Dê o corpus com
   `--root`: a aresta para outro grafo se resolve pelo caminho a partir da raiz.
+
+## `kg_trace.py`: o trace que não resolve (4.25.0)
+
+O `trace:` de um nó diz onde mora o "porquê" dele. O leitor confere que ele está lá, nunca que ainda aponta para algo:
+o leitor não toca o disco, então roda em qualquer lugar, inclusive em JavaScript. Um `trace:` que aponta para um
+arquivo movido ou renomeado passa no gate e engana quem volta a ele. Esta ferramenta confere a âncora a partir da raiz
+do repositório, como o `kg_criterion.py` confere um `sha256`.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root .
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root memory/ --format json
+```
+
+- **O que ele lê.** Os `.kg.yaml` e `.kg.json` que o git rastreia sob a raiz, fora do vendor, de `docs/materials/` e
+  das pastas de fixture (`fixture/`, `fixtures/`, `__fixtures__/`, `testdata/`, `__snapshots__/`, em qualquer nível). O
+  `--exclude` soma padrões, e o `--no-default-excludes` tira os padrões. Um trace que não é texto conta como
+  `not_text`; um nó com id repetido ou fora de texto, que o gate já reprova no MUST, não é lido aqui. Se os seus grafos
+  ancoram numa pasta de fora do repositório (a memória de uma sessão), o check fica vermelho até que você a declare com
+  `--external-root`. Sem nenhum grafo lido, ele avisa.
+- **O que é julgado.** O texto do trace até o primeiro `:` ou `#` (`arquivo:linha`, `arquivo#seção`), e só quando
+  parece caminho do repositório. Fora de julgamento, e contados à parte, nunca em silêncio:
+  - `absolute`: um caminho absoluto ou uma URL (outra máquina ou rede);
+  - `external_root`: um prefixo que você declara com `--external-root` (uma pasta que mora fora do repositório);
+  - `not_path`: um caractere fora de `[A-Za-z0-9_./-]` (um comando, prosa), um nome sem barra (palavra solta, chave de
+    configuração), ou o primeiro segmento com ponto e sem começar por ponto (um hostname, `support.example.com/...`).
+
+  Um nome sem barra só entra quando é um arquivo rastreado na raiz do repositório com o nome exato (`ARCHITECTURE.md`), e
+  nenhum arquivo de mesmo nome fica ao lado do grafo nem na pasta pai dele. `./x` e `x` são o mesmo alvo.
+- **Onde resolve.** Na raiz do repositório, na pasta do grafo ou na pasta pai do grafo (esta só quando o grafo não está
+  na raiz). Um alvo que sai da raiz (`../irmão/x`) não resolve: o clone do CI não o tem.
+- **Saída e rc.** Cada alvo que não resolve é `integrity.trace-target-missing`. `--format json` dá `kg-ssot.trace/1`
+  (`spec/trace.schema.json`). rc 0 quando todo trace julgado resolve, 1 com um alvo faltando ou um grafo que não se lê,
+  2 com entrada quebrada. Estas regras vêm do resolvedor de um adotante medido em milhares de traces; cada corte foi
+  pago por um falso positivo.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 

@@ -348,9 +348,12 @@ msgid ""
 "writes with --accept-regression \"<reason>\", and the reason stays in the baseline. rc 2: broken input (not a git\n"
 "repository, unreadable or out-of-format baseline, missing baseline without --update, unreadable .kg.yaml).\n"
 "\n"
+"Run from a vendor brought by kg_vendor.py update --ref (the bench before a tag; the stamp says unreleased), the gate\n"
+"fails (rc 1) unless --allow-unreleased is given, and it never writes the baseline from one.\n"
+"\n"
 "Usage:\n"
 "  kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]\n"
-"             [--strict-identity] [--update [--accept-regression REASON] [--granularity graph|node]]\n"
+"             [--strict-identity] [--allow-unreleased] [--update [--accept-regression REASON] [--granularity graph|node]]\n"
 msgstr ""
 "O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.\n"
 "\n"
@@ -370,9 +373,12 @@ msgstr ""
 "--accept-regression \"<motivo>\", e o motivo fica na base. rc 2: entrada quebrada (não é repo git, base ilegível ou\n"
 "fora do formato, base ausente sem --update, .kg.yaml ilegível).\n"
 "\n"
+"Rodando de um vendor trazido pelo kg_vendor.py update --ref (a bancada antes da tag; o carimbo diz unreleased), o gate\n"
+"reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.\n"
+"\n"
 "Uso:\n"
 "  kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]\n"
-"             [--strict-identity] [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
+"             [--strict-identity] [--allow-unreleased] [--update [--accept-regression MOTIVO] [--granularity graph|node]]\n"
 
 #: tools/kg_gate.py
 msgid "accepted regression out of format: each one is an object"
@@ -531,10 +537,6 @@ msgid "✗ --update refused: something got worse. Fix it, or accept it with --ac
 msgstr "✗ --update recusado: algo piorou. Corrija, ou aceite com --accept-regression \"<motivo>\" (fica na base)"
 
 #: tools/kg_gate.py
-msgid "✗ --update refused: the vendor contract differs from the stamp"
-msgstr "✗ --update recusado: o contrato do vendor diverge do carimbo"
-
-#: tools/kg_gate.py
 msgid "✗ WORSE  {what}"
 msgstr "✗ PIOROU  {what}"
 
@@ -549,6 +551,22 @@ msgstr "✗ contrato do vendor diverge do carimbo: {rel} (rode kg_vendor.py chec
 #: tools/kg_gate.py
 msgid "✗ vendor without a stamp: {stamp} is missing (run kg_vendor.py check; the gate has nothing to verify the contract against)"
 msgstr "✗ vendor sem carimbo: {stamp} ausente (rode kg_vendor.py check; o gate não tem contra o que conferir o contrato)"
+
+#: tools/kg_gate.py
+msgid "the bench before a tag: accepts a vendor brought by kg_vendor.py update --ref (never with --update)"
+msgstr "a bancada antes da tag: aceita um vendor trazido pelo kg_vendor.py update --ref (nunca com --update)"
+
+#: tools/kg_gate.py
+msgid "✗ --update refused: a bench vendor (unreleased) never writes the baseline; compare without --update"
+msgstr "✗ --update recusado: um vendor de bancada (unreleased) nunca grava a base; compare sem --update"
+
+#: tools/kg_gate.py
+msgid "✗ --update refused: the vendor does not pass its stamp (see above)"
+msgstr "✗ --update recusado: o vendor não passa no próprio carimbo (veja acima)"
+
+#: tools/kg_gate.py
+msgid "✗ bench vendor: {stamp} says unreleased (commit {commit}); a release comes from update --tag, and the bench passes --allow-unreleased"
+msgstr "✗ vendor de bancada: o {stamp} diz unreleased (commit {commit}); uma release vem do update --tag, e a bancada passa --allow-unreleased"
 
 #: tools/kg_mcp.py
 msgid "--allow-remote without --secret-env: outside the loopback, every request must carry the secret"
@@ -2288,6 +2306,14 @@ msgstr "Dois termos vivos têm a mesma notation no mesmo esquema: um código nom
 msgid "Give one of them another notation, put them in different schemes (x_term.scheme), or retire the old term (status superseded, with SUPERSEDES from the new one)."
 msgstr "Dê a um deles outra notation, ponha os dois em esquemas diferentes (x_term.scheme) ou aposente o termo antigo (status superseded, com SUPERSEDES do novo)."
 
+#: tools/kg_validate.py
+msgid "Point trace: to where the file is now (it was moved or renamed?), or to the commit that had it."
+msgstr "Aponte o trace: para onde o arquivo está agora (foi movido ou renomeado?), ou para o commit que o tinha."
+
+#: tools/kg_validate.py
+msgid "The node's trace: points to a path that does not exist in the repository."
+msgstr "O trace: do nó aponta para um caminho que não existe no repositório."
+
 #: tools/kg_vendor.py
 msgid "--source {source} is not a git repository"
 msgstr "--source {source} não é um repositório git"
@@ -2316,7 +2342,12 @@ msgid ""
 "      the check (contract, reader, gate, vendor, requirements, guide and license), without the suite. The stamp\n"
 "      records the profile, check verifies only what the profile brought, and the next update INHERITS the\n"
 "      profile from the stamp; --profile full goes back to the whole release.\n"
-"  check [--dest DIR] [--index]\n"
+"  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]\n"
+"      Only for the bench before a tag (since 4.24): brings the tree of a commit that is not a release yet, with\n"
+"      whatever spec/release.json it has (its version may still be the previous one). The stamp says \"unreleased\"\n"
+"      in place of the tag and keeps the commit, and check refuses that vendor (rc 1) without --allow-unreleased:\n"
+"      a bench vendor never passes for a release in an adopter's CI.\n"
+"  check [--dest DIR] [--index] [--allow-unreleased]\n"
 "      Recomputes the sha256 values and compares them with the stamp: a file edited, missing or extra (including\n"
 "      bytecode in __pycache__ and symlinks) → rc 1. With --index, verifies the blobs in the git index (the stamp\n"
 "      is also read from the index) instead of the working tree: that is what the commit will carry, and it\n"
@@ -2352,7 +2383,12 @@ msgstr ""
 "      rodar o gate e o check (contrato, leitor, gate, vendor, requirements, guia e licença), sem a suíte. O carimbo\n"
 "      registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;\n"
 "      --profile full volta à release inteira.\n"
-"  check [--dest DIR] [--index]\n"
+"  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]\n"
+"      Só para a bancada antes da tag (desde a 4.24): traz a árvore de um commit que ainda não é release, com o\n"
+"      spec/release.json que ele tiver (a versão dele pode ser a anterior). O carimbo diz \"unreleased\" no lugar da\n"
+"      tag e guarda o commit, e o check recusa esse vendor (rc 1) sem --allow-unreleased: um vendor de bancada nunca\n"
+"      passa por release no CI do adotante.\n"
+"  check [--dest DIR] [--index] [--allow-unreleased]\n"
 "      Recalcula os sha256 e compara com o carimbo: arquivo editado, faltando ou sobrando (inclusive bytecode em\n"
 "      __pycache__ e symlink) → rc 1. Com --index, confere os blobs do índice do git (o carimbo também lido do\n"
 "      índice) em vez da árvore de trabalho: é o que o commit vai levar, e pega antes do commit uma normalização\n"
@@ -2534,6 +2570,30 @@ msgstr "✗ faltando {path} (o carimbo da {version} foi gravado por um kg_vendor
 #: tools/kg_vendor.py
 msgid "✗ symlink  {path}"
 msgstr "✗ symlink  {path}"
+
+#: tools/kg_vendor.py
+msgid "--ref {ref}: give a commit"
+msgstr "--ref {ref}: dê um commit"
+
+#: tools/kg_vendor.py
+msgid "BENCH ONLY  the stamp says unreleased: check fails on this vendor without --allow-unreleased"
+msgstr "SÓ PARA BANCADA  o carimbo diz unreleased: o check reprova este vendor sem --allow-unreleased"
+
+#: tools/kg_vendor.py
+msgid "UNRELEASED VENDOR  {dest} came from commit {commit} (update --ref, the bench before a tag), not from a release: bring a tag with update --tag"
+msgstr "VENDOR FORA DE RELEASE  {dest} veio do commit {commit} (update --ref, a bancada antes da tag), não de uma release: traga uma tag com update --tag"
+
+#: tools/kg_vendor.py
+msgid "a commit that is not a release yet, only for the bench before a tag"
+msgstr "um commit que ainda não é release, só para a bancada antes da tag"
+
+#: tools/kg_vendor.py
+msgid "accepts a bench vendor (update --ref); without it, that vendor fails"
+msgstr "aceita o vendor de bancada (update --ref); sem isso, esse vendor reprova"
+
+#: tools/kg_vendor.py
+msgid "commit {ref} does not exist in {source}"
+msgstr "o commit {ref} não existe em {source}"
 
 #: tools/kg_vocab.py
 msgid "for lookup, the text first; then .kg.yaml or .kg.json files (or --root)"
@@ -3046,3 +3106,39 @@ msgstr "o x_measured_under não é um mapa com uma lista criteria"
 #: tools/kg_criterion.py
 msgid "an item of criteria has no criterion in text: {item}"
 msgstr "um item de criteria não tem criterion em texto: {item}"
+
+#: tools/kg_trace.py
+msgid "--external-root takes a relative prefix"
+msgstr "o --external-root pede um prefixo relativo"
+
+#: tools/kg_trace.py
+msgid "PREFIX"
+msgstr "PREFIXO"
+
+#: tools/kg_trace.py
+msgid "The trace that does not resolve: each node's trace: anchor against the files of the repository."
+msgstr "O trace que não resolve: a âncora trace: de cada nó contra os arquivos do repositório."
+
+#: tools/kg_trace.py
+msgid "a trace prefix that lives outside the repository (repeatable), counted apart"
+msgstr "um prefixo de trace que mora fora do repositório (repetível), contado à parte"
+
+#: tools/kg_trace.py
+msgid "also read the vendor and the fixtures"
+msgstr "lê também o vendor e as fixtures"
+
+#: tools/kg_trace.py
+msgid "paths to leave out (repeatable), added to the defaults"
+msgstr "caminhos que ficam de fora (repetível), somados aos padrões"
+
+#: tools/kg_trace.py
+msgid "the repository root (default: .)"
+msgstr "a raiz do repositório (padrão: .)"
+
+#: tools/kg_trace.py
+msgid "· no graph read: git tracks no .kg.yaml or .kg.json under {root} outside the excludes"
+msgstr "· nenhum grafo lido: o git não rastreia .kg.yaml nem .kg.json sob {root} fora dos excludes"
+
+#: tools/kg_trace.py
+msgid "· {judged} trace(s) judged: {resolved} resolve, {missing} missing; not judged (counted): {absolute} absolute or URL, {external} external root, {not_path} not a path, {not_text} not text"
+msgstr "· {judged} trace(s) julgado(s): {resolved} resolve(m), {missing} faltando; fora de julgamento (contados): {absolute} absoluto(s) ou URL, {external} raiz externa, {not_path} não caminho, {not_text} fora de texto"

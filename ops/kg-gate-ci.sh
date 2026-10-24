@@ -10,11 +10,20 @@
 # Uso: bash ops/kg-gate-ci.sh [args extras do kg_gate.py, como --update]
 #   rc 0 = vendor íntegro, nenhum grafo piorou e nenhum código novo sem nome · rc 1 = reprovou · rc 2 = entrada quebrada (nunca verde)
 # Roda da raiz do repo que se quer julgar (o pr-finalize a chama dentro da worktree do HEAD).
+#
+# BANCADA PRÉ-TAG (kg-ssot 4.24.0): um vendor trazido por `kg_vendor.py update --ref <commit>` tem o carimbo
+# `unreleased`, e o check do vendor e o kg_gate.py o reprovam sem --allow-unreleased. Para medir esse vendor:
+#   KG_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh
+# A variável passa --allow-unreleased aos DOIS (check e gate). O CI NUNCA a define: com CI no ambiente ela sai
+# rc 2, para um vendor de bancada nunca passar por release. Sem ela, o vendor de bancada reprova (rc 1).
 set -uo pipefail
 
 [ -f vendor/kg-ssot/tools/kg_gate.py ] || { echo "kg-gate-ci: vendor/kg-ssot ausente em $(pwd) — não dá para julgar" >&2; exit 2; }
 
-python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot || exit $?
+if [ -n "${KG_ALLOW_UNRELEASED:-}" ] && [ -n "${CI:-}" ]; then
+  echo "kg-gate-ci: KG_ALLOW_UNRELEASED é só da bancada local; no CI (CI=${CI}) um vendor de bancada nunca passa" >&2; exit 2
+fi
+python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot ${KG_ALLOW_UNRELEASED:+--allow-unreleased} || exit $?
 
 # FORA DO CORPUS, explícito (política selada pelo maestro, 2026-10-08): propostas arquivadas do
 # kg-inbox são história. A base tem de ser gravada com os MESMOS --exclude:
@@ -22,6 +31,7 @@ python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot || exit
 python3 -I vendor/kg-ssot/tools/kg_gate.py \
   --exclude 'docs/evolution/kg-inbox/_rejected/*' \
   --exclude 'docs/evolution/kg-inbox/_sealed/*' \
+  ${KG_ALLOW_UNRELEASED:+--allow-unreleased} \
   "$@"
 gate_rc=$?
 

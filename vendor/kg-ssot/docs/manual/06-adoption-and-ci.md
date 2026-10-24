@@ -21,7 +21,7 @@ Run this at the root of your repository, with Python 3.11 or later (`rpds-py`, a
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.23.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.25.0 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt
@@ -94,6 +94,19 @@ Do it all in one PR:
 
 If a minor version brings a SHOULD warning that your corpus already had, the debt goes up by design. In that case,
 run `--update` with `--accept-regression "<reason>"`.
+
+## Bench a commit before its tag (since 4.24)
+
+To test what is about to become a release, before the tag exists, bring a commit with
+`kg_vendor.py update --ref <commit> --source <clone or URL>`. You need a repository where that commit is reachable:
+the public mirror carries only tagged commits, so this is for whoever can reach the branch (a clone of the product,
+a fork, a CI that checks out the PR). It takes the tree of that commit with whatever
+`spec/release.json` it has (the version there may still be the previous one, which `--tag` would refuse as a
+mislabeled release). The stamp says `unreleased` in place of the tag and keeps the commit. `kg_vendor.py check`
+then fails with `UNRELEASED VENDOR` unless you pass `--allow-unreleased`, so a bench vendor never passes for a
+release in your CI. The same goes for `kg_gate.py`, which also fails on a bench vendor without
+`--allow-unreleased` and never writes the baseline from one: keep the option in the bench command, never in the CI
+that guards your releases. When the tag comes out, `update --tag` replaces it without `--force`.
 
 ## Move up a major version (v3 → v4)
 

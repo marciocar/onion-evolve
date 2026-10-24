@@ -10,6 +10,37 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.25.0] - 2026-10-24
+
+A node's `trace:` that points to a moved file no longer passes in silence: `kg_trace.py` checks each anchor against the
+files of the repository. Contract v4.14, unchanged.
+
+### Added
+
+- **`kg_trace.py`, the trace that does not resolve.** A node's `trace:` that points to a moved or renamed file passed
+  the gate in silence: the reader does not touch the disk. `kg_trace.py check --root .` checks each anchor from the
+  repository root and reports `integrity.trace-target-missing` (`kg-ssot.trace/1`). It judges only the text that looks
+  like a path of the repository, and counts apart what it does not judge (absolute or URL, a declared
+  `--external-root`, not a path). A name without a slash comes in only as a file tracked at the root with the exact
+  name. It resolves at the root, in the graph's folder, or in its parent, and a target that leaves the root does not
+  resolve. The rules are an adopter's resolver, measured on thousands of traces; on that adopter's corpus the tool
+  judges the same 2,500 nodes, with 0 missing. Also on PyPI as `kg-trace`.
+
+## [4.24.0] - 2026-10-24
+
+An adopter can bench a commit before its tag without retagging it, and the bench vendor never passes for a release.
+Contract v4.14, unchanged.
+
+### Added
+
+- **`kg_vendor.py update --ref <commit>`, for the bench before a tag.** An adopter that tests a release before it
+  exists had to retag a commit locally, because `--tag` rightly refuses a commit whose `spec/release.json` declares
+  another version. `--ref` brings the tree of a commit as it is; the stamp says `unreleased` and keeps the commit, and
+  `check` fails on that vendor (`UNRELEASED VENDOR`, rc 1) unless `--allow-unreleased` is given, so a bench vendor
+  never passes for a release in CI. `kg_gate.py` refuses one the same way (`--allow-unreleased`, and never
+  `--update` from a bench vendor), so a CI that runs only the gate does not take the bench for a release. A later
+  `update --tag` replaces it without `--force`. Requested by an adopter's bench.
+
 ## [4.23.0] - 2026-10-23
 
 A short code gets a readable name in its own vocabulary, and the codes in prose are checked against it, with a

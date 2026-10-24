@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:trace.schema.json",
+  "title": "Saída de kg_trace.py check --format json",
+  "description": "Desde a 4.25.0. Não é veredito do contrato: o leitor não toca o disco. O check confere, a partir da raiz do repo, a âncora trace: de cada nó: o texto até o primeiro : ou #, julgado só quando parece caminho do repo (absoluto ou URL, prefixo externo declarado e não-caminho são contados à parte, nunca em silêncio; o nome sem barra só entra quando é um arquivo rastreado na raiz com o nome exato e sem homônimo ao lado do grafo). Resolve quando existe na raiz, na pasta do grafo ou na pasta pai dele (esta só quando o grafo não está na raiz); um alvo fora da raiz não resolve. missing traz integrity.trace-target-missing. graphs conta os grafos lidos; skipped.not_text, o trace que não é texto. O rc é 1 com missing ou com grafo ilegível.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "graphs",
+    "judged",
+    "resolved",
+    "missing",
+    "skipped",
+    "unreadable"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.trace/1"
+    },
+    "graphs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "judged": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "resolved": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "file",
+          "id",
+          "node_type",
+          "target"
+        ],
+        "properties": {
+          "code": {
+            "const": "integrity.trace-target-missing"
+          },
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "node_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "target": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skipped": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "absolute",
+        "external_root",
+        "not_path",
+        "not_text"
+      ],
+      "properties": {
+        "absolute": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "external_root": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_path": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_text": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "code"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

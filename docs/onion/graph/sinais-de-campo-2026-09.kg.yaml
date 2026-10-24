@@ -471,7 +471,26 @@ nodes:
       locator: "ops/kg-vocab-ci.sh, .claude/validation/house-codes-gen.sh, docs/onion/graph/vocabulario-da-casa-2026-10.kg.yaml e as famílias kg_vocab_ci, house_codes_gen e house_code_gloss da bancada"
       method: "medição: o gate, o lint, a bancada e o hook rodados; o caso do r1 comparado com o hook da origin/main"
       locality: repo
+  - id: E_KG_SSOT_425_ADOTADA_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-24"
+    verified_against: "ops/kg-gate-ci.sh antes e depois do vendor 4.25.0 (rc 0 nos dois): a saída só difere na linha do carimbo, sem --update; com um vendor de update --ref, rc 1 sem KG_ALLOW_UNRELEASED, rc 0 com ela e rc 2 com CI no ambiente; família kg_gate_ci do lint-selftest com 6 casos verdes"
+    label: "A kg-ssot-v4.25.0 (com a 4.24.0, contrato v4.14) entrou no core pelo kg_vendor.py update sem mudar veredito; o gate do core ganhou KG_ALLOW_UNRELEASED para a bancada pré-tag, que o CI recusa"
+    narrative: "A 4.24.0 traz o update --ref e o carimbo unreleased, que o check e o kg_gate.py reprovam sem --allow-unreleased; o ops/kg-gate-ci.sh não passava a flag, então a bancada pré-tag não rodava pelo wrapper. A 4.25.0 traz o kg_trace.py, o resolvedor de trace: que o produto absorveu do core, candidato a substituir o da REGRA 55."
+    provenance:
+      source: "ops/kg-gate-ci.sh no core, antes e depois do vendor 4.25.0, e com um vendor de bancada"
+      locator: "rc e linha do carimbo na saída do gate; família kg_gate_ci do lint-selftest"
+      method: "medição: gate do contrato contra o corpus rastreado, comparado antes e depois"
+      locality: "repo"
 edges:
+  - from: E_KG_SSOT_425_ADOTADA_1024
+    to: E_KG_SSOT_419_ADOTADA_1022
+    edge_type: TRACES_TO
   - from: E_FORK_VS_AGENTE_NOVO_PAR_1_KG_SSOT_422_1023
     to: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
     edge_type: SUPPORTS

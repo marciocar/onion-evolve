@@ -291,7 +291,11 @@ stamp. **rc 2:** broken input, which never passes as green:
   - a release entry covers no file, or a member of the tag is not a regular file;
   - the stamp is missing, unreadable, or out of format;
   - in `update`: the destination is not a vendor, or it is an edited vendor without `--force`, or `--source` is
-    missing inside a vendor.
+    missing inside a vendor, or `--ref` names no commit of `--source`.
+
+Since 4.24, a vendor brought by `update --ref` (the bench before a tag) is not a release: `check` and `kg_gate.py`
+give **rc 1** on it unless you pass `--allow-unreleased`, and the gate never writes the baseline from one. Keep that
+option in the bench command, never in the CI that guards your releases.
 
 ## 4. Update the tag
 
@@ -334,6 +338,18 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.24.0` to `kg-ssot-v4.25.0`, the contract does not change (still v4.14), and the gate asks for no
+`--update`. `kg_trace.py check --root .` checks each node's `trace:` against the files of the repository and reports
+`integrity.trace-target-missing`; it judges only what looks like a path of the repository and counts the rest apart.
+If your graphs anchor in a folder outside the repository, declare it with `--external-root <prefix>`. To run it in
+CI, add `python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root .` next to the gate.
+
+From `kg-ssot-v4.23.0` to `kg-ssot-v4.24.0`, the contract does not change (still v4.14), and the gate asks for no
+`--update`. `kg_vendor.py update --ref <commit>` brings a commit that is not a release yet, for the bench before a
+tag; `check` and `kg_gate.py` give rc 1 on that vendor unless `--allow-unreleased` is given, and the gate never
+writes the baseline from one. If you run the bench, pass the option only in the bench command; your CI, without it,
+keeps refusing a bench vendor.
 
 From `kg-ssot-v4.22.0` to `kg-ssot-v4.23.0`, the contract goes to v4.14, and only the SHOULD level changes: nothing that
 passed fails, and the gate notes the new contract identity without asking for `--update` while no verdict changes

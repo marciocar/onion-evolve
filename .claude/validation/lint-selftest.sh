@@ -29957,6 +29957,50 @@ run_kg_vocab_ci_selftests() {
 }
 _family run_kg_vocab_ci_selftests
 
+run_kg_gate_ci_selftests() {
+  # ops/kg-gate-ci.sh e a BANCADA PRÉ-TAG (kg-ssot 4.24.0): o vendor de `update --ref` tem o carimbo unreleased e só
+  # passa com KG_ALLOW_UNRELEASED, que chega ao check do vendor E ao kg_gate.py; com CI no ambiente a variável sai rc 2.
+  # Mundo falso: repo git com o vendor REAL copiado, um grafo e as duas guardas irmãs (critério e nomes) como stub.
+  local root; root="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+  local sut="${root}/ops/kg-gate-ci.sh"
+  if [ ! -f "${sut}" ] || [ ! -f "${root}/vendor/kg-ssot/tools/kg_gate.py" ]; then record_skip "kg-gate-ci: script ou kg_gate.py ausente"; return; fi
+  local sb; sb="$(mktemp -d)"; trap 'rm -rf "${sb}"' RETURN
+  mkdir -p "${sb}/vendor" "${sb}/docs/g" "${sb}/ops"
+  cp -r "${root}/vendor/kg-ssot" "${sb}/vendor/kg-ssot"; cp "${sut}" "${sb}/ops/"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${sb}/ops/kg-criterion-ci.sh"; cp "${sb}/ops/kg-criterion-ci.sh" "${sb}/ops/kg-vocab-ci.sh"
+  printf 'meta:\n  id: banco\n  title: "bancada"\nnodes:\n  - id: E_A\n    node_type: evidence\n    status: open\n    label: "a"\nedges: []\n' > "${sb}/docs/g/b.kg.yaml"
+  (cd "${sb}" && git init -q && git config user.email t@t && git config user.name t && git add -A >/dev/null 2>&1)
+  local rc out
+  # (a) vendor de release: grava a base e passa (rc 0)
+  (cd "${sb}" && env -u CI -u KG_ALLOW_UNRELEASED bash ops/kg-gate-ci.sh --update >/dev/null 2>&1)
+  if out="$(cd "${sb}" && env -u CI -u KG_ALLOW_UNRELEASED bash ops/kg-gate-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ]; then record_pass "kg-gate-ci: (a) vendor de release passa (rc 0)"
+  else record_fail "kg-gate-ci: (a) vendor de release" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # o carimbo vira o de `update --ref` (a forma que o kg_vendor.py grava: tag unreleased + unreleased true)
+  python3 -I -c 'import json, sys; p = sys.argv[1]; d = json.load(open(p)); d["tag"] = "unreleased"; d["unreleased"] = True; json.dump(d, open(p, "w"), indent=2)' "${sb}/vendor/kg-ssot/.kg-ssot-version"
+  # (b) MUTANTE da release: vendor de bancada SEM a variável reprova (rc 1)
+  if out="$(cd "${sb}" && env -u CI -u KG_ALLOW_UNRELEASED bash ops/kg-gate-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'UNRELEASED' <<< "${out}"; then record_pass "kg-gate-ci: (b) vendor de bancada sem KG_ALLOW_UNRELEASED REPROVA (rc 1)"
+  else record_fail "kg-gate-ci: (b) bancada sem a variável" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (c) com a variável, o check e o gate aceitam a bancada (rc 0)
+  if out="$(cd "${sb}" && env -u CI KG_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ]; then record_pass "kg-gate-ci: (c) vendor de bancada com KG_ALLOW_UNRELEASED passa (rc 0)"
+  else record_fail "kg-gate-ci: (c) bancada com a variável" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (d) no CI a variável é recusada (rc 2): um vendor de bancada nunca passa por release
+  if out="$(cd "${sb}" && CI=true KG_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 2 ]; then record_pass "kg-gate-ci: (d) KG_ALLOW_UNRELEASED com CI no ambiente sai rc 2"
+  else record_fail "kg-gate-ci: (d) variável no CI" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
+  # (e) MUTANTE do wrapper: a variável só no check e não no kg_gate.py → o gate recusa a bancada (rc 1)
+  grep -v '^  \${KG_ALLOW_UNRELEASED:+--allow-unreleased} \\$' "${sut}" > "${sb}/ops/kg-gate-ci.sh"
+  if out="$(cd "${sb}" && env -u CI KG_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && ! cmp -s "${sut}" "${sb}/ops/kg-gate-ci.sh"; then record_pass "kg-gate-ci: (e) mutante sem a variável no kg_gate.py reprova a bancada (rc 1)"
+  else record_fail "kg-gate-ci: (e) mutante do gate" "rc=${rc} (o mutante tem de diferir do script e reprovar)"; fi
+  # (f) nenhum workflow do CI define a variável
+  if ! grep -rq 'KG_ALLOW_UNRELEASED' "${root}/.github"; then record_pass "kg-gate-ci: (f) nenhum workflow define KG_ALLOW_UNRELEASED"
+  else record_fail "kg-gate-ci: (f) variável no CI" "$(grep -rln 'KG_ALLOW_UNRELEASED' "${root}/.github" | tr '\n' ' ')"; fi
+}
+_family run_kg_gate_ci_selftests
+
 run_house_codes_gen_selftests() {
   # .claude/validation/house-codes-gen.sh (2026-10-23): as linhas term do glossário da glosa são projeção dos
   # x_term. Mundo falso: repo git com o vendor real, um TSV com linhas à mão, linha scheme e os marcadores.

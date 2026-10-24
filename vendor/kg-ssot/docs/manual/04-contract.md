@@ -83,6 +83,8 @@ and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.
 | 4.21 | Contract v4.12: the pre-registered criterion, with the SHOULD profiles `x_criterion` and `x_measured_under`, five coherence warnings in both readers, and `kg_criterion.py`, which checks the `sha256` against the text or the file and follows a citation of another graph; `kg_migrate.py nest`, which moves an adopter's own `x_` keys into a canonical profile |
 | 4.22 | Contract v4.13: `x_questionnaire.role` (`item`, `evidence_request`, or `evidence_requirement`) in the SHOULD; the audit package by question, `kg_audit.py`, in CSV, XLSX, or JSON |
 | 4.23 | Contract v4.14: `x_term.scheme` and the warning `integrity.term-notation-duplicate`, so a short code carries a readable name in its own vocabulary; `kg_vocab.py` resolves a code (`scheme:code`) and gains `lint`, with a ratchet, for codes in prose; `kg_query.py --text` without accents, through the vocabulary, and with a hint on zero |
+| 4.24 | `kg_vendor.py update --ref` for the bench before a tag; `check` and `kg_gate.py` refuse a bench vendor without `--allow-unreleased` |
+| 4.25 | `kg_trace.py`, the trace that does not resolve: each node's `trace:` anchor against the files of the repository |
 
 ## Versions and tags
 
