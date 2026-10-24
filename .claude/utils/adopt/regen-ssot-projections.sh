@@ -55,10 +55,15 @@ mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs
 _kgi="${DEST}/.claude/validation/kg-trace.sh"
 [ -f "${_kgi}" ] || _kgi="${DEST}/.claude/validation/kg-trace-resolve.sh"
 if [ -f "${_kgi}" ]; then
-  _idx="$(bash "${_kgi}" "${DEST}" --emit-index 2>/dev/null || true)"
+  _irc=0; _idx="$(bash "${_kgi}" "${DEST}" --emit-index 2>/dev/null)" || _irc=$?
   # Só escreve se veio conteúdo: índice vazio faria o hook da perna de leitura ficar calado
   # para o corpus inteiro, e calado é indistinguível de "não há grafo" (REGRA 84).
-  [ -n "${_idx}" ] && printf '%s\n' "${_idx}" > "${DEST}/docs/onion/kg-read-index.tsv"
+  # A EXCEÇÃO é o rc 3 (corpus sem nenhum trace de arquivo, o dia 1 do adotante): aí o índice certo É
+  # vazio, e ele é escrito vazio. Sem isso sobrevivia o índice de lixo que o resolvedor antigo gravava
+  # nesse estado (a frase "(nenhum .kg.yaml rastreado — nada a verificar)", que ele imprimia no stdout com
+  # rc 0), e a REGRA 84 o leria como índice com linhas, defasado (2026-10-24).
+  if [ "${_irc}" -eq 0 ] && [ -n "${_idx}" ]; then printf '%s\n' "${_idx}" > "${DEST}/docs/onion/kg-read-index.tsv"
+  elif [ "${_irc}" -eq 3 ]; then : > "${DEST}/docs/onion/kg-read-index.tsv"; fi
 fi
 
 _n=0 _vazias=""

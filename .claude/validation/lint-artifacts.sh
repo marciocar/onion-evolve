@@ -2625,10 +2625,12 @@ check_kg_read_index_sync() {
   local idx="${REPO_ROOT}/docs/onion/kg-read-index.tsv"
   local gen="${SCRIPT_DIR}/kg-trace.sh"
   [ -f "${gen}" ] || return 0
-  if [ ! -f "${idx}" ]; then
-    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv"
-    return
-  fi
+  # ⚠️ A AUSÊNCIA SÓ É JULGADA DEPOIS DO GERADOR (2026-10-24, troca para o `resolved_targets` da kg-ssot 4.25.1).
+  # Antes ela vinha primeiro, e o dia 1 do adotante passava só por acaso: o resolvedor antigo, sem grafo
+  # rastreado, imprimia "(nenhum .kg.yaml rastreado — nada a verificar)" no STDOUT com rc 0, e essa frase virava
+  # o índice do adotante. Com o produto, que não escreve prosa no stdout, o adotante nasceu sem índice e a regra
+  # deu HARD de AUSENTE num estado legítimo (adopter-shape (b) no CI). Agora: corpus sem trace de arquivo, sem
+  # índice ou com índice vazio, é SOFT; índice com linhas e gerador sem nenhuma é DIVERGÊNCIA, julgada abaixo.
   # ⚠️ O `2>/dev/null || true` DA 1a VERSAO COLAPSAVA DOIS MUNDOS, e o preco foi medido em 2026-09-24
   # adotando um repo novo: o gate do adotante BARROU O PRIMEIRO COMMIT dele por este HARD. A causa nao
   # era defeito nenhum do adotante — o corpus dele tem UM grafo (a semente da adocao) cujo `trace:` e
@@ -2640,7 +2642,7 @@ check_kg_read_index_sync() {
   # Quem nao lia era esta guarda — ela jogava fora o rc E o stderr e chamava tudo de gerador quebrado.
   # E o modo-de-falha que a propria doutrina de adocao nomeia: gate que nasce reprovando o adotante no
   # dia 1 acaba DESLIGADO, e ai nenhuma regra vale.
-  local new_index gen_err gen_rc=0
+  local new_index gen_err gen_rc=0 _diverge=0
   gen_err="$(mktemp)"
   new_index="$(bash "${gen}" "${REPO_ROOT}" --emit-index 2>"${gen_err}")" || gen_rc=$?
   if [ -z "${new_index}" ]; then
@@ -2650,15 +2652,22 @@ check_kg_read_index_sync() {
       # Desde a kg-ssot 4.25.1 o gerador é o `resolved_targets` do PRODUTO. Vendor ausente (perfil `gate`) ou
       # anterior à 4.25.1 (JSON sem o campo) não tem gerador, e isso é dito como não-julgado, nunca como defasado.
       violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/NAO-JULGOU] o gerador é o \`resolved_targets\` do kg_trace.py do vendor kg-ssot >= 4.25.1, perfil completo, e ele está ausente ou é anterior — ESTA REGRA NÃO VERIFICOU o índice. Suba o vendor (/meta:adopt --update)."
+    elif [ "${gen_rc}" -eq 3 ] && grep -qF 'VAZIO' "${gen_err}" && grep -qF 'resolv' "${gen_err}" && [ -s "${idx}" ]; then
+      # O gerador não acha nenhum trace e o índice commitado tem linhas: não é o dia 1, é divergência (os traces
+      # sumiram, ou o commit é por pathspec e o índice do git é parcial). O veredito é o do diff, abaixo.
+      _diverge=1
     elif [ "${gen_rc}" -eq 3 ] && grep -qF 'VAZIO' "${gen_err}" && grep -qF 'resolv' "${gen_err}"; then
       violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/CORPUS-SEM-TRACE-DE-ARQUIVO] o corpus nao tem NENHUM nó cujo \`trace:\` resolva para arquivo — índice vazio LEGÍTIMO (é o dia 1 de todo adotante: a semente da adoção tem trace em prosa, e prosa é válida). A perna de leitura nada tem a indexar ainda; ela liga sozinha quando o primeiro nó com trace de ARQUIVO nascer. Nada a corrigir."
     else
       violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): o gerador devolveu vazio SEM declarar corpus-sem-trace (rc=${gen_rc}) — isto é falha de ambiente ou parser, não estado legítimo. NÃO regenere por cima (sobrescreveria o índice bom). stderr: $(head -c 200 "${gen_err}" | tr '\n' ' ')"
     fi
-    rm -f "${gen_err}"
-    return
+    [ "${_diverge}" -eq 1 ] || { rm -f "${gen_err}"; return; }
   fi
   rm -f "${gen_err}"
+  if [ ! -f "${idx}" ]; then
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv"
+    return
+  fi
   if ! printf '%s\n' "${new_index}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
     # ⚠️ COMMIT COM PATHSPEC NÃO PODE SER JULGADO AQUI — sinal de campo de um adotante hub,
     # 2026-10-02, com causa VERIFICADA por ele: `git commit -- <pathspec>` monta um índice

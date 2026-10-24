@@ -4569,6 +4569,27 @@ run_kg_trace_resolve_selftests() {
   else record_fail "kg-trace: (j4) (MUT) vazio/quebrado" "rc4=${rc4} e4=${e4:0:120} rc5=${rc5} so5=${so5:0:80}"; fi
   rm -f "${se3}"
 
+  # (j5) O DIA 1 DO ADOTANTE SEM ÍNDICE, E O ÍNDICE QUE SOBROU — a REGRA 84 julga a ausência DEPOIS do gerador.
+  #      Corpus sem trace de arquivo (rc 3) e sem índice → SOFT, nunca HARD de AUSENTE (o adopter-shape (b) do CI
+  #      pegou: o resolvedor antigo só passava porque gravava a própria prosa como índice). E o mesmo rc 3 com um
+  #      índice COM linhas → HARD DEFASADO: os traces sumiram e o hook mentiria por omissão.
+  _r84_j5() { bash -c '
+    set -euo pipefail
+    SCRIPT_DIR="'"${SCRIPT_DIR}"'"; REPO_ROOT="'"${d}"'"
+    export ONION_KG_TRACE="'"${mut}"'/k0.py"
+    violation() { echo "V[$1] $3"; }
+    source <(sed -n "/^check_kg_read_index_sync()/,/^}$/p" "'"${SCRIPT_DIR}/lint-artifacts.sh"'")
+    check_kg_read_index_sync
+  ' 2>&1 || true; }
+  rm -f "${d}/docs/onion/kg-read-index.tsv"
+  local l5a l5b; l5a="$(_r84_j5)"
+  printf 'docs/x.md\tC_X\tdocs/onion/graph/g.kg.yaml\n' > "${d}/docs/onion/kg-read-index.tsv"; l5b="$(_r84_j5)"
+  if grep -q 'V\[SOFT\].*CORPUS-SEM-TRACE' <<< "${l5a}" && ! grep -q 'V\[HARD\]' <<< "${l5a}" \
+     && grep -q 'V\[HARD\].*DEFASADO' <<< "${l5b}"; then
+    record_pass "kg-trace: (j5) rc 3 sem índice → SOFT (dia 1, não AUSENTE); rc 3 com índice de linhas → HARD DEFASADO"
+  else record_fail "kg-trace: (j5) ausência julgada depois do gerador" "sem=${l5a:0:160} com=${l5b:0:160}"; fi
+  unset -f _r84_j5
+
   unset -f _kt _mk_trace_sandbox
   rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${d5}" "${mut}"
 }
