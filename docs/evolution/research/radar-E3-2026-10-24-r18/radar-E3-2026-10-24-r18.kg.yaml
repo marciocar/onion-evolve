@@ -1,0 +1,311 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.310 a 2.1.310 contra a baseline 2.1.309.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-24-r18
+  schema_version: "1"
+  baseline: "2026-10-24"
+  review_after: "2026-11-23"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-24); 9 da rodada; 5 após o juiz (3 superações, 1 omissão de superação, 1 pergunta).
+# ═══ AUFHEBUNG ═══
+#   DECIDIDO (2026-10-24): (a). Três nós da r17 superados: as versões de quem serve (bridge e revisor
+#   saíram da 2.1.308 para a 2.1.309), a pergunta da subida para a 2.1.309 (respondida no vivo, ponta
+#   ajustada pelo juiz) e o revisor no CLI 2.1.308 sem a correção das menções (o pin já a traz).
+external_edges:
+  - from: E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024
+    to: "docs/evolution/research/radar-E3-2026-10-23-r17/radar-E3-2026-10-23-r17.kg.yaml#E_HOST_NA_2_1_309_BRIDGE_E_REVISOR_ATRAS_1023"
+    edge_type: SUPERSEDES
+  - from: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
+    to: "docs/evolution/research/radar-E3-2026-10-23-r17/radar-E3-2026-10-23-r17.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023"
+    edge_type: SUPERSEDES
+  - from: E_REVISOR_SEM_SANITIZAR_ARROBA_NO_PIN_V1_0_260_1024
+    to: "docs/evolution/research/radar-E3-2026-10-23-r17/radar-E3-2026-10-23-r17.kg.yaml#E_REVISOR_POSTA_TEXTO_DO_MODELO_SEM_SANITIZAR_ARROBA_1023"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-24"
+    verified_against: "CHANGELOG oficial: seções 2.1.310 (29 linhas, 26 itens); baseline 2.1.309, disco 2.1.310, processo 2.1.310, SDK bridge 2.1.309"
+    label: "o delta desde a baseline 2.1.309 são 1 versão(ões), de 2.1.310 a 2.1.310, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.310 a ## 2.1.310 (cópias em docs/evolution/research/radar-E3-2026-10-24-r18/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-24"
+    verified_against: "fechada em 2026-10-24 pela r18: 26 itens; os candidatos medidos no vivo (versões de quem serve, hooks só-aspas no Windows, sandbox e AppArmor, Monitor e gateway, compactação e elicitação não interativas, itens sem superfície); juiz independente (subagente opus não-fork): 11 SUSTENTA, 3 EXAGERA, 0 REPROVA, 3 superações, 8 omissões (data/judge-verdicts.json, judge-verdict-check rc 0); o que toca: a subida do bridge e do revisor para a 2.1.310 (SAC-243) e o fecho da SAC-239 com o revisor provado; os itens sem medição estão nos NÃO-VERIFICADOS da SYNTHESIS"
+    label: "quais itens de 2.1.310 a 2.1.310 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+    trace: "docs/evolution/research/radar-E3-2026-10-24-r18/SYNTHESIS.md e data/judge-verdicts.json"
+  - id: E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-24"
+    verified_against: "claude --version no host = 2.1.310; censo: binário do CLI embutido no SDK do bridge (0.3.309) --version = 2.1.309; npm view @anthropic-ai/claude-agent-sdk version = 0.3.310 (claudeCodeVersion 2.1.310); .github/workflows/onion-review.yml linhas 288 e 430 fixam anthropics/claude-code-action@8d70a0dd (tag v1.0.260, CLI 2.1.309); a tag v1.0.261 (16f9f71a) existe, e o compare v1.0.260...v1.0.261 tem 1 commit (chore: bump Claude Code to 2.1.310 and Agent SDK to 0.3.310) em 6 arquivos, só versões: base-action/action.yml CLAUDE_CODE_VERSION=2.1.310, package.json e base-action/package.json ^0.3.310, os dois bun.lock e src/entrypoints/run.ts"
+    label: "o host está na 2.1.310; o /chat do bridge (SDK 0.3.309) e o revisor do CI (pin v1.0.260) estão na 2.1.309, uma versão atrás; o SDK 0.3.310 e a action v1.0.261 já existem e só trocam versões"
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh, .github/workflows/onion-review.yml, o registro npm e a API do GitHub"
+      locator: "tabela de versões do censo; uses: da claude-code-action; compare v1.0.260...v1.0.261"
+      method: "medição: --version dos binários, npm view e gh api do compare e do conteúdo dos arquivos na tag"
+      locality: "host"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024
+    node_type: question
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-24"
+    verified_against: "proposta da r18, reescrita após o EXAGERA do juiz: subir o Agent SDK do bridge para 0.3.310 pelo ops/update-bridge.sh e o pin do revisor para a tag v1.0.261 (16f9f71a); por ordem desta rodada nada sobe aqui (outro trabalho). A razão medida são as linhas 6 e 11 da 2.1.310 (compactação não interativa), que alcançam o /chat do bridge e o runner de convidado pelo SDK; a linha 14 não tem superfície; o revisor só serve com a label review:ia (ONION_REVIEW_MODE ausente = off), então o pin é paridade, não urgência; issue SAC-243"
+    label: "o SDK do bridge deve subir para 0.3.310, pela compactação não interativa das linhas 6 e 11, e o pin do revisor do CI para v1.0.261, por paridade"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-243"
+      locator: "issue SAC-243 do projeto Onion — core: próximas levas"
+      method: "derivado: proposta da rodada a partir de E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024"
+      locality: "web"
+  - id: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-24"
+    verified_against: "reescrito após o EXAGERA do juiz. Bridge: o censo executa o binário do CLI embutido no SDK 0.3.309 e lê 2.1.309. Revisor: o commit 704c8ebf subiu o pin para v1.0.260 (8d70a0dd), mas nas 7 execuções do workflow onion-review desde então o job onion-review saiu skipped (gh run view: onion-review-mode e onion-review-verdict success, onion-review skipped), porque ONION_REVIEW_MODE está ausente (off) e nenhum PR levou a label review:ia; nenhuma execução prova o CLI 2.1.309 no revisor. tm.sh item.read SAC-239 --lean devolve state Backlog; o nó Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023 da r17 seguia open; a medição foi comentada na SAC-239"
+    label: "a subida da SAC-239 está em configuração nas duas metades, provada por execução só no bridge: o revisor tem o pin novo e nunca rodou com ele, porque está desligado; a issue segue em Backlog"
+    provenance:
+      source: "tm.sh item.read SAC-239 e git log do core"
+      locator: "campo state da issue; commit 704c8ebf em .github/workflows/onion-review.yml"
+      method: "medição: leitura da issue pelo adapter executável e git log -S do sha do pin"
+      locality: "web"
+  - id: E_HOOKS_DO_CORE_E_ADOTANTES_NAO_SAO_SO_ASPAS_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-24"
+    verified_against: "linha 9 da 2.1.310 (Windows, PreToolUse e PermissionRequest deixavam passar sem Git Bash quando o comando é só strings entre aspas): os 25 hooks do .claude/settings.json do core começam por bash seguido do caminho entre aspas, nenhum é só aspas; nos 37 settings.json legíveis de adotantes e portas clonados na home da conta do host, 0 comandos começam por aspas (python sobre o JSON). Nenhum hook do core é PermissionRequest. O bundle de plugins do marketplace, que chega a máquinas Windows, emite bash seguido do caminho entre aspas (medido pelo juiz)"
+    label: "a falha do Windows que deixava passar PreToolUse com comando só entre aspas não alcança as guardas exit 2 do core: todo hook do core e dos adotantes medidos começa pelo bash nu"
+    provenance:
+      source: ".claude/settings.json do core e dos clones locais de adotantes e portas"
+      locator: "campo command de cada hook"
+      method: "medição: leitura do JSON por python, contagem dos comandos que começam por aspas"
+      locality: "host"
+  - id: E_SANDBOX_FORA_DO_CORE_E_BWRAP_BARRADO_NO_HOST_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-24"
+    verified_against: "linha 13 da 2.1.310 (/sandbox nomeia a restrição do AppArmor do Ubuntu a user namespaces): o .claude/settings.json do core não tem chave sandbox e grep por /sandbox, sandbox.enabled e bwrap em .claude, ops, docs/meta-specs e docs/knowledge-base não acha prescrição; no host (Ubuntu 24.04.4) kernel.apparmor_restrict_unprivileged_userns = 1 e o bwrap com um bind só-leitura da raiz sai rc 1 (setting up uid map: Permission denied). O isolamento do /chat do bridge é por systemd (ops/chat-runner.sh, sandbox_props), não pelo /sandbox"
+    label: "o core não usa o /sandbox do Claude Code; se alguém o ligar neste host ele não sobe, porque o AppArmor barra o bwrap, e a 2.1.310 passa a dizer isso em vez de falhar calado"
+    provenance:
+      source: ".claude/settings.json, sysctl e bwrap no host"
+      locator: "chave sandbox ausente; kernel.apparmor_restrict_unprivileged_userns"
+      method: "medição: grep no core, sysctl e execução do bwrap"
+      locality: "host"
+  - id: E_MONITOR_E_SONO_LONGO_SEM_EFEITO_NO_HOST_DE_API_DIRETA_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-24"
+    verified_against: "linhas 3 e 4 da 2.1.310 (Monitor em Bedrock, Vertex, Foundry e com telemetria desligada; gateways que recusam o beta de effort): o env do settings de usuário só tem CLAUDE_CODE_ENABLE_TODO_TOOLS e CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS, sem CLAUDE_CODE_USE_BEDROCK/VERTEX/FOUNDRY, DISABLE_TELEMETRY ou CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC; o revisor do CI autentica por anthropic_api_key (onion-review.yml linhas 290 e 432); grep por ANTHROPIC_BASE_URL e effort-2025 em .claude, ops e .github = zero. O launcher instalado do /chat de convidado aceita ONION_CHAT_BASE_URL e o repassa como ANTHROPIC_BASE_URL, e o próprio launcher declara 'SÓ para ensaio (a unit de produção não a define)'; o fonte vive no repo do bridge (omissão apontada pelo juiz)"
+    label: "a extensão do Monitor a Bedrock, Vertex, Foundry e telemetria desligada, e o recuo do beta de effort atrás de gateway, não mudam nada aqui: host e revisor falam com a API direta, e o gateway do /chat de convidado só existe em ensaio"
+    provenance:
+      source: "settings de usuário, .github/workflows/onion-review.yml e grep no core"
+      locator: "chaves de env; input anthropic_api_key"
+      method: "medição: leitura das chaves (só nomes) e grep"
+      locality: "host"
+  - id: E_COMPACTACAO_E_ELICITACAO_NAO_INTERATIVAS_SO_COM_A_SUBIDA_1024
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-24"
+    verified_against: "linhas 6, 11 e 14 da 2.1.310 (compactação após 'Prompt is too long' com texto denso; memória de sessão não interativa na compactação; erro de MCP que expira com elicitação sem resposta): as superfícies não interativas da casa são o /chat do bridge e o runner de convidado (Agent SDK, mesmo binário do ops/cc-sdk-targets.tsv) e o revisor do CI (pela action, só com a label review:ia), todos na 2.1.309; o hook PreCompact do core (worklog-precompact-breadcrumb.sh) só grava migalha e não depende do que a compactação guarda; grep por elicit nos servidores ops/mcp-onion-* e em .claude = zero. Linha 6 acrescentada após omissão apontada pelo juiz"
+    label: "as correções de compactação não interativa (linhas 6 e 11) só chegam ao bridge e ao revisor com a subida; a do erro de elicitação não tem superfície, porque nenhum servidor MCP da casa pede elicitação"
+    provenance:
+      source: "ops/mcp-onion-* e .claude"
+      locator: "grep por elicit"
+      method: "medição: grep no core e a tabela de versões do censo"
+      locality: "repo"
+  - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-24"
+    verified_against: "linha 5 (cleanupPeriodDays): ausente do settings do core e das chaves do settings de usuário; linha 10 (prompt do auto mode): o settings do core não tem defaultMode e o de usuário usa bypassPermissions; linha 12 (Image de mod): o core não tem mods (ls .claude: agents, commands, diary, hooks, identity, rules, skills, utils, validation, workflows); linhas 24 a 26 (Claude Tag): grep por Claude Tag em .claude, ops e docs/meta-specs = zero; linhas 27 e 28 (Code Review gerenciado): o revisor da casa é a claude-code-action em .github/workflows/onion-review.yml, não o Code Review do admin. Linha 8 (timeout do auto-continue de pergunta): AskUserQuestion é prescrito em 10 arquivos de .claude, e o host interativo já está na 2.1.310. Linhas 17 e 22 (papéis de Remote Control em Enterprise): o settings de usuário liga remoteControlAtStartup e o session-beacon-hook.sh trata conexão de Remote Control, mas papel customizado é de conta Enterprise; acrescentadas após omissão apontada pelo juiz"
+    label: "cleanupPeriodDays, o prompt do auto mode, o Image de mod, o Claude Tag, o Code Review gerenciado e os papéis Enterprise de Remote Control não têm superfície no core; o timeout de pergunta já está corrigido no host"
+    provenance:
+      source: ".claude/settings.json, settings de usuário e grep no core"
+      locator: "chaves cleanupPeriodDays e defaultMode; ls .claude; grep Claude Tag"
+      method: "medição: leitura do JSON por python, ls e grep"
+      locality: "repo"
+  - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_310_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-24"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive no host com 2.1.310: 'OK ✓ — todas as guardas reagiram conforme esperado.'"
+    label: "a guarda de deriva de binário (cited_directive) segue verde contra o CLI 2.1.310 instalado"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família cited_directive"
+      method: "medição: execução da família da bancada no host"
+      locality: "host"
+  - id: E_REVISOR_SEM_SANITIZAR_ARROBA_NO_PIN_V1_0_260_1024
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-24"
+    verified_against: "omissão de superação apontada pelo juiz: o nó da r17 dizia que o revisor roda o CLI 2.1.308 (pin v1.0.258); hoje os dois uses: de .github/workflows/onion-review.yml fixam 8d70a0dd (v1.0.260, CLI 2.1.309, que traz a correção das menções da linha 41 da 2.1.309). .claude/utils/forge/post-review-comment.sh segue postando o corpo por gh api -F body=@<arquivo> (linhas 113 e 119) sem tratar '@'; e o job do revisor está desligado (ONION_REVIEW_MODE ausente), então nenhuma execução mediu o efeito"
+    label: "o pin do revisor já traz a correção das menções indevidas da 2.1.309, mas o script que posta o parecer segue sem sanitizar '@', e o revisor desligado não rodou desde a subida"
+    provenance:
+      source: ".github/workflows/onion-review.yml e .claude/utils/forge/post-review-comment.sh"
+      locator: "linhas 288 e 430 do workflow; linhas 113 e 119 do script"
+      method: "medição: grep no core e gh run view das execuções do workflow"
+      locality: "repo"
+  - id: Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024
+    node_type: question
+    layer: audit
+    plane: PROD
+    status: open
+    impact: 1
+    confidence: 0.6
+    verified_at: "2026-10-24"
+    verified_against: "proposta da r18 após o EXAGERA do juiz: fechar a SAC-239 rodando um PR com a label review:ia e lendo a versão do CLI no log do job, ou fechando com a metade do revisor declarada como pin sem execução; comentado na SAC-239 (comentário 0fb40ccd), sem issue nova para não duplicar"
+    label: "a SAC-239 deve fechar com o revisor provado num PR com a label review:ia, ou com a metade do revisor declarada como pin sem execução"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-239"
+      locator: "comentário da r18 na SAC-239"
+      method: "derivado: proposta da rodada a partir de E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024"
+      locality: "web"
+  - id: C_SUPERACAO_20261024_A_SUBIDA_SE_JUSTIFICA_PELA_COMPACTACAO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-24"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO): as linhas 6 e 11 alcançam o bridge e o runner de convidado; a 14 não tem superfície; o revisor só serve com a label review:ia"
+    label: "a razão medida para subir o SDK do bridge na 2.1.310 é a compactação não interativa; o pin do revisor é paridade, porque ele está desligado"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA de Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024"
+      method: "juízes: subagente opus independente, critério CU3"
+      locality: "repo"
+  - id: C_SUPERACAO_20261024_REVISOR_COM_PIN_E_SEM_EXECUCAO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-24"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: 7 execuções do workflow onion-review desde o commit 704c8ebf, todas com o job onion-review skipped"
+    label: "subir o pin do revisor não é o revisor rodar na versão nova: com o modo off, a metade do revisor da SAC-239 está em configuração e sem execução"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA de E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024"
+      method: "juízes: subagente opus independente, critério CU2"
+      locality: "repo"
+  - id: C_SUPERACAO_20261024_A_PERGUNTA_DA_R17_FOI_RESPONDIDA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-24"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO): a pergunta da r17 sobre a 2.1.309 foi respondida pelo commit 704c8ebf e pela subida do bridge, não substituída pela pergunta da 2.1.310; a ponta local da SUPERSEDES passou a ser E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024"
+    label: "quem supera a pergunta da r17 é a evidência que a responde, não a pergunta nova da versão seguinte"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA da superação de r17#Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023"
+      method: "juízes: subagente opus independente, critério CU4"
+      locality: "repo"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024
+    to: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOOKS_DO_CORE_E_ADOTANTES_NAO_SAO_SO_ASPAS_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SANDBOX_FORA_DO_CORE_E_BWRAP_BARRADO_NO_HOST_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_MONITOR_E_SONO_LONGO_SEM_EFEITO_NO_HOST_DE_API_DIRETA_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_COMPACTACAO_E_ELICITACAO_NAO_INTERATIVAS_SO_COM_A_SUBIDA_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITENS_SEM_SUPERFICIE_NO_CORE_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_310_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_COMPACTACAO_E_ELICITACAO_NAO_INTERATIVAS_SO_COM_A_SUBIDA_1024
+    to: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024
+    edge_type: SUPPORTS
+  - from: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
+    to: Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024
+    edge_type: SUPPORTS
+  - from: E_REVISOR_SEM_SANITIZAR_ARROBA_NO_PIN_V1_0_260_1024
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261024_A_SUBIDA_SE_JUSTIFICA_PELA_COMPACTACAO
+    to: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261024_REVISOR_COM_PIN_E_SEM_EXECUCAO
+    to: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261024_A_PERGUNTA_DA_R17_FOI_RESPONDIDA
+    to: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
+    edge_type: TRACES_TO
