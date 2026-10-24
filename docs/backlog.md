@@ -1002,6 +1002,13 @@
 | 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
 | 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
 
+## radar-E3-2026-10-24-r18 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024` | radar-E3-2026-10-24-r18 | o SDK do bridge deve subir para 0.3.310, pela compactação não interativa das linhas 6 e 11, e o pin do revisor do CI para v1.0. |
+| 1.2 | `Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024` | radar-E3-2026-10-24-r18 | a SAC-239 deve fechar com o revisor provado num PR com a label review:ia, ou com a metade do revisor declarada como pin sem execu |
+
 ## vexa-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1072,13 +1079,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
-
-## radar-E3-2026-10-24-r18 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.8 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024` | radar-E3-2026-10-24-r18 | o SDK do bridge deve subir para 0.3.310, pela compactação não interativa das linhas 6 e 11, e o pin do revisor do CI para v1.0. |
-| 1.2 | `Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024` | radar-E3-2026-10-24-r18 | a SAC-239 deve fechar com o revisor provado num PR com a label review:ia, ou com a metade do revisor declarada como pin sem execu |
 
 ## vetos-por-tokens-2026-10 — 1 item(ns)
 
