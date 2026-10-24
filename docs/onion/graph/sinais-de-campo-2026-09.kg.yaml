@@ -550,6 +550,65 @@ nodes:
       locator: "comparação do índice antes e depois; casos (g), (j), (j2), (j3), (j4) da família kg_trace_resolve e (l) da kg_read_leg; os cinco mutantes"
       method: "medição: geração do índice pelos dois caminhos, diff com normalização e bancada com mutantes"
       locality: "repo"
+  - id: E_SINAL_DISSECAR_QUALQUER_OBJETO_1023
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-24"
+    verified_against: "a proposta lida inteira no inbox do core e as peças lidas no repo do remetente (registro de famílias com 6 nós de família, checador de forma de 480 linhas com bancada de 69 casos e 2 de não-medição, medidos (a proposta diz 60), desenho v4 de 155 linhas); a comparação entre os braços não foi re-rodada no core"
+    trace: "docs/evolution/inbox/_processed/2026-10-23-proposal-dissect-any-object.md"
+    label: "Sinal do adotante onion-curation (2026-10-23): dissecar qualquer objeto por família registrada, com Etapa 0 pré-registrada e checador de forma; a comparação do protótipo contra o método atual saiu inconclusiva pela regra deles e subiu ao core"
+    narrative: "O protótipo venceu no juiz cego os dois objetos decisórios sem derrota, mas no custo reprovou um (1,40x) e passou o outro (1,23x). O remetente aponta três vieses: limites desiguais entre os braços num objeto, o juiz sem ver os vereditos válidos da família noutro, e amostra de 2 objetos com um só modelo nos braços e nos juízes. As peças determinísticas (registro, checador, Etapa 0) curam três falhas medidas no 1º objeto e valem independentemente da comparação."
+    provenance:
+      source: "inbox do core, sinal do onion-curation"
+      locator: "docs/evolution/inbox/_processed/2026-10-23-proposal-dissect-any-object.md, seções A comparação e O que propomos"
+      method: "leitura: proposta do adotante e peças do protótipo lidas no repo dele, sem re-execução"
+      locality: "repo"
+  - id: D_DISSECT_ABSORVE_PECAS_PARQUEIA_MOTOR_1024
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-24"
+    verified_against: "decisão do maestro em 2026-10-24, por pergunta com opções (/meta:decide): escolhida «Absorver peças + parquear motor»"
+    label: "O /meta:dissect absorve as peças determinísticas da dissecação de qualquer objeto (registro de famílias, checador de forma com bancada, Etapa 0 pré-registrada, superação buscada também na web) e parqueia o workflow do protótipo como motor até 1 objeto decisório a mais"
+    narrative: "Selado por /meta:decide em 2026-10-24: escolhida «Absorver peças + parquear motor»; descartadas: «Absorver tudo, motor incluso» · «Só parquear, nada entra agora» · «Rodar o objeto extra antes de decidir»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-24: «A proposta de dissecar qualquer objeto saiu inconclusiva pela regra do remetente: o que o core absorve agora?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-24"
+      locality: "pessoa"
+  - id: Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O workflow do protótipo vira motor do /meta:dissect? Gatilho: 1 objeto decisório a mais rodado nos dois braços com o protocolo corrigido; se o protótipo vencer no juiz cego de novo com custo até 1,25x o do método atual, absorver; senão, rejeitar com a medida"
+    narrative: "Protocolo corrigido, pré-registrado antes da rodada: o juiz vê os vereditos válidos da família do objeto, e os dois braços têm os mesmos limites (instalar, rodar implementação de referência, orçamento). Checagem: o grafo dissect-any-object-2026-10 do onion-curation ganha o nó do objeto extra com o placar do juiz cego (3 juízes, 2 ordens) e a razão de custo em tokens entre os braços, e um sinal sobe ao core. Fecha com aquele sinal lido; o objeto não precisa ser da curadoria, só decisório e com os dois braços medidos."
+  - id: E_DISSECT_PECAS_ABSORVIDAS_1024
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-24"
+    verified_against: "a família dissect_object da bancada: 72 casos e 4 de não-medição verdes, cobertura de todos os códigos do checador e o mutante de cada código morto, com piso de casos; mutantes à mão do registro vazio aceito e do apelido legado ignorado reprovam; o checador do core rodado num clone descartável do adotante sai rc 0 nos 3 estudos reais dele (com a aresta da família reapontada ao registro do core) e rc 1 quando o veredito de um app vira perseguir"
+    trace: ".claude/validation/dissect-object-check.py"
+    label: "As peças determinísticas da dissecação de qualquer objeto estão no core: o registro de 6 famílias no perfil x_term, o checador de forma de 8 itens com a bancada (família dissect_object) e a Etapa 0 pré-registrada na doutrina, no comando e na lente do /meta:dissect"
+    narrative: "Adaptado, não copiado: o registro mora em .claude/validation/ porque viaja junto do checador (docs/onion/ não viaja), o apelido legado A|B|C é lido do próprio registro, registro sem família viva sai rc 3, o modo estudo do core (para no dissect:N2 sem veredito) é aceito e veredito dentro dele reprova, e o wrapper usa o .py vizinho (chamado de outro repo devolvia rc 2 do python, fora do contrato 0/1/3, achado do dogfood). O motor do protótipo ficou fora (Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA). Teto: o checador só julga quem o chama; o lint não o roda sobre o corpus, e os 7 estudos de antes de 2026-10-24 ficam fora por desenho."
+    provenance:
+      source: "a sessão que absorveu as peças na worktree feat/dissect-object-families"
+      locator: ".claude/validation/dissect-object-check.py, .claude/validation/dissect-families.kg.yaml, .claude/validation/dissect-object-bench.py e a família dissect_object de .claude/validation/lint-selftest.sh"
+      method: "medição: bancada, mutantes à mão e o checador rodado contra estudos reais num clone descartável"
+      locality: "repo"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -646,4 +705,13 @@ edges:
     edge_type: TRACES_TO
   - from: E_FASES_1_E_2_DO_CORE_ENTREGUES_1024
     to: D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023
+    edge_type: SUPPORTS
+  - from: D_DISSECT_ABSORVE_PECAS_PARQUEIA_MOTOR_1024
+    to: E_SINAL_DISSECAR_QUALQUER_OBJETO_1023
+    edge_type: TRACES_TO
+  - from: Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA
+    to: D_DISSECT_ABSORVE_PECAS_PARQUEIA_MOTOR_1024
+    edge_type: CONSTRAINS
+  - from: E_DISSECT_PECAS_ABSORVIDAS_1024
+    to: D_DISSECT_ABSORVE_PECAS_PARQUEIA_MOTOR_1024
     edge_type: SUPPORTS

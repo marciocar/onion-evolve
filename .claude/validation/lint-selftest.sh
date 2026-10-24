@@ -36693,6 +36693,42 @@ KG
 
 _family run_dissect_selftests
 
+# ── DISSECAR QUALQUER OBJETO: o checador de forma (família, Etapa 0, veredito, destino) ──────────────
+# POR QUE EXISTE (decisão do maestro de 2026-10-24): o /meta:dissect absorveu do protótipo de um adotante
+# de curadoria o registro de famílias, a Etapa 0 pré-registrada e o checador de forma. A bancada dele é
+# Python (repos git temporários com commits de verdade, porque o item 5 lê a ORDEM no git log) e já faz
+# as três partes: cobertura de todo código emitido, um caso por código e o MUTANTE de cada código calado.
+# Esta família a roda e a lê pelo rc e pelas linhas, nunca pela prosa de resumo apenas:
+#   (a) cada `ok   …` vira um pass; rc ≠ 0 vira fail com o bloco FALHA inteiro;
+#   (b) PISO de casos: a bancada que encolhe em silêncio (um CASES apagado, um map vazio) daria rc 0 com
+#       zero casos — o piso reprova menos de 72 casos e menos de 4 de rc 3 (os números de 2026-10-24);
+#   (c) sem PyYAML o checador sai rc 3 e a bancada reprovaria tudo: o fail declara o motivo, nunca ⊘.
+run_dissect_object_selftests() {
+  local bench="${REPO_ROOT}/.claude/validation/dissect-object-bench.py"
+  local sut="${REPO_ROOT}/.claude/validation/dissect-object-check.py"
+  if [ ! -f "${bench}" ] || [ ! -f "${sut}" ]; then record_fail "dissect-object" "SUT ou bancada ausente: ${sut} · ${bench}"; return; fi
+  if ! python3 -I -c 'import yaml' >/dev/null 2>&1; then
+    record_fail "dissect-object" "PyYAML ausente no python3: o checador sai rc 3 e nada se mede (instale pela fonte oficial)"; return
+  fi
+  local out rc=0 line n_ok=0 n_cases n_rc3
+  out="$(cd "${REPO_ROOT}" && python3 -I -B "${bench}" 2>&1)" || rc=$?
+  while IFS= read -r line; do
+    case "${line}" in "ok   "*) record_pass "dissect-object: ${line#ok   }"; n_ok=$((n_ok + 1)) ;; esac
+  done <<< "${out}"
+  if [ "${rc}" != "0" ]; then
+    record_fail "dissect-object" "bancada rc=${rc}: $(_emit "$(sed -n '/^FALHA/,$p' <<< "${out}")" | head -c 1500)"; return
+  fi
+  n_cases="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\1/p' <<< "${out}")"
+  n_rc3="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\2/p' <<< "${out}")"
+  if [ -n "${n_cases}" ] && [ "${n_cases}" -ge 72 ] && [ -n "${n_rc3}" ] && [ "${n_rc3}" -ge 4 ] && [ "${n_ok}" -ge $((n_cases + n_rc3)) ]; then
+    record_pass "dissect-object: (b) piso — ${n_cases} casos + ${n_rc3} de rc 3, ${n_ok} linhas ok (a bancada não encolheu)"
+  else
+    record_fail "dissect-object: (b)" "piso violado ou resumo ilegível: casos='${n_cases}' rc3='${n_rc3}' ok=${n_ok} (piso 72 + 4)"
+  fi
+}
+
+_family run_dissect_object_selftests
+
 # ── CLASSIFICAÇÃO I/O DO GATE (passo 1 da Capacidade 1) ──────────────────────────────────────
 # POR QUE EXISTE: o SUT nasceu SEM bancada, e o custo apareceu no mesmo dia — o seletor
 # `--affected-staged` não achou família que o citasse e RECUSOU estreitar ("tudo, no incerto"),

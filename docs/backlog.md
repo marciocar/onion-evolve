@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**622 itens abertos** em 122 grafo(s) com aberto (de 156 no escopo) · 123 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**630 itens abertos** em 123 grafo(s) com aberto (de 157 no escopo) · 124 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -694,6 +694,18 @@
 | 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
 | 3.6 | `C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP` | projection-ids-2026-10 | TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue p |
 
+## dissect-families — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 16.8 | `C_FAMILIES_REGISTRY_V1` | dissect-families | O registro v1 tem seis famílias, escolhidas pela ordem de predicados da Etapa 0; família nova entra por PR no core antes do N0 d |
+| 4.2 | `T_FAMILY_APP` | dissect-families | Família app da dissecação. |
+| 4.2 | `T_FAMILY_ATOR` | dissect-families | Família ator da dissecação. |
+| 4.2 | `T_FAMILY_CATEGORIA` | dissect-families | Família categoria da dissecação. |
+| 4.2 | `T_FAMILY_FERRAMENTA` | dissect-families | Família ferramenta da dissecação. |
+| 4.2 | `T_FAMILY_IDEIA` | dissect-families | Família ideia da dissecação. |
+| 4.2 | `T_FAMILY_PRATICA` | dissect-families | Família pratica da dissecação. |
+
 ## m3-federation-admin-2026-07 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1115,11 +1127,12 @@
 | 4.5 | `Q_REABRIR_AUTORIDADE_NO_PROBE` | rea-method-2026-10 | Gatilho (b): quando o probe estruturado existir, o verificador deve nomear o id que fecha e a autoridade que provou? Esta é a ide |
 | 3.0 | `Q_REABRIR_PARIDADE_POS_FORGE` | rea-method-2026-10 | Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexis |
 
-## sinais-de-campo-2026-09 — 2 item(ns)
+## sinais-de-campo-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
+| 3.0 | `Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA` | sinais-de-campo-2026-09 | O workflow do protótipo vira motor do /meta:dissect? Gatilho: 1 objeto decisório a mais rodado nos dois braços com o protocolo  |
 | 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
 ## env-falso-positivo-2026-10 — 3 item(ns)

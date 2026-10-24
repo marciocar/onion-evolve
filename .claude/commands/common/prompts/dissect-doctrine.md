@@ -97,6 +97,9 @@ Toda dissecação que chega ao N3 fecha num destes, **com razão escrita**:
 
 **O que NÃO é veredito:** "interessante", "promissor", "vale acompanhar". São parque sem gatilho.
 
+**Estes quatro são os da família `ferramenta`.** Outras famílias têm o seu vocabulário no registro (§6): `ator`
+não absorve, e `categoria` e `ideia` têm `perseguir`, que aponta a saída em vez de um plano de absorção.
+
 **REJEITAR e PARQUEAR são vereditos NEGATIVOS, e negativo leva superação e critério** (SAC-151). O
 maestro, em 2026-10-15: "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e inovação; é preciso ter medição e critérios claros". O nó do veredito declara
 `x_dissect_criterion: "<comando que checa a reprovação>"` e `x_dissect_overcoming: <id>`, que aponta o nó
@@ -187,3 +190,93 @@ Quem preenche mede a origem (N0 com fonte primária); o leitor recusa o plano qu
   Ferramenta que nunca foi anotada em lugar nenhum é invisível a ele, e ele diz isso em vez de
   fingir cobertura.
 - **Não roda sozinha.** Maestro-invocada; sem cron, sem `/loop` (MOAT W7).
+- **Não traz o motor do protótipo de qualquer objeto.** O workflow de 3 agentes está parqueado (§6), com
+  gatilho medido; a família, a Etapa 0 e o checador de forma valem sem ele.
+
+---
+
+## 6. Qualquer objeto: família registrada, Etapa 0, veredito por família e destino declarado
+
+Decisão do maestro de 2026-10-24. A escada servia só a ferramenta de terceiro, e o pedido era dissecar também app,
+categoria de produto, ideia, prática e ator. Um adotante de curadoria desenhou isso, forjou um protótipo e o mediu
+contra o método de então. As **peças determinísticas** foram absorvidas aqui porque curam três falhas medidas no 1º
+estudo dele: a busca de superação que só olhou o repo e não viu a alternativa que superava a técnica estudada, o
+gatilho de parque que contava estado transitório e nunca disparava, e o app sem superfície executável que subia de
+nível por folheto. O **motor** do protótipo (o workflow de 3 agentes) ficou **parqueado**: a comparação saiu
+inconclusiva, e o gatilho é 1 objeto decisório a mais rodado com o protocolo corrigido (o juiz vê os vereditos válidos
+da família, e os braços têm os mesmos limites). Se o protótipo vencer de novo no juiz cego com custo até 1,25× o do
+método atual, absorve-se.
+
+**A família é dado, não prosa.** O registro mora em `.claude/validation/dissect-families.kg.yaml`, no perfil `x_term`:
+cada família é um nó `T_FAMILY_*` com `x_term` (o `pref`, a definição e os sinônimos) e `x_dissect_family_spec` (o que
+**prova** cada nível, os **vereditos válidos** e o **destino padrão**). A lista é **aberta**: família nova entra por PR
+no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada fica `superseded`.
+
+| Família | Sinônimos | N0 prova | N1 prova | N2 prova (comportamento) | N4 / saída | Vereditos | Destino padrão |
+|---|---|---|---|---|---|---|---|
+| `ferramenta` | ferramenta de terceiro · tool | trajetória datada | verbos da superfície executável | rodar isolado ou ler o código | plano `x_absorb_*` | absorver · costurar · parquear · rejeitar | core |
+| `pratica` | método · metodologia | quem prescreve, desde quando | a prescrição escrita | dogfood em tarefa real do Onion contra controle | plano `x_absorb_*` | absorver · costurar · parquear · rejeitar | core |
+| `ator` | empresa · modelo de negócio · perfil | identidade datada | a oferta (produtos, preços públicos) | o dinheiro: filing, preço, rodada, receita | sinal ao panorama | costurar · parquear · rejeitar | panorama |
+| `app` | aplicativo · app de consumo | identidade datada | verbos da superfície observável | artefato aberto do próprio app **ou** uso observado com protocolo commitado | plano `x_absorb_*` (só mecanismo) | absorver · costurar · parquear · rejeitar | core |
+| `categoria` | categoria de produto · mercado | o recorte e os atores candidatos | régua de funcionalidades com ≥ 3 atores e capital datado | ler ou rodar a implementação de referência aberta | `x_dissect_pursue` | perseguir · costurar · parquear · rejeitar | projeto-novo |
+| `ideia` | tese · hipótese | análogos: quem fez, onde, resultado | o valor alegado e para quem | o menor experimento pré-registrado que mede a tese | `x_dissect_pursue` | perseguir · parquear · rejeitar | declarado na Etapa 0 |
+
+**Regras de família:**
+
+- **Como escolher** (ordem de predicados; a 1ª pergunta que responder "sim" decide, e a Etapa 0 registra as
+  respostas até ela): 1. tem superfície executável aberta (código, CLI, API, schema)? → `ferramenta` · 2. é uma
+  prescrição de trabalho para adotar? → `pratica` · 3. interessa o mecanismo de um produto fechado? → `app` ·
+  4. interessa o dinheiro ou o lugar no mercado de uma empresa? → `ator` · 5. o estudo pede três ou mais atores de
+  um mesmo mercado? → `categoria` · 6. o objeto ainda não existe e é uma tese? → `ideia`.
+- `app` cobre **só o mecanismo**; o negócio de um app é outro estudo, da família `ator`, porque ator **não absorve**.
+- No `app`, N2 sem artefato aberto nem uso observado com protocolo deixa o estudo **no nível 1**, e o veredito fica
+  limitado a `parquear`. A lacuna não promove o estudo.
+- O capital mora no N2 de `ator` e no N1 de `categoria`, nunca no N0.
+- `perseguir` declara `x_dissect_pursue: estudo | projeto-novo` e não gera plano `x_absorb_*` (para projeto novo
+  não existe repo de régua).
+- Legado: `x_dissect_family: A` = `ferramenta`, `B` = `pratica`, `C` = `ator` (labels `hidden` no registro; o
+  checador lê o apelido de lá).
+
+**Marcadores de todo estudo por família** (além dos da §1b e do passo 5 do comando):
+`meta.x_dissect_family: <pref>` **e** uma `external_edges` `TRACES_TO` para
+`.claude/validation/dissect-families.kg.yaml#T_FAMILY_<X>` (as duas apontam a mesma família) ·
+`meta.x_study_destination:` do enum `core` · `panorama` · `projeto:<slug>` · `projeto-novo` ·
+`meta.x_who_pays:` (quem paga, e se abre via de bilhetagem) · `meta.x_unverified:` (a lista do que não foi
+verificado; vazia vale, ausente não).
+
+| Destino | Para onde vai | Quem sela |
+|---|---|---|
+| `core` | sinal ao core (`/meta:co-relay` num adotante; no core, o próprio grafo) | o core |
+| `panorama` | sinal ao panorama competitivo do core | o core |
+| `projeto:<slug>` | sinal ao projeto orquestrado pelo Onion | o projeto |
+| `projeto-novo` | fica onde foi estudado; `perseguir` pode virar adoção (`/meta:adopt`) | o maestro (`/meta:decide`) |
+
+**A Etapa 0 é pré-registrada, e o git prova a ordem.** Antes de qualquer dado do objeto, o plano mora em
+`STAGE0.md` **na pasta do estudo**, com os 8 elementos em títulos `## 1.` a `## 8.`: (1) pergunta e recorte, com o
+que fica de fora · (2) família, com as respostas da ordem de predicados · (3) destino · (4) níveis a rodar, com a
+afirmação que cada um testa · (5) critério de corte, eliminatórios e pontuados · (6) a condição que invalida a tese
+(pré-mortem) · (7) orçamento e regra de parada · (8) perspectivas a cobrir, inclusive uma contrária. O grafo ganha
+o nó `S_STAGE0` com `x_criterion` (`id`, `version`, `registered_at` com fuso, `sha256` do arquivo e `ref` para ele;
+contrato 4.12, o digest sai de `python3 -I vendor/kg-ssot/tools/kg_criterion.py digest --text-file <STAGE0.md>`).
+O commit do plano é **ancestral estrito** do primeiro commit que traz um nó `x_dissect_level: 0`; emenda é versão
+nova do critério (`amends`), nunca edição do arquivo. A Etapa 0 pode encerrar o estudo: um eliminatório que já
+reprova antes do N0 é desfecho.
+
+**Superação buscada também fora do repo.** Com superação, o nó dela declara `provenance.locality: web` (ou `repo`).
+Com `x_dissect_overcoming: nenhuma`, o estudo lista as buscas em
+`x_dissect_overcoming_search: [{where: corpus, cmd: "…"}, {where: web, source: "…"}]`, com **ao menos uma**
+`where: web`. Vale junto da §2: a superação tem de entregar, e o `--check-verdict` do censo segue julgando a forma.
+
+**O gatilho de parque lê o que persiste.** `x_dissect_trigger: {kg_query: [flags…], min_count: N}` — uma consulta
+ao grafo pelo leitor do contrato, numa **lista branca** de flags de seleção, que conta nós `superseded`/`done` ou
+arestas `SUPERSEDES` em volta de um nó do próprio estudo, nunca `drifted`. O total tem de estar **abaixo** de
+`min_count` ao selar: gatilho que já disparou não sustenta o parque. O `x_dissect_criterion` da §2 segue com o
+sentido de sempre.
+
+**Quem cobra:** `bash .claude/validation/dissect-object-check.sh <grafo>` (rc 0 sem achado · 1 com achado · 3 não
+mediu, nunca aprovação) confere os 8 itens — família e aresta, veredito da família, destino, quem paga e o não
+verificado, Etapa 0 no git, superação com busca na web, gatilho na lista branca e não disparado, app sem artefato no
+nível 1 — e `--context` projeta as famílias e os estudos do corpus. Ele julga **forma, pertença e ordem no git**, não
+qualidade: se a superação entrega e se o gatilho mede a coisa certa é trabalho do Elenxo. Estudo anterior a
+2026-10-24 (sem `x_study_destination`) fica fora por desenho; rodar o checador direto sobre ele lista o que falta
+para migrar. Bancada: `run_dissect_object_selftests`.

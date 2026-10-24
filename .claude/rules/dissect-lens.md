@@ -21,8 +21,9 @@ O mínimo que não se negocia aqui:
 - **N2 exige COMPORTAMENTO** (behavior-over-declaration): rodar — em worktree/container isolado,
   nunca na árvore de trabalho — ou ler o código-fonte. Impossível? nó `open` com a lacuna
   **nomeada**, jamais `confirmed`.
-- **Veredito é um dos quatro**: `absorver` · `costurar` (SDAAL) · `parquear` **com gatilho
-  nomeado** · `rejeitar` com razão datada. "Promissor" e "vale acompanhar" são parque sem gatilho.
+- **Veredito é um dos da família** (na `ferramenta`, os quatro): `absorver` · `costurar` (SDAAL) ·
+  `parquear` **com gatilho nomeado** · `rejeitar` com razão datada; `perseguir` só em `categoria` e `ideia`.
+  "Promissor" e "vale acompanhar" são parque sem gatilho.
 - **`source_tier` é a escala DREAM 1–10 — 10 é a MAIS FORTE**, `<= 3` é fraca. (Linha escrita
   porque um arquivamento da SEC foi carimbado `source_tier: 1` em 2026-10-01, lendo ao contrário.)
 - **Marcadores obrigatórios** para o censo achar: `meta.x_dissect_tool:`, `x_dissect_level:` por nó,
@@ -36,4 +37,10 @@ O mínimo que não se negocia aqui:
 - **`absorver`/`costurar` no N4 escreve o plano como nós `x_absorb_*`** (alvo, peças, origem com
   pin, licença, forma, paridade) e passa em `dissect-plans.sh . <ferramenta>` com rc 0 —
   é o que o `/meta:forge` lê. Peça que "já existe" não se digita: o leitor mede.
+- **Objeto de qualquer família** (§6 da doutrina): a família sai da ordem de predicados e está no registro
+  `.claude/validation/dissect-families.kg.yaml` — família que não está lá entra por PR **antes** do N0.
+  O `STAGE0.md` (8 elementos) é **commitado antes** do primeiro nó `x_dissect_level: 0`, com o nó
+  `S_STAGE0` e o `x_criterion`; o veredito é do vocabulário da família (`ator` não absorve; `categoria` e
+  `ideia` perseguem); destino, quem paga e o não verificado vão no `meta:`; superação `nenhuma` lista a
+  busca **na web** também. Quem confere: `bash .claude/validation/dissect-object-check.sh <grafo>` rc 0.
 - **Grafo primeiro, prosa depois** — `kg-radar` exit 0 antes de qualquer `SYNTHESIS.md`.
