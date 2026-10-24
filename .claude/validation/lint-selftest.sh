@@ -29857,10 +29857,7 @@ run_kg_vocab_ci_selftests() {
     (cd "${sb}" && git add -A >/dev/null 2>&1)
   }
   _kgv_stamp() {   # regrava só o carimbo das externas (a base fica como está)
-    python3 -I -c '
-import hashlib, sys
-open(sys.argv[2], "w").write(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest() + "\n")
-' "${sb}/.kg-ssot/vocab-externals.tsv" "${sb}/.kg-ssot/vocab-externals.sha256"
+    python3 -I -c 'import hashlib, sys; open(sys.argv[2], "w").write(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest() + "\n")' "${sb}/.kg-ssot/vocab-externals.tsv" "${sb}/.kg-ssot/vocab-externals.sha256"
   }
   _kgv_term() {    # _kgv_term <id> <notation> <scheme>
     printf '  - id: %s\n    node_type: entity\n    status: open\n    label: "termo"\n    x_term:\n      pref: "nome de %s"\n      notation: "%s"\n      scheme: %s\n' "$1" "$2" "$2" "$3"
@@ -29878,9 +29875,8 @@ open(sys.argv[2], "w").write(hashlib.sha256(open(sys.argv[1], "rb").read()).hexd
   if [ "${rc}" = 1 ] && grep -q 'vocab.code-unresolved .*r8' <<< "${out}"; then record_pass "kg-vocab-ci: (b) código novo sem termo REPROVA (rc 1, code-unresolved r8)"
   else record_fail "kg-vocab-ci: (b) código novo" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
   # (c) nomear o legado em DOIS esquemas muda o estado dele (sem termo → ambíguo): reclassificado, rc 0
-  _kgv_prose "A rodada r7 mediu." "$(_kgv_term T_A r7 radar-cc)
-$(_kgv_term T_B r7 a2a-spike)
-"
+  # (sem string multilinha na coluna 0: a seleção da bancada lê a fronteira do bloco pelo '}' da coluna 0)
+  _kgv_prose "A rodada r7 mediu." "$(_kgv_term T_A r7 radar-cc)"$'\n'"$(_kgv_term T_B r7 a2a-spike)"$'\n'
   if out="$(cd "${sb}" && bash ops/kg-vocab-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" = 0 ] && grep -q 'reclassificados=1' <<< "${out}"; then record_pass "kg-vocab-ci: (c) o 1º termo de código que colide reclassifica o legado sem reprovar (rc 0, reclassificados=1)"
   else record_fail "kg-vocab-ci: (c) reclassificado" "rc=${rc} $(tail -2 <<< "${out}" | tr '\n' ' ')"; fi
@@ -29975,16 +29971,14 @@ run_house_codes_gen_selftests() {
   local E='# <<< fim do bloco gerado'
   _hcg_tsv() { printf '# cabeçalho\nstatic\tI3\talta\tum escritor por repo\t-\t-\n%sscheme\tradar-cc\talta\trodada do radar\tradar\tradar\n%s\n%s%s\n' "${2:-}" "${B}" "${1:-}" "${E}" > "${sb}/h.tsv"; }
   _hcg_term() { printf '  - id: %s\n    node_type: entity\n    status: %s\n    label: "termo"\n    x_term:\n      pref: "%s"\n      notation: "%s"\n      scheme: %s\n' "$1" "$2" "$3" "$4" "$5"; }
-  printf 'meta:\n  id: v\n  title: "v"\nnodes:\n%s%s%sedges: []\n' \
-    "$(_hcg_term T_A open 'rodada 7 do radar' r7 radar-cc)
-" "$(_hcg_term T_B open 'réplica 7' r7 a2a-spike)
-" "$(_hcg_term T_C superseded 'rodada velha' r9 radar-cc)
-" > "${sb}/docs/g/v.kg.yaml"
+  # (sem string multilinha na coluna 0: a seleção da bancada lê a fronteira do bloco pelo '}' da coluna 0)
+  printf 'meta:\n  id: v\n  title: "v"\nnodes:\n%s\n%s\n%s\nedges: []\n' \
+    "$(_hcg_term T_A open 'rodada 7 do radar' r7 radar-cc)" "$(_hcg_term T_B open 'réplica 7' r7 a2a-spike)" \
+    "$(_hcg_term T_C superseded 'rodada velha' r9 radar-cc)" > "${sb}/docs/g/v.kg.yaml"
   (cd "${sb}" && git add -A >/dev/null 2>&1)
   local out rc
   # (a) projeta só o esquema com linha scheme, só o termo vivo, e mantém as linhas à mão byte a byte
-  _hcg_tsv "term	velho	alta	lixo	-	-	radar-cc
-"
+  _hcg_tsv $'term\tvelho\talta\tlixo\t-\t-\tradar-cc\n'
   export ONION_VOCAB_ROOT="${sb}" ONION_HOUSE_CODES_TSV="${sb}/h.tsv"
   out="$(bash "${gen}" --markdown 2>&1)"; rc=$?
   if [ "${rc}" = 0 ] && grep -qx 'term	r7	alta	rodada 7 do radar	radar	radar	radar-cc' <<< "${out}" \
@@ -30001,8 +29995,7 @@ run_house_codes_gen_selftests() {
   else record_fail "house-codes-gen: (b) idempotência" "o --markdown difere do arquivo que o --write gravou"; fi
   # (c) MUTANTES de entrada: linha scheme sem termo, marcadores ausentes e pref com TAB saem rc 1 (nunca projeção vazia)
   local r1 r2
-  _hcg_tsv "" "scheme	digitado-errado	alta	x	x	x
-"
+  _hcg_tsv "" $'scheme\tdigitado-errado\talta\tx\tx\tx\n'
   if bash "${gen}" --markdown >/dev/null 2>&1; then r1=0; else r1=$?; fi
   printf 'static\tI3\talta\tx\t-\t-\n' > "${sb}/h.tsv"
   if bash "${gen}" --markdown >/dev/null 2>&1; then r2=0; else r2=$?; fi
@@ -30011,15 +30004,8 @@ run_house_codes_gen_selftests() {
   unset ONION_VOCAB_ROOT ONION_HOUSE_CODES_TSV   # daqui para baixo, o corpus REAL do core
   # (d) o filtro por git grep dá a MESMA resposta que o --root do vendor no corpus real (nenhum termo some)
   local want got
-  want="$(cd "${root}" && python3 -I -B vendor/kg-ssot/tools/kg_vocab.py terms --root . --format json 2>/dev/null | python3 -I -c '
-import json, sys
-sch = {l.split("\t")[1] for l in open(sys.argv[1], encoding="utf-8") if l.startswith("scheme\t")}
-print(sorted((t["scheme"], t["notation"]) for t in json.load(sys.stdin)["terms"] if t.get("scheme") in sch and t.get("notation") and t.get("status") not in ("superseded", "refuted")))
-' "${SCRIPT_DIR}/house-codes.tsv")"
-  got="$(bash "${gen}" --markdown 2>/dev/null | python3 -I -c '
-import re, sys
-print(sorted((c[6], re.sub(r"\\\\(.)", r"\1", c[1])) for c in (l.rstrip("\n").split("\t") for l in sys.stdin) if c[0] == "term"))
-')"
+  want="$(cd "${root}" && python3 -I -B vendor/kg-ssot/tools/kg_vocab.py terms --root . --format json 2>/dev/null | python3 -I -c 'import json, sys; sch = {l.split("\t")[1] for l in open(sys.argv[1], encoding="utf-8") if l.startswith("scheme\t")}; print(sorted((t["scheme"], t["notation"]) for t in json.load(sys.stdin)["terms"] if t.get("scheme") in sch and t.get("notation") and t.get("status") not in ("superseded", "refuted")))' "${SCRIPT_DIR}/house-codes.tsv")"
+  got="$(bash "${gen}" --markdown 2>/dev/null | python3 -I -c 'import re, sys; print(sorted((c[6], re.sub(r"\\\\(.)", r"\1", c[1])) for c in (l.rstrip("\n").split("\t") for l in sys.stdin) if c[0] == "term"))')"
   if [ -n "${want}" ] && [ "${want}" != "[]" ] && [ "${want}" = "${got}" ]; then record_pass "house-codes-gen: (d) o filtro do gerador devolve os mesmos termos que o kg_vocab --root"
   else record_fail "house-codes-gen: (d) filtro × --root" "root=${want:0:160} gerador=${got:0:160}"; fi
   # (e) a projeção rastreada está em dia, e a REGRA 62 a lista (sem a linha, o bloco velho passaria calado)
