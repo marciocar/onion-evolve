@@ -2,7 +2,8 @@
 branch: ci/review-pin-v1-0-261
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e45996681df48acdd94296a8cf7599b2f5b242f4ed9b6c64d5f38754d93f5f04
+reviewed_code_sha256: 67d8520f8b94f3d4a73730339c1918a2746ee451155e1bafc862e1727ae73e4f
 findings_total: 2
 findings_real: 0
 tokens: 0
