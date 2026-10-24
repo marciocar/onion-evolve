@@ -49,8 +49,8 @@ mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs
 
 # O índice de leitura do KG não usa `--markdown` (é TSV) nem vive sob o mesmo molde, então
 # sai do laço — mas pertence à mesma lista por natureza: projeção GERADA com catraca no lint.
-if [ -f "${DEST}/.claude/validation/kg-trace-resolve.sh" ]; then
-  _idx="$(bash "${DEST}/.claude/validation/kg-trace-resolve.sh" "${DEST}" --emit-index 2>/dev/null || true)"
+if [ -f "${DEST}/.claude/validation/kg-trace.sh" ]; then
+  _idx="$(bash "${DEST}/.claude/validation/kg-trace.sh" "${DEST}" --emit-index 2>/dev/null || true)"
   # Só escreve se veio conteúdo: índice vazio faria o hook da perna de leitura ficar calado
   # para o corpus inteiro, e calado é indistinguível de "não há grafo" (REGRA 84).
   [ -n "${_idx}" ] && printf '%s\n' "${_idx}" > "${DEST}/docs/onion/kg-read-index.tsv"

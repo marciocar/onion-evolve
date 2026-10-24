@@ -1,4 +1,4 @@
-# Fixture: REGRA 55 / kg-trace-resolve.sh — os DOIS lados no mesmo grafo.
+# Fixture: REGRA 55 / kg-trace.sh (o juiz é o kg_trace.py do produto) — os DOIS lados no mesmo grafo.
 #
 # Cada nó existe por um falso-positivo REAL medido no corpus em 2026-08-06. Sem o filtro que
 # ele exercita, o número sobe de 13 para 24 (46% de falso-positivo) e o aviso vira ruído.

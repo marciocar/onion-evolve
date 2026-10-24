@@ -244,7 +244,7 @@ nodes:
     verified_at: "2026-08-06"
     verified_against: "medicao-1659-traces-em-54-grafos-e-contagem-de-escopo-do-freshness-tsv"
     label: "M4 EXECUTADO, e a MEDICAO REFUTOU A PROPRIA ESPECIFICACAO em dois pontos. (1) LUGAR: o W3 mandou a clausula para dentro do kg-radar --freshness-tsv; medido, dos 13 casos reais so 2 caem nesse escopo (que cobre apenas plane:PROD ou no com verified_against) — a guarda nasceria vendo 15% do defeito e DECLARANDO cobertura, falso-verde por construcao. (2) ARQUITETURA: o kg-radar tem ZERO acesso a filesystem (0 chamadas system()/getline<), e essa pureza e load-bearing — e o que o faz rodar sob env -i (a portabilidade que o M3 mediu); embutir I/O custaria a propriedade para cobrir menos. SUPERACAO: script-irmao kg-trace-resolve.sh (padrao do kg-radar-integrity.sh), cobrindo 13/13. E a FORMA do M4 tambem mudou duas vezes antes disso: a fila de 70 candidatos morreu porque 64 ja estao ancorados (91% de ruido) e porque o bloco PROVENIENCIA ja cobre ancora ausente — o que o radar NUNCA fez foi verificar se a ancora RESOLVE, que e o behavior-over-declaration virado para a propria ancora"
-    trace: ".claude/validation/kg-trace-resolve.sh"
+    trace: ".claude/validation/kg-trace.sh"
     provenance:
       source: ".claude/validation/kg-trace-resolve.sh"
       locator: "medicao-1659-traces-em-54-grafos-e-contagem-de-escopo-do-freshness-tsv"

@@ -126,7 +126,7 @@ _V="${REPO_ROOT}/.claude/validation"
   && [ -f "${_V}/graph.sh" ] \
   && onion_regen docs/onion/graph.md 21 bash "${_V}/graph.sh" --markdown
 if [ -n "$(onion_staged '*.kg.yaml')" ]; then
-  [ -f "${_V}/kg-trace-resolve.sh" ]     && onion_regen docs/onion/kg-read-index.tsv 84 bash "${_V}/kg-trace-resolve.sh" . --emit-index
+  [ -f "${_V}/kg-trace.sh" ]             && onion_regen docs/onion/kg-read-index.tsv 84 bash "${_V}/kg-trace.sh" . --emit-index
   # o projetor de backlog custa ~14s por invocação (medido) — por isso só com .kg.yaml staged
   [ -f "${_V}/kg-backlog-project.sh" ]     && onion_regen docs/backlog.md 62 bash "${_V}/kg-backlog-project.sh" --markdown
   # A LENTE (REGRA 31) estava fora, e o Elenxo a PROVOU: bastou tocar um `.kg.yaml` com lente para

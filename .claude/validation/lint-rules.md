@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**102 regras** no total — **90 HARD**, **42 SOFT**.
+**102 regras** no total — **90 HARD**, **43 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -139,7 +139,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 47 | Narração do KG cita ids que existem no grafo | HARD | narração que cita nó inexistente no grafo — console embute e DROPA ids mortos silenciosamente |
 | 49 | Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com catraca | HARD + SOFT | nó afirmando sobre produção sem nunca ter sido medido contra o vivo |
 | 52 | Todo .kg.yaml do repo passa no radar de INTEGRIDADE | HARD | grafo com contradição estrutural vivendo no repo sem ninguém medir |
-| 55 | O `trace:` de um nó APONTA para alvo que EXISTE | HARD | âncora declarada que não resolve — quem tenta voltar ao "porquê" cai no vazio |
+| 55 | O `trace:` de um nó APONTA para alvo que EXISTE | HARD + SOFT | âncora declarada que não resolve — quem tenta voltar ao "porquê" cai no vazio |
 | 57 | O veredito do run está SELADO no grafo que ele julgou | HARD | run que mede e não sela — a SSOT segue afirmando o que a medição já derrubou |
 | 58 | O backlog cumpre as promessas do próprio `meta:` | HARD | backlog que promete teto e carimbo no cabeçalho e não cobra nenhum dos dois — inchando |
 | 67 | Grafo de pesquisa com REVISITA carimbada (meta.review_after) | SOFT | pesquisa que envelhece em silêncio — 27 grafos em docs/evolution/research/ sem nenhuma data de |
