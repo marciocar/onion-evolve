@@ -1563,6 +1563,7 @@ MESSAGES = {
                                         "zone that a date alone does not give.",
     "integrity.term-notation-duplicate": "Two live terms have the same notation in the same scheme: a code names one "
                                          "concept per scheme.",
+    "integrity.trace-target-missing": "The node's trace: points to a path that does not exist in the repository.",
     "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
     "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
                                           "a value with no JSON form.",
@@ -1624,6 +1625,8 @@ HINTS = {
     "integrity.term-notation-duplicate": "Give one of them another notation, put them in different schemes "
                                          "(x_term.scheme), or retire the old term (status superseded, with SUPERSEDES "
                                          "from the new one).",
+    "integrity.trace-target-missing": "Point trace: to where the file is now (it was moved or renamed?), or to the "
+                                      "commit that had it.",
     "integrity.measured-order-unknown": "Give registered_at and measured_at a time with a time zone (RFC 3339).",
     "form.required.node.provenance": "Add provenance with source, locator, and method; with no recoverable source, "
                                      "change the status to unverifiable.",

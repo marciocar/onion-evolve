@@ -8,13 +8,22 @@
 # --exclude, e eles têm de casar com os da base (.kg-ssot/gate/, uma pasta com um registro por grafo desde a kg-ssot 4.16.0); por isso os dois chamam este.
 #
 # Uso: bash ops/kg-gate-ci.sh [args extras do kg_gate.py, como --update]
+#   KG_GATE_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh   (só a bancada antes da tag; ver abaixo)
 #   rc 0 = vendor íntegro, nenhum grafo piorou e nenhum código novo sem nome · rc 1 = reprovou · rc 2 = entrada quebrada (nunca verde)
 # Roda da raiz do repo que se quer julgar (o pr-finalize a chama dentro da worktree do HEAD).
 set -uo pipefail
 
 [ -f vendor/kg-ssot/tools/kg_gate.py ] || { echo "kg-gate-ci: vendor/kg-ssot ausente em $(pwd) — não dá para julgar" >&2; exit 2; }
 
-python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot || exit $?
+# A BANCADA antes da tag (kg-ssot 4.24.0): um vendor trazido por `kg_vendor.py update --ref <commit>` tem o carimbo
+# unreleased, e o check e o kg_gate.py o reprovam sem --allow-unreleased. Sem esta variável a bancada pré-tag não
+# tinha como passar a flag ao check (os args extras só vão ao kg_gate.py). Ela vale SÓ quando setada a 1, e o CI e o
+# pr-finalize nunca a setam: o vendor de release vem de update --tag, e um vendor de bancada nunca passa por release.
+# O kg_gate.py recusa --update a partir de um vendor de bancada mesmo com a flag, então a base não se regrava daqui.
+allow=()
+[ "${KG_GATE_ALLOW_UNRELEASED:-}" = 1 ] && allow=(--allow-unreleased)
+
+python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot "${allow[@]}" || exit $?
 
 # FORA DO CORPUS, explícito (política selada pelo maestro, 2026-10-08): propostas arquivadas do
 # kg-inbox são história. A base tem de ser gravada com os MESMOS --exclude:
@@ -22,7 +31,7 @@ python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot || exit
 python3 -I vendor/kg-ssot/tools/kg_gate.py \
   --exclude 'docs/evolution/kg-inbox/_rejected/*' \
   --exclude 'docs/evolution/kg-inbox/_sealed/*' \
-  "$@"
+  "${allow[@]}" "$@"
 gate_rc=$?
 
 # O critério pré-registrado por HASH (kg-ssot 4.21.0): o leitor não calcula hash, então a régua editada no lugar

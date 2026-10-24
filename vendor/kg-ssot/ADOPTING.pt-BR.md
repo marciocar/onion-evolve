@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:0b7b20e28fac3756 -->
+<!-- translation-of: ADOPTING.md sha256:c607b768909b8063 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -291,7 +291,11 @@ Sobre `--update`:
   - uma entrada da release não cobre nenhum arquivo, ou um membro da tag não é arquivo regular;
   - o carimbo está ausente, ilegível ou fora do formato;
   - no `update`: o destino não é um vendor, ou é um vendor editado sem `--force`, ou faltou `--source` dentro
-    de um vendor.
+    de um vendor, ou o `--ref` não nomeia um commit do `--source`.
+
+Desde a 4.24, o vendor trazido pelo `update --ref` (a bancada antes da tag) não é uma release: o `check` e o
+`kg_gate.py` dão **rc 1** nele sem o `--allow-unreleased`, e o gate nunca grava a base a partir de um. Deixe essa
+opção no comando da bancada, nunca no CI que guarda as suas releases.
 
 ## 4. Atualizar a tag
 
@@ -333,6 +337,17 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.24.0` para a `kg-ssot-v4.25.0`, o contrato não muda (segue o v4.14), e o gate não pede `--update`. O
+`kg_trace.py check --root .` confere o `trace:` de cada nó contra os arquivos do repositório e aponta
+`integrity.trace-target-missing`; ele julga só o que parece caminho do repositório e conta o resto à parte. Se os seus
+grafos ancoram numa pasta de fora do repositório, declare-a com `--external-root <prefixo>`. Para rodar no CI, ponha
+`python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root .` ao lado do gate.
+
+Da `kg-ssot-v4.23.0` para a `kg-ssot-v4.24.0`, o contrato não muda (segue o v4.14), e o gate não pede `--update`. O
+`kg_vendor.py update --ref <commit>` traz um commit que ainda não é release, para a bancada antes da tag; o `check` e
+o `kg_gate.py` dão rc 1 nesse vendor sem o `--allow-unreleased`, e o gate nunca grava a base a partir de um. Se você
+roda a bancada, passe a opção só no comando dela; o seu CI, sem ela, segue recusando o vendor de bancada.
 
 Da `kg-ssot-v4.22.0` para a `kg-ssot-v4.23.0`, o contrato vai ao v4.14, e só o nível SHOULD muda: nada que passava
 reprova, e o gate registra a identidade nova do contrato sem pedir `--update` enquanto nenhum veredito muda (medido nos

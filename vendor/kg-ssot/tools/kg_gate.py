@@ -44,9 +44,12 @@ Para ver as ocorrências de um grafo: kg_validate.py <grafo> (sem --schema, o me
 motivo fica na base. rc 2: entrada quebrada (não é repo git, base ilegível, fora do formato ou ausente sem
 --update, .kg.yaml ilegível).
 
+Rodando de um vendor trazido pelo kg_vendor.py update --ref (a bancada antes da tag; o carimbo diz unreleased), o gate
+reprova (rc 1) sem --allow-unreleased, e nunca grava a base a partir de um.
+
 Uso:
   kg_gate.py [--repo DIR] [--baseline PASTA|ARQ.json] [--exclude GLOB ...] [--no-default-excludes]
-             [--strict-identity] [--update [--accept-regression MOTIVO] [--granularity graph|node]]
+             [--strict-identity] [--allow-unreleased] [--update [--accept-regression MOTIVO] [--granularity graph|node]]
 """
 import argparse
 import collections
@@ -168,7 +171,17 @@ def _vtuple(v):
         return None
 
 
-def stamp_problems():
+def is_bench_vendor():
+    """O kit roda de um vendor de bancada (o carimbo diz unreleased)."""
+    stamp = kg_validate.CONTRACT_MUST.resolve().parent.parent / ".kg-ssot-version"
+    try:
+        data = json.loads(stamp.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return isinstance(data, dict) and bool(data.get("unreleased") or data.get("tag") == "unreleased")
+
+
+def stamp_problems(allow_unreleased=False):
     """Quando o gate roda de um vendor (a raiz do kit tem o carimbo .kg-ssot-version), o sha256 dos dois schemas tem
     de ser o carimbado. É a defesa da identidade composta: a troca de identidade deixou de reprovar sozinha, e um
     schema do vendor afrouxado à mão não pode passar como contrato novo. Fora de um vendor (o repo do produto, o
@@ -181,12 +194,19 @@ def stamp_problems():
                       " verify the contract against)").format(stamp=stamp)]
         return []
     try:
-        files = json.loads(stamp.read_text(encoding="utf-8")).get("files")
+        data = json.loads(stamp.read_text(encoding="utf-8"))
+        files = data.get("files")
     except (OSError, json.JSONDecodeError, AttributeError) as exc:
         raise Broken(_("unreadable vendor stamp ({stamp}): {exc}").format(stamp=stamp, exc=exc)) from exc
     if not isinstance(files, dict):
         raise Broken(_("vendor stamp out of format ({stamp}): files").format(stamp=stamp))
     out = []
+    if (data.get("unreleased") or data.get("tag") == "unreleased") and not allow_unreleased:
+        # o vendor de bancada (kg_vendor update --ref) mede um commit que ainda não é release: o gate não o aceita
+        # como release, como o check (desde a 4.24, achado do Elenxo da SAC-236)
+        out.append(_("✗ bench vendor: {stamp} says unreleased (commit {commit}); a release comes from update --tag, "
+                     "and the bench passes --allow-unreleased").format(stamp=stamp,
+                                                                        commit=str(data.get("commit"))[:12]))
     for schema in (kg_validate.CONTRACT_MUST, kg_validate.CONTRACT_SHOULD):
         rel = schema.resolve().relative_to(root).as_posix()
         if files.get(rel) != hashlib.sha256(schema.read_bytes()).hexdigest():
@@ -557,9 +577,12 @@ The baseline is the .kg-ssot/gate/ folder: contract.json, graphs/<meta.id>.json 
 writes with --accept-regression "<reason>", and the reason stays in the baseline. rc 2: broken input (not a git
 repository, unreadable or out-of-format baseline, missing baseline without --update, unreadable .kg.yaml).
 
+Run from a vendor brought by kg_vendor.py update --ref (the bench before a tag; the stamp says unreleased), the gate
+fails (rc 1) unless --allow-unreleased is given, and it never writes the baseline from one.
+
 Usage:
   kg_gate.py [--repo DIR] [--baseline FOLDER|FILE.json] [--exclude GLOB ...] [--no-default-excludes]
-             [--strict-identity] [--update [--accept-regression REASON] [--granularity graph|node]]
+             [--strict-identity] [--allow-unreleased] [--update [--accept-regression REASON] [--granularity graph|node]]
 """
 
 
@@ -576,6 +599,9 @@ def main(argv=None):
     ap.add_argument("--no-default-excludes", action="store_true",
                     help=_("does not apply the defaults (careful: the vendor's fixtures enter the corpus)"))
     ap.add_argument("--update", action="store_true", help=_("writes the baseline (shows the comparison first)"))
+    ap.add_argument("--allow-unreleased", action="store_true",
+                    help=_("the bench before a tag: accepts a vendor brought by kg_vendor.py update --ref (never "
+                           "with --update)"))
     ap.add_argument("--strict-identity", action="store_true",
                     help=_("fails (rc 1) on every change of contract identity, even without a changed verdict, as"
                            " before 4.16.0"))
@@ -622,14 +648,18 @@ def main(argv=None):
     rc, lines, worse = (compare(base, now, set(measured), debt_now, args.strict_identity, recorded) if base is not None
                         else (0, [], False))
     try:
-        tampered = stamp_problems()
+        tampered = stamp_problems(args.allow_unreleased)
+        if args.allow_unreleased and args.update and is_bench_vendor():
+            print(_("✗ --update refused: a bench vendor (unreleased) never writes the baseline; compare without "
+                    "--update"))
+            return 1
     except Broken as exc:
         print(_("GATE BROKEN  {error}").format(error=exc))
         return 2
     if tampered:
         rc, worse, lines = 1, True, tampered + lines
         if args.update:  # contrato adulterado não vira base, nem com --accept-regression
-            print("\n".join(lines + [_("✗ --update refused: the vendor contract differs from the stamp")]))
+            print("\n".join(lines + [_("✗ --update refused: the vendor does not pass its stamp (see above)")]))
             return 1
     print("\n".join(lines + detail(base, now)))
     if not args.update:
