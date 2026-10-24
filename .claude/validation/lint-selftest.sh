@@ -29971,6 +29971,7 @@ run_kg_gate_ci_selftests() {
   printf 'meta:\n  id: banco\n  title: "bancada"\nnodes:\n  - id: E_A\n    node_type: evidence\n    status: open\n    label: "a"\nedges: []\n' > "${sb}/docs/g/b.kg.yaml"
   (cd "${sb}" && git init -q && git config user.email t@t && git config user.name t && git add -A >/dev/null 2>&1)
   (cd "${sb}" && bash ops/kg-vocab-ci.sh --update >/dev/null 2>&1 && bash ops/kg-gate-ci.sh --update >/dev/null 2>&1)
+  # (b)-(d) rodam sem GITHUB_ACTIONS: a bancada roda no CI, e lá o wrapper recusa a variável de propósito (caso e)
   local rc out
   # (a) o vendor de release passa sem a variável (a linha de base do caso)
   if (cd "${sb}" && bash ops/kg-gate-ci.sh >/dev/null 2>&1); then rc=0; else rc=$?; fi
@@ -29980,17 +29981,21 @@ run_kg_gate_ci_selftests() {
   # (b) vendor de bancada SEM a variável (o CI normal) → reprova; e com valor que não é 1, também
   local r1 r2
   if (cd "${sb}" && bash ops/kg-gate-ci.sh >/dev/null 2>&1); then r1=0; else r1=$?; fi
-  if (cd "${sb}" && KG_GATE_ALLOW_UNRELEASED=yes bash ops/kg-gate-ci.sh >/dev/null 2>&1); then r2=0; else r2=$?; fi
+  if (cd "${sb}" && env -u GITHUB_ACTIONS KG_GATE_ALLOW_UNRELEASED=yes bash ops/kg-gate-ci.sh >/dev/null 2>&1); then r2=0; else r2=$?; fi
   if [ "${r1}" = 1 ] && [ "${r2}" = 1 ]; then record_pass "kg-gate-ci: (b) vendor unreleased sem KG_GATE_ALLOW_UNRELEASED=1 REPROVA (rc 1)"
   else record_fail "kg-gate-ci: (b) vendor unreleased sem a variável" "sem=${r1} yes=${r2}"; fi
   # (c) com a variável, o check E o kg_gate.py aceitam a bancada (passar a flag só a um deles reprova no outro)
-  if out="$(cd "${sb}" && KG_GATE_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(cd "${sb}" && env -u GITHUB_ACTIONS KG_GATE_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" = 0 ] && grep -q 'vendor intact: .*unreleased' <<< "${out}"; then record_pass "kg-gate-ci: (c) KG_GATE_ALLOW_UNRELEASED=1 passa a bancada pré-tag (rc 0)"
   else record_fail "kg-gate-ci: (c) bancada com a variável" "rc=${rc} $(tail -3 <<< "${out}" | tr '\n' ' ')"; fi
   # (d) a variável nunca regrava a base: --update de vendor de bancada é recusado pelo kg_gate.py
-  if (cd "${sb}" && KG_GATE_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh --update >/dev/null 2>&1); then rc=0; else rc=$?; fi
+  if (cd "${sb}" && env -u GITHUB_ACTIONS KG_GATE_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh --update >/dev/null 2>&1); then rc=0; else rc=$?; fi
   if [ "${rc}" != 0 ]; then record_pass "kg-gate-ci: (d) --update a partir da bancada é recusado mesmo com a variável (rc ${rc})"
   else record_fail "kg-gate-ci: (d) --update na bancada" "rc=0: a base foi regravada de um vendor unreleased"; fi
+  # (e) no GitHub Actions a variável setada não julga (rc 2): a bancada pré-tag nunca vira verde no CI
+  if (cd "${sb}" && GITHUB_ACTIONS=true KG_GATE_ALLOW_UNRELEASED=1 bash ops/kg-gate-ci.sh >/dev/null 2>&1); then rc=0; else rc=$?; fi
+  if [ "${rc}" = 2 ]; then record_pass "kg-gate-ci: (e) KG_GATE_ALLOW_UNRELEASED=1 no GitHub Actions sai rc 2"
+  else record_fail "kg-gate-ci: (e) variável no CI" "rc=${rc}"; fi
 }
 _family run_kg_gate_ci_selftests
 

@@ -20,8 +20,12 @@ set -uo pipefail
 # tinha como passar a flag ao check (os args extras só vão ao kg_gate.py). Ela vale SÓ quando setada a 1, e o CI e o
 # pr-finalize nunca a setam: o vendor de release vem de update --tag, e um vendor de bancada nunca passa por release.
 # O kg_gate.py recusa --update a partir de um vendor de bancada mesmo com a flag, então a base não se regrava daqui.
+# O "nunca seta" é mecanismo, não promessa: no GitHub Actions a variável setada sai rc 2 (não julgou).
 allow=()
-[ "${KG_GATE_ALLOW_UNRELEASED:-}" = 1 ] && allow=(--allow-unreleased)
+if [ "${KG_GATE_ALLOW_UNRELEASED:-}" = 1 ]; then
+  [ "${GITHUB_ACTIONS:-}" = true ] && { echo "kg-gate-ci: KG_GATE_ALLOW_UNRELEASED=1 no CI — a bancada pré-tag é só local, um vendor de bancada nunca passa por release" >&2; exit 2; }
+  allow=(--allow-unreleased)
+fi
 
 python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot "${allow[@]}" || exit $?
 
