@@ -4,11 +4,11 @@ pr: pendente
 date: 2026-10-24
 reviewed_diff_sha256: 2306888d932b7be4ebd50c41fda3b39fed8672a1983c02c08bec803346c62301
 reviewed_code_sha256: ce794f80f5931d26aa3f3d1e758805ec5cb08f50ea4f67bd21b7dc15208d694c
-findings_total: 8
-findings_real: 3
+findings_total: 9
+findings_real: 4
 tokens: 0
 duration_min: 60
-findings_fixed: 3
+findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: nao
 reviewer: "agente de execução da sessão principal (claude-opus-5-5), passada própria sobre o próprio diff"
@@ -81,6 +81,12 @@ nota: "tokens não medidos pelo agente; o harness reporta o uso na notificação
    o perfil `gate` levando `kg_trace.py` e `kg_query.py` (achado 6). Por isso este PR não usa `classify`.
 8. **Ramo sem uso, declarado**: o SOFT `NAO-JULGOU` da REGRA 84 (gerador = produto ausente) não dispara hoje, porque
    o `--emit-index` não depende do produto. Fica pronto para a 4.25.1, com o caso (d) da `kg_read_index_empty`.
+
+9. **REAL, curado (o CI pegou, run 40108236900)**: o `regen-ssot-projections.sh` roda o gerador do ALVO, e a porta
+   standalone se materializa de `origin/main`, que ainda não tem o `kg-trace.sh`: o índice não era gerado e o
+   `materialize-door.sh` abortava (caso (f) da família `door`). O pré-voo do pr-finalize não rodou essa família. Cura:
+   fallback para o `kg-trace-resolve.sh` do alvo, que tem o mesmo `--emit-index` (vale também para adotante num pin
+   anterior). Família `door` 13/13.
 
 ## Mutantes (família `kg_trace_resolve`, 11/11)
 
