@@ -49,8 +49,13 @@ mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs
 
 # O índice de leitura do KG não usa `--markdown` (é TSV) nem vive sob o mesmo molde, então
 # sai do laço — mas pertence à mesma lista por natureza: projeção GERADA com catraca no lint.
-if [ -f "${DEST}/.claude/validation/kg-trace.sh" ]; then
-  _idx="$(bash "${DEST}/.claude/validation/kg-trace.sh" "${DEST}" --emit-index 2>/dev/null || true)"
+# O gerador é o do ALVO, e o alvo pode ser de antes de 2026-10-24 (a porta materializada de origin/main, o adotante
+# num pin velho), quando a porta única kg-trace.sh ainda não existia: cai no kg-trace-resolve.sh, que tem o mesmo
+# `--emit-index`. Medido: sem o fallback a porta standalone nascia SEM o índice e o materialize-door abortava.
+_kgi="${DEST}/.claude/validation/kg-trace.sh"
+[ -f "${_kgi}" ] || _kgi="${DEST}/.claude/validation/kg-trace-resolve.sh"
+if [ -f "${_kgi}" ]; then
+  _idx="$(bash "${_kgi}" "${DEST}" --emit-index 2>/dev/null || true)"
   # Só escreve se veio conteúdo: índice vazio faria o hook da perna de leitura ficar calado
   # para o corpus inteiro, e calado é indistinguível de "não há grafo" (REGRA 84).
   [ -n "${_idx}" ] && printf '%s\n' "${_idx}" > "${DEST}/docs/onion/kg-read-index.tsv"
