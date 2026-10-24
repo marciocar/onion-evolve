@@ -2,7 +2,7 @@
 branch: research/kg-backlog-case-e-flaky
 pr: pendente
 date: 2026-10-23
-reviewed_diff_sha256: e79224259a0d0dd7925f130b83684bb0da178460415d8bbf32b4cd51549042e9
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 3a4914fe9572a594c63fba467e362b5f17a433debca3023c33d5388cefe9a7bf
 findings_total: 4
 findings_real: 4
@@ -67,3 +67,14 @@ sandboxes separados não mudam o número.
   passa a diffar esses arquivos. Caso de bancada que a prova: um lint-mutante que injeta um HARD só
   no controle (o (e) por contagem reprova em falso e o por conjunto passa) e um que desliga a
   REGRA 58 (o por contagem passa em falso e o por conjunto reprova).
+
+## Re-revisão (2026-10-24, selo do maestro)
+
+O hash de código mudou por dois motivos: o rebase sobre a `origin/main` (17 commits à frente, sem conflito) e o
+commit do selo. Revisei o diff do selo linha a linha. Ele só toca `fios-abertos.kg.yaml`:
+- `Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE` passa a `done`, com o testemunho do maestro em `provenance`;
+- o `verified_against` anterior foi preservado no `narrative`;
+- `meta.x_drive_checkpoint` passa a `sealed`, e o `--seal` do drive apaga a nota de pendência, por desenho.
+
+Tudo saiu pelos seladores da casa (`kg-decide-seal.sh` e `kg-drive-project.sh --seal`), nada à mão, e o radar
+`--integrity --schema` deu exit 0. Achado novo: nenhum.
