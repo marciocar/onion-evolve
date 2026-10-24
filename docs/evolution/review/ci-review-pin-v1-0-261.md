@@ -2,9 +2,8 @@
 branch: ci/review-pin-v1-0-261
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: bf3108bcf9897da725888ce1dfb92ff608f0493159f07762e6ae5475106bc95d
-reviewed_code_sha256: 4a179eac3874b4c2be61861a29de40a9af7c8a65fa2609baf91c2fa3bb1f9fb8
-findings_total: 1
+reviewed_diff_sha256: pendente
+findings_total: 2
 findings_real: 0
 tokens: 0
 duration_min: 10
@@ -50,3 +49,17 @@ contrato deram rc 0 no grafo tocado.
 
 - O PR que edita o workflow do revisor pode fazer a action se auto-pular, então a execução do CLI 2.1.310 no
   revisor não é provada aqui. Isso fica para um PR seguinte com a label `review:ia`.
+
+## Re-revisão (2026-10-24): a v1.0.262 saiu durante o CI deste PR
+
+O hook de versão defasada (`session-currency-check.sh`) acusou a v1.0.262, publicada às 18:57:30Z, com o PR ainda no
+CI. Ficar na v1.0.261 seria nascer uma versão atrás, então o PR sobe direto para a v1.0.262. A tag anotada é
+`70f88a9f` e o commit, `925afb53`.
+
+2. **O compare `v1.0.261...v1.0.262` tem 1 commit, o #1916, que só sobe o Bun do runner de 1.3.14 para 1.4.4.**
+   Ele mexe no `setup-bun` do `action.yml` e do `base-action/action.yml`, e no `@types/bun` dos `package.json` e locks.
+   A versão do CLI não muda (continua 2.1.310), e nenhum input nem output usado pelo revisor muda. O risco é de
+   runtime (Bun 1.4 sob a action), e só se mede com o revisor rodando, o mesmo limite já declarado.
+
+Conferido de novo: os dois `uses:` foram para `925afb53`, sem SHA velho sobrando. A evidência do grafo foi renomeada
+para `…_V1_0_262_1024`, com o `verified_against` e a fonte apontando o compare até a v1.0.262. Radar rc 0.
