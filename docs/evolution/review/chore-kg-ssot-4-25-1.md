@@ -2,13 +2,13 @@
 branch: chore/kg-ssot-4-25-1
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: 4c0ee6fa6c79e96048b844430e55a0be39e37c9dfd268bcef28aabfc6645669c
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 73ba929ffe2f44f1dfc7a2618c450e11321dcd7df6e5ac7b7be94fa18ba4a35c
-findings_total: 5
-findings_real: 3
+findings_total: 6
+findings_real: 4
 tokens: 0
-duration_min: 95
-findings_fixed: 3
+duration_min: 130
+findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: "agente de execução k4251a (passada própria)"
@@ -37,6 +37,7 @@ nota: "tokens não medidos (0): a sessão não expõe o custo do agente."
    - o regen grava o índice vazio no rc 3, o que também limpa o índice de lixo dos adotantes existentes.
    Caso (j5) e adopter-shape (b), com mutantes.
 5. **Real, curado (o CI pegou, 1ª rodada).** O r84-pathspec (d) só passava pela mesma prosa. Sob um GIT_INDEX_FILE sem grafos, o gerador velho emitia a frase, ela divergia e o diff julgava. Com o produto o rc é 3, e a regra o lia como dia 1 (SOFT), mesmo com o índice commitado cheio. Ou seja: traces sumidos com índice cheio ficariam calados. Agora rc 3 com índice de linhas é divergência, julgada pelo diff: HARD no índice real, isenção no temporário.
+6. **Real, curado (o CI pegou, 2ª rodada).** O r84-vazio (a) rodava o "dia 1" com um índice `placeholder` de uma linha, que é a forma do índice de lixo do achado 4. Com a cura do achado 5, rc 3 com índice de linhas é divergência. O caso passou a rodar o dia 1 com o índice vazio, que é a forma real dele agora. Lição: a bancada inteira roda local antes do próximo push.
 
 ## Mutantes
 

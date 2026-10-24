@@ -42556,7 +42556,12 @@ run_kg_read_index_empty_selftests() {
   }
 
   local o
+  # O dia 1 tem índice VAZIO (o regen-ssot-projections.sh o grava assim no rc 3) ou nenhum. Até 2026-10-24 este
+  # caso rodava com o `placeholder` de uma linha, que era a forma do índice de lixo do resolvedor antigo; rc 3
+  # com índice de LINHAS agora é divergência (caso (j5) da família kg_trace_resolve), não dia 1.
+  : > "${d}/docs/onion/kg-read-index.tsv"
   o="$(_r84 3 'ERRO kg-trace --emit-index: indice VAZIO (parser leu 0 nos com trace resolvivel)' || true)"
+  printf 'placeholder\n' > "${d}/docs/onion/kg-read-index.tsv"
   if grep -q 'V\[SOFT\]' <<< "${o}" && grep -q 'CORPUS-SEM-TRACE-DE-ARQUIVO' <<< "${o}"; then
     record_pass "r84-vazio: (a) corpus sem trace de ARQUIVO => SOFT legitimo (o dia 1 do adotante)"
   else record_fail "r84-vazio: (a)" "vazio legitimo nao virou SOFT: ${o}"; fi
