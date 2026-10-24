@@ -4,11 +4,11 @@ pr: pendente
 date: 2026-10-24
 reviewed_diff_sha256: 46b89025b6ca7ebe78d2c030b4c9054adf0e5dd746a59439a8740fe6372cb78a
 reviewed_code_sha256: 22b7d1399841d807503f0e7a286c9edb714cbcb23cd19f86751c15e8f0d57c17
-findings_total: 3
-findings_real: 1
+findings_total: 5
+findings_real: 3
 tokens: 0
-duration_min: 50
-findings_fixed: 1
+duration_min: 95
+findings_fixed: 3
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: "agente de execução k4251a (passada própria)"
@@ -32,15 +32,24 @@ nota: "tokens não medidos (0): a sessão não expõe o custo do agente."
 2. **Não procede.** Suspeita de `../` que o hook não cobre: o hook não normaliza `..`, e não precisa. O `path` vem resolvido relativo à raiz, e o caso (j) prende a ausência de `../` no índice.
 3. **Não procede.** Hook lento ou fail-open: a mudança é um laço de shell sobre a string já extraída, sem processo novo; o caminho mudo (Bash sem `.kg.yaml`) continua sem python, e os casos (j)/(j2) da família kg_read_leg seguem verdes. O hook é aviso por desenho, sai 0 sempre.
 
+4. **Real, curado (o CI pegou, 1ª rodada).** O adotante no dia 1 nascia sem índice e levava HARD de AUSENTE. O resolvedor antigo, sem grafo rastreado, imprimia "(nenhum .kg.yaml rastreado — nada a verificar)" no stdout com rc 0, e o `regen-ssot-projections.sh` gravava essa frase como índice. O produto não escreve prosa no stdout, então o arquivo deixou de nascer. Duas curas:
+   - a REGRA 84 julga a ausência DEPOIS do gerador: rc 3 sem índice é SOFT;
+   - o regen grava o índice vazio no rc 3, o que também limpa o índice de lixo dos adotantes existentes.
+   Caso (j5) e adopter-shape (b), com mutantes.
+5. **Real, curado (o CI pegou, 1ª rodada).** O r84-pathspec (d) só passava pela mesma prosa. Sob um GIT_INDEX_FILE sem grafos, o gerador velho emitia a frase, ela divergia e o diff julgava. Com o produto o rc é 3, e a regra o lia como dia 1 (SOFT), mesmo com o índice commitado cheio. Ou seja: traces sumidos com índice cheio ficariam calados. Agora rc 3 com índice de linhas é divergência, julgada pelo diff: HARD no índice real, isenção no temporário.
+
 ## Mutantes
 
-Os cinco morreram na bancada (famílias kg_trace_resolve e kg_read_leg):
+Os oito morreram na bancada (famílias kg_trace_resolve, kg_read_leg e adopter_shape):
 
 - hook sem tirar a barra: morto por (l);
 - gerador sem recusar o JSON da 4.25.0: morto por (j3);
 - lint sem ler o marcador `resolved_targets`: morto por (j3), HARD em vez de SOFT;
 - gerador emitindo `target` em vez de `path`: morto por (j) e (j2);
-- índice vazio com rc 0: morto por (j4).
+- índice vazio com rc 0: morto por (j4);
+- rc 3 com índice de linhas lido como dia 1: morto por (j5);
+- ausência julgada antes do gerador: morto por (j5);
+- regen sem gravar o índice vazio no rc 3: morto por adopter-shape (b).
 
 ## Limites declarados
 
