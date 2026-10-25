@@ -778,6 +778,39 @@ nodes:
     confidence: 0.5
     label: "Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho), com bypass fechando, sem envio automático, o Always allow sem abrir o envio e nenhuma tool de aceitar no tools/list"
     narrative: "Substitui o round-trip genérico como gatilho do parque selado em D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025, que segue de pé. Pela delegação de 2026-10-25, o core acolheu a troca e não constrói a composição agora: construir é mudar o parque em perseguir, e isso volta ao maestro. Das peças, só a entrega ao Codex pelo codex queue e o aviso no Stop hook têm teste; a assinatura Ed25519 com peers.json do interlink não se copia, porque tiraria a pinagem da topologia."
+  - id: E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-25"
+    verified_against: "o sinal lido inteiro (72 linhas); o 81 contra 79 conferido: lint-selftest --families dissect_object dá 81 passaram, e o dissect-object-bench.py dá 75 casos mais 4 de rc 3, ou seja 79"
+    trace: "docs/evolution/inbox/_processed/2026-10-25-proposal-peer-protocol.md"
+    label: "A curadoria auditou 114 mensagens entre sessões: 0 permissão emprestada, 22 afirmações agidas sem conferência, e só a conferência de ref ou selo na main do par passou no critério de recorrência"
+    narrative: "Estudo SAC-252, família pratica, Etapa 0 eb800ec e desenho do dissect:N2 50970e8, codificação por agente separado. De 97 afirmações checáveis, 54 foram conferidas e 4 divergiram; de 6 erros, a conferência pegou 4. Entre as 22 agidas sem conferência, selos citados antes de existir (IN#14, #41, #43 e #44). Veredito proposto: costurar, placar 5 (o escritor queria absorver com 8, e o Elenxo rebaixou). A divergência que ninguém notou, 81 contra 79, não é erro de medida: são dois instrumentos, a família da bancada da casa (81 registros) e o próprio bench do checador (75 casos mais 4 de rc 3)."
+    provenance:
+      source: "onion-curation, sinal relayado sem commit ao inbox do core"
+      locator: "docs/evolution/inbox/_processed/2026-10-25-proposal-peer-protocol.md; no adotante, docs/evolution/dissect/peer-protocol-2026-10/ (PR #92 do onion-curation)"
+      method: "medição: leitura do sinal inteiro e reexecução das duas bancadas do dissect"
+      locality: "repo"
+  - id: D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-25"
+    verified_against: "acolhida pelo core sob a delegação do maestro de 2026-10-25 («trabalhar em conjunto com as outras sessões com a responsabilidade e autorização total para escolher as decisões e acolher as decisões que tragam valor para o Onion»), porque deriva do critério pré-registrado pelo próprio core (recorrência medida de 2 ou mais)"
+    label: "O protocolo entre sessões costura uma peça, o peer-ref-check (conferir ref ou selo na origin/main do par antes de citar); delegação e registro de mensagem não viram peça; o resto fica doutrina"
+    narrative: "Peça: um helper que confere <par> <grafo>#<ID> ou <sha> na origin/main do par, com rc 0 (existe), 1 (não existe) ou 2 (não mediu), costura do integrity.dangling-external, que só olha o corpus local. O nó de delegação não nasce: falha medida 0, e todo commit sai como o mesmo autor, então um check de selo pelo maestro abriria aprovação forjada; fica até haver âncora de identidade, e por ora a delegação segue na memória da sessão e citada no verified_against de cada selo. O registro da mensagem não nasce: não cobre a falha e nenhum hook vê o SendMessage. O aviso de PR paralelo segue no PR #1355. Doutrina: pedir o estado do par depois do plano commitado, emenda só de fixação, mensagem de par é informação, avisar o par ao fechar, correção vai com a medida. O D_PEER_PROTOCOL_VERDICT da curadoria fecha como costurar, apontando este nó."
+    provenance:
+      source: "sessão do core, sob a delegação do maestro de 2026-10-25"
+      locator: "triagem do sinal 2026-10-25-proposal-peer-protocol.md"
+      method: "testemunho: decisão do core por delegação, aplicando o critério de recorrência pré-registrado no CORE-STATE enviado à curadoria"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -920,3 +953,6 @@ edges:
   - from: E_KG_SSOT_427_ADOTADA_1025
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
+  - from: D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025
+    to: E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025
+    edge_type: TRACES_TO
