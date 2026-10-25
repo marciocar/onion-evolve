@@ -97,6 +97,22 @@
         "integrity.dangling-external"
       ],
       "corpus": "."
+    },
+    {
+      "file": "valid-corpus-dotdir-target.kg.yaml",
+      "description": "Desde o v4.15: a ponta externa numa pasta com ponto é achada no corpus",
+      "valid": true,
+      "codes": [],
+      "corpus": "."
+    },
+    {
+      "file": "bad-corpus-dotdir-id-missing.kg.yaml",
+      "description": "Desde o v4.15: o arquivo numa pasta com ponto existe, mas o id não",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-external"
+      ],
+      "corpus": "."
     }
   ]
 }

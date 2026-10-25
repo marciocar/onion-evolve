@@ -96,6 +96,9 @@ except ImportError:  # POSIX
     msvcrt = None
 
 NAME = re.compile(r"^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)$")
+# o que o armazém LÊ para julgar a ponta externa (desde o contrato v4.15): a forma do <caminho> do contrato, que aceita
+# a pasta com ponto (.github/); o que ele ESCREVE segue o NAME, que não aceita, e .git/ nunca entra
+CORPUS_NAME = re.compile(r"^(?:\.?[A-Za-z0-9_][A-Za-z0-9_.-]*/)*\.?[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)$")
 NEW = "new"
 META = ".kg-store"
 LOCK = ".kg-store.lock"
@@ -760,18 +763,42 @@ class DiskStore:
         return []
 
     # --- o gate --------------------------------------------------------------------------------------------
-    def _texts(self, skip=None):
-        """[(nome, texto)] do armazém, cada texto como o leitor deve lê-lo (as_source: o .kg.json é JsonText)."""
+    def _corpus_names(self):
+        """Os nomes do corpus que julga a ponta externa. No disco e no versionado, os do armazém; o GitStore soma os
+        rastreados em pasta com ponto, que o gate do repo (corpus_index) também lê."""
+        return self.list()
+
+    def _read_corpus(self, name):
+        """O texto de um nome do corpus: pela cabeça quando é um nome do armazém, e direto do arquivo quando só o
+        corpus o aceita (pasta com ponto). Symlink no caminho é StoreError, como na cabeça."""
+        if NAME.fullmatch(name):
+            return self._read_head(name)
+        data = self._read_file(name.split("/"))
+        if data is None:
+            return None
+        try:
+            return data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise StoreError(_("{name} is not UTF-8").format(name=name)) from exc
+
+    def _texts(self, skip=None, names=None):
+        """[(nome, texto)] do corpus que JULGA (o do gate, com a pasta com ponto no GitStore), cada texto como o leitor
+        deve lê-lo (as_source: o .kg.json é JsonText). names: outra lista de nomes (a consulta passa list())."""
         items = []
-        for n in self.list():
+        for n in (self._corpus_names() if names is None else names):
             if n == skip:
                 continue
             try:
-                t = self._read_head(n)
+                t = self._read_corpus(n)
             except StoreError:  # ilegível (não UTF-8) entra sem ids, como no corpus_index do gate
                 t = None
             items.append((n, kg_validate.as_source(n, t if t is not None else "")))
         return items
+
+    def list_texts(self):
+        """[(nome, texto)] só dos grafos do armazém (os que list() mostra e read() lê): é o que a consulta do servidor
+        MCP projeta, para nunca devolver um grafo que kg_get recusaria."""
+        return self._texts(names=self.list())
 
     @staticmethod
     def corpus_of(items):
@@ -1124,6 +1151,20 @@ class GitStore(DiskStore):
             return []
         disk = set(self._disk_names())
         return sorted(n for n in out.stdout.decode("utf-8").split("\0") if n and n in disk)
+
+    def _corpus_names(self):
+        """Os rastreados, como o gate do repo: os do armazém e, desde o contrato v4.15, os de pasta com ponto (fora
+        .git/), que o armazém lê para julgar a ponta externa e nunca escreve."""
+        names = set(self.list())
+        out = self._git("ls-files", "-z", "--", "*.kg.yaml", "*.kg.json", check=False)
+        if out.returncode == 0:
+            for n in out.stdout.decode("utf-8").split("\0"):
+                # só o que o nome do armazém NÃO aceita (pasta com ponto): o symlink e o rastreado já apagado, que o
+                # list() deixa fora, seguem fora
+                if n and n not in names and CORPUS_NAME.fullmatch(n) and not NAME.fullmatch(n) and \
+                        n.split("/")[0] != ".git":
+                    names.add(n)
+        return sorted(names)
 
     def _visible(self, name, head):
         """No GitStore, o que não está rastreado não existe para o armazém (como para list() e para o gate)."""

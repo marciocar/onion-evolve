@@ -114,6 +114,43 @@
       "codes": [
         "form.pattern.top.external_edges.to"
       ]
+    },
+    {
+      "file": "valid-external-dotdir-target.kg.yaml",
+      "description": "Desde o v4.15: o caminho da ponta externa começa por uma pasta com ponto (.github/), onde a maquinaria de um repo mora",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-external-single-dot-segment.kg.yaml",
+      "description": "Desde o v4.15: o segmento . sozinho segue recusado (./fora.kg.yaml), como o ..",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-double-dot-prefix.kg.yaml",
+      "description": "Desde o v4.15: o ponto do começo do segmento tem de vir seguido de letra, dígito ou _ (..config/ reprova)",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "valid-external-dotdir-incoming.kg.yaml",
+      "description": "Desde o v4.15: a ponta externa que ENTRA (from) também pode morar numa pasta com ponto (.github/)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-external-dot-segment-incoming.kg.yaml",
+      "description": "Desde o v4.15: a ponta from com o segmento . segue recusada; sem forma de ponta externa, o from é lido como id local e o to como ponta externa",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.from",
+        "form.pattern.top.external_edges.to"
+      ]
     }
   ]
 }

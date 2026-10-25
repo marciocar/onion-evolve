@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:94033f241591b152 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:d94a9464b7eee88a -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.26.0",
+  "release": "kg-ssot-v4.27.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -330,8 +330,8 @@ if not r["written"]:
     print(r["reason"], r["verdict"])   # "gate", "conflict", "missing", or "not_judged"
 ```
 
-O gate julga mais que o candidato. A ponta externa de cada entrada de `external_edges` é conferida contra o próprio
-armazém, já com o candidato no lugar. Cada grafo que aponta para o nome gravado é julgado de novo, porque trocar ou
+O gate julga mais que o candidato. A ponta externa de cada entrada de `external_edges` é conferida contra o corpus
+do armazém (no `GitStore`, também os grafos rastreados em pasta com ponto, desde a 4.27.0), já com o candidato no lugar. Cada grafo que aponta para o nome gravado é julgado de novo, porque trocar ou
 apagar um grafo pode deixar a aresta externa de outro sem ponta. O armazém só grava com PASS em todos.
 
 Desde a 4.20.0, um objeto de armazém guarda, na memória, o veredito de cada grafo que já julgou, pela chave de tudo de
@@ -344,8 +344,12 @@ o custo inteiro.
 
 O corpus é o mesmo que o gate do repositório veria. No `GitStore`, isso quer dizer só o rastreado: um `.kg.yaml` que
 está no disco sem commit não conta, nem na lista, nem no julgamento, nem na trava (para a trava, o nome está livre, e
-a gravação substitui o arquivo). O `DiskStore` e o `VersionedStore` recusam uma raiz dentro de um repositório git,
-onde o gate leria o rastreado e o armazém leria o disco. E a cabeça só fica trocada com o registro feito: se o commit
+a gravação substitui o arquivo). Desde a 4.27.0 (contrato v4.15), o julgamento do `GitStore` lê também os grafos
+rastreados em pasta com ponto (`.github/`), como o gate: a ponta externa ali resolve, e uma mudança ali pode barrar
+uma gravação que a deixe sem ponta. O armazém continua sem escrever ali, e o `list()`, o `read()` e as ferramentas
+`kg_query` e `kg_terms` do servidor MCP veem só os nomes do próprio armazém. O `DiskStore` e o `VersionedStore`
+julgam só os nomes do armazém (a pasta com ponto fora do git não é lida), e recusam uma raiz dentro de um repositório
+git, onde o gate leria o rastreado e o armazém leria o disco. E a cabeça só fica trocada com o registro feito: se o commit
 ou o evento falha, ela volta ao que era, e a exceção chega a quem chamou.
 
 Para regenerar grafos que se citam, use `write_many` (desde a 4.14.0). Um a um, a troca do primeiro grafo deixaria a
@@ -1008,7 +1012,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   texto antes do link, e `link/../x` é julgado como `x`); o trace que cai na
   própria raiz é o diretório `.`; o `path` nunca termina em barra, nem no diretório (o `kind` diz que é um); e o `path` guarda a caixa que o sistema de arquivos devolve. O campo é aditivo, e a saída da 4.25.0 segue válida. rc 0 quando todo trace
   julgado resolve, 1 com um alvo faltando ou um grafo que não se lê,
-  2 com entrada quebrada. Estas regras vêm do resolvedor de um adotante medido em milhares de traces; cada corte foi
+  2 com entrada quebrada, e 3 quando nenhum grafo foi lido (desde a 4.27: o corpus vazio não é "todo trace resolve"
+  para um CI que só olha o rc). Estas regras vêm do resolvedor de um adotante medido em milhares de traces; cada corte foi
   pago por um falso positivo.
 
 ## `kg_vector.py`: o modelo e o índice da busca por semelhança (4.26.0)

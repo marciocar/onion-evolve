@@ -10,6 +10,27 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.27.0] - 2026-10-25
+
+Contrato v4.15: a ponta externa pode morar numa pasta com ponto como `.github/`, e `.` e `..` seguem reprovando; o
+armazém git julga com o mesmo corpus do gate; o `kg_trace` sai com rc 3 no corpus vazio.
+
+### Mudado
+
+- **Contrato v4.15: a ponta externa pode morar numa pasta com ponto.** O `<caminho>#<id>` exigia que cada segmento
+  começasse por letra, dígito ou `_`, e por isso `.github/` e `.config/`, onde um repositório guarda a
+  maquinaria, não podiam ser apontadas. O segmento agora pode começar por um ponto seguido de um deles; os segmentos
+  `.` e `..` seguem reprovando, porque a regra existe para barrar a travessia. Nada que passava reprova. Os dois
+  leitores mudam juntos, na ponta que sai e na que entra, com oito casos novos na suíte (cinco de forma e três de corpus
+  com alvo numa pasta com ponto). Achado de um adotante cujos estudos apontam para um registro
+  numa pasta com ponto.
+- **O armazém git julga com o mesmo corpus do gate.** O `kg_store` (`GitStore`) passa a ler os grafos rastreados em
+  pasta com ponto ao conferir a ponta externa: um grafo que aponta para lá pode ser gravado, e uma mudança lá pode
+  barrar uma gravação que deixaria a ponta sem alvo. Ele continua sem escrever em pasta com ponto, e o `list()`, o
+  `read()` e as ferramentas `kg_query` e `kg_terms` do servidor MCP veem só os nomes do próprio armazém.
+- **O `kg_trace.py check` sai com rc 3 quando nenhum grafo foi lido.** Ele imprimia "no graph read" com rc 0, que um
+  CI que só olha o rc lia como "todo trace resolve". O JSON já dizia `graphs: 0`.
+
 ## [4.26.0] - 2026-10-25
 
 O `kg_query --semantic` acha o nó quando a pergunta usa outras palavras que não as do label, fundindo a busca por

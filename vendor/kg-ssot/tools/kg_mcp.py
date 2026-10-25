@@ -627,7 +627,7 @@ class Server:
             return {"name": args["name"], "history": store.history(args["name"])}, False
         if name == "kg_query":
             corpus = kg_query.Corpus()
-            for gname, text in store._texts():
+            for gname, text in store.list_texts():  # a consulta vê o que kg_list e kg_get veem
                 corpus.add(gname, text)
             before = args.get("verified_before")
             day = kg_validate.iso_date(before) if before is not None else None
@@ -652,7 +652,7 @@ class Server:
             return res, False
         if name == "kg_terms":
             corpus = kg_query.Corpus()
-            for gname, text in store._texts():
+            for gname, text in store.list_texts():  # a consulta vê o que kg_list e kg_get veem
                 corpus.add(gname, text)
             as_of = datetime.date.today()
             if args.get("as_of") is not None:

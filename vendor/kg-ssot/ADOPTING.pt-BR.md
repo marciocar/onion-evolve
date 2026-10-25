@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:1329351c784afb30 -->
+<!-- translation-of: ADOPTING.md sha256:d17399c27953cd5f -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -340,6 +340,14 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.26.0` para a `kg-ssot-v4.27.0`, o contrato vai ao v4.15 e só amplia: nada que passava reprova, e o
+gate não pede `--update` (mostra o aviso de identidade, porque os bytes do schema mudam). Uma ponta externa
+`<caminho>#<id>` pode começar por uma pasta com ponto (`.github/x.kg.yaml#ID`), nas duas pontas da aresta; `./` e
+`../` seguem reprovando. Quem usa o armazém git: ele passa a ler os grafos rastreados em pasta com ponto ao conferir a
+ponta externa. O `kg_trace.py check` sai com rc 3 quando não lê nenhum grafo: um script que trata como entrada
+quebrada todo rc diferente de 0 e 1 precisa aceitar o 3 como "corpus vazio", e, se o seu CI embrulha o check noutra
+ferramenta, atualize essa ferramenta antes.
 
 Da `kg-ssot-v4.25.1` para a `kg-ssot-v4.26.0`, o contrato não muda (segue o v4.14), e o gate não pede `--update`.
 Nada muda a menos que você queira a busca por sentido: instale o `tools/requirements-vector.txt` com
