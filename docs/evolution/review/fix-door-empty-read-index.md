@@ -2,7 +2,8 @@
 branch: fix/door-empty-read-index
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6216f662ddbe1436a6a0efcc3d8e4d7b2e8590da7c5aafec988a7505d5461f6c
+reviewed_code_sha256: 823770192299cefeb679f44efa346f800e1128038a33916a0d5e75266897cd88
 findings_total: 2
 findings_real: 1
 tokens: 0
