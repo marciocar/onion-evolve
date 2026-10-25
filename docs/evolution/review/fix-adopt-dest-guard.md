@@ -2,7 +2,8 @@
 branch: fix/adopt-dest-guard
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b38270f343dc00a01e1156a63a6ff553636cb3972cd6e3c7bb51f974b59e18f8
+reviewed_code_sha256: cdaef2fbdf3b1aae3c01df67092735828b5efbfee5f46120d85718162eeb08b2
 findings_total: 7
 findings_real: 7
 tokens: 0
