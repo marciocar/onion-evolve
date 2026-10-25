@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**630 itens abertos** em 123 grafo(s) com aberto (de 157 no escopo) · 124 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**631 itens abertos** em 123 grafo(s) com aberto (de 157 no escopo) · 124 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1127,11 +1127,12 @@
 | 4.5 | `Q_REABRIR_AUTORIDADE_NO_PROBE` | rea-method-2026-10 | Gatilho (b): quando o probe estruturado existir, o verificador deve nomear o id que fecha e a autoridade que provou? Esta é a ide |
 | 3.0 | `Q_REABRIR_PARIDADE_POS_FORGE` | rea-method-2026-10 | Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexis |
 
-## sinais-de-campo-2026-09 — 3 item(ns)
+## sinais-de-campo-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
+| 4.0 | `Q_CANAL_ENTRE_SESSOES_NEUTRO_DO_AGENTE_1025` | sinais-de-campo-2026-09 | Quanto a federação de hoje depende do runtime do Claude Code (hooks, harness, moat-judge) e o que falta para uma sessão Codex,  |
 | 3.0 | `Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA` | sinais-de-campo-2026-09 | O workflow do protótipo vira motor do /meta:dissect? Gatilho: 1 objeto decisório a mais rodado nos dois braços com o protocolo  |
 | 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
