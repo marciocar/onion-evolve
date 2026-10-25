@@ -2,7 +2,8 @@
 branch: fix/dissect-verdict-sealed-by-destination
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7cfe3f0084abb9cdebd02ea5838cc15564e9cfb3742fd13f0a342f15cebe1242
+reviewed_code_sha256: d1e852b16f3e771c860e42a83b0562485042d25b635c3572989fd39861ca02d2
 findings_total: 1
 findings_real: 1
 tokens: 0
