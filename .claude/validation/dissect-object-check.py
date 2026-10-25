@@ -12,12 +12,14 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
   item 5  S_STAGE0 com x_criterion cujo sha256 bate com o plano COMMITADO, plano na pasta do estudo com os 8 elementos,
           nunca reescrito depois, e commit ancestral ESTRITO do primeiro commit que traz um nó de nível 0
   item 6  parque e rejeição com superação: nó com locality, ou x_dissect_overcoming_search com where: web
-  item 7  parque com x_dissect_trigger na lista branca do kg_query, lendo o que persiste, e ainda NÃO disparado
+  item 7  parque com x_dissect_trigger na lista branca do kg_query, lendo o que persiste, e ainda NÃO disparado;
+          no parque JÁ SELADO (done + x_dissect_sealed_by válido) o disparo não reprova: sai como AVISO, porque é o
+          que o destino precisa ver para reabrir (achado da curadoria em 2026-10-25)
   item 8  app com N2 sem artefato aberto nem uso observado: nível máximo 1 e veredito parquear
 
 Modos:
   dissect-object-check.py <grafo> [--stage plan|final] [--allow-uncommitted] [--expect-verdict V] [--max-level N]
-      rc 0 sem achado · 1 com achado · 3 não pôde medir
+      rc 0 sem achado · 1 com achado · 3 não pôde medir; linhas `aviso item N <código>:` informam e não mudam o rc
       --allow-uncommitted: quem conduz confere ANTES de commitar; só stage0-nao-commitado e n0-nao-commitado deixam
       de ser achado. O gate do comando roda sem ela.
   dissect-object-check.py --context      projeção para a sessão (peça 3): famílias e estudos
@@ -149,9 +151,14 @@ def first_n0_commit(path):
     return ""
 
 
+NOTICES = []  # avisos do último check(): (item, código, detalhe); informam e não mudam o rc
+
+
 def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=None):
     findings = []
     add = lambda item, code, detail: findings.append((item, code, detail))
+    del NOTICES[:]
+    note = lambda item, code, detail: NOTICES.append((item, code, detail))
     doc = load(path)
     meta = doc.get("meta") or {}
     fams, legacy = registry_families()
@@ -272,7 +279,10 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
 
     # item 7 — o parque tem gatilho que lê o que persiste, e ele ainda não disparou
     if verdict == "parquear":
-        trigger_check(add, vn.get("x_dissect_trigger"), path, by_id)
+        # selado, o estudo já não "sustenta o parque ao selar": o disparo depois do selo é sinal para o destino
+        # reabrir, e reprová-lo impediria o grafo de registrar a superação que o gatilho existe para enxergar
+        trigger_check(add, vn.get("x_dissect_trigger"), path, by_id,
+                      fired=note if (vn.get("status") == "done" and seal_ok) else None)
 
     # item 8 — app sem artefato no N2 fica no nível 1 e só parqueia
     if fam == "app":
@@ -347,7 +357,7 @@ def plan_check(add, path, ref, crit, allow_uncommitted, stage):
         add(5, "n0-nao-commitado", "o grafo tem N0 na árvore e nenhum commit com ele: commite e rode de novo")
 
 
-def trigger_check(add, trig, path, by_id):
+def trigger_check(add, trig, path, by_id, fired=None):
     args = trig.get("kg_query") if isinstance(trig, dict) else None
     mc = trig.get("min_count") if isinstance(trig, dict) else None
     if not (isinstance(args, list) and args and all(isinstance(a, str) for a in args)
@@ -376,7 +386,10 @@ def trigger_check(add, trig, path, by_id):
         return
     total = query_total(args)
     if total >= mc:
-        add(7, "gatilho-ja-disparou", "kg_query deu %d ≥ min_count %d: o parque não se sustenta ao selar" % (total, mc))
+        if fired is not None:
+            fired(7, "gatilho-disparou-depois-do-selo", "kg_query deu %d ≥ min_count %d: o parque selado tem o gatilho disparado; reabrir no destino" % (total, mc))
+        else:
+            add(7, "gatilho-ja-disparou", "kg_query deu %d ≥ min_count %d: o parque não se sustenta ao selar" % (total, mc))
 
 
 def query_total(args, allow_broken=False):
@@ -502,6 +515,8 @@ def main(argv):
         return 3
     for item, code, detail in findings:
         print("item %d %s: %s" % (item, code, detail))
+    for item, code, detail in NOTICES:
+        print("aviso item %d %s: %s" % (item, code, detail))
     print("dissect-object-check: %s · stage %s · %d achado(s)" % (path, opts["stage"], len(findings)))
     return 1 if findings else 0
 

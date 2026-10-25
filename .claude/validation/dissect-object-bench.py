@@ -175,6 +175,8 @@ CASES = [
     ("gatilho --around com caminho, depth 2 e direção in (variante legítima)", None, lambda g: D(g)["x_dissect_trigger"].update(kg_query=["--around", GRAPH + "#E_N0", "--edge-type", "SUPERSEDES", "--depth", "2", "--direction", "in"], min_count=50), "ok", []),
     ("gatilho --around com SUPERSEDES (variante legítima)", None, lambda g: D(g)["x_dissect_trigger"].update(kg_query=["--around", "E_N0", "--edge-type", "SUPERSEDES"], min_count=50), "ok", []),
     ("gatilho já disparado", "gatilho-ja-disparou", lambda g: node(g, "E_PERSIST").update(status="superseded"), "ok", []),
+    ("gatilho disparado num parque já selado", "gatilho-ja-disparou", lambda g: (node(g, "E_PERSIST").update(status="superseded"), D(g).update(status="done", x_dissect_sealed_by="o core selou")), "ok", []),
+    ("gatilho disparado depois do selo válido (avisa, rc 0)", "aviso:gatilho-disparou-depois-do-selo", lambda g: (node(g, "E_PERSIST").update(status="superseded"), D(g).update(status="done", x_dissect_sealed_by="onion-evolve:docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_FIXTURE_SELADO")), "ok", []),
     # item 8
     ("uso observado com trace fora do estudo", "uso-observado-sem-protocolo", uso_observado(CHECK_SH), "ok", []),
     ("uso observado com PROTOCOL.md não rastreado", "uso-observado-sem-protocolo", uso_observado(STUDY + "/PROTOCOL.md"), "protocol-untracked", []),
@@ -321,6 +323,19 @@ def one_case(src, item_of, case):
             if rc != 0:
                 return None, "%s: esperado rc 0; veio rc %d:\n%s" % (name, rc, out)
             return "ok   %-58s rc 0" % name, None
+        if code.startswith("aviso:"):
+            # o aviso informa sem reprovar: rc 0 COM a linha; o mutante cala o note() e a linha tem de sumir
+            acode = code[len("aviso:"):]
+            tag = "aviso item 7 %s:" % acode
+            if rc != 0 or tag not in out:
+                return None, "%s: esperado rc 0 com '%s'; veio rc %d:\n%s" % (name, tag, rc, out)
+            muted = re.sub(r'\bfired\(7, "%s"' % re.escape(acode), r'(lambda *a: None)(7, "%s"' % acode, src)
+            assert muted != src, "mutante do aviso %s não achou o fired" % acode
+            t2 = build(muted, mut, order); made.append(t2)
+            rc_m, out_m = run(t2, extra)
+            if tag in out_m:
+                return None, "%s: o MUTANTE do aviso %s ainda avisa — o caso não discrimina" % (name, acode)
+            return "ok   %-58s %s (mutante calado: rc %d)" % (name, tag, rc_m), None
         tag = "item %d %s:" % (item_of.get(code, 0), code)
         if rc != 1 or tag not in out:
             return None, "%s: esperado rc 1 com '%s'; veio rc %d:\n%s" % (name, tag, rc, out)
