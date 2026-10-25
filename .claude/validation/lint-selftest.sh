@@ -33541,6 +33541,21 @@ run_kg_trace_root_file_selftests() {
      && grep -q $'^docs/onion/graph/VIZINHO.md\tC_VIZINHO\t' <<< "${idx2}"; then
     record_pass "kg-trace-root: (g) ./SUMIDO.md segue TARGET-MISSING e ./VIZINHO.md entra como docs/…/VIZINHO.md"
   else record_fail "kg-trace-root: (g)" "o ./ tirou o alvo de julgamento (tsv=${tsv:0:160} · idx=$(grep VIZINHO <<< "${idx2}" | head -c 120))"; fi
+  # (h) grafo quebrado DE PROPÓSITO fora das pastas de fixture (o caso medido no kg-ssot em 2026-10-25): sem o
+  #     .kg-ssot/trace-excludes.txt reprova (ILEGIVEL); com o glob dele, sai do julgamento; só comentário não exclui.
+  rm -f "${sb}/docs/onion/graph/g2.kg.yaml"
+  mkdir -p "${sb}/docs/medidas/casos" "${sb}/.kg-ssot"
+  printf '{"meta": {,}\n' > "${sb}/docs/medidas/casos/ruim.kg.json"
+  ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  local rh0=0 rh1=0 rh2=0
+  ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${sb}" >/dev/null 2>&1 || rh0=$?
+  printf '# só comentário\n   # docs/medidas/*\n' > "${sb}/.kg-ssot/trace-excludes.txt"
+  ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${sb}" >/dev/null 2>&1 || rh1=$?
+  printf '# casos inválidos de propósito\ndocs/medidas/*   # o dogfood\n' > "${sb}/.kg-ssot/trace-excludes.txt"
+  ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${sb}" >/dev/null 2>&1 || rh2=$?
+  if [ "${rh0}" -eq 1 ] && [ "${rh1}" -eq 1 ] && [ "${rh2}" -eq 0 ]; then
+    record_pass "kg-trace-root: (h) grafo quebrado fora de fixture reprova; o glob do .kg-ssot/trace-excludes.txt o tira; comentário não exclui"
+  else record_fail "kg-trace-root: (h)" "rc sem/comentário/com glob = ${rh0}/${rh1}/${rh2}; esperado 1/1/0"; fi
   unset -f _no
   rm -rf "${sb}"
 }
