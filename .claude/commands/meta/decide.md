@@ -165,7 +165,7 @@ da emissão: resposta de outra rodada é recusada, e edição do round que não 
 
 O selo no nó, escrito por `.claude/validation/kg-decide-seal.sh`, com o **radar exit 0**
 (`kg-radar.sh --integrity --schema`) como condição de sucesso e o desfazer automático quando ele
-reprova. O **contrato de custo** (`run_id` · `tokens` · `agents` · `duration_min`) **não se aplica**:
+reprova; o contrato e o **lint de nomes** (`kg_vocab.py lint`, antes×depois) também desfazem. O **contrato de custo** (`run_id` · `tokens` · `agents` · `duration_min`) **não se aplica**:
 não há run de workflow, e medidor e selador são 0 tokens. Declarado aqui e na doutrina.
 
 ## Peça 4 (orquestração faseada) — AUSENTE por desenho, declarado
