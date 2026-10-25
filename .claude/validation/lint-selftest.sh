@@ -33910,7 +33910,7 @@ PY
   # (MUT-a) grep por PREFIXO no lugar do parser → o caso (b) TEM de reprovar (C_X casaria C_X_2)
   local mut="${sb}/mut-grep.sh"
   awk '/^command -v python3 >\/dev\/null 2>&1 \|\| _unmeasured "python3 ausente/ {
-         print "if git -C \"${PAR}\" show \"${MAIN}:${P}\" | grep -q \"id: ${ID}\"; then _out \"EXISTE — mutante\"; exit 0; else _out \"NÃO EXISTE — mutante\"; exit 1; fi" }
+         print "if grep -q \"id: ${ID}\" <<< \"$(git -C \"${PAR}\" show \"${MAIN}:${P}\")\"; then _out \"EXISTE — mutante\"; exit 0; else _out \"NÃO EXISTE — mutante\"; exit 1; fi" }
        { print }' "${sut}" > "${mut}"
   if ! grep -q 'mutante' "${mut}"; then record_fail "peer-ref: (MUT-a) setup" "a âncora do parser não foi achada — a mutação não aplicou"
   else
