@@ -21329,7 +21329,7 @@ PFSTUB
     && mkdir -p .claude/validation docs/onion docs/graphs src \
     && printf '%s\n' '#!/usr/bin/env bash' '[ -n "${FX_TRACE_RC3:-}" ] && exit 3' 'ls docs/graphs | LC_ALL=C sort | sed "s/^/idx\t/"' > .claude/validation/kg-trace.sh \
     && printf '%s\n' '#!/usr/bin/env bash' '[ "${1:-}" = --markdown ] || exit 2' 'echo "# backlog"' 'ls docs/graphs | LC_ALL=C sort | sed "s/^/- /"' > .claude/validation/kg-backlog-project.sh \
-    && printf '%s\n' '#!/usr/bin/env bash' '[ -n "${FX_LINT_FAIL:-}" ] && { echo "Violações HARD: 1"; exit 1; }' 'echo "Violações HARD: 0"' > .claude/validation/lint-artifacts.sh \
+    && printf '%s\n' '#!/usr/bin/env bash' '[ -n "${FX_LINT_FAIL:-}" ] && { echo "Violações HARD: 1"; exit 1; }' '[ -n "${FX_LINT_SLOW:-}" ] && { : > "${FX_LINT_SLOW}"; sleep 2; }' 'echo "Violações HARD: 0"' > .claude/validation/lint-artifacts.sh \
     && _fxg() { bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv; bash .claude/validation/kg-backlog-project.sh --markdown > docs/backlog.md; } \
     && echo g0 > docs/graphs/g0 && echo base > src/x.sh && _fxg && git add -A && git commit -qm base && git push -q origin HEAD:main \
     && git checkout -qb feat/fx && echo gb > docs/graphs/gb && _fxg && git add -A && git commit -qm "branch: grafo gb" && git push -q origin feat/fx \
@@ -21337,9 +21337,17 @@ PFSTUB
     && git commit -qm "branch: grafo gs + fonte" && git push -q origin feat/fs \
     && git checkout -q main && git checkout -qb feat/fl && echo gl > docs/graphs/gl && _fxg && git add -A && git commit -qm "branch: grafo gl" \
     && git push -q origin feat/fl \
+    && git checkout -q main && git checkout -qb feat/fr && echo gr > docs/graphs/gr && _fxg && git add -A && git commit -qm "branch: grafo gr" \
+    && git push -q origin feat/fr \
+    && git checkout -q main && git checkout -qb feat/fk && echo gk > docs/graphs/gk && _fxg && git add -A && git commit -qm "branch: grafo gk" \
+    && git push -q origin feat/fk \
+    && git checkout -q main && git checkout -qb side && echo s > src/side.sh && git add -A && git commit -qm side \
+    && git checkout -q main && git checkout -qb feat/fm && echo gfm > docs/graphs/gfm && _fxg && git add -A && git commit -qm "branch: grafo gfm" \
+    && git merge -q --no-ff --no-edit side && git push -q origin feat/fm \
     && git checkout -q main && echo gm > docs/graphs/gm && echo main > src/x.sh && _fxg && git add -A && git commit -qm "main: grafo gm" \
     && git push -q origin HEAD:main && git worktree add -q "${f3w}" feat/fx && git worktree add -q "${f3s}" feat/fs \
-    && git worktree add -q "${d}/f3-wl" feat/fl ) >/dev/null 2>&1
+    && git worktree add -q "${d}/f3-wl" feat/fl && git worktree add -q "${d}/f3-wr" feat/fr \
+    && git worktree add -q "${d}/f3-wm" feat/fm && git worktree add -q "${d}/f3-wk" feat/fk ) >/dev/null 2>&1
   mkdir -p "${d}/fxm/ops/review" "${d}/prf"
   cp "${REPO_ROOT}/ops/review/review-mode-decide.sh" "${d}/fxm/ops/review/" 2>/dev/null || true
   printf '%s\n' docs/backlog.md src/a.sh > "${d}/prf/7"; printf '%s\n' src/zzz.sh > "${d}/prf/8"
@@ -21398,29 +21406,67 @@ PFSTUB
              && grep -qF "projeção gerada: docs/backlog.md" "${d}/comment" && grep -q -- '--rebase' "${d}/margs" && ! grep -q -- '--admin' "${d}/margs"; }
   _fxcase "(fx-i) repo alheio, conflito só de projeção ⇒ rebase próprio, regenera pelo gerador do alvo, lint, push e merge" _p_fx1 \
     'if [ ! -f "${_wt}/ops/pr-finalize.sh" ]; then' 'if false; then' feat/fx "${f3w}"
-  # (fx-v) o lint do ALVO reprova o head rebaseado ⇒ nada enviado, a branch (local e remota) volta ao head de antes.
-  #        Com o índice VAZIO (kg-trace rc 3), que tem de ser aceito: sem isso a recusa seria pelo gerador, não pelo lint.
-  #        Ordem invertida de propósito (real, depois os mutantes): o mutante do lint EMPURRA e muda a fixture.
-  local f3l="${d}/f3-wl" _fx_old_l _fxm
-  _fx_old_l="$(git -C "${f3l}" rev-parse HEAD 2>/dev/null)"
-  _p_fx5() { [ "${_mv_rc}" -ne 0 ] && grep -qF "o lint do alvo reprovou o head rebaseado" <<< "${_mv_out}" && [ ! -s "${d}/margs" ] \
-             && [ "$(git -C "${f3l}" rev-parse HEAD)" = "${_fx_old_l}" ] && [ "$(git -C "${f3o}" rev-parse feat/fl)" = "${_fx_old_l}" ] \
-             && git -C "${f3l}" diff --quiet; }
-  export FX_LINT_FAIL=1 FX_TRACE_RC3=1
-  _mvf "${sut}" feat/fl "${f3l}"
-  if ! _p_fx5; then record_fail "pr-merge-verified: (fx-v) lint do alvo reprova" "rc=${_mv_rc} margs=[$(cat "${d}/margs")] out=$(tail -6 <<< "${_mv_out}")"
+  # (fx-v)..(fx-vii) recusas que DEPOIS do rebase começado têm de devolver a branch (local e remota) ao head de
+  # antes. Ordem invertida de propósito (real, depois o mutante): o mutante EMPURRA e muda a fixture; por isso
+  # cada caso tem a sua branch.
+  _fx_intact() { # $1=worktree $2=branch $3=head de antes
+    [ "${_mv_rc}" -ne 0 ] && [ ! -s "${d}/margs" ] && [ "$(git -C "$1" rev-parse HEAD)" = "$3" ] \
+      && [ "$(git -C "${f3o}" rev-parse "$2")" = "$3" ] && git -C "$1" diff --quiet; }
+  _fxcase_rm() { # $1=rótulo $2=predicado $3=âncora $4=substituição $5=branch $6=worktree ; real ANTES do mutante
+    local lbl="$1" pred="$2" mf
+    _mvf "${sut}" "$5" "$6"
+    if ! "${pred}"; then record_fail "pr-merge-verified: ${lbl}" "rc=${_mv_rc} margs=[$(cat "${d}/margs")] out=$(tail -6 <<< "${_mv_out}")"; return; fi
+    mf="$(_fxmut "$3" "$4")"
+    if [ -z "${mf}" ]; then record_fail "pr-merge-verified: ${lbl} — MUTANTE" "a âncora do mutante não casou no SUT (${3})"; return; fi
+    _mvf "${mf}" "$5" "$6"
+    if "${pred}"; then record_fail "pr-merge-verified: ${lbl} — MUTANTE SOBREVIVEU" "o caso não distingue o SUT do mutante (${3} → ${4})"; return; fi
+    record_pass "pr-merge-verified: ${lbl} (e o mutante reprova)"
+  }
+  local f3l="${d}/f3-wl" f3r="${d}/f3-wr" f3m="${d}/f3-wm" _fx_old_l _fx_old_r _fx_old_m
+  _fx_old_l="$(git -C "${f3l}" rev-parse HEAD 2>/dev/null)"; _fx_old_r="$(git -C "${f3r}" rev-parse HEAD 2>/dev/null)"
+  _fx_old_m="$(git -C "${f3m}" rev-parse HEAD 2>/dev/null)"
+  # (fx-v) o lint do ALVO reprova o head rebaseado ⇒ nada enviado
+  _p_fx5() { grep -qF "o lint do alvo reprovou o head rebaseado" <<< "${_mv_out}" && _fx_intact "${f3l}" feat/fl "${_fx_old_l}"; }
+  export FX_LINT_FAIL=1
+  _fxcase_rm "(fx-v) lint do alvo reprova ⇒ nada enviado, branch intacta" _p_fx5 \
+    "if grep -qF 'MORREU' <<< \"\${_lint}\" || [ \"\${_lrc}\" -ne 0 ]; then" 'if false; then' feat/fl "${f3l}"
+  unset FX_LINT_FAIL
+  # (fx-vi) o gerador do índice diz VAZIO (rc 3) e a base tem o índice povoado ⇒ recusa (o rc é declaração: grafo
+  #         ilegível também dá rc 3, medido na passada adversarial), nada enviado
+  _p_fx6() { grep -qF "origin/main tem o índice povoado" <<< "${_mv_out}" && _fx_intact "${f3r}" feat/fr "${_fx_old_r}"; }
+  export FX_TRACE_RC3=1
+  _fxcase_rm "(fx-vi) índice vazio (rc 3) com a base povoada ⇒ recusa nomeada, branch intacta" _p_fx6 \
+    'elif [ -n "$(git -C "${_w}" show "origin/${_FR_BASE}:${_p}" 2>/dev/null)" ]; then' 'elif false; then' feat/fr "${f3r}"
+  unset FX_TRACE_RC3
+  # (fx-vii) a branch carrega commit de MERGE ⇒ recusa antes do rebase (ele linearizaria e descartaria o merge)
+  _p_fx7() { grep -qF "a branch carrega commit de MERGE" <<< "${_mv_out}" && _fx_intact "${f3m}" feat/fm "${_fx_old_m}"; }
+  _fxcase_rm "(fx-vii) branch com merge commit ⇒ recusa antes do rebase, branch intacta" _p_fx7 \
+    '[ -z "$(git -C "${_w}" rev-list --merges "origin/${_b}..HEAD" 2>/dev/null)" ] \' 'true \' feat/fm "${f3m}"
+  # (fx-viii) MORTE NO MEIO: SIGTERM durante o lint do alvo (o Claude Code mata comando de fundo, SAC-136) ⇒ o trap
+  #           devolve a worktree ao head de antes, sem rebase em curso. Sem o trap ela ficava reescrita e não enviada.
+  local f3k="${d}/f3-wk" _fx_old_k _fxk_m
+  _fx_old_k="$(git -C "${f3k}" rev-parse HEAD 2>/dev/null)"
+  _fxk_run() { # $1=script → mata o SUT com TERM quando o lint começa; deixa em _mv_rc o rc dele
+    local _pid _t=0; rm -f "${d}/lint-started"; echo 0 > "${d}/n"; echo 0 > "${d}/mk"; : > "${d}/margs"
+    ( cd "${f3}" && exec env PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MK="${d}/mk" GH_MERGEABLE_SEQ="CONFLICTING MERGEABLE" \
+        GH_HEAD_REF=feat/fk STUB_HEAD_FROM="${f3k}" STUB_MERGE_ARGS="${d}/margs" STUB_COMMENT="${d}/comment" \
+        GH_PR_FILES="docs/backlog.md" FX_LINT_SLOW="${d}/lint-started" ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=5 \
+        GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "$1" 999 ) > "${d}/k.out" 2>&1 &
+    _pid=$!
+    while [ ! -e "${d}/lint-started" ] && [ "${_t}" -lt 200 ]; do sleep 0.1; _t=$((_t+1)); done
+    kill -TERM "${_pid}" 2>/dev/null; wait "${_pid}"; _mv_rc=$?
+  }
+  _p_fx8() { [ -e "${d}/lint-started" ] && [ "${_mv_rc}" -ne 0 ] && [ "$(git -C "${f3k}" rev-parse HEAD)" = "${_fx_old_k}" ] \
+             && [ "$(git -C "${f3o}" rev-parse feat/fk)" = "${_fx_old_k}" ] && git -C "${f3k}" diff --quiet \
+             && ! [ -d "$(git -C "${f3k}" rev-parse --absolute-git-dir)/rebase-merge" ]; }
+  _fxk_run "${sut}"
+  if ! _p_fx8; then record_fail "pr-merge-verified: (fx-viii) SIGTERM no lint" "rc=${_mv_rc} head=$(git -C "${f3k}" rev-parse --short HEAD) out=$(tail -4 "${d}/k.out")"
   else
-    _fxm="$(_fxmut '[ "${_rc}" -eq 3 ] && { _rc=0; _empty_ok=1; }' ':')"
-    [ -n "${_fxm}" ] && _mvf "${_fxm}" feat/fl "${f3l}"
-    if [ -z "${_fxm}" ] || _p_fx5; then record_fail "pr-merge-verified: (fx-v) — MUTANTE do rc 3 SOBREVIVEU" "o caso não distingue índice vazio aceito de gerador falho"
-    else
-      _fxm="$(_fxmut "if grep -qF 'MORREU' <<< \"\${_lint}\" || [ \"\${_lrc}\" -ne 0 ]; then" 'if false; then')"
-      [ -n "${_fxm}" ] && _mvf "${_fxm}" feat/fl "${f3l}"
-      if [ -z "${_fxm}" ] || _p_fx5; then record_fail "pr-merge-verified: (fx-v) — MUTANTE do lint SOBREVIVEU" "o caso não distingue lint julgado de lint ignorado"
-      else record_pass "pr-merge-verified: (fx-v) lint do alvo reprova (índice vazio aceito) ⇒ nada enviado, branch intacta (e os 2 mutantes reprovam)"; fi
-    fi
+    _fxk_m="$(_fxmut '_fr_on_death() { _fr_pushed || _undo; }' '_fr_on_death() { :; }')"
+    [ -n "${_fxk_m}" ] && _fxk_run "${_fxk_m}"
+    if [ -z "${_fxk_m}" ] || _p_fx8; then record_fail "pr-merge-verified: (fx-viii) — MUTANTE SOBREVIVEU" "sem o desfazer do trap a worktree tinha de ficar reescrita"
+    else record_pass "pr-merge-verified: (fx-viii) SIGTERM durante o lint do alvo ⇒ o trap devolve a worktree ao head de antes (e o mutante reprova)"; fi
   fi
-  unset FX_LINT_FAIL FX_TRACE_RC3
 
   # ── (kg-a)-(kg-g) PROVENANCE DA BRANCH × REBASE (SAC-80, 2026-10-09) ─────────────────────────
   # Defeito medido num adotante: o .kg.yaml do PR citava `caminho@<sha>` de commit da PRÓPRIA branch,
@@ -21578,7 +21624,7 @@ PFSTUB
     '|| die "não consegui LER o histórico' '|| echo "não li o histórico' \
     '' 0 1
 
-  unset -f _mvf _fxmut _fxcase _p_fx1 _p_fx2 _p_fx3 _p_fx4 _p_fx5
+  unset -f _mvf _fxmut _fxcase _fxcase_rm _fx_intact _fxk_run _p_fx1 _p_fx2 _p_fx3 _p_fx4 _p_fx5 _p_fx6 _p_fx7 _p_fx8
   unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg _mvr _rvmut _rvcase _p_off _p_prior _p_prior_disp _p_fail _p_hist
 }
 
