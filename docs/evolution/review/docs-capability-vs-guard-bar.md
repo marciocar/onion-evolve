@@ -2,7 +2,8 @@
 branch: docs/capability-vs-guard-bar
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a3e542c13c4fc9179551c16a49686268ce08c62042888a8f8330867a5de7a7ce
+reviewed_code_sha256: 57e1dc815f0d8e8b3ea55ee26e856abb6cf6316d85f6c66ee35c2c2e94a130dd
 findings_total: 0
 findings_real: 0
 tokens: 0
