@@ -2,7 +2,8 @@
 branch: docs/agent-neutral-channel-study
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fd8e8bbe89b3f15b461bc099deae24c5d86e029f3425ed978446c37729621c60
+reviewed_code_sha256: 3f1786c04df35fbbc239e87ebdcf37edcfacd9f313eb528ee2377aaf5de94387
 findings_total: 1
 findings_real: 1
 tokens: 0
