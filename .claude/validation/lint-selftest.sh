@@ -26308,6 +26308,27 @@ run_adopt_dest_guard_selftests() {
   fi
   _prove_mutation "adopt-dest-guard: (e-MUT) sem a checagem de toplevel o config do repo pai muda — a raiz é load-bearing" \
     "${guard}" "${mut}" "${rc_ok}" "${rc_mut}"
+
+  # (f) O AMBIENTE DESVIA: git hook exporta GIT_DIR, e com ele apontando OUTRO repo o `--show-toplevel`
+  #     devolve o próprio DEST — o (6) passaria e o config cairia no repo do GIT_DIR. Achado da passada
+  #     adversarial. DEST = raiz legítima (own); GIT_DIR = o "core" da fixture; o config do core fica intacto.
+  #     (f-MUT) sem a comparação de git-dir (passo 7) o config do core muda.
+  _dg_env_block() {   # $1 = SOURCE_ROOT → guarda + config com GIT_DIR desviado para o core da fixture
+    # INTEGRATION_BRANCH ≠ main: o mutante de (e) já gravou `main` no core da fixture, e regravar o MESMO
+    # valor deixaria o config byte-idêntico — o mutante "sobreviveria" por fixture, não por guarda (medido).
+    ( SOURCE_ROOT="$1"; DEST="${w}/own"; INTEGRATION_BRANCH=f-probe; export GIT_DIR="${P}/.git"
+      eval "${gl}"; eval "${cl}" ) >/dev/null 2>&1
+  }
+  local mut7="${w}/mut7/.claude/utils/adopt/assert-dest.sh" rc7_ok=1 rc7_mut=1
+  mkdir -p "$(dirname "${mut7}")"
+  sed 's|^\[ "\$(cd "\${_gd_env}" && pwd -P)" = "\$(cd "\${_gd_own}" && pwd -P)" \] \\$|true \\|' "${guard}" > "${mut7}"
+  if [ -n "${gl}" ] && [ -n "${cl}" ]; then
+    cfg0="$(cat "${P}/.git/config")"
+    _dg_env_block "${REPO_ROOT}" || true; _dg_cfg_same && rc7_ok=0
+    _dg_env_block "${w}/mut7" || true;    _dg_cfg_same && rc7_mut=0
+  fi
+  _prove_mutation "adopt-dest-guard: (f) GIT_DIR do ambiente apontando outro repo → recusa; (f-MUT) sem a comparação de git-dir o config do outro repo muda" \
+    "${guard}" "${mut7}" "${rc7_ok}" "${rc7_mut}"
   rm -rf "${w}"
 }
 _family run_adopt_dest_guard_selftests
