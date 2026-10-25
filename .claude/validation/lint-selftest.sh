@@ -44152,9 +44152,40 @@ DEC_ORF2
   local rn="${sb}/semleitor"; mkdir -p "${rn}"; "${G[@]}" -C "${rn}" init -q . 2>/dev/null
   cp "${r}/docs/a/a.kg.yaml" "${rn}/g.kg.yaml"
   if out="$(bash "${seal}" "${rn}/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -q 'repo git sem leitor de contrato' <<< "${out}" && ! grep -q 'fora de repo git' <<< "${out}"; then
-    record_pass "decide: (s13) repo git sem leitor de contrato é nomeado como tal, não como 'fora de repo git'"
-  else record_fail "decide: (s13)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'repo git sem leitor de contrato' <<< "${out}" && ! grep -q 'fora de repo git' <<< "${out}" \
+     && grep -q 'lint de nomes não rodou — o repo não tem o kg_vocab.py' <<< "${out}" && grep -q '✅ selado.* · nomes NÃO julgados$' <<< "${out}"; then
+    record_pass "decide: (s13) repo git sem leitor de contrato é nomeado como tal, não como 'fora de repo git'; o lint de nomes ausente é DECLARADO"
+  else record_fail "decide: (s13)" "rc=${rc} $(_emit "${out}" | tail -3 | tr '\n' ' ')"; fi
+  # (s16) o LINT DE NOMES é gate do selo (dano de 2026-10-25: o selo copiou um "r18" do verified_against anterior,
+  #       que o lint não lê, para a narrative, que ele lê; o selador saiu ✅ e o CI reprovou com vocab.code-unresolved).
+  #       Código solto no verified_against anterior → rc 3, grafo byte-idêntico, nomeando código e campo; o mesmo
+  #       código GLOSADO (esquema:código, com o termo no corpus) → rc 0 julgado; grafo não rastreado → declarado.
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_vocab.py" ]; then
+    local rv="${sb}/nomes" gv _kv=""; mkdir -p "${rv}/docs" "${rv}/vendor"; "${G[@]}" -C "${rv}" init -q . 2>/dev/null
+    ln -s "${REPO_ROOT}/vendor/kg-ssot" "${rv}/vendor/kg-ssot"
+    _dec_vnode() {  # $1=id $2=verified_against anterior
+      printf '  - id: %s\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    verified_at: "2026-10-01"\n    verified_against: "%s"\n    label: "decidir %s"\n    provenance:\n      source: "S"\n      locator: "L"\n      method: "leitura: M"\n      locality: "repo"' "$1" "$2" "$1"
+    }
+    gv="${rv}/docs/g.kg.yaml"
+    _dec_graph nomes "$(_dec_vnode D_SOLTO 'lido na rodada r99 do radar')" "$(_dec_vnode D_GLOSADO 'lido no nível dissect:N2')" \
+      "$(printf '  - id: T_DISSECT_N2\n    node_type: entity\n    layer: audit\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    verified_at: "2026-10-01"\n    verified_against: "medido"\n    label: "nível 2 do dissect"\n    provenance:\n      source: "S"\n      locator: "L"\n      method: "medição: M"\n      locality: "repo"\n    x_term:\n      pref: "nível 2 do dissect"\n      notation: "N2"\n      scheme: dissect\n      lang: pt-BR')" > "${gv}"
+    "${G[@]}" -C "${rv}" add docs/g.kg.yaml
+    "${G[@]}" -C "${rv}" commit -q -m c1
+    h0="$(sha256sum "${gv}" | cut -d' ' -f1)"
+    if out="$(bash "${seal}" "${gv}" D_SOLTO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    { [ "${rc}" -eq 3 ] && [ "$(sha256sum "${gv}" | cut -d' ' -f1)" = "${h0}" ] && grep -q 'o lint de nomes REPROVOU o que o selo escreveu' <<< "${out}" \
+      && grep -q '✗ «r99» no campo narrative do nó D_SOLTO (vocab.code-unresolved)' <<< "${out}"; } || _kv="${_kv} solto-rc${rc}"
+    if out="$(bash "${seal}" "${gv}" D_GLOSADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    { [ "${rc}" -eq 0 ] && grep -q '✅ selado.* · nomes sem achado novo por kg_vocab.py$' <<< "${out}" \
+      && grep -q 'dissect:N2' "${gv}"; } || _kv="${_kv} glosado-rc${rc}"
+    # o grafo NÃO rastreado o lint não lê: o selo segue, e a falta é declarada (nunca "sem achado" calado)
+    cp "${gv}" "${rv}/docs/novo.kg.yaml"; sed -i 's/^  id: nomes$/  id: nomes-novo/' "${rv}/docs/novo.kg.yaml"
+    if out="$(bash "${seal}" "${rv}/docs/novo.kg.yaml" D_SOLTO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    { [ "${rc}" -eq 0 ] && grep -q 'lint de nomes não rodou — o grafo não é rastreado' <<< "${out}"; } || _kv="${_kv} nao-rastreado-rc${rc}"
+    if [ -z "${_kv}" ]; then
+      record_pass "decide: (s16) o lint de nomes é gate do selo: código solto copiado para a narrative → rc 3 desfeito; glosado → rc 0; não rastreado → declarado"
+    else record_fail "decide: (s16)" "${_kv} $(_emit "${out}" | tail -3 | tr '\n' ' ')"; fi
+  else record_skip "decide: (s16) kg_vocab.py não vendorizado (o lint de nomes do selo NÃO verificado)"; fi
   # ── o PAINEL opcional (decide-panel.sh, cláusula 9; D_INTELLIGENT_UI_1021, 2026-10-21) ──────────────────
   #   (pn1) PARIDADE: o painel e o AskUserQuestion saem do MESMO censo com as mesmas opções, na mesma ordem, a
   #         recomendada primeiro (e só ela marcada), na ordem do censo; as opções de ATO são as da classe medida.
