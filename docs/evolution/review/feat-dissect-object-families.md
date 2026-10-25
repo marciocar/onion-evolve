@@ -2,8 +2,7 @@
 branch: feat/dissect-object-families
 pr: pendente
 date: 2026-10-24
-reviewed_diff_sha256: 0b3fa98c94b409bdec2c220ec01860487d3a6f1cc227fff1a33f5a1109dc354b
-reviewed_code_sha256: fb66526f8a6ae75978cd7ec0f2875fe43d923485dcf72dba8249da550cea4f75
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 4
 tokens: 0
@@ -75,3 +74,12 @@ CHANGELOG e no rascunho da outbox (core-only, como instrução de reapontar a ar
 - O checador confere forma, pertença e ordem no git; se a superação entrega e se o gatilho mede a coisa certa é do
   Elenxo. O motor do protótipo (workflow de 3 agentes) não entrou: parqueado com gatilho.
 - Bancada local rodada nas famílias `dissect_object` e `dissect`; a seleção completa é do pr-finalize e do CI.
+
+## Re-revisão depois do rebase (2026-10-25)
+
+O hash de código mudou só pelo rebase sobre a main (entraram #1338, #1339 e #1340). Conferido arquivo a arquivo contra o
+push revisado (979b29ec): os 7 arquivos meus de `.claude/` estão byte-idênticos, e o hunk meu do `lint-selftest.sh`
+é idêntico linha a linha (o resto da diferença é da main). O índice de leitura foi regenerado pelo `kg-trace.sh
+--emit-index` (o `kg-trace-resolve.sh` saiu na main) e difere da main só nas 9 linhas dos meus traces. Bancada local nas
+faixas: 2259 passam, 3 falham, todas na família `door` (c, e, f), que reprovam igual na origin/main limpa (índice de
+leitura da porta vazio desde o #1340, curado à parte). Nenhum achado novo.
