@@ -880,6 +880,38 @@ nodes:
       locator: "mensagem da curadoria de 2026-10-25 e o grafo docs/evolution/dissect/duolingo-b1-2026-10/duolingo-b1-2026-10.kg.yaml do onion-curation"
       method: "testemunho: decisão do core por delegação, sobre o veredito do Elenxo do estudo"
       locality: "pessoa"
+  - id: D_REGUA_CAPACIDADE_TESTA_BARATO_GUARDA_RECORRENCIA_1025
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-25"
+    verified_against: "decisão do maestro em 2026-10-25, em texto livre («muitas vezes a regra fica muito alta, com a nossa velocidade de desenvolvimento e multiuso dos agentes, temos mais chances de pesquisar padrões e testar teorias») e por pergunta com opções: «Doutrina no core + memória»"
+    label: "A régua do necessário não fica alta demais: capacidade nova testa barato e mede, e só vira núcleo com prova; guarda segue a recorrência medida; o valor não é só dinheiro, e o que pesa é funcionar para os ICPs, crescendo sem inchar"
+    narrative: "Vale para todo produto da família, e o kg-ssot é o primeiro alvo: crescer usando ou copiando peças para o KG-SSOT Runtime e First sem perder o que ele tem de bom, sempre com dogfood, SDAAL, a lente de Aristóteles, superação, Elenxo, dissecação e forja. Entra na doutrina da dissecação (§2), ao lado dos vereditos. Nasceu do contraste com o estudo do protocolo entre sessões, onde «falha medida 0» recusou peças: correto para guarda, alto demais para capacidade. Descartadas: «Só nó no grafo» e «Só memória»."
+    provenance:
+      source: "maestro, na sessão do core"
+      locator: "mensagem de 2026-10-25 sobre o rdflib e a pergunta com opções «A sua diretriz de hoje fica onde?»"
+      method: "testemunho: decisão do maestro por texto livre e por pergunta com opções, 2026-10-25"
+      locality: "pessoa"
+  - id: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-25"
+    verified_against: "decisão do maestro em 2026-10-25 por perguntas com opções: «a+b+c em série» e «kg-ssot constrói, curadoria disseca»; a ordem a → c → b é proposta do kg-ssot, acolhida pela delegação porque cabe na série"
+    label: "O kg-ssot ganha um extra RDF opcional em série, cada degrau medido antes do próximo: (a) ida e volta do --edges pelo rdflib no CI, (c) pySHACL como leitor a mais na matriz, (b) SPARQL puxado por consultas reais dos ICPs"
+    narrative: "Fora do perfil mínimo do gate, por hash, no molde do extra vector. O kg-ssot constrói, a curadoria disseca (família ferramenta, destino projeto:kg-ssot, superação procurada também no controle sem RDF) e o core faz a bancada pré-tag. O pySHACL julga a projeção RDF e não substitui o gate, que é JSON Schema sobre a forma do arquivo. As consultas do core para o (b): cadeia de SUPERSEDES entre arquivos, decisão done apoiada em evidência que caiu e pontes entre famílias. O maestro pediu compatibilidade com a web semântica, triplestores, SPARQL e pySHACL, «sempre preservando nossas estratégias de eficiência e eficácia». Descartadas: «Só (a) agora», «Pesquisa antes», «Só o kg-ssot» e «Curadoria primeiro»."
+    provenance:
+      source: "maestro, na sessão do core"
+      locator: "perguntas com opções de 2026-10-25 sobre o escopo e a condução do extra RDF"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -1037,3 +1069,12 @@ edges:
   - from: E_KG_SSOT_428_ADOTADA_1025
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
+  - from: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
+    to: D_REGUA_CAPACIDADE_TESTA_BARATO_GUARDA_RECORRENCIA_1025
+    edge_type: TRACES_TO
+  - from: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
+    to: E_KG_SSOT_428_ADOTADA_1025
+    edge_type: TRACES_TO
+  - from: D_REGUA_CAPACIDADE_TESTA_BARATO_GUARDA_RECORRENCIA_1025
+    to: D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025
+    edge_type: TRACES_TO

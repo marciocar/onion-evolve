@@ -97,6 +97,14 @@ Toda dissecação que chega ao N3 fecha num destes, **com razão escrita**:
 
 **O que NÃO é veredito:** "interessante", "promissor", "vale acompanhar". São parque sem gatilho.
 
+**A régua do "necessário" não fica alta demais** (decisão do maestro de 2026-10-25). Para **capacidade
+nova** (extra opcional, leitor a mais, spike), o critério é *testar barato e medir*: costurar como extra
+fora do perfil mínimo é o caminho natural, e só vira núcleo com prova. "Zero consumidores hoje" é o
+estado de partida de toda capacidade, não eliminatório; conta-se o consumidor do próprio produto, as
+consultas que os ICPs já declararam e o custo de não ter. Para **guarda** (o que barra), segue a
+recorrência medida (2 ou mais). Mercado é invariante, mas o valor não é só dinheiro (patrocínio,
+inserção, autoridade); o que pesa é funcionar para os ICPs, crescendo sem inchar.
+
 **Estes quatro são os da família `ferramenta`.** Outras famílias têm o seu vocabulário no registro (§6): `ator`
 não absorve, e `categoria` e `ideia` têm `perseguir`, que aponta a saída em vez de um plano de absorção.
 
