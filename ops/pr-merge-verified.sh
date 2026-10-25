@@ -80,9 +80,13 @@
 #           reescreveria e a provenance ficaria fora da main. Sem --merge-commit, RECUSA antes do
 #           merge nomeando sha e arquivo; com --merge-commit, mergeia e confere depois que cada sha
 #           é ancestral de origin/<base> (rc 3 se não for, como o --assert-ancestor).
+#   RASCUNHO (sem flag, 2026-10-25): PR em rascunho (isDraft) é RECUSADO antes de qualquer efeito —
+#           rebase, push, comentário, merge —, rc 1, nomeando o rascunho. Rascunho é o autor dizendo
+#           "ainda não"; mergear por cima disso é decidir por ele. Leitura ilegível do isDraft = recusa.
+#   --allow-draft: opt-in explícito, para a bancada (e para quem decidiu mergear o rascunho de propósito).
 set -uo pipefail
 
-PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--dispensa <check> --motivo <texto>]}"; shift || true
+PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--allow-draft] [--dispensa <check> --motivo <texto>]}"; shift || true
 REPO_ARG=()
 DEL=(--delete-branch)
 DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ramo do merge PROVADO
@@ -110,7 +114,7 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #   de herdado de uma frase que o próprio check deixou de dizer.
 _DISPENSAVEIS=(onion-review-verdict)
 DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""
-MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0; WAIT_CI_AFTER_REBASE=0
+MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0; WAIT_CI_AFTER_REBASE=0; ALLOW_DRAFT=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -126,6 +130,7 @@ while [ $# -gt 0 ]; do
     --merge-commit) MERGE_COMMIT=1; shift ;;
     --no-wait-after-rebase) NO_WAIT_AFTER_REBASE=1; shift ;;
     --wait-ci-after-rebase) WAIT_CI_AFTER_REBASE=1; shift ;;
+    --allow-draft) ALLOW_DRAFT=1; shift ;;
     --assert-ancestor) ASSERT_ANCESTOR="${2:?--assert-ancestor exige a ref (ex.: onion/vendor)}"; shift 2 ;;
     *) shift ;;
   esac
@@ -175,6 +180,19 @@ state_before="$(pr_state)"
 case "$state_before" in
   MERGED\|*) die "PR #${PR} JÁ ESTAVA MERGED antes desta execução (mergedAt=${state_before#*|}) — não declaro merge que não foi meu" ;;
 esac
+# ── RASCUNHO É RECUSADO ANTES DE QUALQUER EFEITO (2026-10-25, observação do par na bancada do #1355) ──
+# O auto-rebase reescreve a branch, empurra e comenta ANTES do merge: num rascunho, isso é mexer no
+# trabalho que o autor declarou não pronto. Por isso o gate mora aqui, junto da âncora de estado, antes
+# da guarda de provenance, do aviso de serialização, do rebase, do comentário e do merge. A leitura é
+# fail-closed como a âncora: ilegível não é "não é rascunho".
+if [ "${ALLOW_DRAFT}" -ne 1 ]; then
+  _is_draft="$(gh pr view "$PR" "${REPO_ARG[@]}" --json isDraft --jq '.isDraft' 2>/dev/null)"
+  case "${_is_draft}" in
+    false) : ;;
+    true) die "PR #${PR} é RASCUNHO (isDraft) — não rebaseio, não empurro, não comento, não mergeio. Tire do rascunho (gh pr ready ${PR}) ou, de propósito, rode com --allow-draft." ;;
+    *) die "não consegui LER se o PR #${PR} é rascunho (isDraft='${_is_draft}') — não prossigo: rascunho ilegível não é rascunho ausente" ;;
+  esac
+fi
 
 HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
 [ -z "$HEAD_SHA" ] && die "não consegui ler o headRefOid do PR #${PR}"
@@ -307,14 +325,18 @@ _top="$(git rev-parse --show-toplevel 2>/dev/null)"
 # fora de qualquer repo (`_top` vazio) também é alheio: o motor do core não está ao alcance de quem chamou
 [ -f "${_top:-/nonexistent}/ops/pr-finalize.sh" ] || _FOREIGN_REPO=1
 _FR_MSG=""; _FR_OUT=""; _FR_BASE=""
+# _FR_OUTCOME: o desfecho CURTO da recusa ("recusado: <o quê>"), que vai para a linha do head e para o
+# desfecho do rastro no PR. Antes o rastro dizia só "head → —", e quem lia o PR não sabia por que parou
+# (observação do par que rodou a bancada do #1355). Cada sítio de recusa o escreve; o _FR_MSG segue longo.
+_FR_OUTCOME=""
 _foreign_gen() { # $1=worktree $2=projeção → regenera no lugar pelo gerador do alvo; rc≠0 com _FR_MSG
   local _w="$1" _p="$2" _g _tmp _rc=0 _empty_ok=0
   case "${_p}" in
     docs/onion/kg-read-index.tsv) _g=.claude/validation/kg-trace.sh ;;
     docs/backlog.md)              _g=.claude/validation/kg-backlog-project.sh ;;
-    *) _FR_MSG="${_p} não é projeção conhecida"; return 1 ;;
+    *) _FR_MSG="${_p} não é projeção conhecida"; _FR_OUTCOME="recusado: ${_p} não é projeção conhecida"; return 1 ;;
   esac
-  [ -f "${_w}/${_g}" ] || { _FR_MSG="gerador ausente para ${_p}: ${_g} não existe no repo alvo"; return 1; }
+  [ -f "${_w}/${_g}" ] || { _FR_MSG="gerador ausente para ${_p}: ${_g} não existe no repo alvo"; _FR_OUTCOME="recusado: gerador ausente para ${_p}"; return 1; }
   _tmp="$(mktemp)"
   if [ "${_p}" = docs/onion/kg-read-index.tsv ]; then
     local _err; _err="$(mktemp)"
@@ -331,37 +353,37 @@ _foreign_gen() { # $1=worktree $2=projeção → regenera no lugar pelo gerador 
       else _rc=0; _empty_ok=1; fi
     fi
     rm -f "${_err}"
-    [ -z "${_FR_MSG}" ] || { rm -f "${_tmp}"; return 1; }
+    [ -z "${_FR_MSG}" ] || { rm -f "${_tmp}"; _FR_OUTCOME="recusado: índice vazio do gerador de ${_p} não provado"; return 1; }
   else
     ( cd "${_w}" && bash "${_g}" --markdown ) > "${_tmp}" 2>/dev/null || _rc=$?
   fi
-  [ "${_rc}" -eq 0 ] || { rm -f "${_tmp}"; _FR_MSG="o gerador de ${_p} falhou (${_g}, rc=${_rc})"; return 1; }
+  [ "${_rc}" -eq 0 ] || { rm -f "${_tmp}"; _FR_MSG="o gerador de ${_p} falhou (${_g}, rc=${_rc})"; _FR_OUTCOME="recusado: gerador de ${_p} falhou (rc=${_rc})"; return 1; }
   # vazio sem o rc 3 não é projeção: é gerador mudo, e sobrescrever o vivo com nada é pior que a defasagem
   [ -s "${_tmp}" ] || [ "${_empty_ok}" -eq 1 ] \
-    || { rm -f "${_tmp}"; _FR_MSG="o gerador de ${_p} saiu VAZIO (${_g}) — não sobrescrevo o vivo"; return 1; }
+    || { rm -f "${_tmp}"; _FR_MSG="o gerador de ${_p} saiu VAZIO (${_g}) — não sobrescrevo o vivo"; _FR_OUTCOME="recusado: gerador de ${_p} saiu vazio"; return 1; }
   # `cat >`, não `mv`: o mktemp nasce 0600, e o mv levaria esse modo para a árvore do alvo
   cat "${_tmp}" > "${_w}/${_p}"; rm -f "${_tmp}"
 }
 _foreign_rb_busy() { ( cd "$1" && { [ -d "$(git rev-parse --git-path rebase-merge)" ] || [ -d "$(git rev-parse --git-path rebase-apply)" ]; } ); }
 _foreign_rebase() { # $1=worktree $2=base $3=head que o PR mostra → rc 0 = rebaseado, regenerado, julgado e ENVIADO
   local _w="$1" _b="$2" _exp="$3" _before _c _f _i _lint _lrc _wn
-  _FR_MSG=""; _FR_OUT=""; _FR_BASE="${_b}"
+  _FR_MSG=""; _FR_OUT=""; _FR_BASE="${_b}"; _FR_OUTCOME=""
   # o _FR_MSG vai para o comentário do PR, e o repo pode ser público: o nome da worktree, nunca o caminho da máquina
   _wn="worktree '$(basename "${_w}")'"
   _before="$(git -C "${_w}" rev-parse HEAD 2>/dev/null)"
   # a worktree tem de estar NO head do PR: atrás dele, o push com lease no head do PR descartaria commits do
   # remoto; à frente, publicaria commits que ninguém julgou. Nos dois casos, quem decide é o dono da branch.
   [ -n "${_before}" ] && [ "${_before}" = "${_exp}" ] \
-    || { _FR_MSG="a ${_wn} está em ${_before:0:8} e o PR em ${_exp:0:8} — sincronize a worktree com a branch do PR antes"; return 1; }
+    || { _FR_MSG="a ${_wn} está em ${_before:0:8} e o PR em ${_exp:0:8} — sincronize a worktree com a branch do PR antes"; _FR_OUTCOME="recusado: worktree fora do head do PR"; return 1; }
   { git -C "${_w}" diff --quiet && git -C "${_w}" diff --cached --quiet; } \
-    || { _FR_MSG="a ${_wn} tem mudança não commitada — não rebaseio por cima de trabalho em curso"; return 1; }
+    || { _FR_MSG="a ${_wn} tem mudança não commitada — não rebaseio por cima de trabalho em curso"; _FR_OUTCOME="recusado: worktree com mudança não commitada"; return 1; }
   git -C "${_w}" fetch -q origin "+refs/heads/${_b}:refs/remotes/origin/${_b}" 2>/dev/null \
-    || { _FR_MSG="não consegui buscar origin/${_b} na ${_wn}"; return 1; }
+    || { _FR_MSG="não consegui buscar origin/${_b} na ${_wn}"; _FR_OUTCOME="recusado: fetch de origin/${_b} falhou"; return 1; }
   # MERGE COMMIT NA BRANCH: o rebase simples lineariza e DESCARTA o que mora só no merge (a resolução, ou a
   # mudança de um "evil merge") — com lint verde e rc 0 (medido na passada adversarial: src/evil.sh sumiu do
   # head enviado). E as mensagens deste script mandam fazer exatamente `git merge origin/<base>` na branch.
   [ -z "$(git -C "${_w}" rev-list --merges "origin/${_b}..HEAD" 2>/dev/null)" ] \
-    || { _FR_MSG="a branch carrega commit de MERGE — o rebase o linearizaria e descartaria o que mora só nele; rebaseie à mão, decidindo o que o merge carrega (ou, se o merge é o conteúdo, rode com --merge-commit depois de mergear a base na branch e esperar o CI)"; return 1; }
+    || { _FR_MSG="a branch carrega commit de MERGE — o rebase o linearizaria e descartaria o que mora só nele; rebaseie à mão, decidindo o que o merge carrega (ou, se o merge é o conteúdo, rode com --merge-commit depois de mergear a base na branch e esperar o CI)"; _FR_OUTCOME="recusado: a branch carrega commit de merge"; return 1; }
   # daqui em diante, toda saída de falha devolve a branch ao head de antes: "recusado" quer dizer "nada mudou".
   # A exceção é o push que CHEGOU (rc mentindo, ou morte logo depois): aí o fato é o ref remoto, e desfazer o
   # local deixaria o rastro dizendo "nada mudou" sobre uma branch reescrita (o mesmo princípio do SAC-85 abaixo).
@@ -381,10 +403,10 @@ _foreign_rebase() { # $1=worktree $2=base $3=head que o PR mostra → rc 0 = reb
     for _i in $(seq 1 200); do
       _foreign_rb_busy "${_w}" || break
       _c="$(git -C "${_w}" -c core.quotepath=off diff --name-only --diff-filter=U)"
-      [ -n "${_c}" ] || { _undo; _FR_MSG="o rebase parou sem conflito nomeável — abortado, a branch segue em ${_before:0:8}"; _fr_off; return 1; }
+      [ -n "${_c}" ] || { _undo; _FR_MSG="o rebase parou sem conflito nomeável — abortado, a branch segue em ${_before:0:8}"; _FR_OUTCOME="recusado: rebase parou sem conflito nomeável"; _fr_off; return 1; }
       for _f in ${_c}; do
         _foreign_is_proj "${_f}" \
-          || { _undo; _FR_MSG="conflito REAL em ${_f} — só ${_FOREIGN_PROJ// /, } se resolvem sozinhas; rebase abortado, a branch segue em ${_before:0:8}"; _fr_off; return 1; }
+          || { _undo; _FR_MSG="conflito REAL em ${_f} — só ${_FOREIGN_PROJ// /, } se resolvem sozinhas; rebase abortado, a branch segue em ${_before:0:8}"; _FR_OUTCOME="recusado: conflito de fonte em ${_f}"; _fr_off; return 1; }
       done
       for _f in ${_c}; do
         _foreign_gen "${_w}" "${_f}" || { _undo; _FR_MSG="${_FR_MSG} — rebase abortado, a branch segue em ${_before:0:8}"; _fr_off; return 1; }
@@ -399,11 +421,11 @@ _foreign_rebase() { # $1=worktree $2=base $3=head que o PR mostra → rc 0 = reb
         GIT_EDITOR=true git -C "${_w}" rebase --continue >/dev/null 2>&1 && ! _foreign_rb_busy "${_w}" && break
       fi
     done
-    _foreign_rb_busy "${_w}" && { _undo; _FR_MSG="o rebase não terminou — abortado, a branch segue em ${_before:0:8}"; _fr_off; return 1; }
+    _foreign_rb_busy "${_w}" && { _undo; _FR_MSG="o rebase não terminou — abortado, a branch segue em ${_before:0:8}"; _FR_OUTCOME="recusado: o rebase não terminou"; _fr_off; return 1; }
   fi
   # a prova é a ancestralidade, não o rc (o rebase pode falhar sem deixar estado)
   git -C "${_w}" merge-base --is-ancestor "origin/${_b}" HEAD \
-    || { _undo; _FR_MSG="o rebase NÃO pôs origin/${_b} debaixo do HEAD — nada enviado"; _fr_off; return 1; }
+    || { _undo; _FR_MSG="o rebase NÃO pôs origin/${_b} debaixo do HEAD — nada enviado"; _FR_OUTCOME="recusado: origin/${_b} não ficou debaixo do HEAD"; _fr_off; return 1; }
   # a árvore COMBINADA: regenera as projeções que o alvo versiona, e o que mudou vira commit próprio
   for _f in ${_FOREIGN_PROJ}; do
     git -C "${_w}" ls-files --error-unmatch -- "${_f}" >/dev/null 2>&1 || continue
@@ -413,12 +435,17 @@ _foreign_rebase() { # $1=worktree $2=base $3=head que o PR mostra → rc 0 = reb
   if ! git -C "${_w}" diff --cached --quiet; then
     # --no-verify: o gate deste commit é o lint do alvo, logo abaixo, sobre a árvore inteira — uma passada, não duas
     git -C "${_w}" commit -q --no-verify -m "docs: projeções geradas regeneradas na árvore combinada" >/dev/null 2>&1 \
-      || { _undo; _FR_MSG="não consegui commitar as projeções regeneradas na ${_wn} — nada enviado"; _fr_off; return 1; }
+      || { _undo; _FR_MSG="não consegui commitar as projeções regeneradas na ${_wn} — nada enviado"; _FR_OUTCOME="recusado: commit das projeções regeneradas falhou"; _fr_off; return 1; }
     _FR_OUT="${_FR_OUT}projeções regeneradas na árvore combinada e commitadas"$'\n'
   fi
   if [ -f "${_w}/.claude/validation/lint-artifacts.sh" ]; then
     _lint="$(cd "${_w}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1)"; _lrc=$?
     if grep -qF 'MORREU' <<< "${_lint}" || [ "${_lrc}" -ne 0 ]; then
+      # N HARD lido da linha do sumário do lint do alvo; sem ela (lint morto ou de outra forma), diz o rc
+      local _nh; _nh="$(LC_ALL=C grep -m1 -oE 'Violações HARD *: *[0-9]+' <<< "${_lint}" | LC_ALL=C grep -oE '[0-9]+$')" || _nh=""
+      if grep -qF 'MORREU' <<< "${_lint}"; then _FR_OUTCOME="recusado: lint do alvo morreu (rc=${_lrc})"
+      elif [ -n "${_nh}" ]; then _FR_OUTCOME="recusado: lint do alvo com ${_nh} HARD"
+      else _FR_OUTCOME="recusado: lint do alvo reprovou (rc=${_lrc})"; fi
       _undo; _FR_MSG="o lint do alvo reprovou o head rebaseado (rc=${_lrc}): $(grep -m1 -E 'Violações HARD|MORREU' <<< "${_lint}") — nada enviado, a branch segue em ${_before:0:8}"; _fr_off; return 1
     fi
     _FR_OUT="${_FR_OUT}gate do alvo: lint-artifacts.sh rc 0 (0 HARD)"$'\n'
@@ -428,7 +455,7 @@ _foreign_rebase() { # $1=worktree $2=base $3=head que o PR mostra → rc 0 = reb
   if ! git -C "${_w}" push -q --force-with-lease="refs/heads/${HEAD_REF}:${_exp}" origin "HEAD:refs/heads/${HEAD_REF}" >/dev/null 2>&1; then
     # o rc do push é declaração: se o ref remoto JÁ é o head novo, o push chegou e o fluxo segue por ele
     if _fr_pushed; then _FR_OUT="${_FR_OUT}o push saiu rc≠0, mas o ref remoto já é o head novo — sigo pelo ref"$'\n'
-    else _undo; _FR_MSG="o push --force-with-lease (amarrado a ${_exp:0:8}) foi recusado — alguém empurrou na branch? Nada enviado"; _fr_off; return 1; fi
+    else _undo; _FR_MSG="o push --force-with-lease (amarrado a ${_exp:0:8}) foi recusado — alguém empurrou na branch? Nada enviado"; _FR_OUTCOME="recusado: push com lease recusado"; _fr_off; return 1; fi
   fi
   _FR_OUT="${_FR_OUT}enviado ${HEAD_REF} @ $(git -C "${_w}" rev-parse --short HEAD)"$'\n'
   _fr_off; return 0
@@ -480,14 +507,16 @@ _POLL_SECS="${ONION_MERGE_POLL_SECS:-30}"
 # dispensa, aqui o registro NÃO é precondição: quando o comentário é postado o rebase já aconteceu, e
 # morrer depois dele deixaria o PR rebaseado e o merge parado pelo motivo errado. Falha ⇒ AVISO
 # NOMEADO no terminal (nunca falha calada), e o merge segue os gates de sempre.
-_rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=desfecho
-  local _body
+_rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=desfecho [$6=desfecho curto, sem head novo]
+  local _body _hd="\`${2:0:12}\`"
+  # sem head novo, a seta sozinha ("→ —") não dizia nada: o desfecho curto vai na própria linha do head
+  [ "$2" = "—" ] && _hd="— (${6:-sem head novo})"
   _body="$(printf '%s\n' \
     "## 🔁 Auto-rebase de \`ops/pr-merge-verified.sh\`" \
     "" \
     "| | |" \
     "|---|---|" \
-    "| head | \`${1:0:12}\` → \`${2:0:12}\` |" \
+    "| head | \`${1:0:12}\` → ${_hd} |" \
     "| causa | ${3} |" \
     "| tentativa | ${4} |" \
     "| desfecho | ${5} |" \
@@ -676,7 +705,7 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
     _RB_ENGINE_TEXT="Caminho de repo alheio de \`ops/pr-merge-verified.sh\` (o repo não tem \`ops/pr-finalize.sh\`): só \`docs/backlog.md\` e \`docs/onion/kg-read-index.tsv\` se resolvem sozinhas, pelo gerador do próprio repo; qualquer outro conflito aborta com a branch no head anterior."
     say "PR #${PR} ${_rb_state} — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (repo sem ops/pr-finalize.sh: rebase próprio, só projeção conhecida se resolve)"
     if ! _foreign_rebase "${_wt}" "${_BASE_REF}" "${_old_head}"; then
-      _rebase_trail "${_old_head}" "—" "${_FR_MSG}" "${_rebases}/${_REBASE_MAX}" "RECUSADO — nada mudou na branch; resolver à mão"
+      _rebase_trail "${_old_head}" "—" "${_FR_MSG}" "${_rebases}/${_REBASE_MAX}" "${_FR_OUTCOME:-recusado} — nada mudou na branch; resolver à mão" "${_FR_OUTCOME:-recusado}"
       die "auto-rebase RECUSADO (repo sem ops/pr-finalize.sh): ${_FR_MSG}. Nada foi mergeado."
     fi
     printf '%s' "${_FR_OUT}" | sed 's/^/  /'
@@ -691,12 +720,14 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   # carimbo, porque o hash de código muda pelo contexto. Não é "conflito de FONTE", nem "nada mudou".
   _fam="$(LC_ALL=C grep -o 'conflito de famílias acrescentadas lado a lado resolvido em [^ ]*' <<< "$_rb_out" | sed 's/^.* resolvido em //' | sort -u | paste -sd, -)"
   if [ "$_rb_rc" -ne 0 ] && [ -n "${_fam}" ] && ! grep -q 'conflito REAL em ' <<< "$_rb_out"; then
-    _rebase_trail "${_old_head}" "—" "famílias da bancada acrescentadas lado a lado: ${_fam} (resolvido pelo driver)" "${_rebases}/${_REBASE_MAX}" "PARADO — rebaseado só na worktree, NÃO enviado; o resíduo pede re-revisão"
+    _rebase_trail "${_old_head}" "—" "famílias da bancada acrescentadas lado a lado: ${_fam} (resolvido pelo driver)" "${_rebases}/${_REBASE_MAX}" "PARADO — rebaseado só na worktree, NÃO enviado; o resíduo pede re-revisão" "parado: rebaseado só na worktree, o resíduo pede re-revisão"
     die "auto-rebase PARADO no carimbo do resíduo: o driver das famílias resolveu ${_fam}, a branch em ${_wt} está rebaseada e NÃO foi enviada, e o hash de código mudou pelo contexto — re-revise (reviewed_diff_sha256: pendente) e rode bash ops/pr-finalize.sh --push lá. pr-finalize disse: $(printf '%s\n' "$_rb_out" | tail -2 | tr '\n' ' ')"
   fi
   if [ "$_rb_rc" -ne 0 ]; then
     _real="$(grep -o 'conflito REAL em [^ ]*' <<< "$_rb_out" | head -1)"
-    _rebase_trail "${_old_head}" "—" "fonte: ${_real:-pr-finalize rc=${_rb_rc}}" "${_rebases}/${_REBASE_MAX}" "RECUSADO — nada mudou na branch; resolver à mão"
+    if [ -n "${_real}" ]; then _rb_outcome="recusado: conflito de fonte em ${_real#conflito REAL em }"
+    else _rb_outcome="recusado: pr-finalize rc=${_rb_rc}"; fi
+    _rebase_trail "${_old_head}" "—" "fonte: ${_real:-pr-finalize rc=${_rb_rc}}" "${_rebases}/${_REBASE_MAX}" "${_rb_outcome} — nada mudou na branch; resolver à mão" "${_rb_outcome}"
     die "auto-rebase RECUSADO (${_real:-rc=${_rb_rc}}) — conflito de FONTE não se resolve sozinho e não escondo conflito real; resolva à mão na worktree ${_wt}. pr-finalize disse: $(printf '%s\n' "$_rb_out" | tail -2 | tr '\n' ' ')"
   fi
   _new="$(git -C "$_wt" rev-parse HEAD 2>/dev/null)"
