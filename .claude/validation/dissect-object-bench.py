@@ -114,6 +114,9 @@ CASES = [
     # item 2
     ("veredito no S_STAGE0", "veredito-fora-de-decisao", lambda g: (node(g, "S_STAGE0").update(x_dissect_verdict="parquear", x_dissect_overcoming="nenhuma", x_dissect_overcoming_search=D(g)["x_dissect_overcoming_search"], x_dissect_trigger=D(g)["x_dissect_trigger"]), D(g).pop("x_dissect_verdict")), "ok", []),
     ("veredito selado no próprio estudo", "veredito-selado", lambda g: D(g).update(status="done"), "ok", []),
+    ("veredito fechado com o selo do destino (variante legítima)", None, lambda g: D(g).update(status="done", x_dissect_sealed_by="onion-evolve:docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_FIXTURE_SELADO"), "ok", []),
+    ("selo do destino mal formado", "selo-mal-formado", lambda g: D(g).update(status="done", x_dissect_sealed_by="o core selou"), "ok", []),
+    ("selo válido com o veredito refutado (só done fecha)", "veredito-selado", lambda g: D(g).update(status="refuted", x_dissect_sealed_by="onion-evolve:docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_FIXTURE_SELADO"), "ok", []),
     ("sem veredito", "veredito-ausente", lambda g: D(g).pop("x_dissect_verdict"), "ok", []),
     ("estudo sem veredito (variante legítima do modo estudo)", None, lambda g: (g["meta"].update(x_dissect_mode="study"), D(g).pop("x_dissect_verdict")), "ok", []),
     ("estudo com veredito", "estudo-com-veredito", lambda g: g["meta"].update(x_dissect_mode="study"), "ok", []),
