@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:d4eacd13ecaaafc1 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:1b8237351ed95b75 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -87,6 +87,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.23 | Contrato v4.14: o `x_term.scheme` e o aviso `integrity.term-notation-duplicate`, para um código curto levar nome legível no próprio vocabulário; o `kg_vocab.py` resolve um código (`esquema:código`) e ganha o `lint`, com catraca, para os códigos da prosa; o `kg_query.py --text` sem acento, pelo vocabulário e com aviso no zero |
 | 4.24 | O `kg_vendor.py update --ref` para a bancada antes da tag; o `check` e o `kg_gate.py` recusam o vendor de bancada sem `--allow-unreleased` |
 | 4.25 | O `kg_trace.py`, o trace que não resolve: a âncora `trace:` de cada nó contra os arquivos do repositório |
+| 4.26 | O `kg_query --semantic`, a busca opcional por semelhança (o extra `vector`, `kg_vector.py`), fundida ao `--text` por RRF |
 
 ## Versões e tags
 

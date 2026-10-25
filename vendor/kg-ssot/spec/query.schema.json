@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:query.schema.json",
   "title": "Consulta e projeção de um corpus de grafos (kg-ssot.query/1)",
-  "description": "Saída de `kg_query.py --format json` e da ferramenta kg_query do servidor MCP. A consulta não julga: o veredito é do kg_validate.py, e o grafo que não parseia sai em `unreadable` com o código parse.*. Cada nó sai projetado: os campos do contrato que interessam a quem lê e as arestas de saída (`out`) e de entrada (`in`) com a outra ponta resolvida de id para label (o label da outra ponta sai cortado em 200 caracteres, com …; o do próprio nó sai inteiro). No servidor MCP a página também corta pelo tamanho (o --max-bytes do servidor), sempre com ao menos um nó, e o next_cursor segue de onde ela parou. Uma ponta pode ser externa (external_edges, `<caminho>#<id>`) e pode faltar no corpus (`found: false`, `label: null`); a origem ausente de uma aresta externa (o grafo inteiro) sai com o `file` do grafo e `id` nulo. `total` conta todos os nós que a consulta acha; `nodes` traz uma página, e `next_cursor` é o cursor da próxima, ou null na última. O cursor vale para a mesma consulta sobre o mesmo corpus. `query` ecoa o pedido normalizado. Desde a 4.23, o --text compara sem acento nem maiúscula (verificação casa com VERIFICACAO), se expande pelo vocabulário (expanded) quando o texto inteiro é um termo do x_term, e o total vazio traz hint.",
+  "description": "Saída de `kg_query.py --format json` e da ferramenta kg_query do servidor MCP. A consulta não julga: o veredito é do kg_validate.py, e o grafo que não parseia sai em `unreadable` com o código parse.*. Cada nó sai projetado: os campos do contrato que interessam a quem lê e as arestas de saída (`out`) e de entrada (`in`) com a outra ponta resolvida de id para label (o label da outra ponta sai cortado em 200 caracteres, com …; o do próprio nó sai inteiro). No servidor MCP a página também corta pelo tamanho (o --max-bytes do servidor), sempre com ao menos um nó, e o next_cursor segue de onde ela parou. Uma ponta pode ser externa (external_edges, `<caminho>#<id>`) e pode faltar no corpus (`found: false`, `label: null`); a origem ausente de uma aresta externa (o grafo inteiro) sai com o `file` do grafo e `id` nulo. `total` conta todos os nós que a consulta acha; `nodes` traz uma página, e `next_cursor` é o cursor da próxima, ou null na última. O cursor vale para a mesma consulta sobre o mesmo corpus. `query` ecoa o pedido normalizado. Desde a 4.23, o --text compara sem acento nem maiúscula (verificação casa com VERIFICACAO), se expande pelo vocabulário (expanded) quando o texto inteiro é um termo do x_term, e o total vazio traz hint. Desde a 4.26, com --semantic (o extra vector): `query.semantic` é a pergunta, `semantic` diz o modo (semantic, só o vetor, ou hybrid, o --text e o vetor fundidos por RRF k=60), o modelo com revisão e sha256 e quantos nós vieram do índice ou foram embutidos na hora, e cada nó traz `rank` com a posição em cada braço; os filtros valem para os dois braços, as listas são completas e `total` conta todos os candidatos, então `total` e `next_cursor` dizem o corte. Sem --semantic, nada disso aparece.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -160,6 +160,10 @@
             "type": "string"
           },
           "description": "padrões glob de chaves do nó pedidas em extra"
+        },
+        "semantic": {
+          "type": "string",
+          "description": "Desde a 4.26: a pergunta do --semantic; ausente sem ele."
         }
       }
     },
@@ -243,7 +247,89 @@
     },
     "hint": {
       "type": "string",
-      "description": "Desde a 4.23: com --text e nenhum nó, o que tentar, para o zero não passar por \"não há\"."
+      "description": "Desde a 4.23: com --text e nenhum nó, o que tentar, para o zero não passar por \"não há\". Com --semantic e o --text sem nenhum nó, o hint diz que a ordem veio só do vetor."
+    },
+    "semantic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "question",
+        "k",
+        "model",
+        "index"
+      ],
+      "description": "Desde a 4.26, só com --semantic.",
+      "properties": {
+        "mode": {
+          "enum": [
+            "semantic",
+            "hybrid"
+          ]
+        },
+        "question": {
+          "type": "string"
+        },
+        "k": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "model": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "revision",
+            "sha256"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "revision": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "index": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "nodes",
+            "embedded_now",
+            "from_memory",
+            "no_text"
+          ],
+          "properties": {
+            "nodes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "embedded_now": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "from_memory": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "no_text": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "description": "Os candidatos por origem do vetor, que somam o total: nodes do índice em disco, embedded_now embutidos nesta chamada, from_memory guardados na memória do processo (o servidor MCP), no_text sem label nem narrative (vão para o fim)."
+        },
+        "text_matches": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Só no hybrid: quantos nós casam o --text. O total da consulta conta todos os candidatos que passam nos filtros, porque o vetor ordena todos."
+        }
+      }
     }
   },
   "$defs": {
@@ -412,6 +498,35 @@
         "extra": {
           "type": "object",
           "description": "só quando a consulta pede fields: as chaves do nó que casam, com o valor como está no grafo"
+        },
+        "rank": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "text",
+            "vector",
+            "rrf"
+          ],
+          "description": "Desde a 4.26, só com --semantic: a posição do nó na lista do --text (null fora dela ou sem --text), na do vetor, e a pontuação RRF (null sem --text).",
+          "properties": {
+            "text": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 1
+            },
+            "vector": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "rrf": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          }
         }
       }
     }

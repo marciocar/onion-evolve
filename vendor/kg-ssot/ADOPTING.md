@@ -86,9 +86,10 @@ The published tags are listed by `git ls-remote --tags https://github.com/marcio
   - a vendor that differs from its stamp, unless you pass `--force`. This keeps a local edit from vanishing
     silently.
 - **Minimal profile:** if you only run the gate and the check, you can vendor the `gate` profile with
-  `--profile gate`. It has 15 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the vendor
+  `--profile gate`. It has 17 files: the contract (MUST and SHOULD), `release.json`, the reader, the gate, the vendor
   tool, the trace check with the query module it imports and its output schema (`tools/kg_trace.py`,
-  `tools/kg_query.py`, and `spec/trace.schema.json`, since 4.25.1), the language module and its catalog (`tools/kg_i18n.py` and `locale/pt_BR/LC_MESSAGES/kg-ssot.po`),
+  `tools/kg_query.py`, and `spec/trace.schema.json`, since 4.25.1), the vector module the query imports only for
+  `--semantic` and its pinned requirements (`tools/kg_vector.py` and `tools/requirements-vector.txt`, since 4.26.0), the language module and its catalog (`tools/kg_i18n.py` and `locale/pt_BR/LC_MESSAGES/kg-ssot.po`),
   `requirements.txt`, this guide, `LICENSE`, and `NOTICE`. The conformance suite stays out, so `kg_conformance.py` and
   the `spec/conformance/README.md` that this guide cites do not come along. The stamp records the profile, `check`
   verifies only what the profile brought, and the next update **inherits** the profile from the stamp
@@ -339,6 +340,14 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.25.1` to `kg-ssot-v4.26.0`, the contract does not change (still v4.14), and the gate asks for no
+`--update`. Nothing changes unless you want the search by meaning: install `tools/requirements-vector.txt` with
+`--require-hashes` (or `pip install "kg-ssot[vector]"`), run `kg_vector.py fetch` once and `kg_vector.py index --root .`
+with the same `--exclude` you query with, and call `kg_query --text <term> --semantic "<question>"`. Without the
+extra, `--semantic` exits with rc 3, so a script can fall back to `--text` and say so. The `.kg-ssot/vector/` cache
+comes with its own `.gitignore`. If you vendor the `gate` profile, the next `update` brings 17 files. `kg_query`,
+`kg_diff` and `kg_migrate` now write UTF-8 to a file or pipe on Windows too.
 
 From `kg-ssot-v4.25.0` to `kg-ssot-v4.25.1`, the contract does not change (still v4.14), and the gate asks for no
 `--update`. The JSON of `kg_trace.py check` gains `resolved_targets`, with the `path` where each trace resolved and its

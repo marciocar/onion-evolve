@@ -85,6 +85,7 @@ and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.
 | 4.23 | Contract v4.14: `x_term.scheme` and the warning `integrity.term-notation-duplicate`, so a short code carries a readable name in its own vocabulary; `kg_vocab.py` resolves a code (`scheme:code`) and gains `lint`, with a ratchet, for codes in prose; `kg_query.py --text` without accents, through the vocabulary, and with a hint on zero |
 | 4.24 | `kg_vendor.py update --ref` for the bench before a tag; `check` and `kg_gate.py` refuse a bench vendor without `--allow-unreleased` |
 | 4.25 | `kg_trace.py`, the trace that does not resolve: each node's `trace:` anchor against the files of the repository |
+| 4.26 | `kg_query --semantic`, the optional search by similarity (the `vector` extra, `kg_vector.py`), fused with `--text` by RRF |
 
 ## Versions and tags
 

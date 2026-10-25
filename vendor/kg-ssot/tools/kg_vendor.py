@@ -422,7 +422,7 @@ DESCRIPTION = """Vendor KG-SSOT by pin: the adopter brings in the release by TAG
       KG-SSOT clone (inside a vendor, pass --source).
       --profile P brings only profile P from the tag's release.json: `gate` is the minimum to run the gate and
       the check (contract, reader, gate, vendor, language module, the trace check with the query module it
-      imports and its schema, requirements, guide and license), without the suite. The stamp
+      imports and its schema, the vector module and its requirements, requirements, guide and license), without the suite. The stamp
       records the profile, check verifies only what the profile brought, and the next update INHERITS the
       profile from the stamp; --profile full goes back to the whole release.
   update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]

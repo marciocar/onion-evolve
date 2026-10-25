@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.25.1",
+  "release": "kg-ssot-v4.26.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -290,7 +290,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 |---|---|
 | `--source REPO` | The repository (a path or a URL, such as `https://github.com/marciocar/kg-ssot`) that has the tag. Required when you run it from inside a vendor |
 | `--dest DIR` | Where the vendor lives (default `vendor/kg-ssot`) |
-| `--profile gate` | Brings only the minimum to run the gate and the check (15 files since 4.25.1, without the suite); `--profile full` goes back to the whole release |
+| `--profile gate` | Brings only the minimum to run the gate and the check (17 files since 4.26.0, without the suite); `--profile full` goes back to the whole release |
 | `--force` | Replaces a locally edited vendor |
 | `--index` (on `check`) | Verifies the git index instead of the working tree |
 | `--ref COMMIT` (on `update`) | The bench before a tag (4.24): brings a commit that is not a release yet, from a repository where you can reach it. The stamp says `unreleased` |
@@ -745,6 +745,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--root DIR` or files | The corpus. With `--root`, the vendor and the fixtures stay out by default (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*`, and, since 4.20.0, any folder with the `.kg-ssot-version` stamp); `--exclude GLOB` (repeatable) removes more paths, and `--no-default-excludes` reads everything. A file you name one by one is never excluded |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filters, all combined with AND |
 | `--text WORDS` | Words that the label contains, all of them, without case or accents (`verificacao` matches `Verificação`, since 4.23); `--in-narrative` also searches the narrative. When the whole text is a term of the vocabulary (its `pref` or a current domain synonym, folded, or its `notation`, exactly), the term and every node that has any of its forms as a whole word match too, and `expanded` says which term; a case-scoped or retired synonym does not expand. No match gives a `hint`, which says when the zero comes from the other filters, so a zero does not pass for "there is none" |
+| `--semantic QUESTION` | Since 4.26, with the `vector` extra: orders the nodes that pass the other filters by similarity to the question (`--model`, `--model-dir`; see `kg_vector.py` below). Alone, the order is the vector's; with `--text`, the text's list (in corpus order) and the vector's are fused by RRF (k=60), ties going to the vector position. Give the short term to `--text` and the whole question to `--semantic`: that is what the bench measured (14 of 20 hits, against 12 for the vector and 9 for the text). The filters apply to both, both lists are complete, and `--limit` only pages the fused list, so in hybrid mode `total` counts every candidate and `semantic.text_matches` says how many match `--text`. The JSON gains `semantic` (mode, model with revision and sha256, and where each vector came from: the index, embedded now, the process memory, or no text) and a `rank` per node; without `--semantic` the output does not change |
 | `--open` | The open queue (status `open`) |
 | `--verified-before YYYY-MM-DD` | Nodes with no `verified_at`, or verified before the date |
 | `--around ID` | The neighborhood: `<path>#<id>`, or an id that is unique in the corpus; `--depth`, `--edge-type` (repeatable), `--direction out\|in\|both` |
@@ -756,7 +757,9 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 
 A graph that does not parse shows up in `unreadable`, with its `parse.*` code, and does not bring the query down. The
 label of the other end of each edge is cut at 200 characters: a node with a long label cited by thousands of edges
-does not multiply the response. rc 0 when the query ran, even with no node; 2 on broken input. In the MCP server, the
+does not multiply the response. rc 0 when the query ran, even with no node; 2 on broken input; 3 when `--semantic`
+cannot run here (the `vector` extra or the model is missing), so a caller falls back to `--text` and says so, never in
+silence. In the MCP server, the
 same query is the `kg_query` tool, over the store: the page stops at the server's byte cap (with at least one node),
 and `next_cursor` picks up where it stopped. Each call rereads and reparses the area's store, and in a store of tens
 of MB the first call takes tens of seconds; the judgment cache comes in 4.19.
@@ -1023,6 +1026,45 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   4.25.0 stays valid. rc 0 when every judged trace resolves, 1 with a missing target or a
   graph that does not read, 2 on broken input. These rules come from an adopter's resolver measured on thousands of
   traces; each cut was paid for by a false positive.
+
+## `kg_vector.py`: the model and the index of the semantic search (4.26.0)
+
+`kg_query --semantic` finds a node when the question uses other words than the label. It is optional: it needs the
+`vector` extra (`pip install "kg-ssot[vector]"`, which brings onnxruntime, tokenizers and numpy; in the vendor, install
+`tools/requirements-vector.txt` with `--require-hashes`). Without it, the kit runs as always, and only `--semantic` and
+this script refuse, with rc 3 and rc 2 and what to install. Nothing here enters a verdict: the contract, the gate and
+`--text` do not depend on the vector.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_vector.py fetch                 # the model, once (about 250 MB)
+python3 -I -B vendor/kg-ssot/tools/kg_vector.py index --root .        # the cache, redone only where a node changed
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --text "busca vetorial" --semantic "vale a pena adotar busca vetorial?"
+```
+
+- **The model** is an ONNX file with its revision and sha256 pinned in the script (`kg_vector.py models`): the default
+  is the multilingual model that the bench measured (about 50 languages, 128 tokens). `fetch` downloads it from
+  Hugging Face into `$KG_SSOT_MODEL_DIR` (or `.cache/kg-ssot/models in the home folder`) and checks the sha256 before putting it in
+  place; each load checks it again, and a query never goes to the network. Without network, put the files there.
+- **The text of a node** is its label and narrative joined by a space; the vector is the mean of the tokens,
+  normalized. It reproduces the bench's embedder: on its 403 nodes, the smallest cosine was 0.9999999.
+- **The index** is a cache in `<root>/.kg-ssot/vector/<model>/index.npz`, with a `.gitignore` that keeps it out of
+  git: one vector per node and the sha256 of the text that made it, in a single file replaced at once and checked on
+  load (shape, dimension, finite values, unique keys); an index that fails the check is ignored and rebuilt. A node edited after the index does not keep an old vector:
+  the query embeds it on the spot and counts it in `embedded_now`, and the next `index` redoes only what changed.
+  Without an index the query embeds every candidate (on the bench's 403 nodes, about 15 s; with the index, about 2 s).
+  On a corpus of 6,385 nodes, the first `index` took about 10 minutes on 8 cores, the next one 7 s, and a hybrid query
+  with the index 7 s. Give `index` and the query the same `--exclude`: a node the index left out is embedded on the
+  spot at every query.
+- **In the MCP server**, `kg_query` takes `semantic` when the server has the extra and the model; otherwise the tool
+  answers with an error that says what is missing, never with text alone. The server has no index on disk: it embeds
+  each node once per process and keeps the vector in memory by the sha256 of its text, so the first semantic call on a
+  large store is the slow one.
+- **A node without text** (no label and no narrative) goes to the end of the vector order: the vector of an empty text
+  says nothing about it. The MCPB bundle, the GHCR image and the npm
+  package do not carry the vector: it is the PyPI package with the extra, or the vendor with
+  `tools/requirements-vector.txt`.
+
+rc 0 done; 2 on broken input, a missing extra or model, a file that does not match, or a failed download.
 
 ## `kg_prov_export.py`: provenance in PROV-O
 

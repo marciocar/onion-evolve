@@ -28,6 +28,9 @@ pip install kg-ssot
 To run the commands without installing them into your environment, use `pipx install kg-ssot` or
 `uvx --from kg-ssot kg-validate`.
 
+The search by meaning (`kg-query --semantic` and `kg-vector`) is optional: `pip install "kg-ssot[vector]"` adds
+onnxruntime, tokenizers, and numpy, and `kg-vector fetch` downloads the model, pinned by sha256.
+
 ## Quickstart
 
 Check your graphs against the current contract:
@@ -78,6 +81,7 @@ Only `latest/` sets the exit code. The `optional/` cases are reported and never 
 | `kg-criterion` | The pre-registered criterion: prints the `sha256` of a criterion version and checks each version against its text or file, and each citation of another graph |
 | `kg-audit` | The audit package by question: one row per questionnaire item, with the answer, the verdict, the dated evidence, the gaps, and the owner, in CSV, XLSX, or JSON |
 | `kg-trace` | The trace that does not resolve: each node's `trace:` anchor against the files of the repository, with what is not judged counted apart |
+| `kg-vector` | The model and the index of `kg-query --semantic`, the search by similarity; needs `pip install "kg-ssot[vector]"` |
 | `kg-prov-export` | Exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD |
 
 As a library, the modules live under `kg_ssot`: `kg_ssot.kg_validate`, `kg_ssot.kg_store`, `kg_ssot.kg_mcp`, and the
