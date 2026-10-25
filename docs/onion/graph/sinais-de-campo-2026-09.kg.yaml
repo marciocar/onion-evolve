@@ -736,6 +736,31 @@ nodes:
       locator: "perguntas com opções de 2026-10-25 sobre o D_AGENT_TRANSPORT_VERDICT e o round-trip vivo"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
+  - id: E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-25"
+    verified_against: "relato da curadoria do dissect:N2 vivo (pré-registro 3afc3b0, PR #89 do onion-curation): interlink-mcp v0.12.0 em loopback, Codex CLI 0.164.0, Claude Code 2.1.310"
+    label: "O round-trip vivo Claude ↔ Codex por MCP passou, mas mediu o interlink-mcp e não a composição; o Claude em bypass envia sem diálogo"
+    narrative: "A ida e volta com nonce e assinatura do Codex passou, e o estranho foi barrado nas mensagens. A recusa de criar arquivo e de aceitar pareamento veio do julgamento do modelo, não da aprovação do cliente. No envio sem diálogo, o Codex on-request pede a cada chamada, o Codex never fecha tudo, o Claude default nega e o Claude em bypass (o defaultMode da máquina) envia sem diálogo, o mesmo buraco do A7-C1. O Elenxo da curadoria achou ainda um goodbye assinado sem tool, o pareamento levando texto do estranho ao modelo, o Always allow do Codex abrindo o envio e um operador que era agente, não humano. Rejulgado pela régua: o interlink não é adotável (aceitar e parear são tools do modelo, e não há gate de topologia); a composição do core segue em 6 e parqueada. O remédio do envio sem diálogo é a tool só gravar rascunho, e o envio ser um script que o humano roda."
+    provenance:
+      source: "onion-curation, mensagem entre sessões ao core"
+      locator: "no adotante, docs/evolution/dissect/agent-transport-2026-10/N2-LIVE-PLAN.md e N2-LIVE-RESULT.md (PR #89 do onion-curation)"
+      method: "testemunho: relato da curadoria sobre a medição viva, conferido contra o pré-registro"
+      locality: "repo"
+  - id: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho), com bypass fechando, sem envio automático, o Always allow sem abrir o envio e nenhuma tool de aceitar no tools/list"
+    narrative: "Substitui o round-trip genérico como gatilho do parque selado em D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025, que segue de pé. Pela delegação de 2026-10-25, o core acolheu a troca e não constrói a composição agora: construir é mudar o parque em perseguir, e isso volta ao maestro. Das peças, só a entrega ao Codex pelo codex queue e o aviso no Stop hook têm teste; a assinatura Ed25519 com peers.json do interlink não se copia, porque tiraria a pinagem da topologia."
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -866,3 +891,12 @@ edges:
   - from: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
     to: Q_CANAL_ENTRE_SESSOES_NEUTRO_DO_AGENTE_1025
     edge_type: TRACES_TO
+  - from: E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025
+    to: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
+    edge_type: SUPPORTS
+  - from: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    to: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
+    edge_type: TRACES_TO
+  - from: E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025
+    to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    edge_type: SUPPORTS
