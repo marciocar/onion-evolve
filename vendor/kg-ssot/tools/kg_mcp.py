@@ -138,7 +138,8 @@ TOOLS = {
                          "open nodes; around returns the neighborhood of a node (name#id, or the unique id) by depth, "
                          "edge type and direction. Each node comes with its outgoing and incoming edges and the other "
                          "end resolved to its label (local or external, and whether it exists). Pages by cursor: repeat "
-                         "with next_cursor until it comes back null."),
+                         "with next_cursor until it comes back null. semantic orders by similarity to a question (needs "
+                         "the vector extra on the server); with text, both orders are fused by RRF."),
         "inputSchema": {"type": "object", "additionalProperties": False,
                         "properties": {
                             "ids": {"type": "array", "items": {"type": "string", "maxLength": 200}, "maxItems": 200},
@@ -152,6 +153,9 @@ TOOLS = {
                             "text": {"type": "string", "maxLength": 500,
                                      "description": P_("words the label contains, all of them, case-insensitive")},
                             "in_narrative": {"type": "boolean"},
+                            "semantic": {"type": "string", "minLength": 1, "maxLength": 1000,
+                                         "description": P_("a question: orders the nodes by similarity to it (the "
+                                                           "vector extra); with text, fused by RRF")},
                             "open": {"type": "boolean", "description": P_("the queue of open nodes (status open)")},
                             "verified_before": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
                                                 "description": P_("no verified_at, or verified before the date")},
@@ -406,6 +410,22 @@ class Server:
         self.store_error = store_error if store is None else None
         self.max_graphs = max_graphs
 
+    def semantic_ranker(self):
+        """O ordenador do semantic (kg_vector), carregado uma vez por processo; sem o extra ou o modelo, ToolError com o
+        que fazer, nunca uma resposta só por texto. O modelo vem de $KG_SSOT_MODEL_DIR (ou do cache padrão)."""
+        if getattr(self, "_ranker", None) is None:
+            if __package__:
+                from . import kg_vector
+            else:
+                import kg_vector
+            try:
+                self._ranker = kg_vector.Ranker(None)
+            except kg_vector.Unavailable as exc:  # o detalhe (com o caminho do servidor) fica no log, não no cliente
+                print(f"kg_mcp: semantic unavailable: {exc}", file=sys.stderr)
+                raise ToolError(P_("semantic is not available on this server: the vector extra or the model is "
+                                   "missing (the operator runs kg_vector.py fetch)")) from None
+        return self._ranker
+
     def default_context(self):
         """O contexto fora do perfil 'atrás de proxy': o armazém e o --author do processo, sem envelope."""
         return Context(self.store, self.author, store_error=self.store_error)
@@ -613,6 +633,9 @@ class Server:
             day = kg_validate.iso_date(before) if before is not None else None
             if before is not None and day is None:
                 raise ToolError(P_("verified_before {value}: the date is YYYY-MM-DD").format(value=repr(before)))
+            ranker = None
+            if args.get("semantic") is not None:
+                ranker = self.semantic_ranker()
             try:
                 res = kg_query.query(corpus, ids=args.get("ids", ()), id_prefix=args.get("id_prefix"),
                                      node_type=args.get("node_type"), status=args.get("status"), plane=args.get("plane"),
@@ -622,7 +645,8 @@ class Server:
                                      edge_types=args.get("edge_types", ()), direction=args.get("direction", "both"),
                                      sort=args.get("sort", "corpus"), limit=args.get("limit", 50),
                                      cursor=args.get("cursor"), narrative=args.get("narrative", False),
-                                     fields=args.get("fields", ()), max_bytes=self.max_bytes)
+                                     fields=args.get("fields", ()), max_bytes=self.max_bytes,
+                                     semantic=args.get("semantic"), ranker=ranker)
             except ValueError as exc:
                 raise ToolError(str(exc)) from None
             return res, False

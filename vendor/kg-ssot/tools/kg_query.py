@@ -20,7 +20,10 @@ Uso:
   fixtures (vendor/*, fixtures/*, */fixtures/*, docs/materials/* e, desde a 4.20.0, toda pasta com o carimbo
   .kg-ssot-version abaixo de DIR); os caminhos saem relativos a DIR, que
   é a raiz contra a qual a ponta externa <caminho>#<id> se resolve.
-rc: 0 consultou (mesmo sem nenhum nó) · 2 entrada quebrada.
+  --semantic PERGUNTA [--model NOME] [--model-dir DIR] (desde a 4.26, com o extra vector): ordena os nós que passam
+  nos filtros pela semelhança com a pergunta; com --text, funde as duas ordens por RRF (k=60). Ver kg_vector.py.
+rc: 0 consultou (mesmo sem nenhum nó) · 2 entrada quebrada · 3 o --semantic não roda aqui (o extra vector ou o modelo
+ausente): quem chama cai no --text e declara.
 """
 import argparse
 import collections
@@ -107,6 +110,7 @@ class Corpus:
 # os mesmos do kg_migrate.py: o vendor e os fixtures (os da suíte e os de qualquer ferramenta) não são o grafo do
 # adotante; um --root sem eles leu 411 grafos para 29 reais no primeiro adotante que usou (achado de campo, 4.17.1)
 DEFAULT_EXCLUDE = ("vendor/*", "fixtures/*", "*/fixtures/*", "docs/materials/*")
+RRF_K = 60  # a constante do RRF (Cormack et al., 2009), a mesma da bancada que mediu o híbrido
 
 
 def load(root=None, files=(), exclude=(), defaults=True):
@@ -300,10 +304,14 @@ def project(corpus, key, narrative=False, fields=()):
 
 def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=None, layer=None, file=None, text=None,
           in_narrative=False, open_only=False, verified_before=None, around=None, depth=1, edge_types=(),
-          direction="both", sort="corpus", limit=50, cursor=None, narrative=False, fields=(), max_bytes=None):
+          direction="both", sort="corpus", limit=50, cursor=None, narrative=False, fields=(), max_bytes=None,
+          semantic=None, ranker=None):
     """A consulta inteira, no formato kg-ssot.query/1. ValueError: pedido quebrado. max_bytes: o teto da página em bytes
     de JSON (o servidor MCP passa o dele); a página corta antes do limit quando o passa, sempre com ao menos um nó, e o
-    next_cursor continua de onde ela parou."""
+    next_cursor continua de onde ela parou.
+    semantic (desde a 4.26): a pergunta que o ranker (kg_vector.Ranker) ordena por semelhança, sobre os nós que passam
+    nos outros filtros. Sozinho, a ordem é a do vetor; com text, a lista do texto (na ordem do corpus) e a do vetor se
+    fundem por RRF (k=60), com o empate pela posição no vetor. As duas listas são completas, e o limit só pagina."""
     if not 1 <= limit <= MAX_LIMIT:
         raise ValueError(_("--limit must be between 1 and {max}").format(max=MAX_LIMIT))
     if depth < 0:
@@ -331,6 +339,28 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         reach = neighborhood(corpus, resolve(corpus, around), depth, set(edge_types), direction)
         keys = [k for k in keys if k in reach]
     hits = [k for k in keys if matches(corpus.nodes[k], k, f)]
+    text_hits, ranks, sem = hits, {}, None
+    if semantic is not None:
+        if not isinstance(semantic, str) or not semantic.strip():
+            raise ValueError(_("--semantic needs the question as text"))
+        if sort != "corpus":
+            raise ValueError(_("--semantic orders by similarity: it does not combine with --sort impact"))
+        if ranker is None:
+            raise ValueError(_("--semantic needs the vector ranker (kg_vector.py)"))
+        base = [k for k in keys if matches(corpus.nodes[k], k, dict(f, text=None))]  # os outros filtros valem
+        vector, used = ranker(corpus, base, semantic)
+        vpos = {k: i for i, k in enumerate(vector, 1)}
+        if text:
+            tpos = {k: i for i, k in enumerate(hits, 1)}
+            score = {k: 1.0 / (RRF_K + vpos[k]) + (1.0 / (RRF_K + tpos[k]) if k in tpos else 0.0) for k in vector}
+            hits = sorted(vector, key=lambda k: (-score[k], vpos[k]))
+            ranks = {k: {"text": tpos.get(k), "vector": vpos[k], "rrf": round(score[k], 9)} for k in hits}
+        else:
+            hits = vector
+            ranks = {k: {"text": None, "vector": vpos[k], "rrf": None} for k in hits}
+        sem = {"mode": "hybrid" if text else "semantic", "question": semantic, "k": RRF_K, **used}
+        if text:  # o total do híbrido são todos os candidatos; quantos casam o --text sai à parte
+            sem["text_matches"] = len(text_hits)
     if sort == "impact":
         rank = {k: i for i, k in enumerate(corpus.order)}
 
@@ -341,6 +371,8 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
     page, size = [], 0
     for k in hits[offset:offset + limit]:
         node = project(corpus, k, narrative, fields)
+        if sem is not None:
+            node["rank"] = ranks[k]
         size += len(json.dumps(node, ensure_ascii=False))
         if page and max_bytes is not None and size > max_bytes:
             break
@@ -353,13 +385,17 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                "depth": depth if around is not None else None, "edge_types": sorted(set(edge_types)) if around else [],
                "direction": direction if around is not None else None, "sort": sort, "limit": limit, "cursor": cursor,
                "fields": list(fields)}
+    if semantic is not None:
+        request["semantic"] = semantic
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
     res = {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
            "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
            "nodes": page}
+    if sem is not None:
+        res["semantic"] = sem
     if text:
         res["expanded"] = expanded
-        if not hits:  # o zero de uma busca por texto não pode passar por "não há"
+        if not text_hits:  # o zero de uma busca por texto não pode passar por "não há"
             only_text = {k: f[k] for k in ("text", "in_narrative", "forms", "notations", "terms")}
             loose = {"ids": set(), "id_prefix": None, "node_type": None, "status": None, "plane": None, "layer": None,
                      "file": None, "verified_before": None, **only_text}
@@ -370,6 +406,8 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                                  "term of the vocabulary (kg_vocab.py lookup)") if not in_narrative else
                                _("no node has every word of --text in its label or narrative: try fewer words, or a "
                                  "term of the vocabulary (kg_vocab.py lookup)"))
+            if sem is not None:
+                res["hint"] += _("; the order comes from --semantic alone")
     return res
 
 
@@ -379,7 +417,10 @@ def human(res):
         tag = "/".join(str(n[k]) for k in ("node_type", "status", "plane") if n[k] is not None)
         imp = f" imp={n['impact']}" if n["impact"] is not None else ""
         label = (n["label"] or "").replace("\n", " ")
-        lines.append(f"{n['file']}  {n['id']}  {tag}{imp}  {label[:160]}")
+        r = n.get("rank")
+        pos = "" if r is None else (f"  [text={r['text'] if r['text'] is not None else '-'} vector={r['vector']}]"
+                                    if res["semantic"]["mode"] == "hybrid" else f"  [vector={r['vector']}]")
+        lines.append(f"{n['file']}  {n['id']}  {tag}{imp}{pos}  {label[:160]}")
         for e in n["out"]:
             t = e["to"]
             where = "" if t["file"] == n["file"] else f"{t['file']}#"
@@ -401,6 +442,12 @@ def human(res):
             pref=t["pref"], file=t["file"], id=t["id"], forms=", ".join(t["forms"])))
     if res.get("hint"):
         lines.append("· " + res["hint"])
+    if res.get("semantic"):
+        s = res["semantic"]
+        lines.append((_("· order: --text and --semantic fused by RRF (k={k})") if s["mode"] == "hybrid" else
+                      _("· order: similarity to --semantic")).format(k=s["k"])
+                     + _("; model {model}; {indexed} node(s) from the index, {now} embedded now").format(
+                         model=s["model"]["id"], indexed=s["index"]["nodes"], now=s["index"]["embedded_now"]))
     shown = len(res["nodes"])
     first = int(res["query"]["cursor"] or 0)
     tail = _("; next page: --cursor {cursor}").format(cursor=res["next_cursor"]) if res["next_cursor"] else ""
@@ -440,8 +487,14 @@ def main(argv=None):
                     help=_("with --root, paths to leave out (repeatable), added to the defaults: ")
                     + ", ".join(DEFAULT_EXCLUDE))
     ap.add_argument("--no-default-excludes", action="store_true", help=_("with --root, also read the vendor and the fixtures"))
+    ap.add_argument("--semantic", metavar=_("QUESTION"),
+                    help=_("order by similarity to the question (needs the vector extra); with --text, fused by RRF"))
+    ap.add_argument("--model", help=_("the --semantic model (kg_vector.py models)"))
+    ap.add_argument("--model-dir", help=_("where the --semantic model lives (default: $KG_SSOT_MODEL_DIR or "
+                                          ".cache/kg-ssot/models in the home folder)"))
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_args(argv)
+    kg_validate._utf8_stdio()  # no Windows, a saída para arquivo ou pipe seria cp1252 e derrubaria o → do JSON
 
     def broken(msg):
         print(_("BROKEN INPUT  {error}").format(error=msg), file=sys.stderr)
@@ -453,13 +506,31 @@ def main(argv=None):
         before = kg_validate.iso_date(args.verified_before)
         if before is None:
             return broken(_("--verified-before {value}: the date must be YYYY-MM-DD").format(value=repr(args.verified_before)))
+    ranker = None
+    if args.semantic is not None:
+        if not args.semantic.strip():  # o pedido quebrado é rc 2 antes de olhar o extra
+            return broken(_("--semantic needs the question as text"))
+        if __package__:
+            from . import kg_vector
+        else:
+            import kg_vector
+        try:
+            ranker = kg_vector.Ranker(args.root, args.model or kg_vector.DEFAULT_MODEL, args.model_dir)
+        except kg_vector.Unavailable as exc:  # rc próprio: quem chama cai no --text e declara, nunca em silêncio
+            print(_("VECTOR UNAVAILABLE  {error}").format(error=exc), file=sys.stderr)
+            return 3
+        except ValueError as exc:
+            return broken(exc)
+    elif args.model or args.model_dir:
+        return broken(_("--model and --model-dir go with --semantic"))
     try:
         corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
         res = query(corpus, ids=args.ids, id_prefix=args.id_prefix, node_type=args.node_type, status=args.status,
                     plane=args.plane, layer=args.layer, file=args.file, text=args.text, in_narrative=args.in_narrative,
                     open_only=args.open_only, verified_before=before, around=args.around, depth=args.depth,
                     edge_types=args.edge_types, direction=args.direction, sort=args.sort, limit=args.limit,
-                    cursor=args.cursor, narrative=args.narrative, fields=args.fields)
+                    cursor=args.cursor, narrative=args.narrative, fields=args.fields, semantic=args.semantic,
+                    ranker=ranker)
     except (OSError, ValueError, UnicodeDecodeError) as exc:
         return broken(exc)
     text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else human(res)

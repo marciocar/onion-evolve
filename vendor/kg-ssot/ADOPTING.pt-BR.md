@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:4afc19b0b67b2833 -->
+<!-- translation-of: ADOPTING.md sha256:1329351c784afb30 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -87,10 +87,11 @@ As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/
   - um diretório sem carimbo, porque nunca apaga um diretório alheio;
   - um vendor que diverge do carimbo, a menos que venha `--force`. Isso evita que uma edição local suma em
     silêncio.
-- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 15 arquivos:
+- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 17 arquivos:
   o contrato (MUST e SHOULD), o `release.json`, o leitor, o gate, o vendor, o check do trace com o módulo de consulta
   que ele importa e o schema da saída dele (`tools/kg_trace.py`, `tools/kg_query.py` e `spec/trace.schema.json`, desde
-  a 4.25.1), o módulo de língua e o catálogo dele
+  a 4.25.1), o módulo vetorial que a consulta importa só para o `--semantic` e os requirements fixados dele (`tools/kg_vector.py` e
+  `tools/requirements-vector.txt`, desde a 4.26.0), o módulo de língua e o catálogo dele
   (`tools/kg_i18n.py` e `locale/pt_BR/LC_MESSAGES/kg-ssot.po`), o `requirements.txt`, o guia de adoção em inglês
   (`ADOPTING.md`), a `LICENSE` e o `NOTICE`. A suíte de conformidade fica de fora, e por isso o `kg_conformance.py` e o
   `spec/conformance/README.md` que este guia cita não vêm. O carimbo registra o perfil, o `check` confere só o que ele
@@ -339,6 +340,14 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.25.1` para a `kg-ssot-v4.26.0`, o contrato não muda (segue o v4.14), e o gate não pede `--update`.
+Nada muda a menos que você queira a busca por sentido: instale o `tools/requirements-vector.txt` com
+`--require-hashes` (ou `pip install "kg-ssot[vector]"`), rode o `kg_vector.py fetch` uma vez e o
+`kg_vector.py index --root .` com os mesmos `--exclude` da consulta, e chame `kg_query --text <termo> --semantic
+"<pergunta>"`. Sem o extra, o `--semantic` sai com rc 3, para um script cair no `--text` e dizer isso. O cache
+`.kg-ssot/vector/` vem com o próprio `.gitignore`. Quem vendoriza o perfil `gate` recebe 17 arquivos no próximo
+`update`. O `kg_query`, o `kg_diff` e o `kg_migrate` passam a escrever UTF-8 para arquivo ou pipe também no Windows.
 
 Da `kg-ssot-v4.25.0` para a `kg-ssot-v4.25.1`, o contrato não muda (segue o v4.14), e o gate não pede `--update`. O
 JSON do `kg_trace.py check` ganha `resolved_targets`, com o `path` onde cada trace resolveu e o `kind` (`file` ou

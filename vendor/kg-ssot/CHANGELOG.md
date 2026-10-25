@@ -10,6 +10,32 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.26.0] - 2026-10-25
+
+`kg_query --semantic` finds the node when the question uses other words than the label, fusing the text search and a
+local embedding model; optional, and outside every verdict. Contract v4.14, unchanged.
+
+### Added
+
+- **`kg_query --semantic`, the search by meaning.** A question with other words than the label used to find nothing:
+  `--text` matches words. `--semantic "<question>"` orders the nodes that pass the other filters by similarity, using
+  a local multilingual embedding model; with `--text <term>`, both lists are fused by RRF (k=60). On a curator's
+  pre-registered bench of 20 questions, the fusion found 14, the vector alone 12 and the text alone 9. The JSON gains
+  `semantic` (mode, model with revision and sha256, index use) and a `rank` per node; rc 3 says the vector cannot run
+  here, so a caller falls back to `--text` and says so. Without `--semantic`, the output does not change. The MCP
+  `kg_query` tool takes `semantic` too.
+- **`kg_vector.py`, the model and the index.** `fetch` downloads the ONNX model pinned by revision and sha256, and
+  `index` keeps a cache in `.kg-ssot/vector/` that redoes only the nodes that changed. Optional: `pip install
+  "kg-ssot[vector]"` (onnxruntime, tokenizers, numpy), or `tools/requirements-vector.txt` with hashes in the vendor.
+  Nothing here enters a verdict. Also on PyPI as `kg-vector`. The `gate` profile carries `tools/kg_vector.py` and
+  `tools/requirements-vector.txt` (17 files), because `kg_query` imports the module for `--semantic`.
+
+### Fixed
+
+- **`kg_query`, `kg_diff` and `kg_migrate` write UTF-8 when the output goes to a file or a pipe.** On Windows the
+  default was cp1252, and a label with `→` or a character outside it crashed the command; an accented label came out
+  in another encoding. Found by the new CI job, which saved a query's JSON to a file.
+
 ## [4.25.1] - 2026-10-24
 
 `kg_trace.py` now says where each trace resolves, and the `gate` profile carries what it needs to run. Contract v4.14,

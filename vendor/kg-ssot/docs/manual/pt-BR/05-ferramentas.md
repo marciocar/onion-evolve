@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:e42e836d24bd17e4 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:94033f241591b152 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.25.1",
+  "release": "kg-ssot-v4.26.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -292,7 +292,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 |---|---|
 | `--source REPO` | O repositório (caminho ou URL, como `https://github.com/marciocar/kg-ssot`) que tem a tag. Obrigatório quando você roda de dentro de um vendor |
 | `--dest DIR` | Onde fica o vendor (default `vendor/kg-ssot`) |
-| `--profile gate` | Traz só o mínimo para rodar o gate e o check (15 arquivos desde a 4.25.1, sem a suíte); `--profile full` volta à release inteira |
+| `--profile gate` | Traz só o mínimo para rodar o gate e o check (17 arquivos desde a 4.26.0, sem a suíte); `--profile full` volta à release inteira |
 | `--force` | Substitui um vendor editado localmente |
 | `--index` (no `check`) | Confere o índice do git em vez da árvore de trabalho |
 | `--ref COMMIT` (no `update`) | A bancada antes da tag (4.24): traz um commit que ainda não é release, de um repositório a que você chega. O carimbo diz `unreleased` |
@@ -737,6 +737,7 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--root DIR` ou arquivos | O corpus. Com `--root`, o vendor e as fixtures ficam de fora por padrão (`vendor/*`, `fixtures/*`, `*/fixtures/*`, `docs/materials/*` e, desde a 4.20.0, toda pasta com o carimbo `.kg-ssot-version`); `--exclude GLOB` (repetível) tira mais caminhos, e `--no-default-excludes` lê tudo. Um arquivo que você nomeia um a um nunca é excluído |
 | `--id`, `--id-prefix`, `--type`, `--status`, `--plane`, `--layer`, `--file` | Filtros, todos combinados em E |
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem maiúscula nem acento (`verificacao` casa `Verificação`, desde a 4.23); `--in-narrative` procura também na narrative. Quando o texto inteiro é um termo do vocabulário (o `pref` ou um sinônimo de domínio atual, dobrados, ou a `notation`, exata), casam também o termo e todo nó que tenha qualquer forma dele como palavra inteira, e o `expanded` diz qual termo; o sinônimo de caso ou aposentado não expande. Nenhum nó dá um `hint`, que diz quando o zero vem dos outros filtros, para o zero não passar por "não há" |
+| `--semantic PERGUNTA` | Desde a 4.26, com o extra `vector`: ordena os nós que passam nos outros filtros pela semelhança com a pergunta (`--model`, `--model-dir`; ver o `kg_vector.py` abaixo). Sozinho, a ordem é a do vetor; com `--text`, a lista do texto (na ordem do corpus) e a do vetor se fundem por RRF (k=60), com o empate pela posição no vetor. Dê o termo curto ao `--text` e a pergunta inteira ao `--semantic`: é o que a bancada mediu (14 de 20 acertos, contra 12 do vetor e 9 do texto). Os filtros valem para os dois, as duas listas são completas, e o `--limit` só pagina a lista fundida; por isso, no híbrido, o `total` conta todos os candidatos, e o `semantic.text_matches` diz quantos casam o `--text`. O JSON ganha `semantic` (modo, modelo com revisão e sha256, e de onde veio cada vetor: o índice, embutido na hora, a memória do processo, ou sem texto) e um `rank` por nó; sem `--semantic` a saída não muda |
 | `--open` | A fila dos abertos (status `open`) |
 | `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
 | `--around ID` | A vizinhança: `<caminho>#<id>`, ou um id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
@@ -748,7 +749,8 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 
 O grafo que não parseia sai em `unreadable`, com o código `parse.*` dele, e não derruba a consulta. O label da outra
 ponta de cada aresta sai cortado em 200 caracteres: um nó de label longo citado por milhares de arestas não
-multiplica a resposta. rc 0 quando consultou, mesmo sem nó; 2 na entrada quebrada. No servidor MCP, a mesma consulta
+multiplica a resposta. rc 0 quando consultou, mesmo sem nó; 2 na entrada quebrada; 3 quando o `--semantic` não roda
+aqui (falta o extra `vector` ou o modelo), para quem chama cair no `--text` e dizer isso, nunca em silêncio. No servidor MCP, a mesma consulta
 é a ferramenta `kg_query`, sobre o armazém: a página para no teto de bytes do servidor (com ao menos um nó), e o
 `next_cursor` continua de onde ela parou. Cada chamada relê e reparseia o armazém da área, e num armazém de dezenas
 de MB a primeira chamada leva dezenas de segundos; o cache do julgamento vem na 4.19.
@@ -1008,6 +1010,43 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   julgado resolve, 1 com um alvo faltando ou um grafo que não se lê,
   2 com entrada quebrada. Estas regras vêm do resolvedor de um adotante medido em milhares de traces; cada corte foi
   pago por um falso positivo.
+
+## `kg_vector.py`: o modelo e o índice da busca por semelhança (4.26.0)
+
+O `kg_query --semantic` acha o nó quando a pergunta usa outras palavras que não as do label. É opcional: precisa do
+extra `vector` (`pip install "kg-ssot[vector]"`, que traz onnxruntime, tokenizers e numpy; no vendor, instale o
+`tools/requirements-vector.txt` com `--require-hashes`). Sem ele, o kit roda como sempre, e só o `--semantic` e este
+script recusam, com rc 3 e rc 2 e o que instalar. Nada aqui entra em veredito: o contrato, o gate e o `--text` não
+dependem do vetor.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_vector.py fetch                 # o modelo, uma vez (cerca de 250 MB)
+python3 -I -B vendor/kg-ssot/tools/kg_vector.py index --root .        # o cache, refeito só onde um nó mudou
+python3 -I -B vendor/kg-ssot/tools/kg_query.py --root . --text "busca vetorial" --semantic "vale a pena adotar busca vetorial?"
+```
+
+- **O modelo** é um arquivo ONNX com a revisão e o sha256 fixados no script (`kg_vector.py models`): o padrão é o
+  modelo multilíngue que a bancada mediu (cerca de 50 línguas, 128 tokens). O `fetch` o baixa do Hugging Face para
+  `$KG_SSOT_MODEL_DIR` (ou `.cache/kg-ssot/models na pasta pessoal`) e confere o sha256 antes de pôr no lugar; cada carga confere de
+  novo, e a consulta nunca vai à rede. Sem rede, ponha os arquivos lá.
+- **O texto de um nó** é o label e a narrative, juntos por um espaço; o vetor é a média dos tokens, normalizada. Ele
+  reproduz o embedder da bancada: nos 403 nós dela, o menor cosseno foi 0,9999999.
+- **O índice** é um cache em `<raiz>/.kg-ssot/vector/<modelo>/index.npz`, com um `.gitignore` que o deixa fora do
+  git: um vetor por nó e o sha256 do texto que o gerou, num arquivo só, trocado de uma vez e conferido na carga (forma,
+  dimensão, valores finitos, chaves únicas); o índice que não passa na conferência é ignorado e refeito. O nó editado depois do índice não fica com o vetor velho: a consulta o
+  embute na hora e o conta em `embedded_now`, e o próximo `index` refaz só o que mudou. Sem índice, a consulta embute
+  todo candidato (nos 403 nós da bancada, cerca de 15 s; com o índice, cerca de 2 s). Num corpus de 6.385 nós, o
+  primeiro `index` levou cerca de 10 minutos em 8 núcleos, o seguinte 7 s, e uma consulta híbrida com o índice 7 s. Dê
+  ao `index` e à consulta os mesmos `--exclude`: o nó que o índice deixou de fora é embutido na hora a cada consulta.
+- **No servidor MCP**, o `kg_query` aceita `semantic` quando o servidor tem o extra e o modelo; senão a ferramenta
+  responde com um erro que diz o que falta, nunca só com o texto. O servidor não tem índice em disco: ele embute cada
+  nó uma vez por processo e guarda o vetor na memória pelo sha256 do texto, então a primeira chamada semântica num
+  armazém grande é a lenta.
+- **O nó sem texto** (sem label e sem narrative) vai para o fim da ordem do vetor: o vetor de um texto vazio não diz
+  nada sobre ele. O pacote MCPB, a imagem GHCR e o pacote npm não levam
+  o vetor: ele vem pelo pacote PyPI com o extra, ou pelo vendor com o `tools/requirements-vector.txt`.
+
+rc 0 feito; 2 com entrada quebrada, extra ou modelo ausente, arquivo que não confere, ou download que falhou.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 

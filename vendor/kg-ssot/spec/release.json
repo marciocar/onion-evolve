@@ -1,6 +1,6 @@
 {
-  "version": "4.25.1",
-  "tag": "kg-ssot-v4.25.1",
+  "version": "4.26.0",
+  "tag": "kg-ssot-v4.26.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -48,6 +48,8 @@
     "tools/kg_criterion.py",
     "tools/kg_audit.py",
     "tools/kg_trace.py",
+    "tools/kg_vector.py",
+    "tools/requirements-vector.txt",
     "tools/kg_release_notes.py",
     "tools/kg_mcp.py",
     "tools/kg_migrate.py",
@@ -82,6 +84,8 @@
       "tools/kg_validate.py",
       "tools/kg_query.py",
       "tools/kg_trace.py",
+      "tools/kg_vector.py",
+      "tools/requirements-vector.txt",
       "spec/trace.schema.json",
       "tools/kg_gate.py",
       "tools/kg_vendor.py",

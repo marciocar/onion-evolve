@@ -10,6 +10,32 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.26.0] - 2026-10-25
+
+O `kg_query --semantic` acha o nó quando a pergunta usa outras palavras que não as do label, fundindo a busca por
+texto e um modelo de embedding local; opcional, e fora de todo veredito. Contrato v4.14, sem mudança.
+
+### Adicionado
+
+- **O `kg_query --semantic`, a busca por sentido.** Uma pergunta com outras palavras que não as do label não achava
+  nada: o `--text` casa palavras. O `--semantic "<pergunta>"` ordena os nós que passam nos outros filtros por
+  semelhança, com um modelo de embedding multilíngue local; com `--text <termo>`, as duas listas se fundem por RRF
+  (k=60). Numa bancada pré-registrada de 20 perguntas de um curador, a fusão achou 14, o vetor sozinho 12 e o texto
+  sozinho 9. O JSON ganha `semantic` (modo, modelo com revisão e sha256, uso do índice) e um `rank` por nó; o rc 3 diz
+  que o vetor não roda ali, para quem chama cair no `--text` e dizer isso. Sem `--semantic`, a saída não muda. A
+  ferramenta `kg_query` do servidor MCP também aceita `semantic`.
+- **O `kg_vector.py`, o modelo e o índice.** O `fetch` baixa o modelo ONNX fixado por revisão e sha256, e o `index`
+  mantém um cache em `.kg-ssot/vector/` que refaz só os nós que mudaram. Opcional: `pip install "kg-ssot[vector]"`
+  (onnxruntime, tokenizers, numpy), ou o `tools/requirements-vector.txt` com hash no vendor. Nada aqui entra em
+  veredito. Também no PyPI como `kg-vector`. O perfil `gate` leva o `tools/kg_vector.py` e o
+  `tools/requirements-vector.txt` (17 arquivos), porque o `kg_query` importa o módulo para o `--semantic`.
+
+### Corrigido
+
+- **O `kg_query`, o `kg_diff` e o `kg_migrate` escrevem UTF-8 quando a saída vai para arquivo ou pipe.** No Windows
+  o padrão era cp1252, e um label com `→` ou um caractere fora dele derrubava o comando; o label com acento saía em
+  outra codificação. Achado pelo job novo do CI, que gravava o JSON de uma consulta num arquivo.
+
 ## [4.25.1] - 2026-10-24
 
 O `kg_trace.py` passa a dizer onde cada trace resolve, e o perfil `gate` leva o que ele precisa para rodar. Contrato

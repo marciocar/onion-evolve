@@ -1343,6 +1343,58 @@ msgstr "· o --text é o termo {pref} ({file}#{id}): casou também {forms}"
 msgid "nodes match --text, but not the other filters: the zero comes from them"
 msgstr "há nós que casam o --text, mas não os outros filtros: o zero vem deles"
 
+#: tools/kg_query.py
+msgid "--model and --model-dir go with --semantic"
+msgstr "--model e --model-dir vão com --semantic"
+
+#: tools/kg_query.py
+msgid "--semantic needs the question as text"
+msgstr "--semantic precisa da pergunta em texto"
+
+#: tools/kg_query.py
+msgid "--semantic needs the vector ranker (kg_vector.py)"
+msgstr "--semantic precisa do ordenador vetorial (kg_vector.py)"
+
+#: tools/kg_query.py
+msgid "--semantic orders by similarity: it does not combine with --sort impact"
+msgstr "--semantic ordena por semelhança: não combina com --sort impact"
+
+#: tools/kg_query.py
+msgid "; model {model}; {indexed} node(s) from the index, {now} embedded now"
+msgstr "; modelo {model}; {indexed} nó(s) do índice, {now} embutido(s) agora"
+
+#: tools/kg_query.py
+msgid "; the order comes from --semantic alone"
+msgstr "; a ordem vem só do --semantic"
+
+#: tools/kg_query.py
+msgid "QUESTION"
+msgstr "PERGUNTA"
+
+#: tools/kg_query.py
+msgid "VECTOR UNAVAILABLE  {error}"
+msgstr "VETOR INDISPONÍVEL  {error}"
+
+#: tools/kg_query.py
+msgid "order by similarity to the question (needs the vector extra); with --text, fused by RRF"
+msgstr "ordena pela semelhança com a pergunta (precisa do extra vector); com --text, fundido por RRF"
+
+#: tools/kg_query.py
+msgid "the --semantic model (kg_vector.py models)"
+msgstr "o modelo do --semantic (kg_vector.py models)"
+
+#: tools/kg_query.py
+msgid "where the --semantic model lives (default: $KG_SSOT_MODEL_DIR or .cache/kg-ssot/models in the home folder)"
+msgstr "onde mora o modelo do --semantic (padrão: $KG_SSOT_MODEL_DIR ou .cache/kg-ssot/models na pasta pessoal)"
+
+#: tools/kg_query.py
+msgid "· order: --text and --semantic fused by RRF (k={k})"
+msgstr "· ordem: --text e --semantic fundidos por RRF (k={k})"
+
+#: tools/kg_query.py
+msgid "· order: similarity to --semantic"
+msgstr "· ordem: semelhança com o --semantic"
+
 #: packaging/npm/cli.mjs tools/kg_release_notes.py tools/kg_validate.py
 msgid "BROKEN INPUT"
 msgstr "ENTRADA QUEBRADA"
@@ -2340,7 +2392,7 @@ msgid ""
 "      KG-SSOT clone (inside a vendor, pass --source).\n"
 "      --profile P brings only profile P from the tag's release.json: `gate` is the minimum to run the gate and\n"
 "      the check (contract, reader, gate, vendor, language module, the trace check with the query module it\n"
-"      imports and its schema, requirements, guide and license), without the suite. The stamp\n"
+"      imports and its schema, the vector module and its requirements, requirements, guide and license), without the suite. The stamp\n"
 "      records the profile, check verifies only what the profile brought, and the next update INHERITS the\n"
 "      profile from the stamp; --profile full goes back to the whole release.\n"
 "  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]\n"
@@ -2382,7 +2434,7 @@ msgstr ""
 "      ele é a raiz de um clone do KG-SSOT (dentro de um vendor, passe --source).\n"
 "      --profile P traz só o perfil P do release.json da tag: `gate` é o mínimo para\n"
 "      rodar o gate e o check (contrato, leitor, gate, vendor, módulo de língua, o check do trace com o módulo de\n"
-"      consulta que ele importa e o schema dele, requirements, guia e licença), sem a suíte. O carimbo\n"
+"      consulta que ele importa e o schema dele, o módulo vetorial e os requirements dele, requirements, guia e licença), sem a suíte. O carimbo\n"
 "      registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;\n"
 "      --profile full volta à release inteira.\n"
 "  update --ref COMMIT [--dest DIR] [--source REPO] [--force] [--profile P]\n"
@@ -3144,3 +3196,51 @@ msgstr "· nenhum grafo lido: o git não rastreia .kg.yaml nem .kg.json sob {roo
 #: tools/kg_trace.py
 msgid "· {judged} trace(s) judged: {resolved} resolve, {missing} missing; not judged (counted): {absolute} absolute or URL, {external} external root, {not_path} not a path, {not_text} not text"
 msgstr "· {judged} trace(s) julgado(s): {resolved} resolve(m), {missing} faltando; fora de julgamento (contados): {absolute} absoluto(s) ou URL, {external} raiz externa, {not_path} não caminho, {not_text} fora de texto"
+
+#: tools/kg_vector.py
+msgid "The model and the index of the kg_query --semantic search (release 4.26); needs the vector extra."
+msgstr "O modelo e o índice da busca --semantic do kg_query (release 4.26); precisa do extra vector."
+
+#: tools/kg_vector.py
+msgid "could not download {url}: {error}"
+msgstr "não deu para baixar {url}: {error}"
+
+#: tools/kg_vector.py
+msgid "index needs --root"
+msgstr "index precisa de --root"
+
+#: tools/kg_vector.py
+msgid "model {name} is not in {dir}: run kg_vector.py fetch (or put its files there)"
+msgstr "o modelo {name} não está em {dir}: rode kg_vector.py fetch (ou ponha os arquivos dele lá)"
+
+#: tools/kg_vector.py
+msgid "the corpus root (index): the graphs git tracks under it"
+msgstr "a raiz do corpus (index): os grafos que o git rastreia abaixo dela"
+
+#: tools/kg_vector.py
+msgid "the vector search needs the vector extra ({missing}): pip install \"kg-ssot[vector]\""
+msgstr "a busca vetorial precisa do extra vector ({missing}): pip install \"kg-ssot[vector]\""
+
+#: tools/kg_vector.py
+msgid "unknown model {name} (models: {models})"
+msgstr "modelo desconhecido {name} (modelos: {models})"
+
+#: tools/kg_vector.py
+msgid "where the model lives (default: $KG_SSOT_MODEL_DIR or .cache/kg-ssot/models in the home folder)"
+msgstr "onde o modelo mora (padrão: $KG_SSOT_MODEL_DIR ou .cache/kg-ssot/models na pasta pessoal)"
+
+#: tools/kg_vector.py
+msgid "{file} downloaded from {url} does not match the pinned sha256"
+msgstr "{file} baixado de {url} não confere com o sha256 fixado"
+
+#: tools/kg_vector.py
+msgid "{file} in {dir} does not match the pinned sha256: delete it and run kg_vector.py fetch"
+msgstr "{file} em {dir} não confere com o sha256 fixado: apague-o e rode kg_vector.py fetch"
+
+#: tools/kg_vector.py
+msgid "✓ index {dir}: {nodes} node(s), {embedded} embedded, {reused} reused, {removed} removed"
+msgstr "✓ índice {dir}: {nodes} nó(s), {embedded} embutido(s), {reused} reaproveitado(s), {removed} removido(s)"
+
+#: tools/kg_vector.py
+msgid "✓ model {name} in {dir} ({n} file(s) downloaded, sha256 checked)"
+msgstr "✓ modelo {name} em {dir} ({n} arquivo(s) baixado(s), sha256 conferido)"

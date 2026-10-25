@@ -533,6 +533,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_426_ADOTADA_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-25"
+    verified_against: "na branch chore/kg-ssot-4-26-0 sobre origin/main 9b2aea4e0d14: kg_vendor.py update --tag kg-ssot-v4.26.0 (42ae9832f588, 629 arquivos, 2 novos: tools/kg_vector.py e tools/requirements-vector.txt) e kg_vendor.py check intacto; ops/kg-gate-ci.sh rc 0 sem --update (188 grafos, 186 passam o MUST, os 2 da dívida herdada de antes); kg_query.py --root . --text com saída JSON byte a byte igual à da 4.25.1 em 5 consultas (vendor, indice de leitura, federation, kg-ssot, adotada); kg_query.py --semantic sem o extra vector devolve rc 3 com VECTOR UNAVAILABLE; o perfil gate do spec/release.json passa a listar tools/kg_vector.py e tools/requirements-vector.txt"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.26.0 (kg_query --semantic com busca híbrida RRF, o tools/kg_vector.py e o extra vector opcional) entrou no core pelo kg_vendor.py update, com o gate do contrato verde e o --text sem mudança"
+    narrative: "Versão aditiva: o contrato segue v4.14 e o gate não pede --update. O --semantic depende do extra vector (onnxruntime), que o core não instala, então nele a busca semântica responde rc 3 com o aviso VECTOR UNAVAILABLE em vez de cair calada no --text; nada no core chama o --semantic hoje. A versão também corrige o UTF-8 da saída no Windows, que este ambiente Linux não exercita. Nenhuma lista do core repete os arquivos do perfil gate, então os dois arquivos novos só entram pelo release.json do produto."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version e vendor/kg-ssot/spec/release.json"
+      locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh e do kg_query.py --text/--semantic nas duas versões"
+      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e comparação de sha256 da saída do kg_query entre a 4.25.1 (git archive de origin/main) e a 4.26.0"
+      locality: "repo"
   - id: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     node_type: evidence
     layer: audit
@@ -659,6 +676,9 @@ edges:
     to: E_KG_SSOT_4251_ADOTADA_1024
     edge_type: DEPENDS_ON
   - from: E_KG_SSOT_4251_ADOTADA_1024
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_426_ADOTADA_1025
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
   - from: E_REGRA_55_PASSA_AO_KG_TRACE_1024

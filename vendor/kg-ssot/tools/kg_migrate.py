@@ -1332,6 +1332,7 @@ def main(argv=None):
                    help=_("does not apply the defaults: {globs}").format(globs=", ".join(DEFAULT_EXCLUDE)))
     n.add_argument("graphs", nargs="*")
     args = ap.parse_args(argv)
+    kg_validate._utf8_stdio()  # no Windows, a saída para arquivo ou pipe seria cp1252 e derrubaria o → do JSON
     if args.cmd == "nest":
         try:
             return nest_command(args)

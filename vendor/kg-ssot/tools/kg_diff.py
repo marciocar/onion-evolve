@@ -486,6 +486,7 @@ def main(argv=None):
                     help=_("with --from, also compares the vendor and the fixtures"))
     ap.add_argument("--format", default="human", choices=("human", "json"))
     args = ap.parse_args(argv)
+    kg_validate._utf8_stdio()  # no Windows, a saída para arquivo ou pipe seria cp1252 e derrubaria o → do JSON
     global IGNORE
     saved, IGNORE = IGNORE, tuple(p.strip() for p in args.ignore if p.strip())
     try:
