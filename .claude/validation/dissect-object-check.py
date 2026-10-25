@@ -49,6 +49,7 @@ KG_CRITERION = "vendor/kg-ssot/tools/kg_criterion.py"
 DEST_FIXED = {"core", "panorama", "projeto-novo"}
 DEST_PROJECT = re.compile(r"^projeto:[a-z0-9][a-z0-9-]*$")
 PURSUE = {"estudo", "projeto-novo"}
+SEALED_BY = re.compile(r"^[A-Za-z0-9._-]+:[^\s#]+#[A-Z][A-Z0-9_]*$")
 N2_EVIDENCE_OK = {"artefato-aberto", "uso-observado"}
 STAGE0_HEADINGS = re.compile(r"^## ([1-8])\.", re.M)
 UNCOMMITTED_CODES = {"stage0-nao-commitado", "n0-nao-commitado"}
@@ -226,11 +227,17 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
         return findings
     vn = vnodes[0]
     verdict = str(vn.get("x_dissect_verdict"))
-    # o veredito mora no nó de decisão, e ele nasce open (aqui nada se sela)
+    # o veredito mora no nó de decisão, e ele nasce open (o estudo não sela; ele registra o selo do destino)
     if vn.get("node_type") != "decision" or vn.get("id") == "S_STAGE0":
         add(2, "veredito-fora-de-decisao", "x_dissect_verdict está em %s (node_type %s); exigido o nó D_ de decisão" % (vn.get("id"), vn.get("node_type")))
-    if vn.get("status") != "open":
-        add(2, "veredito-selado", "o nó do veredito %s está %s; ele nasce open e quem sela é o destino" % (vn.get("id"), vn.get("status")))
+    # o destino sela no repo DELE; o estudo só registra que selou: status done com x_dissect_sealed_by apontando o nó
+    # do selo (<repo>:<caminho>#<ID>, ponteiro opaco: o checador não lê outro repo). Fechado sem ponteiro segue reprovado.
+    sealed_by = vn.get("x_dissect_sealed_by")
+    seal_ok = isinstance(sealed_by, str) and bool(SEALED_BY.match(sealed_by))
+    if sealed_by is not None and not seal_ok:
+        add(2, "selo-mal-formado", "x_dissect_sealed_by=%r; exigido <repo>:<caminho>#<ID_DO_NO>" % (sealed_by,))
+    if vn.get("status") != "open" and not (vn.get("status") == "done" and seal_ok):
+        add(2, "veredito-selado", "o nó do veredito %s está %s; ele nasce open e só fecha com x_dissect_sealed_by apontando o selo do destino" % (vn.get("id"), vn.get("status")))
     if spec is not None and verdict not in (spec.get("verdicts") or []):
         add(2, "veredito-fora-da-familia", "%s não está nos vereditos de %s: %s" % (verdict, fam, spec.get("verdicts")))
     if verdict == "perseguir" and vn.get("x_dissect_pursue") not in PURSUE:

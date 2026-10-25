@@ -236,6 +236,11 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
   não existe repo de régua).
 - Legado: `x_dissect_family: A` = `ferramenta`, `B` = `pratica`, `C` = `ator` (labels `hidden` no registro; o
   checador lê o apelido de lá).
+- **O veredito nasce `open` e fecha só pelo selo do destino.** Quem sela é o destino, no repo dele. Depois do
+  selo, o estudo registra o fato: `status: done` mais `x_dissect_sealed_by: <repo>:<caminho>#<ID>`, que aponta o
+  nó do selo. O ponteiro é opaco, porque o checador não lê outro repo. Veredito fechado sem esse ponteiro sai
+  `veredito-selado`, e ponteiro fora da forma sai `selo-mal-formado`. Nasceu do 1º selo do core sobre um estudo
+  de adotante (2026-10-25): sem o campo, o estudo não tinha como registrar que o destino selou.
 
 **Marcadores de todo estudo por família** (além dos da §1b e do passo 5 do comando):
 `meta.x_dissect_family: <pref>` **e** uma `external_edges` `TRACES_TO` para
