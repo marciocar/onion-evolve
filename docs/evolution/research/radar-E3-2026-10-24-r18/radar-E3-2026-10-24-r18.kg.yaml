@@ -212,8 +212,8 @@ nodes:
     verified_at: "2026-10-25"
     verified_against: "decisão do maestro em 2026-10-25, por pergunta com opções (/meta:decide): escolhida «Fechar com o pin declarado: o pin v1.0.262 foi conferido por tag e diff, e a execução do revisor não foi medida por falta de crédito (decisão de 2026-10-01); reabre quando houver crédito»"
     narrative: |-
-      verified_against anterior: «proposta da r18 após o EXAGERA do juiz: fechar a SAC-239 rodando um PR com a label review:ia e lendo a versão do CLI no log do job, ou fechando com a metade do revisor declarada como pin sem execução; comentado na SAC-239 (comentário 0fb40ccd), sem issue nova para não duplicar»
-      proveniência anterior: source «https://linear.app/sacola/issue/SAC-239» · locator «comentário da r18 na SAC-239» · method «derivado: proposta da rodada a partir de E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024» · locality «web»
+      verified_against anterior: «proposta da 18ª rodada do radar do Claude Code após o EXAGERA do juiz: fechar a SAC-239 rodando um PR com a label review:ia e lendo a versão do CLI no log do job, ou fechando com a metade do revisor declarada como pin sem execução; comentado na SAC-239 (comentário 0fb40ccd), sem issue nova para não duplicar»
+      proveniência anterior: source «https://linear.app/sacola/issue/SAC-239» · locator «comentário da 18ª rodada do radar do Claude Code na SAC-239» · method «derivado: proposta da rodada a partir de E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024» · locality «web»
       plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)
       Selado por /meta:decide em 2026-10-25: escolhida «Fechar com o pin declarado: o pin v1.0.262 foi conferido por tag e diff, e a execução do revisor não foi medida por falta de crédito (decisão de 2026-10-01); reabre quando houver crédito»; descartadas: «Provar com um PR review:ia» · «Deixar aberta».
     provenance:
