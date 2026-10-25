@@ -2,7 +2,8 @@
 branch: fix/decide-seal-vocab-lint
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 48649af048bd66b577cd43caae450618b93a53a8e4e181f56ced7320a01bf61b
+reviewed_code_sha256: a4a9cf5338f1adf4667d70c5e4a64dbb2e5f5bb1449710fd4477a80510fb10f0
 findings_total: 5
 findings_real: 4
 tokens: 0
