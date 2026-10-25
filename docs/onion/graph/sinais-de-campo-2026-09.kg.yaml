@@ -663,7 +663,9 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-10-25"
+    verified_against: "o sinal do estudo de transporte (SAC-249) lido inteiro e o veredito selado pelo maestro em D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025"
     impact: 4
     confidence: 0.5
     label: "Quanto a federação de hoje depende do runtime do Claude Code (hooks, harness, moat-judge) e o que falta para uma sessão Codex, ou de outro agente, falar e ouvir pelo canal entre sessões?"
@@ -699,6 +701,39 @@ nodes:
     provenance:
       source: "maestro, na sessão do core"
       locator: "perguntas com opções de 2026-10-25 sobre o D_AGENT_NEUTRAL_CHANNEL_VERDICT e sobre o canal como serviço MCP"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      locality: "pessoa"
+  - id: E_SINAL_TRANSPORTE_ENTRE_AGENTES_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-25"
+    verified_against: "o sinal lido inteiro (122 linhas): o Codex CLI 0.164.0 e o Claude Code 2.1.310 só falam MCP como cliente nativo; o Elenxo rebaixou o placar de 8 para 6"
+    trace: "docs/evolution/inbox/_processed/2026-10-25-proposal-agent-transport.md"
+    label: "A curadoria propôs parquear o transporte entre agentes: lidera o HTTP A2A do bridge entre máquinas com um MCP stdio local na ponta (ler a fila, propor aceite, enviar), e aceitar nunca vira tool"
+    narrative: "Estudo SAC-249, família categoria, critério AGENT_TRANSPORT_STAGE0 v1. Placar da régua: MCP local sobre os scripts 8, A2A com SDK 5, injeção nativa 3, ACP 2, MCP Agent Mail eliminado por não assinar nem pinar. O Elenxo rebaixou para 6: a tool de envio fica ao alcance do modelo e o diálogo humano antes dela depende do cliente (falhou no Claude Code no A7-C1; no Codex não foi medido), a via de bilhetagem não está verificada e o dissect:N2 foi só por leitura."
+    provenance:
+      source: "onion-curation, sinal relayado sem commit ao inbox do core"
+      locator: "docs/evolution/inbox/_processed/2026-10-25-proposal-agent-transport.md; no adotante, docs/evolution/dissect/agent-transport-2026-10/ (PRs #87 e #88 do onion-curation)"
+      method: "medição: leitura do sinal inteiro"
+      locality: "repo"
+  - id: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-25"
+    verified_against: "decisão do maestro em 2026-10-25, por pergunta com opções: «Parquear com gatilho» para o transporte, e «Sim, confirmo e pode rodar» para o round-trip vivo Claude ↔ Codex com o Codex CLI"
+    label: "O transporte entre agentes de fornecedores diferentes fica parqueado com gatilho: reabre quando o round-trip vivo Claude ↔ Codex for medido, e a curadoria está autorizada a rodá-lo"
+    narrative: "Nada se constrói no core antes da prova viva. O round-trip segue os passos pré-registrados pela curadoria, com o MCP de teste fora da árvore de trabalho e os negativos (corpo que pede ação, envio sem diálogo em cada política de aprovação, ausência da tool de aceitar); antes dele, o interlink-mcp é lido e rodado como candidato a superar a ponta MCP. O maestro confirmou nesta sessão a instalação do Codex CLI. Descartadas: «Perseguir já» (construir sobre a lacuna da tool de envio sem diálogo) e «Rejeitar». O D_AGENT_TRANSPORT_VERDICT da curadoria fecha como parquear, apontando este nó."
+    provenance:
+      source: "maestro, na sessão do core"
+      locator: "perguntas com opções de 2026-10-25 sobre o D_AGENT_TRANSPORT_VERDICT e o round-trip vivo"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
 edges:
@@ -820,5 +855,14 @@ edges:
     to: E_SINAL_CANAL_NEUTRO_DO_AGENTE_1025
     edge_type: TRACES_TO
   - from: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
+    to: Q_CANAL_ENTRE_SESSOES_NEUTRO_DO_AGENTE_1025
+    edge_type: TRACES_TO
+  - from: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
+    to: E_SINAL_TRANSPORTE_ENTRE_AGENTES_1025
+    edge_type: TRACES_TO
+  - from: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
+    to: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
+    edge_type: TRACES_TO
+  - from: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
     to: Q_CANAL_ENTRE_SESSOES_NEUTRO_DO_AGENTE_1025
     edge_type: TRACES_TO
