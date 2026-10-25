@@ -2,7 +2,8 @@
 branch: docs/duolingo-hlr-parked
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8ee7a5d8310478776d56be3b00924c9b6624c1ded56855e13a22d29e637c57ff
+reviewed_code_sha256: 690c29c3dc766feb31146b223468a1e3ed508ec4dd39a89e0302b768e0f539f7
 findings_total: 1
 findings_real: 1
 tokens: 0
