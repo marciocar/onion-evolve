@@ -33556,6 +33556,21 @@ run_kg_trace_root_file_selftests() {
   if [ "${rh0}" -eq 1 ] && [ "${rh1}" -eq 1 ] && [ "${rh2}" -eq 0 ]; then
     record_pass "kg-trace-root: (h) grafo quebrado fora de fixture reprova; o glob do .kg-ssot/trace-excludes.txt o tira; comentário não exclui"
   else record_fail "kg-trace-root: (h)" "rc sem/comentário/com glob = ${rh0}/${rh1}/${rh2}; esperado 1/1/0"; fi
+  # (i) rc 3 do produto (kg-ssot >= 4.27: nenhum grafo lido) é CORPUS VAZIO, não ENTRADA-QUEBRADA. Produto de
+  #     mentira que sai 3 sem JSON: num corpus sem grafo, humano e TSV saem 0 e o índice sai 3 (o dia 1 do adotante);
+  #     no corpus deste sandbox, que TEM `trace:`, o TSV segue acusando VACUIDADE (a guarda não fica cega pelo 3).
+  local st="${sb}/stub-kt" vz="${sb}/vazio" ri0=0 ri1=0 ri2=0 ri3=0 tsv3
+  mkdir -p "${st}" "${vz}"
+  printf 'import sys\nsys.exit(3)\n' > "${st}/kg_trace.py"
+  : > "${st}/kg_query.py"; : > "${st}/kg_validate.py"
+  ( cd "${vz}" && git init -q . && printf '# x\n' > README.md && git add -A ) >/dev/null 2>&1
+  ONION_KG_TRACE="${st}/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${vz}" >/dev/null 2>&1 || ri0=$?
+  ONION_KG_TRACE="${st}/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${vz}" --format tsv >/dev/null 2>&1 || ri1=$?
+  ONION_KG_TRACE="${st}/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${vz}" --emit-index >/dev/null 2>&1 || ri2=$?
+  tsv3="$(ONION_KG_TRACE="${st}/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${sb}" --format tsv 2>/dev/null)" || ri3=$?
+  if [ "${ri0}" -eq 0 ] && [ "${ri1}" -eq 0 ] && [ "${ri2}" -eq 3 ] && [ "${ri3}" -eq 1 ] && grep -q 'VACUIDADE' <<< "${tsv3}"; then
+    record_pass "kg-trace-root: (i) rc 3 do produto = corpus vazio (humano 0, TSV 0, índice 3); com trace no corpus segue VACUIDADE"
+  else record_fail "kg-trace-root: (i)" "rc humano/tsv/índice/tsv-com-trace = ${ri0}/${ri1}/${ri2}/${ri3}; esperado 0/0/3/1 com VACUIDADE (tsv=${tsv3:0:120})"; fi
   unset -f _no
   rm -rf "${sb}"
 }

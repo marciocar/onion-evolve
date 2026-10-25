@@ -22,6 +22,8 @@
 # Exit : 0 = todo `trace:` julgável resolve / índice emitido · 1 = TARGET-MISSING, grafo ilegível ou VACUIDADE
 #        2 = sem o produto (kg_trace.py, seus vizinhos ou python3 ausentes) ou entrada quebrada
 #        3 = (--emit-index) índice VAZIO: nenhum nó com trace resolvível — legítimo no dia 1 do adotante
+#        O rc 3 do PRODUTO (kg-ssot >= 4.27: nenhum grafo lido, D_TRACE_EMPTY_CORPUS_RC_1025) é CORPUS VAZIO, nunca
+#        entrada quebrada: humano e TSV passam com aviso (a guarda de vacuidade segue julgando), --emit-index sai 3
 #        (--emit-index) 2 também quando o vendor é anterior à 4.25.1 (JSON sem `resolved_targets`): NAO-GEROU,
 #        nunca índice vazio
 # Excl.: <repo_root>/.kg-ssot/trace-excludes.txt (do ALVO, opcional) — um glob por linha, `#` comenta; cada um vira
@@ -60,7 +62,11 @@ if [ "${MODE}" = index ]; then
   # acusa; o índice segue com o que resolve). Outro rc, JSON ilegível ou sem `resolved_targets` = NAO-GEROU, rc 2.
   _kj="$(mktemp)"; trap 'rm -f "${_kj}"' EXIT
   _krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
-  case "${_krc}" in 0|1) : ;; *) echo "ERRO kg-trace --emit-index NAO-GEROU: kg_trace.py rc=${_krc}" >&2; exit 2 ;; esac
+  case "${_krc}" in
+    0|1) : ;;
+    3) echo "ERRO kg-trace --emit-index: índice VAZIO (o produto não leu nenhum grafo; 0 nós com trace resolvível)" >&2; exit 3 ;;
+    *) echo "ERRO kg-trace --emit-index NAO-GEROU: kg_trace.py rc=${_krc}" >&2; exit 2 ;;
+  esac
   _irc=0
   python3 -I -B - "${_kj}" <<'PY' || _irc=$?
 import json, sys
@@ -85,8 +91,9 @@ PY
 fi
 
 if [ "${MODE}" = human ]; then
-  python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"}
-  exit $?
+  _hrc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} || _hrc=$?
+  [ "${_hrc}" -ne 3 ] || { echo "AVISO kg-trace: corpus vazio (o kg_trace.py não leu nenhum grafo, rc 3)" >&2; exit 0; }
+  exit "${_hrc}"
 fi
 
 # ── TSV para o lint ──────────────────────────────────────────────────────────────────────────────────────────
@@ -94,7 +101,15 @@ fi
 # HARD de ambiente no lint, nunca verde).
 _kj="$(mktemp)"; trap 'rm -f "${_kj}"' EXIT
 _krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
-case "${_krc}" in 0|1) : ;; *) printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' "(kg_trace.py rc=${_krc})" 'ENTRADA-QUEBRADA'; exit 1 ;; esac
+# rc 3 = corpus vazio (kg-ssot >= 4.27): o JSON pode nem vir, e a guarda de vacuidade abaixo julga do mesmo jeito
+# (corpus com `trace:` e nada lido segue VACUIDADE). Sem achado, sai 0.
+case "${_krc}" in
+  0|1) : ;;
+  3) python3 -I -B -c 'import json,sys; json.load(open(sys.argv[1]))' "${_kj}" 2>/dev/null \
+       || printf '{"judged": 0, "skipped": {}}\n' >"${_kj}"
+     _krc=0 ;;
+  *) printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' "(kg_trace.py rc=${_krc})" 'ENTRADA-QUEBRADA'; exit 1 ;;
+esac
 
 # GUARDA DE VACUIDADE (herdada do resolvedor da casa, e a razão de ela seguir aqui): um leitor que não lê nada e
 # diz OK é pior que guarda nenhuma. O produto conta julgados E excluídos; só há vacuidade quando NADA foi lido
