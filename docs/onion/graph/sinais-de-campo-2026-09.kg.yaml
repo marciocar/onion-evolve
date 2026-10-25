@@ -847,6 +847,22 @@ nodes:
       locator: "no adotante, docs/evolution/dissect/agent-neutral-channel-2026-10/agent-neutral-channel-2026-10.kg.yaml (PR #96 do onion-curation)"
       method: "medição: peer-ref-check na origin/main do par e releitura dos dois D do core"
       locality: "repo"
+  - id: D_DUOLINGO_HLR_PARQUEADO_PARA_O_FRESCOR_DO_KG_1025
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-25"
+    verified_against: "D_DUOLINGO_B1_PARK conferido na origin/main da curadoria pelo peer-ref-check (rc 0, f591da2e2e44), lido com E_N3_CONTRACT_NO_HISTORY e C_OVERCOMING_FSRS7; acolhido pelo core sob a delegação do maestro de 2026-10-25, por ser parque que deriva da própria medida do estudo"
+    label: "O mecanismo de meia-vida aprendida por item do Duolingo (HLR) fica parqueado para o frescor do KG do core: o contrato não guarda histórico de re-verificação por nó, e o FSRS-7 o supera com dado"
+    narrative: "Estudo da curadoria, objeto da bancada da SAC-226, nível máximo sustentado dissect:N2 (artefato aberto do próprio app). O dissect:N3 não fecha: o contrato KG-SSOT guarda por nó só verified_at, reverify_every e reverify_on, sem a série de re-verificações que a HLR precisa. E o FSRS-7 supera a HLR no srs-benchmark (log loss 0,3370 contra 0,4694; AUC 0,7220 contra 0,6369, em 349.923.850 revisões). Se o frescor por aprendizado voltar, o alvo de estudo é o FSRS, família ferramenta, e não a HLR. O gatilho do parque é o da curadoria: uma decisão done que registre o histórico de re-verificação por nó no contrato. Nada se constrói agora."
+    provenance:
+      source: "sessão do core, sob a delegação do maestro de 2026-10-25"
+      locator: "mensagem da curadoria de 2026-10-25 e o grafo docs/evolution/dissect/duolingo-b1-2026-10/duolingo-b1-2026-10.kg.yaml do onion-curation"
+      method: "testemunho: decisão do core por delegação, sobre o veredito do Elenxo do estudo"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -997,4 +1013,7 @@ edges:
     edge_type: TRACES_TO
   - from: E_GATILHO_DO_CANAL_NEUTRO_DISPAROU_E_O_CORE_REOLHOU_1025
     to: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
+    edge_type: TRACES_TO
+  - from: D_DUOLINGO_HLR_PARQUEADO_PARA_O_FRESCOR_DO_KG_1025
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: TRACES_TO
