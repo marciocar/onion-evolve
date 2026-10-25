@@ -24,6 +24,11 @@
 #        3 = (--emit-index) índice VAZIO: nenhum nó com trace resolvível — legítimo no dia 1 do adotante
 #        (--emit-index) 2 também quando o vendor é anterior à 4.25.1 (JSON sem `resolved_targets`): NAO-GEROU,
 #        nunca índice vazio
+# Excl.: <repo_root>/.kg-ssot/trace-excludes.txt (do ALVO, opcional) — um glob por linha, `#` comenta; cada um vira
+#        `--exclude` do kg_trace.py. Existe porque o produto julga TODO .kg.yaml/.kg.json rastreado fora das pastas de
+#        fixture, e um adotante pode guardar grafos quebrados DE PROPÓSITO noutro lugar (medido em 2026-10-25: o
+#        kg-ssot tem 8 casos inválidos em docs/onion/measurements/, que o CI dele exclui; o update os tornava 8 HARD
+#        da REGRA 55 com ILEGIVEL). O arquivo é do adotante; o core não escreve nele.
 # Env  : ONION_KG_TRACE — caminho do kg_trace.py (default: <repo_root>/vendor/kg-ssot/tools/kg_trace.py; a bancada
 #        aponta o do core quando roda numa caixa de areia sem vendor).
 set -euo pipefail
@@ -33,6 +38,13 @@ REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)
 MODE=human
 for a in "$@"; do case "$a" in tsv|--format=tsv) MODE=tsv ;; --emit-index) MODE=index ;; esac; done
 KT="${ONION_KG_TRACE:-${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py}"
+_KT_EXCL=()
+if [ -f "${REPO_ROOT}/.kg-ssot/trace-excludes.txt" ]; then
+  while IFS= read -r _g || [ -n "${_g}" ]; do
+    _g="${_g%%#*}"; _g="${_g#"${_g%%[![:space:]]*}"}"; _g="${_g%"${_g##*[![:space:]]}"}"
+    [ -n "${_g}" ] && _KT_EXCL+=(--exclude "${_g}")
+  done < "${REPO_ROOT}/.kg-ssot/trace-excludes.txt"
+fi
 # o próprio produto KG-SSOT (tools/ na raiz, sem vendor de si mesmo) se julga pelo kg_trace.py dele
 [ -n "${ONION_KG_TRACE:-}" ] || [ -f "${KT}" ] || [ ! -f "${REPO_ROOT}/tools/kg_trace.py" ] || KT="${REPO_ROOT}/tools/kg_trace.py"
 command -v python3 >/dev/null 2>&1 || { echo "ERRO kg-trace: python3 ausente" >&2; exit 2; }
@@ -47,7 +59,7 @@ if [ "${MODE}" = index ]; then
   # O rc do produto é lido, nunca a prosa: 0|1 trazem o JSON (1 = há missing ou grafo ilegível, que a REGRA 55
   # acusa; o índice segue com o que resolve). Outro rc, JSON ilegível ou sem `resolved_targets` = NAO-GEROU, rc 2.
   _kj="$(mktemp)"; trap 'rm -f "${_kj}"' EXIT
-  _krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ --format json >"${_kj}" 2>/dev/null || _krc=$?
+  _krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
   case "${_krc}" in 0|1) : ;; *) echo "ERRO kg-trace --emit-index NAO-GEROU: kg_trace.py rc=${_krc}" >&2; exit 2 ;; esac
   _irc=0
   python3 -I -B - "${_kj}" <<'PY' || _irc=$?
@@ -73,7 +85,7 @@ PY
 fi
 
 if [ "${MODE}" = human ]; then
-  python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/
+  python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"}
   exit $?
 fi
 
@@ -81,7 +93,7 @@ fi
 # O rc do produto é lido, nunca a prosa: 0 resolve · 1 missing/ilegível · outro = entrada quebrada (a regra vira
 # HARD de ambiente no lint, nunca verde).
 _kj="$(mktemp)"; trap 'rm -f "${_kj}"' EXIT
-_krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ --format json >"${_kj}" 2>/dev/null || _krc=$?
+_krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
 case "${_krc}" in 0|1) : ;; *) printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' "(kg_trace.py rc=${_krc})" 'ENTRADA-QUEBRADA'; exit 1 ;; esac
 
 # GUARDA DE VACUIDADE (herdada do resolvedor da casa, e a razão de ela seguir aqui): um leitor que não lê nada e
