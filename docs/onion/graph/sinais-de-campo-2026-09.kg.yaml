@@ -619,7 +619,7 @@ nodes:
     verified_at: "2026-10-25"
     verified_against: "o sinal lido inteiro (128 linhas) e a recontagem do members.yaml no core: 30 entradas '- id:', como a curadoria mediu (o 28 informado pelo core estava errado)"
     trace: "docs/evolution/inbox/_processed/2026-10-25-proposal-a2a-product.md"
-    label: "A curadoria dissecou o A2A do core como produto próprio e propõe parquear: pela régua pré-registrada do dissect:N2, 6 dos 7 arquivos do par verify/accept e do contrato de transporte citam o core fora do conjunto (0,857), e o que prende é o registro members.yaml, a fronteira MOAT e o bridge, não o código"
+    label: "A curadoria dissecou o A2A do core como produto próprio e propõe parquear: na régua do dissect:N2, 6 de 7 arquivos do par verify/accept e do contrato citam o core fora do conjunto (0,857); prendem o members.yaml, o MOAT e o bridge, não o código"
     narrative: "Estudo SAC-247 da curadoria, com a medição do core como dado. Na leitura por dependência executável (Elenxo), só 2 de 7 dependem de fora (0,286), e as duas leituras dão parquear. O código fecha em 8 arquivos de profundidade 2; não há consumidor fora do Onion; a spec A2A 1.0.0 e a AGNTCY não cobrem convite, aceite, fila nem doutor. O sinal pede ainda olhar os análogos parciais (Agoragentic, inflect-compliance #3706, OyadotAI/A2ARegistry, discussões #924 e #741 do a2aproject) antes de redesenhar a fronteira."
     provenance:
       source: "onion-curation, sinal relayado sem commit ao inbox do core"
