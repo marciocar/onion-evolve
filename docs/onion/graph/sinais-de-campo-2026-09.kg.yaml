@@ -811,6 +811,22 @@ nodes:
       locator: "triagem do sinal 2026-10-25-proposal-peer-protocol.md"
       method: "testemunho: decisão do core por delegação, aplicando o critério de recorrência pré-registrado no CORE-STATE enviado à curadoria"
       locality: "pessoa"
+  - id: E_GATILHO_DO_CANAL_NEUTRO_DISPAROU_E_O_CORE_REOLHOU_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-25"
+    verified_against: "peer-ref-check.sh onion-curation docs/evolution/dissect/agent-neutral-channel-2026-10/agent-neutral-channel-2026-10.kg.yaml#C_NO_NON_CLAUDE_ROUNDTRIP rc 0 na origin/main do par; a curadoria relatou que, com a aresta SUPERSEDES do round-trip vivo (PR #96 dela), o dissect-object-check dá o aviso gatilho-disparou-depois-do-selo"
+    label: "O gatilho do parque do canal neutro disparou depois do selo; o core olhou de novo e o parque fica, porque o round-trip vivo mediu o interlink e não a composição"
+    narrative: "Primeiro uso real do aviso do item 7 (PR #1359). O disparo vem da superação do C_NO_NON_CLAUDE_ROUNDTRIP da curadoria pelo round-trip vivo Claude ↔ Codex. Ele responde que um agente não Claude fala pelo canal, mas pelo interlink-mcp, que não é adotável. O que reabriria o canal no core segue sendo a Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025: a ida e volta pela própria composição, com os negativos. Por isso o D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025 e o D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025 ficam como estão."
+    provenance:
+      source: "onion-curation, mensagem entre sessões, conferida pelo peer-ref-check"
+      locator: "no adotante, docs/evolution/dissect/agent-neutral-channel-2026-10/agent-neutral-channel-2026-10.kg.yaml (PR #96 do onion-curation)"
+      method: "medição: peer-ref-check na origin/main do par e releitura dos dois D do core"
+      locality: "repo"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -955,4 +971,10 @@ edges:
     edge_type: SUPPORTS
   - from: D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025
     to: E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025
+    edge_type: TRACES_TO
+  - from: E_GATILHO_DO_CANAL_NEUTRO_DISPAROU_E_O_CORE_REOLHOU_1025
+    to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    edge_type: TRACES_TO
+  - from: E_GATILHO_DO_CANAL_NEUTRO_DISPAROU_E_O_CORE_REOLHOU_1025
+    to: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
     edge_type: TRACES_TO

@@ -16,6 +16,11 @@
 # `C_X_2`. Sem o produto ao lado, PyYAML; sem nenhum dos dois, NÃO MEDIU (rc 2), nunca "existe".
 #
 # Uso : bash .claude/validation/peer-ref-check.sh <repo-do-par> <ref>
+#       <repo-do-par> = caminho do clone, OU o NOME do par (1º uso real, 2026-10-25: a sessão escreve o nome, não o
+#       caminho). O nome resolve, nesta ordem: (1) `local_path` do membro `id: <nome>` no members.yaml deste repo
+#       (core e hub o têm); (2) o diretório irmão `<pai deste repo>/<nome>`, aceito SÓ se a URL da origin dele
+#       termina em `/<nome>` ou `/<nome>.git` — palpite de diretório sem essa prova seria conferir o repo errado.
+#       Nada resolve → NÃO MEDIU, pedindo o caminho.
 #       <ref> = <caminho>.kg.yaml#<ID> (ou .kg.json#<ID)  → o arquivo existe na origin/main E o nó `id: <ID>` está nele
 #             = <caminho>                                  → o arquivo existe na origin/main
 #             = <sha> (7 a 40 hex)                         → é commit E é ancestral da origin/main
@@ -25,6 +30,7 @@
 #       2 = NÃO MEDIU (o par não é repo git, o fetch falhou, origin/main ausente, argumento malformado,
 #           grafo ilegível ou sem parser)
 # Env : ONION_KG_QUERY — caminho do kg_query.py (default: o vendor kg-ssot deste repo).
+#       ONION_MEMBERS_YAML — o registro de membros (default: docs/evolution/federation/members.yaml deste repo).
 set -euo pipefail
 
 _out() { printf 'peer-ref-check: %s\n' "$*"; }
@@ -35,6 +41,32 @@ PAR="$1"; REF="$2"
 [ -n "${PAR}" ] && [ -n "${REF}" ] || _unmeasured "argumento vazio"
 case "${REF}" in -*|*[[:space:]]*|*[[:cntrl:]]*) _unmeasured "ref malformada: começa com '-' ou tem espaço/controle" ;; esac
 
+HERE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+if [ ! -d "${PAR}" ] && [[ "${PAR}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+  NAME="${PAR}"; PAR=""
+  MEM="${ONION_MEMBERS_YAML:-${HERE_ROOT}/docs/evolution/federation/members.yaml}"
+  if [ -f "${MEM}" ] && command -v python3 >/dev/null 2>&1; then
+    PAR="$(python3 -I -B - "${MEM}" "${NAME}" <<'PY' 2>/dev/null || true
+import sys
+try:
+    import yaml
+    d = yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}
+except Exception:
+    sys.exit(0)
+for m in (d.get("members") or []) if isinstance(d, dict) else []:
+    if isinstance(m, dict) and m.get("id") == sys.argv[2] and isinstance(m.get("local_path"), str):
+        print(m["local_path"]); break
+PY
+)"
+    [ -z "${PAR}" ] || [ -d "${PAR}" ] || PAR=""
+  fi
+  if [ -z "${PAR}" ]; then
+    SIB="$(dirname "${HERE_ROOT}")/${NAME}"
+    URL="$(git -C "${SIB}" remote get-url origin 2>/dev/null || true)"
+    case "${URL}" in */"${NAME}"|*/"${NAME}".git|*:"${NAME}"|*:"${NAME}".git) PAR="${SIB}" ;; esac
+  fi
+  [ -n "${PAR}" ] || _unmeasured "o nome '${NAME}' não resolve (nem no members.yaml, nem num irmão cuja origin seja ${NAME}): passe o caminho do clone"
+fi
 git -C "${PAR}" rev-parse --git-dir >/dev/null 2>&1 || _unmeasured "o par não é repo git: ${PAR}"
 GIT_TERMINAL_PROMPT=0 git -C "${PAR}" fetch -q origin >/dev/null 2>&1 || _unmeasured "o fetch da origin do par falhou (${PAR})"
 MAIN="$(git -C "${PAR}" rev-parse --verify -q 'refs/remotes/origin/main^{commit}' 2>/dev/null)" \
