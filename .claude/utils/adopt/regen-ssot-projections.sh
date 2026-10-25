@@ -37,6 +37,8 @@ fi
 
 DEST="${1:?uso: regen-ssot-projections.sh <DEST> | --list-outputs}"
 [ -d "${DEST}" ] || { echo "ERRO: alvo inexistente: '${DEST}'" >&2; exit 2; }
+# DEST tem de ser a RAIZ de um repo próprio, senão as escritas abaixo caem no repo que o contém (incidente de 2026-10-25: no cabeçalho do assert-dest.sh).
+bash "$(dirname "${BASH_SOURCE[0]}")/assert-dest.sh" "${DEST}" || exit 2
 
 # ⚠️ FAIL-LOUD, e ele entrou porque a 1ª versão MENTIA VERDE — medido 2026-09-15 na passada
 # adversarial: com `docs/onion` existindo como ARQUIVO, ou com os dois geradores ausentes, o helper

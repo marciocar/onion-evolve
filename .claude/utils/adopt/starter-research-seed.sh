@@ -15,6 +15,8 @@
 # =============================================================================
 set -u
 DEST="${1:?uso: starter-research-seed.sh <DEST>}"
+# DEST tem de ser a RAIZ de um repo próprio, senão as escritas abaixo caem no repo que o contém (incidente de 2026-10-25: no cabeçalho do assert-dest.sh).
+bash "$(dirname "${BASH_SOURCE[0]}")/assert-dest.sh" "${DEST}" || exit 2
 R="${DEST}/docs/evolution/research"
 _verifica() { [ -f "${R}/README.md" ] && exit 0
               echo "starter-research-seed: ${R}/README.md nao ficou no lugar" >&2; exit 1; }

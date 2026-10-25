@@ -37,6 +37,8 @@ DEST="${1:-}"
 [ -n "${DEST}" ] || { echo "uso: install-onion-githook.sh <dest-dir>" >&2; exit 2; }
 [ -d "${DEST}" ] || { echo "ERRO: dest não é diretório: ${DEST}" >&2; exit 2; }
 git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERRO: dest não é repo git: ${DEST}" >&2; exit 2; }
+# DEST tem de ser a RAIZ de um repo próprio, senão as escritas abaixo caem no repo que o contém (incidente de 2026-10-25: no cabeçalho do assert-dest.sh).
+bash "$(dirname "$0")/assert-dest.sh" "${DEST}" || exit 2
 
 TPL="$(dirname "$0")/githook-pre-commit-onion.tpl"
 [ -f "${TPL}" ] || { echo "ERRO: template não encontrado: ${TPL}" >&2; exit 2; }
