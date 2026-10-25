@@ -33851,7 +33851,7 @@ open(p, "w", encoding="utf-8").write(s)
 PY
   git -C "${sb}/w" "${gq[@]}" commit -qam novo >/dev/null 2>&1
   git -C "${sb}/w" push -q origin HEAD:main >/dev/null 2>&1
-  local sha_novo; sha_novo="$(git -C "${sb}/w" rev-parse HEAD)"
+  local sha_new; sha_new="$(git -C "${sb}/w" rev-parse HEAD)"
 
   _pr() { # $1=helper · $2=par · $3=ref · demais = env → ecoa o rc; a saída fica em last.out
     local h="$1" p="$2" r="$3"; shift 3
@@ -33860,7 +33860,7 @@ PY
   local r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 out
 
   r1="$(_pr "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_X_2' "${KQ}")"; out="$(cat "${sb}/last.out")"
-  if [ "${r1}" = 0 ] && grep -q "@ ${sha_novo}" <<< "${out}" && [ "$(wc -l <<< "${out}")" -eq 1 ]; then
+  if [ "${r1}" = 0 ] && grep -q "@ ${sha_new}" <<< "${out}" && [ "$(wc -l <<< "${out}")" -eq 1 ]; then
     record_pass "peer-ref: (a) nó que existe → rc 0, uma linha, com o sha da origin/main medida (a de DEPOIS do fetch)"
   else record_fail "peer-ref: (a)" "rc=${r1} saída: ${out:0:200}"; fi
 
