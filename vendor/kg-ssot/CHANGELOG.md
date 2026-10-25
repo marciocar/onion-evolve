@@ -10,6 +10,23 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.28.0] - 2026-10-25
+
+`kg_prov_export.py --edges` exports the edges, with `cito:supports`, `cito:refutes` and `dcterms:replaces` where a
+standard term exists; without the option the output does not change. Contract v4.15, unchanged.
+
+### Added
+
+- **`kg_prov_export.py --edges` exports the edges.** By default the exporter still leaves the edges out, since
+  derivation in PROV is production, not evidential support, and PROV has no pair for `REFUTES`. With `--edges`, every
+  edge, from `edges` and `external_edges`, becomes a `kg:Edge` resource with its type, ends and every key, so it can be
+  rebuilt from the RDF. Between two local nodes, `SUPPORTS`, `REFUTES` and `SUPERSEDES` also get the standard
+  `cito:supports`, `cito:refutes` and `dcterms:replaces` triples. No edge produces `prov:wasDerivedFrom`, and without
+  the option the output does not change.
+  - **How it was measured:** against criteria registered before the measurement, on 213 graphs and 9,988 edges. Every
+    edge came back from the RDF read by rdflib 7.6.0, every standard triple had the right direction, and the cost was
+    1.7 times the plain export.
+
 ## [4.27.0] - 2026-10-25
 
 Contract v4.15: an external end can live in a dot folder such as `.github/`, while `.` and `..` still fail; the git

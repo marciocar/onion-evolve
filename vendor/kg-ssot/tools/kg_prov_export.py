@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exporta a proveniência de um .kg.yaml para PROV-O em JSON-LD.
 
-  kg_prov_export.py <grafo.kg.yaml> [--base IRI]
+  kg_prov_export.py <grafo.kg.yaml> [--base IRI] [--edges]
 
 Cada nó vira uma prov:Entity, com o rótulo, o tipo e o status. Um nó com `provenance` ganha prov:wasDerivedFrom
 para a fonte e uma prov:Derivation qualificada: a atividade carrega o `method`, e o `locator` e a `locality` vão
@@ -14,8 +14,13 @@ de geração marca a existência da entidade, não a conferência dela.
 As IRIs dos nós são <base><meta.id>#<id>, com base urn:kg-ssot:graph: por padrão; o vocabulário kg: mora em
 urn:kg-ssot:vocab#, fora do espaço dos grafos, para um meta.id não colidir com ele.
 
-As arestas (SUPPORTS, REFUTES, SUPERSEDES…) NÃO são exportadas: derivação em PROV é relação de produção, e não de
-suporte evidencial. Exportá-las como wasDerivedFrom diria algo que o grafo não diz.
+Por padrão, as arestas (SUPPORTS, REFUTES, SUPERSEDES…) NÃO são exportadas: derivação em PROV é relação de
+produção, e não de suporte evidencial, e exportá-las como wasDerivedFrom diria algo que o grafo não diz. Com --edges,
+toda aresta (de edges e de external_edges) vira um recurso kg:Edge com kg:edgeType, kg:from, kg:to, o rótulo e as
+outras chaves como kg:<chave> (o nome da chave com percent-encoding), o que permite a volta sem perda. Entre dois nós locais, SUPPORTS ganha também a tripla
+cito:supports, REFUTES a cito:refutes e SUPERSEDES a dcterms:replaces; os outros tipos não ganham tripla-padrão. A
+ponta externa (<caminho>#<id>) vai como o literal kg:fromRef ou kg:toRef, e a ponta ausente (o grafo inteiro) como
+kg:fromGraph. Nenhuma aresta gera prov:wasDerivedFrom.
 
 O exportador lê o grafo com o parse do leitor de referência e não o valida: rode kg_validate.py antes.
 Saída: JSON-LD em stdout. rc: 0 ok · 2 entrada quebrada (arquivo ilegível, que não é um documento YAML único, ou
@@ -45,6 +50,9 @@ CONTEXT = {
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "kg": "urn:kg-ssot:vocab#",
 }
+# Só entram no contexto com --edges, para a saída padrão seguir byte a byte igual.
+EDGE_CONTEXT = {"cito": "http://purl.org/spar/cito/", "dcterms": "http://purl.org/dc/terms/"}
+STANDARD = {"SUPPORTS": "cito:supports", "REFUTES": "cito:refutes", "SUPERSEDES": "dcterms:replaces"}
 IRI = re.compile(r"https?://[^\s<>\"{}|\\^`]+")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
@@ -52,7 +60,7 @@ DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 # O help em inglês, a língua-fonte; a docstring acima é a versão pt-BR, que o catálogo traz de volta.
 DESCRIPTION = """Export the provenance of a .kg.yaml graph to PROV-O in JSON-LD.
 
-  kg_prov_export.py <graph.kg.yaml> [--base IRI]
+  kg_prov_export.py <graph.kg.yaml> [--base IRI] [--edges]
 
 Each node becomes a prov:Entity, with its label, type and status. A node with `provenance` gets prov:wasDerivedFrom
 to the source and a qualified prov:Derivation: the activity carries the `method`, and the `locator` and the
@@ -66,8 +74,13 @@ verified it.
 Node IRIs are <base><meta.id>#<id>, with the base urn:kg-ssot:graph: by default; the kg: vocabulary lives at
 urn:kg-ssot:vocab#, outside the graph space, so a meta.id cannot collide with it.
 
-The edges (SUPPORTS, REFUTES, SUPERSEDES...) are NOT exported: derivation in PROV is a production relation, not
-evidential support. Exporting them as wasDerivedFrom would say something the graph does not say.
+By default the edges (SUPPORTS, REFUTES, SUPERSEDES...) are NOT exported: derivation in PROV is a production relation,
+not evidential support, and exporting them as wasDerivedFrom would say something the graph does not say. With --edges,
+every edge (from edges and external_edges) becomes a kg:Edge resource with kg:edgeType, kg:from, kg:to, the label and
+the other keys as kg:<key> (the key name percent-encoded), so the graph can be rebuilt without loss. Between two local nodes, SUPPORTS also gets the
+cito:supports triple, REFUTES cito:refutes and SUPERSEDES dcterms:replaces; the other types get no standard triple.
+An external end (<path>#<id>) goes as the literal kg:fromRef or kg:toRef, and a missing end (the whole graph) as
+kg:fromGraph. No edge produces prov:wasDerivedFrom.
 
 The exporter reads the graph with the reference reader's parser and does not validate it: run kg_validate.py first.
 Output: JSON-LD on stdout. rc: 0 ok, 2 broken input (an unreadable file, one that is not a single YAML document, or
@@ -78,7 +91,7 @@ class Broken(Exception):
     """Entrada quebrada: rc 2."""
 
 
-def export(doc, base):
+def export(doc, base, edges=False):
     meta = doc.get("meta", {})
     nodes = doc.get("nodes", [])
     if not isinstance(meta, dict):
@@ -121,7 +134,46 @@ def export(doc, base):
             entity["prov:wasDerivedFrom"] = {"@id": src["@id"]}
             entity["prov:qualifiedDerivation"] = derivation
         out.append(entity)
-    return {"@context": CONTEXT, "@graph": out}
+    if not edges:
+        return {"@context": CONTEXT, "@graph": out}
+    by_id = {e["@id"]: e for e in out}
+    count = 0
+    for key in ("edges", "external_edges"):
+        items = doc.get(key) or []
+        if not isinstance(items, list):
+            raise Broken(_("{key} is not a list").format(key=key))
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            count += 1
+            edge = {"@id": f"{prefix}edge-{count}", "@type": "kg:Edge", "kg:edgeType": item.get("edge_type")}
+            ends = {}
+            for end in ("from", "to"):
+                ref = item.get(end)
+                if ref is None:
+                    edge[f"kg:{end}Graph"] = True
+                elif kg_validate.is_external(ref):
+                    edge[f"kg:{end}Ref"] = ref
+                else:
+                    ends[end] = prefix + str(ref)
+                    edge[f"kg:{end}"] = {"@id": ends[end]}
+            if item.get("label") is not None:
+                edge["rdfs:label"] = str(item["label"])
+            for extra, value in item.items():
+                if extra in ("from", "to", "edge_type", "label"):
+                    continue
+                # o nome da chave vai com percent-encoding: o contrato aceita x_ fora do slug, e a IRI não aceita espaço
+                edge[f"kg:{urllib.parse.quote(str(extra), safe='')}"] = value if isinstance(value, str) else {"@value": json.dumps(value, ensure_ascii=False), "@type": "kg:json"}
+            prop = STANDARD.get(item.get("edge_type"))
+            if prop and len(ends) == 2:
+                holder = by_id.get(ends["from"])
+                if holder is None:  # a ponta de origem não é nó declarado: a tripla vai num recurso próprio
+                    holder = {"@id": ends["from"]}
+                    by_id[ends["from"]] = holder
+                    out.append(holder)
+                holder.setdefault(prop, []).append({"@id": ends["to"]})
+            out.append(edge)
+    return {"@context": {**CONTEXT, **EDGE_CONTEXT}, "@graph": out}
 
 
 def _utf8_stdio():
@@ -144,6 +196,8 @@ def main(argv=None):
     ap.add_argument("graph", help=_("the .kg.yaml graph to export"))
     ap.add_argument("--base", default="urn:kg-ssot:graph:",
                     help=_("the prefix of the node IRIs (default: urn:kg-ssot:graph:)"))
+    ap.add_argument("--edges", action="store_true",
+                    help=_("also export the edges, as kg:Edge resources and, where a standard term exists, cito:supports, cito:refutes or dcterms:replaces"))
     args = ap.parse_args(argv)
     _utf8_stdio()
     try:
@@ -156,7 +210,7 @@ def main(argv=None):
         print(f"✗ {args.graph}: {error}", file=sys.stderr)
         return 2
     try:
-        result = export(doc, args.base)
+        result = export(doc, args.base, edges=args.edges)
     except Broken as exc:
         print(f"✗ {args.graph}: {exc}", file=sys.stderr)
         return 2

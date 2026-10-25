@@ -341,6 +341,9 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.27.0` to `kg-ssot-v4.28.0`, the contract stays at v4.15, and the gate and the validator do not
+change. `kg_prov_export.py` gains `--edges`, off by default: without it the output is byte for byte the same.
+
 From `kg-ssot-v4.26.0` to `kg-ssot-v4.27.0`, the contract goes to v4.15 and only widens: nothing that passed fails,
 and the gate asks for no `--update` (it shows the identity notice, since the schema bytes change). An external end
 `<path>#<id>` can now start with a dot folder (`.github/x.kg.yaml#ID`), at either end of the edge; `./` and `../`

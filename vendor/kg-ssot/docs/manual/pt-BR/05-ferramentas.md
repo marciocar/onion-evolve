@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:d94a9464b7eee88a -->
+<!-- translation-of: docs/manual/05-tools.md sha256:97d6cb6edf6d8242 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.27.0",
+  "release": "kg-ssot-v4.28.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -1092,11 +1092,34 @@ Trecho da saída, o nó com `provenance`:
 
 O que ele **não** exporta, de propósito:
 
-- **As arestas.** `SUPPORTS`, `REFUTES` e as outras são relações de evidência, e derivação em PROV é relação de
-  produção. Exportá-las como `wasDerivedFrom` diria algo que o grafo não diz.
+- **As arestas, por padrão.** `SUPPORTS`, `REFUTES` e as outras são relações de evidência, e derivação em PROV é
+  relação de produção. Exportá-las como `wasDerivedFrom` diria algo que o grafo não diz. Com `--edges`, elas saem de
+  outro jeito, descrito abaixo.
 - **O carimbo como tempo de geração.** `verified_at` sai como `kg:verifiedAt` (tipado `xsd:date` quando é uma data),
   não como `prov:generatedAtTime`: em PROV, o tempo de geração marca quando a entidade passou a existir, não quando
   foi conferida.
+
+### As arestas, com `--edges`
+
+`--edges` exporta todas as arestas, de `edges` e de `external_edges`, sem perda e sem derivação falsa:
+
+- **Toda aresta vira um recurso `kg:Edge`.** Ele leva `kg:edgeType`, `kg:from`, `kg:to`, o rótulo como `rdfs:label`
+  e qualquer outra chave (`trigger`, `x_*`) como `kg:<chave>`, com o nome da chave em percent-encoding, para uma chave `x_` com espaço ainda dar uma IRI válida. Um valor que não é texto vai como JSON, tipado
+  `kg:json`. Assim, qualquer tipo, inclusive os da camada domain, volta inteiro a partir do RDF.
+- **A ponta externa** (`<caminho>#<id>`) vai como o literal `kg:fromRef` ou `kg:toRef`, porque a IRI de um nó de outro
+  grafo depende do `meta.id` daquele arquivo. Um `from` ausente (o grafo inteiro) vai como `kg:fromGraph true`.
+- **Entre dois nós locais, três tipos ganham também uma tripla-padrão:**
+  - `SUPPORTS` ganha `cito:supports`, da [CiTO](https://sparontologies.github.io/cito/current/cito.html);
+  - `REFUTES` ganha `cito:refutes`;
+  - `SUPERSEDES` ganha `dcterms:replaces`, dos [DCMI Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/).
+
+  Os outros tipos não ganham nenhuma, porque a PROV não tem par para nenhum dos três e não se achou termo-padrão para
+  o resto.
+- **Nenhuma aresta gera `prov:wasDerivedFrom`.**
+
+Sem a opção, a saída é byte a byte a de antes. Antes da release, o mapeamento foi medido em 213 grafos e 9.988 arestas,
+contra critérios registrados antes da medição. Todas as arestas voltaram a partir do RDF lido pelo rdflib, e o custo
+foi de 1,7 vez o da exportação simples.
 
 O exportador não valida o grafo: rode o `kg_validate.py` antes. `--base IRI` troca o prefixo das IRIs dos nós (o
 default é `urn:kg-ssot:graph:`, e cada nó fica em `<base><meta.id>#<id>`); o vocabulário `kg:` mora em
