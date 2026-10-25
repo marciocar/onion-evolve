@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # onion-effect-gate.sh — R15.3b (ONION-R15): gate de efeito para ação DERIVADA de conteúdo não-confiável.
 #
-# PROTÓTIPO isolado (discuss/guardrails-nemo-lens). NÃO é o core — dogfood em quarentena.
+# Nasceu PROTÓTIPO isolado (discuss/guardrails-nemo-lens) e entrou no core em 2026-07-19 (13275e56). O /meta:adopt, o
+# /docs:reverse-consolidate e o fragmento untrusted-content-provenance o mandam classificar todo efeito derivado de conteúdo alheio.
 #
 # Propósito: torna EXECUTÁVEL a camada de liberação (intake×execução, authorization-layers) para o canal C3
 # (adopt / reverse-consolidate), que — diferente de C1/C2 — não tem o efeito-gate estrutural. Dado um verbo
