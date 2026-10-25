@@ -2,7 +2,8 @@
 branch: fix/kg-trace-adopter-excludes
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b723262514547aa5e1dea8bd8974dbc5824ca64be0626a401e99ce2789730279
+reviewed_code_sha256: 15a55c9990d9f0e174308df159ec47421f24e7c7f006423f50a1b27636ce5a02
 findings_total: 2
 findings_real: 0
 tokens: 0
