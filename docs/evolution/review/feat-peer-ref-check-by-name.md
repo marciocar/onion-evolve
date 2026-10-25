@@ -2,7 +2,8 @@
 branch: feat/peer-ref-check-by-name
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 19404c2afd202558da229cd95671fa53e3446f229feee8adf7304e0b03b36d92
+reviewed_code_sha256: 5506823e57524de00e5781a0dffe395d33f3ecb61e7814bebf366c28ab511c17
 findings_total: 1
 findings_real: 0
 tokens: 0
