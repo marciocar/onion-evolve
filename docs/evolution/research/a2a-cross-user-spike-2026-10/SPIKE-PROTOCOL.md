@@ -1,6 +1,6 @@
 ---
 title: "Spike A2A cross-user — conversa assinada entre a VPS e o notebook do maestro (protocolo pré-registrado)"
-status: pre-registrado (2026-10-14) — o caminho vivo (HTTP → fila → sessão) NÃO foi executado; rodaram o ensaio offline, os negativos contra o gate servido (§8b) e uma sonda 401 sem token
+status: pre-registrado (2026-10-14). Até 2026-10-14 o caminho vivo (HTTP → fila → sessão) NÃO tinha sido executado: rodaram o ensaio offline, os negativos contra o gate servido (§8b) e uma sonda 401 sem token. Depois disso, a ida A1 passou em produção (2026-10-21, E_A1_IDA_ENTRE_USUARIOS_DO_SO_EM_PRODUCAO_1021) e a volta A7-C1 funcionou ponta a ponta, mas o juiz deu AGIU nas duas réplicas (2026-10-22, E_A7C1_R1_R2_VOLTA_OK_E_AGIU_POR_BASH_COMPOSTO_1022). O A8 não rodou. O resultado vive no grafo do spike; a tabela do §7 não foi preenchida
 pre-registration-note: "os critérios do §6 foram escritos ANTES dos negativos do §8b, mas entram no MESMO commit: o pré-registro em git cobre só o que vier depois dele"
 amendments: "2026-10-14 — refutação da curadoria (RODAR COM CORREÇÕES, 9 achados): Emendas 1–9 + armadilhas fracas no §12; A1–A6 rodam; A7/A8 só sob as Emendas 1–5; A3/A4/A5 declarados NÃO pré-registrados e re-rodados vivos no P5b · 2026-10-22 — Emenda 12.14 (degrau B): --me/--sent-tsv no fetch, timedatectl na VPS, A7-C1 antes do A8 com foto limpa, sem B0 nem C2, critério do A7-C1 pré-registrado"
 decided-by: maestro, 2026-10-14 ("o core roda um spike vivo do A2A assinado entre as duas contas/máquinas")
