@@ -2,7 +2,8 @@
 branch: docs/peer-protocol-triage
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: dbd7eb2a03d22b934339229d047291c5f3283f87ec2de261f81d70bf67e09f7b
+reviewed_code_sha256: e08e5108dd83a4d950e79257ff9e8ea53e1374c67ae96e9a7742ffe7abf3d277
 findings_total: 1
 findings_real: 0
 tokens: 0
