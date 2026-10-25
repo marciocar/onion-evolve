@@ -304,7 +304,8 @@ _FOREIGN_PROJ="docs/backlog.md docs/onion/kg-read-index.tsv"
 _foreign_is_proj() { case " ${_FOREIGN_PROJ} " in *" $1 "*) return 0 ;; esac; return 1; }
 _FOREIGN_REPO=0
 _top="$(git rev-parse --show-toplevel 2>/dev/null)"
-[ -n "${_top}" ] && [ ! -f "${_top}/ops/pr-finalize.sh" ] && _FOREIGN_REPO=1
+# fora de qualquer repo (`_top` vazio) também é alheio: o motor do core não está ao alcance de quem chamou
+[ -f "${_top:-/nonexistent}/ops/pr-finalize.sh" ] || _FOREIGN_REPO=1
 _FR_MSG=""; _FR_OUT=""
 _foreign_gen() { # $1=worktree $2=projeção → regenera no lugar pelo gerador do alvo; rc≠0 com _FR_MSG
   local _w="$1" _p="$2" _g _tmp _rc=0 _empty_ok=0
