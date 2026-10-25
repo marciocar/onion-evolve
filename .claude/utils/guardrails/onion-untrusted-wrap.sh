@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # onion-untrusted-wrap.sh — R15.1 (ONION-R15): cerca de proveniência para conteúdo NÃO-CONFIÁVEL.
 #
-# PROTÓTIPO isolado (discuss/guardrails-nemo-lens). NÃO é o core — dogfood em quarentena.
+# Nasceu PROTÓTIPO isolado (discuss/guardrails-nemo-lens) e entrou no core em 2026-07-19 (13275e56). Desde 2026-10-15
+# (e97fe410) é a moldura que o a2a-accept.sh EXIGE para o corpo aceito chegar à sessão: é peça de produção do canal.
 #
 # Propósito: todo conteúdo externo (federação a2a, doc-bridge inbound, repo adotado) entra no
 # contexto de um agente APENAS cercado — nunca cru. A cerca torna as duas confianças visualmente
