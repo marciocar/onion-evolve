@@ -33808,6 +33808,131 @@ run_kg_trace_root_file_selftests() {
 }
 
 
+# ── PEER-REF-CHECK — conferir a ref ou o selo NA ORIGIN/MAIN DO PAR antes de citar ──────────────
+# D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025: a curadoria mediu 22 afirmações agidas sem
+# conferência em 114 mensagens entre sessões, com selos citados antes de existir. A bancada monta um
+# PAR DE VERDADE (bare + clone, como o par é para a sessão: um repo com origin) e chama o helper como
+# a sessão chama: `peer-ref-check.sh <par> <ref>`, lendo só o rc. O caso do PREFIXO (C_X contra C_X_2)
+# é o que separa parser de grep, e o mutante (MUT-a) troca o parser por grep e exige que ele reprove.
+run_peer_ref_check_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/peer-ref-check.sh"
+  [ -f "${sut}" ] || { record_fail "peer-ref: SUT" "ausente: ${sut}"; return; }
+  local sb; sb="$(mktemp -d)"
+  local gq=( -c user.email=t@t -c user.name=t )
+  git init -q --bare -b main "${sb}/origin.git" >/dev/null 2>&1
+  git clone -q "${sb}/origin.git" "${sb}/w" >/dev/null 2>&1
+  mkdir -p "${sb}/w/docs"
+  printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n  - id: C_X_2\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\nedges: []\n' > "${sb}/w/docs/g.kg.yaml"
+  printf '# leia\n' > "${sb}/w/README.md"
+  git -C "${sb}/w" add -A >/dev/null 2>&1
+  git -C "${sb}/w" "${gq[@]}" commit -qm base >/dev/null 2>&1
+  git -C "${sb}/w" push -q origin HEAD:main >/dev/null 2>&1
+  local sha_main; sha_main="$(git -C "${sb}/w" rev-parse HEAD)"
+  git -C "${sb}/w" checkout -q -b side >/dev/null 2>&1
+  printf 'lado\n' > "${sb}/w/lado.md"
+  git -C "${sb}/w" add -A >/dev/null 2>&1
+  git -C "${sb}/w" "${gq[@]}" commit -qm lado >/dev/null 2>&1
+  git -C "${sb}/w" push -q origin side >/dev/null 2>&1
+  local sha_side; sha_side="$(git -C "${sb}/w" rev-parse HEAD)"
+  git clone -q "${sb}/origin.git" "${sb}/par" >/dev/null 2>&1
+  # par SEM origin/main: a origin dele só tem `dev`
+  git init -q --bare -b dev "${sb}/semmain.git" >/dev/null 2>&1
+  git -C "${sb}/w" push -q "${sb}/semmain.git" side:dev >/dev/null 2>&1
+  git clone -q "${sb}/semmain.git" "${sb}/par2" >/dev/null 2>&1
+  mkdir -p "${sb}/naogit"
+  # nó publicado DEPOIS do clone do par: só aparece se o helper fizer o fetch
+  git -C "${sb}/w" checkout -q -B main "${sha_main}" >/dev/null 2>&1
+  python3 - "${sb}/w/docs/g.kg.yaml" <<'PY'
+import sys
+p = sys.argv[1]
+add = "  - id: C_NOVO\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: y\n"
+s = open(p, encoding="utf-8").read().replace("edges: []\n", add + "edges: []\n")
+open(p, "w", encoding="utf-8").write(s)
+PY
+  git -C "${sb}/w" "${gq[@]}" commit -qam novo >/dev/null 2>&1
+  git -C "${sb}/w" push -q origin HEAD:main >/dev/null 2>&1
+  local sha_novo; sha_novo="$(git -C "${sb}/w" rev-parse HEAD)"
+
+  _pr() { # $1=helper · $2=par · $3=ref · demais = env → ecoa o rc; a saída fica em last.out
+    local h="$1" p="$2" r="$3"; shift 3
+    local rc=0; env "$@" bash "${h}" "${p}" "${r}" >"${sb}/last.out" 2>&1 || rc=$?; printf '%s' "${rc}"; }
+  local KQ="ONION_KG_QUERY=${REPO_ROOT}/vendor/kg-ssot/tools/kg_query.py"
+  local r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 out
+
+  r1="$(_pr "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_X_2' "${KQ}")"; out="$(cat "${sb}/last.out")"
+  if [ "${r1}" = 0 ] && grep -q "@ ${sha_novo}" <<< "${out}" && [ "$(wc -l <<< "${out}")" -eq 1 ]; then
+    record_pass "peer-ref: (a) nó que existe → rc 0, uma linha, com o sha da origin/main medida (a de DEPOIS do fetch)"
+  else record_fail "peer-ref: (a)" "rc=${r1} saída: ${out:0:200}"; fi
+
+  r2="$(_pr "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_X' "${KQ}")"
+  if [ "${r2}" = 1 ]; then record_pass "peer-ref: (b) C_X quando só existe C_X_2 → rc 1 (id exato, não prefixo)"
+  else record_fail "peer-ref: (b)" "rc=${r2}: $(cat "${sb}/last.out")"; fi
+
+  r3="$(_pr "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_X' "ONION_KG_QUERY=${sb}/nao-ha/kg_query.py")"
+  r4="$(_pr "${sut}" "${sb}/par" 'docs/g.kg.yaml#C_X_2' "ONION_KG_QUERY=${sb}/nao-ha/kg_query.py")"
+  if [ "${r3}" = 1 ] && [ "${r4}" = 0 ]; then record_pass "peer-ref: (c) sem o produto, o PyYAML julga igual (C_X → 1, C_X_2 → 0)"
+  else record_fail "peer-ref: (c)" "rc C_X/C_X_2 pelo PyYAML = ${r3}/${r4}; esperado 1/0"; fi
+
+  r5="$(_pr "${sut}" "${sb}/par" 'docs/ausente.kg.yaml#C_X_2' "${KQ}")"
+  r6="$(_pr "${sut}" "${sb}/par" 'README.md' "${KQ}")"
+  r7="$(_pr "${sut}" "${sb}/par" 'NAO-EXISTE.md' "${KQ}")"
+  if [ "${r5}" = 1 ] && [ "${r6}" = 0 ] && [ "${r7}" = 1 ]; then
+    record_pass "peer-ref: (d) grafo ausente → 1 · arquivo sem # que existe → 0 · arquivo ausente → 1"
+  else record_fail "peer-ref: (d)" "rc ausente#/README/ausente = ${r5}/${r6}/${r7}; esperado 1/0/1"; fi
+
+  r8="$(_pr "${sut}" "${sb}/par" "${sha_main:0:10}" "${KQ}")"
+  r9="$(_pr "${sut}" "${sb}/par" "${sha_side}" "${KQ}")"
+  if [ "${r8}" = 0 ] && [ "${r9}" = 1 ] && grep -q 'NÃO ANCESTRAL' "${sb}/last.out"; then
+    record_pass "peer-ref: (e) sha ancestral da origin/main → 0 · sha que só está numa branch → 1 (NÃO ANCESTRAL)"
+  else record_fail "peer-ref: (e)" "rc ancestral/branch = ${r8}/${r9}; esperado 0/1: $(cat "${sb}/last.out")"; fi
+
+  r10="$(_pr "${sut}" "${sb}/par2" 'README.md' "${KQ}")"
+  r11="$(_pr "${sut}" "${sb}/naogit" 'README.md' "${KQ}")"
+  if [ "${r10}" = 2 ] && [ "${r11}" = 2 ]; then record_pass "peer-ref: (f) par sem origin/main → 2 · par que não é repo git → 2 (NÃO MEDIU, nunca 'não existe')"
+  else record_fail "peer-ref: (f)" "rc sem-main/não-git = ${r10}/${r11}; esperado 2/2"; fi
+
+  local lixo="" l rl
+  for l in 'docs/g.kg.yaml#' '#C_X_2' 'README.md#C_X_2' '-x' 'docs/g.kg.yaml#C X' '../fora.md' '/etc/passwd'; do
+    rl="$(_pr "${sut}" "${sb}/par" "${l}" "${KQ}")"; [ "${rl}" = 2 ] || lixo="${lixo} [${l}]=${rl}"
+  done
+  rl=0; bash "${sut}" "${sb}/par" >/dev/null 2>&1 || rl=$?; [ "${rl}" = 2 ] || lixo="${lixo} [1-arg]=${rl}"
+  if [ -z "${lixo}" ]; then record_pass "peer-ref: (g) argumento malformado (id vazio, sem caminho, # fora de grafo, '-x', espaço, '..', absoluto, 1 arg) → 2"
+  else record_fail "peer-ref: (g)" "não saiu 2:${lixo}"; fi
+
+  # (MUT-a) grep por PREFIXO no lugar do parser → o caso (b) TEM de reprovar (C_X casaria C_X_2)
+  local mut="${sb}/mut-grep.sh"
+  awk '/^command -v python3 >\/dev\/null 2>&1 \|\| _nao_mediu "python3 ausente/ {
+         print "if git -C \"${PAR}\" show \"${MAIN}:${P}\" | grep -q \"id: ${ID}\"; then _out \"EXISTE — mutante\"; exit 0; else _out \"NÃO EXISTE — mutante\"; exit 1; fi" }
+       { print }' "${sut}" > "${mut}"
+  if ! grep -q 'mutante' "${mut}"; then record_fail "peer-ref: (MUT-a) setup" "a âncora do parser não foi achada — a mutação não aplicou"
+  else
+    rl="$(_pr "${mut}" "${sb}/par" 'docs/g.kg.yaml#C_X' "${KQ}")"
+    if [ "${rl}" = 0 ]; then record_pass "peer-ref: (MUT-a) grep por prefixo no lugar do parser dá C_X → 0 — (b) mede o parser"
+    else record_fail "peer-ref: (MUT-a)" "o mutante não confundiu o prefixo (rc=${rl}) — (b) não prova nada"; fi
+  fi
+  # (MUT-b) sem o merge-base (só 'é commit') → o sha da branch passaria: (e) mede a ancestralidade
+  sed 's/git -C "${PAR}" merge-base --is-ancestor "${full}" "${MAIN}" 2>\/dev\/null || arc=\$?/: mutante/' "${sut}" > "${sb}/mut-anc.sh"
+  if ! grep -q ': mutante' "${sb}/mut-anc.sh"; then record_fail "peer-ref: (MUT-b) setup" "a âncora do merge-base não foi achada"
+  else
+    rl="$(_pr "${sb}/mut-anc.sh" "${sb}/par" "${sha_side}" "${KQ}")"
+    if [ "${rl}" = 0 ]; then record_pass "peer-ref: (MUT-b) sem o merge-base o sha da branch vira 0 — (e) mede a ancestralidade"
+    else record_fail "peer-ref: (MUT-b)" "o mutante não deixou passar (rc=${rl})"; fi
+  fi
+  # (h) origin/main local DEFASADA: com o fetch o nó novo existe; o mutante sem fetch não o vê
+  git clone -q "${sb}/origin.git" "${sb}/par3" >/dev/null 2>&1
+  git -C "${sb}/par3" update-ref refs/remotes/origin/main "${sha_main}" >/dev/null 2>&1
+  local rf rnf
+  rf="$(_pr "${sut}" "${sb}/par3" 'docs/g.kg.yaml#C_NOVO' "${KQ}")"
+  git -C "${sb}/par3" update-ref refs/remotes/origin/main "${sha_main}" >/dev/null 2>&1
+  sed 's/^GIT_TERMINAL_PROMPT=0 git -C "${PAR}" fetch -q origin .*$/: mutante/' "${sut}" > "${sb}/mut-fetch.sh"
+  rnf="$(_pr "${sb}/mut-fetch.sh" "${sb}/par3" 'docs/g.kg.yaml#C_NOVO' "${KQ}")"
+  if [ "${rf}" = 0 ] && [ "${rnf}" = 1 ] && grep -q '^: mutante$' "${sb}/mut-fetch.sh"; then
+    record_pass "peer-ref: (h) origin/main local defasada: com o fetch o nó novo → 0; o mutante (MUT-c) sem fetch → 1"
+  else record_fail "peer-ref: (h)" "rc com fetch/sem fetch = ${rf}/${rnf}; esperado 0/1"; fi
+  unset -f _pr
+  rm -rf "${sb}"
+}
+
 # ── A CURA DA MORTE DO WORKER TEM BANCADA (senão é fé) ────────────────────────────────────────
 # Uma cura de ambiente é a mais fácil de perder: some numa refatoração e ninguém nota até o CI
 # morrer de novo, quatro reprovações depois. Este caso prende o mecanismo.
@@ -36147,6 +36272,7 @@ _family run_role_vocabulary_selftests
 _family run_kg_edit_confirmed_selftests
 _family run_kg_read_leg_selftests
 _family run_kg_trace_root_file_selftests
+_family run_peer_ref_check_selftests
 _family run_sandbox_gc_selftests
 _family run_family_topology_selftests
 _family run_decouple_source_selftests

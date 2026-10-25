@@ -5,7 +5,7 @@ category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
 version: "1.4.0"
 updated: "2026-07-16"
-allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(git fetch origin*) Bash(git pull --ff-only*) Bash(git merge --ff-only origin/main*) Bash(bash .claude/validation/onion-version.sh)
+allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(git fetch origin*) Bash(git pull --ff-only*) Bash(git merge --ff-only origin/main*) Bash(bash .claude/validation/onion-version.sh) Bash(bash .claude/validation/peer-ref-check.sh *)
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 ---
 
@@ -126,6 +126,7 @@ O rascunho nasce **no repo desta sessão** (ou como entrega-sem-commit) — I3 i
 - **Um escritor por repo.** Esta sessão escreve só neste repo; nunca pusha em repo alheio (cobertura de
   ponta adormecida = commit isolado no repo coberto + log de quem fez).
 - **`git fetch` antes de evoluir** (outra instância pode ter mexido — ver lição stale-branch).
+- **Conferir antes de citar o par:** ref, nó ou selo do par só se cita depois de `bash .claude/validation/peer-ref-check.sh <par> <caminho>[#<ID>]|<sha>` (rc 0 existe na origin/main dele · 1 não existe · 2 não mediu).
 - **Você (humano) é o maestro** que roteia mensagens entre repos e decide ordem de merge.
 
 ## Passo 5 — Gerenciar (opcional, sob confirmação)

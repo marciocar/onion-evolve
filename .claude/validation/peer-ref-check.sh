@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# peer-ref-check.sh — antes de CITAR uma ref ou um selo do par, confere que ela existe na origin/main DELE.
+#
+# ═══ POR QUE EXISTE (2026-10-25) ═══
+# A curadoria auditou 114 mensagens entre sessões (53 recebidas, 61 enviadas, codificadas por um agente separado
+# pelo codebook pré-registrado): 97 afirmações checáveis, 54 conferidas, e 22 AGIDAS SEM CONFERÊNCIA — entre elas
+# selos citados antes de existirem na main do par. De tudo o que o estudo propôs, só esta peça passou no critério
+# de recorrência medida (2 ou mais); o resto ficou doutrina (D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025,
+# em docs/onion/graph/sinais-de-campo-2026-09.kg.yaml).
+# É a COSTURA do `integrity.dangling-external` do kg-ssot: aquele confere a ponta `<caminho>#<id>` só contra o
+# corpus LOCAL; o que a sessão cita do par mora no repo do par, e lá ninguém conferia. O comando de referência é
+# o que a sessão já fazia à mão (`git show origin/main:<caminho>`, `git merge-base --is-ancestor`), com o rc
+# trocando a prosa: quem consome lê o rc, nunca a frase.
+#
+# O nó é lido pelo PARSER DO PRODUTO (`kg_query.py --id`, id exato), nunca por grep: `C_X` não pode casar
+# `C_X_2`. Sem o produto ao lado, PyYAML; sem nenhum dos dois, NÃO MEDIU (rc 2), nunca "existe".
+#
+# Uso : bash .claude/validation/peer-ref-check.sh <repo-do-par> <ref>
+#       <ref> = <caminho>.kg.yaml#<ID> (ou .kg.json#<ID)  → o arquivo existe na origin/main E o nó `id: <ID>` está nele
+#             = <caminho>                                  → o arquivo existe na origin/main
+#             = <sha> (7 a 40 hex)                         → é commit E é ancestral da origin/main
+# Antes de medir: `git -C <par> fetch -q origin` (a origin/main de ontem não é a de agora).
+# Saída: uma linha em pt-BR, com o sha da origin/main medida.
+# Exit: 0 = existe / é ancestral · 1 = não existe / não é ancestral (a linha diz qual) ·
+#       2 = NÃO MEDIU (o par não é repo git, o fetch falhou, origin/main ausente, argumento malformado,
+#           grafo ilegível ou sem parser)
+# Env : ONION_KG_QUERY — caminho do kg_query.py (default: o vendor kg-ssot deste repo).
+set -euo pipefail
+
+_out() { printf 'peer-ref-check: %s\n' "$*"; }
+_nao_mediu() { _out "NÃO MEDIU — $*"; exit 2; }
+
+[ "$#" -eq 2 ] || _nao_mediu "uso: peer-ref-check.sh <repo-do-par> <ref> (recebi $# argumento(s))"
+PAR="$1"; REF="$2"
+[ -n "${PAR}" ] && [ -n "${REF}" ] || _nao_mediu "argumento vazio"
+case "${REF}" in -*|*[[:space:]]*|*[[:cntrl:]]*) _nao_mediu "ref malformada: começa com '-' ou tem espaço/controle" ;; esac
+
+git -C "${PAR}" rev-parse --git-dir >/dev/null 2>&1 || _nao_mediu "o par não é repo git: ${PAR}"
+GIT_TERMINAL_PROMPT=0 git -C "${PAR}" fetch -q origin >/dev/null 2>&1 || _nao_mediu "o fetch da origin do par falhou (${PAR})"
+MAIN="$(git -C "${PAR}" rev-parse --verify -q 'refs/remotes/origin/main^{commit}' 2>/dev/null)" \
+  || _nao_mediu "o par não tem origin/main depois do fetch (${PAR})"
+AT="na origin/main do par @ ${MAIN}"
+
+# ── <sha> ──────────────────────────────────────────────────────────────────────────────────────
+if [[ "${REF}" =~ ^[0-9a-f]{7,40}$ ]]; then
+  full="$(git -C "${PAR}" rev-parse --verify -q "${REF}^{commit}" 2>/dev/null)" \
+    || { _out "NÃO EXISTE — ${REF} não é commit conhecido no par (${AT})"; exit 1; }
+  arc=0; git -C "${PAR}" merge-base --is-ancestor "${full}" "${MAIN}" 2>/dev/null || arc=$?
+  case "${arc}" in
+    0) _out "ANCESTRAL — ${REF} (${full}) está ${AT}"; exit 0 ;;
+    1) _out "NÃO ANCESTRAL — ${REF} (${full}) é commit do par mas NÃO está ${AT} (só noutra branch, ou ainda não entrou)"; exit 1 ;;
+    *) _nao_mediu "merge-base --is-ancestor saiu rc=${arc} para ${REF}" ;;
+  esac
+fi
+
+# ── <caminho>[#<ID>] ───────────────────────────────────────────────────────────────────────────
+ID=""; P="${REF}"
+if [[ "${REF}" == *"#"* ]]; then
+  P="${REF%%#*}"; ID="${REF#*#}"
+  [ -n "${P}" ] && [ -n "${ID}" ] || _nao_mediu "ref malformada: '${REF}' (esperado <caminho>.kg.yaml#<ID>)"
+  [[ "${ID}" =~ ^[A-Za-z0-9_.:-]+$ ]] || _nao_mediu "id malformado: '${ID}'"
+  case "${P}" in *.kg.yaml|*.kg.json) ;; *) _nao_mediu "'#<ID>' só vale em grafo (.kg.yaml/.kg.json): '${P}'" ;; esac
+fi
+while [[ "${P}" == ./* ]]; do P="${P#./}"; done
+case "${P}" in /*|""|*/../*|../*|*/..) _nao_mediu "caminho malformado: '${P}' (relativo à raiz do par, sem '..')" ;; esac
+
+typ="$(git -C "${PAR}" cat-file -t "${MAIN}:${P}" 2>/dev/null)" || typ=""
+case "${typ}" in
+  blob) ;;
+  "") _out "NÃO EXISTE — o arquivo ${P} não está ${AT}"; exit 1 ;;
+  *) _out "NÃO EXISTE — ${P} ${AT} é ${typ}, não arquivo"; exit 1 ;;
+esac
+[ -n "${ID}" ] || { _out "EXISTE — o arquivo ${P} está ${AT}"; exit 0; }
+
+command -v python3 >/dev/null 2>&1 || _nao_mediu "python3 ausente: sem parser para ler o nó"
+TMP="$(mktemp -d)"; trap 'rm -rf "${TMP}"' EXIT
+G="${TMP}/peer.kg.${P##*.kg.}"   # a extensão vai junto: o parser escolhe YAML ou JSON por ela
+git -C "${PAR}" show "${MAIN}:${P}" > "${G}" 2>/dev/null || _nao_mediu "não consegui ler ${P} da origin/main do par"
+
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+KQ="${ONION_KG_QUERY:-${SELF}/vendor/kg-ssot/tools/kg_query.py}"
+vrc=0
+if [ -f "${KQ}" ]; then
+  # o PRODUTO lê: rc dele, JSON dele; `unreadable` não vazio = grafo ilegível = não mediu
+  python3 -I -B "${KQ}" --id "${ID}" --format json "${G}" > "${TMP}/q.json" 2>/dev/null || _nao_mediu "kg_query.py falhou ao ler ${P}"
+  python3 -I -B - "${TMP}/q.json" "${ID}" <<'PY' || vrc=$?
+import json, sys
+try:
+    d = json.load(open(sys.argv[1], encoding="utf-8"))
+except (OSError, ValueError):
+    sys.exit(2)
+if d.get("unreadable"):
+    sys.exit(2)
+ids = [n.get("id") for n in d.get("nodes", []) if isinstance(n, dict)]
+sys.exit(0 if sys.argv[2] in ids else 1)
+PY
+  VIA="kg_query.py"
+else
+  python3 -I -B - "${G}" "${ID}" <<'PY' || vrc=$?
+import json, sys
+p, want = sys.argv[1], sys.argv[2]
+try:
+    if p.endswith(".json"):
+        d = json.load(open(p, encoding="utf-8"))
+    else:
+        import yaml
+        d = yaml.safe_load(open(p, encoding="utf-8"))
+except Exception:
+    sys.exit(2)
+nodes = d.get("nodes") if isinstance(d, dict) else None
+if not isinstance(nodes, list):
+    sys.exit(2)
+sys.exit(0 if any(isinstance(n, dict) and n.get("id") == want for n in nodes) else 1)
+PY
+  VIA="PyYAML"
+fi
+case "${vrc}" in
+  0) _out "EXISTE — o nó ${ID} está em ${P} ${AT} (lido por ${VIA})"; exit 0 ;;
+  1) _out "NÃO EXISTE — o arquivo ${P} está ${AT}, mas o nó ${ID} não (id exato, lido por ${VIA})"; exit 1 ;;
+  *) _nao_mediu "o grafo ${P} ${AT} está ilegível para ${VIA} (ou PyYAML ausente)" ;;
+esac
