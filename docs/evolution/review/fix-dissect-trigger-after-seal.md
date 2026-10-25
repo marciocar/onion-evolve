@@ -2,7 +2,8 @@
 branch: fix/dissect-trigger-after-seal
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: aae6a09061518f2a27aad3a0e937a2e9dc895a5f7fee8a7fb039472b33fa00ec
+reviewed_code_sha256: 0ce78164b31ff0b958e7a0a32a8819102e35f80ba9f7b6dc063813d51ef8a84f
 findings_total: 1
 findings_real: 1
 tokens: 0
