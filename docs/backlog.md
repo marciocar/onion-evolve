@@ -926,6 +926,15 @@
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
+## sinais-de-campo-2026-09 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.0 | `Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025` | sinais-de-campo-2026-09 | Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja to |
+| 4.5 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
+| 3.0 | `Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA` | sinais-de-campo-2026-09 | O workflow do protótipo vira motor do /meta:dissect? Gatilho: 1 objeto decisório a mais rodado nos dois braços com o protocolo  |
+| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
+
 ## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1020,15 +1029,6 @@
 |--:|---|---|---|
 | 6.0 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024` | radar-E3-2026-10-24-r18 | o SDK do bridge deve subir para 0.3.310, pela compactação não interativa das linhas 6 e 11, e o pin do revisor do CI para v1.0. |
 | 1.2 | `Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024` | radar-E3-2026-10-24-r18 | a SAC-239 deve fechar com o revisor provado num PR com a label review:ia, ou com a metade do revisor declarada como pin sem execu |
-
-## sinais-de-campo-2026-09 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.0 | `Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025` | sinais-de-campo-2026-09 | Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja to |
-| 4.5 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
-| 3.0 | `Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA` | sinais-de-campo-2026-09 | O workflow do protótipo vira motor do /meta:dissect? Gatilho: 1 objeto decisório a mais rodado nos dois braços com o protocolo  |
-| 2.8 | `Q_HUB_1019_BACKLOG_COM_GATILHO` | sinais-de-campo-2026-09 | U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro |
 
 ## vexa-2026-10 — 2 item(ns)
 
