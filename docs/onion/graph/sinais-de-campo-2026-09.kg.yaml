@@ -668,6 +668,39 @@ nodes:
     confidence: 0.5
     label: "Quanto a federação de hoje depende do runtime do Claude Code (hooks, harness, moat-judge) e o que falta para uma sessão Codex, ou de outro agente, falar e ouvir pelo canal entre sessões?"
     narrative: "Estudo aberto por decisão do maestro em 2026-10-25 («Abrir, junto com a curadoria»): a curadoria conduz a dissecação com Etapa 0 própria; o core entrega o estado medido e sela no fim. É o porquê que o maestro deu depois da dissecação do A2A como produto. Fecha com o sinal da curadoria lido e o veredito selado pelo maestro."
+  - id: E_SINAL_CANAL_NEUTRO_DO_AGENTE_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-25"
+    verified_against: "o sinal lido inteiro (103 linhas) e a medição do core enviada como CORE-STATE: o fio e as guardas do a2a-live são scripts; o aviso (hook de SessionStart) e a triagem (/meta:co-*) são o que depende do Claude Code"
+    trace: "docs/evolution/inbox/_processed/2026-10-25-proposal-agent-neutral-channel.md"
+    label: "A curadoria propôs parquear o canal entre sessões neutro do agente: o fio e a guarda já são neutros, o acoplamento está no aviso e na triagem, e o gatilho é um ida-e-volta medido com uma sessão que não seja Claude"
+    narrative: "Estudo SAC-248 da curadoria, placar 5 de 10, frágil porque o ponto da via de bilhetagem não foi verificado. O a2a-live só envia ao onion-codex, que é standalone e vetado como receptor, então o ida-e-volta passaria pelo git-async ou pelo local. O MCP Agent Mail supera em parte, na coordenação local entre Claude, Codex e Gemini, mas não no canal gated entre organizações."
+    provenance:
+      source: "onion-curation, sinal relayado sem commit ao inbox do core"
+      locator: "docs/evolution/inbox/_processed/2026-10-25-proposal-agent-neutral-channel.md; no adotante, docs/evolution/dissect/agent-neutral-channel-2026-10/ (PRs #83 e #85 do onion-curation)"
+      method: "medição: leitura do sinal inteiro, conferida contra o estado medido que o core enviou"
+      locality: "repo"
+  - id: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-25"
+    verified_against: "decisão do maestro em 2026-10-25, em duas perguntas com opções: à proposta de parquear respondeu «E se fosse montar um serviço e usar como MCP?», e à pergunta seguinte escolheu o estudo com a curadoria «mas como MCP ou algo mais usado pela comunidade ou emergente»"
+    label: "O canal neutro do agente não fica parqueado: vira estudo com a curadoria do transporte entre sessões de fornecedores diferentes (MCP local sobre os scripts, MCP Agent Mail, A2A com SDK oficial, ACP ou o que a trajetória mostrar mais adotado)"
+    narrative: "Linhas vermelhas que o core leva à régua: o aceite humano não vira ferramenta que o modelo chama sozinho (RFC-0004 §4); a chave privada de cada membro não mora em servidor central; assinatura por mensagem, pinagem de chave e gate de topologia não regridem. O dissect:N2 natural é o ida-e-volta medido Claude ↔ Codex pela opção vencedora. Descartadas: «Parquear com gatilho» (a proposta), «Parquear e anotar o MCP no gatilho» e «Protótipo direto no core». O D_AGENT_NEUTRAL_CHANNEL_VERDICT da curadoria fecha como perseguir: estudo, apontando este nó."
+    provenance:
+      source: "maestro, na sessão do core"
+      locator: "perguntas com opções de 2026-10-25 sobre o D_AGENT_NEUTRAL_CHANNEL_VERDICT e sobre o canal como serviço MCP"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -782,4 +815,10 @@ edges:
     edge_type: TRACES_TO
   - from: Q_CANAL_ENTRE_SESSOES_NEUTRO_DO_AGENTE_1025
     to: D_A2A_PRODUTO_PARQUEADO_COM_GATILHO_1025
+    edge_type: TRACES_TO
+  - from: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
+    to: E_SINAL_CANAL_NEUTRO_DO_AGENTE_1025
+    edge_type: TRACES_TO
+  - from: D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025
+    to: Q_CANAL_ENTRE_SESSOES_NEUTRO_DO_AGENTE_1025
     edge_type: TRACES_TO
