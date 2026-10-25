@@ -28,17 +28,17 @@
 set -euo pipefail
 
 _out() { printf 'peer-ref-check: %s\n' "$*"; }
-_nao_mediu() { _out "NÃO MEDIU — $*"; exit 2; }
+_unmeasured() { _out "NÃO MEDIU — $*"; exit 2; }
 
-[ "$#" -eq 2 ] || _nao_mediu "uso: peer-ref-check.sh <repo-do-par> <ref> (recebi $# argumento(s))"
+[ "$#" -eq 2 ] || _unmeasured "uso: peer-ref-check.sh <repo-do-par> <ref> (recebi $# argumento(s))"
 PAR="$1"; REF="$2"
-[ -n "${PAR}" ] && [ -n "${REF}" ] || _nao_mediu "argumento vazio"
-case "${REF}" in -*|*[[:space:]]*|*[[:cntrl:]]*) _nao_mediu "ref malformada: começa com '-' ou tem espaço/controle" ;; esac
+[ -n "${PAR}" ] && [ -n "${REF}" ] || _unmeasured "argumento vazio"
+case "${REF}" in -*|*[[:space:]]*|*[[:cntrl:]]*) _unmeasured "ref malformada: começa com '-' ou tem espaço/controle" ;; esac
 
-git -C "${PAR}" rev-parse --git-dir >/dev/null 2>&1 || _nao_mediu "o par não é repo git: ${PAR}"
-GIT_TERMINAL_PROMPT=0 git -C "${PAR}" fetch -q origin >/dev/null 2>&1 || _nao_mediu "o fetch da origin do par falhou (${PAR})"
+git -C "${PAR}" rev-parse --git-dir >/dev/null 2>&1 || _unmeasured "o par não é repo git: ${PAR}"
+GIT_TERMINAL_PROMPT=0 git -C "${PAR}" fetch -q origin >/dev/null 2>&1 || _unmeasured "o fetch da origin do par falhou (${PAR})"
 MAIN="$(git -C "${PAR}" rev-parse --verify -q 'refs/remotes/origin/main^{commit}' 2>/dev/null)" \
-  || _nao_mediu "o par não tem origin/main depois do fetch (${PAR})"
+  || _unmeasured "o par não tem origin/main depois do fetch (${PAR})"
 AT="na origin/main do par @ ${MAIN}"
 
 # ── <sha> ──────────────────────────────────────────────────────────────────────────────────────
@@ -49,7 +49,7 @@ if [[ "${REF}" =~ ^[0-9a-f]{7,40}$ ]]; then
   case "${arc}" in
     0) _out "ANCESTRAL — ${REF} (${full}) está ${AT}"; exit 0 ;;
     1) _out "NÃO ANCESTRAL — ${REF} (${full}) é commit do par mas NÃO está ${AT} (só noutra branch, ou ainda não entrou)"; exit 1 ;;
-    *) _nao_mediu "merge-base --is-ancestor saiu rc=${arc} para ${REF}" ;;
+    *) _unmeasured "merge-base --is-ancestor saiu rc=${arc} para ${REF}" ;;
   esac
 fi
 
@@ -57,12 +57,12 @@ fi
 ID=""; P="${REF}"
 if [[ "${REF}" == *"#"* ]]; then
   P="${REF%%#*}"; ID="${REF#*#}"
-  [ -n "${P}" ] && [ -n "${ID}" ] || _nao_mediu "ref malformada: '${REF}' (esperado <caminho>.kg.yaml#<ID>)"
-  [[ "${ID}" =~ ^[A-Za-z0-9_.:-]+$ ]] || _nao_mediu "id malformado: '${ID}'"
-  case "${P}" in *.kg.yaml|*.kg.json) ;; *) _nao_mediu "'#<ID>' só vale em grafo (.kg.yaml/.kg.json): '${P}'" ;; esac
+  [ -n "${P}" ] && [ -n "${ID}" ] || _unmeasured "ref malformada: '${REF}' (esperado <caminho>.kg.yaml#<ID>)"
+  [[ "${ID}" =~ ^[A-Za-z0-9_.:-]+$ ]] || _unmeasured "id malformado: '${ID}'"
+  case "${P}" in *.kg.yaml|*.kg.json) ;; *) _unmeasured "'#<ID>' só vale em grafo (.kg.yaml/.kg.json): '${P}'" ;; esac
 fi
 while [[ "${P}" == ./* ]]; do P="${P#./}"; done
-case "${P}" in /*|""|*/../*|../*|*/..) _nao_mediu "caminho malformado: '${P}' (relativo à raiz do par, sem '..')" ;; esac
+case "${P}" in /*|""|*/../*|../*|*/..) _unmeasured "caminho malformado: '${P}' (relativo à raiz do par, sem '..')" ;; esac
 
 typ="$(git -C "${PAR}" cat-file -t "${MAIN}:${P}" 2>/dev/null)" || typ=""
 case "${typ}" in
@@ -72,17 +72,17 @@ case "${typ}" in
 esac
 [ -n "${ID}" ] || { _out "EXISTE — o arquivo ${P} está ${AT}"; exit 0; }
 
-command -v python3 >/dev/null 2>&1 || _nao_mediu "python3 ausente: sem parser para ler o nó"
+command -v python3 >/dev/null 2>&1 || _unmeasured "python3 ausente: sem parser para ler o nó"
 TMP="$(mktemp -d)"; trap 'rm -rf "${TMP}"' EXIT
 G="${TMP}/peer.kg.${P##*.kg.}"   # a extensão vai junto: o parser escolhe YAML ou JSON por ela
-git -C "${PAR}" show "${MAIN}:${P}" > "${G}" 2>/dev/null || _nao_mediu "não consegui ler ${P} da origin/main do par"
+git -C "${PAR}" show "${MAIN}:${P}" > "${G}" 2>/dev/null || _unmeasured "não consegui ler ${P} da origin/main do par"
 
 SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 KQ="${ONION_KG_QUERY:-${SELF}/vendor/kg-ssot/tools/kg_query.py}"
 vrc=0
 if [ -f "${KQ}" ]; then
   # o PRODUTO lê: rc dele, JSON dele; `unreadable` não vazio = grafo ilegível = não mediu
-  python3 -I -B "${KQ}" --id "${ID}" --format json "${G}" > "${TMP}/q.json" 2>/dev/null || _nao_mediu "kg_query.py falhou ao ler ${P}"
+  python3 -I -B "${KQ}" --id "${ID}" --format json "${G}" > "${TMP}/q.json" 2>/dev/null || _unmeasured "kg_query.py falhou ao ler ${P}"
   python3 -I -B - "${TMP}/q.json" "${ID}" <<'PY' || vrc=$?
 import json, sys
 try:
@@ -117,5 +117,5 @@ fi
 case "${vrc}" in
   0) _out "EXISTE — o nó ${ID} está em ${P} ${AT} (lido por ${VIA})"; exit 0 ;;
   1) _out "NÃO EXISTE — o arquivo ${P} está ${AT}, mas o nó ${ID} não (id exato, lido por ${VIA})"; exit 1 ;;
-  *) _nao_mediu "o grafo ${P} ${AT} está ilegível para ${VIA} (ou PyYAML ausente)" ;;
+  *) _unmeasured "o grafo ${P} ${AT} está ilegível para ${VIA} (ou PyYAML ausente)" ;;
 esac
