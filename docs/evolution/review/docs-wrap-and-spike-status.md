@@ -2,7 +2,8 @@
 branch: docs/wrap-and-spike-status
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b121ff947486015614ae743762be4508e3310af18b09bccd60cbb63fc83d1fc9
+reviewed_code_sha256: 7603c7a87ab9a9574bca43fc37b02d57bf75eb8845bb0047d15eb4b711e66550
 findings_total: 1
 findings_real: 1
 tokens: 0
