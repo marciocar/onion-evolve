@@ -241,6 +241,9 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
   nó do selo. O ponteiro é opaco, porque o checador não lê outro repo. Veredito fechado sem esse ponteiro sai
   `veredito-selado`, e ponteiro fora da forma sai `selo-mal-formado`. Nasceu do 1º selo do core sobre um estudo
   de adotante (2026-10-25): sem o campo, o estudo não tinha como registrar que o destino selou.
+  No parque **já selado**, o gatilho que dispara não reprova (`gatilho-ja-disparou`): sai a linha
+  `aviso item 7 gatilho-disparou-depois-do-selo`, com rc 0, e é o sinal para o destino reabrir. Reprovar ali
+  impedia o estudo de registrar a superação que o gatilho existe para ver (achado da curadoria, 2026-10-25).
 
 **Marcadores de todo estudo por família** (além dos da §1b e do passo 5 do comando):
 `meta.x_dissect_family: <pref>` **e** uma `external_edges` `TRACES_TO` para
