@@ -2,7 +2,8 @@
 branch: docs/a2a-product-parked
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 21687d06e536bb3e424c8e5e8840b5507eb2f2c483603d3ac84aff4f16b143bf
+reviewed_code_sha256: 8f24a3e9e971b835517b767868f441cf781618d93128e332ab29612c6eadbb78
 findings_total: 2
 findings_real: 2
 tokens: 0
