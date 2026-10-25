@@ -42,9 +42,15 @@ MAIN="$(git -C "${PAR}" rev-parse --verify -q 'refs/remotes/origin/main^{commit}
 AT="na origin/main do par @ ${MAIN}"
 
 # ── <sha> ──────────────────────────────────────────────────────────────────────────────────────
-if [[ "${REF}" =~ ^[0-9a-f]{7,40}$ ]]; then
-  full="$(git -C "${PAR}" rev-parse --verify -q "${REF}^{commit}" 2>/dev/null)" \
-    || { _out "NÃO EXISTE — ${REF} não é commit conhecido no par (${AT})"; exit 1; }
+if [[ "${REF}" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+  REF="$(printf '%s' "${REF}" | tr 'A-F' 'a-f')"
+  if ! full="$(git -C "${PAR}" rev-parse --verify -q "${REF}^{commit}" 2>/dev/null)"; then
+    # prefixo AMBÍGUO (dois objetos começam assim) não é "não existe": é não mediu. Conta-se pelo
+    # --disambiguate (rc e linhas), nunca pela prosa do erro do git.
+    namb="$(git -C "${PAR}" rev-parse --disambiguate="${REF}" 2>/dev/null | wc -l)" || namb=0
+    [ "${namb}" -le 1 ] || _unmeasured "o prefixo ${REF} é ambíguo no par (${namb} objetos); cite mais dígitos"
+    _out "NÃO EXISTE — ${REF} não é commit conhecido no par (${AT})"; exit 1
+  fi
   arc=0; git -C "${PAR}" merge-base --is-ancestor "${full}" "${MAIN}" 2>/dev/null || arc=$?
   case "${arc}" in
     0) _out "ANCESTRAL — ${REF} (${full}) está ${AT}"; exit 0 ;;
