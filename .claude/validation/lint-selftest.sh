@@ -33885,6 +33885,14 @@ PY
   if [ "${r8}" = 0 ] && [ "${r9}" = 1 ] && grep -q 'NÃO ANCESTRAL' "${sb}/last.out"; then
     record_pass "peer-ref: (e) sha ancestral da origin/main → 0 · sha que só está numa branch → 1 (NÃO ANCESTRAL)"
   else record_fail "peer-ref: (e)" "rc ancestral/branch = ${r8}/${r9}; esperado 0/1: $(cat "${sb}/last.out")"; fi
+  # (e2) o SELO CITADO ANTES DE EXISTIR (o caso medido pela curadoria): sha que o par nunca teve → 1;
+  #      e o mesmo sha ancestral em MAIÚSCULAS segue sha (não cai no ramo de caminho)
+  local re1 re2
+  re1="$(_pr "${sut}" "${sb}/par" '0123456789abcdef0123456789abcdef01234567' "${KQ}")"
+  re2="$(_pr "${sut}" "${sb}/par" "$(printf '%s' "${sha_main:0:12}" | tr 'a-f' 'A-F')" "${KQ}")"
+  if [ "${re1}" = 1 ] && [ "${re2}" = 0 ]; then
+    record_pass "peer-ref: (e2) sha que o par nunca teve (selo citado antes de existir) → 1 · sha em maiúsculas → 0"
+  else record_fail "peer-ref: (e2)" "rc nunca-existiu/maiúsculas = ${re1}/${re2}; esperado 1/0"; fi
 
   r10="$(_pr "${sut}" "${sb}/par2" 'README.md' "${KQ}")"
   r11="$(_pr "${sut}" "${sb}/naogit" 'README.md' "${KQ}")"
@@ -33901,7 +33909,7 @@ PY
 
   # (MUT-a) grep por PREFIXO no lugar do parser → o caso (b) TEM de reprovar (C_X casaria C_X_2)
   local mut="${sb}/mut-grep.sh"
-  awk '/^command -v python3 >\/dev\/null 2>&1 \|\| _nao_mediu "python3 ausente/ {
+  awk '/^command -v python3 >\/dev\/null 2>&1 \|\| _unmeasured "python3 ausente/ {
          print "if git -C \"${PAR}\" show \"${MAIN}:${P}\" | grep -q \"id: ${ID}\"; then _out \"EXISTE — mutante\"; exit 0; else _out \"NÃO EXISTE — mutante\"; exit 1; fi" }
        { print }' "${sut}" > "${mut}"
   if ! grep -q 'mutante' "${mut}"; then record_fail "peer-ref: (MUT-a) setup" "a âncora do parser não foi achada — a mutação não aplicou"
