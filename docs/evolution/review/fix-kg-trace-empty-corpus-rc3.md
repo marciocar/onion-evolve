@@ -2,7 +2,8 @@
 branch: fix/kg-trace-empty-corpus-rc3
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: dad9a2e62975d0a6c5f16bb83f9bc8bf58e4ad6c1ea69afe33e9728d1fb5a44b
+reviewed_code_sha256: 59dd367bb68b1dbaa3adba08dcd88b8c7dfc34b1b5069bf47b6f6753fdef6f7d
 findings_total: 1
 findings_real: 1
 tokens: 0
