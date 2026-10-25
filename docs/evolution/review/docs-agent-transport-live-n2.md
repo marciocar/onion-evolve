@@ -2,7 +2,8 @@
 branch: docs/agent-transport-live-n2
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 41c8c609b09aa287f1110da37bfc87587d8e9bf123ebf7c041a0b97ebf20ae73
+reviewed_code_sha256: 788b902826a6516f9c940710e6941ed52955dd79497d6653fc519a6cdc984799
 findings_total: 0
 findings_real: 0
 tokens: 0
