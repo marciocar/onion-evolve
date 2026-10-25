@@ -2,7 +2,8 @@
 branch: fix/merge-verified-rebase-trail-and-draft
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 697a424c7aed99c80b326266ec2882c7d049293fe89d8293f9e9d089efd265c7
+reviewed_code_sha256: 603f898939a80b90170f85a8a920a26f2909e98bb8918096479dda08ba48a84a
 findings_total: 3
 findings_real: 1
 tokens: 0
