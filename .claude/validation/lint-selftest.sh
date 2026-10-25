@@ -44168,6 +44168,7 @@ DEC_ORF2
     }
     gv="${rv}/docs/g.kg.yaml"
     _dec_graph nomes "$(_dec_vnode D_SOLTO 'lido na rodada r99 do radar')" "$(_dec_vnode D_GLOSADO 'lido no nível dissect:N2')" \
+      "$(_dec_vnode D_EXTERNA 'conforme o critério AB12 de fora')" \
       "$(printf '  - id: T_DISSECT_N2\n    node_type: entity\n    layer: audit\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n    verified_at: "2026-10-01"\n    verified_against: "medido"\n    label: "nível 2 do dissect"\n    provenance:\n      source: "S"\n      locator: "L"\n      method: "medição: M"\n      locality: "repo"\n    x_term:\n      pref: "nível 2 do dissect"\n      notation: "N2"\n      scheme: dissect\n      lang: pt-BR')" > "${gv}"
     "${G[@]}" -C "${rv}" add docs/g.kg.yaml
     "${G[@]}" -C "${rv}" commit -q -m c1
@@ -44178,6 +44179,10 @@ DEC_ORF2
     if out="$(bash "${seal}" "${gv}" D_GLOSADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
     { [ "${rc}" -eq 0 ] && grep -q '✅ selado.* · nomes sem achado novo por kg_vocab.py$' <<< "${out}" \
       && grep -q 'dissect:N2' "${gv}"; } || _kv="${_kv} glosado-rc${rc}"
+    # o código de um sistema DE FORA, declarado nas externas do repo (.kg-ssot/vocab-externals.tsv), resolve sem termo
+    mkdir -p "${rv}/.kg-ssot"; printf '# esquema\tregex\nfora\tAB12\n' > "${rv}/.kg-ssot/vocab-externals.tsv"
+    if out="$(bash "${seal}" "${gv}" D_EXTERNA --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 0 ] || _kv="${_kv} externa-rc${rc}"
     # o grafo NÃO rastreado o lint não lê: o selo segue, e a falta é declarada (nunca "sem achado" calado)
     cp "${gv}" "${rv}/docs/novo.kg.yaml"; sed -i 's/^  id: nomes$/  id: nomes-novo/' "${rv}/docs/novo.kg.yaml"
     if out="$(bash "${seal}" "${rv}/docs/novo.kg.yaml" D_SOLTO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi

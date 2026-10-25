@@ -47,14 +47,12 @@
 #
 # Env (bancada; NUNCA em produção — o override ativo é declarado em stderr):
 #   DECIDE_SEAL_RADAR=<script>   radar alternativo (a bancada injeta um que reprova para provar o desfazer)
-#   DECIDE_SEAL_VOCAB=<script>   lint de nomes alternativo (a bancada injeta um ausente para provar a declaração)
 # Exit: 0 selado e gate verde · 2 recusado (nada escrito) · 3 escrito, gate vermelho, DESFEITO.
 # Determinístico, sem LLM. Exercitado por lint-selftest.sh (run_decide_selftests).
 # ===========================================================================
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RADAR="${DECIDE_SEAL_RADAR:-${HERE}/kg-radar.sh}"
-[ -n "${DECIDE_SEAL_VOCAB:-}" ] && echo "kg-decide-seal: ⚠️ override ativo — DECIDE_SEAL_VOCAB=${DECIDE_SEAL_VOCAB} (não é o lint de produção)" >&2
 [ -n "${DECIDE_SEAL_RADAR:-}" ] && echo "kg-decide-seal: ⚠️ override ativo — DECIDE_SEAL_RADAR=${DECIDE_SEAL_RADAR} (não é o gate de produção)" >&2
 GRAPH=""; NODE=""; NEW=""; CHOSEN=""; REJECTED=""; DATE=""; QUESTION=""; OTHER="0"; LABEL=""; LINK=""; ETYPE="TRACES_TO"; IMPACT="3"
 _need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "kg-decide-seal: $1 exige um valor" >&2; exit 2; }; }
@@ -144,13 +142,12 @@ fi
 # porquê em VOCAB_WHY (declarado no fim, nunca calado). A comparação antes×depois é só do grafo tocado.
 VOCAB_READER=""; VOCAB_WHY=""; VOCAB_REL=""; VOCAB_EXT=()
 if [ -z "${ROOT}" ]; then VOCAB_WHY="fora de repo git"
-elif [ -n "${DECIDE_SEAL_VOCAB:-}" ]; then VOCAB_READER="${DECIDE_SEAL_VOCAB}"
 elif [ -f "${ROOT}/vendor/kg-ssot/tools/kg_vocab.py" ]; then VOCAB_READER="${ROOT}/vendor/kg-ssot/tools/kg_vocab.py"
 elif [ -f "${ROOT}/tools/kg_vocab.py" ]; then VOCAB_READER="${ROOT}/tools/kg_vocab.py"
 else VOCAB_WHY="o repo não tem o kg_vocab.py (nem vendor/kg-ssot/tools nem tools/)"; fi
-if [ -n "${VOCAB_READER}" ] && [ ! -f "${VOCAB_READER}" ]; then VOCAB_WHY="leitor ausente: ${VOCAB_READER}"; VOCAB_READER=""; fi
 if [ -n "${VOCAB_READER}" ]; then
-  VOCAB_REL="$(realpath --relative-to="$(realpath -- "${ROOT}")" -- "${GRAPH}")"
+  # o caminho do grafo como o lint o escreve (relativo à raiz); python e não `realpath --relative-to`, que é só GNU
+  VOCAB_REL="$(python3 -I -c 'import os, sys; print(os.path.relpath(os.path.realpath(sys.argv[2]), os.path.realpath(sys.argv[1])))' "${ROOT}" "${GRAPH}")"
   if ! git -C "${ROOT}" ls-files --error-unmatch -- "${VOCAB_REL}" >/dev/null 2>&1; then
     VOCAB_WHY="o grafo não é rastreado pelo git (o lint lê só os rastreados; rode-o depois do git add)"; VOCAB_READER=""
   fi
@@ -164,7 +161,7 @@ if [ -n "${VOCAB_READER}" ] && [ -f "${ROOT}/.kg-ssot/vocab-externals.tsv" ]; th
 fi
 VB="$(mktemp)"; VA="$(mktemp)"
 _vocab() {  # $1=arquivo de saída: o JSON do lint sobre o corpus; rc além de 0|1 = não julgou
-  (cd "${ROOT}" && python3 -I -B "${VOCAB_READER}" lint --root . --format json "${VOCAB_EXT[@]}") > "$1" 2>/dev/null
+  (cd "${ROOT}" && python3 -I -B "${VOCAB_READER}" lint --root . --format json ${VOCAB_EXT[@]+"${VOCAB_EXT[@]}"}) > "$1" 2>/dev/null
 }
 if [ -n "${VOCAB_READER}" ]; then
   _vrc=0; _vocab "${VB}" || _vrc=$?
