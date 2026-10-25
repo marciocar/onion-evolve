@@ -543,6 +543,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_428_ADOTADA_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-25"
+    verified_against: "na branch chore/kg-ssot-4-28-0: kg_vendor.py update --tag kg-ssot-v4.28.0 (d96d807220d0, 638 arquivos) e check intacto; ops/kg-gate-ci.sh rc 0 sem --update e sem aviso de identidade (contrato segue v4.15); 188 grafos, 186 passam o MUST, os 2 da dívida herdada; a bancada pré-tag da ref 975ec28b2ef2 mediu --text e kg_prov_export sem --edges idênticos e, com --edges, as arestas lidas pelo rdflib 7.6.0 batendo com os grafos"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.28.0 (kg_prov_export --edges: toda aresta vira kg:Edge, e SUPPORTS, REFUTES e SUPERSEDES locais ganham cito:supports, cito:refutes e dcterms:replaces) entrou no core sem mudar o contrato"
+    narrative: "Versão aditiva e desligada por padrão: sem --edges a saída é a de antes. É o primeiro passo da ponte para a web semântica que o maestro pediu como extra opcional (rdflib, triplestores, SPARQL e pySHACL), fora do perfil mínimo do gate."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref 975ec28b2ef2"
+      method: "medição: atualização do vendor e gate do contrato contra o corpus rastreado"
+      locality: "repo"
   - id: E_KG_SSOT_427_ADOTADA_1025
     node_type: evidence
     layer: audit
@@ -1017,3 +1034,6 @@ edges:
   - from: D_DUOLINGO_HLR_PARQUEADO_PARA_O_FRESCOR_DO_KG_1025
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: TRACES_TO
+  - from: E_KG_SSOT_428_ADOTADA_1025
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS

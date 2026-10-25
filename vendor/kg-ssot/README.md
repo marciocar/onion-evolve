@@ -8,7 +8,7 @@ what depends on it, and your CI rejects the ones that don't.**
 **English** | [Português (Brasil)](README.pt-BR.md)
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Contract: v4 · release 4.27.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.27.0-6f42c1)](spec/release.json)
+[![Contract: v4 · release 4.28.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.28.0-6f42c1)](spec/release.json)
 [![Conformance: 438/438](https://img.shields.io/badge/conformance-438%2F438-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -80,7 +80,7 @@ The tools print in English by default and in Brazilian Portuguese when your loca
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
 | [Container](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
-| Your repository | `kg_vendor.py update --tag kg-ssot-v4.27.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
+| Your repository | `kg_vendor.py update --tag kg-ssot-v4.28.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
 
 ## A node, inside
 
@@ -172,7 +172,7 @@ flowchart LR
 | **Per-graph ratchet** | Adopt without a big-bang migration: inherited debt stays named and only shrinks |
 | **Vendor by tag** | No copy-paste, no shared code: one sha256 stamp per file |
 | **Profile-driven migrator** | `kg_migrate.py` proposes the `provenance` the contract asks for, from rules the adopter declares, shows the plan first and writes with node-by-node invariance |
-| **PROV-O bridge** | `kg_prov_export.py` exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD, for the W3C PROV ecosystem |
+| **PROV-O bridge** | `kg_prov_export.py` exports each node's provenance as `prov:Entity` and `prov:Derivation` in JSON-LD, for the W3C PROV ecosystem; `--edges` adds the edges, with `cito:supports`, `cito:refutes` and `dcterms:replaces` where a standard term exists |
 | **No platform** | Python 3.11 or later, PyYAML and jsonschema, installed with checked hashes (`--require-hashes`). No server, editor or assistant required |
 
 ## What KG-SSOT is not
@@ -186,7 +186,7 @@ flowchart LR
 
 ## Status
 
-- **Current:** contract v4, release `kg-ssot-v4.27.0`. The reference reader passes 424 of 438 cases in `latest/`.
+- **Current:** contract v4, release `kg-ssot-v4.28.0`. The reference reader passes 424 of 438 cases in `latest/`.
 - **In use:** three adopters run the gate in CI, one of them in production.
 - **Next:** v5 will fail a `method` outside the `<class>: <detail>` form, which only warns today.
 - **Open:** the semantic layer (freshness, contradiction, domain completeness) lives in `optional/`, and the reference

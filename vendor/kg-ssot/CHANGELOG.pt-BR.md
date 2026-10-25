@@ -10,6 +10,23 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.28.0] - 2026-10-25
+
+O `kg_prov_export.py --edges` exporta as arestas, com `cito:supports`, `cito:refutes` e `dcterms:replaces` onde há
+termo-padrão; sem a opção, a saída não muda. Contrato v4.15, sem mudança.
+
+### Adicionado
+
+- **`kg_prov_export.py --edges` exporta as arestas.** Por padrão, o exportador continua deixando as arestas de fora,
+  porque derivação em PROV é produção, não suporte evidencial, e a PROV não tem par para `REFUTES`. Com `--edges`, toda
+  aresta, de `edges` e de `external_edges`, vira um recurso `kg:Edge` com o tipo, as pontas e todas as chaves, e por
+  isso volta inteira a partir do RDF. Entre dois nós locais, `SUPPORTS`, `REFUTES` e `SUPERSEDES` ganham também as
+  triplas-padrão `cito:supports`, `cito:refutes` e `dcterms:replaces`. Nenhuma aresta gera `prov:wasDerivedFrom`, e
+  sem a opção a saída não muda.
+  - **Como foi medido:** contra critérios registrados antes da medição, em 213 grafos e 9.988 arestas. Todas as
+    arestas voltaram a partir do RDF lido pelo rdflib 7.6.0, todas as triplas-padrão saíram na direção certa, e o custo
+    foi de 1,7 vez o da exportação simples.
+
 ## [4.27.0] - 2026-10-25
 
 Contrato v4.15: a ponta externa pode morar numa pasta com ponto como `.github/`, e `.` e `..` seguem reprovando; o

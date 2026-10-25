@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.27.0",
+  "release": "kg-ssot-v4.28.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -1110,11 +1110,33 @@ An excerpt of the output, the node with `provenance`:
 
 What it does **not** export, on purpose:
 
-- **The edges.** `SUPPORTS`, `REFUTES`, and the others are evidence relations, and derivation in PROV is a production
-  relation. Exporting them as `wasDerivedFrom` would say something the graph does not say.
+- **The edges, by default.** `SUPPORTS`, `REFUTES`, and the others are evidence relations, and derivation in PROV is a
+  production relation. Exporting them as `wasDerivedFrom` would say something the graph does not say. With `--edges`
+  they come out in a different way, described below.
 - **The stamp as a generation time.** `verified_at` comes out as `kg:verifiedAt` (typed `xsd:date` when it is a
   date), not as `prov:generatedAtTime`: in PROV, the generation time marks when the entity came into existence, not
   when it was verified.
+
+### The edges, with `--edges`
+
+`--edges` exports every edge, from `edges` and `external_edges`, without loss and without a false derivation:
+
+- **Every edge becomes a `kg:Edge` resource.** It carries `kg:edgeType`, `kg:from`, `kg:to`, the label as
+  `rdfs:label`, and any other key (`trigger`, `x_*`) as `kg:<key>`, with the key name percent-encoded so that an `x_` key with a space still gives a valid IRI. A value that is not text goes as JSON, typed
+  `kg:json`. So any type, including the domain ones, can be rebuilt from the RDF.
+- **An external end** (`<path>#<id>`) goes as the literal `kg:fromRef` or `kg:toRef`, because the IRI of a node in
+  another graph depends on that file's `meta.id`. A missing `from` (the whole graph) goes as `kg:fromGraph true`.
+- **Between two local nodes, three types also get a standard triple:**
+  - `SUPPORTS` gets `cito:supports`, from [CiTO](https://sparontologies.github.io/cito/current/cito.html);
+  - `REFUTES` gets `cito:refutes`;
+  - `SUPERSEDES` gets `dcterms:replaces`, from [DCMI Terms](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/).
+
+  The other types get none, because PROV has no pair for any of the three and no standard term was found for the rest.
+- **No edge produces `prov:wasDerivedFrom`.**
+
+Without the option, the output is byte for byte what it was before. Before release, the mapping was measured on 213
+graphs and 9,988 edges against criteria registered in advance. Every edge was rebuilt from the RDF read by rdflib, and
+the cost was 1.7 times the plain export.
 
 The exporter does not validate the graph: run `kg_validate.py` first. `--base IRI` changes the prefix of the node IRIs
 (the default is `urn:kg-ssot:graph:`, and each node sits at `<base><meta.id>#<id>`); the `kg:` vocabulary lives at
