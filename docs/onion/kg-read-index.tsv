@@ -1548,6 +1548,7 @@ docs/evolution/inbox/_processed/2026-10-23-proposal-dissect-any-object.md	E_SINA
 docs/evolution/inbox/_processed/2026-10-25-proposal-a2a-product.md	E_SINAL_A2A_PRODUTO_PROPRIO_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-10-25-proposal-agent-neutral-channel.md	E_SINAL_CANAL_NEUTRO_DO_AGENTE_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-10-25-proposal-agent-transport.md	E_SINAL_TRANSPORTE_ENTRE_AGENTES_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-10-25-proposal-peer-protocol.md	E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
