@@ -32,6 +32,9 @@ BR="${4:-chore/onion-${OP}-${PIN}}"
 
 git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1 \
   || { echo "⚠️  ${DEST} não é repo git — commit durável pulado." >&2; exit 0; }
+# Repo SIM, raiz NÃO: um DEST dentro de outro repo faria o checkout e o commit abaixo no repo PAI
+# (incidente de 2026-10-25, no cabeçalho do assert-dest.sh). Não-repo segue pulado acima, como sempre.
+bash "$(dirname "${BASH_SOURCE[0]}")/assert-dest.sh" "${DEST}" || exit 2
 
 # Branch do commit: entra se já existe, cria a partir do HEAD atual senão. A working tree segue INTACTA
 # (só ganha ponteiro de branch + o commit) — NÃO é vendor-branch "que se usa direto".

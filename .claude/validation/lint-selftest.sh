@@ -1597,7 +1597,7 @@ _lib_beside() {  # $1 = diretorio onde o motor copiado vai rodar
 # vendor-baseline-removido (RED/MUT)) — por isso é UM helper, não dois remendos.
 _adopt_sibs_beside() {  # $1 = diretório onde o motor copiado vai rodar
   local f
-  for f in vendor-manifest.sh durable-commit.sh regen-baselines.sh regen-ssot-projections.sh; do
+  for f in vendor-manifest.sh durable-commit.sh regen-baselines.sh regen-ssot-projections.sh assert-dest.sh; do
     cp "${REPO_ROOT}/.claude/utils/adopt/${f}" "$1/" 2>/dev/null || true
   done
 }
@@ -7023,7 +7023,7 @@ run_vendor_baseline_removido_selftests() {
     printf 'cmd v%s\n' "$v" > "$d/.claude/commands/foo.md"
     printf 'meta v%s\n' "$v" > "$d/docs/meta-specs/x.md"
     cp "$vbh" "$d/.claude/utils/adopt/vendor-branch.sh"
-    cp "${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "$d/.claude/utils/adopt/"
+    cp "${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "${REPO_ROOT}/.claude/utils/adopt/assert-dest.sh" "$d/.claude/utils/adopt/"
     cp "$cov" "$d/.claude/validation/"
     cp "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "$d/.claude/validation/" 2>/dev/null || true
     printf 'meta:\n  domain: core-only\nnodes:\n  - id: E_FOREIGN_CORE_ONLY\n    node_type: evidence\n    plane: PROD\n    impact: 5\n    confidence: 0.9\n    label: "no core-only que o adotante nunca teve"\n' \
@@ -26197,6 +26197,120 @@ _family run_session_velocity_selftests
 
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 _family run_githook_selftests
+
+# ---------------------------------------------------------------------------
+# Modo adopt-dest-guard — exercita .claude/utils/adopt/assert-dest.sh e os chamadores dele.
+#
+# POR QUE EXISTE (incidente medido em 2026-10-25, num `/meta:adopt --update`): o bloco pós-cópia do
+# adopt.md foi extraído com o placeholder `DEST="<INSTALL_DIR (Fase 3) | WORK (--update)>"` sem
+# preencher. Um helper criou um diretório-lixo com esse nome literal na raiz do core, e os
+# `git -C "$DEST" config gitflow.branch.*` subiram ao repo que continha o lixo e gravaram no
+# .git/config DO CORE. `git -C <dir>` procura o repo mais próximo para cima; quem não pergunta pelo
+# toplevel escreve no repo pai. Os casos medem o EFEITO (nada criado, .git/config do pai byte-idêntico),
+# não a mensagem.
+# ---------------------------------------------------------------------------
+run_adopt_dest_guard_selftests() {
+  local ad="${REPO_ROOT}/.claude/utils/adopt"
+  local guard="${REPO_ROOT}/.claude/utils/adopt/assert-dest.sh"
+  local adopt="${REPO_ROOT}/.claude/commands/meta/adopt.md"
+  if [ ! -f "${guard}" ]; then record_fail "adopt-dest-guard" "helper ausente: ${guard}"; return; fi
+  local w rc ph='<INSTALL_DIR (Fase 3) | WORK (--update)>'
+  w="$(mktemp -d)"
+  # O "core" da fixture: um repo com o core.hooksPath UNSET (o incidente só escapou porque estava setado).
+  git -C "${w}" init -q "${w}/core"
+  local P="${w}/core" cfg0; cfg0="$(cat "${P}/.git/config")"
+  _dg_cfg_same() { [ "$(cat "${P}/.git/config")" = "${cfg0}" ]; }
+  _dg_no_junk() { [ -z "$(find "${P}" -mindepth 1 -maxdepth 1 ! -name .git -print -quit)" ]; }
+
+  # (a) PLACEHOLDER não preenchido → o guarda recusa; os helpers que fazem `mkdir -p "$DEST/..."` e o
+  #     instalador do githook recusam SEM criar nada. Rodados com o cwd DENTRO do core, como no incidente.
+  local _pa=""
+  rc=0; ( cd "${P}" && bash "${guard}" "${ph}" ) >/dev/null 2>&1 || rc=$?
+  [ "${rc}" -ne 0 ] || _pa="${_pa} guarda-aceitou(rc=0)"
+  local hf
+  for hf in starter-coevolution.sh starter-kg-inbox.sh starter-research-seed.sh regen-ssot-projections.sh install-onion-githook.sh; do
+    rc=0; ( cd "${P}" && bash "${ad}/${hf}" "${ph}" ) >/dev/null 2>&1 || rc=$?
+    [ "${rc}" -ne 0 ] || _pa="${_pa} ${hf}-rc0"
+  done
+  _dg_no_junk || _pa="${_pa} diretório-lixo-criado($(cd "${P}" && ls -A | grep -vx .git | head -1))"
+  _dg_cfg_same || _pa="${_pa} config-do-pai-mudou"
+  if [ -z "${_pa}" ]; then
+    record_pass "adopt-dest-guard: (a) DEST com placeholder → guarda e 5 helpers recusam, nada criado, config do pai intacto"
+  else record_fail "adopt-dest-guard: (a) placeholder" "falhou em:${_pa}"; fi
+
+  # (b) DEST = SUBDIRETÓRIO de um repo (não a raiz) → recusa; o .git/config do repo pai fica
+  #     byte-idêntico. Exercita o instalador do githook (o que seta core.hooksPath) e o durable-commit
+  #     (o que faria checkout+commit no pai), além do guarda.
+  mkdir -p "${P}/sub"
+  local _pb="" head0; head0="$(git -C "${P}" symbolic-ref HEAD)"
+  rc=0; bash "${guard}" "${P}/sub" >/dev/null 2>&1 || rc=$?
+  [ "${rc}" -ne 0 ] || _pb="${_pb} guarda-aceitou-subdiretório"
+  rc=0; bash "${ad}/install-onion-githook.sh" "${P}/sub" >/dev/null 2>&1 || rc=$?
+  [ "${rc}" -ne 0 ] || _pb="${_pb} githook-rc0"
+  [ ! -e "${P}/sub/.githooks" ] || _pb="${_pb} githook-criou-.githooks"
+  rc=0; bash "${ad}/durable-commit.sh" "${P}/sub" update abc >/dev/null 2>&1 || rc=$?
+  [ "${rc}" -ne 0 ] || _pb="${_pb} durable-commit-rc0"
+  [ "$(git -C "${P}" symbolic-ref HEAD)" = "${head0}" ] || _pb="${_pb} HEAD-do-pai-trocado"
+  _dg_cfg_same || _pb="${_pb} config-do-pai-mudou"
+  if [ -z "${_pb}" ]; then
+    record_pass "adopt-dest-guard: (b) DEST subdiretório de repo → recusa, .git/config do pai byte-idêntico"
+  else record_fail "adopt-dest-guard: (b) subdiretório" "falhou em:${_pb}"; fi
+
+  # (c) O BLOCO PÓS-CÓPIA DO adopt.md, com as linhas REAIS dele: a chamada do guarda vem ANTES de toda
+  #     outra chamada e do `git -C "$DEST" config`, e rodar [guarda + config] num DEST subdiretório
+  #     não grava no pai. Extraído do documento (não reescrito aqui), para medir o que o operador roda.
+  local blk gl cl _pc=""
+  blk="$(awk '/^## ⚙️ Procedimento de Configuração pós-cópia/{f=1;next} f&&/^## /{exit} f' "${adopt}")"
+  gl="$(grep -m1 'assert-dest\.sh" "\$DEST"' <<< "${blk}" || true)"
+  cl="$(grep -m1 '^git -C "\$DEST" config gitflow.branch.develop' <<< "${blk}" || true)"
+  [ -n "${gl}" ] || _pc="${_pc} sem-chamada-do-guarda"
+  [ -n "${cl}" ] || _pc="${_pc} sem-linha-de-config(âncora mudou?)"
+  grep -q '|| exit 1' <<< "${gl}" || _pc="${_pc} rc-do-guarda-não-lido"
+  local first_call; first_call="$(grep -m1 -nE '^(bash|git -C|if |GATE_OUT)' <<< "${blk}" | cut -d: -f2-)"
+  [ "${first_call}" = "${gl}" ] || _pc="${_pc} guarda-não-é-a-1ª-chamada([${first_call:0:60}])"
+  _dg_block() {   # $1 = SOURCE_ROOT cujo assert-dest.sh o bloco chama → roda guarda + config como o bloco roda
+    ( SOURCE_ROOT="$1"; DEST="${P}/sub"; INTEGRATION_BRANCH=main
+      eval "${gl}"; eval "${cl}" ) >/dev/null 2>&1
+  }
+  if [ -z "${_pc}" ]; then
+    _dg_block "${REPO_ROOT}" || true
+    _dg_cfg_same || _pc="${_pc} o-bloco-gravou-no-pai"
+  fi
+  if [ -z "${_pc}" ]; then
+    record_pass "adopt-dest-guard: (c) o bloco pós-cópia chama o guarda 1º, lê o rc, e o config do passo (3) não cai no pai"
+  else record_fail "adopt-dest-guard: (c) bloco do adopt.md" "falhou em:${_pc}"; fi
+
+  # (d) DEST = RAIZ de repo próprio → passa; e a RAIZ DE UMA WORKTREE também (a adoção legacy instala numa).
+  git -C "${w}" init -q "${w}/own"
+  local _pd=""
+  rc=0; bash "${guard}" "${w}/own" >/dev/null 2>&1 || rc=$?
+  [ "${rc}" -eq 0 ] || _pd="${_pd} raiz-recusada(rc=${rc})"
+  rc=0; bash "${ad}/starter-coevolution.sh" "${w}/own" >/dev/null 2>&1 || rc=$?
+  { [ "${rc}" -eq 0 ] && [ -d "${w}/own/docs/evolution/inbox/_processed" ]; } || _pd="${_pd} starter-coevolution-não-criou(rc=${rc})"
+  git -C "${w}/own" -c user.name=t -c user.email=t@t commit -q --allow-empty -m base >/dev/null 2>&1
+  git -C "${w}/own" worktree add -q "${w}/own-wt" -b wt >/dev/null 2>&1
+  rc=0; bash "${guard}" "${w}/own-wt" >/dev/null 2>&1 || rc=$?
+  [ "${rc}" -eq 0 ] || _pd="${_pd} worktree-recusada(rc=${rc})"
+  if [ -z "${_pd}" ]; then
+    record_pass "adopt-dest-guard: (d) raiz de repo próprio e raiz de worktree → passam (o guarda não barra o caso legítimo)"
+  else record_fail "adopt-dest-guard: (d) raiz" "falhou em:${_pd}"; fi
+
+  # (e) MUTANTE: sem a checagem de toplevel o guarda vira `rev-parse --git-dir` de novo, e o caso (b)
+  #     do bloco reprova — o config do pai MUDA. Prova que a comparação de raiz é load-bearing.
+  local mut="${w}/mut/.claude/utils/adopt/assert-dest.sh"
+  mkdir -p "$(dirname "${mut}")"
+  sed 's|^\[ "\${_top_p}" = "\${_dest_p}" \] \\$|true \\|' "${guard}" > "${mut}"
+  local rc_ok=1 rc_mut=1
+  if [ -n "${gl}" ] && [ -n "${cl}" ]; then
+    cfg0="$(cat "${P}/.git/config")"
+    _dg_block "${REPO_ROOT}" || true; _dg_cfg_same && rc_ok=0
+    _dg_block "${w}/mut" || true;       _dg_cfg_same && rc_mut=0
+  fi
+  _prove_mutation "adopt-dest-guard: (e-MUT) sem a checagem de toplevel o config do repo pai muda — a raiz é load-bearing" \
+    "${guard}" "${mut}" "${rc_ok}" "${rc_mut}"
+  rm -rf "${w}"
+}
+_family run_adopt_dest_guard_selftests
 # Modo hooks-diff — `merge-onion-hooks.sh --diff`, o diff que o relatório do --update cola (2026-10-13:
 # o relatório comparava só evento/matcher/command e afirmou "idêntico" sobre 4 hooks que ganharam
 # `onFailure: block`). (a) propriedade nova num hook existente aparece como alterado, nomeando a chave;
@@ -26334,7 +26448,9 @@ run_ssot_projections_selftests() {
   #     `.claude/{commands,agents,skills}` o gerador sai rc=0 com SAÍDA VAZIA (não há o que
   #     inventariar), e o caso reprovaria por fixture irreal em vez de por defeito. O alvo de
   #     verdade tem a superfície inteira — o harness espelha o runner.
-  mkdir -p "${d}/a"
+  #     ⚠️ CADA FIXTURE É A RAIZ DE UM REPO (`git init`): desde 2026-10-25 o helper recusa DEST que não
+  #     seja raiz de repo próprio (assert-dest.sh). Um diretório solto mediria a recusa, não a geração.
+  mkdir -p "${d}/a"; git -C "${d}/a" init -q
   _archive_staged "${d}/a" .claude/validation .claude/commands .claude/agents .claude/skills
   bash "${h}" "${d}/a" >/dev/null 2>&1 || true
   if [ -s "${d}/a/docs/onion/inventory.md" ]; then
@@ -26348,7 +26464,7 @@ run_ssot_projections_selftests() {
   #     (medido — o caso virou `setup` fail, que é a falha FECHADA correta, mas cega a guarda).
   sed 's|^mkdir -p "${DEST}/docs/onion".*|: # MUTANTE: sem mkdir|' "${h}" > "${mut}"
   if ! cmp -s "${h}" "${mut}"; then
-    mkdir -p "${d}/b"
+    mkdir -p "${d}/b"; git -C "${d}/b" init -q
     _archive_staged "${d}/b" .claude/validation .claude/commands .claude/agents .claude/skills
     bash "${mut}" "${d}/b" >/dev/null 2>&1 || true
     if [ ! -s "${d}/b/docs/onion/inventory.md" ]; then
@@ -26369,10 +26485,11 @@ run_ssot_projections_selftests() {
   #     para essa propriedade, e o mutante que o remove passava idêntico. O caso provava apenas que
   #     o script termina em `echo`. Agora ele exerce a DISTINÇÃO que importa: parcial segue, zero
   #     aborta — e é essa distinção que impede a adoção de reportar verde tendo gerado nada.
+  mkdir -p "${d}/c"; git -C "${d}/c" init -q
   _archive_staged "${d}/c" .claude/validation .claude/commands .claude/agents .claude/skills
   printf '#!/usr/bin/env bash\nexit 1\n' > "${d}/c/.claude/validation/inventory.sh"
   local _rc=0; bash "${h}" "${d}/c" >/dev/null 2>&1 || _rc=$?
-  local _rc0=0; mkdir -p "${d}/c0"; bash "${h}" "${d}/c0" >/dev/null 2>&1 || _rc0=$?
+  local _rc0=0; mkdir -p "${d}/c0"; git -C "${d}/c0" init -q; bash "${h}" "${d}/c0" >/dev/null 2>&1 || _rc0=$?
   if [ "${_rc}" -eq 0 ] && [ "${_rc0}" -ne 0 ]; then
     record_pass "ssot-projections: (c) gerador parcial SEGUE (rc=0); ZERO projeções FALHA ALTO (rc=${_rc0})"
   else record_fail "ssot-projections: (c)" "parcial=${_rc} (esperado 0) · zero=${_rc0} (esperado ≠0) — helper que anuncia ✓ sem gerar nada faz o alvo nascer vermelho com a adoção dizendo verde"; fi
@@ -26380,6 +26497,7 @@ run_ssot_projections_selftests() {
   # (c2) ARQUIVO 0-BYTE não fica no disco: ele faz o alvo colher HARD da REGRA 8 (inventário
   #      desatualizado) enquanto o relatório some com a linha. Ausente é estado que a guarda do alvo
   #      sabe nomear; vazio, ela lê como drift.
+  mkdir -p "${d}/e"; git -C "${d}/e" init -q
   _archive_staged "${d}/e" .claude/validation .claude/commands .claude/agents .claude/skills
   printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/e/.claude/validation/inventory.sh"
   bash "${h}" "${d}/e" >/dev/null 2>&1 || true
@@ -26420,7 +26538,7 @@ run_ssot_projections_selftests() {
   if [ "${_gf}" = ok ]; then
     record_pass "ssot-projections: (g) greenfield — o passo (8) sem índice perde as projeções de git, e o commit durável as traz (REGRAS 80/81)"
   else record_fail "ssot-projections: (g)" "resultado=${_gf} (sem-repro = o passo 8 já gerou: fixture não reproduz o greenfield; falta = o commit da adoção nasce sem testing-inventory/testing-state)"; fi
-  mkdir -p "${d}/gm"; cp "${h}" "${d}/gm/regen-ssot-projections.sh"
+  mkdir -p "${d}/gm"; cp "${h}" "${d}/gm/regen-ssot-projections.sh"; cp "${REPO_ROOT}/.claude/utils/adopt/assert-dest.sh" "${d}/gm/"
   sed 's|^if \[ -f "${_regen}" \] && \[ -d "${DEST}/.claude/validation" \]; then|if false; then # ONION_MUTANTE: sem re-regenerar|' "${_dc}" > "${d}/gm/durable-commit.sh"
   if ! cmp -s "${_dc}" "${d}/gm/durable-commit.sh"; then
     _gok="$(_gf_run "${d}/g2" "${d}/gm/durable-commit.sh")"
@@ -29821,7 +29939,9 @@ run_upstream_portal_fixes_selftests() {
   #     bloco e rodamos: o que se prova é o EFEITO (README + _sealed/ + _rejected/), e a 2ª rodada
   #     prova a idempotência (o starter não clobba fila em uso).
   if [ ! -f "${adopt}" ]; then record_skip "upstream-portal: (d) adopt.md ausente"; else
-    local sd blk; sd="$(mktemp -d)"; sd="$(cd "${sd}" && pwd -P)"
+    # `git init`: o sandbox é a RAIZ de um repo, como o DEST real — desde 2026-10-25 o helper recusa o
+    # que não for (assert-dest.sh), e um diretório solto mediria a recusa, não a fila.
+    local sd blk; sd="$(mktemp -d)"; sd="$(cd "${sd}" && pwd -P)"; git -C "${sd}" init -q
     blk="$(awk '/^# \(2a\) fila de PROPOSTAS/{f=1} /^# \(2b\) semente de PESQUISA/{f=0} f' "${adopt}")"
     local blk_n; blk_n="$(printf '%s\n' "${blk}" | grep -c . || true)"
     if [ -n "${blk}" ] && { [ "${blk_n}" -gt 12 ] || ! grep -q 'starter-kg-inbox.sh' <<< "${blk}"; }; then
@@ -29856,7 +29976,9 @@ run_upstream_portal_fixes_selftests() {
   local kh="${SCRIPT_DIR}/../utils/adopt/starter-kg-inbox.sh"
   if [ ! -f "${kh}" ]; then record_skip "upstream-portal: (d2) starter-kg-inbox.sh ausente"; else
     local ro rc2 d2miss=""
-    ro="$(mktemp -d)"; mkdir -p "${ro}/docs"; chmod -w "${ro}/docs"
+    # `git init`: desde 2026-10-25 o helper recusa DEST que não é raiz de repo (assert-dest.sh); sem o
+    # repo o rc≠0 viria da recusa, não do DEST somente-leitura, e o caso ficaria vacuoso.
+    ro="$(mktemp -d)"; git -C "${ro}" init -q; mkdir -p "${ro}/docs"; chmod -w "${ro}/docs"
     bash "${kh}" "${ro}" >/dev/null 2>&1 && rc2=0 || rc2=1
     chmod +w "${ro}/docs"; rm -rf "${ro}"
     [ "${rc2}" -ne 0 ] || d2miss="${d2miss} helper-sai-0-sem-criar-a-fila(DEST somente-leitura)"

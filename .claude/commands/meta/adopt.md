@@ -93,6 +93,7 @@ Usado pela **Fase 2** e pelo **`--update`**. Snippet self-contained (shell novo 
 SOURCE_ROOT="$(git rev-parse --show-toplevel)"
 DEST="<INSTALL_DIR — ver Fase 2>"
 ROLE="<ROLE do STATE.md (adoção, PASSO 0) | TARGET_ROLE (--update)>"   # adopted | hub | standalone
+bash "$SOURCE_ROOT/.claude/utils/adopt/assert-dest.sh" "$DEST" || exit 1   # placeholder ou DEST fora da raiz de um repo próprio PARA aqui (o `cp -R` de (d) criaria o diretório)
 
 # (a) MANIFESTO (SSOT: `vendor-manifest.sh`) pela função que LÊ o rc do produtor e recusa o vazio —
 #     pathspec ausente é TODOS para o git (2222 arquivos copiados com rc=0, 2026-09-15). NUNCA
@@ -143,6 +144,12 @@ re-rodar não duplica. Snippet self-contained (shell novo a cada fase).
 ```bash
 SOURCE_ROOT="<checkout (Fase 3) | UPDATE_SOURCE_ROOT (--update: re-resolva com --source <pin> num shell novo)>"
 DEST="<INSTALL_DIR (Fase 3) | WORK (--update)>"
+
+# (-1) DEST VALIDADO ANTES DE TUDO — placeholder não preenchido, caminho inexistente ou DEST que não é
+#      a RAIZ de um repo próprio PARAM aqui. Incidente de 2026-10-25: com o placeholder acima copiado
+#      literal, um helper criou um diretório-lixo com esse nome dentro do core e os `git -C "$DEST"
+#      config` do passo (3) gravaram no .git/config DO CORE (o repo que o continha). Porquê: no helper.
+bash "$SOURCE_ROOT/.claude/utils/adopt/assert-dest.sh" "$DEST" || exit 1
 
 # (0) .gitignore — ESCOPA um ignore CEGO de .claude/ (never-clobber, idempotente). CRÍTICO e PRIMEIRO:
 #     um adotante que ignora `.claude/` INTEIRO (comum se já usava Cursor/Claude) faz o durable-commit
@@ -373,6 +380,7 @@ Delega ao helper **testável e idempotente** `.claude/utils/adopt/durable-commit
 SOURCE_ROOT="<checkout (adoção) | UPDATE_SOURCE_ROOT (--update: re-resolva com --source <pin> num shell novo)>"
 DEST="<INSTALL_DIR (adoção) | WORK (--update)>"
 OP="<adopt | update>"; PIN="<source_commit aplicado (curto)>"
+bash "$SOURCE_ROOT/.claude/utils/adopt/assert-dest.sh" "$DEST" || exit 1   # sem isto, um DEST dentro de outro repo faz o checkout e o commit no repo PAI
 # BR: a ADOÇÃO passa `onion/adopt` (branch que a Fase 2 já criou — sem branch redundante); o --update
 # dedica `chore/onion-update-<pin>` (framework não polui a branch de produto nem a integração — vai a PR).
 # Omitir → default `chore/onion-<OP>-<PIN>`. No --update, prefixe ONION_DURABLE_VERIFY=1 (o gate do alvo roda).
@@ -408,6 +416,8 @@ OP="<adopt | update>"            # operação que gerou o relatório
 PIN="<source_commit aplicado>"   # commit curto da fonte (o pin NOVO)
 PREV="<pin anterior | vazio na 1ª adoção>"
 BR="<branch do commit: onion/adopt (adoção) | \$UPDATE_BR = chore/onion-update-<pin> (update — o merge de onion/vendor cai nela)>"
+
+bash "$SOURCE_ROOT/.claude/utils/adopt/assert-dest.sh" "$DEST" || exit 1   # o `mkdir -p` abaixo criaria o diretório-lixo com o nome do placeholder
 
 INBOUND="$DEST/docs/evolution/inbound"
 mkdir -p "$INBOUND/_processed"

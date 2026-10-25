@@ -15,6 +15,8 @@
 # =============================================================================
 set -u
 DEST="${1:?uso: starter-kg-inbox.sh <DEST>}"
+# DEST tem de ser a RAIZ de um repo próprio, senão as escritas abaixo caem no repo que o contém (incidente de 2026-10-25: no cabeçalho do assert-dest.sh).
+bash "$(dirname "${BASH_SOURCE[0]}")/assert-dest.sh" "${DEST}" || exit 2
 Q="${DEST}/docs/evolution/kg-inbox"
 mkdir -p "${Q}/_sealed" "${Q}/_rejected"
 [ -f "${Q}/_sealed/.gitkeep" ]   || : > "${Q}/_sealed/.gitkeep"
