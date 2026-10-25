@@ -191,13 +191,23 @@ nodes:
   - id: Q_HUB_1019_BACKLOG_COM_GATILHO
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 2
     confidence: 0.7
     label: "U6, C4 e C9 ficam no backlog com gatilho; os gatilhos são proposta da triagem, ainda não selados pelo maestro"
-    narrative: "GATILHOS propostos: U6 quando um 2º adotante dirigir o update da sessão do alvo, ou um commit de merge com conflito escapar do gate; C4 quando o adapter do provider ativo tiver item.read executável e um 2º adotante pedir a ligação controle→tarefa; C9 quando um 2º corte de subagente por limite perder trabalho. U6: o procedimento do --update assume a sessão da fonte (settings-before.json no core) e não diz se o commit do merge com conflito resolvido passa pelo gate. C4: wiki, task manager e chat da equipe ficam fora do /docs:build-compliance-docs, e foi o cruzamento entre fontes que achou o mais grave no hub. C9: o subagente que verificava o código parou por limite semanal da API sem gravar resultado parcial."
     trace: "docs/evolution/inbox/_processed/2026-10-19-build-compliance-docs-review.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-25"
+    verified_against: "decisão do maestro em 2026-10-25, por pergunta com opções (/meta:decide): escolhida «Selar os três gatilhos: U6, C4 e C9 ficam no backlog com o gatilho escrito, e nada se constrói agora»"
+    narrative: |-
+      GATILHOS propostos: U6 quando um 2º adotante dirigir o update da sessão do alvo, ou um commit de merge com conflito escapar do gate; C4 quando o adapter do provider ativo tiver item.read executável e um 2º adotante pedir a ligação controle→tarefa; C9 quando um 2º corte de subagente por limite perder trabalho. U6: o procedimento do --update assume a sessão da fonte (settings-before.json no core) e não diz se o commit do merge com conflito resolvido passa pelo gate. C4: wiki, task manager e chat da equipe ficam fora do /docs:build-compliance-docs, e foi o cruzamento entre fontes que achou o mais grave no hub. C9: o subagente que verificava o código parou por limite semanal da API sem gravar resultado parcial.
+
+      Selado por /meta:decide em 2026-10-25: escolhida «Selar os três gatilhos: U6, C4 e C9 ficam no backlog com o gatilho escrito, e nada se constrói agora»; descartadas: «Selar e construir o U6 já» · «Deixar sem selo».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-25: «Sela os gatilhos de U6, C4 e C9 propostos pela triagem do hub de 10-19?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      locality: "pessoa"
   - id: D_SINAL_COMPLIANCE_REDIGIDO_NO_CORE_PUBLICO
     node_type: decision
     layer: audit
@@ -620,12 +630,22 @@ nodes:
   - id: Q_DISSECT_MOTOR_PARQUEADO_OBJETO_EXTRA
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
     label: "O workflow do protótipo vira motor do /meta:dissect? Gatilho: 1 objeto decisório a mais rodado nos dois braços com o protocolo corrigido; se o protótipo vencer no juiz cego de novo com custo até 1,25x o do método atual, absorver; senão, rejeitar com a medida"
-    narrative: "Protocolo corrigido, pré-registrado antes da rodada: o juiz vê os vereditos válidos da família do objeto, e os dois braços têm os mesmos limites (instalar, rodar implementação de referência, orçamento). Checagem: o grafo dissect-any-object-2026-10 do onion-curation ganha o nó do objeto extra com o placar do juiz cego (3 juízes, 2 ordens) e a razão de custo em tokens entre os braços, e um sinal sobe ao core. Fecha com aquele sinal lido; o objeto não precisa ser da curadoria, só decisório e com os dois braços medidos."
+    status: done
+    plane: DEV
+    verified_at: "2026-10-25"
+    verified_against: "decisão do maestro em 2026-10-25, por pergunta com opções (/meta:decide): escolhida «Manter parqueado: espera um objeto decisório natural para rodar nos dois braços com juiz cego»"
+    narrative: |-
+      Protocolo corrigido, pré-registrado antes da rodada: o juiz vê os vereditos válidos da família do objeto, e os dois braços têm os mesmos limites (instalar, rodar implementação de referência, orçamento). Checagem: o grafo dissect-any-object-2026-10 do onion-curation ganha o nó do objeto extra com o placar do juiz cego (3 juízes, 2 ordens) e a razão de custo em tokens entre os braços, e um sinal sobe ao core. Fecha com aquele sinal lido; o objeto não precisa ser da curadoria, só decisório e com os dois braços medidos.
+
+      Selado por /meta:decide em 2026-10-25: escolhida «Manter parqueado: espera um objeto decisório natural para rodar nos dois braços com juiz cego»; descartadas: «Rodar o objeto extra agora» · «Rejeitar o motor».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-25: «O motor do /meta:dissect segue parqueado até 1 objeto decisório a mais?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
+      locality: "pessoa"
   - id: E_DISSECT_PECAS_ABSORVIDAS_1024
     node_type: evidence
     layer: audit
