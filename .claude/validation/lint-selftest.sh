@@ -33937,6 +33937,23 @@ PY
   if [ "${rf}" = 0 ] && [ "${rnf}" = 1 ] && grep -q '^: mutante$' "${sb}/mut-fetch.sh"; then
     record_pass "peer-ref: (h) origin/main local defasada: com o fetch o nó novo → 0; o mutante (MUT-c) sem fetch → 1"
   else record_fail "peer-ref: (h)" "rc com fetch/sem fetch = ${rf}/${rnf}; esperado 0/1"; fi
+  # (i) o par pelo NOME: pelo members.yaml (local_path) e pelo irmão cuja origin termina no nome; irmão com outra
+  #     origin e nome desconhecido → NÃO MEDIU. Mutante (MUT-d): sem a prova da URL, o irmão errado responde 0.
+  printf 'members:\n  - id: parm\n    local_path: %s\n' "${sb}/par" > "${sb}/members.yaml"
+  mkdir -p "${sb}/me/.claude/validation"; cp "${sut}" "${sb}/me/.claude/validation/peer-ref-check.sh"
+  git clone -q --bare "${sb}/origin.git" "${sb}/parz.git" >/dev/null 2>&1
+  git clone -q "${sb}/parz.git" "${sb}/parz" >/dev/null 2>&1
+  git clone -q "${sb}/origin.git" "${sb}/parw" >/dev/null 2>&1
+  local me="${sb}/me/.claude/validation/peer-ref-check.sh" ri1 ri2 ri3 ri4 rim
+  ri1="$(_pr "${sut}" parm 'docs/g.kg.yaml#C_X_2' "${KQ}" "ONION_MEMBERS_YAML=${sb}/members.yaml")"
+  ri2="$(_pr "${me}" parz 'docs/g.kg.yaml#C_X_2' "${KQ}" "ONION_MEMBERS_YAML=${sb}/nao-ha.yaml")"
+  ri3="$(_pr "${me}" parw 'docs/g.kg.yaml#C_X_2' "${KQ}" "ONION_MEMBERS_YAML=${sb}/nao-ha.yaml")"
+  ri4="$(_pr "${sut}" nao-existe 'docs/g.kg.yaml#C_X_2' "${KQ}" "ONION_MEMBERS_YAML=${sb}/members.yaml")"
+  sed 's|^    case "${URL}" in .*$|    PAR="${SIB}"|' "${me}" > "${sb}/me/.claude/validation/mut-url.sh"
+  rim="$(_pr "${sb}/me/.claude/validation/mut-url.sh" parw 'docs/g.kg.yaml#C_X_2' "${KQ}" "ONION_MEMBERS_YAML=${sb}/nao-ha.yaml")"
+  if [ "${ri1}" = 0 ] && [ "${ri2}" = 0 ] && [ "${ri3}" = 2 ] && [ "${ri4}" = 2 ] && [ "${rim}" = 0 ]; then
+    record_pass "peer-ref: (i) par pelo nome: members.yaml → 0 · irmão com a origin do nome → 0 · irmão com outra origin → 2 · desconhecido → 2; o mutante (MUT-d) sem a prova da URL → 0"
+  else record_fail "peer-ref: (i)" "rc members/irmão/irmão-errado/desconhecido/mutante = ${ri1}/${ri2}/${ri3}/${ri4}/${rim}; esperado 0/0/2/2/0"; fi
   unset -f _pr
   rm -rf "${sb}"
 }
