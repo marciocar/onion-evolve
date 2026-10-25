@@ -2,7 +2,8 @@
 branch: fix/merge-verified-foreign-rebase
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c96854af2ba72d81f6cf001df97cd8501431e0c52483c6324ade7be9f3a83aba
+reviewed_code_sha256: 47b10c2f1586902c1f93efa9ca121564e6f3bd94d8b9f33543ea429baf1085aa
 findings_total: 11
 findings_real: 10
 tokens: 141498
