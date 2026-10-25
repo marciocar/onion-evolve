@@ -10,6 +10,26 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.27.0] - 2026-10-25
+
+Contract v4.15: an external end can live in a dot folder such as `.github/`, while `.` and `..` still fail; the git
+store judges with the same corpus as the gate; `kg_trace` exits 3 on an empty corpus.
+
+### Changed
+
+- **Contract v4.15: an external end can live in a dot folder.** `<path>#<id>` used to require every segment to start
+  with a letter, a digit, or `_`, so `.github/` and `.config/`, where a repository keeps its machinery,
+  could not be pointed at. A segment can now start with a dot followed by one of those; the segments `.` and `..`
+  still fail, since the rule exists to stop traversal. Nothing that passed fails. Both readers change together, for the
+  outgoing and the incoming end, with eight new cases in the suite (five of form, three of corpus with a target in a
+  dot folder). Found by an adopter whose studies point to a registry under a dot folder.
+- **The git store judges with the same corpus as the gate.** `kg_store` (`GitStore`) now reads the tracked graphs
+  in dot folders when it checks external ends, so a graph that points there can be written, and a change there can stop
+  a write that would leave an end dangling. It still never writes in a dot folder, and `list()`, `read()` and the MCP
+  `kg_query` and `kg_terms` tools see only the store's own names.
+- **`kg_trace.py check` exits 3 when no graph was read.** It used to print "no graph read" with rc 0, which a CI that
+  reads only the rc took as "every trace resolves". The JSON already said `graphs: 0`.
+
 ## [4.26.0] - 2026-10-25
 
 `kg_query --semantic` finds the node when the question uses other words than the label, fusing the text search and a

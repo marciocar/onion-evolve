@@ -31,7 +31,7 @@ const MAX_DEPTH = 1000; // coleções abertas de uma vez (MAX_DEPTH da referênc
 // só aviso (yaml.depth-over-128), medido por warnings().
 const PROFILE_DEPTH = 128;
 const SLUG = /^[A-Za-z_][A-Za-z0-9_-]*$/;
-const EXTERNAL_REF = /^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*\/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)#[A-Za-z][A-Za-z0-9_]*$/;
+const EXTERNAL_REF = /^(?:\.?[A-Za-z0-9_][A-Za-z0-9_.-]*\/)*\.?[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)#[A-Za-z][A-Za-z0-9_]*$/;
 const isExternal = (ref) => typeof ref === 'string' && EXTERNAL_REF.test(ref); // is_external da referência
 const CORE_INT = /^(?:[-+]?[0-9]+|0o[0-7]+|0x[0-9a-fA-F]+)$/;
 const Y = 'tag:yaml.org,2002:';

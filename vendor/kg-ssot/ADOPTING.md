@@ -341,6 +341,13 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.26.0` to `kg-ssot-v4.27.0`, the contract goes to v4.15 and only widens: nothing that passed fails,
+and the gate asks for no `--update` (it shows the identity notice, since the schema bytes change). An external end
+`<path>#<id>` can now start with a dot folder (`.github/x.kg.yaml#ID`), at either end of the edge; `./` and `../`
+still fail. If you use the git store, it now reads the tracked graphs in dot folders when it checks external ends.
+`kg_trace.py check` exits 3 when it reads no graph: a script that treats any rc other than 0 and 1 as broken input
+must accept 3 as "empty corpus", and if your CI wraps the check in another tool, update that tool first.
+
 From `kg-ssot-v4.25.1` to `kg-ssot-v4.26.0`, the contract does not change (still v4.14), and the gate asks for no
 `--update`. Nothing changes unless you want the search by meaning: install `tools/requirements-vector.txt` with
 `--require-hashes` (or `pip install "kg-ssot[vector]"`), run `kg_vector.py fetch` once and `kg_vector.py index --root .`

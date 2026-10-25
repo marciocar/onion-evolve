@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.26.0",
+  "release": "kg-ssot-v4.27.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -329,7 +329,7 @@ if not r["written"]:
 ```
 
 The gate judges more than the candidate. The external end of each `external_edges` entry is checked against the
-store itself, with the candidate already in place. Every graph that points to the written name is judged again,
+store's corpus (in `GitStore`, also the tracked graphs in dot folders, since 4.27.0), with the candidate already in place. Every graph that points to the written name is judged again,
 because replacing or deleting a graph can leave another graph's external edge without an end. The store writes only
 when all of them PASS.
 
@@ -343,8 +343,12 @@ and the first write pays the full cost.
 
 The corpus is the same one the repository gate would see. In `GitStore`, that means only what is tracked: a
 `.kg.yaml` file on disk with no commit does not count, not in the list, not in the judgment, and not in the lock (for
-the lock, the name is free, and the write replaces the file). `DiskStore` and `VersionedStore` refuse a root inside a
-git repository, where the gate would read what is tracked and the store would read the disk. And the head changes
+the lock, the name is free, and the write replaces the file). Since 4.27.0 (contract v4.15), the `GitStore` judgment
+also reads the tracked graphs in dot folders (`.github/`), as the gate does, so an external end there resolves and a
+change there can stop a write that leaves it without an end; the store still never writes there, and `list()`,
+`read()` and the MCP `kg_query` and `kg_terms` tools see only the store's own names. `DiskStore` and `VersionedStore`
+judge only the store's own names (a dot folder outside git is not read), and they refuse a root inside a git
+repository, where the gate would read what is tracked and the store would read the disk. And the head changes
 only once the record is made: if the commit or the event fails, the head goes back to what it was, and the exception
 reaches the caller.
 
@@ -1024,7 +1028,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   trace that lands on the root itself is the directory `.`; `path` never ends in a slash, not even for a directory
   (`kind` says it is one); and `path` keeps the case that the file system returns. The field is additive, and the output of
   4.25.0 stays valid. rc 0 when every judged trace resolves, 1 with a missing target or a
-  graph that does not read, 2 on broken input. These rules come from an adopter's resolver measured on thousands of
+  graph that does not read, 2 on broken input, and 3 when no graph was read (since 4.27: an empty corpus is not "every
+  trace resolves" for a CI that reads only the rc). These rules come from an adopter's resolver measured on thousands of
   traces; each cut was paid for by a false positive.
 
 ## `kg_vector.py`: the model and the index of the semantic search (4.26.0)

@@ -29,7 +29,8 @@ repetido ou fora de texto, que o gate já reprova no MUST, não é lido aqui.
 Uso:
   kg_trace.py check [--root DIR] [--exclude GLOB]... [--no-default-excludes] [--external-root PREFIXO]...
                     [--format human|json]
-rc: 0 todo trace julgável resolve · 1 integrity.trace-target-missing, ou grafo ilegível · 2 entrada quebrada.
+rc: 0 todo trace julgável resolve · 1 integrity.trace-target-missing, ou grafo ilegível · 2 entrada quebrada · 3 nenhum
+grafo lido (desde a 4.27: o corpus vazio não passa por "todo trace resolve" num CI que só olha o rc).
 """
 import argparse
 import json
@@ -189,7 +190,7 @@ def main(argv=None):
         for u in corpus.unreadable:
             print(_("UNREADABLE  {file}  {code}").format(file=u["file"], code=u["code"]))
         s = res["skipped"]
-        if not res["graphs"]:  # nenhum grafo lido não é "todo trace resolve"
+        if not res["graphs"] and not corpus.unreadable:  # nenhum grafo lido não é "todo trace resolve"
             print(_("· no graph read: git tracks no .kg.yaml or .kg.json under {root} outside the excludes").format(
                 root=args.root))
         print(_("· {judged} trace(s) judged: {resolved} resolve, {missing} missing; not judged (counted): {absolute} "
@@ -197,7 +198,9 @@ def main(argv=None):
                     judged=res["judged"], resolved=res["resolved"], missing=len(res["missing"]),
                     absolute=s["absolute"], external=s["external_root"], not_path=s["not_path"],
                     not_text=s["not_text"]))
-    return 1 if res["missing"] or corpus.unreadable else 0
+    if res["missing"] or corpus.unreadable:
+        return 1
+    return 3 if not res["graphs"] else 0  # o corpus vazio tem rc próprio: zero lido não é "tudo resolve"
 
 
 if __name__ == "__main__":

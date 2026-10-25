@@ -56,7 +56,7 @@ recorded exception: 4.11.0, 4.12.0 and 4.13.0 started to fail rare YAML construc
 were minor because none of the real graphs measured in four adopter repositories changed its verdict. Even so, they
 count as new MUST rules for the stability criterion, and each one reset the 30-day clock. Since 4.11.0, the contract
 has its own version label (v4.4 in 4.11.0, v4.5 in 4.12.0, v4.6 in 4.13.0, v4.7 in 4.14.0, v4.8 in 4.15.0, v4.9 in 4.15.1
-and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.21.0, v4.13 in 4.22.0, v4.14 since 4.23.0), which is not the release number.
+and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.21.0, v4.13 in 4.22.0, v4.14 from 4.23.0 to 4.26.0, v4.15 since 4.27.0), which is not the release number.
 
 | Release | What it added |
 |---|---|
@@ -86,6 +86,7 @@ and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.
 | 4.24 | `kg_vendor.py update --ref` for the bench before a tag; `check` and `kg_gate.py` refuse a bench vendor without `--allow-unreleased` |
 | 4.25 | `kg_trace.py`, the trace that does not resolve: each node's `trace:` anchor against the files of the repository |
 | 4.26 | `kg_query --semantic`, the optional search by similarity (the `vector` extra, `kg_vector.py`), fused with `--text` by RRF |
+| 4.27 | Contract v4.15: an external end can start with a dot folder (`.github/`, `.config/`); `kg_trace` exits 3 on an empty corpus |
 
 ## Versions and tags
 

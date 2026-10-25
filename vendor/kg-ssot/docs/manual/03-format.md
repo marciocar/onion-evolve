@@ -135,8 +135,9 @@ In the top level, in `meta`, in a node, in an edge, and in an external edge, any
 | `x_*` | any | |
 
 An external reference is `<path>.kg.yaml#<id>`, or `<path>.kg.json#<id>` since v4.7, with the path relative to the
-repository root and written with `/`. Each segment starts with a letter, a digit, or `_`. An absolute path, `..`,
-`\`, and `:` fail.
+repository root and written with `/`. Each segment starts with a letter, a digit, or `_`, or, since v4.15, with a dot
+followed by one of them (`.github/`, `.config/`). An absolute path, the segments `.` and `..`, `\`, and
+`:` fail.
 
 ## Canonical `x_` profiles (v4.11 and v4.12)
 

@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.14"
+CONTRACT_VERSION = "4.15"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -453,7 +453,7 @@ def classify(error):
 
 # fullmatch nos três (EXTERNAL_REF, SLUG, ISO_PREFIX): o $ do Python casa antes de um \n final, e o do ECMA-262, o dos
 # patterns do contrato e do leitor JS, não; com match, "a.kg.yaml#ID\n" passava aqui e virava dangling-external.
-EXTERNAL_REF = re.compile(r"^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)#[A-Za-z][A-Za-z0-9_]*$")
+EXTERNAL_REF = re.compile(r"^(?:\.?[A-Za-z0-9_][A-Za-z0-9_.-]*/)*\.?[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.(?:yaml|json)#[A-Za-z][A-Za-z0-9_]*$")
 
 
 def is_external(ref):

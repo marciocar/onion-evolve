@@ -533,6 +533,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_427_ADOTADA_1025
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-25"
+    verified_against: "na branch chore/kg-ssot-4-27-0 sobre origin/main a51435da: kg_vendor.py update --tag kg-ssot-v4.27.0 (300d5aa7510a, 638 arquivos) e check intacto; ops/kg-gate-ci.sh rc 0 com o aviso de identidade do contrato (f4e01f24… para de323c84…), regravada com --update; 188 grafos, 186 passam o MUST, os 2 da dívida herdada; a bancada pré-tag da ref 5bf74b2c905e mediu os 5 pontos pedidos pelo kg-ssot"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.27.0 (contrato v4.15: referência externa aceita pasta com ponto, como .claude/, e o kg_trace sai rc 3 sem grafo) entrou no core pelo kg_vendor.py update, depois do #1352"
+    narrative: "Na bancada pré-tag: --text byte a byte igual ao da 4.26 em 5 consultas; a aresta do grafo real de transporte da curadoria para .claude/validation/dissect-families.kg.yaml#T_FAMILY_CATEGORIA passa no contrato (na 4.26 caía em form.pattern), e ./, .. e . seguem recusados; o kg-trace.sh dá TSV idêntico e índice igual ao commitado, e num corpus sem grafo trata o rc 3 como vazio; o GitStore grava o grafo que aponta para .claude/ e recusa alvo ausente. O kg-writer passou 62/62 e 11 famílias da casa 273/273. Destrava a curadoria para fechar os três vereditos com x_dissect_sealed_by apontando os D do core."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version e a bancada pré-tag na worktree do core"
+      locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh e da bancada da ref 5bf74b2c905e (relatório ao onion-kg-ssot)"
+      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e bancada antes e depois da troca"
+      locality: "repo"
   - id: E_KG_SSOT_426_ADOTADA_1025
     node_type: evidence
     layer: audit
@@ -899,4 +916,7 @@ edges:
     edge_type: TRACES_TO
   - from: E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025
     to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_427_ADOTADA_1025
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS

@@ -1,0 +1,14 @@
+{
+  "description": "Desde o v4.15: o grafo-alvo numa pasta com ponto, para a ponta externa <caminho>#<id> do grupo external-corpus que mora em .config/.",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "alvo-dot.kg.yaml",
+      "description": "Desde o v4.15: o grafo-alvo numa pasta com ponto; válido sozinho",
+      "valid": true,
+      "codes": [],
+      "corpus": ".."
+    }
+  ]
+}

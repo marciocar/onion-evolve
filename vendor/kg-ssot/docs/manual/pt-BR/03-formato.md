@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:017fe4cd71efc6ff -->
+<!-- translation-of: docs/manual/03-format.md sha256:54de2ab8cc3b50f2 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -138,8 +138,9 @@ No topo, no `meta`, no nó, na aresta e na aresta externa, qualquer outra chave 
 | `x_*` | qualquer | |
 
 Uma referência externa é `<caminho>.kg.yaml#<id>`, ou `<caminho>.kg.json#<id>` desde o v4.7, com o caminho relativo
-à raiz do repositório e escrito com `/`. Cada segmento começa por letra, dígito ou `_`. Caminho absoluto, `..`, `\`
-e `:` reprovam.
+à raiz do repositório e escrito com `/`. Cada segmento começa por letra, dígito ou `_`, ou, desde o v4.15, por um
+ponto seguido de um deles (`.github/`, `.config/`). Caminho absoluto, os segmentos `.` e `..`, `\` e `:`
+reprovam.
 
 ## Perfis canônicos de `x_` (v4.11 e v4.12)
 
