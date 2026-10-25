@@ -20915,6 +20915,11 @@ run_pr_merge_verified_selftests() {
 #!/usr/bin/env bash
 args="$*"
 case "$args" in
+  # o aviso de serialização (repo alheio): os PRs abertos, e os arquivos de cada um por arquivo em STUB_PRFILES_DIR/<n>
+  *"pr list"*) [ -n "${GH_OPEN_PRS:-}" ] && printf '%s\n' ${GH_OPEN_PRS}; exit 0 ;;
+  *"pr view"*"--json files"*)
+      _pn="${args#*pr view }"; _pn="${_pn%% *}"
+      [ -f "${STUB_PRFILES_DIR:-/nonexistent}/${_pn}" ] && cat "${STUB_PRFILES_DIR}/${_pn}"; exit 0 ;;
   *"pr view"*"json mergeable"*)
       # sequência de respostas (uma por chamada) — o auto-rebase lê de novo depois de cada rebase
       if [ -n "${GH_MERGEABLE_SEQ:-}" ]; then
@@ -21239,6 +21244,9 @@ fi
 echo "r$(wc -l < "${PF_LOG}")" > r; git add r; git -c user.email=t@t -c user.name=t commit -q --allow-empty -m rebase
 echo "PR-FINALIZE: enviado feat/alguma-coisa @ $(git rev-parse --short HEAD)"
 PFSTUB
+  # a raiz do r2 também tem o motor, como o checkout do core: sem isto ela seria "repo alheio" (2026-10-25), e o
+  # (y) receberia a mensagem do adotante — o caso de repo alheio sem worktree é o (fx-iv)
+  mkdir -p "${r2}/ops" && cp "${w2}/ops/pr-finalize.sh" "${r2}/ops/pr-finalize.sh"
   _mva() { # $1=sequência de mergeable  $2=PF_MODE  $3=headRefName ; o SUT roda a partir do repo principal
     echo 0 > "${d}/n"; echo 0 > "${d}/mk"; echo 0 > "${d}/hk"; : > "${d}/pflog"; : > "${d}/margs"
     _mv_out="$(cd "${r2}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MK="${d}/mk" STUB_HK="${d}/hk" GH_MERGEABLE_SEQ="$1" \
@@ -21307,6 +21315,112 @@ PFSTUB
     record_pass "pr-merge-verified: (w6) push chegou mas a API não reflete ⇒ para no teto nomeando a causa"
   else record_fail "pr-merge-verified: (w6) diagnóstico" "margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
   git -C "${r2}" remote remove origin >/dev/null 2>&1 || true
+
+  # ── (fx-i)-(fx-iv) REPO ALHEIO sem ops/pr-finalize.sh (2026-10-25, medido 4x no onion-kg-ssot) ─────────────
+  # O adotante chama este script do core com --repo, de dentro do repo DELE, e o auto-rebase rodava o motor do
+  # core na worktree da branch: rc 127 (#227); sem worktree, a mensagem mandava rodar o mesmo motor (#230).
+  # Sandbox de verdade: origin bare + clone + worktree da branch, sem `ops/`, com os geradores do PRÓPRIO
+  # alvo (stubs determinísticos: a projeção lista os "grafos" em docs/graphs) e um lint do alvo. A main e a
+  # branch acrescentam um grafo cada, e as duas projeções conflitam; a variante de fonte também conflita em
+  # src/x.sh. Cada caso roda contra o SUT real E contra um mutante que tem de reprovar.
+  local f3o="${d}/f3-origin.git" f3="${d}/f3" f3w="${d}/f3-wt" f3s="${d}/f3-ws"
+  git init -q --bare -b main "${f3o}" >/dev/null 2>&1
+  ( git clone -q "${f3o}" "${f3}" 2>/dev/null; cd "${f3}" && git config user.email t@t && git config user.name t \
+    && mkdir -p .claude/validation docs/onion docs/graphs src \
+    && printf '%s\n' '#!/usr/bin/env bash' '[ -n "${FX_TRACE_RC3:-}" ] && exit 3' 'ls docs/graphs | LC_ALL=C sort | sed "s/^/idx\t/"' > .claude/validation/kg-trace.sh \
+    && printf '%s\n' '#!/usr/bin/env bash' '[ "${1:-}" = --markdown ] || exit 2' 'echo "# backlog"' 'ls docs/graphs | LC_ALL=C sort | sed "s/^/- /"' > .claude/validation/kg-backlog-project.sh \
+    && printf '%s\n' '#!/usr/bin/env bash' '[ -n "${FX_LINT_FAIL:-}" ] && { echo "Violações HARD: 1"; exit 1; }' 'echo "Violações HARD: 0"' > .claude/validation/lint-artifacts.sh \
+    && _fxg() { bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv; bash .claude/validation/kg-backlog-project.sh --markdown > docs/backlog.md; } \
+    && echo g0 > docs/graphs/g0 && echo base > src/x.sh && _fxg && git add -A && git commit -qm base && git push -q origin HEAD:main \
+    && git checkout -qb feat/fx && echo gb > docs/graphs/gb && _fxg && git add -A && git commit -qm "branch: grafo gb" && git push -q origin feat/fx \
+    && git checkout -q main && git checkout -qb feat/fs && echo gs > docs/graphs/gs && echo branch > src/x.sh && _fxg && git add -A \
+    && git commit -qm "branch: grafo gs + fonte" && git push -q origin feat/fs \
+    && git checkout -q main && git checkout -qb feat/fl && echo gl > docs/graphs/gl && _fxg && git add -A && git commit -qm "branch: grafo gl" \
+    && git push -q origin feat/fl \
+    && git checkout -q main && echo gm > docs/graphs/gm && echo main > src/x.sh && _fxg && git add -A && git commit -qm "main: grafo gm" \
+    && git push -q origin HEAD:main && git worktree add -q "${f3w}" feat/fx && git worktree add -q "${f3s}" feat/fs \
+    && git worktree add -q "${d}/f3-wl" feat/fl ) >/dev/null 2>&1
+  mkdir -p "${d}/fxm/ops/review" "${d}/prf"
+  cp "${REPO_ROOT}/ops/review/review-mode-decide.sh" "${d}/fxm/ops/review/" 2>/dev/null || true
+  printf '%s\n' docs/backlog.md src/a.sh > "${d}/prf/7"; printf '%s\n' src/zzz.sh > "${d}/prf/8"
+  _mvf() { # $1=script $2=headRefName $3=worktree da branch (o head do PR sai dela) ; o SUT roda de dentro do alvo
+    echo 0 > "${d}/n"; echo 0 > "${d}/mk"; echo 0 > "${d}/hk"; : > "${d}/pflog"; : > "${d}/margs"; : > "${d}/comment"
+    _mv_out="$(cd "${f3}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MK="${d}/mk" STUB_HK="${d}/hk" GH_MERGEABLE_SEQ="CONFLICTING MERGEABLE" \
+               PF_LOG="${d}/pflog" GH_HEAD_REF="$2" STUB_HEAD_FROM="$3" STUB_MERGE_ARGS="${d}/margs" STUB_COMMENT="${d}/comment" \
+               GH_PR_FILES="docs/backlog.md docs/onion/kg-read-index.tsv docs/graphs/gb" STUB_PRFILES_DIR="${d}/prf" \
+               ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=5 ONION_MERGE_HEAD_SYNC_TRIES=3 ONION_MERGE_HEAD_SYNC_POLL=0 \
+               GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged \
+               bash "$1" 999 2>&1)"; _mv_rc=$?
+  }
+  _fxmut() { # $1=âncora literal $2=substituição → caminho do mutante (vazio se a âncora não casou: mutante que não muta)
+    local m="${d}/fxm/ops/pr-merge-verified.sh"
+    A="$1" B="$2" awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${sut}" > "${m}"
+    cmp -s "${sut}" "${m}" && { echo ""; return; }
+    printf '%s' "${m}"
+  }
+  _fxcase() { # $1=rótulo $2=predicado $3=âncora $4=substituição $5=branch $6=worktree ; o MUTANTE roda antes (o real muda a fixture)
+    local lbl="$1" pred="$2" mf; mf="$(_fxmut "$3" "$4")"
+    if [ -z "${mf}" ]; then record_fail "pr-merge-verified: ${lbl} — MUTANTE" "a âncora do mutante não casou no SUT (${3})"; return; fi
+    _mvf "${mf}" "$5" "$6"
+    if "${pred}"; then record_fail "pr-merge-verified: ${lbl} — MUTANTE SOBREVIVEU" "o caso não distingue o SUT do mutante (${3} → ${4})"; return; fi
+    _mvf "${sut}" "$5" "$6"
+    if ! "${pred}"; then record_fail "pr-merge-verified: ${lbl}" "rc=${_mv_rc} pf=[$(cat "${d}/pflog")] margs=[$(cat "${d}/margs")] out=$(tail -8 <<< "${_mv_out}")"; return; fi
+    record_pass "pr-merge-verified: ${lbl} (e o mutante reprova)"
+  }
+  local _fx_old_s; _fx_old_s="$(git -C "${f3s}" rev-parse HEAD 2>/dev/null)"
+  # (fx-ii) conflito em FONTE ⇒ aborta nomeando o arquivo, a branch (local e remota) segue no head de antes, sem merge
+  _p_fx2() { [ "${_mv_rc}" -ne 0 ] && grep -qF "conflito REAL em src/x.sh" <<< "${_mv_out}" && [ ! -s "${d}/margs" ] \
+             && [ "$(git -C "${f3s}" rev-parse HEAD)" = "${_fx_old_s}" ] && [ "$(git -C "${f3o}" rev-parse feat/fs)" = "${_fx_old_s}" ] \
+             && git -C "${f3s}" diff --quiet && ! [ -d "$(git -C "${f3s}" rev-parse --absolute-git-dir)/rebase-merge" ]; }
+  _fxcase "(fx-ii) repo alheio, conflito em fonte ⇒ aborta nomeando, branch intacta, sem merge" _p_fx2 \
+    '_foreign_is_proj "${_f}" \' 'true \' feat/fs "${f3s}"
+  # (fx-iii) o aviso de serialização: outro PR aberto toca a mesma projeção ⇒ avisa nomeando (sem bloquear); o que não toca, cala
+  _p_fx3() { grep -qF "PR #7 também toca docs/backlog.md: serialize" <<< "${_mv_out}" && ! grep -qF "PR #8 também" <<< "${_mv_out}" \
+             && ! grep -qF "PR #999 também" <<< "${_mv_out}" && grep -qF "conflito REAL em src/x.sh" <<< "${_mv_out}"; }
+  _mv_out=""; GH_OPEN_PRS="999 7 8"; export GH_OPEN_PRS
+  _fxcase "(fx-iii) outro PR aberto toca a mesma projeção ⇒ aviso 'serialize' nomeado, antes de qualquer efeito" _p_fx3 \
+    'say "⚠️  PR #${_n} também toca' ': "' feat/fs "${f3s}"
+  unset GH_OPEN_PRS
+  # (fx-iv) repo alheio sem worktree da branch ⇒ não rebaseia, e a mensagem diz o comando que o ADOTANTE tem
+  _p_fx4() { [ "${_mv_rc}" -ne 0 ] && grep -qF "Este repo não tem ops/pr-finalize.sh" <<< "${_mv_out}" \
+             && grep -qF "git rebase origin/main" <<< "${_mv_out}" && ! grep -qF "Rode na worktree da branch: bash ops/pr-finalize.sh" <<< "${_mv_out}" \
+             && [ ! -s "${d}/margs" ]; }
+  _fxcase "(fx-iv) repo alheio sem worktree ⇒ comando do adotante (rebase + regenerar + push), nunca o motor do core" _p_fx4 \
+    'if [ -z "$_wt" ] && [ "${_FOREIGN_REPO}" -eq 1 ]; then' 'if false; then' feat/sem-worktree "${f3}"
+  # (fx-i) repo alheio, conflito SÓ de projeção ⇒ rebase próprio, projeções regeneradas pelo gerador do alvo,
+  #        push com lease, sem o caminho rápido, merge provado. O MUTANTE é o código antigo (pr-finalize, rc 127).
+  _p_fx1() { local _h; _h="$(git -C "${f3w}" rev-parse HEAD)"
+             [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}" && [ ! -s "${d}/pflog" ] \
+             && [ "$(git -C "${f3o}" rev-parse feat/fx)" = "${_h}" ] && git -C "${f3w}" merge-base --is-ancestor "$(git -C "${f3o}" rev-parse main)" "${_h}" \
+             && [ "$(git -C "${f3w}" show HEAD:docs/backlog.md)" = "$(printf '# backlog\n- g0\n- gb\n- gm')" ] \
+             && [ "$(git -C "${f3w}" show HEAD:docs/onion/kg-read-index.tsv)" = "$(printf 'idx\tg0\nidx\tgb\nidx\tgm')" ] \
+             && grep -qF "espera: repo sem ops/pr-finalize.sh" <<< "${_mv_out}" && grep -qF "gate do alvo: lint-artifacts.sh rc 0" <<< "${_mv_out}" \
+             && grep -qF "projeção gerada: docs/backlog.md" "${d}/comment" && grep -q -- '--rebase' "${d}/margs" && ! grep -q -- '--admin' "${d}/margs"; }
+  _fxcase "(fx-i) repo alheio, conflito só de projeção ⇒ rebase próprio, regenera pelo gerador do alvo, lint, push e merge" _p_fx1 \
+    'if [ ! -f "${_wt}/ops/pr-finalize.sh" ]; then' 'if false; then' feat/fx "${f3w}"
+  # (fx-v) o lint do ALVO reprova o head rebaseado ⇒ nada enviado, a branch (local e remota) volta ao head de antes.
+  #        Com o índice VAZIO (kg-trace rc 3), que tem de ser aceito: sem isso a recusa seria pelo gerador, não pelo lint.
+  #        Ordem invertida de propósito (real, depois os mutantes): o mutante do lint EMPURRA e muda a fixture.
+  local f3l="${d}/f3-wl" _fx_old_l _fxm
+  _fx_old_l="$(git -C "${f3l}" rev-parse HEAD 2>/dev/null)"
+  _p_fx5() { [ "${_mv_rc}" -ne 0 ] && grep -qF "o lint do alvo reprovou o head rebaseado" <<< "${_mv_out}" && [ ! -s "${d}/margs" ] \
+             && [ "$(git -C "${f3l}" rev-parse HEAD)" = "${_fx_old_l}" ] && [ "$(git -C "${f3o}" rev-parse feat/fl)" = "${_fx_old_l}" ] \
+             && git -C "${f3l}" diff --quiet; }
+  export FX_LINT_FAIL=1 FX_TRACE_RC3=1
+  _mvf "${sut}" feat/fl "${f3l}"
+  if ! _p_fx5; then record_fail "pr-merge-verified: (fx-v) lint do alvo reprova" "rc=${_mv_rc} margs=[$(cat "${d}/margs")] out=$(tail -6 <<< "${_mv_out}")"
+  else
+    _fxm="$(_fxmut '[ "${_rc}" -eq 3 ] && { _rc=0; _empty_ok=1; }' ':')"
+    [ -n "${_fxm}" ] && _mvf "${_fxm}" feat/fl "${f3l}"
+    if [ -z "${_fxm}" ] || _p_fx5; then record_fail "pr-merge-verified: (fx-v) — MUTANTE do rc 3 SOBREVIVEU" "o caso não distingue índice vazio aceito de gerador falho"
+    else
+      _fxm="$(_fxmut "if grep -qF 'MORREU' <<< \"\${_lint}\" || [ \"\${_lrc}\" -ne 0 ]; then" 'if false; then')"
+      [ -n "${_fxm}" ] && _mvf "${_fxm}" feat/fl "${f3l}"
+      if [ -z "${_fxm}" ] || _p_fx5; then record_fail "pr-merge-verified: (fx-v) — MUTANTE do lint SOBREVIVEU" "o caso não distingue lint julgado de lint ignorado"
+      else record_pass "pr-merge-verified: (fx-v) lint do alvo reprova (índice vazio aceito) ⇒ nada enviado, branch intacta (e os 2 mutantes reprovam)"; fi
+    fi
+  fi
+  unset FX_LINT_FAIL FX_TRACE_RC3
 
   # ── (kg-a)-(kg-g) PROVENANCE DA BRANCH × REBASE (SAC-80, 2026-10-09) ─────────────────────────
   # Defeito medido num adotante: o .kg.yaml do PR citava `caminho@<sha>` de commit da PRÓPRIA branch,
@@ -21464,6 +21578,7 @@ PFSTUB
     '|| die "não consegui LER o histórico' '|| echo "não li o histórico' \
     '' 0 1
 
+  unset -f _mvf _fxmut _fxcase _p_fx1 _p_fx2 _p_fx3 _p_fx4 _p_fx5
   unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg _mvr _rvmut _rvcase _p_off _p_prior _p_prior_disp _p_fail _p_hist
 }
 
