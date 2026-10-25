@@ -522,7 +522,20 @@ git -C "${DEST}" add -A \
 _faltam=""
 [ "${_DOOR_HAS_LINT}" -eq 1 ] && for _proj in docs/onion/inventory.md docs/onion/graph.md docs/onion/kg-read-index.tsv \
              docs/onion/testing-inventory.md docs/onion/testing-state.md; do
-  [ -s "${DEST}/${_proj}" ] || _faltam="${_faltam} ${_proj}"
+  [ -s "${DEST}/${_proj}" ] && continue
+  # O índice de leitura VAZIO é legítimo quando o produto o DECLARA (kg-trace.sh --emit-index rc 3): desde a
+  # kg-ssot 4.25.1 o gerador é o kg_trace.py, que exclui fixtures e vendor por padrão, e a porta não leva a
+  # biografia do core, então nenhum nó dela tem trace de arquivo (medido em 2026-10-25: 447 grafos, 446 fixtures
+  # e 1 do vendor, rc 3). O lint da porta diz o mesmo pela REGRA 84 (CORPUS-SEM-TRACE-DE-ARQUIVO, SOFT). Vazio
+  # sem essa declaração (rc 2, vendor ausente ou ilegível) segue faltando.
+  if [ "${_proj}" = docs/onion/kg-read-index.tsv ] && [ -f "${DEST}/${_proj}" ]; then
+    _ki_rc=0; bash "${DEST}/.claude/validation/kg-trace.sh" "${DEST}" --emit-index >/dev/null 2>&1 || _ki_rc=$?
+    if [ "${_ki_rc}" -eq 3 ]; then
+      echo "  (6-pos) docs/onion/kg-read-index.tsv vazio e DECLARADO pelo produto (rc 3: nenhum nó com trace de arquivo na porta)"
+      continue
+    fi
+  fi
+  _faltam="${_faltam} ${_proj}"
 done
 if [ -n "${_faltam}" ]; then
   echo "ERRO: a porta ficaria SEM projeção SSOT:${_faltam}" >&2

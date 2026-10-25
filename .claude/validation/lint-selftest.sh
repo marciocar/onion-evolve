@@ -32966,7 +32966,13 @@ run_door_selftests() {
     local _absent_n=0 _p
     for _p in docs/onion/inventory.md docs/onion/graph.md docs/onion/kg-read-index.tsv \
               docs/onion/testing-inventory.md docs/onion/testing-state.md; do
-      [ -s "${d5}/${_p}" ] || _absent_n=$((_absent_n + 1))
+      [ -s "${d5}/${_p}" ] && continue
+      # o índice de leitura vazio vale só quando o produto o DECLARA (rc 3: a porta não tem nó com trace de arquivo)
+      if [ "${_p}" = docs/onion/kg-read-index.tsv ] && [ -f "${d5}/${_p}" ]; then
+        local _ki=0; bash "${REPO_ROOT}/.claude/validation/kg-trace.sh" "${d5}" --emit-index >/dev/null 2>&1 || _ki=$?
+        [ "${_ki}" -eq 3 ] && continue
+      fi
+      _absent_n=$((_absent_n + 1))
     done
     if [ "${_absent_n}" -eq 0 ]; then
       record_pass "door: (f) papel SEM o regenerador ainda sai com as 5 projeções (rodado do core)"
