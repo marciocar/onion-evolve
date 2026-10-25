@@ -79,6 +79,8 @@ a **pergunta** registrada (`--question` é obrigatório: é o único rastro de q
 que não está no futuro, escolha não vazia e distinta das descartadas; a narrative anterior fica
 **verbatim** e a proveniência anterior vai inteira para ela. O passo 0 roda radar **e** contrato: dívida
 que o grafo já tinha não vira culpa do selo (rc 2, não 3). Curas da passada adversarial da forja.
+Depois da escrita roda também o lint de nomes (`kg_vocab.py lint`, onde o repo o tem): código curto que
+o selo trouxe do texto anterior para a narrative sem termo reprova (rc 3, desfeito); ausente, é declarado.
 O selo fica em **`plane: DEV`** (e rebaixa um PROD, dizendo isso na narrative): a base dele é
 **testemunho**, e o contrato do `.kg.yaml` reprova testemunho em PROD (`integrity.testimony-in-prod`).
 O radar avisa `decision-done-em-DEV` (SOFT, agregado) — os dois discordam, e vence o contrato; a
