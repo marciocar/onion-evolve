@@ -2,7 +2,8 @@
 branch: docs/agent-transport-parked
 pr: pendente
 date: 2026-10-25
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a7cb3d8d9b56c9e00c87246c82ff4cb90aa5d7f3872d04dad839311bdd78d76c
+reviewed_code_sha256: 602ba169296bbe49482f7fcfb921c49a936dfbd9b3a42ae2da942fc7f2266a63
 findings_total: 0
 findings_real: 0
 tokens: 0
