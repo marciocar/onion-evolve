@@ -21316,7 +21316,7 @@ PFSTUB
   else record_fail "pr-merge-verified: (w6) diagnóstico" "margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
   git -C "${r2}" remote remove origin >/dev/null 2>&1 || true
 
-  # ── (fx-i)-(fx-iv) REPO ALHEIO sem ops/pr-finalize.sh (2026-10-25, medido 4x no onion-kg-ssot) ─────────────
+  # ── (fx-i)-(fx-iv) REPO ALHEIO sem ops/pr-finalize.sh (2026-10-25, medido 4x num adotante de campo) ───────
   # O adotante chama este script do core com --repo, de dentro do repo DELE, e o auto-rebase rodava o motor do
   # core na worktree da branch: rc 127 (#227); sem worktree, a mensagem mandava rodar o mesmo motor (#230).
   # Sandbox de verdade: origin bare + clone + worktree da branch, sem `ops/`, com os geradores do PRÓPRIO
