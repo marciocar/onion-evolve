@@ -23,6 +23,8 @@ nota: "tokens 0 = não medido (passada na própria sessão, sem subagente)"
   - `D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025`: a peça que nasce, as que não nascem e a doutrina.
   - Uma aresta `TRACES_TO` do D ao sinal.
 - `docs/evolution/inbox/_processed/2026-10-25-proposal-peer-protocol.md`: o sinal, lido inteiro.
+- `CLAUDE.md`: a afirmação de «ZERO» SendMessage ganha a re-medição de 2026-10-25 (1 menção rastreada em `.claude/`,
+  `execution-agent-preamble.md:22`, e o uso vivo entre sessões pelo harness).
 
 ## Suspeitas descartadas
 
@@ -32,5 +34,5 @@ nota: "tokens 0 = não medido (passada na própria sessão, sem subagente)"
 ## Limites declarados
 
 - A peça (o helper) não está neste PR: nasce no seguinte, com bancada e mutante.
-- O texto do CLAUDE.md sobre o SendMessage, apontado como defasado, não muda aqui: mudar o CLAUDE.md fica com o
-  maestro.
+- O texto do CLAUDE.md sobre o SendMessage foi corrigido com a re-medição de 2026-10-25, por ordem do maestro
+  («Mantenha corrigido sempre, integridade é importante»); a medição de 2026-08-16 fica como história.

@@ -15,8 +15,9 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   **A capacidade que COMPRA o acoplamento** (corrigido em 2026-08-16, medido): o **`exit 2`
   determinístico de hook**, que barra a ação inclusive sob `bypassPermissions` — isso não existe fora
   do Claude Code e nenhum CI replica. O exemplo antigo era `SendMessage` no modo Teams, e a medição o
-  derrubou: `grep -rn SendMessage .claude` devolve **ZERO** — a capacidade citada como razão de
-  abandonar o agnosticismo **nunca foi exercitada na maquinaria**. Acoplamento declarado e não usado é
+  derrubou: em 2026-08-16 `grep -rn SendMessage .claude` dava **ZERO** — a capacidade **nunca foi
+  exercitada na maquinaria** (em 2026-10-25: 1 menção; ele é o canal vivo entre sessões pelo harness,
+  sem peça do Onion). Acoplamento declarado e não usado é
   a pior categoria: paga-se o preço doutrinário sem receber a capacidade. E há uma inversão a saber:
   medidas as massas, **26.596 linhas de shell agnóstico (o que REPROVA, roda em qualquer CI)** contra
   **52.655 de markdown acoplado (o que ACONSELHA)** — o fosso do Onion está, de fato, na metade que
