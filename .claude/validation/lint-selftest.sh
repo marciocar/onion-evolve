@@ -20945,6 +20945,7 @@ case "$args" in
   *"pr view"*headRefName*)         echo "${GH_HEAD_REF:-feat/alguma-coisa}"; exit 0 ;;
   *"pr view"*statusCheckRollup*)
       if [ -n "${GH_VERDICT_FAIL:-}" ]; then echo "FAILURE"; else echo "SUCCESS"; fi; exit 0 ;;
+  *"pr view"*isDraft*) echo "${GH_IS_DRAFT:-false}"; exit 0 ;;   # rascunho (2026-10-25): o gate lê antes de qualquer efeito
   *"pr view"*state,mergedAt*)
       n=$(cat "${STUB_N}" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "${STUB_N}"
       if [ "$n" -eq 1 ]; then v="${GH_STATE_BEFORE}"; else v="${GH_STATE_AFTER}"; fi
@@ -21341,13 +21342,16 @@ PFSTUB
     && git push -q origin feat/fr \
     && git checkout -q main && git checkout -qb feat/fk && echo gk > docs/graphs/gk && _fxg && git add -A && git commit -qm "branch: grafo gk" \
     && git push -q origin feat/fk \
+    && git checkout -q main && git checkout -qb feat/fg && echo gg > docs/graphs/gg && _fxg && git rm -q .claude/validation/kg-backlog-project.sh \
+    && git add -A && git commit -qm "branch: grafo gg, sem o gerador do backlog" && git push -q origin feat/fg \
     && git checkout -q main && git checkout -qb side && echo s > src/side.sh && git add -A && git commit -qm side \
     && git checkout -q main && git checkout -qb feat/fm && echo gfm > docs/graphs/gfm && _fxg && git add -A && git commit -qm "branch: grafo gfm" \
     && git merge -q --no-ff --no-edit side && git push -q origin feat/fm \
     && git checkout -q main && echo gm > docs/graphs/gm && echo main > src/x.sh && _fxg && git add -A && git commit -qm "main: grafo gm" \
     && git push -q origin HEAD:main && git worktree add -q "${f3w}" feat/fx && git worktree add -q "${f3s}" feat/fs \
     && git worktree add -q "${d}/f3-wl" feat/fl && git worktree add -q "${d}/f3-wr" feat/fr \
-    && git worktree add -q "${d}/f3-wm" feat/fm && git worktree add -q "${d}/f3-wk" feat/fk ) >/dev/null 2>&1
+    && git worktree add -q "${d}/f3-wm" feat/fm && git worktree add -q "${d}/f3-wk" feat/fk \
+    && git worktree add -q "${d}/f3-wg" feat/fg ) >/dev/null 2>&1
   mkdir -p "${d}/fxm/ops/review" "${d}/prf"
   cp "${REPO_ROOT}/ops/review/review-mode-decide.sh" "${d}/fxm/ops/review/" 2>/dev/null || true
   printf '%s\n' docs/backlog.md src/a.sh > "${d}/prf/7"; printf '%s\n' src/zzz.sh > "${d}/prf/8"
@@ -21466,6 +21470,68 @@ PFSTUB
     [ -n "${_fxk_m}" ] && _fxk_run "${_fxk_m}"
     if [ -z "${_fxk_m}" ] || _p_fx8; then record_fail "pr-merge-verified: (fx-viii) — MUTANTE SOBREVIVEU" "sem o desfazer do trap a worktree tinha de ficar reescrita"
     else record_pass "pr-merge-verified: (fx-viii) SIGTERM durante o lint do alvo ⇒ o trap devolve a worktree ao head de antes (e o mutante reprova)"; fi
+  fi
+
+  # ── (fx-ix)..(fx-xii) O DESFECHO DA RECUSA VAI NO RASTRO (2026-10-25, observação do par na bancada do #1355) ──
+  # O comentário do auto-rebase recusado dizia só "head <sha> → —": quem lia o PR não sabia por que parou. Agora a
+  # linha do head e o desfecho dizem "recusado: <o quê>". Cada caso lê o comentário que o SUT POSTA (o stub grava o
+  # corpo) e tem um mutante que apaga o desfecho daquele sítio — o caso só passa se o mutante reprova.
+  local f3g="${d}/f3-wg"
+  _p_fx9() { [ "${_mv_rc}" -ne 0 ] && grep -qF "→ — (recusado: conflito de fonte em src/x.sh) |" "${d}/comment" \
+             && grep -qF "| desfecho | recusado: conflito de fonte em src/x.sh — nada mudou" "${d}/comment"; }
+  _fxcase "(fx-ix) rastro da recusa por conflito de fonte diz 'recusado: conflito de fonte em src/x.sh'" _p_fx9 \
+    '_FR_OUTCOME="recusado: conflito de fonte em ${_f}"' '_FR_OUTCOME=""' feat/fs "${f3s}"
+  _p_fx10() { [ "${_mv_rc}" -ne 0 ] && grep -qF "→ — (recusado: gerador ausente para docs/backlog.md) |" "${d}/comment" \
+              && [ ! -s "${d}/margs" ]; }
+  _fxcase "(fx-x) rastro da recusa por gerador ausente diz 'recusado: gerador ausente para docs/backlog.md'" _p_fx10 \
+    '_FR_OUTCOME="recusado: gerador ausente para ${_p}"' '_FR_OUTCOME=""' feat/fg "${f3g}"
+  _p_fx11() { [ "${_mv_rc}" -ne 0 ] && grep -qF "→ — (recusado: lint do alvo com 1 HARD) |" "${d}/comment" && [ ! -s "${d}/margs" ]; }
+  export FX_LINT_FAIL=1
+  _fxcase "(fx-xi) rastro da recusa pelo lint do alvo diz 'recusado: lint do alvo com 1 HARD'" _p_fx11 \
+    'elif [ -n "${_nh}" ]; then' 'elif false; then' feat/fl "${f3l}"
+  unset FX_LINT_FAIL
+  # (fx-xii) o caminho do CORE (pr-finalize recusa por fonte): o mesmo desfecho, lido da linha "conflito REAL em"
+  local _xm
+  _p_fx12() { [ "${_mv_rc}" -ne 0 ] && grep -qF "→ — (recusado: conflito de fonte em src/x.sh) |" "${d}/comment" && [ ! -s "${d}/margs" ]; }
+  : > "${d}/comment"; STUB_COMMENT="${d}/comment" _mva "CONFLICTING MERGEABLE" fail feat/alguma-coisa
+  if ! _p_fx12; then record_fail "pr-merge-verified: (fx-xii) rastro do core" "rc=${_mv_rc} com=[$(cat "${d}/comment")]"
+  else
+    _xm="$(_fxmut '_rb_outcome="recusado: conflito de fonte em ${_real#conflito REAL em }"' '_rb_outcome=""')"
+    : > "${d}/comment"; [ -n "${_xm}" ] && STUB_COMMENT="${d}/comment" _sut_a="${_xm}" _mva "CONFLICTING MERGEABLE" fail feat/alguma-coisa
+    if [ -z "${_xm}" ] || _p_fx12; then record_fail "pr-merge-verified: (fx-xii) — MUTANTE SOBREVIVEU" "sem o desfecho do core o rastro tinha de voltar a 'recusado' genérico"
+    else record_pass "pr-merge-verified: (fx-xii) rastro da recusa do pr-finalize (core) diz 'recusado: conflito de fonte em src/x.sh' (e o mutante reprova)"; fi
+  fi
+
+  # ── (dr-a)..(dr-c) RASCUNHO É RECUSADO ANTES DE QUALQUER EFEITO (2026-10-25) ────────────────────────────
+  # O fixture é o PIOR caso: repo alheio, PR CONFLICTING com conflito de fonte — sem o gate, o SUT faria fetch,
+  # rebase, comentário de rastro. Com o rascunho: rc 1 nomeando, comentário VAZIO, nenhum merge, branch local e
+  # remota no head de antes.
+  local _fx_old_s2; _fx_old_s2="$(git -C "${f3s}" rev-parse HEAD 2>/dev/null)"
+  _p_dra() { [ "${_mv_rc}" -eq 1 ] && grep -qF "é RASCUNHO (isDraft)" <<< "${_mv_out}" && [ ! -s "${d}/comment" ] && [ ! -s "${d}/margs" ] \
+             && [ "$(git -C "${f3s}" rev-parse HEAD)" = "${_fx_old_s2}" ] && [ "$(git -C "${f3o}" rev-parse feat/fs)" = "${_fx_old_s2}" ]; }
+  export GH_IS_DRAFT=true
+  _fxcase "(dr-a) PR em rascunho ⇒ rc 1 nomeando, sem rebase, sem comentário, sem push, sem merge" _p_dra \
+    '    true) die "PR #${PR} é RASCUNHO' '    true) : ;; mutante) die "PR #${PR} é RASCUNHO' feat/fs "${f3s}"
+  # (dr-b) isDraft ilegível ⇒ recusa (fail-closed como a âncora de estado), também sem efeito
+  _p_drb() { [ "${_mv_rc}" -eq 1 ] && grep -qF "não consegui LER se o PR #999 é rascunho" <<< "${_mv_out}" && [ ! -s "${d}/comment" ] && [ ! -s "${d}/margs" ]; }
+  export GH_IS_DRAFT="talvez"
+  _fxcase "(dr-b) isDraft ilegível ⇒ recusa sem efeito (rascunho ilegível não é rascunho ausente)" _p_drb \
+    '    *) die "não consegui LER se o PR' '    *) : ;; mutante) die "não consegui LER se o PR' feat/fs "${f3s}"
+  unset GH_IS_DRAFT
+  # (dr-c) --allow-draft ⇒ segue: o rascunho de propósito mergeia pelos gates de sempre
+  local _drm
+  _drc() { # $1=SUT → merge limpo de rascunho com --allow-draft
+    echo 0 > "${d}/n"; : > "${d}/margs"
+    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" GH_IS_DRAFT=true STUB_MERGE_ARGS="${d}/margs" GH_STATE_BEFORE="OPEN|null" \
+               GH_STATE_AFTER="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)" GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "$1" 999 --allow-draft 2>&1)"; _mv_rc=$?; }
+  _p_drc() { [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}" && [ -s "${d}/margs" ]; }
+  _drc "${sut}"
+  if ! _p_drc; then record_fail "pr-merge-verified: (dr-c) --allow-draft" "rc=${_mv_rc} out=$(tail -4 <<< "${_mv_out}")"
+  else
+    _drm="$(_fxmut '    --allow-draft) ALLOW_DRAFT=1; shift ;;' '    --allow-draft) shift ;;')"
+    [ -n "${_drm}" ] && _drc "${_drm}"
+    if [ -z "${_drm}" ] || _p_drc; then record_fail "pr-merge-verified: (dr-c) — MUTANTE SOBREVIVEU" "sem o opt-in o rascunho tinha de ser recusado"
+    else record_pass "pr-merge-verified: (dr-c) rascunho com --allow-draft ⇒ segue e mergeia (e o mutante sem o opt-in recusa)"; fi
   fi
 
   # ── (kg-a)-(kg-g) PROVENANCE DA BRANCH × REBASE (SAC-80, 2026-10-09) ─────────────────────────
@@ -21698,6 +21764,7 @@ case "$a" in
   *"--json headRepositoryOwner,headRepository"*)   echo "owner/repo"; exit 0 ;;
   *"--json headRefOid,mergeable"*)                 echo "$(f "$pr" head) $(f "$pr" mergeable)"; exit 0 ;;
   *"--json headRefOid"*)                           f "$pr" head; exit 0 ;;
+  *"--json isDraft"*) echo "${GH_IS_DRAFT:-false}"; exit 0 ;;   # rascunho (2026-10-25): o gate lê antes de qualquer efeito
   *"--json state,mergedAt"*)                       echo "$(f "$pr" state)|$(f "$pr" mergedAt)"; exit 0 ;;
   *"check-runs/"*"/annotations"*)
       id="$(sed -E 's|.*check-runs/([0-9]+)/annotations.*|\1|' <<< "$a")"
@@ -21880,6 +21947,7 @@ case "$a" in
   *"pr view"*headRefName*)         echo "feat/x"; exit 0 ;;
   *"pr view"*baseRefName*)         echo "main"; exit 0 ;;
   *"pr view"*statusCheckRollup*)   echo "SUCCESS"; exit 0 ;;
+  *"pr view"*isDraft*) echo "${GH_IS_DRAFT:-false}"; exit 0 ;;   # rascunho (2026-10-25): o gate lê antes de qualquer efeito
   *"pr view"*state,mergedAt*)
       n=$(cat "${R_N}"); n=$((n+1)); echo "$n" > "${R_N}"
       if [ "$n" -eq 1 ]; then echo "OPEN|null"; else echo "MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"; fi; exit 0 ;;
@@ -21923,9 +21991,12 @@ GH2
     if grep -q '__rc=4' <<< "${_r_out}" && grep -qF 'saio rc=4 SEM esperar' <<< "${_r_out}" && [ ! -s "${d}/rmargs" ] && [ -s "${d}/rcom" ]; then
       record_pass "merge-serial: (r3) --no-wait-after-rebase ⇒ comenta, sai rc 4 sem esperar o CI e sem mergear"
     else record_fail "merge-serial: (r3) modo da série" "margs=[$(cat "${d}/rmargs")] out=${_r_out}"; fi
-    # (r4) rebase RECUSADO (fonte) ⇒ comentário com a causa "fonte" e o desfecho, sem merge
+    # (r4) rebase RECUSADO (fonte) ⇒ comentário com a causa "fonte" e o DESFECHO nomeado (desde 2026-10-25 a linha
+    #      do head diz "→ — (recusado: conflito de fonte em <arquivo>)", não só "→ —"), sem merge
     _rv "CONFLICTING MERGEABLE" fail
-    if [ "${_r_rc}" -ne 0 ] && grep -qF "fonte: conflito REAL em src/x.sh" "${d}/rcom" && grep -qF "RECUSADO" "${d}/rcom" && [ ! -s "${d}/rmargs" ]; then
+    if [ "${_r_rc}" -ne 0 ] && grep -qF "fonte: conflito REAL em src/x.sh" "${d}/rcom" \
+       && grep -qF "→ — (recusado: conflito de fonte em src/x.sh) |" "${d}/rcom" \
+       && grep -qF "| desfecho | recusado: conflito de fonte em src/x.sh — nada mudou" "${d}/rcom" && [ ! -s "${d}/rmargs" ]; then
       record_pass "merge-serial: (r4) auto-rebase recusado por conflito de fonte ⇒ comentário com a causa, sem merge"
     else record_fail "merge-serial: (r4) recusa sem rastro" "rc=${_r_rc} com=[$(cat "${d}/rcom")] out=${_r_out}"; fi
     # (r5) a série já fez os 2 rebases ⇒ o 3º é recusado sem rodar o pr-finalize (limite da SÉRIE, não da chamada)
@@ -35689,6 +35760,7 @@ run_merge_dispensa_selftests() {
 # dublê de `gh` — responde só o que o SUT pergunta; o resto sai não-zero (fail-loud)
 _args="$*"
 case "${_args}" in
+  *"--json isDraft"*) echo "${GH_IS_DRAFT:-false}"; exit 0 ;;   # rascunho (2026-10-25): o gate lê antes de qualquer efeito
   *"--json state,mergedAt"*)
     # ⚠️ O DUBLÊ TEM DE TER ESTADO. A 1ª versão respondia "OPEN|" SEMPRE, então o SUT mergeava e
     # logo depois lia "não mergeou" — e o caso do caminho FELIZ reprovava por defeito do dublê,
@@ -41201,6 +41273,7 @@ case "$a" in
           && git --git-dir="${MSC_ORIGIN}" update-ref refs/heads/main "${t}"
       fi
       echo "SUCCESS"; exit 0 ;;
+  *"pr view"*isDraft*) echo "${GH_IS_DRAFT:-false}"; exit 0 ;;   # rascunho (2026-10-25): o gate lê antes de qualquer efeito
   *"pr view"*state,mergedAt*)
       n=$(cat "${MSC_D}/n" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "${MSC_D}/n"
       if [ "$n" -eq 1 ] || [ -z "${MSC_MERGED:-}" ]; then echo "OPEN|null"; else echo "MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"; fi
