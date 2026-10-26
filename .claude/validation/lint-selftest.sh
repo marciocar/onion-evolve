@@ -37277,10 +37277,10 @@ run_dissect_object_selftests() {
   fi
   n_cases="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\1/p' <<< "${out}")"
   n_rc3="$(sed -nE 's/^dissect-object-bench: ([0-9]+) caso\(s\) \+ ([0-9]+) de rc 3 verdes.*/\2/p' <<< "${out}")"
-  if [ -n "${n_cases}" ] && [ "${n_cases}" -ge 72 ] && [ -n "${n_rc3}" ] && [ "${n_rc3}" -ge 4 ] && [ "${n_ok}" -ge $((n_cases + n_rc3)) ]; then
+  if [ -n "${n_cases}" ] && [ "${n_cases}" -ge 97 ] && [ -n "${n_rc3}" ] && [ "${n_rc3}" -ge 4 ] && [ "${n_ok}" -ge $((n_cases + n_rc3)) ]; then
     record_pass "dissect-object: (b) piso — ${n_cases} casos + ${n_rc3} de rc 3, ${n_ok} linhas ok (a bancada não encolheu)"
   else
-    record_fail "dissect-object: (b)" "piso violado ou resumo ilegível: casos='${n_cases}' rc3='${n_rc3}' ok=${n_ok} (piso 72 + 4)"
+    record_fail "dissect-object: (b)" "piso violado ou resumo ilegível: casos='${n_cases}' rc3='${n_rc3}' ok=${n_ok} (piso 97 + 4)"
   fi
 }
 

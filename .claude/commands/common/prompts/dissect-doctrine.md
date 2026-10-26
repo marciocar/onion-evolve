@@ -252,6 +252,13 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
   No parque **já selado**, o gatilho que dispara não reprova (`gatilho-ja-disparou`): sai a linha
   `aviso item 7 gatilho-disparou-depois-do-selo`, com rc 0, e é o sinal para o destino reabrir. Reprovar ali
   impedia o estudo de registrar a superação que o gatilho existe para ver (achado da curadoria, 2026-10-25).
+- **Objeto em peças.** Se as peças do objeto pedem vereditos diferentes (costurar uma, parquear outra), o meta
+  declara `x_dissect_pieces: [ids]`, e cada nó de peça leva o seu `x_dissect_verdict`. O checador julga **cada**
+  peça como julgaria um veredito único: família, selo, superação e gatilho. O selo vale por peça, porque o destino
+  sela cada uma no seu tempo. Veredito fora das peças declaradas sai `veredito-fora-das-pecas`, e peça sem
+  veredito sai `peca-sem-veredito`. O `x_piece_verdict` do 1º estudo em peças é lido como apelido. Sem a
+  declaração, o parque de uma peça passava calado atrás do veredito positivo de outra, mesmo com o gatilho já
+  disparado (medido no estudo da curadoria, 2026-10-26).
 
 **Marcadores de todo estudo por família** (além dos da §1b e do passo 5 do comando):
 `meta.x_dissect_family: <pref>` **e** uma `external_edges` `TRACES_TO` para

@@ -97,6 +97,37 @@ def seq(*fs):
     return m
 
 
+PIECES = ["D_FIXTURE", "D_PIECE_B", "D_PIECE_C"]
+
+
+def pieces(g):
+    """o objeto em 3 peças, na forma do 1º estudo que as pediu (2026-10-26): a 1ª costura, as outras duas parqueiam,
+    cada uma com a sua superação e o seu gatilho. O gatilho da C lê só o E_PERSIST, para o caso do risco medido:
+    o veredito da 1ª peça é positivo e o parque de outra peça já disparou."""
+    g["meta"]["x_dissect_pieces"] = list(PIECES)
+    d = D(g)
+    d["x_dissect_verdict"] = "costurar"
+    for k in ("x_dissect_overcoming", "x_dissect_overcoming_search", "x_dissect_trigger"):
+        d.pop(k)
+    park = lambda nid, trig: {"id": nid, "node_type": "decision", "plane": "DEV", "status": "open", "impact": 3, "confidence": 0.5,
+                              "label": "parquear a peça.", "trace": STAGE0, "x_dissect_level": 3, "x_dissect_verdict": "parquear",
+                              "x_dissect_overcoming": "nenhuma",
+                              "x_dissect_overcoming_search": [{"where": "corpus", "cmd": "kg_query --text peca"}, {"where": "web", "source": "https://example.org/peca"}],
+                              "x_dissect_trigger": {"kg_query": trig, "min_count": 1}}
+    g["nodes"] += [park("D_PIECE_B", ["--id", "E_OVER", "--status", "superseded"]),
+                   park("D_PIECE_C", ["--id", "E_PERSIST", "--status", "superseded"])]
+
+
+def piece_alias(g):
+    """a forma literal do 1º estudo: o veredito da peça em x_piece_verdict (a 1ª com os dois campos iguais)."""
+    node(g, "D_FIXTURE")["x_piece_verdict"] = "costurar"
+    for nid in PIECES[1:]:
+        node(g, nid)["x_piece_verdict"] = node(g, nid).pop("x_dissect_verdict")
+
+
+SEAL = "onion-evolve:docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_FIXTURE_SELADO"
+
+
 # (nome, código esperado ou None para rc 0, mutação do grafo, ordem dos commits, args extras)
 CASES = [
     ("grafo bom", None, None, "ok", []),
@@ -183,6 +214,27 @@ CASES = [
     ("uso observado com PROTOCOL.md rastreado (variante legítima)", None, uso_observado(STUDY + "/PROTOCOL.md"), "protocol-tracked", []),
     ("app N2 sem artefato acima do nível 1", "app-acima-do-nivel-1", no_art, "ok", []),
     ("app N2 sem artefato com veredito rejeitar", "app-sem-artefato-veredito", seq(no_art, flatten_to_1, lambda g: D(g).update(x_dissect_verdict="rejeitar")), "ok", []),
+    # peças: um veredito por peça declarada, e os itens 2, 6, 7 e 8 em cada uma
+    ("três peças com vereditos diferentes (variante legítima)", None, pieces, "ok", []),
+    ("três peças pelo apelido x_piece_verdict (variante legítima)", None, seq(pieces, piece_alias), "ok", []),
+    ("peças pelo apelido sem declarar as peças", "veredito-duplicado", seq(pieces, piece_alias, lambda g: g["meta"].pop("x_dissect_pieces")), "ok", []),
+    ("peça parquear com gatilho disparado e a 1ª peça costurar", "gatilho-ja-disparou", seq(pieces, lambda g: node(g, "E_PERSIST").update(status="superseded")), "ok", []),
+    ("o mesmo risco pelo apelido x_piece_verdict", "gatilho-ja-disparou", seq(pieces, piece_alias, lambda g: node(g, "E_PERSIST").update(status="superseded")), "ok", []),
+    ("peça parquear sem superação", "sem-x_dissect_overcoming", seq(pieces, lambda g: node(g, "D_PIECE_B").pop("x_dissect_overcoming")), "ok", []),
+    ("peça parquear com busca só no repo", "busca-sem-web", seq(pieces, lambda g: node(g, "D_PIECE_C").update(x_dissect_overcoming_search=[{"where": "corpus", "cmd": "kg_query --text x"}])), "ok", []),
+    ("veredito fora das peças declaradas", "veredito-fora-das-pecas", seq(pieces, lambda g: g["meta"].update(x_dissect_pieces=PIECES[:2])), "ok", []),
+    ("peça declarada sem veredito", "peca-sem-veredito", seq(pieces, lambda g: node(g, "D_PIECE_B").pop("x_dissect_verdict")), "ok", []),
+    ("peças com uma só", "pecas-mal-formadas", seq(pieces, lambda g: (g["meta"].update(x_dissect_pieces=["D_FIXTURE"]), node(g, "D_PIECE_B").pop("x_dissect_verdict"), node(g, "D_PIECE_C").pop("x_dissect_verdict"))), "ok", []),
+    ("peça que não é nó do grafo", "pecas-mal-formadas", seq(pieces, lambda g: g["meta"]["x_dissect_pieces"].append("D_NAO_EXISTE")), "ok", []),
+    ("apelido e campo divergem na mesma peça", "veredito-de-peca-diverge", seq(pieces, lambda g: node(g, "D_PIECE_B").update(x_piece_verdict="rejeitar")), "ok", []),
+    ("peça selada pelo destino, as outras abertas (variante legítima)", None, seq(pieces, lambda g: node(g, "D_PIECE_B").update(status="done", x_dissect_sealed_by=SEAL)), "ok", []),
+    ("peça fechada sem o selo do destino", "veredito-selado", seq(pieces, lambda g: node(g, "D_PIECE_C").update(status="done")), "ok", []),
+    ("peça de família alheia", "veredito-fora-da-familia", seq(pieces, lambda g: node(g, "D_PIECE_B").update(x_dissect_verdict="perseguir")), "ok", []),
+    ("gatilho disparado na peça já selada (avisa, rc 0)", "aviso:gatilho-disparou-depois-do-selo", seq(pieces, lambda g: (node(g, "E_PERSIST").update(status="superseded"), node(g, "D_PIECE_C").update(status="done", x_dissect_sealed_by=SEAL))), "ok", []),
+    ("expect-verdict por peça que bate (variante legítima)", None, pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=parquear,D_PIECE_C=parquear"]),
+    ("expect-verdict por peça que diverge", "veredito-diverge-do-elenxo", pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=rejeitar,D_PIECE_C=parquear"]),
+    ("expect-verdict para peça que não existe", "veredito-diverge-do-elenxo", pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=parquear,D_PIECE_C=parquear,D_OUTRA=parquear"]),
+    ("app N2 sem artefato com uma peça que costura", "app-sem-artefato-veredito", seq(pieces, no_art, flatten_to_1), "ok", []),
 ]
 RC3_CASES = [
     ("grafo ilegível", "rc3-yaml", ["@graph"]),
