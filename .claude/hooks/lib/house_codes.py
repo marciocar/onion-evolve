@@ -201,7 +201,32 @@ def _subject_before(t, start, end, before, codes_rx):
     b = before.rstrip()
     if not (b.endswith("(") and t[end:].lstrip().startswith(")")):
         return False
-    return len(_words(" ".join(b[:-1].split()[-6:]), codes_rx)) >= 3
+    ws = [w.lower() for w in _words(" ".join(b[:-1].split()[-6:]), codes_rx)]
+    # glosa vazia não vale ("veja o que está em (SAC-256)", Elenxo 2026-10-26): ao menos uma palavra de conteúdo
+    return len(ws) >= 2 and any(w not in _FILLER for w in ws)
+
+
+# verbo de ligação, pronome e advérbio que não dizem o assunto de nada
+_FILLER = frozenset("""veja ver vejo que está estão estava isso isto esse essa este esta aquele aquela fiz feito
+foi foram ser são era com para por pela pelo pelos pelas dos das nos nas uma uns umas aqui ali lá ainda também
+mais menos muito sobre depois antes agora fica ficou tem têm tinha vai vou segue sigo como onde quando qual
+quais detalhe ponto item caso coisa""".split())
+
+
+def _table_def(t, start, end, codes_rx):
+    """'| SIGLA | o que ela é |': a sigla sozinha numa célula de tabela, definida pela célula seguinte (≥2
+    palavras). É a forma natural do pré-registro (Elenxo 2026-10-26)."""
+    ls = t.rfind("\n", 0, start) + 1
+    le = t.find("\n", end)
+    line = t[ls:le if le != -1 else len(t)]
+    if not line.lstrip().startswith("|"):
+        return False
+    left = t[ls:start].rstrip(" *`")
+    right = t[end:le if le != -1 else len(t)].lstrip(" *`")
+    if not (left.endswith("|") and right.startswith("|")):
+        return False
+    nxt = right[1:].split("|", 1)[0]
+    return len(_words(nxt, codes_rx)) >= 2
 
 
 def _near(before, after, n=8):
@@ -320,6 +345,8 @@ def findings(text, glossary, titles=None, root=None, glossed_out=None, already=(
                 ok = bool(row["accept"].search(_near(before, after)))
             if not ok and row["kind"] == "issue":
                 ok = _subject_before(t, m.start(), m.end(), before, codes_rx)
+            if not ok:
+                ok = _table_def(t, m.start(), m.end(), codes_rx)
             d = seen.setdefault(tok, {"token": tok, "row": row["code"], "kind": row["kind"],
                                       "opacity": row["opacity"], "gloss": row["gloss"], "glossed": False})
             d["glossed"] = d["glossed"] or ok

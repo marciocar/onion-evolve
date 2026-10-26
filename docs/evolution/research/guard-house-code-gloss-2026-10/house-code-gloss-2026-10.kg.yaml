@@ -183,10 +183,10 @@ nodes:
     confidence: 0.85
     status: done
     verified_at: "2026-10-26"
-    verified_against: "bash .claude/hooks/house-code-gloss.sh --selftest (casos t1 a t6) e a família house_code_gloss da bancada com o caso de registro; 7 mutantes plantados, 7 mordem; 120 payloads reais de SendMessage pelo hook como o runner o chama: rc 0 em todos, mediana 90 ms"
+    verified_against: "bash .claude/hooks/house-code-gloss.sh --selftest (casos t1 a t11, os de t7 a t11 nascidos da passada adversarial) e a família house_code_gloss da bancada com o caso de registro; 12 mutantes plantados, 12 mordem; 120 payloads reais de SendMessage pelo hook como o runner o chama: rc 0 em todos, mediana 94 ms"
     trace: ".claude/hooks/house-code-gloss.sh"
     label: "Substrato do 3º caminho: modo tool do mesmo hook, no PreToolUse com matcher SendMessage|Write|Edit, devolvendo additionalContext e exit 0 sempre. Molde: o kg-read-leg (aviso no PreToolUse). O motor e o glossário são os mesmos."
-    narrative: "Lembrete, nunca bloqueio, por pedido do maestro. A lista de arquivos foi decidida por medida: no acervo de dissecação e pesquisa, todo .md de basename em CAIXA ALTA é prosa de estudo (STAGE0, SYNTHESIS, RESULT, N2-PLAN, CORE-STATE, PROTOCOL, ELENXO, SIGNAL-DRAFT, ACCEPT, BRIEF, BENCH-PLAN), e o README é índice; por isso o filtro é a forma, não uma lista de nomes. No Edit, a glosa que o arquivo já tem cobre (a 1ª menção está lá). O id de tarefa sozinho no parêntese depois do assunto (a tarefa X (SAC-256)) passou a contar como glosa, que é a forma que o glossário pede. Um filtro de shell descarta a chamada que não cita SendMessage nem o caminho de estudo antes do python (11 ms por Write fora da lista)."
+    narrative: "Lembrete, nunca bloqueio, por pedido do maestro. A lista de arquivos foi decidida por medida: no acervo de dissecação e pesquisa, todo .md de basename em CAIXA ALTA é prosa de estudo (STAGE0, SYNTHESIS, RESULT, N2-PLAN, CORE-STATE, PROTOCOL, ELENXO, SIGNAL-DRAFT, ACCEPT, BRIEF, BENCH-PLAN), e o README é índice; por isso o filtro é a forma, não uma lista de nomes. O Edit é julgado pelo resultado (o arquivo com a troca aplicada) e só se cobra a sigla do trecho novo; a 1ª redação julgava o fragmento e acusava a troca de um número de tarefa já glosada. A sigla definida numa linha de tabela conta como glosa, e o rótulo K<n> só é da casa perto de critério ou mutante (a 1ª redação acusava o modelo Kimi K3). Texto acima de 200 KB cala. O id de tarefa sozinho no parêntese depois do assunto (a tarefa X (SAC-256)) passou a contar como glosa, que é a forma que o glossário pede. Um filtro de shell descarta a chamada que não cita SendMessage nem o caminho de estudo antes do python (11 ms por Write fora da lista)."
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "modo tool (tool_target, PREREG) + bash .claude/hooks/house-code-gloss.sh --selftest"
@@ -203,7 +203,7 @@ nodes:
     verified_against: "cabeçalho do modo tool em .claude/hooks/house-code-gloss.sh (TETO) e o caso t6 da bancada"
     trace: ".claude/hooks/house-code-gloss.sh"
     label: "TETO 3: o PreToolUse que não barra deixa a ferramenta rodar; a mensagem e o arquivo saem como foram escritos, e o lembrete corrige a próxima escrita ou pede um Edit de cura. Mensagem estruturada (objeto) não é lida; Bash que escreve .md não é vigiado."
-    narrative: "Barrar daria a correção antes do envio, e foi descartado pelo pedido (lembrete, nunca bloqueio). A massa de opacidade baixa (Elenxo, ids de tarefa) entra no lembrete, como no modo prompt: 36 de 120 mensagens reais o receberiam. Se o ruído treinar a sessão a ignorá-lo, o gatilho é medir a taxa de novo e cortar a opacidade baixa do modo tool."
+    narrative: "Barrar daria a correção antes do envio, e foi descartado pelo pedido (lembrete, nunca bloqueio). A massa de opacidade baixa (Elenxo, ids de tarefa) entra no lembrete, como no modo prompt: das 120 mensagens mais recentes, 36 o receberiam numa janela e 77 na janela seguinte, dominada por sessões de dissecação (Elenxo e N2 sem glosa); no conjunto de 2.506, 516. Se o ruído treinar a sessão a ignorá-lo, o gatilho é medir a taxa de novo e cortar a opacidade baixa do modo tool."
     provenance:
       source: ".claude/hooks/house-code-gloss.sh"
       locator: "cabeçalho, bloco do modo tool (TETO)"
