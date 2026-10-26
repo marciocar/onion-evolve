@@ -1,0 +1,91 @@
+meta:
+  id: ai-front-2026-10
+  schema_version: "1"
+  x_dissect_tool: ai-front
+  x_dissect_against: onion-curation
+  baseline: "2026-10-26"
+  review_after: "2026-12-26"   # o MESMO prazo da dissecação de origem (família ideia, estudo em ondas)
+  # kg-backlog-guard: on
+  # ═══ TETO: 3 NÓS. Triagem fechada: cresce quando o piloto 3 da curadoria voltar com resultado. ═══
+  #
+  # TRIAGEM DO CORE de uma dissecação feita FORA dele: o adotante de curadoria dissecou a ideia de uma frente
+  # fixa de IA (família ideia, destino projeto:onion-curation) e propôs PERSEGUIR como estudo em ondas, com o
+  # piloto 3 como próxima onda. O veredito da frente é da curadoria e o grafo canônico mora lá, no MESMO
+  # caminho relativo deste arquivo. Este grafo registra só a DECISÃO DO MAESTRO sobre a próxima onda (rodar o
+  # piloto 3) e existe para o dissect-census.sh DO CORE responder sem o clone da curadoria.
+  # O que o sinal entregou ao core foi tratado nos grafos donos, no mesmo PR:
+  #   (a) o rótulo da pergunta de modelos pequenos: onion-slm-2026-10 (Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+  #       SUPERSEDES Q_ONION_SLM_PRIMARIES_2026_10, com E_POETA_V2_QWEN3_PTBR_STIL2026);
+  #   (b) a lacuna do radar: já respondida pelo eixo de treino e inferência (D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026
+  #       em docs/onion/graph/sinais-de-campo-2026-09.kg.yaml); o fim do ajuste fino self-serve da OpenAI ficou
+  #       anotado na baseline desse eixo em docs/onion/radar-baselines.yaml como item da 1ª rodada;
+  #   (c) ToolOrchestra (arXiv 2511.21689, orquestrador de 8B treinado por reforço, 37,1% no Humanity's Last
+  #       Exam contra 35,1% do GPT-5, número autorrelatado e sem réplica): SÓ INFORMAÇÃO, sem nó. O roteamento
+  #       entre vários modelos já tem recusa de identidade no core (docs/knowledge-base/concepts/onion-engine-economy.md,
+  #       linha 97: plataforma única), e a revisão adversarial da curadoria o derrubou por falta de caso de uso real.
+  # Proposta triada: docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md
+
+nodes:
+
+  - id: E_CURADORIA_AI_FRONT_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    x_dissect_level: 3
+    verified_at: "2026-10-26"
+    verified_against: "grafo da dissecação da frente de IA no repo de curadoria (onion-curation@f12dd1b, main, que contém o merge e605e6f), lido pela triagem: D_AI_FRONT_VERDICT (open, perseguir como estudo), C_PILOT3_PROPOSAL (open), E_N2_PILOT2_RESULT e E_PILOT2_POETA_PTBR_SLM; os dois primeiros conferidos por peer-ref-check (EXISTEM na origin/main do par)"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "A dissecação da curadoria sustenta perseguir a frente como estudo em ondas: os pilotos 1 e 2 ficaram abaixo do critério de 2 achados aceitos depois da revisão adversarial (0 e 1), e o que mais derrubou achado foi a fonte que mede outra coisa."
+    trace: "docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md"
+    narrative: "Pela régua pré-registrada da curadoria, a nota de 4 a 6 parquearia; o maestro já tinha selado lá não parquear, com a direção de que piloto inconclusivo pede piloto melhor. A proposta do piloto 3 tem 6 perguntas, um juiz separado que filtra já na escolha, exige caso de uso real ou um nó de impacto 4 ou mais para mudar, exige que a fonte meça o que a pergunta pede e conta por fato, não por fonte. Não foi rodada."
+    provenance:
+      source: "github.com/marciocar/onion-curation@f12dd1b:docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml"
+      locator: "nós D_AI_FRONT_VERDICT, C_PILOT3_PROPOSAL, E_N2_PILOT2_RESULT, E_PILOT2_POETA_PTBR_SLM"
+      method: "leitura: grafo canônico da curadoria, relido pela triagem do core; referências conferidas por peer-ref-check.sh"
+      locality: "repo"
+
+  - id: Q_AI_FRONT_PILOTO3_RESULTADO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "O piloto 3 da curadoria chega a 2 achados aceitos ou mais depois da revisão adversarial? Se chegar, a frente de IA vira estudo recorrente; se não, a curadoria volta ao maestro com a escolha entre só por demanda e encerrar."
+    x_gatilho: "reabrir quando o grafo da frente de IA na curadoria trouxer o resultado do piloto 3 (um nó de resultado do piloto 3 que não esteja open), conferido por peer-ref-check.sh na origin/main do par."
+    trace: "docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md"
+  - id: D_AI_FRONT_PILOTO3_1026
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    x_dissect_level: 3
+    x_dissect_verdict: perseguir
+    x_dissect_pursue: estudo
+    trace: "docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md"
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Rodar o piloto 3»"
+    label: "Rodar o piloto 3 da frente de IA na curadoria, com o desenho proposto lá: 6 perguntas, juiz separado já na escolha, caso de uso real ou nó de impacto 4 ou mais, fonte que mede o que a pergunta pede e contagem por fato. O veredito da frente segue da curadoria."
+    narrative: "Selado por /meta:decide em 2026-10-26: escolhida «Rodar o piloto 3»; descartadas: «Só por demanda» · «Encerrar a frente»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Frente de IA na curadoria (pilotos 1 e 2 inconclusivos): qual a próxima onda?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
+
+edges:
+
+  - from: Q_AI_FRONT_PILOTO3_RESULTADO
+    to: E_CURADORIA_AI_FRONT_1026
+    edge_type: DEPENDS_ON
+  - from: D_AI_FRONT_PILOTO3_1026
+    to: E_CURADORIA_AI_FRONT_1026
+    edge_type: DEPENDS_ON
+  - from: Q_AI_FRONT_PILOTO3_RESULTADO
+    to: D_AI_FRONT_PILOTO3_1026
+    edge_type: CONSTRAINS

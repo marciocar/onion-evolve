@@ -1,6 +1,6 @@
 # Panorama Competitivo
 
-**Última Atualização:** 2026-10-14 (Tessl re-medida: o "10k+ specs" não se confirma hoje e o "único spec-as-source" foi refutado, pelo estudo C do adotante de curadoria; Superpowers fechado pela dissecação do mesmo adotante: PARQUEAR; antes, 2026-10-12: estrelas re-medidas pela API do GitHub)
+**Última Atualização:** 2026-10-26 (Duolingo entra como ator medido fora da categoria, COSTURADO pela dissecação do adotante de curadoria; antes, 2026-10-14: Tessl re-medida: o "10k+ specs" não se confirma hoje e o "único spec-as-source" foi refutado, pelo estudo C do adotante de curadoria; Superpowers fechado pela dissecação do mesmo adotante: PARQUEAR; antes, 2026-10-12: estrelas re-medidas pela API do GitHub)
 
 > Da pesquisa orquestrada citada (2026-07-12). Categoria: **SDD (spec-driven development) sobre Claude Code**. Complementa [`../02-product/strategy.md`](../02-product/strategy.md) §Posicionamento.
 
@@ -67,6 +67,15 @@
 ## Adjacente (não concorrente)
 - **GSD (gsd-core)**: open-gsd/gsd-core, 10,4k★ em 2026-10-12; o repo antigo gsd-build/get-shit-done (64,3k★) está **arquivado**. Trajetória citada em 2026-08 (`docs/evolution/research/claude-code-2.1-onion-2026-08/SYNTHESIS.md`).
 - **Claude Task Master**: gestão de tasks local drop-in. O Onion é **provider-agnóstico** (Jira/ClickUp/Asana/Linear via SDAAL), categoria diferente.
+
+## Atores medidos fora da categoria (referência de mercado, sem concorrência direta)
+
+### Duolingo (Nasdaq: DUOL): aprendizagem gamificada com IA, COSTURADO em 2026-10-26
+- **Por que está aqui:** o panorama só tinha ferramentas de IA para desenvolvimento. O Duolingo entra como ator **medido** de aprendizagem gamificada com IA, referência para os projetos de gamificação e de hábito, não como concorrente. A família ator não absorve.
+- **Dinheiro (SEC):** 2025, no relatório anual auditado: receita de US$ 1.037,6 milhões (+39%), reservas de US$ 1.158,4 milhões (+33%), margem bruta de 72,2%, que caiu pelo custo de IA. 2º trimestre de 2026, na carta não auditada: receita de US$ 298,5 milhões (+18%), reservas +8%, usuários por dia +23%, margem bruta de 72,6%, e a margem do EBITDA ajustado caiu de 31,2% para 25,9%.
+- **As duas escolhas medidas:** em 2026 a empresa prioriza retenção e aprendizagem antes de monetizar; e a IA corta o custo de conteúdo e aumenta o custo de servir. O custo de IA só aparece em texto, sem número próprio.
+- **Desfecho:** **COSTURAR**, nota 7 de 10 no limite da régua da dissecação do adotante de curadoria, com revisita trimestral. A próxima é a carta do 3º trimestre de 2026, no início de novembro. Selado pelo maestro em 2026-10-26 no grafo [`duolingo-actor-2026-10.kg.yaml`](../../evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml).
+- **Não medido:** a superação por outro ator (Busuu e Babbel têm fonte primária possível, não lida), os preços públicos, a queda da ação e o controle acionário.
 
 ---
 
