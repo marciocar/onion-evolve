@@ -43805,6 +43805,21 @@ run_cc_delta_census_selftests() {
      && LC_ALL=C grep -qF 'SDK bridge: package.json ilegível (JSONDecodeError)' <<< "${out}"; then
     record_pass "cc-delta-census: (v) sem binário anotado; pacote sem claudeCodeVersion e acima do teto avisados"
   else record_fail "cc-delta-census: (v)" "rc=${rc} $(_emit "${g}${out}" | LC_ALL=C grep -E '^(sdk|aviso.*SDK (sembin|bridge):)' | tr '\t\n' '  ')"; fi
+  # (w) worktree ANINHADA (SAC-219, r16 de 2026-10-22): o censo rodado de dentro de uma worktree sob
+  #     .claude/worktrees/ mede a MESMA contagem de citações de scriptPath que da raiz — o filtro olha o caminho
+  #     relativo ao repo; pelo absoluto, todo arquivo da worktree era descartado e a contagem zerava. E a raiz
+  #     segue sem contar a cópia aninhada. Mutante: o filtro voltar ao caminho absoluto zera a worktree.
+  local wtr="${sb}/r/.claude/worktrees/agent-x" n_root n_wt
+  mkdir -p "${sb}/r/.claude/commands" "${wtr}"
+  printf 'usa scriptPath\n' > "${sb}/r/.claude/commands/wf.md"; printf '// scriptPath\n' > "${sb}/r/.claude/wf.mjs"
+  (cd "${sb}/r" && tar --exclude=./.claude/worktrees -cf - .) | (cd "${wtr}" && tar -xf -)
+  _ccd_wf() { CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= bash "${sut}" "$1" --markdown 2>&1 \
+    | LC_ALL=C sed -n 's/^- arquivos de `\.claude\/` que citam `scriptPath` (citação, não execução): \([0-9][0-9]*\)$/\1/p'; }
+  n_root="$(_ccd_wf "${sb}/r")"; n_wt="$(_ccd_wf "${wtr}")"
+  rm -rf "${sb}/r/.claude/worktrees" "${sb}/r/.claude/commands" "${sb}/r/.claude/wf.mjs"
+  if [ "${n_root}" = "2" ] && [ "${n_wt}" = "2" ]; then
+    record_pass "cc-delta-census: (w) de dentro de uma worktree aninhada a contagem de scriptPath é a mesma da raiz (2 = 2)"
+  else record_fail "cc-delta-census: (w)" "raiz=[${n_root}] worktree=[${n_wt}] (esperado 2 e 2)"; fi
   # (e) o ESQUELETO escrito em (a) passa no radar (--integrity --schema) e no contrato v3
   g="${sb}/w/radar-E3-2026-10-08-r9/radar-E3-2026-10-08-r9.kg.yaml"
   if [ ! -f "${g}" ]; then record_fail "cc-delta-census: (e)" "esqueleto não escrito em ${g}"

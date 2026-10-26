@@ -364,7 +364,9 @@ inv['marketplace'] = os.path.isfile(os.path.join(repo, '.claude-plugin/marketpla
 wf = []
 for pat in ('.claude/**/*.md', '.claude/**/*.js', '.claude/**/*.mjs'):
     for f in glob.glob(os.path.join(repo, pat), recursive=True):
-        if '/worktrees/' in f: continue
+        # o filtro olha o caminho RELATIVO ao repo (SAC-219, r16 de 2026-10-22): pelo absoluto, a rodada que roda
+        # numa worktree da sessão (sob .claude/worktrees/) descartava TODO arquivo e a contagem zerava
+        if '/worktrees/' in '/' + os.path.relpath(f, repo): continue
         try:
             if 'scriptPath' in open(f, encoding='utf-8').read(): wf.append(os.path.relpath(f, repo))
         except Exception: pass
