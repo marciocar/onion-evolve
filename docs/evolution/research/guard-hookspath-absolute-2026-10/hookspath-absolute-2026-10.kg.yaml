@@ -1,0 +1,130 @@
+# kg-backlog-guard: on
+# ═══ TETO: 8 NÓS ═══ (defeito, dogfood, substrato, mutante, 2 tetos + 2 de folga para o Elenxo)
+meta:
+  id: hookspath-absolute-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-26"
+  review_after: "2026-11-26"
+  # Forja de GUARDA (/meta:forge-guard) do lembrete do core.hooksPath ABSOLUTO, decidido pelo maestro em
+  # 2026-10-26: o core volta a relativo e nasce um LEMBRETE (nunca veto) que avisa quando voltar a absoluto.
+  # Doutrina: docs/knowledge-base/concepts/keep-current-doctrine.md (seção "O gate da própria branch").
+nodes:
+  - id: E_DEFEITO_HOOKSPATH_ABSOLUTO_RODA_HOOK_DA_MAIN
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-26'
+    verified_against: "git 2.43.0, repo descartável com worktree ligada e pre-commit diferente em cada árvore: hooksPath=.githooks → HOOK-DA-BRANCH; hooksPath=<abs>/r/.githooks → HOOK-DA-MAIN"
+    trace: '.claude/hooks/session-currency-check.sh'
+    label: 'O DEFEITO, DATADO: com core.hooksPath ABSOLUTO toda worktree roda o .githooks/ do checkout principal (git 2.43, medido em 2026-10-26 no core e num adotante). Um PR que muda o pre-commit não é provado por ele mesmo.'
+    narrative: 'O DEFEITO, DATADO: com `core.hooksPath .githooks` (relativo) o git resolve o caminho contra a worktree, e cada uma roda o .githooks/ da própria branch. Com o caminho ABSOLUTO, toda worktree roda o do checkout principal, e um PR que muda o .githooks/pre-commit deixa de ser provado por ele mesmo: o gate que roda é o da main. Medido pelo maestro no core e num adotante em 2026-10-26 e reproduzido pela forja num repo descartável. Causa conhecida, já escrita no verificador de gate de adoção desde 2026-10-12: o Claude Code grava o caminho absoluto ao criar worktree de agente.'
+    provenance:
+      source: "repo descartável em mktemp, git 2.43.0"
+      locator: "init + .githooks/pre-commit que ecoa HOOK-DA-MAIN; worktree add com pre-commit que ecoa HOOK-DA-BRANCH; commit na worktree com cada forma do hooksPath"
+      method: "medição: comandos executados na sessão de 2026-10-26"
+      locality: "repo"
+
+  - id: E_DOGFOOD_CORE_VOLTOU_A_ABSOLUTO
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-26'
+    verified_against: "git config --show-origin --get core.hooksPath no core, de dentro da worktree da forja: file:<core>/.git/config <core>/.githooks (absoluto), poucas horas depois de o maestro o ter devolvido a relativo; o hook estendido, rodado com o JSON de sessão do runner, avisou no 1º prompt e calou no 2º, rc 0 nos dois"
+    trace: '.claude/hooks/session-currency-check.sh'
+    label: 'DOGFOOD: no mesmo dia em que o maestro devolveu o core a relativo, a config já estava ABSOLUTA de novo quando a forja rodou (com worktrees de agente sendo criadas). O lembrete estendido avisou no 1º prompt e calou no 2º.'
+    narrative: 'DOGFOOD: no mesmo dia em que o maestro devolveu o core a `.githooks` relativo, a forja leu a config de dentro da própria worktree de agente e a achou ABSOLUTA de novo. A atribuição exata do regravador não foi provada nesta medição (o .git/config também é tocado por outras escritas de git), mas o fato é o que o lembrete existe para dizer: voltou, e ninguém foi avisado. O hook estendido avisou no 1º prompt, calou no 2º da mesma sessão, rc 0 nos dois. A forja não mexeu na config (ordem do maestro).'
+    provenance:
+      source: "<core>/.git/config"
+      locator: "git config --show-origin --get core.hooksPath; echo '{\"session_id\":\"dogfood-hp\"}' | bash .claude/hooks/session-currency-check.sh (2 vezes)"
+      method: "medição: leitura de config e invocação do hook como o runner o chama"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: done
+    verified_at: '2026-10-26'
+    verified_against: "guard-census 2026-10-26 com GUARD_CENSUS_QUERY='hooksPath ': nenhuma guarda menciona o termo; SessionStart registrados (task-manager, worklog, inbox, farol) não tratam de gate; session-degraded-notice é da escada de modelos; session-currency-check é UserPromptSubmit com estado por sessão e trata de base atual"
+    trace: '.claude/hooks/session-currency-check.sh'
+    label: 'O SUBSTRATO: o lembrete estende o session-currency-check (UserPromptSubmit), não um SessionStart: a regravação acontece NO MEIO da sessão, ao criar worktree de agente, e só um hook de prompt a vê nascer.'
+    narrative: 'O SUBSTRATO: estender o session-currency-check.sh, sem hook novo nem registro novo. Três razões medidas: (1) a regravação acontece no meio da sessão, quando uma worktree de agente nasce, e um SessionStart (o do inbox, o candidato natural) só a veria na sessão seguinte; (2) o hook já tem o estado por sessão em diretório da conta, então o aviso sai 1× por (sessão, valor) e re-avisa se for consertado e voltar; (3) o assunto é o dele, "base atual": o gate que roda tem de ser o da branch. O bloco roda ANTES do censo e não depende dele (sem rede, sem registro). LEMBRETE, exit 0 sempre (decisão do maestro): o caminho absoluto não quebra o commit, só o deixa sem prova. Erra para o lado de calar: só fala quando o valor é absoluto, termina em `.githooks` e a árvore tem .githooks/.'
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "GUARD_CENSUS_QUERY='hooksPath ' bash .claude/validation/guard-census.sh . --markdown; .claude/settings.json hooks.SessionStart e hooks.UserPromptSubmit"
+      method: "medição: censo de guardas e leitura do registro antes da forja"
+      locality: "repo"
+
+  - id: E_BANCADA_E_MUTANTE_HOOKSPATH
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-26'
+    verified_against: "bash .claude/validation/lint-selftest.sh --families hookspath_reminder,currency_census: OK, 10/10 na família nova com LC_ALL=C; o caso (m) roda o hook sem a linha do ramo do absoluto e exige silêncio no caso (a)"
+    trace: '.claude/validation/lint-selftest.sh'
+    label: 'BANCADA: família hookspath_reminder, 10 casos invocando o hook como o runner. Absoluto avisa; relativo, unset, fora de git e outro diretório calam; o MUTANTE sem o ramo do absoluto faz o 1º caso calar.'
+    narrative: 'BANCADA: família run_hookspath_reminder_selftests. Polaridades: (a) absoluto avisa com o conserto e rc 0; (a2) a 2ª vez na mesma sessão cala; (a3) a sessão numa worktree ligada avisa, porque o --local lê o .git/config comum; (a4) sem o censo o lembrete sai mesmo assim; (b) relativo, (c) unset, (d) fora de git e (e) absoluto para outro diretório calam com rc 0; (b2) consertado e voltando a absoluto avisa de novo. Mutante (m), dentro da família para morder sempre: o hook sem a linha do ramo do absoluto faz o (a) calar; se a âncora do sed mudar, o caso reprova em vez de passar vazio.'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_hookspath_reminder_selftests, casos (a) a (e) e (m)"
+      method: "medição: bancada executada com LC_ALL=C"
+      locality: "repo"
+
+  - id: C_TETO_SO_O_LOCAL
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: confirmed
+    verified_at: '2026-10-26'
+    verified_against: "o bloco lê git config --local --get core.hooksPath; extensions.worktreeConfig (config.worktree) e o gitconfig global da conta não são consultados"
+    trace: '.claude/hooks/session-currency-check.sh'
+    label: 'TETO 1: lê só o --local (o .git/config comum). Um hooksPath por worktree (extensions.worktreeConfig) ou global não é visto, e um absoluto que aponta para diretório que não termina em .githooks cala de propósito.'
+    narrative: 'TETO 1: lê só o `--local`, que é onde o Claude Code grava. Um hooksPath por worktree (extensions.worktreeConfig) ou global não é visto. Um absoluto que aponta para outro diretório qualquer (gestor de hooks global, por exemplo) cala de propósito: o conserto `.githooks` não se aplica a ele, e acusar quem escolheu outro gestor treina a sessão a ignorar o lembrete (cláusula 4).'
+    provenance:
+      source: ".claude/hooks/session-currency-check.sh"
+      locator: "função hookspath_reminder"
+      method: "leitura: o código do lembrete"
+      locality: "repo"
+
+  - id: C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: confirmed
+    verified_at: '2026-10-26'
+    verified_against: "o hook é UserPromptSubmit no settings.json do projeto; subagente não recebe prompt do usuário"
+    trace: '.claude/settings.json'
+    label: 'TETO 2: o lembrete chega à sessão principal (UserPromptSubmit), não ao subagente que acabou de criar a worktree; ele aparece no prompt seguinte do maestro. Não conserta nada: o conserto é um comando que a sessão roda com o maestro sabendo.'
+    narrative: 'TETO 2: subagente não dispara UserPromptSubmit. O lembrete aparece na sessão principal no prompt seguinte à regravação, e só nela. Não conserta: o conserto (`git config core.hooksPath .githooks`) é mudança de config que a sessão roda com o maestro sabendo. A causa a montante (o Claude Code regravar o caminho) continua viva enquanto o produto fizer isso.'
+    provenance:
+      source: ".claude/settings.json"
+      locator: "hooks.UserPromptSubmit (session-currency-check.sh)"
+      method: "leitura: registro do hook no settings do projeto"
+      locality: "repo"
+
+edges:
+  - from: E_DEFEITO_HOOKSPATH_ABSOLUTO_RODA_HOOK_DA_MAIN
+    to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_CORE_VOLTOU_A_ABSOLUTO
+    to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
+    edge_type: SUPPORTS
+  - from: E_BANCADA_E_MUTANTE_HOOKSPATH
+    to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
+    edge_type: SUPPORTS
+  - from: C_TETO_SO_O_LOCAL
+    to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
+    edge_type: CONSTRAINS
+  - from: C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL
+    to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
+    edge_type: CONSTRAINS

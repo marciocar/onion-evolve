@@ -25,17 +25,28 @@
 # superfície que tinha voltado a em dia cair de novo, avisa de novo. Fonte inalcançável aparece como NÃO
 # MEDIDO, nunca como "em dia". A rede é paga no máximo uma vez por TTL de cada fonte (o censo guarda só as
 # respostas remotas; o lado local é relido a cada prompt, então a cura aparece na hora).
+#
+# ── O GATE DA PRÓPRIA BRANCH: core.hooksPath ABSOLUTO (2026-10-26) ─────────────────────────────────
+# A outra metade de "base atual": o pre-commit que roda tem de ser o DESTA branch. Medido em 2026-10-26
+# (git 2.43, no core e num adotante): com `core.hooksPath .githooks` (relativo) cada worktree roda o
+# .githooks/ da própria branch; com o caminho ABSOLUTO, toda worktree roda o do checkout principal, e um PR
+# que muda o .githooks/pre-commit não é provado por ele mesmo. Causa conhecida: o Claude Code grava o
+# caminho absoluto ao criar worktree de agente, ou seja NO MEIO da sessão; por isso o lembrete mora aqui
+# (UserPromptSubmit) e não num SessionStart, que só o veria na sessão seguinte. LEMBRETE, nunca veto
+# (exit 0): avisa 1× por (sessão, valor); consertado e voltando, avisa de novo. Silêncio quando o valor é
+# relativo, está ausente, não termina em `.githooks`, a árvore não tem .githooks/, ou não há git. Roda
+# mesmo sem o censo (não depende de rede nem de registro).
+# TETO: lê só o `--local` (o .git/config comum); hooksPath por worktree (extensions.worktreeConfig) ou
+# global não é visto, e um absoluto que aponta para outro diretório (não `.githooks`) cala.
 set -uo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 census="${ONION_CURRENCY_CENSUS:-${here}/../validation/currency-census.sh}"
-[ -f "${census}" ] || exit 0
 repo="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 # a sessão vem do JSON do hook (stdin); sem ele, do ambiente. Sem nenhuma, não há como deduplicar por sessão.
 payload=""; [ -t 0 ] || payload="$(head -c 65536 2>/dev/null)"
 sess="$(printf '%s' "${payload}" | sed -n 's/.*"session_id"[[:space:]]*:[[:space:]]*"\([A-Za-z0-9._-]*\)".*/\1/p' | awk 'NR==1')"
 [ -n "${sess}" ] || sess="${CLAUDE_CODE_SESSION_ID:-nosession}"
 sess="${sess//[^A-Za-z0-9._-]/_}"
-tsv="$(bash "${census}" "${repo}" --tsv </dev/null 2>/dev/null)" || exit 0
 # o estado só vale num diretório da conta e não gravável por outros; fora disso, avisa sem deduplicar
 # (barulho num ambiente quebrado é preferível a um aviso que outra conta pode calar)
 state_dir="${ONION_CURRENCY_STATE_DIR:-${XDG_RUNTIME_DIR:-${HOME:-/nonexistent}/.cache}/onion-currency-notice}"
@@ -43,6 +54,24 @@ mkdir -p -m 700 "${state_dir}" 2>/dev/null || true
 state=""
 st="$(stat -c '%u %a' "${state_dir}" 2>/dev/null)" && [ "${st%% *}" = "$(id -u)" ] && case "${st##* }" in *[2367]?|*?[2367]) ;; *) state="${state_dir}/${sess}.tsv" ;; esac
 [ -z "${state}" ] || [ -f "${state}" ] || : > "${state}" 2>/dev/null
+hookspath_reminder() {
+  command -v git >/dev/null 2>&1 || return 0
+  local top hp mark
+  top="$(git -C "${repo}" rev-parse --show-toplevel 2>/dev/null)" || return 0
+  hp="$(git -C "${repo}" config --local --get core.hooksPath 2>/dev/null)" || hp=""
+  mark=""; [ -z "${state}" ] || mark="${state%.tsv}.hookspath"
+  case "${hp}" in
+    /*/.githooks|/*/.githooks/|"~"*/.githooks|"~"*/.githooks/) [ -d "${top}/.githooks" ] || return 0 ;;
+    *) [ -z "${mark}" ] || rm -f "${mark}" 2>/dev/null; return 0 ;;
+  esac
+  [ -n "${mark}" ] && [ "$(cat "${mark}" 2>/dev/null)" = "${hp}" ] && return 0
+  [ -z "${mark}" ] || printf '%s' "${hp}" > "${mark}" 2>/dev/null
+  echo "⚠️ Onion — core.hooksPath está ABSOLUTO ('${hp}'): toda worktree roda o .githooks/ do checkout principal, não o da própria branch, e um PR que muda o pre-commit não é provado por ele mesmo. Conserto: git config core.hooksPath .githooks (causa conhecida: o Claude Code grava o caminho absoluto ao criar worktree de agente)."
+  echo "  (Repasse ao maestro com a fonte: este lembrete é do hook session-currency-check.sh; nada foi bloqueado.)"
+}
+hookspath_reminder
+[ -f "${census}" ] || exit 0
+tsv="$(bash "${census}" "${repo}" --tsv </dev/null 2>/dev/null)" || exit 0
 # POR SUPERFÍCIE (não pelo aviso inteiro): cada superfície que não está em dia é avisada 1× por sessão e
 # por assinatura; a que VOLTA a em dia, ou que SOME da medição (perna que morreu e voltou), sai do estado,
 # e se ela cair de novo o aviso volta. Na BASE a assinatura é só o estado (a branch padrão anda a cada
