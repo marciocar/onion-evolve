@@ -56,7 +56,8 @@ if [ -n "${OUT}" ]; then
   # Escrita atômica: o script chama a si mesmo com o stdout num temporário AO LADO do destino (mesmo sistema de
   # arquivos, então o mv é rename) e só troca o destino com rc 0. Nenhum caminho de erro toca no destino.
   _odir="$(dirname -- "${OUT}")"
-  [ -d "${_odir}" ] || { echo "ERRO kg-trace --out: diretório do destino não existe (${_odir})" >&2; exit 2; }
+  # o diretório do destino nasce se faltar (o dia 1, e a worktree descartável onde docs/onion/ não é rastreado)
+  mkdir -p -- "${_odir}" 2>/dev/null && [ -d "${_odir}" ] || { echo "ERRO kg-trace --out: diretório do destino inválido (${_odir})" >&2; exit 2; }
   _otmp="$(mktemp "${_odir}/.kg-read-index.XXXXXX")" || { echo "ERRO kg-trace --out: não consegui criar temporário em ${_odir}" >&2; exit 2; }
   trap 'rm -f "${_otmp}"' EXIT   # interrupção no meio não deixa o temporário na árvore
   _args=() _skip=0

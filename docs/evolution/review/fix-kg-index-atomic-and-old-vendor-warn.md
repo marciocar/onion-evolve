@@ -3,11 +3,11 @@ branch: fix/kg-index-atomic-and-old-vendor-warn
 pr: pendente
 date: 2026-10-26
 reviewed_diff_sha256: pendente
-findings_total: 4
-findings_real: 3
+findings_total: 6
+findings_real: 5
 tokens: 0
 duration_min: 75
-findings_fixed: 3
+findings_fixed: 5
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: autor (passada adversarial própria, agente de execução)
@@ -51,6 +51,13 @@ nota: "tokens não medidos (0). Passada feita pelo próprio autor, contra o arte
    `--emit-index > /tmp/idx.tsv && mv …`. Ela já é atômica (o `&&` não move no erro), e o alvo pode ter um
    `kg-trace.sh` anterior a este PR. Um script anterior IGNORA `--out` e imprime no stdout, então trocar a mensagem
    faria a regeneração virar um no-op calado lá.
+
+5. **REAL, curado (achado pela bancada `--affected-range`).** O `pr-finalize --check` monta uma worktree
+   descartável do índice. Ali `docs/onion/` não existe quando nada nele é rastreado, e o `--out` reprovava com
+   "diretório não existe". Agora o `--out` cria o diretório do destino (`mkdir -p`) e só falha se ele for inválido.
+   O stub da bancada faz o mesmo.
+6. **REAL, curado (achado pela REGRA de shell-pipefail da bancada).** No `kg-index-floor.sh`, os pipes
+   `sort -V | head -1` e `sed | head -1` fechavam cedo sob pipefail. Viraram `sed -n 1p` e `sed …;q`.
 
 Grep de fechamento: `git grep -n -- '--emit-index >'` fora de `docs/evolution/` devolve só essa mensagem (item 4)
 e o fixture-stub da bancada do merge alheio (`_fxg`, que exercita um stub próprio, não o gerador).

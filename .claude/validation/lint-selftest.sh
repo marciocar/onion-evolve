@@ -12723,7 +12723,7 @@ run_pre_push_selftests() {
       && printf '%s\n' '#!/bin/bash' 'printf "v-%s\n" "$(cat a.txt 2>/dev/null)" > .claude/validation/lint-rules.md' > .claude/utils/adopt/regen-ssot-projections.sh \
       && printf '#!/bin/bash\nexit 0\n' > .claude/validation/kg-backlog-project.sh \
       && printf '%s\n' '#!/bin/bash' 'o=""; while [ $# -gt 0 ]; do [ "$1" = --out ] && o="$2"; shift; done' \
-           'if [ -n "$o" ]; then printf "a\tb\n" > "$o"; else printf "a\tb\n"; fi' > .claude/validation/kg-trace.sh \
+           'if [ -n "$o" ]; then mkdir -p "$(dirname "$o")"; printf "a\tb\n" > "$o"; else printf "a\tb\n"; fi' > .claude/validation/kg-trace.sh \
       && printf '%s\n' '#!/bin/bash' \
            '[ "${GITHUB_EVENT_NAME:-}" = pull_request ] || { echo "  Violações HARD : 7"; exit 1; }' \
            '[ "$(cat .claude/validation/lint-rules.md 2>/dev/null)" = "v-$(cat a.txt 2>/dev/null)" ] || { echo "VIOLATION: lint-rules defasado"; echo "  Violações HARD : 1"; exit 1; }' \
