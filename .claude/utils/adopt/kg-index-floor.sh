@@ -25,13 +25,13 @@ T="${1:-}"
 [ -n "${T}" ] && [ -d "${T}" ] || { echo "uso: kg-index-floor.sh <TARGET> (diretório)" >&2; exit 2; }
 V="${T}/vendor/kg-ssot"
 [ -d "${V}" ] || exit 4   # sem vendor (inclui o próprio produto, que se julga pelo tools/ da raiz)
-_ver="$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' "${V}/.kg-ssot-version" 2>/dev/null | head -1)"
+_ver="$(sed -n '/"version": *"/{s/.*"version": *"\([^"]*\)".*/\1/p;q;}' "${V}/.kg-ssot-version" 2>/dev/null)"
 _msg="o regerador do índice de leitura precisa da kg-ssot >= ${FLOOR}; adote a kg-ssot junto, ou o índice fica sem regerador"
 if [ -z "${_ver}" ]; then
   echo "AVISO kg-index: vendor/kg-ssot do alvo sem versão legível no carimbo (.kg-ssot-version) — ${_msg}."; exit 1
 fi
 # sort -V: se a menor das duas é o piso, a versão do alvo é >= piso
-if [ "$(printf '%s\n%s\n' "${FLOOR}" "${_ver}" | sort -V | head -1)" != "${FLOOR}" ]; then
+if [ "$(printf '%s\n%s\n' "${FLOOR}" "${_ver}" | sort -V | sed -n 1p)" != "${FLOOR}" ]; then
   echo "AVISO kg-index: vendor/kg-ssot do alvo é ${_ver} — ${_msg}."; exit 1
 fi
 if [ ! -f "${V}/tools/kg_trace.py" ]; then
