@@ -2,7 +2,8 @@
 branch: research/codex-spikes-seal
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 02a46c590ec9c6ba1ec2c47ed9ff35641fa423673bd282a1253e23ee4093ddac
+reviewed_code_sha256: aa561ead62ecb80bf2a2db38cb67f8cc86dd68baf888771a42dadeaef9fed351
 findings_total: 9
 findings_real: 8
 tokens: 0
