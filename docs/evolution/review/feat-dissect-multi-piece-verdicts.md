@@ -2,7 +2,8 @@
 branch: feat/dissect-multi-piece-verdicts
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: da8d56c1fbe302dd7ba0f73eaf282c1137e20173181f46edc1690d998a345cff
+reviewed_code_sha256: e5c017c77d46b8d33d2e7e686eebad9398a49c35e3bd6f98f7460a9e98cb6503
 findings_total: 3
 findings_real: 2
 tokens: 0
