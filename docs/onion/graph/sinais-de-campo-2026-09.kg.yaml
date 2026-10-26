@@ -1034,13 +1034,29 @@ nodes:
     node_type: decision
     layer: audit
     plane: DEV
-    status: done
+    status: superseded
     impact: 3
     confidence: 0.9
     verified_at: "2026-10-26"
     verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Os 3, com CI aplicado»"
     label: "A sessão do sge acerta o label do ONION_INSTALLED, move o relatório de update antigo para _processed/ e aplica o CI onion-validate"
     narrative: "Selado por /meta:decide em 2026-10-26: escolhida «Os 3, com CI aplicado»; descartadas: «Label e relatório, sem CI» · «Deixar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Pendências do sge: o que pedimos à sessão do sge?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
+  - id: D_SGE_PENDENTES_SO_OS_DOIS_1026
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Label e relatório, sem CI (o maestro reconfirmou na sessão do sge: o CI fica de fora por enquanto, e a oferta medida daria verde no dia 1); feito no sge PR #155 (bcd81f3)»"
+    label: "A sessão do sge acerta o label do ONION_INSTALLED e move o relatório de update antigo para _processed/; o CI onion-validate fica de fora por enquanto (supera D_SGE_PENDENTES_POS_UPDATE_76CCB2F8_1026)"
+    narrative: "Selado por /meta:decide em 2026-10-26: escolhida «Label e relatório, sem CI (o maestro reconfirmou na sessão do sge: o CI fica de fora por enquanto, e a oferta medida daria verde no dia 1); feito no sge PR #155 (bcd81f3)»; descartadas: «Os 3, com CI aplicado» · «Deixar como está»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Pendências do sge: o que pedimos à sessão do sge?»"
@@ -1233,3 +1249,6 @@ edges:
   - from: D_SGE_PENDENTES_POS_UPDATE_76CCB2F8_1026
     to: E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026
     edge_type: TRACES_TO
+  - from: D_SGE_PENDENTES_SO_OS_DOIS_1026
+    to: D_SGE_PENDENTES_POS_UPDATE_76CCB2F8_1026
+    edge_type: SUPERSEDES
