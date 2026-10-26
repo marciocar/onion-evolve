@@ -259,11 +259,16 @@ _pieces() {
     function clean(s) { sub(/[[:space:]]+#.*$/, "", s); gsub(/["\047[:space:]]/, "", s); return s }
     /^meta:/ { m = 1; next }
     m && /^[^[:space:]#]/ { m = 0 }
+    function emit(v,  n, a, i) { gsub(/[][]/, "", v); n = split(v, a, ","); for (i = 1; i <= n; i++) if (a[i] != "") print a[i] }
     !m { next }
-    blk && /^[[:space:]]*-[[:space:]]/ && $0 !~ /:/ { v = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", v); v = clean(v); if (v != "") print v; next }
-    blk && !/^[[:space:]]*(#.*)?$/ { blk = 0 }
+    # lista em fluxo que quebra linha ([D_A,\n D_B]): segue lendo até o `]`
+    fl { v = clean($0); emit(v); if (v ~ /\]/) fl = 0; next }
+    # lista em bloco: o comentário sai ANTES de olhar o `:` (um `# a peça: x` não encerra a lista)
+    blk { v = $0; sub(/[[:space:]]+#.*$/, "", v); sub(/^[[:space:]]*#.*$/, "", v)
+      if (v ~ /^[[:space:]]*-[[:space:]]/ && v !~ /:/) { sub(/^[[:space:]]*-[[:space:]]*/, "", v); v = clean(v); if (v != "") print v; next }
+      if (v !~ /^[[:space:]]*$/) blk = 0 }
     /^[[:space:]]*x_dissect_pieces:/ { v = $0; sub(/^[^:]*:[[:space:]]*/, "", v); v = clean(v)
-      if (v ~ /^\[/) { gsub(/[][]/, "", v); n = split(v, a, ","); for (i = 1; i <= n; i++) if (a[i] != "") print a[i] }
+      if (v ~ /^\[/) { emit(v); if (v !~ /\]/) fl = 1 }
       else if (v == "") blk = 1 }' "$1"
 }
 
