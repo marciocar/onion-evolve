@@ -2,7 +2,8 @@
 branch: docs/worktreecreate-parked
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7fc8e1902a9642561e23c20d8e66d5a6e93046db9d8fad5a57e57b9d36ef13d5
+reviewed_code_sha256: 52c491bd5c2909fcd96885a69169db107bf170a06604dc76b8a1dd4dec8a05b0
 findings_total: 0
 findings_real: 0
 tokens: 112102
