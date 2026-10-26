@@ -2,7 +2,8 @@
 branch: fix/dissect-census-pieces
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b72c7bf2f6ff60dd24037cf38223f875e2a23d2a5ac14fb82507ec057d62649b
+reviewed_code_sha256: a2f6045ca84cbdf8042a3187872fe7cfcff8b9ebeb4a592e9183a21ebf382a82
 findings_total: 3
 findings_real: 2
 tokens: 0
