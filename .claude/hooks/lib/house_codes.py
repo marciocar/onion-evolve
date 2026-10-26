@@ -194,6 +194,16 @@ def _structural(t, start, end, after, codes_rx):
     return False
 
 
+def _subject_before(t, start, end, before, codes_rx):
+    """'o assunto (SAC-256)': o id de tarefa SOZINHO no parêntese, com o assunto escrito logo antes (≥3
+    palavras nas 6 anteriores). É a forma que o glossário pede para tarefa ("diga o assunto"), e a única
+    glosa possível dela: o assunto só quem escreve sabe (reforço do maestro, 2026-10-26)."""
+    b = before.rstrip()
+    if not (b.endswith("(") and t[end:].lstrip().startswith(")")):
+        return False
+    return len(_words(" ".join(b[:-1].split()[-6:]), codes_rx)) >= 3
+
+
 def _near(before, after, n=8):
     return " ".join(before.split()[-n:]) + " " + " ".join(after.split()[:n])
 
@@ -308,6 +318,8 @@ def findings(text, glossary, titles=None, root=None, glossed_out=None, already=(
                 ok = True
             if not ok and row["accept"] is not None:
                 ok = bool(row["accept"].search(_near(before, after)))
+            if not ok and row["kind"] == "issue":
+                ok = _subject_before(t, m.start(), m.end(), before, codes_rx)
             d = seen.setdefault(tok, {"token": tok, "row": row["code"], "kind": row["kind"],
                                       "opacity": row["opacity"], "gloss": row["gloss"], "glossed": False})
             d["glossed"] = d["glossed"] or ok
