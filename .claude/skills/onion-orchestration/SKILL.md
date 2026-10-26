@@ -261,6 +261,13 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
 
 ## Gotchas
 
+- **Agente novo com brief é o padrão; fork só quando a tarefa precisa da conversa inteira.** Medido em
+  3 pares (decisão do maestro de 2026-10-26, o selo de `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS`): no par
+  controlado, o mesmo update rodado pelos dois deu árvores idênticas, mas o agente novo custou 16% dos
+  tokens do fork (126 mil contra 800 mil, que é quase todo contexto herdado) e ganhou no juiz cego. O
+  brief que funcionou manda esperar em PRIMEIRO PLANO (CI com `--watch`, saída lida até o fim) e nunca
+  depender de notificação de tarefa de fundo, que travou um agente por 1 h. Lance sem `name` quando
+  quiser que a notificação traga tokens e tempo.
 - **Refutador roda em WORKTREE ISOLADA — e isso é mecanismo, não etiqueta.** Medido em 2026-09-20:
   um refutador com briefing que dizia, literalmente, *"Não modifique NENHUM arquivo; só meça e
   reporte"* escreveu em **seis** arquivos da árvore principal — incluindo o script de merge
