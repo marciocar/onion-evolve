@@ -128,6 +128,22 @@ nodes:
       locator: "run_hookspath_reminder_selftests, casos (b2) (b3) (e2) (e3) (f) (g) (h)"
       method: "medição: refutador em subagente e mutantes externos re-rodados sobre a cura"
       locality: "repo"
+  - id: D_WORKTREECREATE_PROPRIO_PARQUEADO_1026
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Parquear com gatilho: reabre se o trampolim mostrar furo medido, se a Anthropic passar a remover ou varrer worktrees criadas por hook, ou se as issues 85039 e 88747 do claude-code fecharem sem correção e o absoluto quebrar algo que o trampolim não cobre; o desenho de 7 passos do spike (criar sem git config, marcador próprio, remoção sem force, varredor só do marcado) fica para a reabertura»"
+    label: "O hook WorktreeCreate próprio fica parqueado com gatilho: funciona no spike (dispara no agente isolado e deixa o hooksPath relativo), mas as worktrees criadas por hook ficam fora da remoção e da varredura do Claude Code, e o trampolim do #1381 já torna o absoluto inofensivo"
+    narrative: "Selado por /meta:decide em 2026-10-26: escolhida «Parquear com gatilho: reabre se o trampolim mostrar furo medido, se a Anthropic passar a remover ou varrer worktrees criadas por hook, ou se as issues 85039 e 88747 do claude-code fecharem sem correção e o absoluto quebrar algo que o trampolim não cobre; o desenho de 7 passos do spike (criar sem git config, marcador próprio, remoção sem force, varredor só do marcado) fica para a reabertura»; descartadas: «Ligar mesmo assim» · «Rejeitar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «O que fazer com o hook WorktreeCreate próprio, depois do spike e do trampolim?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 
 edges:
   - from: E_ELENXO_1A_PASSADA_FALSOS_POSITIVOS
@@ -148,3 +164,6 @@ edges:
   - from: C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL
     to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
     edge_type: CONSTRAINS
+  - from: D_WORKTREECREATE_PROPRIO_PARQUEADO_1026
+    to: E_DEFEITO_HOOKSPATH_ABSOLUTO_RODA_HOOK_DA_MAIN
+    edge_type: TRACES_TO
