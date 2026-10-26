@@ -55,3 +55,15 @@ axes:
     session_floor: claude-sonnet-5-5   # piso: so por fallback; degradacao visivel
     descartes: "4/25 estratégias reprovadas pelo juiz Elenxo (itens 1, 3, 18, 25) + 3 contagens corrigidas; preço do Fable 5.1 = catálogo, não medido"
     kg: docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
+  - id: E7-treino-inferencia
+    # ABERTO SEM RODAR (decisão do maestro, 2026-10-26, por pergunta com opções: «Novo eixo E7 + registrar
+    # o achado»). Escopo: a TRAJETÓRIA DO MERCADO de treino e inferência — treino próprio, retreino e
+    # fine-tuning, APIs de ajuste que abrem e fecham, plataformas de pesos abertos, modelos pequenos,
+    # inferência e custo. Fronteira contra o E6: o E6 mede o modelo da SESSÃO (lançamento, capacidade,
+    # lineup, preço; guarda session_models/session_floor da PreModelSwitch); o E7 mede o mercado em volta
+    # dele e não toca a escada. Origem: a curadoria mediu que o eixo de modelos tinha 0 menções a treino,
+    # fine-tuning, LoRA, destilação, quantização ou inferência, e o fim do fine-tuning self-serve da OpenAI
+    # (desde 2026-05-07) passou pelo radar sem ser visto. Sem data de rodada DE PROPÓSITO: carimbar rodada
+    # que não houve é o carimbo-sem-medição. A REGRA 65 o acusa SOFT como nunca-rodado até a 1ª rodada,
+    # que é do maestro; ao selar, entra a data e o kg, e sai o never_run.
+    never_run: "aberto em 2026-10-26 sem rodada; a 1a rodada e do maestro"

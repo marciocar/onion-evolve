@@ -44,6 +44,7 @@ static	E3	alta	o eixo E3 do radar de mundo (o que muda a cada versão do Claude 
 static	E4	alta	o eixo E4 do radar de mundo (capital e mercado)	capital|mercado|invest	radar|eixo
 static	E5	alta	o eixo E5 do radar de mundo (gates determinísticos)	determin	radar|eixo
 static	E6	alta	o eixo E6 do radar de mundo (a fronteira de modelos e a escada de modelos da sessão)	modelo|lineup	radar|eixo
+static	E7	alta	o eixo E7 do radar de mundo (a trajetória do mercado de treino e inferência)	treino|infer|fine-?tun|pesos abertos	radar|eixo
 static	D10	alta	a dimensão D10 do /meta:evolve (frescor da memória de sessão)	memória|dimens|evolve	evolve|dimens|mem[oó]ria
 static	W7	alta	a cláusula W7 do MOAT (o Onion é invocado pelo maestro, nunca agendado: sem cron)	agend|cron|invocad	-
 static	NS1	alta	o norte NS1 (o grafo de conhecimento como norte do Onion)	norte|grafo|conhecimento	-

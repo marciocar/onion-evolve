@@ -54,3 +54,16 @@ axes:
       - { url: "https://exa.ai/", kind: vendor-on-competitor, tier: 3, note: "todo comparativo de busca lido em 2026-09 era de concorrente direto — sempre suspeito" }
       - { url: "https://firecrawl.dev/blog", kind: vendor-on-competitor, tier: 3 }
       - { url: "https://parallel.ai/articles", kind: vendor-on-competitor, tier: 3 }
+  # Grupo do eixo E7-treino-inferencia do radar (aberto em 2026-10-26, sem rodada). É GRUPO NOVO, e não
+  # anotação num grupo existente, pela medida: nenhum dos sete grupos acima tem fonte de treino,
+  # fine-tuning, pesos abertos ou custo de inferência (os mais próximos, mercado-capital e analistas,
+  # cobrem dinheiro e adoção). Fontes vindas do estudo da curadoria (ai-front-2026-10): só a página da
+  # OpenAI foi aberta de novo aqui; as outras chegaram por resumo de busca lá e ficam sem last_checked.
+  - id: treino-inferencia
+    cadence: monthly
+    sources:
+      - { url: "https://developers.openai.com/api/docs/deprecations", kind: primary, tier: 10, last_checked: "2026-10-26", note: "descontinuações e o fim do fine-tuning self-serve (2026-05-07, 2026-07-02, 2027-01-06); molde para as páginas de descontinuação e preço dos outros provedores, que ninguém mediu ainda" }
+      - { url: "https://hai.stanford.edu/ai-index/2026-ai-index-report", kind: analyst, tier: 9, cadence: yearly, note: "AI Index de Stanford: anual; a página não traz custo de treino nem de fine-tuning" }
+      - { url: "https://epoch.ai/topics/finances", kind: analyst, tier: 8, note: "custo de treino e de compute; lido só por resumo de busca" }
+      - { url: "https://www.interconnects.ai/", kind: engineer, tier: 8, cadence: weekly, note: "pós-treino e modelos de pesos abertos (o autor lidera pós-treino no Ai2); de 1 a 3 posts por semana" }
+      - { url: "https://www.latent.space/", kind: engineer, tier: 7, cadence: weekly, note: "parte paga; The End of Finetuning (2026-05-13) só pelo trecho aberto" }
