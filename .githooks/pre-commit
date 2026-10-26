@@ -52,7 +52,11 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 # CORE-ONLY: vive no hook PRÓPRIO do core (difere do template vendorizado) — não viaja ao adotante,
 # que pode ter fluxo trunk-based (a lição "o core é o pior oráculo do que viaja").
 _ONION_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')"
-_ONION_DEFAULT="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@')"
+# ⚠️ Sem `origin` (o sandbox da prove-gate-blocks.sh remove o remoto; clone local idem) o symbolic-ref sai
+# 1, o `pipefail` o propaga e o `set -e` matava o hook AQUI, rc 1 sem uma palavra: todo commit barrado em
+# silêncio. Medido em 2026-10-26 pela prova do gate ("controle rc 1 sem HARD"). O `|| true` fica DENTRO
+# do grupo, antes do pipe; a classe é a mesma do (g) da família githook no template.
+_ONION_DEFAULT="$( { git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || true; } | sed 's@^origin/@@')"
 [ -n "${_ONION_DEFAULT}" ] || _ONION_DEFAULT=main
 if [ "${_ONION_BRANCH}" = "${_ONION_DEFAULT}" ]; then
   echo "🛑 Onion pre-commit — commit DIRETO na default branch (${_ONION_DEFAULT}) BLOQUEADO." >&2
