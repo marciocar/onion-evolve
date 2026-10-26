@@ -8827,7 +8827,8 @@ run_hookspath_reminder_selftests() {
   local hk="${REPO_ROOT}/.claude/hooks/session-currency-check.sh"
   [ -f "${hk}" ] || { record_fail "hookspath-reminder" "SUT ausente: ${hk}"; return; }
   command -v git >/dev/null 2>&1 || { record_skip "hookspath-reminder: git ausente → pulado"; return; }
-  local d; d="$(mktemp -d)"; mkdir -p "${d}/state" "${d}/nogit" "${d}/other"; chmod 700 "${d}/state"
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/state" "${d}/nogit" "${d}/other" "${d}/shared/.githooks"; chmod 700 "${d}/state"
+  : > "${d}/gcfg"   # gitconfig GLOBAL da bancada (o da conta do runner nunca entra)
   local g="git -c user.name=bench -c user.email=bench@example.invalid -c init.defaultBranch=main"
   ${g} init -q "${d}/repo"; mkdir -p "${d}/repo/.githooks"; : > "${d}/repo/.githooks/pre-commit"
   ${g} -C "${d}/repo" add -A; ${g} -C "${d}/repo" commit -q -m init
@@ -8837,6 +8838,7 @@ run_hookspath_reminder_selftests() {
     local dir="$1" sid="$2" sut="${3:-${hk}}" rc=0 out; shift 3
     out="$(printf '{"session_id":"%s","hook_event_name":"UserPromptSubmit"}' "${sid}" \
       | env -u CLAUDE_CODE_SESSION_ID LC_ALL=C GIT_CEILING_DIRECTORIES="${d}" ONION_CURRENCY_CENSUS="${d}/census-ok.sh" \
+        HOME="${d}" GIT_CONFIG_GLOBAL="${d}/gcfg" GIT_CONFIG_NOSYSTEM=1 \
         ONION_CURRENCY_STATE_DIR="${d}/state" CLAUDE_PROJECT_DIR="${dir}" "$@" bash "${sut}" 2>/dev/null)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
@@ -8858,10 +8860,46 @@ run_hookspath_reminder_selftests() {
   r="$(_hp "${d}/repo" s1 "")"
   [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (b) relativo ⇒ silêncio, rc=0" \
     || record_fail "hookspath-reminder: (b) relativo" "veio: ${r:0:200}"
-  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks/"
+  # (b2) o MESMO valor do (a), na mesma sessão: só re-avisa se o conserto tiver limpado a marca
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
   r="$(_hp "${d}/repo" s1 "")"
-  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (b2) consertado e voltou a absoluto ⇒ avisa DE NOVO na mesma sessão" ;;
+  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (b2) consertado e voltou ao MESMO absoluto ⇒ avisa DE NOVO na mesma sessão" ;;
     *) record_fail "hookspath-reminder: (b2) re-aviso" "veio: ${r:0:200}" ;; esac
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks/"
+  r="$(_hp "${d}/repo" s1b "")"
+  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (b3) barra final no absoluto ⇒ avisa (identidade de diretório)" ;;
+    *) record_fail "hookspath-reminder: (b3) barra final" "veio: ${r:0:200}" ;; esac
+  # (f) `~/` que o git expande e que É o .githooks deste repo (HOME da bancada = ${d}) ⇒ avisa
+  git -C "${d}/repo" config core.hooksPath "~/repo/.githooks"
+  r="$(_hp "${d}/repo" s8 "")"
+  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (f) ~/ que resolve no .githooks deste repo ⇒ avisa" ;;
+    *) record_fail "hookspath-reminder: (f) til" "veio: ${r:0:200}" ;; esac
+  # (e2) gestor de hooks COMPARTILHADO noutro lugar, também chamado .githooks ⇒ cala (o conserto trocaria os hooks)
+  git -C "${d}/repo" config core.hooksPath "${d}/shared/.githooks"
+  r="$(_hp "${d}/repo" s9 "")"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (e2) absoluto para OUTRO .githooks (compartilhado) ⇒ cala" \
+    || record_fail "hookspath-reminder: (e2) .githooks alheio" "veio: ${r:0:200}"
+  # (e3) hooks globais em ~/.githooks pelo gitconfig GLOBAL ⇒ cala (não é o .githooks do repo)
+  git -C "${d}/repo" config --unset core.hooksPath; mkdir -p "${d}/.githooks"
+  printf '[core]\n\thooksPath = ~/.githooks\n' > "${d}/gcfg"
+  r="$(_hp "${d}/repo" s10 "")"
+  : > "${d}/gcfg"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (e3) ~/.githooks global ⇒ cala" \
+    || record_fail "hookspath-reminder: (e3) global" "veio: ${r:0:200}"
+  # (g) o VALOR EFETIVO manda: --local absoluto, mas a worktree tem `.githooks` relativo por config própria ⇒ cala nela
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  git -C "${d}/repo" config extensions.worktreeConfig true
+  git -C "${d}/wt" config --worktree core.hooksPath .githooks
+  r="$(_hp "${d}/wt" s11 "")"
+  git -C "${d}/wt" config --worktree --unset core.hooksPath; git -C "${d}/repo" config --unset extensions.worktreeConfig
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (g) efetivo relativo por config da worktree ⇒ cala" \
+    || record_fail "hookspath-reminder: (g) worktreeConfig" "veio: ${r:0:200}"
+  # (h) absoluto para o .githooks deste repo, mas o diretório não existe ⇒ cala (o conserto não teria o que rodar)
+  mv "${d}/repo/.githooks" "${d}/repo/.githooks.off"
+  r="$(_hp "${d}/repo" s12 "")"
+  mv "${d}/repo/.githooks.off" "${d}/repo/.githooks"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (h) sem .githooks/ na árvore ⇒ cala" \
+    || record_fail "hookspath-reminder: (h) sem diretório" "veio: ${r:0:200}"
   git -C "${d}/repo" config --unset core.hooksPath
   r="$(_hp "${d}/repo" s4 "")"
   [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (c) unset ⇒ silêncio, rc=0" \
@@ -8875,7 +8913,7 @@ run_hookspath_reminder_selftests() {
     || record_fail "hookspath-reminder: (e) outro diretório" "veio: ${r:0:200}"
   # (m) MUTANTE: sem o ramo do absoluto, o caso (a) cala — o caso morde
   git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
-  sed '/^    \/\*\/\.githooks|/d' "${hk}" > "${d}/mutant.sh"
+  sed '/ -ef "\${top}\/\.githooks"/d' "${hk}" > "${d}/mutant.sh"
   r="$(_hp "${d}/repo" s7 "${d}/mutant.sh")"
   if cmp -s "${hk}" "${d}/mutant.sh"; then record_fail "hookspath-reminder: (m) mutante" "o sed não achou o ramo do absoluto (âncora mudou)"
   elif [ "${r}" = "0|" ]; then record_pass "hookspath-reminder: (m) mutante sem o ramo do absoluto ⇒ (a) cala (o caso morde)"

@@ -68,27 +68,27 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: '2026-10-26'
-    verified_against: "bash .claude/validation/lint-selftest.sh --families hookspath_reminder,currency_census: OK, 10/10 na família nova com LC_ALL=C; o caso (m) roda o hook sem a linha do ramo do absoluto e exige silêncio no caso (a)"
+    verified_against: "bash .claude/validation/lint-selftest.sh --families hookspath_reminder,currency_census: OK, 16/16 na família nova com LC_ALL=C e gitconfig global/sistema isolados; 6 mutantes externos (sem identidade, sem limpar a marca, sem til, só --local, sem dedupe, exit 1) reprovam cada um o caso nomeado"
     trace: '.claude/validation/lint-selftest.sh'
-    label: 'BANCADA: família hookspath_reminder, 10 casos invocando o hook como o runner. Absoluto avisa; relativo, unset, fora de git e outro diretório calam; o MUTANTE sem o ramo do absoluto faz o 1º caso calar.'
-    narrative: 'BANCADA: família run_hookspath_reminder_selftests. Polaridades: (a) absoluto avisa com o conserto e rc 0; (a2) a 2ª vez na mesma sessão cala; (a3) a sessão numa worktree ligada avisa, porque o --local lê o .git/config comum; (a4) sem o censo o lembrete sai mesmo assim; (b) relativo, (c) unset, (d) fora de git e (e) absoluto para outro diretório calam com rc 0; (b2) consertado e voltando a absoluto avisa de novo. Mutante (m), dentro da família para morder sempre: o hook sem a linha do ramo do absoluto faz o (a) calar; se a âncora do sed mudar, o caso reprova em vez de passar vazio.'
+    label: 'BANCADA: família hookspath_reminder, 16 casos invocando o hook como o runner. Absoluto deste repo avisa; relativo, unset, fora de git, .githooks alheio, global e efetivo relativo calam; 7 mutantes mordem.'
+    narrative: 'BANCADA: família run_hookspath_reminder_selftests, com HOME, gitconfig global e de sistema isolados. Avisa: (a) absoluto com o conserto e rc 0, (a3) numa worktree ligada, (a4) sem o censo, (b2) consertado e voltando ao MESMO valor, (b3) com barra final, (f) por o til que resolve no .githooks do repo. Cala: (a2) 2ª vez na sessão, (b) relativo, (c) unset, (d) fora de git, (e) outro diretório, (e2) outro .githooks compartilhado, (e3) .githooks global na home da conta, (g) efetivo relativo por config da worktree, (h) .githooks/ ausente. Mutante (m) dentro da família; mais 6 mutantes externos, cada um reprovando o caso nomeado.'
     provenance:
       source: ".claude/validation/lint-selftest.sh"
-      locator: "run_hookspath_reminder_selftests, casos (a) a (e) e (m)"
+      locator: "run_hookspath_reminder_selftests, casos (a) a (h) e (m)"
       method: "medição: bancada executada com LC_ALL=C"
       locality: "repo"
 
-  - id: C_TETO_SO_O_LOCAL
+  - id: C_TETO_CONSERTO_NO_LOCAL
     node_type: claim
     plane: DEV
     impact: 2
     confidence: 0.8
     status: confirmed
     verified_at: '2026-10-26'
-    verified_against: "o bloco lê git config --local --get core.hooksPath; extensions.worktreeConfig (config.worktree) e o gitconfig global da conta não são consultados"
+    verified_against: "o bloco lê o valor efetivo (git config --get) e compara por -ef com <toplevel>/.githooks e <pai do git-common-dir>/.githooks; o texto do conserto é sempre git config core.hooksPath .githooks"
     trace: '.claude/hooks/session-currency-check.sh'
-    label: 'TETO 1: lê só o --local (o .git/config comum). Um hooksPath por worktree (extensions.worktreeConfig) ou global não é visto, e um absoluto que aponta para diretório que não termina em .githooks cala de propósito.'
-    narrative: 'TETO 1: lê só o `--local`, que é onde o Claude Code grava. Um hooksPath por worktree (extensions.worktreeConfig) ou global não é visto. Um absoluto que aponta para outro diretório qualquer (gestor de hooks global, por exemplo) cala de propósito: o conserto `.githooks` não se aplica a ele, e acusar quem escolheu outro gestor treina a sessão a ignorar o lembrete (cláusula 4).'
+    label: 'TETO 1: o conserto do texto escreve no --local. Se o absoluto vier de config por worktree (extensions.worktreeConfig), o lugar certo é --worktree, e o texto não distingue. Só o .githooks deste repo dispara; outro gestor cala.'
+    narrative: 'TETO 1: o lembrete lê o valor EFETIVO e só fala quando ele é, por identidade de diretório, o .githooks/ desta árvore ou do checkout principal. Um gestor de hooks compartilhado ou global cala de propósito: o conserto `.githooks` trocaria quais hooks rodam (cláusula 4). O texto do conserto escreve no `--local`; se o absoluto vier de config por worktree, o lugar certo é `--worktree`, e o texto não distingue.'
     provenance:
       source: ".claude/hooks/session-currency-check.sh"
       locator: "função hookspath_reminder"
@@ -112,7 +112,27 @@ nodes:
       method: "leitura: registro do hook no settings do projeto"
       locality: "repo"
 
+  - id: E_ELENXO_1A_PASSADA_FALSOS_POSITIVOS
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-26'
+    verified_against: "refutador em subagente, só leitura, repos descartáveis: 3 falsos positivos (absoluto para outro .githooks compartilhado, .githooks global na home da conta, efetivo relativo por config da worktree com --local absoluto) e 4 mutantes sobreviventes (sem o teste do diretório, sem limpar a marca, sem o ramo do til, sem o --local); nenhum rc diferente de 0 nem trava; todos curados com caso"
+    trace: '.claude/hooks/session-currency-check.sh'
+    label: 'A 1a PASSADA ACHOU FALSO POSITIVO: o 1º corte avisava em qualquer absoluto terminado em .githooks, inclusive um gestor compartilhado, onde o conserto trocaria os hooks. A cura compara por identidade com o .githooks deste repo e lê o valor efetivo.'
+    narrative: 'A 1a PASSADA ACHOU FALSO POSITIVO: o 1º corte decidia por STRING (absoluto terminado em .githooks), a mesma classe que o verificador de gate de adoção já pagou em 2026-09-15. Avisava num .githooks compartilhado noutro lugar e no .githooks global na home da conta, onde o conserto trocaria quais hooks rodam, e avisava numa worktree cujo valor efetivo já era relativo. A cura: valor efetivo (git config --get), o til expandido, e comparação por identidade (`-ef`) com o .githooks/ da árvore atual ou do checkout principal. Os 4 mutantes sobreviventes ganharam caso; a família foi de 10 para 16 casos.'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_hookspath_reminder_selftests, casos (b2) (b3) (e2) (e3) (f) (g) (h)"
+      method: "medição: refutador em subagente e mutantes externos re-rodados sobre a cura"
+      locality: "repo"
+
 edges:
+  - from: E_ELENXO_1A_PASSADA_FALSOS_POSITIVOS
+    to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
+    edge_type: SUPPORTS
   - from: E_DEFEITO_HOOKSPATH_ABSOLUTO_RODA_HOOK_DA_MAIN
     to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
     edge_type: SUPPORTS
@@ -122,7 +142,7 @@ edges:
   - from: E_BANCADA_E_MUTANTE_HOOKSPATH
     to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
     edge_type: SUPPORTS
-  - from: C_TETO_SO_O_LOCAL
+  - from: C_TETO_CONSERTO_NO_LOCAL
     to: D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL
     edge_type: CONSTRAINS
   - from: C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL
