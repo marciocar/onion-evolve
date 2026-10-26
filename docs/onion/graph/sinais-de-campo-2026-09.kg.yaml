@@ -406,12 +406,22 @@ nodes:
 
   - id: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
     node_type: question
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
     label: "Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4.22 por agente novo contra os forks #1302, #1306, #1316 e #1317) e selar ou refutar (Linear SAC-237)"
-    narrative: "Gatilho: a próxima tarefa de execução sem dependência do histórico (a adoção da kg-ssot 4.22 é o 1º par). Medir por agente: tokens, duração, retomadas, CI reprovado e achados da passada adversarial. Ponto de partida, de 2026-10-22/23, não comparável por ser de tarefas diferentes: forks de execução de ~400k a ~810k tokens; agentes novos de ~114k (Elenxo do A7) e ~131k (pesquisa de nomes canônicos). Fecha com 3 pares medidos."
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Selar: agente novo com brief (com espera em primeiro plano) é o padrão; fork só quando a tarefa precisa do contexto inteiro da conversa; vale a regra pré-registrada em E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026, cumprida pelo par 3»"
+    narrative: |-
+      Gatilho: a próxima tarefa de execução sem dependência do histórico (a adoção da kg-ssot 4.22 é o 1º par). Medir por agente: tokens, duração, retomadas, CI reprovado e achados da passada adversarial. Ponto de partida, de 2026-10-22/23, não comparável por ser de tarefas diferentes: forks de execução de ~400k a ~810k tokens; agentes novos de ~114k (Elenxo do A7) e ~131k (pesquisa de nomes canônicos). Fecha com 3 pares medidos.
+
+      Selado por /meta:decide em 2026-10-26: escolhida «Selar: agente novo com brief (com espera em primeiro plano) é o padrão; fork só quando a tarefa precisa do contexto inteiro da conversa; vale a regra pré-registrada em E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026, cumprida pelo par 3»; descartadas: «Selar só no grafo» · «Mais um par».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Com os 3 pares medidos, selo agente novo como o padrão?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 
   - id: E_ENV_GUARD_A1_A5_CURADOS_1023
     node_type: evidence
@@ -950,7 +960,9 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: open
+    status: confirmed
+    verified_at: "2026-10-26"
+    verified_against: "commit 6830604f empurrado antes de lançar os dois braços; o resultado está em E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026"
     impact: 3
     confidence: 0.6
     label: "Pré-registro do 3º par fork contra agente novo: o mesmo update do Onion no sge, do pin 6aa5c567f579 para 7391404e946f, por dois braços em worktrees irmãs, com critério fixado antes e juiz cego"
@@ -960,6 +972,22 @@ nodes:
       locator: "/meta:decide de 2026-10-26, pergunta do 3º par"
       method: "testemunho: pré-registro do critério pelo core, a pedido do maestro"
       locality: "pessoa"
+  - id: E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-26"
+    verified_against: "notificações de término dos dois braços (agente novo 125.764 tokens em 18 min; fork 800.081 tokens em 19 min) e o veredito do juiz cego (87.004 tokens): git diff entre as branches -a e -b do sge dá um arquivo só, o relatório inbound; lint do sge HARD 0 nas duas; placar 14/14 para o agente novo e 11/14 para o fork"
+    label: "3º par: o mesmo update do Onion no sge deu árvores idênticas; o agente novo custou 16% dos tokens do fork e ganhou no juiz cego (14 contra 11)"
+    narrative: "O fork perdeu pontos por criar o commit da onion/vendor sem assinatura, que o outro braço reaproveitou, e por um relatório com uma imprecisão (kg-migrate-v3.py «saiu do core», quando só deixou de viajar) e sem o label defasado, o hooksPath absoluto, a oferta de CI e o HARD de antes e depois. O fork achou o melhor risco isolado: o vendor 4.22 do sge reprova aresta de dissecação para pasta com ponto. Nenhum dos dois travou nem fez ação fora do brief. A branch vencedora virou o PR #147 do sge; a perdedora fica para o dono apagar, porque a guarda do core barra apagar branch em repo alheio."
+    provenance:
+      source: "notificações dos agentes e relatório do juiz cego, na sessão do core"
+      locator: "branches chore/onion-update-7391404e946f-a e -b do sge; PR #147 do sge"
+      method: "medição: pré-registro em 6830604f, dois braços, juiz cego"
+      locality: "repo"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -1134,4 +1162,10 @@ edges:
     edge_type: SUPPORTS
   - from: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
     to: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
+    edge_type: TRACES_TO
+  - from: E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026
+    to: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
+    edge_type: SUPPORTS
+  - from: E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026
+    to: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
     edge_type: TRACES_TO
