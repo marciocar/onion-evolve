@@ -2,8 +2,8 @@
 branch: research/codex-as-core
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: b2dd911d9d8a2090787126a3308ed2bf84ead2a8fcb36146b178c80963aeca53
-reviewed_code_sha256: 3a49be32065392bc25691075a2c8b094f529ebc72e89b60f040a8a9a41e9ae73
+reviewed_diff_sha256: 642ec1e6fac01b159752ceb7423869f86928534319b5218889e807b35796d319
+reviewed_code_sha256: 5c41d93884bbc14e136522489a0415053a68decf627ccad9362b1d5e18a2e2cf
 findings_total: 16
 findings_real: 16
 tokens: 1384791
@@ -33,3 +33,12 @@ contadas no `E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026`.
 - Nenhum spike rodou, e o veredito da peça do hook é «falta equivalente provado», não «impossível».
 - O Codex CLI não está instalado no ambiente do core; os spikes pedem a instalação, que é do maestro, ou o ambiente
   da curadoria, que já o tem.
+
+## Re-revisão (2026-10-26, depois do CI)
+
+O CI reprovou a faixa 1 da bancada: a guarda de caminho de máquina em nó de grafo (REGRA 99) achou a isenção
+`x_path_is_content: "citação"` do `E_CUSTOM_AGENTS_ARE_TOML` fora do baseline. O delta novo é uma linha no
+`.claude/validation/kg-machine-path-baseline.txt`, emitida por `kg-machine-path-check.sh --emit-baseline`.
+Conferido à mão: o único caminho do nó é `~/.codex/agents/` / `.codex/agents/`, que é a citação verbatim da doc do
+Codex no `verified_against`. É conteúdo, não caminho desta máquina. A guarda sai rc 0 e sem linhas depois do baseline.
+Achados novos: 0.
