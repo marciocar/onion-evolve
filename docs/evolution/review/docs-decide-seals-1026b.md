@@ -2,7 +2,8 @@
 branch: docs/decide-seals-1026b
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9b42e4fbd9f5e6f4bf3f7e4e7b5f1ab043cc9fcc2a455f6f596c9c9835caae30
+reviewed_code_sha256: 6b9356d1229b69a1eff2d690387116b7e97cd56b4f5c1d1710882d7e59a7317d
 findings_total: 0
 findings_real: 0
 tokens: 56242

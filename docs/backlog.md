@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**621 itens abertos** em 122 grafo(s) com aberto (de 157 no escopo) · 123 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**619 itens abertos** em 121 grafo(s) com aberto (de 157 no escopo) · 122 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1088,12 +1088,6 @@
 |--:|---|---|---|
 | 4.8 | `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2` | vetos-por-tokens-2026-10 | TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se  |
 
-## radar-E3-2026-10-21-r14 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.5 | `Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305` | radar-E3-2026-10-21-r14 | re-testar a migalha do resume de Workflow (vence 2026-10-22) reproduzindo a condição dela no CLI 2.1.305 ou posterior (processo  |
-
 ## rea-method-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1212,12 +1206,11 @@
 |--:|---|---|---|
 | 2.4 | `Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022` | radar-E3-2026-10-22-r16 | o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda |
 
-## radar-E3-2026-10-23-r17 — 2 item(ns)
+## radar-E3-2026-10-23-r17 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.4 | `Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023` | radar-E3-2026-10-23-r17 | a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum |
-| 2.0 | `Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023` | radar-E3-2026-10-23-r17 | a guarda de isolamento de worktree endurecida na 2.1.309 aceita o padrão LC_ALL=C bash .claude/validation/... que a casa usa nos  |
 
 ## residuos-2026-08-18 — 1 item(ns)
 
