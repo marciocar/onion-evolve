@@ -2,7 +2,8 @@
 branch: feat/githooks-worktree-trampoline
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1286b0cd5dcb080bebc0b986f11f7b83db1c5eb3a47588e7cfebf9db593cc65b
+reviewed_code_sha256: cf182d8f440d6273881d97e3acd8407918d3cc1ba8e5a0b8aed4b37b78e7be12
 findings_total: 5
 findings_real: 4
 tokens: 159761
