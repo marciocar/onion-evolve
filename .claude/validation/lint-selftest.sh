@@ -33922,9 +33922,11 @@ run_kg_read_leg_selftests() {
   _klr "${hs}" "sed -n 1,5p src/alvo.ts"; m1="${kout}"; r1="${rcs}"
   _klr "${hs}" "sed 's/-i/x/' src/alvo.ts"; m2="${kout}"; r2="${rcs}"
   _klr "${hs}" "echo sed -i x src/alvo.ts"; m3="${kout}"; r3="${rcs}"
-  if [ -z "${m1}${m2}${m3}" ] && [ "${r1}${r2}${r3}" = "000" ]; then
-    record_pass "kg-read-leg: (o) sed sem -i, -i dentro do script e sed -i citado por echo → calados, rc 0"
-  else record_fail "kg-read-leg: (o)" "rc=${r1}${r2}${r3} leitura=[${m1:0:60}] script=[${m2:0:60}] echo=[${m3:0:60}]"; fi
+  # e depois de um `cd` o relativo não é resolvido (o hook não segue a pasta): calar vence apontar o arquivo errado
+  _klr "${hs}" "cd outro && sed -i 's/a/b/' src/alvo.ts"; m4="${kout}"; r4="${rcs}"
+  if [ -z "${m1}${m2}${m3}${m4}" ] && [ "${r1}${r2}${r3}${r4}" = "0000" ]; then
+    record_pass "kg-read-leg: (o) sed sem -i, -i dentro do script, sed -i citado por echo e relativo depois de cd → calados, rc 0"
+  else record_fail "kg-read-leg: (o)" "rc=${r1}${r2}${r3}${r4} leitura=[${m1:0:60}] script=[${m2:0:60}] echo=[${m3:0:60}] cd=[${m4:0:60}]"; fi
   # (p) SEM a guarda do .env ao lado o ramo do sed CALA e não quebra (rc 0); o Read segue avisando
   ms="$(mktemp -d)"; mkdir -p "${ms}/.claude/hooks" "${ms}/docs/onion"
   cp "${hs}" "${ms}/.claude/hooks/"; cp "${sbs}/docs/onion/kg-read-index.tsv" "${ms}/docs/onion/"

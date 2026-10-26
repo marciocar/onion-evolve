@@ -175,16 +175,21 @@ try:
                 and os.path.isfile(guard)):
             try:
                 segments, wrappers = load_segments(guard)
-                cwd = str(d.get("cwd") or "")
+                cwd, moved = str(d.get("cwd") or ""), False
                 for seg in segments(cmd):
                     argv = argv_of(seg, wrappers)
                     if not argv:
                         continue
                     prog = os.path.basename(argv[0])
+                    if prog in ("cd", "pushd", "popd"):
+                        moved = True                # a pasta mudou e o hook não a segue: relativo cala
+                        continue
                     files = sed_files(argv[1:]) if prog in ("sed", "gsed") else perl_files(argv[1:]) if prog == "perl" else []
                     for f in files:
                         if not f or re.search(r"[*?\[$`]", f):
                             continue                # glob e variável: o hook não expande, cala
+                        if moved and not os.path.isabs(f):
+                            continue
                         if cwd and not os.path.isabs(f):
                             f = os.path.normpath(os.path.join(cwd, f))
                         print(f)
