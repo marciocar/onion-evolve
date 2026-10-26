@@ -2,7 +2,7 @@
 branch: fix/cc-delta-census-worktree-relative
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: dc277afdc9e6501106d7b08f454ec4cbc62a34e1be3f49ff57c7ab01f2b14b7e
+reviewed_diff_sha256: c37f4bc85a9d7ff4acc112a48cfdfdf647b086626ce2cb24f77ca64b61225868
 reviewed_code_sha256: 287300e4222da0420312ca1e23d5c037c3d2d7746a4fdfa6ab59f0ac608eba23
 findings_total: 2
 findings_real: 1
