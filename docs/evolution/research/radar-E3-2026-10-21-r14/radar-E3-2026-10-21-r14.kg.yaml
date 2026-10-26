@@ -346,6 +346,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-21: «Qual gatilho reabre a SAC-182 no estacionamento?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-21"
       locality: "pessoa"
+  - id: D_FECHAR_SAC180_RESUME_MEDIDO_1026
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Fechar a SAC-180»"
+    label: "A SAC-180 (o parque do resume de Workflow) fecha: o resume serve do journal os agentes concluídos no CLI 2.1.310, medido no run wf_79bb235e-71e, e retomar de outra sessão é limite de desenho da ferramenta"
+    narrative: "Selado por /meta:decide em 2026-10-26: escolhida «Fechar a SAC-180»; descartadas: «Reabrir e documentar o limite» · «Manter parqueada»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «O parque do resume de Workflow reabre?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -406,4 +422,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_ESTACIONAR_SAC182_SEM_GATILHO
     to: Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304
+    edge_type: TRACES_TO
+  - from: D_FECHAR_SAC180_RESUME_MEDIDO_1026
+    to: D_ESTACIONAR_SAC180_ATE_O_1O_RESUME_REAL
     edge_type: TRACES_TO
