@@ -14,6 +14,20 @@
 #
 # Desativar temporariamente um commit: git commit --no-verify
 # =============================================================================
+# >>> onion-hook-trampoline >>>
+# TRAMPOLIM DE WORKTREE: com core.hooksPath ABSOLUTO (o Claude Code o grava ao criar worktree de
+# agente), toda worktree rodaria o hook do checkout PRINCIPAL e um PR que muda este hook não seria
+# provado por ele mesmo. Se a árvore atual tem o MESMO hook, executável e de conteúdo diferente, ele
+# assume com os mesmos argumentos e stdin. Árvore sem o hook: segue este (o gate nunca deixa de rodar).
+# Mesmo arquivo ou byte-idêntico: segue sem exec. A variável guarda o alvo, contra laço.
+_onion_tt="$(git rev-parse --show-toplevel 2>/dev/null || true)/.githooks/${0##*/}"
+if [ "${ONION_HOOK_TRAMPOLINED:-}" != "${_onion_tt}" ] && [ -f "${_onion_tt}" ] && [ -x "${_onion_tt}" ] \
+   && ! [ "${_onion_tt}" -ef "$0" ] && ! cmp -s "${_onion_tt}" "$0"; then
+  export ONION_HOOK_TRAMPOLINED="${_onion_tt}"
+  exec "${_onion_tt}" "$@"
+fi
+unset _onion_tt
+# <<< onion-hook-trampoline <<<
 set -euo pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
