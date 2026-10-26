@@ -87,8 +87,9 @@ isso que o lembrete mora no `UserPromptSubmit` e não num `SessionStart`. O cons
 Teto: o conserto do texto escreve no `--local`; se o absoluto vier de config por worktree
 (`extensions.worktreeConfig`), o lugar certo é `--worktree`, e o texto não distingue.
 Desde a mesma data, um trampolim no topo de cada hook de `.githooks/` (e no template que viaja ao adotante)
-torna o absoluto inofensivo, qualquer que seja a causa: rodando de um `.githooks/` que não é o da árvore
-atual, o hook passa a vez ao da árvore quando ele existe, é executável e difere. O lembrete segue como aviso
+torna o absoluto inofensivo, qualquer que seja a causa: rodando do `.githooks/` do checkout principal
+numa worktree, o hook passa a vez ao da árvore quando ele existe, é executável e difere (hook noutro
+diretório, como `.git/hooks` ou um gestor central, não trampolina). O lembrete segue como aviso
 de config, não como a única defesa.
 
 **Por que aviso e não veto (`exit 2`).** Toda superfície depende de registro de terceiro e de rede: um veto
