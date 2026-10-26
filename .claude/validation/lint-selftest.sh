@@ -4598,8 +4598,10 @@ run_kg_trace_resolve_selftests() {
   #      vendor anterior à 4.25.1, porque o shell trunca o destino antes de o script rodar. Com --out:
   #      a) rc 2 (vendor 4.25.0) → destino BYTE-IDÊNTICO e nenhum temporário largado ao lado;
   #      b) rc 0 → destino atualizado, igual ao índice do stdout;
-  #      c) rc 3 com destino povoado → intacto; rc 3 sem destino → nasce vazio (o dia 1).
-  #      MUTANTE: o gerador escrevendo DIRETO no destino → (a) reprova.
+  #      c) rc 3 com destino povoado → intacto; rc 3 sem destino → SEGUE ausente (nenhum caminho de erro cria
+  #         o índice vazio — revisão adversarial do adotante sge, 2026-10-26: o `: >` do dia 1 criava/truncava);
+  #         rc 3 com destino vazio → byte-idêntico, e nenhum temporário largado.
+  #      MUTANTE: o gerador escrevendo DIRETO no destino → (a) reprova; o `: >` de volta no rc 3 → (c) reprova.
   local idxj6="${d}/docs/onion/kg-read-index.tsv"
   _j6() {  # $1=kg-trace.sh → letras dos casos que passam
     local s="$1" ok="" r=0 ref
@@ -4615,7 +4617,12 @@ run_kg_trace_resolve_selftests() {
     ONION_KG_TRACE="${mut}/k0.py" bash "${s}" "${d}" --emit-index --out "${idxj6}" >/dev/null 2>&1 || r3=$?
     local same=0; [ "$(sha256sum < "${idxj6}")" = "${ref}" ] && same=1
     rm -f "${idxj6}"; ONION_KG_TRACE="${mut}/k0.py" bash "${s}" "${d}" --emit-index --out "${idxj6}" >/dev/null 2>&1 || r4=$?
-    [ "${r3}" -eq 3 ] && [ "${same}" -eq 1 ] && [ "${r4}" -eq 3 ] && [ -f "${idxj6}" ] && [ ! -s "${idxj6}" ] && ok="${ok} c"
+    local absent=0; [ ! -e "${idxj6}" ] && [ ! -L "${idxj6}" ] && absent=1
+    local r5=0; : > "${idxj6}"; touch -d '2001-01-01' "${idxj6}"; ref="$(stat -c %Y "${idxj6}")"
+    ONION_KG_TRACE="${mut}/k0.py" bash "${s}" "${d}" --emit-index --out "${idxj6}" >/dev/null 2>&1 || r5=$?
+    local keep_empty=0; [ ! -s "${idxj6}" ] && [ "$(stat -c %Y "${idxj6}")" = "${ref}" ] && keep_empty=1
+    [ "${r3}" -eq 3 ] && [ "${same}" -eq 1 ] && [ "${r4}" -eq 3 ] && [ "${absent}" -eq 1 ] && [ "${r5}" -eq 3 ] \
+      && [ "${keep_empty}" -eq 1 ] && [ -z "$(find "${d}/docs/onion" -maxdepth 1 -name '.kg-read-index.*' 2>/dev/null)" ] && ok="${ok} c"
     printf '%s' "${ok}"
   }
   local g6; g6=" $(_j6 "${helper}") "
@@ -4623,7 +4630,7 @@ run_kg_trace_resolve_selftests() {
     *) record_fail "kg-trace: (j6a) --out com rc 2" "casos=${g6}" ;; esac
   case "${g6}" in *" b "*) record_pass "kg-trace: (j6b) --out com rc 0 → índice atualizado, igual ao do stdout" ;;
     *) record_fail "kg-trace: (j6b) --out com rc 0" "casos=${g6}" ;; esac
-  case "${g6}" in *" c "*) record_pass "kg-trace: (j6c) --out com rc 3 → povoado fica intacto; ausente nasce vazio (o dia 1)" ;;
+  case "${g6}" in *" c "*) record_pass "kg-trace: (j6c) --out com rc 3 → povoado intacto, ausente SEGUE ausente, vazio intocado (nenhum caminho de erro escreve)" ;;
     *) record_fail "kg-trace: (j6c) --out com rc 3" "casos=${g6}" ;; esac
   # (j6d) a invocação literal que a produção consome (pr-finalize: `kg-trace.sh . --emit-index --out <índice>`),
   #       sem o produto declarado por env: o gerador acha o kg_trace.py pelo vendor do REPO_ROOT, aqui o do core
@@ -4639,6 +4646,15 @@ run_kg_trace_resolve_selftests() {
     case " $(_j6 "${mut}/kg-trace-direto.sh") " in
       *" a "*) record_fail "kg-trace: (j6-MUT) mutante NÃO morde" "escrevendo direto no destino, o rc 2 ainda deixa o índice intacto" ;;
       *) record_pass "kg-trace: (j6-MUT) gerador escrevendo direto no destino → (j6a) cai (o índice some no rc 2)" ;;
+    esac
+  fi
+  # (j6c-MUT) o `: >` do dia 1 de volta no rc 3 (a forma anterior à cura) → (j6c) tem de cair
+  sed 's|^    3) rm -f "${_otmp}"$|    3) rm -f "${_otmp}"; [ -s "${OUT}" ] \|\| : > "${OUT}"|' "${helper}" > "${mut}/kg-trace-trunca.sh"
+  if cmp -s "${helper}" "${mut}/kg-trace-trunca.sh"; then record_fail "kg-trace: (j6c-MUT) mutante não aplicou" "âncora '    3) rm -f \"\${_otmp}\"' mudou"
+  else
+    case " $(_j6 "${mut}/kg-trace-trunca.sh") " in
+      *" c "*) record_fail "kg-trace: (j6c-MUT) mutante NÃO morde" "com o \`: >\` no rc 3 o (j6c) ainda passa" ;;
+      *) record_pass "kg-trace: (j6c-MUT) o \`: >\` de volta no rc 3 → (j6c) cai (o índice vazio nasceria num caminho de erro)" ;;
     esac
   fi
   unset -f _j6
@@ -8932,11 +8948,37 @@ run_githook_trampoline_selftests() {
   r="$(_ci "${d}/wt")"
   [ "${r}" = "${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (b) worktree sem o hook ⇒ roda o do principal" \
     || record_fail "githook-trampoline: (b) sem hook na worktree" "log: ${r:0:200}"
-  # (b2) hook presente mas NÃO executável ⇒ segue o do principal
+  # (b2) hook presente mas NÃO executável ⇒ FALHA FECHADO (revisão adversarial do adotante sge, 2026-10-26). Antes
+  #      caía em silêncio no do principal: o hook sob teste não rodava e o bit perdido chegava à main, onde o git
+  #      IGNORA hook não executável. Confere rc≠0, HEAD parado, NENHUM hook rodou e a mensagem nomeia o chmod.
+  _b2() {  # $1 = worktree → "rc|HEAD parado?|log|stderr cita chmod?"
+    local n h0 h1 rc=0 e; n="$(_nx)"; : > "${d}/log"; echo "${n}" > "$1/f${n}"; _tg -C "$1" add "f${n}"
+    h0="$(_tg -C "$1" rev-parse HEAD)"
+    e="$(_tg -C "$1" commit -q -m "c${n}" 2>&1 >/dev/null)" || rc=$?
+    h1="$(_tg -C "$1" rev-parse HEAD)"; _tg -C "$1" reset -q
+    printf '%s|%s|%s|%s' "${rc}" "$([ "${h0}" = "${h1}" ] && echo parado || echo andou)" "$(cat "${d}/log")" \
+      "$(grep -q 'chmod +x' <<< "${e}" && echo cita || echo muda)"
+  }
   _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"; chmod -x "${d}/wt/.githooks/pre-commit"
-  r="$(_ci "${d}/wt")"
-  [ "${r}" = "${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (b2) hook da worktree não executável ⇒ segue o do principal" \
-    || record_fail "githook-trampoline: (b2) não executável" "log: ${r:0:200}"
+  r="$(_b2 "${d}/wt")"
+  case "${r}" in
+    0\|*) record_fail "githook-trampoline: (b2) não executável" "o commit passou: ${r:0:200}" ;;
+    *"|parado||cita") record_pass "githook-trampoline: (b2) hook da worktree não executável ⇒ FALHA FECHADO (HEAD parado, nenhum hook rodou, a mensagem manda o chmod)" ;;
+    *) record_fail "githook-trampoline: (b2) não executável" "rc|HEAD|log|msg: ${r:0:200}" ;;
+  esac
+  # (b2-MUT) o bloco ANTERIOR à cura (o `-x` como condição do trampolim) ⇒ cai no principal, o commit passa e (b2) morde
+  local blk_ok="${blk}"
+  blk="$(printf '%s\n' "${blk_ok}" | sed 's|^\(   && \[ "\${ONION_HOOK_TRAMPOLINED:-}" != "\${_onion_tt}" \] && \[ -f "\${_onion_tt}" \]\) && ! \[|\1 \&\& [ -x "${_onion_tt}" ] \&\& ! [|')"
+  if [ "${blk}" = "${blk_ok}" ]; then record_fail "githook-trampoline: (b2-MUT) setup" "a mutação não foi aplicada (âncora da condição mudou)"
+  else
+    _mk "${d}/main/.githooks/pre-commit" com "${logb}"
+    r="$(_b2 "${d}/wt")"
+    case "${r}" in
+      0\|*"|${d}/main/.githooks/pre-commit|"*) record_pass "githook-trampoline: (b2-MUT) com o -x na condição (a forma anterior) o commit passa pelo principal — (b2) é load-bearing" ;;
+      *) record_fail "githook-trampoline: (b2-MUT)" "o mutante não reproduziu a queda no principal: ${r:0:200}" ;;
+    esac
+  fi
+  blk="${blk_ok}"; _mk "${d}/main/.githooks/pre-commit" com "${logb}"
   # (c) conteúdo byte-idêntico ⇒ sem exec (roda o do principal, uma vez)
   cp "${d}/main/.githooks/pre-commit" "${d}/wt/.githooks/pre-commit"; chmod +x "${d}/wt/.githooks/pre-commit"
   r="$(_ci "${d}/wt")"
@@ -28433,6 +28475,15 @@ LINT
   if [ "${_r}" -eq 1 ] && [[ "$(_pg_last)" == "bloqueio NÃO PROVADO: FAIL-OPEN"* ]] && [ "${_intact}" = 1 ] && grep -qF '· trampolim:' <<< "${_o}"; then
     record_pass "prove-gate-blocks: (o) hooksPath absoluto + trampolim → prova o pre-commit da WORKTREE (o que o git roda): FAIL-OPEN"
   else record_fail "prove-gate-blocks: (o)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+  # (o2) a worktree com pre-commit próprio NÃO executável: o trampolim falha fechado (revisão do adotante sge,
+  #      2026-10-26), todo commit dali é barrado pelo modo do arquivo e não pelo gate → NÃO PROVADO (rc 3), nomeando
+  local tow2="${d}/o-wt2"
+  git -C "${to}" -c core.hooksPath=/dev/null worktree add -q -b wt-tramp2 "${tow2}" >/dev/null 2>&1 || true
+  printf '#!/usr/bin/env bash\necho "🧅 Onion pre-commit — tudo certo"\nexit 0\n' > "${tow2}/.githooks/pre-commit"; chmod -x "${tow2}/.githooks/pre-commit"
+  _pg_run "${pg}" "${tow2}"
+  if [ "${_r}" -eq 3 ] && [[ "$(_pg_last)" == *"não é executável: o trampolim barra"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (o2) hook da worktree não executável sob o trampolim → NÃO PROVADO (rc 3), o modo nomeado"
+  else record_fail "prove-gate-blocks: (o2)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
 
   # ── da passada adversarial (2026-10-20): cada caso abaixo reproduz um achado executado pelo refutador ──
   # (i) hook que RODA o lint e barra TUDO, com o lint emitindo SOFT (`VIOLATION:` de rotina) → NÃO PROVADO.
@@ -28504,7 +28555,9 @@ LINT
   # sem distinguir HARD pelo sumário, a HARD pré-existente (n) vira "barra tudo"
   _pg_mut hardsum 's|if \[ -n "${C_HARD}" \] && \[ "${C_HARD}" -gt 0 \]; then|if false; then|' "${tn}" "já reprova com 1 HARD"
   # sem espelhar o trampolim, a prova (o) julgaria o hook do principal (PROVADO) e não o que o git roda
-  _pg_mut tramp 's|^  H="${T}/.githooks"$|  :|' "${tow}" "FAIL-OPEN"
+  _pg_mut tramp 's|^    H="${T}/.githooks"$|    :|' "${tow}" "FAIL-OPEN"
+  # sem espelhar a falha fechada do trampolim, a prova (o2) seguiria como se o hook não executável rodasse
+  _pg_mut trampx 's|^  \[ -x "${T}/.githooks/pre-commit" \] \\$|  true \\|' "${tow2}" "não é executável: o trampolim barra"
   # com `ls-files -m` no lugar de `diff HEAD`, o stageado (j) some do sandbox
   _pg_mut staged 's|diff -z --no-renames --name-only HEAD|ls-files -z -m|' "${tj}" "bloqueio PROVADO"
   # sem apagar no sandbox o que o alvo apagou, (m) volta a reprovar pela HARD apagada
@@ -34269,7 +34322,7 @@ run_kg_read_leg_selftests() {
     record_pass "kg-read-leg: (p) sem a guarda do .env o ramo do sed cala com rc 0, e o Read segue avisando"
   else record_fail "kg-read-leg: (p)" "rc=${r1} sed=[${m1:0:80}] read=[${m2:0:80}]"; fi
   # (q) MUTANTE: sem o ramo do Bash in-place (o laço dos segmentos desligado), o 1º caso do (m) CALA
-  sed 's|                for seg in segments(cmd):|                for seg in []:  # ONION_MUTANTE|' "${hs}" > "${ms}/.claude/hooks/kg-read-leg.sh"
+  sed 's|                for seg in segments(strip_heredoc_bodies(cmd)):|                for seg in []:  # ONION_MUTANTE|' "${hs}" > "${ms}/.claude/hooks/kg-read-leg.sh"
   cp "${sbs}/.claude/hooks/pretooluse-env-guard.sh" "${ms}/.claude/hooks/"
   if cmp -s "${hs}" "${ms}/.claude/hooks/kg-read-leg.sh"; then
     record_fail "kg-read-leg: (q-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
@@ -34278,6 +34331,78 @@ run_kg_read_leg_selftests() {
     if [ -z "${m1}" ]; then record_pass "kg-read-leg: (q-MUT) sem o ramo do Bash o sed -i volta a calar — (m) é load-bearing"
     else record_fail "kg-read-leg: (q-MUT)" "o mutante ainda avisou: ${m1:0:120}"; fi
   fi
+  # ── (r..s) O ACOPLAMENTO COM A GUARDA DO .env (revisão adversarial do adotante sge, 2026-10-26) ──────────────
+  # (r) FALSO POSITIVO CRUZADO: o `segments` do veto lê o corpo de heredoc como comando (fecha, por ser veto). O
+  #     lembrete tira o corpo antes: `sed -i` sobre arquivo indexado DENTRO do corpo (nota em arquivo, mensagem de
+  #     commit) cala; o `sed -i` de verdade DEPOIS do terminador segue avisando; `<<-` com terminador indentado também.
+  local r1 r2 r3 r4
+  _klr "${hs}" $'cat > notas.md <<\'EOF\'\nsed -i s/a/b/ src/alvo.ts\nEOF'; m1="${kout}"; r1="${rcs}"
+  _klr "${hs}" $'G commit -F - <<\'EOF\'\nfix: o hook\n\n  sed -i s/a/b/ src/alvo.ts\nEOF'; m2="${kout}"; r2="${rcs}"
+  _klr "${hs}" $'cat <<-EOF > x.md\n\tsed -i s/a/b/ src/alvo.ts\n\tEOF\nsed -i s/a/b/ src/alvo.ts'; m3="${kout}"; r3="${rcs}"
+  _klr "${hs}" $'cat <<"E O F"\nsed -i s/a/b/ src/alvo.ts\nE O F'; m4="${kout}"; r4="${rcs}"
+  # e o deslocamento aritmético (`$((1<<2))`) não abre corpo: o sed -i da linha seguinte segue avisando
+  local m5 r5; _klr "${hs}" $'x=$((1<<2))\nsed -i s/a/b/ src/alvo.ts'; m5="${kout}"; r5="${rcs}"
+  if [ -z "${m1}${m2}${m4}" ] && grep -q 'C_NO_DO_SED' <<< "${m3}" && grep -q 'C_NO_DO_SED' <<< "${m5}" \
+     && [ "${r1}${r2}${r3}${r4}${r5}" = "00000" ]; then
+    record_pass "kg-read-leg: (r) sed -i no CORPO de heredoc cala (nota, commit, delimitador ilegível); depois do terminador e de \$((1<<2)) avisa, rc 0"
+  else record_fail "kg-read-leg: (r)" "rc=${r1}${r2}${r3}${r4}${r5} nota=[${m1:0:60}] commit=[${m2:0:60}] depois=[${m3:0:60}] ilegivel=[${m4:0:60}] aritm=[${m5:0:60}]"; fi
+  # (r-MUT) sem tirar o corpo (o `segments` da guarda cru, a forma anterior), a nota volta a avisar
+  sed 's|segments(strip_heredoc_bodies(cmd))|segments(cmd)|' "${hs}" > "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
+  if cmp -s "${hs}" "${sbs}/.claude/hooks/kg-read-leg-mut.sh"; then record_fail "kg-read-leg: (r-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  else
+    _klr "${sbs}/.claude/hooks/kg-read-leg-mut.sh" $'cat > notas.md <<\'EOF\'\nsed -i s/a/b/ src/alvo.ts\nEOF'; m1="${kout}"
+    if grep -q 'C_NO_DO_SED' <<< "${m1}"; then record_pass "kg-read-leg: (r-MUT) com o segments cru o corpo do heredoc avisa — (r) é load-bearing"
+    else record_fail "kg-read-leg: (r-MUT)" "o mutante seguiu calado: (r) não mede o corte do corpo"; fi
+  fi
+  rm -f "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
+  # (s) O CONTRATO DO `ast`: o `segments`/`WRAPPERS` que o loader REAL do hook extrai da guarda são os da guarda
+  #     executada inteira, num corpus de comandos (case/esac, heredoc, &&, |, ;, comentário, `\;`, invólucro).
+  #     Uma constante renomeada para minúsculas ou atribuída em tupla some do namespace do `ast` e a perna cala com
+  #     a bancada da guarda verde; este caso é quem reprova. Roda o loader tirado do PRÓPRIO hook.
+  _kparity() {  # $1 = guarda → "OK" ou a 1ª divergência
+    python3 - "${hs}" "$1" <<'PYP' 2>&1
+import ast, contextlib, io, re, sys
+hook, guard = sys.argv[1], sys.argv[2]
+leg = re.search(r"KG_LEG_PY=\$\(cat <<'PY'\n(.*?)\nPY\n\)", open(hook, encoding="utf-8").read(), re.S).group(1)
+lt = ast.parse(leg)
+lns = {}
+exec(compile(ast.Module(body=[n for n in lt.body if isinstance(n, (ast.Import, ast.ImportFrom, ast.FunctionDef))
+                              or (isinstance(n, ast.Assign) and all(isinstance(t, ast.Name) and t.id.isupper() for t in n.targets))],
+                        type_ignores=[]), hook, "exec"), lns)
+seg_a, wr_a = lns["load_segments"](guard)
+body = re.search(r"GUARD_PY=\$\(cat <<'PY'\n(.*?)\nPY\n\)", open(guard, encoding="utf-8").read(), re.S).group(1)
+full = {}
+sys.stdin = io.StringIO("{}")
+with contextlib.redirect_stdout(io.StringIO()):
+    exec(compile(body, guard, "exec"), full)
+cmds = ["sed -i s/a/b/ f", "case $x in a|b) sed -i s/a/b/ f;; *) :;; esac", "a && b | c; d\ne", "cat <<'E'\nsed -i x f\nE",
+        "sudo -u x timeout 3 env A=1 sed -i x f", "find . -exec sed -i x {} \\;", "x # sed -i y f\nsed -n p f", "if true; then sed -i x f; fi",
+        "if true; then case $x in a) sed -i x f;; esac; fi"]
+if wr_a != full["WRAPPERS"]:
+    print("WRAPPERS diverge"); sys.exit(0)
+for c in cmds:
+    try:
+        a = seg_a(c)
+    except Exception as e:
+        print(f"ast quebra em {c!r}: {type(e).__name__}"); sys.exit(0)
+    if a != full["segments"](c):
+        print(f"diverge em {c!r}"); sys.exit(0)
+print("OK")
+PYP
+  }
+  local par; par="$(_kparity "${sbs}/.claude/hooks/pretooluse-env-guard.sh")"
+  if [ "${par}" = "OK" ]; then record_pass "kg-read-leg: (s) o segments/WRAPPERS que o ast do hook extrai da guarda são os da guarda inteira (9 comandos)"
+  else record_fail "kg-read-leg: (s) contrato do ast" "${par:0:200}"; fi
+  # (s-MUT) a guarda com uma constante do `segments` renomeada para minúsculas (KEYWORDS → keywords): a guarda segue
+  #         funcionando, a perna cala no `case` — e o (s) tem de acusar
+  sed 's/\bKEYWORDS\b/keywords/g' "${sbs}/.claude/hooks/pretooluse-env-guard.sh" > "${sbs}/guard-mut.sh"
+  if cmp -s "${sbs}/.claude/hooks/pretooluse-env-guard.sh" "${sbs}/guard-mut.sh"; then record_fail "kg-read-leg: (s-MUT) setup" "a mutação não foi aplicada (KEYWORDS sumiu da guarda?)"
+  else
+    par="$(_kparity "${sbs}/guard-mut.sh")"
+    case "${par}" in OK) record_fail "kg-read-leg: (s-MUT)" "constante minúscula na guarda e o (s) seguiu OK — o caso não prende o contrato" ;;
+      *) record_pass "kg-read-leg: (s-MUT) constante da guarda em minúsculas → o (s) acusa (${par:0:60})" ;; esac
+  fi
+  unset -f _kparity
   rm -rf "${ms}" "${sbs}"
 
 }

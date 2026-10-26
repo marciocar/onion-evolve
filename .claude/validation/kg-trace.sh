@@ -21,9 +21,12 @@
 #        `--emit-index > docs/onion/kg-read-index.tsv` ESVAZIA o índice antes do erro: o shell trunca o arquivo
 #        antes de o script rodar, e o rc 2 (vendor anterior à 4.25.1, produto ausente) deixava o adotante sem
 #        índice (medido num adotante em 2026-10-26, restaurado pelo git). Com --out: rc 2 → destino INTACTO,
-#        byte a byte. rc 3 (índice vazio declarado) → grava vazio SÓ se o destino não existe ou já está vazio
-#        (o dia 1); destino com linhas fica intacto, porque o rc 3 também vem com grafo ILEGÍVEL, e quem julga
-#        a divergência é a REGRA 84 — se os traces sumiram de propósito, esvazie à mão (`: > <arquivo>`).
+#        byte a byte. rc 3 (índice vazio declarado) → destino INTACTO também: ausente segue ausente, povoado
+#        segue povoado, porque o rc 3 também vem com grafo ILEGÍVEL, e quem julga a divergência é a REGRA 84 —
+#        se os traces sumiram de propósito, esvazie à mão (`: > <arquivo>`). Até 2026-10-26 o rc 3 com destino
+#        ausente ou vazio fazia `: > <destino>`: um caminho de erro que CRIAVA o índice vazio (e, entre o teste
+#        `-s` e a escrita, truncaria o que outro processo gravasse). A revisão adversarial do adotante sge achou;
+#        o dia 1 não precisa do arquivo: a REGRA 84 dá SOFT sem índice e o hook cala sem ele.
 #        Sem --out, o índice vai ao stdout como sempre (compatível).
 # Saída: humano (a saída do produto) · TSV `grafo·id·node_type·alvo·veredito` (só os que reprovam) ·
 #        índice `caminho·id·grafo`, ordenado (LC_ALL=C sort -u)
@@ -71,9 +74,9 @@ if [ -n "${OUT}" ]; then
        # o modo do destino é preservado (o mktemp nasce 0600 e o mv levaria esse modo à árvore)
        if [ -e "${OUT}" ]; then chmod --reference="${OUT}" "${_otmp}" 2>/dev/null || chmod 644 "${_otmp}"; else chmod 644 "${_otmp}"; fi
        mv -f "${_otmp}" "${OUT}"; exit 0 ;;
+    # rc 3: NENHUM caminho de erro escreve no destino — nem o vazio do dia 1 (a REGRA 84 dá SOFT sem o índice)
     3) rm -f "${_otmp}"
-       if [ ! -s "${OUT}" ]; then : > "${OUT}"
-       else echo "AVISO kg-trace --out: o produto declarou índice VAZIO (rc 3) e ${OUT} tem linhas — destino INTACTO (a REGRA 84 julga a divergência; se os traces sumiram de propósito, esvazie à mão)" >&2; fi
+       echo "AVISO kg-trace --out: o produto declarou índice VAZIO (rc 3) — ${OUT} INTACTO (ausente segue ausente; a REGRA 84 julga a divergência; se os traces sumiram de propósito, esvazie à mão)" >&2
        exit 3 ;;
     *) rm -f "${_otmp}"; echo "ERRO kg-trace --out: NAO-GEROU (rc=${_orc}) — ${OUT} INTACTO" >&2; exit "${_orc}" ;;
   esac

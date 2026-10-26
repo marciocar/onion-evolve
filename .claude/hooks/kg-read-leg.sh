@@ -67,6 +67,15 @@ esac
 # arquivo; aqui o `ast` carrega só as definições (import, def, class e constantes em maiúsculas) e deixa de
 # fora o corpo que lê a entrada. Sem a guarda ao lado, ou se ela mudar de forma, o ramo do sed CALA (lembrete
 # erra para o silêncio); a família kg_read_leg da bancada cobre a guarda (selftest-covers) e reprova a mudança.
+# ⚠️ O ACOPLAMENTO É DECLARADO NOS DOIS LADOS E TESTADO (revisão adversarial do adotante sge, 2026-10-26). O que
+# ele custava, medido: (1) o `segments` da guarda é de um VETO, que erra para FECHAR — ele lê o corpo de um heredoc
+# como comando. Emprestado a um LEMBRETE, isso virava falso positivo cruzado: `cat > notas.md <<'EOF'` com uma
+# linha `sed -i … <arquivo do índice>` no corpo (ou a mensagem de um commit por heredoc) avisava como se fosse
+# edição. Por isso o corpo de heredoc sai AQUI, antes do `segments`, com a regra deste lado (calar vence: operador
+# sem delimitador legível corta o resto). (2) O `ast` só leva import, def, class e constante em MAIÚSCULAS: uma
+# constante da guarda renomeada para minúsculas, ou atribuída em tupla, some do namespace e o ramo cala em
+# silêncio, com a bancada da guarda verde. O caso (s) da família kg_read_leg compara o `segments` carregado pelo
+# `ast` com o da guarda executada inteira, num corpus de comandos, e o mutante (s-MUT) prova que ele morde.
 KG_LEG_PY=$(cat <<'PY'
 import ast, json, os, re, sys
 
@@ -81,6 +90,28 @@ def load_segments(guard):
     ns = {}
     exec(compile(ast.Module(body=keep, type_ignores=[]), guard, "exec"), ns)
     return ns["segments"], ns.get("WRAPPERS", set())
+
+# `<<<` é here-string e `<< 2` é deslocamento aritmético (`$((1<<2))`): nenhum dos dois abre corpo
+HEREDOC_ANY = re.compile(r"(?<!<)<<(?!<)(?![ \t]*[0-9])")
+HEREDOC_OP = re.compile(r"(?<!<)<<(?!<)(?![ \t]*[0-9])(-?)[ \t]*(['\"]?)([A-Za-z0-9_.-]+)\2")
+
+def strip_heredoc_bodies(cmd):
+    """tira o CORPO de todo heredoc (é dado, não comando). Operador sem delimitador legível: corta dali ao fim."""
+    out, pending = [], []
+    for line in cmd.split("\n"):
+        if pending:
+            dash, word = pending[0]
+            if (line.lstrip("\t") if dash else line) == word:
+                pending.pop(0)
+            continue
+        out.append(line)
+        n_any = len(HEREDOC_ANY.findall(line))
+        if n_any:
+            ops = HEREDOC_OP.findall(line)
+            if len(ops) != n_any:
+                break                               # não sei onde o corpo acaba: o resto não é julgado
+            pending = [(d == "-", w) for d, _, w in ops]
+    return "\n".join(out)
 
 def argv_of(seg, wrappers):
     """tira atribuições (`LC_ALL=C sed`) e invólucros (`sudo`, `env`, `timeout 30`) da frente do segmento."""
@@ -176,7 +207,7 @@ try:
             try:
                 segments, wrappers = load_segments(guard)
                 cwd, moved = str(d.get("cwd") or ""), False
-                for seg in segments(cmd):
+                for seg in segments(strip_heredoc_bodies(cmd)):
                     argv = argv_of(seg, wrappers)
                     if not argv:
                         continue

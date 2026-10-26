@@ -53,6 +53,12 @@
 # nada; a 2ª, que a quebra de linha não separava comandos (`test -f .env` na 1ª linha liberava o bloco
 # inteiro), que comentário e `echo` viravam falso positivo nos blocos da própria cura, e que `git diff
 # --no-index`, glob (`cat .e*`, Grep glob) e interpretador inline escapavam. Bancada: run_env_exposure_selftests.
+# ⚠️ CONSUMIDOR DECLARADO (2026-10-26, revisão adversarial do adotante sge): a perna de leitura do KG
+# (`kg-read-leg.sh`) LÊ o `GUARD_PY` abaixo pelo `ast` e usa `segments` e `WRAPPERS`. O contrato: o bloco
+# `GUARD_PY=$(cat <<'PY' … PY )` com esse delimitador, `segments(cmd)` e `WRAPPERS` no nível do módulo, e toda
+# constante de que eles dependem em MAIÚSCULAS e atribuída a um nome só (o `ast` de lá leva import, def, class
+# e constante em maiúsculas, nada mais). Quebrar o contrato não abre o veto: faz a perna CALAR no `sed -i`. A
+# família kg_read_leg prende o contrato (caso (s): o `segments` pelo `ast` igual ao da guarda executada inteira).
 set -uo pipefail
 input="$(cat)"
 # o script vai por -c e o JSON do hook pela entrada padrão. A 1ª redação usava `python3 - <<'PY'`, e aí o
