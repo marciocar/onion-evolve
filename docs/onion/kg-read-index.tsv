@@ -160,12 +160,15 @@
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+.claude/hooks/house-code-gloss.sh	C_TETO_O_LEMBRETE_DO_PRETOOLUSE_CHEGA_DEPOIS	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/house-code-gloss.sh	D_LEMBRA_ANTES_E_BARRA_SO_A_REINCIDENCIA	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
+.claude/hooks/house-code-gloss.sh	D_LEMBRETE_PRETOOLUSE_SENDMESSAGE_E_PRE_REGISTRO_1026	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/house-code-gloss.sh	E_DEFEITO_SIGLA_SEM_GLOSA_AO_MAESTRO	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/house-code-gloss.sh	E_ELENXO_1A_PASSADA_RECALCULAVA_O_LEMBRETE	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/house-code-gloss.sh	E_ELENXO_2A_PASSADA_O_LEMBRETE_DO_MEIO_DO_TURNO	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/house-code-gloss.sh	E_MEDIDA_TAXA_DE_BLOQUEIO_EM_TURNOS_REAIS	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/house-code-gloss.sh	E_REFORCO_ESCREVER_CERTO_NAO_TRAVAR	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
+.claude/hooks/house-code-gloss.sh	E_SIGLA_SEM_GLOSA_FORA_DA_RESPOSTA_1026	docs/evolution/research/guard-house-code-gloss-2026-10/house-code-gloss-2026-10.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_OBJECAO_HOOK_STALENESS_IS_THE_BRANCH	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_OBJECAO_MAIN_MUST_KEEP_VERSIONING	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
