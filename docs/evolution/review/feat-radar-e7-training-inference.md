@@ -2,7 +2,8 @@
 branch: feat/radar-e7-training-inference
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d3f860d5f0f3abcfd5e54b4458ceb6c3f42e4caee66c357ce7ec4355d71b3229
+reviewed_code_sha256: 3a6408a0c8770ef033e0f549d4af99f2ccde73e6ca7e97ed82f2213be4c8659a
 findings_total: 5
 findings_real: 5
 tokens: 148681
