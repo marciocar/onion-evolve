@@ -2,7 +2,8 @@
 branch: feat/kg-read-leg-sed-inplace
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 53731d399229f3758d7bf5a299df72ccda37396514883f961e44104c7065b0de
+reviewed_code_sha256: 204f43f7d5e1c437426cdc43c885e2d750c9857bbe7b5bdb8991dc32c4352f09
 findings_total: 4
 findings_real: 2
 tokens: 0
