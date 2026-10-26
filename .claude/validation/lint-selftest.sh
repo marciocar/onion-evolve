@@ -8872,6 +8872,108 @@ PYF
   rm -rf "${d}"
 }
 
+# ── TRAMPOLIM DE WORKTREE nos hooks (.githooks/* e o template do adotante, 2026-10-26) ─────────────────
+# Com core.hooksPath ABSOLUTO a worktree roda o hook do checkout principal; o trampolim no topo de cada
+# hook passa a vez ao hook da árvore atual quando ele existe e difere. Repo git REAL: worktree ligada,
+# hooksPath absoluto, commits e push de verdade. O bloco testado é o EXTRAÍDO dos hooks reais (entre os
+# marcadores), e os blocos têm de ser idênticos em todos — o template é o que viaja ao adotante.
+run_githook_trampoline_selftests() {
+  command -v git >/dev/null 2>&1 || { record_skip "githook-trampoline: git ausente → pulado"; return; }
+  local f b n=0 srcs=() first="" miss="" ln_t ln_c
+  for f in "${REPO_ROOT}"/.githooks/* "${REPO_ROOT}/.claude/utils/adopt/githook-pre-commit-onion.tpl"; do
+    [ -f "${f}" ] || continue
+    case "${f##*/}" in *.onion|*.sample) continue ;; esac
+    srcs+=("${f}")
+  done
+  [ "${#srcs[@]}" -gt 0 ] || { record_fail "githook-trampoline" "nenhum hook encontrado"; return; }
+  for f in "${srcs[@]}"; do
+    b="$(sed -n '/^# >>> onion-hook-trampoline >>>$/,/^# <<< onion-hook-trampoline <<<$/p' "${f}")"
+    if [ -z "${b}" ]; then miss="${miss} ${f#"${REPO_ROOT}"/}"; continue; fi
+    # no TOPO: antes de qualquer linha de código (o set -e/-u e o resto do hook vêm depois)
+    ln_t="$(awk '/^# >>> onion-hook-trampoline >>>$/{print NR; exit}' "${f}")"
+    ln_c="$(awk '!/^(#|[[:space:]]*$)/{print NR; exit}' "${f}")"
+    [ "${ln_c}" -gt "${ln_t}" ] || miss="${miss} ${f#"${REPO_ROOT}"/}(fora-do-topo)"
+    if [ -z "${first}" ]; then first="${b}"; elif [ "${b}" != "${first}" ]; then miss="${miss} ${f#"${REPO_ROOT}"/}(bloco-divergente)"; fi
+    n=$((n + 1))
+  done
+  [ -z "${miss}" ] && record_pass "githook-trampoline: (p) bloco presente, no topo e idêntico em ${n} hook(s) (template incluso)" \
+    || record_fail "githook-trampoline: (p) paridade do bloco" "faltou/divergiu:${miss}"
+  local blk="${first}"
+  [ -n "${blk}" ] || return
+  local d; d="$(mktemp -d)"; : > "${d}/gcfg"
+  _tg() { env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_PREFIX -u GIT_OBJECT_DIRECTORY -u ONION_HOOK_TRAMPOLINED \
+      HOME="${d}" GIT_CONFIG_GLOBAL="${d}/gcfg" GIT_CONFIG_NOSYSTEM=1 timeout 30 \
+      git -c user.name=bench -c user.email=bench@example.invalid -c init.defaultBranch=main -c commit.gpgsign=false "$@"; }
+  _mk() {  # $1 = destino, $2 = com|sem trampolim, $3 = corpo
+    { printf '#!/usr/bin/env bash\n'; [ "$2" = com ] && printf '%s\n' "${blk}"; printf '%s\n' "$3"; } > "$1"; chmod +x "$1"
+  }
+  local logb='echo "$(cd "${0%/*}" && pwd)/${0##*/}" >> "'"${d}"'/log"'   # caminho ABSOLUTO do hook que rodou (relativo no hooksPath relativo)
+  local pushb='> "'"${d}"'/pushlog"; cat >> "'"${d}"'/pushlog"'
+  _tg init -q "${d}/main"; mkdir -p "${d}/main/.githooks"
+  _mk "${d}/main/.githooks/pre-commit" com "${logb}"
+  _mk "${d}/main/.githooks/pre-push" com "echo \"main \$*\" ${pushb}"
+  _tg -C "${d}/main" add -A; _tg -C "${d}/main" commit -q --no-verify -m init
+  _tg -C "${d}/main" worktree add -q -b wt "${d}/wt" 2>/dev/null
+  _tg init -q --bare "${d}/remote.git"; _tg -C "${d}/main" remote add origin "${d}/remote.git"
+  _tg -C "${d}/main" config core.hooksPath "${d}/main/.githooks"
+  local i=0 r rc sha
+  _ci() { i=$((i + 1)); : > "${d}/log"; echo "${i}" > "$1/f${i}"; _tg -C "$1" add "f${i}"; _tg -C "$1" commit -q -m "c${i}" >/dev/null 2>&1; cat "${d}/log"; }
+  # (a) a worktree tem pre-commit DIFERENTE ⇒ roda o DELA, uma vez só (sem laço: o dela também tem o trampolim = d)
+  _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"
+  r="$(_ci "${d}/wt")"
+  [ "${r}" = "${d}/wt/.githooks/pre-commit" ] && record_pass "githook-trampoline: (a)+(d) hooksPath absoluto, worktree com hook diferente ⇒ roda o DELA, uma vez (sem laço)" \
+    || record_fail "githook-trampoline: (a) roda o da worktree" "log: ${r:0:200}"
+  # (b) sem hook na worktree ⇒ roda o do principal (o gate não deixa de rodar)
+  rm -f "${d}/wt/.githooks/pre-commit"
+  r="$(_ci "${d}/wt")"
+  [ "${r}" = "${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (b) worktree sem o hook ⇒ roda o do principal" \
+    || record_fail "githook-trampoline: (b) sem hook na worktree" "log: ${r:0:200}"
+  # (b2) hook presente mas NÃO executável ⇒ segue o do principal
+  _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"; chmod -x "${d}/wt/.githooks/pre-commit"
+  r="$(_ci "${d}/wt")"
+  [ "${r}" = "${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (b2) hook da worktree não executável ⇒ segue o do principal" \
+    || record_fail "githook-trampoline: (b2) não executável" "log: ${r:0:200}"
+  # (c) conteúdo byte-idêntico ⇒ sem exec (roda o do principal, uma vez)
+  cp "${d}/main/.githooks/pre-commit" "${d}/wt/.githooks/pre-commit"; chmod +x "${d}/wt/.githooks/pre-commit"
+  r="$(_ci "${d}/wt")"
+  [ "${r}" = "${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (c) byte-idêntico ⇒ sem exec, uma execução" \
+    || record_fail "githook-trampoline: (c) idêntico" "log: ${r:0:200}"
+  # (c2) no próprio checkout principal (mesmo arquivo) ⇒ sem exec
+  r="$(_ci "${d}/main")"
+  [ "${r}" = "${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (c2) no checkout principal (mesmo inode) ⇒ sem exec" \
+    || record_fail "githook-trampoline: (c2) mesmo arquivo" "log: ${r:0:200}"
+  # (e) hooksPath RELATIVO ⇒ nada muda: cada árvore roda o seu, uma vez
+  _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"
+  _tg -C "${d}/main" config core.hooksPath .githooks
+  r="$(_ci "${d}/wt")|$(_ci "${d}/main")"
+  [ "${r}" = "${d}/wt/.githooks/pre-commit|${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (e) hooksPath relativo ⇒ cada árvore roda o seu, sem exec" \
+    || record_fail "githook-trampoline: (e) relativo" "log: ${r:0:200}"
+  _tg -C "${d}/main" config core.hooksPath "${d}/main/.githooks"
+  # (f) pre-push: argumentos e stdin (as refs) chegam íntegros ao hook da worktree
+  _mk "${d}/wt/.githooks/pre-push" com "echo \"wt \$*\" ${pushb}"
+  : > "${d}/pushlog"
+  _tg -C "${d}/wt" push -q origin wt >/dev/null 2>&1
+  sha="$(_tg -C "${d}/wt" rev-parse HEAD)"
+  r="$(cat "${d}/pushlog")"
+  [ "${r}" = "wt origin ${d}/remote.git"$'\n'"refs/heads/wt ${sha} refs/heads/wt 0000000000000000000000000000000000000000" ] \
+    && record_pass "githook-trampoline: (f) pre-push: args e stdin (refs) íntegros no hook da worktree" \
+    || record_fail "githook-trampoline: (f) pre-push stdin" "pushlog: ${r:0:300}"
+  # (g) o trampolim não engole o veredito: hook da worktree que REPROVA barra o commit
+  _mk "${d}/wt/.githooks/pre-commit" com "${logb}; exit 1"
+  i=$((i + 1)); echo "${i}" > "${d}/wt/f${i}"; _tg -C "${d}/wt" add "f${i}"
+  rc=0; _tg -C "${d}/wt" commit -q -m "c${i}" >/dev/null 2>&1 || rc=$?
+  [ "${rc}" -ne 0 ] && record_pass "githook-trampoline: (g) hook da worktree reprova ⇒ commit barrado (rc=${rc})" \
+    || record_fail "githook-trampoline: (g) veredito" "commit passou com o hook da worktree em exit 1"
+  _tg -C "${d}/wt" reset -q
+  # (m) MUTANTE: principal SEM o trampolim ⇒ o caso (a) roda o do principal — o caso morde
+  _mk "${d}/main/.githooks/pre-commit" sem "${logb}"
+  _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"
+  r="$(_ci "${d}/wt")"
+  [ "${r}" = "${d}/main/.githooks/pre-commit" ] && record_pass "githook-trampoline: (m) mutante sem trampolim ⇒ (a) roda o do principal (o caso detecta a falta)" \
+    || record_fail "githook-trampoline: (m) mutante" "log: ${r:0:200}"
+  rm -rf "${d}"
+}
+
 # ── LEMBRETE do core.hooksPath ABSOLUTO (session-currency-check.sh, 2026-10-26) ──────────────────────
 # Defeito medido (git 2.43, core e adotante): absoluto ⇒ toda worktree roda o .githooks/ do checkout
 # principal. O hook avisa (nunca veta). Invocado COMO O RUNNER O CHAMA: JSON no stdin, CLAUDE_PROJECT_DIR,
@@ -36739,6 +36841,7 @@ _family run_update_bridge_selftests
 _family run_version_drift_selftests
 _family run_currency_census_selftests
 _family run_hookspath_reminder_selftests
+_family run_githook_trampoline_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests
 _family run_command_role_parity_selftests
