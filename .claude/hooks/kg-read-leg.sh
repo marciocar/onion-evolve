@@ -49,13 +49,112 @@ payload="$(cat)"
 # desde o nascimento do hook. Eu teria trocado 95% do valor original pelo caso novo.
 # A condicao certa tem DOIS ramos: se ha `file_path` (Read/Edit/Write), segue como sempre, seja qual
 # for o arquivo; se NAO ha (Bash), so vale a pena parsear quando o comando cita um `.kg.yaml`.
+# ⚠️ E A ESCRITA IN-PLACE POR BASH TAMBÉM É EDIÇÃO (SAC-240, r17 de 2026-10-23). Medido: o mesmo arquivo
+# rastreado dava 988 bytes de aviso por Edit e 0 por `sed -i`, que na 2.1.309 é Bash comum — o Edit avisava e o
+# `sed -i` passava calado. O 3º ramo do prefiltro deixa passar `sed`/`perl` com um `-` e um `i` adiante; quem
+# decide se é in-place é o parser, não o `case`.
 case "${payload}" in
   *'"file_path"'*) : ;;
   *.kg.yaml*)      : ;;
+  *'sed '*-*i*|*'perl '*-*i*) : ;;
   *)               exit 0 ;;
 esac
 
-target="$(printf '%s' "${payload}" | python3 -c 'import json,sys,re
+# O parser de comando é o da guarda do .env, LIDO da fonte e não copiado: o `GUARD_PY` de
+# pretooluse-env-guard.sh tem o tokenizador linear (sem o custo quadrático do shlex da stdlib), o corte de
+# comentários e de `\;`, e os segmentos da linha (`;`, `&&`, `|`, quebra de linha, padrões de `case`). Ele vive
+# inline num veto que viaja SOZINHO no plugin, então extraí-lo para uma lib faria o veto depender de um 2º
+# arquivo; aqui o `ast` carrega só as definições (import, def, class e constantes em maiúsculas) e deixa de
+# fora o corpo que lê a entrada. Sem a guarda ao lado, ou se ela mudar de forma, o ramo do sed CALA (lembrete
+# erra para o silêncio); a família kg_read_leg da bancada cobre a guarda (selftest-covers) e reprova a mudança.
+KG_LEG_PY=$(cat <<'PY'
+import ast, json, os, re, sys
+
+def load_segments(guard):
+    src = open(guard, encoding="utf-8").read()
+    m = re.search(r"GUARD_PY=\$\(cat <<'PY'\n(.*?)\nPY\n\)", src, re.S)
+    tree = ast.parse(m.group(1))
+    const = re.compile(r"^_?[A-Z][A-Z0-9_]*$")
+    keep = [n for n in tree.body
+            if isinstance(n, (ast.Import, ast.ImportFrom, ast.FunctionDef, ast.ClassDef))
+            or (isinstance(n, ast.Assign) and all(isinstance(t, ast.Name) and const.match(t.id) for t in n.targets))]
+    ns = {}
+    exec(compile(ast.Module(body=keep, type_ignores=[]), guard, "exec"), ns)
+    return ns["segments"], ns.get("WRAPPERS", set())
+
+def argv_of(seg, wrappers):
+    """tira atribuições (`LC_ALL=C sed`) e invólucros (`sudo`, `env`, `timeout 30`) da frente do segmento."""
+    i = 0
+    while i < len(seg):
+        t = seg[i]
+        if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", t):
+            i += 1; continue
+        if t in wrappers:
+            i += 1
+            while i < len(seg) and seg[i].startswith("-"):
+                i += 1
+            if t == "timeout" and i < len(seg) and re.match(r"^[0-9.]+[smhd]?$", seg[i]):
+                i += 1
+            continue
+        break
+    return seg[i:]
+
+def sed_files(args):
+    """operandos de arquivo de um `sed` IN-PLACE (`-i`, `-i.bak`, `-Ei`, `--in-place[=SUF]`); vazio se não é."""
+    inplace, script, files, i, opts = False, False, [], 0, True
+    while i < len(args):
+        a = args[i]
+        if opts and a == "--":
+            opts = False
+        elif opts and a.startswith("--"):
+            name = a.split("=", 1)[0]
+            if name == "--in-place":
+                inplace = True
+            elif name in ("--expression", "--file", "--line-length"):
+                script = script or name != "--line-length"
+                if "=" not in a:
+                    i += 1
+        elif opts and a.startswith("-") and len(a) > 1:
+            for j, c in enumerate(a[1:], 1):
+                if c == "i":
+                    inplace = True; break           # o resto do cluster é o sufixo do backup
+                if c in "efl":
+                    script = script or c != "l"
+                    if j == len(a) - 1:
+                        i += 1                      # o argumento vem no token seguinte
+                    break
+        elif not script:
+            script = True                           # 1º operando sem -e/-f é o script
+        else:
+            files.append(a)
+        i += 1
+    return files if inplace else []
+
+def perl_files(args):
+    """operandos de arquivo de um `perl -i`/`-pi`; o perl para de ler chaves no 1º operando."""
+    inplace, code, i = False, False, 0
+    while i < len(args):
+        a = args[i]
+        if a == "--":
+            i += 1; break
+        if not a.startswith("-") or len(a) == 1:
+            break
+        for j, c in enumerate(a[1:], 1):
+            if c == "i":
+                inplace = True; break
+            if c in "eE":
+                code = True
+                if j == len(a) - 1:
+                    i += 1
+                break
+            if c in "IMmxCdD":
+                break
+        i += 1
+    rest = args[i:]
+    if not code:
+        rest = rest[1:]                             # sem -e, o 1º operando é o arquivo do programa
+    return rest if inplace else []
+
 try:
     d = json.load(sys.stdin)
     ti = d.get("tool_input", {}) or {}
@@ -69,8 +168,33 @@ try:
         # caminho plausivel terminando em .kg.yaml, sem aspas/espacos no meio
         for m in re.findall(r"[A-Za-z0-9_./~-]+\.kg\.yaml", cmd):
             print(m)
+        # o ramo do Bash in-place: `sed -i`, `sed --in-place`, `perl -pi` sobre arquivo que o índice conheça
+        guard = os.environ.get("KG_LEG_ENV_GUARD") or ""
+        # o parse da guarda custa ~0,1 s: só se paga quando há o programa E uma chave com `i` (ou --in-place)
+        if (re.search(r"\b(g?sed|perl)\b", cmd) and re.search(r"(^|\s)-[^\s-]*i|--in-place", cmd)
+                and os.path.isfile(guard)):
+            try:
+                segments, wrappers = load_segments(guard)
+                cwd = str(d.get("cwd") or "")
+                for seg in segments(cmd):
+                    argv = argv_of(seg, wrappers)
+                    if not argv:
+                        continue
+                    prog = os.path.basename(argv[0])
+                    files = sed_files(argv[1:]) if prog in ("sed", "gsed") else perl_files(argv[1:]) if prog == "perl" else []
+                    for f in files:
+                        if not f or re.search(r"[*?\[$`]", f):
+                            continue                # glob e variável: o hook não expande, cala
+                        if cwd and not os.path.isabs(f):
+                            f = os.path.normpath(os.path.join(cwd, f))
+                        print(f)
+            except Exception:
+                pass                                # guarda ausente ou de outra forma: o ramo cala
 except Exception:
-    pass' 2>/dev/null)"
+    pass
+PY
+)
+target="$(printf '%s' "${payload}" | KG_LEG_ENV_GUARD="$(dirname "${BASH_SOURCE[0]}")/pretooluse-env-guard.sh" python3 -c "${KG_LEG_PY}" 2>/dev/null)"
 [ -n "${target}" ] || exit 0
 
 # O índice guarda caminhos RELATIVOS à root; o Read chega com absoluto e o Bash costuma vir relativo.
