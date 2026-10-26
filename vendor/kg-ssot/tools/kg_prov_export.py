@@ -19,8 +19,8 @@ produção, e não de suporte evidencial, e exportá-las como wasDerivedFrom dir
 toda aresta (de edges e de external_edges) vira um recurso kg:Edge com kg:edgeType, kg:from, kg:to, o rótulo e as
 outras chaves como kg:<chave> (o nome da chave com percent-encoding), o que permite a volta sem perda. Entre dois nós locais, SUPPORTS ganha também a tripla
 cito:supports, REFUTES a cito:refutes e SUPERSEDES a dcterms:replaces; os outros tipos não ganham tripla-padrão. A
-ponta externa (<caminho>#<id>) vai como o literal kg:fromRef ou kg:toRef, e a ponta ausente (o grafo inteiro) como
-kg:fromGraph. Nenhuma aresta gera prov:wasDerivedFrom. Com --full (que implica --edges), o documento inteiro vai:
+ponta externa (<caminho>#<id>), e também a que não é um id de nó válido, vai como o literal kg:fromRef ou kg:toRef, e
+a ponta ausente (o grafo inteiro) como kg:fromGraph. Nenhuma aresta gera prov:wasDerivedFrom. Com --full (que implica --edges), o documento inteiro vai:
 todo campo de cada nó e do meta como kg:<chave> (texto como literal, o resto como JSON tipado kg:json), as chaves do
 meta e as x_ do topo num recurso kg:Graph em <base><meta.id>, o que permite remontar o YAML carregado a partir do RDF.
 
@@ -58,6 +58,7 @@ EDGE_CONTEXT = {"cito": "http://purl.org/spar/cito/", "dcterms": "http://purl.or
 STANDARD = {"SUPPORTS": "cito:supports", "REFUTES": "cito:refutes", "SUPERSEDES": "dcterms:replaces"}
 IRI = re.compile(r"https?://[^\s<>\"{}|\\^`]+")
 DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
+NODE_ID = re.compile(r"[A-Za-z][A-Za-z0-9_]*")  # o padrão de id de nó do contrato v4 ($defs.nodeId)
 
 
 # O help em inglês, a língua-fonte; a docstring acima é a versão pt-BR, que o catálogo traz de volta.
@@ -82,8 +83,8 @@ not evidential support, and exporting them as wasDerivedFrom would say something
 every edge (from edges and external_edges) becomes a kg:Edge resource with kg:edgeType, kg:from, kg:to, the label and
 the other keys as kg:<key> (the key name percent-encoded), so the graph can be rebuilt without loss. Between two local nodes, SUPPORTS also gets the
 cito:supports triple, REFUTES cito:refutes and SUPERSEDES dcterms:replaces; the other types get no standard triple.
-An external end (<path>#<id>) goes as the literal kg:fromRef or kg:toRef, and a missing end (the whole graph) as
-kg:fromGraph. No edge produces prov:wasDerivedFrom. With --full (which implies --edges), the whole document goes out:
+An external end (<path>#<id>), and also an end that is not a valid node id, goes as the literal kg:fromRef or
+kg:toRef, and a missing end (the whole graph) as kg:fromGraph. No edge produces prov:wasDerivedFrom. With --full (which implies --edges), the whole document goes out:
 every field of every node and of meta as kg:<key> (text as a literal, anything else as JSON typed kg:json), with the
 meta keys and the top-level x_ keys on a kg:Graph resource at <base><meta.id>, so the loaded YAML can be rebuilt from
 the RDF.
@@ -186,8 +187,10 @@ def export(doc, base, edges=False, full=False):
                 ref = item.get(end)
                 if ref is None:
                     edge[f"kg:{end}Graph"] = True
-                elif kg_validate.is_external(ref):
-                    edge[f"kg:{end}Ref"] = ref
+                elif kg_validate.is_external(ref) or not NODE_ID.fullmatch(str(ref)):
+                    # a ponta externa, e também a que não é id de nó válido (entrada que o contrato recusa), vai como
+                    # literal: como IRI local, uma ref com "/" ou "#" vira IRI quebrada, que cada leitor RDF lê de um jeito
+                    edge[f"kg:{end}Ref"] = ref if isinstance(ref, str) else _value(ref, f"{key} #{count}.{end}")
                 else:
                     ends[end] = prefix + str(ref)
                     edge[f"kg:{end}"] = {"@id": ends[end]}

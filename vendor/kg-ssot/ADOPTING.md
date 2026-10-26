@@ -59,7 +59,9 @@ As an adopter, you only use `update` and `check`.
 > adopter's stamp too. Nothing else changes: the old tags still exist, and your next update only changes the `--tag`
 > string.
 
-The public repository is `https://github.com/marciocar/kg-ssot`: each of its commits is a release, with its tag. The
+The public repository is `https://github.com/marciocar/kg-ssot`: each of its commits is a release, with its tag. It keeps
+its own history, so a tag points there to a different commit than in the development repository, with byte-identical
+files; the commit in the vendor stamp is the public repository's. The
 first time, clone it outside your repository and run the vendor tool from the root of your repository (the adopter):
 
 ```bash
@@ -340,6 +342,9 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.29.0` to `kg-ssot-v4.29.1`, nothing changes for a valid graph: an edge end that is neither a valid
+node id nor an external reference (input the contract rejects) now goes to RDF as a literal instead of a broken IRI.
 
 From `kg-ssot-v4.28.0` to `kg-ssot-v4.29.0`, the contract stays at v4.15, and the gate and the validator do not
 change. The full profile brings a new file, `tools/requirements-rdf.txt` (rdflib, with hashes), for whoever wants to

@@ -10,6 +10,18 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.29.1] - 2026-10-26
+
+O `kg_prov_export.py` não emite mais IRI quebrada para ponta de aresta malformada. Contrato v4.15, sem mudança.
+
+### Corrigido
+
+- **O `kg_prov_export.py` não emite mais IRI quebrada para ponta de aresta malformada.** Com `--edges` ou `--full`, uma
+  ponta que não era id de nó válido nem referência externa (um caminho absoluto, por exemplo, que o contrato recusa)
+  virava IRI local com `/` ou um segundo `#`. O rdflib mantinha a tripla, mas o pyoxigraph e o pyrudof a descartavam
+  sem erro, e a mesma saída virava grafos diferentes conforme o leitor. Uma ponta assim agora vai como o literal
+  `kg:fromRef` ou `kg:toRef`. Achado pela dissecação dos leitores RDF em outro repositório que usa o KG-SSOT.
+
 ## [4.29.0] - 2026-10-26
 
 O extra `rdf` traz o rdflib para ler a exportação PROV, com um job de CI que reconstrói toda aresta a partir do RDF; e o

@@ -10,6 +10,18 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.29.1] - 2026-10-26
+
+`kg_prov_export.py` no longer emits a broken IRI for a malformed edge end. Contract v4.15, unchanged.
+
+### Fixed
+
+- **`kg_prov_export.py` no longer emits a broken IRI for a malformed edge end.** With `--edges` or `--full`, an end
+  that was neither a valid node id nor an external reference (an absolute path, for example, which the contract
+  rejects) became a local IRI with `/` or a second `#`. rdflib kept that triple, but pyoxigraph and pyrudof dropped it
+  without an error, so the same output became different graphs depending on the reader. Such an end now goes as the
+  literal `kg:fromRef` or `kg:toRef`. Found by a dissection of the RDF readers in another repository that uses KG-SSOT.
+
 ## [4.29.0] - 2026-10-26
 
 The `rdf` extra brings rdflib to read the PROV export, with a CI job that rebuilds every edge from the RDF; and
