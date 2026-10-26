@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**628 itens abertos** em 123 grafo(s) com aberto (de 157 no escopo) · 124 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**621 itens abertos** em 122 grafo(s) com aberto (de 157 no escopo) · 123 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -480,16 +480,6 @@
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
 
-## intelligent-ui-2026-10 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 25.6 | `Q_MCP_APPS_PILOT_PROPOSAL_1021` | intelligent-ui-2026-10 | HIPÓTESE para o /meta:decide: abrir um piloto ÚNICO de MCP Apps num host que o Onion controla (o /chat do onion-bridge ou o brai |
-| 8.4 | `C_INLINE_VISUALS_MARKET_CONVERGENCE_1021` | intelligent-ui-2026-10 | Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03 |
-| 4.0 | `Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021` | intelligent-ui-2026-10 | NÃO VERIFICADO: a Intelligent UI do ChatGPT com GPT-6 (lançamento alegado em 2026-10-07; componentes, critério de uso, streamin |
-| 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
-| 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
-
 ## meta-research-lens-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -911,6 +901,14 @@
 |--:|---|---|---|
 | 9.0 | `E_ITEM6_VERIFY` | session-2026-07-18-evolve-review-triage | drive-to-verify: os 5 pontos sao o MESMO conceito enquadrado por audiencia/profundidade (index vs normativo vs troubleshooting); e |
 
+## intelligent-ui-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.4 | `C_INLINE_VISUALS_MARKET_CONVERGENCE_1021` | intelligent-ui-2026-10 | Visuais inline na resposta são convergência de mercado, não invenção da OpenAI: a Anthropic lançou visuais inline em 2026-03 |
+| 3.6 | `C_SUPERACAO_20261021_LIBRECHAT_MCP_APPS_OPTIN_VERBATIM` | intelligent-ui-2026-10 | A frase verbatim do PR #13831 do LibreChat entrega o valor que o claim rejeitado prometia: MCP Apps exigem mcpSettings.apps: true  |
+| 3.2 | `A_ABSORB_ONION_KG_RECURSO_UI` | intelligent-ui-2026-10 | PLANO N4 (gated): o onion-kg do brain serve um recurso ui:// (text/html;profile=mcp-app) com a vista do grafo, por adapter SDAAL a |
+
 ## company-brain-market-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -977,14 +975,6 @@
 | 7.2 | `C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE` | forge-cc-update-2026-10 | teto declarado: o medidor não decide se um item do CHANGELOG toca o Onion; casar por palavra-chave fabricaria as ligações que a |
 | 3.6 | `Q_ISSUE_PELO_ADAPTER_EXECUTAVEL` | forge-cc-update-2026-10 | quando o adapter executável do task manager existir (SAC-65), o passo de ação vira chamada, não prosa seguida pela sessão? |
 
-## radar-E3-2026-10-23-r17 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.2 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_309_1023` | radar-E3-2026-10-23-r17 | o SDK do bridge deve subir para 0.3.309 e o pin do revisor do CI para v1.0.260, para o delta da 2.1.309 chegar a quem serve |
-| 2.4 | `Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023` | radar-E3-2026-10-23-r17 | a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum |
-| 2.0 | `Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023` | radar-E3-2026-10-23-r17 | a guarda de isolamento de worktree endurecida na 2.1.309 aceita o padrão LC_ALL=C bash .claude/validation/... que a casa usa nos  |
-
 ## rito-task-manager-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1020,12 +1010,6 @@
 |--:|---|---|---|
 | 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
 | 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
-
-## radar-E3-2026-10-24-r18 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.0 | `Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024` | radar-E3-2026-10-24-r18 | o SDK do bridge deve subir para 0.3.310, pela compactação não interativa das linhas 6 e 11, e o pin do revisor do CI para v1.0. |
 
 ## vexa-2026-10 — 2 item(ns)
 
@@ -1104,27 +1088,11 @@
 |--:|---|---|---|
 | 4.8 | `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2` | vetos-por-tokens-2026-10 | TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se  |
 
-## radar-E3-2026-10-21-r14 — 2 item(ns)
+## radar-E3-2026-10-21-r14 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_RETESTAR_A_MIGALHA_DO_RESUME_NA_2_1_305` | radar-E3-2026-10-21-r14 | re-testar a migalha do resume de Workflow (vence 2026-10-22) reproduzindo a condição dela no CLI 2.1.305 ou posterior (processo  |
-| 3.0 | `Q_REMEDIR_O_IDIOMA_DEPOIS_DA_COMPACTACAO_NA_2_1_304` | radar-E3-2026-10-21-r14 | re-medir na 1ª compactação no CLI 2.1.304 ou posterior se a resposta escorrega para EN, agora que a lista de skills volta depoi |
-
-## radar-E3-2026-10-21-r15 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.5 | `Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-21-r15 | o revisor de IA do CI no pin v1.0.257 (CLI 2.1.307) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a |
-| 2.8 | `C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO` | radar-E3-2026-10-21-r15 | a leitura do aviso real que o modelo recebe, extraída do binário de cada versão instalada (2.1.304 a 2.1.307), em vez do resumo |
-| 2.8 | `C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA` | radar-E3-2026-10-21-r15 | a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304: WebFetch direto num buscador conta como contornar o teto? |
-
-## radar-E3-2026-10-22-r16 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.5 | `Q_REVISOR_NO_PIN_1_0_258_PROVADO_NUM_PR_COM_A_LABEL` | radar-E3-2026-10-22-r16 | o revisor de IA do CI no pin v1.0.258 (CLI 2.1.308) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a |
-| 2.4 | `Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022` | radar-E3-2026-10-22-r16 | o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda |
 
 ## rea-method-2026-10 — 2 item(ns)
 
@@ -1212,6 +1180,13 @@
 |--:|---|---|---|
 | 2.8 | `Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO` | inbox-triage-2026-10-04 | LACUNA que o proprio hub declarou: clickup_delete_task pelo MCP oficial nao foi medido (exige servidor MCP conectado). O transport |
 
+## radar-E3-2026-10-21-r15 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `C_SUPERACAO_20261021_AVISO_DE_TETO_LIDO_NO_BINARIO` | radar-E3-2026-10-21-r15 | a leitura do aviso real que o modelo recebe, extraída do binário de cada versão instalada (2.1.304 a 2.1.307), em vez do resumo |
+| 2.8 | `C_SUPERACAO_20261021_PERGUNTA_DO_FALLBACK_REANCORADA` | radar-E3-2026-10-21-r15 | a mesma pergunta ao maestro reancorada no aviso medido desde a 2.1.304: WebFetch direto num buscador conta como contornar o teto? |
+
 ## catraca-regra49-2026-08 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1230,6 +1205,19 @@
 |--:|---|---|---|
 | 2.4 | `Q_DERIVA_DA_R9_VAI_AO_KG_FRESHNESS` | radar-E3-2026-10-14-r10 | selar a deriva da r9 (contagem de hooks, timeout e onFailure) pelo /meta:kg-freshness e medir a latência dos 2 vetos PreToolUse n |
 | 2.0 | `Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299` | radar-E3-2026-10-14-r10 | sondar o plugin onion publicado sob 2.1.299: o bash-empty-result-guard empacotado (PostToolUse com exit 2) e o env-guard mudam de  |
+
+## radar-E3-2026-10-22-r16 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.4 | `Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022` | radar-E3-2026-10-22-r16 | o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda |
+
+## radar-E3-2026-10-23-r17 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.4 | `Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023` | radar-E3-2026-10-23-r17 | a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum |
+| 2.0 | `Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023` | radar-E3-2026-10-23-r17 | a guarda de isolamento de worktree endurecida na 2.1.309 aceita o padrão LC_ALL=C bash .claude/validation/... que a casa usa nos  |
 
 ## residuos-2026-08-18 — 1 item(ns)
 
