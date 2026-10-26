@@ -27,24 +27,44 @@ nodes:
   - id: Q_INTELLIGENT_UI_GPT6_NOT_VERIFIED_1021
     node_type: question
     x_dissect_level: 0
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.2
     label: "NÃO VERIFICADO: a Intelligent UI do ChatGPT com GPT-6 (lançamento alegado em 2026-10-07; componentes, critério de uso, streaming antes do fim do raciocínio) não tem nenhuma âncora primária nesta rodada."
-    narrative: "N0 (identidade OpenAI, proprietária, datada), N1 (os verbos) e N2 (o mecanismo: declarativo, HTML em sandbox, widget do Apps SDK ou template server-side) do objeto ficam todos em aberto. A fonte openai-gpt6-intelligent-ui ficou inalcançável e nenhuma das 14 claims ancoradas responde a essa lacuna. A frase mais próxima ('Inline surfaces currently always appear before the generated model response.', ui-guidelines do Apps SDK) foi rebaixada na ancoragem e, mesmo se valesse, descreve apps de terceiros, não a UI nativa do GPT-6. Fecha quando uma fonte primária da OpenAI sobre o produto for lida e ancorada com quote + locator."
     trace: "pergunta do /meta:dissect de 2026-10-21: 'a funcionalidade ultimas respostas do chatgpt', fonte openai-gpt6-intelligent-ui (inalcançável)"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Registrar e fechar: o anúncio oficial existe (openai.com/index/gpt-6-for-everyone, 2026-10-07) mas devolveu HTTP 403 à leitura em 2026-10-26; duas fontes secundárias (unite.ai e vktr.com) confirmam gráficos, formulários, botões e mini-ferramentas dentro da resposta, o modelo escolhendo o formato e a resposta começando antes do fim do raciocínio; verificado por secundária, e o veredito do mecanismo aberto não muda»"
+    narrative: |-
+      N0 (identidade OpenAI, proprietária, datada), N1 (os verbos) e N2 (o mecanismo: declarativo, HTML em sandbox, widget do Apps SDK ou template server-side) do objeto ficam todos em aberto. A fonte openai-gpt6-intelligent-ui ficou inalcançável e nenhuma das 14 claims ancoradas responde a essa lacuna. A frase mais próxima ('Inline surfaces currently always appear before the generated model response.', ui-guidelines do Apps SDK) foi rebaixada na ancoragem e, mesmo se valesse, descreve apps de terceiros, não a UI nativa do GPT-6. Fecha quando uma fonte primária da OpenAI sobre o produto for lida e ancorada com quote + locator.
+
+      Selado por /meta:decide em 2026-10-26: escolhida «Registrar e fechar: o anúncio oficial existe (openai.com/index/gpt-6-for-everyone, 2026-10-07) mas devolveu HTTP 403 à leitura em 2026-10-26; duas fontes secundárias (unite.ai e vktr.com) confirmam gráficos, formulários, botões e mini-ferramentas dentro da resposta, o modelo escolhendo o formato e a resposta começando antes do fim do raciocínio; verificado por secundária, e o veredito do mecanismo aberto não muda»; descartadas: «Fechar e me dê o card da flag» · «Deixar aberto».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 
   - id: Q_MCP_APPS_PILOT_PROPOSAL_1021
     node_type: question
     x_dissect_level: 4
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.4
     label: "HIPÓTESE para o /meta:decide: abrir um piloto ÚNICO de MCP Apps num host que o Onion controla (o /chat do onion-bridge ou o brain em canary), com um recurso ui:// servido pelo onion-kg, e medir antes de generalizar."
-    narrative: "Proposta do Elenxo, rotulada como hipótese, não como decisão. Sustentada pelo mecanismo aberto ancorado (MIME text/html;profile=mcp-app, ui://, spec Stable 2026-01-26, sandbox de origem distinta com proxy, ponte JSON-RPC/postMessage bidirecional). Fora do piloto até a fonte primária da OpenAI ser lida: streaming antes do fim do raciocínio e paridade com o GPT-6. Caminhos plausíveis NÃO medidos para os cards do /meta:decide: o Artifact tool com capabilities (card persistente) ou o /chat do onion-bridge como host MCP Apps próprio, pagando uma segunda origem para o proxy de sandbox. A forja (/meta:forge) só começa depois que o maestro escolher no /meta:decide."
     trace: "recommendation do Elenxo da rodada de primárias de 2026-10-21 (/meta:dissect intelligent-ui)"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Registrar e fechar: o piloto foi decidido em D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021 e está servido no onion-bridge (PR #83 render-only atrás de flag, PR #86 a vista volta ao reabrir), na main servida 5819d8e; sandbox.onionevolve.com/sandbox.html responde 200; não medidos nesta passada: a flag ONION_UI_PILOT no .env servido e o selftest do piloto»"
+    narrative: |-
+      Proposta do Elenxo, rotulada como hipótese, não como decisão. Sustentada pelo mecanismo aberto ancorado (MIME text/html;profile=mcp-app, ui://, spec Stable 2026-01-26, sandbox de origem distinta com proxy, ponte JSON-RPC/postMessage bidirecional). Fora do piloto até a fonte primária da OpenAI ser lida: streaming antes do fim do raciocínio e paridade com o GPT-6. Caminhos plausíveis NÃO medidos para os cards do /meta:decide: o Artifact tool com capabilities (card persistente) ou o /chat do onion-bridge como host MCP Apps próprio, pagando uma segunda origem para o proxy de sandbox. A forja (/meta:forge) só começa depois que o maestro escolher no /meta:decide.
+
+      Selado por /meta:decide em 2026-10-26: escolhida «Registrar e fechar: o piloto foi decidido em D_UI_PILOTO_RENDER_ONLY_NO_CHAT_1021 e está servido no onion-bridge (PR #83 render-only atrás de flag, PR #86 a vista volta ao reabrir), na main servida 5819d8e; sandbox.onionevolve.com/sandbox.html responde 200; não medidos nesta passada: a flag ONION_UI_PILOT no .env servido e o selftest do piloto»; descartadas: «Fechar e me dê o card da flag» · «Deixar aberto».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 
   - id: C_INLINE_VISUALS_MARKET_CONVERGENCE_1021
     node_type: claim

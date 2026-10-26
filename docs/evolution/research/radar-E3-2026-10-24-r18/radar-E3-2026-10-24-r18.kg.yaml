@@ -69,18 +69,23 @@ nodes:
   - id: Q_SUBIR_SDK_DO_BRIDGE_E_PIN_DO_REVISOR_PARA_2_1_310_1024
     node_type: question
     layer: audit
-    plane: PROD
-    status: open
     impact: 2
     confidence: 0.6
-    verified_at: "2026-10-24"
-    verified_against: "proposta da r18, reescrita após o EXAGERA do juiz: subir o Agent SDK do bridge para 0.3.310 pelo ops/update-bridge.sh e o pin do revisor para a tag v1.0.261 (16f9f71a); por ordem desta rodada nada sobe aqui (outro trabalho). A razão medida são as linhas 6 e 11 da 2.1.310 (compactação não interativa), que alcançam o /chat do bridge e o runner de convidado pelo SDK; a linha 14 não tem superfície; o revisor só serve com a label review:ia (ONION_REVIEW_MODE ausente = off), então o pin é paridade, não urgência; issue SAC-243"
     label: "o SDK do bridge deve subir para 0.3.310, pela compactação não interativa das linhas 6 e 11, e o pin do revisor do CI para v1.0.261, por paridade"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Registrar e fechar: cumprido; o bridge serve o SDK 0.3.310 (PR #91, main servida 5819d8e) e o pin do revisor está em v1.0.262 (E_SDK_DO_BRIDGE_NA_0_3_310_E_PIN_DO_REVISOR_EM_V1_0_262_1024)»"
+    narrative: |-
+      verified_against anterior: «proposta da rodada 18 do radar do Claude Code, reescrita após o EXAGERA do juiz: subir o Agent SDK do bridge para 0.3.310 pelo ops/update-bridge.sh e o pin do revisor para a tag v1.0.261 (16f9f71a); por ordem desta rodada nada sobe aqui (outro trabalho). A razão medida são as linhas 6 e 11 da 2.1.310 (compactação não interativa), que alcançam o /chat do bridge e o runner de convidado pelo SDK; a linha 14 não tem superfície; o revisor só serve com a label review:ia (ONION_REVIEW_MODE ausente = off), então o pin é paridade, não urgência; issue SAC-243»
+      proveniência anterior: source «https://linear.app/sacola/issue/SAC-243» · locator «issue SAC-243 do projeto Onion — core: próximas levas» · method «derivado: proposta da rodada a partir de E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024» · locality «web»
+      plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)
+      Selado por /meta:decide em 2026-10-26: escolhida «Registrar e fechar: cumprido; o bridge serve o SDK 0.3.310 (PR #91, main servida 5819d8e) e o pin do revisor está em v1.0.262 (E_SDK_DO_BRIDGE_NA_0_3_310_E_PIN_DO_REVISOR_EM_V1_0_262_1024)»; descartadas: «Fechar e me dê o card da flag» · «Deixar aberto».
     provenance:
-      source: "https://linear.app/sacola/issue/SAC-243"
-      locator: "issue SAC-243 do projeto Onion — core: próximas levas"
-      method: "derivado: proposta da rodada a partir de E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024"
-      locality: "web"
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
   - id: E_SAC_239_CUMPRIDA_NO_VIVO_E_ABERTA_NO_LINEAR_1024
     node_type: evidence
     layer: audit
