@@ -4983,31 +4983,47 @@ check_radar_staleness() {
   [ -f "${bl}" ] || return 0
   local stale_days="${RADAR_STALE_DAYS:-45}"
   local today_epoch; today_epoch=$(date +%s)
-  local axes=0 stale=0 axis="" lr="" nr="" seen_lr=0
+  local axes=0 stale=0 axis="" lr="" nr="" has_nr=0 seen_lr=0 _t=""
   # Eixo ABERTO E NUNCA RODADO (2026-10-26, abertura do E7 por decisão do maestro): até aqui o eixo sem
   # data era pulado EM SILÊNCIO (o laço só contava linha com data) — medido: um eixo novo nascia invisível
   # à regra. Agora cada eixo fecha na troca de `- id:` (ou no fim do arquivo): sem data, é SOFT nomeando o
   # eixo, com o motivo declarado em `never_run:` quando há; data E `never_run:` juntos também é SOFT (o
   # carimbo de nunca-rodado sobreviveu à 1ª rodada). Nunca HARD: eixo recém-aberto não é defeito do arquivo.
+  # Só o eixo DECLARADO nunca-rodado conta como legível: um arquivo cujos eixos perderam todos a data por
+  # erro de digitação (`lastrun:`) segue HARD "SEM eixos legíveis" (achado da passada adversarial).
   _r65_flush() {
     [ -n "${axis}" ] || return 0
     if [ "${seen_lr}" -eq 0 ]; then
-      axes=$((axes+1))
-      if [ -n "${nr}" ]; then
+      if [ "${has_nr}" -eq 1 ]; then
+        axes=$((axes+1))
         violation "SOFT" "${bl}" "REGRA 65: eixo '${axis}' do radar de mundo NUNCA RODOU (declarado: ${nr}) — sem baseline não há percepção externa a cobrar pela idade; a 1ª rodada é do maestro: /meta:radar ${axis}"
       else
         violation "SOFT" "${bl}" "REGRA 65: eixo '${axis}' sem data de rodada e sem 'never_run:' declarado — a idade dele não é medida; declare 'never_run: <motivo>' ou rode /meta:radar ${axis}"
       fi
-    elif [ -n "${nr}" ]; then
+    elif [ "${has_nr}" -eq 1 ]; then
       violation "SOFT" "${bl}" "REGRA 65: eixo '${axis}' tem data de rodada E 'never_run:' — o carimbo de nunca-rodado sobreviveu à rodada; remova o never_run"
     fi
+    # `return 0` explícito: a função é chamada como comando solto sob `set -e`, e o rc dela não pode
+    # depender do último `violation` ou do `elif` que não casou (defesa; a morte medida na 1ª versão era
+    # outra, o `pinned_cc` abaixo).
+    return 0
   }
   while IFS= read -r line; do
+    # linha de COMENTÁRIO não é chave: sem este corte, "# ... never_run: ..." ou "# last_run: ..." num
+    # comentário virava declaração (achado da passada adversarial, latente no arquivo vivo).
+    _t="${line#"${line%%[![:space:]]*}"}"
+    [ "${_t#\#}" = "${_t}" ] || continue
     case "${line}" in
-      *"- id: "*) _r65_flush; axis="${line#*- id: }"; lr=""; nr=""; seen_lr=0 ;;
-      *"never_run: "*)
-        nr="${line#*never_run: }"; nr="${nr%%#*}"; nr="${nr#\"}"; nr="${nr%\"}"
-        nr="${nr%"${nr##*[![:space:]]}"}"; nr="${nr%\"}"; [ -n "${nr}" ] || nr="(sem motivo)" ;;
+      *"- id: "*) _r65_flush; axis="${line#*- id: }"; lr=""; nr=""; has_nr=0; seen_lr=0 ;;
+      *"never_run:"*)
+        has_nr=1
+        nr="${line#*never_run:}"; nr="${nr#"${nr%%[![:space:]]*}"}"
+        case "${nr}" in
+          \"*) nr="${nr#\"}"; nr="${nr%%\"*}" ;;     # entre aspas: o # de dentro é texto
+          \'*) nr="${nr#\'}"; nr="${nr%%\'*}" ;;
+          *)   nr="${nr%%#*}"; nr="${nr%"${nr##*[![:space:]]}"}" ;;
+        esac
+        [ -n "${nr}" ] || nr="(sem motivo)" ;;
       *"last_run: "*)
         lr="${line#*last_run: }"
         axes=$((axes+1)); seen_lr=1
@@ -5050,7 +5066,11 @@ check_radar_staleness() {
   # (pre-commit), a versão que importa é a do processo (CLAUDE_CODE_EXECPATH); e processo ≠ disco
   # é um 2º SOFT próprio, porque a cura é outra (reiniciar a sessão, não rodar o radar).
   local pinned_cc installed_cc disk_cc proc_cc exec_path
-  pinned_cc=$(grep -oE 'cc_version:[[:space:]]*"[0-9][0-9.]*"' "${bl}" | head -1 | grep -oE '[0-9][0-9.]*')
+  # `|| true` (medido 2026-10-26): sem `cc_version:` no arquivo o grep devolve 1, o pipefail propaga e o
+  # `set -e` MATAVA o lint aqui, depois de emitir os avisos de idade e antes do sumário. O arquivo vivo tem
+  # a chave e nunca disparou; toda fixture da bancada sem ela morria, e os casos que só olhavam a saída
+  # (o "silêncio" do eixo fresco) passavam mesmo assim.
+  pinned_cc=$(grep -oE 'cc_version:[[:space:]]*"[0-9][0-9.]*"' "${bl}" | head -1 | grep -oE '[0-9][0-9.]*' || true)
   exec_path="${ONION_CC_EXECPATH-${CLAUDE_CODE_EXECPATH:-}}"   # `-` e não `:-`: override DEFINIDO-vazio isola a bancada do vazamento da sessão
   [ -n "${exec_path}" ] && proc_cc=$(printf '%s' "${exec_path##*/}" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' || true)
   if command -v "${ONION_CC_BIN:-claude}" >/dev/null 2>&1; then
