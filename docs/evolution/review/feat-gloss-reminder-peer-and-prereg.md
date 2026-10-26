@@ -2,7 +2,7 @@
 branch: feat/gloss-reminder-peer-and-prereg
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: ba21a9e4cda5913b884b20fa591611174b29580c13155e7c43480f62aa64f0ce
+reviewed_diff_sha256: 108a6a81ff52cc90526ae010c96c708812f8a4d11f93e83fa9405b5f4fdb0bb3
 reviewed_code_sha256: 2572881bbfd1ce94aa8696c75f41b35b62b2d865aab2bdc13b23e3a7d521e8af
 findings_total: 8
 findings_real: 3
