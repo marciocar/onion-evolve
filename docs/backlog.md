@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**618 itens abertos** em 121 grafo(s) com aberto (de 157 no escopo) · 122 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**617 itens abertos** em 120 grafo(s) com aberto (de 157 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1204,12 +1204,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 2.4 | `Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022` | radar-E3-2026-10-22-r16 | o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda |
-
-## radar-E3-2026-10-23-r17 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 2.4 | `Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023` | radar-E3-2026-10-23-r17 | a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum |
 
 ## residuos-2026-08-18 — 1 item(ns)
 
