@@ -21281,6 +21281,36 @@ run_githook_selftests() {
       "rc=${g_rc} e saída=[${g_out}] — esperava a dica com 'bun install'; a cura virou deleção"
   fi
   rm -rf "${d}"
+
+  # (i) A MESMA CLASSE NO HOOK DO CORE (medido em 2026-10-26 pela prova do gate, "controle rc 1 sem HARD"): a guarda
+  #     anti-commit-na-default-branch lia `symbolic-ref refs/remotes/origin/HEAD | sed` sob pipefail+set -e, e repo
+  #     SEM origin (o sandbox da prove-gate-blocks.sh, um clone local) morria ali com rc 1 mudo. Roda o hook REAL do
+  #     core num repo sem origin e sem lint: na branch de feature chega ao fim (rc 0); na main (o fallback) barra
+  #     DIZENDO. O hook da guarda é core-only (não viaja): sem ele na árvore, o caso não se aplica.
+  local core_hook="${REPO_ROOT}/.githooks/pre-commit"
+  grep -q '_ONION_DEFAULT=' "${core_hook}" 2>/dev/null || return 0
+  _gi() {  # $1 = hook, $2 = branch → "rc|cita-BLOQUEADO?"
+    # sem o GIT_* do processo pai (a bancada também roda DENTRO de um hook, com GIT_DIR/GIT_INDEX_FILE exportados)
+    local dd rc=0 o _ge=(env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_PREFIX -u GIT_OBJECT_DIRECTORY)
+    dd="$(mktemp -d)"; "${_ge[@]}" git -C "${dd}" init -q -b "$2"
+    "${_ge[@]}" git -C "${dd}" -c user.name=b -c user.email=b@example.invalid -c commit.gpgsign=false commit -q --allow-empty --no-verify -m base
+    o="$(cd "${dd}" && "${_ge[@]}" bash "$1" 2>&1)" || rc=$?
+    rm -rf "${dd}"; printf '%s|%s' "${rc}" "$(grep -q 'BLOQUEADO' <<< "${o}" && echo cita || echo muda)"
+  }
+  local gi1 gi2; gi1="$(_gi "${core_hook}" feat/x)"; gi2="$(_gi "${core_hook}" main)"
+  if [ "${gi1}" = "0|muda" ] && [ "${gi2%%|*}" != 0 ] && [ "${gi2#*|}" = cita ]; then
+    record_pass "githook: (i) hook do core em repo SEM origin: branch de feature chega ao fim (rc 0); main barra dizendo"
+  else record_fail "githook: (i) morte silenciosa sem origin" "feature=${gi1} main=${gi2}"; fi
+  # (i-MUT) a linha anterior à cura (pipe cru sob pipefail) → a branch de feature volta a morrer muda
+  d="$(mktemp -d)"
+  sed 's#{ git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null || true; } | sed#git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed#' "${core_hook}" > "${d}/pre-commit"
+  if cmp -s "${core_hook}" "${d}/pre-commit"; then record_fail "githook: (i-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  else
+    gi1="$(_gi "${d}/pre-commit" feat/x)"
+    [ "${gi1}" = "1|muda" ] && record_pass "githook: (i-MUT) sem o '|| true' a branch de feature morre muda (rc 1) — (i) é load-bearing" \
+      || record_fail "githook: (i-MUT)" "o mutante não reproduziu a morte muda: ${gi1}"
+  fi
+  rm -rf "${d}"; unset -f _gi
 }
 
 # ---------------------------------------------------------------------------
