@@ -16,6 +16,16 @@
 #           O estado só existe em turno que o maestro abriu (o UserPromptSubmit não dispara em aviso de
 #           tarefa de fundo), e a sigla que o próprio maestro escreveu no pedido não barra. A taxa medida
 #           em transcripts reais mora no grafo da forja (nó E_MEDIDA_TAXA_DE_BLOQUEIO_*), não aqui.
+#   tool   (PreToolUse)       — o 3º caminho, nascido do reforço do maestro em 2026-10-26 ("nada de sigla opaca
+#           na prosa"): a prosa que NÃO é a resposta ao maestro e que ele lê mesmo assim. São duas: a mensagem
+#           entre sessões (SendMessage, campo `message`), que a outra sessão lê e repassa ao maestro, e os .md
+#           de pré-registro e resultado de estudo (basename em CAIXA ALTA — STAGE0, SYNTHESIS, RESULT, N2-PLAN,
+#           CORE-STATE, PROTOCOL, ELENXO… — sob docs/evolution/dissect/ ou docs/evolution/research/, exceto
+#           README), escritos por Write/Edit. Devolve additionalContext com a glosa de cada sigla sem glosa.
+#           SEMPRE exit 0: é lembrete, nunca bloqueio. No Edit, a sigla glosada em outro ponto do arquivo
+#           não é cobrada de novo (a 1ª menção já está lá).
+#           TETO: o PreToolUse não barra, então a mensagem/o arquivo segue como foi escrito; o lembrete
+#           corrige a PRÓXIMA escrita (ou um Edit de cura), não a que disparou.
 #
 # COMO    : o glossário é .claude/validation/house-codes.tsv (fonte única; nada embutido aqui). O
 #           que conta como glosa, o domínio de cada sigla e o que não é prosa (código, citação, caminho,
@@ -27,7 +37,8 @@
 #           Anti-loop: stop_hook_active=true → exit 0. Sem python3, sem glossário ou sem transcript:
 #           exit 0 (a guarda erra para o lado de calar).
 #
-# USO     : registrado em .claude/settings.json (UserPromptSubmit com `prompt`, Stop com `stop`).
+# USO     : registrado em .claude/settings.json (UserPromptSubmit com `prompt`, Stop com `stop`, PreToolUse
+#           `SendMessage|Write|Edit` com `tool`).
 #           --selftest prova as polaridades; --scan <transcript.jsonl> simula os dois modos em cada turno
 #           de uma sessão real (dogfood; a taxa de bloqueio sai no fim).
 # =============================================================================
@@ -37,7 +48,7 @@ VAL="${HERE}/../validation"
 GLOSSARY="${ONION_HOUSE_CODES_TSV:-${VAL}/house-codes.tsv}"
 STATE_DIR="${ONION_HOUSE_CODE_STATE_DIR:-${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/onion-house-code-gloss-$(id -u)}"
 
-_engine() {   # $1=modo (prompt|stop|scan|text) · $2=transcript (ou, no modo text, o arquivo com o texto) · $3=sessão
+_engine() {   # $1=modo (prompt|stop|scan|text|tool) · $2=transcript (ou, nos modos text e tool, o arquivo com o texto ou o payload do hook) · $3=sessão
   command -v python3 >/dev/null 2>&1 || return 0
   python3 - "$1" "${2:--}" "${HERE}" "${GLOSSARY}" "${VAL}/lint-artifacts.sh" "${VAL}/plugin-bundle-check.sh" "${3:-}" "${STATE_DIR}" <<'PY'
 import hashlib, importlib.util, json, os, re, subprocess, sys
@@ -273,6 +284,72 @@ def blockers(cur, state, exempt, policy=None):
 if mode == "text":
     for d in find([open(tp, encoding="utf-8", errors="replace").read()]):
         print("%s|%s|%s|%s" % (d["token"], d["opacity"], d["row"], d["gloss"]))
+    sys.exit(0)
+
+# o .md de estudo que a outra sessão e o maestro leem: pré-registro e resultado (medido em 2026-10-26 no
+# acervo de dissecação e pesquisa: STAGE0, SYNTHESIS, RESULT, *-PLAN, CORE-STATE, PROTOCOL, ELENXO,
+# SIGNAL-DRAFT, ACCEPT-*, BRIEF-* — todos prosa de estudo, todos em CAIXA ALTA; o README é índice)
+PREREG = re.compile(r"(?:^|/)docs/evolution/(?:dissect|research)/(?:[^/]+/)+([A-Z0-9][A-Z0-9_-]*)\.md$")
+
+def tool_target(d):
+    """(onde, [textos novos], texto que já estava no arquivo) da chamada, ou None se ela não é prosa vigiada."""
+    name = d.get("tool_name")
+    ti = d.get("tool_input")
+    if not isinstance(ti, dict):
+        return None
+    if name == "SendMessage":
+        m = ti.get("message")
+        if not isinstance(m, str) or not m.strip():
+            return None            # mensagem estruturada (objeto) não é prosa
+        to = ti.get("to")
+        return ("a mensagem a outra sessão (SendMessage%s)" % (" para %s" % to if isinstance(to, str) and to else ""),
+                [m], "")
+    if name not in ("Write", "Edit", "MultiEdit"):
+        return None
+    fp = ti.get("file_path")
+    mt = PREREG.search(fp) if isinstance(fp, str) else None
+    if not mt or mt.group(1) == "README":
+        return None
+    if name == "Write":
+        texts = [ti.get("content")]
+    elif name == "Edit":
+        texts = [ti.get("new_string")]
+    else:
+        texts = [e.get("new_string") for e in ti.get("edits") or [] if isinstance(e, dict)]
+    prior = ""
+    if name != "Write":
+        try:
+            prior = open(fp, encoding="utf-8", errors="replace").read()
+        except Exception:
+            prior = ""
+    return ("o .md de estudo %s" % os.path.basename(fp), [t for t in texts if isinstance(t, str)], prior)
+
+if mode == "tool":
+    try:
+        d = json.load(open(tp, encoding="utf-8", errors="replace"))
+    except Exception:
+        sys.exit(0)
+    tg = tool_target(d) if isinstance(d, dict) else None
+    if not tg or not tg[1]:
+        sys.exit(0)
+    where, texts, prior = tg
+    glossed = set()
+    if prior:
+        hc.findings(prior, gl, titles, root, glossed_out=glossed)   # a glosa que o arquivo já tem vale
+    out = {}
+    for t in texts:
+        for x in hc.findings(t, gl, titles, root, glossed_out=glossed, already=frozenset(glossed)):
+            out.setdefault(x["token"], x)
+    fs = sorted(out.values(), key=lambda x: (x["opacity"] != "alta", x["token"]))
+    if not fs:
+        sys.exit(0)
+    lines = ["📖 Glossário da casa — %s leva sigla SEM glosa, e quem a lê repassa ao maestro. Glose na 1ª "
+             "menção (ex.: \"a tarefa do pré-registro (SAC-256)\", \"I3 (um escritor por repo)\") ou troque a "
+             "sigla pela glosa; se já foi, corrija na próxima escrita. Lembrete, não bloqueio:" % where]
+    for x in fs[:10]:
+        lines.append("  · %s → %s" % (x["token"], x["gloss"]))
+    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+                                             "additionalContext": "\n".join(lines)}}, ensure_ascii=False))
     sys.exit(0)
 
 if not tp or tp == "-" or not os.path.isfile(tp):
@@ -581,6 +658,35 @@ PY
   _rc=0; bash "${BASH_SOURCE[0]}" stop < "${_d}/in2.json" >/dev/null 2>&1 || _rc=$?
   _rc2=0; _o2="$(ONION_HOUSE_CODE_STOP=alta _hook stop 2>&1)" || _rc2=$?
   if [ "${_rc}" -eq 0 ] && [ "${_rc2}" -eq 2 ] && ! grep -q Traceback <<< "${_o2}"; then _ok "(l) stop_hook_active=true sai 0 (anti-loop); linha JSON não-objeto não quebra o hook"; else _ko "(l) ativo rc=${_rc} · lixo rc=${_rc2} [${_o2}]"; fi
+  # ── modo tool (PreToolUse, 2026-10-26): a prosa que a outra sessão e o maestro leem fora da resposta ──
+  # o payload vai pelo stdin, como o runner o entrega; rc tem de ser 0 em TODOS (lembrete, nunca bloqueio)
+  _tool() { _rc=0; _o="$(printf '%s' "$1" | bash "${BASH_SOURCE[0]}" tool 2>&1)" || _rc=$?; }
+  # (t1) o caso do pedido: SendMessage com SAC-256 solto → lembrete com a glosa do glossário
+  _tool '{"tool_name":"SendMessage","tool_input":{"to":"main","message":"Fechei o SAC-256 e sigo para o próximo."}}'
+  if [ "${_rc}" -eq 0 ] && grep -q '"hookEventName": "PreToolUse"' <<< "${_o}" && grep -q 'SendMessage para main' <<< "${_o}" && grep -q 'SAC-256 → a tarefa do task manager' <<< "${_o}"; then _ok "(t1) SendMessage com SAC-256 sem glosa: additionalContext com a glosa (rc 0)"; else _ko "(t1) rc=${_rc} [${_o}]"; fi
+  # (t2) a mesma mensagem com a glosa → silêncio
+  _tool '{"tool_name":"SendMessage","tool_input":{"to":"main","message":"Fechei a tarefa da glosa entre sessões (SAC-256) e sigo."}}'
+  if [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t2) SendMessage com a glosa cala (rc 0)"; else _ko "(t2) glosada acusada: rc=${_rc} [${_o}]"; fi
+  # (t3) Write de STAGE0.md com K1 solto → lembrete; (t4) o mesmo texto fora da lista (notes.md, README.md) → silêncio
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/dissect/x-2026-10/STAGE0.md","content":"# Etapa 0\n\nO critério K1 decide o veredito."}}'
+  if [ "${_rc}" -eq 0 ] && grep -q 'STAGE0.md' <<< "${_o}" && grep -q 'K1 → o critério ou mutante' <<< "${_o}"; then _ok "(t3) Write de STAGE0.md com K1 solto: lembrete (rc 0)"; else _ko "(t3) rc=${_rc} [${_o}]"; fi
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/dissect/x-2026-10/notes.md","content":"# Etapa 0\n\nO critério K1 decide o veredito."}}'
+  _o4="${_o}"; _rc4="${_rc}"
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/dissect/x-2026-10/README.md","content":"# Etapa 0\n\nO critério K1 decide o veredito."}}'
+  if [ "${_rc4}" -eq 0 ] && [ -z "${_o4}" ] && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t4) .md fora da lista (notes.md, README.md) cala (rc 0)"; else _ko "(t4) notes rc=${_rc4} [${_o4}] · README rc=${_rc} [${_o}]"; fi
+  # (t5) Edit: a sigla glosada em outro ponto do arquivo não é cobrada de novo; sem a glosa no arquivo, é
+  mkdir -p "${_d}/docs/evolution/research/y-2026-10"; _ef="${_d}/docs/evolution/research/y-2026-10/SYNTHESIS.md"
+  printf '# Síntese\n\nO I3 (um escritor por repo) vale aqui.\n' > "${_ef}"
+  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"x\",\"new_string\":\"E o I3 segue valendo.\"}}"
+  _o5="${_o}"; _rc5="${_rc}"
+  printf '# Síntese\n\nNada aqui.\n' > "${_ef}"
+  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"x\",\"new_string\":\"E o I3 segue valendo.\"}}"
+  if [ "${_rc5}" -eq 0 ] && [ -z "${_o5}" ] && [ "${_rc}" -eq 0 ] && grep -q 'I3 → o invariante' <<< "${_o}"; then _ok "(t5) Edit: glosa já no arquivo cobre; sem ela, lembra (rc 0)"; else _ko "(t5) com glosa rc=${_rc5} [${_o5}] · sem rc=${_rc} [${_o}]"; fi
+  # (t6) payload lixo, ferramenta fora do matcher e mensagem não-texto: rc 0, mudo, sem Traceback
+  _tool 'lixo SendMessage {'; _o6="${_o}${_rc}"
+  _tool '{"tool_name":"Bash","tool_input":{"command":"echo SAC-256 docs/evolution/research/a/STAGE0.md"}}'; _o6="${_o6}${_o}${_rc}"
+  _tool '{"tool_name":"SendMessage","tool_input":{"to":"main","message":{"type":"shutdown_request"}}}'; _o6="${_o6}${_o}${_rc}"
+  if [ "${_o6}" = "000" ]; then _ok "(t6) payload lixo, Bash e mensagem estruturada: mudo, rc 0"; else _ko "(t6) [${_o6}]"; fi
   unset ONION_HOUSE_CODE_STATE_DIR
   rm -rf "${_d}"
 
@@ -591,6 +697,18 @@ fi
 mode="${1:-stop}"
 input="$(cat)"
 command -v python3 >/dev/null 2>&1 || exit 0
+if [ "${mode}" = "tool" ]; then
+  # filtro barato ANTES do python: o matcher inclui Write|Edit, que dispara em TODA escrita da sessão
+  case "${input}" in
+    *'"SendMessage"'*|*docs/evolution/dissect/*|*docs/evolution/research/*) : ;;
+    *) exit 0 ;;
+  esac
+  _pf="$(mktemp 2>/dev/null)" || exit 0
+  printf '%s' "${input}" > "${_pf}"
+  _engine tool "${_pf}" "" || true
+  rm -f "${_pf}"
+  exit 0
+fi
 if [ "${mode}" = "stop" ]; then
   active="$(printf '%s' "${input}" | python3 -c 'import json,sys; d=json.load(sys.stdin); print("1" if d.get("stop_hook_active") else "0")' 2>/dev/null || echo 0)"
   [ "${active}" = "1" ] && exit 0

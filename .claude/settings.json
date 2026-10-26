@@ -195,6 +195,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/kg-read-leg.sh\""
           }
         ]
+      },
+      {
+        "matcher": "SendMessage|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/house-code-gloss.sh\" tool"
+          }
+        ]
       }
     ],
     "PreModelSwitch": [

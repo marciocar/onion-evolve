@@ -52,6 +52,7 @@ static	SDAAL	baixa	o padrão de abstração do Onion (adapter plugável por prov
 static	Elenxo	baixa	o método de refutar antes de selar	refut|adversári	-
 static	F\d	baixa	a fase N do plano em curso (diga do quê)	fase|etapa|porta|plano	-
 static	S\d{1,2}	baixa	o spike/cenário N (diga o que ele testa)	spike|cenário|teste	-
+static	K\d{1,2}	baixa	o critério ou mutante N do pré-registro (diga o que ele julga)	-	crit[ée]rio|mutante|pr[ée]-regist|Etapa 0|STAGE0|juiz
 static	AUTOMATE|AUDIT|ADVISE	baixa	o degrau da escada de automação	degrau|escada|automa	-
 rule	R\d{2,3}	alta	REGRA N (título)	-	-
 node	[A-Z][A-Z0-9]{0,3}_[A-Z][A-Z0-9_]{2,}	alta	o título do nó	-	-

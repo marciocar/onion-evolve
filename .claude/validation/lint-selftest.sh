@@ -43467,6 +43467,25 @@ run_house_code_gloss_selftests() {
     esac
   done <<< "${_ho}"
   [ "${_hrc}" -eq 0 ] || record_fail "house-code-gloss" "o selftest do hook saiu ${_hrc}"
+  # (reg) o modo tool só dispara se o settings.json o ligar no PreToolUse com SendMessage, Write e Edit no
+  # matcher (2026-10-26): o selftest acima prova o motor, este caso prova que o runner o chama
+  local st="${ONION_SETTINGS_JSON:-${REPO_ROOT}/.claude/settings.json}" _reg
+  _reg="$(python3 - "${st}" <<'PY' 2>/dev/null
+import json, sys
+try:
+    d = json.load(open(sys.argv[1], encoding="utf-8"))
+except Exception:
+    print("ilegível"); sys.exit(0)
+for g in (d.get("hooks") or {}).get("PreToolUse") or []:
+    if any(str(h.get("command", "")).endswith('house-code-gloss.sh" tool') for h in g.get("hooks") or []):
+        m = set(str(g.get("matcher", "")).split("|"))
+        miss = [t for t in ("SendMessage", "Write", "Edit") if t not in m]
+        print("ok" if not miss else "matcher sem " + ",".join(miss)); sys.exit(0)
+print("não registrado")
+PY
+)"
+  if [ "${_reg}" = "ok" ]; then record_pass "house-code-gloss: (reg) modo tool registrado no PreToolUse com SendMessage|Write|Edit"
+  else record_fail "house-code-gloss" "(reg) o modo tool do PreToolUse: ${_reg:-sem python3} — o lembrete da mensagem entre sessões e do pré-registro nunca dispara"; fi
 }
 _family run_house_code_gloss_selftests
 _family run_role_promotion_selftests
