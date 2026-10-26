@@ -4588,7 +4588,60 @@ run_kg_trace_resolve_selftests() {
      && grep -q 'V\[HARD\].*DEFASADO' <<< "${l5b}"; then
     record_pass "kg-trace: (j5) rc 3 sem índice → SOFT (dia 1, não AUSENTE); rc 3 com índice de linhas → HARD DEFASADO"
   else record_fail "kg-trace: (j5) ausência julgada depois do gerador" "sem=${l5a:0:160} com=${l5b:0:160}"; fi
+  # a mensagem do HARD ensina a forma ATÔMICA: `> docs/onion/kg-read-index.tsv` truncava o índice antes do erro
+  if grep -qF -- '--emit-index --out docs/onion/kg-read-index.tsv' <<< "${l5b}" && ! grep -qF -- '--emit-index > ' <<< "${l5b}"; then
+    record_pass "kg-trace: (j5b) o HARD DEFASADO da REGRA 84 ensina --out (nunca a redireção que trunca)"
+  else record_fail "kg-trace: (j5b) mensagem da REGRA 84" "${l5b:0:240}"; fi
   unset -f _r84_j5
+
+  # (j6) --out É ATÔMICO (sinal de campo de 2026-10-26): `--emit-index > índice` ESVAZIAVA o índice antes do rc 2 do
+  #      vendor anterior à 4.25.1, porque o shell trunca o destino antes de o script rodar. Com --out:
+  #      a) rc 2 (vendor 4.25.0) → destino BYTE-IDÊNTICO e nenhum temporário largado ao lado;
+  #      b) rc 0 → destino atualizado, igual ao índice do stdout;
+  #      c) rc 3 com destino povoado → intacto; rc 3 sem destino → nasce vazio (o dia 1).
+  #      MUTANTE: o gerador escrevendo DIRETO no destino → (a) reprova.
+  local idxj6="${d}/docs/onion/kg-read-index.tsv"
+  _j6() {  # $1=kg-trace.sh → letras dos casos que passam
+    local s="$1" ok="" r=0 ref
+    printf 'docs/vivo.md\tC_VIVO\tdocs/onion/graph/g.kg.yaml\n' > "${idxj6}"; ref="$(sha256sum < "${idxj6}")"
+    ONION_KG_TRACE="${mut}/k4250.py" bash "${s}" "${d}" --emit-index --out "${idxj6}" >/dev/null 2>&1 || r=$?
+    [ "${r}" -eq 2 ] && [ "$(sha256sum < "${idxj6}")" = "${ref}" ] \
+      && [ -z "$(find "${d}/docs/onion" -maxdepth 1 -name '.kg-read-index.*' 2>/dev/null)" ] && ok="${ok} a"
+    r=0; ONION_KG_TRACE="${kt}" bash "${s}" "${d}" --emit-index --out "${idxj6}" >/dev/null 2>&1 || r=$?
+    [ "${r}" -eq 0 ] && grep -q $'^docs/onion/graph/trace-mixed.kg.yaml\tC_VIVO_RAIZ\t' "${idxj6}" \
+      && [ "$(cat "${idxj6}")" = "$(_kt "${d}" --emit-index 2>/dev/null)" ] && ok="${ok} b"
+    local r3=0 r4=0
+    printf 'docs/vivo.md\tC_VIVO\tdocs/onion/graph/g.kg.yaml\n' > "${idxj6}"; ref="$(sha256sum < "${idxj6}")"
+    ONION_KG_TRACE="${mut}/k0.py" bash "${s}" "${d}" --emit-index --out "${idxj6}" >/dev/null 2>&1 || r3=$?
+    local same=0; [ "$(sha256sum < "${idxj6}")" = "${ref}" ] && same=1
+    rm -f "${idxj6}"; ONION_KG_TRACE="${mut}/k0.py" bash "${s}" "${d}" --emit-index --out "${idxj6}" >/dev/null 2>&1 || r4=$?
+    [ "${r3}" -eq 3 ] && [ "${same}" -eq 1 ] && [ "${r4}" -eq 3 ] && [ -f "${idxj6}" ] && [ ! -s "${idxj6}" ] && ok="${ok} c"
+    printf '%s' "${ok}"
+  }
+  local g6; g6=" $(_j6 "${helper}") "
+  case "${g6}" in *" a "*) record_pass "kg-trace: (j6a) --out com rc 2 (vendor 4.25.0) → índice BYTE-IDÊNTICO, sem temporário largado" ;;
+    *) record_fail "kg-trace: (j6a) --out com rc 2" "casos=${g6}" ;; esac
+  case "${g6}" in *" b "*) record_pass "kg-trace: (j6b) --out com rc 0 → índice atualizado, igual ao do stdout" ;;
+    *) record_fail "kg-trace: (j6b) --out com rc 0" "casos=${g6}" ;; esac
+  case "${g6}" in *" c "*) record_pass "kg-trace: (j6c) --out com rc 3 → povoado fica intacto; ausente nasce vazio (o dia 1)" ;;
+    *) record_fail "kg-trace: (j6c) --out com rc 3" "casos=${g6}" ;; esac
+  # (j6d) a invocação literal que a produção consome (pr-finalize: `kg-trace.sh . --emit-index --out <índice>`),
+  #       sem o produto declarado por env: o gerador acha o kg_trace.py pelo vendor do REPO_ROOT, aqui o do core
+  rm -f "${idxj6}"; local r6=0 e6=0 x6
+  x6="$(cd "${REPO_ROOT}" && bash "${SCRIPT_DIR}/kg-trace.sh" . --emit-index 2>/dev/null)" || e6=$?
+  ( cd "${REPO_ROOT}" && bash "${SCRIPT_DIR}/kg-trace.sh" . --emit-index --out "${idxj6}" ) >/dev/null 2>&1 || r6=$?
+  if [ "${r6}" -eq "${e6}" ] && [ "$(cat "${idxj6}" 2>/dev/null)" = "${x6}" ] && { [ "${e6}" -eq 0 ] || [ "${e6}" -eq 3 ]; }; then
+    record_pass "kg-trace: (j6d) a forma da produção (. --emit-index --out) grava o mesmo índice e o mesmo rc do stdout, no repo real"
+  else record_fail "kg-trace: (j6d) forma da produção" "rc out=${r6} stdout=${e6} linhas=$(wc -l < "${idxj6}" 2>/dev/null)"; fi
+  sed 's|> "${_otmp}" \|\| _orc=\$?|> "${OUT}" \|\| _orc=$?|' "${helper}" > "${mut}/kg-trace-direto.sh"
+  if cmp -s "${helper}" "${mut}/kg-trace-direto.sh"; then record_fail "kg-trace: (j6-MUT) mutante não aplicou" "âncora '> \"\${_otmp}\" || _orc=\$?' mudou"
+  else
+    case " $(_j6 "${mut}/kg-trace-direto.sh") " in
+      *" a "*) record_fail "kg-trace: (j6-MUT) mutante NÃO morde" "escrevendo direto no destino, o rc 2 ainda deixa o índice intacto" ;;
+      *) record_pass "kg-trace: (j6-MUT) gerador escrevendo direto no destino → (j6a) cai (o índice some no rc 2)" ;;
+    esac
+  fi
+  unset -f _j6
 
   unset -f _kt _mk_trace_sandbox
   rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${d5}" "${mut}"
@@ -12669,7 +12722,8 @@ run_pre_push_selftests() {
       && mkdir -p .claude/utils/adopt .claude/validation docs/onion docs/evolution/review \
       && printf '%s\n' '#!/bin/bash' 'printf "v-%s\n" "$(cat a.txt 2>/dev/null)" > .claude/validation/lint-rules.md' > .claude/utils/adopt/regen-ssot-projections.sh \
       && printf '#!/bin/bash\nexit 0\n' > .claude/validation/kg-backlog-project.sh \
-      && printf '#!/bin/bash\nprintf "a\\tb\\n"\n' > .claude/validation/kg-trace.sh \
+      && printf '%s\n' '#!/bin/bash' 'o=""; while [ $# -gt 0 ]; do [ "$1" = --out ] && o="$2"; shift; done' \
+           'if [ -n "$o" ]; then printf "a\tb\n" > "$o"; else printf "a\tb\n"; fi' > .claude/validation/kg-trace.sh \
       && printf '%s\n' '#!/bin/bash' \
            '[ "${GITHUB_EVENT_NAME:-}" = pull_request ] || { echo "  Violações HARD : 7"; exit 1; }' \
            '[ "$(cat .claude/validation/lint-rules.md 2>/dev/null)" = "v-$(cat a.txt 2>/dev/null)" ] || { echo "VIOLATION: lint-rules defasado"; echo "  Violações HARD : 1"; exit 1; }' \
@@ -42732,6 +42786,43 @@ run_remeasure_contract_selftests() {
     *) record_fail "remeasure-contract: (h)" "$(bash "${sut}" "${d}/api4" 2>&1 | head -2 | tr '\n' '|') / $(bash "${sut}" "${d}/antigo" 2>&1 | head -1)" ;; esac
   case " ${got} " in *" i "*) record_pass "remeasure-contract: (i) nó com dois códigos MUST conta 1 nó e nada 'fora de nó' (a subtração antiga inventava 1)" ;;
     *) record_fail "remeasure-contract: (i)" "$(bash "${sut}" "${d}/dois-codigos" 2>&1 | grep reprova | head -1)" ;; esac
+  # (k) O AVISO DO PISO DO ÍNDICE (sinal de campo de 2026-10-26): o vendor kg-ssot do alvo anterior à 4.25.1 (o
+  #     PRÓPRIO, que o update não sobrescreve) deixa o índice de leitura sem regerador. O relatório do update (a saída
+  #     deste helper vai inteira nele) e o manifesto que detecta o vendor próprio dizem isso em UMA linha.
+  #     Fixture: o vendor do core com o carimbo reescrito para 4.22.0. MUTANTE: sem a chamada, (k) cai.
+  local floor="${REPO_ROOT}/.claude/utils/adopt/kg-index-floor.sh"
+  _rc_target "${d}/v422"; _rc_ok "${d}/v422/docs/g/a.kg.yaml" fx-a
+  sed -i 's/"version": *"[^"]*"/"version": "4.22.0"/' "${d}/v422/vendor/kg-ssot/.kg-ssot-version"; _rc_commit "${d}/v422"
+  _rc_floor() {  # $1=remeasure-contract.sh → 0 se 4.22 avisa em 1 linha e o vendor atual cala
+    local o1 o2; o1="$(bash "$1" "${d}/v422" 2>&1)"; o2="$(bash "$1" "${d}/passa" 2>&1)"
+    [ "$(grep -c '^AVISO kg-index:' <<< "${o1}")" -eq 1 ] && grep -q 'kg-ssot do alvo é 4.22.0 — o regerador do índice de leitura precisa da kg-ssot >= 4.25.1; adote a kg-ssot junto, ou o índice fica sem regerador' <<< "${o1}" \
+      && grep -q 'CONTRATO medido: kg-ssot 4.22.0' <<< "${o1}" && ! grep -q 'AVISO kg-index' <<< "${o2}"
+  }
+  if [ ! -f "${floor}" ]; then record_fail "remeasure-contract: (k)" "SUT ausente: ${floor}"
+  elif _rc_floor "${sut}"; then record_pass "remeasure-contract: (k) vendor 4.22 → 1 linha 'AVISO kg-index' no relatório (adote a kg-ssot junto); vendor atual cala"
+  else record_fail "remeasure-contract: (k)" "$(bash "${sut}" "${d}/v422" 2>&1 | head -2 | tr '\n' '|')"; fi
+  # o piso, medido no helper: 4.25.0 e perfil gate avisam (rc 1); 4.25.1 e 4.25.10 calam (rc 0); sem vendor = 4
+  local fr="" r; _rc_target "${d}/vfl"
+  for _v in 4.25.0:1 4.25.1:0 4.25.10:0 4.3.9:1; do
+    sed -i "s/\"version\": *\"[^\"]*\"/\"version\": \"${_v%%:*}\"/" "${d}/vfl/vendor/kg-ssot/.kg-ssot-version"
+    r=0; bash "${floor}" "${d}/vfl" >/dev/null 2>&1 || r=$?; fr="${fr} ${_v%%:*}=${r}"
+  done
+  rm -f "${d}/vfl/vendor/kg-ssot/tools/kg_trace.py"; r=0; bash "${floor}" "${d}/vfl" >/dev/null 2>&1 || r=$?; fr="${fr} gate=${r}"
+  r=0; bash "${floor}" "${d}/sem-vendor" >/dev/null 2>&1 || r=$?; fr="${fr} sem=${r}"
+  if [ "${fr}" = " 4.25.0=1 4.25.1=0 4.25.10=0 4.3.9=1 gate=1 sem=4" ]; then
+    record_pass "remeasure-contract: (k2) piso 4.25.1 por sort -V: 4.25.0/4.3.9/perfil gate avisam, 4.25.1/4.25.10 calam, sem vendor = 4"
+  else record_fail "remeasure-contract: (k2) piso do índice" "${fr}"; fi
+  # o manifesto (vendor PRÓPRIO detectado, antes da cópia) também avisa: o alvo v422 não tem onion/vendor
+  local vm; vm="$(ONION_TARGET="${d}/v422" bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --role adopted --kind adoption --repo "${REPO_ROOT}" 2>&1 >/dev/null)"
+  if grep -q 'próprio contrato do .kg.yaml' <<< "${vm}" && grep -q '^AVISO kg-index: vendor/kg-ssot do alvo é 4.22.0' <<< "${vm}"; then
+    record_pass "remeasure-contract: (k3) vendor-manifest com vendor PRÓPRIO 4.22 → o AVISO kg-index sai junto do aviso do contrato próprio"
+  else record_fail "remeasure-contract: (k3) aviso no manifesto" "${vm:0:300}"; fi
+  cp "${sut}" "${d}/mutk.sh"; cp "${floor}" "${d}/kg-index-floor.sh"
+  sed -i 's|^\[ ! -f "\$(dirname "\${BASH_SOURCE\[0\]}")/kg-index-floor.sh" \] .*|: # mutante: sem o aviso do piso|' "${d}/mutk.sh"
+  if cmp -s "${sut}" "${d}/mutk.sh"; then record_fail "remeasure-contract: (k-MUT) mutante não aplicou" "âncora da chamada ao kg-index-floor.sh mudou"
+  elif _rc_floor "${d}/mutk.sh"; then record_fail "remeasure-contract: (k-MUT) mutante NÃO morde" "sem a chamada o relatório ainda avisa"
+  else record_pass "remeasure-contract: (k-MUT) sem a chamada ao piso o relatório cala o vendor 4.22 e (k) cai"; fi
+  rm -f "${d}/mutk.sh" "${d}/kg-index-floor.sh"; unset -f _rc_floor
   # (g) a OFERTA DE CI não declara verde o corpus que reprova: lint (stub) verde, forge GitHub, dívida MUST no corpus
   #     → rc 0 (a dívida não bloqueia a oferta: o CI ofertado roda só o lint), e a linha diz o número do contrato.
   #     MUTANTE: o ramo rc 1 do contrato some e a frase cai em "NÃO MEDIDO" — (g) reprova.

@@ -726,6 +726,10 @@ if [ "${MODE}" = "manifest" ]; then
   if _target_owns_contract; then
     _spec+=(':(exclude)vendor/kg-ssot')
     echo "AVISO: o alvo (${ONION_TARGET}) já tem o próprio contrato do .kg.yaml (vendor/kg-ssot fora da linha do Onion, ou o produto KG-SSOT) — o do core NÃO viaja; o kg-contract-check.sh lê o do alvo." >&2
+    # O vendor PRÓPRIO não é sobrescrito, então se ele é anterior à 4.25.1 o índice de leitura fica sem regerador
+    # depois do update (sinal de campo de 2026-10-26). É aqui, antes da cópia, que a decisão ainda cabe.
+    _floor="$(dirname "${BASH_SOURCE[0]}")/kg-index-floor.sh"
+    [ ! -f "${_floor}" ] || bash "${_floor}" "${ONION_TARGET}" >&2 || :
   fi
 
   # `git ls-tree` recusa magia de pathspec; `git diff-tree` (comando de diff) a aceita — contra a

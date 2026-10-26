@@ -432,7 +432,7 @@ flow: downstream (core→consumidor / distribuição)
 <colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/applied-delta.sh" "$DEST" "$INTEGRATION_BRANCH" — medido NO ALVO; rc=3 = NÃO MEDIDO, nunca o delta da fonte>
 
 ## Contrato KG-SSOT do corpus
-<colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$DEST" 2>&1 — medido NO ALVO, com o vendor DELE; rc 1 = dívida MUST · rc 4 = não se aplica · rc 3 = NÃO MEDIDO; nunca "lint VERDE" no lugar disto. Logo abaixo, a migração PLANEJADA: a saída inteira de bash "$SOURCE_ROOT/.claude/utils/adopt/plan-contract-migration.sh" "$DEST" 2>&1 (rc 0 = o plano e a planilha · 2 = falta o perfil, a orientação · 3 = NÃO MEDIDO · 4 = não roda · 5 = o alvo mudou, PARE); o apply é do dono do corpus, nunca do update>
+<colar a saída de bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-contract.sh" "$DEST" 2>&1 — medido NO ALVO, com o vendor DELE; rc 1 = dívida MUST · rc 4 = não se aplica · rc 3 = NÃO MEDIDO; nunca "lint VERDE" no lugar disto. Uma linha `AVISO kg-index:` no topo diz que o vendor do alvo é anterior à kg-ssot 4.25.1 e o índice de leitura fica sem regerador: vai inteira, e a saída é adotar a kg-ssot junto. Logo abaixo, a migração PLANEJADA: a saída inteira de bash "$SOURCE_ROOT/.claude/utils/adopt/plan-contract-migration.sh" "$DEST" 2>&1 (rc 0 = o plano e a planilha · 2 = falta o perfil, a orientação · 3 = NÃO MEDIDO · 4 = não roda · 5 = o alvo mudou, PARE); o apply é do dono do corpus, nunca do update>
 
 ## Gate do alvo
 <no --update, a ÚLTIMA linha de bash "$SOURCE_ROOT/.claude/utils/adopt/prove-gate-blocks.sh" "$DEST": "bloqueio PROVADO (regra, rc)" ou "bloqueio NÃO PROVADO: <motivo>" — nunca omitida; na adoção, o veredito do verify-adopter-gate.sh do passo (6)>

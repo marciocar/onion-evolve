@@ -269,10 +269,10 @@ fi
 _regen() {  # regenera TODA projeção gerada com catraca no lint e stageia só elas
   bash .claude/utils/adopt/regen-ssot-projections.sh "${ROOT}" >/dev/null || die "regen-ssot-projections.sh falhou"
   bash .claude/validation/kg-backlog-project.sh --write >/dev/null || die "kg-backlog-project.sh falhou"
-  local idx; idx="$(mktemp)"
-  bash .claude/validation/kg-trace.sh . --emit-index > "${idx}" || { rm -f "${idx}"; die "kg-trace.sh --emit-index falhou"; }
-  [ -s "${idx}" ] || { rm -f "${idx}"; die "índice de leitura saiu VAZIO — não sobrescrevo o vivo"; }
-  mv "${idx}" docs/onion/kg-read-index.tsv
+  # --out: temporário ao lado + mv só com rc 0; rc 2 e rc 3 com índice povoado deixam o vivo intacto (no core,
+  # índice vazio nunca é legítimo, então rc≠0 morre aqui como antes)
+  bash .claude/validation/kg-trace.sh . --emit-index --out docs/onion/kg-read-index.tsv \
+    || die "kg-trace.sh --emit-index --out falhou — o índice vivo ficou intacto"
   if [ -f .claude/validation/federation-console.sh ]; then
     local con; con="$(mktemp)"
     bash .claude/validation/federation-console.sh > "${con}" || { rm -f "${con}"; die "federation-console.sh falhou"; }
