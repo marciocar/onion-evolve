@@ -202,13 +202,21 @@ nodes:
   - id: Q_REVISOR_NO_PIN_1_0_257_PROVADO_NUM_PR_COM_A_LABEL
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-21"
-    verified_against: "aberta pela r15 em 2026-10-21, supera a pergunta da r14 presa ao v1.0.256; fecha quando um PR com a label review:ia mostrar o job onion-review rodando no pin aa8a7738 com o CLI 2.1.307 no log; segue estacionada como a SAC-181 (D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA)"
     label: "o revisor de IA do CI no pin v1.0.257 (CLI 2.1.307) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a versão no log"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Registrar e fechar: superado pelo selo de 2026-10-25 em Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024 (pin declarado; execução do revisor não medida por falta de crédito)»"
+    narrative: |-
+      verified_against anterior: «aberta pela r15 em 2026-10-21, supera a pergunta da r14 presa ao v1.0.256; fecha quando um PR com a label review:ia mostrar o job onion-review rodando no pin aa8a7738 com o CLI 2.1.307 no log; segue estacionada como a SAC-181 (D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA)»
+      Selado por /meta:decide em 2026-10-26: escolhida «Registrar e fechar: superado pelo selo de 2026-10-25 em Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024 (pin declarado; execução do revisor não medida por falta de crédito)»; descartadas: «Fechar e me dê o card da flag» · «Deixar aberto».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
   - id: E_SONDA_DE_FUNDO_NAO_FECHAVA_TAREFA_PARADA_ATE_2_1_306
     node_type: evidence
     layer: audit

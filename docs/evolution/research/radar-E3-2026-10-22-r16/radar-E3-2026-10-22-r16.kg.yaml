@@ -82,13 +82,21 @@ nodes:
   - id: Q_REVISOR_NO_PIN_1_0_258_PROVADO_NUM_PR_COM_A_LABEL
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-22"
-    verified_against: "aberta pela r16 em 2026-10-22, supera a da r15 presa ao v1.0.257; o pin mudou para v1.0.258 no #1292; fecha quando um PR com a label review:ia mostrar o job onion-review rodando no pin 6b6870e6 com o CLI 2.1.308 no log; segue estacionada como a SAC-181 (D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA), sem issue nova"
     label: "o revisor de IA do CI no pin v1.0.258 (CLI 2.1.308) tem de ser provado num PR com a label review:ia, com o job rodando de fato e a versão no log"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Registrar e fechar: superado pelo selo de 2026-10-25 em Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024 (pin declarado; execução do revisor não medida por falta de crédito)»"
+    narrative: |-
+      verified_against anterior: «aberta pela rodada 16 do radar do Claude Code em 2026-10-22, supera a da rodada 15 do radar do Claude Code presa ao v1.0.257; o pin mudou para v1.0.258 no #1292; fecha quando um PR com a label review:ia mostrar o job onion-review rodando no pin 6b6870e6 com o CLI 2.1.308 no log; segue estacionada como a SAC-181 (D_ESTACIONAR_SAC181_ATE_O_1O_PR_COM_REVIEW_IA), sem issue nova»
+      Selado por /meta:decide em 2026-10-26: escolhida «Registrar e fechar: superado pelo selo de 2026-10-25 em Q_FECHAR_SAC_239_COM_O_REVISOR_PROVADO_1024 (pin declarado; execução do revisor não medida por falta de crédito)»; descartadas: «Fechar e me dê o card da flag» · «Deixar aberto».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Como fecho os itens já resolvidos do decide de 2026-10-26?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
   - id: E_CENSO_ZERA_SCRIPTPATH_EM_WORKTREE_1022
     node_type: evidence
     layer: audit
