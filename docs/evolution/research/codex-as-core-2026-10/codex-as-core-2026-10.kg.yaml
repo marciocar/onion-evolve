@@ -1173,7 +1173,7 @@ nodes:
     source_kind: measurement
     valid_from: "2026-10-26"
     label: "MEDIDO no 0.164.0: o deny do PreToolUse vale para apply_patch que CRIA arquivo (Add File), pelas duas formas; a #27833 ('hook fires, write proceeds') não se reproduziu neste caso."
-    narrative: "Não testado: patch que edita arquivo existente (*** Update File), patch que apaga, e repositório com várias worktrees (o caso de E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS). Logo a #27833 não fica refutada, fica sem reprodução num caso. Mesmas condições de confiança do S1 (--dangerously-bypass-hook-trust)."
+    narrative: "Não testado: patch que edita arquivo existente (*** Update File), patch que apaga, e repositório com várias worktrees (o caso de E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS). Logo a #27833 não fica refutada, fica sem reprodução num caso. Mesmas condições de confiança do spike 1 (--dangerously-bypass-hook-trust)."
     trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
     provenance:
       source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
@@ -1213,7 +1213,7 @@ nodes:
     source_kind: measurement
     valid_from: "2026-10-26"
     label: "DEFEITO MEDIDO na LINHA VIVA onion-codex: o Codex 0.164.0 recusa o .codex/hooks.json do porte (a216791), que começa em SessionStart sem a chave 'hooks', e o hook do porte não roda; envolvido em {\"hooks\": ...}, carrega e dispara."
-    narrative: "Emenda C da curadoria, pré-registrada em 97fa177 (20:57Z) antes do resultado 42defa7 (21:04Z). Conferido nesta escrita: hooks-A0.json é byte a byte o .codex/hooks.json de onion-codex@a216791; o erro de parse está no --json como item error, então a falha NÃO é silenciosa, mas o codex exec sai com 0 e segue sem o hook (nada reprova). O SessionStart do porte é a detecção do provider do task manager (E_CORPUS_ONION_CODEX_PORT_STATE_1026): no Codex atual ele não roda. A correção é uma linha de estrutura no repo onion-codex, não neste (Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026). Uma versão, uma rodada por caso. As rodadas S4T rodaram com a confiança do projeto gravada (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026); as S4-A0/A1/B1 sem ela nem chegaram a ler o arquivo."
+    narrative: "Emenda C da curadoria, pré-registrada em 97fa177 (20:57Z) antes do resultado 42defa7 (21:04Z). Conferido nesta escrita: hooks-A0.json é byte a byte o .codex/hooks.json de onion-codex@a216791; o erro de parse está no --json como item error, então a falha NÃO é silenciosa, mas o codex exec sai com 0 e segue sem o hook (nada reprova). O SessionStart do porte é a detecção do provider do task manager (E_CORPUS_ONION_CODEX_PORT_STATE_1026): no Codex atual ele não roda. A correção é uma linha de estrutura no repo onion-codex, não neste (Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026). Uma versão, uma rodada por caso. As rodadas S4T rodaram com a confiança do projeto gravada (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026); as S4-A0, S4-A1 e S4-B1 sem ela nem chegaram a ler o arquivo."
     trace: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
     provenance:
       source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
@@ -1228,7 +1228,7 @@ nodes:
     impact: 4
     confidence: 0.6
     label: "Correção na LINHA VIVA onion-codex (repo próprio, não este): envolver o .codex/hooks.json do porte em {\"hooks\": ...} e cobrar a forma no gate dele (.codex/validation/), para o SessionStart voltar a rodar no Codex atual."
-    narrative: "Defeito medido em E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026. A correção e o PR são da linha viva onion-codex; este core só registra e sinaliza (I3, um escritor por repo). TESTE QUE FECHA: no onion-codex corrigido, um clone descartável com a confiança do projeto gravada roda codex exec --json e o item 'failed to parse hooks config' some, e um caso no gate do porte reprova o hooks.json sem a chave 'hooks'. Fica open até o commit no onion-codex ser citado aqui."
+    narrative: "Defeito medido em E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026. A correção e o PR são da linha viva onion-codex; este core só registra e sinaliza (a invariante de um escritor por repo). TESTE QUE FECHA: no onion-codex corrigido, um clone descartável com a confiança do projeto gravada roda codex exec --json e o item 'failed to parse hooks config' some, e um caso no gate do porte reprova o hooks.json sem a chave 'hooks'. Fica open até o commit no onion-codex ser citado aqui."
     trace: "github.com/marciocar/onion-codex@a216791:.codex/hooks.json"
 
   - id: Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026
@@ -1238,7 +1238,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "O deny do PreToolUse vale para apply_patch que EDITA (Update File) ou apaga arquivo existente, e em repositório com várias worktrees, no Codex atual?"
-    narrative: "S2 cobriu só Add File (E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026); a #27833 segue aberta e a issue ligada fala do workdir em multi-worktree (E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS). TESTE QUE FECHA: no mesmo arnês, quatro rodadas sem sandbox com hook confiável: Update File num arquivo rastreado, Delete File, e as duas numa worktree secundária; o veredito é o conteúdo e a existência do arquivo depois de cada rodada, não a mensagem do modelo."
+    narrative: "O spike 2 cobriu só Add File (E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026); a #27833 segue aberta e a issue ligada fala do workdir em multi-worktree (E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS). TESTE QUE FECHA: no mesmo arnês, quatro rodadas sem sandbox com hook confiável: Update File num arquivo rastreado, Delete File, e as duas numa worktree secundária; o veredito é o conteúdo e a existência do arquivo depois de cada rodada, não a mensagem do modelo."
     trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
 
   - id: Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026
@@ -1272,7 +1272,7 @@ nodes:
     source_kind: measurement
     valid_from: "2026-10-26"
     label: "Confiança de PROJETO no Codex 0.164.0: o -c projects.<dir>.trust_level=\"trusted\" não confia o projeto; o .codex/ só é lido com [projects.<dir>] trust_level gravado na config do usuário. Logo o hook que barra exige DUAS confianças: a do projeto gravada e a do hook."
-    narrative: "Explica a falha aberta 2 (E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026): o --ignore-user-config descarta a confiança gravada e os hooks do projeto somem em silêncio. O que a evidência SUSTENTA, conferido nesta escrita: nas rodadas S4 (com o -c, pelo pré-registro) o hooks.json nem foi lido, porque o mesmo arquivo malformado que nas S4T dá erro de parse nas S4 não dá nada. O que fica SÓ no relato da curadoria, sem artefato em evidence/ (não há args.txt nem cópia do config.toml do usuário em runs-c): (i) que a diferença entre S4 e S4T é exatamente a entrada gravada; (ii) que o controle S4-CTRL disparou (o SIGNAL-CTRL.json não foi guardado); (iii) que foi o próprio Codex que gravou a entrada, o que o RESULTS.md declara NÃO isolado ('é provável' que tenham sido as rodadas sem sandbox nem aprovação). Por isso a confiança é 0.6. Consequência para o veredito de hooks: para automação, o hook que barra só roda com a confiança do projeto gravada E a do hook (pelo /hooks interativo ou pelo --dangerously-bypass-hook-trust); sem qualquer uma, é pulado. A config do usuário foi restaurada pela curadoria depois das rodadas."
+    narrative: "Explica a falha aberta 2 (E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026): o --ignore-user-config descarta a confiança gravada e os hooks do projeto somem em silêncio. O que a evidência SUSTENTA, conferido nesta escrita: nas rodadas S4-* (com o -c, pelo pré-registro) o hooks.json nem foi lido, porque o mesmo arquivo malformado que dá erro de parse em S4T-A0 não dá nada em S4-A0. O que fica SÓ no relato da curadoria, sem artefato em evidence/ (não há args.txt nem cópia do config.toml do usuário em runs-c): (i) que a diferença entre as rodadas S4-* e S4T-* é exatamente a entrada gravada; (ii) que o controle S4-CTRL disparou (o SIGNAL-CTRL.json não foi guardado); (iii) que foi o próprio Codex que gravou a entrada, o que o RESULTS.md declara NÃO isolado ('é provável' que tenham sido as rodadas sem sandbox nem aprovação). Por isso a confiança é 0.6. Consequência para o veredito de hooks: para automação, o hook que barra só roda com a confiança do projeto gravada E a do hook (pelo /hooks interativo ou pelo --dangerously-bypass-hook-trust); sem qualquer uma, é pulado. A config do usuário foi restaurada pela curadoria depois das rodadas."
     trace: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
     provenance:
       source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
@@ -1287,7 +1287,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "Quem grava a confiança do projeto na config do usuário do Codex, e em que modo? Se o próprio codex exec a grava sob --dangerously-bypass-approvals-and-sandbox, rodar uma vez nesse modo confia o projeto para sempre, sem diálogo."
-    narrative: "Não isolado pela curadoria (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026). TESTE QUE FECHA: config do usuário limpa (só [tui]) e copiada antes; uma rodada de codex exec por modo (read-only, workspace-write + never, sem sandbox e sem aprovação) num repo limpo diferente cada; diff do config.toml depois de cada rodada; e uma rodada com só o -c para confirmar que ele não basta. Guardar args.txt e o diff do config em evidence/, que é o que faltou no S4."
+    narrative: "Não isolado pela curadoria (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026). TESTE QUE FECHA: config do usuário limpa (só [tui]) e copiada antes; uma rodada de codex exec por modo (read-only, workspace-write + never, sem sandbox e sem aprovação) num repo limpo diferente cada; diff do config.toml depois de cada rodada; e uma rodada com só o -c para confirmar que ele não basta. Guardar args.txt e o diff do config em evidence/, que é o que faltou na emenda C."
     trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
 
   - id: Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026
