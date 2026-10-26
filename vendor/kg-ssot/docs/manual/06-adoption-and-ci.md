@@ -21,7 +21,7 @@ Run this at the root of your repository, with Python 3.11 or later (`rpds-py`, a
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.28.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.29.0 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt

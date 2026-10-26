@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:97d6cb6edf6d8242 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:fcd47c722e72bf38 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.28.0",
+  "release": "kg-ssot-v4.29.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -1120,6 +1120,35 @@ O que ele **não** exporta, de propósito:
 Sem a opção, a saída é byte a byte a de antes. Antes da release, o mapeamento foi medido em 213 grafos e 9.988 arestas,
 contra critérios registrados antes da medição. Todas as arestas voltaram a partir do RDF lido pelo rdflib, e o custo
 foi de 1,7 vez o da exportação simples.
+
+### O documento inteiro, com `--full`
+
+`--full` implica `--edges` e exporta também todo campo de cada nó e do `meta`. Assim, o YAML carregado pode ser
+remontado a partir do RDF:
+
+- **Todo campo de cada nó vai como `kg:<chave>`,** inclusive os que já saem por outro termo (`label`, `status`,
+  `provenance`…). Texto vai como literal simples, e qualquer outro valor (número, booleano, nulo, lista, mapa) vai como
+  JSON, tipado `kg:json`.
+- **Um recurso `kg:Graph` em `<base><meta.id>`** leva cada chave do `meta` como `kg:<chave>`, e cada chave extra do
+  topo (as `x_*`) como `kg:top-<chave>`.
+- **Um valor que não cabe em JSON** faz o exportador sair com rc 2, nomeando o campo.
+
+A ordem dos itens e a forma de superfície (aspas, comentários, estilo) não são guardadas. Antes da release, o `--full`
+foi medido em 209 grafos, 7.778 nós e 9.906 arestas, contra critérios registrados antes da medição. O YAML carregado
+voltou igual a partir do RDF em todos os grafos, e exportar o corpus inteiro do core levou 0,25 s e 19,7 MB num runner
+de CI.
+
+Para ler a saída em ferramentas RDF, instale o extra `rdf`: `pip install "kg-ssot[rdf]"` (rdflib) ou, no vendor, o
+`tools/requirements-rdf.txt` com `--require-hashes`. Ele fica fora do perfil `gate`, e o exportador em si não precisa
+dele. O CI lê com o rdflib a saída `--edges` da suíte inteira e dos grafos do repo, e reconstrói toda aresta só a
+partir do RDF:
+
+```python
+import rdflib, subprocess
+out = subprocess.run(["kg-prov-export", "--edges", "grafo.kg.yaml"], capture_output=True, text=True, check=True).stdout
+g = rdflib.Graph().parse(data=out, format="json-ld")
+print(len(g), "triplas")
+```
 
 O exportador não valida o grafo: rode o `kg_validate.py` antes. `--base IRI` troca o prefixo das IRIs dos nós (o
 default é `urn:kg-ssot:graph:`, e cada nó fica em `<base><meta.id>#<id>`); o vocabulário `kg:` mora em

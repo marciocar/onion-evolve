@@ -543,6 +543,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_429_ADOTADA_1026
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "na branch chore/kg-ssot-4-29-0: kg_vendor.py update --tag kg-ssot-v4.29.0 (4c699e275995, 639 arquivos) e check intacto; ops/kg-gate-ci.sh rc 0 sem --update (188 grafos, 186 passam o MUST, os 2 da dívida herdada); a bancada pré-tag da ref e39d26408f47 mediu --text e kg_prov_export (sem opção e com --edges) idênticos à 4.28.0, e a volta do --full sem diferença nos 190 grafos do core por um reconstrutor independente com rdflib 7.6.0"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.29.0 (o extra rdf opcional, fora do perfil do gate, e o kg_prov_export --full, que exporta o documento inteiro e volta sem perda) entrou no core sem mudar o contrato"
+    narrative: "Degraus (a) e a2 da série do D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025. O a2 reprovou por custo na série 1 e passou na série 2, pré-registrada de novo com custo absoluto no runner do CI (0,25 s e 19,7 MB, contra tetos de 10 s e 100 MB); o kg-ssot escreveu que os tetos foram fixados sabendo do custo e que a razão real é 3,6. A 4.29.1 virá com a ponta de aresta malformada exportada como literal, o que não muda nada em grafo válido."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref e39d26408f47"
+      method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e reconstrução independente do --full"
+      locality: "repo"
   - id: E_KG_SSOT_428_ADOTADA_1025
     node_type: evidence
     layer: audit
@@ -1078,3 +1095,6 @@ edges:
   - from: D_REGUA_CAPACIDADE_TESTA_BARATO_GUARDA_RECORRENCIA_1025
     to: D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025
     edge_type: TRACES_TO
+  - from: E_KG_SSOT_429_ADOTADA_1026
+    to: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
+    edge_type: SUPPORTS

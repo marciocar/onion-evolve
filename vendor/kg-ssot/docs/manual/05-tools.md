@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.28.0",
+  "release": "kg-ssot-v4.29.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -1137,6 +1137,34 @@ What it does **not** export, on purpose:
 Without the option, the output is byte for byte what it was before. Before release, the mapping was measured on 213
 graphs and 9,988 edges against criteria registered in advance. Every edge was rebuilt from the RDF read by rdflib, and
 the cost was 1.7 times the plain export.
+
+### The whole document, with `--full`
+
+`--full` implies `--edges` and also exports every field of every node and of `meta`, so the loaded YAML can be rebuilt
+from the RDF:
+
+- **Every field of every node goes as `kg:<key>`,** including the ones that already go out under another term
+  (`label`, `status`, `provenance`...). Text goes as a plain literal, and any other value (number, boolean, null, list,
+  map) goes as JSON, typed `kg:json`.
+- **A `kg:Graph` resource at `<base><meta.id>`** carries each `meta` key as `kg:<key>`, and each extra top-level key
+  (the `x_*`) as `kg:top-<key>`.
+- **A value that does not fit in JSON** makes the exporter exit with rc 2, naming the field.
+
+The order of the items and the surface form (quotes, comments, style) are not kept. Before release it was measured on
+209 graphs, 7,778 nodes and 9,906 edges, against criteria registered in advance. The loaded YAML came back equal from
+the RDF in every graph, and exporting the whole core corpus took 0.25 s and 19.7 MB on a CI runner.
+
+To read the output in RDF tools, install the `rdf` extra: `pip install "kg-ssot[rdf]"` (rdflib), or, in the vendor,
+`tools/requirements-rdf.txt` with `--require-hashes`. It stays out of the gate profile, and the exporter itself does
+not need it. The CI reads the `--edges` output of the whole suite and of the repository's graphs with rdflib and
+rebuilds every edge from the RDF alone:
+
+```python
+import rdflib, subprocess
+out = subprocess.run(["kg-prov-export", "--edges", "graph.kg.yaml"], capture_output=True, text=True, check=True).stdout
+g = rdflib.Graph().parse(data=out, format="json-ld")
+print(len(g), "triples")
+```
 
 The exporter does not validate the graph: run `kg_validate.py` first. `--base IRI` changes the prefix of the node IRIs
 (the default is `urn:kg-ssot:graph:`, and each node sits at `<base><meta.id>#<id>`); the `kg:` vocabulary lives at

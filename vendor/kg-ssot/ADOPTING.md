@@ -341,6 +341,11 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.28.0` to `kg-ssot-v4.29.0`, the contract stays at v4.15, and the gate and the validator do not
+change. The full profile brings a new file, `tools/requirements-rdf.txt` (rdflib, with hashes), for whoever wants to
+read the PROV export in RDF tools; the `gate` profile does not change. `kg_prov_export.py` gains `--full`, which
+exports the whole document; without it, and with `--edges`, the output is byte for byte the same.
+
 From `kg-ssot-v4.27.0` to `kg-ssot-v4.28.0`, the contract stays at v4.15, and the gate and the validator do not
 change. `kg_prov_export.py` gains `--edges`, off by default: without it the output is byte for byte the same.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exporta a proveniência de um .kg.yaml para PROV-O em JSON-LD.
 
-  kg_prov_export.py <grafo.kg.yaml> [--base IRI] [--edges]
+  kg_prov_export.py <grafo.kg.yaml> [--base IRI] [--edges] [--full]
 
 Cada nó vira uma prov:Entity, com o rótulo, o tipo e o status. Um nó com `provenance` ganha prov:wasDerivedFrom
 para a fonte e uma prov:Derivation qualificada: a atividade carrega o `method`, e o `locator` e a `locality` vão
@@ -20,11 +20,14 @@ toda aresta (de edges e de external_edges) vira um recurso kg:Edge com kg:edgeTy
 outras chaves como kg:<chave> (o nome da chave com percent-encoding), o que permite a volta sem perda. Entre dois nós locais, SUPPORTS ganha também a tripla
 cito:supports, REFUTES a cito:refutes e SUPERSEDES a dcterms:replaces; os outros tipos não ganham tripla-padrão. A
 ponta externa (<caminho>#<id>) vai como o literal kg:fromRef ou kg:toRef, e a ponta ausente (o grafo inteiro) como
-kg:fromGraph. Nenhuma aresta gera prov:wasDerivedFrom.
+kg:fromGraph. Nenhuma aresta gera prov:wasDerivedFrom. Com --full (que implica --edges), o documento inteiro vai:
+todo campo de cada nó e do meta como kg:<chave> (texto como literal, o resto como JSON tipado kg:json), as chaves do
+meta e as x_ do topo num recurso kg:Graph em <base><meta.id>, o que permite remontar o YAML carregado a partir do RDF.
 
 O exportador lê o grafo com o parse do leitor de referência e não o valida: rode kg_validate.py antes.
-Saída: JSON-LD em stdout. rc: 0 ok · 2 entrada quebrada (arquivo ilegível, que não é um documento YAML único, ou
-com meta ou nodes fora da forma).
+Saída: JSON-LD em stdout. rc: 0 ok · 2 entrada que o exportador não consegue levar (arquivo ilegível, que não é um
+documento YAML único, com meta ou nodes fora da forma, ou com um valor que não cabe em JSON, como um !!set ou um
+!!binary numa chave x_).
 """
 import argparse
 import json
@@ -60,7 +63,7 @@ DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 # O help em inglês, a língua-fonte; a docstring acima é a versão pt-BR, que o catálogo traz de volta.
 DESCRIPTION = """Export the provenance of a .kg.yaml graph to PROV-O in JSON-LD.
 
-  kg_prov_export.py <graph.kg.yaml> [--base IRI] [--edges]
+  kg_prov_export.py <graph.kg.yaml> [--base IRI] [--edges] [--full]
 
 Each node becomes a prov:Entity, with its label, type and status. A node with `provenance` gets prov:wasDerivedFrom
 to the source and a qualified prov:Derivation: the activity carries the `method`, and the `locator` and the
@@ -80,18 +83,37 @@ every edge (from edges and external_edges) becomes a kg:Edge resource with kg:ed
 the other keys as kg:<key> (the key name percent-encoded), so the graph can be rebuilt without loss. Between two local nodes, SUPPORTS also gets the
 cito:supports triple, REFUTES cito:refutes and SUPERSEDES dcterms:replaces; the other types get no standard triple.
 An external end (<path>#<id>) goes as the literal kg:fromRef or kg:toRef, and a missing end (the whole graph) as
-kg:fromGraph. No edge produces prov:wasDerivedFrom.
+kg:fromGraph. No edge produces prov:wasDerivedFrom. With --full (which implies --edges), the whole document goes out:
+every field of every node and of meta as kg:<key> (text as a literal, anything else as JSON typed kg:json), with the
+meta keys and the top-level x_ keys on a kg:Graph resource at <base><meta.id>, so the loaded YAML can be rebuilt from
+the RDF.
 
 The exporter reads the graph with the reference reader's parser and does not validate it: run kg_validate.py first.
-Output: JSON-LD on stdout. rc: 0 ok, 2 broken input (an unreadable file, one that is not a single YAML document, or
-one with meta or nodes out of shape)."""
+Output: JSON-LD on stdout. rc: 0 ok, 2 input the exporter cannot carry (an unreadable file, one that is not a single
+YAML document, one with meta or nodes out of shape, or one with a value that does not fit in JSON, such as a !!set or a
+!!binary in an x_ key)."""
 
 
 class Broken(Exception):
     """Entrada quebrada: rc 2."""
 
 
-def export(doc, base, edges=False):
+def _field(key):
+    """O termo kg: de uma chave: o nome em percent-encoding (o contrato aceita x_ fora do slug, e a IRI não)."""
+    return f"kg:{urllib.parse.quote(str(key), safe='')}"
+
+
+def _value(value, where):
+    """Texto vai como literal; o resto como JSON tipado kg:json. Um valor que não cabe em JSON é recusado com o lugar."""
+    if isinstance(value, str):
+        return value
+    try:
+        return {"@value": json.dumps(value, ensure_ascii=False, sort_keys=True), "@type": "kg:json"}
+    except (TypeError, ValueError):
+        raise Broken(_("{where}: a value that does not fit in JSON ({kind})").format(where=where, kind=type(value).__name__))
+
+
+def export(doc, base, edges=False, full=False):
     meta = doc.get("meta", {})
     nodes = doc.get("nodes", [])
     if not isinstance(meta, dict):
@@ -133,7 +155,19 @@ def export(doc, base, edges=False):
                     derivation[f"kg:{key}"] = str(prov[key])
             entity["prov:wasDerivedFrom"] = {"@id": src["@id"]}
             entity["prov:qualifiedDerivation"] = derivation
+        if full:  # todo campo do nó, inclusive os que já saem por outro termo: a volta lê só estes
+            for key, value in node.items():
+                entity[_field(key)] = _value(value, f"{node['id']}.{key}")
         out.append(entity)
+    if full:
+        graph = {"@id": prefix[:-1], "@type": "kg:Graph"}
+        for key, value in meta.items():
+            graph[_field(key)] = _value(value, f"meta.{key}")
+        for key, value in doc.items():
+            if key not in ("meta", "nodes", "edges", "external_edges"):
+                graph[_field(f"top-{key}")] = _value(value, key)
+        out.append(graph)
+        edges = True
     if not edges:
         return {"@context": CONTEXT, "@graph": out}
     by_id = {e["@id"]: e for e in out}
@@ -163,7 +197,7 @@ def export(doc, base, edges=False):
                 if extra in ("from", "to", "edge_type", "label"):
                     continue
                 # o nome da chave vai com percent-encoding: o contrato aceita x_ fora do slug, e a IRI não aceita espaço
-                edge[f"kg:{urllib.parse.quote(str(extra), safe='')}"] = value if isinstance(value, str) else {"@value": json.dumps(value, ensure_ascii=False), "@type": "kg:json"}
+                edge[_field(extra)] = _value(value, f"{key} #{count}.{extra}")
             prop = STANDARD.get(item.get("edge_type"))
             if prop and len(ends) == 2:
                 holder = by_id.get(ends["from"])
@@ -198,6 +232,8 @@ def main(argv=None):
                     help=_("the prefix of the node IRIs (default: urn:kg-ssot:graph:)"))
     ap.add_argument("--edges", action="store_true",
                     help=_("also export the edges, as kg:Edge resources and, where a standard term exists, cito:supports, cito:refutes or dcterms:replaces"))
+    ap.add_argument("--full", action="store_true",
+                    help=_("export the whole document: every field of every node and of meta as kg:<key>, plus the edges (implies --edges)"))
     args = ap.parse_args(argv)
     _utf8_stdio()
     try:
@@ -210,7 +246,7 @@ def main(argv=None):
         print(f"✗ {args.graph}: {error}", file=sys.stderr)
         return 2
     try:
-        result = export(doc, args.base, edges=args.edges)
+        result = export(doc, args.base, edges=args.edges, full=args.full)
     except Broken as exc:
         print(f"✗ {args.graph}: {exc}", file=sys.stderr)
         return 2

@@ -65,6 +65,8 @@ dependencies = ["PyYAML>=6.0.2", "jsonschema>=4.23"]
 [project.optional-dependencies]
 # a busca por semelhança do kg_query --semantic (desde a 4.26): o modelo ONNX roda local, sem servidor
 vector = ["onnxruntime>=1.20", "tokenizers>=0.20", "numpy>=1.26"]
+# a leitura da exportação PROV por um leitor RDF (desde a 4.29): o kg-prov-export --edges vira grafo do rdflib
+rdf = ["rdflib>=7.0"]
 
 [project.urls]
 Homepage = "{mirror}"
@@ -89,7 +91,7 @@ The modules are the adoption kit's (kg_validate, kg_conformance, kg_gate, kg_sto
 kg_criterion, kg_audit, kg_trace, kg_vector, kg_mcp, kg_prov_export), and the contract, the suite and the output schemas live in
 kg_ssot/spec. The commands kg-validate, kg-conformance, kg-gate, kg-store, kg-query, kg-diff, kg-vocab, kg-criterion,
 kg-audit, kg-trace, kg-vector, kg-mcp and kg-prov-export are the same scripts as the kit's. The vector search
-(kg-query --semantic, kg-vector) needs the extra: pip install "kg-ssot[vector]". Manual: {mirror}/tree/main/docs/manual
+(kg-query --semantic, kg-vector) needs the extra: pip install "kg-ssot[vector]". To read the kg-prov-export output in RDF tools (rdflib, SPARQL), pip install "kg-ssot[rdf]". Manual: {mirror}/tree/main/docs/manual
 """
 __version__ = "{version}"
 '''

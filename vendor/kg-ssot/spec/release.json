@@ -1,6 +1,6 @@
 {
-  "version": "4.28.0",
-  "tag": "kg-ssot-v4.28.0",
+  "version": "4.29.0",
+  "tag": "kg-ssot-v4.29.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -50,6 +50,7 @@
     "tools/kg_trace.py",
     "tools/kg_vector.py",
     "tools/requirements-vector.txt",
+    "tools/requirements-rdf.txt",
     "tools/kg_release_notes.py",
     "tools/kg_mcp.py",
     "tools/kg_migrate.py",
