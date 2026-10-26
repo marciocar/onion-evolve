@@ -1559,6 +1559,13 @@ docs/evolution/inbox/_processed/2026-10-25-proposal-a2a-product.md	E_SINAL_A2A_P
 docs/evolution/inbox/_processed/2026-10-25-proposal-agent-neutral-channel.md	E_SINAL_CANAL_NEUTRO_DO_AGENTE_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-10-25-proposal-agent-transport.md	E_SINAL_TRANSPORTE_ENTRE_AGENTES_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-10-25-proposal-peer-protocol.md	E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md	D_AI_FRONT_PILOTO3_1026	docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md	E_CURADORIA_AI_FRONT_1026	docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md	Q_AI_FRONT_PILOTO3_RESULTADO	docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md	Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-26-proposal-duolingo-actor.md	D_DUOLINGO_ACTOR_TRIAGEM_1026	docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-26-proposal-duolingo-actor.md	E_CURADORIA_DUOLINGO_1026	docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-26-proposal-duolingo-actor.md	Q_DUOLINGO_REVISITA_CARTA_3T_2026	docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
