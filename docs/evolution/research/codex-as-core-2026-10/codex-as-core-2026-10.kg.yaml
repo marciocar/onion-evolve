@@ -12,10 +12,16 @@ meta:
   baseline: "2026-10-26"
   review_after: "2026-11-25"   # 30d: FERRAMENTA é o tipo dominante — o Codex CLI solta estáveis a cada poucos dias
                                # (27 minors em ~140 dias) e o estado dos hooks (#21753, #27833) muda por release.
-                               # Gatilhos antecipados: (1) o teste vivo do PreToolUse exit 2 no 0.164.0+; (2) a
-                               # #27833 fechar; (3) nova minor do Codex com item de hook/PreToolUse nas notas.
+                               # Gatilhos antecipados: (1) ~~o teste vivo do PreToolUse exit 2 no 0.164.0+~~ RODADO
+                               # em 2026-10-26 pela curadoria (nós E_SPIKE_*); (2) a #27833 fechar; (3) nova minor do
+                               # Codex com item de hook/PreToolUse nas notas; (4) qualquer Q_*_1026 aberta pelos spikes
+                               # ser medida.
   # kg-backlog-guard: on
-  # ═══ TETO: 62 NÓS ═══
+  # ═══ TETO: 80 NÓS (62 da rodada de primárias + 18 dos spikes) ═══
+  #   SPIKES DA CURADORIA (onion-curation@da53ec3), incorporados em 2026-10-26 — 18 nós: 9 evidências medidas
+  #   ou re-ancoradas (E_SPIKE_*, a 8ª e a 9ª da emenda C em onion-curation@bc30bce), 6 perguntas com o teste que as
+  #   fecha (1 já superada pela emenda C), 2 vereditos por peça novos e 1
+  #   recomendação nova, com SUPERSEDES sobre os 3 nós que caíram e sobre E_OBJECAO_24 (Aufhebung).
   #   RODADA DE PRIMÁRIAS (run wf_e4a2a9be-bb5), EXECUTADA em 2026-10-26 — 62 nós: 1 question + 32 evidências ancoradas
   #   por verificador independente (rules, config-reference, agents-md, subagents, mcp-server, mcp cliente,
   #   non-interactive-mode, github-action, releases 0.137.0 e 0.164.0, issue #21753) + 1 evidência do corpus
@@ -32,6 +38,13 @@ external_edges:
     edge_type: SUPPORTS
   - from: E_CODEX_REMAINS_MCP_CLIENT
     to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025"
+    edge_type: SUPPORTS
+
+  - from: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026
+    to: "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml#E_PRETOOLUSE_BARRA_SOB_BYPASS"
     edge_type: SUPPORTS
 
 nodes:
@@ -860,7 +873,7 @@ nodes:
   - id: E_OBJECAO_24_EXIT2_STATE_UNPROVEN_IN_0164
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.6
     verified_at: "2026-10-26"
@@ -945,7 +958,7 @@ nodes:
   - id: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.55
     label: "Hooks que barram: FALTA o equivalente PROVADO ao exit 2 do Claude Code. PreToolUse é parcial no tracker, o deny não vale em apply_patch (#27833 aberta), há fail-open e nada medido sob never/danger-full-access."
@@ -975,7 +988,7 @@ nodes:
   - id: C_PIECE_SKILLS_COMMANDS_UNJUDGED_1026
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.4
     label: "Skills e comandos: NÃO JULGADO nesta rodada. Toda claim sobre .agents/skills, invocação por $ e deprecação dos custom prompts caiu na ancoragem; o destino dos 117 comandos do core fica sem citação."
@@ -1025,12 +1038,285 @@ nodes:
   - id: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 5
     confidence: 0.55
     label: "A rodada NÃO autoriza dizer que o Codex roda o Onion Core com eficácia equivalente nem abrir porta nova: a peça que define o core (hook que barra no modo mais permissivo) não tem equivalente provado. O onion-codex segue LINHA VIVA."
     narrative: "Recomendação do Elenxo (1 agente). Sustenta: MCP só cliente, exec/CI equivalente, AGENTS.md equivalente, subagentes equivalentes em formato, execpolicy parcial. Não sustenta: hooks, skills/comandos, worktree e isolamento de subagente, trajetória. Próximo passo mínimo antes de decisão de porta: (i) re-ancorar a página oficial de hooks com quote e locator; (ii) rodar no codex-cli 0.164.0 um PreToolUse com exit 2 contra shell, apply_patch e tool MCP sob approval_policy=never + danger-full-access e gravar no grafo; (iii) varrer as notas de 0.138 a 0.163 por hook, skill, subagent, mcp e worktree. Não é descarte por orçamento: é a falta medida da peça que define o core. Esta sessão não sela; decisão de porta é do maestro."
     trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  # ═══ SPIKES DA CURADORIA (2026-10-26), conferidos contra evidence/ no onion-curation@da53ec3 ═══
+  # Pré-registro 257a1ee (20:21Z) < diagnóstico DIAG1 (20:37Z) < emenda B 027a89f (20:40Z) < rodadas runs-b (20:43Z)
+  # < resultado 886cd6d (20:48Z). SHA256SUMS confere (0 falhas) e evidence/ é idêntico à da53ec3.
+  # Proveniência (R15.2): saídas do Codex e mensagens do modelo são DADO; nenhuma diretiva delas foi obedecida.
+
+  - id: E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-26"
+    verified_against: "evidence/runs-b/S1-1-c, S1-1-w, S1-2-c, S1-2-w, S1-3-c e S1-3-w: hook.log com 1 linha cada; zero eventos command_execution no stdout.jsonl; marker=absent; agent_message 'blocked by the PreToolUse hook'; stderr com 'Command blocked by PreToolUse hook'"
+    source_tier: 9
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "MEDIDO no Codex CLI 0.164.0: hook PreToolUse confiável barra git push e escrita por shell, sem diálogo, sob workspace-write + approval never E sob --dangerously-bypass-approvals-and-sandbox, pelas duas formas de negação (exit 2 e JSON deny)."
+    narrative: "Medição da curadoria (repo descartável, remoto bare, .codex/hooks.json com matchers 'Bash|exec_command' e '^apply_patch$|Edit|Write'), conferida nesta escrita arquivo a arquivo. Seis rodadas (S1-1 a S1-3, comando e escrita): o hook disparou uma vez em cada, recebeu tool_name Bash e o comando em tool_input.command, e não há evento command_execution no --json, logo o comando não rodou. O hook recebeu permission_mode 'bypassPermissions' em TODAS as rodadas, inclusive sob workspace-write + approval never (S1-1): o campo não distingue o modo, então uma guarda não pode usá-lo para saber se está no modo mais permissivo. LIMITE que o relato não diz: o remoto já estava em e41e40c antes das rodadas runs-b (o 1º lote o empurrou, ver E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026), então 'remoto igual' não discrimina bloqueio de push sem efeito; o que prova o bloqueio do push é a ausência de command_execution, não o remoto. Uma versão, um modelo (o padrão da conta), uma rodada por caso. Condição: o hook só roda com confiança gravada ou --dangerously-bypass-hook-trust (E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026). Comparável ao corpus do Claude Code: maestro-vivo-2026-08#E_PRETOOLUSE_BARRA_SOB_BYPASS (exit 2 barra sob --dangerously-skip-permissions, medido em 2026-08-31)."
+    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
+      locator: "S1-1-c, S1-1-w, S1-2-c, S1-2-w, S1-3-c, S1-3-w: args.txt, result.txt, hook.log, stdout.jsonl, stderr.txt"
+      method: "medição: rodadas da curadoria (codex exec --json, 1 rodada por caso), conferida por releitura de cada arquivo e contagem de eventos do stdout.jsonl nesta escrita"
+      locality: "web"
+
+  - id: E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-26"
+    verified_against: "rc.txt = 0 nas 9 rodadas que barraram (runs-b S1-1 a S1-3, S2-1, S2-2 e runs-diag DIAG1-c); os itens 'error' do --json são só o aviso do --dangerously-bypass-hook-trust; stderr.txt das 9 traz 'ERROR codex_core::tools::router: error=Command blocked by PreToolUse hook'"
+    source_tier: 9
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "MEDIDO: quando o hook barra, o codex exec sai com 0 e o --json não tem evento do hook; o bloqueio aparece na agent_message do modelo e numa linha de log ERROR no stderr. Um CI que leia rc ou o JSON não vê o veto."
+    narrative: "O relato da curadoria diz que o único rastro é a agent_message. A conferência achou um segundo rastro que o relato não cita: o stderr de todas as 9 rodadas que barraram traz a linha de log do roteador de tools ('Command blocked by PreToolUse hook: <motivo>. Command: <comando>'). É log, não contrato: não há garantia de formato entre versões. A agent_message é texto do modelo, então não serve de verificação. Isto LIMITA C_PIECE_EXEC_CI_EQUIVALENT_1026 (o gate que lê e reprova precisa de sinal de máquina do veto) sem derrubá-lo."
+    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/"
+      locator: "runs-b/{S1-1,S1-2,S1-3}-{c,w}, runs-b/S2-1, runs-b/S2-2, runs-diag/DIAG1-c: rc.txt, stdout.jsonl (itens error), stderr.txt"
+      method: "medição: rodadas da curadoria, conferida nesta escrita por grep no stderr e leitura dos itens do stdout.jsonl"
+      locality: "web"
+
+  - id: E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "evidence/runs-b/S1-0-c e S1-0-w: args sem --dangerously-bypass-hook-trust, hook_fired=0 (sem hook.log), nenhum item do --json sobre hook; o par S1-1 difere só pela flag e o hook disparou"
+    source_tier: 9
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "FALHA ABERTA 1 (medida): no codex exec, hook de projeto sem confiança gravada é PULADO em silêncio, sem aviso no --json nem no stderr; só roda com o /hooks interativo ou com --dangerously-bypass-hook-trust."
+    narrative: "Nas S1-0 o comando só não rodou porque o sandbox desta VPS não sobe (bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted), ou seja, nada barrou: num host com sandbox funcional o git push sob workspace-write teria seguido sem o hook. O deny.py grava o stdin no hook.log antes de qualquer decisão, então hook.log ausente prova que o hook não foi invocado. A doc oficial confirma a regra ('Non-managed hooks must be reviewed and trusted before they run', E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026). Os hooks gerenciados (requirements.toml), confiáveis por política, são a via declarada para impor hook e NÃO foram testados. O corpus do core não mede se o Claude Code exige confiança de hook de projeto nas mesmas condições (claude -p): não medido."
+    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
+      locator: "S1-0-c e S1-0-w (args.txt, result.txt, stdout.jsonl, stderr.txt), contra S1-1-c e S1-1-w"
+      method: "medição: rodadas da curadoria, conferida nesta escrita por releitura e comparação dos args"
+      locality: "web"
+
+  - id: E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "evidence/runs/ (1º lote, todos com --ignore-user-config): hook_fired=0 nas 8; S1-2-c e S1-3-c com command_execution 'git push origin main' exit 0 (S1-2-c: f463a17..e41e40c no remoto); S1-2-w e S1-3-w com command_execution 'echo hello > MARKER.txt' exit 0 e marker=exists; runs-diag/DIAG1-c, igual à S1-2-c sem a flag, barrou"
+    source_tier: 9
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "FALHA ABERTA 2 (medida): com --ignore-user-config o hook do projeto não dispara, em silêncio; sem sandbox, o push chegou ao remoto e o arquivo foi escrito, nas QUATRO rodadas sem sandbox (exit 2 e JSON deny)."
+    narrative: "O relato cita S1-2-c e S1-2-w; a conferência acha o mesmo em S1-3-c (o push RODOU, 'Everything up-to-date' porque o S1-2-c já tinha empurrado) e S1-3-w (marcador escrito). Logo são 4 rodadas com a ação executada, não 2, e a forma JSON deny falha igual. Não isolado nesta medição: as rodadas passavam também a confiança do projeto por -c projects.<dir>.trust_level. A emenda C da curadoria explicou depois: o -c não confia o projeto, e a flag descarta a confiança gravada na config do usuário (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026). O diagnóstico DIAG1-c rodou antes da emenda B (20:37Z contra 20:40Z do commit), como a emenda declara. Corpus do Claude Code, para comparação honesta: um operador também desliga hooks por configuração lá (chat-agent-isolation-2026-10#E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016: settings {disableAllHooks:true} e o hook não rodou); se isso é silencioso no claude -p não foi medido. A diferença a pesar é que aqui o nome da flag (ignorar a configuração do USUÁRIO) não anuncia que derruba os hooks do PROJETO."
+    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/PLAN-B.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs/"
+      locator: "S1-0-c a S1-3-w (args.txt, result.txt, stdout.jsonl) e runs-diag/DIAG1-c"
+      method: "medição: rodadas da curadoria, conferida nesta escrita por contagem de command_execution e leitura dos result.txt"
+      locality: "web"
+
+  - id: E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "WebFetch de learn.chatgpt.com/docs/hooks nesta escrita: '...a `PreToolUse` callback error, timeout, or malformed response can fail the hook without blocking the tool.' (seção 'Managed hooks from requirements.toml'); 'Non-managed hooks must be reviewed and trusted before they run.' (seção 'How hooks run'); 'You can also use exit code `2` and write the blocking reason to `stderr`.' (seção 'PreToolUse')"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "FALHA ABERTA 3 (declarada, não exercitada): a doc oficial de hooks do Codex diz que erro, timeout ou resposta malformada do PreToolUse podem falhar o hook sem barrar a tool; hook não gerenciado exige revisão e confiança."
+    narrative: "Re-ancora com quote e locator a página oficial que a rodada de primárias tinha perdido por forma (E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026, lacuna codex-hooks). O trecho de fail-open está na seção de hooks GERENCIADOS (lido por resumo do WebFetch, que o devolveu começando em reticências), o que sugere que vale também para a via de imposição por política; o contexto completo da frase não foi conferido. A mesma página mostra o hooks.json com a chave 'hooks' no topo (seção 'Config shape'), a forma que o porte não segue (E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026). Não exercitado nos spikes. Corpus do Claude Code: exit 2 com JSON inválido BLOQUEIA desde a 2.1.214 (claude-code-2.1-onion-2026-08#E_CONTRATO_DE_HOOKS_EXPLODIU); erro e timeout do hook do Claude Code nas mesmas condições não estão medidos no corpus."
+    trace: "https://learn.chatgpt.com/docs/hooks"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/hooks"
+      locator: "seções 'Managed hooks from requirements.toml', 'How hooks run', 'Review and trust hooks', 'PreToolUse', 'Config shape'"
+      method: "leitura: WebFetch nesta escrita, conferindo a citação que a curadoria relatou"
+      locality: "web"
+
+  - id: E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-26"
+    verified_against: "evidence/runs-b/S2-1 (exit 2) e S2-2 (JSON deny): hook.log com tool_name 'apply_patch' e o patch '*** Add File: MARKER2.txt' em tool_input.command; marker2=absent; zero command_execution e zero file_change no --json"
+    source_tier: 9
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "MEDIDO no 0.164.0: o deny do PreToolUse vale para apply_patch que CRIA arquivo (Add File), pelas duas formas; a #27833 ('hook fires, write proceeds') não se reproduziu neste caso."
+    narrative: "Não testado: patch que edita arquivo existente (*** Update File), patch que apaga, e repositório com várias worktrees (o caso de E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS). Logo a #27833 não fica refutada, fica sem reprodução num caso. Mesmas condições de confiança do S1 (--dangerously-bypass-hook-trust)."
+    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
+      locator: "S2-1 e S2-2: hook.log, result.txt, stdout.jsonl"
+      method: "medição: rodadas da curadoria, conferida nesta escrita por releitura"
+      locality: "web"
+
+  - id: E_SPIKE_S3_PORT_SKILLS_LOAD_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-26"
+    verified_against: "evidence/runs-b/S3-onion, S3-engineer-start, S3-engineer-warm-up (read-only) e S3X-engineer-warm-up (sem sandbox): as respostas reproduzem o menu de $onion (SKILL.md l.33, 34, 57, 146 no onion-codex@a216791) e a l.35 de engineer-start; S3X tem 13 command_execution concluídos, entre eles lint-selftest.sh e lint-artifacts.sh com exit 0"
+    source_tier: 8
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "MEDIDO: as skills $onion, $engineer-start e $engineer-warm-up do porte onion-codex (a216791) CARREGAM no Codex 0.164.0; o warm-up RODOU sem sandbox (13 comandos, os lints do porte com exit 0)."
+    narrative: "Conferido nesta escrita: as linhas citadas existem em onion-codex@a216791 (.agents/skills/onion/SKILL.md l.33, 34, 57, 146; .agents/skills/engineer-start/SKILL.md l.35). 'Carregar' aqui é o modelo seguir o texto da skill, julgado pela resposta: uma rodada por skill, um modelo. A rodada S3X ficou FORA do pré-registro e foi declarada como tal; o pré-registro errou ao dizer que $onion não existia no porte (corte de head -10), e a curadoria o declarou. Em read-only nada executa nesta VPS porque o bwrap não sobe (RTM_NEWADDR), limite de ambiente já no corpus (chat-agent-isolation-2026-10#E_OBJECAO_06_BWRAP_FAILS_ON_THIS_VPS). Não mede: os 117 comandos do core como skills, invocação implícita pela description, nem equivalência de eficácia."
+    trace: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@da53ec3:docs/evolution/research/codex-spikes-2026-10/evidence/runs-b/"
+      locator: "S3-onion, S3-engineer-start, S3-engineer-warm-up, S3X-engineer-warm-up: args.txt, stdout.jsonl; e github.com/marciocar/onion-codex@a216791 (.agents/skills)"
+      method: "medição: rodadas da curadoria, conferida nesta escrita por contagem de eventos e git show das linhas citadas no porte"
+      locality: "web"
+
+  - id: E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "evidence/runs-c/S4T-A0 e S4T-A1: item error 'failed to parse hooks config ⟨scratchpad⟩/port-A0/.codex/hooks.json: unknown field `SessionStart`, expected `description` or `hooks` at line 2 column 16', rc 0, sem arquivo-sinal; S4T-B1 (o mesmo conteúdo dentro de {\"hooks\": ...}): SIGNAL-B1.json gravado pelo SessionStart (hook_event_name SessionStart, source startup); hooks-A0.json idêntico ao do porte"
+    source_tier: 9
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "DEFEITO MEDIDO na LINHA VIVA onion-codex: o Codex 0.164.0 recusa o .codex/hooks.json do porte (a216791), que começa em SessionStart sem a chave 'hooks', e o hook do porte não roda; envolvido em {\"hooks\": ...}, carrega e dispara."
+    narrative: "Emenda C da curadoria, pré-registrada em 97fa177 (20:57Z) antes do resultado 42defa7 (21:04Z). Conferido nesta escrita: hooks-A0.json é byte a byte o .codex/hooks.json de onion-codex@a216791; o erro de parse está no --json como item error, então a falha NÃO é silenciosa, mas o codex exec sai com 0 e segue sem o hook (nada reprova). O SessionStart do porte é a detecção do provider do task manager (E_CORPUS_ONION_CODEX_PORT_STATE_1026): no Codex atual ele não roda. A correção é uma linha de estrutura no repo onion-codex, não neste (Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026). Uma versão, uma rodada por caso. As rodadas S4T rodaram com a confiança do projeto gravada (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026); as S4-A0/A1/B1 sem ela nem chegaram a ler o arquivo."
+    trace: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
+      locator: "S4T-A0, S4T-A1, S4T-B1 (rc.txt, stdout.jsonl, SIGNAL-B1.json); hooks-A0.json, hooks-A1.json, hooks-B1.json"
+      method: "medição: rodadas da curadoria (codex exec --json em clones descartáveis do porte), conferidas nesta escrita por leitura dos itens do stdout.jsonl e diff dos hooks.json contra o porte"
+      locality: "web"
+
+  - id: Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Correção na LINHA VIVA onion-codex (repo próprio, não este): envolver o .codex/hooks.json do porte em {\"hooks\": ...} e cobrar a forma no gate dele (.codex/validation/), para o SessionStart voltar a rodar no Codex atual."
+    narrative: "Defeito medido em E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026. A correção e o PR são da linha viva onion-codex; este core só registra e sinaliza (I3, um escritor por repo). TESTE QUE FECHA: no onion-codex corrigido, um clone descartável com a confiança do projeto gravada roda codex exec --json e o item 'failed to parse hooks config' some, e um caso no gate do porte reprova o hooks.json sem a chave 'hooks'. Fica open até o commit no onion-codex ser citado aqui."
+    trace: "github.com/marciocar/onion-codex@a216791:.codex/hooks.json"
+
+  - id: Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "O deny do PreToolUse vale para apply_patch que EDITA (Update File) ou apaga arquivo existente, e em repositório com várias worktrees, no Codex atual?"
+    narrative: "S2 cobriu só Add File (E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026); a #27833 segue aberta e a issue ligada fala do workdir em multi-worktree (E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS). TESTE QUE FECHA: no mesmo arnês, quatro rodadas sem sandbox com hook confiável: Update File num arquivo rastreado, Delete File, e as duas numa worktree secundária; o veredito é o conteúdo e a existência do arquivo depois de cada rodada, não a mensagem do modelo."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+
+  - id: Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "A falha aberta declarada (erro, timeout, resposta malformada do PreToolUse) acontece de fato no 0.164.0, e um hook GERENCIADO (requirements.toml) cura a falha 1 (hook sem confiança pulado)?"
+    narrative: "TESTE QUE FECHA: três hooks negadores defeituosos (sai com 1 sem saída; dorme além do timeout; imprime JSON malformado com exit 0), cada um contra 'echo > MARKER' sem sandbox, mais um hook gerenciado por requirements.toml SEM --dangerously-bypass-hook-trust; o veredito é o marcador no disco. Comparação com o Claude Code nas mesmas três falhas: não está no corpus; medir no mesmo movimento se for usada no veredito."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+
+  - id: Q_CODEX_IGNORE_USER_CONFIG_LAYER_1026
+    node_type: question
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.5
+    label: "O --ignore-user-config desliga os hooks do projeto por si, ou derruba a confiança do projeto passada por -c projects.<dir>.trust_level?"
+    narrative: "E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026 não isolou. TESTE QUE FECHA: quatro rodadas sem sandbox com --dangerously-bypass-hook-trust, cruzando --ignore-user-config (sim/não) com a confiança do projeto (por -c ou gravada no config do usuário); hook.log e marcador decidem."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+  - id: E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "evidence/runs-c: S4-A0, S4-A1, S4-B1, S4-BISECT-1 a 4 e S4-DIAG-* sem item de hook nenhum no --json (nem o erro de parse que o mesmo hooks.json do A0 produz em S4T-A0); S4T-A0/A1 com o erro de parse e S4T-B1 com o SIGNAL-B1.json; PLAN-C (97fa177) declara o -c projects.<dir>.trust_level=\"trusted\" nas rodadas S4"
+    source_tier: 7
+    source_kind: measurement
+    valid_from: "2026-10-26"
+    label: "Confiança de PROJETO no Codex 0.164.0: o -c projects.<dir>.trust_level=\"trusted\" não confia o projeto; o .codex/ só é lido com [projects.<dir>] trust_level gravado na config do usuário. Logo o hook que barra exige DUAS confianças: a do projeto gravada e a do hook."
+    narrative: "Explica a falha aberta 2 (E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026): o --ignore-user-config descarta a confiança gravada e os hooks do projeto somem em silêncio. O que a evidência SUSTENTA, conferido nesta escrita: nas rodadas S4 (com o -c, pelo pré-registro) o hooks.json nem foi lido, porque o mesmo arquivo malformado que nas S4T dá erro de parse nas S4 não dá nada. O que fica SÓ no relato da curadoria, sem artefato em evidence/ (não há args.txt nem cópia do config.toml do usuário em runs-c): (i) que a diferença entre S4 e S4T é exatamente a entrada gravada; (ii) que o controle S4-CTRL disparou (o SIGNAL-CTRL.json não foi guardado); (iii) que foi o próprio Codex que gravou a entrada, o que o RESULTS.md declara NÃO isolado ('é provável' que tenham sido as rodadas sem sandbox nem aprovação). Por isso a confiança é 0.6. Consequência para o veredito de hooks: para automação, o hook que barra só roda com a confiança do projeto gravada E a do hook (pelo /hooks interativo ou pelo --dangerously-bypass-hook-trust); sem qualquer uma, é pulado. A config do usuário foi restaurada pela curadoria depois das rodadas."
+    trace: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/RESULTS.md"
+    provenance:
+      source: "github.com/marciocar/onion-curation@bc30bce:docs/evolution/research/codex-spikes-2026-10/evidence/runs-c/"
+      locator: "S4-A0, S4-A1, S4-B1, S4-BISECT-1-clean a S4-BISECT-4-codex-dirs, S4-DIAG-*, S4-CTRL contra S4T-A0, S4T-A1, S4T-B1; PLAN-C.md seção Rodadas"
+      method: "medição: rodadas da curadoria, conferidas nesta escrita por leitura dos itens do stdout.jsonl de todas as rodadas de runs-c; a variável (entrada gravada) é declaração da curadoria"
+      locality: "web"
+
+  - id: Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Quem grava a confiança do projeto na config do usuário do Codex, e em que modo? Se o próprio codex exec a grava sob --dangerously-bypass-approvals-and-sandbox, rodar uma vez nesse modo confia o projeto para sempre, sem diálogo."
+    narrative: "Não isolado pela curadoria (E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026). TESTE QUE FECHA: config do usuário limpa (só [tui]) e copiada antes; uma rodada de codex exec por modo (read-only, workspace-write + never, sem sandbox e sem aprovação) num repo limpo diferente cada; diff do config.toml depois de cada rodada; e uma rodada com só o -c para confirmar que ele não basta. Guardar args.txt e o diff do config em evidence/, que é o que faltou no S4."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+
+  - id: Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Existe sinal de máquina estável do veto do hook no codex exec (código de saída, evento no --json, flag) para um gate de CI reprovar, ou só a linha de log ERROR no stderr?"
+    narrative: "E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026 mediu rc 0 e --json sem evento. TESTE QUE FECHA: ler a referência do codex exec e o schema dos eventos do --json na versão atual em busca de evento de hook; rodar uma vez o caso barrado com --output-schema pedindo o veto como campo; se só houver o log, declarar que o gate leria log sem contrato."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+
+  - id: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.65
+    label: "Hooks que barram: PARCIAL (antes FALTA). O bloqueio determinístico existe no 0.164.0 e vale até sem sandbox, mas pede DUAS confianças (projeto gravada e hook) e tem três falhas abertas silenciosas: sem uma delas é pulado, --ignore-user-config e erro/timeout."
+    narrative: "Aufhebung de C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026: o que caiu é 'nada medido sob never/danger-full-access' e 'deny não vale em apply_patch' (para Add File). O que fica: o PreToolUse barra shell e apply_patch Add File sem diálogo, inclusive sem sandbox (E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026, E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026). O que impede EQUIVALENTE: (1) no codex exec o hook de projeto só roda com DUAS confianças, a do projeto gravada na config do usuário (o -c não basta, E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026) e a do hook (/hooks ou flag 'dangerously'), e sem qualquer uma é pulado sem aviso; (2) uma flag cujo nome fala da config do usuário derruba os hooks do projeto (porque descarta a confiança gravada), e a ação passou; (3) a doc declara fail-open em erro/timeout/malformado, e a frase está na seção dos hooks gerenciados; (4) o veto não chega ao rc nem ao --json. Comparação com o Claude Code: o corpus mede só o exit 2 barrando sob bypass (maestro-vivo-2026-08#E_PRETOOLUSE_BARRA_SOB_BYPASS) e um desligamento por settings disableAllHooks (chat-agent-isolation-2026-10#E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016); as falhas 1 e 3 nas mesmas condições NÃO estão medidas lá, então este nó não afirma que o Claude Code não as tem. Seguem abertos: Update File e multi-worktree, tool MCP sob o hook, fail-open exercitado, hooks gerenciados. Juízo desta escrita sobre a medição da curadoria, 1 agente."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+
+  - id: C_PIECE_SKILLS_LOAD_EQUIVALENT_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: "Skills e comandos: EQUIVALENTE em carregamento (antes NÃO JULGADO). Três skills do porte carregam por $nome no 0.164.0 e uma rodou de ponta a ponta sem sandbox; o destino dos 117 comandos do core segue sem medida."
+    narrative: "Aufhebung de C_PIECE_SKILLS_COMMANDS_UNJUDGED_1026 pela medição E_SPIKE_S3_PORT_SKILLS_LOAD_1026. O veredito é só de CARREGAMENTO (o modelo segue a skill invocada por $); não é eficácia equivalente, não cobre invocação implícita nem os 117 comandos, e a citação oficial de .agents/skills e da deprecação dos custom prompts continua sem âncora (lacuna codex-skills-agents-md). Juízo desta escrita, 1 agente."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+
+  - id: C_RECOMMENDATION_AFTER_SPIKES_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: "Depois dos spikes: o Codex 0.164.0 TEM o primitivo do bloqueio determinístico, mas ainda não roda o Onion Core com eficácia equivalente; hooks sobem a PARCIAL e skills a EQUIVALENTE em carregamento. Porta nova segue não autorizada por esta rodada; a decisão é do maestro."
+    narrative: "Aufhebung de C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026. O QUE OS SPIKES MUDARAM: (i) 'sem equivalente provado' virou 'existe, medido, com três falhas abertas silenciosas'; (ii) o deny vale em apply_patch Add File; (iii) as skills do porte carregam; (iv) a página oficial de hooks está re-ancorada. O QUE AINDA FALTA antes de uma decisão de porta: (a) Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026, a correção do defeito medido na LINHA VIVA (E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026: o hook do porte não roda no Codex atual), que é do repo onion-codex; (b) Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026; (c) Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026, incluindo os hooks gerenciados como cura da falha 1; (d) Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026 (a falha 2 já tem causa: a confiança do projeto só vale gravada, E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026); (e) Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026; (f) PreToolUse sobre tool MCP; (g) a varredura das notas de 0.138 a 0.163 (C_PIECE_RELEASES_TRAJECTORY_OPEN_1026) e o isolamento por worktree dos subagentes. Para a porta, o que pesa é que um Onion Core no Codex teria de fechar as falhas 1 e 2 por mecanismo próprio (hook gerenciado, ou guarda que reprove a ausência do hook), não por doutrina. As peças não tocadas pelos spikes mantêm o veredito anterior. Esta sessão não sela."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
 
 edges:
   - from: C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT
@@ -1237,3 +1523,133 @@ edges:
   - from: E_CORPUS_ONION_CODEX_PORT_STATE_1026
     to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
     edge_type: SUPPORTS
+  # ═══ SPIKES DA CURADORIA (2026-10-26): Aufhebung dos vereditos por peça ═══
+  - from: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    to: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    edge_type: SUPERSEDES
+  - from: C_PIECE_SKILLS_LOAD_EQUIVALENT_1026
+    to: C_PIECE_SKILLS_COMMANDS_UNJUDGED_1026
+    edge_type: SUPERSEDES
+  - from: C_RECOMMENDATION_AFTER_SPIKES_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPERSEDES
+  - from: E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026
+    to: E_OBJECAO_24_EXIT2_STATE_UNPROVEN_IN_0164
+    edge_type: SUPERSEDES
+  - from: E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026
+    to: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    edge_type: CONSTRAINS
+  - from: E_TRACKER_PRETOOLUSE_PARTIAL
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_SPIKE_S3_PORT_SKILLS_LOAD_1026
+    to: C_PIECE_SKILLS_LOAD_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_CORPUS_ONION_CODEX_PORT_STATE_1026
+    to: C_PIECE_SKILLS_LOAD_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026
+    to: E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026
+    edge_type: SUPPORTS
+  - from: E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026
+    to: E_CORPUS_ONION_CODEX_PORT_STATE_1026
+    edge_type: CONSTRAINS
+  - from: Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026
+    to: E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026
+    edge_type: TRACES_TO
+  - from: E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026
+    to: Q_CODEX_IGNORE_USER_CONFIG_LAYER_1026
+    edge_type: SUPERSEDES
+  - from: E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026
+    to: E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026
+    edge_type: SUPPORTS
+  - from: E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026
+    to: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026
+    to: E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026
+    edge_type: TRACES_TO
+  - from: Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026
+    to: E_SPIKE_S2_APPLY_PATCH_ADD_FILE_BLOCKED_1026
+    edge_type: TRACES_TO
+  - from: Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026
+    to: E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026
+    edge_type: TRACES_TO
+  - from: Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026
+    to: E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026
+    edge_type: TRACES_TO
+  - from: Q_CODEX_IGNORE_USER_CONFIG_LAYER_1026
+    to: E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026
+    edge_type: TRACES_TO
+  - from: Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026
+    to: E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026
+    edge_type: TRACES_TO
+  - from: C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_SKILLS_LOAD_EQUIVALENT_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_RULES_SANDBOX_PARTIAL_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_AGENTS_MD_EQUIVALENT_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_MCP_CLIENT_ONLY_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: SUPPORTS
+  - from: Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: CONSTRAINS
+  - from: Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: CONSTRAINS
+  - from: Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: CONSTRAINS
+  - from: Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: CONSTRAINS
+  - from: Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026
+    to: C_RECOMMENDATION_AFTER_SPIKES_1026
+    edge_type: CONSTRAINS
+  - from: C_RECOMMENDATION_AFTER_SPIKES_1026
+    to: Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026
+    edge_type: TRACES_TO

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**633 itens abertos** em 120 grafo(s) com aberto (de 159 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**638 itens abertos** em 120 grafo(s) com aberto (de 159 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -241,6 +241,33 @@
 | 3.6 | `C_OPCAO_C_DURANTE_GATE_E_POLITICA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por basel |
 | 1.8 | `C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVO |
 
+## codex-as-core-2026-10 — 22 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 51.0 | `C_RECOMMENDATION_AFTER_SPIKES_1026` | codex-as-core-2026-10 | Depois dos spikes: o Codex 0.164.0 TEM o primitivo do bloqueio determinístico, mas ainda não roda o Onion Core com eficácia equ |
+| 45.5 | `C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026` | codex-as-core-2026-10 | Hooks que barram: PARCIAL (antes FALTA). O bloqueio determinístico existe no 0.164.0 e vale até sem sandbox, mas pede DUAS confi |
+| 24.0 | `C_PIECE_EXEC_CI_EQUIVALENT_1026` | codex-as-core-2026-10 | Execução não interativa e CI: EQUIVALENTE ao claude -p para o gate que lê e reprova (exec read-only por padrão, JSONL tipado, |
+| 24.0 | `C_PIECE_MCP_CLIENT_ONLY_1026` | codex-as-core-2026-10 | MCP: EQUIVALENTE como cliente ([mcp_servers.*] em TOML, stdio e HTTP, allow/deny de tools, aprovação por servidor e tool); FALTA |
+| 22.0 | `C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026` | codex-as-core-2026-10 | Subagentes: EQUIVALENTE em outro formato (TOML com model por agente e teto de paralelismo); isolamento por worktree e restrição  |
+| 18.0 | `C_PIECE_RELEASES_TRAJECTORY_OPEN_1026` | codex-as-core-2026-10 | Trajetória de releases: ABERTA. Lidas só a 0.137.0 e a 0.164.0; a cadência real é de estáveis a cada poucos dias (27 minors e |
+| 15.4 | `C_PIECE_RULES_SANDBOX_PARTIAL_1026` | codex-as-core-2026-10 | Sandbox, approval policy e execpolicy: PARCIAL. Há forbidden>prompt>allow por prefixo de comando, sandbox read-only/workspace-wri |
+| 12.0 | `C_PIECE_AGENTS_MD_EQUIVALENT_1026` | codex-as-core-2026-10 | AGENTS.md: EQUIVALENTE ao CLAUDE.md em descoberta e precedência por diretório (raiz ao cwd, o mais próximo prevalece, override  |
+| 11.0 | `C_PIECE_SKILLS_LOAD_EQUIVALENT_1026` | codex-as-core-2026-10 | Skills e comandos: EQUIVALENTE em carregamento (antes NÃO JULGADO). Três skills do porte carregam por $nome no 0.164.0 e uma rod |
+| 10.0 | `Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026` | codex-as-core-2026-10 | O Codex CLI atual (outubro de 2026) roda o Onion como Onion Core, a maquinaria inteira com eficiência e eficácia equivalentes à |
+| 8.0 | `Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026` | codex-as-core-2026-10 | A falha aberta declarada (erro, timeout, resposta malformada do PreToolUse) acontece de fato no 0.164.0, e um hook GERENCIADO (req |
+| 7.2 | `Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026` | codex-as-core-2026-10 | Correção na LINHA VIVA onion-codex (repo próprio, não este): envolver o .codex/hooks.json do porte em {\"hooks\": ...} e cobra |
+| 6.0 | `Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026` | codex-as-core-2026-10 | O deny do PreToolUse vale para apply_patch que EDITA (Update File) ou apaga arquivo existente, e em repositório com várias workt |
+| 6.0 | `Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026` | codex-as-core-2026-10 | Quem grava a confiança do projeto na config do usuário do Codex, e em que modo? Se o próprio codex exec a grava sob --dangerous |
+| 4.5 | `Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026` | codex-as-core-2026-10 | Existe sinal de máquina estável do veto do hook no codex exec (código de saída, evento no --json, flag) para um gate de CI rep |
+| 3.6 | `C_SUPERACAO_20261026_ISSUE_TITLES_27833_20204` | codex-as-core-2026-10 | Os títulos reais de #27833 ('PreToolUse deny (exit 2 + permissionDecision JSON) is not enforced for apply_patch - hook fires, wri |
+| 3.6 | `C_SUPERACAO_20261026_RELEASE_CADENCE_DAYS` | codex-as-core-2026-10 | A listagem de releases do repositório (rust-v0.160.1 a rust-v0.164.0) sustenta a cadência real: estáveis a cada poucos dias, n |
+| 3.6 | `C_SUPERACAO_20261026_REPO_SKILLS_REPLACE_PROMPTS` | codex-as-core-2026-10 | Skills de repositório em .agents/skills (SKILL.md com name e description), versionadas no repo e invocáveis por $, /skills ou im |
+| 3.6 | `C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT` | codex-as-core-2026-10 | O parágrafo literal da seção 'When Codex does not split the script' da página de rules sustenta o fato: o script inteiro é av |
+| 3.6 | `C_SUPERACAO_20261026_SANDBOX_DEFAULTS_YOLO_CORRECTED` | codex-as-core-2026-10 | Formulação sustentada pela página de approvals e segurança: defaults sem rede e escrita no workspace, caminhos protegidos (.gi |
+| 3.6 | `C_SUPERACAO_20261026_SKILLS_0137_ALREADY_PER_TURN` | codex-as-core-2026-10 | As linhas #26106 e #26167 da 0.137.0 (catálogo de skills por turno e injeção de prompt v1) e #54050 da 0.164.0 (refresh de skil |
+| 3.6 | `C_SUPERACAO_20261026_SUBAGENT_SPAWN_BY_NAME_IN_PROMPT` | codex-as-core-2026-10 | Formulação corrigida pela página de subagentes: spawn por pedido direto ou instrução de projeto/skill, agente customizado nom |
+
 ## slm-frameworks-2026-10 — 14 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -446,28 +473,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
-
-## codex-as-core-2026-10 — 17 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 30.2 | `C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026` | codex-as-core-2026-10 | A rodada NÃO autoriza dizer que o Codex roda o Onion Core com eficácia equivalente nem abrir porta nova: a peça que define o co |
-| 21.6 | `C_PIECE_MCP_CLIENT_ONLY_1026` | codex-as-core-2026-10 | MCP: EQUIVALENTE como cliente ([mcp_servers.*] em TOML, stdio e HTTP, allow/deny de tools, aprovação por servidor e tool); FALTA |
-| 19.8 | `C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026` | codex-as-core-2026-10 | Hooks que barram: FALTA o equivalente PROVADO ao exit 2 do Claude Code. PreToolUse é parcial no tracker, o deny não vale em appl |
-| 19.8 | `C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026` | codex-as-core-2026-10 | Subagentes: EQUIVALENTE em outro formato (TOML com model por agente e teto de paralelismo); isolamento por worktree e restrição  |
-| 19.2 | `C_PIECE_EXEC_CI_EQUIVALENT_1026` | codex-as-core-2026-10 | Execução não interativa e CI: EQUIVALENTE ao claude -p para o gate que lê e reprova (exec read-only por padrão, JSONL tipado, |
-| 16.0 | `C_PIECE_RELEASES_TRAJECTORY_OPEN_1026` | codex-as-core-2026-10 | Trajetória de releases: ABERTA. Lidas só a 0.137.0 e a 0.164.0; a cadência real é de estáveis a cada poucos dias (27 minors e |
-| 13.2 | `C_PIECE_RULES_SANDBOX_PARTIAL_1026` | codex-as-core-2026-10 | Sandbox, approval policy e execpolicy: PARCIAL. Há forbidden>prompt>allow por prefixo de comando, sandbox read-only/workspace-wri |
-| 9.6 | `C_PIECE_AGENTS_MD_EQUIVALENT_1026` | codex-as-core-2026-10 | AGENTS.md: EQUIVALENTE ao CLAUDE.md em descoberta e precedência por diretório (raiz ao cwd, o mais próximo prevalece, override  |
-| 7.5 | `Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026` | codex-as-core-2026-10 | O Codex CLI atual (outubro de 2026) roda o Onion como Onion Core, a maquinaria inteira com eficiência e eficácia equivalentes à |
-| 4.8 | `C_PIECE_SKILLS_COMMANDS_UNJUDGED_1026` | codex-as-core-2026-10 | Skills e comandos: NÃO JULGADO nesta rodada. Toda claim sobre .agents/skills, invocação por $ e deprecação dos custom prompts |
-| 3.6 | `C_SUPERACAO_20261026_ISSUE_TITLES_27833_20204` | codex-as-core-2026-10 | Os títulos reais de #27833 ('PreToolUse deny (exit 2 + permissionDecision JSON) is not enforced for apply_patch - hook fires, wri |
-| 3.6 | `C_SUPERACAO_20261026_RELEASE_CADENCE_DAYS` | codex-as-core-2026-10 | A listagem de releases do repositório (rust-v0.160.1 a rust-v0.164.0) sustenta a cadência real: estáveis a cada poucos dias, n |
-| 3.6 | `C_SUPERACAO_20261026_REPO_SKILLS_REPLACE_PROMPTS` | codex-as-core-2026-10 | Skills de repositório em .agents/skills (SKILL.md com name e description), versionadas no repo e invocáveis por $, /skills ou im |
-| 3.6 | `C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT` | codex-as-core-2026-10 | O parágrafo literal da seção 'When Codex does not split the script' da página de rules sustenta o fato: o script inteiro é av |
-| 3.6 | `C_SUPERACAO_20261026_SANDBOX_DEFAULTS_YOLO_CORRECTED` | codex-as-core-2026-10 | Formulação sustentada pela página de approvals e segurança: defaults sem rede e escrita no workspace, caminhos protegidos (.gi |
-| 3.6 | `C_SUPERACAO_20261026_SKILLS_0137_ALREADY_PER_TURN` | codex-as-core-2026-10 | As linhas #26106 e #26167 da 0.137.0 (catálogo de skills por turno e injeção de prompt v1) e #54050 da 0.164.0 (refresh de skil |
-| 3.6 | `C_SUPERACAO_20261026_SUBAGENT_SPAWN_BY_NAME_IN_PROMPT` | codex-as-core-2026-10 | Formulação corrigida pela página de subagentes: spawn por pedido direto ou instrução de projeto/skill, agente customizado nom |
 
 ## onion-identity-2026-07 — 4 item(ns)
 
