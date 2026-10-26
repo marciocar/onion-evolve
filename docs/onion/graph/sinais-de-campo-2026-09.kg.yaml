@@ -1030,6 +1030,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-26: «Novo eixo E7 + registrar o achado»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
+  - id: D_SGE_PENDENTES_POS_UPDATE_76CCB2F8_1026
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Os 3, com CI aplicado»"
+    label: "A sessão do sge acerta o label do ONION_INSTALLED, move o relatório de update antigo para _processed/ e aplica o CI onion-validate"
+    narrative: "Selado por /meta:decide em 2026-10-26: escolhida «Os 3, com CI aplicado»; descartadas: «Label e relatório, sem CI» · «Deixar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Pendências do sge: o que pedimos à sessão do sge?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -1214,3 +1230,6 @@ edges:
   - from: E_KG_SSOT_430_ADOTADA_1026
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
+  - from: D_SGE_PENDENTES_POS_UPDATE_76CCB2F8_1026
+    to: E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026
+    edge_type: TRACES_TO
