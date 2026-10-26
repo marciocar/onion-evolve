@@ -17,7 +17,7 @@ meta:
                                # Codex com item de hook/PreToolUse nas notas; (4) qualquer Q_*_1026 aberta pelos spikes
                                # ser medida.
   # kg-backlog-guard: on
-  # ═══ TETO: 80 NÓS (62 da rodada de primárias + 18 dos spikes) ═══
+  # ═══ TETO: 81 NÓS (62 da rodada de primárias + 18 dos spikes + 1 decisão do maestro, D_CODEX_HOOKSJSON_FIX_POR_PR_DO_CORE_1026) ═══
   #   SPIKES DA CURADORIA (onion-curation@da53ec3), incorporados em 2026-10-26 — 18 nós: 9 evidências medidas
   #   ou re-ancoradas (E_SPIKE_*, a 8ª e a 9ª da emenda C em onion-curation@bc30bce), 6 perguntas com o teste que as
   #   fecha (1 já superada pela emenda C), 2 vereditos por peça novos e 1
@@ -30,7 +30,9 @@ meta:
   #   Cresce só com MEDIÇÃO: o teste vivo do PreToolUse exit 2 sob never + danger-full-access, a re-ancoragem
   #   da página oficial de hooks e a varredura das notas de 0.138 a 0.163.
 #
-# MODO PRIMÁRIAS: não há decisão nesta rodada. A decisão de porta é do maestro; esta sessão nunca sela.
+# MODO PRIMÁRIAS: não havia decisão na rodada de primárias. Depois dos spikes, o maestro decidiu em 2026-10-26 (por
+# pergunta com opções, gravado por kg-decide-seal.sh): Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026 (ainda não; curar e
+# re-medir) e D_CODEX_HOOKSJSON_FIX_POR_PR_DO_CORE_1026 (quem corrige o hooks.json do porte).
 
 external_edges:
   - from: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
@@ -50,13 +52,23 @@ external_edges:
 nodes:
   - id: Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026
     node_type: question
-    plane: DEV
-    status: open
     impact: 5
     confidence: 0.5
     label: "O Codex CLI atual (outubro de 2026) roda o Onion como Onion Core, a maquinaria inteira com eficiência e eficácia equivalentes às do Claude Code, para virar uma porta nova publicada a partir do core?"
-    narrative: "Lacunas nomeadas: (1) hooks que barram de forma determinística, equivalente ao exit 2 de PreToolUse inclusive no modo mais permissivo; (2) skills, AGENTS.md e comandos; (3) subagentes TOML, spawn, modelo, isolamento, worktree; (4) MCP cliente e servidor; (5) sandbox, approval policy, perfis e o que se faz sem diálogo; (6) codex exec e CI/GitHub Action; (7) trajetória de releases de 0.137 à atual e limites relatados pela comunidade. Saída pedida: EQUIVALENTE, PARCIAL e FALTA por peça do core, com citação. Segue open: a resposta desta rodada é parcial (ver E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026) e a decisão de porta é do maestro."
     trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Ainda não; curar e re-medir: sem porta nova agora; corrigir a linha viva (hooks.json), dar ao porte uma guarda que reprove quando a confiança faltar, re-medir com a curadoria; gatilho de reabrir = gate que barra em CI sem passo interativo»"
+    narrative: |-
+      Lacunas nomeadas: (1) hooks que barram de forma determinística, equivalente ao exit 2 de PreToolUse inclusive no modo mais permissivo; (2) skills, AGENTS.md e comandos; (3) subagentes TOML, spawn, modelo, isolamento, worktree; (4) MCP cliente e servidor; (5) sandbox, approval policy, perfis e o que se faz sem diálogo; (6) codex exec e CI/GitHub Action; (7) trajetória de releases de 0.137 à atual e limites relatados pela comunidade. Saída pedida: EQUIVALENTE, PARCIAL e FALTA por peça do core, com citação. Segue open: a resposta desta rodada é parcial (ver E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026) e a decisão de porta é do maestro.
+
+      Selado por /meta:decide em 2026-10-26: escolhida «Ainda não; curar e re-medir: sem porta nova agora; corrigir a linha viva (hooks.json), dar ao porte uma guarda que reprove quando a confiança faltar, re-medir com a curadoria; gatilho de reabrir = gate que barra em CI sem passo interativo»; descartadas: «Porta experimental já» · «Encerrar: só linha viva» · «Pesquisar mais antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Porta nova do Codex: com os spikes medidos, o que fazemos?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 
   - id: E_EXECPOLICY_MOST_RESTRICTIVE_WINS
     node_type: evidence
@@ -1317,6 +1329,22 @@ nodes:
     label: "Depois dos spikes: o Codex 0.164.0 TEM o primitivo do bloqueio determinístico, mas ainda não roda o Onion Core com eficácia equivalente; hooks sobem a PARCIAL e skills a EQUIVALENTE em carregamento. Porta nova segue não autorizada por esta rodada; a decisão é do maestro."
     narrative: "Aufhebung de C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026. O QUE OS SPIKES MUDARAM: (i) 'sem equivalente provado' virou 'existe, medido, com três falhas abertas silenciosas'; (ii) o deny vale em apply_patch Add File; (iii) as skills do porte carregam; (iv) a página oficial de hooks está re-ancorada. O QUE AINDA FALTA antes de uma decisão de porta: (a) Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026, a correção do defeito medido na LINHA VIVA (E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026: o hook do porte não roda no Codex atual), que é do repo onion-codex; (b) Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026; (c) Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026, incluindo os hooks gerenciados como cura da falha 1; (d) Q_CODEX_PROJECT_TRUST_WHO_WRITES_1026 (a falha 2 já tem causa: a confiança do projeto só vale gravada, E_SPIKE_PROJECT_TRUST_ONLY_PERSISTED_1026); (e) Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026; (f) PreToolUse sobre tool MCP; (g) a varredura das notas de 0.138 a 0.163 (C_PIECE_RELEASES_TRAJECTORY_OPEN_1026) e o isolamento por worktree dos subagentes. Para a porta, o que pesa é que um Onion Core no Codex teria de fechar as falhas 1 e 2 por mecanismo próprio (hook gerenciado, ou guarda que reprove a ausência do hook), não por doutrina. As peças não tocadas pelos spikes mantêm o veredito anterior. Esta sessão não sela."
     trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+  - id: D_CODEX_HOOKSJSON_FIX_POR_PR_DO_CORE_1026
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Core faz PR + guarda; você mergeia»"
+    label: "O core prepara no onion-codex a correção do .codex/hooks.json (a chave hooks no topo) junto com uma checagem no .codex/validation que reprova hooks.json fora da forma; a curadoria re-mede com o Codex e o maestro faz o merge"
+    narrative: "Selado por /meta:decide em 2026-10-26: escolhida «Core faz PR + guarda; você mergeia»; descartadas: «Só a correção, sem guarda» · «Abro uma sessão no onion-codex» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Quem corrige o hooks.json do onion-codex?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 
 edges:
   - from: C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT
@@ -1652,4 +1680,7 @@ edges:
     edge_type: CONSTRAINS
   - from: C_RECOMMENDATION_AFTER_SPIKES_1026
     to: Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026
+    edge_type: TRACES_TO
+  - from: D_CODEX_HOOKSJSON_FIX_POR_PR_DO_CORE_1026
+    to: E_SPIKE_S4_PORT_HOOKS_JSON_REJECTED_1026
     edge_type: TRACES_TO

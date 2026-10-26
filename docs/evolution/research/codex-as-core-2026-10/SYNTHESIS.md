@@ -91,8 +91,22 @@ Claude Code nas condições das falhas 1 e 3 (confiança de hook de projeto no `
 ## Recomendação (`C_RECOMMENDATION_AFTER_SPIKES_1026`, supera `C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026`)
 
 O Codex 0.164.0 tem o primitivo do bloqueio determinístico, mas ainda não roda o Onion Core com eficácia
-equivalente. Esta rodada não autoriza a porta nova. O onion-codex segue como LINHA VIVA. **A decisão de porta é do
-maestro, e esta sessão não sela.**
+equivalente. Esta rodada não autoriza a porta nova. O onion-codex segue como LINHA VIVA.
+
+**Decisão do maestro (2026-10-26, por pergunta com opções, gravada pelo selador `kg-decide-seal.sh`).** A decisão
+de porta foi selada no nó `Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026`: **ainda não; curar e re-medir.**
+
+- Não há porta nova agora.
+- O primeiro passo é corrigir a linha viva (o `hooks.json`).
+- O segundo é dar ao porte uma guarda que reprove quando a confiança faltar.
+- Depois, a curadoria re-mede.
+- O gatilho para reabrir a decisão é um gate que barre em CI sem passo interativo.
+
+Foram descartadas três opções: a porta experimental já, encerrar e manter só a linha viva, e pesquisar mais antes.
+
+A correção tem dono no nó `D_CODEX_HOOKSJSON_FIX_POR_PR_DO_CORE_1026`. O core prepara no onion-codex a correção do
+`.codex/hooks.json`, junto com uma checagem no `.codex/validation` que reprova o `hooks.json` fora da forma. A
+curadoria re-mede com o Codex, e o maestro faz o merge.
 
 Um Onion Core no Codex teria de fechar as falhas 1 e 2 por mecanismo próprio, não por doutrina: por exemplo, um hook
 gerenciado, ou uma guarda que reprove a ausência do hook. E a LINHA VIVA tem hoje um hook que não roda (S4).

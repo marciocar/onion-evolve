@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**638 itens abertos** em 120 grafo(s) com aberto (de 159 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**637 itens abertos** em 120 grafo(s) com aberto (de 159 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -241,7 +241,7 @@
 | 3.6 | `C_OPCAO_C_DURANTE_GATE_E_POLITICA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por basel |
 | 1.8 | `C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVO |
 
-## codex-as-core-2026-10 — 22 item(ns)
+## codex-as-core-2026-10 — 21 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -254,7 +254,6 @@
 | 15.4 | `C_PIECE_RULES_SANDBOX_PARTIAL_1026` | codex-as-core-2026-10 | Sandbox, approval policy e execpolicy: PARCIAL. Há forbidden>prompt>allow por prefixo de comando, sandbox read-only/workspace-wri |
 | 12.0 | `C_PIECE_AGENTS_MD_EQUIVALENT_1026` | codex-as-core-2026-10 | AGENTS.md: EQUIVALENTE ao CLAUDE.md em descoberta e precedência por diretório (raiz ao cwd, o mais próximo prevalece, override  |
 | 11.0 | `C_PIECE_SKILLS_LOAD_EQUIVALENT_1026` | codex-as-core-2026-10 | Skills e comandos: EQUIVALENTE em carregamento (antes NÃO JULGADO). Três skills do porte carregam por $nome no 0.164.0 e uma rod |
-| 10.0 | `Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026` | codex-as-core-2026-10 | O Codex CLI atual (outubro de 2026) roda o Onion como Onion Core, a maquinaria inteira com eficiência e eficácia equivalentes à |
 | 8.0 | `Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026` | codex-as-core-2026-10 | A falha aberta declarada (erro, timeout, resposta malformada do PreToolUse) acontece de fato no 0.164.0, e um hook GERENCIADO (req |
 | 7.2 | `Q_ONION_CODEX_HOOKS_JSON_FIX_IN_PORT_1026` | codex-as-core-2026-10 | Correção na LINHA VIVA onion-codex (repo próprio, não este): envolver o .codex/hooks.json do porte em {\"hooks\": ...} e cobra |
 | 6.0 | `Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026` | codex-as-core-2026-10 | O deny do PreToolUse vale para apply_patch que EDITA (Update File) ou apaga arquivo existente, e em repositório com várias workt |
