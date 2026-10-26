@@ -31681,9 +31681,11 @@ run_radar_staleness_selftests() {
 
   printf 'axes:\n  - id: EA\n    last_run: %s\n' "${fresh_date}" > "$d/fresco.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/fresco.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if grep -q 'REGRA 65' <<< "${out}"; then
-    record_fail "radar-staleness: (a)" "eixo fresco gerou violação: ${out}"
-  else record_pass "radar-staleness: (a) eixo com rodada de hoje fica em silêncio"; fi
+  # rc 0 e sem MORREU (2026-10-26): o caso só olhava a saída, e o lint MORRIA calado em toda baseline sem
+  # `cc_version:` (o grep do gatilho de versão sob pipefail+set -e) — o "silêncio" passava com o gate morto.
+  if grep -q 'REGRA 65' <<< "${out}" || [ "${rc}" -ne 0 ] || grep -q 'MORREU' <<< "${out}"; then
+    record_fail "radar-staleness: (a)" "eixo fresco gerou violação ou o lint morreu (rc=${rc}): ${out}"
+  else record_pass "radar-staleness: (a) eixo com rodada de hoje fica em silêncio, e o lint chega ao sumário (rc 0)"; fi
 
   printf 'axes:\n  - id: EB\n    last_run: 2026-01-01\n' > "$d/velho.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/velho.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
@@ -31748,21 +31750,34 @@ run_radar_staleness_selftests() {
   #     nomeando o eixo e o motivo declarado — e o rc segue 0 (nunca HARD), mesmo sendo o único eixo.
   printf 'axes:\n  - id: EJ\n    never_run: "aberto hoje"\n' > "$d/nunca.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/nunca.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && grep -qF "eixo 'EJ' do radar de mundo NUNCA RODOU (declarado: aberto hoje)" <<< "${out}"&& ! grep -q 'SEM eixos legíveis' <<< "${out}"; then
+  if [ "${rc}" -eq 0 ] && ! grep -q 'MORREU' <<< "${out}" && grep -qF "eixo 'EJ' do radar de mundo NUNCA RODOU (declarado: aberto hoje)" <<< "${out}"&& ! grep -q 'SEM eixos legíveis' <<< "${out}"; then
     record_pass "radar-staleness: (j) eixo nunca-rodado declarado ⇒ SOFT nomeando eixo e motivo, rc 0 (nunca HARD)"
   else record_fail "radar-staleness: (j)" "nunca-rodado mal tratado (rc=${rc}): ${out}"; fi
   # (k) eixo sem data E sem declaração, no meio de eixos datados (o caso que sumia em silêncio)
   printf 'axes:\n  - id: EK1\n    last_run: %s\n  - id: EK2\n    kg: x\n  - id: EK3\n    last_run: %s\n' "${fresh_date}" "${fresh_date}" > "$d/semdata.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/semdata.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && grep -qF "eixo 'EK2' sem data de rodada e sem 'never_run:' declarado" <<< "${out}"&& ! grep -qE "eixo 'EK(1|3)'" <<< "${out}"; then
+  if [ "${rc}" -eq 0 ] && ! grep -q 'MORREU' <<< "${out}" && grep -qF "eixo 'EK2' sem data de rodada e sem 'never_run:' declarado" <<< "${out}"&& ! grep -qE "eixo 'EK(1|3)'" <<< "${out}"; then
     record_pass "radar-staleness: (k) eixo sem data e sem declaração no meio de eixos datados ⇒ SOFT só nele"
   else record_fail "radar-staleness: (k)" "eixo sem data não acusado ou vizinho acusado (rc=${rc}): ${out}"; fi
   # (l) data E never_run juntos: o carimbo de nunca-rodado sobreviveu à 1ª rodada ⇒ SOFT
   printf 'axes:\n  - id: EL\n    last_run: %s\n    never_run: "velho"\n' "${fresh_date}" > "$d/ambos.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/ambos.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && grep -qF "eixo 'EL' tem data de rodada E 'never_run:'" <<< "${out}"; then
+  if [ "${rc}" -eq 0 ] && ! grep -q 'MORREU' <<< "${out}" && grep -qF "eixo 'EL' tem data de rodada E 'never_run:'" <<< "${out}"; then
     record_pass "radar-staleness: (l) data e never_run juntos ⇒ SOFT pedindo remover o never_run"
   else record_fail "radar-staleness: (l)" "contradição não acusada (rc=${rc}): ${out}"; fi
+  # (m) arquivo cujos eixos perderam a data por digitação (sem never_run) segue HARD "SEM eixos legíveis":
+  #     eixo sem data só conta como legível quando DECLARADO nunca-rodado (passada adversarial, 2026-10-26)
+  printf 'axes:\n  - id: EM\n    lastrun: 2026-01-01\n' > "$d/typo.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/typo.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && grep -q 'SEM eixos legíveis' <<< "${out}"; then
+    record_pass "radar-staleness: (m) eixos todos sem data e sem never_run ⇒ HARD 'SEM eixos legíveis' (o alarme de arquivo quebrado não enfraquece)"
+  else record_fail "radar-staleness: (m)" "arquivo quebrado não reprovou (rc=${rc}): ${out}"; fi
+  # (n) comentário não é chave, e '#' entre aspas é texto do motivo
+  printf 'axes:\n  - id: EN1\n    last_run: %s\n    # nota: remova o never_run: depois\n  - id: EN2\n    never_run: "motivo #1 do maestro"   # comentario\n' "${fresh_date}" > "$d/coment.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/coment.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -qF "eixo 'EN1'" <<< "${out}"&& grep -qF "(declarado: motivo #1 do maestro)" <<< "${out}"; then
+    record_pass "radar-staleness: (n) never_run em comentário não conta; '#' entre aspas fica no motivo"
+  else record_fail "radar-staleness: (n)" "comentário lido como chave ou motivo cortado (rc=${rc}): ${out}"; fi
 
   rm -rf "$d"
 }
