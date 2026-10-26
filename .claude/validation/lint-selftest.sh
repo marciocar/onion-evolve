@@ -33720,6 +33720,7 @@ run_kg_edit_confirmed_selftests() {
 }
 
 run_kg_read_leg_selftests() {
+  # selftest-covers: .claude/hooks/pretooluse-env-guard.sh
   local sb2 out h idx
   sb2="$(mktemp -d)"
   mkdir -p "${sb2}/.claude/hooks" "${sb2}/docs/onion"
@@ -33887,6 +33888,62 @@ run_kg_read_leg_selftests() {
     record_pass "kg-read-leg: (i) dois .kg.yaml no mesmo comando → casa os DOIS"
   else record_fail "kg-read-leg: (i)" "casou menos que os dois alvos: ${ob:0:200}"; fi
   rm -rf "${sbb}"
+
+  # ── (m..r) A ESCRITA IN-PLACE POR BASH (SAC-240, r17 de 2026-10-23) ──────────────────────────────────
+  # Medido na r17: o mesmo arquivo rastreado dava 988 bytes de aviso por Edit e 0 por `sed -i`, que na 2.1.309
+  # é Bash comum. O hook lê o parser de comando da guarda do .env (o `segments` do GUARD_PY), então o sandbox
+  # copia OS DOIS hooks, como o runner os tem lado a lado. Cada caso confere também o rc 0: lembrete nunca barra.
+  local sbs hs ms rcs; sbs="$(mktemp -d)"
+  mkdir -p "${sbs}/.claude/hooks" "${sbs}/docs/onion" "${sbs}/src"
+  cp "${REPO_ROOT}/.claude/hooks/kg-read-leg.sh" "${REPO_ROOT}/.claude/hooks/pretooluse-env-guard.sh" "${sbs}/.claude/hooks/"
+  hs="${sbs}/.claude/hooks/kg-read-leg.sh"
+  printf 'src/alvo.ts\tC_NO_DO_SED\tdocs/onion/graph/g.kg.yaml\n' > "${sbs}/docs/onion/kg-read-index.tsv"
+  local kout="" rcs=0
+  _klr() {  # <hook> <comando> [cwd]: roda o hook com o payload de Bash; a saída vai a kout e o rc a rcs (no MESMO shell)
+    local _p; _p="$(python3 -c 'import json,sys; print(json.dumps({"tool_name":"Bash","cwd":sys.argv[2],"tool_input":{"command":sys.argv[1]}}))' "$2" "${3:-${sbs}}")"
+    rcs=0; kout="$(printf '%s' "${_p}" | bash "$1" 2>/dev/null)" || rcs=$?
+  }
+  local m1 m2 m3 m4 r1 r2 r3 r4
+  # (m) `sed -i`, `sed --in-place` e `perl -pi` sobre arquivo indexado → avisam e nomeiam o nó, rc 0
+  _klr "${hs}" "sed -i 's/a/b/' src/alvo.ts"; m1="${kout}"; r1="${rcs}"
+  _klr "${hs}" "sed --in-place -e s/a/b/ src/alvo.ts"; m2="${kout}"; r2="${rcs}"
+  _klr "${hs}" "perl -pi -e 's/a/b/' src/alvo.ts"; m3="${kout}"; r3="${rcs}"
+  _klr "${hs}" "sed -i 's/a/b/' alvo.ts" "${sbs}/src"; m4="${kout}"; r4="${rcs}"
+  if grep -q 'C_NO_DO_SED' <<< "${m1}" && grep -q 'C_NO_DO_SED' <<< "${m2}" && grep -q 'C_NO_DO_SED' <<< "${m3}" \
+     && grep -q 'C_NO_DO_SED' <<< "${m4}" && [ "${r1}${r2}${r3}${r4}" = "0000" ] \
+     && printf '%s' "${m1}" | python3 -c 'import json,sys; assert json.load(sys.stdin)["hookSpecificOutput"]["additionalContext"]' 2>/dev/null; then
+    record_pass "kg-read-leg: (m) sed -i, sed --in-place e perl -pi sobre arquivo indexado avisam (também relativo ao cwd), rc 0"
+  else record_fail "kg-read-leg: (m)" "rc=${r1}${r2}${r3}${r4} sed-i=[${m1:0:60}] in-place=[${m2:0:60}] perl=[${m3:0:60}] cwd=[${m4:0:60}]"; fi
+  # (n) `sed -i` sobre arquivo NÃO indexado → silêncio
+  _klr "${hs}" "sed -i 's/a/b/' src/outro.ts"; m1="${kout}"; r1="${rcs}"
+  if [ -z "${m1}" ] && [ "${r1}" = "0" ]; then record_pass "kg-read-leg: (n) sed -i sobre arquivo não indexado → calado, rc 0"
+  else record_fail "kg-read-leg: (n)" "rc=${r1} falou sobre arquivo fora do índice: ${m1:0:120}"; fi
+  # (o) `sed` SEM -i (leitura, ou `i` só dentro do script) e o `sed -i` que é só TEXTO de um echo → silêncio
+  _klr "${hs}" "sed -n 1,5p src/alvo.ts"; m1="${kout}"; r1="${rcs}"
+  _klr "${hs}" "sed 's/-i/x/' src/alvo.ts"; m2="${kout}"; r2="${rcs}"
+  _klr "${hs}" "echo sed -i x src/alvo.ts"; m3="${kout}"; r3="${rcs}"
+  if [ -z "${m1}${m2}${m3}" ] && [ "${r1}${r2}${r3}" = "000" ]; then
+    record_pass "kg-read-leg: (o) sed sem -i, -i dentro do script e sed -i citado por echo → calados, rc 0"
+  else record_fail "kg-read-leg: (o)" "rc=${r1}${r2}${r3} leitura=[${m1:0:60}] script=[${m2:0:60}] echo=[${m3:0:60}]"; fi
+  # (p) SEM a guarda do .env ao lado o ramo do sed CALA e não quebra (rc 0); o Read segue avisando
+  ms="$(mktemp -d)"; mkdir -p "${ms}/.claude/hooks" "${ms}/docs/onion"
+  cp "${hs}" "${ms}/.claude/hooks/"; cp "${sbs}/docs/onion/kg-read-index.tsv" "${ms}/docs/onion/"
+  _klr "${ms}/.claude/hooks/kg-read-leg.sh" "sed -i 's/a/b/' src/alvo.ts" "${ms}"; m1="${kout}"; r1="${rcs}"
+  m2="$(printf '{"tool_name":"Read","tool_input":{"file_path":"%s/src/alvo.ts"}}' "${ms}" | bash "${ms}/.claude/hooks/kg-read-leg.sh" 2>&1 || true)"
+  if [ -z "${m1}" ] && [ "${r1}" = "0" ] && grep -q 'C_NO_DO_SED' <<< "${m2}"; then
+    record_pass "kg-read-leg: (p) sem a guarda do .env o ramo do sed cala com rc 0, e o Read segue avisando"
+  else record_fail "kg-read-leg: (p)" "rc=${r1} sed=[${m1:0:80}] read=[${m2:0:80}]"; fi
+  # (q) MUTANTE: sem o ramo do Bash in-place (o laço dos segmentos desligado), o 1º caso do (m) CALA
+  sed 's|                for seg in segments(cmd):|                for seg in []:  # ONION_MUTANTE|' "${hs}" > "${ms}/.claude/hooks/kg-read-leg.sh"
+  cp "${sbs}/.claude/hooks/pretooluse-env-guard.sh" "${ms}/.claude/hooks/"
+  if cmp -s "${hs}" "${ms}/.claude/hooks/kg-read-leg.sh"; then
+    record_fail "kg-read-leg: (q-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  else
+    _klr "${ms}/.claude/hooks/kg-read-leg.sh" "sed -i 's/a/b/' src/alvo.ts" "${ms}"; m1="${kout}"
+    if [ -z "${m1}" ]; then record_pass "kg-read-leg: (q-MUT) sem o ramo do Bash o sed -i volta a calar — (m) é load-bearing"
+    else record_fail "kg-read-leg: (q-MUT)" "o mutante ainda avisou: ${m1:0:120}"; fi
+  fi
+  rm -rf "${ms}" "${sbs}"
 
 }
 
