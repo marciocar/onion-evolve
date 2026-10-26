@@ -1,6 +1,6 @@
 {
-  "version": "4.29.1",
-  "tag": "kg-ssot-v4.29.1",
+  "version": "4.30.0",
+  "tag": "kg-ssot-v4.30.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -51,6 +51,8 @@
     "tools/kg_vector.py",
     "tools/requirements-vector.txt",
     "tools/requirements-rdf.txt",
+    "skills/kg-ssot/",
+    ".claude-plugin/",
     "tools/kg_release_notes.py",
     "tools/kg_mcp.py",
     "tools/kg_migrate.py",

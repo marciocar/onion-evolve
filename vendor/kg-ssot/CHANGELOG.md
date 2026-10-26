@@ -10,6 +10,12 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.30.0] - 2026-10-26
+
+The release carries the agent skill `skills/kg-ssot/` (Agent Skills format) and a Claude Code plugin marketplace in
+`.claude-plugin/`. In a pre-registered test, agents with the skill matched the agents without it (12 of 12) with 45%
+of the output tokens and 54% of the tool calls. Contract v4.15, unchanged.
+
 ## [4.29.1] - 2026-10-26
 
 `kg_prov_export.py` no longer emits a broken IRI for a malformed edge end. Contract v4.15, unchanged.

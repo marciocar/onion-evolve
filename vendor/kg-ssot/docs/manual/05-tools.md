@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.29.1",
+  "release": "kg-ssot-v4.30.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -718,6 +718,21 @@ write or a name that does not exist comes with `isError: true`, so the model can
     405.
   - **Measured with official clients:** the Python `mcp` SDK 2.3.0, which is v2, in the new era, over stdio and over
     HTTP; and the TypeScript SDKs 1.30.0, the one LibreChat uses, and 1.32.1 in the old era. CI runs all three.
+
+## `skills/kg-ssot/`: the agent skill (4.30.0)
+
+The release carries a skill in the [Agent Skills](https://agentskills.io) format: a `SKILL.md` that tells a coding
+agent how to write a graph that passes, how to fix by code, how to query, and when to read one of its references
+(the contract, the fixes, the domain vocabulary, the edge to another graph, the pre-registered criterion and the gate
+in CI). It has no code of its own: it points to the tools on this page.
+
+- **Install it** with `npx skills add marciocar/kg-ssot -s kg-ssot`, which copies the folder into the skills
+  directory of each client you pick (Claude Code, Codex and others).
+- **In Claude Code**, it is also a plugin: `/plugin marketplace add marciocar/kg-ssot`, then
+  `/plugin install kg-ssot@kg-ssot`.
+- **What it buys:** in a pre-registered test of 24 runs, agents with and without the skill got 12 of 12 right; with
+  it, they used 45% of the output tokens and 54% of the tool calls. Without it, they read the schemas inside the
+  package and wrote by trial and error.
 
 ## `kg_query.py`: query and projection over the corpus
 

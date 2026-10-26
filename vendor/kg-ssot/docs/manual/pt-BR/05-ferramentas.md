@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:bfb12a3b94d6ab24 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:8a70e44cbbf594f5 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.29.1",
+  "release": "kg-ssot-v4.30.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -710,6 +710,21 @@ recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir 
     com a versão pedida quando a conhece. O servidor nunca emite `Mcp-Session-Id`, e GET e DELETE dão 405.
   - **Medido com clientes oficiais:** o SDK Python `mcp` 2.3.0, que é o v2, na era nova, por stdio e por HTTP; e os
     SDKs TypeScript 1.30.0, o que o LibreChat usa, e 1.32.1 na era antiga. O CI roda os três.
+
+## `skills/kg-ssot/`: a skill de agente (4.30.0)
+
+A release traz uma skill no formato [Agent Skills](https://agentskills.io): um `SKILL.md` que diz a um agente de
+código como escrever um grafo que passa, como corrigir pelo código, como consultar e quando ler uma das referências
+(o contrato, as correções, o vocabulário de domínio, a aresta para outro grafo, o critério pré-registrado e o gate no
+CI). Ela não tem código próprio: aponta para as ferramentas desta página.
+
+- **Instale** com `npx skills add marciocar/kg-ssot -s kg-ssot`, que copia a pasta para o diretório de skills de cada
+  cliente que você escolher (Claude Code, Codex e outros).
+- **No Claude Code**, ela é também um plugin: `/plugin marketplace add marciocar/kg-ssot` e depois
+  `/plugin install kg-ssot@kg-ssot`.
+- **O que ela rende:** num teste pré-registrado de 24 execuções, os agentes com e sem a skill acertaram 12 de 12; com
+  ela, gastaram 45% dos tokens de saída e 54% das chamadas de ferramenta. Sem ela, leram os schemas dentro do pacote e
+  escreveram por tentativa.
 
 ## `kg_query.py`: a consulta e a projeção do corpus
 
