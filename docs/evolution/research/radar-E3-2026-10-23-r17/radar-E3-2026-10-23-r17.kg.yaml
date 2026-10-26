@@ -236,18 +236,22 @@ nodes:
   - id: Q_GUARDA_DE_ISOLAMENTO_ACEITA_O_PREFIXO_LC_ALL_DA_CASA_1023
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 2
     confidence: 0.5
-    verified_at: "2026-10-23"
-    verified_against: "proposta da r17 após o REPROVA do juiz: num clone descartável, um Agent com isolation worktree roda LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive e registra se a guarda endurecida o recusa; issue SAC-241"
     label: "a guarda de isolamento de worktree endurecida na 2.1.309 aceita o padrão LC_ALL=C bash .claude/validation/... que a casa usa nos agentes isolados?"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções (/meta:decide): escolhida «Eu faço agora (fechar pela medida): em 2026-10-25 e 26, no CLI 2.1.310, os agentes isolados em worktree rodaram o padrão LC_ALL=C bash .claude/validation/lint-selftest.sh --families ... sem recusa da guarda (relatórios dos PRs #1355, #1357, #1358, #1361, #1364, #1368, #1370 e #1371)»"
+    narrative: |-
+      verified_against anterior: «proposta da r17 após o REPROVA do juiz: num clone descartável, um Agent com isolation worktree roda LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive e registra se a guarda endurecida o recusa; issue SAC-241»
+      proveniência anterior: source «https://linear.app/sacola/issue/SAC-241» · locator «issue SAC-241 do projeto Onion — core: próximas levas» · method «derivado: proposta da rodada a partir de E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023» · locality «web»
+      Selado por /meta:decide em 2026-10-26: escolhida «Eu faço agora (fechar pela medida): em 2026-10-25 e 26, no CLI 2.1.310, os agentes isolados em worktree rodaram o padrão LC_ALL=C bash .claude/validation/lint-selftest.sh --families ... sem recusa da guarda (relatórios dos PRs #1355, #1357, #1358, #1361, #1364, #1368, #1370 e #1371)»; descartadas: «Só medir e fechar o (2)» · «Depois».
     provenance:
-      source: "https://linear.app/sacola/issue/SAC-241"
-      locator: "issue SAC-241 do projeto Onion — core: próximas levas"
-      method: "derivado: proposta da rodada a partir de E_ITENS_DE_CLAUDE_MD_ANINHADO_E_WORKTREE_SEM_SUPERFICIE_1023"
-      locality: "web"
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-26: «Faço agora a engenharia pequena dos radares?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
   - id: C_SUPERACAO_20261023_DENY_MORA_NO_RUNNER_DO_CONVIDADO
     node_type: claim
     layer: audit
