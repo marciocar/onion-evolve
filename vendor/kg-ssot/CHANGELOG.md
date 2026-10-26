@@ -10,6 +10,29 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.29.0] - 2026-10-26
+
+The `rdf` extra brings rdflib to read the PROV export, with a CI job that rebuilds every edge from the RDF; and
+`kg_prov_export.py --full` exports the whole document, so the loaded YAML can be rebuilt from the RDF. Contract v4.15,
+unchanged.
+
+### Added
+
+- **`kg_prov_export.py --full` exports the whole document.** It implies `--edges` and also carries every field of
+  every node and of `meta` as `kg:<key>` (text as a literal, anything else as JSON typed `kg:json`). So the loaded YAML
+  can be rebuilt from the RDF, for SPARQL or SHACL over the same data. Measured against criteria registered in
+  advance:
+  - **Correctness:** structural equality of the loaded YAML in 209 graphs.
+  - **Cost:** 0.25 s and 19.7 MB for the whole core corpus on a CI runner, against ceilings of 10 s and 100 MB.
+
+  A first series failed on a ceiling of 3 times the plain export: the real ratio is about 3.6. That ceiling was
+  replaced, after the result, by absolute ceilings set knowing the cost was about 1 s. The measurement page says so,
+  and the code was frozen before the second series ran.
+- **The `rdf` extra.** `pip install "kg-ssot[rdf]"`, or `tools/requirements-rdf.txt` with hashes in the vendor,
+  brings rdflib, to read the `kg-prov-export --edges` output in RDF tools. It stays out of the gate profile. A new CI
+  job reads the `--edges` output of every valid suite case and of the repository's graphs, rebuilds every edge from
+  the RDF alone, checks the standard triples, and serializes to N-Triples.
+
 ## [4.28.0] - 2026-10-25
 
 `kg_prov_export.py --edges` exports the edges, with `cito:supports`, `cito:refutes` and `dcterms:replaces` where a

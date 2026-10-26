@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:fa50ab8cb3c4df8a -->
+<!-- translation-of: ADOPTING.md sha256:8ce6e3d7fd29a1c1 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -340,6 +340,11 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.28.0` para a `kg-ssot-v4.29.0`, o contrato fica no v4.15, e o gate e o validador não mudam. O perfil
+completo traz um arquivo novo, o `tools/requirements-rdf.txt` (rdflib, com hash), para quem quer ler a exportação PROV
+em ferramentas RDF; o perfil `gate` não muda. O `kg_prov_export.py` ganha `--full`, que exporta o documento inteiro;
+sem ele, e com `--edges`, a saída é byte a byte a mesma.
 
 Da `kg-ssot-v4.27.0` para a `kg-ssot-v4.28.0`, o contrato fica no v4.15, e o gate e o validador não mudam. O
 `kg_prov_export.py` ganha `--edges`, desligado por padrão: sem ele, a saída é byte a byte a mesma.

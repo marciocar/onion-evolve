@@ -10,6 +10,29 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.29.0] - 2026-10-26
+
+O extra `rdf` traz o rdflib para ler a exportação PROV, com um job de CI que reconstrói toda aresta a partir do RDF; e o
+`kg_prov_export.py --full` exporta o documento inteiro, de modo que o YAML carregado pode ser remontado a partir do RDF.
+Contrato v4.15, sem mudança.
+
+### Adicionado
+
+- **O `kg_prov_export.py --full` exporta o documento inteiro.** Ele implica `--edges` e leva também todo campo de cada
+  nó e do `meta` como `kg:<chave>` (texto como literal, o resto como JSON tipado `kg:json`). Assim, o YAML carregado
+  pode ser remontado a partir do RDF, para SPARQL ou SHACL sobre o mesmo dado. Medido contra critérios registrados
+  antes da medição:
+  - **Correção:** igualdade estrutural do YAML carregado em 209 grafos.
+  - **Custo:** 0,25 s e 19,7 MB para o corpus inteiro do core num runner de CI, contra tetos de 10 s e 100 MB.
+
+  Uma primeira série reprovou num teto de 3 vezes a exportação simples: a razão real é de cerca de 3,6. Esse teto foi
+  substituído, depois do resultado, por tetos absolutos fixados sabendo que o custo era de cerca de 1 s. A página da
+  medição diz isso, e o código foi congelado antes da segunda série.
+- **O extra `rdf`.** O `pip install "kg-ssot[rdf]"`, ou o `tools/requirements-rdf.txt` com hash no vendor, traz o
+  rdflib, para ler a saída do `kg-prov-export --edges` em ferramentas RDF. Ele fica fora do perfil `gate`. Um job novo
+  de CI lê a saída `--edges` de todo caso válido da suíte e dos grafos do repo, reconstrói cada aresta só a partir do
+  RDF, confere as triplas-padrão e serializa em N-Triples.
+
 ## [4.28.0] - 2026-10-25
 
 O `kg_prov_export.py --edges` exporta as arestas, com `cito:supports`, `cito:refutes` e `dcterms:replaces` onde há

@@ -1,0 +1,9 @@
+# O extra rdf (kg_prov_export.py --edges lido por um leitor RDF, desde a 4.29): versão exata e o sha256 de cada
+# arquivo publicado, gerado por packaging/python/lock.py. Instale junto com tools/requirements.txt e --require-hashes.
+# O rdflib é direto; o pyparsing é a única dependência dele no Python 3.11 ou mais.
+rdflib==7.6.0 \
+    --hash=sha256:30c0a3ebf4c0e09215f066be7246794b6492e054e782d7ac2a34c9f70a15e0dd \
+    --hash=sha256:6c831288d5e4a5a7ece85d0ccde9877d512a3d0f02d7c06455d00d6d0ea379df
+pyparsing==3.3.3 \
+    --hash=sha256:928ae7e20211f3b6f3915a72f06a0cfd29ab9d24279dd6346b6b1a7146397d36 \
+    --hash=sha256:ece8c00a69cf01b45d0b1dedabb469c90d8caf996d4fda40f147627a122849a4
