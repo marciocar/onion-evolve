@@ -3,15 +3,15 @@ branch: fix/sge-review-trampoline-index-readleg
 pr: pendente
 date: 2026-10-26
 reviewed_diff_sha256: pendente
-findings_total: 5
-findings_real: 5
+findings_total: 6
+findings_real: 6
 tokens: 0
 duration_min: 20
-findings_fixed: 1
+findings_fixed: 2
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: sessão de execução (passada inline, sondas executadas contra o hook real e repos git descartáveis)
-nota: "tokens 0 = não medido: a passada foi inline na sessão de execução, sem subagente. Os três defeitos de origem vêm da revisão adversarial do adotante sge sobre o update para o pin 76ccb2f8aef4; os 5 achados abaixo são da MINHA passada sobre a cura deles."
+nota: "tokens 0 = não medido: a passada foi inline na sessão de execução, sem subagente. Os três defeitos de origem vêm da revisão adversarial do adotante sge sobre o update para o pin 76ccb2f8aef4; os 6 achados abaixo são da MINHA passada sobre a cura deles (o 6º, pré-existente, veio da prova do gate)."
 ---
 
 # Passada adversarial: `fix/sge-review-trampoline-index-readleg`
@@ -68,6 +68,13 @@ Passada adversarial sobre a cura (sondas executadas contra o hook real, num sand
 5. **REAL, DECLARADO (pré-existente, não tocado).** O 1º ramo da perna (o regex de `.kg.yaml` sobre o
    comando cru) segue vendo menções a `.kg.yaml` dentro de corpo de heredoc. É aviso de menção a grafo,
    não de edição, e mudá-lo é outra leva.
+
+6. **REAL, CURADO (pré-existente, achado pela prova do gate).** A `prove-gate-blocks.sh .` no core dava
+   "controle rc 1 sem HARD medida". Com `bash -x` num clone sem `origin`, a causa: a guarda
+   anti-commit-na-default-branch do `.githooks/pre-commit` (core-only) lia `symbolic-ref
+   refs/remotes/origin/HEAD | sed` sob `pipefail` + `set -e`, e sem `origin` o hook morria ali, rc 1 sem
+   uma palavra. É a mesma classe do caso (g) da família githook no template. Cura: `|| true` dentro do
+   grupo, antes do pipe. Caso (i) e mutante (i-MUT) na família githook.
 
 Sondas que confirmaram a cura: here-string `<<<` não abre corpo (avisa); dois heredocs na mesma linha
 (`<<A <<B`) consomem os dois corpos em ordem e o `sed -i` depois avisa; heredoc sem terminador cala;
