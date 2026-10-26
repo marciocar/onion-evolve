@@ -1,0 +1,331 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "data/2.1.311.txt não bate byte a byte com a seção ## 2.1.311 do CHANGELOG oficial, ou um label/verified_against cita texto ou número de linha do item que não está lá",
+   "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V='## 2.1.311' '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-26-r19/data/2.1.311.txt; grep -n '' no arquivo para as linhas citadas"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+   "check": "re-executar a medição do nó (o censo com raiz '.'; npm view do SDK; gh api do compare v1.0.262...v1.0.263; gh issue view 85039 e 88747; git config --show-origin core.hooksPath; o hook premodelswitch-guard.sh com JSON no stdin; grep no core; a família cited_directive)"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+   "check": "ler o label e o verified_against e conferir no core (grep/ls/leitura do hook) que a superfície existe e se comporta como afirmado"
+  },
+  {
+   "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+   "when": "a rodada propõe superar um nó da rodada anterior que não existe, ou cujo estado afirmado ainda vale; ou deixa de superar um nó da rodada anterior cujo estado a medição de hoje derrubou",
+   "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-10-24-r18/radar-E3-2026-10-24-r18.kg.yaml e comparar o estado que ele afirma com a medição de hoje"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core (hook, guarda, settings, comando, CI, bridge, worktree, core.hooksPath, adotante) e a rodada não o mediu nem o listou",
+   "check": "para cada item de data/2.1.311.txt, grep do termo-chave no core (.claude, ops, .github, CLAUDE.md) e leitura da superfície achada"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "CU1 — cópia data/2.1.311.txt",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "curl -s do CHANGELOG oficial (raw anthropics/claude-code main) | awk da seção '## 2.1.311' até o próximo '## ' > sec.txt; cmp sec.txt data/2.1.311.txt → IDENTICAL, diff rc 0; wc -l = 95; grep -c '^- ' = 92. Conferi com cat -n todas as linhas citadas nos nós (3, 5, 9, 10, 11, 12, 14, 24-26, 30, 32, 36, 37, 45, 51, 52, 53, 58, 59, 67, 68, 70, 71, 74, 75, 76, 85, 90-94): cada uma diz o que o nó afirma (24 é o reinício de sessão de fundo, 25 o daemon e 26 o respawn)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "cópia byte a byte fiel; numeração de linhas confere"
+  },
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "bash .claude/validation/cc-delta-census.sh . --markdown → 'DELTA 1 versão(ões): 2.1.311 a 2.1.311'; baseline 2.1.310, disco 2.1.311, processo 2.1.311, SDK bridge 2.1.310 (SDK 0.3.310); seção 2.1.311 com 95 linhas e 92 itens"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz número a número"
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "leitura do nó (question open) e varredura dos 92 itens contra o core; as lacunas achadas vão como entradas 'omissão:' separadas"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "a pergunta é legítima; fecha só depois de incorporar as 4 omissões abaixo"
+  },
+  {
+   "alvo": "E_HOST_NA_2_1_311_BRIDGE_E_REVISOR_NA_2_1_310_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "censo: disco/processo 2.1.311, SDK bridge 2.1.310 (0.3.310); npm view @anthropic-ai/claude-agent-sdk version claudeCodeVersion → 0.3.311 / 2.1.311; grep -n claude-code-action .github/workflows/onion-review.yml → linhas 291 e 436 com 925afb53; gh api .../tags → v1.0.262 = 925afb53, v1.0.263 = 8041f1d1 (o git/ref devolve o objeto da tag anotada 3b7e1a45, que aponta 8041f1d1); action.yml na v1.0.262 linha 150 CLAUDE_CODE_VERSION=2.1.310, na v1.0.263 = 2.1.311; compare v1.0.262...v1.0.263 = 1 commit 'chore: bump Claude Code to 2.1.311 and Agent SDK to 0.3.311', 6 arquivos (action.yml, 2 bun.lock, 2 package.json, src/entrypoints/run.ts), só versões; gh variable list --json name → [] (ONION_REVIEW_MODE ausente, revisor off)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "imprecisão menor: '8041f1d1' é o commit, não o sha do objeto da tag anotada; para o uses: o commit é o certo"
+  },
+  {
+   "alvo": "E_BRIDGE_RETOMA_SESSAO_E_A_ORDEM_DO_TRANSCRIPT_SO_CHEGA_COM_A_SUBIDA_1026",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "sed -n 486,493p src/chat.ts no clone de desenvolvimento → a linha 491 existe, mas o clone tem node_modules SDK 0.3.232 (claudeCodeVersion 2.1.232), ou seja, código atrás do servido. No bridge SERVIDO (lido como a conta do serviço, sudo -n -u <conta>): grep -n resume src/chat.ts → só comentários (310, 511, 516), sem 'resume: sessionId'; grep -rn 'resume[:,]' src → src/chat-query-options.ts:84 '...(f.sessionId ? { resume: f.sessionId } : {})', chamado por chatQueryOptions({... sessionId ...}) em src/chat.ts ~466; SDK servido 0.3.310 / 2.1.310"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(reescrita) trocar a âncora pela do bridge SERVIDO: o /chat retoma sessões por resume em src/chat-query-options.ts linha 84 (montado em src/chat.ts por chatQueryOptions), servindo o CLI 2.1.310 do SDK 0.3.310; o clone de desenvolvimento (SDK 0.3.232, src/chat.ts linha 491) está atrás do servido e não serve de prova. A conclusão (a linha 11 só chega com a subida; a linha 70 não muda o que a casa lê) fica de pé",
+    "medida": "grep -rn 'resume[:,]' na árvore src do bridge servido como a conta do serviço → chat-query-options.ts:84; grep version/claudeCodeVersion no package.json do SDK servido → 0.3.310 / 2.1.310; idem no clone de desenvolvimento → 0.3.232 / 2.1.232"
+   },
+   "nota": "conclusão certa, prova colhida em código defasado: a linha 491 do clone não é o que roda em produção"
+  },
+  {
+   "alvo": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_311_E_PIN_DO_REVISOR_PARA_V1_0_263_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "a razão (resume no /chat) existe no servido (chat-query-options.ts:84); npm view → 0.3.311/2.1.311; tags → v1.0.263 = 8041f1d1, CLI 2.1.311 na linha 150 do base-action/action.yml; gh variable list --json name → [] (revisor off, então o pin é paridade)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "proposta coerente com o medido; o deploy segue do maestro"
+  },
+  {
+   "alvo": "E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_311_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "git config --show-origin --show-scope --get-all core.hooksPath → local, .git/config do checkout principal, valor absoluto ⟨raiz⟩/.githooks; git config --get extensions.worktreeConfig → rc 1 (ausente); stat: .git/config e .git/worktrees/agent-a94f09617a1a7850a/ com mtime 22:37:54.379259787 idêntico; gh issue view 85039 e 88747 -R anthropics/claude-code → OPEN, closedAt null; grep -niE 'worktree|hookspath|git hook' na cópia → só a linha 14 (e 12/80 por 'hooks', que não são de git); grep onion-hook-trampoline → pre-commit 17/35 e pre-push 38/56"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz integralmente"
+  },
+  {
+   "alvo": "E_WORKTREE_DE_SUBAGENTE_NAO_SOME_COM_FILHO_EM_FUNDO_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -n -iE 'worktree|isolation' .claude/skills/onion-orchestration/SKILL.md → linhas 79, 278, 281, 289 existem; git worktree list --porcelain → 5 worktrees em .claude/worktrees (4 agent-*, todas locked, e discuss+onion-pessoal-app)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "nuance: a skill prescreve partição primeiro e worktree só com sobreposição (linhas 286-289), não 'worktree por worker' incondicional; o caso aninhado é real porque o juiz da rodada roda dentro da worktree da rodada"
+  },
+  {
+   "alvo": "E_CLAUDE_MD_E_MEMORIA_FRESCOS_APOS_COMPACTACAO_1026",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "git log --since=2026-09-26 --oneline -- CLAUDE.md | wc -l → 22 (confere). Maior item de lista: por linhas contíguas → linha 10, 15 linhas, 1.391 caracteres (confere); contando o conteúdo aninhado como o Markdown conta (sub-itens, citações '>' e parágrafos indentados até o próximo item de topo) → o item 'CORE ≠ FAMÍLIA' da linha 29: 62 linhas, 4.969 caracteres (python sobre o arquivo). Nas .claude/rules o maior é 623 (dissect-lens.md)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(reescrita) o maior item de lista do CLAUDE.md depende de como se conta: 1.391 caracteres em 15 linhas (linha 10) se só as linhas contíguas contam, ou 4.969 caracteres em 62 linhas (o 'CORE ≠ FAMÍLIA', linha 29) se contam os sub-itens, as citações e os parágrafos aninhados, como no Markdown. O limiar do congelamento não está no CHANGELOG, então os dois números ficam declarados. As rules ficam abaixo de 623. A linha 10 tem instrumento no core: o InstructionsLoaded registra load_reason=compact (ver a omissão)",
+    "medida": "python sobre o CLAUDE.md com e sem continuação aninhada → (10, 15, 1391) e (29, 62, 4969); python sobre .claude/rules/*.md → máximo 623"
+   },
+   "nota": "o número único subestima o item mais longo em 3,6x; o resto do nó (PreCompact só grava migalha, chat-runner nega Edit/Write em CLAUDE.md) conferido em ops/chat-runner.sh 621-623"
+  },
+  {
+   "alvo": "E_GUARDA_DE_MODELO_INDIFERENTE_AO_SUFIXO_1M_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "linha 68 do hook = to_base=\"${to%%\\[*}\"; executei premodelswitch-guard.sh com JSON no stdin (PreModelSwitch, from claude-fable-5-1, source picker, ONION_MODEL_SWITCH_LOG no scratchpad): opus-5-5 rc 0 e opus-5-5[1m] rc 0 (allow, degraded); sonnet-5-5 rc 2 e sonnet-5-5[1m] rc 2 (PISO); haiku-5-5 rc 2 (fora de session_models); fable-5-1[1m] rc 0 (same); sonnet-5-5[1m] com source fallback rc 0. fallbackModel do .claude/settings.json = opus-5-5, opus-5, sonnet-5-5, sem sufixo"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "o log guarda o nome cru (com ou sem [1m]), e nenhum leitor do model-switch.jsonl compara por nome (session-degraded-notice.sh lê a escada)"
+  },
+  {
+   "alvo": "E_POSTTOOLUSE_CALA_NO_TIMEOUT_COM_SAIDA_PARCIAL_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "Bash com timeout 3000 em python -u que imprime, dorme 9 s e imprime → resultado com 'primeira-linha-juiz' + 'Command did not complete within its 3s timeout and was moved to the background (ID: bvi1c101w)'; nenhuma mensagem do bash-empty-result-guard.sh nesse resultado (a guarda disparou em outras chamadas minhas, então está ativa); a tarefa terminou com exit 0"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz; a 2ª superfície que lê esse texto (background-task-probe.sh) vai como omissão"
+  },
+  {
+   "alvo": "E_SUBAGENTE_VE_MCP_QUE_CONECTA_DEPOIS_1026",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rln mcp__ .claude/agents → 3 arquivos, mas lendo só o frontmatter (awk entre os '---') e fazendo grep mcp: jira-specialist → mcp__claude_ai_Atlassian__authenticate/complete_authentication; system-documentation-orchestrator → 5 mcp__code-understanding__*; agent-creator-specialist → NENHUMA (o tools: dele é Read/Write/Edit/...; as menções a mcp__ estão em prosa, linhas 183-249, e num exemplo de antipadrão, linha 905)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(reescrita) dois agentes do core declaram ferramentas MCP (jira-specialist, com o conector Atlassian, e system-documentation-orchestrator, com o code-understanding); o agent-creator-specialist só as cita em prosa. Os 51 agentes têm tools: explícito; a superfície mais exercitada é o subagente general-purpose (juiz e refutador da casa), que herda todo MCP: nesta sessão do juiz, ferramentas de conectores claude.ai chegaram depois do início, que é o caso da linha 9. Nenhuma guarda depende disso",
+    "medida": "awk do frontmatter + grep mcp nos 3 agentes → 2, 5 e 0 entradas; contagem de agentes sem tools: no frontmatter → 0 de 51"
+   },
+   "nota": "contagem errada (3 em vez de 2) por grep de corpo, não de frontmatter"
+  },
+  {
+   "alvo": "E_AGENT_TEAMS_SENDMESSAGE_E_WORKFLOW_SEM_MUDANCA_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -nE 'SendMessage|Workflow|scriptPath|TeamCreate' na cópia → rc 1 (zero); settings de usuário (só nomes de chave por python): env CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS, teammateMode=auto; grep -rlF em .claude, ops, .github, CLAUDE.md: TeamCreate 0, DISABLE_COMPACT 0, SendMessage em house-code-gloss.sh, settings.json (linha 200, matcher 'SendMessage|Write|Edit'), execution-agent-preamble.md e CLAUDE.md (prosa)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rlF em .claude, ops, .github, CLAUDE.md (sem bancada/fixtures): SubagentStop 0, CLAUDE_CODE_RETRY_WATCHDOG 0, DISABLE_COMPACT 0, CLAUDE_CODE_SYNC_SKILLS 0, self-hosted-runner 0, ultrathink 0, 'claude daemon' 0, 'claude respawn' 0, CLAUDE_CODE_MODEL_CATALOG 0, DISABLE_TELEMETRY 0, plugin-dir 1 (só um diário), bwrap 0, chave sandbox 0 (core e usuário); grep .mcp.json em ops/publish-door.sh, ops/materialize-door.sh, ops/door-templates, .claude/utils/marketplace → rc 1; eventos de hook: core Stop×2 e sem SubagentStop, usuário Notification e Stop; nenhum frontmatter com hooks: em agents/skills/commands (grep rc 1)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "certo para o CORE; a linha 85 (DISABLE_TELEMETRY) tem superfície no HOST, na extensão do VS Code (ver omissão)"
+  },
+  {
+   "alvo": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_311_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 0, 'Falharam: 0', 'OK ✓ — todas as guardas reagiram conforme esperado.'; git status --porcelain depois → só o diretório da rodada (sem fixture órfã)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "superação",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024' na r18 → linha 54, status confirmed, afirma host 2.1.310 e bridge/revisor 2.1.309; hoje o censo dá host 2.1.311 e bridge 2.1.310, e o pin é 925afb53 (v1.0.262, CLI 2.1.310): as duas metades caíram. E_SDK_DO_BRIDGE_NA_0_3_310_E_PIN_DO_REVISOR_EM_V1_0_262_1024 (r18 linha 274) afirma bridge 0.3.310/2.1.310 e pin v1.0.262, e segue VERDADEIRO hoje. post-review-comment.sh sem commit desde 2026-10-24 (git log --since), linhas 113/119 iguais, então E_REVISOR_SEM_SANITIZAR_ARROBA_NO_PIN_V1_0_260_1024 segue de pé. Guardas cited_directive: r16, r17 e r18 nunca superaram a anterior (precedente)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "RECOMENDAÇÃO: forma (a), UMA aresta: external_edges: - from: E_HOST_NA_2_1_311_BRIDGE_E_REVISOR_NA_2_1_310_1026 / to: docs/evolution/research/radar-E3-2026-10-24-r18/radar-E3-2026-10-24-r18.kg.yaml#E_HOST_NA_2_1_310_BRIDGE_E_REVISOR_NA_2_1_309_1024 / edge_type: SUPERSEDES. NÃO superar E_SDK_DO_BRIDGE_NA_0_3_310_E_PIN_DO_REVISOR_EM_V1_0_262_1024 (vale), Q_SUBIR_..._2_1_310_1024 (done, respondida na própria r18), E_GUARDA_..._2_1_310_1024 (precedente), E_REVISOR_SEM_SANITIZAR_ARROBA (vale). NÃO VERIFICADO: o estado da SAC-239 no Linear (E_SAC_239_..._1024 diz Backlog), porque não há .env na worktree"
+  },
+  {
+   "alvo": "omissão: InstructionsLoaded e o caminho da compactação (linhas 7, 10 e 59)",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "o censo lista 'InstructionsLoaded · instructions-loaded-log.sh' entre os 26 hooks; o cabeçalho do hook registra load_reason (session_start|nested_traversal|path_glob_match|include|compact); python sobre .claude/sessions/instructions-loaded.jsonl do checkout principal → compact 48, session_start 122, path_glob_match 418, nested_traversal 7; último compact 2026-10-26T20:16:05Z; o binário 2.1.311 foi instalado em 2026-10-26T21:50 (ls de versions/), então nenhuma compactação foi registrada na 2.1.311. O nó E_CLAUDE_MD só cita o PreCompact. A linha 7 (sessão de contexto padrão acima de 200K agora compacta em vez de parar) é um gatilho novo de PreCompact e de InstructionsLoaded(compact), e nenhum nó a cita"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(nó novo) nó novo E_INSTRUCTIONSLOADED_MEDE_A_RECARGA_POS_COMPACTACAO_1026: o hook InstructionsLoaded do core já registra load_reason=compact (48 registros, nenhum na 2.1.311 ainda), e é o instrumento para medir a linha 10 (CLAUDE.md e MEMORY.md frescos depois da compactação): basta comparar, por sessão, os registros de compact antes e depois da 2.1.311. A linha 7 cria compactação onde antes a sessão parava, e dispara o PreCompact (migalha no worklog) e o InstructionsLoaded(compact); a linha 59 só muda o conteúdo do resumo",
+    "medida": "contagem por load_reason no instructions-loaded.jsonl + data de instalação do 2.1.311; leitura do cabeçalho de .claude/hooks/instructions-loaded-log.sh"
+   },
+   "nota": "não muda veredito de guarda; muda o que dá para medir"
+  },
+  {
+   "alvo": "omissão: extensão do VS Code no host em 2.1.306 (linhas 79 a 86, sobretudo 80, 82 e 85)",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "ls ⟨home⟩/.vscode-server/extensions → anthropic.claude-code-2.1.306-linux-x64 (diretório de 2026-10-21); resources/native-binary/claude --version → '2.1.306 (Claude Code)'; sem settings de máquina/usuário do VS Code que troquem o binário. A tabela de versões do censo só tem disco, processo e SDK do bridge. Os 7 UserPromptSubmit do core (session-currency-check com timeout 15, house-code-gloss 10) são o que a linha 80 passa a anunciar como 'Running UserPromptSubmit hooks'"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(nó novo) nó novo E_EXTENSAO_VSCODE_DO_HOST_NA_2_1_306_1026: o host tem a extensão Claude Code do VS Code em 2.1.306 (binário embutido), cinco versões atrás do CLI; uma sessão aberta por ela não recebe nada de 2.1.307 a 2.1.311, e os itens [VSCode] (80: spinner dos 7 UserPromptSubmit; 82: congelamento ao ler o PATH no Linux; 85: DISABLE_TELEMETRY quando a telemetria do VS Code está desligada) só valem quando ela subir. Se a extensão entra como 4ª fonte na tabela do censo é questão do maestro; o uso dela no core não está medido (o último workspace aberto não aponta o repo)",
+    "medida": "ls do diretório de extensões + --version do binário embutido = 2.1.306"
+   },
+   "nota": "superfície de host, não do core; o censo não a enxerga"
+  },
+  {
+   "alvo": "omissão: Remote Control ligado no início de sessão (linhas 20, 21 e 22)",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "python lendo só nomes e valores escalares do settings de usuário → remoteControlAtStartup=True, crossSessionInbound='accept'; a rodada usou o mesmo settings de usuário como superfície (teammateMode), mas não citou as linhas 20-22; grep 'Remote Control' no core → session-beacon-hook.sh e session-beacon.sh (SessionEnd por conexão de Remote Control)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(nó novo) acrescentar a um nó (ou criar E_REMOTE_CONTROL_LIGADO_NO_HOST_1026): toda sessão do host abre Remote Control (remoteControlAtStartup=true), o canal do maestro pelo celular; as linhas 20 (preso em 'Connecting' com proxy bloqueando), 21 (mensagem do Claude aparecendo como do usuário no app) e 22 (anexo perdido por disco cheio, ou depois do 20º) passam a valer nele; nenhuma guarda do core depende disso",
+    "medida": "nomes de chave do settings de usuário por python; grep -rlF 'Remote Control' .claude"
+   },
+   "nota": "baixo impacto, mas é o canal real do maestro"
+  },
+  {
+   "alvo": "omissão: background-task-probe.sh lê o texto do Bash movido ao fundo (linha 58)",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "o cabeçalho de .claude/hooks/background-task-probe.sh (UserPromptSubmit) acha as tarefas pelo texto do harness 'Output is being written to: <dir>/tasks/<id>.output' e pelo campo backgroundTaskId; a linha 58 muda esse resultado. Medi na 2.1.311: um comando com timeout 2000 foi movido ao fundo (ID ba33anglv), o transcript traz \"backgroundTaskId\":\"bvi1c101w\" para a sonda anterior, e o hook executado com JSON {transcript_path} devolveu 'tarefa ba33anglv: PID … (sleep) · rodando há 8s', rc 0"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(nó novo) acrescentar ao E_POSTTOOLUSE_CALA_NO_TIMEOUT_COM_SAIDA_PARCIAL_1026 (ou nó irmão): a sonda de fundo background-task-probe.sh, que lê o texto do harness e o backgroundTaskId, segue achando o comando que o timeout moveu ao fundo na 2.1.311",
+    "medida": "execução do hook com transcript_path do subagente depois de um timeout de 2 s → a tarefa ba33anglv aparece medida"
+   },
+   "nota": "sem quebra; é a segunda superfície do mesmo item, e a rodada mediu só uma"
+  }
+ ]
+}

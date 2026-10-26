@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**637 itens abertos** em 120 grafo(s) com aberto (de 159 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**639 itens abertos** em 121 grafo(s) com aberto (de 160 no escopo) · 122 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1159,6 +1159,13 @@
 |--:|---|---|---|
 | 3.6 | `I_ADOPT_CAMADA_COLABORADOR` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ram |
 | 2.4 | `I_KB_GAMIFICACAO_RAMPA_GATED` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/educat |
+
+## radar-E3-2026-10-26-r19 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_311_E_PIN_DO_REVISOR_PARA_V1_0_263_1026` | radar-E3-2026-10-26-r19 | o SDK do bridge deve subir para 0.3.311, pela ordem do transcript nas sessões retomadas (linha 11), e o pin do revisor do CI para |
+| 2.0 | `Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026` | radar-E3-2026-10-26-r19 | a extensão do VS Code do host deve entrar como fonte declarada no censo de versões, ou basta atualizá-la quando for usada |
 
 ## task-progress-story-points-2026-10 — 2 item(ns)
 

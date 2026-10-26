@@ -13,13 +13,13 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-24
-    cc_version: "2.1.310"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "juiz independente (opus não-fork): 0 reprovados e 3 exagerados, reescritos com 3 superações; 8 omissões (1 superação faltante virou nó); Aufhebung: SUPERSEDES de 3 nós da r17 (as versões de quem serve, a pergunta da subida para a 2.1.309 e o revisor no CLI 2.1.308)"
-                            # rodada 18 (2.1.309->2.1.310, uma versão, 26 itens). Host na 2.1.310; /chat (SDK 0.3.309) e
-                            # revisor (v1.0.260) uma atrás (SAC-243). Achado: a SAC-239 cumprida em configuração e aberta,
-                            # com o revisor desligado e nunca executado no pin novo. Histórico da r17 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-24-r18/radar-E3-2026-10-24-r18.kg.yaml
+    last_run: 2026-10-26
+    cc_version: "2.1.311"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "juiz independente (opus não-fork): 0 reprovados e 7 exagerados (3 nós e 4 omissões), reescritos com 7 superações; 2 omissões viraram nó; Aufhebung: SUPERSEDES de 1 nó da r18 (as versões de quem serve)"
+                            # rodada 19 (2.1.310->2.1.311, uma versão, 92 itens). Host na 2.1.311; /chat (SDK 0.3.310) e
+                            # revisor (v1.0.262) uma atrás (SAC-259); extensão do VS Code do host na 2.1.306 (SAC-260).
+                            # core.hooksPath absoluto: a 2.1.311 não muda nada. Histórico da r18 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
