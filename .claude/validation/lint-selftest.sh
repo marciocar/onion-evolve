@@ -8916,8 +8916,12 @@ run_githook_trampoline_selftests() {
   _tg -C "${d}/main" worktree add -q -b wt "${d}/wt" 2>/dev/null
   _tg init -q --bare "${d}/remote.git"; _tg -C "${d}/main" remote add origin "${d}/remote.git"
   _tg -C "${d}/main" config core.hooksPath "${d}/main/.githooks"
-  local i=0 r rc sha
-  _ci() { i=$((i + 1)); : > "${d}/log"; echo "${i}" > "$1/f${i}"; _tg -C "$1" add "f${i}"; _tg -C "$1" commit -q -m "c${i}" >/dev/null 2>&1; cat "${d}/log"; }
+  local r rc sha h0 h1
+  echo 0 > "${d}/n"
+  # o contador mora num ARQUIVO: `r="$(_ci …)"` roda num subshell e um `i` de variável nunca voltava, e todo
+  # commit depois do 1º era "nada a commitar" (passada adversarial: o (g) passava com mutante que engole o veredito)
+  _nx() { local n; n=$(( $(cat "${d}/n") + 1 )); echo "${n}" > "${d}/n"; echo "${n}"; }
+  _ci() { local n; n="$(_nx)"; : > "${d}/log"; echo "${n}" > "$1/f${n}"; _tg -C "$1" add "f${n}"; _tg -C "$1" commit -q -m "c${n}" >/dev/null 2>&1; cat "${d}/log"; }
   # (a) a worktree tem pre-commit DIFERENTE ⇒ roda o DELA, uma vez só (sem laço: o dela também tem o trampolim = d)
   _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"
   r="$(_ci "${d}/wt")"
@@ -8960,11 +8964,34 @@ run_githook_trampoline_selftests() {
     || record_fail "githook-trampoline: (f) pre-push stdin" "pushlog: ${r:0:300}"
   # (g) o trampolim não engole o veredito: hook da worktree que REPROVA barra o commit
   _mk "${d}/wt/.githooks/pre-commit" com "${logb}; exit 1"
-  i=$((i + 1)); echo "${i}" > "${d}/wt/f${i}"; _tg -C "${d}/wt" add "f${i}"
-  rc=0; _tg -C "${d}/wt" commit -q -m "c${i}" >/dev/null 2>&1 || rc=$?
-  [ "${rc}" -ne 0 ] && record_pass "githook-trampoline: (g) hook da worktree reprova ⇒ commit barrado (rc=${rc})" \
-    || record_fail "githook-trampoline: (g) veredito" "commit passou com o hook da worktree em exit 1"
+  local n; n="$(_nx)"; : > "${d}/log"; echo "${n}" > "${d}/wt/f${n}"; _tg -C "${d}/wt" add "f${n}"
+  h0="$(_tg -C "${d}/wt" rev-parse HEAD)"
+  rc=0; _tg -C "${d}/wt" commit -q -m "c${n}" >/dev/null 2>&1 || rc=$?
+  h1="$(_tg -C "${d}/wt" rev-parse HEAD)"; r="$(cat "${d}/log")"
+  [ "${rc}" -ne 0 ] && [ "${h0}" = "${h1}" ] && [ "${r}" = "${d}/wt/.githooks/pre-commit" ] \
+    && record_pass "githook-trampoline: (g) hook da worktree reprova ⇒ commit barrado (rc=${rc}, HEAD parado, quem reprovou foi o dela)" \
+    || record_fail "githook-trampoline: (g) veredito" "rc=${rc} HEAD ${h0:0:8}→${h1:0:8} log: ${r:0:120}"
   _tg -C "${d}/wt" reset -q
+  # (g2) o commit de controle: um caso de commit que ANDA (prova que o contador gera conteúdo novo)
+  _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"
+  h0="$(_tg -C "${d}/wt" rev-parse HEAD)"; r="$(_ci "${d}/wt")"; h1="$(_tg -C "${d}/wt" rev-parse HEAD)"
+  [ "${h0}" != "${h1}" ] && [ "${r}" = "${d}/wt/.githooks/pre-commit" ] && record_pass "githook-trampoline: (g2) hook da worktree aprova ⇒ o commit anda" \
+    || record_fail "githook-trampoline: (g2) controle" "HEAD ${h0:0:8}→${h1:0:8} log: ${r:0:120}"
+  # (h) hook FORA do .githooks do checkout principal (diretório central, .git/hooks, husky) ⇒ não trampolina:
+  #     o .githooks/ do repo não foi ativado por ninguém (passada adversarial: bypass do gate central por conteúdo)
+  mkdir -p "${d}/central"; _mk "${d}/central/pre-commit" com "${logb}"
+  _tg -C "${d}/main" config core.hooksPath "${d}/central"
+  r="$(_ci "${d}/wt")"
+  _tg -C "${d}/main" config core.hooksPath "${d}/main/.githooks"
+  [ "${r}" = "${d}/central/pre-commit" ] && record_pass "githook-trampoline: (h) hooksPath para diretório central ⇒ roda o central, o .githooks do repo não assume" \
+    || record_fail "githook-trampoline: (h) diretório central" "log: ${r:0:200}"
+  # (i) a guarda não vaza: depois do bloco, o hook que assumiu (e todo processo filho dele, um git aninhado
+  #     inclusive) não vê ONION_HOOK_TRAMPOLINED (passada adversarial: exportada, desligava o trampolim no aninhado)
+  _mk "${d}/wt/.githooks/pre-commit" com "${logb}; echo \"VAR=\${ONION_HOOK_TRAMPOLINED:-}\" >> \"${d}/log\""
+  r="$(_ci "${d}/wt" | tr '\n' ' ')"
+  [ "${r}" = "${d}/wt/.githooks/pre-commit VAR= " ] && record_pass "githook-trampoline: (i) a guarda contra laço é limpa depois do bloco (não vaza a filhos)" \
+    || record_fail "githook-trampoline: (i) vazamento da guarda" "log: ${r:0:300}"
+  _mk "${d}/wt/.githooks/pre-commit" com "${logb}"
   # (m) MUTANTE: principal SEM o trampolim ⇒ o caso (a) roda o do principal — o caso morde
   _mk "${d}/main/.githooks/pre-commit" sem "${logb}"
   _mk "${d}/wt/.githooks/pre-commit" com "echo wt-hook >/dev/null; ${logb}"
@@ -28396,6 +28423,17 @@ LINT
     record_pass "prove-gate-blocks: (h) alvo em worktree ligada → PROVADO; worktree e checkout principal intocados"
   else record_fail "prove-gate-blocks: (h)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
 
+  # (o) TRAMPOLIM: hooksPath ABSOLUTO para o .githooks do principal (template com o trampolim) e a worktree com
+  #     pre-commit PRÓPRIO que só ecoa → o git rodaria o da worktree, então a prova tem de dizer FAIL-OPEN
+  local to="${d}/o" tow="${d}/o-wt"; _pg_mk "${to}" onion
+  git -C "${to}" config core.hooksPath "${to}/.githooks"
+  git -C "${to}" -c core.hooksPath=/dev/null worktree add -q -b wt-tramp "${tow}" >/dev/null 2>&1 || true
+  printf '#!/usr/bin/env bash\necho "🧅 Onion pre-commit — tudo certo"\nexit 0\n' > "${tow}/.githooks/pre-commit"; chmod +x "${tow}/.githooks/pre-commit"
+  _pg_run "${pg}" "${tow}"
+  if [ "${_r}" -eq 1 ] && [[ "$(_pg_last)" == "bloqueio NÃO PROVADO: FAIL-OPEN"* ]] && [ "${_intact}" = 1 ] && grep -qF '· trampolim:' <<< "${_o}"; then
+    record_pass "prove-gate-blocks: (o) hooksPath absoluto + trampolim → prova o pre-commit da WORKTREE (o que o git roda): FAIL-OPEN"
+  else record_fail "prove-gate-blocks: (o)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+
   # ── da passada adversarial (2026-10-20): cada caso abaixo reproduz um achado executado pelo refutador ──
   # (i) hook que RODA o lint e barra TUDO, com o lint emitindo SOFT (`VIOLATION:` de rotina) → NÃO PROVADO.
   #     A 1ª versão contava `^VIOLATION:` como HARD, aceitava o controle barrado e dava PROVADO.
@@ -28465,6 +28503,8 @@ LINT
   _pg_mut control 's|^if \[ "${C_RC}" -ne 0 \]; then|if false; then|' "${ti}" "NÃO PROVADO"
   # sem distinguir HARD pelo sumário, a HARD pré-existente (n) vira "barra tudo"
   _pg_mut hardsum 's|if \[ -n "${C_HARD}" \] && \[ "${C_HARD}" -gt 0 \]; then|if false; then|' "${tn}" "já reprova com 1 HARD"
+  # sem espelhar o trampolim, a prova (o) julgaria o hook do principal (PROVADO) e não o que o git roda
+  _pg_mut tramp 's|^  H="${T}/.githooks"$|  :|' "${tow}" "FAIL-OPEN"
   # com `ls-files -m` no lugar de `diff HEAD`, o stageado (j) some do sandbox
   _pg_mut staged 's|diff -z --no-renames --name-only HEAD|ls-files -z -m|' "${tj}" "bloqueio PROVADO"
   # sem apagar no sandbox o que o alvo apagou, (m) volta a reprovar pela HARD apagada

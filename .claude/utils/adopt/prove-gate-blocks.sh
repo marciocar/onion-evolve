@@ -150,6 +150,16 @@ done < <(git -C "${T}" diff -z --no-renames --name-only --diff-filter=D HEAD 2>/
 # fora dos dois (hooksPath absoluto para outro checkout) → diretório próprio do sandbox.
 # `-L`: symlink resolvido. Preservado, um hook que faz `readlink -f "$0"` voltava ao checkout real e
 # lintava o ALVO, não o sandbox (medido: veredito errado e escrita no alvo).
+# Trampolim de worktree (bloco onion-hook-trampoline no topo do hook): com hooksPath ABSOLUTO para o
+# `.githooks/` do checkout principal, o git de uma worktree roda o pre-commit DELA quando ele existe, é
+# executável e difere. A prova espelha o que o git fará: sem isto ela provaria o hook do principal.
+if [ -f "${H}/pre-commit" ] && grep -qF '# >>> onion-hook-trampoline >>>' "${H}/pre-commit" 2>/dev/null \
+   && [ "${H}" -ef "${COMMON%/*}/.githooks" ] && ! [ "${H}" -ef "${T}/.githooks" ] \
+   && [ -f "${T}/.githooks/pre-commit" ] && [ -x "${T}/.githooks/pre-commit" ] \
+   && ! cmp -s "${T}/.githooks/pre-commit" "${H}/pre-commit"; then
+  echo "· trampolim: o pre-commit que roda é o da própria árvore (${T}/.githooks)"
+  H="${T}/.githooks"
+fi
 case "${H}/" in
   "${T}/"*)      HSB="${R}/${H#"${T}/"}" ;;
   "${COMMON}/"*) HSB="${R}/.git/${H#"${COMMON}/"}" ;;
