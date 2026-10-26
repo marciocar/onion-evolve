@@ -2,7 +2,7 @@
 branch: docs/fork-vs-fresh-pair3-prereg
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: 9681840f3498c95d72ce807f3680cd8c19df9075ae148e074ce770ff252a9470
+reviewed_diff_sha256: 5ffa4d8c59c1512936d04a436ee960061b3744265d730e0439dbc127e9f82b12
 reviewed_code_sha256: ab7d01289004c56e8a1250d96ab1d9988bd7de9b8737160b04ee09acf8ded4d9
 findings_total: 0
 findings_real: 0
