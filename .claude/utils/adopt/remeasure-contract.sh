@@ -47,6 +47,10 @@ if [ ! -f "${TOOLS}/kg_gate.py" ]; then
   echo "CONTRATO não se aplica: ${T} não tem o contrato vendorizado (vendor/kg-ssot/tools/kg_gate.py) — nada a medir."
   exit 4
 fi
+# O índice de leitura (REGRA 84) sai do kg_trace.py do vendor DO ALVO desde a 4.25.1: vendor anterior (próprio, que o
+# update não sobrescreve, ou perfil gate) deixa o índice sem regerador depois do update. Uma linha, nunca gate
+# (sinal de campo de 2026-10-26). Vem antes da medição, porque vendor velho pode sair dela como NÃO MEDIDO.
+[ ! -f "$(dirname "${BASH_SOURCE[0]}")/kg-index-floor.sh" ] || bash "$(dirname "${BASH_SOURCE[0]}")/kg-index-floor.sh" "${T}" || :
 git -C "${T}" rev-parse --git-dir >/dev/null 2>&1 \
   || { echo "CONTRATO NÃO MEDIDO: ${T} não é repositório git (o corpus do gate é o que o git rastreia)." >&2; exit 3; }
 command -v python3 >/dev/null 2>&1 || { echo "CONTRATO NÃO MEDIDO: python3 ausente (o leitor do contrato é Python)." >&2; exit 3; }

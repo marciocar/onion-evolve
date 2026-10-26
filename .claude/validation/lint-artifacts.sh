@@ -2665,7 +2665,7 @@ check_kg_read_index_sync() {
   fi
   rm -f "${gen_err}"
   if [ ! -f "${idx}" ]; then
-    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv"
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace.sh . --emit-index --out docs/onion/kg-read-index.tsv (escreve em temporário e só troca o índice com rc 0; redirecionar com > o esvaziaria antes de um erro)"
     return
   fi
   if ! printf '%s\n' "${new_index}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
@@ -2696,7 +2696,7 @@ check_kg_read_index_sync() {
         violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/PATHSPEC-NAO-JULGAVEL] commit com pathspec usa índice TEMPORÁRIO (GIT_INDEX_FILE=${GIT_INDEX_FILE}), e o gerador enumera o corpus por \`git ls-files\` — um \`.kg.yaml\` novo fora do pathspec desaparece e o índice PODE parecer defasado sem estar. ESTA GUARDA NÃO VERIFICOU se há defeito — ela declara que NÃO PODE JULGAR aqui, e isso NÃO é \"sem divergência\". NÃO regenere sob este índice (encurtaria o índice bom): faça um commit ÚNICO, sem pathspec, que é onde o veredito vale."
         return ;;
     esac
-    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace.sh . --emit-index > docs/onion/kg-read-index.tsv"
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace.sh . --emit-index --out docs/onion/kg-read-index.tsv (escreve em temporário e só troca o índice com rc 0; redirecionar com > o esvaziaria antes de um erro)"
   fi
 }
 

@@ -16,7 +16,15 @@
 #
 # A raiz externa `memory/` (a memória da sessão, fora do repo) é declarada ao produto com --external-root.
 #
-# Uso  : bash .claude/validation/kg-trace.sh [<repo_root>] [--format tsv | --emit-index]
+# Uso  : bash .claude/validation/kg-trace.sh [<repo_root>] [--format tsv | --emit-index [--out <arquivo>]]
+# --out: o índice é escrito num temporário AO LADO do destino e só troca o destino (mv) com rc 0. Existe porque
+#        `--emit-index > docs/onion/kg-read-index.tsv` ESVAZIA o índice antes do erro: o shell trunca o arquivo
+#        antes de o script rodar, e o rc 2 (vendor anterior à 4.25.1, produto ausente) deixava o adotante sem
+#        índice (medido num adotante em 2026-10-26, restaurado pelo git). Com --out: rc 2 → destino INTACTO,
+#        byte a byte. rc 3 (índice vazio declarado) → grava vazio SÓ se o destino não existe ou já está vazio
+#        (o dia 1); destino com linhas fica intacto, porque o rc 3 também vem com grafo ILEGÍVEL, e quem julga
+#        a divergência é a REGRA 84 — se os traces sumiram de propósito, esvazie à mão (`: > <arquivo>`).
+#        Sem --out, o índice vai ao stdout como sempre (compatível).
 # Saída: humano (a saída do produto) · TSV `grafo·id·node_type·alvo·veredito` (só os que reprovam) ·
 #        índice `caminho·id·grafo`, ordenado (LC_ALL=C sort -u)
 # Exit : 0 = todo `trace:` julgável resolve / índice emitido · 1 = TARGET-MISSING, grafo ilegível ou VACUIDADE
@@ -37,8 +45,38 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
   printf 'kg-trace: repo_root inválido\n' >&2; exit 2; }
-MODE=human
-for a in "$@"; do case "$a" in tsv|--format=tsv) MODE=tsv ;; --emit-index) MODE=index ;; esac; done
+MODE=human OUT="" _prev=""
+for a in "$@"; do
+  [ "${_prev}" = --out ] && { OUT="${a}"; _prev=""; continue; }
+  case "$a" in tsv|--format=tsv) MODE=tsv ;; --emit-index) MODE=index ;; --out) _prev=--out ;; --out=*) OUT="${a#--out=}" ;; esac
+done
+[ "${_prev}" != --out ] || { echo "ERRO kg-trace: --out sem arquivo" >&2; exit 2; }
+if [ -n "${OUT}" ]; then
+  [ "${MODE}" = index ] || { echo "ERRO kg-trace: --out só vale com --emit-index" >&2; exit 2; }
+  # Escrita atômica: o script chama a si mesmo com o stdout num temporário AO LADO do destino (mesmo sistema de
+  # arquivos, então o mv é rename) e só troca o destino com rc 0. Nenhum caminho de erro toca no destino.
+  _odir="$(dirname -- "${OUT}")"
+  [ -d "${_odir}" ] || { echo "ERRO kg-trace --out: diretório do destino não existe (${_odir})" >&2; exit 2; }
+  _otmp="$(mktemp "${_odir}/.kg-read-index.XXXXXX")" || { echo "ERRO kg-trace --out: não consegui criar temporário em ${_odir}" >&2; exit 2; }
+  trap 'rm -f "${_otmp}"' EXIT   # interrupção no meio não deixa o temporário na árvore
+  _args=() _skip=0
+  for a in "$@"; do
+    [ "${_skip}" -eq 1 ] && { _skip=0; continue; }
+    case "$a" in --out) _skip=1 ;; --out=*) : ;; *) _args+=("$a") ;; esac
+  done
+  _orc=0; bash "${BASH_SOURCE[0]}" ${_args[@]+"${_args[@]}"} > "${_otmp}" || _orc=$?
+  case "${_orc}" in
+    0) if [ ! -s "${_otmp}" ]; then rm -f "${_otmp}"; echo "ERRO kg-trace --out: rc 0 com índice vazio — ${OUT} INTACTO" >&2; exit 2; fi
+       # o modo do destino é preservado (o mktemp nasce 0600 e o mv levaria esse modo à árvore)
+       if [ -e "${OUT}" ]; then chmod --reference="${OUT}" "${_otmp}" 2>/dev/null || chmod 644 "${_otmp}"; else chmod 644 "${_otmp}"; fi
+       mv -f "${_otmp}" "${OUT}"; exit 0 ;;
+    3) rm -f "${_otmp}"
+       if [ ! -s "${OUT}" ]; then : > "${OUT}"
+       else echo "AVISO kg-trace --out: o produto declarou índice VAZIO (rc 3) e ${OUT} tem linhas — destino INTACTO (a REGRA 84 julga a divergência; se os traces sumiram de propósito, esvazie à mão)" >&2; fi
+       exit 3 ;;
+    *) rm -f "${_otmp}"; echo "ERRO kg-trace --out: NAO-GEROU (rc=${_orc}) — ${OUT} INTACTO" >&2; exit "${_orc}" ;;
+  esac
+fi
 KT="${ONION_KG_TRACE:-${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py}"
 _KT_EXCL=()
 if [ -f "${REPO_ROOT}/.kg-ssot/trace-excludes.txt" ]; then
