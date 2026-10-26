@@ -543,6 +543,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_4291_ADOTADA_1026
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "na branch chore/kg-ssot-4-29-1: kg_vendor.py update --tag kg-ssot-v4.29.1 (bf4c45399020, 639 arquivos) e check intacto; ops/kg-gate-ci.sh rc 0 sem --update; a bancada pré-tag da ref 2ad91641a511 mediu 380 de 380 saídas --edges e --full idênticas à 4.29.0 nos 190 grafos válidos, e o grafo plantado com ponta absoluta e com segmento de ponto saindo como literal kg:toRef no rdflib 7.6.0"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.29.1 (a ponta de aresta malformada sai como literal kg:toRef em vez de IRI local quebrada) entrou no core, sem efeito nos grafos válidos"
+    narrative: "Achado da curadoria nos três leitores RDF (rdflib mantinha a tripla, pyoxigraph e pyrudof a descartavam sem erro). Em grafo válido a saída é byte a byte a de antes."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref 2ad91641a511"
+      method: "medição: atualização do vendor e gate do contrato contra o corpus rastreado"
+      locality: "repo"
   - id: E_KG_SSOT_429_ADOTADA_1026
     node_type: evidence
     layer: audit
@@ -1096,5 +1113,8 @@ edges:
     to: D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025
     edge_type: TRACES_TO
   - from: E_KG_SSOT_429_ADOTADA_1026
+    to: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_4291_ADOTADA_1026
     to: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
     edge_type: SUPPORTS

@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:fcd47c722e72bf38 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:bfb12a3b94d6ab24 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.29.0",
+  "release": "kg-ssot-v4.29.1",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -1107,7 +1107,8 @@ O que ele **não** exporta, de propósito:
   e qualquer outra chave (`trigger`, `x_*`) como `kg:<chave>`, com o nome da chave em percent-encoding, para uma chave `x_` com espaço ainda dar uma IRI válida. Um valor que não é texto vai como JSON, tipado
   `kg:json`. Assim, qualquer tipo, inclusive os da camada domain, volta inteiro a partir do RDF.
 - **A ponta externa** (`<caminho>#<id>`) vai como o literal `kg:fromRef` ou `kg:toRef`, porque a IRI de um nó de outro
-  grafo depende do `meta.id` daquele arquivo. Um `from` ausente (o grafo inteiro) vai como `kg:fromGraph true`.
+  grafo depende do `meta.id` daquele arquivo. Uma ponta que não é id de nó válido (entrada que o contrato recusa, como
+  um caminho absoluto) também vai como literal, para nunca virar uma IRI quebrada que cada leitor RDF lê de um jeito. Um `from` ausente (o grafo inteiro) vai como `kg:fromGraph true`.
 - **Entre dois nós locais, três tipos ganham também uma tripla-padrão:**
   - `SUPPORTS` ganha `cito:supports`, da [CiTO](https://sparontologies.github.io/cito/current/cito.html);
   - `REFUTES` ganha `cito:refutes`;

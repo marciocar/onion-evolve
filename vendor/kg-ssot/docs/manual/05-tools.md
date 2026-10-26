@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.29.0",
+  "release": "kg-ssot-v4.29.1",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -1125,7 +1125,8 @@ What it does **not** export, on purpose:
   `rdfs:label`, and any other key (`trigger`, `x_*`) as `kg:<key>`, with the key name percent-encoded so that an `x_` key with a space still gives a valid IRI. A value that is not text goes as JSON, typed
   `kg:json`. So any type, including the domain ones, can be rebuilt from the RDF.
 - **An external end** (`<path>#<id>`) goes as the literal `kg:fromRef` or `kg:toRef`, because the IRI of a node in
-  another graph depends on that file's `meta.id`. A missing `from` (the whole graph) goes as `kg:fromGraph true`.
+  another graph depends on that file's `meta.id`. An end that is not a valid node id (input the contract rejects, such
+  as an absolute path) also goes as a literal, so it never becomes a broken IRI that each RDF reader reads its own way. A missing `from` (the whole graph) goes as `kg:fromGraph true`.
 - **Between two local nodes, three types also get a standard triple:**
   - `SUPPORTS` gets `cito:supports`, from [CiTO](https://sparontologies.github.io/cito/current/cito.html);
   - `REFUTES` gets `cito:refutes`;

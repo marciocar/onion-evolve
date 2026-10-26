@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:8ce6e3d7fd29a1c1 -->
+<!-- translation-of: ADOPTING.md sha256:18a020bca128f23a -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -61,7 +61,9 @@ O adotante usa só `update` e `check`.
 > no carimbo do adotante. Nada mais muda: as tags antigas seguem existindo, e o próximo update só troca a string do
 > `--tag`.
 
-O repositório público é `https://github.com/marciocar/kg-ssot`: cada commit dele é uma release, com a tag. A
+O repositório público é `https://github.com/marciocar/kg-ssot`: cada commit dele é uma release, com a tag. Ele tem
+história própria, então uma tag aponta lá para um commit diferente do repositório de desenvolvimento, com os arquivos
+iguais byte a byte; o commit do carimbo do vendor é o do repositório público. A
 primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu repo (o adotante):
 
 ```bash
@@ -340,6 +342,9 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.29.0` para a `kg-ssot-v4.29.1`, nada muda num grafo válido: uma ponta de aresta que não é id de nó
+válido nem referência externa (entrada que o contrato recusa) vai agora para o RDF como literal, e não como IRI quebrada.
 
 Da `kg-ssot-v4.28.0` para a `kg-ssot-v4.29.0`, o contrato fica no v4.15, e o gate e o validador não mudam. O perfil
 completo traz um arquivo novo, o `tools/requirements-rdf.txt` (rdflib, com hash), para quem quer ler a exportação PROV
