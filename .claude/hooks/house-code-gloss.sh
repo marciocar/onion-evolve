@@ -22,10 +22,12 @@
 #           de pré-registro e resultado de estudo (basename em CAIXA ALTA — STAGE0, SYNTHESIS, RESULT, N2-PLAN,
 #           CORE-STATE, PROTOCOL, ELENXO… — sob docs/evolution/dissect/ ou docs/evolution/research/, exceto
 #           README), escritos por Write/Edit. Devolve additionalContext com a glosa de cada sigla sem glosa.
-#           SEMPRE exit 0: é lembrete, nunca bloqueio. No Edit, a sigla glosada em outro ponto do arquivo
-#           não é cobrada de novo (a 1ª menção já está lá).
+#           SEMPRE exit 0: é lembrete, nunca bloqueio. O Edit é julgado pelo RESULTADO (o arquivo com a troca
+#           aplicada), e só se cobra a sigla que aparece no trecho novo: a glosa que o arquivo já tem vale.
 #           TETO: o PreToolUse não barra, então a mensagem/o arquivo segue como foi escrito; o lembrete
-#           corrige a PRÓXIMA escrita (ou um Edit de cura), não a que disparou.
+#           corrige a PRÓXIMA escrita (ou um Edit de cura), não a que disparou. Texto ou arquivo acima de
+#           200 KB cala (o motor custa ~1 s a cada 100 KB). Edit cujo old_string não está no arquivo é
+#           julgado só pelo trecho novo. Mensagem estruturada (objeto) e Bash que escreve .md não são lidos.
 #
 # COMO    : o glossário é .claude/validation/house-codes.tsv (fonte única; nada embutido aqui). O
 #           que conta como glosa, o domínio de cada sigla e o que não é prosa (código, citação, caminho,
@@ -291,8 +293,11 @@ if mode == "text":
 # SIGNAL-DRAFT, ACCEPT-*, BRIEF-* — todos prosa de estudo, todos em CAIXA ALTA; o README é índice)
 PREREG = re.compile(r"(?:^|/)docs/evolution/(?:dissect|research)/(?:[^/]+/)+([A-Z0-9][A-Z0-9_-]*)\.md$")
 
+CAP = 200000   # bytes: acima disto o PreToolUse sai calado (o motor custa ~1 s a cada 100 KB; medido 2026-10-26)
+
 def tool_target(d):
-    """(onde, [textos novos], texto que já estava no arquivo) da chamada, ou None se ela não é prosa vigiada."""
+    """(onde, texto como fica DEPOIS da chamada, [trechos novos]) ou None se a chamada não é prosa vigiada.
+    O julgamento é do RESULTADO (a glosa que o arquivo já tem vale), e só se cobra a sigla dos trechos novos."""
     name = d.get("tool_name")
     ti = d.get("tool_input")
     if not isinstance(ti, dict):
@@ -303,26 +308,29 @@ def tool_target(d):
             return None            # mensagem estruturada (objeto) não é prosa
         to = ti.get("to")
         return ("a mensagem a outra sessão (SendMessage%s)" % (" para %s" % to if isinstance(to, str) and to else ""),
-                [m], "")
-    if name not in ("Write", "Edit", "MultiEdit"):
+                m, [m])
+    if name not in ("Write", "Edit"):
         return None
     fp = ti.get("file_path")
     mt = PREREG.search(fp) if isinstance(fp, str) else None
     if not mt or mt.group(1) == "README":
         return None
+    where = "o .md de estudo %s" % os.path.basename(fp)
     if name == "Write":
-        texts = [ti.get("content")]
-    elif name == "Edit":
-        texts = [ti.get("new_string")]
-    else:
-        texts = [e.get("new_string") for e in ti.get("edits") or [] if isinstance(e, dict)]
-    prior = ""
-    if name != "Write":
-        try:
+        c = ti.get("content")
+        return (where, c, [c]) if isinstance(c, str) else None
+    new, old = ti.get("new_string"), ti.get("old_string")
+    if not isinstance(new, str):
+        return None
+    full = new
+    try:
+        if os.path.isfile(fp) and os.path.getsize(fp) <= CAP and isinstance(old, str) and old:
             prior = open(fp, encoding="utf-8", errors="replace").read()
-        except Exception:
-            prior = ""
-    return ("o .md de estudo %s" % os.path.basename(fp), [t for t in texts if isinstance(t, str)], prior)
+            if old in prior:
+                full = prior.replace(old, new) if ti.get("replace_all") is True else prior.replace(old, new, 1)
+    except Exception:
+        full = new
+    return (where, full, [new])
 
 if mode == "tool":
     try:
@@ -330,17 +338,14 @@ if mode == "tool":
     except Exception:
         sys.exit(0)
     tg = tool_target(d) if isinstance(d, dict) else None
-    if not tg or not tg[1]:
+    if not tg or not tg[2] or len(tg[1]) > CAP:
         sys.exit(0)
-    where, texts, prior = tg
-    glossed = set()
-    if prior:
-        hc.findings(prior, gl, titles, root, glossed_out=glossed)   # a glosa que o arquivo já tem vale
-    out = {}
-    for t in texts:
-        for x in hc.findings(t, gl, titles, root, glossed_out=glossed, already=frozenset(glossed)):
-            out.setdefault(x["token"], x)
-    fs = sorted(out.values(), key=lambda x: (x["opacity"] != "alta", x["token"]))
+    where, full, news = tg
+    def _in_new(tok):
+        rx = re.compile(r"(?<![\w-])%s(?![\w-])" % re.escape(tok))
+        return any(rx.search(n) for n in news)
+    fs = sorted((x for x in hc.findings(full, gl, titles, root) if _in_new(x["token"])),
+                key=lambda x: (x["opacity"] != "alta", x["token"]))
     if not fs:
         sys.exit(0)
     lines = ["📖 Glossário da casa — %s leva sigla SEM glosa, e quem a lê repassa ao maestro. Glose na 1ª "
@@ -348,8 +353,11 @@ if mode == "tool":
              "sigla pela glosa; se já foi, corrija na próxima escrita. Lembrete, não bloqueio:" % where]
     for x in fs[:10]:
         lines.append("  · %s → %s" % (x["token"], x["gloss"]))
-    print(json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
-                                             "additionalContext": "\n".join(lines)}}, ensure_ascii=False))
+    # bytes com errors="replace": o destinatário vem do payload, e um surrogate solto quebrava o print com
+    # Traceback (Elenxo 2026-10-26); o JSON segue legível em UTF-8, o surrogate vira "?"
+    out = json.dumps({"hookSpecificOutput": {"hookEventName": "PreToolUse",
+                                             "additionalContext": "\n".join(lines)}}, ensure_ascii=False)
+    sys.stdout.buffer.write(out.encode("utf-8", "replace") + b"\n")
     sys.exit(0)
 
 if not tp or tp == "-" or not os.path.isfile(tp):
@@ -677,16 +685,43 @@ PY
   # (t5) Edit: a sigla glosada em outro ponto do arquivo não é cobrada de novo; sem a glosa no arquivo, é
   mkdir -p "${_d}/docs/evolution/research/y-2026-10"; _ef="${_d}/docs/evolution/research/y-2026-10/SYNTHESIS.md"
   printf '# Síntese\n\nO I3 (um escritor por repo) vale aqui.\n' > "${_ef}"
-  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"x\",\"new_string\":\"E o I3 segue valendo.\"}}"
+  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"vale aqui.\",\"new_string\":\"vale aqui. E o I3 segue valendo.\"}}"
   _o5="${_o}"; _rc5="${_rc}"
   printf '# Síntese\n\nNada aqui.\n' > "${_ef}"
-  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"x\",\"new_string\":\"E o I3 segue valendo.\"}}"
+  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"Nada aqui.\",\"new_string\":\"E o I3 segue valendo.\"}}"
   if [ "${_rc5}" -eq 0 ] && [ -z "${_o5}" ] && [ "${_rc}" -eq 0 ] && grep -q 'I3 → o invariante' <<< "${_o}"; then _ok "(t5) Edit: glosa já no arquivo cobre; sem ela, lembra (rc 0)"; else _ko "(t5) com glosa rc=${_rc5} [${_o5}] · sem rc=${_rc} [${_o}]"; fi
   # (t6) payload lixo, ferramenta fora do matcher e mensagem não-texto: rc 0, mudo, sem Traceback
   _tool 'lixo SendMessage {'; _o6="${_o}${_rc}"
   _tool '{"tool_name":"Bash","tool_input":{"command":"echo SAC-256 docs/evolution/research/a/STAGE0.md"}}'; _o6="${_o6}${_o}${_rc}"
   _tool '{"tool_name":"SendMessage","tool_input":{"to":"main","message":{"type":"shutdown_request"}}}'; _o6="${_o6}${_o}${_rc}"
   if [ "${_o6}" = "000" ]; then _ok "(t6) payload lixo, Bash e mensagem estruturada: mudo, rc 0"; else _ko "(t6) [${_o6}]"; fi
+  # ── os achados da passada adversarial de 2026-10-26, cada um com o caso que o reproduzia ──
+  # (t7) a sigla definida numa linha de tabela está glosada; a célula vazia de sentido não
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/dissect/x-2026-10/STAGE0.md","content":"# Critérios\n\n| id | critério |\n|---|---|\n| K1 | o veredito absorver exige dois usos reais |\n| I3 | só a sessão dona do repo commita nele |\n\nO critério K1 decide, e o I3 vale.\n"}}'
+  _o7="${_o}${_rc}"
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/dissect/x-2026-10/STAGE0.md","content":"# Critérios\n\n| K1 | ok |\n\nO critério K1 decide."}}'
+  if [ "${_o7}" = "0" ] && [ "${_rc}" -eq 0 ] && grep -q 'K1 →' <<< "${_o}"; then _ok "(t7) K1 definido em linha de tabela cala; célula sem definição lembra (rc 0)"; else _ko "(t7) tabela [${_o7}] · célula vazia rc=${_rc} [${_o}]"; fi
+  # (t8) "Kimi K3" (nome de modelo) num arquivo que fala de critério LONGE dali não é rótulo do pré-registro
+  _tool '{"tool_name":"Write","tool_input":{"file_path":"/w/docs/evolution/research/y-2026-10/SYNTHESIS.md","content":"O modelo Kimi K3 respondeu rápido.\n\nMais adiante: o critério de aceite segue o pré-registro."}}'
+  if [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t8) Kimi K3 com critério longe cala (rc 0)"; else _ko "(t8) rc=${_rc} [${_o}]"; fi
+  # (t9) Edit é julgado pelo RESULTADO: trocar só o número de uma tarefa glosada cala; apagar a glosa lembra
+  printf '# Síntese\n\nFechei a tarefa da glosa entre sessões (SAC-255).\n' > "${_ef}"
+  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"SAC-255\",\"new_string\":\"SAC-256\"}}"
+  _o9="${_o}${_rc}"
+  printf '# Síntese\n\nO I3 (um escritor por repo) vale.\n' > "${_ef}"
+  _tool "{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"${_ef}\",\"old_string\":\"O I3 (um escritor por repo) vale.\",\"new_string\":\"O I3 vale.\"}}"
+  if [ "${_o9}" = "0" ] && [ "${_rc}" -eq 0 ] && grep -q 'I3 →' <<< "${_o}"; then _ok "(t9) Edit julgado pelo resultado: troca de número glosado cala; glosa apagada lembra (rc 0)"; else _ko "(t9) troca [${_o9}] · apagada rc=${_rc} [${_o}]"; fi
+  # (t10) assunto vazio antes do parêntese não é glosa; assunto curto e honesto é
+  _tool '{"tool_name":"SendMessage","tool_input":{"to":"main","message":"Para o detalhe, veja o que está em (SAC-256)."}}'
+  _o10="${_o}"; _rc10="${_rc}"
+  _tool '{"tool_name":"SendMessage","tool_input":{"to":"main","message":"Fiz a migração (SAC-256)."}}'
+  if [ "${_rc10}" -eq 0 ] && grep -q 'SAC-256 →' <<< "${_o10}" && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t10) assunto vazio lembra; assunto curto honesto cala (rc 0)"; else _ko "(t10) vazio rc=${_rc10} [${_o10}] · honesto rc=${_rc} [${_o}]"; fi
+  # (t11) destinatário com surrogate solto e texto acima do teto: rc 0, nada de Traceback
+  _tool '{"tool_name":"SendMessage","tool_input":{"to":"\ud800","message":"Fechei o SAC-256."}}'
+  _o11="${_o}${_rc}"
+  _big="$(python3 -c 'print("SAC-256 " * 30000)')"
+  _tool "{\"tool_name\":\"SendMessage\",\"tool_input\":{\"to\":\"main\",\"message\":\"${_big}\"}}"
+  if ! grep -q Traceback <<< "${_o11}" && grep -q 'SAC-256 →' <<< "${_o11}" && [ "${_rc}" -eq 0 ] && [ -z "${_o}" ]; then _ok "(t11) surrogate no destinatário sem Traceback; texto acima do teto cala (rc 0)"; else _ko "(t11) surrogate [${_o11}] · teto rc=${_rc} [${_o:0:120}]"; fi
   unset ONION_HOUSE_CODE_STATE_DIR
   rm -rf "${_d}"
 
@@ -700,7 +735,7 @@ command -v python3 >/dev/null 2>&1 || exit 0
 if [ "${mode}" = "tool" ]; then
   # filtro barato ANTES do python: o matcher inclui Write|Edit, que dispara em TODA escrita da sessão
   case "${input}" in
-    *'"SendMessage"'*|*docs/evolution/dissect/*|*docs/evolution/research/*) : ;;
+    *SendMessage*|*evolution*) : ;;   # sem aspas nem barras: JSON com barra ou letra escapada não escapa do filtro
     *) exit 0 ;;
   esac
   _pf="$(mktemp 2>/dev/null)" || exit 0
