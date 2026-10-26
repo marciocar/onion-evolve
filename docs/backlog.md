@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**617 itens abertos** em 120 grafo(s) com aberto (de 157 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**618 itens abertos** em 120 grafo(s) com aberto (de 157 no escopo) · 121 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -924,11 +924,12 @@
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
-## sinais-de-campo-2026-09 — 1 item(ns)
+## sinais-de-campo-2026-09 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.0 | `Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025` | sinais-de-campo-2026-09 | Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja to |
+| 4.5 | `Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS` | sinais-de-campo-2026-09 | Agente novo com brief custa menos que fork sem perder qualidade? Medir 3 pares de tarefa parecida (a 1ª: a adoção da kg-ssot 4. |
 
 ## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
 
@@ -1199,11 +1200,11 @@
 | 2.4 | `Q_DERIVA_DA_R9_VAI_AO_KG_FRESHNESS` | radar-E3-2026-10-14-r10 | selar a deriva da r9 (contagem de hooks, timeout e onFailure) pelo /meta:kg-freshness e medir a latência dos 2 vetos PreToolUse n |
 | 2.0 | `Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299` | radar-E3-2026-10-14-r10 | sondar o plugin onion publicado sob 2.1.299: o bash-empty-result-guard empacotado (PostToolUse com exit 2) e o env-guard mudam de  |
 
-## radar-E3-2026-10-22-r16 — 1 item(ns)
+## radar-E3-2026-10-23-r17 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 2.4 | `Q_CENSO_FILTRA_WORKTREE_PELO_CAMINHO_RELATIVO_1022` | radar-E3-2026-10-22-r16 | o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda |
+| 2.4 | `Q_PERNA_DE_LEITURA_AVISA_NO_SED_I_EM_ARQUIVO_RASTREADO_1023` | radar-E3-2026-10-23-r17 | a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum |
 
 ## residuos-2026-08-18 — 1 item(ns)
 

@@ -116,11 +116,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
-    confidence: 0.6
-    verified_at: "2026-10-22"
-    verified_against: "proposta da r16: aplicar o filtro de worktrees ao caminho relativo ao repo (os.path.relpath), com caso na bancada run_cc_delta_census_selftests rodando o censo de dentro de um diretório cujo caminho contém o segmento worktrees; issue SAC-219"
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "curado em fix/cc-delta-census-worktree-relative: o filtro olha '/' + os.path.relpath(f, repo); o censo rodado numa worktree sob .claude/worktrees/ mede 8 citações de scriptPath (era 0); caso (w) da família cc_delta_census exige a mesma contagem da raiz e da worktree aninhada, e o mutante do filtro absoluto reprova com worktree=[0]; issue SAC-219"
     label: "o filtro de worktrees do cc-delta-census.sh deve olhar o caminho relativo ao repo, para a contagem não zerar quando a rodada roda numa worktree"
   - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_308_1022
     node_type: evidence
