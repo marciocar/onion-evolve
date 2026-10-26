@@ -153,12 +153,17 @@ done < <(git -C "${T}" diff -z --no-renames --name-only --diff-filter=D HEAD 2>/
 # Trampolim de worktree (bloco onion-hook-trampoline no topo do hook): com hooksPath ABSOLUTO para o
 # `.githooks/` do checkout principal, o git de uma worktree roda o pre-commit DELA quando ele existe, é
 # executável e difere. A prova espelha o que o git fará: sem isto ela provaria o hook do principal.
+# Presente e NÃO executável: o trampolim FALHA FECHADO (revisão do adotante sge, 2026-10-26) — todo commit
+# daquela árvore é barrado pelo modo do arquivo, não pelo gate, então o bloqueio do gate não é provável ali.
 if [ -f "${H}/pre-commit" ] && grep -qF '# >>> onion-hook-trampoline >>>' "${H}/pre-commit" 2>/dev/null \
    && [ "${H}" -ef "${COMMON%/*}/.githooks" ] && ! [ "${H}" -ef "${T}/.githooks" ] \
-   && [ -f "${T}/.githooks/pre-commit" ] && [ -x "${T}/.githooks/pre-commit" ] \
-   && ! cmp -s "${T}/.githooks/pre-commit" "${H}/pre-commit"; then
-  echo "· trampolim: o pre-commit que roda é o da própria árvore (${T}/.githooks)"
-  H="${T}/.githooks"
+   && [ -f "${T}/.githooks/pre-commit" ]; then
+  [ -x "${T}/.githooks/pre-commit" ] \
+    || verdict_no 3 "o pre-commit de ${T}/.githooks não é executável: o trampolim barra todo commit dali (chmod +x e commite o modo 100755)"
+  if ! cmp -s "${T}/.githooks/pre-commit" "${H}/pre-commit"; then
+    echo "· trampolim: o pre-commit que roda é o da própria árvore (${T}/.githooks)"
+    H="${T}/.githooks"
+  fi
 fi
 case "${H}/" in
   "${T}/"*)      HSB="${R}/${H#"${T}/"}" ;;

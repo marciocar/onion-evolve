@@ -89,7 +89,9 @@ Teto: o conserto do texto escreve no `--local`; se o absoluto vier de config por
 Desde a mesma data, um trampolim no topo de cada hook de `.githooks/` (e no template que viaja ao adotante)
 torna o absoluto inofensivo, qualquer que seja a causa: rodando do `.githooks/` do checkout principal
 numa worktree, o hook passa a vez ao da árvore quando ele existe, é executável e difere (hook noutro
-diretório, como `.git/hooks` ou um gestor central, não trampolina). O lembrete segue como aviso
+diretório, como `.git/hooks` ou um gestor central, não trampolina). Se o da árvore existe e NÃO é
+executável, o trampolim falha fechado e manda o `chmod +x`: cair no do principal escondia o bit perdido,
+que na main faz o git ignorar o hook (revisão do adotante sge, 2026-10-26). O lembrete segue como aviso
 de config, não como a única defesa.
 
 **Por que aviso e não veto (`exit 2`).** Toda superfície depende de registro de terceiro e de rede: um veto
