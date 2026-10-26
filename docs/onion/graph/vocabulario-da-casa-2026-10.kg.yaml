@@ -6,6 +6,11 @@ meta:
   date: "2026-10-23"
   purpose: "Os termos x_term (contrato v4.14 da kg-ssot 4.23.0) dos códigos curtos que colidem no corpus do core. O id curto fica estável e vira a notation; o pref é o nome legível; o scheme é a família do código (D_NOMES_FORMA_ID_CURTO_MAIS_X_TERM_1023). O kg_vocab lint confere a prosa contra estes termos, e o glossário do hook house-code-gloss projeta daqui as linhas de termo."
   note: "Notation repetida entre esquemas é a colisão medida, e é de propósito: a menção sem qualificador fica ambígua (escreva esquema:código, como radar-cc:r7). TETO, medido na passada adversarial: cada esquema traz só os códigos que o corpus de HOJE usa, e um código que existe em um esquema só resolve para aquele sentido mesmo num texto de outro (o caso r14 da bancada resolve como rodada do radar, porque a bancada não tem termo r14). O lint pega o código sem nome e o ambíguo, não o sentido errado com nome único; a segunda rede é o hook da glosa, onde o domínio do bloco decide."
+# Arestas para nó de OUTRO grafo do core (contrato v4.3): o termo do eixo E7 aponta a decisão que o abriu.
+external_edges:
+  - from: T_RADAR_AXIS_E7
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026"
+    edge_type: TRACES_TO
 nodes:
   - id: E_COLISOES_DE_CODIGO_MEDIDAS_1023
     node_type: evidence
@@ -1181,6 +1186,46 @@ nodes:
       scheme: selfconsistency-claim
       lang: pt-BR
       definition: "A afirmação 5 do experimento de autoconsistência do grafo typesafe-ai-2026-09 (veredito por distribuição empírica e confiança 1-H/ln4)."
+  - id: T_RADAR_AXIS_E6
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "docs/onion/radar-baselines.yaml (o id do eixo) e o kg_vocab lint de 2026-10-26 (ops/kg-vocab-ci.sh), que acusou o código E6 sem termo nos nós da abertura do eixo E7"
+    provenance:
+      source: "docs/onion/radar-baselines.yaml e o kg_vocab lint do vendor kg-ssot"
+      locator: "a entrada '- id:' do eixo no baseline; os achados vocab.code-unresolved do lint"
+      method: "medição: o baseline lido e o lint rodado no corpus"
+      locality: repo
+    label: "Eixo E6 do radar de mundo: a fronteira de modelos, isto é, o modelo da sessão (lançamento, capacidade, lineup, preço) e a escada que a guarda PreModelSwitch lê."
+    x_term:
+      pref: "eixo de fronteira de modelos do radar de mundo"
+      notation: "E6"
+      scheme: radar-axis
+      lang: pt-BR
+      definition: "O eixo E6-fronteira-modelos de docs/onion/radar-baselines.yaml (/meta:radar): guarda session_models e session_floor. Não cobre treino nem inferência, que são do E7."
+  - id: T_RADAR_AXIS_E7
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "docs/onion/radar-baselines.yaml (o id do eixo) e o kg_vocab lint de 2026-10-26 (ops/kg-vocab-ci.sh), que acusou o código E7 sem termo nos nós da abertura do eixo E7"
+    provenance:
+      source: "docs/onion/radar-baselines.yaml e o kg_vocab lint do vendor kg-ssot"
+      locator: "a entrada '- id:' do eixo no baseline; os achados vocab.code-unresolved do lint"
+      method: "medição: o baseline lido e o lint rodado no corpus"
+      locality: repo
+    label: "Eixo E7 do radar de mundo: a trajetória do mercado de treino e inferência (fine-tuning, APIs de ajuste, pesos abertos, modelos pequenos, inferência e custo), aberto em 2026-10-26 sem rodar."
+    x_term:
+      pref: "eixo de treino e inferência do radar de mundo"
+      notation: "E7"
+      scheme: radar-axis
+      lang: pt-BR
+      definition: "O eixo E7-treino-inferencia de docs/onion/radar-baselines.yaml (/meta:radar), aberto pela decisão D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026. Não toca a escada de modelos, que é do E6."
 edges:
   - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
     to: T_RADAR_CC_R1
@@ -1356,3 +1401,6 @@ edges:
   - from: E_COLISOES_DE_CODIGO_MEDIDAS_1023
     to: T_SELFCONSISTENCY_CLAIM_N5
     edge_type: SUPPORTS
+  - from: T_RADAR_AXIS_E7
+    to: T_RADAR_AXIS_E6
+    edge_type: CONSTRAINS

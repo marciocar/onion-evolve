@@ -6,6 +6,14 @@ meta:
   # o fios-abertos tem teto de 20 nos declarado no proprio meta: e "onda nova exige onda COLHIDA" —
   # despejar triagem la seria inflar o backlog para nao pensar, que e o que aquele teto impede.
   # Fonte: os inboxes dos adotantes, NAO relayados (o relay e ato do maestro, nao do agente).
+# Arestas para nó de OUTRO grafo do core (contrato v4.3). O nó da curadoria que originou a abertura do E7
+# (ai-front-2026-10#E_N0_HOUSE_RADAR_GAP, no repo onion-curation) NÃO entra aqui: o gate confere o alvo
+# contra os .kg.yaml rastreados NESTE repo (integrity.dangling-external), e o grafo do par não é um deles.
+# A ligação com ele vai por texto conferido (peer-ref-check) no nó.
+external_edges:
+  - from: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026"
+    to: D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026
+    edge_type: SUPPORTS
 nodes:
   - id: E_RADAR_IGNORAVA_O_SEGUNDO_MODO
     node_type: evidence
@@ -1005,6 +1013,23 @@ nodes:
       locator: "branches chore/onion-update-7391404e946f-a e -b do sge; PR #147 do sge"
       method: "medição: pré-registro em 6830604f, dois braços, juiz cego"
       locality: "repo"
+  - id: D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "decisão do maestro em 2026-10-26, por pergunta com opções: escolhida «Novo eixo E7 + registrar o achado»; o nó da curadoria que a motivou (ai-front-2026-10#E_N0_HOUSE_RADAR_GAP e #D_AI_FRONT_VERDICT) conferido por peer-ref-check: EXISTE na origin/main do onion-curation @ b75a5903"
+    label: "O radar ganha o eixo E7, trajetória de treino e inferência, aberto SEM rodar: treino próprio, retreino e fine-tuning, APIs de ajuste que abrem e fecham, pesos abertos, modelos pequenos, inferência e custo. O E6 segue só com o modelo da sessão."
+    narrative: "Selado em 2026-10-26: escolhida «Novo eixo E7 + registrar o achado». Origem: a curadoria mediu (ai-front-2026-10, nó E_N0_HOUSE_RADAR_GAP) que o grafo do E6 tem 0 menções a fine-tuning, retreino, LoRA, destilação, quantização ou inferência de modelo, e o veredito dela (D_AI_FRONT_VERDICT) parqueia a frente fixa de IA e entrega ao core a proposta de alargar o E6 ou criar um eixo novo. Fronteira: E6 = o modelo da sessão (lineup e a escada que a PreModelSwitch lê); E7 = o mercado de treino e inferência, sem tocar a escada. O eixo entra em docs/onion/radar-baselines.yaml com never_run declarado; a REGRA 65 (Radar de mundo com baseline DATADA por eixo) passou a acusar eixo sem data como SOFT nunca-rodado (antes ele era pulado em silêncio), nunca HARD. Fontes no grupo treino-inferencia de docs/onion/radar-sources.yaml. O achado que o motivou entra como E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026 no grafo do nanochat. A 1ª rodada é do maestro (/meta:radar E7-treino-inferencia), nunca agendada."
+    trace: "docs/onion/radar-baselines.yaml"
+    provenance:
+      source: "maestro, na sessão do core"
+      locator: "pergunta com opções de 2026-10-26: «Novo eixo E7 + registrar o achado»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251

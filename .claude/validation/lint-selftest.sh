@@ -31744,6 +31744,26 @@ run_radar_staleness_selftests() {
     record_pass "radar-staleness: (i) baseline com session_models ⇒ silêncio"
   else record_fail "radar-staleness: (i)" "falso positivo (rc=${rc}): ${out}"; fi
 
+  # (j) eixo ABERTO SEM RODAR (abertura do E7, 2026-10-26): antes era pulado EM SILÊNCIO. Agora é SOFT
+  #     nomeando o eixo e o motivo declarado — e o rc segue 0 (nunca HARD), mesmo sendo o único eixo.
+  printf 'axes:\n  - id: EJ\n    never_run: "aberto hoje"\n' > "$d/nunca.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/nunca.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qF "eixo 'EJ' do radar de mundo NUNCA RODOU (declarado: aberto hoje)" <<< "${out}"&& ! grep -q 'SEM eixos legíveis' <<< "${out}"; then
+    record_pass "radar-staleness: (j) eixo nunca-rodado declarado ⇒ SOFT nomeando eixo e motivo, rc 0 (nunca HARD)"
+  else record_fail "radar-staleness: (j)" "nunca-rodado mal tratado (rc=${rc}): ${out}"; fi
+  # (k) eixo sem data E sem declaração, no meio de eixos datados (o caso que sumia em silêncio)
+  printf 'axes:\n  - id: EK1\n    last_run: %s\n  - id: EK2\n    kg: x\n  - id: EK3\n    last_run: %s\n' "${fresh_date}" "${fresh_date}" > "$d/semdata.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/semdata.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qF "eixo 'EK2' sem data de rodada e sem 'never_run:' declarado" <<< "${out}"&& ! grep -qE "eixo 'EK(1|3)'" <<< "${out}"; then
+    record_pass "radar-staleness: (k) eixo sem data e sem declaração no meio de eixos datados ⇒ SOFT só nele"
+  else record_fail "radar-staleness: (k)" "eixo sem data não acusado ou vizinho acusado (rc=${rc}): ${out}"; fi
+  # (l) data E never_run juntos: o carimbo de nunca-rodado sobreviveu à 1ª rodada ⇒ SOFT
+  printf 'axes:\n  - id: EL\n    last_run: %s\n    never_run: "velho"\n' "${fresh_date}" > "$d/ambos.yaml"
+  rc=0; out="$(ONION_RADAR_BASELINES="$d/ambos.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -qF "eixo 'EL' tem data de rodada E 'never_run:'" <<< "${out}"; then
+    record_pass "radar-staleness: (l) data e never_run juntos ⇒ SOFT pedindo remover o never_run"
+  else record_fail "radar-staleness: (l)" "contradição não acusada (rc=${rc}): ${out}"; fi
+
   rm -rf "$d"
 }
 

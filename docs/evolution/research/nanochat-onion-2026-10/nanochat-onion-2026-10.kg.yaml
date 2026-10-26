@@ -10,7 +10,7 @@ meta:
                              # VEICULO sim: se o nanochat voltar a andar ou ganhar loader de dominio, a opcao C
                              # muda de ordem no mesmo dia.
   # kg-backlog-guard: on
-  # ═══ TETO: 51 NÓS ═══  (emendas em 2026-10-05: 45->46 o eval de dominio; 46->47 o reenquadramento das doutrinas; 2026-10-12: 47->51 as 4 emendas do eixo D)
+  # ═══ TETO: 52 NÓS ═══  (emendas em 2026-10-05: 45->46 o eval de dominio; 46->47 o reenquadramento das doutrinas; 2026-10-12: 47->51 as 4 emendas do eixo D; 2026-10-26: 51->52 o fim do fine-tuning self-serve da OpenAI, achado da curadoria)
   #
   # Pesquisa /onion-research --mode:decision sobre o Nanochat (Karpathy) e o Onion no treino de um modelo de
   # DOMINIO (Dogfood, KG-SSOT First, Runtime SDAAL, Elenxo). Varredura larga: 17 fontes, 32 claims, 14
@@ -442,7 +442,7 @@ nodes:
     verified_against: 'E_CORPUS_SCALE_MEASURED; classification-por-vertical (PRIVATE nunca sai; DESTILADO so predicado provado); NDA de adotantes; arXiv 2603.25158 citado, NAO lido'
     label: 'OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo e transcripts. GATED. So o corpus PUBLICO e DESTILADO pode entrar — nunca PRIVATE, NDA, material de adotante ou transcript com dado de cliente; isso encolhe ainda mais um corpus que ja e pequeno. A pergunta "quem consome e por que" (MOAT W7, pull-not-push) nao tem resposta, e o eixo que a julgaria (custo de dado sintetico, esquecimento catastrofico, treino com corpus agentico) foi cortado por orcamento.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
-    narrative: "CONSTRAINS por C_OPTION_D_SECOND_GATE_PROTECTED_EVAL (2o gate: eval de dominio interno e protegido) e por E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ, selados pelo maestro em 2026-10-12 (emendas 2 e 3 do eixo D). D segue open e GATED. O verified_against ('arXiv 2603.25158 citado, NAO lido') e de 2026-10-05; o paper foi lido depois (E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ)."
+    narrative: "CONSTRAINS por C_OPTION_D_SECOND_GATE_PROTECTED_EVAL (2o gate: eval de dominio interno e protegido) e por E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ, selados pelo maestro em 2026-10-12 (emendas 2 e 3 do eixo D). D segue open e GATED. O verified_against ('arXiv 2603.25158 citado, NAO lido') e de 2026-10-05; o paper foi lido depois (E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ). Em 2026-10-26, CONSTRAINS também por E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026: o modelo de terceiro passa a ser só de pesos abertos."
   - id: C_OPCAO_E_ONION_AS_WEIGHTS
     node_type: claim
     plane: DEV
@@ -858,6 +858,24 @@ nodes:
       method: "leitura: no ancorado do eixo D + selo do maestro (/meta:decide, «Aplicar as 4»); paper nao re-lido"
       locality: "repo"
 
+  - id: E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    valid_from: "2026-05-07"
+    verified_at: "2026-10-26"
+    verified_against: "WebFetch de developers.openai.com/api/docs/deprecations em 2026-10-26, seção 'Update to OpenAI’s self-serve fine-tuning'; o mesmo achado é o E_N0_OPENAI_FINETUNE_SUNSET do grafo ai-front-2026-10 da curadoria, conferido por peer-ref-check (EXISTE na origin/main dela @ b75a5903)"
+    source_tier: 10
+    source_kind: primary
+    label: "A OpenAI fecha o fine-tuning self-serve: desde 2026-05-07 quem nunca ajustou não cria job; desde 2026-07-02 só quem rodou inferência num modelo ajustado nos últimos 60 dias; em 2027-01-06 ninguém cria job novo. A opção D fica só com pesos abertos."
+    narrative: "Trecho lido: 'Creating fine-tuning jobs or training is not available to organizations that have not previously run fine-tuning' (May 7, 2026); 'Creating fine-tuning jobs is no longer available to organizations that have not run inference on a fine-tuned model in the past 60 days' (July 2, 2026); 'Active existing customers will no longer be able to create new fine-tuning jobs' (Jan 6, 2027). A inferência nos modelos já ajustados segue até o modelo base ser descontinuado. Se o core já rodou fine-tuning na OpenAI não foi medido; sem isso, desde 2026-05-07 ele não cria job lá. CONSTRAINS sem flip em C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY: a opção D (dataset do corpus para ajustar modelo de terceiro) segue open e GATED, e o modelo de terceiro passa a ser só de pesos abertos (ajuste local ou numa plataforma que treine pesos abertos), nunca a API de ajuste de um provedor fechado, que pode fechar. Que os outros provedores fechados sigam o mesmo caminho NÃO foi medido: é o que o eixo E7 do radar existe para acompanhar. Achado da curadoria (estudo ai-front-2026-10, aceito pelo juiz dela), aberto de novo aqui na página oficial."
+    provenance:
+      source: "https://developers.openai.com/api/docs/deprecations"
+      locator: "seção 'Update to OpenAI’s self-serve fine-tuning': May 7, 2026 · July 2, 2026 · Jan 6, 2027; e 'Inference on fine-tuned models will continue to be available until the base models are deprecated'"
+      method: "leitura: página oficial aberta por WebFetch em 2026-10-26"
+      locality: "web"
 
 edges:
   - from: E_NANOCHAT_COST_48_USD
@@ -1076,4 +1094,7 @@ edges:
     edge_type: CONSTRAINS
   - from: E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ
     to: E_OBJECAO_DOMAIN_FORKS_UNREAD
+    edge_type: CONSTRAINS
+  - from: E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026
+    to: C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY
     edge_type: CONSTRAINS

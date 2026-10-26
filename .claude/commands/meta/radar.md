@@ -1,15 +1,15 @@
 ---
 name: radar
 description: >
-  Percepção externa do Onion — re-mede os 6 eixos de mundo (KG-agente, self-improving,
-  ecossistema Claude Code, capital, gates determinísticos, fronteira de modelos) contra a
-  baseline DATADA da última rodada, com juiz adversarial por eixo. Maestro-invocado, nunca
+  Percepção externa do Onion — re-mede os 7 eixos de mundo (KG-agente, self-improving,
+  ecossistema Claude Code, capital, gates determinísticos, fronteira de modelos, treino e
+  inferência) contra a baseline DATADA da última rodada, com juiz adversarial por eixo. Maestro-invocado, nunca
   agendado (MOAT W7); a REGRA 65 detecta a idade no lint e o humano dispara.
 category: meta
 tags: [radar, research, market, external-perception, orchestration]
-version: "1.0.0"
-updated: "2026-08-31"
-argument-hint: "[E1..E6 | vazio = eixos vencidos pela REGRA 65 | --all]"
+version: "1.1.0"
+updated: "2026-10-26"
+argument-hint: "[E1..E7 | vazio = eixos vencidos pela REGRA 65 | --all]"
 related_commands:
   - /meta:kg-freshness
   - /meta:evolve
@@ -64,11 +64,31 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
 - **Lacuna declarada é desfecho de 1ª classe** (molde `E_REDDIT_INALCANCAVEL`): fonte
   inalcançável vira `lacunas_declaradas`, nunca finding.
 
+## Os eixos
+
+Os eixos e as datas vivem em `docs/onion/radar-baselines.yaml` (SSOT); esta tabela diz o escopo.
+
+| Eixo | Mede | Fronteira |
+|---|---|---|
+| `E1-kg-agente` | KG para agentes, memória e grafos de conhecimento | — |
+| `E2-self-improving` | sistemas que se auto-melhoram | — |
+| `E3-claude-code-delta` | o delta do Claude Code contra a versão da última rodada | gatilho de versão da REGRA 65; `/meta:cc-update` |
+| `E4-capital` | rodadas, M&A, parcerias e down rounds | invariante de toda pesquisa |
+| `E5-gates-deterministicos` | gates e guardas determinísticos no mercado | — |
+| `E6-fronteira-modelos` | o modelo da **sessão**: lançamento, capacidade, lineup e preço | guarda `session_models`/`session_floor`, lidos pela PreModelSwitch |
+| `E7-treino-inferencia` | a **trajetória do mercado** de treino e inferência: treino próprio, retreino e fine-tuning, APIs de ajuste que abrem e fecham, plataformas de pesos abertos, modelos pequenos, inferência e custo | não toca a escada de modelos (isso é E6); fontes no grupo `treino-inferencia` de `docs/onion/radar-sources.yaml` |
+
+O **E7** foi aberto em 2026-10-26 por decisão do maestro, **sem rodada**: a curadoria mediu que o E6
+não tinha nenhuma menção a treino, fine-tuning, LoRA, destilação, quantização ou inferência, e que o fim
+do fine-tuning self-serve da OpenAI (desde 2026-05-07) passou pelo radar sem ser visto. Enquanto não
+roda, ele declara `never_run:` no baseline e a REGRA 65 o acusa SOFT como nunca-rodado (nunca HARD).
+Ao selar a 1ª rodada, entram `last_run` e `kg:`, e sai o `never_run:`.
+
 ## Etapas
 
 1. **Escopo**: sem argumento → eixos acusados pela REGRA 65 (`bash .claude/validation/lint-artifacts.sh`
-   ou leia `docs/onion/radar-baselines.yaml`); `E<N>` → só o eixo; `--all` → os 6.
-   `--axis <slug>` → eixo AD-HOC (tema livre fora de E1–E6): a rodada usa a lente de
+   ou leia `docs/onion/radar-baselines.yaml`); `E<N>` → só o eixo; `--all` → os 7.
+   `--axis <slug>` → eixo AD-HOC (tema livre fora de E1–E7): a rodada usa a lente de
    `common/prompts/research-doctrine.md` e o workflow `/onion-research`; ao selar, o eixo entra em
    `docs/onion/radar-baselines.yaml` como `AX-<slug>` com `last_run` e `kg:` — a REGRA 65 passa a
    cobrar a idade dele como dos demais. Fontes por eixo: `docs/onion/radar-sources.yaml`.

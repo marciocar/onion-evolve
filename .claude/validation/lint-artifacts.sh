@@ -4983,13 +4983,34 @@ check_radar_staleness() {
   [ -f "${bl}" ] || return 0
   local stale_days="${RADAR_STALE_DAYS:-45}"
   local today_epoch; today_epoch=$(date +%s)
-  local axes=0 stale=0 axis="" lr=""
+  local axes=0 stale=0 axis="" lr="" nr="" seen_lr=0
+  # Eixo ABERTO E NUNCA RODADO (2026-10-26, abertura do E7 por decisão do maestro): até aqui o eixo sem
+  # data era pulado EM SILÊNCIO (o laço só contava linha com data) — medido: um eixo novo nascia invisível
+  # à regra. Agora cada eixo fecha na troca de `- id:` (ou no fim do arquivo): sem data, é SOFT nomeando o
+  # eixo, com o motivo declarado em `never_run:` quando há; data E `never_run:` juntos também é SOFT (o
+  # carimbo de nunca-rodado sobreviveu à 1ª rodada). Nunca HARD: eixo recém-aberto não é defeito do arquivo.
+  _r65_flush() {
+    [ -n "${axis}" ] || return 0
+    if [ "${seen_lr}" -eq 0 ]; then
+      axes=$((axes+1))
+      if [ -n "${nr}" ]; then
+        violation "SOFT" "${bl}" "REGRA 65: eixo '${axis}' do radar de mundo NUNCA RODOU (declarado: ${nr}) — sem baseline não há percepção externa a cobrar pela idade; a 1ª rodada é do maestro: /meta:radar ${axis}"
+      else
+        violation "SOFT" "${bl}" "REGRA 65: eixo '${axis}' sem data de rodada e sem 'never_run:' declarado — a idade dele não é medida; declare 'never_run: <motivo>' ou rode /meta:radar ${axis}"
+      fi
+    elif [ -n "${nr}" ]; then
+      violation "SOFT" "${bl}" "REGRA 65: eixo '${axis}' tem data de rodada E 'never_run:' — o carimbo de nunca-rodado sobreviveu à rodada; remova o never_run"
+    fi
+  }
   while IFS= read -r line; do
     case "${line}" in
-      *"- id: "*) axis="${line#*- id: }"; lr="" ;;
+      *"- id: "*) _r65_flush; axis="${line#*- id: }"; lr=""; nr=""; seen_lr=0 ;;
+      *"never_run: "*)
+        nr="${line#*never_run: }"; nr="${nr%%#*}"; nr="${nr#\"}"; nr="${nr%\"}"
+        nr="${nr%"${nr##*[![:space:]]}"}"; nr="${nr%\"}"; [ -n "${nr}" ] || nr="(sem motivo)" ;;
       *"last_run: "*)
         lr="${line#*last_run: }"
-        axes=$((axes+1))
+        axes=$((axes+1)); seen_lr=1
         if ! grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' <<< "${lr}"; then
           violation "HARD" "${bl}" "REGRA 65: eixo '${axis}' com last_run ilegível ('${lr}') — baseline datada é o contrato; corrija ou remova o eixo"
           continue
@@ -5015,6 +5036,7 @@ check_radar_staleness() {
         ;;
     esac
   done < "${bl}"
+  _r65_flush
   if [ "${axes}" -eq 0 ]; then
     violation "HARD" "${bl}" "REGRA 65: arquivo de baselines presente mas SEM eixos legíveis — fail-loud, nunca conformidade por ausência"
   fi
