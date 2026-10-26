@@ -33,11 +33,13 @@
 # que muda o .githooks/pre-commit não é provado por ele mesmo. Causa conhecida: o Claude Code grava o
 # caminho absoluto ao criar worktree de agente, ou seja NO MEIO da sessão; por isso o lembrete mora aqui
 # (UserPromptSubmit) e não num SessionStart, que só o veria na sessão seguinte. LEMBRETE, nunca veto
-# (exit 0): avisa 1× por (sessão, valor); consertado e voltando, avisa de novo. Silêncio quando o valor é
-# relativo, está ausente, não termina em `.githooks`, a árvore não tem .githooks/, ou não há git. Roda
-# mesmo sem o censo (não depende de rede nem de registro).
-# TETO: lê só o `--local` (o .git/config comum); hooksPath por worktree (extensions.worktreeConfig) ou
-# global não é visto, e um absoluto que aponta para outro diretório (não `.githooks`) cala.
+# (exit 0): avisa 1× por (sessão, valor); consertado e voltando, avisa de novo. Lê o valor EFETIVO e só
+# fala quando ele é absoluto e é, por identidade de diretório, o .githooks/ deste repositório (da árvore
+# atual ou do checkout principal). Silêncio quando é relativo, está ausente, aponta para outro lugar (um
+# gestor de hooks compartilhado não é este defeito), o diretório não existe, ou não há git. Roda mesmo sem
+# o censo (não depende de rede nem de registro).
+# TETO: o conserto sugerido escreve no `--local`; se o absoluto vier de config por worktree
+# (extensions.worktreeConfig), o lugar certo é `--worktree`, e o texto não distingue.
 set -uo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 census="${ONION_CURRENCY_CENSUS:-${here}/../validation/currency-census.sh}"
@@ -56,14 +58,20 @@ st="$(stat -c '%u %a' "${state_dir}" 2>/dev/null)" && [ "${st%% *}" = "$(id -u)"
 [ -z "${state}" ] || [ -f "${state}" ] || : > "${state}" 2>/dev/null
 hookspath_reminder() {
   command -v git >/dev/null 2>&1 || return 0
-  local top hp mark
-  top="$(git -C "${repo}" rev-parse --show-toplevel 2>/dev/null)" || return 0
-  hp="$(git -C "${repo}" config --local --get core.hooksPath 2>/dev/null)" || hp=""
+  local top common hp abs mark
   mark=""; [ -z "${state}" ] || mark="${state%.tsv}.hookspath"
-  case "${hp}" in
-    /*/.githooks|/*/.githooks/|"~"*/.githooks|"~"*/.githooks/) [ -d "${top}/.githooks" ] || return 0 ;;
-    *) [ -z "${mark}" ] || rm -f "${mark}" 2>/dev/null; return 0 ;;
+  top="$(git -C "${repo}" rev-parse --show-toplevel 2>/dev/null)" || return 0
+  common="$(git -C "${repo}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || common=""
+  # o valor EFETIVO (o que o git usa nesta árvore: config por worktree vence o --local), e o `~/` que o git expande
+  hp="$(git -C "${repo}" config --get core.hooksPath 2>/dev/null)" || hp=""
+  abs="${hp}"; case "${hp}" in "~/"*) abs="${HOME:-/nonexistent}/${hp#\~/}" ;; esac
+  # só o .githooks DESTE repositório, por IDENTIDADE de diretório (`-ef`), nunca por string: um gestor de hooks
+  # compartilhado noutro lugar não é este defeito, e o conserto `.githooks` trocaria quais hooks rodam
+  case "${abs}" in
+    /*) if [ "${abs}" -ef "${top}/.githooks" ] || { [ -n "${common}" ] && [ "${abs}" -ef "$(dirname "${common}")/.githooks" ]; }; then :; else abs=""; fi ;;
+    *) abs="" ;;
   esac
+  if [ -z "${abs}" ]; then [ -z "${mark}" ] || rm -f "${mark}" 2>/dev/null; return 0; fi
   [ -n "${mark}" ] && [ "$(cat "${mark}" 2>/dev/null)" = "${hp}" ] && return 0
   [ -z "${mark}" ] || printf '%s' "${hp}" > "${mark}" 2>/dev/null
   echo "⚠️ Onion — core.hooksPath está ABSOLUTO ('${hp}'): toda worktree roda o .githooks/ do checkout principal, não o da própria branch, e um PR que muda o pre-commit não é provado por ele mesmo. Conserto: git config core.hooksPath .githooks (causa conhecida: o Claude Code grava o caminho absoluto ao criar worktree de agente)."
