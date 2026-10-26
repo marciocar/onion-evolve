@@ -221,7 +221,12 @@
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_MASTER_PASSAVA_RC0_REPRODUZIDO	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
+.claude/hooks/session-currency-check.sh	C_TETO_CONSERTO_NO_LOCAL	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/hooks/session-currency-check.sh	D_SUBSTRATO_HOOK_DE_AVISO	docs/evolution/research/guard-keep-current-2026-10/keep-current-2026-10.kg.yaml
+.claude/hooks/session-currency-check.sh	D_SUBSTRATO_LEMBRETE_NO_HOOK_DE_BASE_ATUAL	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
+.claude/hooks/session-currency-check.sh	E_DEFEITO_HOOKSPATH_ABSOLUTO_RODA_HOOK_DA_MAIN	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
+.claude/hooks/session-currency-check.sh	E_DOGFOOD_CORE_VOLTOU_A_ABSOLUTO	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
+.claude/hooks/session-currency-check.sh	E_ELENXO_1A_PASSADA_FALSOS_POSITIVOS	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/rules/dissect-lens.md	C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
@@ -229,6 +234,7 @@
 .claude/rules/kg-grammar.md	C_TETO_PERFIL_YAML_E_DO_CONTRATO	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/rules/research-lens.md	E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/settings.json	C_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
+.claude/settings.json	C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/settings.json	D_DOIS_SUBSTRATOS_UMA_FRONTEIRA	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/settings.json	E_D2_SRC	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/settings.json	E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
@@ -600,6 +606,7 @@
 .claude/validation/lint-selftest.sh	D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_36_selftests	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/lint-selftest.sh	E_BANCADA_E_MUTANTE_HOOKSPATH	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_BANCADA_MORREU_CALADA_POR_SET_E	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_BANCADA_NAO_CONTAVA_PARA_NINGUEM	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_CASA_MEDIDA_ORDEM_E_CORPUS_1001	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml

@@ -2,7 +2,8 @@
 branch: feat/hookspath-absolute-reminder
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f0911af407c026ab449bece44da00ed7920dd5fd22d27bd239c14158072cddb7
+reviewed_code_sha256: 3755e2e5e3012fe4d760ec5d20ab0c83c963af8d6cf8890f1bc8b0dc0f3be2bd
 findings_total: 7
 findings_real: 7
 tokens: 90598
