@@ -222,11 +222,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
-    confidence: 0.6
-    verified_at: "2026-10-23"
-    verified_against: "proposta da r17 após o EXAGERA do juiz: estender o ramo Bash do kg-read-leg.sh às escritas in-place sobre arquivos rastreados, com caso na bancada (Edit e sed -i no mesmo arquivo dão o mesmo aviso); issue SAC-240"
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "curado em feat/kg-read-leg-sed-inplace: o kg-read-leg.sh com Bash sed -i sobre .claude/hooks/pretooluse-env-guard.sh agora avisa (antes 0 bytes), e também sed --in-place, sed -Ei.bak e perl -pi; o parser de comando é o segments da própria guarda do .env, carregado por ast; bancada kg_read_leg (m) avisa, (n) arquivo não indexado cala, (o) sed sem -i, echo e relativo depois de cd calam, (p) sem a guarda cala com rc 0, (q-MUT) sem o ramo do Bash o (m) cala; issue SAC-240"
     label: "a perna de leitura do grafo deve avisar também quando um arquivo rastreado é editado por sed -i, que na 2.1.309 é Bash comum"
     provenance:
       source: "https://linear.app/sacola/issue/SAC-240"
