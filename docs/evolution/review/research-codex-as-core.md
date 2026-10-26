@@ -2,7 +2,8 @@
 branch: research/codex-as-core
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b2dd911d9d8a2090787126a3308ed2bf84ead2a8fcb36146b178c80963aeca53
+reviewed_code_sha256: 3a49be32065392bc25691075a2c8b094f529ebc72e89b60f040a8a9a41e9ae73
 findings_total: 16
 findings_real: 16
 tokens: 1384791
