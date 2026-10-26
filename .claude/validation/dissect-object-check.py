@@ -27,7 +27,7 @@ Sem `x_dissect_pieces`, tudo como antes: um veredito por estudo.
 
 Modos:
   dissect-object-check.py <grafo> [--stage plan|final] [--allow-uncommitted] [--expect-verdict V] [--max-level N]
-      --expect-verdict com peças: V vale para todas, ou ID=V,ID=V por peça
+      --expect-verdict com peças: V vale para todas, ou ID=V,ID=V nomeando cada peça (peça fora do mapa reprova)
       rc 0 sem achado · 1 com achado · 3 não pôde medir; linhas `aviso item N <código>:` informam e não mudam o rc
       --allow-uncommitted: quem conduz confere ANTES de commitar; só stage0-nao-commitado e n0-nao-commitado deixam
       de ser achado. O gate do comando roda sem ela.
@@ -266,6 +266,10 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
         stray = sorted(set(expect_map) - {n.get("id") for n in judged})
         if stray:
             add(2, "veredito-diverge-do-elenxo", "o Elenxo sustentou vereditos para %s, que não são vereditos deste grafo" % stray)
+        # peça fora do mapa não é peça conferida: sem isto, o mapa com uma peça só deixava as outras sem juiz
+        unjudged = sorted(n.get("id") for n in judged if n.get("id") not in expect_map)
+        if unjudged:
+            add(2, "veredito-sem-elenxo", "o mapa do --expect-verdict não diz o que o Elenxo sustentou para %s" % unjudged)
     levels = [level_of(n) for n in nodes if isinstance(level_of(n), int)]
     if max_level is not None and levels and max(levels) > max_level:
         add(2, "nivel-acima-do-sustentado", "o grafo chega ao N%d; o Elenxo sustentou até o N%d" % (max(levels), max_level))

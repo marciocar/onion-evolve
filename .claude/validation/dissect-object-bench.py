@@ -234,6 +234,7 @@ CASES = [
     ("expect-verdict por peça que bate (variante legítima)", None, pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=parquear,D_PIECE_C=parquear"]),
     ("expect-verdict por peça que diverge", "veredito-diverge-do-elenxo", pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=rejeitar,D_PIECE_C=parquear"]),
     ("expect-verdict para peça que não existe", "veredito-diverge-do-elenxo", pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=parquear,D_PIECE_C=parquear,D_OUTRA=parquear"]),
+    ("expect-verdict por peça que deixa uma peça de fora", "veredito-sem-elenxo", pieces, "ok", ["--expect-verdict", "D_FIXTURE=costurar,D_PIECE_B=parquear"]),
     ("app N2 sem artefato com uma peça que costura", "app-sem-artefato-veredito", seq(pieces, no_art, flatten_to_1), "ok", []),
 ]
 RC3_CASES = [
