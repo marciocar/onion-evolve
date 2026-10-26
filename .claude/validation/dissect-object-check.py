@@ -17,8 +17,17 @@ de UM estudo e o git log. Determinístico, sem LLM e sem rede.
           que o destino precisa ver para reabrir (achado da curadoria em 2026-10-25)
   item 8  app com N2 sem artefato aberto nem uso observado: nível máximo 1 e veredito parquear
 
+PEÇAS (achado da curadoria em 2026-10-26): um objeto pode ter peças de vereditos diferentes (costurar uma, parquear
+outra). O meta declara `x_dissect_pieces: [ids]` (2 ou mais), e cada peça tem o SEU `x_dissect_verdict`, o mesmo campo
+do veredito único, para o censo e o --context enxergarem. Aí o item 2 aceita um veredito por peça declarada (veredito
+fora delas ou peça sem veredito reprova), e os itens 2, 6, 7 e 8 julgam CADA peça com as regras de sempre; o selo
+(status done + x_dissect_sealed_by) é por peça, porque o destino sela cada uma no seu tempo. `x_piece_verdict` é lido
+como apelido do 1º estudo que usou peças: sem ele, aquele parque saía calado, e é o caso que esta leitura existe para ver.
+Sem `x_dissect_pieces`, tudo como antes: um veredito por estudo.
+
 Modos:
   dissect-object-check.py <grafo> [--stage plan|final] [--allow-uncommitted] [--expect-verdict V] [--max-level N]
+      --expect-verdict com peças: V vale para todas, ou ID=V,ID=V por peça
       rc 0 sem achado · 1 com achado · 3 não pôde medir; linhas `aviso item N <código>:` informam e não mudam o rc
       --allow-uncommitted: quem conduz confere ANTES de commitar; só stage0-nao-commitado e n0-nao-commitado deixam
       de ser achado. O gate do comando roda sem ela.
@@ -218,71 +227,54 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
     if not isinstance(meta.get("x_unverified"), list):
         add(4, "sem-x_unverified", "meta.x_unverified ausente: a lista do que não foi verificado (vazia vale, ausente não)")
 
-    # item 2 — um veredito, do vocabulário da família, e o que o Elenxo sustentou
-    vnodes = [n for n in nodes if n.get("x_dissect_verdict") is not None]
+    # item 2 — um veredito (ou um por peça declarada), do vocabulário da família, e o que o Elenxo sustentou
+    for n in nodes:  # o apelido e o campo dizendo coisas diferentes: qual dos dois o destino sela?
+        if n.get("x_dissect_verdict") is not None and n.get("x_piece_verdict") is not None and str(n["x_dissect_verdict"]) != str(n["x_piece_verdict"]):
+            add(2, "veredito-de-peca-diverge", "%s: x_dissect_verdict=%s e x_piece_verdict=%s; fica o x_dissect_verdict, e o apelido sai" % (n.get("id"), n["x_dissect_verdict"], n["x_piece_verdict"]))
+    vnodes = [n for n in nodes if verdict_of(n) is not None]
     # o modo estudo do core (§1b da doutrina) para no N2 SEM veredito: a família, a Etapa 0, o destino, quem paga e o
     # não verificado seguem cobrados; veredito ali é o estudo decidindo, e o censo já o chama de INCOERENTE
     if meta.get("x_dissect_mode") == "study":
         if vnodes:
             add(2, "estudo-com-veredito", "meta.x_dissect_mode: study não emite veredito; achado em %s" % [n.get("id") for n in vnodes])
         return findings
-    if len(vnodes) != 1:
-        if vnodes:
-            add(2, "veredito-duplicado", "%d nós com x_dissect_verdict; exigido 1" % len(vnodes))
-        else:
-            add(2, "veredito-ausente", "nenhum nó com x_dissect_verdict; exigido 1")
-        return findings
-    vn = vnodes[0]
-    verdict = str(vn.get("x_dissect_verdict"))
-    # o veredito mora no nó de decisão, e ele nasce open (o estudo não sela; ele registra o selo do destino)
-    if vn.get("node_type") != "decision" or vn.get("id") == "S_STAGE0":
-        add(2, "veredito-fora-de-decisao", "x_dissect_verdict está em %s (node_type %s); exigido o nó D_ de decisão" % (vn.get("id"), vn.get("node_type")))
-    # o destino sela no repo DELE; o estudo só registra que selou: status done com x_dissect_sealed_by apontando o nó
-    # do selo (<repo>:<caminho>#<ID>, ponteiro opaco: o checador não lê outro repo). Fechado sem ponteiro segue reprovado.
-    sealed_by = vn.get("x_dissect_sealed_by")
-    seal_ok = isinstance(sealed_by, str) and bool(SEALED_BY.match(sealed_by))
-    if sealed_by is not None and not seal_ok:
-        add(2, "selo-mal-formado", "x_dissect_sealed_by=%r; exigido <repo>:<caminho>#<ID_DO_NO>" % (sealed_by,))
-    if vn.get("status") != "open" and not (vn.get("status") == "done" and seal_ok):
-        add(2, "veredito-selado", "o nó do veredito %s está %s; ele nasce open e só fecha com x_dissect_sealed_by apontando o selo do destino" % (vn.get("id"), vn.get("status")))
-    if spec is not None and verdict not in (spec.get("verdicts") or []):
-        add(2, "veredito-fora-da-familia", "%s não está nos vereditos de %s: %s" % (verdict, fam, spec.get("verdicts")))
-    if verdict == "perseguir" and vn.get("x_dissect_pursue") not in PURSUE:
-        add(2, "perseguir-sem-saida", "x_dissect_pursue=%r; exigido estudo | projeto-novo" % vn.get("x_dissect_pursue"))
-    if expect_verdict is not None and verdict != expect_verdict:
-        add(2, "veredito-diverge-do-elenxo", "o grafo diz %s; o Elenxo sustentou %s (o escritor não troca o veredito)" % (verdict, expect_verdict))
+    pieces = meta.get("x_dissect_pieces")
+    if pieces is None:
+        if len(vnodes) != 1:
+            if vnodes:
+                add(2, "veredito-duplicado", "%d nós com veredito (%s); exigido 1, ou declare as peças em meta.x_dissect_pieces" % (len(vnodes), [n.get("id") for n in vnodes]))
+            else:
+                add(2, "veredito-ausente", "nenhum nó com x_dissect_verdict; exigido 1")
+            return findings
+        judged = vnodes
+    else:
+        well = (isinstance(pieces, list) and len(pieces) >= 2 and all(isinstance(p, str) for p in pieces)
+                and len(set(pieces)) == len(pieces))
+        if not well or any(p not in by_id for p in pieces):
+            add(2, "pecas-mal-formadas", "meta.x_dissect_pieces=%r; exigida lista de 2 ou mais ids distintos de nós deste grafo" % (pieces,))
+            return findings
+        for n in vnodes:
+            if n.get("id") not in pieces:
+                add(2, "veredito-fora-das-pecas", "%s tem veredito e não está em meta.x_dissect_pieces %s" % (n.get("id"), pieces))
+        for p in pieces:
+            if verdict_of(by_id[p]) is None:
+                add(2, "peca-sem-veredito", "a peça %s está em meta.x_dissect_pieces e não tem x_dissect_verdict" % p)
+        judged = [by_id[p] for p in pieces if verdict_of(by_id[p]) is not None]
+    expect_map = None
+    if expect_verdict is not None and "=" in expect_verdict:
+        expect_map = dict(kv.split("=", 1) for kv in expect_verdict.split(",") if "=" in kv)
+        stray = sorted(set(expect_map) - {n.get("id") for n in judged})
+        if stray:
+            add(2, "veredito-diverge-do-elenxo", "o Elenxo sustentou vereditos para %s, que não são vereditos deste grafo" % stray)
     levels = [level_of(n) for n in nodes if isinstance(level_of(n), int)]
     if max_level is not None and levels and max(levels) > max_level:
         add(2, "nivel-acima-do-sustentado", "o grafo chega ao N%d; o Elenxo sustentou até o N%d" % (max(levels), max_level))
-
-    # item 6 — negativo com superação; quando nenhuma, a busca saiu do repo
-    if verdict in ("parquear", "rejeitar"):
-        ov = vn.get("x_dissect_overcoming")
-        if ov is None:
-            add(6, "sem-x_dissect_overcoming", "veredito %s sem x_dissect_overcoming (id de nó ou nenhuma)" % verdict)
-        elif ov == "nenhuma":
-            search = vn.get("x_dissect_overcoming_search")
-            items = [s for s in search if isinstance(s, dict)] if isinstance(search, list) else []
-            bad = [s for s in items if s.get("where") not in ("corpus", "web") or not (s.get("cmd") or s.get("source"))]
-            if not items or bad:
-                add(6, "busca-mal-formada", "x_dissect_overcoming_search exige itens {where: corpus|web, cmd|source}")
-            elif not any(s.get("where") == "web" for s in items):
-                add(6, "busca-sem-web", "superação nenhuma sem busca where: web (o 1º estudo do adotante não achou a alternativa por buscar só no repo)")
-        else:
-            target = by_id.get(ov)
-            prov = (target or {}).get("provenance") if isinstance(target, dict) else None
-            loc = prov.get("locality") if isinstance(prov, dict) else None
-            if target is None:
-                add(6, "superacao-id-invalido", "x_dissect_overcoming=%r não é nó deste grafo" % ov)
-            elif loc not in ("web", "repo"):
-                add(6, "superacao-sem-locality", "o nó %s não declara provenance.locality web|repo" % ov)
-
-    # item 7 — o parque tem gatilho que lê o que persiste, e ele ainda não disparou
-    if verdict == "parquear":
-        # selado, o estudo já não "sustenta o parque ao selar": o disparo depois do selo é sinal para o destino
-        # reabrir, e reprová-lo impediria o grafo de registrar a superação que o gatilho existe para enxergar
-        trigger_check(add, vn.get("x_dissect_trigger"), path, by_id,
-                      fired=note if (vn.get("status") == "done" and seal_ok) else None)
+    verdicts = []
+    for vn in judged:
+        verdict = str(verdict_of(vn))
+        verdicts.append(verdict)
+        want = expect_map.get(vn.get("id")) if expect_map is not None else expect_verdict
+        judge_verdict(add, note, vn, verdict, want, spec, fam, by_id, path)
 
     # item 8 — app sem artefato no N2 fica no nível 1 e só parqueia
     if fam == "app":
@@ -301,9 +293,68 @@ def check(path, stage, allow_uncommitted=False, expect_verdict=None, max_level=N
             deep = sorted({lv for lv in levels if lv >= 2})
             if deep:
                 add(8, "app-acima-do-nivel-1", "N2 sem artefato aberto nem uso observado; nós nos níveis %s" % deep)
-            if verdict != "parquear":
-                add(8, "app-sem-artefato-veredito", "N2 sem artefato limita o veredito a parquear; achado %s" % verdict)
+            if any(v != "parquear" for v in verdicts):
+                add(8, "app-sem-artefato-veredito", "N2 sem artefato limita o veredito a parquear; achado %s" % verdicts)
     return findings
+
+
+def verdict_of(n):
+    """o veredito do nó: x_dissect_verdict, ou o apelido x_piece_verdict do 1º estudo com peças (2026-10-26)."""
+    v = n.get("x_dissect_verdict")
+    return v if v is not None else n.get("x_piece_verdict")
+
+
+def judge_verdict(add, note, vn, verdict, expect, spec, fam, by_id, path):
+    """os itens 2, 6 e 7 sobre UM veredito: o do estudo, ou o de cada peça declarada."""
+    vid = vn.get("id")
+    # o veredito mora no nó de decisão, e ele nasce open (o estudo não sela; ele registra o selo do destino)
+    if vn.get("node_type") != "decision" or vid == "S_STAGE0":
+        add(2, "veredito-fora-de-decisao", "x_dissect_verdict está em %s (node_type %s); exigido o nó D_ de decisão" % (vid, vn.get("node_type")))
+    # o destino sela no repo DELE; o estudo só registra que selou: status done com x_dissect_sealed_by apontando o nó
+    # do selo (<repo>:<caminho>#<ID>, ponteiro opaco: o checador não lê outro repo). Fechado sem ponteiro segue reprovado.
+    sealed_by = vn.get("x_dissect_sealed_by")
+    seal_ok = isinstance(sealed_by, str) and bool(SEALED_BY.match(sealed_by))
+    if sealed_by is not None and not seal_ok:
+        add(2, "selo-mal-formado", "%s: x_dissect_sealed_by=%r; exigido <repo>:<caminho>#<ID_DO_NO>" % (vid, sealed_by))
+    if vn.get("status") != "open" and not (vn.get("status") == "done" and seal_ok):
+        add(2, "veredito-selado", "o nó do veredito %s está %s; ele nasce open e só fecha com x_dissect_sealed_by apontando o selo do destino" % (vid, vn.get("status")))
+    if spec is not None and verdict not in (spec.get("verdicts") or []):
+        add(2, "veredito-fora-da-familia", "%s (%s) não está nos vereditos de %s: %s" % (verdict, vid, fam, spec.get("verdicts")))
+    if verdict == "perseguir" and vn.get("x_dissect_pursue") not in PURSUE:
+        add(2, "perseguir-sem-saida", "%s: x_dissect_pursue=%r; exigido estudo | projeto-novo" % (vid, vn.get("x_dissect_pursue")))
+    if expect is not None and verdict != expect:
+        add(2, "veredito-diverge-do-elenxo", "%s diz %s; o Elenxo sustentou %s (o escritor não troca o veredito)" % (vid, verdict, expect))
+
+    # item 6 — negativo com superação; quando nenhuma, a busca saiu do repo
+    if verdict in ("parquear", "rejeitar"):
+        ov = vn.get("x_dissect_overcoming")
+        if ov is None:
+            add(6, "sem-x_dissect_overcoming", "%s: veredito %s sem x_dissect_overcoming (id de nó ou nenhuma)" % (vid, verdict))
+        elif ov == "nenhuma":
+            search = vn.get("x_dissect_overcoming_search")
+            items = [s for s in search if isinstance(s, dict)] if isinstance(search, list) else []
+            bad = [s for s in items if s.get("where") not in ("corpus", "web") or not (s.get("cmd") or s.get("source"))]
+            if not items or bad:
+                add(6, "busca-mal-formada", "%s: x_dissect_overcoming_search exige itens {where: corpus|web, cmd|source}" % vid)
+            elif not any(s.get("where") == "web" for s in items):
+                add(6, "busca-sem-web", "%s: superação nenhuma sem busca where: web (o 1º estudo do adotante não achou a alternativa por buscar só no repo)" % vid)
+        else:
+            target = by_id.get(ov)
+            prov = (target or {}).get("provenance") if isinstance(target, dict) else None
+            loc = prov.get("locality") if isinstance(prov, dict) else None
+            if target is None:
+                add(6, "superacao-id-invalido", "%s: x_dissect_overcoming=%r não é nó deste grafo" % (vid, ov))
+            elif loc not in ("web", "repo"):
+                add(6, "superacao-sem-locality", "%s: o nó %s não declara provenance.locality web|repo" % (vid, ov))
+
+    # item 7 — o parque tem gatilho que lê o que persiste, e ele ainda não disparou
+    if verdict == "parquear":
+        # selado, o estudo já não "sustenta o parque ao selar": o disparo depois do selo é sinal para o destino
+        # reabrir, e reprová-lo impediria o grafo de registrar a superação que o gatilho existe para enxergar.
+        # Com peças, cada parque leva o prefixo da peça: o rdf-extra mostrou o parque de peça passando calado
+        tag = lambda f: (lambda item, code, detail: f(item, code, "%s: %s" % (vid, detail)))
+        trigger_check(tag(add), vn.get("x_dissect_trigger"), path, by_id,
+                      fired=tag(note) if (vn.get("status") == "done" and seal_ok) else None)
 
 
 def plan_check(add, path, ref, crit, allow_uncommitted, stage):
@@ -454,7 +505,9 @@ def context():
         meta = doc.get("meta") or {}
         if not meta.get("x_dissect_tool"):
             continue
-        verdict = next((str(n.get("x_dissect_verdict")) for n in nodes_of(doc) if n.get("x_dissect_verdict") is not None), "—")
+        # com peças, um veredito por peça (a+b+c); sem elas, o 1º, como sempre
+        vs = [str(verdict_of(n)) for n in nodes_of(doc) if verdict_of(n) is not None]
+        verdict = (" + ".join(vs) if meta.get("x_dissect_pieces") else vs[0]) if vs else "—"
         fam = meta.get("x_dissect_family")
         k3 = "anterior"
         if meta.get("x_study_destination") is not None:  # o marcador de estudo v4; família legada sem ele fica fora
