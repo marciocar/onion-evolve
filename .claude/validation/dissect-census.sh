@@ -64,6 +64,13 @@
 # ancorado no próprio critério. Motivos: superacao-circular-*, superacao-nao-medida-status-*,
 # superacao-sem-verified_at, superacao-carimbo-futuro-*, superacao-sem-verified_against,
 # superacao-ancorada-no-criterio. O status quo rotulado de superação NÃO é visto aqui (declarado).
+# 3ª leva (OBJETO EM PEÇAS, 2026-10-26): com `meta.x_dissect_pieces: [ids]` (a forma do checador), cada peça
+# tem o seu `x_dissect_verdict` (apelido `x_piece_verdict`). Antes este censo lia só o 1º veredito do arquivo,
+# e o `--check-verdict` julgava só a 1ª peça — a que parqueia ficava fora da cobrança. Agora a seção `peças`
+# lista cada uma (id, veredito, estado), a coluna veredito junta as peças com `+`, e cada peça NEGATIVA é
+# cobrada pelas regras acima: uma recusada ⇒ `veredito-SEM-SUPERACAO(<peça>:<motivos>;…)`; peça declarada
+# sem veredito ⇒ `pecas-SEM-VEREDITO(<peças>)`. Sem peças, a saída é a de antes, byte a byte. O --tsv segue
+# com uma linha por estudo (as peças estão na coluna veredito e no estado, não em linhas próprias).
 #
 # Uso:  bash .claude/validation/dissect-census.sh [<repo>] [--markdown|--tsv|--regua-padrao]
 #       bash .claude/validation/dissect-census.sh [<repo>] --check-verdict <ferramenta>
@@ -133,7 +140,145 @@ TODAY="$(date +%F)"
 # (`grep -q`/`head`) a jusante de escritor grande, que sob `set -o pipefail` devolve 141 e faz
 # a peça existente contar como ausente — classe pipefail-epipe-early-closer, curada aqui por
 # construção (laços que leem até o fim).
-rows=""; parked=""; found=0
+# ── _neg_why <grafo> [<id da peça>] — os motivos (",a,b") que recusam um veredito NEGATIVO ─────────
+# Sem id: o 1º nó que carrega veredito (o comportamento de sempre, um veredito por estudo). Com id: o nó DAQUELA
+# peça (meta.x_dissect_pieces), lido também pelo apelido x_piece_verdict — cada peça negativa é julgada pelas
+# mesmas regras de superação e critério de um veredito único. Vazio = conta como veredito.
+_neg_why() {
+  local f="$1" want="${2:-}" ogm og_id og_crit og_ov og_meas ogwhy ogc
+  # SAC-151: o nó da reprovação é o que carrega x_dissect_verdict; os marcadores moram NELE.
+  # Leitura tolerante à forma (achados do refutador, 2026-10-15): aspas e comentário `# …` saem do valor;
+  # o id da superação tem de ser do alfabeto do radar; a aresta é lida por ITEM do bloco `edges:` (from,
+  # to e edge_type do MESMO item) e só TRACES_TO (a superação nasce da reprovação) ou SUPPORTS (evidência
+  # que já existia e sustenta a decisão) contam — REFUTES/CONSTRAINS não são superação.
+  # ⚠️ SEPARADOR \037 (US), NUNCA TAB: tab é IFS-WHITESPACE para o `read`, e tabs seguidos COLAPSAM —
+  #    com `x_dissect_criterion:` vazio a medida caía em og_ov e o estado acusava `superacao-id-invalido`
+  #    (achado de campo da sessão de curadoria, 2026-10-16). O mesmo colapso pegava o id vazio (veredito
+  #    no `meta:`, antes de qualquer `- id:`) e o overcoming vazio com medida. Com separador que não é
+  #    whitespace, campo vazio fica vazio no lugar dele.
+  ogm="$(awk -v want="${want}" '
+    function val(s) { sub(/^[^:]*:[[:space:]]*/, "", s); sub(/[[:space:]]+#.*$/, "", s); gsub(/^["\047]|["\047][[:space:]]*$/, "", s); sub(/[[:space:]]+$/, "", s); return s }
+    function flush() { if (isv && (want == "" || id == want)) { printf "%s\037%s\037%s\037%s\n", id, crit, ov, meas; done = 1 } isv = 0; crit = ""; ov = ""; meas = ""; id = "" }
+    done { next }
+    /^[[:space:]]*- id:/ { flush(); if (done) next; id = val($0); next }
+    /^edges:/ { flush(); next }
+    /^[[:space:]]*(x_)?dissect_verdict:/ || (want != "" && /^[[:space:]]*x_piece_verdict:/) { isv = 1 }
+    /^[[:space:]]*x_dissect_criterion:/ { crit = val($0) }
+    /^[[:space:]]*x_dissect_overcoming:/ { ov = val($0) }
+    /^[[:space:]]*x_dissect_overcoming_measure:/ { meas = val($0) }
+    END { if (!done) flush() }' "${f}")"
+  IFS=$'\037' read -r og_id og_crit og_ov og_meas <<< "${ogm}"
+  ogwhy=""
+  # critério = um COMANDO com argumento (≥ 8 caracteres e um espaço), nunca "sim"
+  { [ "${#og_crit}" -ge 8 ] && [[ "${og_crit}" == *" "* ]]; } || ogwhy="${ogwhy},sem-x_dissect_criterion"
+  if [ -z "${og_ov}" ]; then ogwhy="${ogwhy},sem-x_dissect_overcoming"
+  elif [ "${og_ov}" = "nenhuma" ]; then
+    # a razão MEDIDA tem palavras (duas com letra), não pontuação de enchimento
+    [ "$(printf '%s' "${og_meas}" | LC_ALL=C tr -s '[:space:]' '\n' | LC_ALL=C grep -c '[A-Za-z]')" -ge 2 ] || ogwhy="${ogwhy},nenhuma-sem-medida"
+  elif ! [[ "${og_ov}" =~ ^[A-Za-z0-9_]+$ ]]; then ogwhy="${ogwhy},superacao-id-invalido"
+  # veredito SEM id (declarado no `meta:`, antes de qualquer `- id:`): não há nó para a aresta da
+  # superação apontar, e com d="" uma aresta SEM `to:` casava `to == d` e a busca de circularidade
+  # semeava do vazio (achado do refutador, 2026-10-16). `nenhuma` medida segue valendo no meta:.
+  elif [ -z "${og_id}" ]; then ogwhy="${ogwhy},superacao-sem-id-do-veredito"
+  else
+    grep -qE "^[[:space:]]*- id:[[:space:]]*[\"']?${og_ov}[\"']?[[:space:]]*(#.*)?\$" "${f}" || ogwhy="${ogwhy},superacao-${og_ov}-inexistente"
+    awk -v s="${og_ov}" -v d="${og_id}" '
+      function val(x) { sub(/^[^:]*:[[:space:]]*/, "", x); sub(/[[:space:]]+#.*$/, "", x); gsub(/^["\047]|["\047][[:space:]]*$/, "", x); sub(/[[:space:]]+$/, "", x); return x }
+      function item() { if (fr == s && to == d && (et == "TRACES_TO" || et == "SUPPORTS")) ok = 1; fr = ""; to = ""; et = "" }
+      /^edges:/ { e = 1; next }
+      e && /^[^[:space:]-]/ { item(); e = 0 }
+      !e { next }
+      /^[[:space:]]*-[[:space:]]/ { item(); line = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", line); $0 = line }
+      /^[[:space:]]*from:/ { fr = val($0) }
+      /^[[:space:]]*to:/ { to = val($0) }
+      /^[[:space:]]*edge_type:/ { et = val($0) }
+      END { item(); exit ok ? 0 : 1 }' "${f}" || ogwhy="${ogwhy},sem-aresta-${og_ov}-para-${og_id:-?}"
+    # 2ª leva (SAC-151): superação de CONSOLO. Achado de campo de um adotante de curadoria (PR #30, DADO): a
+    # 1ª versão do pagamento da dívida passou aqui com 4 superações que só o Elenxo reprovou. O que a FORMA
+    # do grafo deixa ver, recusa-se aqui (o resto vai como pergunta ao juiz, na doutrina):
+    #   · CIRCULAR — o próprio nó do veredito, ou um nó que DERIVA dele por OUTRO caminho que não a aresta
+    #     declarada da superação. Derivação POR TIPO de aresta (medida no contrato: a decisão aponta a origem
+    #     com TRACES_TO): `A SUPPORTS B` e `A CAUSES B` ⇒ B deriva de A; `A TRACES_TO B` e `A DEPENDS_ON B` ⇒
+    #     A deriva de B. REFUTES/CONSTRAINS/SUPERSEDES não derivam. A aresta S→D que liga a superação ao
+    #     veredito fica FORA da busca: é a forma que a doutrina pede (S TRACES_TO D = nasceu da reprovação;
+    #     S SUPPORTS D = já existia e sustenta) — distinguir as duas por estrutura é impossível (declarado).
+    #     O ANCESTRAL que sustenta é a forma LEGÍTIMA (a única superação real medida, o OCR local do
+    #     markitdown, é `E SUPPORTS D`), logo não é recusado; `D TRACES_TO S` (D cita S como fonte) também não;
+    #   · NÃO MEDIDA — status fora de confirmed|done (open = condição ou cura em curso), sem verified_at ou
+    #     fora de AAAA-MM-DD, verified_at (10 primeiros caracteres) DEPOIS de hoje, verified_against vazio
+    #     ou sem 3 caracteres alfanuméricos (`-`, `?`, `0`) ou n/a|null|none|tbd|todo;
+    #   · ANCORADA NO CRITÉRIO — verified_against/trace do nó É o x_dissect_criterion (igualdade sem espaços):
+    #     mede a reprovação, não a entrega. Só a igualdade: citar o critério aplicado à variante é a forma
+    #     mais forte de medir (achado do refutador, 2026-10-15), e a inclusão a recusaria.
+    # Campos lidos só na indentação do próprio nó (id + 2), não em sub-blocos. Critério via ENVIRON (o -v do
+    # awk interpreta barra invertida). NÃO detectado (declarado): o STATUS QUO rotulado de superação e o
+    # placeholder em prosa num nó confirmed (o verified_against da superação real é um token hifenizado,
+    # igual ao de um placeholder) — exigiria palavra-chave frágil; é a pergunta obrigatória da doutrina.
+    ogc="$(OG_CRIT="${og_crit}" awk -v s="${og_ov}" -v d="${og_id}" -v today="${TODAY}" '
+      function val(x) { sub(/^[^:]*:[[:space:]]*/, "", x); sub(/[[:space:]]+#.*$/, "", x); gsub(/^["\047]|["\047][[:space:]]*$/, "", x); sub(/[[:space:]]+$/, "", x); return x }
+      function squash(x) { x = tolower(x); gsub(/["\047`[:space:]]/, "", x); return x }
+      function ind(x) { match(x, /^[[:space:]]*/); return RLENGTH }
+      function item() { if (fr != "" && to != "" && !(fr == s && to == d)) {
+          if (et == "SUPPORTS" || et == "CAUSES") { n++; P[n] = fr; C[n] = to }
+          else if (et == "TRACES_TO" || et == "DEPENDS_ON") { n++; P[n] = to; C[n] = fr } }
+        fr = ""; to = ""; et = "" }
+      /^edges:/ { e = 1; next }
+      e && /^[^[:space:]-]/ { item(); e = 0 }
+      !e && /^[[:space:]]*- id:/ { cur = val($0); fi = ind($0) + 2; next }
+      !e && cur == s && ind($0) == fi && /^[[:space:]]*status:/ { st = val($0) }
+      !e && cur == s && ind($0) == fi && /^[[:space:]]*verified_at:/ { va = val($0) }
+      !e && cur == s && ind($0) == fi && /^[[:space:]]*verified_against:/ { vg = val($0) }
+      !e && cur == s && ind($0) == fi && /^[[:space:]]*trace:/ { tr = val($0) }
+      !e { next }
+      /^[[:space:]]*-[[:space:]]/ { item(); line = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", line); $0 = line }
+      /^[[:space:]]*from:/ { fr = val($0) }
+      /^[[:space:]]*to:/ { to = val($0) }
+      /^[[:space:]]*edge_type:/ { et = val($0) }
+      END {
+        item(); why = ""
+        if (s == d) { print ",superacao-circular-e-o-proprio-veredito"; exit }
+        R[d] = 1; ch = 1; while (ch) { ch = 0; for (i = 1; i <= n; i++) if ((P[i] in R) && !(C[i] in R)) { R[C[i]] = 1; ch = 1 } }
+        if (s in R) why = why ",superacao-circular-deriva-do-veredito"
+        if (st != "confirmed" && st != "done") why = why ",superacao-nao-medida-status-" (st == "" ? "ausente" : st)
+        if (va == "") why = why ",superacao-sem-verified_at"
+        else if (va !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/) why = why ",superacao-verified_at-ilegivel"
+        else if (substr(va, 1, 10) > today) why = why ",superacao-carimbo-futuro-" substr(va, 1, 10)
+        lv = tolower(vg); al = vg; gsub(/[^A-Za-z0-9]/, "", al)
+        if (vg == "" || length(al) < 3 || lv ~ /^(n\/a|null|none|tbd|todo)$/) why = why ",superacao-sem-verified_against"
+        c = squash(ENVIRON["OG_CRIT"])
+        if (length(c) >= 8 && (squash(vg) == c || squash(tr) == c)) why = why ",superacao-ancorada-no-criterio"
+        print why }' "${f}")"
+    ogwhy="${ogwhy}${ogc}"
+  fi
+  printf '%s' "${ogwhy}"
+}
+
+# ── _pieces <grafo> — os ids de meta.x_dissect_pieces, um por linha (lista em fluxo [a, b] ou em bloco) ──
+_pieces() {
+  awk '
+    function clean(s) { sub(/[[:space:]]+#.*$/, "", s); gsub(/["\047[:space:]]/, "", s); return s }
+    /^meta:/ { m = 1; next }
+    m && /^[^[:space:]#]/ { m = 0 }
+    !m { next }
+    blk && /^[[:space:]]*-[[:space:]]/ && $0 !~ /:/ { v = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", v); v = clean(v); if (v != "") print v; next }
+    blk && !/^[[:space:]]*(#.*)?$/ { blk = 0 }
+    /^[[:space:]]*x_dissect_pieces:/ { v = $0; sub(/^[^:]*:[[:space:]]*/, "", v); v = clean(v)
+      if (v ~ /^\[/) { gsub(/[][]/, "", v); n = split(v, a, ","); for (i = 1; i <= n; i++) if (a[i] != "") print a[i] }
+      else if (v == "") blk = 1 }' "$1"
+}
+
+# ── _piece_verdict <grafo> <id> — o veredito da peça: x_dissect_verdict do nó, ou o apelido x_piece_verdict ──
+_piece_verdict() {
+  awk -v p="$2" '
+    function val(s) { sub(/^[^:]*:[[:space:]]*["\047]?/, "", s); match(s, /^[a-z]*/); return substr(s, 1, RLENGTH) }
+    /^edges:/ { cur = ""; next }
+    /^[[:space:]]*- id:/ { v = $0; sub(/^[^:]*:[[:space:]]*/, "", v); sub(/[[:space:]]+#.*$/, "", v); gsub(/["\047[:space:]]/, "", v); cur = v; next }
+    cur == p && /^[[:space:]]*(x_)?dissect_verdict:/ && dv == "" { dv = val($0) }
+    cur == p && /^[[:space:]]*x_piece_verdict:/ && pv == "" { pv = val($0) }
+    END { print (dv != "" ? dv : pv) }' "$1"
+}
+
+rows=""; parked=""; prows=""; found=0
 for rel in "${GRAPHS[@]}"; do
   f="${REPO}/${rel}"
   [ -f "${f}" ] || continue
@@ -157,6 +302,8 @@ for rel in "${GRAPHS[@]}"; do
   scope="$(sed -n 's/^[[:space:]]*x_dissect_scope:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\1/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
   [ -n "${scope}" ] || scope="-"
   mode="$(sed -n 's/^[[:space:]]*x_dissect_mode:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#[:space:]]*\).*/\1/p' "${f}" | head -1)"
+  # PEÇAS: objeto dissecado em peças de vereditos diferentes (meta.x_dissect_pieces, a forma do checador).
+  pieces="$(_pieces "${f}")"
 
   verdict="$(sed -n 's/^[[:space:]]*\(x_\)\{0,1\}dissect_verdict:[[:space:]]*["'"'"']\{0,1\}\([a-z]*\).*/\2/p' "${f}" | head -1)"
   [ -n "${verdict}" ] || verdict="-"
@@ -192,111 +339,32 @@ for rel in "${GRAPHS[@]}"; do
     [ "${open_q}" = "1" ] || incoh="${incoh},sem-question-aberta"
     if [ -n "${incoh}" ]; then state="estudo-INCOERENTE(${incoh#,})"; else state="estudo"; fi
   elif [ -n "${mode}" ]; then state="modo-DESCONHECIDO(${mode})"
+  elif [ -n "${pieces}" ]; then
+    # OBJETO EM PEÇAS (meta.x_dissect_pieces): cada peça tem o seu veredito, e cada peça NEGATIVA é cobrada
+    # pelas mesmas regras de superação e critério. Antes só o 1º veredito do arquivo era lido, e a peça que
+    # parqueia passava calada atrás da que costura (SAC-151, medido num estudo em peças, 2026-10-26).
+    pverd=""; pbad=""; pmiss=""
+    while IFS= read -r pc; do
+      [ -n "${pc}" ] || continue
+      pv="$(_piece_verdict "${f}" "${pc}")"
+      case "${pv}" in
+        rejeitar|parquear) pw="$(_neg_why "${f}" "${pc}")"
+          if [ -n "${pw}" ]; then ps="veredito-SEM-SUPERACAO(${pw#,})"; pbad="${pbad};${pc}:${pw#,}"; else ps="veredito"; fi ;;
+        "") pv="-"; ps="sem-veredito"; pmiss="${pmiss},${pc}" ;;
+        *) ps="veredito" ;;
+      esac
+      pverd="${pverd}+${pv}"
+      prows="${prows}${tool}	${pc}	${pv}	${ps}	${rel}
+"
+      [ "${pv}" = "parquear" ] && [ "${ps}" = "veredito" ] && parked="${parked}${tool} · peça ${pc}	${rel}
+"
+    done <<< "${pieces}"
+    verdict="${pverd#+}"
+    if [ -n "${pbad}" ]; then state="veredito-SEM-SUPERACAO(${pbad#;})"
+    elif [ -n "${pmiss}" ]; then state="pecas-SEM-VEREDITO(${pmiss#,})"
+    else state="veredito"; fi
   elif [ "${verdict}" = "rejeitar" ] || [ "${verdict}" = "parquear" ]; then
-    # SAC-151: o nó da reprovação é o que carrega x_dissect_verdict; os marcadores moram NELE.
-    # Leitura tolerante à forma (achados do refutador, 2026-10-15): aspas e comentário `# …` saem do valor;
-    # o id da superação tem de ser do alfabeto do radar; a aresta é lida por ITEM do bloco `edges:` (from,
-    # to e edge_type do MESMO item) e só TRACES_TO (a superação nasce da reprovação) ou SUPPORTS (evidência
-    # que já existia e sustenta a decisão) contam — REFUTES/CONSTRAINS não são superação.
-    # ⚠️ SEPARADOR \037 (US), NUNCA TAB: tab é IFS-WHITESPACE para o `read`, e tabs seguidos COLAPSAM —
-    #    com `x_dissect_criterion:` vazio a medida caía em og_ov e o estado acusava `superacao-id-invalido`
-    #    (achado de campo da sessão de curadoria, 2026-10-16). O mesmo colapso pegava o id vazio (veredito
-    #    no `meta:`, antes de qualquer `- id:`) e o overcoming vazio com medida. Com separador que não é
-    #    whitespace, campo vazio fica vazio no lugar dele.
-    ogm="$(awk '
-      function val(s) { sub(/^[^:]*:[[:space:]]*/, "", s); sub(/[[:space:]]+#.*$/, "", s); gsub(/^["\047]|["\047][[:space:]]*$/, "", s); sub(/[[:space:]]+$/, "", s); return s }
-      function flush() { if (isv) { printf "%s\037%s\037%s\037%s\n", id, crit, ov, meas; done = 1 } isv = 0; crit = ""; ov = ""; meas = ""; id = "" }
-      done { next }
-      /^[[:space:]]*- id:/ { flush(); if (done) next; id = val($0); next }
-      /^edges:/ { flush(); next }
-      /^[[:space:]]*(x_)?dissect_verdict:/ { isv = 1 }
-      /^[[:space:]]*x_dissect_criterion:/ { crit = val($0) }
-      /^[[:space:]]*x_dissect_overcoming:/ { ov = val($0) }
-      /^[[:space:]]*x_dissect_overcoming_measure:/ { meas = val($0) }
-      END { if (!done) flush() }' "${f}")"
-    IFS=$'\037' read -r og_id og_crit og_ov og_meas <<< "${ogm}"
-    ogwhy=""
-    # critério = um COMANDO com argumento (≥ 8 caracteres e um espaço), nunca "sim"
-    { [ "${#og_crit}" -ge 8 ] && [[ "${og_crit}" == *" "* ]]; } || ogwhy="${ogwhy},sem-x_dissect_criterion"
-    if [ -z "${og_ov}" ]; then ogwhy="${ogwhy},sem-x_dissect_overcoming"
-    elif [ "${og_ov}" = "nenhuma" ]; then
-      # a razão MEDIDA tem palavras (duas com letra), não pontuação de enchimento
-      [ "$(printf '%s' "${og_meas}" | LC_ALL=C tr -s '[:space:]' '\n' | LC_ALL=C grep -c '[A-Za-z]')" -ge 2 ] || ogwhy="${ogwhy},nenhuma-sem-medida"
-    elif ! [[ "${og_ov}" =~ ^[A-Za-z0-9_]+$ ]]; then ogwhy="${ogwhy},superacao-id-invalido"
-    # veredito SEM id (declarado no `meta:`, antes de qualquer `- id:`): não há nó para a aresta da
-    # superação apontar, e com d="" uma aresta SEM `to:` casava `to == d` e a busca de circularidade
-    # semeava do vazio (achado do refutador, 2026-10-16). `nenhuma` medida segue valendo no meta:.
-    elif [ -z "${og_id}" ]; then ogwhy="${ogwhy},superacao-sem-id-do-veredito"
-    else
-      grep -qE "^[[:space:]]*- id:[[:space:]]*[\"']?${og_ov}[\"']?[[:space:]]*(#.*)?\$" "${f}" || ogwhy="${ogwhy},superacao-${og_ov}-inexistente"
-      awk -v s="${og_ov}" -v d="${og_id}" '
-        function val(x) { sub(/^[^:]*:[[:space:]]*/, "", x); sub(/[[:space:]]+#.*$/, "", x); gsub(/^["\047]|["\047][[:space:]]*$/, "", x); sub(/[[:space:]]+$/, "", x); return x }
-        function item() { if (fr == s && to == d && (et == "TRACES_TO" || et == "SUPPORTS")) ok = 1; fr = ""; to = ""; et = "" }
-        /^edges:/ { e = 1; next }
-        e && /^[^[:space:]-]/ { item(); e = 0 }
-        !e { next }
-        /^[[:space:]]*-[[:space:]]/ { item(); line = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", line); $0 = line }
-        /^[[:space:]]*from:/ { fr = val($0) }
-        /^[[:space:]]*to:/ { to = val($0) }
-        /^[[:space:]]*edge_type:/ { et = val($0) }
-        END { item(); exit ok ? 0 : 1 }' "${f}" || ogwhy="${ogwhy},sem-aresta-${og_ov}-para-${og_id:-?}"
-      # 2ª leva (SAC-151): superação de CONSOLO. Achado de campo de um adotante de curadoria (PR #30, DADO): a
-      # 1ª versão do pagamento da dívida passou aqui com 4 superações que só o Elenxo reprovou. O que a FORMA
-      # do grafo deixa ver, recusa-se aqui (o resto vai como pergunta ao juiz, na doutrina):
-      #   · CIRCULAR — o próprio nó do veredito, ou um nó que DERIVA dele por OUTRO caminho que não a aresta
-      #     declarada da superação. Derivação POR TIPO de aresta (medida no contrato: a decisão aponta a origem
-      #     com TRACES_TO): `A SUPPORTS B` e `A CAUSES B` ⇒ B deriva de A; `A TRACES_TO B` e `A DEPENDS_ON B` ⇒
-      #     A deriva de B. REFUTES/CONSTRAINS/SUPERSEDES não derivam. A aresta S→D que liga a superação ao
-      #     veredito fica FORA da busca: é a forma que a doutrina pede (S TRACES_TO D = nasceu da reprovação;
-      #     S SUPPORTS D = já existia e sustenta) — distinguir as duas por estrutura é impossível (declarado).
-      #     O ANCESTRAL que sustenta é a forma LEGÍTIMA (a única superação real medida, o OCR local do
-      #     markitdown, é `E SUPPORTS D`), logo não é recusado; `D TRACES_TO S` (D cita S como fonte) também não;
-      #   · NÃO MEDIDA — status fora de confirmed|done (open = condição ou cura em curso), sem verified_at ou
-      #     fora de AAAA-MM-DD, verified_at (10 primeiros caracteres) DEPOIS de hoje, verified_against vazio
-      #     ou sem 3 caracteres alfanuméricos (`-`, `?`, `0`) ou n/a|null|none|tbd|todo;
-      #   · ANCORADA NO CRITÉRIO — verified_against/trace do nó É o x_dissect_criterion (igualdade sem espaços):
-      #     mede a reprovação, não a entrega. Só a igualdade: citar o critério aplicado à variante é a forma
-      #     mais forte de medir (achado do refutador, 2026-10-15), e a inclusão a recusaria.
-      # Campos lidos só na indentação do próprio nó (id + 2), não em sub-blocos. Critério via ENVIRON (o -v do
-      # awk interpreta barra invertida). NÃO detectado (declarado): o STATUS QUO rotulado de superação e o
-      # placeholder em prosa num nó confirmed (o verified_against da superação real é um token hifenizado,
-      # igual ao de um placeholder) — exigiria palavra-chave frágil; é a pergunta obrigatória da doutrina.
-      ogc="$(OG_CRIT="${og_crit}" awk -v s="${og_ov}" -v d="${og_id}" -v today="${TODAY}" '
-        function val(x) { sub(/^[^:]*:[[:space:]]*/, "", x); sub(/[[:space:]]+#.*$/, "", x); gsub(/^["\047]|["\047][[:space:]]*$/, "", x); sub(/[[:space:]]+$/, "", x); return x }
-        function squash(x) { x = tolower(x); gsub(/["\047`[:space:]]/, "", x); return x }
-        function ind(x) { match(x, /^[[:space:]]*/); return RLENGTH }
-        function item() { if (fr != "" && to != "" && !(fr == s && to == d)) {
-            if (et == "SUPPORTS" || et == "CAUSES") { n++; P[n] = fr; C[n] = to }
-            else if (et == "TRACES_TO" || et == "DEPENDS_ON") { n++; P[n] = to; C[n] = fr } }
-          fr = ""; to = ""; et = "" }
-        /^edges:/ { e = 1; next }
-        e && /^[^[:space:]-]/ { item(); e = 0 }
-        !e && /^[[:space:]]*- id:/ { cur = val($0); fi = ind($0) + 2; next }
-        !e && cur == s && ind($0) == fi && /^[[:space:]]*status:/ { st = val($0) }
-        !e && cur == s && ind($0) == fi && /^[[:space:]]*verified_at:/ { va = val($0) }
-        !e && cur == s && ind($0) == fi && /^[[:space:]]*verified_against:/ { vg = val($0) }
-        !e && cur == s && ind($0) == fi && /^[[:space:]]*trace:/ { tr = val($0) }
-        !e { next }
-        /^[[:space:]]*-[[:space:]]/ { item(); line = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", line); $0 = line }
-        /^[[:space:]]*from:/ { fr = val($0) }
-        /^[[:space:]]*to:/ { to = val($0) }
-        /^[[:space:]]*edge_type:/ { et = val($0) }
-        END {
-          item(); why = ""
-          if (s == d) { print ",superacao-circular-e-o-proprio-veredito"; exit }
-          R[d] = 1; ch = 1; while (ch) { ch = 0; for (i = 1; i <= n; i++) if ((P[i] in R) && !(C[i] in R)) { R[C[i]] = 1; ch = 1 } }
-          if (s in R) why = why ",superacao-circular-deriva-do-veredito"
-          if (st != "confirmed" && st != "done") why = why ",superacao-nao-medida-status-" (st == "" ? "ausente" : st)
-          if (va == "") why = why ",superacao-sem-verified_at"
-          else if (va !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/) why = why ",superacao-verified_at-ilegivel"
-          else if (substr(va, 1, 10) > today) why = why ",superacao-carimbo-futuro-" substr(va, 1, 10)
-          lv = tolower(vg); al = vg; gsub(/[^A-Za-z0-9]/, "", al)
-          if (vg == "" || length(al) < 3 || lv ~ /^(n\/a|null|none|tbd|todo)$/) why = why ",superacao-sem-verified_against"
-          c = squash(ENVIRON["OG_CRIT"])
-          if (length(c) >= 8 && (squash(vg) == c || squash(tr) == c)) why = why ",superacao-ancorada-no-criterio"
-          print why }' "${f}")"
-      ogwhy="${ogwhy}${ogc}"
-    fi
+    ogwhy="$(_neg_why "${f}" "")"
     if [ -n "${ogwhy}" ]; then state="veredito-SEM-SUPERACAO(${ogwhy#,})"; else state="veredito"; fi
   elif [ "${verdict}" != "-" ]; then state="veredito"
   else state="interrompida"; fi
@@ -304,7 +372,7 @@ for rel in "${GRAPHS[@]}"; do
   rows="${rows}${tool}	${level}	${verdict}	${baseline}	${review}	${fresh}	${rel}	${against}	${state}	${scope}
 "
   # parqueada que o gate RECUSOU não é parque (achado do refutador): sai só na seção dos recusados
-  [ "${verdict}" = "parquear" ] && [ "${state}" = "veredito" ] && parked="${parked}${tool}	${rel}
+  [ -z "${pieces}" ] && [ "${verdict}" = "parquear" ] && [ "${state}" = "veredito" ] && parked="${parked}${tool}	${rel}
 "
 done
 
@@ -349,6 +417,11 @@ else
     printf '\n## parqueadas (técnica a investigar — exigem gatilho nomeado)\n'
     printf '%s' "${parked}" | awk -F'\t' '$1!=""{ printf "- %s  (%s)\n", $1, $2 }'
   fi
+  # só aparece com peças declaradas: sem elas a saída fica a de antes, byte a byte
+  if [ -n "${prows}" ]; then
+    printf '\n## peças (objeto com veredito por peça — cada peça negativa é cobrada como um veredito único)\n'
+    printf '%s' "${prows}" | awk -F'\t' '$1!=""{ printf "- %s · peça %s · %s · %s  (%s)\n", $1, $2, $3, $4, $5 }'
+  fi
   _section() {  # $1=título $2=regex do estado (awk)
     local body; body="$(printf '%s\n' "${sorted_rows}" | awk -F'\t' -v re="$2" '$1!="" && $9 ~ re { printf "- %s · N%s · régua %s · escopo %s · %s  (%s)\n", $1, $2, $8, $10, $9, $7 }')"
     [ -z "${body}" ] || printf '\n## %s\n%s\n' "$1" "${body}"
@@ -357,6 +430,7 @@ else
   _section 'interrompidas (sem veredito e SEM marcador de estudo — retomar do nível alcançado ou fechar com veredito)' '^interrompida$'
   _section 'a corrigir (o grafo contradiz o próprio modo, ou declara modo que este censo não conhece)' '^(estudo-INCOERENTE|modo-DESCONHECIDO)'
   _section 'vereditos NEGATIVOS recusados (rejeitar/parquear sem critério checável ou sem superação — não contam como veredito; ver x_dissect_criterion e x_dissect_overcoming)' '^veredito-SEM-SUPERACAO'
+  _section 'peças sem veredito (declaradas em meta.x_dissect_pieces e sem x_dissect_verdict — não contam como veredito)' '^pecas-SEM-VEREDITO'
 fi
 printf '\n(ferramenta com nível fresco ENTRA no nível seguinte — re-derivar nível pago é o\n'
 printf 'desperdício que este censo corta. VENCIDO não se cita como se fosse de hoje: licença,\n'

@@ -258,7 +258,9 @@ no core **antes** do N0 do estudo que a pede, nunca durante. Família aposentada
   sela cada uma no seu tempo. Veredito fora das peças declaradas sai `veredito-fora-das-pecas`, e peça sem
   veredito sai `peca-sem-veredito`. O `x_piece_verdict` do 1º estudo em peças é lido como apelido. Sem a
   declaração, o parque de uma peça passava calado atrás do veredito positivo de outra, mesmo com o gatilho já
-  disparado (medido no estudo da curadoria, 2026-10-26).
+  disparado (medido no estudo da curadoria, 2026-10-26). O censo segue a mesma forma: `dissect-census.sh`
+  lista cada peça (id, veredito, estado), e o `--check-verdict` cobra cada peça negativa pela superação e pelo
+  critério. Antes ele lia só o 1º veredito do arquivo e julgava só a 1ª peça.
 
 **Marcadores de todo estudo por família** (além dos da §1b e do passo 5 do comando):
 `meta.x_dissect_family: <pref>` **e** uma `external_edges` `TRACES_TO` para

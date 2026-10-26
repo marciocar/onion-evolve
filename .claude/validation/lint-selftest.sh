@@ -7728,6 +7728,7 @@ _judge_overcoming_dissect_cases() {
   rm -rf "${m}"
   _judge_empty_field_dissect_cases "${sut}"
   _judge_consolo_dissect_cases "${sut}"
+  _judge_pieces_dissect_cases "${sut}"
 }
 # _og_empty_states <dissect-census.sh> → "vazio=<estado>;metav=<estado>;ovvazio=<estado>;rc-vazio=<rc>"
 # Achado de campo da sessão de curadoria (2026-10-16, DADO verificado): o read do nó do veredito usava TAB
@@ -7876,6 +7877,69 @@ _judge_consolo_dissect_cases() {
     record_pass "dissect: (og-k2) superação sem medida nenhuma é recusada (status, verified_at e verified_against); o mutante sem a recusa do verified_at muda o estado"
   else record_fail "dissect: (og-k2)" "estado=${o2} mutante=${o2m}"; fi
   rm -rf "${d2}" "${m}"
+}
+# ── SAC-151, 3ª leva: OBJETO EM PEÇAS no censo (meta.x_dissect_pieces) ───────────────────────────────────
+# POR QUE EXISTE (medido em 2026-10-26, num estudo em peças de um adotante): o checador de forma já julgava
+# cada peça, mas este censo lia só o 1º `x_dissect_verdict` do arquivo — a listagem mostrava um veredito só e
+# o `--check-verdict` julgava só a 1ª peça (a que costura), deixando as que parqueiam fora da cobrança.
+# _op_pieces_kg <dir> <ferramenta> <forma: flow|block|none> <campos extras do nó D_B>
+_op_pieces_kg() {
+  local d="$1" t="$2" form="$3" extra="$4" pl
+  case "${form}" in
+    flow)  pl='  x_dissect_pieces: [D_A, D_B, D_C]\n' ;;
+    block) pl='  x_dissect_pieces:\n    - D_A\n    - "D_B"\n    - D_C  # a peça que rejeita\n' ;;
+    *)     pl='' ;;
+  esac
+  printf 'meta:\n  id: %s\n  x_dissect_tool: %s\n%b  baseline: "2026-10-26"\n  review_after: "2099-01-01"\nnodes:\n  - id: D_A\n    node_type: decision\n    x_dissect_level: 3\n    x_dissect_verdict: costurar\n    label: "a peca que costura"\n  - id: D_B\n    node_type: decision\n    x_dissect_level: 3\n    x_dissect_verdict: parquear\n    x_dissect_criterion: "gh issue view 7 --repo o/r --json state"\n%b    label: "a peca que parqueia"\n  - id: D_C\n    node_type: decision\n    x_dissect_level: 3\n    x_piece_verdict: rejeitar\n    x_dissect_criterion: "pdftotext a.pdf - | wc -c"\n    x_dissect_overcoming: nenhuma\n    x_dissect_overcoming_measure: "procurou-se OCR local em apt-cache e no README"\n    label: "a peca que rejeita"\n\nedges: []\n' \
+    "${t}" "${t}" "${pl}" "${extra}" > "${d}/docs/evolution/dissect/${t}.kg.yaml"
+}
+_PIECES_OK_DB='    x_dissect_overcoming: nenhuma\n    x_dissect_overcoming_measure: "procurou-se persistencia em disco no codigo e na doc"\n'
+# _op_pieces_states <dissect-census.sh> → "p1=<0|1>;p1b=<0|1>;rc-ok=<rc>;rc-sem=<rc>;nomeia=<0|1>;semp=<linha tsv>;rc-semp=<rc>;semp-secao=<0|1>"
+_op_pieces_states() {
+  local sut="$1" d md mdb err rok rsem rsp tsv
+  d="$(mktemp -d)"; git -C "${d}" init -q -b main 2>/dev/null; mkdir -p "${d}/docs/evolution/dissect"
+  _op_pieces_kg "${d}" tres flow "${_PIECES_OK_DB}"
+  _op_pieces_kg "${d}" bloco block "${_PIECES_OK_DB}"
+  _op_pieces_kg "${d}" semsup flow ''
+  _op_pieces_kg "${d}" sempecas none ''
+  git -C "${d}" add -A >/dev/null 2>&1
+  md="$(bash "${sut}" "${d}" --markdown 2>&1)"
+  _has3() { grep -qF -- "- $1 · peça D_A · costurar · veredito  (docs/evolution/dissect/$1.kg.yaml)" <<< "${md}" \
+    && grep -qF -- "- $1 · peça D_B · parquear · veredito  (docs/evolution/dissect/$1.kg.yaml)" <<< "${md}" \
+    && grep -qF -- "- $1 · peça D_C · rejeitar · veredito  (docs/evolution/dissect/$1.kg.yaml)" <<< "${md}" \
+    && grep -qF -- "- $1 · peça D_B  (docs/evolution/dissect/$1.kg.yaml)" <<< "${md}" \
+    && grep -qF -- "$1 | N3 | costurar+parquear+rejeitar |" <<< "${md}" && echo 1 || echo 0; }
+  if bash "${sut}" "${d}" --check-verdict tres >/dev/null 2>&1; then rok=0; else rok=$?; fi
+  if err="$(bash "${sut}" "${d}" --check-verdict semsup 2>&1 >/dev/null)"; then rsem=0; else rsem=$?; fi
+  if bash "${sut}" "${d}" --check-verdict sempecas >/dev/null 2>&1; then rsp=0; else rsp=$?; fi
+  tsv="$(bash "${sut}" "${d}" --tsv 2>&1 | awk -F'\t' '$1=="sempecas"')"
+  printf 'p1=%s;p1b=%s;rc-ok=%s;rc-sem=%s;nomeia=%s;semp=%s;rc-semp=%s;semp-secao=%s\n' "$(_has3 tres)" "$(_has3 bloco)" "${rok}" "${rsem}" \
+    "$(grep -qF 'veredito-SEM-SUPERACAO(D_B:sem-x_dissect_overcoming)' <<< "${err}" && echo 1 || echo 0)" \
+    "$(printf '%s' "${tsv}" | tr '\t' '|')" "${rsp}" "$(grep -qF -- '- sempecas · peça' <<< "${md}" && echo 1 || echo 0)"
+  rm -rf "${d}"
+}
+_judge_pieces_dissect_cases() {
+  local sut="$1" want o m mo
+  # (op-p1) estudo com 3 peças (lista em fluxo e em bloco, apelido x_piece_verdict na 3ª) lista as 3, com id,
+  #         veredito e estado; a coluna veredito junta as peças; a peça que parqueia entra nas parqueadas.
+  # (op-p2) peça parquear SEM superação ⇒ --check-verdict rc 1 nomeando a peça (D_B:sem-x_dissect_overcoming);
+  #         com a superação medida nas 3, rc 0.
+  # (op-p3) SEM peças, a forma de antes: lê o 1º veredito (costurar), a linha do --tsv é a mesma de antes do
+  #         ramo das peças (golden medido contra o censo do origin/main em 2026-10-26), rc 0, nenhuma seção de peças.
+  want='p1=1;p1b=1;rc-ok=0;rc-sem=1;nomeia=1;semp=sempecas|3|costurar|2026-10-26|2099-01-01|fresco|docs/evolution/dissect/sempecas.kg.yaml|onion|veredito|-;rc-semp=0;semp-secao=0'
+  o="$(_op_pieces_states "${sut}")"
+  if [ "${o}" = "${want}" ]; then record_pass "dissect: (op-p1..p3) objeto em peças: o censo lista as 3 (fluxo, bloco e apelido), a peça parquear sem superação reprova o --check-verdict nomeando a peça, e sem peças a linha é a de antes"
+  else record_fail "dissect: (op-p1..p3)" "esperado ${want}, veio ${o}"; fi
+  # (op-p2m) MUTANTE: lendo só o 1º veredito (sem o ramo das peças), a peça sem superação passa (rc 0)
+  m="$(mktemp -d)"
+  sed 's/  elif \[ -n "${pieces}" \]; then/  elif [ -n "${pieces}" ] \&\& [ "ONION_MUTANTE" = "" ]; then/' "${sut}" > "${m}/dc.sh"
+  if cmp -s "${sut}" "${m}/dc.sh"; then record_fail "dissect: (op-p2m)" "o mutante NÃO foi plantado (âncora do sed ausente) — o caso não prova nada"
+  else
+    mo="$(_op_pieces_states "${m}/dc.sh")"
+    if [ "${mo}" != "${want}" ] && grep -qF ';rc-sem=0;' <<< "${mo}"; then record_pass "dissect: (op-p2m) mutante que lê só o 1º veredito deixa a peça parquear sem superação passar (rc 0) — o (op-p2) o pega"
+    else record_fail "dissect: (op-p2m)" "o mutante não deixou a peça sem superação passar: ${mo}"; fi
+  fi
+  rm -rf "${m}"
 }
 # _judge_overcoming_seal_case <census-seal.py>: reprovação com superação ACHADA vira nó C_SUPERACAO_ com
 # TRACES_TO ao nó; reprovação RECUSADA (recusada:true) não vira nó. Mutante: sem o filtro da recusa.
