@@ -2,7 +2,7 @@
 branch: fix/kg-index-atomic-and-old-vendor-warn
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: 948689bc8d3e81e00356fa1d63b416908b5de49b69f06c626b3fbbe0ab532e28
+reviewed_diff_sha256: 663cc0e7cf0b8dfb52715c6321207db7b5a89b3293311cc57bae233abb9b2c69
 reviewed_code_sha256: 0473b94dfa0ebaff62055424ff6c3d9e85488b494365c72f2837b786769f2bb6
 findings_total: 6
 findings_real: 5
