@@ -76,6 +76,15 @@ o HEAD do checkout × a branch padrão do origin (por `git ls-remote`, sem mudar
 instala no texto da ação (desde 2026-10-17, SAC-169: o revisor de IA do CI rodava o CLI 2.1.220 com o host
 em 2.1.302, e nenhum censo via; um CLI que a action instala no runner é tão "em produção" quanto o do disco).
 
+**O gate da própria branch (lembrete, desde 2026-10-26).** O mesmo hook avisa quando o `core.hooksPath`
+local está ABSOLUTO e termina em `.githooks`. Medido em 2026-10-26 (git 2.43, no core e num adotante): com
+o caminho relativo cada worktree roda o `.githooks/` da própria branch, com o absoluto toda worktree roda o
+do checkout principal, e um PR que muda o `pre-commit` deixa de ser provado por ele mesmo. A causa conhecida
+é o Claude Code gravar o caminho absoluto ao criar worktree de agente, ou seja no meio da sessão, e é por
+isso que o lembrete mora no `UserPromptSubmit` e não num `SessionStart`. O conserto vem no texto:
+`git config core.hooksPath .githooks`. Avisa 1× por sessão e valor, roda mesmo sem o censo e nunca bloqueia.
+Teto: lê só o `--local`; um `hooksPath` por worktree (`extensions.worktreeConfig`) ou global não é visto.
+
 **Por que aviso e não veto (`exit 2`).** Toda superfície depende de registro de terceiro e de rede: um veto
 que dispara no minuto em que o npm publica é falso positivo por construção, e falso positivo treina a
 sessão a ignorar o veto (cláusula 4 da [doutrina de guardas](../../../.claude/commands/common/prompts/guard-doctrine.md)).

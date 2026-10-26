@@ -8819,6 +8819,70 @@ PYF
   rm -rf "${d}"
 }
 
+# ── LEMBRETE do core.hooksPath ABSOLUTO (session-currency-check.sh, 2026-10-26) ──────────────────────
+# Defeito medido (git 2.43, core e adotante): absoluto ⇒ toda worktree roda o .githooks/ do checkout
+# principal. O hook avisa (nunca veta). Invocado COMO O RUNNER O CHAMA: JSON no stdin, CLAUDE_PROJECT_DIR,
+# censo presente (stub em dia) — o lembrete tem de sair com e sem o censo. LC_ALL=C (o locale do hook).
+run_hookspath_reminder_selftests() {
+  local hk="${REPO_ROOT}/.claude/hooks/session-currency-check.sh"
+  [ -f "${hk}" ] || { record_fail "hookspath-reminder" "SUT ausente: ${hk}"; return; }
+  command -v git >/dev/null 2>&1 || { record_skip "hookspath-reminder: git ausente → pulado"; return; }
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/state" "${d}/nogit" "${d}/other"; chmod 700 "${d}/state"
+  local g="git -c user.name=bench -c user.email=bench@example.invalid -c init.defaultBranch=main"
+  ${g} init -q "${d}/repo"; mkdir -p "${d}/repo/.githooks"; : > "${d}/repo/.githooks/pre-commit"
+  ${g} -C "${d}/repo" add -A; ${g} -C "${d}/repo" commit -q -m init
+  ${g} -C "${d}/repo" worktree add -q -b wt "${d}/wt" 2>/dev/null
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/census-ok.sh"
+  _hp() {  # $1 = diretório do projeto, $2 = sessão, $3 = hook ("" = o real); resto = env extra
+    local dir="$1" sid="$2" sut="${3:-${hk}}" rc=0 out; shift 3
+    out="$(printf '{"session_id":"%s","hook_event_name":"UserPromptSubmit"}' "${sid}" \
+      | env -u CLAUDE_CODE_SESSION_ID LC_ALL=C GIT_CEILING_DIRECTORIES="${d}" ONION_CURRENCY_CENSUS="${d}/census-ok.sh" \
+        ONION_CURRENCY_STATE_DIR="${d}/state" CLAUDE_PROJECT_DIR="${dir}" "$@" bash "${sut}" 2>/dev/null)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  local r
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  r="$(_hp "${d}/repo" s1 "")"
+  case "${r}" in "0|"*"core.hooksPath está ABSOLUTO"*"git config core.hooksPath .githooks"*) record_pass "hookspath-reminder: (a) absoluto ⇒ lembrete com o conserto, rc=0" ;;
+    *) record_fail "hookspath-reminder: (a) absoluto avisa" "veio: ${r:0:200}" ;; esac
+  r="$(_hp "${d}/repo" s1 "")"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (a2) 2ª vez na mesma (sessão, valor) ⇒ cala" \
+    || record_fail "hookspath-reminder: (a2) dedupe" "veio: ${r:0:200}"
+  r="$(_hp "${d}/wt" s2 "")"
+  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (a3) sessão numa worktree ligada ⇒ avisa (lê o .git/config comum)" ;;
+    *) record_fail "hookspath-reminder: (a3) worktree" "veio: ${r:0:200}" ;; esac
+  r="$(_hp "${d}/repo" s3 "" ONION_CURRENCY_CENSUS="${d}/nao-existe.sh")"
+  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (a4) sem o censo ⇒ o lembrete sai mesmo assim" ;;
+    *) record_fail "hookspath-reminder: (a4) sem censo" "veio: ${r:0:200}" ;; esac
+  git -C "${d}/repo" config core.hooksPath .githooks
+  r="$(_hp "${d}/repo" s1 "")"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (b) relativo ⇒ silêncio, rc=0" \
+    || record_fail "hookspath-reminder: (b) relativo" "veio: ${r:0:200}"
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks/"
+  r="$(_hp "${d}/repo" s1 "")"
+  case "${r}" in "0|"*"ABSOLUTO"*) record_pass "hookspath-reminder: (b2) consertado e voltou a absoluto ⇒ avisa DE NOVO na mesma sessão" ;;
+    *) record_fail "hookspath-reminder: (b2) re-aviso" "veio: ${r:0:200}" ;; esac
+  git -C "${d}/repo" config --unset core.hooksPath
+  r="$(_hp "${d}/repo" s4 "")"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (c) unset ⇒ silêncio, rc=0" \
+    || record_fail "hookspath-reminder: (c) unset" "veio: ${r:0:200}"
+  r="$(_hp "${d}/nogit" s5 "")"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (d) fora de git ⇒ silêncio, rc=0" \
+    || record_fail "hookspath-reminder: (d) fora de git" "veio: ${r:0:200}"
+  git -C "${d}/repo" config core.hooksPath "${d}/other"
+  r="$(_hp "${d}/repo" s6 "")"
+  [ "${r}" = "0|" ] && record_pass "hookspath-reminder: (e) absoluto para outro diretório (não .githooks) ⇒ cala (erra para o lado de calar)" \
+    || record_fail "hookspath-reminder: (e) outro diretório" "veio: ${r:0:200}"
+  # (m) MUTANTE: sem o ramo do absoluto, o caso (a) cala — o caso morde
+  git -C "${d}/repo" config core.hooksPath "${d}/repo/.githooks"
+  sed '/^    \/\*\/\.githooks|/d' "${hk}" > "${d}/mutant.sh"
+  r="$(_hp "${d}/repo" s7 "${d}/mutant.sh")"
+  if cmp -s "${hk}" "${d}/mutant.sh"; then record_fail "hookspath-reminder: (m) mutante" "o sed não achou o ramo do absoluto (âncora mudou)"
+  elif [ "${r}" = "0|" ]; then record_pass "hookspath-reminder: (m) mutante sem o ramo do absoluto ⇒ (a) cala (o caso morde)"
+  else record_fail "hookspath-reminder: (m) mutante" "o mutante ainda avisou: ${r:0:200}"; fi
+  rm -rf "${d}"
+}
+
 run_pretooluse_veto_selftests() {
   local pm="${REPO_ROOT}/.claude/hooks/pretooluse-protect-main.sh"
   local mg="${REPO_ROOT}/.claude/hooks/pretooluse-merge-gate.sh"
@@ -36582,6 +36646,7 @@ _family run_stt_service_selftests
 _family run_update_bridge_selftests
 _family run_version_drift_selftests
 _family run_currency_census_selftests
+_family run_hookspath_reminder_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests
 _family run_command_role_parity_selftests
