@@ -8,7 +8,7 @@ what depends on it, and your CI rejects the ones that don't.**
 **English** | [Português (Brasil)](README.pt-BR.md)
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Contract: v4 · release 4.29.1](https://img.shields.io/badge/contract-v4%20%C2%B7%204.29.1-6f42c1)](spec/release.json)
+[![Contract: v4 · release 4.30.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.30.0-6f42c1)](spec/release.json)
 [![Conformance: 438/438](https://img.shields.io/badge/conformance-438%2F438-2ea44f)](spec/conformance/README.md)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -80,7 +80,7 @@ The tools print in English by default and in Brazilian Portuguese when your loca
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
 | [Container](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
-| Your repository | `kg_vendor.py update --tag kg-ssot-v4.29.1` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
+| Your repository | `kg_vendor.py update --tag kg-ssot-v4.30.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
 
 ## A node, inside
 
@@ -118,6 +118,17 @@ kg-mcp --root ./graphs          # stdio, for Claude Desktop, Claude Code and oth
 `kg_schema_help` returns the current contract, a minimal passing example and the fixes for the most common codes, so a
 model can write a passing graph on the first try. [llms.txt](llms.txt) indexes the documentation for agents, and
 [llms-full.txt](llms-full.txt) has all of it in one file.
+
+**The agent skill.** `skills/kg-ssot/` is an [Agent Skills](https://agentskills.io) skill that teaches a coding agent
+to write, fix, validate and query graphs with these tools, in `.kg.yaml` and `.kg.json`. In a pre-registered test, an
+agent with the skill reached the same result with 45% of the output tokens and 54% of the tool calls.
+
+```bash
+npx skills add marciocar/kg-ssot -s kg-ssot     # Claude Code, Codex and other clients that read Agent Skills
+```
+
+In Claude Code, it also comes as a plugin: `/plugin marketplace add marciocar/kg-ssot`, then
+`/plugin install kg-ssot@kg-ssot`.
 
 ## How it works
 
@@ -186,7 +197,7 @@ flowchart LR
 
 ## Status
 
-- **Current:** contract v4, release `kg-ssot-v4.29.1`. The reference reader passes 424 of 438 cases in `latest/`.
+- **Current:** contract v4, release `kg-ssot-v4.30.0`. The reference reader passes 424 of 438 cases in `latest/`.
 - **In use:** three adopters run the gate in CI, one of them in production.
 - **Next:** v5 will fail a `method` outside the `<class>: <detail>` form, which only warns today.
 - **Open:** the semantic layer (freshness, contradiction, domain completeness) lives in `optional/`, and the reference

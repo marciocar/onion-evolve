@@ -1,0 +1,14 @@
+{
+  "name": "kg-ssot",
+  "description": "The KG-SSOT skill for verifiable knowledge graphs in plain text.",
+  "owner": {
+    "name": "Marcio Carvalho"
+  },
+  "plugins": [
+    {
+      "name": "kg-ssot",
+      "source": "./",
+      "description": "Write, fix, validate and query verifiable knowledge graphs in plain text (.kg.yaml and .kg.json) with the KG-SSOT tools."
+    }
+  ]
+}

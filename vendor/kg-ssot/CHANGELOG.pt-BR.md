@@ -10,6 +10,12 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.30.0] - 2026-10-26
+
+A release traz a skill de agente `skills/kg-ssot/` (formato Agent Skills) e um marketplace de plugin do Claude Code em
+`.claude-plugin/`. Num teste pré-registrado, os agentes com a skill acertaram tanto quanto os sem ela (12 de 12), com
+45% dos tokens de saída e 54% das chamadas de ferramenta. Contrato v4.15, sem mudança.
+
 ## [4.29.1] - 2026-10-26
 
 O `kg_prov_export.py` não emite mais IRI quebrada para ponta de aresta malformada. Contrato v4.15, sem mudança.

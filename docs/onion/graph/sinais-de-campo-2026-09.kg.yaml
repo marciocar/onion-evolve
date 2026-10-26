@@ -553,6 +553,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_430_ADOTADA_1026
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "na branch chore/kg-ssot-4-30-0: kg_vendor.py update --tag kg-ssot-v4.30.0 (c751ebd5ab3a, 648 arquivos) e check intacto; ops/kg-gate-ci.sh rc 0 sem --update (189 grafos, 187 passam o MUST, os 2 da dívida herdada); a bancada pré-tag da ref 989447de2b4a mediu gate idêntico ao da 4.29.1 e lint do core com 0 HARD e as mesmas 22 SOFT com o vendor novo no índice"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.30.0 (a skill de agente skills/kg-ssot/ e o marketplace .claude-plugin/ no vendor) entrou no core, inerte para a maquinaria e para o descobridor de skills"
+    narrative: "As pastas novas ficam fora de qualquer .claude/skills/, então o Claude Code não as descobre como skill do repo, e o .claude-plugin/ aninhado só carrega por adição explícita de marketplace. Nenhum lint ou hook da casa reagiu. O contrato segue v4.15. A skill entrou no produto por uma rodada pré-registrada do kg-ssot (12 de 12 com e sem ela; com ela, 45% dos tokens de saída)."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; bancada pré-tag da ref 989447de2b4a"
+      method: "medição: atualização do vendor, gate do contrato e lint completo com o vendor novo"
+      locality: "repo"
   - id: E_KG_SSOT_4291_ADOTADA_1026
     node_type: evidence
     layer: audit
@@ -1169,3 +1186,6 @@ edges:
   - from: E_FORK_VS_AGENTE_NOVO_PAR_3_RESULTADO_1026
     to: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
     edge_type: TRACES_TO
+  - from: E_KG_SSOT_430_ADOTADA_1026
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
