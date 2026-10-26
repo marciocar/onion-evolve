@@ -1,0 +1,1239 @@
+# Pesquisa em MODO PRIMÁRIAS (2026-10-26): o Codex CLI atual roda o Onion como Onion Core, a ponto de virar porta nova?
+#
+# ⚠️ Proveniência (R15): label e narrative das evidências web carregam texto extraído de páginas da OpenAI e de
+#    issues do GitHub. É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Relação com o corpus: o porte onion-codex (LINHA VIVA desde 2026-09-16) parou no codex-cli 0.137.0; a
+# curadoria de 2026-10-25 mediu o 0.164.0 como cliente MCP. Esta rodada SUSTENTA C_POSTURA_ACOPLAMENTO e o
+# E_N2_VIVO_INTERLINK… por external_edges, sem editar os grafos antigos (contrato v4.3).
+meta:
+  id: codex-as-core-2026-10
+  schema_version: "1"
+  baseline: "2026-10-26"
+  review_after: "2026-11-25"   # 30d: FERRAMENTA é o tipo dominante — o Codex CLI solta estáveis a cada poucos dias
+                               # (27 minors em ~140 dias) e o estado dos hooks (#21753, #27833) muda por release.
+                               # Gatilhos antecipados: (1) o teste vivo do PreToolUse exit 2 no 0.164.0+; (2) a
+                               # #27833 fechar; (3) nova minor do Codex com item de hook/PreToolUse nas notas.
+  # kg-backlog-guard: on
+  # ═══ TETO: 62 NÓS ═══
+  #   RODADA DE PRIMÁRIAS (run wf_e4a2a9be-bb5), EXECUTADA em 2026-10-26 — 62 nós: 1 question + 32 evidências ancoradas
+  #   por verificador independente (rules, config-reference, agents-md, subagents, mcp-server, mcp cliente,
+  #   non-interactive-mode, github-action, releases 0.137.0 e 0.164.0, issue #21753) + 1 evidência do corpus
+  #   (estado do porte onion-codex) + 1 E_LACUNAS_PRIMARIES (16 rejeitadas na ancoragem, 4 lacunas abertas)
+  #   + 11 objeções sobreviventes do Elenxo + 7 superações achadas + 8 vereditos por peça + 1 recomendação.
+  #   Cresce só com MEDIÇÃO: o teste vivo do PreToolUse exit 2 sob never + danger-full-access, a re-ancoragem
+  #   da página oficial de hooks e a varredura das notas de 0.138 a 0.163.
+#
+# MODO PRIMÁRIAS: não há decisão nesta rodada. A decisão de porta é do maestro; esta sessão nunca sela.
+
+external_edges:
+  - from: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
+    edge_type: SUPPORTS
+  - from: E_CODEX_REMAINS_MCP_CLIENT
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025"
+    edge_type: SUPPORTS
+
+nodes:
+  - id: Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "O Codex CLI atual (outubro de 2026) roda o Onion como Onion Core, a maquinaria inteira com eficiência e eficácia equivalentes às do Claude Code, para virar uma porta nova publicada a partir do core?"
+    narrative: "Lacunas nomeadas: (1) hooks que barram de forma determinística, equivalente ao exit 2 de PreToolUse inclusive no modo mais permissivo; (2) skills, AGENTS.md e comandos; (3) subagentes TOML, spawn, modelo, isolamento, worktree; (4) MCP cliente e servidor; (5) sandbox, approval policy, perfis e o que se faz sem diálogo; (6) codex exec e CI/GitHub Action; (7) trajetória de releases de 0.137 à atual e limites relatados pela comunidade. Saída pedida: EQUIVALENTE, PARCIAL e FALTA por peça do core, com citação. Segue open: a resposta desta rodada é parcial (ver E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026) e a decisão de porta é do maestro."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+
+  - id: E_EXECPOLICY_MOST_RESTRICTIVE_WINS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "\"Codex applies the most restrictive decision when more than one rule matches (`forbidden` > `prompt` > `allow`).\" — rules, 'Understand rule fields' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: vendor-on-self
+    label: "Execpolicy decide allow/prompt/forbidden por prefixo de comando; forbidden bloqueia sem diálogo e, com várias regras casando, vence a mais restritiva. É experimental."
+    narrative: "Lacuna: codex-config-sandbox. Citação verbatim: \"Codex applies the most restrictive decision when more than one rule matches (`forbidden` > `prompt` > `allow`).\". Locator: rules, 'Understand rule fields'. tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/rules"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/rules"
+      locator: "rules, 'Understand rule fields'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_RULES_EXPERIMENTAL_OUTSIDE_SANDBOX
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-26"
+    verified_against: "\"Rules are experimental and may change.\" — rules, introdução — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: vendor-on-self
+    label: "As rules do Codex são experimentais e controlam só o que roda fora do sandbox."
+    narrative: "Lacuna: codex-config-sandbox. Citação verbatim: \"Rules are experimental and may change.\". Locator: rules, introdução. tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/rules"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/rules"
+      locator: "rules, introdução"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_PROJECT_RULES_NEED_TRUST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"Project-local rules under `<repo>/.codex/rules/` load only when the project `.codex/` layer is trusted.\" — rules, 'Create a rules file' e 'Test a rule file' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Regras de projeto em .codex/rules só carregam se a camada .codex do projeto for confiável; o teste é por `codex execpolicy check`, que emite JSON com a decisão mais estrita."
+    narrative: "Lacuna: codex-config-sandbox. Citação verbatim: \"Project-local rules under `<repo>/.codex/rules/` load only when the project `.codex/` layer is trusted.\". Locator: rules, 'Create a rules file' e 'Test a rule file'. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/rules"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/rules"
+      locator: "rules, 'Create a rules file' e 'Test a rule file'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_APPROVAL_POLICY_AND_SANDBOX_MODES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-26"
+    verified_against: "\"`untrusted` is unsupported, and `on-failure` is deprecated.\" — config-reference, 'approval_policy', 'sandbox_mode', 'default_permissions', permissions.<name>.* — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: vendor-on-self
+    label: "approval_policy aceita on-request, never ou granular (untrusted não suportado, on-failure deprecado); sandbox_mode tem read-only, workspace-write e danger-full-access; perfis de permissão nomeados existem em beta."
+    narrative: "Lacuna: codex-config-sandbox. Citação verbatim: \"`untrusted` is unsupported, and `on-failure` is deprecated.\". Locator: config-reference, 'approval_policy', 'sandbox_mode', 'default_permissions', permissions.<name>.*. tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/config-file/config-reference"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/config-file/config-reference"
+      locator: "config-reference, 'approval_policy', 'sandbox_mode', 'default_permissions', permissions.<name>.*"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_AGENTS_MD_DIRECTORY_WALK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"Starting at the project root (typically the Git root), Codex walks down to your current working directory.\" — AGENTS.md, seção de descoberta (Directory walk) — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O AGENTS.md é descoberto descendo da raiz do projeto até o diretório de trabalho: escopo por diretório como o do CLAUDE.md, com precedência pela ordem de concatenação."
+    narrative: "Lacuna: codex-skills-agents-md. Citação verbatim: \"Starting at the project root (typically the Git root), Codex walks down to your current working directory.\". Locator: AGENTS.md, seção de descoberta (Directory walk). tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
+      locator: "AGENTS.md, seção de descoberta (Directory walk)"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_AGENTS_MD_CLOSER_OVERRIDES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"Files closer to your current directory override earlier guidance because they appear later in the combined prompt.\" — AGENTS.md, seção de precedência — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Arquivos mais próximos do diretório atual vêm depois no prompt e prevalecem; AGENTS.override.md substitui o AGENTS.md do mesmo diretório."
+    narrative: "Lacuna: codex-skills-agents-md. Citação verbatim: \"Files closer to your current directory override earlier guidance because they appear later in the combined prompt.\". Locator: AGENTS.md, seção de precedência. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/agents-md"
+      locator: "AGENTS.md, seção de precedência"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CUSTOM_AGENTS_ARE_TOML
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"add standalone TOML files under `~/.codex/agents/` for personal agents or `.codex/agents/` for project-scoped agents.\" — seção Custom agents — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    x_path_is_content: "citação"
+    label: "Agentes customizados são arquivos TOML por agente, em escopo pessoal ou de projeto: equivalente parcial aos .claude/agents/*.md, em outro formato."
+    narrative: "Lacuna: codex-subagents. Citação verbatim: \"add standalone TOML files under `~/.codex/agents/` for personal agents or `.codex/agents/` for project-scoped agents.\". Locator: seção Custom agents. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+      locator: "seção Custom agents"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_AGENT_FILE_MODEL_TAKES_PRECEDENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"If a custom agent file sets `model` or `model_reasoning_effort`, the value in the file takes precedence.\" — seção Fields / Custom agents — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Campos obrigatórios do agente: name, description e developer_instructions; model e model_reasoning_effort no arquivo têm precedência (modelo por agente suportado)."
+    narrative: "Lacuna: codex-subagents. Citação verbatim: \"If a custom agent file sets `model` or `model_reasoning_effort`, the value in the file takes precedence.\". Locator: seção Fields / Custom agents. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+      locator: "seção Fields / Custom agents"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_SUBAGENT_PARALLELISM_CAP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"Cap concurrently open spawned-agent threads, excluding the primary.\" — seção Parallelism / agents config — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Paralelismo de subagentes suportado com teto configurável (agents.max_concurrent_threads_per_session; agents.max_threads é alias legado)."
+    narrative: "Lacuna: codex-subagents. Citação verbatim: \"Cap concurrently open spawned-agent threads, excluding the primary.\". Locator: seção Parallelism / agents config. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+      locator: "seção Parallelism / agents config"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_SUBAGENT_INHERITS_PARENT_PERMISSIONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-26"
+    verified_against: "\"They inherit the parent’s permissions, provider, and MCP servers;\" — seção Approvals and sandbox inheritance — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Subagentes herdam sandbox, aprovações e servidores MCP do pai; o arquivo do agente não os substitui (o leitor ressalvou leituras divergentes)."
+    narrative: "Lacuna: codex-subagents. Citação verbatim: \"They inherit the parent’s permissions, provider, and MCP servers;\". Locator: seção Approvals and sandbox inheritance. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+      locator: "seção Approvals and sandbox inheritance"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_SUBAGENTS_PAGE_SILENT_ON_WORKTREE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "\"Git worktrees (apenas item de navegação lateral; corpo da página sem menção)\" — navegação lateral (único match de 'worktree') — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A página de subagentes não trata de isolamento por git worktree (só um link de navegação), nem de max_depth ou nickname_candidates."
+    narrative: "Lacuna: codex-subagents. Citação verbatim: \"Git worktrees (apenas item de navegação lateral; corpo da página sem menção)\". Locator: navegação lateral (único match de 'worktree'). tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/agent-configuration/subagents"
+      locator: "navegação lateral (único match de 'worktree')"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CODEX_MCP_SERVER_REMOVED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "\"The `codex mcp-server` command and the standalone `codex-mcp-server` binary have been removed.\" — seção 'Codex MCP server removal' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Codex não roda mais como servidor MCP: `codex mcp-server` e o binário `codex-mcp-server` foram removidos, e o caminho 'Codex como servidor MCP' (Agents SDK) fechou."
+    narrative: "Lacuna: codex-mcp. Citação verbatim: \"The `codex mcp-server` command and the standalone `codex-mcp-server` binary have been removed.\". Locator: seção 'Codex MCP server removal'. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/mcp-server"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/mcp-server"
+      locator: "seção 'Codex MCP server removal'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_APP_SERVER_IS_NOT_MCP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "\"It isn't an MCP server or a drop-in replacement for an MCP client.\" — seção 'Use the Codex app server' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O substituto é o app server, com protocolo JSON-RPC próprio, que não é servidor MCP nem substituto direto de cliente MCP."
+    narrative: "Lacuna: codex-mcp. Citação verbatim: \"It isn't an MCP server or a drop-in replacement for an MCP client.\". Locator: seção 'Use the Codex app server'. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/mcp-server"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/mcp-server"
+      locator: "seção 'Use the Codex app server'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CODEX_REMAINS_MCP_CLIENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "\"Codex continues to support external MCP servers.\" — seção 'Connect Codex to MCP tools' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Codex segue como cliente MCP, gerenciado por `codex mcp`."
+    narrative: "Lacuna: codex-mcp. Citação verbatim: \"Codex continues to support external MCP servers.\". Locator: seção 'Connect Codex to MCP tools'. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/mcp-server"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/mcp-server"
+      locator: "seção 'Connect Codex to MCP tools'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_SERVERS_TOML_STDIO_HTTP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "\"Configure each MCP server with a `[mcp_servers.<server-name>]` table in the configuration file.\" — 'Configure with config.toml' > 'STDIO servers' / 'Streamable HTTP servers' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O cliente MCP é configurado por tabela TOML [mcp_servers.<nome>], com stdio (command, args, env_vars, cwd) e streamable HTTP (url, bearer_token_env_var, http_headers, auth)."
+    narrative: "Lacuna: codex-mcp. Citação verbatim: \"Configure each MCP server with a `[mcp_servers.<server-name>]` table in the configuration file.\". Locator: 'Configure with config.toml' > 'STDIO servers' / 'Streamable HTTP servers'. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
+      locator: "'Configure with config.toml' > 'STDIO servers' / 'Streamable HTTP servers'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_TOOL_ALLOW_DENY_LISTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"`disabled_tools` (optional): Tool deny list (applied after `enabled_tools`).\" — 'Configure with config.toml' > 'Other configuration options' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Controle de superfície por servidor MCP: lista de permissão e de negação de tools, servidor obrigatório e timeouts. É declarativo, não hook que barra por script."
+    narrative: "Lacuna: codex-mcp. Citação verbatim: \"`disabled_tools` (optional): Tool deny list (applied after `enabled_tools`).\". Locator: 'Configure with config.toml' > 'Other configuration options'. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
+      locator: "'Configure with config.toml' > 'Other configuration options'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_MCP_WRITES_MODE_DEPENDS_ON_READ_ONLY_MARK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-26"
+    verified_against: "\"The `writes` mode prompts for tools that aren’t marked read-only.\" — 'Other configuration options' (não há seção 'Tool approval') — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: vendor-on-self
+    label: "Aprovação de tool MCP tem modos por servidor e por tool; o modo writes depende de a tool estar marcada como somente leitura, e a doc não detalha as anotações."
+    narrative: "Lacuna: codex-mcp. Citação verbatim: \"The `writes` mode prompts for tools that aren’t marked read-only.\". Locator: 'Other configuration options' (não há seção 'Tool approval'). tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/extend/mcp?surface=cli"
+      locator: "'Other configuration options' (não há seção 'Tool approval')"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_EXEC_READ_ONLY_BY_DEFAULT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "\"By default, `codex exec` runs in a read-only sandbox.\" — non-interactive-mode, seção Sandbox/permissões — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "codex exec roda por padrão em sandbox somente leitura; em automação dar o mínimo de permissão e danger-full-access só em ambiente isolado."
+    narrative: "Lacuna: codex-exec-ci. Citação verbatim: \"By default, `codex exec` runs in a read-only sandbox.\". Locator: non-interactive-mode, seção Sandbox/permissões. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/non-interactive-mode"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/non-interactive-mode"
+      locator: "non-interactive-mode, seção Sandbox/permissões"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_EXEC_JSONL_TYPED_EVENTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-26"
+    verified_against: "\"When you enable `--json`, `stdout` becomes a JSON Lines (JSONL) stream\" — non-interactive-mode, seção JSON output (--json) — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Com --json o stdout do codex exec vira fluxo JSONL com eventos tipados (thread.started, turn.started, turn.completed, turn.failed, item.*, error)."
+    narrative: "Lacuna: codex-exec-ci. Citação verbatim: \"When you enable `--json`, `stdout` becomes a JSON Lines (JSONL) stream\". Locator: non-interactive-mode, seção JSON output (--json). tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/non-interactive-mode"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/non-interactive-mode"
+      locator: "non-interactive-mode, seção JSON output (--json)"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_EXEC_FULL_AUTO_REMOVED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "\"`--full-auto` is no longer supported.\" — non-interactive-mode, nota de depreciação — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: vendor-on-self
+    label: "--full-auto não é mais suportada; a migração é para --sandbox workspace-write ou --approve-for-me."
+    narrative: "Lacuna: codex-exec-ci. Citação verbatim: \"`--full-auto` is no longer supported.\". Locator: non-interactive-mode, nota de depreciação. tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/non-interactive-mode"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/non-interactive-mode"
+      locator: "non-interactive-mode, nota de depreciação"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_EXEC_OUTPUT_SCHEMA_AND_API_KEY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "\"use `--output-schema` to request a final response that conforms to a JSON Schema.\" — non-interactive-mode, seção Output schema / autenticação — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: vendor-on-self
+    label: "codex exec aceita --output-schema para resposta final conforme JSON Schema, e CODEX_API_KEY por execução (exec, review, SDK TypeScript)."
+    narrative: "Lacuna: codex-exec-ci. Citação verbatim: \"use `--output-schema` to request a final response that conforms to a JSON Schema.\". Locator: non-interactive-mode, seção Output schema / autenticação. tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/non-interactive-mode"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/non-interactive-mode"
+      locator: "non-interactive-mode, seção Output schema / autenticação"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_GHA_DROP_SUDO_DEFAULT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "\"`safety-strategy` (default `drop-sudo`) removes `sudo` before running Codex.\" — github-action, seção Inputs/safety-strategy — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: vendor-on-self
+    label: "A Action oficial tem sandbox interno do Codex e safety-strategy padrão drop-sudo, que remove o sudo de forma irreversível no job; em Windows exige unsafe."
+    narrative: "Lacuna: codex-exec-ci. Citação verbatim: \"`safety-strategy` (default `drop-sudo`) removes `sudo` before running Codex.\". Locator: github-action, seção Inputs/safety-strategy. tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/github-action"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/github-action"
+      locator: "github-action, seção Inputs/safety-strategy"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_GHA_WRITE_ACCESS_ONLY_AND_LATEST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "\"By default only users with write access can run the action.\" — github-action, seção allow-users e codex-version — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Por padrão só usuários com acesso de escrita disparam a Action (allow-users/allow-bots restringem); codex-version em branco usa a última versão publicada."
+    narrative: "Lacuna: codex-exec-ci. Citação verbatim: \"By default only users with write access can run the action.\". Locator: github-action, seção allow-users e codex-version. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://learn.chatgpt.com/docs/github-action"
+    provenance:
+      source: "https://learn.chatgpt.com/docs/github-action"
+      locator: "github-action, seção allow-users e codex-version"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_R164_HOOKS_OBSERVATION_LIFECYCLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-26"
+    verified_against: "\"Add observation-only model request lifecycle hooks\" — Release rust-v0.164.0, seção Hooks (junto de 'Add lifecycle hooks for inter-agent messages' e 'Bind plugin hook approval to plugin contents') — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: "2026-10-23"
+    label: "Na 0.164.0 os hooks evoluem para observação do ciclo de vida do modelo, mensagens entre agentes e aprovação de hook de plugin; nenhuma entrada cita PreToolUse nem bloqueio determinístico."
+    narrative: "Lacuna: codex-releases. Citação verbatim: \"Add observation-only model request lifecycle hooks\". Locator: Release rust-v0.164.0, seção Hooks (junto de 'Add lifecycle hooks for inter-agent messages' e 'Bind plugin hook approval to plugin contents'). tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
+    provenance:
+      source: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
+      locator: "Release rust-v0.164.0, seção Hooks (junto de 'Add lifecycle hooks for inter-agent messages' e 'Bind plugin hook approval to plugin contents')"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_R137_NO_HOOKS_NO_MCP_IN_NOTES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-26"
+    verified_against: "\"Multi-agent v2 keeps runtime choice with each thread and exposes cleaner follow-up and metadata defaults for spawned agents\" — Release 0.137.0 (04 Jun), notas — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: "2026-06-04"
+    label: "Nas notas da 0.137.0 não aparecem hooks nem MCP; subagentes aparecem só como multi-agent v2."
+    narrative: "Lacuna: codex-releases. Citação verbatim: \"Multi-agent v2 keeps runtime choice with each thread and exposes cleaner follow-up and metadata defaults for spawned agents\". Locator: Release 0.137.0 (04 Jun), notas. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/releases/tag/rust-v0.137.0"
+    provenance:
+      source: "https://github.com/openai/codex/releases/tag/rust-v0.137.0"
+      locator: "Release 0.137.0 (04 Jun), notas"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_R164_SUBAGENT_ENV_INHERITANCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-26"
+    verified_against: "\"Add configured thread environment inheritance for subagents\" — Release rust-v0.164.0, seção Subagent (junto de 'Resume unloaded subagent threads when selected in the TUI') — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: "2026-10-23"
+    label: "Na 0.164.0 os subagentes ganham herança de ambiente configurável e retomada de threads."
+    narrative: "Lacuna: codex-releases. Citação verbatim: \"Add configured thread environment inheritance for subagents\". Locator: Release rust-v0.164.0, seção Subagent (junto de 'Resume unloaded subagent threads when selected in the TUI'). tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
+    provenance:
+      source: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
+      locator: "Release rust-v0.164.0, seção Subagent (junto de 'Resume unloaded subagent threads when selected in the TUI')"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_R164_MCP_AUTH_DORMANT_SERVERS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-26"
+    verified_against: "\"Start dormant MCP servers for hook calls\" — Release rust-v0.164.0, seção Hooks/MCP; Sandbox: 'Reject replaceable symlinks in pre-sandbox executable lookup' — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: "2026-10-23"
+    label: "Na 0.164.0 o MCP se concentra em autenticação enterprise/OAuth e no start de servidores dormentes para hooks; sandbox e exec-server remoto recebem endurecimento."
+    narrative: "Lacuna: codex-releases. Citação verbatim: \"Start dormant MCP servers for hook calls\". Locator: Release rust-v0.164.0, seção Hooks/MCP; Sandbox: 'Reject replaceable symlinks in pre-sandbox executable lookup'. tier 9 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
+    provenance:
+      source: "https://github.com/openai/codex/releases/tag/rust-v0.164.0"
+      locator: "Release rust-v0.164.0, seção Hooks/MCP; Sandbox: 'Reject replaceable symlinks in pre-sandbox executable lookup'"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_TRACKER_PRETOOLUSE_PARTIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "\"Coverage must be consistent across every tool handler, not only selected paths.\" — issue #21753, corpo, Event Matrix, linha PreToolUse (Partial) — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: forum
+    label: "A matriz do tracker #21753 marca PreToolUse como PARCIAL: a cobertura não é consistente em todos os handlers, então a guarda do core (exit 2 em toda ação) não tem equivalente provado."
+    narrative: "Lacuna: codex-community-limits. Citação verbatim: \"Coverage must be consistent across every tool handler, not only selected paths.\". Locator: issue #21753, corpo, Event Matrix, linha PreToolUse (Partial). tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/issues/21753"
+    provenance:
+      source: "https://github.com/openai/codex/issues/21753"
+      locator: "issue #21753, corpo, Event Matrix, linha PreToolUse (Partial)"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-26"
+    verified_against: "\"the hook is marked Failed and the command proceeds\" — issue #21753, comentário de chrysent (2026-09-17) sobre permissionDecision 'ask', verificado no tag rust-v0.153.3 — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_kind: forum
+    valid_from: "2026-09-17"
+    label: "Comentário de usuário: o PreToolUse só tem Continue/Blocked, sem 'ask'; hook que falha deixa o comando prosseguir (fail-open); sob approval_policy=never nenhuma aprovação é iniciada."
+    narrative: "Lacuna: codex-community-limits. Citação verbatim: \"the hook is marked Failed and the command proceeds\". Locator: issue #21753, comentário de chrysent (2026-09-17) sobre permissionDecision 'ask', verificado no tag rust-v0.153.3. tier não declarado pelo leitor (o run deu '?'). Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/issues/21753"
+    provenance:
+      source: "https://github.com/openai/codex/issues/21753"
+      locator: "issue #21753, comentário de chrysent (2026-09-17) sobre permissionDecision 'ask', verificado no tag rust-v0.153.3"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_TRACKER_WORKTREECREATE_MISSING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "\"Needed for parallel-agent workspace orchestration.\" — issue #21753, corpo, Event Matrix, linha WorktreeCreate (Missing); SubagentStart/SubagentStop também Missing — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 8
+    source_kind: forum
+    label: "O tracker lista SubagentStart, SubagentStop e WorktreeCreate como eventos ausentes, necessários à orquestração de agentes paralelos e worktrees."
+    narrative: "Lacuna: codex-community-limits. Citação verbatim: \"Needed for parallel-agent workspace orchestration.\". Locator: issue #21753, corpo, Event Matrix, linha WorktreeCreate (Missing); SubagentStart/SubagentStop também Missing. tier 8 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/issues/21753"
+    provenance:
+      source: "https://github.com/openai/codex/issues/21753"
+      locator: "issue #21753, corpo, Event Matrix, linha WorktreeCreate (Missing); SubagentStart/SubagentStop também Missing"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-26"
+    verified_against: "\"Native apply_patch lacks per-call workdir context for Hooks in multi-worktree repositories.\" — issue #21753, issue relacionada (título) — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 3
+    source_kind: forum
+    label: "Issue ligada relata que o apply_patch não traz o workdir por chamada para os hooks em repositórios com várias worktrees."
+    narrative: "Lacuna: codex-community-limits. Citação verbatim: \"Native apply_patch lacks per-call workdir context for Hooks in multi-worktree repositories.\". Locator: issue #21753, issue relacionada (título). tier 3 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/issues/21753"
+    provenance:
+      source: "https://github.com/openai/codex/issues/21753"
+      locator: "issue #21753, issue relacionada (título)"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_COMMENT_SUBAGENT_INSTRUCTIONS_UNINSPECTABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-10-26"
+    verified_against: "\"operators lost every supported way to inspect the exact instructions and follow-up messages sent to subagents.\" — issue #21753, comentário de usuário (hoganfan, 2026-07-13) — ancorada por verificador independente (run wf_e4a2a9be-bb5)"
+    source_tier: 3
+    source_kind: forum
+    valid_from: "2026-07-13"
+    label: "Comentário de usuário: operadores perderam toda forma suportada de inspecionar as instruções enviadas a subagentes, um limite de observabilidade e de guarda sobre subagentes."
+    narrative: "Lacuna: codex-community-limits. Citação verbatim: \"operators lost every supported way to inspect the exact instructions and follow-up messages sent to subagents.\". Locator: issue #21753, comentário de usuário (hoganfan, 2026-07-13). tier 3 declarado pelo leitor. Claim ANCORADA no modo primaries (leitura + verificador independente que reabriu o documento)."
+    trace: "https://github.com/openai/codex/issues/21753"
+    provenance:
+      source: "https://github.com/openai/codex/issues/21753"
+      locator: "issue #21753, comentário de usuário (hoganfan, 2026-07-13)"
+      method: "leitura: WebFetch pelo leitor do run wf_e4a2a9be-bb5, ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CORPUS_ONION_CODEX_PORT_STATE_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: "clone do onion-codex no commit a21679136d27 (2026-09-16): contagem de .agents/skills, de .codex/agents/*.toml, leitura de .codex/hooks.json e grep de 0.137 no CODEX-NEXT-STEPS.md"
+    label: "O porte onion-codex (linha viva) tem 82 skills em .agents/skills, 49 subagentes TOML e um único hook (SessionStart); o último commit é de 2026-09-16 e o CLI validado é o 0.137.0."
+    narrative: "Medido nesta escrita: hooks.json tem só SessionStart (detecção do provider do task manager), nenhum PreToolUse; CODEX-NEXT-STEPS.md l.44 registra 'codex --version responde codex-cli 0.137.0'. Corpus do core: a capacidade que compra o acoplamento ao Claude Code é o exit 2 determinístico de hook (onion-identity-2026-07#C_POSTURA_ACOPLAMENTO); a curadoria de 2026-10-25 mediu o Codex 0.164.0 como cliente MCP (sinais-de-campo-2026-09#E_N2_VIVO_INTERLINK_MEDIU_O_ENVIO_SEM_DIALOGO_1025). O porte não exercita guarda de hook nenhuma."
+    trace: "github.com/marciocar/onion-codex@a21679136d27"
+    provenance:
+      source: "github.com/marciocar/onion-codex@a21679136d27a9bd013859d405e4e48b4b941fbe"
+      locator: ".codex/hooks.json; .agents/skills; .codex/agents; CODEX-NEXT-STEPS.md l.44"
+      method: "medição: ls | wc -l e cat no clone local do commit"
+      locality: "web"
+
+  - id: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-26"
+    verified_against: "contabilidade do run wf_e4a2a9be-bb5 (modo primaries): 7 chaves de fonte lidas, 0 inalcançáveis; 32 claims ancoradas, 16 rejeitadas na ancoragem (9 AFIRMADA-SEM-CITACAO, 7 EXAGERADA); 32 objeções do Elenxo (11 sobreviventes); 0 recusadas pelo motor; 7 superações achadas"
+    label: "Lacunas da rodada de primárias: 7 chaves lidas, 0 inalcançáveis; 32 ancoradas e 16 rejeitadas (9 sem citação, 7 exageradas); 11 objeções sobreviventes, 0 recusadas, 7 superações. Seguem abertas hooks, skills/comandos, subagentes e releases."
+    narrative: "FONTES LIDAS (chaves do run): codex-hooks (learn.chatgpt.com/docs/hooks), codex-config-sandbox (rules, config-reference, agent-approvals-security), codex-skills-agents-md (agents-md, build-skills, custom-prompts), codex-subagents (agent-configuration/subagents), codex-mcp (mcp-server, extend/mcp?surface=cli), codex-exec-ci (non-interactive-mode, github-action), codex-releases (rust-v0.137.0, rust-v0.164.0, listagem de releases), codex-community-limits (issue #21753 e ligadas). INALCANÇÁVEIS: 0. REJEITADAS NA ANCORAGEM (16, nenhuma virou nó): [codex-hooks, 6, todas AFIRMADA-SEM-CITACAO, rebaixadas pelo motor por falta de quote/locator, embora o verificador tenha achado o texto] (1) PreToolUse barra por exit 2 com motivo no stderr (o texto sustenta exit 2 + stderr; nada sobre valer sob approval never ou danger-full-access); (2) JSON permissionDecision deny e o formato antigo decision block; (3) os 12 eventos (PreToolUse, PermissionRequest, PostToolUse, PreCompact, PostCompact, UserPromptSubmit, SubagentStop, Stop, Interrupt, SessionStart, SubagentStart, SessionEnd) e entrada JSON no stdin; (4) a doc diz 'Treat tool hooks as a useful guardrail, not a complete enforcement boundary' e hosted tools como WebSearch não passam pelo hook; (5) hooks não gerenciados exigem revisão; hooks em background não bloqueiam; ask, approve, continue:false, stopReason e suppressOutput no PreToolUse são lidos mas não suportados e o Codex marca o hook como falho e CONTINUA a tool call (fail-open); (6) PermissionRequest só roda quando o Codex iria pedir aprovação, e a página não declara o PreToolUse sob approval never/danger-full-access. [codex-config-sandbox, 2 EXAGERADA] (7) scripts com redirecionamento ou substituição não são divididos: a substância está na página, a quote não; (8) defaults de rede e escrita, caminhos protegidos e --yolo: a parêntese 'sem guarda nativa além de regras/hooks' não está na página. [codex-skills-agents-md, 3 AFIRMADA-SEM-CITACAO + 1 EXAGERADA] (9) teto project_doc_max_bytes de 32 KiB (o Elenxo mediu que não morde: CLAUDE.md 25981 B, AGENTS.md do porte 10948 B); (10) skills em SKILL.md com name e description, nas pastas .agents/skills do cwd até a raiz do repo, do usuário, do admin (⟨etc⟩/codex/skills) e do sistema; (11) invocação explícita por /skills ou $ e implícita pela description, com carregamento progressivo; (12) EXAGERADA: custom prompts deprecados e restritos à pasta prompts do home do Codex, sem compartilhamento por repositório, mas a página não diz que os 117 comandos 'só podem' virar skills invocadas por $. [codex-subagents, 1 EXAGERADA] (13) spawn por pedido direto ou instrução de projeto/skill: a metade 'não há invocação por nome, é decisão do modelo' não está no texto, que exemplifica o usuário nomeando pr_explorer. [codex-releases, 2 EXAGERADA] (14) cadência: 'estável em semanas' estica, as estáveis saíram a cada poucos dias (0.160.1 em 10-05 a 0.164.0 em 10-23; 27 minors em ~140 dias); (15) skills na 0.137.0 'andaime inicial' estica: a 0.137.0 já traz catálogo por turno (#26106) e injeção de prompt (#26167). [codex-community-limits, 1 EXAGERADA] (16) 'títulos de issues' sobre ferramentas sem evento de hook e deny não aplicado em apply_patch: a frase é glosa num comentário; os títulos reais de #27833 e #20204 sustentam a substância. OBJEÇÕES DO ELENXO: 32, das quais 11 sobreviveram com critério pré-registrado (modeladas como E_OBJECAO_*), 21 foram testadas e derrubadas. RECUSADAS PELO MOTOR: 0. SUPERAÇÕES achadas: 7, todas nas claims rejeitadas, modeladas como C_SUPERACAO_20261026_*; nenhuma das 11 objeções sobreviventes achou superação. LACUNAS ABERTAS (gapsOpen do Elenxo): (1) codex-hooks: nenhuma claim da página oficial ancorada; falta re-ancorar com quote e locator e, sobretudo, o teste vivo no codex-cli 0.164.0 de um PreToolUse com exit 2 contra shell, apply_patch e tool MCP sob approval_policy=never + danger-full-access (a #27833 segue OPEN: 'PreToolUse deny ... is not enforced for apply_patch - hook fires, write proceeds'); (2) codex-skills-agents-md: o destino dos 117 comandos do core fica sem citação ancorada (.agents/skills, invocação por $, deprecação dos custom prompts todos rejeitados por forma); (3) codex-subagents: isolamento por worktree não lido (as notas da 0.162.0 #50148 e da 0.164.0 #54175 mostram worktrees gerenciadas e a flag aposentada) e se a herança configurável da 0.164.0 permite RESTRINGIR o subagente; (4) codex-releases: só as duas pontas lidas, 27 minors (0.138 a 0.163) sem varredura por hook, skill, subagent, mcp e worktree. Fechadas pelo Elenxo: codex-config-sandbox, codex-mcp, codex-exec-ci, codex-community-limits."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, objeções e gapsOpen do Elenxo"
+      method: "derivado: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O parágrafo literal da seção 'When Codex does not split the script' da página de rules sustenta o fato: o script inteiro é avaliado como um único [\"bash\",\"-lc\",\"<full script>\"], com a lista completa de gatilhos."
+    narrative: "Medida: curl da página + extração de texto em python; grep de 'does not split the script', trecho completo impresso e conferido. Critério: A1_QUOTE_AUSENTE. Alvo reprovado: [codex-config-sandbox] scripts com redirecionamento ou substituição não são divididos (EXAGERADA: quote montada, locator 'Limits' inexistente)."
+    trace: "curl -sL https://learn.chatgpt.com/docs/agent-configuration/rules | grep -F 'Codex does not split it' # 0 ocorrências (o título 'When Codex does not split the script' é a única ocorrência de 'does not split')"
+
+  - id: C_SUPERACAO_20261026_SANDBOX_DEFAULTS_YOLO_CORRECTED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação sustentada pela página de approvals e segurança: defaults sem rede e escrita no workspace, caminhos protegidos (.git, .agents, .codex, .aws somente leitura) e a linha 'No sandbox; no approvals', sem a parêntese sobre regras/hooks."
+    narrative: "Medida: curl da página + extração de texto em python; trechos 'Defaults include no network access', '.aws is protected as read-only' e 'No sandbox; no approvals (not recommended)' conferidos literalmente. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [codex-config-sandbox] defaults e --yolo 'sem guarda nativa além de regras/hooks'."
+    trace: "curl -sL https://learn.chatgpt.com/docs/agent-approvals-security | grep -o 'Dangerous full access.\\{0,200\\}' # mostra só 'No sandbox; no approvals (not recommended)', sem menção a regras/hooks sob yolo"
+
+  - id: C_SUPERACAO_20261026_REPO_SKILLS_REPLACE_PROMPTS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Skills de repositório em .agents/skills (SKILL.md com name e description), versionadas no repo e invocáveis por $, /skills ou implicitamente, que a página de skills documenta como o destino oficial dos prompts."
+    narrative: "Medida: WebFetch de learn.chatgpt.com/docs/build-skills (locais $CWD/.agents/skills, $CWD/../.agents/skills e $REPO_ROOT/.agents/skills; invocação explícita e implícita) e de custom-prompts (aviso 'Use skills for reusable instructions'); leitura da documentação, sem execução do Codex. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [codex-skills-agents-md] os 117 comandos 'só podem virar skills invocadas por $'."
+    trace: "WebFetch https://learn.chatgpt.com/docs/custom-prompts e buscar 'only'/'só' e 'cannot'; contraste com https://learn.chatgpt.com/docs/build-skills (skills em $REPO_ROOT/.agents/skills, invocação por $, /skills ou implícita)"
+
+  - id: C_SUPERACAO_20261026_SUBAGENT_SPAWN_BY_NAME_IN_PROMPT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida pela página de subagentes: spawn por pedido direto ou instrução de projeto/skill, agente customizado nomeável no prompt pelo `name`, delegação proativa só no Ultra, e a lacuna de não haver sintaxe formal de seleção documentada."
+    narrative: "Medida: segunda abertura da página (WebFetch com prompt de citação literal) devolveu a frase da quote, 'At most intelligence levels, ask for subagents or parallel agent work directly', 'Ultra enables proactive delegation...' e o exemplo com pr_explorer. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [codex-subagents] 'não há invocação determinística por nome, é decisão do modelo'."
+    trace: "WebFetch https://learn.chatgpt.com/docs/agent-configuration/subagents e citar a seção 'Orchestration and thread controls': 'Current local Codex releases spawn agents after a direct request or applicable project or skill instruction.'"
+
+  - id: C_SUPERACAO_20261026_RELEASE_CADENCE_DAYS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A listagem de releases do repositório (rust-v0.160.1 a rust-v0.164.0) sustenta a cadência real: estáveis a cada poucos dias, não semanas, e 27 minors de 0.137.0 (2026-06-04) a 0.164.0 (2026-10-23)."
+    narrative: "Medida: gh api 'repos/openai/codex/releases?per_page=100' em 2026-10-26: estáveis 0.160.1 (10-05), 0.161.0 (10-07), 0.162.0 (10-08), 0.162.1 (10-09), 0.163.0 (10-15), 0.164.0 (10-23); 0.164.0 com prerelease=false; 0.137.0 publicada em 2026-06-04T01:17Z. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [codex-releases] 'estável em semanas' e '(Latest, stable)'."
+    trace: "gh api 'repos/openai/codex/releases?per_page=100' -q '.[]|select(.prerelease==false)|[.tag_name,.published_at]|@tsv' | head -8"
+
+  - id: C_SUPERACAO_20261026_SKILLS_0137_ALREADY_PER_TURN
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "As linhas #26106 e #26167 da 0.137.0 (catálogo de skills por turno e injeção de prompt v1) e #54050 da 0.164.0 (refresh de skills na TUI escopado a diretórios explícitos) dão a formulação que as notas sustentam."
+    narrative: "Medida: grep no corpo de rust-v0.137.0 devolve as linhas 143 (#26106) e 146 (#26167); grep em rust-v0.164.0 devolve a linha 81 (#54050 'Scope TUI skill refreshes and workspace commands to explicit directories'). Critério: A2_CLAIM_ESTICA. Alvo reprovado: [codex-releases] skills na 0.137.0 como 'andaime inicial'."
+    trace: "gh api repos/openai/codex/releases/tags/rust-v0.137.0 -q .body | grep -nE 'skills: resolve per-turn|v1 skills extension'; gh api repos/openai/codex/releases/tags/rust-v0.164.0 -q .body | grep -n '#54050'"
+
+  - id: C_SUPERACAO_20261026_ISSUE_TITLES_27833_20204
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Os títulos reais de #27833 ('PreToolUse deny (exit 2 + permissionDecision JSON) is not enforced for apply_patch - hook fires, write proceeds') e de #20204 entregam o que a claim prometia: deny não aplicado em apply_patch e a maioria das ferramentas sem evento de hook."
+    narrative: "Medida: gh api repos/openai/codex/issues/27833 --jq .title e gh api repos/openai/codex/issues/20204 --jq .title devolveram os títulos; #20204 também aparece no índice dos comentários. Critério: A2_CLAIM_ESTICA. Alvo reprovado: [codex-community-limits] a glosa entre parênteses tratada como título literal."
+    trace: "grep -n -F 'PreToolUse deny not enforced for apply_patch' all.txt # 1 linha, glosa no comentário (linha 877); gh api repos/openai/codex/issues/27833 --jq .title # título real, mais longo"
+
+  - id: E_OBJECAO_01_EXECPOLICY_NOT_ANY_TOOL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_EXECPOLICY_MOST_RESTRICTIVE_WINS, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a precedência do execpolicy vale só entre regras de prefixo de comando; nenhuma claim ancorada diz que ele cobre apply_patch ou tools MCP, nem que vale sob danger-full-access."
+    narrative: "O equivalente ao exit 2 de PreToolUse barra QUALQUER tool (Edit/Write/MCP), inclusive sob bypassPermissions. A #27833, aberta hoje ('PreToolUse deny ... is not enforced for apply_patch - hook fires, write proceeds'), contraria a superação. Critério: grep 'apply_patch|danger-full-access' nas claims 1-4 → 0 ligações. Superação: nenhuma achada."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_EXECPOLICY_MOST_RESTRICTIVE_WINS (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_02_OUTSIDE_SANDBOX_UNQUOTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_RULES_EXPERIMENTAL_OUTSIDE_SANDBOX, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a quote sustenta só 'experimental'; a metade 'só controla o que roda fora do sandbox', que decide se a regra serve de guarda, está sem trecho verbatim."
+    narrative: "A frase 'outside the sandbox' só aparece citada pelo verificador numa claim rejeitada (a do --yolo). Critério: comparar a quote com o texto da claim. Superação: nenhuma achada nas 32 claims ancoradas."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_RULES_EXPERIMENTAL_OUTSIDE_SANDBOX (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_04_NO_DIALOG_UNDER_NEVER_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_APPROVAL_POLICY_AND_SANDBOX_MODES, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a quote cobre só untrusted/on-failure; perfis e modos de sandbox estão no locator sem trecho, e o que um agente faz sem diálogo sob never/danger-full-access não tem claim ancorada."
+    narrative: "A única claim sobre o modo mais permissivo (a do --yolo) foi rejeitada como EXAGERADA. A curadoria de 2026-10-25 mediu só o round-trip MCP ('never fecha tudo'), não hooks nem rules. Critério: claims de codex-config-sandbox que citem never/danger-full-access com quote → 0. Superação: nenhuma."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_APPROVAL_POLICY_AND_SANDBOX_MODES (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_10_INHERITANCE_NOW_CONFIGURABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_SUBAGENT_INHERITS_PARENT_PERMISSIONS, critério pré-registrado E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): a 0.164.0 trouxe herança de ambiente configurável para subagentes, o que pode contrariar 'o arquivo do agente não os substitui'; restringir permissão por agente é peça do core."
+    narrative: "Critério: gh api repos/openai/codex/releases/tags/rust-v0.164.0 --jq .body | grep -i 'inheritance for subagents'. Superação: nenhuma; não há doc que diga se o subagente pode receber sandbox ou aprovação MAIS restrita que o pai."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_SUBAGENT_INHERITS_PARENT_PERMISSIONS (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_11_WORKTREE_CAPABILITY_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_SUBAGENTS_PAGE_SILENT_ON_WORKTREE, critério pré-registrado E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): ausência numa página não é ausência no produto; as notas da 0.162.0 (#50148, worktrees gerenciadas) e da 0.164.0 (#54175, flag aposentada) mostram capacidade não lida."
+    narrative: "A lacuna do isolamento por worktree fica SEM RESPOSTA, não respondida como 'falta'. Nenhuma nota diz que um subagente spawnado roda isolado numa worktree; não medido ao vivo. Critério: gh api das releases rust-v0.162.0 e rust-v0.164.0 | grep -i worktree. Superação: nenhuma."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_SUBAGENTS_PAGE_SILENT_ON_WORKTREE (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_17_READ_ONLY_MARK_IS_DECLARATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_MCP_WRITES_MODE_DEPENDS_ON_READ_ONLY_MARK, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): guarda que depende de o SERVIDOR declarar a própria tool como read-only é declaração, não mecanismo; um servidor que se declara read-only escapa do prompt."
+    narrative: "Doutrina behavior-over-declaration. O único mecanismo do cliente ancorado é disabled_tools, lista estática por nome. Critério: buscar 'readOnlyHint' ou 'annotations' nas claims 15-17 → 0. Superação: nenhuma."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_MCP_WRITES_MODE_DEPENDS_ON_READ_ONLY_MARK (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_24_EXIT2_STATE_UNPROVEN_IN_0164
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_R164_HOOKS_OBSERVATION_LIFECYCLE, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a ausência de 'PreToolUse' nas notas da 0.164.0 não diz o estado do deny na versão atual; a #27833 segue OPEN e a #54114 ('blocking reasons') não foi lida."
+    narrative: "O estado do exit 2 no 0.164.0 segue sem prova direta. kg-corpus-grep 'PreToolUse' devolve só nós do Claude Code. Critério: gh api issues/27833 (title,state) e grep pretooluse|block nas notas da 0.164.0. Superação: o teste vivo (PreToolUse exit 2 contra shell, apply_patch e MCP sob never + danger-full-access) não existe."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_R164_HOOKS_OBSERVATION_LIFECYCLE (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_25_TRAJECTORY_ONLY_ENDPOINTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_R137_NO_HOOKS_NO_MCP_IN_NOTES, critério pré-registrado E4_LACUNA_ABERTA"
+    label: "OBJEÇÃO (Elenxo): ler as duas pontas (0.137 e 0.164) não é trajetória; 27 minors ficam sem leitura, e a lacuna 'o que mudou de 0.137 para a atual' fica aberta."
+    narrative: "A claim 29 situa o PreToolUse no tag rust-v0.153.3 e a 0.162.0 traz worktrees gerenciadas (#50148), nada disso nas claims de releases. Amostra 0.160-0.164 feita pelo Elenxo; varredura completa não. Critério: loop gh api rust-v0.140.0…rust-v0.163.0 | grep hook|skill|subagent|mcp|worktree. Superação: nenhuma."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_R137_NO_HOOKS_NO_MCP_IN_NOTES (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_29_COMMENT_PREDATES_CURRENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o comentário foi verificado no tag rust-v0.153.3, 11 minors antes da atual 0.164.0; para a versão atual prova menos do que a decisão precisa."
+    narrative: "O fail-open de campo não suportado também está na doc oficial ('Codex marks the hook run as failed, reports the error, and continues the tool call'), mas essa claim foi rebaixada por falta de quote. Critério: gh api releases/latest → rust-v0.164.0 ≠ rust-v0.153.3. Superação: nenhuma ancorada."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_30_SUBAGENT_EVENTS_EXIST_IN_DOCS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_TRACKER_WORKTREECREATE_MISSING, critério pré-registrado E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): a tabela oficial de hooks, segundo o verificador, lista SubagentStart e SubagentStop; o tracker (último update 2026-09-17) está defasado nessas duas linhas. Para WorktreeCreate a claim se sustenta."
+    narrative: "Critério: gh api issues/21753 --jq .body | grep SubagentStart|SubagentStop ('Missing') × a tabela 'Hooks run at different points' citada pelo verificador. Superação: nenhuma; a tabela de 12 eventos não foi re-ancorada nem medida ao vivo."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_TRACKER_WORKTREECREATE_MISSING (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_32_INTER_AGENT_HOOK_MAY_RESTORE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-26"
+    verified_against: "objeção sobrevivente do Elenxo (run wf_e4a2a9be-bb5) contra E_COMMENT_SUBAGENT_INSTRUCTIONS_UNINSPECTABLE, critério pré-registrado E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): o comentário é de 2026-07-13, várias releases antes da 0.164.0, que adicionou 'lifecycle hooks for inter-agent messages' e pode ter devolvido a observabilidade perdida."
+    narrative: "Critério: gh api releases/tags/rust-v0.164.0 --jq .body | grep -i 'inter-agent messages'. Superação: nenhuma; não há doc do contrato desse evento nem teste vivo."
+    trace: "journal do run wf_e4a2a9be-bb5"
+    provenance:
+      source: "journal do run wf_e4a2a9be-bb5"
+      locator: "Elenxo, objeção ao alvo E_COMMENT_SUBAGENT_INSTRUCTIONS_UNINSPECTABLE (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: "Hooks que barram: FALTA o equivalente PROVADO ao exit 2 do Claude Code. PreToolUse é parcial no tracker, o deny não vale em apply_patch (#27833 aberta), há fail-open e nada medido sob never/danger-full-access."
+    narrative: "Peça que COMPRA o acoplamento (onion-identity-2026-07#C_POSTURA_ACOPLAMENTO). Todas as claims da página oficial de hooks caíram por forma; o que ficou ancorado é do tracker e dos comentários. Falta o teste vivo no 0.164.0. Juízo do Elenxo, 1 agente."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_PIECE_RULES_SANDBOX_PARTIAL_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: "Sandbox, approval policy e execpolicy: PARCIAL. Há forbidden>prompt>allow por prefixo de comando, sandbox read-only/workspace-write/danger-full-access e perfis beta, mas as rules são experimentais e dependem de trust."
+    narrative: "Não cobre edição de arquivo nem tool MCP por regra; o comportamento sob never + danger-full-access ficou sem âncora (E_OBJECAO_04). Juízo do Elenxo, 1 agente."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_PIECE_AGENTS_MD_EQUIVALENT_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "AGENTS.md: EQUIVALENTE ao CLAUDE.md em descoberta e precedência por diretório (raiz ao cwd, o mais próximo prevalece, override por diretório)."
+    narrative: "O teto de 32 KiB (rejeitado na ancoragem por forma) não morde hoje: CLAUDE.md 25981 B e AGENTS.md do porte 10948 B, medidos pelo Elenxo. Juízo do Elenxo, 1 agente."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_PIECE_SKILLS_COMMANDS_UNJUDGED_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Skills e comandos: NÃO JULGADO nesta rodada. Toda claim sobre .agents/skills, invocação por $ e deprecação dos custom prompts caiu na ancoragem; o destino dos 117 comandos do core fica sem citação."
+    narrative: "A superação C_SUPERACAO_20261026_REPO_SKILLS_REPLACE_PROMPTS aponta skills de repositório como destino oficial, mas é afirmação de um juiz. O porte já tem 82 skills (E_CORPUS_ONION_CODEX_PORT_STATE_1026)."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: "Subagentes: EQUIVALENTE em outro formato (TOML com model por agente e teto de paralelismo); isolamento por worktree e restrição de permissão por agente seguem ABERTOS."
+    narrative: "Herdam permissões, provider e MCP do pai; a 0.164.0 tornou a herança configurável sem dizer se restringe. A REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable) não lê TOML: dívida do core. Juízo do Elenxo, 1 agente."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_PIECE_MCP_CLIENT_ONLY_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "MCP: EQUIVALENTE como cliente ([mcp_servers.*] em TOML, stdio e HTTP, allow/deny de tools, aprovação por servidor e tool); FALTA o papel de servidor (codex mcp-server removido, app server não é MCP)."
+    narrative: "Um peer Codex por MCP com o Codex como servidor deixa de existir; integrar exige adapter SDAAL próprio sobre o app server. Bate com a medição viva da curadoria de 2026-10-25. Juízo do Elenxo, 1 agente."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Execução não interativa e CI: EQUIVALENTE ao claude -p para o gate que lê e reprova (exec read-only por padrão, JSONL tipado, --output-schema, Action com drop-sudo e restrita a quem tem escrita)."
+    narrative: "O --full-auto do porte velho quebra; codex-version em branco usa a última versão, o que contraria a fixação de versão do core (configuração, não falta). Juízo do Elenxo, 1 agente."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Trajetória de releases: ABERTA. Lidas só a 0.137.0 e a 0.164.0; a cadência real é de estáveis a cada poucos dias (27 minors em ~140 dias), e as 27 minors intermediárias não foram varridas."
+    narrative: "A cadência vem da superação C_SUPERACAO_20261026_RELEASE_CADENCE_DAYS (1 juiz). O porte parou no 0.137.0 (E_CORPUS_ONION_CODEX_PORT_STATE_1026). Juízo do Elenxo, 1 agente."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+  - id: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "A rodada NÃO autoriza dizer que o Codex roda o Onion Core com eficácia equivalente nem abrir porta nova: a peça que define o core (hook que barra no modo mais permissivo) não tem equivalente provado. O onion-codex segue LINHA VIVA."
+    narrative: "Recomendação do Elenxo (1 agente). Sustenta: MCP só cliente, exec/CI equivalente, AGENTS.md equivalente, subagentes equivalentes em formato, execpolicy parcial. Não sustenta: hooks, skills/comandos, worktree e isolamento de subagente, trajetória. Próximo passo mínimo antes de decisão de porta: (i) re-ancorar a página oficial de hooks com quote e locator; (ii) rodar no codex-cli 0.164.0 um PreToolUse com exit 2 contra shell, apply_patch e tool MCP sob approval_policy=never + danger-full-access e gravar no grafo; (iii) varrer as notas de 0.138 a 0.163 por hook, skill, subagent, mcp e worktree. Não é descarte por orçamento: é a falta medida da peça que define o core. Esta sessão não sela; decisão de porta é do maestro."
+    trace: "recomendação do Elenxo, run wf_e4a2a9be-bb5"
+
+edges:
+  - from: C_SUPERACAO_20261026_RULES_SCRIPT_NOT_SPLIT
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261026_SANDBOX_DEFAULTS_YOLO_CORRECTED
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261026_REPO_SKILLS_REPLACE_PROMPTS
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261026_SUBAGENT_SPAWN_BY_NAME_IN_PROMPT
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261026_RELEASE_CADENCE_DAYS
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261026_SKILLS_0137_ALREADY_PER_TURN
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261026_ISSUE_TITLES_27833_20204
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_01_EXECPOLICY_NOT_ANY_TOOL
+    to: E_EXECPOLICY_MOST_RESTRICTIVE_WINS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_OUTSIDE_SANDBOX_UNQUOTED
+    to: E_RULES_EXPERIMENTAL_OUTSIDE_SANDBOX
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_NO_DIALOG_UNDER_NEVER_UNANCHORED
+    to: E_APPROVAL_POLICY_AND_SANDBOX_MODES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_10_INHERITANCE_NOW_CONFIGURABLE
+    to: E_SUBAGENT_INHERITS_PARENT_PERMISSIONS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_WORKTREE_CAPABILITY_UNREAD
+    to: E_SUBAGENTS_PAGE_SILENT_ON_WORKTREE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_17_READ_ONLY_MARK_IS_DECLARATION
+    to: E_MCP_WRITES_MODE_DEPENDS_ON_READ_ONLY_MARK
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_24_EXIT2_STATE_UNPROVEN_IN_0164
+    to: E_R164_HOOKS_OBSERVATION_LIFECYCLE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_25_TRAJECTORY_ONLY_ENDPOINTS
+    to: E_R137_NO_HOOKS_NO_MCP_IN_NOTES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_29_COMMENT_PREDATES_CURRENT
+    to: E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_30_SUBAGENT_EVENTS_EXIST_IN_DOCS
+    to: E_TRACKER_WORKTREECREATE_MISSING
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_32_INTER_AGENT_HOOK_MAY_RESTORE
+    to: E_COMMENT_SUBAGENT_INSTRUCTIONS_UNINSPECTABLE
+    edge_type: CONSTRAINS
+  - from: E_TRACKER_PRETOOLUSE_PARTIAL
+    to: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    edge_type: SUPPORTS
+  - from: E_COMMENT_PRETOOLUSE_FAIL_OPEN_NO_ASK
+    to: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    edge_type: SUPPORTS
+  - from: E_APPLY_PATCH_NO_WORKDIR_FOR_HOOKS
+    to: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    edge_type: SUPPORTS
+  - from: E_TRACKER_WORKTREECREATE_MISSING
+    to: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    edge_type: SUPPORTS
+  - from: E_R164_HOOKS_OBSERVATION_LIFECYCLE
+    to: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    edge_type: SUPPORTS
+  - from: E_CORPUS_ONION_CODEX_PORT_STATE_1026
+    to: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_HOOKS_DETERMINISTIC_BLOCK_MISSING_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: E_EXECPOLICY_MOST_RESTRICTIVE_WINS
+    to: C_PIECE_RULES_SANDBOX_PARTIAL_1026
+    edge_type: SUPPORTS
+  - from: E_RULES_EXPERIMENTAL_OUTSIDE_SANDBOX
+    to: C_PIECE_RULES_SANDBOX_PARTIAL_1026
+    edge_type: SUPPORTS
+  - from: E_PROJECT_RULES_NEED_TRUST
+    to: C_PIECE_RULES_SANDBOX_PARTIAL_1026
+    edge_type: SUPPORTS
+  - from: E_APPROVAL_POLICY_AND_SANDBOX_MODES
+    to: C_PIECE_RULES_SANDBOX_PARTIAL_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_RULES_SANDBOX_PARTIAL_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: E_AGENTS_MD_DIRECTORY_WALK
+    to: C_PIECE_AGENTS_MD_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_AGENTS_MD_CLOSER_OVERRIDES
+    to: C_PIECE_AGENTS_MD_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_AGENTS_MD_EQUIVALENT_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_SKILLS_COMMANDS_UNJUDGED_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: E_CUSTOM_AGENTS_ARE_TOML
+    to: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_AGENT_FILE_MODEL_TAKES_PRECEDENCE
+    to: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_SUBAGENT_PARALLELISM_CAP
+    to: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_SUBAGENT_INHERITS_PARENT_PERMISSIONS
+    to: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_SUBAGENTS_PAGE_SILENT_ON_WORKTREE
+    to: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_R164_SUBAGENT_ENV_INHERITANCE
+    to: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: E_CODEX_MCP_SERVER_REMOVED
+    to: C_PIECE_MCP_CLIENT_ONLY_1026
+    edge_type: SUPPORTS
+  - from: E_APP_SERVER_IS_NOT_MCP
+    to: C_PIECE_MCP_CLIENT_ONLY_1026
+    edge_type: SUPPORTS
+  - from: E_CODEX_REMAINS_MCP_CLIENT
+    to: C_PIECE_MCP_CLIENT_ONLY_1026
+    edge_type: SUPPORTS
+  - from: E_MCP_SERVERS_TOML_STDIO_HTTP
+    to: C_PIECE_MCP_CLIENT_ONLY_1026
+    edge_type: SUPPORTS
+  - from: E_MCP_TOOL_ALLOW_DENY_LISTS
+    to: C_PIECE_MCP_CLIENT_ONLY_1026
+    edge_type: SUPPORTS
+  - from: E_MCP_WRITES_MODE_DEPENDS_ON_READ_ONLY_MARK
+    to: C_PIECE_MCP_CLIENT_ONLY_1026
+    edge_type: SUPPORTS
+  - from: E_R164_MCP_AUTH_DORMANT_SERVERS
+    to: C_PIECE_MCP_CLIENT_ONLY_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_MCP_CLIENT_ONLY_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: E_EXEC_READ_ONLY_BY_DEFAULT
+    to: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_EXEC_JSONL_TYPED_EVENTS
+    to: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_EXEC_FULL_AUTO_REMOVED
+    to: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_EXEC_OUTPUT_SCHEMA_AND_API_KEY
+    to: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_GHA_DROP_SUDO_DEFAULT
+    to: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: E_GHA_WRITE_ACCESS_ONLY_AND_LATEST
+    to: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_EXEC_CI_EQUIVALENT_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: E_R137_NO_HOOKS_NO_MCP_IN_NOTES
+    to: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_R164_HOOKS_OBSERVATION_LIFECYCLE
+    to: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_R164_SUBAGENT_ENV_INHERITANCE
+    to: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_R164_MCP_AUTH_DORMANT_SERVERS
+    to: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
+  - from: C_PIECE_SKILLS_COMMANDS_UNJUDGED_1026
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    to: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    edge_type: TRACES_TO
+  - from: E_CORPUS_ONION_CODEX_PORT_STATE_1026
+    to: C_PIECE_RELEASES_TRAJECTORY_OPEN_1026
+    edge_type: SUPPORTS
+  - from: E_COMMENT_SUBAGENT_INSTRUCTIONS_UNINSPECTABLE
+    to: C_PIECE_SUBAGENTS_EQUIVALENT_FORMAT_ISOLATION_OPEN_1026
+    edge_type: CONSTRAINS
+  - from: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    to: Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_PRIMARIES_CODEX_AS_CORE_1026
+    to: Q_CODEX_RUNS_ONION_CORE_AS_NEW_DOOR_1026
+    edge_type: TRACES_TO
+  - from: E_CORPUS_ONION_CODEX_PORT_STATE_1026
+    to: C_ELENXO_NOT_EQUIVALENT_NO_NEW_DOOR_YET_1026
+    edge_type: SUPPORTS
