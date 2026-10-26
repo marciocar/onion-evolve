@@ -946,6 +946,20 @@ nodes:
       locator: "perguntas com opções de 2026-10-25 sobre o escopo e a condução do extra RDF"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-25"
       locality: "pessoa"
+  - id: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Pré-registro do 3º par fork contra agente novo: o mesmo update do Onion no sge, do pin 6aa5c567f579 para 7391404e946f, por dois braços em worktrees irmãs, com critério fixado antes e juiz cego"
+    narrative: "Critério, fixado antes de rodar. Braço A é agente novo com brief, braço B é fork da sessão do core; os dois sem nome, para a notificação trazer tokens e tempo. Mede-se em cada braço: (1) tokens do subagente; (2) duração; (3) travou esperando notificação de fundo; (4) gate do alvo 0 HARD no commit durável; (5) prova de bloqueio do gate; (6) conflitos resolvidos sem tocar customização; (7) ações fora do brief no repo alheio; (8) qualidade, por um juiz cego que recebe os dois diffs e relatórios rotulados X e Y, sem saber qual é qual, e dá veredito com razão. Regra de selo: agente novo vira o padrão se custar no máximo 50% dos tokens do fork, sem perder em (4) a (7) e sem perder no juiz; fork vira o padrão se ganhar no juiz e em (6) ou (7); empate leva ao agente novo, por custo. Só o PR do vencedor fica aberto para o merge do dono; o outro é fechado sem merge. Contam com os pares 1 (adoção da kg-ssot 4.22) e 2 (update do brain em 2026-10-26)."
+    provenance:
+      source: "decisão do maestro em 2026-10-26 por pergunta com opções: «opção 1, No SGE»"
+      locator: "/meta:decide de 2026-10-26, pergunta do 3º par"
+      method: "testemunho: pré-registro do critério pelo core, a pedido do maestro"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -1118,3 +1132,6 @@ edges:
   - from: E_KG_SSOT_4291_ADOTADA_1026
     to: D_EXTRA_RDF_DO_KG_SSOT_EM_SERIE_1025
     edge_type: SUPPORTS
+  - from: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
+    to: Q_FORK_VS_AGENTE_NOVO_TRES_PARES_MEDIDOS
+    edge_type: TRACES_TO
