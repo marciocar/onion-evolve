@@ -12,7 +12,8 @@ meta:
                              # lentos. Gatilho extra de revisita antecipada: release de um Qwen3.8 <=9B, de um
                              # GLiNER/OPF com avaliacao em portugues, ou a abertura do gatilho de C.
   # kg-backlog-guard: on
-  # ═══ TETO: 86 NOS — a rodada de PRIMARIAS NOMEADAS foi EXECUTADA em 2026-10-05 (17 fontes, 17 alcancadas,
+  # ═══ TETO: 88 NOS — +2 em 2026-10-26 pela reconciliação da pergunta-raiz com a primária do PoETa v2
+  #     (1 evidência + 1 pergunta que SUPERSEDES a antiga; sinal da curadoria conferido na fonte). Antes, 86: a rodada de PRIMARIAS NOMEADAS foi EXECUTADA em 2026-10-05 (17 fontes, 17 alcancadas,
   #     58 claims ancoradas por verificador independente, 28 rejeitadas na ancoragem — contabilidade em
   #     E_LACUNAS_ONION_SLM_PRIMARIES_1005). Composicao: 58 evidencias + 1 contabilidade + 9 leituras de
   #     sintese (claims open: o que cada fonte habilita/veta para o Onion) + 9 afirmacoes do chat
@@ -43,11 +44,42 @@ nodes:
   - id: Q_ONION_SLM_PRIMARIES_2026_10
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.6
     label: 'Do lado do core e contra PRIMARIAS: o que, das 45 afirmacoes do chat do maestro sobre SLMs, se sustenta — e o que isso habilita ou veta para o Onion, dado que o SLM so interessa como ferramenta de conjunto fechado ancorada no mecanismo verificavel? Segue open: a rodada ancorou 58 claims e reconciliou 9 afirmacoes do chat, mas NENHUMA primaria mede SLM em pt-BR nem em extracao de KG do dominio do Onion — a resposta operante continua sendo o eval de dominio (X_REF_NANOCHAT_Q_EVAL).'
+    narrative: "Superada em 2026-10-26 por Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026. A metade do português do Brasil caiu: o artigo do PoETa v2 (STIL 2026, E_POETA_V2_QWEN3_PTBR_STIL2026) mede variantes de um modelo pequeno adaptadas ao português em benchmark brasileiro. A metade da extração de grafo do domínio do Onion continua de pé, e a resposta operante continua sendo o eval de domínio. O rótulo acima fica como estava: é o registro do que se afirmava em 2026-10-05."
     trace: 'docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md'
+
+  - id: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'Contra primárias: das 45 afirmações do chat sobre SLMs, o que se sustenta e o que habilita ou veta ao Onion? Segue open: já há primária de SLM em português do Brasil (PoETa v2), mas NENHUMA mede SLM em extração de KG do domínio do Onion; vale o eval de domínio.'
+    narrative: "Reconciliação (Aufhebung) da pergunta de 2026-10-05, que fica superada e guardada. Conserva tudo o que ela dizia, menos a metade que caiu: a rodada ancorou 58 claims e reconciliou 9 afirmações do chat; o SLM só interessa como ferramenta de conjunto fechado ancorada no mecanismo verificável; e a resposta operante continua sendo o eval de domínio (X_REF_NANOCHAT_Q_EVAL), porque nenhuma primária mede extração de grafo no domínio do Onion. O que muda: o PoETa v2 (E_POETA_V2_QWEN3_PTBR_STIL2026) é primária revisada por pares que mede um modelo de 1,7B parâmetros, na forma base e em duas adaptações ao português, num benchmark com tarefas nativas do Brasil e traduzidas. Ele não mede extração de grafo nem a primitiva de conjunto fechado, e não troca o eval de domínio. Sugestão fraca que ele traz ao eval de domínio: reportar por tarefa e por origem (nativa ou traduzida), não só o total, porque os totais empatam e as tarefas divergem. Origem: sinal da curadoria de 2026-10-26 (docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md), conferido pelo core na fonte primária."
+    trace: 'docs/evolution/inbox/_processed/2026-10-26-proposal-ai-front.md'
+
+  - id: E_POETA_V2_QWEN3_PTBR_STIL2026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-26"
+    verified_against: 'PDF baixado da ACL Anthology (HTTP 200, application/pdf, 685.807 bytes, sha256 a73ed798fd5db9c555a36f27d5c32c8d696a797cf4ef3f8710a97fcff26a196a), texto extraído por pdftotext: resumo na p. 209 e a seção 3.1 com a Tabela 1. QUOTE verbatim do resumo: "we examine this issue using PoETa v2, a broad Portuguese evaluation benchmark, as a diagnostic setting to evaluate three Qwen3 1.7B variants under different Portuguese adaptation settings. Our results show that, although overall scores differ by less than one percentage point across models, disaggregated analyses reveal substantially different patterns across task origin, category, and subarea."'
+    source_tier: 8
+    source_kind: paper
+    valid_from: "2026"
+    label: 'Primária revisada por pares mede SLM em português do Brasil: Hochgraf, Assis, Paes e Cozman (USP e UFF), STIL 2026, avaliam três variantes do Qwen3 1.7B no PoETa v2. Os totais diferem menos de 1 ponto percentual, e as tarefas, a origem e a subárea divergem muito.'
+    narrative: "Conferido no texto: as três variantes são o modelo base sem adaptação e duas com uma época de pré-treino continuado, uma no corpus GigaVerbo (cerca de 100 bilhões de tokens, português dominado por texto nativo) e outra no corpus Carolina (cerca de 200 milhões de tokens, português do Brasil contemporâneo), Tabela 1 da seção 3.1. O sinal da curadoria dizia 'três variantes adaptadas': são duas adaptadas e a base. O benchmark junta tarefas nativas do Brasil (ENEM 2022, BLUEX) e traduzidas, e a incerteza vem de bootstrap pareado com 10.000 réplicas sobre 300 exemplos por tarefa (seção 3, texto: 'we resample examples with replacement (10,000 replicates)'). Achado que pesa no eval de domínio: o ganho do Carolina aparece na categoria Brasil, exames e cultura (+2,33 pontos percentuais) e some no total. Não mede extração de grafo nem tarefa de conjunto fechado."
+    trace: 'https://aclanthology.org/2026.stil-1.18.pdf'
+    provenance:
+      source: "https://aclanthology.org/2026.stil-1.18.pdf"
+      locator: "Proceedings of the 17th Brazilian Symposium in Information and Human Language Technology, pp. 209-217: Abstract; seção 3.1 Models and Corpora e Tabela 1; parágrafo do bootstrap (10,000 replicates)"
+      method: "leitura: PDF aberto e texto extraído pela triagem do core em 2026-10-26, citação verbatim conferida"
+      locality: "web"
 
   - id: C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT
     node_type: claim
@@ -1380,6 +1412,47 @@ nodes:
     label: 'AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem primaria.'
 
 edges:
+  # ── reconciliação de 2026-10-26: a metade do português do Brasil caiu (PoETa v2) ─────────
+  - from: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: SUPERSEDES
+  - from: E_POETA_V2_QWEN3_PTBR_STIL2026
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: SUPPORTS
+  - from: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: TRACES_TO
+  - from: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    to: X_REF_NANOCHAT_DECISION
+    edge_type: TRACES_TO
+  # as 9 leituras de síntese respondem à pergunta VIVA; as arestas para a superada ficam como registro
+  - from: C_DEID_OFF_THE_SHELF_CANDIDATES
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_BASE_MODELS_MENU_2026_10
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
+  - from: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT
+    to: Q_ONION_SLM_PRIMARIES_PTBR_RECONCILED_1026
+    edge_type: TRACES_TO
   # ── enquadramento, fonte do chat e ancoras ───────────────────────────────────────────────
   - from: C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT
     to: Q_ONION_SLM_PRIMARIES_2026_10

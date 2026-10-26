@@ -66,4 +66,9 @@ axes:
     # (desde 2026-05-07) passou pelo radar sem ser visto. Sem data de rodada DE PROPÓSITO: carimbar rodada
     # que não houve é o carimbo-sem-medição. A REGRA 65 o acusa SOFT como nunca-rodado até a 1ª rodada,
     # que é do maestro; ao selar, entra a data e o kg, e sai o never_run.
+    # ITEM DE ENTRADA DA 1ª RODADA (2026-10-26, sinal da curadoria da frente de IA, triado no core em
+    # docs/evolution/dissect/ai-front-2026-10/): o fim do ajuste fino self-serve da OpenAI, em vigor desde
+    # 2026-05-07 (encerramento escalonado: 2026-07-02 e 2027-01-06), já no corpus como
+    # E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026 (nanochat-onion-2026-10). A rodada re-mede a fonte oficial
+    # (developers.openai.com/api/docs/deprecations) antes de citar; não é baseline, é a pauta.
     never_run: "aberto em 2026-10-26 sem rodada; a 1a rodada e do maestro"
