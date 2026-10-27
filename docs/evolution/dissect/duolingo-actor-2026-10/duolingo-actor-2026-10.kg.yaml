@@ -6,7 +6,7 @@ meta:
   baseline: "2026-10-26"
   review_after: "2026-11-15"   # a revisita é a carta do 3º trimestre de 2026, prevista para o início de novembro; depois, trimestral
   # kg-backlog-guard: on
-  # ═══ TETO: 3 NÓS. Triagem fechada: cresce quando a carta do 3º trimestre for lida na revisita. ═══
+  # ═══ TETO: 4 NÓS. Triagem fechada: cresce quando a carta do 3º trimestre for lida na revisita (o 4º é a re-medida de 2026-10-27). ═══
   #
   # TRIAGEM DO CORE de uma dissecação feita FORA dele: o adotante de curadoria dissecou o Duolingo como
   # empresa (família ator, destino panorama) e propôs COSTURAR ao panorama competitivo do core como ator
@@ -71,7 +71,31 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 
+  - id: E_REMEDIDA_DUOLINGO_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "peer-ref-check.sh onion-curation docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml#D_DUOLINGO_ACTOR_VERDICT: EXISTE na origin/main do par @ f2118c198678; o grafo lido ali pelo PyYAML tem 15 nós, o veredito em costurar e status done (verified_at 2026-10-27), e os 6 nós de apoio citados com o mesmo status de antes"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "A leitura da triagem se confirma na re-medida: o veredito da curadoria segue costurar, no limite da nota 7. O único detalhe que andou é o status: o nó de decisão de lá passou de open a done depois do selo deste grafo."
+    narrative: "Conferidos no mesmo grafo do par: C_N3_SCORE, C_N3_PROJECTS, E_OBJECAO_P1_REGUA e E_OBJECAO_E3_NOT_MEASURED seguem open; E_N2_MONEY_FY2025 e E_N2_MONEY_Q2_2026 seguem confirmed, verificados em 2026-10-26. O review_after da origem segue 2027-01-24. O gatilho da revisita (a carta do 3º trimestre na SEC) não foi medido aqui: depende da lista de documentos da empresa na SEC, fora desta re-medida, e a previsão dele é o início de novembro."
+    trace: "docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml"
+    provenance:
+      source: "github.com/marciocar/onion-curation@f2118c198678:docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml"
+      locator: "D_DUOLINGO_ACTOR_VERDICT, C_N3_SCORE, C_N3_PROJECTS, E_N2_MONEY_FY2025, E_N2_MONEY_Q2_2026, E_OBJECAO_P1_REGUA e E_OBJECAO_E3_NOT_MEASURED"
+      method: "measurement: peer-ref-check.sh na origin/main do par e o grafo dela lido por parser, em 2026-10-27"
+      locality: "repo"
+
 edges:
+
+  - from: E_REMEDIDA_DUOLINGO_1027
+    to: E_CURADORIA_DUOLINGO_1026
+    edge_type: SUPPORTS
 
   - from: Q_DUOLINGO_REVISITA_CARTA_3T_2026
     to: E_CURADORIA_DUOLINGO_1026

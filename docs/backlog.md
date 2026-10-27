@@ -1096,6 +1096,12 @@
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
+## ai-front-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_AI_FRONT_PILOTO3_RESULTADO` | ai-front-2026-10 | O piloto 3 da curadoria chega a 2 achados aceitos ou mais depois da revisão adversarial? Se chegar, a frente de IA vira estudo re |
+
 ## anarlog-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1201,12 +1207,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2` | vetos-por-tokens-2026-10 | TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se  |
-
-## ai-front-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.5 | `Q_AI_FRONT_PILOTO3_RESULTADO` | ai-front-2026-10 | O piloto 3 da curadoria chega a 2 achados aceitos ou mais depois da revisão adversarial? Se chegar, a frente de IA vira estudo re |
 
 ## cortex-2026-10 — 5 item(ns)
 

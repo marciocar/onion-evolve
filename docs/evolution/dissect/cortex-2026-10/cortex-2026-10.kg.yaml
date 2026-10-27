@@ -6,7 +6,7 @@ meta:
   baseline: "2026-10-27"
   review_after: "2027-01-25"   # o MESMO prazo da dissecação de origem
   # kg-backlog-guard: on
-  # ═══ TETO: 16 NÓS. Triagem fechada: cresce quando um parque disparar ou uma costura aberta virar PR. ═══
+  # ═══ TETO: 17 NÓS. Triagem fechada: cresce quando um parque disparar ou uma costura aberta virar PR (o 17º é a re-medida de 2026-10-27). ═══
   #
   # TRIAGEM DO CORE de uma dissecação feita FORA dele: o adotante de curadoria dissecou o Cortex (família
   # ferramenta), um framework para Claude Code que mora no repositório de um cliente, e avaliou nove peças contra
@@ -295,7 +295,55 @@ nodes:
       method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
 
+  - id: E_REMEDIDA_PECAS_CORTEX_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "peer-ref-check.sh onion-curation nos 9 nós D_PIECE_* (rc 0, EXISTE na origin/main do par @ f2118c198678); os 9 lidos ali pelo PyYAML com status done e o MESMO veredito que os 9 nós de leitura deste grafo citam; e as afirmações sobre o core re-rodadas na main 8857bc9b"
+    source_tier: 9
+    source_kind: internal-audit
+    label: "Os 9 nós de leitura das peças do Cortex se confirmam na re-medida: os vereditos da curadoria seguem os mesmos (agora done, selados por este grafo), e o que eles afirmam do core reproduz rodando, com dois detalhes novos."
+    narrative: "Por peça, o que se re-rodou do lado do core. Gate de plano: grep -n sessions .gitignore dá a linha 8 (.claude/sessions/), como citado. Qualidade: ops/mutate-and-restore.sh numa cópia descartável sai 4 com a âncora repetida, 3 com a ausente e 5 com a linha de base vermelha, a cura que o nó E_MUTATE_ANCORA_UNICA_MEDIDA_1027 descreve. Documentos: grep -rlni pptx em .claude e ops acha só o /product:presentation, o gamma-api-specialist, o presentation-orchestrator e o adapter do Linear (tipo de anexo), então o pptx segue só pelo Gamma. Frota: 0 arquivos com fleet.config, fleet_provision ou worktreeinclude em .claude e ops. Registro de uso: nada do core a re-rodar; a afirmação sobre a telemetria nativa é da documentação do Claude Code e não foi re-lida. Handoff: o worklog-capture-session.sh, rodado com um STATE.md descartável, gravou a linha resume_command; o worklog-precompact-breadcrumb.sh, rodado na mesma branch docs/, não escreveu nada, porque só age em feature/, hotfix/ e release/ (o de captura aceita qualquer prefixo). Distribuição: adopt.md cita onion/vendor nas linhas 55 e 446, como o critério da curadoria diz. Especificação: o lint com --only reprova um comando plantado sem description pela REGRA 2 (Frontmatter de comando: description: obrigatório) e um agente plantado sem description e tools pela REGRA 1 (Frontmatter de agente: name:, description:, tools: obrigatórios), os dois com rc 1; o critério da curadoria contava 104 REGRAs distintas no lint, hoje são 105. Estudos: kg_query --open neste grafo devolve 5 nós em 2.991 bytes com rc 0; a capacidade se confirma, e os 8 nós em 5,7 KB eram de outro estudo."
+    trace: "docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml"
+    provenance:
+      source: "peer-ref-check.sh onion-curation <grafo>#D_PIECE_*; git show f2118c198678:docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml no clone do par; ops/mutate-and-restore.sh, lint-artifacts.sh --only, .claude/hooks/worklog-*.sh e kg_query.py na main do core"
+      locator: "D_PIECE_PLAN_GATE, D_PIECE_QUALITY, D_PIECE_DOCS_PRESENTATIONS, D_PIECE_FLEET, D_PIECE_USAGE_TELEMETRY, D_PIECE_MEMORY, D_PIECE_DISTRIBUTION, D_PIECE_SPEC_AS_CODE e D_PIECE_STUDIES; .gitignore:8; adopt.md:55 e :446"
+      method: "measurement: re-medida dos nós de leitura em 2026-10-27, com o par conferido pelo peer-ref-check e as afirmações sobre o core rodadas em cópia descartável"
+      locality: "repo"
+
 edges:
+
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_GATE_DE_PLANO_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_QUALIDADE_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_DOCUMENTOS_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_FROTA_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_REGISTRO_DE_USO_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_HANDOFF_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_DISTRIBUICAO_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_ESPECIFICACAO_1027
+    edge_type: SUPPORTS
+  - from: E_REMEDIDA_PECAS_CORTEX_1027
+    to: E_CORTEX_PECA_ESTUDOS_1027
+    edge_type: SUPPORTS
 
   - from: E_MUTATE_ANCORA_UNICA_MEDIDA_1027
     to: E_CORTEX_PECA_QUALIDADE_1027

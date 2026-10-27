@@ -5,7 +5,7 @@ meta:
   baseline: "2026-10-09"
   review_after: "2026-11-08"   # 30d: ferramenta/licenca (cadencia da doutrina), o MESMO prazo da dissecacao de origem
   # kg-backlog-guard: on
-  # ═══ TETO: 4 NÓS. Triagem fechada: cresce só quando um dos dois gatilhos disparar e reabrir a dissecação. ═══
+  # ═══ TETO: 5 NÓS. Triagem fechada: cresce só quando um dos dois gatilhos disparar e reabrir a dissecação (o 5º é a re-medida da superação, 2026-10-27). ═══
   #
   # TRIAGEM DO CORE de uma dissecação feita FORA dele: o 1º estudo do adotante de curadoria levou o
   # Superpowers (obra/superpowers, MIT, HEAD 8ca22dba, v6.4.2) até o N4 e propôs PARQUEAR, com o
@@ -26,6 +26,10 @@ nodes:
     confidence: 0.8
     x_dissect_level: 3
     x_dissect_verdict: parquear
+    x_dissect_criterion: "ls docs/evolution/dissect | grep -cE '^(systematic-debugging|test-driven-development|diagnosing-superpowers)-'"
+    x_dissect_overcoming: nenhuma
+    x_dissect_overcoming_measure: "procurou-se em 2026-10-27, na main do core, peça que ENTREGUE o que as 3 skills prometem ou o carimbo por probe: o critério acima dá 0 (nenhuma das 3 dissecada); grep -rlniE 'test-driven|diagnosing' .claude acha só .claude/agents/testing/test-engineer.md, agente sem fluxo; grep -rn expect_regex .claude dá 0 (o probe estruturado não existe). Na web, a busca por TDD e depuração sistemática em skill do Claude Code imposta por hook achou só as skills de instrução (o próprio Superpowers e cópias), nenhuma com gate determinístico. Mesma busca e mesmo resultado da origem (D_SUPERPOWERS_2610 do adotante, 2026-10-15)."
+    x_dissect_overcoming_search: [{where: corpus, cmd: "ls docs/evolution/dissect; grep -rlniE 'test-driven|diagnosing' .claude; grep -rn expect_regex .claude"}, {where: web, source: "WebSearch 2026-10-27: Claude Code skill test-driven development enforced by hook deterministic gate systematic debugging 2026"}]
     verified_at: "2026-10-14"
     verified_against: "veredito PARQUEAR selado pelo maestro em 2026-10-13 no grafo da dissecação do adotante de curadoria (nó D_SUPERPOWERS_2610, status done, por pergunta com opções); a triagem do core é derivável e não abre pergunta nova ao maestro"
     label: "TRIAGEM DO CORE: PARQUEAR o Superpowers, com dois gatilhos nomeados. O mesmo movimento do Onion se confirma SÓ EM PARTE: método em skills por plugin, mas o mecanismo é persuasão injetada no SessionStart, sem gate determinístico."
@@ -78,7 +82,31 @@ nodes:
       method: "medição: bash .claude/validation/dissect-census.sh <repo-do-adotante> --tsv; leitura integral do grafo com grep -n nos números citados"
       locality: "repo"
 
+  - id: E_REMEDIDA_SUPERACAO_SUPERPOWERS_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "na main 8857bc9b: o critério ls docs/evolution/dissect | grep -cE ... dá 0; grep -rlniE 'test-driven|diagnosing' .claude acha 1 arquivo (o agente test-engineer); grep -rn expect_regex .claude dá 0; peer-ref-check.sh onion-curation no D_SUPERPOWERS_2610 do adotante (EXISTE @ f2118c198678), que já declarava x_dissect_overcoming nenhuma com a medida de 2026-10-15"
+    source_tier: 9
+    source_kind: internal-audit
+    label: "O parque do Superpowers não tem superação que entregue, medido hoje: nenhuma das 3 skills dissecada, o core só tem o agente test-engineer, sem fluxo, e o probe estruturado não existe. Os dois gatilhos de reabertura seguem sem disparar."
+    narrative: "Este grafo nasceu em 2026-10-14, antes da exigência de superação e critério no veredito negativo (SAC-151, 2026-10-15), e por isso o censo o recusava desde então: 'veredito NEGATIVO parquear RECUSADO: sem x_dissect_criterion, sem x_dissect_overcoming'. A origem já tinha os campos (D_SUPERPOWERS_2610, verificado no par); a triagem do core não os copiou. A cura é declarar no nó da triagem o critério da origem e a superação nenhuma, com a medida refeita hoje, sem mexer no veredito. Q_REABRIR_TRES_SKILLS segue fechado porque nenhuma das 3 skills foi rodada em worktree contra tarefa de bancada no core; Q_REABRIR_CARIMBO_POR_PROBE, porque nem o kg-freshness nem o census devolvem probe {argv[], expect_regex}."
+    trace: "docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml"
+    provenance:
+      source: "main do core em 8857bc9b; github.com/marciocar/onion-curation@f2118c198678:docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml"
+      locator: "D_SUPERPOWERS_2610 do adotante (x_dissect_criterion, x_dissect_overcoming e x_dissect_overcoming_measure); saída dos três greps e do critério no core"
+      method: "measurement: critério e buscas re-rodados na main do core, e o nó do par conferido por peer-ref-check.sh, em 2026-10-27"
+      locality: "repo"
+
 edges:
+
+  - from: E_REMEDIDA_SUPERACAO_SUPERPOWERS_1027
+    to: D_SUPERPOWERS_TRIAGEM_1014
+    edge_type: SUPPORTS
 
   - from: E_TRIAGEM_SUPERPOWERS_1014
     to: D_SUPERPOWERS_TRIAGEM_1014
