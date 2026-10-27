@@ -2,7 +2,8 @@
 branch: chore/python-3.15
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ddf79b54fef5cbeec8bddbb4066180bcf187736fd4e1e327fceb84a914f7b24f
+reviewed_code_sha256: 867398ffe4239f840d6874e195d9e0a6b324f01b8688e17292d2f6a043713625
 findings_total: 10
 findings_real: 9
 tokens: 146990
