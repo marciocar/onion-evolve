@@ -15,7 +15,9 @@
 #  1. LÊ A FONTE do veredito de revisão — a linha `onion-review-verdict` — nunca o `pass`
 #     do `onion-review`, que sai VERDE POR DESENHO quando o revisor falha (soft-pass).
 #  2. Recusa se qualquer check falhou, ou se ainda há check pendente.
-#  3. Confere o RC do `gh pr merge` (o defeito de origem).
+#  3. Confere o RC do `gh pr merge` (o defeito de origem). O merge vai SEMPRE amarrado ao head
+#     julgado (`--match-head-commit`, 2026-10-27): push que cai entre o julgamento e o merge faz o
+#     forge recusar, e a recusa sai nomeada ("o head mudou depois do julgamento (X → Y)").
 #  4. PROVA INDEPENDENTE: relê o estado do PR na API; só declara sucesso se `state=MERGED`
 #     e `mergedAt` não for nulo. O sucesso é afirmado pelo ESTADO, nunca pelo comando.
 #
@@ -1159,10 +1161,26 @@ if [ "${MERGE_COMMIT}" -eq 0 ]; then
 fi
 
 t0="$(date -u +%s)"
-# o merge sem o CI do head novo: o bypass do ruleset (--admin) e o head AMARRADO (--match-head-commit) —
-# se alguém empurrar depois da decisão, o forge recusa em vez de mergear um head que ninguém julgou
-MERGE_EXTRA=()
-[ "${SKIP_CI}" -eq 1 ] && MERGE_EXTRA=(--admin --match-head-commit "${HEAD_SHA}")
+# HEAD AMARRADO EM TODO CAMINHO (TOCTOU curado em 2026-10-27, caso da curadoria nos PRs #117/#118 de
+# 2026-10-26): os gates julgam os check-runs do HEAD_SHA lido (a cura do #634), mas até aqui só o caminho
+# sem o CI do head novo passava `--match-head-commit`. Nos outros (rebase, squash, --merge-commit), um
+# push que caísse entre a leitura do CI e o merge fazia o forge mergear um head que ninguém julgou — a
+# curadoria teve de conferir à mão que o CI era do head novo. Agora o forge SEMPRE recebe o head julgado
+# (depois de um auto-rebase, é o head novo cujo CI se esperou, ou o anterior cujo verde vale no caminho
+# rápido) e recusa se ele andou; a recusa é lida pelo ESTADO e pelo head relido adiante, nunca pela prosa.
+# O bypass do ruleset (--admin) continua SÓ no caminho sem o CI do head novo: nos demais o ruleset vale.
+[ -n "${HEAD_SHA}" ] || die "não tenho o head julgado (HEAD_SHA vazio) logo antes do merge — sem ele o forge não pode amarrar o merge ao head que o CI julgou. Nada foi mergeado."
+JUDGED_HEAD="${HEAD_SHA}"
+MERGE_EXTRA=(--match-head-commit "${JUDGED_HEAD}")
+[ "${SKIP_CI}" -eq 1 ] && MERGE_EXTRA=(--admin --match-head-commit "${JUDGED_HEAD}")
+# o forge recusou e o head do PR já não é o julgado: um push caiu entre o julgamento e o merge.
+# Lido pelo headRefOid (dado), não pela mensagem do forge. Ilegível = não afirmo que mudou.
+_head_moved_die() {
+  local _now
+  _now="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)" || return 0
+  [ -n "${_now}" ] && [ "${_now}" != "${JUDGED_HEAD}" ] || return 0
+  die "o head mudou depois do julgamento (${JUDGED_HEAD:0:8} → ${_now:0:8}); rode de novo. O forge recusou o merge (--match-head-commit) e nada foi mergeado: o head ${_now:0:8} não teve o CI julgado. Saída do gh: $(printf '%s' "$merge_out" | tail -1 | cut -c1-200)"
+}
 if [ "${MERGE_COMMIT}" -eq 1 ]; then
   say "modo: --merge-commit (gh pr merge --merge) — mesmos gates, só muda como o histórico entra"
   merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --merge "${MERGE_EXTRA[@]}" "${DEL[@]}" 2>&1)"; rc=$?
@@ -1181,11 +1199,13 @@ if [ "$rc" -ne 0 ] && [ "${SKIP_CI}" -eq 1 ]; then
   case "$(pr_state)" in
     MERGED\|*) : ;;   # mergeou e falhou depois (limpeza): o bloco abaixo prova pelo estado
     *)
+      # na série (rc 4) o head que andou também volta à fila e é re-julgado; direto, a recusa diz qual foi
       if [ "${NO_WAIT_AFTER_REBASE}" -eq 1 ]; then
         printf '↻ PR #%s: o forge RECUSOU o merge sem o CI do head novo (%s) — saio rc=4: o CI do head %s é esperado e o merge volta pelo caminho de sempre\n' \
           "$PR" "$(printf '%s' "$merge_out" | tail -1 | cut -c1-200)" "${HEAD_SHA:0:8}"
         exit 4
       fi
+      _head_moved_die
       die "o forge RECUSOU o merge sem o CI do head novo ($(printf '%s' "$merge_out" | tail -1 | cut -c1-200)) — nada foi mergeado. Espere o CI do head ${HEAD_SHA:0:8} e rode de novo (ou use --wait-ci-after-rebase)." ;;
   esac
 fi
@@ -1205,6 +1225,9 @@ if [ "$rc" -ne 0 ]; then
   # MENSAGEM tem de dizer qual das duas — afirmar estado='' e inventar um estado que ninguem leu,
   # que e a reincidencia do defeito do #623 documentado acima, so que com o sinal invertido.
   [ -z "$state_after" ] && die "gh pr merge saiu com rc=${rc} e eu NÃO CONSEGUI LER o estado do PR depois (gh falhou?) — não declaro nem merge nem não-merge. Saída do gh: $(printf '%s' "$merge_out" | tail -1)"
+  # não mergeou e o head já não é o julgado: a recusa do --match-head-commit, nomeada antes de qualquer
+  # leitura da prosa do gh (que muda de versão para versão)
+  case "$state_after" in MERGED\|*) : ;; *) _head_moved_die ;; esac
   # O `gh` dizendo que o PR JÁ estava mergeado nunca pode virar sucesso deste run — barra antes
   # de qualquer aritmética de data, e sem depender de relógio nenhum.
   if grep -qi "already been merged\|not mergeable" <<< "$merge_out"; then
