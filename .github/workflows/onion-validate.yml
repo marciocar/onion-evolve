@@ -97,6 +97,58 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      # ── O INTERPRETADOR DO CORE (2026-10-27): o core roda em Python 3.15; o código que viaja chama `python3`
+      # e segue no piso 3.12. Quem escolhe o interpretador é o AMBIENTE: aqui, o setup-python (pin por sha);
+      # sem ele, o `python3` era o da imagem (3.14.4 no ubuntu-26.04), que muda quando a imagem muda. O passo
+      # seguinte prova que o `python3` efetivo é o 3.15 e instala as dependências do lint pelo pino com hash.
+      # TETO declarado: o PyYAML 6.0.3 não publica wheel cp315, então no 3.15 ele compila do sdist (hash conferido),
+      # mas as dependências de BUILD (setuptools, Cython) vêm sem pino nem hash, e o módulo sai SEM libyaml.
+      # O PISO vem antes e não é o interpretador do core: um 3.12 só para o passo "Piso 3.12" abaixo. O setup-python
+      # posterior é o que fica no PATH. A marca `# onion:floor` tira esta linha da conta do currency-census.sh.
+      - name: Python 3.12 (o piso do código que viaja)
+        id: floor
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12' # onion:floor
+
+      - name: Python 3.15 (o interpretador do core)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.15'
+
+      - name: O python3 efetivo é o 3.15, com as dependências do lint
+        run: |
+          set -euo pipefail
+          python3 --version
+          python3 -c 'import sys; sys.exit(0 if sys.version_info[:2] == (3, 15) else 1)' \
+            || { echo "ERRO: o python3 efetivo não é o 3.15 do setup-python: $(command -v python3) $(python3 --version 2>&1)"; exit 1; }
+          python3 -m pip install --quiet --require-hashes -r vendor/kg-ssot/tools/requirements.txt
+
+      # O PISO 3.12 (passada adversarial de 2026-10-27): o CI roda no 3.15, e sem este passo nada barrava código que
+      # só funciona acima do piso (um `except A, B:` sem parênteses, uma t-string, um `copy.replace`). Duas provas no
+      # 3.12, com o PyYAML de wheel (COM libyaml): todo .py rastreado compila, e o harness do escritor de grafos roda
+      # inteiro, o que prova o caminho C (libyaml) da guarda de aninhamento, que no 3.15 não existe.
+      # TETO: só a sintaxe dos .py e um harness; o Python embutido nos .sh e a API de biblioteca não passam aqui.
+      - name: Piso 3.12 (o código que viaja compila e o harness do escritor passa com libyaml)
+        env:
+          PY312: ${{ steps.floor.outputs.python-path }}
+        run: |
+          set -euo pipefail
+          "${PY312}" --version
+          "${PY312}" -m pip install --quiet --require-hashes -r vendor/kg-ssot/tools/requirements.txt
+          "${PY312}" -c 'import yaml, sys; sys.exit(0 if yaml.__with_libyaml__ else 1)' \
+            || { echo "ERRO: o PyYAML do piso 3.12 veio sem libyaml: o caminho C da guarda não seria provado"; exit 1; }
+          git ls-files -z -- '*.py' | xargs -0 "${PY312}" -I -c 'import sys
+          bad = 0
+          for f in sys.argv[1:]:
+              try:
+                  compile(open(f, "rb").read(), f, "exec", dont_inherit=True)
+              except SyntaxError as e:
+                  bad += 1; print(f"ERRO: não compila no piso 3.12: {f}:{e.lineno}: {e.msg}")
+          print(f"piso 3.12: {len(sys.argv) - 1} arquivo(s) .py, {bad} falha(s)")
+          sys.exit(1 if bad else 0)'
+          LC_ALL=C "${PY312}" -I -B ops/mcp-onion-kg-writer/selftest.py --code-root "${GITHUB_WORKSPACE}"
+
       # ── FONTE PRIVADA DE TERMOS (P8 do projection-safety.sh; decisão do maestro de 2026-10-13) ──
       # O core ficou PÚBLICO e a lista de nomes privados saiu da árvore: era o próprio vazamento. As
       # REGRAS 30, 33 e 36 a leem de ONION_CLIENT_TERMS_FILE; aqui ela vem do secret de repo

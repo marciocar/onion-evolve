@@ -19,6 +19,9 @@
 #                     censo do /meta:cc-update (mesmo arquivo, 4 colunas); só o package.json é LIDO, como a conta
 #                     dona (sudo -n, ambiente limpo), e só se o caminho declarado for o REAL (sem symlink).
 #   kg-ssot           vendor/kg-ssot pinado × a maior tag kg-ssot-v* do repositório público do produto.
+#   python            o minor do python3 do lint × o python-version do setup-python nos workflows onion-* (2026-10-27:
+#                     o core roda no 3.15 e o código que viaja segue no piso 3.12; a linha `# onion:floor` é o job do
+#                     piso e fica fora). Sem setup-python nos onion-*: omitida (os outros workflows são da aplicação).
 #   python:<pkg>      PyYAML e jsonschema (as diretas do leitor do KG-SSOT) no python3 do lint × PyPI. Quando o
 #                     instalado é o PINO do contrato e o PyPI andou, o estado é `pinada`: a subida é do produto.
 #   base:<branch>     HEAD deste checkout × a branch de INTEGRAÇÃO do Onion no origin, pelo resolve-integration-
@@ -317,12 +320,39 @@ except Exception: pass' "${pkg}" 2>/dev/null | _ver)"
   fi
   _judge "python:${pkg}" "${inst}" "${latest}" "${PY} -m pip install -U ${pkg}==${latest}"
 }
+leg_py_interp() {  # o python3 do lint × o python-version que o setup-python dos workflows onion-* instala
+  # REGRA DO INTERPRETADOR (2026-10-27): o código que viaja chama `python3` e roda no piso 3.12; quem escolhe o
+  # interpretador é o AMBIENTE. No CI, o setup-python dos workflows; numa máquina, o python3 à frente do PATH. Esta
+  # linha mede que o python3 local é o mesmo minor que o CI do Onion instala.
+  # SÓ os workflows `onion-*` (passada adversarial): no adotante, os outros workflows são da APLICAÇÃO dele, e
+  # cobrar o python deles mandava o adotante para baixo do piso. Linha com `# onion:floor` é o job do PISO, não o
+  # interpretador do core, e fica fora. Sem setup-python nos onion-*: superfície omitida; com setup-python e sem
+  # valor legível (matriz, 3.x, arquivo de versão): não medida, nunca omitida.
+  local wf="${REPO}/.github/workflows" want n inst live
+  [ -d "${wf}" ] || return 0
+  live="$(cat "${wf}"/onion-*.yml "${wf}"/onion-*.yaml 2>/dev/null | grep -vE '^[[:space:]]*#' | grep -v 'onion:floor')"
+  # o minor é o que conta (3.15 e 3.15.2 = 3.15)
+  want="$(printf '%s\n' "${live}" | grep -oE "^[[:space:]]*python-version:[[:space:]]*[\"']?[0-9]+\.[0-9]+" \
+    | grep -oE '[0-9]+\.[0-9]+$' | sort -u)"
+  if [ -z "${want}" ]; then
+    printf '%s\n' "${live}" | grep -qE 'uses:[[:space:]]*["'\'']?actions/setup-python@' || return 0
+    _row python - - nao-medida "os workflows onion-* usam o setup-python sem python-version legível (X.Y literal): o minor do CI não foi lido"; return 0
+  fi
+  n="$(printf '%s\n' "${want}" | awk 'END{print NR}')"
+  if [ "${n}" != 1 ]; then _row python - "$(printf '%s' "${want}" | tr '\n' ',')" nao-medida "os workflows instalam minors diferentes de Python ($(printf '%s' "${want}" | tr '\n' ' ')): alinhe o python-version do setup-python (o job do piso marca a linha com # onion:floor)"; return 0; fi
+  inst="$("${PY}" -I -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])' 2>/dev/null | _ver)"
+  [ -n "${inst}" ] || { _row python - "${want}" nao-medida "o ${PY} não respondeu à versão"; return 0; }
+  local im="${inst%.*}"
+  if [ "${im}" = "${want}" ]; then _row python "${inst}" "${want}" em-dia "-"
+  elif _newer "${im}.0" "${want}.0"; then _row python "${inst}" "${want}" fora-do-pino "o python3 do lint ($(command -v "${PY}")) está À FRENTE do ${want} que o CI instala: alinhe o setup-python ou ponha um ${want} à frente do PATH"
+  else _row python "${inst}" "${want}" defasada "o CI roda Python ${want} (setup-python) e o python3 do lint é ${inst} ($(command -v "${PY}")): crie um venv ${want} (uv venv --python ${want} <venv>), instale nele (<venv>/bin/python -m pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt) e ponha <venv>/bin à frente do PATH; o python do SO não se troca"; fi
+}
 leg_py() {
   [ -n "${PY}" ] || return 0
   _has "${PY}" || { _row python - - ausente "falta o ${PY} que o lint usa: ${ASK} o python3 pela distro"; return 0; }
   local t; t="$(mktemp -d)" || return 1
-  leg_py_one PyYAML > "${t}/a" & leg_py_one jsonschema > "${t}/b" & wait
-  cat "${t}/a" "${t}/b"; rm -rf "${t}"
+  leg_py_interp > "${t}/i" & leg_py_one PyYAML > "${t}/a" & leg_py_one jsonschema > "${t}/b" & wait
+  cat "${t}/i" "${t}/a" "${t}/b"; rm -rf "${t}"
 }
 
 leg_base() {
