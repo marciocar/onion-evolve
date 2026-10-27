@@ -2,7 +2,8 @@
 branch: fix/sge-review-round3
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6ad31f366283f963749fb8e1947f1be6f5f3d43c73a6205bcc9898340fb26e43
+reviewed_code_sha256: a687f2a68f0cb74728765d5664096e3b0778ed77fe6b5dbf6b1398ea1c48b5ad
 findings_total: 3
 findings_real: 0
 tokens: 139336
