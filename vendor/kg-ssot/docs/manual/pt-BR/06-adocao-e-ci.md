@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:2b6048df8988326d -->
+<!-- translation-of: docs/manual/06-adoption-and-ci.md sha256:8314a829229c87d8 -->
 # 6. Adoção e CI
 
 [English](../06-adoption-and-ci.md) | **Português (Brasil)**
@@ -18,13 +18,13 @@ flowchart LR
   C --> D["4. CI: check + gate<br/>em todo PR"]
 ```
 
-Rode isto na raiz do seu repositório, com Python 3.11 ou mais (o `rpds-py`, dependência do jsonschema, declara
-`Requires-Python >=3.11`):
+Rode isto na raiz do seu repositório, com Python 3.12 ou mais (o piso desde a 4.35.0; o CI roda 3.12, 3.14 e 3.15, e o extra opcional
+`vector` vai até o 3.14 enquanto o `onnxruntime` não sai para o 3.15):
 
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.34.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.35.0 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt

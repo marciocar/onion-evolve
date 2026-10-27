@@ -9,7 +9,8 @@
 # (integrity.dangling-external, caso 2) e o arquivo de tokens que some (integrity.trace-target-missing, caso 4),
 # SEM regra nova. Dois buracos sobraram, e só um checador da vertical os vê:
 #   · o token que some de DENTRO do JSON, citado só pelo grafo (caso 5: kg_validate 0, kg_trace 0, lint de
-#     tokens 0), e o locator que aponta um GRUPO em vez de um token (caso 9);
+#     tokens 0), e o locator que aponta um GRUPO em vez de um token (caso 9). O 1º passou ao produto na
+#     kg-ssot 4.35.0 (kg_trace check segue o JSON Pointer; REGRA 55): aqui fica só o GRUPO, a forma DTCG;
 #   · o brief SEM ligação nenhuma ao business-context (caso 6): qualquer aresta interna o tirava de órfão.
 # E a deriva medida pelo kg-ssot nos contextos dele (disciplina sem mecanismo): 2 de 6 ids citados no
 # design-context não resolviam.
@@ -17,9 +18,9 @@
 # 1º CICLO = AVISO: os achados saem SOFT, porque os briefs dos adotantes ainda não migraram para grafo.
 #   --strict os sobe para HARD (para quando os dois adotantes migrarem).
 # O contraste NÃO é daqui: segue no lint-design-tokens.sh. O checador de PROJEÇÃO (o .md cita ids que existem
-#   no grafo do projection_of) é do kg-ssot e ainda não existe (kg_projection_check): dependência declarada.
-# Toda a lógica vive em design-context-check.py, isolado (só Python + PyYAML), para poder migrar o locator
-#   para o kg_trace do kg-ssot sem tocar no resto.
+#   no grafo do projection_of) é do kg-ssot (kg_trace.py projection, 4.35.0) e roda na REGRA 112, kg-projection.sh.
+# Toda a lógica vive em design-context-check.py, isolado (só Python + PyYAML); a parte genérica do locator já
+#   migrou para o kg_trace do kg-ssot (4.35.0).
 #
 # Uso:  bash .claude/validation/design-context-check.sh [<raiz>] [--graph <arquivo>] [--format tsv|human] [--strict]
 #   A pasta do design e a do business se resolvem por .claude/utils/scope/resolve-context-dir.sh (declaração
@@ -59,4 +60,10 @@ _dir() {  # <dim> — a pasta do contexto; declaração inválida (rc 3 do resol
 }
 DESIGN_DIR="$(_dir design)" || exit 2
 BUSINESS_DIR="$(_dir business)" || exit 2
+# A DELEGAÇÃO DO LOCATOR só vale se o juiz da REGRA 55 julga o locator: o mesmo kg_trace.py que o kg-trace.sh
+# resolve (ONION_KG_TRACE, senão o vendor do alvo) e com o código integrity.trace-locator-missing (kg-ssot >= 4.35.0).
+# Sem ele (adotante com vendor anterior), a vertical segue acusando o token ausente: delegar a quem não julga é calar
+# (passada adversarial da adoção da 4.35.0, achado 2).
+KT="${ONION_KG_TRACE:-${ROOT}/vendor/kg-ssot/tools/kg_trace.py}"
+[ -f "${KT}" ] && LC_ALL=C command grep -q 'integrity.trace-locator-missing' "${KT}" 2>/dev/null && PASS+=(--delegate-locator)
 exec python3 -I -B "${HERE}/design-context-check.py" --root "${ROOT}" --design-dir "${DESIGN_DIR}" --business-dir "${BUSINESS_DIR}" ${PASS[@]+"${PASS[@]}"}

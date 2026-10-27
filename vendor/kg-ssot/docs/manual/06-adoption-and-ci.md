@@ -15,13 +15,13 @@ flowchart LR
   C --> D["4. CI: check + gate<br/>on every PR"]
 ```
 
-Run this at the root of your repository, with Python 3.11 or later (`rpds-py`, a jsonschema dependency, declares
-`Requires-Python >=3.11`):
+Run this at the root of your repository, with Python 3.12 or later (the floor since 4.35.0; CI runs 3.12, 3.14 and 3.15, and the optional
+`vector` extra stops at 3.14 until `onnxruntime` ships for 3.15):
 
 ```bash
 # 1. bring in the release, by tag, from the public repository
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.34.0 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.35.0 --dest vendor/kg-ssot
 
 # 2. the dependencies in a venv, then the baseline (the gate only measures tracked files: git add first)
 python3 -m venv .venv && .venv/bin/pip install --require-hashes -r vendor/kg-ssot/tools/requirements.txt

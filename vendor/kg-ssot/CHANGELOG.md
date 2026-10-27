@@ -10,6 +10,23 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.35.0] - 2026-10-27
+
+Contract v4.16, unchanged. **Python 3.12 or later** (it was 3.11): the package, the MCPB bundle and the docs say so, CI
+runs 3.12, 3.14 and 3.15, and the optional `vector` extra stops at 3.14 until `onnxruntime` ships for 3.15.
+
+- `kg_query --chain --with PREFIX=FOLDER` follows a `provenance.source` URL into a graph of another repository, read
+  only, at the commit the URL cites when the folder has it (`pinned`), otherwise from the working tree with a warning.
+  A ref that is absent, or a file that is not at it, gives a broken link; a ref that starts with `-` is refused.
+- `kg_trace.py projection` checks Markdown pages that declare `projection_of` in their front matter: each node id they
+  cite between backticks is `resolved`, `elsewhere` (a warning), `outside` (in another repository not read) or
+  `missing` (`integrity.projection-id-missing`, rc 1). Contract words and `projection_ignore` are counted apart.
+  `--format json` gives `kg-ssot.projection/1` (`spec/projection.schema.json`).
+- `kg_trace check` follows a JSON Pointer `provenance.locator` (`#/a/b`) inside the `.json` file the node's source
+  names: `integrity.trace-locator-missing` and `integrity.trace-locator-unreadable`, rc 1. The output gains
+  `locators`, additive.
+- `kg_hygiene` fails a release file that still cites the old Python floor.
+
 ## [4.34.0] - 2026-10-27
 
 Contract v4.16, unchanged. `kg_query --chain` follows `provenance.source` first: a node with a `provenance.source`

@@ -4,7 +4,7 @@
 
 [← The contract](04-contract.md) · [Contents](README.md) · [Adoption and CI →](06-adoption-and-ci.md)
 
-The tools that ship in the release live in `tools/`. They need only Python 3.11 or later and the pinned, hashed
+The tools that ship in the release live in `tools/`. They need only Python 3.12 or later and the pinned, hashed
 versions in [`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML and jsonschema, plus the jsonschema
 dependencies).
 
@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.34.0",
+  "release": "kg-ssot-v4.35.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -828,6 +828,15 @@ chain: complete
 - **A claim relayed from another repository** writes the bridge in its `provenance.source` as the URL of that graph
   pinned to the commit that was read (`…/blob/<sha>/<path>.kg.yaml#<id>`), with a `testimony` method. The chain shows
   that link outside the corpus, so it is visible and `weak`, never a silent one-node chain.
+- **`--with PREFIX=FOLDER` (4.35.0)** reads that other graph from a local folder, so the chain goes on through it.
+  The prefix is the URL before the commit (`https://github.com/acme/core/blob`). When the folder is a git repository
+  that has the commit in the URL, the graph is read at that commit (what was cited, not what is there today); otherwise
+  it is read from the working tree, and the link comes out with `pinned: false` and a warning. Without `--with`, or with
+  a prefix that does not match, the link stays outside the corpus. A relative path inside that graph resolves in that
+  repository, never in yours. The ref is the first segment after the prefix, so a branch name with a slash
+  (`feature/x`) does not resolve; `pinned: true` means "read at the ref in the URL", which is a fixed commit only when
+  the URL gives a sha. When the ref exists and the file is not in it, the link is broken: the working tree is never
+  read in its place. The folder is only read: a ref that starts with `-` is refused.
 - **A link with no numeric `confidence`,** or one outside [0, 1], is the weakest one, shown with a null value, and the
   lenient grade is `weak`. Links count by file and id, and `weakest_link.at` gives the file of each.
 - **Limits:** up to 200 steps (beyond that, `too_long`) and 1000 paths (beyond that, `truncated`). A chain that is
@@ -1101,6 +1110,63 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   graph that does not read, 2 on broken input, and 3 when no graph was read (since 4.27: an empty corpus is not "every
   trace resolves" for a CI that reads only the rc). These rules come from an adopter's resolver measured on thousands of
   traces; each cut was paid for by a false positive.
+
+### The JSON locator (4.35.0)
+
+When a node points into a JSON file, its `provenance.locator` can be a JSON Pointer in fragment form (`#/color/brand/primary`,
+RFC 6901), and `kg_trace check` follows it inside the file, so a token or a key that disappears from the JSON is caught,
+not only the file.
+
+- **What is judged.** A `provenance.locator` that is `#` or starts with `#/`, against a `.json` file of the repository:
+  the path of `provenance.source` when it is a path of the repository, otherwise the path of `trace:`. A source path
+  that no longer exists is `integrity.trace-locator-missing` itself: the locator is never judged in another file. For
+  the source, a bare file name with an extension (`tokens.json`) is a path, since a source is not prose; a source that
+  leaves the repository root (`../x.json`) is counted as `outside_root`, not judged. The fragment loses
+  its percent-encoding, then `~1` becomes `/` and `~0` becomes `~`; an object is followed by key and a list by a decimal
+  index with no leading zero.
+- **Not judged, counted:** a locator that is not a pointer (`not_pointer`), a source given by URL or absolute path
+  (`absolute`), and a pointer with no `.json` file of the repository to read (`no_json_file`).
+- **Output and rc.** A pointer that does not resolve is `integrity.trace-locator-missing`, and a JSON file that does not
+  read is `integrity.trace-locator-unreadable`; both give rc 1. The JSON output gains `locators`, additive and outside
+  `required`, so the output of 4.25 stays valid. Write the path in `trace:` too: that is what says the file itself is gone.
+
+### The projection checker (`kg_trace.py projection`, 4.35.0)
+
+A context page in Markdown (business, technical, design) can declare that it is a projection of graphs: `projection_of`
+in its front matter lists the graphs, and the page cites node ids between backticks. The checker makes that discipline
+verifiable.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py projection --root .
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py projection --root . --with https://github.com/acme/core/blob=../core
+```
+
+```yaml
+---
+projection_of:
+  - docs/graph/product.kg.yaml
+  - https://github.com/acme/core/blob/<sha>/docs/graph/core.kg.yaml   # another repository, pinned to the commit
+projection_ignore:   # names between backticks that are not node ids
+  - BUILD_TOKEN
+---
+```
+
+- **What is read.** Every tracked `.md` whose front matter has `projection_of`, or the pages you name. A page named
+  without `projection_of` is counted as `no_projection`; in the scan, a front matter without it is not read at all.
+- **What counts as a cited id.** Text between backticks shaped like an id (`D_SOMETHING`, `E_X_1027`), in the prose
+  or inside a code block alike. An id in running text, outside backticks, is not read; a page that declares
+  `projection_of` and cites no id between backticks is listed in `uncited`, with a warning, since nothing was checked. The contract's
+  own words (edge types such as `TRACES_TO`, enum values) and the names in `projection_ignore` are counted apart.
+- **Four buckets.** `resolved` (in a graph of `projection_of`); `elsewhere` (only in another graph of the repository: a
+  warning, not a failure); `outside` (`projection_of` names a graph of another repository by URL that `--with` did not
+  read: not judged, counted); `missing` (`integrity.projection-id-missing`).
+- **`--with PREFIX=FOLDER`** reads that other graph from a local folder, at the commit in the URL when the folder is a
+  git repository that has it, as in `kg_query --chain`. A URL that `--with` covers and that does not read (absent at
+  the ref, not UTF-8, not a graph) is a graph error (rc 1), never `outside`. A graph read from the working tree because
+  the ref of the URL is not in that folder is listed in `unpinned`, with a warning.
+- **Output and rc.** `--format json` gives `kg-ssot.projection/1` (`spec/projection.schema.json`). rc 0 with no `missing`
+  and every graph of `projection_of` read; 1 otherwise; 2 on broken input (a front matter that does not read, a
+  `--root` that is not a folder).
 
 ## `kg_vector.py`: the model and the index of the semantic search (4.26.0)
 

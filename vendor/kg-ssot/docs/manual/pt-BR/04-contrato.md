@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:361c3ba264a24ccb -->
+<!-- translation-of: docs/manual/04-contract.md sha256:95149d676e333e72 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -93,6 +93,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.35 | Contrato v4.16, sem mudança. Python 3.12 ou mais. O `kg_query --chain --with` segue a corrente para outro repositório no commit citado; o `kg_trace.py projection` confere as páginas Markdown que declaram `projection_of`; o `kg_trace check` segue um `provenance.locator` em JSON Pointer dentro do arquivo JSON |
 | 4.34 | Contrato v4.16, sem mudança. O `kg_query --chain` segue primeiro o `provenance.source`, e uma origem sem `provenance.source` sai marcada e deixa a corrente `weak` |
 | 4.33 | Contrato v4.16, sem mudança. `kg_query --chain`: a cadeia de transmissão de um nó até a origem, com o elo mais fraco e a força da origem em eixos separados, e um grau estrito e um leniente |
 | 4.32 | Contrato v4.16: a classe de `provenance.method` ganha forma canônica em inglês (`measurement`, `reading`, `judges`, `derived`, `testimony`), e as palavras em português seguem aceitas como alias |

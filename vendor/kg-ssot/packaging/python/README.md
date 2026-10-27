@@ -17,7 +17,7 @@ This package ships the formal KG-SSOT contract and the tools that enforce it:
 - the **provenance exporter** to PROV-O in JSON-LD.
 
 The contract, the suite, and the verdict schema ship inside the package. The reader depends on no agent harness.
-It needs Python 3.11 or later, PyYAML, and jsonschema.
+It needs Python 3.12 or later, PyYAML, and jsonschema.
 
 ## Install
 

@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:63183804b09bb8e8 -->
+<!-- translation-of: ADOPTING.md sha256:c584d08f37244bd4 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -24,7 +24,7 @@ A lista está em [`spec/release.json`](spec/release.json):
 - o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
   HTTP local;
 - o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
-- as dependências fixadas (`tools/requirements.txt`: Python 3.11 ou mais com PyYAML e jsonschema). Cada arquivo traz o
+- as dependências fixadas (`tools/requirements.txt`: Python 3.12 ou mais com PyYAML e jsonschema). Cada arquivo traz o
   sha256, que o pip confere ao instalar; o `--require-hashes` faz a instalação falhar se um dia o arquivo perder os
   hashes;
 - a receita do pacote PyPI (`packaging/python/`): o script de build, o README do cadastro e as ferramentas de build
@@ -237,7 +237,7 @@ jobs:
           python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
 
-Em outro CI, o passo é o mesmo: Python 3.11 ou mais, as dependências fixadas com `--require-hashes` e os dois comandos.
+Em outro CI, o passo é o mesmo: Python 3.12 ou mais, as dependências fixadas com `--require-hashes` e os dois comandos.
 
 **`check`** reprova (rc 1) quando um arquivo do vendor foi editado, apagado ou acrescentado. Isso inclui
 bytecode num `__pycache__`, que trocaria o leitor sem mudar a fonte, e symlink. Os scripts do kit não gravam
@@ -342,6 +342,11 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.34.0` para a `kg-ssot-v4.35.0`, nada muda no contrato nem no veredito do gate, mas o **piso do Python
+agora é 3.12**: um CI que ainda fixa o 3.11 precisa ir para o 3.12 ou mais antes do update. O `kg_trace check` pode
+agora reprovar um `provenance.locator` em JSON Pointer que não resolve; se os seus grafos têm esses locators, rode-o
+antes do update. O `kg_trace.py projection` é novo e só roda se você o chamar.
 
 Da `kg-ssot-v4.33.0` para a `kg-ssot-v4.34.0`, nada muda no contrato nem no gate: só a saída do `kg_query --chain`
 muda, como descreve o changelog.

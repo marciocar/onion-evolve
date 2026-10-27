@@ -64,6 +64,8 @@ class Corpus:
         self.files = []
         self.root = None  # a raiz do --root, contra a qual os caminhos (file) e a ponta externa se resolvem
         self.meta_ids = {}  # arquivo -> meta.id (o kg_vocab monta o IRI do termo com ele, como o kg_prov_export)
+        self.withs = []  # [(prefixo da URL, pasta local)]: o --with lê o grafo de outro repositório (4.35.0)
+        self.external = {}  # URL do grafo lido pelo --with -> {"base": prefixo/ref/, "pinned": bool}
 
     def add(self, name, text):
         if name in self.files:  # o mesmo arquivo dado duas vezes não duplica as arestas
@@ -218,6 +220,57 @@ def band(conf):
     return "weak"
 
 
+def with_spec(text):
+    """O --with PREFIXO=PASTA, validado: (prefixo, pasta). ValueError: forma quebrada ou pasta que não existe."""
+    prefix, sep, folder = text.partition("=")
+    prefix = prefix.rstrip("/")
+    if not sep or not prefix or not folder:
+        raise ValueError(_("--with takes PREFIX=FOLDER, the URL prefix before the commit and the local folder"))
+    if not pathlib.Path(folder).is_dir():
+        raise ValueError(_("--with {folder} is not a directory").format(folder=folder))
+    return prefix, folder
+
+
+def _git(folder, *args):
+    """git -C folder com --end-of-options antes do que vem do grafo: um ref que começa com - nunca vira opção."""
+    return subprocess.run(["git", "-C", folder, *args], capture_output=True)
+
+
+def load_external(corpus, url):
+    """Lê para o corpus, pelo --with, o grafo de outro repositório que a URL nomeia (<prefixo>/<ref>/<caminho>), só
+    para leitura. Quando a pasta é git e o ref da URL existe nela, o grafo é lido naquele ref (pinned), relativo à
+    pasta dada, e o arquivo que não está nele fica de fora; quando o ref não existe ali ou a pasta não é git, é lido da
+    árvore de trabalho (pinned False). Devolve True quando o grafo está no corpus, False quando um prefixo casou e o
+    grafo não se lê (o passo sai quebrado), e None quando nenhum prefixo casa."""
+    if url in corpus.external:
+        return url in corpus.files
+    for prefix, folder in corpus.withs:
+        if not url.startswith(prefix + "/"):
+            continue
+        ref, _sep, rel = url[len(prefix) + 1:].partition("/")
+        while rel.startswith("./"):
+            rel = rel[2:]
+        corpus.external[url] = {"base": f"{prefix}/{ref}/", "pinned": False}
+        if not ref or ref.startswith("-") or not rel or rel.startswith("/") or ".." in rel.split("/"):
+            return False
+        text, pinned = None, False
+        try:
+            if _git(folder, "cat-file", "-e", "--end-of-options", f"{ref}^{{commit}}").returncode == 0:
+                out = _git(folder, "show", "--end-of-options", f"{ref}:./{rel}")
+                if out.returncode == 0:
+                    text, pinned = out.stdout.decode("utf-8"), True
+            elif (pathlib.Path(folder) / rel).is_file():
+                text = (pathlib.Path(folder) / rel).read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):  # o grafo de lá que não se lê é passo quebrado, não entrada quebrada
+            text = None
+        corpus.external[url]["pinned"] = pinned
+        if text is None:
+            return False
+        corpus.add(url, text)
+        return not any(u["file"] == url for u in corpus.unreadable)
+    return None
+
+
 def _source_ref(corpus, key):
     """O passo pelo fragmento do provenance.source, ou None quando o source não aponta para um grafo. Aponta quando o
     caminho antes do # é vazio, é o do próprio arquivo, termina no meta.id do próprio grafo (a URL de quem publica o
@@ -233,6 +286,15 @@ def _source_ref(corpus, key):
         return None
     path = path.split("?", 1)[0]  # a query string (?ref=main) não muda o arquivo que a URL nomeia
     here = key[0]
+    if here in corpus.external and path.endswith((".kg.yaml", ".kg.json")) and "://" not in path:
+        rel = path
+        while rel.startswith("./"):
+            rel = rel[2:]
+        if not rel.startswith("/") and ".." not in rel.split("/"):
+            path = corpus.external[here]["base"] + rel  # o caminho do repo de lá, não o daqui
+    if corpus.withs and "://" in path:
+        if load_external(corpus, path):
+            return ((path, frag), source)
     last = path.rstrip("/").rsplit("/", 1)[-1]
     for ext in (".kg.yaml", ".kg.json"):
         last = last[: -len(ext)] if last.endswith(ext) else last
@@ -270,7 +332,9 @@ def _link(corpus, key, ref=None, edge_types=None):
                 "label": None}
     conf = node.get("confidence")
     numeric = isinstance(conf, (int, float)) and not isinstance(conf, bool) and 0 <= conf <= 1  # fora de [0, 1] é desconhecido
+    ext = corpus.external.get(key[0])
     return {"file": key[0], "id": key[1], "ref": None, "found": True, "confidence": conf if numeric else None,
+            **({"pinned": ext["pinned"]} if ext else {}),
             "declared": _declared(node),
             "edges_not_followed": [dst[1] for et, dst, _r in corpus.out[key] if edge_types and et in edge_types
                                    and dst is not None and _declared(node)],
@@ -368,6 +432,8 @@ def chain_human(res):
             miss = "" if link["found"] else "  " + _("(outside the corpus)")
             lines.append("    " + _("{id}  confidence={conf}  method={cls}").format(id=link["id"], conf=conf, cls=cls)
                          + f"{miss}  {(link['label'] or '')[:90]}")
+            if link.get("pinned") is False:
+                lines.append("      " + _("read from the working tree: the commit in the URL is not in that folder"))
             if link.get("edges_not_followed"):
                 lines.append("      " + _("edges not followed, the node declares its provenance: {ids}").format(
                     ids=", ".join(link["edges_not_followed"])))
@@ -682,6 +748,9 @@ def main(argv=None):
     ap.add_argument("--chain", metavar="ID",
                     help=_("the transmission chain from the node back to its origin: the weakest link and the origin's "
                            "strength, as separate axes, with a strict and a lenient grade"))
+    ap.add_argument("--with", action="append", default=[], dest="withs", metavar=_("PREFIX=FOLDER"),
+                    help=_("with --chain, read the graph of another repository that a provenance.source URL names: the "
+                           "URL prefix before the commit, and the local folder of that repository (repeatable)"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
@@ -731,11 +800,14 @@ def main(argv=None):
             return broken(exc)
     elif args.model or args.model_dir:
         return broken(_("--model and --model-dir go with --semantic"))
+    if args.withs and args.chain is None:
+        return broken(_("--with goes with --chain"))
     if args.chain is not None:
         if args.around is not None or args.semantic is not None or args.text is not None:
             return broken(_("--chain does not combine with --around, --text or --semantic"))
         try:
             corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
+            corpus.withs = [with_spec(w) for w in args.withs]
             res = chain(corpus, args.chain, args.edge_types)
         except (OSError, ValueError, UnicodeDecodeError) as exc:
             return broken(exc)

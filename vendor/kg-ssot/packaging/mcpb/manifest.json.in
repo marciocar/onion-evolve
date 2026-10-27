@@ -93,7 +93,7 @@
       "win32"
     ],
     "runtimes": {
-      "python": ">=3.11"
+      "python": ">=3.12"
     }
   },
   "user_config": {

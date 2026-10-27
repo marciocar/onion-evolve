@@ -2,7 +2,7 @@
 name: kg-ssot
 description: Write, fix, validate and query verifiable knowledge graphs in plain text (.kg.yaml, or the same model as .kg.json) with the KG-SSOT tools. Use when a task asks to record claims, evidence, decisions or open questions with their source and verification date, when a .kg.yaml or .kg.json file must pass the KG-SSOT contract, or when you need to answer a question from such graphs (what supports a decision, what was superseded, what is still open).
 license: Apache-2.0
-compatibility: Needs Python 3.11 or later and the kg-ssot package (pip install kg-ssot). Works offline.
+compatibility: Needs Python 3.12 or later and the kg-ssot package (pip install kg-ssot). Works offline.
 metadata:
   homepage: https://github.com/marciocar/kg-ssot
   contract: "v4"

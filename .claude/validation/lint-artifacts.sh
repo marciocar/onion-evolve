@@ -800,13 +800,18 @@ check_kg_radar_integrity() {
 #   main: 2.501/2.501/0. O kg-trace.sh só traduz o JSON do produto para o TSV abaixo e mantém a
 #   guarda de vacuidade; sem o produto (vendor < 4.25, python3 ausente) a regra DECLARA que não
 #   julgou (SOFT), nunca cala.
+#   DESDE A 4.35.0 (2026-10-27) ELA SEGUE TAMBÉM O LOCATOR: o provenance.locator em JSON Pointer
+#   (#/a/b) dentro do .json que a fonte do nó nomeia (integrity.trace-locator-missing|-unreadable).
+#   É a parte genérica que a REGRA 111 fazia por conta própria (o token que some do JSON com o
+#   arquivo presente). HARD no core, SOFT no derivado no 1º ciclo. E o rc 1 do produto sem achado
+#   traduzido vira ENTRADA-QUEBRADA: antes da tradução do locator, ele saía com TSV vazio e calava.
 # ===========================================================================
 check_kg_trace_resolve() {
   local helper="${SCRIPT_DIR}/kg-trace.sh"
   [ -f "${helper}" ] || return 0
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in
-      *.kg.yaml|*.kg.json|*/kg-trace.sh) : ;;
+      *.kg.yaml|*.kg.json|*.json|*/kg-trace.sh) : ;;   # .json: o alvo do locator (o token que sai do arquivo)
       *) return 0 ;;
     esac
   fi
@@ -832,6 +837,18 @@ check_kg_trace_resolve() {
       ENTRADA-QUEBRADA|ILEGIVEL)
         violation "HARD" "${REPO_ROOT}/${g}" \
           "[trace-resolve/${verdict}] o kg_trace.py não leu ${g} ${target} — sem leitura não há veredito (detalhe: bash .claude/validation/kg-trace.sh)"
+        continue ;;
+      LOCATOR-MISSING|LOCATOR-ILEGIVEL)
+        # kg-ssot 4.35.0: o provenance.locator em JSON Pointer não resolve dentro do .json (o token que sumiu do
+        # arquivo de tokens, que até aqui só a REGRA 111 via). HARD no core; SOFT no derivado, no 1º ciclo, como
+        # a REGRA 111 era (os briefs e tokens dos adotantes ainda migram para grafo).
+        local _lsev="HARD" _lwhy; [ "${IS_DERIVED}" -eq 1 ] && _lsev="SOFT"
+        # o produto dá LOCATOR_MISSING também quando o ARQUIVO da fonte sumiu (achado 7 da passada adversarial)
+        if [ "${verdict}" = LOCATOR-ILEGIVEL ]; then _lwhy="o JSON não se lê (integrity.trace-locator-unreadable)"
+        elif [ -e "${REPO_ROOT}/${target%%#*}" ]; then _lwhy="a chave saiu do JSON? cite o ponteiro vivo (integrity.trace-locator-missing)"
+        else _lwhy="o arquivo da fonte ${target%%#*} não existe (integrity.trace-locator-missing)"; fi
+        violation "${_lsev}" "${REPO_ROOT}/${g}" \
+          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/${verdict}] ${nid}: o provenance.locator não resolve em '${target}' — ${_lwhy} (detalhe: bash .claude/validation/kg-trace.sh)"
         continue ;;
     esac
     violation "HARD" "${REPO_ROOT}/${g}" \
@@ -6173,7 +6190,10 @@ check_kb_index_counts
 #   1º CICLO = SOFT em todo papel: os briefs dos adotantes ainda não migraram para grafo, e o achado
 #   SEM-GRAFO é o aviso dessa migração. Sobe para HARD (`--strict`) quando os dois adotantes migrarem.
 #   rc 2 do helper é "não pude julgar" e sai SOFT nomeado — nunca verde calado.
-#   Lógica em design-context-check.sh + .py (isolado, para o locator poder migrar ao kg_trace do kg-ssot).
+#   Lógica em design-context-check.sh + .py. DESDE A kg-ssot 4.35.0 (2026-10-27) o token que some do JSON é
+#   da REGRA 55 (o kg_trace check segue o locator em JSON Pointer, integrity.trace-locator-missing); aqui
+#   ficou só o que é de design: o destino ser token DTCG ($value), a forma do locator numa fonte de tokens,
+#   o arquivo .tokens que o produto não lê e a regra do brief.
 # ===========================================================================
 check_design_context_graph() {
   local helper="${SCRIPT_DIR}/design-context-check.sh"
@@ -6200,6 +6220,51 @@ check_design_context_graph() {
   return 0
 }
 check_design_context_graph
+
+# ===========================================================================
+# REGRA 112 — Página com projection_of cita ids que existem nos grafos dela [HARD + SOFT]
+# previne: a página de contexto que se declara projeção de grafos citar um id de nó que não existe mais
+#   DERIVA MEDIDA (2026-10-27): o kg-ssot mediu nos contextos dele 2 de 6 ids citados no design-context sem
+#   resolver, e promoveu o checador ao produto na 4.35.0 (`kg_trace.py projection`, `kg-ssot.projection/1`).
+#   No core, a 1ª medida, sobre o piloto do design (docs/design-context/brief.md, #1409), achou os 2 ids do
+#   business-context em `elsewhere`: o brief os cita e o projection_of não listava aquele grafo (curado).
+#   QUEM JULGA É O PRODUTO; o kg-projection.sh lê o rc e o JSON, nunca a prosa, e traduz para o TSV:
+#   HARD o id que não existe (integrity.projection-id-missing) e o grafo do projection_of não lido;
+#   SOFT a página sem nenhum id entre crases (`uncited`), o id em outro grafo, o grafo de outro repo não lido
+#   e o não fixado. No derivado, tudo SOFT no 1º ciclo, como a REGRA 111. rc 2 do helper (vendor anterior à
+#   4.35.0 com página para julgar, entrada quebrada, rc e JSON que discordam, raiz fora do git, o produto que
+#   julga 0 páginas com alguma no disco) é "não pude julgar" e sai SOFT nomeado, nunca verde calado. Repo sem
+#   nenhuma página com projection_of não é julgado, nem cobrado pelo juiz ausente.
+# ===========================================================================
+check_kg_projection() {
+  local helper="${SCRIPT_DIR}/kg-projection.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.md|*.kg.yaml|*.kg.json|*/kg-projection.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  if [ "${_hrc}" -ge 2 ] 2>/dev/null; then
+    violation "SOFT" "${helper}" "REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): [NAO-JULGOU] a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+    [ "${_err}" = /dev/null ] || rm -f "${_err}"
+    return 0
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    [ "${_path}" = "-" ] && _path=".claude/validation/kg-projection.sh"
+    # 1º CICLO no derivado: SOFT, como a REGRA 111 e o locator da REGRA 55 (o /design:setup gera brief com
+    # projection_of nos adotantes, e eles ainda migram); HARD no core
+    [ "${IS_DERIVED}" -eq 1 ] && _sev="SOFT"
+    violation "${_sev:-SOFT}" "${REPO_ROOT}/${_path}" "REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  return 0
+}
+check_kg_projection
 
 # ===========================================================================
 # SUMÁRIO FINAL

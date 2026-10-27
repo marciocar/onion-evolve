@@ -3357,3 +3357,107 @@ msgstr "  a origem não tem provenance.source: a corrente pode seguir fora do qu
 #: tools/kg_query.py
 msgid "edges not followed, the node declares its provenance: {ids}"
 msgstr "arestas não seguidas, o nó declara o seu provenance: {ids}"
+
+#: tools/kg_trace.py
+msgid "The node's provenance.locator is a JSON Pointer that does not resolve inside the JSON file it names."
+msgstr "O provenance.locator do nó é um JSON Pointer que não resolve dentro do arquivo JSON que ele nomeia."
+
+#: tools/kg_trace.py
+msgid "The JSON file that the node's provenance.locator points into does not read as JSON."
+msgstr "O arquivo JSON para onde o provenance.locator do nó aponta não se lê como JSON."
+
+#: tools/kg_trace.py
+msgid "A context page cites a node id that no graph of its projection_of has."
+msgstr "Uma página de contexto cita um id de nó que nenhum grafo do projection_of dela tem."
+
+#: tools/kg_trace.py
+msgid "Point the locator to where the value is now (was the key renamed or moved?), or retire the node if the value is gone."
+msgstr "Aponte o locator para onde o valor está agora (a chave foi renomeada ou movida?), ou aposente o nó se o valor sumiu."
+
+#: tools/kg_trace.py
+msgid "Fix the JSON file, or point the node to the file that holds the value."
+msgstr "Conserte o arquivo JSON, ou aponte o nó para o arquivo que guarda o valor."
+
+#: tools/kg_trace.py
+msgid "Fix the id, add the graph that has it to projection_of (a URL pinned to the commit for another repository), or list the name in projection_ignore if it is not a node id."
+msgstr "Corrija o id, ponha no projection_of o grafo que o tem (uma URL fixada no commit, se for de outro repositório), ou liste o nome em projection_ignore se ele não for id de nó."
+
+#: tools/kg_trace.py
+msgid "· {judged} JSON locator(s) judged: {resolved} resolve, {missing} missing, {unreadable} unreadable file; not judged (counted): {absolute} URL or absolute source, {nofile} with no JSON file of the repository"
+msgstr "· {judged} locator(es) JSON julgado(s): {resolved} resolvem, {missing} faltam, {unreadable} com arquivo ilegível; não julgados (contados): {absolute} com fonte por URL ou absoluta, {nofile} sem arquivo JSON do repositório"
+
+#: tools/kg_query.py
+msgid "--with takes PREFIX=FOLDER, the URL prefix before the commit and the local folder"
+msgstr "--with recebe PREFIXO=PASTA: o prefixo da URL antes do commit e a pasta local"
+
+#: tools/kg_query.py
+msgid "--with {folder} is not a directory"
+msgstr "--with {folder} não é uma pasta"
+
+#: tools/kg_query.py
+msgid "PREFIX=FOLDER"
+msgstr "PREFIXO=PASTA"
+
+#: tools/kg_query.py
+msgid "with --chain, read the graph of another repository that a provenance.source URL names: the URL prefix before the commit, and the local folder of that repository (repeatable)"
+msgstr "com --chain, lê o grafo de outro repositório que uma URL do provenance.source nomeia: o prefixo da URL antes do commit e a pasta local daquele repositório (repetível)"
+
+#: tools/kg_query.py
+msgid "read from the working tree: the commit in the URL is not in that folder"
+msgstr "lido da árvore de trabalho: o commit da URL não está naquela pasta"
+
+#: tools/kg_query.py
+msgid "--with goes with --chain"
+msgstr "--with vai com --chain"
+
+#: tools/kg_trace.py
+msgid "PAGE.md"
+msgstr "PAGINA.md"
+
+#: tools/kg_trace.py
+msgid "projection: the pages to check (default: every tracked .md with projection_of)"
+msgstr "projection: as páginas a conferir (padrão: todo .md rastreado com projection_of)"
+
+#: tools/kg_trace.py
+msgid "projection: read a graph of another repository that projection_of names by URL"
+msgstr "projection: lê um grafo de outro repositório que o projection_of nomeia por URL"
+
+#: tools/kg_trace.py
+msgid "pages and --with go with projection"
+msgstr "páginas e --with vão com projection"
+
+#: tools/kg_trace.py
+msgid "GRAPH NOT READ  {page}  projection_of: {graph}"
+msgstr "GRAFO NÃO LIDO  {page}  projection_of: {graph}"
+
+#: tools/kg_trace.py
+msgid "· {page}  `{id}` is in a graph that projection_of does not list: {graphs}"
+msgstr "· {page}  `{id}` está num grafo que o projection_of não lista: {graphs}"
+
+#: tools/kg_trace.py
+msgid "· {pages} page(s), {cited} id(s) cited: {resolved} resolve, {elsewhere} elsewhere, {outside} in another repository not read (--with), {missing} missing; not judged (counted): {contract} contract words, {ignored} in projection_ignore"
+msgstr "· {pages} página(s), {cited} id(s) citado(s): {resolved} resolvem, {elsewhere} em outro grafo, {outside} em outro repositório não lido (--with), {missing} faltam; não julgados (contados): {contract} palavras do contrato, {ignored} no projection_ignore"
+
+#: tools/kg_trace.py
+msgid "{page}: the front matter does not read ({error})"
+msgstr "{page}: o frontmatter não se lê ({error})"
+
+#: tools/kg_trace.py
+msgid "{page}: projection_of and projection_ignore are lists of text"
+msgstr "{page}: projection_of e projection_ignore são listas de texto"
+
+#: tools/kg_trace.py
+msgid "{page}: the page does not read"
+msgstr "{page}: a página não se lê"
+
+#: tools/kg_trace.py
+msgid "{page}: the page is not UTF-8"
+msgstr "{page}: a página não está em UTF-8"
+
+#: tools/kg_trace.py
+msgid "· {url} read from the working tree: the commit in the URL is not in that folder"
+msgstr "· {url} lido da árvore de trabalho: o commit da URL não está naquela pasta"
+
+#: tools/kg_trace.py
+msgid "· {page} declares projection_of but cites no id between backticks: nothing was checked"
+msgstr "· {page} declara projection_of mas não cita id entre crases: nada foi conferido"

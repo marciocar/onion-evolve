@@ -1,7 +1,7 @@
 # Versões exatas e hash de cada arquivo publicado: a matriz do leitor de referência tem de ser reproduzível no CI,
 # e o pip só instala com --require-hashes o que bate com o sha256 abaixo (todos os wheels e o sdist de cada versão,
 # tirados da API JSON do PyPI). Diretas: PyYAML e jsonschema; as transitivas do jsonschema também são fixadas,
-# porque o pip as instala sem pino. Python 3.11 ou mais: todo arquivo do rpds-py, sdist incluído, declara Requires-Python >=3.11.
+# porque o pip as instala sem pino. O produto pede Python 3.12 ou mais desde a 4.35.0; o rpds-py, sdist incluído, aceita um Python mais antigo que esse piso.
 PyYAML==6.0.3 \
     --hash=sha256:00c4bdeba853cc34e7dd471f16b4114f4162dc03e6b7afcc2128711f0eca823c \
     --hash=sha256:0150219816b6a1fa26fb4699fb7daa9caf09eb1999f3b70fb6e786805e80375a \

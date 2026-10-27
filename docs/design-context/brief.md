@@ -1,5 +1,9 @@
 ---
-projection_of: docs/design-context/design-context.kg.yaml
+# o brief projeta o grafo do design e, no público e no posicionamento, o do business-context
+# (REGRA 112, kg_trace.py projection: sem o 2º grafo, os dois ids saíam em `elsewhere`)
+projection_of:
+  - docs/design-context/design-context.kg.yaml
+  - docs/business-context/business-context.kg.yaml
 review_after: "2027-01-27"
 date: 2026-10-27
 ---

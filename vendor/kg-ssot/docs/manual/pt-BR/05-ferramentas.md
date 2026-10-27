@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:cf6b666219bad508 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:7c9700c7976a29d9 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -7,7 +7,7 @@
 
 [← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
 
-As ferramentas que viajam na release ficam em `tools/`. Elas dependem só de Python 3.11 ou mais e das versões
+As ferramentas que viajam na release ficam em `tools/`. Elas dependem só de Python 3.12 ou mais e das versões
 fixadas, e com hash, em [`tools/requirements.txt`](../../../tools/requirements.txt) (PyYAML e jsonschema, mais as
 dependências do jsonschema).
 
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.34.0",
+  "release": "kg-ssot-v4.35.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -820,6 +820,14 @@ chain: complete
 - **Uma afirmação repassada de outro repositório** grava a ponte no `provenance.source` como a URL daquele grafo, fixada
   no commit que foi lido (`…/blob/<sha>/<caminho>.kg.yaml#<id>`), com method `testimony`. A corrente mostra esse elo
   fora do corpus, visível e `weak`, nunca como uma corrente de um nó só em silêncio.
+- **`--with PREFIXO=PASTA` (4.35.0)** lê esse outro grafo de uma pasta local, e a corrente segue por ele. O prefixo é a
+  URL antes do commit (`https://github.com/acme/core/blob`). Quando a pasta é um repositório git que tem o commit da
+  URL, o grafo é lido naquele commit (o que foi citado, não o que está lá hoje); senão, é lido da árvore de trabalho, e o
+  elo sai com `pinned: false` e um aviso. Sem `--with`, ou com um prefixo que não casa, o elo fica fora do corpus. Um
+  caminho relativo dentro daquele grafo resolve naquele repositório, nunca no seu. O ref é o primeiro segmento depois
+  do prefixo, então um nome de branch com barra (`feature/x`) não resolve; `pinned: true` quer dizer "lido no ref da
+  URL", que só é um commit fixo quando a URL traz um sha. Quando o ref existe e o arquivo não está nele, o elo sai
+  quebrado: a árvore de trabalho nunca é lida no lugar. A pasta é só lida: um ref que começa com `-` é recusado.
 - **Um elo sem `confidence` numérico,** ou com um fora de [0, 1], é o mais fraco, mostrado com valor nulo, e o grau
   leniente sai `weak`. Os elos contam por arquivo e id, e `weakest_link.at` dá o arquivo de cada um.
 - **Limites:** até 200 passos (além disso, `too_long`) e 1000 caminhos (além disso, `truncated`). Uma corrente
@@ -1086,6 +1094,63 @@ python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root . --external-root me
   2 com entrada quebrada, e 3 quando nenhum grafo foi lido (desde a 4.27: o corpus vazio não é "todo trace resolve"
   para um CI que só olha o rc). Estas regras vêm do resolvedor de um adotante medido em milhares de traces; cada corte foi
   pago por um falso positivo.
+
+### O locator JSON (4.35.0)
+
+Quando um nó aponta para dentro de um arquivo JSON, o `provenance.locator` dele pode ser um JSON Pointer em forma de
+fragmento (`#/color/brand/primary`, RFC 6901), e o `kg_trace check` o segue dentro do arquivo. Assim, um token ou uma
+chave que some do JSON é pego, e não só o arquivo.
+
+- **O que é julgado.** Um `provenance.locator` que é `#` ou começa com `#/`, contra um arquivo `.json` do repositório: o
+  caminho do `provenance.source` quando ele é caminho do repositório, senão o do `trace:`. Um caminho de fonte que não
+  existe mais já é `integrity.trace-locator-missing`: o locator nunca é julgado em outro arquivo. Na fonte, um nome
+  solto com extensão (`tokens.json`) é caminho, porque a fonte não é prosa; uma fonte que sai da raiz do repositório
+  (`../x.json`) é contada como `outside_root`, sem julgamento. O fragmento perde o
+  percent-encoding, depois `~1` vira `/` e `~0` vira `~`; objeto se segue por chave e lista por índice decimal sem zero à
+  esquerda.
+- **Não julgado, contado:** o locator que não é ponteiro (`not_pointer`), a fonte por URL ou caminho absoluto
+  (`absolute`) e o ponteiro sem arquivo `.json` do repositório para ler (`no_json_file`).
+- **Saída e rc.** O ponteiro que não resolve é `integrity.trace-locator-missing`, e o JSON que não se lê é
+  `integrity.trace-locator-unreadable`; os dois dão rc 1. A saída JSON ganha `locators`, aditivo e fora do `required`,
+  então a saída da 4.25 segue válida. Ponha o caminho também no `trace:`: é ele que diz que o próprio arquivo sumiu.
+
+### O checador de projeção (`kg_trace.py projection`, 4.35.0)
+
+Uma página de contexto em Markdown (negócio, técnico, design) pode declarar que é projeção de grafos: o
+`projection_of` do frontmatter lista os grafos, e a página cita ids de nó entre crases. O checador torna essa
+disciplina verificável.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py projection --root .
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py projection --root . --with https://github.com/acme/core/blob=../core
+```
+
+```yaml
+---
+projection_of:
+  - docs/graph/product.kg.yaml
+  - https://github.com/acme/core/blob/<sha>/docs/graph/core.kg.yaml   # outro repositório, fixado no commit
+projection_ignore:   # nomes entre crases que não são id de nó
+  - BUILD_TOKEN
+---
+```
+
+- **O que é lido.** Todo `.md` rastreado cujo frontmatter tem `projection_of`, ou as páginas que você nomear. A página
+  nomeada sem `projection_of` conta como `no_projection`; na varredura, o frontmatter sem ele nem é lido.
+- **O que conta como id citado.** Texto entre crases na forma de id (`D_ALGO`, `E_X_1027`), na prosa ou dentro de um
+  bloco de código. Um id em texto corrido, fora de crases, não é lido; uma página que declara `projection_of` e não
+  cita id entre crases sai em `uncited`, com um aviso, porque nada foi conferido. As palavras do próprio
+  contrato (tipos de aresta como `TRACES_TO`, valores de enum) e os nomes do `projection_ignore` são contados à parte.
+- **Quatro baldes.** `resolved` (num grafo do `projection_of`); `elsewhere` (só em outro grafo do repositório: aviso,
+  não reprova); `outside` (o `projection_of` nomeia por URL um grafo de outro repositório que o `--with` não leu: não
+  julgado, contado); `missing` (`integrity.projection-id-missing`).
+- **`--with PREFIXO=PASTA`** lê esse outro grafo de uma pasta local, no commit da URL quando a pasta é um repositório
+  git que o tem, como no `kg_query --chain`. Uma URL que o `--with` cobre e que não se lê (ausente no ref, fora de
+  UTF-8, que não é grafo) é erro de grafo (rc 1), nunca `outside`. Um grafo lido da árvore de trabalho, porque o ref da
+  URL não está naquela pasta, sai em `unpinned`, com um aviso.
+- **Saída e rc.** `--format json` dá `kg-ssot.projection/1` (`spec/projection.schema.json`). rc 0 sem `missing` e com
+  todo grafo do `projection_of` lido; 1 caso contrário; 2 entrada quebrada (frontmatter que não se lê, `--root` que não
+  é pasta).
 
 ## `kg_vector.py`: o modelo e o índice da busca por semelhança (4.26.0)
 

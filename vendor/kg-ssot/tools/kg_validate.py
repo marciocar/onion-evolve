@@ -1564,6 +1564,11 @@ MESSAGES = {
     "integrity.term-notation-duplicate": "Two live terms have the same notation in the same scheme: a code names one "
                                          "concept per scheme.",
     "integrity.trace-target-missing": "The node's trace: points to a path that does not exist in the repository.",
+    "integrity.trace-locator-missing": "The node's provenance.locator is a JSON Pointer that does not resolve inside "
+                                       "the JSON file it names.",
+    "integrity.trace-locator-unreadable": "The JSON file that the node's provenance.locator points into does not "
+                                          "read as JSON.",
+    "integrity.projection-id-missing": "A context page cites a node id that no graph of its projection_of has.",
     "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
     "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
                                           "a value with no JSON form.",
@@ -1627,6 +1632,12 @@ HINTS = {
                                          "from the new one).",
     "integrity.trace-target-missing": "Point trace: to where the file is now (it was moved or renamed?), or to the "
                                       "commit that had it.",
+    "integrity.trace-locator-missing": "Point the locator to where the value is now (was the key renamed or moved?), "
+                                       "or retire the node if the value is gone.",
+    "integrity.trace-locator-unreadable": "Fix the JSON file, or point the node to the file that holds the value.",
+    "integrity.projection-id-missing": "Fix the id, add the graph that has it to projection_of (a URL pinned to the "
+                                       "commit for another repository), or list the name in projection_ignore if it "
+                                       "is not a node id.",
     "integrity.measured-order-unknown": "Give registered_at and measured_at a time with a time zone (RFC 3339).",
     "form.required.node.provenance": "Add provenance with source, locator, and method; with no recoverable source, "
                                      "change the status to unverifiable.",

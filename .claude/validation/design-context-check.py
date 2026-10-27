@@ -4,22 +4,28 @@
 Faz as duas checagens que o gate do contrato KG-SSOT (kg_validate --corpus, kg_trace) NÃO faz, medidas no
 laboratório do estudo da curadoria (design-setup-2026-10, emenda F, casos 5, 6 e 9):
 
-1. LOCATOR DE TOKEN. Todo nó com `provenance.source` num arquivo .json e `provenance.locator` que começa com
-   "#/" tem o JSON Pointer resolvido (RFC 6901, com o percent-encoding do fragmento decodificado, §6) no
-   arquivo, a partir da raiz do repo, e o destino tem de ser um TOKEN DTCG (um objeto com "$value"), não um
-   grupo. O `trace:` só acusa o arquivo que some (integrity.trace-target-missing); o token que some de dentro
-   do JSON, citado só pelo grafo, só esta checagem pega.
+1. LOCATOR DE TOKEN, SÓ A PARTE DE DESIGN. Desde a kg-ssot 4.35.0 o `kg_trace check` segue o
+   `provenance.locator` em JSON Pointer dentro do .json da fonte (integrity.trace-locator-missing, na REGRA 55
+   (O `trace:` de um nó APONTA para alvo que EXISTE)): com `--delegate-locator`, que o .sh passa SÓ quando o
+   kg_trace.py que a REGRA 55 usa tem o locator, o token que some de dentro do JSON e o JSON ilegível são dele,
+   e esta checagem não os repete. Sem a flag (vendor anterior à 4.35.0 no adotante), ela segue acusando os dois:
+   delegar a um juiz que não julga seria calar. Fica aqui, sempre, o que é de DESIGN: o destino do ponteiro que
+   RESOLVE tem de ser um TOKEN DTCG (um objeto com "$value", ou "$root"), não um grupo; o locator que não é JSON
+   Pointer numa fonte de tokens (o produto o conta como `not_pointer`, sem julgar); a fonte fora da raiz (o
+   produto só a conta, em `outside_root`, e não a acusa); e o arquivo `.tokens` (sem .json), que o produto não
+   lê (`no_json_file`). O JSON é lido com `utf-8-sig`, como o produto lê: um BOM não desliga o julgamento.
 2. LIGAÇÃO DO BRIEF. O nó cujo `trace:` aponta o brief (`<design>/brief.md`) precisa de uma `external_edge`
    para um grafo do business-context, OU de um nó `question` aberto com `x_missing_context: business-context`
    ligado a ele, que declara a falta. O gate só pega a ligação QUEBRADA (integrity.dangling-external); a
    AUSENTE é esta regra. E o brief que existe no disco sem nenhum nó que o trace também acusa: sem isso,
    apagar o nó do brief calava a regra (a forma do protótipo da curadoria saía 0 nesse caso).
 
-ISOLADO DE PROPÓSITO: só Python 3 e PyYAML, sem nada do core. A checagem do locator pode migrar para o
-kg_trace do kg-ssot (pergunta em aberto com ele); isolado, delegar é trocar a chamada.
+ISOLADO DE PROPÓSITO: só Python 3 e PyYAML, sem nada do core. A parte genérica do locator migrou para o
+kg_trace do kg-ssot na 4.35.0 (2026-10-27, adoção chore/kg-ssot-4.35.0).
 
 Uso: python3 -I -B design-context-check.py --root <raiz> --design-dir <rel> --business-dir <rel>
                                           [--graph <arquivo>] [--format tsv|human] [--strict]
+                                          [--delegate-locator]
 Saída tsv: `<SEV>\t<CÓDIGO>\t<caminho relativo>\t<mensagem>`, uma por achado. SEV é SOFT no 1º ciclo
 (os briefs dos adotantes ainda não migraram); --strict a sobe para HARD.
 rc: 0 nada a acusar · 1 algum achado · 2 NÃO PUDE JULGAR (grafo ilegível, YAML que não é mapa, `nodes` que
@@ -89,7 +95,7 @@ def load_graph(path):
     return graph
 
 
-def check_locators(graph, root, grel, add):
+def check_locators(graph, root, grel, add, delegate=False):
     for node in graph["nodes"]:
         prov = node.get("provenance") if isinstance(node.get("provenance"), dict) else {}
         src, loc = prov.get("source"), prov.get("locator")
@@ -105,19 +111,24 @@ def check_locators(graph, root, grel, add):
             # checagem pulava calada um token inexistente (passada adversarial, achado 4)
             add("LOCATOR-FORMA", grel, f"{nid}: o locator '{loc}' de {src} não é um JSON Pointer no fragmento (#/a/b)")
             continue
+        # com --delegate-locator (o kg_trace.py da REGRA 55 segue o locator), a fonte .json ilegível ou com o
+        # ponteiro ausente é dele; aqui ela só é aberta para julgar a forma DTCG do destino. A fonte fora da raiz
+        # segue daqui: o produto só a conta (outside_root), não a acusa (passada adversarial, achado 3).
+        delegated = delegate and src.endswith(".json")
         if not inside_root(root, src):
             add("LOCATOR-FORA-DA-RAIZ", grel, f"{nid}: provenance.source '{src}' sai da raiz do repo")
             continue
         try:
-            with open(os.path.join(root, src), encoding="utf-8") as fh:
+            with open(os.path.join(root, src), encoding="utf-8-sig") as fh:  # -sig: como o produto lê (achado 8)
                 doc = json.load(fh)
         except (OSError, ValueError):
-            add("LOCATOR-FONTE-ILEGIVEL", grel, f"{nid}: o arquivo de tokens {src} não abre como JSON")
+            if not delegated:
+                add("LOCATOR-FONTE-ILEGIVEL", grel, f"{nid}: o arquivo de tokens {src} não abre como JSON")
             continue
         verdict = resolve_pointer(doc, loc)
         if verdict == "grupo":
             add("LOCATOR-GRUPO", grel, f"{nid}: {src}{loc} é um grupo, não um token ($value ausente)")
-        elif verdict == "ausente":
+        elif verdict == "ausente" and not delegated:
             add("LOCATOR-AUSENTE", grel, f"{nid}: o token {loc} não existe em {src}")
 
 
@@ -160,6 +171,7 @@ def main(argv):
     ap.add_argument("--graph", default="")
     ap.add_argument("--format", choices=("tsv", "human"), default="human")
     ap.add_argument("--strict", action="store_true")
+    ap.add_argument("--delegate-locator", action="store_true")
     try:
         args = ap.parse_args(argv)
     except SystemExit:
@@ -191,7 +203,7 @@ def main(argv):
         except CannotJudge as exc:
             print(f"design-context-check: {exc} — não pude julgar", file=sys.stderr)
             return 2
-        check_locators(graph, root, grel, add)
+        check_locators(graph, root, grel, add, delegate=args.delegate_locator)
         check_brief(graph, root, grel, design_dir, business_dir, add)
 
     for s, code, path, msg in found:
