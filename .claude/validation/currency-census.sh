@@ -335,7 +335,7 @@ leg_py_interp() {  # o python3 do lint × o python-version que o setup-python do
   want="$(printf '%s\n' "${live}" | grep -oE "^[[:space:]]*python-version:[[:space:]]*[\"']?[0-9]+\.[0-9]+" \
     | grep -oE '[0-9]+\.[0-9]+$' | sort -u)"
   if [ -z "${want}" ]; then
-    printf '%s\n' "${live}" | grep -qE 'uses:[[:space:]]*["'\'']?actions/setup-python@' || return 0
+    grep -qE 'uses:[[:space:]]*["'\'']?actions/setup-python@' <<< "${live}" || return 0
     _row python - - nao-medida "os workflows onion-* usam o setup-python sem python-version legível (X.Y literal): o minor do CI não foi lido"; return 0
   fi
   n="$(printf '%s\n' "${want}" | awk 'END{print NR}')"
