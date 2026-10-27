@@ -77,6 +77,14 @@ TERM e o de INT, a recusa do marcador, o `MUTATE_BASELINE_PROVEN`, a escrita por
 preservado no rc 9, o backup antes do trap e o `env -u`. Todos morrem. A linha de base de cada mutante é o
 caso na cópia sem mutante, a cura que a família prova.
 
+## Depois da passada: o CI achou um
+
+O caso (l), Ctrl-C na linha de base, passava localmente e falhou no CI, junto com o mutante dele (rc 5). A
+faixa paralela da bancada roda o job em segundo plano, e o bash herda o INT IGNORADO; sinal ignorado na
+entrada não se captura. Reproduzi com `trap '' INT` em volta da bancada e curei no caso: o SIGINT volta ao
+padrão por um exec em Python antes do helper. O helper não muda: quem o chama de um job em segundo plano já não
+recebe Ctrl-C do terminal.
+
 ## Limites declarados
 
 - O stdin e a idempotência ficam como contrato escrito, não como mecanismo.
