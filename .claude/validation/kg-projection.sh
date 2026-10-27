@@ -51,9 +51,13 @@
 #   Segurança: forma ruim (sem "=", prefixo fora de https://, pasta vazia) → rc 2. PASTA que não existe ou não é
 #   repo git (o CI, sem o clone do par) → aviso nomeado no stderr, o par NÃO vai ao produto e a página segue
 #   FORA-DO-REPO: nunca HARD por falta de clone, nunca verde calado. Sem par nenhum, o comportamento é o de antes.
-#   Teto declarado: do registro só deriva o forge github.com (o /blob/ é dele); outro forge entra pelo item 1.
-#   Além do JSON, este script lê as URLs do bloco projection_of (para filtrar os pares e ver o ramo no lugar do
-#   sha); o julgamento dos ids segue do produto.
+#   Vence, por prefixo, o 1º candidato que tem clone (o explícito antes do registro); o par cujo prefixo nenhuma
+#   página declara não vai nem avisa. Clone que não tem o commit da URL: o produto lê a árvore de lá, sai
+#   NAO-FIXADO, e o ID-AUSENTE daquela página cai a SOFT (julgado contra a versão errada, sem veredito firme).
+#   Teto declarado: do registro só deriva o forge github.com (o /blob/ é dele); outro forge entra pelo item 1. O
+#   par só aceita prefixo https:// (o produto aceita qualquer "://"): URL de outro esquema segue FORA-DO-REPO.
+#   Além do JSON, este script lê as URLs do projection_of (yaml.safe_load do frontmatter, a leitura do produto)
+#   para filtrar os pares e ver o ramo no lugar do sha; o julgamento dos ids segue do produto.
 # Exercitado por lint-selftest.sh (run_kg_projection_selftests); registrado no lint-artifacts.sh (REGRA 112).
 # ===========================================================================
 set -uo pipefail
@@ -110,20 +114,19 @@ for name in names:
     m = fm.match(head)
     if m and key.search(m.group(1)):
         n += 1
-        # as URLs do bloco projection_of (a linha da chave e as de continuação, indentadas ou em "- "): servem
-        # para filtrar os pares do registro e para ver o ramo no lugar do sha; os ids seguem julgados pelo produto
-        lines = m.group(1).split("\n")
-        for i, ln in enumerate(lines):
-            if not key.match(ln):
-                continue
-            block = [ln.split(":", 1)[1]]
-            for nxt in lines[i + 1:]:
-                if nxt[:1] in (" ", "\t", "-") or not nxt.strip():
-                    block.append(nxt)
-                else:
-                    break
-            for url in re.findall(r"https://[^\s'\",\]\[]+", "\n".join(block)):
-                urls.append(f"{url}\t{name}")
+        # as URLs do projection_of, lidas como o produto as lê (yaml.safe_load do frontmatter, e a entrada com
+        # "://" é URL): servem para filtrar os pares e para ver o ramo no lugar do sha; os ids seguem do produto.
+        # Comentário YAML não é URL (passada adversarial, achado 1). Sem PyYAML o produto não roda, e sem a
+        # leitura as URLs ficam de fora: nenhum NAO-FIXADO inventado, e o rc 2 do produto diz o resto.
+        try:
+            import yaml
+            meta = yaml.safe_load(m.group(1))
+        except Exception:
+            meta = None
+        decl = meta.get("projection_of") if isinstance(meta, dict) else None
+        for url in ([decl] if isinstance(decl, str) else decl if isinstance(decl, list) else []):
+            if isinstance(url, str) and "://" in url.strip():
+                urls.append(f"{url.strip()}\t{name}")
 print(f"{n} {'git' if git else 'nogit'}")
 print("\n".join(urls))
 PY
@@ -156,7 +159,7 @@ def warn(msg):
     print(f"kg-projection: aviso: {msg}", file=sys.stderr)
 def is_git(folder):
     return subprocess.run(["git", "-C", folder, "rev-parse", "--git-dir"], capture_output=True).returncode == 0
-pairs = {}  # prefixo → pasta, na ordem: explícitos primeiro
+pairs = {}  # prefixo → [(pasta, origem)], na ordem: explícitos primeiro; vence o 1º que tem clone
 for w in explicit:
     prefix, sep, folder = w.strip().partition("=")
     prefix = prefix.rstrip("/")
@@ -164,8 +167,8 @@ for w in explicit:
         print(f"kg-projection: --with pede PREFIXO=PASTA com o prefixo em https:// (recebi: {w!r}) — não pude julgar",
               file=sys.stderr)
         sys.exit(2)
-    pairs.setdefault(prefix, (folder, "--with"))
-used = lambda p: any(u == p or u.startswith(p + "/") for u, _pg in declared)
+    pairs.setdefault(prefix, []).append((folder, "--with"))
+used = lambda p: any(u.startswith(p + "/") for u, _pg in declared)
 if declared and os.path.isfile(members):
     try:
         import yaml
@@ -180,19 +183,22 @@ if declared and os.path.isfile(members):
         remote, local = str(mb.get("remote") or "").strip(), str(mb.get("local_path") or "").strip()
         if not re.fullmatch(r"github\.com/[\w.-]+/[\w.-]+", remote) or not local:
             continue
-        prefix = f"https://{remote}/blob"
-        if used(prefix) and prefix not in pairs:  # 1º membro com o remoto vence (dois clones do mesmo repo)
-            pairs[prefix] = (local, f"members.yaml ({mb.get('id', '?')})")
-for prefix, (folder, origin) in pairs.items():
-    if not os.path.isdir(folder) or not is_git(folder):
-        warn(f"o par {prefix}={folder} (de {origin}) não vai ao produto: a pasta não existe ou não é repo git "
-             "(sem o clone do par); a página que cita esse prefixo segue FORA-DO-REPO")
+        prefix = f"https://{remote}/blob"  # na ordem do arquivo: o mesmo remoto em dois membros = dois clones
+        pairs.setdefault(prefix, []).append((local, f"members.yaml ({mb.get('id', '?')})"))
+for prefix, cands in pairs.items():
+    if not used(prefix):  # par que nenhuma página declara: não vai, nem avisa (achado 3)
+        continue
+    folder = next((f for f, _o in cands if os.path.isdir(f) and is_git(f)), None)
+    if folder is None:
+        tried = "; ".join(f"{f} (de {o})" for f, o in cands)
+        warn(f"o par {prefix} não vai ao produto: nenhuma pasta é um repo git ({tried}), sem o clone do par; "
+             "a página que cita esse prefixo segue FORA-DO-REPO")
         continue
     print(f"W\t{prefix}={folder}")
     for url, page in declared:
         if url.startswith(prefix + "/"):
             ref = url[len(prefix) + 1:].split("/", 1)[0]
-            if not re.fullmatch(r"[0-9a-f]{7,40}", ref):
+            if not re.fullmatch(r"[0-9a-fA-F]{7,40}", ref):
                 print(f"B\t{url}\t{page}")
 PY
 _wargs=()
@@ -224,7 +230,17 @@ if not d.get("pages"):  # VACUIDADE: o disco tem página com projection_of e o p
     print(f"kg-projection: o disco tem {ndisk} página(s) com projection_of e o produto julgou 0 (não rastreadas?) "
           "— não pude julgar", file=sys.stderr); sys.exit(2)
 rows = []
+# a página que declara um grafo de outro repo lido FORA do sha (unpinned: o clone não tem o commit) teve os ids
+# julgados contra a árvore de lá, não contra o commit da URL: o ID-AUSENTE dela sai SOFT (sem veredito firme), e
+# quem barra é o NAO-FIXADO abaixo (passada adversarial, achado 2: o clone desatualizado não vira HARD de id)
+unpinned = list(d.get("unpinned") or [])
+loose = {r[2] for r in kp if r[0] == "D" and len(r) >= 3 and r[1] in unpinned}
 for m in d.get("missing") or []:
+    if m["page"] in loose:
+        rows.append(("SOFT", "ID-AUSENTE", m["page"], f"`{m['id']}` não está no grafo de outro repositório lido FORA do "
+                     "sha da URL (o clone do par não tem o commit): sem veredito firme; busque o commit no clone "
+                     "(git fetch) e rode de novo (integrity.projection-id-missing)"))
+        continue
     rows.append(("HARD", "ID-AUSENTE", m["page"], f"`{m['id']}` não existe em grafo nenhum que o produto leu (os "
                  "deste repositório e os de outro que um par --with leu no commit da URL) "
                  "(integrity.projection-id-missing): o nó foi renomeado ou removido? cite o id vivo"))
@@ -241,13 +257,14 @@ for o in d.get("outside") or []:
     rows.append(("SOFT", "FORA-DO-REPO", o["page"], f"`{o['id']}`: o projection_of nomeia por URL um grafo de outro "
                  f"repositório ({', '.join(o.get('declared') or [])}) que não foi lido (--with): contado, não julgado"))
 # o rc 1 do produto se confere contra os achados DELE, antes do NAO-FIXADO que o --strict eleva aqui
-judged_hard = any(r[0] == "HARD" for r in rows)
+judged_hard = bool(d.get("missing") or d.get("graph_errors"))
 pin_sev = "HARD" if strict else "SOFT"
-for u in d.get("unpinned") or []:
-    rows.append((pin_sev, "NAO-FIXADO", page_of.get(u, "-"), f"{u}: lido da árvore de trabalho, não do commit da URL "
-                 "(o sha não existe na pasta do par): fixe a URL num sha que o repositório de lá tem"))
+for u in unpinned:
+    rows.append((pin_sev, "NAO-FIXADO", page_of.get(u, "-"), f"{u}: lido da árvore de trabalho, não do commit da URL: "
+                 "o sha não existe no clone do par. Ou o sha está errado (fixe num commit que o repositório de lá tem), "
+                 "ou o clone não o buscou (git fetch na pasta do par)"))
 for u, pg in branch:
-    if u not in (d.get("unpinned") or []):
+    if u not in unpinned:
         rows.append((pin_sev, "NAO-FIXADO", pg, f"{u}: a URL nomeia um ramo, não um sha, e o grafo é lido na ponta "
                      "dele, que anda: link entre repositórios vai fixado no sha"))
 if krc == 1 and not judged_hard:

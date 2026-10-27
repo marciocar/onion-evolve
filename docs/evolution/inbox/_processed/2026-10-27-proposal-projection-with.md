@@ -89,5 +89,10 @@ SHA256SUMS dela; não foi aplicado às cegas). Branch `feat/kg-projection-with`.
   `.claude/.onion-version` com `role: adopted` e o 1º ciclo rebaixava o HARD esperado. Reproduzido numa cópia
   com o carimbo dela, e curado na bancada: a caixa fixa o papel (sem carimbo = core) e um 2º passe como
   adotante espera SOFT.
-- **Bancada:** sete casos novos na família `kg_projection`, de (i) a (q), cada um com mutante.
+- **Bancada:** oito casos novos na família `kg_projection`, de (i) a (q), cada um com mutante; o (l) confere a
+  saída sem par contra a do wrapper de antes, byte a byte.
+- **A passada adversarial** achou dois HARD indevidos no estrito, ambos curados: a URL de ramo num comentário
+  YAML virava NAO-FIXADO (as URLs agora saem do `yaml.safe_load`, a leitura do produto; o sha em maiúsculas
+  também deixou de contar como ramo), e o clone sem o commit dava HARD ID-AUSENTE contra a árvore errada (o
+  ID-AUSENTE dessa página cai a SOFT, e o NAO-FIXADO diz "sha errado ou falta `git fetch`").
 - **A nota ao kg-ssot (G7)** fica com a curadoria, que é quem fala com o produto.
