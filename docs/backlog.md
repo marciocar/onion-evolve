@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**734 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 132 grupo(s), agrupados por `owner:` (37 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**723 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 130 grupo(s), agrupados por `owner:` (26 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1004,7 +1004,7 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
-## maestro — 11 item(ns)
+## maestro — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -1014,6 +1014,7 @@
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA` | coordenacao-sessoes-2026-10 | Os cartões 2, 3 e 4 do teste de ida e volta (CARD-MAESTRO.md): o convite novo, o token no notebook e o teste. |
+| 5.0 | `Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA` | coordenacao-sessoes-2026-10 | Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. D |
 | 4.5 | `Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT` | coordenacao-sessoes-2026-10 | O npm de cada release da kg-ssot, a começar pela 4.35.0. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
