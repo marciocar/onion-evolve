@@ -2,7 +2,8 @@
 branch: docs/doctrine-no-external-service
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 41f22edbb29ad5d29e64d66d2609526b38ac2774503f492996d35db0b1136935
+reviewed_code_sha256: e1277ec1a7dbe17122163c5ea0ad5e63ffdda05f494d244e2380458df4f8db12
 findings_total: 9
 findings_real: 4
 tokens: 125988
