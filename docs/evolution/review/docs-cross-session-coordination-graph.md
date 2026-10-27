@@ -1,6 +1,6 @@
 ---
 branch: docs/cross-session-coordination-graph
-pr: pendente
+pr: 1410
 date: 2026-10-27
 reviewed_diff_sha256: pendente
 findings_total: 4
