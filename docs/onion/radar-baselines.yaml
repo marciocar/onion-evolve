@@ -71,4 +71,9 @@ axes:
     # 2026-05-07 (encerramento escalonado: 2026-07-02 e 2027-01-06), já no corpus como
     # E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026 (nanochat-onion-2026-10). A rodada re-mede a fonte oficial
     # (developers.openai.com/api/docs/deprecations) antes de citar; não é baseline, é a pauta.
-    never_run: "aberto em 2026-10-26 sem rodada; a 1a rodada e do maestro"
+    # 1ª RODADA (2026-10-27, maestro, modo primárias, run wf_2be7b5c9-f34): selada como BASELINE DATADA, não
+    # como trajetória (um ponto por série; meta.x_supersedes_none no grafo). Confirma e data o nó do corpus
+    # E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026 por quatro arestas SUPPORTS. Sai o never_run, entram a data e o kg.
+    last_run: 2026-10-27
+    descartes: "8/38 afirmações rejeitadas na ancoragem (7 exageradas, 1 não encontrada), 7 delas com superação; 15/31 objeções do Elenxo sobrevivem"
+    kg: docs/evolution/research/radar-E7-2026-10-27/radar-E7-2026-10-27.kg.yaml

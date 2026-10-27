@@ -62,11 +62,23 @@ axes:
   - id: treino-inferencia
     cadence: monthly
     sources:
-      - { url: "https://developers.openai.com/api/docs/deprecations", kind: primary, tier: 10, last_checked: "2026-10-26", note: "descontinuações e o fim do fine-tuning self-serve (2026-05-07, 2026-07-02, 2027-01-06); molde para as páginas de descontinuação e preço dos outros provedores, que ninguém mediu ainda" }
+      - { url: "https://developers.openai.com/api/docs/deprecations", kind: primary, tier: 10, last_checked: "2026-10-27", note: "descontinuações e o fim do fine-tuning self-serve (2026-05-07, 2026-07-02, 2027-01-06); relida na 1ª rodada do E7 (2026-10-27), os três degraus verbatim" }
       - { url: "https://hai.stanford.edu/ai-index/2026-ai-index-report", kind: analyst, tier: 9, cadence: yearly, note: "AI Index de Stanford: anual; a página não traz custo de treino nem de fine-tuning" }
       - { url: "https://epoch.ai/topics/finances", kind: analyst, tier: 8, note: "custo de treino e de compute; lido só por resumo de busca" }
       - { url: "https://www.interconnects.ai/", kind: engineer, tier: 8, cadence: weekly, note: "pós-treino e modelos de pesos abertos (o autor lidera pós-treino no Ai2); de 1 a 3 posts por semana" }
       - { url: "https://www.latent.space/", kind: engineer, tier: 7, cadence: weekly, note: "parte paga; The End of Finetuning (2026-05-13) só pelo trecho aberto" }
+      # Ancoradas pela 1ª rodada do E7 (2026-10-27, modo primárias; insumo da curadoria em
+      # docs/evolution/inbox/_processed/2026-10-27-signal-e7-sources.md). O tier é o que o juiz deu ao nó,
+      # não o proposto pela curadoria. As fontes que a curadoria recusou não entram.
+      - { url: "https://ai.google.dev/gemini-api/docs/model-tuning", kind: primary, tier: 9, last_checked: "2026-10-27", note: "Gemini API e AI Studio sem modelo ajustável desde 2025-05; o ajuste segue na Gemini Enterprise Agent Platform (fechou uma superfície, não o ajuste)" }
+      - { url: "https://ai.google.dev/gemini-api/docs/pricing", kind: primary, tier: 9, last_checked: "2026-10-27", note: "preço do nível pago; o Gemini 4 Argon dobra entrada e saída em 2026-12-01" }
+      - { url: "https://docs.mistral.ai/capabilities/finetuning/", kind: primary, tier: 9, last_checked: "2026-10-27", note: "API de ajuste marcada deprecated, sem data na página; o preço de US$4 por job e US$2/mês é resíduo, não custo vigente" }
+      - { url: "https://mistral.ai/news/mistral-large-4/", kind: primary, tier: 9, last_checked: "2026-10-27", note: "anúncio de 2026-10-06; pesos prometidos para o fim de 2026-10, sem licença nomeada; reler depois do prazo" }
+      - { url: "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/", kind: primary, tier: 9, last_checked: "2026-10-27", note: "RFT (ajuste por reforço) do Bedrock aberto a pesos abertos em 2026-02-17; estado do lançamento, o catálogo atual não foi re-medido" }
+      - { url: "https://www.together.ai/pricing", kind: primary, tier: 6, last_checked: "2026-10-27", note: "ajuste e inferência de pesos abertos; página sem data e sem o método (LoRA ou completo) por tabela de ajuste" }
+      - { url: "https://fireworks.ai/pricing", kind: primary, tier: 9, last_checked: "2026-10-27", note: "ajuste por faixa de tamanho e método (LoRA/Full, SFT/DPO); página sem data" }
+      - { url: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16", kind: primary, tier: 9, last_checked: "2026-10-27", note: "pesos abertos da NVIDIA, 74B com 9B ativos, no HF em 2026-10-15; benchmarks são declaração do fornecedor" }
+      - { url: "https://arxiv.org/abs/2602.20164", kind: paper, tier: 7, last_checked: "2026-10-27", note: "destilação de 8B a 622 horas de H100; o 2.000x é custo marginal (sem o professor nem o pré-treino); pré-publicação de autores da indústria" }
   # Grupo de PADRÕES E ECOSSISTEMA ABERTO DE AGENTES (aberto em 2026-10-27). É GRUPO NOVO pela medida: nenhum
   # dos oito acima cobre padrão de protocolo de agentes nem a fundação que os hospeda (claude-code-atual é só
   # o produto da Anthropic; mercado-capital e analistas cobrem dinheiro e parecer; literatura é paper).
