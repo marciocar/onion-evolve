@@ -2,7 +2,7 @@
 branch: feat/cortex-seal-and-unique-anchor
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: c30c3a148455c7aa76d481ae3994da5b4c87f98f1a8821ed4226f4b7cff82f7a
+reviewed_diff_sha256: e095158965a385e86167ceb2ee07321f574f59bcb5f63ae1659ed2890752ce74
 reviewed_code_sha256: 33c94191a32c1efc7ad8066fe0d6cb426a286eea74fa3f328647087c40ab7b45
 findings_total: 10
 findings_real: 4
