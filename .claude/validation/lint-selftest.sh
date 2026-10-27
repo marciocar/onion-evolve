@@ -2476,6 +2476,9 @@ run_vendor_scrub_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local helper="${SCRIPT_DIR}/projection-safety.sh"
   [ -f "${helper}" ] || return 0
+  # os casos de binário usam termo SINTÉTICO e sandbox próprio: rodam ANTES do retorno por falta de
+  # termo derivável (que é o estado do core hoje — atrás dele, os casos seriam código morto)
+  _vendor_scrub_binary_cases
   local term
   term="$(bash "${helper}" --emit-terms 2>/dev/null | grep -vE '^(CONFIDENCIAL|PRIVADO)$' | head -1 || true)"
   [ -n "${term}" ] || { record_pass "vendor-scrub: sem termo derivável — nada a testar"; return; }
@@ -2495,6 +2498,66 @@ run_vendor_scrub_selftests() {
     record_pass "vendor-scrub: (b) superfície limpa → sem HARD"
   else record_fail "vendor-scrub: (b)" "falso-positivo em texto limpo"; fi
   rm -f "${tf}"
+}
+
+# ── BINÁRIO NÃO É SUPERFÍCIE DE SUBSTRING (medido 2026-10-27) ─────────────────────────────────────
+# A bancada da kg-ssot 4.31.0 vendorizou um GIF de 837 KB e o lint do core deu 1 HARD pela REGRA 36
+# (Superfície VENDORIZADA sem nome comercial de cliente): um termo privado de 3 letras aparecia por
+# acaso nos bytes comprimidos, e o `grep -rilF` lê binário. A cura é `-I` na busca por substring da
+# REGRA 36 e na família `sub` do door-leak-scan.sh (a mesma busca do (5a) da publicação).
+# Tudo num SANDBOX descartável e com termo SINTÉTICO: o core é público, e o termo real nunca entra.
+#   (c) binário com o termo em bytes não textuais → NÃO acusa;
+#   (d) texto disfarçado (SVG) com o termo → ACUSA (o binário não virou ponto cego total);
+#   (e) MUTANTE sem o -I → o binário volta a acusar (o -I é load-bearing);
+#   (f)/(f-MUT) o mesmo par na família `sub` do door-leak-scan.sh, chamada direta.
+_vendor_scrub_binary_cases() {
+  local sb tfile out mut rc
+  sb="$(mktemp -d)"
+  _archive_staged "${sb}" .claude/validation .claude/utils .claude/commands
+  mkdir -p "${sb}/docs/evolution/federation" "${sb}/.claude/commands"
+  printf 'members: []\n' > "${sb}/docs/evolution/federation/members.yaml"
+  tfile="${sb}/synthetic-terms.txt"; printf 'Zqv\n' > "${tfile}"
+  # GIF mínimo: cabeçalho real, NULs, e o termo em caixa trocada no meio dos bytes de "dados"
+  printf 'GIF89a\x00\x01\x02\xffZQV\x00\x9c\xfe\x00\x00;' > "${sb}/.claude/commands/demo-bin.gif"
+  printf '<svg xmlns="http://www.w3.org/2000/svg"><text>zqv</text></svg>\n' > "${sb}/.claude/commands/demo-text.svg"
+  _vs_lint() {  # $1 = arquivo; roda o lint do SANDBOX sob --only com a lista sintética
+    (cd "${sb}" && ONION_CLIENT_TERMS_FILE="${tfile}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="$1" 2>&1 || true)
+  }
+  out="$(_vs_lint "${sb}/.claude/commands/demo-bin.gif")"
+  if ! grep -q 'Sumário' <<< "${out}"; then
+    record_fail "vendor-scrub: (c) o lint do sandbox não completou" "silêncio por aborto não é silêncio por ausência (saída: ${out: -200})"
+  elif ! grep -q '\[vendor-scrub\]' <<< "${out}"; then
+    record_pass "vendor-scrub: (c) binário com o termo em bytes não textuais → sem HARD (grep -I)"
+  else record_fail "vendor-scrub: (c)" "o termo casou nos bytes do binário — o falso positivo do GIF voltou"; fi
+  out="$(_vs_lint "${sb}/.claude/commands/demo-text.svg")"
+  if grep -q '\[vendor-scrub\]' <<< "${out}"; then
+    record_pass "vendor-scrub: (d) texto disfarçado (SVG) com o termo → HARD (binário não virou ponto cego do texto)"
+  else record_fail "vendor-scrub: (d)" "o termo num SVG não foi pego — o -I engoliu texto"; fi
+  # (e) MUTANTE: tira o -I da busca por substring da REGRA 36 no lint do sandbox
+  sed -i 's/grep -rilIF -- "\${term}"/grep -rilF -- "${term}"/' "${sb}/.claude/validation/lint-artifacts.sh"
+  if grep -qF 'grep -rilF -- "${term}"' "${sb}/.claude/validation/lint-artifacts.sh"; then
+    out="$(_vs_lint "${sb}/.claude/commands/demo-bin.gif")"
+    if grep -q '\[vendor-scrub\]' <<< "${out}"; then
+      record_pass "vendor-scrub: (e) MUTANTE sem o -I acusa o binário — o -I é load-bearing"
+    else record_fail "vendor-scrub: (e)" "o mutante não acusou o binário — (c) não prova nada"; fi
+  else record_fail "vendor-scrub: (e) setup" "a mutação não foi aplicada (a busca mudou de forma?)"; fi
+  # (f) família `sub` do door-leak-scan.sh (o (5a) da publicação) — mesma busca, mesmo defeito
+  local dls="${sb}/.claude/validation/door-leak-scan.sh"
+  if [ -f "${dls}" ]; then
+    rc=0; out="$(bash "${dls}" --families sub --terms-file "${tfile}" -- "${sb}/.claude/commands" 2>&1)" || rc=$?
+    if [ "${rc}" -eq 1 ] && grep -q 'demo-text.svg' <<< "${out}" && ! grep -q 'demo-bin.gif' <<< "${out}"; then
+      record_pass "vendor-scrub: (f) door-leak-scan sub: SVG acusa, binário não (rc=1)"
+    else record_fail "vendor-scrub: (f)" "rc=${rc} saída: ${out:0:200}"; fi
+    mut="${sb}/dls-mut.sh"
+    sed 's/grep -rilIF --exclude-dir/grep -rilF --exclude-dir/' "${dls}" > "${mut}"
+    if grep -qF 'grep -rilF --exclude-dir' "${mut}"; then
+      rc=0; out="$(bash "${mut}" --families sub --terms-file "${tfile}" -- "${sb}/.claude/commands" 2>&1)" || rc=$?
+      if grep -q 'demo-bin.gif' <<< "${out}"; then
+        record_pass "vendor-scrub: (f-MUT) door-leak-scan sem o -I acusa o binário — o -I é load-bearing"
+      else record_fail "vendor-scrub: (f-MUT)" "o mutante não acusou o binário: rc=${rc}"; fi
+    else record_fail "vendor-scrub: (f-MUT) setup" "a mutação não foi aplicada"; fi
+  else record_fail "vendor-scrub: (f)" "door-leak-scan.sh ausente no sandbox"; fi
+  rm -rf "${sb}"
 }
 
 # Modo moat-boundary — REGRA 61. Um manifesto de plugin publicável NÃO pode declarar fonte de
