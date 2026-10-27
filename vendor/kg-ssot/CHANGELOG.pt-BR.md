@@ -10,6 +10,16 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.34.0] - 2026-10-27
+
+Contrato v4.16, sem mudança. O `kg_query --chain` segue primeiro o `provenance.source`: um nó com `provenance.source`
+toma só o fragmento `#<id>` como próximo passo, e um `source` que não nomeia nó de grafo faz do nó a origem, quaisquer
+que sejam as arestas que saem dele. As arestas (`TRACES_TO`, ou `--edge-type`) só valem para o nó sem
+`provenance.source`, e as que o provenance de um nó deixa de fora saem nomeadas (`edges_not_followed`). Uma origem sem
+`provenance.source` sai com `declared: false` e deixa a corrente `weak` nos dois modos. Achado num teste de campo em
+grafos reais: uma decisão selada pelo dono, que aponta para a pergunta que responde, aparecia como o primeiro elo da
+história da pergunta, e não como a origem.
+
 ## [4.33.0] - 2026-10-27
 
 Contrato v4.16, sem mudança. `kg_query --chain <id>` projeta a cadeia de transmissão de um nó até a origem: cada

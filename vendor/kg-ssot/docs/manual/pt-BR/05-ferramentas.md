@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:392fd5561340ec6a -->
+<!-- translation-of: docs/manual/05-tools.md sha256:cf6b666219bad508 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.33.0",
+  "release": "kg-ssot-v4.34.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -776,8 +776,9 @@ de MB a primeira chamada leva dezenas de segundos; o cache do julgamento vem na 
 
 ### A cadeia de transmissão (`--chain`, 4.33.0)
 
-`--chain <id>` segue uma afirmação até a origem: de cada nó para aquele de onde ele veio, pelas arestas `TRACES_TO`
-que saem dele (outro tipo com `--edge-type`), ou, sem aresta, pelo fragmento `#<id>` do `provenance.source`. Ela
+`--chain <id>` segue uma afirmação até a origem: de cada nó para aquele de onde ele veio, pelo fragmento `#<id>` do
+`provenance.source`, ou, num nó sem `provenance.source`, pelas arestas `TRACES_TO` que saem dele (outro tipo com
+`--edge-type`). Ela
 responde quem passou a afirmação para quem, onde a corrente é mais fraca e se ela quebra.
 
 ```bash
@@ -807,8 +808,18 @@ chain: complete
   Se o nó que ele nomeia não existe, a corrente sai quebrada. Qualquer outro fragmento (a seção de um README, uma URL
   externa) é a origem, e nunca cai num nó local com o mesmo id.
 - **O caminho antes do `#`** é relativo à raiz do repositório, como na referência externa, e a query string sai. Um
-  nó cujo `source` nomeia a si mesmo é um ciclo. Quando o fragmento nomeia um nó que nenhuma aresta alcança, ele é um
-  caminho à parte.
+  nó cujo `source` nomeia a si mesmo é um ciclo.
+- **O `provenance` primeiro (4.34.0):** um nó com `provenance.source` segue só o fragmento dele, e um `source` que não
+  nomeia nó de grafo (uma pessoa, uma URL, um README) faz do nó a origem, quaisquer que sejam as arestas que saem dele.
+  A aresta diz o que o nó responde ou em que se apoia; o `source` diz de onde ele veio. Uma decisão selada pelo dono que
+  `TRACES_TO` a pergunta que responde é a origem, não o primeiro elo da história da pergunta.
+- **Uma origem sem `provenance.source`** sai com `declared: false`, e a saída diz que a corrente pode seguir fora do que
+  o grafo registra. Uma corrente que termina nela sai `weak` nos dois modos, de qualquer comprimento, e um `source` só
+  com `#` não declara nada. As arestas que o provenance de um nó deixa de fora saem nomeadas (`edges_not_followed`),
+  para que um tipo pedido com `--edge-type` nunca seja pulado em silêncio.
+- **Uma afirmação repassada de outro repositório** grava a ponte no `provenance.source` como a URL daquele grafo, fixada
+  no commit que foi lido (`…/blob/<sha>/<caminho>.kg.yaml#<id>`), com method `testimony`. A corrente mostra esse elo
+  fora do corpus, visível e `weak`, nunca como uma corrente de um nó só em silêncio.
 - **Um elo sem `confidence` numérico,** ou com um fora de [0, 1], é o mais fraco, mostrado com valor nulo, e o grau
   leniente sai `weak`. Os elos contam por arquivo e id, e `weakest_link.at` dá o arquivo de cada um.
 - **Limites:** até 200 passos (além disso, `too_long`) e 1000 caminhos (além disso, `truncated`). Uma corrente

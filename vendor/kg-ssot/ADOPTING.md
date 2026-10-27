@@ -343,6 +343,9 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.33.0` to `kg-ssot-v4.34.0`, nothing changes in the contract or the gate: only the output of
+`kg_query --chain` changes, as described in the changelog.
+
 From `kg-ssot-v4.32.0` to `kg-ssot-v4.33.0`, nothing changes in the contract or the gate: the release adds
 `kg_query --chain`, and no verdict and no identity change.
 

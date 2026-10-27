@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.33.0",
+  "release": "kg-ssot-v4.34.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -785,9 +785,9 @@ of MB the first call takes tens of seconds; the judgment cache comes in 4.19.
 
 ### The transmission chain (`--chain`, 4.33.0)
 
-`--chain <id>` follows a claim back to its origin: from each node to the one it came from, along its outgoing
-`TRACES_TO` edges (another type with `--edge-type`), or, with no edge, along the `#<id>` fragment of
-`provenance.source`. It answers who passed the claim to whom, where the chain is weakest, and whether it breaks.
+`--chain <id>` follows a claim back to its origin: from each node to the one it came from, along the `#<id>` fragment
+of its `provenance.source`, or, for a node with no `provenance.source`, along its outgoing `TRACES_TO` edges (another
+type with `--edge-type`). It answers who passed the claim to whom, where the chain is weakest, and whether it breaks.
 
 ```bash
 kg-query --root . --chain E_RELAY_B
@@ -816,8 +816,18 @@ chain: complete
   names does not exist, the chain is broken. Any other fragment (a README section, an outside URL) is the origin, and
   it never falls on a local node with the same id.
 - **The path before `#`** is relative to the repository root, as in an external reference, and a query string is
-  dropped. A node whose `source` names itself is a cycle. When the fragment names a node that no edge reaches, it is a
-  path of its own.
+  dropped. A node whose `source` names itself is a cycle.
+- **Provenance first (4.34.0):** a node with a `provenance.source` follows only its fragment, and a `source` that names
+  no graph node (a person, a URL, a README) makes the node the origin, whatever edges leave it. An edge says what a node
+  answers or rests on; the `source` says where it came from. A decision sealed by its owner that `TRACES_TO` the
+  question it answers is the origin, not the first link of the question's history.
+- **An origin with no `provenance.source`** comes out with `declared: false`, and the output says that the chain may go
+  on outside what the graph records. A chain that ends there is `weak` in both modes, however long, and a `source` of
+  only `#` declares nothing. The edges that a node's provenance leaves out are named in the output
+  (`edges_not_followed`), so a type asked with `--edge-type` is never skipped in silence.
+- **A claim relayed from another repository** writes the bridge in its `provenance.source` as the URL of that graph
+  pinned to the commit that was read (`…/blob/<sha>/<path>.kg.yaml#<id>`), with a `testimony` method. The chain shows
+  that link outside the corpus, so it is visible and `weak`, never a silent one-node chain.
 - **A link with no numeric `confidence`,** or one outside [0, 1], is the weakest one, shown with a null value, and the
   lenient grade is `weak`. Links count by file and id, and `weakest_link.at` gives the file of each.
 - **Limits:** up to 200 steps (beyond that, `too_long`) and 1000 paths (beyond that, `truncated`). A chain that is

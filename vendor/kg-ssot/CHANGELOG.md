@@ -10,6 +10,16 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.34.0] - 2026-10-27
+
+Contract v4.16, unchanged. `kg_query --chain` follows `provenance.source` first: a node with a `provenance.source`
+takes only its `#<id>` fragment as the next step, and a `source` that names no graph node makes the node the origin,
+whatever edges leave it. Edges (`TRACES_TO`, or `--edge-type`) are followed only for a node with no
+`provenance.source`, and the ones a node's provenance leaves out are named (`edges_not_followed`). An origin with no
+`provenance.source` comes out with `declared: false` and makes the chain `weak` in both modes. Found in a field test
+on real graphs: a decision sealed by its owner that traces to the question it answers showed up as the first link of
+the question's history instead of the origin.
+
 ## [4.33.0] - 2026-10-27
 
 Contract v4.16, unchanged. `kg_query --chain <id>` projects the transmission chain from a node back to its origin: each

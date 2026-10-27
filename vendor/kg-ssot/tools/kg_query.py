@@ -245,17 +245,25 @@ def _source_ref(corpus, key):
     return (target, source)  # o nó que cita a si mesmo é um ciclo, não uma origem
 
 
+def _declared(node):
+    """O nó declara de onde veio: tem provenance.source em texto, e não só um # sem nada depois."""
+    prov = node.get("provenance") if isinstance(node, dict) else None
+    source = prov.get("source") if isinstance(prov, dict) else None
+    return isinstance(source, str) and bool(source.strip().strip("#").strip())
+
+
 def _steps(corpus, key, edge_types):
-    """Os passos de um nó para o anterior: as arestas que saem dele, dos tipos pedidos; sem aresta, o fragmento do
-    provenance.source. Cada passo é (chave, ref): a chave pode não existir no corpus (a ponta quebrada)."""
-    hops = [(dst, ref) for et, dst, ref in corpus.out[key] if et in edge_types and dst is not None]
-    found = _source_ref(corpus, key)
-    if found and found[0] not in {dst for dst, _ref in hops}:  # o fragmento que a aresta não cobre é outro caminho
-        hops.append(found)
-    return hops
+    """Os passos de um nó para o anterior. O provenance manda quando existe (4.34.0): o fragmento do source é o passo,
+    e um source que não nomeia nó de grafo faz do nó a origem. As arestas dos tipos pedidos só valem para o nó sem
+    provenance.source, porque um selo TRACES_TO o nó que ele responde, não o de onde veio. Cada passo é (chave, ref):
+    a chave pode não existir no corpus (a ponta quebrada)."""
+    if _declared(corpus.nodes[key]):
+        found = _source_ref(corpus, key)
+        return [found] if found else []  # as arestas que o provenance deixa de fora saem em _link (edges_not_followed)
+    return [(dst, ref) for et, dst, ref in corpus.out[key] if et in edge_types and dst is not None]
 
 
-def _link(corpus, key, ref=None):
+def _link(corpus, key, ref=None, edge_types=None):
     node = corpus.nodes.get(key)
     if node is None:
         return {"file": key[0], "id": key[1], "ref": ref, "found": False, "confidence": None, "method_class": None,
@@ -263,6 +271,9 @@ def _link(corpus, key, ref=None):
     conf = node.get("confidence")
     numeric = isinstance(conf, (int, float)) and not isinstance(conf, bool) and 0 <= conf <= 1  # fora de [0, 1] é desconhecido
     return {"file": key[0], "id": key[1], "ref": None, "found": True, "confidence": conf if numeric else None,
+            "declared": _declared(node),
+            "edges_not_followed": [dst[1] for et, dst, _r in corpus.out[key] if edge_types and et in edge_types
+                                   and dst is not None and _declared(node)],
             "method_class": method_class(node), "label": node.get("label") if isinstance(node.get("label"), str) else None}
 
 
@@ -286,17 +297,18 @@ def _grade(path, status):
     if not complete:
         return {"weakest_link": weakest, "origin": None, "grade": {"strict": "weak", "lenient": "weak"}}
     origin = path[-1]
-    if unknown:
+    if unknown or not origin.get("declared"):  # a origem sem provenance não diz de onde veio: a corrente pode seguir
         lenient = "weak"
     elif links:
         lenient = band(weakest["confidence"])
     else:  # corrente de um nó só: o leniente é a própria origem
         lenient = band(origin["confidence"])
-    origin_band = "weak" if origin["method_class"] in (None, "testimony") else band(origin["confidence"])
+    origin_band = ("weak" if origin["method_class"] in (None, "testimony") or not origin.get("declared")
+                   else band(origin["confidence"]))
     strict = min(lenient, origin_band, key=GRADE_ORDER.get)
     return {"weakest_link": weakest,
             "origin": {"id": origin["id"], "file": origin["file"], "method_class": origin["method_class"],
-                       "confidence": origin["confidence"]},
+                       "confidence": origin["confidence"], "declared": bool(origin.get("declared"))},
             "grade": {"strict": strict, "lenient": lenient}}
 
 
@@ -326,9 +338,9 @@ def chain(corpus, ref, edge_types=("TRACES_TO",)):
             elif nxt not in corpus.nodes:
                 paths.append({"status": "broken", "links": links + [_link(corpus, nxt, nref)]})
             else:
-                walk(keys + [nxt], links + [_link(corpus, nxt)])
+                walk(keys + [nxt], links + [_link(corpus, nxt, edge_types=edge_types)])
 
-    walk([start], [_link(corpus, start)])
+    walk([start], [_link(corpus, start, edge_types=edge_types)])
     truncated = len(paths) > MAX_PATHS  # um caminho além do teto prova que havia mais
     paths = paths[:MAX_PATHS]
     out = [{"status": p["status"], "links": p["links"], **_grade(p["links"], p["status"])} for p in paths]
@@ -356,6 +368,9 @@ def chain_human(res):
             miss = "" if link["found"] else "  " + _("(outside the corpus)")
             lines.append("    " + _("{id}  confidence={conf}  method={cls}").format(id=link["id"], conf=conf, cls=cls)
                          + f"{miss}  {(link['label'] or '')[:90]}")
+            if link.get("edges_not_followed"):
+                lines.append("      " + _("edges not followed, the node declares its provenance: {ids}").format(
+                    ids=", ".join(link["edges_not_followed"])))
         w = p["weakest_link"]
         if w["ids"]:
             conf = _("unknown") if w["confidence"] is None else f"{w['confidence']:g}"
@@ -367,6 +382,8 @@ def chain_human(res):
             conf = "-" if o["confidence"] is None else f"{o['confidence']:g}"
             lines.append(_("  origin: {id}, method {cls}, confidence {conf} (a separate axis)").format(
                 id=o["id"], cls=o["method_class"] or "-", conf=conf))
+            if not o["declared"]:
+                lines.append(_("  the origin has no provenance.source: the chain may go on outside what the graph records"))
         lines.append(_("  grade: strict {strict}, lenient {lenient}").format(
             strict=_word_of(p["grade"]["strict"]), lenient=_word_of(p["grade"]["lenient"])))
     if res.get("truncated"):
