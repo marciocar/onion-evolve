@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**674 itens abertos** em 124 grafo(s) com aberto (de 163 no escopo) · 125 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**683 itens abertos** em 125 grafo(s) com aberto (de 164 no escopo) · 126 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -153,6 +153,20 @@
 | 12.0 | `C_CALIBRATION_IS_STILL_UNVERIFIED` | jev-decision-round2-2026-10 | A unica propriedade que justifica comprar a primitiva — confidence CALIBRADO, derivado da distribuicao e nao carimbado por quem  |
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
+
+## radar-E7-2026-10-27 — 9 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 66.6 | `Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27` | radar-E7-2026-10-27 | Como anda o mercado de treino e inferência (APIs de ajuste que fecham e abrem, custo, pesos abertos, destilação) e o que isso m |
+| 4.5 | `Q_E7_BASELINE_CLOSE_BEFORE_SEAL_1027` | radar-E7-2026-10-27 | Antes de selar a baseline do E7: ler 3 primárias a mais (Hugging Face da Mistral para o ML4, texto da licença OpenMDW 1.1, chang |
+| 3.6 | `C_SUPERACAO_20261027_BEDROCK_RFT_NO_OPENAI_LINK` | radar-E7-2026-10-27 | A formulação que o próprio texto sustenta: lançamento, modelos e data de 17/02/2026, sem a ligação causal com a OpenAI. |
+| 3.6 | `C_SUPERACAO_20261027_BEDROCK_RFT_NO_TRAINING_COST_CLAIM` | radar-E7-2026-10-27 | A formulação sustentada pelos parágrafos 1 e 2 do documento: poucos prompts, variantes menores e custo-efetivas, recompensa por |
+| 3.6 | `C_SUPERACAO_20261027_FIREWORKS_SERVERLESS_VERBATIM_QUOTE` | radar-E7-2026-10-27 | A citação verbatim do mesmo documento, 'To view the current pricing for our most popular serverless models across Standard, Prio |
+| 3.6 | `C_SUPERACAO_20261027_GPT4_FOUR_FAMILIES_ONLY` | radar-E7-2026-10-27 | A formulação limitada às quatro famílias listadas, tirada da mesma entrada do documento, mais a entrada 'Legacy GPT model snap |
+| 3.6 | `C_SUPERACAO_20261027_ML4_PRICE_CARD_VERBATIM` | radar-E7-2026-10-27 | O trecho do cartão no mesmo documento, 'Input (/M tokens) $1.36 Output (/M tokens) $4.18', que entrega os mesmos valores com cita |
+| 3.6 | `C_SUPERACAO_20261027_ML4_SCALE_WITHOUT_INFRA_INFERENCE` | radar-E7-2026-10-27 | A formulação sustentada pelo mesmo documento (1T, 52B ativos, MoE, Blackwell na Europa), sem a inferência sobre infraestrutura  |
+| 3.6 | `C_SUPERACAO_20261027_TOGETHER_BILLING_EPOCHS_EVAL_TOKENS` | radar-E7-2026-10-27 | A frase completa da nota de preço no mesmo documento, que entrega o valor que o claim prometia (a base de cobrança), com épocas |
 
 ## a2a-configurator-2026-10 — 4 item(ns)
 
