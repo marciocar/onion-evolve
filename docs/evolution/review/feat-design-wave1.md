@@ -2,8 +2,7 @@
 branch: feat/design-wave1
 pr: 1409
 date: 2026-10-27
-reviewed_diff_sha256: 2ff6680d7748c81431236507934b4f25b9dddcc1da23c9cead015ef445c2179e
-reviewed_code_sha256: 88ab8e36fa30ce39010f6c21fd62270b29b61010d836dc630def9a73fe9e0a42
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 12
 tokens: 146249
@@ -53,6 +52,8 @@ Na família `design_context` (13 casos): sem a exigência de `$value`/`$root` o 
   carimbo foi refeito por isso, não por re-revisão: (1) o teto e o carimbo do grafo da guarda, que a REGRA 58 (O backlog
   cumpre as promessas do próprio `meta:`) cobrou no lint do commit; (2) a movimentação dos dois sinais de inbox para
   `_processed/` (renomeação, zero linha mudada).
+  E (3) o rebase sobre a origin/main, que trouxe a KB nova do núcleo sem serviço externo: o conflito foi só nas
+  contagens escritas à mão (INDEX, agents-reference, project-charter), resolvidas para 118 comandos, 14 skills e 114 KBs.
 - O checador de projeção do kg-ssot (o `.md` com `projection_of` cita só ids que existem) não existe e não foi implementado: dependência declarada (`Q_PROJECTION_CHECK_DEPENDENCY`).
 - A checagem do locator pode migrar para o `kg_trace` do kg-ssot (`Q_LOCATOR_CHECK_HOME`); a guarda ficou isolada para isso.
 - O número da REGRA 111 estava livre na origin/main no momento da revisão; outros PRs abertos não foram conferidos.
