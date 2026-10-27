@@ -41274,8 +41274,12 @@ run_kg_projection_selftests() {
   local _ko _ke _kr _kef; _kef="$(mktemp)"
   _kc() { grep -c "$@" || true; }  # contagem que não mata a suíte sob set -e quando é 0
   _kprun() { local hh="$1"; shift; if _ko="$(ONION_KG_TRACE="${KT}" bash "${hh}" "$@" --format tsv 2>"${_kef}")"; then _kr=0; else _kr=$?; fi; _ke="$(cat "${_kef}")"; }
-  local xd sha P="https://github.com/acme/peer/blob" mut ok
+  local xd sha P="https://github.com/acme/peer/blob" mut
   xd="$(mktemp -d)"; sha="$(_kp_peer_fixture "${xd}")"
+  if ! grep -qE '^[0-9a-f]{40}$' <<< "${sha}"; then  # sem o sha, os sed abaixo não têm o que trocar
+    record_fail "kg-projection: (i-q) fixture" "o repo peer não se montou (sha='${sha}')"; rm -rf "${xd}"; rm -f "${_kef}"; unset -f _kprun _kc
+    rm -rf "${vd}" "${mdir}" "${c3}" "${cd_unc}" "${sb}" "${d}"; return
+  fi
   local XM="${xd}/main" XP="${xd}/peer"
   # (i) G2: id morto no grafo do outro repo. Sem o par ⇒ só SOFT FORA-DO-REPO (rc 1, nenhum HARD); com o par
   #     (--with) ⇒ HARD ID-AUSENTE sobre o morto, e o vivo resolve (lido no commit da URL)
@@ -41289,81 +41293,106 @@ run_kg_projection_selftests() {
     record_pass "kg-projection: (i) id morto no grafo de outro repo ⇒ SOFT FORA-DO-REPO sem o par, HARD ID-AUSENTE com o --with (mutante sem repasse cala)"
   else record_fail "kg-projection: (i) G2" "sem-par=${i1} (1|2|0) com-par=${i2} (1|1|0) mutante=${mut} (0)"; fi
   # (j) PAR SEM CLONE: pasta inexistente e pasta que não é git ⇒ aviso nomeado no stderr, a página segue SOFT
-  #     FORA-DO-REPO, rc 1, nunca HARD nem rc 2
-  local j1 j2; mkdir -p "${xd}/nogit"
+  #     FORA-DO-REPO, rc 1, nunca HARD nem rc 2; o par explícito que nenhuma página declara não avisa
+  local j1 j2 j3; mkdir -p "${xd}/nogit"
   _kprun "${h}" "${XM}" --with "${P}=${xd}/nada"
-  j1="${_kr}|$(_kc '^SOFT	FORA-DO-REPO' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")|$(_kc "aviso: o par ${P}=${xd}/nada" <<< "${_ke}")"
+  j1="${_kr}|$(_kc '^SOFT	FORA-DO-REPO' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")|$(_kc "aviso: o par ${P} não vai.*${xd}/nada (de --with)" <<< "${_ke}")"
   _kprun "${h}" "${XM}" --with "${P}=${xd}/nogit"
-  j2="${_kr}|$(_kc '^SOFT	FORA-DO-REPO' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")|$(_kc "aviso: o par ${P}=${xd}/nogit" <<< "${_ke}")"
-  # m6: sem a conferência da pasta, o par sem clone vai ao produto (inexistente ⇒ rc 2; não-git ⇒ outro veredito)
-  sed 's/^    if not os.path.isdir(folder) or not is_git(folder):$/    if False:/' "${h}" > "${mdir}/m6.sh"
+  j2="${_kr}|$(_kc '^SOFT	FORA-DO-REPO' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")|$(_kc "aviso: o par ${P} não vai.*${xd}/nogit (de --with)" <<< "${_ke}")"
+  _kprun "${h}" "${XM}" --with "https://github.com/acme/ninguem/blob=${xd}/nada"; j3="${_kr}|${#_ke}"
+  # m6: sem a conferência do clone, a pasta inexistente vai ao produto, que a recusa (rc 2, sem aviso)
+  sed 's/^    folder = next((f for f, _o in cands if os.path.isdir(f) and is_git(f)), None)$/    folder = cands[0][0]/' "${h}" > "${mdir}/m6.sh"
   _kprun "${mdir}/m6.sh" "${XM}" --with "${P}=${xd}/nada"; mut="${_kr}|$(_kc 'aviso: o par' <<< "${_ke}")"
-  if [ "${j1}" = "1|2|0|1" ] && [ "${j2}" = "1|2|0|1" ] && [ "${mut}" != "1|1" ] && ! cmp -s "${h}" "${mdir}/m6.sh"; then
-    record_pass "kg-projection: (j) par sem clone (inexistente, não-git) ⇒ aviso nomeado + SOFT FORA-DO-REPO, nunca HARD (mutante sem a conferência muda o veredito)"
-  else record_fail "kg-projection: (j) par sem clone" "inexistente=${j1} não-git=${j2} (1|2|0|1) mutante=${mut} (≠1|1)"; fi
+  if [ "${j1}" = "1|2|0|1" ] && [ "${j2}" = "1|2|0|1" ] && [ "${j3}" = "1|0" ] && [ "${mut}" = "2|0" ] && ! cmp -s "${h}" "${mdir}/m6.sh"; then
+    record_pass "kg-projection: (j) par sem clone (inexistente, não-git) ⇒ aviso nomeado + SOFT FORA-DO-REPO, nunca HARD; par não declarado não avisa (mutante sem a conferência sai rc 2)"
+  else record_fail "kg-projection: (j) par sem clone" "inexistente=${j1} não-git=${j2} (1|2|0|1) não-declarado=${j3} (1|0) mutante=${mut} (2|0)"; fi
   # (k) FORMA RUIM ⇒ rc 2: sem "=", prefixo em http://, pasta vazia; pela opção e pela variável
   local k1 k2 k3 k4
   _kprun "${h}" "${XM}" --with "semigual"; k1="${_kr}"
   _kprun "${h}" "${XM}" --with "http://x/blob=${XP}"; k2="${_kr}"
   _kprun "${h}" "${XM}" --with "${P}="; k3="${_kr}"
   if _ko="$(ONION_KG_PROJECTION_WITH="semigual" ONION_KG_TRACE="${KT}" bash "${h}" "${XM}" --format tsv 2>/dev/null)"; then k4=0; else k4=$?; fi
-  # m7: sem a conferência da forma, "semigual" vira par sem clone (aviso, rc 1) em vez de "não pude julgar"
+  # m7: sem a conferência da forma, o "${P}=" (pasta vazia) vira par sem clone: aviso e rc 1, não "não pude julgar"
   sed 's/^    if not sep or not folder or not prefix.startswith("https:\/\/") or len(prefix) <= len("https:\/\/"):$/    if False:/' "${h}" > "${mdir}/m7.sh"
-  _kprun "${mdir}/m7.sh" "${XM}" --with "semigual"; mut="${_kr}"
-  if [ "${k1}${k2}${k3}${k4}" = 2222 ] && [ "${mut}" != 2 ] && ! cmp -s "${h}" "${mdir}/m7.sh"; then
-    record_pass "kg-projection: (k) --with de forma ruim (sem =, http://, pasta vazia; opção e variável) ⇒ rc 2 (mutante sem a conferência não sai 2)"
-  else record_fail "kg-projection: (k) forma ruim" "rc=${k1}${k2}${k3}${k4} (2222) mutante=${mut} (≠2)"; fi
-  # (l) SEM PAR = O DE ANTES: sem --with, e com a variável só de linhas vazias, a saída é a mesma, sem aviso
-  local l0 l1 l0e
+  _kprun "${mdir}/m7.sh" "${XM}" --with "${P}="; mut="${_kr}|$(_kc 'aviso: o par' <<< "${_ke}")"
+  if [ "${k1}${k2}${k3}${k4}" = 2222 ] && [ "${mut}" = "1|1" ] && ! cmp -s "${h}" "${mdir}/m7.sh"; then
+    record_pass "kg-projection: (k) --with de forma ruim (sem =, http://, pasta vazia; opção e variável) ⇒ rc 2 (mutante sem a conferência sai 1 com aviso)"
+  else record_fail "kg-projection: (k) forma ruim" "rc=${k1}${k2}${k3}${k4} (2222) mutante=${mut} (1|1)"; fi
+  # (l) SEM PAR = O DE ANTES: a saída é exatamente as 2 linhas FORA-DO-REPO que o wrapper de antes dava (o G2 da
+  #     curadoria, medido contra o original), sem aviso; e a variável só de linhas vazias dá a mesma coisa
+  local l0 l1 l0e lexp
+  lexp="$(printf 'SOFT\tFORA-DO-REPO\tdocs/p.md\t`C_PEER_ALIVE`: o projection_of nomeia por URL um grafo de outro repositório (%s/%s/docs/g.kg.yaml) que não foi lido (--with): contado, não julgado\nSOFT\tFORA-DO-REPO\tdocs/p.md\t`C_PEER_DEAD`: o projection_of nomeia por URL um grafo de outro repositório (%s/%s/docs/g.kg.yaml) que não foi lido (--with): contado, não julgado' "${P}" "${sha}" "${P}" "${sha}")"
   _kprun "${h}" "${XM}"; l0="${_kr}|${_ko}"; l0e="${_ke}"
   if _ko="$(ONION_KG_PROJECTION_WITH=$'\n  \n' ONION_KG_TRACE="${KT}" bash "${h}" "${XM}" --format tsv 2>"${_kef}")"; then _kr=0; else _kr=$?; fi
   l1="${_kr}|${_ko}"
   # m8: a variável sem o filtro de linha vazia vira forma ruim (rc 2)
   sed 's/do \[ -n "\${_w\/\/\[\[:space:\]\]\/}" \] && WITHS+=/do WITHS+=/' "${h}" > "${mdir}/m8.sh"
   if ONION_KG_PROJECTION_WITH=$'\n  \n' ONION_KG_TRACE="${KT}" bash "${mdir}/m8.sh" "${XM}" --format tsv >/dev/null 2>&1; then mut=0; else mut=$?; fi
-  if [ "${l0}" = "${l1}" ] && [ -z "${l0e}" ] && [ -z "$(cat "${_kef}")" ] && [ "${l0%%|*}" = 1 ] && [ "${mut}" = 2 ] \
+  if [ "${l0}" = "1|${lexp}" ] && [ "${l0}" = "${l1}" ] && [ -z "${l0e}" ] && [ -z "$(cat "${_kef}")" ] && [ "${mut}" = 2 ] \
      && ! cmp -s "${h}" "${mdir}/m8.sh"; then
-    record_pass "kg-projection: (l) sem par (nem --with, nem variável útil) ⇒ a saída de antes, sem aviso (mutante sem o filtro sai 2)"
-  else record_fail "kg-projection: (l) sem par" "igual=$([ "${l0}" = "${l1}" ] && echo s || echo n) stderr=${l0e:0:80} mutante=${mut} (2)"; fi
+    record_pass "kg-projection: (l) sem par (nem --with, nem variável útil) ⇒ a saída de antes, byte a byte, sem aviso (mutante sem o filtro sai 2)"
+  else record_fail "kg-projection: (l) sem par" "igual-ao-de-antes=$([ "${l0}" = "1|${lexp}" ] && echo s || echo n) variável=$([ "${l0}" = "${l1}" ] && echo s || echo n) stderr=${l0e:0:80} mutante=${mut} (2)"; fi
   # (n) NAO-FIXADO: a URL com um sha que o peer não tem (o G6) e a URL que nomeia um ramo ⇒ SOFT por padrão, HARD
-  #     com --strict; o caminho é o da página
-  local nd n1 n2 n3 br; nd="$(mktemp -d)"; cp -a "${XM}/." "${nd}/"
-  sed -i "s/${sha}/0123456789abcdef0123456789abcdef01234567/; s/ e \`C_PEER_DEAD\`//" "${nd}/docs/p.md"; _dc_commit "${nd}" "sha falso"
+  #     com --strict; o caminho é o da página. E o que NÃO é NAO-FIXADO: a URL de ramo só num comentário YAML, e o
+  #     sha em maiúsculas. Com o sha ausente no clone, o ID-AUSENTE da página cai a SOFT (julgado na versão errada)
+  local nd n1 n2 n3 n4 n5 n6 br FAKE=0123456789abcdef0123456789abcdef01234567; nd="$(mktemp -d)"; cp -a "${XM}/." "${nd}/"
+  sed -i "s/${sha}/${FAKE}/" "${nd}/docs/p.md"; _dc_commit "${nd}" "sha falso"
+  _kprun "${h}" "${nd}" --with "${P}=${XP}"
+  n4="$(_kc '^SOFT	ID-AUSENTE	docs/p.md	`C_PEER_DEAD`' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")"
+  sed 's/^    if m\["page"\] in loose:$/    if False:/' "${h}" > "${mdir}/m15.sh"
+  local mu15; _kprun "${mdir}/m15.sh" "${nd}" --with "${P}=${XP}"; mu15="$(_kc '^HARD	ID-AUSENTE' <<< "${_ko}")"
+  sed -i 's/ e `C_PEER_DEAD`//' "${nd}/docs/p.md"; _dc_commit "${nd}" "sem o morto"
   _kprun "${h}" "${nd}" --with "${P}=${XP}"; n1="${_kr}|$(_kc '^SOFT	NAO-FIXADO	docs/p.md' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")"
   _kprun "${h}" "${nd}" --with "${P}=${XP}" --strict; n2="${_kr}|$(_kc '^HARD	NAO-FIXADO	docs/p.md' <<< "${_ko}")"
-  br="$(git -C "${XP}" branch --show-current 2>/dev/null)"
-  sed -i "s/0123456789abcdef0123456789abcdef01234567/${br:-master}/" "${nd}/docs/p.md"; _dc_commit "${nd}" "ramo"
-  _kprun "${h}" "${nd}" --with "${P}=${XP}" --strict; n3="${_kr}|$(_kc '^HARD	NAO-FIXADO	docs/p.md	.*nomeia um ramo' <<< "${_ko}")"
-  # m9: o --strict não eleva; m10: sem a conferência do ramo, a URL de ramo passa calada
   sed 's/^pin_sev = "HARD" if strict else "SOFT"$/pin_sev = "SOFT"/' "${h}" > "${mdir}/m9.sh"
-  sed 's/^            if not re.fullmatch(r"\[0-9a-f\]{7,40}", ref):$/            if False:/' "${h}" > "${mdir}/m10.sh"
-  local mu9 mu10
-  sed -i "s/${br:-master}/0123456789abcdef0123456789abcdef01234567/" "${nd}/docs/p.md"; _dc_commit "${nd}" "sha falso de novo"
-  _kprun "${mdir}/m9.sh" "${nd}" --with "${P}=${XP}" --strict; mu9="$(_kc '^HARD' <<< "${_ko}")"
-  sed -i "s/0123456789abcdef0123456789abcdef01234567/${br:-master}/" "${nd}/docs/p.md"; _dc_commit "${nd}" "ramo de novo"
-  _kprun "${mdir}/m10.sh" "${nd}" --with "${P}=${XP}" --strict; mu10="$(_kc 'NAO-FIXADO' <<< "${_ko}")"
-  if [ "${n1}" = "1|1|0" ] && [ "${n2}" = "1|1" ] && [ "${n3}" = "1|1" ] && [ "${mu9}" = 0 ] && [ "${mu10}" = 0 ] \
-     && ! cmp -s "${h}" "${mdir}/m9.sh" && ! cmp -s "${h}" "${mdir}/m10.sh"; then
-    record_pass "kg-projection: (n) NAO-FIXADO (sha que o peer não tem; URL de ramo) ⇒ SOFT por padrão, HARD com --strict (os 2 mutantes calam)"
-  else record_fail "kg-projection: (n) NAO-FIXADO" "padrão=${n1} (1|1|0) strict=${n2} (1|1) ramo=${n3} (1|1) m9=${mu9} m10=${mu10} (0 0)"; fi
+  local mu9; _kprun "${mdir}/m9.sh" "${nd}" --with "${P}=${XP}" --strict; mu9="$(_kc '^HARD' <<< "${_ko}")"
+  br="$(git -C "${XP}" branch --show-current 2>/dev/null)"; br="${br:-master}"
+  sed -i "s/${FAKE}/${br}/" "${nd}/docs/p.md"; _dc_commit "${nd}" "ramo"
+  _kprun "${h}" "${nd}" --with "${P}=${XP}" --strict; n3="${_kr}|$(_kc '^HARD	NAO-FIXADO	docs/p.md	.*nomeia um ramo' <<< "${_ko}")"
+  sed 's/^            if not re.fullmatch(r"\[0-9a-fA-F\]{7,40}", ref):$/            if False:/' "${h}" > "${mdir}/m10.sh"
+  local mu10; _kprun "${mdir}/m10.sh" "${nd}" --with "${P}=${XP}" --strict; mu10="$(_kc 'NAO-FIXADO' <<< "${_ko}")"
+  # a URL de ramo só no comentário: o sha certo na entrada, o ramo depois do "#"
+  sed -i "s|${P}/${br}/docs/g.kg.yaml|${P}/${sha}/docs/g.kg.yaml  # antes: ${P}/${br}/docs/g.kg.yaml|" "${nd}/docs/p.md"; _dc_commit "${nd}" "comentário"
+  _kprun "${h}" "${nd}" --with "${P}=${XP}" --strict; n5="${_kr}|$(_kc 'NAO-FIXADO' <<< "${_ko}")"
+  sed 's/^            meta = yaml.safe_load(m.group(1))$/            meta = {"projection_of": re.findall(r"https:\/\/[^\\s]+", m.group(1))}/' "${h}" > "${mdir}/m16.sh"
+  local mu16; _kprun "${mdir}/m16.sh" "${nd}" --with "${P}=${XP}" --strict; mu16="$(_kc 'NAO-FIXADO' <<< "${_ko}")"
+  # o sha em maiúsculas (o git o aceita e o produto o lê fixado)
+  local SHAU; SHAU="$(tr 'a-f' 'A-F' <<< "${sha}")"
+  sed -i "s|  # antes: .*$||; s|${P}/${sha}/|${P}/${SHAU}/|" "${nd}/docs/p.md"; _dc_commit "${nd}" "maiúsculas"
+  _kprun "${h}" "${nd}" --with "${P}=${XP}" --strict; n6="${_kr}|$(_kc 'NAO-FIXADO' <<< "${_ko}")"
+  sed 's/\[0-9a-fA-F\]{7,40}/[0-9a-f]{7,40}/' "${h}" > "${mdir}/m17.sh"
+  local mu17; _kprun "${mdir}/m17.sh" "${nd}" --with "${P}=${XP}" --strict; mu17="$(_kc 'NAO-FIXADO' <<< "${_ko}")"
+  if [ "${n1}" = "1|1|0" ] && [ "${n2}" = "1|1" ] && [ "${n3}" = "1|1" ] && [ "${n4}" = "1|0" ] && [ "${n5}" = "0|0" ] \
+     && [ "${n6}" = "0|0" ] && [ "${mu9}" = 0 ] && [ "${mu10}" = 0 ] && [ "${mu15}" = 1 ] && [ "${mu16}" = 1 ] && [ "${mu17}" = 1 ] \
+     && ! cmp -s "${h}" "${mdir}/m9.sh" && ! cmp -s "${h}" "${mdir}/m10.sh" && ! cmp -s "${h}" "${mdir}/m15.sh" \
+     && ! cmp -s "${h}" "${mdir}/m16.sh" && ! cmp -s "${h}" "${mdir}/m17.sh"; then
+    record_pass "kg-projection: (n) NAO-FIXADO (sha que o peer não tem; URL de ramo) ⇒ SOFT, HARD com --strict; ramo em comentário e sha maiúsculo não acusam; id de grafo lido fora do sha ⇒ SOFT (os 5 mutantes falham)"
+  else record_fail "kg-projection: (n) NAO-FIXADO" "padrão=${n1} (1|1|0) strict=${n2} (1|1) ramo=${n3} (1|1) id-solto=${n4} (1|0) comentário=${n5} (0|0) maiúsculo=${n6} (0|0) m9=${mu9} m10=${mu10} (0 0) m15=${mu15} m16=${mu16} m17=${mu17} (1 1 1)"; fi
   rm -rf "${nd}"
   # (o) PAR DO members.yaml: sem --with, o membro com o remote do prefixo dá o par (HARD ID-AUSENTE); o membro cujo
-  #     prefixo nenhuma página declara não entra, nem avisa, mesmo sem clone; o explícito vence o do registro
-  local od o1 o2; od="$(mktemp -d)"; cp -a "${XM}/." "${od}/"; mkdir -p "${od}/docs/evolution/federation"
+  #     prefixo nenhuma página declara não entra nem avisa, mesmo sem clone; o explícito sem clone cede ao registro;
+  #     com os dois válidos, vence o explícito (o registro aponta um clone sem o commit, que daria NAO-FIXADO)
+  local od o1 o2 o3 o4 mf; od="$(mktemp -d)"; cp -a "${XM}/." "${od}/"; mkdir -p "${od}/docs/evolution/federation"
+  mf="${od}/docs/evolution/federation/members.yaml"
   printf 'version: 2\nmembers:\n  - id: alheio\n    remote: github.com/acme/outro\n    local_path: "%s/nada"\n  - id: peer\n    remote: github.com/acme/peer   # comentário\n    local_path: "%s"\n' \
-    "${xd}" "${XP}" > "${od}/docs/evolution/federation/members.yaml"
-  _kprun "${h}" "${od}"; o1="${_kr}|$(_kc '^HARD	ID-AUSENTE	docs/p.md	`C_PEER_DEAD`' <<< "${_ko}")|$(_kc 'aviso' <<< "${_ke}")"
-  _kprun "${h}" "${od}" --with "${P}=${xd}/nogit"; o2="$(_kc "aviso: o par ${P}=${xd}/nogit (de --with)" <<< "${_ke}")|$(_kc '^HARD' <<< "${_ko}")"
+    "${xd}" "${XP}" > "${mf}"
+  _kprun "${h}" "${od}"; o1="${_kr}|$(_kc '^HARD	ID-AUSENTE	docs/p.md	`C_PEER_DEAD`' <<< "${_ko}")|${#_ke}"
+  _kprun "${h}" "${od}" --with "${P}=${xd}/nogit"; o2="$(_kc '^HARD	ID-AUSENTE' <<< "${_ko}")|${#_ke}"
+  local p2r="${xd}/peer2"; mkdir -p "${p2r}/docs"; git -C "${p2r}" init -q 2>/dev/null; cp "${XP}/docs/g.kg.yaml" "${p2r}/docs/"; _dc_commit "${p2r}" "outro commit"
+  sed -i "s|local_path: \"${XP}\"|local_path: \"${p2r}\"|" "${mf}"
+  _kprun "${h}" "${od}"; o3="$(_kc 'NAO-FIXADO' <<< "${_ko}")"
+  _kprun "${h}" "${od}" --with "${P}=${XP}"; o4="$(_kc 'NAO-FIXADO' <<< "${_ko}")|$(_kc '^HARD	ID-AUSENTE' <<< "${_ko}")"
+  sed -i "s|local_path: \"${p2r}\"|local_path: \"${XP}\"|" "${mf}"
   # m11: sem a derivação do registro, o G2 volta a SOFT; m12: sem o filtro do prefixo declarado, o alheio avisa
-  sed 's/^        if used(prefix) and prefix not in pairs:/        if False:/' "${h}" > "${mdir}/m11.sh"
-  sed 's/^        if used(prefix) and prefix not in pairs:/        if prefix not in pairs:/' "${h}" > "${mdir}/m12.sh"
+  sed 's/^if declared and os.path.isfile(members):$/if False:/' "${h}" > "${mdir}/m11.sh"
+  sed 's/^    if not used(prefix):  # par que nenhuma página declara.*$/    if False:/' "${h}" > "${mdir}/m12.sh"
   local mu11 mu12
   _kprun "${mdir}/m11.sh" "${od}"; mu11="$(_kc 'ID-AUSENTE' <<< "${_ko}")"
   _kprun "${mdir}/m12.sh" "${od}"; mu12="$(_kc 'aviso: o par https://github.com/acme/outro/blob' <<< "${_ke}")"
-  if [ "${o1}" = "1|1|0" ] && [ "${o2}" = "1|0" ] && [ "${mu11}" = 0 ] && [ "${mu12}" = 1 ] \
+  if [ "${o1}" = "1|1|0" ] && [ "${o2}" = "1|0" ] && [ "${o3}" = 1 ] && [ "${o4}" = "0|1" ] && [ "${mu11}" = 0 ] && [ "${mu12}" = 1 ] \
      && ! cmp -s "${h}" "${mdir}/m11.sh" && ! cmp -s "${h}" "${mdir}/m12.sh"; then
-    record_pass "kg-projection: (o) o par vem do members.yaml (só o prefixo declarado; o explícito vence) ⇒ HARD ID-AUSENTE (os 2 mutantes falham)"
-  else record_fail "kg-projection: (o) members.yaml" "registro=${o1} (1|1|0) explícito-vence=${o2} (1|0) m11=${mu11} (0) m12=${mu12} (1)"; fi
+    record_pass "kg-projection: (o) o par vem do members.yaml (só o prefixo declarado; o explícito vence, e o sem clone cede) ⇒ HARD ID-AUSENTE (os 2 mutantes falham)"
+  else record_fail "kg-projection: (o) members.yaml" "registro=${o1} (1|1|0) explícito-sem-clone-cede=${o2} (1|0) registro-sem-commit=${o3} (1) explícito-vence=${o4} (0|1) m11=${mu11} (0) m12=${mu12} (1)"; fi
   rm -rf "${od}"
   # (p) ADOTANTE SEM members.yaml (o registro é só do core e não viaja): carimbo role: adopted, nenhum registro ⇒
   #     sem par, SOFT FORA-DO-REPO e nenhum erro; com o par pela ONION_KG_PROJECTION_WITH, HARD ID-AUSENTE no TSV
