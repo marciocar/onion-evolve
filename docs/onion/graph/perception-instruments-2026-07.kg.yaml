@@ -151,6 +151,39 @@ nodes:
       locator: "docs/knowledge-base/concepts/onion-perception-instruments.md"
       method: "derivado: trace do nó, sem registro de medição"
       locality: "repo"
+  # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
+  - id: E_REVERIFY_CANARY_BANCADA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "pin-integrity-check.sh l.46 'CANARY=\".claude/validation/lint-artifacts.sh\"', l.59-60 (git show PIN:CANARY | diff -q → 'pin-untrusted canario-divergente'); bancada --families pin_integrity: 5 ✓ 0 ✗ 0 ⊘ (faixa de 10 famílias, 98/0/0)"
+    label: "CONFIRMED no vivo: o canário do pin-integrity-check.sh segue sendo o lint-artifacts.sh, e a divergência byte a byte devolve 'pin-untrusted canario-divergente'; a bancada da família passa."
+    narrative: "Re-verificação de C_CANARY. As linhas mudaram (21 → 46, 34-35 → 59-60); o mecanismo é o mesmo."
+    provenance:
+      source: ".claude/validation/pin-integrity-check.sh @ origin/main 8857bc9b8"
+      locator: "pin-integrity-check.sh l.46 e l.59-60; resultado da família pin_integrity"
+      method: "measurement: bancada da família pin_integrity + grep -n do canário"
+      locality: "repo"
+  - id: E_REVERIFY_FRESHNESS_LAZY_HOOK_RODADO_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "echo '{}' | bash .claude/hooks/co-evolution-inbox-check.sh → '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"⏰ Onion diário: 14 migalha(s) com review_after vencido …\"}}'; grep -l schedule: .github/workflows/*.yml → só onion-selftest.yml, que não toca diário nem frescor"
+    label: "CONFIRMED no vivo: o frescor segue lazy por sessão. O hook emite ⏰ com 14 migalhas vencidas no SessionStart, e nenhum workflow agendado mexe em diário ou frescor (o cron segue rejeitado)."
+    narrative: "Re-verificação de C_FRESHNESS_LAZY. O número do hook bate com o do diary-index.sh medido na mesma rodada (14)."
+    provenance:
+      source: ".claude/hooks/co-evolution-inbox-check.sh + .github/workflows/ @ origin/main 8857bc9b8"
+      locator: "co-evolution-inbox-check.sh l.19-31 e l.62-67; saída do hook; grep schedule: nos workflows"
+      method: "measurement: hook rodado com entrada vazia + grep dos workflows agendados"
+      locality: "repo"
 edges:
   - from: E_FABLE_REVIEW
     to: C_4_ROLES
@@ -188,3 +221,9 @@ edges:
   - from: D_INSTRUMENTS_DOCTRINE
     to: C_HYP_READS_CRUMBS
     edge_type: SUPERSEDES
+  - from: E_REVERIFY_CANARY_BANCADA_1027
+    to: C_CANARY
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_FRESHNESS_LAZY_HOOK_RODADO_1027
+    to: C_FRESHNESS_LAZY
+    edge_type: SUPPORTS

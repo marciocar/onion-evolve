@@ -207,6 +207,39 @@ nodes:
       locator: ".claude/utils/adopt/decouple-source.sh"
       method: "derivado: trace do nó, sem registro de medição"
       locality: "repo"
+  # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
+  - id: E_REVERIFY_SOURCE_TAMBEM_E_A_PORTA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "ls .claude/.onion-version no core → ausente (git ls-files = 0); roles.yaml l.130 'source: # TIER 0 — o core (onion-evolve) e a porta onion-core'; gh api repos/marciocar/onion-core/contents/.claude/.onion-version → 'role: source', 'kind: door', 'release: 2.0.5', source_commit 00525a3ee5aa"
+    label: "DRIFTED: o core segue sem stamp, mas o papel source não é mais só a autora: roles.yaml o dá também à porta onion-core, que carrega stamp com role: source e kind: door. 'source = sem stamp' só vale para o core."
+    narrative: "Re-verificação de ROLE_source. Mudou com a segunda fase das portas (o carimbo source da onion-core) e com o materialize-door.sh, que passou a escrever o stamp porque a porta sem stamp se apresentava como a fonte. A meta-fábrica viaja também para a porta (work_tools com meta_factory em l.133). O que segue: o core é o único source sem stamp e é lido ao vivo."
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml @ origin/main 8857bc9b8 + remoto marciocar/onion-core:.claude/.onion-version"
+      locator: "roles.yaml l.130-135; ops/materialize-door.sh l.343-346; stamp lido do remoto"
+      method: "measurement: ls no core, grep -n em roles.yaml e leitura do stamp no remoto por gh api"
+      locality: "repo"
+  - id: E_REVERIFY_DECOUPLE_SOURCE_BANCADA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decouple-source.sh l.3-6 (cabeçalho: adopted/hub → source, decoupled_from, sem --update, 'A fonte é soberana de quem a usa') e l.9 ('a fonte-desacoplada CARREGA stamp'); bancada --families decouple_source,family_topology: decouple-source 3 ✓ e family-topology 3 ✓, 0 ✗ 0 ⊘ (faixa de 10 famílias, 98/0/0)"
+    label: "CONFIRMED no vivo: o decouple-source.sh segue fazendo a transição adopted/hub → source com decoupled_from e corte do --update, e a bancada da família passa."
+    narrative: "Re-verificação de ROLE_decoupled_source, antes só lida no cabeçalho. A bancada exercita o mecanismo em repo descartável."
+    provenance:
+      source: ".claude/utils/adopt/decouple-source.sh + .claude/validation/lint-selftest.sh @ origin/main 8857bc9b8"
+      locator: "decouple-source.sh l.3-14; resultado das famílias decouple_source e family_topology"
+      method: "measurement: bancada das famílias decouple_source e family_topology + grep -n do cabeçalho"
+      locality: "repo"
 
 edges:
   # source e a origem: cria, adota, atualiza; o distilled deriva dele
@@ -252,3 +285,9 @@ edges:
   - from: AUTH_visitor
     to: TX_invite
     edge_type: DEPENDS_ON
+  - from: E_REVERIFY_SOURCE_TAMBEM_E_A_PORTA_1027
+    to: ROLE_source
+    edge_type: CONSTRAINS
+  - from: E_REVERIFY_DECOUPLE_SOURCE_BANCADA_1027
+    to: ROLE_decoupled_source
+    edge_type: SUPPORTS

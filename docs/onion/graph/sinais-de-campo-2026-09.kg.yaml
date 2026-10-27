@@ -1469,6 +1469,23 @@ nodes:
       locator: "pergunta com opções de 2026-10-27: «Onde o intérprete dos serviços vive e como a migração é executada?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
+  # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
+  - id: E_REVERIFY_DESIGN_SETUP_PEER_REF_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "peer-ref-check.sh onion-curation …#D_DESIGN_SETUP_PROPOSAL → 'EXISTE … na origin/main do par @ f2118c198678'; …#C_WAVE1_WITH_GRAPH → 'EXISTE … @ f2118c198678'; peer-ref-check.sh onion-curation 19b9e500c010… → 'ANCESTRAL … está na origin/main do par @ f2118c198678'"
+    label: "CONFIRMED no vivo: os três apontamentos de E_DESIGN_SETUP_ESTUDO_CURADORIA_1027 seguem válidos na origin/main da curadoria, que avançou para f2118c198678."
+    narrative: "Re-verificação de E_DESIGN_SETUP_ESTUDO_CURADORIA_1027. O nó lido já tinha rodado o peer-ref-check.sh no mesmo dia, mas declarava method 'reading'; esta rodada repete a medição na main de agora do par."
+    provenance:
+      source: ".claude/validation/peer-ref-check.sh @ origin/main 8857bc9b8"
+      locator: "saídas das três chamadas do peer-ref-check.sh"
+      method: "measurement: peer-ref-check.sh rodado contra a origin/main da curadoria"
+      locality: "repo"
 edges:
   - from: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
     to: Q_PYYAML_604_CP315_GATILHO_1027
@@ -1740,3 +1757,6 @@ edges:
   - from: D_PY315_EXECUCAO_POR_OPS_E_OPT_1027
     to: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
     edge_type: TRACES_TO
+  - from: E_REVERIFY_DESIGN_SETUP_PEER_REF_1027
+    to: E_DESIGN_SETUP_ESTUDO_CURADORIA_1027
+    edge_type: SUPPORTS

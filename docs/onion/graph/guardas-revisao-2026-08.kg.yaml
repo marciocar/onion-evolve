@@ -765,6 +765,39 @@ nodes:
       locator: "bash .claude/validation/lint-artifacts.sh + leitura de check_scan_sanity e safe-count.sh, medido 2026-09-09"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
+  # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
+  - id: E_REVERIFY_RADAR_SEM_CADENCIA_HISTORICO_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-27"
+    verified_against: "git grep -n kg-radar 9c4f3082^ -- .github/workflows .githooks | wc -l → 0; hoje lint-artifacts.sh l.733 '# REGRA 52 — Todo .kg.yaml do repo passa no radar de INTEGRIDADE [HARD]'"
+    label: "CONFIRMED (histórico): no pai de 9c4f3082 nenhum workflow nem hook citava o kg-radar.sh (git grep = 0 linhas). A lacuna foi fechada pela REGRA 52, hoje em l.733 do lint, HARD."
+    narrative: "Re-verificação de E_RADAR_SEM_CADENCIA. A afirmação é sobre o passado e se reproduz pelo git. O estado de hoje é o que ela pediu: a REGRA 52 (Todo .kg.yaml do repo passa no radar de INTEGRIDADE) roda o radar em todo grafo do repo."
+    provenance:
+      source: "git 9c4f3082^ + .claude/validation/lint-artifacts.sh @ origin/main 8857bc9b8"
+      locator: "git grep no commit pai; lint-artifacts.sh l.733-745"
+      method: "measurement: git grep no commit pai + grep -n da regra no lint atual"
+      locality: "repo"
+  - id: E_REVERIFY_REGRA_SEM_FIXTURE_SEGUE_SEM_GATE_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-27"
+    verified_against: "grep -n -i 'sem fixture|regra-sem-fixture|regra sem selftest' lint-artifacts.sh rules-registry.sh → nenhuma guarda dessa classe; bash .claude/validation/consumed-mode-check.sh → 'pares de produção: 74 · sem teste: 0 … ✅ todo modo consumido é exercitado pelo selftest'; lint l.889 '# REGRA 59 — Modo que a produção consome é exercitado pela bancada [HARD]'; lint-selftest.sh l.143 STRICT"
+    label: "CONFIRMED no vivo: segue sem gate de regra-sem-fixture. O vizinho mais perto é a REGRA 59 (Modo que a produção consome é exercitado pela bancada), que julga o modo do helper (74 pares, 0 sem teste), não a regra sem caso."
+    narrative: "Re-verificação de C_SEM_GATE_REGRA_SEM_TESTE. O STRICT do selftest mudou de linha (64/69 → 143) e segue reprovando skip por tooling. O consumed-mode-check.sh registra no cabeçalho que a 1ª tentativa do gate 'regra sem teste' morreu por casar nome de função (8 falsos positivos). A 6ª catraca continua candidata."
+    provenance:
+      source: ".claude/validation/consumed-mode-check.sh + .claude/validation/lint-artifacts.sh + .claude/validation/lint-selftest.sh @ origin/main 8857bc9b8"
+      locator: "consumed-mode-check.sh l.13-17 e saída; lint-artifacts.sh l.889; lint-selftest.sh l.138-143"
+      method: "measurement: consumed-mode-check.sh rodado + grep -n da classe no lint e no registro de regras"
+      locality: "repo"
 
 edges:
   - from: C_LACUNA_E_COBERTURA
@@ -941,3 +974,9 @@ edges:
   - from: E_A_FORMA_PRUNE_DEIXOU_DE_SER_INVISIVEL
     to: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
     edge_type: SUPERSEDES
+  - from: E_REVERIFY_RADAR_SEM_CADENCIA_HISTORICO_1027
+    to: E_RADAR_SEM_CADENCIA
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_REGRA_SEM_FIXTURE_SEGUE_SEM_GATE_1027
+    to: C_SEM_GATE_REGRA_SEM_TESTE
+    edge_type: SUPPORTS
