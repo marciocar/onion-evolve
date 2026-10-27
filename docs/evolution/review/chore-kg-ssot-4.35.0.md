@@ -2,8 +2,8 @@
 branch: chore/kg-ssot-4.35.0
 pr: 1411
 date: 2026-10-27
-reviewed_diff_sha256: 02f3827e3cb71d5e8b6f9cc39185c8357209d1c398e2e8b61204c31c6af8c358
-reviewed_code_sha256: 61813e4ff543a8e3e4471fd5cc5659b91bf564cd3e3340cf4fafad369a2f930a
+reviewed_diff_sha256: b83542c9d5f4494deed35711e9534d3ec854107c85b0731abd867f0b91a26f04
+reviewed_code_sha256: fa52ef09449bb02ebc8826528fbe37c2ad394ef53ed892f62c986bfb3f7028b6
 findings_total: 8
 findings_real: 8
 tokens: 95974
@@ -83,6 +83,16 @@ Depois do recarimbo acima, entrou um único commit: o grafo de coordenação fec
 (f2118c1), o `gh pr view 1404` dá MERGED (8857bc9b8) e o `peer-ref-check` do `E_MEASURE_WORKLOG_HOOKS` dá rc 0 @
 f2118c1. O grafo passa no radar (`--integrity --schema`), no contrato e na REGRA 58 (35 de 40 nós, nenhum `done` sem
 carimbo). Nenhum script mudou.
+
+## Recarimbo depois do rebase sobre o #1412
+
+O #1412 (a migração para o Python 3.15, 5a60fb5fa) entrou na main e também mexeu no grafo de coordenação: fechou a
+`Q_COORD_MAESTRO_FECHAR_SESSOES_ANTIGAS` por selo do maestro e pôs um DEPENDS_ON na
+`Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS`. No conflito fiquei com o fechamento da main, sem duplicar o meu, e
+mantive o nó novo `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA`. O `Q_COORD_CORE_PYTHON_315_PISO_312`
+segue fechado por este PR, que entrega o piso 3.12 do template. Os conflitos de projeção (backlog e inventário) foram
+regenerados. O grafo passa no radar (`--integrity --schema`), no contrato e na REGRA 58 (O backlog cumpre as
+promessas do próprio `meta:`): 35 de 40 nós, nenhum `done` sem carimbo. Nenhum script deste PR mudou.
 
 ## Limites declarados
 
