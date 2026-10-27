@@ -1354,7 +1354,108 @@ nodes:
       Correção feita no caminho, registrada: primeiro o core disse que reusaria o "gerador" de contextos do kg-ssot. O kg-ssot mediu e corrigiu: lá a projeção do .md a partir do grafo é disciplina, sem gerador nem gate (E_KGSSOT_PRECEDENT_IS_DISCIPLINE, na curadoria @ 668e13b). É dessa correção que nasce o degrau 1, o checador que faltava.
       Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar.
     trace: ".claude/utils/scope/resolve-context-dir.sh"
+  - id: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "auditoria da migração 3.12 → 3.15.2 na VPS (relatório da sessão, sem execução em serviço) e medida desta branch: o kg_validate.py do vendor sobre as 431 fixtures .yaml de conformidade (as 395 .kg.yaml e as 36 do perfil estrito) dá saída byte a byte igual no python3 3.12.3 do sistema (PyYAML 6.0.1 com libyaml e jsonschema 4.10.3 do apt) e no 3.15.2 com o pino por hash (PyYAML 6.0.3 puro, jsonschema 4.26.0), rc 1 nos dois; o kg-radar.sh --integrity --schema sobre docs/onion/graph/onion-identity-2026-07.kg.yaml dá a mesma saída nos dois; o plan do ops/migrate-python-service.sh lê as duas units vivas no python3.12 do sistema, com 7 e 6 tools no /health, iguais às do código"
+    trace: "ops/migrate-python-service.sh"
+    label: "Os dois MCPs de grafo da VPS rodam no python3 3.12 do sistema com as libs do apt (jsonschema 4.10.3), que o CI não testa; no 3.15.2 com o pino por hash, o veredito do contrato sobre as fixtures de conformidade sai idêntico ao de hoje."
+    narrative: |-
+      O que a auditoria mediu (stdlib, wheels, YAML, JSON): nenhum uso de stdlib removida entre o 3.13 e o 3.15 nas fontes do core, do kg-ssot e do bridge; das libs pinadas, só o PyYAML 6.0.3 fica sem wheel cp315, e no 3.15 ele compila do sdist sem a libyaml (parse em massa ~7× mais lento, o kg_gate do corpus de 10,2 s para 15,6 s, o radar de um grafo igual dentro do ruído). O desvio que pesa mais que a versão é o de produção: o jsonschema 4.10.3 do apt contra o 4.26.0 do pino.
+      A DIVERGÊNCIA C × puro do YAML: a libyaml recusa a fixture warn-lone-surrogate.kg.yaml (o escape de surrogate solto, ScannerError) e o leitor puro a aceita. Medido nesta branch, ela NÃO muda veredito do escritor: o kg_validate.py já manda todo texto com escape de surrogate para o leitor puro (a regex RISKY, também no 3.12 com a libyaml), e o veredito dessa fixture é PASS com o aviso SHOULD yaml.lone-surrogate nos dois intérpretes; o escritor compõe com o SafeLoader puro desde sempre (o _NoAliasLoader), e a guarda de aninhamento só roda os dois parsers quando há indício de profundidade, engolindo o erro de sintaxe dos dois. A divergência só existe no CSafeLoader cru, que nenhum caminho de julgamento usa.
+      Uma divergência que o relatório não tinha, medida pela passada adversarial desta branch: nas 32 fixtures .kg.json, o json da stdlib do 3.13 em diante aponta outra LINHA no erro de sintaxe em 2 delas (bad-duplicate-then-syntax e bad-trailing-comma: linha 17 vira 16, 5 vira 4). O veredito e o código (parse.yaml-error) não mudam, só o locator `line`; e os dois serviços gravam e julgam só .kg.yaml. Por isso a paridade do wrapper mede os .yaml e deixa o .kg.json de fora, declarado no código.
+      O que a medida desta branch acrescentou ao relatório: o MCP de leitura também precisa das libs, porque o PATH do venv faz o kg-radar.sh que ele chama usar o python3 do venv; e a worktree servida dele está num SHA cujo pino (rpds-py 2026.6.3) é anterior ao que tem wheel cp315, então ela sobe para a origin/main antes da troca.
+    provenance:
+      source: "ops/migrate-python-service.sh"
+      locator: "saída do kg_validate.py sobre as fixtures de conformidade nos dois intérpretes (cmp igual), do kg-radar.sh no grafo de identidade nos dois, e do plan do wrapper nas duas units"
+      method: "measurement: comparação byte a byte do veredito do contrato e do radar entre o intérprete de hoje e o novo, e leitura das units vivas pelo plan"
+      locality: "repo"
+  - id: Q_PYYAML_604_CP315_GATILHO_1027
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ssot e no vendor do core, e os venvs dos serviços são remontados."
+    narrative: |-
+      Nasce do selo D_PY315_YAML_LEITOR_PURO_ATE_604_1027: até lá, no 3.15, o leitor YAML é o puro. O conserto já está mergeado no upstream (o PR 971 do yaml/pyyaml, de 2026-10-07, gera os wheels cp315 no CI) e não foi publicado; nenhum mantenedor deu data.
+      Gatilho, medido pela API JSON do PyPI: `curl -fsS https://pypi.org/pypi/PyYAML/json` lista um release acima de 6.0.3 com um arquivo cujo nome tem `cp315`. Quando isso acontecer: (1) o kg-ssot sobe o pino com hash no tools/requirements.txt dele e o core adota a tag pelo vendor; (2) o CI do core passa a provar a libyaml também no 3.15 (hoje só o piso 3.12 a prova); (3) o maestro roda o apply de cada serviço de novo, porque o venv é endereçado pelo hash do requirements.txt e o drop-in aponta o novo.
+      Fecha quando o pino novo estiver na origin/main do core e o verify dos dois serviços mostrar a libyaml presente.
+    trace: "vendor/kg-ssot/tools/requirements.txt"
+  - id: D_PY315_SERVICOS_VENV_DEDICADO_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Venv dedicado em 3.15.2, com o pino por hash, para o escritor e para o leitor»"
+    label: "O escritor de grafos e o MCP de leitura da VPS vão para o Python 3.15.2, cada um num venv dedicado com as libs fixadas por hash, as mesmas que o CI testa, e saem do jsonschema 4.10.3 do apt."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Venv dedicado em 3.15.2, com o pino por hash, para o escritor e para o leitor»; descartadas: «Venv dedicado em 3.14.10 já» · «Esperar o PyYAML 6.0.4 e ficar no apt até lá» · «Deixar o leitor no python3 3.12 do sistema»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Qual intérprete para o escritor de grafos (onion-vps-mcp-kg-writer) e para o MCP de leitura (onion-vps-mcp-kg-granaai)?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+  - id: D_PY315_CHAT_RUNNER_MIGRA_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Migrar o runner para o intérprete de patch fixo fora do HOME»"
+    label: "O chat-runner do onion-bridge também migra para o Python 3.15.2, num intérprete fora do HOME (a unit tem ProtectHome=yes), com PR no bridge e no core mudando juntos o literal do template, da allowlist e da verificação."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Migrar o runner para o intérprete de patch fixo fora do HOME»; descartadas: «Manter o python3 3.12 do sistema no runner»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «O chat-runner do bridge (onion-chat@.service) migra para o 3.15 ou fica no python3 do sistema?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+  - id: D_PY315_YAML_LEITOR_PURO_ATE_604_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Ficar no PyYAML com o leitor puro e subir o pino quando sair o 6.0.4»"
+    label: "No 3.15 o leitor YAML é o puro do PyYAML 6.0.3, que não tem wheel cp315; o pino sobe quando sair o 6.0.4 com o wheel, pelo gatilho da pergunta Q_PYYAML_604_CP315_GATILHO_1027."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Ficar no PyYAML com o leitor puro e subir o pino quando sair o 6.0.4»; descartadas: «Avaliar o ruamel.yaml» · «Instalar o wheel do artefato do Actions do PyYAML»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «A dependência de YAML do core no 3.15, sem wheel cp315 do PyYAML 6.0.3?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+  - id: D_PY315_EXECUCAO_POR_OPS_E_OPT_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Graduar o script para ops/ com bancada, e o intérprete no diretório fixo onion-python de opt, dono root»"
+    label: "A migração roda por um script em ops/ com bancada, e o intérprete dos serviços fica num lugar fixo, o diretório onion-python de opt, com dono root e patch controlado; o apply e o rollback são comandos do maestro."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Graduar o script para ops/ com bancada, e o intérprete no diretório fixo onion-python de opt, dono root»; descartadas: «Apontar o serviço para o venv do uv no HOME» · «Rodar o script do scratchpad uma única vez»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Onde o intérprete dos serviços vive e como a migração é executada?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
 edges:
+  - from: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
+    to: Q_PYYAML_604_CP315_GATILHO_1027
+    edge_type: SUPPORTS
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
     edge_type: SUPPORTS
@@ -1603,4 +1704,16 @@ edges:
     edge_type: SUPPORTS
   - from: D_DESIGN_SETUP_OPCAO1_GRAFO_PILOTO_1027
     to: Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027
+    edge_type: TRACES_TO
+  - from: D_PY315_SERVICOS_VENV_DEDICADO_1027
+    to: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: D_PY315_CHAT_RUNNER_MIGRA_1027
+    to: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: D_PY315_YAML_LEITOR_PURO_ATE_604_1027
+    to: Q_PYYAML_604_CP315_GATILHO_1027
+    edge_type: TRACES_TO
+  - from: D_PY315_EXECUCAO_POR_OPS_E_OPT_1027
+    to: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
     edge_type: TRACES_TO
