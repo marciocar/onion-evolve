@@ -3,7 +3,6 @@ branch: docs/reverify-research-read-only
 pr: pendente
 date: 2026-10-27
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 6
 findings_real: 4
 tokens: 135767
