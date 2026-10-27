@@ -5,7 +5,7 @@ meta:
   baseline: "2026-10-11"
   review_after: "2026-11-10"   # 30d: FERRAMENTA/LICENCA e o tipo dominante (cadencia da doutrina); o Conductor solta release por semana
   # kg-backlog-guard: on
-  # ═══ TETO: 12 NÓS ═══
+  # ═══ TETO: 12 NÓS (o 12º é a re-medida do N1, 2026-10-27) ═══
   #
   # SEGUNDA dissecacao do /meta:dissect e PRIMEIRA a chegar ao N4. E dogfood do SAC-77 (costura
   # dissect→forge): a pergunta nao era so "o Onion absorve o Conductor?", era "onde o veredito do
@@ -217,7 +217,31 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
       locality: "pessoa"
 
+  - id: E_REMEDIDA_N1_CORPUS_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    x_dissect_level: 1
+    verified_at: "2026-10-27"
+    verified_against: "bash .claude/validation/kg-corpus-grep.sh conductor na main 8857bc9b: '# corpus: 203 grafos · termos: conductor · 15 nó(s)', com E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO (confirmed, tier=10) e E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME (confirmed, tier=6) entre eles"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "O N1 pago pelo corpus se confirma rodando: o kg-corpus-grep acha os dois nós que o N1 cita, confirmed e com os tiers citados (10 e 6). O corpus cresceu de 10 para 15 nós com o termo, e os 5 novos são da própria dissecação e do estudo dissect-forge."
+    narrative: "Dos 15 nós de hoje, 4 são deste grafo, 2 do dissect-forge-2026-10, 8 do agent-command-composition-2026-09 e 1 do forge-comando-framework-2026-09. O N1 não muda: os dois nós em que ele se apoia seguem os mesmos, e o que entrou depois veio desta dissecação. De quebra, a absorção que o plano A_PLAN_VERIFICACAO_PELO_MOTOR pedia está no motor: grep -n engine-verify .claude/workflows/onion-research.js acha o bloco nas linhas 259 a 309, com MAX_WRITE_ATTEMPTS = 3 na 264."
+    trace: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml"
+    provenance:
+      source: "bash .claude/validation/kg-corpus-grep.sh conductor"
+      locator: "linhas E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO e E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME da saída; cabeçalho com 15 nós"
+      method: "measurement: kg-corpus-grep.sh rodado na main do core em 2026-10-27"
+      locality: "repo"
+
 edges:
+
+  - from: E_REMEDIDA_N1_CORPUS_1027
+    to: E_N1_CORPUS_PAGOU
+    edge_type: SUPPORTS
 
   - from: E_N0_IDENTIDADE
     to: Q_CONDUCTOR_ABSORVER_OU_NAO_1011

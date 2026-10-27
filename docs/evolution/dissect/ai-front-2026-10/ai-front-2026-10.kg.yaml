@@ -6,7 +6,7 @@ meta:
   baseline: "2026-10-26"
   review_after: "2026-12-26"   # o MESMO prazo da dissecação de origem (família ideia, estudo em ondas)
   # kg-backlog-guard: on
-  # ═══ TETO: 3 NÓS. Triagem fechada: cresce quando o piloto 3 da curadoria voltar com resultado. ═══
+  # ═══ TETO: 4 NÓS. Triagem fechada: cresce quando o piloto 3 da curadoria voltar com resultado (voltou: o 4º nó é a re-medida de 2026-10-27, que o mede). ═══
   #
   # TRIAGEM DO CORE de uma dissecação feita FORA dele: o adotante de curadoria dissecou a ideia de uma frente
   # fixa de IA (família ideia, destino projeto:onion-curation) e propôs PERSEGUIR como estudo em ondas, com o
@@ -30,7 +30,7 @@ nodes:
   - id: E_CURADORIA_AI_FRONT_1026
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.75
     x_dissect_level: 3
@@ -78,7 +78,34 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
 
+  - id: E_REMEDIDA_AI_FRONT_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "peer-ref-check.sh onion-curation nos 4 nós citados pela triagem (rc 0, EXISTE na origin/main do par @ f2118c198678); o grafo lido ali pelo PyYAML tem 28 nós: D_AI_FRONT_VERDICT done (verified_at 2026-10-27), E_N2_PILOT3_RESULT confirmed e D_AI_FRONT_RADAR_COUPLING_1027 done"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "A leitura da triagem andou: o piloto 3 já rodou na curadoria e deu 0 fatos de pé, o 3º inconclusivo, e o maestro selou lá, em 2026-10-27, acoplar a frente de IA ao eixo de treino e inferência do radar do core, sem piloto 4. O perseguir segue."
+    narrative: "O que a triagem de 2026-10-26 leu e mudou: D_AI_FRONT_VERDICT estava open e hoje é done, com o label reescrito para três pilotos inconclusivos e a forma da frente devolvida ao maestro; E_N2_PILOT3_RESULT (confirmed, 2026-10-26) diz que o juiz separado aceitou 1 achado em 6 perguntas e a revisão adversarial o derrubou; D_AI_FRONT_RADAR_COUPLING_1027 registra a escolha «Acoplar ao eixo do radar», descartadas «Piloto 4 mais rigoroso», «Encerrar a frente fixa» e «Depois». Com isso o gatilho do Q_AI_FRONT_PILOTO3_RESULTADO DISPAROU (há nó de resultado do piloto 3 que não está open) e a resposta é não. Fechar a pergunta e registrar aqui a decisão do acoplamento é triagem do core sobre um sinal da curadoria, e fica para ela: este nó só mede. A decisão D_AI_FRONT_PILOTO3_1026 (rodar o piloto 3) foi cumprida, não derrubada."
+    trace: "docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml"
+    provenance:
+      source: "github.com/marciocar/onion-curation@f2118c198678:docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml"
+      locator: "D_AI_FRONT_VERDICT, C_PILOT3_PROPOSAL, C_PILOT3_PLAN, E_N2_PILOT2_RESULT, E_PILOT2_POETA_PTBR_SLM, E_N2_PILOT3_RESULT e D_AI_FRONT_RADAR_COUPLING_1027"
+      method: "measurement: peer-ref-check.sh na origin/main do par e o grafo dela lido por parser, em 2026-10-27"
+      locality: "repo"
+
 edges:
+
+  - from: E_REMEDIDA_AI_FRONT_1027
+    to: E_CURADORIA_AI_FRONT_1026
+    edge_type: SUPERSEDES
+  - from: E_REMEDIDA_AI_FRONT_1027
+    to: Q_AI_FRONT_PILOTO3_RESULTADO
+    edge_type: TRACES_TO
 
   - from: Q_AI_FRONT_PILOTO3_RESULTADO
     to: E_CURADORIA_AI_FRONT_1026

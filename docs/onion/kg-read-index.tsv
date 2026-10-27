@@ -1461,6 +1461,7 @@ docs/discussions/vps-shared-tools/SEED.md	Q_monitoring_stack	docs/onion/graph/vp
 docs/discussions/vps-shared-tools/SEED.md	Q_p2_clarify	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
 docs/discussions/vps-shared-tools/SEED.md	Q_tunneling	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
 docs/evolution/README.md	Q_gatilho	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
+docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml	E_REMEDIDA_AI_FRONT_1027	docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml
 docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml	D_CEDAR_1001	docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml
 docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml	E_CORPUS_PAGOU_N0_A_N2	docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml
 docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml	E_N2_LACUNA_EXECUCAO	docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml
@@ -1469,7 +1470,10 @@ docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	D_CONDUCTOR_1
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	E_DOGFOOD_CONDUCTOR_ATE_N4	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	E_N3_FAIL_OPEN_NAO_TRANSFERE	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	Q_CONDUCTOR_ABSORVER_OU_NAO_1011	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
+docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml	E_REMEDIDA_PECAS_CORTEX_1027	docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml
+docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml	E_REMEDIDA_DUOLINGO_1027	docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml
 docs/evolution/dissect/intelligent-ui-2026-10/data/run-wf_95b7868c-c7d.json	D_INTELLIGENT_UI_1021	docs/evolution/dissect/intelligent-ui-2026-10/intelligent-ui-2026-10.kg.yaml
+docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	E_REMEDIDA_SUPERACAO_SUPERPOWERS_1027	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_AUTORIDADE_NO_PROBE	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_TRES_SKILLS	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 docs/evolution/federation-roadmap-2026.md	C_naive_admin_platform	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -1612,6 +1616,7 @@ docs/evolution/research/agent-command-composition-2026-09/agent-command-composit
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_PRIMARIES_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_MERCADO_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_N1_CORPUS_PAGOU	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
+docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_REMEDIDA_N1_CORPUS_1027	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONDUCTOR_VETO_ANCHORING_PENDING	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_DESTINO_DIFERENCIAL_OU_LACUNA	docs/onion/graph/forge-comando-framework-2026-09.kg.yaml
