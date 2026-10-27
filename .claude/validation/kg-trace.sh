@@ -59,10 +59,20 @@ if [ -n "${OUT}" ]; then
   # Escrita atômica: o script chama a si mesmo com o stdout num temporário AO LADO do destino (mesmo sistema de
   # arquivos, então o mv é rename) e só troca o destino com rc 0. Nenhum caminho de erro toca no destino.
   _odir="$(dirname -- "${OUT}")"
-  # o diretório do destino nasce se faltar (o dia 1, e a worktree descartável onde docs/onion/ não é rastreado)
-  mkdir -p -- "${_odir}" 2>/dev/null && [ -d "${_odir}" ] || { echo "ERRO kg-trace --out: diretório do destino inválido (${_odir})" >&2; exit 2; }
-  _otmp="$(mktemp "${_odir}/.kg-read-index.XXXXXX")" || { echo "ERRO kg-trace --out: não consegui criar temporário em ${_odir}" >&2; exit 2; }
-  trap 'rm -f "${_otmp}"' EXIT   # interrupção no meio não deixa o temporário na árvore
+  # o diretório do destino nasce se faltar (o dia 1, e a worktree descartável onde docs/onion/ não é rastreado),
+  # porque o temporário mora AO LADO do destino. Mas ele só FICA no sucesso: `_onew` guarda o ancestral mais alto
+  # que ESTE script criou, e todo caminho de erro desfaz a cadeia (rmdir, só vazio; o que já existia nunca é tocado).
+  # Revisão adversarial do adotante sge (2026-10-27): o mkdir antes do produto deixava o diretório no rc 3.
+  _onew="" _op="${_odir}"
+  while [ ! -e "${_op}" ] && [ ! -L "${_op}" ]; do _onew="${_op}"; _op="$(dirname -- "${_op}")"; done
+  _oundo() {
+    [ -n "${_onew}" ] || return 0
+    local _d="${_odir}"
+    while rmdir -- "${_d}" 2>/dev/null; do [ "${_d}" = "${_onew}" ] && break; _d="$(dirname -- "${_d}")"; done
+  }
+  mkdir -p -- "${_odir}" 2>/dev/null && [ -d "${_odir}" ] || { _oundo; echo "ERRO kg-trace --out: diretório do destino inválido (${_odir})" >&2; exit 2; }
+  _otmp="$(mktemp "${_odir}/.kg-read-index.XXXXXX")" || { _oundo; echo "ERRO kg-trace --out: não consegui criar temporário em ${_odir}" >&2; exit 2; }
+  trap 'rm -f "${_otmp}"; _oundo' EXIT   # interrupção no meio não deixa o temporário nem o diretório novo na árvore
   _args=() _skip=0
   for a in "$@"; do
     [ "${_skip}" -eq 1 ] && { _skip=0; continue; }
@@ -73,8 +83,9 @@ if [ -n "${OUT}" ]; then
     0) if [ ! -s "${_otmp}" ]; then rm -f "${_otmp}"; echo "ERRO kg-trace --out: rc 0 com índice vazio — ${OUT} INTACTO" >&2; exit 2; fi
        # o modo do destino é preservado (o mktemp nasce 0600 e o mv levaria esse modo à árvore)
        if [ -e "${OUT}" ]; then chmod --reference="${OUT}" "${_otmp}" 2>/dev/null || chmod 644 "${_otmp}"; else chmod 644 "${_otmp}"; fi
-       mv -f "${_otmp}" "${OUT}"; exit 0 ;;
-    # rc 3: NENHUM caminho de erro escreve no destino — nem o vazio do dia 1 (a REGRA 84 dá SOFT sem o índice)
+       mv -f "${_otmp}" "${OUT}"; _onew=""; exit 0 ;;
+    # rc 3: NENHUM caminho de erro escreve no destino — nem o vazio do dia 1 (a REGRA 84 dá SOFT sem o índice),
+    # nem o diretório que o mkdir acima criou (o trap EXIT o desfaz)
     3) rm -f "${_otmp}"
        echo "AVISO kg-trace --out: o produto declarou índice VAZIO (rc 3) — ${OUT} INTACTO (ausente segue ausente; a REGRA 84 julga a divergência; se os traces sumiram de propósito, esvazie à mão)" >&2
        exit 3 ;;
