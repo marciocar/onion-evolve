@@ -7579,6 +7579,104 @@ run_mutant_leftover_selftests() {
 
 }
 
+# ── O HELPER DE MUTAÇÃO: ÂNCORA ÚNICA, LINHA DE BASE E SAÍDAS DISTINTAS (2026-10-27) ──────────────────
+# POR QUE EXISTE: a curadoria mediu o ops/mutate-and-restore.sh contra o mutate.py de um framework irmão, no mesmo
+# alvo e no mesmo teste (docs/evolution/dissect/cortex-2026-10/ no core), e achou o helper AFIRMANDO o que não mediu:
+# com a âncora repetida ele trocava a 1ª em silêncio; o rc 3 valia para "não plantei" e para um teste que sai 3; e
+# ninguém rodava o teste sem o mutante antes, então com a linha de base vermelha todo mutante saía "morto".
+# Os casos rodam num SANDBOX (mktemp) e cada um vira um script que sai 0 quando o caso passa: assim o PRÓPRIO helper
+# vivo planta, numa CÓPIA dele mesmo, o mutante de cada cura, e o caso tem de morrer (rc 1 do helper vivo). A linha
+# de base do mutante é o caso na cópia sem mutante — exatamente a cura que esta família prova.
+# Casos: (a) âncora ausente → 3, nada rodado · (b) repetida → 4, nomeia a contagem, nada rodado · (c) sobreposta
+# ('aa' em 'aaa') → 4 · (d) única e o teste pega → 1, alvo restaurado, rc cru no MUTATE_RC_FILE · (e) única e o
+# teste não pega → 0 · (f) linha de base vermelha → 5, o comando rodou UMA vez e nada foi plantado · (g) o teste que
+# sai 3 → 1 do helper e 3 no MUTATE_RC_FILE · (h) NOVO sem o marcador → 2 · (i) TERM no meio do comando mutado →
+# 143 e alvo restaurado · (j) MUTATE_BASELINE_PROVEN pula a linha de base e DECLARA em stderr · (k) CRLF preservado.
+run_mutate_helper_selftests() {
+  local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
+  [ -f "${helper}" ] || { record_skip "mutate-helper: ops/mutate-and-restore.sh ausente (core-only)"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "mutate-helper: python3 ausente → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  local _M="ONION""_MUTANTE"   # partido: a família não se acusa no mutant-leftover
+  cat > "${d}/case.sh" <<'CASE'
+#!/usr/bin/env bash
+# case.sh <helper> <caso> — sai 0 quando o caso passa contra <helper>
+set -u
+H="$1"; C="$2"; M="ONION""_MUTANTE"
+unset MUTATE_BASELINE_PROVEN MUTATE_RC_FILE
+w="$(mktemp -d)"; trap 'rm -rf "${w}"' EXIT; cd "${w}"
+printf 'def f():\n    return 1\ndef g():\n    return 1\ndef h():\n    return 2\n' > alvo.py
+h0="$(sha256sum alvo.py)"
+intact() { [ "$(sha256sum alvo.py)" = "${h0}" ] && ! grep -q "${M}" alvo.py; }
+ran() { [ -f runs ] && wc -l < runs | tr -d ' '; [ -f runs ] || echo 0; }
+rc=0
+case "${C}" in
+  a) err="$(bash "${H}" alvo.py "return 9|||return 8  # ${M}" sh -c 'echo r >> runs' 2>&1)" || rc=$?
+     [ "${rc}" = 3 ] && intact && [ "$(ran)" = 0 ] && grep -q 'AUSENTE' <<<"${err}" ;;
+  b) err="$(bash "${H}" alvo.py "return 1|||return 7  # ${M}" sh -c 'echo r >> runs' 2>&1)" || rc=$?
+     [ "${rc}" = 4 ] && intact && [ "$(ran)" = 0 ] && grep -q '2 ocorrências' <<<"${err}" ;;
+  c) printf 'aaa\n' > o.txt
+     bash "${H}" o.txt "aa|||b ${M}" true >/dev/null 2>&1 || rc=$?
+     [ "${rc}" = 4 ] && [ "$(cat o.txt)" = aaa ] ;;
+  d) MUTATE_RC_FILE="${w}/rcf" bash "${H}" alvo.py "return 2|||return 7  # ${M}" grep -q 'return 2' alvo.py >/dev/null 2>&1 || rc=$?
+     [ "${rc}" = 1 ] && intact && [ "$(cat rcf 2>/dev/null)" = 1 ] ;;
+  e) bash "${H}" alvo.py "return 2|||return 2  # ${M}" grep -q 'return 2' alvo.py >/dev/null 2>&1 || rc=$?
+     [ "${rc}" = 0 ] && intact ;;
+  f) bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'echo r >> runs; exit 1' >/dev/null 2>&1 || rc=$?
+     [ "${rc}" = 5 ] && intact && [ "$(ran)" = 1 ] ;;
+  g) MUTATE_RC_FILE="${w}/rcf" bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'grep -q "return 2" alvo.py || exit 3' >/dev/null 2>&1 || rc=$?
+     [ "${rc}" = 1 ] && intact && [ "$(cat rcf 2>/dev/null)" = 3 ] ;;
+  h) bash "${H}" alvo.py "return 2|||return 7" true >/dev/null 2>&1 || rc=$?
+     [ "${rc}" = 2 ] && intact ;;
+  i) bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'grep -q "ONION""_MUTANTE" alvo.py && kill -TERM "${PPID}"; exit 0' >/dev/null 2>&1 || rc=$?
+     [ "${rc}" = 143 ] && intact ;;
+  j) err="$(MUTATE_BASELINE_PROVEN="prova de bancada" bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'echo r >> runs; exit 1' 2>&1)" || rc=$?
+     [ "${rc}" = 1 ] && intact && [ "$(ran)" = 1 ] && grep -q 'linha de base NÃO rodada' <<<"${err}" ;;
+  k) printf 'x = 1\r\ny = 2\r\n' > crlf.txt; c0="$(grep -c $'\r' crlf.txt)"
+     bash "${H}" crlf.txt "y = 2|||y = 3  # ${M}" bash -c '[ "$(grep -c $'"'"'\r'"'"' crlf.txt)" = 2 ] || exit 0; grep -q "y = 2" crlf.txt' >/dev/null 2>&1 || rc=$?
+     # o mutante tem de MORRER pelo conteúdo (y = 2 sumiu) com os dois CR intactos; sem eles, o comando sai 0 (sobrevive)
+     [ "${rc}" = 1 ] && [ "${c0}" = 2 ] && [ "$(grep -c $'\r' crlf.txt)" = 2 ] ;;
+  *) exit 2 ;;
+esac
+CASE
+  local c names="a:âncora ausente → rc 3, nada rodado|b:âncora repetida → rc 4 com a contagem, nada rodado|c:âncora sobreposta ('aa' em 'aaa') → rc 4|d:âncora única e o teste pega → rc 1, alvo restaurado, rc cru no MUTATE_RC_FILE|e:o teste não pega → rc 0 (sobreviveu)|f:linha de base vermelha → rc 5, o comando rodou uma vez, nada plantado|g:o teste que sai 3 → rc 1 do helper e 3 no MUTATE_RC_FILE|h:NOVO sem o marcador → rc 2|i:TERM no meio do comando mutado → rc 143 e alvo restaurado|j:MUTATE_BASELINE_PROVEN pula a linha de base e declara|k:fins de linha CRLF preservados"
+  local IFS_OLD="${IFS}" entry desc
+  IFS='|'
+  for entry in ${names}; do
+    IFS="${IFS_OLD}"
+    c="${entry%%:*}"; desc="${entry#*:}"
+    if LC_ALL=C bash "${d}/case.sh" "${helper}" "${c}" >/dev/null 2>&1; then record_pass "mutate-helper: (${c}) ${desc}"
+    else record_fail "mutate-helper: (${c})" "não passou contra o helper vivo: ${desc}"; fi
+    IFS='|'
+  done
+  IFS="${IFS_OLD}"
+  # (m) UM MUTANTE POR CURA, plantado pelo helper VIVO numa CÓPIA dele: <caso que morre>\x1f<âncora>\x1f<novo>
+  local want old new mrc n
+  while IFS=$'\x1f' read -r want old new; do
+    [ -n "${want}" ] || continue
+    cp "${helper}" "${d}/h.sh"
+    n="$(grep -cF -- "${old}" "${d}/h.sh" || true)"
+    if [ "${n}" != 1 ]; then record_fail "mutate-helper: (m) ${want}" "âncora do mutante aparece ${n}× no helper (tem de ser 1): ${old:0:80}"; continue; fi
+    mrc=0; LC_ALL=C bash "${helper}" "${d}/h.sh" "${old}|||${new}" bash "${d}/case.sh" "${d}/h.sh" "${want}" >/dev/null 2>&1 || mrc=$?
+    if [ "${mrc}" = 1 ]; then record_pass "mutate-helper: (m) mutante reprova (${want})"
+    else record_fail "mutate-helper: (m) ${want}" "o mutante não morreu (rc ${mrc} do helper; 0 = sobreviveu, 3 a 6 = não plantou): ${new:0:80}"; fi
+  done <<EOF_MH
+a$(printf '\x1f')— nada plantado (rc 3)" >&2; exit 3 ;;$(printf '\x1f')— nada plantado" >&2; exit 1 ;;  # ${_M}
+b$(printf '\x1f')  1) : ;;$(printf '\x1f')  [1-9]*) : ;;  # ${_M}
+c$(printf '\x1f')    n += 1; i = s.find(a, i + 1)$(printf '\x1f')    n += 1; i = s.find(a, i + len(a))  # ${_M}
+f$(printf '\x1f')  if [ "\${_brc}" -ne 0 ]; then$(printf '\x1f')  if false; then  # ${_M}
+g$(printf '\x1f')[ "\${_rc}" -eq 0 ] && exit 0$(printf '\x1f')exit "\${_rc}"  # ${_M}
+e$(printf '\x1f')[ "\${_rc}" -eq 0 ] && exit 0$(printf '\x1f')exit 1  # ${_M}
+d$(printf '\x1f')[ -n "\${MUTATE_RC_FILE:-}" ] && printf$(printf '\x1f'): ${_M}; false && printf
+d$(printf '\x1f')trap _restore EXIT$(printf '\x1f')trap '' EXIT  # ${_M}
+i$(printf '\x1f')trap 'exit 143' TERM$(printf '\x1f')trap '' TERM  # ${_M}
+h$(printf '\x1f')in *"\${MARKER}"*) : ;; *)$(printf '\x1f')in *) : ;; ${_M})
+j$(printf '\x1f')if [ -n "\${MUTATE_BASELINE_PROVEN:-}" ]; then$(printf '\x1f')if false; then  # ${_M}
+k$(printf '\x1f')open(p, 'wb').write(s.replace(a, b, 1).encode('utf-8', 'surrogateescape'))$(printf '\x1f')open(p, 'w', encoding='utf-8').write(s.replace(a, b, 1).replace(chr(13), ''))  # ${_M}
+EOF_MH
+  rm -rf "${d}"
+}
+
 run_hook_chain_order_selftests() {
   local hook="${REPO_ROOT}/.githooks/pre-commit"
   if [ ! -f "${hook}" ]; then record_skip "hook-chain-order: .githooks/pre-commit ausente"; return; fi
@@ -11737,7 +11835,10 @@ run_stt_service_selftests() {
     if [ "${n}" != 1 ]; then record_fail "stt-service: (m) ${want}" "âncora do mutante aparece ${n}× em ${tgt} (tem de ser 1): ${old:0:80}"; continue; fi
     if mo="$(LC_ALL=C bash "${helper}" "${d}/mut/${tgt}" "${old}|||${new}" python3 -I -B "${st}/selftest.py" \
              --core "${d}/mut/stt_core.py" --smoke "${d}/mut/smoke.py" --until "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
-    if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want}" <<< "${mo}"; then record_pass "stt-service: (m) mutante reprova ${want}"
+    # rc do helper (ops/mutate-and-restore.sh): 1 = morreu · 0 = sobreviveu · 3, 4, 5, 6 = não plantou (âncora ausente,
+    # repetida, linha de base vermelha, escrita) — esses NUNCA contam como mutante que reprova
+    if [ "${mrc}" -eq 1 ] && grep -q "^FAIL ${want}" <<< "${mo}"; then record_pass "stt-service: (m) mutante reprova ${want}"
+    elif [ "${mrc}" -ge 3 ] && [ "${mrc}" -le 6 ]; then record_fail "stt-service: (m) ${want}" "o mutante NÃO foi plantado (rc ${mrc} do helper): $(grep '^mutate:' <<< "${mo}" | head -2 | tr '\n' '|')"
     else record_fail "stt-service: (m) ${want}" "o mutante SOBREVIVEU (rc=${mrc}): $(tail -2 <<< "${mo}" | tr '\n' '|')"; fi
   done <<EOF_MUT
 stt_core.py$(printf '\x1f')    if scheme.lower() not in AUTH_SCHEMES:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')esquema-estranho-recusa
@@ -11941,11 +12042,18 @@ PY
     cp "${wr}" "${d}/wops/stt-service.sh"
     nm="$(grep -cF -- "${old}" "${d}/wops/stt-service.sh" || true)"
     if [ "${nm}" != 1 ]; then record_fail "stt-service: ${name} (MUT)" "âncora aparece ${nm}× no wrapper (tem de ser 1): ${old:0:80}"; return; fi
+    # o caso acabou de passar no VIVO (ok=1) com o mesmo conteúdo: essa é a linha de base, e o helper não a re-roda
+    # (rodá-la de novo sujaria o estado que o <preparo> montou). Sem ela verde, o mutante não prova nada.
+    if [ "${ok}" != 1 ]; then record_fail "stt-service: ${name} (MUT)" "a linha de base (o caso no vivo) não passou: o mutante não provaria nada"; return; fi
     _st_reset; "${prep}"
-    mout="$(LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "${old}|||${new}" \
+    local hrc
+    mout="$(MUTATE_BASELINE_PROVEN="o caso ${name} passou no vivo" MUTATE_RC_FILE="${d}/mut-rc" LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "${old}|||${new}" \
             env ONION_STT_SERVICE_TEST=1 ONION_STT_SERVICE_ROOT="${d}/run/root" ONION_STT_SERVICE_ETC="${d}/run/etc" \
             ONION_STT_SERVICE_UNIT_DIR="${d}/run/units" ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" \
-            STT_FAKE="${d}/run/fk" PATH="${fk}:${PATH}" bash "${d}/wops/stt-service.sh" "$@" 2>&1)"; mrc=$?
+            STT_FAKE="${d}/run/fk" PATH="${fk}:${PATH}" bash "${d}/wops/stt-service.sh" "$@" 2>&1)"; hrc=$?
+    # o caso compara o rc CRU do wrapper (pode esperar 1 ou 3); o helper o grava no MUTATE_RC_FILE só quando plantou
+    if [ "${hrc}" != 0 ] && [ "${hrc}" != 1 ]; then record_fail "stt-service: ${name} (MUT)" "o mutante NÃO foi plantado (rc ${hrc} do helper)"; return; fi
+    mrc="$(cat "${d}/mut-rc" 2>/dev/null)"
     if [ "${mrc}" = "${want}" ] && { [ "${pat}" = - ] || grep -qE -- "${pat}" <<<"${mout}"; } && _st_post_ok; then
       record_fail "stt-service: ${name} (MUT)" "o mutante SOBREVIVEU: ${new:0:80}"
     else record_pass "stt-service: ${name} (MUT reprova)"; fi
@@ -11975,9 +12083,12 @@ PY
             '"ProtectSystem=strict" "ProtectHome=yes"|||"ProtectSystem=strict"  # ONION_MUTANTE' \
             '"DynamicUser=yes" "LoadCredential=token:${TOKEN_FILE}"|||"LoadCredential=token:${TOKEN_FILE}"  # ONION_MUTANTE'; do
     cp "${wr}" "${d}/wops/stt-service.sh"
-    local mu; mu="$(_st_reset; LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "${m1}" env ONION_STT_SERVICE_TEST=1 \
+    local mu murc=0; mu="$(_st_reset; LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "${m1}" env ONION_STT_SERVICE_TEST=1 \
       ONION_STT_SERVICE_ROOT="${d}/run/root" ONION_STT_SERVICE_ETC="${d}/run/etc" ONION_STT_SERVICE_UNIT_DIR="${d}/run/units" \
-      ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" bash "${d}/wops/stt-service.sh" show 2>&1)"
+      ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" bash "${d}/wops/stt-service.sh" show 2>&1)" || murc=$?
+    # o veredito aqui é pela SAÍDA; o rc do helper só diz se o mutante existiu (≥2 = não plantou: a saída vazia
+    # faria o mutante "reprovar" sem nunca ter sido plantado)
+    if [ "${murc}" -ge 2 ]; then record_fail "stt-service: (w1) MUT" "o mutante NÃO foi plantado (rc ${murc} do helper): ${m1:0:80}"; continue; fi
     local mmiss=""
     for want in 'ExecStart=.* --host 127.0.0.1 ' '^DynamicUser=yes$' '^ProtectHome=yes$' '^IPAddressDeny=any$'; do
       grep -qE -- "${want}" <<<"${mu}" || mmiss+=" ${want}"
@@ -11992,7 +12103,7 @@ PY
   git -C "${gr}" init -q -b main && git -C "${gr}" add -A && git -C "${gr}" -c user.email=t@t -c user.name=t commit -q -m base
   # o mutante é COMMITADO no checkout temporário antes de rodar: sem a guarda do ambiente, a produção segue e imprime a
   # unit (rc 0) — a prova de que é ESTA guarda, e não a do rastreio, que recusa
-  local r2m; r2m="$(LC_ALL=C bash "${helper}" "${gr}/ops/stt-service.sh" "  if compgen -e | grep -E '^ONION_STT_SERVICE_' >/dev/null; then|||  if false; then  # ONION_MUTANTE" \
+  local r2m; r2m="$(MUTATE_BASELINE_PROVEN="(w2) controle positivo: o vivo recusou com rc 3 acima" LC_ALL=C bash "${helper}" "${gr}/ops/stt-service.sh" "  if compgen -e | grep -E '^ONION_STT_SERVICE_' >/dev/null; then|||  if false; then  # ONION_MUTANTE" \
      bash -c 'cd "$1" && git -c user.email=t@t -c user.name=t commit -qam mutante && env ONION_STT_SERVICE_ROOT=/tmp/x bash ops/stt-service.sh show' _ "${gr}" 2>&1)"; local rc2m=$?
   if [ "${rc}" = 3 ] && grep -q 'não se redireciona' <<<"${r2}" && [ "${rc2m}" = 0 ] && grep -q '^\[Service\]' <<<"${r2m}"; then
     record_pass "stt-service: (w2) ONION_STT_SERVICE_* sem o modo de teste → rc 3 (e o mutante sem a guarda passa adiante)"
@@ -12056,11 +12167,15 @@ PY
   if [ "${rc}" = 0 ] && _st_post_ok; then record_pass "stt-service: (w15) --apply instala, gera o token 0600 sem imprimi-lo, prova antes e depois da troca"
   else record_fail "stt-service: (w15) --apply" "rc=${rc}: $(tail -4 "${d}/apply.out" | tr '\n' '|' | cut -c1-300)"; fi
   cp "${wr}" "${d}/wops/stt-service.sh"; _st_reset; _p_apply
-  _ST_LAST_OUT="$(LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "  priv sh -c 'umask 077; set -C;|||  priv sh -c 'umask 022; set -C; : ONION_MUTANTE;" \
+  # a linha de base é o (w15) no vivo, logo acima; re-rodá-la sujaria o estado do --apply que o mutante precisa limpo
+  local w15rc; w15rc="${rc}"
+  _ST_LAST_OUT="$(MUTATE_BASELINE_PROVEN="(w15) no vivo saiu rc ${w15rc}" LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" "  priv sh -c 'umask 077; set -C;|||  priv sh -c 'umask 022; set -C; : ONION_MUTANTE;" \
     env ONION_STT_SERVICE_TEST=1 ONION_STT_SERVICE_ROOT="${d}/run/root" ONION_STT_SERVICE_ETC="${d}/run/etc" \
     ONION_STT_SERVICE_UNIT_DIR="${d}/run/units" ONION_STT_SERVICE_BACKUP_DIR="${d}/run/bk" ONION_STT_SERVICE_LOCK="${d}/run/lock" \
     STT_FAKE="${d}/run/fk" PATH="${fk}:${PATH}" bash "${d}/wops/stt-service.sh" install --apply 2>&1)"; rc=$?
-  if [ "${rc}" = 0 ] && _st_post_ok; then record_fail "stt-service: (w15) MUT" "o token 0644 passou pela pós-condição"
+  if [ "${w15rc}" != 0 ]; then record_fail "stt-service: (w15) MUT" "a linha de base (o --apply no vivo) não passou: o mutante não provaria nada"
+  elif [ "${rc}" -ge 2 ]; then record_fail "stt-service: (w15) MUT" "o mutante NÃO foi plantado (rc ${rc} do helper)"
+  elif [ "${rc}" = 0 ] && _st_post_ok; then record_fail "stt-service: (w15) MUT" "o token 0644 passou pela pós-condição"
   else record_pass "stt-service: (w15) MUT reprova (token gerado com umask 022)"; fi
   _st_post_ok() { return 0; }
   # (w16) prova pré-troca que reprova: a unit de produção NÃO é tocada
@@ -12094,9 +12209,12 @@ PY
   # porque o stage_diar_bin só roda no --apply (o download real); o mutante tira o filtro e tem de reprovar
   _st_tarform() { grep -qF 'extractall(sys.argv[2], filter="data")' "$1" && grep -qF 'setpriv --reuid=65534' "$1"; }
   cp "${wr}" "${d}/wops/stt-service.sh"
-  if _st_tarform "${wr}" && ! LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" \
+  local w27rc=0
+  LC_ALL=C bash "${helper}" "${d}/wops/stt-service.sh" \
        'extractall(sys.argv[2], filter="data")|||extractall(sys.argv[2])  # ONION_MUTANTE' \
-       bash -c "$(declare -f _st_tarform); _st_tarform '${d}/wops/stt-service.sh'" >/dev/null 2>&1; then
+       bash -c "$(declare -f _st_tarform); _st_tarform '${d}/wops/stt-service.sh'" >/dev/null 2>&1 || w27rc=$?
+  # só o rc 1 do helper é mutante MORTO; a recusa (âncora ausente, repetida, linha de base vermelha) também sai ≠0
+  if _st_tarform "${wr}" && [ "${w27rc}" = 1 ]; then
     record_pass "stt-service: (w27) extração do diarizador filtrada e sonda sem root, pela FORMA (o download real é do --apply; o mutante sem filtro reprova)"
   else record_fail "stt-service: (w27) forma da extração" "sem filter=\"data\" ou sem setpriv no stage_diar_bin, ou o mutante passou"; fi
   # (w23) digest do asset do diarizador no GitHub diferente do fixado · (w24) sha256 do gguf publicado diferente ·
@@ -39424,6 +39542,7 @@ _family run_zoho_adapter_selftests
 _family run_door_role_change_refusal_selftests
 _family run_review_cause_bands_selftests
 _family run_mutant_leftover_selftests
+_family run_mutate_helper_selftests
 
 # ── ANÚNCIO QUE AFIRMA ZERO SEM MEDIÇÃO (REGRA 95) ───────────────────────────────────────────
 # POR QUE EXISTE: o anúncio é o ÚNICO documento que chega ANTES do merge, e em 2026-08-31 um zero
@@ -46506,6 +46625,11 @@ run_mcp_onion_kg_writer_selftests() {
   # Serial, 58 mutantes levaram 788 s na VPS compartilhada (medido em 2026-10-13). O veredito sai DEPOIS do `wait`,
   # na ordem da lista; mutante sem arquivo de rc (morto no meio) conta como FALHA, nunca como verde.
   local sb old new want mo mrc n i=0 d jobs_max="${ONION_KG_WRITER_MUTANT_JOBS:-4}"
+  # A linha de base de cada mutante é o (a) acima: o MESMO harness, verde, sobre o MESMO servidor (a cópia é byte a
+  # byte). Re-rodá-la por mutante dobraria ~12 s em cada um dos 67 (medido em 2026-10-27). Sem o (a) verde, o helper
+  # roda a linha de base, e ela recusa (rc 5).
+  local baseline_proven=""
+  [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}" && baseline_proven="o caso (a) da família, verde"
   sb="$(TMPDIR=/tmp mktemp -d)"
   while IFS=$'\x1f' read -r old new want; do
     [ -n "${old}" ] || continue
@@ -46515,7 +46639,7 @@ run_mcp_onion_kg_writer_selftests() {
     n="$(grep -cF -- "${old}" "${d}/server.py" || true)"
     if [ "${n}" != "1" ]; then printf '%s' "${n}" > "${d}/ancora"; continue; fi
     (
-      if mo="$(LC_ALL=C bash "${helper}" "${d}/server.py" "${old}|||${new}" python3 -I -B "${h}" --server "${d}/server.py" --code-root "${REPO_ROOT}" --until "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
+      if mo="$(MUTATE_BASELINE_PROVEN="${baseline_proven}" LC_ALL=C bash "${helper}" "${d}/server.py" "${old}|||${new}" python3 -I -B "${h}" --server "${d}/server.py" --code-root "${REPO_ROOT}" --until "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
       printf '%s' "${mo}" > "${d}/out"; printf '%s' "${mrc}" > "${d}/rc"
     ) &
     while [ "$(jobs -rp | wc -l)" -ge "${jobs_max}" ]; do wait -n || true; done
@@ -46596,8 +46720,9 @@ EOF_MUT
     if [ -f "${d}/ancora" ]; then record_fail "mcp-onion-kg-writer: (m) âncora do mutante ocorre $(cat "${d}/ancora")x (precisa 1)" "${want}"; continue; fi
     if [ ! -f "${d}/rc" ]; then record_fail "mcp-onion-kg-writer: (m) mutante sem resultado (processo morto?)" "${want}"; continue; fi
     mo="$(cat "${d}/out")"; mrc="$(cat "${d}/rc")"
-    if grep -q 'não consegui plantar\|RECUSADO' <<< "${mo}"; then record_fail "mcp-onion-kg-writer: (m) mutante não aplicou" "${want}"; continue; fi
-    if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want} " <<< "${mo}"; then record_pass "mcp-onion-kg-writer: (m) mutante morde → FAIL ${want}"
+    # pelo rc do helper, nunca pela prosa: ≥2 = não plantou (âncora ausente 3, repetida 4, linha de base vermelha 5…)
+    if [ "${mrc}" -ge 2 ]; then record_fail "mcp-onion-kg-writer: (m) mutante não aplicou (rc ${mrc} do helper)" "${want}"; continue; fi
+    if [ "${mrc}" -eq 1 ] && grep -q "^FAIL ${want} " <<< "${mo}"; then record_pass "mcp-onion-kg-writer: (m) mutante morde → FAIL ${want}"
     elif [ "${want}" = profundidade-tab-inicial ] && [ "${libyaml}" = 0 ] && [ "${mrc}" -eq 0 ]; then
       record_pass "mcp-onion-kg-writer: (m) ${want}: sem libyaml no python3 ($(python3 -V 2>&1), CSafeLoader ausente, medido) o mutante é equivalente — o caminho C se prova no piso com libyaml"
     else record_fail "mcp-onion-kg-writer: (m) mutante NÃO morde" "${want} (rc=${mrc}) $(grep -E '^(FAIL|TOTAL)' <<< "${mo}" | head -3 | tr '\n' '|')"; fi

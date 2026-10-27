@@ -1,0 +1,359 @@
+meta:
+  id: cortex-2026-10
+  schema_version: "1"
+  x_dissect_tool: cortex
+  x_dissect_against: onion-curation
+  baseline: "2026-10-27"
+  review_after: "2027-01-25"   # o MESMO prazo da dissecação de origem
+  # kg-backlog-guard: on
+  # ═══ TETO: 16 NÓS. Triagem fechada: cresce quando um parque disparar ou uma costura aberta virar PR. ═══
+  #
+  # TRIAGEM DO CORE de uma dissecação feita FORA dele: o adotante de curadoria dissecou o Cortex (família
+  # ferramenta), um framework para Claude Code que mora no repositório de um cliente, e avaliou nove peças contra
+  # o Onion, com uma rodada de medida que rodou os dois lados no mesmo caso. O grafo canônico mora no repo de
+  # curadoria, no MESMO caminho relativo deste arquivo, e cada nó de evidência aqui aponta o nó da peça de lá pelo
+  # provenance.source com o commit fixado (a forma que o kg_query --chain segue). Este grafo NÃO re-mede o Cortex:
+  # sela a decisão do maestro, guarda os gatilhos dos parques e os próximos passos das costuras, e existe para o
+  # dissect-census.sh DO CORE responder "já dissecamos o Cortex?" sem o clone da curadoria.
+  # CONFIDENCIALIDADE: o core é público. Nada do cliente entra aqui, só o que o sinal da curadoria já diz sobre o
+  # framework; nenhum nome de pessoa, de repositório ou de banco do cliente.
+  # Sinais triados: docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-evaluation.md (1º round) e
+  # docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md (2º round, medido).
+
+nodes:
+
+  - id: E_CORTEX_PECA_GATE_DE_PLANO_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_PLAN_GATE e a medida E_MEASURE_PLAN_GATE no grafo da curadoria (onion-curation@8d64aef8737e, main, que contém o PR #133), conferidos por peer-ref-check.sh (EXISTEM na origin/main do par)"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Gate de plano, nota 6, costurar só a peça: o script do Cortex barra sem plano commitado e passa com o plano no HEAD, mas também passa com o plano commitado depois do código; nenhum dos dois lados barra o commit."
+    narrative: "Medido pela curadoria em laboratório isolado: quatro casos do lado do Cortex (dois recusam com saída 2, dois passam) e o pre-commit do core saindo 0 no mesmo cenário. A nota caiu de 8 para 6 pela revisão adversarial da curadoria: conferir o plano pelo HEAD exige commitar a pasta de sessões, que o core ignora por escolha declarada no .gitignore, e o gate não confere a ordem entre plano e código."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_PLAN_GATE"
+      locator: "D_PIECE_PLAN_GATE (x_dissect_verdict costurar, nota 6) e E_MEASURE_PLAN_GATE"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_QUALIDADE_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_QUALITY e a medida E_MEASURE_MUTATION no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh; a lacuna reproduzida no helper do core antes da cura"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Âncora única na mutação, nota 6, costurar só a peça como remendo no helper do core: com a âncora repetida, o helper trocava a 1ª ocorrência em silêncio, e o código de saída 3 valia tanto para a âncora ausente quanto para um teste que sai 3."
+    narrative: "A curadoria rodou o helper do core e o mutate.py do Cortex no mesmo alvo e no mesmo teste. O requisito novo veio por acidente: nenhum dos dois rodava o teste sem a mutação antes, e o do Cortex respondeu que o pino funcionava para um teste que falhava por erro de importação. A defesa do core contra a morte do processo (o marcador no mutante e a REGRA 94 (Mutante esquecido na árvore rastreada)) cobre outro modo de falha e fica."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_QUALITY"
+      locator: "D_PIECE_QUALITY (x_dissect_verdict costurar, nota 6) e E_MEASURE_MUTATION"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_DOCUMENTOS_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e E_MEASURE_DOCS_NOT_EXERCISED no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Documentação e apresentações, nota 6, costurar condicionado: o Onion não gera pptx nem docx; as ferramentas do Cortex para isso são Node, do npm, e não foram exercidas."
+    narrative: "O core tem o /design:deck (HTML offline) e o /product:presentation (serviço externo com chave). A curadoria não instalou nada, porque a autorização era de ambiente virtual do PyPI. O maestro trocou a pilha na decisão: a costura sai em Python, com python-pptx e python-docx, sem navegador e portanto sem o print real da aplicação."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DOCS_PRESENTATIONS"
+      locator: "D_PIECE_DOCS_PRESENTATIONS (x_dissect_verdict costurar, nota 6, condicionado) e E_MEASURE_DOCS_NOT_EXERCISED"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_FROTA_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_FLEET e a âncora Q_FLEET_PARALLEL_DEMAND no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Frota, nota 5, parquear: N issues em worktrees paralelas, com aprovação humana em lote e dados isolados por worktree, não têm par no Onion, mas nenhum adotante pediu isso."
+    narrative: "A busca da curadoria no core por esse fluxo deu 0 arquivos, e a worktree nativa do Claude Code cobre parte dele. O custo inclui o modo de equipes de agentes, ainda experimental."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_FLEET"
+      locator: "D_PIECE_FLEET (x_dissect_verdict parquear, x_dissect_trigger com min_count 2)"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_REGISTRO_DE_USO_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_USAGE_TELEMETRY e a âncora E_NATIVE_OTEL_USAGE no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Registro de uso, nota 5, parquear: a telemetria nativa do Claude Code em OpenTelemetry já registra o uso, com coletor; a forma do Cortex grava dentro do git com o nome de quem rodou."
+    narrative: "A forma útil ao Onion seria contar o uso de comando fora do git e sem identificar a pessoa, e ela ainda é só desenho, sem adotante que a peça e sem consumidor medido."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_USAGE_TELEMETRY"
+      locator: "D_PIECE_USAGE_TELEMETRY (x_dissect_verdict parquear, x_dissect_trigger com min_count 2)"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_HANDOFF_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_MEMORY e a âncora E_ONION_WORKLOG_HOOKS no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Memória, nota 5, parquear só o handoff commitado no git: o core tem os ganchos de retomada do worklog, que não rodaram na medida, e o resto da memória fica rejeitado."
+    narrative: "A 1ª versão da curadoria dizia que o core não tinha script de retomada, porque buscou por nome; a revisão adversarial corrigiu de costurar para parquear. O que sobra sem par é o handoff versionado no git, que o core descarta por escolha: o .gitignore ignora a pasta de sessões."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_MEMORY"
+      locator: "D_PIECE_MEMORY (x_dissect_verdict parquear, x_dissect_trigger com min_count 2)"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_DISTRIBUICAO_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_DISTRIBUTION no grafo da curadoria (onion-curation@8d64aef8737e), conferido por peer-ref-check.sh"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Distribuição, nota 4, rejeitar: o merge do onion/vendor preservou a customização sem conflito falso e acusou o conflito real; a fusão do lado do Cortex segue lida, porque o instalador dele não está na máquina."
+    narrative: "Medido do lado do Onion e lido do lado do Cortex. A superação é a atualização por merge do vendor que o /meta:adopt já faz."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DISTRIBUTION"
+      locator: "D_PIECE_DISTRIBUTION (x_dissect_verdict rejeitar, nota 4)"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_ESPECIFICACAO_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_SPEC_AS_CODE no grafo da curadoria (onion-curation@8d64aef8737e), conferido por peer-ref-check.sh"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Especificação como código, nota 3, rejeitar: no artefato do framework fora do padrão, o lint do core reprova pela REGRA 1 e pela REGRA 2 e o Cortex deixa entrar; na decisão de arquitetura no código do projeto, empate, porque nos dois quem confere é agente."
+    narrative: "Medido do lado do Onion e lido do lado do Cortex, cujo checador de decisões de arquitetura não bloqueia por padrão. O empate entra como limite: o lint do core não lê o código do adotante."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_SPEC_AS_CODE"
+      locator: "D_PIECE_SPEC_AS_CODE (x_dissect_verdict rejeitar, nota 3)"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_CORTEX_PECA_ESTUDOS_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "nó D_PIECE_STUDIES no grafo da curadoria (onion-curation@8d64aef8737e), conferido por peer-ref-check.sh"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "Estudos e avaliações, nota 3, rejeitar: o kg_query devolve o estado aberto de um estudo por comando (8 nós em 5,7 KB); a busca nos scripts do Cortex achou 3 arquivos, e nenhum faz isso."
+    narrative: "Medido do lado do Onion e lido do lado do Cortex. A superação é o par /onion-research e /meta:dissect, com o pré-registro que a própria dissecação usou."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_STUDIES"
+      locator: "D_PIECE_STUDIES (x_dissect_verdict rejeitar, nota 3)"
+      method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
+      locality: "repo"
+
+  - id: E_MUTATE_ANCORA_UNICA_MEDIDA_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    x_dissect_level: 3
+    verified_at: "2026-10-27"
+    verified_against: "família mutate_helper do lint-selftest.sh: 11 casos verdes contra o helper vivo, e um mutante por cura plantado pelo próprio helper numa cópia dele, cada um reprovando o seu caso"
+    label: "A costura da âncora única está no ops/mutate-and-restore.sh: conta a âncora e recusa a ausente com saída 3 e a repetida com saída 4, roda a linha de base e recusa a vermelha com saída 5, e só 0 e 1 são veredito de mutante."
+    narrative: "O código de saída do helper deixou de ser o do teste cru: um teste que sai 3 dá 1 no helper, e o valor cru vai para o stderr e, sob MUTATE_RC_FILE, para um arquivo. Os chamadores da bancada que comparam um código específico leem o arquivo; os que provaram a linha de base no mesmo caso, logo antes, a declaram por MUTATE_BASELINE_PROVEN, dito em stderr. A restauração por trap continua, e agora o sinal sai do script em vez de deixá-lo seguir."
+    trace: "ops/mutate-and-restore.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_mutate_helper_selftests, casos (a) a (k) e (m)"
+      method: "measurement: bancada rodada na branch feat/cortex-seal-and-unique-anchor"
+      locality: "repo"
+
+  - id: Q_CORTEX_GATE_DE_PLANO_PROXIMO_PASSO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "Costura do gate de plano: onde o plano mora, se o .gitignore do core ignora a pasta de sessões, e como o script confere que o plano foi commitado ANTES do 1º commit de código, e não só que existe no HEAD?"
+    narrative: "Próximo passo: decidir o lugar do plano (mudar a escolha do .gitignore para o plano, ou levá-lo a um caminho rastreado fora das sessões) e escrever o script com a ordem como requisito, com bancada que reprove o plano commitado depois do código, que é o caso que o gate do Cortex deixa passar."
+    x_gatilho: "reabrir ao começar a costura: a decisão do lugar do plano vem antes do script, porque ela muda o que o script lê."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+
+  - id: Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "Costura do pptx e do docx: uma rodada de prova em Python, com python-pptx e python-docx autorizados pelo maestro e sem navegador, gera um pptx e um docx que abrem e trazem o conteúdo pedido?"
+    narrative: "Próximo passo: instalar as duas bibliotecas pela fonte oficial num ambiente virtual isolado, gerar uma amostra de cada a partir de um roteiro, medir que o arquivo abre e tem o texto esperado, e só então desenhar a peça como vertical opcional, fora do núcleo. O print real da aplicação fica de fora, porque exigiria navegador."
+    x_gatilho: "reabrir ao começar a rodada de prova; a autorização das duas bibliotecas já foi dada pelo maestro em 2026-10-27."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+
+  - id: Q_CORTEX_FROTA_GATILHO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "Parque da frota: algum adotante do Onion pede N issues em worktrees paralelas com aprovação humana em lote e dados isolados por worktree?"
+    x_gatilho: "no repo de curadoria, kg_query --around docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#Q_FLEET_PARALLEL_DEMAND --edge-type SUPERSEDES dá 2 ou mais (hoje 1), conferido por peer-ref-check.sh na origin/main do par."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+
+  - id: Q_CORTEX_REGISTRO_DE_USO_GATILHO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetria nativa do Claude Code não dá?"
+    x_gatilho: "no repo de curadoria, kg_query --around docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#E_NATIVE_OTEL_USAGE --edge-type SUPERSEDES dá 2 ou mais (hoje 1), conferido por peer-ref-check.sh na origin/main do par."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+
+  - id: Q_CORTEX_HANDOFF_GATILHO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "Parque do handoff no git: medidos no mesmo caso, os ganchos de retomada do worklog do core perdem para o handoff versionado do Cortex?"
+    x_gatilho: "no repo de curadoria, kg_query --around docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#E_ONION_WORKLOG_HOOKS --edge-type SUPERSEDES dá 2 ou mais (hoje 1), conferido por peer-ref-check.sh na origin/main do par."
+    trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
+  - id: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Selar como medido»"
+    label: "Selar as 9 peças do Cortex como medido: costurar só a peça no gate de plano, na âncora única da mutação (feita neste PR) e no pptx e docx em Python; parquear a frota, o registro de uso e o handoff no git; rejeitar distribuição, especificação como código e estudos."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Selar como medido»; descartadas: «Selar, sem implementar agora» · «Depois». É o 2º round: no 1º, diante do sinal com as rejeições só lidas, o maestro escolheu «Medir as rejeições antes», e a curadoria mediu rodando os dois lados no mesmo caso, em laboratório isolado. Por peça: costurar só a peça no gate de plano (nota 6, esbarra no .gitignore das sessões e na ordem do plano em relação ao código), na âncora única da mutação (nota 6, implementada no mesmo PR deste selo) e no pptx e docx (nota 6, em Python, com python-pptx e python-docx autorizados pelo maestro, sem navegador); parquear a frota, o registro de uso e o handoff no git (nota 5, cada um com o gatilho medido da curadoria); rejeitar distribuição, especificação como código e estudos (notas 4, 3 e 3, medidas do lado do Onion). Nenhuma peça é absorvida no núcleo: nenhuma tem uso medido em dois adotantes ou mais."
+    x_dissect_level: 3
+    x_dissect_verdict: costurar
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Como selo as 9 peças do Cortex, agora medidas?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+
+edges:
+
+  - from: E_MUTATE_ANCORA_UNICA_MEDIDA_1027
+    to: E_CORTEX_PECA_QUALIDADE_1027
+    edge_type: TRACES_TO
+  - from: Q_CORTEX_GATE_DE_PLANO_PROXIMO_PASSO
+    to: E_CORTEX_PECA_GATE_DE_PLANO_1027
+    edge_type: DEPENDS_ON
+  - from: Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO
+    to: E_CORTEX_PECA_DOCUMENTOS_1027
+    edge_type: DEPENDS_ON
+  - from: Q_CORTEX_FROTA_GATILHO
+    to: E_CORTEX_PECA_FROTA_1027
+    edge_type: DEPENDS_ON
+  - from: Q_CORTEX_REGISTRO_DE_USO_GATILHO
+    to: E_CORTEX_PECA_REGISTRO_DE_USO_1027
+    edge_type: DEPENDS_ON
+  - from: Q_CORTEX_HANDOFF_GATILHO
+    to: E_CORTEX_PECA_HANDOFF_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_GATE_DE_PLANO_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_QUALIDADE_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_DOCUMENTOS_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_FROTA_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_REGISTRO_DE_USO_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_HANDOFF_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_DISTRIBUICAO_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_ESPECIFICACAO_1027
+    edge_type: DEPENDS_ON
+  - from: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    to: E_CORTEX_PECA_ESTUDOS_1027
+    edge_type: DEPENDS_ON
+  - from: Q_CORTEX_GATE_DE_PLANO_PROXIMO_PASSO
+    to: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    edge_type: CONSTRAINS
+  - from: Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO
+    to: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    edge_type: CONSTRAINS
+  - from: Q_CORTEX_FROTA_GATILHO
+    to: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    edge_type: CONSTRAINS
+  - from: Q_CORTEX_REGISTRO_DE_USO_GATILHO
+    to: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    edge_type: CONSTRAINS
+  - from: Q_CORTEX_HANDOFF_GATILHO
+    to: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
+    edge_type: CONSTRAINS
