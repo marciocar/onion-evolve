@@ -2,8 +2,8 @@
 branch: feat/a2a-draft-piece
 pr: 1399
 date: 2026-10-27
-reviewed_diff_sha256: 8b38b298ca52fa8960fea8b408e0fa04f3eebccba598423d1d63c39729991293
-reviewed_code_sha256: 152c2d1fceae42384156f8601934dd9c8cf3334daf20e439b658dd0d2792b070
+reviewed_diff_sha256: 287b6dde2d61cb8bf579aac6cfb687dfd30970f8d9b610bf6f2297ed747bdf41
+reviewed_code_sha256: ab89698b309afdc0107b71b8c35770cffae34abc3caef88d57c7cf8fb496ae3f
 findings_total: 9
 findings_real: 6
 tokens: 115980
@@ -12,7 +12,7 @@ findings_fixed: 5
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: "agente novo (general-purpose), com só o código e o contrato no brief, sem a conclusão do autor"
-nota: "foco pedido pelo maestro: envio escondido e injeção. 6 achados reais: 5 curados no commit 76f3a7cf6 e 1 limite de desenho, declarado na Emenda 1 do pré-registro e mitigado só por lombada. Outras 3 eram hipóteses, julgadas sem cura."
+nota: "foco pedido pelo maestro: envio escondido e injeção. 6 achados reais: 5 curados no commit 76f3a7cf6 e 1 limite de desenho, declarado na Emenda 1 do pré-registro e mitigado só por lombada. Outras 3 eram hipóteses, julgadas sem cura. Recarimbo depois do rebase sobre a adoção da kg-ssot 4.32.0: o diff deste PR em .claude/ foi comparado antes e depois e só mudaram os offsets dos hunks e os índices dos blobs; o conteúdo revisado é o mesmo."
 ---
 
 # Passada adversarial: `feat/a2a-draft-piece`
