@@ -286,7 +286,7 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — medido 2026-10-09: o origin do clone é o repo da granaai, na branch onion/develop
     local_path: "/home/marcio/brain-granaai"
-    onion_version: fb36b24becfa   # carimbado por ops/registry-pins.sh (remoto onion/develop conferido em 2026-10-27)
+    onion_version: 95365699a0e3   # carimbado por ops/registry-pins.sh (remoto onion/develop conferido em 2026-10-27)
                                   # 2º update de 2026-10-13 pela sessão do adotante, mergeado lá no PR #1576 (merge e3dda5fbc
                                   # na onion/develop); o anterior (bd769f168411) foi o PR #1571 (merge dd0ea769a)
     integration_branch: onion/develop   # medido: branch do clone e do carimbo vivo (o carimbo não declara o campo)
@@ -589,7 +589,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/sge   # PRIVADO — medido 2026-10-09 no origin do clone (o registro dizia n/a)
     local_path: "/home/marcio/sge"
-    onion_version: fb36b24becfa   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-27)
+    onion_version: 95365699a0e3   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-27)
     adopted_at: 2026-09-24
     mode: regulated             # licitação PÚBLICA: trilha de auditoria desde o dia 1, não camada opcional
     personality_summary: "Mapeia editais de licitação pública brasileira em três etapas encadeadas: mapeamento do objeto (lotes/itens/subitens), ficha de análise técnica (exigência × oferta) e checklist de qualidade da saída. Recorte inicial: veículos. BASE LEGAL: Lei 14.133/2021 por decisão do maestro — a 8.666/93 é regime histórico. Foi o adotante que ACHOU o defeito da REGRA 84 (Índice de leitura do KG em sincronia com os traces): o gate barrava o primeiro commit de TODO adotante porque a guarda lia índice vazio como gerador quebrado, quando no dia 1 isso é o estado normal. Curado na fonte no mesmo dia."
@@ -762,7 +762,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-kg-ssot (privado)
     local_path: /home/marcio/onion-kg-ssot
-    onion_version: fb36b24becfa   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-27)
+    onion_version: 95365699a0e3   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-27)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "O grafo de conhecimento verificável como PRODUTO INDEPENDENTE: adota e usa o Onion, e o Onion adota e usa o KG-SSOT (dogfood nos dois sentidos). Tem contextos próprios, feitos de pesquisa profunda e de mercado ali dentro, e lê o core só para entender o encaixe. Primeiro marco: o contrato formal do .kg.yaml (JSON Schema + suíte de conformidade) que o core passará a consumir."
