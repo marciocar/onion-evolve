@@ -45,5 +45,6 @@ REQUIRES=(
 LOADS=(
   "when:brief -> kb-or-context:business-context"
   "when:setup -> resolve:design-context (skill onion-design-context)"
+  "when:setup sem business-context -> skill:onion-product-context (plugin onion-product; ausente, o setup pergunta publico e tom)"
   "when:material -> reuse:presentation/canva"
 )

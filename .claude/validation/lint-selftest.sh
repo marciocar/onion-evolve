@@ -40354,10 +40354,28 @@ run_design_setup_selftests() {
   rm -rf "${d}" "${m}" "${dm}"
   # (f) sem grafo do business-context: o grafo nasce com a question aberta que declara a falta, e a guarda cala
   d="$(mktemp -d)"; _dc_fixture "${d}" 0
-  if grep -q 'x_missing_context: "business-context"' "${d}/${G}" && ! grep -q 'E_POSITIONING"' "${d}/${G}" \
+  if grep -q 'x_missing_context: "business-context"' "${d}/${G}" && ! grep -q '#E_POSITIONING' "${d}/${G}" \
      && bash "${REPO_ROOT}/.claude/validation/design-context-check.sh" "${d}" >/dev/null 2>&1; then
     record_pass "design-setup: (f) sem business-context ⇒ question aberta declara a falta (nenhuma ligação inventada) e a guarda sai 0"
   else record_fail "design-setup: (f) sem business-context" "$(grep -n 'x_missing\|E_POSITIONING' "${d}/${G}" 2>&1 | head -3 | tr '\n' '|')"; fi
+  rm -rf "${d}"
+  # (g) passada adversarial, achado 3: TOKENS PARCIAIS (só foundations) ⇒ rc 3 com FALTA, e nada gravado
+  d="$(mktemp -d)"; git -C "${d}" init -q 2>/dev/null; mkdir -p "${d}/docs/design-context/foundations"
+  printf '{"color":{"$type":"color","x":{"$value":"#112233"}}}\n' > "${d}/docs/design-context/foundations/color.tokens.json"
+  : > "${d}/docs/design-context/brief.md"
+  if o="$(bash "${s}" --repo "${d}" --brand '#D97757' --apply 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 3 ] && grep -q '^FALTA	docs/design-context/semantic' <<< "${o}" && [ ! -e "${d}/docs/design-context/semantic" ] && [ ! -e "${d}/${G}" ]; then
+    record_pass "design-setup: (g) tokens parciais ⇒ rc 3 (FALTA a outra metade) e nada gravado — o setup não inventa aliases"
+  else record_fail "design-setup: (g) tokens parciais" "rc=${rc} ${o:0:200}"; fi
+  rm -rf "${d}"
+  # (h) achado 2: pasta de design DECLARADA fora de docs/design-context ⇒ o gate não a lê, e o setup sai 2
+  #     ("gravado, não verificado") em vez de declarar o gate verde
+  d="$(mktemp -d)"; git -C "${d}" init -q 2>/dev/null; mkdir -p "${d}/.claude"
+  printf 'context:\n  design: docs/design\n' > "${d}/.claude/onion-context.yaml"
+  if o="$(bash "${s}" --repo "${d}" --brand '#D97757' --create-brief --apply 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 2 ] && grep -q 'não pude julgar' <<< "${o}" && [ -f "${d}/docs/design/design-context.kg.yaml" ]; then
+    record_pass "design-setup: (h) pasta de design declarada ⇒ grava nela e sai 2 (o gate de tokens não a mede), nunca verde"
+  else record_fail "design-setup: (h) pasta declarada" "rc=${rc} ${o:0:200}"; fi
   rm -rf "${d}"
 }
 _family run_design_setup_selftests
@@ -40446,6 +40464,23 @@ PY
   i2="$(bash "${chk}" "${c}" --format tsv 2>&1 || true)"; rm -rf "${c}"
   if grep -q '^SOFT	SEM-GRAFO' <<< "${i1}" && [ -z "${i2}" ]; then record_pass "design-context: (i) brief sem grafo ⇒ SEM-GRAFO (SOFT); sem brief nem grafo ⇒ cala"
   else record_fail "design-context: (i) migração" "brief=${i1:0:120} vazio=${i2:0:120}"; fi
+  # (n) passada adversarial, achado 1: a ponta externa no `from` (válida no contrato v4.3) conta como ligação
+  c="$(mktemp -d)"; cp -a "${d}/." "${c}/"
+  python3 -I - "${c}/${G}" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read(); s = s[:s.index("external_edges:")]
+s += 'external_edges:\n  - from: "docs/business-context/business-context.kg.yaml#E_POSITIONING"\n    to: C_BRIEF\n    edge_type: SUPPORTS\n'
+open(p, "w").write(s)
+PY
+  if o="$(bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && [ -z "${o}" ]; then record_pass "design-context: (n) ponta externa no from (o brief como to) conta como ligação — sem falso positivo"
+  else record_fail "design-context: (n) ponta externa no from" "rc=${rc} ${o:0:200}"; fi
+  # (o) achado 4: locator fora da forma JSON Pointer numa fonte de tokens (`color.action.x`) ⇒ LOCATOR-FORMA, não silêncio
+  sed -i 's|locator: "#/color/action/primary"|locator: "color.action.nao-existe"|' "${c}/${G}"
+  if o="$(bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'LOCATOR-FORMA' <<< "${o}"; then record_pass "design-context: (o) locator pontuado numa fonte de tokens ⇒ LOCATOR-FORMA, rc 1"
+  else record_fail "design-context: (o) forma do locator" "rc=${rc} ${o:0:200}"; fi
+  rm -rf "${c}"
   # (j) o DISPATCHER de produção emite a REGRA 111 (SOFT) sobre o token sumido, com --only no grafo
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
   cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; cp -a "${d}/docs" "${sd}/" 2>/dev/null
@@ -40463,7 +40498,7 @@ PY
   #     sem o ramo do token ausente o token sumido cala. Cada um tem de CALAR o caso que a cura pega.
   local mdir; mdir="$(mktemp -d)"
   local m1 m2 m3 c1 c2 c3
-  sed 's/    return "ok" if isinstance(cur, dict) and "\$value" in cur else "grupo"/    return "ok"/' "${py}" > "${mdir}/m1.py"
+  sed 's/    return "ok" if isinstance(cur, dict) and ("\$value" in cur or "\$root" in cur) else "grupo"/    return "ok"/' "${py}" > "${mdir}/m1.py"
   sed 's/        if not (linked or declared):/        if False:/' "${py}" > "${mdir}/m2.py"
   sed 's/        elif verdict == "ausente":/        elif False:/' "${py}" > "${mdir}/m3.py"
   c1="$(mktemp -d)"; cp -a "${d}/." "${c1}/"; sed -i 's|locator: "#/color/action/primary"|locator: "#/color/action"|' "${c1}/${G}"

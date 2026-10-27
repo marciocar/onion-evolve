@@ -18,7 +18,7 @@ nodes:
     narrative: "Laboratório da emenda F do estudo design-setup-2026-10 (curadoria, main 668e13b, PR 140), um repo git por caso, tudo commitado: caso 5 (token que existia, citado só pelo grafo, some) sai 0 no kg_validate --corpus, no kg_trace e no lint-design-tokens; caso 9 (locator aponta um grupo) idem; caso 6 (brief sem ligação e sem falta declarada) só o protótipo check_design_context.py pega como ligação ausente. Os casos 2 (nó-alvo removido) e 4 (arquivo de tokens removido) o gate do contrato já pega, e por isso a integridade das ligações não ganhou regra no core. Reproduzido na bancada do core (famílias design_context e design_setup)."
     valid_from: "2026-10-27"
     verified_at: "2026-10-27"
-    verified_against: "a bancada do core: lint-selftest.sh --families=design_context,design_setup (11 e 6 casos verdes)"
+    verified_against: "a bancada do core: lint-selftest.sh --families=design_context,design_setup (13 e 8 casos verdes, depois das curas da passada adversarial)"
     provenance:
       source: "onion-curation@668e13b:docs/evolution/research/design-setup-2026-10/evidence/lab-graph/lab-graph-output.txt"
       locator: "casos 2, 4, 5, 6, 9 e 11"
@@ -74,6 +74,30 @@ nodes:
     impact: 2
     confidence: 0.7
     label: "Teto: o alvo de tema do setup é heurística (components.json, @theme, tailwind.config, CSS); no core ela achou um CSS do site e o grafo foi ajustado à mão."
+  - id: C_CEILING_MISSING_NEVER_EXPIRES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "Teto: a question que declara a falta do business-context segue valendo depois que o alvo passa a existir; a guarda não acusa a falta superada."
+  - id: C_CEILING_ONLY_DEFAULT_PATHS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "Teto: com --only, a REGRA 111 só responde a caminhos com design-context no nome; numa pasta de design declarada ela pula no --only e roda no lint inteiro."
+  - id: C_CEILING_SETUP_TOP_LEVEL_TARGETS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "Teto: o setup procura E_POSITIONING e ST_THEME_APPLIED só no nível de cima da pasta do contexto; grafo-alvo em subpasta vira question de falta."
   - id: Q_PROJECTION_CHECK_DEPENDENCY
     node_type: question
     layer: audit
@@ -113,6 +137,15 @@ edges:
     to: D_GUARD_SUBSTRATE_LINT_CHECK
     edge_type: CONSTRAINS
   - from: Q_LOCATOR_CHECK_HOME
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: C_CEILING_MISSING_NEVER_EXPIRES
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: C_CEILING_ONLY_DEFAULT_PATHS
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: C_CEILING_SETUP_TOP_LEVEL_TARGETS
     to: D_GUARD_SUBSTRATE_LINT_CHECK
     edge_type: CONSTRAINS
 external_edges:

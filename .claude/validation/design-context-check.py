@@ -57,7 +57,8 @@ def resolve_pointer(doc, fragment):
             cur = cur[int(key)]
         else:
             return "ausente"
-    return "ok" if isinstance(cur, dict) and "$value" in cur else "grupo"
+    # `$root` (DTCG 2025.10): o grupo que carrega o próprio token-raiz é citável como token
+    return "ok" if isinstance(cur, dict) and ("$value" in cur or "$root" in cur) else "grupo"
 
 
 def inside_root(root, rel):
@@ -92,9 +93,18 @@ def check_locators(graph, root, grel, add):
     for node in graph["nodes"]:
         prov = node.get("provenance") if isinstance(node.get("provenance"), dict) else {}
         src, loc = prov.get("source"), prov.get("locator")
-        if not (isinstance(src, str) and src.endswith(".json") and isinstance(loc, str) and loc.startswith("#/")):
+        src = src.strip() if isinstance(src, str) else src
+        if not (isinstance(src, str) and src.endswith((".json", ".tokens")) and isinstance(loc, str)):
             continue
         nid = node["id"]
+        loc = loc.strip()
+        if not loc.startswith("#/"):
+            if not src.endswith((".tokens.json", ".tokens")):
+                continue  # .json que não é arquivo de tokens (contrast-pairs.json) pode ter locator em prosa
+            # a fonte é um arquivo de tokens e o locator não é JSON Pointer (`/a/b`, `a.b.c`): sem esta linha a
+            # checagem pulava calada um token inexistente (passada adversarial, achado 4)
+            add("LOCATOR-FORMA", grel, f"{nid}: o locator '{loc}' de {src} não é um JSON Pointer no fragmento (#/a/b)")
+            continue
         if not inside_root(root, src):
             add("LOCATOR-FORA-DA-RAIZ", grel, f"{nid}: provenance.source '{src}' sai da raiz do repo")
             continue
@@ -124,9 +134,16 @@ def check_brief(graph, root, grel, design_dir, business_dir, add):
                if n.get("node_type") == "question" and n.get("status") == "open"
                and n.get("x_missing_context") == "business-context"}
     prefix = f"{business_dir}/"
+    ext_ref = re.compile(r"\.kg\.(yaml|json)#")
+
+    def is_biz(end):
+        return isinstance(end, str) and end.startswith(prefix) and bool(ext_ref.search(end))
+
     for bid in briefs:
-        linked = any(e.get("from") == bid and isinstance(e.get("to"), str)
-                     and e["to"].startswith(prefix) and ".kg.yaml#" in e["to"] for e in ext)
+        # a ponta externa pode estar no `to` OU no `from` (contrato v4.3: exatamente uma ponta externa, em
+        # qualquer lado) — a 1ª redação só aceitava `from == brief` e acusava a forma válida (achado 1)
+        linked = any((e.get("from") == bid and is_biz(e.get("to"))) or (e.get("to") == bid and is_biz(e.get("from")))
+                     for e in ext)
         declared = any((e.get("from") in missing and e.get("to") == bid)
                        or (e.get("to") in missing and e.get("from") == bid) for e in edges)
         if not (linked or declared):

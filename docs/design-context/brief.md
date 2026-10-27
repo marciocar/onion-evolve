@@ -1,6 +1,7 @@
 ---
 projection_of: docs/design-context/design-context.kg.yaml
 review_after: "2027-01-27"
+date: 2026-10-27
 ---
 
 # Brief de Identidade Visual — Sistema Onion (core)

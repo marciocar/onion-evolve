@@ -7,7 +7,7 @@ description: |
   plano em dry-run, grava sem nunca sobrescrever (idempotente) os tokens W3C DTCG e
   o grafo do design-context ligado ao business-context e ao technical-context, e
   termina no gate de tokens. Tudo local, sem serviço externo.
-allowed-tools: AskUserQuestion Read Glob Grep Skill Bash(bash .claude/utils/design-setup/*) Bash(bash .claude/utils/scope/*) Bash(bash .claude/validation/lint-design-tokens.sh*) Bash(bash .claude/validation/design-context-check.sh*) Bash(bash .claude/validation/kg-radar.sh*) Bash(git rev-parse*)
+allowed-tools: AskUserQuestion Read Glob Grep Skill Bash(bash .claude/utils/design-setup/*) Bash(bash .claude/utils/scope/*) Bash(bash .claude/validation/lint-design-tokens.sh*) Bash(bash .claude/validation/design-context-check.sh*) Bash(bash .claude/validation/kg-radar.sh*) Bash(bash .claude/validation/kg-contract-check.sh*) Bash(git rev-parse*)
 category: design
 tags: [design, setup, tokens, wcag, kg, context]
 version: "0.1.0"
@@ -90,7 +90,12 @@ Depois rode `bash .claude/validation/kg-radar.sh docs/design-context/design-cont
 **Commite o grafo-alvo antes do grafo do design**: o gate do contrato só enxerga grafo rastreado, e o alvo
 fora do git reprova até o caso íntegro.
 
-**Reexecutar** só imprime `MANTER` e `NADA`: o setup é idempotente.
+**Reexecutar** não grava nada: o plano só tem `MANTER` (e as linhas informativas `TEMA`, `LIGACAO`, e
+`AVISO` se vier uma `--brand` diferente da dos tokens) e termina em `NADA`. O setup é idempotente.
+
+**Tokens parciais** (só foundations ou só semantic): o plano diz `FALTA` e sai 3 — o setup não inventa a
+outra metade. **Pasta de design declarada** fora de `docs/design-context`: o motor grava, mas o gate de
+tokens só lê `docs/design-context`, e o setup sai 2 ("gravado, não verificado") em vez de declarar verde.
 
 ## Saídas e rc
 
