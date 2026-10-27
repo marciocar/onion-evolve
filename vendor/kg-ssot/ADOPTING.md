@@ -343,6 +343,9 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.32.0` to `kg-ssot-v4.33.0`, nothing changes in the contract or the gate: the release adds
+`kg_query --chain`, and no verdict and no identity change.
+
 From `kg-ssot-v4.31.1` to `kg-ssot-v4.32.0` (contract v4.16), no verdict changes for an existing graph: the English
 classes of `provenance.method` are added, and the Portuguese ones stay accepted with no warning. The contract's
 identity changes, so the gate passes with the `· identity` warning, and the `--update` can come later. A graph that

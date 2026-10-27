@@ -113,6 +113,7 @@ kg-query --root . --type decision --status done    # filter by fields
 kg-query --root . --around D_RELEASE --depth 2     # a node and its neighbourhood, with edge labels resolved
 kg-query --root . --around E_OLD --edge-type SUPPORTS --direction out   # what this evidence supports
 kg-query --root . --open --sort impact             # the open work, most important first
+kg-query --root . --chain E_RELAY                  # who passed a claim to whom, the weakest link and the origin
 kg-query --format json ...                         # the same, as JSON for a program
 ```
 

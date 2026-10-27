@@ -10,6 +10,16 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.33.0] - 2026-10-27
+
+Contract v4.16, unchanged. `kg_query --chain <id>` projects the transmission chain from a node back to its origin: each
+path in edge order (`TRACES_TO` by default, `--edge-type` for others), and the `provenance.source` fragment when it
+names a node of a graph. Each path carries a status (`complete`, `broken`, `cycle`, `too_long`), the weakest link and
+the strength of the origin on separate axes, and two grades: strict, which counts the origin, and lenient, which leaves
+it out. A broken, cyclic or too long chain is `weak` in both modes, and a link with no numeric `confidence` is the
+weakest one. The output is human or `--format json` (`kg-ssot.chain/1`), with caps of 200 steps and 1000 paths. The
+criteria were committed before the code, and the projection passes them on the probes of an outside session.
+
 ## [4.32.0] - 2026-10-27
 
 Contract v4.16: the class of `provenance.method` has a canonical English form, `measurement`, `reading`, `judges`,

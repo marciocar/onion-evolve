@@ -148,19 +148,19 @@ def load(root=None, files=(), exclude=(), defaults=True):
     return corpus
 
 
-def resolve(corpus, ref):
+def resolve(corpus, ref, flag="--around"):
     """Um id dado na linha de comando: <caminho>#<id> ou o id sozinho, que tem de ser único no corpus. ValueError."""
     if "#" in ref:
         path, nid = ref.rsplit("#", 1)
         if (path, nid) not in corpus.nodes:
-            raise ValueError(_("--around {ref}: the node does not exist in the corpus").format(ref=ref))
+            raise ValueError(_("{flag} {ref}: the node does not exist in the corpus").format(flag=flag, ref=ref))
         return (path, nid)
     hits = [k for k in corpus.order if k[1] == ref]
     if not hits:
-        raise ValueError(_("--around {ref}: the node does not exist in the corpus").format(ref=ref))
+        raise ValueError(_("{flag} {ref}: the node does not exist in the corpus").format(flag=flag, ref=ref))
     if len(hits) > 1:
-        raise ValueError(_("--around {ref}: the id exists in {n} graphs; use <path>#{ref}")
-                         .format(ref=ref, n=len(hits)))
+        raise ValueError(_("{flag} {ref}: the id exists in {n} graphs; use <path>#{ref}")
+                         .format(flag=flag, ref=ref, n=len(hits)))
     return hits[0]
 
 
@@ -184,6 +184,194 @@ def neighborhood(corpus, start, depth, edge_types, direction):
                 nxt.append(other)
         frontier = nxt
     return seen
+
+
+# A classe de provenance.method, canônica em inglês desde o contrato v4.16; o português é alias aceito
+METHOD_CLASS = {"measurement": "measurement", "reading": "reading", "judges": "judges", "derived": "derived",
+                "testimony": "testimony", "medição": "measurement", "leitura": "reading", "juízes": "judges",
+                "derivado": "derived", "testemunho": "testimony"}
+# As faixas do grau da corrente (4.33.0), fixadas no pré-registro da projeção, antes do código
+GRADE_BANDS = ((0.85, "strong"), (0.60, "acceptable"))
+GRADE_ORDER = {"weak": 0, "acceptable": 1, "strong": 2}
+CHAIN_SCHEMA = "kg-ssot.chain/1"
+MAX_CHAIN = 200  # um teto de passos: uma corrente com mais passos que isso é dado quebrado, não transmissão
+MAX_PATHS = 1000  # um teto de caminhos: correntes que bifurcam e se reencontram multiplicam os caminhos (o Elenxo mediu
+# 262.144 caminhos e 2,3 GB num losango de 18 camadas); além do teto, a projeção sai truncated
+
+
+def method_class(node):
+    """A classe canônica do provenance.method do nó, ou None (sem method, ou classe fora do vocabulário)."""
+    prov = node.get("provenance")
+    method = prov.get("method") if isinstance(prov, dict) else None
+    if not isinstance(method, str) or ": " not in method:
+        return None
+    return METHOD_CLASS.get(method.split(": ", 1)[0])
+
+
+def band(conf):
+    """A faixa de um confidence; um valor que não é número conta como weak."""
+    if not isinstance(conf, (int, float)) or isinstance(conf, bool):
+        return "weak"
+    for floor, name in GRADE_BANDS:
+        if conf >= floor:
+            return name
+    return "weak"
+
+
+def _source_ref(corpus, key):
+    """O passo pelo fragmento do provenance.source, ou None quando o source não aponta para um grafo. Aponta quando o
+    caminho antes do # é vazio, é o do próprio arquivo, termina no meta.id do próprio grafo (a URL de quem publica o
+    grafo), é um arquivo do corpus, ou tem a extensão de um grafo. Qualquer outro fragmento (a seção de um README, uma
+    URL externa) é a origem, e nunca cai num homônimo local. Devolve ((arquivo, id), ref): a chave pode não existir no
+    corpus, e o passo sai quebrado."""
+    prov = corpus.nodes[key].get("provenance")
+    source = prov.get("source") if isinstance(prov, dict) else None
+    if not isinstance(source, str) or "#" not in source:
+        return None
+    path, frag = source.rsplit("#", 1)
+    if not frag:
+        return None
+    path = path.split("?", 1)[0]  # a query string (?ref=main) não muda o arquivo que a URL nomeia
+    here = key[0]
+    last = path.rstrip("/").rsplit("/", 1)[-1]
+    for ext in (".kg.yaml", ".kg.json"):
+        last = last[: -len(ext)] if last.endswith(ext) else last
+    if path in ("", here) or (corpus.meta_ids.get(here) and last == corpus.meta_ids[here]):
+        target = (here, frag)
+    elif path in corpus.files or path.endswith((".kg.yaml", ".kg.json")):
+        target = (path, frag)
+    else:
+        return None
+    return (target, source)  # o nó que cita a si mesmo é um ciclo, não uma origem
+
+
+def _steps(corpus, key, edge_types):
+    """Os passos de um nó para o anterior: as arestas que saem dele, dos tipos pedidos; sem aresta, o fragmento do
+    provenance.source. Cada passo é (chave, ref): a chave pode não existir no corpus (a ponta quebrada)."""
+    hops = [(dst, ref) for et, dst, ref in corpus.out[key] if et in edge_types and dst is not None]
+    found = _source_ref(corpus, key)
+    if found and found[0] not in {dst for dst, _ref in hops}:  # o fragmento que a aresta não cobre é outro caminho
+        hops.append(found)
+    return hops
+
+
+def _link(corpus, key, ref=None):
+    node = corpus.nodes.get(key)
+    if node is None:
+        return {"file": key[0], "id": key[1], "ref": ref, "found": False, "confidence": None, "method_class": None,
+                "label": None}
+    conf = node.get("confidence")
+    numeric = isinstance(conf, (int, float)) and not isinstance(conf, bool) and 0 <= conf <= 1  # fora de [0, 1] é desconhecido
+    return {"file": key[0], "id": key[1], "ref": None, "found": True, "confidence": conf if numeric else None,
+            "method_class": method_class(node), "label": node.get("label") if isinstance(node.get("label"), str) else None}
+
+
+def _grade(path, status):
+    """Os dois eixos de um caminho: o elo mais fraco (sem a origem) e a força da origem, e o grau nos dois modos. Um
+    caminho que não é complete (broken, cycle, too_long) sai weak nos dois modos e sem origem. Um elo sem confidence
+    numérico conta como o mais fraco, com confidence null, e rebaixa o leniente para weak."""
+    complete = status == "complete"
+    links = path[:-1] if complete else [p for p in path if p["found"]]
+    by_key = {(p["file"], p["id"]): p for p in links}  # o ciclo repete o nó: cada (arquivo, id) entra uma vez
+    unknown = [k for k, p in by_key.items() if p["confidence"] is None]
+    if unknown:
+        at = unknown
+        weakest = {"confidence": None}
+    else:
+        floor = min((p["confidence"] for p in by_key.values()), default=None)
+        at = [k for k, p in by_key.items() if p["confidence"] == floor] if by_key else []
+        weakest = {"confidence": floor}
+    weakest["ids"] = [i for _f, i in at]
+    weakest["at"] = [{"file": f, "id": i} for f, i in at]  # o mesmo id pode estar em dois arquivos
+    if not complete:
+        return {"weakest_link": weakest, "origin": None, "grade": {"strict": "weak", "lenient": "weak"}}
+    origin = path[-1]
+    if unknown:
+        lenient = "weak"
+    elif links:
+        lenient = band(weakest["confidence"])
+    else:  # corrente de um nó só: o leniente é a própria origem
+        lenient = band(origin["confidence"])
+    origin_band = "weak" if origin["method_class"] in (None, "testimony") else band(origin["confidence"])
+    strict = min(lenient, origin_band, key=GRADE_ORDER.get)
+    return {"weakest_link": weakest,
+            "origin": {"id": origin["id"], "file": origin["file"], "method_class": origin["method_class"],
+                       "confidence": origin["confidence"]},
+            "grade": {"strict": strict, "lenient": lenient}}
+
+
+def chain(corpus, ref, edge_types=("TRACES_TO",)):
+    """A projeção da cadeia de transmissão a partir de ref (kg-ssot.chain/1): cada caminho até a origem, na ordem das
+    arestas, o elo mais fraco e a força da origem em eixos separados, e o grau estrito e leniente pelas faixas de
+    GRADE_BANDS. Até MAX_PATHS caminhos (além disso, truncated). ValueError: pedido quebrado."""
+    start = resolve(corpus, ref, "--chain")
+    edge_types = set(edge_types or ("TRACES_TO",))
+    paths = []
+
+    def walk(keys, links):
+        if len(paths) > MAX_PATHS:
+            return
+        if len(keys) - 1 > MAX_CHAIN:
+            paths.append({"status": "too_long", "links": links})
+            return
+        steps = _steps(corpus, keys[-1], edge_types)
+        if not steps:
+            paths.append({"status": "complete", "links": links})
+            return
+        for nxt, nref in steps:
+            if len(paths) > MAX_PATHS:
+                return
+            if nxt in keys:
+                paths.append({"status": "cycle", "links": links + [_link(corpus, nxt)]})
+            elif nxt not in corpus.nodes:
+                paths.append({"status": "broken", "links": links + [_link(corpus, nxt, nref)]})
+            else:
+                walk(keys + [nxt], links + [_link(corpus, nxt)])
+
+    walk([start], [_link(corpus, start)])
+    truncated = len(paths) > MAX_PATHS  # um caminho além do teto prova que havia mais
+    paths = paths[:MAX_PATHS]
+    out = [{"status": p["status"], "links": p["links"], **_grade(p["links"], p["status"])} for p in paths]
+    bands = {name: floor for floor, name in GRADE_BANDS}
+    bands["weak"] = None  # abaixo da menor faixa, sem piso
+    return {"schema_version": CHAIN_SCHEMA, "root": corpus.root, "start": {"file": start[0], "id": start[1]},
+            "edge_types": sorted(edge_types), "bands": bands, "truncated": truncated, "paths": out}
+
+
+def _word_of(value):
+    """O valor do JSON (status, grau) na língua da saída humana; o JSON fica sempre em inglês."""
+    return {"complete": _("complete"), "broken": _("broken"), "cycle": _("cycle"), "too_long": _("too long"),
+            "strong": _("strong"), "acceptable": _("acceptable"), "weak": _("weak")}.get(value, value)
+
+
+def chain_human(res):
+    lines = []
+    for i, p in enumerate(res["paths"], 1):
+        status = _word_of(p["status"])
+        lines.append(_("chain {n}: {status}").format(n=i, status=status) if len(res["paths"]) > 1 else
+                     _("chain: {status}").format(status=status))
+        for link in p["links"]:
+            conf = "-" if link["confidence"] is None else f"{link['confidence']:g}"
+            cls = link["method_class"] or "-"
+            miss = "" if link["found"] else "  " + _("(outside the corpus)")
+            lines.append("    " + _("{id}  confidence={conf}  method={cls}").format(id=link["id"], conf=conf, cls=cls)
+                         + f"{miss}  {(link['label'] or '')[:90]}")
+        w = p["weakest_link"]
+        if w["ids"]:
+            conf = _("unknown") if w["confidence"] is None else f"{w['confidence']:g}"
+            dup = len(set(w["ids"])) < len(w["ids"])  # o mesmo id em dois arquivos: diz o arquivo
+            at = [f"{a['file']}#{a['id']}" if dup else a["id"] for a in w["at"]]
+            lines.append(_("  weakest link: {conf} at {ids}").format(conf=conf, ids=", ".join(at)))
+        if p["origin"]:
+            o = p["origin"]
+            conf = "-" if o["confidence"] is None else f"{o['confidence']:g}"
+            lines.append(_("  origin: {id}, method {cls}, confidence {conf} (a separate axis)").format(
+                id=o["id"], cls=o["method_class"] or "-", conf=conf))
+        lines.append(_("  grade: strict {strict}, lenient {lenient}").format(
+            strict=_word_of(p["grade"]["strict"]), lenient=_word_of(p["grade"]["lenient"])))
+    if res.get("truncated"):
+        lines.append(_("· more than {n} paths: the projection stops there").format(n=MAX_PATHS))
+    return "\n".join(lines)
 
 
 def fold(text):
@@ -474,6 +662,9 @@ def main(argv=None):
     ap.add_argument("--open", action="store_true", dest="open_only", help=_("the queue of open nodes (status open)"))
     ap.add_argument("--verified-before", metavar=_("YYYY-MM-DD"), help=_("without verified_at, or verified before the date"))
     ap.add_argument("--around", metavar="ID", help=_("the neighborhood of the node (<path>#<id>, or an id unique in the corpus)"))
+    ap.add_argument("--chain", metavar="ID",
+                    help=_("the transmission chain from the node back to its origin: the weakest link and the origin's "
+                           "strength, as separate axes, with a strict and a lenient grade"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
@@ -523,6 +714,17 @@ def main(argv=None):
             return broken(exc)
     elif args.model or args.model_dir:
         return broken(_("--model and --model-dir go with --semantic"))
+    if args.chain is not None:
+        if args.around is not None or args.semantic is not None or args.text is not None:
+            return broken(_("--chain does not combine with --around, --text or --semantic"))
+        try:
+            corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
+            res = chain(corpus, args.chain, args.edge_types)
+        except (OSError, ValueError, UnicodeDecodeError) as exc:
+            return broken(exc)
+        text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else chain_human(res)
+        print(text.encode("utf-8", "backslashreplace").decode("utf-8"))
+        return 0
     try:
         corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
         res = query(corpus, ids=args.ids, id_prefix=args.id_prefix, node_type=args.node_type, status=args.status,
