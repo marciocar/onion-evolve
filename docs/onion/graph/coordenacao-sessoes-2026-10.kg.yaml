@@ -27,6 +27,11 @@ external_edges:
   - from: Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA
     to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027"
     edge_type: TRACES_TO
+  # a troca dos serviços para o 3.15 tem os selos e o wrapper (ops/migrate-python-service.sh) no sinais-de-campo; o card
+  # do maestro, com os comandos na ordem, está no PR feat/ops-python-315-services
+  - from: Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_PY315_EXECUCAO_POR_OPS_E_OPT_1027"
+    edge_type: DEPENDS_ON
   - from: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
     to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
     edge_type: TRACES_TO
@@ -413,14 +418,24 @@ nodes:
   - id: Q_COORD_MAESTRO_FECHAR_SESSOES_ANTIGAS
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 3
     confidence: 0.5
-    verified_against: "correção repassada pela sessão principal do core em 2026-10-27, com a confirmação da sessão do kg-ssot"
     label: "Fechar as sessões antigas sem atividade do kg-ssot (243923 e b600fe) e da curadoria (onion-curation-f0)."
-    narrative: "Substitui a pendência que dizia haver uma sessão duplicada do kg-ssot: o kg-ssot confirmou que o PR 277 foi mergeado pela sessão ATUAL dele, e não houve segundo escritor. Restam as sessões paradas, que só o maestro fecha."
+    status: done
+    plane: DEV
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «As 5 sessões antigas foram encerradas pelo maestro em 2026-10-27, conferido no ps»"
+    narrative: |-
+      Substitui a pendência que dizia haver uma sessão duplicada do kg-ssot: o kg-ssot confirmou que o PR 277 foi mergeado pela sessão ATUAL dele, e não houve segundo escritor. Restam as sessões paradas, que só o maestro fecha.
+
+      verified_against anterior: «correção repassada pela sessão principal do core em 2026-10-27, com a confirmação da sessão do kg-ssot»
+      Selado por /meta:decide em 2026-10-27: escolhida «As 5 sessões antigas foram encerradas pelo maestro em 2026-10-27, conferido no ps» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Manter as sessões antigas abertas».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Fechar as sessões antigas sem atividade do kg-ssot e da curadoria?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
 edges:
   - from: Q_COORD_MERGE_PR1407_KGSSOT_4340
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
