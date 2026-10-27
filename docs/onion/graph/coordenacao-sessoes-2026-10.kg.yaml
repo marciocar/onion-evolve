@@ -145,13 +145,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "ops/registry-pins.sh --check em 2026-10-27, por volta das 23h UTC: o carimbo da integração no remoto dos quatro adotantes diz source_commit 95365699a0e3; gh pr view: curadoria 150, kg-ssot 285, sge 163 e brain 1648 MERGED"
     label: "A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core."
-    narrative: "Segue a ordem do maestro de 2026-10-26: a cada pin novo do core, oferecer o update às sessões adotantes, agrupando. Andamento em 2026-10-27, com o pin 95365699a0e3: a curadoria mergeou (PR 150). Seguem abertos o PR 285 do kg-ssot, com o check conformance vermelho até a sessão dona re-medir a catraca no pin novo como faz a cada update; o PR 163 do sge, verde; e o PR 1648 do brain, sem checks na base, à espera do calendário da entrega de 31/10. O merge é de cada sessão dona; este nó fecha quando os três entrarem."
+    narrative: "Segue a ordem do maestro de 2026-10-26: a cada pin novo do core, oferecer o update às sessões adotantes, agrupando. Andamento em 2026-10-27, com o pin 95365699a0e3: a curadoria mergeou (PR 150). Seguem abertos o PR 285 do kg-ssot, com o check conformance vermelho até a sessão dona re-medir a catraca no pin novo como faz a cada update; o PR 163 do sge, verde; e o PR 1648 do brain, sem checks na base, à espera do calendário da entrega de 31/10. O merge é de cada sessão dona; este nó fecha quando os três entrarem. Fechado em 2026-10-27: os quatro PRs entraram, e o registro carimba os quatro em 95365699a0e3. Resta um PR de correção no brain (1652): o merge do 1648 trocou o campo commit do carimbo da kg-ssot para o da tag no repo de desenvolvimento (3960131ab70d), quando o brain vendoriza pelo espelho público (9fc22ac170d1). Os arquivos são idênticos; só o campo e o relatório mudam."
   - id: Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA
     node_type: question
     layer: audit
