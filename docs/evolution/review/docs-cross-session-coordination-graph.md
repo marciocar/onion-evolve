@@ -2,8 +2,7 @@
 branch: docs/cross-session-coordination-graph
 pr: 1410
 date: 2026-10-27
-reviewed_diff_sha256: 81d49f93ce011e2340a87b3e4229babfccfd3e357b09b981814bddd4eecd6704
-reviewed_code_sha256: 7123a03abc3a22e3e4c8d0bd50ca671c216d37d88f98a3c091136e872693fca1
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 3
 tokens: 0
@@ -35,7 +34,7 @@ nota: "tokens não medidos; grafo, projeção e duas frases de doc"
    o que vale hoje: o grafo de coordenação o declara em cada pendência, outros grafos em nós avulsos.
 2. **Real, corrigido.** O label do PR 1407 dizia que o merge é do maestro com o dono `core`: duas afirmações que
    se contradiziam. Ficou só «falta o merge».
-3. **Real, corrigido.** «D0 do lançamento» era código curto sem glosa; virou «dia zero (D0)».
+3. **Real, corrigido.** «D0 do lançamento» era código curto sem termo; virou «dia zero». A glosa entre parênteses não bastou: o kg_vocab lint do pr-finalize seguiu reprovando o código, e ele saiu da prosa.
 4. **Limite, não defeito.** O `kg_query.py` não filtra por `owner`. A consulta por dono sai pelo `--fields owner`
    no JSON com um filtro `jq`, e o comando exato está no corpo do PR.
 

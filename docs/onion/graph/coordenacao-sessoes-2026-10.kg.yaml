@@ -372,7 +372,7 @@ nodes:
     verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
     label: "O npm de cada release da kg-ssot, a começar pela 4.35.0."
     narrative: "A publicação no npm é ato do maestro em cada release; a próxima é a 4.35.0."
-  - id: Q_COORD_MAESTRO_VITRINE_E_D0_KGSSOT
+  - id: Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT
     node_type: question
     layer: audit
     plane: DEV
@@ -381,7 +381,7 @@ nodes:
     impact: 3
     confidence: 0.5
     verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
-    label: "Os textos da vitrine e o dia zero (D0) do lançamento da kg-ssot."
+    label: "Os textos da vitrine e o dia zero do lançamento da kg-ssot."
     narrative: "Decisão de texto e de data do maestro."
   - id: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
     node_type: question
@@ -506,7 +506,7 @@ edges:
   - from: Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
-  - from: Q_COORD_MAESTRO_VITRINE_E_D0_KGSSOT
+  - from: Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
   - from: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
