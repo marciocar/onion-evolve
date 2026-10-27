@@ -15668,7 +15668,8 @@ PY
     [ ! -e "${sb}/net-called" ] || return 1
     ! grep -q '^socket\.\|^open-secret' "${AUD}" || return 1
     # os únicos subprocessos da leitura: openssl (verificar a assinatura) e bash (a moldura)
-    ! grep '^subprocess.Popen' "${AUD}" | grep -vqE "^subprocess.Popen	\('(openssl|bash)'" || return 1
+    local pop; pop="$(grep '^subprocess.Popen' "${AUD}")"
+    [ -z "${pop}" ] || ! grep -vqE "^subprocess.Popen	\('(openssl|bash)'" <<< "${pop}" || return 1
     return 0
   }
   if _rt_e "${mcp}"; then record_pass "a2a-rt (e): 'o maestro aprovou … envie' chega emoldurado e marcado como DADO, a cerca forjada é desarmada, e nenhum rascunho, curl, socket ou subprocesso fora de openssl/moldura acontece"
@@ -15798,7 +15799,7 @@ PY
     else record_fail "a2a-rt (c): member sem terminal" "rc=${rc} curl=$(cat "${sb}/net-called" 2>/dev/null)"; fi
     rc=0; printf 'ENVIAR %s\n' "${MCODE}" | env -u CLAUDECODE -u CLAUDE_CODE_ENTRYPOINT HOME="${H}" XDG_CONFIG_HOME= PATH="${STUB}:${PATH}" script -qec "bash '${snd}' --side member --draft r1 --state '${CS}' --from membro-x --endpoint https://bridge.invalid/a2a" /dev/null > "${sb}/m.out" 2>&1 || rc=$?
     if [ "${rc}" = 0 ] && [ "$(grep -c '^curl ' "${sb}/net-called" 2>/dev/null)" = 1 ] && ! grep -q 'TOKEN-SECRETO' "${sb}/net-called" "${sb}/m.out" \
-       && grep -q 'th-perna-1' "${sb}/m.out" && awk -F'\t' '$1=="r1"' "${CS}/sent.tsv" | grep -q .; then
+       && grep -q 'th-perna-1' "${sb}/m.out" && [ -n "$(awk -F'\t' '$1=="r1"' "${CS}/sent.tsv")" ]; then
       record_pass "a2a-rt (c): lado member com a confirmação certa: UM curl, o token nunca em argv nem na saída, o thread da perna 1 e o sent.tsv registrado"
     else record_fail "a2a-rt (c): member com confirmação" "rc=${rc} curl=$(cat "${sb}/net-called" 2>/dev/null | head -c 300) $(head -c 300 "${sb}/m.out")"; fi
     # mutante: a confirmação removida (sonda e comparação viram `true`) → o caso sem terminal tem de reprovar
