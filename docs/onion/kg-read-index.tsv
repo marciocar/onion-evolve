@@ -2541,6 +2541,7 @@ ops/mcp-onion-kg/server.py	E_OBJECAO_PRECEDENTE_SEM_FRESCOR_POR_COMMIT	docs/evol
 ops/mcp-onion-kg/server.py	E_OBJECAO_PRECEDENTE_USA_X_API_KEY	docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml
 ops/mcp-onion-kg/server.py	Q_ONION_KG_MCP_NEXT	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 ops/merge-drivers/selftest-families.py	D_DRIVER_DE_MERGE_DAS_FAMILIAS	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
+ops/migrate-python-service.sh	E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 ops/migrate-python-service.sh	E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 ops/mutate-and-restore.sh	E_MUTATE_ANCORA_UNICA_MEDIDA_1027	docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml
 ops/pr-finalize.sh	E_CONFLITO_DE_PROJECAO_GERADA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
