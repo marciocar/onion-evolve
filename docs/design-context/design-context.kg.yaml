@@ -1,0 +1,207 @@
+# Grafo do design-context, gerado pelo /design:setup (design-setup.py). O brief.md segue escrito à mão,
+# com projection_of apontando este arquivo. Editar à mão é permitido; o setup nunca o sobrescreve.
+# GRAFO PILOTO do core (2026-10-27, dogfood da onda 1): o 1º contexto do Onion com grafo próprio. Gerado pelo
+# setup sobre os tokens que já existiam e ajustado à mão em três pontos: o tema aponta docs/materials/theme.css
+# (o setup detectou um CSS do site, que não deriva dos tokens), o acento roxo entra como token e a política e
+# a decisão da paleta citam o brief e os PRs que as fixaram. Gerar o .md a partir daqui NÃO está na onda 1, e
+# o checador de projeção (o .md cita ids que existem aqui) é do kg-ssot e ainda não existe.
+meta:
+  id: design-context
+  schema_version: "1"
+  baseline: "2026-10-27"
+  review_after: "2027-01-27"
+nodes:
+  - id: C_BRIEF
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    label: "O brief do design: a intenção da marca, o público e o tom, de onde os tokens derivam."
+    trace: "docs/design-context/brief.md"
+    verified_at: "2026-10-27"
+    verified_against: "docs/design-context/brief.md"
+    provenance:
+      source: "docs/design-context/brief.md"
+      locator: "o arquivo inteiro"
+      method: "reading: o brief escrito à mão"
+      locality: "repo"
+  - id: E_BRAND
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: "A marca do Onion: o laranja #D97757 (badge Claude Code) é a cor primária nos tokens W3C DTCG."
+    trace: "docs/design-context/foundations/color.tokens.json"
+    verified_at: "2026-10-27"
+    verified_against: "docs/design-context/foundations/color.tokens.json"
+    provenance:
+      source: "docs/design-context/foundations/color.tokens.json"
+      locator: "#/color/brand/orange"
+      method: "reading: os tokens W3C DTCG"
+      locality: "repo"
+  - id: E_TOKEN_ACTION_PRIMARY
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: "O token da ação primária (CTA): #D97757."
+    trace: "docs/design-context/semantic/color.tokens.json"
+    verified_at: "2026-10-27"
+    verified_against: "docs/design-context/semantic/color.tokens.json"
+    provenance:
+      source: "docs/design-context/semantic/color.tokens.json"
+      locator: "#/color/action/primary"
+      method: "reading: os tokens W3C DTCG"
+      locality: "repo"
+  - id: E_TOKEN_ON_PRIMARY
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: "O token do texto sobre a ação primária: #1A1714."
+    trace: "docs/design-context/semantic/color.tokens.json"
+    verified_at: "2026-10-27"
+    verified_against: "docs/design-context/semantic/color.tokens.json"
+    provenance:
+      source: "docs/design-context/semantic/color.tokens.json"
+      locator: "#/color/action/on-primary"
+      method: "reading: os tokens W3C DTCG"
+      locality: "repo"
+  - id: E_TOKEN_ACCENT
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "O token do acento: o roxo #8A2BE2 da família Onion, com texto branco sobre ele."
+    trace: "docs/design-context/semantic/color.tokens.json"
+    verified_at: "2026-10-27"
+    verified_against: "docs/design-context/semantic/color.tokens.json"
+    provenance:
+      source: "docs/design-context/semantic/color.tokens.json"
+      locator: "#/color/action/accent"
+      method: "reading: os tokens W3C DTCG"
+      locality: "repo"
+  - id: A_TOKENS_FOUNDATIONS
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O arquivo dos primitivos de cor (foundations), valores crus em W3C DTCG."
+    trace: "docs/design-context/foundations/color.tokens.json"
+  - id: A_TOKENS_SEMANTIC
+    node_type: artifact
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "O arquivo dos papéis de cor (semantic), que referenciam as foundations por alias."
+    trace: "docs/design-context/semantic/color.tokens.json"
+  - id: I_CONTRAST_CTA
+    node_type: invariant
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    label: "O texto do CTA tem contraste de pelo menos 4,5:1 sobre a cor de ação (medido: 5.72:1)."
+    trace: "docs/design-context/governance/contrast-pairs.json"
+    verified_at: "2026-10-27"
+    verified_against: "docs/design-context/governance/contrast-pairs.json"
+    provenance:
+      source: "docs/design-context/governance/contrast-pairs.json"
+      locator: "o par color.action.on-primary sobre color.action.primary"
+      method: "measurement: razão WCAG 2.x calculada pelo design-setup; o lint-design-tokens.sh re-mede"
+      locality: "repo"
+  - id: ST_THEME
+    node_type: state
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O tema do core no modo claro, materializado em variáveis CSS pelo design-sink; os modos dark e alto contraste estão a popular."
+    trace: "docs/materials/theme.css"
+  - id: P_BRAND_USE
+    node_type: policy
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Uso da marca: o laranja é a ação primária e o roxo é acento, que nunca concorre com o laranja em CTA."
+    narrative: "A hierarquia está no brief, seção Cores de marca. Fica open porque é diretriz declarada: nenhum gate mede uso de cor em componente."
+  - id: D_PALETTE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "A escolha da paleta da marca, que espera o selo do maestro."
+    narrative: "No core a paleta foi fixada pelos PRs 143 (a vertical de design, 2026-06-23) e 171 (o texto do CTA escuro, para chegar a 4,5:1, 2026-06-24). Merge não é selo: o registro da escolha como decisão do maestro, com testemunho, é dele."
+edges:
+  - from: E_BRAND
+    to: C_BRIEF
+    edge_type: TRACES_TO
+  - from: D_PALETTE
+    to: E_BRAND
+    edge_type: TRACES_TO
+  - from: E_TOKEN_ACTION_PRIMARY
+    to: E_BRAND
+    edge_type: DEPENDS_ON
+  - from: A_TOKENS_FOUNDATIONS
+    to: E_BRAND
+    edge_type: TRACES_TO
+  - from: A_TOKENS_SEMANTIC
+    to: E_TOKEN_ACTION_PRIMARY
+    edge_type: TRACES_TO
+  - from: A_TOKENS_SEMANTIC
+    to: E_TOKEN_ON_PRIMARY
+    edge_type: TRACES_TO
+  - from: I_CONTRAST_CTA
+    to: E_TOKEN_ACTION_PRIMARY
+    edge_type: CONSTRAINS
+  - from: I_CONTRAST_CTA
+    to: E_TOKEN_ON_PRIMARY
+    edge_type: CONSTRAINS
+  - from: E_BRAND
+    to: ST_THEME
+    edge_type: HAS_STATE
+  - from: ST_THEME
+    to: D_PALETTE
+    edge_type: TRACES_TO
+  - from: P_BRAND_USE
+    to: E_BRAND
+    edge_type: CONSTRAINS
+  - from: P_BRAND_USE
+    to: E_TOKEN_ACCENT
+    edge_type: CONSTRAINS
+  - from: A_TOKENS_SEMANTIC
+    to: E_TOKEN_ACCENT
+    edge_type: TRACES_TO
+  - from: P_BRAND_USE
+    to: C_BRIEF
+    edge_type: TRACES_TO
+external_edges:
+  - from: C_BRIEF
+    to: "docs/business-context/business-context.kg.yaml#E_POSITIONING"
+    edge_type: TRACES_TO
+  - from: C_BRIEF
+    to: "docs/business-context/business-context.kg.yaml#E_AUDIENCE"
+    edge_type: TRACES_TO
+  - from: I_CONTRAST_CTA
+    to: "docs/technical-context/technical-context.kg.yaml#ST_THEME_APPLIED"
+    edge_type: CONSTRAINS

@@ -2,7 +2,7 @@
 name: context-freshness
 description: |
   Audita o frescor dos contextos de domínio (docs/business-context/,
-  docs/technical-context/, docs/compliance-context/) tratando-os como SSOT viva,
+  docs/technical-context/, docs/compliance-context/, docs/design-context/) tratando-os como SSOT viva,
   não snapshot. Um worker por arquivo via onion-orchestration retorna veredito
   CURRENT/STALE/HISTORICAL + trechos desatualizados + direção de refresh; o fan-in
   consolida, detecta contradição cross-domínio e marca candidatos a remoção.
@@ -10,9 +10,9 @@ description: |
 category: meta
 tags: [context, freshness, orchestration, validation, lifecycle]
 version: "1.0.0"
-updated: "2026-06-17"
+updated: "2026-10-27"
 allowed-tools: Read Grep Glob
-argument-hint: "[caminho/glob de contexto específico | vazio = os 3 contextos]"
+argument-hint: "[caminho/glob de contexto específico | vazio = os 4 contextos]"
 related_commands:
   - /meta:kb-freshness
   - /meta:evolve
@@ -28,9 +28,11 @@ related_agents:
 
 ## Objetivo
 
-Garantir que `docs/business-context/`, `docs/technical-context/` e
-`docs/compliance-context/` permaneçam **fiéis à realidade do projeto** ao longo do
-tempo. A geração (`/docs:build-*-docs`) é só o **primeiro tick**; este comando é a
+Garantir que `docs/business-context/`, `docs/technical-context/`,
+`docs/compliance-context/` e `docs/design-context/` permaneçam **fiéis à realidade do projeto** ao longo do
+tempo. (O design-context entrou em 2026-10-27, com a onda 1 do setup de design: é contexto de primeira
+classe, não dimensão peer. A régua dele tem uma tensão própria: design estável não é stale, e o critério é
+"bate com o que está em produção" — os tokens contra o tema gerado e o brief contra o grafo do design.) A geração (`/docs:build-*-docs`) é só o **primeiro tick**; este comando é a
 fase **Manage** do ciclo de vida CRUD+ — a operação **Validar** (rastreabilidade +
 frescor + contradição cross-domínio) que decide se o contexto ainda merece
 confiança, e sinaliza a operação **Remover** (stale engana ativamente).
@@ -97,7 +99,10 @@ Argumento recebido: $ARGUMENTS
 ```
 - **Preenchido**: trate como caminho/glob dentro de um `docs/*-context/`.
 - **Vazio**: `Glob` em `docs/business-context/**/*.md`, `docs/technical-context/**/*.md`,
-  `docs/compliance-context/**/*.md`, **excluindo** `README.md` e `index.md`.
+  `docs/compliance-context/**/*.md` e `docs/design-context/**/*.md`, **excluindo** `README.md` e `index.md`.
+  No design, o worker lê também o grafo `docs/design-context/design-context.kg.yaml` (o `brief.md` declara
+  `projection_of` para ele) e a saída de `bash .claude/validation/design-context-check.sh` (locator de token e
+  ligação do brief), que é a camada determinística daquele contexto.
 
 Registre o conjunto como `CTX_FILES`. **Se vazio** (repo que só instalou o framework, com os
 contextos ainda em template), informe o usuário e **encerre sem erro** — não há contexto populado
@@ -116,7 +121,7 @@ Autore um script `Workflow` com `parallel()`. Cada worker recebe o caminho, a
 ```javascript
 const FreshnessSchema = {
   file: "string",            // caminho relativo a docs/
-  context: "business|technical|compliance",
+  context: "business|technical|compliance|design",
   verdict: "CURRENT|STALE|HISTORICAL",
   failed_items: ["string"],  // ids da régua que falharam
   stale_excerpts: [ { excerpt: "string", reason: "string" } ],
@@ -195,7 +200,7 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 ## Exemplos
 
 ```bash
-/meta:context-freshness                                   # os 3 contextos
+/meta:context-freshness                                   # os 4 contextos
 /meta:context-freshness docs/business-context/            # só negócio
 /meta:context-freshness docs/technical-context/03-domain/ # um subdiretório
 ```

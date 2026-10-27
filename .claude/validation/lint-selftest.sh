@@ -16266,10 +16266,19 @@ run_resolve_context_dir_selftests() {
   rc=0; bash "${helper}" compliance --repo "$t" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 3 ]; then record_pass "resolve-context-dir: (d) declaração com '..' → exit 3"
   else record_fail "resolve-context-dir: (d)" "esperava 3, veio ${rc}"; fi
-  # (e) dimensão desconhecida → exit 2
-  rc=0; bash "${helper}" design --repo "$t" >/dev/null 2>&1 || rc=$?
-  if [ "${rc}" -eq 2 ]; then record_pass "resolve-context-dir: (e) dimensão fora de business|technical|compliance → exit 2"
+  # (e) dimensão desconhecida → exit 2. ⚠️ Até 2026-10-27 o caso usava `design` como a desconhecida; a onda 1
+  #     do setup de design a tornou conhecida, e o caso passou a usar `infra` (nenhum contexto com esse nome).
+  rc=0; bash "${helper}" infra --repo "$t" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "resolve-context-dir: (e) dimensão fora de business|technical|compliance|design → exit 2"
   else record_fail "resolve-context-dir: (e)" "esperava 2, veio ${rc}"; fi
+  # (e2) design: o default é docs/design-context e a declaração context.design vence (onda 1 do setup de design)
+  local de1 de2; rm -f "$t/.claude/onion-context.yaml"
+  de1="$(bash "${helper}" design --repo "$t" --source 2>/dev/null || true)"
+  printf 'context:\n  design: brand/tokens\n' > "$t/.claude/onion-context.yaml"
+  de2="$(bash "${helper}" design --repo "$t" --source 2>/dev/null || true)"
+  if [ "${de1}" = $'docs/design-context\tdefault' ] && [ "${de2}" = $'brand/tokens\tonion-context' ]; then
+    record_pass "resolve-context-dir: (e2) design → docs/design-context por default; context.design declarado vence"
+  else record_fail "resolve-context-dir: (e2) design" "default='${de1}' declarado='${de2}'"; fi
   # (f) declaração absoluta → exit 3; `--repo` sem valor → exit 2 (antes: laço infinito, passada adversarial)
   printf 'context:\n  compliance: /abs\n' > "$t/.claude/onion-context.yaml"
   rc=0; bash "${helper}" compliance --repo "$t" >/dev/null 2>&1 || rc=$?
@@ -27301,6 +27310,18 @@ run_context_freshness_metric_selftests() {
      && grep -q '"no_stamp":1' <<< "${out}"; then
     record_pass "context-freshness-metric: current/stale/no-stamp + denominador exclui no-stamp"
   else record_fail "context-freshness-metric" "esperado docs3/current1/stale1/nostamp1, veio: ${out}"; fi
+  rm -rf "${d}"
+  # (b) a lista PADRÃO cobre o design-context (onda 1 do setup de design, 2026-10-27): um .md em
+  #     docs/design-context de um repo sem os outros três contextos é contado. Mutante: a lista sem o design cala.
+  d="$(mktemp -d)"; git -C "${d}" init -q 2>/dev/null; mkdir -p "${d}/docs/design-context"
+  printf -- '---\ndate: %s\n---\n# brief\n' "${today}" > "${d}/docs/design-context/brief.md"
+  local dm
+  out="$(cd "${d}" && bash "${helper}" --summary-json 2>/dev/null)"
+  sed 's#docs/compliance-context docs/design-context"#docs/compliance-context"#' "${helper}" > "${d}/m.sh"
+  dm="$(cd "${d}" && bash "${d}/m.sh" --summary-json 2>/dev/null)"
+  if grep -q '"docs":1' <<< "${out}" && grep -q '"docs":0' <<< "${dm}" && ! cmp -s "${helper}" "${d}/m.sh"; then
+    record_pass "context-freshness-metric: (b) a lista padrão cobre docs/design-context; o mutante sem ele cala"
+  else record_fail "context-freshness-metric: (b) design-context" "real=${out} mutante=${dm}"; fi
   rm -rf "${d}"
 }
 _family run_context_freshness_metric_selftests
@@ -40200,6 +40221,273 @@ KBI
   rm -rf "${f}"
 }
 _family run_kb_index_selftests
+
+# ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+# Famílias design_setup e design_context (onda 1 do setup de design, 2026-10-27): o motor do /design:setup e a
+# guarda do grafo do design-context (REGRA 111 (Grafo do design-context: locator de token e ligação do brief)).
+# O fixture é um repo git com tudo COMMITADO, porque o gate do contrato (kg_validate --corpus) só lê grafo
+# rastreado — a mesma razão do laboratório da curadoria (caso 8). O design nasce do PRÓPRIO setup: a bancada
+# exercita o motor como o comando o invoca, e a guarda julga a saída real dele, não um grafo escrito à mão.
+# ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
+_dc_commit() { git -C "$1" add -A >/dev/null 2>&1; git -C "$1" -c user.name=bancada -c user.email=bancada@bancada.invalid commit -qm "$2" >/dev/null 2>&1; }
+_dc_fixture() {  # <dir> <com-business:1|0> — repo git com os grafos-alvo (opcionais) e o design gerado pelo setup
+  local d="$1" biz="${2:-1}"
+  mkdir -p "${d}/docs/technical-context" "${d}/docs/design-context"
+  git -C "${d}" init -q 2>/dev/null
+  if [ "${biz}" = 1 ]; then
+    mkdir -p "${d}/docs/business-context"
+    cat > "${d}/docs/business-context/business-context.kg.yaml" <<'YAML'
+meta:
+  id: business-context
+  schema_version: "1"
+  baseline: "2026-10-27"
+nodes:
+  - id: E_POSITIONING
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: "Posicionamento do produto sintético."
+  - id: E_AUDIENCE
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: "Público do produto sintético."
+edges:
+  - from: E_POSITIONING
+    to: E_AUDIENCE
+    edge_type: TRACES_TO
+YAML
+  fi
+  cat > "${d}/docs/technical-context/technical-context.kg.yaml" <<'YAML'
+meta:
+  id: technical-context
+  schema_version: "1"
+  baseline: "2026-10-27"
+nodes:
+  - id: EV_BUILD_THEME
+    node_type: event
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Build do tema."
+  - id: ST_THEME_APPLIED
+    node_type: state
+    layer: domain
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Tema aplicado."
+edges:
+  - from: EV_BUILD_THEME
+    to: ST_THEME_APPLIED
+    edge_type: EMITS
+YAML
+  _dc_commit "${d}" "alvos antes do design"   # a ordem de migração: o alvo entra no git antes do design
+  bash "${REPO_ROOT}/.claude/utils/design-setup/design-setup.sh" --repo "${d}" --brand '#D97757' --create-brief \
+    --audience "adultos que estudam no celular" --tone "direto" --today 2026-10-27 --apply >/dev/null 2>&1
+  _dc_commit "${d}" "design gerado pelo setup"
+}
+
+run_design_setup_selftests() {
+  local s="${REPO_ROOT}/.claude/utils/design-setup/design-setup.sh"
+  [ -f "${s}" ] || { record_fail "design-setup" "motor ausente: ${s}"; return; }
+  local d o rc G="docs/design-context/design-context.kg.yaml"
+  # (a) sem brief e sem --create-brief, sem tokens e sem --brand: rc 3 nomeando o que falta, e NADA gravado
+  d="$(mktemp -d)"; git -C "${d}" init -q 2>/dev/null
+  if o="$(bash "${s}" --repo "${d}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 3 ] && grep -q 'PRECISA.*--brand' <<< "${o}" && grep -q 'PRECISA.*--create-brief' <<< "${o}" && [ ! -e "${d}/docs" ]; then
+    record_pass "design-setup: (a) sem brief nem marca ⇒ rc 3 nomeando --brand e --create-brief, nada gravado"
+  else record_fail "design-setup: (a) confirmação" "rc=${rc} ${o:0:200}"; fi
+  # (b) dry-run com tudo dado: plano CRIAR, rc 0, e o disco intocado
+  if o="$(bash "${s}" --repo "${d}" --brand '#D97757' --create-brief 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && grep -q '^CRIAR	docs/design-context/brief.md' <<< "${o}" && grep -q '^DRY-RUN' <<< "${o}" && [ ! -e "${d}/docs" ]; then
+    record_pass "design-setup: (b) dry-run é o padrão: plano CRIAR com rc 0 e nenhum arquivo gravado"
+  else record_fail "design-setup: (b) dry-run" "rc=${rc} ${o:0:200}"; fi
+  rm -rf "${d}"
+  # (c) --apply grava e TERMINA NO GATE (lint de tokens verde); o grafo passa no radar e no contrato
+  d="$(mktemp -d)"; _dc_fixture "${d}" 1
+  local radar=1 contract=1
+  bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${d}/${G}" --integrity --schema >/dev/null 2>&1 && radar=0
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ]; then
+    ( cd "${d}" && KG_CONTRACT_VENDOR="${REPO_ROOT}/vendor/kg-ssot" bash "${REPO_ROOT}/.claude/validation/kg-contract-check.sh" "${G}" ) >/dev/null 2>&1 && contract=0
+  else contract=skip; fi
+  if [ -f "${d}/${G}" ] && [ -f "${d}/docs/design-context/governance/contrast-pairs.json" ] && [ "${radar}" = 0 ] && [ "${contract}" != 1 ] \
+     && bash "${REPO_ROOT}/.claude/validation/lint-design-tokens.sh" "${d}" >/dev/null 2>&1 \
+     && grep -q 'business-context.kg.yaml#E_POSITIONING' "${d}/${G}" && grep -q 'technical-context.kg.yaml#ST_THEME_APPLIED' "${d}/${G}"; then
+    record_pass "design-setup: (c) --apply grava tokens, brief e grafo ligado aos dois contextos; lint de tokens, radar e contrato (${contract/0/rc 0}) verdes"
+  else record_fail "design-setup: (c) apply" "radar=${radar} contrato=${contract} $(ls -R "${d}/docs" 2>&1 | tr '\n' ' ' | head -c 200)"; fi
+  # (d) IDEMPOTENTE e NUNCA SOBRESCREVE: a 2ª execução só tem MANTER/NADA e nenhum byte muda
+  local before after
+  before="$(cd "${d}" && find docs -type f -exec sha256sum {} + | sort)"
+  if o="$(bash "${s}" --repo "${d}" --brand '#123456' --create-brief --apply 2>&1)"; then rc=0; else rc=$?; fi
+  after="$(cd "${d}" && find docs -type f -exec sha256sum {} + | sort)"
+  if [ "${rc}" = 0 ] && [ "${before}" = "${after}" ] && grep -q '^NADA' <<< "${o}" && grep -q 'ignorado' <<< "${o}" && ! grep -q '^CRIAR' <<< "${o}"; then
+    record_pass "design-setup: (d) reexecutar não duplica nem sobrescreve (outra --brand é ignorada com aviso; 0 byte mudou)"
+  else record_fail "design-setup: (d) idempotência" "rc=${rc} mudou=$([ "${before}" = "${after}" ] && echo não || echo SIM) ${o:0:200}"; fi
+  rm -rf "${d}"
+  # (e) CONTRASTE DO CTA: #7A7A7A dá menos de 4,5:1 com branco E com quase preto ⇒ a ação usa um tom mais
+  #     escuro (primary-strong) e a cor original vira acento; o gate re-mede verde. Mutante: sem o escurecimento,
+  #     o par do CTA reprova no gate e o setup sai 1.
+  d="$(mktemp -d)"; git -C "${d}" init -q 2>/dev/null
+  if o="$(bash "${s}" --repo "${d}" --brand '#7A7A7A' --create-brief --apply 2>&1)"; then rc=0; else rc=$?; fi
+  local m mrc
+  m="$(mktemp -d)"; mkdir -p "${m}/.claude/utils/design-setup" "${m}/.claude/validation" "${m}/.claude/utils/scope"
+  cp "${s}" "${m}/.claude/utils/design-setup/"; cp "${REPO_ROOT}/.claude/utils/scope/resolve-context-dir.sh" "${m}/.claude/utils/scope/"
+  cp "${REPO_ROOT}/.claude/validation/lint-design-tokens.sh" "${m}/.claude/validation/"
+  sed 's/    if max(rw, rb) >= MIN:/    if True:/' "${REPO_ROOT}/.claude/utils/design-setup/design-setup.py" > "${m}/.claude/utils/design-setup/design-setup.py"
+  local dm; dm="$(mktemp -d)"; git -C "${dm}" init -q 2>/dev/null
+  if bash "${m}/.claude/utils/design-setup/design-setup.sh" --repo "${dm}" --brand '#7A7A7A' --create-brief --apply >/dev/null 2>&1; then mrc=0; else mrc=$?; fi
+  if [ "${rc}" = 0 ] && grep -q 'nenhum chega a 4,5:1' <<< "${o}" && grep -q 'primary-strong' "${d}/docs/design-context/semantic/color.tokens.json" \
+     && grep -q '"accent"' "${d}/docs/design-context/semantic/color.tokens.json" && [ "${mrc}" = 1 ] \
+     && ! cmp -s "${REPO_ROOT}/.claude/utils/design-setup/design-setup.py" "${m}/.claude/utils/design-setup/design-setup.py"; then
+    record_pass "design-setup: (e) marca sem 4,5:1 com branco nem quase preto ⇒ tom mais escuro na ação e a cor original como acento, gate verde; o mutante sem escurecer sai 1 no gate"
+  else record_fail "design-setup: (e) contraste do CTA" "rc=${rc} mutante=${mrc} ${o:0:200}"; fi
+  rm -rf "${d}" "${m}" "${dm}"
+  # (f) sem grafo do business-context: o grafo nasce com a question aberta que declara a falta, e a guarda cala
+  d="$(mktemp -d)"; _dc_fixture "${d}" 0
+  if grep -q 'x_missing_context: "business-context"' "${d}/${G}" && ! grep -q 'E_POSITIONING"' "${d}/${G}" \
+     && bash "${REPO_ROOT}/.claude/validation/design-context-check.sh" "${d}" >/dev/null 2>&1; then
+    record_pass "design-setup: (f) sem business-context ⇒ question aberta declara a falta (nenhuma ligação inventada) e a guarda sai 0"
+  else record_fail "design-setup: (f) sem business-context" "$(grep -n 'x_missing\|E_POSITIONING' "${d}/${G}" 2>&1 | head -3 | tr '\n' '|')"; fi
+  rm -rf "${d}"
+}
+_family run_design_setup_selftests
+
+run_design_context_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/design-context-check.sh" py="${REPO_ROOT}/.claude/validation/design-context-check.py"
+  [ -f "${chk}" ] && [ -f "${py}" ] || { record_fail "design-context" "guarda ausente: ${chk}"; return; }
+  local G="docs/design-context/design-context.kg.yaml" VAL="${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py"
+  local o rc d
+  # (a) o grafo piloto do PRÓPRIO core: rc 0, sem achado (onde o piloto existe; no adotante pula visível)
+  if [ -f "${REPO_ROOT}/${G}" ]; then
+    if o="$(bash "${chk}" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" = 0 ] && [ -z "${o}" ]; then record_pass "design-context: (a) o grafo piloto do core ⇒ rc 0, sem achado"
+    else record_fail "design-context: (a) piloto do core" "rc=${rc} ${o:0:240}"; fi
+  else record_skip "design-context: (a) sem o grafo piloto neste repo (só o core o tem)"; fi
+  # (b) LIGAÇÃO ÍNTEGRA: a guarda e o gate do contrato saem 0
+  d="$(mktemp -d)"; _dc_fixture "${d}" 1
+  local vrc="skip"
+  if [ -f "${VAL}" ]; then if ( cd "${d}" && python3 -I -B "${VAL}" --corpus . "${G}" ) >/dev/null 2>&1; then vrc=0; else vrc=$?; fi; fi
+  if o="$(bash "${chk}" "${d}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && [ -z "${o}" ] && [ "${vrc}" != 1 ] && [ "${vrc}" != 2 ]; then
+    record_pass "design-context: (b) ligação íntegra ⇒ guarda rc 0 e kg_validate --corpus rc ${vrc}"
+  else record_fail "design-context: (b) íntegra" "guarda rc=${rc} contrato=${vrc} ${o:0:200}"; fi
+  # (c) NÓ-ALVO REMOVIDO: é o GATE DO CONTRATO que pega (integrity.dangling-external), sem regra nova; a guarda
+  #     da vertical não duplica (sai 0)
+  local c; c="$(mktemp -d)"; cp -a "${d}/." "${c}/"
+  python3 -I - "${c}/docs/business-context/business-context.kg.yaml" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read()
+a = s.index("  - id: E_POSITIONING"); b = s.index("  - id: E_AUDIENCE")
+s = s[:a] + s[b:]
+s = s.replace("edges:\n  - from: E_POSITIONING\n    to: E_AUDIENCE\n    edge_type: TRACES_TO\n", "edges: []\n")
+open(p, "w").write(s)
+PY
+  _dc_commit "${c}" "o posicionamento sai"
+  if [ -f "${VAL}" ]; then
+    local vo; if vo="$(cd "${c}" && python3 -I -B "${VAL}" --corpus . "${G}" 2>&1)"; then vrc=0; else vrc=$?; fi
+    if [ "${vrc}" = 1 ] && grep -q 'dangling-external' <<< "${vo}" && bash "${chk}" "${c}" >/dev/null 2>&1; then
+      record_pass "design-context: (c) nó-alvo removido ⇒ o gate do contrato reprova (integrity.dangling-external, rc 1) e a guarda da vertical não duplica"
+    else record_fail "design-context: (c) alvo removido" "contrato rc=${vrc} ${vo:0:200}"; fi
+  else record_skip "design-context: (c) sem vendor/kg-ssot o gate do contrato não roda aqui"; fi
+  rm -rf "${c}"
+  # (d) TOKEN SUMIDO DO JSON (o arquivo continua): só a guarda pega — LOCATOR-AUSENTE, rc 1
+  c="$(mktemp -d)"; cp -a "${d}/." "${c}/"
+  python3 -I - "${c}/docs/design-context/semantic/color.tokens.json" <<'PY'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
+PY
+  if o="$(bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q '^SOFT	LOCATOR-AUSENTE	.*E_TOKEN_ON_PRIMARY' <<< "${o}"; then
+    record_pass "design-context: (d) token sumido do JSON com o arquivo presente ⇒ LOCATOR-AUSENTE (SOFT no 1º ciclo), rc 1"
+  else record_fail "design-context: (d) token sumido" "rc=${rc} ${o:0:200}"; fi
+  # (e) LOCATOR QUE APONTA UM GRUPO ⇒ LOCATOR-GRUPO
+  cp "${d}/docs/design-context/semantic/color.tokens.json" "${c}/docs/design-context/semantic/color.tokens.json"
+  sed -i 's|locator: "#/color/action/primary"|locator: "#/color/action"|' "${c}/${G}"
+  if o="$(bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'LOCATOR-GRUPO' <<< "${o}"; then record_pass "design-context: (e) locator que aponta um grupo ⇒ LOCATOR-GRUPO, rc 1"
+  else record_fail "design-context: (e) grupo" "rc=${rc} ${o:0:200}"; fi
+  rm -rf "${c}"
+  # (f) BRIEF SEM LIGAÇÃO e sem falta declarada ⇒ BRIEF-SEM-LIGACAO (o gate não vê: o brief segue ligado por aresta interna)
+  c="$(mktemp -d)"; cp -a "${d}/." "${c}/"
+  python3 -I - "${c}/${G}" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read(); s = s[:s.index("external_edges:")]; open(p, "w").write(s)
+PY
+  if o="$(bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'BRIEF-SEM-LIGACAO	.*C_BRIEF' <<< "${o}"; then record_pass "design-context: (f) brief sem ligação e sem question que declare a falta ⇒ BRIEF-SEM-LIGACAO, rc 1"
+  else record_fail "design-context: (f) brief sem ligação" "rc=${rc} ${o:0:200}"; fi
+  # (g) BRIEF FORA DO GRAFO: o brief existe e nenhum nó o traça (apagar o nó calava a regra no protótipo)
+  sed -i 's|trace: "docs/design-context/brief.md"|trace: "docs/design-context/outro.md"|' "${c}/${G}"
+  if o="$(bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q 'BRIEF-FORA-DO-GRAFO' <<< "${o}"; then record_pass "design-context: (g) brief no disco sem nó que o trace ⇒ BRIEF-FORA-DO-GRAFO, rc 1"
+  else record_fail "design-context: (g) brief fora do grafo" "rc=${rc} ${o:0:200}"; fi
+  rm -rf "${c}"
+  # (h) NÃO PUDE JULGAR ⇒ rc 2, nunca verde: o grafo é uma lista; o --graph aponta arquivo que não existe
+  c="$(mktemp -d)"; cp -a "${d}/." "${c}/"; printf -- '- isto\n- é uma lista\n' > "${c}/${G}"
+  local h1 h2
+  if bash "${chk}" "${c}" >/dev/null 2>&1; then h1=0; else h1=$?; fi
+  if bash "${chk}" "${c}" --graph docs/nao-existe.kg.yaml >/dev/null 2>&1; then h2=0; else h2=$?; fi
+  if [ "${h1}" = 2 ] && [ "${h2}" = 2 ]; then record_pass "design-context: (h) grafo que é lista e --graph inexistente ⇒ rc 2 (não pude julgar), nunca verde"
+  else record_fail "design-context: (h) rc 2" "lista=${h1} inexistente=${h2}"; fi
+  rm -rf "${c}"
+  # (i) brief que existe, sem grafo ⇒ SEM-GRAFO (o aviso da migração dos adotantes); sem brief nem grafo ⇒ cala
+  c="$(mktemp -d)"; mkdir -p "${c}/docs/design-context"; : > "${c}/docs/design-context/brief.md"
+  local i1 i2; i1="$(bash "${chk}" "${c}" --format tsv 2>&1 || true)"; rm -f "${c}/docs/design-context/brief.md"
+  i2="$(bash "${chk}" "${c}" --format tsv 2>&1 || true)"; rm -rf "${c}"
+  if grep -q '^SOFT	SEM-GRAFO' <<< "${i1}" && [ -z "${i2}" ]; then record_pass "design-context: (i) brief sem grafo ⇒ SEM-GRAFO (SOFT); sem brief nem grafo ⇒ cala"
+  else record_fail "design-context: (i) migração" "brief=${i1:0:120} vazio=${i2:0:120}"; fi
+  # (j) o DISPATCHER de produção emite a REGRA 111 (SOFT) sobre o token sumido, com --only no grafo
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; cp -a "${d}/docs" "${sd}/" 2>/dev/null
+  python3 -I - "${sd}/docs/design-context/semantic/color.tokens.json" <<'PY'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
+PY
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${G}" 2>&1 || true)"
+  rm -rf "${sd}"
+  if grep -q 'REGRA 111 (Grafo do design-context: locator de token e ligação do brief): \[LOCATOR-AUSENTE\]' <<< "${l}"; then
+    record_pass "design-context: (j) o lint de produção (dispatcher) emite a REGRA 111 sobre o token sumido"
+  else record_fail "design-context: (j) dispatcher" "$(grep -E 'REGRA 111' <<< "${l}" | head -2 | tr '\n' '|')"; fi
+  # (m) MUTANTES: sem a exigência de $value o grupo passa; sem a regra do brief a ligação ausente cala;
+  #     sem o ramo do token ausente o token sumido cala. Cada um tem de CALAR o caso que a cura pega.
+  local mdir; mdir="$(mktemp -d)"
+  local m1 m2 m3 c1 c2 c3
+  sed 's/    return "ok" if isinstance(cur, dict) and "\$value" in cur else "grupo"/    return "ok"/' "${py}" > "${mdir}/m1.py"
+  sed 's/        if not (linked or declared):/        if False:/' "${py}" > "${mdir}/m2.py"
+  sed 's/        elif verdict == "ausente":/        elif False:/' "${py}" > "${mdir}/m3.py"
+  c1="$(mktemp -d)"; cp -a "${d}/." "${c1}/"; sed -i 's|locator: "#/color/action/primary"|locator: "#/color/action"|' "${c1}/${G}"
+  c2="$(mktemp -d)"; cp -a "${d}/." "${c2}/"
+  python3 -I - "${c2}/${G}" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read(); s = s[:s.index("external_edges:")]; open(p, "w").write(s)
+PY
+  c3="$(mktemp -d)"; cp -a "${d}/." "${c3}/"
+  python3 -I - "${c3}/docs/design-context/semantic/color.tokens.json" <<'PY'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
+PY
+  _mrun() { python3 -I -B "$1" --root "$2" --format tsv 2>&1 | grep -c "$3" || true; }
+  m1="$(_mrun "${mdir}/m1.py" "${c1}" LOCATOR-GRUPO)"; m2="$(_mrun "${mdir}/m2.py" "${c2}" BRIEF-SEM-LIGACAO)"; m3="$(_mrun "${mdir}/m3.py" "${c3}" LOCATOR-AUSENTE)"
+  local r1 r2 r3
+  r1="$(_mrun "${py}" "${c1}" LOCATOR-GRUPO)"; r2="$(_mrun "${py}" "${c2}" BRIEF-SEM-LIGACAO)"; r3="$(_mrun "${py}" "${c3}" LOCATOR-AUSENTE)"
+  if [ "${m1}" = 0 ] && [ "${m2}" = 0 ] && [ "${m3}" = 0 ] && [ "${r1}" -ge 1 ] && [ "${r2}" -ge 1 ] && [ "${r3}" -ge 1 ] \
+     && ! cmp -s "${py}" "${mdir}/m1.py" && ! cmp -s "${py}" "${mdir}/m2.py" && ! cmp -s "${py}" "${mdir}/m3.py"; then
+    record_pass "design-context: (m) os 3 mutantes (sem \$value, sem a regra do brief, sem o token ausente) calam o caso que a cura pega"
+  else record_fail "design-context: (m) mutantes" "mutantes=${m1}/${m2}/${m3} (esperado 0) cura=${r1}/${r2}/${r3} (esperado ≥1; o sed precisa casar)"; fi
+  rm -rf "${mdir}" "${c1}" "${c2}" "${c3}" "${d}"
+}
+_family run_design_context_selftests
 
 # REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) — SAC-83, medido ao vivo em 2026-10-11 (CC
 # 2.1.296, `claude -p` em sandbox): PreToolUse com script ausente saiu 127 e a ação RODOU; com onFailure: block

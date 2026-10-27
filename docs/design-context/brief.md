@@ -1,3 +1,8 @@
+---
+projection_of: docs/design-context/design-context.kg.yaml
+review_after: "2027-01-27"
+---
+
 # Brief de Identidade Visual — Sistema Onion (core)
 
 > **Papel:** intenção declarada que ancora a SSOT de tokens. Não é guia de estilo livre —
@@ -44,6 +49,9 @@ As duas cores coexistem: o laranja ancora a plataforma (Claude Code); o roxo anc
 
 ## Fonte upstream
 
-`docs/business-context/` está vazio (framework template — não tem produto/cliente específico).
 Brief derivado da identidade canônica dos badges do README + princípios do framework (spec-as-code,
-dogfood, legibilidade técnica).
+dogfood, legibilidade técnica). _Corrigido em 2026-10-27:_ esta seção dizia que `docs/business-context/`
+estava vazio, e ele está populado desde 2026-07-13. O público e o posicionamento que este brief usa estão
+lá (`02-product/strategy.md`, `01-customer/personas.md`), e o nó `C_BRIEF` do grafo
+[`design-context.kg.yaml`](design-context.kg.yaml) liga a eles por `external_edges` (`E_POSITIONING`,
+`E_AUDIENCE`).

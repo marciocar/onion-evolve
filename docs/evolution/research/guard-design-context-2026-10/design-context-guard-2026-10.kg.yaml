@@ -1,0 +1,124 @@
+# kg-backlog-guard: on
+# O destino da forja da onda 1 do setup de design (2026-10-27): o defeito medido, o molde escolhido, os tetos
+# declarados da guarda do grafo do design-context e as duas dependências abertas com o kg-ssot.
+meta:
+  id: design-context-guard-2026-10
+  schema_version: "1"
+  baseline: "2026-10-27"
+  review_after: "2027-01-27"
+nodes:
+  - id: E_DESIGN_GRAPH_GAPS_MEASURED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: "No laboratório da curadoria, o token citado só pelo grafo que some do JSON e o brief sem ligação passam no gate do contrato; só um checador da vertical os pega."
+    narrative: "Laboratório da emenda F do estudo design-setup-2026-10 (curadoria, main 668e13b, PR 140), um repo git por caso, tudo commitado: caso 5 (token que existia, citado só pelo grafo, some) sai 0 no kg_validate --corpus, no kg_trace e no lint-design-tokens; caso 9 (locator aponta um grupo) idem; caso 6 (brief sem ligação e sem falta declarada) só o protótipo check_design_context.py pega como ligação ausente. Os casos 2 (nó-alvo removido) e 4 (arquivo de tokens removido) o gate do contrato já pega, e por isso a integridade das ligações não ganhou regra no core. Reproduzido na bancada do core (famílias design_context e design_setup)."
+    valid_from: "2026-10-27"
+    verified_at: "2026-10-27"
+    verified_against: "a bancada do core: lint-selftest.sh --families=design_context,design_setup (11 e 6 casos verdes)"
+    provenance:
+      source: "onion-curation@668e13b:docs/evolution/research/design-setup-2026-10/evidence/lab-graph/lab-graph-output.txt"
+      locator: "casos 2, 4, 5, 6, 9 e 11"
+      method: "reading: a saída literal do laboratório, reproduzida pela bancada do core"
+      locality: web
+  - id: D_GUARD_SUBSTRATE_LINT_CHECK
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    label: "A guarda nasce como check de lint (REGRA 111) com o molde do kg-yaml-validity e do kb-index: helper isolado, tsv, SOFT no 1º ciclo e rc 2 nomeado."
+    narrative: "O censo de guardas (guard-census.sh, 2026-10-27) não achou guarda da classe e deu o meeting-graph-check.sh e o kb-index-check.sh como moldes de check de grafo. A lógica fica em design-context-check.py, só Python e PyYAML, para a checagem do locator poder migrar ao kg_trace do kg-ssot trocando uma chamada. Decisão de construção desta onda, autorizada pelo maestro (opção 1 do sinal da curadoria, 2026-10-27)."
+    trace: .claude/validation/design-context-check.sh
+  - id: C_CEILING_BRIEF_BY_TRACE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Teto: o brief é reconhecido pelo trace igual a <design>/brief.md; um brief noutro arquivo não é cobrado."
+  - id: C_CEILING_LINK_BY_PREFIX
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Teto: a ligação do brief conta pela pasta do business-context no alvo da external_edge; se o nó-alvo existe é o gate do contrato que julga."
+  - id: C_CEILING_FIRST_CYCLE_SOFT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "Teto: no 1º ciclo todo achado é SOFT; a guarda avisa e não bloqueia até os dois adotantes migrarem (--strict sobe para HARD)."
+  - id: C_CEILING_TOKENS_GATE_FIXED_DIR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "Teto: o lint-design-tokens.sh lê só docs/design-context; num repo que declara outra pasta o setup avisa e o gate não a vê."
+  - id: C_CEILING_THEME_DETECTION
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "Teto: o alvo de tema do setup é heurística (components.json, @theme, tailwind.config, CSS); no core ela achou um CSS do site e o grafo foi ajustado à mão."
+  - id: Q_PROJECTION_CHECK_DEPENDENCY
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "O checador de projeção do kg-ssot (o .md com projection_of cita só ids que existem no grafo) existe? Dependência declarada da onda 1; o core não o implementa."
+  - id: Q_LOCATOR_CHECK_HOME
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A checagem do locator de token migra para o kg_trace do contrato KG-SSOT ou fica na vertical de design do core? Em discussão com o kg-ssot."
+edges:
+  - from: D_GUARD_SUBSTRATE_LINT_CHECK
+    to: E_DESIGN_GRAPH_GAPS_MEASURED
+    edge_type: TRACES_TO
+  - from: C_CEILING_BRIEF_BY_TRACE
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: C_CEILING_LINK_BY_PREFIX
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: C_CEILING_FIRST_CYCLE_SOFT
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: C_CEILING_TOKENS_GATE_FIXED_DIR
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: C_CEILING_THEME_DETECTION
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: Q_PROJECTION_CHECK_DEPENDENCY
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+  - from: Q_LOCATOR_CHECK_HOME
+    to: D_GUARD_SUBSTRATE_LINT_CHECK
+    edge_type: CONSTRAINS
+external_edges:
+  - from: D_GUARD_SUBSTRATE_LINT_CHECK
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027"
+    edge_type: SUPPORTS
+  - from: D_GUARD_SUBSTRATE_LINT_CHECK
+    to: "docs/design-context/design-context.kg.yaml#C_BRIEF"
+    edge_type: TRACES_TO

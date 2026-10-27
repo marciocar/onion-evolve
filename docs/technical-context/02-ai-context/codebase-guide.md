@@ -25,9 +25,9 @@ date: 2026-08-13
 ```
 onion-evolve/
 ├── .claude/                    # o FRAMEWORK propriamente dito (o "produto")
-│   ├── commands/                # 117 comandos invocáveis, 10 categorias
+│   ├── commands/                # 118 comandos invocáveis, 10 categorias
 │   ├── agents/                  # 51 agentes especializados, 9 categorias
-│   ├── skills/                  # 13 skills (Claude Code-nativas)
+│   ├── skills/                  # 14 skills (Claude Code-nativas)
 │   ├── utils/                   # abstrações SDAAL (task-manager, forge, ...)
 │   ├── validation/               # scripts determinísticos (lint, inventory, kg-radar...)
 │   ├── hooks/                    # hooks de ciclo de vida de sessão (SessionStart, PreCompact...)
@@ -66,11 +66,11 @@ Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.m
 | `validate/` | `.claude/commands/validate/` (inclui subpastas `collab/`, `qa-points/`, `test-strategy/`) | 6 |
 | `git/` | `.claude/commands/git/` | 6 |
 | `test/` | `.claude/commands/test/` | 3 |
-| `design/` | `.claude/commands/design/` | 3 |
+| `design/` | `.claude/commands/design/` | 4 |
 | `quick/` | `.claude/commands/quick/` | 1 |
 | `development/` | `.claude/commands/development/` | 1 |
 | _root_ | `onion.md`, `warm-up.md`, `catch-up.md` | 3 |
-| **Total** | | **117** |
+| **Total** | | **118** |
 
 `.claude/commands/common/` **não conta** como categoria — guarda fragmentos
 compartilhados (`common/templates/`, `common/prompts/`) reusados via referência

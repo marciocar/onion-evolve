@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**102 regras** no total — **90 HARD**, **43 SOFT**.
+**103 regras** no total — **90 HARD**, **44 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -151,6 +151,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 89 | Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca | HARD + SOFT | a UNICA divida deste corpus que piora sozinha — rodada de radar selada como baseline sem |
 | 93 | KB de terceiro declara a QUE VERSÃO se aplica | HARD + SOFT | documentação que caduca sem dizer para qual versão ela valia |
 | 99 | Nó de .kg.yaml sem caminho de máquina, julgado pela classe | HARD + SOFT | caminho de máquina voltando ao corpus depois de a migração de provenance tirá-lo (com catraca). |
+| 111 | Grafo do design-context: locator de token e ligação do brief | SOFT | o grafo do design-context citar um token que sumiu do JSON, ou o brief nascer sem ligação ao business-context |
 
 ## Automação Graduada
 
