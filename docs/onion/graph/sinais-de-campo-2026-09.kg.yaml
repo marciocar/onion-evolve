@@ -878,12 +878,31 @@ nodes:
   - id: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
     node_type: question
     layer: audit
+    impact: 4
+    confidence: 0.5
+    label: "Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho), com bypass fechando, sem envio automático, o Always allow sem abrir o envio e nenhuma tool de aceitar no tools/list"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Vira critério e linha de base da pesquisa, medida entre a VPS e o notebook Avell local do maestro (máquinas diferentes)»"
+    narrative: |-
+      Substitui o round-trip genérico como gatilho do parque selado em D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025, que segue de pé. Pela delegação de 2026-10-25, o core acolheu a troca e não constrói a composição agora: construir é mudar o parque em perseguir, e isso volta ao maestro. Das peças, só a entrega ao Codex pelo codex queue e o aviso no Stop hook têm teste; a assinatura Ed25519 com peers.json do interlink não se copia, porque tiraria a pinagem da topologia.
+
+      Selado por /meta:decide em 2026-10-27: escolhida «Vira critério e linha de base da pesquisa, medida entre a VPS e o notebook Avell local do maestro (máquinas diferentes)» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Testar só depois da decisão» · «Depois».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «O que fazemos com a ida e volta viva?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+  - id: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    node_type: question
+    layer: audit
     plane: DEV
     status: open
     impact: 4
     confidence: 0.5
-    label: "Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho), com bypass fechando, sem envio automático, o Always allow sem abrir o envio e nenhuma tool de aceitar no tools/list"
-    narrative: "Substitui o round-trip genérico como gatilho do parque selado em D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025, que segue de pé. Pela delegação de 2026-10-25, o core acolheu a troca e não constrói a composição agora: construir é mudar o parque em perseguir, e isso volta ao maestro. Das peças, só a entrega ao Codex pelo codex queue e o aviso no Stop hook têm teste; a assinatura Ed25519 com peers.json do interlink não se copia, porque tiraria a pinagem da topologia."
+    label: "A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), passa no critério pré-registrado?"
+    narrative: "Nasce porque o selo da pergunta da ida e volta viva, em 2026-10-27, a fechou como decidida (vira critério e linha de base da pesquisa de canal para empresas), e decidir não é medir: a medida ainda não foi feita. Fecha com um teste só: pré-registro commitado antes do dado, com o critério e os negativos; envio da VPS para o notebook e resposta de volta do notebook para a VPS pela composição (HTTP A2A do bridge e MCP local cuja ferramenta de envio só grava rascunho); nenhum envio automático, nem com o cliente em bypass nem com o Always allow; nenhuma ferramenta de aceitar exposta ao modelo; e a identidade do remetente estável nas duas pernas, conferida pela assinatura e pela chave pinada. Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar."
   - id: E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025
     node_type: evidence
     layer: audit
@@ -1061,6 +1080,38 @@ nodes:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-10-26: «Pendências do sge: o que pedimos à sessão do sge?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
+      locality: "pessoa"
+  - id: D_A2A_EMPRESA_PESQUISA_DECISION_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Pesquisar antes, modo decision: candidata A, o A2A hospedado via onion-bridge; candidata B, o mesmo receptor em self-host, numa VPS ou serverless como Lambda ou Cloudflare Workers; candidata C, o protocolo aberto A2A mais MCP remoto por HTTP; candidata D, os canais nativos da Anthropic; com um refutador»"
+    label: "A topologia de canal entre sessões de pessoas e máquinas diferentes numa empresa adotante se decide por pesquisa no modo decision, com quatro candidatas nomeadas e um refutador, antes de qualquer construção"
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Pesquisar antes, modo decision: candidata A, o A2A hospedado via onion-bridge; candidata B, o mesmo receptor em self-host, numa VPS ou serverless como Lambda ou Cloudflare Workers; candidata C, o protocolo aberto A2A mais MCP remoto por HTTP; candidata D, os canais nativos da Anthropic; com um refutador»; descartadas: «Decidir já: A e B» · «Primárias nomeadas» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Como uma empresa adotante deve falar entre sessões de pessoas e máquinas diferentes?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+  - id: D_MANUAL_CANAIS_A2A_AGORA_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Agora, com o estado atual»"
+    label: "O manual de canais entre sessões e A2A se escreve agora, com o estado atual, e se atualiza quando a pesquisa de canal para empresas decidir"
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Agora, com o estado atual»; descartadas: «Depois da decisão» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Quando escrevemos o manual de canais e A2A?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
@@ -1252,3 +1303,12 @@ edges:
   - from: D_SGE_PENDENTES_SO_OS_DOIS_1026
     to: D_SGE_PENDENTES_POS_UPDATE_76CCB2F8_1026
     edge_type: SUPERSEDES
+  - from: D_A2A_EMPRESA_PESQUISA_DECISION_1027
+    to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    edge_type: TRACES_TO
+  - from: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    edge_type: TRACES_TO
+  - from: D_MANUAL_CANAIS_A2A_AGORA_1027
+    to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    edge_type: TRACES_TO
