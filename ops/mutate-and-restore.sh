@@ -34,10 +34,15 @@
 #       <python-expr> = 'ANTIGO|||NOVO' (substituição literal) — ANTIGO tem de ocorrer EXATAMENTE 1 vez no
 #       arquivo, e o NOVO deve conter o marcador ONION_MUTANTE, senão este script RECUSA (fail-closed:
 #       mutante sem marcador é o mutante que some sem rastro).
-#       Antes de plantar, o <comando> roda SEM o mutante (a linha de base) e tem de sair 0.
+#       Antes de plantar, o <comando> roda SEM o mutante (a linha de base) e tem de sair 0. Ele roda DUAS
+#       vezes, então tem de ser IDEMPOTENTE (um `mkdir d` sairia "morto" na 2ª só pelo estado) e NÃO pode
+#       ler o stdin (a linha de base o consumiria, e a rodada mutada leria EOF). O helper não guarda o stdin
+#       de propósito: chamado dentro de um `while read … done <<EOF`, guardá-lo comeria o resto do laço.
 #       Env MUTATE_BASELINE_PROVEN="<evidência>": pula a linha de base, DECLARADO em stderr. Só para quem
 #       acabou de medir o MESMO comando verde no MESMO conteúdo (a família do chamador provou o rc 0 no
-#       caso dela antes dos mutantes); nunca para economizar sem essa medida.
+#       caso dela antes dos mutantes), ou para o CONTROLE POSITIVO, cujo mutante deve sobreviver e cuja
+#       linha de base o chamador mediu à parte; nunca para economizar sem essa medida.
+#       As duas variáveis MUTATE_* NÃO passam para o <comando>: um helper aninhado mede a própria linha de base.
 #       Env MUTATE_RC_FILE=<caminho>: o helper grava ali o rc CRU do comando com o mutante (só quando ele
 #       rodou; o arquivo é apagado no início). Para o chamador cujo caso espera um rc ≠0 específico.
 # SAÍDA (o rc é do HELPER; o rc cru do comando sai em stderr como "mutate: rc do comando = N"):
@@ -65,9 +70,15 @@ case "${MUT_EXPR#*|||}" in *"${MARKER}"*) : ;; *)
   exit 2 ;;
 esac
 
-_BACKUP="$(mktemp)"; cp -p "${TARGET}" "${_BACKUP}"
-_HASH0="$(sha256sum "${TARGET}" | cut -d' ' -f1)"
+# o backup tem de EXISTIR antes do trap: com o `cp` falho (alvo sem leitura), a 1ª versão armava a
+# restauração com um backup vazio e, no EXIT, podia truncar o alvo por cima.
+_BACKUP="$(mktemp)"
+if ! cp -p "${TARGET}" "${_BACKUP}" 2>/dev/null || ! _HASH0="$(sha256sum "${TARGET}" 2>/dev/null | cut -d' ' -f1)" || [ -z "${_HASH0}" ]; then
+  rm -f "${_BACKUP}"; echo "mutate: não consegui ler ${TARGET} para o backup — nada plantado (rc 6)" >&2; exit 6
+fi
+_BLOG=""
 _restore() {
+  [ -n "${_BLOG}" ] && rm -f "${_BLOG}" 2>/dev/null
   [ -n "${_BACKUP:-}" ] || return 0
   cp -p "${_BACKUP}" "${TARGET}" 2>/dev/null
   local _h; _h="$(sha256sum "${TARGET}" 2>/dev/null | cut -d' ' -f1)"
@@ -109,12 +120,15 @@ case "${_count}" in
   *) echo "mutate: âncora REPETIDA em ${TARGET}: ${_count} ocorrências de '${_anchor:0:60}' (precisa 1) — nada plantado (rc 4)" >&2; exit 4 ;;
 esac
 
+# o comando nunca herda as variáveis do helper (um helper aninhado pularia a própria linha de base)
+_run() { env -u MUTATE_BASELINE_PROVEN -u MUTATE_RC_FILE "$@"; }
+
 # 2) a linha de base: o MESMO comando, SEM o mutante, tem de sair 0
 if [ -n "${MUTATE_BASELINE_PROVEN:-}" ]; then
   echo "mutate: ⚠️ linha de base NÃO rodada (MUTATE_BASELINE_PROVEN=${MUTATE_BASELINE_PROVEN})" >&2
 else
   _BLOG="$(mktemp)"
-  "$@" > "${_BLOG}" 2>&1; _brc=$?
+  _run "$@" > "${_BLOG}" 2>&1; _brc=$?
   if [ "${_brc}" -ne 0 ]; then
     echo "mutate: linha de base VERMELHA — o comando SEM o mutante saiu ${_brc}; um mutante 'morto' aqui não provaria nada (rc 5). Fim da saída dela:" >&2
     tail -5 "${_BLOG}" | sed 's/^/  | /' >&2
@@ -135,7 +149,7 @@ open(p, 'wb').write(s.replace(a, b, 1).encode('utf-8', 'surrogateescape'))
 PY
 
 # 4) o comando com o mutante: o rc cru vai para stderr; o do helper é 0 (sobreviveu) ou 1 (morreu)
-"$@"; _rc=$?
+_run "$@"; _rc=$?
 echo "mutate: rc do comando = ${_rc}" >&2
 [ -n "${MUTATE_RC_FILE:-}" ] && printf '%s\n' "${_rc}" > "${MUTATE_RC_FILE}"
 [ "${_rc}" -eq 0 ] && exit 0
