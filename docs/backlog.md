@@ -294,7 +294,7 @@
 | 3.6 | `C_SUPERACAO_20261027_XSESSION_ADDRESSING_CORRECTED` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela primária: destinatário endereçado pelo nome da sessão (com identificador curto na colisão); socke |
 | 3.6 | `C_SUPERACAO_20261027_XSESSION_CROSS_MACHINE_OPEN_2_1_225` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela primária: desde a 2.1.225 uma sessão em Remote Control PODE abrir conversa com sessão de outra máq |
 | 3.6 | `C_SUPERACAO_20261027_XSESSION_PRIMARY_REREAD` | a2a-empresa-adotante-2026-10 | Releitura da primária de cross-session: sessão na nuvem não responde por SendMessage a outra máquina, mesmo com endereço de r |
-| 3.6 | `C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248` | a2a-empresa-adotante-2026-10 | Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS/Linux/WSL2), a 2.1.234 levou ao Windows, |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248` | a2a-empresa-adotante-2026-10 | Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS, Linux e WSL 2), a 2.1.234 levou ao Wind |
 
 ## slm-frameworks-2026-10 — 14 item(ns)
 
