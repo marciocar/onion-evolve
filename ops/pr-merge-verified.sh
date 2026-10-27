@@ -1201,7 +1201,7 @@ if [ "$rc" -ne 0 ] && [ "${SKIP_CI}" -eq 1 ]; then
     *)
       # na série (rc 4) o head que andou também volta à fila e é re-julgado; direto, a recusa diz qual foi
       if [ "${NO_WAIT_AFTER_REBASE}" -eq 1 ]; then
-        printf '↻ PR #%s: o forge RECUSOU o merge sem o CI do head novo (%s) — saio rc=4: o CI do head %s é esperado e o merge volta pelo caminho de sempre\n' \
+        printf '↻ PR #%s: o forge RECUSOU o merge sem o CI do head novo (%s) — saio rc=4: o head julgado era %s; o CI do head atual é esperado e o merge volta pelo caminho de sempre\n' \
           "$PR" "$(printf '%s' "$merge_out" | tail -1 | cut -c1-200)" "${HEAD_SHA:0:8}"
         exit 4
       fi

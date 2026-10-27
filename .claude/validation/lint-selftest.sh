@@ -21417,6 +21417,11 @@ case "$args" in
       exit 0 ;;
   *"pr view"*headRefOid*)
       # TOCTOU (2026-10-27): depois do push que caiu no meio do merge, o PR mostra o head NOVO
+      # (th4) o push cai ANTES do merge: da leitura nº GH_PUSH_FROM_READ em diante o PR já mostra o head novo
+      if [ -n "${GH_PUSH_FROM_READ:-}" ]; then
+        tk=$(cat "${STUB_TK}" 2>/dev/null || echo 0); tk=$((tk+1)); echo "$tk" > "${STUB_TK}"
+        [ "$tk" -ge "${GH_PUSH_FROM_READ}" ] && : > "${STUB_PUSHED}"
+      fi
       if [ -n "${GH_PUSH_AT_MERGE:-}" ] && [ -f "${STUB_PUSHED}" ]; then echo "${GH_PUSH_AT_MERGE}"; exit 0; fi
       # SAC-85: a API do PR ATRASA o push. As chamadas de nº GH_HEAD_STALE_FIRST..GH_HEAD_STALE_LAST
       # devolvem o head de ANTES do rebase (o pai do HEAD da worktree), como o GitHub fez no #985.
@@ -22200,8 +22205,8 @@ PFSTUB
   # faz o push cair DENTRO da chamada de merge e recusa como o forge (expectedHeadOid) quando o sha não bate.
   _mvth() { # $1=SUT ; resto = flags do SUT
     local _s="$1"; shift
-    echo 0 > "${d}/n"; : > "${d}/margs"; rm -f "${d}/pushed" "${d}/merged-th"
-    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/margs" \
+    echo 0 > "${d}/n"; echo 0 > "${d}/tk"; : > "${d}/margs"; rm -f "${d}/pushed" "${d}/merged-th"
+    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/margs" STUB_TK="${d}/tk" \
                STUB_PUSHED="${d}/pushed" STUB_MERGED="${d}/merged-th" \
                GH_PUSH_AT_MERGE="cafecafecafecafecafecafecafecafecafecafe" \
                GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="OPEN|null" \
@@ -22229,6 +22234,23 @@ PFSTUB
     if ! _p_th && [ -f "${d}/merged-th" ]; then
       record_pass "pr-merge-verified: (th3) mutante sem --match-head-commit ⇒ mergeia o head não julgado e o caso (th1) REPROVA"
     else record_fail "pr-merge-verified: (th3) o mutante SOBREVIVEU — o caso não mede o --match-head-commit" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
+  fi
+
+  # (th4) o push cai ANTES do merge (da 2ª leitura do headRefOid em diante, depois do julgamento). Mede que o
+  #       merge amarra o head JULGADO, não um head relido logo antes do merge — e o mutante que relê reprova.
+  GH_PUSH_FROM_READ=2 _mvth "${sut}"
+  if _p_th; then
+    record_pass "pr-merge-verified: (th4) push entre o julgamento e o merge ⇒ o merge leva o head JULGADO e o forge recusa, nomeado"
+  else record_fail "pr-merge-verified: (th4) o merge não leva o head julgado" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
+  local _thr="${d}/sut-mutante-th4.sh"
+  awk 'index($0,"JUDGED_HEAD=\"${HEAD_SHA}\"")==1 { print "JUDGED_HEAD=\"$(gh pr view \"$PR\" \"${REPO_ARG[@]}\" --json headRefOid --jq .headRefOid)\""; next } { print }' "${sut}" > "${_thr}"
+  if cmp -s "${sut}" "${_thr}"; then
+    record_fail "pr-merge-verified: (th4m) âncora do mutante não casou" "a linha JUDGED_HEAD=\"\${HEAD_SHA}\" mudou de forma; reancore o mutante"
+  else
+    GH_PUSH_FROM_READ=2 _mvth "${_thr}"
+    if ! _p_th && [ -f "${d}/merged-th" ]; then
+      record_pass "pr-merge-verified: (th4m) mutante que RELÊ o head antes do merge ⇒ mergeia o head não julgado e o (th4) REPROVA"
+    else record_fail "pr-merge-verified: (th4m) o mutante SOBREVIVEU" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
   fi
 
   unset -f _mvf _fxmut _fxcase _fxcase_rm _fx_intact _fxk_run _p_fx1 _p_fx2 _p_fx3 _p_fx4 _p_fx5 _p_fx6 _p_fx7 _p_fx8
