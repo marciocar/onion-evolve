@@ -13,14 +13,17 @@
 # REGRA 108 lê), troca o 1º "pin `<hex>`" do label pelo pin novo e re-carimba verified_at/verified_against
 # como leitura do carimbo. Não toca outro nó nem outro campo. Idempotente.
 # Também troca, em verified_against e provenance (source/locator), as citações do pin ANTIGO pelo novo: esses
-# campos descrevem a verificação atual. Label e narrative (a história) ficam como o dono escreveu.
-# O QUE NÃO FAZ: inventar onde está o pin. Nó sem x_pin e com label sem "pin `<hex>`" (editado pelo dono)
-# ganha só o x_pin e o aviso; grafo ou nó ausente = nada a carimbar (adotante sem semente), dito.
+# campos descrevem a verificação atual. A narrative (a história) fica como o dono escreveu.
+# LABEL EDITADO PELO DONO que cita o pin ANTIGO como token exato (o x_pin anterior, sem ser prefixo de outro hex):
+# só esse token vira o pin novo, e o resto da redação fica (revisão adversarial do adotante sge, 2026-10-27: duas
+# rodadas seguidas ele trocou o hash do label à mão, porque o motor gravava o x_pin e deixava o label no pin velho).
+# O QUE NÃO FAZ: inventar onde está o pin. Label editado SEM o pin antigo como token ganha só o x_pin e o aviso
+# (rc 3); grafo ou nó ausente = nada a carimbar (adotante sem semente), dito.
 #
 # Uso : stamp-adoption-graph-pin.sh <DEST> [--check]
 #   --check: não escreve; rc 0 = o pin do grafo é o do carimbo (ou não há semente) · 1 = divergem
 #            (imprime os dois) · 3 = não deu para ler o pin do grafo (nó sem x_pin nem pin no label).
-# Saída: rc 0 escrito ou nada a fazer · 2 uso · 3 aviso (gravou só o x_pin; label não reconhecido).
+# Saída: rc 0 escrito ou nada a fazer · 2 uso · 3 aviso (gravou só o x_pin; label sem o pin antigo como token).
 # =============================================================================
 set -uo pipefail
 DEST="${1:-}"; MODE="write"
@@ -64,13 +67,21 @@ if mode == "check":
 # verified_at. Re-carimbar o MESMO pin (o --promote-hub) deixava o grafo sujo e fora do commit dele.
 if xi is not None and cur and cur[:min(len(cur), len(pin))] == pin[:min(len(cur), len(pin))] and len(cur) >= len(pin):
     print(f"stamp-adoption-graph-pin: ONION_INSTALLED já diz o pin {pin} — nada a carimbar"); sys.exit(0)
-# O LABEL só é reescrito quando ainda é o do SEMEADOR ("Framework instalado: pin `X`, modo …"). Label que o dono
-# editou (história de pins, notas) fica INTACTO: trocar só o hash deixava o resto da frase desatualizado e
-# cortava a cadeia que ele escreveu. Aí grava-se só o x_pin, que é o que a REGRA 108 lê, e diz-se isso.
+# O LABEL do SEMEADOR ("Framework instalado: pin `X`, modo …") troca o 1º "pin `X`". Label que o dono editou
+# (história de pins, notas) troca SÓ o token exato do pin antigo (cur), e a redação dele fica: antes ficava
+# inteiro, e o adotante sge trocou o hash à mão duas rodadas seguidas (revisão adversarial, 2026-10-27). Os
+# outros hashes da cadeia dele (o pin da adoção) não são o cur e não mudam. Label que não cita o cur como token:
+# grava-se só o x_pin, que é o que a REGRA 108 lê, e diz-se isso (rc 3).
 SEED_LABEL = re.compile(r'^    label: "Framework instalado: pin `[0-9a-f]{7,40}`, modo `[^`]*`, papel `[^`]*`, branch de integração `[^`]*`"[ \t]*$')
 rc, label_ok = 0, li is not None and SEED_LABEL.match(blk[li])
+label_swapped = 0
 if label_ok:
     blk[li] = LABEL_PIN.sub(f"pin `{pin}`", blk[li], count=1)
+elif li is not None and cur and len(cur) >= 7:
+    # o pin antigo como TOKEN exato (nem prefixo nem pedaço de outro hex): só ele muda, a frase do dono fica
+    blk[li], label_swapped = re.subn(r"(?<![0-9A-Za-z])" + re.escape(cur) + r"(?![0-9A-Za-z])", pin, blk[li])
+    if not label_swapped:
+        rc = 3
 else:
     rc = 3
 newpin = f'    x_pin: "{pin}"'
@@ -87,8 +98,8 @@ if gi is not None and blk[gi].split(":", 1)[1].strip().strip('"\'') in SEED_VA: 
     blk[gi] = "    verified_against: stamp-claude-onion-version-lido-pelo-escritor-do-carimbo"
 # A FONTE DA VERIFICAÇÃO acompanha o pin (2026-10-18, sinal de um adotante): o motor trocava o verified_at e o
 # x_pin e deixava verified_against e provenance citando o pin ANTIGO, e o nó declarava verificado o que não
-# verificou mais. Esses dois campos descrevem a verificação ATUAL, então o pin antigo vira o novo neles; o
-# label e a narrative guardam a HISTÓRIA e ficam como o dono escreveu. Só troca o pin que ESTAVA no nó (cur):
+# verificou mais. Esses dois campos descrevem a verificação ATUAL, então o pin antigo vira o novo neles; a
+# narrative guarda a HISTÓRIA e fica como o dono escreveu (o label troca só o token do pin, acima). Só troca o pin que ESTAVA no nó (cur):
 # um outro hash citado ali é referência do dono, não o pin desta adoção.
 swapped = 0
 if cur:
@@ -112,7 +123,8 @@ if new != lines:
     open(path + ".pin-tmp", "w", encoding="utf-8").write("\n".join(new))
     import os; os.replace(path + ".pin-tmp", path)
 print(f"stamp-adoption-graph-pin: ONION_INSTALLED carimbado com o pin {pin}"
-      + ("" if label_ok else " (só o x_pin: o label foi editado pelo dono e ficou intacto — confira-o)")
+      + ("" if label_ok else f" (label editado pelo dono: {label_swapped} citação(ões) do pin antigo {cur} trocada(s) pelo novo, o resto intacto)" if label_swapped
+         else " (só o x_pin: o label foi editado pelo dono, não cita o pin antigo como token, e ficou intacto — confira-o)")
       + (f"; {swapped} citação(ões) do pin antigo em verified_against/provenance trocada(s) pelo novo" if swapped else ""))
 sys.exit(rc)
 PY

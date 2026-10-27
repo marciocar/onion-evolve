@@ -214,4 +214,4 @@ echo "stamp escrito: ${STAMP} ($([ -n "${OLD_EXISTS}" ] && echo "update — adop
 # o nó ONION_INSTALLED seguia dizendo o pin antigo até alguém editá-lo à mão. Sem a semente, o helper diz e sai 0.
 # (cópia do write-stamp FORA da árvore — a bancada roda mutantes assim — não tem ../kg: o cd falho não pode matar o carimbo)
 _pin_helper="$(cd "$(dirname "${BASH_SOURCE[0]}")/../kg" 2>/dev/null && pwd || true)/stamp-adoption-graph-pin.sh"
-if [ -f "${_pin_helper}" ]; then bash "${_pin_helper}" "${TARGET}" || echo "AVISO: o carimbo do pin no grafo de adoção saiu rc=$? (3 = só o x_pin, label editado pelo dono; outro = não carimbado e a REGRA 108 (Pin do grafo de adoção concorda com o carimbo) vai cobrar)." >&2; fi
+if [ -f "${_pin_helper}" ]; then bash "${_pin_helper}" "${TARGET}" || echo "AVISO: o carimbo do pin no grafo de adoção saiu rc=$? (3 = só o x_pin: o label editado pelo dono não cita o pin antigo como token; outro = não carimbado e a REGRA 108 (Pin do grafo de adoção concorda com o carimbo) vai cobrar)." >&2; fi

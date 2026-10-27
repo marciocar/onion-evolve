@@ -4721,6 +4721,35 @@ run_kg_trace_resolve_selftests() {
     esac
   fi
   unset -f _j6
+  # (j6e) o diretório do destino que o --out CRIA só fica no sucesso (revisão adversarial do adotante sge, 2026-10-27:
+  #       o `mkdir -p` antes do produto deixava `novo/fundo/` na árvore no rc 3, desmentindo "nenhum caminho de erro
+  #       escreve no destino"). rc 3 e rc 2 → a cadeia nova some e o pai que já existia fica; rc 0 → o índice nasce nela.
+  #       MUTANTE: o trap sem o desfazer (`_oundo`) → o rc 3 larga o diretório e o (j6e) cai.
+  _j6e() {  # $1=kg-trace.sh → "ok" quando os três ramos se comportam
+    local s="$1" base="${d}/docs/onion/novo" r3=0 r2=0 r0=0
+    rm -rf "${base}"
+    ONION_KG_TRACE="${mut}/k0.py" bash "${s}" "${d}" --emit-index --out "${base}/fundo/idx.tsv" >/dev/null 2>&1 || r3=$?
+    local gone3=0; [ ! -e "${base}" ] && [ -d "${d}/docs/onion" ] && gone3=1
+    ONION_KG_TRACE="${mut}/k4250.py" bash "${s}" "${d}" --emit-index --out "${base}/fundo/idx.tsv" >/dev/null 2>&1 || r2=$?
+    local gone2=0; [ ! -e "${base}" ] && gone2=1
+    ONION_KG_TRACE="${kt}" bash "${s}" "${d}" --emit-index --out "${base}/fundo/idx.tsv" >/dev/null 2>&1 || r0=$?
+    local born=0; [ -s "${base}/fundo/idx.tsv" ] && born=1
+    rm -rf "${base}"
+    [ "${r3}" -eq 3 ] && [ "${gone3}" -eq 1 ] && [ "${r2}" -eq 2 ] && [ "${gone2}" -eq 1 ] && [ "${r0}" -eq 0 ] && [ "${born}" -eq 1 ] \
+      && printf ok || printf 'r3=%s gone3=%s r2=%s gone2=%s r0=%s born=%s' "${r3}" "${gone3}" "${r2}" "${gone2}" "${r0}" "${born}"
+  }
+  local g6e; g6e="$(_j6e "${helper}")"
+  if [ "${g6e}" = ok ]; then record_pass "kg-trace: (j6e) --out num diretório novo: rc 3 e rc 2 desfazem a cadeia criada, rc 0 a mantém com o índice"
+  else record_fail "kg-trace: (j6e) diretório novo no erro" "${g6e}"; fi
+  sed 's|^  trap '"'"'rm -f "${_otmp}"; _oundo'"'"' EXIT|  trap '"'"'rm -f "${_otmp}"'"'"' EXIT|' "${helper}" > "${mut}/kg-trace-mkdir.sh"
+  if cmp -s "${helper}" "${mut}/kg-trace-mkdir.sh"; then record_fail "kg-trace: (j6e-MUT) mutante não aplicou" "âncora do trap com _oundo mudou"
+  else
+    case "$(_j6e "${mut}/kg-trace-mkdir.sh")" in
+      ok) record_fail "kg-trace: (j6e-MUT) mutante NÃO morde" "sem o _oundo no trap o diretório novo ainda some no rc 3" ;;
+      *) record_pass "kg-trace: (j6e-MUT) trap sem o desfazer → (j6e) cai (o rc 3 larga o diretório criado)" ;;
+    esac
+  fi
+  unset -f _j6e
 
   unset -f _kt _mk_trace_sandbox
   rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${d5}" "${mut}"
@@ -29114,6 +29143,18 @@ LINT
   if [ "${_r}" -eq 3 ] && [[ "$(_pg_last)" == *"não é executável: o trampolim barra"* ]] && [ "${_intact}" = 1 ]; then
     record_pass "prove-gate-blocks: (o2) hook da worktree não executável sob o trampolim → NÃO PROVADO (rc 3), o modo nomeado"
   else record_fail "prove-gate-blocks: (o2)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
+  # (o3) hooksPath RELATIVO (o `.githooks` que a ativação documenta) e o pre-commit da worktree NÃO executável: o
+  #      git resolve o hook DENTRO da árvore, o ignora e o commit sai rc 0 — o trampolim nem roda, é limite do git
+  #      (revisão adversarial do adotante sge, 2026-10-27). A prova é quem pega por outro caminho: resolve o hook
+  #      pelo `rev-parse --git-path hooks`, que honra o relativo na worktree, e recusa o não executável (rc 3).
+  local to3="${d}/o3" tow3="${d}/o3-wt"; _pg_mk "${to3}" onion
+  git -C "${to3}" config core.hooksPath .githooks
+  git -C "${to3}" -c core.hooksPath=/dev/null worktree add -q -b wt-rel "${tow3}" >/dev/null 2>&1 || true
+  chmod -x "${tow3}/.githooks/pre-commit"
+  _pg_run "${pg}" "${tow3}"
+  if [ "${_r}" -eq 3 ] && [[ "$(_pg_last)" == *"${tow3}/.githooks' não é executável (o git o ignora)"* ]] && [ "${_intact}" = 1 ]; then
+    record_pass "prove-gate-blocks: (o3) hooksPath relativo + pre-commit da worktree sem +x (o git o ignora, rc 0) → NÃO PROVADO (rc 3), o modo nomeado"
+  else record_fail "prove-gate-blocks: (o3)" "rc=${_r} intacto=${_intact} última='$(_pg_last)'"; fi
 
   # ── da passada adversarial (2026-10-20): cada caso abaixo reproduz um achado executado pelo refutador ──
   # (i) hook que RODA o lint e barra TUDO, com o lint emitindo SOFT (`VIOLATION:` de rotina) → NÃO PROVADO.
@@ -29188,6 +29229,8 @@ LINT
   _pg_mut tramp 's|^    H="${T}/.githooks"$|    :|' "${tow}" "FAIL-OPEN"
   # sem espelhar a falha fechada do trampolim, a prova (o2) seguiria como se o hook não executável rodasse
   _pg_mut trampx 's|^  \[ -x "${T}/.githooks/pre-commit" \] \\$|  true \\|' "${tow2}" "não é executável: o trampolim barra"
+  # sem conferir o +x do hook que o git resolve, a prova (o3) copiaria o hook ignorado e diria FAIL-OPEN, sem nomear o modo
+  _pg_mut relx 's#^\[ -x "${H}/pre-commit" \] || verdict_no 3#false \&\& verdict_no 3#' "${tow3}" "não é executável (o git o ignora)"
   # com `ls-files -m` no lugar de `diff HEAD`, o stageado (j) some do sandbox
   _pg_mut staged 's|diff -z --no-renames --name-only HEAD|ls-files -z -m|' "${tj}" "bloqueio PROVADO"
   # sem apagar no sandbox o que o alvo apagou, (m) volta a reprovar pela HARD apagada
@@ -34985,6 +35028,29 @@ run_kg_read_leg_selftests() {
     else record_fail "kg-read-leg: (r-MUT)" "o mutante seguiu calado: (r) não mede o corte do corpo"; fi
   fi
   rm -f "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
+  # (r2) OS DOIS FALSOS NEGATIVOS DA REGEX (revisão adversarial do adotante sge, 2026-10-27): `<<` dentro de ASPAS não
+  #      é operador (o `sed -i` da linha seguinte avisa, também com aspa que atravessa a linha) e `<<$X` é heredoc de
+  #      delimitador LITERAL `$X` (o corpo cala, o `sed -i` depois do terminador avisa). O par: `$((1<<2))` do (r)
+  #      segue sem abrir corpo, e `<<` num comentário também não.
+  local q1 q2 q3 q4 q5 rq
+  _klr "${hs}" $'echo "a<<b"\nsed -i s/a/b/ src/alvo.ts'; q1="${kout}"; rq="${rcs}"
+  _klr "${hs}" $'G commit -m "linha 1\nmuda o <<EOF da nota"\nsed -i s/a/b/ src/alvo.ts'; q2="${kout}"; rq="${rq}${rcs}"
+  _klr "${hs}" $'cat <<$X > n.md\nsed -i s/a/b/ src/alvo.ts\n$X'; q3="${kout}"; rq="${rq}${rcs}"
+  _klr "${hs}" $'cat <<$X > n.md\ncorpo\n$X\nsed -i s/a/b/ src/alvo.ts'; q4="${kout}"; rq="${rq}${rcs}"
+  _klr "${hs}" $'true # <<EOF\nsed -i s/a/b/ src/alvo.ts'; q5="${kout}"; rq="${rq}${rcs}"
+  if grep -q 'C_NO_DO_SED' <<< "${q1}" && grep -q 'C_NO_DO_SED' <<< "${q2}" && [ -z "${q3}" ] \
+     && grep -q 'C_NO_DO_SED' <<< "${q4}" && grep -q 'C_NO_DO_SED' <<< "${q5}" && [ "${rq}" = "00000" ]; then
+    record_pass "kg-read-leg: (r2) << entre aspas (também multilinha) e em comentário não abre corpo; <<\$X corta o corpo até \$X e avisa depois, rc 0"
+  else record_fail "kg-read-leg: (r2)" "rc=${rq} aspas=[${q1:0:50}] multilinha=[${q2:0:50}] corpo\$X=[${q3:0:50}] depois\$X=[${q4:0:50}] coment=[${q5:0:50}]"; fi
+  # (r2-MUT) a varredura sem seguir aspas (a forma da regex) → o `<<` entre aspas volta a engolir o resto e (r2) cai
+  sed 's|^        if c in "'"'"'\\"":$|        if False:  # ONION_MUTANTE|' "${hs}" > "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
+  if cmp -s "${hs}" "${sbs}/.claude/hooks/kg-read-leg-mut.sh"; then record_fail "kg-read-leg: (r2-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  else
+    _klr "${sbs}/.claude/hooks/kg-read-leg-mut.sh" $'echo "a<<b"\nsed -i s/a/b/ src/alvo.ts'; q1="${kout}"
+    if [ -z "${q1}" ]; then record_pass "kg-read-leg: (r2-MUT) sem seguir aspas o << entre aspas engole o sed -i seguinte — (r2) é load-bearing"
+    else record_fail "kg-read-leg: (r2-MUT)" "o mutante ainda avisou: a varredura de aspas não é medida por (r2)"; fi
+  fi
+  rm -f "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
   # (s) O CONTRATO DO `ast`: o `segments`/`WRAPPERS` que o loader REAL do hook extrai da guarda são os da guarda
   #     executada inteira, num corpus de comandos (case/esac, heredoc, &&, |, ;, comentário, `\;`, invólucro).
   #     Uma constante renomeada para minúsculas ou atribuída em tupla some do namespace do `ast` e a perna cala com
@@ -36620,9 +36686,10 @@ run_adopter_shape_selftests() {
   if grep -q 'REGRA 108 (Pin do grafo de adoção concorda com o carimbo): o grafo diz pin fedcba987654, o carimbo diz 0123456789ab' "${d}/hard108.lst"; then
     record_pass "adopter-shape: (i2) pin do grafo divergente do carimbo → HARD da REGRA 108 no lint do adotante"
   else record_fail "adopter-shape: (i2)" "$(grep -E 'REGRA 108|Violações HARD' <<< "${_l108}" | head -3 | tr '\n' ' ' | cut -c1-300)"; fi
-  # (i3) o escritor do pin NÃO reescreve o label que o DONO editou (passada adversarial: trocar só o hash deixava o
-  #      resto da frase velho e cortava a cadeia dele), aceita id entre aspas, casa pin de 7 hex no label e é
-  #      idempotente (mesmo pin → nada muda, nem o verified_at: o --promote-hub sujava o grafo fora do commit).
+  # (i3) no label que o DONO editou o escritor troca SÓ o token do pin antigo (desde 2026-10-27, revisão do adotante
+  #      sge: o resto da frase e a outra referência da cadeia dele ficam), aceita id entre aspas, casa pin de 7 hex
+  #      no label e é idempotente (mesmo pin → nada muda, nem o verified_at: o --promote-hub sujava o grafo fora do
+  #      commit). O label editado SEM o pin antigo (rc 3, intocado) é o (i5).
   local _ie="${d}/i3"; mkdir -p "${_ie}/.claude" "${_ie}/docs/onion/graph"
   printf 'source_commit: 0123456789ab\nrole: adopted\n' > "${_ie}/.claude/.onion-version"
   printf 'nodes:\n  - id: "ONION_INSTALLED"\n    verified_at: "2026-01-01"\n    verified_against: leitura-minha-do-carimbo\n    label: "Framework instalado: pin `0123456`, cadeia minha: antes `aaaaaaa`"\n' > "${_ie}/docs/onion/graph/onion-adoption.kg.yaml"
@@ -36631,21 +36698,21 @@ run_adopter_shape_selftests() {
   [ "${_ic}" -eq 0 ] || _i3="${_i3} pin-de-7-hex-no-label-deu-rc${_ic}"
   printf 'source_commit: fedcba987654\nrole: adopted\n' > "${_ie}/.claude/.onion-version"
   bash "${_pk}" "${_ie}" >/dev/null 2>&1 || _iw=$?
-  grep -qF 'label: "Framework instalado: pin `0123456`, cadeia minha: antes `aaaaaaa`"' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" || _i3="${_i3} label-do-dono-reescrito"
+  grep -qF 'label: "Framework instalado: pin `fedcba987654`, cadeia minha: antes `aaaaaaa`"' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" || _i3="${_i3} label-do-dono-sem-a-troca-exata-do-pin-antigo"
   grep -qx '    verified_against: leitura-minha-do-carimbo' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" || _i3="${_i3} verified_against-do-dono-reescrito"
   grep -qx '    x_pin: "fedcba987654"' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" || _i3="${_i3} x_pin-nao-gravado-em-id-com-aspas"
-  [ "${_iw}" -eq 3 ] || _i3="${_i3} rc-do-label-editado=${_iw}(esperado-3)"
+  [ "${_iw}" -eq 0 ] || _i3="${_i3} rc-do-label-editado-com-o-pin-antigo=${_iw}(esperado-0)"
   sed -i 's/^    verified_at: .*/    verified_at: "2026-01-01"/' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml"   # o re-carimbo do MESMO pin não pode tocá-lo
   _ih0="$(sha256sum "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
   bash "${_pk}" "${_ie}" >/dev/null 2>&1 || true
   _ih1="$(sha256sum "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
   [ "${_ih0}" = "${_ih1}" ] || _i3="${_i3} mesmo-pin-mudou-o-grafo"
   if [ -z "${_i3}" ]; then
-    record_pass "adopter-shape: (i3) label e verified_against do dono intactos, id com aspas, pin de 7 hex, mesmo pin = nada muda"
+    record_pass "adopter-shape: (i3) label do dono: só o token do pin antigo muda; verified_against do dono intacto, id com aspas, pin de 7 hex, mesmo pin = nada muda"
   else record_fail "adopter-shape: (i3)" "${_i3}"; fi
   # (i4) A FONTE DA VERIFICAÇÃO acompanha o pin (2026-10-18, sinal de um adotante, forma do grafo real dele):
-  #      verified_against e provenance (source/locator) que citavam o pin ANTIGO passam a citar o novo; o label
-  #      (história do dono) e um OUTRO hash citado como referência ficam. MUTANTE: sem a troca, (i4) reprova.
+  #      verified_against e provenance (source/locator) que citavam o pin ANTIGO passam a citar o novo; um OUTRO
+  #      hash citado como referência fica. MUTANTE: sem a troca, (i4) reprova.
   _i4_run() {  # $1=helper → lista de desvios (vazio = ok)
     local _e="${d}/i4-$RANDOM" _bad=""
     mkdir -p "${_e}/.claude" "${_e}/docs/onion/graph"
@@ -36660,11 +36727,12 @@ run_adopter_shape_selftests() {
     grep -qx '    verified_against: stamp-lido-apos-o-update-3bd13fc565e2' "${_g}" || _bad="${_bad} verified_against-ficou-com-o-pin-antigo"
     grep -qx '      locator: "linha source_commit: 3bd13fc565e2"' "${_g}" || _bad="${_bad} locator-ficou-com-o-pin-antigo"
     grep -qF 'source: "carimbo na branch do update 3bd13fc565e2, comparado com fe8359e38b43"' "${_g}" || _bad="${_bad} source-errado(trocou-a-referencia-ou-nao-trocou-o-pin)"
-    grep -qF 'label: "Framework instalado: pin `cff2940153ab` (adotado em `fe8359e38b43`)"' "${_g}" || _bad="${_bad} label-da-historia-reescrito"
+    # o label: desde 2026-10-27 o token do pin antigo vira o novo (o (i5)); a referência da adoção fica
+    grep -qF 'label: "Framework instalado: pin `3bd13fc565e2` (adotado em `fe8359e38b43`)"' "${_g}" || _bad="${_bad} label-sem-a-troca-do-pin-ou-com-a-referencia-tocada"
     printf '%s' "${_bad}"
   }
   local _i4; _i4="$(_i4_run "${_pk}")"
-  if [ -z "${_i4}" ]; then record_pass "adopter-shape: (i4) o pin antigo em verified_against/provenance vira o novo; o label e a outra referência ficam"
+  if [ -z "${_i4}" ]; then record_pass "adopter-shape: (i4) o pin antigo em verified_against/provenance (e no label) vira o novo; a outra referência fica"
   else record_fail "adopter-shape: (i4)" "${_i4}"; fi
   local _i4m="${d}/stamp-i4-mut.sh"
   sed 's/^if cur:$/if False:/' "${_pk}" > "${_i4m}"
@@ -36672,6 +36740,44 @@ run_adopter_shape_selftests() {
   elif [ -n "$(_i4_run "${_i4m}")" ]; then record_pass "adopter-shape: (i4-MUT) sem a troca o pin antigo fica na fonte — (i4) é load-bearing"
   else record_fail "adopter-shape: (i4-MUT)" "o mutante passou — (i4) não mede a troca"; fi
   unset -f _i4_run
+  # (i5) O LABEL DO DONO NO --update (revisão adversarial do adotante sge, 2026-10-27; recorrência: duas rodadas
+  #      seguidas ele trocou o hash à mão). Forma do grafo REAL dele: x_pin e label citam o pin antigo, e o label
+  #      cita também o pin da adoção. a) o token exato do pin antigo vira o novo, o pin da adoção e o resto da frase
+  #      ficam, rc 0; b) label sem o pin antigo como token (um hex que só COMEÇA com ele não conta) → intocado,
+  #      só o x_pin muda, rc 3 com o aviso. MUTANTE: sem a troca no label, (a) cai.
+  _i5_run() {  # $1=helper → lista de desvios (vazio = ok)
+    local _e="${d}/i5-$RANDOM" _bad="" _r=0 _g
+    mkdir -p "${_e}/.claude" "${_e}/docs/onion/graph"; _g="${_e}/docs/onion/graph/onion-adoption.kg.yaml"
+    printf 'source_commit: 3bd13fc565e2\nrole: adopted\n' > "${_e}/.claude/.onion-version"
+    printf '%s\n' 'nodes:' '  - id: ONION_INSTALLED' '    verified_at: "2026-10-26"' \
+      '    x_pin: "c012991f32f6"' \
+      '    label: "Framework instalado: pin `c012991f32f6` (adotado no pin `ba0d2d423c17` em 2026-09-24), modo `regulated`. Atualizar depois."' > "${_g}"
+    bash "$1" "${_e}" >/dev/null 2>&1 || _r=$?
+    grep -qF 'label: "Framework instalado: pin `3bd13fc565e2` (adotado no pin `ba0d2d423c17` em 2026-09-24), modo `regulated`. Atualizar depois."' "${_g}" \
+      || _bad="${_bad} a:label-sem-a-troca-exata"
+    [ "${_r}" -eq 0 ] || _bad="${_bad} a:rc=${_r}(esperado-0)"
+    grep -qx '    x_pin: "3bd13fc565e2"' "${_g}" || _bad="${_bad} a:x_pin"
+    _r=0
+    printf '%s\n' 'nodes:' '  - id: ONION_INSTALLED' '    verified_at: "2026-10-26"' \
+      '    x_pin: "c012991f32f6"' '    label: "Instalado no pin `c012991f32f6aa` (ver o histórico)"' > "${_g}"
+    bash "$1" "${_e}" >/dev/null 2>&1 || _r=$?
+    grep -qF 'label: "Instalado no pin `c012991f32f6aa` (ver o histórico)"' "${_g}" || _bad="${_bad} b:label-tocado"
+    grep -qx '    x_pin: "3bd13fc565e2"' "${_g}" || _bad="${_bad} b:x_pin"
+    [ "${_r}" -eq 3 ] || _bad="${_bad} b:rc=${_r}(esperado-3)"
+    printf '%s' "${_bad}"
+  }
+  local _i5; _i5="$(_i5_run "${_pk}")"
+  if [ -z "${_i5}" ]; then record_pass "adopter-shape: (i5) label do dono com o pin antigo como token → só ele vira o novo (rc 0); sem o token → intocado e rc 3"
+  else record_fail "adopter-shape: (i5)" "${_i5}"; fi
+  local _i5m="${d}/stamp-i5-mut.sh"
+  sed 's/^    blk\[li\], label_swapped = re.subn(.*/    label_swapped = 0  # ONION_MUTANTE/' "${_pk}" > "${_i5m}"
+  if cmp -s "${_pk}" "${_i5m}"; then record_fail "adopter-shape: (i5-MUT) setup" "a mutação não foi aplicada (âncora mudou?)"
+  else case "$(_i5_run "${_i5m}")" in
+      *a:label-sem-a-troca-exata*) record_pass "adopter-shape: (i5-MUT) sem a troca no label o pin antigo fica nele — (i5) é load-bearing" ;;
+      *) record_fail "adopter-shape: (i5-MUT)" "o mutante passou — (i5) não mede a troca no label" ;;
+    esac
+  fi
+  unset -f _i5_run
 
   rm -rf "${d}"
 }

@@ -91,13 +91,76 @@ def load_segments(guard):
     exec(compile(ast.Module(body=keep, type_ignores=[]), guard, "exec"), ns)
     return ns["segments"], ns.get("WRAPPERS", set())
 
-# `<<<` é here-string e `<< 2` é deslocamento aritmético (`$((1<<2))`): nenhum dos dois abre corpo
-HEREDOC_ANY = re.compile(r"(?<!<)<<(?!<)(?![ \t]*[0-9])")
-HEREDOC_OP = re.compile(r"(?<!<)<<(?!<)(?![ \t]*[0-9])(-?)[ \t]*(['\"]?)([A-Za-z0-9_.-]+)\2")
+# O operador de heredoc se acha por VARREDURA da linha, nunca por regex solta (revisão adversarial do adotante sge,
+# 2026-10-27, dois falsos negativos medidos na forma por regex): (1) `<<` dentro de ASPAS (`echo "a<<b"`) não é
+# operador, e a regex o lia como heredoc de delimitador `b`, engolindo o resto do comando; (2) `<<$X` é heredoc
+# de delimitador LITERAL `$X` (o bash não expande a palavra do delimitador), e a regex, sem `$` na classe, o tinha
+# por ilegível e cortava o resto. A varredura segue aspas (também as que atravessam a linha), `\`, comentário,
+# `$((…))`/`((…))` (o deslocamento `1<<2` não abre corpo) e `<<<` (here-string). Na dúvida, CALA: delimitador
+# ilegível (vazio ou aspas sem fecho) corta dali ao fim, como antes.
+_HD_META = " \t;&|<>()"
+
+def heredoc_ops(line, quote):
+    """(ops, quote): ops = [(dash, palavra)] dos `<<` FORA de aspas e de aritmética, ou None se um é ilegível;
+    quote = a aspa que segue aberta no fim da linha (None se nenhuma)."""
+    ops, i, n, arith = [], 0, len(line), 0
+    while i < n:
+        c = line[i]
+        if quote == "'":
+            if c == "'":
+                quote = None
+            i += 1; continue
+        if quote == '"':
+            if c == "\\":
+                i += 2; continue
+            if c == '"':
+                quote = None
+            i += 1; continue
+        if c == "\\":
+            i += 2; continue
+        if c in "'\"":
+            quote = c; i += 1; continue
+        if c == "#" and (i == 0 or line[i - 1] in " \t;&|("):
+            break                                   # comentário: o resto da linha não é comando
+        if line.startswith("((", i):
+            arith += 1; i += 2; continue
+        if arith and line.startswith("))", i):
+            arith -= 1; i += 2; continue
+        if line.startswith("<<<", i):
+            i += 3; continue
+        if line.startswith("<<", i) and not arith:
+            j = i + 2
+            dash = j < n and line[j] == "-"
+            j += 1 if dash else 0
+            while j < n and line[j] in " \t":
+                j += 1
+            if j < n and line[j].isdigit() and not dash:
+                i = j; continue                     # `<< 2` sem `((`: deslocamento, não heredoc
+            word, wq = [], None
+            while j < n:
+                ch = line[j]
+                if wq:
+                    if ch == wq:
+                        wq = None
+                    else:
+                        word.append(ch)
+                    j += 1; continue
+                if ch in "'\"":
+                    wq = ch; j += 1; continue
+                if ch == "\\" and j + 1 < n:
+                    word.append(line[j + 1]); j += 2; continue
+                if ch in _HD_META:
+                    break
+                word.append(ch); j += 1
+            if wq or not word:
+                return None, quote                  # delimitador ilegível
+            ops.append((dash, "".join(word))); i = j; continue
+        i += 1
+    return ops, quote
 
 def strip_heredoc_bodies(cmd):
     """tira o CORPO de todo heredoc (é dado, não comando). Operador sem delimitador legível: corta dali ao fim."""
-    out, pending = [], []
+    out, pending, quote = [], [], None
     for line in cmd.split("\n"):
         if pending:
             dash, word = pending[0]
@@ -105,12 +168,10 @@ def strip_heredoc_bodies(cmd):
                 pending.pop(0)
             continue
         out.append(line)
-        n_any = len(HEREDOC_ANY.findall(line))
-        if n_any:
-            ops = HEREDOC_OP.findall(line)
-            if len(ops) != n_any:
-                break                               # não sei onde o corpo acaba: o resto não é julgado
-            pending = [(d == "-", w) for d, _, w in ops]
+        ops, quote = heredoc_ops(line, quote)
+        if ops is None:
+            break                                   # não sei onde o corpo acaba: o resto não é julgado
+        pending = list(ops)
     return "\n".join(out)
 
 def argv_of(seg, wrappers):
