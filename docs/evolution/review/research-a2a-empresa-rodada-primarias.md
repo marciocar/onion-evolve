@@ -2,7 +2,7 @@
 branch: research/a2a-empresa-rodada-primarias
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: ceac15d5355418ba25ebdd6bea3b3a76048a4fea22bca844f099c9413b784933
+reviewed_diff_sha256: 69303c19d2afdf37d71211f61b33e200311502673ac6b2281c025616be9bdddb
 reviewed_code_sha256: 69b23d4f021680066a36849f469bf75fa25d9975e37c651297dc73907f64418a
 findings_total: 3
 findings_real: 3
