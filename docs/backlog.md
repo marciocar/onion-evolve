@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**641 itens abertos** em 123 grafo(s) com aberto (de 162 no escopo) · 124 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**665 itens abertos** em 124 grafo(s) com aberto (de 163 no escopo) · 125 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -266,6 +266,35 @@
 | 3.6 | `C_SUPERACAO_20261026_SANDBOX_DEFAULTS_YOLO_CORRECTED` | codex-as-core-2026-10 | Formulação sustentada pela página de approvals e segurança: defaults sem rede e escrita no workspace, caminhos protegidos (.gi |
 | 3.6 | `C_SUPERACAO_20261026_SKILLS_0137_ALREADY_PER_TURN` | codex-as-core-2026-10 | As linhas #26106 e #26167 da 0.137.0 (catálogo de skills por turno e injeção de prompt v1) e #54050 da 0.164.0 (refresh de skil |
 | 3.6 | `C_SUPERACAO_20261026_SUBAGENT_SPAWN_BY_NAME_IN_PROMPT` | codex-as-core-2026-10 | Formulação corrigida pela página de subagentes: spawn por pedido direto ou instrução de projeto/skill, agente customizado nom |
+
+## a2a-empresa-adotante-2026-10 — 24 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 50.0 | `Q_A2A_EMPRESA_ADOTANTE_2026_10` | a2a-empresa-adotante-2026-10 | Como uma empresa adotante do Onion deve conectar sessões de agentes de pessoas e máquinas diferentes, com ida e volta viva, iden |
+| 48.0 | `C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE` | a2a-empresa-adotante-2026-10 | OPÇÃO C) A2A aberto 1.0 (AAIF/LF) + MCP remoto por Streamable HTTP como formato de fio. |
+| 41.2 | `C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D` | a2a-empresa-adotante-2026-10 | Combinação recomendada: B falando C (A2A do Onion como perfil do padrão aberto) entre pessoas + D com isolatePeerMachines para  |
+| 37.5 | `D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027` | a2a-empresa-adotante-2026-10 | DECISÃO ABERTA: topologia A2A da empresa adotante. A bridge hospedado (piloto) · B receptor self-host · C A2A aberto 1.0 + MCP  |
+| 28.0 | `C_OPCAO_D_NATIVE_SAME_PERSON_ONLY` | a2a-empresa-adotante-2026-10 | OPÇÃO D) Canais nativos Anthropic (cross-session via Remote Control, isolatePeerMachines): só para a mesma pessoa entre máquin |
+| 18.0 | `C_OPCAO_B_SELF_HOSTED_RECEIVER` | a2a-empresa-adotante-2026-10 | OPÇÃO B) Mesmo receptor em self-host pela empresa (VPS ou serverless com armazenamento durável). |
+| 16.0 | `Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027` | a2a-empresa-adotante-2026-10 | Rodada complementar em modo primaries: ler as fontes que o orçamento cortou e o Elenxo marcou como load-bearing (Channels, Manage |
+| 5.2 | `C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY` | a2a-empresa-adotante-2026-10 | OPÇÃO A) A2A do Onion hospedado pelo onion-bridge (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho): só on |
+| 3.6 | `C_SUPERACAO_20261027_A2A_AUTHZ_MUST_NO_INJECTION_CONTROL` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela spec A2A 1.0.0: autorização OBRIGATÓRIA em toda operação, com modelo e lógica a cargo da impleme |
+| 3.6 | `C_SUPERACAO_20261027_A2A_AUTH_REQUIRED_HUMAN_APPROVAL` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela spec A2A 1.0 (§7.6): o protocolo TEM estado para pedir aprovação humana (TASK_STATE_AUTH_REQUIRED,  |
+| 3.6 | `C_SUPERACAO_20261027_A2A_JOINS_AAIF_2026_08_17` | a2a-empresa-adotante-2026-10 | Formulação corrigida: em 17/08/2026 o A2A, que o Google doou à Linux Foundation em 2025, passou a projeto hospedado da Agentic  |
+| 3.6 | `C_SUPERACAO_20261027_A2A_LF_2025_V1_0_1_EXAMPLE_EXTENSIONS` | a2a-empresa-adotante-2026-10 | Formulação corrigida: o A2A, criado pelo Google (abr/2025) e hospedado pela Linux Foundation desde 23/06/2025, está na v1.0.1 ( |
+| 3.6 | `C_SUPERACAO_20261027_AAIF_BLOG_READ` | a2a-empresa-adotante-2026-10 | O blog aaif.io/blog/a2a-joins-aaif foi lido nesta rodada, com frase verbatim e data: o A2A entra na AAIF em 17/08/2026, ao lado do |
+| 3.6 | `C_SUPERACAO_20261027_AAIF_DATE_PRIMARY` | a2a-empresa-adotante-2026-10 | Primária aaif.io lida nesta rodada: o A2A entra na AAIF em 17/08/2026, junto ao MCP, o que põe os dois padrões sob a mesma fund |
+| 3.6 | `C_SUPERACAO_20261027_AAIF_FOUNDERS_LIST` | a2a-empresa-adotante-2026-10 | A primária aaif.io, lida nesta rodada, traz a lista verbatim de fundadores da entrada do A2A na AAIF: AWS, Cisco, Microsoft, Sale |
+| 3.6 | `C_SUPERACAO_20261027_AAIF_PRIMARY_REPLACES_TIER4` | a2a-empresa-adotante-2026-10 | A primária aaif.io substitui o blog tier 4 para a parte de governança e financiamento: o A2A entrou na AAIF em 17/08/2026, doado |
+| 3.6 | `C_SUPERACAO_20261027_CHANGELOG_2_1_311_MOBILE_DISPLAY_BUG` | a2a-empresa-adotante-2026-10 | Na 2.1.311 o Claude Code corrigiu um defeito de EXIBIÇÃO nos apps móveis: mensagens do Claude a uma sessão na nuvem ou de Remo |
+| 3.6 | `C_SUPERACAO_20261027_ISOLATE_PEER_MACHINES_PRIMARY` | a2a-empresa-adotante-2026-10 | Primária relida: isolatePeerMachines=true exige aprovação humana antes de qualquer mensagem sair da máquina, inclusive sob byp |
+| 3.6 | `C_SUPERACAO_20261027_REMOTE_CONTROL_SAME_ACCOUNT_MULTI_SESSION` | a2a-empresa-adotante-2026-10 | Formulação corrigida: o Remote Control liga claude.ai/code, o app e as OUTRAS sessões da mesma conta, inclusive entre máquinas |
+| 3.6 | `C_SUPERACAO_20261027_THOUGHTWORKS_ASSESS_NOT_TRIAL` | a2a-empresa-adotante-2026-10 | Formulação corrigida: o Technology Radar vol. 33 (05/11/2025) pôs o A2A em Assess ('olhar de perto, não necessariamente experi |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_ADDRESSING_CORRECTED` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela primária: destinatário endereçado pelo nome da sessão (com identificador curto na colisão); socke |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_CROSS_MACHINE_OPEN_2_1_225` | a2a-empresa-adotante-2026-10 | Formulação corrigida pela primária: desde a 2.1.225 uma sessão em Remote Control PODE abrir conversa com sessão de outra máq |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_PRIMARY_REREAD` | a2a-empresa-adotante-2026-10 | Releitura da primária de cross-session: sessão na nuvem não responde por SendMessage a outra máquina, mesmo com endereço de r |
+| 3.6 | `C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248` | a2a-empresa-adotante-2026-10 | Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS/Linux/WSL2), a 2.1.234 levou ao Windows, |
 
 ## slm-frameworks-2026-10 — 14 item(ns)
 

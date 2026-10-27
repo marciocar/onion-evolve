@@ -2,8 +2,8 @@
 branch: research/a2a-empresa-adotante
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
+reviewed_diff_sha256: c29594dbc133d9b95194465c6619e9515e372299d7264b40bb07c43e5f898b30
+reviewed_code_sha256: 21fbf4b9361c46e03956e5f248a64e421a83e8bc4ecbca8fadaae5efed7661c7
 findings_total: 3
 findings_real: 3
 tokens: 0
