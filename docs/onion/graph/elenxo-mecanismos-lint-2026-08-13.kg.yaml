@@ -252,6 +252,23 @@ nodes:
       locator: "workflow-de-4-agentes-com-241-tool-calls-e-os-4-schemas-validados"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
+  # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
+  - id: E_REVERIFY_KG_VIEW_PARSE_UNICO_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "grep -n 'bash \"$0\"' kg-view.sh → uma só linha (l.100, v_json reusado em l.101, l.128, l.129); kg-view.sh perception-instruments-2026-07.kg.yaml --assert-parity → '✅ paridade kg-view × kg-radar: 11 nós, 12 arestas' em 0,85 s"
+    label: "CONFIRMED no vivo: o --assert-parity do kg-view.sh faz uma só auto-invocação self --json (l.100) e a reusa para o vetor e as duas contagens; a paridade roda verde num grafo real."
+    narrative: "Re-verificação de I_P3_KG_VIEW_TRIPLO_PARSE_CURADO. A forma da cura segue no código e a guarda roda. Os números de tempo do nó (12,99 → 8,81 s, lint inteiro de 78 s) não foram re-medidos: a base de grafos cresceu desde 08-13 e o tempo de hoje não é comparável ao de lá."
+    provenance:
+      source: ".claude/validation/kg-view.sh @ origin/main 8857bc9b8"
+      locator: "kg-view.sh l.96-100 (comentário e captura única), l.101, l.128-129 (reuso); saída do --assert-parity"
+      method: "measurement: grep -n da auto-invocação + --assert-parity rodado num grafo real"
+      locality: "repo"
 
 edges:
   - from: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
@@ -299,3 +316,6 @@ edges:
   - from: Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA
     to: Q_PARECER_SOBRE_DIFF_INVERTIDO
     edge_type: CONSTRAINS
+  - from: E_REVERIFY_KG_VIEW_PARSE_UNICO_1027
+    to: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
+    edge_type: SUPPORTS

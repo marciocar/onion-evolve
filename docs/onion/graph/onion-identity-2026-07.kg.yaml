@@ -1376,6 +1376,39 @@ nodes:
       locator: "pergunta com opções de 2026-10-27: «O núcleo do Onion pode depender de serviço externo para entregar uma capacidade?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
+  # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
+  - id: E_REVERIFY_HAGEL_GIT_REPRODUZ_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "git show -s 70f9a26 → '2026-07-04 feat(meta): /meta:kg nasce do dogfood …'; git show 70f9a26:.claude/validation/kg-radar.sh l.16 'NÃO é port do radar.js do rhilo'; hoje kg-radar.sh l.87 '… NÃO é port do radar.js de um adotante'; sinal _processed/2026-07-02 l.4-6 (from: instância rhilo-metagamify, 2026-07-02); git show -s 3823978 → 2026-07-11"
+    label: "CONFIRMED no vivo: a evidência git do edge Hagel reproduz (sinal de 07-02 antes do commit de 07-04 em que /meta:kg e kg-radar nascem). Hoje a linha do radar mudou para l.87 e cita 'um adotante' no lugar do nome."
+    narrative: "Re-verificação de C_EDGE_HAGEL. A ordem das datas e as duas citações de commit se reproduzem. A linha de soberania do radar foi limpa de nome de adotante desde então, sem mudar o sentido."
+    provenance:
+      source: "git 70f9a26 + git 3823978 + docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md @ origin/main 8857bc9b8"
+      locator: "kg-radar.sh@70f9a26 l.16; kg-radar.sh l.87; sinal l.3-8"
+      method: "measurement: git show dos commits e grep -n no radar de então e de hoje"
+      locality: "repo"
+  - id: E_REVERIFY_DOGFOOD_VALUE_PRS_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 126/89/128 --json state,mergedAt → os três MERGED (2026-06-22, 2026-06-18, 2026-06-22); corpo do #126 l.22 '…pegou um bug que o happy-path escondia: o CLAUDE.md mora fora dos roots'; #89 l.1 '## Bug (achado pelo dogfooding)'; #128 l.3 '…Rodar o comando de verdade expôs 2 lacunas…'"
+    label: "CONFIRMED no vivo: os três PRs citados estão MERGED e os corpos dizem o que o nó cita, palavra por palavra."
+    narrative: "Re-verificação de C_DOGFOOD_VALUE, acrescentada ao lote pelo coordenador. A evidência mede a citação; o valor geral (dogfood pega o que revisão no papel não pega) é a leitura que o nó tira dela."
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/126"
+      locator: "gh pr view 126, 89 e 128 (state, mergedAt e body)"
+      method: "measurement: gh pr view dos três PRs, com grep no corpo"
+      locality: "web"
 
 edges:
   - from: D_FAMILIA_TEM_DOIS_REGIMES_2026_09
@@ -1723,3 +1756,9 @@ edges:
   - from: D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027
     to: C_POSTURA_ACOPLAMENTO
     edge_type: TRACES_TO
+  - from: E_REVERIFY_HAGEL_GIT_REPRODUZ_1027
+    to: C_EDGE_HAGEL
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_DOGFOOD_VALUE_PRS_1027
+    to: C_DOGFOOD_VALUE
+    edge_type: SUPPORTS

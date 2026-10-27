@@ -492,6 +492,23 @@ nodes:
     verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O no esta status:open como se 'documentar o boletim como padrao candidato' fosse trabalho pendente, mas as 3 afirmacoes do label ja estao TODAS entregues e conferindo com"
     label: "documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por estetica"
+  # ── re-verificação no vivo (2026-10-27): nós lidos, nunca rodados, agora medidos ──
+  - id: E_REVERIFY_DIARY_REVIEW_RODADO_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.95
+    verified_at: "2026-10-27"
+    verified_against: "bash .claude/validation/diary-index.sh <cópia do diário no scratchpad> → 'index.md regenerado: 128 entradas (14 stale, 116 compartilháveis)' e '⏰ 14 entrada(s) com review_after vencido'; grep -n no diary.md: l.7 e l.236"
+    label: "CONFIRMED no vivo: o /meta:diary review segue o protocolo 'migalha vencida → re-testar, nunca re-carimbar' (diary.md l.7 e l.236), e o motor que alimenta o ⏰ roda: 128 migalhas, 14 vencidas."
+    narrative: "Re-verificação de ENT_DIARY_REVIEW, que só tinha sido lido. O diary-index.sh rodou numa cópia do diário (efeito só no scratchpad) e contou 14 vencidas, o mesmo número que o hook co-evolution-inbox-check.sh emite no boot. O texto do comando mudou de linha (o protocolo agora é a seção 'review' em l.236), sem mudar o sentido."
+    provenance:
+      source: ".claude/validation/diary-index.sh + .claude/commands/meta/diary.md @ origin/main 8857bc9b8"
+      locator: "saída do diary-index.sh sobre a cópia do diário; diary.md l.7 (descrição) e l.236-258 (protocolo do review)"
+      method: "measurement: diary-index.sh rodado numa cópia descartável do diário + grep -n no comando"
+      locality: "repo"
 edges:
   # a prova viva sustenta a tese e a epistemologia
   - from: E_INTERFACE_FOLD
@@ -652,4 +669,7 @@ edges:
     edge_type: DEPENDS_ON
   - from: C_BOLETIM_INFORM
     to: D_BOLETIM_CANDIDATE
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_DIARY_REVIEW_RODADO_1027
+    to: ENT_DIARY_REVIEW
     edge_type: SUPPORTS
