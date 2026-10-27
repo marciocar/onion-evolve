@@ -1,0 +1,47 @@
+# Grafo MÍNIMO do business-context do core (2026-10-27), criado para servir de ALVO às ligações do grafo
+# piloto do design-context (docs/design-context/design-context.kg.yaml). Não é a migração do business-context
+# para grafo: os .md desta pasta seguem sendo a fonte, e estes dois nós só os apontam por trace. A ordem de
+# migração do estudo da curadoria (design-setup-2026-10, caso 8 do laboratório) manda este arquivo entrar no
+# commit ANTES do grafo do design, porque o gate do contrato só enxerga grafo rastreado.
+meta:
+  id: business-context
+  schema_version: "1"
+  baseline: "2026-10-27"
+  review_after: "2027-01-27"
+nodes:
+  - id: E_POSITIONING
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    label: "Posicionamento do Onion: SDD sobre Claude Code, com o whitespace de tratar produto, engenharia e compliance num ciclo só."
+    trace: docs/business-context/02-product/strategy.md
+    verified_at: "2026-10-27"
+    verified_against: "docs/business-context/02-product/strategy.md, seção Posicionamento"
+    provenance:
+      source: docs/business-context/02-product/strategy.md
+      locator: "## Posicionamento (pesquisa citada — 2026-07-12)"
+      method: "reading: a seção de posicionamento da estratégia de produto"
+      locality: repo
+  - id: E_AUDIENCE
+    node_type: entity
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    label: "Público do Onion: personas em camadas, do maestro e do adotante da família (provadas) ao regulado e ao dev solo (hipóteses)."
+    trace: docs/business-context/01-customer/personas.md
+    verified_at: "2026-10-27"
+    verified_against: "docs/business-context/01-customer/personas.md, seções P1 a P7"
+    provenance:
+      source: docs/business-context/01-customer/personas.md
+      locator: "## P1 a ## P7"
+      method: "reading: as personas do contexto de cliente"
+      locality: repo
+edges:
+  - from: E_POSITIONING
+    to: E_AUDIENCE
+    edge_type: TRACES_TO
