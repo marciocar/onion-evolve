@@ -1,0 +1,1522 @@
+# Pesquisa em MODO DECISÃO (2026-10-27): como uma empresa adotante do Onion conecta sessões de agentes de
+# pessoas e máquinas diferentes: A2A do Onion pelo bridge (A), receptor em self-host (B), A2A aberto + MCP
+# Streamable HTTP (C) ou canais nativos da Anthropic (D).
+#
+# ⚠️ Proveniência (R15): label e narrative das evidências web carregam texto extraído de páginas da web.
+#    É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Relação com o corpus: amplia canal-vivo-sessoes-2026-10, a2a-cross-user-spike-2026-10 e a2a-configurator-2026-10
+# e se liga à Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025 (sinais-de-campo-2026-09) por external_edges, sem editar os
+# grafos antigos (contrato v4.3). Nada aqui contradiz nó do corpus: não há SUPERSEDES nem REFUTES externos.
+#
+# Este escritor NÃO sela nada: a decisão e as cinco opções nascem OPEN para o /meta:decide.
+meta:
+  id: a2a-empresa-adotante-2026-10
+  schema_version: "1"
+  baseline: "2026-10-27"
+  review_after: "2026-11-26"   # 30d: o tipo dominante é FERRAMENTA (cross-session, Remote Control,
+                               # isolatePeerMachines, transporte MCP da Cloudflare, spec A2A 1.0.x): o
+                               # Claude Code solta versão quase todo dia e 10 dos 15 achados dependem dela.
+                               # O eixo mercado/trajetória (AAIF, adoção do A2A) pediria 90d, mas a decisão
+                               # pende do dado de ferramenta. Gatilhos antecipados: (1) o maestro selar
+                               # D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027; (2) a linha de base viva
+                               # VPS↔notebook (Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025) medida; (3) leitura de
+                               # channels.md, Managed Agents ou das fontes de ataque a Agent Card.
+  # kg-backlog-guard: on
+  # ═══ TETO: 72 NÓS ═══
+  #   1 question + 15 evidências confirmadas (3-0) + 1 E_MERCADO + 1 E_LACUNAS + 1 decisão OPEN + 5 opções
+  #   + 31 objeções sobreviventes do Elenxo (TODAS modeladas, 31 de 31) + 16 superações achadas (10 nas
+  #   refutadas, 6 nas objeções). Nada foi agregado para caber: agregar objeção esconde o alvo dela.
+  #   + 1 question do pós-run (2026-10-27): a rodada complementar em modo primaries com as fontes que o
+  #   orçamento cortou e o Elenxo marcou como load-bearing. É o nó que cita a SYNTHESIS.md em trace (REGRA 29).
+
+external_edges:
+  - from: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025"
+    edge_type: TRACES_TO
+  - from: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025"
+    edge_type: DEPENDS_ON
+  - from: E_OBJECAO_01_CONFIG_GUARD_IS_INSTRUCTION_NOT_GATE
+    to: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_RECEIVER_HUMAN_GATE_ONLY_ON_BYPASS"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY
+    to: "docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml#C_VETO_INTERPOLAVA_O_REMETENTE"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY
+    to: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_XSESSION_LIVE_S1B_CONVERSATION"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_04_SIGNED_CARD_IS_AGENT_NOT_MESSAGE
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#E_F1_CORPO_FORA_DA_ASSINATURA"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_12_A2A_SPEC_CONTENT_NOT_UNTRUSTED
+    to: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#C_LIVE_CLASS_DESIGN_CONSTRAINTS"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING
+    to: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_CC_XSESSION_ISOLATE_PEER_MACHINES_OUTBOUND_GATE"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_27_YOUNG_INTEROP_LAYER
+    to: "docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml#C_ACEITE_CONFIAVA_NO_JSON_DA_FILA"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    to: "docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml#C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET"
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
+    edge_type: TRACES_TO
+
+nodes:
+  - id: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "Como uma empresa adotante do Onion deve conectar sessões de agentes de pessoas e máquinas diferentes, com ida e volta viva, identidade estável do remetente, mensagem de colega como informação (nunca aprovação) e nada de envio automático para fora?"
+    narrative: "Pergunta do run /onion-research modo decision de 2026-10-27, relayada da sessão do maestro ('traga em decide, uma empresa adotante do onion poderia ter duas possibilidades, usar o nosso A2A (ex. via bridge ou instalado em uma VPS ou lambda) ou outra sugestão mais moderna e costurável'). Candidatas: A) A2A do Onion hospedado pelo onion-bridge (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho); B) o mesmo receptor em self-host pela empresa (VPS ou serverless); C) A2A aberto (Agent2Agent, AAIF/LF) + MCP remoto por Streamable HTTP; D) canais nativos da Anthropic (Remote Control, sessões na nuvem, Managed Agents, Agent SDK). Critérios: ida e volta viva; identidade estável; dono do dado e onde ele passa; custo e esforço de operação; maturidade e trajetória (adoção, quem financia, quem implementa); segurança (autenticação, autorização, injeção vinda de outro agente); costura com o Claude Code atual. Segue open: a decisão D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027 espera o selo do maestro."
+    trace: "docs/evolution/research/a2a-empresa-adotante-2026-10/a2a-empresa-adotante-2026-10.kg.yaml (run /onion-research modo decision de 2026-10-27)"
+
+  - id: E_XSESSION_SCOPED_TO_SAME_USER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "https://code.claude.com/docs/en/cross-session-messaging · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "O cross-session nativo do Claude Code (SendMessage/ListAgents) é escopado às sessões DO MESMO usuário ('your other sessions'): não é canal entre pessoas e não resolve sozinho a troca entre colegas."
+    narrative: "Elenxo tentou derrubar e não caiu (objeção não sobrevivente). Corpus: canal-vivo-sessoes-2026-10, S2 observado: com contas Max e Team, 'nenhuma conta lista as sessões da outra'. Ressalva sem medida: 'dois membros da mesma org Team' segue NÃO VERIFICADO."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+    provenance:
+      source: "https://code.claude.com/docs/en/cross-session-messaging"
+      locator: "seção de abertura 'Let Claude list and message your other Claude Code sessions' e 'Availability'"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_XSESSION_MESSAGE_NEVER_APPROVAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "https://code.claude.com/docs/en/cross-session-messaging · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "Mensagem de outra sessão não aprova prompt pendente, comandos chegam como texto puro e prompts de permissão continuam valendo; a primária alinha com 'mensagem de colega é informação'."
+    narrative: "Restringida por E_OBJECAO_01_CONFIG_GUARD_IS_INSTRUCTION_NOT_GATE: 'não altera configuração' é INSTRUÇÃO ao modelo receptor ('Claude Code instructs the receiving Claude never to change permission settings'), não gate determinístico."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+    provenance:
+      source: "https://code.claude.com/docs/en/cross-session-messaging"
+      locator: "seção sobre o que a mensagem recebida pode e não pode fazer ('can't approve anything', 'Commands don't run')"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "https://code.claude.com/docs/en/cross-session-messaging · votos 3-0"
+    source_tier: 10
+    source_kind: primary
+    label: "Entre máquinas ou com a nuvem, a mensagem nativa passa pelos servidores da Anthropic via Remote Control e exige login claude.ai (não com API key, Bedrock, Vertex ou Foundry); na mesma máquina vai por socket local, sem passar pela Anthropic."
+    narrative: "Define o dono do dado e a dependência de fornecedor da opção D. Corpus S1 observou o canal VPS↔notebook na mesma conta."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+    provenance:
+      source: "https://code.claude.com/docs/en/cross-session-messaging"
+      locator: "tabela 'How the message travels' ('On another of your machines | Through Anthropic servers'; 'Over a per-session socket ... never through Anthropic servers') e 'Availability'"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_NATIVE_ROUNDTRIP_BUGS_2_1_299_309
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-27"
+    verified_against: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    valid_from: "2026-10"
+    label: "Os canais nativos (Remote Control, Desktop) tiveram defeitos de ida e volta corrigidos entre 2.1.299 e 2.1.309: prompt perdido, mensagem perdida em reconexão e sessão marcada como parada enquanto rodava."
+    narrative: "Restringida por E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY (contar bug corrigido mede manutenção, não confiabilidade; a régua reprova mais a opção A) e por E_OBJECAO_25_CHANGELOG_READ_9_PERCENT (o run leu ~9% do CHANGELOG)."
+    trace: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "entradas das seções 2.1.299 a 2.1.309 do CHANGELOG"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_REMOTE_CONTROL_OUTBOUND_HTTPS_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-27"
+    verified_against: "https://code.claude.com/docs/en/remote-control.md · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "No Remote Control o tráfego passa pela API da Anthropic sobre TLS, a sessão local só faz HTTPS de saída (sem porta de entrada) e usa credenciais de curta duração: o dado transita pela Anthropic, não pela infraestrutura da empresa."
+    narrative: "Efeito colateral apontado pelo Elenxo (não sobrevivente): só-saída é vantagem real da D sobre A/B quando a máquina está atrás de NAT; no corpus, a volta A2A entre usuários atrás de NAT é polling por tasks/get ou SSE (a2a-cross-user-spike-2026-10)."
+    trace: "https://code.claude.com/docs/en/remote-control.md"
+    provenance:
+      source: "https://code.claude.com/docs/en/remote-control.md"
+      locator: "seção de segurança da página de Remote Control"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_A2A_150_ORGS_22K_STARS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-27"
+    verified_against: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    valid_from: "2026-04"
+    label: "O A2A tinha mais de 150 organizações apoiando o padrão em abril de 2026 (contra mais de 50 em abril de 2025), e o repositório central passou de 22 mil estrelas no GitHub."
+    narrative: "Restringida por E_OBJECAO_03_SUPPORTERS_ARE_NOT_PRODUCTION_USE: 'apoiar' é número de comunicado da própria parte interessada e estrela não é adoção; adoção real em produção segue sem número."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "comunicado da Linux Foundation, parágrafos de abertura"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_A2A_1_0_SIGNED_AGENT_CARDS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    valid_from: "2026-04"
+    label: "A spec A2A 1.0 é a primeira versão estável e traz Signed Agent Cards para verificação criptográfica da identidade de agentes, além de multi-tenancy; cobre identidade do agente, não de pessoas."
+    narrative: "Restringida por E_OBJECAO_04_SIGNED_CARD_IS_AGENT_NOT_MESSAGE: a spec deixa a assinatura opcional e o card autentica o agente, não cada mensagem (o spike do Onion achou o mesmo buraco: corpo fora do JWS)."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "comunicado da Linux Foundation, trecho sobre a versão 1.0"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_CLOUDFLARE_STREAMABLE_HTTP_DEFAULT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-27"
+    verified_against: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/ · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    valid_from: "2025-03"
+    label: "A Cloudflare documenta o Streamable HTTP como o transporte padrão de conexões MCP remotas, com um único endpoint HTTP para mensagens bidirecionais."
+    narrative: "Restringida por E_OBJECAO_05_STREAMABLE_HTTP_IS_TOOL_TRANSPORT: prova transporte agente→ferramenta, não ida e volta viva entre sessões; um MCP remoto não empurra mensagem para a sessão ociosa do colega."
+    trace: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/"
+    provenance:
+      source: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/"
+      locator: "seção de transporte Streamable HTTP"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_CLOUDFLARE_MCPAGENT_DEPRECATED_STATELESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/ · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "Na Cloudflare, servidores MCP novos devem usar o handler Streamable HTTP stateless, sem sessão no nível do protocolo; o McpAgent, baseado em Durable Object, está deprecado e congelado."
+    narrative: "Elenxo (não sobrevivente) com ressalva de escopo: o deprecado é a classe McpAgent, não os Durable Objects como armazenamento. Pesa contra a B em Cloudflare: a fila e a caixa de entrada viram projeto da empresa."
+    trace: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/"
+    provenance:
+      source: "https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/"
+      locator: "seção sobre o handler stateless e o aviso de deprecação do McpAgent"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_SURVEY_PROTOCOL_GROWTH_OUTPACED_SECURITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "https://arxiv.org/pdf/2506.23260 · votos 3-0"
+    source_tier: 7
+    source_kind: paper
+    valid_from: "2025-06"
+    label: "O survey de Ferrag et al. (arXiv 2506.23260) afirma que o crescimento de plugins, conectores e protocolos inter-agente superou as práticas de segurança: nenhum protocolo de agentes dispensa gate próprio."
+    narrative: "Elenxo tentou derrubar pela data (jun/2025, anterior ao A2A 1.0) e não caiu: a conclusão é corroborada pelos defeitos medidos no próprio bridge (a2a-configurator-2026-10: 'interpolava o from cru no YAML', 'enfileirava o sinal sem assinatura como verificado')."
+    trace: "https://arxiv.org/pdf/2506.23260"
+    provenance:
+      source: "https://arxiv.org/pdf/2506.23260"
+      locator: "abstract do arXiv 2506.23260"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_SURVEY_ADHOC_AUTH_WEAK_VALIDATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "https://arxiv.org/pdf/2506.23260 · votos 3-0"
+    source_tier: 7
+    source_kind: paper
+    valid_from: "2025-06"
+    label: "As integrações atuais de agentes sofrem de autenticação ad hoc, esquemas inconsistentes e validação fraca: o receptor, próprio ou aberto, precisa de identidade estável e autenticação explícita."
+    narrative: "Corroborado pelo corpus: a divergência PyYAML × awk no trust-check e a reverificação de envelope que faltava no aceite (a2a-configurator-2026-10)."
+    trace: "https://arxiv.org/pdf/2506.23260"
+    provenance:
+      source: "https://arxiv.org/pdf/2506.23260"
+      locator: "abstract do arXiv 2506.23260"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_YORK_MCP_LIGHTER_STATE_IN_APP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "https://www.alphaxiv.org/abs/2607.23884 · votos 3-0"
+    source_tier: 6
+    source_kind: paper
+    valid_from: "2026-07-26"
+    label: "Estudo de jul/2026 (Univ. de York), mesma tarefa em MCP e em A2A: o MCP coordena agentes em sistemas restritos com implementação mais leve, mas estado de conversa e ciclo de vida de tarefa ficam na aplicação."
+    narrative: "Restringida por E_OBJECAO_06_YORK_NO_NUMBERS e E_OBJECAO_21_YORK_CUT_INFLATED: observações de desenho sem números; não sustenta escolha de topologia."
+    trace: "https://www.alphaxiv.org/abs/2607.23884"
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2607.23884"
+      locator: "abstract do alphaxiv 2607.23884"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_YORK_A2A_STATEFUL_RICHER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "https://www.alphaxiv.org/abs/2607.23884 · votos 3-0"
+    source_tier: 6
+    source_kind: paper
+    valid_from: "2026-07-26"
+    label: "O A2A oferece suporte nativo mais rico a coordenação stateful e multi-turno (tarefa e ciclo de vida no protocolo), ao custo de maior complexidade de implementação."
+    narrative: "Restringida por E_OBJECAO_07_A2A_COMPLEXITY_UNMEASURED: a Task com ciclo de vida é sustentada por outra via (o Onion já usa tasks/get ou SSE para a volta); 'maior complexidade' não tem medida."
+    trace: "https://www.alphaxiv.org/abs/2607.23884"
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2607.23884"
+      locator: "abstract do alphaxiv 2607.23884"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_AAIF_PLATINUM_SPONSORS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: "2026-10-27"
+    verified_against: "https://www.flowhunt.io/blog/agentic-ai-foundation-a2a-mcp-standards/ · votos 3-0"
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    valid_from: "2026-08"
+    label: "Patrocinadores platinum da AAIF incluem AWS, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft e OpenAI: financiamento amplo do padrão aberto."
+    narrative: "Fonte tier 4. Restringida por E_OBJECAO_08_AAIF_SPONSORS_TIER4: patrocínio não mede implementação nem adoção. A parte de governança foi superada pela primária aaif.io (C_SUPERACAO_20261027_AAIF_PRIMARY_REPLACES_TIER4)."
+    trace: "https://www.flowhunt.io/blog/agentic-ai-foundation-a2a-mcp-standards/"
+    provenance:
+      source: "https://www.flowhunt.io/blog/agentic-ai-foundation-a2a-mcp-standards/"
+      locator: "trecho sobre os patrocinadores da AAIF"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_SESSION_NAME_NOT_STABLE_IDENTITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "https://pasqualepillitteri.it/en/news/10215/claude-code-cross-session-messaging · votos 3-0"
+    source_tier: 4
+    source_kind: engineer
+    valid_from: "2026-08-07"
+    label: "A identidade do remetente nativo é um nome de sessão (/rename, --name ou automático), que pode colidir, ganha sufixo curto na colisão e não tem persistência garantida: não serve como identidade estável."
+    narrative: "Elenxo (não sobrevivente) substitui a fonte tier 4 pela primária: 'A session answers to the name you set with /rename or --name ... When you don't set one, Claude Code names the session itself' e 'Claude adds a short identifier'. Reflexão de campo de 2026-10-26: o socket local muda com o PID ao reiniciar."
+    trace: "https://pasqualepillitteri.it/en/news/10215/claude-code-cross-session-messaging"
+    provenance:
+      source: "https://pasqualepillitteri.it/en/news/10215/claude-code-cross-session-messaging"
+      locator: "artigo sobre cross-session messaging, seção de nomes de sessão"
+      method: "juízes: votação 3-0 do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: E_MERCADO_A2A_EMPRESA_ADOTANTE_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year · https://www.flowhunt.io/blog/agentic-ai-foundation-a2a-mcp-standards/ · síntese de mercado do run"
+    source_tier: 8
+    source_kind: primary
+    valid_from: "2026-04"
+    label: "Mercado: o A2A foi de mais de 50 a mais de 150 apoiadores em um ano e está nas grandes nuvens; a AAIF é financiada pelos mesmos fornecedores de modelo e nuvem, inclusive a Anthropic. Sem rodada, M&A ou analista confirmado."
+    narrative: "Do sintetizador: (1) primária LF, abr/2026: >50 → >150 organizações, >22 mil estrelas, presença nas grandes nuvens e uso de produção declarado (sem nome de cliente nem volume). (2) Tier 4, ago/2026: patrocinadores platinum da AAIF AWS, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft e OpenAI. (3) Nenhuma rodada, M&A ou parecer de analista confirmado; a claim do Thoughtworks Radar (Assess) foi refutada no run, e a refutação foi contestada pelo Elenxo (E_OBJECAO_10_THOUGHTWORKS_ASSESS_UNREFUTED, superação C_SUPERACAO_20261027_THOUGHTWORKS_ASSESS_NOT_TRIAL). Leitura: o capital favorece C como formato de fio, não um protocolo próprio; quem financia o padrão é o mesmo conjunto que financia o substrato do Onion. Limite: 'apoiar' não é adoção medida (E_OBJECAO_03)."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+    provenance:
+      source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+      locator: "comunicado LF de abr/2026 + trecho de patrocinadores do blog flowhunt"
+      method: "derivado: síntese do eixo mercado/capital do run /onion-research modo decision de 2026-10-27"
+      locality: "web"
+
+  - id: C_SUPERACAO_20261027_XSESSION_ADDRESSING_CORRECTED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida pela primária: destinatário endereçado pelo nome da sessão (com identificador curto na colisão); socket por sessão só na mesma máquina; entre máquinas e nuvem, via Anthropic com login claude.ai; só sessões do próprio usuário."
+    narrative: "Medida: WebFetch da primária em 2026-10-27; tabela 'How the message travels', 'Replies from other machines and cloud sessions', 'Availability' e o título 'Message your other Claude Code sessions'. Critério: V2_CONTRADITA. Alvo reprovado: 'a identidade é nome de sessão/identificador curto, endereço é socket por sessão, sem identidade estável de pessoa, nuvem não responde via SendMessage' (tier 10). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://code.claude.com/docs/en/cross-session-messaging e citar a tabela 'How the message travels'; grep -F 'your other Claude Code sessions'"
+
+  - id: C_SUPERACAO_20261027_CHANGELOG_2_1_311_MOBILE_DISPLAY_BUG
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Na 2.1.311 o Claude Code corrigiu um defeito de EXIBIÇÃO nos apps móveis: mensagens do Claude a uma sessão na nuvem ou de Remote Control apareciam como do próprio usuário. É bug de renderização, não prova de remetente ambíguo no canal."
+    narrative: "Medida: grep -F 'appearing as your own message' no CHANGELOG baixado casa só na seção 2.1.311, com o sufixo 'in the Claude mobile apps'; outras entradas do mesmo arquivo mostram remetente registrado e exibido à parte em outros clientes. Critério: V1_QUOTE_NAO_SUSTENTA. Alvo reprovado: 'a partir da 2.1.311 ... a identidade do remetente nos canais nativos era ambígua' (tier 9). Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | sed -n '3,30p' | grep -n -F 'appearing as your own message'"
+
+  - id: C_SUPERACAO_20261027_REMOTE_CONTROL_SAME_ACCOUNT_MULTI_SESSION
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida: o Remote Control liga claude.ai/code, o app e as OUTRAS sessões da mesma conta, inclusive entre máquinas e na nuvem, carrega mensagens com ida e volta e atende até 32 sessões em modo servidor; não alcança outra pessoa ou conta."
+    narrative: "Medida: WebFetch de remote-control.md ('between your own sessions on different machines', '--capacity <N> ... Default is 32') e de cross-session-messaging.md ('arriving over that machine's Remote Control connection', 'The receiving Claude can reply to the sender with SendMessage'). Critério: V2_CONTRADITA. Alvo reprovado: 'Remote Control conecta a UMA sessão local' (tier 9). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://code.claude.com/docs/en/remote-control.md e grep -F 'the same connection carries messages between your own sessions on different machines'"
+
+  - id: C_SUPERACAO_20261027_THOUGHTWORKS_ASSESS_NOT_TRIAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida: o Technology Radar vol. 33 (05/11/2025) pôs o A2A em Assess ('olhar de perto, não necessariamente experimentar ainda', abaixo do Trial, que é o de piloto); o blip não está na edição atual (vol. 34, abr/2026)."
+    narrative: "Medida: WebFetch da página do blip (anel Assess, 05/11/2025, 'not on the current edition') e da FAQ do radar (definições de Assess e Trial) em 2026-10-27; WebSearch confirmou a vol. 34 em abril de 2026. Critério: V2_CONTRADITA. Alvo reprovado: 'Thoughtworks Radar nov/2025 põe A2A em Assess, indicado para piloto controlado' (tier 7). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://www.thoughtworks.com/radar/faq e citar 'The Assess ring are things to look at closely, but not necessarily trial yet'"
+
+  - id: C_SUPERACAO_20261027_A2A_LF_2025_V1_0_1_EXAMPLE_EXTENSIONS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida: o A2A, criado pelo Google (abr/2025) e hospedado pela Linux Foundation desde 23/06/2025, está na v1.0.1 (28/05/2026); a página oficial lista quatro extensões de EXEMPLO; o juízo 'não tratam governança' é só do preprint."
+    narrative: "Medida: WebFetch do comunicado LF ('June 23, 2025'), de github.com/a2aproject/A2A/releases (v1.0.0 em 12/03/2026, v1.0.1 em 28/05/2026) e de a2a-protocol.org/latest/topics/extensions/ ('List of Example Extensions'). Critério: V2_CONTRADITA. Alvo reprovado: 'A2A v1.0.1 ... contribuído à LF em 2026; extensões oficiais não tratam governança' (tier 6). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://www.linuxfoundation.org/press/linux-foundation-launches-the-agent2agent-protocol-project-to-enable-secure-intelligent-communication-between-ai-agents -> 'June 23, 2025'"
+
+  - id: C_SUPERACAO_20261027_A2A_AUTH_REQUIRED_HUMAN_APPROVAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida pela spec A2A 1.0 (§7.6): o protocolo TEM estado para pedir aprovação humana (TASK_STATE_AUTH_REQUIRED, encadeável, e INPUT_REQUIRED), mas não define gatilho, identidade da autoridade nem escopo, validade e revogação da decisão."
+    narrative: "Medida: curl da spec viva, HTML reduzido a texto, grep de 'human approval before a destructive action', 'chain of Tasks in TASK_STATE_AUTH_REQUIRED' e 'does not define the scope': os três presentes; o preprint 2606.31498 não menciona AUTH_REQUIRED. Critério: V2_CONTRADITA. Alvo reprovado: 'o A2A não tem mecanismo para escalar a decisão a humano' (tier 6). Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://a2a-protocol.org/latest/specification/ | sed 's/<[^>]*>/ /g' | grep -oE 'chain of Tasks in TASK_STATE_AUTH_REQUIRED|does not define the scope, representation, validity, or revocation semantics'"
+
+  - id: C_SUPERACAO_20261027_A2A_JOINS_AAIF_2026_08_17
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida: em 17/08/2026 o A2A, que o Google doou à Linux Foundation em 2025, passou a projeto hospedado da Agentic AI Foundation (AAIF/LF), ao lado do MCP."
+    narrative: "Medida: WebFetch de aaif.io/blog/a2a-joins-aaif (data 2026-08-17, 'is joining the Agentic AI Foundation (AAIF) as a hosted project'); WebSearch achou a Axios de 17/08/2026 e a Techzine. Critério: V2_CONTRADITA. Alvo reprovado: 'em 20/08/2026 a Google Cloud doou o A2A à AAIF' (tier 4). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif e citar '2026-08-17' e 'is joining the Agentic AI Foundation (AAIF) as a hosted project'"
+
+  - id: C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS/Linux/WSL2), a 2.1.234 levou ao Windows, e desde a 2.1.248 a mesma máquina funciona em todos os provedores (Bedrock, Vertex, Foundry); entre máquinas exige claude.ai."
+    narrative: "Medida: grep no CHANGELOG oficial ('## 2.1.224' 'Added cross-session SendMessage'; '## 2.1.248' '... same machine on Bedrock, Vertex, and Foundry'; 'Windows: cross-session messaging is now available') e WebFetch da seção Availability da primária em 2026-10-27. Critério: V4_DESATUALIZADA. Alvo reprovado: 'cross-session chegou na 2.1.224 ... indisponível em Bedrock/Vertex/Foundry' (tier 4). Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -E 'between sessions on the same machine on Bedrock|Windows: cross-session messaging is now available'"
+
+  - id: C_SUPERACAO_20261027_XSESSION_CROSS_MACHINE_OPEN_2_1_225
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida pela primária: desde a 2.1.225 uma sessão em Remote Control PODE abrir conversa com sessão de outra máquina; limites reais: só o próprio usuário, nuvem não responde por SendMessage, remetente sem Remote Control manda mão única."
+    narrative: "Medida: WebFetch da página oficial em 2026-10-27, verbatim 'Starting a conversation with a session on another of your machines requires Claude Code v2.1.225 or later', 'can't use SendMessage to answer a message from another machine', 'without a reply address'. Critério: V4_DESATUALIZADA. Alvo reprovado: 'entre máquinas o nativo só permite respostas, nunca abrir conversa' (tier 4). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://code.claude.com/docs/en/cross-session-messaging e grep -F 'Starting a conversation with a session on another of your machines requires Claude Code v2.1.225 or later'"
+
+  - id: C_SUPERACAO_20261027_A2A_AUTHZ_MUST_NO_INJECTION_CONTROL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Formulação corrigida pela spec A2A 1.0.0: autorização OBRIGATÓRIA em toda operação, com modelo e lógica a cargo da implementação (§7.5, §13), e nenhum controle específico contra prompt injection entre agentes, só validação genérica."
+    narrative: "Medida: três WebFetch da spec (offsets 0, 100000 e 200000, versão 1.0.0, 2026-10-27): 'Servers MUST implement authorization checks on every A2A Protocol Operations request' (§13), 'Authorization logic is implementation-specific' (§7.5); 'prompt injection' ausente da §13. Critério: V2_CONTRADITA. Alvo reprovado: 'a spec A2A não define autorização nem controles contra prompt injection' (tier 4). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://a2a-protocol.org/latest/specification/ e procurar 'Servers **MUST** implement authorization checks on every A2A Protocol Operations request'"
+
+  - id: E_OBJECAO_01_CONFIG_GUARD_IS_INSTRUCTION_NOT_GATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 2, critério pré-registrado E1_EVIDENCIA_CONTRARIA: curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'instructs the receiving Claude never to change'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 2: 'não altera configuração' é INSTRUÇÃO ao modelo receptor, não gate; com o receptor pedindo permissão, o default ENTREGA a mensagem e quem segura o conteúdo é o próprio modelo."
+    narrative: "Verbatim da primária: 'It can't change configuration: Claude Code INSTRUCTS the receiving Claude never to change permission settings, CLAUDE.md...'. Determinísticos são só 'can't approve anything' e 'Commands don't run'. Corpus: 'O portão humano do lado RECEPTOR só está ancorado para receptor em bypass' e a robustez do S3 contra adversário segue NÃO VERIFICADA. Superação não achada (classe nenhuma): crossSessionInbound=hold/refuse é determinístico mas retém ou descarta tudo ('hold explícito não abre diálogo; refuse descarta sem humano'). Critério: E1_EVIDENCIA_CONTRARIA."
+    trace: "curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'instructs the receiving Claude never to change'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 2' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 4, critério pré-registrado E2_PROVA_MENOS: grep -n 'enfileirava o sinal sem assinatura' docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml; grep -n '26 s' docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 4: contar bug corrigido mede manutenção, não confiabilidade, e a régua é assimétrica: aplicada à A, reprova mais (o bridge enfileirava sinal sem assinatura como verificado). Falta taxa de perda medida em qualquer opção."
+    narrative: "Corpus: a2a-configurator-2026-10 registra 'o aceite da fila confiava no verified do JSON e interpolava o from cru no YAML' e 'o bridge, que ignorava o exit code e parseava last-wins, enfileirava o sinal sem assinatura como verificado'. Na D, o corpus OBSERVOU conversa real entre máquinas com ciclo de ~26 s (S1b, 2.1.296); a primária desenha a reconexão ('arrives only after that session's machine reconnects'). Superação não achada: só há observações pontuais e a linha de base VPS↔notebook (Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025, open). Critério: E2_PROVA_MENOS."
+    trace: "grep -n 'enfileirava o sinal sem assinatura' docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml; grep -n '26 s' docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 4' (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_03_SUPPORTERS_ARE_NOT_PRODUCTION_USE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 6, critério pré-registrado E2_PROVA_MENOS: WebFetch https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year → procurar nome de cliente ou volume de produção (ausente)"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 6: 'apoiar' é número de comunicado da própria Linux Foundation, parte interessada, e estrela de GitHub não é adoção; a adoção real do A2A em produção segue sem número."
+    narrative: "O descarte cortado sobre a mesma família de fontes admite: 'A página fala em implantações de produção ativas, sem citar clientes nem números'. Superação não achada: o mais perto é Azure AI Foundry/Copilot Studio e Bedrock AgentCore (suporte de plataforma, não uso medido), e esse claim foi cortado por orçamento. Critério: E2_PROVA_MENOS."
+    trace: "WebFetch https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year → procurar nome de cliente ou volume de produção (ausente)"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 6' (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_04_SIGNED_CARD_IS_AGENT_NOT_MESSAGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 7, critério pré-registrado E1_EVIDENCIA_CONTRARIA: grep -n 'o signal do envelope fica fora do JWS' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 7: a spec deixa a assinatura OPCIONAL e não trata conteúdo de agente como não confiável; o card assinado autentica o AGENTE, não cada MENSAGEM. Fontes de envenenamento de card: primário citado, não lido."
+    narrative: "Corpus: C_LIVE_CLASS_DESIGN_CONSTRAINTS (canal-vivo-sessoes-2026-10) diz 'a spec deixa assinatura OPCIONAL e não trata conteúdo de agente como não confiável — o Onion precisa exigir as duas coisas'; o spike do Onion achou o mesmo buraco: 'o signal do envelope fica fora do JWS ... o remetente autenticado não autentica a mensagem'. Superação não achada (condição futura): assinar o CORPO (JWS sobre o payload) com chave pinada no members.yaml, a emenda 'corpo como dado (assinado)' da RFC-0004, PENDENTE até o gate curado e o spike vivo. Critério: E1_EVIDENCIA_CONTRARIA."
+    trace: "grep -n 'o signal do envelope fica fora do JWS' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 7' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_05_STREAMABLE_HTTP_IS_TOOL_TRANSPORT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 8, critério pré-registrado E2_PROVA_MENOS: curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'Channels'; bash .claude/validation/kg-corpus-grep.sh 'Streamable HTTP'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 8: Streamable HTTP prova transporte agente→ferramenta, não ida e volta viva entre sessões; um MCP remoto não empurra mensagem para a sessão ociosa do colega. Channels: primário citado, não lido."
+    narrative: "Pela mesma página Cloudflare, o caminho recomendado é stateless e a caixa de entrada exige camada de armazenamento projetada pela empresa. A costura nativa de entrega empurrada seria Channels ('push external events ... into a session'), que ficou sem leitura; o corpus registra Channels como research preview, só interativo, com relay que transforma o remetente em autoridade. Superação não achada. Critério: E2_PROVA_MENOS."
+    trace: "curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'Channels'; bash .claude/validation/kg-corpus-grep.sh 'Streamable HTTP'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 8' (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_06_YORK_NO_NUMBERS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 12, critério pré-registrado E2_PROVA_MENOS: WebFetch https://www.alphaxiv.org/abs/2607.23884 → procurar métrica quantitativa MCP vs A2A (ausente)"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 12: fonte tier 6 com observações de desenho de escopo restrito, sem números e sem provar superioridade de protocolo; não sustenta escolha de topologia."
+    narrative: "O próprio run, num claim cortado, registra a ausência de métrica quantitativa. Superação não achada: nenhuma comparação medida MCP × A2A (latência, LOC, falhas) na mesma tarefa no run nem no corpus. Critério: E2_PROVA_MENOS."
+    trace: "WebFetch https://www.alphaxiv.org/abs/2607.23884 → procurar métrica quantitativa MCP vs A2A (ausente)"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 12' (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_07_A2A_COMPLEXITY_UNMEASURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 13, critério pré-registrado E2_PROVA_MENOS: grep -n 'tasks/get' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 13: a Task com ciclo de vida do A2A se sustenta por outra via (o Onion já usa tasks/get ou SSE para a volta), mas 'ao custo de maior complexidade' não tem medida."
+    narrative: "Mesma fonte sem números do achado 12. O custo do receptor A2A próprio está registrado no corpus como defeitos achados, não como esforço medido. Superação não achada. Critério: E2_PROVA_MENOS."
+    trace: "grep -n 'tasks/get' docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 13' (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_08_AAIF_SPONSORS_TIER4
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 14, critério pré-registrado E2_PROVA_MENOS: WebFetch https://aaif.io/blog/a2a-joins-aaif → 'is joining the Agentic AI Foundation'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 14: blog tier 4 colava financiamento da AAIF à trajetória do A2A; a primária aaif.io confirma que o A2A está na AAIF, mas patrocínio não mede implementação nem adoção."
+    narrative: "aaif.io/blog/a2a-joins-aaif (17/08/2026): 'Agent2Agent (A2A), the open standard for inter-agent communication, is joining the Agentic AI Foundation (AAIF)'. O eixo 'quem implementa' segue sem número. Superação ACHADA (classe entrega): a primária substitui o blog para governança e financiamento (C_SUPERACAO_20261027_AAIF_PRIMARY_REPLACES_TIER4). Critério: E2_PROVA_MENOS."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif → 'is joining the Agentic AI Foundation'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'achado 14' (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261027_AAIF_PRIMARY_REPLACES_TIER4
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A primária aaif.io substitui o blog tier 4 para a parte de governança e financiamento: o A2A entrou na AAIF em 17/08/2026, doado pelo Google, com AWS, Cisco, Microsoft, Salesforce, SAP e ServiceNow entre os fundadores."
+    narrative: "Medida: WebFetch de aaif.io/blog/a2a-joins-aaif nesta rodada (data 17/08/2026, doador Google, fundadores AWS, Cisco, Microsoft, Salesforce, SAP e ServiceNow). Critério: E2_PROVA_MENOS. Alvo reprovado: achado 14 (patrocinadores platinum da AAIF, tier 4). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif → 'is joining the Agentic AI Foundation'"
+
+  - id: E_OBJECAO_09_IDENTITY_DISCARD_WAS_TRUE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra descarte da identidade por nome de sessão, critério pré-registrado E1_EVIDENCIA_CONTRARIA: curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n \"can't use .SendMessage. to answer a message from another machine\""
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao descarte da claim 'identidade é nome de sessão, endereço é socket, nuvem não responde via SendMessage': a primária CONTRARIA a refutação; o claim era verdadeiro e o achado 15, que diz o mesmo, foi confirmado."
+    narrative: "Verbatim: 'A cloud session ... can't use SendMessage to answer a message from another machine, even when the message carries a reply address'; identidade por nome/identificador curto e socket por sessão também verbatim na mesma página. A refutação é incoerente com o próprio run. Superação ACHADA (classe entrega): releitura da primária (C_SUPERACAO_20261027_XSESSION_PRIMARY_REREAD). Critério: E1_EVIDENCIA_CONTRARIA."
+    trace: "curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n \"can't use .SendMessage. to answer a message from another machine\""
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'descarte da identidade por nome de sessão' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261027_XSESSION_PRIMARY_REREAD
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Releitura da primária de cross-session: sessão na nuvem não responde por SendMessage a outra máquina, mesmo com endereço de resposta; a identidade nativa é nome de sessão com identificador curto na colisão."
+    narrative: "Medida: WebFetch de code.claude.com/docs/en/cross-session-messaging nesta rodada, seção 'Replies from other machines and cloud sessions'. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: o descarte refutado da identidade por nome de sessão. Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n \"can't use .SendMessage. to answer a message from another machine\""
+
+  - id: E_OBJECAO_10_THOUGHTWORKS_ASSESS_UNREFUTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra descarte do Thoughtworks Radar, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://www.thoughtworks.com/radar/platforms/agent-to-agent-a2a-protocol → ler o anel e a data do blip"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao descarte do Thoughtworks Radar (A2A em Assess, nov/2025): não há leitura que refute o anel; na dúvida o descarte não vale. Página do blip: primário citado, não lido pelo Elenxo."
+    narrative: "A busca da rodada achou o blip publicado em 05/11/2025 com 'Assess ?' (ambíguo) e fora da edição atual. Superação não achada pelo Elenxo (só snippet). Nota do escritor: outro juiz leu a página e a FAQ e corrigiu a glosa (C_SUPERACAO_20261027_THOUGHTWORKS_ASSESS_NOT_TRIAL): Assess é 'olhar de perto', não piloto. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://www.thoughtworks.com/radar/platforms/agent-to-agent-a2a-protocol → ler o anel e a data do blip"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'descarte do Thoughtworks Radar' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_11_A2A_IN_AAIF_CORE_TRUE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra descarte da doação à AAIF, critério pré-registrado E1_EVIDENCIA_CONTRARIA: WebFetch https://aaif.io/blog/a2a-joins-aaif → 'is joining the Agentic AI Foundation (AAIF)'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao descarte 'Google doou A2A à AAIF em 20/08/2026': a refutação acertou data e doador, mas jogou fora o núcleo VERDADEIRO: A2A e MCP estão hoje sob a mesma fundação, a peça de trajetória mais forte a favor da C."
+    narrative: "aaif.io/blog/a2a-joins-aaif, 17/08/2026: 'Agent2Agent (A2A) ... is joining the Agentic AI Foundation (AAIF)'. Superação ACHADA (classe entrega): primária lida nesta rodada (C_SUPERACAO_20261027_AAIF_DATE_PRIMARY). Critério: E1_EVIDENCIA_CONTRARIA."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif → 'is joining the Agentic AI Foundation (AAIF)'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'descarte da doação à AAIF' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261027_AAIF_DATE_PRIMARY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Primária aaif.io lida nesta rodada: o A2A entra na AAIF em 17/08/2026, junto ao MCP, o que põe os dois padrões sob a mesma fundação neutra."
+    narrative: "Medida: WebFetch com data 17/08/2026 e frase verbatim. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: o descarte 'Google doou A2A à AAIF em 20/08/2026, junto ao MCP'. Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif → 'is joining the Agentic AI Foundation (AAIF)'"
+
+  - id: E_OBJECAO_12_A2A_SPEC_CONTENT_NOT_UNTRUSTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra descarte sobre autorização e injeção na spec A2A, critério pré-registrado E1_EVIDENCIA_CONTRARIA: grep -n 'não trata conteúdo de agente como não confiável' docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao descarte 'a spec A2A não define autorização nem controles contra injeção': na injeção a refutação tier 4 não procede; tratar conteúdo de agente como dado é obrigação do implementador. Spec A2A: primário citado, não lido pelo Elenxo."
+    narrative: "Corpus: 'a spec deixa assinatura opcional e não trata conteúdo de agente como não confiável' (C_LIVE_CLASS_DESIGN_CONSTRAINTS, canal-vivo-sessoes-2026-10). Na autorização a refutação pode ter mérito (o Agent Card declara esquemas de segurança). Superação não achada pelo Elenxo; outro juiz leu a spec 1.0.0 e confirmou: autorização MUST, 'prompt injection' ausente da §13 (C_SUPERACAO_20261027_A2A_AUTHZ_MUST_NO_INJECTION_CONTROL). Critério: E1_EVIDENCIA_CONTRARIA."
+    trace: "grep -n 'não trata conteúdo de agente como não confiável' docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'descarte sobre autorização e injeção na spec A2A' (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_13_AAIF_FOUNDERS_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP, ServiceNow apoiam A2A, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://aaif.io/blog/a2a-joins-aaif → lista de fundadores"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte por orçamento da lista de grandes apoiadores do A2A: cortado sem refutação; a primária aaif.io confirma o núcleo."
+    narrative: "aaif.io lista 'founding organizations including AWS, Cisco, Microsoft, Salesforce, SAP, and ServiceNow'. Superação ACHADA (classe entrega): C_SUPERACAO_20261027_AAIF_FOUNDERS_LIST. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif → lista de fundadores"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP, ServiceNow apoiam A2A' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261027_AAIF_FOUNDERS_LIST
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A primária aaif.io, lida nesta rodada, traz a lista verbatim de fundadores da entrada do A2A na AAIF: AWS, Cisco, Microsoft, Salesforce, SAP e ServiceNow."
+    narrative: "Medida: WebFetch com a lista verbatim de fundadores. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: o corte 'AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP, ServiceNow apoiam A2A; hoje sob LF'. Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif → lista de fundadores"
+
+  - id: E_OBJECAO_14_PLATFORM_SUPPORT_WITHOUT_NUMBERS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: A2A no Azure AI Foundry/Copilot Studio e Bedrock AgentCore, critério pré-registrado E4_LACUNA_ABERTA: bash .claude/validation/kg-corpus-grep.sh 'AgentCore'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte do único claim sobre 'quem implementa' em plataforma grande (Azure AI Foundry/Copilot Studio, Bedrock AgentCore): o próprio claim não tem números. Docs Microsoft/AWS: primário citado, não lido."
+    narrative: "O limite (sem clientes nem números) é a lacuna da adoção real. Superação não achada: documentação primária Microsoft/AWS com uso em produção não lida no run; só o comunicado da LF. Critério: E4_LACUNA_ABERTA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'AgentCore'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: A2A no Azure AI Foundry/Copilot Studio e Bedrock AgentCore' (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_15_CROSS_ORG_VS_TOOLS_PREMISE_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: A2A entre organizações, MCP para ferramentas internas, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: bash .claude/validation/kg-corpus-grep.sh 'complementing MCP'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte da premissa estrutural da C (A2A entre fronteiras organizacionais, MCP para ferramentas; papéis complementares): cortada sem medida. Spec A2A, seção MCP: primário citado, não lido."
+    narrative: "O corpus a sustenta por outra via: a busca Thoughtworks desta rodada traz 'positions A2A as complementing MCP'. Superação não achada (só snippet secundário). Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'complementing MCP'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: A2A entre organizações, MCP para ferramentas internas' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: isolatePeerMachines, crossSessionInbound e deny rules, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'even in .bypassPermissions. mode'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte dos controles determinísticos nativos: era load-bearing para o Onion. isolatePeerMachines pede aprovação antes de a mensagem sair da máquina, mesmo em bypass, e o projeto liga mas não desliga."
+    narrative: "Primária verbatim: 'asks for your approval before Claude's message to a session beyond this machine leaves, even in bypassPermissions mode ... a checked-in project file can turn the requirement on but not off', mais o bloco managed com deny SendMessage/ListAgents + crossSessionInbound refuse. Superação ACHADA (classe entrega): C_SUPERACAO_20261027_ISOLATE_PEER_MACHINES_PRIMARY. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'even in .bypassPermissions. mode'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: isolatePeerMachines, crossSessionInbound e deny rules' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261027_ISOLATE_PEER_MACHINES_PRIMARY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Primária relida: isolatePeerMachines=true exige aprovação humana antes de qualquer mensagem sair da máquina, inclusive sob bypassPermissions; o arquivo do projeto liga e não desliga. É o gate determinístico de saída da D."
+    narrative: "Medida: WebFetch verbatim da primária nesta rodada + grep 'isolatePeerMachines=true exige aprovação' no grafo canal-vivo-sessoes-2026-10 (nó E_CC_XSESSION_ISOLATE_PEER_MACHINES_OUTBOUND_GATE). Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: o corte 'isolatePeerMachines, crossSessionInbound e deny rules como controles determinísticos'. Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'even in .bypassPermissions. mode'"
+
+  - id: E_OBJECAO_17_INJECTION_EXAMPLE_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: 30+ técnicas de ataque, Toxic Agent Flow, critério pré-registrado E4_LACUNA_ABERTA: bash .claude/validation/kg-corpus-grep.sh 'Toxic Agent Flow'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte das 30+ técnicas de ataque ('Toxic Agent Flow' em GitHub MCP): o critério 'injeção vinda de outro agente' ficou sem exemplo concreto ancorado. Fontes de ataque: primário citado, não lido."
+    narrative: "As fontes específicas (keysight agent-card-poisoning, levelblue agent-in-the-middle) não foram lidas. Superação não achada. Critério: E4_LACUNA_ABERTA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Toxic Agent Flow'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: 30+ técnicas de ataque, Toxic Agent Flow' (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_18_PROVENANCE_MITIGATION_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: mitigações do survey, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://arxiv.org/pdf/2506.23260 → seção de mitigações"
+    label: "OBJEÇÃO (Elenxo, 1 agente, peso baixo) ao corte das mitigações do survey (confiança dinâmica, proveniência criptográfica, sandbox): o abstract não detalha e o corpo do paper não foi aberto. Corpo do arXiv: primário citado, não lido."
+    narrative: "A proveniência criptográfica é exatamente o buraco que o spike do Onion achou (corpo fora do JWS). Superação não achada. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://arxiv.org/pdf/2506.23260 → seção de mitigações"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: mitigações do survey' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_19_STATELESS_INBOX_IS_COMPANY_PROJECT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: no stateless a caixa de entrada é projeto da empresa, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/ → 'stateless'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte 'no stateless não há sessão MCP; caixa de entrada exige armazenamento projetado pela empresa': decide o custo da B serverless (fila, deduplicação de jti, estado de Task). Página Cloudflare: primário citado, não relido."
+    narrative: "Cortado embora venha da mesma página tier 8 do achado 9. Superação não achada: nenhum claim do run nem nó do corpus mede custo de Lambda/Workers; a lacuna de custo segue aberta. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/ → 'stateless'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: no stateless a caixa de entrada é projeto da empresa' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_20_CLOUDFLARE_RPC_NO_AUTH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: transporte RPC da Cloudflare sem autenticação, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/ → 'RPC' e 'OAuth'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte 'transporte RPC da Cloudflare sem autenticação; OAuth exige Streamable HTTP; SSE deprecado': restrição direta de segurança da B em Cloudflare, cortada sem refutação. Página: primário citado, não relido."
+    narrative: "Superação não achada: a página não foi relida nesta rodada. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://developers.cloudflare.com/agents/model-context-protocol/protocol/transport/ → 'RPC' e 'OAuth'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: transporte RPC da Cloudflare sem autenticação' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_21_YORK_CUT_INFLATED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: estudo York sem números, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://www.alphaxiv.org/abs/2607.23884 → procurar tabela quantitativa"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte 'estudo York sem números, escopo restrito': esse corte é justamente a evidência que rebaixa os achados 12 e 13; cortá-lo inflou os dois."
+    narrative: "Superação não achada: o claim cortado afirma a ausência de tabela quantitativa; não verificado além disso. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://www.alphaxiv.org/abs/2607.23884 → procurar tabela quantitativa"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: estudo York sem números' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_22_OWN_PROTOCOL_VS_EXISTING_CHANNELS_UNSOURCED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: o artigo não compara protocolo próprio com padrão aberto, critério pré-registrado E4_LACUNA_ABERTA: bash .claude/validation/kg-corpus-grep.sh 'protocolo próprio'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte 'o artigo não compara protocolo próprio com padrão aberto nem trata Claude Code': o ângulo contrário pedido (protocolo dedicado vale frente a canais existentes?) ficou sem fonte, e o corte apaga essa lacuna."
+    narrative: "O corpus canal-vivo registra que Slack/Teams não têm canal oficial sessão↔sessão; não há fonte externa contrária no run. Superação não achada. Critério: E4_LACUNA_ABERTA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'protocolo próprio'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: o artigo não compara protocolo próprio com padrão aberto' (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_23_DRAFT_TOOL_MUST_BE_IDEMPOTENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: cliente MCP remoto corrigido em 2.1.307 e 2.1.302, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -i 'idempotent'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte das correções do cliente MCP remoto (2.1.307 chamada duplicada, 2.1.302 protocolo 2026-07-28): o retry só repete tool somente-leitura ou idempotente; a tool de rascunho precisa ser idempotente por chave. CHANGELOG: primário citado, não relido."
+    narrative: "É o dado de costura da C com o Claude Code atual. Superação não achada: teste de idempotência da tool de rascunho do Onion não medido; Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025 segue open. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -i 'idempotent'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: cliente MCP remoto corrigido em 2.1.307 e 2.1.302' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_24_NATIVE_ENTERPRISE_CONTROLS_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: 2.1.310 papéis Enterprise e 2.1.307 OTel safety_event, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n 'safety_event'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte dos controles de acesso (papéis Enterprise para nuvem/Remote Control, 2.1.310) e da trilha de auditoria (OTel safety_event, 2.1.307) nativos: a D ficou avaliada só pelos bugs. CHANGELOG: primário citado, não relido."
+    narrative: "Superação não achada: o CHANGELOG não foi relido nesta rodada. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n 'safety_event'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: 2.1.310 papéis Enterprise e 2.1.307 OTel safety_event' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_25_CHANGELOG_READ_9_PERCENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: trecho lido do changelog (0–100k de ~1,1M), critério pré-registrado E4_LACUNA_ABERTA: curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -i -E 'SendMessage|cross-session|Remote Control' | wc -l"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte 'trecho lido do changelog não menciona A2A nem SendMessage': o run leu ~9% do CHANGELOG; os achados de maturidade da D se apoiam em amostra parcial, e ausência num trecho parcial não é ausência."
+    narrative: "Superação não achada: leitura completa do CHANGELOG filtrada por messaging/Remote Control não feita; o caminho é o /meta:cc-update (radar E3). Critério: E4_LACUNA_ABERTA."
+    trace: "curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -i -E 'SendMessage|cross-session|Remote Control' | wc -l"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: trecho lido do changelog (0–100k de ~1,1M)' (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_26_AAIF_LAUNCH_MEMBERS_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: AAIF lançada em 09/12/2025, de <40 para >250 membros, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://aaif.io → data de lançamento e contagem de membros"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte do dado de trajetória da AAIF (lançada em 09/12/2025 com MCP, Goose e AGENTS.md; de <40 para >250 membros): consistente com aaif.io. Contagem de membros: primário citado, não lido."
+    narrative: "Superação não achada: o blog a2a-joins-aaif não dá contagem de membros. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://aaif.io → data de lançamento e contagem de membros"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: AAIF lançada em 09/12/2025, de <40 para >250 membros' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_27_YOUNG_INTEROP_LAYER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: camada de interoperabilidade jovem, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: grep -n 'interpolava o from cru' docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml"
+    label: "OBJEÇÃO (Elenxo, 1 agente) ao corte 'camada de interoperabilidade jovem; identidade, isolamento e implantação segura não vêm de graça': é o ângulo de cautela que equilibra a trajetória, e o corpus o corrobora com os defeitos do bridge."
+    narrative: "Corroborado internamente (a2a-configurator-2026-10: 'interpolava o from cru'). Superação: não há o que medir. Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "grep -n 'interpolava o from cru' docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'corte: camada de interoperabilidade jovem' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_28_AAIF_PRIMARY_UNREAD_IN_RUN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra fonte não lida: aaif.io/blog/a2a-joins-aaif, critério pré-registrado E3_DESCARTE_SEM_MEDIDA: WebFetch https://aaif.io/blog/a2a-joins-aaif"
+    label: "OBJEÇÃO (Elenxo, 1 agente) à fonte não lida aaif.io/blog/a2a-joins-aaif: era a primária da trajetória, e a leitura desta rodada muda o quadro: o A2A entra na AAIF em 17/08/2026, junto ao MCP."
+    narrative: "Superação ACHADA (classe entrega): lida nesta rodada (C_SUPERACAO_20261027_AAIF_BLOG_READ). Critério: E3_DESCARTE_SEM_MEDIDA."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'fonte não lida: aaif.io/blog/a2a-joins-aaif' (survives: true, critério E3_DESCARTE_SEM_MEDIDA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261027_AAIF_BLOG_READ
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O blog aaif.io/blog/a2a-joins-aaif foi lido nesta rodada, com frase verbatim e data: o A2A entra na AAIF em 17/08/2026, ao lado do MCP."
+    narrative: "Medida: WebFetch com frase verbatim e data. Critério: E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: a fonte não lida aaif.io/blog/a2a-joins-aaif. Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://aaif.io/blog/a2a-joins-aaif"
+
+  - id: E_OBJECAO_29_CHANNELS_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra fonte não lida: channels.md, critério pré-registrado E4_LACUNA_ABERTA: WebFetch https://code.claude.com/docs/en/channels.md → como a mensagem é marcada (dado × prompt do usuário)"
+    label: "OBJEÇÃO (Elenxo, 1 agente) à fonte não lida channels.md: Channels é a costura nativa que entregaria a ida e volta VIVA de um receptor A2A próprio na sessão ociosa do colega. Primário citado, não lido."
+    narrative: "O corpus só registra que Channels é research preview e que o relay transforma o remetente em autoridade. Superação não achada: falta ler como a mensagem é marcada (dado × prompt do usuário). Critério: E4_LACUNA_ABERTA."
+    trace: "WebFetch https://code.claude.com/docs/en/channels.md → como a mensagem é marcada (dado × prompt do usuário)"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'fonte não lida: channels.md' (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_30_MANAGED_AGENTS_UNEVALUATED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra fonte não lida: claude-code-on-the-web e Managed Agents, critério pré-registrado E4_LACUNA_ABERTA: bash .claude/validation/kg-corpus-grep.sh 'Managed Agents'"
+    label: "OBJEÇÃO (Elenxo, 1 agente) às fontes não lidas de sessões na nuvem e Claude Managed Agents: a D nomeia Managed Agents e Agent SDK, e nenhum claim ancorado os avalia; a D foi julgada só por cross-session e Remote Control. Primário citado, não lido."
+    narrative: "O corpus tem nós com 'Managed Agents', mas o run não ancorou nenhum à pergunta. Superação não achada: falta a primária de Managed Agents (multi-usuário, identidade, dono do dado). Critério: E4_LACUNA_ABERTA."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Managed Agents'"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'fonte não lida: claude-code-on-the-web e Managed Agents' (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_OBJECAO_31_AGENT_CARD_ATTACKS_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra fontes não lidas: keysight e levelblue, critério pré-registrado E4_LACUNA_ABERTA: WebFetch https://www.levelblue.com/blogs/spiderlabs-blog/agent-in-the-middle-abusing-agent-cards-in-the-agent-2-agent-protocol-to-win-all-the-tasks"
+    label: "OBJEÇÃO (Elenxo, 1 agente) às fontes não lidas sobre envenenamento de Agent Card e agent-in-the-middle: são as únicas específicas sobre o ataque que mais ameaça as opções A2A. Primário citado, não lido."
+    narrative: "O pino de chave do Onion (members.yaml, sem descoberta aberta) mitiga a descoberta aberta por desenho, mas não está medido contra esse ataque. Superação não achada. Critério: E4_LACUNA_ABERTA."
+    trace: "WebFetch https://www.levelblue.com/blogs/spiderlabs-blog/agent-in-the-middle-abusing-agent-cards-in-the-agent-2-agent-protocol-to-win-all-the-tasks"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
+      locator: "objeção ao alvo 'fontes não lidas: keysight e levelblue' (survives: true, critério E4_LACUNA_ABERTA)"
+      method: "juízes: Elenxo, 1 agente sem votação"
+      locality: "host"
+
+  - id: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "contabilidade do run /onion-research modo decision de 2026-10-27: 15 confirmadas (3-0), 10 refutadas, 0 não verificadas, 34 fontes e 40 claims cortadas por orçamento; 47 objeções do Elenxo, 31 sobreviventes, 31 modeladas; 0 recusadas pelo motor; 16 superações achadas"
+    label: "Lacunas: 15 confirmadas, 10 refutadas (6 com superação de fonte mais forte), 0 não verificadas, 34 fontes e 40 claims cortadas por orçamento; 31 de 47 objeções sobreviveram, 31 modeladas; 0 recusadas; 16 superações."
+    narrative: "REFUTADAS (10, nenhuma virou nó de evidência; cada uma tem superação modelada que TRACES_TO este nó): (1) identidade é nome de sessão/socket, nuvem não responde via SendMessage (tier 10; o Elenxo contesta a refutação, E_OBJECAO_09); (2) 2.1.311 e remetente ambíguo (tier 9; era bug de exibição mobile); (3) Remote Control liga a UMA sessão (tier 9); (4) Thoughtworks Radar Assess = piloto (tier 7; Elenxo contesta, E_OBJECAO_10); (5) A2A v1.0.1 contribuído à LF em 2026 (tier 6; foi 2025); (6) A2A sem mecanismo para escalar a humano (tier 6; há AUTH_REQUIRED); (7) Google doou à AAIF em 20/08/2026 (tier 4; foi 17/08, Elenxo contesta o descarte do núcleo, E_OBJECAO_11); (8) cross-session 2.1.224 indisponível em Bedrock/Vertex/Foundry (tier 4; a mesma máquina funciona desde 2.1.248); (9) entre máquinas só respostas (tier 4; abrir conversa desde 2.1.225); (10) spec A2A não define autorização nem anti-injeção (tier 4; autorização é MUST, injeção de fato ausente, Elenxo contesta, E_OBJECAO_12). Refutadas por fonte fraca (tier ≤4): 4 (itens 7 a 10). NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 34 fontes e 40 claims; as que o Elenxo julgou load-bearing estão modeladas como E_OBJECAO_13 a E_OBJECAO_27. RECUSADAS PELO MOTOR: 0. OBJEÇÕES: 47 julgadas, 31 sobreviventes, TODAS as 31 modeladas como E_OBJECAO_01 a E_OBJECAO_31 (nenhuma agregada); 16 derrubadas. SUPERAÇÕES ACHADAS: 16 (10 nas refutadas, 6 nas objeções: 08, 09, 11, 13, 16, 28). LACUNAS ABERTAS ANTES DE SELAR: adoção real de A2A em produção (só contagem de apoiadores); Managed Agents e Agent SDK não avaliados; ataques a Agent Card não lidos (keysight, levelblue); Channels não lido; dois membros da mesma org Team não testados; custo de operação da B serverless não medido; taxa de entrega/perda não medida em nenhuma opção; idempotência da tool de rascunho não testada; a linha de base viva VPS↔notebook (Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025) ainda não medida."
+    trace: "journal do run /onion-research modo decision de 2026-10-27"
+    provenance:
+      source: "journal do run /onion-research modo decision de 2026-10-27"
+      locator: "listas de claims confirmadas, refutadas, cortadas por orçamento, objeções do Elenxo e superações"
+      method: "derivado: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  - id: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA: topologia A2A da empresa adotante. A bridge hospedado (piloto) · B receptor self-host · C A2A aberto 1.0 + MCP Streamable HTTP · D nativo Anthropic (mesma pessoa) · combinação. Elenxo recomenda B falando C entre pessoas + D com isolatePeerMachines; A piloto."
+    narrative: "Opções: C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY, C_OPCAO_B_SELF_HOSTED_RECEIVER, C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE, C_OPCAO_D_NATIVE_SAME_PERSON_ONLY, C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D. RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação; íntegra recebida do motor, sem corte): «Recomendação: uma combinação em duas camadas, não uma opção única. (1) Entre colegas e máquinas de donos diferentes, o canal é um receptor A2A que a própria empresa hospeda (opção B, numa VPS ou serverless com armazenamento durável). Ele fala o protocolo A2A aberto 1.0 (C) como formato de fio. O 'A2A do Onion' deixa de ser protocolo próprio e vira um PERFIL do A2A aberto: chave pinada no members.yaml, cards assinados obrigatórios, corpo assinado e tratado como dado, MCP local cuja tool de envio só grava rascunho. A trajetória sustenta isso: o A2A entrou na AAIF em 17/08/2026, junto ao MCP (aaif.io). O onion-bridge hospedado (A) fica só como onboarding e piloto, não como topologia de produção, porque concentra o dado de terceiros e já teve defeitos de gate. (2) Para a mesma pessoa em várias máquinas, o canal nativo (D: cross-session via Remote Control) com isolatePeerMachines=true no .claude/settings.json do adotado: é o gate determinístico de saída, que vale até sob bypass e o projeto liga mas não desliga. CONDIÇÕES (as objeções que sobreviveram): (a) a D não serve entre pessoas: o escopo é 'your sessions', exige login claude.ai, o dado passa pela Anthropic, fica vetada em org ZDR, e a proteção de configuração no receptor é INSTRUÇÃO ao modelo, não gate. (b) O card assinado autentica o agente, não a mensagem: o Onion precisa assinar o CORPO (emenda pendente da RFC-0004) e exigir assinatura, que a spec deixa opcional. (c) A identidade estável vem da chave pinada no members.yaml, nunca do nome de sessão ou do socket/PID. (d) Atrás de NAT, a volta é polling por tasks/get ou SSE. A entrega viva na sessão ociosa depende de Channels, que não foi lido e é research preview. (e) Na B serverless, a fila, a deduplicação de jti e o estado de Task são projeto da empresa. O McpAgent em Durable Object está deprecado, só Streamable HTTP tem OAuth, e o custo de operação NÃO foi medido. (f) A tool de rascunho tem de ser idempotente, porque o retry do cliente MCP repete chamada. (g) Lacunas abertas antes de selar: adoção real de A2A em produção (só contagem de apoiadores), Managed Agents/Agent SDK não avaliados, ataques a Agent Card não lidos, dois membros da mesma org Team não testados, e a linha de base viva VPS↔notebook (Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025) ainda não medida.» Este escritor NÃO sela: o maestro sela pelo /meta:decide."
+    trace: "run /onion-research modo decision de 2026-10-27; pergunta Q_A2A_EMPRESA_ADOTANTE_2026_10; corpus Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025 (docs/onion/graph/sinais-de-campo-2026-09.kg.yaml)"
+
+  - id: C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.35
+    label: "OPÇÃO A) A2A do Onion hospedado pelo onion-bridge (HTTP A2A do bridge + MCP local cuja tool de envio só grava rascunho): só onboarding e piloto."
+    narrative: "A favor: já existe, é o caminho da linha de base viva (Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025) e não exige infraestrutura da empresa. Contra (CONSTRAINS): concentra o dado de terceiros num host que não é da empresa e já teve defeitos de gate medidos (E_OBJECAO_02); a tool de rascunho precisa ser idempotente (E_OBJECAO_23). Por isso o Elenxo a deixa como piloto, não produção."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-10-27"
+
+  - id: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO B) Mesmo receptor em self-host pela empresa (VPS ou serverless com armazenamento durável)."
+    narrative: "A favor: o dado fica na infraestrutura da empresa e a identidade continua na chave pinada do members.yaml. Contra (CONSTRAINS): no serverless a fila, a deduplicação de jti e o estado de Task são projeto da empresa (E_OBJECAO_19); o McpAgent em Durable Object está deprecado (E_CLOUDFLARE_MCPAGENT_DEPRECATED_STATELESS); o RPC da Cloudflare não tem autenticação (E_OBJECAO_20); custo de operação NÃO medido; entrega viva na sessão ociosa depende de Channels, não lido (E_OBJECAO_29)."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-10-27"
+
+  - id: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO C) A2A aberto 1.0 (AAIF/LF) + MCP remoto por Streamable HTTP como formato de fio."
+    narrative: "A favor: trajetória (A2A na AAIF desde 17/08/2026, junto ao MCP), apoio amplo e o mesmo conjunto de financiadores do substrato do Onion. Contra (CONSTRAINS): adoção em produção sem número (E_OBJECAO_03, E_OBJECAO_14); card assinado autentica agente, não mensagem, e a assinatura é opcional (E_OBJECAO_04); a spec não trata conteúdo de agente como não confiável (E_OBJECAO_12); Streamable HTTP é transporte de ferramenta, não ida e volta viva (E_OBJECAO_05); ataques a Agent Card não lidos (E_OBJECAO_31). C é formato de fio, não topologia: alguém hospeda o receptor."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-10-27"
+
+  - id: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO D) Canais nativos Anthropic (cross-session via Remote Control, isolatePeerMachines): só para a mesma pessoa entre máquinas."
+    narrative: "A favor: ida e volta observada entre máquinas (~26 s, S1b), só HTTPS de saída (bom atrás de NAT) e um gate determinístico de saída (isolatePeerMachines, vale sob bypass). Contra (CONSTRAINS): escopo 'your sessions', exige claude.ai, dado passa pela Anthropic, vetado em ZDR; identidade é nome de sessão (E_OBJECAO_09); a proteção de configuração no receptor é instrução ao modelo (E_OBJECAO_01); Managed Agents e Agent SDK não avaliados (E_OBJECAO_30); controles Enterprise não lidos (E_OBJECAO_24)."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-10-27"
+
+  - id: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "Combinação recomendada: B falando C (A2A do Onion como perfil do padrão aberto) entre pessoas + D com isolatePeerMachines para a mesma pessoa; A como piloto."
+    narrative: "O perfil exige: chave pinada no members.yaml, card assinado obrigatório, corpo assinado (emenda pendente da RFC-0004) e tratado como dado, tool de envio que só grava rascunho e é idempotente. Restrições sobreviventes: E_OBJECAO_01, 04, 12, 16, 18, 23, 27, 29, 31. Respeita C_POSTURA_ACOPLAMENTO: acopla à D só onde a capacidade (gate de saída sob bypass entre as máquinas da mesma pessoa) não existe fora; entre pessoas, fica no padrão aberto."
+    trace: "opção da pergunta do run /onion-research modo decision de 2026-10-27"
+
+  - id: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Rodada complementar em modo primaries: ler as fontes que o orçamento cortou e o Elenxo marcou como load-bearing (Channels, Managed Agents, envenenamento de Agent Card, controles isolatePeerMachines e crossSessionInbound, CHANGELOG inteiro) antes de selar a topologia."
+    narrative: "Aberta no pós-run de 2026-10-27. O run em modo decision cortou 34 fontes e 40 claims por orçamento (maxFetch 15, maxVerify 25) e leu cerca de 9% do CHANGELOG do Claude Code. As lacunas já têm nome, então a régua da skill manda o modo primaries, não outra varredura. Fontes nomeadas: (1) code.claude.com/docs/en/channels.md, a costura nativa que traz eventos externos para a sessão, de que depende a entrega viva na sessão ociosa do colega (E_OBJECAO_29_CHANNELS_UNREAD); (2) o handbook de Claude Managed Agents e a página de sessões na nuvem, que a opção D nomeia e ninguém avaliou (E_OBJECAO_30_MANAGED_AGENTS_UNEVALUATED); (3) as fontes de envenenamento de Agent Card e agent-in-the-middle da Keysight e da LevelBlue (E_OBJECAO_31_AGENT_CARD_ATTACKS_UNREAD); (4) isolatePeerMachines e crossSessionInbound como controles determinísticos (E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING): aqui a fonte FOI lida, e o que o orçamento cortou foram as claims. A conferência do pós-run (WebFetch da página de cross-session em 2026-10-27) achou o texto dos dois controles na página; falta ancorá-los e ler a referência de settings; (5) o CHANGELOG inteiro, para a maturidade da D e os controles Enterprise (E_OBJECAO_25_CHANGELOG_READ_9_PERCENT, E_OBJECAO_24_NATIVE_ENTERPRISE_CONTROLS_CUT). Quem decide se a rodada roda antes do selo é o maestro."
+    trace: "docs/evolution/research/a2a-empresa-adotante-2026-10/SYNTHESIS.md (seção NÃO-VERIFICADOS e ações candidatas)"
+
+edges:
+  - from: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    to: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    edge_type: DEPENDS_ON
+  - from: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    to: E_OBJECAO_29_CHANNELS_UNREAD
+    edge_type: TRACES_TO
+  - from: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    to: E_OBJECAO_30_MANAGED_AGENTS_UNEVALUATED
+    edge_type: TRACES_TO
+  - from: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    to: E_OBJECAO_31_AGENT_CARD_ATTACKS_UNREAD
+    edge_type: TRACES_TO
+  - from: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    to: E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING
+    edge_type: TRACES_TO
+  - from: Q_A2A_EMPRESA_RODADA_PRIMARIAS_1027
+    to: E_OBJECAO_25_CHANGELOG_READ_9_PERCENT
+    edge_type: TRACES_TO
+  - from: E_XSESSION_SCOPED_TO_SAME_USER
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_XSESSION_MESSAGE_NEVER_APPROVAL
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_NATIVE_ROUNDTRIP_BUGS_2_1_299_309
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_REMOTE_CONTROL_OUTBOUND_HTTPS_ONLY
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_A2A_150_ORGS_22K_STARS
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_A2A_1_0_SIGNED_AGENT_CARDS
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_CLOUDFLARE_STREAMABLE_HTTP_DEFAULT
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_CLOUDFLARE_MCPAGENT_DEPRECATED_STATELESS
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_SURVEY_PROTOCOL_GROWTH_OUTPACED_SECURITY
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_SURVEY_ADHOC_AUTH_WEAK_VALIDATION
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_YORK_MCP_LIGHTER_STATE_IN_APP
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_YORK_A2A_STATEFUL_RICHER
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_AAIF_PLATINUM_SPONSORS
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_SESSION_NAME_NOT_STABLE_IDENTITY
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: E_MERCADO_A2A_EMPRESA_ADOTANTE_1027
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261027_XSESSION_ADDRESSING_CORRECTED
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_CHANGELOG_2_1_311_MOBILE_DISPLAY_BUG
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_REMOTE_CONTROL_SAME_ACCOUNT_MULTI_SESSION
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_THOUGHTWORKS_ASSESS_NOT_TRIAL
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_A2A_LF_2025_V1_0_1_EXAMPLE_EXTENSIONS
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_A2A_AUTH_REQUIRED_HUMAN_APPROVAL
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_A2A_JOINS_AAIF_2026_08_17
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_XSESSION_PROVIDERS_SAME_MACHINE_2_1_248
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_XSESSION_CROSS_MACHINE_OPEN_2_1_225
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_A2A_AUTHZ_MUST_NO_INJECTION_CONTROL
+    to: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_01_CONFIG_GUARD_IS_INSTRUCTION_NOT_GATE
+    to: E_XSESSION_MESSAGE_NEVER_APPROVAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_01_CONFIG_GUARD_IS_INSTRUCTION_NOT_GATE
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_01_CONFIG_GUARD_IS_INSTRUCTION_NOT_GATE
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY
+    to: E_NATIVE_ROUNDTRIP_BUGS_2_1_299_309
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY
+    to: C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_02_BUG_COUNT_IS_NOT_RELIABILITY
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_03_SUPPORTERS_ARE_NOT_PRODUCTION_USE
+    to: E_A2A_150_ORGS_22K_STARS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_03_SUPPORTERS_ARE_NOT_PRODUCTION_USE
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_SIGNED_CARD_IS_AGENT_NOT_MESSAGE
+    to: E_A2A_1_0_SIGNED_AGENT_CARDS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_SIGNED_CARD_IS_AGENT_NOT_MESSAGE
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_04_SIGNED_CARD_IS_AGENT_NOT_MESSAGE
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_STREAMABLE_HTTP_IS_TOOL_TRANSPORT
+    to: E_CLOUDFLARE_STREAMABLE_HTTP_DEFAULT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_05_STREAMABLE_HTTP_IS_TOOL_TRANSPORT
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_YORK_NO_NUMBERS
+    to: E_YORK_MCP_LIGHTER_STATE_IN_APP
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_06_YORK_NO_NUMBERS
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_A2A_COMPLEXITY_UNMEASURED
+    to: E_YORK_A2A_STATEFUL_RICHER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_07_A2A_COMPLEXITY_UNMEASURED
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_08_AAIF_SPONSORS_TIER4
+    to: E_AAIF_PLATINUM_SPONSORS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_08_AAIF_SPONSORS_TIER4
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261027_AAIF_PRIMARY_REPLACES_TIER4
+    to: E_OBJECAO_08_AAIF_SPONSORS_TIER4
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_09_IDENTITY_DISCARD_WAS_TRUE
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261027_XSESSION_PRIMARY_REREAD
+    to: E_OBJECAO_09_IDENTITY_DISCARD_WAS_TRUE
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_10_THOUGHTWORKS_ASSESS_UNREFUTED
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_11_A2A_IN_AAIF_CORE_TRUE
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261027_AAIF_DATE_PRIMARY
+    to: E_OBJECAO_11_A2A_IN_AAIF_CORE_TRUE
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_12_A2A_SPEC_CONTENT_NOT_UNTRUSTED
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_12_A2A_SPEC_CONTENT_NOT_UNTRUSTED
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_13_AAIF_FOUNDERS_CUT
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261027_AAIF_FOUNDERS_LIST
+    to: E_OBJECAO_13_AAIF_FOUNDERS_CUT
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_14_PLATFORM_SUPPORT_WITHOUT_NUMBERS
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_15_CROSS_ORG_VS_TOOLS_PREMISE_CUT
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261027_ISOLATE_PEER_MACHINES_PRIMARY
+    to: E_OBJECAO_16_ISOLATE_PEER_MACHINES_LOAD_BEARING
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_17_INJECTION_EXAMPLE_UNANCHORED
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_17_INJECTION_EXAMPLE_UNANCHORED
+    to: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_18_PROVENANCE_MITIGATION_UNREAD
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_19_STATELESS_INBOX_IS_COMPANY_PROJECT
+    to: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_20_CLOUDFLARE_RPC_NO_AUTH
+    to: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_21_YORK_CUT_INFLATED
+    to: E_YORK_MCP_LIGHTER_STATE_IN_APP
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_21_YORK_CUT_INFLATED
+    to: E_YORK_A2A_STATEFUL_RICHER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_21_YORK_CUT_INFLATED
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_22_OWN_PROTOCOL_VS_EXISTING_CHANNELS_UNSOURCED
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_23_DRAFT_TOOL_MUST_BE_IDEMPOTENT
+    to: C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_23_DRAFT_TOOL_MUST_BE_IDEMPOTENT
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_24_NATIVE_ENTERPRISE_CONTROLS_CUT
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_25_CHANGELOG_READ_9_PERCENT
+    to: E_NATIVE_ROUNDTRIP_BUGS_2_1_299_309
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_25_CHANGELOG_READ_9_PERCENT
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_26_AAIF_LAUNCH_MEMBERS_CUT
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_27_YOUNG_INTEROP_LAYER
+    to: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_27_YOUNG_INTEROP_LAYER
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_28_AAIF_PRIMARY_UNREAD_IN_RUN
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: CONSTRAINS
+  - from: C_SUPERACAO_20261027_AAIF_BLOG_READ
+    to: E_OBJECAO_28_AAIF_PRIMARY_UNREAD_IN_RUN
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_29_CHANNELS_UNREAD
+    to: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_29_CHANNELS_UNREAD
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_30_MANAGED_AGENTS_UNEVALUATED
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_30_MANAGED_AGENTS_UNEVALUATED
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_31_AGENT_CARD_ATTACKS_UNREAD
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_31_AGENT_CARD_ATTACKS_UNREAD
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_A2A_EMPRESA_ADOTANTE_1027
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: SUPPORTS
+  - from: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    to: Q_A2A_EMPRESA_ADOTANTE_2026_10
+    edge_type: TRACES_TO
+  - from: C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: TRACES_TO
+  - from: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: TRACES_TO
+  - from: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: TRACES_TO
+  - from: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: TRACES_TO
+  - from: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    to: D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027
+    edge_type: TRACES_TO
+  - from: E_XSESSION_SCOPED_TO_SAME_USER
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_XSESSION_SCOPED_TO_SAME_USER
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: SUPPORTS
+  - from: E_XSESSION_MESSAGE_NEVER_APPROVAL
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: SUPPORTS
+  - from: E_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_REMOTE_CONTROL_OUTBOUND_HTTPS_ONLY
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: SUPPORTS
+  - from: E_NATIVE_ROUNDTRIP_BUGS_2_1_299_309
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_SESSION_NAME_NOT_STABLE_IDENTITY
+    to: C_OPCAO_D_NATIVE_SAME_PERSON_ONLY
+    edge_type: CONSTRAINS
+  - from: E_SESSION_NAME_NOT_STABLE_IDENTITY
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: SUPPORTS
+  - from: E_A2A_150_ORGS_22K_STARS
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: SUPPORTS
+  - from: E_A2A_1_0_SIGNED_AGENT_CARDS
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: SUPPORTS
+  - from: E_CLOUDFLARE_STREAMABLE_HTTP_DEFAULT
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: SUPPORTS
+  - from: E_CLOUDFLARE_MCPAGENT_DEPRECATED_STATELESS
+    to: C_OPCAO_B_SELF_HOSTED_RECEIVER
+    edge_type: CONSTRAINS
+  - from: E_SURVEY_PROTOCOL_GROWTH_OUTPACED_SECURITY
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: CONSTRAINS
+  - from: E_SURVEY_PROTOCOL_GROWTH_OUTPACED_SECURITY
+    to: C_OPCAO_A_BRIDGE_HOSTED_PILOT_ONLY
+    edge_type: CONSTRAINS
+  - from: E_SURVEY_ADHOC_AUTH_WEAK_VALIDATION
+    to: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
+    edge_type: SUPPORTS
+  - from: E_YORK_MCP_LIGHTER_STATE_IN_APP
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: SUPPORTS
+  - from: E_YORK_A2A_STATEFUL_RICHER
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: SUPPORTS
+  - from: E_AAIF_PLATINUM_SPONSORS
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: SUPPORTS
+  - from: E_MERCADO_A2A_EMPRESA_ADOTANTE_1027
+    to: C_OPCAO_C_OPEN_A2A_MCP_STREAMABLE_WIRE
+    edge_type: SUPPORTS
