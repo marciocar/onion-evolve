@@ -451,7 +451,21 @@ nodes:
       locator: "pergunta com opções de 2026-10-27: «Fechar as sessões antigas sem atividade do kg-ssot e da curadoria?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
+  - id: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    x_review_after: "2026-11-10"
+    label: "O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)?"
+    narrative: "O maestro anotou em 2026-10-27: «gostei desta questão de gerenciamento do core das pendências de sessões, vamos acompanhar isso… candidato a doutrina ou ferramenta». Gatilho de promoção: duas semanas ou mais de uso com as sessões consultando o grafo, e um caso medido em que ele evitou erro de ordem ou de dono. Medidas a acompanhar: pendências abertas e fechadas por semana, consultas pelas sessões e retrabalho evitado. Revisitar em 2026-11-10."
 edges:
+  - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
   - from: Q_COORD_MERGE_PR1407_KGSSOT_4340
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
