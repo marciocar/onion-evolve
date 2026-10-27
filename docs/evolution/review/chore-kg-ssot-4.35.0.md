@@ -2,8 +2,8 @@
 branch: chore/kg-ssot-4.35.0
 pr: 1411
 date: 2026-10-27
-reviewed_diff_sha256: 7717c32be3d7aae13ddfbecd5085950a4be9f33a0d14c338273b43ec31413c94
-reviewed_code_sha256: 84c12943adf53e28834b21620cd279ec9abc5a27fb06f61b44251f34eb4af3de
+reviewed_diff_sha256: 69d80ab087105d39afd0e3a86f94647d10bda11d3539f8ee050ffd2477f2c751
+reviewed_code_sha256: 1f964c91d5adf1d46f687b51755c56b538141261098bea5e8556a1e74da527aa
 findings_total: 8
 findings_real: 8
 tokens: 95974
@@ -66,6 +66,15 @@ Python em 3.12, o `kg_trace.py projection` e o locator em JSON Pointer no `kg_tr
   main do par antes de carimbar. O nó da curadoria passou pelo `peer-ref-check` (rc 0 @ 7bf0b9a), as linhas do
   escritor por `grep -n` na origin/main do core, e os merges do sge e do kg-ssot por `gh pr view`. O nó do brain não
   se alcançou, e o carimbo diz isso em vez de citá-lo como conferido.
+
+## Recarimbo depois do rebase sobre o #1404
+
+O rebase sobre a main com o #1404 (8857bc9b8) mudou o hash de código porque a base mudou: o #1404 mexe no
+`lint-selftest.sh` e no `ops/mutate-and-restore.sh`. Conferi que o patch de código do PR é o mesmo antes e depois:
+`git diff <base> <ponta> -- .claude ops | git patch-id --stable` dá `1a2fc0b95cf2` nos dois lados. O pré-voo do
+pr-finalize, com as famílias `design_context`, `kg_projection` e `kg_ssot_require_hashes` sobre a base nova, ficou
+verde. O que entrou depois da revisão foram só o caminho literal do caso (a) da família `kg_projection` (REGRA 59) e
+um nó question no grafo de coordenação, que não são código julgado por esta passada.
 
 ## Limites declarados
 
