@@ -4,4 +4,5 @@
 # Nasceu em 2026-10-19 no tamanho medido, 25.918 B, mais 64 B de folga declarada: uma contagem que a
 # REGRA 9 obriga a atualizar pode ganhar um dígito (99→100) e não deve virar HARD por 1 byte (achado do
 # Elenxo). Decisão: D_PODA_CATRACA_E_L2_DIRIGIDO_1019, grafo fila-2026-10-06.
-ceiling: 25982
+ceiling: 26246
+raise: 2026-10-27 +264 D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027 linha da doutrina sem dependência de serviço externo, ao lado da postura de acoplamento

@@ -1,8 +1,8 @@
 ---
 name: gamma-api-specialist
 description: |
-  Especialista em Gamma.App API para criação automatizada de apresentações e conteúdo com IA.
-  Use para integrações técnicas e automações com Gamma. Relacionado: @presentation-orchestrator.
+  Especialista na ponte opcional para o serviço Gamma (externo, pago): API Gamma.App para apresentações com IA.
+  Use para integrações e automações com Gamma; o caminho local é /design:deck. Relacionado: @presentation-orchestrator.
 model: sonnet
 tools:
   - Read
@@ -38,7 +38,7 @@ updated: "2026-07-04"
 # Configurações Necessárias
 required_env:
   - name: GAMMA_API_KEY
-    description: API Key do Gamma.App (obtida em gamma.app/settings/api)
+    description: API Key do Gamma.App (obtida em gamma.app/settings/api); obrigatória só para usar a ponte
     required: true
   - name: GAMMA_WORKSPACE_ID
     description: ID do workspace Gamma (opcional, usa default)
@@ -59,6 +59,12 @@ robustas, otimizadas e escaláveis.
 > (rate-limit manager, matriz de erros, best practices), casos de uso com código e implementações
 > de referência (SDK/CLI). **Consulte-a antes de montar qualquer request**; este agente é o
 > executor, a KB é o conhecimento.
+
+> 🔌 **Ponte opcional, não a capacidade de deck.** O Gamma é serviço **externo e pago**; pela
+> [doutrina sem dependência de serviço externo](../../../docs/knowledge-base/concepts/no-external-service-dependency.md)
+> (maestro, 2026-10-27) nenhuma capacidade do núcleo depende dele. Sem `GAMMA_API_KEY` ou sem rede,
+> devolva ao chamador o caminho local: `/design:deck` (HTML offline) ou pptx/docx em Python
+> (`python-pptx`/`python-docx`, receita provada na curadoria). Nunca invente a chave.
 
 ### Filosofia Core
 

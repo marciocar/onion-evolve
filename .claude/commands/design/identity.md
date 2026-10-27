@@ -81,7 +81,7 @@ ou `<brand>`/`<product>` para multi-brand. Cada fase atualiza o ponteiro `NEXT`.
 ### Fase 3 — MATERIAL (opcional, reuso)
 
 Gerar material de comunicação **on-brand** a partir dos tokens resolvidos por escopo — **reusa**
-`/product:presentation` (Gamma) e o MCP Canva. NÃO cria gerador novo: o material lê a identidade
+`/product:presentation` (Gamma, ponte opcional e paga; local: `/design:deck`) e o MCP Canva. NÃO cria gerador novo: o material lê a identidade
 materializada. Ex.: deck, brand-book, social. Retomável.
 
 ## Auto-update / Task Manager

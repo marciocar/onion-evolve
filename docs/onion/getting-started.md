@@ -11,7 +11,7 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 | Comandos | 117 | Organizados em 10 categorias + root |
 | Agentes | 51 | 9 categorias especializadas |
 | Skills | 13 | Orquestração, validação, pesquisa e resolvers de contexto |
-| Knowledge Bases | 113 | Documentação estruturada |
+| Knowledge Bases | 114 | Documentação estruturada |
 
 ## 📋 Checklist de Setup
 
@@ -52,7 +52,7 @@ seu-projeto/
 ├── docs/
 │   ├── onion/              # Documentação do framework
 │   ├── meta-specs/         # Constituição do sistema (L0)
-│   └── knowledge-base/     # 113 Knowledge Bases estruturadas
+│   └── knowledge-base/     # 114 Knowledge Bases estruturadas
 ├── .env                    # Variáveis de ambiente (NÃO commitar)
 ├── .env.example            # Template de variáveis
 ├── .claudeignore           # Otimização do context window
@@ -110,7 +110,7 @@ O Sistema Onion oferece um comando interativo para configurar todas as integraç
 
 **Integrações suportadas:**
 - **Task Managers**: Jira, ClickUp, Asana, Linear (via Task Manager Abstraction)
-- **Gamma.App**: API para apresentações
+- **Gamma.App**: ponte opcional para apresentações (serviço externo, pago); o caminho local é o `/design:deck`
 - **PostgreSQL**: Banco de dados
 
 #### **📝 Método Alternativo: Configuração Manual**

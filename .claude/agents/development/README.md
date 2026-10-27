@@ -35,7 +35,7 @@ Agentes especialistas de execução técnica do Onion: backend, frontend, banco,
 |--------|---------------|-------------|
 | [`@jira-specialist`](jira-specialist.md) | Jira (Cloud e Server/DC) — REST v3/v2, JQL, ADF, transitions, bulk | Operações técnicas Jira, queries JQL complexas, integrações |
 | [`@clickup-specialist`](clickup-specialist.md) | ClickUp (API-first; MCP opcional) — automações e bulk | Operações técnicas ClickUp, bulk operations, workflows |
-| [`@gamma-api-specialist`](gamma-api-specialist.md) | Gamma.App API — apresentações e conteúdo com IA | Integrações técnicas e automações com Gamma |
+| [`@gamma-api-specialist`](gamma-api-specialist.md) | Ponte opcional para o Gamma (externo, pago) — apresentações com IA; local: `/design:deck` | Integrações técnicas e automações com Gamma |
 | [`@runflow-specialist`](runflow-specialist.md) | Runflow SDK — agentes IA, workflows, RAG, integrações | Desenvolvimento via Runflow SDK |
 | [`@whisper-specialist`](whisper-specialist.md) | Whisper (OpenAI) — transcrição de áudio multi-plataforma | Transcrever áudio e processar fala em projetos locais |
 | [`@zen-engine-specialist`](zen-engine-specialist.md) | ZEN Engine / JDM (GoRules) — regras de negócio | Criar/validar JDM, Decision Tables, integração projeto de gamificação |

@@ -10,6 +10,11 @@ verified_at: 2026-09-30
 > `@gamma-api-specialist`** na rodada shed-ceremony de 2026-07-04 (doutrina: agente mantém o grafo
 > executável; conhecimento de fundo vive em KB citável). O agente cita esta KB; consumidores
 > humanos e IA leem daqui.
+>
+> 🔌 **Ponte opcional, não capacidade do núcleo** (2026-10-27): o Gamma é serviço externo e pago, e
+> pela [doutrina sem dependência de serviço externo](../concepts/no-external-service-dependency.md)
+> nada no núcleo depende dele. Caminho local: `/design:deck` (HTML offline) e pptx/docx em Python
+> (`python-pptx`/`python-docx`, receita provada na curadoria).
 
 ---
 

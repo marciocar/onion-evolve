@@ -1,8 +1,8 @@
 ---
 name: presentation
 description: |
-  Criação de apresentações profissionais via Gamma.app.
-  Use para gerar apresentações a partir de temas, tasks ou documentos.
+  Ponte opcional para o serviço Gamma (externo, pago): apresentações via Gamma.app.
+  Caminho local sem rede: /design:deck (HTML offline); pptx/docx via python-pptx/python-docx (receita provada na curadoria).
 allowed-tools: Read Glob Grep
 
 parameters:
@@ -23,6 +23,7 @@ version: "3.0.0"
 updated: "2025-11-24"
 
 related_commands:
+  - /design/deck
   - /product/task
   - /docs/build-business-docs
 
@@ -38,7 +39,14 @@ Wrapper para criação de apresentações via @presentation-orchestrator.
 
 ## 🎯 Objetivo
 
-Criar apresentações profissionais no Gamma.app de forma automatizada.
+Criar apresentações profissionais pela **ponte opcional** do Gamma.app (externo, pago), de forma automatizada.
+
+> 🔌 **Ponte opcional, não a capacidade de deck.** O Gamma é serviço **externo e pago**; pela
+> doutrina [sem dependência de serviço externo](../../../docs/knowledge-base/concepts/no-external-service-dependency.md)
+> (maestro, 2026-10-27), ele não é pré-requisito de apresentação. Sem `GAMMA_API_KEY` ou sem rede,
+> o caminho local é o **`/design:deck`** (um HTML self-contained, offline) e, para pptx/docx,
+> a geração em Python com `python-pptx`/`python-docx` (provada na curadoria (PR 137 de lá, mergeado em 2026-10-27; receita, sem gerador no core)).
+> Sem a chave, este comando **para e devolve** esse caminho ao usuário; não gera nada sozinho.
 
 ## ⚡ Fluxo de Execução
 
@@ -169,6 +177,6 @@ data: [dados coletados]
 
 ## ⚠️ Notas
 
-- Requer Gamma.app configurado (GAMMA_API_KEY)
+- A ponte Gamma requer GAMMA_API_KEY; sem ela, use `/design:deck` (local, offline)
 - Para config: `/meta/setup-integration gamma`
 - Tempo médio: 2-5 minutos por apresentação
