@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**687 itens abertos** em 125 grafo(s) com aberto (de 164 no escopo) · 126 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**697 itens abertos** em 126 grafo(s) com aberto (de 165 no escopo) · 127 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1150,6 +1150,21 @@
 | 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
 | 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
 | 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
+
+## design-context-guard-2026-10 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `C_CEILING_FIRST_CYCLE_SOFT` | design-context-guard-2026-10 | Teto: no 1º ciclo todo achado é SOFT; a guarda avisa e não bloqueia até os dois adotantes migrarem (--strict sobe para HARD). |
+| 4.2 | `C_CEILING_BRIEF_BY_TRACE` | design-context-guard-2026-10 | Teto: o brief é reconhecido pelo trace igual a <design>/brief.md; um brief noutro arquivo não é cobrado. |
+| 4.2 | `C_CEILING_LINK_BY_PREFIX` | design-context-guard-2026-10 | Teto: a ligação do brief conta pela pasta do business-context no alvo da external_edge; se o nó-alvo existe é o gate do contra |
+| 4.0 | `Q_PROJECTION_CHECK_DEPENDENCY` | design-context-guard-2026-10 | O checador de projeção do kg-ssot (o .md com projection_of cita só ids que existem no grafo) existe? Dependência declarada da  |
+| 3.2 | `C_CEILING_TOKENS_GATE_FIXED_DIR` | design-context-guard-2026-10 | Teto: o lint-design-tokens.sh lê só docs/design-context; num repo que declara outra pasta o setup avisa e o gate não a vê. |
+| 3.0 | `Q_LOCATOR_CHECK_HOME` | design-context-guard-2026-10 | A checagem do locator de token migra para o kg_trace do contrato KG-SSOT ou fica na vertical de design do core? Em discussão com  |
+| 2.8 | `C_CEILING_MISSING_NEVER_EXPIRES` | design-context-guard-2026-10 | Teto: a question que declara a falta do business-context segue valendo depois que o alvo passa a existir; a guarda não acusa a fa |
+| 2.8 | `C_CEILING_ONLY_DEFAULT_PATHS` | design-context-guard-2026-10 | Teto: com --only, a REGRA 111 só responde a caminhos com design-context no nome; numa pasta de design declarada ela pula no --onl |
+| 2.8 | `C_CEILING_SETUP_TOP_LEVEL_TARGETS` | design-context-guard-2026-10 | Teto: o setup procura E_POSITIONING e ST_THEME_APPLIED só no nível de cima da pasta do contexto; grafo-alvo em subpasta vira que |
+| 2.8 | `C_CEILING_THEME_DETECTION` | design-context-guard-2026-10 | Teto: o alvo de tema do setup é heurística (components.json, @theme, tailwind.config, CSS); no core ela achou um CSS do site e o |
 
 ## evolve-cures-2026-10 — 1 item(ns)
 
