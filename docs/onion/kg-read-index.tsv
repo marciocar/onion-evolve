@@ -37,6 +37,7 @@
 .claude/commands/common/prompts/research-doctrine.md	Q_ANCHORING_DOES_NOT_CHECK_PROVENANCE	docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml
 .claude/commands/common/prompts/task-manager-provider-detection.md	C_D3_6	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/common/prompts/untrusted-content-provenance.md	C_UNTRUSTED_INPUT_IS_THE_REAL_BLOCKER	docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml
+.claude/commands/design/README.md	Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/commands/engineer/pr-update.md	C_D3_7	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/engineer/pr-update.md	E_J_D3_7	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/engineer/pr.md	D_PASSADA_ADVERSARIAL_VIRA_PASSO_EM_PARALELO_AO_CI	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
@@ -1421,6 +1422,7 @@ docs/business-context/decisions.md	I_REGUA_CANONICA_DE_ADOTANTE_RATIFICADA	docs/
 docs/business-context/decisions.md	Q_d2_l1l6_activation	docs/onion/graph/d5-pricing-2026-07.kg.yaml
 docs/business-context/decisions.md	Q_p4_interviews	docs/onion/graph/d5-pricing-2026-07.kg.yaml
 docs/business-context/gtm-decision-brief-2026-07.md	Q_onprem_tension	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
+docs/design-context/README.md	Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md	D_GUARDRAIL_PULL_NOT_PUSH	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md	D_INDEX_FORTIFIED	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md	D_NO_COMMAND	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml

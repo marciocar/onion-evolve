@@ -2,7 +2,8 @@
 branch: docs/design-fourth-dimension-direction
 pr: 1403
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e235a8c573f48ff2a37d9799c51da900966bcb95f659e8e18c61cacf8c2c48a8
+reviewed_code_sha256: ebbf0d4355ef1bf234f61225820f0bb5b3ae346e363ca9b1bff28a23ddca3a8d
 findings_total: 9
 findings_real: 9
 tokens: 51796
