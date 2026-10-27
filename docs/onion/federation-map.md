@@ -83,7 +83,7 @@ flowchart TD
 | onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `eb598aa5bcdd` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `eb598aa5bcdd` |
 | hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `8278fee79d1c` |
-| brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `fb36b24becfa` |
+| brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `95365699a0e3` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `4299290b73d4` |
 | onion-core | source | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `eb598aa5bcdd` |
 | onion-plugins | plugins | greenfield | plugin-marketplace, public-distribution, claude-code | `eb598aa5bcdd` |
@@ -94,14 +94,14 @@ flowchart TD
 | poc-venda-direta-pdi | standalone | greenfield | greenfield-adoption, document-comparison, compliance-nda, public-procurement | `219e9a5f365b` |
 | arandek | standalone | legacy | field-dogfood, legacy-adoption, monorepo, upstream-signal | `65d8a7501a03` |
 | onion-dist | standalone | greenfield | distribution-algorithms, kg-sdaal-method, research-arm, benchmarking | `e88c1e11e051` |
-| sge | standalone | regulated | licitacao-publica, lei-14133, regulated-greenfield, analise-tecnica, checklist-qualidade | `fb36b24becfa` |
+| sge | standalone | regulated | licitacao-publica, lei-14133, regulated-greenfield, analise-tecnica, checklist-qualidade | `95365699a0e3` |
 | hub-formacao-enterprise | hub | greenfield | hub-de-adocao, formacao-hands-on, company-brain, spec-as-code | `f32e2f931c73` |
 | sacola-de-ideias | standalone | greenfield | astro-site, institutional, greenfield-dogfood | `8e2517724c0a` |
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `ce60ec13f298` |
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `df031ef53683` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
 | onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `95365699a0e3` |
-| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `fb36b24becfa` |
+| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `95365699a0e3` |
 | bomtexto | standalone | greenfield |  | `bd769f168411` |
 | maestro-notebook-test | standalone | greenfield | a2a-spike | `n/a` |
 | maestro-peer-test | standalone | greenfield | a2a-spike | `n/a` |
