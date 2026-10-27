@@ -2,7 +2,8 @@
 branch: feat/design-wave1
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8e02930d5d46714bc218abd5c5ce97df357781cc4ebb8d417195258ace22bafd
+reviewed_code_sha256: e50a6fa92163649c6a4e5478752081c9d3c59a40b3779f11b7818c84e910e474
 findings_total: 12
 findings_real: 12
 tokens: 146249

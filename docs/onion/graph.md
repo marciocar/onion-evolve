@@ -56,6 +56,7 @@
 - **onion** --has-member--> nx-monorepo-specialist
 - **onion** --has-member--> onion
 - **onion** --has-member--> onion-compliance-context
+- **onion** --has-member--> onion-design-context
 - **onion** --has-member--> onion-engineering-context
 - **onion** --has-member--> onion-onboarding
 - **onion** --has-member--> onion-orchestration
@@ -190,14 +191,22 @@
 - onion-compliance **requires** template:compliance_soc2_template.md
 - onion-design **loads** when:brief -> kb-or-context:business-context
 - onion-design **loads** when:material -> reuse:presentation/canva
+- onion-design **loads** when:setup -> resolve:design-context (skill onion-design-context)
+- onion-design **loads** when:setup sem business-context -> skill:onion-product-context (plugin onion-product; ausente, o setup pergunta publico e tom)
+- onion-design **provides** design-context-graph
+- onion-design **provides** design-setup
 - onion-design **provides** design-tokens-w3c-dtcg
 - onion-design **provides** materializacao-css-tailwind-shadcn
+- onion-design **provides** ssot-context-resolver
 - onion-design **provides** wcag-contrast-gate
 - onion-design **requires** agent:brand-generator
 - onion-design **requires** agent:branding-positioning-specialist
 - onion-design **requires** agent:design-system-specialist
+- onion-design **requires** skill:onion-design-context
+- onion-design **requires** util:design-setup
 - onion-design **requires** util:design-sink
 - onion-design **requires** util:design-source
+- onion-design **requires** validation:design-context-check.sh
 - onion-design **requires** validation:lint-design-tokens.sh
 - onion-engineering **loads** embed:kb/gitflow-patterns.md
 - onion-engineering **loads** embed:kb/worklog-protocol.md
@@ -511,6 +520,7 @@ onion	has-member	nx-migration-specialist
 onion	has-member	nx-monorepo-specialist	
 onion	has-member	onion	
 onion	has-member	onion-compliance-context	
+onion	has-member	onion-design-context	
 onion	has-member	onion-engineering-context	
 onion	has-member	onion-onboarding	
 onion	has-member	onion-orchestration	
@@ -644,14 +654,22 @@ onion-curation	tier	standalone
 onion-curation	trust-advises	onion-evolve	
 onion-design	loads	when:brief -> kb-or-context:business-context	
 onion-design	loads	when:material -> reuse:presentation/canva	
+onion-design	loads	when:setup -> resolve:design-context (skill onion-design-context)	
+onion-design	loads	when:setup sem business-context -> skill:onion-product-context (plugin onion-product; ausente, o setup pergunta publico e tom)	
+onion-design	provides	design-context-graph	
+onion-design	provides	design-setup	
 onion-design	provides	design-tokens-w3c-dtcg	
 onion-design	provides	materializacao-css-tailwind-shadcn	
+onion-design	provides	ssot-context-resolver	
 onion-design	provides	wcag-contrast-gate	
 onion-design	requires	agent:brand-generator	
 onion-design	requires	agent:branding-positioning-specialist	
 onion-design	requires	agent:design-system-specialist	
+onion-design	requires	skill:onion-design-context	
+onion-design	requires	util:design-setup	
 onion-design	requires	util:design-sink	
 onion-design	requires	util:design-source	
+onion-design	requires	validation:design-context-check.sh	
 onion-design	requires	validation:lint-design-tokens.sh	
 onion-dist	adopts	onion-evolve	
 onion-dist	mode	greenfield	
