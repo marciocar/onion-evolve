@@ -950,12 +950,6 @@
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
-## sinais-de-campo-2026-09 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.0 | `Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025` | sinais-de-campo-2026-09 | Gatilho trocado do transporte entre agentes: a ida e volta viva pela própria composição (HTTP A2A do bridge + MCP local cuja to |
-
 ## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1164,6 +1158,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_MEETING_CONSOLIDATION_GRAPH` | meeting-capture-2026-10 | Falta o grafo de CONSOLIDAÇÃO entre reuniões (o papel do @meeting-consolidator em arestas) e o gate de reunião fora do comando |
+
+## sinais-de-campo-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
 
 ## fios-abertos — 2 item(ns)
 
