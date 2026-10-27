@@ -2,7 +2,8 @@
 branch: fix/rule36-skip-binary
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8c70fcf909785358ea6af9e314f97c8995e575ada31aa9b65dcb567c03094181
+reviewed_code_sha256: ae4874d7a9806163c0f409f498f864ee26c3fd9ccb6ef0219ecd50eff562c709
 findings_total: 7
 findings_real: 5
 tokens: 97044
