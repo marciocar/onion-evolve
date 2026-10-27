@@ -2,8 +2,7 @@
 branch: chore/kg-ssot-4.35.0
 pr: 1411
 date: 2026-10-27
-reviewed_diff_sha256: 6545a5dae2a3e02f1b3743dd241baf343b9e076964a829f3bb6dc029c6e349d9
-reviewed_code_sha256: 8b0dc2ca9bd9e12b1c1095ddc0fc50bc15b8909474387aad2296138dbeafabd5
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 8
 tokens: 95974
@@ -59,6 +58,13 @@ Python em 3.12, o `kg_trace.py projection` e o locator em JSON Pointer no `kg_tr
 - Os sed dos mutantes m1, m2 e m3 da família `kg_projection` casam e geram Python válido.
 - O piso 3.12 do template e o caso (d) de `kg_ssot_require_hashes`.
 - O `brief.md` com o `projection_of` em lista: 3 de 3 ids resolvem.
+- REGRA 87 (PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele), em `sinais-de-campo-2026-09`: conferi os três
+  do topo. `E_SPIKE_SOBREVIVENCIA_PREMIA_O_TRIVIAL_1012` (critério de sobrevivência num spike de produto) e
+  `E_SINAL_TRANSPORTE_ENTRE_AGENTES_1025` (o transporte entre agentes) não tratam da adoção. O
+  `E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025` trata, e o PR o segue: o que se agiu de outra sessão foi conferido na
+  main do par antes de carimbar. O nó da curadoria passou pelo `peer-ref-check` (rc 0 @ 7bf0b9a), as linhas do
+  escritor por `grep -n` na origin/main do core, e os merges do sge e do kg-ssot por `gh pr view`. O nó do brain não
+  se alcançou, e o carimbo diz isso em vez de citá-lo como conferido.
 
 ## Limites declarados
 
