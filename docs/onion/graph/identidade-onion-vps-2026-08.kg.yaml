@@ -687,7 +687,7 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "docker network ls → 15 redes, as do Onion uma por stack (onion-logto_default, onion-waha_default, onion-vps-vaultwarden_default, onion-librechat_*); docker ps --format '{{.Ports}}' | grep -c 0.0.0.0 → 0 de 22 containers; onion-vps-waha em 127.0.0.1:3999->3000; ops/caddy/conf.d com basic_auth no vhost do hub-operacoes-enterprise"
     label: "DRIFTED: o vetor que refutou o isolamento (porta de container publicada em 0.0.0.0, alcançável de outro container) está fechado hoje: 0 de 22 containers publicam em 0.0.0.0. E o Caddy não tem mais zero autenticação: um vhost versionado usa basic_auth."
-    narrative: "Re-verificação de C_REDE_ISOLADA_POR_CONSTRUCAO (refuted). O status refutado segue certo: o isolamento de hoje vem da disciplina de bind em 127.0.0.1, não da construção, e o Docker continua furando o ufw para porta publicada em todas as interfaces. Medição só de leitura (network ls e ps); nenhum curl de dentro de container foi refeito. A stack do LibreChat tem container em duas redes (default e fetch_link), dentro da mesma stack."
+    narrative: "Re-verificação de C_REDE_ISOLADA_POR_CONSTRUCAO (refuted). O status refutado segue certo: o isolamento de hoje vem da disciplina de bind em 127.0.0.1, não da construção. Medição só de leitura (network ls e ps); nenhum curl de dentro de container foi refeito. A stack do LibreChat tem container em duas redes (default e fetch_link), dentro da mesma stack."
     provenance:
       source: "docker network ls + docker ps no host (somente leitura) + ops/caddy/conf.d/ @ origin/main 8857bc9b8"
       locator: "contagem de binds 0.0.0.0 na coluna Ports; nomes das redes do Onion; vhost versionado com basic_auth"
@@ -742,7 +742,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: "2026-10-27"
-    verified_against: "crontab -l do operador → '0 13 * * * …onion-vps-vaultwarden/offsite-cron.sh'; crontab do root → 0 linhas offsite/restic; logs/offsite-cron.log do clone: 7 'snapshot+prune OK' (o último em 2026-10-12T13:00:29Z) e 54 'backup-offsite FALHOU rc=3', um por dia de 2026-10-13 a 2026-10-27; 2026-10-27T13:00:02Z '✗ … FALHOU rc=3 — se rc=3, o GPG estava frio'"
+    verified_against: "crontab -l do operador → '0 13 * * * …onion-vps-vaultwarden/offsite-cron.sh'; crontab do root → 0 linhas offsite/restic; logs/offsite-cron.log do clone: 7 'snapshot+prune OK' (o último em 2026-10-12T13:00:29Z) e 54 'backup-offsite FALHOU rc=3' no total, um por dia sem exceção de 2026-10-13 a 2026-10-27; 2026-10-27T13:00:02Z '✗ … FALHOU rc=3 — se rc=3, o GPG estava frio'"
     label: "DRIFTED: a linha de cron que faltava existe (crontab do operador, 13:00 UTC), mas o offsite falha todo dia desde 2026-10-13 com rc=3 (GPG frio). O último envio bom foi em 2026-10-12: 15 dias sem cópia fora da máquina."
     narrative: "Re-verificação de E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA e de Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA. O que o nó elogiava se confirma no vivo: o backup-offsite.sh sai com exit 3 e diz que não fez, sem fingir sucesso. O que mudou é o estado: o cron foi armado em 2026-08-31 (Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO), mas no crontab do usuário, não no do root, e o mecanismo depende do agente GPG destravado, que não está. Medição só de leitura: crontab -l, contagem de linhas no log, nenhum segredo lido."
     provenance:
