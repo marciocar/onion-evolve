@@ -95,17 +95,26 @@ def load_segments(guard):
 # 2026-10-27, dois falsos negativos medidos na forma por regex): (1) `<<` dentro de ASPAS (`echo "a<<b"`) não é
 # operador, e a regex o lia como heredoc de delimitador `b`, engolindo o resto do comando; (2) `<<$X` é heredoc
 # de delimitador LITERAL `$X` (o bash não expande a palavra do delimitador), e a regex, sem `$` na classe, o tinha
-# por ilegível e cortava o resto. A varredura segue aspas (também as que atravessam a linha), `\`, comentário,
-# `$((…))`/`((…))` (o deslocamento `1<<2` não abre corpo) e `<<<` (here-string). Na dúvida, CALA: delimitador
-# ilegível (vazio ou aspas sem fecho) corta dali ao fim, como antes.
+# por ilegível e cortava o resto. A varredura segue aspas (também as que atravessam a linha, e `$'…'` com
+# escape), `\`, comentário, `$((…))`/`((…))`/`$[…]` (o deslocamento `1<<2` não abre corpo) e `<<<`
+# (here-string). Fora de aritmética `<<` é SEMPRE heredoc no bash, também `<< 2` e `let x=1<<2` (o bash abre o
+# corpo neles). Na dúvida, CALA: delimitador ilegível (vazio ou aspas sem fecho) corta dali ao fim, como antes.
+# Teto declarado (passada adversarial, 2026-10-27): aspas aninhadas dentro de `"$(…)"` desalinham a varredura; o
+# tokenizador da guarda desalinha igual e o ramo cala, então o efeito medido no hook é silêncio.
 _HD_META = " \t;&|<>()"
 
 def heredoc_ops(line, quote):
     """(ops, quote): ops = [(dash, palavra)] dos `<<` FORA de aspas e de aritmética, ou None se um é ilegível;
     quote = a aspa que segue aberta no fim da linha (None se nenhuma)."""
-    ops, i, n, arith = [], 0, len(line), 0
+    ops, i, n, arith, brk = [], 0, len(line), 0, 0
     while i < n:
         c = line[i]
+        if quote == "$'":
+            if c == "\\":
+                i += 2; continue
+            if c == "'":
+                quote = None
+            i += 1; continue
         if quote == "'":
             if c == "'":
                 quote = None
@@ -118,6 +127,8 @@ def heredoc_ops(line, quote):
             i += 1; continue
         if c == "\\":
             i += 2; continue
+        if line.startswith("$'", i):
+            quote = "$'"; i += 2; continue
         if c in "'\"":
             quote = c; i += 1; continue
         if c == "#" and (i == 0 or line[i - 1] in " \t;&|("):
@@ -126,16 +137,18 @@ def heredoc_ops(line, quote):
             arith += 1; i += 2; continue
         if arith and line.startswith("))", i):
             arith -= 1; i += 2; continue
+        if line.startswith("$[", i):
+            brk += 1; i += 2; continue
+        if brk and c == "]":
+            brk -= 1; i += 1; continue
         if line.startswith("<<<", i):
             i += 3; continue
-        if line.startswith("<<", i) and not arith:
+        if line.startswith("<<", i) and not arith and not brk:
             j = i + 2
             dash = j < n and line[j] == "-"
             j += 1 if dash else 0
             while j < n and line[j] in " \t":
                 j += 1
-            if j < n and line[j].isdigit() and not dash:
-                i = j; continue                     # `<< 2` sem `((`: deslocamento, não heredoc
             word, wq = [], None
             while j < n:
                 ch = line[j]

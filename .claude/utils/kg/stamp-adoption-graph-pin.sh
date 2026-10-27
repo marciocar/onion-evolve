@@ -14,8 +14,8 @@
 # como leitura do carimbo. Não toca outro nó nem outro campo. Idempotente.
 # Também troca, em verified_against e provenance (source/locator), as citações do pin ANTIGO pelo novo: esses
 # campos descrevem a verificação atual. A narrative (a história) fica como o dono escreveu.
-# LABEL EDITADO PELO DONO que cita o pin ANTIGO como token exato (o x_pin anterior, sem ser prefixo de outro hex):
-# só esse token vira o pin novo, e o resto da redação fica (revisão adversarial do adotante sge, 2026-10-27: duas
+# LABEL EDITADO PELO DONO que cita o pin ANTIGO como token exato UMA vez (o x_pin anterior, sem ser prefixo de outro
+# hex; repetido, qual é o atual é leitura da frase e o motor cala): só esse token vira o pin novo, e o resto da redação fica (revisão adversarial do adotante sge, 2026-10-27: duas
 # rodadas seguidas ele trocou o hash do label à mão, porque o motor gravava o x_pin e deixava o label no pin velho).
 # O QUE NÃO FAZ: inventar onde está o pin. Label editado SEM o pin antigo como token ganha só o x_pin e o aviso
 # (rc 3); grafo ou nó ausente = nada a carimbar (adotante sem semente), dito.
@@ -79,7 +79,11 @@ if label_ok:
     blk[li] = LABEL_PIN.sub(f"pin `{pin}`", blk[li], count=1)
 elif li is not None and cur and len(cur) >= 7:
     # o pin antigo como TOKEN exato (nem prefixo nem pedaço de outro hex): só ele muda, a frase do dono fica
-    blk[li], label_swapped = re.subn(r"(?<![0-9A-Za-z])" + re.escape(cur) + r"(?![0-9A-Za-z])", pin, blk[li])
+    # e só quando ele aparece UMA vez: citado duas ou mais (histórico "X -> Y, agora X"), qual é o atual é
+    # leitura da frase do dono, não do motor; aí cala como antes (rc 3, passada adversarial de 2026-10-27)
+    _tok = re.compile(r"(?<![0-9A-Za-z])" + re.escape(cur) + r"(?![0-9A-Za-z])")
+    if len(_tok.findall(blk[li])) == 1:
+        blk[li], label_swapped = _tok.subn(pin, blk[li])
     if not label_swapped:
         rc = 3
 else:
@@ -124,7 +128,7 @@ if new != lines:
     import os; os.replace(path + ".pin-tmp", path)
 print(f"stamp-adoption-graph-pin: ONION_INSTALLED carimbado com o pin {pin}"
       + ("" if label_ok else f" (label editado pelo dono: {label_swapped} citação(ões) do pin antigo {cur} trocada(s) pelo novo, o resto intacto)" if label_swapped
-         else " (só o x_pin: o label foi editado pelo dono, não cita o pin antigo como token, e ficou intacto — confira-o)")
+         else " (só o x_pin: o label foi editado pelo dono, não cita o pin antigo como token único, e ficou intacto — confira-o)")
       + (f"; {swapped} citação(ões) do pin antigo em verified_against/provenance trocada(s) pelo novo" if swapped else ""))
 sys.exit(rc)
 PY
