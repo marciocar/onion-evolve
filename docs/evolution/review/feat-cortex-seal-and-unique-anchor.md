@@ -2,12 +2,11 @@
 branch: feat/cortex-seal-and-unique-anchor
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: e095158965a385e86167ceb2ee07321f574f59bcb5f63ae1659ed2890752ce74
-reviewed_code_sha256: 33c94191a32c1efc7ad8066fe0d6cb426a286eea74fa3f328647087c40ab7b45
-findings_total: 10
+reviewed_diff_sha256: pendente
+findings_total: 17
 findings_real: 4
-tokens: 95761
-duration_min: 5
+tokens: 143440
+duration_min: 7
 findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: sim
@@ -84,6 +83,13 @@ faixa paralela da bancada roda o job em segundo plano, e o bash herda o INT IGNO
 entrada não se captura. Reproduzi com `trap '' INT` em volta da bancada e curei no caso: o SIGINT volta ao
 padrão por um exec em Python antes do helper. O helper não muda: quem o chama de um job em segundo plano já não
 recebe Ctrl-C do terminal.
+
+O delta desta cura passou por uma 2ª passada, com outro agente novo (47.679 tokens, 2 min). Ele rodou a família
+com o INT ignorado e uma matriz que cruza o caso antigo e o novo com três versões do helper (original, o mutante
+`trap '' INT` e sem trap de INT nenhum), sob INT padrão e ignorado. O caso antigo reprova só com o INT ignorado e
+o helper correto, que é o vermelho do CI; o novo passa no helper correto e reprova nas outras duas versões, então
+não é decorativo. São 7 achados, 6 confirmações e 1 falso-positivo descartado (o caso do TERM não sofre do mesmo
+mal), e nenhum defeito real. Os totais do frontmatter somam as duas passadas.
 
 ## Limites declarados
 
