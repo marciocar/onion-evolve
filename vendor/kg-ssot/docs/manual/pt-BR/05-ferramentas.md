@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:7c43b141765d8ebf -->
+<!-- translation-of: docs/manual/05-tools.md sha256:392fd5561340ec6a -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.32.0",
+  "release": "kg-ssot-v4.33.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -773,6 +773,51 @@ aqui (falta o extra `vector` ou o modelo), para quem chama cair no `--text` e di
 é a ferramenta `kg_query`, sobre o armazém: a página para no teto de bytes do servidor (com ao menos um nó), e o
 `next_cursor` continua de onde ela parou. Cada chamada relê e reparseia o armazém da área, e num armazém de dezenas
 de MB a primeira chamada leva dezenas de segundos; o cache do julgamento vem na 4.19.
+
+### A cadeia de transmissão (`--chain`, 4.33.0)
+
+`--chain <id>` segue uma afirmação até a origem: de cada nó para aquele de onde ele veio, pelas arestas `TRACES_TO`
+que saem dele (outro tipo com `--edge-type`), ou, sem aresta, pelo fragmento `#<id>` do `provenance.source`. Ela
+responde quem passou a afirmação para quem, onde a corrente é mais fraca e se ela quebra.
+
+```bash
+kg-query --root . --chain E_RELAY_B
+```
+
+```text
+chain: complete
+    E_RELAY_B  confidence=0.7  method=measurement  session B checked it against the repo
+    E_RELAY_A  confidence=0.7  method=testimony  session A relayed it
+    D_ORIGIN  confidence=0.9  method=testimony  the owner decided
+  weakest link: 0.7 at E_RELAY_B, E_RELAY_A
+  origin: D_ORIGIN, method testimony, confidence 0.9 (a separate axis)
+  grade: strict weak, lenient acceptable
+```
+
+- **Dois eixos, que nunca se somam:** o elo mais fraco é o menor `confidence` entre os repasses; a força da origem é a
+  classe do método dela e o `confidence` dela.
+- **O grau:** `strong` (≥ 0,85), `acceptable` (≥ 0,60), `weak` (abaixo). O grau leniente é a faixa do elo mais fraco.
+  O estrito leva também a origem, e uma origem que se apoia em `testimony` (ou que não tem `method`) conta como `weak`,
+  porque ninguém a mediu.
+- **A corrente quebrada** (um passo para um nó fora do corpus) termina ali, marcada `found: false`, e sai `weak` nos
+  dois modos. Uma corrente que bifurca sai com um caminho por ramo; um ciclo é cortado e marcado.
+- `--format json` dá a mesma projeção, como `kg-ssot.chain/1`.
+- **O passo pelo `provenance.source`:** um fragmento vira passo quando o que vem antes do `#` é vazio, é o caminho do
+  próprio arquivo, é uma URL que termina no `meta.id` do grafo, é um arquivo do corpus ou tem a extensão de um grafo.
+  Se o nó que ele nomeia não existe, a corrente sai quebrada. Qualquer outro fragmento (a seção de um README, uma URL
+  externa) é a origem, e nunca cai num nó local com o mesmo id.
+- **O caminho antes do `#`** é relativo à raiz do repositório, como na referência externa, e a query string sai. Um
+  nó cujo `source` nomeia a si mesmo é um ciclo. Quando o fragmento nomeia um nó que nenhuma aresta alcança, ele é um
+  caminho à parte.
+- **Um elo sem `confidence` numérico,** ou com um fora de [0, 1], é o mais fraco, mostrado com valor nulo, e o grau
+  leniente sai `weak`. Os elos contam por arquivo e id, e `weakest_link.at` dá o arquivo de cada um.
+- **Limites:** até 200 passos (além disso, `too_long`) e 1000 caminhos (além disso, `truncated`). Uma corrente
+  quebrada, em ciclo ou longa demais sai `weak` nos dois modos.
+- **O grau leniente deixa a origem de fora:** uma corrente de repasses fortes a partir de uma origem fraca sai
+  `strong` no leniente e `weak` no estrito. Um repasse que se apoia em `testimony` não é rebaixado pela classe, porque o
+  `confidence` dele já dá o preço do repasse; a origem é, porque é onde a afirmação nasce.
+
+A corrente é declarada por quem escreve o grafo: a projeção a mede, não prova quem de fato disse o quê.
 
 ## `kg_diff.py`: o diff por id entre revisões
 

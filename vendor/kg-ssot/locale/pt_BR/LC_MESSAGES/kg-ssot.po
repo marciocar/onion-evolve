@@ -1245,12 +1245,12 @@ msgid ", showing {first} to {last}"
 msgstr ", mostrando {first} a {last}"
 
 #: tools/kg_query.py
-msgid "--around {ref}: the id exists in {n} graphs; use <path>#{ref}"
-msgstr "--around {ref}: o id existe em {n} grafos; use <caminho>#{ref}"
+msgid "{flag} {ref}: the id exists in {n} graphs; use <path>#{ref}"
+msgstr "{flag} {ref}: o id existe em {n} grafos; use <caminho>#{ref}"
 
 #: tools/kg_query.py
-msgid "--around {ref}: the node does not exist in the corpus"
-msgstr "--around {ref}: o nó não existe no corpus"
+msgid "{flag} {ref}: the node does not exist in the corpus"
+msgstr "{flag} {ref}: o nó não existe no corpus"
 
 #: tools/kg_query.py
 msgid "--cursor {cursor} is invalid: use the next_cursor of a previous query"
@@ -3281,3 +3281,71 @@ msgstr "✓ índice {dir}: {nodes} nó(s), {embedded} embutido(s), {reused} reap
 #: tools/kg_vector.py
 msgid "✓ model {name} in {dir} ({n} file(s) downloaded, sha256 checked)"
 msgstr "✓ modelo {name} em {dir} ({n} arquivo(s) baixado(s), sha256 conferido)"
+
+#: tools/kg_query.py
+msgid "  grade: strict {strict}, lenient {lenient}"
+msgstr "  grau: estrito {strict}, leniente {lenient}"
+
+#: tools/kg_query.py
+msgid "  origin: {id}, method {cls}, confidence {conf} (a separate axis)"
+msgstr "  origem: {id}, método {cls}, confiança {conf} (um eixo à parte)"
+
+#: tools/kg_query.py
+msgid "  weakest link: {conf} at {ids}"
+msgstr "  elo mais fraco: {conf} em {ids}"
+
+#: tools/kg_query.py
+msgid "--chain does not combine with --around, --text or --semantic"
+msgstr "--chain não se combina com --around, --text nem --semantic"
+
+#: tools/kg_query.py
+msgid "chain {n}: {status}"
+msgstr "corrente {n}: {status}"
+
+#: tools/kg_query.py
+msgid "chain: {status}"
+msgstr "corrente: {status}"
+
+#: tools/kg_query.py
+msgid "the transmission chain from the node back to its origin: the weakest link and the origin's strength, as separate axes, with a strict and a lenient grade"
+msgstr "a corrente de transmissão do nó até a origem: o elo mais fraco e a força da origem, em eixos separados, com um grau estrito e um leniente"
+
+#: tools/kg_query.py
+msgid "complete"
+msgstr "completa"
+
+#: tools/kg_query.py
+msgid "broken"
+msgstr "quebrada"
+
+#: tools/kg_query.py
+msgid "cycle"
+msgstr "ciclo"
+
+#: tools/kg_query.py
+msgid "too long"
+msgstr "longa demais"
+
+#: tools/kg_query.py
+msgid "strong"
+msgstr "forte"
+
+#: tools/kg_query.py
+msgid "acceptable"
+msgstr "aceitável"
+
+#: tools/kg_query.py
+msgid "weak"
+msgstr "fraco"
+
+#: tools/kg_query.py
+msgid "unknown"
+msgstr "desconhecido"
+
+#: tools/kg_query.py
+msgid "· more than {n} paths: the projection stops there"
+msgstr "· mais de {n} caminhos: a projeção para aí"
+
+#: tools/kg_query.py
+msgid "{id}  confidence={conf}  method={cls}"
+msgstr "{id}  confiança={conf}  método={cls}"

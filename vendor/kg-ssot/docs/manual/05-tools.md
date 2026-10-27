@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.32.0",
+  "release": "kg-ssot-v4.33.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -782,6 +782,51 @@ silence. In the MCP server, the
 same query is the `kg_query` tool, over the store: the page stops at the server's byte cap (with at least one node),
 and `next_cursor` picks up where it stopped. Each call rereads and reparses the area's store, and in a store of tens
 of MB the first call takes tens of seconds; the judgment cache comes in 4.19.
+
+### The transmission chain (`--chain`, 4.33.0)
+
+`--chain <id>` follows a claim back to its origin: from each node to the one it came from, along its outgoing
+`TRACES_TO` edges (another type with `--edge-type`), or, with no edge, along the `#<id>` fragment of
+`provenance.source`. It answers who passed the claim to whom, where the chain is weakest, and whether it breaks.
+
+```bash
+kg-query --root . --chain E_RELAY_B
+```
+
+```text
+chain: complete
+    E_RELAY_B  confidence=0.7  method=measurement  session B checked it against the repo
+    E_RELAY_A  confidence=0.7  method=testimony  session A relayed it
+    D_ORIGIN  confidence=0.9  method=testimony  the owner decided
+  weakest link: 0.7 at E_RELAY_B, E_RELAY_A
+  origin: D_ORIGIN, method testimony, confidence 0.9 (a separate axis)
+  grade: strict weak, lenient acceptable
+```
+
+- **Two axes, never added up:** the weakest link is the lowest `confidence` among the relays; the origin's strength is
+  its method class and its own `confidence`.
+- **The grade:** `strong` (≥ 0.85), `acceptable` (≥ 0.60), `weak` (below). The lenient grade is the weakest link's band.
+  The strict grade also takes the origin, and an origin that rests on `testimony` (or has no `method`) counts as `weak`,
+  because nobody measured it.
+- **A broken chain** (a step to a node outside the corpus) ends there, marked `found: false`, and is `weak` in both
+  modes. A chain that forks comes out as one path per branch; a cycle is cut and marked.
+- `--format json` gives the same projection as `kg-ssot.chain/1`.
+- **A step by `provenance.source`:** a fragment becomes a step when the part before `#` is empty, is the file's own
+  path, is a URL that ends in the graph's `meta.id`, is a file of the corpus, or has a graph extension. If the node it
+  names does not exist, the chain is broken. Any other fragment (a README section, an outside URL) is the origin, and
+  it never falls on a local node with the same id.
+- **The path before `#`** is relative to the repository root, as in an external reference, and a query string is
+  dropped. A node whose `source` names itself is a cycle. When the fragment names a node that no edge reaches, it is a
+  path of its own.
+- **A link with no numeric `confidence`,** or one outside [0, 1], is the weakest one, shown with a null value, and the
+  lenient grade is `weak`. Links count by file and id, and `weakest_link.at` gives the file of each.
+- **Limits:** up to 200 steps (beyond that, `too_long`) and 1000 paths (beyond that, `truncated`). A chain that is
+  broken, a cycle or too long is `weak` in both modes.
+- **The lenient grade leaves the origin out:** a chain of strong relays from a weak origin is `strong` lenient and
+  `weak` strict. A relay that rests on `testimony` is not marked down by its class, because its own `confidence`
+  already prices the relay; the origin is, because it is where the claim is made.
+
+The chain is declared by whoever writes the graph: the projection measures it, it does not prove who really said what.
 
 ## `kg_diff.py`: diff by id between revisions
 

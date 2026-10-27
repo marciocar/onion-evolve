@@ -10,6 +10,16 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.33.0] - 2026-10-27
+
+Contrato v4.16, sem mudança. `kg_query --chain <id>` projeta a cadeia de transmissão de um nó até a origem: cada
+caminho na ordem das arestas (`TRACES_TO` por padrão, `--edge-type` para outros), e o fragmento do `provenance.source`
+quando ele nomeia um nó de um grafo. Cada caminho traz um status (`complete`, `broken`, `cycle`, `too_long`), o elo mais
+fraco e a força da origem em eixos separados, e dois graus: o estrito, que conta a origem, e o leniente, que a deixa de
+fora. Uma corrente quebrada, em ciclo ou longa demais sai `weak` nos dois modos, e um elo sem `confidence` numérico é o
+mais fraco. A saída é humana ou `--format json` (`kg-ssot.chain/1`), com tetos de 200 passos e 1000 caminhos. Os
+critérios foram commitados antes do código, e a projeção passa neles nas sondas de uma sessão de fora.
+
 ## [4.32.0] - 2026-10-27
 
 Contrato v4.16: a classe de `provenance.method` ganha a forma canônica em inglês, `measurement`, `reading`, `judges`,

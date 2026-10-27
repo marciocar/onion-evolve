@@ -561,6 +561,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_433_ADOTADA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "na branch chore/kg-ssot-4.33.0: kg_vendor.py update --tag kg-ssot-v4.33.0 --source do clone local (9160f4a7baec, 658 arquivos, sem arquivo novo) e check intacto; ops/kg-gate-ci.sh rc 0 sem --update, igual antes e depois (195 grafos, 193 passam o MUST, os 2 da dívida herdada, sem aviso de identidade); a árvore da tag é idêntica à da ref 12dcfc491c69 da bancada pré-tag (mesmo tree 08542cc292d6 no clone da kg-ssot); kg_query.py --chain D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027 rc 0 com quatro cadeias completas, saída igual byte a byte à da bancada"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.33.0 (o kg_query ganha a projeção da cadeia de transmissão) entrou no core sem mudar o contrato nem o veredito de nenhum grafo"
+    narrative: "A 4.33.0 só muda ferramenta: o kg_query ganha a opção --chain, que projeta a cadeia de transmissão de um nó até a sua origem, seguindo as arestas de rastro, com o status de cada caminho, o elo mais fraco, a força da origem num eixo separado e dois graus, o estrito, que conta a origem, e o leniente, que a deixa de fora. É a peça do isnad, a cadeia de quem transmitiu o quê, que o grafo do produto acolheu como projeção e não como campo novo do contrato. O contrato segue v4.16, e em spec/ só muda o release.json. O vendor continua com 658 arquivos: mudam o kg_query.py, o carimbo, o plugin, a documentação, os manuais, a skill e o .po, sem nenhum arquivo novo nem removido. Nenhum grafo do core muda de veredito, e a identidade do contrato não muda, então o --update não foi preciso. Diante da bancada, o gate da main tem um grafo a mais (195 contra 194), porque a main cresceu desde a ref medida; a linha de base continua com 194 registros, e o grafo sem registro é julgado pelo MUST e passa, como o gate prevê para grafo novo. O teste vivo da projeção, sobre a decisão aberta da topologia entre agentes da empresa adotante, devolve as mesmas quatro cadeias completas que a bancada mediu, todas com grau fraco nos dois modos, porque o elo mais fraco é a própria decisão aberta e as perguntas com confiança 0.5."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh antes e depois e do kg_query.py --chain; tree da tag comparado ao da ref da bancada no clone da kg-ssot; diff da saída do --chain contra a da bancada"
+      method: "measurement: atualização do vendor, gate do contrato antes e depois, comparação com a bancada pré-tag e teste vivo da projeção da cadeia no corpus real"
+      locality: "repo"
   - id: E_KG_SSOT_432_ADOTADA_1027
     node_type: evidence
     layer: audit
@@ -1417,3 +1434,6 @@ edges:
   - from: E_A2A_PECA_RASCUNHO_BANCADA_E_DOGFOOD_LOCAL_1027
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     edge_type: TRACES_TO
+  - from: E_KG_SSOT_433_ADOTADA_1027
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
