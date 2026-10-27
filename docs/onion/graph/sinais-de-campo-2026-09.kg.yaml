@@ -1270,6 +1270,59 @@ nodes:
       locator: "pergunta com opções de 2026-10-27: «Design como 4ª dimensão do Onion, ao lado de produto, engenharia e compliance?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
+  - id: D_DESIGN_SETUP_OPCAO1_GRAFO_PILOTO_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Opção 1, o fio fino em 3 ondas, com uma observação: o design também deve ter grafo, como as verticais de business, technical e compliance, independentes mas ligados. O design vira o PILOTO de contexto como grafo na onda 1.»"
+    label: "O setup de design segue a opção 1, o fio fino em três ondas, e o design ganha grafo próprio, como as verticais de business, technical e compliance, independentes mas ligados: o design é o piloto de contexto como grafo na onda 1."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Opção 1, o fio fino em 3 ondas, com uma observação: o design também deve ter grafo, como as verticais de business, technical e compliance, independentes mas ligados. O design vira o PILOTO de contexto como grafo na onda 1.» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Opção 2: tudo numa onda» · «Opção 3: dimensão completa já» · «Depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «O setup de design é o primeiro tijolo da 4ª dimensão. Qual caminho?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+  - id: E_DESIGN_SETUP_ESTUDO_E_DESENHO_DO_CONTRATO_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "onion-curation@19b9e500c010 (origin/main): nó D_DESIGN_SETUP_PROPOSAL do design-setup-2026-10.kg.yaml, conferido por peer-ref-check.sh (rc 0, nó existe; commit ancestral da origin/main)"
+    trace: "https://github.com/marciocar/onion-curation/blob/19b9e500c0101c041564838d85f88dabcd5f420a/docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#D_DESIGN_SETUP_PROPOSAL"
+    label: "A base do selo do setup de design: a proposta da curadoria (opção 1, fio fino em três ondas, já na origin/main dela) e o desenho do contrato do kg-ssot para o design como grafo de domínio, com tokens W3C DTCG ligados por trace e locator em JSON Pointer."
+    narrative: |-
+      O estudo da curadoria (design-setup-2026-10) chegou à origin/main dela pelo PR 138, e o nó D_DESIGN_SETUP_PROPOSAL está lá @ 19b9e500c010; a frase da pergunta Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027 de que o grafo estava só em voo numa worktree ficou superada nesta medição. A proposta: a onda 1 cobre os critérios 1 a 4 do gatilho (entrada), a onda 2 cobre o 5 e o 6 (identidade, deck e componentes mínimos locais nos dois adotantes), a onda 3 enriquece. A observação do maestro acrescenta à onda 1 o grafo próprio do design.
+      Desenho do contrato, vindo da sessão do kg-ssot em 2026-10-27 (testemunho da sessão par, sem selo dela conferido na main): o grafo do design é `layer: domain`. A marca e cada token são `entity`; o contraste mínimo é `invariant`; o tema (claro, escuro) é `state`; a política de marca é `policy`; a escolha da paleta é `decision` e o arquivo de tokens é `artifact`. As ligações com os outros contextos vão por `external_edges` (TRACES_TO para a origem no business-context, CONSTRAINS para o que o design restringe no technical-context). Os tokens ficam no JSON do W3C DTCG (o formato de design tokens do W3C), referenciados pelo `trace:` do nó mais `provenance` com `locator` em JSON Pointer (por exemplo `/color/brand/primary`).
+      Lacuna conhecida, declarada: o `trace:` confere o ARQUIVO, não o ponteiro. Um token que some de dentro do JSON enquanto o arquivo continua lá não é pego pelo trace; quem pegaria isso é um conferente do locator, que ainda não existe.
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/19b9e500c0101c041564838d85f88dabcd5f420a/docs/evolution/research/design-setup-2026-10/design-setup-2026-10.kg.yaml#D_DESIGN_SETUP_PROPOSAL"
+      locator: "D_DESIGN_SETUP_PROPOSAL (proposta da opção 1 em três ondas); o desenho do contrato veio por mensagem da sessão do kg-ssot em 2026-10-27"
+      method: "reading: peer-ref-check.sh no clone local da curadoria, lido por kg_query.py na origin/main @ 19b9e500c010"
+      locality: "web"
+  - id: Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "O molde de contexto como grafo, provado no piloto do design, se estende aos contextos business, technical e compliance do core e dos adotantes?"
+    narrative: |-
+      Nasce do selo D_DESIGN_SETUP_OPCAO1_GRAFO_PILOTO_1027. Três degraus, confirmados pelo maestro em 2026-10-27:
+      (1) O checador de projeção, `kg_projection_check`, que o kg-ssot vai fazer como ferramenta do vendor: lê o `projection_of` do .md e reprova id citado que não existe no grafo, com rc 0 (íntegro), 1 (id citado sem nó) e 2 (não mediu). Aplica-se aos contextos de hoje SEM migrar nada. Medido pelo kg-ssot no technical-context dele: 11 dos 98 ids citados não resolvem.
+      (2) O piloto do design, com grafo próprio e o .md escrito à mão como projeção dele, conferido pelo checador do degrau 1.
+      (3) A extensão do grafo aos outros contextos, como decisão à parte do maestro depois do piloto. Ordem sugerida: business, depois technical, depois compliance.
+      Gatilho do degrau 3, todos juntos: o piloto rodando nos dois adotantes de gamificação (jogo-da-vida e portal-gamificacao); a projeção conferida pelo checador em rc 0 nos dois; e nenhuma regressão nos leitores, ou seja, as skills resolvedoras de contexto e o `.claude/utils/scope/resolve-context-dir.sh` continuam entregando o .md.
+      Correção feita no caminho, registrada: primeiro o core disse que reusaria o "gerador" de contextos do kg-ssot. O kg-ssot mediu e corrigiu: lá a projeção do .md a partir do grafo é disciplina, sem gerador nem gate. É dessa correção que nasce o degrau 1, o checador que faltava.
+      Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar.
+    trace: ".claude/utils/scope/resolve-context-dir.sh"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -1501,4 +1554,13 @@ edges:
     edge_type: TRACES_TO
   - from: D_DESIGN_QUARTA_DIMENSAO_DIRECAO_1027
     to: Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027
+    edge_type: TRACES_TO
+  - from: D_DESIGN_SETUP_OPCAO1_GRAFO_PILOTO_1027
+    to: Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027
+    edge_type: TRACES_TO
+  - from: E_DESIGN_SETUP_ESTUDO_E_DESENHO_DO_CONTRATO_1027
+    to: D_DESIGN_SETUP_OPCAO1_GRAFO_PILOTO_1027
+    edge_type: SUPPORTS
+  - from: D_DESIGN_SETUP_OPCAO1_GRAFO_PILOTO_1027
+    to: Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027
     edge_type: TRACES_TO
