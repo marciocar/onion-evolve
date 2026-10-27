@@ -668,6 +668,23 @@ nodes:
       locator: "corpos de a7184ef (ALTO 1/2, BAIXO 11/12), 7ff20f7 (MÉDIO 4-7), 867f95d (ALTO 3, pat-selftest); docs/evolution/review/docs-round-elenxo-cured.md:19-23"
       method: "leitura: commits a7184ef/7ff20f7/867f95d em onion-bridge + resíduo PR #611 (docs-round-elenxo-cured.md:19-23)"
       locality: "repo"
+  - id: E_REVERIFY_1027_CONTEXTO_DO_BRIDGE_FORA_DE_ALCANCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de F_ID_2_DUAL_TOKEN_CONTEXTO em 2026-10-27: CONFIRMED pelo checkout de dev do bridge (c91374da e a origin/main de lá, 5819d8e); a 1ª redação dizia UNVERIFIABLE e o refutador a reprovou"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): no repo do bridge, src/context.ts é igual em c91374da e na main de lá (5819d8e). resolveCtx segue fail-closed com isBridgeOrg e isMember em Promise.all, e a rota devolve 403."
+    narrative: "Comandos (só leitura, no checkout de dev do bridge, remoto onion-bridge): git fetch; git diff --stat c91374da origin/main -- src/context.ts → vazio (o arquivo não mudou). git show <ref>:src/context.ts | grep -n → l.2 o par p:/o:, l.7-8 o dual-token (Authorization + X-Onion-Org-Token), l.40-41 storeKey com h16, l.50 resolveCtx, l.52-57 recusas de identidade e de outra identidade, l.66 Promise.all([isBridgeOrg, isMember]), l.70-71 recusa quando a verificação falha ou a org não é do bridge. git show <ref>:src/server.ts → em c91374da l.235-236, na main l.272-273: \"if ('error' in ctx) return ... 403\". docs/onion/federation-orgs.json l.2 segue com o id de org citado. CORREÇÃO DO REFUTADOR: a 1ª redação deste nó era UNVERIFIABLE, porque o checkout do SERVIÇO nega leitura a esta conta; o checkout de dev é legível e tem o commit fixado. Teto: medido o código, não o serviço vivo; customData.bridge mora no provedor de identidade e não foi lido."
+    provenance:
+      source: "⟨checkout de dev do repo onion-bridge⟩ c91374da e origin/main 5819d8e: src/context.ts, src/server.ts; docs/onion/federation-orgs.json no core"
+      locator: "context.ts l.2, l.7-8, l.40-41, l.50-71; server.ts l.235-236 (c91374da) e l.272-273 (main); federation-orgs.json l.2"
+      method: "measurement: git show e git diff do código do bridge no commit fixado e na main de lá, mais o mapa de orgs do core"
+      locality: "repo"
 
 edges:
   - from: E_ELENXO_ROUND_CURADO
@@ -816,5 +833,8 @@ edges:
     edge_type: SUPPORTS
   - from: F_ID_4_MGM
     to: Q_GESTAO_USUARIOS_E_WORKSPACES
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_CONTEXTO_DO_BRIDGE_FORA_DE_ALCANCE
+    to: F_ID_2_DUAL_TOKEN_CONTEXTO
     edge_type: SUPPORTS
 

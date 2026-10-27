@@ -149,6 +149,23 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "Qual adapter passa primeiro a ler os pontos (estimate.points_read) e com que medição? ClickUp e Linear têm campo nativo ancorado pela Onda 1; o Jira depende do id do campo custom de cada instância. Até lá o progresso sai por contagem, declarado."
+  - id: E_REVERIFY_1027_PROGRESS_HELPER_30_DE_30
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de D_PROGRESS_E_DERIVACAO_COM_HELPER na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): progress.sh --selftest 30/30 e a família task_progress 23 verdes. A interface manda a conta para o helper, nenhum capabilities.tsv tem linha de progress, e os consumidores citam o helper."
+    narrative: "Comandos: bash .claude/utils/task-manager/progress.sh --selftest → rc=0, \"selftest: 30/30 verdes\"; bash .claude/validation/lint-selftest.sh --families adopt_robust,task_progress,workflow_syntax → rc=0, task-progress 23 casos verdes; grep -n progress.sh interface.md → l.32, l.334, l.391; grep progress adapters/*.capabilities.tsv → só as 5 linhas estimate.points_read (cuja nota cita o progresso), nenhuma capacidade de derivação progress; grep -rln progress.sh .claude/commands → task-check.md, work.md, pre-pr.md, task-manager-auto-update.md, output-formats.md. Observação: estimate.points_read está not_implemented nos 5 adapters, então no vivo o método sai count enquanto nenhum adapter ler os pontos."
+    provenance:
+      source: "bash .claude/utils/task-manager/progress.sh --selftest; lint-selftest família task_progress; interface.md; adapters/*.capabilities.tsv"
+      locator: "interface.md l.32, l.334, l.391; capabilities.tsv estimate.points_read"
+      method: "measurement: o helper e a família rodados, e grep -n na interface, nas declarações e nos consumidores"
+      locality: "repo"
 
 edges:
   - from: E_DEFEITO_PERCENTUAL_SEM_METODO
@@ -174,4 +191,7 @@ edges:
     edge_type: CONSTRAINS
   - from: D_LEITURA_DE_PONTOS_E_CAPACIDADE_PROPRIA
     to: Q_ADAPTER_LER_STORY_POINTS
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_PROGRESS_HELPER_30_DE_30
+    to: D_PROGRESS_E_DERIVACAO_COM_HELPER
     edge_type: SUPPORTS

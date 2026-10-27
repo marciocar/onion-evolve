@@ -1,5 +1,6 @@
 # kg-backlog-guard: on
-# ═══ TETO: 10 NÓS ═══ (7 da forja + D_MANTER_ATUALIZADO_E_ETERNO pelo selo + os 2 nós das passadas do Elenxo; cheio)
+# ═══ TETO: 11 NÓS ═══ (7 da forja + D_MANTER_ATUALIZADO_E_ETERNO pelo selo + os 2 nós das passadas do Elenxo; cheio)
+#   (+1 em 2026-10-27: E_REVERIFY_1027_FECHAMENTO_SO_REBASEIA_COM_FLAG, re-medição de 2026-10-27 (ordem do maestro: rever o que foi só lido; o nó lido fica, o novo carrega a medida))
 meta:
   id: keep-current-2026-10
   schema_version: "1"
@@ -173,6 +174,23 @@ nodes:
       locator: "run_currency_census_selftests, casos (n2) (n3) (p) a (z)"
       method: "medição: refutador em sandbox e bancada com mutantes, 2026-10-16"
       locality: "repo"
+  - id: E_REVERIFY_1027_FECHAMENTO_SO_REBASEIA_COM_FLAG
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de C_TETO_SUBAGENTE_SEM_HOOK na origin/main de 2026-10-27: REFUTED de UMA cláusula (o rebase no fechamento), o resto CONFIRMED; a 1ª redação dizia DRIFTED e o refutador emendou"
+    source_tier: 10
+    source_kind: primary
+    label: "REFUTED de uma cláusula (2026-10-27): o hook segue só no UserPromptSubmit e o preâmbulo manda rodar o currency-census. Mas o fechamento de PR nunca rebaseou sozinho: o --rebase do ops/pr-finalize.sh é opt-in desde 842597dd8 (2026-10-05)."
+    narrative: "Comandos: leitura de .claude/settings.json (UserPromptSubmit → session-currency-check.sh); grep -n currency-census .claude/commands/common/prompts/execution-agent-preamble.md → l.21 manda rodar bash .claude/validation/currency-census.sh . --table; grep -n rebase ops/pr-finalize.sh → l.17 a assinatura [--rebase] [--push] [--check], l.24 \"--rebase traz a branch para cima da origin/main antes de tudo\", l.70 REBASE=1 só pela flag. Não é deriva, e quem achou foi o refutador: git show 72a7bc4d0:ops/pr-finalize.sh (o commit que criou o nó, 2026-10-16) já tinha REBASE=0 na l.60 e \"--rebase) REBASE=1\" na l.65, e git log -S\"--rebase) REBASE=1\" aponta 842597dd8 (2026-10-05). A cláusula era falsa ao nascer. A aresta é CONSTRAINS e não REFUTES porque o resto do teto se sustenta. Sem a flag, um --push envia a branch na base em que ela está; quem cobra a base no fim é o CI e o merge verificado."
+    provenance:
+      source: ".claude/settings.json; .claude/commands/common/prompts/execution-agent-preamble.md; ops/pr-finalize.sh"
+      locator: "execution-agent-preamble.md l.21; pr-finalize.sh l.17, l.24, l.70; 72a7bc4d0:ops/pr-finalize.sh l.60, l.65; commit 842597dd8"
+      method: "measurement: grep -n no preâmbulo e no motor de fechamento, git show e git log -S do motor no commit que criou o nó, e leitura do JSON de hooks"
+      locality: "repo"
 
 edges:
   - from: E_ELENXO_2A_PASSADA_EPIPE_E_ESTADO
@@ -202,3 +220,6 @@ edges:
   - from: D_MANTER_ATUALIZADO_E_ETERNO
     to: E_PREAMBULO_SO_NO_SCRATCHPAD
     edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_FECHAMENTO_SO_REBASEIA_COM_FLAG
+    to: C_TETO_SUBAGENTE_SEM_HOOK
+    edge_type: CONSTRAINS

@@ -225,6 +225,40 @@ nodes:
     verified_against: "RESPONDIDA E CONSTRUIDA em 2026-09-26, por escolha do maestro num formulario com as opcoes nomeadas: `ops/door-seal-pin.sh <membro>` (irmao novo em ops/, pelo MESMO motivo que poe o audit-adopters-registry.sh la — precisa do clone da porta e do remoto, e nenhum dos dois existe no CI). Ele VERIFICA e carimba: le o pin do stamp da porta, prova que e commit deste core, prova que esta em origin/<integracao>, prova o PUSH pelo remoto via forge (clone == remoto) e so entao carimba `onion_version` cirurgicamente. Fail-closed nas seis portas de saida, todas presas na bancada (run_door_seal_pin_selftests, 9 casos). Invocado pelo maestro APOS o push — a fronteira I3 fica intacta, e o materialize-door.sh passou a imprimir o comando do carimbo como segundo passo. Dogfood no estado vivo: rc=0, `registro ja em dia`. FICA MANUAL por decisao do maestro: as duas linhas de dado do door-staleness-baseline.txt. == REGISTRO ANTERIOR, preservado: Medido no mesmo dia, DUAS vezes: (1) a porta foi publicada em 07c81b974880 e o `onion_version` do registro seguiu em d425501b14bc; avancei a mao e escrevi no proprio members.yaml que numero mantido a mao apodrece. (2) Duas horas depois, publicada em 5063e81b2d8d, o campo ficou atras OUTRA VEZ, e a REGRA 85 seguiu acusando 3 commits de defasagem porque ela le o REGISTRO, nao a porta. Tambem medido: `pin-integrity-check.sh . <clone local de onion-core>` devolve `pin-untrusted unknown` — nenhuma guarda confere este campo contra o publicado."
     label: "QUEM CARIMBA O PIN DA PORTA DEPOIS DO PUSH? Hoje: ninguem — e o numero e mantido A MAO num campo que a REGRA 85 (Porta publica espelha o core, com catraca) LE para decidir defasagem. Logo a guarda pode acusar defasagem que nao existe (foi o que fez duas vezes hoje) ou, pior, calar sobre uma que existe. O gatilho de mecanizacao DISPAROU DUAS VEZES NUM DIA, que e o criterio desta casa para parar de aconselhar e construir. DESENHO CANDIDATO, com a costura ja pronta: o `ops/materialize-door.sh` PARA antes do push por desenho (I3 — publicar e ato do maestro), entao o carimbo nao cabe nele; cabe num irmao pos-push, algo como `ops/door-seal-pin.sh <membro>`, que (a) le o remoto pelo forge (`gh api repos/<owner>/<repo>/commits/<branch>`) — o MESMO comando que o ciclo ja roda a mao para verificar, (b) so carimba se o remoto de fato bater com o pin materializado, fail-closed se nao conseguir ler, e (c) atualiza o `onion_version` E as duas linhas de dado do `door-staleness-baseline.txt`. ⚠️ RESTRICAO MEDIDA que qualquer automacao tem de respeitar: o `--emit-baseline` devolve SO as duas linhas de dado, e redirecionar a saida dele por cima do arquivo apagaria ~170 linhas de historico — saida destrutiva PLAUSIVEL, porque o gerador sai 0 e o arquivo fica nao-vazio. A atualizacao tem de ser cirurgica. ESTE NO MORA AQUI, e nao no fios-abertos, porque o teto daquele arquivo e catraca que so ENCOLHE e porque o fato mora onde nasceu — a decisao de cobrar a defasagem pos-merge (`D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA`) e deste grafo. GATED na decisao do maestro sobre construir; o diagnostico esta fechado."
     trace: '.claude/validation/door-staleness-baseline.txt · ops/materialize-door.sh'
+  - id: E_REVERIFY_1027_FAIXA_REPLICA_A_FALHA_COM_MUTANTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): rodada de novo com mutante, a faixa paralela traz a falha inline com nome e motivo (5 casos ✗); o pai replica a saída do filho em lint-selftest.sh l.1396."
+    narrative: "Comando: bash ops/mutate-and-restore.sh .claude/validation/workflow-syntax-check.sh 'exit \"${rc}\"|||exit 0 # <marcador de mutante que o helper exige>' <sonda que roda lint-selftest.sh --families workflow_syntax,shard_plan,identifier_language --jobs auto com a saída inteira num arquivo, sem pipe>. Observado: \"mutate: rc do comando = 1\"; o arquivo tem 49 linhas, e nas l.5-11 vêm \"✗ workflow-syntax: (c) — sintaxe quebrada passou\", \"(d) — alvo inexistente: rc=0\", \"(f) — o strip largo voltou\", \"(g) — voltou a contar chaves\" e \"(e) — sem meta virou passe livre\"; git status limpo depois. grep -n: l.1396 grep -vE \"^#ONION_SELFTEST_\" \"${_tdir}/${i}.out\" (o pai replica o filho); l.1531 record_fail imprime \"✗ nome — motivo\". As linhas citadas (l.401, l.495 em 0595c2d5) moveram. Eram 6 casos reprovando em 2026-09-23 e hoje são 5."
+    provenance:
+      source: "bash ops/mutate-and-restore.sh sobre .claude/validation/workflow-syntax-check.sh; .claude/validation/lint-selftest.sh"
+      locator: "lint-selftest.sh l.1396 e l.1531; saída da faixa l.5-11"
+      method: "measurement: o mutante plantado e restaurado pelo helper, a faixa rodada com a saída inteira capturada, e grep -n"
+      locality: "repo"
+  - id: E_REVERIFY_1027_TRES_REPROVACOES_SEGUEM_AUSENTES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): a KB segue com o bloco CORRIGIDO de 2026-09-18, e as reprovações ausentes seguem ausentes. Um fixture com ciclo DEPENDS_ON, refuted recebendo SUPPORTS e decision done em DEV passa no --integrity com rc 0."
+    narrative: "Comandos: grep -n \"CORRIGIDO em 2026-09-18\" docs/knowledge-base/concepts/knowledge-graph-sdaal.md → l.197 e l.208 (o placar registrado: uma implementada, três ausentes, uma rebaixada a aviso); a lista de INTEGRIDADE do kg-radar.sh segue na l.27-29, a mesma do nó lido (a 1ª redação citava a l.8, que é o RADAR de atenção; o refutador emendou). Fixture de 3 nós (A→B e B→A por DEPENDS_ON; B status refuted recebendo SUPPORTS de D; D decision done plane DEV): bash .claude/validation/kg-radar.sh <fixture> --integrity → rc=0, \"✅ sem contradições estruturais (3 nós, 3 arestas)\". A decisão de implementar as três segue aberta, como o nó diz."
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md; bash .claude/validation/kg-radar.sh <fixture de 3 nós> --integrity"
+      locator: "KB l.197 e l.208; kg-radar.sh l.27-29"
+      method: "measurement: grep -n na KB e no motor, e o radar rodado contra um fixture que exerce as três ausências"
+      locality: "repo"
 
 edges:
   - from: Q_QUEM_CARIMBA_O_PIN_DA_PORTA
@@ -268,4 +302,10 @@ edges:
   # que `DEPENDS_ON` escrito so para evitar orfao BLOQUEIA a fila e inverte a ordem recomendada.
   - from: D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA
     to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_FAIXA_REPLICA_A_FALHA_COM_MUTANTE
+    to: E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_TRES_REPROVACOES_SEGUEM_AUSENTES
+    to: E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA
     edge_type: SUPPORTS

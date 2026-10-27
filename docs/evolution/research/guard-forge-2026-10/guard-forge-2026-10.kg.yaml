@@ -1,5 +1,6 @@
 # kg-backlog-guard: on
-# ═══ TETO: 13 NÓS ═══ (+1 em 2026-10-14: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA, o selo do maestro que aposenta o veto sobre a prosa; +1 em 2026-10-15: D_SONDA_JULGA_PROGRESSO_MEDIDO_NAO_NOME_DE_KERNEL, o selo que tira da sonda a última lista de nomes)
+# ═══ TETO: 15 NÓS ═══ (+1 em 2026-10-14: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA, o selo do maestro que aposenta o veto sobre a prosa; +1 em 2026-10-15: D_SONDA_JULGA_PROGRESSO_MEDIDO_NAO_NOME_DE_KERNEL, o selo que tira da sonda a última lista de nomes)
+#   (+2 em 2026-10-27: E_REVERIFY_1027_MOLDE_VIVO_GUARDA_APOSENTADA e E_REVERIFY_1027_TETO_DE_GUARDA_REMOVIDA, re-medição de 2026-10-27 (ordem do maestro: rever o que foi só lido; o nó lido fica, o novo carrega a medida))
 # ⚠️ SUBIDO DE 8 PARA 11 em 2026-10-02, e a razão importa porque ontem eu quase subi um teto pelo
 # motivo ERRADO: no `fios-abertos` o teto acusou uma violação de FRONTEIRA (fato no lugar do
 # compromisso) e subi-lo teria consertado o número mantendo a doença. AQUI é diferente e verificável:
@@ -205,6 +206,40 @@ nodes:
       locator: "pergunta com opções de 2026-10-15: «A sonda (SAC-140) acertou o essencial no CI, mas o rótulo SUSPEITO dependia de uma lista de nomes do kernel (wchan), que muda entre versões. Como fecho?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
       locality: "pessoa"
+  - id: E_REVERIFY_1027_MOLDE_VIVO_GUARDA_APOSENTADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO na origin/main de 2026-10-27 (8857bc9b8): DRIFTED"
+    source_tier: 10
+    source_kind: primary
+    label: "DRIFTED (2026-10-27): o molde segue vivo (rule-title-in-prose.sh no Stop, exit 2, selftest 6/6), mas a guarda nascida desta decisão não existe mais: background-state-needs-evidence.sh saiu em cdb34f6ce (2026-10-15)."
+    narrative: "Comandos: ls .claude/hooks (sem background-state-needs-evidence.sh); git log --diff-filter=D -- .claude/hooks/background-state-needs-evidence.sh → cdb34f6ce \"a sonda mede a tarefa de fundo e o veto sobre a prosa se aposenta\" (480 linhas removidas, background-task-probe.sh criado, UserPromptSubmit); leitura do settings.json: o Stop tem hoje rule-title-in-prose.sh e house-code-gloss.sh stop; bash .claude/hooks/rule-title-in-prose.sh --selftest → rc=0, \"rule-title-in-prose selftest: OK\" (casos a, b, c, d, e, f). guard-doctrine.md: a peça 2 segue na l.18; a menção do molde mais exercitado passou da l.82 para a l.91. A decisão vale como escolha datada e já é superada por D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA; esta medida só limita o que ela ainda descreve do vivo."
+    provenance:
+      source: ".claude/hooks/ e .claude/settings.json na main; git log cdb34f6ce; bash .claude/hooks/rule-title-in-prose.sh --selftest"
+      locator: "settings.json hooks.Stop; guard-doctrine.md l.18 e l.91; commit cdb34f6ce"
+      method: "measurement: selftest do molde rodado, ls e git log do hook removido, leitura do JSON de hooks contado um a um"
+      locality: "repo"
+  - id: E_REVERIFY_1027_TETO_DE_GUARDA_REMOVIDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de T_O_QUE_A_GUARDA_NAO_VE na origin/main de 2026-10-27 (8857bc9b8): DRIFTED"
+    source_tier: 10
+    source_kind: primary
+    label: "DRIFTED (2026-10-27): o teto descrevia background-state-needs-evidence.sh, que saiu em cdb34f6ce; o par de vetos Stop de hoje é rule-title-in-prose.sh e house-code-gloss.sh stop, e a interação entre eles segue não medida."
+    narrative: "Comandos: ls .claude/hooks → o arquivo fonte do nó não existe; leitura de .claude/settings.json → Stop: rule-title-in-prose.sh e house-code-gloss.sh stop (o cabeçalho do segundo, l.14, declara exit 2 só para sigla de opacidade alta). A sucessora background-task-probe.sh roda em UserPromptSubmit e também lê transcript_path (cabeçalho l.16), então a classe do teto (assumir a forma do transcript) sobrevive nela; a interação entre dois vetos Stop continua sem medida, agora entre outro par."
+    provenance:
+      source: ".claude/settings.json e .claude/hooks/ na main; git log cdb34f6ce"
+      locator: "settings.json hooks.Stop; house-code-gloss.sh l.14; background-task-probe.sh l.3 e l.16"
+      method: "measurement: ls do diretório de hooks, git log do arquivo removido e leitura do JSON de hooks"
+      locality: "repo"
 
 edges:
   - from: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
@@ -246,3 +281,9 @@ edges:
   - from: D_SONDA_JULGA_PROGRESSO_MEDIDO_NAO_NOME_DE_KERNEL
     to: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA
     edge_type: TRACES_TO
+  - from: E_REVERIFY_1027_MOLDE_VIVO_GUARDA_APOSENTADA
+    to: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
+    edge_type: CONSTRAINS
+  - from: E_REVERIFY_1027_TETO_DE_GUARDA_REMOVIDA
+    to: T_O_QUE_A_GUARDA_NAO_VE
+    edge_type: SUPERSEDES

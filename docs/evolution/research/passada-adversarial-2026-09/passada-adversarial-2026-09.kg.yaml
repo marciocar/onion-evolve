@@ -4,7 +4,9 @@ meta:
   baseline: "2026-09-14"
   review_after: "2027-01-12"   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 57 NOS (era 56: +1 pela INSTANCIA C da classe EPIPE-acusa-o-vivo, medida em 2026-10-23:
+  # ═══ TETO: 58 NOS (era 57: +1 em 2026-10-27, E_REVERIFY_1027_MANIFESTO_FALHO_RECUSA, re-medição
+  #     do que foi só lido, por ordem do maestro; o nó lido fica, o novo carrega a medida.)
+  #     (era 56: +1 pela INSTANCIA C da classe EPIPE-acusa-o-vivo, medida em 2026-10-23:
   #     o empate HARD 9->9 do caso (e) da kg_backlog era HARD espurio no CONTROLE, vindo de leitor
   #     que fecha cedo dentro do lint. Cresce por recorrencia medida da mesma classe.)
   #     (era 55: +1 pela CLASSE trava-por-binario-externo, medida em 2026-10-20 com o
@@ -985,6 +987,23 @@ nodes:
       locator: "980bdbe3 l.356/410/413/470 (pipe para grep -q) contra HEAD (here-string); lint-artifacts.sh de 980bdbe3 l.961/963 contra HEAD l.1228-1264; lint-selftest.sh run_kg_backlog_selftests, caso (e), mensagem de FAIL-OPEN"
       method: "medição: harness em diretório temporário (lint inteiro por sandbox git archive; helper isolado; probe do matcher), serie contra concorrencia, com o liga-desliga feito pela troca do leitor e nada mais"
       locality: "repo"
+  - id: E_REVERIFY_1027_MANIFESTO_FALHO_RECUSA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO na origin/main de 2026-10-27 (8857bc9b8): DRIFTED"
+    source_tier: 10
+    source_kind: primary
+    label: "DRIFTED (2026-10-27): o \"NÃO curado\" do rótulo caiu. O adopt.md não consome mais o manifesto por mapfile: onion_load_manifest (load-manifest.sh) lê o rc e recusa. Papel inválido sai rc 1 com array vazio, e não há cópia."
+    narrative: "Sonda (source .claude/utils/adopt/load-manifest.sh): onion_load_manifest <repo> papel-que-nao-existe → stderr \"ABORTADO: manifesto de transporte não resolvido ... (rc=3)\", rc=1, len(manifest)=0; com adopted → rc=0, len=19. Contraste: mapfile -t old < <(resolve-manifest.sh <repo> papel-que-nao-existe) → rc=0, len=0 (o mapfile ainda engole o 3, a classe é real). grep -n no adopt.md: l.97-101 e l.733-735 chamam onion_load_manifest e dizem \"NUNCA mapfile ... || ABORTADO\". bash .claude/validation/lint-selftest.sh --families adopt_robust,task_progress,workflow_syntax → rc=0, adopt-robust 14 casos verdes."
+    provenance:
+      source: ".claude/utils/adopt/load-manifest.sh, resolve-manifest.sh e .claude/commands/meta/adopt.md na main; lint-selftest família adopt_robust"
+      locator: "adopt.md l.97-101 e l.733-735; load-manifest.sh l.26-31; resolve-manifest.sh l.29-33"
+      method: "measurement: o carregador rodado com papel inválido e válido, o mapfile antigo rodado como contraste, e a família da bancada"
+      locality: "repo"
 
 edges:
   - from: C_TRAVA_POR_BINARIO_EXTERNO_PERDE_ATOMICIDADE_NA_IMAGEM
@@ -1159,3 +1178,6 @@ edges:
   - from: E_KG_BACKLOG_E_CONTROLE_INFLADO_PELO_EPIPE_DO_LINT
     to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
     edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_MANIFESTO_FALHO_RECUSA
+    to: E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO
+    edge_type: SUPERSEDES

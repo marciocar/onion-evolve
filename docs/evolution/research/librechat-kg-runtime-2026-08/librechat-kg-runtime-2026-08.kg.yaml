@@ -336,6 +336,23 @@ nodes:
       locator: "systemctl is-active / is-enabled; journalctl -u onion-vps-mcp-kg; comentário de 2026-08-27 no topo do librechat.yaml"
       method: "medição: systemctl, journalctl e leitura do librechat.yaml no host em 2026-10-11"
       locality: "host"
+  - id: E_REVERIFY_1027_QUATRO_SERVIDORES_POR_RISCO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de D_TRIADE_MCP_POR_EIXO na origin/main de 2026-10-27 (8857bc9b8): DRIFTED; o log do LibreChat não medido"
+    source_tier: 10
+    source_kind: primary
+    label: "DRIFTED (2026-10-27): a separação por risco segue, mas a tríade virou quatro servidores em ops/: o onion-kg-writer (escrita de grafos, 880868e77, 2026-10-12) entrou ao lado do onion-kg, que segue só leitura."
+    narrative: "Comandos: ls -d ops/mcp-* → mcp-onion-exec, mcp-onion-framework, mcp-onion-kg, mcp-onion-kg-writer; contagem estática da lista TOOLS (ast do Python) → kg 7, exec 4, framework 5, kg-writer 6. git log --diff-filter=A -- ops/mcp-onion-kg-writer/server.py → 880868e77. O cabeçalho do framework (l.9-10) ainda diz \"Trinca de MCPs ... read≠exec não colapsa\"; o do writer diz que é o irmão de escrita do onion-kg, que continua só leitura. A decisão (não fundir read e exec numa porta) sai reforçada; o número três envelheceu. NÃO MEDIDO: o \"4 configured servers and 24 tools\" do log do LibreChat, que mora no host do serviço."
+    provenance:
+      source: "ops/mcp-*/server.py na main; git log do kg-writer"
+      locator: "mcp-onion-framework/server.py l.9-10; mcp-onion-kg-writer/server.py l.2-4"
+      method: "measurement: ls dos servidores, contagem estática das ferramentas por ast e git log"
+      locality: "repo"
 edges:
   - from: E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO
     to: Q_ONION_KG_MCP_NEXT
@@ -418,3 +435,6 @@ edges:
   - from: E_ARGUMENTO_CORRIGIDO_ANTES_DO_MERGE
     to: E_KG_INBOX_FORA_POR_MEDICAO_NAO_POR_ESQUECIMENTO
     edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_QUATRO_SERVIDORES_POR_RISCO
+    to: D_TRIADE_MCP_POR_EIXO
+    edge_type: CONSTRAINS
