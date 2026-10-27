@@ -2,13 +2,12 @@
 branch: research/a2a-empresa-adotante
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: c29594dbc133d9b95194465c6619e9515e372299d7264b40bb07c43e5f898b30
-reviewed_code_sha256: 21fbf4b9361c46e03956e5f248a64e421a83e8bc4ecbca8fadaae5efed7661c7
-findings_total: 3
-findings_real: 3
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 4
 tokens: 0
 duration_min: 25
-findings_fixed: 2
+findings_fixed: 3
 verdict: APROVADO
 elenxo: nao
 reviewer: subagente do pós-run (conferência por amostragem com WebFetch)
@@ -49,6 +48,10 @@ Extra: `C_SUPERACAO_20261027_A2A_JOINS_AAIF_2026_08_17` conferido em aaif.io/blo
 3. **Vocabulário de provedor defasado no label** (`Vertex` contra "Google Cloud's Agent Platform").
    Não corrigido: o label é a claim votada 3-0 no run, e a mudança é de nome, não de fato. Fica para a
    revisita (`review_after` 2026-11-26).
+
+4. **Códigos curtos sem termo na prosa dos nós.** O contrato KG-SSOT do commit reprovou sete códigos
+   (nomes de etapa de spike, `WSL2` e o nome curto do radar do CHANGELOG) em narrativas escritas pelo
+   workflow. Trocados por prosa; `ops/kg-vocab-ci.sh` voltou a 0 código novo.
 
 ## Mutantes
 
