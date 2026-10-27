@@ -3,11 +3,11 @@ branch: docs/reverify-research-read-only
 pr: pendente
 date: 2026-10-27
 reviewed_diff_sha256: pendente
-findings_total: 6
-findings_real: 4
+findings_total: 8
+findings_real: 6
 tokens: 135767
 duration_min: 9
-findings_fixed: 6
+findings_fixed: 8
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 reviewer: subagente refutador (general-purpose, opus, só leitura)
