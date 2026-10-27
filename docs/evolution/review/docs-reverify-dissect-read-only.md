@@ -2,7 +2,6 @@
 branch: docs/reverify-dissect-read-only
 date: 2026-10-27
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
