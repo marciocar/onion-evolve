@@ -123,6 +123,23 @@ nodes:
     verified_at: "2026-10-08"
     verified_against: "o passo 8 do comando segue o adapter doc do Linear, que ainda é prosa (SAC-65); gatilho: o adapter executável existir"
     label: "quando o adapter executável do task manager existir (SAC-65), o passo de ação vira chamada, não prosa seguida pela sessão?"
+  - id: E_REVERIFY_1027_CC_UPDATE_MEDIDOR_RODA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): o /meta:cc-update segue com os 10 passos (juiz opus no 4, merge verificado no 9); o medidor roda rc 0 e diz NADA A MEDIR em 2.1.311, e a família cc_delta_census passa 25/25."
+    narrative: "Comandos: bash .claude/validation/cc-delta-census.sh . --markdown → rc=0, \"VEREDITO: NADA A MEDIR\", baseline E3 2.1.311 = disco 2.1.311 = processo 2.1.311, e um aviso: o CLI do SDK do bridge está em 2.1.310 (SDK 0.3.310), uma versão atrás do host. bash .claude/validation/lint-selftest.sh --families cc_delta_census → rc=0, Passaram 25, Falharam 0. grep -n no cc-update.md: l.62-107 numeram os passos 1 a 10; l.74 o juiz é general-purpose, model opus, effort high, mandato REFUTAR; l.104-105 o merge só por ops/pr-merge-verified.sh (core-only)."
+    provenance:
+      source: "bash .claude/validation/cc-delta-census.sh . --markdown; bash .claude/validation/lint-selftest.sh --families cc_delta_census; .claude/commands/meta/cc-update.md"
+      locator: "cc-update.md l.62-107 (Procedimento), l.74 (juiz), l.104-105 (merge verificado)"
+      method: "measurement: o medidor e a família da bancada rodados na main, mais grep -n no comando"
+      locality: "repo"
 edges:
   - from: E_R8_FOI_FEITA_A_MAO
     to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
@@ -145,3 +162,6 @@ edges:
   - from: Q_ISSUE_PELO_ADAPTER_EXECUTAVEL
     to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
     edge_type: DEPENDS_ON
+  - from: E_REVERIFY_1027_CC_UPDATE_MEDIDOR_RODA
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: SUPPORTS

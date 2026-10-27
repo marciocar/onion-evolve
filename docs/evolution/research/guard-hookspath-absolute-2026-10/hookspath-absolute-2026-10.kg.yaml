@@ -1,5 +1,6 @@
 # kg-backlog-guard: on
-# ═══ TETO: 8 NÓS ═══ (defeito, dogfood, substrato, mutante, 2 tetos + 2 de folga para o Elenxo)
+# ═══ TETO: 9 NÓS ═══ (defeito, dogfood, substrato, mutante, 2 tetos + 2 de folga para o Elenxo)
+#   (+1 em 2026-10-27: E_REVERIFY_1027_HOOK_FALA_SUBAGENTE_NAO_OUVE, re-medição de 2026-10-27 (ordem do maestro: rever o que foi só lido; o nó lido fica, o novo carrega a medida))
 meta:
   id: hookspath-absolute-2026-10
   schema_version: "1"
@@ -144,6 +145,23 @@ nodes:
       locator: "pergunta com opções de 2026-10-26: «O que fazer com o hook WorktreeCreate próprio, depois do spike e do trampolim?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-26"
       locality: "pessoa"
+  - id: E_REVERIFY_1027_HOOK_FALA_SUBAGENTE_NAO_OUVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): session-currency-check.sh segue só em UserPromptSubmit; alimentado à mão numa worktree de subagente ele fala, e o contexto do subagente que o mediu não recebeu nada dele."
+    narrative: "Comandos: leitura de .claude/settings.json → UserPromptSubmit lista session-currency-check.sh, nenhum evento de subagente o registra. Sonda: printf um JSON de UserPromptSubmit | CLAUDE_PROJECT_DIR=<worktree> bash .claude/hooks/session-currency-check.sh → rc=0 e o aviso \"BASE ATUAL, SEMPRE\" com três defasagens (SDK do bridge 0.3.310 → 0.3.311, kg-ssot 4.34.0 → 4.35.0, python 3.12.3 → 3.15). O subagente que rodou a sonda nasceu com core.hooksPath absoluto na worktree e não recebeu nenhuma linha do hook no seu prompt: testemunho do próprio medidor, coerente com o teto."
+    provenance:
+      source: ".claude/settings.json; bash .claude/hooks/session-currency-check.sh com stdin sintético"
+      locator: "settings.json hooks.UserPromptSubmit; session-currency-check.sh l.46 (repo de CLAUDE_PROJECT_DIR) e l.77 (texto do lembrete do hooksPath)"
+      method: "measurement: o hook invocado com stdin sintético e o registro lido no JSON; a ausência no contexto do subagente é testemunho do medidor"
+      locality: "repo"
 
 edges:
   - from: E_ELENXO_1A_PASSADA_FALSOS_POSITIVOS
@@ -167,3 +185,6 @@ edges:
   - from: D_WORKTREECREATE_PROPRIO_PARQUEADO_1026
     to: E_DEFEITO_HOOKSPATH_ABSOLUTO_RODA_HOOK_DA_MAIN
     edge_type: TRACES_TO
+  - from: E_REVERIFY_1027_HOOK_FALA_SUBAGENTE_NAO_OUVE
+    to: C_TETO_SUBAGENTE_E_SESSAO_PRINCIPAL
+    edge_type: SUPPORTS

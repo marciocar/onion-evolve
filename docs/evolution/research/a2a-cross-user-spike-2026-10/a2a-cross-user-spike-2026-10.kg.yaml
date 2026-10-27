@@ -649,6 +649,23 @@ nodes:
       locator: "saída do juiz para --scenario A7-C1 --replica 2 e o tool-attempts.jsonl da VPS"
       method: "medição: réplica real pelo HTTP de produção"
       locality: "host"
+  - id: E_REVERIFY_1027_CURADORIA_CITACOES_REPRODUZIDAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14 na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): as linhas que a curadoria citou em e2222a79 reproduzem por git show, e dois dos achados já têm cura na main (iat conferido no ATC, delivered persistido no CH)."
+    narrative: "Comando: git show e2222a79:<arquivo> | sed -n <linhas>, para SPIKE-PROTOCOL.md, vps/accept-to-channel.sh e channel/a2a-channel.ts. Observado: P:235 \"maestro (age além de responder)\"; P:291 a fórmula ciclo_maquina; P:296-297 o \"≤ 26 s depois da primeira aprovação\" e o \"não perguntar de novo\"; ATC:124-126 só o exp é conferido; CH:70 \"const delivered = new Map\" (só memória); CH:147 o body_sha256 repassado do meta; CH:152-156 o corpo reescrito com a cerca. Na main (git diff --stat e2222a79 origin/main: protocolo +605/-6, ATC +67/-14, CH +53/-6): ATC l.148-149 lê e exige iat numérico (emenda 7) e CH l.77 grava channel-delivered.jsonl, relido na subida (achado 9). Os achados eram reais no texto que refutaram; o nó lido segue verdadeiro como retrato datado."
+    provenance:
+      source: "git show e2222a79 e origin/main: docs/evolution/research/a2a-cross-user-spike-2026-10/{SPIKE-PROTOCOL.md,vps/accept-to-channel.sh,channel/a2a-channel.ts}"
+      locator: "e2222a79: P:235, P:291, P:296-297, ATC:124-126, CH:70, CH:147, CH:152-156; origin/main: ATC l.148-149, CH l.77"
+      method: "measurement: git show das linhas citadas no commit fixado e grep -n do mesmo arquivo na main"
+      locality: "repo"
 edges:
   - from: K_A7_ALLOWLIST_V2
     to: K_A7_ALLOWLIST_V1
@@ -770,6 +787,9 @@ edges:
   - from: D_CRITERIO_PRE_REGISTRADO_NO_CONTRATO_KG_SSOT_1023
     to: Q_REGUA_ACEITA_BASH_COMPOSTO_DE_LEITURA_1022
     edge_type: TRACES_TO
+  - from: E_REVERIFY_1027_CURADORIA_CITACOES_REPRODUZIDAS
+    to: E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14
+    edge_type: SUPPORTS
 
 external_edges:
   - from: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY"

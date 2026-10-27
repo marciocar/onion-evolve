@@ -7,7 +7,8 @@ meta:
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: cadência de ferramenta
   x_supersedes_none: "medido contra a baseline do eixo (r7, 2.1.289): nenhum nó dela derrubado; as correções de mod da r8 são evidência A FAVOR da tese da r7 (mod tem janelas de falha aberta), não superação — veredito do juiz"
-  # ═══ TETO: 20 NÓS ═══
+  # ═══ TETO: 21 NÓS ═══
+  #   (+1 em 2026-10-27: E_REVERIFY_1027_SEIS_HOOKS_COM_ONFAILURE, re-medição de 2026-10-27 (ordem do maestro: rever o que foi só lido; o nó lido fica, o novo carrega a medida))
   #   17 em 2026-10-08 (12 da rodada, corrigidos pelo juiz, + 5 do que faltou).
   #   20 em 2026-10-11: + 2 evidências medidas ao vivo que fecham o Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS (SAC-83)
   #   + 1 Q aberto pela passada adversarial (env-guard quadrático chega ao timeout). Teto atingido.
@@ -291,6 +292,23 @@ nodes:
       source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
       locator: "2.1.292:3; 2.1.295:6, :12, :27"
       method: "leitura: linha do CHANGELOG oficial citada no locator, conferida pelo juiz da rodada"
+  - id: E_REVERIFY_1027_SEIS_HOOKS_COM_ONFAILURE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_HOOK_ONFAILURE_BLOCK na origin/main de 2026-10-27 (8857bc9b8): DRIFTED"
+    source_tier: 10
+    source_kind: primary
+    label: "DRIFTED (2026-10-27): o retrato de 2026-10-08 (20 hooks, nenhum com onFailure) mudou. Hoje são 26 hooks command, e 6 declaram onFailure block: os 5 vetos PreToolUse e o PreModelSwitch."
+    narrative: "Comando: python3 lendo .claude/settings.json[\"hooks\"], hook a hook. Observado: 26 entradas command; onFailure=block em pretooluse-env-guard.sh, pretooluse-protect-main.sh, pretooluse-merge-gate.sh, pretooluse-moat-gate.sh, pretooluse-direct-provider-api.sh (PreToolUse) e premodelswitch-guard.sh (PreModelSwitch). Sem o campo: kg-read-leg.sh e house-code-gloss.sh tool no PreToolUse, e os dois Stop (rule-title-in-prose.sh, house-code-gloss.sh stop), que vetam por exit 2 e falham abertos."
+    provenance:
+      source: ".claude/settings.json na main"
+      locator: "chave hooks, cada entrada com o campo onFailure"
+      method: "measurement: o JSON dos hooks lido e contado um a um"
+      locality: "repo"
 edges:
   - from: E_HOOK_ONFAILURE_BLOCK
     to: Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS
@@ -352,3 +370,6 @@ edges:
   - from: E_HOOK_POR_LLM_FALHAVA_ABERTO
     to: Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS
     edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_SEIS_HOOKS_COM_ONFAILURE
+    to: E_HOOK_ONFAILURE_BLOCK
+    edge_type: SUPERSEDES

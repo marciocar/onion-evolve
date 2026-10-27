@@ -190,6 +190,23 @@ nodes:
       locator: "§\"Mas: a matriz está estruturalmente incompleta\" l.44 (\"Contagem: são 16 work-tools (não ~17). Reconciliar.\")"
       method: "leitura: síntese da pesquisa wf_ab57a814-c16"
       locality: "repo"
+  - id: E_REVERIFY_1027_BASE_IGUAL_WORK_TOOLS_SEPARAM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_BASE_IDENTICAL na origin/main de 2026-10-27 (8857bc9b8): DRIFTED"
+    source_tier: 10
+    source_kind: primary
+    label: "DRIFTED (2026-10-27): standalone.base e optional seguem iguais aos do hub no roles.yaml, mas não é mais só trust/downstream que separa: work_tools do hub tem 5 itens e o do standalone 2."
+    narrative: "Comando: python3 com yaml.safe_load(.claude/utils/marketplace/roles.yaml)[\"roles\"] → base == True, optional == True; hub.base = [onion-engineering, onion-product] = standalone.base; hub.work_tools = [full, meta_factory, federation, adoption, pending], downstream gated; standalone.work_tools = [full, meta_factory], downstream False, mais adoption_keeps (2). As linhas citadas (l.20-25) passaram para l.137 (hub) e l.151 (standalone)."
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml na main"
+      locator: "roles.yaml l.137 (hub) e l.151 (standalone)"
+      method: "measurement: o YAML carregado e comparado chave a chave"
+      locality: "repo"
 edges:
   - from: E_BASE_IDENTICAL
     to: C_REFRAME_SUSTAINED
@@ -239,3 +256,6 @@ edges:
   - from: C_STD_MOAT_NOT_REVENUE
     to: C_REFRAME_SUSTAINED
     edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_BASE_IGUAL_WORK_TOOLS_SEPARAM
+    to: E_BASE_IDENTICAL
+    edge_type: SUPERSEDES

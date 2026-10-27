@@ -328,6 +328,23 @@ nodes:
       locator: "contabilidade da propria rodada: 26 fontes, 30 claims, 15 sobreviventes, 11 quedas, 0 nao-verificadas por falha de acesso"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
+  - id: E_REVERIFY_1027_PLUGINS_NASCEM_NA_PUBLICACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_ONION_MEDIDO_LOCAL_0904 na origin/main de 2026-10-27 (8857bc9b8): DRIFTED"
+    source_tier: 10
+    source_kind: primary
+    label: "DRIFTED (2026-10-27): o core não carrega mais plugins/ (F4 das portas). O marketplace.json tem 6 entradas, todas apontando o repo público onion-plugins, e o plugin-namespace-check no core dá 0 porque não há bundle a julgar."
+    narrative: "Comandos: ls -d plugins → \"No such file or directory\"; python3 sobre .claude-plugin/marketplace.json → 6 plugins (onion-compliance, onion-design, onion-engineering, onion-meta, onion-product, onion), cada um com source git-subdir em github.com/marciocar/onion-plugins; bash .claude/validation/plugin-namespace-check.sh . --summary → rc=0, \"plugin-namespace: 0 — limpo\". NÃO MEDIDO: os 531 refs no bundle montado; medir exige um ensaio de ops/publish-door.sh onion-plugins (clone e materialização), fora do escopo desta re-medição. O retrato de 8 plugins e 531 refs vale como estado de 2026-09-04."
+    provenance:
+      source: ".claude-plugin/marketplace.json; bash .claude/validation/plugin-namespace-check.sh . --summary"
+      locator: "marketplace.json plugins[]; saída do namespace-check"
+      method: "measurement: ls, leitura do JSON do marketplace e o check rodado no core"
+      locality: "repo"
 edges:
   - from: E_NAMESPACE_SEMPRE_QUALIFICADO
     to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
@@ -387,5 +404,8 @@ edges:
     to: E_GRANULARIDADE_VERTICAL_COESA
     edge_type: SUPPORTS
   - from: E_NAMESPACE_SEMPRE_QUALIFICADO
+    to: E_ONION_MEDIDO_LOCAL_0904
+    edge_type: CONSTRAINS
+  - from: E_REVERIFY_1027_PLUGINS_NASCEM_NA_PUBLICACAO
     to: E_ONION_MEDIDO_LOCAL_0904
     edge_type: CONSTRAINS

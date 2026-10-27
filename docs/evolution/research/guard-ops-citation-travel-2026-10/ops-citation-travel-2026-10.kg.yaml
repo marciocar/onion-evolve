@@ -147,6 +147,23 @@ nodes:
     confidence: 0.8
     trace: ".claude/validation/ops-citation-travel-check.sh"
     label: "TETO: lint-selftest.sh, fixtures/ e baselines ficam fora (a bancada executa o que cita e falha alto); árvore genérica em bloco cercado acusa; .yaml não tem isenção de arquivo; variável de raiz é lista fechada e o resto cala."
+  - id: E_REVERIFY_1027_NENHUM_PAPEL_LEVA_OPS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_DEFEITO_LENTE_DESCREVE_OPS_AO_ADOTANTE na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): nenhum dos 6 papéis do vendor-manifest.sh leva ops/ (0 em todos, rc 0), e os três sítios citam ops/pr-merge-verified.sh marcado (core-only)."
+    narrative: "Sonda: para cada papel em adopted source hub standalone plugins mini, bash .claude/utils/adopt/vendor-manifest.sh --role <papel> | grep -cE \"^ops(/|$)\". Observado: adopted 13 linhas ops=0; source 13 ops=0; hub 13 ops=0; standalone 111 ops=0; plugins 111 ops=0; mini 23 ops=0; e --kind door para source, standalone e plugins, ops=0. Deriva menor: o nó dizia 11 raízes para adopted, hub e source; hoje são 13 linhas. grep -n ops/pr-merge-verified em kg-grammar.md l.33, pretooluse-merge-gate.sh l.7, l.13, l.20, l.22 e onion-orchestration/SKILL.md l.274 → todas com \"(core-only)\"."
+    provenance:
+      source: "bash .claude/utils/adopt/vendor-manifest.sh --role <papel> (6 papéis); grep -n nos três sítios"
+      locator: "kg-grammar.md l.33; pretooluse-merge-gate.sh l.7-22; onion-orchestration/SKILL.md l.274"
+      method: "measurement: o manifesto rodado por papel e contado, e grep -n nos sítios"
+      locality: "repo"
 
 edges:
   - from: E_ELENXO_REPROVOU_E_FOI_CURADO
@@ -176,3 +193,6 @@ edges:
   - from: C_TETO_BANCADA_E_CORE_ONLY_FORA
     to: D_TRES_DECLARACOES_E_O_MARCADOR
     edge_type: CONSTRAINS
+  - from: E_REVERIFY_1027_NENHUM_PAPEL_LEVA_OPS
+    to: E_DEFEITO_LENTE_DESCREVE_OPS_AO_ADOTANTE
+    edge_type: SUPPORTS

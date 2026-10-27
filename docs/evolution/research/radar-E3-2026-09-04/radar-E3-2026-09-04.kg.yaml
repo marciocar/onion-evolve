@@ -261,6 +261,40 @@ nodes:
       locator: "SYNTHESIS.md l.36-37; corpo de 1ab1429e ('Nada de 2.1.260 foi observado — lacunas declaradas', 2026-09-04 00:58Z); .claude/sessions/model-switch.jsonl (gitignored, host) l.1 (09-02, sem campo ladder; l.2 é 09-04T17:27, posterior ao commit)"
       method: "testemunho: lacunas declaradas pela sessão 2026-09-04 no corpo de 1ab1429e e SYNTHESIS l.37; cláusula do ladder por leitura de .claude/sessions/model-switch.jsonl no host"
       locality: "repo"
+  - id: E_REVERIFY_1027_PERMISSOES_SEGUEM_ALLOW_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_R3_F11_REGRAS_DE_PERMISSAO na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): as 4 camadas de settings seguem só com allow (12, 97, 3, 24), zero deny e zero ask, e as correções de regra de permissão da 2.1.260 continuam sem morder o core."
+    narrative: "Comando: python3 lendo permissions.allow/deny/ask em .claude/settings.json (repo), settings.local.json do projeto (host, gitignorado), settings.json e settings.local.json do usuário (host). Observado: repo allow=12 deny=0 ask=0; projeto local allow=97; usuário allow=3, defaultMode=bypassPermissions; usuário local allow=24; deny=0 e ask=0 em todas. Deriva menor: o repo tinha 13 allow em 1ab1429e e tem 12; a camada do usuário que o nó citava como .bak é hoje o settings.json."
+    provenance:
+      source: ".claude/settings.json (repo) e as três camadas do host"
+      locator: "chave permissions de cada camada"
+      method: "measurement: as quatro camadas lidas como JSON e contadas"
+      locality: "host"
+  - id: E_REVERIFY_1027_SEM_SANDBOX_NAS_CAMADAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "re-medição de E_R3_F13_BASH_MODE_FORA_DO_SANDBOX na origin/main de 2026-10-27 (8857bc9b8): CONFIRMED"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMED (2026-10-27): nenhuma das 4 camadas de settings tem a chave sandbox; o escape do bash-mode segue sem morder o core."
+    narrative: "Comando: o mesmo leitor das quatro camadas, conferindo \"sandbox\" in <json>. Observado: sandbox=False no repo, no local do projeto, no settings.json do usuário e no local do usuário."
+    provenance:
+      source: ".claude/settings.json (repo) e as três camadas do host"
+      locator: "chave sandbox de cada camada (ausente)"
+      method: "measurement: as quatro camadas lidas como JSON"
+      locality: "host"
 edges:
   - from: E_R3_F1_REVERT_DENY_READ_BASH
     to: Q_E3_DELTA_2_1_260
@@ -303,4 +337,10 @@ edges:
     edge_type: SUPPORTS
   - from: E_LACUNAS_E3_0904
     to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_PERMISSOES_SEGUEM_ALLOW_ONLY
+    to: E_R3_F11_REGRAS_DE_PERMISSAO
+    edge_type: SUPPORTS
+  - from: E_REVERIFY_1027_SEM_SANDBOX_NAS_CAMADAS
+    to: E_R3_F13_BASH_MODE_FORA_DO_SANDBOX
     edge_type: SUPPORTS
