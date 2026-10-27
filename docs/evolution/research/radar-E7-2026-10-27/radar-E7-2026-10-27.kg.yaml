@@ -20,7 +20,8 @@ meta:
                                # fim de todo job novo de fine-tuning self-serve na OpenAI.
   x_supersedes_none: "1ª rodada do eixo E7-treino-inferencia (aberto em 2026-10-26 por D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026, never_run em docs/onion/radar-baselines.yaml): não há rodada anterior do eixo a superar. O nó do corpus sobre o mesmo fato (E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026) é SUSTENTADO, não superado."
   # kg-backlog-guard: on
-  # ═══ TETO: 57 NÓS ═══  (55 do escritor do run + 2 do fechamento: o selo da baseline e a passada adversarial do PR)
+  # ═══ TETO: 65 NÓS ═══  (55 do escritor do run + 2 do fechamento: o selo da baseline e a passada adversarial do PR
+  #   + 8 termos x_term dos códigos de produto e unidade que as fontes trazem: H100, B200, BF16, CO2, ML4, K2, K3, V3)
   #   Rodada de primárias EXECUTADA em 2026-10-27 (decisão do maestro: só primárias), 10 chaves de fonte, 0
   #   inalcançáveis: 1 question raiz + 30 evidências ancoradas + 15 objeções sobreviventes do Elenxo + 1 contabilidade
   #   (E_LACUNAS) + 7 superações (C_SUPERACAO_20261027_*) + 1 question de fechamento. 8 claims rejeitadas na
@@ -1093,6 +1094,182 @@ nodes:
       method: "medição: leitura do arquivo depois da edição e saída do lint-artifacts.sh sem o aviso de eixo nunca rodado"
       locality: "repo"
 
+  - id: T_E7_KIMI_K2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "K2 nesta rodada é Kimi K2: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "Kimi K2"
+      notation: "K2"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "Kimi K2, família de modelos de pesos abertos da Moonshot AI; aparece nas tabelas de preço da Together (K2.6) e da Fireworks (exemplo da faixa acima de 300B)."
+
+  - id: T_E7_KIMI_K3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "K3 nesta rodada é Kimi K3: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "Kimi K3"
+      notation: "K3"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "Kimi K3, modelo de pesos abertos da Moonshot AI; aparece na faixa alta de inferência da Together."
+
+  - id: T_E7_DEEPSEEK_V3
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "V3 nesta rodada é DeepSeek V3: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "DeepSeek V3"
+      notation: "V3"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "DeepSeek V3, modelo de pesos abertos da DeepSeek; exemplo da faixa acima de 300B na tabela de ajuste da Fireworks."
+
+  - id: T_E7_BF16
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "BF16 nesta rodada é bfloat16: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "bfloat16"
+      notation: "BF16"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "bfloat16, formato numérico de 16 bits em que a NVIDIA publica os pesos e mede os benchmarks do Nemotron 3.5 Bolt."
+
+  - id: T_E7_ML4
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "ML4 nesta rodada é Mistral Large 4: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "Mistral Large 4"
+      notation: "ML4"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "Mistral Large 4, modelo de 1 trilhão de parâmetros com 52 bilhões ativos anunciado pela Mistral em 2026-10-06; ML4 é a abreviação que a própria página do anúncio usa."
+
+  - id: T_E7_H100
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "H100 nesta rodada é GPU NVIDIA H100: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "GPU NVIDIA H100"
+      notation: "H100"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "GPU NVIDIA H100, a unidade de horas de GPU com que o paper arXiv 2602.20164 mede o custo da destilação (622 horas) e do treino de base (1,2 milhão de horas)."
+
+  - id: T_E7_CO2
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "CO2 nesta rodada é dióxido de carbono: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "dióxido de carbono"
+      notation: "CO2"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "Dióxido de carbono, a unidade das emissões que o paper arXiv 2602.20164 estima para o treino de base e para a destilação."
+
+  - id: T_E7_B200
+    node_type: entity
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "as menções do código no label e no narrative deste grafo, lidas no lint de nomes da kg-ssot (ops/kg-gate-ci.sh) de 2026-10-27"
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_vocab.py lint, rodado por ops/kg-gate-ci.sh, e as fontes citadas nos nós deste grafo"
+      locator: "as menções do código no label e no narrative dos nós deste grafo"
+      method: "medição: o lint rodado no commit e cada menção lida no nó dela"
+      locality: "repo"
+    label: "B200 nesta rodada é GPU NVIDIA B200: nome de produto ou unidade que vem das fontes, não código da casa."
+    x_term:
+      pref: "GPU NVIDIA B200"
+      notation: "B200"
+      scheme: mercado-ia
+      lang: pt-BR
+      definition: "GPU NVIDIA B200, cuja hora a Together oferece em promoção até 2026-12-14 na página de preço."
+
 edges:
   - from: E_OPENAI_FT_CLOSED_NEW_ORGS_20260507
     to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
@@ -1282,4 +1459,28 @@ edges:
     edge_type: SUPPORTS
   - from: E_E7_PR_PASS_60_DAYS_VERBATIM_1027
     to: E_E7_BASELINE_SEALED_1027
+    edge_type: TRACES_TO
+  - from: T_E7_KIMI_K2
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: T_E7_KIMI_K3
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: T_E7_DEEPSEEK_V3
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: T_E7_BF16
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: T_E7_ML4
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: T_E7_H100
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: T_E7_CO2
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: T_E7_B200
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
     edge_type: TRACES_TO
