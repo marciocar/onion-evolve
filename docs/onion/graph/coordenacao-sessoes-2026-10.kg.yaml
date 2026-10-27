@@ -380,9 +380,9 @@ nodes:
     impact: 3
     confidence: 0.5
     verified_at: "2026-10-27"
-    verified_against: "testemunho da sessão principal do core em 2026-10-27: ops/migrate-python-service.sh <serviço> verify com rc 0 no runtime 3.15.2 em /opt (raiz fechada) e nos 3 serviços (granaai, writer e chat-runner)"
+    verified_against: "testemunho da sessão principal do core em 2026-10-27: ops/migrate-python-service.sh <serviço> verify com rc 0 no runtime 3.15.2 instalado no diretório de software opcional da VPS (raiz fechada) e nos 3 serviços (granaai, writer e chat-runner)"
     label: "A troca para o Python 3.15 nos serviços, depois do deploy do escritor por MCP."
-    narrative: "Espera o deploy do escritor e o core em Python 3.15 com piso 3.12. Fechado em 2026-10-27. granaai: venv por cópia, 0 hardlinks, selftest 34 e paridade de 431 fixtures. writer: selftest 65, paridade de 431 e backup pre-py3.15.2. chat-runner: o onion-bridge#92 entrou às 22:03Z, depois vieram update-bridge.sh e chat-runner.sh install --apply, com verify n_fail=0 e backup das units em /var/backups/onion-chat-runner/20261027-221426. O cache do uv ficou com 0 arquivos de outro dono. Limite declarado: falta o probe autenticado dos dois MCPs."
+    narrative: "Espera o deploy do escritor e o core em Python 3.15 com piso 3.12. Fechado em 2026-10-27. granaai: venv por cópia, 0 hardlinks, selftest 34 e paridade de 431 fixtures. writer: selftest 65, paridade de 431 e backup pre-py3.15.2. chat-runner: o onion-bridge#92 entrou às 22:03Z, depois vieram update-bridge.sh e chat-runner.sh install --apply, com verify n_fail=0 e backup das units no diretório de backups do chat-runner (carimbo 20261027-221426). O cache do uv ficou com 0 arquivos de outro dono. Limite declarado: falta o probe autenticado dos dois MCPs."
   - id: Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA
     node_type: question
     layer: audit
