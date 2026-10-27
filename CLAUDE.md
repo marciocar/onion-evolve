@@ -26,6 +26,9 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   Code para tirar vantagem da sua estrutura e maquinaria, **mas mantendo independência sempre que
   isso for mais vantajoso e o acoplamento não for necessidade***. Acople só quando a capacidade
   ganha não existe fora — nunca por conveniência nem por simetria.
+  **Sem dependência de serviço externo** (2026-10-27): serviço de terceiro (Gamma etc.) só como
+  ponte opcional com alternativa local nomeada. `D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027`,
+  [KB](docs/knowledge-base/concepts/no-external-service-dependency.md).
 - **CORE ≠ FAMÍLIA** — estas linhas descrevem **este repo** (o core). Existe uma **família
   multi-IDE pública**, e ela tem **três regimes**, não um:
   - **CONGELADOS** (`onion`, `onion-cursor`, `onion-antigravity`, `onion-copilot`,

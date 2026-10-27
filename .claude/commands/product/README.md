@@ -60,7 +60,7 @@ flowchart TD
 **Quando usar**: Análise de requisitos, tasks problemáticas
 
 ### 4. **`/product/presentation <description>`** 🎨
-**Objetivo**: Criar apresentações profissionais via Gamma.app
+**Objetivo**: Criar apresentações profissionais via Gamma.app — **ponte opcional** (serviço externo, pago); caminho local: `/design:deck`
 
 **O que faz**:
 - ✅ Analisa tipo de apresentação (tema, task, doc, métricas)

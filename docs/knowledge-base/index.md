@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **107 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **54** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **13** em `decisions/` (+ 1 README de categoria)
+- **108 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **55** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **13** em `decisions/` (+ 1 README de categoria)
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 54 — Conceitos fundamentais
+├── concepts/            # 55 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 7  — Ferramentas e recursos
 ├── platforms/           # 5  — Plataformas e tecnologias
@@ -34,7 +34,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (54)
+## 🧠 Conceitos Fundamentais (55)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Onboarding do adotante](concepts/adopter-onboarding.md) — a fonte canônica da orientação de adoção (vendorizada); guias por adotante apontam para cá, não duplicam
@@ -88,6 +88,7 @@ docs/knowledge-base/
 - [Transfer Heuristic (Aristóteles)](concepts/transfer-heuristic-aristotle.md) — **CANDIDATO** — régua de transferência *igual → transfere / diferente → desenha* (lente de Aristóteles); invocada por `/meta:adopt`
 - [Transformer Architecture](concepts/transformer-architecture.md) — Transformer: a arquitetura por trás do reasoner do Onion
 - [Verify-External-for-Current](concepts/verify-external-for-current.md) — forcing function: claim sobre atual/emergente/popular (versão·device·player·framework·tendência) ⇒ verify externo (web) obrigatório; WebFetch é budget separado do WebSearch; sem verificar → declarar "não verificado". O `verify(vivo)` do SSOT-as-runtime aplicado ao mundo externo
+- [Sem dependência de serviço externo](concepts/no-external-service-dependency.md) — decisão do maestro (2026-10-27): o núcleo roda local e aberto; serviço externo, sobretudo pago, só como ponte opcional declarada com alternativa local nomeada. Critério: funciona sem rede para terceiro, ou nomeia o caminho local. Caso aplicado: o Gamma
 - [Base atual, sempre](concepts/keep-current-doctrine.md) — ordem eterna do maestro (2026-10-16): construir sobre a origin/main recém-buscada e as versões atuais; defasagem é subida ou nomeada; faltou pacote ⇒ pedir autorização e instalar. Cobrada pelo hook `session-currency-check.sh` (medidor `currency-census.sh`)
 - [Worklog Protocol](concepts/worklog-protocol.md) — sessões retomáveis com eficácia de IA (STATE.md, leitura Tier 0→3, checkpoint)
 

@@ -6,7 +6,7 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 
 ## 📊 Resumo
 
-> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Sistema Onion: **117 comandos** em 10 categorias, **51 agentes** em 9 categorias, **13 skills**, **113 knowledge bases**. Categorias de agentes: `development/`, `product/`, `compliance/`, `git/`, `meta/`, `testing/`, `review/`, `research/`, `deployment/`.
+> **Contagens canônicas por categoria e total:** [docs/onion/inventory.md](inventory.md) — **SSOT gerada do filesystem** (`/meta:inventory`), validada no CI. Sistema Onion: **117 comandos** em 10 categorias, **51 agentes** em 9 categorias, **13 skills**, **114 knowledge bases**. Categorias de agentes: `development/`, `product/`, `compliance/`, `git/`, `meta/`, `testing/`, `review/`, `research/`, `deployment/`.
 
 ## 📋 Índice de Agentes
 
@@ -52,7 +52,7 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 ```
 
 **Capacidades**:
-- Conhecimento completo: 117 comandos, 51 agentes, 13 skills, 113 knowledge bases
+- Conhecimento completo: 117 comandos, 51 agentes, 13 skills, 114 knowledge bases
 - Análise inteligente de contexto e recomendação de abordagem
 - Orquestração de workflows end-to-end
 - Delegação para agentes especializados
@@ -83,7 +83,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 | `claude-code-specialist` | Sonnet | Otimização, configuração e troubleshooting do Claude Code |
 | `runflow-specialist` | Sonnet | Runflow SDK: agentes IA, workflows e integrações |
 | `zen-engine-specialist` | Sonnet | ZEN Engine / JDM: regras de negócio, Decision Tables |
-| `gamma-api-specialist` | Sonnet | Gamma.App API: apresentações e conteúdo com IA |
+| `gamma-api-specialist` | Sonnet | Ponte opcional Gamma (externo, pago): apresentações com IA; local: `/design:deck` |
 | `whisper-specialist` | Sonnet | Transcrição de áudio com Whisper (OpenAI) |
 | `linux-security-specialist` | Sonnet | Hardening, auditoria e resposta a incidentes Linux |
 | `task-specialist` | Sonnet | Decomposição hierárquica de tasks (agnóstico de provider) _(destaque abaixo)_ |

@@ -457,7 +457,7 @@ Storytelling para QBR:
 
 ### **Quando NÃO USAR Este Agente**
 ```yaml
-❌ Geração técnica de apresentações (use @gamma-api-specialist)
+❌ Geração técnica de apresentações (use @gamma-api-specialist, ponte opcional e paga; local: `/design:deck`)
 ❌ Estratégia de produto pura (use @product-agent)
 ❌ Pesquisa de dados/mercado (use @research-agent)
 ❌ Documentação técnica/código (use agentes de development)

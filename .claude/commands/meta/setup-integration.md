@@ -44,7 +44,7 @@ SENÃO:
   - **asana** - Asana (API-first; MCP opcional) para gestão de tarefas
   - **linear** - Linear (API-first) para gestão de tarefas
   - **zoho** - Zoho Projects (API V3; OAuth Self client)
-  - **gamma** - Gamma.App API para apresentações
+  - **gamma** - Gamma.App API para apresentações (ponte opcional, externa e paga; local: `/design:deck`)
   - **postgres** - PostgreSQL para banco de dados
 
 ### Passo 2: Verificar Estado Atual

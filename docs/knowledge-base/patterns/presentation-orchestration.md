@@ -4,6 +4,10 @@
 > Conhecimento de orquestração **extraído do agente `@presentation-orchestrator`** na rodada
 > shed-ceremony de 2026-07-04. O agente mantém o grafo executável (7 fases) e cita esta KB para
 > contratos de delegação, templates de prompt/config, matriz de erros e casos de uso.
+>
+> 🔌 **A geração pelo Gamma é ponte opcional** (serviço externo, pago; doutrina
+> [sem dependência de serviço externo](../concepts/no-external-service-dependency.md), 2026-10-27).
+> O caminho local é o `/design:deck` (HTML offline) e pptx/docx em Python (receita provada na curadoria).
 
 ---
 
