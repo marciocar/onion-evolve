@@ -321,8 +321,8 @@ if [ "${1:-}" = "--selftest" ]; then
   CROOT="$(git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || true)"
   if [ -n "${CROOT}" ] && [ -f "${CROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ] \
      && [ -f "${CROOT}/.claude/validation/fixtures/meeting-graph/transcript-ok.txt" ]; then
-    _case "contrato reprova o method fora da forma" CONTRATO "s=s.replace('method: \"leitura: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}"
-    _case "contrato julga também o caminho relativo" CONTRATO "s=s.replace('method: \"leitura: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}" rel
+    _case "contrato reprova o method fora da forma" CONTRATO "s=s.replace('method: \"reading: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}"
+    _case "contrato julga também o caminho relativo" CONTRATO "s=s.replace('method: \"reading: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}" rel
   else echo "⊘ contrato reprova o method fora da forma (vendor/kg-ssot ausente: não julgado aqui)"; fi
   if [ -n "${ONLY}" ] && [ "$((P + F))" -eq 0 ]; then echo "✗ caso inexistente: ${ONLY}"; F=1; fi
   echo "meeting-graph selftest: ${P} passaram, ${F} falharam"

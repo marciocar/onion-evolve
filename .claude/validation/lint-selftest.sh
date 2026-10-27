@@ -5507,6 +5507,17 @@ run_kg_radar_contract_selftests() {
     record_pass "kg-radar-contract: (a) PROD com provenance.method testemunho → MISPLANED (integrity.testimony-in-prod)"
   else record_fail "kg-radar-contract: (a) warn-testimony-method-in-prod" "rc=${rc} out=${out}"; fi
 
+  # (a2) WARN pela forma CANÔNICA em inglês (contrato v4.16, kg-ssot 4.32.0): `method: "testimony: …"` em PROD dá
+  #      o MESMO MISPLANED que `testemunho:`, nomeando a classe lida. Caso do vendor; sem ele (vendor < 4.32.0), ⊘.
+  if [ -f "${cx}/warn-testimony-english-method-in-prod.kg.yaml" ]; then
+    rc=0; out=$(LC_ALL=C bash "${radar}" "${cx}/warn-testimony-english-method-in-prod.kg.yaml" --freshness 2>&1) || rc=$?
+    if [ "${rc}" -eq 0 ] && [ "$(grep -c 'MISPLANED: EV_A (plane:PROD mas provenance.method: testimony ' <<< "${out}")" -eq 1 ]; then
+      record_pass "kg-radar-contract: (a2) PROD com provenance.method testimony (forma canônica v4.16) → o mesmo MISPLANED do alias"
+    else record_fail "kg-radar-contract: (a2) warn-testimony-english-method-in-prod" "rc=${rc} out=${out}"; fi
+  else
+    record_skip "kg-radar-contract: (a2) vendor sem warn-testimony-english-method-in-prod (contrato < v4.16) — caso pulado"
+  fi
+
   # (b) o caso pela CLASSE segue avisando, e UMA vez só (os dois marcadores não somam dois avisos).
   rc=0; out=$(LC_ALL=C bash "${radar}" "${cx}/warn-testimony-class-in-prod.kg.yaml" --freshness 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] && [ "$(grep -c 'MISPLANED: EV_A' <<< "${out}")" -eq 1 ]; then
@@ -5533,7 +5544,8 @@ run_kg_radar_contract_selftests() {
 
   # (f) as quatro fixtures são grafos íntegros — veredito sobre grafo quebrado seria vacuidade.
   local f bad=""
-  for f in warn-testimony-method-in-prod warn-testimony-class-in-prod valid-testimony-in-dev valid-decision-with-provenance warn-untraced-decision; do
+  for f in warn-testimony-method-in-prod warn-testimony-english-method-in-prod warn-testimony-class-in-prod valid-testimony-in-dev valid-decision-with-provenance warn-untraced-decision; do
+    [ -f "${cx}/${f}.kg.yaml" ] || continue
     rc=0; LC_ALL=C bash "${radar}" "${cx}/${f}.kg.yaml" --integrity --schema >/dev/null 2>&1 || rc=$?
     [ "${rc}" -eq 0 ] || bad="${bad} ${f}(rc=${rc})"
   done
@@ -5560,13 +5572,27 @@ run_kg_radar_contract_selftests() {
 
   # (h) (MUT) cura 1 desligada: o radar volta a ler só o evidence_class → (a) tem de reprovar.
   cp "${radar}" "${mut}/mut-tm.sh"; _lib_beside "${mut}"
-  sed -i 's|provMethod\[id\] ~ /^testemunho:/|provMethod[id] ~ /^MUTANTE_NUNCA:/|' "${mut}/mut-tm.sh"
+  sed -i 's#provMethod\[id\] ~ /^(testimony|testemunho):/#provMethod[id] ~ /^MUTANTE_NUNCA:/#' "${mut}/mut-tm.sh"
   if grep -q 'MUTANTE_NUNCA' "${mut}/mut-tm.sh"; then
     out="$(LC_ALL=C bash "${mut}/mut-tm.sh" "${cx}/warn-testimony-method-in-prod.kg.yaml" --freshness 2>&1 || true)"
     if ! grep -q 'MISPLANED: EV_A' <<< "${out}"; then
       record_pass "kg-radar-contract: (h) (MUT) sem a leitura do method, o caso (a) cala — o teste morde"
     else record_fail "kg-radar-contract: (h) (MUT)" "o mutante ainda avisa; out=${out}"; fi
   else record_fail "kg-radar-contract: (h) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+
+  # (h2) (MUT) sem a forma canônica: o radar volta a reconhecer só `testemunho:` → (a2) tem de calar, e (a) segue
+  #      avisando no mesmo mutante (a mutação tira só o inglês, não a guarda inteira).
+  if [ -f "${cx}/warn-testimony-english-method-in-prod.kg.yaml" ]; then
+    cp "${radar}" "${mut}/mut-te.sh"; _lib_beside "${mut}"
+    sed -i 's#provMethod\[id\] ~ /^(testimony|testemunho):/#provMethod[id] ~ /^(testemunho):/#' "${mut}/mut-te.sh"
+    if grep -q 'provMethod\[id\] ~ /^(testemunho):/' "${mut}/mut-te.sh"; then
+      out="$(LC_ALL=C bash "${mut}/mut-te.sh" "${cx}/warn-testimony-english-method-in-prod.kg.yaml" --freshness 2>&1 || true)"
+      local out_pt; out_pt="$(LC_ALL=C bash "${mut}/mut-te.sh" "${cx}/warn-testimony-method-in-prod.kg.yaml" --freshness 2>&1 || true)"
+      if ! grep -q 'MISPLANED: EV_A' <<< "${out}" && grep -q 'MISPLANED: EV_A (plane:PROD mas provenance.method: testemunho' <<< "${out_pt}"; then
+        record_pass "kg-radar-contract: (h2) (MUT) sem testimony na classe, o caso (a2) cala e o (a) segue — o teste morde"
+      else record_fail "kg-radar-contract: (h2) (MUT)" "esperava (a2) calado e (a) avisando; en=${out} pt=${out_pt}"; fi
+    else record_fail "kg-radar-contract: (h2) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  fi
 
   # (i) (MUT) cura 2 desligada: provenance deixa de valer como origem → (d) tem de reprovar.
   cp "${radar}" "${mut}/mut-dp.sh"
@@ -21238,6 +21264,32 @@ run_seed_adoption_graph_selftests() {
   if grep -q 'decision-done-em-DEV: 1 decisão(ões)' <<< "${_ddo}" && grep -q '(DX)' <<< "${_ddo}" && ! grep -q 'DM' <<< "$(grep 'decision-done' <<< "${_ddo}")" && grep -q '1 decisão(ões) selada(s) pelo maestro em DEV' <<< "${_ddo}" && [ "${_ddrc}" = 0 ]; then
     record_pass "seed-graph: (r2) decisão selada pelo maestro em DEV é aceita; outra decisão done em DEV segue avisando"
   else record_fail "seed-graph: (r2) selo do maestro em DEV" "rc=${_ddrc} saída: $(grep -E 'decision-done|selada' <<< "${_ddo}" | tr '\n' ' ')"; fi
+  # (r3) o MESMO selo escrito na forma canônica do contrato v4.16 (`testimony: decisão do maestro…`, kg-ssot 4.32.0)
+  #      é aceito igual; o selo do (r2), no alias `testemunho:`, segue valendo (mesma fixture, só a classe muda).
+  sed -i 's|method: "testemunho: decisão do maestro|method: "testimony: decisão do maestro|' "${_dd}/dd2.kg.yaml"
+  _ddrc=0; _ddo="$(bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${_dd}/dd2.kg.yaml" --reconcile 2>&1)" || _ddrc=$?
+  if grep -q 'testimony: decisão do maestro' "${_dd}/dd2.kg.yaml" && grep -q '1 decisão(ões) selada(s) pelo maestro em DEV' <<< "${_ddo}" \
+     && ! grep -q 'DM' <<< "$(grep 'decision-done' <<< "${_ddo}")" && [ "${_ddrc}" = 0 ]; then
+    record_pass "seed-graph: (r3) selo do maestro na forma canônica testimony é aceito como o alias testemunho"
+  else record_fail "seed-graph: (r3) selo do maestro em testimony" "rc=${_ddrc} saída: $(grep -E 'decision-done|selada' <<< "${_ddo}" | tr '\n' ' ')"; fi
+  # (r4) (MUT) um mutante por forma: a exceção sem `testimony` faz o selo canônico (r3) voltar ao aviso, e a exceção
+  #      sem `testemunho` faz o selo antigo (r2) voltar ao aviso. Cada forma tem a sua guarda viva, não uma só.
+  cp "${_dd}/dd2.kg.yaml" "${_dd}/en.kg.yaml"
+  sed 's|method: "testimony: decisão do maestro|method: "testemunho: decisão do maestro|' "${_dd}/en.kg.yaml" > "${_dd}/pt.kg.yaml"
+  local _mf _mg _mw _mo _mok=1 _mdet=""
+  for _mf in "testimony|testemunho#testemunho#en" "testimony|testemunho#testimony#pt"; do
+    IFS='#' read -r _mg _mw _mo <<< "${_mf}"
+    mkdir -p "${_dd}/m-${_mo}"; cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${_dd}/m-${_mo}/r.sh"; _lib_beside "${_dd}/m-${_mo}"
+    sed -i "s#(${_mg}): decisão do maestro#(${_mw}): decisão do maestro#" "${_dd}/m-${_mo}/r.sh"
+    if ! grep -q "(${_mw}): decisão do maestro" "${_dd}/m-${_mo}/r.sh"; then _mok=0; _mdet="${_mdet} ${_mo}:mutação-não-aplicada"; continue; fi
+    _ddo="$(bash "${_dd}/m-${_mo}/r.sh" "${_dd}/${_mo}.kg.yaml" --reconcile 2>&1 || true)"
+    if grep -q 'selada(s) pelo maestro em DEV' <<< "${_ddo}" || ! grep -q '(DM' <<< "$(grep 'decision-done' <<< "${_ddo}")"; then
+      _mok=0; _mdet="${_mdet} ${_mo}:mutante-não-mordeu"
+    fi
+  done
+  if [ "${_mok}" = 1 ]; then
+    record_pass "seed-graph: (r4) (MUT) sem testimony a exceção perde o selo canônico, sem testemunho perde o selo antigo — os dois testes mordem"
+  else record_fail "seed-graph: (r4) (MUT) selo do maestro nas duas formas" "${_mdet}"; fi
   rm -rf "${_dd}"
 }
 
@@ -32892,7 +32944,7 @@ EOF_INC
   local blk; blk="$(awk '/- id: C_TASK_A/{f=1} f&&/- id: C_TASK_B/{f=0} f' "${sb}/${G}")"
   if [ "${rc}" = 0 ] && grep -q 'status: done' <<< "${blk}" && grep -q 'verified_at: "2026-10-03"' <<< "${blk}" \
      && grep -q 'locator: "https://github.com/acme/core/pull/7 · merge abcdef0123456789abcdef0123456789abcdef01 · selftest-gate run 111, lint-onion-artifacts run 222"' <<< "${blk}" \
-     && grep -q 'method: "leitura: drive-automate.sh stamp' <<< "${blk}" && bash "${sb}/.claude/validation/kg-radar.sh" "${sb}/${G}" --integrity --schema >/dev/null 2>&1; then
+     && grep -q 'method: "reading: drive-automate.sh stamp' <<< "${blk}" && bash "${sb}/.claude/validation/kg-radar.sh" "${sb}/${G}" --integrity --schema >/dev/null 2>&1; then
     record_pass "drive-automate: (o2a) o carimbo cita o que LEU: URL do PR, SHA do merge, run de CI de cada check exigido; verified_at = mergedAt; radar exit 0"
   else record_fail "drive-automate: (o2a) carimbo" "rc=${rc}: ${out} :: ${blk}"; fi
   rm -rf "${sb}"
@@ -44790,7 +44842,7 @@ GHP
 import sys, yaml
 n = [x for x in yaml.safe_load(open(sys.argv[1]))['nodes'] if x['id'] == 'D_VELHO'][0]
 ok = (n['status'] == 'done' and n['plane'] == 'DEV' and n['verified_at'] == '2026-10-12'
-      and n['provenance']['method'] == 'testemunho: decisão do maestro por pergunta com opções, 2026-10-12'
+      and n['provenance']['method'] == 'testimony: decisão do maestro por pergunta com opções, 2026-10-12'
       and n['provenance']['locality'] == 'pessoa'
       and '«caminho um»' in n['narrative'] and '«caminho dois» · «pesquisar antes»' in n['narrative'])
 sys.exit(0 if ok else 1)
@@ -44826,7 +44878,7 @@ d = yaml.safe_load(open(sys.argv[1]))
 n = [x for x in d['nodes'] if x['id'] == 'D_NOVA_DA_SESSAO']
 e = [x for x in d['edges'] if x['from'] == 'D_NOVA_DA_SESSAO' and x['to'] == 'Q_CITADO']
 ok = (len(n) == 1 and len(e) == 1 and n[0]['status'] == 'done' and n[0]['plane'] == 'DEV'
-      and 'resposta livre do maestro' in n[0]['narrative'] and n[0]['provenance']['method'].startswith('testemunho: decisão do maestro'))
+      and 'resposta livre do maestro' in n[0]['narrative'] and n[0]['provenance']['method'].startswith('testimony: decisão do maestro'))
 sys.exit(0 if ok else 1)
 DEC_PY
   then record_pass "decide: (s5) --new cria a decisão ligada à origem, com a marca de resposta livre, radar 0"
@@ -45366,7 +45418,10 @@ _family run_mcp_onion_kg_selftests
 # compositor (a âncora sempre precede o alias); a reconferência do verdict.schema.json pelo writer (o _verdict_ok do
 # armazém já recusa o fora-do-schema como not_judged); e o REPROVADO forçado quando o safe_load não confere o meta.id.
 # O contrato-stub-aprova é o controle de polaridade do code root falso e não leva mutante; o commit-nao-cai-no-repo-pai
-# é a defesa dupla do git declarada acima. Os outros 60 casos têm ao menos um mutante (64 no total).
+# é a defesa dupla do git declarada acima. Os outros 63 casos têm ao menos um mutante (67 no total). Os três do
+# vocabulário da classe de provenance.method (contrato v4.16, kg-ssot 4.32.0): a ajuda sem as canônicas, o veredito
+# sem os avisos SHOULD (a forma sem classe deixa de avisar) e o texto com as classes em inglês desfiguradas antes do
+# contrato (o escritor que só conhece o português: as cinco em inglês passam a avisar).
 run_mcp_onion_kg_writer_selftests() {
   local h="${REPO_ROOT}/ops/mcp-onion-kg-writer/selftest.py" srv="${REPO_ROOT}/ops/mcp-onion-kg-writer/server.py"
   local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
@@ -45375,7 +45430,7 @@ run_mcp_onion_kg_writer_selftests() {
   fi
   command -v python3 >/dev/null 2>&1 && python3 -I -c 'import yaml, jsonschema' >/dev/null 2>&1 \
     || { record_skip "mcp-onion-kg-writer: python3/PyYAML/jsonschema ausentes (gate do contrato não exercido)"; return; }
-  local want_total=62 o rc
+  local want_total=65 o rc
   if o="$(LC_ALL=C python3 -I -B "${h}" --code-root "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
     record_pass "mcp-onion-kg-writer: (a) servidor real por HTTP — ${want_total} casos (401, e-mail, área, GitStore, aresta externa, delete, aninhamento, veredito)"
@@ -45427,7 +45482,10 @@ run_mcp_onion_kg_writer_selftests() {
     env = {'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, 'usuario': email,$(printf '\x1f')    env = {'tool': nome, 'usuario': email,  # ONION_MUTANTE$(printf '\x1f')envelope-nao-confiavel
            'served_commit': served, 'store_commit': STORE_COMMIT, 'code_source': CODE_SOURCE, 'data': data}$(printf '\x1f')           'served_commit': None, 'store_commit': STORE_COMMIT, 'code_source': CODE_SOURCE, 'data': data}  # ONION_MUTANTE$(printf '\x1f')served-commit-do-gate
             if n < 0 or n > MAX_BODY:$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')content-length-negativo-400
-        '      method: "leitura: secao 2 do documento"\n'$(printf '\x1f')        '      x_m: "leitura"\n'  # ONION_MUTANTE$(printf '\x1f')schema-help-exemplo-aprova
+        '      method: "reading: secao 2 do documento"\n'$(printf '\x1f')        '      x_m: "reading"\n'  # ONION_MUTANTE$(printf '\x1f')schema-help-exemplo-aprova
+        'provenance.method fora da forma "<classe>: <detalhe>" (contrato v4.16: classes canonicas em ingles measurement, '$(printf '\x1f')        'provenance.method fora da forma "<classe>: <detalhe>" (classes: medicao, '  # ONION_MUTANTE$(printf '\x1f')schema-help-classes-canonicas-e-aliases
+                    'avisos_should': _dedup([o for o in r['occurrences'] if o['level'] == 'SHOULD']),$(printf '\x1f')                    'avisos_should': [],  # ONION_MUTANTE$(printf '\x1f')method-sem-classe-avisa
+        contrato = judge_in_area(adir, exists, graph_name(slug), text)$(printf '\x1f')        contrato = judge_in_area(adir, exists, graph_name(slug), re.sub(r'method: "(measurement|reading|judges|derived|testimony):', r'method: "\1_v4:', text))  # ONION_MUTANTE$(printf '\x1f')method-classe-ingles-e-alias-aprovam-sem-aviso
     'kg_my_get': (t_kg_my_get, 'Le um grafo da SUA area pelo slug (com o sha256 para o expected_sha256)', {'slug': _SLUG}, ['slug'], True, False),$(printf '\x1f')    # ONION_MUTANTE$(printf '\x1f')tools-list-6
     if doc.get('schema_version') != VERDICT_VERSION:  # o schema carregado pode ter mudado com o vendor$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-versao-desconhecida-recusa
         if (r['verdict'] == 'PASS') != (not r['summary']['MUST']):$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')contrato-incoerente-recusa

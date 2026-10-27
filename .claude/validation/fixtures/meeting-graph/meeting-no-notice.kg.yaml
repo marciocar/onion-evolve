@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
       locator: "#L1-L2"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
   - id: P_DIEGO
     node_type: entity
@@ -40,7 +40,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
       locator: "#L3"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
   - id: P_ELISA
     node_type: entity
@@ -58,7 +58,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
       locator: "#L4"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
   - id: D_CNPJ_ONCE
     node_type: decision
@@ -74,7 +74,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-no-notice.txt"
       locator: "#L4-L5"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
   - id: A_ADJUST_FORM
     node_type: claim

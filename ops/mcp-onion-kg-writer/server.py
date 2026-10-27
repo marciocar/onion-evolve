@@ -644,7 +644,10 @@ SCHEMA_HELP = {
     'avisos_que_nao_reprovam': [
         'datas sem aspas (escreva "2026-10-12")', 'label acima de 280 caracteres',
         'claim com verified_at e sem verified_against', 'decision sem trace, provenance ou aresta TRACES_TO',
-        'provenance.method fora da forma "<classe>: <detalhe>" (classes: medicao, leitura, juizes, derivado, testemunho)',
+        'provenance.method fora da forma "<classe>: <detalhe>" (contrato v4.16: classes canonicas em ingles measurement, '
+        'reading, judges, derived, testimony; os aliases medição, leitura, juízes, derivado, testemunho seguem aceitos sem aviso)',
+        'no PROD com provenance.method da classe testimony (ou o alias testemunho), ou evidence_class: testimony: '
+        'relato nao e artefato vivo, deixe em DEV (integrity.testimony-in-prod)',
     ],
     'boas_praticas': [
         'nao escreva caminho absoluto de maquina (/home/..., /tmp/..., ~/) em nenhum campo: use caminho relativo ou URL',
@@ -661,7 +664,7 @@ SCHEMA_HELP = {
         '    confidence: 0.8\n    verified_at: "2026-10-12"\n    verified_against: "leitura do documento citado"\n'
         '    label: "a resposta, em uma linha"\n    trace: "docs/exemplo.md"\n'
         '    provenance:\n      source: "docs/exemplo.md"\n      locator: "secao 2"\n'
-        '      method: "leitura: secao 2 do documento"\n'
+        '      method: "reading: secao 2 do documento"\n'
         'edges:\n  - from: C_RESPOSTA\n    to: Q_PERGUNTA\n    edge_type: SUPPORTS\n'),
     'fluxo': 'kg_schema_help -> escreva -> kg_validate (dry-run) -> corrija as linhas falhas -> kg_write com slug = meta.id',
 }

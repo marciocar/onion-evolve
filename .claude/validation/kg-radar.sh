@@ -44,7 +44,8 @@
 #                     ter olhado a FONTE; contradição interna, vale p/ TODOS os tipos; `commit`
 #                     de sentido-EXECUÇÃO — commit-sonda, commit barrado/recusado — não acusa), e
 #                     plane:PROD com base em relato (`evidence_class: testimony` ou
-#                     `provenance.method: testemunho: …` — contrato v4.1, SAC-96).
+#                     `provenance.method: testimony: …`, ou o alias `testemunho: …` —
+#                     contrato v4.1, SAC-96; forma canônica em inglês desde o v4.16).
 #                     Determinístico: compara duas datas / dois campos do arquivo, sem "agora"
 #                     (ADR onion-adr-kg-freshness-gate, proposta #2 (dogfood de campo)).
 #                     STALE-EXPIRED (2026-10-21) é a EXCEÇÃO declarada, e usa hoje: nó com
@@ -410,7 +411,7 @@ section == "nodes" && nid != "" {
   }
   # ── PROVENANCE (bloco ANINHADO, contrato v4.1 — SAC-96, 2026-10-09) ─────────────────────────────
   # O contrato lê dois campos de dentro do bloco que este radar ignorava: `provenance.method` da
-  # classe `testemunho:` em PROD alerta integrity.testimony-in-prod (aqui: MISPLANED), e a decision
+  # classe `testimony:` (ou o alias `testemunho:`, contrato v4.16) em PROD alerta integrity.testimony-in-prod (aqui: MISPLANED), e a decision
   # com `provenance` já tem origem (não alerta integrity.untraced-decision). Os dois avisos do radar
   # liam só `evidence_class` e `trace:`/TRACES_TO, e divergiam do contrato em ~256 nós e 9 decisões.
   # Leitura POSICIONAL, como a chave repetida acima: o bloco abre com `provenance:` SEM valor na
@@ -915,8 +916,9 @@ END {
       # EXCEÇÃO (2026-10-12, decisão do maestro): decisão selada pelo maestro (método "testemunho: decisão do
       # maestro…", o que o kg-decide-seal.sh grava) é conhecimento de ADOTAR, não claim verificada em produção — e
       # em PROD o contrato a acusaria de testimony-in-prod. Ela fica em DEV e não entra no aviso; PROD continua
-      # exigindo medição. Sinal de campo do adotante KG-SSOT, que achou a contradição em dogfood.
-      if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV" && pmethod[id] ~ /^["\x27]?testemunho: decisão do maestro/) { ndm++; continue }
+      # exigindo medição. Sinal de campo do adotante KG-SSOT, que achou a contradição em dogfood. Desde o
+      # contrato v4.16 a classe aceita também a forma canônica em inglês (`testimony: decisão do maestro…`).
+      if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV" && pmethod[id] ~ /^["\x27]?(testimony|testemunho): decisão do maestro/) { ndm++; continue }
       if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV") {
         ndd++
         if (ndd <= 5) ddids = ddids (ddids == "" ? "" : ", ") id
@@ -1193,8 +1195,13 @@ END {
       # (2026-10-09) o radar só via o `evidence_class`, e ~125 nós PROD com método de testemunho
       # passavam calados enquanto o contrato os acusava. `else`: um nó com os DOIS marcadores é UM
       # aviso, não dois.
-      else if (plane[id] == "PROD" && provMethod[id] ~ /^testemunho:/) {
-        print "  ⚠ MISPLANED: " id " (plane:PROD mas provenance.method: testemunho — relato não é artefato vivo; reclassifique para plane:DEV)"; fwarns++
+      # Contrato v4.16 (kg-ssot 4.32.0, 2026-10-27): a classe tem forma canônica em inglês, `testimony:`,
+      # e `testemunho:` segue como alias sem aviso; o validador casa `^(?:testimony|testemunho): ` e a
+      # regra vale para as duas. A mensagem nomeia a classe lida, e a matriz do dono do contrato
+      # (radar_rules.json) traduz as duas formas para integrity.testimony-in-prod.
+      else if (plane[id] == "PROD" && provMethod[id] ~ /^(testimony|testemunho):/) {
+        _tc = provMethod[id]; sub(/:.*/, "", _tc)
+        print "  ⚠ MISPLANED: " id " (plane:PROD mas provenance.method: " _tc " — relato não é artefato vivo; reclassifique para plane:DEV)"; fwarns++
       }
       # MISPLANED — CONTRADIÇÃO INTERNA ao próprio nó, e vale para TODOS os tipos.
       # `plane: PROD` afirma "cruzei com o ARTEFATO VIVO"; `verified_against: branch|commit`

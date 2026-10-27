@@ -23,7 +23,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
       locator: "#L1-L2"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
 
   - id: NOTICE_1
@@ -42,7 +42,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
       locator: "#L3"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
 
   - id: P_ANA_TESTE
@@ -61,7 +61,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
       locator: "#L3"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
 
   - id: P_BRUNO_EXEMPLO
@@ -80,7 +80,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
       locator: "#L4"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
 
   - id: P_CARLA_MODELO
@@ -99,7 +99,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
       locator: "#L5"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
 
   - id: D_RELATORIO_PDF_PLANILHA
@@ -116,7 +116,7 @@ nodes:
     provenance:
       source: ".claude/validation/fixtures/meeting-graph/transcript-ok.txt"
       locator: "#L6-L7"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
 
   - id: A_GERADOR_PLANILHA

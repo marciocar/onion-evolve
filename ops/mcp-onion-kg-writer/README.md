@@ -157,7 +157,12 @@ O Python precisa ter PyYAML e jsonschema (o do venv). Sem um dos dois o servidor
 
 ## Bancada
 
-`python3 -I -B ops/mcp-onion-kg-writer/selftest.py` sobe o servidor de verdade (62 casos). A família
+`python3 -I -B ops/mcp-onion-kg-writer/selftest.py` sobe o servidor de verdade (65 casos). A família
 `mcp_onion_kg_writer` do `lint-selftest.sh` trava a contagem e roda um mutante por caso, plantado por
 `ops/mutate-and-restore.sh` numa cópia do servidor, com `--until <caso>` (o harness para depois do caso
 que o mutante tem de reprovar).
+Desde a kg-ssot 4.32.0 (contrato v4.16), três casos conferem o vocabulário da classe de `provenance.method`:
+a ajuda (`kg_schema_help`) ensina as cinco classes canônicas em inglês (`measurement`, `reading`, `judges`,
+`derived`, `testimony`) e os cinco aliases em português (`medição`, `leitura`, `juízes`, `derivado`,
+`testemunho`), o gate aprova as duas formas sem aviso, e a forma sem acento (`medicao`), que a ajuda antiga
+ensinava, recebe o aviso de method. O julgamento da classe é do contrato vendorizado, não do servidor.

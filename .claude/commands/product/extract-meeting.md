@@ -216,7 +216,7 @@ nodes:
     provenance:
       source: "<x_meeting_source>"
       locator: "#L1-L2"
-      method: "leitura: trecho da transcrição da reunião"
+      method: "reading: trecho da transcrição da reunião"
       locality: "repo"
   - id: NOTICE_1                   # 1 por TENTATIVA de aviso (gravação, transcrição, uso dos dados)
     node_type: evidence
