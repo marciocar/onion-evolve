@@ -40840,6 +40840,40 @@ assert n["E_M_FORA"]["plane"]=="PROD"
      && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --verified-at 2026-10-09 --apply-judged "${cm}" "${gm}" >/dev/null 2>&1; then
     record_pass "kg-migrate-v3: (m) onda O4 dev-historia: PROD→DEV sem tocar status nem provenance (open inclusive); REPROVADO fica em PROD; manter-prod-medido fica em PROD com provenance medida e verified_at novo; manter sem medição recusado inteiro; nó fora da planilha intocado; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (m)" "onda O4 aplicou o reprovado, mexeu no status ou não é idempotente: rc=${rc} ${out} ${y}"; fi
+  # (m2) contrato v4.16 (kg-ssot 4.32.0): a planilha que escreve o method na forma canônica em inglês
+  #      (`measurement: …`) é LIDA como a do alias — manter-prod-medido fica em PROD com a provenance da planilha, e
+  #      `reading: …` segue recusado por não ser medição. (MUT) com só o prefixo em português aceito, o nó inglês
+  #      volta a ser recusado: o caso morde.
+  local gm2="${d}/docs/x/m2.kg.yaml" cm2="${d}/o4-m2.csv" _m2 _m2ok _m2mut
+  {
+    printf 'meta:\n  id: m2\n  schema_version: "1"\n  baseline: "2026-10-27"\nnodes:\n'
+    _kmv_o4 E_M2_EN PROD confirmed "sessão 2026-09-01"
+    _kmv_o4 E_M2_EN_RUIM PROD confirmed "sessão 2026-09-01"
+    printf 'edges:\n  - from: E_M2_EN\n    to: E_M2_EN_RUIM\n    edge_type: SUPPORTS\n'
+  } > "${gm2}"
+  {
+    printf 'id,grafo,regra,proposta_original,veredito,proposta_final,source_final,locator_final,method_final,locality_final,motivo,confianca\n'
+    printf 'E_M2_EN,docs/x/m2.kg.yaml,1,manter-prod-medido,APROVADO,manter-prod-medido,ops/a.sh,l.3,measurement: grep -n x ops/a.sh → l.3,repo,medido,0.85\n'
+    printf 'E_M2_EN_RUIM,docs/x/m2.kg.yaml,1,manter-prod-medido,APROVADO,manter-prod-medido,ops/a.sh,l.3,reading: ops/a.sh,repo,sem medição,0.85\n'
+  } > "${cm2}"
+  cp "${gm2}" "${gm2}.orig"
+  _m2="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --verified-at 2026-10-27 --apply-judged "${cm2}" "${gm2}" 2>&1)" || true
+  _m2ok=0
+  python3 -I -B -c '
+import sys,yaml
+n={x["id"]:x for x in yaml.safe_load(open(sys.argv[1]))["nodes"]}
+assert n["E_M2_EN"]["plane"]=="PROD" and n["E_M2_EN"]["verified_at"]=="2026-10-27"
+assert n["E_M2_EN"]["provenance"]["method"]=="measurement: grep -n x ops/a.sh → l.3"
+assert n["E_M2_EN_RUIM"]["provenance"]["method"]=="testemunho: relato da sessão"
+' "${gm2}" 2>/dev/null && grep -q 'RECUSADO.*E_M2_EN_RUIM \[regra 1\] (manter-prod-medido sem method medição)' <<< "${_m2}" \
+    && ! grep -q 'RECUSADO.*E_M2_EN \[' <<< "${_m2}" && _m2ok=1
+  cp "${gm2}.orig" "${gm2}"
+  mkdir -p "${d}/mut-m2"; cp "${tool}" "${d}/mut-m2/kg-migrate-v3.py"; cp "$(dirname "${tool}")/machine_path.py" "${d}/mut-m2/"
+  sed -i 's|^MEASURED_PREFIXES = ("medição: ", "measurement: ")|MEASURED_PREFIXES = ("medição: ",)|' "${d}/mut-m2/kg-migrate-v3.py"
+  _m2mut="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${d}/mut-m2/kg-migrate-v3.py" --verified-at 2026-10-27 --apply-judged "${cm2}" "${gm2}" 2>&1)" || true
+  if [ "${_m2ok}" = 1 ] && grep -q '^MEASURED_PREFIXES = ("medição: ",)' "${d}/mut-m2/kg-migrate-v3.py" && grep -q 'RECUSADO.*E_M2_EN \[regra 1\] (manter-prod-medido sem method medição)' <<< "${_m2mut}"; then
+    record_pass "kg-migrate-v3: (m2) a planilha com method measurement (forma canônica v4.16) é lida como medição; reading segue recusado; (MUT) só com o prefixo em português o nó inglês volta a ser recusado"
+  else record_fail "kg-migrate-v3: (m2) method em inglês na planilha" "ok=${_m2ok} out=${_m2} mut=${_m2mut}"; fi
   # (n) onda O4 reescrever-source e corrigir-method-locality: a locality é a do JUIZ (a regra de locality_of calaria
   #     sobre "repo-x@abc:README.md (host)"); `(inalterado)` copia o valor atual; o mesmo nó em duas regras recebe as
   #     duas (dev-historia + reescrever); caminho absoluto de arquivo na source final recusa a linha inteira, rota

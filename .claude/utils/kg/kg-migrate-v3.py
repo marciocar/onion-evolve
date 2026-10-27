@@ -109,8 +109,13 @@ PATH_RE = re.compile(r'(?<![\w./-])((?:\.claude|docs|ops|vendor|plugins|\.github
 # Passada adversarial da O2 (2026-10-09): 8 nós escritos assim; o `→` solto ficou de fora (casava descrição de cadeia).
 CMD_TRACE_RE = re.compile(r'\b(grep|ls|find)\s|\bgit\s+(show|log|ls-files|ls-tree|merge-base|diff)\b|\bruns?\s+\d{6,}|\bPR\s*#\d+')
 LABEL_MAX = 280
-# as classes de method do contrato v4 (SHOULD: ^(medição|leitura|juízes|derivado|testemunho): \S)
-METHOD_CLASSES = ("medição", "leitura", "juízes", "derivado", "testemunho")
+# as classes de method do contrato v4 (SHOULD: ^(medição|leitura|juízes|derivado|testemunho): \S). Desde o v4.16
+# (kg-ssot 4.32.0) a forma canônica é em inglês e as cinco em português seguem como alias: a LEITURA das tabelas de
+# decisão aceita as dez. O que esta ferramenta ESCREVE por conta própria fica em português de propósito: as ondas
+# O1 a O4 já foram seladas com essa saída, e a bancada kg_migrate_v3 a fixa.
+METHOD_CLASSES = ("medição", "leitura", "juízes", "derivado", "testemunho",
+                  "measurement", "reading", "judges", "derived", "testimony")
+MEASURED_PREFIXES = ("medição: ", "measurement: ")
 ROUTED = ("A1", "A2")
 ROUTING_COLS = ("graph", "id", "final", "method_class")
 
@@ -801,7 +806,7 @@ def _o4_row(block, r, verified_at):
         _, plane = _get_scalar(block, "plane")
         if plane != "PROD":
             return block, False, f"manter-prod-medido sobre plane {plane}"
-        if not method.startswith("medição: "):
+        if not method.startswith(MEASURED_PREFIXES):
             return block, False, "manter-prod-medido sem method medição"
         if not verified_at:
             return block, False, "manter-prod-medido sem --verified-at"
@@ -1123,7 +1128,7 @@ def _o6_row(block, r, new_nodes):
             return block, False, "source/locator/method vazio (nem final nem atual)", None
         if not re.match(r'^(' + "|".join(METHOD_CLASSES) + r'): \S', method):
             return block, False, "method fora das classes do contrato", None
-        if act == "binario-prod" and not method.startswith("medição: "):
+        if act == "binario-prod" and not method.startswith(MEASURED_PREFIXES):
             return block, False, "binario-prod sem method medição", None
         if locality is not None and locality not in LOCALITIES:
             return block, False, f"locality fora do contrato ({locality or 'vazia'})", None
