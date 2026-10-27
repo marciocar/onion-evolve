@@ -1,11 +1,10 @@
 ---
 branch: docs/reverify-dissect-read-only
 date: 2026-10-27
-reviewed_diff_sha256: 42ff6330155420dacb960e28cc273d79f188a5040a88702df82238998029ab1f
-reviewed_code_sha256: 91ac1a9d0865667478cc40bc1354bd048f3fb7b315e116e145f13dbdef85074b
-findings_total: 2
-findings_real: 2
-findings_fixed: 2
+reviewed_diff_sha256: pendente
+findings_total: 3
+findings_real: 3
+findings_fixed: 3
 tokens: 0
 duration_min: 20
 verdict: REPROVADO_E_CURADO
@@ -23,6 +22,10 @@ reviewer: passada própria, adversarial sobre o diff, com re-medição ao vivo (
 2. **O README da pasta afirmava que não havia dissecação selada** (linha 23, apontado pela curadoria).
    Era falso. Curado com a contagem do `dissect-census.sh --tsv` de 2026-10-27: 10 dissecações, todas
    com estado `veredito`, com o comando citado e o aviso de que o número envelhece.
+3. **Um código ambíguo entrou na prosa de um nó.** O contrato KG-SSOT do commit reprovou
+   (`vocab.code-ambiguous`): o label e a narrative do `E_REMEDIDA_N1_CORPUS_1027` escreviam "N1", que o
+   vocabulário resolve para três termos. Curado: o texto diz "nível 1", e o `ops/kg-gate-ci.sh` dá
+   "nenhum código novo sem termo".
 
 ## O que se conferiu e se manteve
 

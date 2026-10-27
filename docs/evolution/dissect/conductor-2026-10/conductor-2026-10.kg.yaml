@@ -228,8 +228,8 @@ nodes:
     verified_against: "bash .claude/validation/kg-corpus-grep.sh conductor na main 8857bc9b: '# corpus: 203 grafos · termos: conductor · 15 nó(s)', com E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO (confirmed, tier=10) e E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME (confirmed, tier=6) entre eles"
     source_tier: 10
     source_kind: internal-audit
-    label: "O N1 pago pelo corpus se confirma rodando: o kg-corpus-grep acha os dois nós que o N1 cita, confirmed e com os tiers citados (10 e 6). O corpus cresceu de 10 para 15 nós com o termo, e os 5 novos são da própria dissecação e do estudo dissect-forge."
-    narrative: "Dos 15 nós de hoje, 4 são deste grafo, 2 do dissect-forge-2026-10, 8 do agent-command-composition-2026-09 e 1 do forge-comando-framework-2026-09. O N1 não muda: os dois nós em que ele se apoia seguem os mesmos, e o que entrou depois veio desta dissecação. De quebra, a absorção que o plano A_PLAN_VERIFICACAO_PELO_MOTOR pedia está no motor: grep -n engine-verify .claude/workflows/onion-research.js acha o bloco nas linhas 259 a 309, com MAX_WRITE_ATTEMPTS = 3 na 264."
+    label: "O nível 1 pago pelo corpus se confirma rodando: o kg-corpus-grep acha os dois nós que o nível 1 cita, confirmed e com os tiers citados (10 e 6). O corpus cresceu de 10 para 15 nós com o termo, e os 5 novos são da própria dissecação e do estudo dissect-forge."
+    narrative: "Dos 15 nós de hoje, 4 são deste grafo, 2 do dissect-forge-2026-10, 8 do agent-command-composition-2026-09 e 1 do forge-comando-framework-2026-09. O nível 1 não muda: os dois nós em que ele se apoia seguem os mesmos, e o que entrou depois veio desta dissecação. De quebra, a absorção que o plano A_PLAN_VERIFICACAO_PELO_MOTOR pedia está no motor: grep -n engine-verify .claude/workflows/onion-research.js acha o bloco nas linhas 259 a 309, com MAX_WRITE_ATTEMPTS = 3 na 264."
     trace: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml"
     provenance:
       source: "bash .claude/validation/kg-corpus-grep.sh conductor"
