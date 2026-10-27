@@ -2,8 +2,8 @@
 branch: chore/kg-ssot-4.35.0
 pr: 1411
 date: 2026-10-27
-reviewed_diff_sha256: 69d80ab087105d39afd0e3a86f94647d10bda11d3539f8ee050ffd2477f2c751
-reviewed_code_sha256: 1f964c91d5adf1d46f687b51755c56b538141261098bea5e8556a1e74da527aa
+reviewed_diff_sha256: 02f3827e3cb71d5e8b6f9cc39185c8357209d1c398e2e8b61204c31c6af8c358
+reviewed_code_sha256: 61813e4ff543a8e3e4471fd5cc5659b91bf564cd3e3340cf4fafad369a2f930a
 findings_total: 8
 findings_real: 8
 tokens: 95974
@@ -75,6 +75,14 @@ O rebase sobre a main com o #1404 (8857bc9b8) mudou o hash de código porque a b
 pr-finalize, com as famílias `design_context`, `kg_projection` e `kg_ssot_require_hashes` sobre a base nova, ficou
 verde. O que entrou depois da revisão foram só o caminho literal do caso (a) da família `kg_projection` (REGRA 59) e
 um nó question no grafo de coordenação, que não são código julgado por esta passada.
+
+## Recarimbo pelo fechamento do Cortex
+
+Depois do recarimbo acima, entrou um único commit: o grafo de coordenação fecha `Q_COORD_CUR_FECHAR_9_PECAS_CORTEX` e
+`Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS`. Conferi antes de carimbar: o `gh pr view 147` da curadoria dá MERGED
+(f2118c1), o `gh pr view 1404` dá MERGED (8857bc9b8) e o `peer-ref-check` do `E_MEASURE_WORKLOG_HOOKS` dá rc 0 @
+f2118c1. O grafo passa no radar (`--integrity --schema`), no contrato e na REGRA 58 (35 de 40 nós, nenhum `done` sem
+carimbo). Nenhum script mudou.
 
 ## Limites declarados
 

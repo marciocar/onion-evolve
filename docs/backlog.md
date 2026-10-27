@@ -1020,13 +1020,12 @@
 | 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
 | 3.0 | `Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT` | coordenacao-sessoes-2026-10 | Os textos da vitrine e o dia zero do lançamento da kg-ssot. |
 
-## core — 12 item(ns)
+## core — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.0 | `Q_COORD_CURADORIA_UPDATE_4340` | coordenacao-sessoes-2026-10 | A rodada de update da curadoria com a kg-ssot 4.34.0, depois do merge do PR 1407. |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
-| 8.0 | `Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS` | coordenacao-sessoes-2026-10 | O PR 1404 (a âncora única no mutate-and-restore e o selo das 9 peças do Cortex) está em conflito com a main e com dois checks  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_COORD_UPDATE_4_ADOTANTES_4350` | coordenacao-sessoes-2026-10 | A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core. |
 | 4.5 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
@@ -1218,12 +1217,11 @@
 | 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
 | 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
 
-## curadoria — 3 item(ns)
+## curadoria — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_COORD_CUR_CONFERIR_ONDA1_CONTRA_PR140` | coordenacao-sessoes-2026-10 | Conferir a onda 1 do design do core contra o desenho do PR 140 da curadoria. |
-| 4.5 | `Q_COORD_CUR_FECHAR_9_PECAS_CORTEX` | coordenacao-sessoes-2026-10 | Fechar as 9 peças do Cortex quando o PR 1404 entrar. |
 | 4.5 | `Q_COORD_CUR_LAB_11_CASOS_E_CHAIN_WITH` | coordenacao-sessoes-2026-10 | Depois da 4.35.0: rodar os 11 casos do laboratório do PR 140 e o --chain com --with. |
 
 ## duolingo-actor-2026-10 — 1 item(ns)
