@@ -41144,6 +41144,18 @@ _family run_design_context_selftests
 # porque o produto lê as páginas e os grafos RASTREADOS. Casos: (a) o core real · (b) íntegro · (c) id ausente
 # HARD · (d) sem citação SOFT · (e) em outro grafo SOFT · (f) não pude julgar (rc 2: produto que sai 2, e rc 1 sem
 # achado no JSON) · (g) o dispatcher de produção · (m) mutantes, um por ramo.
+# GRAFO DE OUTRO REPOSITÓRIO (o --with, proposta da curadoria absorvida em 2026-10-27): (i) id morto no grafo
+# alheio (o G2 dela) · (j) par sem clone · (k) forma ruim · (l) sem par = o de antes · (n) NAO-FIXADO · (o) par do
+# members.yaml · (p) adotante sem members.yaml, par pela variável · (q) o dispatcher com --strict. Cada um com mutante.
+_kp_peer_fixture() {  # <dir> — dois repos git: <dir>/peer (o grafo com C_PEER_ALIVE) e <dir>/main (a página que
+  # cita, pela URL fixada no sha do peer, o vivo e um morto); imprime o sha
+  local d="$1" sha
+  mkdir -p "${d}/peer/docs" "${d}/main/docs"; git -C "${d}/peer" init -q 2>/dev/null; git -C "${d}/main" init -q 2>/dev/null
+  printf 'meta:\n  id: peer\n  schema_version: "1"\n  baseline: "2026-10-27"\nnodes:\n  - id: C_PEER_ALIVE\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.7\n    label: "vivo"\n' > "${d}/peer/docs/g.kg.yaml"
+  _dc_commit "${d}/peer" "peer"; sha="$(git -C "${d}/peer" rev-parse HEAD 2>/dev/null)"
+  printf -- '---\nprojection_of:\n  - https://github.com/acme/peer/blob/%s/docs/g.kg.yaml\n---\n\nVer `C_PEER_ALIVE` e `C_PEER_DEAD`.\n' "${sha}" > "${d}/main/docs/p.md"
+  _dc_commit "${d}/main" "main"; printf '%s' "${sha}"
+}
 run_kg_projection_selftests() {
   local h="${REPO_ROOT}/.claude/validation/kg-projection.sh" KT="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py"
   [ -f "${h}" ] || { record_fail "kg-projection" "guarda ausente: ${h}"; return; }
@@ -41195,21 +41207,30 @@ run_kg_projection_selftests() {
   else record_fail "kg-projection: (f) rc 2" "produto-rc2=${f1} rc1-sem-achado=${f2} (esperado 2 e 2)"; fi
   # (g) o DISPATCHER de produção emite a REGRA 112 (HARD) sobre o id ausente, com --only na página; e diz que não
   #     julgou (SOFT) quando o produto sai 2
-  local sd l lg; sd="$(TMPDIR=/tmp mktemp -d)"
+  #     PAPEL FIXADO NA CAIXA (cura de portabilidade, 2026-10-27): a caixa herda o .claude do SANDBOX, e no adotante
+  #     ele traz o carimbo `role: adopted`, que liga o 1º ciclo (tudo SOFT): o HARD esperado não vinha e o caso
+  #     falhava só lá (a curadoria mediu). Aqui o carimbo sai (julga-se como o core) e um 2º passe o põe de volta
+  #     como adotante, que deve sair SOFT: a linha VIOLATION aparece e o HARD_FILE não a lista.
+  local sd l lg la; sd="$(TMPDIR=/tmp mktemp -d)"
   cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; cp -a "${d}/docs" "${sd}/" 2>/dev/null
+  rm -f "${sd}/.claude/.onion-version"
   printf '\nVer `C_NO_QUE_SUMIU`.\n' >> "${sd}/${B}"
   ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
   # a linha VIOLATION não diz a severidade: a HARD vem do ONION_LINT_HARD_FILE, como o motor a lista
-  local hf hfg; hf="$(mktemp)"; hfg="$(mktemp)"
+  local hf hfg hfa; hf="$(mktemp)"; hfg="$(mktemp)"; hfa="$(mktemp)"
   l="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hf}" ONION_KG_TRACE="${KT}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${B}" 2>&1 || true)"
   lg="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hfg}" ONION_KG_TRACE="${sb}/kg_trace.py" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${B}" 2>&1 || true)"
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${sd}/.claude/.onion-version"
+  la="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hfa}" ONION_KG_TRACE="${KT}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${B}" 2>&1 || true)"
   rm -rf "${sd}"
-  local hl hlg; hl="$(cat "${hf}" 2>/dev/null)"; hlg="$(cat "${hfg}" 2>/dev/null)"; rm -f "${hf}" "${hfg}"
+  local hl hlg hla; hl="$(cat "${hf}" 2>/dev/null)"; hlg="$(cat "${hfg}" 2>/dev/null)"; hla="$(cat "${hfa}" 2>/dev/null)"; rm -f "${hf}" "${hfg}" "${hfa}"
   if grep -q 'REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): \[ID-AUSENTE\]' <<< "${hl}" \
      && grep -q 'REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): \[NAO-JULGOU\]' <<< "${lg}" \
-     && ! grep -q 'REGRA 112' <<< "${hlg}"; then
-    record_pass "kg-projection: (g) o lint de produção (dispatcher) emite a REGRA 112 HARD sobre o id ausente, e SOFT NAO-JULGOU com o produto que sai 2"
-  else record_fail "kg-projection: (g) dispatcher" "$(grep -E 'REGRA 112' <<< "${l}${lg}" | head -3 | tr '\n' '|')"; fi
+     && ! grep -q 'REGRA 112' <<< "${hlg}" \
+     && grep -q 'REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): \[ID-AUSENTE\]' <<< "${la}" \
+     && ! grep -q 'REGRA 112' <<< "${hla}"; then
+    record_pass "kg-projection: (g) o lint de produção (dispatcher) emite a REGRA 112 HARD sobre o id ausente no core, SOFT no adotante (1º ciclo), e SOFT NAO-JULGOU com o produto que sai 2"
+  else record_fail "kg-projection: (g) dispatcher" "core-hard=$(grep -c 'ID-AUSENTE' <<< "${hl}") adotante-hard=$(grep -c 'REGRA 112' <<< "${hla}") $(grep -E 'REGRA 112' <<< "${l}${lg}" | head -3 | tr '\n' '|')"; fi
   # (h) A DESCOBERTA PRÓPRIA (achados 4 e 5 da passada adversarial): repo sem página com projection_of e sem o
   #     produto ⇒ rc 0 calado (nada a julgar, nenhum aviso eterno); a página fora do git ⇒ rc 2; a página só não
   #     rastreada, que o produto não lê (julga 0) ⇒ rc 2 (VACUIDADE), nunca verde
@@ -41230,7 +41251,7 @@ run_kg_projection_selftests() {
   local mdir m1 m2 m3 c3; mdir="$(mktemp -d)"
   sed '/^for m in d.get("missing") or \[\]:$/,/^for g in d.get("graph_errors")/{/^for g in/!d}' "${h}" > "${mdir}/m1.sh"
   sed 's/^for p in d.get("uncited") or \[\]:$/for p in []:/' "${h}" > "${mdir}/m2.sh"
-  sed 's/^if krc == 1 and not any(r\[0\] == "HARD" for r in rows):$/if False:/' "${mdir}/m1.sh" > "${mdir}/m3.sh"
+  sed 's/^if krc == 1 and not judged_hard:$/if False:/' "${mdir}/m1.sh" > "${mdir}/m3.sh"
   c3="$(mktemp -d)"; cp -a "${d}/." "${c3}/"; printf '\nVer `C_NO_QUE_SUMIU`.\n' >> "${c3}/${B}"
   m1="$(ONION_KG_TRACE="${KT}" bash "${mdir}/m1.sh" "${c3}" --format tsv 2>&1 | grep -c 'ID-AUSENTE' || true)"
   m2="$(ONION_KG_TRACE="${KT}" bash "${mdir}/m2.sh" "${cd_unc}" --format tsv 2>&1 | grep -c 'SEM-CITACAO' || true)"
@@ -41248,6 +41269,142 @@ run_kg_projection_selftests() {
   if [ "${m4rc}" = 0 ] && ! cmp -s "${h}" "${mdir}/m4.sh"; then
     record_pass "kg-projection: (m) o mutante sem a guarda de vacuidade dá verde na página não rastreada (a cura dá rc 2)"
   else record_fail "kg-projection: (m) mutante da vacuidade" "rc=${m4rc} (esperado 0; o sed precisa casar)"; fi
+  # ── GRAFO DE OUTRO REPOSITÓRIO (--with) ──────────────────────────────────────────────────────────────────────
+  # _kprun <helper> <raiz> [args...]: roda com o produto real; devolve em _ko (stdout), _ke (stderr) e _kr (rc)
+  local _ko _ke _kr _kef; _kef="$(mktemp)"
+  _kc() { grep -c "$@" || true; }  # contagem que não mata a suíte sob set -e quando é 0
+  _kprun() { local hh="$1"; shift; if _ko="$(ONION_KG_TRACE="${KT}" bash "${hh}" "$@" --format tsv 2>"${_kef}")"; then _kr=0; else _kr=$?; fi; _ke="$(cat "${_kef}")"; }
+  local xd sha P="https://github.com/acme/peer/blob" mut ok
+  xd="$(mktemp -d)"; sha="$(_kp_peer_fixture "${xd}")"
+  local XM="${xd}/main" XP="${xd}/peer"
+  # (i) G2: id morto no grafo do outro repo. Sem o par ⇒ só SOFT FORA-DO-REPO (rc 1, nenhum HARD); com o par
+  #     (--with) ⇒ HARD ID-AUSENTE sobre o morto, e o vivo resolve (lido no commit da URL)
+  local i1 i2; _kprun "${h}" "${XM}"; i1="${_kr}|$(_kc '^SOFT	FORA-DO-REPO	docs/p.md' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")"
+  _kprun "${h}" "${XM}" --with "${P}=${XP}"
+  i2="${_kr}|$(_kc '^HARD	ID-AUSENTE	docs/p.md	`C_PEER_DEAD`' <<< "${_ko}")|$(_kc 'C_PEER_ALIVE' <<< "${_ko}")"
+  # m5: o par nunca chega ao produto ⇒ o G2 volta a SOFT com o --with
+  sed '/^while IFS=\$.\\t. read -r _k _v _; do \[ "\${_k}" = W \]/s/_wargs+=("--with=\${_v}")/:/' "${h}" > "${mdir}/m5.sh"
+  _kprun "${mdir}/m5.sh" "${XM}" --with "${P}=${XP}"; mut="$(_kc 'ID-AUSENTE' <<< "${_ko}")"
+  if [ "${i1}" = "1|2|0" ] && [ "${i2}" = "1|1|0" ] && [ "${mut}" = 0 ] && ! cmp -s "${h}" "${mdir}/m5.sh"; then
+    record_pass "kg-projection: (i) id morto no grafo de outro repo ⇒ SOFT FORA-DO-REPO sem o par, HARD ID-AUSENTE com o --with (mutante sem repasse cala)"
+  else record_fail "kg-projection: (i) G2" "sem-par=${i1} (1|2|0) com-par=${i2} (1|1|0) mutante=${mut} (0)"; fi
+  # (j) PAR SEM CLONE: pasta inexistente e pasta que não é git ⇒ aviso nomeado no stderr, a página segue SOFT
+  #     FORA-DO-REPO, rc 1, nunca HARD nem rc 2
+  local j1 j2; mkdir -p "${xd}/nogit"
+  _kprun "${h}" "${XM}" --with "${P}=${xd}/nada"
+  j1="${_kr}|$(_kc '^SOFT	FORA-DO-REPO' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")|$(_kc "aviso: o par ${P}=${xd}/nada" <<< "${_ke}")"
+  _kprun "${h}" "${XM}" --with "${P}=${xd}/nogit"
+  j2="${_kr}|$(_kc '^SOFT	FORA-DO-REPO' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")|$(_kc "aviso: o par ${P}=${xd}/nogit" <<< "${_ke}")"
+  # m6: sem a conferência da pasta, o par sem clone vai ao produto (inexistente ⇒ rc 2; não-git ⇒ outro veredito)
+  sed 's/^    if not os.path.isdir(folder) or not is_git(folder):$/    if False:/' "${h}" > "${mdir}/m6.sh"
+  _kprun "${mdir}/m6.sh" "${XM}" --with "${P}=${xd}/nada"; mut="${_kr}|$(_kc 'aviso: o par' <<< "${_ke}")"
+  if [ "${j1}" = "1|2|0|1" ] && [ "${j2}" = "1|2|0|1" ] && [ "${mut}" != "1|1" ] && ! cmp -s "${h}" "${mdir}/m6.sh"; then
+    record_pass "kg-projection: (j) par sem clone (inexistente, não-git) ⇒ aviso nomeado + SOFT FORA-DO-REPO, nunca HARD (mutante sem a conferência muda o veredito)"
+  else record_fail "kg-projection: (j) par sem clone" "inexistente=${j1} não-git=${j2} (1|2|0|1) mutante=${mut} (≠1|1)"; fi
+  # (k) FORMA RUIM ⇒ rc 2: sem "=", prefixo em http://, pasta vazia; pela opção e pela variável
+  local k1 k2 k3 k4
+  _kprun "${h}" "${XM}" --with "semigual"; k1="${_kr}"
+  _kprun "${h}" "${XM}" --with "http://x/blob=${XP}"; k2="${_kr}"
+  _kprun "${h}" "${XM}" --with "${P}="; k3="${_kr}"
+  if _ko="$(ONION_KG_PROJECTION_WITH="semigual" ONION_KG_TRACE="${KT}" bash "${h}" "${XM}" --format tsv 2>/dev/null)"; then k4=0; else k4=$?; fi
+  # m7: sem a conferência da forma, "semigual" vira par sem clone (aviso, rc 1) em vez de "não pude julgar"
+  sed 's/^    if not sep or not folder or not prefix.startswith("https:\/\/") or len(prefix) <= len("https:\/\/"):$/    if False:/' "${h}" > "${mdir}/m7.sh"
+  _kprun "${mdir}/m7.sh" "${XM}" --with "semigual"; mut="${_kr}"
+  if [ "${k1}${k2}${k3}${k4}" = 2222 ] && [ "${mut}" != 2 ] && ! cmp -s "${h}" "${mdir}/m7.sh"; then
+    record_pass "kg-projection: (k) --with de forma ruim (sem =, http://, pasta vazia; opção e variável) ⇒ rc 2 (mutante sem a conferência não sai 2)"
+  else record_fail "kg-projection: (k) forma ruim" "rc=${k1}${k2}${k3}${k4} (2222) mutante=${mut} (≠2)"; fi
+  # (l) SEM PAR = O DE ANTES: sem --with, e com a variável só de linhas vazias, a saída é a mesma, sem aviso
+  local l0 l1 l0e
+  _kprun "${h}" "${XM}"; l0="${_kr}|${_ko}"; l0e="${_ke}"
+  if _ko="$(ONION_KG_PROJECTION_WITH=$'\n  \n' ONION_KG_TRACE="${KT}" bash "${h}" "${XM}" --format tsv 2>"${_kef}")"; then _kr=0; else _kr=$?; fi
+  l1="${_kr}|${_ko}"
+  # m8: a variável sem o filtro de linha vazia vira forma ruim (rc 2)
+  sed 's/do \[ -n "\${_w\/\/\[\[:space:\]\]\/}" \] && WITHS+=/do WITHS+=/' "${h}" > "${mdir}/m8.sh"
+  if ONION_KG_PROJECTION_WITH=$'\n  \n' ONION_KG_TRACE="${KT}" bash "${mdir}/m8.sh" "${XM}" --format tsv >/dev/null 2>&1; then mut=0; else mut=$?; fi
+  if [ "${l0}" = "${l1}" ] && [ -z "${l0e}" ] && [ -z "$(cat "${_kef}")" ] && [ "${l0%%|*}" = 1 ] && [ "${mut}" = 2 ] \
+     && ! cmp -s "${h}" "${mdir}/m8.sh"; then
+    record_pass "kg-projection: (l) sem par (nem --with, nem variável útil) ⇒ a saída de antes, sem aviso (mutante sem o filtro sai 2)"
+  else record_fail "kg-projection: (l) sem par" "igual=$([ "${l0}" = "${l1}" ] && echo s || echo n) stderr=${l0e:0:80} mutante=${mut} (2)"; fi
+  # (n) NAO-FIXADO: a URL com um sha que o peer não tem (o G6) e a URL que nomeia um ramo ⇒ SOFT por padrão, HARD
+  #     com --strict; o caminho é o da página
+  local nd n1 n2 n3 br; nd="$(mktemp -d)"; cp -a "${XM}/." "${nd}/"
+  sed -i "s/${sha}/0123456789abcdef0123456789abcdef01234567/; s/ e \`C_PEER_DEAD\`//" "${nd}/docs/p.md"; _dc_commit "${nd}" "sha falso"
+  _kprun "${h}" "${nd}" --with "${P}=${XP}"; n1="${_kr}|$(_kc '^SOFT	NAO-FIXADO	docs/p.md' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")"
+  _kprun "${h}" "${nd}" --with "${P}=${XP}" --strict; n2="${_kr}|$(_kc '^HARD	NAO-FIXADO	docs/p.md' <<< "${_ko}")"
+  br="$(git -C "${XP}" branch --show-current 2>/dev/null)"
+  sed -i "s/0123456789abcdef0123456789abcdef01234567/${br:-master}/" "${nd}/docs/p.md"; _dc_commit "${nd}" "ramo"
+  _kprun "${h}" "${nd}" --with "${P}=${XP}" --strict; n3="${_kr}|$(_kc '^HARD	NAO-FIXADO	docs/p.md	.*nomeia um ramo' <<< "${_ko}")"
+  # m9: o --strict não eleva; m10: sem a conferência do ramo, a URL de ramo passa calada
+  sed 's/^pin_sev = "HARD" if strict else "SOFT"$/pin_sev = "SOFT"/' "${h}" > "${mdir}/m9.sh"
+  sed 's/^            if not re.fullmatch(r"\[0-9a-f\]{7,40}", ref):$/            if False:/' "${h}" > "${mdir}/m10.sh"
+  local mu9 mu10
+  sed -i "s/${br:-master}/0123456789abcdef0123456789abcdef01234567/" "${nd}/docs/p.md"; _dc_commit "${nd}" "sha falso de novo"
+  _kprun "${mdir}/m9.sh" "${nd}" --with "${P}=${XP}" --strict; mu9="$(_kc '^HARD' <<< "${_ko}")"
+  sed -i "s/0123456789abcdef0123456789abcdef01234567/${br:-master}/" "${nd}/docs/p.md"; _dc_commit "${nd}" "ramo de novo"
+  _kprun "${mdir}/m10.sh" "${nd}" --with "${P}=${XP}" --strict; mu10="$(_kc 'NAO-FIXADO' <<< "${_ko}")"
+  if [ "${n1}" = "1|1|0" ] && [ "${n2}" = "1|1" ] && [ "${n3}" = "1|1" ] && [ "${mu9}" = 0 ] && [ "${mu10}" = 0 ] \
+     && ! cmp -s "${h}" "${mdir}/m9.sh" && ! cmp -s "${h}" "${mdir}/m10.sh"; then
+    record_pass "kg-projection: (n) NAO-FIXADO (sha que o peer não tem; URL de ramo) ⇒ SOFT por padrão, HARD com --strict (os 2 mutantes calam)"
+  else record_fail "kg-projection: (n) NAO-FIXADO" "padrão=${n1} (1|1|0) strict=${n2} (1|1) ramo=${n3} (1|1) m9=${mu9} m10=${mu10} (0 0)"; fi
+  rm -rf "${nd}"
+  # (o) PAR DO members.yaml: sem --with, o membro com o remote do prefixo dá o par (HARD ID-AUSENTE); o membro cujo
+  #     prefixo nenhuma página declara não entra, nem avisa, mesmo sem clone; o explícito vence o do registro
+  local od o1 o2; od="$(mktemp -d)"; cp -a "${XM}/." "${od}/"; mkdir -p "${od}/docs/evolution/federation"
+  printf 'version: 2\nmembers:\n  - id: alheio\n    remote: github.com/acme/outro\n    local_path: "%s/nada"\n  - id: peer\n    remote: github.com/acme/peer   # comentário\n    local_path: "%s"\n' \
+    "${xd}" "${XP}" > "${od}/docs/evolution/federation/members.yaml"
+  _kprun "${h}" "${od}"; o1="${_kr}|$(_kc '^HARD	ID-AUSENTE	docs/p.md	`C_PEER_DEAD`' <<< "${_ko}")|$(_kc 'aviso' <<< "${_ke}")"
+  _kprun "${h}" "${od}" --with "${P}=${xd}/nogit"; o2="$(_kc "aviso: o par ${P}=${xd}/nogit (de --with)" <<< "${_ke}")|$(_kc '^HARD' <<< "${_ko}")"
+  # m11: sem a derivação do registro, o G2 volta a SOFT; m12: sem o filtro do prefixo declarado, o alheio avisa
+  sed 's/^        if used(prefix) and prefix not in pairs:/        if False:/' "${h}" > "${mdir}/m11.sh"
+  sed 's/^        if used(prefix) and prefix not in pairs:/        if prefix not in pairs:/' "${h}" > "${mdir}/m12.sh"
+  local mu11 mu12
+  _kprun "${mdir}/m11.sh" "${od}"; mu11="$(_kc 'ID-AUSENTE' <<< "${_ko}")"
+  _kprun "${mdir}/m12.sh" "${od}"; mu12="$(_kc 'aviso: o par https://github.com/acme/outro/blob' <<< "${_ke}")"
+  if [ "${o1}" = "1|1|0" ] && [ "${o2}" = "1|0" ] && [ "${mu11}" = 0 ] && [ "${mu12}" = 1 ] \
+     && ! cmp -s "${h}" "${mdir}/m11.sh" && ! cmp -s "${h}" "${mdir}/m12.sh"; then
+    record_pass "kg-projection: (o) o par vem do members.yaml (só o prefixo declarado; o explícito vence) ⇒ HARD ID-AUSENTE (os 2 mutantes falham)"
+  else record_fail "kg-projection: (o) members.yaml" "registro=${o1} (1|1|0) explícito-vence=${o2} (1|0) m11=${mu11} (0) m12=${mu12} (1)"; fi
+  rm -rf "${od}"
+  # (p) ADOTANTE SEM members.yaml (o registro é só do core e não viaja): carimbo role: adopted, nenhum registro ⇒
+  #     sem par, SOFT FORA-DO-REPO e nenhum erro; com o par pela ONION_KG_PROJECTION_WITH, HARD ID-AUSENTE no TSV
+  #     (o rebaixamento do 1º ciclo é do dispatcher, caso (q))
+  local pd p1 p2; pd="$(mktemp -d)"; cp -a "${XM}/." "${pd}/"; mkdir -p "${pd}/.claude"
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${pd}/.claude/.onion-version"
+  _kprun "${h}" "${pd}"; p1="${_kr}|$(_kc '^SOFT	FORA-DO-REPO' <<< "${_ko}")|$(_kc '^HARD' <<< "${_ko}")|${#_ke}"
+  if _ko="$(ONION_KG_PROJECTION_WITH="${P}=${XP}" ONION_KG_TRACE="${KT}" bash "${h}" "${pd}" --format tsv 2>/dev/null)"; then _kr=0; else _kr=$?; fi
+  p2="${_kr}|$(_kc '^HARD	ID-AUSENTE	docs/p.md	`C_PEER_DEAD`' <<< "${_ko}")"
+  # m13: a variável não é lida ⇒ o adotante não tem como declarar o par, e o G2 fica SOFT
+  sed 's/^if \[ -n "\${ONION_KG_PROJECTION_WITH:-}" \]; then$/if false; then/' "${h}" > "${mdir}/m13.sh"
+  if _ko="$(ONION_KG_PROJECTION_WITH="${P}=${XP}" ONION_KG_TRACE="${KT}" bash "${mdir}/m13.sh" "${pd}" --format tsv 2>/dev/null)"; then :; fi
+  mut="$(_kc 'ID-AUSENTE' <<< "${_ko}")"
+  if [ "${p1}" = "1|2|0|0" ] && [ "${p2}" = "1|1" ] && [ "${mut}" = 0 ] && ! cmp -s "${h}" "${mdir}/m13.sh"; then
+    record_pass "kg-projection: (p) adotante sem members.yaml ⇒ SOFT sem par, sem erro; HARD ID-AUSENTE com o par pela variável (mutante que não lê a variável cala)"
+  else record_fail "kg-projection: (p) adotante" "sem-par=${p1} (1|2|0|0) com-variável=${p2} (1|1) mutante=${mut} (0)"; fi
+  rm -rf "${pd}"
+  # (q) O DISPATCHER passa --strict só no core: a página com sha que o peer não tem (par pela variável) ⇒ NAO-FIXADO
+  #     no HARD_FILE do core, e fora dele no adotante; o par sem clone sai SOFT [PAR-SEM-CLONE]. m14: sem o --strict
+  #     na cópia do dispatcher, o core não lista o HARD
+  local qd ql qla qlc qhf qhfa qhfm; qd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${qd}/" 2>/dev/null; rm -f "${qd}/.claude/.onion-version"; cp -a "${XM}/docs" "${qd}/" 2>/dev/null
+  sed -i "s/${sha}/0123456789abcdef0123456789abcdef01234567/; s/ e \`C_PEER_DEAD\`//" "${qd}/docs/p.md"
+  ( cd "${qd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  qhf="$(mktemp)"; qhfa="$(mktemp)"; qhfm="$(mktemp)"
+  ql="$(cd "${qd}" && ONION_KG_PROJECTION_WITH="${P}=${XP}" ONION_LINT_HARD_FILE="${qhf}" ONION_KG_TRACE="${KT}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${qd}/docs/p.md" 2>&1 || true)"
+  qlc="$(cd "${qd}" && ONION_KG_PROJECTION_WITH="${P}=${xd}/nada" ONION_LINT_HARD_FILE=/dev/null ONION_KG_TRACE="${KT}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${qd}/docs/p.md" 2>&1 || true)"
+  cp "${qd}/.claude/validation/lint-artifacts.sh" "${mdir}/la.orig"
+  sed -i 's/^  \[ "\${IS_DERIVED}" -eq 1 \] || _strict=(--strict)$/  :/' "${qd}/.claude/validation/lint-artifacts.sh"
+  ( cd "${qd}" && ONION_KG_PROJECTION_WITH="${P}=${XP}" ONION_LINT_HARD_FILE="${qhfm}" ONION_KG_TRACE="${KT}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${qd}/docs/p.md" >/dev/null 2>&1 || true )
+  local qmut=1; cmp -s "${mdir}/la.orig" "${qd}/.claude/validation/lint-artifacts.sh" || qmut=0
+  cp "${mdir}/la.orig" "${qd}/.claude/validation/lint-artifacts.sh"
+  printf 'framework: onion-evolve\nrole: adopted\n' > "${qd}/.claude/.onion-version"
+  qla="$(cd "${qd}" && ONION_KG_PROJECTION_WITH="${P}=${XP}" ONION_LINT_HARD_FILE="${qhfa}" ONION_KG_TRACE="${KT}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${qd}/docs/p.md" 2>&1 || true)"
+  rm -rf "${qd}"
+  local q1 q2 q3 q4; q1="$(_kc 'REGRA 112 .*\[NAO-FIXADO\]' "${qhf}" 2>/dev/null)"; q2="$(_kc 'REGRA 112 .*\[NAO-FIXADO\]' <<< "${qla}")|$(_kc 'REGRA 112' "${qhfa}" 2>/dev/null)"
+  q3="$(_kc 'REGRA 112 .*\[PAR-SEM-CLONE\]' <<< "${qlc}")"; q4="$(_kc 'REGRA 112' "${qhfm}" 2>/dev/null)"; rm -f "${qhf}" "${qhfa}" "${qhfm}"
+  if [ "${q1}" = 1 ] && [ "${q2}" = "1|0" ] && [ "${q3}" = 1 ] && [ "${q4}" = 0 ] && [ "${qmut}" = 0 ]; then
+    record_pass "kg-projection: (q) o dispatcher: NAO-FIXADO HARD no core (--strict), SOFT no adotante; par sem clone ⇒ SOFT [PAR-SEM-CLONE] (mutante sem --strict cala)"
+  else record_fail "kg-projection: (q) dispatcher --strict" "core-hard=${q1} (1) adotante=${q2} (1|0) sem-clone=${q3} (1) mutante-hard=${q4} (0) sed=${qmut} (0) $(grep 'REGRA 112' <<< "${ql}" | head -2 | tr '\n' '|')"; fi
+  rm -rf "${xd}"; rm -f "${_kef}"; unset -f _kprun _kc
   rm -rf "${vd}" "${mdir}" "${c3}" "${cd_unc}" "${sb}" "${d}"
 }
 _family run_kg_projection_selftests

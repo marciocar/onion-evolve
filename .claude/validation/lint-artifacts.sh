@@ -6231,7 +6231,7 @@ check_design_context_graph
 #   QUEM JULGA É O PRODUTO; o kg-projection.sh lê o rc e o JSON, nunca a prosa, e traduz para o TSV:
 #   HARD o id que não existe (integrity.projection-id-missing) e o grafo do projection_of não lido;
 #   SOFT a página sem nenhum id entre crases (`uncited`), o id em outro grafo, o grafo de outro repo não lido
-#   e o não fixado. No derivado, tudo SOFT no 1º ciclo, como a REGRA 111. rc 2 do helper (vendor anterior à
+#   e o par --with sem clone ([PAR-SEM-CLONE]); o não fixado é HARD no core (--strict). No derivado, tudo SOFT no 1º ciclo, como a REGRA 111. rc 2 do helper (vendor anterior à
 #   4.35.0 com página para julgar, entrada quebrada, rc e JSON que discordam, raiz fora do git, o produto que
 #   julga 0 páginas com alguma no disco) é "não pude julgar" e sai SOFT nomeado, nunca verde calado. Repo sem
 #   nenhuma página com projection_of não é julgado, nem cobrado pelo juiz ausente.
@@ -6245,9 +6245,18 @@ check_kg_projection() {
       *) return 0 ;;
     esac
   fi
-  local _out _hrc=0 _err
+  local _out _hrc=0 _err _strict=()
   _err="$(mktemp 2>/dev/null || echo /dev/null)"
-  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  # --strict no core: o grafo de outro repo lido fora do sha fixado (NAO-FIXADO) é HARD; no derivado, o 1º ciclo
+  # abaixo rebaixa tudo a SOFT. Os pares --with vêm do ambiente (ONION_KG_PROJECTION_WITH) e do members.yaml.
+  [ "${IS_DERIVED}" -eq 1 ] || _strict=(--strict)
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv ${_strict[@]+"${_strict[@]}"} 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  # o aviso do par sem clone (o CI) não é "não pude julgar": sai SOFT nomeado, e a página segue FORA-DO-REPO
+  if [ "${_hrc}" -lt 2 ] 2>/dev/null && [ "${_err}" != /dev/null ]; then
+    while IFS= read -r _wl; do
+      violation "SOFT" "${helper}" "REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): [PAR-SEM-CLONE] ${_wl#kg-projection: aviso: }"
+    done < <(grep '^kg-projection: aviso: ' "${_err}" 2>/dev/null || true)
+  fi
   if [ "${_hrc}" -ge 2 ] 2>/dev/null; then
     violation "SOFT" "${helper}" "REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): [NAO-JULGOU] a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
     [ "${_err}" = /dev/null ] || rm -f "${_err}"
