@@ -4,7 +4,8 @@ date: 2026-10-27
 branch: docs/reverify-onion-graph-read-only
 pr: pendente
 reviewer: "passada adversarial do próprio autor sobre cada nó novo, conferindo cada afirmação contra a saída do comando que a sustenta; duas frases que diziam mais que a medição foram cortadas"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b5bd3a11fd503f714732d83d252ea5c59db017b90d84d8fda56a4f0152317c3d
+reviewed_code_sha256: 5d6ef488daf03487d479633456e78529d5748b920defd2c6c0a5e079b60b7180
 findings_total: 2
 findings_real: 2
 verdict: CORRIGIDO
