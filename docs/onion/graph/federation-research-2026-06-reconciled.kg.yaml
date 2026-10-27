@@ -452,16 +452,38 @@ nodes:
     node_type: claim
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.95
     trace: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
     label: "AAIF não governa o A2A — são dois projetos separados da Linux Foundation (refuta o claim forte de F8, primário duplo: press release AAIF 09-dez-2025 lista só MCP/goose/AGENTS.md; press release A2A 09-abr-2026 chama A2A de 'another Linux Foundation project')"
+    x_valid_to: "2026-08-17"
+    narrative: "Verdadeiro na data dele (press releases de 09/12/2025 e 09/04/2026) e deixou de valer em 17/08/2026, quando o A2A entrou na Agentic AI Foundation (AAIF) como projeto hospedado. Superado, não apagado, por E_AAIF_HOSTS_A2A_SINCE_2026_08_17 (aresta SUPERSEDES, reconciliação de 2026-10-27 pedida pela objeção E_OBJECAO_39_AAIF_DATE_AND_G4_CONTRADICTION da pesquisa docs/evolution/research/a2a-empresa-adotante-2026-10/, sob a diretriz do maestro de que aaif.io é fonte constante de consulta). O nó irmão G4_AAIF_A2A_COMPLEMENTARY (MCP e A2A complementares) segue confirmado: o enquadramento vertical e horizontal sobrevive à mudança de casa."
     provenance:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
       locality: "repo"
+  - id: E_AAIF_HOSTS_A2A_SINCE_2026_08_17
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    trace: "https://aaif.io/blog/a2a-joins-aaif"
+    label: "Desde 17/08/2026 a Agentic AI Foundation (AAIF, Linux Foundation) hospeda o A2A: o post oficial 'A2A joins AAIF's open agentic stack', datado de 2026-08-17, diz que o A2A 'is joining the Agentic AI Foundation (AAIF) as a hosted project'"
+    narrative: "Reconciliação de 2026-10-27. Supera G4_AAIF_A2A_SEPARATE ('dois projetos separados'), que era verdadeiro na data dele e fica no grafo, superseded, com x_valid_to 2026-08-17 (o contrato v4 não tem campo valid_to; a extensão leva o prefixo x_). A data vem da publicação do post: o texto diz 'is joining' e não dá outra data de entrada. Medida por WebFetch na primária aaif.io em 2026-10-27. Fecha a lacuna da data aberta na pesquisa docs/evolution/research/a2a-empresa-adotante-2026-10/ (objeção E_OBJECAO_39_AAIF_DATE_AND_G4_CONTRADICTION) e cumpre a diretriz do maestro do mesmo dia: aaif.io é fonte constante de consulta, validação e avaliação dos projetos, documentos e recomendações do Onion."
+    verified_at: "2026-10-27"
+    verified_against: "WebFetch de https://aaif.io/blog/a2a-joins-aaif em 2026-10-27: data de publicação 2026-08-17, título 'A2A joins AAIF's open agentic stack', frase 'is joining the Agentic AI Foundation (AAIF) as a hosted project'"
+    valid_from: "2026-08-17"
+    source_tier: 9
+    source_kind: primary
+    provenance:
+      source: "https://aaif.io/blog/a2a-joins-aaif"
+      locator: "cabeçalho do post (data 2026-08-17, título) e 1º parágrafo ('as a hosted project')"
+      method: "medição: WebFetch da primária em 2026-10-27, trecho verbatim"
+      locality: "web"
   - id: G4_AAIF_A2A_COMPLEMENTARY
     node_type: claim
     layer: audit
@@ -10805,6 +10827,9 @@ edges:
   - from: G4_AAIF_A2A_COMPLEMENTARY
     to: G4_AAIF_A2A_SEPARATE
     edge_type: DEPENDS_ON
+  - from: E_AAIF_HOSTS_A2A_SINCE_2026_08_17
+    to: G4_AAIF_A2A_SEPARATE
+    edge_type: SUPERSEDES
   - from: G4_ARXIV_AIP
     to: G4_DELEGATION_GATE_DECISION
     edge_type: SUPPORTS

@@ -67,3 +67,14 @@ axes:
       - { url: "https://epoch.ai/topics/finances", kind: analyst, tier: 8, note: "custo de treino e de compute; lido só por resumo de busca" }
       - { url: "https://www.interconnects.ai/", kind: engineer, tier: 8, cadence: weekly, note: "pós-treino e modelos de pesos abertos (o autor lidera pós-treino no Ai2); de 1 a 3 posts por semana" }
       - { url: "https://www.latent.space/", kind: engineer, tier: 7, cadence: weekly, note: "parte paga; The End of Finetuning (2026-05-13) só pelo trecho aberto" }
+  # Grupo de PADRÕES E ECOSSISTEMA ABERTO DE AGENTES (aberto em 2026-10-27). É GRUPO NOVO pela medida: nenhum
+  # dos oito acima cobre padrão de protocolo de agentes nem a fundação que os hospeda (claude-code-atual é só
+  # o produto da Anthropic; mercado-capital e analistas cobrem dinheiro e parecer; literatura é paper).
+  # Diretriz do maestro (2026-10-27, selo de Q_AAIF_G4_SUPERSEDE_PROPOSAL_1027 no grafo
+  # a2a-empresa-adotante-2026-10): aaif.io é fonte constante de consulta, validação e avaliação dos
+  # projetos, documentos e recomendações do Onion; não reinventar a roda, o novo parte do conhecido.
+  - id: padroes-agentes
+    cadence: monthly
+    sources:
+      - { url: "https://aaif.io", kind: primary, tier: 9, last_checked: "2026-10-27", note: "Agentic AI Foundation (Linux Foundation), casa neutra do MCP e do A2A; diretriz do maestro de 2026-10-27: consultar antes de propor padrão próprio" }
+      - { url: "https://aaif.io/blog", kind: primary, tier: 9, last_checked: "2026-10-27", note: "anúncios de projeto hospedado (o A2A entrou em 2026-08-17); diretriz do maestro de 2026-10-27" }
