@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**734 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 132 grupo(s), agrupados por `owner:` (38 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**729 itens abertos** em 127 grafo(s) com aberto (de 166 no escopo) · 131 grupo(s), agrupados por `owner:` (37 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -987,7 +987,7 @@
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
 
-## sinais-de-campo-2026-09 — 5 item(ns)
+## sinais-de-campo-2026-09 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -996,6 +996,7 @@
 | 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
 | 6.0 | `Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027` | sinais-de-campo-2026-09 | O molde de contexto como grafo, provado no piloto do design, se estende aos contextos business, technical e compliance do core e d |
 | 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
+| 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
 
 ## conductor-2026-10 — 2 item(ns)
 
@@ -1031,17 +1032,16 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
-## maestro — 12 item(ns)
+## maestro — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 8.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafos por MCP com as curas da 4.32.0 (o card está no PR 1397). |
+| 7.5 | `Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS` | coordenacao-sessoes-2026-10 | A troca para o Python 3.15 nos serviços, depois do deploy do escritor por MCP. |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA` | coordenacao-sessoes-2026-10 | Os cartões 2, 3 e 4 do teste de ida e volta (CARD-MAESTRO.md): o convite novo, o token no notebook e o teste. |
-| 6.0 | `Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS` | coordenacao-sessoes-2026-10 | A troca para o Python 3.15 nos serviços, depois do deploy do escritor por MCP. |
-| 4.5 | `Q_COORD_MAESTRO_FECHAR_SESSOES_ANTIGAS` | coordenacao-sessoes-2026-10 | Fechar as sessões antigas sem atividade do kg-ssot (243923 e b600fe) e da curadoria (onion-curation-f0). |
 | 4.5 | `Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT` | coordenacao-sessoes-2026-10 | O npm de cada release da kg-ssot, a começar pela 4.35.0. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
@@ -1235,16 +1235,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_AI_FRONT_PILOTO3_RESULTADO` | ai-front-2026-10 | O piloto 3 da curadoria chega a 2 achados aceitos ou mais depois da revisão adversarial? Se chegar, a frente de IA vira estudo re |
-
-## cortex-2026-10 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.5 | `Q_CORTEX_FROTA_GATILHO` | cortex-2026-10 | Parque da frota: algum adotante do Onion pede N issues em worktrees paralelas com aprovação humana em lote e dados isolados por  |
-| 4.5 | `Q_CORTEX_GATE_DE_PLANO_PROXIMO_PASSO` | cortex-2026-10 | Costura do gate de plano: onde o plano mora, se o .gitignore do core ignora a pasta de sessões, e como o script confere que o pla |
-| 4.5 | `Q_CORTEX_HANDOFF_GATILHO` | cortex-2026-10 | Parque do handoff no git: medidos no mesmo caso, os ganchos de retomada do worklog do core perdem para o handoff versionado do Cor |
-| 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
-| 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
 
 ## duolingo-actor-2026-10 — 1 item(ns)
 
