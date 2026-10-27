@@ -4450,7 +4450,16 @@ ${_decl}"
         else
           violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] nome da fonte privada de termos na superfície vendorizada (o termo não é impresso: o log do CI é público) — viaja p/ todo adotante; generalize. Para achar: a lista sai do modo --emit-declared do projection-safety.sh; case-a com grep -nioF contra ${f#${REPO_ROOT}/}"
         fi
-      done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
+      # `-I`: arquivo BINÁRIO (byte NUL, o critério do GNU grep) fica fora da busca por SUBSTRING.
+      # MEDIDO 2026-10-27 (bancada da kg-ssot 4.31.0): um GIF de 837 KB vendorizado deu 1 HARD porque
+      # um termo privado de 3 letras aparecia POR ACASO nos bytes comprimidos — com -i, cada posição
+      # tem 8 grafias que casam, e a chance de colisão em ~800 mil posições é da ordem de 1. Acusação
+      # que o texto não sustenta é ruído, e a guarda que grita sem motivo é a que se desliga.
+      # Texto disfarçado de binário (SVG, JSON, HTML grande) NÃO tem NUL e continua coberto.
+      # TETO DECLARADO: texto legível DENTRO de binário (metadado EXIF/XMP, PDF sem compressão, .tar
+      # sem compressão, sqlite) não é visto aqui — pede um passo PRÓPRIO de extração por formato, não
+      # substring em bytes crus.
+      done < <(grep -rilIF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
     done <<< "${_list}"
   done
 

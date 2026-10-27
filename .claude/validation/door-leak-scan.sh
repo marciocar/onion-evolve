@@ -39,7 +39,14 @@
 #   · id `onion-<x>` de adotante NÃO REGISTRADO não é visto (a classe da lista: [[vendor-scrub-blind-spot]]);
 #   · id dentro de URL pública conta como vazamento: `github.com/<dono>/onion-<adotante>` É o nome do
 #     repo privado. Só porte e porta (pelo kind) são públicos por desenho;
-#   · `.git` é excluído; arquivo binário casa como qualquer outro (o grep -r o lê).
+#   · `.git` é excluído;
+#   · binário (byte NUL) fica FORA da família `sub` desde 2026-10-27: termo curto por substring sem caixa
+#     casa POR ACASO em bytes comprimidos (medido: um GIF de 837 KB vendorizado acusou um termo privado de
+#     3 letras). Texto disfarçado (SVG, JSON) não tem NUL e segue coberto; texto legível DENTRO de
+#     binário (EXIF/XMP, PDF ou .tar sem compressão) não é visto — pede extração por formato, passo
+#     próprio. `word` e `home` SEGUEM lendo binário: palavra inteira `onion-<x>` e `/home/<conta>/` têm 8+
+#     bytes estruturados, colisão por acaso é desprezível, e um caminho real gravado num binário é
+#     vazamento de verdade.
 # =============================================================================
 set -uo pipefail
 
@@ -54,7 +61,7 @@ while [ $# -gt 0 ]; do
     --emit-sub-ids)  EMIT="sub"; shift ;;
     --emit-accounts) EMIT="home"; shift ;;
     --emit-members-tsv) EMIT="tsv"; shift ;;
-    -h|--help) sed -n '2,45p' "${BASH_SOURCE[0]}"; exit 0 ;;
+    -h|--help) sed -n '2,50p' "${BASH_SOURCE[0]}"; exit 0 ;;
     --) shift; while [ $# -gt 0 ]; do PATHS+=("$1"); shift; done ;;
     -*) echo "ERRO: opção desconhecida: $1" >&2; exit 2 ;;
     *) PATHS+=("$1"); shift ;;
@@ -119,7 +126,7 @@ if [[ ",${FAMILIES}," == *,sub,* ]]; then
     while IFS= read -r _f; do
       [ -n "${_f}" ] || continue
       printf 'sub\t%s\t-\t-\n' "${_f}"; found=1
-    done < <(grep -rilF --exclude-dir=.git -- "${_t}" "${PATHS[@]}" 2>/dev/null)
+    done < <(grep -rilIF --exclude-dir=.git -- "${_t}" "${PATHS[@]}" 2>/dev/null)   # -I: ver TETO (binário na família sub)
   done < "${_tmp}/sub"
 fi
 
