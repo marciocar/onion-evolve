@@ -243,3 +243,36 @@ jobs:
           python3 -I packaging/mcp-registry/render.py mcpb/*.mcpb server.json
           "$RUNNER_TEMP/mcp-publisher" login github-oidc
           "$RUNNER_TEMP/mcp-publisher" publish
+
+  # O site de documentação (4.31.0): o tools/kg_site.py monta a fonte a partir do README, do ADOPTING, do CHANGELOG e
+  # do manual, o Zensical constrói em modo estrito (aviso de link quebra o build) e o GitHub Pages publica. Sai depois
+  # da release do GitHub, para o site nunca anunciar uma versão que não foi publicada.
+  pages:
+    needs: github-release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Monta e constrói o site
+        run: |
+          python3 -m pip install --disable-pip-version-check --require-hashes -r tools/requirements-site.txt
+          python3 -I tools/kg_site.py --out site-src
+          zensical build --clean --strict
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1

@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:8a70e44cbbf594f5 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:a04d5568b03d2572 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.30.0",
+  "release": "kg-ssot-v4.31.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 438/438 (reprova)
+latest: 457/457 (reprova)
 optional: 10/24 (só reporta)
 ```
 

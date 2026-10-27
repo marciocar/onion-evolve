@@ -1,6 +1,6 @@
 {
-  "version": "4.30.0",
-  "tag": "kg-ssot-v4.30.0",
+  "version": "4.31.0",
+  "tag": "kg-ssot-v4.31.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -51,6 +51,9 @@
     "tools/kg_vector.py",
     "tools/requirements-vector.txt",
     "tools/requirements-rdf.txt",
+    "tools/kg_site.py",
+    "tools/requirements-site.txt",
+    "zensical.toml",
     "skills/kg-ssot/",
     ".claude-plugin/",
     "tools/kg_release_notes.py",
@@ -94,5 +97,8 @@
       "tools/kg_vendor.py",
       "tools/requirements.txt"
     ]
-  }
+  },
+  "mirror_only": [
+    "docs/demo/"
+  ]
 }

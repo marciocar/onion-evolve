@@ -561,6 +561,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_431_ADOTADA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "na branch chore/kg-ssot-4.31.0: kg_vendor.py update --tag kg-ssot-v4.31.0 --source do clone local (5c9526300f92, 651 arquivos, eram 648) e check intacto; ops/kg-gate-ci.sh rc 0 sem --update, igual antes e depois (193 grafos, 191 passam o MUST, os 2 da dívida herdada); a bancada pré-tag da ref f113410ba3a0 mediu 191 grafos porque a main cresceu dois grafos desde então, e o vendor dela difere do da tag só no locale/pt_BR/LC_MESSAGES/kg-ssot.po"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.31.0 (o site de documentação e a demo só do espelho) entrou no core, com três arquivos novos no vendor e a demo fora dele"
+    narrative: "Chegam tools/kg_site.py, tools/requirements-site.txt e zensical.toml, que constroem o site de documentação da kg-ssot e ficam inertes para a maquinaria do core: nenhum workflow, lint ou censo de versões lê o requirements do site, só o requirements do contrato, que não mudou. A demo gravada (docs/demo/) está na lista mirror_only do spec/release.json, que a publica no repositório público e no site e não a leva ao vendor: ela não aparece nem no vendor nem no carimbo. O contrato segue v4.15. Diante da bancada, a tag trouxe a tradução da mensagem do mirror_only no .po e um ajuste de teste para o console do Windows, que não viaja para o vendor."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check e do ops/kg-gate-ci.sh; comparação com o vendor da bancada pré-tag da ref f113410ba3a0"
+      method: "medição: atualização do vendor, gate do contrato antes e depois, diff contra o vendor da bancada e lint completo com o vendor novo"
+      locality: "repo"
   - id: E_KG_SSOT_430_ADOTADA_1026
     node_type: evidence
     layer: audit
@@ -1312,3 +1329,6 @@ edges:
   - from: D_MANUAL_CANAIS_A2A_AGORA_1027
     to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
     edge_type: TRACES_TO
+  - from: E_KG_SSOT_431_ADOTADA_1027
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS

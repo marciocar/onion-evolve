@@ -10,6 +10,15 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.31.0] - 2026-10-26
+
+A documentation site at https://marciocar.github.io/kg-ssot/, built from the README, the adoption guide, the changelog
+and the manual by `tools/kg_site.py` and Zensical, and published to GitHub Pages by the release workflow; a 40-second
+demo in the README, recorded from `docs/demo/demo.sh` and listed in the new `mirror_only` of `spec/release.json`, so it is
+published in the public repository and on the site but not vendored by adopters. The README and the manual counted the conformance suite as 438
+cases while `latest/` had 457; the count is fixed and the hygiene check now ties it to the suite manifests. Contract
+v4.15, unchanged.
+
 ## [4.30.0] - 2026-10-26
 
 The release carries the agent skill `skills/kg-ssot/` (Agent Skills format) and a Claude Code plugin marketplace in

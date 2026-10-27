@@ -343,6 +343,11 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.30.0` to `kg-ssot-v4.31.0`, nothing changes in the gate or the vendored tools: the release adds
+`tools/kg_site.py`, `tools/requirements-site.txt` and `zensical.toml`, which `kg_vendor.py` brings along and which no
+tool of the gate reads. The demo in `docs/demo/` is published only in the public repository and on the site (the new
+`mirror_only` list of `spec/release.json`), so the vendor does not grow by its GIF.
+
 From `kg-ssot-v4.29.1` to `kg-ssot-v4.30.0`, nothing changes in the gate or the vendored tools: the release adds
 `skills/kg-ssot/` and `.claude-plugin/`, which `kg_vendor.py` brings along and which no tool reads.
 
