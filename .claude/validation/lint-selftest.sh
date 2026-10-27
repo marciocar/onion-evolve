@@ -14828,6 +14828,14 @@ YML
   openssl pkey -in "${sb}/priv.pem" -pubout -out "${sb}/jwks/k1.pem" 2>/dev/null
   local NOW out rc
   NOW="$(date +%s)"
+  # RELÓGIO INJETADO (2026-10-27): o NOW da fixture é lido UMA vez, no início da família, e os envelopes
+  # vivem NOW+100/NOW+300 — numa VPS lenta (um commit levou ~20 min) o gate lia o relógio real minutos
+  # depois e o caso "exp anterior ao iat" virava "expired", o do teto pelo now virava verified. O `date +%s`
+  # do gate (e do remetente do spike) passa a devolver o NOW da fixture; qualquer outro formato vai ao
+  # date real. Os casos de vencido seguem vencidos: são NOW-3600 contra o MESMO NOW. Os casos do relógio
+  # (clkbin/chb) montam o PATH deles e não veem este stub.
+  printf '#!/bin/sh\nif [ "$#" -eq 1 ] && [ "$1" = "+%%s" ]; then echo %s; else exec %s "$@"; fi\n' \
+    "${NOW}" "$(command -v date)" > "${_A2A_SYNC}/date"; chmod +x "${_A2A_SYNC}/date"
   _b64url() { _a2a_fx_b64url; }
   _sha() { _a2a_fx_sha; }
   # Desde 2026-10-14 o corpo entra na assinatura: o _jws assina body_sha256 de ${_BODY} (vazio por default,
@@ -15419,7 +15427,7 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   if [ ! -f "${snd}" ]; then record_fail "a2a-verify: remetente do spike" "ausente: ${snd}"
   elif ! command -v curl >/dev/null 2>&1; then record_skip "a2a-verify: remetente do spike exige curl no PATH → skip (não-SUT)"
   else
-    _spk() { HOME="${sb}/home" bash "${snd}" --dry-run --key "${sb}/priv.pem" --kid k1 --from acme --to onion-evolve "$@" 2>/dev/null; }
+    _spk() { HOME="${sb}/home" PATH="${_A2A_SYNC}:${PATH}" bash "${snd}" --dry-run --key "${sb}/priv.pem" --kid k1 --from acme --to onion-evolve "$@" 2>/dev/null; }
     _verify onion-evolve "$(_spk --body $'conversa do spike: "olá", é?\n')"
     if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}"; then record_pass "a2a-verify: envelope do send-a2a.sh do spike → verified"
     else record_fail "a2a-verify: remetente do spike" "out='${out}' rc=${rc}"; fi
