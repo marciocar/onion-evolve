@@ -920,6 +920,23 @@ nodes:
     confidence: 0.5
     label: "A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), passa no critério pré-registrado?"
     narrative: "Nasce porque o selo da pergunta da ida e volta viva, em 2026-10-27, a fechou como decidida (vira critério e linha de base da pesquisa de canal para empresas), e decidir não é medir: a medida ainda não foi feita. Fecha com um teste só: pré-registro commitado antes do dado, com o critério e os negativos; envio da VPS para o notebook e resposta de volta do notebook para a VPS pela composição (HTTP A2A do bridge e MCP local cuja ferramenta de envio só grava rascunho); nenhum envio automático, nem com o cliente em bypass nem com o Always allow; nenhuma ferramenta de aceitar exposta ao modelo; e a identidade do remetente estável nas duas pernas, conferida pela assinatura e pela chave pinada. Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar."
+  - id: E_IDA_E_VOLTA_VPS_NOTEBOOK_PRE_REGISTRO_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "PRE-REGISTRO.md e CARD-MAESTRO.md commitados neste PR antes de qualquer passo vivo; a pré-condição foi medida pela sessão do core na VPS em 2026-10-27: /health 200, POST /a2a sem credencial 401, doctor do receptor rc 0 para o maestro-peer-test, convite dele vencido em 2026-10-22 e a peça de rascunho ausente no core e no bridge"
+    trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md; docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/CARD-MAESTRO.md"
+    label: "Pré-registro da ida e volta viva entre a VPS e o notebook pela composição: sucesso e oito modos de falha fixados antes de rodar; o teste está bloqueado pela peça de rascunho, que não existe, e por um convite novo"
+    narrative: "Decisão do maestro de 2026-10-27, «Prepare o pré-registro e o card». Sucesso só com tudo junto: ida e volta completa da VPS ao notebook e de volta, nas duas rodadas com reinício no meio; nenhum envio automático, nem com bypass nem com o sempre permitir marcado; o envio parado em rascunho até o humano rodar o script; a identidade do remetente igual depois do reinício (remetente, chave e impressão); o corpo que pede ação sem virar ação; nenhuma porta de entrada no notebook; e nenhuma ferramenta de enviar ou de aceitar exposta ao modelo; e, por pedido do maestro no mesmo dia, a mensagem enviada com o destino fechado chegando quando ele abre, no canal nativo entre máquinas da mesma pessoa (a fila anunciada na versão 2.1.261 do Claude Code, com o tempo de vida dela medido e não julgado) e no receptor A2A (o registro sobrevive ao reinício do receptor e é lido uma vez só). Falha, cada uma nomeada: entrega perdida em dez minutos, perda silenciosa com o destino fechado, duplicata, envio automático, identidade trocada, mensagem ou entrega tratada como aprovação, porta exposta no notebook e ferramenta proibida exposta. As sessões de teste abrem sem nenhuma ferramenta embutida e só com o MCP local do teste, de modo que a superfície da sessão não tem como enviar; o limite declarado é que a sessão roda no mesmo usuário do sistema dono da chave e do token. O notebook entra pelo WSL (o Linux dentro do Windows): a sessão e o envio no usuário de teste cuja chave nasceu no notebook, a retirada por ssh no usuário do maestro, e nenhuma conexão de entrada: nas duas pernas é o notebook quem conecta. Medido na preparação: a peça de rascunho não existe, e construí-la muda o parque do transporte entre agentes para perseguir, o que é decisão do maestro; o contrato da peça ficou fixado antes, para o critério não ser ajustado a ela. O convite do membro de teste venceu e precisa ser refeito pelo maestro. A pergunta segue aberta até o resultado."
+    provenance:
+      source: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
+      locator: "§2 (sucesso), §3 (falha), §4 (passos e medidas), §5 (contrato da peça de rascunho) e o card da pré-condição em CARD-MAESTRO.md"
+      method: "testemunho: pré-registro do critério pelo core, a pedido do maestro, com a pré-condição medida na VPS"
+      locality: "repo"
   - id: E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025
     node_type: evidence
     layer: audit
@@ -1325,6 +1342,9 @@ edges:
     edge_type: TRACES_TO
   - from: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_VPS_NOTEBOOK_PRE_REGISTRO_1027
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     edge_type: TRACES_TO
   - from: D_MANUAL_CANAIS_A2A_AGORA_1027
     to: Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025
