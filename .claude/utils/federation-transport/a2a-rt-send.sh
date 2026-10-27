@@ -54,7 +54,12 @@ esac; done
 case "${SIDE}" in core|member) ;; *) die "--side core|member obrigatório" ;; esac
 case "${DRAFT}" in ''|*[!A-Za-z0-9._-]*|.*) die "--draft <id> obrigatório, na forma [A-Za-z0-9._-]" ;; esac
 case "${EXP_OFF}" in ''|*[!0-9]*) die "--exp-offset inteiro positivo" ;; esac
-for t in jq openssl; do command -v "$t" >/dev/null 2>&1 || die "ferramenta ausente: $t"; done
+for t in jq openssl python3; do command -v "$t" >/dev/null 2>&1 || die "ferramenta ausente: $t"; done
+# LOMBADA, não portão (passada adversarial de 2026-10-27): o Bash de uma sessão do Claude Code exporta CLAUDECODE.
+# Quem roda no mesmo usuário e abre um pty (script -qec) contorna o /dev/tty; esta recusa só torna o contorno um ato
+# deliberado e visível. O limite real (pty prova terminal, não humano) está declarado no PRE-REGISTRO.md, Emenda 1.
+[ -z "${CLAUDECODE:-}" ] && [ -z "${CLAUDE_CODE_ENTRYPOINT:-}" ] \
+  || refuse "rodando dentro de uma sessão do Claude Code (CLAUDECODE no ambiente): o envio é do humano, no terminal dele."
 [ -f "${SEND}" ] || die "remetente canônico ausente: ${SEND}"
 
 DF="${STATE}/drafts/${DRAFT}.json"
@@ -87,19 +92,25 @@ exec 3<>/dev/tty
   echo "thread: ${THREAD:-(nova)}"
   echo "bytes:  ${BYTES} · sha256 ${SHA}"
   echo "──────── corpo ────────"
-  # caractere de controle vira '?' na TELA (o corpo assinado não muda): um ESC do texto do modelo não pode
-  # apagar linha, mover o cursor nem desenhar um rascunho falso por cima do verdadeiro
-  LC_ALL=C tr '\000-\010\013-\037\177' '?' < "${WORK}/body" | sed 's/^/  │ /'; echo
+  # na TELA (o corpo assinado não muda), todo caractere de controle, de formato ou separador de linha vira '?',
+  # por CODEPOINT: C0, C1 (o CSI de 8 bits), bidi (U+202E), largura zero, U+2028. Um texto do modelo não pode
+  # apagar linha, mover o cursor, inverter a leitura nem desenhar um rascunho falso por cima do verdadeiro.
+  python3 -I -c 'import sys, unicodedata as u
+t = open(sys.argv[1], encoding="utf-8").read()
+c = "".join(ch if ch in "\n\t" or u.category(ch) not in ("Cc", "Cf", "Co", "Cs", "Zl", "Zp") else "?" for ch in t)
+ls = c.split("\n")
+print("\n".join("  │ " + x for x in ls))
+print(f"  └── fim do corpo: {len(ls)} linha(s)")' "${WORK}/body"
   echo "────────────────────────"
   printf 'Para ASSINAR e ENVIAR, digite exatamente:  ENVIAR %s\n> ' "${CODE}"
 } >&3
 ANS=""; IFS= read -r ANS <&3 || true
 exec 3>&-
-[ "${ANS}" = "ENVIAR ${CODE}" ] || refuse "confirmação não confere (esperado 'ENVIAR ${CODE}')."
+[ "${ANS}" = "ENVIAR ${CODE}" ] || refuse "a confirmação digitada não confere."
 
 record_sent() {  # $1 = jti
   ( umask 077; printf '%s\t%s\t%s\t%s\t%s\n' "${DRAFT}" "$1" "${THREAD}" "$(date +%s)" "${SIDE}" >> "${SENT_TSV}" )
-  mkdir -p "${STATE}/drafts/sent"; mv -f "${DF}" "${STATE}/drafts/sent/${DRAFT}.json"
+  ( umask 077; mkdir -p "${STATE}/drafts/sent" ); mv -f "${DF}" "${STATE}/drafts/sent/${DRAFT}.json"
 }
 TARGS=(); [ -z "${THREAD}" ] || TARGS=(--thread "${THREAD}")
 

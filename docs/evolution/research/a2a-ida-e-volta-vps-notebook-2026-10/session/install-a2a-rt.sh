@@ -11,7 +11,8 @@
 # Uso: bash install-a2a-rt.sh --side notebook|vps [--core DIR]
 #   notebook  A2A_RT_ME=maestro-peer-test; caixa = ~/.local/state/onion/a2a-rt/inbox (os envelopes [ok] da
 #             retirada, copiados pelo marciocar com sudo install); verifica com a pública pinada do core
-#   vps       A2A_RT_ME=onion-evolve; caixa = <core>/docs/evolution/inbox (só os docs do a2a-accept.sh)
+#   vps       A2A_RT_ME=onion-evolve; caixa = <core>/docs/evolution/inbox (só os docs que estão no razão de
+#             aceites do a2a-accept.sh, <core>/.claude/sessions/.a2a-accept.onion-evolve.ledger)
 #   --core    o checkout do core de onde se copia (default: a raiz deste repositório)
 # Depois: claude --tools "" --strict-mcp-config --mcp-config ~/.local/share/onion/a2a-rt/mcp.json \
 #                --settings ~/.local/share/onion/a2a-rt/settings.json --permission-mode default
@@ -44,11 +45,12 @@ install -m 644 "${PUB}" "${D}/onion-evolve-spike-1.pub.pem"
 if [ "${SIDE}" = notebook ]; then
   ENVJ="$(jq -n --arg s "${S}" --arg in "${S}/inbox" --arg pub "${D}/onion-evolve-spike-1.pub.pem" \
     '{A2A_RT_ME:"maestro-peer-test", A2A_RT_STATE:$s, A2A_RT_INBOX_MODE:"envelope", A2A_RT_INBOX:$in,
-      A2A_RT_PEER_PUB:$pub, A2A_RT_PEER_KID:"onion-evolve-spike-1"}')"
+      A2A_RT_PEER_PUB:$pub, A2A_RT_PEER_KID:"onion-evolve-spike-1", A2A_RT_PEER_ID:"onion-evolve"}')"
 else
   [ -d "${CORE}/docs/evolution/inbox" ] || die "inbox do core ausente: ${CORE}/docs/evolution/inbox"
-  ENVJ="$(jq -n --arg s "${S}" --arg in "${CORE}/docs/evolution/inbox" \
-    '{A2A_RT_ME:"onion-evolve", A2A_RT_STATE:$s, A2A_RT_INBOX_MODE:"inbox-doc", A2A_RT_INBOX:$in}')"
+  # o razão de aceites do a2a-accept.sh: só o doc registrado nele chega ao modelo (o frontmatter não é prova)
+  ENVJ="$(jq -n --arg s "${S}" --arg in "${CORE}/docs/evolution/inbox" --arg led "${CORE}/.claude/sessions/.a2a-accept.onion-evolve.ledger" \
+    '{A2A_RT_ME:"onion-evolve", A2A_RT_STATE:$s, A2A_RT_INBOX_MODE:"inbox-doc", A2A_RT_INBOX:$in, A2A_RT_ACCEPT_LEDGER:$led}')"
 fi
 ( umask 077
   jq -n --arg py "${D}/a2a-rt-mcp.py" --argjson env "${ENVJ}" \
