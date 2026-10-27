@@ -2,7 +2,8 @@
 branch: docs/cross-session-coordination-graph
 pr: 1410
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 871dfa4f2f64d1c06e77bfa9f6f0cd6b3d36add63f4f928bc0d74204703112be
+reviewed_code_sha256: 85ce8468bcc1dec5e92e7657f56425d05dcfad1bd2ba85bd33d061088b7cc392
 findings_total: 4
 findings_real: 3
 tokens: 0
