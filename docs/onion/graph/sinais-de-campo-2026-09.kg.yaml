@@ -567,6 +567,23 @@ nodes:
       locator: "saída do kg_vendor.py update e do ops/kg-gate-ci.sh; campo resolved_targets do schema; lista do perfil gate"
       method: "medição: atualização do vendor, gate do contrato contra o corpus rastreado e leitura do schema e do release.json"
       locality: "repo"
+  - id: E_KG_SSOT_434_ADOTADA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "na branch chore/kg-ssot-4.34.0: kg_vendor.py update --tag kg-ssot-v4.34.0 --source do clone local (57533348af50, 658 arquivos, sem arquivo novo) e check intacto; ops/kg-gate-ci.sh rc 0, também com --strict-identity, igual antes e depois (195 grafos, 193 passam o MUST, os 2 da dívida herdada, sem aviso de identidade); o kg_query.py da tag é idêntico ao da ref a0589dacd22a da bancada pré-tag, que muda só no teste, no manual e no grafo do produto; kg_query.py --chain nos dois selos reais da peça de rascunho e da topologia entre agentes rc 0 com a origem no próprio selo, saída igual à da bancada; o caso novo da família decide da bancada passa e reprova com o mutante do source com fragmento de grafo"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.34.0 (a cadeia de transmissão segue o provenance.source) entrou no core sem mudar o contrato, e o selo do maestro ganhou bancada como origem da própria cadeia"
+    narrative: "A 4.34.0 só muda o kg_query --chain, e o contrato segue v4.16. O que entra é o acordo de transmissão entre o core, a kg-ssot e a curadoria: a cadeia segue primeiro o provenance.source; um source sem fragmento de grafo faz do nó a origem; e a TRACES_TO de um nó que tem provenance não é seguida, e sai na lista de arestas não seguidas, porque um selo rastreia a pergunta que responde, não a de onde veio. O vendor continua com 658 arquivos, e em spec/ só muda o release.json. Nenhum grafo do core muda de veredito, e a identidade do contrato não muda, então o --update não foi preciso. Nos dois selos reais, a peça de rascunho entre agentes e a topologia entre agentes da empresa adotante, a origem é o próprio selo, com method testimony, e a pergunta respondida aparece entre as arestas não seguidas. No mesmo PR, a família decide da bancada ganha o caso que grava um selo novo com o kg-decide-seal.sh num grafo descartável, com --new e --link para uma pergunta, roda o kg_query.py vendorizado e lê o rc e o JSON: a origem é o selo, o method é testimony e a aresta para a pergunta não é seguida. O mutante, um selador que grava o source com fragmento de grafo, faz a pergunta virar a origem, e o caso reprova. A medida achou um detalhe do leitor: num repositório versionado o corpus do kg_query é o que está rastreado, então o grafo da bancada precisa estar commitado para existir para ele."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh antes e depois e do kg_query.py --chain nos dois selos; diff da saída contra a da bancada; bancada da família decide com e sem o mutante"
+      method: "measurement: atualização do vendor, gate do contrato antes e depois, comparação com a bancada pré-tag, teste vivo da cadeia no corpus real e bancada do selo com mutante"
+      locality: "repo"
   - id: E_KG_SSOT_433_ADOTADA_1027
     node_type: evidence
     layer: audit
@@ -1558,6 +1575,9 @@ edges:
     to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     edge_type: TRACES_TO
   - from: E_KG_SSOT_433_ADOTADA_1027
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_434_ADOTADA_1027
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
   - from: Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027

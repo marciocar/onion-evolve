@@ -91,6 +91,7 @@ and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.
 | 4.29 | Contract v4.15, unchanged. The `rdf` extra reads the PROV export, and `kg_prov_export.py --full` exports the whole document; in 4.29.1, a malformed edge end goes as a literal |
 | 4.30 | Contract v4.15, unchanged. The agent skill (`skills/kg-ssot/`, Agent Skills format) and the Claude Code plugin marketplace |
 | 4.31 | Contract v4.15, unchanged. The documentation site and the demo, published only in the public repository (`mirror_only`); in 4.31.1, the site renders code blocks |
+| 4.34 | Contract v4.16, unchanged. `kg_query --chain` follows `provenance.source` first, and an origin with no `provenance.source` is marked and makes the chain `weak` |
 | 4.33 | Contract v4.16, unchanged. `kg_query --chain`: the transmission chain from a node to its origin, with the weakest link and the strength of the origin on separate axes, and a strict and a lenient grade |
 | 4.32 | Contract v4.16: the class of `provenance.method` has a canonical English form (`measurement`, `reading`, `judges`, `derived`, `testimony`), and the Portuguese words stay accepted as aliases |
 

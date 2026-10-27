@@ -3349,3 +3349,11 @@ msgstr "· mais de {n} caminhos: a projeção para aí"
 #: tools/kg_query.py
 msgid "{id}  confidence={conf}  method={cls}"
 msgstr "{id}  confiança={conf}  método={cls}"
+
+#: tools/kg_query.py
+msgid "  the origin has no provenance.source: the chain may go on outside what the graph records"
+msgstr "  a origem não tem provenance.source: a corrente pode seguir fora do que o grafo registra"
+
+#: tools/kg_query.py
+msgid "edges not followed, the node declares its provenance: {ids}"
+msgstr "arestas não seguidas, o nó declara o seu provenance: {ids}"

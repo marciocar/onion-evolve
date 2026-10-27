@@ -45739,6 +45739,35 @@ DEC_ORF2
       record_pass "decide: (s16) o lint de nomes é gate do selo: código solto copiado para a narrative → rc 3 desfeito; glosado → rc 0; não rastreado → declarado"
     else record_fail "decide: (s16)" "${_kv} $(_emit "${out}" | tail -3 | tr '\n' ' ')"; fi
   else record_skip "decide: (s16) kg_vocab.py não vendorizado (o lint de nomes do selo NÃO verificado)"; fi
+  # (s17) o ACORDO DE TRANSMISSÃO da kg-ssot 4.34.0 (a cadeia do kg_query --chain segue o provenance.source): o selo
+  #       do maestro é a ORIGEM da própria cadeia. O source do selador não tem fragmento de grafo, então o nó é a
+  #       origem, com method testimony, e a TRACES_TO do selo para a pergunta que ele responde sai em
+  #       edges_not_followed (o selo responde a pergunta, não vem dela). Lê o rc e o JSON, nunca a prosa. Mutante: o
+  #       selador que grava o source com fragmento de grafo (docs/g.kg.yaml#Q_ALVO) faz a pergunta virar a origem.
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_query.py" ]; then
+    local rq="${sb}/cadeia" gq _kq=""; mkdir -p "${rq}/docs" "${rq}/vendor"; "${G[@]}" -C "${rq}" init -q . 2>/dev/null
+    ln -s "${REPO_ROOT}/vendor/kg-ssot" "${rq}/vendor/kg-ssot"
+    gq="${rq}/docs/g.kg.yaml"
+    _dec_graph cadeia "$(_dec_node Q_ALVO question open 'qual caminho segue a cadeia?')" > "${gq}"
+    # rastreado: num repo git o corpus do kg_query é o que o git conhece (o grafo não rastreado não existe para ele)
+    "${G[@]}" -C "${rq}" add docs/g.kg.yaml
+    "${G[@]}" -C "${rq}" commit -q -m c1
+    if out="$(bash "${seal}" "${gq}" --new D_SELO_CADEIA --label "decidiu-se pela cadeia" --link Q_ALVO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 0 ] || _kq="${_kq} selo-rc${rc}"
+    if out="$(python3 -I "${REPO_ROOT}/vendor/kg-ssot/tools/kg_query.py" --root "${rq}" --chain D_SELO_CADEIA --format json 2>/dev/null)"; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 0 ] || _kq="${_kq} chain-rc${rc}"
+    python3 -I -c '
+import json, sys
+d = json.loads(sys.stdin.read())
+p = d["paths"]
+ok = (len(p) == 1 and p[0]["status"] == "complete" and p[0]["origin"]["id"] == "D_SELO_CADEIA"
+      and p[0]["origin"]["method_class"] == "testimony" and p[0]["links"][0]["id"] == "D_SELO_CADEIA"
+      and "Q_ALVO" in p[0]["links"][0]["edges_not_followed"])
+sys.exit(0 if ok else 1)' <<< "${out}" 2>/dev/null || _kq="${_kq} cadeia-errada"
+    if [ -z "${_kq}" ]; then
+      record_pass "decide: (s17) o selo é a origem da própria cadeia (kg_query --chain): method testimony, e a TRACES_TO para a pergunta em edges_not_followed"
+    else record_fail "decide: (s17)" "${_kq} $(_emit "${out}" | head -c 300 | tr '\n' ' ')"; fi
+  else record_skip "decide: (s17) kg_query.py não vendorizado (a cadeia do selo NÃO verificada)"; fi
   # ── o PAINEL opcional (decide-panel.sh, cláusula 9; D_INTELLIGENT_UI_1021, 2026-10-21) ──────────────────
   #   (pn1) PARIDADE: o painel e o AskUserQuestion saem do MESMO censo com as mesmas opções, na mesma ordem, a
   #         recomendada primeiro (e só ela marcada), na ordem do censo; as opções de ATO são as da classe medida.
