@@ -11848,6 +11848,13 @@ run_migrate_python_service_selftests() {
   if [ ! -f "${wr}" ]; then record_skip "migrate-python-service: sem ops/migrate-python-service.sh (core-only) — nada a testar"; return; fi
   command -v flock >/dev/null 2>&1 || { record_skip "migrate-python-service: flock ausente → pulado"; return; }
   [ "$(id -u)" = 0 ] && { record_skip "migrate-python-service: rodando como root (o wrapper recusa root) → pulado"; return; }
+  # os nomes e caminhos de produção saem do PRÓPRIO wrapper (core-only): esta bancada viaja, e a REGRA 36 e a REGRA 106
+  # barram nome de adotante e home de conta nela
+  local MPR MPR_CODE MPW_CODE
+  read -r MPR MPR_CODE < <(sed -n 's#^  \([a-z]*\)) *UNIT=onion-vps-mcp-kg-[a-z]*; CODE="${R}\([^"]*\)"; REL=ops/mcp-onion-kg$#\1 \2#p' "${wr}")
+  read -r _ MPW_CODE < <(sed -n 's#^  \(writer\)) *UNIT=onion-vps-mcp-kg-writer; CODE="${R}\([^"]*\)"; REL=ops/mcp-onion-kg-writer$#\1 \2#p' "${wr}")
+  if [ -z "${MPR}" ] || [ -z "${MPR_CODE}" ] || [ -z "${MPW_CODE}" ]; then record_fail "migrate-python-service" "não li do wrapper o serviço de leitura e as worktrees servidas (a forma do case mudou)"; return; fi
+  local -x MP_W_UNIT=onion-vps-mcp-kg-writer MP_W_SRV="${MPW_CODE}/ops/mcp-onion-kg-writer/server.py" MP_R_SRV="${MPR_CODE}/ops/mcp-onion-kg/server.py"
   local d; d="$(mktemp -d)"
   local R="${d}/r" F="${d}/f" K="${d}/fk"
   mkdir -p "${K}"
@@ -11888,7 +11895,7 @@ case "$verb" in
   show) unit="$1"; shift; props=""; val=0
     while [ $# -gt 0 ]; do case "$1" in -p) props="$props $2"; shift 2 ;; --value) val=1; shift ;; *) shift ;; esac; done
     di="$R/etc/systemd/system/$unit.service.d/50-python.conf"
-    case "$unit" in onion-vps-mcp-kg-writer) srv=/home/marcio/mcp-kg/core-writer/ops/mcp-onion-kg-writer/server.py ;; *) srv=/home/marcio/mcp-kg/core-served/ops/mcp-onion-kg/server.py ;; esac
+    if [ "$unit" = "$MP_W_UNIT" ]; then srv="$MP_W_SRV"; else srv="$MP_R_SRV"; fi
     for p in $props; do
       case "$p" in
         MainPID) v=4242 ;; NRestarts) v=0 ;;
@@ -11943,7 +11950,7 @@ EOF
     cp "${d}/fpy" "${F}/fpy"; cp "${d}/fpy" "${R}/usr/bin/python3"; cp "${d}/fpy" "${R}/usr/bin/python3.12"
     ln -s "${R}/usr/bin/python3.12" "${R}/proc/4242/exe"; printf 'PATH=/usr/bin:/bin\0' > "${R}/proc/4242/environ"; echo dado > "${R}/var/lib/onion-chat-kg/area/x.kg.yaml"
     echo 3.15.2 > "${F}/pyver"; echo 2 > "${F}/tools"; printf 'pyyaml==6.0.3\njsonschema==4.26.0\nattrs==26.1.0\n' > "${F}/pins"
-    _mpcode "${R}/home/marcio/mcp-kg/core-served" ops/mcp-onion-kg; _mpcode "${R}/home/marcio/mcp-kg/core-writer" ops/mcp-onion-kg-writer
+    _mpcode "${R}${MPR_CODE}" ops/mcp-onion-kg; _mpcode "${R}${MPW_CODE}" ops/mcp-onion-kg-writer
   }
   _mpr() {  # _mpr <script> <args…> → "rc|saída"
     local w="$1" rc=0 out; shift
@@ -11991,24 +11998,24 @@ PY
     _mprc "${r}" 1 && _mphas "${r}" "RECUSADO: apply sem --yes" && [ ! -e "$(_mpdi writer)" ] && [ ! -e "${VW}" ] && [ "$(_mpcalls 'systemctl restart')" = 0 ]; }
   _mc_apply() { local r; _mprt "$1"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:900}"
     _mprc "${r}" 0 && _mphas "${r}" "OK: onion-vps-mcp-kg-writer no 3.15.2" && grep -qxF "Environment=PATH=${VW}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" "$(_mpdi writer)" \
-      && grep -qxF "ExecStart=${VW}/bin/python /home/marcio/mcp-kg/core-writer/ops/mcp-onion-kg-writer/server.py" "$(_mpdi writer)" \
+      && grep -qxF "ExecStart=${VW}/bin/python ${MP_W_SRV}" "$(_mpdi writer)" \
       && [ -f "${VW}/.onion-venv-complete" ] && case "$(_mpexe)" in "${R}/opt/onion-python/"*) true ;; *) false ;; esac \
       && [ "$(find "${R}/backups/onion-chat-kg" -name '*-pre-py3.15.2.tar.gz' -perm 0600 | wc -l)" = 1 ]; }
   _mc_noruntime() { local r; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:300}"
     _mprc "${r}" 1 && _mphas "${r}" "runtime apply --yes" && [ ! -e "$(_mpdi writer)" ] && [ ! -e "${R}/opt/onion-venvs" ]; }
   _mc_stfail() { local r; _mprt "$1"; : > "${F}/selftest-fail"; : > "${F}/calls"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:400}"
     _mprc "${r}" 1 && _mphas "${r}" "selftest reprovou no 3.15.2" && [ ! -e "$(_mpdi writer)" ] && [ "$(_mpcalls 'systemctl restart')" = 0 ]; }
-  _mc_parity() { local r; _mprt "$1"; : > "${F}/parity-diverge"; : > "${F}/calls"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
-    _mprc "${r}" 1 && _mphas "${r}" "paridade antes × depois DIVERGE" && [ ! -e "$(_mpdi granaai)" ] && [ "$(_mpcalls 'systemctl restart')" = 0 ]; }
-  _mc_radar() { local r; _mprt "$1"; : > "${F}/radar-diverge"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
-    _mprc "${r}" 1 && _mphas "${r}" "DIVERGE" && [ ! -e "$(_mpdi granaai)" ]; }
+  _mc_parity() { local r; _mprt "$1"; : > "${F}/parity-diverge"; : > "${F}/calls"; r="$(_mpr "$1" "${MPR}" apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 1 && _mphas "${r}" "paridade antes × depois DIVERGE" && [ ! -e "$(_mpdi "${MPR}")" ] && [ "$(_mpcalls 'systemctl restart')" = 0 ]; }
+  _mc_radar() { local r; _mprt "$1"; : > "${F}/radar-diverge"; r="$(_mpr "$1" "${MPR}" apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 1 && _mphas "${r}" "DIVERGE" && [ ! -e "$(_mpdi "${MPR}")" ]; }
   # o kg_validate que NÃO julga (o vendor antigo sem --format sai rc 2, e um traceback sai rc 1, nas duas pernas):
   # "igual" seria verde sem medir. A guarda do rc 2 e a da forma do relatório se cobrem uma à outra (defesa dupla, por
   # isso o rc 2 entra sem mutante próprio); o mutante é o do traceback, que só a forma pega
-  _mc_rc2() { local r; _mprt "$1"; : > "${F}/validate-rc2"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
-    _mprc "${r}" 2 && _mphas "${r}" "não medi a paridade" && [ ! -e "$(_mpdi granaai)" ]; }
-  _mc_traceback() { local r; _mprt "$1"; : > "${F}/validate-traceback"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
-    _mprc "${r}" 2 && _mphas "${r}" "não medi a paridade" && [ ! -e "$(_mpdi granaai)" ]; }
+  _mc_rc2() { local r; _mprt "$1"; : > "${F}/validate-rc2"; r="$(_mpr "$1" "${MPR}" apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 2 && _mphas "${r}" "não medi a paridade" && [ ! -e "$(_mpdi "${MPR}")" ]; }
+  _mc_traceback() { local r; _mprt "$1"; : > "${F}/validate-traceback"; r="$(_mpr "$1" "${MPR}" apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 2 && _mphas "${r}" "não medi a paridade" && [ ! -e "$(_mpdi "${MPR}")" ]; }
   # o verify ANTES da migração: sem o venv, a perna nova cairia no python3 do sistema e daria "igual" (dogfood de 2026-10-27)
   _mc_novenv() { local r; _mprt "$1"; r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:600}"
     _mprc "${r}" 1 && _mphas "${r}" "FALHA paridade não medida: não medi a perna nova"; }

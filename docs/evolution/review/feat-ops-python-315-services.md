@@ -2,8 +2,7 @@
 branch: feat/ops-python-315-services
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: 8600a0bb875b1e9df328327f62301fedfa669d24038c240728d75df3ee4ab4e6
-reviewed_code_sha256: abd42e10290c4e198accb420d4c2218ccfce28db30f4c6520e9fba53c4251155
+reviewed_diff_sha256: pendente
 findings_total: 13
 findings_real: 10
 tokens: 152773
