@@ -7638,7 +7638,10 @@ case "${C}" in
      bash "${H}" crlf.txt "y = 2|||y = 3  # ${M}" bash -c '[ "$(grep -c $'"'"'\r'"'"' crlf.txt)" = 2 ] || exit 0; grep -q "y = 2" crlf.txt' >/dev/null 2>&1 || rc=$?
      # o mutante tem de MORRER pelo conteúdo (y = 2 sumiu) com os dois CR intactos; sem eles, o comando sai 0 (sobrevive)
      [ "${rc}" = 1 ] && [ "${c0}" = 2 ] && [ "$(grep -c $'\r' crlf.txt)" = 2 ] ;;
-  l) bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'echo r >> runs; grep -q "ONION""_MUTANTE" alvo.py || kill -INT "${PPID}"; exit 0' >/dev/null 2>&1 || rc=$?
+  l) # o SIGINT volta ao padrão antes do helper: numa faixa paralela da bancada (job em segundo plano) o bash herda o
+     #    INT IGNORADO, e sinal ignorado na entrada não se pode capturar — o caso falhava só no CI (medido em 2026-10-27)
+     python3 -I -c 'import os, signal, sys; signal.signal(signal.SIGINT, signal.SIG_DFL); os.execvp(sys.argv[1], sys.argv[1:])' \
+       bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'echo r >> runs; grep -q "ONION""_MUTANTE" alvo.py || kill -INT "${PPID}"; exit 0' >/dev/null 2>&1 || rc=$?
      # Ctrl-C na LINHA DE BASE: o helper sai 130 e NUNCA planta nem roda o mutante (o comando rodou 1 vez)
      [ "${rc}" = 130 ] && intact && [ "$(ran)" = 1 ] ;;
   n) [ "$(id -u)" = 0 ] && exit 3
