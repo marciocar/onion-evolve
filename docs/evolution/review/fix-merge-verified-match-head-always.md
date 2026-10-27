@@ -2,7 +2,8 @@
 branch: fix/merge-verified-match-head-always
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d93c5d081d2bfeee7fa1f29b053e1376784db8ae41f4eee186e87fc1d949ae45
+reviewed_code_sha256: d2e9c29ccc182d3fd03845390f20f3b735d3bdebd5f7ebac6c4cda574c99a92c
 findings_total: 9
 findings_real: 4
 tokens: 105419
