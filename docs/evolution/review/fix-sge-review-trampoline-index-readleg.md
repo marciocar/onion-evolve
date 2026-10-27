@@ -2,7 +2,8 @@
 branch: fix/sge-review-trampoline-index-readleg
 pr: pendente
 date: 2026-10-26
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 39eb11378905cdfd9ad35a6032600ee09c35e9f332a47e8e1ece872c20bf7560
+reviewed_code_sha256: f3ee745be06f62303c8fa2131514d241352a38b0df53cc4c5bdb2487e32d0d5d
 findings_total: 6
 findings_real: 6
 tokens: 0
