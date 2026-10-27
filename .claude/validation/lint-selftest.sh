@@ -7591,7 +7591,9 @@ run_mutant_leftover_selftests() {
 # ('aa' em 'aaa') → 4 · (d) única e o teste pega → 1, alvo restaurado, rc cru no MUTATE_RC_FILE · (e) única e o
 # teste não pega → 0 · (f) linha de base vermelha → 5, o comando rodou UMA vez e nada foi plantado · (g) o teste que
 # sai 3 → 1 do helper e 3 no MUTATE_RC_FILE · (h) NOVO sem o marcador → 2 · (i) TERM no meio do comando mutado →
-# 143 e alvo restaurado · (j) MUTATE_BASELINE_PROVEN pula a linha de base e DECLARA em stderr · (k) CRLF preservado.
+# 143 e alvo restaurado · (j) MUTATE_BASELINE_PROVEN pula a linha de base e DECLARA em stderr · (k) CRLF preservado ·
+# (l) Ctrl-C na linha de base → 130, nada plantado · (n) restauração que falha → 9, o backup fica · (o) alvo sem leitura
+# → 6, intacto · (p) as variáveis MUTATE_* não vazam para o comando. (n) e (o) pulam como root (a permissão não morde).
 run_mutate_helper_selftests() {
   local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
   [ -f "${helper}" ] || { record_skip "mutate-helper: ops/mutate-and-restore.sh ausente (core-only)"; return; }
@@ -7636,16 +7638,38 @@ case "${C}" in
      bash "${H}" crlf.txt "y = 2|||y = 3  # ${M}" bash -c '[ "$(grep -c $'"'"'\r'"'"' crlf.txt)" = 2 ] || exit 0; grep -q "y = 2" crlf.txt' >/dev/null 2>&1 || rc=$?
      # o mutante tem de MORRER pelo conteúdo (y = 2 sumiu) com os dois CR intactos; sem eles, o comando sai 0 (sobrevive)
      [ "${rc}" = 1 ] && [ "${c0}" = 2 ] && [ "$(grep -c $'\r' crlf.txt)" = 2 ] ;;
+  l) bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'echo r >> runs; grep -q "ONION""_MUTANTE" alvo.py || kill -INT "${PPID}"; exit 0' >/dev/null 2>&1 || rc=$?
+     # Ctrl-C na LINHA DE BASE: o helper sai 130 e NUNCA planta nem roda o mutante (o comando rodou 1 vez)
+     [ "${rc}" = 130 ] && intact && [ "$(ran)" = 1 ] ;;
+  n) [ "$(id -u)" = 0 ] && exit 3
+     err="$(bash "${H}" alvo.py "return 2|||return 7  # ${M}" sh -c 'grep -q "ONION""_MUTANTE" alvo.py || exit 0; chmod 444 alvo.py; exit 1' 2>&1)" || rc=$?
+     chmod 644 alvo.py
+     bk="$(sed -n 's/.*o backup está em \([^ ]*\)\. NÃO COMMITE.*/\1/p' <<<"${err}")"
+     # a restauração falha (alvo sem escrita): rc 9, e o backup NOMEADO existe com o conteúdo original
+     ok=1; [ "${rc}" = 9 ] && [ -n "${bk}" ] && [ -f "${bk}" ] && [ "$(sha256sum < "${bk}")" = "$(printf 'def f():\n    return 1\ndef g():\n    return 1\ndef h():\n    return 2\n' | sha256sum)" ] || ok=0
+     [ -n "${bk}" ] && rm -f "${bk}"; [ "${ok}" = 1 ] ;;
+  o) [ "$(id -u)" = 0 ] && exit 3
+     chmod 200 alvo.py; sz0="$(stat -c %s alvo.py)"
+     bash "${H}" alvo.py "return 2|||return 7  # ${M}" true >/dev/null 2>&1 || rc=$?
+     sz1="$(stat -c %s alvo.py)"; chmod 644 alvo.py
+     # alvo sem leitura: rc 6 e o alvo INTACTO (o restore com backup vazio o truncaria)
+     [ "${rc}" = 6 ] && [ "${sz1}" = "${sz0}" ] && intact ;;
+  p) MUTATE_BASELINE_PROVEN="externo" MUTATE_RC_FILE="${w}/rcf" bash "${H}" alvo.py "return 2|||return 7  # ${M}" \
+       sh -c '[ -z "${MUTATE_BASELINE_PROVEN:-}" ] && [ -z "${MUTATE_RC_FILE:-}" ] || exit 0; grep -q "return 2" alvo.py' >/dev/null 2>&1 || rc=$?
+     # as variáveis do helper NÃO chegam ao comando: vazadas, o comando sairia 0 e o mutante "sobreviveria"
+     [ "${rc}" = 1 ] && intact ;;
   *) exit 2 ;;
 esac
 CASE
-  local c names="a:âncora ausente → rc 3, nada rodado|b:âncora repetida → rc 4 com a contagem, nada rodado|c:âncora sobreposta ('aa' em 'aaa') → rc 4|d:âncora única e o teste pega → rc 1, alvo restaurado, rc cru no MUTATE_RC_FILE|e:o teste não pega → rc 0 (sobreviveu)|f:linha de base vermelha → rc 5, o comando rodou uma vez, nada plantado|g:o teste que sai 3 → rc 1 do helper e 3 no MUTATE_RC_FILE|h:NOVO sem o marcador → rc 2|i:TERM no meio do comando mutado → rc 143 e alvo restaurado|j:MUTATE_BASELINE_PROVEN pula a linha de base e declara|k:fins de linha CRLF preservados"
+  local c names="a:âncora ausente → rc 3, nada rodado|b:âncora repetida → rc 4 com a contagem, nada rodado|c:âncora sobreposta ('aa' em 'aaa') → rc 4|d:âncora única e o teste pega → rc 1, alvo restaurado, rc cru no MUTATE_RC_FILE|e:o teste não pega → rc 0 (sobreviveu)|f:linha de base vermelha → rc 5, o comando rodou uma vez, nada plantado|g:o teste que sai 3 → rc 1 do helper e 3 no MUTATE_RC_FILE|h:NOVO sem o marcador → rc 2|i:TERM no meio do comando mutado → rc 143 e alvo restaurado|j:MUTATE_BASELINE_PROVEN pula a linha de base e declara|k:fins de linha CRLF preservados|l:Ctrl-C na linha de base → rc 130, nada plantado|n:restauração que falha → rc 9 e o backup nomeado fica|o:alvo sem leitura → rc 6 e o alvo intacto|p:as variáveis MUTATE_* não vazam para o comando"
   local IFS_OLD="${IFS}" entry desc
   IFS='|'
   for entry in ${names}; do
     IFS="${IFS_OLD}"
     c="${entry%%:*}"; desc="${entry#*:}"
-    if LC_ALL=C bash "${d}/case.sh" "${helper}" "${c}" >/dev/null 2>&1; then record_pass "mutate-helper: (${c}) ${desc}"
+    local crc=0; LC_ALL=C bash "${d}/case.sh" "${helper}" "${c}" >/dev/null 2>&1 || crc=$?
+    if [ "${crc}" = 0 ]; then record_pass "mutate-helper: (${c}) ${desc}"
+    elif [ "${crc}" = 3 ]; then record_skip "mutate-helper: (${c}) rodando como root (a permissão não morde) → pulado"
     else record_fail "mutate-helper: (${c})" "não passou contra o helper vivo: ${desc}"; fi
     IFS='|'
   done
@@ -7654,6 +7678,7 @@ CASE
   local want old new mrc n
   while IFS=$'\x1f' read -r want old new; do
     [ -n "${want}" ] || continue
+    case "${want}" in n|o) [ "$(id -u)" = 0 ] && { record_skip "mutate-helper: (m) ${want} como root → pulado"; continue; } ;; esac
     cp "${helper}" "${d}/h.sh"
     n="$(grep -cF -- "${old}" "${d}/h.sh" || true)"
     if [ "${n}" != 1 ]; then record_fail "mutate-helper: (m) ${want}" "âncora do mutante aparece ${n}× no helper (tem de ser 1): ${old:0:80}"; continue; fi
@@ -7673,6 +7698,10 @@ i$(printf '\x1f')trap 'exit 143' TERM$(printf '\x1f')trap '' TERM  # ${_M}
 h$(printf '\x1f')in *"\${MARKER}"*) : ;; *)$(printf '\x1f')in *) : ;; ${_M})
 j$(printf '\x1f')if [ -n "\${MUTATE_BASELINE_PROVEN:-}" ]; then$(printf '\x1f')if false; then  # ${_M}
 k$(printf '\x1f')open(p, 'wb').write(s.replace(a, b, 1).encode('utf-8', 'surrogateescape'))$(printf '\x1f')open(p, 'w', encoding='utf-8').write(s.replace(a, b, 1).replace(chr(13), ''))  # ${_M}
+l$(printf '\x1f')trap 'exit 130' INT$(printf '\x1f')trap '' INT  # ${_M}
+n$(printf '\x1f')    _BACKUP=""; exit 9$(printf '\x1f')    rm -f "\${_BACKUP}"; _BACKUP=""; exit 9  # ${_M}
+o$(printf '\x1f')if ! cp -p "\${TARGET}" "\${_BACKUP}" 2>/dev/null || ! _HASH0="\$(sha256sum "\${TARGET}" 2>/dev/null | cut -d' ' -f1)" || [ -z "\${_HASH0}" ]; then$(printf '\x1f')_HASH0=x; cp -p "\${TARGET}" "\${_BACKUP}" 2>/dev/null; if false; then  # ${_M}
+p$(printf '\x1f')_run() { env -u MUTATE_BASELINE_PROVEN -u MUTATE_RC_FILE "\$@"; }$(printf '\x1f')_run() { "\$@"; }  # ${_M}
 EOF_MH
   rm -rf "${d}"
 }

@@ -70,15 +70,15 @@ nodes:
     confidence: 0.55
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e E_MEASURE_DOCS_NOT_EXERCISED no grafo da curadoria (onion-curation@8d64aef8737e), conferidos por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e as evidências da prova (E_DOCS_PROOF_PYTHON, E_ONION_GAMMA_PPTX, E_DOCS_PROOF_NOT_EXERCISED) no grafo da curadoria (onion-curation@6dc082acac33, main, que contém o PR #137), conferidos por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
-    label: "Documentação e apresentações, nota 6, costurar condicionado: o Onion não gera pptx nem docx; as ferramentas do Cortex para isso são Node, do npm, e não foram exercidas."
-    narrative: "O core tem o /design:deck (HTML offline) e o /product:presentation (serviço externo com chave). A curadoria não instalou nada, porque a autorização era de ambiente virtual do PyPI. O maestro trocou a pilha na decisão: a costura sai em Python, com python-pptx e python-docx, sem navegador e portanto sem o print real da aplicação."
+    label: "Documentação e apresentações, nota 5 depois da prova, costurar só a receita local: python-pptx e python-docx, sem Node, geram 8 slides e um docx com tabela do histórico do git em cerca de 35 ms. Captura real e diagrama parqueados."
+    narrative: "No sinal medido a peça tinha nota 6 e não fora exercida: as ferramentas do Cortex são Node, do npm. A prova veio depois, na curadoria, com a revisão adversarial aplicada e reproduzida num laboratório novo com o mesmo resultado; ela cobre 6 dos 12 tipos de slide, só texto, sem imagem. A nota caiu para 5, e a régua dessa nota NÃO foi pré-registrada: nasceu depois do resultado, o que fica declarado aqui. Correção factual: o Onion só exporta pptx pelo Gamma, serviço externo usado pelo /product:presentation, e nunca a partir do git; pela doutrina sem dependência de serviço externo, decidida pelo maestro em 2026-10-27, o Gamma não conta como par. O /design:deck gera HTML offline, não pptx nem docx."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/8d64aef8737e5c319673c292a80c40c9e62bb77e/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DOCS_PRESENTATIONS"
-      locator: "D_PIECE_DOCS_PRESENTATIONS (x_dissect_verdict costurar, nota 6, condicionado) e E_MEASURE_DOCS_NOT_EXERCISED"
+      source: "https://github.com/marciocar/onion-curation/blob/6dc082acac333d3ef76aa13872dd681c601f5608/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DOCS_PRESENTATIONS"
+      locator: "D_PIECE_DOCS_PRESENTATIONS (x_dissect_verdict costurar, nota 5, régua não pré-registrada), E_DOCS_PROOF_PYTHON, E_ONION_GAMMA_PPTX e E_DOCS_PROOF_NOT_EXERCISED"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -210,13 +210,13 @@ nodes:
     confidence: 0.85
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "família mutate_helper do lint-selftest.sh: 11 casos verdes contra o helper vivo, e um mutante por cura plantado pelo próprio helper numa cópia dele, cada um reprovando o seu caso"
+    verified_against: "família mutate_helper do lint-selftest.sh: 15 casos verdes contra o helper vivo (a âncora, a linha de base, as saídas, os sinais, o backup e o ambiente do comando), e 16 mutantes, um por cura, plantado pelo próprio helper numa cópia dele, cada um reprovando o seu caso"
     label: "A costura da âncora única está no ops/mutate-and-restore.sh: conta a âncora e recusa a ausente com saída 3 e a repetida com saída 4, roda a linha de base e recusa a vermelha com saída 5, e só 0 e 1 são veredito de mutante."
     narrative: "O código de saída do helper deixou de ser o do teste cru: um teste que sai 3 dá 1 no helper, e o valor cru vai para o stderr e, sob MUTATE_RC_FILE, para um arquivo. Os chamadores da bancada que comparam um código específico leem o arquivo; os que provaram a linha de base no mesmo caso, logo antes, a declaram por MUTATE_BASELINE_PROVEN, dito em stderr. A restauração por trap continua, e agora o sinal sai do script em vez de deixá-lo seguir."
     trace: "ops/mutate-and-restore.sh"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
-      locator: "run_mutate_helper_selftests, casos (a) a (k) e (m)"
+      locator: "run_mutate_helper_selftests, casos (a) a (p) e os mutantes (m)"
       method: "measurement: bancada rodada na branch feat/cortex-seal-and-unique-anchor"
       locality: "repo"
 
@@ -239,9 +239,9 @@ nodes:
     impact: 3
     confidence: 0.5
     x_dissect_level: 3
-    label: "Costura do pptx e do docx: uma rodada de prova em Python, com python-pptx e python-docx autorizados pelo maestro e sem navegador, gera um pptx e um docx que abrem e trazem o conteúdo pedido?"
-    narrative: "Próximo passo: instalar as duas bibliotecas pela fonte oficial num ambiente virtual isolado, gerar uma amostra de cada a partir de um roteiro, medir que o arquivo abre e tem o texto esperado, e só então desenhar a peça como vertical opcional, fora do núcleo. O print real da aplicação fica de fora, porque exigiria navegador."
-    x_gatilho: "reabrir ao começar a rodada de prova; a autorização das duas bibliotecas já foi dada pelo maestro em 2026-10-27."
+    label: "Costura da receita local de pptx e docx: como a receita provada na curadoria (python-pptx e python-docx, a partir do git, sem Node e sem serviço externo) entra no core como vertical opcional, fora do núcleo, e cobre os tipos de slide que a prova não cobriu?"
+    narrative: "Próximo passo: trazer a receita como script com bancada (o arquivo abre, tem o texto e a tabela esperados, sai do histórico do git), começando pelos 6 tipos de slide que a prova cobriu e medindo os outros 6 antes de declará-los; o venv local tem cerca de 57 MB. A captura real da aplicação e o diagrama ficam PARQUEADOS, porque exigem um navegador sem tela, que o maestro não autorizou."
+    x_gatilho: "reabrir ao começar a costura da receita; a parte parqueada (captura real e diagrama) reabre quando o maestro autorizar o navegador sem tela."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
 
   - id: Q_CORTEX_FROTA_GATILHO
@@ -285,8 +285,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-27"
     verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Selar como medido»"
-    label: "Selar as 9 peças do Cortex como medido: costurar só a peça no gate de plano, na âncora única da mutação (feita neste PR) e no pptx e docx em Python; parquear a frota, o registro de uso e o handoff no git; rejeitar distribuição, especificação como código e estudos."
-    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Selar como medido»; descartadas: «Selar, sem implementar agora» · «Depois». É o 2º round: no 1º, diante do sinal com as rejeições só lidas, o maestro escolheu «Medir as rejeições antes», e a curadoria mediu rodando os dois lados no mesmo caso, em laboratório isolado. Por peça: costurar só a peça no gate de plano (nota 6, esbarra no .gitignore das sessões e na ordem do plano em relação ao código), na âncora única da mutação (nota 6, implementada no mesmo PR deste selo) e no pptx e docx (nota 6, em Python, com python-pptx e python-docx autorizados pelo maestro, sem navegador); parquear a frota, o registro de uso e o handoff no git (nota 5, cada um com o gatilho medido da curadoria); rejeitar distribuição, especificação como código e estudos (notas 4, 3 e 3, medidas do lado do Onion). Nenhuma peça é absorvida no núcleo: nenhuma tem uso medido em dois adotantes ou mais."
+    label: "Selar as 9 peças do Cortex como medido: costurar só a peça no gate de plano, na âncora única da mutação (feita neste PR) e na receita local de pptx e docx; parquear a frota, o registro de uso e o handoff no git; rejeitar distribuição, especificação como código e estudos."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Selar como medido»; descartadas: «Selar, sem implementar agora» · «Depois». É o 2º round: no 1º, diante do sinal com as rejeições só lidas, o maestro escolheu «Medir as rejeições antes», e a curadoria mediu rodando os dois lados no mesmo caso, em laboratório isolado. Por peça: costurar só a peça no gate de plano (nota 6, esbarra no .gitignore das sessões e na ordem do plano em relação ao código), na âncora única da mutação (nota 6, implementada no mesmo PR deste selo) e no pptx e docx (nota 6 no sinal, em Python, com python-pptx e python-docx autorizados pelo maestro, sem navegador); parquear a frota, o registro de uso e o handoff no git (nota 5, cada um com o gatilho medido da curadoria); rejeitar distribuição, especificação como código e estudos (notas 4, 3 e 3, medidas do lado do Onion). Nenhuma peça é absorvida no núcleo: nenhuma tem uso medido em dois adotantes ou mais. Complemento do mesmo dia, depois da escolha: a prova do pptx e do docx entrou na main da curadoria (PR #137, 6dc082a) e rebaixou essa peça para nota 5, com régua NÃO pré-registrada (nasceu depois do resultado), e o veredito ficou costurar só a receita local; a captura real e o diagrama ficam parqueados até o maestro autorizar um navegador sem tela. O Onion só exporta pptx pelo Gamma, nunca a partir do git, e pela doutrina sem dependência de serviço externo o Gamma não conta como par."
     x_dissect_level: 3
     x_dissect_verdict: costurar
     provenance:
