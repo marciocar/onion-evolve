@@ -2,7 +2,8 @@
 branch: docs/manual-canais-a2a
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1c964bc4d5725c78e976ded6283ed6ef2bec5f8033c78485a838bd38f0134dc5
+reviewed_code_sha256: 290051d5d8ee776856dacfadecc424c1bd73c858f78eb57cd556364c85d0304a
 findings_total: 8
 findings_real: 8
 tokens: 145678
