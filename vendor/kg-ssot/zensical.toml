@@ -1,0 +1,36 @@
+# O site de documentação do KG-SSOT (4.31.0): o Zensical constrói site-src/, que o tools/kg_site.py monta a partir
+# do README, do ADOPTING, do CHANGELOG e do manual. O workflow de release do espelho publica no GitHub Pages.
+[project]
+site_name = "KG-SSOT"
+site_description = "Verifiable knowledge graphs in plain text: every claim with its source, a formal contract and a conformance suite."
+site_url = "https://marciocar.github.io/kg-ssot/"
+repo_url = "https://github.com/marciocar/kg-ssot"
+repo_name = "marciocar/kg-ssot"
+docs_dir = "site-src"
+site_dir = "site"
+nav = [
+  { "Home" = "index.md" },
+  { "Manual" = [
+    "docs/manual/README.md",
+    "docs/manual/01-what-it-is.md",
+    "docs/manual/02-concepts.md",
+    "docs/manual/03-format.md",
+    "docs/manual/04-contract.md",
+    "docs/manual/05-tools.md",
+    "docs/manual/06-adoption-and-ci.md",
+    "docs/manual/07-conformance-and-readers.md",
+    "docs/manual/08-recipes.md",
+    "docs/manual/09-troubleshooting.md",
+    "docs/manual/10-glossary.md",
+  ] },
+  { "Adopting" = "ADOPTING.md" },
+  { "Changelog" = "CHANGELOG.md" },
+]
+
+# o markdown dentro do bloco HTML do cabeçalho do README (o kg_site.py marca o bloco com markdown="1")
+[project.markdown_extensions.md_in_html]
+
+# as âncoras com acento do manual em pt-BR seguem a forma do GitHub
+[project.markdown_extensions.toc]
+permalink = true
+slugify = { object = "pymdownx.slugs.slugify", kwds = { case = "lower" } }

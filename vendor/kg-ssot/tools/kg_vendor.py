@@ -111,6 +111,11 @@ def read_release(text, where):
             or not all(isinstance(e, str) and e for e in release["files"]):
         raise Broken(_("{release} at {where}: files must be a non-empty list of paths").format(release=RELEASE,
                                                                                                  where=where))
+    # mirror_only (4.31.0): arquivos que o espelho e o site publicam e o vendor NÃO traz, como o GIF da demo, que
+    # pesaria no repositório de cada adotante sem uso lá
+    mirror_only = release.get("mirror_only", [])
+    if not isinstance(mirror_only, list) or not all(isinstance(e, str) and e for e in mirror_only):
+        raise Broken(_("{release} at {where}: mirror_only must be a list of paths").format(release=RELEASE, where=where))
     contract = release.get("contract")
     if not isinstance(contract, dict) or not all(isinstance(contract.get(k), str) for k in ("must", "should")):
         raise Broken(_("{release} at {where}: contract must have must and should").format(release=RELEASE, where=where))
@@ -178,8 +183,8 @@ FULL = "full"
 UNRELEASED = "unreleased"
 
 
-def update(dest, tag, source, force=False, profile=None, ref=None):
-    """profile None herda o perfil do carimbo que já existe (um update não tira o adotante do perfil em silêncio);
+def update(dest, tag, source, force=False, profile=None, ref=None, mirror=False):
+    """mirror True (só o kg_mirror.py) traz também os arquivos de mirror_only, que o adotante nunca recebe. profile None herda o perfil do carimbo que já existe (um update não tira o adotante do perfil em silêncio);
     'full' traz a release inteira. ref (no lugar de tag): o commit de bancada, que o carimbo marca como unreleased."""
     dest = pathlib.Path(dest)
     if profile is not None and not profile.strip():
@@ -240,13 +245,14 @@ def update(dest, tag, source, force=False, profile=None, ref=None):
                 raise Broken(_("the {release} of tag {tag} declares tag {declared}: mislabeled release").format(
                     release=RELEASE, tag=tag, declared=repr(release.get("tag"))))
         listed = git(repo, "ls-tree", "-r", "--name-only", commit).splitlines()
-        files = release_files(listed, release["files"])
+        entries = release["files"] + (release.get("mirror_only", []) if mirror else [])
+        files = release_files(listed, entries)
         if profile:
             files = profile_files(release, files, listed, profile)
         # o archive vai pelas entradas da release, não arquivo a arquivo: a lista inteira passa do limite da linha de
         # comando do Windows (32.767 caracteres, WinError 206) desde a 4.13.0; o que a entrada cobre e o perfil tira
         # é descartado abaixo
-        specs = sorted({e.rstrip("/") for e in release["files"]})
+        specs = sorted({e.rstrip("/") for e in entries})
         tar = tarfile.open(fileobj=io.BytesIO(git(repo, "archive", "--format=tar", commit, "--", *specs, binary=True)))
         wanted = set(files)
         staged = pathlib.Path(tmp) / "staged"

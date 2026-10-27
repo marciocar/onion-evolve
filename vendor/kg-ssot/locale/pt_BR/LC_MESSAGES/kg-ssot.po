@@ -2623,6 +2623,10 @@ msgid "{release} at {where}: must be an object"
 msgstr "{release} em {where}: tem de ser um objeto"
 
 #: tools/kg_vendor.py
+msgid "{release} at {where}: mirror_only must be a list of paths"
+msgstr "{release} em {where}: mirror_only tem de ser uma lista de caminhos"
+
+#: tools/kg_vendor.py
 msgid "{release} at {where}: profiles must map name → non-empty list of paths"
 msgstr "{release} em {where}: profiles tem de mapear nome → lista não vazia de caminhos"
 

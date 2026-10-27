@@ -10,6 +10,15 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.31.0] - 2026-10-26
+
+Um site de documentação em https://marciocar.github.io/kg-ssot/, construído do README, do guia de adoção, do changelog e
+do manual pelo `tools/kg_site.py` e pelo Zensical, e publicado no GitHub Pages pelo workflow de release; e uma demo de
+40 segundos no README, gravada do `docs/demo/demo.sh` e listada no novo `mirror_only` do `spec/release.json`, que a
+publica no repositório público e no site, mas não a leva ao vendor dos adotantes. O README e o manual contavam a suíte de conformidade como 438
+casos, e `latest/` tinha 457; a contagem foi corrigida, e a checagem de higiene agora a amarra aos manifestos da suíte.
+Contrato v4.15, sem mudança.
+
 ## [4.30.0] - 2026-10-26
 
 A release traz a skill de agente `skills/kg-ssot/` (formato Agent Skills) e um marketplace de plugin do Claude Code em
