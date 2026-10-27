@@ -39976,6 +39976,36 @@ run_door_role_parity_selftests() {
   if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/CARIMBO-AUSENTE' <<< "${_drpa_out}"; then
     record_pass "door-role-parity: (g5) adotante com clone e SEM carimbo é nomeado (não passa calado)"
   else record_fail "door-role-parity: (g5)" "clone sem carimbo passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  # (g7) LINHAGEM HISTÓRICA (2026-10-27, medido no registro real: `granaai`, standalone, superseded_by brain-granaai):
+  #      a adoção superada mora no MESMO clone do sucessor, e o carimbo lá é o dele (hub). Comparar o papel antigo
+  #      com o carimbo do sucessor acusava PAPEL-INCOMPATIVEL para sempre. A antiga sai da comparação, contada e
+  #      DECLARADA; o sucessor segue julgado (g7b). MUTANTE: sem o ramo do superseded_by, (g7) volta a acusar.
+  _drps() { # $1=papel do sucessor no registro; o carimbo do clone compartilhado é `hub`
+    printf 'role: hub\n' > "${d}/porta/.claude/.onion-version"
+    { echo 'members:'; echo '  - id: antiga'; echo '    kind: adopter'; echo '    role: standalone'
+      echo "    local_path: \"${d}/porta\""; echo '    superseded_by: sucessor'
+      echo '  - id: sucessor'; echo '    kind: adopter'; echo "    role: $1"; echo "    local_path: \"${d}/porta\"" ; } \
+      > "${d}/docs/evolution/federation/members.yaml"
+    if _drpa_out="$(bash "${2:-${sut}}" "${d}" 2>&1)"; then _drpa_rc=0; else _drpa_rc=$?; fi
+  }
+  _drps hub
+  if [ "${_drpa_rc}" = "0" ] && ! grep -q 'adotante/' <<< "${_drpa_out}" && grep -q '1 adotante(s) de linhagem histórica' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g7) adotante superseded_by fora da comparação, DECLARADO; o sucessor hub×hub em silêncio"
+  else record_fail "door-role-parity: (g7)" "linhagem histórica acusada ou calada sem declarar (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  _drps standalone
+  if [ "${_drpa_rc}" = "1" ] && grep -q "adotante 'sucessor': registro \`standalone\`" <<< "${_drpa_out}" && ! grep -q "adotante 'antiga'" <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g7b) o SUCESSOR segue julgado: standalone×hub nele é acusado (o pulo não cala o clone)"
+  else record_fail "door-role-parity: (g7b)" "o pulo calou o sucessor ou acusou a antiga (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  local _drps_mut="${d}/drp-mut.sh"
+  sed 's|^    if \[ -n "\${superby}" \]; then superseded=\$((superseded + 1)); continue; fi$|    : # ONION_MUTANTE|' "${sut}" > "${_drps_mut}"
+  if cmp -s "${sut}" "${_drps_mut}"; then record_fail "door-role-parity: (g7-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  else
+    _drps hub "${_drps_mut}"
+    if [ "${_drpa_rc}" = "1" ] && grep -q "adotante 'antiga'.*PAPEL\|PAPEL-INCOMPATIVEL\] adotante 'antiga'" <<< "${_drpa_out}"; then
+      record_pass "door-role-parity: (g7-MUT) sem o ramo do superseded_by a linhagem histórica volta a ser acusada — (g7) é load-bearing"
+    else record_fail "door-role-parity: (g7-MUT)" "o mutante seguiu calado: (g7) não mede o pulo (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  fi
+  rm -f "${_drps_mut}"
   # (g6) O CARIMBO É O DA INTEGRAÇÃO (2026-10-19, medido num adotante real): clone vivo e adotado, parado numa
   # branch de trabalho sem `.claude/` rastreado, com o carimbo na `develop`. A guarda acusava
   # CARIMBO-AUSENTE num membro em dia. Ler a integração cala (g6); sem carimbo em lugar nenhum, segue

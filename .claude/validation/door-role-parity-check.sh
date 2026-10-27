@@ -105,9 +105,10 @@ for m in (doc.get('members') or []):
     kind = str(m.get('kind', '')).strip() if isinstance(m, dict) else ''
     if kind not in ('door', 'adopter'):
         continue
-    print("%s\x1f%s\x1f%s\x1f%s" % (str(m.get('id', '')).strip(),
+    print("%s\x1f%s\x1f%s\x1f%s\x1f%s" % (str(m.get('id', '')).strip(),
                               str(m.get('role', '') or '').strip(),
-                              str(m.get('local_path', '') or '').strip(), kind))
+                              str(m.get('local_path', '') or '').strip(), kind,
+                              str(m.get('superseded_by', '') or '').strip()))
 PY
 )"
 py_rc=$?
@@ -125,8 +126,8 @@ _norm_role() { printf '%s' "$1" | sed 's/[[:space:]]*#.*$//; s/^[[:space:]]*//; 
 _compat_ok() {  # $1=registro $2=carimbo
   case "$1:$2" in hub:hub|standalone:standalone|standalone:adopted|consumer:adopted) return 0 ;; *) return 1 ;; esac; }
 
-found=0; unreadable=0; adopter_unreadable=0; mini_pending=0
-while IFS=$'\x1f' read -r mid role path kind; do
+found=0; unreadable=0; adopter_unreadable=0; mini_pending=0; superseded=0
+while IFS=$'\x1f' read -r mid role path kind superby; do
   [ -n "${mid}" ] || continue
   role="$(_norm_role "${role}")"
 
@@ -134,6 +135,12 @@ while IFS=$'\x1f' read -r mid role path kind; do
     # Sem clone (CI) → não-medido, contado e declarado; sem papel no registro é cobrança do
     # members-validate.sh, não desta guarda.
     [ -n "${role}" ] || continue
+    # LINHAGEM HISTÓRICA (`superseded_by: <id>`, 2026-10-27): adoção superada por OUTRO membro no mesmo
+    # remoto. O clone dela carrega o carimbo do SUCESSOR, que é medido na entrada dele; comparar o papel
+    # antigo com o carimbo do sucessor acusava PAPEL-INCOMPATIVEL para sempre (medido: `granaai`, registro
+    # standalone × carimbo hub do brain-granaai). Mesma régua do ops/registry-pins.sh; a forma do campo
+    # (alvo existe, sem cadeia) é cobrada pelo members-validate.sh. Contado e declarado, nunca calado.
+    if [ -n "${superby}" ]; then superseded=$((superseded + 1)); continue; fi
     if [ -z "${path}" ] || [ ! -d "${path}" ]; then adopter_unreadable=$((adopter_unreadable + 1)); continue; fi
     # O CARIMBO É O DA INTEGRAÇÃO, não o da branch em que o clone está (2026-10-19, medido num adotante real):
     # o clone da equipe estava numa branch de trabalho sem `.claude/` rastreado, e a guarda acusava
@@ -239,6 +246,9 @@ while IFS=$'\x1f' read -r mid role path kind; do
 done <<< "${doors}"
 
 # A DECLARAÇÃO do não-medido é impressa SEMPRE que houver — silêncio aqui seria fail-open.
+if [ "${superseded}" -gt 0 ]; then
+  echo "door-role-parity: ${superseded} adotante(s) de linhagem histórica (superseded_by) fora da comparação — o carimbo do clone é o do sucessor, medido na entrada dele." >&2
+fi
 if [ "${adopter_unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${adopter_unreadable} adotante(s) com clone INALCANÇÁVEL — compatibilidade registro×carimbo NÃO MEDIDA neles." >&2
 fi
