@@ -21416,6 +21416,8 @@ case "$args" in
       fi
       exit 0 ;;
   *"pr view"*headRefOid*)
+      # TOCTOU (2026-10-27): depois do push que caiu no meio do merge, o PR mostra o head NOVO
+      if [ -n "${GH_PUSH_AT_MERGE:-}" ] && [ -f "${STUB_PUSHED}" ]; then echo "${GH_PUSH_AT_MERGE}"; exit 0; fi
       # SAC-85: a API do PR ATRASA o push. As chamadas de nº GH_HEAD_STALE_FIRST..GH_HEAD_STALE_LAST
       # devolvem o head de ANTES do rebase (o pai do HEAD da worktree), como o GitHub fez no #985.
       if [ -n "${GH_HEAD_STALE_FIRST:-}" ]; then
@@ -21435,6 +21437,10 @@ case "$args" in
   *"pr view"*state,mergedAt*)
       n=$(cat "${STUB_N}" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "${STUB_N}"
       if [ "$n" -eq 1 ]; then v="${GH_STATE_BEFORE}"; else v="${GH_STATE_AFTER}"; fi
+      # TOCTOU: o estado depois do merge é o que o forge FEZ (mergeou ou recusou), não um roteiro
+      if [ -n "${GH_PUSH_AT_MERGE:-}" ] && [ "$n" -gt 1 ]; then
+        if [ -f "${STUB_MERGED}" ]; then v="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"; else v="OPEN|null"; fi
+      fi
       [ -n "$v" ] && echo "$v"; exit 0 ;;
   *"pr comment"*)
       # grava o CORPO do comentário — o esboço tem de ver o que o SUT de fato POSTA.
@@ -21475,6 +21481,17 @@ case "$args" in
       # os arquivos do PR, um por linha (SAC-80: só PR que toca .kg.yaml faz a guarda ler git)
       [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}; exit 0 ;;
   *"pr merge"*)
+      # TOCTOU: um push alheio cai ENTRE o julgamento do CI e o merge. O forge de verdade (expectedHeadOid)
+      # recusa quando --match-head-commit não bate com o head atual; sem a flag, mergeia o head novo.
+      if [ -n "${GH_PUSH_AT_MERGE:-}" ]; then
+        : > "${STUB_PUSHED}"
+        [ -n "${STUB_MERGE_ARGS:-}" ] && printf '%s\n' "$args" >> "${STUB_MERGE_ARGS}"
+        _mh=""; prev=""; for a in "$@"; do [ "$prev" = "--match-head-commit" ] && _mh="$a"; prev="$a"; done
+        if [ -n "$_mh" ] && [ "$_mh" != "${GH_PUSH_AT_MERGE}" ]; then
+          echo "GraphQL: Head branch was modified. Review and try the merge again. (mergePullRequest)" >&2; exit 1
+        fi
+        : > "${STUB_MERGED}"; echo "merged"; exit 0
+      fi
       [ -n "${STUB_MERGE_ARGS:-}" ] && printf '%s\n' "$args" >> "${STUB_MERGE_ARGS}"
       # o merge DE VERDADE no sandbox, quando o caso precisa que a base mude (SAC-80, pós-merge)
       [ -n "${STUB_MERGE_CMD:-}" ] && bash -c "${STUB_MERGE_CMD}" >/dev/null 2>&1
@@ -22176,8 +22193,46 @@ PFSTUB
     '|| die "não consegui LER o histórico' '|| echo "não li o histórico' \
     '' 0 1
 
+  # ── (th1)-(th3) TOCTOU: O HEAD MUDA ENTRE O JULGAMENTO E O MERGE (2026-10-27) ─────────────────
+  # Caso vivo da curadoria (PRs #117 e #118 de 2026-10-26, --merge-commit): os gates julgavam os check-runs
+  # do head lido, mas o `gh pr merge` só levava --match-head-commit no caminho sem o CI do head novo. Um push
+  # entre a leitura e o merge fazia o forge mergear um head que ninguém julgou; conferiram à mão. O esboço
+  # faz o push cair DENTRO da chamada de merge e recusa como o forge (expectedHeadOid) quando o sha não bate.
+  _mvth() { # $1=SUT ; resto = flags do SUT
+    local _s="$1"; shift
+    echo 0 > "${d}/n"; : > "${d}/margs"; rm -f "${d}/pushed" "${d}/merged-th"
+    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/margs" \
+               STUB_PUSHED="${d}/pushed" STUB_MERGED="${d}/merged-th" \
+               GH_PUSH_AT_MERGE="cafecafecafecafecafecafecafecafecafecafe" \
+               GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="OPEN|null" \
+               GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${_s}" 999 "$@" 2>&1)"; _mv_rc=$?
+  }
+  _p_th() { [ "${_mv_rc}" -ne 0 ] && [ ! -f "${d}/merged-th" ] \
+      && grep -qF "o head mudou depois do julgamento (deadbeef → cafecafe); rode de novo" <<< "${_mv_out}" \
+      && grep -qF -- "--match-head-commit deadbeefdeadbeefdeadbeefdeadbeefdeadbeef" "${d}/margs" \
+      && ! grep -qF -- "--admin" "${d}/margs" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _mvth "${sut}"
+  if _p_th; then
+    record_pass "pr-merge-verified: (th1) head muda entre o julgamento e o merge (--rebase) ⇒ forge recusa pelo --match-head-commit, rc≠0, sem merge, mensagem nomeada, sem --admin"
+  else record_fail "pr-merge-verified: (th1) TOCTOU aberto" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
+  _mvth "${sut}" --merge-commit
+  if _p_th && grep -qF -- "--merge --match-head-commit" "${d}/margs"; then
+    record_pass "pr-merge-verified: (th2) o mesmo em --merge-commit (o caso da curadoria) ⇒ recusa nomeada, sem merge"
+  else record_fail "pr-merge-verified: (th2) TOCTOU aberto no --merge-commit" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
+  # (th3) MUTANTE: tira o --match-head-commit do caminho de sempre ⇒ o forge mergeia o head não julgado e (th1) reprova
+  local _thm="${d}/sut-mutante-th.sh"
+  awk 'index($0,"MERGE_EXTRA=(--match-head-commit \"${JUDGED_HEAD}\")")==1 { print "MERGE_EXTRA=()"; next } { print }' "${sut}" > "${_thm}"
+  if cmp -s "${sut}" "${_thm}"; then
+    record_fail "pr-merge-verified: (th3) âncora do mutante não casou" "a linha MERGE_EXTRA=(--match-head-commit …) mudou de forma; reancore o mutante"
+  else
+    _mvth "${_thm}"
+    if ! _p_th && [ -f "${d}/merged-th" ]; then
+      record_pass "pr-merge-verified: (th3) mutante sem --match-head-commit ⇒ mergeia o head não julgado e o caso (th1) REPROVA"
+    else record_fail "pr-merge-verified: (th3) o mutante SOBREVIVEU — o caso não mede o --match-head-commit" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
+  fi
+
   unset -f _mvf _fxmut _fxcase _fxcase_rm _fx_intact _fxk_run _p_fx1 _p_fx2 _p_fx3 _p_fx4 _p_fx5 _p_fx6 _p_fx7 _p_fx8
-  unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg _mvr _rvmut _rvcase _p_off _p_prior _p_prior_disp _p_fail _p_hist
+  unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg _mvr _rvmut _rvcase _p_off _p_prior _p_prior_disp _p_fail _p_hist _mvth _p_th
 }
 
 # ═══ ops/merge-serial.sh + o rastro do auto-rebase no ops/pr-merge-verified.sh (passo C de D_MERGE_PROCESS_ONION_2026_10) ═══
