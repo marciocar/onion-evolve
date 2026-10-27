@@ -1,8 +1,9 @@
 ---
 branch: research/radar-e7-r1
-pr: pendente
+pr: 1398
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fcda18252efe4e6f0a9297d59773f4210617c1c52c0d1398edd1b90c825b5ed4
+reviewed_code_sha256: 0cdadf3215569a533069d84023be3969e7994e3875f9359f425dc488bc78946d
 findings_total: 1
 findings_real: 1
 tokens: 0
