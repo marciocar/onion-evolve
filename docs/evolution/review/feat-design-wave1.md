@@ -1,9 +1,8 @@
 ---
 branch: feat/design-wave1
-pr: pendente
+pr: 1409
 date: 2026-10-27
-reviewed_diff_sha256: 80fc32c9dba6b26718e39f000bae417f8451c7074aa6b7e26214f33cdc5e76d8
-reviewed_code_sha256: e517d2c7bd48fd0aa80efb6e46ac133f5c8427aef12b59a986e8805cb811f4f5
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 12
 tokens: 146249
@@ -49,6 +48,10 @@ Na família `design_context` (13 casos): sem a exigência de `$value`/`$root` o 
 ## Limites declarados
 
 - O 3º commit, com as curas, não voltou ao refutador; as curas foram conferidas pela bancada (4 casos novos).
+- Recarimbo declarado: depois da 1ª rodada do pr-finalize, o PR ganhou dois commits que o refutador não viu, e o
+  carimbo foi refeito por isso, não por re-revisão: (1) o teto e o carimbo do grafo da guarda, que a REGRA 58 (O backlog
+  cumpre as promessas do próprio `meta:`) cobrou no lint do commit; (2) a movimentação dos dois sinais de inbox para
+  `_processed/` (renomeação, zero linha mudada).
 - O checador de projeção do kg-ssot (o `.md` com `projection_of` cita só ids que existem) não existe e não foi implementado: dependência declarada (`Q_PROJECTION_CHECK_DEPENDENCY`).
 - A checagem do locator pode migrar para o `kg_trace` do kg-ssot (`Q_LOCATOR_CHECK_HOME`); a guarda ficou isolada para isso.
 - O número da REGRA 111 estava livre na origin/main no momento da revisão; outros PRs abertos não foram conferidos.
