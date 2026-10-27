@@ -1,0 +1,46 @@
+# Grafo MÍNIMO do technical-context do core (2026-10-27), criado para servir de ALVO à ligação de contraste do
+# grafo piloto do design-context (docs/design-context/design-context.kg.yaml): o invariante de contraste do CTA
+# CONSTRAINS o tema aplicado, que mora aqui. Não é a migração do technical-context para grafo: os .md desta
+# pasta seguem sendo a fonte. Entra no commit ANTES do grafo do design, pela mesma ordem de migração.
+meta:
+  id: technical-context
+  schema_version: "1"
+  baseline: "2026-10-27"
+  review_after: "2027-01-27"
+nodes:
+  - id: EV_BUILD_THEME
+    node_type: event
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "O build do tema: o design-sink traduz os tokens W3C DTCG do design-context em variáveis CSS, sem LLM."
+    trace: .claude/utils/design-sink/tokens-to-css-vars.sh
+    verified_at: "2026-10-27"
+    verified_against: ".claude/utils/design-sink/tokens-to-css-vars.sh"
+    provenance:
+      source: .claude/utils/design-sink/tokens-to-css-vars.sh
+      locator: "o script inteiro: lê foundations e semantic e emite :root"
+      method: "reading: o conversor css-vars do design-sink"
+      locality: repo
+  - id: ST_THEME_APPLIED
+    node_type: state
+    layer: domain
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "O tema aplicado do core: as variáveis CSS geradas dos tokens, consumidas pelo material em docs/materials."
+    trace: docs/materials/theme.css
+    verified_at: "2026-10-27"
+    verified_against: "docs/materials/theme.css (cabeçalho: gerado por design-sink/tokens-to-css-vars.sh)"
+    provenance:
+      source: docs/materials/theme.css
+      locator: "o bloco :root"
+      method: "reading: o tema gerado em docs/materials"
+      locality: repo
+edges:
+  - from: EV_BUILD_THEME
+    to: ST_THEME_APPLIED
+    edge_type: EMITS
