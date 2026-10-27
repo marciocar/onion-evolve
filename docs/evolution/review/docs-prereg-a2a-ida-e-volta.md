@@ -2,7 +2,7 @@
 branch: docs/prereg-a2a-ida-e-volta
 pr: 1395
 date: 2026-10-27
-reviewed_diff_sha256: b3c30d8226280396752fc85e8ca3583b7a1d448613f07747f8f9deb9bec743e7
+reviewed_diff_sha256: 4db98c7e737ec70433cd9135a82431754061fd8019505665c00505a9bbd46e1d
 reviewed_code_sha256: 83b3ac3f9ed4069cfa8c4493bf47fe8cda41ec02e96ebdb2054ca1aaa95c7cf0
 findings_total: 15
 findings_real: 15
