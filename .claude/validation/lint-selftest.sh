@@ -41073,7 +41073,8 @@ run_kg_projection_selftests() {
   local o rc d c B="docs/design-context/brief.md"
   # (a) o core real: o piloto do design (o brief, com o business-context no projection_of) resolve tudo
   if [ -f "${REPO_ROOT}/${B}" ]; then
-    if o="$(ONION_KG_TRACE="${KT}" bash "${h}" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+    # CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o modo que o lint consome (--format tsv)
+    if o="$(ONION_KG_TRACE="${KT}" bash "${REPO_ROOT}/.claude/validation/kg-projection.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
     if [ "${rc}" = 0 ] && [ -z "${o}" ]; then record_pass "kg-projection: (a) o core real ⇒ rc 0, nenhum achado (o brief piloto resolve os 3 ids)"
     else record_fail "kg-projection: (a) core real" "rc=${rc} ${o:0:240}"; fi
   else record_skip "kg-projection: (a) sem o brief piloto neste repo (só o core o tem)"; fi
