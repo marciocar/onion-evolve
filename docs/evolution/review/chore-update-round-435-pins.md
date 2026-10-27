@@ -2,7 +2,8 @@
 branch: chore/update-round-435-pins
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: eb819cf20f6529e58525314d3aa7519b90fb17d7173e9d6ad16bc7b44a9a4814
+reviewed_code_sha256: b52bd3f330efe04950aa79ae8a0f7032f2160520f6311b2cb8737f6fcc8b5637
 findings_total: 0
 findings_real: 0
 tokens: 0
