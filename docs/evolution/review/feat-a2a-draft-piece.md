@@ -2,7 +2,7 @@
 branch: feat/a2a-draft-piece
 pr: 1399
 date: 2026-10-27
-reviewed_diff_sha256: 287b6dde2d61cb8bf579aac6cfb687dfd30970f8d9b610bf6f2297ed747bdf41
+reviewed_diff_sha256: e28024a75d3a2a95ee1e9143ad41da6a4307447a8cab6d2d406cd92060fdb19f
 reviewed_code_sha256: ab89698b309afdc0107b71b8c35770cffae34abc3caef88d57c7cf8fb496ae3f
 findings_total: 9
 findings_real: 6
