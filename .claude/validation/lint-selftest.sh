@@ -11870,7 +11870,13 @@ case "$1" in
         *"import yaml, jsonschema"*) [ -f "$F/deps-bad" ] && exit 1; echo "deps: falso" ;;
         radar) if [ "$new" = 1 ] && [ -f "$F/radar-diverge" ]; then echo "radar novo"; else echo "radar igual"; fi ;;
       esac; exit 0 ;;
-  -) c="$(cat)"; case "$c" in *importlib.metadata*) cat "$F/pins" ;; esac; exit 0 ;;
+  # a leitura do venv pelo usuário do serviço: o falso ABRE de verdade (find -readable, o access() de quem roda); o
+  # "outro dono" se simula pelo modo do arquivo, sem sudo (teto declarado)
+  -) c="$(cat)"; v="$(dirname "$(dirname "$0")")"
+     case "$c" in
+       *os.walk*) b="$(find "$2" ! -type l ! -readable 2>/dev/null | head -3)"; [ -z "$b" ] || { echo "$b: Permission denied"; echo "1 ilegível(is)"; exit 1; } ;;
+       *importlib.metadata*) [ -f "$F/pins-unreadable" ] && { echo "ERRO-LEITURA $v/lib/site/x.dist-info: MetadataNotFound: falso"; exit 3; }; cat "$F/pins" ;;
+     esac; exit 0 ;;
   *selftest.py) if [ "$new" = 1 ] && [ -f "$F/selftest-fail" ]; then echo "FAIL caso-falso"; echo "TOTAL 3"; exit 1; fi; echo "TOTAL 3"; exit 0 ;;
   *kg_validate.py) [ -f "$F/validate-rc2" ] && { echo "error: unrecognized arguments: --format"; exit 2; }
     [ -f "$F/validate-traceback" ] && { echo "Traceback (most recent call last): ImportError: falso"; exit 1; }
@@ -11889,6 +11895,7 @@ case "$verb" in
     di="$R/etc/systemd/system/$1.service.d/50-python.conf"
     if [ -f "$di" ] && [ ! -f "$F/stay-old" ]; then a0="$(sed -n 's/^ExecStart=\([^ ][^ ]*\) .*/\1/p' "$di" | tail -1)"; t="$(readlink -f "$a0")"; else t="$R/usr/bin/python3.12"; fi
     ln -sfn "$t" "$R/proc/4242/exe"
+    if [ -f "$di" ] && [ ! -f "$F/stay-old" ]; then printf '%s\0srv\0' "$a0"; else printf '/usr/bin/python3\0srv\0'; fi > "$R/proc/4242/cmdline"
     # o environ do processo: o PATH do drop-in, a menos que o EnvironmentFile o sobreponha (marcador envfile-path)
     pa=/usr/bin:/bin; [ -f "$di" ] && [ ! -f "$F/envfile-path" ] && pa="$(sed -n 's/^Environment=PATH=//p' "$di" | tail -1)"
     printf 'TOKEN=nao-se-imprime\0PATH=%s\0' "$pa" > "$R/proc/4242/environ"; exit 0 ;;
@@ -11898,7 +11905,7 @@ case "$verb" in
     if [ "$unit" = "$MP_W_UNIT" ]; then srv="$MP_W_SRV"; else srv="$MP_R_SRV"; fi
     for p in $props; do
       case "$p" in
-        MainPID) v=4242 ;; NRestarts) v=0 ;;
+        MainPID) v=4242 ;; NRestarts) v=0 ;; User) v="$(id -un)" ;;
         ExecStart) case "$unit" in
             onion-chat@*) if [ -f "$F/runner-oldpy" ]; then a=/usr/bin/python3; else a=/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15; fi
               v="{ path=$a ; argv[]=$a -I /run/onion-chat-bin/launcher.py ; ignore_errors=no }" ;;
@@ -11924,9 +11931,13 @@ EOF
 F="$MP_FAKE"; echo "uv $*" >> "$F/calls"
 case "$1 $2" in
   "python install") [ -f "$F/uv-fail" ] && exit 1; for k; do :; done; dir="$UV_PYTHON_INSTALL_DIR/$k"; mkdir -p "$dir/bin"
-    cp "$F/fpy" "$dir/bin/python3.15"; chmod 0755 "$dir/bin/python3.15"; ln -sfn python3.15 "$dir/bin/python3"; ln -sfn "$dir" "$UV_PYTHON_INSTALL_DIR/cpython-3.15-linux-x86_64-gnu"; exit 0 ;;
+    cp "$F/fpy" "$dir/bin/python3.15"; chmod 0755 "$dir/bin/python3.15"; ln -sfn python3.15 "$dir/bin/python3"; ln -sfn "$dir" "$UV_PYTHON_INSTALL_DIR/cpython-3.15-linux-x86_64-gnu"
+    # o que o uv real deixou na VPS (medido 2026-10-27): a trava da raiz em 0666
+    : > "$UV_PYTHON_INSTALL_DIR/.lock"; chmod 0666 "$UV_PYTHON_INSTALL_DIR/.lock"; exit 0 ;;
   "venv --allow-existing") mkdir -p "$5/bin"; ln -sfn "$4" "$5/bin/python"; ln -sfn python "$5/bin/python3"; echo "home = falso" > "$5/pyvenv.cfg"; exit 0 ;;
-  "pip install") [ -f "$F/pip-fail" ] && exit 1; exit 0 ;;
+  # o uv real: sem UV_LINK_MODE=copy HARDLINKA no cache; com ele copia e PRESERVA o modo do cache (0640, medido)
+  "pip install") [ -f "$F/pip-fail" ] && exit 1; v="${4%/bin/python}"; mkdir -p "$F/uvcache" "$v/lib/site"; echo x > "$F/uvcache/m.py"; chmod 0640 "$F/uvcache/m.py"
+    if [ "${UV_LINK_MODE:-}" = copy ] && [ ! -f "$F/uv-hardlink" ]; then cp -p "$F/uvcache/m.py" "$v/lib/site/m.py"; else ln -f "$F/uvcache/m.py" "$v/lib/site/m.py"; fi; exit 0 ;;
 esac
 exit 9
 EOF
@@ -11948,7 +11959,7 @@ EOF
   _mpreset() {
     rm -rf "${R}" "${F}"; mkdir -p "${R}/usr/bin" "${R}/proc/4242" "${R}/etc/systemd/system" "${R}/var/lib/onion-chat-kg/area" "${F}"
     cp "${d}/fpy" "${F}/fpy"; cp "${d}/fpy" "${R}/usr/bin/python3"; cp "${d}/fpy" "${R}/usr/bin/python3.12"
-    ln -s "${R}/usr/bin/python3.12" "${R}/proc/4242/exe"; printf 'PATH=/usr/bin:/bin\0' > "${R}/proc/4242/environ"; echo dado > "${R}/var/lib/onion-chat-kg/area/x.kg.yaml"
+    ln -s "${R}/usr/bin/python3.12" "${R}/proc/4242/exe"; printf 'PATH=/usr/bin:/bin\0' > "${R}/proc/4242/environ"; printf '/usr/bin/python3\0srv\0' > "${R}/proc/4242/cmdline"; echo dado > "${R}/var/lib/onion-chat-kg/area/x.kg.yaml"
     echo 3.15.2 > "${F}/pyver"; echo 2 > "${F}/tools"; printf 'pyyaml==6.0.3\njsonschema==4.26.0\nattrs==26.1.0\n' > "${F}/pins"
     _mpcode "${R}${MPR_CODE}" ops/mcp-onion-kg; _mpcode "${R}${MPW_CODE}" ops/mcp-onion-kg-writer
   }
@@ -12042,7 +12053,46 @@ PY
   _mc_rootguard() { local r; r="$(cd "${d}" && env PATH="${K}:${PATH}" MP_FAKE="${F}" ONION_MIGRATE_PY_TEST=1 ONION_MIGRATE_PY_ROOT=/ bash "$1" writer plan 2>&1)"; local rc=$?
     MP_WHY="rc=${rc} ${r:0:300}"; [ "${rc}" = 3 ] && case "${r}" in *"raiz de produção"*) true ;; *) false ;; esac; }
   _mc_reuse_bad() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; _mpr "$1" writer rollback --yes >/dev/null; chmod g+w "${VW}/bin"
-    r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:300}"; _mprc "${r}" 1 && _mphas "${r}" "tem o marcador mas não é de" && [ ! -e "$(_mpdi writer)" ]; }
+    r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:300}"; _mprc "${r}" 1 && _mphas "${r}" "tem o marcador mas reprova: não é de" && [ ! -e "$(_mpdi writer)" ]; }
+  # ── o 1º apply do serviço de leitura (2026-10-27, nó E_PY315_APPLY_* do sinais-de-campo): hardlink no cache, modo do cache, leitura pelo usuário do serviço ──
+  local VWF="${VW}/lib/site/m.py"
+  _mc_copy() { local r; _mprt "$1"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:600}"
+    _mprc "${r}" 0 && [ -f "${VWF}" ] && [ -z "$(find "${VW}" -type f -links +1)" ] && [ -n "$(find "${VWF}" -perm -0444)" ] \
+      && [ "$(stat -c %a "${F}/uvcache/m.py")" = 640 ]; }
+  _mc_hardlink() { local r; _mprt "$1"; : > "${F}/uv-hardlink"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:600}"
+    _mprc "${r}" 1 && _mphas "${r}" "links>1 ANTES do chown" && _mphas "${r}" "Nada mudou de dono" && [ ! -e "${VW}/.onion-venv-complete" ] && [ ! -e "$(_mpdi writer)" ]; }
+  # o venv já entregue, com o marcador, em que um arquivo ganhou um segundo link: a guarda do reuso o barra
+  _mc_hardlink_reuse() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; _mpr "$1" writer rollback --yes >/dev/null; ln -f "${VWF}" "${d}/fora-do-venv"
+    r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:600}"; rm -f "${d}/fora-do-venv"
+    _mprc "${r}" 1 && _mphas "${r}" "tem o marcador mas reprova: arquivo do venv com links>1" && [ ! -e "$(_mpdi writer)" ]; }
+  # o venv quebrado com o marcador (o caso da VPS): o modo do cache sem leitura para "outros"
+  _mc_brokenperm() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; _mpr "$1" writer rollback --yes >/dev/null; chmod 0640 "${VWF}"
+    r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:600}"
+    _mprc "${r}" 1 && _mphas "${r}" "tem o marcador mas reprova" && _mphas "${r}" "sem leitura para outros" && _mphas "${r}" "writer discard-venv --yes" && [ ! -e "$(_mpdi writer)" ]; }
+  # o arquivo que o usuário do serviço NÃO abre (0000: nem o dono não-root lê; é o "outro dono" honesto sem sudo)
+  _mc_unreadable() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; _mpr "$1" writer rollback --yes >/dev/null; chmod 0000 "${VWF}"
+    r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:700}"; chmod 0644 "${VWF}"
+    _mprc "${r}" 1 && _mphas "${r}" "do serviço não lê o venv (permissão)" && _mphas "${r}" "Permission denied" && [ ! -e "$(_mpdi writer)" ]; }
+  _mc_v_unreadable() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; chmod 0000 "${VWF}"
+    r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:700}"; chmod 0644 "${VWF}"
+    _mprc "${r}" 1 && _mphas "${r}" "FALHA o usuário $(id -un) do serviço não lê o venv (permissão)"; }
+  _mc_pins_unreadable() { local r; _mprt "$1"; : > "${F}/pins-unreadable"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:600}"
+    _mprc "${r}" 1 && _mphas "${r}" "não li os metadados do venv" && _mphas "${r}" "MetadataNotFound" && ! _mphas "${r}" "não tem os pinos" && [ ! -e "$(_mpdi writer)" ]; }
+  _mc_discard() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; _mpr "$1" writer rollback --yes >/dev/null; chmod 0000 "${VWF}"
+    r="$(_mpr "$1" writer discard-venv --yes)"; MP_WHY="${r:0:600}"
+    _mprc "${r}" 0 && _mphas "${r}" "discard-venv OK" && [ ! -e "${VW}" ] && _mprc "$(_mpr "$1" writer apply --yes)" 0 && [ -f "${VW}/.onion-venv-complete" ]; }
+  _mc_discard_dropin() { local r; _mprt "$1"; : > "${F}/stay-old"; : > "${F}/envfile-path"; _mpr "$1" writer apply --yes >/dev/null
+    r="$(_mpr "$1" writer discard-venv --yes)"; MP_WHY="${r:0:600}"
+    [ -f "$(_mpdi writer)" ] && _mprc "${r}" 1 && _mphas "${r}" "o drop-in" && _mphas "${r}" "aponta para ${VW}" && [ -d "${VW}" ]; }
+  _mc_discard_live() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; rm -f "$(_mpdi writer)"
+    r="$(_mpr "$1" writer discard-venv --yes)"; MP_WHY="${r:0:600}"
+    _mprc "${r}" 1 && _mphas "${r}" "o processo vivo de onion-vps-mcp-kg-writer usa ${VW}" && [ -d "${VW}" ]; }
+  _mc_discard_noyes() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; _mpr "$1" writer rollback --yes >/dev/null
+    r="$(_mpr "$1" writer discard-venv)"; MP_WHY="${r:0:300}"; _mprc "${r}" 1 && _mphas "${r}" "RECUSADO: discard-venv sem --yes" && [ -d "${VW}" ]; }
+  _mc_rt_lock() { local r v; _mprt "$1"; chmod 0666 "${R}/opt/onion-python/.lock"; : > "${F}/calls"
+    v="$(_mpr "$1" runtime verify)"; r="$(_mpr "$1" runtime apply --yes)"; MP_WHY="verify=${v:0:300} apply=${r:0:300}"
+    _mprc "${v}" 1 && _mphas "${v}" "/opt/onion-python/.lock" && _mprc "${r}" 0 && _mphas "${r}" "não foi reinstalado" \
+      && [ "$(_mpcalls 'uv python install')" = 0 ] && [ "$(stat -c %a "${R}/opt/onion-python/.lock")" = 644 ] && _mprc "$(_mpr "$1" runtime verify)" 0; }
   _mc_v_envfile() { local r; _mprt "$1"; : > "${F}/envfile-path"; _mpr "$1" writer apply --yes >/dev/null
     r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:600}"; _mprc "${r}" 1 && _mphas "${r}" "FALHA o PATH da unit não começa em ${VW}/bin (/usr/bin:/bin)" \
       && ! _mphas "${r}" "nao-se-imprime"; }
@@ -12078,7 +12128,7 @@ PY
   _mpcase "(v5) verify sem o venv → a paridade é NÃO MEDIDA, nunca igual pelo python3 do sistema" \
     '  [ -x "${bin}/python3" ] || return 2' '  :' _mc_novenv
   _mpcase "(a10) venv sem um dos pinos do requirements.txt → rc 1 nomeando o pino, sem drop-in" \
-    '[ -z "${miss}" ] || die 1 "o venv não tem os pinos' 'true || die 1 "o venv não tem os pinos' _mc_pins
+    '[ -z "${miss}" ] || echo "o venv não tem os pinos' 'true || echo "o venv não tem os pinos' _mc_pins
   _mpcase "(r1) rollback --yes volta ao estado anterior: /etc igual ao de antes, processo no python do sistema, um restart" \
     '    priv rm -f -- "${DROPIN}" || die 2' '    true || die 2' _mc_rollback
   _mpcase "(r2) rollback sem --yes → rc 1, o drop-in fica" \
@@ -12105,7 +12155,37 @@ PY
   _mpcase "(a12) linha com marcador python_version < 3.13 não é exigida no 3.15 (o typing-extensions real)" \
     '        if not ops[mm.group(1)](ver, (int(mm.group(2)), int(mm.group(3)))):' '        if False:' _mc_apply
   _mpcase "(a13) venv com o marcador mas que aceita escrita de grupo → o reuso recusa, sem drop-in" \
-    '[ -z "$(venv_owner_problems "${VENV}")" ] || die 1 "${VENV} tem o marcador' 'true || die 1 "${VENV} tem o marcador' _mc_reuse_bad
+    '[ -z "${gp}" ] || die 1 "${VENV} tem o marcador mas reprova' 'true || die 1 "${VENV} tem o marcador mas reprova' _mc_reuse_bad
+  _mpcase "(h1) o venv nasce com UV_LINK_MODE=copy: nenhum arquivo com links>1, o cache intocado (0640) e o venv legível por outros" \
+    '  export UV_LINK_MODE=copy' '  :' _mc_copy
+  _mpcase "(h2) a cópia preserva o modo 0640 do cache: o chmod a+rX abre a leitura ao usuário do serviço" \
+    'priv chmod -R a+rX,go-w "${VENV}"' 'priv chmod -R go-w "${VENV}"' _mc_copy
+  _mpcase "(h3) arquivo do venv com links>1 (hardlink no cache) → rc 1 ANTES do chown (o cache não muda de dono), sem marcador nem drop-in" \
+    '  [ -z "${hl}" ] || die 1' '  true || die 1' _mc_hardlink
+  _mpcase "(h3b) venv com o marcador em que um arquivo tem links>1 → o reuso recusa" \
+    '  out="$(find "${v}" -type f -links +1 -print 2>/dev/null | head -3)"' '  out=""' _mc_hardlink_reuse
+  _mpcase "(h4) venv quebrado COM o marcador (modo 0640, sem leitura para outros) → o re-apply recusa e aponta o discard-venv" \
+    '  out="$(find "${v}" ! -type l \( ! -perm -0444 -o -type d ! -perm -0111 \) -print 2>/dev/null | head -3)"' '  out=""' _mc_brokenperm
+  _mpcase "(h5) o mesmo venv quebrado: sem a recusa do reuso, a unit seria trocada para ele" \
+    '[ -z "${gp}" ] || die 1 "${VENV} tem o marcador mas reprova' 'true || die 1 "${VENV} tem o marcador mas reprova' _mc_brokenperm
+  _mpcase "(h6) arquivo que o usuário do serviço não ABRE → rc 1 com a mensagem de PERMISSÃO (a prova roda como ele)" \
+    '  [ "${rc}" = 0 ] || echo "o usuário ${SVC_USER} do serviço não lê' '  true || echo "o usuário ${SVC_USER} do serviço não lê' _mc_unreadable
+  _mpcase "(h7) verify com arquivo do venv ilegível pelo usuário do serviço → rc 1 nomeando a permissão" \
+    '  else while IFS= read -r l; do vbad "${l}"; done <<<"${ap}"; fi' '  else :; fi' _mc_v_unreadable
+  _mpcase "(h8) metadados ilegíveis (MetadataNotFound) → 'não li os metadados', nunca 'faltam pinos'" \
+    $'  if [ "${rc}" != 0 ]; then\n    echo "não li os metadados' $'  if false; then\n    echo "não li os metadados' _mc_pins_unreadable
+  _mpcase "(d1) discard-venv --yes de um venv quebrado sem uso → removido, e o apply seguinte monta um novo" \
+    '    priv rm -rf -- "${VENV}" || die 1 "não removi' '    true || die 1 "não removi' _mc_discard
+  _mpcase "(d2) discard-venv com o drop-in apontando para o venv → rc 1, o venv fica" \
+    '    if [ -f "${DROPIN}" ] && grep -qF -- "${VENV}/" "${DROPIN}"; then' '    if false; then' _mc_discard_dropin
+  _mpcase "(d3) discard-venv com o processo vivo no venv (o drop-in já saiu, sem restart) → rc 1, o venv fica" \
+    '    case "$(proc_path) $(proc_argv)" in *"${VENV}/"*)' '    case "x" in *"${VENV}/"*)' _mc_discard_live
+  _mpcase "(d4) discard-venv sem --yes → rc 1, o venv fica" \
+    '    [ "${YES}" = 1 ] || { say "RECUSADO: discard-venv sem --yes. Nada foi feito."; exit 1; }' '    :' _mc_discard_noyes
+  _mpcase "(rt1) o .lock 0666 na raiz /opt/onion-python → o verify reprova; o apply fecha o modo SEM reinstalar" \
+    '  bad="$(root_loose | head -3)"' '  bad=""' _mc_rt_lock
+  _mpcase "(rt2) o runtime apply fecha o .lock 0666 que o uv deixa na raiz (o verify seguinte aceita)" \
+    '      fix_root_loose || die 1 "não fechei dono e modo do resto' '      true || die 1 "não fechei dono e modo do resto' _mc_rt_apply
   _mpcase "(v6) o PATH do PROCESSO (um EnvironmentFile o sobrepõe) fora do venv → rc 1, mesmo com o drop-in certo" \
     '  pe="$(proc_path)"' '  pe="$(systemctl show "${UNIT}" -p Environment --value | sed -n "s/^PATH=//p")"' _mc_v_envfile
   _mpcase "(u2) ONION_MIGRATE_PY_* sem o modo de teste → rc 3" \

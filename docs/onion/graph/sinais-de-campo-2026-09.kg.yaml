@@ -1486,7 +1486,31 @@ nodes:
       locator: "saídas das três chamadas do peer-ref-check.sh"
       method: "measurement: peer-ref-check.sh rodado contra a origin/main da curadoria"
       locality: "repo"
+  - id: E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "apply do maestro do serviço granaai pelo ops/migrate-python-service.sh (por volta das 20:00 UTC): o venv montou e o wrapper abortou em falha fechada antes do drop-in; contagem de links e de dono no venv e no cache do uv do operador; e, nesta branch, a medida de que o uv no modo copy deixa os links em 1 mas preserva o modo do cache (0660 no arquivo copiado, igual ao do cache)"
+    trace: "ops/migrate-python-service.sh"
+    label: "O 1º apply do granaai abortou fechado: o uv hardlinkou o venv no cache do operador, o chown de root levou 393 arquivos do cache junto, e o modo 0640 do cache deixou o venv ilegível para o usuário do serviço. Produção intocada."
+    narrative: |-
+      O que o apply mediu: o uv venv e o uv pip install rodam como o operador e, por padrão, HARDLINKAM os arquivos do venv no cache do uv (151 arquivos do venv com links>1). O chown -R de root do venv mudou o dono dos MESMOS inodes no cache: 393 arquivos do cache do operador viraram de root (as 8 entradas archive-v0 foram limpas pelo maestro). Com hardlink, o isolamento "venv de root que o operador não reescreve" era ilusório até o chown, e o chown corrompeu o cache de quem montou.
+      O segundo defeito é de permissão: os arquivos do cache têm modo 0640, e depois do chown o operador, que é o User= da unit, lê como "outros". 212 de 241 arquivos do venv ficaram sem leitura para outros, entre eles .py e o .so do rpds. O importlib.metadata do 3.15 levanta MetadataNotFound com o METADATA ilegível, e o venv_pins, que tinha 2>/dev/null, devolveu vazio; por isso a mensagem falou em pinos, não em permissão.
+      Por que a bancada não pegou: nela o dono esperado é quem roda (sem chown de verdade) e o cache é do mesmo usuário. Dois achados do card vieram junto: o sleep 3 antes do curl do /health é menor que os ~6 s que o servidor leva para abrir a porta, e o uv python install deixou a trava da raiz do onion-python em 0666, que o verify do runtime não olhava. E o rollback só remove o drop-in: não havia caminho para descartar o venv quebrado que tem o marcador de completo.
+      A cura, nesta branch: UV_LINK_MODE=copy na montagem, chmod -R a+rX,go-w depois do chown, e a conferência antes do marcador (nenhum links>1; o usuário do serviço abre todo arquivo, importa as libs e lê os metadados, rodando como ele); o venv_pins nomeia a falha de leitura; o venv com marcador que reprova é recusado com o caminho do novo discard-venv --yes, que recusa venv em uso; o runtime fecha e confere a raiz inteira. A decisão de executar por ops e opt fica de pé: o defeito era do como, não do onde.
+    provenance:
+      source: "ops/migrate-python-service.sh granaai apply --yes, rodado pelo maestro na VPS"
+      locator: "a saída do apply (o aborto em «o venv não tem os pinos do requirements.txt») e as contagens de links, dono e modo no venv do granaai e no cache do uv do operador, relatadas na sessão"
+      method: "measurement: contagem por find de links>1, dono root e falta de leitura para outros no venv e no cache, depois do apply"
+      locality: "host"
 edges:
+  - from: E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027
+    to: D_PY315_EXECUCAO_POR_OPS_E_OPT_1027
+    edge_type: CONSTRAINS
   - from: E_PY315_AUDITORIA_SERVICOS_VPS_MEDIDA_1027
     to: Q_PYYAML_604_CP315_GATILHO_1027
     edge_type: SUPPORTS
