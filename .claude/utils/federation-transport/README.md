@@ -74,6 +74,15 @@ git-async e local **documentam/apontam** o fluxo que já existe (`co-*`), não r
 | [`a2a-invite.sh`](a2a-invite.sh) | o convite por membro (F2): cria, revoga, lista e confere o arquivo de convites do bridge pelas regras dele; token só em arquivo 0600 |
 | [`a2a-verify.sh`](a2a-verify.sh) | o gate do receptor (verificação antes de agir) |
 | [`a2a-accept.sh`](a2a-accept.sh) | o ato humano fila → inbox |
+| [`a2a-rt-mcp.py`](a2a-rt-mcp.py) | a **peça de rascunho** (desde 2026-10-27): MCP local por stdio com só `draft_message` (grava rascunho, nunca envia) e `read_inbox` (lê uma vez, como dado na moldura R15.2) |
+| [`a2a-rt-send.sh`](a2a-rt-send.sh) | o envio HUMANO do rascunho: mostra, pede a confirmação digitada no terminal e só então assina e envia pelo `a2a-send.sh` |
 
 Superfície: [`/meta:federation-a2a`](../../commands/meta/federation-a2a.md). Bancada:
-`run_federation_a2a_selftests` (com a `a2a_verify`, a `a2a_accept` e a `a2a_ssrf`).
+`run_federation_a2a_selftests` (com a `a2a_verify`, a `a2a_accept` e a `a2a_ssrf`) e `run_a2a_rt_selftests` (a peça
+de rascunho, decisão `D_A2A_PECA_RASCUNHO_CONSTRUIR_1027`).
+
+**A peça de rascunho viaja junto com este diretório** (papéis `source` e `hub`, e o adotado com papel
+`adopted`), e é cortada de standalone, plugins e mini pelo mesmo prefixo do `_role_cut`. Ela ainda não
+entra no pacote de entrada da trilha 2 do `/meta:federation-a2a`: até a ida e volta viva entre a VPS e o
+notebook ser medida (`Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027`), é peça do perfil Onion do A2A em teste, e o
+membro a recebe pelo checkout do core.

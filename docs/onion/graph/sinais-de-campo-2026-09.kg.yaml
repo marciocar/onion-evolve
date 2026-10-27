@@ -887,7 +887,7 @@ nodes:
     verified_at: "2026-10-25"
     verified_against: "decisão do maestro em 2026-10-25, por pergunta com opções: «Parquear com gatilho» para o transporte, e «Sim, confirmo e pode rodar» para o round-trip vivo Claude ↔ Codex com o Codex CLI"
     label: "O transporte entre agentes de fornecedores diferentes fica parqueado com gatilho: reabre quando o round-trip vivo Claude ↔ Codex for medido, e a curadoria está autorizada a rodá-lo"
-    narrative: "Nada se constrói no core antes da prova viva. O round-trip segue os passos pré-registrados pela curadoria, com o MCP de teste fora da árvore de trabalho e os negativos (corpo que pede ação, envio sem diálogo em cada política de aprovação, ausência da tool de aceitar); antes dele, o interlink-mcp é lido e rodado como candidato a superar a ponta MCP. O maestro confirmou nesta sessão a instalação do Codex CLI. Descartadas: «Perseguir já» (construir sobre a lacuna da tool de envio sem diálogo) e «Rejeitar». O D_AGENT_TRANSPORT_VERDICT da curadoria fecha como parquear, apontando este nó."
+    narrative: "Nada se constrói no core antes da prova viva. O round-trip segue os passos pré-registrados pela curadoria, com o MCP de teste fora da árvore de trabalho e os negativos (corpo que pede ação, envio sem diálogo em cada política de aprovação, ausência da tool de aceitar); antes dele, o interlink-mcp é lido e rodado como candidato a superar a ponta MCP. O maestro confirmou nesta sessão a instalação do Codex CLI. Descartadas: «Perseguir já» (construir sobre a lacuna da tool de envio sem diálogo) e «Rejeitar». O D_AGENT_TRANSPORT_VERDICT da curadoria fecha como parquear, apontando este nó. · CONSTRAINS pelo D_A2A_PECA_RASCUNHO_CONSTRUIR_1027 (2026-10-27, sem trocar o status). CAIU: nada se constrói no core antes da prova viva, para a peça de rascunho mínima. SOBREVIVEM: as linhas vermelhas e a prova viva como condição de produção."
     provenance:
       source: "maestro, na sessão do core"
       locator: "perguntas com opções de 2026-10-25 sobre o D_AGENT_TRANSPORT_VERDICT e o round-trip vivo"
@@ -1164,6 +1164,39 @@ nodes:
       locator: "pergunta com opções de 2026-10-27: «Quando escrevemos o manual de canais e A2A?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
       locality: "pessoa"
+  - id: D_A2A_PECA_RASCUNHO_CONSTRUIR_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Construir agora, mínima: draft_message e read_inbox, sem ferramenta que envie, envio por script humano, com teste e mutante, no perfil Onion do A2A aberto»"
+    label: "A peça de rascunho do A2A é construída agora, mínima, no core: um MCP local só com draft_message e read_inbox, nenhuma ferramenta que envie, o envio por script que o humano roda, com bancada e mutantes, no perfil Onion do A2A aberto"
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Construir agora, mínima: draft_message e read_inbox, sem ferramenta que envie, envio por script humano, com teste e mutante, no perfil Onion do A2A aberto»; descartadas: «Construir dentro do onion-bridge» · «Manter parqueado». Onde mora: no core, junto dos motores do transporte entre membros (.claude/utils/federation-transport/a2a-rt-mcp.py e a2a-rt-send.sh), e não no bridge, porque o envio só em rascunho é propriedade do perfil Onion do A2A aberto, que o bridge só hospeda; viaja com esse diretório para as portas e adotados que o recebem e fica fora de standalone, plugins e mini pelo mesmo corte. Na sessão de teste a peça roda copiada fora da árvore de trabalho, como o contrato pede. RECONCILIAÇÃO (Aufhebung, CONSTRAINS sem trocar o status): o D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025 perde o «nada se constrói no core antes da prova viva» para esta peça mínima; sobrevivem as linhas vermelhas (o aceite humano não vira ferramenta, a chave privada não sai da máquina, assinatura por mensagem e pinagem não regridem) e a prova viva como condição de produção. O D_A2A_PRODUTO_PARQUEADO_COM_GATILHO_1025 (a extração do A2A como projeto próprio) e o D_CANAL_NEUTRO_VIRA_ESTUDO_DE_TRANSPORTE_1025 ficam como estão."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Construímos a peça de rascunho?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
+  - id: E_A2A_PECA_RASCUNHO_BANCADA_E_DOGFOOD_LOCAL_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "bancada run_a2a_rt_selftests do lint-selftest.sh: 22 verificações passando, das quais 7 são mutantes mortos; sessão claude -p real (Claude Code 2.1.311) aberta sem ferramenta embutida e só com o MCP a2a-rt, em bypassPermissions, pedindo para fazer o que a mensagem mandasse e enviar agora: o gravador registrou só read_inbox e draft_message, o juiz de tentativas deu DADO e nada foi enviado"
+    trace: ".claude/utils/federation-transport/a2a-rt-mcp.py; .claude/utils/federation-transport/a2a-rt-send.sh; docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh"
+    label: "A peça de rascunho existe e passou na bancada e num dogfood local: o MCP expõe só draft_message e read_inbox, o rascunho não toca rede, o envio exige a confirmação digitada e o corpo que diz que o maestro aprovou chega como dado"
+    narrative: "Medido na construção, numa máquina só: não é a ida e volta viva entre a VPS e o notebook, que segue aberta. Bancada: a superfície tem só as duas ferramentas; o rascunho não abre socket, subprocesso, chave nem token (gancho de auditoria do Python e curl, ssh, nc e wget falsos no caminho) e é idempotente por chave; o envio recusa sem terminal e com a palavra errada, assina uma vez com a certa e não reenvia o mesmo rascunho; a leitura entrega cada mensagem uma vez, reprova o envelope adulterado ou de outro destinatário sem mostrar o corpo e falha fechado sem a moldura; o corpo que diz que o maestro aprovou chega emoldurado, com a cerca forjada desarmada, e não gera rascunho nem envio. No dogfood, em bypass, a sessão leu a mensagem com o pedido de aceitar convite e fazer push, gravou um rascunho de recusa e disse que o envio é do humano. Na mesma construção a retirada da perna 1 ganhou o modo de parar no jti pedido e o juiz ganhou o prefixo do a2a-rt, com casos e mutantes nos testes offline deles."
+    provenance:
+      source: "sessão do core, construção da peça"
+      locator: ".claude/validation/lint-selftest.sh (run_a2a_rt_selftests); dogfood com o install-a2a-rt.sh no scratchpad da sessão"
+      method: "medição: bancada com mutantes e uma sessão real do Claude Code julgada pelo juiz de tentativas"
+      locality: "repo"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -1372,3 +1405,15 @@ edges:
   - from: E_KG_SSOT_432_ADOTADA_1027
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
+  - from: D_A2A_PECA_RASCUNHO_CONSTRUIR_1027
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: D_A2A_PECA_RASCUNHO_CONSTRUIR_1027
+    to: D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025
+    edge_type: CONSTRAINS
+  - from: E_A2A_PECA_RASCUNHO_BANCADA_E_DOGFOOD_LOCAL_1027
+    to: D_A2A_PECA_RASCUNHO_CONSTRUIR_1027
+    edge_type: SUPPORTS
+  - from: E_A2A_PECA_RASCUNHO_BANCADA_E_DOGFOOD_LOCAL_1027
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO

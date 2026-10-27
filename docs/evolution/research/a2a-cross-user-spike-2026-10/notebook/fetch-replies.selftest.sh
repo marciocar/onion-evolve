@@ -15,6 +15,8 @@
 #   · sent.tsv de outro usuário com `a[$(cmd)]` na coluna 1 NÃO executa nada (rc 1, sem o arquivo-prova);
 #   · flag de valor sem o valor sai rc 2 (uso), não rc 1;
 #   · corpo adulterado depois de assinado sai corpo-adulterado (rc 1), e o corpo não é impresso;
+#   · --until-jti (perna 1 da ida e volta VPS ↔ notebook, 2026-10-27): a pergunta NOVA sem in_reply_to sai [ok]
+#     e o --watch para nela (rc 0); sem a flag, a mesma pergunta sai in_reply_to-desconhecido (rc 1);
 #   · MUTANTES (o --me ignorado; o --sent-tsv ignorado; a validação numérica do t_send removida): cada um
 #     tem de reprovar o seu caso. Mutate-and-restore NO PRÓPRIO arquivo, conferido por sha256 no fim.
 # Uso : bash notebook/fetch-replies.selftest.sh      Exit: 0 tudo passou · 1 algum caso falhou
@@ -55,6 +57,8 @@ mkenv() {
 OUTBOX="${T}/outbox"; mkdir -p "${OUTBOX}"
 mkenv ack   "${MEMBER}" "${JTI}" ""                    "cs-ack-0001"   > "${OUTBOX}/0001-ack.json"
 mkenv reply "${MEMBER}" "${JTI}" $'são 42 grafos.\nfim' "cs-reply-0001" > "${OUTBOX}/0002-reply.json"
+QBOX="${T}/outbox-question"; mkdir -p "${QBOX}"
+mkenv question "${MEMBER}" "" "pergunta da perna 1" "vps-q-0001" > "${QBOX}/0003-question.json"
 TAMPER="${T}/outbox-tamper"; mkdir -p "${TAMPER}"
 jq -c '.signal.body = "são 43 grafos."' "${OUTBOX}/0002-reply.json" > "${TAMPER}/0002-reply.json"
 # o sent.tsv do REMETENTE (o a2a-peer), fora da HOME de quem faz o fetch — formato do send-a2a.sh
@@ -105,6 +109,14 @@ expect 2 "--me vazio é erro de uso" "--me vazio"
 run "${OUTBOX}" --sent-tsv
 expect 2 "--sent-tsv sem valor é erro de uso, não unbound variable" "falta o valor de --sent-tsv"
 
+echo "── fetch-replies: --until-jti (perna 1 da ida e volta)"
+run "${QBOX}" --me "${MEMBER}" --sent-tsv "${SENT}" --watch --until-jti vps-q-0001 --timeout 5
+expect 0 "--until-jti: pergunta nova sem in_reply_to sai [ok] e o --watch para nela" "[ok] question ←" "│ pergunta da perna 1"
+run "${QBOX}" --me "${MEMBER}" --sent-tsv "${SENT}"
+expect 1 "sem --until-jti a mesma pergunta segue in_reply_to-desconhecido" "[in_reply_to-desconhecido] question"
+run "${QBOX}" --me "${MEMBER}" --until-jti 'x;y'
+expect 2 "--until-jti fora da forma é erro de uso" "--until-jti fora da forma"
+
 echo "── mutantes (mutate-and-restore no próprio arquivo, conferido por sha256 no fim)"
 mutant() {  # mutant <nome> <expressão sed> <marca> ; deixa o fetch mutado (o próximo restore desfaz)
   cp "${T}/fetch.orig" "${FETCH}"; sed -i "$2" "${FETCH}"
@@ -124,6 +136,11 @@ if mutant "t_send sem validação" 's/^  case "\${t_send}" in \*\[!0-9\]\*) t_se
   rm -f "${PWNED}"; run "${OUTBOX}" --me "${MEMBER}" --sent-tsv "${EVIL}"
   if [ -e "${PWNED}" ]; then ok "mutante «t_send sem validação» EXECUTOU o a[\$(cmd)]: o caso da injeção morde"
   else ko "mutante «t_send sem validação» não executou: o caso da injeção não prova nada"; fi
+fi
+if mutant "--until-jti não para" 's/^  \[ -n "\${UNTIL_JTI}" \] && \[ "\${rj}" = "\${UNTIL_JTI}" \] && \[ "\${verdict}" = ok \] && GOT_UNTIL=1$/  : # MUTANTE: until-jti não para/' 'MUTANTE: until-jti não para'; then
+  run "${QBOX}" --me "${MEMBER}" --sent-tsv "${SENT}" --watch --until-jti vps-q-0001 --timeout 2
+  if [ "${rc}" = 3 ]; then ok "mutante «--until-jti não para» saiu por timeout (rc 3): o caso da perna 1 morde"
+  else ko "mutante «--until-jti não para» passou (rc ${rc})"; fi
 fi
 cp "${T}/fetch.orig" "${FETCH}"
 SHA1="$(openssl dgst -sha256 < "${FETCH}" | awk '{print $NF}')"
