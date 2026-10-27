@@ -51,7 +51,7 @@ onion-evolve/
 
 ---
 
-## 2. Comandos — 117 invocáveis em 10 categorias
+## 2. Comandos — 118 invocáveis em 10 categorias
 
 Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.md), regenerada por
 `.claude/validation/inventory.sh` — contrato: "comando invocável" = `.md` em
