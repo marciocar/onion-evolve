@@ -87,7 +87,7 @@ nodes:
     source_tier: 10
     source_kind: primary
     label: "O cross-session nativo do Claude Code (SendMessage/ListAgents) é escopado às sessões DO MESMO usuário ('your other sessions'): não é canal entre pessoas e não resolve sozinho a troca entre colegas."
-    narrative: "Elenxo tentou derrubar e não caiu (objeção não sobrevivente). Corpus: canal-vivo-sessoes-2026-10, S2 observado: com contas Max e Team, 'nenhuma conta lista as sessões da outra'. Ressalva sem medida: 'dois membros da mesma org Team' segue NÃO VERIFICADO."
+    narrative: "Elenxo tentou derrubar e não caiu (objeção não sobrevivente). Corpus: no spike de duas contas do canal-vivo-sessoes-2026-10, observado: com contas Max e Team, 'nenhuma conta lista as sessões da outra'. Ressalva sem medida: 'dois membros da mesma org Team' segue NÃO VERIFICADO."
     trace: "https://code.claude.com/docs/en/cross-session-messaging"
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
@@ -125,7 +125,7 @@ nodes:
     source_tier: 10
     source_kind: primary
     label: "Entre máquinas ou com a nuvem, a mensagem nativa passa pelos servidores da Anthropic via Remote Control e exige login claude.ai (não com API key, Bedrock, Vertex ou Foundry); na mesma máquina vai por socket local, sem passar pela Anthropic."
-    narrative: "Define o dono do dado e a dependência de fornecedor da opção D. Corpus S1 observou o canal VPS↔notebook na mesma conta."
+    narrative: "Define o dono do dado e a dependência de fornecedor da opção D. O spike do corpus observou o canal VPS↔notebook na mesma conta."
     trace: "https://code.claude.com/docs/en/cross-session-messaging"
     provenance:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
@@ -467,7 +467,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    label: "Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS/Linux/WSL2), a 2.1.234 levou ao Windows, e desde a 2.1.248 a mesma máquina funciona em todos os provedores (Bedrock, Vertex, Foundry); entre máquinas exige claude.ai."
+    label: "Formulação corrigida: SendMessage/ListAgents entre sessões estrearam na 2.1.224 (macOS, Linux e WSL 2), a 2.1.234 levou ao Windows, e desde a 2.1.248 a mesma máquina funciona em todos os provedores (Bedrock, Vertex, Foundry); entre máquinas exige claude.ai."
     narrative: "Medida: grep no CHANGELOG oficial ('## 2.1.224' 'Added cross-session SendMessage'; '## 2.1.248' '... same machine on Bedrock, Vertex, and Foundry'; 'Windows: cross-session messaging is now available') e WebFetch da seção Availability da primária em 2026-10-27. Critério: V4_DESATUALIZADA. Alvo reprovado: 'cross-session chegou na 2.1.224 ... indisponível em Bedrock/Vertex/Foundry' (tier 4). Afirmação de UM juiz, sem votação."
     trace: "curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -E 'between sessions on the same machine on Bedrock|Windows: cross-session messaging is now available'"
 
@@ -500,7 +500,7 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 2, critério pré-registrado E1_EVIDENCIA_CONTRARIA: curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'instructs the receiving Claude never to change'"
     label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 2: 'não altera configuração' é INSTRUÇÃO ao modelo receptor, não gate; com o receptor pedindo permissão, o default ENTREGA a mensagem e quem segura o conteúdo é o próprio modelo."
-    narrative: "Verbatim da primária: 'It can't change configuration: Claude Code INSTRUCTS the receiving Claude never to change permission settings, CLAUDE.md...'. Determinísticos são só 'can't approve anything' e 'Commands don't run'. Corpus: 'O portão humano do lado RECEPTOR só está ancorado para receptor em bypass' e a robustez do S3 contra adversário segue NÃO VERIFICADA. Superação não achada (classe nenhuma): crossSessionInbound=hold/refuse é determinístico mas retém ou descarta tudo ('hold explícito não abre diálogo; refuse descarta sem humano'). Critério: E1_EVIDENCIA_CONTRARIA."
+    narrative: "Verbatim da primária: 'It can't change configuration: Claude Code INSTRUCTS the receiving Claude never to change permission settings, CLAUDE.md...'. Determinísticos são só 'can't approve anything' e 'Commands don't run'. Corpus: 'O portão humano do lado RECEPTOR só está ancorado para receptor em bypass' e a robustez do teste de receptor do spike contra adversário segue NÃO VERIFICADA. Superação não achada (classe nenhuma): crossSessionInbound=hold/refuse é determinístico mas retém ou descarta tudo ('hold explícito não abre diálogo; refuse descarta sem humano'). Critério: E1_EVIDENCIA_CONTRARIA."
     trace: "curl -sL https://code.claude.com/docs/en/cross-session-messaging.md | grep -n 'instructs the receiving Claude never to change'"
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
@@ -517,7 +517,7 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra achado 4, critério pré-registrado E2_PROVA_MENOS: grep -n 'enfileirava o sinal sem assinatura' docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml; grep -n '26 s' docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
     label: "OBJEÇÃO (Elenxo, 1 agente) ao achado 4: contar bug corrigido mede manutenção, não confiabilidade, e a régua é assimétrica: aplicada à A, reprova mais (o bridge enfileirava sinal sem assinatura como verificado). Falta taxa de perda medida em qualquer opção."
-    narrative: "Corpus: a2a-configurator-2026-10 registra 'o aceite da fila confiava no verified do JSON e interpolava o from cru no YAML' e 'o bridge, que ignorava o exit code e parseava last-wins, enfileirava o sinal sem assinatura como verificado'. Na D, o corpus OBSERVOU conversa real entre máquinas com ciclo de ~26 s (S1b, 2.1.296); a primária desenha a reconexão ('arrives only after that session's machine reconnects'). Superação não achada: só há observações pontuais e a linha de base VPS↔notebook (Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025, open). Critério: E2_PROVA_MENOS."
+    narrative: "Corpus: a2a-configurator-2026-10 registra 'o aceite da fila confiava no verified do JSON e interpolava o from cru no YAML' e 'o bridge, que ignorava o exit code e parseava last-wins, enfileirava o sinal sem assinatura como verificado'. Na D, o corpus OBSERVOU conversa real entre máquinas com ciclo de ~26 s (spike entre máquinas, 2.1.296); a primária desenha a reconexão ('arrives only after that session's machine reconnects'). Superação não achada: só há observações pontuais e a linha de base VPS↔notebook (Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025, open). Critério: E2_PROVA_MENOS."
     trace: "grep -n 'enfileirava o sinal sem assinatura' docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml; grep -n '26 s' docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
@@ -958,7 +958,7 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "objeção sobrevivente do Elenxo (run /onion-research modo decision de 2026-10-27) contra corte: trecho lido do changelog (0–100k de ~1,1M), critério pré-registrado E4_LACUNA_ABERTA: curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -i -E 'SendMessage|cross-session|Remote Control' | wc -l"
     label: "OBJEÇÃO (Elenxo, 1 agente) ao corte 'trecho lido do changelog não menciona A2A nem SendMessage': o run leu ~9% do CHANGELOG; os achados de maturidade da D se apoiam em amostra parcial, e ausência num trecho parcial não é ausência."
-    narrative: "Superação não achada: leitura completa do CHANGELOG filtrada por messaging/Remote Control não feita; o caminho é o /meta:cc-update (radar E3). Critério: E4_LACUNA_ABERTA."
+    narrative: "Superação não achada: leitura completa do CHANGELOG filtrada por messaging/Remote Control não feita; o caminho é o /meta:cc-update (o radar do CHANGELOG do Claude Code). Critério: E4_LACUNA_ABERTA."
     trace: "curl -sL https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | grep -n -i -E 'SendMessage|cross-session|Remote Control' | wc -l"
     provenance:
       source: "journal do run /onion-research modo decision de 2026-10-27 (resposta do Elenxo)"
@@ -1142,7 +1142,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "OPÇÃO D) Canais nativos Anthropic (cross-session via Remote Control, isolatePeerMachines): só para a mesma pessoa entre máquinas."
-    narrative: "A favor: ida e volta observada entre máquinas (~26 s, S1b), só HTTPS de saída (bom atrás de NAT) e um gate determinístico de saída (isolatePeerMachines, vale sob bypass). Contra (CONSTRAINS): escopo 'your sessions', exige claude.ai, dado passa pela Anthropic, vetado em ZDR; identidade é nome de sessão (E_OBJECAO_09); a proteção de configuração no receptor é instrução ao modelo (E_OBJECAO_01); Managed Agents e Agent SDK não avaliados (E_OBJECAO_30); controles Enterprise não lidos (E_OBJECAO_24)."
+    narrative: "A favor: ida e volta observada entre máquinas (~26 s, no spike entre máquinas), só HTTPS de saída (bom atrás de NAT) e um gate determinístico de saída (isolatePeerMachines, vale sob bypass). Contra (CONSTRAINS): escopo 'your sessions', exige claude.ai, dado passa pela Anthropic, vetado em ZDR; identidade é nome de sessão (E_OBJECAO_09); a proteção de configuração no receptor é instrução ao modelo (E_OBJECAO_01); Managed Agents e Agent SDK não avaliados (E_OBJECAO_30); controles Enterprise não lidos (E_OBJECAO_24)."
     trace: "opção da pergunta do run /onion-research modo decision de 2026-10-27"
 
   - id: C_OPCAO_COMBINACAO_B_SPEAKS_C_PLUS_D
