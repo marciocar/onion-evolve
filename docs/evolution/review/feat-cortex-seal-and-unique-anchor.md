@@ -2,13 +2,12 @@
 branch: feat/cortex-seal-and-unique-anchor
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: 03934dcdba9ef4cfa6e9e760b80c7935dc74bf569be6b2cc0b8038237d3a0957
-reviewed_code_sha256: 777909469a85ea4b1e8a508e2a9adfba4e381a629f0b576ee779ab5cd49d23e1
-findings_total: 17
-findings_real: 4
-tokens: 143440
-duration_min: 7
-findings_fixed: 4
+reviewed_diff_sha256: pendente
+findings_total: 26
+findings_real: 8
+tokens: 206552
+duration_min: 9
+findings_fixed: 8
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: code-reviewer (agente novo, recebeu o código e não as minhas conclusões)
@@ -94,6 +93,18 @@ com o INT ignorado e uma matriz que cruza o caso antigo e o novo com três vers�
 o helper correto, que é o vermelho do CI; o novo passa no helper correto e reprova nas outras duas versões, então
 não é decorativo. São 7 achados, 6 confirmações e 1 falso-positivo descartado (o caso do TERM não sofre do mesmo
 mal), e nenhum defeito real. Os totais do frontmatter somam as duas passadas.
+
+## 3ª passada: a atualização da peça de documentos
+
+A 2ª prova da curadoria (PR #144 de lá) mudou a peça de documentos, e o delta do grafo passou por um 3º agente
+novo (63.112 tokens, 2 min), que leu o grafo da curadoria no commit fixado. Foram 9 achados: 4 reais, todos
+curados, 4 confirmações e 1 falso-positivo. Os reais: o custo de 205 e 483 MB estava atribuído ao navegador,
+quando é a pegada em execução (o navegador custa 0 MB a mais com o cache e 278 MB numa máquina limpa); faltava a
+2ª condição da nota 6 (a versão do Playwright fixada); faltava dizer que a régua da nota 5 a 6 não era cega e que
+a do custo mudou depois do 1º laboratório; e "exportava" afirmava que o Onion deixou de exportar pelo Gamma. Das
+confirmações, apliquei três: a proveniência passou a citar as evidências da 2ª prova, o locator separa o campo do
+label, e a frase da CDN admite o download da instalação. A quarta pedia não reescrever o label do selo do maestro,
+e ele voltou ao texto selado; o complemento fica só na narrative.
 
 ## Limites declarados
 

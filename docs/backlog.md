@@ -1182,7 +1182,7 @@
 | 4.5 | `Q_CORTEX_FROTA_GATILHO` | cortex-2026-10 | Parque da frota: algum adotante do Onion pede N issues em worktrees paralelas com aprovação humana em lote e dados isolados por  |
 | 4.5 | `Q_CORTEX_GATE_DE_PLANO_PROXIMO_PASSO` | cortex-2026-10 | Costura do gate de plano: onde o plano mora, se o .gitignore do core ignora a pasta de sessões, e como o script confere que o pla |
 | 4.5 | `Q_CORTEX_HANDOFF_GATILHO` | cortex-2026-10 | Parque do handoff no git: medidos no mesmo caso, os ganchos de retomada do worklog do core perdem para o handoff versionado do Cor |
-| 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita local de pptx e docx: como a receita provada na curadoria (python-pptx e python-docx, a partir do git, sem Node |
+| 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
 | 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
 
 ## duolingo-actor-2026-10 — 1 item(ns)
