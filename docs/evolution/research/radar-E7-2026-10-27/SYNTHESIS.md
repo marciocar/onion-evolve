@@ -11,9 +11,11 @@ type: research
 mode: primaries
 ---
 
-> **Projeção do grafo, nunca fonte.** O grafo tem 57 nós: 55 escritos pelo run (1 pergunta raiz, 30 evidências
-> ancoradas, 15 objeções sobreviventes, 1 contabilidade, 7 superações e 1 pergunta de fechamento) e 2 do
-> fechamento (o selo da baseline e a passada adversarial do PR). O retorno bruto do run está em
+> **Projeção do grafo, nunca fonte.** O grafo tem 65 nós: 55 escritos pelo run (1 pergunta raiz, 30 evidências
+> ancoradas, 15 objeções sobreviventes, 1 contabilidade, 7 superações e 1 pergunta de fechamento), 2 do
+> fechamento (o selo da baseline e a passada adversarial do PR) e 8 termos `x_term` que dão nome aos códigos de
+> produto e unidade vindos das fontes (H100, B200, BF16, CO2, ML4, K2, K3, V3), exigidos pelo lint de nomes da
+> kg-ssot. O retorno bruto do run está em
 > `data/workflow-return.json`. Modo primárias: 10 fontes nomeadas, lidas inteiras, 0 inalcançáveis. A pauta veio
 > da curadoria (`docs/evolution/inbox/_processed/2026-10-27-signal-e7-sources.md`) mais a página de
 > descontinuações da OpenAI, relida.

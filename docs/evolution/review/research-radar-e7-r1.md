@@ -2,8 +2,8 @@
 branch: research/radar-e7-r1
 pr: 1398
 date: 2026-10-27
-reviewed_diff_sha256: fcda18252efe4e6f0a9297d59773f4210617c1c52c0d1398edd1b90c825b5ed4
-reviewed_code_sha256: 0cdadf3215569a533069d84023be3969e7994e3875f9359f425dc488bc78946d
+reviewed_diff_sha256: 442f13bbde5a5f536d21c3a21a0b37a1f492ef13ac8b1abf3929c1294c91b299
+reviewed_code_sha256: 761685a72aaef37947cc512f8fba3b18864b1393ad4bef763fdf409240eeca99
 findings_total: 1
 findings_real: 1
 tokens: 0
@@ -19,8 +19,9 @@ nota: "tokens = 0 porque a passada rodou dentro da sessão, sem agente medido à
 
 ## O que muda
 
-- 1ª rodada do eixo E7-treino-inferencia do radar de mundo: grafo `radar-E7-2026-10-27.kg.yaml` (57 nós, 55 do
-  run e 2 do fechamento), `data/workflow-return.json` (o retorno do run wf_2be7b5c9-f34) e `SYNTHESIS.md`.
+- 1ª rodada do eixo E7-treino-inferencia do radar de mundo: grafo `radar-E7-2026-10-27.kg.yaml` (65 nós: 55 do
+  run, 2 do fechamento e 8 termos `x_term` para os códigos de produto e unidade das fontes, que o lint de nomes
+  da kg-ssot cobrou no pr-finalize), `data/workflow-return.json` (o retorno do run wf_2be7b5c9-f34) e `SYNTHESIS.md`.
 - Baseline do E7 selada em `docs/onion/radar-baselines.yaml` no mesmo commit do grafo: sai o `never_run`, entram
   `last_run: 2026-10-27` e o `kg:`. A REGRA 65 (Radar de mundo com baseline DATADA por eixo) parou de acusar o eixo.
 - Roster `treino-inferencia` em `docs/onion/radar-sources.yaml`: 9 fontes ancoradas pela rodada, com
