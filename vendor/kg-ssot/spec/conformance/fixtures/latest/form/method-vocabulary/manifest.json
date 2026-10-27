@@ -1,35 +1,65 @@
 {
-  "description": "O vocabulário de provenance.method no v4: '<classe>: <detalhe>', classe em medição, leitura, juízes, derivado, testemunho. SHOULD no v4, MUST no v5.",
+  "description": "O vocabulário de provenance.method no v4: '<classe>: <detalhe>'. Desde o v4.16, a classe canônica é em inglês (measurement, reading, judges, derived, testimony), e as cinco em português (medição, leitura, juízes, derivado, testemunho) seguem aceitas como alias, sem aviso. SHOULD no v4, MUST no v5.",
   "layer": "form",
   "pending_on": [],
   "cases": [
     {
+      "file": "valid-method-measurement.kg.yaml",
+      "description": "classe canônica em inglês (measurement), desde o v4.16",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-reading.kg.yaml",
+      "description": "classe canônica em inglês (reading), desde o v4.16",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-judges.kg.yaml",
+      "description": "classe canônica em inglês (judges), desde o v4.16",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-derived.kg.yaml",
+      "description": "classe canônica em inglês (derived), desde o v4.16",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-testimony-third-party.kg.yaml",
+      "description": "classe canônica em inglês (testimony), desde o v4.16",
+      "valid": true,
+      "codes": []
+    },
+    {
       "file": "valid-method-medicao.kg.yaml",
-      "description": "classe medição",
+      "description": "classe medição (alias em português, aceito sem aviso desde o v4.16)",
       "valid": true,
       "codes": []
     },
     {
       "file": "valid-method-leitura.kg.yaml",
-      "description": "classe leitura",
+      "description": "classe leitura (alias em português, aceito sem aviso desde o v4.16)",
       "valid": true,
       "codes": []
     },
     {
       "file": "valid-method-juizes.kg.yaml",
-      "description": "classe juízes",
+      "description": "classe juízes (alias em português, aceito sem aviso desde o v4.16)",
       "valid": true,
       "codes": []
     },
     {
       "file": "valid-method-derivado.kg.yaml",
-      "description": "classe derivado",
+      "description": "classe derivado (alias em português, aceito sem aviso desde o v4.16)",
       "valid": true,
       "codes": []
     },
     {
       "file": "valid-method-testemunho-terceiro.kg.yaml",
-      "description": "medição de terceiro lida aqui é testemunho",
+      "description": "medição de terceiro lida aqui é testemunho (alias em português, aceito sem aviso desde o v4.16)",
       "valid": true,
       "codes": []
     },

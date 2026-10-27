@@ -343,6 +343,17 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.31.1` to `kg-ssot-v4.32.0` (contract v4.16), no verdict changes for an existing graph: the English
+classes of `provenance.method` are added, and the Portuguese ones stay accepted with no warning. The contract's
+identity changes, so the gate passes with the `· identity` warning, and the `--update` can come later. A graph that
+already wrote `reading:` or another English class loses the `form.pattern.node.provenance.method` warning, and the SHOULD
+debt goes down. Exception: a PROD node whose method already starts with `testimony:` trades the
+`form.pattern.node.provenance.method` warning for `integrity.testimony-in-prod`; that debt goes up and the gate fails.
+Move the node to DEV, or record the change with `kg_gate.py --update --accept-regression "<reason>"`.
+
+From `kg-ssot-v4.31.0` to `kg-ssot-v4.31.1`, nothing changes for an adopter: only `zensical.toml`, the documentation site
+configuration, changes.
+
 From `kg-ssot-v4.30.0` to `kg-ssot-v4.31.0`, nothing changes in the gate or the vendored tools: the release adds
 `tools/kg_site.py`, `tools/requirements-site.txt` and `zensical.toml`, which `kg_vendor.py` brings along and which no
 tool of the gate reads. The demo in `docs/demo/` is published only in the public repository and on the site (the new
@@ -775,6 +786,8 @@ What changes in v4:
   `medição: <what was measured>; não reverificado na migração` (maintainer decision, 2026-10-09).
   Your team's internal prose (a `docs/*.md` written by someone on the team) is `testemunho`, not `leitura`: it is the
   account of whoever wrote it, and that way the radar shows which `confirmed` nodes have only prose behind them.
+  Since contract v4.16 the canonical class names are in English (`measurement`, `reading`, `judges`, `derived`,
+  `testimony`); the five Portuguese words above are still accepted as aliases, with no warning.
   **Watch out:** if your CI requires new graphs to come out clean at the SHOULD level too, this warning already fails
   there in v4, not only in v5. Adjust the generators that write `provenance` first.
 
@@ -828,7 +841,7 @@ What to do with a `confirmed` or PROD node **with no recoverable source**:
 - **the default is to downgrade** the `status` to `unverifiable`, which does not require `provenance`: what cannot be
   traced is not confirmed;
 - **when the origin is a recoverable person or session**, `provenance` points to that origin, with a `method` of
-  class `testemunho`, and the node stays `confirmed`;
+  class `testimony`, and the node stays `confirmed`;
 - **never a placeholder** in `source`: it fails.
 
 Changing a node's `status` is a decision about the truth of the graph, and it belongs to whoever owns the graph. A

@@ -652,7 +652,7 @@ export function indexTexts(items) {
 // ---------------------------------------------------------------- avisos (SHOULD)
 
 const ISO_PREFIX = /^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$/;
-const TESTIMONY_METHOD = /^testemunho: /;
+const TESTIMONY_METHOD = /^(?:testimony|testemunho): /;  // a canônica e o alias (v4.16)
 // Só espaço no sentido do str.isspace do Python (o strip da referência): o trim() do JS tira o U+FEFF, que o Python
 // não tira, e não tira \x1c a \x1f nem o \x85, que o Python tira
 const PY_BLANK = /^[\t-\r\x1c-\x20\x85\xa0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]*$/;

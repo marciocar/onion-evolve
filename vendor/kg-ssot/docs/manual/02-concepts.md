@@ -135,7 +135,7 @@ is present:
 |---|---|---|
 | `source` | The source: a file, an address, a person | `tests/payment_retry_test.py` |
 | `locator` | Where, inside the source | `test_retry_is_idempotent` |
-| `method` | How the claim came out of the source, in the form `<class>: <detail>` | `medição: integration test in CI` |
+| `method` | How the claim came out of the source, in the form `<class>: <detail>` | `measurement: integration test in CI` |
 
 `source` cannot be an empty placeholder: `desconhecida`, `unknown`, `n/a`, `none`, `null`, `tbd`, `sem fonte`,
 one or more hyphens, an em dash, an en dash, or `?` fail (`form.pattern.node.provenance.source`). If there is no
@@ -143,15 +143,16 @@ source, the node is `unverifiable`, not `confirmed`.
 
 ### The five `method` classes
 
-The class names are literal contract values, so you write them in Portuguese, exactly as shown.
+The class names are literal contract values, written in English exactly as shown. Since contract v4.16 the
+Portuguese names (in parentheses) are still accepted as aliases, with no warning.
 
 | Class | When to use it |
 |---|---|
-| `medição` (measurement) | You ran something and observed the result: a test, a benchmark, a query |
-| `leitura` (reading) | You read the primary source, and the claim is in it |
-| `juízes` (judges) | More than one independent evaluator voted |
-| `derivado` (derived) | The claim was deduced from other nodes, with no new verification |
-| `testemunho` (testimony) | Someone reported it. This includes a measurement made by someone else that you only read |
+| `measurement` (`medição`) | You ran something and observed the result: a test, a benchmark, a query |
+| `reading` (`leitura`) | You read the primary source, and the claim is in it |
+| `judges` (`juízes`) | More than one independent evaluator voted |
+| `derived` (`derivado`) | The claim was deduced from other nodes, with no new verification |
+| `testimony` (`testemunho`) | Someone reported it. This includes a measurement made by someone else that you only read |
 
 A `method` outside this form **warns** in contract v4 (`form.pattern.node.provenance.method`). In v5 it will fail.
 

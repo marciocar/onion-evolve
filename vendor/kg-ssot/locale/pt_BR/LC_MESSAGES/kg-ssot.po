@@ -2129,8 +2129,8 @@ msgid "UNSTAMPED"
 msgstr "SEM CARIMBO"
 
 #: tools/kg_validate.py
-msgid "Use the form '<class>: <detail>', with class medição, leitura, juízes, derivado, or testemunho."
-msgstr "Use a forma '<classe>: <detalhe>', com classe medição, leitura, juízes, derivado ou testemunho."
+msgid "Use the form '<class>: <detail>', with class measurement, reading, judges, derived, or testimony."
+msgstr "Use a forma '<classe>: <detalhe>', com classe measurement, reading, judges, derived ou testimony (ou o alias em português: medição, leitura, juízes, derivado ou testemunho)."
 
 #: tools/kg_validate.py
 msgid "Value differs from the required one in \"{field}\" {scope}."

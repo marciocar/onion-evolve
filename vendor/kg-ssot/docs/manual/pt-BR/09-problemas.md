@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/09-troubleshooting.md sha256:43b4b90e23ac6e1f -->
+<!-- translation-of: docs/manual/09-troubleshooting.md sha256:bd0124e9b9f1848c -->
 # 9. Solução de problemas
 
 [English](../09-troubleshooting.md) | **Português (Brasil)**
@@ -42,14 +42,14 @@ A lista completa, com a forma de cada código, está em
 | `yaml.lone-surrogate` | O texto tem um surrogate solto (U+D800 a U+DFFF sem o par). Corrija o texto. No `.kg.json`, reprova |
 | `yaml.depth-over-128` | O arquivo aninha mais de 128 coleções. Achate a estrutura. No `.kg.json`, reprova |
 | `form.range.node.label` | Encurte o `label` para até 280 caracteres e mova o resto para `narrative` |
-| `form.pattern.node.provenance.method` | Use `<classe>: <detalhe>`, com a classe em `medição`, `leitura`, `juízes`, `derivado` ou `testemunho`. Reprova no v5 |
+| `form.pattern.node.provenance.method` | Use `<classe>: <detalhe>`, com a classe em `measurement`, `reading`, `judges`, `derived` ou `testimony` (os nomes em português são alias aceitos). Reprova no v5 |
 | `form.required.node.verified_against` | Acrescente `verified_against`: diga o que você conferiu na data do `verified_at` |
 | `form.required.node.verified_at` | Nó PROD sem `verified_at`, ou com `verified_scope` sem a data. Carimbe a última conferência |
 | `form.enum.node.verified_scope` | Use `fato`, `mecanismo` ou `nenhum` |
 | `integrity.untraced-decision` | Dê origem à decisão: `trace`, `provenance` ou uma aresta `TRACES_TO` |
 | `integrity.refutes-unreconciled` | O nó recebe `REFUTES` e segue valendo: o grafo afirma e refuta a mesma coisa. Se a refutação procede, mude o status do alvo para `refuted` ou `superseded`. Se não procede, tire a aresta ou mude o status de quem refuta. Hoje é aviso, e vai reprovar numa versão futura do contrato |
 | `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`. Se o fato tem vigência futura (uma norma lida antes de entrar em vigor), o aviso é esperado e pode ficar na linha de base do gate. Se não, as datas estão trocadas: `valid_from` é quando o fato passou a valer, e `verified_at`, quando você o conferiu |
-| `integrity.testimony-in-prod` | Meça e troque a classe para `medição`, ou aceite o risco à vista |
+| `integrity.testimony-in-prod` | Meça e troque a classe para `measurement`, ou aceite o risco à vista |
 
 ## O gate
 

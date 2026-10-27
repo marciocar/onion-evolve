@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:a04d5568b03d2572 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:7c43b141765d8ebf -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.31.0",
+  "release": "kg-ssot-v4.32.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 457/457 (reprova)
+latest: 463/463 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -1198,7 +1198,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile kg-migrate.prof
 - **O perfil escolhe dentro do contrato e nunca o relaxa.** Toda proposta é conferida contra o schema MUST e o schema
   SHOULD de forma antes de virar proposta. A que reprovaria vai para revisão com o motivo, e o template que resolve
   para vazio também. Um aviso de coerência que a proposta acende não a barra, porque o aviso diz a verdade sobre o
-  nó. Por exemplo, um `testemunho` num nó PROD acende `integrity.testimony-in-prod`: a proposta segue, e o nó vai para
+  nó. Por exemplo, um `testimony` num nó PROD acende `integrity.testimony-in-prod`: a proposta segue, e o nó vai para
   quem revisa com o aviso nomeado.
 - **O `apply` grava arquivo por arquivo, por texto, e os comentários ficam.** Depois ele relê o arquivo e confere a
   invariância: cada nó fica igual ao de antes, fora as chaves que a ação autoriza, e o diff só acrescenta linhas,

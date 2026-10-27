@@ -21,7 +21,7 @@ Required: `id`, `node_type`, `plane`, `status`, `impact`, `confidence`, `label`.
 - `impact`: an integer from 1 to 5. `confidence`: a number from 0 to 1.
 - `label`: the short claim (up to 280 characters is the recommended form). `narrative`: the context and the why.
 - `verified_at` (a quoted date) and `verified_against` (what you checked it against): when and against what the claim was last verified.
-- `provenance`: `source`, `locator` and `method` (`<class>: <detail>`, class one of `medição`, `leitura`, `juízes`, `derivado`, `testemunho`), and optionally `locality`: `repo` (a file in this repository), `web` (a public address), `privado` (a document others can read only with access), `host` (only on one machine) or `pessoa` (a person's account). Required on a `confirmed` node and on a `PROD` node.
+- `provenance`: `source`, `locator` and `method` (`<class>: <detail>`, class one of `measurement`, `reading`, `judges`, `derived`, `testimony`; the Portuguese `medição`, `leitura`, `juízes`, `derivado`, `testemunho` are accepted aliases since v4.16), and optionally `locality`: `repo` (a file in this repository), `web` (a public address), `privado` (a document others can read only with access), `host` (only on one machine) or `pessoa` (a person's account). Required on a `confirmed` node and on a `PROD` node.
 - `valid_from` (a quoted date or year), `source_tier` (1 to 10) and `source_kind`: optional, on evidence, for when the fact became true and how strong the source is.
 - `verified_scope`: optional, `fato` (the claim itself was checked), `mecanismo` (only the mechanism, such as code) or `nenhum`.
 - `trace`: a file path or URL the node points to; `kg-trace check` verifies it exists.

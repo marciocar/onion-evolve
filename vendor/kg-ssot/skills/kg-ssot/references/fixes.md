@@ -5,7 +5,7 @@ Each line is the code `kg-validate` prints and the fix. The text comes from the 
 
 | Code | Fix |
 |---|---|
-| `form.pattern.node.provenance.method` | Use the form '<class>: <detail>', with class medição, leitura, juízes, derivado, or testemunho. |
+| `form.pattern.node.provenance.method` | Use the form '<class>: <detail>', with class measurement, reading, judges, derived, or testimony. |
 | `form.pattern.node.provenance.source` | Write the source of truth (URL, path, command); with no recoverable source, remove provenance and change the status to unverifiable. |
 | `form.range.node.label` | Shorten the label to 280 characters and move the rest to narrative. |
 | `form.required.node.label` | Add label: the node's short claim, up to 280 characters. |

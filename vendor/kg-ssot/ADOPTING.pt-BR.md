@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:3b138dee43187e15 -->
+<!-- translation-of: ADOPTING.md sha256:844ec9d201a2b6ba -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -342,6 +342,16 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.31.1` para a `kg-ssot-v4.32.0` (contrato v4.16), nenhum veredito muda num grafo existente: entram as
+classes em inglês de `provenance.method`, e as em português seguem aceitas sem aviso. A identidade do contrato muda,
+então o gate passa com o aviso `· identity`, e o `--update` pode vir depois. Um grafo que já escrevia `reading:` ou
+outra classe em inglês perde o aviso `form.pattern.node.provenance.method`, e a dívida SHOULD cai. Exceção: um nó PROD cujo method já começa com `testimony:` troca o aviso
+`form.pattern.node.provenance.method` por `integrity.testimony-in-prod`; essa dívida sobe e o gate reprova. Leve o nó
+para DEV, ou registre a mudança com `kg_gate.py --update --accept-regression "<motivo>"`.
+
+Da `kg-ssot-v4.31.0` para a `kg-ssot-v4.31.1`, nada muda para o adotante: só muda o `zensical.toml`, a configuração do
+site de documentação.
 
 Da `kg-ssot-v4.30.0` para a `kg-ssot-v4.31.0`, nada muda no gate nem nas ferramentas vendorizadas: a release
 acrescenta `tools/kg_site.py`, `tools/requirements-site.txt` e `zensical.toml`, que o `kg_vendor.py` traz junto e que
@@ -764,6 +774,8 @@ O que muda no v4:
   `medição: <o que foi medido>; não reverificado na migração` (decisão do mantenedor em 2026-10-09).
   A prosa interna do adotante (um `docs/*.md` escrito por alguém do time) é `testemunho`, não `leitura`: é o relato
   de quem a escreveu, e assim o radar mostra quais `confirmed` só têm prosa por trás.
+  Desde o contrato v4.16 os nomes canônicos das classes são em inglês (`measurement`, `reading`, `judges`, `derived`,
+  `testimony`); as cinco palavras em português acima seguem aceitas como alias, sem aviso.
   **Atenção:** se o seu CI cobra que grafo novo saia limpo também no SHOULD, este alerta já reprova lá no v4, e não só
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
@@ -815,7 +827,7 @@ O que fazer com um nó `confirmed` ou PROD **sem fonte recuperável**:
 - **o padrão é rebaixar** o `status` para `unverifiable`, que não exige `provenance`: o que não se rastreia não
   está confirmado;
 - **quando a origem é uma pessoa ou sessão recuperável**, a `provenance` aponta essa origem, com `method` de
-  `testemunho`, e o nó segue `confirmed`;
+  `testimony`, e o nó segue `confirmed`;
 - **nunca um placeholder** em `source`: ele reprova.
 
 Trocar o `status` de um nó é decisão sobre a verdade do grafo, e fica com quem é dono dele. A migração pode

@@ -60,7 +60,7 @@ nodes:
     provenance:
       source: "tests/payment_retry_test.py"
       locator: "test_retry_is_idempotent"
-      method: "medição: integration test in CI"
+      method: "measurement: integration test in CI"
 edges:
   - from: E_RETRY_TEST
     to: Q_RETRY
@@ -76,9 +76,9 @@ Rules that make a graph pass:
    Ids use letters, digits and `_`, start with a letter, and are unique in the file.
 2. **Every edge** has `from`, `to` and `edge_type`, and both ends exist. **No node is left without an edge.**
 3. **A `confirmed` node, or one in `plane: PROD`, has `provenance`** with `source` (what was read: a URL, a path, a
-   command), `locator` (where in it) and `method` in the form `<class>: <detail>`. The class is one of `medição`
-   (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived) or `testemunho` (testimony). These five
-   words are literal contract values: keep them as written, even in an English graph. If you cannot name a real
+   command), `locator` (where in it) and `method` in the form `<class>: <detail>`. The class is one of `measurement`,
+   `reading`, `judges`, `derived` or `testimony`. The Portuguese words `medição`, `leitura`, `juízes`, `derivado` and
+   `testemunho` are accepted aliases (since contract v4.16), with no warning. If you cannot name a real
    source, do not invent one: make the node `open` or `unverifiable`.
 4. **Dates go in quotes** (`"2026-10-26"`). A bare date is read as a date object by some readers.
 5. **The label is the claim, short** (up to 280 characters). Put the why and the context in `narrative`.

@@ -56,7 +56,7 @@ recorded exception: 4.11.0, 4.12.0 and 4.13.0 started to fail rare YAML construc
 were minor because none of the real graphs measured in four adopter repositories changed its verdict. Even so, they
 count as new MUST rules for the stability criterion, and each one reset the 30-day clock. Since 4.11.0, the contract
 has its own version label (v4.4 in 4.11.0, v4.5 in 4.12.0, v4.6 in 4.13.0, v4.7 in 4.14.0, v4.8 in 4.15.0, v4.9 in 4.15.1
-and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.21.0, v4.13 in 4.22.0, v4.14 from 4.23.0 to 4.26.0, v4.15 since 4.27.0), which is not the release number.
+and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.21.0, v4.13 in 4.22.0, v4.14 from 4.23.0 to 4.26.0, v4.15 from 4.27.0 to 4.31.1, v4.16 since 4.32.0), which is not the release number.
 
 | Release | What it added |
 |---|---|
@@ -87,6 +87,11 @@ and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.
 | 4.25 | `kg_trace.py`, the trace that does not resolve: each node's `trace:` anchor against the files of the repository |
 | 4.26 | `kg_query --semantic`, the optional search by similarity (the `vector` extra, `kg_vector.py`), fused with `--text` by RRF |
 | 4.27 | Contract v4.15: an external end can start with a dot folder (`.github/`, `.config/`); `kg_trace` exits 3 on an empty corpus |
+| 4.28 | Contract v4.15, unchanged. `kg_prov_export.py --edges`: the edges go to PROV-O as qualified relations |
+| 4.29 | Contract v4.15, unchanged. The `rdf` extra reads the PROV export, and `kg_prov_export.py --full` exports the whole document; in 4.29.1, a malformed edge end goes as a literal |
+| 4.30 | Contract v4.15, unchanged. The agent skill (`skills/kg-ssot/`, Agent Skills format) and the Claude Code plugin marketplace |
+| 4.31 | Contract v4.15, unchanged. The documentation site and the demo, published only in the public repository (`mirror_only`); in 4.31.1, the site renders code blocks |
+| 4.32 | Contract v4.16: the class of `provenance.method` has a canonical English form (`measurement`, `reading`, `judges`, `derived`, `testimony`), and the Portuguese words stay accepted as aliases |
 
 ## Versions and tags
 

@@ -292,6 +292,11 @@
               "properties": {
                 "class": {
                   "enum": [
+                    "measurement",
+                    "reading",
+                    "judges",
+                    "derived",
+                    "testimony",
                     "medição",
                     "leitura",
                     "juízes",

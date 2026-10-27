@@ -34,3 +34,23 @@ nav = [
 [project.markdown_extensions.toc]
 permalink = true
 slugify = { object = "pymdownx.slugs.slugify", kwds = { case = "lower" } }
+
+# Sem extensões declaradas, o Zensical não renderiza bloco de código cercado: a 4.31.0 publicou o site com as crases
+# cruas (achado do maestro em 2026-10-27). Estas são as do README e do manual: código com realce, a cerca do mermaid
+# para os diagramas, tabelas, atributos e avisos.
+[project.markdown_extensions.pymdownx.highlight]
+anchor_linenums = true
+
+[project.markdown_extensions.pymdownx.inlinehilite]
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" },
+]
+
+[project.markdown_extensions.tables]
+
+[project.markdown_extensions.attr_list]
+
+[project.markdown_extensions.admonition]
+

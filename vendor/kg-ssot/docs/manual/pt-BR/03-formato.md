@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:54de2ab8cc3b50f2 -->
+<!-- translation-of: docs/manual/03-format.md sha256:e602f96586f44514 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -109,7 +109,7 @@ No topo, no `meta`, no nó, na aresta e na aresta externa, qualquer outra chave 
 |---|---|---|
 | `source` | texto | obr. Não vazio e não marcador (`unknown`, `n/a`, `tbd`, `?`...) |
 | `locator` | texto | obr. Não vazio |
-| `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, com a classe entre `medição`, `leitura`, `juízes`, `derivado` e `testemunho` |
+| `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, com a classe entre `measurement`, `reading`, `judges`, `derived` e `testimony` (os em português, `medição`, `leitura`, `juízes`, `derivado`, `testemunho`, são alias aceitos desde o v4.16) |
 | `locality` | enum | opcional. `repo` `web` `host` `pessoa` `privado`; fora do enum alerta. Descreve onde está a cópia que você leu, não a classificação do documento |
 | `x_*` | qualquer | outra chave alerta, não reprova |
 
