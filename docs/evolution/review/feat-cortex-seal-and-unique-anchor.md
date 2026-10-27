@@ -106,6 +106,14 @@ confirmações, apliquei três: a proveniência passou a citar as evidências da
 label, e a frase da CDN admite o download da instalação. A quarta pedia não reescrever o label do selo do maestro,
 e ele voltou ao texto selado; o complemento fica só na narrative.
 
+## O conflito com a main, resolvido à mão
+
+A main ganhou, no mesmo bloco do veredito dos mutantes da família `mcp_onion_kg_writer`, o ramo do mutante
+equivalente `profundidade-tab-inicial` (sem libyaml no Python 3.15, ele sobrevive por construção). A resolução
+mantém os dois: primeiro o rc do helper (≥2 é "não plantou"), depois o rc 1 com o `FAIL` do caso, depois o
+ramo da main, que exige `mrc` 0, o mesmo "sobreviveu" do helper novo. A família foi rodada de novo depois da
+resolução.
+
 ## Limites declarados
 
 - O stdin e a idempotência ficam como contrato escrito, não como mecanismo.
