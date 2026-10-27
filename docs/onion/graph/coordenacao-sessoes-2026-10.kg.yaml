@@ -85,13 +85,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 4
     confidence: 0.5
-    verified_against: "gh pr list --state all em 2026-10-27: 1404 OPEN, DIRTY; gh pr checks 1404 com 2 fail"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 1404 em 2026-10-27: MERGED, merge 8857bc9b87d3"
     label: "O PR 1404 (a âncora única no mutate-and-restore e o selo das 9 peças do Cortex) está em conflito com a main e com dois checks falhando: a faixa 2 do selftest e o selftest-gate."
-    narrative: "Medido em 2026-10-27: mergeStateStatus DIRTY; falham o job «selftest (2, kg_coverage, vendor_scrub, ...)» e o «selftest-gate», que agrega as faixas. O conserto é do core: rebase pelo pr-finalize e a faixa 2 lida antes de mexer. A curadoria só fecha as 9 peças do Cortex depois que ele entrar."
+    narrative: "Medido em 2026-10-27: mergeStateStatus DIRTY; falham o job «selftest (2, kg_coverage, vendor_scrub, ...)» e o «selftest-gate», que agrega as faixas. O conserto é do core: rebase pelo pr-finalize e a faixa 2 lida antes de mexer. A curadoria só fecha as 9 peças do Cortex depois que ele entrar. Fechado em 2026-10-27: o 1404 entrou na main (8857bc9b8), e esta branch foi rebaseada sobre ele."
   - id: Q_COORD_CORE_PYTHON_315_PISO_312
     node_type: question
     layer: audit
@@ -237,13 +238,19 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 147 -R marciocar/onion-curation em 2026-10-27: MERGED, merge f2118c198678; peer-ref-check.sh onion-curation docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#E_MEASURE_WORKLOG_HOOKS: rc 0 @ f2118c198678; o grafo do Cortex da curadoria cita D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027 do core"
     label: "Fechar as 9 peças do Cortex quando o PR 1404 entrar."
-    narrative: "Espera o PR 1404, que hoje está em conflito e com dois checks falhando."
+    narrative: "Espera o PR 1404, que hoje está em conflito e com dois checks falhando. Fechado em 2026-10-27: o PR 147 da curadoria entrou (main f2118c1). As 9 D_PIECE_* passaram a done com x_dissect_sealed_by e a proveniência no selo do core D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027 @ 8857bc9b, conferida por peer-ref-check. A curadoria também curou o censo de dissecação do Cortex (rc 1 para 0) com o nó medido E_MEASURE_WORKLOG_HOOKS."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/f2118c198678f995e02b4137a6b6f3f321636ba2/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#E_MEASURE_WORKLOG_HOOKS"
+      locator: "E_MEASURE_WORKLOG_HOOKS @ f2118c198678"
+      method: "reading: peer-ref-check.sh no clone local da curadoria, nó lido por kg_query.py"
+      locality: "web"
   - id: Q_COORD_CUR_CONFERIR_ONDA1_CONTRA_PR140
     node_type: question
     layer: audit
