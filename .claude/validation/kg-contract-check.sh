@@ -56,7 +56,7 @@ HINT = {
     # avisos do v4.1 (2026-10-09): SHOULD, mas grafo novo nasce sem nenhum
     "form.required.node.verified_against": "claim com verified_at e sem verified_against: o carimbo diz QUANDO, falta CONTRA O QUÊ foi verificado",
     "integrity.untraced-decision": "decision sem origem: dê a ela trace: \"<run, pergunta ou fonte>\", provenance ou uma aresta TRACES_TO",
-    "integrity.testimony-in-prod": "nó PROD apoiado em testemunho: rebaixe para DEV ou meça e troque o method para medição/leitura",
+    "integrity.testimony-in-prod": "nó PROD apoiado em testemunho: rebaixe para DEV ou meça e troque o method para measurement/reading (as formas canônicas do contrato v4.16; medição/leitura seguem como alias)",
     "integrity.verified-before-fact": "verified_at anterior ao valid_from: não se verifica um fato antes de ele valer; corrija uma das datas",
     # aviso do v4.2 (2026-10-09, SAC-97): locality é opcional, mas quando vem tem de estar no vocabulário
     "form.enum.node.provenance.locality": "provenance.locality fora do vocabulário: use repo, web, host ou pessoa (ou tire a chave; no core, kg-migrate-v3.py --locality (core-only) a deriva do source)",

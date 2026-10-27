@@ -1113,7 +1113,7 @@ def stamp_node(path, nid, judged=None):
         ("provenance", ["provenance:",
                         "  source: %s" % q("estado do forge lido por gh pr view %s (state, mergedAt, mergeCommit, statusCheckRollup)" % pr_num),
                         "  locator: %s" % q("%s · merge %s · %s" % (url, sha, runs_txt)),
-                        "  method: %s" % q("leitura: drive-automate.sh stamp lê o estado do forge depois do merge, nunca o que a sessão relata"),
+                        "  method: %s" % q("reading: drive-automate.sh stamp lê o estado do forge depois do merge, nunca o que a sessão relata"),
                         "  locality: \"web\""]),
     ]
     new = set_node_fields(txt, nid, fields)

@@ -109,16 +109,16 @@ warns, migrated = [], []
 # seria afirmar origem falsa — medido no adotante, cuja Q_WHAT_IS_THIS_REPO_DOMAIN já estava respondida. Nó fora
 # da tabela sem provenance → o contrato reprova e a migração RECUSA, nomeando os nós.
 PROV = {
-    ("THIS_REPO", "basename-do-alvo-e-stamp-claude-onion-version"): (".claude/.onion-version deste repo", "campo role e o nome do diretório", "leitura: na adoção", "repo"),
-    ("ONION_INSTALLED", "stamp-claude-onion-version-lido-na-adocao"): (".claude/.onion-version deste repo", "campos source_commit, mode, role e integration_branch", "leitura: na adoção", "repo"),
+    ("THIS_REPO", "basename-do-alvo-e-stamp-claude-onion-version"): (".claude/.onion-version deste repo", "campo role e o nome do diretório", "reading: na adoção", "repo"),
+    ("ONION_INSTALLED", "stamp-claude-onion-version-lido-na-adocao"): (".claude/.onion-version deste repo", "campos source_commit, mode, role e integration_branch", "reading: na adoção", "repo"),
     ("DETERMINISTIC_GATE", "verify-adopter-gate-executado-na-adocao"):
-        ("install-onion-githook.sh rodado na adoção (linha GATE VIVO)", "hook nativo via core.hooksPath deste repo", "medição: execução de commit-sonda", "host"),
+        ("install-onion-githook.sh rodado na adoção (linha GATE VIVO)", "hook nativo via core.hooksPath deste repo", "measurement: execução de commit-sonda", "host"),
     ("DETERMINISTIC_GATE", "nao-verificado-gate-declarado-e-nao-provado"):
-        ("install-onion-githook.sh rodado na adoção (prova adiada)", "hook nativo via core.hooksPath deste repo", "derivado: instalação sem execução de prova", "host"),
+        ("install-onion-githook.sh rodado na adoção (prova adiada)", "hook nativo via core.hooksPath deste repo", "derived: instalação sem execução de prova", "host"),
     ("DETERMINISTIC_GATE", "nao-informado-ao-semeador"):
-        ("semeador da adoção, sem informação do instalador do gate", "hook nativo via core.hooksPath deste repo", "derivado: nenhuma medição", "repo"),
-    ("Q_WHAT_IS_THIS_REPO_DOMAIN", "semente-da-adocao-dominio-ainda-nao-mapeado"): ("semeador da adoção (seed-adoption-graph.sh)", "ausência de grafo de domínio no repo na hora da adoção", "medição: verificação de ausência por git ls-files", "repo"),
-    ("D_ADOPT_ONION", "superficie-do-framework-presente-e-stamp-carimbado"): ("commit da adoção neste repo e o .claude/.onion-version", "superfície do framework presente e stamp carimbado", "leitura: na adoção", "repo"),
+        ("semeador da adoção, sem informação do instalador do gate", "hook nativo via core.hooksPath deste repo", "derived: nenhuma medição", "repo"),
+    ("Q_WHAT_IS_THIS_REPO_DOMAIN", "semente-da-adocao-dominio-ainda-nao-mapeado"): ("semeador da adoção (seed-adoption-graph.sh)", "ausência de grafo de domínio no repo na hora da adoção", "measurement: verificação de ausência por git ls-files", "repo"),
+    ("D_ADOPT_ONION", "superficie-do-framework-presente-e-stamp-carimbado"): ("commit da adoção neste repo e o .claude/.onion-version", "superfície do framework presente e stamp carimbado", "reading: na adoção", "repo"),
 }
 
 def prov_for(node):

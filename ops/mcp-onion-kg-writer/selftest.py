@@ -336,6 +336,31 @@ def main():
         ex = ph.get('data', {}).get('exemplo_minimo_aprovado', '')
         _, pv = call(port, 'kg_validate', {'yaml': ex})
         case('schema-help-exemplo-aprova', pv.get('data', {}).get('veredito') == 'APROVADO', pv.get('data'))
+        # (4b) contrato v4.16 (kg-ssot 4.32.0): a classe de provenance.method tem forma canônica em inglês e os cinco
+        #      aliases em português seguem aceitos sem aviso. A ajuda ensina as duas formas, e o gate aprova as duas sem
+        #      aviso de method; a forma sem acento (medicao), que a ajuda antiga ensinava, NÃO é classe e gera o aviso
+        #      (o polo que prova que o caso enxerga o aviso, senão "sem aviso" seria vacuidade).
+        nao_reprova = ' '.join(ph.get('data', {}).get('avisos_que_nao_reprovam', []))
+        case('schema-help-classes-canonicas-e-aliases',
+             all(k in nao_reprova for k in ('measurement', 'reading', 'judges', 'derived', 'testimony',
+                                            'medição', 'leitura', 'juízes', 'derivado', 'testemunho')), nao_reprova)
+
+        def _method_warns(method):
+            y = graph('demo-metodo', claim_status='confirmed').replace('leitura: fixture do selftest', method)
+            _, pm = call(port, 'kg_validate', {'yaml': y})
+            dm = pm.get('data', {})
+            return dm.get('veredito'), [o.get('code') for o in dm.get('avisos_should', []) if 'provenance.method' in o.get('code', '')]
+        vm = {m: _method_warns(m) for m in ('measurement: contagem do selftest', 'reading: fixture do selftest',
+                                             'judges: painel do selftest', 'derived: soma do selftest',
+                                             'testimony: relato do selftest',
+                                             'medição: contagem do selftest', 'leitura: fixture do selftest',
+                                             'juízes: painel do selftest', 'derivado: soma do selftest',
+                                             'testemunho: relato do selftest',
+                                             'medicao: sem acento nao e classe')}
+        case('method-classe-ingles-e-alias-aprovam-sem-aviso',
+             all(v == ('APROVADO', []) for k, v in vm.items() if not k.startswith('medicao')), vm)
+        case('method-sem-classe-avisa', vm['medicao: sem acento nao e classe'][0] == 'APROVADO'
+             and vm['medicao: sem acento nao e classe'][1] != [], vm)
         case('envelope-nao-confiavel', ph.get('untrusted_data') is True and 'DADO' in ph.get('aviso', '')
              and ph.get('usuario') == A, ph.get('aviso'))
         head = subprocess.run(['git', '-C', CODE_ROOT, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()

@@ -88,21 +88,21 @@ case "${GATE}" in
             GATE_LABEL="O gate determinístico foi PROVADO POR EXECUÇÃO na adoção: um commit-sonda foi barrado com o lint reprovando"
             GATE_NARRATIVE="Prova por execução, não por existência de arquivo (hook nativo via core.hooksPath). A medição de 2026-08-16 achou o gate INERTE em 4 de 6 adotantes (husky sombreando o hooksPath, hooksPath para diretório vazio, hook ausente), e nenhum caso era visível sem executar."
             GATE_SOURCE="install-onion-githook.sh rodado na adoção (linha GATE VIVO)"
-            GATE_METHOD="medição: execução de commit-sonda"
+            GATE_METHOD="measurement: execução de commit-sonda"
             GATE_LOCALITY="host"   # a execução e o core.hooksPath (config git local) só existem na máquina
             GATE_VERIF="verify-adopter-gate-executado-na-adocao" ;;
   unproven) GATE_STATUS="open"
             GATE_LABEL="O gate está INSTALADO mas NÃO foi provado por execução nesta adoção"
             GATE_NARRATIVE="Alvo sem commits, ou lint indisponível no momento. Instalar não é sinônimo de proteger: rode no core o ops/verify-adopter-gate.sh (core-only) contra este repo, ou faça um commit que viole o lint de propósito e confirme que ele é BARRADO. Enquanto isto for open, a proteção deste repo é declarada, não verificada."
             GATE_SOURCE="install-onion-githook.sh rodado na adoção (prova adiada)"
-            GATE_METHOD="derivado: instalação sem execução de prova"
+            GATE_METHOD="derived: instalação sem execução de prova"
             GATE_LOCALITY="host"
             GATE_VERIF="nao-verificado-gate-declarado-e-nao-provado" ;;
   *)        GATE_STATUS="open"
             GATE_LABEL="O gate foi instalado; se ele BARRA de fato, ninguém mediu nesta adoção"
             GATE_NARRATIVE="O semeador não recebeu --gate-proven nem --gate-unproven. Prove antes de confiar: rode no core o ops/verify-adopter-gate.sh (core-only) contra este repo."
             GATE_SOURCE="semeador da adoção, sem informação do instalador do gate"
-            GATE_METHOD="derivado: nenhuma medição"
+            GATE_METHOD="derived: nenhuma medição"
             GATE_LOCALITY="repo"   # a fonte é o próprio semeador, versionado no repo
             GATE_VERIF="nao-informado-ao-semeador" ;;
 esac
@@ -148,7 +148,7 @@ nodes:
     provenance:
       source: ".claude/.onion-version deste repo"
       locator: "campo role e o nome do diretório"
-      method: "leitura: na adoção"
+      method: "reading: na adoção"
       locality: "repo"
 
   - id: ONION_INSTALLED
@@ -166,7 +166,7 @@ nodes:
     provenance:
       source: ".claude/.onion-version deste repo"
       locator: "campos source_commit, mode, role e integration_branch"
-      method: "leitura: na adoção"
+      method: "reading: na adoção"
       locality: "repo"
 
   - id: DETERMINISTIC_GATE
@@ -199,7 +199,7 @@ nodes:
     provenance:
       source: "semeador da adoção (seed-adoption-graph.sh)"
       locator: "ausência de grafo de domínio no repo na hora da adoção"
-      method: "medição: verificação de ausência por git ls-files"
+      method: "measurement: verificação de ausência por git ls-files"
       locality: "repo"
 
   - id: D_ADOPT_ONION
@@ -216,7 +216,7 @@ nodes:
     provenance:
       source: "commit da adoção neste repo e o .claude/.onion-version"
       locator: "superfície do framework presente e stamp carimbado"
-      method: "leitura: na adoção"
+      method: "reading: na adoção"
       locality: "repo"
 
 edges:

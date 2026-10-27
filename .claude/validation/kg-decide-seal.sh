@@ -10,7 +10,8 @@
 #
 # O que escreve (nó existente decision|question `open`):
 #   status: done · verified_at · verified_against · provenance {source, locator, method, locality: pessoa}
-#   com method = "testemunho: decisão do maestro por pergunta com opções, <data>" · e na narrative (mantida
+#   com method = "testimony: decisão do maestro por pergunta com opções, <data>" (forma canônica do contrato v4.16;
+#   selos antigos com o alias "testemunho:" seguem valendo) · e na narrative (mantida
 #   a anterior) a opção escolhida E as descartadas. O plane fica DEV, e PROD é REBAIXADO (dito na narrative):
 #   a base do selo é testemunho, e o contrato reprova testemunho em PROD (integrity.testimony-in-prod, SHOULD).
 #   O radar avisa decision-done-em-DEV (SOFT, agregado) — os dois discordam, e quem vence é o contrato; a
@@ -207,7 +208,7 @@ seal_txt = (f'Selado por /meta:decide em {date}: escolhida «{chosen}»'
             + (' (resposta livre do maestro, fora das opções oferecidas)' if other == '1' else '')
             + '; descartadas: ' + ' · '.join(f'«{r}»' for r in rej) + '.')
 vag = f'decisão do maestro em {date}, por pergunta com opções (/meta:decide): escolhida «{chosen}»'
-method = f'testemunho: decisão do maestro por pergunta com opções, {date}'
+method = f'testimony: decisão do maestro por pergunta com opções, {date}'
 locator = f'pergunta com opções de {date}' + (f': «{one(question)}»' if question else '')
 
 def narr_block(fi, old, tail):

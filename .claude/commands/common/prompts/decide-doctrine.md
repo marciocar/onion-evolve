@@ -34,9 +34,9 @@ Sobra o que é **do maestro**: escopo, trade-off de produto, forma canônica, o 
 gated, um entendimento a selar. O que o filtro tirou é **listado** no relatório com o porquê
 (medido / derivado / de outro dono) — o filtro não apaga em silêncio.
 
-⚠️ **O que o filtro tirou NÃO se sela por aqui.** O selador grava `method: testemunho: decisão do
-maestro…`; usá-lo num nó que o maestro não respondeu é forjar testemunho. Nó que a medição fecha se
-fecha pelo caminho da medição (`/meta:kg-freshness`, ou o fluxo normal com `method: medição`), nunca
+⚠️ **O que o filtro tirou NÃO se sela por aqui.** O selador grava `method: testimony: decisão do
+maestro…` (forma canônica do contrato v4.16; selos antigos no alias `testemunho:` seguem valendo); usá-lo num nó que o maestro não respondeu é forjar testemunho. Nó que a medição fecha se
+fecha pelo caminho da medição (`/meta:kg-freshness`, ou o fluxo normal com `method: measurement`), nunca
 em lote "sem pergunta individual". Achado do dogfood de carga da forja (2026-10-12): a sessão de teste
 propôs exatamente isso para oito decisões que julgou "já exercitadas".
 
@@ -72,7 +72,7 @@ saber o que foi escolhido) **não sela**: vira pergunta de esclarecimento na rod
 ### 6. O selo vai no MESMO movimento
 Cada resposta vira escrita no grafo **antes** da próxima rodada, pelo selador
 (`.claude/validation/kg-decide-seal.sh`), nunca à mão: nó existente → `status: done`, `verified_at`,
-`provenance.method` = `testemunho: decisão do maestro por pergunta com opções, <data>`, a escolhida e
+`provenance.method` = `testimony: decisão do maestro por pergunta com opções, <data>`, a escolhida e
 as descartadas na `narrative`; decisão sem nó → `D_` novo no grafo do tema, ligado ao nó de onde veio.
 Só se sela nó **`open`** (lista positiva: `confirmed` com proveniência medida não é re-carimbado), com
 a **pergunta** registrada (`--question` é obrigatório: é o único rastro de que houve pergunta), data
