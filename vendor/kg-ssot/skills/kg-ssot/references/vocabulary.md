@@ -15,7 +15,7 @@ where they come from. It follows SKOS: `pref` is the preferred label, and each s
   provenance:
     source: "Card network rulebook"
     locator: "section 4.2"
-    method: "leitura: rulebook section on disputes"
+    method: "reading: rulebook section on disputes"
   x_term:
     pref: "chargeback"
     scheme: "payments"

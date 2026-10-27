@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/08-recipes.md sha256:0fbea3c4f2b33552 -->
+<!-- translation-of: docs/manual/08-recipes.md sha256:dfa6116b84f6924b -->
 # 8. Receitas
 
 [English](../08-recipes.md) | **Português (Brasil)**
@@ -37,14 +37,14 @@ nodes:
     provenance:
       source: bench/cache-load.md
       locator: table 2
-      method: "medição: 4-hour load test"
+      method: "measurement: 4-hour load test"
 edges:
   - from: E_CACHE_GROWTH
     to: Q_CACHE_TTL
     edge_type: SUPPORTS
 ```
 
-O `method` começa pela classe, `medição`, seguida do detalhe.
+O `method` começa pela classe, `measurement`, seguida do detalhe.
 
 Todo nó precisa de pelo menos uma aresta: um nó solto reprova como `integrity.orphan-node`. Por isso um grafo de
 um nó só não passa, e o seu primeiro grafo já nasce com uma pergunta e o que a sustenta.
@@ -90,18 +90,18 @@ afirmação.
     provenance:
       source: tests/payment_retry_test.py
       locator: test_retry_is_idempotent
-      method: "medição: integration test in CI"
+      method: "measurement: integration test in CI"
 ```
 
 ## Registrar um relato sem inventar medição
 
-Alguém do time disse que o retry é idempotente, e ninguém rodou nada. A classe é `testemunho`:
+Alguém do time disse que o retry é idempotente, e ninguém rodou nada. A classe é `testimony`:
 
 ```yaml
     provenance:
       source: payments team
       locator: conversation on 2026-10-01
-      method: "testemunho: report from the payments team"
+      method: "testimony: report from the payments team"
 ```
 
 Num nó PROD, o contrato alerta (`integrity.testimony-in-prod`): produção apoiada só em relato é um risco que o
@@ -226,7 +226,7 @@ nodes:
     provenance:
       source: docs/decisions/2026-10-streak.md
       locator: Decision section
-      method: "leitura: product decision record"
+      method: "reading: product decision record"
   - id: R_STREAK_RESET
     node_type: rule
     layer: domain
@@ -239,7 +239,7 @@ nodes:
     provenance:
       source: tests/test_streak.py
       locator: test_resets_after_a_day_with_no_entry
-      method: "medição: pytest tests/test_streak.py, 6 cases passing"
+      method: "measurement: pytest tests/test_streak.py, 6 cases passing"
   - id: A_STREAK_CODE
     node_type: artifact
     layer: domain
@@ -253,7 +253,7 @@ nodes:
     provenance:
       source: app/streak.py
       locator: reset function
-      method: "leitura: code at the release commit"
+      method: "reading: code at the release commit"
 edges:
   - from: R_STREAK_RESET
     to: D_STREAK_RESET

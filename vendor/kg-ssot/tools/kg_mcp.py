@@ -271,7 +271,8 @@ def _spec_home():
 
 
 SPEC_HOME = _spec_home()
-EXAMPLE = SPEC_HOME / "spec" / "conformance" / "fixtures" / "latest" / "form" / "minimal" / "valid-minimal.kg.yaml"
+# o exemplo que o modelo copia, em inglês e com a classe canônica de method (v4.16); fora da suíte, que é dado de teste
+EXAMPLE = SPEC_HOME / "spec" / "examples" / "minimal.kg.yaml"
 
 
 def schema_help():

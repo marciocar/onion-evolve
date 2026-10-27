@@ -90,7 +90,7 @@ What v4 changed in severity, and what it added:
 | `form.unknown-key.<scope>.<key>` (a key outside the grammar and without `x_`, at the top level, in meta, in a node, or in an edge) | SHOULD | **MUST** |
 | `form.pattern.<scope>.key` (a name that is not a slug, without `x_`) | SHOULD | **MUST** (with `x_`, still SHOULD) |
 | `form.pattern.node.provenance.source` (a placeholder `source`: whitespace only, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hyphens, an em dash, `?`...) | — | **MUST** (an empty value still gives `form.range`) |
-| `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived), or `testemunho` (testimony)) | — | SHOULD (MUST in v5) |
+| `form.pattern.node.provenance.method` (not in the form `'<class>: <detail>'`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony`, or, since v4.16, their Portuguese aliases `medição`, `leitura`, `juízes`, `derivado`, `testemunho`) | — | SHOULD (MUST in v5) |
 | `form.unknown-key.node.provenance.<key>` (an unknown key inside `provenance`) | SHOULD | SHOULD |
 
 v4.1 adds four SHOULD warnings (no verdict changes; `latest/form/unanchored/` and `latest/integrity/coherence/`).
@@ -99,7 +99,7 @@ The three `integrity.*` codes cross fields or edges, so the reader computes them
 | Code | When it warns |
 |---|---|
 | `form.required.node.verified_against` | a `claim` with `verified_at` and without `verified_against`: a stamp with no target (the other node types already anchor themselves through another field) |
-| `integrity.testimony-in-prod` | a PROD node whose basis is testimony (`evidence_class: testimony` or a `method` of class `testemunho`) |
+| `integrity.testimony-in-prod` | a PROD node whose basis is testimony (`evidence_class: testimony` or a `method` of class `testimony` or its alias `testemunho`) |
 | `integrity.verified-before-fact` | `verified_at` earlier than `valid_from`, compared at the granularity of the shorter one (`YYYY`, `YYYY-MM`, `YYYY-MM-DD`); a date outside these forms is not compared |
 | `integrity.untraced-decision` | a `decision` that is neither `superseded` nor `refuted`, with no `trace`, no `provenance`, and no outgoing `TRACES_TO` edge |
 
@@ -268,7 +268,7 @@ Nothing gets ahead of an open decision.
 **Today's score.** The reference reader passes 100% of `latest/`: 438 cases against contract v4, 32 of them
 `.kg.json`. The groups from the v4 draft moved from `proposals/` to `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), and the cases inherited from v3 whose
-verdict v4 changes became `bad-*` cases. Every case uses a canonical `method` (`medição: caso de conformidade`), so
+verdict v4 changes became `bad-*` cases. Every case uses a valid `method` (`medição: caso de conformidade`, the Portuguese alias), so
 the vocabulary warning shows up only where a case asks for it. `proposals/` is empty.
 
 ## Run

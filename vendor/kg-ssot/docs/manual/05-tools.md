@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.31.0",
+  "release": "kg-ssot-v4.32.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 457/457 (gates the rc)
+latest: 463/463 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -1214,7 +1214,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_migrate.py apply --profile kg-migrate.prof
 - **The profile chooses within the contract and never relaxes it.** Every proposal is checked against the MUST schema
   and the SHOULD form schema before it becomes a proposal. A proposal that would fail goes to review with the reason,
   and so does a template that resolves to empty. A coherence warning that the proposal raises does not block it,
-  because the warning tells the truth about the node. For example, a `testemunho` (testimony) on a PROD node raises
+  because the warning tells the truth about the node. For example, a `testimony` on a PROD node raises
   `integrity.testimony-in-prod`: the proposal goes ahead, and the node goes to the reviewer with the warning named.
 - **`apply` writes file by file, as text, and comments stay.** Afterward it rereads the file and checks the
   invariance: each node stays as it was, except the keys the action authorizes, and the diff only adds lines, except

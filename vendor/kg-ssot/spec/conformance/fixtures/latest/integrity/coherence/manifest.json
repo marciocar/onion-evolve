@@ -22,6 +22,15 @@
       ]
     },
     {
+      "file": "warn-testimony-english-method-in-prod.kg.yaml",
+      "description": "nó PROD cuja provenance.method é da classe canônica testimony, desde o v4.16",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.testimony-in-prod"
+      ]
+    },
+    {
       "file": "valid-testimony-in-dev.kg.yaml",
       "description": "o mesmo testemunho em plane DEV: nada a alertar",
       "valid": true,

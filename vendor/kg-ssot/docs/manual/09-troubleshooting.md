@@ -39,14 +39,14 @@ The full list, with the shape of each code, is in
 | `yaml.lone-surrogate` | The text has a lone surrogate (U+D800 to U+DFFF without its pair). Fix the text. In `.kg.json`, it fails |
 | `yaml.depth-over-128` | The file nests more than 128 collections. Flatten the structure. In `.kg.json`, it fails |
 | `form.range.node.label` | Shorten the `label` to 280 characters or less, and move the rest to `narrative` |
-| `form.pattern.node.provenance.method` | Use `<class>: <detail>`, with the class in `medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived) or `testemunho` (testimony). It fails in v5 |
+| `form.pattern.node.provenance.method` | Use `<class>: <detail>`, with the class in `measurement`, `reading`, `judges`, `derived` or `testimony` (the Portuguese names are accepted aliases). It fails in v5 |
 | `form.required.node.verified_against` | Add `verified_against`: say what you checked on the `verified_at` date |
 | `form.required.node.verified_at` | A PROD node has no `verified_at`, or has `verified_scope` without the date. Stamp the last check |
 | `form.enum.node.verified_scope` | Use `fato`, `mecanismo` or `nenhum` |
 | `integrity.untraced-decision` | Give the decision an origin: `trace`, `provenance` or a `TRACES_TO` edge |
 | `integrity.refutes-unreconciled` | The node receives `REFUTES` and is still live: the graph asserts and refutes the same thing. If the refutation holds, change the target's status to `refuted` or `superseded`. If it does not, remove the edge or change the status of the refuting node. Today this is a warning, and it will fail in a future contract version |
 | `integrity.verified-before-fact` | `verified_at` is earlier than `valid_from`. If the fact takes effect in the future (a regulation read before it comes into force), the warning is expected and can stay in the gate baseline. If not, the dates are swapped: `valid_from` is when the fact started to hold, and `verified_at` is when you checked it |
-| `integrity.testimony-in-prod` | Measure it and change the class to `medição`, or accept the risk in plain sight |
+| `integrity.testimony-in-prod` | Measure it and change the class to `measurement`, or accept the risk in plain sight |
 
 ## The gate
 

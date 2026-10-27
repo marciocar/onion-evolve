@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/10-glossary.md sha256:0f421704592e83ac -->
+<!-- translation-of: docs/manual/10-glossary.md sha256:df2c7eb3e6f783cc -->
 # 10. Glossário
 
 [English](../10-glossary.md) | **Português (Brasil)**
@@ -14,7 +14,7 @@
 | **Carimbo de verificação** | O par `verified_at` e `verified_against` de um nó |
 | **Carimbo do vendor** | O arquivo `.kg-ssot-version` com a tag, o commit, a versão, o contrato e o sha256 de cada arquivo trazido |
 | **Catraca** | Uma conferência que só deixa a medida melhorar ou ficar igual. O gate é a catraca por grafo |
-| **Classe (de `method`)** | `medição`, `leitura`, `juízes`, `derivado` ou `testemunho` |
+| **Classe (de `method`)** | `measurement`, `reading`, `judges`, `derived` ou `testimony`; desde o v4.16, os em português, `medição`, `leitura`, `juízes`, `derivado` e `testemunho`, são alias aceitos, sem aviso |
 | **Código** | O identificador estável de uma violação, como `form.required.node.label` |
 | **Contrato** | Os schemas MUST e SHOULD, mais as regras de perfil YAML e as regras de integridade |
 | **Corpus** | O conjunto de grafos (`.kg.yaml` e `.kg.json`) de um repositório |
@@ -40,6 +40,6 @@
 | **Suíte de conformidade** | Os casos em `spec/conformance/` que todo leitor tem de passar |
 | **Sinônimo** | Um item de `x_term.labels`: outro jeito de escrever o termo, `alt` ou `hidden`, com fonte, versão do documento e data de conferência próprias |
 | **Termo** | Um nó com o perfil `x_term`: o rótulo preferido de um conceito num vocabulário de domínio, com os sinônimos |
-| **Testemunho** | A classe `testemunho`: o relato de alguém, ou a medição de terceiro que você só leu |
+| **Testemunho** | A classe `testimony` (alias `testemunho`): o relato de alguém, ou a medição de terceiro que você só leu |
 | **Vendor** | A cópia da release dentro do adotante, em `vendor/kg-ssot`, conferida pelo `check` |
 | **`x_`** | O prefixo de extensão: chaves que começam com ele passam livres |

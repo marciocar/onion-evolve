@@ -106,7 +106,7 @@ In the top level, in `meta`, in a node, in an edge, and in an external edge, any
 |---|---|---|
 | `source` | string | req. Not empty and not a placeholder (`unknown`, `n/a`, `tbd`, `?`...) |
 | `locator` | string | req. Not empty |
-| `method` | string | req. Not empty. SHOULD: `<class>: <detail>`, with the class one of `medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived), or `testemunho` (testimony) |
+| `method` | string | req. Not empty. SHOULD: `<class>: <detail>`, with the class one of `measurement`, `reading`, `judges`, `derived`, or `testimony` (the Portuguese `medição`, `leitura`, `juízes`, `derivado`, `testemunho` are accepted aliases, since v4.16) |
 | `locality` | enum | optional. `repo` `web` `host` `pessoa` (person) `privado` (private); a value outside the enum warns. It describes where the copy you read lives, not how the document is classified |
 | `x_*` | any | any other key warns; it does not fail |
 

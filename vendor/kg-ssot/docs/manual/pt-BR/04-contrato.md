@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:ecdfc66f6c9a6268 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:fd37d202f05f48f7 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -58,7 +58,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 desde a 4.27.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 desde a 4.32.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -89,6 +89,11 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.25 | O `kg_trace.py`, o trace que não resolve: a âncora `trace:` de cada nó contra os arquivos do repositório |
 | 4.26 | O `kg_query --semantic`, a busca opcional por semelhança (o extra `vector`, `kg_vector.py`), fundida ao `--text` por RRF |
 | 4.27 | Contrato v4.15: a ponta externa pode começar por uma pasta com ponto (`.github/`, `.config/`); o `kg_trace` sai com rc 3 no corpus vazio |
+| 4.28 | Contrato v4.15, sem mudança. `kg_prov_export.py --edges`: as arestas vão para o PROV-O como relações qualificadas |
+| 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
+| 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
+| 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.32 | Contrato v4.16: a classe de `provenance.method` ganha forma canônica em inglês (`measurement`, `reading`, `judges`, `derived`, `testimony`), e as palavras em português seguem aceitas como alias |
 
 ## Versões e tags
 

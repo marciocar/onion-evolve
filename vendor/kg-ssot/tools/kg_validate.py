@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.15"
+CONTRACT_VERSION = "4.16"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1126,14 +1126,14 @@ SLUG = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*$")
 
 
 ISO_PREFIX = re.compile(r"^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$")
-TESTIMONY_METHOD = re.compile(r"^testemunho: ")
+TESTIMONY_METHOD = re.compile(r"^(?:testimony|testemunho): ")  # a canônica e o alias (v4.16)
 
 
 def coherence_located(doc, corpus=None):
     """Os avisos SHOULD que o schema não exprime, porque cruzam campos ou arestas:
 
     - integrity.testimony-in-prod: nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe
-      testemunho): relato não é artefato vivo, e o plane pede DEV;
+      testimony, ou testemunho, o alias): relato não é artefato vivo, e o plane pede DEV;
     - integrity.verified-before-fact: verified_at anterior a valid_from, comparados na granularidade do mais curto
       (AAAA, AAAA-MM ou AAAA-MM-DD); data que não está nessa forma não é comparada;
     - integrity.untraced-decision: decision viva (não superseded nem refuted) sem origem: nem trace com texto, nem
@@ -1632,8 +1632,8 @@ HINTS = {
                                      "change the status to unverifiable.",
     "form.required.node.label": "Add label: the node's short claim, up to 280 characters.",
     "form.range.node.label": "Shorten the label to 280 characters and move the rest to narrative.",
-    "form.pattern.node.provenance.method": "Use the form '<class>: <detail>', with class medição, leitura, juízes, "
-                                           "derivado, or testemunho.",
+    "form.pattern.node.provenance.method": "Use the form '<class>: <detail>', with class measurement, reading, judges, "
+                                           "derived, or testimony.",
     "form.pattern.node.provenance.source": "Write the source of truth (URL, path, command); with no recoverable source, "
                                            "remove provenance and change the status to unverifiable.",
 }

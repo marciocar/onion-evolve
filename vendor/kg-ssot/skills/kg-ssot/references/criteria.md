@@ -46,7 +46,7 @@ it was measured under. Changing the rule after seeing the data becomes a dated a
      provenance:
        source: "reports/latency-2026-10-26.md"
        locator: "p95 table"
-       method: "medição: load test"
+       method: "measurement: load test"
      x_measured_under:
        measured_at: "2026-10-26T10:00:00Z"
        criteria:

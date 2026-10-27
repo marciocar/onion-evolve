@@ -10,7 +10,7 @@
 | **Audit package** | One row per questionnaire item, with the question, the answer, the verdict, the dated evidence, the evidence requests, the owner, and the computed gaps, in CSV, XLSX, or JSON (`kg_audit.py`), since 4.22.0 |
 | **Baseline** | The `.kg-ssot/gate/` folder with the debt the gate compares against: the contract identity and one record per graph (through 4.15.1, the single file `.kg-ssot/gate.json`) |
 | **Canonical profile** | The shape the SHOULD gives to an `x_` key that adopters repeat (`x_term`, `x_mirror`, `x_severity`...), since v4.11; `x_criterion` and `x_measured_under` since v4.12. It only judges a key that is present, and only warns |
-| **Class (of `method`)** | `medição` (measurement), `leitura` (reading), `juízes` (judges), `derivado` (derived), or `testemunho` (testimony) |
+| **Class (of `method`)** | `measurement`, `reading`, `judges`, `derived`, or `testimony`; since v4.16 the Portuguese `medição`, `leitura`, `juízes`, `derivado`, and `testemunho` are accepted aliases, with no warning |
 | **Code** | The stable identifier of a violation, such as `form.required.node.label` |
 | **Conformance suite** | The cases in `spec/conformance/` that every reader must pass |
 | **Contract** | The MUST and SHOULD schemas, plus the YAML profile rules and the integrity rules |
@@ -35,7 +35,7 @@
 | **SHOULD debt** | How many graphs (or occurrences) carry each warning |
 | **Synonym** | An item of `x_term.labels`: another way to write the term, `alt` or `hidden`, with its own source, document version, and verification date |
 | **Term** | A node with the `x_term` profile: the preferred label of a concept in a domain vocabulary, with its synonyms |
-| **Testimony** | The `testemunho` class: an account from someone, or a third-party measurement that you only read |
+| **Testimony** | The `testimony` class (alias `testemunho`): an account from someone, or a third-party measurement that you only read |
 | **Vendor** | The copy of the release inside the adopter, in `vendor/kg-ssot`, verified by `check` |
 | **Vendor stamp** | The `.kg-ssot-version` file with the tag, the commit, the version, the contract, and the sha256 of each vendored file |
 | **Verification stamp** | The pair `verified_at` and `verified_against` on a node |

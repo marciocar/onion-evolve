@@ -1,0 +1,28 @@
+meta:
+  schema_version: "1"
+  id: payments-review
+nodes:
+  - id: Q_RETRY
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Is the payment retry safe to run twice?"
+  - id: E_RETRY_TEST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: "The retry test passes with the same request sent twice."
+    verified_at: "2026-10-26"
+    verified_against: "tests/payment_retry_test.py"
+    provenance:
+      source: "tests/payment_retry_test.py"
+      locator: "test_retry_is_idempotent"
+      method: "measurement: integration test in CI"
+edges:
+  - from: E_RETRY_TEST
+    to: Q_RETRY
+    edge_type: SUPPORTS

@@ -1,4 +1,4 @@
-<!-- translation-of: spec/conformance/README.md sha256:d04b66fd5cbfdacd -->
+<!-- translation-of: spec/conformance/README.md sha256:ee10340b3eb55342 -->
 # Suíte de conformidade do `.kg.yaml` e do `.kg.json`
 
 [English](README.md) | **Português (Brasil)**
@@ -93,7 +93,7 @@ O que o v4 mudou de severidade, e o que entrou:
 | `form.unknown-key.<escopo>.<chave>` (chave fora da gramática e sem `x_`, no topo, no meta, no nó ou na aresta) | SHOULD | **MUST** |
 | `form.pattern.<escopo>.key` (nome que não é slug, sem `x_`) | SHOULD | **MUST** (com `x_`, segue SHOULD) |
 | `form.pattern.node.provenance.source` (`source` placeholder: só espaço, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão, `?`...) | — | **MUST** (o vazio segue dando `form.range`) |
-| `form.pattern.node.provenance.method` (fora da forma `'<classe>: <detalhe>'`, com a classe em `medição`, `leitura`, `juízes`, `derivado` ou `testemunho`) | — | SHOULD (MUST no v5) |
+| `form.pattern.node.provenance.method` (fora da forma `'<classe>: <detalhe>'`, com a classe em `measurement`, `reading`, `judges`, `derived` ou `testimony` ou, desde o v4.16, nos alias em português `medição`, `leitura`, `juízes`, `derivado`, `testemunho`) | — | SHOULD (MUST no v5) |
 | `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
 
 O v4.1 acrescenta quatro avisos SHOULD (nenhum veredito muda; `latest/form/unanchored/` e
@@ -103,7 +103,7 @@ schema:
 | Código | Quando alerta |
 |---|---|
 | `form.required.node.verified_against` | `claim` com `verified_at` e sem `verified_against`: carimbo sem alvo (os outros tipos de nó já se ancoram por outro campo) |
-| `integrity.testimony-in-prod` | nó PROD cuja base é testemunho (`evidence_class: testimony` ou `method` da classe `testemunho`) |
+| `integrity.testimony-in-prod` | nó PROD cuja base é testemunho (`evidence_class: testimony` ou `method` da classe `testimony` ou do alias `testemunho`) |
 | `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`, comparados na granularidade do mais curto (`AAAA`, `AAAA-MM`, `AAAA-MM-DD`); data fora dessas formas não é comparada |
 | `integrity.untraced-decision` | `decision` que não é `superseded` nem `refuted`, sem `trace`, sem `provenance` e sem aresta `TRACES_TO` saindo dela |
 
@@ -269,7 +269,7 @@ antecipa decisão aberta.
 **O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 438 casos contra o contrato v4, 32 deles
 `.kg.json`. Os grupos do rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`,
 `placeholder-source`, `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 cujo veredito o
-v4 muda viraram casos `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
+v4 muda viraram casos `bad-*`. Todo caso usa `method` válido (`medição: caso de conformidade`, o alias em português), para que o aviso de
 vocabulário só apareça onde o caso o pede. `proposals/` está vazia.
 
 ## Rodar

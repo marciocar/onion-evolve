@@ -34,14 +34,14 @@ nodes:
     provenance:
       source: bench/cache-load.md
       locator: table 2
-      method: "medição: 4-hour load test"
+      method: "measurement: 4-hour load test"
 edges:
   - from: E_CACHE_GROWTH
     to: Q_CACHE_TTL
     edge_type: SUPPORTS
 ```
 
-The `method` starts with its class, `medição` (measurement), followed by the detail.
+The `method` starts with its class, `measurement`, followed by the detail.
 
 Every node needs at least one edge: a node on its own fails as `integrity.orphan-node`. That is why a graph with a
 single node does not pass, and why your first graph starts with a question and what supports it.
@@ -87,18 +87,18 @@ from.
     provenance:
       source: tests/payment_retry_test.py
       locator: test_retry_is_idempotent
-      method: "medição: integration test in CI"
+      method: "measurement: integration test in CI"
 ```
 
 ## Record a report without making up a measurement
 
-Someone on the team said the retry is idempotent, and nobody ran anything. The class is `testemunho` (testimony):
+Someone on the team said the retry is idempotent, and nobody ran anything. The class is `testimony`:
 
 ```yaml
     provenance:
       source: payments team
       locator: conversation on 2026-10-01
-      method: "testemunho: report from the payments team"
+      method: "testimony: report from the payments team"
 ```
 
 On a PROD node, the contract warns (`integrity.testimony-in-prod`): production backed only by a report is a risk the
@@ -223,7 +223,7 @@ nodes:
     provenance:
       source: docs/decisions/2026-10-streak.md
       locator: Decision section
-      method: "leitura: product decision record"
+      method: "reading: product decision record"
   - id: R_STREAK_RESET
     node_type: rule
     layer: domain
@@ -236,7 +236,7 @@ nodes:
     provenance:
       source: tests/test_streak.py
       locator: test_resets_after_a_day_with_no_entry
-      method: "medição: pytest tests/test_streak.py, 6 cases passing"
+      method: "measurement: pytest tests/test_streak.py, 6 cases passing"
   - id: A_STREAK_CODE
     node_type: artifact
     layer: domain
@@ -250,7 +250,7 @@ nodes:
     provenance:
       source: app/streak.py
       locator: reset function
-      method: "leitura: code at the release commit"
+      method: "reading: code at the release commit"
 edges:
   - from: R_STREAK_RESET
     to: D_STREAK_RESET

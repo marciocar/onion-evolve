@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/02-concepts.md sha256:13e1531c349bb0ee -->
+<!-- translation-of: docs/manual/02-concepts.md sha256:71ce4a852a430731 -->
 # 2. Conceitos
 
 [English](../02-concepts.md) | **Português (Brasil)**
@@ -139,7 +139,7 @@ existe:
 |---|---|---|
 | `source` | A fonte: um arquivo, um endereço, uma pessoa | `tests/payment_retry_test.py` |
 | `locator` | Onde, dentro da fonte | `test_retry_is_idempotent` |
-| `method` | Como a afirmação saiu da fonte, na forma `<classe>: <detalhe>` | `medição: teste de integração no CI` |
+| `method` | Como a afirmação saiu da fonte, na forma `<classe>: <detalhe>` | `measurement: teste de integração no CI` |
 
 `source` não pode ser um marcador vazio: `desconhecida`, `unknown`, `n/a`, `none`, `null`, `tbd`, `sem fonte`, um ou mais
 hífens, travessão, meia-risca ou `?` reprovam (`form.pattern.node.provenance.source`). Se não há fonte, o nó é
@@ -147,15 +147,16 @@ hífens, travessão, meia-risca ou `?` reprovam (`form.pattern.node.provenance.s
 
 ### As cinco classes de `method`
 
-Os nomes das classes são valores literais do contrato, por isso você os escreve em português, exatamente como aqui.
+Os nomes das classes são valores literais do contrato, escritos em inglês exatamente como aqui. Desde o contrato
+v4.16, os nomes em português (entre parênteses) seguem aceitos como alias, sem aviso.
 
 | Classe | Quando usar |
 |---|---|
-| `medição` | Você rodou algo e observou o resultado: um teste, um benchmark, uma consulta |
-| `leitura` | Você leu a fonte primária, e a afirmação está nela |
-| `juízes` | Mais de um avaliador independente votou |
-| `derivado` | A afirmação foi deduzida de outros nós, sem conferência nova |
-| `testemunho` | Alguém relatou. Inclui a medição feita por terceiro que você só leu |
+| `measurement` (`medição`) | Você rodou algo e observou o resultado: um teste, um benchmark, uma consulta |
+| `reading` (`leitura`) | Você leu a fonte primária, e a afirmação está nela |
+| `judges` (`juízes`) | Mais de um avaliador independente votou |
+| `derived` (`derivado`) | A afirmação foi deduzida de outros nós, sem conferência nova |
+| `testimony` (`testemunho`) | Alguém relatou. Inclui a medição feita por terceiro que você só leu |
 
 Um `method` fora dessa forma **alerta** no contrato v4 (`form.pattern.node.provenance.method`). No v5 vai reprovar.
 
