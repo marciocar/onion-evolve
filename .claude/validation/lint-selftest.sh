@@ -4779,6 +4779,37 @@ run_kg_trace_resolve_selftests() {
     esac
   fi
   unset -f _j6f
+  # (j6g) DESTINO QUE É DIRETÓRIO (3ª passada adversarial do adotante sge, 2026-10-27): `--out dir/` saía rc 1 com a
+  #       mensagem crua do mv (o nome vazio fazia o mv mirar o próprio temporário), e `--out <dir existente>` saía
+  #       rc 0 largando um `.kg-read-index.XXXXXX` oculto DENTRO do diretório. Os dois → rc 2 com a mensagem da casa,
+  #       sem temporário em lugar nenhum e sem criar o diretório que a barra nomeia. O produto é o REAL (rc 0): sem a
+  #       guarda, o caminho de sucesso é justamente o que larga o resíduo.
+  #       MUTANTE: as duas linhas da guarda removidas → o (j6g) cai (rc 1/rc 0 e o resíduo de volta).
+  _j6g() {  # $1=kg-trace.sh → "ok" ou o desvio
+    local s="$1" o="${d}/docs/onion" ra=0 rb=0 ea eb bad=""
+    rm -rf "${o}/pasta-idx" "${o}/nova-idx"; mkdir -p "${o}/pasta-idx"
+    ea="$(ONION_KG_TRACE="${kt}" bash "${s}" "${d}" --emit-index --out "${o}/nova-idx/" 2>&1 >/dev/null)" || ra=$?
+    eb="$(ONION_KG_TRACE="${kt}" bash "${s}" "${d}" --emit-index --out "${o}/pasta-idx" 2>&1 >/dev/null)" || rb=$?
+    [ "${ra}" -eq 2 ] && grep -q 'ERRO kg-trace --out: o destino termina em barra' <<< "${ea}" || bad="${bad} barra:rc=${ra}"
+    [ "${rb}" -eq 2 ] && grep -q 'ERRO kg-trace --out: o destino é um diretório existente' <<< "${eb}" || bad="${bad} dir:rc=${rb}"
+    [ ! -e "${o}/nova-idx" ] || bad="${bad} nova-idx-criada"
+    [ -z "$(find "${o}" -name '.kg-read-index.*' 2>/dev/null)" ] || bad="${bad} temporario-largado"
+    find "${o}" -name '.kg-read-index.*' -delete 2>/dev/null || true
+    rm -rf "${o}/pasta-idx" "${o}/nova-idx"
+    [ -z "${bad}" ] && printf ok || printf '%s' "${bad}"
+  }
+  local g6g; g6g="$(_j6g "${helper}")"
+  if [ "${g6g}" = ok ]; then record_pass "kg-trace: (j6g) --out com barra final ou diretório existente → rc 2 com mensagem da casa, sem temporário largado nem diretório criado"
+  else record_fail "kg-trace: (j6g) destino diretório" "${g6g}"; fi
+  sed '/^  case "${OUT}" in \*\/) echo "ERRO kg-trace --out: o destino termina em barra/d; /^  \[ ! -d "${OUT}" \] || { echo "ERRO kg-trace --out: o destino é um diretório existente/d' "${helper}" > "${mut}/kg-trace-semdir.sh"
+  if cmp -s "${helper}" "${mut}/kg-trace-semdir.sh"; then record_fail "kg-trace: (j6g-MUT) mutante não aplicou" "âncora da guarda de diretório mudou"
+  else
+    case "$(_j6g "${mut}/kg-trace-semdir.sh")" in
+      *temporario-largado*) record_pass "kg-trace: (j6g-MUT) sem a guarda de diretório → (j6g) cai (o temporário oculto volta a sobrar)" ;;
+      *) record_fail "kg-trace: (j6g-MUT) mutante NÃO morde" "sem a guarda o destino-diretório não largou temporário" ;;
+    esac
+  fi
+  unset -f _j6g
 
   unset -f _kt _mk_trace_sandbox
   rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${d5}" "${mut}"
@@ -15501,7 +15532,7 @@ run_a2a_rt_selftests() {
   if ! command -v python3 >/dev/null 2>&1 || ! command -v openssl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1; then
     record_skip "a2a-rt: python3/openssl/jq ausente → skip (não-SUT)"; return
   fi
-  local sb; sb="$(mktemp -d)"
+  local sb; sb="$(mktemp -d)"; trap 'rm -rf "'"${sb}"'"' RETURN   # o caso que falha e sai cedo não larga o sandbox (padrão das irmãs)
   local H="${sb}/home" ST="${sb}/state" IN="${sb}/inbox" STUB="${sb}/stub" AUD="${sb}/audit.log"
   mkdir -p "${H}/.config/onion/a2a" "${ST}" "${IN}" "${STUB}"; chmod 700 "${H}/.config/onion/a2a"
   # rede e ssh FALSOS à frente do PATH: chamar qualquer um deixa a marca (sem rede de verdade)
@@ -35085,6 +35116,26 @@ run_kg_read_leg_selftests() {
     else record_fail "kg-read-leg: (r2-MUT)" "o mutante ainda avisou: a varredura de aspas não é medida por (r2)"; fi
   fi
   rm -f "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
+  # (r3) `((` QUE É SUBSHELL ANINHADO (3ª passada adversarial do adotante sge, 2026-10-27): `((cmd) <<E` são dois `(`,
+  #      não aritmética, e o bash abre o corpo do heredoc; a varredura o lia como aritmética e julgava o corpo (aviso
+  #      falso). Como o bash: `((` só é aritmética se o par do 2º `(` fecha em `))` colado. O par: `(( x = (1<<2) ))`,
+  #      aritmética com parêntese dentro, segue sem abrir corpo, e o `sed -i` depois do terminador do subshell avisa.
+  local t1 t2 t3 rt
+  _klr "${hs}" $'((cat) <<\'EOF\' > n.md\nsed -i s/a/b/ src/alvo.ts\nEOF'; t1="${kout}"; rt="${rcs}"
+  _klr "${hs}" $'((cat) <<\'EOF\' > n.md\ncorpo\nEOF\nsed -i s/a/b/ src/alvo.ts'; t2="${kout}"; rt="${rt}${rcs}"
+  _klr "${hs}" $'(( x = (1<<2) ))\nsed -i s/a/b/ src/alvo.ts'; t3="${kout}"; rt="${rt}${rcs}"
+  if [ -z "${t1}" ] && grep -q 'C_NO_DO_SED' <<< "${t2}" && grep -q 'C_NO_DO_SED' <<< "${t3}" && [ "${rt}" = "000" ]; then
+    record_pass "kg-read-leg: (r3) ((cmd) <<E é subshell (o corpo cala, depois do terminador avisa); (( x = (1<<2) )) segue aritmética, rc 0"
+  else record_fail "kg-read-leg: (r3)" "rc=${rt} corpo=[${t1:0:60}] depois=[${t2:0:60}] aritm=[${t3:0:60}]"; fi
+  # (r3-MUT) sem a desambiguação (todo `((` volta a ser aritmética) → o corpo do subshell volta a avisar e (r3) cai
+  sed 's|^            _e = _dparen_end(line, i)$|            _e = None  # ONION_MUTANTE|' "${hs}" > "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
+  if cmp -s "${hs}" "${sbs}/.claude/hooks/kg-read-leg-mut.sh"; then record_fail "kg-read-leg: (r3-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  else
+    _klr "${sbs}/.claude/hooks/kg-read-leg-mut.sh" $'((cat) <<\'EOF\' > n.md\nsed -i s/a/b/ src/alvo.ts\nEOF'; t1="${kout}"
+    if grep -q 'C_NO_DO_SED' <<< "${t1}"; then record_pass "kg-read-leg: (r3-MUT) sem a desambiguação o ((cmd) <<E volta a julgar o corpo — (r3) é load-bearing"
+    else record_fail "kg-read-leg: (r3-MUT)" "o mutante seguiu calado: (r3) não mede a desambiguação"; fi
+  fi
+  rm -f "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
   # (s) O CONTRATO DO `ast`: o `segments`/`WRAPPERS` que o loader REAL do hook extrai da guarda são os da guarda
   #     executada inteira, num corpus de comandos (case/esac, heredoc, &&, |, ;, comentário, `\;`, invólucro).
   #     Uma constante renomeada para minúsculas ou atribuída em tupla some do namespace do `ast` e a perna cala com
@@ -43901,6 +43952,35 @@ run_remeasure_contract_selftests() {
     *) record_fail "remeasure-contract: (h)" "$(bash "${sut}" "${d}/api4" 2>&1 | head -2 | tr '\n' '|') / $(bash "${sut}" "${d}/antigo" 2>&1 | head -1)" ;; esac
   case " ${got} " in *" i "*) record_pass "remeasure-contract: (i) nó com dois códigos MUST conta 1 nó e nada 'fora de nó' (a subtração antiga inventava 1)" ;;
     *) record_fail "remeasure-contract: (i)" "$(bash "${sut}" "${d}/dois-codigos" 2>&1 | grep reprova | head -1)" ;; esac
+  # (l) A LINHA DA BASE DIZ O QUE O GATE DO ALVO FAZ (3ª passada adversarial do adotante sge, 2026-10-27): desde a
+  #     4.16.0 `.kg-ssot/gate` é PASTA, e o `is_file()` a dava por "ausente; o kg_gate.py dele sairia rc 2" com o gate
+  #     do alvo saindo rc 0 (medido no sge). A base é escrita pelo `kg_gate.py --update` DO ALVO (a forma real), e o
+  #     rc do próprio gate é medido ao lado da frase: pasta com dívida → "1 grafo(s) travado(s)" e gate rc 0; sem base
+  #     → "ausente … rc 2" e gate rc 2 (o que a frase promete). MUTANTE: a leitura só por arquivo → (l) cai.
+  _rc_target "${d}/basepasta"; _rc_ok "${d}/basepasta/docs/g/a.kg.yaml" fx-a; _rc_bad "${d}/basepasta/docs/g/b.kg.yaml" fx-b; _rc_commit "${d}/basepasta"
+  ( cd "${d}/basepasta" && python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update >/dev/null 2>&1 ); _rc_commit "${d}/basepasta"
+  _rc_base() {  # $1=remeasure-contract.sh → "ok" ou o desvio
+    local s="$1" bad="" gp=0 ga=0 op oa
+    ( cd "${d}/basepasta" && python3 -I -B vendor/kg-ssot/tools/kg_gate.py >/dev/null 2>&1 ) || gp=$?
+    ( cd "${d}/passa" && python3 -I -B vendor/kg-ssot/tools/kg_gate.py >/dev/null 2>&1 ) || ga=$?
+    op="$(bash "${s}" "${d}/basepasta" 2>&1)"; oa="$(bash "${s}" "${d}/passa" 2>&1)"
+    [ -d "${d}/basepasta/.kg-ssot/gate" ] || bad="${bad} sem-pasta-do-update"
+    { [ "${gp}" -eq 0 ] && grep -q 'base   .kg-ssot/gate: 1 grafo(s) na dívida MUST travada' <<< "${op}"; } || bad="${bad} pasta:gate-rc=${gp}"
+    { [ "${ga}" -eq 2 ] && grep -q 'base   .kg-ssot/gate: ausente (o alvo ainda não trava a dívida; o kg_gate.py dele sairia rc 2)' <<< "${oa}"; } || bad="${bad} ausente:gate-rc=${ga}"
+    [ -z "${bad}" ] && printf ok || printf '%s' "${bad}"
+  }
+  local gb; gb="$(_rc_base "${sut}")"
+  if [ "${gb}" = ok ]; then record_pass "remeasure-contract: (l) base em PASTA (4.16.0+) → 'N grafo(s) travado(s)' com o gate do alvo rc 0; sem base → 'ausente … rc 2' com o gate rc 2"
+  else record_fail "remeasure-contract: (l) linha da base × gate do alvo" "${gb}"; fi
+  sed 's|^    if base.is_file() or base.is_dir():$|    if base.is_file():|' "${sut}" > "${d}/mutl.sh"; cp "${REPO_ROOT}/.claude/utils/adopt/kg-index-floor.sh" "${d}/kg-index-floor.sh"
+  if cmp -s "${sut}" "${d}/mutl.sh"; then record_fail "remeasure-contract: (l-MUT) mutante não aplicou" "âncora 'if base.is_file() or base.is_dir():' mudou"
+  else
+    case "$(_rc_base "${d}/mutl.sh")" in
+      *pasta:*) record_pass "remeasure-contract: (l-MUT) lendo a base só como arquivo, a pasta volta a sair 'ausente, rc 2' com o gate rc 0 → (l) cai" ;;
+      *) record_fail "remeasure-contract: (l-MUT) mutante NÃO morde" "lendo só arquivo a pasta ainda foi contada" ;;
+    esac
+  fi
+  rm -f "${d}/mutl.sh" "${d}/kg-index-floor.sh"; unset -f _rc_base
   # (k) O AVISO DO PISO DO ÍNDICE (sinal de campo de 2026-10-26): o vendor kg-ssot do alvo anterior à 4.25.1 (o
   #     PRÓPRIO, que o update não sobrescreve) deixa o índice de leitura sem regerador. O relatório do update (a saída
   #     deste helper vai inteira nele) e o manifesto que detecta o vendor próprio dizem isso em UMA linha.

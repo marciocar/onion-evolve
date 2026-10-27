@@ -68,6 +68,12 @@ if [ -n "${OUT}" ]; then
   # entre a medida e o mkdir pode sair no desfazer, se ainda estiver vazio (o rmdir nunca apaga conteúdo).
   _odir="$(realpath -m -- "${_odir}" 2>/dev/null)" || { echo "ERRO kg-trace --out: não consegui normalizar ${OUT}" >&2; exit 2; }
   OUT="${_odir}/${OUT##*/}"   # o destino segue o caminho normalizado: `novo/` do `novo/../` não é criado, e o mv não pode depender dele
+  # o destino é o ARQUIVO do índice, nunca um diretório (3ª passada adversarial do adotante sge, 2026-10-27): com
+  # `--out dir/` o nome vazio fazia o mv mirar o próprio temporário (rc 1, mensagem crua do mv), e com `--out <dir
+  # existente>` o mv punha o índice DENTRO dele e saía rc 0, largando um `.kg-read-index.XXXXXX` oculto. Recusa aqui,
+  # antes do mkdir e do mktemp: nada é criado.
+  case "${OUT}" in */) echo "ERRO kg-trace --out: o destino termina em barra — --out recebe o caminho do ARQUIVO do índice (ex.: docs/onion/kg-read-index.tsv), não um diretório" >&2; exit 2 ;; esac
+  [ ! -d "${OUT}" ] || { echo "ERRO kg-trace --out: o destino é um diretório existente (${OUT}) — --out recebe o caminho do ARQUIVO do índice (ex.: docs/onion/kg-read-index.tsv)" >&2; exit 2; }
   _onew="" _op="${_odir}"
   while [ ! -e "${_op}" ] && [ ! -L "${_op}" ]; do _onew="${_op}"; _op="$(dirname -- "${_op}")"; done
   _oundo() {
