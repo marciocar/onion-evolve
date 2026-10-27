@@ -338,7 +338,7 @@ nodes:
     verified_against: "re-medição de E_ONION_MEDIDO_LOCAL_0904 na origin/main de 2026-10-27 (8857bc9b8): DRIFTED"
     source_tier: 10
     source_kind: primary
-    label: "DRIFTED (2026-10-27): o core não carrega mais plugins/ (F4 das portas). O marketplace.json tem 6 entradas, todas apontando o repo público onion-plugins, e o plugin-namespace-check no core dá 0 porque não há bundle a julgar."
+    label: "DRIFTED (2026-10-27): o core não carrega mais plugins/ (4ª fase das portas). O marketplace.json tem 6 entradas, todas apontando o repo público onion-plugins, e o plugin-namespace-check no core dá 0 porque não há bundle a julgar."
     narrative: "Comandos: ls -d plugins → \"No such file or directory\"; python3 sobre .claude-plugin/marketplace.json → 6 plugins (onion-compliance, onion-design, onion-engineering, onion-meta, onion-product, onion), cada um com source git-subdir em github.com/marciocar/onion-plugins; bash .claude/validation/plugin-namespace-check.sh . --summary → rc=0, \"plugin-namespace: 0 — limpo\". NÃO MEDIDO: os 531 refs no bundle montado; medir exige um ensaio de ops/publish-door.sh onion-plugins (clone e materialização), fora do escopo desta re-medição. O retrato de 8 plugins e 531 refs vale como estado de 2026-09-04."
     provenance:
       source: ".claude-plugin/marketplace.json; bash .claude/validation/plugin-namespace-check.sh . --summary"

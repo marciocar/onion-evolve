@@ -134,7 +134,7 @@ nodes:
     source_tier: 10
     source_kind: primary
     label: "CONFIRMED (2026-10-27): o /meta:cc-update segue com os 10 passos (juiz opus no 4, merge verificado no 9); o medidor roda rc 0 e diz NADA A MEDIR em 2.1.311, e a família cc_delta_census passa 25/25."
-    narrative: "Comandos: bash .claude/validation/cc-delta-census.sh . --markdown → rc=0, \"VEREDITO: NADA A MEDIR\", baseline E3 2.1.311 = disco 2.1.311 = processo 2.1.311, e um aviso: o CLI do SDK do bridge está em 2.1.310 (SDK 0.3.310), uma versão atrás do host. bash .claude/validation/lint-selftest.sh --families cc_delta_census → rc=0, Passaram 25, Falharam 0. grep -n no cc-update.md: l.62-107 numeram os passos 1 a 10; l.74 o juiz é general-purpose, model opus, effort high, mandato REFUTAR; l.104-105 o merge só por ops/pr-merge-verified.sh (core-only)."
+    narrative: "Comandos: bash .claude/validation/cc-delta-census.sh . --markdown → rc=0, \"VEREDITO: NADA A MEDIR\", baseline do eixo do ecossistema Claude Code em 2.1.311 = disco 2.1.311 = processo 2.1.311, e um aviso: o CLI do SDK do bridge está em 2.1.310 (SDK 0.3.310), uma versão atrás do host. bash .claude/validation/lint-selftest.sh --families cc_delta_census → rc=0, Passaram 25, Falharam 0. grep -n no cc-update.md: l.62-107 numeram os passos 1 a 10; l.74 o juiz é general-purpose, model opus, effort high, mandato REFUTAR; l.104-105 o merge só por ops/pr-merge-verified.sh (core-only)."
     provenance:
       source: "bash .claude/validation/cc-delta-census.sh . --markdown; bash .claude/validation/lint-selftest.sh --families cc_delta_census; .claude/commands/meta/cc-update.md"
       locator: "cc-update.md l.62-107 (Procedimento), l.74 (juiz), l.104-105 (merge verificado)"

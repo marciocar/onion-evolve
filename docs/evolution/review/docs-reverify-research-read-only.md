@@ -2,8 +2,7 @@
 branch: docs/reverify-research-read-only
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: 12c9b34f27d4ceb78f76771d71d8426b434a75281fe8ff014880f6ee06324b7b
-reviewed_code_sha256: 262aaa6a2fb29970390e8319ade0e94782e6f0e101af4d4c3d484da609785809
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 4
 tokens: 135767
@@ -50,6 +49,10 @@ Um refutador novo, que não viu o meu raciocínio, re-mediu os 19 nós. Achados:
 
 O lint achou mais um, HARD: a narrativa do nó da faixa citava o marcador literal do mutante, e a guarda
 `mutante-esquecido` o tomou por mutante plantado. Curado com a descrição no lugar do marcador.
+
+O contrato KG-SSOT do commit (o passo 4 do pr-finalize, o mesmo do CI) achou 3 códigos novos sem termo
+na prosa: `E3` em dois nós e `F4` em outro. Curado escrevendo o nome por extenso (o eixo do ecossistema
+Claude Code, a 4ª fase das portas); a forma `radar:E3` também reprovou, porque o esquema não resolve.
 
 A REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca) também
 pesou numa escolha. Um SUPERSEDES no radar-E3-2026-09-03 tirava a rodada da dívida (5→4) sem ela ter
