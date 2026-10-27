@@ -297,7 +297,7 @@ bomtexto	tier	standalone
 bomtexto	trust-advises	onion-evolve	
 brain-granaai	adopts	onion-evolve	
 brain-granaai	mode	brownfield	
-brain-granaai	pin	59ebe7fe1288	
+brain-granaai	pin	fb36b24becfa	
 brain-granaai	specialization	clickup	
 brain-granaai	specialization	company-brain	
 brain-granaai	specialization	pesquisa-primaria	
@@ -646,7 +646,7 @@ onion-core	tier	source
 onion-core	trust-advises	onion-evolve	
 onion-curation	adopts	onion-evolve	
 onion-curation	mode	greenfield	
-onion-curation	pin	6df1646b8c00	
+onion-curation	pin	95365699a0e3	
 onion-curation	specialization	curadoria	
 onion-curation	specialization	dissecacao	
 onion-curation	specialization	mercado	
@@ -713,7 +713,7 @@ onion-evolve	specialization	sdaal
 onion-evolve	tier	source	
 onion-kg-ssot	adopts	onion-evolve	
 onion-kg-ssot	mode	greenfield	
-onion-kg-ssot	pin	fab7711811d4	
+onion-kg-ssot	pin	fb36b24becfa	
 onion-kg-ssot	specialization	kg-ssot	
 onion-kg-ssot	specialization	produto	
 onion-kg-ssot	specialization	schema	
@@ -856,7 +856,7 @@ security-information-master	related	pmbok-specialist
 security-information-master	related	soc2-specialist	
 sge	adopts	onion-evolve	
 sge	mode	regulated	
-sge	pin	6aa5c567f579	
+sge	pin	fb36b24becfa	
 sge	specialization	analise-tecnica	
 sge	specialization	checklist-qualidade	
 sge	specialization	lei-14133	
