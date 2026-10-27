@@ -40,13 +40,14 @@
 #   · id dentro de URL pública conta como vazamento: `github.com/<dono>/onion-<adotante>` É o nome do
 #     repo privado. Só porte e porta (pelo kind) são públicos por desenho;
 #   · `.git` é excluído;
-#   · binário (byte NUL) fica FORA da família `sub` desde 2026-10-27: termo curto por substring sem caixa
-#     casa POR ACASO em bytes comprimidos (medido: um GIF de 837 KB vendorizado acusou um termo privado de
-#     3 letras). Texto disfarçado (SVG, JSON) não tem NUL e segue coberto; texto legível DENTRO de
-#     binário (EXIF/XMP, PDF ou .tar sem compressão) não é visto — pede extração por formato, passo
-#     próprio. `word` e `home` SEGUEM lendo binário: palavra inteira `onion-<x>` e `/home/<conta>/` têm 8+
-#     bytes estruturados, colisão por acaso é desprezível, e um caminho real gravado num binário é
-#     vazamento de verdade.
+#   · binário (NUL visto pelo GNU grep antes do casamento) fica FORA da família `sub` desde 2026-10-27:
+#     termo curto por substring sem caixa casa POR ACASO em bytes comprimidos (medido: um GIF de 837 KB
+#     vendorizado acusou um termo privado de 3 letras). Texto disfarçado (SVG, JSON) não tem NUL e segue
+#     coberto. `word` e `home` NÃO viam binário nem antes: com `-o` e sem `-a` o GNU grep suprime a linha
+#     casada de arquivo binário (medido na passada adversarial de 2026-10-27). Logo o binário é ponto cego
+#     das TRÊS famílias, e é TETO: texto legível DENTRO de binário (EXIF/XMP, PDF ou .tar sem compressão,
+#     sqlite), texto com um NUL perdido e arquivo esparso não são vistos — pede extração por formato,
+#     passo próprio. Binário SEM NUL, ou com o 1º NUL depois de MBs, ainda casa.
 # =============================================================================
 set -uo pipefail
 
@@ -61,7 +62,7 @@ while [ $# -gt 0 ]; do
     --emit-sub-ids)  EMIT="sub"; shift ;;
     --emit-accounts) EMIT="home"; shift ;;
     --emit-members-tsv) EMIT="tsv"; shift ;;
-    -h|--help) sed -n '2,50p' "${BASH_SOURCE[0]}"; exit 0 ;;
+    -h|--help) sed -n '2,51p' "${BASH_SOURCE[0]}"; exit 0 ;;
     --) shift; while [ $# -gt 0 ]; do PATHS+=("$1"); shift; done ;;
     -*) echo "ERRO: opção desconhecida: $1" >&2; exit 2 ;;
     *) PATHS+=("$1"); shift ;;
