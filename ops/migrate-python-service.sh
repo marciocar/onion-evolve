@@ -16,6 +16,8 @@
 #   ops/migrate-python-service.sh <serviço> apply --yes       faz (sem --yes: recusa, rc 1, e mostra o plan)
 #   ops/migrate-python-service.sh <serviço> rollback --yes    desfaz (sem --yes: recusa, rc 1)
 #   ops/migrate-python-service.sh <serviço> verify            prova o estado VIVO (só lê)
+#   ops/migrate-python-service.sh <serviço> discard-venv --yes  (granaai|writer) descarta o venv alvo (o quebrado, ou
+#                                                             um sem uso), só se nem a unit nem o processo vivo o usam
 #
 #   serviços:
 #     runtime      o CPython 3.15.2 em /opt/onion-python/cpython-3.15.2-linux-x86_64-gnu, pelo `uv python install`
@@ -35,7 +37,12 @@
 #      sdist do PyYAML compila sem root), com o pino POR HASH da worktree servida
 #      (vendor/kg-ssot/tools/requirements.txt, o mesmo que o CI testa) e PYYAML_FORCE_LIBYAML=0 (o 6.0.3 não tem wheel
 #      cp315; o leitor sai puro, decisão D_PY315_YAML_LEITOR_PURO_ATE_604_1027); depois passa a root e perde a escrita.
-#      Os DOIS serviços levam as libs: o PATH do venv faz o kg-radar.sh que eles chamam usar o python3 do venv
+#      Os DOIS serviços levam as libs: o PATH do venv faz o kg-radar.sh que eles chamam usar o python3 do venv.
+#      O uv monta com UV_LINK_MODE=copy: o padrão HARDLINKA no cache do operador, e o chown de root mudava o dono dos
+#      mesmos inodes no cache (E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027). A cópia preserva o modo do cache (0640/0660,
+#      medido), então o chmod -R a+rX,go-w abre a leitura. ANTES do marcador de completo: nenhum arquivo com links>1, e o
+#      USUÁRIO DO SERVIÇO (User= da unit) lê todo arquivo, importa as libs e lê os metadados dos pinos. Reprovou: o venv
+#      fica SEM o marcador, e o discard-venv --yes o descarta
 #   3. PROVA ANTES DA TROCA, no intérprete novo e com o PATH do venv: o selftest do serviço (o da worktree servida,
 #      contra o server.py servido) e a PARIDADE: o kg_validate.py servido sobre as fixtures de conformidade do
 #      kg-ssot e o kg-radar.sh servido sobre um grafo real, no intérprete de hoje e no novo, com a saída comparada
@@ -49,7 +56,11 @@
 # O verify de granaai|writer reprova se: a unit não está ativa; /health não está UP com as tools do código; o drop-in
 #   não é o renderizado; o processo vivo (/proc/<pid>/exe) não é o 3.15.2 de /opt; o PATH da unit não começa no venv;
 #   o venv não é de root ou aceita escrita; as libs não são as do pino; o selftest reprova no intérprete novo; ou a
-#   paridade antes × depois diverge.
+#   paridade antes × depois diverge; e também se um arquivo do venv tem links>1 ou o usuário do serviço não o lê.
+#
+# O discard-venv --yes de granaai|writer apaga o venv alvo (o do sha12 do requirements de hoje) e recusa se o drop-in
+#   aponta para ele ou o processo vivo da unit o usa (PATH ou argv). É o caminho para o venv quebrado que o re-apply
+#   recusa reusar; o rollback não o apaga (o venv sem uso fica, por desenho).
 #
 # EXIT: 0 ok · 1 problema medido ou recusado · 2 não pude medir (trava, sudo, unit, health, fonte) · 3 uso inválido
 #
@@ -121,12 +132,12 @@ SVC="$1"; MODE="${2:-}"; YES=0
 shift 2
 while [ $# -gt 0 ]; do
   case "$1" in
-    --yes) case "${MODE}" in apply|rollback) YES=1 ;; *) die 3 "--yes só no apply e no rollback" ;; esac ;;
+    --yes) case "${MODE}" in apply|rollback|discard-venv) YES=1 ;; *) die 3 "--yes só no apply, no rollback e no discard-venv" ;; esac ;;
     *) die 3 "opção não aceita: $1 (a versão, os caminhos e as units são fixos)" ;;
   esac
   shift
 done
-case "${MODE}" in plan|apply|rollback|verify) : ;; *) usage ;; esac
+case "${MODE}" in plan|apply|rollback|verify|discard-venv) : ;; *) usage ;; esac
 
 # ── os caminhos (todo absoluto de produção ganha o prefixo da sandbox no modo de teste) ──────────────
 PYROOT="${R}/opt/onion-python"
@@ -149,6 +160,7 @@ case "${SVC}" in
            HEALTH=http://172.23.0.1:3037/health; DATA="${R}/var/lib/onion-chat-kg" ;;
   *) die 3 "serviço desconhecido: ${SVC} (runtime | granaai | writer | chat-runner)" ;;
 esac
+case "${SVC}:${MODE}" in runtime:discard-venv|chat-runner:discard-venv) die 3 "discard-venv só para granaai e writer (o venv é deles)" ;; esac
 
 # ── o intérprete de /opt ─────────────────────────────────────────────────────────────────────────────
 py_version() { "$1" -I -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])' 2>/dev/null; }
@@ -159,15 +171,29 @@ runtime_state() {
   [ "${v}" = "${PY_VERSION}" ] || echo "${PYBASE} responde '${v:-nada}', não ${PY_VERSION}"
   [ "$(realpath -m -- "${PYBASE}")" = "$(realpath -m -- "${PYDIR}")/bin/python${PY_MINOR}" ] || echo "${PYBASE} aponta para fora de ${PYDIR}"
   # o symlink tem modo 0777 por natureza (o do python3 → python3.15 inclusive): só o que não é link é julgado
-  local bad; bad="$( { find "${PYROOT}" -maxdepth 0 \( ! -user "${OWNER}" -o -perm /022 \) -print
-                       find "${PYDIR}" ! -type l \( ! -user "${OWNER}" -o -perm /022 \) -print; } 2>/dev/null | head -3)"
+  local bad; bad="$(find "${PYDIR}" ! -type l \( ! -user "${OWNER}" -o -perm /022 \) -print 2>/dev/null | head -3)"
   [ -z "${bad}" ] || echo "em ${PYDIR}, dono ≠ ${OWNER} ou escrita de grupo/outros: $(tr '\n' ' ' <<<"${bad}")"
+  # a RAIZ inteira, fora do intérprete (E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027: o `uv python install` deixou o
+  # ${PYROOT}/.lock em 0666, e o verify só olhava a pasta-raiz e o intérprete)
+  bad="$(root_loose | head -3)"
+  [ -z "${bad}" ] || echo "${LOOSE_TAG} em ${PYROOT}, dono ≠ ${OWNER} ou escrita de grupo/outros: $(tr '\n' ' ' <<<"${bad}")"
+  return 0
+}
+LOOSE_TAG="RAIZ-FROUXA"
+root_loose() { find "${PYROOT}" ! -type l ! -path "${PYDIR}" ! -path "${PYDIR}/*" \( ! -user "${OWNER}" -o -perm /022 \) -print 2>/dev/null; }
+# fecha dono e modo do que está frouxo na raiz (o .lock do uv), sem reinstalar o intérprete por isso
+fix_root_loose() {
+  local p; local -a loose; mapfile -t loose < <(root_loose)
+  for p in "${loose[@]}"; do
+    priv chown -h "${OWNER}:$(id -gn "${OWNER}")" -- "${p}" && priv chmod go-w -- "${p}" || return 1
+  done
   return 0
 }
 need_runtime() {
   local p; p="$(runtime_state)"
   [ -z "${p}" ] && return 0
   case "${p}" in AUSENTE*) die 1 "o intérprete não está instalado (${PYBASE}): rode antes ops/migrate-python-service.sh runtime apply --yes" ;; esac
+  case "${p}" in "${LOOSE_TAG} "*) die 1 "o intérprete de /opt não vale: ${p} (a raiz frouxa se fecha com ops/migrate-python-service.sh runtime apply --yes, sem reinstalar)" ;; esac
   die 1 "o intérprete de /opt não vale: ${p}"
 }
 
@@ -209,6 +235,11 @@ proc_path() {
   [ -n "${pid}" ] && [ "${pid}" != 0 ] || return 0
   tr '\0' '\n' < "${PROC}/${pid}/environ" 2>/dev/null | sed -n 's/^PATH=//p' | tail -1
 }
+proc_argv() {  # o argv do processo vivo (o discard-venv recusa o venv que ele roda)
+  local pid; pid="$(systemctl show "${UNIT}" -p MainPID --value 2>/dev/null)"
+  [ -n "${pid}" ] && [ "${pid}" != 0 ] || return 0
+  tr '\0' ' ' < "${PROC}/${pid}/cmdline" 2>/dev/null
+}
 
 req_file() { echo "${CODE}/${REQ_REL}"; }
 # dono e modo do venv E da pasta-mãe (achado 6: com a mãe do operador, ele trocaria o diretório conferido inteiro);
@@ -241,12 +272,94 @@ for line in open(path, encoding="utf-8"):
     print("%s==%s" % (name, v))
 PY
 }
+# O USUÁRIO DO SERVIÇO (E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027): o venv é de root e o serviço roda como User= da unit,
+# que lê como "outros". As conferências de leitura e de pinos rodam COMO ele. Na bancada rodam como quem roda (teto
+# declarado: sem sudo, o "outro dono" se simula por modo de arquivo)
+svc_user() { local u; u="$(systemctl show "${UNIT}" -p User --value 2>/dev/null)"; echo "${u:-root}"; }
+as_svc() {
+  if [ "${TEST}" = 1 ] || [ "${SVC_USER}" = "$(id -un)" ]; then "$@"; else sudo -n -u "${SVC_USER}" -- "$@"; fi
+}
+# rc 0: um pino por linha. rc ≠ 0: a falha de LEITURA, nomeada (o METADATA ilegível levanta MetadataNotFound no 3.15,
+# e o 2>/dev/null de antes a fazia passar por "faltam pinos")
 venv_pins() {
-  "$1/bin/python" -I - <<'PY' 2>/dev/null | sort
-import importlib.metadata as m
-for d in m.distributions():
-    print("%s==%s" % (d.metadata["Name"].lower().replace("_", "-"), d.version))
+  as_svc "$1/bin/python" -I - <<'PY'
+import importlib.metadata as m, sys
+try:
+    ds = list(m.distributions())
+except Exception as e:
+    print("ERRO-LEITURA distributions: %s: %s" % (type(e).__name__, e)); sys.exit(3)
+if not ds:  # o site-packages ilegível some em silêncio no importlib (achado 5): zero distribuições não é "faltam pinos"
+    print("ERRO-LEITURA nenhuma distribuição visível (site-packages ilegível?)"); sys.exit(3)
+bad = []
+for d in ds:
+    try:
+        n = d.metadata["Name"]
+        if not n:
+            raise LookupError("METADATA vazio ou ilegível")
+        print("%s==%s" % (n.lower().replace("_", "-"), d.version))
+    except Exception as e:
+        bad.append("ERRO-LEITURA %s: %s: %s" % (getattr(d, "_path", "?"), type(e).__name__, e))
+for b in bad[:3]:
+    print(b)
+sys.exit(3 if bad else 0)
 PY
+}
+# pins_problem <venv> → vazio = o venv tem os pinos; senão o problema, com a falha de leitura NOMEADA à parte
+pins_problem() {
+  local out rc miss
+  out="$(venv_pins "$1" 2>&1)"; rc=$?
+  if [ "${rc}" != 0 ]; then
+    echo "não li os metadados do venv como ${SVC_USER} (rc ${rc}; permissão de leitura?): $(grep -vE '^[a-z0-9._-]+==[^ ]+$' <<<"${out}" | head -3 | tr '\n' ' ' | cut -c1-400)"
+    return 0
+  fi
+  [ -n "$(req_pins)" ] || { echo "o requirements.txt não tem pino"; return 0; }
+  miss="$(comm -23 <(req_pins) <(sort <<<"${out}"))"
+  [ -z "${miss}" ] || echo "o venv não tem os pinos do requirements.txt: $(tr '\n' ' ' <<<"${miss}")"
+}
+# venv_access_problems <venv> → um problema por linha; vazio = o usuário do serviço lê tudo e nada é inode dividido
+venv_access_problems() {
+  local v="$1" out rc
+  # links>1: o inode é o mesmo de um arquivo fora do venv (o cache do uv no modo hardlink); o chown o levaria junto
+  out="$(find "${v}" -type f -links +1 -print 2>/dev/null | head -3)"
+  [ -z "${out}" ] || echo "arquivo do venv com links>1 (hardlink, provável cache do uv): $(tr '\n' ' ' <<<"${out}")"
+  # o modo: o dono é root, o serviço lê como "outros"
+  out="$(find "${v}" ! -type l \( ! -perm -0444 -o -type d ! -perm -0111 \) -print 2>/dev/null | head -3)"
+  [ -z "${out}" ] || echo "sem leitura para outros no venv (o usuário do serviço não é o dono): $(tr '\n' ' ' <<<"${out}")"
+  # a prova: o usuário do serviço ABRE cada arquivo e importa as libs
+  out="$(as_svc "${v}/bin/python" -I - "${v}" 2>&1 <<'PY'
+import os, sys
+root, bad = sys.argv[1], []
+def err(e):
+    bad.append("%s: %s" % (e.filename, e.strerror))
+for d, _dirs, files in os.walk(root, onerror=err):
+    for f in files:
+        p = os.path.join(d, f)
+        if os.path.islink(p):
+            continue
+        try:
+            with open(p, "rb") as h:
+                h.read(1)
+        except OSError as e:
+            bad.append("%s: %s" % (p, e.strerror))
+try:
+    import yaml, jsonschema  # noqa: F401
+except Exception as e:
+    bad.append("import: %s: %s" % (type(e).__name__, e))
+for b in bad[:3]:
+    print(b)
+if bad:
+    print("%d ilegível(is)" % len(bad))
+sys.exit(1 if bad else 0)
+PY
+)"; rc=$?
+  [ "${rc}" = 0 ] || echo "o usuário ${SVC_USER} do serviço não lê o venv (permissão): $(head -4 <<<"${out}" | tr '\n' ' ' | cut -c1-400)"
+}
+# venv_gate <venv> → vazio = o venv serve ao serviço (dono, modo, leitura pelo usuário do serviço, pinos)
+venv_gate() {
+  local p
+  p="$(venv_owner_problems "$1")"; [ -z "${p}" ] || { echo "não é de ${OWNER} ou aceita escrita: $(tr '\n' ' ' <<<"${p}")"; return 0; }
+  p="$(venv_access_problems "$1")"; [ -z "${p}" ] || { tr '\n' ' ' <<<"${p}"; echo; return 0; }
+  pins_problem "$1"
 }
 
 render_dropin() {  # render_dropin <venv> <argumentos do ExecStart de hoje, sem o intérprete>
@@ -341,8 +454,11 @@ verify_service() {
   if [ -f "${venv}/${COMPLETE}" ] && [ -d "${venv}" ] && [ -z "$(venv_owner_problems "${venv}")" ]; then
     vok "o venv é de ${OWNER} e não aceita escrita de grupo/outros"
   else vbad "o venv ${venv} está incompleto, não é de ${OWNER} ou aceita escrita"; fi
-  local miss; miss="$(comm -23 <(req_pins) <(venv_pins "${venv}"))"
-  if [ -z "${miss}" ] && [ -n "$(req_pins)" ]; then vok "as libs do venv são as do pino ($(req_pins | tr '\n' ' '))"; else vbad "o venv não tem os pinos: $(tr '\n' ' ' <<<"${miss:-requirements sem pino}")"; fi
+  local ap; ap="$(venv_access_problems "${venv}")"
+  if [ -z "${ap}" ]; then vok "o usuário ${SVC_USER} do serviço lê o venv inteiro e importa as libs; nenhum hardlink"
+  else while IFS= read -r l; do vbad "${l}"; done <<<"${ap}"; fi
+  local pp; pp="$(pins_problem "${venv}")"
+  if [ -z "${pp}" ]; then vok "as libs do venv são as do pino ($(req_pins | tr '\n' ' '))"; else vbad "${pp}"; fi
   local so; so="$(run_selftest "${venv}")" && vok "selftest no ${PY_VERSION}: ${so}" || vbad "selftest reprova no ${PY_VERSION}: ${so}"
   local po prc=0; po="$(parity "${venv}")" || prc=$?
   case "${prc}" in 0) vok "paridade antes × depois igual: ${po##*novo (${PY_VERSION}): }" ;;
@@ -380,14 +496,21 @@ if [ "${SVC}" = runtime ]; then
       say "o apply --yes faria (como root, por sudo):"
       say "  install -d -m 0755 -o root -g root ${PYROOT}"
       say "  ${INSTALL_CMD[*]}"
-      say "  chown -R -h root:root ${PYDIR}; chmod -R go-w ${PYDIR}; setfacl -R -b ${PYDIR}"
+      say "  chown -R -h root:root ${PYDIR}; chmod -R go-w ${PYDIR}; setfacl -R -b ${PYDIR}; e fecha o resto de ${PYROOT} (o .lock do uv)"
       say "  e prova: ${PYBASE} -I responde ${PY_VERSION}. Custo declarado: este Python não recebe o unattended-upgrades;"
       say "  patch novo = PR que muda PY_VERSION aqui e no ops/chat-runner.sh + apply de cada serviço."
       exit 0 ;;
     apply)
       [ "${YES}" = 1 ] || { say "RECUSADO: apply sem --yes. Nada foi feito."; "$0" runtime plan; exit 1; }
       take_lock
-      if [ -z "$(runtime_state)" ]; then say "NOOP: ${PYBASE} já é ${PY_VERSION} e de ${OWNER}"; exit 0; fi
+      st="$(runtime_state)"
+      if [ -z "${st}" ]; then say "NOOP: ${PYBASE} já é ${PY_VERSION} e de ${OWNER}"; exit 0; fi
+      # só a raiz frouxa, com o intérprete valendo: fecha o modo, sem reinstalar
+      if [ -z "$(grep -v "^${LOOSE_TAG} " <<<"${st}")" ]; then
+        fix_root_loose || die 1 "não fechei dono e modo em ${PYROOT}"
+        st="$(runtime_state)"; [ -z "${st}" ] || die 1 "a raiz segue frouxa: ${st}"
+        say "OK: ${PYROOT} fechado (dono ${OWNER}, sem escrita de grupo/outros); o intérprete não foi reinstalado"; exit 0
+      fi
       priv install -d -m 0755 -o "${OWNER}" -g "$(id -gn "${OWNER}")" "${PYROOT}" || die 2 "não criei ${PYROOT} (sudo?)"
       [ -x "${UV}" ] || die 2 "uv ausente em ${UV}"
       priv install -D -m 0755 -o "${OWNER}" -g "$(id -gn "${OWNER}")" "${UV}" "${ROOT_UV}" || die 2 "não copiei o uv para ${ROOT_UV}"
@@ -397,6 +520,7 @@ if [ "${SVC}" = runtime ]; then
       [ -x "${PYBASE}" ] || die 1 "${PYBASE} não apareceu depois do install"
       priv chown -R -h "${OWNER}:$(id -gn "${OWNER}")" "${PYDIR}" && priv chmod -R go-w "${PYDIR}" || die 1 "não fechei dono e modo de ${PYDIR}"
       if command -v setfacl >/dev/null 2>&1; then priv setfacl -R -b "${PYDIR}" || die 1 "não tirei as ACLs de ${PYDIR}"; fi
+      fix_root_loose || die 1 "não fechei dono e modo do resto de ${PYROOT} (o .lock do uv)"
       st="$(runtime_state)"; [ -z "${st}" ] || die 1 "o intérprete instalado não vale: ${st}"
       say "OK: ${PYBASE} (${PY_VERSION}), dono ${OWNER}. Rollback: ops/migrate-python-service.sh runtime rollback --yes"
       exit 0 ;;
@@ -449,6 +573,8 @@ fi
 VENV="$(venv_dir)"
 SERVER="${CODE}/${REL}/server.py"
 [ -f "${SERVER}" ] || die 2 "sem ${SERVER}"
+SVC_USER="$(svc_user)"
+DISCARD_HINT="descarte-o com bash ops/migrate-python-service.sh ${SVC} discard-venv --yes e rode o apply de novo"
 
 case "${MODE}" in
   plan)
@@ -456,7 +582,8 @@ case "${MODE}" in
     say "  ExecStart carregado: $(exec_argv)"
     [ -f "${DROPIN}" ] && say "  drop-in PRESENTE (${DROPIN}): já migrado? rode verify" || say "  drop-in: ausente"
     st="$(runtime_state)"; say "  intérprete: $([ -z "${st}" ] && echo "${PYBASE} (${PY_VERSION}) válido" || echo "${st}")"
-    say "  venv alvo: ${VENV} $([ -f "${VENV}/${COMPLETE}" ] && echo '(já montado: será reusado)' || echo '(a montar, pelo operador, com o pino por hash e PYYAML_FORCE_LIBYAML=0)')"
+    say "  venv alvo: ${VENV} $([ -f "${VENV}/${COMPLETE}" ] && echo '(com o marcador: o apply o reconfere e só o reusa se passar)' || { [ -e "${VENV}" ] && echo '(existe SEM o marcador: discard-venv --yes antes)'; } || echo '(a montar, pelo operador, com o pino por hash, UV_LINK_MODE=copy e PYYAML_FORCE_LIBYAML=0)')"
+    say "  usuário do serviço: ${SVC_USER} (a leitura do venv, o import e os pinos se conferem como ele, antes do drop-in)"
     say "  pinos: $(req_pins | tr '\n' ' ')"
     [ -n "${DATA}" ] && say "  backup antes da troca: ${DATA} → ${BK_DIR}/onion-chat-kg-<data>-pre-py${PY_VERSION}.tar.gz"
     say "  drop-in que seria gravado:"
@@ -478,7 +605,30 @@ case "${MODE}" in
     [ -n "${got}" ] || die 1 "/health não voltou depois do rollback"
     exe="$(proc_exe)"
     case "${exe}" in "$(realpath -m -- "${PYROOT}")/"*|'?') die 1 "o processo ainda roda ${exe} depois do rollback" ;; esac
-    say "rollback OK: ${UNIT} em ${exe}, /health UP com ${got} tools (o venv ${VENV} fica, sem uso)"; exit 0 ;;
+    say "rollback OK: ${UNIT} em ${exe}, /health UP com ${got} tools (o venv ${VENV} fica, sem uso; quebrado, sai pelo discard-venv --yes)"; exit 0 ;;
+  discard-venv)
+    # o venv que o re-apply recusa reusar (E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027): sai só se NADA o usa
+    [ "${YES}" = 1 ] || { say "RECUSADO: discard-venv sem --yes. Nada foi feito."; exit 1; }
+    take_lock
+    [ -e "${VENV}" ] || { say "NOOP: ${VENV} não existe"; exit 0; }
+    case "${VENV##*/}" in "${SVC}-py${PY_VERSION}-"[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]) : ;;
+      *) die 1 "recusado: ${VENV} fora da forma <serviço>-py${PY_VERSION}-<sha12>" ;; esac
+    [ "${VENV%/*}" = "${VENVROOT}" ] || die 1 "recusado: ${VENV} fora de ${VENVROOT}"
+    if [ -f "${DROPIN}" ] && grep -qF -- "${VENV}/" "${DROPIN}"; then
+      die 1 "o drop-in ${DROPIN} aponta para ${VENV}: rode antes ops/migrate-python-service.sh ${SVC} rollback --yes"; fi
+    # o que não se mede não libera o rm (achado 2): MainPID ilegível, ou processo vivo com o argv ilegível, é rc 2
+    pid="$(systemctl show "${UNIT}" -p MainPID --value 2>/dev/null)" || die 2 "não li o MainPID de ${UNIT}: nada removido"
+    if [ -n "${pid}" ] && [ "${pid}" != 0 ]; then
+      [ -r "${PROC}/${pid}/cmdline" ] && [ -r "${PROC}/${pid}/environ" ] || die 2 "não leio o argv e o ambiente do processo ${pid} de ${UNIT}: nada removido"
+    fi
+    # e o carregado pela unit (qualquer .conf, não só o drop-in daqui)
+    case "$(systemctl show "${UNIT}" -p ExecStart -p Environment --value 2>/dev/null)" in *"${VENV}/"*)
+      die 1 "a unit ${UNIT} carregada (ExecStart/Environment) aponta para ${VENV}: rode antes o rollback --yes e confira os drop-ins" ;; esac
+    case "$(proc_path) $(proc_argv)" in *"${VENV}/"*)
+      die 1 "o processo vivo de ${UNIT} usa ${VENV} (PATH ou argv): rode antes o rollback --yes (ou o restart, se o drop-in já saiu)" ;; esac
+    priv rm -rf -- "${VENV}" || die 1 "não removi ${VENV}"
+    [ ! -e "${VENV}" ] || die 1 "${VENV} ainda existe depois do rm"
+    say "discard-venv OK: ${VENV} removido (nem o drop-in nem o processo vivo o usavam); o próximo apply --yes monta um novo"; exit 0 ;;
 esac
 
 # ── apply ────────────────────────────────────────────────────────────────────────────────────────────
@@ -496,30 +646,44 @@ ARGV="$(exec_argv)"
   || die 1 "o ExecStart carregado mudou (${ARGV:-vazio}); esperado /usr/bin/python3 ${CODE#"${R}"}/${REL}/server.py: confira a unit antes"
 [ -z "$(git -C "${CODE}" status --porcelain 2>/dev/null)" ] || die 1 "a worktree servida ${CODE} está SUJA: o servido não é versionado"
 SHA="$(git -C "${CODE}" rev-parse HEAD 2>/dev/null)" || die 2 "rev-parse da worktree servida falhou"
+# rodar como o usuário do serviço é pré-condição de MEDIR (achado 3): sem isso, a falha do sudo viraria "permissão" e a
+# dica mandaria descartar um venv bom
+as_svc true || die 2 "não rodo como o usuário do serviço ${SVC_USER} (sudo -n -u): a leitura do venv não se mede"
 say "pré-voo OK: código ${SHA:0:12}, ${EXPECTED} tools, processo $(proc_exe)"
 
 # 2. o venv (montado pelo operador; root só no fim)
 if [ -f "${VENV}/${COMPLETE}" ]; then
-  # reusar exige o venv já entregue (achado 2: o marcador sem o dono certo faria a unit rodar num venv do operador)
-  [ -z "$(venv_owner_problems "${VENV}")" ] || die 1 "${VENV} tem o marcador mas não é de ${OWNER} ou aceita escrita: $(venv_owner_problems "${VENV}")"
-  say "venv ${VENV} já montado e de ${OWNER}: reusado"
+  # reusar exige o venv já entregue E servível (achado 2 e E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027): o marcador sem o
+  # dono certo faria a unit rodar num venv do operador; o marcador num venv que o serviço não lê, numa unit quebrada
+  gp="$(venv_gate "${VENV}")"
+  [ -z "${gp}" ] || die 1 "${VENV} tem o marcador mas reprova: ${gp} O re-apply não o reusa: ${DISCARD_HINT}"
+  say "venv ${VENV} já montado, de ${OWNER} e legível por ${SVC_USER}: reusado"
 else
-  [ -e "${VENV}" ] && die 1 "${VENV} existe sem o marcador de completo (montagem interrompida): remova-o (sudo rm -rf ${VENV}) e rode de novo"
+  [ -e "${VENV}" ] && die 1 "${VENV} existe sem o marcador de completo (montagem interrompida ou reprovada): ${DISCARD_HINT}"
   priv install -d -m 0755 -o "${OWNER}" -g "$(id -gn "${OWNER}")" "${VENVROOT}" || die 2 "não criei ${VENVROOT} (sudo?)"
   priv install -d -m 0755 -o "$(id -un)" -g "$(id -gn)" "${VENV}" || die 2 "não criei ${VENV}"
+  # CÓPIA, nunca hardlink no cache do operador: o chown de root mudaria o dono dos mesmos inodes lá (medido 2026-10-27:
+  # 393 arquivos do ~/.cache/uv viraram root). Vale para o uv venv e o uv pip install (o env vence o uv.toml)
+  export UV_LINK_MODE=copy
   "${UV}" venv --allow-existing --python "${PYBASE}" "${VENV}" >/dev/null || die 1 "uv venv falhou"
   PYYAML_FORCE_LIBYAML=0 "${UV}" pip install --python "${VENV}/bin/python" --require-hashes -r "$(req_file)" \
     || die 1 "uv pip install com --require-hashes falhou (nada foi trocado na unit; o venv parcial fica em ${VENV} sem o marcador)"
   "${VENV}/bin/python" -I -c 'import yaml, jsonschema, sys; from importlib.metadata import version as v; print("deps:", sys.version.split()[0], "pyyaml", yaml.__version__, "libyaml", yaml.__with_libyaml__, "jsonschema", v("jsonschema"))' \
     || die 1 "o venv não importa yaml e jsonschema"
-  priv chown -R -h "${OWNER}:$(id -gn "${OWNER}")" "${VENV}" && priv chmod -R go-w "${VENV}" || die 1 "não passei ${VENV} a ${OWNER} (o venv fica sem o marcador)"
+  # o hardlink se barra ANTES do chown (passada adversarial, achado 1): depois dele, o dono dos inodes do cache já mudou
+  hl="$(find "${VENV}" -type f -links +1 -print 2>/dev/null | head -3)"
+  [ -z "${hl}" ] || die 1 "o venv tem arquivo com links>1 ANTES do chown (o uv hardlinkou no cache?): $(tr '\n' ' ' <<<"${hl}") Nada mudou de dono: ${DISCARD_HINT}"
+  # a cópia preserva o modo do cache (0640/0660, medido): a+rX abre a leitura ao usuário do serviço, go-w fecha a escrita
+  priv chown -R -h "${OWNER}:$(id -gn "${OWNER}")" "${VENV}" && priv chmod -R a+rX,go-w "${VENV}" || die 1 "não passei ${VENV} a ${OWNER} (o venv fica sem o marcador)"
+  if command -v setfacl >/dev/null 2>&1; then priv setfacl -R -b "${VENV}" || die 1 "não tirei as ACLs de ${VENV}"; fi
+  # a conferência ANTES do marcador: reprovou, o venv fica sem ele (o re-apply recusa e aponta o discard-venv)
+  gp="$(venv_gate "${VENV}")"
+  [ -z "${gp}" ] || die 1 "${VENV} montado mas reprova: ${gp} Ficou SEM o marcador: ${DISCARD_HINT}"
   # o marcador nasce DEPOIS da entrega e pelas mãos do dono (achado 2): marcador presente = venv de root
   priv install -m 0644 -o "${OWNER}" -g "$(id -gn "${OWNER}")" /dev/null "${VENV}/${COMPLETE}" || die 1 "não gravei o marcador de completo"
   [ -z "$(venv_owner_problems "${VENV}")" ] || die 1 "${VENV} não ficou de ${OWNER}: $(venv_owner_problems "${VENV}")"
-  say "venv montado e entregue a ${OWNER}: ${VENV}"
+  say "venv montado, entregue a ${OWNER} e legível por ${SVC_USER}: ${VENV}"
 fi
-miss="$(comm -23 <(req_pins) <(venv_pins "${VENV}"))"
-[ -z "${miss}" ] || die 1 "o venv não tem os pinos do requirements.txt: $(tr '\n' ' ' <<<"${miss}")"
 
 # 3. a prova ANTES da troca
 say "selftest no intérprete novo (o escritor leva ~40 s)…"
