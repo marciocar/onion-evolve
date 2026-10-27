@@ -8,8 +8,8 @@
 
 ## 📊 Estatísticas
 
-- **106 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
-- **53** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **13** em `decisions/` (+ 1 README de categoria)
+- **107 documentos de conteúdo** de knowledge base (exceto `index.md` e READMEs de (sub)categoria)
+- **54** em `concepts/` · **9** em `frameworks/` · **7** em `tools/` · **5** em `platforms/` · **4** em `patterns/` · **1** em `architectures/` · **2** em `meta/` · **8** em `agentic-patterns/` (+ 4 READMEs de (sub)categoria) · **4** em `education/` (+ 1 README de categoria) · **13** em `decisions/` (+ 1 README de categoria)
 
 ---
 
@@ -17,7 +17,7 @@
 
 ```
 docs/knowledge-base/
-├── concepts/            # 53 — Conceitos fundamentais
+├── concepts/            # 54 — Conceitos fundamentais
 ├── frameworks/          # 9  — Frameworks e metodologias
 ├── tools/               # 7  — Ferramentas e recursos
 ├── platforms/           # 5  — Plataformas e tecnologias
@@ -34,7 +34,7 @@ docs/knowledge-base/
 
 ---
 
-## 🧠 Conceitos Fundamentais (53)
+## 🧠 Conceitos Fundamentais (54)
 
 - [Abstraction Patterns Catalog](concepts/abstraction-patterns-catalog.md) — catálogo de padrões de abstração
 - [Onboarding do adotante](concepts/adopter-onboarding.md) — a fonte canônica da orientação de adoção (vendorizada); guias por adotante apontam para cá, não duplicam
@@ -52,6 +52,7 @@ docs/knowledge-base/
 - [Domain Context Lifecycle](concepts/domain-context-lifecycle.md) — contexto de domínio como SSOT viva (CRUD+), não snapshot; fundamenta a regra L0 e o ciclo *Manage*
 - [Interesse da fonte](concepts/evidence-source-interest.md) — verificado ≠ neutro: o 3º eixo da evidência ("quem produziu isto ganha o quê com o que diz?")
 - [Federação × Tipos de Uso](concepts/federation-usage-modes.md) — matriz canônica de reconciliação: 5 eixos A-E (tiers × adoção × topologias de sessão W1-W7), 3 namespaces de papel, gatilhos de graduação
+- [Canais entre sessões e A2A](concepts/inter-session-channels-a2a.md) — manual de qual canal usar: socket local do harness, Remote Control e nuvem, A2A do Onion e doc-bridge, com o que cada um garante e o que não garante (estado de 2026-10-27)
 - [Automação graduada](concepts/graduated-automation-ladder.md) — **CANDIDATO** — nomeia e unifica a escada de automação que o Onion já sobe, espalhada em ~6 docs
 - [Identificar e Precificar Dor do Cliente](concepts/identificar-precificar-dor-cliente.md) — metodologias de produto
 - [Mitigação de inferência](concepts/inference-mitigation.md) — doutrina (contrato) para defender um KG do motor que o lê; o mecanismo executável é do adotante
