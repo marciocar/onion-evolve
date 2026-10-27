@@ -2,12 +2,11 @@
 branch: chore/update-round-435-pins
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: 55e2f265e054cf54a7295f13099cdef33f45a508e04e5adb9e3a765e041635a0
-reviewed_code_sha256: 7a2cca504b6a631858e8503a640af27cab183d1ef3a90ac0c925ff71cfb74b76
+reviewed_diff_sha256: pendente
 findings_total: 0
 findings_real: 0
 tokens: 0
-duration_min: 10
+duration_min: 20
 findings_fixed: 0
 verdict: SEM_ACHADOS
 elenxo: sim
@@ -25,6 +24,23 @@ nota: ""
   O update para `95365699a0e3` segue em PR aberto nos três.
 - Grafo de coordenação: fecham `Q_COORD_CURADORIA_UPDATE_4340` e `Q_COORD_BRAIN_REPOR_VENDOR_NO_CLONE`.
   `Q_COORD_UPDATE_4_ADOTANTES_4350` ganha o andamento e segue aberto.
+- 2ª leva, a pedido da sessão principal: fecham também `Q_COORD_CUR_LAB_11_CASOS_E_CHAIN_WITH`,
+  `Q_COORD_CUR_CONFERIR_ONDA1_CONTRA_PR140`, `Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT`,
+  `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320` e `Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS`. Medi pelo core
+  o que dava para medir: o PR 151 da curadoria MERGED em 91ac66b, que é a `origin/main` dela; os nós
+  `E_CHAIN_WITH_FIELD_TEST_435`, `E_LAB_435_CONFORMANCE` e `E_WAVE1_SETUP_RUN` presentes na main dela;
+  e `npm view kg-ssot dist-tags` com latest 4.35.0. O deploy do escritor e o Python 3.15 nos serviços
+  entram como testemunho da sessão principal, e o `verified_against` diz isso. Os limites declarados
+  (probe autenticado, business-context real) estão na narrativa de cada nó. Radar rc 0.
+
+## Achado fora do diff, corrigido no PR do adotante
+
+- Na rodada, afirmei que o `9fc22ac170d1` (o commit da tag 4.35.0 que o sge e o brain carimbam) não
+  existia. Estava errado: eu tinha medido só o repo de desenvolvimento da kg-ssot (onde a tag é
+  `3960131ab70d`), e o adotante vendoriza pelo espelho público (onde a tag é `9fc22ac170d1`). No PR do
+  brain, o campo voltou ao valor do repo, e o relatório no inbound/ foi corrigido (commit `f03900257`).
+  O que resta como classe: o `.kg-ssot-version` não diz de qual remoto veio, e o vendor do core (pelo
+  repo de desenvolvimento) conflita nesse campo com todo adotante que vendoriza pelo espelho.
 
 ## O que a passada conferiu
 

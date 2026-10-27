@@ -256,13 +256,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 3
     confidence: 0.5
-    verified_against: "gh pr view 140 -R marciocar/onion-curation em 2026-10-27: MERGED, mergeCommit 668e13ba9132"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 151 -R marciocar/onion-curation em 2026-10-27: MERGED, merge 91ac66b; git grep na main dela acha E_WAVE1_SETUP_RUN"
     label: "Conferir a onda 1 do design do core contra o desenho do PR 140 da curadoria."
-    narrative: "O PR 140 da curadoria (https://github.com/marciocar/onion-curation/pull/140, mergeado @ 668e13b) é a onda 1 revista com o grafo do design-context. A conferência espera a onda 1 do core, que é a pergunta Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027."
+    narrative: "O PR 140 da curadoria (https://github.com/marciocar/onion-curation/pull/140, mergeado @ 668e13b) é a onda 1 revista com o grafo do design-context. A conferência espera a onda 1 do core, que é a pergunta Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027. Fechado em 2026-10-27 pelo E_WAVE1_SETUP_RUN, no PR 151 da curadoria. O dry-run mostrou 5 CRIAR, depois veio o apply, e o 2º apply deu 5 MANTER: idempotente e sem rede. Limite declarado: a conferência não exercitou o business-context real nem o tema."
   - id: Q_COORD_CUR_MEDIR_CAPTURA_DIAGRAMA_DECK_CORTEX
     node_type: question
     layer: audit
@@ -279,13 +280,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 151 -R marciocar/onion-curation em 2026-10-27: MERGED, merge 91ac66b (= origin/main da curadoria); git grep na main dela acha E_CHAIN_WITH_FIELD_TEST_435 e E_LAB_435_CONFORMANCE"
     label: "Depois da 4.35.0: rodar os 11 casos do laboratório do PR 140 e o --chain com --with."
-    narrative: "O --with é uma das quatro frentes da 4.35.0; os onze casos são o laboratório do grafo do design-context da curadoria."
+    narrative: "O --with é uma das quatro frentes da 4.35.0; os onze casos são o laboratório do grafo do design-context da curadoria. Fechado em 2026-10-27 pelo PR 151 da curadoria (main 91ac66b). Em E_CHAIN_WITH_FIELD_TEST_435, o --chain fecha completo com --with nos 23 nós e quebra sem ele. Em E_LAB_435_CONFORMANCE, os 11 casos têm o mesmo veredito do checador de referência. Os vereditos são da sessão da curadoria, e o core conferiu o merge e a presença dos nós."
   - id: Q_COORD_KGSSOT_RELEASE_4350
     node_type: question
     layer: audit
@@ -361,24 +363,26 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     impact: 4
     confidence: 0.5
-    verified_against: "gh pr list em 2026-10-27: 1397 MERGED"
+    verified_at: "2026-10-27"
+    verified_against: "testemunho da sessão principal do core em 2026-10-27: o maestro rodou ops/update-kg-writer.sh por volta das 21:57 UTC, código 2cbe59d98b1c para 849c23a7faf9, /health UP com 6 tools, backup onion-chat-kg-20261027-215739-pre-849c23a7faf9.tar.gz"
     label: "O deploy do escritor de grafos por MCP com as curas da 4.32.0 (o card está no PR 1397)."
-    narrative: "O deploy é ato do maestro. Depois dele vem a troca dos serviços para o Python 3.15."
+    narrative: "O deploy é ato do maestro. Depois dele vem a troca dos serviços para o Python 3.15. Fechado em 2026-10-27: o deploy levou o escritor de 2cbe59d98b1c para 849c23a7faf9, com o /health UP e 6 tools, e o backup foi guardado antes. Limite declarado: falta o probe autenticado (served_commit igual ao store_commit), que exige o token."
   - id: Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "testemunho da sessão principal do core em 2026-10-27: ops/migrate-python-service.sh <serviço> verify com rc 0 no runtime 3.15.2 em /opt (raiz fechada) e nos 3 serviços (granaai, writer e chat-runner)"
     label: "A troca para o Python 3.15 nos serviços, depois do deploy do escritor por MCP."
-    narrative: "Espera o deploy do escritor e o core em Python 3.15 com piso 3.12."
+    narrative: "Espera o deploy do escritor e o core em Python 3.15 com piso 3.12. Fechado em 2026-10-27. granaai: venv por cópia, 0 hardlinks, selftest 34 e paridade de 431 fixtures. writer: selftest 65, paridade de 431 e backup pre-py3.15.2. chat-runner: o onion-bridge#92 entrou às 22:03Z, depois vieram update-bridge.sh e chat-runner.sh install --apply, com verify n_fail=0 e backup das units em /var/backups/onion-chat-runner/20261027-221426. O cache do uv ficou com 0 arquivos de outro dono. Limite declarado: falta o probe autenticado dos dois MCPs."
   - id: Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA
     node_type: question
     layer: audit
@@ -394,13 +398,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "npm view kg-ssot dist-tags em 2026-10-27, rodado pelo core: { latest: '4.35.0' }"
     label: "O npm de cada release da kg-ssot, a começar pela 4.35.0."
-    narrative: "A publicação no npm é ato do maestro em cada release; a próxima é a 4.35.0."
+    narrative: "A publicação no npm é ato do maestro em cada release; a próxima é a 4.35.0. Fechado em 2026-10-27 para a 4.35.0: o latest do npm é 4.35.0, medido pelo core. O fluxo, segundo a sessão do kg-ssot: npm stage publish --provenance pelo CI do espelho, aprovação do maestro pelo link do npm e chk.sh com rc 0 nos 5 canais."
   - id: Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT
     node_type: question
     layer: audit
