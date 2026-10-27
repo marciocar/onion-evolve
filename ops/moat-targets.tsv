@@ -47,6 +47,10 @@
 #     /opt/onion-stt (modelo e VAD por revisão fixada e sha256, venv por lock com hash, código), gera o token em
 #     /etc/onion-stt (0600, nunca em argv), prova o sandbox numa unit transitória ANTES de trocar a unit onion-vps-stt,
 #     guarda a anterior em /var/backups/onion-stt e prova o serviço vivo. Uma linha por caminho que só ele escreve.
+#   · o INTÉRPRETE dos serviços Python (2026-10-27, D_PY315_EXECUCAO_POR_OPS_E_OPT_1027) se troca só por
+#     migrate-python-service.sh: o CPython de patch fixo em /opt/onion-python (dono root), os venvs dedicados em
+#     /opt/onion-venvs e o drop-in 50-python.conf das duas units MCP de grafo. O restart dessas units segue com o
+#     wrapper da unit (o do escritor, update-kg-writer.sh; o do leitor, nenhum): o drop-in é o alvo deste.
 #   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
 #     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
 #     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
@@ -79,6 +83,10 @@ deploy	path	/var/backups/onion-chat-runner	ops/chat-runner.sh
 deploy	path	/run/onion-chat.sock	ops/chat-runner.sh
 deploy	path	/etc/systemd/system/onion-vps-stt.service	ops/stt-service.sh
 deploy	path	/opt/onion-stt	ops/stt-service.sh
+deploy	path	/opt/onion-python	ops/migrate-python-service.sh
+deploy	path	/opt/onion-venvs	ops/migrate-python-service.sh
+deploy	path	/etc/systemd/system/onion-vps-mcp-kg-writer.service.d/50-python.conf	ops/migrate-python-service.sh
+deploy	path	/etc/systemd/system/onion-vps-mcp-kg-granaai.service.d/50-python.conf	ops/migrate-python-service.sh
 deploy	path	/etc/onion-stt	ops/stt-service.sh
 deploy	path	/var/backups/onion-stt	ops/stt-service.sh
 deploy	path	/var/lib/onion-bridge	-

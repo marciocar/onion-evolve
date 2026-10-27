@@ -204,7 +204,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,bridge_hardening,stt_service,migrate_python_service,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes,kg_migrate_v3"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -11306,7 +11306,7 @@ case "$1" in
         case "$p" in
           DynamicUser) v=yes ;; ProtectHome) v=yes ;;
           User) if [ -f "$F/eff-root" ]; then v=root; else v=onion-chat-verify; fi ;;
-          ExecStart) v="{ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py ; ignore_errors=no }" ;;
+          ExecStart) if [ -f "$F/eff-oldpy" ]; then ip=/usr/bin/python3; else ip=/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15; fi; v="{ path=$ip ; argv[]=$ip -I /run/onion-chat-bin/launcher.py ; ignore_errors=no }" ;;
           ExecStartPre|ExecStartPost) continue ;;
           DropInPaths) v=""; [ -f "$ONION_CHAT_RUNNER_UNIT_DIR/onion-chat@.service.d/60-egress-fence.conf" ] && case "$unit" in onion-chat@*) v="$ONION_CHAT_RUNNER_UNIT_DIR/onion-chat@.service.d/60-egress-fence.conf" ;; esac
             [ -f "$F/eff-dropin" ] && v="$v /run/systemd/system/onion-chat@.service.d/90-x.conf" ;;
@@ -11363,7 +11363,7 @@ if grep -qx "TemporaryFileSystem=$S" "$F/sr-args" && [ ! -f "$F/notfs" ]; then
 fi
 if grep -q '^SupplementaryGroups=' "$F/sr-args"; then for r in "$S/workspaces" "$S/chat-homes"; do [ -d "$r" ] && chmod 0311 "$r"; done; fi
 envs="$(grep '^Environment=' "$F/sr-args" | sed 's/^Environment=//' | sed "s#/run/onion-chat-bin/#$B/#g" | tr '\n' ' ')"
-sed -e "s#/run/onion-chat-bin/#$B/#g" -e 's/ pid=[^;]*;/ pid=1;/' | env PATH="$CR_INBIN:$PATH" $envs "$@"; rc=$?
+sed -e "s#/run/onion-chat-bin/#$B/#g" -e 's/ pid=[^;]*;/ pid=1;/' -e 's#; runner_py=/opt/onion-python/cpython-[^ ]*/bin/python3\.[0-9]*$#; runner_py=/usr/bin/python3#' | env PATH="$CR_INBIN:$PATH" $envs "$@"; rc=$?
 chmod 0755 "${H%/*}"; chmod 0750 "$H"; rm -f "$F/tfs-on"; for r in "$S/workspaces" "$S/chat-homes"; do [ -d "$r" ] && chmod 0750 "$r"; done
 for e in "$F/hidden"/* "$F/hidden"/.[!.]*; do [ -e "$e" ] && mv "$e" "$S/"; done
 exit $rc
@@ -11456,7 +11456,7 @@ PYEOF
       'BindReadOnlyPaths=@CLAUDE_SRC@:/run/onion-chat-bin/claude' 'BindReadOnlyPaths=@LIBEXEC@/launcher.py:/run/onion-chat-bin/launcher.py' \
       'RuntimeDirectory=onion-chat/%i' \
       'Environment=ONION_CHAT_WS_ROOT=@STATE@/workspaces ONION_CHAT_HOME_ROOT=@STATE@/chat-homes ONION_CHAT_CLAUDE=/run/onion-chat-bin/claude' \
-      'ExecStart=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py' 'ExecStopPost=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py --fixup' \
+      'ExecStart=/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15 -I /run/onion-chat-bin/launcher.py' 'ExecStopPost=/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15 -I /run/onion-chat-bin/launcher.py --fixup' \
       > "${C}/onion-chat@.service.in"
     printf '%s\n' '# modelo da cerca (bancada)' '[Service]' 'IPAddressDeny=0.0.0.0/8' 'IPAddressDeny=127.0.0.0/8' 'IPAddressDeny=::/128' 'IPAddressDeny=::1/128' \
       'IPAddressDeny=169.254.0.0/16' 'IPAddressDeny=fe80::/10' 'IPAddressDeny=10.0.0.0/8' 'IPAddressDeny=172.16.0.0/12' 'IPAddressDeny=192.168.0.0/16' \
@@ -11551,6 +11551,11 @@ PY
     _crrc "${r}" 1 && _crhas "${r}" "NÃO é tmpfs na unit"; }
   _cc_uidonly() { local r; : > "${d}/st/protect-uid-only"; r="$(_crr "$1" install)"; CR_WHY="${r:0:600}"
     _crrc "${r}" 1 && _crhas "${r}" "a home do serviço está visível"; }
+  _cc_oldpy_model() { local r; sed -i 's#^ExecStart=/opt/onion-python/[^ ]* #ExecStart=/usr/bin/python3 #' "${d}/home/h/onion-bridge/deploy/chat-runner/onion-chat@.service.in"
+    git -C "${d}/home/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qam oldpy
+    r="$(_crr "$1" install)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "ExecStart=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py (exigido: /opt/onion-python/" && ! _crinstalled; }
+  _cc_oldpy_eff() { local r; _crr "$1" install --apply >/dev/null; : > "${d}/st/eff-oldpy"
+    r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "FALHA efetivo: ExecStart não é o lançador no intérprete do runner"; }
   _cc_allow() { local r; sed -i -e 's/^DynamicUser=yes/DynamicUser=no/' -e '$a ExecStartPre=/bin/sh -c id' "${d}/home/h/onion-bridge/deploy/chat-runner/onion-chat@.service.in"
     git -C "${d}/home/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qam root
     r="$(_crr "$1" install)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "allowlist de diretivas" \
@@ -11808,13 +11813,307 @@ PY
   _crcase "(r64) verify: o contrato SDK↔lançador do bridge servido reprova → rc 1 com o rodapé do selftest" \
     '  if [ "${rc}" = 0 ]; then' '  if true; then' _cc_contract_fail
   _crcase "(r65) o contrato roda contra o lançador INSTALADO (LAUNCHER_PATH), com o ambiente limpo, e passa" \
-    '    LAUNCHER_PATH="${LIBEXEC}/launcher.py" /usr/bin/python3' '    /usr/bin/python3' _cc_contract_ok
+    '    LAUNCHER_PATH="${LIBEXEC}/launcher.py" "${RUNNER_PY_EXEC}"' '    "${RUNNER_PY_EXEC}"' _cc_contract_ok
+  # o INTÉRPRETE do runner (2026-10-27, D_PY315_CHAT_RUNNER_MIGRA_1027): o literal de /opt é contrato da allowlist e do efetivo
+  _crcase "(r67) modelo do bridge com o ExecStart no /usr/bin/python3 antigo → rc 1 pela allowlist, nada instalado" \
+    '    "ExecStart": runner_py + " -I /run/onion-chat-bin/launcher.py",' '    "ExecStart": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py",' _cc_oldpy_model
+  _crcase "(r68) verify com o ExecStart EFETIVO no /usr/bin/python3 (o template novo não carregou) → rc 1 nomeando o intérprete" \
+    'grep -qF "argv[]=${RUNNER_PY} -I /run/onion-chat-bin/launcher.py ;"' 'grep -qF "argv[]=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py ;"' _cc_oldpy_eff
   _crcase "(r66) bridge servido sem o selftest do contrato → FALHA pedindo o deploy, nunca passa calado" \
     '    echo "FALHA o bridge servido não tem ${CONTRACT_SELFTEST} (anterior à SAC-156): faça o deploy do bridge (ops/update-bridge.sh)"; return 1' \
     '    echo "OK sem contrato"; return 0' _cc_contract_absent
   [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
   kill "${pid_on}" "${pid_off}" 2>/dev/null; wait "${pid_on}" "${pid_off}" 2>/dev/null
   chmod 0755 "${d}/home" 2>/dev/null; [ -d "${d}/home/h" ] && chmod -R u+rwX "${d}/home/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# migrate-python-service (2026-10-27, D_PY315_SERVICOS_VENV_DEDICADO_1027 e D_PY315_EXECUCAO_POR_OPS_E_OPT_1027): o
+# wrapper core-only que troca o intérprete dos MCPs de grafo pelo CPython 3.15.2 de patch fixo em /opt/onion-python,
+# num venv dedicado com o pino por hash. Cada caso roda o wrapper REAL em MODO DE TESTE DECLARADO
+# (ONION_MIGRATE_PY_TEST=1 + uma raiz de sandbox que prefixa todo caminho de produção) com systemctl, uv e curl FALSOS
+# no PATH, um python FALSO no lugar do /usr/bin/python3 e do intérprete que o uv instala (responde a versão, as libs,
+# o selftest e a paridade conforme os marcadores da bancada) e um /proc falso cujo exe o systemctl falso reaponta no
+# restart, lendo o drop-in. O que se prova: o plan não altera nada; o apply sem --yes recusa; o apply troca e prova; a
+# prova pré-troca que reprova (selftest, paridade) deixa a unit intocada; o rollback volta ao estado anterior; o verify
+# reprova com o intérprete efetivo fora do 3.15.2, com o PATH fora do venv e com o drop-in divergente; o runtime não sai
+# com unit em uso; e o RUNNER_PY daqui é o mesmo do ops/chat-runner.sh. CADA caso tem MUTANTE, provado por _prove_mutation.
+# TETO DECLARADO: o uv, o sudo e o systemd de verdade não rodam aqui; o dogfood do plan e do verify na VPS e o apply do
+# maestro são a prova deles.
+# ---------------------------------------------------------------------------
+run_migrate_python_service_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/migrate-python-service.sh" cr="${REPO_ROOT}/ops/chat-runner.sh"
+  if [ ! -f "${wr}" ]; then record_skip "migrate-python-service: sem ops/migrate-python-service.sh (core-only) — nada a testar"; return; fi
+  command -v flock >/dev/null 2>&1 || { record_skip "migrate-python-service: flock ausente → pulado"; return; }
+  [ "$(id -u)" = 0 ] && { record_skip "migrate-python-service: rodando como root (o wrapper recusa root) → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  local R="${d}/r" F="${d}/f" K="${d}/fk"
+  mkdir -p "${K}"
+  # ── os falsos ──
+  cat > "${d}/fpy" <<'EOF'
+#!/bin/sh
+F="$MP_FAKE"; new=0; case "$0" in */opt/onion-*) new=1 ;; esac
+echo "py$new $*" >> "$F/calls"
+[ "$1" = -I ] && shift; [ "$1" = -B ] && shift
+case "$1" in
+  -c) case "$2" in
+        *"sys.version_info[:3]"*) if [ "$new" = 1 ]; then cat "$F/pyver"; else echo 3.12.3; fi ;;
+        *"import yaml, jsonschema"*) [ -f "$F/deps-bad" ] && exit 1; echo "deps: falso" ;;
+        radar) if [ "$new" = 1 ] && [ -f "$F/radar-diverge" ]; then echo "radar novo"; else echo "radar igual"; fi ;;
+      esac; exit 0 ;;
+  -) c="$(cat)"; case "$c" in *importlib.metadata*) cat "$F/pins" ;; esac; exit 0 ;;
+  *selftest.py) if [ "$new" = 1 ] && [ -f "$F/selftest-fail" ]; then echo "FAIL caso-falso"; echo "TOTAL 3"; exit 1; fi; echo "TOTAL 3"; exit 0 ;;
+  *kg_validate.py) [ -f "$F/validate-rc2" ] && { echo "error: unrecognized arguments: --format"; exit 2; }
+    [ -f "$F/validate-traceback" ] && { echo "Traceback (most recent call last): ImportError: falso"; exit 1; }
+    if [ "$new" = 1 ] && [ -f "$F/parity-diverge" ]; then v=novo; else v=igual; fi; echo "{\"schema_version\": \"kg-ssot.verdict/1\", \"v\": \"$v\"}"; exit 1 ;;
+esac
+exit 0
+EOF
+  cat > "${K}/systemctl" <<'EOF'
+#!/bin/sh
+F="$MP_FAKE"; R="$ONION_MIGRATE_PY_ROOT"; echo "systemctl $*" >> "$F/calls"
+verb="$1"; shift
+case "$verb" in
+  is-active) [ -f "$F/inactive" ] && { echo inactive; exit 3; }; echo active; exit 0 ;;
+  daemon-reload) exit 0 ;;
+  restart) [ -f "$F/restart-fail" ] && exit 1
+    di="$R/etc/systemd/system/$1.service.d/50-python.conf"
+    if [ -f "$di" ] && [ ! -f "$F/stay-old" ]; then a0="$(sed -n 's/^ExecStart=\([^ ][^ ]*\) .*/\1/p' "$di" | tail -1)"; t="$(readlink -f "$a0")"; else t="$R/usr/bin/python3.12"; fi
+    ln -sfn "$t" "$R/proc/4242/exe"
+    # o environ do processo: o PATH do drop-in, a menos que o EnvironmentFile o sobreponha (marcador envfile-path)
+    pa=/usr/bin:/bin; [ -f "$di" ] && [ ! -f "$F/envfile-path" ] && pa="$(sed -n 's/^Environment=PATH=//p' "$di" | tail -1)"
+    printf 'TOKEN=nao-se-imprime\0PATH=%s\0' "$pa" > "$R/proc/4242/environ"; exit 0 ;;
+  show) unit="$1"; shift; props=""; val=0
+    while [ $# -gt 0 ]; do case "$1" in -p) props="$props $2"; shift 2 ;; --value) val=1; shift ;; *) shift ;; esac; done
+    di="$R/etc/systemd/system/$unit.service.d/50-python.conf"
+    case "$unit" in onion-vps-mcp-kg-writer) srv=/home/marcio/mcp-kg/core-writer/ops/mcp-onion-kg-writer/server.py ;; *) srv=/home/marcio/mcp-kg/core-served/ops/mcp-onion-kg/server.py ;; esac
+    for p in $props; do
+      case "$p" in
+        MainPID) v=4242 ;; NRestarts) v=0 ;;
+        ExecStart) case "$unit" in
+            onion-chat@*) if [ -f "$F/runner-oldpy" ]; then a=/usr/bin/python3; else a=/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15; fi
+              v="{ path=$a ; argv[]=$a -I /run/onion-chat-bin/launcher.py ; ignore_errors=no }" ;;
+            *) if [ -f "$di" ]; then l="$(sed -n 's/^ExecStart=\(..*\)$/\1/p' "$di" | tail -1)"; v="{ path=${l%% *} ; argv[]=$l ; ignore_errors=no }"
+               else v="{ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 $srv ; ignore_errors=no }"; fi ;;
+          esac ;;
+        Environment) v=""; [ -f "$di" ] && v="$(sed -n 's/^Environment=//p' "$di" | tr '\n' ' ')" ;;
+        *) v="" ;;
+      esac
+      if [ "$val" = 1 ]; then echo "$v"; else echo "$p=$v"; fi
+    done ;;
+esac
+exit 0
+EOF
+  cat > "${K}/curl" <<'EOF'
+#!/bin/sh
+F="$MP_FAKE"; R="$ONION_MIGRATE_PY_ROOT"
+[ -f "$F/health-down" ] && exit 22
+echo "{\"status\":\"UP\",\"tools\":$(cat "$F/tools")}"
+EOF
+  cat > "${K}/uv" <<'EOF'
+#!/bin/sh
+F="$MP_FAKE"; echo "uv $*" >> "$F/calls"
+case "$1 $2" in
+  "python install") [ -f "$F/uv-fail" ] && exit 1; for k; do :; done; dir="$UV_PYTHON_INSTALL_DIR/$k"; mkdir -p "$dir/bin"
+    cp "$F/fpy" "$dir/bin/python3.15"; chmod 0755 "$dir/bin/python3.15"; ln -sfn python3.15 "$dir/bin/python3"; ln -sfn "$dir" "$UV_PYTHON_INSTALL_DIR/cpython-3.15-linux-x86_64-gnu"; exit 0 ;;
+  "venv --allow-existing") mkdir -p "$5/bin"; ln -sfn "$4" "$5/bin/python"; ln -sfn python "$5/bin/python3"; echo "home = falso" > "$5/pyvenv.cfg"; exit 0 ;;
+  "pip install") [ -f "$F/pip-fail" ] && exit 1; exit 0 ;;
+esac
+exit 9
+EOF
+  chmod +x "${d}/fpy" "${K}/"*
+  # ── o estado padrão: os dois serviços vivos no python do sistema, com a worktree servida limpa ──
+  # o pino falso, com uma linha de MARCADOR que no 3.15 não se instala (o typing-extensions real, achado 1)
+  local MP_REQ; MP_REQ="$(printf 'PyYAML==6.0.3 \\\n    --hash=sha256:aa\njsonschema==4.26.0 \\\n    --hash=sha256:bb\ntyping-extensions==4.16.0 ; python_version < "3.13" \\\n    --hash=sha256:cc')"
+  _mpcode() {  # _mpcode <worktree> <rel do servidor>
+    local c="$1" rel="$2"
+    mkdir -p "${c}/${rel}" "${c}/vendor/kg-ssot/tools" "${c}/vendor/kg-ssot/spec/conformance/fixtures/latest/yaml" "${c}/.claude/validation" "${c}/docs/onion/graph"
+    printf 'TOOLS = {"a": 1, "b": 2}\n' > "${c}/${rel}/server.py"; printf '# selftest falso\n' > "${c}/${rel}/selftest.py"
+    printf '%s\n' "${MP_REQ}" > "${c}/vendor/kg-ssot/tools/requirements.txt"
+    # o validador falso, que o python3 REAL também roda igual ao falso de hoje: a perna que caísse no python3 do sistema
+    # daria "igual" sem medir (o v5 só prova a guarda -x com isto)
+    printf 'print("{\\"schema_version\\": \\"kg-ssot.verdict/1\\", \\"v\\": \\"igual\\"}"); raise SystemExit(1)\n' > "${c}/vendor/kg-ssot/tools/kg_validate.py"; printf 'meta: {}\n' > "${c}/vendor/kg-ssot/spec/conformance/fixtures/latest/yaml/a.kg.yaml"
+    printf '#!/bin/sh\nexec python3 -I -c radar "$@"\n' > "${c}/.claude/validation/kg-radar.sh"; printf 'meta: {}\n' > "${c}/docs/onion/graph/onion-identity-2026-07.kg.yaml"
+    git -C "${c}" init -q -b main && git -C "${c}" add -A && git -C "${c}" -c user.email=t@t -c user.name=t -c commit.gpgsign=false commit -qm base
+  }
+  _mpreset() {
+    rm -rf "${R}" "${F}"; mkdir -p "${R}/usr/bin" "${R}/proc/4242" "${R}/etc/systemd/system" "${R}/var/lib/onion-chat-kg/area" "${F}"
+    cp "${d}/fpy" "${F}/fpy"; cp "${d}/fpy" "${R}/usr/bin/python3"; cp "${d}/fpy" "${R}/usr/bin/python3.12"
+    ln -s "${R}/usr/bin/python3.12" "${R}/proc/4242/exe"; printf 'PATH=/usr/bin:/bin\0' > "${R}/proc/4242/environ"; echo dado > "${R}/var/lib/onion-chat-kg/area/x.kg.yaml"
+    echo 3.15.2 > "${F}/pyver"; echo 2 > "${F}/tools"; printf 'pyyaml==6.0.3\njsonschema==4.26.0\nattrs==26.1.0\n' > "${F}/pins"
+    _mpcode "${R}/home/marcio/mcp-kg/core-served" ops/mcp-onion-kg; _mpcode "${R}/home/marcio/mcp-kg/core-writer" ops/mcp-onion-kg-writer
+  }
+  _mpr() {  # _mpr <script> <args…> → "rc|saída"
+    local w="$1" rc=0 out; shift
+    out="$(cd "${d}" && env PATH="${K}:${PATH}" LC_ALL=C MP_FAKE="${F}" ONION_MIGRATE_PY_TEST=1 ONION_MIGRATE_PY_ROOT="${R}" bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  _mprc() { [ "${1%%|*}" = "$2" ]; }
+  _mphas() { case "${1#*|}" in *"$2"*) true ;; *) false ;; esac; }
+  _mpcalls() { if [ -f "${F}/calls" ]; then grep -c -- "$1" "${F}/calls"; else echo 0; fi; }
+  _mpdi() { echo "${R}/etc/systemd/system/onion-vps-mcp-kg-$1.service.d/50-python.conf"; }
+  _mpexe() { readlink -f "${R}/proc/4242/exe"; }
+  _mpcase() {  # _mpcase <nome> <âncora> <novo> <função do caso>
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    cp "${wr}" "${d}/w.sh"
+    _mpreset; MP_WHY=""; "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "migrate-python-service: ${name}"; else record_fail "migrate-python-service: ${name}" "${MP_WHY:-caso não satisfeito}"; fi
+    cp "${d}/w.sh" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 - "${d}/m.sh" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if s.count(o) == 1:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    _mpreset; "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "migrate-python-service: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  _mprt() { _mpr "$1" runtime apply --yes >/dev/null; }   # o intérprete instalado (pré-condição dos serviços)
+  local VW; VW="${R}/opt/onion-venvs/writer-py3.15.2-$(printf '%s\n' "${MP_REQ}" | sha256sum | cut -c1-12)"
+  # ── os casos ──
+  _mc_rt_plan() { local r; r="$(_mpr "$1" runtime plan)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 0 && _mphas "${r}" "AUSENTE" && [ ! -e "${R}/opt" ] && [ "$(_mpcalls '^uv ')" = 0 ]; }
+  _mc_rt_noyes() { local r; r="$(_mpr "$1" runtime apply)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 1 && _mphas "${r}" "RECUSADO: apply sem --yes" && [ ! -e "${R}/opt" ] && [ "$(_mpcalls '^uv ')" = 0 ]; }
+  _mc_rt_apply() { local r; r="$(_mpr "$1" runtime apply --yes)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 0 && [ -x "${R}/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15" ] && _mphas "$(_mpr "$1" runtime verify)" "verify OK"; }
+  _mc_rt_wrongver() { local r; echo 3.15.1 > "${F}/pyver"; r="$(_mpr "$1" runtime apply --yes)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 1 && _mphas "${r}" "responde '3.15.1', não 3.15.2"; }
+  _mc_rt_inuse() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; r="$(_mpr "$1" runtime rollback --yes)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 1 && _mphas "${r}" "está em uso" && [ -x "${R}/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15" ]; }
+  _mc_plan() { local r b a; _mprt "$1"; b="$(find "${R}/etc" "${R}/opt" | sort)"; : > "${F}/calls"; r="$(_mpr "$1" writer plan)"; MP_WHY="${r:0:400}"
+    a="$(find "${R}/etc" "${R}/opt" | sort)"
+    _mprc "${r}" 0 && _mphas "${r}" "Environment=PATH=${VW}/bin:" && [ "${a}" = "${b}" ] && [ "$(_mpcalls 'systemctl \(restart\|daemon-reload\)')" = 0 ] \
+      && [ "$(_mpcalls '^uv ')" = 0 ]; }
+  _mc_noyes() { local r; _mprt "$1"; : > "${F}/calls"; r="$(_mpr "$1" writer apply)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 1 && _mphas "${r}" "RECUSADO: apply sem --yes" && [ ! -e "$(_mpdi writer)" ] && [ ! -e "${VW}" ] && [ "$(_mpcalls 'systemctl restart')" = 0 ]; }
+  _mc_apply() { local r; _mprt "$1"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:900}"
+    _mprc "${r}" 0 && _mphas "${r}" "OK: onion-vps-mcp-kg-writer no 3.15.2" && grep -qxF "Environment=PATH=${VW}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" "$(_mpdi writer)" \
+      && grep -qxF "ExecStart=${VW}/bin/python /home/marcio/mcp-kg/core-writer/ops/mcp-onion-kg-writer/server.py" "$(_mpdi writer)" \
+      && [ -f "${VW}/.onion-venv-complete" ] && case "$(_mpexe)" in "${R}/opt/onion-python/"*) true ;; *) false ;; esac \
+      && [ "$(find "${R}/backups/onion-chat-kg" -name '*-pre-py3.15.2.tar.gz' -perm 0600 | wc -l)" = 1 ]; }
+  _mc_noruntime() { local r; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 1 && _mphas "${r}" "runtime apply --yes" && [ ! -e "$(_mpdi writer)" ] && [ ! -e "${R}/opt/onion-venvs" ]; }
+  _mc_stfail() { local r; _mprt "$1"; : > "${F}/selftest-fail"; : > "${F}/calls"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 1 && _mphas "${r}" "selftest reprovou no 3.15.2" && [ ! -e "$(_mpdi writer)" ] && [ "$(_mpcalls 'systemctl restart')" = 0 ]; }
+  _mc_parity() { local r; _mprt "$1"; : > "${F}/parity-diverge"; : > "${F}/calls"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 1 && _mphas "${r}" "paridade antes × depois DIVERGE" && [ ! -e "$(_mpdi granaai)" ] && [ "$(_mpcalls 'systemctl restart')" = 0 ]; }
+  _mc_radar() { local r; _mprt "$1"; : > "${F}/radar-diverge"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 1 && _mphas "${r}" "DIVERGE" && [ ! -e "$(_mpdi granaai)" ]; }
+  # o kg_validate que NÃO julga (o vendor antigo sem --format sai rc 2, e um traceback sai rc 1, nas duas pernas):
+  # "igual" seria verde sem medir. A guarda do rc 2 e a da forma do relatório se cobrem uma à outra (defesa dupla, por
+  # isso o rc 2 entra sem mutante próprio); o mutante é o do traceback, que só a forma pega
+  _mc_rc2() { local r; _mprt "$1"; : > "${F}/validate-rc2"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 2 && _mphas "${r}" "não medi a paridade" && [ ! -e "$(_mpdi granaai)" ]; }
+  _mc_traceback() { local r; _mprt "$1"; : > "${F}/validate-traceback"; r="$(_mpr "$1" granaai apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 2 && _mphas "${r}" "não medi a paridade" && [ ! -e "$(_mpdi granaai)" ]; }
+  # o verify ANTES da migração: sem o venv, a perna nova cairia no python3 do sistema e daria "igual" (dogfood de 2026-10-27)
+  _mc_novenv() { local r; _mprt "$1"; r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:600}"
+    _mprc "${r}" 1 && _mphas "${r}" "FALHA paridade não medida: não medi a perna nova"; }
+  _mc_pins() { local r; _mprt "$1"; printf 'pyyaml==6.0.3\n' > "${F}/pins"; r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 1 && _mphas "${r}" "não tem os pinos" && _mphas "${r}" "jsonschema==4.26.0" && [ ! -e "$(_mpdi writer)" ]; }
+  _mc_rollback() { local r b; _mprt "$1"; b="$(find "${R}/etc" | sort)"; _mpr "$1" writer apply --yes >/dev/null; : > "${F}/calls"
+    r="$(_mpr "$1" writer rollback --yes)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 0 && [ "$(find "${R}/etc" | sort)" = "${b}" ] && [ "$(_mpexe)" = "${R}/usr/bin/python3.12" ] && [ "$(_mpcalls 'systemctl restart onion-vps-mcp-kg-writer')" = 1 ]; }
+  _mc_rb_noyes() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; r="$(_mpr "$1" writer rollback)"; MP_WHY="${r:0:300}"
+    _mprc "${r}" 1 && _mphas "${r}" "RECUSADO: rollback sem --yes" && [ -f "$(_mpdi writer)" ]; }
+  _mc_v_oldexe() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; ln -sfn "${R}/usr/bin/python3.12" "${R}/proc/4242/exe"
+    r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:500}"; _mprc "${r}" 1 && _mphas "${r}" "FALHA o processo vivo roda ${R}/usr/bin/python3.12, não o 3.15.2"; }
+  _mc_v_ver() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; echo 3.14.10 > "${F}/pyver"
+    r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:500}"; _mprc "${r}" 1 && _mphas "${r}" "que responde '3.14.10', não 3.15.2"; }
+  _mc_v_path() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; sed -i '/^Environment=PATH=/d' "$(_mpdi writer)"
+    env MP_FAKE="${F}" ONION_MIGRATE_PY_ROOT="${R}" "${K}/systemctl" restart onion-vps-mcp-kg-writer   # o processo renasce sem o PATH
+    r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:500}"; _mprc "${r}" 1 && _mphas "${r}" "FALHA o PATH da unit não começa em ${VW}/bin"; }
+  _mc_v_dropin() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; printf 'Environment=X=1\n' >> "$(_mpdi writer)"
+    r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:500}"; _mprc "${r}" 1 && _mphas "${r}" "FALHA o drop-in DIFERE do renderizado"; }
+  _mc_cr_old() { local r; _mprt "$1"; : > "${F}/runner-oldpy"; r="$(_mpr "$1" chat-runner verify)"; MP_WHY="${r:0:400}"
+    _mprc "${r}" 1 && _mphas "${r}" "FALHA o ExecStart efetivo do runner não é /opt/onion-python/" && _mprc "$(rm -f "${F}/runner-oldpy"; _mpr "$1" chat-runner verify)" 0; }
+  _mc_testguard() { local r; r="$(cd "${d}" && env PATH="${PATH}" MP_FAKE="${F}" ONION_MIGRATE_PY_TEST=1 ONION_MIGRATE_PY_ROOT="${R}" bash "$1" writer plan 2>&1)"; local rc=$?
+    MP_WHY="rc=${rc} ${r:0:300}"; [ "${rc}" = 3 ] && case "${r}" in *"modo de teste exige systemctl FALSO"*) true ;; *) false ;; esac; }
+  _mc_rootguard() { local r; r="$(cd "${d}" && env PATH="${K}:${PATH}" MP_FAKE="${F}" ONION_MIGRATE_PY_TEST=1 ONION_MIGRATE_PY_ROOT=/ bash "$1" writer plan 2>&1)"; local rc=$?
+    MP_WHY="rc=${rc} ${r:0:300}"; [ "${rc}" = 3 ] && case "${r}" in *"raiz de produção"*) true ;; *) false ;; esac; }
+  _mc_reuse_bad() { local r; _mprt "$1"; _mpr "$1" writer apply --yes >/dev/null; _mpr "$1" writer rollback --yes >/dev/null; chmod g+w "${VW}/bin"
+    r="$(_mpr "$1" writer apply --yes)"; MP_WHY="${r:0:300}"; _mprc "${r}" 1 && _mphas "${r}" "tem o marcador mas não é de" && [ ! -e "$(_mpdi writer)" ]; }
+  _mc_v_envfile() { local r; _mprt "$1"; : > "${F}/envfile-path"; _mpr "$1" writer apply --yes >/dev/null
+    r="$(_mpr "$1" writer verify)"; MP_WHY="${r:0:600}"; _mprc "${r}" 1 && _mphas "${r}" "FALHA o PATH da unit não começa em ${VW}/bin (/usr/bin:/bin)" \
+      && ! _mphas "${r}" "nao-se-imprime"; }
+  _mc_envguard() { local r; r="$(cd "${d}" && env ONION_MIGRATE_PY_ROOT="${R}" bash "$1" writer plan 2>&1)"; local rc=$?
+    MP_WHY="rc=${rc} ${r:0:300}"; [ "${rc}" = 3 ] && case "${r}" in *"sem ONION_MIGRATE_PY_TEST=1"*) true ;; *) false ;; esac; }
+  _mpcase "(p1) runtime plan só lê: nada em /opt, nenhum uv" \
+    '      say "o apply --yes faria (como root, por sudo):"' '      priv install -d "${PYROOT}"; say "o apply --yes faria (como root, por sudo):"' _mc_rt_plan
+  _mpcase "(p2) writer plan só lê: /etc e /opt intocados, sem restart nem daemon-reload, e mostra o drop-in com o PATH do venv" \
+    '    say "  drop-in que seria gravado:"' '    priv systemctl daemon-reload; say "  drop-in que seria gravado:"' _mc_plan
+  _mpcase "(a1) runtime apply sem --yes → rc 1, nada instalado" \
+    '[ "${YES}" = 1 ] || { say "RECUSADO: apply sem --yes. Nada foi feito."; "$0" runtime plan; exit 1; }' 'true' _mc_rt_noyes
+  _mpcase "(a2) writer apply sem --yes → rc 1, sem drop-in, sem venv, sem restart" \
+    '[ "${YES}" = 1 ] || { say "RECUSADO: apply sem --yes. Nada foi feito; o que ele faria:"; "$0" "${SVC}" plan; exit 1; }' 'true' _mc_noyes
+  _mpcase "(a3) runtime apply --yes instala o 3.15.2 em /opt e o verify o aceita" \
+    '      priv "${INSTALL_CMD[@]}"; irc=$?' '      irc=0' _mc_rt_apply
+  _mpcase "(a4) runtime que responde outra versão (3.15.1) → rc 1 nomeando a versão" \
+    '  [ "${v}" = "${PY_VERSION}" ] || echo "${PYBASE} responde' '  true || echo "${PYBASE} responde' _mc_rt_wrongver
+  _mpcase "(a5) writer apply --yes: drop-in com o ExecStart do venv e o PATH do venv, processo no 3.15.2 de /opt, backup 0600" \
+    'Environment=PATH=$1/bin:${SYS_PATH}' '# sem o PATH' _mc_apply
+  _mpcase "(a6) writer apply sem o intérprete de /opt → rc 1 pedindo o runtime apply, nada montado" \
+    $'# 1. pré-voo\nneed_runtime' '# 1. pré-voo' _mc_noruntime
+  _mpcase "(a7) selftest que reprova no intérprete novo → rc 1, a unit nem é tocada" \
+    'so="$(run_selftest "${VENV}")" || die 1 "selftest reprovou' 'so="$(run_selftest "${VENV}")" || true "selftest reprovou' _mc_stfail
+  _mpcase "(a8) paridade do kg_validate que diverge entre o intérprete de hoje e o novo → rc 1, a unit nem é tocada" \
+    '[ "${prc}" = 0 ] || { [ "${prc}" = 1 ] && die 1' 'true || { [ "${prc}" = 1 ] && die 1' _mc_parity
+  _mpcase "(a9) paridade do RADAR que diverge → rc 1 (a perna do radar conta, não só a do kg_validate)" \
+    '    "${rc2}" "$(printf '"'"'%s'"'"' "${o2}" | sha256sum | cut -c1-16)"' '    "${rc2}" "x"' _mc_radar
+  _mpcase "(a11) kg_validate que quebra com traceback (rc 1 sem o relatório, nas duas pernas) → rc 2 'não medi a paridade'" \
+    $'  grep -qE \'"schema_version": *"kg-ssot\\.verdict/1"\' <<<"${o1}" || return 2' '  :' _mc_traceback
+  local r11; r11="$(_mpreset; _mc_rc2 "${wr}" && echo OK)"
+  if [ "${r11}" = OK ]; then record_pass "migrate-python-service: (a11b) kg_validate sem --format (rc 2) → rc 2 'não medi a paridade' (defesa dupla com a forma, sem mutante próprio)"
+  else record_fail "migrate-python-service: (a11b)" "${MP_WHY:-caso não satisfeito}"; fi
+  _mpcase "(v5) verify sem o venv → a paridade é NÃO MEDIDA, nunca igual pelo python3 do sistema" \
+    '  [ -x "${bin}/python3" ] || return 2' '  :' _mc_novenv
+  _mpcase "(a10) venv sem um dos pinos do requirements.txt → rc 1 nomeando o pino, sem drop-in" \
+    '[ -z "${miss}" ] || die 1 "o venv não tem os pinos' 'true || die 1 "o venv não tem os pinos' _mc_pins
+  _mpcase "(r1) rollback --yes volta ao estado anterior: /etc igual ao de antes, processo no python do sistema, um restart" \
+    '    priv rm -f -- "${DROPIN}" || die 2' '    true || die 2' _mc_rollback
+  _mpcase "(r2) rollback sem --yes → rc 1, o drop-in fica" \
+    '[ "${YES}" = 1 ] || { say "RECUSADO: rollback sem --yes. Nada foi feito."; exit 1; }
+    take_lock
+    [ -f "${DROPIN}" ]' 'take_lock
+    [ -f "${DROPIN}" ]' _mc_rb_noyes
+  _mpcase "(r3) runtime rollback com um serviço usando o intérprete → rc 1, o intérprete fica" \
+    '[ -z "${users}" ] || die 1' 'true || die 1' _mc_rt_inuse
+  _mpcase "(v1) verify com o processo vivo no python do sistema → rc 1, não o 3.15.2" \
+    '    *) vbad "o processo vivo roda ${exe}, não o ${PY_VERSION} de ${PYDIR}" ;;' '    *) vok "x" ;;' _mc_v_oldexe
+  _mpcase "(v2) verify com o intérprete de /opt respondendo outra versão (3.14.10) → rc 1" \
+    'if [ "${v}" = "${PY_VERSION}" ]; then vok "o processo vivo roda' 'if true; then vok "o processo vivo roda' _mc_v_ver
+  _mpcase "(v3) verify com o PATH da unit fora do venv (o radar julgaria em outro python3) → rc 1" \
+    '*) vbad "o PATH da unit não começa em' '*) vok "o PATH da unit não começa em' _mc_v_path
+  _mpcase "(v4) verify com o drop-in mexido à mão → rc 1" \
+    'if [ "$(cat "${DROPIN}")" = "${want}" ]; then' 'if true; then' _mc_v_dropin
+  _mpcase "(c1) chat-runner verify: o ExecStart efetivo no /usr/bin/python3 → rc 1; no de /opt → rc 0" \
+    '    *) vbad "o ExecStart efetivo do runner não é' '    *) vok "o ExecStart efetivo do runner não é' _mc_cr_old
+  _mpcase "(u1) modo de teste com o systemctl REAL no PATH → rc 3, antes de qualquer chamada" \
+    '    case "${_w}" in "$(dirname -- "${R}")"/*) : ;; *) die 3' '    case "${_w}" in *) : ;; NADA) die 3' _mc_testguard
+  _mpcase "(u3) raiz de sandbox / (o realpath tira a barra) → rc 3, recusada como raiz de produção" \
+    '  case "${R}" in /|/opt|' '  case "${R}" in NADA|/opt|' _mc_rootguard
+  _mpcase "(a12) linha com marcador python_version < 3.13 não é exigida no 3.15 (o typing-extensions real)" \
+    '        if not ops[mm.group(1)](ver, (int(mm.group(2)), int(mm.group(3)))):' '        if False:' _mc_apply
+  _mpcase "(a13) venv com o marcador mas que aceita escrita de grupo → o reuso recusa, sem drop-in" \
+    '[ -z "$(venv_owner_problems "${VENV}")" ] || die 1 "${VENV} tem o marcador' 'true || die 1 "${VENV} tem o marcador' _mc_reuse_bad
+  _mpcase "(v6) o PATH do PROCESSO (um EnvironmentFile o sobrepõe) fora do venv → rc 1, mesmo com o drop-in certo" \
+    '  pe="$(proc_path)"' '  pe="$(systemctl show "${UNIT}" -p Environment --value | sed -n "s/^PATH=//p")"' _mc_v_envfile
+  _mpcase "(u2) ONION_MIGRATE_PY_* sem o modo de teste → rc 3" \
+    "  if compgen -e | grep -E '^ONION_MIGRATE_PY_' >/dev/null; then" '  if false; then' _mc_envguard
+  # (c2) o literal do intérprete do runner é o MESMO nos dois scripts (contrato: template do bridge, allowlist, verify)
+  if [ -f "${cr}" ]; then
+    local a b; a="$(sed -n 's/^RUNNER_PY=//p' "${wr}")"; b="$(sed -n 's/^RUNNER_PY=//p' "${cr}")"
+    if [ -n "${a}" ] && [ "${a}" = "${b}" ] && [ "$(grep -c '^RUNNER_PY=' "${wr}")" = 1 ] && [ "$(grep -c '^RUNNER_PY=' "${cr}")" = 1 ]; then
+      record_pass "migrate-python-service: (c2) RUNNER_PY igual no wrapper e no ops/chat-runner.sh (${a})"
+    else record_fail "migrate-python-service: (c2)" "RUNNER_PY diverge: migrate='${a}' chat-runner='${b}'"; fi
+  fi
+  local r3; r3="$(_mpreset; _mpr "${wr}" chat-runner apply --yes)"
+  if _mprc "${r3}" 3 && _mphas "${r3}" "ops/chat-runner.sh install --apply"; then record_pass "migrate-python-service: (c3) chat-runner apply → rc 3, a troca é do ops/chat-runner.sh"
+  else record_fail "migrate-python-service: (c3)" "${r3:0:200}"; fi
+  unset -f _mpcode _mpreset _mpr _mprc _mphas _mpcalls _mpdi _mpexe _mpcase _mprt
   rm -rf "${d}"
 }
 
@@ -38074,6 +38373,7 @@ _family run_a2a_invite_live_selftests
 _family run_a2a_queue_live_selftests
 _family run_bridge_hardening_selftests
 _family run_chat_runner_selftests
+_family run_migrate_python_service_selftests
 _family run_stt_service_selftests
 _family run_update_bridge_selftests
 _family run_version_drift_selftests

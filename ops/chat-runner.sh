@@ -60,6 +60,12 @@ PROD_BACKUP_DIR=/var/backups/onion-chat-runner
 PROD_SOCKET=/run/onion-chat.sock
 PROD_LOCK=/tmp/onion-update-bridge.lock
 HEALTH_LOCAL="http://127.0.0.1:8787/health"
+# O INTÉRPRETE DO RUNNER (2026-10-27, D_PY315_CHAT_RUNNER_MIGRA_1027): o CPython de patch FIXO de /opt, instalado por
+# ops/migrate-python-service.sh runtime apply (dono root; fora do /home, que o ProtectHome=yes esconde). É CONTRATO em
+# três lugares que mudam juntos: o template do bridge (deploy/chat-runner/onion-chat@.service.in, ExecStart e
+# ExecStopPost), a allowlist de diretivas daqui (validate_units) e a prova do efetivo (effective_props). O mesmo literal
+# vive no ops/migrate-python-service.sh, e a bancada confere que os dois dizem o mesmo. Até 2026-10-27 era /usr/bin/python3.
+RUNNER_PY=/opt/onion-python/cpython-3.15.2-linux-x86_64-gnu/bin/python3.15
 DROPIN_NAME=40-chat-runner.conf
 SOCKET_UNIT=onion-chat.socket
 TEMPLATE_UNIT=onion-chat@.service
@@ -170,6 +176,10 @@ else
 fi
 
 [ "$(id -u)" -eq 0 ] && die 3 "rodando como root: rode como o operador (o wrapper chama sudo onde precisa)"
+
+# o intérprete que o wrapper EXECUTA no host (o pré-voo e o contrato SDK↔lançador, rodado no mesmo python do runner).
+# Na bancada (CI) o /opt não existe: ela usa o /usr/bin/python3, e o literal RUNNER_PY segue o que a allowlist exige
+if [ "${TEST}" = 1 ]; then RUNNER_PY_EXEC=/usr/bin/python3; else RUNNER_PY_EXEC="${RUNNER_PY}"; fi
 
 priv()   { if [ "${TEST}" = 1 ]; then "$@"; else sudo -n "$@"; fi; }
 as_svc() { if [ "${TEST}" = 1 ]; then (cd / && "$@"); else (cd / && sudo -n -u "${SVC_USER}" "$@"); fi; }
@@ -297,9 +307,9 @@ EOF
 validate_units() {
   local f="$1" kind="$2" out rc=0
   out="$(python3 -I - "${f}" "${kind}" "${SOCKET}" "${SVC_USER}" "${GROUP}" "${STATE}" "${CLAUDE_SRC}" "${LIBEXEC}" \
-           "${FENCE_REQUIRED}" "${FENCE_RESOLV_BIND}" "${HOST_ADDRS:-}" <<'PY'
+           "${FENCE_REQUIRED}" "${FENCE_RESOLV_BIND}" "${HOST_ADDRS:-}" "${RUNNER_PY}" <<'PY'
 import sys
-f, kind, sock, svc, grp, state, claude, libexec, freq, fresolv, fhost = sys.argv[1:]
+f, kind, sock, svc, grp, state, claude, libexec, freq, fresolv, fhost, runner_py = sys.argv[1:]
 if kind == "fence":
     # a cerca de rede: só [Service], só IPAddressDeny e o bind do resolv.conf público, e o conjunto EXATO (as faixas
     # exigidas mais os endereços do host medidos agora). Faixa a mais, a menos ou mais larga recusa; IPAddressAllow recusa
@@ -351,8 +361,8 @@ EXACT = {
     "BindPaths": state + "/workspaces " + state + "/chat-homes", "KillMode": "control-group",
     "RuntimeDirectory": "onion-chat/%i", "CollectMode": "inactive-or-failed",
     "Environment": "ONION_CHAT_WS_ROOT=%s/workspaces ONION_CHAT_HOME_ROOT=%s/chat-homes ONION_CHAT_CLAUDE=/run/onion-chat-bin/claude" % (state, state),
-    "ExecStart": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py",
-    "ExecStopPost": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py --fixup",
+    "ExecStart": runner_py + " -I /run/onion-chat-bin/launcher.py",
+    "ExecStopPost": runner_py + " -I /run/onion-chat-bin/launcher.py --fixup",
     "RuntimeMaxSec": "1800", "TimeoutStopSec": "10", "UMask": "0007", "PrivateDevices": "yes",
     "ProtectKernelTunables": "yes", "ProtectKernelModules": "yes", "ProtectKernelLogs": "yes", "ProtectControlGroups": "yes",
     "ProtectClock": "yes", "ProtectHostname": "yes", "RestrictNamespaces": "yes", "RestrictRealtime": "yes",
@@ -466,9 +476,9 @@ check_script() {
   local wg="$1" fence="${2:-0}" ctl="${3:-}" pid
   pid="$(systemctl show -p MainPID --value "${UNIT}" 2>/dev/null)"
   echo 'n_fail=0; ok() { echo "OK $*"; }; bad() { echo "FALHA $*"; n_fail=$((n_fail+1)); }'
-  printf 'svc_uid=%q; home=%q; state=%q; ws=%q; hr=%q; pid=%q; probe=%q; wg=%q; fence=%q; api=%q; targets=%q; ctl=%q\n' \
+  printf 'svc_uid=%q; home=%q; state=%q; ws=%q; hr=%q; pid=%q; probe=%q; wg=%q; fence=%q; api=%q; targets=%q; ctl=%q; runner_py=%q\n' \
     "$(id -u "${SVC_USER}" 2>/dev/null || echo x)" "${SVC_HOME}" "${STATE}" "${WS_ROOT}" "${HOME_ROOT}" "${pid}" "${PROBE_SLUG}" "${wg}" \
-    "${fence}" "${NET_PROBE_API}" "$(net_targets)" "${ctl}"
+    "${fence}" "${NET_PROBE_API}" "$(net_targets)" "${ctl}" "${RUNNER_PY}"
   [ "${fence}" = 1 ] && net_probe_writer
   cat <<'EOS'
 u="$(id -u)"
@@ -506,7 +516,7 @@ if [ "$wg" = 1 ]; then
   done
 fi
 if [ -x /run/onion-chat-bin/claude ]; then ok "o CLI está ligado fora da home (/run/onion-chat-bin/claude)"; else bad "o CLI não está em /run/onion-chat-bin/claude"; fi
-if /usr/bin/python3 -I /run/onion-chat-bin/launcher.py --check-config 2>/dev/null; then ok "o lançador aceita a configuração da unit"; else bad "o lançador recusa a configuração da unit (--check-config)"; fi
+if "$runner_py" -I /run/onion-chat-bin/launcher.py --check-config 2>/dev/null; then ok "o lançador aceita a configuração da unit, no intérprete do runner ($runner_py)"; else bad "o lançador recusa a configuração da unit (--check-config), ou o intérprete do runner ($runner_py) não roda no sandbox"; fi
 # a CERCA DE REDE (opção A do degrau 3). Barrado só prova a cerca onde a perna de CONTROLE (o mesmo sandbox sem ela)
 # viu o alvo aberto ou recusado: timeout sozinho seria qualquer descarte (refutador da cerca, achado 4, medido)
 if [ "$fence" = 1 ]; then
@@ -602,7 +612,7 @@ sdk_contract() {
     echo "FALHA o bridge servido não tem ${CONTRACT_SELFTEST} (anterior à SAC-156): faça o deploy do bridge (ops/update-bridge.sh)"; return 1
   fi
   out="$(as_svc /usr/bin/timeout 180 /usr/bin/env -i PATH=/usr/bin:/bin HOME="${SVC_HOME}" LC_ALL=C \
-    LAUNCHER_PATH="${LIBEXEC}/launcher.py" /usr/bin/python3 -I "${BRIDGE}/${CONTRACT_SELFTEST}" 2>&1)"; rc=$?
+    LAUNCHER_PATH="${LIBEXEC}/launcher.py" "${RUNNER_PY_EXEC}" -I "${BRIDGE}/${CONTRACT_SELFTEST}" 2>&1)"; rc=$?
   if [ "${rc}" = 0 ]; then
     echo "OK o argv do SDK servido, com a política do convidado, passa pelo lançador instalado ($(grep -c '^  ✓' <<<"${out}") asserções)"; return 0
   fi
@@ -664,7 +674,7 @@ effective_props() {
   grep -qx 'User=onion-chat-verify' <<<"${out}" || { echo "    FALHA efetivo: User não é onion-chat-<instância> ($(grep '^User=' <<<"${out}"))"; nf=$((nf+1)); }
   # vazio, o systemctl show nem imprime a linha (medido no dogfood): falha é a linha COM valor
   ! grep -qE '^ExecStart(Pre|Post)=.+' <<<"${out}" || { echo "    FALHA efetivo: há ExecStartPre/ExecStartPost"; nf=$((nf+1)); }
-  grep -q '^ExecStart=.*argv\[\]=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py ;' <<<"${out}" || { echo "    FALHA efetivo: ExecStart não é o lançador"; nf=$((nf+1)); }
+  grep -qF "argv[]=${RUNNER_PY} -I /run/onion-chat-bin/launcher.py ;" <<<"$(grep '^ExecStart=' <<<"${out}")" || { echo "    FALHA efetivo: ExecStart não é o lançador no intérprete do runner (${RUNNER_PY})"; nf=$((nf+1)); }
   grep -qx 'ProtectHome=yes' <<<"${out}" || { echo "    FALHA efetivo: ProtectHome não é yes"; nf=$((nf+1)); }
   # a cerca EFETIVA: com ela, as faixas que o systemd carregou são exatamente as renderizadas (comparadas como conjunto,
   # normalizadas); sem ela, nenhuma (uma faixa vinda de outro lugar mudaria a instância sem passar pela allowlist)
@@ -803,7 +813,14 @@ if [ "${FENCE}" = 1 ] && [ "${TEST}" = 0 ]; then
   priv test -f "${FENCE_RESOLV_SRC}" || die 1 "${FENCE_RESOLV_SRC} ausente: sem ele a cerca corta o DNS (o stub do resolvedor fica fora)"
 fi
 command -v setfacl >/dev/null 2>&1 && command -v getfacl >/dev/null 2>&1 || die 2 "setfacl/getfacl ausentes (pacote acl)"
-[ -x /usr/bin/python3 ] || die 2 "/usr/bin/python3 ausente (o lançador é python)"
+[ -x "${RUNNER_PY_EXEC}" ] || die 2 "${RUNNER_PY_EXEC} ausente (o lançador é python): rode antes ops/migrate-python-service.sh runtime apply --yes"
+_rpv="$("${RUNNER_PY_EXEC}" -I -c 'import sys; print("%d.%d.%d" % sys.version_info[:3])' 2>/dev/null)"
+if [ "${TEST}" = 1 ]; then
+  [ -n "${_rpv}" ] || die 2 "${RUNNER_PY_EXEC} não responde como python"
+else
+  # o patch é o do caminho (cpython-<X.Y.Z>-…): outro patch no mesmo diretório é intérprete trocado sem PR
+  case "${RUNNER_PY}" in */cpython-"${_rpv}"-*) : ;; *) die 2 "${RUNNER_PY_EXEC} responde '${_rpv:-nada}', não o patch do caminho" ;; esac
+fi
 if priv test -e "${SOCKET}" && ! systemctl cat "${SOCKET_UNIT}" >/dev/null 2>&1; then
   die 1 "${SOCKET} já existe e não é do ${SOCKET_UNIT}: recusado"
 fi
