@@ -20,4 +20,8 @@ O mínimo que não se negocia aqui:
   `meta.x_dissect_mode: study` (estudo: para no N2, sem veredito).
 - **Corpus primeiro**: `bash .claude/validation/dissect-census.sh` antes de abrir fonte externa.
 
-Nenhuma dissecação selada ainda — este README é a semente que a lente ancora.
+Em 2026-10-27, `bash .claude/validation/dissect-census.sh --tsv` lista **10 dissecações**, todas
+com estado `veredito` (o veredito conta): chatgpt-intelligent-ui, conductor, rea-method e superpowers
+no N4; ai-front, anarlog, cedar, cortex, duolingo-actor e vexa no N3. O Superpowers só voltou a contar
+nesse dia: antes saía `veredito-SEM-SUPERACAO`, porque a triagem era anterior à exigência de
+superação e critério. A contagem envelhece, então rode o censo em vez de confiar neste número.

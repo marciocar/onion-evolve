@@ -79,7 +79,7 @@ nodes:
     confidence: 0.8
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "peer-ref-check.sh onion-curation docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml#D_DUOLINGO_ACTOR_VERDICT: EXISTE na origin/main do par @ f2118c198678; o grafo lido ali pelo PyYAML tem 15 nós, o veredito em costurar e status done (verified_at 2026-10-27), e os 6 nós de apoio citados com o mesmo status de antes"
+    verified_against: "peer-ref-check.sh onion-curation docs/evolution/dissect/duolingo-actor-2026-10/duolingo-actor-2026-10.kg.yaml#D_DUOLINGO_ACTOR_VERDICT: EXISTE na origin/main do par @ f2118c198678; o grafo lido ali pelo PyYAML tem 15 nós, o veredito em costurar e status done (verified_at 2026-10-27), e os 6 nós de apoio citados presentes (4 open, 2 confirmed)"
     source_tier: 8
     source_kind: primary-repo
     label: "A leitura da triagem se confirma na re-medida: o veredito da curadoria segue costurar, no limite da nota 7. O único detalhe que andou é o status: o nó de decisão de lá passou de open a done depois do selo deste grafo."
