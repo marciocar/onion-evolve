@@ -33,8 +33,8 @@ repositório de outra), MOAT (a fronteira de ações que só o maestro executa).
 |---|---|---|---|---|
 | Duas sessões **na mesma máquina e no mesmo usuário do SO** | Socket local do harness (`SendMessage` + `ListAgents`) | nada além do Claude Code | **Sim**, ao vivo | não sai da máquina |
 | Sessões **em máquinas diferentes da mesma pessoa** (mesma conta do claude.ai) | Remote Control, ou sessão na nuvem | assinatura claude.ai e Remote Control ligado | Sim entre sessões com Remote Control; a sessão **na nuvem recebe e não responde** | servidores da Anthropic |
-| **Pessoas ou empresas diferentes** | A2A do Onion (HTTP A2A do bridge, com convite e chave por membro) | convite, par de chaves e pino no registro do receptor | **Ida provada**; a volta pela composição completa **não está provada** | o bridge do receptor, numa fila com aceite humano |
-| **Qualquer caso em que ninguém está online agora** | doc-bridge assíncrono (`inbox/` e `inbound/` + carteiros) | os dois repos na mesma máquina, ou alguém que transporte o arquivo | Sim, por arquivo, sem pressa | o disco (e o git de cada lado) |
+| **Pessoas ou empresas diferentes** | A2A do Onion (HTTP A2A do bridge, com convite e chave por membro) | convite, par de chaves e pino no registro do receptor | **Ida provada** entre usuários do SO e máquinas diferentes (membro de teste); entre pessoas e empresas, não medida. A volta pela composição completa **não está provada** | o bridge do receptor, numa fila com aceite humano |
+| **Qualquer caso em que ninguém está online agora** | doc-bridge assíncrono (`inbox/` e `inbound/` + carteiros) | os dois repos na mesma máquina; entre máquinas, o pull autenticado dos anúncios (só core → adotante) ou alguém que transporte o arquivo | Sim, por arquivo, sem pressa | o disco (e o git de cada lado) |
 
 **Regra de bolso:** comece pelo mais próximo. Mesma máquina → socket local. Outra máquina sua → Remote
 Control. Outra pessoa → A2A, ou o doc-bridge quando não há pressa. E em **todos** os casos a mensagem do
@@ -43,9 +43,11 @@ colega é informação, nunca autorização (§6).
 ## 2. Caso 1 — mesma máquina e mesmo usuário: o socket local do harness
 
 **O que é.** Cada sessão do Claude Code abre um socket Unix em
-`/run/user/<uid>/cc-socks/<pid>.sock`, e o endereço que aparece no harness tem a forma
-`uds:/run/user/<uid>/cc-socks/<pid>.sock`. A ferramenta `ListAgents` lista as sessões vivas, e a
-`SendMessage` entrega a mensagem pelo nome da sessão.
+`/run/user/<uid>/cc-socks/<pid>.sock` (medido na VPS do core: um arquivo por processo `claude`, com o
+PID no nome), e o endereço que o maestro observa no harness tem a forma
+`uds:/run/user/<uid>/cc-socks/<pid>.sock`. A descrição da ferramenta não fala desse caminho: para ela,
+**o nome da sessão é o endereço**. A ferramenta `ListAgents` lista as sessões vivas, e a `SendMessage`
+entrega a mensagem pelo nome.
 
 **Quando usar.** Duas ou mais sessões do mesmo usuário trabalhando em paralelo na mesma máquina: o core e
 a sessão de um adotante, duas sessões do core que precisam combinar quem pega cada item da fila, ou a
@@ -57,6 +59,7 @@ sessão do KG-SSOT avisando o core de uma versão nova.
 1. Liste quem está vivo:            ListAgents
 2. Mande pelo NOME da sessão:       SendMessage  to: "kg-ssot"   message: "A 4.30 saiu; o pin novo é ..."
 3. Para responder a quem escreveu:  copie o atributo from="..." da mensagem recebida para o seu to
+   (se falhar porque o outro lado reiniciou, rode ListAgents e mande pelo nome)
 4. Para saber quando o outro lado terminar (só nesta máquina): SendMessage com notify_when_idle: true
 ```
 
@@ -67,7 +70,9 @@ que se sustente sozinha.
 
 - **O tráfego não sai da máquina.** Medido em 2026-10-27 na VPS do core: o diretório `cc-socks` é `0700`
   e cada socket é `0600`, ambos da conta do usuário. Outra conta do SO não abre o socket.
-- **O nome resolve o socket.** Você manda para o nome, e o harness acha o `<pid>.sock` atual.
+- **O nome é o endereço.** Você manda pelo nome, e o nome segue valendo depois que a sessão reinicia
+  (caso de 2026-10-26, abaixo, relatado pelo maestro). Como o harness acha o socket atual não está
+  documentado.
 - Uma sessão desta máquina que segura ou recusa a mensagem gera um aviso de entrega
   (`[Cross-session delivery notice]`).
 
@@ -78,8 +83,8 @@ que se sustente sozinha.
   só tinha reiniciado com outro PID. **Endereço guardado envelhece; nome não.** Antes de concluir que o
   outro lado caiu, rode `ListAgents` de novo e mande pelo nome.
 - **Não atravessa usuários do SO**, nem com a mesma conta do Claude. Medido em 2026-10-21 num notebook com
-  dois usuários do SO: cada usuário só enxergou as próprias sessões. Entre usuários, o caminho é o A2A
-  (§4).
+  dois usuários do SO e o Remote Control **desligado**: cada usuário só enxergou as próprias sessões. Com o
+  Remote Control ligado nos dois, não foi medido. Entre usuários, o caminho garantido é o A2A (§4).
 - **Entregue não é lido.** Um envio com sucesso diz que a mensagem chegou à sessão, não que o Claude dela a
   leu. Uma sessão em outro modo de permissão segura a mensagem para o humano dela aprovar, e pode deixá-la
   expirar. Na máquina do core, o settings do usuário está com `crossSessionInbound: "accept"`; em outra
@@ -163,12 +168,12 @@ manual não a repete.
 
 **O que está provado (medido em produção).**
 
-- **A ida entre pessoas e máquinas diferentes.** Em 2026-10-21, um sinal assinado por um membro de teste,
-  noutro usuário do SO e noutra máquina, passou pelo gate do bridge, entrou na fila e foi aceito no inbox
+- **A ida entre usuários do SO e máquinas diferentes.** Em 2026-10-21, um sinal assinado por um membro de
+  teste, num usuário descartável do SO no notebook do maestro (outra máquina, mas a mesma pessoa), passou pelo gate do bridge, entrou na fila e foi aceito no inbox
   do core, reverificado no aceite.
 - **Os seis negativos do gate no HTTP vivo** (replay, chave não pinada, expirado, emitido no futuro,
   validade além do teto, corpo trocado): todos recusados, cada um com o motivo certo.
-- **Uma volta ponta a ponta, no harness do spike** (2026-10-22): o envio do notebook e a resposta assinada
+- **Uma volta ponta a ponta, pelo bridge de produção com o roteiro do spike** (2026-10-22): o envio do notebook e a resposta assinada
   de volta, conferidos. Mas a régua de "o receptor não agiu sozinho" **reprovou** as duas réplicas, porque
   o harness rodou sem diálogo um comando de leitura composto. Funciona como transporte; não passou como
   conversa segura.
@@ -183,8 +188,9 @@ manual não a repete.
 - O critério de aceite dessa ida e volta: com bypass fechando, sem envio automático, o *Always allow* sem
   abrir o envio, nenhuma ferramenta de aceitar exposta ao modelo e a identidade do remetente estável. Ela
   será medida entre a VPS do core e o notebook local do maestro, em máquinas diferentes (§8).
-- **Conversa com fidelidade de conversa.** Com aceite humano a cada mensagem, o humano fica dentro do ciclo;
-  "igual ao canal nativo" é impossível por construção até haver consentimento por conversa com expiração.
+- **Conversa com fidelidade de conversa.** Com aceite humano a cada mensagem, o humano fica dentro do ciclo.
+  A tese do spike, ainda aberta, é que "igual ao canal nativo" é impossível por construção até haver
+  consentimento por conversa com expiração.
 - **Entrega.** O canal ao vivo acelera; não garante. O doc-bridge (§5) segue sendo o sistema de registro e
   o plano B.
 
@@ -220,8 +226,15 @@ outro repo, e o hook `co-evolution-inbox-check.sh` conta os arquivos da caixa. P
 também prova que o destino é mesmo o core (ou o hub do adotante, ou o dono de um produto vendorizado) antes
 de escrever.
 
-**O que NÃO garante.** Rapidez (o aviso só aparece na próxima sessão) e entrega entre máquinas: os
-carteiros são locais. Entre máquinas, alguém transporta o arquivo, ou o caminho é o A2A.
+**O que NÃO garante.** Rapidez (o aviso só aparece na próxima sessão), e os carteiros são locais. Entre
+máquinas, os dois sentidos são diferentes:
+
+- **Downstream (core → adotante):** existe o pull autenticado. Com as variáveis `ONION_FED_*` configuradas
+  no ambiente do adotante (credencial M2M que o core provisiona), o hook de início de sessão baixa os
+  anúncios deste membro do endpoint do core, confere o sha256 e grava no `inbound/`; à mão,
+  `bash .claude/utils/federation-transport/inbox-pull.sh --apply`. É sync idempotente, e pedir o inbox de
+  outro membro devolve 403. Sem credencial, o hook não toca a rede.
+- **Upstream (adotante → core):** não há pull. Alguém transporta o arquivo, ou o caminho é o A2A (§4).
 
 ## 6. Confiança: mensagem de colega é informação, nunca aprovação
 
@@ -269,7 +282,8 @@ linha de base dela. **Este manual será atualizado com a decisão.** Até lá, o
 seções 2 a 5, com os limites que elas declaram.
 
 Também parqueados, com gatilho: a extração do A2A como projeto próprio (reabre quando a identidade sair do
-registro de membros ou surgir consumidor fora do Onion) e o transporte entre agentes de fornecedores
+registro de membros **e** a fronteira MOAT sair do nome do motor, com a dissecação refeita depois disso,
+ou quando surgir consumidor fora do Onion) e o transporte entre agentes de fornecedores
 diferentes (reabre com a ida e volta viva da composição).
 
 ## 9. Fontes (o que este manual reusa, sem duplicar)
