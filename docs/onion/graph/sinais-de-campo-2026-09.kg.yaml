@@ -11,6 +11,12 @@ meta:
 # contra os .kg.yaml rastreados NESTE repo (integrity.dangling-external), e o grafo do par não é um deles.
 # A ligação com ele vai por texto conferido (peer-ref-check) no nó.
 external_edges:
+  # decisão do maestro de 2026-10-27 (/meta:decide): a direção do design como 4ª dimensão supera EM PARTE a opção D
+  # do estudo de infra da VPS. CONSTRAINS, não SUPERSEDES: lá o candidato era a infra, e a recusa foi por falta de
+  # evidência; o veredito sobre aquele candidato fica de pé.
+  - from: D_DESIGN_QUARTA_DIMENSAO_DIRECAO_1027
+    to: "docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml#C_OPCAO_D_QUARTA_DIMENSAO"
+    edge_type: CONSTRAINS
   - from: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026"
     to: D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026
     edge_type: SUPPORTS
@@ -1214,6 +1220,56 @@ nodes:
       locator: ".claude/validation/lint-selftest.sh (run_a2a_rt_selftests); dogfood com o install-a2a-rt.sh no scratchpad da sessão"
       method: "medição: bancada com mutantes e uma sessão real do Claude Code julgada pelo juiz de tentativas"
       locality: "repo"
+  - id: Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo de design inteiro roda, da entrada à saída, com as ligações checadas por lint e dois adotantes usando."
+    narrative: |-
+      Nasce do selo de 2026-10-27 que fixou a direção (o design SERÁ a 4ª dimensão) e deixou a doutrina parada até a medida. Enquanto esta pergunta estiver aberta, o CLAUDE.md e os docs seguem dizendo três dimensões, e a frase da promoção "provisória e gated" do design-context fica como está.
+      Critérios, todos medidos na origin/main do core, cada um com o comando que o confere (rc 0 = cumprido):
+      (1) Entrada, o setup: `test -f .claude/commands/design/setup.md` (hoje rc 1: o comando não existe; o brief existe em docs/design-context/brief.md).
+      (2) Skill resolvedora do contexto de design, irmã das três de domínio: `test -f .claude/skills/onion-design-context/SKILL.md` (hoje rc 1).
+      (3) Auditoria de frescor cobrindo o design: `grep -q 'docs/design-context' .claude/commands/meta/context-freshness.md` E o design-context como domínio na métrica `.claude/validation/context-freshness-metric.sh` (hoje a métrica não o cita).
+      (4) Ligações com business-context e technical-context checadas por lint: uma guarda de lint que reprova o design-context sem a ligação, com caso de mutante no lint-selftest.sh (hoje não existe; o protótipo de checador de ligações está no estudo de setup de design da curadoria, num repositório sintético).
+      (5) Saída, identidade, deck e componentes: um projeto real percorre /design:identity, /design:generate e /design:deck a partir do setup, e `bash .claude/validation/lint-design-tokens.sh <projeto>` sai 0 sobre o design-context gerado (o gate existe; o percurso inteiro a partir do setup nunca rodou).
+      (6) Dois adotantes usando: dois repos do members.yaml com docs/design-context/ na origin/main deles passando no `lint-design-tokens.sh` e com saída do ciclo (deck ou componentes na identidade). Os projetos de gamificação do maestro contam como uso. Medido no disco em 2026-10-27, sem conferir a origin/main: docs/design-context/ existe em jogo-da-vida e em portal-gamificacao (este registrado no members.yaml); o lint deles não foi rodado nesta rodada.
+      Fecha quando os seis critérios saírem rc 0 na mesma medição; então a mudança da doutrina vai ao maestro, que a sela. Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar.
+    trace: "docs/design-context/README.md"
+  - id: Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Como o core constrói o design-context como contexto de primeira classe (setup, skill resolvedora, auditoria de frescor e ligações checadas por lint com business-context e technical-context), a partir do estudo de setup de design da curadoria?"
+    narrative: |-
+      É o trabalho que a direção selada em 2026-10-27 manda começar já, antes do gatilho da doutrina. Entrada: o estudo da curadoria design-setup-2026-10 (pergunta Q_DESIGN_SETUP e proposta D_DESIGN_SETUP_PROPOSAL), que desenha um /design:setup levando o projeto do zero ao docs/design-context/ preenchido, com tokens DTCG que passam no lint-design-tokens.sh, e ao deck na identidade do projeto. Conferido por peer-ref-check em 2026-10-27: o grafo do estudo NÃO está na origin/main da curadoria @ 8d64aef (está em voo numa worktree dela); a ligação é por texto até ele chegar à main, e quem constrói confere de novo antes de citar.
+      Fecha quando as quatro peças estiverem na origin/main do core, cada uma pelo comando do critério correspondente da pergunta do gatilho (critérios 1 a 4 de Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027). Construir cada peça passa pelo /meta:forge, medindo antes o que já existe. Criada à mão, pelo mesmo motivo da pergunta do gatilho.
+    trace: ".claude/commands/design/README.md"
+  - id: D_DESIGN_QUARTA_DIMENSAO_DIRECAO_1027
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Selar a direção, com gatilho»"
+    label: "O design SERÁ a 4ª dimensão do Onion, ao lado de produto, engenharia e compliance, pela ligação e pela influência que tem sobre as outras. O design-context se constrói já como contexto de primeira classe; a doutrina das três dimensões só muda quando o gatilho medido disparar."
+    narrative: |-
+      Selado por /meta:decide em 2026-10-27: escolhida «Selar a direção, com gatilho»; descartadas: «Selar como dimensão já» · «Só contexto de primeira classe» · «Depois».
+      O motivo é o mesmo que fez do compliance uma dimensão: o design se liga às outras e as influencia (a identidade nasce do contexto de negócio e se materializa no técnico). O que começa já: o design-context como contexto de primeira classe, com setup, skill resolvedora, auditoria de frescor e ligações com business-context e technical-context checadas por lint (pergunta Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027). O que espera: a doutrina. O CLAUDE.md e os docs que dizem três dimensões não mudam até o gatilho medido disparar (pergunta Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027): o ciclo completo funcionando, da entrada (setup e brief) à saída (identidade, deck e componentes), com as ligações checadas e dois adotantes usando; os projetos de gamificação do maestro contam como uso. Este nó é o registro; a frase do CLAUDE.md sobre a promoção provisória e gated do design-context fica como está.
+      Supera EM PARTE a OPÇÃO D do estudo de infraestrutura da VPS (C_OPCAO_D_QUARTA_DIMENSAO, em docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml), ligada por external_edges com CONSTRAINS e não SUPERSEDES: aquele nó recusou uma 4ª dimensão de INFRA, outro candidato, por falta de evidência de mercado e de adotante, e não por mérito. Sobre o candidato dele o veredito segue de pé; o que cai é lê-lo como "o Onion não terá 4ª dimensão". A restrição dele (E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES, a doutrina selada das três dimensões e o pull-not-push) é respeitada aqui pelo próprio gatilho: a doutrina só muda com dois adotantes usando.
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-27: «Design como 4ª dimensão do Onion, ao lado de produto, engenharia e compliance?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-27"
+      locality: "pessoa"
 edges:
   - from: E_INDICE_DE_LEITURA_PELO_RESOLVED_TARGETS_1024
     to: Q_INDICE_DE_LEITURA_PELO_KG_TRACE_4251
@@ -1437,3 +1493,12 @@ edges:
   - from: E_KG_SSOT_433_ADOTADA_1027
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
     edge_type: SUPPORTS
+  - from: Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027
+    to: Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027
+    edge_type: SUPPORTS
+  - from: D_DESIGN_QUARTA_DIMENSAO_DIRECAO_1027
+    to: Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027
+    edge_type: TRACES_TO
+  - from: D_DESIGN_QUARTA_DIMENSAO_DIRECAO_1027
+    to: Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027
+    edge_type: TRACES_TO
