@@ -2,7 +2,8 @@
 branch: fix/migrate-python-venv-copy-perms
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3d4e9f1739caccfd443170310ced97e4ed3bd6939b748aa5b7f3b408a1e6d13a
+reviewed_code_sha256: ccb98b611d2b52890b3342c0a9c89e034a0183fabd25d7f7c6433d9f24d72ed5
 findings_total: 9
 findings_real: 9
 tokens: 146220
