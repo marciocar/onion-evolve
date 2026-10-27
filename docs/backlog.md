@@ -959,6 +959,12 @@
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
 
+## sinais-de-campo-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
+
 ## conductor-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1081,12 +1087,6 @@
 |--:|---|---|---|
 | 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
 | 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
-
-## sinais-de-campo-2026-09 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
 
 ## vexa-2026-10 — 2 item(ns)
 

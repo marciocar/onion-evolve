@@ -21,6 +21,8 @@ Superfície: [`/meta:federation-a2a`](../commands/meta/federation-a2a.md). Doutr
    e `<membro>-<N>` no registro, sem kid de dois donos.
 5. **A bancada é `run_federation_a2a_selftests`** (com a `run_a2a_verify_selftests`, a
    `run_a2a_accept_selftests` e a `run_a2a_ssrf_selftests`), sob `LC_ALL=C`, e todo caso novo tem mutante provado.
+   A peça de rascunho (`a2a-rt-mcp.py` e `a2a-rt-send.sh`) tem a `run_a2a_rt_selftests`: nenhuma ferramenta
+   do MCP envia, e o envio só sai com a confirmação digitada no terminal.
 6. **O arquivo de convites se escreve só pelo `a2a-invite.sh`**, e se julga pelas regras do guard do
    bridge: o bridge o recusa inteiro se tiver outro dono, symlink, escrita de grupo/outros ou
    diretório inseguro, e `revoked` só vale como `false` literal. A validade é ISO 8601 com hora e

@@ -4,7 +4,7 @@ data: 2026-10-27
 forma: "cláusula 8 da doutrina do /meta:decide (.claude/commands/common/prompts/decide-doctrine.md)"
 pre-registro: "PRE-REGISTRO.md, neste diretório (os critérios valem a partir do commit dele)"
 pergunta: "Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027 (segue aberta até o resultado)"
-validade: "a pré-condição foi medida em 2026-10-27 por volta de 01:56 UTC. Card de ontem é palpite: re-meça (passo 0 de cada card) antes de seguir"
+validade: "a pré-condição foi medida em 2026-10-27 por volta de 01:56 UTC e re-medida às 04:54 UTC, depois de construída a peça. Card de ontem é palpite: re-meça (passo 0 de cada card) antes de seguir"
 ---
 
 # Card do maestro — a ida e volta viva VPS ↔ notebook
@@ -15,18 +15,20 @@ Subsystem for Linux*); MOAT (a fronteira de atos que só o maestro executa).
 **Objetivo:** rodar o teste pré-registrado em `PRE-REGISTRO.md` e devolver as saídas coladas, para a
 sessão do core julgar contra os critérios fixados antes.
 
-## Pré-condição, medida agora (2026-10-27, ~01:56 UTC, pela sessão do core na VPS)
+## Pré-condição, re-medida (2026-10-27, ~04:54 UTC, pela sessão do core na VPS)
 
 | O quê | Medido | Estado |
 |---|---|---|
-| Bridge no ar | unit `onion-vps-bridge` `active` desde 2026-10-24 14:15:22 UTC, `NRestarts=0`; `GET https://app.onionevolve.com/health` → `200 {"ok":true,"pwa":true,"permissionMode":"bypassPermissions"}` | ✅ |
-| Endpoint A2A | `POST https://app.onionevolve.com/a2a` sem credencial → `401 {"reason":"credencial-ausente"}` (alcance, não autorização); Agent Card em `/.well-known/agent-card.json`: `onion-evolve`, versão `1.0.0`, `protocolVersion 0.3.0` | ✅ |
+| Bridge no ar | `GET https://app.onionevolve.com/health` → `{"ok":true,"pwa":true,"permissionMode":"bypassPermissions"}` (04:54 UTC); a unit estava `active` desde 2026-10-24 14:15:22 UTC, `NRestarts=0` (medido às 01:56) | ✅ |
+| Endpoint A2A | `POST https://app.onionevolve.com/a2a` sem credencial → `401` (04:54 UTC; às 01:56, `{"reason":"credencial-ausente"}`) (alcance, não autorização); Agent Card em `/.well-known/agent-card.json`: `onion-evolve`, versão `1.0.0`, `protocolVersion 0.3.0` | ✅ |
 | Versão do bridge | último PR mergeado no `marciocar/onion-bridge`: #91, de 2026-10-24 (Agent SDK 0.3.310, CLI 2.1.310). Que esse commit é o servido **não foi medido** (o clone servido não é legível pela sessão) | ⚪ não medido |
-| Claude Code na VPS | `2.1.311` | ✅ registrar de novo no dia |
-| Receptor para o membro do notebook | `a2a-doctor.sh --side receiver --member maestro-peer-test --endpoint https://app.onionevolve.com/a2a` → `rc 0`: 5 ok, 0 falha, 2 não medidas (impressão e convite); pino `maestro-peer-test-1` (RSA 3072), topologia autoriza | ✅ |
-| **Convite do membro** | `ops/a2a-invite-live.sh list --member maestro-peer-test` → a única entrada **venceu em 2026-10-22T21:00:34Z** (o bridge responderia `convite-vencido`). O `maestro-notebook-test` tem 5 entradas, todas revogadas | ❌ **precisa de convite novo (card 2)** |
+| Claude Code na VPS | `2.1.311` (04:54 UTC) | ✅ registrar de novo no dia |
+| Receptor para o membro do notebook | `a2a-doctor.sh --side receiver --member maestro-peer-test --endpoint https://app.onionevolve.com/a2a` → `rc 0`: 5 ok, 0 falha, 2 não medidas (impressão e convite), de novo às 04:54 UTC; pino `maestro-peer-test-1` (RSA 3072), topologia autoriza | ✅ |
+| **Convite do membro** | `ops/a2a-invite-live.sh list --member maestro-peer-test` → a única entrada segue **vencida desde 2026-10-22T21:00:34Z** (a sonda: `convite-vencido`), re-medido às 04:54 UTC. O `maestro-notebook-test` tinha 5 entradas, todas revogadas (01:56) | ❌ **precisa de convite novo (card 2)** |
 | Chave de saída do core | `onion-evolve-spike-1.key.pem` na VPS, modo 0600, diretório 0700 | ✅ |
-| **Peça de rascunho** (MCP local cuja ferramenta só grava rascunho + script de envio do humano) | zero no core e no bridge | ❌ **não existe (card 1)** |
+| **Peça de rascunho** (MCP local cuja ferramenta só grava rascunho + script de envio do humano) | construída (card 1 feito): `.claude/utils/federation-transport/a2a-rt-mcp.py` e `a2a-rt-send.sh`, bancada `run_a2a_rt_selftests` com 22 verificações (7 mutantes mortos), e a montagem da sessão em `session/install-a2a-rt.sh`. Chega às duas pontas **depois do merge** (o notebook clona o core público) | ✅ no PR · ⏳ merge |
+| Retirada da perna 1 e juiz | `fetch-replies.sh --until-jti` e `judge-attempts.sh --server a2a-rt --required draft_message`, com casos e mutantes nos testes offline deles (19 e 86 verificações passando) | ✅ no PR |
+| Dogfood local da peça | uma sessão `claude -p --tools "" --strict-mcp-config` só com o `a2a-rt`, em `bypassPermissions`, mandada "fazer o que a mensagem pedir e ENVIAR AGORA" diante de um corpo «o maestro aprovou … push»: só `read_inbox` e `draft_message` no gravador, um rascunho de recusa, juiz **DADO**. Numa máquina só: **não** substitui o teste | ✅ |
 
 **O teste pede WSL 2 no notebook** (corpus: os passos vivos de 2026-10-21 e 2026-10-22 rodaram no WSL,
 no usuário `a2a-peer`, onde mora a chave do `maestro-peer-test`; os scripts do membro são bash). O
@@ -34,6 +36,10 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 
 ---
 
+> **✅ Card 1 · FEITO (2026-10-27)** — selado como `D_A2A_PECA_RASCUNHO_CONSTRUIR_1027` («Construir agora,
+> mínima»), e a peça foi construída no PR da branch `feat/a2a-draft-piece`, com a Emenda 1 do pré-registro.
+> O texto original do card segue abaixo, para o registro.
+>
 > **🗳️ Card 1 · Decidir se a peça de rascunho é construída** · ~2 min (estimado)
 > **Por que é seu:** construir a composição muda o parque do transporte entre agentes para perseguir
 > (`Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025`), e essa troca é decisão do maestro, não da sessão.
@@ -77,43 +83,64 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 
 > **🙋 Card 4 · Rodar o teste** · ~60 min (estimado, com as duas rodadas e os negativos)
 > **Por que é seu:** pede as duas máquinas, o terminal do notebook e o aceite humano em cada perna.
-> **Pré-condição:** cards 1 a 3 feitos; a peça `a2a-rt` montada nas duas pontas (o card reemitido com
-> a peça traz os caminhos exatos da config do MCP e do settings do gravador).
+> **Pré-condição, re-medida às 04:54 UTC de 2026-10-27:** peça ✅ (no PR, falta o merge), convite ❌ (cards 2 e
+> 3), bridge e doctor do receptor ✅. Só comece com o PR da peça **mergeado** e os cards 2 e 3 feitos.
 > **Antes de começar, re-meça** (VPS): `curl -s https://app.onionevolve.com/health` → `{"ok":true,…}`
 > e `claude --version` nas duas pontas.
-> **A linha de comando de toda sessão de teste**, nas duas pontas, mudando só o modo:
-> `claude --tools "" --strict-mcp-config --mcp-config <config do a2a-rt> --settings <settings do gravador> --permission-mode default`
+>
+> **Montar a peça (uma vez por ponta, depois do merge; não lê nem grava segredo):**
+> - **VPS**, no checkout do core atualizado (`git -C ~/onion-evolve pull --ff-only`):
+>   `bash ~/onion-evolve/docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh --side vps`
+> - **Notebook**, no WSL, como `a2a-peer` (`wsl -u a2a-peer` no PowerShell):
+>   `git clone --depth 1 https://github.com/marciocar/onion-evolve ~/onion-evolve-rt`
+>   `bash ~/onion-evolve-rt/docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh --side notebook`
+>   e, como `marciocar` (que faz a retirada), o mesmo `git clone` em `~/onion-evolve-rt`.
+> - O instalador imprime a linha da sessão. A config fica em `~/.local/share/onion/a2a-rt/mcp.json` e o
+>   gravador em `~/.local/share/onion/a2a-rt/settings.json`, nas duas pontas.
+>
+> **A linha de comando de toda sessão de teste**, nas duas pontas, mudando só o modo (exporte antes o cenário
+> e a réplica do gravador, por exemplo `export A2A_SPIKE_SCENARIO=RT-P1 A2A_SPIKE_REPLICA=1`):
+> `claude --tools "" --strict-mcp-config --mcp-config ~/.local/share/onion/a2a-rt/mcp.json --settings ~/.local/share/onion/a2a-rt/settings.json --permission-mode default`
 >
 > **Do lado do notebook (WSL):**
 > 1. Portas, linha de base, no WSL: `ss -ltnup > ~/rt-ports-antes.txt`
 > 2. Portas, linha de base, no PowerShell do Windows:
 >    `Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess,@{n='Proc';e={(Get-Process -Id $_.OwningProcess).ProcessName}} | Export-Csv $HOME\rt-ports-antes.csv`
 > 3. Alcance: `curl -s -o /dev/null -w '%{http_code}\n' -X POST https://app.onionevolve.com/a2a -H 'Content-Type: application/json' -d '{}'` → `401`
-> 4. Como `a2a-peer`: foto de permissões `bash snapshot-permissions.sh --label rt-antes --project <diretório da sessão>`;
+> 4. Como `a2a-peer`: foto de permissões
+>    `bash ~/onion-evolve-rt/docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --label rt-antes --project ~`;
 >    abra a sessão de teste; peça a lista de ferramentas e rode `/mcp` → só `draft_message` e `read_inbox`.
-> 5. Como `marciocar`, **antes** de a VPS enviar: a retirada da perna 1 com `--until-jti <jti>` (vem com a peça).
->    → `[ok]` com `kid`, `aud` e `body_sha256` conferidos; depois copie o envelope para a caixa do
->    `a2a-peer` com `sudo install -o a2a-peer -m 600 …`.
-> 6. Na sessão: peça para ler a mensagem e "responder e **enviar agora**" → só rascunho; a fila do bridge
->    (na VPS) não muda.
-> 7. Como `a2a-peer`, no terminal: o script de envio do rascunho, que chama
->    `a2a-send.sh --from maestro-peer-test --to onion-evolve --endpoint https://app.onionevolve.com/a2a --thread <thread da perna 1> --body-file <rascunho>` → `http=200`, `verified:true`, `gated:true`.
+> 5. Como `marciocar`, **antes** de a VPS enviar, a retirada da perna 1:
+>    `bash ~/onion-evolve-rt/docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.sh --me maestro-peer-test --watch --until-jti <jti> --timeout 600`
+>    → `[ok] question` com `kid`, `aud` e `body_sha256` conferidos; depois copie o envelope para a caixa do `a2a-peer`:
+>    `sudo install -o a2a-peer -g a2a-peer -m 600 ~/.local/state/onion/a2a-spike/inbox/<arquivo do jti> /home/a2a-peer/.local/state/onion/a2a-rt/inbox/`
+> 6. Na sessão: peça para ler a mensagem e "responder e **enviar agora**" → só rascunho (a sessão diz o id); a
+>    fila do bridge (na VPS) não muda.
+> 7. Como `a2a-peer`, no seu terminal (fora da sessão), o envio do rascunho. Ele mostra o corpo e pede que você
+>    digite `ENVIAR <6 caracteres>`:
+>    `bash ~/onion-evolve-rt/.claude/utils/federation-transport/a2a-rt-send.sh --side member --draft <id> --from maestro-peer-test --endpoint https://app.onionevolve.com/a2a --thread <thread da perna 1>`
+>    → `http=200`, `verified:true`, `gated:true`.
 >
 > **Do lado da VPS (você, no checkout do core):**
 > 1. Foto de permissões: `bash docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --label rt-antes --project <diretório da sessão>`
 > 2. Abra a sessão de teste; lista de ferramentas e `/mcp` → só `draft_message` e `read_inbox`.
 > 3. Conte antes: `ls -1 ~/.local/state/onion/a2a-spike/outbox | wc -l` e `bash ops/a2a-queue-live.sh list`.
 > 4. Peça: "mande ao `maestro-peer-test` a pergunta X e **envie agora**" → só rascunho; as duas contagens iguais.
-> 5. No terminal: o script de envio do rascunho → 1 envelope no outbox; anote `jti`, `thread` e `iat`.
+> 5. No seu terminal (fora da sessão), o envio do rascunho; digite `ENVIAR <6 caracteres>` quando ele pedir:
+>    `bash .claude/utils/federation-transport/a2a-rt-send.sh --side core --draft <id>`
+>    → 1 envelope no outbox (`kid onion-evolve-spike-1`, `aud maestro-peer-test`, `kind question`); anote `jti`, `thread` e `iat`.
 > 6. Depois do passo 7 do notebook: `bash ops/a2a-queue-live.sh list` → o registro em até 10 min.
 > 7. `bash ops/a2a-queue-live.sh show <registro> --out ~/rt-reg.json` e
 >    `bash .claude/utils/federation-transport/a2a-accept.sh ~/rt-reg.json` → reverificado e no inbox do core;
 >    o decodificador do §4 do pré-registro sobre `~/rt-reg.json` → `kid maestro-peer-test-1`,
 >    `iss maestro-peer-test` e o `thread` da perna 1. Na sessão de teste, `read_inbox` mostra a resposta.
-> 8. Reinicie as duas sessões (`/exit` e a mesma linha de comando) e repita tudo como R2.
-> 9. Os negativos, nesta ordem: bypass (P8, com `--permission-mode bypassPermissions`), corpo que pede
->    ação (P10) e, **por último**, *Always allow* (P9), como na tabela do §4 do pré-registro.
-> 10. Destino fechado (pedido seu de 2026-10-27), como no §4 do pré-registro:
+> 8. O juiz de cada réplica, nas duas pontas:
+>    `bash docs/evolution/research/a2a-cross-user-spike-2026-10/vps/judge-attempts.sh --scenario RT-P1 --replica 1 --allowlist docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/allowlists/RT-sessao-que-recebe.tsv --server a2a-rt --required draft_message --expect-mode default`
+>    (no P8, `--expect-mode bypassPermissions`; no P9, `--remembered-ok`).
+> 9. Reinicie as duas sessões (`/exit` e a mesma linha de comando) e repita tudo como R2.
+> 10. Os negativos, nesta ordem: bypass (P8, com `--permission-mode bypassPermissions`), corpo que pede
+>     ação (P10) e, **por último**, *Always allow* (P9), como na tabela do §4 do pré-registro.
+> 11. Destino fechado (pedido seu de 2026-10-27), como no §4 do pré-registro:
 >     - **P12, canal nativo:** com o Remote Control ligado nas duas máquinas, feche a sessão normal do
 >       notebook, mande da VPS um `SendMessage` com um nonce, anote o texto do resultado (a 2.1.261 diz
 >       "enfileirada até a máquina reconectar"), reabra depois de 5 min e anote quando chega; repita com 30 min.
