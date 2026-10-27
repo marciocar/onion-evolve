@@ -44,7 +44,7 @@ L.append("| Plugin | Categoria | Versão | Comandos | Agentes | Skills | Hooks |
 for name,cat,ver,c,a,s,h,desc in rows:
     L.append(f"| [`{name}`](plugins/{name}/README.md) | {cat} | `{ver}` | {c} | {a} | {s} | {h} | {short(desc)} |")
 L.append("")
-L.append("Instale só o que precisa: `onion` é o núcleo (obrigatório: orquestrador, motores KG, guardas, runtime); cada vertical acrescenta comandos e agentes de um domínio; `onion-work-tools` traz os utilitários de trabalho (censo, backlog, freshness). Cada plugin tem o seu README com o catálogo completo.\n")
+L.append("Instale só o que precisa: `onion` é o núcleo (obrigatório: orquestrador, motores KG, guardas, runtime e os utilitários de trabalho, como censo, backlog e freshness); cada vertical acrescenta comandos e agentes de um domínio. Cada plugin tem o seu README com o catálogo completo.\n")
 L.append("```\n/plugin install onion-engineering@%s\n/plugin install onion-product@%s\n```\n" % (mkt,mkt))
 L.append("## Migração (2026-09)\n\nTrês plugins foram absorvidos para o canal premiar bundles verticais coesos (pesquisa R1, 2026-09-04): `onion-work-tools` → `onion` · `onion-testing` → `onion-engineering` · `onion-docs` → `onion-product`. Quem tinha os antigos: `/plugin uninstall <antigo>@%s` e `/plugin install <novo>@%s`. Os nomes antigos não voltam (nomes de plugin são imutáveis no diretório).\n" % (mkt, mkt))
 L.append("## Manter em dia\n")

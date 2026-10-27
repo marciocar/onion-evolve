@@ -31807,6 +31807,19 @@ run_marketplace_readmes_selftests() {
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out" >/dev/null 2>&1 || true
   if [ -f "${d}/out/LICENSE" ] && grep -q 'Copyright (c) 2026 Probe' "${d}/out/LICENSE"; then record_pass "marketplace-readmes: (e) LICENSE do source embarcado em cada plugin"
   else record_fail "marketplace-readmes: (e) LICENSE" "ausente ou diferente do source"; fi
+  # (f) plugin ABSORVIDO não é recomendado fora da seção de migração (2026-10-27): o README mandava instalar
+  #     `onion-work-tools` uma linha antes de dizer que ele foi absorvido pelo `onion`. Fora de `## Migração`,
+  #     nenhum nome absorvido (lidos da própria seção, não de lista fixa) pode aparecer no README gerado.
+  local _absorbed _leak=""
+  _absorbed="$(awk '/^## Migração/{m=1;next} /^## /{m=0} m' "${d}/tgt/README.md" | grep -oE '`onion-[a-z-]+` →' | tr -d '`→ ' | sort -u)"
+  if [ -z "${_absorbed}" ]; then record_fail "marketplace-readmes: (f) absorvidos" "seção de migração sem pares \`antigo\` → lida do README"
+  else
+    for _ab in ${_absorbed}; do
+      awk '/^## Migração/{m=1;next} /^## /{m=0} !m' "${d}/tgt/README.md" | grep -qF "\`${_ab}\`" && _leak="${_leak} ${_ab}"
+    done
+    if [ -z "${_leak}" ]; then record_pass "marketplace-readmes: (f) plugin absorvido ($(echo ${_absorbed} | tr ' ' ',')) só aparece na seção de migração"
+    else record_fail "marketplace-readmes: (f) absorvido recomendado" "fora de '## Migração':${_leak}"; fi
+  fi
   rm -rf "${d}"
 }
 _family run_marketplace_readmes_selftests
