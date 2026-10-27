@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**725 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 130 grupo(s), agrupados por `owner:` (26 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**723 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 129 grupo(s), agrupados por `owner:` (24 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1023,11 +1023,10 @@
 | 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
 | 3.0 | `Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT` | coordenacao-sessoes-2026-10 | Os textos da vitrine e o dia zero do lançamento da kg-ssot. |
 
-## core — 11 item(ns)
+## core — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 8.0 | `Q_COORD_CURADORIA_UPDATE_4340` | coordenacao-sessoes-2026-10 | A rodada de update da curadoria com a kg-ssot 4.34.0, depois do merge do PR 1407. |
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_COORD_UPDATE_4_ADOTANTES_4350` | coordenacao-sessoes-2026-10 | A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core. |
@@ -1300,12 +1299,6 @@
 |--:|---|---|---|
 | 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
 | 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
-
-## brain — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.0 | `Q_COORD_BRAIN_REPOR_VENDOR_NO_CLONE` | coordenacao-sessoes-2026-10 | No próximo update do brain: repor a onion/vendor no clone local do adotante. |
 
 ## radar-E3-2026-10-14-r11 — 1 item(ns)
 

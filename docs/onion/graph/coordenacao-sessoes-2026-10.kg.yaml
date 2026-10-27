@@ -109,13 +109,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 4
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 145 e 150 -R marciocar/onion-curation em 2026-10-27: os dois MERGED; o carimbo da main do remoto diz source_commit 95365699a0e3, lido por ops/registry-pins.sh"
     label: "A rodada de update da curadoria com a kg-ssot 4.34.0, depois do merge do PR 1407."
-    narrative: "O core oferece e roda o /meta:adopt --update no adotante da curadoria, que aceita o push fast-forward da onion/vendor se o relatório disser (acordo de 2026-10-26). Destrava a ponte com URL fixada nos três vereditos de fora."
+    narrative: "O core oferece e roda o /meta:adopt --update no adotante da curadoria, que aceita o push fast-forward da onion/vendor se o relatório disser (acordo de 2026-10-26). Destrava a ponte com URL fixada nos três vereditos de fora. Fechado em 2026-10-27: o PR 145 da curadoria levou o pin 87c9b8f53be7 com a 4.34.0, e o PR 150 levou o 95365699a0e3 com a 4.35.0 por cima dele. A onion/vendor foi empurrada em fast-forward pelo core, como o relatório declara."
   - id: Q_COORD_BANCADA_KGSSOT_4350
     node_type: question
     layer: audit
@@ -150,7 +151,7 @@ nodes:
     confidence: 0.5
     verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
     label: "A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core."
-    narrative: "Segue a ordem do maestro de 2026-10-26: a cada pin novo do core, oferecer o update às sessões adotantes, agrupando."
+    narrative: "Segue a ordem do maestro de 2026-10-26: a cada pin novo do core, oferecer o update às sessões adotantes, agrupando. Andamento em 2026-10-27, com o pin 95365699a0e3: a curadoria mergeou (PR 150). Seguem abertos o PR 285 do kg-ssot, com o check conformance vermelho até a sessão dona re-medir a catraca no pin novo como faz a cada update; o PR 163 do sge, verde; e o PR 1648 do brain, sem checks na base, à espera do calendário da entrega de 31/10. O merge é de cada sessão dona; este nó fecha quando os três entrarem."
   - id: Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA
     node_type: question
     layer: audit
@@ -325,13 +326,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: brain
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "git merge-base --is-ancestor e git update-ref no clone local em 2026-10-27: a onion/vendor foi de 81cc0e3bd a 373b09b88, que a origin/onion/develop contém"
     label: "No próximo update do brain: repor a onion/vendor no clone local do adotante."
-    narrative: "Só o nome do repo aparece aqui; o conteúdo do adotante não entra no core público. Anotado em 2026-10-27: o brain já tem a kg-ssot 4.35.0 na onion/develop (7770189de, conferido por branch -r --contains), então na próxima rodada só o carimbo do .kg-ssot-version vai divergir."
+    narrative: "Só o nome do repo aparece aqui; o conteúdo do adotante não entra no core público. Anotado em 2026-10-27: o brain já tem a kg-ssot 4.35.0 na onion/develop (7770189de, conferido por branch -r --contains), então na próxima rodada só o carimbo do .kg-ssot-version vai divergir. Fechado em 2026-10-27, na rodada do pin 95365699a0e3: a onion/vendor do clone foi reposta em fast-forward. A previsão acertou em parte: o carimbo da kg-ssot divergiu só no campo commit, com os arquivos idênticos, mas também conflitou o índice da KB, que o adotante customizou."
   - id: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
     node_type: question
     layer: audit
