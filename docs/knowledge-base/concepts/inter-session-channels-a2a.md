@@ -267,19 +267,48 @@ Esta é a regra que vale para os quatro canais.
 | O membro do A2A recebe 401 | convite revogado, vencido ou de outro receptor | `/meta:federation-a2a conferir`: a checagem do convite diz o motivo |
 | O sinal relayado não apareceu no core | o carteiro recusou o destino | rode o `/meta:co-relay` com `--dry-run` e leia o motivo |
 
-## 8. Em estudo
+## 8. A direção selada para empresas (e o que segue em estudo)
 
-**A topologia de canal para empresas está em pesquisa no modo decision** (decisão do maestro de
-2026-10-27). As quatro candidatas são:
+**A topologia de canal para empresas foi selada como DIREÇÃO, não como avaliação completa** (selo do
+maestro de 2026-10-27, depois de uma pesquisa no modo decision e de uma rodada complementar que leu as
+fontes primárias). O enquadramento do maestro:
 
-- **A:** o A2A hospedado pelo onion-bridge do core;
-- **B:** o mesmo receptor em self-host, numa VPS da empresa ou em serverless (Lambda, Cloudflare Workers);
-- **C:** o protocolo aberto A2A mais MCP remoto por HTTP;
-- **D:** os canais nativos da Anthropic.
+> O padrão de comunicação é o **A2A aberto**, hospedado pela Agentic AI Foundation (AAIF, da Linux
+> Foundation) desde 17/08/2026. O A2A do Onion é o **empacotamento** desse padrão com o que falta nele.
 
-A pesquisa tem um refutador, e a ida e volta viva entre a VPS e o notebook local do maestro é critério e
-linha de base dela. **Este manual será atualizado com a decisão.** Até lá, o recomendado é o que está nas
-seções 2 a 5, com os limites que elas declaram.
+O que o empacotamento acrescenta ao padrão:
+
+- **identidade fixada** no registro de membros (`members.yaml`), nunca o nome de sessão;
+- **card assinado e verificado como obrigatório**: a especificação A2A 1.0 deixa a assinatura do Agent
+  Card como opcional (MAY) e a verificação como recomendada (SHOULD); o Onion as endurece;
+- **corpo da mensagem assinado**, porque o card assinado autentica o agente, não a mensagem;
+- **envio só em rascunho**: a ferramenta de envio grava rascunho, e quem envia é a pessoa;
+- **caixa de entrada durável no receptor**;
+- **mensagem de colega tratada como dado**, como na seção 6.
+
+As pernas da direção:
+
+| Quem fala com quem | Canal |
+|---|---|
+| Pessoas diferentes (colegas, empresas) | receptor A2A 1.0 em **self-host da empresa** (VPS ou serverless com armazenamento durável) |
+| A mesma pessoa em várias máquinas | o canal nativo (seção 3) com **`isolatePeerMachines`** ligado no `.claude/settings.json` do projeto: a aprovação antes de a mensagem sair vale até sob `bypassPermissions`, e o arquivo de projeto liga, mas não desliga |
+
+**Fica de fora:**
+
+- **Channels entre pessoas.** A autenticação é uma lista de IDs da plataforma de chat, o relay de
+  permissão faz do colega um aprovador de ferramenta, e não está provado que o evento acorda uma sessão
+  ociosa.
+- **Nuvem e Managed Agents para adotante regulado.** As sessões na nuvem ficam fora de ZDR, HIPAA e
+  CMEK, e o Managed Agents não tem ZDR nem BAA. Para adotante não regulado, eles ainda não foram avaliados.
+
+**Condição de produção:** a ida e volta medida entre a VPS e o notebook, **incluindo a entrega a uma
+sessão que estava fechada**. Até essa medida, a direção orienta o desenho e o piloto, e o recomendado em
+uso continua sendo o das seções 2 a 5, com os limites que elas declaram. O onion-bridge hospedado do core
+fica para onboarding e piloto, não para produção.
+
+Os dados e as lacunas que seguem abertas estão no grafo da pesquisa, no repositório público do core:
+<https://github.com/marciocar/onion-evolve/tree/main/docs/evolution/research/a2a-empresa-adotante-2026-10>
+(nó `D_A2A_EMPRESA_ADOTANTE_TOPOLOGIA_1027`).
 
 Também parqueados, com gatilho: a extração do A2A como projeto próprio (reabre quando a identidade sair do
 registro de membros **e** a fronteira MOAT sair do nome do motor, com a dissecação refeita depois disso,
@@ -303,5 +332,6 @@ diferentes (reabre com a ida e volta viva da composição).
   `D_A2A_PRODUTO_PARQUEADO_COM_GATILHO_1025`, `D_TRANSPORTE_ENTRE_AGENTES_PARQUEADO_COM_GATILHO_1025`,
   `D_PROTOCOLO_ENTRE_SESSOES_COSTURA_PEER_REF_CHECK_1025`, `D_A2A_EMPRESA_PESQUISA_DECISION_1027` e
   `D_MANUAL_CANAIS_A2A_AGORA_1027`); a pesquisa do canal vivo entre sessões
-  `docs/evolution/research/canal-vivo-sessoes-2026-10/`; e o spike A2A entre usuários
-  `docs/evolution/research/a2a-cross-user-spike-2026-10/`.
+  `docs/evolution/research/canal-vivo-sessoes-2026-10/`; o spike A2A entre usuários
+  `docs/evolution/research/a2a-cross-user-spike-2026-10/`; e a pesquisa da topologia para empresas, com
+  a direção selada em 2026-10-27, `docs/evolution/research/a2a-empresa-adotante-2026-10/`.
