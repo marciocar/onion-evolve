@@ -2,8 +2,7 @@
 branch: fix/migrate-python-venv-copy-perms
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: 869965d7f2f29b0298581d01d8a72e6d8107262fd7a3fbd9eac65e6f7fe2b4a5
-reviewed_code_sha256: cf9ea3cd1b287430d15ac40a40da8315784bed4c3e1051e32d16a402fd51dd0a
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 9
 tokens: 146220
@@ -36,3 +35,7 @@ nota: "Nenhum achado ALTO. Curados: o hardlink barrado ANTES do chown (antes a g
 9. **BAIXA, curado.** O cabeçalho dizia que o `discard-venv` descarta o venv "QUEBRADO", mas ele descarta o venv alvo sem uso, quebrado ou não. O texto foi corrigido. A recusa é por uso, não por saúde: um venv saudável sem uso é remontável pelo apply.
 
 Sobre a base: o revisor apontou a worktree atrás da `origin/main`. A branch foi rebaseada antes do PR.
+
+## Rebase sobre a origin/main (70bcb53c0, depois do #1413)
+
+O conflito foi no `sinais-de-campo-2026-09.kg.yaml`: os dois lados acrescentaram nós no mesmo ponto. Fiquei com tudo o que a main trouxe e com a minha evidência e a aresta dela, sem id duplicado. O radar `--integrity --schema` sai com rc 0 e o contrato fica conforme. Conferi que o código revisado não mudou: o `git patch-id --stable` do diff de `ops/` e `.claude/` é o mesmo antes e depois do rebase (3be65c3241e2), e as linhas +/− do grafo também são as mesmas (sha das linhas ordenadas 732b1539a7b5). Só o contexto mudou. Por isso o carimbo foi refeito sem uma passada nova.
