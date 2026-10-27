@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**718 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 128 grupo(s), agrupados por `owner:` (19 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**717 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 128 grupo(s), agrupados por `owner:` (18 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1020,13 +1020,12 @@
 | 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
 | 3.0 | `Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT` | coordenacao-sessoes-2026-10 | Os textos da vitrine e o dia zero do lançamento da kg-ssot. |
 
-## core — 10 item(ns)
+## core — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 6.0 | `Q_COORD_UPDATE_4_ADOTANTES_4350` | coordenacao-sessoes-2026-10 | A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core. |
 | 4.5 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
