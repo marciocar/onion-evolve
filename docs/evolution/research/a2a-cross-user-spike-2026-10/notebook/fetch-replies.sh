@@ -117,7 +117,8 @@ verify_one() {  # $1 = nome; imprime veredito e grava recv.tsv
   printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${t_recv}" "${kind}" "${irt}" "${rtt}" "${thread}" "${rj}" "${verdict}" >> "${STATE_DIR}/recv.tsv"
   echo "${name}" >> "${STATE_DIR}/seen.txt"
   printf '[%s] %s ← %s (rtt %s ms) %s\n' "${verdict}" "${kind}" "${irt}" "${rtt}" "${thread}"
-  { [ "${kind}" = reply ] || [ -n "${UNTIL_JTI}" ]; } && [ "${verdict}" = ok ] && printf '%s\n' "$(jq -r '.signal.body' "${f}")" | sed 's/^/    │ /'
+  # o corpo vem de OUTRA conta: caractere de controle (C0, ESC) vira '?' na tela, para não reescrever o terminal
+  { [ "${kind}" = reply ] || [ -n "${UNTIL_JTI}" ]; } && [ "${verdict}" = ok ] && printf '%s\n' "$(jq -r '.signal.body' "${f}")" | LC_ALL=C tr '\000-\010\013-\037\177' '?' | sed 's/^/    │ /'
   [ "${verdict}" = ok ] || BAD=1
   [ -n "${UNTIL}" ] && [ "${irt}" = "${UNTIL}" ] && [ "${kind}" = reply ] && GOT_UNTIL=1
   [ -n "${UNTIL_JTI}" ] && [ "${rj}" = "${UNTIL_JTI}" ] && [ "${verdict}" = ok ] && GOT_UNTIL=1
