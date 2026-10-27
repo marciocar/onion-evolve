@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**729 itens abertos** em 127 grafo(s) com aberto (de 166 no escopo) · 131 grupo(s), agrupados por `owner:` (37 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**734 itens abertos** em 128 grafo(s) com aberto (de 167 no escopo) · 132 grupo(s), agrupados por `owner:` (37 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1235,6 +1235,16 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.5 | `Q_AI_FRONT_PILOTO3_RESULTADO` | ai-front-2026-10 | O piloto 3 da curadoria chega a 2 achados aceitos ou mais depois da revisão adversarial? Se chegar, a frente de IA vira estudo re |
+
+## cortex-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_CORTEX_FROTA_GATILHO` | cortex-2026-10 | Parque da frota: algum adotante do Onion pede N issues em worktrees paralelas com aprovação humana em lote e dados isolados por  |
+| 4.5 | `Q_CORTEX_GATE_DE_PLANO_PROXIMO_PASSO` | cortex-2026-10 | Costura do gate de plano: onde o plano mora, se o .gitignore do core ignora a pasta de sessões, e como o script confere que o pla |
+| 4.5 | `Q_CORTEX_HANDOFF_GATILHO` | cortex-2026-10 | Parque do handoff no git: medidos no mesmo caso, os ganchos de retomada do worklog do core perdem para o handoff versionado do Cor |
+| 4.5 | `Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO` | cortex-2026-10 | Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromiu |
+| 4.5 | `Q_CORTEX_REGISTRO_DE_USO_GATILHO` | cortex-2026-10 | Parque do registro de uso: algum adotante precisa contar o uso de comando sem coletor e sem identificar a pessoa, o que a telemetr |
 
 ## duolingo-actor-2026-10 — 1 item(ns)
 
