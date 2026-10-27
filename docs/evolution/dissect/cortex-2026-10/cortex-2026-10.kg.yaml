@@ -70,15 +70,15 @@ nodes:
     confidence: 0.55
     x_dissect_level: 3
     verified_at: "2026-10-27"
-    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e as evidências da prova (E_DOCS_PROOF_PYTHON, E_ONION_GAMMA_PPTX, E_DOCS_PROOF_NOT_EXERCISED) no grafo da curadoria (onion-curation@6dc082acac33, main, que contém o PR #137), conferidos por peer-ref-check.sh"
+    verified_against: "nó D_PIECE_DOCS_PRESENTATIONS e as evidências da prova (E_DOCS_PROOF_PYTHON, E_ONION_GAMMA_PPTX, E_DOCS_PROOF_NOT_EXERCISED) no grafo da curadoria (onion-curation@5f5f6584a02b, main, que contém os PRs #137 e #144), conferidos por peer-ref-check.sh"
     source_tier: 8
     source_kind: primary-repo
-    label: "Documentação e apresentações, nota 5 depois da prova, costurar só a receita local: python-pptx e python-docx, sem Node, geram 8 slides e um docx com tabela do histórico do git em cerca de 35 ms. Captura real e diagrama parqueados."
-    narrative: "No sinal medido a peça tinha nota 6 e não fora exercida: as ferramentas do Cortex são Node, do npm. A prova veio depois, na curadoria, com a revisão adversarial aplicada e reproduzida num laboratório novo com o mesmo resultado; ela cobre 6 dos 12 tipos de slide, só texto, sem imagem. A nota caiu para 5, e a régua dessa nota NÃO foi pré-registrada: nasceu depois do resultado, o que fica declarado aqui. Correção factual: o Onion só exporta pptx pelo Gamma, serviço externo usado pelo /product:presentation, e nunca a partir do git; pela doutrina sem dependência de serviço externo, decidida pelo maestro em 2026-10-27, o Gamma não conta como par. O /design:deck gera HTML offline, não pptx nem docx."
+    label: "Documentação e apresentações, nota 5 a 6 conforme o navegador, costurar a receita completa, local, a partir do git, com captura e diagrama: em Python, 9 slides e um docx, com 3 imagens em cada, e 0 requisições externas medidas com a rede bloqueada."
+    narrative: "No sinal medido a peça tinha nota 6 e não fora exercida: as ferramentas do Cortex são Node, do npm. A 1ª prova da curadoria (PR #137 de lá) gerou 8 slides e um docx com tabela a partir do histórico do git, em python-pptx e python-docx, em cerca de 35 ms, só texto, e rebaixou a nota para 5 por uma régua NÃO pré-registrada (nasceu depois do resultado), o que fica declarado aqui. A 2ª prova (PR #144 de lá, com revisão adversarial) provou a captura e o diagrama: 2 telas de uma página local pelo Chromium sem janela e o Mermaid carregado do disco. A nota fica 6 com o chromium_headless_shell já no cache (cerca de 205 MB) e 5 numa máquina limpa (cerca de 483 MB). O desenho do Cortex carrega o Mermaid de uma CDN pública, o que conflita com a doutrina sem dependência de serviço externo; a receita da curadoria não tem esse problema. Correção factual: o Onion só exportava pptx pelo Gamma, serviço externo, nunca a partir do git, e o Gamma não conta como par."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
     provenance:
-      source: "https://github.com/marciocar/onion-curation/blob/6dc082acac333d3ef76aa13872dd681c601f5608/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DOCS_PRESENTATIONS"
-      locator: "D_PIECE_DOCS_PRESENTATIONS (x_dissect_verdict costurar, nota 5, régua não pré-registrada), E_DOCS_PROOF_PYTHON, E_ONION_GAMMA_PPTX e E_DOCS_PROOF_NOT_EXERCISED"
+      source: "https://github.com/marciocar/onion-curation/blob/5f5f6584a02bd8a49db2b7ea06d240f9104a873a/docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml#D_PIECE_DOCS_PRESENTATIONS"
+      locator: "D_PIECE_DOCS_PRESENTATIONS (x_dissect_verdict costurar a receita completa, nota 5 a 6 conforme o navegador), E_DOCS_PROOF_PYTHON e E_ONION_GAMMA_PPTX"
       method: "reading: grafo canônico da curadoria, conferido por peer-ref-check.sh na origin/main do par"
       locality: "repo"
 
@@ -239,9 +239,9 @@ nodes:
     impact: 3
     confidence: 0.5
     x_dissect_level: 3
-    label: "Costura da receita local de pptx e docx: como a receita provada na curadoria (python-pptx e python-docx, a partir do git, sem Node e sem serviço externo) entra no core como vertical opcional, fora do núcleo, e cobre os tipos de slide que a prova não cobriu?"
-    narrative: "Próximo passo: trazer a receita como script com bancada (o arquivo abre, tem o texto e a tabela esperados, sai do histórico do git), começando pelos 6 tipos de slide que a prova cobriu e medindo os outros 6 antes de declará-los; o venv local tem cerca de 57 MB. A captura real da aplicação e o diagrama ficam PARQUEADOS, porque exigem um navegador sem tela, que o maestro não autorizou."
-    x_gatilho: "reabrir ao começar a costura da receita; a parte parqueada (captura real e diagrama) reabre quando o maestro autorizar o navegador sem tela."
+    label: "Costura da receita completa de pptx e docx: como a receita provada na curadoria (Python, a partir do git, com captura pelo Chromium sem janela e Mermaid do disco, 0 requisições externas) entra no core como vertical opcional, fora do núcleo?"
+    narrative: "Próximo passo: trazer a receita como script com bancada que confira que o pptx e o docx abrem e trazem o texto, a tabela e as imagens esperados, saem do histórico do git e não fazem nenhuma requisição externa (rede bloqueada na prova); medir os tipos de slide que a prova não cobriu antes de declará-los; e declarar o custo do navegador (cerca de 205 MB com o chromium_headless_shell já no cache, cerca de 483 MB numa máquina limpa). O Mermaid vem do disco, nunca de CDN, pela doutrina sem dependência de serviço externo. O parque da captura e do diagrama fechou: os dois foram provados."
+    x_gatilho: "reabrir ao começar a costura da receita; instalar o navegador numa máquina limpa é pacote novo e pede a autorização do maestro, pela fonte oficial."
     trace: "docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md"
 
   - id: Q_CORTEX_FROTA_GATILHO
@@ -285,8 +285,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-27"
     verified_against: "decisão do maestro em 2026-10-27, por pergunta com opções (/meta:decide): escolhida «Selar como medido»"
-    label: "Selar as 9 peças do Cortex como medido: costurar só a peça no gate de plano, na âncora única da mutação (feita neste PR) e na receita local de pptx e docx; parquear a frota, o registro de uso e o handoff no git; rejeitar distribuição, especificação como código e estudos."
-    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Selar como medido»; descartadas: «Selar, sem implementar agora» · «Depois». É o 2º round: no 1º, diante do sinal com as rejeições só lidas, o maestro escolheu «Medir as rejeições antes», e a curadoria mediu rodando os dois lados no mesmo caso, em laboratório isolado. Por peça: costurar só a peça no gate de plano (nota 6, esbarra no .gitignore das sessões e na ordem do plano em relação ao código), na âncora única da mutação (nota 6, implementada no mesmo PR deste selo) e no pptx e docx (nota 6 no sinal, em Python, com python-pptx e python-docx autorizados pelo maestro, sem navegador); parquear a frota, o registro de uso e o handoff no git (nota 5, cada um com o gatilho medido da curadoria); rejeitar distribuição, especificação como código e estudos (notas 4, 3 e 3, medidas do lado do Onion). Nenhuma peça é absorvida no núcleo: nenhuma tem uso medido em dois adotantes ou mais. Complemento do mesmo dia, depois da escolha: a prova do pptx e do docx entrou na main da curadoria (PR #137, 6dc082a) e rebaixou essa peça para nota 5, com régua NÃO pré-registrada (nasceu depois do resultado), e o veredito ficou costurar só a receita local; a captura real e o diagrama ficam parqueados até o maestro autorizar um navegador sem tela. O Onion só exporta pptx pelo Gamma, nunca a partir do git, e pela doutrina sem dependência de serviço externo o Gamma não conta como par."
+    label: "Selar as 9 peças do Cortex como medido: costurar a peça no gate de plano, na âncora única da mutação (feita neste PR) e na receita local completa de pptx e docx; parquear a frota, o registro de uso e o handoff no git; rejeitar distribuição, especificação como código e estudos."
+    narrative: "Selado por /meta:decide em 2026-10-27: escolhida «Selar como medido»; descartadas: «Selar, sem implementar agora» · «Depois». É o 2º round: no 1º, diante do sinal com as rejeições só lidas, o maestro escolheu «Medir as rejeições antes», e a curadoria mediu rodando os dois lados no mesmo caso, em laboratório isolado. Por peça: costurar só a peça no gate de plano (nota 6, esbarra no .gitignore das sessões e na ordem do plano em relação ao código), na âncora única da mutação (nota 6, implementada no mesmo PR deste selo) e no pptx e docx (nota 6 no sinal, em Python, com python-pptx e python-docx autorizados pelo maestro, sem navegador); parquear a frota, o registro de uso e o handoff no git (nota 5, cada um com o gatilho medido da curadoria); rejeitar distribuição, especificação como código e estudos (notas 4, 3 e 3, medidas do lado do Onion). Nenhuma peça é absorvida no núcleo: nenhuma tem uso medido em dois adotantes ou mais. Complementos do mesmo dia, depois da escolha: a 1ª prova do pptx e do docx (PR #137 da curadoria, 6dc082a) rebaixou essa peça para nota 5, com régua NÃO pré-registrada; a 2ª (PR #144, 5f5f658) provou a captura pelo Chromium sem janela e o diagrama com o Mermaid do disco, com 0 requisições externas, e o veredito da peça passou a costurar a receita completa, local, a partir do git, com captura e diagrama, nota 5 a 6 conforme o navegador já estar na máquina; o parque da captura fechou. O desenho do Cortex carrega o Mermaid de uma CDN pública, o que a doutrina sem dependência de serviço externo veda; a receita da curadoria não. Os outros 8 vereditos ficam como escolhidos."
     x_dissect_level: 3
     x_dissect_verdict: costurar
     provenance:
@@ -357,3 +357,9 @@ edges:
   - from: Q_CORTEX_HANDOFF_GATILHO
     to: D_CORTEX_PECAS_SELADAS_COMO_MEDIDO_1027
     edge_type: CONSTRAINS
+
+external_edges:
+
+  - from: E_CORTEX_PECA_DOCUMENTOS_1027
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
+    edge_type: DEPENDS_ON

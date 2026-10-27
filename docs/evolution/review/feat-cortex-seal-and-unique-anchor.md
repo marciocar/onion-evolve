@@ -67,7 +67,10 @@ os três de maior impacto contra o que o PR propõe: `E_MUTATE_ANCORA_UNICA_MEDI
 PR (15 casos e 16 mutantes, rodados); `E_CORTEX_PECA_QUALIDADE_1027` é a lacuna que a cura fecha, e nada no
 helper novo a contraria; `E_CORTEX_PECA_GATE_DE_PLANO_1027` diz que o gate de plano esbarra no `.gitignore` das
 sessões, e por isso o PR não o implementa: deixa a pergunta aberta com o próximo passo. A peça de documentos foi
-rebaixada de 6 para 5 depois da prova da curadoria (PR #137 de lá), e o nó dela e o do selo dizem isso.
+rebaixada de 6 para 5 depois da 1ª prova da curadoria (PR #137 de lá). A 2ª (PR #144 de lá) provou a captura e o
+diagrama sem rede, e a peça passou a costurar a receita completa, nota 5 a 6 conforme o navegador; o parque da
+captura fechou. O nó da peça, a pergunta dela e o selo dizem isso, e a evidência da peça ganhou a aresta externa
+para a doutrina sem dependência de serviço externo.
 
 ## Mutantes
 
