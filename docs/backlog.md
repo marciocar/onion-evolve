@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**697 itens abertos** em 126 grafo(s) com aberto (de 165 no escopo) · 127 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**719 itens abertos** em 126 grafo(s) com aberto (de 165 no escopo) · 130 grupo(s), agrupados por `owner:` (38 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -743,6 +743,14 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
+## kg-ssot — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 17.5 | `Q_COORD_KGSSOT_RELEASE_4350` | coordenacao-sessoes-2026-10 | A release 4.35.0 da kg-ssot, com quatro frentes: --with, Python 3.12 testado em 3.12, 3.14 e 3.15 (o extra vector só até o 3.14, |
+| 4.5 | `Q_COORD_KGSSOT_CONFERIR_CURA_ESCRITOR_MCP` | coordenacao-sessoes-2026-10 | Conferir a cura do escritor de grafos por MCP na adoção da 4.32.0 do core. |
+| 3.0 | `Q_COORD_KGSSOT_GIF_DEMO_PTBR` | coordenacao-sessoes-2026-10 | O GIF da demo em pt-BR, depois da 4.35.0. |
+
 ## ops-citation-travel-2026-10 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -866,6 +874,26 @@
 | 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
 | 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
+
+## core — 15 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.0 | `Q_COORD_ADOCAO_4330_4350_NO_CORE` | coordenacao-sessoes-2026-10 | A adoção da kg-ssot até a 4.35.0 no core, com o template de CI no piso 3.12, o checador de projeção valendo nos contextos e a |
+| 8.0 | `Q_COORD_BANCADA_KGSSOT_4350` | coordenacao-sessoes-2026-10 | A bancada do core sobre a kg-ssot 4.35.0, assim que houver ref publicada. |
+| 8.0 | `Q_COORD_CORE_PYTHON_315_PISO_312` | coordenacao-sessoes-2026-10 | O core passa a rodar em Python 3.15 com o piso no 3.12; a branch chore/python-3.15 está em construção. |
+| 8.0 | `Q_COORD_CURADORIA_UPDATE_4340` | coordenacao-sessoes-2026-10 | A rodada de update da curadoria com a kg-ssot 4.34.0, depois do merge do PR 1407. |
+| 8.0 | `Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES` | coordenacao-sessoes-2026-10 | A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda  |
+| 8.0 | `Q_COORD_MERGE_PR1407_KGSSOT_4340` | coordenacao-sessoes-2026-10 | O PR 1407 (o core adota a kg-ssot 4.34.0) está na fila de merge, limpo e com os checks verdes; falta só o merge. |
+| 8.0 | `Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS` | coordenacao-sessoes-2026-10 | O PR 1404 (a âncora única no mutate-and-restore e o selo das 9 peças do Cortex) está em conflito com a main e com dois checks  |
+| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
+| 6.0 | `Q_COORD_UPDATE_4_ADOTANTES_4350` | coordenacao-sessoes-2026-10 | A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core. |
+| 4.5 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
+| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+| 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
+| 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
+| 2.0 | `Q_COORD_FIXTURE_NODE_SELFTEST_TMP` | coordenacao-sessoes-2026-10 | O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás. |
+| 2.0 | `Q_COORD_WORKTREES_TRAVADAS_SESSAO_BD` | coordenacao-sessoes-2026-10 | A sessão antiga onion-evolve-bd segura 3 worktrees travadas. |
 
 ## passada-adversarial-2026-09 — 2 item(ns)
 
@@ -1003,14 +1031,22 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
-## maestro — 4 item(ns)
+## maestro — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
+| 8.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafos por MCP com as curas da 4.32.0 (o card está no PR 1397). |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
+| 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
+| 6.0 | `Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA` | coordenacao-sessoes-2026-10 | Os cartões 2, 3 e 4 do teste de ida e volta (CARD-MAESTRO.md): o convite novo, o token no notebook e o teste. |
+| 6.0 | `Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS` | coordenacao-sessoes-2026-10 | A troca para o Python 3.15 nos serviços, depois do deploy do escritor por MCP. |
+| 4.5 | `Q_COORD_MAESTRO_FECHAR_SESSOES_ANTIGAS` | coordenacao-sessoes-2026-10 | Fechar as sessões antigas sem atividade do kg-ssot (243923 e b600fe) e da curadoria (onion-curation-f0). |
+| 4.5 | `Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT` | coordenacao-sessoes-2026-10 | O npm de cada release da kg-ssot, a começar pela 4.35.0. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
+| 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
+| 3.0 | `Q_COORD_MAESTRO_VITRINE_E_D0_KGSSOT` | coordenacao-sessoes-2026-10 | Os textos da vitrine e o dia zero (D0) do lançamento da kg-ssot. |
 
 ## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
 
@@ -1078,12 +1114,15 @@
 | 6.0 | `Q_ANARLOG_PORTAO_EXPORT` | anarlog-2026-10 | Portão do anarlog: numa reunião de teste consentida, o export JSON traz palavras com start_ms, end_ms, channel e speaker, e a tr |
 | 4.0 | `E_AVISO_WINDOWS_RECUSA` | anarlog-2026-10 | RISCO ao costurar: a função de postar o aviso do anarlog recusa no Windows, e o maestro disse que a máquina dele é Windows. O  |
 
-## core — 2 item(ns)
+## curadoria — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+| 6.0 | `Q_COORD_CUR_PONTE_URL_3_VEREDITOS_E_CHAIN` | coordenacao-sessoes-2026-10 | Depois do update com a 4.34.0, gravar a ponte com URL fixada no sha nos 3 vereditos selados de fora (Duolingo ator, rdf-extra e is |
+| 4.5 | `Q_COORD_CUR_CONFERIR_ONDA1_CONTRA_PR140` | coordenacao-sessoes-2026-10 | Conferir a onda 1 do design do core contra o desenho do PR 140 da curadoria. |
+| 4.5 | `Q_COORD_CUR_FECHAR_9_PECAS_CORTEX` | coordenacao-sessoes-2026-10 | Fechar as 9 peças do Cortex quando o PR 1404 entrar. |
+| 4.5 | `Q_COORD_CUR_LAB_11_CASOS_E_CHAIN_WITH` | coordenacao-sessoes-2026-10 | Depois da 4.35.0: rodar os 11 casos do laboratório do PR 140 e o --chain com --with. |
+| 4.5 | `Q_COORD_CUR_MEDIR_CAPTURA_DIAGRAMA_DECK_CORTEX` | coordenacao-sessoes-2026-10 | Medir a captura real e o diagrama no deck do Cortex, com o navegador autorizado pelo maestro na curadoria. Se a nota mudar, o core |
 
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)
 
@@ -1143,6 +1182,13 @@
 | 5.1 | `C_TETO_PERFIL_YAML_E_DO_CONTRATO` | kg-id-valid-from-2026-10 | TETO: politica de extensoes e MUST x SHOULD de verified_at em PROD ficaram FORA de proposito — decisao do contrato formal do .kg |
 | 3.2 | `C_TETO_DATAS_ISO_SEM_ASPAS` | kg-id-valid-from-2026-10 | TETO: valid_from: 2026-10-01 sem aspas e lido como DATA (timestamp YAML 1.1) por um leitor tipado, nao como string — 88 ocorrenc |
 
+## brain — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.0 | `Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA` | coordenacao-sessoes-2026-10 | Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. D |
+| 3.0 | `Q_COORD_BRAIN_REPOR_VENDOR_NO_CLONE` | coordenacao-sessoes-2026-10 | No próximo update do brain: repor a onion/vendor no clone local do adotante. |
+
 ## audit-textual-gates-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1150,21 +1196,6 @@
 | 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
 | 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
 | 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
-
-## design-context-guard-2026-10 — 10 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.8 | `C_CEILING_FIRST_CYCLE_SOFT` | design-context-guard-2026-10 | Teto: no 1º ciclo todo achado é SOFT; a guarda avisa e não bloqueia até os dois adotantes migrarem (--strict sobe para HARD). |
-| 4.2 | `C_CEILING_BRIEF_BY_TRACE` | design-context-guard-2026-10 | Teto: o brief é reconhecido pelo trace igual a <design>/brief.md; um brief noutro arquivo não é cobrado. |
-| 4.2 | `C_CEILING_LINK_BY_PREFIX` | design-context-guard-2026-10 | Teto: a ligação do brief conta pela pasta do business-context no alvo da external_edge; se o nó-alvo existe é o gate do contra |
-| 4.0 | `Q_PROJECTION_CHECK_DEPENDENCY` | design-context-guard-2026-10 | O checador de projeção do kg-ssot (o .md com projection_of cita só ids que existem no grafo) existe? Dependência declarada da  |
-| 3.2 | `C_CEILING_TOKENS_GATE_FIXED_DIR` | design-context-guard-2026-10 | Teto: o lint-design-tokens.sh lê só docs/design-context; num repo que declara outra pasta o setup avisa e o gate não a vê. |
-| 3.0 | `Q_LOCATOR_CHECK_HOME` | design-context-guard-2026-10 | A checagem do locator de token migra para o kg_trace do contrato KG-SSOT ou fica na vertical de design do core? Em discussão com  |
-| 2.8 | `C_CEILING_MISSING_NEVER_EXPIRES` | design-context-guard-2026-10 | Teto: a question que declara a falta do business-context segue valendo depois que o alvo passa a existir; a guarda não acusa a fa |
-| 2.8 | `C_CEILING_ONLY_DEFAULT_PATHS` | design-context-guard-2026-10 | Teto: com --only, a REGRA 111 só responde a caminhos com design-context no nome; numa pasta de design declarada ela pula no --onl |
-| 2.8 | `C_CEILING_SETUP_TOP_LEVEL_TARGETS` | design-context-guard-2026-10 | Teto: o setup procura E_POSITIONING e ST_THEME_APPLIED só no nível de cima da pasta do contexto; grafo-alvo em subpasta vira que |
-| 2.8 | `C_CEILING_THEME_DETECTION` | design-context-guard-2026-10 | Teto: o alvo de tema do setup é heurística (components.json, @theme, tailwind.config, CSS); no core ela achou um CSS do site e o |
 
 ## evolve-cures-2026-10 — 1 item(ns)
 
@@ -1202,6 +1233,12 @@
 |--:|---|---|---|
 | 4.5 | `Q_REABRIR_AUTORIDADE_NO_PROBE` | rea-method-2026-10 | Gatilho (b): quando o probe estruturado existir, o verificador deve nomear o id que fecha e a autoridade que provou? Esta é a ide |
 | 3.0 | `Q_REABRIR_PARIDADE_POS_FORGE` | rea-method-2026-10 | Gatilho (a): a paridade do plano de absorção precisa de um check pós-forge? Hoje não: 1 plano, 0 incidentes de família inexis |
+
+## sge — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_COORD_SGE_ADOTAR_4350` | coordenacao-sessoes-2026-10 | O sge adota a kg-ssot 4.35.0. A oferta do CI onion-validate segue NÃO aplicada, por decisão do maestro. |
 
 ## env-falso-positivo-2026-10 — 3 item(ns)
 

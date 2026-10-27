@@ -120,7 +120,7 @@ fi
 
 TMP="$(mktemp)"
 n_open=0
-n_owner_declared=0   # quantos nos DECLARARAM owner: hoje ZERO no corpus inteiro
+n_owner_declared=0   # quantos nos abertos DECLARAM owner: (todas as pendencias do grafo de coordenacao entre sessoes, desde 2026-10-27, e nos avulsos de outros grafos)
 RERR="$(mktemp)"; RTSV="$(mktemp)"
 trap 'rm -f "$TMP" "$RERR" "$RTSV"' EXIT
 n_processed=0

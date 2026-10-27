@@ -1,0 +1,577 @@
+meta:
+  schema_version: "1"
+  id: coordenacao-sessoes-2026-10
+  slug: coordenacao-sessoes-2026-10
+  title: "Coordenação entre as sessões: a lista única de pendências, com dono"
+  date: "2026-10-27"
+  baseline: "2026-10-27"
+  purpose: "A lista única de pendências que o maestro pediu em 2026-10-27 («pergunte de tudo que está pendente e organize com o core para as outras sessões»), mantida pelo core. Um nó question aberto por pendência, com o dono no campo owner do contrato (v4.8 da kg-ssot): core, curadoria, kg-ssot, brain, sge ou maestro. DEPENDS_ON diz o que espera o quê. Cada sessão consulta a sua parte por kg_query, e o /meta:backlog projeta tudo em docs/backlog.md agrupado por dono."
+  note: "TETO, declarado: este grafo guarda o COMPROMISSO e a ORDEM, não o fato. A pendência que já tem nó em outro grafo do core NÃO ganha nó aqui; entra por external_edges (Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027 é a onda 1 do design, por exemplo). Nó de outro repositório entra pela proveniência com a URL fixada no sha, conferida por peer-ref-check, porque o gate só confere external_edges contra os grafos deste repo. O estado dos PRs é o da medição de 2026-10-27, e o grafo não se atualiza sozinho: quem fecha uma pendência fecha o nó aqui, com carimbo, e o backlog a tira na regeneração seguinte. O core não escreve nome de cliente nem conteúdo de repo privado: o brain e os adotantes aparecem pelo nome."
+  # kg-backlog-guard: on
+  # ↑ opt-in da REGRA 58 (O backlog cumpre as promessas do próprio meta:): teto e carimbo do done cobrados pelo lint.
+  # ═══ TETO: 40 NÓS. Pendência nova entra quando uma fechada sai. ═══
+# Arestas para nó de OUTRO grafo do core (contrato v4.3): a pendência que já tem nó lá não ganha nó aqui.
+external_edges:
+  - from: Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027"
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027"
+    edge_type: TRACES_TO
+  - from: Q_COORD_CUR_CONFERIR_ONDA1_CONTRA_PR140
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027"
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_ADOCAO_4330_4350_NO_CORE
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027"
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027"
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
+    to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027"
+    edge_type: TRACES_TO
+nodes:
+  - id: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "gh pr list --state all e gh pr checks 1404 e 1407 rodados na criação do grafo, em 2026-10-27; peer-ref-check.sh rc 0 para o nó da curadoria citado; o resto é o censo da sessão principal do core, por mensagem às sessões peer"
+    label: "O censo das pendências entre as sessões em 2026-10-27, por volta das 16h UTC: 32 pendências abertas com dono, 13 do core, 5 da curadoria, 3 do kg-ssot, 2 do brain, 1 do sge, 8 do maestro."
+    narrative: "A sessão principal do core perguntou a cada sessão o que estava pendente e trouxe a lista para cá. O estado dos PRs do core foi reconferido por gh na hora de gravar: o 1407 limpo e verde, o 1404 em conflito e com dois checks falhando, o 1401, o 1397 e o 1405 mergeados. A pendência do kg-ssot sobre uma sessão duplicada foi corrigida antes de gravar e virou a do maestro de fechar as sessões antigas."
+    provenance:
+      source: "censo da sessão principal do core, 2026-10-27"
+      locator: "a mensagem da sessão principal que encomendou este grafo, com a correção sobre o PR 277 do kg-ssot"
+      method: "testimony: respostas das sessões peer ao censo, com os PRs do core reconferidos por gh"
+      locality: "repo"
+  - id: C_COORD_LICAO_MERGE_EM_SEGUNDO_PLANO_SEM_FILTRO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: kg-ssot
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "confirmação da sessão do kg-ssot, repassada pela sessão principal do core em 2026-10-27: o PR 277 foi mergeado pela sessão atual dele"
+    label: "Lição do kg-ssot: o comando de merge que roda em segundo plano mostra o resultado sem filtro."
+    narrative: "O PR 277 do kg-ssot foi mergeado pela sessão atual dele, com o merge rodando em segundo plano; o resultado se perdeu no filtro da saída, e a falta dele foi lida como um segundo escritor. Não houve segundo escritor. A cura é ler a saída do merge em segundo plano inteira, sem filtro, e conferir o estado do PR pelo rc e pelo JSON do gh, não pela linha que sobrou."
+    provenance:
+      source: "sessão do kg-ssot, por mensagem repassada pela sessão principal do core"
+      locator: "correção de 2026-10-27 sobre o PR 277"
+      method: "testimony: a sessão dona do merge, conferida pela transcrição dela"
+      locality: "repo"
+  - id: Q_COORD_MERGE_PR1407_KGSSOT_4340
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_against: "gh pr list --state all em 2026-10-27: 1407 OPEN, CLEAN; gh pr checks 1407 sem falha"
+    label: "O PR 1407 (o core adota a kg-ssot 4.34.0) está na fila de merge, limpo e com os checks verdes; falta só o merge."
+    narrative: "Medido em 2026-10-27: mergeStateStatus CLEAN e nenhum check falhando. É a porta de duas pendências: a rodada de update da curadoria com a 4.34.0 e a adoção até a 4.35 no core; pela primeira, também da ponte com URL fixada que a curadoria grava nos vereditos de fora."
+  - id: Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_against: "gh pr list --state all em 2026-10-27: 1404 OPEN, DIRTY; gh pr checks 1404 com 2 fail"
+    label: "O PR 1404 (a âncora única no mutate-and-restore e o selo das 9 peças do Cortex) está em conflito com a main e com dois checks falhando: a faixa 2 do selftest e o selftest-gate."
+    narrative: "Medido em 2026-10-27: mergeStateStatus DIRTY; falham o job «selftest (2, kg_coverage, vendor_scrub, ...)» e o «selftest-gate», que agrega as faixas. O conserto é do core: rebase pelo pr-finalize e a faixa 2 lida antes de mexer. A curadoria só fecha as 9 peças do Cortex depois que ele entrar."
+  - id: Q_COORD_CORE_PYTHON_315_PISO_312
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "O core passa a rodar em Python 3.15 com o piso no 3.12; a branch chore/python-3.15 está em construção."
+    narrative: "O piso 3.12 acompanha a 4.35.0 da kg-ssot, que testa 3.12, 3.14 e 3.15. O template de CI com o piso 3.12 entra na adoção até a 4.35 no core. A troca dos serviços da VPS para o 3.15 é do maestro e vem depois."
+  - id: Q_COORD_CURADORIA_UPDATE_4340
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "A rodada de update da curadoria com a kg-ssot 4.34.0, depois do merge do PR 1407."
+    narrative: "O core oferece e roda o /meta:adopt --update no adotante da curadoria, que aceita o push fast-forward da onion/vendor se o relatório disser (acordo de 2026-10-26). Destrava a ponte com URL fixada nos três vereditos de fora."
+  - id: Q_COORD_BANCADA_KGSSOT_4350
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "A bancada do core sobre a kg-ssot 4.35.0, assim que houver ref publicada."
+    narrative: "É a etapa do core no ciclo de release da kg-ssot: medir a ref nova contra a bancada antes da tag. Sem ref, não há o que medir."
+  - id: Q_COORD_ADOCAO_4330_4350_NO_CORE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_against: "gh pr list em 2026-10-27: 1401 MERGED (4.33.0), 1407 OPEN (4.34.0)"
+    label: "A adoção da kg-ssot até a 4.35.0 no core, com o template de CI no piso 3.12, o checador de projeção valendo nos contextos e a delegação do locator ao kg_trace."
+    narrative: "A 4.33.0 já entrou pelo PR 1401 e a 4.34.0 está no PR 1407; falta a 4.35.0 com as quatro frentes dela. O checador de projeção é o degrau 1 de Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027."
+  - id: Q_COORD_UPDATE_4_ADOTANTES_4350
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core."
+    narrative: "Segue a ordem do maestro de 2026-10-26: a cada pin novo do core, oferecer o update às sessões adotantes, agrupando."
+  - id: Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0."
+    narrative: "É o acordo de transmissão aplicado ao próprio core: o selo que cita nó do par leva a URL do blob no sha conferido por peer-ref-check, e não só o texto."
+  - id: Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "A onda 2 do design: a saída (identidade, deck e componentes mínimos locais) nos dois adotantes de gamificação, depois da onda 1."
+    narrative: "A onda 1 (setup, skill onion-design-context, frescor e grafo piloto) está no pr-finalize e é a pergunta Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027, sem nó novo aqui. A onda 2 cobre os critérios 5 e 6 do gatilho Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027."
+  - id: Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "O escritor do carimbo troca só o pin no label e não atualiza o resto da frase."
+    narrative: "Backlog técnico: o label fica com o pin novo e o resto da frase com o estado do pin velho, uma afirmação defasada que o próprio carimbo produz."
+  - id: Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo."
+    narrative: "Backlog técnico: subagentes dividem o scratchpad, e o mesmo nome de arquivo (o corpo do PR, por exemplo) já foi sobrescrito mais de uma vez. Recorrência medida pede guarda, não lembrete."
+  - id: Q_COORD_FIXTURE_NODE_SELFTEST_TMP
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 2
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás."
+    narrative: "Backlog técnico: o caso cria o temporário e não o remove ao sair."
+  - id: Q_COORD_WORKTREES_TRAVADAS_SESSAO_BD
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 2
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "A sessão antiga onion-evolve-bd segura 3 worktrees travadas."
+    narrative: "Backlog técnico: as worktrees ficam presas enquanto a sessão existir; soltá-las exige fechar a sessão ou destravar com o dono ciente."
+  - id: Q_COORD_CUR_PONTE_URL_3_VEREDITOS_E_CHAIN
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 4
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Depois do update com a 4.34.0, gravar a ponte com URL fixada no sha nos 3 vereditos selados de fora (Duolingo ator, rdf-extra e isnad) e refazer o --chain."
+    narrative: "Espera a rodada de update da curadoria pelo core. O --chain é a projeção da cadeia de transmissão que entrou com a 4.33.0."
+  - id: Q_COORD_CUR_FECHAR_9_PECAS_CORTEX
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Fechar as 9 peças do Cortex quando o PR 1404 entrar."
+    narrative: "Espera o PR 1404, que hoje está em conflito e com dois checks falhando."
+  - id: Q_COORD_CUR_CONFERIR_ONDA1_CONTRA_PR140
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 3
+    confidence: 0.5
+    verified_against: "gh pr view 140 -R marciocar/onion-curation em 2026-10-27: MERGED, mergeCommit 668e13ba9132"
+    label: "Conferir a onda 1 do design do core contra o desenho do PR 140 da curadoria."
+    narrative: "O PR 140 da curadoria (https://github.com/marciocar/onion-curation/pull/140, mergeado @ 668e13b) é a onda 1 revista com o grafo do design-context. A conferência espera a onda 1 do core, que é a pergunta Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027."
+  - id: Q_COORD_CUR_MEDIR_CAPTURA_DIAGRAMA_DECK_CORTEX
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Medir a captura real e o diagrama no deck do Cortex, com o navegador autorizado pelo maestro na curadoria. Se a nota mudar, o core ajusta o selo."
+    narrative: "A medição é da curadoria; o ajuste do selo das 9 peças, se a nota mudar, volta para o core, no PR 1404 ou depois dele."
+  - id: Q_COORD_CUR_LAB_11_CASOS_E_CHAIN_WITH
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Depois da 4.35.0: rodar os 11 casos do laboratório do PR 140 e o --chain com --with."
+    narrative: "O --with é uma das quatro frentes da 4.35.0; os onze casos são o laboratório do grafo do design-context da curadoria."
+  - id: Q_COORD_KGSSOT_RELEASE_4350
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    impact: 5
+    confidence: 0.5
+    verified_against: "git branch no clone do kg-ssot em 2026-10-27: feat/release-4350 só local; ls-remote sem a branch"
+    label: "A release 4.35.0 da kg-ssot, com quatro frentes: --with, Python 3.12 testado em 3.12, 3.14 e 3.15 (o extra vector só até o 3.14, por causa do onnxruntime), o checador de projeção e o locator."
+    narrative: "Branch feat/release-4350 no clone da sessão do kg-ssot, sem push medido; o pré-registro está em docs/onion/measurements/release-4350/CRITERIA.md nessa branch. Está na 2ª volta do Elenxo; depois vêm o PR, a bancada do core, a tag, o npm com o maestro e os avisos. É a pendência de que mais outras esperam."
+  - id: Q_COORD_KGSSOT_GIF_DEMO_PTBR
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    impact: 2
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "O GIF da demo em pt-BR, depois da 4.35.0."
+    narrative: "Material de vitrine; espera a release para não gravar a demo de uma versão que já mudou."
+  - id: Q_COORD_KGSSOT_CONFERIR_CURA_ESCRITOR_MCP
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    impact: 3
+    confidence: 0.5
+    verified_against: "gh pr list em 2026-10-27: 1397 MERGED"
+    label: "Conferir a cura do escritor de grafos por MCP na adoção da 4.32.0 do core."
+    narrative: "A adoção da 4.32.0 entrou pelo PR 1397, com o card do deploy do escritor. A conferência é da sessão do kg-ssot, dona do escritor."
+  - id: Q_COORD_BRAIN_REPOR_VENDOR_NO_CLONE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: brain
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "No próximo update do brain: repor a onion/vendor no clone local do adotante."
+    narrative: "Só o nome do repo aparece aqui; o conteúdo do adotante não entra no core público."
+  - id: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: brain
+    impact: 5
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. Donos: o brain e o maestro."
+    narrative: "O apontamento é pelo nome do arquivo versionado (.env.test), sem abrir o conteúdo, como manda a regra de segredo. A rotação de chave, se houver, é do maestro, e a rotação segue parada por ordem dele até nova decisão."
+  - id: Q_COORD_SGE_ADOTAR_4350
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: sge
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "O sge adota a kg-ssot 4.35.0. A oferta do CI onion-validate segue NÃO aplicada, por decisão do maestro."
+    narrative: "Entra na rodada de update da 4.35.0 aos adotantes. A decisão sobre o CI não muda com esta adoção."
+  - id: Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 4
+    confidence: 0.5
+    verified_against: "gh pr list em 2026-10-27: 1397 MERGED"
+    label: "O deploy do escritor de grafos por MCP com as curas da 4.32.0 (o card está no PR 1397)."
+    narrative: "O deploy é ato do maestro. Depois dele vem a troca dos serviços para o Python 3.15."
+  - id: Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "A troca para o Python 3.15 nos serviços, depois do deploy do escritor por MCP."
+    narrative: "Espera o deploy do escritor e o core em Python 3.15 com piso 3.12."
+  - id: Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 4
+    confidence: 0.5
+    verified_against: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/CARD-MAESTRO.md na origin/main de 2026-10-27"
+    label: "Os cartões 2, 3 e 4 do teste de ida e volta (CARD-MAESTRO.md): o convite novo, o token no notebook e o teste."
+    narrative: "São os passos do maestro que destravam a medida de Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027; a pergunta da medida não ganha nó novo aqui."
+  - id: Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "O npm de cada release da kg-ssot, a começar pela 4.35.0."
+    narrative: "A publicação no npm é ato do maestro em cada release; a próxima é a 4.35.0."
+  - id: Q_COORD_MAESTRO_VITRINE_E_D0_KGSSOT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    label: "Os textos da vitrine e o dia zero (D0) do lançamento da kg-ssot."
+    narrative: "Decisão de texto e de data do maestro."
+  - id: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 4
+    confidence: 0.5
+    verified_against: "gh pr list em 2026-10-27: 1405 MERGED"
+    label: "Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no light-arch e no engineer:start, o Canva no design:identity, o Runflow e o revisor do CI sem par local nomeado."
+    narrative: "O PR 1405 selou D_SEM_DEPENDENCIA_DE_SERVICO_EXTERNO_1027: serviço externo só como ponte opcional declarada, com alternativa local nomeada. Cada candidata pede o veredito do maestro (vira ponte opcional, ganha par local ou sai)."
+  - id: Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    verified_against: "peer-ref-check.sh onion-curation docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml#Q_MC_BROWSER_LOCAL em 2026-10-27: rc 0 @ e3db38edbfd8"
+    label: "Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria)."
+    narrative: "O nó da curadoria fica no repo dela e entra pela proveniência fixada no sha, conferida por peer-ref-check (rc 0 @ e3db38e)."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/e3db38edbfd8d28e4d5b21c3e3101d1344df7937/docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml#Q_MC_BROWSER_LOCAL"
+      locator: "Q_MC_BROWSER_LOCAL @ e3db38edbfd8"
+      method: "reading: peer-ref-check.sh no clone local da curadoria, nó lido por kg_query.py"
+      locality: "web"
+  - id: Q_COORD_MAESTRO_FECHAR_SESSOES_ANTIGAS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    verified_against: "correção repassada pela sessão principal do core em 2026-10-27, com a confirmação da sessão do kg-ssot"
+    label: "Fechar as sessões antigas sem atividade do kg-ssot (243923 e b600fe) e da curadoria (onion-curation-f0)."
+    narrative: "Substitui a pendência que dizia haver uma sessão duplicada do kg-ssot: o kg-ssot confirmou que o PR 277 foi mergeado pela sessão ATUAL dele, e não houve segundo escritor. Restam as sessões paradas, que só o maestro fecha."
+edges:
+  - from: Q_COORD_MERGE_PR1407_KGSSOT_4340
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CORE_PYTHON_315_PISO_312
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CURADORIA_UPDATE_4340
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_BANCADA_KGSSOT_4350
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_ADOCAO_4330_4350_NO_CORE
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_UPDATE_4_ADOTANTES_4350
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_FIXTURE_NODE_SELFTEST_TMP
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_WORKTREES_TRAVADAS_SESSAO_BD
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CUR_PONTE_URL_3_VEREDITOS_E_CHAIN
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CUR_FECHAR_9_PECAS_CORTEX
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CUR_CONFERIR_ONDA1_CONTRA_PR140
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CUR_MEDIR_CAPTURA_DIAGRAMA_DECK_CORTEX
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CUR_LAB_11_CASOS_E_CHAIN_WITH
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_KGSSOT_RELEASE_4350
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_KGSSOT_GIF_DEMO_PTBR
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_KGSSOT_CONFERIR_CURA_ESCRITOR_MCP
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_BRAIN_REPOR_VENDOR_NO_CLONE
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_SGE_ADOTAR_4350
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_VITRINE_E_D0_KGSSOT
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_FECHAR_SESSOES_ANTIGAS
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: C_COORD_LICAO_MERGE_EM_SEGUNDO_PLANO_SEM_FILTRO
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CURADORIA_UPDATE_4340
+    to: Q_COORD_MERGE_PR1407_KGSSOT_4340
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_ADOCAO_4330_4350_NO_CORE
+    to: Q_COORD_MERGE_PR1407_KGSSOT_4340
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_ADOCAO_4330_4350_NO_CORE
+    to: Q_COORD_BANCADA_KGSSOT_4350
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_ADOCAO_4330_4350_NO_CORE
+    to: Q_COORD_CORE_PYTHON_315_PISO_312
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_BANCADA_KGSSOT_4350
+    to: Q_COORD_KGSSOT_RELEASE_4350
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_UPDATE_4_ADOTANTES_4350
+    to: Q_COORD_ADOCAO_4330_4350_NO_CORE
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA
+    to: Q_COORD_KGSSOT_RELEASE_4350
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_CUR_PONTE_URL_3_VEREDITOS_E_CHAIN
+    to: Q_COORD_CURADORIA_UPDATE_4340
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_CUR_FECHAR_9_PECAS_CORTEX
+    to: Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_CUR_LAB_11_CASOS_E_CHAIN_WITH
+    to: Q_COORD_KGSSOT_RELEASE_4350
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_KGSSOT_GIF_DEMO_PTBR
+    to: Q_COORD_KGSSOT_RELEASE_4350
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_SGE_ADOTAR_4350
+    to: Q_COORD_UPDATE_4_ADOTANTES_4350
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS
+    to: Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_MAESTRO_PYTHON_315_NOS_SERVICOS
+    to: Q_COORD_CORE_PYTHON_315_PISO_312
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_MAESTRO_NPM_RELEASE_KGSSOT
+    to: Q_COORD_KGSSOT_RELEASE_4350
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320
+    to: Q_COORD_KGSSOT_CONFERIR_CURA_ESCRITOR_MCP
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_CUR_MEDIR_CAPTURA_DIAGRAMA_DECK_CORTEX
+    to: Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS
+    edge_type: TRACES_TO
+  - from: C_COORD_LICAO_MERGE_EM_SEGUNDO_PLANO_SEM_FILTRO
+    to: Q_COORD_MAESTRO_FECHAR_SESSOES_ANTIGAS
+    edge_type: SUPPORTS

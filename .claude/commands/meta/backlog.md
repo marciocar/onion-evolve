@@ -1,6 +1,6 @@
 ---
 name: backlog
-description: "Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos marcados. Use para ver os fios abertos num lugar só, ordenados por atenção (a régua do radar), agrupados por grafo (o campo `owner:` é lido, mas HOJE nenhum nó o declara — a projeção imprime isso). Projeção pura: item fecha no grafo → some daqui sozinho. A fonte é o grafo; este .md deriva."
+description: "Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos marcados. Use para ver os fios abertos num lugar só, ordenados por atenção (a régua do radar), agrupados por grafo (e por `owner:` quando o nó o declara; o grafo de coordenação entre as sessões o declara em cada pendência desde 2026-10-27, alguns outros grafos em nós avulsos, e a projeção imprime quantos nós o declaram). Projeção pura: item fecha no grafo → some daqui sozinho. A fonte é o grafo; este .md deriva."
 category: meta
 tags: [backlog, kg, projection, open-threads, self-evolution, ssot]
 version: "1.0.0"
@@ -39,9 +39,11 @@ decisão. Superfície de controle limpa > completude: o backlog é a fila ACION�
 
 1. **Regenerar** (default): `bash .claude/validation/kg-backlog-project.sh` — consome
    `kg-radar --open-tsv` de cada grafo marcado (a **atenção já vem calculada**, coluna 8 — a régua do
-   radar, não recalculada), agrupa por **`owner:`** quando o nó o declara — **hoje ZERO nós declaram**
-   no corpus inteiro, então o agrupamento efetivo é o **fallback: nome do grafo**, e o cabeçalho da
-   projeção IMPRIME essa medição em vez de prometer o eixo. Ordena por
+   radar, não recalculada), agrupa por **`owner:`** quando o nó o declara — desde 2026-10-27 o declara cada pendência de
+   `docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml` (core, curadoria, kg-ssot, brain, sge, maestro),
+   e alguns outros grafos o declaram em nós avulsos;
+   o nó sem `owner:` cai no **fallback: nome do grafo**, e o cabeçalho da projeção IMPRIME quantos nós o
+   declaram em vez de prometer o eixo. Ordena por
    atenção desc, **sem corte** (item recém-criado nunca some), e escreve `docs/backlog.md`.
 2. **`--markdown`**: emite a projeção em **stdout** sem tocar o arquivo. É o modo que a
    **REGRA 62** consome (o `_gen_into` do lint exige gerador que escreva em stdout) e o mesmo que
