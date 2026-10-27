@@ -388,6 +388,7 @@
 .claude/utils/marketplace/verticals/onion.manifest.sh	Q_KG_INBOX_FORA_DO_PLUGIN	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	Q_PLUGIN_SEM_DRIVE_NEM_ADOPT	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
+.claude/utils/scope/resolve-context-dir.sh	Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/utils/scope/resolve-scope-layers.sh	SY4_prod_show_scope_provenancia	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/task-manager/adapters	E_MEDIDO_SDAAL_E_POR_PROVIDER_1011	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml
 .claude/utils/task-manager/adapters/clickup.md	E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
