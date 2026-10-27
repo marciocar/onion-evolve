@@ -55,7 +55,12 @@ GATE="${CLAUDE_DIR}/validation/lint-design-tokens.sh"
 if [ ! -f "${GATE}" ]; then
   echo "GATE	-	lint-design-tokens.sh ausente em ${CLAUDE_DIR}/validation — não pude julgar" >&2; exit 2
 fi
-[ "${D}" = "docs/design-context" ] || echo "AVISO	-	o lint-design-tokens.sh lê só docs/design-context; o design deste repo mora em ${D}" >&2
+# O gate lê só docs/design-context. Numa pasta declarada ele sairia 0 com "design-context ausente" e o setup
+# diria "gate verde" sem medir um token (achado 2 da passada adversarial): aqui é "não pude julgar".
+if [ "${D}" != "docs/design-context" ]; then
+  echo "GATE	-	o lint-design-tokens.sh lê só docs/design-context e o design deste repo mora em ${D}: o gate não mediu nada — não pude julgar (gravado, NÃO verificado)" >&2
+  exit 2
+fi
 bash "${GATE}" "${REPO}"; grc=$?
 CHECK="${CLAUDE_DIR}/validation/design-context-check.sh"
 [ -f "${CHECK}" ] && { bash "${CHECK}" "${REPO}" || true; }   # 1º ciclo: aviso, não reprova o setup

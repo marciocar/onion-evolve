@@ -349,24 +349,35 @@ def main(argv):
             print(f"ERRO: tokens existentes não abrem como JSON ({exc}) — rode o lint-design-tokens.sh", file=sys.stderr)
             return 2
         brand_tok = alias_of(sdoc, "color.action.primary") or ""
-        # a ação pode apontar um tom escurecido; a MARCA é o acento quando ele existe e a ação foi escurecida
+        # a ação pode apontar o tom escurecido que o próprio setup cria (`*-strong`); aí a MARCA é a cor
+        # original, que ficou como acento (achado 7 da passada adversarial)
+        accent_tok = alias_of(sdoc, "color.action.accent") or ""
+        if brand_tok.endswith("-strong") and accent_tok:
+            brand_tok = accent_tok
         t["brand_token"] = brand_tok
         t["brand_file"] = paths["found"] if get_path(fdoc, brand_tok) is not None else paths["sem"]
         t["action"] = resolve_value([sdoc, fdoc], "color.action.primary")
         t["on"] = resolve_value([sdoc, fdoc], "color.action.on-primary")
-        t["brand"] = t["action"]
+        t["brand"] = resolve_value([fdoc, sdoc], brand_tok) or t["action"]
         if not (brand_tok and isinstance(t["action"], str) and isinstance(t["on"], str)):
             print("ERRO: os tokens existentes não têm color.action.primary (por alias) e color.action.on-primary"
                   " resolvíveis — o setup não adivinha a marca; acerte os tokens ou declare --brand num projeto sem tokens",
                   file=sys.stderr)
             return 2
-        if a.brand and a.brand.upper() != t["action"].upper():
-            plan.append(("AVISO", "-", f"--brand {a.brand} ignorado: os tokens existentes dizem {t['action']} (nunca sobrescrevo)"))
-        t["darkened"] = False
+        if a.brand and "#" + a.brand.lstrip("#").upper() != str(t["brand"]).upper():
+            plan.append(("AVISO", "-", f"--brand {a.brand} ignorado: os tokens existentes dizem {t['brand']} (nunca sobrescrevo)"))
+        t["darkened"] = str(t["brand"]).upper() != str(t["action"]).upper()
         t["cta_ratio"] = ratio(t["action"], t["on"])
         for k in ("found", "sem", "pairs"):
             plan.append(("MANTER", paths[k], "existe — nunca sobrescrevo") if os.path.isfile(P(paths[k]))
                         else ("FALTA", paths[k], "os tokens existem sem este arquivo; o setup não o inventa"))
+    elif any(os.path.exists(P(paths[k])) for k in ("found", "sem")):
+        # TOKENS PARCIAIS (achado 3): um dos dois arquivos existe. Criar o outro com aliases do esquema do setup
+        # gravava 4 arquivos incoerentes com o que ficou (11 alias órfãos no gate). O setup não completa à mão.
+        for k in ("found", "sem"):
+            plan.append(("MANTER", paths[k], "existe — nunca sobrescrevo") if os.path.exists(P(paths[k]))
+                        else ("FALTA", paths[k], "tokens parciais: o setup não cria a outra metade"))
+        need.append("tokens parciais: complete foundations e semantic à mão (ou pelo /design:identity) e rode de novo")
     else:
         if not a.brand:
             need.append("--brand '#RRGGBB' (a cor ou marca principal: os tokens não existem)")
@@ -390,7 +401,7 @@ def main(argv):
 
     # 2. o brief
     if os.path.isfile(P(paths["brief"])):
-        with open(P(paths["brief"]), encoding="utf-8") as fh:
+        with open(P(paths["brief"]), encoding="utf-8-sig") as fh:  # -sig: um BOM não esconde o frontmatter
             has_fm = fh.read(4).startswith("---")
         plan.append(("MANTER", paths["brief"], "a entrada do setup — a prosa não é tocada"))
         if not has_fm:
@@ -442,15 +453,20 @@ def main(argv):
         writes[paths["graph"]] = build_graph(a, t)
     for rel, body in writes.items():
         os.makedirs(os.path.dirname(P(rel)), exist_ok=True)
-        with open(P(rel), "x", encoding="utf-8") as fh:  # "x": falha se alguém criou no meio — nunca sobrescreve
-            fh.write(body)
+        try:
+            with open(P(rel), "x", encoding="utf-8") as fh:  # "x": falha se alguém criou no meio — nunca sobrescreve
+                fh.write(body)
+        except FileExistsError:
+            print(f"ERRO: {rel} apareceu durante o setup — não sobrescrevo; o que já foi gravado fica, rode de novo", file=sys.stderr)
+            return 2
         print(f"GRAVADO\t{rel}\t-")
     if a.add_frontmatter and os.path.isfile(P(paths["brief"])):
-        with open(P(paths["brief"]), encoding="utf-8") as fh:
+        with open(P(paths["brief"]), encoding="utf-8-sig") as fh:
             text = fh.read()
         if not text.startswith("---"):
             with open(P(paths["brief"]), "w", encoding="utf-8") as fh:
-                fh.write(f"---\nprojection_of: {D}/design-context.kg.yaml\nreview_after: \"{t['review_after']}\"\n---\n\n" + text)
+                fh.write(f"---\nprojection_of: {D}/design-context.kg.yaml\nreview_after: \"{t['review_after']}\"\n"
+                         f"date: {a.today}\n---\n\n" + text)
             print(f"GRAVADO\t{paths['brief']}\tfrontmatter (a prosa ficou intacta)")
     if not writes:
         print("NADA\t-\ttudo já existia: reexecutar não duplica")
