@@ -35,7 +35,7 @@ onion-evolve/
 │   └── settings.json              # registro dos hooks + permissions
 ├── docs/                        # Spec as Code (documentação estruturada, L0→L4)
 │   ├── meta-specs/                # L0 — constituição (architecture, code-standards, integrations, agents, commands)
-│   ├── knowledge-base/            # 90 KBs (conceitos/frameworks/padrões, técnica)
+│   ├── knowledge-base/            # 114 KBs (conceitos/frameworks/padrões, técnica)
 │   ├── onion/                     # documentação operacional do próprio framework (SSOT, guias, grafo)
 │   ├── evolution/                 # co-evolução core↔adotantes (inbox/outbox/federation/rfc)
 │   ├── business-context/          # spec-as-code de negócio (gerado por /docs:build-business-docs)
@@ -108,23 +108,23 @@ SSOT (`.claude/validation/inventory.sh:48-52`, contrato: "agente" = `.md` em
 Cada agente é um `.md` com YAML header obrigatório (`name`, `description`,
 `model`, `tools`, `category`, `expertise`, `related_agents`, ...) — exemplo lido
 em `.claude/agents/meta/onion.md:1-24`. O agente `@onion` é o orquestrador
-master, cujo header declara conhecimento completo dos agentes e comandos do inventário
-(`.claude/agents/meta/onion.md:4` — hoje 51 e 102) — ou seja, o próprio agente-âncora
-referencia os totais da SSOT.
+master, cujo header declara conhecimento completo dos agentes e comandos do Sistema
+(`.claude/agents/meta/onion.md:4`). O header não repete os totais (medido em 2026-10-27): o número
+mora só na SSOT.
 
 ---
 
-## 4. Skills — 11 em `.claude/skills/`
+## 4. Skills — 14 em `.claude/skills/`
 
 Contrato: "skill" = diretório em `.claude/skills/` (`.claude/validation/inventory.sh:56-58`).
-Listagem direta (`ls .claude/skills/`, 2026-08-13):
+Listagem direta (`ls .claude/skills/`, 2026-10-27):
 
 `language-standards`, `onion` (orquestrador), `onion-compliance-context`,
-`onion-engineering-context`, `onion-onboarding`, `onion-orchestration`,
-`onion-patterns`, `onion-product-context`, `onion-retro`, `onion-validation`,
-`onion-wizard`.
+`onion-design-context`, `onion-engineering-context`, `onion-onboarding`,
+`onion-orchestration`, `onion-patterns`, `onion-product-context`, `onion-publish`,
+`onion-research`, `onion-retro`, `onion-validation`, `onion-wizard`.
 
-> **Nota de frescor — o que foi re-testado, e só isso** (2026-08-13): o cabeçalho desta seção, a
+> **Nota de frescor — o que foi re-testado, e só isso** (2026-10-27): o cabeçalho desta seção, a
 > lista acima e as contagens da seção 2 foram conferidos contra `docs/onion/inventory.md` **e**
 > contra `ls .claude/skills/`. Quando um número aqui divergir, **não corrija à mão** — rode
 > `/meta:inventory` + `/docs:build-index onion`, que propagam a partir da SSOT gerada.
@@ -268,7 +268,7 @@ Integrações externas são **sempre** opt-in via `.env` (`TASK_MANAGER_PROVIDER
 | Diretório | Conteúdo | Gerado por |
 |-----------|----------|------------|
 | `docs/meta-specs/` | L0 — constituição (`architecture.md`, `code-standards.md`, `integrations.md`, `agents.md`, `commands.md`) | mantido à mão, é a autoridade máxima |
-| `docs/knowledge-base/` | 90 KBs em 9 subcategorias (`concepts/` é a maior, 49 arquivos de conteúdo) | `/meta:create-knowledge-base` |
+| `docs/knowledge-base/` | 114 KBs (SSOT `docs/onion/inventory.md`) em 10 subcategorias (`concepts/` é a maior) | `/meta:create-knowledge-base` |
 | `docs/onion/` | Documentação operacional do próprio framework: `inventory.md` (SSOT), `getting-started.md`, `graph.md`, `federation-map.md`, `agents-reference.md`, `commands-guide.md`, entre outros | mistura gerado (`inventory.md`) + mantido à mão |
 | `docs/evolution/` | Co-evolução core↔adotantes: `inbox/`, `outbox/`, `inbound/`, `federation/`, `rfc/`, `research/` | fluxo `/meta:co-*` e `/meta:federation-*` |
 | `docs/business-context/` | Spec-as-code de negócio (`01-customer` a `04-operations`) | `/docs:build-business-docs` |
