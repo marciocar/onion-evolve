@@ -103,6 +103,34 @@ def load_segments(guard):
 # tokenizador da guarda desalinha igual e o ramo cala, então o efeito medido no hook é silêncio.
 _HD_META = " \t;&|<>()"
 
+# `((` é aritmética OU dois `(` de subshell aninhado, e o bash decide como aqui (3ª passada adversarial do adotante sge,
+# 2026-10-27: `((cmd) <<E` era lido como aritmética e o corpo do heredoc virava comando julgado, aviso falso): o par
+# do 2º `(` fecha em `))` colado → aritmética; fecha em `)` seguido de outra coisa → subshell. Teto declarado: par que
+# não fecha NESTA linha (aritmética multilinha) segue lido como aritmética, a forma anterior.
+def _dparen_end(line, i):
+    """i aponta o 1º `(` de `((`. Devolve o índice depois do `))` (aritmética), -1 (subshell) ou None (sem par)."""
+    depth, j, n, q = 1, i + 2, len(line), None
+    while j < n:
+        ch = line[j]
+        if q:
+            if ch == "\\" and q == '"':
+                j += 2; continue
+            if ch == q:
+                q = None
+            j += 1; continue
+        if ch == "\\":
+            j += 2; continue
+        if ch in "'\"":
+            q = ch
+        elif ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return j + 2 if line.startswith("))", j) else -1
+        j += 1
+    return None
+
 def heredoc_ops(line, quote):
     """(ops, quote): ops = [(dash, palavra)] dos `<<` FORA de aspas e de aritmética, ou None se um é ilegível;
     quote = a aspa que segue aberta no fim da linha (None se nenhuma)."""
@@ -134,6 +162,11 @@ def heredoc_ops(line, quote):
         if c == "#" and (i == 0 or line[i - 1] in " \t;&|("):
             break                                   # comentário: o resto da linha não é comando
         if line.startswith("((", i):
+            _e = _dparen_end(line, i)
+            if _e == -1:
+                i += 1; continue                    # subshell aninhado: o 1º `(` é só `(`, e o `<<` adiante é heredoc
+            if _e is not None:
+                i = _e; continue                    # aritmética inteira na linha: nada dentro dela abre corpo
             arith += 1; i += 2; continue
         if arith and line.startswith("))", i):
             arith -= 1; i += 2; continue

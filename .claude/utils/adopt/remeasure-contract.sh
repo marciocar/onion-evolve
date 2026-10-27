@@ -135,13 +135,25 @@ def run():
            f"  corpus os .kg.yaml rastreados, excluídos: {', '.join(exclude)}"]
     out += [f"  MUST   {c}: {must_occ[c]} ocorrência(s) em {len(must_graphs[c])} grafo(s)" for c in sorted(must_occ)]
     out += [f"  SHOULD {c}: {should_occ[c]} ocorrência(s) em {len(should_graphs[c])} grafo(s)" for c in sorted(should_occ)]
-    base = pathlib.Path(repo) / kg_gate.DEFAULT_BASELINE
-    if base.is_file():
+    # a base se escolhe como o main() do gate a escolhe (3ª passada adversarial do adotante sge, 2026-10-27): desde a
+    # 4.16.0 `.kg-ssot/gate` é PASTA, e o `is_file()` antigo a dava por "ausente, rc 2" com o gate do alvo saindo rc 0
+    # (medido no sge: pasta presente, rc 0). Pasta, ou o arquivo único de antes da 4.16.0 quando a pasta falta; a
+    # leitura é a do vendor (read_base); sem nenhum dos dois, o gate sai rc 2 (medido: "missing baseline").
+    folder = pathlib.Path(repo) / kg_gate.DEFAULT_BASELINE
+    legacy_name = getattr(kg_gate, "LEGACY_BASELINE", None)
+    legacy = pathlib.Path(repo) / legacy_name if legacy_name else None
+    base, base_name = folder, kg_gate.DEFAULT_BASELINE
+    if not folder.exists() and legacy is not None and legacy.is_file():
+        base, base_name = legacy, legacy_name
+    if base.is_file() or base.is_dir():
         try:
-            locked = len(json.loads(base.read_text(encoding="utf-8")).get("failing") or {})
-            out.append(f"  base   {kg_gate.DEFAULT_BASELINE}: {locked} grafo(s) na dívida MUST travada (travada continua sendo dívida)")
+            if hasattr(kg_gate, "read_base"):
+                locked = len(kg_gate.read_base(base, measured).get("failing") or {})
+            else:
+                locked = len(json.loads(base.read_text(encoding="utf-8")).get("failing") or {})
+            out.append(f"  base   {base_name}: {locked} grafo(s) na dívida MUST travada (travada continua sendo dívida)")
         except Exception:
-            out.append(f"  base   {kg_gate.DEFAULT_BASELINE}: ilegível (o kg_gate.py do alvo sairia rc 2)")
+            out.append(f"  base   {base_name}: ilegível (o kg_gate.py do alvo sairia rc 2)")
     else:
         out.append(f"  base   {kg_gate.DEFAULT_BASELINE}: ausente (o alvo ainda não trava a dívida; o kg_gate.py dele sairia rc 2)")
     if failing:
