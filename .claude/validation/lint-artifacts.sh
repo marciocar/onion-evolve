@@ -6161,6 +6161,47 @@ check_kb_index_counts() {
 check_kb_index_counts
 
 # ===========================================================================
+# REGRA 111 — Grafo do design-context: locator de token e ligação do brief [SOFT]
+# previne: o grafo do design-context citar um token que sumiu do JSON, ou o brief nascer sem ligação ao business-context
+#   DEFEITO MEDIDO (2026-10-27, laboratório da emenda F do estudo de setup de design da curadoria, um repo git
+#   por caso): o gate do contrato KG-SSOT pega a ligação QUEBRADA (integrity.dangling-external) e o arquivo
+#   de tokens que some (integrity.trace-target-missing) — por isso a integridade das ligações NÃO ganhou regra
+#   aqui. Sobraram dois buracos que só a vertical vê: o token citado só pelo grafo que some de dentro do JSON
+#   (kg_validate 0, kg_trace 0, lint de tokens 0) e o locator que aponta um GRUPO; e o brief SEM ligação
+#   nenhuma, que qualquer aresta interna tirava de órfão. A deriva do mesmo tipo medida pelo kg-ssot nos
+#   contextos dele: 2 de 6 ids citados no design-context não resolviam.
+#   1º CICLO = SOFT em todo papel: os briefs dos adotantes ainda não migraram para grafo, e o achado
+#   SEM-GRAFO é o aviso dessa migração. Sobe para HARD (`--strict`) quando os dois adotantes migrarem.
+#   rc 2 do helper é "não pude julgar" e sai SOFT nomeado — nunca verde calado.
+#   Lógica em design-context-check.sh + .py (isolado, para o locator poder migrar ao kg_trace do kg-ssot).
+# ===========================================================================
+check_design_context_graph() {
+  local helper="${SCRIPT_DIR}/design-context-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *design-context*|*/business-context/*.kg.yaml|*.tokens.json) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  if [ "${_hrc}" -ge 2 ] 2>/dev/null; then
+    violation "SOFT" "${helper}" "REGRA 111 (Grafo do design-context: locator de token e ligação do brief): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+    [ "${_err}" = /dev/null ] || rm -f "${_err}"
+    return 0
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-SOFT}" "${REPO_ROOT}/${_path}" "REGRA 111 (Grafo do design-context: locator de token e ligação do brief): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  return 0
+}
+check_design_context_graph
+
+# ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
 _LINT_SUMMARY_REACHED=1   # daqui para baixo, a saida E veredito (ver o trap no topo)

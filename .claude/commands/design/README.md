@@ -12,8 +12,10 @@ W3C/DTCG como SSOT em `docs/design-context/`; CSS/componentes/material como saí
 
 | Comando | Faz |
 |---------|-----|
+| [`/design:setup`](setup.md) | A entrada do ciclo: parte do brief que existe, três perguntas, dry-run, grava sem sobrescrever os tokens e o grafo do design-context ligado aos outros contextos, e termina no gate de tokens. Tudo local. |
 | [`/design:identity`](identity.md) | Ciclo brief → develop (tokens + gate WCAG + materializa) → material. Faseado, retomável. Delega a `@design-system-specialist`. |
 | [`/design:generate`](generate.md) | Camada generativa: diverge (N identidades por IA, em orquestração) → converge (gate WCAG + juiz) → vencedora alimenta o DEVELOP do identity. Delega a `@brand-generator`. |
+| [`/design:deck`](deck.md) | Deck de treino auto-guiado como um único HTML offline (fonte embutida, zero CDN). |
 
 ## Próximos (roadmap — plano `transient-cooking-pebble`)
 

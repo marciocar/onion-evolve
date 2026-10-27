@@ -14,6 +14,7 @@ de verdade; CSS/componentes/material são saída gerada.
 | **Brand** | `brands/<brand>/` | Override por marca (multi-brand; esparso). _vazio no core._ |
 | **Product** | `products/<product>/` | Override por produto (herda brand). _vazio no core._ |
 | **Mode** | `modes/<light\|dark\|hc>.json` | Override por modo. _a popular._ |
+| **Grafo** (2026-10-27) | [`design-context.kg.yaml`](design-context.kg.yaml) | O 1º contexto do Onion com grafo próprio: marca, tokens (por `provenance.locator`), contraste, tema, política e paleta, ligados ao business-context e ao technical-context por `external_edges`. Nasceu do `/design:setup`; o [`brief.md`](brief.md) é a projeção (`projection_of`). Guarda: `design-context-check.sh`. |
 
 ## Resolução
 

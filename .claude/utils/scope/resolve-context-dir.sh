@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # =============================================================================
-# resolve-context-dir.sh — diz ONDE mora o contexto de domínio (negócio, técnico, compliance) deste repo.
+# resolve-context-dir.sh — diz ONDE mora o contexto de domínio (negócio, técnico, compliance, design) deste repo.
 #
 # O passo 1 do resolver das skills de contexto (onion-product-context, onion-engineering-context,
-# onion-compliance-context §2) era só prosa, e os comandos que GRAVAM o contexto não o liam: os cinco
+# onion-compliance-context §2; e onion-design-context desde 2026-10-27) era só prosa, e os comandos que GRAVAM o contexto não o liam: os cinco
 # `/docs:build-*` escreviam em `docs/<dim>-context/` fixo. Sinal de campo de 2026-10-19
 # (um hub): o repo declara `context.compliance: docs/compliance` em `.claude/onion-context.yaml`,
 # e o `/docs:build-compliance-docs` gerou noutra pasta. Declaração explícita vence convenção (skill §2.1);
@@ -16,7 +16,9 @@
 #      este passo quase sempre cala; fica porque as skills o declaram);
 #   3. o default `docs/<dim>-context` (o layout Onion padrão).
 #
-# Uso   : resolve-context-dir.sh <business|technical|compliance> [--repo <dir>] [--source]
+# Uso   : resolve-context-dir.sh <business|technical|compliance|design> [--repo <dir>] [--source]
+#         `design` (2026-10-27, onda 1 do setup de design): o design-context é CONTEXTO, não dimensão peer — a
+#         doutrina das três dimensões só muda pelo gatilho medido (Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027).
 #         --source : imprime também a origem, separada por TAB (`<caminho>\t<onion-context|stamp|default>`).
 # Saída : o caminho RELATIVO à raiz do repo, sem barra final.
 # Exit  : 0 = resolvido · 2 = uso · 3 = declaração inválida (absoluta, com `..` ou vazia) — o comando PARA:
@@ -29,7 +31,7 @@
 set -uo pipefail
 
 DIM=""; REPO=""; SHOW_SOURCE=0
-usage() { echo "uso: resolve-context-dir.sh <business|technical|compliance> [--repo <dir>] [--source]" >&2; }
+usage() { echo "uso: resolve-context-dir.sh <business|technical|compliance|design> [--repo <dir>] [--source]" >&2; }
 while [ "$#" -gt 0 ]; do case "$1" in
   --repo)   [ "$#" -ge 2 ] || { usage; exit 2; }; REPO="$2"; shift 2 ;;
   --source) SHOW_SOURCE=1; shift ;;
@@ -37,7 +39,7 @@ while [ "$#" -gt 0 ]; do case "$1" in
   -*) usage; exit 2 ;;
   *) [ -z "${DIM}" ] && DIM="$1" || { usage; exit 2; }; shift ;;
 esac; done
-case "${DIM}" in business|technical|compliance) : ;; *) usage; exit 2 ;; esac
+case "${DIM}" in business|technical|compliance|design) : ;; *) usage; exit 2 ;; esac
 [ -n "${REPO}" ] || REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 [ -d "${REPO}" ] || { echo "ERRO: repo inexistente: ${REPO}" >&2; exit 2; }
 

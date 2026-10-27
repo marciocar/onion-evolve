@@ -3,7 +3,7 @@
 # context-freshness-metric.sh — SINAL 2 da instrumentação valor-por-adotante:
 # frescor de contexto (SSOT viva vs stale), CAMADA DETERMINÍSTICA.
 #
-# Varre os context-docs (business/technical/compliance) e classifica cada um por
+# Varre os context-docs (business/technical/compliance/design) e classifica cada um por
 # FRESCOR do carimbo de data: CURRENT (≤ THRESHOLD meses) · STALE (>) · NO-STAMP.
 # Série temporal do --jsonl = trend de frescor por adotante. Determinístico, sem
 # LLM, molde do cycle-completion.sh.
@@ -30,7 +30,10 @@ set -uo pipefail
 REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 MODE="human"
 THRESH_MONTHS=18
-DIRS_DEFAULT="docs/business-context docs/technical-context docs/compliance-context"
+# docs/design-context entrou em 2026-10-27 (onda 1 do setup de design): o design-context é contexto de
+# primeira classe e tem de envelhecer à vista como os outros três. O threshold é o mesmo; o "design estável
+# não é stale" é veredito SEMÂNTICO do /meta:context-freshness, não desta camada.
+DIRS_DEFAULT="docs/business-context docs/technical-context docs/compliance-context docs/design-context"
 DIRS="${ONION_CONTEXT_DIRS:-${DIRS_DEFAULT}}"
 
 while [ $# -gt 0 ]; do
