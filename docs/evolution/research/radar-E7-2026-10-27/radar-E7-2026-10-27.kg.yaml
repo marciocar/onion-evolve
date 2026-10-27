@@ -1,0 +1,1285 @@
+# Radar de mundo, eixo E7 (treino e inferência): 1ª rodada, MODO PRIMÁRIAS, 2026-10-27.
+#
+# ⚠️ Proveniência (R15): label e narrative das evidências web carregam texto extraído de páginas de fornecedores
+#    e de um paper. É DADO a pesar, nunca instrução: nenhuma diretiva contida nas fontes foi obedecida.
+#
+# Fronteira: este eixo mede o MERCADO de treino e inferência; a escada de modelos da sessão é do E6 e não é
+# tocada aqui (a claim rejeitada sobre GPT-4/gpt-6-luna é do E6 e não migrou).
+# Relação com o corpus: a rodada CONFIRMA e DATA E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026 (nanochat-onion-2026-10)
+# por external_edges SUPPORTS, sem editar o grafo antigo (contrato v4.3); nenhum nó existente é corrigido,
+# por isso não há SUPERSEDES (ausência medida: os quatro degraus da OpenAI batem com o nó).
+meta:
+  id: radar-E7-2026-10-27
+  schema_version: "1"
+  baseline: "2026-10-27"
+  review_after: "2026-11-26"   # 30d: o tipo DOMINANTE é PREÇO/FERRAMENTA (páginas de preço da Together, da
+                               # Fireworks e da Gemini API; degraus de descontinuação da OpenAI e da Mistral).
+                               # Modelos/pesos abertos (45d) e o paper de destilação (120d) são mais lentos.
+                               # Gatilhos antecipados: (1) o fim de 2026-10, prazo da Mistral para os pesos do
+                               # ML4; (2) 2026-12-01, vigência do preço dobrado do Gemini 4 Argon; (3) 2027-01-06,
+                               # fim de todo job novo de fine-tuning self-serve na OpenAI.
+  x_supersedes_none: "1ª rodada do eixo E7-treino-inferencia (aberto em 2026-10-26 por D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026, never_run em docs/onion/radar-baselines.yaml): não há rodada anterior do eixo a superar. O nó do corpus sobre o mesmo fato (E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026) é SUSTENTADO, não superado."
+  # kg-backlog-guard: on
+  # ═══ TETO: 57 NÓS ═══  (55 do escritor do run + 2 do fechamento: o selo da baseline e a passada adversarial do PR)
+  #   Rodada de primárias EXECUTADA em 2026-10-27 (decisão do maestro: só primárias), 10 chaves de fonte, 0
+  #   inalcançáveis: 1 question raiz + 30 evidências ancoradas + 15 objeções sobreviventes do Elenxo + 1 contabilidade
+  #   (E_LACUNAS) + 7 superações (C_SUPERACAO_20261027_*) + 1 question de fechamento. 8 claims rejeitadas na
+  #   ancoragem não viraram nó (estão na contabilidade). O teto é o número real ao fim da escrita.
+external_edges:
+  - from: E_OPENAI_FT_CLOSED_NEW_ORGS_20260507
+    to: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026"
+    edge_type: SUPPORTS
+  - from: E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702
+    to: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026"
+    edge_type: SUPPORTS
+  - from: E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106
+    to: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026"
+    edge_type: SUPPORTS
+  - from: E_OPENAI_FT_INFERENCE_CONTINUES_UNTIL_BASE_DEPRECATION
+    to: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026"
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_LORA_SFT_SIZE_TIERS
+    to: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY"
+    edge_type: SUPPORTS
+  - from: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#D_RADAR_E7_TREINO_INFERENCIA_ABERTO_1026"
+    edge_type: TRACES_TO
+  - from: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    to: "docs/evolution/dissect/ai-front-2026-10/ai-front-2026-10.kg.yaml#D_AI_FRONT_PILOTO3_1026"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Como anda o mercado de treino e inferência (APIs de ajuste que fecham e abrem, custo, pesos abertos, destilação) e o que isso muda para o Onion, que não treina e é acoplado ao Claude Code?"
+    narrative: "Primeira rodada do eixo E7-treino-inferencia do radar de mundo do Onion (2026-10-27, decisão do maestro: só primárias): a trajetória do mercado de treino e inferência — APIs de ajuste que fecham e abrem, custo de inferência e de ajuste, pesos abertos, treino barato e destilação. Resposta desta rodada: uma BASELINE datada, não uma trajetória (1ª rodada, um ponto por série). O Onion não faz treino próprio e só usa modelo pequeno como ferramenta de conjunto fechado ancorada no mecanismo verificável; nenhuma fonte desta rodada muda a maquinaria dele hoje. Fronteira: a escada de modelos da sessão é do E6."
+    trace: "pergunta do maestro, /meta:radar E7-treino-inferencia em 2026-10-27; run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+
+  - id: E_OPENAI_FT_CLOSED_NEW_ORGS_20260507
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    valid_from: "2026-05-07"
+    verified_at: "2026-10-27"
+    verified_against: "\"Creating fine-tuning jobs or training is not available to organizations that have not previously run fine-tuning.\" — openai-deprecations, Seção 'Update to OpenAI’s self-serve fine-tuning', tabela, linha 'May 7, 2026' — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Em 2026-05-07 a OpenAI fechou a criação de jobs de fine-tuning a organizações que nunca rodaram fine-tuning."
+    narrative: "Trecho: \"Creating fine-tuning jobs or training is not available to organizations that have not previously run fine-tuning.\". Confirma e data o nó E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026 (nanochat-onion-2026-10), como a pergunta pediu: a página de descontinuações foi relida em 2026-10-27 e a linha datada segue lá. Efeito no Onion (leitura do escritor, não medida): o Onion não treina, então nada muda na maquinaria hoje; confirma que, se a opção D do nanochat (dataset do corpus para ajustar modelo de terceiro) um dia abrir, ela não pode depender da API de ajuste de um fornecedor fechado."
+    trace: "https://developers.openai.com/api/docs/deprecations"
+    provenance:
+      source: "https://developers.openai.com/api/docs/deprecations"
+      locator: "Seção 'Update to OpenAI’s self-serve fine-tuning', tabela, linha 'May 7, 2026'"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    valid_from: "2026-07-02"
+    verified_at: "2026-10-27"
+    verified_against: "\"Creating fine-tuning jobs is no longer available to organizations that have not run inference on a fine-tuned model\" — openai-deprecations, Mesma seção, tabela, linha 'July 2, 2026' — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Em 2026-07-02 o fechamento do fine-tuning self-serve da OpenAI se estende a quem não rodou inferência em modelo ajustado; a janela numérica não está no trecho ancorado."
+    narrative: "Trecho: \"Creating fine-tuning jobs is no longer available to organizations that have not run inference on a fine-tuned model\". A janela de '60 dias' que o leitor escreveu está no claim, não no trecho citado (E_OBJECAO_E7_02); o nó do nanochat a cita de outra leitura da mesma página, o que não é ancoragem independente do número. Efeito no Onion (leitura do escritor, não medida): o Onion não treina, então nada muda na maquinaria hoje; confirma que, se a opção D do nanochat (dataset do corpus para ajustar modelo de terceiro) um dia abrir, ela não pode depender da API de ajuste de um fornecedor fechado."
+    trace: "https://developers.openai.com/api/docs/deprecations"
+    provenance:
+      source: "https://developers.openai.com/api/docs/deprecations"
+      locator: "Mesma seção, tabela, linha 'July 2, 2026'"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    x_effective_from: "2027-01-06"
+    verified_at: "2026-10-27"
+    verified_against: "\"Active existing customers will no longer be able to create new fine-tuning jobs on this date.\" — openai-deprecations, Mesma seção, tabela, linha 'Jan 6, 2027' — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Em 2027-01-06 clientes ativos existentes da OpenAI também perdem a criação de novos jobs de fine-tuning."
+    narrative: "Trecho: \"Active existing customers will no longer be able to create new fine-tuning jobs on this date.\". Data FUTURA: vai em x_effective_from (valid_from não pode passar do verified_at). A afirmação do leitor de que 'a página não lista substituto' é ausência sem medida (E_OBJECAO_E7_03) e fica fora do label. Efeito no Onion (leitura do escritor, não medida): o Onion não treina, então nada muda na maquinaria hoje; confirma que, se a opção D do nanochat (dataset do corpus para ajustar modelo de terceiro) um dia abrir, ela não pode depender da API de ajuste de um fornecedor fechado."
+    trace: "https://developers.openai.com/api/docs/deprecations"
+    provenance:
+      source: "https://developers.openai.com/api/docs/deprecations"
+      locator: "Mesma seção, tabela, linha 'Jan 6, 2027'"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_OPENAI_FT_INFERENCE_CONTINUES_UNTIL_BASE_DEPRECATION
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "\"Inference on fine-tuned models will continue to be available until the base models are deprecated.\" — openai-deprecations, Seção do fine-tuning, parágrafo introdutório — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A inferência em modelos já ajustados na OpenAI continua até a descontinuação do modelo base: fecha a criação de job, não o uso."
+    narrative: "Trecho: \"Inference on fine-tuned models will continue to be available until the base models are deprecated.\". O parágrafo não traz data própria; por isso sem valid_from. Efeito no Onion (leitura do escritor, não medida): o Onion não treina, então nada muda na maquinaria hoje; confirma que, se a opção D do nanochat (dataset do corpus para ajustar modelo de terceiro) um dia abrir, ela não pode depender da API de ajuste de um fornecedor fechado."
+    trace: "https://developers.openai.com/api/docs/deprecations"
+    provenance:
+      source: "https://developers.openai.com/api/docs/deprecations"
+      locator: "Seção do fine-tuning, parágrafo introdutório"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_GEMINI_API_NO_TUNABLE_MODEL_SINCE_2025_05
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    valid_from: "2025-05"
+    verified_at: "2026-10-27"
+    verified_against: "\"With the deprecation of Gemini 1.5 Flash-001 in May 2025, we no longer have a model available which supports fine-tuning in the Gemini API or AI Studio\" — gemini-tuning, Página 'Fine-tuning with the Gemini API', parágrafo de abertura (corpo inteiro da página) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A Gemini API e o AI Studio não têm mais nenhum modelo que suporte ajuste fino desde a descontinuação do Gemini 1.5 Flash-001, em maio de 2025."
+    narrative: "Trecho: \"With the deprecation of Gemini 1.5 Flash-001 in May 2025, we no longer have a model available which supports fine-tuning in the Gemini API or AI Studio\". É fechamento ANTIGO (2025-05) e de UMA superfície: a própria página diz que o ajuste 'is supported in Gemini Enterprise Agent Platform' (E_OBJECAO_E7_05). Não sustenta 'o Google fechou o ajuste fino'. Efeito no Onion (leitura do escritor, não medida): a superfície de desenvolvedor do Gemini não oferece ajuste; para o Onion, que não treina, isso só reforça que ajuste, se houver, é de pesos abertos ou de plataforma corporativa, nunca da API de desenvolvedor."
+    trace: "https://ai.google.dev/gemini-api/docs/model-tuning"
+    provenance:
+      source: "https://ai.google.dev/gemini-api/docs/model-tuning"
+      locator: "Página 'Fine-tuning with the Gemini API', parágrafo de abertura (corpo inteiro da página)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_GEMINI_API_NO_IMMEDIATE_TUNING_PLANS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-27"
+    verified_against: "\"We don't have immediate plans to bring fine-tuning support but would love to hear from you on our developer forum\" — gemini-tuning, Página 'Fine-tuning with the Gemini API', segundo parágrafo — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Google declara não ter planos imediatos de reabrir o ajuste fino na Gemini API; não há data de retorno."
+    narrative: "Trecho: \"We don't have immediate plans to bring fine-tuning support but would love to hear from you on our developer forum\". Prova a ausência de data de retorno na Gemini API, e só isso. A curadoria informa a página como atualizada em 2026-04-28 (inbox §1), data não ancorada nesta rodada; por isso sem valid_from. Efeito no Onion (leitura do escritor, não medida): a superfície de desenvolvedor do Gemini não oferece ajuste; para o Onion, que não treina, isso só reforça que ajuste, se houver, é de pesos abertos ou de plataforma corporativa, nunca da API de desenvolvedor."
+    trace: "https://ai.google.dev/gemini-api/docs/model-tuning"
+    provenance:
+      source: "https://ai.google.dev/gemini-api/docs/model-tuning"
+      locator: "Página 'Fine-tuning with the Gemini API', segundo parágrafo"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_MISTRAL_FT_API_DEPRECATED
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "\"This feature is deprecated and is no longer actively supported.\" — mistral-finetuning, Aviso 'Deprecated' no topo da página; sidebar 'Fine-tuning API (legacy)' — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A página de ajuste fino da Mistral está marcada como descontinuada e sem suporte ativo (Fine-tuning API legacy)."
+    narrative: "Trecho: \"This feature is deprecated and is no longer actively supported.\". Estado ancorado, data não: a página não é datada (inbox §2) e não se sabe se fechou em 2025 ou 2026 (E_OBJECAO_E7_07). Sem valid_from. Efeito no Onion (leitura do escritor, não medida): mais um fornecedor fechado com a API de ajuste em modo legado; nada muda na maquinaria, que não treina."
+    trace: "https://docs.mistral.ai/capabilities/finetuning/"
+    provenance:
+      source: "https://docs.mistral.ai/capabilities/finetuning/"
+      locator: "Aviso 'Deprecated' no topo da página; sidebar 'Fine-tuning API (legacy)'"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_MISTRAL_FT_PAGE_RECOMMENDS_PROMPT_ENGINEERING_FIRST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "\"It's generally recommended to start with prompt engineering, as it's faster and less resource-intensive.\" — mistral-finetuning, Seção introdutória; sidebar de recursos deprecados — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A página de ajuste da Mistral recomenda começar por prompt engineering e lista SFT e Classifier Factory também como deprecados."
+    narrative: "Trecho: \"It's generally recommended to start with prompt engineering, as it's faster and less resource-intensive.\". O leitor afirmou também 'sem data nem substituto nomeado': ausências sem grep reportado, e o conselho citado é genérico, provavelmente anterior à deprecação (E_OBJECAO_E7_08). O label fica só no que o trecho sustenta. Efeito no Onion (leitura do escritor, não medida): mais um fornecedor fechado com a API de ajuste em modo legado; nada muda na maquinaria, que não treina."
+    trace: "https://docs.mistral.ai/capabilities/finetuning/"
+    provenance:
+      source: "https://docs.mistral.ai/capabilities/finetuning/"
+      locator: "Seção introdutória; sidebar de recursos deprecados"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_MISTRAL_FT_RESIDUAL_PRICE_4USD_2USD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.5
+    verified_at: "2026-10-27"
+    verified_against: "\"Every fine-tuning job comes with a minimum fee of $4, and there's a monthly storage fee of $2 for each model.\" — mistral-finetuning, Seção de preços da página — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A página deprecada da Mistral documenta taxa mínima de US$4 por job de ajuste e US$2 por mês de armazenamento por modelo."
+    narrative: "Trecho: \"Every fine-tuning job comes with a minimum fee of $4, and there's a monthly storage fee of $2 for each model.\". Preço publicado numa página deprecada e sem data: NÃO prova cobrança vigente e não entra como ponto de custo de ajuste em 2026-10 (E_OBJECAO_E7_09). Efeito no Onion (leitura do escritor, não medida): mais um fornecedor fechado com a API de ajuste em modo legado; nada muda na maquinaria, que não treina."
+    trace: "https://docs.mistral.ai/capabilities/finetuning/"
+    provenance:
+      source: "https://docs.mistral.ai/capabilities/finetuning/"
+      locator: "Seção de preços da página"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_BEDROCK_RFT_LAUNCH_QWEN3_GPTOSS_20260217
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    valid_from: "2026-02-17"
+    verified_at: "2026-10-27"
+    verified_against: "\"Models supported at this launch are: qwen.qwen3-32b and openai.gpt-oss-20b. After fine-tuning completes, customers can immediately use the resulting fine tuned model for on-demand inference\" — bedrock-rft, Parágrafo 3 (final) do anúncio What's New de 2026-02-17 — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Em 2026-02-17 o Bedrock lançou RFT para dois modelos abertos (Qwen3-32B e GPT-OSS-20B), com inferência sob demanda do ajustado por APIs compatíveis com a OpenAI, sem deploy extra."
+    narrative: "Trecho: \"Models supported at this launch are: qwen.qwen3-32b and openai.gpt-oss-20b. After fine-tuning completes, customers can immediately use the resulting fine tuned model for on-demand inference\". 'At this launch': é o catálogo de 2026-02-17, não re-medido em 2026-10 (E_OBJECAO_E7_10). A data 'Posted on: Feb 17, 2026' foi conferida pelo verificador. Efeito no Onion (leitura do escritor, não medida): existe plataforma gerenciada que ajusta pesos abertos; só importaria se C_BASE_MODELS_MENU_2026_10 (onion-slm-2026-10, open, conf 0.5) abrir, o que exige um eval falhar."
+    trace: "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/"
+    provenance:
+      source: "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/"
+      locator: "Parágrafo 3 (final) do anúncio What's New de 2026-02-17"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_BEDROCK_RFT_RULE_GRADERS_OR_AI_JUDGES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    valid_from: "2026-02-17"
+    verified_at: "2026-10-27"
+    verified_against: "\"Customers define reward functions using verifiable rule-based graders or AI-based judges, including built-in templates for both objective tasks such as code generation and math reasoning\" — bedrock-rft, Parágrafo 2 do anúncio — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "No RFT do Bedrock a recompensa é por grader verificável baseado em regra OU por juiz de IA, com templates para código e matemática."
+    narrative: "Trecho: \"Customers define reward functions using verifiable rule-based graders or AI-based judges, including built-in templates for both objective tasks such as code generation and math reasoning\". O 'encaixe' com o mecanismo verificável do Onion, que o leitor sugeriu, é analogia: o Onion não treina, e o recompensador pode ser um juiz de IA (E_OBJECAO_E7_11). Efeito no Onion (leitura do escritor, não medida): existe plataforma gerenciada que ajusta pesos abertos; só importaria se C_BASE_MODELS_MENU_2026_10 (onion-slm-2026-10, open, conf 0.5) abrir, o que exige um eval falhar."
+    trace: "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/"
+    provenance:
+      source: "https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/"
+      locator: "Parágrafo 2 do anúncio"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_GEMINI_4_ARGON_FLAGSHIP_PAGE_1026
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    valid_from: "2026-10-26"
+    verified_at: "2026-10-27"
+    verified_against: "\"Our flagship reasoning model, built for complex software engineering, deep mathematical and scientific problem solving, autonomous multi-step agents, and long-decode generation up to 1M tokens.\" — gemini-pricing, Seção Gemini 4 Argon, Standard, descrição do modelo — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A página de preços da Gemini API (datada de 2026-10-26) tem como principal o Gemini 4 Argon (gemini-4-argon), carro-chefe de raciocínio, sem camada gratuita."
+    narrative: "Trecho: \"Our flagship reasoning model, built for complex software engineering, deep mathematical and scientific problem solving, autonomous multi-step agents, and long-decode generation up to 1M tokens.\". Preço de terceiro, não a escada de modelos da sessão (E6). A data da página vem do inbox §4. Efeito no Onion (leitura do escritor, não medida): preço de terceiro; o Onion é acoplado ao Claude Code e não consome o Gemini, e a escada de modelos da sessão é do E6, que esta rodada não toca."
+    trace: "https://ai.google.dev/gemini-api/docs/pricing"
+    provenance:
+      source: "https://ai.google.dev/gemini-api/docs/pricing"
+      locator: "Seção Gemini 4 Argon, Standard, descrição do modelo"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_GEMINI_4_ARGON_INPUT_PRICE_DOUBLES_20261201
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    valid_from: "2026-10-26"
+    x_effective_from: "2026-12-01"
+    verified_at: "2026-10-27"
+    verified_against: "\"$2.00 through November 30, 2026. $4.00 starting December 1, 2026.\" — gemini-pricing, Gemini 4 Argon, Standard, Paid Tier, Input price — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A entrada do Gemini 4 Argon dobra de US$2,00 para US$4,00 por 1M de tokens em 2026-12-01."
+    narrative: "Trecho: \"$2.00 through November 30, 2026. $4.00 starting December 1, 2026.\". Ponto de trajetória de verdade: preço futuro anunciado. valid_from é a data da página que o anuncia; a vigência vai em x_effective_from. Efeito no Onion (leitura do escritor, não medida): preço de terceiro; o Onion é acoplado ao Claude Code e não consome o Gemini, e a escada de modelos da sessão é do E6, que esta rodada não toca."
+    trace: "https://ai.google.dev/gemini-api/docs/pricing"
+    provenance:
+      source: "https://ai.google.dev/gemini-api/docs/pricing"
+      locator: "Gemini 4 Argon, Standard, Paid Tier, Input price"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_GEMINI_4_ARGON_OUTPUT_PRICE_DOUBLES_20261201
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    valid_from: "2026-10-26"
+    x_effective_from: "2026-12-01"
+    verified_at: "2026-10-27"
+    verified_against: "\"$10.00 through November 30, 2026. $20.00 starting December 1, 2026.\" — gemini-pricing, Gemini 4 Argon, Standard, Paid Tier, Output price (including thinking tokens) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A saída do Gemini 4 Argon (com tokens de raciocínio) dobra de US$10,00 para US$20,00 por 1M de tokens em 2026-12-01."
+    narrative: "Trecho: \"$10.00 through November 30, 2026. $20.00 starting December 1, 2026.\". Ressalva: um modelo só, tier Standard só. Não autoriza 'o custo de inferência sobe' como tendência: E_TOGETHER_INFERENCE_SMALL_OPEN_WEIGHTS_CENTS mostra pesos abertos a centavos. Efeito no Onion (leitura do escritor, não medida): preço de terceiro; o Onion é acoplado ao Claude Code e não consome o Gemini, e a escada de modelos da sessão é do E6, que esta rodada não toca."
+    trace: "https://ai.google.dev/gemini-api/docs/pricing"
+    provenance:
+      source: "https://ai.google.dev/gemini-api/docs/pricing"
+      locator: "Gemini 4 Argon, Standard, Paid Tier, Output price (including thinking tokens)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_TOGETHER_SFT_SMALL_034_USD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "\"| Llama 3.1 8B | $0.34 | $0.84 | $4.00 |\" — together-pricing, Fine-tuning, tabela principal (SFT | DPO | Minimum) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 6
+    source_kind: vendor-on-self
+    label: "Na Together, ajuste SFT de modelo aberto pequeno (8B, 9B) custa US$0,34 por 1M tokens de treino, com mínimo de US$4 por job; DPO US$0,84 (foto de 2026-10-27)."
+    narrative: "Trecho: \"| Llama 3.1 8B | $0.34 | $0.84 | $4.00 |\". A página não diz qual tabela vale para LoRA e qual para ajuste completo (inbox §5), e a cobrança multiplica o dataset pelas épocas e soma tokens de avaliação: não se compara com a Fireworks (E_OBJECAO_E7_15). Página sem data: vale como foto da leitura. Efeito no Onion (leitura do escritor, não medida): dá a ordem de grandeza do custo de um modelo pequeno aberto usado como ferramenta de conjunto fechado por API, se um dia for usado assim; não muda a maquinaria hoje."
+    trace: "https://www.together.ai/pricing"
+    provenance:
+      source: "https://www.together.ai/pricing"
+      locator: "Fine-tuning, tabela principal (SFT | DPO | Minimum)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_TOGETHER_SFT_COST_SCALES_WITH_SIZE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "\"| GLM-5.2 | $40.00 | $100.00 | $60.00 |\" — together-pricing, Fine-tuning, tabela principal, última linha; comparar Llama 3.3 70B $2.03 e Kimi K2.6 $15.00 — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 6
+    source_kind: vendor-on-self
+    label: "Na Together o custo de ajuste SFT cresce com o tamanho: 70B a US$2,03, Maverick a US$5,60, Kimi K2.6 a US$15 e GLM-5.2 a US$40 por 1M tokens, com mínimos de até US$60."
+    narrative: "Trecho: \"| GLM-5.2 | $40.00 | $100.00 | $60.00 |\". Mesma ambiguidade LoRA/Full e mesma página sem data (E_OBJECAO_E7_16): há ordenação por tamanho, não gradiente comparável. Efeito no Onion (leitura do escritor, não medida): dá a ordem de grandeza do custo de um modelo pequeno aberto usado como ferramenta de conjunto fechado por API, se um dia for usado assim; não muda a maquinaria hoje."
+    trace: "https://www.together.ai/pricing"
+    provenance:
+      source: "https://www.together.ai/pricing"
+      locator: "Fine-tuning, tabela principal, última linha; comparar Llama 3.3 70B $2.03 e Kimi K2.6 $15.00"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_TOGETHER_INFERENCE_SMALL_OPEN_WEIGHTS_CENTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "\"| gpt-oss-120B | $0.15 | $0.60 |\" — together-pricing, Serverless inference: chat (Input | Output por 1M tokens) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 6
+    source_kind: vendor-on-self
+    label: "Na Together a inferência serverless de pesos abertos pequenos e médios custa centavos por 1M tokens: gpt-oss-120B a US$0,15/0,60 e Qwen3.5 9B a US$0,17/0,25 (foto de 2026-10-27)."
+    narrative: "Trecho: \"| gpt-oss-120B | $0.15 | $0.60 |\". Página de preço sem data: foto na data de leitura, e o claim não pretende mais que isso. Efeito no Onion (leitura do escritor, não medida): dá a ordem de grandeza do custo de um modelo pequeno aberto usado como ferramenta de conjunto fechado por API, se um dia for usado assim; não muda a maquinaria hoje."
+    trace: "https://www.together.ai/pricing"
+    provenance:
+      source: "https://www.together.ai/pricing"
+      locator: "Serverless inference: chat (Input | Output por 1M tokens)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_TOGETHER_INFERENCE_HIGH_TIER_OPEN_WEIGHTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "\"| GLM-5.3 | $1.40$0.26 (cached) | $4.40 |\" — together-pricing, Serverless inference: chat; comparar Kimi K3 $3.00 / $15.00 — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 6
+    source_kind: vendor-on-self
+    label: "Na Together a faixa alta de pesos abertos (GLM-5.3, Kimi K3) custa US$1,40 a 3,00 de entrada e US$4,40 a 15 de saída por 1M tokens, com desconto de cache."
+    narrative: "Trecho: \"| GLM-5.3 | $1.40$0.26 (cached) | $4.40 |\". Foto datada pela leitura (2026-10-27). Efeito no Onion (leitura do escritor, não medida): dá a ordem de grandeza do custo de um modelo pequeno aberto usado como ferramenta de conjunto fechado por API, se um dia for usado assim; não muda a maquinaria hoje."
+    trace: "https://www.together.ai/pricing"
+    provenance:
+      source: "https://www.together.ai/pricing"
+      locator: "Serverless inference: chat; comparar Kimi K3 $3.00 / $15.00"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_FIREWORKS_LORA_SFT_SIZE_TIERS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "\"Models up to 16B parameters | $0.50 | $1.00 | $1.00 | $2.00; Models 16.1B - 80B | $3.00 | $6.00 | $6.00 | $12.00\" — fireworks-pricing, Seção Fine-tuning (Managed Training), tabela de preço por 1M tokens de treino — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A Fireworks cobra ajuste gerenciado por 1M tokens de treino em faixas por tamanho: LoRA SFT US$0,50 (até 16B), 3,00 (16,1-80B), 6,00 (80-300B) e 10,00 (acima de 300B)."
+    narrative: "Trecho: \"Models up to 16B parameters | $0.50 | $1.00 | $1.00 | $2.00; Models 16.1B - 80B | $3.00 | $6.00 | $6.00 | $12.00\". Método nomeado (LoRA/Full, SFT/DPO) por faixa: fecha a lacuna de custo de ajuste como pedida. Página sem data: foto de 2026-10-27. Efeito no Onion (leitura do escritor, não medida): faixa de custo de ajuste por tamanho e método, comparável entre si; só pesa se a opção D (gated) abrir."
+    trace: "https://fireworks.ai/pricing"
+    provenance:
+      source: "https://fireworks.ai/pricing"
+      locator: "Seção Fine-tuning (Managed Training), tabela de preço por 1M tokens de treino"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_FIREWORKS_FULL_PARAM_DOUBLE_LORA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-27"
+    verified_against: "\"Models >300B (e.g. DeepSeek V3, Kimi K2) | $10.00 | $20.00 | $20.00 | $40.00\" — fireworks-pricing, Seção Fine-tuning (Managed Training), última linha da tabela (LoRA SFT, LoRA DPO, Full Param SFT, Full Param DPO) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Na Fireworks o ajuste de parâmetros completos custa o dobro do LoRA em cada faixa, e DPO o dobro do SFT (acima de 300B: US$10/20/20/40)."
+    narrative: "Trecho: \"Models >300B (e.g. DeepSeek V3, Kimi K2) | $10.00 | $20.00 | $20.00 | $40.00\". A razão 2x se confere nas duas linhas citadas. Efeito no Onion (leitura do escritor, não medida): faixa de custo de ajuste por tamanho e método, comparável entre si; só pesa se a opção D (gated) abrir."
+    trace: "https://fireworks.ai/pricing"
+    provenance:
+      source: "https://fireworks.ai/pricing"
+      locator: "Seção Fine-tuning (Managed Training), última linha da tabela (LoRA SFT, LoRA DPO, Full Param SFT, Full Param DPO)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_NEMOTRON_BOLT_HYBRID_MAMBA_LATENTMOE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    valid_from: "2026-10-15"
+    verified_at: "2026-10-27"
+    verified_against: "\"Mamba-2–Transformer hybrid LatentMoE with a C-RADIO v4-H vision encoder\" — nemotron-bolt, Model Summary (Architecture); Model Architecture (README linhas 60 e 165) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_kind: vendor-on-self
+    label: "O NVIDIA Nemotron 3.5 Bolt é híbrido Mamba-2/Transformer com MoE latente e codificador de visão C-RADIO v4-H, com 74B totais e 9B ativos."
+    narrative: "Trecho: \"Mamba-2–Transformer hybrid LatentMoE with a C-RADIO v4-H vision encoder\". Tier não declarado pelo leitor (source_tier omitido). 74B/9B não está neste trecho; o nome de coluna '74B-A9B' do nó de benchmarks sustenta. Efeito no Onion (leitura do escritor, não medida): peso aberto de 74B totais e 9B ativos não é o modelo pequeno local de conjunto fechado do Onion; entra como ponto da trajetória de pesos abertos, sem uso previsto."
+    trace: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+    provenance:
+      source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+      locator: "Model Summary (Architecture); Model Architecture (README linhas 60 e 165)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_NEMOTRON_BOLT_OPENMDW_LICENSE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    valid_from: "2026-10-15"
+    verified_at: "2026-10-27"
+    verified_against: "\"Use of the models is governed by the OpenMDW License Agreement, version 1.1\" — nemotron-bolt, License/Terms of Use (linha 119); Description (linha 53) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Nemotron 3.5 Bolt é regido pela licença OpenMDW, versão 1.1; a permissão de uso comercial não está no trecho ancorado."
+    narrative: "Trecho: \"Use of the models is governed by the OpenMDW License Agreement, version 1.1\". O leitor escreveu 'uso comercial e não comercial permitido', mas o trecho só nomeia a licença e a linha 53 não foi transcrita (E_OBJECAO_E7_22). A permissão fica fora do label. Efeito no Onion (leitura do escritor, não medida): peso aberto de 74B totais e 9B ativos não é o modelo pequeno local de conjunto fechado do Onion; entra como ponto da trajetória de pesos abertos, sem uso previsto."
+    trace: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+    provenance:
+      source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+      locator: "License/Terms of Use (linha 119); Description (linha 53)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_NEMOTRON_BOLT_HF_RELEASE_20261015_256K
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    valid_from: "2026-10-15"
+    verified_at: "2026-10-27"
+    verified_against: "\"The model supports up to 256K tokens of context. | Release Date: Hugging Face 10/15/2026\" — nemotron-bolt, Model Design (linha 171); Release Date (linha 151); Model Overview (linha 75) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Nemotron 3.5 Bolt foi publicado no Hugging Face em 2026-10-15, com janela de treino de dez/2025 a mai/2026 e contexto de até 256K tokens."
+    narrative: "Trecho: \"The model supports up to 256K tokens of context. | Release Date: Hugging Face 10/15/2026\". Ponto datado da trajetória de pesos abertos (valid_from 2026-10-15). Efeito no Onion (leitura do escritor, não medida): peso aberto de 74B totais e 9B ativos não é o modelo pequeno local de conjunto fechado do Onion; entra como ponto da trajetória de pesos abertos, sem uso previsto."
+    trace: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+    provenance:
+      source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+      locator: "Model Design (linha 171); Release Date (linha 151); Model Overview (linha 75)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_NEMOTRON_BOLT_VENDOR_BENCHMARKS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.5
+    valid_from: "2026-10-15"
+    verified_at: "2026-10-27"
+    verified_against: "\"GPQA Diamond 88.83 | Terminal-Bench 2.1 53.93 | BrowseComp 70.00 | MCP-Atlas 55.60\" — nemotron-bolt, Benchmarks (tabela, coluna Nemotron 3.5 Bolt 74B-A9B (BF16), README linhas 123-136) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 6
+    source_kind: vendor-on-self
+    label: "Benchmarks DECLARADOS pela NVIDIA para o Bolt 74B-A9B BF16: GPQA Diamond 88.83, Terminal-Bench 2.1 53.93, BrowseComp 70.00, MCP-Atlas 55.60."
+    narrative: "Trecho: \"GPQA Diamond 88.83 | Terminal-Bench 2.1 53.93 | BrowseComp 70.00 | MCP-Atlas 55.60\". Declaração do fornecedor sobre si: não é medida independente e não deve virar uma na síntese. Efeito no Onion (leitura do escritor, não medida): peso aberto de 74B totais e 9B ativos não é o modelo pequeno local de conjunto fechado do Onion; entra como ponto da trajetória de pesos abertos, sem uso previsto."
+    trace: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+    provenance:
+      source: "https://huggingface.co/nvidia/NVIDIA-Nemotron-3.5-Bolt-74B-A9B-BF16"
+      locator: "Benchmarks (tabela, coluna Nemotron 3.5 Bolt 74B-A9B (BF16), README linhas 123-136)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    valid_from: "2026-10-06"
+    verified_at: "2026-10-27"
+    verified_against: "\"We will release the weights by the end of the month.\" — mistral-large-4, Artigo 'Mistral Large 4', seção de pesos/red-teaming (grep -F no texto extraído) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Em 2026-10-06 a Mistral prometeu liberar os pesos do Mistral Large 4 até o fim do mês do anúncio; o estado em 2026-10-27 não foi medido."
+    narrative: "Trecho: \"We will release the weights by the end of the month.\". A promessa está ancorada; 'ainda não entregues' hoje não está (nenhuma leitura do Hugging Face em 2026-10-27, E_OBJECAO_E7_25). Gatilho de revisita: o fim de 2026-10. Efeito no Onion (leitura do escritor, não medida): é promessa; nada muda até os pesos e a licença saírem."
+    trace: "https://mistral.ai/news/mistral-large-4/"
+    provenance:
+      source: "https://mistral.ai/news/mistral-large-4/"
+      locator: "Artigo 'Mistral Large 4', seção de pesos/red-teaming (grep -F no texto extraído)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_MISTRAL_LARGE_4_ANNOUNCED_OPEN_WEIGHT_PREVIEW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    valid_from: "2026-10-06"
+    verified_at: "2026-10-27"
+    verified_against: "\"ML4 pushes the frontier of open-weight performance.\" — mistral-large-4, Artigo 'Mistral Large 4', abertura — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Mistral Large 4 foi anunciado em 2026-10-06 como modelo de pesos abertos, com API em preview pública no Mistral Studio."
+    narrative: "Trecho: \"ML4 pushes the frontier of open-weight performance.\". 'Open-weight' é autodeclaração de um modelo cujos pesos não tinham saído no anúncio e cuja licença não aparece (0 ocorrências de 'licen' na página, medido pelo verificador): como lançamento de pesos abertos, é promessa (E_OBJECAO_E7_26). Efeito no Onion (leitura do escritor, não medida): é promessa; nada muda até os pesos e a licença saírem."
+    trace: "https://mistral.ai/news/mistral-large-4/"
+    provenance:
+      source: "https://mistral.ai/news/mistral-large-4/"
+      locator: "Artigo 'Mistral Large 4', abertura"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_DISTILL_8B_2000X_ABSTRACT_CLAIM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    valid_from: "2026"
+    verified_at: "2026-10-27"
+    verified_against: "\"We find that creating a distilled 8B model is over 2,000 times more compute-efficient than training its vanilla counterpart, while achieving reasoning capabilities on par with, or even exceeding, standard models ten times its size.\" — distill-2602-20164, Abstract (PDF p.1) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_kind: paper
+    label: "O abstract do arXiv 2602.20164 (autores Lenovo) alega que um 8B destilado custa mais de 2.000 vezes menos computação que o vanilla equivalente; é custo MARGINAL (ver E_DISTILL_COST_IS_MARGINAL)."
+    narrative: "Trecho: \"We find that creating a distilled 8B model is over 2,000 times more compute-efficient than training its vanilla counterpart, while achieving reasoning capabilities on par with, or even exceeding, standard models ten times its size.\". Tier não declarado pelo leitor (source_tier omitido). Dito sozinho, o número prova menos do que sugere: a conta exclui o treino do professor de 685B e o pré-treino do aluno, e não há reprodução (E_OBJECAO_E7_27). Nunca usar sem E_DISTILL_COST_IS_MARGINAL. Efeito no Onion (leitura do escritor, não medida): treino barato por destilação é custo MARGINAL que pressupõe um professor grande já treinado; o Onion não treina, e o número não autoriza a leitura de que treinar ficou barato."
+    trace: "https://arxiv.org/abs/2602.20164"
+    provenance:
+      source: "https://arxiv.org/abs/2602.20164"
+      locator: "Abstract (PDF p.1)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_DISTILL_8B_622_H100_HOURS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    valid_from: "2026"
+    verified_at: "2026-10-27"
+    verified_against: "\"Creating a highly capable 8B parameter model via distillation requires approximately 622 H100 GPU-hours, a reduction of over 2,000 times compared to training its vanilla counterpart from scratch.\" — distill-2602-20164, Seção 4.2, final (PDF p.8) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 7
+    source_kind: paper
+    label: "Destilar o 8B (DeepSeek-R1-0528-Qwen3-8B, professor de 685B) exige cerca de 622 horas de H100, redução de mais de 2.000x contra o vanilla, segundo o paper."
+    narrative: "Trecho: \"Creating a highly capable 8B parameter model via distillation requires approximately 622 H100 GPU-hours, a reduction of over 2,000 times compared to training its vanilla counterpart from scratch.\". Número operacional útil, e ele mesmo marginal (ver E_DISTILL_COST_IS_MARGINAL). Efeito no Onion (leitura do escritor, não medida): treino barato por destilação é custo MARGINAL que pressupõe um professor grande já treinado; o Onion não treina, e o número não autoriza a leitura de que treinar ficou barato."
+    trace: "https://arxiv.org/abs/2602.20164"
+    provenance:
+      source: "https://arxiv.org/abs/2602.20164"
+      locator: "Seção 4.2, final (PDF p.8)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_DISTILL_BASELINE_IS_6ND_ESTIMATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    valid_from: "2026"
+    verified_at: "2026-10-27"
+    verified_against: "\"requires a staggering investment of over 1.2 million H100 GPU-hours and results in over 417 metric tons of CO2 equivalent emissions.\" — distill-2602-20164, Seção 4.1, final (PDF p.7) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 7
+    source_kind: paper
+    label: "A base de comparação do paper é o pré-treino do Qwen3-8B (36T tokens, ~1,26 milhão de horas de H100), uma ESTIMATIVA por 6ND com MFU de 38%, não medição."
+    narrative: "Trecho: \"requires a staggering investment of over 1.2 million H100 GPU-hours and results in over 417 metric tons of CO2 equivalent emissions.\". A destilação usa ~600M tokens e professor de 685B. Efeito no Onion (leitura do escritor, não medida): treino barato por destilação é custo MARGINAL que pressupõe um professor grande já treinado; o Onion não treina, e o número não autoriza a leitura de que treinar ficou barato."
+    trace: "https://arxiv.org/abs/2602.20164"
+    provenance:
+      source: "https://arxiv.org/abs/2602.20164"
+      locator: "Seção 4.1, final (PDF p.7)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_DISTILL_COST_IS_MARGINAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    valid_from: "2026"
+    verified_at: "2026-10-27"
+    verified_against: "\"Total Distillation FLOPs: (8.22×1020) + (2.88×1019) ≈ 8.5×1020 FLOPs\" — distill-2602-20164, Seção 4.2, item 2 (PDF p.8) — ancorada por verificador independente (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27)"
+    source_tier: 7
+    source_kind: paper
+    label: "A conta de destilação do paper soma só a inferência do professor e o treino do aluno (~8,5×10^20 FLOPs): o 2.000x mede custo marginal, sem o treino do professor nem o pré-treino do aluno."
+    narrative: "Trecho: \"Total Distillation FLOPs: (8.22×1020) + (2.88×1019) ≈ 8.5×1020 FLOPs\". Autolimitação correta do run: este nó tem de acompanhar E_DISTILL_8B_2000X_ABSTRACT_CLAIM em qualquer síntese. Efeito no Onion (leitura do escritor, não medida): treino barato por destilação é custo MARGINAL que pressupõe um professor grande já treinado; o Onion não treina, e o número não autoriza a leitura de que treinar ficou barato."
+    trace: "https://arxiv.org/abs/2602.20164"
+    provenance:
+      source: "https://arxiv.org/abs/2602.20164"
+      locator: "Seção 4.2, item 2 (PDF p.8)"
+      method: "leitura: fonte inteira lida pelo leitor do run e reaberta por verificador independente, que conferiu o trecho verbatim (ANCORADA)"
+      locality: "web"
+
+  - id: E_OBJECAO_E7_00
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a rodada não entrega o efeito no Onion por fonte (29 de 30 claims sem ele) e não mede trajetória: é baseline de um ponto por série."
+    narrative: "Das 30 claims ancoradas só a #11 (bedrock-rft) traz leitura para o Onion, e é inferência do leitor. 1ª rodada (never_run em docs/onion/radar-baselines.yaml): cada série tem um único ponto datado. Superação: nenhuma achada (o inbox não tem campo de efeito; o nó da OpenAI é o único do corpus). As linhas 'Efeito no Onion' das narrativas deste grafo são leitura do ESCRITOR, não medida, e não fecham esta objeção. Critério E2_PROVA_MENOS: grep -c 'Onion' nas claims 1-10 e 12-30 do run E7 2026-10-27: só a #11 contém 'Para o Onion'"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27 (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_02
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a janela de '60 dias' do degrau de 2026-07-02 está no claim, não no trecho citado; a data está ancorada, o parâmetro numérico não."
+    narrative: "Superação: nenhuma. O nó E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026 menciona a regra, mas vem da mesma página e não é ancoragem independente do número. Critério E2_PROVA_MENOS: grep -F '60 days' no texto extraído da página de deprecations da OpenAI (o quote ancorado não contém '60')"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702 (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_03
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): 'a página não lista substituto' para o fim do fine-tuning em 2027-01-06 é afirmação de ausência sem medida."
+    narrative: "Superação: nenhuma. O único substituto do run (gpt-6-luna) é de modelo, não de ajuste, e é fronteira do E6. Critério E2_PROVA_MENOS: grep -ciE 'instead|alternative|migrat|recommend' na seção 'Update to OpenAI’s self-serve fine-tuning' (não reportado no run)"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106 (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_05
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_GEMINI_API_NO_TUNABLE_MODEL_SINCE_2025_05, critério pré-registrado E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): o fechamento do ajuste no Gemini é de 2025-05 e de uma superfície só; a própria página diz que o ajuste segue na Gemini Enterprise Agent Platform."
+    narrative: "Não é movimento recente da trajetória nem 'API de ajuste que fecha' no sentido amplo: o Google tirou o ajuste de uma superfície. Superação: nenhuma (nenhuma claim lê preço, modelos ou disponibilidade dessa plataforma; kg-corpus-grep 'Gemini Enterprise Agent Platform' = 0 nós pertinentes). Critério E1_EVIDENCIA_CONTRARIA: https://ai.google.dev/gemini-api/docs/model-tuning — trecho verbatim 'but it is supported in Gemini Enterprise Agent Platform' (inbox docs/evolution/inbox/2026-10-27-signal-e7-sources.md §1)"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_GEMINI_API_NO_TUNABLE_MODEL_SINCE_2025_05 (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_07
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_MISTRAL_FT_API_DEPRECATED, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a deprecação do ajuste da Mistral está ancorada sem data; só há a data de observação, e não se sabe se fechou em 2025 ou em 2026."
+    narrative: "Superação: nenhuma. Nenhum changelog da Mistral foi lido, e o roster de 5 fontes de docs/onion/radar-sources.yaml não tem um. Critério E2_PROVA_MENOS: grep -E '20(25|26)' no aviso Deprecated de https://docs.mistral.ai/capabilities/finetuning/ — inbox §2 declara ausência de data"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_MISTRAL_FT_API_DEPRECATED (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_08
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_MISTRAL_FT_PAGE_RECOMMENDS_PROMPT_ENGINEERING_FIRST, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): 'sem data nem substituto' na página da Mistral é ausência sem grep, e o conselho de prompt engineering é genérico, não substituto."
+    narrative: "Superação: nenhuma (nenhuma claim do run sobre substituto Mistral). Critério E2_PROVA_MENOS: grep -ciE 'instead|replac|migrat|alternative' na página de finetuning da Mistral (não reportado no run)"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_MISTRAL_FT_PAGE_RECOMMENDS_PROMPT_ENGINEERING_FIRST (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_09
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_MISTRAL_FT_RESIDUAL_PRICE_4USD_2USD, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o preço de US$4/US$2 está numa página deprecada e sem data; não prova cobrança vigente e não entra como custo de ajuste em 2026-10."
+    narrative: "Superação: nenhuma (a página de pricing vigente da Mistral não está no inbox nem nas claims). Critério E2_PROVA_MENOS: cruzar com a página de preços atual da Mistral (não lida no run); E_MISTRAL_FT_API_DEPRECATED já ancora 'deprecated and no longer actively supported'"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_MISTRAL_FT_RESIDUAL_PRICE_4USD_2USD (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_10
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_BEDROCK_RFT_LAUNCH_QWEN3_GPTOSS_20260217, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o catálogo de dois modelos do RFT é o de 2026-02-17 ('at this launch'), oito meses atrás, e não foi re-medido; não prova o catálogo de hoje."
+    narrative: "Superação: nenhuma (só o anúncio What's New foi lido; a doc atual não está no inbox nem no roster). Critério E2_PROVA_MENOS: bash .claude/validation/kg-corpus-grep.sh 'qwen3-32b' = 0 nós; nenhuma claim lê a doc atual de modelos suportados do RFT no Bedrock"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_BEDROCK_RFT_LAUNCH_QWEN3_GPTOSS_20260217 (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_11
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_BEDROCK_RFT_RULE_GRADERS_OR_AI_JUDGES, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o 'encaixe' do RFT com o mecanismo verificável do Onion é analogia: o recompensador pode ser juiz de IA e o Onion não treina."
+    narrative: "Superação: nenhuma. C_BASE_MODELS_MENU_2026_10 (onion-slm-2026-10) está open, conf 0.5, e só vale se o eval falhar e o ajuste abrir. Critério E2_PROVA_MENOS: o quote contém 'or AI-based judges'; bash .claude/validation/kg-corpus-grep.sh 'reinforcement fine-tuning' — nenhum nó liga RFT a consumidor do Onion"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_BEDROCK_RFT_RULE_GRADERS_OR_AI_JUDGES (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_15
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_TOGETHER_SFT_SMALL_034_USD, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o SFT de US$0,34 da Together não declara método (LoRA ou completo), omite épocas e tokens de avaliação e não tem data; não se compara com a Fireworks."
+    narrative: "Superação: nenhuma (a doc de fine-tuning da Together com o método por preço não foi lida; o inbox só traz together.ai/pricing). Critério E2_PROVA_MENOS: inbox docs/evolution/inbox/2026-10-27-signal-e7-sources.md §5, ressalva 'a página não diz qual tabela de ajuste vale para LoRA...'"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_TOGETHER_SFT_SMALL_034_USD (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_16
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_TOGETHER_SFT_COST_SCALES_WITH_SIZE, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o gradiente de custo por tamanho da Together tem a mesma ambiguidade LoRA/Full e a mesma página sem data; ordena, não compara."
+    narrative: "Superação: nenhuma (mesma busca da objeção 15). Critério E2_PROVA_MENOS: inbox §5, ressalva LoRA/Full; o quote '| GLM-5.2 | $40.00 | $100.00 | $60.00 |' não nomeia o método"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_TOGETHER_SFT_COST_SCALES_WITH_SIZE (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_22
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_NEMOTRON_BOLT_OPENMDW_LICENSE, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): 'uso comercial e não comercial permitido' no Nemotron não está no trecho citado, que só nomeia a licença OpenMDW 1.1."
+    narrative: "Para o Onion, que usaria o modelo como ferramenta, a permissão é o que importa, e ela está sem quote. Superação: nenhuma (o texto da OpenMDW 1.1 não foi lido). Critério E2_PROVA_MENOS: grep -iE 'commercial' no README do Nemotron 3.5 Bolt, linha 53 (não transcrito no run); bash .claude/validation/kg-corpus-grep.sh OpenMDW = 0 nós"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_NEMOTRON_BOLT_OPENMDW_LICENSE (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_25
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): a promessa de pesos do Mistral Large 4 está ancorada em 2026-10-06, mas 'ainda não entregues' em 2026-10-27 não foi medido."
+    narrative: "Superação: nenhuma (a página do modelo no Hugging Face da Mistral não está no inbox nem nas claims). Critério E2_PROVA_MENOS: bash .claude/validation/kg-corpus-grep.sh 'Mistral Large 4' = 0 nós pertinentes; nenhuma claim lê huggingface.co/mistralai em 2026-10-27"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_26
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_MISTRAL_LARGE_4_ANNOUNCED_OPEN_WEIGHT_PREVIEW, critério pré-registrado E1_EVIDENCIA_CONTRARIA"
+    label: "OBJEÇÃO (Elenxo): 'open-weight' do Mistral Large 4 é autodeclaração sem pesos publicados nem licença; como lançamento de pesos abertos, ainda é promessa."
+    narrative: "Superação: nenhuma (condição futura, fim de 2026-10; nada medido). Critério E1_EVIDENCIA_CONTRARIA: E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH: 'We will release the weights by the end of the month.' + claim rejeitada do preço do ML4: grep 'licen' = 0 na página"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_MISTRAL_LARGE_4_ANNOUNCED_OPEN_WEIGHT_PREVIEW (survives: true, critério E1_EVIDENCIA_CONTRARIA)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_OBJECAO_E7_27
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-27"
+    verified_against: "objeção sobrevivente do Elenxo (run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27) contra E_DISTILL_8B_2000X_ABSTRACT_CLAIM, critério pré-registrado E2_PROVA_MENOS"
+    label: "OBJEÇÃO (Elenxo): o 2.000x do abstract, dito sozinho, prova menos do que sugere: exclui o treino do professor de 685B e o pré-treino do aluno, e não tem reprodução."
+    narrative: "Superação: nenhuma externa; a qualificação é a costura interna do run (E_DISTILL_COST_IS_MARGINAL), não superação medida. Critério E2_PROVA_MENOS: E_DISTILL_COST_IS_MARGINAL: 'Total Distillation FLOPs: (8.22×10^20) + (2.88×10^19) ≈ 8.5×10^20' — só inferência do professor + treino do aluno; bash .claude/validation/kg-corpus-grep.sh 2602.20164 = 0 nós"
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "Elenxo, objeção ao alvo E_DISTILL_8B_2000X_ABSTRACT_CLAIM (survives: true, critério E2_PROVA_MENOS)"
+      method: "juízes: Elenxo de 1 agente com critério pré-registrado"
+      locality: "host"
+
+  - id: E_LACUNAS_RADAR_E7_2026_10_27
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "contabilidade do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27: 10 chaves de fonte lidas, 0 inalcançáveis; 30 claims ancoradas, 8 rejeitadas na ancoragem (7 EXAGERADA, 1 NAO-ENCONTRADA); 31 objeções do Elenxo (15 sobreviventes, 16 derrubadas); 0 recusadas pelo motor; 7 superações achadas"
+    label: "Lacunas da 1ª rodada do E7: 10 fontes lidas, 0 inalcançáveis; 30 ancoradas e 8 rejeitadas (7 exageradas, 1 não encontrada); 15 objeções sobreviventes, 0 recusadas, 7 superações. É baseline de um ponto, sem efeito no Onion medido por fonte."
+    narrative: "FONTES LIDAS (10 chaves do run): openai-deprecations, gemini-tuning, mistral-finetuning, bedrock-rft, gemini-pricing, together-pricing, fireworks-pricing, nemotron-bolt, mistral-large-4, distill-2602-20164 (9 vindas da pauta da curadoria em docs/evolution/inbox/2026-10-27-signal-e7-sources.md + a página de descontinuações da OpenAI, relida para confirmar e datar o nó E_OPENAI_SELF_SERVE_FINETUNE_SUNSET_2026). INALCANÇÁVEIS: 0. CLAIMS ANCORADAS: 30, todas viraram nó E_ neste grafo. REJEITADAS NA ANCORAGEM (8, nenhuma virou nó; 7 EXAGERADA, 1 NAO-ENCONTRADA): (1) [openai-deprecations, EXAGERADA] 'a série GPT-4 será desligada em 2027-01-14, substituto gpt-6-luna': a entrada de 2026-10-14 cobre só 'certain GPT-4 series models' (GPT-4o 2024-08-06 e 2024-11-20, GPT-4o mini, GPT-4.1, GPT-4.1 mini); gpt-4-0613, gpt-4-turbo, gpt-4.1-nano e gpt-4o-2024-05-13 estão na entrada de 2026-04-22 com outro shutdown; é fronteira do E6 e não migra para cá; (2) [gemini-tuning, EXAGERADA] 'o ajuste segue na Gemini Enterprise Agent Platform, substituto indicado': a página só diz que é suportado lá; grep por recommend/migrat/switch/instead = 0; sem superação achada; (3) [bedrock-rft, EXAGERADA] 'abre justo quando a OpenAI fecha o self-serve': a página não menciona a OpenAI nem relação temporal; (4) [bedrock-rft, EXAGERADA] 'treino barato... recompensador verificável': 'cost-effective' qualifica as variantes de modelo, e o grader é de regra OU juiz de IA; (5) [together-pricing, EXAGERADA] 'cobrança por tokens do dataset de treino': prefixo truncado; a frase completa multiplica por épocas e soma tokens de avaliação; (6) [fireworks-pricing, EXAGERADA] serverless sem faixa por tamanho: substância sustentada, citação com omissão ('across Standard, Priority, and Fast serving paths'); (7) [mistral-large-4, EXAGERADA] '1T de pesos exige infraestrutura pesada de inferência': inferência do leitor; (8) [mistral-large-4, NAO-ENCONTRADA] preço US$1,36/4,18: os números existem no cartão, a frase citada foi reformulada. OBJEÇÕES DO ELENXO: 31 (1 transversal + 30 por claim), 15 sobreviventes com critério pré-registrado (modeladas como E_OBJECAO_E7_*, CONSTRAINS no alvo), 16 testadas e derrubadas. RECUSADAS PELO MOTOR (naoJulgada): 0. SUPERAÇÕES ACHADAS: 7, todas sobre claims rejeitadas na ancoragem, modeladas como C_SUPERACAO_20261027_* (TRACES_TO este nó); nenhuma das 15 objeções sobreviventes achou superação; a rejeição (2) do Gemini Enterprise não tem superação. LACUNAS QUE CONTINUAM ABERTAS (gapsOpen do Elenxo): (a) mistral-large-4: a promessa de 2026-10-06 está ancorada, mas 'ainda não entregues' em 2026-10-27 não foi medido (sem leitura do HF), e 'open-weight' segue sem licença; (b) mistral-finetuning: a data da deprecação não tem fonte (página não datada, inbox §2); (c) gemini-tuning (contra-evidência): o ajuste segue na Gemini Enterprise Agent Platform, e nenhuma claim lê preço ou modelos dessa plataforma; (d) together-pricing (comparabilidade): ajuste sem método LoRA/Full declarado e cobrança por épocas e tokens de avaliação omitida; não se compara com a Fireworks; (e) nemotron-bolt (licença): 'uso comercial permitido' sem quote; (f) bedrock-rft (estado atual): o catálogo do RFT em 2026-10 não foi re-medido; (g) transversal: efeito no Onion por fonte ausente em 29 de 30 claims (as linhas 'Efeito no Onion' deste grafo são leitura do escritor, não medida), e 'trajetória' é baseline de um ponto. O QUE A RODADA NÃO SUSTENTA (recomendação do Elenxo): 'o Google fechou o ajuste fino'; uma data para a deprecação da Mistral e o preço US$4/2 como custo vigente; 'pesos do ML4 ainda não entregues' hoje; comparar Together com Fireworks; permissão comercial do Nemotron; qualquer encaixe do RFT com o Onion; a tendência 'inferência encarece' (um ponto do Gemini contra pesos abertos baratos)."
+    trace: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+    provenance:
+      source: "journal do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+      locator: "listas de claims ancoradas, rejeitadas na ancoragem, fontes inalcançáveis, objeções, superações e gapsOpen do Elenxo"
+      method: "derivado: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  - id: C_SUPERACAO_20261027_GPT4_FOUR_FAMILIES_ONLY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação limitada às quatro famílias listadas, tirada da mesma entrada do documento, mais a entrada 'Legacy GPT model snapshots' para os demais GPT-4."
+    narrative: "Medida: curl -sL https://developers.openai.com/api/docs/deprecations, depois remoção de tags e leitura da entrada 2026-10-14: quatro famílias, shutdown January 14, 2027, substituto gpt-6-luna. Na entrada de 2026-04-22: gpt-4-0613, gpt-4-turbo e outros com shutdown October 23, 2026. Critério: A2_CLAIM_ESTICA. Alvo reprovado na ancoragem: [openai-deprecations] A série GPT-4 será desligada em 2027-01-14 e os fine-tunes seguem o cronograma do modelo base; substituto indicado gpt-6-luna. (EXAGERADA; é fronteira do E6 e não migra para cá)"
+    trace: "curl -sL https://developers.openai.com/api/docs/deprecations | sed 's/<[^>]*>/\\n/g' | grep -A3 -F 'certain GPT-4 series models' # diz 'certain', não a série inteira; ver também grep -F 'gpt-4-turbo' (shutdown October 23, 2026)"
+
+  - id: C_SUPERACAO_20261027_BEDROCK_RFT_NO_OPENAI_LINK
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação que o próprio texto sustenta: lançamento, modelos e data de 17/02/2026, sem a ligação causal com a OpenAI."
+    narrative: "Medida: Reaberto o HTML com curl e removidas as tags. grep -cF da quote do claim 1 deu 1, e 'Posted on: Feb 17, 2026' confere. O documento não traz as palavras 'deprecat', 'sunset' nem referência ao self-serve da OpenAI. Critério: A2_CLAIM_ESTICA. Alvo reprovado na ancoragem: [bedrock-rft] Em 17/02/2026 o Bedrock estendeu o RFT a modelos de pesos abertos e introduziu APIs compatíveis com a OpenAI; 'uma API de ajuste abre justo quando a OpenAI fecha o self-serve'. (EXAGERADA)"
+    trace: "curl -sL -A 'Mozilla/5.0' https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/ | sed 's/<[^>]*>/ /g' | grep -ci 'sunset\\|first-party\\|self-serve\\|deprecat' # esperado 0: o trecho não sustenta 'justo quando a OpenAI fecha o self-serve'"
+
+  - id: C_SUPERACAO_20261027_BEDROCK_RFT_NO_TRAINING_COST_CLAIM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação sustentada pelos parágrafos 1 e 2 do documento: poucos prompts, variantes menores e custo-efetivas, recompensa por grader de regra OU juiz de IA, sem alegação de custo de treino."
+    narrative: "Medida: grep -cF da quote do claim 3 deu 1. Nas linhas de preço do texto extraído não há valor, tabela ou comparação de custo de treino (grep -ci 'price\\|pricing\\|\\$' sobre o texto limpo não traz nenhuma cifra de treino). 'cost-effective' só qualifica 'model variants'. Critério: A2_CLAIM_ESTICA. Alvo reprovado na ancoragem: [bedrock-rft] 'Isso é treino barato com poucos dados, e o recompensador é verificável.' (EXAGERADA)"
+    trace: "curl -sL -A 'Mozilla/5.0' https://aws.amazon.com/about-aws/whats-new/2026/02/amazon-bedrock-reinforcement-fine-tuning-openai/ | sed 's/<[^>]*>/ /g' | grep -o 'enables customers to use smaller, faster, and more cost-effective model variants[^.]*\\.\\|verifiable rule-based graders or AI-based judges' # 'cost-effective' qualifica variantes de modelo, não o treino; grader é 'verifiable ... OR AI-based'"
+
+  - id: C_SUPERACAO_20261027_TOGETHER_BILLING_EPOCHS_EVAL_TOKENS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A frase completa da nota de preço no mesmo documento, que entrega o valor que o claim prometia (a base de cobrança), com épocas e tokens de avaliação."
+    narrative: "Medida: curl do HTML de https://www.together.ai/pricing em 2026-10-27, extração de texto e busca por 'sum of tokens': a frase completa aparece duas vezes, uma sob cada tabela de ajuste fino. A promoção B200 'valid until 12/14/2026' aparece uma vez. Critério: A2_CLAIM_ESTICA. Alvo reprovado na ancoragem: [together-pricing] 'A cobrança de ajuste é por tokens do dataset de treino; a única data na página é uma promoção de GPU de pós-treino.' (EXAGERADA: prefixo truncado)"
+    trace: "curl -sL -A 'Mozilla/5.0' https://www.together.ai/pricing | grep -o 'Price is based on the sum of tokens processed[^|<]*' | head -1 # a frase continua com '(training dataset size × number of epochs) plus any tokens in the optional evaluation dataset', que o claim omite"
+
+  - id: C_SUPERACAO_20261027_FIREWORKS_SERVERLESS_VERBATIM_QUOTE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A citação verbatim do mesmo documento, 'To view the current pricing for our most popular serverless models across Standard, Priority, and Fast serving paths, visit our full pricing documentation.', que sustenta o claim sem alteração de substância."
+    narrative: "Medida: Página reaberta via curl e extraída para texto; a frase completa está na linha 27 do texto extraído, e a promoção do Muse Glimmer na linha 42, conferidas por grep -n. Critério: A1_QUOTE_AUSENTE. Alvo reprovado na ancoragem: [fireworks-pricing] A página não lista preço de inferência serverless de texto por faixa; remete à documentação; Muse Glimmer 30B SFT grátis até 30/11 (ano não informado). (EXAGERADA: citação com omissão)"
+    trace: "curl -sL -A 'Mozilla/5.0' https://fireworks.ai/pricing | sed -E 's/<script.*<\\/script>//g; s/<[^>]+>/\\n/g' | grep -c -F 'To view the current pricing for our most popular serverless models, visit our full' # 0 ocorrências; a forma verbatim é 'serverless models across Standard, Priority, and Fast serving paths, visit our full'"
+
+  - id: C_SUPERACAO_20261027_ML4_SCALE_WITHOUT_INFRA_INFERENCE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A formulação sustentada pelo mesmo documento (1T, 52B ativos, MoE, Blackwell na Europa), sem a inferência sobre infraestrutura de inferência."
+    narrative: "Medida: grep -F no texto extraído da página: 'ML4 is a 1 trillion-parameter...', 'trained from scratch on 3,800 NVIDIA Grace Blackwell GPUs', 'Open-weight hybrid instruct-and-reasoning MoE' presentes. Critério: A2_CLAIM_ESTICA. Alvo reprovado na ancoragem: [mistral-large-4] Escala 1T/52B ativos treinado em Blackwell na Europa; 'a liberação de pesos de 1T parâmetros exige infraestrutura pesada de inferência'. (EXAGERADA)"
+    trace: "curl -sL https://mistral.ai/news/mistral-large-4/ | grep -o -i -E '.{80}(infrastructure|inference|hardware).{80}' e conferir que nenhum trecho diz que liberar/rodar os pesos exige infraestrutura pesada; o trecho citado só dá 1T/52B"
+
+  - id: C_SUPERACAO_20261027_ML4_PRICE_CARD_VERBATIM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O trecho do cartão no mesmo documento, 'Input (/M tokens) $1.36 Output (/M tokens) $4.18', que entrega os mesmos valores com citação verbatim."
+    narrative: "Medida: grep -F '1.36' e '4.18' no texto extraído da página: ambos presentes no cartão, sem 'Input is'; grep -i 'licen' = 0. Critério: A1_QUOTE_AUSENTE. Alvo reprovado na ancoragem: [mistral-large-4] Preço de API US$1,36/M de entrada e US$4,18/M de saída; sem rótulo de preview nem licença. (NAO-ENCONTRADA: quote reformulada)"
+    trace: "curl -sL -A 'Mozilla/5.0' https://mistral.ai/news/mistral-large-4/ | grep -F 'Input is $1.36 per million tokens, and output is $4.18 per million tokens.' (0 ocorrências)"
+
+  - id: Q_E7_BASELINE_CLOSE_BEFORE_SEAL_1027
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Antes de selar a baseline do E7: ler 3 primárias a mais (Hugging Face da Mistral para o ML4, texto da licença OpenMDW 1.1, changelog da Mistral) e escrever, por fonte, a linha medida do que muda para o Onion?"
+    narrative: "Proposta do Elenxo desta rodada, não selo: a rodada sustenta uma baseline datada (legítima como 1ª rodada, meta.x_supersedes_none) e deve ser selada ASSIM, como baseline. As três leituras fecham as lacunas (a), (b) e (e) do E_LACUNAS; a linha por fonte fecha a (g). A data da baseline em docs/onion/radar-baselines.yaml é do maestro (/meta:radar), não deste escritor, que nunca sela."
+    trace: "recommendation do Elenxo do run E7-treino-inferencia do /onion-research, modo primaries, 2026-10-27"
+
+  - id: E_E7_PR_PASS_60_DAYS_VERBATIM_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    valid_from: "2026-07-02"
+    verified_at: "2026-10-27"
+    verified_against: "passada adversarial do PR da 1ª rodada do E7 (2026-10-27): curl da página de descontinuações da OpenAI, tags removidas, grep -i -A2 'have not run inference' devolve a frase inteira com 'in the past 60 days.'"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "A janela de 60 dias do degrau de 2026-07-02 da OpenAI está verbatim na página: a frase termina em 'in the past 60 days.'. A objeção que a dava como não ancorada cai."
+    narrative: "Trecho: \"Creating fine-tuning jobs is no longer available to organizations that have not run inference on a fine-tuned model in the past 60 days.\". O verificador do run ancorou a frase cortada antes da janela, e o Elenxo objetou com razão sobre o trecho que tinha (E_OBJECAO_E7_02, critério 'grep -F 60 days' no texto da página). A passada adversarial do PR rodou esse critério: uma ocorrência. A objeção vira refutada; o nó do degrau de 2026-07-02 fica com a janela numérica ancorada por esta leitura."
+    trace: "https://developers.openai.com/api/docs/deprecations"
+    provenance:
+      source: "https://developers.openai.com/api/docs/deprecations"
+      locator: "Seção 'Update to OpenAI’s self-serve fine-tuning', tabela, linha 'July 2, 2026'"
+      method: "medição: curl da página em 2026-10-27, remoção de tags e grep pela frase; conferida também por WebFetch na mesma data"
+      locality: "web"
+
+  - id: E_E7_BASELINE_SEALED_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "docs/onion/radar-baselines.yaml, eixo E7-treino-inferencia: sem never_run, com last_run 2026-10-27 e kg apontando este grafo, no mesmo commit do grafo; o lint parou de acusar o eixo como nunca rodado (REGRA 65)"
+    label: "A 1ª rodada do E7 está selada como baseline datada de 2026-10-27, não como trajetória; o roster treino-inferencia ganhou as 9 fontes ancoradas e a passada do PR conferiu 5 nós contra a fonte."
+    narrative: "Selo por ordem do maestro, na forma que o próprio Elenxo da rodada pediu: baseline de um ponto por série (meta.x_supersedes_none), legítima como 1ª rodada. A pergunta Q_E7_BASELINE_CLOSE_BEFORE_SEAL_1027 (três primárias a mais e a linha por fonte do que muda para o Onion) segue aberta para a 2ª rodada: o selo não a responde. Fontes acrescentadas ao grupo treino-inferencia de docs/onion/radar-sources.yaml com last_checked 2026-10-27: gemini-api model-tuning e pricing, mistral finetuning e o anúncio do Mistral Large 4, o anúncio do RFT no Bedrock, as páginas de preço da Together e da Fireworks, o cartão do Nemotron 3.5 Bolt e o paper 2602.20164; a página de descontinuações da OpenAI teve o last_checked renovado. As fontes que a curadoria recusou não entraram. A passada adversarial do PR conferiu contra a fonte os dois preços do Gemini 4 Argon, o degrau de 2027-01-06 da OpenAI, a data do RFT no Bedrock e as 622 horas de H100 do paper: os cinco batem; e achou a janela de 60 dias verbatim (E_E7_PR_PASS_60_DAYS_VERBATIM_1027). A projeção humana desta rodada é a SYNTHESIS."
+    trace: "docs/evolution/research/radar-E7-2026-10-27/SYNTHESIS.md"
+    provenance:
+      source: "docs/onion/radar-baselines.yaml e docs/onion/radar-sources.yaml"
+      locator: "eixo E7-treino-inferencia (baselines) e grupo treino-inferencia (sources)"
+      method: "medição: leitura do arquivo depois da edição e saída do lint-artifacts.sh sem o aviso de eixo nunca rodado"
+      locality: "repo"
+
+edges:
+  - from: E_OPENAI_FT_CLOSED_NEW_ORGS_20260507
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_OPENAI_FT_INFERENCE_CONTINUES_UNTIL_BASE_DEPRECATION
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_GEMINI_API_NO_TUNABLE_MODEL_SINCE_2025_05
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_GEMINI_API_NO_IMMEDIATE_TUNING_PLANS
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_MISTRAL_FT_API_DEPRECATED
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_MISTRAL_FT_PAGE_RECOMMENDS_PROMPT_ENGINEERING_FIRST
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_MISTRAL_FT_RESIDUAL_PRICE_4USD_2USD
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_BEDROCK_RFT_LAUNCH_QWEN3_GPTOSS_20260217
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_BEDROCK_RFT_RULE_GRADERS_OR_AI_JUDGES
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_GEMINI_4_ARGON_FLAGSHIP_PAGE_1026
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_GEMINI_4_ARGON_INPUT_PRICE_DOUBLES_20261201
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_GEMINI_4_ARGON_OUTPUT_PRICE_DOUBLES_20261201
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_SFT_SMALL_034_USD
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_SFT_COST_SCALES_WITH_SIZE
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_INFERENCE_SMALL_OPEN_WEIGHTS_CENTS
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_INFERENCE_HIGH_TIER_OPEN_WEIGHTS
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_LORA_SFT_SIZE_TIERS
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_FULL_PARAM_DOUBLE_LORA
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_NEMOTRON_BOLT_HYBRID_MAMBA_LATENTMOE
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_NEMOTRON_BOLT_OPENMDW_LICENSE
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_NEMOTRON_BOLT_HF_RELEASE_20261015_256K
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_NEMOTRON_BOLT_VENDOR_BENCHMARKS
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_MISTRAL_LARGE_4_ANNOUNCED_OPEN_WEIGHT_PREVIEW
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_DISTILL_8B_2000X_ABSTRACT_CLAIM
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_DISTILL_8B_622_H100_HOURS
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_DISTILL_BASELINE_IS_6ND_ESTIMATE
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_DISTILL_COST_IS_MARGINAL
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_DISTILL_COST_IS_MARGINAL
+    to: E_DISTILL_8B_2000X_ABSTRACT_CLAIM
+    edge_type: CONSTRAINS
+  - from: E_DISTILL_BASELINE_IS_6ND_ESTIMATE
+    to: E_DISTILL_8B_2000X_ABSTRACT_CLAIM
+    edge_type: CONSTRAINS
+  - from: E_TOGETHER_INFERENCE_SMALL_OPEN_WEIGHTS_CENTS
+    to: E_GEMINI_4_ARGON_OUTPUT_PRICE_DOUBLES_20261201
+    edge_type: CONSTRAINS
+  - from: E_OPENAI_FT_INFERENCE_CONTINUES_UNTIL_BASE_DEPRECATION
+    to: E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_00
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_02
+    to: E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_03
+    to: E_OPENAI_FT_CLOSED_ALL_NEW_JOBS_20270106
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_05
+    to: E_GEMINI_API_NO_TUNABLE_MODEL_SINCE_2025_05
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_07
+    to: E_MISTRAL_FT_API_DEPRECATED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_08
+    to: E_MISTRAL_FT_PAGE_RECOMMENDS_PROMPT_ENGINEERING_FIRST
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_09
+    to: E_MISTRAL_FT_RESIDUAL_PRICE_4USD_2USD
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_10
+    to: E_BEDROCK_RFT_LAUNCH_QWEN3_GPTOSS_20260217
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_11
+    to: E_BEDROCK_RFT_RULE_GRADERS_OR_AI_JUDGES
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_15
+    to: E_TOGETHER_SFT_SMALL_034_USD
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_16
+    to: E_TOGETHER_SFT_COST_SCALES_WITH_SIZE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_22
+    to: E_NEMOTRON_BOLT_OPENMDW_LICENSE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_25
+    to: E_MISTRAL_LARGE_4_WEIGHTS_PROMISED_END_OF_MONTH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_26
+    to: E_MISTRAL_LARGE_4_ANNOUNCED_OPEN_WEIGHT_PREVIEW
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_E7_27
+    to: E_DISTILL_8B_2000X_ABSTRACT_CLAIM
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_RADAR_E7_2026_10_27
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_GPT4_FOUR_FAMILIES_ONLY
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_BEDROCK_RFT_NO_OPENAI_LINK
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_BEDROCK_RFT_NO_TRAINING_COST_CLAIM
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_TOGETHER_BILLING_EPOCHS_EVAL_TOKENS
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_FIREWORKS_SERVERLESS_VERBATIM_QUOTE
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_ML4_SCALE_WITHOUT_INFRA_INFERENCE
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261027_ML4_PRICE_CARD_VERBATIM
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: Q_E7_BASELINE_CLOSE_BEFORE_SEAL_1027
+    to: E_LACUNAS_RADAR_E7_2026_10_27
+    edge_type: TRACES_TO
+  - from: Q_E7_BASELINE_CLOSE_BEFORE_SEAL_1027
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: DEPENDS_ON
+  - from: E_E7_PR_PASS_60_DAYS_VERBATIM_1027
+    to: E_OBJECAO_E7_02
+    edge_type: REFUTES
+  - from: E_E7_PR_PASS_60_DAYS_VERBATIM_1027
+    to: E_OPENAI_FT_CLOSED_NO_RECENT_INFERENCE_20260702
+    edge_type: SUPPORTS
+  - from: E_E7_BASELINE_SEALED_1027
+    to: Q_RADAR_E7_TREINO_INFERENCIA_2026_10_27
+    edge_type: SUPPORTS
+  - from: E_E7_PR_PASS_60_DAYS_VERBATIM_1027
+    to: E_E7_BASELINE_SEALED_1027
+    edge_type: TRACES_TO
