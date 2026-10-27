@@ -21,7 +21,7 @@ The list lives in [`spec/release.json`](spec/release.json):
 - the reference MCP server (`tools/kg_mcp.py`), so a model can judge and write graphs through the contract, over stdio
   or local HTTP;
 - the provenance exporter to PROV-O in JSON-LD (`tools/kg_prov_export.py`);
-- the pinned dependencies (`tools/requirements.txt`: Python 3.11 or later with PyYAML and jsonschema). Each file
+- the pinned dependencies (`tools/requirements.txt`: Python 3.12 or later with PyYAML and jsonschema). Each file
   carries its sha256, and pip checks it at install time; `--require-hashes` makes the install fail if the file ever
   loses its hashes;
 - the PyPI package recipe (`packaging/python/`): the build script, the listing README, and the build tools pinned by
@@ -234,7 +234,7 @@ jobs:
           python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
 
-On another CI, the step is the same: Python 3.11 or later, the pinned dependencies with `--require-hashes`, and the
+On another CI, the step is the same: Python 3.12 or later, the pinned dependencies with `--require-hashes`, and the
 two commands.
 
 **`check`** fails (rc 1) when a vendor file was edited, deleted, or added. That includes bytecode in a
@@ -342,6 +342,11 @@ this ("run the update again"). The second `update`, now with the new kit, writes
 After `git add`, `check --index` confirms that the index holds the release bytes. Another way is to run the update
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
+
+From `kg-ssot-v4.34.0` to `kg-ssot-v4.35.0`, nothing changes in the contract or the gate's verdict, but the
+**Python floor is now 3.12**: a CI that still pins 3.11 must move to 3.12 or later before updating. `kg_trace check`
+can now fail on a JSON Pointer `provenance.locator` that does not resolve; if your graphs carry such locators, run it
+before updating. `kg_trace.py projection` is new and only runs if you call it.
 
 From `kg-ssot-v4.33.0` to `kg-ssot-v4.34.0`, nothing changes in the contract or the gate: only the output of
 `kg_query --chain` changes, as described in the changelog.

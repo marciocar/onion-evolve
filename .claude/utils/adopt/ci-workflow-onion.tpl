@@ -47,10 +47,14 @@ jobs:
           # requirements.txt traz o sha256 de cada arquivo publicado, e o pip já os confere sozinho; o
           # --require-hashes acrescenta falhar alto se o arquivo um dia perder todos os hashes. Ele só entra quando
           # o arquivo traz hash: um vendor/kg-ssot próprio e anterior à v4.7.4 não tem, e com a flag o CI nasceria
-          # vermelho. Piso: Python 3.11.
+          # vermelho. Piso: Python 3.12 (o da kg-ssot 4.35.0, `requires-python = ">=3.12"`; era 3.11).
+          # O template NÃO fixa o Python do runner com setup-python, de propósito, e o core sim (#1408): quem escolhe
+          # o interpretador é o ambiente, e este workflow é do adotante. Com setup-python aqui, o currency-census.sh
+          # do adotante passaria a cobrar o python3 da máquina dele contra o pino deste arquivo; sem, a superfície
+          # some no adotante. O python3 da imagem (ubuntu-latest) basta, e o passo abaixo barra a imagem sob o piso.
           if [ -f vendor/kg-ssot/tools/requirements.txt ]; then
-            python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 11) else 1)' \
-              || { echo "ERRO: o leitor do contrato KG-SSOT exige Python 3.11 ou mais; o runner tem $(python3 --version 2>&1)"; exit 1; }
+            python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 12) else 1)' \
+              || { echo "ERRO: o leitor do contrato KG-SSOT exige Python 3.12 ou mais; o runner tem $(python3 --version 2>&1)"; exit 1; }
             rh=""; grep -q -- '--hash=sha256:' vendor/kg-ssot/tools/requirements.txt && rh="--require-hashes"
             python3 -m pip install --quiet ${rh} -r vendor/kg-ssot/tools/requirements.txt
           fi

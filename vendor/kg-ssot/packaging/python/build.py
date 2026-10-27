@@ -39,7 +39,7 @@ name = "kg-ssot"
 version = "{version}"
 description = "Verifiable knowledge graphs in plain text (.kg.yaml and .kg.json): the formal contract, reference reader, conformance suite, per-graph CI gate, gated store and MCP server."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{{ name = "Marcio Carvalho" }}]
@@ -53,9 +53,10 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Software Development :: Quality Assurance",
     "Topic :: Software Development :: Testing",
     "Topic :: Text Processing :: Markup",

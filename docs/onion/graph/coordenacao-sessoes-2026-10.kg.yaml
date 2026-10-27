@@ -73,13 +73,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 4
     confidence: 0.5
-    verified_against: "gh pr list --state all em 2026-10-27: 1407 OPEN, CLEAN; gh pr checks 1407 sem falha"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 1407 em 2026-10-27: MERGED, merge 87c9b8f53be7"
     label: "O PR 1407 (o core adota a kg-ssot 4.34.0) está na fila de merge, limpo e com os checks verdes; falta só o merge."
-    narrative: "Medido em 2026-10-27: mergeStateStatus CLEAN e nenhum check falhando. É a porta de duas pendências: a rodada de update da curadoria com a 4.34.0 e a adoção até a 4.35 no core; pela primeira, também da ponte com URL fixada que a curadoria grava nos vereditos de fora."
+    narrative: "Medido em 2026-10-27: mergeStateStatus CLEAN e nenhum check falhando. É a porta de duas pendências: a rodada de update da curadoria com a 4.34.0 e a adoção até a 4.35 no core; pela primeira, também da ponte com URL fixada que a curadoria grava nos vereditos de fora. Fechado em 2026-10-27: o 1407 entrou (merge 87c9b8f53be7), e a 4.35.0 foi adotada por cima dele no PR chore/kg-ssot-4.35.0."
   - id: Q_COORD_PR1404_CORTEX_CONFLITO_E_CHECKS
     node_type: question
     layer: audit
@@ -95,13 +96,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 4
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 1408 em 2026-10-27: MERGED, merge 9f375c6e1567; no PR chore/kg-ssot-4.35.0, o template .claude/utils/adopt/ci-workflow-onion.tpl com o piso 3.12 e o caso (d) da família kg_ssot_require_hashes da bancada"
     label: "O core passa a rodar em Python 3.15 com o piso no 3.12; a branch chore/python-3.15 está em construção."
-    narrative: "O piso 3.12 acompanha a 4.35.0 da kg-ssot, que testa 3.12, 3.14 e 3.15. O template de CI com o piso 3.12 entra na adoção até a 4.35 no core. A troca dos serviços da VPS para o 3.15 é do maestro e vem depois."
+    narrative: "O piso 3.12 acompanha a 4.35.0 da kg-ssot, que testa 3.12, 3.14 e 3.15. O template de CI com o piso 3.12 entra na adoção até a 4.35 no core. A troca dos serviços da VPS para o 3.15 é do maestro e vem depois. Fechado em 2026-10-27: o PR 1408 pôs o core no 3.15 com o piso 3.12 provado no CI, e o template de CI que viaja subiu o piso para 3.12 no PR chore/kg-ssot-4.35.0, sem fixar o Python do runner (o workflow é do adotante; com setup-python ali, o currency-census.sh dele cobraria a máquina dele contra o pino)."
   - id: Q_COORD_CURADORIA_UPDATE_4340
     node_type: question
     layer: audit
@@ -117,24 +119,26 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 4
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "bancada pré-tag de 2026-10-27 na ref d58e80befed8 da kg-ssot: kg_vendor.py update e ops/kg-gate-ci.sh com o gate igual ao da 4.34.0 e o spec/projection.schema.json novo no vendor (659 arquivos); a tag kg-ssot-v4.35.0 (3960131ab70d no clone fonte) difere da ref só no balde uncited do checador de projeção, no teste e no manual"
     label: "A bancada do core sobre a kg-ssot 4.35.0, assim que houver ref publicada."
-    narrative: "É a etapa do core no ciclo de release da kg-ssot: medir a ref nova contra a bancada antes da tag. Sem ref, não há o que medir."
+    narrative: "É a etapa do core no ciclo de release da kg-ssot: medir a ref nova contra a bancada antes da tag. Sem ref, não há o que medir. Fechado em 2026-10-27: a bancada rodou na ref d58e80befed8 antes da tag e deu o gate igual ao da 4.34.0; o que muda da ref para a tag é o balde uncited do checador de projeção, que a adoção mediu na tag."
   - id: Q_COORD_ADOCAO_4330_4350_NO_CORE
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 4
     confidence: 0.5
-    verified_against: "gh pr list em 2026-10-27: 1401 MERGED (4.33.0), 1407 OPEN (4.34.0)"
+    verified_at: "2026-10-27"
+    verified_against: "na branch chore/kg-ssot-4.35.0: kg_vendor.py update --tag kg-ssot-v4.35.0 (3960131ab70d, 659 arquivos) e check intacto; ops/kg-gate-ci.sh igual antes e depois (199 grafos, 197 passam o MUST, os 2 da dívida herdada); a REGRA 112 nova sobre o kg_trace.py projection; o locator delegado ao kg_trace check na REGRA 55; as famílias design_context, kg_projection e kg_ssot_require_hashes da bancada, com mutantes"
     label: "A adoção da kg-ssot até a 4.35.0 no core, com o template de CI no piso 3.12, o checador de projeção valendo nos contextos e a delegação do locator ao kg_trace."
-    narrative: "A 4.33.0 já entrou pelo PR 1401 e a 4.34.0 está no PR 1407; falta a 4.35.0 com as quatro frentes dela. O checador de projeção é o degrau 1 de Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027."
+    narrative: "A 4.33.0 já entrou pelo PR 1401 e a 4.34.0 está no PR 1407; falta a 4.35.0 com as quatro frentes dela. O checador de projeção é o degrau 1 de Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027. Fechado em 2026-10-27 pelo PR chore/kg-ssot-4.35.0 (E_KG_SSOT_435_ADOTADA_1027, em sinais-de-campo-2026-09): a 4.33.0 entrou pelo 1401, a 4.34.0 pelo 1407 e a 4.35.0 por esse PR, com o template no piso 3.12, o checador de projeção valendo pela REGRA 112 (Página com projection_of cita ids que existem nos grafos dela) e a parte genérica do locator passada ao kg_trace check."
   - id: Q_COORD_UPDATE_4_ADOTANTES_4350
     node_type: question
     layer: audit
@@ -216,13 +220,19 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 4
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "peer-ref-check.sh onion-curation docs/evolution/dissect/isnad-2026-10/isnad-2026-10.kg.yaml#E_CHAIN_FIELD_RETEST_434 em 2026-10-27: rc 0 @ 7bf0b9abce68, a main da curadoria depois do PR 146"
     label: "Depois do update com a 4.34.0, gravar a ponte com URL fixada no sha nos 3 vereditos selados de fora (Duolingo ator, rdf-extra e isnad) e refazer o --chain."
-    narrative: "Espera a rodada de update da curadoria pelo core. O --chain é a projeção da cadeia de transmissão que entrou com a 4.33.0."
+    narrative: "Espera a rodada de update da curadoria pelo core. O --chain é a projeção da cadeia de transmissão que entrou com a 4.33.0. Fechado em 2026-10-27: entrou no PR 146 da curadoria (main 7bf0b9a). A URL fixada no sha foi para 12 vereditos, não só os 3 previstos: todos os que têm x_dissect_sealed_by de onion-evolve ou de onion-kg-ssot. O --chain foi refeito na 4.34.0 e passa nos 3 critérios do acordo (o nó E_CHAIN_FIELD_RETEST_434 da curadoria, na proveniência)."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/7bf0b9abce68b2451c0f1169b09cc4c19cecf01d/docs/evolution/dissect/isnad-2026-10/isnad-2026-10.kg.yaml#E_CHAIN_FIELD_RETEST_434"
+      locator: "E_CHAIN_FIELD_RETEST_434 @ 7bf0b9abce68"
+      method: "reading: peer-ref-check.sh no clone local da curadoria, nó lido por kg_query.py"
+      locality: "web"
   - id: Q_COORD_CUR_FECHAR_9_PECAS_CORTEX
     node_type: question
     layer: audit
@@ -249,13 +259,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: curadoria
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "merge-base --is-ancestor 5f5f658 origin/main no clone da curadoria em 2026-10-27: rc 0 (o PR 144 da curadoria)"
     label: "Medir a captura real e o diagrama no deck do Cortex, com o navegador autorizado pelo maestro na curadoria. Se a nota mudar, o core ajusta o selo."
-    narrative: "A medição é da curadoria; o ajuste do selo das 9 peças, se a nota mudar, volta para o core, no PR 1404 ou depois dele."
+    narrative: "A medição é da curadoria; o ajuste do selo das 9 peças, se a nota mudar, volta para o core, no PR 1404 ou depois dele. Fechado em 2026-10-27: entrou no PR 144 da curadoria (main 5f5f658). Captura e diagrama rodam locais, e a nota fica entre 5 e 6, conforme o navegador."
   - id: Q_COORD_CUR_LAB_11_CASOS_E_CHAIN_WITH
     node_type: question
     layer: audit
@@ -271,35 +282,38 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     impact: 5
     confidence: 0.5
-    verified_against: "git branch no clone do kg-ssot em 2026-10-27: feat/release-4350 só local; ls-remote sem a branch"
+    verified_at: "2026-10-27"
+    verified_against: "confirmação da sessão do kg-ssot em 2026-10-27: a 4.35.0 saiu nos cinco canais (npm, PyPI, GHCR, MCPB e Registry, e o site), conferida pelo chk.sh com rc 0; a tag kg-ssot-v4.35.0 existe no clone fonte (3960131ab70d); o sge a adotou (merge ddb72cf66f00) e o brain também (7770189de e fb3971971)"
     label: "A release 4.35.0 da kg-ssot, com quatro frentes: --with, Python 3.12 testado em 3.12, 3.14 e 3.15 (o extra vector só até o 3.14, por causa do onnxruntime), o checador de projeção e o locator."
-    narrative: "Branch feat/release-4350 no clone da sessão do kg-ssot, sem push medido; o pré-registro está em docs/onion/measurements/release-4350/CRITERIA.md nessa branch. Está na 2ª volta do Elenxo; depois vêm o PR, a bancada do core, a tag, o npm com o maestro e os avisos. É a pendência de que mais outras esperam."
+    narrative: "Branch feat/release-4350 no clone da sessão do kg-ssot, sem push medido; o pré-registro está em docs/onion/measurements/release-4350/CRITERIA.md nessa branch. Está na 2ª volta do Elenxo; depois vêm o PR, a bancada do core, a tag, o npm com o maestro e os avisos. É a pendência de que mais outras esperam. Fechado em 2026-10-27: a release saiu nos cinco canais e foi conferida pelo chk.sh com rc 0, segundo a sessão do kg-ssot; o sge e o brain já a adotaram, e o core a adota no PR chore/kg-ssot-4.35.0."
   - id: Q_COORD_KGSSOT_GIF_DEMO_PTBR
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     impact: 2
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 282 -R marciocar/onion-kg-ssot em 2026-10-27: MERGED às 17:54:48Z"
     label: "O GIF da demo em pt-BR, depois da 4.35.0."
-    narrative: "Material de vitrine; espera a release para não gravar a demo de uma versão que já mudou."
+    narrative: "Material de vitrine; espera a release para não gravar a demo de uma versão que já mudou. Fechado em 2026-10-27: o PR 282 do kg-ssot entrou com o docs/demo/kg-ssot-demo.pt-BR.gif e o README.pt-BR apontando para ele; o GIF chega ao espelho público na próxima tag. Com isso o kg-ssot fica sem pendência própria em voo."
   - id: Q_COORD_KGSSOT_CONFERIR_CURA_ESCRITOR_MCP
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     impact: 3
     confidence: 0.5
-    verified_against: "gh pr list em 2026-10-27: 1397 MERGED"
+    verified_at: "2026-10-27"
+    verified_against: "grep -n na origin/main do core em 2026-10-27, da qual 1d888603b é ancestral: ops/mcp-onion-kg-writer/server.py, linhas 647 a 650 com as classes canônicas em inglês, os aliases em português aceitos e testimony e testemunho valendo igual em PROD (integrity.testimony-in-prod), e a linha 667 com o exemplo method reading:"
     label: "Conferir a cura do escritor de grafos por MCP na adoção da 4.32.0 do core."
-    narrative: "A adoção da 4.32.0 entrou pelo PR 1397, com o card do deploy do escritor. A conferência é da sessão do kg-ssot, dona do escritor."
+    narrative: "A adoção da 4.32.0 entrou pelo PR 1397, com o card do deploy do escritor. A conferência é da sessão do kg-ssot, dona do escritor. Fechado em 2026-10-27: a sessão do kg-ssot leu a origin/main do core e confirmou a cura, e o core conferiu as mesmas linhas por grep -n antes de carimbar."
   - id: Q_COORD_BRAIN_REPOR_VENDOR_NO_CLONE
     node_type: question
     layer: audit
@@ -310,29 +324,30 @@ nodes:
     confidence: 0.5
     verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
     label: "No próximo update do brain: repor a onion/vendor no clone local do adotante."
-    narrative: "Só o nome do repo aparece aqui; o conteúdo do adotante não entra no core público."
+    narrative: "Só o nome do repo aparece aqui; o conteúdo do adotante não entra no core público. Anotado em 2026-10-27: o brain já tem a kg-ssot 4.35.0 na onion/develop (7770189de, conferido por branch -r --contains), então na próxima rodada só o carimbo do .kg-ssot-version vai divergir."
   - id: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
     node_type: question
     layer: audit
     plane: DEV
     status: open
-    owner: brain
+    owner: maestro
     impact: 5
     confidence: 0.5
     verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
-    label: "Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. Donos: o brain e o maestro."
-    narrative: "O apontamento é pelo nome do arquivo versionado (.env.test), sem abrir o conteúdo, como manda a regra de segredo. A rotação de chave, se houver, é do maestro, e a rotação segue parada por ordem dele até nova decisão."
+    label: "Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. Dono: o maestro, que decide."
+    narrative: "O apontamento é pelo nome do arquivo versionado (.env.test), sem abrir o conteúdo, como manda a regra de segredo. A rotação de chave, se houver, é do maestro, e a rotação segue parada por ordem dele até nova decisão. Ajuste de 2026-10-27: é decisão do MAESTRO, a D_CMP_ENV_TEST_TRACKED_REVIEW de 2026-10-25, no repo do brain. Ele confere o conteúdo, e só depois o arquivo sai do controle de versão e as chaves são trocadas. O nó é citado em texto, sem URL: o peer-ref-check não o alcança (o repo do brain não tem origin/main, e o nó não aparece em origin/develop nem em origin/onion/develop, medidos em 2026-10-27), e a URL do repo levaria o nome do cliente."
   - id: Q_COORD_SGE_ADOTAR_4350
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: sge
     impact: 3
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-27"
+    verified_against: "gh pr view 162 -R marciocar/sge em 2026-10-27: MERGED, merge ddb72cf66f00, check contrato SUCCESS; o vendor/kg-ssot/.kg-ssot-version do merge carimba a tag kg-ssot-v4.35.0 no commit 9fc22ac170d1"
     label: "O sge adota a kg-ssot 4.35.0. A oferta do CI onion-validate segue NÃO aplicada, por decisão do maestro."
-    narrative: "Entra na rodada de update da 4.35.0 aos adotantes. A decisão sobre o CI não muda com esta adoção."
+    narrative: "Entra na rodada de update da 4.35.0 aos adotantes. A decisão sobre o CI não muda com esta adoção. Fechado em 2026-10-27: a 4.35.0 entrou no sge pelo PR 162 (merge ddb72cf), com o CI contrato verde. O sge atualiza a kg-ssot pelo kg_vendor.py num PR à parte, e não pela rodada do Onion: a próxima rodada não precisa trazer a kg-ssot, e se trouxer, o pin tem de ser kg-ssot-v4.35.0 ou mais (9fc22ac170d1, o commit que o carimbo do sge registra; no clone fonte da kg-ssot a mesma tag é 3960131ab70d)."
   - id: Q_COORD_MAESTRO_DEPLOY_ESCRITOR_MCP_4320
     node_type: question
     layer: audit

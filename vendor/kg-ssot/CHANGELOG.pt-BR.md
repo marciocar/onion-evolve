@@ -10,6 +10,23 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.35.0] - 2026-10-27
+
+Contrato v4.16, sem mudança. **Python 3.12 ou mais** (era 3.11): o pacote, o bundle MCPB e a documentação dizem isso,
+o CI roda 3.12, 3.14 e 3.15, e o extra opcional `vector` vai até o 3.14 enquanto o `onnxruntime` não sai para o 3.15.
+
+- O `kg_query --chain --with PREFIXO=PASTA` segue uma URL do `provenance.source` para um grafo de outro repositório, só
+  para leitura, no commit que a URL cita quando a pasta o tem (`pinned`), senão da árvore de trabalho, com aviso. Um
+  ref ausente, ou um arquivo que não está nele, dá elo quebrado; um ref que começa com `-` é recusado.
+- O `kg_trace.py projection` confere as páginas Markdown que declaram `projection_of` no frontmatter: cada id de nó
+  citado entre crases sai `resolved`, `elsewhere` (aviso), `outside` (em outro repositório não lido) ou `missing`
+  (`integrity.projection-id-missing`, rc 1). As palavras do contrato e o `projection_ignore` são contados à parte.
+  `--format json` dá `kg-ssot.projection/1` (`spec/projection.schema.json`).
+- O `kg_trace check` segue um `provenance.locator` em JSON Pointer (`#/a/b`) dentro do `.json` que a fonte do nó
+  nomeia: `integrity.trace-locator-missing` e `integrity.trace-locator-unreadable`, rc 1. A saída ganha `locators`,
+  aditivo.
+- O `kg_hygiene` reprova arquivo da release que ainda cite o piso antigo do Python.
+
 ## [4.34.0] - 2026-10-27
 
 Contrato v4.16, sem mudança. O `kg_query --chain` segue primeiro o `provenance.source`: um nó com `provenance.source`

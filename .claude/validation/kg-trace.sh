@@ -199,8 +199,23 @@ for m in d.get("missing", []):
     print(f"{m['file']}\t{m['id']}\t{m.get('node_type') or '-'}\t{m['target']}\tTARGET-MISSING")
 for u in d.get("unreadable", []):
     print(f"{u['file']}\t-\t-\t({u['code']})\tILEGIVEL")
+# LOCATOR (kg-ssot >= 4.35.0, `locators`, aditivo): o provenance.locator em JSON Pointer (#/a/b) seguido dentro do
+# .json que a fonte do nó nomeia. É a parte GENÉRICA que a REGRA 111 fazia por conta própria (o token que some de
+# dentro do JSON com o arquivo presente) e passou ao produto; o design-context-check.py ficou só com o que é de
+# design (o destino ser token DTCG, com $value, e a regra do brief). O alvo sai como `<arquivo><ponteiro>`.
+loc = d.get("locators") or {}
+for m in loc.get("missing", []):
+    print(f"{m['file']}\t{m['id']}\t-\t{m['target']}{m['locator']}\tLOCATOR-MISSING")
+for u in loc.get("unreadable", []):
+    print(f"{u['file']}\t{u['id']}\t-\t{u['target']}{u['locator']}\tLOCATOR-ILEGIVEL")
 PY
 )" || { printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' '(JSON do kg_trace.py ilegível)' 'ENTRADA-QUEBRADA'; exit 1; }
+# rc 1 do produto SEM nenhuma linha traduzida: o rc e o JSON discordam (um código novo do produto que esta tradução
+# não conhece). Com a 4.35.0 e antes desta tradução, o locator que não resolvia dava rc 1 com TSV vazio, e o lint
+# calava (medido na adoção, 2026-10-27): nunca verde calado.
+if [ -z "${_tsv}" ] && [ "${_krc}" -eq 1 ]; then
+  printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' '(kg_trace.py rc=1 sem achado que esta tradução conheça)' 'ENTRADA-QUEBRADA'; exit 1
+fi
 [ -n "${_tsv}" ] || exit "${_krc}"
 printf '%s\n' "${_tsv}"
 exit 1

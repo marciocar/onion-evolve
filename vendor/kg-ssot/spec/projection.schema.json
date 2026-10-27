@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kg-ssot.dev/spec/projection.schema.json",
+  "title": "kg-ssot.projection/1",
+  "description": "Desde a 4.35.0. A saída de kg_trace.py projection --format json: cada página .md com projection_of no frontmatter, e cada id que ela cita entre crases, contra os grafos que ela declara. resolved conta os ids achados num grafo do projection_of; elsewhere lista os achados só em outro grafo do corpus (aviso, não reprova); outside, os não achados quando o projection_of declara uma URL de outro repositório que o --with não carregou (não julgado); missing, os que reprovam (integrity.projection-id-missing). graph_errors lista o grafo do projection_of que não existe ou não se lê. skipped conta o vocabulário do contrato, o projection_ignore da página e, nas páginas dadas pelo nome, a que não tem projection_of. rc: 0 sem missing nem graph_errors; 1 com algum; 2 entrada quebrada.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "pages",
+    "cited",
+    "resolved",
+    "elsewhere",
+    "outside",
+    "missing",
+    "graph_errors",
+    "skipped",
+    "unpinned",
+    "uncited"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.projection/1"
+    },
+    "pages": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "cited": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "resolved": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "elsewhere": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "page",
+          "id",
+          "graphs"
+        ],
+        "properties": {
+          "page": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "graphs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "outside": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "page",
+          "id",
+          "declared"
+        ],
+        "properties": {
+          "page": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "declared": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "page",
+          "id",
+          "code"
+        ],
+        "properties": {
+          "page": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "const": "integrity.projection-id-missing"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "graph_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "page",
+          "graph"
+        ],
+        "properties": {
+          "page": {
+            "type": "string"
+          },
+          "graph": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skipped": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "contract",
+        "ignored",
+        "no_projection"
+      ],
+      "properties": {
+        "contract": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ignored": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "no_projection": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "unpinned": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "As URLs do projection_of lidas pelo --with da árvore de trabalho, porque o ref da URL não está na pasta: aviso, não reprova."
+    },
+    "uncited": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "As páginas que declaram projection_of e não citam nenhum id entre crases: nada foi conferido nelas (aviso, não reprova). O id em texto corrido, fora de crases, não é lido."
+    }
+  }
+}

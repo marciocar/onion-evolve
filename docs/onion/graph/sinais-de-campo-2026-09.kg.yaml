@@ -584,6 +584,23 @@ nodes:
       locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh antes e depois e do kg_query.py --chain nos dois selos; diff da saída contra a da bancada; bancada da família decide com e sem o mutante"
       method: "measurement: atualização do vendor, gate do contrato antes e depois, comparação com a bancada pré-tag, teste vivo da cadeia no corpus real e bancada do selo com mutante"
       locality: "repo"
+  - id: E_KG_SSOT_435_ADOTADA_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-27"
+    verified_against: "na branch chore/kg-ssot-4.35.0: kg_vendor.py update --tag kg-ssot-v4.35.0 --source do clone local (3960131ab70d, 659 arquivos, o novo é o spec/projection.schema.json) e check intacto; ops/kg-gate-ci.sh rc 0 igual antes e depois (199 grafos, 197 passam o MUST, os 2 da dívida herdada, sem aviso de identidade); a tag difere da ref d58e80befed8 da bancada pré-tag só no balde uncited do checador de projeção, no teste e no manual; kg_trace.py projection no core: 1 página, 3 ids citados, 1 resolvido e 2 em elsewhere antes da cura do brief e 3 resolvidos depois; kg_trace.py check: 4 locators julgados, 4 resolvem; famílias design_context, kg_projection e kg_ssot_require_hashes da bancada verdes, com os mutantes reprovando"
+    trace: "vendor/kg-ssot/.kg-ssot-version"
+    label: "A kg-ssot 4.35.0 entrou no core sem mudar o contrato; o checador de projeção virou a REGRA 112, o locator genérico passou ao kg_trace e o template de CI subiu o piso para Python 3.12"
+    narrative: "A 4.35.0 traz quatro frentes e o contrato segue v4.16: o --with no --chain, o piso do Python em 3.12, o kg_trace.py projection e o locator em JSON Pointer no kg_trace check. Nenhum grafo do core muda de veredito. O checador de projeção passou a valer no lint pela REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): o kg-projection.sh lê o rc e o JSON do produto, reprova HARD o id que não existe e o grafo do projection_of que não se lê, avisa SOFT a página sem id entre crases, o id em outro grafo, o grafo de outro repositório não lido e o não fixado, e diz que não julgou quando o produto sai 2 ou quando o rc 1 vem sem achado no JSON. A 1ª medida no core real achou o piloto do design, o docs/design-context/brief.md, citando E_POSITIONING e E_AUDIENCE do business-context sem listar aquele grafo no projection_of; a cura é o projection_of em lista com os dois grafos, porque o brief projeta o público e o posicionamento de lá. A parte genérica do locator saiu do design-context-check.py: o token que some do JSON passa a ser pego pela REGRA 55 (O trace: de um nó APONTA para alvo que EXISTE), pelo kg-trace.sh, que traduz o campo locators do JSON do produto (HARD no core, SOFT no derivado). No checador de design ficou só o que é de design: o destino ser token DTCG, com $value, a forma do locator numa fonte de tokens, a fonte fora da raiz, que o produto só conta, o arquivo .tokens que o produto não lê e a regra do brief. A delegação só vale quando o kg_trace.py que a REGRA 55 usa tem o locator: com vendor anterior à 4.35.0 no adotante, a vertical segue acusando o token ausente, porque delegar a quem não julga é calar. A passada adversarial achou oito pontos reais, todos curados: entre eles esse, a vacuidade do checador de projeção (raiz fora do git, ou página não rastreada, julgava 0 e saía verde), o aviso eterno no adotante sem nenhuma página com projection_of e um mutante da bancada que dava erro de sintaxe e passava pelo ramo errado. A adoção achou um silêncio no kg-trace.sh: com a 4.35.0, o locator que não resolvia dava rc 1 com o TSV vazio, e o lint calava; agora o rc 1 sem achado traduzido sai ENTRADA-QUEBRADA, e dois mutantes na bancada provam a tradução e a guarda. O template de CI que viaja aos adotantes subiu o piso de 3.11 para 3.12 no comentário, no sys.version_info e na mensagem, e de propósito não fixa o Python do runner como o core fez no PR 1408: o workflow é do adotante, e com setup-python nele o currency-census.sh do adotante cobraria a máquina dele contra o pino. Um caso da bancada amarra o piso do template ao requires-python do kg-ssot vendorizado."
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version"
+      locator: "saída do kg_vendor.py update e check, do ops/kg-gate-ci.sh antes e depois, do kg_trace.py projection e check no core; diff da ref da bancada para a tag no clone da kg-ssot; bancada das famílias design_context, kg_projection e kg_ssot_require_hashes com e sem os mutantes"
+      method: "measurement: atualização do vendor, gate do contrato antes e depois, comparação com a bancada pré-tag, checador de projeção e locator no corpus real e bancada com mutantes"
+      locality: "repo"
   - id: E_KG_SSOT_433_ADOTADA_1027
     node_type: evidence
     layer: audit
@@ -1677,6 +1694,12 @@ edges:
     edge_type: TRACES_TO
   - from: E_KG_SSOT_433_ADOTADA_1027
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_435_ADOTADA_1027
+    to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023
+    edge_type: SUPPORTS
+  - from: E_KG_SSOT_435_ADOTADA_1027
+    to: Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027
     edge_type: SUPPORTS
   - from: E_KG_SSOT_434_ADOTADA_1027
     to: D_CANAL_CORE_KG_SSOT_FORMALIZADO_1023

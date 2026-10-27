@@ -40329,6 +40329,29 @@ run_kg_ssot_require_hashes_selftests() {
   if [ "${nb}" -eq 3 ]; then record_pass "kg-ssot-require-hashes: (c) -r em linha de baixo, flag só em comentário e pacote avulso ⇒ os 3 vistos sem a flag"
   else record_fail "kg-ssot-require-hashes: (c)" "esperava 3 sítios sem a flag no sandbox, veio ${nb}"; fi
   rm -rf "${sb}"
+  # (d) O PISO DO TEMPLATE é o do produto (adoção da kg-ssot 4.35.0, 2026-10-27: o piso subiu de 3.11 para 3.12 e
+  #     o template que viaja aos adotantes dizia 3.11 em três lugares). O piso do produto é o `requires-python` do
+  #     pacote vendorizado; o do template, o `sys.version_info >= (X, Y)`, e o comentário e a mensagem dizem o
+  #     mesmo X.Y. Mutante: o template com o piso velho reprova.
+  local tpl="${r}/.claude/utils/adopt/ci-workflow-onion.tpl" bld="${r}/vendor/kg-ssot/packaging/python/build.py" want
+  want="$(LC_ALL=C command grep -oE 'requires-python = ">=[0-9]+\.[0-9]+"' "${bld}" 2>/dev/null | head -1 | LC_ALL=C command grep -oE '[0-9]+\.[0-9]+')"
+  _krh_floor() {  # <template> <X.Y> → 0 se o version_info, o comentário e a mensagem dizem X.Y
+    local x="${2%%.*}" y="${2#*.}"
+    LC_ALL=C command grep -qF "sys.version_info >= (${x}, ${y})" "$1" \
+      && LC_ALL=C command grep -qF "Piso: Python ${2} " "$1" \
+      && LC_ALL=C command grep -qF "exige Python ${2} ou mais" "$1" \
+      && ! LC_ALL=C command grep -qE "sys.version_info >= \(3, (1[01]|[0-9])\)|exige Python 3\.(1[01]|[0-9]) " "$1"
+  }
+  if [ -z "${want}" ]; then
+    record_skip "kg-ssot-require-hashes: (d) sem o requires-python do kg-ssot vendorizado (packaging/python/build.py)"
+  else
+    local mt; mt="$(TMPDIR=/tmp mktemp)"
+    sed -e 's/sys.version_info >= (3, 12)/sys.version_info >= (3, 11)/' -e 's/exige Python 3.12 ou mais/exige Python 3.11 ou mais/' "${tpl}" > "${mt}"
+    if _krh_floor "${tpl}" "${want}" && ! _krh_floor "${mt}" "${want}" && ! cmp -s "${tpl}" "${mt}"; then
+      record_pass "kg-ssot-require-hashes: (d) o piso do template de CI é o do kg-ssot vendorizado (${want}), no version_info, no comentário e na mensagem; o mutante com 3.11 reprova"
+    else record_fail "kg-ssot-require-hashes: (d) piso do template" "requires-python=${want}; o template ou o mutante não bateu"; fi
+    rm -f "${mt}"
+  fi
 }
 _family run_kg_ssot_require_hashes_selftests
 
@@ -40876,16 +40899,34 @@ PY
     else record_fail "design-context: (c) alvo removido" "contrato rc=${vrc} ${vo:0:200}"; fi
   else record_skip "design-context: (c) sem vendor/kg-ssot o gate do contrato não roda aqui"; fi
   rm -rf "${c}"
-  # (d) TOKEN SUMIDO DO JSON (o arquivo continua): só a guarda pega — LOCATOR-AUSENTE, rc 1
+  # (d) TOKEN SUMIDO DO JSON (o arquivo continua): desde a kg-ssot 4.35.0 quem pega é o kg_trace check (o locator
+  #     em JSON Pointer, integrity.trace-locator-missing), pelo kg-trace.sh da REGRA 55, e a guarda da vertical
+  #     não duplica (sai 0). Sem o vendor (o kg_trace.py da 4.35.0) o caso pula visível.
+  local KT435="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" kto krc
   c="$(mktemp -d)"; cp -a "${d}/." "${c}/"
   python3 -I - "${c}/docs/design-context/semantic/color.tokens.json" <<'PY'
 import json, sys
 p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
 PY
-  if o="$(bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if o="$(ONION_KG_TRACE="${KT435}" bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ -f "${KT435}" ] && grep -q 'LOCATOR_MISSING' "${KT435}"; then
+    if kto="$(ONION_KG_TRACE="${KT435}" bash "${REPO_ROOT}/.claude/validation/kg-trace.sh" "${c}" --format tsv 2>&1)"; then krc=0; else krc=$?; fi
+    if [ "${rc}" = 0 ] && [ -z "${o}" ] && [ "${krc}" = 1 ] \
+       && grep -q '^docs/design-context/design-context.kg.yaml	E_TOKEN_ON_PRIMARY	-	docs/design-context/semantic/color.tokens.json#/color/action/on-primary	LOCATOR-MISSING$' <<< "${kto}"; then
+      record_pass "design-context: (d) token sumido do JSON com o arquivo presente ⇒ o kg_trace o pega (LOCATOR-MISSING no kg-trace.sh, rc 1) e a guarda da vertical não duplica (rc 0)"
+    else record_fail "design-context: (d) token sumido" "guarda rc=${rc} ${o:0:120} kg-trace rc=${krc} ${kto:0:200}"; fi
+  else record_skip "design-context: (d) sem o kg_trace.py da kg-ssot >= 4.35.0 o locator não é julgado aqui"; fi
+  # (q) SEM O JUIZ do locator (o adotante com vendor anterior à 4.35.0): a vertical NÃO delega e segue acusando o
+  #     token ausente (LOCATOR-AUSENTE), e um BOM no arquivo de tokens não desliga o julgamento (achados 2 e 8 da
+  #     passada adversarial)
+  local kold; kold="$(mktemp -d)"; printf 'import sys\nsys.exit(0)\n' > "${kold}/kg_trace.py"
+  printf '\xef\xbb\xbf' | cat - "${c}/docs/design-context/semantic/color.tokens.json" > "${kold}/bom.json"
+  cp "${kold}/bom.json" "${c}/docs/design-context/semantic/color.tokens.json"
+  if o="$(ONION_KG_TRACE="${kold}/kg_trace.py" bash "${chk}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  rm -rf "${kold}"
   if [ "${rc}" = 1 ] && grep -q '^SOFT	LOCATOR-AUSENTE	.*E_TOKEN_ON_PRIMARY' <<< "${o}"; then
-    record_pass "design-context: (d) token sumido do JSON com o arquivo presente ⇒ LOCATOR-AUSENTE (SOFT no 1º ciclo), rc 1"
-  else record_fail "design-context: (d) token sumido" "rc=${rc} ${o:0:200}"; fi
+    record_pass "design-context: (q) juiz sem o locator (vendor anterior à 4.35.0) ⇒ a vertical não delega e acusa LOCATOR-AUSENTE, com BOM no JSON"
+  else record_fail "design-context: (q) sem o juiz" "rc=${rc} ${o:0:200}"; fi
   # (e) LOCATOR QUE APONTA UM GRUPO ⇒ LOCATOR-GRUPO
   cp "${d}/docs/design-context/semantic/color.tokens.json" "${c}/docs/design-context/semantic/color.tokens.json"
   sed -i 's|locator: "#/color/action/primary"|locator: "#/color/action"|' "${c}/${G}"
@@ -40947,40 +40988,188 @@ import json, sys
 p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
 PY
   ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
-  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${G}" 2>&1 || true)"
+  local l; l="$(cd "${sd}" && ONION_KG_TRACE="${KT435}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${G}" 2>&1 || true)"
   rm -rf "${sd}"
-  if grep -q 'REGRA 111 (Grafo do design-context: locator de token e ligação do brief): \[LOCATOR-AUSENTE\]' <<< "${l}"; then
-    record_pass "design-context: (j) o lint de produção (dispatcher) emite a REGRA 111 sobre o token sumido"
-  else record_fail "design-context: (j) dispatcher" "$(grep -E 'REGRA 111' <<< "${l}" | head -2 | tr '\n' '|')"; fi
+  # desde a 4.35.0 o token sumido sai pela REGRA 55 (o kg_trace segue o locator), e a REGRA 111 não o repete
+  if [ ! -f "${KT435}" ] || ! grep -q 'LOCATOR_MISSING' "${KT435}"; then
+    record_skip "design-context: (j) sem o kg_trace.py da kg-ssot >= 4.35.0 o dispatcher não julga o locator"
+  elif grep -q 'REGRA 55 (O `trace:` de um nó APONTA para alvo que EXISTE): \[trace-resolve/LOCATOR-MISSING\] E_TOKEN_ON_PRIMARY' <<< "${l}" \
+     && ! grep -q 'REGRA 111 .*LOCATOR-AUSENTE' <<< "${l}"; then
+    record_pass "design-context: (j) o lint de produção (dispatcher) emite a REGRA 55 sobre o token sumido (LOCATOR-MISSING), e a REGRA 111 não duplica"
+  else record_fail "design-context: (j) dispatcher" "$(grep -E 'REGRA 55|REGRA 111' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  # (p) o arquivo `.tokens` (sem .json) o kg_trace não lê (no_json_file): ali o token ausente segue sendo da vertical
+  local cp_tok; cp_tok="$(mktemp -d)"; cp -a "${d}/." "${cp_tok}/"
+  python3 -I - "${cp_tok}/docs/design-context/semantic/color.tokens.json" "${cp_tok}/docs/design-context/semantic/color.tokens" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1])); del d["color"]["action"]["on-primary"]; json.dump(d, open(sys.argv[2], "w"), indent=2)
+PY
+  sed -i 's|source: "docs/design-context/semantic/color.tokens.json"|source: "docs/design-context/semantic/color.tokens"|' "${cp_tok}/${G}"
+  if o="$(bash "${chk}" "${cp_tok}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q '^SOFT	LOCATOR-AUSENTE	.*E_TOKEN_ON_PRIMARY' <<< "${o}"; then
+    record_pass "design-context: (p) fonte .tokens (que o kg_trace não lê) com o token ausente ⇒ LOCATOR-AUSENTE da vertical, rc 1"
+  else record_fail "design-context: (p) fonte .tokens" "rc=${rc} ${o:0:200}"; fi
   # (m) MUTANTES: sem a exigência de $value o grupo passa; sem a regra do brief a ligação ausente cala;
-  #     sem o ramo do token ausente o token sumido cala. Cada um tem de CALAR o caso que a cura pega.
+  #     sem o ramo do token ausente o token sumido da fonte .tokens cala. Cada um tem de CALAR o caso que a cura
+  #     pega. Do lado do kg_trace (o token sumido da fonte .json): sem a tradução do locator no kg-trace.sh (m4),
+  #     o rc 1 do produto vira ENTRADA-QUEBRADA, nunca verde; sem a tradução E sem a guarda do rc 1 (m5), o lint
+  #     volta a calar, como antes desta adoção.
   local mdir; mdir="$(mktemp -d)"
   local m1 m2 m3 c1 c2 c3
   sed 's/    return "ok" if isinstance(cur, dict) and ("\$value" in cur or "\$root" in cur) else "grupo"/    return "ok"/' "${py}" > "${mdir}/m1.py"
   sed 's/        if not (linked or declared):/        if False:/' "${py}" > "${mdir}/m2.py"
-  sed 's/        elif verdict == "ausente":/        elif False:/' "${py}" > "${mdir}/m3.py"
+  sed 's/        elif verdict == "ausente" and not delegated:/        elif False:/' "${py}" > "${mdir}/m3.py"
   c1="$(mktemp -d)"; cp -a "${d}/." "${c1}/"; sed -i 's|locator: "#/color/action/primary"|locator: "#/color/action"|' "${c1}/${G}"
   c2="$(mktemp -d)"; cp -a "${d}/." "${c2}/"
   python3 -I - "${c2}/${G}" <<'PY'
 import sys
 p = sys.argv[1]; s = open(p).read(); s = s[:s.index("external_edges:")]; open(p, "w").write(s)
 PY
-  c3="$(mktemp -d)"; cp -a "${d}/." "${c3}/"
-  python3 -I - "${c3}/docs/design-context/semantic/color.tokens.json" <<'PY'
-import json, sys
-p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
-PY
+  c3="${cp_tok}"
   _mrun() { python3 -I -B "$1" --root "$2" --format tsv 2>&1 | grep -c "$3" || true; }
   m1="$(_mrun "${mdir}/m1.py" "${c1}" LOCATOR-GRUPO)"; m2="$(_mrun "${mdir}/m2.py" "${c2}" BRIEF-SEM-LIGACAO)"; m3="$(_mrun "${mdir}/m3.py" "${c3}" LOCATOR-AUSENTE)"
   local r1 r2 r3
   r1="$(_mrun "${py}" "${c1}" LOCATOR-GRUPO)"; r2="$(_mrun "${py}" "${c2}" BRIEF-SEM-LIGACAO)"; r3="$(_mrun "${py}" "${c3}" LOCATOR-AUSENTE)"
   if [ "${m1}" = 0 ] && [ "${m2}" = 0 ] && [ "${m3}" = 0 ] && [ "${r1}" -ge 1 ] && [ "${r2}" -ge 1 ] && [ "${r3}" -ge 1 ] \
      && ! cmp -s "${py}" "${mdir}/m1.py" && ! cmp -s "${py}" "${mdir}/m2.py" && ! cmp -s "${py}" "${mdir}/m3.py"; then
-    record_pass "design-context: (m) os 3 mutantes (sem \$value, sem a regra do brief, sem o token ausente) calam o caso que a cura pega"
+    record_pass "design-context: (m) os 3 mutantes (sem \$value, sem a regra do brief, sem o token ausente da fonte .tokens) calam o caso que a cura pega"
   else record_fail "design-context: (m) mutantes" "mutantes=${m1}/${m2}/${m3} (esperado 0) cura=${r1}/${r2}/${r3} (esperado ≥1; o sed precisa casar)"; fi
+  if [ -f "${KT435}" ] && grep -q 'LOCATOR_MISSING' "${KT435}"; then
+    local kts="${REPO_ROOT}/.claude/validation/kg-trace.sh" c4 o4 o5 o0
+    c4="$(mktemp -d)"; cp -a "${d}/." "${c4}/"
+    python3 -I - "${c4}/docs/design-context/semantic/color.tokens.json" <<'PY'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p)); del d["color"]["action"]["on-primary"]; json.dump(d, open(p, "w"), indent=2)
+PY
+    # o print vira `pass` com a MESMA indentação: apagar a linha deixava o `for` sem corpo, o Python do heredoc
+    # dava IndentationError e o caso passava pelo ramo errado (JSON ilegível), não pela guarda do rc 1 (achado 1)
+    sed '/LOCATOR-MISSING")$/s/^\( *\)print(.*$/\1pass/' "${kts}" > "${mdir}/m4.sh"
+    sed 's/^if \[ -z "\${_tsv}" \] && \[ "\${_krc}" -eq 1 \]; then$/if false; then/' "${mdir}/m4.sh" > "${mdir}/m5.sh"
+    o0="$(ONION_KG_TRACE="${KT435}" bash "${kts}" "${c4}" --format tsv 2>&1 || true)"
+    o4="$(ONION_KG_TRACE="${KT435}" bash "${mdir}/m4.sh" "${c4}" --format tsv 2>&1 || true)"
+    o5="$(ONION_KG_TRACE="${KT435}" bash "${mdir}/m5.sh" "${c4}" --format tsv 2>&1 || true)"
+    if grep -q 'LOCATOR-MISSING' <<< "${o0}" && ! grep -q 'LOCATOR-MISSING' <<< "${o4}" && grep -q 'rc=1 sem achado' <<< "${o4}" \
+       && ! grep -q 'Error' <<< "${o4}${o5}" \
+       && [ -z "${o5}" ] && ! cmp -s "${kts}" "${mdir}/m4.sh" && ! cmp -s "${mdir}/m4.sh" "${mdir}/m5.sh"; then
+      record_pass "design-context: (m) kg-trace.sh: sem a tradução do locator o rc 1 vira ENTRADA-QUEBRADA (m4); sem ela e sem a guarda do rc 1 o lint cala (m5)"
+    else record_fail "design-context: (m) mutantes do kg-trace.sh" "cura=${o0:0:80} m4=${o4:0:80} m5=${o5:0:80} (o sed/grep precisa casar)"; fi
+    rm -rf "${c4}"
+  else record_skip "design-context: (m) mutantes do kg-trace.sh pedem o kg_trace.py da kg-ssot >= 4.35.0"; fi
   rm -rf "${mdir}" "${c1}" "${c2}" "${c3}" "${d}"
 }
 _family run_design_context_selftests
+
+# REGRA 112 (Página com projection_of cita ids que existem nos grafos dela) — adoção da kg-ssot 4.35.0
+# (2026-10-27). Quem julga é o `kg_trace.py projection` do produto; o kg-projection.sh lê o rc e o JSON. O fixture é
+# o design gerado pelo próprio /design:setup (o brief stub cita `C_BRIEF`), num repo git com tudo commitado,
+# porque o produto lê as páginas e os grafos RASTREADOS. Casos: (a) o core real · (b) íntegro · (c) id ausente
+# HARD · (d) sem citação SOFT · (e) em outro grafo SOFT · (f) não pude julgar (rc 2: produto que sai 2, e rc 1 sem
+# achado no JSON) · (g) o dispatcher de produção · (m) mutantes, um por ramo.
+run_kg_projection_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/kg-projection.sh" KT="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py"
+  [ -f "${h}" ] || { record_fail "kg-projection" "guarda ausente: ${h}"; return; }
+  if [ ! -f "${KT}" ] || ! grep -q 'def projection' "${KT}"; then
+    record_skip "kg-projection: sem o kg_trace.py da kg-ssot >= 4.35.0 (subcomando projection) a família não roda"; return
+  fi
+  local o rc d c B="docs/design-context/brief.md"
+  # (a) o core real: o piloto do design (o brief, com o business-context no projection_of) resolve tudo
+  if [ -f "${REPO_ROOT}/${B}" ]; then
+    if o="$(ONION_KG_TRACE="${KT}" bash "${h}" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" = 0 ] && [ -z "${o}" ]; then record_pass "kg-projection: (a) o core real ⇒ rc 0, nenhum achado (o brief piloto resolve os 3 ids)"
+    else record_fail "kg-projection: (a) core real" "rc=${rc} ${o:0:240}"; fi
+  else record_skip "kg-projection: (a) sem o brief piloto neste repo (só o core o tem)"; fi
+  # (b) íntegro: o brief stub do setup cita `C_BRIEF`, que está no grafo do projection_of
+  d="$(mktemp -d)"; _dc_fixture "${d}" 1
+  if o="$(ONION_KG_TRACE="${KT}" bash "${h}" "${d}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 0 ] && [ -z "${o}" ] && grep -q '`C_BRIEF`' "${d}/${B}"; then record_pass "kg-projection: (b) brief do setup íntegro ⇒ rc 0, sem achado"
+  else record_fail "kg-projection: (b) íntegro" "rc=${rc} ${o:0:200}"; fi
+  # (c) ID AUSENTE: o brief cita um nó que não existe ⇒ HARD ID-AUSENTE, rc 1
+  c="$(mktemp -d)"; cp -a "${d}/." "${c}/"; printf '\nVer `C_NO_QUE_SUMIU`.\n' >> "${c}/${B}"
+  if o="$(ONION_KG_TRACE="${KT}" bash "${h}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q "^HARD	ID-AUSENTE	${B}	\`C_NO_QUE_SUMIU\`" <<< "${o}"; then record_pass "kg-projection: (c) id citado que não existe ⇒ HARD ID-AUSENTE, rc 1"
+  else record_fail "kg-projection: (c) id ausente" "rc=${rc} ${o:0:200}"; fi
+  rm -rf "${c}"
+  # (d) SEM CITAÇÃO: o id em texto corrido não é lido ⇒ SOFT SEM-CITACAO (nada foi conferido), rc 1
+  c="$(mktemp -d)"; cp -a "${d}/." "${c}/"; sed -i 's/`C_BRIEF`/C_BRIEF/' "${c}/${B}"
+  if o="$(ONION_KG_TRACE="${KT}" bash "${h}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q "^SOFT	SEM-CITACAO	${B}	" <<< "${o}" && ! grep -q '^HARD' <<< "${o}"; then
+    record_pass "kg-projection: (d) projection_of sem id entre crases ⇒ SOFT SEM-CITACAO, sem HARD"
+  else record_fail "kg-projection: (d) sem citação" "rc=${rc} ${o:0:200}"; fi
+  local cd_unc="${c}"
+  # (e) EM OUTRO GRAFO: o brief cita o posicionamento sem listar o business-context ⇒ SOFT EM-OUTRO-GRAFO
+  c="$(mktemp -d)"; cp -a "${d}/." "${c}/"; printf '\nPosicionamento: `E_POSITIONING`.\n' >> "${c}/${B}"
+  if o="$(ONION_KG_TRACE="${KT}" bash "${h}" "${c}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" = 1 ] && grep -q "^SOFT	EM-OUTRO-GRAFO	${B}	\`E_POSITIONING\`" <<< "${o}" && ! grep -q '^HARD' <<< "${o}"; then
+    record_pass "kg-projection: (e) id de grafo que o projection_of não lista ⇒ SOFT EM-OUTRO-GRAFO"
+  else record_fail "kg-projection: (e) em outro grafo" "rc=${rc} ${o:0:200}"; fi
+  rm -rf "${c}"
+  # (f) NÃO PUDE JULGAR ⇒ rc 2, nunca verde: um produto que sai 2 (o vendor sem o subcomando sai assim pelo
+  #     argparse) e um que sai 1 com o JSON sem achado (o rc e o JSON discordam)
+  local sb f1 f2; sb="$(mktemp -d)"
+  printf 'import sys\nsys.exit(2)\n' > "${sb}/kg_trace.py"
+  mkdir -p "${sb}/r1"
+  printf 'import json, sys\nprint(json.dumps({"schema_version": "kg-ssot.projection/1", "pages": 1, "cited": 1, "resolved": 1}))\nsys.exit(1)\n' > "${sb}/r1/kg_trace.py"
+  if ONION_KG_TRACE="${sb}/kg_trace.py" bash "${h}" "${d}" --format tsv >/dev/null 2>&1; then f1=0; else f1=$?; fi
+  if ONION_KG_TRACE="${sb}/r1/kg_trace.py" bash "${h}" "${d}" --format tsv >/dev/null 2>&1; then f2=0; else f2=$?; fi
+  if [ "${f1}" = 2 ] && [ "${f2}" = 2 ]; then record_pass "kg-projection: (f) produto que sai 2, e rc 1 sem achado no JSON ⇒ rc 2 (não pude julgar), nunca verde"
+  else record_fail "kg-projection: (f) rc 2" "produto-rc2=${f1} rc1-sem-achado=${f2} (esperado 2 e 2)"; fi
+  # (g) o DISPATCHER de produção emite a REGRA 112 (HARD) sobre o id ausente, com --only na página; e diz que não
+  #     julgou (SOFT) quando o produto sai 2
+  local sd l lg; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; cp -a "${d}/docs" "${sd}/" 2>/dev/null
+  printf '\nVer `C_NO_QUE_SUMIU`.\n' >> "${sd}/${B}"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  # a linha VIOLATION não diz a severidade: a HARD vem do ONION_LINT_HARD_FILE, como o motor a lista
+  local hf hfg; hf="$(mktemp)"; hfg="$(mktemp)"
+  l="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hf}" ONION_KG_TRACE="${KT}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${B}" 2>&1 || true)"
+  lg="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hfg}" ONION_KG_TRACE="${sb}/kg_trace.py" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/${B}" 2>&1 || true)"
+  rm -rf "${sd}"
+  local hl hlg; hl="$(cat "${hf}" 2>/dev/null)"; hlg="$(cat "${hfg}" 2>/dev/null)"; rm -f "${hf}" "${hfg}"
+  if grep -q 'REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): \[ID-AUSENTE\]' <<< "${hl}" \
+     && grep -q 'REGRA 112 (Página com projection_of cita ids que existem nos grafos dela): \[NAO-JULGOU\]' <<< "${lg}" \
+     && ! grep -q 'REGRA 112' <<< "${hlg}"; then
+    record_pass "kg-projection: (g) o lint de produção (dispatcher) emite a REGRA 112 HARD sobre o id ausente, e SOFT NAO-JULGOU com o produto que sai 2"
+  else record_fail "kg-projection: (g) dispatcher" "$(grep -E 'REGRA 112' <<< "${l}${lg}" | head -3 | tr '\n' '|')"; fi
+  # (h) A DESCOBERTA PRÓPRIA (achados 4 e 5 da passada adversarial): repo sem página com projection_of e sem o
+  #     produto ⇒ rc 0 calado (nada a julgar, nenhum aviso eterno); a página fora do git ⇒ rc 2; a página só não
+  #     rastreada, que o produto não lê (julga 0) ⇒ rc 2 (VACUIDADE), nunca verde
+  local h1 h2 h3 hd; hd="$(mktemp -d)"; git -C "${hd}" init -q 2>/dev/null; mkdir -p "${hd}/docs"
+  printf '# sem frontmatter\n' > "${hd}/docs/a.md"; _dc_commit "${hd}" "sem projeção"
+  if o="$(ONION_KG_TRACE="${hd}/nao-existe.py" bash "${h}" "${hd}" --format tsv 2>&1)"; then h1=0; else h1=$?; fi
+  [ -z "${o}" ] || h1="${h1}+saida"
+  printf -- '---\nprojection_of: docs/g.kg.yaml\n---\n\nVer `C_X`.\n' > "${hd}/docs/p.md"
+  if ONION_KG_TRACE="${KT}" bash "${h}" "${hd}" --format tsv >/dev/null 2>&1; then h3=0; else h3=$?; fi
+  local hn; hn="$(mktemp -d)"; cp "${hd}/docs/p.md" "${hn}/"
+  if ONION_KG_TRACE="${KT}" bash "${h}" "${hn}" --format tsv >/dev/null 2>&1; then h2=0; else h2=$?; fi
+  rm -rf "${hd}" "${hn}"
+  if [ "${h1}" = 0 ] && [ "${h2}" = 2 ] && [ "${h3}" = 2 ]; then
+    record_pass "kg-projection: (h) sem página nem produto ⇒ rc 0 calado; página fora do git ⇒ rc 2; página só não rastreada ⇒ rc 2 (vacuidade)"
+  else record_fail "kg-projection: (h) descoberta" "sem-página=${h1} (0) fora-do-git=${h2} (2) não-rastreada=${h3} (2)"; fi
+  # (m) MUTANTES, na cópia do helper: sem o ramo do id ausente (m1) o caso (c) não sai ID-AUSENTE; sem o ramo do
+  #     uncited (m2) o caso (d) cala; sem o ramo do id ausente E sem a guarda do rc 1 (m3) o caso (c) sai verde.
+  local mdir m1 m2 m3 c3; mdir="$(mktemp -d)"
+  sed '/^for m in d.get("missing") or \[\]:$/,/^for g in d.get("graph_errors")/{/^for g in/!d}' "${h}" > "${mdir}/m1.sh"
+  sed 's/^for p in d.get("uncited") or \[\]:$/for p in []:/' "${h}" > "${mdir}/m2.sh"
+  sed 's/^if krc == 1 and not any(r\[0\] == "HARD" for r in rows):$/if False:/' "${mdir}/m1.sh" > "${mdir}/m3.sh"
+  c3="$(mktemp -d)"; cp -a "${d}/." "${c3}/"; printf '\nVer `C_NO_QUE_SUMIU`.\n' >> "${c3}/${B}"
+  m1="$(ONION_KG_TRACE="${KT}" bash "${mdir}/m1.sh" "${c3}" --format tsv 2>&1 | grep -c 'ID-AUSENTE' || true)"
+  m2="$(ONION_KG_TRACE="${KT}" bash "${mdir}/m2.sh" "${cd_unc}" --format tsv 2>&1 | grep -c 'SEM-CITACAO' || true)"
+  local m3rc; if ONION_KG_TRACE="${KT}" bash "${mdir}/m3.sh" "${c3}" --format tsv >/dev/null 2>&1; then m3rc=0; else m3rc=$?; fi
+  if [ "${m1}" = 0 ] && [ "${m2}" = 0 ] && [ "${m3rc}" = 0 ] \
+     && ! cmp -s "${h}" "${mdir}/m1.sh" && ! cmp -s "${h}" "${mdir}/m2.sh" && ! cmp -s "${mdir}/m1.sh" "${mdir}/m3.sh"; then
+    record_pass "kg-projection: (m) os 3 mutantes (sem o id ausente, sem o uncited, sem a guarda do rc 1) calam o caso que a cura pega"
+  else record_fail "kg-projection: (m) mutantes" "m1=${m1} m2=${m2} (esperado 0) m3 rc=${m3rc} (esperado 0; o sed precisa casar)"; fi
+  # m4: sem a guarda de VACUIDADE, a página só não rastreada (o caso (h)) sai verde calado
+  local m4rc vd; vd="$(mktemp -d)"; git -C "${vd}" init -q 2>/dev/null; mkdir -p "${vd}/docs"
+  printf '# x\n' > "${vd}/docs/a.md"; _dc_commit "${vd}" "base"
+  printf -- '---\nprojection_of: docs/g.kg.yaml\n---\n\nVer `C_X`.\n' > "${vd}/docs/p.md"
+  sed 's/^if not d.get("pages"):  # VACUIDADE.*$/if False:/' "${h}" > "${mdir}/m4.sh"
+  if ONION_KG_TRACE="${KT}" bash "${mdir}/m4.sh" "${vd}" --format tsv >/dev/null 2>&1; then m4rc=0; else m4rc=$?; fi
+  if [ "${m4rc}" = 0 ] && ! cmp -s "${h}" "${mdir}/m4.sh"; then
+    record_pass "kg-projection: (m) o mutante sem a guarda de vacuidade dá verde na página não rastreada (a cura dá rc 2)"
+  else record_fail "kg-projection: (m) mutante da vacuidade" "rc=${m4rc} (esperado 0; o sed precisa casar)"; fi
+  rm -rf "${vd}" "${mdir}" "${c3}" "${cd_unc}" "${sb}" "${d}"
+}
+_family run_kg_projection_selftests
 
 # REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) — SAC-83, medido ao vivo em 2026-10-11 (CC
 # 2.1.296, `claude -p` em sandbox): PreToolUse com script ausente saiu 127 e a ação RODOU; com onFailure: block

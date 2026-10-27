@@ -151,6 +151,118 @@
           }
         }
       }
+    },
+    "locators": {
+      "description": "Desde a 4.35.0, aditivo e fora do required: o provenance.locator que é JSON Pointer em fragmento (# ou #/...), conferido contra o .json do repo que o nó nomeia (o do provenance.source quando é caminho do repo, senão o do trace). missing traz integrity.trace-locator-missing, e unreadable, integrity.trace-locator-unreadable; os dois dão rc 1. skipped conta o que não se julga: not_pointer, absolute (fonte por URL ou caminho absoluto) e no_json_file. outside_root (desde a mesma versão) conta a fonte que sai da raiz do repo, não julgada. A fonte com nome solto e extensão (gone.json) é caminho: a fonte não é prosa.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "judged",
+        "resolved",
+        "missing",
+        "unreadable",
+        "skipped"
+      ],
+      "properties": {
+        "judged": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "resolved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "missing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "file",
+              "id",
+              "target",
+              "locator"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "locator": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "unreadable": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "file",
+              "id",
+              "target",
+              "locator"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "locator": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "skipped": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "not_pointer",
+            "absolute",
+            "no_json_file",
+            "outside_root"
+          ],
+          "properties": {
+            "not_pointer": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "absolute": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "no_json_file": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "outside_root": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
     }
   }
 }
