@@ -39,6 +39,13 @@ Conferido e sem defeito: a regex do radar exige o `:` logo depois da classe (nã
 `kg-decide-seal.sh` confere o method que acabou de gravar contra o mesmo texto; a matriz `radar_rules.json` da
 kg-ssot (tools/runners, não vendorizada) já casa `(?:testemunho|testimony)` na mensagem nova.
 
+Conferidos os `confirmed` de maior impacto do grafo editado (REGRA 87, PR que EDITA um `.kg.yaml` enxergou os
+`confirmed` dele): `E_SPIKE_SOBREVIVENCIA_PREMIA_O_TRIVIAL_1012` (critério de spike de produto),
+`E_SINAL_TRANSPORTE_ENTRE_AGENTES_1025` (transporte A2A entre agentes) e `E_SINAL_PROTOCOLO_ENTRE_SESSOES_1025`
+(auditoria das mensagens entre sessões). Nenhum trata do vocabulário de `provenance.method`, e nenhum é contrariado
+pelo nó novo `E_KG_SSOT_432_ADOTADA_1027`, que só registra a adoção no molde do 4.31.0. O
+`vendor/kg-ssot/spec/examples/minimal.kg.yaml` é arquivo do vendor, que chega pela tag e não se edita no core.
+
 ## Mutantes
 
 - radar (a2)/(h2): sem `testimony` na regex, o caso inglês cala e o português segue avisando.
