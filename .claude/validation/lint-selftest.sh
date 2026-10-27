@@ -4750,6 +4750,35 @@ run_kg_trace_resolve_selftests() {
     esac
   fi
   unset -f _j6e
+  # (j6f) da passada adversarial (2026-10-27): com `..` no caminho do destino (`novo/../velho/x/idx.tsv`) o desfazer
+  #       subia por `novo/..` e apagava `velho/`, vazio e PRÉ-EXISTENTE, deixando `novo/` para trás. O caminho é
+  #       normalizado antes de medir a cadeia: no rc 3 `velho/` fica, e nem `novo/` nem `velho/x/` sobram; no rc 0 o
+  #       índice nasce em `velho/x/`. MUTANTE: sem a normalização, `velho/` some e o (j6f) cai.
+  _j6f() {  # $1=kg-trace.sh → "ok" ou o desvio
+    local s="$1" o="${d}/docs/onion" r3=0 r0=0 bad=""
+    rm -rf "${o}/novo" "${o}/velho"; mkdir -p "${o}/velho"
+    ONION_KG_TRACE="${mut}/k0.py" bash "${s}" "${d}" --emit-index --out "${o}/novo/../velho/x/idx.tsv" >/dev/null 2>&1 || r3=$?
+    [ "${r3}" -eq 3 ] || bad="${bad} rc3=${r3}"
+    [ -d "${o}/velho" ] || bad="${bad} velho-pre-existente-apagado"
+    [ ! -e "${o}/novo" ] || bad="${bad} novo-sobrou"
+    [ ! -e "${o}/velho/x" ] || bad="${bad} velho/x-sobrou"
+    ONION_KG_TRACE="${kt}" bash "${s}" "${d}" --emit-index --out "${o}/novo/../velho/x/idx.tsv" >/dev/null 2>&1 || r0=$?
+    { [ "${r0}" -eq 0 ] && [ -s "${o}/velho/x/idx.tsv" ]; } || bad="${bad} rc0=${r0}-sem-indice"
+    rm -rf "${o}/novo" "${o}/velho"
+    [ -z "${bad}" ] && printf ok || printf '%s' "${bad}"
+  }
+  local g6f; g6f="$(_j6f "${helper}")"
+  if [ "${g6f}" = ok ]; then record_pass "kg-trace: (j6f) --out com .. no caminho: o desfazer não apaga o diretório vazio pré-existente, e o rc 0 grava no normalizado"
+  else record_fail "kg-trace: (j6f) .. no destino" "${g6f}"; fi
+  sed '/^  _odir="$(realpath -m -- "${_odir}" 2>\/dev\/null)"/d; /^  OUT="${_odir}\/${OUT##\*\/}"/d' "${helper}" > "${mut}/kg-trace-semnorm.sh"
+  if cmp -s "${helper}" "${mut}/kg-trace-semnorm.sh"; then record_fail "kg-trace: (j6f-MUT) mutante não aplicou" "âncora do realpath -m mudou"
+  else
+    case "$(_j6f "${mut}/kg-trace-semnorm.sh")" in
+      *velho-pre-existente-apagado*) record_pass "kg-trace: (j6f-MUT) sem a normalização o desfazer apaga o diretório pré-existente → (j6f) cai" ;;
+      *) record_fail "kg-trace: (j6f-MUT) mutante NÃO morde" "sem a normalização o diretório pré-existente seguiu de pé" ;;
+    esac
+  fi
+  unset -f _j6f
 
   unset -f _kt _mk_trace_sandbox
   rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${d5}" "${mut}"
@@ -35038,10 +35067,15 @@ run_kg_read_leg_selftests() {
   _klr "${hs}" $'cat <<$X > n.md\nsed -i s/a/b/ src/alvo.ts\n$X'; q3="${kout}"; rq="${rq}${rcs}"
   _klr "${hs}" $'cat <<$X > n.md\ncorpo\n$X\nsed -i s/a/b/ src/alvo.ts'; q4="${kout}"; rq="${rq}${rcs}"
   _klr "${hs}" $'true # <<EOF\nsed -i s/a/b/ src/alvo.ts'; q5="${kout}"; rq="${rq}${rcs}"
-  if grep -q 'C_NO_DO_SED' <<< "${q1}" && grep -q 'C_NO_DO_SED' <<< "${q2}" && [ -z "${q3}" ] \
-     && grep -q 'C_NO_DO_SED' <<< "${q4}" && grep -q 'C_NO_DO_SED' <<< "${q5}" && [ "${rq}" = "00000" ]; then
-    record_pass "kg-read-leg: (r2) << entre aspas (também multilinha) e em comentário não abre corpo; <<\$X corta o corpo até \$X e avisa depois, rc 0"
-  else record_fail "kg-read-leg: (r2)" "rc=${rq} aspas=[${q1:0:50}] multilinha=[${q2:0:50}] corpo\$X=[${q3:0:50}] depois\$X=[${q4:0:50}] coment=[${q5:0:50}]"; fi
+  # da passada adversarial (2026-10-27): fora de aritmética `<< 2` é heredoc no bash (o corpo cala), e `$[1<<2]` não
+  local q6 q7
+  _klr "${hs}" $'cat << 2 > n.md\nsed -i s/a/b/ src/alvo.ts\n2'; q6="${kout}"; rq="${rq}${rcs}"
+  _klr "${hs}" $'x=$[1<<2]\nsed -i s/a/b/ src/alvo.ts'; q7="${kout}"; rq="${rq}${rcs}"
+  if grep -q 'C_NO_DO_SED' <<< "${q1}" && grep -q 'C_NO_DO_SED' <<< "${q2}" && [ -z "${q3}${q6}" ] \
+     && grep -q 'C_NO_DO_SED' <<< "${q4}" && grep -q 'C_NO_DO_SED' <<< "${q5}" && grep -q 'C_NO_DO_SED' <<< "${q7}" \
+     && [ "${rq}" = "0000000" ]; then
+    record_pass "kg-read-leg: (r2) << entre aspas (também multilinha), em comentário e em \$[..] não abre corpo; <<\$X e << 2 cortam o corpo, rc 0"
+  else record_fail "kg-read-leg: (r2)" "rc=${rq} aspas=[${q1:0:50}] multilinha=[${q2:0:50}] corpo\$X=[${q3:0:50}] depois\$X=[${q4:0:50}] coment=[${q5:0:50}] <<2=[${q6:0:50}] \$[]=[${q7:0:50}]"; fi
   # (r2-MUT) a varredura sem seguir aspas (a forma da regex) → o `<<` entre aspas volta a engolir o resto e (r2) cai
   sed 's|^        if c in "'"'"'\\"":$|        if False:  # ONION_MUTANTE|' "${hs}" > "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
   if cmp -s "${hs}" "${sbs}/.claude/hooks/kg-read-leg-mut.sh"; then record_fail "kg-read-leg: (r2-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
@@ -36744,7 +36778,8 @@ run_adopter_shape_selftests() {
   #      seguidas ele trocou o hash à mão). Forma do grafo REAL dele: x_pin e label citam o pin antigo, e o label
   #      cita também o pin da adoção. a) o token exato do pin antigo vira o novo, o pin da adoção e o resto da frase
   #      ficam, rc 0; b) label sem o pin antigo como token (um hex que só COMEÇA com ele não conta) → intocado,
-  #      só o x_pin muda, rc 3 com o aviso. MUTANTE: sem a troca no label, (a) cai.
+  #      só o x_pin muda, rc 3 com o aviso; c) o pin antigo citado duas vezes (histórico) → intocado, rc 3.
+  #      MUTANTE: sem a troca no label, (a) cai.
   _i5_run() {  # $1=helper → lista de desvios (vazio = ok)
     local _e="${d}/i5-$RANDOM" _bad="" _r=0 _g
     mkdir -p "${_e}/.claude" "${_e}/docs/onion/graph"; _g="${_e}/docs/onion/graph/onion-adoption.kg.yaml"
@@ -36764,13 +36799,20 @@ run_adopter_shape_selftests() {
     grep -qF 'label: "Instalado no pin `c012991f32f6aa` (ver o histórico)"' "${_g}" || _bad="${_bad} b:label-tocado"
     grep -qx '    x_pin: "3bd13fc565e2"' "${_g}" || _bad="${_bad} b:x_pin"
     [ "${_r}" -eq 3 ] || _bad="${_bad} b:rc=${_r}(esperado-3)"
+    # c) o pin antigo citado DUAS vezes (histórico do dono): qual é o atual é leitura da frase → intocado, rc 3
+    _r=0
+    printf '%s\n' 'nodes:' '  - id: ONION_INSTALLED' '    verified_at: "2026-10-26"' \
+      '    x_pin: "c012991f32f6"' '    label: "Histórico: c012991f32f6 -> fff0001 (rollback), agora c012991f32f6"' > "${_g}"
+    bash "$1" "${_e}" >/dev/null 2>&1 || _r=$?
+    grep -qF 'label: "Histórico: c012991f32f6 -> fff0001 (rollback), agora c012991f32f6"' "${_g}" || _bad="${_bad} c:historico-reescrito"
+    [ "${_r}" -eq 3 ] || _bad="${_bad} c:rc=${_r}(esperado-3)"
     printf '%s' "${_bad}"
   }
   local _i5; _i5="$(_i5_run "${_pk}")"
-  if [ -z "${_i5}" ]; then record_pass "adopter-shape: (i5) label do dono com o pin antigo como token → só ele vira o novo (rc 0); sem o token → intocado e rc 3"
+  if [ -z "${_i5}" ]; then record_pass "adopter-shape: (i5) label do dono com o pin antigo como token único → só ele vira o novo (rc 0); sem o token ou com ele repetido → intocado e rc 3"
   else record_fail "adopter-shape: (i5)" "${_i5}"; fi
   local _i5m="${d}/stamp-i5-mut.sh"
-  sed 's/^    blk\[li\], label_swapped = re.subn(.*/    label_swapped = 0  # ONION_MUTANTE/' "${_pk}" > "${_i5m}"
+  sed 's/^        blk\[li\], label_swapped = _tok.subn(.*/        label_swapped = 0  # ONION_MUTANTE/' "${_pk}" > "${_i5m}"
   if cmp -s "${_pk}" "${_i5m}"; then record_fail "adopter-shape: (i5-MUT) setup" "a mutação não foi aplicada (âncora mudou?)"
   else case "$(_i5_run "${_i5m}")" in
       *a:label-sem-a-troca-exata*) record_pass "adopter-shape: (i5-MUT) sem a troca no label o pin antigo fica nele — (i5) é load-bearing" ;;

@@ -63,6 +63,11 @@ if [ -n "${OUT}" ]; then
   # porque o temporário mora AO LADO do destino. Mas ele só FICA no sucesso: `_onew` guarda o ancestral mais alto
   # que ESTE script criou, e todo caminho de erro desfaz a cadeia (rmdir, só vazio; o que já existia nunca é tocado).
   # Revisão adversarial do adotante sge (2026-10-27): o mkdir antes do produto deixava o diretório no rc 3.
+  # o caminho é normalizado ANTES de medir a cadeia (passada adversarial: com `novo/../velho/x` o rmdir subia por
+  # `novo/..` e apagava `velho/`, vazio e pré-existente). Teto declarado: um diretório que OUTRO processo crie
+  # entre a medida e o mkdir pode sair no desfazer, se ainda estiver vazio (o rmdir nunca apaga conteúdo).
+  _odir="$(realpath -m -- "${_odir}" 2>/dev/null)" || { echo "ERRO kg-trace --out: não consegui normalizar ${OUT}" >&2; exit 2; }
+  OUT="${_odir}/${OUT##*/}"   # o destino segue o caminho normalizado: `novo/` do `novo/../` não é criado, e o mv não pode depender dele
   _onew="" _op="${_odir}"
   while [ ! -e "${_op}" ] && [ ! -L "${_op}" ]; do _onew="${_op}"; _op="$(dirname -- "${_op}")"; done
   _oundo() {

@@ -45,6 +45,13 @@
 # árvore presente e NÃO executável: FALHA FECHADO (revisão do adotante sge, 2026-10-26). Antes caía em
 # silêncio no do principal: o hook sob teste não rodava, e o bit perdido chegava à main, onde o git
 # IGNORA hook não executável e o gate inteiro some. Rodá-lo por `bash` esconderia o mesmo bit perdido.
+# ⚠️ LIMITE DO GIT, declarado (revisão adversarial do adotante sge, 2026-10-27): a falha fechada só existe
+# com o hooksPath ABSOLUTO, porque é só aí que ESTE arquivo roda numa worktree. Com o RELATIVO (o
+# `.githooks` da ativação) o git resolve o hook DENTRO da worktree, acha-o não executável, o IGNORA (só
+# um `hint:`) e o commit sai rc 0 sem este bloco nem o gate rodarem; nenhum código de hook alcança esse
+# caso. Quem o pega por outro caminho é a prova do gate (`prove-gate-blocks.sh`, rc 3 "não é executável
+# (o git o ignora)") e o `chmod +x` da instalação. O bit perdido COMMITADO (modo 100644) segue sem guarda
+# no commit do relativo; confira com `git ls-files -s .githooks/pre-commit` (tem de dizer 100755).
 # A variável guarda o alvo contra laço e é limpa logo abaixo, para não vazar a um git aninhado.
 _onion_top="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 _onion_cmn="$(CDPATH= cd "$(git rev-parse --git-common-dir 2>/dev/null || echo /nonexistent)" 2>/dev/null && cd .. && pwd || true)"
