@@ -9063,6 +9063,44 @@ PYF
   r="$(env ONION_CC_BIN= ONION_CURRENCY_PY= ONION_CURRENCY_NPM= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_ACTION_REMOTE_BASE="${d}/act" ONION_CURRENCY_CACHE_DIR="${d}/cache" bash "${sut}" "${d}/r3" --fresh 2>/dev/null </dev/null)"
   [ -z "${r}" ] && record_pass "currency-census: (aa8) sem workflow que use a action ⇒ superfície omitida" \
     || record_fail "currency-census: (aa8) superfície inexistente" "veio: ${r:0:120}"
+  # (py) o INTERPRETADOR (2026-10-27): o minor do python3 do lint × o python-version do setup-python dos workflows onion-*.
+  #      Polaridades: mesmo minor ⇒ em dia (dois passos com o mesmo minor também); abaixo ⇒ defasada com a cura (venv à
+  #      frente do PATH, pip DO venv, nunca trocar o do SO); acima ⇒ fora do pino; dois minors ⇒ não medido; a linha
+  #      comentada e a `# onion:floor` ficam fora; workflow da APLICAÇÃO (fora de onion-*) nunca conta (o adotante);
+  #      onion-* sem setup-python ⇒ omitida; setup-python sem valor legível ⇒ não medido, nunca omitida.
+  printf '#!/usr/bin/env bash\ncase " $* " in *sys.version_info*) printf "%%s\\n" "${FAKE_PYVER:-}"; exit 0 ;; *" -m pip "*) exit 1 ;; esac\nexit 0\n' > "${d}/bin/pyv"
+  chmod +x "${d}/bin/pyv"
+  local w3="${d}/r3/.github/workflows"
+  _cpy() { env ONION_CC_BIN= ONION_CURRENCY_NPM= ONION_CURRENCY_GIT= ONION_CURRENCY_SDK_TARGETS= ONION_CURRENCY_KG_SSOT_REMOTE="${d}/sumiu.git" \
+      ONION_CURRENCY_PY="${d}/bin/pyv" ONION_CURRENCY_CACHE_DIR="${d}/cache" ONION_CURRENCY_TIMEOUT=20 FAKE_PYVER="$1" \
+      bash "${sut}" "${d}/r3" --fresh 2>/dev/null </dev/null; }
+  printf 'jobs:\n  l:\n    steps:\n      - uses: actions/setup-python@x\n        with:\n          python-version: %s\n      # python-version: 3.11\n      - uses: actions/setup-python@x\n        with:\n          python-version: %s # onion:floor\n  m:\n    steps:\n      - uses: actions/setup-python@x\n        with:\n          python-version: %s\n' "'3.15'" "'3.12'" "'3.15'" > "${w3}/onion-ci.yml"
+  r="$(_st "$(_cpy 3.15.2)" python)"
+  [ "${r}" = "em-dia|3.15.2|3.15" ] && record_pass "currency-census: (py1) python3 3.15.2 × CI 3.15 (2 passos) ⇒ em dia; a linha comentada e a onion:floor ficam fora" \
+    || record_fail "currency-census: (py1) interpretador em dia" "veio: ${r}"
+  o="$(_cpy 3.12.3)"
+  case "$(_st "${o}" python)|$(_act "${o}" python)" in "defasada|3.12.3|3.15|"*"uv venv --python 3.15"*"<venv>/bin/python -m pip"*"não se troca"*) record_pass "currency-census: (py2) python3 3.12 × CI 3.15 ⇒ defasada, com a cura pelo pip DO venv à frente do PATH" ;;
+    *) record_fail "currency-census: (py2) interpretador defasado" "veio: $(_st "${o}" python) $(_act "${o}" python)" ;; esac
+  r="$(_st "$(_cpy 3.16.0)" python)"
+  [ "${r%%|*}" = "fora-do-pino" ] && record_pass "currency-census: (py3) python3 3.16 × CI 3.15 ⇒ fora do pino, nunca em dia" \
+    || record_fail "currency-census: (py3) interpretador à frente" "veio: ${r}"
+  printf 'jobs:\n  app:\n    steps:\n      - uses: actions/setup-python@x\n        with:\n          python-version: "3.10"\n' > "${w3}/app.yml"
+  r="$(_st "$(_cpy 3.15.2)" python)"
+  [ "${r}" = "em-dia|3.15.2|3.15" ] && record_pass "currency-census: (py5) o workflow da APLICAÇÃO (fora de onion-*) não conta" \
+    || record_fail "currency-census: (py5) workflow da aplicação contou" "veio: ${r}"
+  printf 'jobs:\n  b:\n    steps:\n      - uses: actions/setup-python@x\n        with:\n          python-version: "3.14"\n' > "${w3}/onion-other.yaml"
+  r="$(_st "$(_cpy 3.15.2)" python)"
+  [ "${r%%|*}" = "nao-medida" ] && record_pass "currency-census: (py4) workflows onion-* com dois minors ⇒ não medido" \
+    || record_fail "currency-census: (py4) minors divergentes" "veio: ${r}"
+  printf 'jobs:\n  l:\n    steps:\n      - uses: actions/checkout@x\n' > "${w3}/onion-ci.yml"; rm -f "${w3}/onion-other.yaml"
+  o="$(_cpy 3.15.2)"
+  [ -z "$(_st "${o}" python)" ] && record_pass "currency-census: (py6) onion-* sem setup-python ⇒ superfície omitida (o adotante sem o CI do core)" \
+    || record_fail "currency-census: (py6) superfície inexistente" "veio: $(_st "${o}" python)"
+  printf 'jobs:\n  l:\n    strategy:\n      matrix:\n        py: ["3.15"]\n    steps:\n      - uses: "actions/setup-python@x"\n        with:\n          python-version: ${{ matrix.py }}\n' > "${w3}/onion-ci.yml"
+  r="$(_st "$(_cpy 3.15.2)" python)"
+  [ "${r%%|*}" = "nao-medida" ] && record_pass "currency-census: (py7) setup-python com valor ilegível (matriz) ⇒ não medido, nunca omitido" \
+    || record_fail "currency-census: (py7) valor ilegível" "veio: ${r}"
+  rm -f "${w3}/onion-ci.yml" "${w3}/app.yml"
   rm -rf "${d}"
 }
 
@@ -46129,7 +46167,12 @@ run_mcp_onion_kg_writer_selftests() {
   fi
   command -v python3 >/dev/null 2>&1 && python3 -I -c 'import yaml, jsonschema' >/dev/null 2>&1 \
     || { record_skip "mcp-onion-kg-writer: python3/PyYAML/jsonschema ausentes (gate do contrato não exercido)"; return; }
-  local want_total=65 o rc
+  local want_total=65 o rc libyaml
+  # A libyaml do python3 (2026-10-27): o PyYAML 6.0.3 não publica wheel cp315 e o sdist compila sem ela, então no
+  # Python 3.15 do core não há CSafeLoader. Aí o mutante `profundidade-tab-inicial` (tirar o parser C da medição) é
+  # EQUIVALENTE por construção, e o veredito dele abaixo o declara assim, medido. O caminho da libyaml se prova num
+  # python que a tenha (o 3.12 do SO, a passada no piso).
+  libyaml="$(python3 -I -c 'import yaml; print(1 if getattr(yaml, "CSafeLoader", None) is not None else 0)' 2>/dev/null)"
   if o="$(LC_ALL=C python3 -I -B "${h}" --code-root "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
     record_pass "mcp-onion-kg-writer: (a) servidor real por HTTP — ${want_total} casos (401, e-mail, área, GitStore, aresta externa, delete, aninhamento, veredito)"
@@ -46232,6 +46275,8 @@ EOF_MUT
     mo="$(cat "${d}/out")"; mrc="$(cat "${d}/rc")"
     if grep -q 'não consegui plantar\|RECUSADO' <<< "${mo}"; then record_fail "mcp-onion-kg-writer: (m) mutante não aplicou" "${want}"; continue; fi
     if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want} " <<< "${mo}"; then record_pass "mcp-onion-kg-writer: (m) mutante morde → FAIL ${want}"
+    elif [ "${want}" = profundidade-tab-inicial ] && [ "${libyaml}" = 0 ] && [ "${mrc}" -eq 0 ]; then
+      record_pass "mcp-onion-kg-writer: (m) ${want}: sem libyaml no python3 ($(python3 -V 2>&1), CSafeLoader ausente, medido) o mutante é equivalente — o caminho C se prova no piso com libyaml"
     else record_fail "mcp-onion-kg-writer: (m) mutante NÃO morde" "${want} (rc=${mrc}) $(grep -E '^(FAIL|TOTAL)' <<< "${mo}" | head -3 | tr '\n' '|')"; fi
   done
   rm -rf "${sb}"

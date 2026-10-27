@@ -99,6 +99,11 @@ jobs:
           # o diff base...head do PR precisa da história dos dois lados
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      # o core roda em Python 3.15 (2026-10-27): o interpretador é escolhido pelo AMBIENTE, nunca pela imagem
+      - name: Python 3.15 (o interpretador do core)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.15'
       # NÍVEL (passo D): no PR, a seleção pelo diff; fora do PR, sempre a completa. Labels e shas
       # entram por env, nunca interpolados no script (nome de label é texto de quem abriu o PR).
       - id: n
@@ -159,13 +164,25 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      # O INTERPRETADOR (2026-10-27): a bancada roda no Python 3.15 do setup-python; o código que viaja chama
+      # `python3` e segue no piso 3.12 (a passada no 3.12 é local, nas famílias tocadas). As dependências entram
+      # pelo pino com hash do leitor do KG-SSOT, no python do setup-python: o `apt install python3-yaml` de antes
+      # instalaria no python da IMAGEM, que deixou de ser o `python3` efetivo.
+      - name: Python 3.15 (o interpretador do core)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.15'
+
       # Capacidade ANTES da suíte: ela degrada gracioso sem tooling (⊘ NÃO VERIFICADO) —
       # correto na máquina do autor, inaceitável aqui: um runner sem jq/pyyaml pularia
       # dezenas de guardas e o job ficaria VERDE sem tê-las exercido.
       - name: Asserção de capacidade do runner (a bancada não pode pular nada)
         run: |
           command -v jq >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq jq; }
-          python3 -c "import yaml" >/dev/null 2>&1 || { sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml; }
+          python3 --version
+          python3 -c 'import sys; sys.exit(0 if sys.version_info[:2] == (3, 15) else 1)' \
+            || { echo "ERRO: o python3 efetivo não é o 3.15 do setup-python: $(command -v python3) $(python3 --version 2>&1)"; exit 1; }
+          python3 -m pip install --quiet --require-hashes -r vendor/kg-ssot/tools/requirements.txt
           missing=""
           for t in jq git openssl awk python3; do command -v "$t" >/dev/null 2>&1 || missing="${missing} $t"; done
           python3 -c "import yaml" >/dev/null 2>&1 || missing="${missing} python3-yaml"
@@ -174,7 +191,7 @@ jobs:
             echo "Sem isto a bancada PULA guardas e o verde não significa nada."
             exit 1
           fi
-          echo "OK — capacidade completa: jq git openssl awk python3 + pyyaml"
+          echo "OK — capacidade completa: jq git openssl awk $(python3 --version) + pyyaml"
 
       - name: Auto-teste das guardas (fixtures determinísticas)
         # STRICT=1: qualquer ⊘ (guarda não exercida) REPROVA. É o que separa "verifiquei e
@@ -264,6 +281,10 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.sha }}
+      - name: Python 3.15 (o interpretador do core)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.15'
       # A ASSINATURA DA QUEBRA (2026-10-13): os relatórios das faixas dizem QUAIS famílias reprovaram.
       # Com eles o alarme separa o commit que HERDOU o main vermelho (mesmas famílias: só comenta) do
       # que trouxe quebra nova (família nova: suspeito + revert). Medido no dia: sem isso o alarme

@@ -649,10 +649,23 @@ def main():
             'profundidade-quebra-ps': 'meta:\u2029  x_deep:\u2029    ' + '- ' * 30000 + 'x\u2029',
             'profundidade-tab-inicial': 'a:\t1\nb: ' + '[' * 30000 + ']' * 30000 + '\n',
         }
+        # O tab inicial só leva ao fundo pela libyaml: o parser puro recusa o tab na linha 1, antes de abrir coleção.
+        # Sem a libyaml no python do servidor (o PyYAML 6.0.3 não publica wheel cp315, e o sdist compila sem ela; medido
+        # em 2026-10-27), nenhum dos dois caminhos compõe o documento, e o caso prova isso: não grava e o processo segue
+        # vivo, com a recusa do teto ou o REPROVADO de parse. O servidor herda o interpretador deste harness.
+        try:
+            import yaml as _yaml
+            libyaml = getattr(_yaml, 'CSafeLoader', None) is not None
+        except ImportError:
+            libyaml = False
         for nm, txt in fundo.items():
             e, pz = call(port, 'kg_write', {'slug': 'demo-fundo', 'yaml': txt})
-            case(nm, len(txt.encode()) <= 512 * 1024 and e and 'aninhamento acima do teto' in pz.get('recusa', '')
-                 and alive(srv, port) and not os.path.exists(os.path.join(area_a, 'demo-fundo')), pz.get('recusa'))
+            recusado = bool(e) and 'aninhamento acima do teto' in pz.get('recusa', '')
+            if nm == 'profundidade-tab-inicial' and not libyaml:
+                recusado = recusado or (pz.get('data', {}).get('veredito') == 'REPROVADO'
+                                        and 'nao parseia' in pz.get('data', {}).get('parse', ''))
+            case(nm, len(txt.encode()) <= 512 * 1024 and recusado
+                 and alive(srv, port) and not os.path.exists(os.path.join(area_a, 'demo-fundo')), pz.get('recusa') or pz.get('data'))
         bomb = ['a0: &a0 [x, x, x, x, x, x, x, x, x, x]']
         bomb += [f'a{i}: &a{i} [' + ', '.join([f'*a{i - 1}'] * 10) + ']' for i in range(1, 9)]
         bomb = '\n'.join(bomb + ['z: [' + ', '.join(['*a8'] * 10) + ']']) + '\n'
