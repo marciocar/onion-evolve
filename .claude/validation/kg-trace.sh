@@ -29,7 +29,9 @@
 #        o dia 1 não precisa do arquivo: a REGRA 84 dá SOFT sem índice e o hook cala sem ele.
 #        Sem --out, o índice vai ao stdout como sempre (compatível).
 # Saída: humano (a saída do produto) · TSV `grafo·id·node_type·alvo·veredito` (só os que reprovam) ·
-#        índice `caminho·id·grafo`, ordenado (LC_ALL=C sort -u)
+#        índice `caminho·id·grafo`, ordenado (LC_ALL=C sort -u). No TSV, desde a kg-ssot 4.37.0, a falha do
+#        provenance.scheme/sha256 sai `SCHEME-FALHA:<código>` e o unpinned/malformed do skipped numa linha
+#        `SCHEME-AVISO` (que não conta para o rc)
 # Exit : 0 = todo `trace:` julgável resolve / índice emitido · 1 = TARGET-MISSING, grafo ilegível ou VACUIDADE
 #        2 = sem o produto (kg_trace.py, seus vizinhos ou python3 ausentes) ou entrada quebrada
 #        3 = (--emit-index) índice VAZIO: nenhum nó com trace resolvível — legítimo no dia 1 do adotante
@@ -208,14 +210,33 @@ for m in loc.get("missing", []):
     print(f"{m['file']}\t{m['id']}\t-\t{m['target']}{m['locator']}\tLOCATOR-MISSING")
 for u in loc.get("unreadable", []):
     print(f"{u['file']}\t{u['id']}\t-\t{u['target']}{u['locator']}\tLOCATOR-ILEGIVEL")
+# SCHEMES (kg-ssot >= 4.37.0, contrato v4.17, `schemes`, aditivo): a fonte lida pelo provenance.scheme e conferida pelo
+# provenance.sha256. Cada falha sai com o nó e o código do produto (integrity.trace-sha256-mismatch,
+# -locator-out-of-range, -quote-missing), nunca como ENTRADA-QUEBRADA. O skipped que é DEFEITO de quem declara
+# (unpinned: o ref da URL anda; malformed: scheme, locator ou hash fora da forma) sai numa linha de aviso; o resto do
+# skipped (form_only, absolute, missing_source...) é o não-julgado por desenho, que o produto já conta.
+def _cell(s):
+    return " ".join(str(s or "").split())
+sch = d.get("schemes") or {}
+for m in sch.get("failures", []):  # a tradução das falhas de esquema (o mutante (s-MUT) a esvazia)
+    print(f"{m['file']}\t{m['id']}\t-\t{_cell(m.get('target'))} [{_cell(m.get('scheme')) or 'sha256'}] "
+          f"{_cell(m.get('locator'))}".rstrip() + f"\tSCHEME-FALHA:{m['code']}")
+ss = sch.get("skipped") or {}
+warn = [f"{ss[k]} {k}" for k in ("unpinned", "malformed") if ss.get(k)]
+if warn:
+    print(f"-\tSCHEMES\t-\t({', '.join(warn)})\tSCHEME-AVISO")
 PY
 )" || { printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' '(JSON do kg_trace.py ilegível)' 'ENTRADA-QUEBRADA'; exit 1; }
 # rc 1 do produto SEM nenhuma linha traduzida: o rc e o JSON discordam (um código novo do produto que esta tradução
 # não conhece). Com a 4.35.0 e antes desta tradução, o locator que não resolvia dava rc 1 com TSV vazio, e o lint
 # calava (medido na adoção, 2026-10-27): nunca verde calado.
-if [ -z "${_tsv}" ] && [ "${_krc}" -eq 1 ]; then
+# A linha SCHEME-AVISO não é achado (o produto sai 0 com ela): não conta para o rc, nem para esta guarda.
+_achados="$(grep -v $'\tSCHEME-AVISO$' <<< "${_tsv}" || true)"
+if [ -z "${_achados}" ] && [ "${_krc}" -eq 1 ]; then
+  [ -z "${_tsv}" ] || printf '%s\n' "${_tsv}"
   printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' '(kg_trace.py rc=1 sem achado que esta tradução conheça)' 'ENTRADA-QUEBRADA'; exit 1
 fi
 [ -n "${_tsv}" ] || exit "${_krc}"
 printf '%s\n' "${_tsv}"
-exit 1
+[ -z "${_achados}" ] || exit 1
+exit "${_krc}"

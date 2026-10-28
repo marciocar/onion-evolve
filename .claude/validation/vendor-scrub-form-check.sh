@@ -96,10 +96,19 @@ _scan() {
     | grep -vE '&(quot|amp|lt|gt|nbsp|apos|#[0-9]+);|https?://|&&|\|\||\$\{' \
     | while IFS= read -r line; do
         local_file="${line%%:*}"; rest="${line#*:}"; rest="${rest#*:}"
+        # `chave=valor&chave=valor` (query ou fragmento de URL) não é ampersand corporativo. Medido na
+        # kg-ssot 4.37.0 (2026-10-28, adotante sge): os fragmentos de PDF `zoom=200&page=3` e
+        # `page=3&zoom=200` viravam os candidatos `200&page` e `3&zoom`, 2 HARD falsos no pre-commit.
+        # Pela FORMA: o token que encosta num `=` dos DOIS lados, ou que tem um lado só de dígitos, cala.
+        # Os nomes do cabeçalho (`Acme&Co`, `Baker&Sons`) não têm nem um nem outro, e seguem acusando.
         while IFS= read -r t; do
           [ -n "${t}" ] || continue
+          case "${t}" in =*=) continue ;; esac   # a cura da query: o mutante do --selftest a remove
+          t="${t#=}"; t="${t%=}"
+          case "${t%%&*}" in *[!0-9]*) : ;; *) continue ;; esac
+          case "${t#*&}" in *[!0-9]*) : ;; *) continue ;; esac
           printf '%s|%s\n' "${local_file#${ROOT}/}" "${t}"
-        done < <(LC_ALL="${_LC}" grep -oE "${_PAT_AMP}" <<< "${rest}" || true)
+        done < <(LC_ALL="${_LC}" grep -oE "=?(${_PAT_AMP})=?" <<< "${rest}" || true)
         # só o NOME, nunca a âncora: `cliente da Acme` reporta `Acme`. O `sed` acompanha o padrão
         # (conector e pontuação opcionais) — se ele ficar para trás, a âncora entra na chave da
         # catraca e o mesmo nome em duas frases vira dois candidatos distintos.
@@ -124,18 +133,24 @@ if [ "${MODE}" = "--selftest" ]; then
   d="$(mktemp -d)"; mkdir -p "${d}/x"
   printf 'nada aqui\nM&A e Q&A sao siglas\nQ&A e V&V tambem\n' > "${d}/x/ok.md"
   printf 'a PoC Acme&Co foi medida\n' > "${d}/x/leak.md"
+  # a query/fragmento de URL (kg-ssot 4.37.0, adotante sge): `chave=valor&chave=valor` cala; o nome com `&` não
+  printf 'locator: "#zoom=200&page=3"\nlocator: "#page=3&zoom=200"\nurl: "?lang=pt&mode=dark"\nfrag: "#page=200&zoom"\n' > "${d}/x/query.md"
+  # o `&` entra por argumento: o literal aqui viraria candidato NOVO deste arquivo (ele também viaja)
+  printf 'a Baker%sSons e a Foo%sBar Ltda\n' '&' '&' > "${d}/x/amp.md"
   # o caso que a 1ª redação PERDIA: caixa alta, segundo token, conector e acento
   printf 'MEDIDO na PoC KVX Motores em campo\ncliente da Lumora\nadotante: Vantiro Sistemas\nPoC Banvi Digital\nadotante NAO registrado\ncliente NUNCA visto\n' > "${d}/x/hard.md"
   ROOT="${d}"; _targets=("${d}/x")
   out="$(_scan)"
   _miss=""
-  for _w in 'Acme&Co' 'KVX Motores' 'Lumora' 'Vantiro Sistemas' 'Banvi Digital'; do
+  _e='&'
+  for _w in 'Acme&Co' "Baker${_e}Sons" "Foo${_e}Bar" 'KVX Motores' 'Lumora' 'Vantiro Sistemas' 'Banvi Digital'; do
     grep -qF "|${_w}" <<< "${out}" || _miss="${_miss} ${_w}"
   done
   _false=""; grep -q 'ok\.md' <<< "${out}" && _false="ok.md (sigla do ofício virou candidato)"
+  grep -q 'query\.md' <<< "${out}" && _false="${_false} query.md (chave=valor&chave=valor virou candidato)"
   rm -rf "${d}"
   if [ -z "${_miss}" ] && [ -z "${_false}" ]; then
-    echo "vendor-scrub-form selftest: OK (pega ampersand, caixa alta, 2º token, conector e acento; cala em M&A/Q&A/V&V)"; exit 0
+    echo "vendor-scrub-form selftest: OK (pega ampersand, caixa alta, 2º token, conector e acento; cala em M&A/Q&A/V&V e em chave=valor&chave=valor)"; exit 0
   fi
   echo "vendor-scrub-form selftest: FALHOU — não pegou:${_miss:-(nada)} · falso-positivo: ${_false:-(nenhum)}" >&2
   echo "saída do _scan: [${out}]" >&2; exit 1
