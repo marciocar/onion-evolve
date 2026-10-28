@@ -27996,7 +27996,10 @@ run_lint_hard_file_selftests() {
   rm -f "${dir}/zz-hard-file-probe.md" "${hf}"
   # (c) o motor PEDE a lista e a IMPRIME ao reprovar (registro: arquivo que ninguém lê é recurso morto)
   # (a forma mudou em 2026-10-08, SAC-66: o lint do commit virou a função _lint_in, que recebe o arquivo)
-  if grep -q 'ONION_LINT_HARD_FILE="$2"' "${REPO_ROOT}/ops/pr-finalize.sh" \
+  # O ops/pr-finalize.sh é core-only (não viaja): no adotante o caso não tem objeto (medido no sge, 2026-10-28).
+  if [ ! -f "${REPO_ROOT}/ops/pr-finalize.sh" ]; then
+    record_skip "lint-hard-file: (c) sem ops/pr-finalize.sh (core-only) → pulado"
+  elif grep -q 'ONION_LINT_HARD_FILE="$2"' "${REPO_ROOT}/ops/pr-finalize.sh" \
      && grep -q '_lint_in "${_tmp}/wt" "${_tmp}/hard.txt"' "${REPO_ROOT}/ops/pr-finalize.sh" \
      && grep -q 'as violações HARD do commit' "${REPO_ROOT}/ops/pr-finalize.sh"; then
     record_pass "lint-hard-file: (c) o pr-finalize pede a lista e a imprime quando reprova"
@@ -28017,6 +28020,10 @@ run_r16_table_total_selftests() {
      || [ ! -f "${fxd}/bad-table-total-thousand.md" ]; then
     record_skip "r16-table-total: sandbox ou fixture ausente → pulado"; return; fi
   [ -n "${SSOT_AGENT_TOTAL:-}" ] || { record_skip "r16-table-total: SSOT de agentes vazia → pulado"; return; }
+  # Como as fixtures r16-count-drift/* da família `fixtures`: no adotante o escopo de inventário exclui o que está fora
+  # de docs/onion/, e a sonda em docs/ não é julgada (medido no sge, 2026-10-28: 4 ✗ por isso).
+  if [ "${SELFTEST_ROLE:-}" = "adopted" ]; then
+    record_skip "r16-table-total: core-only (role: adopted; escopo derivado torna a asserção insatisfazível)"; return; fi
   local vdir; vdir="$(dirname "${lint}")"
   local mfull="${vdir}/zz-r16-mut-full.sh" mthou="${vdir}/zz-r16-mut-thousand.sh"
   local probe="${SANDBOX}/docs/zz-r16-table-probe.md" msg="linha 'Total' de tabela"
@@ -28102,7 +28109,19 @@ if [ -f "${MANIFEST}" ]; then
       case "${fixture}" in r16-count-drift/*|r22-evolution-links/*)
         record_skip "fixtures: ${fixture} — core-only (role: adopted; escopo derivado torna a asserção insatisfazível)"; continue ;;
       esac
+      # Medido no sge em 2026-10-28 (pin 1d04d4e24cec): o glob morto sob `docs/` não viaja, e no adotante a REGRA 53
+      # responde com o SOFT [papel/SEM-OBJETO] antes do HARD «NUNCA carrega», que é o certo para o papel. A asserção
+      # do keyword do core é insatisfazível lá; o veredito bad segue medido no core.
+      case "${fixture}" in r53-rules-pathscoped/bad-brace-dead.md|r53-rules-pathscoped/bad-scalar-dead.md)
+        record_skip "fixtures: ${fixture} — core-only (role: adopted; o glob morto sob docs/ vira [papel/SEM-OBJETO], não «NUNCA carrega»)"; continue ;;
+      esac
     fi
+    # A REGRA 89 só julga onde há docs/onion/radar-baselines.yaml (radar-aufhebung-check.sh sai com TOTAL 0 sem ele):
+    # adotante sem radar não tem o objeto, e a fixture é insatisfazível lá (medido no sge, 2026-10-28).
+    case "${fixture}" in r89-aufhebung/*)
+      if [ ! -e "${REPO_ROOT}/docs/onion/radar-baselines.yaml" ]; then
+        record_skip "fixtures: ${fixture} — sem docs/onion/radar-baselines.yaml a REGRA 89 não tem objeto aqui"; continue; fi ;;
+    esac
     case "${kind}" in
       lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" "${inject:-}" ;;
       fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
