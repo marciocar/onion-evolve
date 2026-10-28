@@ -1623,7 +1623,27 @@ nodes:
       locator: ".claude/validation/lint-selftest.sh (run_a2a_rt_selftests); docs/evolution/research/a2a-cross-user-spike-2026-10/hooks/record-tool-attempts.selftest.sh"
       method: "medição: bancada com mutantes e dogfood do instalador num HOME descartável"
       locality: "repo"
+  - id: Q_META_VELHO_EM_GRAFO_SELADO_1028
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
+    verified_against: "caso da curadoria relatado ao core em 2026-10-28: um meta.x_unverified dizendo «pré-registro» num grafo cujos nós já foram medidos, e o radar passou calado"
+    label: "O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro."
+    narrative: "O radar julga os nós e não o bloco meta; um campo x_* de meta escrito na abertura do grafo (x_unverified: «pré-registro») sobrevive à medição e passa a afirmar o contrário do que os nós dizem. Caso único até aqui, o da curadoria. Gatilho: o 2º caso. Forma provável da cura: a seção ESTADO do kg-radar.sh acusa meta.x_* sem carimbo de data e mais velho que o nó medido mais novo do grafo (verified_at ou valid_from), sem casar texto, porque guarda que casa a palavra falha pelo vocabulário."
+    provenance:
+      source: "sessão da curadoria, via sessão principal do core"
+      locator: "brief do PR de manutenção do core, item 10, 2026-10-28"
+      method: "testimony: relato de um caso, não medido no core"
+      locality: "pessoa"
 edges:
+  - from: Q_META_VELHO_EM_GRAFO_SELADO_1028
+    to: D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028
+    edge_type: TRACES_TO
   - from: E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027
     to: D_PY315_EXECUCAO_POR_OPS_E_OPT_1027
     edge_type: CONSTRAINS
