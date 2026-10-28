@@ -1,14 +1,13 @@
 ---
 branch: chore/kg-ssot-4.37.0
-pr: pendente
+pr: 1424
 date: 2026-10-28
-reviewed_diff_sha256: 6798bc22d11fa934c83ddceaf7b667cbc96c6ea03c9f912a7f9e59ec722e8d37
-reviewed_code_sha256: 19abc4de331cf987388f3691363d1e901209aa2b2c31eac4ea59c21e8bdb79aa
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 tokens: 71668
 duration_min: 3
-findings_fixed: 3
+findings_fixed: 4
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: "subagente revisor novo (code-reviewer), só leitura, sem a conclusão da sessão de adoção, sobre o diff contra a origin/main fora do vendor"
@@ -30,7 +29,7 @@ A adoção da kg-ssot 4.37.0 (contrato v4.17, só SHOULD), saltando a 4.36.0. No
 - o nó `Q_MA_FREE_ORG_READ_ENFORCED` ganha `scheme: kg-node` e o `sha256` da fonte na curadoria;
 - a identidade do contrato regravada no `.kg-ssot/gate/` (`kg_gate.py --update`).
 
-## Achados (5 reais, 3 corrigidos, 2 declarados)
+## Achados (5 reais, 4 corrigidos, 1 declarado)
 
 1. **O texto prometia julgar o unpinned, e no core ele não nasce** (média). O `kg-trace.sh` não passa `--with`, e no
    produto o `unpinned` só aparece com `--with`: a URL de outro repo cai em `absolute`, não julgada. Cura: o teto
@@ -42,8 +41,13 @@ A adoção da kg-ssot 4.37.0 (contrato v4.17, só SHOULD), saltando a 4.36.0. No
    tem. A narrativa do nó segue citando o commit `2c8d3846` do nó espelhado, e o `source` usa `518b332b`, o commit
    pedido para o card; os dois resolvem.
 3. **`missing_source` com sha256 declarado calava** (baixa). Cura: entra na linha de aviso; caso (s5).
-4. **O (f0-MUT) mede o symlink ao lado, não reescreve o caso** (baixa). Declarado: ele aplica ao mesmo predicado do
-   (f0) o PATH com o symlink de antes e mostra o `sys.prefix` do Python base; onde não há venv, pula visível.
+4. **O (f0-MUT) mede o symlink ao lado, não reescreve o caso** (baixa). A 1ª forma só mordia onde o python3 é de venv,
+   e no CI (STRICT, sem venv) virou `record_skip`, que o STRICT reprova: o selftest (1) do PR caiu por isso. Cura: o caso
+   cria um venv de prova (`python3 -m venv --without-pip`) e aplica nele as duas formas pela mesma função
+   (`_pm_pywrap`): o wrapper mantém o `sys.prefix` do venv e o symlink o perde. Morde em qualquer runner. Revisado de
+   novo, só este trecho, por revisor novo (53.615 tokens, 2 min): no CI o `sys.prefix` sozinho não distingue o
+   symlink do wrapper, então o (f0) exige também que `bin/python3` não seja symlink e tenha o `exec`; e o mutante
+   passou a ser o `_pm_pywrap` virando `ln -sf`. O indicador segue indireto (o `sys.prefix`, não o `import yaml`).
 5. **A regra do `=` dos dois lados se mantém viva por um caso só** (baixa). Cura: o comentário da família diz qual
    caso segura cada regra (os fragmentos de PDF, a dos dígitos; o `?lang=pt&mode=dark`, a do `=`).
 
