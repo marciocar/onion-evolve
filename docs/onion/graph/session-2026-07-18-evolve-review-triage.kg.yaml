@@ -254,7 +254,7 @@ nodes:
     confidence: 0.2
     status: superseded
     label: "ALEGAVA (memoria 07-14): is_error do onion-review era TRANSITORIO (rate-limit/overload sob rajada de CI)"
-    trace: "memory/onion-review-ci-semantics.md"
+    narrative: "a origem desta afirmação é a memória de sessão do agente (a entrada onion-review-ci-semantics, de 2026-07-14), que fica fora do repo e não é versionada; o trace que apontava para ela saiu em 2026-10-28 (adoção da kg-ssot 4.38.0) porque nenhum leitor de fora a alcança"
   - id: D_PIN
     node_type: decision
     layer: audit
