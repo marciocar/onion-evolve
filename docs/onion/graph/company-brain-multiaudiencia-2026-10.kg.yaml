@@ -1,0 +1,426 @@
+meta:
+  schema_version: "1"
+  id: company-brain-multiaudiencia-2026-10
+  slug: company-brain-multiaudiencia-2026-10
+  title: "Company Brain multiaudiência: negócio e tecnologia na mesma fonte, cada um escrevendo só no que é seu"
+  date: "2026-10-28"
+  baseline: "2026-10-28"
+  review_after: "2026-11-27"
+  purpose: "O grafo de pendências que o adotante brain (o hub da empresa) pediu ao core em 2026-10-27: como o Company Brain serve o negócio e a tecnologia ao mesmo tempo, com leitura cruzada, sem que um sobrescreva o lado do outro e sem que nada errado passe despercebido. O core orquestra; a curadoria e o kg-ssot respondem às perguntas deles pelos próprios canais; o maestro decide o custo e a arquitetura. Um nó por pendência, com o dono no campo owner (core, curadoria, kg-ssot, brain ou maestro). DEPENDS_ON diz o que espera o quê."
+  note: "TETO, declarado: este grafo guarda as PERGUNTAS, o COMPROMISSO e a ORDEM, não o desenho. Nada se implementa antes de D_MA_ARCH: o hub segue com o que já está decidido (wiki antes do Drive; nenhuma pessoa de negócio com escrita no repo). A pendência que já tem nó em outro grafo do core entra por external_edges (a medida da ida e volta A2A, a decisão do MCP remoto). Nó de outro repositório entra em texto até existir aresta entre repos. O core não escreve nome de cliente, de pessoa nem conteúdo de repo privado: o hub aparece como «o hub» ou «o adotante brain». Grafo de camada de coordenação, na forma de coordenacao-sessoes-2026-10."
+  # kg-backlog-guard: on
+  # ↑ opt-in da REGRA 58 (O backlog cumpre as promessas do próprio meta:): teto e carimbo do done cobrados pelo lint.
+  # ═══ TETO: 30 NÓS. Pendência nova entra quando uma fechada sai. ═══
+# Arestas para nó de OUTRO grafo do core (contrato v4.3).
+external_edges:
+  - from: Q_MA_A2A_ENTRE_CONTAS
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027"
+    edge_type: DEPENDS_ON
+  - from: C_MA_MCP_READ_LIVE
+    to: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml#D_ONION_BRAIN_MCP_REMOTO"
+    edge_type: TRACES_TO
+  - from: C_MA_COORDENACAO_POR_GRAFO_ENTRE_REPOS_1028
+    to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_MA_SINAL_DO_HUB_1027
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-27"
+    verified_against: "a proposta do adotante brain de 2026-10-27 (feature-request, severidade alta), lida inteira pelo core em 2026-10-28; as medidas são do hub, não re-medidas aqui, salvo a do MCP de leitura (E_MA_MCP_LEITURA_MEDIDO_1028)"
+    label: "O sinal do hub: o negócio precisa ler o que a tecnologia sabe (desenvolvimento, nuvem, plataforma, dados) e a tecnologia precisa ler o negócio, sem escrita cruzada e com detecção do que sair errado."
+    narrative: "Medido pelo hub em 2026-10-27: a barreira do servidor (ruleset, check obrigatório, CODEOWNERS aplicado) não está disponível no plano atual do forge, e toda guarda dentro do repo é detecção, não bloqueio; o conhecimento convive com o código no mesmo repo; hoje só pessoas técnicas escrevem em docs/, e o negócio escreve na wiki (permissão por coleção, histórico por revisão), no task manager e no Drive; commits tocam docs/ e código juntos, de propósito, pela regra de doc no mesmo PR. O hub propõe quatro hipóteses de arquitetura, nenhuma decidida: A (um repo, pastas por vertical), B (repo de conhecimento separado do código), C (superfícies por audiência com o grafo como núcleo) e D (C mais detecção no repo). O hub não implementa nada antes do desenho."
+    provenance:
+      source: "proposta do adotante brain, 2026-10-27, pelo inbox do core"
+      locator: "o sinal 2026-10-27-proposal-company-brain-multiaudiencia, mantido fora do repo público por carregar dado operacional do hub"
+      method: "testimony: medidas do hub, só leitura, nos quatro repos da família"
+      locality: "repo"
+  - id: C_MA_MATRIZ_DO_MAESTRO_1028
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: maestro
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-28"
+    verified_against: "testemunho do maestro em 2026-10-28, repassado pela sessão principal do core na encomenda deste grafo"
+    label: "A matriz de partida do maestro: a tecnologia escreve o código e o technical-context; o negócio escreve o business-context, o compliance-context e o design-context; todos leem tudo; ninguém escreve no que é do outro."
+    narrative: "Em palavras do maestro (resumo fiel, 2026-10-28): o time tech (desenvolvedores) é responsável pelo technical-context e pelo código, mas lê todos os outros contextos; o time de negócios (marketing, operações, atendimento) é responsável pelo business-context, pelo compliance-context e pelo design-context, e lê o resto. Os dois leem tudo; a tecnologia não escreve direto no business-context, e o negócio não mexe em código nem no technical-context. É hipótese de partida de Q_MA_AUDIENCES, não o desenho: o «lê tudo» fica sujeito à ressalva de sensibilidade de Q_MA_CLASSIFICATION (conteúdo de segurança e dados de pessoas não abrem a toda audiência sem classificação)."
+    provenance:
+      source: "maestro, 2026-10-28"
+      locator: "encomenda deste grafo pela sessão principal do core"
+      method: "testimony: palavras do maestro, resumo fiel"
+      locality: "pessoa"
+  - id: C_MA_REPOS_POR_RESPONSABILIDADE_VENDORIZADOS_1028
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: maestro
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-28"
+    verified_against: "testemunho do maestro em 2026-10-28, repassado pela sessão principal do core"
+    label: "Opção E do maestro: repos separados por responsabilidade, ligados por vendorização com pin, no molde do kg-ssot vendorizado no core; a escrita só no repo dono, a barreira pela permissão por repo."
+    narrative: "O core usa o kg-ssot, mas o responsável é o repo do kg-ssot: a cópia vendorizada não se edita, só se atualiza pelo pin, e a escrita acontece só no repo dono. Aplicado ao caso: um repo por vertical de responsabilidade (por exemplo, o conhecimento de negócio num repo dono e o código com o technical-context em outro), cada um vendorizando ou lendo o do outro com pin. A barreira vem da permissão por repo, que funciona no plano gratuito, sem CODEOWNERS. O custo a avaliar é a regra «doc no mesmo PR do código», que passa a cruzar repos. Confirmado é o testemunho do maestro, não a opção: ela é candidata em Q_MA_WRITE_SURFACE."
+    provenance:
+      source: "maestro, 2026-10-28"
+      locator: "reforço repassado pela sessão principal do core durante a construção deste grafo"
+      method: "testimony: palavras do maestro, resumo fiel"
+      locality: "pessoa"
+  - id: C_MA_PADRAO_DE_MERCADO_PRIMEIRO_1028
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: maestro
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-28"
+    verified_against: "testemunho do maestro em 2026-10-28 («SEMPRE buscar usar padrões de mercado»), repassado pela sessão principal do core"
+    label: "Restrição do maestro sobre todo o desenho: cada opção nomeia o padrão de mercado em que se apoia, e a solução própria só entra declarada, onde nenhum padrão serve."
+    narrative: "Vale para as perguntas de desenho (Q_MA_WRITE_SURFACE, Q_MA_CLASSIFICATION, Q_MA_ENFORCEMENT) e para D_MA_ARCH, por CONSTRAINS: a opção sem padrão nomeado não chega à decisão, e a cunhagem própria vem com o porquê de nenhum padrão servir. É o mesmo eixo de Q_MA_MARKET, que levanta os padrões candidatos."
+    provenance:
+      source: "maestro, 2026-10-28"
+      locator: "reforço repassado pela sessão principal do core durante a construção deste grafo"
+      method: "testimony: palavras do maestro"
+      locality: "pessoa"
+  - id: C_MA_COORDENACAO_POR_GRAFO_ENTRE_REPOS_1028
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: maestro
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-28"
+    verified_against: "testemunho do maestro em 2026-10-28, repassado pela sessão principal do core"
+    label: "Na opção E, os repos donos se coordenam pela técnica do grafo de coordenação de sessões: uma pendência por nó, owner = o repo ou time dono, DEPENDS_ON entre eles, o hub ou o core orquestrando."
+    narrative: "É o que cobre o custo da regra «doc no mesmo PR do código» quando ela passa a cruzar repos: a mudança no código abre a pendência para o dono do contexto, e nada se perde. A técnica é a que o core já roda em coordenacao-sessoes-2026-10. É um caso de uso do candidato Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA, a contar na medida de promoção dele. Confirmado é o testemunho do maestro, não que a técnica cubra o custo: isso se mede no piloto."
+    provenance:
+      source: "maestro, 2026-10-28"
+      locator: "reforço repassado pela sessão principal do core durante a construção deste grafo"
+      method: "testimony: palavras do maestro, resumo fiel"
+      locality: "pessoa"
+  - id: Q_MA_AUDIENCES
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 5
+    confidence: 0.5
+    label: "Quais são as audiências e papéis do Company Brain (direção, operações, marketing, atendimento, comercial, desenvolvimento) e a MATRIZ de quem lê e quem escreve cada contexto?"
+    narrative: "Dono: o core, com o hub. Parte da matriz do maestro (C_MA_MATRIZ_DO_MAESTRO_1028): tecnologia escreve código e technical-context; negócio escreve business, compliance e design-context; todos leem tudo, com a ressalva de sensibilidade. Falta o hub levantar a lista de colaboradores e papéis (quem é de qual audiência) e o core fechar a matriz por contexto e por superfície. Fecha quando a matriz estiver no grafo com o testemunho do hub sobre os papéis e o aceite do maestro. É a primeira da ordem: as outras perguntas de desenho esperam esta."
+  - id: Q_MA_WRITE_SURFACE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 5
+    confidence: 0.5
+    label: "Onde cada audiência escreve: no repo por PR, na wiki, pelo MCP de escrita por identidade, no task manager ou num repo próprio por responsabilidade (hipóteses A a D do hub e E do maestro)?"
+    narrative: "A: um repo com pastas por vertical (barato, mas o não técnico vai ao git e a barreira só existe com plano pago). B: repo de conhecimento separado do código (barreira por permissão de repo, que funciona no plano gratuito; pede aresta entre repos). C: superfícies por audiência com o grafo como núcleo (o negócio na wiki e no MCP de escrita por identidade, a tecnologia no repo; a escrita já nasce separada; pede ponte wiki↔grafo e classificação). D: C mais detecção no repo, a que o hub recomenda estudar primeiro. E (do maestro, C_MA_REPOS_POR_RESPONSABILIDADE_VENDORIZADOS_1028): repos separados por responsabilidade, ligados por vendorização com pin, no molde do kg-ssot vendorizado no core; a barreira é a permissão por repo, sem CODEOWNERS; o custo a medir é a regra «doc no mesmo PR do código», que passa a cruzar repos. Em todas as opções, o MCP é superfície explícita de escrita e de leitura (visão do maestro, 2026-10-28): o escritor por identidade que já existe escreve numa área própria, só aceita grafo válido, assina com o e-mail do autor e trava a escrita sobre cópia velha pelo sha; o MCP de leitura serve a todos. Fecha com a recomendação do core, medida contra a matriz de Q_MA_AUDIENCES e o estudo de mercado, levada a D_MA_ARCH."
+  - id: Q_MA_CLASSIFICATION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    impact: 5
+    confidence: 0.5
+    label: "Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência?"
+    narrative: "É o bloqueador escondido apontado pelo hub: grafos e páginas carregam conteúdo sensível (de segurança e dados de pessoas), e locality: privado não é sensibilidade. Abrir leitura ao negócio pede o campo e a projeção redigida. Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028 (não é selo). A decisão vai ao maestro porque mexe no contrato; antes do selo, uma rodada de padrão de mercado."
+  - id: Q_MA_MARKET
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: curadoria
+    impact: 4
+    confidence: 0.5
+    label: "Como o mercado resolve conhecimento multiaudiência: portais de conhecimento com IA, wikis com permissão por espaço e catálogos de engenharia?"
+    narrative: "Estudo de campo da curadoria, no método dela (/onion-research ou /meta:dissect, em .kg.yaml com radar exit 0), com o mercado e o capital como eixo invariante. Pergunta-guia: quem separa a escrita por audiência e mantém a leitura cruzada, como faz a barreira (permissão por espaço, papel, aprovação) e como trata sensibilidade. Alimenta Q_MA_WRITE_SURFACE, Q_MA_ENFORCEMENT e a rodada de padrão de mercado da classificação. Pauta inicial do maestro (2026-10-28) para a curadoria verificar; são CANDIDATOS, não fatos verificados: domain ownership e governança federada do Data Mesh; Team Topologies e a lei de Conway; InnerSource; docs-as-code com dono por repo (por exemplo, o TechDocs do Backstage); git subtree e submodule contra vendorização com pin; policy-as-code para a permissão de escrita."
+  - id: Q_MA_ENFORCEMENT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 5
+    confidence: 0.5
+    label: "Barreira paga (plano do forge com CODEOWNERS, rulesets e checks obrigatórios) ou barreira por superfície mais detecção no plano gratuito?"
+    narrative: "Decisão de custo do maestro. Fato medido pelo hub: a barreira do servidor não está disponível no plano atual, então hoje a pasta por vertical é só convenção. Com o plano pago, CODEOWNERS e check obrigatório viram bloqueio do servidor; sem ele, a barreira vem de onde cada audiência escreve (Q_MA_WRITE_SURFACE) e o repo fica com detecção (C_MA_CROSS_WRITE_DETECTOR). Espera a superfície, a classificação e o mercado."
+  - id: Q_MA_CROSS_REPO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: kg-ssot
+    impact: 3
+    confidence: 0.5
+    label: "Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes?"
+    narrative: "Só abre de fato se Q_MA_WRITE_SURFACE escolher uma superfície com mais de um repo (B, C ou a E do maestro, que liga os repos por vendorização com pin). Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_CROSS_REPO_1028: as peças existem desde a 4.35.0; falta ferramenta, não contrato."
+  - id: Q_MA_WIKI_BRIDGE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    label: "Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós?"
+    narrative: "Dono: o core, com o kg-ssot. A wiki já é a superfície de escrita do negócio no hub. Posição prévia do kg-ssot em E_MA_KGSSOT_POSICAO_WIKI_BRIDGE_1028: a projeção primeiro, o importador só se o piloto pedir. O hub testa do lado dele as permissões por coleção da wiki."
+  - id: C_MA_MCP_READ_LIVE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    status: open
+    owner: core
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-28"
+    verified_against: "E_MA_MCP_LEITURA_MEDIDO_1028"
+    label: "O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir à audiência do hub."
+    narrative: "O hub disse não ter achado sinal de que o passo 1 estivesse no ar; a medida de 2026-10-28 diz que está: o serviço de leitura do hub roda, o health responde UP com 7 ferramentas e os três presets da casa no chat já o declaram, atrás do SSO. O que falta para o hub usar: (1) a lista de e-mails permitidos do serviço abrir às pessoas do hub, ato do maestro (o último testemunho, de 2026-10-13, diz que só os endereços do maestro estão nela; não re-medido aqui porque a configuração é legível só pela raiz); (2) Q_MA_CLASSIFICATION antes de abrir ao negócio, porque o MCP serve o clone inteiro; (3) conferir o served_commit da resposta contra a main do hub. Só leitura: nada de escrita entra por este nó."
+    provenance:
+      source: "medida do core na VPS, 2026-10-28 (E_MA_MCP_LEITURA_MEDIDO_1028)"
+      locator: "systemctl, curl no /health e a configuração do chat da casa"
+      method: "measurement: comandos rodados pela sessão do core, saída citada no nó de evidência"
+      locality: "host"
+  - id: C_MA_CROSS_WRITE_DETECTOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    label: "Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avisa, sem bloquear."
+    narrative: "Serve a qualquer hipótese, por isso anda em paralelo. Lê a matriz (C_MA_MATRIZ_DO_MAESTRO_1028) e o mapa autor→audiência, olha os caminhos de cada commit ou PR e emite aviso quando um autor escreve fora do que é dele. No plano gratuito é a barreira possível dentro do repo (detecção, não bloqueio). Não se implementa antes de D_MA_ARCH; o desenho pode começar."
+  - id: C_MA_CODEOWNERS_TEMPLATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    label: "Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago."
+    narrative: "Derivado da matriz: cada contexto de docs/ e o código com o time dono. Sem o plano pago, sinaliza o dono na revisão; com ele, vira barreira do servidor. Espera a matriz de Q_MA_AUDIENCES."
+  - id: C_MA_EVIDENCE_FEED
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    owner: brain
+    impact: 4
+    confidence: 0.5
+    label: "Trabalho: uma coleta recorrente só leitura (nuvem, plataforma, alertas de dependência) que alimenta nós evidence lidos pelo negócio."
+    narrative: "Dono: o hub, com o core. A pergunta do negócio sobre nuvem e plataforma não vira acesso à nuvem: é respondida por evidência medida (nós evidence com plane PROD, verified_at e proveniência), atualizada por coleta automática só leitura do lado técnico. O caso real é o da auditoria: a direção pergunta, a tecnologia mede, o grafo guarda a evidência; hoje tudo passa por uma pessoa técnica. Espera a classificação, porque a evidência de segurança é sensível."
+  - id: Q_MA_A2A_ENTRE_CONTAS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.5
+    label: "Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core com a mesma troca que havia na mesma conta, pelo canal A2A?"
+    narrative: "Pedido do maestro em 2026-10-28: a sessão do hub roda com outra conta do Claude, e ele quer entre contas a troca e a coordenação que havia quando era a mesma conta. Fato por testemunho (E_MA_SENDMESSAGE_NAO_ALCANCA_ENTRE_CONTAS_1028): o SendMessage não alcança entre contas; o canal que funciona hoje é o doc-bridge (inbox do core e inbound do adotante). O caminho é o canal A2A do core (A2A aberto 1.0 como padrão, o Onion A2A como perfil, topologia selada no PR 1396), e depende da medida da ida e volta pré-registrada (Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027, no sinais-de-campo). Fecha quando uma ida e volta entre contas diferentes passar no critério pré-registrado, ou quando a medida mostrar o que impede."
+  - id: D_MA_ARCH
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 5
+    confidence: 0.5
+    label: "A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, mercado e barreira."
+    narrative: "Nasce open: o maestro sela, com as opções e a recomendação do core. Antes dela, nada se implementa no hub."
+  - id: E_MA_MCP_LEITURA_MEDIDO_1028
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-28"
+    verified_against: "systemctl is-active na unidade do MCP de leitura do hub: active (running); curl -fsS no /health dele na rede interna dos MCPs: {\"status\": \"UP\", \"tools\": 7}, rc 0; grep na configuração do chat da casa: o MCP de leitura nos mcpServers dos três presets. Medido às 00:12 UTC de 2026-10-28."
+    label: "O MCP de leitura do hub roda e responde UP com 7 ferramentas, e o chat da casa já o oferece nos três presets."
+    narrative: "Medido pelo core na VPS. A unidade do escritor de grafos por MCP também está ativa. Não medido: a lista de e-mails permitidos (a configuração é legível só pela raiz); o último testemunho, de 2026-10-13, diz que só os endereços do maestro estão nela."
+    provenance:
+      source: "medida do core na VPS, 2026-10-28"
+      locator: "systemctl, curl no /health e a configuração do chat da casa"
+      method: "measurement: comandos rodados pela sessão do core, saída citada"
+      locality: "host"
+  - id: E_MA_SENDMESSAGE_NAO_ALCANCA_ENTRE_CONTAS_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-28"
+    verified_against: "testemunho da sessão principal do core em 2026-10-28: a mensagem pelo SendMessage à sessão do hub, que roda com outra conta do Claude na mesma VPS e no mesmo usuário Linux, voltou como not reachable"
+    label: "O SendMessage não alcança uma sessão de outra conta do Claude, nem na mesma máquina e no mesmo usuário Linux; o doc-bridge é o canal que funciona hoje."
+    narrative: "O inbox do core e o inbound do adotante, com os carteiros locais (/meta:co-relay e /meta:co-deliver), entregam sem commit cruzado. É lento e não conversa: cada troca é um arquivo e uma leitura na sessão do outro lado."
+    provenance:
+      source: "sessão principal do core, 2026-10-28"
+      locator: "encomenda deste grafo"
+      method: "testimony: resultado da ferramenta relatado pela sessão que a chamou"
+      locality: "pessoa"
+  - id: E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-28"
+    verified_against: "posição prévia da sessão do kg-ssot, repassada pela sessão principal do core em 2026-10-28; é posição, não selo"
+    label: "Posição prévia do kg-ssot sobre a classificação: um campo no meta (o padrão do grafo) e no nó (a exceção), como SHOULD, com vocabulário de mercado; a redação por audiência fica fora do contrato."
+    narrative: "O candidato é o TLP 2.0 da FIRST (CLEAR, GREEN, AMBER, AMBER+STRICT, RED); a alternativa são os níveis de classificação da ISO 27001. A redação por audiência fica como projeção de ferramenta (--audience e --max-classification no kg_query e no export), fora do contrato. Antes do selo, uma rodada de padrão de mercado; a decisão vai ao maestro porque mexe no contrato."
+    provenance:
+      source: "sessão do kg-ssot, 2026-10-28"
+      locator: "mensagem repassada pela sessão principal do core"
+      method: "testimony: posição prévia da sessão dona do contrato"
+      locality: "pessoa"
+  - id: E_MA_KGSSOT_POSICAO_CROSS_REPO_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-28"
+    verified_against: "posição prévia da sessão do kg-ssot, repassada pela sessão principal do core em 2026-10-28; é posição, não selo"
+    label: "Posição prévia do kg-ssot sobre o corpus entre repos: as peças existem desde a 4.35.0; falta só um --with que leia o corpus inteiro do outro repo, o que é ferramenta e não toca o contrato."
+    narrative: "As peças: URL fixada no sha, --with lendo o grafo alheio no commit citado e projection_of por URL."
+    provenance:
+      source: "sessão do kg-ssot, 2026-10-28"
+      locator: "mensagem repassada pela sessão principal do core"
+      method: "testimony: posição prévia da sessão dona do contrato"
+      locality: "pessoa"
+  - id: E_MA_KGSSOT_POSICAO_WIKI_BRIDGE_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-28"
+    verified_against: "posição prévia da sessão do kg-ssot, repassada pela sessão principal do core em 2026-10-28; é posição, não selo"
+    label: "Posição prévia do kg-ssot sobre a ponte wiki↔grafo: a página como projeção (projection_of com o checador da 4.35.0) já funciona e é a ponte barata; a projeção primeiro."
+    narrative: "Um importador wiki→grafo só entra se o piloto pedir, com pré-registro e medida de valor."
+    provenance:
+      source: "sessão do kg-ssot, 2026-10-28"
+      locator: "mensagem repassada pela sessão principal do core"
+      method: "testimony: posição prévia da sessão dona do contrato"
+      locality: "pessoa"
+edges:
+  - from: E_MA_SINAL_DO_HUB_1027
+    to: Q_MA_AUDIENCES
+    edge_type: SUPPORTS
+  - from: C_MA_MATRIZ_DO_MAESTRO_1028
+    to: Q_MA_AUDIENCES
+    edge_type: SUPPORTS
+  - from: Q_MA_WRITE_SURFACE
+    to: Q_MA_AUDIENCES
+    edge_type: DEPENDS_ON
+  - from: C_MA_PADRAO_DE_MERCADO_PRIMEIRO_1028
+    to: Q_MA_WRITE_SURFACE
+    edge_type: CONSTRAINS
+  - from: C_MA_PADRAO_DE_MERCADO_PRIMEIRO_1028
+    to: Q_MA_CLASSIFICATION
+    edge_type: CONSTRAINS
+  - from: C_MA_PADRAO_DE_MERCADO_PRIMEIRO_1028
+    to: Q_MA_ENFORCEMENT
+    edge_type: CONSTRAINS
+  - from: C_MA_PADRAO_DE_MERCADO_PRIMEIRO_1028
+    to: D_MA_ARCH
+    edge_type: CONSTRAINS
+  - from: C_MA_REPOS_POR_RESPONSABILIDADE_VENDORIZADOS_1028
+    to: Q_MA_WRITE_SURFACE
+    edge_type: SUPPORTS
+  - from: C_MA_REPOS_POR_RESPONSABILIDADE_VENDORIZADOS_1028
+    to: Q_MA_CROSS_REPO
+    edge_type: SUPPORTS
+  - from: C_MA_COORDENACAO_POR_GRAFO_ENTRE_REPOS_1028
+    to: C_MA_REPOS_POR_RESPONSABILIDADE_VENDORIZADOS_1028
+    edge_type: SUPPORTS
+  - from: C_MA_COORDENACAO_POR_GRAFO_ENTRE_REPOS_1028
+    to: Q_MA_WRITE_SURFACE
+    edge_type: SUPPORTS
+  - from: Q_MA_CLASSIFICATION
+    to: Q_MA_AUDIENCES
+    edge_type: DEPENDS_ON
+  - from: Q_MA_MARKET
+    to: Q_MA_AUDIENCES
+    edge_type: DEPENDS_ON
+  - from: Q_MA_ENFORCEMENT
+    to: Q_MA_WRITE_SURFACE
+    edge_type: DEPENDS_ON
+  - from: Q_MA_ENFORCEMENT
+    to: Q_MA_CLASSIFICATION
+    edge_type: DEPENDS_ON
+  - from: Q_MA_ENFORCEMENT
+    to: Q_MA_MARKET
+    edge_type: DEPENDS_ON
+  - from: Q_MA_CROSS_REPO
+    to: Q_MA_WRITE_SURFACE
+    edge_type: DEPENDS_ON
+  - from: Q_MA_WIKI_BRIDGE
+    to: Q_MA_WRITE_SURFACE
+    edge_type: DEPENDS_ON
+  - from: D_MA_ARCH
+    to: Q_MA_ENFORCEMENT
+    edge_type: DEPENDS_ON
+  - from: D_MA_ARCH
+    to: Q_MA_WRITE_SURFACE
+    edge_type: DEPENDS_ON
+  - from: D_MA_ARCH
+    to: Q_MA_CLASSIFICATION
+    edge_type: DEPENDS_ON
+  - from: D_MA_ARCH
+    to: Q_MA_MARKET
+    edge_type: DEPENDS_ON
+  - from: D_MA_ARCH
+    to: Q_MA_CROSS_REPO
+    edge_type: TRACES_TO
+  - from: D_MA_ARCH
+    to: Q_MA_WIKI_BRIDGE
+    edge_type: TRACES_TO
+  - from: C_MA_CODEOWNERS_TEMPLATE
+    to: Q_MA_AUDIENCES
+    edge_type: DEPENDS_ON
+  - from: C_MA_CROSS_WRITE_DETECTOR
+    to: C_MA_MATRIZ_DO_MAESTRO_1028
+    edge_type: TRACES_TO
+  - from: C_MA_EVIDENCE_FEED
+    to: Q_MA_CLASSIFICATION
+    edge_type: DEPENDS_ON
+  - from: E_MA_MCP_LEITURA_MEDIDO_1028
+    to: C_MA_MCP_READ_LIVE
+    edge_type: SUPPORTS
+  - from: C_MA_MCP_READ_LIVE
+    to: Q_MA_CLASSIFICATION
+    edge_type: DEPENDS_ON
+  - from: E_MA_SENDMESSAGE_NAO_ALCANCA_ENTRE_CONTAS_1028
+    to: Q_MA_A2A_ENTRE_CONTAS
+    edge_type: SUPPORTS
+  - from: E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028
+    to: Q_MA_CLASSIFICATION
+    edge_type: SUPPORTS
+  - from: E_MA_KGSSOT_POSICAO_CROSS_REPO_1028
+    to: Q_MA_CROSS_REPO
+    edge_type: SUPPORTS
+  - from: E_MA_KGSSOT_POSICAO_WIKI_BRIDGE_1028
+    to: Q_MA_WIKI_BRIDGE
+    edge_type: SUPPORTS
