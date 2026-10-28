@@ -8,18 +8,22 @@ meta:
   baseline: "2026-10-28"
   review_after: "2026-11-27"   # 30d: cadência de ferramenta
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-28); 14 da rodada.
+  #   2 no esqueleto (2026-10-28); 14 da rodada; 21 após o juiz (1 omissão virou nó, 6 superações).
 # ═══ AUFHEBUNG ═══
 #   DECIDIDO (2026-10-28): (a), duas arestas. O nó das versões de quem serve da r19 caiu (host 2.1.312, revisor
 #   2.1.311 pelo pin v1.0.263 que subiu em 3892b25d7, bridge segue 2.1.310), e a pergunta da subida da r19 ficou
 #   com alvo velho (0.3.311 e v1.0.263; o pin já subiu, e hoje existem 0.3.312 e v1.0.264). A extensão do VS Code
-#   da r19 segue de pé (2.1.306), e a pergunta dela recebe apoio, não superação.
+#   da r19 também caiu, pela distância relativa (cinco versões atrás; hoje seis), como o juiz apontou; a pergunta
+#   dela (SAC-260) segue de pé e recebe apoio.
 external_edges:
   - from: E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028
     to: "docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml#E_HOST_NA_2_1_311_BRIDGE_E_REVISOR_NA_2_1_310_1026"
     edge_type: SUPERSEDES
   - from: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028
     to: "docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_311_E_PIN_DO_REVISOR_PARA_V1_0_263_1026"
+    edge_type: SUPERSEDES
+  - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028
+    to: "docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml#E_EXTENSAO_VSCODE_DO_HOST_NA_2_1_306_1026"
     edge_type: SUPERSEDES
   - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028
     to: "docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml#Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026"
@@ -44,12 +48,13 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.5
     verified_at: "2026-10-28"
-    verified_against: "aberta pelo esqueleto em 2026-10-28; fecha quando a rodada ligar cada item a superfície medida no vivo e o juiz refutar"
+    verified_against: "fechada em 2026-10-28 pela rodada 20 do radar do Claude Code: 39 itens; os candidatos medidos no vivo (versões de quem serve, skills com paths:, proteção do Write, nome de comando inválido, hooks de prompt e de agente, autoCompactWindow, troca por recusa, core.hooksPath, extensão do VS Code, Remote Control, itens sem superfície); juiz independente (subagente opus não-fork): 15 SUSTENTA, 6 EXAGERA, 0 REPROVA, 6 superações (data/judge-verdicts.json, judge-verdict-check rc 0); o que toca: a subida do SDK do bridge e do pin do revisor (SAC-261) e a extensão do VS Code (SAC-260, da r19); os itens sem medição estão nos NÃO-VERIFICADOS da SYNTHESIS"
     label: "quais itens de 2.1.312 a 2.1.312 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+    trace: "docs/evolution/research/radar-E3-2026-10-28-r20/SYNTHESIS.md e data/judge-verdicts.json"
   - id: E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028
     node_type: evidence
     layer: audit
@@ -74,8 +79,13 @@ nodes:
     impact: 2
     confidence: 0.6
     verified_at: "2026-10-28"
-    verified_against: "proposta da rodada 20 do radar do Claude Code: subir o Agent SDK do bridge de 0.3.310 para 0.3.312 pelo ops/update-bridge.sh (deploy do maestro, repo alheio) e o pin do revisor para a tag v1.0.264 (d70510b1); a metade do pin da SAC-259 já foi feita (v1.0.263, commit 3892b25d7) e a do SDK não; a razão medida segue sendo a ordem do transcript nas sessões retomadas (linha 11 da 2.1.311), mais a linha 9 da 2.1.312 (comando com nome inválido deixando claude -p sem saída), cujo alcance no bridge não foi medido; nada sobe nesta rodada"
+    verified_against: "proposta da rodada 20 do radar do Claude Code: subir o Agent SDK do bridge de 0.3.310 para 0.3.312 pelo ops/update-bridge.sh (deploy do maestro, repo alheio) e o pin do revisor para a tag v1.0.264 (d70510b1); a metade do pin da SAC-259 já foi feita (v1.0.263, commit 3892b25d7) e a do SDK não; a razão medida segue sendo a ordem do transcript nas sessões retomadas (linha 11 da 2.1.311); a linha 9 da 2.1.312 (comando com nome inválido deixando claude -p sem saída) dá ao pin uma razão além da paridade, porque o revisor roda o CLI 2.1.311 headless no checkout do PR com os 166 comandos (omissão apontada pelo juiz), e o alcance no bridge e na action não foi medido; nada sobe nesta rodada; issue SAC-261, que substitui o alvo da SAC-259 (comentada)"
     label: "o SDK do bridge deve subir para 0.3.312 e o pin do revisor do CI para v1.0.264; o alvo da SAC-259 envelheceu, e só a metade do pin dela foi feita"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-261"
+      locator: "issue SAC-261 do projeto Onion — core: próximas levas"
+      method: "derived: proposta da rodada a partir de E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028 e E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028"
+      locality: "web"
   - id: E_SKILLS_COM_PATHS_E_O_CD_PARA_DENTRO_1028
     node_type: evidence
     layer: audit
@@ -84,12 +94,12 @@ nodes:
     impact: 2
     confidence: 0.65
     verified_at: "2026-10-28"
-    verified_against: "linha 7 da 2.1.312 (skills por diretório e com paths: não eram achadas depois de um cd do Bash mais fundo num repo git): grep -lE '^paths:' nas SKILL.md do core = 2, onion-patterns (paths: .claude/** e docs/onion/**, linha 7 do frontmatter) e onion-validation (paths: .claude/**, linha 7); find de SKILL.md fora de .claude/skills (sem node_modules, .git e worktrees) = só vendor/kg-ssot/skills/kg-ssot/SKILL.md, sem skill por diretório do core; as worktrees de agente da casa moram em .claude/worktrees, dentro da árvore que os paths casam; o efeito antes e depois da correção não foi reproduzido"
-    label: "o core tem duas skills com paths: casando .claude/**, que é onde a casa mais trabalha e onde moram as worktrees de agente; a correção da descoberta após cd as alcança, mas o efeito não foi reproduzido"
+    verified_against: "linha 7 da 2.1.312 (skills por diretório e com paths: não eram achadas depois de um cd do Bash mais fundo num repo git): grep -lE '^paths:' nas SKILL.md do core = 2, onion-patterns (paths: .claude/** e docs/onion/**, linha 7 do frontmatter) e onion-validation (paths: .claude/**, linha 7); find de SKILL.md fora de .claude/skills (sem node_modules, .git e worktrees) = só vendor/kg-ssot/skills/kg-ssot/SKILL.md, sem skill por diretório do core; as worktrees de agente da casa moram em .claude/worktrees, dentro da árvore que os paths casam, e, vistas do checkout principal, cada uma (15 hoje, ls) traz um .claude/skills próprio com os mesmos 14 nomes, ignorado só por .git/info/exclude linha 12 (omissão do find apontada pelo juiz): é a skill por diretório da linha 7, e um cd da sessão principal para dentro de uma worktree passa a achá-las, duplicadas; não está medido se o harness varre diretório ignorado por info/exclude, nem o efeito da duplicata; o efeito antes e depois da correção não foi reproduzido"
+    label: "o core tem duas skills com paths: casando .claude/**, e cada uma das 15 worktrees de agente traz o próprio .claude/skills, que vira skill por diretório depois de um cd para dentro dela; a correção as alcança, e o efeito, inclusive o da duplicata, não foi medido"
     provenance:
       source: ".claude/skills/onion-patterns/SKILL.md e .claude/skills/onion-validation/SKILL.md"
       locator: "linha 7 do frontmatter de cada uma"
-      method: "measurement: grep do frontmatter e find de SKILL.md fora de .claude/skills"
+      method: "measurement: grep do frontmatter, find de SKILL.md e ls das worktrees; reescrito após o EXAGERA do juiz"
       locality: "repo"
   - id: E_WRITE_NAO_SOBRESCREVE_ARQUIVO_GRANDE_LIDO_PELA_METADE_1028
     node_type: evidence
@@ -99,12 +109,12 @@ nodes:
     impact: 1
     confidence: 0.6
     verified_at: "2026-10-28"
-    verified_against: "linha 6 da 2.1.312 (Claude sobrescrevia um CLAUDE.md, arquivo de rules ou arquivo @-incluído muito grande num subdiretório depois de ver só o início): git ls-files de CLAUDE.md = só o da raiz (26.246 bytes, 344 linhas; não é de subdiretório); nenhuma inclusão @ no CLAUDE.md (grep de linha iniciada por @ e de @caminho.md = zero); as rules ficam no subdiretório .claude/rules, a maior é kg-grammar.md com 12.507 bytes em 77 linhas, depois dissect-lens.md com 3.232 (wc -c); o limiar de 'muito grande' não está no CHANGELOG"
-    label: "a superfície da casa para a proteção do Write é o subdiretório .claude/rules, cuja maior regra tem 12.507 bytes; o core não tem CLAUDE.md de subdiretório nem inclusão @, e o limiar não é público"
+    verified_against: "linha 6 da 2.1.312 (Claude sobrescrevia um CLAUDE.md, arquivo de rules ou arquivo @-incluído muito grande num subdiretório depois de ver só o início): git ls-files de CLAUDE.md = só o da raiz (26.246 bytes, 344 linhas; não é de subdiretório); nenhuma inclusão @ no CLAUDE.md (grep de linha iniciada por @ e de @caminho.md = zero); as rules ficam no subdiretório .claude/rules, a maior é kg-grammar.md com 12.507 bytes em 77 linhas, depois dissect-lens.md com 3.232 (wc -c); vistas do checkout principal, as 15 worktrees de agente em .claude/worktrees trazem cada uma um CLAUDE.md de 26.246 bytes e um .claude/rules próprio num subdiretório (ls e wc -c; omissão apontada pelo juiz), que é o caso da linha 6 quando a sessão principal edita dentro de uma worktree; o limiar de 'muito grande' não está no CHANGELOG"
+    label: "a proteção do Write alcança o .claude/rules (maior regra com 12.507 bytes) e os CLAUDE.md de 26.246 bytes das 15 worktrees de agente, que são de subdiretório vistos do checkout principal; o core não tem inclusão @, e o limiar não é público"
     provenance:
       source: "CLAUDE.md e .claude/rules"
       locator: "wc -c dos arquivos rastreados"
-      method: "measurement: git ls-files, wc -c e grep"
+      method: "measurement: git ls-files, ls e wc -c das worktrees e grep; reescrito com a omissão do juiz"
       locality: "repo"
   - id: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028
     node_type: evidence
@@ -114,10 +124,10 @@ nodes:
     impact: 2
     confidence: 0.65
     verified_at: "2026-10-28"
-    verified_against: "linha 9 da 2.1.312 (um comando com nome inválido impedia todos os comandos de carregar e podia deixar claude -p sem saída): find de .md em .claude/commands = 166; fora de [a-z0-9-]: os README.md das categorias e quatro templates com sublinhado (compliance_iso27001_template, compliance_soc2_template, compliance_pmbok_template, compliance_iso22301_template); nesta sessão, processo 2.1.312, a lista de skills entregue ao agente traz common:templates:compliance_iso27001_template e os README, logo carregam; a REGRA 6 (Filenames em .claude/ devem ser kebab-case) é SOFT (lint-artifacts.sh linha 684); o CHANGELOG não diz o que é nome inválido; o CLI do bridge (2.1.310) não tem a correção"
-    label: "o core tem nomes de comando fora do kebab-case (sublinhado e README) que carregam na 2.1.312; o CHANGELOG não define nome inválido, e a correção não chega ao bridge na 2.1.310"
+    verified_against: "linha 9 da 2.1.312 (um comando com nome inválido impedia todos os comandos de carregar e podia deixar claude -p sem saída): find de .md em .claude/commands = 166; fora de [a-z0-9-]: os README.md das categorias e quatro templates com sublinhado (compliance_iso27001_template, compliance_soc2_template, compliance_pmbok_template, compliance_iso22301_template); nesta sessão, processo 2.1.312, a lista de skills entregue ao agente traz common:templates:compliance_iso27001_template e os README, logo carregam; a REGRA 6 (Filenames em .claude/ devem ser kebab-case) é SOFT (lint-artifacts.sh linha 684); o CHANGELOG não diz o que é nome inválido; quem roda headless sem a correção: o revisor do CI, que executa a claude-code-action no checkout do PR com estes 166 arquivos e o pin v1.0.263 (CLI 2.1.311; omissão apontada pelo juiz), desligado por padrão, e o CLI do bridge (2.1.310); não está medido se a action ou o bridge carregam os comandos do projeto"
+    label: "o core tem nomes de comando fora do kebab-case (sublinhado e README) que carregam na 2.1.312; o CHANGELOG não define nome inválido, e a correção não chega ao revisor do CI (2.1.311) nem ao bridge (2.1.310)"
     provenance:
-      source: ".claude/commands e .claude/validation/lint-artifacts.sh"
+      source: ".claude/commands, .claude/validation/lint-artifacts.sh e .github/workflows/onion-review.yml"
       locator: "nomes de arquivo; REGRA 6 na linha 684"
       method: "measurement: find, grep e a lista de skills da sessão 2.1.312"
       locality: "repo"
@@ -174,7 +184,7 @@ nodes:
     impact: 2
     confidence: 0.85
     verified_at: "2026-10-28"
-    verified_against: "nenhum dos 39 itens da 2.1.312 cita core.hooksPath, worktree ou hook de git (leitura integral da cópia); gh issue view 85039 e 88747 -R anthropics/claude-code: as duas OPEN, closedAt nulo; a worktree desta rodada foi criada pelo processo 2.1.312 e o .git/config do checkout principal foi regravado 1 ms antes do diretório da worktree em .git/worktrees (stat), com core.hooksPath de escopo local = ⟨raiz do checkout principal⟩/.githooks, absoluto; o trampolim segue nos dois hooks (.githooks/pre-commit linhas 17 a 50 e .githooks/pre-push linhas 38 a 71)"
+    verified_against: "nenhum dos 39 itens da 2.1.312 cita core.hooksPath, worktree ou hook de git (leitura integral da cópia); gh issue view 85039 e 88747 -R anthropics/claude-code: as duas OPEN, closedAt nulo; a worktree desta rodada foi criada pelo processo 2.1.312 e o .git/config do checkout principal foi regravado junto com a criação do diretório da worktree em .git/worktrees (stat; o juiz mediu 7 s de intervalo na dele, então o intervalo varia), com core.hooksPath de escopo local = ⟨raiz do checkout principal⟩/.githooks, absoluto; o trampolim segue nos dois hooks (.githooks/pre-commit linhas 17 a 50 e .githooks/pre-push linhas 38 a 71)"
     label: "a 2.1.312 não muda o core.hooksPath absoluto: criar worktree de agente ainda o regrava no .git/config, as issues 85039 e 88747 seguem abertas, e o trampolim dos hooks de git segue sendo o que o torna inofensivo"
     provenance:
       source: "data/2.1.312.txt, a API de issues do GitHub e a configuração git do core"
@@ -204,12 +214,12 @@ nodes:
     impact: 1
     confidence: 0.7
     verified_at: "2026-10-28"
-    verified_against: "grep -rlF em .claude, ops, .github e CLAUDE.md: 'session limit' (linha 22, a troca do texto do limite) = zero, então nenhuma guarda lê a prosa que mudou; OTEL_, OpenTelemetry e CLAUDE_CODE_ENABLE_TELEMETRY (linhas 11, 26 e 27) = zero; BEDROCK, VERTEX, FOUNDRY e MANTLE no settings, em ops/*.sh e nos workflows (linha 20) = zero; oidc (linha 3) só no transporte de federação e na autenticação do bridge (inbox-pull.sh, logto-provision.sh, um vhost do caddy), nenhum deles é o gateway de apps do Claude; effort lido de transcript por hook, validação ou ops (linha 11) = zero; pdftoppm (linha 10) = zero; /verify (linha 17) não é comando do core; linhas 37 a 40 (Claude Tag) e 41 (Code Review gerenciado): o revisor da casa é a claude-code-action"
+    verified_against: "grep -rlF em .claude, ops, .github e CLAUDE.md: 'session limit' (linha 22, a troca do texto do limite) = zero, então nenhuma guarda lê a prosa que mudou; OTEL_, OpenTelemetry e CLAUDE_CODE_ENABLE_TELEMETRY (linhas 11, 26 e 27) = zero; BEDROCK, VERTEX, FOUNDRY e MANTLE no settings, em ops/*.sh e nos workflows (linha 20) = zero; oidc (linha 3) em 9 arquivos: o transporte de federação (inbox-pull.sh, federation-member.md), a autenticação do bridge (logto-provision.sh, o Caddyfile e um vhost), o token OIDC do GitHub Actions do revisor (onion-review.yml linha 40, id-token: write), a prosa de compliance (o agente iso-27001-specialist e o template compliance_iso27001) e a bancada; nenhum é o gateway de apps do Claude; effort lido de transcript por hook, validação ou ops (linha 11) = zero; pdftoppm (linha 10) só como texto de fixture da bancada (.claude/validation/lint-selftest.sh linhas 8030, 8111 e 8155), nunca como chamada; /verify (linha 17) não é comando do core; linhas 37 a 40 (Claude Tag) e 41 (Code Review gerenciado): o revisor da casa é a claude-code-action"
     label: "o gateway OIDC, o texto do limite de 5 horas, a telemetria, Bedrock e afins, o PDF do Read, o /verify, o Claude Tag e o Code Review gerenciado não têm superfície no core"
     provenance:
       source: "grep no core"
       locator: "termos-chave de cada linha citada"
-      method: "measurement: grep -rlF por termo"
+      method: "measurement: grep -rlF por termo; reescrito após o EXAGERA do juiz"
       locality: "repo"
   - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_312_1028
     node_type: evidence
@@ -226,6 +236,111 @@ nodes:
       locator: "família cited_directive"
       method: "measurement: execução da família da bancada no host"
       locality: "host"
+  - id: E_REMOTE_CONTROL_OCIOSO_VALE_NO_HOST_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-28"
+    verified_against: "omissão apontada pelo juiz e re-medida pela rodada: linha 36 da 2.1.312 (sessão de Remote Control desarquivada aparecia trabalhando até um computador reconectar; agora fica ociosa); o settings de usuário tem remoteControlAtStartup = True e crossSessionInbound = accept (python, só as duas chaves), então toda sessão do host abre o canal do maestro pelo celular; no core, o .claude/hooks/session-beacon-hook.sh (linha 50) só cita a conexão de Remote Control como hipótese para um farol que nunca refrescou; nenhuma guarda lê o estado ocioso ou trabalhando"
+    label: "a correção do estado de sessão de Remote Control desarquivada vale no host, onde toda sessão abre o Remote Control, e nenhuma guarda do core lê esse estado"
+    provenance:
+      source: "settings de usuário (duas chaves) e .claude/hooks/session-beacon-hook.sh"
+      locator: "remoteControlAtStartup, crossSessionInbound; linha 50 do hook"
+      method: "measurement: python sobre os nomes de chave e grep no hook"
+      locality: "host"
+  - id: C_SUPERACAO_20261028_SKILLS_POR_DIRETORIO_SAO_AS_WORKTREES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: ls de .claude/worktrees/*/.claude/skills = 15 e .git/info/exclude linha 12; aplicada em E_SKILLS_COM_PATHS_E_O_CD_PARA_DENTRO_1028"
+    label: "a skill por diretório que a casa tem são as worktrees de agente, vistas do checkout principal; o find que as exclui esconde a superfície"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA de E_SKILLS_COM_PATHS_E_O_CD_PARA_DENTRO_1028"
+      method: "judges: subagente opus independente, critério CU3"
+      locality: "repo"
+  - id: C_SUPERACAO_20261028_ZERO_E_SO_SE_ESCREVEM_COM_A_LISTA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: grep -rliF de pdftoppm e de oidc com a lista exata de arquivos; aplicada em E_ITENS_SEM_SUPERFICIE_NO_CORE_1028"
+    label: "zero e só numa varredura de ausência se escrevem com a lista medida; a conclusão de que não há superfície se manteve"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA de E_ITENS_SEM_SUPERFICIE_NO_CORE_1028"
+      method: "judges: subagente opus independente, critério CU2"
+      locality: "repo"
+  - id: C_SUPERACAO_20261028_DISTANCIA_RELATIVA_TAMBEM_SE_SUPERA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: ls do diretório de extensões (2.1.306) contra o disco (2.1.312); aplicada em E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028"
+    label: "nó de versão que afirma distância relativa cai quando a distância anda, mesmo com a versão parada; os dois nós de versão se tratam igual"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito EXAGERA da aresta SUPPORTS sem SUPERSEDES da extensão"
+      method: "judges: subagente opus independente, critério CU4"
+      locality: "repo"
+  - id: C_SUPERACAO_20261028_REMOTE_CONTROL_SEGUE_SUPERFICIE_DO_HOST
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: remoteControlAtStartup = True no settings de usuário; aplicada em E_REMOTE_CONTROL_OCIOSO_VALE_NO_HOST_1028"
+    label: "item de Remote Control é superfície do host enquanto toda sessão o abrir; a r19 já o tratava assim"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "omissão: Remote Control ligado em toda sessão do host (linha 36)"
+      method: "judges: subagente opus independente, critério CU5"
+      locality: "repo"
+  - id: C_SUPERACAO_20261028_CLAUDE_MD_DE_SUBDIRETORIO_SAO_AS_WORKTREES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: ls e wc -c dos CLAUDE.md em .claude/worktrees (15, 26.246 bytes cada); aplicada em E_WRITE_NAO_SOBRESCREVE_ARQUIVO_GRANDE_LIDO_PELA_METADE_1028"
+    label: "o CLAUDE.md de subdiretório que a casa tem é o de cada worktree de agente; medir só git ls-files não o vê"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "omissão: CLAUDE.md das worktrees aninhadas (linha 6)"
+      method: "judges: subagente opus independente, critério CU5"
+      locality: "repo"
+  - id: C_SUPERACAO_20261028_O_REVISOR_DO_CI_E_O_HEADLESS_DA_CASA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: pin v1.0.263 (CLI 2.1.311) e o compare v1.0.263...v1.0.264 (2.1.312); aplicada em E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028"
+    label: "correção de modo headless alcança o revisor do CI antes do bridge; o pin do revisor deixa de ser só paridade quando a versão traz correção headless"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "omissão: linha 9 no revisor do CI"
+      method: "judges: subagente opus independente, critério CU5"
+      locality: "repo"
 edges:
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
@@ -269,3 +384,24 @@ edges:
   - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_312_1028
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     edge_type: SUPPORTS
+  - from: E_REMOTE_CONTROL_OCIOSO_VALE_NO_HOST_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261028_SKILLS_POR_DIRETORIO_SAO_AS_WORKTREES
+    to: E_SKILLS_COM_PATHS_E_O_CD_PARA_DENTRO_1028
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261028_ZERO_E_SO_SE_ESCREVEM_COM_A_LISTA
+    to: E_ITENS_SEM_SUPERFICIE_NO_CORE_1028
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261028_DISTANCIA_RELATIVA_TAMBEM_SE_SUPERA
+    to: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261028_REMOTE_CONTROL_SEGUE_SUPERFICIE_DO_HOST
+    to: E_REMOTE_CONTROL_OCIOSO_VALE_NO_HOST_1028
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261028_CLAUDE_MD_DE_SUBDIRETORIO_SAO_AS_WORKTREES
+    to: E_WRITE_NAO_SOBRESCREVE_ARQUIVO_GRANDE_LIDO_PELA_METADE_1028
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261028_O_REVISOR_DO_CI_E_O_HEADLESS_DA_CASA
+    to: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028
+    edge_type: TRACES_TO
