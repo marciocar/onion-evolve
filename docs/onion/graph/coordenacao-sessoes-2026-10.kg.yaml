@@ -184,7 +184,7 @@ nodes:
     verified_at: "2026-10-28"
     verified_against: "gh pr view 1422 em 2026-10-28: MERGED (merge 422ee15f0ff5), com o resultado das rodadas 1 a 3 da ida e volta e as seis curas; o nó E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028 do sinais-de-campo registra a R3"
     label: "Os cartões 2, 3 e 4 do teste de ida e volta (CARD-MAESTRO.md): o convite novo, o token no notebook e o teste."
-    narrative: "São os passos do maestro que destravam a medida de Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027; a pergunta da medida não ganha nó novo aqui. Fechado em 2026-10-28: o maestro fez os três cartões. O convite novo está ativo até 2026-10-30T01:05:02Z, o token está no notebook, e o teste RT-P1 rodou em 3 rodadas, com a R3 dando DADO nas duas pontas. O resultado e as curas estão no PR 1422. A pergunta da medida (Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027) segue aberta por causa dos negativos e dos destinos fechados, e o que falta ao maestro está em Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO."
+    narrative: "São os passos do maestro que destravam a medida de Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027; a pergunta da medida não ganha nó novo aqui. Fechado em 2026-10-28: o maestro fez os três cartões. O convite novo está ativo até 2026-10-30T01:05:02Z, o token está no notebook, e o teste RT-P1 rodou em 3 rodadas, com a 3ª rodada dando DADO nas duas pontas. O resultado e as curas estão no PR 1422. A pergunta da medida (Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027) segue aberta por causa dos negativos e dos destinos fechados, e o que falta ao maestro está em Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO."
   - id: Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT
     node_type: question
     layer: audit
@@ -261,7 +261,7 @@ nodes:
     verified_at: "2026-10-28"
     verified_against: "gh pr view 1422 em 2026-10-28: MERGED; o convite novo vale até 2026-10-30T01:05:02Z"
     label: "Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027."
-    narrative: "A R3 deu DADO nas duas pontas, mas a pergunta da medida só fecha com os negativos pré-registrados e com os destinos fechados medidos. Os passos de novo são do maestro, na ponta do notebook. Gatilho: depois do PR 1422; o convite vence em 2026-10-30T01:05Z, e passada essa hora o teste pede convite novo."
+    narrative: "A 3ª rodada deu DADO nas duas pontas, mas a pergunta da medida só fecha com os negativos pré-registrados e com os destinos fechados medidos. Os passos de novo são do maestro, na ponta do notebook. Gatilho: depois do PR 1422; o convite vence em 2026-10-30T01:05Z, e passada essa hora o teste pede convite novo."
   - id: Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370
     node_type: question
     layer: audit
@@ -310,7 +310,7 @@ nodes:
     verified_at: "2026-10-28"
     verified_against: "pedido da sessão principal do core em 2026-10-28"
     label: "O /meta:cc-update da 2.1.312 do Claude Code."
-    narrative: "Update do Claude Code é gatilho de re-medição: o delta do CHANGELOG contra a baseline do radar E3, julgado por juiz que refuta e selado até o PR mergeado. Gatilho: a sessão do core com janela para a rodada."
+    narrative: "Update do Claude Code é gatilho de re-medição: o delta do CHANGELOG contra a baseline do eixo do ecossistema Claude Code no radar, julgado por juiz que refuta e selado até o PR mergeado. Gatilho: a sessão do core com janela para a rodada."
   - id: Q_COORD_CORE_DPAREN_END_KG_READ_LEG
     node_type: question
     layer: audit
