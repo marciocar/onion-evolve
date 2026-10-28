@@ -37,6 +37,8 @@ nota: >-
 - `.claude/validation/lint-selftest.sh`, família `kg_read_leg`: caso (r4) com a forma `((a)+(b)) <<E` do relato do sge.
 - `.claude/validation/lint-selftest.sh`: com `role: adopted`, ⊘ nomeado para r16-table-total, lint-hard-file (c) sem
   `ops/pr-finalize.sh`, as fixtures r53 bad-brace-dead e bad-scalar-dead, e a r89 sem `docs/onion/radar-baselines.yaml`.
+- `.claude/validation/lint-selftest.sh`, família `a2a_verify`: o python3 dos PATHs enxutos entra por invólucro, não por
+  symlink (o symlink de um venv perde o venv e o PyYAML; medido no pré-voo deste PR, 10 ✗ → 133/133).
 - `docs/onion/graph/sinais-de-campo-2026-09.kg.yaml`: `Q_META_VELHO_EM_GRAFO_SELADO_1028`, gatilho no 2º caso.
 - `docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml`: quatro pendências do core fechadas com a medida.
 
