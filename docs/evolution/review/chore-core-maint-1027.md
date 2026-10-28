@@ -2,7 +2,7 @@
 branch: chore/core-maint-1027
 pr: 1430
 date: 2026-10-28
-reviewed_diff_sha256: 738fa522ab8487ab0529496574c2086fce28e4cd8fa7623f5f2aa6d8c5215c82
+reviewed_diff_sha256: 128b87290f30a65cf63ffb578dfc6cb5a7e1e7ea3ca2ed516e43f3b59a86b481
 reviewed_code_sha256: e63c9a5cace3f84587a517c382fde427226de83370e443399d10a77f6ad794e9
 findings_total: 5
 findings_real: 5
