@@ -75,6 +75,26 @@ and columns of a CSV count from 1 and are written without a leading zero (RFC 71
 media interval excludes its end. The form does not check what only the
 source can say, such as a start after the end or a line that does not exist: that is the job of `kg_trace`.
 
+## The hash of a cited node (v4.18)
+
+A bridge to another graph (`scheme: kg-node`) points to one node inside a file. The `sha256` of the file breaks as soon
+as any node of that file changes, even one the bridge does not cite. Since v4.18, `provenance.node_sha256` hashes only
+the cited node: the SHA-256 of its canonical form by RFC 8785 (JCS, the JSON Canonicalization Scheme), computed over the
+model the reader extracts from the graph, with keys in UTF-16 order and numbers and strings in ECMAScript form.
+
+```yaml
+provenance:
+  source: "https://github.com/acme/core/blob/9f2c1e0/docs/graph/seals.kg.yaml#D_RETRY_POLICY"
+  locator: "#D_RETRY_POLICY"
+  method: "testimony: the seal of the core"
+  scheme: kg-node
+  node_sha256: "d4d7…"   # kg_trace.py digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
+```
+
+It goes only with `scheme: kg-node` and only warns: `form.pattern.node.provenance.node_sha256` out of form,
+`form.required.node.provenance.scheme` without a scheme, `form.const.node.provenance.scheme` with another one.
+`kg_trace check` compares it with the cited node (chapter 5).
+
 ## What changed from v3 to v4
 
 v4 is a **major** version: what used to warn now fails.
@@ -92,7 +112,7 @@ recorded exception: 4.11.0, 4.12.0 and 4.13.0 started to fail rare YAML construc
 were minor because none of the real graphs measured in four adopter repositories changed its verdict. Even so, they
 count as new MUST rules for the stability criterion, and each one reset the 30-day clock. Since 4.11.0, the contract
 has its own version label (v4.4 in 4.11.0, v4.5 in 4.12.0, v4.6 in 4.13.0, v4.7 in 4.14.0, v4.8 in 4.15.0, v4.9 in 4.15.1
-and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.21.0, v4.13 in 4.22.0, v4.14 from 4.23.0 to 4.26.0, v4.15 from 4.27.0 to 4.31.1, v4.16 from 4.32.0 to 4.36.0, v4.17 since 4.37.0), which is not the release number.
+and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.21.0, v4.13 in 4.22.0, v4.14 from 4.23.0 to 4.26.0, v4.15 from 4.27.0 to 4.31.1, v4.16 from 4.32.0 to 4.36.0, v4.17 in 4.37.0, v4.18 since 4.38.0), which is not the release number.
 
 | Release | What it added |
 |---|---|
@@ -127,6 +147,7 @@ and 4.16.0, v4.10 from 4.16.1 to 4.18.0, v4.11 in 4.19.0 and 4.20.0, v4.12 in 4.
 | 4.29 | Contract v4.15, unchanged. The `rdf` extra reads the PROV export, and `kg_prov_export.py --full` exports the whole document; in 4.29.1, a malformed edge end goes as a literal |
 | 4.30 | Contract v4.15, unchanged. The agent skill (`skills/kg-ssot/`, Agent Skills format) and the Claude Code plugin marketplace |
 | 4.31 | Contract v4.15, unchanged. The documentation site and the demo, published only in the public repository (`mirror_only`); in 4.31.1, the site renders code blocks |
+| 4.38 | Contract v4.18, SHOULD only: `provenance.node_sha256`, the canonical hash of the cited node (RFC 8785); `kg_query --revisit` and `--decision` read a support of another repository at its pinned commit with `--with`, and list the decisions whose support changed upstream; `kg_trace.py digest` |
 | 4.37 | Contract v4.17, SHOULD only: `provenance.scheme` (how to read the locator: `json-pointer`, `text`, `csv`, `pdf`, `media`, `quote`, `html`, `kg-node`) and `provenance.sha256` (the hash of what was read, in its own field); `kg_trace check` reads the source by its scheme and hash, also at a pinned commit of another repository with `--with` |
 | 4.36 | Contract v4.16, unchanged. `kg_query --sort attention` (the radar's formula), `--decision` (the history of a decision) and `--revisit` (the live decisions to revisit, with the reason) |
 | 4.35 | Contract v4.16, unchanged. Python 3.12 or later. `kg_query --chain --with` follows a chain into another repository at the cited commit; `kg_trace.py projection` checks Markdown pages that declare `projection_of`; `kg_trace check` follows a JSON Pointer `provenance.locator` inside the JSON file |

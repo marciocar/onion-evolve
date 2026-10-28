@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:2248ccd2ece011b2 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:3418464fc33b61eb -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.37.0",
+  "release": "kg-ssot-v4.38.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 508/508 (reprova)
+latest: 512/512 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -876,6 +876,28 @@ outras, com o motivo na narrativa. Um detector automático de contradições foi
 ele achava afirmações irmãs, não contradições. A tensão é a refutação que alguém registra, e a atenção diz qual olhar
 primeiro.
 
+### Apoios em outro repositório (4.38.0)
+
+O `--with PREFIXO=PASTA` vale também com `--revisit` e com `--decision`, como no `--chain` desde a 4.35.0: o apoio dado
+por uma URL no `provenance.source` (`<prefixo>/<commit>/<caminho>#<id>`) é lido no commit fixado, de um clone local. O
+prefixo acaba logo antes do commit: no GitHub ele inclui o `/blob` (`https://github.com/acme/core/blob=../core`). Sem o
+`/blob`, a referência lida seria `blob`, que não fixa nada, e o apoio sai `unpinned`.
+
+- O `--revisit` julga só as decisões do corpus local; um grafo lido de outro repositório é apoio, não decisão a
+  revisitar. O apoio que não se resolve traz o motivo: `no_with`, `not_found`, `not_pinned_url` (uma fonte que não é URL
+  com commit, como `dono/repo@ref:caminho`), `unpinned` (lido sem fixação real: o commit não está no clone, a pasta não
+  é repositório git, ou a referência é branch ou tag) ou `outside_corpus`. O apoio sem fixação nunca é julgado pela
+  árvore de trabalho.
+- O `upstream_changed` lista, à parte e nunca como motivo de revisão, as decisões locais cujo apoio tem outro status, ou
+  sumiu, na ponta do clone: o commit fixado ficou para trás. Inferido das arestas, o apoio caído deu 1 aviso útil em 10
+  (4.36.0); esta lista diz outra coisa, que a fonte andou desde que foi lida.
+- O `--decision` mostra cada apoio externo com o status no commit fixado, `pinned` e, em `head_status`, na ponta. A ponta
+  é o `HEAD` local do clone: rode `git fetch` e o atualize antes, ou a lista fica vazia.
+
+```bash
+kg-query --root . --revisit --with https://github.com/acme/core/blob=../core
+```
+
 ## `kg_diff.py`: o diff por id entre revisões
 
 Compara dois grafos, ou todos os grafos que mudaram entre duas revisões do git, alinhando os nós pelo id e as
@@ -1183,6 +1205,22 @@ confere.
 ```bash
 kg-trace check --root . \
   --with https://github.com/acme/core/blob=../core
+```
+
+### O hash de um nó citado, e o `digest` (4.38.0)
+
+Com `scheme: kg-node`, o `provenance.node_sha256` (contrato v4.18) é comparado com o hash canônico do nó citado, lido no
+commit fixado: a diferença é `integrity.trace-node-sha256-mismatch`, e a saída JSON conta `node_sha256_checked`. Uma
+mudança em outro nó do mesmo arquivo não mexe nele. O `kg_trace.py digest ARQUIVO#ID...` imprime o hash a registrar; o
+leitor JavaScript exporta `nodeCanonical(doc, id)`, a mesma string canônica, para o SHA-256 da plataforma. O hash cobre o nó citado inteiro, `verified_at` incluído, então recarimbar o nó citado
+derruba as pontes para ele, e é para isso que ele serve. O nó citado que se repete, ou que não tem forma JCS (um número
+de valor inteiro fora de ±(2^53−1)), não tem hash a conferir e conta como `not_canonical`. Quando a ponte leva os dois
+hashes, o `sha256` do arquivo é conferido antes e a mudança num vizinho ainda a derruba: numa ponte `kg-node`, deixe só
+o `node_sha256`. O `digest` lê a árvore de trabalho sob a raiz; para uma fonte fixada, leia antes o arquivo no commit
+(`git show <commit>:<caminho>`).
+
+```bash
+kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
 
 ### O checador de projeção (`kg_trace.py projection`, 4.35.0)

@@ -3393,16 +3393,8 @@ msgid "PREFIX=FOLDER"
 msgstr "PREFIXO=PASTA"
 
 #: tools/kg_query.py
-msgid "with --chain, read the graph of another repository that a provenance.source URL names: the URL prefix before the commit, and the local folder of that repository (repeatable)"
-msgstr "com --chain, lê o grafo de outro repositório que uma URL do provenance.source nomeia: o prefixo da URL antes do commit e a pasta local daquele repositório (repetível)"
-
-#: tools/kg_query.py
 msgid "read from the working tree: the commit in the URL is not in that folder"
 msgstr "lido da árvore de trabalho: o commit da URL não está naquela pasta"
-
-#: tools/kg_query.py
-msgid "--with goes with --chain"
-msgstr "--with vai com --chain"
 
 #: tools/kg_trace.py
 msgid "PAGE.md"
@@ -3516,10 +3508,6 @@ msgstr "· {n} decisão(ões) a revisitar em {date}; {m} esperam um evento (reve
 msgid "· {n} decision(s) have a cadence but no verified_at, so they never come due: {ids}"
 msgstr "· {n} decisão(ões) têm cadência mas não verified_at, e por isso nunca vencem: {ids}"
 
-#: tools/kg_query.py
-msgid "· {n} support(s) are outside the corpus and were not judged: {ids}"
-msgstr "· {n} apoio(s) estão fora do corpus e não foram julgados: {ids}"
-
 #: tools/kg_validate.py
 msgid "Copy the passage again as it is in the file, or retire the node if the passage is gone."
 msgstr "Copie o trecho de novo como está no arquivo, ou aposente o nó se o trecho sumiu."
@@ -3571,3 +3559,51 @@ msgstr "com --revisit, a data que conta como hoje"
 #: tools/kg_trace.py
 msgid "· {judged} source(s) read by scheme or sha256: {ok} ok, {failed} failed ({sha} sha256 checked); not judged (counted): {form} form only, {absolute} URL with no --with, {missing} source not found, {malformed} malformed scheme, locator or hash, {other} other"
 msgstr "· {judged} fonte(s) lida(s) pelo scheme ou pelo sha256: {ok} ok, {failed} com falha ({sha} sha256 conferido(s)); não julgado (contado): {form} só pela forma, {absolute} URL sem --with, {missing} fonte não achada, {malformed} scheme, locator ou hash malformado, {other} outro(s)"
+
+#: tools/kg_query.py
+msgid "  [now {status} at the head of the clone]"
+msgstr "  [agora {status} na ponta do clone]"
+
+#: tools/kg_query.py
+msgid "--with goes with --chain, --decision or --revisit"
+msgstr "--with vai com --chain, --decision ou --revisit"
+
+#: tools/kg_query.py
+msgid "with --chain, --decision or --revisit, read the graph of another repository that a provenance.source URL names, at the commit of the URL: the URL prefix before the commit, and the local folder of that repository (repeatable)"
+msgstr "com --chain, --decision ou --revisit, lê o grafo de outro repositório que uma URL do provenance.source nomeia, no commit da URL: o prefixo da URL antes do commit e a pasta local desse repositório (repetível)"
+
+#: tools/kg_query.py
+msgid "· {decision}: what it rests on changed upstream since the pinned commit: {support} was {pinned}, now {head}"
+msgstr "· {decision}: aquilo em que ela se apoia mudou na origem desde o commit fixado: {support} era {pinned}, agora {head}"
+
+#: tools/kg_query.py
+msgid "· {n} support(s) are outside the corpus and were not judged ({why}): {ids}"
+msgstr "· {n} apoio(s) estão fora do corpus e não foram julgados ({why}): {ids}"
+
+#: tools/kg_trace.py
+msgid "NOT FOUND  {ref}"
+msgstr "NÃO ACHADO  {ref}"
+
+#: tools/kg_trace.py
+msgid "NO CANONICAL FORM  {ref}"
+msgstr "SEM FORMA CANÔNICA  {ref}"
+
+#: tools/kg_validate.py
+msgid "two map keys are the same text once their surrogate pairs are combined"
+msgstr "duas chaves do mapa viram o mesmo texto quando os pares de surrogates se combinam"
+
+#: tools/kg_trace.py
+msgid "digest takes FILE#ID"
+msgstr "digest recebe ARQUIVO#ID"
+
+#: tools/kg_validate.py
+msgid "The provenance.node_sha256 of the node differs from the canonical hash of the node it cites: that node changed after it was read."
+msgstr "O provenance.node_sha256 do nó difere do hash canônico do nó que ele cita: esse nó mudou depois de lido."
+
+#: tools/kg_validate.py
+msgid "Read the cited node again and record its new hash (kg_trace.py digest FILE#ID), or cite the commit that has the version that was read."
+msgstr "Leia o nó citado de novo e registre o hash novo (kg_trace.py digest ARQUIVO#ID), ou cite o commit que tem a versão que foi lida."
+
+#: tools/kg_trace.py
+msgid "{path} is outside the root"
+msgstr "{path} está fora da raiz"

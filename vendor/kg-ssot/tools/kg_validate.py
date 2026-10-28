@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.17"
+CONTRACT_VERSION = "4.18"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1051,6 +1051,138 @@ def _parse_json(text):
     return value, canonical(value, json_keys=True), None  # 1e400 vira inf e daí NonFinite, como o .inf do YAML
 
 
+class JcsError(ValueError):
+    """O valor não tem forma JCS (RFC 8785): o surrogate solto, o inteiro fora de ±(2^53−1), o não finito, o que não é JSON."""
+
+
+JCS_MAX_SAFE = 2 ** 53 - 1
+
+
+def es_number(x):
+    """O número na forma do Number.prototype.toString do ECMAScript, que o JCS pede (RFC 8785, 3.2.2.3). Um só JCS no
+    produto: este, que o kg_criterion e o node_digest usam."""
+    if isinstance(x, int):
+        if abs(x) > JCS_MAX_SAFE:
+            raise JcsError(_("the integer {n} is outside ±(2^53−1): JCS cannot represent it exactly").format(n=x))
+        return str(x)
+    if not math.isfinite(x):
+        raise JcsError(_("NaN and Infinity have no JCS form"))
+    if x == 0:
+        return "0"
+    sign = "-" if x < 0 else ""
+    mant, _e, exp = repr(abs(x)).partition("e")
+    whole, _dot, frac = mant.partition(".")
+    digits = (whole + frac).lstrip("0")
+    n = len(whole) + (int(exp) if exp else 0) - (len(whole + frac) - len((whole + frac).lstrip("0")))
+    digits = digits.rstrip("0")
+    k = len(digits)
+    if k <= n <= 21:
+        out = digits + "0" * (n - k)
+    elif 0 < n <= 21:
+        out = digits[:n] + "." + digits[n:]
+    elif -6 < n <= 0:
+        out = "0." + "0" * (-n) + digits
+    else:
+        e = n - 1
+        out = digits[0] + ("." + digits[1:] if k > 1 else "") + "e" + ("+" if e > 0 else "-") + str(abs(e))
+    return sign + out
+
+
+def _jcs_pairs(s):
+    """O texto com os pares de surrogates combinados (o par escrito com escape no YAML, \\ud83d\\ude00, vira o code point
+    que ele codifica, como o leitor JS já faz); o surrogate que sobra sozinho não tem forma JCS."""
+    if not any(0xD800 <= ord(ch) <= 0xDFFF for ch in s):
+        return s
+    try:
+        return s.encode("utf-16-le", "surrogatepass").decode("utf-16-le")
+    except UnicodeDecodeError:
+        raise JcsError(_("a lone surrogate has no JCS form")) from None
+
+
+def _jcs_string(s):
+    out = ['"']
+    for ch in _jcs_pairs(s):
+        o = ord(ch)
+        if 0xD800 <= o <= 0xDFFF:
+            raise JcsError(_("a lone surrogate has no JCS form"))
+        if ch == '"':
+            out.append('\\"')
+        elif ch == "\\":
+            out.append("\\\\")
+        elif o < 0x20:
+            out.append({"\b": "\\b", "\t": "\\t", "\n": "\\n", "\f": "\\f", "\r": "\\r"}.get(ch, f"\\u{o:04x}"))
+        else:
+            out.append(ch)
+    out.append('"')
+    return "".join(out)
+
+
+def jcs(value):
+    """A forma canônica JCS (RFC 8785) de um valor JSON: chaves em ordem de unidade UTF-16, número do ECMAScript, sem
+    espaços. JcsError para o que não tem forma JCS."""
+    if value is None:
+        return "null"
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    if isinstance(value, (int, float)):
+        return es_number(value)
+    if isinstance(value, str):
+        return _jcs_string(value)
+    if isinstance(value, NonFinite):
+        raise JcsError(_("NaN and Infinity have no JCS form"))
+    if isinstance(value, list):
+        return "[" + ",".join(jcs(v) for v in value) + "]"
+    if isinstance(value, dict):
+        if not all(isinstance(k, str) for k in value):
+            raise JcsError(_("a map key that is not text has no JSON form"))
+        pairs = {}
+        for k, v in value.items():
+            key = _jcs_pairs(k)
+            if key in pairs:
+                raise JcsError(_("two map keys are the same text once their surrogate pairs are combined"))
+            pairs[key] = v
+        keys = sorted(pairs, key=lambda k: k.encode("utf-16-be"))
+        return "{" + ",".join(_jcs_string(k) + ":" + jcs(pairs[k]) for k in keys) + "}"
+    raise JcsError(_("a value of type {type} has no JSON form").format(type=type(value).__name__))
+
+
+def node_digest(doc, node_id):
+    """O provenance.node_sha256 de um nó (contrato v4.18): o SHA-256, em hex minúsculo, do JCS do nó no modelo canônico
+    do grafo. None quando o nó não existe, quando se repete (é defeito do grafo, integrity.duplicate-id) ou quando ele não
+    tem forma JCS (um inteiro fora de ±(2^53−1), um surrogate solto): nesses casos não há hash a conferir."""
+    import hashlib
+    nodes = [n for n in (doc.get("nodes") if isinstance(doc, dict) and isinstance(doc.get("nodes"), list) else [])
+             if isinstance(n, dict) and n.get("id") == node_id]
+    if len(nodes) != 1 or _unsafe_number(nodes[0]):
+        return None
+    try:
+        return hashlib.sha256(jcs(nodes[0]).encode("utf-8")).hexdigest()
+    except (ValueError, OverflowError):
+        return None
+
+
+def _unsafe_number(value):
+    """Algum número de valor inteiro fora de ±(2^53−1) sob value, escrito como inteiro ou como decimal (1e300)? O leitor JS
+    não distingue os dois depois do parse, então a regra é a que os dois leitores conseguem aplicar igual: esse número não
+    tem forma canônica, e o nó fica sem node_sha256."""
+    stack = [value]
+    while stack:
+        v = stack.pop()
+        if isinstance(v, bool):
+            continue
+        if isinstance(v, int) and abs(v) > 2 ** 53 - 1:
+            return True
+        if isinstance(v, float) and v == v and abs(v) > 2 ** 53 - 1 and v.is_integer():
+            return True
+        if isinstance(v, list):
+            stack.extend(v)
+        elif isinstance(v, dict):
+            stack.extend(v.values())
+    return False
+
+
 @functools.lru_cache(maxsize=1024, typed=True)
 def parse_v1(text):
     """O parse do contrato v1, um só para codes(), warnings() e external_info(): (documento cru, canônico, código).
@@ -1574,6 +1706,8 @@ MESSAGES = {
                                      "the file it names.",
     "integrity.trace-sha256-mismatch": "The provenance.sha256 of the node differs from the hash of the file it names: "
                                        "the source changed after it was read.",
+    "integrity.trace-node-sha256-mismatch": "The provenance.node_sha256 of the node differs from the canonical hash of "
+                                            "the node it cites: that node changed after it was read.",
     "integrity.projection-id-missing": "A context page cites a node id that no graph of its projection_of has.",
     "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
     "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
@@ -1647,6 +1781,8 @@ HINTS = {
                                      "is gone.",
     "integrity.trace-sha256-mismatch": "Read the source again and record the new hash, or cite the commit that has the "
                                        "version that was read.",
+    "integrity.trace-node-sha256-mismatch": "Read the cited node again and record its new hash (kg_trace.py digest "
+                                            "FILE#ID), or cite the commit that has the version that was read.",
     "integrity.projection-id-missing": "Fix the id, add the graph that has it to projection_of (a URL pinned to the "
                                        "commit for another repository), or list the name in projection_ignore if it "
                                        "is not a node id.",
