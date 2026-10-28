@@ -1,0 +1,271 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.312 a 2.1.312 contra a baseline 2.1.311.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-28-r20
+  schema_version: "1"
+  baseline: "2026-10-28"
+  review_after: "2026-11-27"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-28); 14 da rodada.
+# ═══ AUFHEBUNG ═══
+#   DECIDIDO (2026-10-28): (a), duas arestas. O nó das versões de quem serve da r19 caiu (host 2.1.312, revisor
+#   2.1.311 pelo pin v1.0.263 que subiu em 3892b25d7, bridge segue 2.1.310), e a pergunta da subida da r19 ficou
+#   com alvo velho (0.3.311 e v1.0.263; o pin já subiu, e hoje existem 0.3.312 e v1.0.264). A extensão do VS Code
+#   da r19 segue de pé (2.1.306), e a pergunta dela recebe apoio, não superação.
+external_edges:
+  - from: E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028
+    to: "docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml#E_HOST_NA_2_1_311_BRIDGE_E_REVISOR_NA_2_1_310_1026"
+    edge_type: SUPERSEDES
+  - from: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028
+    to: "docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_311_E_PIN_DO_REVISOR_PARA_V1_0_263_1026"
+    edge_type: SUPERSEDES
+  - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028
+    to: "docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml#Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-28"
+    verified_against: "CHANGELOG oficial: seções 2.1.312 (42 linhas, 39 itens); baseline 2.1.311, disco 2.1.312, processo 2.1.312, SDK bridge 2.1.310"
+    label: "o delta desde a baseline 2.1.311 são 1 versão(ões), de 2.1.312 a 2.1.312, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.312 a ## 2.1.312 (cópias em docs/evolution/research/radar-E3-2026-10-28-r20/data/)"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-28"
+    verified_against: "aberta pelo esqueleto em 2026-10-28; fecha quando a rodada ligar cada item a superfície medida no vivo e o juiz refutar"
+    label: "quais itens de 2.1.312 a 2.1.312 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-28"
+    verified_against: "censo (cc-delta-census.sh com raiz '.'): disco 2.1.312, processo 2.1.312, binário do CLI embutido no SDK do bridge --version = 2.1.310 (SDK 0.3.310), 2 versões atrás; npm view @anthropic-ai/claude-agent-sdk version claudeCodeVersion = 0.3.312 e 2.1.312 (time.modified 2026-10-27T20:24:34Z); os dois uses: de .github/workflows/onion-review.yml (linhas 293 e 440) fixam 8041f1d1 (tag v1.0.263, CLI 2.1.311), subidos pelo commit 3892b25d7; gh api da lista de tags: v1.0.264 = d70510b1; o compare v1.0.263...v1.0.264 tem 2 commits (docs dos exemplos de plugin para claude-plugins-official; chore: bump Claude Code to 2.1.312 and Agent SDK to 0.3.312): base-action/action.yml linha 150 CLAUDE_CODE_VERSION=2.1.312, src/entrypoints/run.ts claudeCodeVersion 2.1.312, e o action.yml só muda a descrição do input plugins, que o onion-review.yml não usa (grep de plugins: e plugin_marketplaces: = zero)"
+    label: "o host está na 2.1.312; o revisor do CI subiu para a 2.1.311 (pin v1.0.263) e o /chat do bridge segue na 2.1.310 (SDK 0.3.310), duas versões atrás; o SDK 0.3.312 e a action v1.0.264 já existem e só trocam versões para quem os usa como a casa"
+    narrative: "O delta da 2.1.311 e o da 2.1.312 não chegam a quem serve pelo SDK do bridge. O SDK vive em repo alheio e o deploy é do maestro: a rodada registra e não sobe nada. O revisor segue desligado por padrão (só a label review:ia o liga), então o pin é paridade."
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh, .github/workflows/onion-review.yml, o registro npm e a API do GitHub"
+      locator: "tabela de versões do censo; uses: da claude-code-action; compare v1.0.263...v1.0.264"
+      method: "measurement: --version dos binários pelo censo, npm view e gh api das tags, do compare e do conteúdo na tag"
+      locality: "host"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-28"
+    verified_against: "proposta da rodada 20 do radar do Claude Code: subir o Agent SDK do bridge de 0.3.310 para 0.3.312 pelo ops/update-bridge.sh (deploy do maestro, repo alheio) e o pin do revisor para a tag v1.0.264 (d70510b1); a metade do pin da SAC-259 já foi feita (v1.0.263, commit 3892b25d7) e a do SDK não; a razão medida segue sendo a ordem do transcript nas sessões retomadas (linha 11 da 2.1.311), mais a linha 9 da 2.1.312 (comando com nome inválido deixando claude -p sem saída), cujo alcance no bridge não foi medido; nada sobe nesta rodada"
+    label: "o SDK do bridge deve subir para 0.3.312 e o pin do revisor do CI para v1.0.264; o alvo da SAC-259 envelheceu, e só a metade do pin dela foi feita"
+  - id: E_SKILLS_COM_PATHS_E_O_CD_PARA_DENTRO_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.65
+    verified_at: "2026-10-28"
+    verified_against: "linha 7 da 2.1.312 (skills por diretório e com paths: não eram achadas depois de um cd do Bash mais fundo num repo git): grep -lE '^paths:' nas SKILL.md do core = 2, onion-patterns (paths: .claude/** e docs/onion/**, linha 7 do frontmatter) e onion-validation (paths: .claude/**, linha 7); find de SKILL.md fora de .claude/skills (sem node_modules, .git e worktrees) = só vendor/kg-ssot/skills/kg-ssot/SKILL.md, sem skill por diretório do core; as worktrees de agente da casa moram em .claude/worktrees, dentro da árvore que os paths casam; o efeito antes e depois da correção não foi reproduzido"
+    label: "o core tem duas skills com paths: casando .claude/**, que é onde a casa mais trabalha e onde moram as worktrees de agente; a correção da descoberta após cd as alcança, mas o efeito não foi reproduzido"
+    provenance:
+      source: ".claude/skills/onion-patterns/SKILL.md e .claude/skills/onion-validation/SKILL.md"
+      locator: "linha 7 do frontmatter de cada uma"
+      method: "measurement: grep do frontmatter e find de SKILL.md fora de .claude/skills"
+      locality: "repo"
+  - id: E_WRITE_NAO_SOBRESCREVE_ARQUIVO_GRANDE_LIDO_PELA_METADE_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.6
+    verified_at: "2026-10-28"
+    verified_against: "linha 6 da 2.1.312 (Claude sobrescrevia um CLAUDE.md, arquivo de rules ou arquivo @-incluído muito grande num subdiretório depois de ver só o início): git ls-files de CLAUDE.md = só o da raiz (26.246 bytes, 344 linhas; não é de subdiretório); nenhuma inclusão @ no CLAUDE.md (grep de linha iniciada por @ e de @caminho.md = zero); as rules ficam no subdiretório .claude/rules, a maior é kg-grammar.md com 12.507 bytes em 77 linhas, depois dissect-lens.md com 3.232 (wc -c); o limiar de 'muito grande' não está no CHANGELOG"
+    label: "a superfície da casa para a proteção do Write é o subdiretório .claude/rules, cuja maior regra tem 12.507 bytes; o core não tem CLAUDE.md de subdiretório nem inclusão @, e o limiar não é público"
+    provenance:
+      source: "CLAUDE.md e .claude/rules"
+      locator: "wc -c dos arquivos rastreados"
+      method: "measurement: git ls-files, wc -c e grep"
+      locality: "repo"
+  - id: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.65
+    verified_at: "2026-10-28"
+    verified_against: "linha 9 da 2.1.312 (um comando com nome inválido impedia todos os comandos de carregar e podia deixar claude -p sem saída): find de .md em .claude/commands = 166; fora de [a-z0-9-]: os README.md das categorias e quatro templates com sublinhado (compliance_iso27001_template, compliance_soc2_template, compliance_pmbok_template, compliance_iso22301_template); nesta sessão, processo 2.1.312, a lista de skills entregue ao agente traz common:templates:compliance_iso27001_template e os README, logo carregam; a REGRA 6 (Filenames em .claude/ devem ser kebab-case) é SOFT (lint-artifacts.sh linha 684); o CHANGELOG não diz o que é nome inválido; o CLI do bridge (2.1.310) não tem a correção"
+    label: "o core tem nomes de comando fora do kebab-case (sublinhado e README) que carregam na 2.1.312; o CHANGELOG não define nome inválido, e a correção não chega ao bridge na 2.1.310"
+    provenance:
+      source: ".claude/commands e .claude/validation/lint-artifacts.sh"
+      locator: "nomes de arquivo; REGRA 6 na linha 684"
+      method: "measurement: find, grep e a lista de skills da sessão 2.1.312"
+      locality: "repo"
+  - id: E_HOOKS_DE_PROMPT_E_AGENTE_SEM_SUPERFICIE_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-28"
+    verified_against: "linha 24 da 2.1.312 (hooks de prompt e de agente rodam no máximo 24 por vez por sessão, subagentes incluídos, e timeout abaixo de 1 s conta como 1 s): .claude/settings.json tem 26 hooks, todos type command (grep -c = 26; prompt, agent ou http = 0); o settings de usuário tem 2, Notification e Stop, os dois command (python); nenhum agente, skill ou comando do core declara hooks: no frontmatter (grep -lE '^hooks:' = zero); o menor timeout declarado é 5 s (censo); o único type prompt do repo é uma fixture da bancada de adoção"
+    label: "o teto de 24 hooks de prompt e de agente e o piso de 1 s de timeout não tocam o core, que só tem hooks command com timeout de 5 s ou mais"
+    provenance:
+      source: ".claude/settings.json, settings de usuário (só tipos) e o frontmatter de .claude/agents, skills e commands"
+      locator: "campo type de cada hook"
+      method: "measurement: grep -c e python sobre os settings"
+      locality: "repo"
+  - id: E_AUTOCOMPACTWINDOW_SO_NA_ALLOWLIST_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "linha 25 da 2.1.312 (o autoCompactWindow de um subagente passa a baixar a janela de CLAUDE_CODE_AUTO_COMPACT_WINDOW): o campo está na allowlist de frontmatter de agente (.claude/validation/agent-frontmatter-keys.tsv linha 38, oficial desde a 2.1.296), e nenhum agente de .claude/agents o declara (grep = zero); nem o .claude/settings.json nem o settings de usuário têm CLAUDE_CODE_AUTO_COMPACT_WINDOW no env (python: o do core não tem env; o de usuário tem CLAUDE_CODE_ENABLE_TODO_TOOLS e CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS)"
+    label: "a mudança do autoCompactWindow de subagente não tem efeito no core: o campo só está na allowlist, nenhum agente o usa e a variável de janela não está ligada"
+    provenance:
+      source: ".claude/validation/agent-frontmatter-keys.tsv, .claude/agents e os settings"
+      locator: "linha 38 do tsv; chaves env"
+      method: "measurement: grep e python sobre os nomes de chave"
+      locality: "repo"
+  - id: E_TROCA_POR_RECUSA_E_A_GUARDA_DE_MODELO_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-28"
+    verified_against: "linha 21 da 2.1.312 (a troca automática de modelo depois de mensagem sinalizada passa a cobrir nomes que o Claude Code não reconhece): a casa só usa ids reconhecidos, a allowlist do E6 (claude-fable-5-1, claude-opus-5-5, claude-opus-5, pelo censo) e o fallbackModel do .claude/settings.json (claude-opus-5-5, claude-opus-5, claude-sonnet-5-5, linhas 264 a 268); a guarda .claude/hooks/premodelswitch-guard.sh decide pelo id sem sufixo (linha 68) e pela source (linhas 77 a 90: o piso só passa com source diferente de picker), sem ramo por nome reconhecido; grep de CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK e CLAUDE_CODE_SIMPLE_SYSTEM_PROMPT (linha 20) no core = zero"
+    label: "a ampliação da troca automática por recusa para nomes não reconhecidos não muda a guarda de modelo, porque a casa só usa ids reconhecidos e a guarda decide pelo id e pela source"
+    provenance:
+      source: ".claude/hooks/premodelswitch-guard.sh e .claude/settings.json"
+      locator: "linhas 68 a 90 do hook; chave fallbackModel"
+      method: "reading: leitura do hook e grep no core"
+      locality: "repo"
+  - id: E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-28"
+    verified_against: "nenhum dos 39 itens da 2.1.312 cita core.hooksPath, worktree ou hook de git (leitura integral da cópia); gh issue view 85039 e 88747 -R anthropics/claude-code: as duas OPEN, closedAt nulo; a worktree desta rodada foi criada pelo processo 2.1.312 e o .git/config do checkout principal foi regravado 1 ms antes do diretório da worktree em .git/worktrees (stat), com core.hooksPath de escopo local = ⟨raiz do checkout principal⟩/.githooks, absoluto; o trampolim segue nos dois hooks (.githooks/pre-commit linhas 17 a 50 e .githooks/pre-push linhas 38 a 71)"
+    label: "a 2.1.312 não muda o core.hooksPath absoluto: criar worktree de agente ainda o regrava no .git/config, as issues 85039 e 88747 seguem abertas, e o trampolim dos hooks de git segue sendo o que o torna inofensivo"
+    provenance:
+      source: "data/2.1.312.txt, a API de issues do GitHub e a configuração git do core"
+      locator: "issues anthropics/claude-code 85039 e 88747; git config --show-scope core.hooksPath"
+      method: "measurement: leitura da cópia do CHANGELOG, gh issue view, git config e stat"
+      locality: "host"
+  - id: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "o diretório de extensões do VS Code Server da conta do host segue com uma só, anthropic.claude-code-2.1.306-linux-x64 (ls), agora seis versões atrás do CLI; as linhas 28 e 29 da 2.1.312 são da extensão (sessão terminando em código de saída nu quando a configuração da organização falha; reset de limite em hora do relógio) e só valem quando ela subir; a pergunta da r19 sobre ela (SAC-260) segue aberta"
+    label: "a extensão do VS Code do host segue na 2.1.306, seis versões atrás, e os dois itens de VS Code da 2.1.312 não a alcançam; a pergunta da r19 continua de pé"
+    provenance:
+      source: "diretório de extensões do VS Code Server do host"
+      locator: "anthropic.claude-code-2.1.306-linux-x64"
+      method: "measurement: ls do diretório de extensões"
+      locality: "host"
+  - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-28"
+    verified_against: "grep -rlF em .claude, ops, .github e CLAUDE.md: 'session limit' (linha 22, a troca do texto do limite) = zero, então nenhuma guarda lê a prosa que mudou; OTEL_, OpenTelemetry e CLAUDE_CODE_ENABLE_TELEMETRY (linhas 11, 26 e 27) = zero; BEDROCK, VERTEX, FOUNDRY e MANTLE no settings, em ops/*.sh e nos workflows (linha 20) = zero; oidc (linha 3) só no transporte de federação e na autenticação do bridge (inbox-pull.sh, logto-provision.sh, um vhost do caddy), nenhum deles é o gateway de apps do Claude; effort lido de transcript por hook, validação ou ops (linha 11) = zero; pdftoppm (linha 10) = zero; /verify (linha 17) não é comando do core; linhas 37 a 40 (Claude Tag) e 41 (Code Review gerenciado): o revisor da casa é a claude-code-action"
+    label: "o gateway OIDC, o texto do limite de 5 horas, a telemetria, Bedrock e afins, o PDF do Read, o /verify, o Claude Tag e o Code Review gerenciado não têm superfície no core"
+    provenance:
+      source: "grep no core"
+      locator: "termos-chave de cada linha citada"
+      method: "measurement: grep -rlF por termo"
+      locality: "repo"
+  - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_312_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-28"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive no host com 2.1.312: 6 passaram, 0 pularam, 0 falharam, 'OK ✓ — todas as guardas reagiram conforme esperado.'"
+    label: "a guarda de deriva de binário (cited_directive) segue verde contra o CLI 2.1.312 instalado"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família cited_directive"
+      method: "measurement: execução da família da bancada no host"
+      locality: "host"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028
+    edge_type: SUPPORTS
+  - from: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028
+    edge_type: SUPPORTS
+  - from: E_SKILLS_COM_PATHS_E_O_CD_PARA_DENTRO_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_WRITE_NAO_SOBRESCREVE_ARQUIVO_GRANDE_LIDO_PELA_METADE_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOOKS_DE_PROMPT_E_AGENTE_SEM_SUPERFICIE_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_AUTOCOMPACTWINDOW_SO_NA_ALLOWLIST_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_TROCA_POR_RECUSA_E_A_GUARDA_DE_MODELO_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITENS_SEM_SUPERFICIE_NO_CORE_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_312_1028
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
