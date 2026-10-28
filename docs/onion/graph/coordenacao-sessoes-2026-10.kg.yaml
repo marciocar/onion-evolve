@@ -153,6 +153,18 @@ nodes:
     verified_against: "ops/registry-pins.sh --check em 2026-10-27, por volta das 23h UTC: o carimbo da integração no remoto dos quatro adotantes diz source_commit 95365699a0e3; gh pr view: curadoria 150, kg-ssot 285, sge 163 e brain 1648 MERGED"
     label: "A rodada de update da 4.35.0 aos quatro adotantes, depois da adoção no core."
     narrative: "Segue a ordem do maestro de 2026-10-26: a cada pin novo do core, oferecer o update às sessões adotantes, agrupando. Andamento em 2026-10-27, com o pin 95365699a0e3: a curadoria mergeou (PR 150). Seguem abertos o PR 285 do kg-ssot, com o check conformance vermelho até a sessão dona re-medir a catraca no pin novo como faz a cada update; o PR 163 do sge, verde; e o PR 1648 do brain, sem checks na base, à espera do calendário da entrega de 31/10. O merge é de cada sessão dona; este nó fecha quando os três entrarem. Fechado em 2026-10-27: os quatro PRs entraram, e o registro carimba os quatro em 95365699a0e3. Resta um PR de correção no brain (1652): o merge do 1648 trocou o campo commit do carimbo da kg-ssot para o da tag no repo de desenvolvimento (3960131ab70d), quando o brain vendoriza pelo espelho público (9fc22ac170d1). Os arquivos são idênticos; só o campo e o relatório mudam."
+  - id: Q_COORD_UPDATE_4_ADOTANTES_4370
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-28"
+    verified_against: "gh pr view em 2026-10-28 por volta das 12h UTC: curadoria 157, sge 165, kg-ssot 290 e brain 1656 OPEN; ops/registry-pins.sh --seal --only nos quatro: o carimbo da integração no remoto segue em 95365699a0e3, nada a carimbar"
+    label: "A rodada de update da 4.37.0 aos quatro adotantes, com o pin 5b27d09c088f do core."
+    narrative: "Segue a ordem do maestro de 2026-10-26: a cada pin novo do core, oferecer o update às sessões adotantes, agrupando. Entram a kg-ssot 4.37.0 com o contrato v4.17, o --with na REGRA 112 (Página com projection_of cita ids que existem nos grafos dela) com a cura da bancada (g), a cura da REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) para o & entre chave=valor, o tsv do kg-trace com scheme e sha256, o resultado do teste A2A e o grafo do Company Brain. Andamento em 2026-10-28, com o pin 5b27d09c088f: os quatro PRs estão abertos, todos com merge da onion/vendor limpo, HARD 0 antes e depois, e o bloqueio do gate provado pela REGRA 8 (Inventário canônico sincronizado com o filesystem). O PR 157 da curadoria está verde, e a onion/vendor dela foi empurrada em fast-forward, como ela aceita. O PR 165 do sge está verde e traz a kg-ssot 4.37.0 num commit à parte, porque o vendor da kg-ssot do sge é dele e o update do Onion não o toca; a sessão dona roda o kg_gate.py --update e faz o deploy do servidor do chat depois do merge. O PR 290 do kg-ssot tem o check conformance vermelho até a sessão dona gravar a catraca no pin novo (kg_ratchet.py --update com o core, medido numa worktree descartável: o teste da catraca passa depois). O PR 1656 do brain foi feito numa worktree separada, sem tocar o checkout em uso, e torna o PR 1652 desnecessário: os dois mexem na mesma linha do carimbo da kg-ssot, e este já leva o commit do espelho público da 4.37.0. A entrega do brain em 31/10 manda no calendário do merge dele. O merge é de cada sessão dona; o registro recarimba cada um num 2º selo, depois do merge; este nó fecha quando os quatro entrarem."
   - id: Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA
     node_type: question
     layer: audit
@@ -478,6 +490,9 @@ nodes:
     label: "O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)?"
     narrative: "O maestro anotou em 2026-10-27: «gostei desta questão de gerenciamento do core das pendências de sessões, vamos acompanhar isso… candidato a doutrina ou ferramenta». Gatilho de promoção: duas semanas ou mais de uso com as sessões consultando o grafo, e um caso medido em que ele evitou erro de ordem ou de dono. Medidas a acompanhar: pendências abertas e fechadas por semana, consultas pelas sessões e retrabalho evitado. Revisitar em 2026-11-10."
 edges:
+  - from: Q_COORD_UPDATE_4_ADOTANTES_4370
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
