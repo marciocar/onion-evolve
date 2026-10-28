@@ -110,6 +110,10 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 >   vez: **nunca escolha «não perguntar de novo»**. Na R1 essa escolha gravou `"allow": ["mcp__a2a-rt__read_inbox"]`
 >   no `~/rt-sessao-vps/.claude/settings.local.json`, e a R2 da VPS deu INCONCLUSIVO por isso. Se escolher sem
 >   querer, apague o arquivo antes da rodada seguinte.
+> - **Carimbo de cripto na VPS.** O `read_inbox` só marca `verified-crypto="true"` se o razão de aceites for privado.
+>   Medido em 2026-10-28: o razão (`.claude/sessions/.a2a-accept.onion-evolve.ledger`) e a pasta dele têm ACL de
+>   escrita de outro usuário do sistema (`getfacl`). Enquanto ela existir, a mensagem chega com `false` e o motivo.
+>   Tirar a ACL (`setfacl -x`, e a padrão da pasta) é decisão sua.
 > - **Envio fora da sessão.** O envio é sempre num **terminal SEPARADO**, nunca com `!` dentro da sessão de
 >   teste (lá o script recusa, e a tentativa suja o gravador). O `draft_message` devolve o comando completo; copie-o.
 >

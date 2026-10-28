@@ -67,9 +67,11 @@ clean)
   done
   for n in "${SERVERS[@]}"; do case "${n}" in ''|*[!A-Za-z0-9_-]*) die "nome de servidor fora da forma: ${n}" ;; esac; done
   SJ="$(printf '%s\n' "${SERVERS[@]}" | jq -R . | jq -sc 'unique')"
-  # por PREFIXO literal (startswith), não por regex montada do nome: o nome não vira metacaractere
+  # por PREFIXO literal (startswith), não por regex montada do nome: o nome não vira metacaractere. Curinga mais
+  # largo (mcp__*, mcp__a2a-*) que cobre um servidor do teste também conta (passada adversarial de 2026-10-28)
   hits="$(jq -r --argjson s "${SJ}" 'select(.allow) | .file as $f | .allow[] | . as $r
-    | select([$s[] as $n | ($r == "mcp__" + $n) or ($r | startswith("mcp__" + $n + "__"))] | any) | "\($f): \(.)"' "${a}")"
+    | select([$s[] as $n | ($r == "mcp__" + $n) or ($r | startswith("mcp__" + $n + "__"))
+      or (($r | startswith("mcp__")) and ($r | contains("*")) and (("mcp__" + $n + "__") | startswith($r | split("*")[0])))] | any) | "\($f): \(.)"' "${a}")"
   modes="$(jq -r 'select(.defaultMode != null and .defaultMode != "default") | "\(.file): defaultMode=\(.defaultMode)"' "${a}")"
   # defaultMode fora de default num arquivo é AVISO, não reprovação: o --settings do receptor fixa
   # default por cima, e o modo REAL de cada réplica é o permission_mode que o hook grava (o juiz cobra).

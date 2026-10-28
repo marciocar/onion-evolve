@@ -16236,6 +16236,13 @@ PY
     _rt_has "${tc}" "bash /srv/core/.claude/utils/federation-transport/a2a-rt-send.sh --side core --draft h2 --state ${sb}/hint-core" || return 1
     _rt_has "${tc}" "terminal SEPARADO" || return 1
     ! _rt_has "${tc}" "--endpoint" || return 1   # o core grava no outbox: endpoint não é dele
+    # config incompleta: placeholder sem metacaractere de shell, e a variável que falta dita por nome
+    local oi ti; rm -rf "${sb}/hint-inc"
+    oi="$(HOME="${H}" A2A_RT_STATE="${sb}/hint-inc" A2A_RT_INBOX_MODE=envelope python3 -I "$1" < "${sb}/h2.req")"
+    ti="$(_rt_text "${oi}" 1)"
+    _rt_has "${ti}" "Config incompleta nesta ponta: troque A2A_RT_SEND_SCRIPT, A2A_RT_ME, A2A_RT_ENDPOINT" || return 1
+    ti="${ti#*rode: }"
+    ! grep -q '[<>|;&`$()]' <<< "${ti}" || return 1
     return 0
   }
   if _rt_hint "${mcp}"; then record_pass "a2a-rt (b2): o draft_message devolve o comando de envio COMPLETO (caminho, --side da ponta; no membro --from, --endpoint e --thread) para um terminal SEPARADO, também na repetição idempotente"
@@ -16413,12 +16420,14 @@ PY
   local ja jb na nb
   ja="$(printf a | openssl dgst -sha256 | awk '{print $NF}')"; jb="$(printf b | openssl dgst -sha256 | awk '{print $NF}')"
   na="$(_rt_doc membro-x "${ja}" "RESPOSTA-ACEITA")"; nb="$(_rt_doc membro-x "${jb}" "DOC-FORJADO-FORA-DO-RAZAO")"
-  printf '%s task-1 %s\n' "${ja}" "${na}" > "${LED}"
+  # o razão na forma do a2a-accept.sh desde 2026-10-28: 4ª coluna = sha256 do doc, arquivo 0600 (privado)
+  local dsa; dsa="$(openssl dgst -sha256 < "${DI}/${na}" | awk '{print $NF}')"
+  printf '%s task-1 %s %s\n' "${ja}" "${na}" "${dsa}" > "${LED}"; chmod 600 "${LED}"
   printf 'nota solta\n' > "${DI}/2026-10-27-outra-coisa.md"
   printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"read_inbox","arguments":{}}}' > "${sb}/vps.req"
-  _rt_vps() {  # $1 = mcp · $2 = razão (vazio = sem a env) → texto do read_inbox
+  _rt_vps() {  # $1 = mcp · $2 = razão (vazio = sem a env) · $3 = caixa (default a do core) → texto do read_inbox
     local o; rm -rf "${sb}/vps-state"
-    o="$(HOME="${H}" A2A_RT_STATE="${sb}/vps-state" A2A_RT_ME=onion-evolve A2A_RT_INBOX_MODE=inbox-doc A2A_RT_INBOX="${DI}" \
+    o="$(HOME="${H}" A2A_RT_STATE="${sb}/vps-state" A2A_RT_ME=onion-evolve A2A_RT_INBOX_MODE=inbox-doc A2A_RT_INBOX="${3:-${DI}}" \
       env ${2:+A2A_RT_ACCEPT_LEDGER="$2"} python3 -I "$1" < "${sb}/vps.req")"
     _rt_text "${o}" 1
   }
@@ -16428,7 +16437,7 @@ PY
     _rt_has "${ov}" "RESPOSTA-ACEITA" || return 1
     # achado c (2026-10-28): o razão é a prova do aceite, que reverificou; o carimbo é true, com a ORIGEM explícita
     _rt_has "${ov}" 'channel="a2a-federation" verified-crypto="true" verified-semantic="false"' || return 1
-    _rt_has "${ov}" "cripto: reverificada no aceite (a2a-accept.sh, razão de aceites), não por este MCP" || return 1
+    _rt_has "${ov}" "cripto: reverificada no aceite (a2a-accept.sh, razão de aceites privado e sha256 do doc conferido), não por este MCP" || return 1
     ! _rt_has "${ov}" "DOC-FORJADO-FORA-DO-RAZAO" || return 1
     ! _rt_has "${ov}" "nota solta" || return 1
     return 0
@@ -16452,24 +16461,71 @@ PY
   python3 - "${mcp}" "${mut}/vc.py" <<'PY'
 import sys
 s = open(sys.argv[1], encoding="utf-8").read()
-a = '    meta = {"from": o.group(1), "kid": "-", "jti": "sha256:" + js[:16], "thread": "-", "crypto": "true",\n'
+a = '    if doc_sha and private:\n'
 assert a in s
-open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, a.replace('"crypto": "true"', '"crypto": "false"'), 1))
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, '    if False:  # MUTANTE: nunca carimba\n', 1))
 PY
   if [ ! -f "${mut}/vc.py" ]; then record_fail "a2a-rt (c-cripto) mutante" "a âncora do carimbo sumiu"
   elif _rt_vps_ok "${mut}/vc.py"; then record_fail "a2a-rt (c-cripto) mutante" "o doc reverificado no aceite marcado verified-crypto=false passou"
   else record_pass "a2a-rt (c-cripto) mutante: o doc reverificado no aceite com verified-crypto=false (a forma antiga) reprova"; fi
+  # as duas amarras do carimbo (passada adversarial de 2026-10-28): o sha do doc confere, e o razão é privado. Sem a
+  # 1ª o corpo podia mudar depois do aceite; sem a 2ª outro usuário (o razão vivo tinha ACL de outro) escreve a linha.
+  _rt_amarras() {  # $1 = mcp → 0 se: doc alterado recusa; linha antiga e razão não privado chegam com "false"
+    local o L2="${sb}/amarra.ledger"
+    cp "${DI}/${na}" "${sb}/na.bak"; printf 'linha forjada depois do aceite\n' >> "${DI}/${na}"
+    o="$(_rt_vps "$1" "${LED}")"; cp "${sb}/na.bak" "${DI}/${na}"
+    _rt_has "${o}" "o doc mudou depois do aceite" || return 1
+    ! _rt_has "${o}" "RESPOSTA-ACEITA" || return 1
+    printf '%s task-1 %s\n' "${ja}" "${na}" > "${L2}"; chmod 600 "${L2}"
+    o="$(_rt_vps "$1" "${L2}")"
+    _rt_has "${o}" "RESPOSTA-ACEITA" && _rt_has "${o}" 'verified-crypto="false"' && _rt_has "${o}" "forma antiga" || return 1
+    cp "${LED}" "${L2}"; chmod 660 "${L2}"
+    o="$(_rt_vps "$1" "${L2}")"
+    _rt_has "${o}" 'verified-crypto="false"' && _rt_has "${o}" "não é privado" || return 1
+    if command -v setfacl >/dev/null 2>&1; then
+      cp "${LED}" "${L2}"; chmod 600 "${L2}"
+      if setfacl -m "u:$(id -un):rw" "${L2}" 2>/dev/null && [ -n "$(getfacl -cp "${L2}" 2>/dev/null | grep '^user:[^:]')" ]; then
+        o="$(_rt_vps "$1" "${L2}")"
+        _rt_has "${o}" 'verified-crypto="false"' && _rt_has "${o}" "não é privado" || return 1
+      fi
+    fi
+    return 0
+  }
+  if _rt_amarras "${mcp}"; then record_pass "a2a-rt (c-amarras): doc alterado depois do aceite é recusado; linha do razão sem o sha do doc, razão com escrita de grupo ou com ACL chegam com verified-crypto=false e o motivo"
+  else record_fail "a2a-rt (c-amarras)" "$(_rt_vps "${mcp}" "${sb}/amarra.ledger" | head -c 400)"; fi
+  python3 - "${mcp}" "${mut}/am1.py" "${mut}/am2.py" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = '    if doc_sha and private:\n'
+b = '    if doc_sha and hashlib.sha256(raw).hexdigest() != doc_sha:\n'
+assert a in s and b in s
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, '    if True:  # MUTANTE: carimba sem as amarras\n', 1))
+open(sys.argv[3], "w", encoding="utf-8").write(s.replace(b, '    if False:  # MUTANTE: não confere o sha do doc\n', 1))
+PY
+  if [ ! -f "${mut}/am1.py" ] || [ ! -f "${mut}/am2.py" ]; then record_fail "a2a-rt (c-amarras) mutantes" "as âncoras das amarras sumiram"
+  else
+    if _rt_amarras "${mut}/am1.py"; then record_fail "a2a-rt (c-amarras) mutante" "o carimbo sem as amarras passou"
+    else record_pass "a2a-rt (c-amarras) mutante: carimbar true sem o sha do doc e sem razão privado reprova"; fi
+    if _rt_amarras "${mut}/am2.py"; then record_fail "a2a-rt (c-amarras) mutante 2" "o doc alterado depois do aceite passou"
+    else record_pass "a2a-rt (c-amarras) mutante 2: sem conferir o sha do doc, o doc alterado depois do aceite chega e reprova"; fi
+  fi
 
   # achado d (2026-10-28): razão AUSENTE porque nunca houve aceite = "nenhuma mensagem"; ilegível ou corrompido recusa.
   # Ausente não abre buraco: com o razão vazio, o doc na forma certa não chega.
   _rt_ledger() {  # $1 = mcp → 0 se ausente diz "nenhuma mensagem" sem entregar, e corrompido/symlink/o+w/sem diretório recusam
     local o
-    o="$(_rt_vps "$1" "${sb}/ledger-dir/ainda-nao.ledger")"
+    mkdir -p "${sb}/inbox-vazia"
+    o="$(_rt_vps "$1" "${sb}/ledger-dir/ainda-nao.ledger" "${sb}/inbox-vazia")"
     _rt_has "${o}" "nenhuma mensagem: ainda não houve aceite" || return 1
     _rt_has "${o}" "read_inbox: 0 nova(s)" || return 1
     ! _rt_has "${o}" "recusado" || return 1
+    # ausente COM docs a2a na caixa não é "nunca houve aceite" (razão apagado?): avisa, e nada chega
+    o="$(_rt_vps "$1" "${sb}/ledger-dir/ainda-nao.ledger")"
+    _rt_has "${o}" "AVISO: o razão de aceites não existe, mas há 2 doc(s) a2a no inbox" || return 1
+    ! _rt_has "${o}" "nenhuma mensagem: ainda não houve aceite" || return 1
+    ! _rt_has "${o}" "recusado" || return 1
     ! _rt_has "${o}" "RESPOSTA-ACEITA" || return 1
-    printf '%s task-1 %s\nLIXO-NO-RAZAO\n' "${ja}" "${na}" > "${sb}/ledger-dir/corrompido.ledger"
+    printf '%s task-1 %s\nLIXO-NO-RAZAO\n' "${ja}" "${na}" > "${sb}/ledger-dir/corrompido.ledger"; chmod 600 "${sb}/ledger-dir/corrompido.ledger"
     o="$(_rt_vps "$1" "${sb}/ledger-dir/corrompido.ledger")"
     _rt_has "${o}" "recusado: razão de aceites corrompido" || return 1
     ! _rt_has "${o}" "RESPOSTA-ACEITA" || return 1
@@ -16489,10 +16545,10 @@ PY
   python3 - "${mcp}" "${mut}/la.py" "${mut}/lc.py" <<'PY'
 import sys
 s = open(sys.argv[1], encoding="utf-8").read()
-a = '            return {}, "ausente"\n'
-b = '                    return None, f"razão de aceites corrompido (linha {i} fora da forma)"\n'
+a = '            return {}, "ausente", False\n'
+b = '                    return None, f"razão de aceites corrompido (linha {i} fora da forma)", False\n'
 assert a in s and b in s
-open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, '            return None, "razão de aceites ausente ou ilegível"  # MUTANTE: a forma antiga\n', 1))
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, '            return None, "razão de aceites ausente ou ilegível", False  # MUTANTE: a forma antiga\n', 1))
 open(sys.argv[3], "w", encoding="utf-8").write(s.replace(b, '                    continue  # MUTANTE: linha corrompida ignorada\n', 1))
 PY
   if [ ! -f "${mut}/la.py" ] || [ ! -f "${mut}/lc.py" ]; then record_fail "a2a-rt (d-razão) mutantes" "as âncoras do razão sumiram"
@@ -16583,7 +16639,7 @@ PY
     python3 - "${snd}" "${mut}/send/dr.sh" <<'PY'
 import sys
 s = open(sys.argv[1], encoding="utf-8").read()
-a = """  grep -v '^(dry-run: ' "${WORK}/build.err" >&2 || true\n"""
+a = """  grep -v '^(dry-run: ' "${WORK}/build.err" >&2 || [ "$?" -eq 1 ] || die "não consegui ler o stderr da montagem (${WORK}/build.err)"\n"""
 assert a in s
 open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, """  cat "${WORK}/build.err" >&2  # MUTANTE: sem o filtro\n""", 1))
 PY
@@ -16643,6 +16699,13 @@ PY
       rc=0; HOME="${H}" A2A_SPIKE_STATE="${sb}/snap" bash "$1" --assert-clean rt2 >/dev/null 2>&1 || rc=$?; [ "${rc}" = 0 ] || return 1
       rc=0; HOME="${H}" A2A_SPIKE_STATE="${sb}/snap" bash "$1" --assert-clean rt2 --mcp-config "${sb}/rt-mcp.json" >/dev/null 2>&1 || rc=$?; [ "${rc}" = 1 ] || return 1
       rc=0; HOME="${H}" A2A_SPIKE_STATE="${sb}/snap" bash "$1" --assert-clean rt2 --mcp-config "${sb}/rt-mcp-ruim.json" >/dev/null 2>&1 || rc=$?; [ "${rc}" = 2 ] || return 1
+      # curinga largo que cobre um servidor do teste conta; o que não cobre, não
+      printf '{"permissions":{"allow":["mcp__a2a-*"]}}' > "${PJ}/.claude/settings.local.json"
+      HOME="${H}" A2A_SPIKE_STATE="${sb}/snap" bash "$1" --label rt3 --project "${PJ}" >/dev/null 2>&1 || return 1
+      rc=0; HOME="${H}" A2A_SPIKE_STATE="${sb}/snap" bash "$1" --assert-clean rt3 >/dev/null 2>&1 || rc=$?; [ "${rc}" = 1 ] || return 1
+      printf '{"permissions":{"allow":["mcp__zeta*"]}}' > "${PJ}/.claude/settings.local.json"
+      HOME="${H}" A2A_SPIKE_STATE="${sb}/snap" bash "$1" --label rt4 --project "${PJ}" >/dev/null 2>&1 || return 1
+      rc=0; HOME="${H}" A2A_SPIKE_STATE="${sb}/snap" bash "$1" --assert-clean rt4 >/dev/null 2>&1 || rc=$?; [ "${rc}" = 0 ] || return 1
       return 0
     }
     if _rt_snap "${snap}"; then record_pass "a2a-rt (a-foto): --assert-clean acusa o mcp__a2a-rt lembrado e os servidores do mcp.json em uso; mcp__a2a-rtx (prefixo parecido) não conta; mcp.json ilegível = rc 2"
@@ -16651,9 +16714,10 @@ PY
     python3 - "${snap}" "${mut}/snap/s.sh" <<'PY'
 import sys
 s = open(sys.argv[1], encoding="utf-8").read()
-a = '| select([$s[] as $n | ($r == "mcp__" + $n) or ($r | startswith("mcp__" + $n + "__"))] | any) |'
-assert a in s
-open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, '| select(test("^mcp__a2a-spike(__|$)")) |', 1))
+import re
+m = re.search(r'\| select\(\[\$s\[\] as \$n .*?\] \| any\) \|', s, re.S)
+assert m
+open(sys.argv[2], "w", encoding="utf-8").write(s[:m.start()] + '| select(test("^mcp__a2a-spike(__|$)")) |' + s[m.end():])
 PY
     if [ ! -f "${mut}/snap/s.sh" ]; then record_fail "a2a-rt (a-foto) mutante" "a âncora da lista de servidores sumiu"
     elif _rt_snap "${mut}/snap/s.sh"; then record_fail "a2a-rt (a-foto) mutante" "o casamento fixo em ^mcp__a2a-spike passou"
@@ -16762,6 +16826,37 @@ YML
   else record_fail "a2a-accept: (SAC-150 N3) hash do corpo" "sem sha256/verified_semantic"; fi
   case "$(basename "${doc}")" in *-a2a-acme-$(printf '%s' jti-ok-1 | _a2a_fx_sha | cut -c1-16).md) record_pass "a2a-accept: (SAC-150 N6) o nome do doc vem do jti ASSINADO (sha256), não do signal.id" ;;
     *) record_fail "a2a-accept: (SAC-150 N6) nome pelo jti" "doc=$(basename "${doc}")" ;; esac
+  # ida e volta de 2026-10-28: a linha do razão traz o sha256 do doc como escrito (4ª coluna), e o razão nasce sem
+  # escrita de grupo nem de outros (umask 077); o a2a-rt-mcp.py só carimba cripto com as duas coisas
+  _acc_ledger_ok() {  # $1 = arquivo do razão · $2 = doc → 0 se a linha do doc tem o sha dele e o razão não é g/o-gravável
+    local ln dsha; dsha="$(openssl dgst -sha256 < "$2" | awk '{print $NF}')"
+    ln="$(awk -v n="$(basename "$2")" '$3 == n' "$1")"
+    [ "$(awk '{print NF}' <<< "${ln}")" = 4 ] && [ "$(awk '{print $4}' <<< "${ln}")" = "${dsha}" ] || return 1
+    [ $(( 0$(stat -c %a "$1") & 022 )) = 0 ] || return 1
+    return 0
+  }
+  if _acc_ledger_ok "${d}/ledger" "${doc}"; then record_pass "a2a-accept: a linha do razão de aceites traz o sha256 do doc (4ª coluna) e o razão nasce sem escrita de grupo nem de outros"
+  else record_fail "a2a-accept: razão com o sha do doc" "linha: $(awk -v n="$(basename "${doc}")" '$3 == n' "${d}/ledger") · modo $(stat -c %a "${d}/ledger")"; fi
+  local mft="${d}/mut-ft"; mkdir -p "${mft}/.claude/utils"
+  cp -r "${REPO_ROOT}/.claude/utils/federation-transport" "${REPO_ROOT}/.claude/utils/guardrails" "${mft}/.claude/utils/"
+  mkdir -p "${mft}/.claude/validation"; cp "${REPO_ROOT}/.claude/validation/trust-topology-check.sh" "${mft}/.claude/validation/"   # o gate o acha pela raiz da instalação
+  python3 - "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = """( umask 077; printf '%s %s %s %s\\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" "${DOC_SHA}" >> "${LEDGER}" ) 2>/dev/null"""
+assert a in s, "ancora"
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, """printf '%s %s %s\\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" >> "${LEDGER}" 2>/dev/null""", 1))
+PY
+  if cmp -s "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: razão com o sha do doc (mutante)" "a âncora da linha do razão sumiu"
+  else
+    local rmu="${d}/r-mut-ledger.json" ibm="${d}/inbox-mut"; mkdir -p "${ibm}"
+    _arec acme onion-evolve jti-mut-ledger "$((NOW-60))" "corpo do mutante do razão" "${rmu}"
+    rc=0; out="$(bash "${mft}/.claude/utils/federation-transport/a2a-accept.sh" "${rmu}" --inbox "${ibm}" --trust-repo "${tr}" --ledger "${d}/ledger-mut" 2>&1)" || rc=$?
+    local dmu; dmu="$(find "${ibm}" -maxdepth 1 -name '*-a2a-acme-*.md' | head -1)"
+    if [ "${rc}" != 0 ] || [ -z "${dmu}" ]; then record_fail "a2a-accept: razão com o sha do doc (mutante)" "o mutante não aceitou (rc ${rc}): o caso não prova a coluna $(head -c 300 <<< "${out}")"
+    elif _acc_ledger_ok "${d}/ledger-mut" "${dmu}"; then record_fail "a2a-accept: razão com o sha do doc (mutante)" "a linha de 3 colunas passou"
+    else record_pass "a2a-accept: razão com o sha do doc (mutante): a linha sem o sha do doc (a forma antiga) reprova"; fi
+  fi
 
   # (2) idempotente: o mesmo registro de novo → rc 0 "já aceito"; inclusive depois de ir para _processed
   _acc "${rec}" --inbox "${ib}"

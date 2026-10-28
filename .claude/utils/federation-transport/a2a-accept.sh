@@ -341,7 +341,11 @@ PY
 # nome previsível não é seguido
 ( set -C; cat "${TMP}/doc.md" > "${OUT}" ) 2>/dev/null || refuse "não consegui criar ${OUT} (já existe, ou o diretório recusa) — nada sobrescrito."
 mkdir -p "$(dirname "${LEDGER}")" 2>/dev/null
-printf '%s %s %s\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" >> "${LEDGER}" 2>/dev/null \
+# 4ª coluna (ida e volta de 2026-10-28): o sha256 do doc COMO ESCRITO. Sem ela a linha liga o jti só ao NOME, e o
+# corpo do doc podia mudar depois do aceite sem ninguém ver; com ela, quem lê o inbox (a2a-rt-mcp.py) confere o
+# conteúdo antes de dizer que o envelope foi provado. O razão nasce 0600 (umask 077): ele é a prova do aceite.
+DOC_SHA="$(openssl dgst -sha256 < "${TMP}/doc.md" | awk '{print $NF}')"
+( umask 077; printf '%s %s %s %s\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" "${DOC_SHA}" >> "${LEDGER}" ) 2>/dev/null \
   || echo "AVISO: o doc foi criado, mas o razão de aceites (${LEDGER}) não foi gravado: o dedupe fica só pelo nome." >&2
 
 echo "aceito → ${OUT}"

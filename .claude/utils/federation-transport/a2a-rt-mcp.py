@@ -163,16 +163,29 @@ def _send_hint(draft_id, thread):
     DENTRO da sessão, onde o script recusa (CLAUDECODE no ambiente). Só texto: nada aqui roda, assina ou envia.
     """
     q = shlex.quote
-    cmd = ["bash", q(SEND_SCRIPT) if SEND_SCRIPT else "<checkout>/.claude/utils/federation-transport/a2a-rt-send.sh",
-           "--side", SIDE if SIDE in ("core", "member") else "<core|member>", "--draft", draft_id]
+    # faltando config, PLACEHOLDER sem metacaractere de shell (`<`, `|` e `>` colados criariam arquivo e pipe) e a
+    # variável que falta dita por nome (passada adversarial de 2026-10-28)
+    missing = []
+    if not SEND_SCRIPT:
+        missing.append("A2A_RT_SEND_SCRIPT")
+    if SIDE not in ("core", "member"):
+        missing.append("A2A_RT_SIDE")
+    cmd = ["bash", q(SEND_SCRIPT) if SEND_SCRIPT else "CAMINHO_DO_CHECKOUT/.claude/utils/federation-transport/a2a-rt-send.sh",
+           "--side", SIDE if SIDE in ("core", "member") else "LADO", "--draft", draft_id]
     if os.path.abspath(STATE) != os.path.abspath(DEFAULT_STATE):
         cmd += ["--state", q(STATE)]
     if SIDE == "member":
-        cmd += ["--from", ME if ID_RE.fullmatch(ME or "") else "<seu id>", "--endpoint", q(ENDPOINT) if ENDPOINT else "<endpoint /a2a>"]
+        if not ID_RE.fullmatch(ME or ""):
+            missing.append("A2A_RT_ME")
+        if not ENDPOINT:
+            missing.append("A2A_RT_ENDPOINT")
+        cmd += ["--from", ME if ID_RE.fullmatch(ME or "") else "SEU_ID", "--endpoint", q(ENDPOINT) if ENDPOINT else "ENDPOINT_A2A"]
         if thread:
             cmd += ["--thread", thread]
-    return ("Só o humano envia: num terminal SEPARADO, fora desta sessão (nunca com ! aqui dentro, onde o script "
-            "recusa), rode: " + " ".join(cmd))
+    # o aviso vem ANTES do "rode:": o comando é o fim da linha, para colar sem levar texto junto
+    head = (f"Config incompleta nesta ponta: troque {', '.join(missing)} pelo valor real no comando. " if missing else "")
+    return (head + "Só o humano envia: num terminal SEPARADO, fora desta sessão (nunca com ! aqui dentro, onde o "
+            "script recusa), rode: " + " ".join(cmd))
 
 
 def draft_message(args):
@@ -278,53 +291,72 @@ FM_ORIG = re.compile(r'^origem: "([A-Za-z0-9][A-Za-z0-9._-]{0,63}) \(via a2a-liv
 DOC_NAME = re.compile(r"\d{4}-\d{2}-\d{2}-a2a-([A-Za-z0-9][A-Za-z0-9._-]{0,63})-([0-9a-f]{16})\.md\Z")
 
 
+def _ledger_private(st, fd):
+    """O razão só pode carimbar cripto se SÓ este usuário escreve nele: dono, sem escrita de grupo nem de outros,
+    sem ACL (passada adversarial de 2026-10-28: o razão vivo na VPS tinha `user:<outro usuário>:rwx` por ACL, e o
+    `664` que o modo mostrava era a máscara dela). Na dúvida (xattr ilegível), não é privado."""
+    if st.st_mode & 0o022:
+        return False
+    try:
+        return "system.posix_acl_access" not in os.listxattr(fd)
+    except OSError:
+        return False
+
+
 def _ledger():
-    """→ (razão, motivo). razão = {jti_sha256: arquivo} do a2a-accept.sh; None = recusa (falha fechado).
+    """→ (razão, motivo, privado). razão = {jti_sha256: (arquivo, sha256 do doc ou "")}; None = recusa.
 
     Dois casos que a forma antiga confundia (achado d, ida e volta de 2026-10-28): o razão AUSENTE porque nunca
-    houve aceite (o a2a-accept.sh o cria no 1º aceite) é razão VAZIO, e o read_inbox diz "nenhuma mensagem"; o
-    razão ILEGÍVEL ou CORROMPIDO segue recusando. Vazio não abre buraco: sem linha no razão, nenhum doc chega.
-    Só conta como "nunca houve aceite" o arquivo que não existe num diretório que existe: env vazia ou
-    diretório ausente é configuração errada, e recusa.
+    houve aceite (o a2a-accept.sh o cria no 1º aceite) é razão VAZIO, e o read_inbox não entrega nada; o razão
+    ILEGÍVEL ou CORROMPIDO segue recusando. Vazio não abre buraco: sem linha no razão, nenhum doc chega. Só conta
+    como ausente o arquivo que não existe num diretório que existe: env vazia ou diretório ausente é configuração
+    errada, e recusa. Abre com O_NOFOLLOW e julga o PRÓPRIO descritor (fstat): sem janela entre olhar e ler.
     """
     if not ACCEPT_LEDGER:
-        return None, "razão de aceites não configurado"
+        return None, "razão de aceites não configurado", False
     try:
-        st = os.lstat(ACCEPT_LEDGER)
+        fd = os.open(ACCEPT_LEDGER, os.O_RDONLY | os.O_NOFOLLOW)
     except FileNotFoundError:
         if os.path.isdir(os.path.dirname(os.path.abspath(ACCEPT_LEDGER))):
-            return {}, "ausente"
-        return None, "o diretório do razão de aceites não existe (configuração?)"
+            return {}, "ausente", False
+        return None, "o diretório do razão de aceites não existe (configuração?)", False
     except OSError:
-        return None, "razão de aceites ilegível"
-    # o razão é a prova que autoriza a entrega E o carimbo de cripto do aceite: só vale o arquivo regular, do
-    # próprio usuário e não gravável por outros (o grupo privado do umask 002 é o caso medido na VPS: 664)
-    if not stat.S_ISREG(st.st_mode):
-        return None, "razão de aceites não é arquivo regular (symlink?)"
-    if st.st_uid != os.geteuid() or st.st_mode & 0o002:
-        return None, "razão de aceites com outro dono ou gravável por outros"
-    out = {}
+        if os.path.islink(ACCEPT_LEDGER):
+            return None, "razão de aceites não é arquivo regular (symlink?)", False
+        return None, "razão de aceites ilegível", False
     try:
-        with open(ACCEPT_LEDGER, encoding="utf-8") as f:
+        st = os.fstat(fd)
+        if not stat.S_ISREG(st.st_mode):
+            return None, "razão de aceites não é arquivo regular (symlink?)", False
+        if st.st_uid != os.geteuid() or st.st_mode & 0o002:
+            return None, "razão de aceites com outro dono ou gravável por outros", False
+        private = _ledger_private(st, fd)
+        out = {}
+        with os.fdopen(os.dup(fd), encoding="utf-8") as f:
             for i, ln in enumerate(f, 1):
                 if not ln.strip():
                     continue
                 parts = ln.split()
-                if len(parts) != 3 or not SHA_RE.fullmatch(parts[0]) or not DOC_NAME.fullmatch(parts[2]):
-                    return None, f"razão de aceites corrompido (linha {i} fora da forma)"
-                out[parts[0]] = parts[2]
+                # 3 colunas: a forma de antes de 2026-10-28 (sem o sha do doc); 4: com ele
+                if (len(parts) not in (3, 4) or not SHA_RE.fullmatch(parts[0]) or not DOC_NAME.fullmatch(parts[2])
+                        or (len(parts) == 4 and not SHA_RE.fullmatch(parts[3]))):
+                    return None, f"razão de aceites corrompido (linha {i} fora da forma)", False
+                out[parts[0]] = (parts[2], parts[3] if len(parts) == 4 else "")
     except Exception:
-        return None, "razão de aceites ilegível"
-    return out, "ok"
+        return None, "razão de aceites ilegível", False
+    finally:
+        os.close(fd)
+    return out, "ok", private
 
 
-def _read_doc(path, ledger):
+def _read_doc(path, ledger, private):
     name = os.path.basename(path)
     nm = DOC_NAME.fullmatch(name)
     if not nm:
         return False, "", {}, "", "nome fora da forma do a2a-accept.sh"
     try:
-        t = open(path, encoding="utf-8").read()
+        raw = open(path, "rb").read()
+        t = raw.decode("utf-8")
     except Exception:
         return False, "", {}, "", "doc ilegível"
     if not t.startswith("---\n") or "\n---\n" not in t[4:]:
@@ -338,16 +370,26 @@ def _read_doc(path, ledger):
     if js[:16] != nm.group(2) or o.group(1) != nm.group(1):
         return False, "", {}, "", "nome, jti e origem não batem entre si"
     # o frontmatter é texto que qualquer escritor do inbox escreve: a prova é o RAZÃO de aceites
-    if ledger.get(js) != name:
+    entry = ledger.get(js)
+    if not entry or entry[0] != name:
         return False, "", {}, "", "não está no razão de aceites do a2a-accept.sh"
-    # verified-crypto=true (achado c, ida e volta de 2026-10-28): quem provou o envelope foi o a2a-accept.sh, que
-    # só grava a linha do razão DEPOIS de reverificar (gate --reverify-at: JWS, kid-binding, janela, body_sha256) e
-    # que emoldura o próprio corpo com verified-crypto true. O razão é a mesma prova que já autoriza a entrega aqui;
-    # marcar false desmentia a moldura de dentro do doc e fez o maestro achar que o aceite não tinha conferido.
-    # A ORIGEM vai explícita no cabeçalho: reverificada no aceite, NÃO por este MCP (o doc não carrega o JWS). O
-    # limite é o de sempre (PRE-REGISTRO.md §1 e §7): quem escreve no razão com o mesmo UID forja os dois.
-    meta = {"from": o.group(1), "kid": "-", "jti": "sha256:" + js[:16], "thread": "-", "crypto": "true",
-            "verif": "reverificada no aceite (a2a-accept.sh, razão de aceites), não por este MCP"}
+    doc_sha = entry[1]
+    if doc_sha and hashlib.sha256(raw).hexdigest() != doc_sha:
+        return False, "", {}, "", "o doc mudou depois do aceite (sha256 diferente do gravado no razão)"
+    # verified-crypto (achado c, ida e volta de 2026-10-28). Quem provou o envelope foi o a2a-accept.sh, que só grava
+    # a linha do razão DEPOIS de reverificar (gate --reverify-at: JWS, kid-binding, janela, body_sha256) e emoldura o
+    # próprio corpo com verified-crypto true. O razão autoriza o "true" aqui SÓ com as duas amarras que a passada
+    # adversarial mostrou faltarem: (1) a linha traz o sha256 do doc e ele confere (sem isso o corpo podia mudar
+    # depois do aceite), e (2) o razão é privado (sem isso outro usuário escreve a linha). Faltando uma, o doc chega
+    # como antes, com "false" e o motivo no cabeçalho. A ORIGEM vai explícita: reverificada no aceite, NÃO por este
+    # MCP (o doc não carrega o JWS). O limite de sempre (PRE-REGISTRO.md §1 e §7): o mesmo UID forja os dois.
+    if doc_sha and private:
+        crypto, verif = "true", "reverificada no aceite (a2a-accept.sh, razão de aceites privado e sha256 do doc conferido), não por este MCP"
+    elif not doc_sha:
+        crypto, verif = "false", "não carimbada: a linha do razão é da forma antiga, sem o sha256 do doc"
+    else:
+        crypto, verif = "false", "não carimbada: o razão de aceites não é privado (escrita de grupo, de outros ou ACL)"
+    meta = {"from": o.group(1), "kid": "-", "jti": "sha256:" + js[:16], "thread": "-", "crypto": crypto, "verif": verif}
     return True, js, meta, t, ""
 
 
@@ -383,18 +425,23 @@ def read_inbox(args):
         names = [n for n in names if n.endswith(".json")]
     else:
         names = [n for n in names if n.endswith(".md") and "-a2a-" in n]
-        ledger, why_l = _ledger()
+        ledger, why_l, private = _ledger()
         if ledger is None:
             raise ToolError(f"{why_l} (A2A_RT_ACCEPT_LEDGER): nada entregue")
-        if why_l == "ausente":
+        if why_l == "ausente" and not names:
             notes.append("nenhuma mensagem: ainda não houve aceite (o razão de aceites do a2a-accept.sh ainda não "
-                         "existe; ele nasce no 1º aceite). Doc a2a sem aceite registrado não chega.")
+                         "existe; ele nasce no 1º aceite).")
+        elif why_l == "ausente":
+            # razão ausente COM docs a2a no inbox não é "nunca houve aceite": pode ser razão apagado (passada
+            # adversarial de 2026-10-28). Nada é entregue, e o sinal não se esconde.
+            notes.append(f"AVISO: o razão de aceites não existe, mas há {len(names)} doc(s) a2a no inbox: o razão pode "
+                         "ter sido apagado ou movido. Nada é entregue sem ele.")
     new, refused, out_ids = [], [], []
     for n in names:
         p = os.path.join(INBOX, n)
         if not os.path.isfile(p) or os.path.islink(p):
             continue
-        ok, mid, meta, body, why = (_verify_envelope(p) if INBOX_MODE == "envelope" else _read_doc(p, ledger))
+        ok, mid, meta, body, why = (_verify_envelope(p) if INBOX_MODE == "envelope" else _read_doc(p, ledger, private))
         if not ok:
             refused.append(f"{n if ID_SAFE.fullmatch(n) else '(nome fora da forma)'}: {why}")
             continue
