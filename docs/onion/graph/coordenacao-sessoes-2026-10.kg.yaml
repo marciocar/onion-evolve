@@ -302,51 +302,51 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.5
     verified_at: "2026-10-28"
     evidence_class: testimony
-    verified_against: "relato da rodada da 4.37.0, em 2026-10-28: o kg-ssot normalizou o resíduo dele à mão para passar no review-artifact-check"
+    verified_against: "medido no PR de manutenção do core em 2026-10-28: grep de elenxo em .claude/utils/adopt/, .claude/commands/meta/adopt.md, ops/ e .claude/validation/; review-artifact-check.sh --schema nos resíduos com «não» do sge e do brain"
     label: "O resíduo de revisão que a rodada de update escreve no adotante usa «elenxo: não», com til, e o review-artifact-check só aceita «nao»."
     narrative: "O kg-ssot normalizou o dele à mão; os outros adotantes vão topar no mesmo. A cura é na fonte que escreve o resíduo na rodada de update, não em cada adotante, com um caso na bancada que prove o resíduo gerado passando no check. Gatilho: o próximo PR de manutenção do core, antes da próxima rodada de update."
   - id: Q_COORD_CORE_CC_UPDATE_2_1_312
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.5
     verified_at: "2026-10-28"
-    verified_against: "pedido da sessão principal do core em 2026-10-28"
+    verified_against: "gh pr view 1428 em 2026-10-28: MERGED às 17:19 UTC, merge d5c58ae6a na main (a rodada 20 do radar do Claude Code)"
     label: "O /meta:cc-update da 2.1.312 do Claude Code."
     narrative: "Update do Claude Code é gatilho de re-medição: o delta do CHANGELOG contra a baseline do eixo do ecossistema Claude Code no radar, julgado por juiz que refuta e selado até o PR mergeado. Gatilho: a sessão do core com janela para a rodada."
   - id: Q_COORD_CORE_DPAREN_END_KG_READ_LEG
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 2
     confidence: 0.5
     verified_at: "2026-10-28"
     evidence_class: testimony
-    verified_against: "relato do sge ao censo cruzado de 2026-10-28"
+    verified_against: "medido no PR de manutenção do core em 2026-10-28: _dparen_end e heredoc_ops tirados do .claude/hooks/kg-read-leg.sh e rodados na forma relatada, e a mesma linha rodada no bash 5"
     label: "Aviso falso do _dparen_end no kg-read-leg.sh: ((a)+(b)) <<E é lido como subshell."
     narrative: "O leitor confunde a aritmética com parêntese interno seguida de heredoc com um subshell, e avisa onde não há defeito. A cura vem com um caso na bancada que reproduz a forma. Gatilho: o PR de manutenção do core."
   - id: Q_COORD_CORE_SELFTEST_9_CASOS_NO_ADOTADO
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.5
     verified_at: "2026-10-28"
     evidence_class: testimony
-    verified_against: "relato do sge ao censo cruzado de 2026-10-28"
+    verified_against: "medido no PR de manutenção do core em 2026-10-28: lint-selftest --families lint_hard_file,r16_table_total,radar_aufhebung,fixtures num clone descartável do sge no pin 1d04d4e24cec (bancada idêntica à do pin): 8 ✗; com a bancada curada, 0 ✗ e 5 ⊘ nomeados; no core os mesmos casos seguem passando"
     label: "Os 9 casos do lint-selftest que falham no adotado (lint-hard-file, r16-table-total, r89-aufhebung, r53-rules-pathscoped): separar o que é ambiente do que é defeito."
     narrative: "Rodada no adotante, a bancada reprova 9 casos que passam no core. Antes de curar, medir cada um: depende do ambiente do core (caminho, ferramenta, arquivo que só existe aqui) ou é defeito do caso. Gatilho: o PR de manutenção do core."
   - id: Q_COORD_MAESTRO_SGE_REGISTRO_PENDENTES
