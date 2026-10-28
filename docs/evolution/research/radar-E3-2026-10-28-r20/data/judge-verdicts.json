@@ -26,5 +26,330 @@
    "check": "para cada item de data/2.1.312.txt, grep do termo-chave no core (.claude, ops, .github, CLAUDE.md) e leitura da superfície achada"
   }
  ],
- "verdicts": []
+ "verdicts": [
+  {
+   "alvo": "CU1: cópia data/2.1.312.txt",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "curl -s do CHANGELOG oficial; awk da seção '## 2.1.312' > sec.txt; cmp sec.txt data/2.1.312.txt → idênticos; 2.1.312 é a seção do topo, sem 2.1.313; grep -c '^- ' = 39; cat -n conferiu as linhas citadas (3, 6, 7, 9, 10, 11, 17, 20, 21, 22, 24, 25, 26, 27, 28, 29, 37-40, 41) e a linha 11 da 2.1.311"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "cópia fiel byte a byte; numeração confere"
+  },
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "bash .claude/validation/cc-delta-census.sh . --markdown → DELTA 1 versão, 2.1.312; baseline 2.1.311, disco 2.1.312, processo 2.1.312, SDK bridge 2.1.310 (SDK 0.3.310); 42 linhas, 39 itens"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "bash .claude/validation/kg-radar.sh <r20>.kg.yaml → integridade ok (14 nós, 14 arestas)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "pergunta do esqueleto; fecha depois de absorver este juízo"
+  },
+  {
+   "alvo": "E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "censo → disco/processo 2.1.312, bridge 2.1.310 (SDK 0.3.310); npm view @anthropic-ai/claude-agent-sdk version claudeCodeVersion time.modified → 0.3.312 / 2.1.312 / 2026-10-27T20:24:34.855Z; onion-review.yml 293 e 440 = 8041f1d1; gh api tags → v1.0.264 d70510b1; compare v1.0.263...v1.0.264 → 2 commits, base-action/action.yml linha 150 = 2.1.312, action.yml só muda a descrição do input plugins; grep plugins: no workflow = zero; gh variable list vazio (revisor desligado por padrão)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "tudo reproduz"
+  },
+  {
+   "alvo": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "censo → bridge no SDK 0.3.310; onion-review.yml = v1.0.263 (3892b25d7); npm e tags → 0.3.312 e v1.0.264"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "alvo atualizado corretamente; ver a omissão da linha 9 no revisor"
+  },
+  {
+   "alvo": "E_SKILLS_COM_PATHS_E_O_CD_PARA_DENTRO_1028",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -lE '^paths:' .claude/skills/*/SKILL.md → onion-patterns e onion-validation; find fora de .claude/skills excluindo worktrees → só vendor/kg-ssot; MAS ls -d ⟨checkout principal⟩/.claude/worktrees/*/.claude/skills | wc -l → 15, cada uma com 14 SKILL.md; git check-ignore → .git/info/exclude:12 '**/.claude/worktrees/'"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(reescrita) vista do checkout principal, cada worktree de agente em .claude/worktrees (15 hoje) é um subdiretório com .claude/skills próprio, com os mesmos 14 nomes: é a skill por diretório da linha 7; um cd da sessão principal para dentro de uma worktree passa a achá-las, duplicadas. Não está medido se o harness varre diretório ignorado por info/exclude nem o efeito da duplicata",
+    "medida": "ls -d .claude/worktrees/*/.claude/skills → 15; ls .claude/worktrees/*/.claude/skills/onion-patterns/SKILL.md → 15; git check-ignore → só info/exclude"
+   },
+   "nota": "o nó excluiu as worktrees do find sem dizer por quê"
+  },
+  {
+   "alvo": "E_WRITE_NAO_SOBRESCREVE_ARQUIVO_GRANDE_LIDO_PELA_METADE_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "git ls-files | grep CLAUDE.md → só a raiz; wc -c -l CLAUDE.md → 344 linhas, 26246 bytes; grep de @ → 0; wc -c .claude/rules/*.md → kg-grammar.md 12507 (77 linhas), dissect-lens.md 3232"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz na árvore rastreada; o CLAUDE.md das worktrees vai como omissão"
+  },
+  {
+   "alvo": "E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "find .claude/commands -name '*.md' | wc -l → 166; fora de ^[a-z0-9-]+$ → 11 README + 4 compliance_*_template; lint-artifacts.sh linha 684 = REGRA 6 [SOFT]; lista de skills da sessão 2.1.312 traz compliance_iso27001_template e README"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz; o revisor do CI vai como omissão"
+  },
+  {
+   "alvo": "E_HOOKS_DE_PROMPT_E_AGENTE_SEM_SUPERFICIE_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "python -I sobre .claude/settings.json → 26 command, timeouts {5,10,15}, 11 sem timeout; settings de usuário → Notification e Stop, command; grep '^hooks:' em agents/skills/commands → 0; type prompt só na fixture de adoção; hooks.json dos plugins instalados no host → zero prompt/agent"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "estendido aos hooks de plugin do host"
+  },
+  {
+   "alvo": "E_AUTOCOMPACTWINDOW_SO_NA_ALLOWLIST_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -n autoCompactWindow agent-frontmatter-keys.tsv → linha 38; grep em .claude/agents → 0; AUTO_COMPACT_WINDOW → só fixture da bancada; env dos settings por python"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "E_TROCA_POR_RECUSA_E_A_GUARDA_DE_MODELO_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n no premodelswitch-guard.sh → linha 68, 71, 77, bloco 76-90; fallbackModel linhas 264-268; session_models do E6; grep DISABLE_REFUSAL_FALLBACK|SIMPLE_SYSTEM_PROMPT → 0"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "confere"
+  },
+  {
+   "alvo": "E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -inE 'worktree|hookspath|git hook' data/2.1.312.txt → zero; gh issue view 85039 e 88747 → OPEN; git config --show-scope core.hooksPath → local, absoluto; trampolim pre-commit 17-50, pre-push 38-71; stat da worktree do juiz e do .git/config"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "o intervalo de 1 ms não se reproduz (o config foi regravado de novo depois); o fato central se mantém"
+  },
+  {
+   "alvo": "E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "ls do diretório de extensões → só anthropic.claude-code-2.1.306-linux-x64; binário embutido --version → 2.1.306; grep vscode no cc-delta-census.sh → zero"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1028",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -rliF -e 'session limit' -e OTEL_ -e OpenTelemetry -e CLAUDE_CODE_ENABLE_TELEMETRY -e pdftoppm -e safety_event -e '5-hour' .claude ops CLAUDE.md .github → só lint-selftest.sh (pdftoppm nas linhas 8030, 8111, 8155, fixture); grep -rliF oidc → 9 arquivos, incluindo onion-review.yml (id-token: write), ops/caddy/Caddyfile, federation-member.md, iso-27001-specialist, o template compliance_iso27001 e lint-selftest.sh"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(reescrita) pdftoppm só aparece como texto de fixture da bancada; oidc aparece em 9 arquivos, entre eles o OIDC do GitHub Actions do revisor (onion-review.yml linha 40); nenhum é o gateway de apps do Claude da linha 3; a conclusão se mantém",
+    "medida": "as duas buscas grep -rliF com a lista exata"
+   },
+   "nota": "conclusão certa com dois números errados"
+  },
+  {
+   "alvo": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_312_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → 6 passaram, 0 falharam, OK"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "superação: E_HOST_NA_2_1_312 SUPERSEDES r19#E_HOST_NA_2_1_311_BRIDGE_E_REVISOR_NA_2_1_310_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n id do alvo na r19 → linha 49; estado caiu: host 2.1.312, workflow v1.0.263 (CLI 2.1.311)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "alvo existe e foi derrubado"
+  },
+  {
+   "alvo": "superação: Q_SUBIR_0_3_312 SUPERSEDES r19#Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_311_E_PIN_DO_REVISOR_PARA_V1_0_263_1026",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n id do alvo na r19 → linha 80; pin cumprido (3892b25d7), alvos superados por 0.3.312/v1.0.264"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "o alvo envelheceu"
+  },
+  {
+   "alvo": "superação: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028 SUPPORTS r19#Q_EXTENSAO_VSCODE_ENTRA_NO_CENSO_OU_SOBE_1026 sem superar r19#E_EXTENSAO_VSCODE_DO_HOST_NA_2_1_306_1026",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: E_EXTENSAO_VSCODE_DO_HOST_NA_2_1_306_1026' r19 → linha 246, label 'cinco versões atrás'; hoje ls e --version → 2.1.306 contra CLI 2.1.312 → seis"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(aresta nova) SUPERSEDES de E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028 para r19#E_EXTENSAO_VSCODE_DO_HOST_NA_2_1_306_1026, mantendo o SUPPORTS para a pergunta: a distância relativa afirmada caiu, o mesmo critério que superou o nó de host",
+    "medida": "ls do diretório de extensões → 2.1.306; censo → disco 2.1.312"
+   },
+   "nota": "os dois nós de versão foram tratados de forma desigual"
+  },
+  {
+   "alvo": "omissão: Remote Control ligado em toda sessão do host (linha 36)",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "python -I com só as chaves do settings de usuário → remoteControlAtStartup=True, crossSessionInbound='accept'; grep -rnF 'Remote Control' .claude/hooks ops → session-beacon-hook.sh linha 50; a linha 36 não aparece na r20"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(nó novo ou absorção) a linha 36 vale no host, onde toda sessão abre o Remote Control; nenhuma guarda do core lê esse estado; o session-beacon só usa a conexão de Remote Control como hipótese de farol",
+    "medida": "chaves do settings de usuário por python; grep em .claude/hooks"
+   },
+   "nota": "baixo impacto; a r19 já o tratou como superfície do host"
+  },
+  {
+   "alvo": "omissão: CLAUDE.md das worktrees aninhadas em .claude/worktrees (linha 6)",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "ls ⟨checkout principal⟩/.claude/worktrees/*/CLAUDE.md | wc -l → 15; wc -c → 26246 cada; git check-ignore → info/exclude:12"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(reescrita do E_WRITE) vista do checkout principal, cada worktree de agente traz um CLAUDE.md de 26.246 bytes e um .claude/rules num subdiretório (15 hoje): é o caso da linha 6 quando a sessão principal edita dentro de uma worktree; o limiar segue não público",
+    "medida": "ls e wc -c dos CLAUDE.md em .claude/worktrees/*/"
+   },
+   "nota": "a casa mede a árvore rastreada; o harness vê o disco"
+  },
+  {
+   "alvo": "omissão: linha 9 no revisor do CI",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "sed -n 290,320p .github/workflows/onion-review.yml → a action roda headless no checkout do PR com os 166 .md de .claude/commands; pin v1.0.263 = CLI 2.1.311 sem a correção; compare v1.0.263...v1.0.264 → 2.1.312; gh variable list vazio"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "(reescrita de E_NOME e Q_SUBIR) a superfície mais direta da linha 9 é o revisor do CI, que roda o CLI 2.1.311 headless numa árvore com nomes fora do kebab-case; o pin v1.0.264 passa a trazer a correção, não só paridade; não medido se a action carrega os comandos do projeto nem se algum nome é inválido; o revisor está desligado por padrão",
+    "medida": "leitura do step da action; gh api compare; find → 166; gh variable list → vazio"
+   },
+   "nota": "vale também para adotantes com CLI anterior (não medido)"
+  }
+ ],
+ "juiz": {
+  "tipo": "subagente general-purpose não-fork",
+  "model": "opus",
+  "effort": "high",
+  "mandato": "REFUTAR",
+  "tokens": 164048,
+  "tool_uses": 54,
+  "duration_ms": 515825
+ }
 }
