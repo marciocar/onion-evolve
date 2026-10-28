@@ -14793,6 +14793,17 @@ _a2a_fx_jws_raw() {  # $1 = payload JSON literal · $2 = kid · $3 = chave priva
   printf '%s.%s.%s' "$h" "$p" "$(printf '%s' "$h.$p" | openssl dgst -sha256 -sign "$3" | _a2a_fx_b64url)"
 }
 
+# PATH ENXUTO SEM PERDER O VENV (medido em 2026-10-28, no pré-voo do PR de manutenção): o python3 do PATH era um venv
+# (~/.venvs/onion-core/bin/python3 -> python), e o symlink dele num diretório do caso faz o Python procurar o
+# pyvenv.cfg ao lado do LINK, não achar e subir o interpretador base, sem PyYAML: os casos do relógio davam
+# tooling-absent:python-yaml em vez do veredito medido. O python3 entra por um invólucro que chama o caminho
+# original (o venv fica de pé); as outras ferramentas seguem por symlink.
+_a2a_tool_link() {  # $1 = caminho da ferramenta, $2 = destino no PATH do caso
+  case "${2##*/}" in
+    python3) printf '#!/bin/sh\nexec "%s" "$@"\n' "$1" > "$2"; chmod +x "$2" ;;
+    *) ln -s "$1" "$2" ;;
+  esac
+}
 run_a2a_verify_selftests() {
   # relógio SINCRONIZADO stubado (SAC-150 N8): a medição agora vence o atestado A2A_CLOCK_TRUST, então os casos
   # que não testam o relógio levam um timedatectl que diz "yes" à frente do PATH — o host do CI (que pode dizer
@@ -14983,7 +14994,7 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   # FAIL-SAFE: openssl fora do PATH → veto tooling-absent (degrade→VETO, nunca skip/allow)
   local bin t p; bin="$(mktemp -d)"
   for t in jq date mktemp python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum; do
-    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -s "$p" "${bin}/$t"
+    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && _a2a_tool_link "$p" "${bin}/$t"
   done
   local se; se="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-safe)" acme onion-evolve "")"
   rc=0; out="$(PATH="${bin}" A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${se}" 2>/dev/null)" || rc=$?
@@ -14996,7 +15007,7 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   # `mkdir` entrou em 2026-10-14: o anti-replay virou fail-closed (gravar o jti É verificar), e o
   # PATH stubado sem mkdir só passava porque a gravação antiga engolia o erro com `|| true`.
   for t in jq date mktemp mkdir python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum openssl; do
-    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -s "$p" "${clkbin}/$t"
+    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && _a2a_tool_link "$p" "${clkbin}/$t"
   done
   printf '#!/usr/bin/env bash\necho no\n' > "${clkbin}/timedatectl"; chmod +x "${clkbin}/timedatectl"
   local ce; ce="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-clk1)" acme onion-evolve "")"
@@ -15011,7 +15022,7 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   # host SEM nenhuma fonte de tempo + atestado → a camada passa (é para isso que o atestado existe)
   local noclk; noclk="$(mktemp -d)"
   for t in jq date mktemp mkdir python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum openssl; do
-    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -s "$p" "${noclk}/$t"
+    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && _a2a_tool_link "$p" "${noclk}/$t"
   done
   ce="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-clk3)" acme onion-evolve "")"
   rc=0; out="$(PATH="${noclk}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${ce}" 2>/dev/null)" || rc=$?
@@ -15192,7 +15203,7 @@ _log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2
   # chronyc: leap pendente é sincronizado; "Not synchronised" vence o atestado (paridade com o doctor)
   local chb; chb="$(mktemp -d)"
   for t in jq date mktemp mkdir python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum openssl; do
-    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -s "$p" "${chb}/$t"
+    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && _a2a_tool_link "$p" "${chb}/$t"
   done
   printf '#!/bin/sh\necho "Leap status     : Insert second"\n' > "${chb}/chronyc"; chmod +x "${chb}/chronyc"
   rc=0; out="$(env -u A2A_CLOCK_TRUST PATH="${chb}" A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-ch1)" acme onion-evolve "")" 2>/dev/null)" || rc=$?
