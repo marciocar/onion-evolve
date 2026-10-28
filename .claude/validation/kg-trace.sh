@@ -234,12 +234,12 @@ PY
 # não conhece). Com a 4.35.0 e antes desta tradução, o locator que não resolvia dava rc 1 com TSV vazio, e o lint
 # calava (medido na adoção, 2026-10-27): nunca verde calado.
 # A linha SCHEME-AVISO não é achado (o produto sai 0 com ela): não conta para o rc, nem para esta guarda.
-_achados="$(grep -v $'\tSCHEME-AVISO$' <<< "${_tsv}" || true)"
-if [ -z "${_achados}" ] && [ "${_krc}" -eq 1 ]; then
+_findings="$(grep -v $'\tSCHEME-AVISO$' <<< "${_tsv}" || true)"
+if [ -z "${_findings}" ] && [ "${_krc}" -eq 1 ]; then
   [ -z "${_tsv}" ] || printf '%s\n' "${_tsv}"
   printf '%s\t%s\t%s\t%s\t%s\n' '-' 'PRODUTO' '-' '(kg_trace.py rc=1 sem achado que esta tradução conheça)' 'ENTRADA-QUEBRADA'; exit 1
 fi
 [ -n "${_tsv}" ] || exit "${_krc}"
 printf '%s\n' "${_tsv}"
-[ -z "${_achados}" ] || exit 1
+[ -z "${_findings}" ] || exit 1
 exit "${_krc}"
