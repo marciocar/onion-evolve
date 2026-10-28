@@ -36218,6 +36218,16 @@ run_kg_read_leg_selftests() {
     else record_fail "kg-read-leg: (r3-MUT)" "o mutante seguiu calado: (r3) não mede a desambiguação"; fi
   fi
   rm -f "${sbs}/.claude/hooks/kg-read-leg-mut.sh"
+  # (r4) A FORMA DO RELATO DO sge (2026-10-28): `((a)+(b)) <<E` seria lida como subshell e daria aviso falso. Medido
+  #      no bash 5: é subshell mesmo (o par do 2º `(` fecha em `)+`, e o bash dá erro de sintaxe no `+`), e nas duas
+  #      leituras o `<<E` abre corpo, então o corpo cala e o `sed -i` depois do terminador avisa. Não reproduz: este
+  #      caso fixa a forma; a desambiguação do `((` é medida pelo (r3-MUT).
+  local u1 u2 ru
+  _klr "${hs}" $'((a)+(b)) <<E\nsed -i s/a/b/ src/alvo.ts\nE'; u1="${kout}"; ru="${rcs}"
+  _klr "${hs}" $'((a)+(b)) <<E\ncorpo\nE\nsed -i s/a/b/ src/alvo.ts'; u2="${kout}"; ru="${ru}${rcs}"
+  if [ -z "${u1}" ] && grep -q 'C_NO_DO_SED' <<< "${u2}" && [ "${ru}" = "00" ]; then
+    record_pass "kg-read-leg: (r4) ((a)+(b)) <<E abre corpo (o corpo cala, depois do terminador avisa), rc 0"
+  else record_fail "kg-read-leg: (r4)" "rc=${ru} corpo=[${u1:0:60}] depois=[${u2:0:60}]"; fi
   # (s) O CONTRATO DO `ast`: o `segments`/`WRAPPERS` que o loader REAL do hook extrai da guarda são os da guarda
   #     executada inteira, num corpus de comandos (case/esac, heredoc, &&, |, ;, comentário, `\;`, invólucro).
   #     Uma constante renomeada para minúsculas ou atribuída em tupla some do namespace do `ast` e a perna cala com
