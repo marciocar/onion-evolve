@@ -258,6 +258,7 @@ nodes:
     owner: maestro
     impact: 4
     confidence: 0.5
+    verified_at: "2026-10-28"
     verified_against: "gh pr view 1422 em 2026-10-28: MERGED; o convite novo vale até 2026-10-30T01:05:02Z"
     label: "Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027."
     narrative: "A R3 deu DADO nas duas pontas, mas a pergunta da medida só fecha com os negativos pré-registrados e com os destinos fechados medidos. Os passos de novo são do maestro, na ponta do notebook. Gatilho: depois do PR 1422; o convite vence em 2026-10-30T01:05Z, e passada essa hora o teste pede convite novo."
@@ -269,6 +270,7 @@ nodes:
     owner: maestro
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
     verified_against: "gh pr view 1424 em 2026-10-28: MERGED (merge 5b27d09c088f, o pin da rodada)"
     label: "O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe."
     narrative: "O deploy é ato do maestro. O PR 1424 já entrou, então o gatilho está armado: rodar ops/update-kg-writer.sh e conferir com o probe que o serviço responde na versão nova."
@@ -280,6 +282,7 @@ nodes:
     owner: core
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
     verified_against: "E_MA_MCP_CLONE_SERVIDO_PARADO_1028, no grafo do Company Brain: o MCP de leitura do hub serve o commit 2bdc52fe, de 2026-10-12"
     label: "Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação."
     narrative: "O código do servidor está em dia; o que parou foi o clone que ele serve, 16 dias sem atualizar. A cura é mecanismo, no molde do ops/update-kg-writer.sh: um script do repo que busca e atualiza o clone servido e confere a ponta servida contra a remota. Gatilho: o próximo PR de manutenção do core."
@@ -291,6 +294,8 @@ nodes:
     owner: core
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da rodada da 4.37.0, em 2026-10-28: o kg-ssot normalizou o resíduo dele à mão para passar no review-artifact-check"
     label: "O resíduo de revisão que a rodada de update escreve no adotante usa «elenxo: não», com til, e o review-artifact-check só aceita «nao»."
     narrative: "O kg-ssot normalizou o dele à mão; os outros adotantes vão topar no mesmo. A cura é na fonte que escreve o resíduo na rodada de update, não em cada adotante, com um caso na bancada que prove o resíduo gerado passando no check. Gatilho: o próximo PR de manutenção do core, antes da próxima rodada de update."
@@ -302,6 +307,7 @@ nodes:
     owner: core
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
     verified_against: "pedido da sessão principal do core em 2026-10-28"
     label: "O /meta:cc-update da 2.1.312 do Claude Code."
     narrative: "Update do Claude Code é gatilho de re-medição: o delta do CHANGELOG contra a baseline do radar E3, julgado por juiz que refuta e selado até o PR mergeado. Gatilho: a sessão do core com janela para a rodada."
@@ -313,6 +319,8 @@ nodes:
     owner: core
     impact: 2
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato do sge ao censo cruzado de 2026-10-28"
     label: "Aviso falso do _dparen_end no kg-read-leg.sh: ((a)+(b)) <<E é lido como subshell."
     narrative: "O leitor confunde a aritmética com parêntese interno seguida de heredoc com um subshell, e avisa onde não há defeito. A cura vem com um caso na bancada que reproduz a forma. Gatilho: o PR de manutenção do core."
@@ -324,6 +332,8 @@ nodes:
     owner: core
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato do sge ao censo cruzado de 2026-10-28"
     label: "Os 9 casos do lint-selftest que falham no adotado (lint-hard-file, r16-table-total, r89-aufhebung, r53-rules-pathscoped): separar o que é ambiente do que é defeito."
     narrative: "Rodada no adotante, a bancada reprova 9 casos que passam no core. Antes de curar, medir cada um: depende do ambiente do core (caminho, ferramenta, arquivo que só existe aqui) ou é defeito do caso. Gatilho: o PR de manutenção do core."
@@ -335,6 +345,8 @@ nodes:
     owner: maestro
     impact: 2
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato do sge ao censo cruzado de 2026-10-28; só registro, o conteúdo fica no repo do sge"
     label: "As decisões do maestro que o sge tem em espera, em um nó: as 4 ligações «normalizado» da SAEB, as branches antigas de update no forge, 4 perguntas do grafo do modelo do objeto e a oferta do CI onion-validate."
     narrative: "Só registro. As 4 ligações marcadas como «normalizado» da SAEB pedem o veredito do maestro; as branches antigas de update no forge do sge esperam a ordem de apagar; o grafo do modelo do objeto do sge tem 4 perguntas abertas que são decisão dele; e a oferta do CI onion-validate foi recusada pelo maestro por ora. O conteúdo de cada item mora no repo do sge. Gatilho: decisão do maestro."
@@ -346,6 +358,8 @@ nodes:
     owner: maestro
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da curadoria ao censo cruzado de 2026-10-28"
     label: "O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização."
     narrative: "A curadoria pede o teste do MCP oficial do GitHub com a mesma conta e a mesma organização do card Q_MA_FREE_ORG_READ_ENFORCED, que é a ordem: primeiro a medida da permissão por repo (o push recusado no repo com Read e aceito no com Write), depois o MCP. Gatilho: o card da organização feito."
@@ -357,6 +371,8 @@ nodes:
     owner: maestro
     impact: 2
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da curadoria ao censo cruzado de 2026-10-28"
     label: "A dissecação do clai (baalimago/clai), deixada para depois."
     narrative: "O maestro deixou para depois. Quando vier, entra pelo /meta:dissect, com a Etapa 0 pré-registrada. Gatilho: o maestro pedir."
@@ -368,6 +384,7 @@ nodes:
     owner: core
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
     verified_against: "o nó D_COMPANY_BRAIN_MARKET_PROPOSAL no grafo do estudo da curadoria, já citado com URL fixada pelo grafo do Company Brain do core"
     label: "A decisão D_COMPANY_BRAIN_MARKET_PROPOSAL, da curadoria, depois do card da organização."
     narrative: "A proposta de mercado do Company Brain feita pela curadoria pede a decisão do lado do core, e a medida da permissão por repo na organização gratuita muda o que a proposta pode prometer. Gatilho: o card Q_MA_FREE_ORG_READ_ENFORCED feito."
@@ -379,6 +396,8 @@ nodes:
     owner: core
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da curadoria ao censo cruzado de 2026-10-28; o sinal docs/evolution/inbox/2026-10-28-proposal-esperanto.md chegou ao inbox do core e ainda não está na main"
     label: "Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT (estacionar com gatilho)."
     narrative: "Os vereditos são da curadoria, no grafo dela; o selo é do maestro, pelo /meta:decide, e a execução depois do selo é do core. O sinal está em docs/evolution/inbox/2026-10-28-proposal-esperanto.md. Gatilho: a triagem do sinal pelo core, que leva as duas perguntas ao maestro."
@@ -390,6 +409,8 @@ nodes:
     owner: curadoria
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da curadoria ao censo cruzado de 2026-10-28"
     label: "Re-medir o estacionamento do transporte (Q_COMPOSITION_LIVE_ROUNDTRIP, da curadoria) com a medida da ida e volta."
     narrative: "O nó mora no grafo da curadoria; estacionou esperando a medida viva entre máquinas. Gatilho: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027 fechada."
@@ -401,6 +422,8 @@ nodes:
     owner: kg-ssot
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da curadoria ao censo cruzado de 2026-10-28, confirmado pelo kg-ssot na correção do mesmo dia"
     label: "O --with no --revisit e no --decision, porque hoje 26 apoios por URL entram sem julgamento."
     narrative: "A curadoria depende disso para julgar os apoios por URL nos vereditos de fora. Gatilho: o pré-registro do kg-ssot."
@@ -412,6 +435,8 @@ nodes:
     owner: kg-ssot
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da curadoria ao censo cruzado de 2026-10-28, confirmado pelo kg-ssot na correção do mesmo dia"
     label: "A aresta tipada entre repos pela URL fixada, que fecha os 3 buracos de E_OBJECAO_CB_KG_SPLIT, candidata à 4.38.0."
     narrative: "E_OBJECAO_CB_KG_SPLIT é nó da curadoria. A peça é do contrato e liga ao Q_MA_CROSS_REPO do grafo do Company Brain, que só abre se Q_MA_WRITE_SURFACE escolher superfície com mais de um repo. Gatilho: o pré-registro do kg-ssot."
@@ -423,6 +448,8 @@ nodes:
     owner: kg-ssot
     impact: 2
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato da curadoria ao censo cruzado de 2026-10-28, confirmado pelo kg-ssot na correção do mesmo dia"
     label: "O hash canônico do nó citado no scheme kg-node, em versão futura da kg-ssot."
     narrative: "Com o hash, quem cita um nó de outro repo prova que o nó citado é o mesmo que foi lido. Gatilho: o pré-registro do kg-ssot."
@@ -434,6 +461,8 @@ nodes:
     owner: maestro
     impact: 4
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato do kg-ssot ao censo cruzado de 2026-10-28; a posição prévia é o nó E_MA_KGSSOT_POSICAO_CLASSIFICATION_1028 do grafo do Company Brain"
     label: "A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot."
     narrative: "A pergunta mora no grafo do Company Brain e não se duplica aqui: este nó guarda só o ato do maestro e a ordem. Gatilho: uma rodada com o padrão de mercado antes do selo. A posição prévia do kg-ssot é o campo no meta (o padrão do grafo) e no nó (a exceção), como SHOULD, com vocabulário de mercado."
@@ -445,6 +474,8 @@ nodes:
     owner: maestro
     impact: 3
     confidence: 0.5
+    verified_at: "2026-10-28"
+    evidence_class: testimony
     verified_against: "relato do kg-ssot ao censo cruzado de 2026-10-28"
     label: "Selar D_KG_SSOT_PRODUTO_SEPARADO e D_KG_SSOT_PRODUCT_FORM_1007, do kg-ssot, que destravam a fatia de negócio do EPIC_8_CONTEXTS_AS_PROJECTION."
     narrative: "As duas decisões moram no repo do kg-ssot e entram aqui em texto. O selo é do maestro, pelo /meta:decide. Gatilho: decisão do maestro."
