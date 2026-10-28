@@ -865,7 +865,7 @@ check_kg_trace_resolve() {
         # cura é outra: reler o nó e regravar o hash pelo digest do produto (nunca o sha256 do arquivo).
         local _ssev="HARD" _scura; [ "${IS_DERIVED:-0}" -eq 1 ] && _ssev="SOFT"
         _scura="a fonte mudou ou o locator saiu dela: releia a fonte e regrave o sha256 e o locator"
-        [ "${verdict}" != SCHEME-FALHA:integrity.trace-node-sha256-mismatch ] || _scura="o nó citado mudou: releia o nó e regrave o node_sha256 com python3 -I vendor/kg-ssot/tools/kg_trace.py digest <arquivo>#<id>"  # a cura do node_sha256
+        [ "${verdict}" != SCHEME-FALHA:integrity.trace-node-sha256-mismatch ] || _scura="o nó citado mudou: releia o nó e regrave o node_sha256 com python3 -I -B vendor/kg-ssot/tools/kg_trace.py digest <arquivo>#<id> (nó de outro repo: o digest lê a árvore, então rode-o sobre o arquivo do commit fixado no source)"  # a cura do node_sha256
         violation "${_ssev}" "${REPO_ROOT}/${g}" \
           "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME] ${nid}: a fonte não sustenta o que o nó declara em '${target}' — ${verdict#SCHEME-FALHA:} (${_scura}; detalhe: bash .claude/validation/kg-trace.sh)"
         continue ;;

@@ -217,7 +217,7 @@ for u in loc.get("unreadable", []):
 # numa linha de aviso: malformed (scheme, locator ou hash fora da forma), missing_source (a fonte que o nó nomeia não
 # está no repo) e unpinned (o ref da URL anda). O resto (form_only, absolute, not_json...) é o não-julgado por desenho.
 # TETO DECLARADO (passada adversarial da adoção da 4.37.0): este TSV não passa --with ao produto, então a fonte por URL
-# de outro repo cai em `absolute` e NÃO é julgada aqui; o unpinned só nasce com --with. O sha256 de um nó que cita outro
+# de outro repo cai em `absolute` e NÃO é julgada aqui; o unpinned só nasce com --with. O sha256 ou o node_sha256 de um nó que cita outro
 # repo se confere por `kg_trace.py check --with <prefixo>=<clone>` (o 1º do core: Q_MA_FREE_ORG_READ_ENFORCED).
 # NODE_SHA256 (kg-ssot >= 4.38.0, contrato v4.18): o provenance.node_sha256 é o SHA-256 do JCS (RFC 8785) do nó citado,
 # com scheme kg-node, e só a mudança DESSE nó o derruba (o vizinho no mesmo arquivo, não). A falha chega pelo mesmo
