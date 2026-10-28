@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kg-ssot.dev/spec/revisit.schema.json",
   "title": "kg-ssot.revisit/1",
-  "description": "Desde a 4.36.0. A saída de kg_query.py --revisit --format json: as decisões vivas (status que não é superseded nem refuted) que pedem revisão na data as_of, pela atenção (impact × confidence × fator do status × (1 + grau)), cada uma com os motivos: evidence-due (algo em que ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e segue viva). on_event lista as decisões que só têm reverify_on, porque o evento não tem data. Ficam à parte, nunca em silêncio: unstamped (cadência sem verified_at) e unresolved (apoio fora do corpus). O apoio refutado ou substituído não é motivo: a história dele está no --decision.",
+  "description": "Desde a 4.36.0. A saída de kg_query.py --revisit --format json: as decisões vivas (status que não é superseded nem refuted) que pedem revisão na data as_of, pela atenção (impact × confidence × fator do status × (1 + grau)), cada uma com os motivos: evidence-due (algo em que ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e segue viva). on_event lista as decisões que só têm reverify_on, porque o evento não tem data. Ficam à parte, nunca em silêncio: unstamped (cadência sem verified_at) e unresolved (apoio fora do corpus). O apoio refutado ou substituído não é motivo: a história dele está no --decision. Desde a 4.38.0, com --with, o apoio de outro repositório é lido no commit fixado da URL, e só as decisões do corpus local são julgadas. Cada item de unresolved traz reason: no_with (URL sem --with que case), not_found (o arquivo ou o nó não estão no commit), not_pinned_url (a fonte não é uma URL com commit, como dono/repo@ref:caminho) ou outside_corpus. upstream_changed lista, à parte e sem virar motivo de revisão, a decisão local cujo apoio externo tem outro status na ponta do clone (o HEAD da pasta do --with), ou sumiu dela (missing-node, missing-file): o commit fixado ficou para trás. unpinned: o apoio externo foi lido sem fixação real (o commit da URL não está no clone, a pasta não é git, ou o ref é branch ou tag) e não foi julgado.",
   "type": "object",
   "required": [
     "schema_version",
@@ -11,7 +11,8 @@
     "decisions",
     "on_event",
     "unstamped",
-    "unresolved"
+    "unresolved",
+    "upstream_changed"
   ],
   "properties": {
     "schema_version": {
@@ -102,10 +103,56 @@
           },
           "edge_type": {
             "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "no_with",
+              "not_found",
+              "not_pinned_url",
+              "outside_corpus",
+              "unpinned"
+            ]
           }
         }
       },
       "description": "Os apoios que não estão no corpus lido, e por isso não foram julgados."
+    },
+    "upstream_changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "decision",
+          "file",
+          "support",
+          "pinned_status",
+          "head_status"
+        ],
+        "properties": {
+          "decision": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "support": {
+            "type": "string"
+          },
+          "pinned_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "head_status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "description": "As decisões locais cujo apoio externo mudou na ponta do clone desde o commit fixado; não é motivo de revisão."
     }
   },
   "$defs": {

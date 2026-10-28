@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kg-ssot.dev/spec/decision.schema.json",
   "title": "kg-ssot.decision/1",
-  "description": "Desde a 4.36.0. A saída de kg_query.py --decision <id> --format json: a decisão, o que ela substituiu (replaced) e quem a substituiu (replaced_by) em toda a linhagem de SUPERSEDES, o que a refuta (refuted_by), o que a apoia (supported_by) e aquilo em que ela se apoia (leans_on: as arestas SUPPORTS, TRACES_TO e DEPENDS_ON que saem dela, e o passo do provenance.source), com o status de cada um. A decisão superada e a refutada aparecem com o que veio no lugar: nada se perde.",
+  "description": "Desde a 4.36.0. A saída de kg_query.py --decision <id> --format json: a decisão, o que ela substituiu (replaced) e quem a substituiu (replaced_by) em toda a linhagem de SUPERSEDES, o que a refuta (refuted_by), o que a apoia (supported_by) e aquilo em que ela se apoia (leans_on: as arestas SUPPORTS, TRACES_TO e DEPENDS_ON que saem dela, e o passo do provenance.source), com o status de cada um. A decisão superada e a refutada aparecem com o que veio no lugar: nada se perde. Desde a 4.38.0, com --with, o apoio de outro repositório é lido no commit fixado da URL, e o item de leans_on traz head_status: o status do mesmo nó na ponta do clone (o HEAD da pasta do --with), ou missing-node e missing-file quando ele sumiu. O apoio externo traz pinned: se foi lido num commit de fato fixado.",
   "type": "object",
   "required": [
     "schema_version",
@@ -116,6 +116,15 @@
         "due_on": {
           "type": "string",
           "format": "date"
+        },
+        "head_status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pinned": {
+          "type": "boolean"
         }
       }
     }

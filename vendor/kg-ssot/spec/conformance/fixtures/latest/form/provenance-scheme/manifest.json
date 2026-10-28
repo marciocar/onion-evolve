@@ -1,5 +1,5 @@
 {
-  "description": "O esquema do locator e o hash da fonte (v4.17), só SHOULD. provenance.scheme diz como ler o locator, por um código: json-pointer (RFC 6901; em fragmento, com #, sem espaço cru), text (RFC 5147, posições a partir de 0 como fronteiras; o ;length= da norma vale, e o ;md5= não), csv (RFC 7111 §3: só row=, só col= ou só cell= numa seleção, a partir de 1, com * para a última), pdf (RFC 8118, a página física a partir de 1, entre outros parâmetros), media (Media Fragments, npt com minutos de dois dígitos no relógio, intervalo semiaberto), quote (o texto exato), html (#id) e kg-node (o id de um nó do grafo citado). As URIs do conformsTo do Web Annotation valem como alias, inclusive a da RFC 3778. Com o scheme, o locator fora da forma alerta como form.pattern.node.provenance.locator; o código fora da tabela, como form.enum.node.provenance.scheme. O provenance.sha256 é o hash SHA-256 do conteúdo lido, em 64 hex minúsculos, fora do locator (o md5= da RFC 5147 não é usado), e fora da forma alerta como form.pattern.node.provenance.sha256. Sem scheme, o locator segue texto livre, e nada muda no veredito.",
+  "description": "O esquema do locator e o hash da fonte (v4.17), só SHOULD. provenance.scheme diz como ler o locator, por um código: json-pointer (RFC 6901; em fragmento, com #, sem espaço cru), text (RFC 5147, posições a partir de 0 como fronteiras; o ;length= da norma vale, e o ;md5= não), csv (RFC 7111 §3: só row=, só col= ou só cell= numa seleção, a partir de 1, com * para a última), pdf (RFC 8118, a página física a partir de 1, entre outros parâmetros), media (Media Fragments, npt com minutos de dois dígitos no relógio, intervalo semiaberto), quote (o texto exato), html (#id) e kg-node (o id de um nó do grafo citado). As URIs do conformsTo do Web Annotation valem como alias, inclusive a da RFC 3778. Com o scheme, o locator fora da forma alerta como form.pattern.node.provenance.locator; o código fora da tabela, como form.enum.node.provenance.scheme. O provenance.sha256 é o hash SHA-256 do conteúdo lido, em 64 hex minúsculos, fora do locator (o md5= da RFC 5147 não é usado), e fora da forma alerta como form.pattern.node.provenance.sha256. Sem scheme, o locator segue texto livre, e nada muda no veredito. Desde o v4.18, provenance.node_sha256, o hash canônico do nó citado pela RFC 8785, em 64 hex minúsculos e só com scheme kg-node.",
   "layer": "form",
   "pending_on": [],
   "cases": [
@@ -356,6 +356,40 @@
       "codes": [],
       "warnings": [
         "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "valid-node-sha256-kg-node.kg.yaml",
+      "description": "o hash canônico do nó citado (RFC 8785) com scheme kg-node",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-node-sha256-without-scheme.kg.yaml",
+      "description": "o node_sha256 pede scheme kg-node: sem o scheme, alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance.scheme"
+      ]
+    },
+    {
+      "file": "warn-node-sha256-other-scheme.kg.yaml",
+      "description": "o node_sha256 vale só com scheme kg-node",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.const.node.provenance.scheme"
+      ]
+    },
+    {
+      "file": "warn-node-sha256-uppercase.kg.yaml",
+      "description": "o node_sha256 é em hex minúsculo",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.node_sha256"
       ]
     }
   ]

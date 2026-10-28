@@ -343,6 +343,11 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.37.0` to `kg-ssot-v4.38.0` (contract v4.18), no verdict changes for an existing graph:
+`provenance.node_sha256` is optional and only warns when present. The contract identity changes, so the gate
+passes with the `· identity` warning. `kg_query --revisit` now returns `upstream_changed`, and each item of
+`unresolved` carries a `reason`: a consumer that reads the JSON gets one new key and one new field.
+
 From `kg-ssot-v4.36.0` to `kg-ssot-v4.37.0` (contract v4.17), no verdict changes for an existing graph: the new
 fields (`provenance.scheme` and `provenance.sha256`) are optional and only warn when present, so the
 SHOULD debt stays the same. The contract identity changes, so the gate passes with the `· identity` warning, and the

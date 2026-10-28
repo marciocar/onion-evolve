@@ -10,6 +10,26 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.38.0] - 2026-10-28
+
+Contract v4.18, SHOULD only: nothing that passed fails. A company brain spans several repositories, and a decision in one
+rests on a seal in another. This release reads that support where it was pinned, says when its source moved, and gives a
+bridge to a node a hash that only that node can break.
+
+- `kg_query --revisit` and `--decision` accept `--with PREFIX=FOLDER`: a support given by a `provenance.source` URL is
+  read at its pinned commit from a local clone. `--revisit` judges only local decisions, and a support that does not
+  resolve carries its reason (`no_with`, `not_found`, `not_pinned_url`, `unpinned`, `outside_corpus`); a support read
+  without a real pin is never judged against the working tree.
+- `upstream_changed` lists, apart and never as a reason to revisit, the local decisions whose support has another
+  status, or is gone, at the head of the clone; `--decision` shows that status as `head_status`.
+- `provenance.node_sha256` is the SHA-256 of the RFC 8785 (JCS) canonical form of the cited node, with `scheme: kg-node`:
+  a change in a neighbor node of the same file does not break it. `kg_trace check` compares it
+  (`integrity.trace-node-sha256-mismatch`), `kg_trace.py digest FILE#ID` prints it, and the JavaScript reader exports
+  `nodeCanonical`. There is one JCS in the product, the strict one of `kg_criterion`, and a node with no JCS form
+  (a repeated id, an integer value outside ±(2^53−1)) counts as `not_canonical` instead of failing.
+- `kg_trace` no longer emits the Python 3.15 `DeprecationWarning` of a positional `maxsplit`.
+- The conformance suite goes from 508 to 512 cases.
+
 ## [4.37.0] - 2026-10-28
 
 Contract v4.17, SHOULD only: nothing that passed fails. A claim already says where it came from; now it can say exactly

@@ -37,7 +37,6 @@ import argparse
 import fnmatch
 import hashlib
 import json
-import math
 import pathlib
 import re
 import sys
@@ -53,7 +52,6 @@ else:  # script ou vendor
 _ = kg_i18n._
 
 SCHEMA_VERSION = "kg-ssot.criterion/1"
-MAX_SAFE = 2 ** 53 - 1
 MAX_REF_BYTES = 64 << 20  # um critério é texto; o teto evita ler um arquivo de gigabytes na memória
 _TRAILING_SPACE = re.compile(r" +$", re.M)
 
@@ -69,74 +67,21 @@ def text_digest(text):
 
 
 def es_number(x):
-    """O número na forma do Number.prototype.toString do ECMAScript, que o JCS pede (RFC 8785, 3.2.2.3)."""
-    if isinstance(x, int):
-        if abs(x) > MAX_SAFE:
-            raise CriterionError(_("the integer {n} is outside ±(2^53−1): JCS cannot represent it exactly").format(n=x))
-        return str(x)
-    if not math.isfinite(x):
-        raise CriterionError(_("NaN and Infinity have no JCS form"))
-    if x == 0:
-        return "0"
-    sign = "-" if x < 0 else ""
-    mant, _e, exp = repr(abs(x)).partition("e")
-    whole, _dot, frac = mant.partition(".")
-    digits = (whole + frac).lstrip("0")
-    n = len(whole) + (int(exp) if exp else 0) - (len(whole + frac) - len((whole + frac).lstrip("0")))
-    digits = digits.rstrip("0")
-    k = len(digits)
-    if k <= n <= 21:
-        out = digits + "0" * (n - k)
-    elif 0 < n <= 21:
-        out = digits[:n] + "." + digits[n:]
-    elif -6 < n <= 0:
-        out = "0." + "0" * (-n) + digits
-    else:
-        e = n - 1
-        out = digits[0] + ("." + digits[1:] if k > 1 else "") + "e" + ("+" if e > 0 else "-") + str(abs(e))
-    return sign + out
-
-
-def _jcs_string(s):
-    out = ['"']
-    for ch in s:
-        o = ord(ch)
-        if 0xD800 <= o <= 0xDFFF:
-            raise CriterionError(_("a lone surrogate has no JCS form"))
-        if ch == '"':
-            out.append('\\"')
-        elif ch == "\\":
-            out.append("\\\\")
-        elif o < 0x20:
-            out.append({"\b": "\\b", "\t": "\\t", "\n": "\\n", "\f": "\\f", "\r": "\\r"}.get(ch, f"\\u{o:04x}"))
-        else:
-            out.append(ch)
-    out.append('"')
-    return "".join(out)
+    """O número na forma do Number.prototype.toString do ECMAScript, que o JCS pede (RFC 8785, 3.2.2.3): o do leitor de
+    referência (kg_validate.es_number), o único JCS do produto."""
+    try:
+        return kg_validate.es_number(x)
+    except kg_validate.JcsError as exc:
+        raise CriterionError(str(exc)) from None
 
 
 def jcs(value):
-    """A forma canônica JCS (RFC 8785) de um valor JSON: chaves em ordem de unidade UTF-16, número do ECMAScript."""
-    if value is None:
-        return "null"
-    if value is True:
-        return "true"
-    if value is False:
-        return "false"
-    if isinstance(value, (int, float)):
-        return es_number(value)
-    if isinstance(value, str):
-        return _jcs_string(value)
-    if isinstance(value, kg_validate.NonFinite):
-        raise CriterionError(_("NaN and Infinity have no JCS form"))
-    if isinstance(value, list):
-        return "[" + ",".join(jcs(v) for v in value) + "]"
-    if isinstance(value, dict):
-        if not all(isinstance(k, str) for k in value):
-            raise CriterionError(_("a map key that is not text has no JSON form"))
-        keys = sorted(value, key=lambda k: k.encode("utf-16-be"))
-        return "{" + ",".join(_jcs_string(k) + ":" + jcs(value[k]) for k in keys) + "}"
-    raise CriterionError(_("a value of type {type} has no JSON form").format(type=type(value).__name__))
+    """A forma canônica JCS (RFC 8785) de um valor JSON: a do leitor de referência (kg_validate.jcs), o único JCS do
+    produto, com o erro dele como CriterionError."""
+    try:
+        return kg_validate.jcs(value)
+    except kg_validate.JcsError as exc:
+        raise CriterionError(str(exc)) from None
 
 
 def _no_dups(pairs):

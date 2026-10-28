@@ -61,6 +61,7 @@ LOCATOR_UNREADABLE = "integrity.trace-locator-unreadable"
 OUT_OF_RANGE = "integrity.trace-locator-out-of-range"
 QUOTE_MISSING = "integrity.trace-quote-missing"
 SHA_MISMATCH = "integrity.trace-sha256-mismatch"
+NODE_SHA_MISMATCH = "integrity.trace-node-sha256-mismatch"  # desde a 4.38.0 (contrato v4.18)
 # os códigos do scheme, e os aliases (as URIs do conformsTo do Web Annotation) para eles, como no schema SHOULD
 SCHEME_ALIASES = {
     "http://tools.ietf.org/rfc/rfc6901": "json-pointer", "http://tools.ietf.org/rfc/rfc5147": "text",
@@ -114,7 +115,7 @@ def locate(trace, graph_dir, root, root_files, external_roots=()):
     text = trace.strip().strip("\"'").strip()
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
         return "absolute", text, None
-    original = re.split(r"[#:]", text, 1)[0].strip().strip("\"'").strip()
+    original = re.split(r"[#:]", text, maxsplit=1)[0].strip().strip("\"'").strip()
     if any(original.startswith(p) for p in external_roots):
         return "external_root", original, None
     if not original or not PATH_CHARS.fullmatch(original):
@@ -177,7 +178,7 @@ def locate_source(source, graph_dir, root):
     text = source.strip().strip("\"'").strip()
     if text.startswith("/") or re.match(r"[A-Za-z][A-Za-z0-9+.-]*://", text):
         return "absolute", text, None
-    target = re.split(r"[#:]", text, 1)[0].strip()
+    target = re.split(r"[#:]", text, maxsplit=1)[0].strip()
     while target.startswith("./"):
         target = target[2:]
     if not target or not PATH_CHARS.fullmatch(target) or "." not in target.rsplit("/", 1)[-1]:
@@ -476,8 +477,9 @@ def check_schemes(corpus, root, withs=()):
     o scheme fora da tabela ou o sha256 fora da forma, que o schema SHOULD já alerta), not_json e not_text. Devolve
     também, fora da saída, o conjunto dos nós cujo locator foi julgado aqui (o check_locators não os julga de novo)."""
     keys = ("form_only", "absolute", "missing_source", "not_path", "outside_root", "unpinned", "malformed", "not_json",
-            "not_text")
-    res = {"judged": 0, "ok": 0, "sha256_checked": 0, "failures": [], "skipped": {k: 0 for k in keys}}
+            "not_text", "not_canonical")
+    res = {"judged": 0, "ok": 0, "sha256_checked": 0, "node_sha256_checked": 0, "failures": [],
+           "skipped": {k: 0 for k in keys}}
     located = set()
     cache, files = {}, {}
     for key in corpus.order:
@@ -486,7 +488,7 @@ def check_schemes(corpus, root, withs=()):
         if not isinstance(prov, dict) or not isinstance(prov.get("source"), str):
             continue
         raw_scheme, raw_sha = prov.get("scheme"), prov.get("sha256")
-        if raw_scheme is None and raw_sha is None:
+        if raw_scheme is None and raw_sha is None and prov.get("node_sha256") is None:
             continue
         scheme = scheme_of(prov)
         sha = raw_sha if isinstance(raw_sha, str) and SHA256.fullmatch(raw_sha) else None
@@ -498,6 +500,11 @@ def check_schemes(corpus, root, withs=()):
             unjudged.append("malformed")
         if scheme in FORM_SCHEMES:
             unjudged.append("form_only")
+        raw_node_sha = prov.get("node_sha256")
+        node_sha = raw_node_sha if isinstance(raw_node_sha, str) and SHA256.fullmatch(raw_node_sha) else None
+        if raw_node_sha is not None and (node_sha is None or scheme != "kg-node"):
+            unjudged.append("malformed")  # fora da forma, ou sem o scheme kg-node que o define
+            node_sha = None
         if scheme not in READ_SCHEMES and sha is None:
             for k in dict.fromkeys(unjudged or ["malformed"]):
                 res["skipped"][k] += 1
@@ -535,6 +542,16 @@ def check_schemes(corpus, root, withs=()):
                     located.add(key)
                     if not fits:
                         failed = QUOTE_MISSING if scheme == "quote" else OUT_OF_RANGE
+                    elif node_sha is not None:
+                        res["node_sha256_checked"] += 1
+                        nid = locator[1:] if locator.startswith("#") else locator
+                        _tree, doc, _code = kg_validate.parse_v1(kg_validate.as_source(target, text))
+                        digest = kg_validate.node_digest(doc, nid)
+                        if digest is None:  # o nó se repete ou não tem forma JCS: não há hash a conferir
+                            unjudged.append("not_canonical")
+                            res["node_sha256_checked"] -= 1
+                        elif digest != node_sha:
+                            failed = NODE_SHA_MISMATCH
         for k in dict.fromkeys(unjudged):  # um motivo conta uma vez por nó
             res["skipped"][k] += 1
         if sha is None and key not in located and failed is None:
@@ -709,7 +726,7 @@ def check(corpus, root, external_roots=(), withs=()):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=_("The trace that does not resolve: each node's trace: anchor against "
                                                "the files of the repository."))
-    ap.add_argument("command", choices=("check", "projection"))
+    ap.add_argument("command", choices=("check", "projection", "digest"))
     ap.add_argument("pages", nargs="*", metavar=_("PAGE.md"),
                     help=_("projection: the pages to check (default: every tracked .md with projection_of)"))
     ap.add_argument("--with", action="append", default=[], dest="withs", metavar=_("PREFIX=FOLDER"),
@@ -728,6 +745,8 @@ def main(argv=None):
         print(_("BROKEN INPUT  {error}").format(error=_("--root {root} is not a directory").format(root=args.root)),
               file=sys.stderr)
         return 2
+    if args.command == "digest":
+        return main_digest(args)
     if args.command == "projection":
         return main_projection(args)
     if args.pages:
@@ -775,7 +794,7 @@ def main(argv=None):
                         form=ss["form_only"], absolute=ss["absolute"], missing=ss["missing_source"],
                         malformed=ss["malformed"],
                         other=ss["not_path"] + ss["outside_root"] + ss["unpinned"] + ss["not_json"]
-                        + ss["not_text"]))
+                        + ss["not_text"] + ss["not_canonical"]))
         if loc["judged"] or loc["skipped"]["no_json_file"] or loc["skipped"]["absolute"]:
             ls = loc["skipped"]
             print(_("· {judged} JSON locator(s) judged: {resolved} resolve, {missing} missing, {unreadable} unreadable "
@@ -796,6 +815,42 @@ def main(argv=None):
             or res["schemes"]["failures"]):
         return 1
     return 3 if not res["graphs"] else 0  # o corpus vazio tem rc próprio: zero lido não é "tudo resolve"
+
+
+def main_digest(args):
+    """kg_trace.py digest ARQUIVO#ID...: o provenance.node_sha256 de cada nó (contrato v4.18), o SHA-256 do JCS (RFC
+    8785) do nó no modelo canônico do grafo, para quem anota a ponte kg-node. rc 0 · 1 nó que não existe ou se repete,
+    grafo ilegível (NOT FOUND) ou nó sem forma JCS, como um inteiro fora de ±(2^53−1) (NO CANONICAL FORM) · 2 entrada
+    quebrada."""
+    if not args.pages:
+        print(_("BROKEN INPUT  {error}").format(error=_("digest takes FILE#ID")), file=sys.stderr)
+        return 2
+    rc = 0
+    for ref in args.pages:
+        path, sep, nid = ref.rpartition("#")
+        if not sep or not path or not nid:
+            print(_("BROKEN INPUT  {error}").format(error=_("digest takes FILE#ID")), file=sys.stderr)
+            return 2
+        base = pathlib.Path(args.root).resolve()
+        full = (base / path).resolve()
+        if full != base and base not in full.parents:
+            print(_("BROKEN INPUT  {error}").format(error=_("{path} is outside the root").format(path=path)), file=sys.stderr)
+            return 2
+        try:
+            text = full.read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeDecodeError) as exc:
+            print(_("BROKEN INPUT  {error}").format(error=exc), file=sys.stderr)
+            return 2
+        _tree, doc, code = kg_validate.parse_v1(kg_validate.as_source(path, text))
+        digest = None if code else kg_validate.node_digest(doc, nid)
+        if digest is None:
+            found = not code and isinstance(doc, dict) and isinstance(doc.get("nodes"), list) and sum(
+                1 for n in doc["nodes"] if isinstance(n, dict) and n.get("id") == nid) == 1
+            print((_("NO CANONICAL FORM  {ref}") if found else _("NOT FOUND  {ref}")).format(ref=ref))
+            rc = 1
+        else:
+            print(f"{digest}  {ref}")
+    return rc
 
 
 def main_projection(args):

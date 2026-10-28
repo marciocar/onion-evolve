@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:123e9221eb5bf52d -->
+<!-- translation-of: ADOPTING.md sha256:7a60cc3db26830d9 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -342,6 +342,11 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.37.0` para a `kg-ssot-v4.38.0` (contrato v4.18), nenhum veredito muda num grafo existente:
+o `provenance.node_sha256` é opcional e só alerta quando presente. A identidade do contrato muda, então o gate
+passa com o aviso `· identity`. O `kg_query --revisit` passa a devolver `upstream_changed`, e cada item de
+`unresolved` traz um `reason`: quem lê o JSON ganha uma chave nova e um campo novo.
 
 Da `kg-ssot-v4.36.0` para a `kg-ssot-v4.37.0` (contrato v4.17), nenhum veredito muda num grafo existente: os campos
 novos (`provenance.scheme` e `provenance.sha256`) são opcionais e só alertam quando presentes, então a

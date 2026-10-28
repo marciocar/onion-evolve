@@ -347,7 +347,8 @@ def _source_ref(corpus, key):
         if not rel.startswith("/") and ".." not in rel.split("/"):
             path = corpus.external[here]["base"] + rel  # o caminho do repo de lá, não o daqui
     if corpus.withs and "://" in path:
-        if load_external(corpus, path):
+        loaded = load_external(corpus, path)
+        if loaded is not None:  # um prefixo do --with casou: o passo é o de lá, carregado ou quebrado, nunca um homônimo daqui
             return ((path, frag), source)
     last = path.rstrip("/").rsplit("/", 1)[-1]
     for ext in (".kg.yaml", ".kg.json"):
@@ -537,7 +538,18 @@ def decision_history(corpus, ref):
             "replaced": _supersede_line(corpus, key, forward=False),
             "replaced_by": _supersede_line(corpus, key, forward=True),
             "refuted_by": refuted_by, "supported_by": supported_by,
-            "leans_on": [_brief(corpus, k, et) for k, et in _leans_on(corpus, key).items()]}
+            "leans_on": [_leaning(corpus, k, et) for k, et in _leans_on(corpus, key).items()]}
+
+
+def _leaning(corpus, key, edge):
+    """O apoio de uma decisão, com o status na ponta do clone quando ele é externo e fixado (4.38.0)."""
+    out = _brief(corpus, key, edge)
+    if key[0] in corpus.external:
+        out["pinned"] = pinned(corpus, key[0])
+    head = head_status(corpus, key) if key in corpus.nodes else None
+    if head is not None:
+        out["head_status"] = head
+    return out
 
 
 def _due(node, as_of):
@@ -553,17 +565,93 @@ def _due(node, as_of):
     return when if when <= as_of else None
 
 
+def _with_of(corpus, url):
+    """(pasta, ref, caminho) da URL <prefixo>/<ref>/<caminho> por um --with, ou None."""
+    for prefix, folder in corpus.withs:
+        if url.startswith(prefix + "/"):
+            ref, _sep, rel = url[len(prefix) + 1:].partition("/")
+            while rel.startswith("./"):
+                rel = rel[2:]
+            return folder, ref, rel
+    return None
+
+
+COMMIT_REF = re.compile(r"[0-9a-fA-F]{7,64}")
+
+
+def ref_fixed(corpus, url):
+    """O ref da URL fixa um commit no clone do --with? Exige a forma de commit e que o commit resolvido comece por ele
+    (uma branch ou tag, que andam, não fixam; a mesma regra do kg_trace). Não olha o arquivo: um arquivo ausente num
+    commit fixado é not_found, não unpinned. Um rev-parse por URL (cache no corpus)."""
+    cache = corpus.__dict__.setdefault("_ref_fixed", {})
+    if url not in cache:
+        where = _with_of(corpus, url)
+        ok = False
+        if where is not None and COMMIT_REF.fullmatch(where[1]):
+            out = _git(where[0], "rev-parse", "--verify", "--quiet", "--end-of-options", f"{where[1]}^{{commit}}")
+            ok = out.returncode == 0 and out.stdout.decode("utf-8").strip().lower().startswith(where[1].lower())
+        cache[url] = ok
+    return cache[url]
+
+
+def pinned(corpus, url):
+    """O grafo externo foi lido num commit de fato fixado? O load_external marca pinned quando o arquivo saiu do ref numa
+    pasta git, e o ref_fixed exige que esse ref seja um commit."""
+    info = corpus.external.get(url)
+    return bool(info and info.get("pinned")) and ref_fixed(corpus, url)
+
+
+def head_status(corpus, key):
+    """O apoio externo lido no commit fixado, olhado na ponta do clone (o HEAD da pasta do --with): None quando ele não é
+    externo fixado; senão (status na ponta, ou "missing-file" ou "missing-node"). O commit fixado diz o que se leu; a ponta
+    diz se a origem andou desde então (4.38.0)."""
+    url, nid = key
+    if not pinned(corpus, url):
+        return None
+    where = _with_of(corpus, url)
+    if where is None:
+        return None
+    folder, _ref, rel = where
+    cache = corpus.__dict__.setdefault("_head_docs", {})
+    if url not in cache:
+        out = _git(folder, "show", "--end-of-options", f"HEAD:./{rel}")
+        doc = None
+        if out.returncode == 0:
+            _tree, parsed, code = kg_validate.parse_v1(kg_validate.as_source(url, out.stdout.decode("utf-8", "replace")))
+            doc = parsed if not code and isinstance(parsed, dict) else None
+        cache[url] = doc
+    doc = cache[url]
+    if doc is None:
+        return "missing-file"
+    node = next((n for n in doc.get("nodes") or [] if isinstance(n, dict) and n.get("id") == nid), None)
+    return "missing-node" if node is None else node.get("status")
+
+
+def _unresolved_reason(corpus, path):
+    """Por que um apoio não está no corpus: no_with (URL sem --with que case), not_found (o --with casou e o arquivo ou o
+    nó não estão no commit), not_pinned_url (a fonte não é uma URL com commit, como dono/repo@ref:caminho) ou
+    outside_corpus (um caminho que o corpus lido não tem). O unpinned (lido sem fixação real) é dado no revisit."""
+    if "://" in path:
+        return "not_found" if _with_of(corpus, path) else "no_with"
+    if "@" in path and ":" in path.split("@", 1)[1]:
+        return "not_pinned_url"
+    return "outside_corpus"
+
+
 def revisit(corpus, as_of):
     """As decisões vivas que pedem revisão (kg-ssot.revisit/1), pela atenção, com o motivo: evidence-due (algo em que
     ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e
     segue viva). Ficam à parte, nunca em silêncio: on_event (só reverify_on, porque o evento não tem data), unstamped
     (cadência sem verified_at, que nunca vence) e unresolved (um apoio que não está no corpus, e por isso não foi
     julgado). O apoio refutado ou substituído não é motivo: inferido das arestas, deu 1 aviso útil em 10 no corpus do
-    core (o critério pedia 7), e a história dele fica no --decision."""
-    items, on_event, unstamped, unresolved = [], [], [], []
-    for key in corpus.order:
+    core (o critério pedia 7), e a história dele fica no --decision. Desde a 4.38.0, com --with, o apoio de outro
+    repositório é lido no commit fixado da URL; só as decisões do corpus local são julgadas (o grafo externo entra só
+    como apoio); o não resolvido traz o motivo (_unresolved_reason); e upstream_changed lista, à parte e sem virar
+    motivo, a decisão local cujo apoio externo tem outro status (ou sumiu) na ponta do clone."""
+    items, on_event, unstamped, unresolved, upstream = [], [], [], [], []
+    for key in list(corpus.order):
         node = corpus.nodes[key]
-        if node.get("node_type") != "decision" or node.get("status") in HISTORY:
+        if node.get("node_type") != "decision" or node.get("status") in HISTORY or key[0] in corpus.external:
             continue
         reasons, seen = [], set()
 
@@ -577,8 +665,28 @@ def revisit(corpus, as_of):
         for dep, how in _leans_on(corpus, key).items():
             dnode = corpus.nodes.get(dep)
             if dnode is None:
-                unresolved.append({"decision": key[1], "file": key[0], "target": f"{dep[0]}#{dep[1]}", "edge_type": how})
+                why = dep[0]
+                if how == "provenance.source":  # o motivo vem da fonte escrita, não da chave já resolvida
+                    src = (node.get("provenance") or {}).get("source")
+                    why = src.strip().split("#", 1)[0].split("?", 1)[0] if isinstance(src, str) else dep[0]
+                # o ref que não fixa um commit não se julga, nem para dizer que falta; o arquivo ausente num commit
+                # fixado é not_found
+                if dep[0] in corpus.external and not ref_fixed(corpus, dep[0]):
+                    reason = "unpinned"
+                else:
+                    reason = _unresolved_reason(corpus, why)
+                unresolved.append({"decision": key[1], "file": key[0], "target": f"{dep[0]}#{dep[1]}", "edge_type": how,
+                                   "reason": reason})
                 continue
+            if dep[0] in corpus.external and not pinned(corpus, dep[0]):
+                # lido sem fixação real (o commit não está no clone, a pasta não é git, ou o ref é branch): não se julga
+                unresolved.append({"decision": key[1], "file": key[0], "target": f"{dep[0]}#{dep[1]}", "edge_type": how,
+                                   "reason": "unpinned"})
+                continue
+            head = head_status(corpus, dep)
+            if head is not None and head != dnode.get("status"):
+                upstream.append({"decision": key[1], "file": key[0], "support": f"{dep[0]}#{dep[1]}",
+                                 "pinned_status": dnode.get("status"), "head_status": head})
             if dnode.get("status") in HISTORY or dnode.get("node_type") == "question":
                 continue  # o que caiu ou foi respondido é história, e o --decision a mostra
             when = _due(dnode, as_of)
@@ -600,7 +708,8 @@ def revisit(corpus, as_of):
     pos = {k: i for i, k in enumerate(by_attention(list(raw), raw))}
     items.sort(key=lambda it: pos[(it["file"], it["id"])])
     return {"schema_version": REVISIT_SCHEMA, "root": corpus.root, "as_of": as_of.isoformat(),
-            "decisions": items, "on_event": on_event, "unstamped": unstamped, "unresolved": unresolved}
+            "decisions": items, "on_event": on_event, "unstamped": unstamped, "unresolved": unresolved,
+            "upstream_changed": upstream}
 
 
 def _line(b):
@@ -618,7 +727,9 @@ def decision_human(res):
                        ("leans_on", _("  rests on:"))):
         if res[key]:
             lines.append(title)
-            lines += ["    " + _line(b) + (f"  ({b['edge_type']})" if b.get("edge_type") else "") for b in res[key]]
+            lines += ["    " + _line(b) + (f"  ({b['edge_type']})" if b.get("edge_type") else "")
+                      + (_("  [now {status} at the head of the clone]").format(status=b["head_status"])
+                         if b.get("head_status") not in (None, b.get("status")) else "") for b in res[key]]
     return "\n".join(lines)
 
 
@@ -638,9 +749,15 @@ def revisit_human(res):
     if res["unstamped"]:
         lines.append(_("· {n} decision(s) have a cadence but no verified_at, so they never come due: {ids}").format(
             n=len(res["unstamped"]), ids=", ".join(d["id"] for d in res["unstamped"][:10])))
+    for u in res.get("upstream_changed", []):
+        lines.append(_("· {decision}: what it rests on changed upstream since the pinned commit: {support} was {pinned}, "
+                       "now {head}").format(decision=u["decision"], support=u["support"], pinned=u["pinned_status"],
+                                            head=u["head_status"]))
     if res["unresolved"]:
-        lines.append(_("· {n} support(s) are outside the corpus and were not judged: {ids}").format(
-            n=len(res["unresolved"]), ids=", ".join(u["target"] for u in res["unresolved"][:5])))
+        why = collections.Counter(u.get("reason", "outside_corpus") for u in res["unresolved"])
+        lines.append(_("· {n} support(s) are outside the corpus and were not judged ({why}): {ids}").format(
+            n=len(res["unresolved"]), why=", ".join(f"{k} {v}" for k, v in sorted(why.items())),
+            ids=", ".join(u["target"] for u in res["unresolved"][:5])))
     return "\n".join(lines)
 
 
@@ -991,8 +1108,9 @@ def main(argv=None):
                            "is due, they are due themselves, or they are contested"))
     ap.add_argument("--as-of", metavar=_("YYYY-MM-DD"), help=_("with --revisit, the date that counts as today"))
     ap.add_argument("--with", action="append", default=[], dest="withs", metavar=_("PREFIX=FOLDER"),
-                    help=_("with --chain, read the graph of another repository that a provenance.source URL names: the "
-                           "URL prefix before the commit, and the local folder of that repository (repeatable)"))
+                    help=_("with --chain, --decision or --revisit, read the graph of another repository that a "
+                           "provenance.source URL names, at the commit of the URL: the URL prefix before the commit, and "
+                           "the local folder of that repository (repeatable)"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
@@ -1042,8 +1160,8 @@ def main(argv=None):
             return broken(exc)
     elif args.model or args.model_dir:
         return broken(_("--model and --model-dir go with --semantic"))
-    if args.withs and args.chain is None:
-        return broken(_("--with goes with --chain"))
+    if args.withs and args.chain is None and args.decision is None and not args.revisit:
+        return broken(_("--with goes with --chain, --decision or --revisit"))
     if args.as_of is not None and not args.revisit:
         return broken(_("--as-of goes with --revisit"))
     if args.decision is not None or args.revisit:
@@ -1058,6 +1176,7 @@ def main(argv=None):
                 return broken(_("--as-of {value}: the date must be YYYY-MM-DD").format(value=repr(args.as_of)))
         try:
             corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
+            corpus.withs = [with_spec(w) for w in args.withs]
             res = decision_history(corpus, args.decision) if args.decision is not None else revisit(corpus, as_of)
         except (OSError, ValueError, UnicodeDecodeError) as exc:
             return broken(exc)

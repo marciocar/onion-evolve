@@ -744,6 +744,49 @@ export function textInRange(text, locator) {
   return start >= 0 && start <= end && end <= total;
 }
 
+const MAX_SAFE = 2 ** 53 - 1;
+const LONE_SURROGATE = /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/;
+
+/** A serialização canônica de um valor do modelo pela RFC 8785 (JCS), a mesma do jcs do leitor de referência (o do
+ * kg_criterion): chaves em ordem de unidades UTF-16 (a ordem padrão do sort do JS, que é a do JCS), sem espaços, números e
+ * strings pelo JSON.stringify, que já é a forma do ECMAScript. Lança erro, como a norma pede, para o que não tem forma
+ * JCS: o surrogate solto, o número de valor inteiro fora de ±(2^53−1) (o leitor não distingue 1e300 do inteiro), o não
+ * finito e o que não é JSON (os bytes do !!binary, o marcador de não finito, undefined). */
+export function jcs(value) {
+  if (value === null || typeof value === 'boolean') return JSON.stringify(value);
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) throw new Error('NaN or infinity has no JCS form');
+    if (Number.isInteger(value) && Math.abs(value) > MAX_SAFE) throw new Error('an integer outside ±(2^53−1) has no JCS form');
+    return JSON.stringify(value);
+  }
+  if (typeof value === 'string') {
+    if (LONE_SURROGATE.test(value)) throw new Error('a lone surrogate has no JCS form');
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) return `[${value.map(jcs).join(',')}]`;
+  if (isObj(value)) {
+    return `{${Object.keys(value).sort().map((k) => {
+      if (LONE_SURROGATE.test(k)) throw new Error('a lone surrogate has no JCS form');
+      return `${JSON.stringify(k)}:${jcs(value[k])}`;
+    }).join(',')}}`;
+  }
+  throw new Error('a value with no JSON form has no JCS form');
+}
+
+/** A forma canônica (JCS) do nó node_id do documento, sobre a qual o provenance.node_sha256 (contrato v4.18) é o
+ * SHA-256 em hex minúsculo; null quando o nó não existe, se repete ou não tem forma JCS (como o node_digest da
+ * referência). O núcleo não carrega hash (roda num bundle de React Native): quem chama aplica o SHA-256 da plataforma
+ * (crypto.subtle, node:crypto) sobre o UTF-8 desta string. */
+export function nodeCanonical(doc, nodeId) {
+  const nodes = (isObj(doc) && Array.isArray(doc.nodes) ? doc.nodes : []).filter((n) => isObj(n) && n.id === nodeId);
+  if (nodes.length !== 1) return null;
+  try {
+    return jcs(nodes[0]);
+  } catch {
+    return null;
+  }
+}
+
 /** integrity.term-notation-duplicate (v4.14), só entre nós do mesmo grafo (term_located da referência): dois nós vivos
  * com x_term no mesmo esquema (x_term.scheme ou, sem ele, o grafo, de nome meta.id) e com a mesma notation; o aviso cai em cada nó
  * depois do primeiro. A notation se compara exata. */

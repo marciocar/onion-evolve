@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:ef4d3d84ea1b98fe -->
+<!-- translation-of: docs/manual/04-contract.md sha256:8ada412c98d0f510 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -77,6 +77,26 @@ contam a partir de 1 e se escrevem sem zero à esquerda (a RFC 7111 aceita `0` e
 o fim. A forma não confere o que só a fonte diz, como o início
 depois do fim ou a linha que não existe: isso é do `kg_trace`.
 
+## O hash de um nó citado (v4.18)
+
+Uma ponte para outro grafo (`scheme: kg-node`) aponta um nó dentro de um arquivo. O `sha256` do arquivo cai assim que
+qualquer nó do arquivo muda, mesmo um que a ponte não cita. Desde o v4.18, o `provenance.node_sha256` faz o hash só do nó
+citado: o SHA-256 da forma canônica dele pela RFC 8785 (JCS, JSON Canonicalization Scheme), sobre o modelo que o leitor
+extrai do grafo, com as chaves em ordem UTF-16 e números e strings na forma do ECMAScript.
+
+```yaml
+provenance:
+  source: "https://github.com/acme/core/blob/9f2c1e0/docs/graph/seals.kg.yaml#D_RETRY_POLICY"
+  locator: "#D_RETRY_POLICY"
+  method: "testimony: o selo do core"
+  scheme: kg-node
+  node_sha256: "d4d7…"   # kg_trace.py digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
+```
+
+Ele vai só com `scheme: kg-node` e só alerta: `form.pattern.node.provenance.node_sha256` fora da forma,
+`form.required.node.provenance.scheme` sem scheme, `form.const.node.provenance.scheme` com outro. O `kg_trace check` o
+compara com o nó citado (capítulo 5).
+
 ## O que mudou do v3 para o v4
 
 O v4 é uma versão **maior**: o que alertava passou a reprovar.
@@ -94,7 +114,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 desde a 4.37.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 na 4.37.0, v4.18 desde a 4.38.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -129,6 +149,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.38 | Contrato v4.18, só SHOULD: `provenance.node_sha256`, o hash canônico do nó citado (RFC 8785); o `kg_query --revisit` e o `--decision` leem o apoio de outro repositório no commit fixado com `--with`, e listam as decisões cujo apoio mudou na origem; `kg_trace.py digest` |
 | 4.37 | Contrato v4.17, só SHOULD: `provenance.scheme` (como ler o locator: `json-pointer`, `text`, `csv`, `pdf`, `media`, `quote`, `html`, `kg-node`) e `provenance.sha256` (o hash do que foi lido, num campo próprio); o `kg_trace check` lê a fonte pelo esquema e pelo hash, também num commit fixado de outro repositório com `--with` |
 | 4.36 | Contrato v4.16, sem mudança. `kg_query --sort attention` (a fórmula do radar), `--decision` (a história de uma decisão) e `--revisit` (as decisões vivas a revisitar, com o motivo) |
 | 4.35 | Contrato v4.16, sem mudança. Python 3.12 ou mais. O `kg_query --chain --with` segue a corrente para outro repositório no commit citado; o `kg_trace.py projection` confere as páginas Markdown que declaram `projection_of`; o `kg_trace check` segue um `provenance.locator` em JSON Pointer dentro do arquivo JSON |

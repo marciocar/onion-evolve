@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.37.0",
+  "release": "kg-ssot-v4.38.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 508/508 (gates the rc)
+latest: 512/512 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -885,6 +885,28 @@ others, with the reason in its narrative. An automatic detector of contradiction
 left out: it found sibling claims, not contradictions. A tension is a refutation someone records, and attention says
 which one to look at first.
 
+### Supports in another repository (4.38.0)
+
+`--with PREFIX=FOLDER` works with `--revisit` and `--decision` too, as with `--chain` since 4.35.0: a support given by a
+`provenance.source` URL (`<prefix>/<commit>/<path>#<id>`) is read at the pinned commit, from a local clone. The
+prefix ends right before the commit: for GitHub it includes `/blob` (`https://github.com/acme/core/blob=../core`).
+Without `/blob`, the reference read would be `blob`, which pins nothing, and the support comes out `unpinned`.
+
+- `--revisit` judges only the decisions of the local corpus; a graph read from another repository is a support, not a
+  decision to revisit. A support that does not resolve carries its reason: `no_with`, `not_found`, `not_pinned_url` (a
+  source that is not a URL with a commit, such as `owner/repo@ref:path`), `unpinned` (read without a real pin: the
+  commit is not in the clone, the folder is not a git repository, or the reference is a branch or tag) or
+  `outside_corpus`. An unpinned support is never judged against the working tree.
+- `upstream_changed` lists, apart and never as a reason to revisit, the local decisions whose support has another status,
+  or is gone, at the head of the clone: the pinned commit fell behind. Inferred from the edges, a fallen support gave 1
+  useful warning in 10 (4.36.0); this list says something else, that the source moved since it was read.
+- `--decision` shows each external support with its status at the pinned commit, `pinned`, and, as `head_status`, at
+  the head. The head is the local `HEAD` of the clone: run `git fetch` and update it before, or the list stays empty.
+
+```bash
+kg-query --root . --revisit --with https://github.com/acme/core/blob=../core
+```
+
 ## `kg_diff.py`: diff by id between revisions
 
 Compares two graphs, or every graph that changed between two git revisions, aligning nodes by id and edges by their
@@ -1199,6 +1221,23 @@ checks them.
 ```bash
 kg-trace check --root . \
   --with https://github.com/acme/core/blob=../core
+```
+
+### The hash of a cited node, and `digest` (4.38.0)
+
+With `scheme: kg-node`, `provenance.node_sha256` (contract v4.18) is compared with the canonical hash of the cited node,
+read at the pinned commit: a difference is `integrity.trace-node-sha256-mismatch`, and the JSON output counts
+`node_sha256_checked`. A change in another node of the same file does not touch it. `kg_trace.py digest FILE#ID...`
+prints the hash to record; the JavaScript reader exports `nodeCanonical(doc, id)`, the same canonical string, to hash
+with the platform's SHA-256. The hash covers the whole cited node, `verified_at` included, so a re-stamp of the cited
+node breaks the bridges to it, which is the point. A cited node that repeats, or has no JCS form (a number with an
+integer value outside ±(2^53−1)), has no hash to check and counts as `not_canonical`. When a bridge carries both
+hashes, the file `sha256` is checked first and a change in a neighbor still breaks it: on a `kg-node` bridge, keep
+only `node_sha256`. `digest` reads the working tree under the root; for a pinned source, read the file at the commit
+(`git show <commit>:<path>`) first.
+
+```bash
+kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
 
 ### The projection checker (`kg_trace.py projection`, 4.35.0)

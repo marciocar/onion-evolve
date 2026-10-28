@@ -10,6 +10,26 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.38.0] - 2026-10-28
+
+Contrato v4.18, só SHOULD: nada que passava reprova. Um company brain atravessa vários repositórios, e uma decisão num
+deles se apoia num selo de outro. Esta versão lê esse apoio onde ele foi fixado, diz quando a fonte dele andou e dá à
+ponte para um nó um hash que só esse nó derruba.
+
+- O `kg_query --revisit` e o `--decision` aceitam `--with PREFIXO=PASTA`: o apoio dado por uma URL no
+  `provenance.source` é lido no commit fixado, de um clone local. O `--revisit` julga só as decisões locais, e o apoio que
+  não se resolve traz o motivo (`no_with`, `not_found`, `not_pinned_url`, `unpinned`, `outside_corpus`); o apoio lido
+  sem fixação real nunca é julgado pela árvore de trabalho.
+- O `upstream_changed` lista, à parte e nunca como motivo de revisão, as decisões locais cujo apoio tem outro status, ou
+  sumiu, na ponta do clone; o `--decision` mostra esse status em `head_status`.
+- O `provenance.node_sha256` é o SHA-256 da forma canônica (JCS, RFC 8785) do nó citado, com `scheme: kg-node`: uma
+  mudança num nó vizinho do mesmo arquivo não o derruba. O `kg_trace check` o compara
+  (`integrity.trace-node-sha256-mismatch`), o `kg_trace.py digest ARQUIVO#ID` o imprime, e o leitor JavaScript exporta
+  `nodeCanonical`. Há um JCS só no produto, o estrito do `kg_criterion`, e o nó sem forma JCS (um id repetido, um valor
+  inteiro fora de ±(2^53−1)) conta como `not_canonical` em vez de falhar.
+- O `kg_trace` deixa de emitir o `DeprecationWarning` do `maxsplit` posicional no Python 3.15.
+- A suíte de conformidade passa de 508 para 512 casos.
+
 ## [4.37.0] - 2026-10-28
 
 Contrato v4.17, só SHOULD: nada que passava reprova. Uma afirmação já diz de onde veio; agora ela pode dizer exatamente
