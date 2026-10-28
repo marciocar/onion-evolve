@@ -61,9 +61,10 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-02'
     label: 'DECISÃO DE SUBSTRATO (peça 2 do conjunto da GUARDA): hook `Stop`, copiando `rule-title-in-prose.sh`. O que o censo respondeu e a memória não responderia: entre os moldes disponíveis, só `rule-title-in-prose.sh` veta a PROSA do assistente com `exit 2` lendo o transcript — e a classe a vigiar é precisamente uma AFIRMAÇÃO em prosa, não uma ação de ferramenta. Um `PreToolUse` não serve: o dano não está numa chamada, está no que eu escrevo DEPOIS de não ter chamado nada. Um check de lint também não: a prosa não está no repo. O censo foi o que tornou isto verificável em vez de preferência.'
+    narrative: "Reconciliado em 2026-10-28 pela regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09): valia em 2026-10-02 (a guarda nasceu desta decisão e rodou); a guarda saiu em cdb34f6ce, 2026-10-15, e a decisão não governa mais artefato vivo; superado por E_REVERIFY_1027_MOLDE_VIVO_GUARDA_APOSENTADA."
     verified_against: 'censo de guardas de 2026-10-02: 2 moldes de hook com --selftest próprio e 12 de check de lint; só um molde lê o transcript do assistente'
     provenance:
       source: ".claude/commands/common/prompts/guard-doctrine.md"
@@ -122,9 +123,10 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.8
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-02'
     label: 'TETO DECLARADO da guarda (peça 7 do conjunto da GUARDA), e o teto que importa NÃO é o vocabulário: é O QUE ELA ASSUME SOBRE A FORMA DO TRANSCRIPT. Ela assume (a) que `tool_result` aparece em `message.content[].type`; (b) que o texto do assistente vem em `content[].text`; (c) que `tool_use` traz `name` e `input`. Se o harness mudar qualquer uma, ela degrada EM SILÊNCIO — e por isso a bancada a exercita por stdin+transcript, não só pela função pura. TETO SECUNDÁRIO, real mas menor: a afirmação é reconhecida por LISTA de formas (pt-BR e en), logo redação nova escapa; ela erra para o lado de CALAR. NÃO VERIFICADO e declarado: a interação entre os DOIS vetos `Stop` (este e o `rule-title-in-prose`) — um pode esconder o outro, e o refutador não conseguiu medir sem o runtime.'
+    narrative: "Reconciliado em 2026-10-28 pela regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09): valia em 2026-10-02 sobre background-state-needs-evidence.sh, que saiu em cdb34f6ce (2026-10-15); superado por E_REVERIFY_1027_TETO_DE_GUARDA_REMOVIDA."
     verified_against: 'teto escrito no cabeçalho do próprio hook; a assunção (a) foi medida (1123 de 1327 rows `user` são tool_result); a interação entre vetos permanece NÃO MEDIDA'
     provenance:
       source: ".claude/hooks/background-state-needs-evidence.sh"
@@ -283,7 +285,7 @@ edges:
     edge_type: TRACES_TO
   - from: E_REVERIFY_1027_MOLDE_VIVO_GUARDA_APOSENTADA
     to: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
-    edge_type: CONSTRAINS
+    edge_type: SUPERSEDES
   - from: E_REVERIFY_1027_TETO_DE_GUARDA_REMOVIDA
     to: T_O_QUE_A_GUARDA_NAO_VE
     edge_type: SUPERSEDES

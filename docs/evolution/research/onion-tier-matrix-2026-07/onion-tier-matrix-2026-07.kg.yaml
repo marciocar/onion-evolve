@@ -19,9 +19,10 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: "2026-07-19"
     label: "roles.yaml:20-25 — standalone.base == hub.base e optional byte-a-byte idênticos; só trust/downstream separa"
+    narrative: "Reconciliado em 2026-10-28 pela regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09): valia em 2026-07-19: no roles.yaml de 87d805325 o hub e o standalone tinham os dois work_tools: full; a separação nasceu em 4c68e6505 (2026-10-10); superado por E_REVERIFY_1027_BASE_IGUAL_WORK_TOOLS_SEPARAM."
     provenance:
       source: ".claude/utils/marketplace/roles.yaml@9ed41811"
       locator: "l.20-21 (hub base/optional) × l.24-25 (standalone base/optional)"
