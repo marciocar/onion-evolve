@@ -2,7 +2,8 @@
 branch: docs/company-brain-market-evidence
 pr: pendente
 date: 2026-10-28
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1840a0fa98782fafe365ae5f4e3f69720b1b608dd66dd4d77fb961ff4ca31287
+reviewed_code_sha256: 6d23db6f865cc203f37bccc869010ad952fbfda720160bcbdf53661d93aceb0f
 findings_total: 2
 findings_real: 1
 tokens: 0
