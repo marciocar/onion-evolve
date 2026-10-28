@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**747 itens abertos** em 130 grafo(s) com aberto (de 169 no escopo) · 132 grupo(s), agrupados por `owner:` (48 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**744 itens abertos** em 130 grafo(s) com aberto (de 169 no escopo) · 132 grupo(s), agrupados por `owner:` (44 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -618,7 +618,7 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## core — 23 item(ns)
+## core — 19 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -630,20 +630,16 @@
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 4.5 | `Q_COORD_CORE_COMPANY_BRAIN_MARKET_PROPOSAL` | coordenacao-sessoes-2026-10 | A decisão D_COMPANY_BRAIN_MARKET_PROPOSAL, da curadoria, depois do card da organização. |
-| 4.5 | `Q_COORD_CORE_RESIDUO_ADOTANTE_ELENXO_SEM_TIL` | coordenacao-sessoes-2026-10 | O resíduo de revisão que a rodada de update escreve no adotante usa «elenxo: não», com til, e o review-artifact-check só ace |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
 | 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
-| 3.0 | `Q_COORD_CORE_CC_UPDATE_2_1_312` | coordenacao-sessoes-2026-10 | O /meta:cc-update da 2.1.312 do Claude Code. |
 | 3.0 | `Q_COORD_CORE_ESPERANTO_VEREDITOS` | coordenacao-sessoes-2026-10 | Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT (estacionar com gatilho). |
-| 3.0 | `Q_COORD_CORE_SELFTEST_9_CASOS_NO_ADOTADO` | coordenacao-sessoes-2026-10 | Os 9 casos do lint-selftest que falham no adotado (lint-hard-file, r16-table-total, r89-aufhebung, r53-rules-pathscoped): separar  |
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
 | 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
 | 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
 | 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4380` | coordenacao-sessoes-2026-10 | A rodada de update da 4.38.0 aos quatro adotantes, com o pin 1d04d4e24cec do core. |
 | 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
-| 2.0 | `Q_COORD_CORE_DPAREN_END_KG_READ_LEG` | coordenacao-sessoes-2026-10 | Aviso falso do _dparen_end no kg-read-leg.sh: ((a)+(b)) <<E é lido como subshell. |
 | 2.0 | `Q_COORD_FIXTURE_NODE_SELFTEST_TMP` | coordenacao-sessoes-2026-10 | O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás. |
 
 ## maestro — 17 item(ns)
@@ -803,7 +799,7 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## sinais-de-campo-2026-09 — 6 item(ns)
+## sinais-de-campo-2026-09 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -813,6 +809,7 @@
 | 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
 | 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
 | 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
+| 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
 
 ## ops-citation-travel-2026-10 — 5 item(ns)
 
