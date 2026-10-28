@@ -64,3 +64,5 @@ expired, o remetente do spike), o 5º campo com `IFS=$'\x1f'` e o pulo do supers
   não apareceu). Com a bancada curada: 72 ✓ e 0 ✗ lá; no core, lint_hard_file, r16_table_total e fixtures deram 130 ✓,
   0 ✗, 0 ⊘ (antes do ajuste da passada 2, que só estreita os pulos).
 - O `_dparen_end` não reproduz: em `((a)+(b)) <<E` o bash também lê subshell, e o `<<E` abre corpo nas duas leituras.
+- A cura do venv nos casos do relógio entrou depois da 2ª passada e não foi revista por agente novo; a prova é a
+  família `a2a_verify` no ambiente do runner (133/133) contra os 10 ✗ do pré-voo anterior.
