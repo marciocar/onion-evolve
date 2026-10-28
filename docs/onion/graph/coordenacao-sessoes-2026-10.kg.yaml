@@ -12,9 +12,6 @@ meta:
   # ═══ TETO: 40 NÓS. Pendência nova entra quando uma fechada sai. ═══
 # Arestas para nó de OUTRO grafo do core (contrato v4.3): a pendência que já tem nó lá não ganha nó aqui.
 external_edges:
-  - from: Q_COORD_UPDATE_4_ADOTANTES_4380
-    to: Q_COORD_UPDATE_4_ADOTANTES_4370
-    edge_type: TRACES_TO
   - from: Q_COORD_DESIGN_ONDA2_SAIDA_NOS_ADOTANTES
     to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027"
     edge_type: DEPENDS_ON
@@ -494,6 +491,9 @@ nodes:
     label: "Selar D_KG_SSOT_PRODUTO_SEPARADO e D_KG_SSOT_PRODUCT_FORM_1007, do kg-ssot, que destravam a fatia de negócio do EPIC_8_CONTEXTS_AS_PROJECTION."
     narrative: "As duas decisões moram no repo do kg-ssot e entram aqui em texto. O selo é do maestro, pelo /meta:decide. Gatilho: decisão do maestro. Fechado em 2026-10-28 pela opção (a): o nó foi aberto por engano, porque as duas já estavam seladas. O maestro selou D_KG_SSOT_PRODUTO_SEPARADO em 2026-10-24, com a opção (a), produto separado com contrato formal próprio e pin mútuo, e D_KG_SSOT_PRODUCT_FORM_1007 fechou por derivação desse selo (verified_at 2026-10-25). A sessão do kg-ssot confirmou o engano. Não há selo a pedir ao maestro."
 edges:
+  - from: Q_COORD_UPDATE_4_ADOTANTES_4380
+    to: Q_COORD_UPDATE_4_ADOTANTES_4370
+    edge_type: TRACES_TO
   - from: Q_COORD_UPDATE_4_ADOTANTES_4370
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
