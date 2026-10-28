@@ -1,12 +1,12 @@
 ---
 branch: chore/core-maint-1027
-pr: pendente
+pr: 1430
 date: 2026-10-28
 reviewed_diff_sha256: 738fa522ab8487ab0529496574c2086fce28e4cd8fa7623f5f2aa6d8c5215c82
 reviewed_code_sha256: e63c9a5cace3f84587a517c382fde427226de83370e443399d10a77f6ad794e9
 findings_total: 5
 findings_real: 5
-tokens: 115997
+tokens: 168140
 duration_min: 6
 findings_fixed: 5
 verdict: CORRIGIDO
@@ -67,3 +67,5 @@ expired, o remetente do spike), o 5º campo com `IFS=$'\x1f'` e o pulo do supers
 - O `_dparen_end` não reproduz: em `((a)+(b)) <<E` o bash também lê subshell, e o `<<E` abre corpo nas duas leituras.
 - A cura do venv nos casos do relógio entrou depois da 2ª passada e não foi revista por agente novo; a prova é a
   família `a2a_verify` no ambiente do runner (133/133) contra os 10 ✗ do pré-voo anterior.
+- A 2ª passada teve um 1º revisor que travou e entregou depois do 2º; ele achou o mesmo pulo do lint-hard-file (c), já
+  curado, e nada mais. Os tokens dos três revisores estão somados.
