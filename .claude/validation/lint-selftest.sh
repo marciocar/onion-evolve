@@ -45880,9 +45880,29 @@ run_plan_contract_migration_selftests() {
   _pm_profile "${d}/identidade/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/identidade"
   # um PATH sem sha256sum, com o resto do que o helper e a fase 1 chamam
   mkdir -p "${d}/bin"; local _c
-  for _c in bash env git python3 sed head tail mktemp rm mkdir cut grep paste ls dirname cat tr sort find xargs; do
+  for _c in bash env git sed head tail mktemp rm mkdir cut grep paste ls dirname cat tr sort find xargs; do
     command -v "${_c}" >/dev/null 2>&1 && ln -sf "$(command -v "${_c}")" "${d}/bin/${_c}"
   done
+  # o python3 entra por WRAPPER, nunca por symlink (medido na bancada em 2026-10-28): o Python acha o venv pelo
+  # pyvenv.cfg ao lado do executável INVOCADO, e pelo symlink em ${d}/bin o sys.prefix virava o Python base do uv,
+  # sem o PyYAML, e o (f) caía pelo `import yaml` e não pela escrita no alvo. O exec pelo caminho do PATH real
+  # mantém o venv onde há venv e é o mesmo python3 onde não há.
+  if command -v python3 >/dev/null 2>&1; then
+    printf '#!%s\nexec %q "$@"\n' "$(command -v bash)" "$(command -v python3)" > "${d}/bin/python3"; chmod +x "${d}/bin/python3"
+    # (f0) o python3 do PATH restrito é o MESMO Python (sys.prefix) do PATH real. MUTANTE: o symlink de antes; ele só
+    #      morde onde o python3 é de um venv (sys.prefix ≠ sys.base_prefix), e fora dele o mutante pula VISÍVEL.
+    local _pq='import sys; print(sys.prefix)' _pr _pw _pm
+    _pr="$(python3 -I -c "${_pq}" 2>/dev/null)"; _pw="$(env PATH="${d}/bin" "${d}/bin/python3" -I -c "${_pq}" 2>/dev/null)"
+    if [ -n "${_pr}" ] && [ "${_pw}" = "${_pr}" ]; then record_pass "plan-contract-migration: (f0) o python3 do PATH sem sha256sum é o mesmo Python do PATH real (sys.prefix ${_pr})"
+    else record_fail "plan-contract-migration: (f0) python3 do PATH restrito" "real=${_pr} restrito=${_pw}"; fi
+    if python3 -I -c 'import sys; sys.exit(0 if sys.prefix != sys.base_prefix else 1)' 2>/dev/null; then
+      mkdir -p "${d}/bin-mut"; ln -sf "$(command -v python3)" "${d}/bin-mut/python3"
+      _pm="$("${d}/bin-mut/python3" -I -c "${_pq}" 2>/dev/null)"
+      if [ "${_pm}" != "${_pr}" ]; then record_pass "plan-contract-migration: (f0-MUT) o symlink de volta → o Python perde o venv (sys.prefix ${_pm}) e o (f0) cai"
+      else record_fail "plan-contract-migration: (f0-MUT) mutante NÃO morde" "pelo symlink o sys.prefix seguiu ${_pm}"; fi
+      rm -rf "${d}/bin-mut"
+    else record_skip "plan-contract-migration: (f0-MUT) o python3 daqui não é de venv: o symlink e o wrapper dão o mesmo Python, o mutante não tem o que morder"; fi
+  fi
   _pm_target "${d}/sem-migrador"; _pm_bad "${d}/sem-migrador/docs/g/b.kg.yaml" fx-b; rm -f "${d}/sem-migrador/vendor/kg-ssot/tools/kg_migrate.py"; _pm_commit "${d}/sem-migrador"
   _pm_target "${d}/perfil-quebrado"; _pm_bad "${d}/perfil-quebrado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado/.kg-ssot"
   printf 'profile_version: "1"\ncontract: kg-ssot-v4.13.0\nrules: []\n' > "${d}/perfil-quebrado/.kg-ssot/migrate-profile.yaml"; _pm_commit "${d}/perfil-quebrado"
