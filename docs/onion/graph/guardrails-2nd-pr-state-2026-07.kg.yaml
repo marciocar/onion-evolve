@@ -28,7 +28,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-07-24"
     label: "a memoria diz FALTA o 2o PR gated (wire-in R15 + gate anti-drift taxonomia + superficie /meta:guardrails)"
-    trace: "memory/discuss-guardrails-nemo-lens-state.md"
+    narrative: "a origem desta afirmação é a memória de sessão do agente (a entrada discuss-guardrails-nemo-lens-state), que fica fora do repo e não é versionada; o trace que apontava para ela saiu em 2026-10-28 (adoção da kg-ssot 4.38.0) porque nenhum leitor de fora a alcança. O que a refuta é rastreado: o diário de 2026-07-19 e o PR #452"
 
   - id: E_WIRE_IN_DONE_PR452
     node_type: evidence
