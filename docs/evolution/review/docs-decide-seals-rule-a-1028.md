@@ -2,7 +2,7 @@
 title: "Revisão: selos do decide de 2026-10-28 e a regra da data do nó nas re-medições"
 date: 2026-10-28
 branch: docs/decide-seals-rule-a-1028
-reviewed_diff_sha256: 508dbdf22b843f9be6293c2203b6665c414497dce5c95970da11f5eb7fca6e4a
+reviewed_diff_sha256: 7a83da603caf5d4656762748152c39540dee7dd3203f7885c26e46077fa3c9c6
 reviewed_code_sha256: d1029a6d6d0ead779f346047cd359208e95b7511ebc1abf1bee665c43f3d5e7e
 pr: pendente
 reviewer: "passada adversarial do próprio autor sobre o diff: cada troca de status e de aresta conferida contra o nó lido, a re-medição e as arestas já existentes no grafo"
