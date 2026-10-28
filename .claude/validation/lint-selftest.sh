@@ -4811,6 +4811,79 @@ run_kg_trace_resolve_selftests() {
   fi
   unset -f _j6g
 
+  # (s) O `schemes` DA KG-SSOT 4.37.0 (contrato v4.17): o provenance.scheme lido na fonte e o provenance.sha256
+  #     conferido com os bytes dela (como o git os guarda). A falha sai com o NÓ e o CÓDIGO do produto
+  #     (SCHEME-FALHA:<código>), HARD no core e SOFT no derivado; o malformed do skipped sai numa linha SCHEME-AVISO
+  #     que não conta para o rc. Antes da tradução a falha caía em PRODUTO … ENTRADA-QUEBRADA, sem nomear o nó.
+  #     s1 scheme kg-node e sha256 certos → rc 0, nada · s2 a fonte mudou → sha256-mismatch HARD (SOFT no derivado)
+  #     · s3 o nó-alvo sumiu da fonte com o sha256 certo → locator-out-of-range · s4 sha256 fora da forma e s5
+  #     scheme fora da tabela → aviso, rc 0. MUTANTE (s-MUT): a tradução das falhas esvaziada → s2 volta a
+  #     ENTRADA-QUEBRADA e o caso cai.
+  local ds; ds="$(mktemp -d)"; mkdir -p "${ds}/docs/onion/graph"
+  local GS="${ds}/docs/onion/graph"
+  _s_node() { printf '  - id: %s\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: %s\n' "$1" "$2"; }
+  _s_fonte() {  # $1=label do nó da fonte · $2=id do nó → sha256 da fonte como o git a guarda
+    { printf 'meta:\n  id: fonte\n  schema_version: "1"\nnodes:\n'; _s_node "${2:-N_FONTE}" "$1"; printf 'edges: []\n'; } > "${GS}/fonte.kg.yaml"
+    ( cd "${ds}" && git add -A && git show :docs/onion/graph/fonte.kg.yaml ) 2>/dev/null | sha256sum | cut -c1-64
+  }
+  _s_deriv() {  # $1=sha256 · $2=scheme · $3=locator
+    { printf 'meta:\n  id: derivado\n  schema_version: "1"\nnodes:\n'; _s_node N_DERIVADO "o derivado"
+      printf '    provenance:\n      source: docs/onion/graph/fonte.kg.yaml\n      method: "testimony: card"\n      scheme: %s\n      locator: "%s"\n      sha256: "%s"\n' "$2" "$3" "$1"
+      printf 'edges: []\n'; } > "${GS}/derivado.kg.yaml"
+    ( cd "${ds}" && git add -A ) >/dev/null 2>&1
+  }
+  _s_lint() {  # $1=IS_DERIVED · $2=kg-trace.sh → as violações da REGRA 55
+    bash -c '
+      set -euo pipefail
+      SCRIPT_DIR="'"${SCRIPT_DIR}"'"; REPO_ROOT="'"${ds}"'"; ONLY_PATH=""; IS_DERIVED='"$1"'
+      export ONION_KG_TRACE="'"${kt}"'"
+      violation() { echo "V[$1] $3"; }
+      source <(sed -n "/^check_kg_trace_resolve()/,/^}$/p" "'"${SCRIPT_DIR}/lint-artifacts.sh"'")
+      SCRIPT_DIR="$(dirname "'"$2"'")"
+      check_kg_trace_resolve
+    ' 2>&1 || true
+  }
+  ( cd "${ds}" && git init -q . ) >/dev/null 2>&1
+  local sha_s ts rs=0 ls_core ls_der
+  sha_s="$(_s_fonte "a origem")"; _s_deriv "${sha_s}" kg-node "#N_FONTE"
+  ts="$(_kt "${ds}" --format tsv 2>/dev/null)" || rs=$?
+  if [ "${rs}" -eq 0 ] && [ -z "${ts}" ]; then record_pass "kg-trace: (s1) scheme kg-node e sha256 certos → rc 0, nenhuma linha"
+  else record_fail "kg-trace: (s1) esquema são" "rc=${rs} out=${ts:0:200}"; fi
+  _s_fonte "a origem mudou" >/dev/null
+  rs=0; ts="$(_kt "${ds}" --format tsv 2>/dev/null)" || rs=$?
+  ls_core="$(_s_lint 0 "${helper}")"; ls_der="$(_s_lint 1 "${helper}")"
+  if [ "${rs}" -eq 1 ] && grep -q $'^docs/onion/graph/derivado.kg.yaml\tN_DERIVADO\t-\tdocs/onion/graph/fonte.kg.yaml \[kg-node\] #N_FONTE\tSCHEME-FALHA:integrity.trace-sha256-mismatch$' <<< "${ts}" \
+     && ! grep -q 'ENTRADA-QUEBRADA' <<< "${ts}" \
+     && grep -q 'V\[HARD\].*N_DERIVADO.*integrity.trace-sha256-mismatch' <<< "${ls_core}" \
+     && grep -q 'V\[SOFT\].*N_DERIVADO.*integrity.trace-sha256-mismatch' <<< "${ls_der}" && ! grep -q 'V\[HARD\]' <<< "${ls_der}"; then
+    record_pass "kg-trace: (s2) a fonte mudou → SCHEME-FALHA:integrity.trace-sha256-mismatch nomeando o nó, HARD no core e SOFT no derivado"
+  else record_fail "kg-trace: (s2) fonte mudada" "rc=${rs} tsv=${ts:0:200} core=${ls_core:0:160} der=${ls_der:0:160}"; fi
+  sha_s="$(_s_fonte "a origem" N_OUTRO)"; _s_deriv "${sha_s}" kg-node "#N_FONTE"
+  rs=0; ts="$(_kt "${ds}" --format tsv 2>/dev/null)" || rs=$?
+  if [ "${rs}" -eq 1 ] && grep -q $'\tN_DERIVADO\t.*\tSCHEME-FALHA:integrity.trace-locator-out-of-range$' <<< "${ts}"; then
+    record_pass "kg-trace: (s3) o nó-alvo saiu da fonte (sha256 certo) → SCHEME-FALHA:integrity.trace-locator-out-of-range"
+  else record_fail "kg-trace: (s3) locator fora" "rc=${rs} tsv=${ts:0:200}"; fi
+  sha_s="$(_s_fonte "a origem")"
+  local s4 s5 r4s=0 r5s=0 l4
+  _s_deriv "abc" kg-node "#N_FONTE"; s4="$(_kt "${ds}" --format tsv 2>/dev/null)" || r4s=$?; l4="$(_s_lint 0 "${helper}")"
+  _s_deriv "${sha_s}" kg-nodo "#N_FONTE"; s5="$(_kt "${ds}" --format tsv 2>/dev/null)" || r5s=$?
+  if [ "${r4s}" -eq 0 ] && [ "${s4}" = $'-\tSCHEMES\t-\t(1 malformed)\tSCHEME-AVISO' ] \
+     && grep -q 'V\[SOFT\].*SCHEME-AVISO.*1 malformed' <<< "${l4}" && ! grep -q 'V\[HARD\]' <<< "${l4}" \
+     && [ "${r5s}" -eq 0 ] && [ "${s5}" = $'-\tSCHEMES\t-\t(1 malformed)\tSCHEME-AVISO' ]; then
+    record_pass "kg-trace: (s4) sha256 fora da forma e scheme fora da tabela → SCHEME-AVISO (malformed), rc 0, só SOFT no lint"
+  else record_fail "kg-trace: (s4) malformados" "sha: rc=${r4s} ${s4:0:120} lint=${l4:0:160} · scheme: rc=${r5s} ${s5:0:120}"; fi
+  sed 's|^for m in sch.get("failures", \[\]):  # a tradução das falhas de esquema|for m in []:  # a tradução das falhas de esquema|' "${helper}" > "${mut}/kg-trace-semscheme.sh"
+  if cmp -s "${helper}" "${mut}/kg-trace-semscheme.sh"; then record_fail "kg-trace: (s-MUT) mutante não aplicou" "âncora da tradução das falhas de esquema mudou"
+  else
+    _s_fonte "a origem mudou" >/dev/null; _s_deriv "${sha_s}" kg-node "#N_FONTE"
+    rs=0; ts="$(ONION_KG_TRACE="${kt}" bash "${mut}/kg-trace-semscheme.sh" "${ds}" --format tsv 2>/dev/null)" || rs=$?
+    if grep -q 'SCHEME-FALHA' <<< "${ts}"; then record_fail "kg-trace: (s-MUT) mutante NÃO morde" "sem a tradução a falha ainda saiu nomeada: ${ts:0:160}"
+    elif grep -q $'PRODUTO\t.*ENTRADA-QUEBRADA' <<< "${ts}"; then record_pass "kg-trace: (s-MUT) sem a tradução das falhas de esquema → a fonte mudada volta a ENTRADA-QUEBRADA, sem nó (o (s2) cai)"
+    else record_fail "kg-trace: (s-MUT) desvio" "rc=${rs} tsv=${ts:0:160}"; fi
+  fi
+  unset -f _s_node _s_fonte _s_deriv _s_lint
+  rm -rf "${ds}"
+
   unset -f _kt _mk_trace_sandbox
   rm -rf "${d}" "${d2}" "${d3}" "${d4}" "${d5}" "${mut}"
 }
@@ -6820,6 +6893,28 @@ run_vendor_scrub_form_selftests() {
   if [ -z "${out//[[:space:]]/}" ]; then
     record_pass "vendor-scrub-form: (f) M&A, Q&A e V&V não viram candidato (1 letra de cada lado)"
   else record_fail "vendor-scrub-form: (f)" "sigla do ofício virou candidato: ${out:0:200}"; fi
+  # (i) chave=valor&chave=valor NÃO é ampersand corporativo (medido 2026-10-28 no adotante sge, kg-ssot 4.37.0: os
+  #     fragmentos de PDF `zoom=200&page=3` e `page=3&zoom=200` de duas fixtures do vendor viravam `200&page` e
+  #     `3&zoom`, 2 HARD falsos). Pelo modo scan que a REGRA 36 consome: a query cala, o nome com `&` segue acusando.
+  #     MUTANTES: sem a regra do `=` dos dois lados, ou sem a do lado só de dígitos, o --selftest do script cai.
+  local _e='&'   # o `&` por variável: o literal neste arquivo (que viaja) viraria candidato NOVO da própria guarda
+  printf 'locator: "#zoom=200%spage=3"\nlocator: "#page=3%szoom=200"\na Acme%sCo, a Baker%sSons e a Foo%sBar Ltda\n' "${_e}" "${_e}" "${_e}" "${_e}" "${_e}" > "${d}/.claude/commands/vaza.md"
+  out="$(bash "${sc}" "${d}" 2>&1 || true)"
+  if ! grep -qE "200${_e}page|3${_e}zoom" <<< "${out}" && grep -qF "|Acme${_e}Co" <<< "${out}" && grep -qF "|Baker${_e}Sons" <<< "${out}" \
+     && grep -qF "|Foo${_e}Bar" <<< "${out}"; then
+    record_pass "vendor-scrub-form: (i) fragmento de PDF (zoom=200${_e}page=3, page=3${_e}zoom=200) cala; Acme${_e}Co, Baker${_e}Sons e Foo${_e}Bar Ltda seguem acusando"
+  else record_fail "vendor-scrub-form: (i) query de URL" "out=${out:0:240}"; fi
+  local _hm _hn
+  for _hm in 'query' 'digito'; do
+    case "${_hm}" in
+      query)  sed '/^          case "${t}" in =\*=) continue ;; esac/d' "${sc}" > "${mut}/h.sh" ;;
+      digito) sed '/^          case "${t%%&\*}" in \*\[!0-9\]\*) : ;; \*) continue ;; esac/d; /^          case "${t#\*&}" in \*\[!0-9\]\*) : ;; \*) continue ;; esac/d' "${sc}" > "${mut}/h.sh" ;;
+    esac
+    if cmp -s "${sc}" "${mut}/h.sh"; then record_fail "vendor-scrub-form: (i-MUT ${_hm}) mutante não aplicou" "a âncora da cura mudou"; continue; fi
+    _hn=0; bash "${mut}/h.sh" --selftest >/dev/null 2>&1 || _hn=$?
+    if [ "${_hn}" -ne 0 ]; then record_pass "vendor-scrub-form: (i-MUT ${_hm}) sem a regra '${_hm}' da cura → o --selftest do detector cai (a query volta a ser candidato)"
+    else record_fail "vendor-scrub-form: (i-MUT ${_hm}) mutante NÃO morde" "sem a regra o --selftest segue verde"; fi
+  done
   rm -rf "${d}" "${mut}"
 
   # ── (g) A METADE POR FORMA RODA EM `role: adopted` E SEM `members.yaml` ────────────────────────

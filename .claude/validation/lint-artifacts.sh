@@ -805,6 +805,10 @@ check_kg_radar_integrity() {
 #   É a parte genérica que a REGRA 111 fazia por conta própria (o token que some do JSON com o
 #   arquivo presente). HARD no core, SOFT no derivado no 1º ciclo. E o rc 1 do produto sem achado
 #   traduzido vira ENTRADA-QUEBRADA: antes da tradução do locator, ele saía com TSV vazio e calava.
+#   DESDE A 4.37.0 (2026-10-28) ELA LÊ O `schemes` DO PRODUTO: a falha do provenance.scheme ou do
+#   provenance.sha256 sai com o nó e o código (integrity.trace-sha256-mismatch, -locator-out-of-range,
+#   -quote-missing), HARD no core e SOFT no derivado; o unpinned e o malformed do skipped saem SOFT.
+#   Antes da tradução, a falha caía em ENTRADA-QUEBRADA sem nomear o nó.
 # ===========================================================================
 check_kg_trace_resolve() {
   local helper="${SCRIPT_DIR}/kg-trace.sh"
@@ -849,6 +853,17 @@ check_kg_trace_resolve() {
         else _lwhy="o arquivo da fonte ${target%%#*} não existe (integrity.trace-locator-missing)"; fi
         violation "${_lsev}" "${REPO_ROOT}/${g}" \
           "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/${verdict}] ${nid}: o provenance.locator não resolve em '${target}' — ${_lwhy} (detalhe: bash .claude/validation/kg-trace.sh)"
+        continue ;;
+      SCHEME-FALHA:*)
+        # kg-ssot 4.37.0 (contrato v4.17): a fonte lida pelo provenance.scheme não tem o que o locator aponta, ou o
+        # provenance.sha256 não confere com os bytes dela. HARD no core; SOFT no derivado, como o locator.
+        local _ssev="HARD"; [ "${IS_DERIVED:-0}" -eq 1 ] && _ssev="SOFT"
+        violation "${_ssev}" "${REPO_ROOT}/${g}" \
+          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME] ${nid}: a fonte não sustenta o que o nó declara em '${target}' — ${verdict#SCHEME-FALHA:} (a fonte mudou ou o locator saiu dela: releia a fonte e regrave o sha256 e o locator; detalhe: bash .claude/validation/kg-trace.sh)"
+        continue ;;
+      SCHEME-AVISO)
+        violation "SOFT" "${SCRIPT_DIR}/kg-trace.sh" \
+          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME-AVISO] provenance.scheme ou sha256 declarados e NÃO julgados ${target} — unpinned é URL sem commit fixado, malformed é scheme, locator ou hash fora da forma (detalhe: bash .claude/validation/kg-trace.sh)"
         continue ;;
     esac
     violation "HARD" "${REPO_ROOT}/${g}" \
