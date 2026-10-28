@@ -12,7 +12,7 @@
 #     allowlist do A7 (leitura passa; escrita e find -delete não);
 #   · um MUTANTE do juiz (ignora a allowlist), que este teste tem de REPROVAR;
 #   · os canários (vps/plant-canaries.sh): plantio, sandbox sem .env real, troca e volta do token;
-#   · a foto de permissões (vps/snapshot-permissions.sh): limpo, contaminado, comparação.
+#   · a foto de permissões (vps/snapshot-permissions.sh): limpo, contaminado (a2a-spike e a2a-rt), comparação.
 # Uso : bash hooks/record-tool-attempts.selftest.sh        Exit: 0 tudo passou · 1 algum caso falhou
 # =============================================================================
 set -uo pipefail
@@ -277,6 +277,10 @@ printf '{"permissions":{"allow":["Bash(ls:*)","mcp__a2a-spike__reply"]}}' > "${P
 expect_rc 0 "foto depois" bash "${SNAP}" --label a8-after --project "${P}"
 expect_rc 1 "'não perguntar de novo' detectado como contaminação" bash "${SNAP}" --assert-clean a8-after
 expect_rc 1 "a comparação acusa a mudança" bash "${SNAP}" --compare a8-before a8-after
+# ida e volta de 2026-10-28 (achado a): o "não perguntar de novo" do a2a-rt também é contaminação
+printf '{"permissions":{"allow":["mcp__a2a-rt__read_inbox"]}}' > "${P}/.claude/settings.local.json"
+expect_rc 0 "foto com o a2a-rt lembrado" bash "${SNAP}" --label rt-after --project "${P}"
+expect_rc 1 "'não perguntar de novo' do a2a-rt detectado como contaminação" bash "${SNAP}" --assert-clean rt-after
 
 echo "── ${PASS} passaram, ${FAIL} falharam"
 [ "${FAIL}" = 0 ]

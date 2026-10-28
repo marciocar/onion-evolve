@@ -117,10 +117,14 @@ TARGS=(); [ -z "${THREAD}" ] || TARGS=(--thread "${THREAD}")
 if [ "${SIDE}" = core ]; then
   [ -n "${FROM}" ] || FROM="onion-evolve"; [ -n "${KID}" ] || KID="onion-evolve-spike-1"
   KARGS=(); [ -z "${KEY}" ] || KARGS=(--key "${KEY}")
-  # o a2a-send monta e assina SEM rede (--dry-run) e grava o envelope 0600 (--out); daqui ele vai ao outbox
+  # o a2a-send monta e assina SEM rede (--dry-run) e grava o envelope 0600 (--out); daqui ele vai ao outbox.
+  # O stderr dessa etapa INTERNA fica num arquivo: a linha "(dry-run: …)" dela é sobre a montagem, não sobre este
+  # envio, e impressa aqui contradizia o "gravado no outbox" logo abaixo (achado e, 2026-10-28). Só a saída muda:
+  # se a montagem falhar, o stderr inteiro aparece.
   bash "${SEND}" --from "${FROM}" --to "${TO}" --kid "${KID}" "${KARGS[@]}" --kind question \
-    --exp-offset "${EXP_OFF}" "${TARGS[@]}" --body-file "${WORK}/body" --dry-run --out "${WORK}/env.json" >/dev/null \
-    || die "o a2a-send.sh não montou o envelope"
+    --exp-offset "${EXP_OFF}" "${TARGS[@]}" --body-file "${WORK}/body" --dry-run --out "${WORK}/env.json" >/dev/null 2> "${WORK}/build.err" \
+    || { cat "${WORK}/build.err" >&2; die "o a2a-send.sh não montou o envelope"; }
+  grep -v '^(dry-run: ' "${WORK}/build.err" >&2 || true
   JTI="$(jq -r '.jws' "${WORK}/env.json" | cut -d. -f2 | tr '_-' '/+' | { s="$(cat)"; case $(( ${#s} % 4 )) in 2) s="${s}==";; 3) s="${s}=";; esac; printf '%s' "$s"; } | openssl base64 -d -A | jq -r '.jti')"
   TH="$(jq -r '.signal.thread' "${WORK}/env.json")"
   ( umask 077; mkdir -p "${OUTBOX}" )

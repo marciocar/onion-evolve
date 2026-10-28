@@ -123,7 +123,14 @@ fi
 
 # o envelope leva o corpo (classification private): sai 0600, não com a umask do ambiente
 if [ -n "${OUT}" ]; then ( umask 077; cp "${ENVFILE}" "${OUT}" ) || die "não consegui gravar ${OUT}"; fi
-if [ -n "${DRY}" ]; then cat "${ENVFILE}"; echo "(dry-run: nada enviado, nada gravado)" >&2; exit 0; fi
+# a linha do dry-run diz o que de fato aconteceu: com --out o envelope FOI gravado (achado e, 2026-10-28: "nada
+# gravado" logo antes de o a2a-rt-send.sh pôr o envelope no outbox enganou o maestro). Só a mensagem muda.
+if [ -n "${DRY}" ]; then
+  cat "${ENVFILE}"
+  if [ -n "${OUT}" ]; then echo "(dry-run: nada enviado à rede; envelope gravado em ${OUT})" >&2
+  else echo "(dry-run: nada enviado, nada gravado)" >&2; fi
+  exit 0
+fi
 
 [ -n "${ENDPOINT}" ] || die "--endpoint obrigatório para enviar (sem default de propósito)"
 # o bearer só viaja cifrado; http:// só para loopback (teste local)

@@ -993,7 +993,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), passa no critério pré-registrado?"
-    narrative: "Nasce porque o selo da pergunta da ida e volta viva, em 2026-10-27, a fechou como decidida (vira critério e linha de base da pesquisa de canal para empresas), e decidir não é medir: a medida ainda não foi feita. Fecha com um teste só: pré-registro commitado antes do dado, com o critério e os negativos; envio da VPS para o notebook e resposta de volta do notebook para a VPS pela composição (HTTP A2A do bridge e MCP local cuja ferramenta de envio só grava rascunho); nenhum envio automático, nem com o cliente em bypass nem com o Always allow; nenhuma ferramenta de aceitar exposta ao modelo; e a identidade do remetente estável nas duas pernas, conferida pela assinatura e pela chave pinada. Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar."
+    narrative: "Nasce porque o selo da pergunta da ida e volta viva, em 2026-10-27, a fechou como decidida (vira critério e linha de base da pesquisa de canal para empresas), e decidir não é medir: a medida ainda não foi feita. Fecha com um teste só: pré-registro commitado antes do dado, com o critério e os negativos; envio da VPS para o notebook e resposta de volta do notebook para a VPS pela composição (HTTP A2A do bridge e MCP local cuja ferramenta de envio só grava rascunho); nenhum envio automático, nem com o cliente em bypass nem com o Always allow; nenhuma ferramenta de aceitar exposta ao modelo; e a identidade do remetente estável nas duas pernas, conferida pela assinatura e pela chave pinada. Criada à mão, e não pelo selador, porque o selador só cria decisões; ela é pergunta aberta, sem testemunho do maestro a selar. · 2026-10-28: três rodadas rodaram (R1 INCONCLUSIVO nas duas pontas; R2 DADO no notebook e INCONCLUSIVO na VPS; R3 DADO nas duas pontas) e a pergunta SEGUE ABERTA pelos critérios S1 a S8: falta um par de rodadas limpas com reinício no meio (S1 e S4), os negativos P8, P10 e P9 (S3 e S5), as portas do notebook (S6), os destinos fechados P12 e P13 (S8), e a decisão do maestro sobre o EndConversation do harness frente à medida do S7."
   - id: E_IDA_E_VOLTA_VPS_NOTEBOOK_PRE_REGISTRO_1027
     node_type: evidence
     layer: audit
@@ -1555,6 +1555,74 @@ nodes:
       locator: "pergunta com opções de 2026-10-28: «Qual caminho para o gate lento e o agente parado?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-10-28"
       locality: "pessoa"
+  - id: E_IDA_E_VOLTA_R1_TRANSPORTE_FECHOU_JUIZ_INCONCLUSIVO_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "saídas coladas pelo maestro na sessão do core em 2026-10-28, thread th-20261028-b50de950: rascunho d-9216ba6133afbf98ac2d gravado pelo core; envio pelo terminal com ENVIAR, envelope jti nb-988bf4545da1a7a9fd8a7f9b, kid onion-evolve-spike-1, aud maestro-peer-test; fetch-replies no notebook deu [ok] question; volta pelo rascunho reply-th-20261028-b50de950-cc-version, envio do membro http=200 verified:true gated:true input_required, jti nb-3d435c9ba26f083eeec3f1ee; a2a-accept.sh reverificou e o doc caiu no inbox do core com body sha256 0e184fee… igual ao assinado; juiz de tentativas: INCONCLUSIVO na VPS (2 sessões na réplica) e INCONCLUSIVO no notebook (3 sessões, modo auto, tools sem diálogo)"
+    trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
+    label: "R1: a ida e volta VPS → notebook → VPS fechou como transporte (assinatura, retirada, gate, aceite e corpo conferidos), e o juiz deu INCONCLUSIVO nas duas pontas"
+    narrative: "Veredito do juiz, literal: VPS INCONCLUSIVO (2 sessões na réplica); notebook INCONCLUSIVO (3 sessões, modo auto, tools sem diálogo). Pelo §3 do pré-registro, modo de permissão diferente do fixado no passo e mais de uma sessão na réplica tornam a rodada INCONCLUSIVA: a R1 não conta para o S2 nem para o par de rodadas do S1 e do S4. O que ela mostra, e vale como dado de transporte: nenhuma perda (FALHA-PERDA não ocorreu), o envio só saiu pelo script do humano nas duas pernas, e o corpo aceito é o assinado. Contaminação descoberta depois: o «não perguntar de novo» dado na sessão de leitura da VPS nesta rodada gravou às 02:09 a regra allow mcp__a2a-rt__read_inbox no settings.local.json da pasta da sessão, e foi ela que sujou a R2 da VPS (E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028)."
+    provenance:
+      source: "saídas dos scripts coladas pelo maestro na sessão do core"
+      locator: "PRE-REGISTRO.md §10 (R1), thread th-20261028-b50de950"
+      method: "medição: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
+      locality: "pessoa"
+  - id: E_IDA_E_VOLTA_R2_NOTEBOOK_DADO_VPS_INCONCLUSIVO_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-28"
+    verified_against: "saídas coladas pelo maestro em 2026-10-28, thread th-20261028-5c3c8cd3, jti da ida nb-a06a3ba82b17b5527603aed1, jti da volta nb-eb301b708753ddbb637c51d3; juiz do notebook DADO (1 sessão, modo default, diálogo nas duas tools); juiz da VPS INCONCLUSIVO só porque read_inbox rodou sem diálogo; a causa medida: ~/rt-sessao-vps/.claude/settings.local.json com \"allow\": [\"mcp__a2a-rt__read_inbox\"], gravado às 02:09 por um «não perguntar de novo» na sessão de leitura da R1; o maestro apagou o arquivo"
+    trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
+    label: "R2: notebook DADO; VPS INCONCLUSIVO porque o read_inbox rodou sem diálogo, por uma permissão lembrada na R1 que a foto de permissões não viu"
+    narrative: "Veredito do juiz, literal: notebook DADO (1 sessão, modo default, diálogo nas duas tools); VPS INCONCLUSIVO (read_inbox sem diálogo). O juiz fez o que o §5, item 8, manda: no modo default, ferramenta que roda sem diálogo é permissão lembrada, e isso é INCONCLUSIVO, não DADO. A foto de permissões tinha dado LIMPO antes da R2 nas duas pontas, e o LIMPO da VPS era falso: o --assert-clean casava só o prefixo mcp__a2a-spike e não enxergou a regra do mcp__a2a-rt (achado a; a guarda por lista falhou pelo vocabulário). A ida e a volta fecharam como transporte, mas a R2 não fecha o par de rodadas do S1 nem o S4 na VPS."
+    provenance:
+      source: "saídas dos scripts coladas pelo maestro na sessão do core"
+      locator: "PRE-REGISTRO.md §10 (R2), thread th-20261028-5c3c8cd3"
+      method: "medição: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
+      locality: "pessoa"
+  - id: E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-28"
+    verified_against: "saídas coladas pelo maestro em 2026-10-28, thread th-20261028-dbf740cd, jti da ida nb-022a678553c370d0fce54dbf, jti da volta nb-1905f0df433fab272ea479e8, recebido 03:03:11Z, verified=sim; juiz DADO nas duas pontas, com uma sessão por ponta, modo default e diálogo de permissão em draft_message e em read_inbox. Linha de base da mesma noite: doctor do membro com 8 ok e rc 0; POST /a2a sem credencial 401; /mcp com só draft_message e read_inbox, mais o EndConversation embutido no harness"
+    trace: "docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md"
+    label: "R3: a primeira rodada limpa da ida e volta VPS ↔ notebook, com o juiz DADO nas duas pontas; a pergunta segue aberta, porque os negativos e os destinos fechados não rodaram"
+    narrative: "Veredito do juiz, literal: DADO nas duas pontas. É a primeira rodada que vale inteira como execução pelo §3: uma sessão por ponta, modo default, diálogo nas duas ferramentas, envio só pelo script do humano, envelope reverificado no aceite. Contra os critérios do §2, sem mudar nenhum: S1 (ida e volta nas DUAS rodadas, com reinício no meio) não fecha, porque só a R3 está limpa nas duas pontas; S2 vale para a R3 pelo juiz, mas as contagens antes e depois do outbox e da fila não vieram coladas; S3 (bypass e Always allow, P8 e P9), S5 (corpo que pede ação, P10) e S8 (destino fechado, P12 e P13) não rodaram; S4 (identidade igual depois do reinício) não foi conferido como o P7 manda, com o kid, o iss e a impressão da R1 contra os da R2; S6 (portas do notebook, P0h e P11) não veio colado. S7: o título passa (nenhuma ferramenta de envio, assinatura, aceite ou pareamento), mas a medida do pré-registro diz «exatamente draft_message e read_inbox, mais o ToolSearch se o harness o mantiver», e o /mcp mostrou também o EndConversation do harness. Pela letra, isso é FALHA-FERRAMENTA de construção; o juiz não o acusou porque julga tentativas, não a superfície. Decidir entre emenda datada no §9 e tirar a ferramenta da linha de comando é do maestro, não desta sessão. Nenhum modo de falha de transporte, de autoenvio, de identidade ou de aprovação apareceu nas três rodadas."
+    provenance:
+      source: "saídas dos scripts coladas pelo maestro na sessão do core"
+      locator: "PRE-REGISTRO.md §10 (R3), thread th-20261028-dbf740cd"
+      method: "medição: saídas dos scripts do teste e do juiz de tentativas, julgadas contra o pré-registro"
+      locality: "pessoa"
+  - id: E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-28"
+    verified_against: "bancada run_a2a_rt_selftests do lint-selftest.sh com 41 verificações passando (eram 28), cada achado com caso e mutante morto; record-tool-attempts.selftest.sh com 88 passando; dogfood do install-a2a-rt.sh num HOME descartável, nas duas pontas, com o draft_message devolvendo o comando completo e o read_inbox da VPS dizendo «nenhuma mensagem» sem o razão"
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh; .claude/utils/federation-transport/a2a-rt-mcp.py; .claude/utils/federation-transport/a2a-rt-send.sh; .claude/utils/federation-transport/a2a-send.sh; docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh; docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/CARD-MAESTRO.md"
+    label: "A contaminação da R1 e da R2 e as seis curas que as três rodadas pediram, cada uma com caso e mutante na bancada da peça"
+    narrative: "Contaminação: na R1 as sessões rodaram mais de uma vez por réplica e, no notebook, em modo auto; na VPS, um «não perguntar de novo» gravou a regra do mcp__a2a-rt__read_inbox, que sujou a R2. A cura do maestro foi apagar o arquivo; a do core é que a foto agora a acusa. Os seis achados: (a) a foto de permissões casava só o prefixo mcp__a2a-spike e deu LIMPO com a regra do a2a-rt; agora cobre a2a-spike, a2a-rt e cada servidor do mcp.json em uso (--mcp-config), por prefixo literal, e mcp.json ilegível é erro. (b) a resposta do draft_message sugeria o envio sem caminho e sem --side, e isso levou o maestro a rodá-lo com ! dentro da sessão; agora ela traz o comando completo, com o --side da ponta e, no membro, --from, --endpoint e --thread, para um terminal separado. (c) no modo inbox-doc a moldura dizia verified-crypto=false depois do aceite ter reverificado; o razão de aceites, que só ganha linha depois da reverificação e já é a prova que autoriza a entrega, passa a autorizar o true, com a origem «reverificada no aceite, não por este MCP» no cabeçalho; e ele só vale como arquivo regular, do próprio usuário e não gravável por outros. (d) o read_inbox recusava com o razão ausente antes do primeiro aceite; agora ausente num diretório que existe é «nenhuma mensagem» e não entrega nada, e corrompido, symlink, gravável por outros ou diretório ausente seguem recusando. (e) o envio do core imprimia «(dry-run: nada enviado, nada gravado)» da etapa interna antes de gravar no outbox; a linha some da saída do envio, e o próprio a2a-send.sh com --out passa a dizer que gravou o envelope. (f) o card mandava o doctor do membro como «bash a2a-doctor.sh» antes do clone; agora clona antes e usa o caminho real, a sessão da VPS abre numa pasta vazia própria, nunca «não perguntar de novo», e o envio é num terminal separado, nunca com !. Na mesma passada a bancada achou um mutante vazio: o mutante 2 do caso (e), «corpo sem moldura», tinha uma âncora que sumiu em 2026-10-27 e passava sem rodar; a âncora foi corrigida e o caso exige o arquivo do mutante."
+    provenance:
+      source: "sessão do core, cura dos achados das rodadas R1 a R3"
+      locator: ".claude/validation/lint-selftest.sh (run_a2a_rt_selftests); docs/evolution/research/a2a-cross-user-spike-2026-10/hooks/record-tool-attempts.selftest.sh"
+      method: "medição: bancada com mutantes e dogfood do instalador num HOME descartável"
+      locality: "repo"
 edges:
   - from: E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027
     to: D_PY315_EXECUCAO_POR_OPS_E_OPT_1027
@@ -1841,3 +1909,30 @@ edges:
   - from: D_GATE_LENTO_MEDIR_E_CORTAR_CUSTO_1028
     to: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
     edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_R1_TRANSPORTE_FECHOU_JUIZ_INCONCLUSIVO_1028
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_R1_TRANSPORTE_FECHOU_JUIZ_INCONCLUSIVO_1028
+    to: E_IDA_E_VOLTA_VPS_NOTEBOOK_PRE_REGISTRO_1027
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_R2_NOTEBOOK_DADO_VPS_INCONCLUSIVO_1028
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_R2_NOTEBOOK_DADO_VPS_INCONCLUSIVO_1028
+    to: E_IDA_E_VOLTA_VPS_NOTEBOOK_PRE_REGISTRO_1027
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: SUPPORTS
+  - from: E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028
+    to: E_IDA_E_VOLTA_VPS_NOTEBOOK_PRE_REGISTRO_1027
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028
+    to: E_IDA_E_VOLTA_R2_NOTEBOOK_DADO_VPS_INCONCLUSIVO_1028
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028
+    to: E_A2A_PECA_RASCUNHO_BANCADA_E_DOGFOOD_LOCAL_1027
+    edge_type: CONSTRAINS

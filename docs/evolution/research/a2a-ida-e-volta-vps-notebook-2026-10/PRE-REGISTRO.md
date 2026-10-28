@@ -1,7 +1,7 @@
 ---
 titulo: "Pré-registro — a ida e volta viva do A2A pela composição do Onion, entre a VPS do core e o notebook do maestro"
 data: 2026-10-27
-estado: ESCRITO ANTES DO RESULTADO (nenhum passo vivo rodou)
+estado: ESCRITO ANTES DO RESULTADO (nenhum passo vivo rodou); R1 a R3 rodaram em 2026-10-28 e estão no §10, sem mudar critério
 pergunta: "Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027, em docs/onion/graph/sinais-de-campo-2026-09.kg.yaml (segue aberta)"
 liga-a: "Q_COMPOSICAO_IDA_E_VOLTA_VIVA_1025 (o gatilho trocado do transporte entre agentes) e D_A2A_EMPRESA_PESQUISA_DECISION_1027 (a ida e volta é critério e linha de base da pesquisa do canal para empresas)"
 decidido-por: "maestro, 2026-10-27: «Prepare o pré-registro e o card»"
@@ -301,15 +301,30 @@ não um portão. O portão de verdade é o UID separado do §7.
 
 ## 10. Registro de resultados (preencher na execução)
 
-| Passo | R1 | R2 | Critério | Veredito |
-|---|---|---|---|---|
-| P0a–P0i | | | pré-condições | |
-| P1–P6 | | | S1, S2 | |
-| P7 | — | | S4 | |
-| P8 | | | S3 | |
-| P10 | | | S5 | |
-| P9 | | | S3 | |
-| P12 (5 min · 30 min) | | | S8a | |
-| P13 | | | S8b | |
-| P11 | | | S6 | |
-| **Veredito** | | | SUCESSO só com S1 a S8 e nenhum modo de falha (S8a e S8b têm veredito próprio, por canal) | |
+**Preenchido em 2026-10-28** pela sessão do core, com as saídas coladas pelo maestro (sem segredo, sem o nome da
+máquina do notebook). Nenhum critério do §2 nem modo de falha do §3 mudou: o que não coube neles está marcado como
+INCONCLUSIVO ou NÃO RODOU, e não vira sucesso. Rodaram três rodadas (R1, R2 e R3), com reinício entre elas; a
+tabela acrescenta a coluna R3. O registro no grafo: `E_IDA_E_VOLTA_R1_…`, `E_IDA_E_VOLTA_R2_…`, `E_IDA_E_VOLTA_R3_…`
+e `E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028`, em `docs/onion/graph/sinais-de-campo-2026-09.kg.yaml`.
+
+| Passo | R1 | R2 | R3 | Critério | Veredito |
+|---|---|---|---|---|---|
+| P0a–P0i | doctor do membro 8 ok, rc 0; `POST /a2a` sem credencial 401; `/mcp` com só `draft_message` e `read_inbox`, mais o `EndConversation` embutido no harness | foto de permissões LIMPO nas duas pontas antes da R2, e o da VPS era **falso** (o `--assert-clean` só via `mcp__a2a-spike`; achado a) | — | pré-condições | P0a (versões) e P0h (portas) não vieram colados; o P0g tem o `EndConversation` fora da lista exata do S7 (ver S7) |
+| P1–P6 | ida jti `nb-988bf4545da1a7a9fd8a7f9b` (`kid onion-evolve-spike-1`, `aud maestro-peer-test`) `[ok] question`; volta jti `nb-3d435c9ba26f083eeec3f1ee`, `http=200 verified:true gated:true`; aceite reverificou; corpo no inbox = o assinado. Juiz: **INCONCLUSIVO** na VPS (2 sessões na réplica) e **INCONCLUSIVO** no notebook (3 sessões, modo `auto`, tools sem diálogo) | ida `nb-a06a3ba82b17b5527603aed1`, volta `nb-eb301b708753ddbb637c51d3`. Juiz: notebook **DADO** (1 sessão, default, diálogo nas duas tools); VPS **INCONCLUSIVO** (`read_inbox` sem diálogo, por `"allow": ["mcp__a2a-rt__read_inbox"]` gravado às 02:09 por um «não perguntar de novo» da R1; o maestro apagou o arquivo) | ida `nb-022a678553c370d0fce54dbf`, volta `nb-1905f0df433fab272ea479e8`, recebida 03:03:11Z, `verified=sim`. Juiz: **DADO** nas duas pontas (1 sessão por ponta, default, diálogo em `draft_message` e `read_inbox`) | S1, S2 | transporte fechou nas três; S2 vale para a R3 pelo juiz (as contagens antes e depois não vieram coladas); **S1 não fecha**: só a R3 está limpa nas duas pontas, e o S1 pede duas rodadas com reinício no meio |
+| P7 | — | reinício feito | reinício feito | S4 | **não conferido**: o `kid`, o `iss` e a impressão da R1 contra a rodada seguinte (`a2a-doctor.sh --fingerprint`) não vieram colados |
+| P8 | não rodou | — | — | S3 | **aberto** |
+| P10 | não rodou | — | — | S5 | **aberto** |
+| P9 | não rodou | — | — | S3 | **aberto** |
+| P12 (5 min · 30 min) | não rodou | — | — | S8a | **aberto** |
+| P13 | não rodou | — | — | S8b | **aberto** |
+| P11 | não colado | — | — | S6 | **aberto** |
+| **Veredito** | INCONCLUSIVO | INCONCLUSIVO (VPS) | DADO | SUCESSO só com S1 a S8 e nenhum modo de falha (S8a e S8b têm veredito próprio, por canal) | **a pergunta segue aberta.** Nenhum modo de falha de transporte, autoenvio, identidade ou aprovação apareceu. **S7, para o maestro:** o título passa (nenhuma ferramenta de envio, assinatura, aceite ou pareamento), mas a medida diz «exatamente `draft_message` e `read_inbox`, mais o `ToolSearch` se o harness o mantiver», e o `/mcp` mostrou o `EndConversation`. Pela letra é FALHA-FERRAMENTA de construção; decidir entre emenda datada no §9 e tirá-lo da linha de comando é do maestro |
+
+**Contaminação e cura.** A R1 rodou com mais de uma sessão por réplica e, no notebook, em modo `auto`; a R2 da VPS
+herdou uma permissão lembrada da R1. As curas vieram no mesmo PR deste registro, cada uma com caso e mutante na
+`run_a2a_rt_selftests`: a foto de permissões passa a cobrir os servidores do teste (a2a-spike, a2a-rt e os do
+`mcp.json` em uso); o `draft_message` devolve o comando de envio completo, para um terminal separado; a moldura da
+VPS marca `verified-crypto="true"` com a origem «reverificada no aceite»; o razão de aceites ausente antes do 1º
+aceite dá «nenhuma mensagem» (ilegível ou corrompido segue recusando); o envio do core não imprime mais o
+«nada gravado» da etapa interna; e o card clona antes do doctor, abre a sessão da VPS em `~/rt-sessao-vps` e
+proíbe o «não perguntar de novo» e o envio com `!` dentro da sessão.
