@@ -641,10 +641,10 @@
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
 | 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
 | 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
+| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4380` | coordenacao-sessoes-2026-10 | A rodada de update da 4.38.0 aos quatro adotantes, com o pin 1d04d4e24cec do core. |
 | 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
 | 2.0 | `Q_COORD_CORE_DPAREN_END_KG_READ_LEG` | coordenacao-sessoes-2026-10 | Aviso falso do _dparen_end no kg-read-leg.sh: ((a)+(b)) <<E é lido como subshell. |
 | 2.0 | `Q_COORD_FIXTURE_NODE_SELFTEST_TMP` | coordenacao-sessoes-2026-10 | O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás. |
-| 1.5 | `Q_COORD_UPDATE_4_ADOTANTES_4380` | coordenacao-sessoes-2026-10 | A rodada de update da 4.38.0 aos quatro adotantes, com o pin 1d04d4e24cec do core. |
 
 ## maestro — 17 item(ns)
 
