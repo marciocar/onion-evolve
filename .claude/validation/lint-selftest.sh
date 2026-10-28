@@ -27997,8 +27997,9 @@ run_lint_hard_file_selftests() {
   # (c) o motor PEDE a lista e a IMPRIME ao reprovar (registro: arquivo que ninguém lê é recurso morto)
   # (a forma mudou em 2026-10-08, SAC-66: o lint do commit virou a função _lint_in, que recebe o arquivo)
   # O ops/pr-finalize.sh é core-only (não viaja): no adotante o caso não tem objeto (medido no sge, 2026-10-28).
-  if [ ! -f "${REPO_ROOT}/ops/pr-finalize.sh" ]; then
-    record_skip "lint-hard-file: (c) sem ops/pr-finalize.sh (core-only) → pulado"
+  # No core a falta dele cai no else e reprova.
+  if [ "${SELFTEST_ROLE:-}" = "adopted" ] && [ ! -f "${REPO_ROOT}/ops/pr-finalize.sh" ]; then
+    record_skip "lint-hard-file: (c) role: adopted e sem ops/pr-finalize.sh (core-only) → pulado"
   elif grep -q 'ONION_LINT_HARD_FILE="$2"' "${REPO_ROOT}/ops/pr-finalize.sh" \
      && grep -q '_lint_in "${_tmp}/wt" "${_tmp}/hard.txt"' "${REPO_ROOT}/ops/pr-finalize.sh" \
      && grep -q 'as violações HARD do commit' "${REPO_ROOT}/ops/pr-finalize.sh"; then
@@ -28110,16 +28111,17 @@ if [ -f "${MANIFEST}" ]; then
         record_skip "fixtures: ${fixture} — core-only (role: adopted; escopo derivado torna a asserção insatisfazível)"; continue ;;
       esac
       # Medido no sge em 2026-10-28 (pin 1d04d4e24cec): o glob morto sob `docs/` não viaja, e no adotante a REGRA 53
-      # responde com o SOFT [papel/SEM-OBJETO] antes do HARD «NUNCA carrega», que é o certo para o papel. A asserção
+      # responde com o SOFT [papel/SEM-OBJETO] em vez do HARD «NUNCA carrega», o certo para o papel. A asserção
       # do keyword do core é insatisfazível lá; o veredito bad segue medido no core.
       case "${fixture}" in r53-rules-pathscoped/bad-brace-dead.md|r53-rules-pathscoped/bad-scalar-dead.md)
         record_skip "fixtures: ${fixture} — core-only (role: adopted; o glob morto sob docs/ vira [papel/SEM-OBJETO], não «NUNCA carrega»)"; continue ;;
       esac
     fi
     # A REGRA 89 só julga onde há docs/onion/radar-baselines.yaml (radar-aufhebung-check.sh sai com TOTAL 0 sem ele):
-    # adotante sem radar não tem o objeto, e a fixture é insatisfazível lá (medido no sge, 2026-10-28).
+    # adotante sem radar não tem o objeto, e a fixture é insatisfazível lá (medido no sge, 2026-10-28). Só no papel
+    # adopted: no core a falta da baseline é defeito, e a fixture segue reprovando.
     case "${fixture}" in r89-aufhebung/*)
-      if [ ! -e "${REPO_ROOT}/docs/onion/radar-baselines.yaml" ]; then
+      if [ "${SELFTEST_ROLE}" = "adopted" ] && [ ! -e "${REPO_ROOT}/docs/onion/radar-baselines.yaml" ]; then
         record_skip "fixtures: ${fixture} — sem docs/onion/radar-baselines.yaml a REGRA 89 não tem objeto aqui"; continue; fi ;;
     esac
     case "${kind}" in
