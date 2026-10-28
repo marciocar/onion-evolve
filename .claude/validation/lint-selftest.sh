@@ -41525,7 +41525,8 @@ PY
     # o print vira `pass` com a MESMA indentação: apagar a linha deixava o `for` sem corpo, o Python do heredoc
     # dava IndentationError e o caso passava pelo ramo errado (JSON ilegível), não pela guarda do rc 1 (achado 1)
     sed '/LOCATOR-MISSING")$/s/^\( *\)print(.*$/\1pass/' "${kts}" > "${mdir}/m4.sh"
-    sed 's/^if \[ -z "\${_tsv}" \] && \[ "\${_krc}" -eq 1 \]; then$/if false; then/' "${mdir}/m4.sh" > "${mdir}/m5.sh"
+    # a guarda do rc 1 olha os ACHADOS (o TSV sem a linha SCHEME-AVISO, kg-ssot 4.37.0), não o TSV inteiro
+    sed 's/^if \[ -z "\${_findings}" \] && \[ "\${_krc}" -eq 1 \]; then$/if false; then/' "${mdir}/m4.sh" > "${mdir}/m5.sh"
     o0="$(ONION_KG_TRACE="${KT435}" bash "${kts}" "${c4}" --format tsv 2>&1 || true)"
     o4="$(ONION_KG_TRACE="${KT435}" bash "${mdir}/m4.sh" "${c4}" --format tsv 2>&1 || true)"
     o5="$(ONION_KG_TRACE="${KT435}" bash "${mdir}/m5.sh" "${c4}" --format tsv 2>&1 || true)"
@@ -45896,21 +45897,33 @@ run_plan_contract_migration_selftests() {
   # pyvenv.cfg ao lado do executável INVOCADO, e pelo symlink em ${d}/bin o sys.prefix virava o Python base do uv,
   # sem o PyYAML, e o (f) caía pelo `import yaml` e não pela escrita no alvo. O exec pelo caminho do PATH real
   # mantém o venv onde há venv e é o mesmo python3 onde não há.
+  # _pm_pywrap <python> <destino>: a forma que o PATH restrito usa (o mutante (f0-MUT) troca por symlink)
+  _pm_pywrap() { printf '#!%s\nexec %q "$@"\n' "$(command -v bash)" "$1" > "$2"; chmod +x "$2"; }
   if command -v python3 >/dev/null 2>&1; then
-    printf '#!%s\nexec %q "$@"\n' "$(command -v bash)" "$(command -v python3)" > "${d}/bin/python3"; chmod +x "${d}/bin/python3"
-    # (f0) o python3 do PATH restrito é o MESMO Python (sys.prefix) do PATH real. MUTANTE: o symlink de antes; ele só
-    #      morde onde o python3 é de um venv (sys.prefix ≠ sys.base_prefix), e fora dele o mutante pula VISÍVEL.
-    local _pq='import sys; print(sys.prefix)' _pr _pw _pm
+    _pm_pywrap "$(command -v python3)" "${d}/bin/python3"
+    # (f0) o python3 do PATH restrito é o MESMO Python (sys.prefix) do PATH real, e num venv de verdade (criado aqui,
+    #      sem pip, para o caso não depender de o runner ter venv) o wrapper mantém o venv. MUTANTE (f0-MUT): o
+    #      symlink de antes, no mesmo venv, perde o venv (o sys.prefix vira o do Python base) e o (f0) cai.
+    local _pq='import sys; print(sys.prefix)' _pr _pw _pv _pvw _pvm
     _pr="$(python3 -I -c "${_pq}" 2>/dev/null)"; _pw="$(env PATH="${d}/bin" "${d}/bin/python3" -I -c "${_pq}" 2>/dev/null)"
-    if [ -n "${_pr}" ] && [ "${_pw}" = "${_pr}" ]; then record_pass "plan-contract-migration: (f0) o python3 do PATH sem sha256sum é o mesmo Python do PATH real (sys.prefix ${_pr})"
-    else record_fail "plan-contract-migration: (f0) python3 do PATH restrito" "real=${_pr} restrito=${_pw}"; fi
-    if python3 -I -c 'import sys; sys.exit(0 if sys.prefix != sys.base_prefix else 1)' 2>/dev/null; then
-      mkdir -p "${d}/bin-mut"; ln -sf "$(command -v python3)" "${d}/bin-mut/python3"
-      _pm="$("${d}/bin-mut/python3" -I -c "${_pq}" 2>/dev/null)"
-      if [ "${_pm}" != "${_pr}" ]; then record_pass "plan-contract-migration: (f0-MUT) o symlink de volta → o Python perde o venv (sys.prefix ${_pm}) e o (f0) cai"
-      else record_fail "plan-contract-migration: (f0-MUT) mutante NÃO morde" "pelo symlink o sys.prefix seguiu ${_pm}"; fi
-      rm -rf "${d}/bin-mut"
-    else record_skip "plan-contract-migration: (f0-MUT) o python3 daqui não é de venv: o symlink e o wrapper dão o mesmo Python, o mutante não tem o que morder"; fi
+    if python3 -I -m venv --without-pip "${d}/vv" >/dev/null 2>&1 && [ -x "${d}/vv/bin/python3" ]; then
+      _pv="$("${d}/vv/bin/python3" -I -c "${_pq}" 2>/dev/null)"
+      # o mutante é a forma de antes da cura, aplicada no mesmo venv: `_pm_pywrap` virando `ln -sf`
+      _pm_pywrap_mut() { ln -sf "$1" "$2"; }
+      mkdir -p "${d}/bin-vv" "${d}/bin-mut"; _pm_pywrap "${d}/vv/bin/python3" "${d}/bin-vv/python3"
+      _pm_pywrap_mut "${d}/vv/bin/python3" "${d}/bin-mut/python3"; unset -f _pm_pywrap_mut
+      _pvw="$("${d}/bin-vv/python3" -I -c "${_pq}" 2>/dev/null)"; _pvm="$("${d}/bin-mut/python3" -I -c "${_pq}" 2>/dev/null)"
+      # o PATH restrito usa MESMO o wrapper (no CI o python3 não é de venv e o sys.prefix sozinho não distingue o
+      # symlink do wrapper: passada adversarial da 2ª rodada)
+      if [ -n "${_pr}" ] && [ "${_pw}" = "${_pr}" ] && [ -n "${_pv}" ] && [ "${_pvw}" = "${_pv}" ] \
+         && [ ! -L "${d}/bin/python3" ] && grep -q '^exec ' "${d}/bin/python3"; then
+        record_pass "plan-contract-migration: (f0) o python3 do PATH sem sha256sum é wrapper (não symlink), é o mesmo Python do PATH real, e num venv o wrapper o mantém"
+      else record_fail "plan-contract-migration: (f0) python3 do PATH restrito" "real=${_pr} restrito=${_pw} venv=${_pv} wrapper=${_pvw}"; fi
+      if [ -n "${_pvm}" ] && [ "${_pvm}" != "${_pv}" ]; then
+        record_pass "plan-contract-migration: (f0-MUT) com o _pm_pywrap virando symlink, no mesmo venv, o Python perde o venv (sys.prefix ${_pvm}): a comparação do (f0) cairia"
+      else record_fail "plan-contract-migration: (f0-MUT) mutante NÃO morde" "pelo symlink o sys.prefix seguiu ${_pvm} (venv ${_pv})"; fi
+      rm -rf "${d}/vv" "${d}/bin-vv" "${d}/bin-mut"
+    else record_fail "plan-contract-migration: (f0) não consegui criar o venv de prova" "python3 -m venv --without-pip falhou"; fi
   fi
   _pm_target "${d}/sem-migrador"; _pm_bad "${d}/sem-migrador/docs/g/b.kg.yaml" fx-b; rm -f "${d}/sem-migrador/vendor/kg-ssot/tools/kg_migrate.py"; _pm_commit "${d}/sem-migrador"
   _pm_target "${d}/perfil-quebrado"; _pm_bad "${d}/perfil-quebrado/docs/g/b.kg.yaml" fx-b; mkdir -p "${d}/perfil-quebrado/.kg-ssot"
