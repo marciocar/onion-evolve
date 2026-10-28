@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**730 itens abertos** em 129 grafo(s) com aberto (de 168 no escopo) · 131 grupo(s), agrupados por `owner:` (32 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**731 itens abertos** em 129 grafo(s) com aberto (de 168 no escopo) · 131 grupo(s), agrupados por `owner:` (33 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -618,7 +618,7 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## core — 16 item(ns)
+## core — 17 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -636,6 +636,7 @@
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
 | 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
 | 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
+| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4370` | coordenacao-sessoes-2026-10 | A rodada de update da 4.37.0 aos quatro adotantes, com o pin 5b27d09c088f do core. |
 | 2.0 | `Q_COORD_FIXTURE_NODE_SELFTEST_TMP` | coordenacao-sessoes-2026-10 | O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás. |
 | 2.0 | `Q_COORD_WORKTREES_TRAVADAS_SESSAO_BD` | coordenacao-sessoes-2026-10 | A sessão antiga onion-evolve-bd segura 3 worktrees travadas. |
 
