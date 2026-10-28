@@ -191,7 +191,7 @@ nodes:
     verified_at: "2026-10-28"
     verified_against: "E_MA_MCP_LEITURA_MEDIDO_1028"
     label: "O passo 1 de D_ONION_BRAIN_MCP_REMOTO (MCP só leitura do hub pelo chat da casa, atrás do SSO) está no ar; o que falta é abrir à audiência do hub."
-    narrative: "O hub disse não ter achado sinal de que o passo 1 estivesse no ar; a medida de 2026-10-28 diz que está: o serviço de leitura do hub roda, o health responde UP com 7 ferramentas e os três presets da casa no chat já o declaram, atrás do SSO. O que falta para o hub usar: (1) a lista de e-mails permitidos do serviço abrir às pessoas do hub, ato do maestro (o último testemunho, de 2026-10-13, diz que só os endereços do maestro estão nela; não re-medido aqui porque a configuração é legível só pela raiz); (2) Q_MA_CLASSIFICATION antes de abrir ao negócio, porque o MCP serve o clone inteiro; (3) conferir o served_commit da resposta contra a main do hub. Só leitura: nada de escrita entra por este nó."
+    narrative: "O hub disse não ter achado sinal de que o passo 1 estivesse no ar; a medida de 2026-10-28 diz que está: o serviço de leitura do hub roda, o health responde UP com 7 ferramentas e os três presets da casa no chat já o declaram, atrás do SSO. O que falta para o hub usar: (1) a lista de e-mails permitidos do serviço abrir às pessoas do hub, ato do maestro (o último testemunho, de 2026-10-13, diz que só os endereços do maestro estão nela; não re-medido aqui porque a configuração é legível só pela raiz); (2) Q_MA_CLASSIFICATION antes de abrir ao negócio, porque o MCP serve o clone inteiro; (3) conferir o served_commit da resposta contra a main do hub; o probe de 2026-10-28 mostrou os dados 16 dias atrás e nenhum passo que atualize o clone servido (E_MA_MCP_CLONE_SERVIDO_PARADO_1028). Só leitura: nada de escrita entra por este nó."
     provenance:
       source: "medida do core na VPS, 2026-10-28 (E_MA_MCP_LEITURA_MEDIDO_1028)"
       locator: "systemctl, curl no /health e a configuração do chat da casa"
@@ -344,6 +344,50 @@ nodes:
       locator: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028"
       method: "medição: resultado da R3 lido contra o que esta pergunta precisa"
       locality: "repo"
+  - id: E_MA_MARKET_CURADORIA_PROPOSTA_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: curadoria
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-28"
+    verified_against: "o nó D_COMPANY_BRAIN_MARKET_PROPOSAL no grafo do estudo da curadoria, na origin/main dela em 2c8d3846ce21 (peer-ref-check rc 0), e o sinal de proposta de 2026-10-28 que o resume; a pesquisa e as medidas são da curadoria, não re-medidas aqui"
+    label: "Proposta condicional da curadoria para Q_MA_MARKET: no plano atual nenhum caminho de prevenção rodou; o padrão de mercado é um repo por audiência numa organização gratuita, condicionado ao card do maestro (Q_MA_FREE_ORG_READ_ENFORCED)."
+    narrative: "Origem: o PR 153 da curadoria (três pré-registros, dois braços em fonte primária, um laboratório local e um Gitea 28.2.0 rodados, e uma revisão adversarial que reprovou a 1ª versão). PLANO ATUAL (conta pessoal, GitHub gratuito): nenhum caminho de prevenção rodou. O colaborador de repo privado de conta pessoal sempre escreve, porque não há papel só de leitura; não há proteção de branch, CODEOWNERS nem rulesets; a CI só detecta. RECOMENDAÇÃO, condicional, pelo padrão de mercado (lei de Conway, Team Topologies, Data Mesh, InnerSource): um repo por audiência numa organização gratuita, cada equipe com Write no seu repo e Read no outro; uma conta por audiência, porque o dono da organização tem admin em tudo e é bypass declarado; o consumidor liga ao dono por git submodule fixado; a proposta cruzada por PR de fork (InnerSource); o MCP oficial do GitHub herdando a permissão da conta. ALTERNATIVAS: o Pro, que previne no merge (CODEOWNERS com revisão exigida); o Team, que previne no push por caminho (push rulesets); o Gitea auto-hospedado, que previne no push mas é de sentido único (quem está na whitelist escreve tudo); ou só detecção no plano atual. CUSTOS: a migração (referências ao dono atual espalhadas pelos repos da família); o Pages, que não redireciona na transferência; o fork privado, desligado por padrão numa organização nova; e o KG-SSOT partido entre repos (a ponta externa não qualifica o repo, o submodule escapa do ls-files, não há pin no sentido inverso, os grafos que cruzam contextos ficam sem dono), pergunta que a curadoria leva ao kg-ssot. Refutador da curadoria: se o push do card passar, ou se a migração custar mais que o plano pago, a recomendação passa ao plano pago."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/2c8d3846ce21165127117b0b27ae60b8fda4adae/docs/evolution/research/company-brain-multiaudience-2026-10/company-brain-multiaudience-2026-10.kg.yaml#D_COMPANY_BRAIN_MARKET_PROPOSAL"
+      locator: "nó D_COMPANY_BRAIN_MARKET_PROPOSAL; resumo no sinal 2026-10-28-proposal-company-brain-market, em docs/evolution/inbox/_processed/"
+      method: "reading: o core leu o sinal inteiro e conferiu o nó na origin/main da curadoria com o peer-ref-check (rc 0)"
+      locality: "repo"
+  - id: Q_MA_FREE_ORG_READ_ENFORCED
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 5
+    confidence: 0.5
+    label: "Na organização gratuita do GitHub, o servidor aplica a permissão por repositório: a conta que não é dona, com Read num repo e Write no outro, é recusada no push do primeiro e aceita no do segundo?"
+    narrative: "Espelha Q_CB_FREE_ORG_READ_ENFORCED da curadoria (https://github.com/marciocar/onion-curation/blob/2c8d3846ce21165127117b0b27ae60b8fda4adae/docs/evolution/research/company-brain-multiaudience-2026-10/company-brain-multiaudience-2026-10.kg.yaml#Q_CB_FREE_ORG_READ_ENFORCED). Card do maestro, porque cria a organização e convida a segunda conta. Especificação pré-registrada no PLAN-D da curadoria (https://github.com/marciocar/onion-curation/blob/518b332b9eb4b7a1b00c0f1213b6d65b5fc7b0e3/docs/evolution/research/company-brain-multiaudience-2026-10/PLAN-D.md): uma organização gratuita de teste com permissão-base nenhuma e dois repos privados, um de negócio e um de tecnologia; a equipe negocio com Write num e Read no outro; uma segunda conta que não é dona, nem admin, nem colaboradora externa, e sem outra relação com a organização, entra só nessa equipe. P1: ela dá push no repo de Read (esperado recusado). P2: push no repo de Write (esperado aceito). P3: o dono dá push (esperado aceito, o bypass declarado). P4: fork privado liberado e PR a partir do fork (mede o fluxo InnerSource). P5: fork com o fork privado desligado (esperado recusado). Critério: P1 recusado e P2 aceito provam a separação, e a proposta de E_MA_MARKET_CURADORIA_PROPOSTA_1028 deixa de ser condicional nesse ponto; P1 aceito refuta a proposta e leva ao plano pago. A curadoria confere a saída literal contra o PLAN-D e grava a medida no grafo dela; o core registra aqui citando o nó dela pela URL fixada no sha."
+  - id: E_MA_MCP_CLONE_SERVIDO_PARADO_1028
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    owner: core
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-28"
+    verified_against: "testemunho do maestro (probe autenticado de 2026-10-28) e medida só leitura do core: a unidade do MCP de leitura do hub lê a raiz servida de um EnvironmentFile só da raiz (o Environment da unit não tem ONION_KG_ROOT); o comentário da unit diz que a raiz é um worktree destacado do develop do hub; esse worktree está em 2bdc52fe3, e o FETCH_HEAD do clone é de 2026-10-12 20:09 UTC; o código servido está em 5a60fb5fa, ancestral da origin/main do core, sem commit novo em ops/mcp-onion-kg depois dele; nenhum timer, cron ou script em ops/ atualiza o clone servido"
+    label: "O MCP de leitura do hub responde com token e lista 23 grafos, mas serve dados do commit 2bdc52fe, buscado em 2026-10-12: 16 dias sem atualizar o clone servido. O código do servidor está em dia; falta o passo que atualize o clone."
+    narrative: "Testemunho do maestro: o probe autenticado de 2026-10-28 respondeu com token, listou 23 grafos e declarou o served_commit 2bdc52fe. Medida do core, só leitura: (1) a raiz servida não está no Environment da unit; vem do EnvironmentFile, legível só pela raiz, e não foi lida; o comentário no topo da unit diz que a raiz é o worktree destacado do develop do hub e dá a receita de atualização à mão (fetch no clone e checkout destacado no worktree servido, sem restart, porque o commit é declarado por resposta); (2) o worktree servido está em 2bdc52fe3 e o último fetch do clone foi em 2026-10-12; (3) o código do servidor vem de outro worktree, em 5a60fb5fa (2026-10-27), que é ancestral da origin/main do core e sem mudança posterior em ops/mcp-onion-kg; (4) o que existe para atualizar: o passo 2 do runbook em ops/mcp-onion-kg/README.md e a receita no comentário da unit, ambos manuais; ops/update-kg-writer.sh atualiza o escritor, não o clone servido do leitor; systemctl list-timers e o crontab do usuário não têm nada do MCP. FALTA o passo de atualizar o clone servido: nem script, nem timer, nem gatilho por evento. Até lá, quem consulta o Brain pelo chat lê uma foto de 2026-10-12, declarada no served_commit de cada resposta."
+    provenance:
+      source: "maestro (probe autenticado, 2026-10-28) e medida do core na VPS, 2026-10-28"
+      locator: "systemctl show (Environment, EnvironmentFiles, DropInPaths, ExecStart) da unidade do MCP de leitura do hub; o comentário da unit; log -1 no worktree servido e no worktree do código; stat do FETCH_HEAD do clone; systemctl list-timers --all; crontab -l; grep -rn ONION_KG_ROOT ops/"
+      method: "measurement: comandos só leitura rodados pela sessão do core, sem ler o EnvironmentFile nem segredo; o served_commit e os 23 grafos são testemunho do maestro"
+      locality: "host"
 edges:
   - from: E_MA_SINAL_DO_HUB_1027
     to: Q_MA_AUDIENCES
@@ -447,3 +491,18 @@ edges:
   - from: E_MA_IDA_E_VOLTA_R3_SEM_CANAL_DO_HARNESS_1028
     to: Q_MA_A2A_ENTRE_CONTAS
     edge_type: SUPPORTS
+  - from: E_MA_MARKET_CURADORIA_PROPOSTA_1028
+    to: Q_MA_MARKET
+    edge_type: SUPPORTS
+  - from: E_MA_MARKET_CURADORIA_PROPOSTA_1028
+    to: Q_MA_FREE_ORG_READ_ENFORCED
+    edge_type: DEPENDS_ON
+  - from: Q_MA_ENFORCEMENT
+    to: Q_MA_FREE_ORG_READ_ENFORCED
+    edge_type: DEPENDS_ON
+  - from: D_MA_ARCH
+    to: Q_MA_FREE_ORG_READ_ENFORCED
+    edge_type: DEPENDS_ON
+  - from: E_MA_MCP_CLONE_SERVIDO_PARADO_1028
+    to: C_MA_MCP_READ_LIVE
+    edge_type: CONSTRAINS
