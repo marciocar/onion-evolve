@@ -4888,6 +4888,70 @@ run_kg_trace_resolve_selftests() {
     elif grep -q $'PRODUTO\t.*ENTRADA-QUEBRADA' <<< "${ts}"; then record_pass "kg-trace: (s-MUT) sem a tradução das falhas de esquema → a fonte mudada volta a ENTRADA-QUEBRADA, sem nó (o (s2) cai)"
     else record_fail "kg-trace: (s-MUT) desvio" "rc=${rs} tsv=${ts:0:160}"; fi
   fi
+  # (n) O `node_sha256` DA KG-SSOT 4.38.0 (contrato v4.18): o SHA-256 do JCS do NÓ citado (scheme kg-node), dado pelo
+  #     `kg_trace.py digest ARQUIVO#ID`. Só a mudança desse nó o derruba; a do vizinho no mesmo arquivo, não (é a razão
+  #     de ele existir ao lado do sha256 do arquivo). n1 hash certo e vizinho mudado → rc 0, nada · n2 o nó citado mudou
+  #     → SCHEME-FALHA:integrity.trace-node-sha256-mismatch nomeando o nó, HARD no core e SOFT no derivado, com a cura
+  #     do digest · n3 o nó citado se repete (sem forma JCS) → o produto sai 0 contando not_canonical, e o TSV dá
+  #     SCHEME-AVISO. MUTANTES: (n-MUT aviso) o not_canonical fora da lista do aviso → n3 volta a calar; (n-MUT cura) a
+  #     cura própria do node_sha256 apagada no lint → n2 volta a mandar regravar o sha256 do arquivo.
+  _n_fonte() {  # $1=label do nó citado · $2=id do vizinho (repita N_FONTE para o id duplicado)
+    { printf 'meta:\n  id: fonte\n  schema_version: "1"\nnodes:\n'; _s_node N_FONTE "$1"; _s_node "${2:-N_VIZINHO}" "o vizinho"
+      printf 'edges: []\n'; } > "${GS}/fonte.kg.yaml"
+    ( cd "${ds}" && git add -A ) >/dev/null 2>&1
+  }
+  _n_deriv() {  # $1=node_sha256
+    { printf 'meta:\n  id: derivado\n  schema_version: "1"\nnodes:\n'; _s_node N_DERIVADO "o derivado"
+      printf '    provenance:\n      source: docs/onion/graph/fonte.kg.yaml\n      method: "testimony: card"\n      scheme: kg-node\n      locator: "#N_FONTE"\n      node_sha256: "%s"\n' "$1"
+      printf 'edges: []\n'; } > "${GS}/derivado.kg.yaml"
+    ( cd "${ds}" && git add -A ) >/dev/null 2>&1
+  }
+  local dg rn=0 tn ln_core ln_der
+  _n_fonte "a origem"
+  dg="$(python3 -I -B "${kt}" digest --root "${ds}" docs/onion/graph/fonte.kg.yaml#N_FONTE 2>/dev/null | cut -c1-64)"
+  _n_deriv "${dg}"; _n_fonte "a origem" N_VIZINHO_NOVO
+  tn="$(_kt "${ds}" --format tsv 2>/dev/null)" || rn=$?
+  if [ "${#dg}" -eq 64 ] && [ "${rn}" -eq 0 ] && [ -z "${tn}" ]; then
+    record_pass "kg-trace: (n1) node_sha256 certo e o vizinho do nó citado mudado → rc 0, nenhuma linha"
+  else record_fail "kg-trace: (n1) node_sha256 são" "digest=${dg:0:70} rc=${rn} out=${tn:0:200}"; fi
+  _n_fonte "a origem mudou"
+  rn=0; tn="$(_kt "${ds}" --format tsv 2>/dev/null)" || rn=$?
+  ln_core="$(_s_lint 0 "${helper}")"; ln_der="$(_s_lint 1 "${helper}")"
+  if [ "${rn}" -eq 1 ] && grep -q $'^docs/onion/graph/derivado.kg.yaml\tN_DERIVADO\t-\tdocs/onion/graph/fonte.kg.yaml \[kg-node\] #N_FONTE\tSCHEME-FALHA:integrity.trace-node-sha256-mismatch$' <<< "${tn}" \
+     && grep -q 'V\[HARD\].*N_DERIVADO.*integrity.trace-node-sha256-mismatch.*kg_trace.py digest' <<< "${ln_core}" \
+     && grep -q 'V\[SOFT\].*N_DERIVADO.*integrity.trace-node-sha256-mismatch' <<< "${ln_der}" && ! grep -q 'V\[HARD\]' <<< "${ln_der}"; then
+    record_pass "kg-trace: (n2) o nó citado mudou → SCHEME-FALHA:integrity.trace-node-sha256-mismatch nomeando o nó, HARD no core (cura: digest) e SOFT no derivado"
+  else record_fail "kg-trace: (n2) node_sha256 mudado" "rc=${rn} tsv=${tn:0:200} core=${ln_core:0:200} der=${ln_der:0:160}"; fi
+  _n_fonte "a origem" N_FONTE
+  local ln3; rn=0; tn="$(_kt "${ds}" --format tsv 2>/dev/null)" || rn=$?; ln3="$(_s_lint 0 "${helper}")"
+  if [ "${rn}" -eq 0 ] && [ "${tn}" = $'-\tSCHEMES\t-\t(1 not_canonical)\tSCHEME-AVISO' ] \
+     && grep -q 'V\[SOFT\].*SCHEME-AVISO.*1 not_canonical' <<< "${ln3}" && ! grep -q 'V\[HARD\]' <<< "${ln3}"; then
+    record_pass "kg-trace: (n3) o nó citado pelo node_sha256 se repete → SCHEME-AVISO (not_canonical), rc 0, só SOFT no lint"
+  else record_fail "kg-trace: (n3) not_canonical" "rc=${rn} tsv=${tn:0:160} lint=${ln3:0:160}"; fi
+  sed 's|"unpinned", "not_canonical") if ss.get(k)\]  # o aviso do skipped|"unpinned") if ss.get(k)]  # o aviso do skipped|' "${helper}" > "${mut}/kg-trace-semcanon.sh"
+  if cmp -s "${helper}" "${mut}/kg-trace-semcanon.sh"; then record_fail "kg-trace: (n-MUT aviso) mutante não aplicou" "a âncora da lista do aviso mudou"
+  else
+    rn=0; tn="$(ONION_KG_TRACE="${kt}" bash "${mut}/kg-trace-semcanon.sh" "${ds}" --format tsv 2>/dev/null)" || rn=$?
+    if [ "${rn}" -eq 0 ] && [ -z "${tn}" ]; then record_pass "kg-trace: (n-MUT aviso) sem o not_canonical no aviso → o nó sem forma JCS volta a calar (o (n3) cai)"
+    else record_fail "kg-trace: (n-MUT aviso) mutante NÃO morde" "rc=${rn} tsv=${tn:0:160}"; fi
+  fi
+  _n_fonte "a origem mudou"
+  sed '/# a cura do node_sha256$/d' "${SCRIPT_DIR}/lint-artifacts.sh" > "${mut}/lint-semcura.sh"
+  if cmp -s "${SCRIPT_DIR}/lint-artifacts.sh" "${mut}/lint-semcura.sh"; then record_fail "kg-trace: (n-MUT cura) mutante não aplicou" "a âncora da cura do node_sha256 mudou"
+  else
+    ln_core="$(bash -c '
+      set -euo pipefail
+      SCRIPT_DIR="'"${SCRIPT_DIR}"'"; REPO_ROOT="'"${ds}"'"; ONLY_PATH=""; IS_DERIVED=0
+      export ONION_KG_TRACE="'"${kt}"'"
+      violation() { echo "V[$1] $3"; }
+      source <(sed -n "/^check_kg_trace_resolve()/,/^}$/p" "'"${mut}/lint-semcura.sh"'")
+      check_kg_trace_resolve
+    ' 2>&1 || true)"
+    if grep -q 'V\[HARD\].*integrity.trace-node-sha256-mismatch.*regrave o sha256 e o locator' <<< "${ln_core}" && ! grep -q 'kg_trace.py digest' <<< "${ln_core}"; then
+      record_pass "kg-trace: (n-MUT cura) sem a cura própria → o mismatch do nó volta a mandar regravar o sha256 do arquivo (o (n2) cai)"
+    else record_fail "kg-trace: (n-MUT cura) mutante NÃO morde" "lint=${ln_core:0:200}"; fi
+  fi
+  unset -f _n_fonte _n_deriv
   unset -f _s_node _s_fonte _s_deriv _s_lint
   rm -rf "${ds}"
 

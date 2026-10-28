@@ -810,6 +810,9 @@ check_kg_radar_integrity() {
 #   -quote-missing), HARD no core e SOFT no derivado; o malformed, o missing_source e o unpinned do skipped
 #   saem SOFT. Teto: sem --with, a fonte por URL de outro repo não é julgada aqui (skipped absolute).
 #   Antes da tradução, a falha caía em ENTRADA-QUEBRADA sem nomear o nó.
+#   DESDE A 4.38.0 (2026-10-28, contrato v4.18): o provenance.node_sha256 (o hash JCS do nó citado, scheme
+#   kg-node) que não confere sai integrity.trace-node-sha256-mismatch com o nó, HARD no core e SOFT no
+#   derivado, com a cura própria (o digest do produto); o not_canonical do skipped sai no aviso SOFT.
 # ===========================================================================
 check_kg_trace_resolve() {
   local helper="${SCRIPT_DIR}/kg-trace.sh"
@@ -858,13 +861,17 @@ check_kg_trace_resolve() {
       SCHEME-FALHA:*)
         # kg-ssot 4.37.0 (contrato v4.17): a fonte lida pelo provenance.scheme não tem o que o locator aponta, ou o
         # provenance.sha256 não confere com os bytes dela. HARD no core; SOFT no derivado, como o locator.
-        local _ssev="HARD"; [ "${IS_DERIVED:-0}" -eq 1 ] && _ssev="SOFT"
+        # kg-ssot 4.38.0 (contrato v4.18): o provenance.node_sha256 é o hash do NÓ citado (JCS), não do arquivo, e a
+        # cura é outra: reler o nó e regravar o hash pelo digest do produto (nunca o sha256 do arquivo).
+        local _ssev="HARD" _scura; [ "${IS_DERIVED:-0}" -eq 1 ] && _ssev="SOFT"
+        _scura="a fonte mudou ou o locator saiu dela: releia a fonte e regrave o sha256 e o locator"
+        [ "${verdict}" != SCHEME-FALHA:integrity.trace-node-sha256-mismatch ] || _scura="o nó citado mudou: releia o nó e regrave o node_sha256 com python3 -I vendor/kg-ssot/tools/kg_trace.py digest <arquivo>#<id>"  # a cura do node_sha256
         violation "${_ssev}" "${REPO_ROOT}/${g}" \
-          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME] ${nid}: a fonte não sustenta o que o nó declara em '${target}' — ${verdict#SCHEME-FALHA:} (a fonte mudou ou o locator saiu dela: releia a fonte e regrave o sha256 e o locator; detalhe: bash .claude/validation/kg-trace.sh)"
+          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME] ${nid}: a fonte não sustenta o que o nó declara em '${target}' — ${verdict#SCHEME-FALHA:} (${_scura}; detalhe: bash .claude/validation/kg-trace.sh)"
         continue ;;
       SCHEME-AVISO)
         violation "SOFT" "${SCRIPT_DIR}/kg-trace.sh" \
-          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME-AVISO] provenance.scheme ou sha256 declarados e NÃO julgados ${target} — malformed é scheme, locator ou hash fora da forma, missing_source é a fonte que não está no repo, unpinned é URL sem commit fixado lida pelo --with (detalhe: bash .claude/validation/kg-trace.sh)"
+          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME-AVISO] provenance.scheme ou sha256 declarados e NÃO julgados ${target} — malformed é scheme, locator ou hash fora da forma, missing_source é a fonte que não está no repo, unpinned é URL sem commit fixado lida pelo --with, not_canonical é o nó citado pelo node_sha256 que se repete ou não tem forma JCS (detalhe: bash .claude/validation/kg-trace.sh)"
         continue ;;
     esac
     violation "HARD" "${REPO_ROOT}/${g}" \

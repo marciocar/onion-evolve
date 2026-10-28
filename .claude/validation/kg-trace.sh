@@ -31,7 +31,8 @@
 # Saída: humano (a saída do produto) · TSV `grafo·id·node_type·alvo·veredito` (só os que reprovam) ·
 #        índice `caminho·id·grafo`, ordenado (LC_ALL=C sort -u). No TSV, desde a kg-ssot 4.37.0, a falha do
 #        provenance.scheme/sha256 sai `SCHEME-FALHA:<código>` e o unpinned/malformed do skipped numa linha
-#        `SCHEME-AVISO` (que não conta para o rc)
+#        `SCHEME-AVISO` (que não conta para o rc); desde a 4.38.0, o provenance.node_sha256 que não confere sai
+#        `SCHEME-FALHA:integrity.trace-node-sha256-mismatch` e o not_canonical entra no aviso
 # Exit : 0 = todo `trace:` julgável resolve / índice emitido · 1 = TARGET-MISSING, grafo ilegível ou VACUIDADE
 #        2 = sem o produto (kg_trace.py, seus vizinhos ou python3 ausentes) ou entrada quebrada
 #        3 = (--emit-index) índice VAZIO: nenhum nó com trace resolvível — legítimo no dia 1 do adotante
@@ -218,6 +219,13 @@ for u in loc.get("unreadable", []):
 # TETO DECLARADO (passada adversarial da adoção da 4.37.0): este TSV não passa --with ao produto, então a fonte por URL
 # de outro repo cai em `absolute` e NÃO é julgada aqui; o unpinned só nasce com --with. O sha256 de um nó que cita outro
 # repo se confere por `kg_trace.py check --with <prefixo>=<clone>` (o 1º do core: Q_MA_FREE_ORG_READ_ENFORCED).
+# NODE_SHA256 (kg-ssot >= 4.38.0, contrato v4.18): o provenance.node_sha256 é o SHA-256 do JCS (RFC 8785) do nó citado,
+# com scheme kg-node, e só a mudança DESSE nó o derruba (o vizinho no mesmo arquivo, não). A falha chega pelo mesmo
+# `schemes.failures`, com o código integrity.trace-node-sha256-mismatch, e sai nomeando o nó como as outras. O skipped
+# ganha o not_canonical (o nó citado se repete ou não tem forma JCS, como um inteiro fora de ±(2^53−1)): sem hash a
+# conferir, o produto conta o nó como ok pelo locator e sai 0, e calar seria declarar a ponte conferida. Sai no aviso.
+# O not_found e o no_with da 4.38.0 são motivos do `kg_query --revisit`, não do `kg_trace check`: não chegam a este JSON
+# (medido na adoção: as chaves do schemes.skipped da 4.38.0 são as da 4.37.0 mais not_canonical).
 def _cell(s):
     return " ".join(str(s or "").split())
 sch = d.get("schemes") or {}
@@ -225,7 +233,7 @@ for m in sch.get("failures", []):  # a tradução das falhas de esquema (o mutan
     print(f"{m['file']}\t{m['id']}\t-\t{_cell(m.get('target'))} [{_cell(m.get('scheme')) or 'sha256'}] "
           f"{_cell(m.get('locator'))}".rstrip() + f"\tSCHEME-FALHA:{m['code']}")
 ss = sch.get("skipped") or {}
-warn = [f"{ss[k]} {k}" for k in ("malformed", "missing_source", "unpinned") if ss.get(k)]
+warn = [f"{ss[k]} {k}" for k in ("malformed", "missing_source", "unpinned", "not_canonical") if ss.get(k)]  # o aviso do skipped
 if warn:
     print(f"-\tSCHEMES\t-\t({', '.join(warn)})\tSCHEME-AVISO")
 PY
