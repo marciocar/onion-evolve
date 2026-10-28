@@ -282,6 +282,8 @@ jobs:
         # SUBIDO para v1.0.264 (d70510b1; a tag anotada é 8c3fd987) em 2026-10-27, pelo aviso do session-currency-check: 2 commits.
         # d70510b1 é o bump (CLI 2.1.312, SDK 0.3.312); 98a9e39f (#1932) só troca o exemplo da descrição do input
         # `plugins` e o docs/usage.md para claude-plugins-official. Este job não usa `plugins`; nenhum input nem output usado aqui muda.
+        # Razão além da paridade (rodada 20 do radar do Claude Code, SAC-261): a 2.1.312 corrige o comando com nome inválido que
+        # derrubava os outros e deixava `claude -p` sem saída, e este job roda o CLI headless no checkout do PR, com os comandos dele.
         # Antes: SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
         # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
         # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
@@ -432,6 +434,8 @@ jobs:
         # SUBIDO para v1.0.264 (d70510b1; a tag anotada é 8c3fd987) em 2026-10-27, pelo aviso do session-currency-check: 2 commits.
         # d70510b1 é o bump (CLI 2.1.312, SDK 0.3.312); 98a9e39f (#1932) só troca o exemplo da descrição do input
         # `plugins` e o docs/usage.md para claude-plugins-official. Este job não usa `plugins`; nenhum input nem output usado aqui muda.
+        # Razão além da paridade (rodada 20 do radar do Claude Code, SAC-261): a 2.1.312 corrige o comando com nome inválido que
+        # derrubava os outros e deixava `claude -p` sem saída, e este job roda o CLI headless no checkout do PR, com os comandos dele.
         # Antes: SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
         # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
         # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
