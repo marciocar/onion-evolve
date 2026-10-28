@@ -2,7 +2,8 @@
 branch: chore/core-maint-1027
 pr: pendente
 date: 2026-10-27
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f8ac4f92987e7cc7b33b745b1151befd629e180075e25b0483fac5eb4785705a
+reviewed_code_sha256: b3475fe62611b3fd07ee21ec3d36466909d6511078f9c5203db67d8aac8821f7
 findings_total: 1
 findings_real: 1
 tokens: 63276
