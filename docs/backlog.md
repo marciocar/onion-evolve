@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**746 itens abertos** em 130 grafo(s) com aberto (de 169 no escopo) · 132 grupo(s), agrupados por `owner:` (47 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**747 itens abertos** em 130 grafo(s) com aberto (de 169 no escopo) · 132 grupo(s), agrupados por `owner:` (48 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -618,7 +618,7 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## core — 22 item(ns)
+## core — 23 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -644,6 +644,7 @@
 | 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
 | 2.0 | `Q_COORD_CORE_DPAREN_END_KG_READ_LEG` | coordenacao-sessoes-2026-10 | Aviso falso do _dparen_end no kg-read-leg.sh: ((a)+(b)) <<E é lido como subshell. |
 | 2.0 | `Q_COORD_FIXTURE_NODE_SELFTEST_TMP` | coordenacao-sessoes-2026-10 | O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás. |
+| 1.5 | `Q_COORD_UPDATE_4_ADOTANTES_4380` | coordenacao-sessoes-2026-10 | A rodada de update da 4.38.0 aos quatro adotantes, com o pin 1d04d4e24cec do core. |
 
 ## maestro — 17 item(ns)
 
