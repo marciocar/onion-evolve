@@ -336,7 +336,7 @@ nodes:
     impact: 3
     confidence: 0.6
     verified_at: "2026-10-28"
-    verified_against: "a rodada R3 da ida e volta VPS ↔ notebook (E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028, no sinais-de-campo), juiz DADO nas duas pontas; a conta do Claude de cada ponta não foi registrada no teste"
+    verified_against: "a rodada rodada 3 da ida e volta VPS ↔ notebook (E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028, no sinais-de-campo), juiz DADO nas duas pontas; a conta do Claude de cada ponta não foi registrada no teste"
     label: "Uma ida e volta limpa entre duas sessões que não dividem nenhum canal do harness (máquinas e usuários do sistema diferentes) passou pelo canal A2A do core; entre contas do Claude na mesma máquina segue sem medida"
     narrative: "O que a medida diz para esta pergunta: o canal A2A do core (HTTP do bridge, envelope assinado, aceite humano, MCP que só grava rascunho) não depende do SendMessage nem de nada da conta do Claude, e fechou uma ida e volta limpa entre a VPS e o notebook. O que ela NÃO diz: a conta de cada ponta não foi anotada, e o caso do hub (contas diferentes na mesma máquina e no mesmo usuário Linux) não rodou. A medida-mãe segue aberta (faltam os negativos e os destinos fechados), e esta pergunta também."
     provenance:
