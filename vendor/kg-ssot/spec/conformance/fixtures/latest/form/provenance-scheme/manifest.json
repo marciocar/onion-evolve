@@ -1,0 +1,362 @@
+{
+  "description": "O esquema do locator e o hash da fonte (v4.17), só SHOULD. provenance.scheme diz como ler o locator, por um código: json-pointer (RFC 6901; em fragmento, com #, sem espaço cru), text (RFC 5147, posições a partir de 0 como fronteiras; o ;length= da norma vale, e o ;md5= não), csv (RFC 7111 §3: só row=, só col= ou só cell= numa seleção, a partir de 1, com * para a última), pdf (RFC 8118, a página física a partir de 1, entre outros parâmetros), media (Media Fragments, npt com minutos de dois dígitos no relógio, intervalo semiaberto), quote (o texto exato), html (#id) e kg-node (o id de um nó do grafo citado). As URIs do conformsTo do Web Annotation valem como alias, inclusive a da RFC 3778. Com o scheme, o locator fora da forma alerta como form.pattern.node.provenance.locator; o código fora da tabela, como form.enum.node.provenance.scheme. O provenance.sha256 é o hash SHA-256 do conteúdo lido, em 64 hex minúsculos, fora do locator (o md5= da RFC 5147 não é usado), e fora da forma alerta como form.pattern.node.provenance.sha256. Sem scheme, o locator segue texto livre, e nada muda no veredito.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-scheme-json-pointer.kg.yaml",
+      "description": "o JSON Pointer da RFC 6901, sem o #",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-json-pointer-fragment.kg.yaml",
+      "description": "o JSON Pointer em fragmento, com ~1",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-text-line-range.kg.yaml",
+      "description": "um intervalo de linhas da RFC 5147",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-text-char-position.kg.yaml",
+      "description": "a posição 0, antes do primeiro caractere",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-text-open-ranges.kg.yaml",
+      "description": "o intervalo do começo até a linha 5",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-csv-cell-range.kg.yaml",
+      "description": "um intervalo de células da RFC 7111",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-pdf-page.kg.yaml",
+      "description": "a primeira página física da RFC 8118",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-pdf-rfc3778-alias.kg.yaml",
+      "description": "a URI da RFC 3778, que a tabela do Web Annotation ainda cita, vale como pdf",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-pdf-rfc8118-alias.kg.yaml",
+      "description": "a URI da RFC 8118, com outro parâmetro depois da página",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-media-npt.kg.yaml",
+      "description": "um intervalo de mídia em segundos npt",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-media-clock.kg.yaml",
+      "description": "o npt em relógio",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-quote.kg.yaml",
+      "description": "o texto exato, com aspas",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-html.kg.yaml",
+      "description": "o fragmento de uma página HTML",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-kg-node.kg.yaml",
+      "description": "o id de um nó do grafo citado no source",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-kg-node-bare.kg.yaml",
+      "description": "o id sem o #",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-sha256-alone.kg.yaml",
+      "description": "o sha256 sem scheme: o locator segue texto livre",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-free-locator-without-scheme.kg.yaml",
+      "description": "sem scheme, o locator é texto livre, como antes",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-scheme-unknown.kg.yaml",
+      "description": "um esquema fora da tabela",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.provenance.scheme"
+      ]
+    },
+    {
+      "file": "warn-scheme-uppercase.kg.yaml",
+      "description": "o código é em minúsculas",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.provenance.scheme"
+      ]
+    },
+    {
+      "file": "warn-text-free-prose.kg.yaml",
+      "description": "texto livre com scheme text",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-text-md5-integrity.kg.yaml",
+      "description": "o md5= da RFC 5147 não é usado: o hash vai no sha256",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-csv-row-zero.kg.yaml",
+      "description": "linhas do CSV contam a partir de 1",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-pdf-page-zero.kg.yaml",
+      "description": "a primeira página é a 1",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-pdf-alias-page-zero.kg.yaml",
+      "description": "o alias da RFC 3778 é julgado como pdf: a página 0 não existe",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-media-no-t.kg.yaml",
+      "description": "o intervalo de mídia leva t=",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-json-pointer-relative.kg.yaml",
+      "description": "o ponteiro começa por / (ou #/)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-json-pointer-bad-escape.kg.yaml",
+      "description": "o ~ só escapa como ~0 ou ~1",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-kg-node-starts-with-digit.kg.yaml",
+      "description": "o id de nó começa por letra",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-html-with-space.kg.yaml",
+      "description": "o fragmento não tem espaço",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-quote-blank.kg.yaml",
+      "description": "a citação em branco não cita nada",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-sha256-uppercase.kg.yaml",
+      "description": "o sha256 é em hex minúsculo",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.sha256"
+      ]
+    },
+    {
+      "file": "warn-sha256-short.kg.yaml",
+      "description": "o sha256 tem 64 dígitos hex",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.sha256"
+      ]
+    },
+    {
+      "file": "valid-scheme-csv-rows.kg.yaml",
+      "description": "várias linhas numa seleção só, a última até o fim (RFC 7111 §3)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-csv-last-row.kg.yaml",
+      "description": "a última linha, pela posição *",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-csv-cell-to-end.kg.yaml",
+      "description": "da célula 4,1 até a última linha e coluna",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-text-length.kg.yaml",
+      "description": "o ;length= da RFC 5147 faz parte da gramática (só o md5= fica de fora)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-media-trailing-dot.kg.yaml",
+      "description": "npt-sec aceita o ponto sem fração (Media Fragments)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-scheme-pdf-page-after-param.kg.yaml",
+      "description": "a página depois de outro parâmetro",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-csv-row-and-col-mixed.kg.yaml",
+      "description": "uma seleção é só row=, só col= ou só cell= (RFC 7111 §3)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-csv-cell-open-column.kg.yaml",
+      "description": "o fim de uma célula leva linha e coluna",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-media-one-digit-minute.kg.yaml",
+      "description": "no npt em relógio, os minutos têm dois dígitos",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "warn-json-pointer-fragment-space.kg.yaml",
+      "description": "o fragmento leva percent-encoding: espaço cru não é fragmento",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "valid-json-pointer-fragment-bom-char.kg.yaml",
+      "description": "U+FEFF no fragmento não é espaço da regra: o padrão lista o espaço, a tabulação e as quebras, e não usa \\s, que muda de dialeto entre leitores (Python, ECMAScript e RE2)",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "valid-json-pointer-fragment-nel-char.kg.yaml",
+      "description": "U+0085 no fragmento, pelo mesmo motivo: os dois leitores dão o mesmo veredito",
+      "valid": true,
+      "codes": [],
+      "warnings": []
+    },
+    {
+      "file": "warn-json-pointer-trailing-newline.kg.yaml",
+      "description": "a quebra de linha no fim (um bloco locator: | termina em \\n) não é parte do ponteiro: os dois leitores alertam, porque o $ do padrão casa no fim real do texto",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.locator"
+      ]
+    }
+  ]
+}

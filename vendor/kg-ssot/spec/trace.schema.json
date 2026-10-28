@@ -263,6 +263,127 @@
           }
         }
       }
+    },
+    "schemes": {
+      "description": "Desde a 4.37.0 (contrato v4.17), aditivo e fora do required: a fonte lida pelo provenance.scheme e pelo provenance.sha256. A fonte é o arquivo do repo que o source nomeia ou, pelo --with, o arquivo da URL no commit fixado, lido da raiz de um clone git (o commit que ele não tem, e a pasta que não é a raiz de um clone, contam como missing_source; o ref que não tem forma de commit, como main ou HEAD, conta como unpinned). failures traz integrity.trace-locator-out-of-range (a linha, o caractere em code points, a linha ou coluna do CSV, o nó do kg-node ou o JSON Pointer que a fonte não tem), integrity.trace-quote-missing (o texto exato do quote não aparece) e integrity.trace-sha256-mismatch (o hash difere: a fonte mudou depois de lida); todos dão rc 1. scheme é null quando só o sha256 foi conferido. skipped conta o que não se julga, nunca como ok: form_only (pdf, media e html, julgados só pela forma no schema), absolute (URL sem --with que case), missing_source, not_path, outside_root, unpinned, malformed (o locator fora da gramática do esquema, o scheme fora da tabela ou o sha256 fora da forma), not_json (json-pointer numa fonte que não é .json) e not_text (a fonte não é UTF-8). Um nó com sha256 conta em judged pelo hash, e o locator que não se julga conta também em skipped. skipped conta motivos: um motivo conta uma vez por nó, e um nó pode contar em mais de um motivo (o scheme e o hash malformados contam uma vez em malformed; pdf com hash fora da forma, em form_only e em malformed). O ref da URL tem de resolver para um commit cujo nome comece por ele: um branch ou tag de nome hexadecimal conta como unpinned. O sha256 de uma fonte do repo é do conteúdo como o git o guarda: o arquivo rastreado com o mesmo id de objeto do índice (o git hash-object --path, que aplica o filtro de limpeza) é lido do blob, e o arquivo com mudança ou fora do git, do disco; pelo --with, sempre o blob do commit. Assim o hash é o de git show <commit>:<caminho> | sha256sum, o mesmo no Windows com autocrlf e no Linux.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "judged",
+        "ok",
+        "sha256_checked",
+        "failures",
+        "skipped"
+      ],
+      "properties": {
+        "judged": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ok": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256_checked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "code",
+              "file",
+              "id",
+              "target",
+              "locator",
+              "scheme"
+            ],
+            "properties": {
+              "code": {
+                "enum": [
+                  "integrity.trace-locator-out-of-range",
+                  "integrity.trace-quote-missing",
+                  "integrity.trace-sha256-mismatch"
+                ]
+              },
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string"
+              },
+              "locator": {
+                "type": "string"
+              },
+              "scheme": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "skipped": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "form_only",
+            "absolute",
+            "missing_source",
+            "not_path",
+            "outside_root",
+            "unpinned",
+            "malformed",
+            "not_json",
+            "not_text"
+          ],
+          "properties": {
+            "form_only": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "absolute": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "missing_source": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_path": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "outside_root": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unpinned": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "malformed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_json": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_text": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        }
+      }
     }
   }
 }

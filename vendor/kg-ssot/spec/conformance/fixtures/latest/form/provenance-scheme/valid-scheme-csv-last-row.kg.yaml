@@ -1,0 +1,27 @@
+meta:
+  schema_version: "1"
+  id: valid-scheme-csv-last-row
+nodes:
+  - id: "Q_A"
+    node_type: "question"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: "C_A"
+    node_type: "claim"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.8
+    label: "A afirmação sintética A."
+    provenance:
+      source: "docs/fonte.md"
+      locator: "row=*"
+      method: "reading: o arquivo"
+      scheme: "csv"
+edges:
+  - from: C_A
+    to: Q_A
+    edge_type: SUPPORTS

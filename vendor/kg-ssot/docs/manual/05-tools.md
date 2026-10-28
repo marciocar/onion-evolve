@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.35.0",
+  "release": "kg-ssot-v4.37.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -179,7 +179,7 @@ The last lines:
 
 ```text
 —
-latest: 463/463 (gates the rc)
+latest: 508/508 (gates the rc)
 optional: 10/24 (report only)
 ```
 
@@ -847,6 +847,44 @@ chain: complete
 
 The chain is declared by whoever writes the graph: the projection measures it, it does not prove who really said what.
 
+### Attention, and the decisions to revisit (4.36.0)
+
+A decision is a node like any other, and the graph already keeps its history: a new decision `SUPERSEDES` the old one,
+a refutation keeps the refuted node, and nothing is deleted. Three views make that history something you can ask.
+
+- **`--sort attention`** orders the nodes by their weight on the radar: `impact × confidence × status factor × (1 +
+  degree)`, where degree counts the edges that touch the node and the status factor is 1.0 for `open`, `confirmed` and
+  `unverifiable`, 1.3 for `drifted`, 0.2 for `superseded`, 0.1 for `done` and 0 for `refuted`. A tie goes to the id in
+  descending order. It is the same formula and the same tie-break as the radar of the framework where the format was
+  born, so both give the same queue on the same graph that passes the MUST. The degree is scoped to the node's file, as
+  in the radar: an edge counts for the local ends of the file that declares it, the event of a `trigger` counts too,
+  and an edge that arrives from another file does not, so the attention does not change with `--root`. Each node of the
+  page carries its `attention`; the order uses the unrounded value.
+- **`--decision <id>`** gives the history of one decision: what it replaced and what replaced it, along the whole
+  `SUPERSEDES` line, what refutes it, what supports it, and what it rests on (the `SUPPORTS` that reach it, its outgoing
+  `TRACES_TO` and `DEPENDS_ON`, and the step of its `provenance.source`; an outgoing `SUPPORTS` says what the decision
+  supports, not what it rests on), each with its status. `--format json` gives
+  `kg-ssot.decision/1` (`spec/decision.schema.json`).
+- **`--revisit`** lists the live decisions (not `superseded` nor `refuted`) that ask for a review, by attention, each
+  with its reasons: `evidence-due` (something it rests on is past its `reverify_every`), `review-due` (the decision itself is past its
+  `reverify_every`) and `contested` (it receives a `REFUTES` and is still live). A decision with only `reverify_on`
+  waits for its event and is listed apart; a decision with a cadence but no `verified_at` is listed in `unstamped`, and
+  a support outside the corpus in `unresolved`, so nothing is dropped in silence. A support that was refuted or
+  superseded is not a reason: inferred from the edges, it gave 1 useful warning in 10 on the corpus of the framework
+  where the format was born, so the fall shows in `--decision`, where the reader sees the status of each support. `--as-of YYYY-MM-DD` sets the date; the default is today. `--format json`
+  gives `kg-ssot.revisit/1` (`spec/revisit.schema.json`).
+
+```bash
+kg-query --root . --open --sort attention --limit 10
+kg-query --root . --decision D_RETRY_3
+kg-query --root . --revisit
+```
+
+Rejected options need no new field: write each option as a node, and let the chosen decision refute or supersede the
+others, with the reason in its narrative. An automatic detector of contradictions was measured for this release and
+left out: it found sibling claims, not contradictions. A tension is a refutation someone records, and attention says
+which one to look at first.
+
 ## `kg_diff.py`: diff by id between revisions
 
 Compares two graphs, or every graph that changed between two git revisions, aligning nodes by id and edges by their
@@ -1129,6 +1167,39 @@ not only the file.
 - **Output and rc.** A pointer that does not resolve is `integrity.trace-locator-missing`, and a JSON file that does not
   read is `integrity.trace-locator-unreadable`; both give rc 1. The JSON output gains `locators`, additive and outside
   `required`, so the output of 4.25 stays valid. Write the path in `trace:` too: that is what says the file itself is gone.
+
+### The locator by scheme, and the hash of the source (4.37.0)
+
+When a node declares `provenance.scheme` or `provenance.sha256` (contract v4.17), `kg_trace check` opens the source and
+checks them.
+
+- **The source.** The file of the repository that `provenance.source` names, or, with `--with PREFIX=FOLDER`, the file
+  that a URL names at the commit of the URL (`<prefix>/<commit>/<path>`), read from a local clone of the other
+  repository with `git show`. The folder must be the root of a git clone, and the reference in the URL must be a
+  commit name: a commit that the clone does not have, or a folder that is not the root of a clone, is
+  `missing_source`, and a branch or tag name (`main`, `HEAD`) is `unpinned`, since it moves. A pinned source is never
+  checked against another version. A URL with no `--with` that matches is counted as `absolute`.
+- **The hash.** `provenance.sha256` against the content of the source as git stores it: a tracked file with no
+  change since the index is read from its blob, so a checkout that converts line endings (`core.autocrlf`, the git
+  default on Windows) gives the same hash as on Linux, and the same as `git show <commit>:<path> | sha256sum`. A file
+  with a change, or outside git, is read from disk. A difference is `integrity.trace-sha256-mismatch`, the source
+  changed after it was read.
+- **The locator.** `text` (the line or character range exists, characters counted as code points and each line
+  ending as one, as RFC 5147 asks), `csv` (the row, column or cell exists, the column of a cell against its own row),
+  `quote` (the exact text appears, with runs of spaces counted as one), `kg-node` (the node exists in the graph) and
+  `json-pointer` (it resolves in a `.json` source, in both forms of RFC 6901). Out of range is
+  `integrity.trace-locator-out-of-range`; a quote that is not there, `integrity.trace-quote-missing`. Not judged, and
+  counted, never as ok: `pdf`, `media` and `html` (`form_only`, judged by form in the schema), a locator outside the
+  grammar of its scheme, a scheme outside the table or a `sha256` out of form (`malformed`, which the schema already
+  warns about), a JSON Pointer on a source that is not JSON (`not_json`) and a source that is not UTF-8
+  (`not_text`). A pointer judged here is not judged again in `locators`; one that could not be judged here (a source
+  that is gone, an anchor in `trace:`) still is, as in 4.35.0.
+- **Output and rc.** Each failure gives rc 1. The JSON output gains `schemes`, additive and outside `required`.
+
+```bash
+kg-trace check --root . \
+  --with https://github.com/acme/core/blob=../core
+```
 
 ### The projection checker (`kg_trace.py projection`, 4.35.0)
 

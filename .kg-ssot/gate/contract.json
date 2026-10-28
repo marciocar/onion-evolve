@@ -1,6 +1,6 @@
 {
   "contract": "kg-contract-v4.schema.json",
-  "contract_sha256": "af2a899587a7fbb7fed692f5f02b9e4b063e29932798b1ef117ed39d09d233d8",
+  "contract_sha256": "5d791c7cc46c73a6f09c7d0844fac867cca3a5f3c7de5f9ce4815325ccef16df",
   "granularity": "node",
-  "kit": "4.32.0"
+  "kit": "4.37.0"
 }

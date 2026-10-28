@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kg-ssot.dev/spec/decision.schema.json",
+  "title": "kg-ssot.decision/1",
+  "description": "Desde a 4.36.0. A saída de kg_query.py --decision <id> --format json: a decisão, o que ela substituiu (replaced) e quem a substituiu (replaced_by) em toda a linhagem de SUPERSEDES, o que a refuta (refuted_by), o que a apoia (supported_by) e aquilo em que ela se apoia (leans_on: as arestas SUPPORTS, TRACES_TO e DEPENDS_ON que saem dela, e o passo do provenance.source), com o status de cada um. A decisão superada e a refutada aparecem com o que veio no lugar: nada se perde.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "root",
+    "decision",
+    "is_decision",
+    "attention",
+    "replaced",
+    "replaced_by",
+    "refuted_by",
+    "supported_by",
+    "leans_on"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.decision/1"
+    },
+    "root": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decision": {
+      "$ref": "#/$defs/brief"
+    },
+    "is_decision": {
+      "type": "boolean"
+    },
+    "attention": {
+      "type": "number",
+      "minimum": 0
+    },
+    "replaced": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/brief"
+      }
+    },
+    "replaced_by": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/brief"
+      }
+    },
+    "refuted_by": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/brief"
+      }
+    },
+    "supported_by": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/brief"
+      }
+    },
+    "leans_on": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/brief"
+      }
+    }
+  },
+  "$defs": {
+    "brief": {
+      "type": "object",
+      "required": [
+        "file",
+        "id",
+        "found"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "node_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "edge_type": {
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "evidence-due",
+            "review-due",
+            "contested"
+          ]
+        },
+        "due_on": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    }
+  }
+}

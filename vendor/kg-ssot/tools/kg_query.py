@@ -7,7 +7,7 @@ antes de uma data (--verified-before). Cada nó sai PROJETADO: as arestas de sa�
 resolvida de id para label, local ou externa (external_edges), e se a ponta existe no corpus. Paginação por cursor.
 
 Não julga: o veredito é do kg_validate.py, e um grafo que não parseia sai em "unreadable", sem derrubar a consulta.
-Não ranqueia por atenção: --sort impact ordena pelo impacto declarado, e a fórmula de atenção fica com quem a usa.
+Ranqueia por atenção desde a 4.36.0 (--sort attention): impact × confidence × fator do status × (1 + grau), a mesma fórmula e o mesmo desempate do radar do framework onde o formato nasceu.
 Saída humana, ou JSON no formato kg-ssot.query/1 (spec/query.schema.json).
 
 Uso:
@@ -27,8 +27,10 @@ ausente): quem chama cai no --text e declara.
 """
 import argparse
 import collections
+import datetime
 import fnmatch
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -66,6 +68,9 @@ class Corpus:
         self.meta_ids = {}  # arquivo -> meta.id (o kg_vocab monta o IRI do termo com ele, como o kg_prov_export)
         self.withs = []  # [(prefixo da URL, pasta local)]: o --with lê o grafo de outro repositório (4.35.0)
         self.external = {}  # URL do grafo lido pelo --with -> {"base": prefixo/ref/, "pinned": bool}
+        # o grau da atenção (4.36.0), no escopo do arquivo, como o radar: a aresta conta para as pontas locais do arquivo
+        # que a declara, e o evento do trigger (ou on) de uma aresta também conta; a que chega de outro arquivo não
+        self.local_degree = collections.Counter()
 
     def add(self, name, text):
         if name in self.files:  # o mesmo arquivo dado duas vezes não duplica as arestas
@@ -86,11 +91,19 @@ class Corpus:
         for e in doc.get("edges") if isinstance(doc.get("edges"), list) else []:
             if isinstance(e, dict) and isinstance(e.get("from"), str) and isinstance(e.get("to"), str):
                 self._link(e.get("edge_type"), (name, e["from"]), (name, e["to"]), None, None)
+                self.local_degree[(name, e["from"])] += 1
+                self.local_degree[(name, e["to"])] += 1
+                event = e.get("trigger", e.get("on"))
+                if isinstance(event, str) and event:
+                    self.local_degree[(name, event)] += 1
         for e in doc.get("external_edges") if isinstance(doc.get("external_edges"), list) else []:
             if not isinstance(e, dict):
                 continue
             src, dst = self._end(name, e.get("from")), self._end(name, e.get("to"))
             self._link(e.get("edge_type"), src, dst, e.get("from"), e.get("to"))
+            for end in (src, dst):
+                if end[0] == name and end[1] is not None:
+                    self.local_degree[end] += 1
 
     @staticmethod
     def _end(name, ref):
@@ -127,7 +140,7 @@ def load(root=None, files=(), exclude=(), defaults=True):
         if not base.is_dir():
             raise ValueError(_("--root {root} is not a directory").format(root=root))
         corpus.root = str(root)
-        out = subprocess.run(["git", "-C", str(base), "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json"], capture_output=True)
+        out = _git(str(base), "ls-files", "-z", "--", "*.kg.yaml", "*.kg.json")
         if out.returncode == 0:
             names = [n for n in out.stdout.decode("utf-8").split("\0") if n]
         else:
@@ -201,6 +214,42 @@ MAX_PATHS = 1000  # um teto de caminhos: correntes que bifurcam e se reencontram
 # 262.144 caminhos e 2,3 GB num losango de 18 camadas); além do teto, a projeção sai truncated
 
 
+# A atenção (4.36.0): o peso do nó no radar, impact × confidence × fator do status × (1 + grau), a mesma fórmula da
+# fila de abertos do radar do framework onde o formato nasceu, para os dois concordarem num mesmo grafo. O fator dá
+# mais peso ao que mediu que o mundo andou (drifted) e quase nenhum à história (superseded, done, refuted).
+STATUS_FACTOR = {"open": 1.0, "confirmed": 1.0, "drifted": 1.3, "unverifiable": 1.0, "refuted": 0.0,
+                 "superseded": 0.2, "done": 0.1}
+
+
+def _num(v):
+    return v if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+
+def degree(corpus, key):
+    """As arestas que tocam o nó, no escopo do arquivo dele, como o radar: as locais, a ponta local das externas que o
+    arquivo declara e o evento de um trigger. A que chega de outro arquivo não conta: a atenção não muda com o --root."""
+    return corpus.local_degree.get(key, 0)
+
+
+def by_attention(keys, att):
+    """Os nós pela atenção, maior primeiro; no empate, o id em ordem decrescente, como o desempate do radar
+    (@val_num_desc do gawk), para os dois darem a mesma fila num mesmo grafo; depois o arquivo."""
+    keys = sorted(keys, key=lambda k: (k[1], k[0]), reverse=True)
+    return sorted(keys, key=lambda k: -att[k])
+
+
+def attention(corpus, key, raw=False):
+    """impact × confidence × fator do status × (1 + grau); o campo que falta ou não é número conta zero. Em grafo que passa
+    no MUST, é o valor do radar; raw dá o valor sem arredondar, que é o que ordena."""
+    node = corpus.nodes[key]
+    impact, conf = _num(node.get("impact")), _num(node.get("confidence"))
+    factor = STATUS_FACTOR.get(node.get("status"), 0.0)
+    if impact is None or conf is None:
+        return 0.0
+    value = impact * conf * factor * (1 + degree(corpus, key))
+    return value if raw else round(value, 6)
+
+
 def method_class(node):
     """A classe canônica do provenance.method do nó, ou None (sem method, ou classe fora do vocabulário)."""
     prov = node.get("provenance")
@@ -231,9 +280,14 @@ def with_spec(text):
     return prefix, folder
 
 
+GIT_ENV_DROP = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE")  # um hook de pre-commit os define para o repo dele
+
+
 def _git(folder, *args):
-    """git -C folder com --end-of-options antes do que vem do grafo: um ref que começa com - nunca vira opção."""
-    return subprocess.run(["git", "-C", folder, *args], capture_output=True)
+    """git -C folder com --end-of-options antes do que vem do grafo: um ref que começa com - nunca vira opção. Sem o
+    GIT_DIR, o GIT_WORK_TREE e o GIT_INDEX_FILE herdados, que apontariam o git para outro repositório."""
+    env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_DROP}
+    return subprocess.run(["git", "-C", folder, *args], capture_output=True, env=env)
 
 
 def load_external(corpus, url):
@@ -414,6 +468,182 @@ def chain(corpus, ref, edge_types=("TRACES_TO",)):
             "edge_types": sorted(edge_types), "bands": bands, "truncated": truncated, "paths": out}
 
 
+DECISION_SCHEMA = "kg-ssot.decision/1"
+REVISIT_SCHEMA = "kg-ssot.revisit/1"
+HISTORY = {"refuted", "superseded"}  # a história: o nó fica, mas não é mais a SSOT viva
+LEANS_ON = ("TRACES_TO", "DEPENDS_ON")  # a decisão se apoia no nó para onde estas arestas saem; SUPPORTS conta ao contrário
+
+
+def _real(key):
+    """A ponta que é um nó: a aresta de grafo inteiro tem a ponta (arquivo, None), que não é nó."""
+    return key is not None and key[1] is not None
+
+
+def _brief(corpus, key, edge=None):
+    node = corpus.nodes.get(key)
+    out = {"file": key[0], "id": key[1], "found": node is not None}
+    if node is not None:
+        out.update(status=node.get("status"), node_type=node.get("node_type"),
+                   label=node.get("label") if isinstance(node.get("label"), str) else None)
+    if edge:
+        out["edge_type"] = edge
+    return out
+
+
+def _leans_on(corpus, key):
+    """O que a decisão usa como base: o que a apoia (SUPPORTS que chega nela), o TRACES_TO e o DEPENDS_ON que saem dela,
+    e o passo do provenance.source. O SUPPORTS que sai dela diz o que ela apoia, não aquilo em que ela se apoia."""
+    seen = {}
+    for et, src, _ref in corpus.into.get(key, ()):
+        if et == "SUPPORTS" and _real(src) and src != key:
+            seen.setdefault(src, "SUPPORTS")
+    for et, dst, _ref in corpus.out.get(key, ()):
+        if et in LEANS_ON and _real(dst) and dst != key:
+            seen.setdefault(dst, et)
+    found = _source_ref(corpus, key) if _declared(corpus.nodes[key]) else None
+    if found and found[0] != key:
+        seen.setdefault(found[0], "provenance.source")
+    return seen
+
+
+def _supersede_line(corpus, key, forward):
+    """A linhagem de substituição: forward, quem substituiu o nó (e quem substituiu esse); senão, o que ele substituiu."""
+    line, frontier, seen = [], [key], {key}
+    while frontier:
+        nxt = []
+        for k in frontier:
+            pairs = corpus.into.get(k, ()) if forward else corpus.out.get(k, ())
+            for et, other, _ref in pairs:
+                if et == "SUPERSEDES" and _real(other) and other not in seen:
+                    seen.add(other)
+                    line.append(_brief(corpus, other))
+                    nxt.append(other)
+        frontier = nxt
+    return line
+
+
+def decision_history(corpus, ref):
+    """A história de uma decisão (kg-ssot.decision/1): o que ela substituiu e quem a substituiu, em toda a linhagem; o
+    que a refuta; e aquilo em que ela se apoia, com o status de cada um. Nada se perde: a superada e a refutada aparecem
+    com o que veio no lugar. ValueError: pedido quebrado."""
+    key = resolve(corpus, ref, "--decision")
+    node = corpus.nodes[key]
+    refuted_by = [_brief(corpus, src) for src in dict.fromkeys(s for et, s, _r in corpus.into.get(key, ())
+                                                                if et == "REFUTES" and _real(s))]
+    supported_by = [_brief(corpus, src) for src in dict.fromkeys(s for et, s, _r in corpus.into.get(key, ())
+                                                                  if et == "SUPPORTS" and _real(s))]
+    return {"schema_version": DECISION_SCHEMA, "root": corpus.root, "decision": _brief(corpus, key),
+            "is_decision": node.get("node_type") == "decision", "attention": attention(corpus, key),
+            "replaced": _supersede_line(corpus, key, forward=False),
+            "replaced_by": _supersede_line(corpus, key, forward=True),
+            "refuted_by": refuted_by, "supported_by": supported_by,
+            "leans_on": [_brief(corpus, k, et) for k, et in _leans_on(corpus, key).items()]}
+
+
+def _due(node, as_of):
+    """A data em que o nó venceu (verified_at + reverify_every) quando venceu até as_of; senão None."""
+    stamp = kg_validate._as_date(node.get("verified_at"))
+    every = kg_validate.parse_duration(node.get("reverify_every"))
+    if stamp is None or every is None:
+        return None
+    try:
+        when = kg_validate.add_duration(stamp, every)
+    except OverflowError:
+        return None
+    return when if when <= as_of else None
+
+
+def revisit(corpus, as_of):
+    """As decisões vivas que pedem revisão (kg-ssot.revisit/1), pela atenção, com o motivo: evidence-due (algo em que
+    ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e
+    segue viva). Ficam à parte, nunca em silêncio: on_event (só reverify_on, porque o evento não tem data), unstamped
+    (cadência sem verified_at, que nunca vence) e unresolved (um apoio que não está no corpus, e por isso não foi
+    julgado). O apoio refutado ou substituído não é motivo: inferido das arestas, deu 1 aviso útil em 10 no corpus do
+    core (o critério pedia 7), e a história dele fica no --decision."""
+    items, on_event, unstamped, unresolved = [], [], [], []
+    for key in corpus.order:
+        node = corpus.nodes[key]
+        if node.get("node_type") != "decision" or node.get("status") in HISTORY:
+            continue
+        reasons, seen = [], set()
+
+        def add(reason, target, **extra):
+            if (reason, target) not in seen:
+                seen.add((reason, target))
+                reasons.append({"reason": reason, **extra, **_brief(corpus, target)})
+        for src in (s for et, s, _r in corpus.into.get(key, ()) if et == "REFUTES" and _real(s) and s != key):
+            if corpus.nodes.get(src, {}).get("status") not in HISTORY:
+                add("contested", src)
+        for dep, how in _leans_on(corpus, key).items():
+            dnode = corpus.nodes.get(dep)
+            if dnode is None:
+                unresolved.append({"decision": key[1], "file": key[0], "target": f"{dep[0]}#{dep[1]}", "edge_type": how})
+                continue
+            if dnode.get("status") in HISTORY or dnode.get("node_type") == "question":
+                continue  # o que caiu ou foi respondido é história, e o --decision a mostra
+            when = _due(dnode, as_of)
+            if when:
+                add("evidence-due", dep, edge_type=how, due_on=when.isoformat())
+        when = _due(node, as_of)
+        if when:
+            add("review-due", key, due_on=when.isoformat())
+        elif kg_validate.parse_duration(node.get("reverify_every")) and kg_validate._as_date(node.get("verified_at")) is None:
+            unstamped.append(_brief(corpus, key))
+        item = {**_brief(corpus, key), "attention": attention(corpus, key), "reasons": reasons}
+        if node.get("reverify_on"):
+            item["reverify_on"] = node.get("reverify_on")
+        if reasons:
+            items.append(item)
+        elif node.get("reverify_on"):
+            on_event.append({**_brief(corpus, key), "reverify_on": node.get("reverify_on")})
+    raw = {(it["file"], it["id"]): attention(corpus, (it["file"], it["id"]), raw=True) for it in items}
+    pos = {k: i for i, k in enumerate(by_attention(list(raw), raw))}
+    items.sort(key=lambda it: pos[(it["file"], it["id"])])
+    return {"schema_version": REVISIT_SCHEMA, "root": corpus.root, "as_of": as_of.isoformat(),
+            "decisions": items, "on_event": on_event, "unstamped": unstamped, "unresolved": unresolved}
+
+
+def _line(b):
+    label = (b.get("label") or "")[:90]
+    return f"{b['id']}  {b.get('status') or '-'}  {label}" if b.get("found") else f"{b['id']}  {_('(outside the corpus)')}"
+
+
+def decision_human(res):
+    d = res["decision"]
+    lines = [_("decision: {line}").format(line=_line(d))]
+    if not res["is_decision"]:
+        lines.append(_("  (the node is a {kind}, not a decision)").format(kind=d.get("node_type")))
+    for key, title in (("replaced", _("  replaced:")), ("replaced_by", _("  replaced by:")),
+                       ("refuted_by", _("  refuted by:")), ("supported_by", _("  supported by:")),
+                       ("leans_on", _("  rests on:"))):
+        if res[key]:
+            lines.append(title)
+            lines += ["    " + _line(b) + (f"  ({b['edge_type']})" if b.get("edge_type") else "") for b in res[key]]
+    return "\n".join(lines)
+
+
+def revisit_human(res):
+    reason = {"evidence-due": _("what it rests on is due for a re-check"),
+              "review-due": _("the decision itself is due for review"),
+              "contested": _("it is refuted and still live")}
+    lines = []
+    for d in res["decisions"]:
+        lines.append(f"{d['file']}  {d['id']}  " + _("attention {value:g}").format(value=d["attention"]) +
+                     f"  {(d.get('label') or '')[:90]}")
+        for r in d["reasons"]:
+            due = f" ({r['due_on']})" if r.get("due_on") else ""
+            lines.append(f"    {reason[r['reason']]}{due}: {r['id']}  {(r.get('label') or '')[:70]}")
+    lines.append(_("· {n} decision(s) to revisit on {date}; {m} wait for an event (reverify_on)").format(
+        n=len(res["decisions"]), date=res["as_of"], m=len(res["on_event"])))
+    if res["unstamped"]:
+        lines.append(_("· {n} decision(s) have a cadence but no verified_at, so they never come due: {ids}").format(
+            n=len(res["unstamped"]), ids=", ".join(d["id"] for d in res["unstamped"][:10])))
+    if res["unresolved"]:
+        lines.append(_("· {n} support(s) are outside the corpus and were not judged: {ids}").format(
+            n=len(res["unresolved"]), ids=", ".join(u["target"] for u in res["unresolved"][:5])))
+    return "\n".join(lines)
+
+
 def _word_of(value):
     """O valor do JSON (status, grau) na língua da saída humana; o JSON fica sempre em inglês."""
     return {"complete": _("complete"), "broken": _("broken"), "cycle": _("cycle"), "too_long": _("too long"),
@@ -589,8 +819,8 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         raise ValueError(_("--depth must be 0 or more"))
     if direction not in ("out", "in", "both"):
         raise ValueError(_("--direction must be out, in or both"))
-    if sort not in ("corpus", "impact"):
-        raise ValueError(_("--sort must be corpus or impact"))
+    if sort not in ("corpus", "impact", "attention"):
+        raise ValueError(_("--sort must be corpus, impact or attention"))
     offset = 0
     if cursor is not None:
         if not (isinstance(cursor, str) and cursor.isascii() and cursor.isdigit() and len(cursor) <= 9):
@@ -615,7 +845,7 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         if not isinstance(semantic, str) or not semantic.strip():
             raise ValueError(_("--semantic needs the question as text"))
         if sort != "corpus":
-            raise ValueError(_("--semantic orders by similarity: it does not combine with --sort impact"))
+            raise ValueError(_("--semantic orders by similarity: it does not combine with --sort impact or attention"))
         if ranker is None:
             raise ValueError(_("--semantic needs the vector ranker (kg_vector.py)"))
         base = [k for k in keys if matches(corpus.nodes[k], k, dict(f, text=None))]  # os outros filtros valem
@@ -639,9 +869,14 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
             v = corpus.nodes[k].get("impact")
             return v if isinstance(v, (int, float)) and not isinstance(v, bool) else float("-inf")
         hits.sort(key=lambda k: (-impact(k), rank[k]))
+    elif sort == "attention":
+        att = {k: attention(corpus, k) for k in hits}
+        hits = by_attention(hits, {k: attention(corpus, k, raw=True) for k in hits})
     page, size = [], 0
     for k in hits[offset:offset + limit]:
         node = project(corpus, k, narrative, fields)
+        if sort == "attention":
+            node["attention"] = att[k]
         if sem is not None:
             node["rank"] = ranks[k]
         size += len(json.dumps(node, ensure_ascii=False))
@@ -748,13 +983,20 @@ def main(argv=None):
     ap.add_argument("--chain", metavar="ID",
                     help=_("the transmission chain from the node back to its origin: the weakest link and the origin's "
                            "strength, as separate axes, with a strict and a lenient grade"))
+    ap.add_argument("--decision", metavar="ID",
+                    help=_("the history of a decision: what it replaced, what replaced it, what refutes it and what it "
+                           "rests on, with the status of each"))
+    ap.add_argument("--revisit", action="store_true",
+                    help=_("the live decisions to revisit, by attention: what they rest on was refuted, superseded or "
+                           "is due, they are due themselves, or they are contested"))
+    ap.add_argument("--as-of", metavar=_("YYYY-MM-DD"), help=_("with --revisit, the date that counts as today"))
     ap.add_argument("--with", action="append", default=[], dest="withs", metavar=_("PREFIX=FOLDER"),
                     help=_("with --chain, read the graph of another repository that a provenance.source URL names: the "
                            "URL prefix before the commit, and the local folder of that repository (repeatable)"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
-    ap.add_argument("--sort", default="corpus", choices=("corpus", "impact"))
+    ap.add_argument("--sort", default="corpus", choices=("corpus", "impact", "attention"))
     ap.add_argument("--limit", type=int, default=50)
     ap.add_argument("--cursor")
     ap.add_argument("--narrative", action="store_true", help=_("include the narrative of each node"))
@@ -802,6 +1044,29 @@ def main(argv=None):
         return broken(_("--model and --model-dir go with --semantic"))
     if args.withs and args.chain is None:
         return broken(_("--with goes with --chain"))
+    if args.as_of is not None and not args.revisit:
+        return broken(_("--as-of goes with --revisit"))
+    if args.decision is not None or args.revisit:
+        if args.decision is not None and args.revisit:
+            return broken(_("--decision and --revisit are different questions: ask one at a time"))
+        if args.around is not None or args.semantic is not None or args.text is not None or args.chain is not None:
+            return broken(_("--decision and --revisit do not combine with --around, --text, --semantic or --chain"))
+        as_of = datetime.date.today()
+        if args.as_of is not None:
+            as_of = kg_validate.iso_date(args.as_of)
+            if as_of is None:
+                return broken(_("--as-of {value}: the date must be YYYY-MM-DD").format(value=repr(args.as_of)))
+        try:
+            corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
+            res = decision_history(corpus, args.decision) if args.decision is not None else revisit(corpus, as_of)
+        except (OSError, ValueError, UnicodeDecodeError) as exc:
+            return broken(exc)
+        if args.format == "json":
+            text = json.dumps(res, ensure_ascii=False, indent=1)
+        else:
+            text = decision_human(res) if args.decision is not None else revisit_human(res)
+        print(text.encode("utf-8", "backslashreplace").decode("utf-8"))
+        return 0
     if args.chain is not None:
         if args.around is not None or args.semantic is not None or args.text is not None:
             return broken(_("--chain does not combine with --around, --text or --semantic"))

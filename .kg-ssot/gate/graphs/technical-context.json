@@ -1,0 +1,6 @@
+{
+  "graph": "docs/technical-context/technical-context.kg.yaml",
+  "id": "technical-context",
+  "must": [],
+  "should": {}
+}

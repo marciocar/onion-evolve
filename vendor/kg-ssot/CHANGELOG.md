@@ -10,6 +10,48 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.37.0] - 2026-10-28
+
+Contract v4.17, SHOULD only: nothing that passed fails. A claim already says where it came from; now it can say exactly
+where in the source, and keep a hash of what it read, so a tool can check both.
+
+- `provenance.scheme` says how to read the locator: `json-pointer` (RFC 6901), `text` (RFC 5147, positions from 0,
+  characters as code points and each line ending as one), `csv` (RFC 7111, one kind of selection, from 1), `pdf` (RFC
+  8118, the physical page from 1), `media` (Media Fragments, npt, the end excluded), `quote` (the exact text), `html`
+  (`#id`) and `kg-node` (a node of the graph named in `source`). The W3C Web Annotation `conformsTo` URIs count as
+  aliases, including the RFC 3778 one. A locator that does not fit its scheme warns as
+  `form.pattern.node.provenance.locator`.
+- `provenance.sha256` is the SHA-256 of what was read, in its own field (`form.pattern.node.provenance.sha256`);
+  `kg_trace` hashes a repository source as git stores it, so the hash is the same on Windows and on Linux.
+- `kg_trace check` reads the source by its scheme and hash: the line, character, row, column, quote, node or JSON
+  Pointer exists, and the hash matches (`integrity.trace-locator-out-of-range`, `integrity.trace-quote-missing`,
+  `integrity.trace-sha256-mismatch`). With `--with PREFIX=FOLDER`, a source given by URL is read at its pinned commit
+  from the root of a local git clone; a commit the clone does not have, or a folder that is not the root of a clone,
+  is never read from the working tree, and a branch name (`main`) counts as `unpinned`. What is not judged is counted
+  (`form_only`, `unpinned`, `malformed`, `not_json`, `not_text`), never as ok. The JSON output gains `schemes`.
+- The JS reader exports `textInRange`, which counts code points and line endings like the Python reader. The
+  conformance suite goes from 463 to 508 cases.
+- The open tension between two claims, planned for this release, was measured against its pre-registered criterion and
+  left out (2 of 10 with a blind evaluator, against a floor of 3).
+
+## [4.36.0] - 2026-10-28
+
+Contract v4.16, unchanged. A graph already keeps the history of its decisions: a new decision supersedes the old one,
+a refutation keeps the refuted node, and nothing is deleted. This release makes that history something you can ask.
+
+- `kg_query --sort attention` orders nodes by their weight on the radar, `impact × confidence × status factor × (1 +
+  degree)`, with the degree scoped to the node's file and ties broken by id in descending order, so it gives the same
+  queue as the radar of the framework where the format was born on a graph that passes the MUST.
+- `kg_query --decision <id>` gives the history of a decision: what it replaced and what replaced it along the whole
+  `SUPERSEDES` line, what refutes and supports it, and what it rests on, with the status of each
+  (`kg-ssot.decision/1`).
+- `kg_query --revisit [--as-of DATE]` lists the live decisions to revisit, by attention, with the reason:
+  `evidence-due`, `review-due` or `contested`, where the support is what reaches the decision by `SUPPORTS` and what it
+  traces to or depends on; a support that was refuted or superseded is history shown by `--decision`, not a reason; decisions that wait for an event, have a cadence
+  but no stamp, or rest on something outside the corpus are listed apart (`kg-ssot.revisit/1`).
+- `kg_trace.py projection`: an id of a page whose declared graph does not read is no longer `missing`; the graph error
+  still fails the page.
+
 ## [4.35.0] - 2026-10-27
 
 Contract v4.16, unchanged. **Python 3.12 or later** (it was 3.11): the package, the MCPB bundle and the docs say so, CI

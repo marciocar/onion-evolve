@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:95149d676e333e72 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:ef4d3d84ea1b98fe -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -41,6 +41,42 @@ Nas `external_edges`, o escopo é `top` e o campo leva o nome da lista
 A lista completa, com o que cada código pega, está em
 [`spec/conformance/README.pt-BR.md`](../../../spec/conformance/README.pt-BR.md#códigos).
 
+## Onde na fonte (v4.17)
+
+O `locator` era texto livre: "linhas 10 a 12", "a seção License". Uma pessoa lê; uma ferramenta não confere. Desde o
+v4.17, o nó pode dizer como lê-lo e guardar o hash do que leu. Os dois são opcionais e só alertam: nada que passava
+reprova.
+
+```yaml
+provenance:
+  source: "https://github.com/acme/brain/blob/9f2c1e0/docs/payments.md"
+  locator: "line=41,44"
+  method: "reading: a seção de retentativa"
+  scheme: text
+  sha256: "3f1d…"   # 64 dígitos hex minúsculos: o SHA-256 do arquivo naquele commit
+```
+
+| `scheme` | Norma | Locator | Conta a partir de |
+|---|---|---|---|
+| `json-pointer` | RFC 6901 | `/a/b`, ou `#/a/b` em fragmento (com percent-encoding, sem espaço cru) | — |
+| `text` | RFC 5147 | `line=10`, `line=10,20`, `char=5,9`, com um `;length=N` opcional | 0, posições entre linhas ou caracteres; `char` conta code points, e cada quebra de linha (CRLF, LF ou CR) é um caractere |
+| `csv` | RFC 7111 | `row=4;6-*`, `col=2`, `cell=4,2-6,3`: um tipo de seleção por vez, `*` para a última | 1 |
+| `pdf` | RFC 8118 e ISO 32000-2 | `page=3`, entre outros parâmetros | 1, a página física |
+| `media` | W3C Media Fragments | `t=10,20`, `t=npt:1:02:03` | segundos; o fim fica de fora |
+| `quote` | W3C TextQuoteSelector | o texto exato | — |
+| `html` | um fragmento HTML | `#id` | — |
+| `kg-node` | este contrato | `#ID` ou `ID`, um nó do grafo nomeado no `source` | — |
+
+As URIs do `conformsTo` do modelo Web Annotation do W3C valem como alias, inclusive a da RFC 3778, que a tabela dele
+ainda usa para PDF. O hash vai num campo próprio: o `md5=` da RFC 5147 não é usado, porque o MD5 não resiste a colisão
+(RFC 6151). Avisos: `form.enum.node.provenance.scheme`, `form.pattern.node.provenance.locator` (o locator não cabe no
+esquema) e `form.pattern.node.provenance.sha256`. O `kg_trace check` então abre a fonte e confere o locator e o hash
+(capítulo 5). O que as normas deixam em aberto é decisão deste contrato, escrita como tal: o JSON Pointer que não
+resolve numa fonte JSON reprova no `kg_trace`, o `char` conta code points em todo leitor, linhas e colunas do CSV
+contam a partir de 1 e se escrevem sem zero à esquerda (a RFC 7111 aceita `0` e `01`), e o intervalo de mídia exclui
+o fim. A forma não confere o que só a fonte diz, como o início
+depois do fim ou a linha que não existe: isso é do `kg_trace`.
+
 ## O que mudou do v3 para o v4
 
 O v4 é uma versão **maior**: o que alertava passou a reprovar.
@@ -58,7 +94,7 @@ registrada: a 4.11.0, a 4.12.0 e a 4.13.0 passaram a reprovar construções rara
 menores porque nenhum dos grafos reais medidos em quatro repositórios adotantes mudou de veredito. Mesmo assim, contam
 como MUST novo para o critério de estável, e cada uma zerou o relógio de 30 dias. Desde a 4.11.0, o contrato tem
 rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.7 na 4.14.0, v4.8 na 4.15.0, v4.9 na 4.15.1 e na
-4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 desde a 4.32.0), que não é o número da release.
+4.16.0, v4.10 da 4.16.1 à 4.18.0, v4.11 na 4.19.0 e na 4.20.0, v4.12 na 4.21.0, v4.13 na 4.22.0, v4.14 da 4.23.0 à 4.26.0, v4.15 da 4.27.0 à 4.31.1, v4.16 da 4.32.0 à 4.36.0, v4.17 desde a 4.37.0), que não é o número da release.
 
 | Release | O que entrou |
 |---|---|
@@ -93,6 +129,8 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.37 | Contrato v4.17, só SHOULD: `provenance.scheme` (como ler o locator: `json-pointer`, `text`, `csv`, `pdf`, `media`, `quote`, `html`, `kg-node`) e `provenance.sha256` (o hash do que foi lido, num campo próprio); o `kg_trace check` lê a fonte pelo esquema e pelo hash, também num commit fixado de outro repositório com `--with` |
+| 4.36 | Contrato v4.16, sem mudança. `kg_query --sort attention` (a fórmula do radar), `--decision` (a história de uma decisão) e `--revisit` (as decisões vivas a revisitar, com o motivo) |
 | 4.35 | Contrato v4.16, sem mudança. Python 3.12 ou mais. O `kg_query --chain --with` segue a corrente para outro repositório no commit citado; o `kg_trace.py projection` confere as páginas Markdown que declaram `projection_of`; o `kg_trace check` segue um `provenance.locator` em JSON Pointer dentro do arquivo JSON |
 | 4.34 | Contrato v4.16, sem mudança. O `kg_query --chain` segue primeiro o `provenance.source`, e uma origem sem `provenance.source` sai marcada e deixa a corrente `weak` |
 | 4.33 | Contrato v4.16, sem mudança. `kg_query --chain`: a cadeia de transmissão de um nó até a origem, com o elo mais fraco e a força da origem em eixos separados, e um grau estrito e um leniente |
