@@ -375,7 +375,7 @@ nodes:
       source: "https://github.com/marciocar/onion-curation/blob/518b332b9eb4b7a1b00c0f1213b6d65b5fc7b0e3/docs/evolution/research/company-brain-multiaudience-2026-10/company-brain-multiaudience-2026-10.kg.yaml#Q_CB_FREE_ORG_READ_ENFORCED"
       scheme: kg-node
       locator: "#Q_CB_FREE_ORG_READ_ENFORCED"
-      sha256: "f2584d31cf98a1d9f736141bb92e9c94b21f9e868124e0df4131f6811d4e7b9f"
+      node_sha256: "5cd456dc9c5d4723e55683dc273b177214d0d3e008d13250b08a226e02db1f07"
       method: "testimony: card da curadoria"
       locality: "repo"
   - id: E_MA_MCP_CLONE_SERVIDO_PARADO_1028

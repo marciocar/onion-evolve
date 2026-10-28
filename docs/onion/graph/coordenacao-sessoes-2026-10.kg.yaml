@@ -470,15 +470,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: maestro
     impact: 3
     confidence: 0.5
     verified_at: "2026-10-28"
-    evidence_class: testimony
-    verified_against: "relato do kg-ssot ao censo cruzado de 2026-10-28"
+    verified_against: "git show na origin/main do repo do kg-ssot (55db567) em 2026-10-28: D_KG_SSOT_PRODUTO_SEPARADO, em docs/onion/graph/kg-ssot-product.kg.yaml, está done com verified_at 2026-10-24 (selo do maestro pelo /meta:decide, opção (a), produto separado); D_KG_SSOT_PRODUCT_FORM_1007, no grafo da pesquisa kg-ssot-estrategia-produto-independente-2026-10, está done com verified_at 2026-10-25, fechada por derivação daquele selo"
     label: "Selar D_KG_SSOT_PRODUTO_SEPARADO e D_KG_SSOT_PRODUCT_FORM_1007, do kg-ssot, que destravam a fatia de negócio do EPIC_8_CONTEXTS_AS_PROJECTION."
-    narrative: "As duas decisões moram no repo do kg-ssot e entram aqui em texto. O selo é do maestro, pelo /meta:decide. Gatilho: decisão do maestro."
+    narrative: "As duas decisões moram no repo do kg-ssot e entram aqui em texto. O selo é do maestro, pelo /meta:decide. Gatilho: decisão do maestro. Fechado em 2026-10-28 pela opção (a): o nó foi aberto por engano, porque as duas já estavam seladas. O maestro selou D_KG_SSOT_PRODUTO_SEPARADO em 2026-10-24, com a opção (a), produto separado com contrato formal próprio e pin mútuo, e D_KG_SSOT_PRODUCT_FORM_1007 fechou por derivação desse selo (verified_at 2026-10-25). A sessão do kg-ssot confirmou o engano. Não há selo a pedir ao maestro."
 edges:
   - from: Q_COORD_UPDATE_4_ADOTANTES_4370
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
