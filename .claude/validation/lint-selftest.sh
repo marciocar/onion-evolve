@@ -4826,9 +4826,9 @@ run_kg_trace_resolve_selftests() {
     { printf 'meta:\n  id: fonte\n  schema_version: "1"\nnodes:\n'; _s_node "${2:-N_FONTE}" "$1"; printf 'edges: []\n'; } > "${GS}/fonte.kg.yaml"
     ( cd "${ds}" && git add -A && git show :docs/onion/graph/fonte.kg.yaml ) 2>/dev/null | sha256sum | cut -c1-64
   }
-  _s_deriv() {  # $1=sha256 · $2=scheme · $3=locator
+  _s_deriv() {  # $1=sha256 · $2=scheme · $3=locator · $4=fonte (default: o grafo-fonte)
     { printf 'meta:\n  id: derivado\n  schema_version: "1"\nnodes:\n'; _s_node N_DERIVADO "o derivado"
-      printf '    provenance:\n      source: docs/onion/graph/fonte.kg.yaml\n      method: "testimony: card"\n      scheme: %s\n      locator: "%s"\n      sha256: "%s"\n' "$2" "$3" "$1"
+      printf '    provenance:\n      source: %s\n      method: "testimony: card"\n      scheme: %s\n      locator: "%s"\n      sha256: "%s"\n' "${4:-docs/onion/graph/fonte.kg.yaml}" "$2" "$3" "$1"
       printf 'edges: []\n'; } > "${GS}/derivado.kg.yaml"
     ( cd "${ds}" && git add -A ) >/dev/null 2>&1
   }
@@ -4872,6 +4872,13 @@ run_kg_trace_resolve_selftests() {
      && [ "${r5s}" -eq 0 ] && [ "${s5}" = $'-\tSCHEMES\t-\t(1 malformed)\tSCHEME-AVISO' ]; then
     record_pass "kg-trace: (s4) sha256 fora da forma e scheme fora da tabela → SCHEME-AVISO (malformed), rc 0, só SOFT no lint"
   else record_fail "kg-trace: (s4) malformados" "sha: rc=${r4s} ${s4:0:120} lint=${l4:0:160} · scheme: rc=${r5s} ${s5:0:120}"; fi
+  # (s5) a fonte que o nó nomeia não está no repo (com sha256 declarado) → SCHEME-AVISO missing_source, rc 0: o produto a
+  #      conta em skipped e sai 0, e calar seria o silêncio que a passada adversarial da adoção achou
+  local s6 r6s=0
+  _s_deriv "${sha_s}" kg-node "#N_FONTE" docs/onion/graph/sumiu.kg.yaml; s6="$(_kt "${ds}" --format tsv 2>/dev/null)" || r6s=$?
+  if [ "${r6s}" -eq 0 ] && [ "${s6}" = $'-\tSCHEMES\t-\t(1 missing_source)\tSCHEME-AVISO' ]; then
+    record_pass "kg-trace: (s5) fonte declarada com sha256 que não está no repo → SCHEME-AVISO (missing_source), rc 0"
+  else record_fail "kg-trace: (s5) fonte ausente" "rc=${r6s} ${s6:0:160}"; fi
   sed 's|^for m in sch.get("failures", \[\]):  # a tradução das falhas de esquema|for m in []:  # a tradução das falhas de esquema|' "${helper}" > "${mut}/kg-trace-semscheme.sh"
   if cmp -s "${helper}" "${mut}/kg-trace-semscheme.sh"; then record_fail "kg-trace: (s-MUT) mutante não aplicou" "âncora da tradução das falhas de esquema mudou"
   else
@@ -6897,6 +6904,8 @@ run_vendor_scrub_form_selftests() {
   #     fragmentos de PDF `zoom=200&page=3` e `page=3&zoom=200` de duas fixtures do vendor viravam `200&page` e
   #     `3&zoom`, 2 HARD falsos). Pelo modo scan que a REGRA 36 consome: a query cala, o nome com `&` segue acusando.
   #     MUTANTES: sem a regra do `=` dos dois lados, ou sem a do lado só de dígitos, o --selftest do script cai.
+  #     Os fragmentos de PDF medidos têm um lado só de dígitos (é a regra que os cala); a do `=` dos dois lados se
+  #     mantém viva pelo `?lang=pt&mode=dark` do --selftest, que não tem dígito.
   local _e='&'   # o `&` por variável: o literal neste arquivo (que viaja) viraria candidato NOVO da própria guarda
   printf 'locator: "#zoom=200%spage=3"\nlocator: "#page=3%szoom=200"\na Acme%sCo, a Baker%sSons e a Foo%sBar Ltda\n' "${_e}" "${_e}" "${_e}" "${_e}" "${_e}" > "${d}/.claude/commands/vaza.md"
   out="$(bash "${sc}" "${d}" 2>&1 || true)"

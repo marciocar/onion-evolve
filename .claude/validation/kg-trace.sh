@@ -212,9 +212,12 @@ for u in loc.get("unreadable", []):
     print(f"{u['file']}\t{u['id']}\t-\t{u['target']}{u['locator']}\tLOCATOR-ILEGIVEL")
 # SCHEMES (kg-ssot >= 4.37.0, contrato v4.17, `schemes`, aditivo): a fonte lida pelo provenance.scheme e conferida pelo
 # provenance.sha256. Cada falha sai com o nó e o código do produto (integrity.trace-sha256-mismatch,
-# -locator-out-of-range, -quote-missing), nunca como ENTRADA-QUEBRADA. O skipped que é DEFEITO de quem declara
-# (unpinned: o ref da URL anda; malformed: scheme, locator ou hash fora da forma) sai numa linha de aviso; o resto do
-# skipped (form_only, absolute, missing_source...) é o não-julgado por desenho, que o produto já conta.
+# -locator-out-of-range, -quote-missing), nunca como ENTRADA-QUEBRADA. O skipped que é DEFEITO de quem declara sai
+# numa linha de aviso: malformed (scheme, locator ou hash fora da forma), missing_source (a fonte que o nó nomeia não
+# está no repo) e unpinned (o ref da URL anda). O resto (form_only, absolute, not_json...) é o não-julgado por desenho.
+# TETO DECLARADO (passada adversarial da adoção da 4.37.0): este TSV não passa --with ao produto, então a fonte por URL
+# de outro repo cai em `absolute` e NÃO é julgada aqui; o unpinned só nasce com --with. O sha256 de um nó que cita outro
+# repo se confere por `kg_trace.py check --with <prefixo>=<clone>` (o 1º do core: Q_MA_FREE_ORG_READ_ENFORCED).
 def _cell(s):
     return " ".join(str(s or "").split())
 sch = d.get("schemes") or {}
@@ -222,7 +225,7 @@ for m in sch.get("failures", []):  # a tradução das falhas de esquema (o mutan
     print(f"{m['file']}\t{m['id']}\t-\t{_cell(m.get('target'))} [{_cell(m.get('scheme')) or 'sha256'}] "
           f"{_cell(m.get('locator'))}".rstrip() + f"\tSCHEME-FALHA:{m['code']}")
 ss = sch.get("skipped") or {}
-warn = [f"{ss[k]} {k}" for k in ("unpinned", "malformed") if ss.get(k)]
+warn = [f"{ss[k]} {k}" for k in ("malformed", "missing_source", "unpinned") if ss.get(k)]
 if warn:
     print(f"-\tSCHEMES\t-\t({', '.join(warn)})\tSCHEME-AVISO")
 PY
