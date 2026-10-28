@@ -1,0 +1,30 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "data/2.1.312.txt não bate byte a byte com a seção ## 2.1.312 do CHANGELOG oficial, ou um label/verified_against cita texto ou número de linha do item que não está lá",
+   "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V='## 2.1.312' '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-28-r20/data/2.1.312.txt; grep -n '' no arquivo para as linhas citadas"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+   "check": "re-executar a medição do nó (o censo com raiz '.'; npm view do SDK; gh api das tags e do compare v1.0.263...v1.0.264; gh issue view 85039 e 88747; git config --show-scope core.hooksPath; grep e wc no core; ls da extensão; a família cited_directive)"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+   "check": "ler o label e o verified_against e conferir no core (grep/ls/leitura do hook) que a superfície existe e se comporta como afirmado"
+  },
+  {
+   "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+   "when": "a rodada supera um nó da r19 que não existe ou cujo estado afirmado ainda vale; ou deixa de superar um nó da r19 cujo estado a medição de hoje derrubou",
+   "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-10-26-r19/radar-E3-2026-10-26-r19.kg.yaml e comparar o estado que ele afirma com a medição de hoje"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core (hook, guarda, settings, comando, skill, CI, bridge, worktree, core.hooksPath, adotante) e a rodada não o mediu nem o listou",
+   "check": "para cada item de data/2.1.312.txt, grep do termo-chave no core (.claude, ops, .github, CLAUDE.md) e leitura da superfície achada"
+  }
+ ],
+ "verdicts": []
+}
