@@ -200,7 +200,7 @@ nodes:
     confidence: 0.75
     verified_at: "2026-10-28"
     verified_against: "o diretório de extensões do VS Code Server da conta do host segue com uma só, anthropic.claude-code-2.1.306-linux-x64 (ls), agora seis versões atrás do CLI; as linhas 28 e 29 da 2.1.312 são da extensão (sessão terminando em código de saída nu quando a configuração da organização falha; reset de limite em hora do relógio) e só valem quando ela subir; a pergunta da r19 sobre ela (SAC-260) segue aberta"
-    label: "a extensão do VS Code do host segue na 2.1.306, seis versões atrás, e os dois itens de VS Code da 2.1.312 não a alcançam; a pergunta da r19 continua de pé"
+    label: "a extensão do VS Code do host segue na 2.1.306, seis versões atrás, e os dois itens de VS Code da 2.1.312 não a alcançam; a pergunta da rodada anterior continua de pé"
     provenance:
       source: "diretório de extensões do VS Code Server do host"
       locator: "anthropic.claude-code-2.1.306-linux-x64"
@@ -305,7 +305,7 @@ nodes:
     confidence: 0.75
     verified_at: "2026-10-28"
     verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: remoteControlAtStartup = True no settings de usuário; aplicada em E_REMOTE_CONTROL_OCIOSO_VALE_NO_HOST_1028"
-    label: "item de Remote Control é superfície do host enquanto toda sessão o abrir; a r19 já o tratava assim"
+    label: "item de Remote Control é superfície do host enquanto toda sessão o abrir; a rodada anterior já o tratava assim"
     provenance:
       source: "data/judge-verdicts.json"
       locator: "omissão: Remote Control ligado em toda sessão do host (linha 36)"
