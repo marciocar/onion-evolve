@@ -324,7 +324,8 @@ e `E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028`, em `docs/onion/graph/sinais-de
 herdou uma permissão lembrada da R1. As curas vieram no mesmo PR deste registro, cada uma com caso e mutante na
 `run_a2a_rt_selftests`: a foto de permissões passa a cobrir os servidores do teste (a2a-spike, a2a-rt e os do
 `mcp.json` em uso); o `draft_message` devolve o comando de envio completo, para um terminal separado; a moldura da
-VPS marca `verified-crypto="true"` com a origem «reverificada no aceite»; o razão de aceites ausente antes do 1º
-aceite dá «nenhuma mensagem» (ilegível ou corrompido segue recusando); o envio do core não imprime mais o
+VPS marca `verified-crypto="true"`, com a origem «reverificada no aceite», só quando o razão de aceites traz o sha256
+do doc e é privado (o razão vivo tem ACL de outro usuário do sistema, medido; tirá-la é do maestro); o razão ausente
+antes do 1º aceite dá «nenhuma mensagem» (ilegível ou corrompido segue recusando); o envio do core não imprime mais o
 «nada gravado» da etapa interna; e o card clona antes do doctor, abre a sessão da VPS em `~/rt-sessao-vps` e
 proíbe o «não perguntar de novo» e o envio com `!` dentro da sessão.
