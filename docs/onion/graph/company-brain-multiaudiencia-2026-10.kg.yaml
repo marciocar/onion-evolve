@@ -371,6 +371,13 @@ nodes:
     confidence: 0.5
     label: "Na organização gratuita do GitHub, o servidor aplica a permissão por repositório: a conta que não é dona, com Read num repo e Write no outro, é recusada no push do primeiro e aceita no do segundo?"
     narrative: "Espelha Q_CB_FREE_ORG_READ_ENFORCED da curadoria (https://github.com/marciocar/onion-curation/blob/2c8d3846ce21165127117b0b27ae60b8fda4adae/docs/evolution/research/company-brain-multiaudience-2026-10/company-brain-multiaudience-2026-10.kg.yaml#Q_CB_FREE_ORG_READ_ENFORCED). Card do maestro, porque cria a organização e convida a segunda conta. Especificação pré-registrada no PLAN-D da curadoria (https://github.com/marciocar/onion-curation/blob/518b332b9eb4b7a1b00c0f1213b6d65b5fc7b0e3/docs/evolution/research/company-brain-multiaudience-2026-10/PLAN-D.md): uma organização gratuita de teste com permissão-base nenhuma e dois repos privados, um de negócio e um de tecnologia; a equipe negocio com Write num e Read no outro; uma segunda conta que não é dona, nem admin, nem colaboradora externa, e sem outra relação com a organização, entra só nessa equipe. passo 1: ela dá push no repo de Read (esperado recusado). passo 2: push no repo de Write (esperado aceito). passo 3: o dono dá push (esperado aceito, o bypass declarado). passo 4: fork privado liberado e PR a partir do fork (mede o fluxo InnerSource). passo 5: fork com o fork privado desligado (esperado recusado). Critério: passo 1 recusado e passo 2 aceito provam a separação, e a proposta de E_MA_MARKET_CURADORIA_PROPOSTA_1028 deixa de ser condicional nesse ponto; passo 1 aceito refuta a proposta e leva ao plano pago. A curadoria confere a saída literal contra o PLAN-D e grava a medida no grafo dela; o core registra aqui citando o nó dela pela URL fixada no sha."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/518b332b9eb4b7a1b00c0f1213b6d65b5fc7b0e3/docs/evolution/research/company-brain-multiaudience-2026-10/company-brain-multiaudience-2026-10.kg.yaml#Q_CB_FREE_ORG_READ_ENFORCED"
+      scheme: kg-node
+      locator: "#Q_CB_FREE_ORG_READ_ENFORCED"
+      sha256: "f2584d31cf98a1d9f736141bb92e9c94b21f9e868124e0df4131f6811d4e7b9f"
+      method: "testimony: card da curadoria"
+      locality: "repo"
   - id: E_MA_MCP_CLONE_SERVIDO_PARADO_1028
     node_type: evidence
     layer: audit
