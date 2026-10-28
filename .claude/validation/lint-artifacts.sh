@@ -807,7 +807,8 @@ check_kg_radar_integrity() {
 #   traduzido vira ENTRADA-QUEBRADA: antes da tradução do locator, ele saía com TSV vazio e calava.
 #   DESDE A 4.37.0 (2026-10-28) ELA LÊ O `schemes` DO PRODUTO: a falha do provenance.scheme ou do
 #   provenance.sha256 sai com o nó e o código (integrity.trace-sha256-mismatch, -locator-out-of-range,
-#   -quote-missing), HARD no core e SOFT no derivado; o unpinned e o malformed do skipped saem SOFT.
+#   -quote-missing), HARD no core e SOFT no derivado; o malformed, o missing_source e o unpinned do skipped
+#   saem SOFT. Teto: sem --with, a fonte por URL de outro repo não é julgada aqui (skipped absolute).
 #   Antes da tradução, a falha caía em ENTRADA-QUEBRADA sem nomear o nó.
 # ===========================================================================
 check_kg_trace_resolve() {
@@ -863,7 +864,7 @@ check_kg_trace_resolve() {
         continue ;;
       SCHEME-AVISO)
         violation "SOFT" "${SCRIPT_DIR}/kg-trace.sh" \
-          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME-AVISO] provenance.scheme ou sha256 declarados e NÃO julgados ${target} — unpinned é URL sem commit fixado, malformed é scheme, locator ou hash fora da forma (detalhe: bash .claude/validation/kg-trace.sh)"
+          "REGRA 55 (O \`trace:\` de um nó APONTA para alvo que EXISTE): [trace-resolve/SCHEME-AVISO] provenance.scheme ou sha256 declarados e NÃO julgados ${target} — malformed é scheme, locator ou hash fora da forma, missing_source é a fonte que não está no repo, unpinned é URL sem commit fixado lida pelo --with (detalhe: bash .claude/validation/kg-trace.sh)"
         continue ;;
     esac
     violation "HARD" "${REPO_ROOT}/${g}" \
