@@ -457,13 +457,13 @@ nodes:
   - id: E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO
     node_type: evidence
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 0.95
     verified_at: '2026-09-15'
     verified_against: 'mapfile com papel invalido -> array vazio -> git archive HEAD -- : 2222 arquivos no tar, 353 de biografia, rc=0'
     label: "VAZAMENTO PRÉ-EXISTENTE: `mapfile -t manifest < <(script)` engole o rc; manifesto ≠0 → array vazio → `git archive HEAD --` copia TODOS: 2222 arquivos, 353 de biografia, rc=0. NÃO curado: resolve-manifest.sh sai 3, mas o adopt.md o consome pelo mesmo mapfile, que engole o 3."
-    narrative: "label anterior: O VAZAMENTO MAIOR, e ele e PRE-EXISTENTE que as minhas guardas novas tornaram ALCANCAVEL. `mapfile -t manifest < <(script)` ENGOLE o rc do produtor. Com o manifesto saindo ≠0 (papel desconhecido, repo sem superficie) o array fica VAZIO, e `git archive HEAD --` sem pathspec significa TODOS para o git: 2222 arquivos, o diario inteiro, docs/discussions e materials, rc=0. As guardas `exit 2/3` que eu acrescentei ao manifesto AUMENTARAM as portas para esse estado sem que ninguem do outro lado as lesse. Guarda que o consumidor nao le e decoracao — a mesma classe do nome deste no, uma camada adiante. Curado: o adopt captura o rc e CONTA o array antes de virar pathspec."
+    narrative: "label anterior: O VAZAMENTO MAIOR, e ele e PRE-EXISTENTE que as minhas guardas novas tornaram ALCANCAVEL. `mapfile -t manifest < <(script)` ENGOLE o rc do produtor. Com o manifesto saindo ≠0 (papel desconhecido, repo sem superficie) o array fica VAZIO, e `git archive HEAD --` sem pathspec significa TODOS para o git: 2222 arquivos, o diario inteiro, docs/discussions e materials, rc=0. As guardas `exit 2/3` que eu acrescentei ao manifesto AUMENTARAM as portas para esse estado sem que ninguem do outro lado as lesse. Guarda que o consumidor nao le e decoracao — a mesma classe do nome deste no, uma camada adiante. Curado: o adopt captura o rc e CONTA o array antes de virar pathspec. Reconciliado em 2026-10-28 pela regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09): valia em 2026-09-15; a cura (load-manifest.sh, manifesto que falha aborta) entrou em 5beab220f (2026-10-09); superado por E_REVERIFY_1027_MANIFESTO_FALHO_RECUSA."
     trace: '.claude/commands/meta/adopt.md'
     provenance:
       source: "docs/evolution/review/fix-adopt-role-cut-transport.md + commit df031ef5 + .claude/utils/adopt/resolve-manifest.sh + .claude/commands/meta/adopt.md"

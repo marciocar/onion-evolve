@@ -1259,15 +1259,16 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: superseded
-    verified_at: "2026-07-28"
-    verified_against: grants-no-db-e-toolset-medido-no-ar
+    status: confirmed
+    verified_at: "2026-10-28"
+    verified_against: "re-medido em 2026-10-28 por E_REMEDIDA_CAPABILITY_BY_SCOPE_1028: no Logto, bridge:write só na role humana bridge-user; a role de serviço bridge-operator só com bridge:invoke"
     label: "P10 — CAPACIDADE por identidade via scope `bridge:write` (autorizado nominalmente pelo maestro apos o classificador barrar a versao que eu ia inventar sozinho). Concedido SO a role humana; o app de SERVICO nao recebe. Sem o scope: Read/Grep/Glob/WebFetch/WebSearch/TodoWrite — le e propoe. Com ele: conjunto completo. `Task` fica de fora de proposito — um subagente poderia receber o conjunto completo e a restricao vazaria pelo delegado. Provisionamento incorporado ao script idempotente (passo 9), nao aplicado a mao"
+    narrative: "Reconciliado para confirmed em 2026-10-28. Ficou superseded em 2026-08-23 (037b9fd94), quando E_bridge_write_grant_absent_2026_08 achou o grant ausente; no mesmo dia E_bridge_write_regranted_2026_08 o reconcedeu e superou aquele achado, mas este nó não voltou. O superseder dele está superseded, e a re-medição E_REMEDIDA_CAPABILITY_BY_SCOPE_1028 mostra a capacidade vigorando. Verificado em 2026-07-28 contra grants-no-db-e-toolset-medido-no-ar."
     provenance:
-      source: "ops/bridge-auth/logto-provision.sh"
-      locator: "grants-no-db-e-toolset-medido-no-ar"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      source: "banco do Logto da VPS (tabelas roles, roles_scopes e scopes), consultado só para leitura"
+      locator: "tenant default: bridge-user com bridge:admin, bridge:invoke e bridge:write; bridge-operator só com bridge:invoke"
+      method: "measurement: consulta read-only (default_transaction_read_only=on) por docker exec psql no contêiner onion-vps-logto-postgres, 2026-10-28"
+      locality: "host"
 
   - id: E_p10_service_cannot_write
     node_type: evidence
@@ -2011,6 +2012,24 @@ nodes:
       locator: "reconcedido e provado por comportamento 2026-08-23 (ordem do maestro): via Management API do Logto (token m-default), a role humana bridge-user NAO tinha bridge:write ANTES (GET /roles/{}/scopes = ausente); POST /roles/{}/scopes {scopeIds:[bridge:write]} concedeu; GET DEPOIS = PRESENTE. O servico (bridge-operator) NAO recebeu. Grant cirurgico (um POST), sem rodar o --apply inteiro"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
+  - id: E_REMEDIDA_CAPABILITY_BY_SCOPE_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-28"
+    verified_against: "consulta read-only ao banco do Logto (roles x roles_scopes x scopes, scopes bridge:*) e git grep bridge:write na origin/main do onion-bridge (5819d8e)"
+    source_tier: 10
+    source_kind: primary
+    label: "A capacidade por scope vigora em 2026-10-28: bridge:write está só na role humana bridge-user, a role de serviço bridge-operator tem só bridge:invoke, e o código do bridge segue decidindo as tools pelo bridge:write."
+    narrative: "Saída da consulta, tenant default: bridge-admin com bridge:admin; bridge-operator com bridge:invoke; bridge-user com bridge:admin, bridge:invoke e bridge:write. No onion-bridge, origin/main 5819d8e: src/agent-policy.ts (sem bridge:write, lê e propõe; o convidado com bridge:write escreve no próprio workspace, sem Bash nem Task) e src/chat-query-options.ts l.82. Restaura D_capability_by_scope, que ficara superseded por um achado já superado. Não medido: um turno de chat de ponta a ponta com cada identidade."
+    provenance:
+      source: "banco do Logto da VPS e onion-bridge@5819d8e:src/agent-policy.ts"
+      locator: "roles_scopes do tenant default; src/agent-policy.ts l.37 e l.40; src/chat-query-options.ts l.82"
+      method: "measurement: SELECT read-only por docker exec psql e git grep na origin/main do bridge"
+      locality: "host"
   - id: E_d5_granaai_acolhida_2026_08
     node_type: evidence
     layer: audit
@@ -2772,6 +2791,9 @@ edges:
   - from: E_bridge_write_regranted_2026_08
     to: E_bridge_write_grant_absent_2026_08
     edge_type: SUPERSEDES
+  - from: E_REMEDIDA_CAPABILITY_BY_SCOPE_1028
+    to: D_capability_by_scope
+    edge_type: SUPPORTS
   - from: E_d5_granaai_acolhida_2026_08
     to: D_logto_is_projection
     edge_type: SUPPORTS

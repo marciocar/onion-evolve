@@ -500,11 +500,11 @@ nodes:
     plane: PROD
     verified_at: "2026-08-12"
     verified_against: crontab-l-do-root-com-4-entradas-e-zero-offsite-find-tar-gpg-num-so-disco-which-restic-presente-password-store-sem-entrada
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 1.0
     label: "Refina Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA: backup-offsite.sh (31cd4f9) usa restic e sai com exit 3 declarando que não fez. Medido em 2026-08-12: cron do root com 4 entradas, nenhuma offsite; um .tar.gpg num só disco; pass sem entrada restic. Faltam 2 pass insert e a linha de cron."
-    narrative: "label anterior: REFINA [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] sem contradiza-lo: a lacuna e real, mas o mecanismo que a fecha JA EXISTE ESCRITO. `backup-offsite.sh` (commit `31cd4f9`) usa `restic`, e o binario esta instalado (⟨no PATH do sistema⟩). Ele sai com **exit 3** declarando que NAO FEZ, em vez de sair 0 parecendo que fez — o oposto do fail-open que derrubou o Logto no `I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE`. FALTAM EXATAMENTE TRES COISAS, e as tres sao do maestro: `pass insert onion/restic-repo`, `pass insert onion/restic-password` (destino e conta a contratar) e a linha de cron. MEDIDO com stderr visivel (nao `2>/dev/null`, que confunde 'falhou' com 'nao ha'): o cron do root tem 4 entradas — logto/backup.sh, check-version, bridge-backup, vaultwarden/backup.sh — e NENHUMA offsite; `find` por `*.tar.gpg` acha UM artefato, no mesmo ⟨disco do host⟩; ⟨o password-store do usuário⟩ nao tem entrada `restic`. CONSEQUENCIA PARA A LEITURA DO NO PAI: aquilo nao e pesquisa a fazer, e um interruptor esperando destino contratado."
+    narrative: "label anterior: REFINA [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] sem contradiza-lo: a lacuna e real, mas o mecanismo que a fecha JA EXISTE ESCRITO. `backup-offsite.sh` (commit `31cd4f9`) usa `restic`, e o binario esta instalado (⟨no PATH do sistema⟩). Ele sai com **exit 3** declarando que NAO FEZ, em vez de sair 0 parecendo que fez — o oposto do fail-open que derrubou o Logto no `I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE`. FALTAM EXATAMENTE TRES COISAS, e as tres sao do maestro: `pass insert onion/restic-repo`, `pass insert onion/restic-password` (destino e conta a contratar) e a linha de cron. MEDIDO com stderr visivel (nao `2>/dev/null`, que confunde 'falhou' com 'nao ha'): o cron do root tem 4 entradas — logto/backup.sh, check-version, bridge-backup, vaultwarden/backup.sh — e NENHUMA offsite; `find` por `*.tar.gpg` acha UM artefato, no mesmo ⟨disco do host⟩; ⟨o password-store do usuário⟩ nao tem entrada `restic`. CONSEQUENCIA PARA A LEITURA DO NO PAI: aquilo nao e pesquisa a fazer, e um interruptor esperando destino contratado. Reconciliado em 2026-10-28 pela regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09): valia em 2026-08-12 (cron sem linha offsite); a linha foi armada em 2026-08-31, no crontab do operador; superado por E_REVERIFY_OFFSITE_ARMADO_E_FALHANDO_1027."
     trace: "onion-vps-vaultwarden@31cd4f99:backup-offsite.sh"
     provenance:
       source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
@@ -687,7 +687,7 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "docker network ls → 15 redes, as do Onion uma por stack (onion-logto_default, onion-waha_default, onion-vps-vaultwarden_default, onion-librechat_*); docker ps --format '{{.Ports}}' | grep -c 0.0.0.0 → 0 de 22 containers; onion-vps-waha em 127.0.0.1:3999->3000; ops/caddy/conf.d com basic_auth no vhost do hub-operacoes-enterprise"
     label: "DRIFTED: o vetor que refutou o isolamento (porta de container publicada em 0.0.0.0, alcançável de outro container) está fechado hoje: 0 de 22 containers publicam em 0.0.0.0. E o Caddy não tem mais zero autenticação: um vhost versionado usa basic_auth."
-    narrative: "Re-verificação de C_REDE_ISOLADA_POR_CONSTRUCAO (refuted). O status refutado segue certo: o isolamento de hoje vem da disciplina de bind em 127.0.0.1, não da construção. Medição só de leitura (network ls e ps); nenhum curl de dentro de container foi refeito. A stack do LibreChat tem container em duas redes (default e fetch_link), dentro da mesma stack."
+    narrative: "Re-verificação de C_REDE_ISOLADA_POR_CONSTRUCAO (refuted). O status refutado segue certo: o isolamento de hoje vem da disciplina de bind em 127.0.0.1, não da construção. Medição só de leitura (network ls e ps); nenhum curl de dentro de container foi refeito. A stack do LibreChat tem container em duas redes (default e fetch_link), dentro da mesma stack. Regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09) aplicada em 2026-10-28: a aresta segue CONSTRAINS e o nó lido segue refuted, porque ele já estava errado na data dele (o isolamento nunca foi por construção); o vetor fechado hoje vem da disciplina de bind, o que não torna a afirmação verdadeira."
     provenance:
       source: "docker network ls + docker ps no host (somente leitura) + ops/caddy/conf.d/ @ origin/main 8857bc9b8"
       locator: "contagem de binds 0.0.0.0 na coluna Ports; nomes das redes do Onion; vhost versionado com basic_auth"
@@ -703,7 +703,7 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "payload PostToolUse com 'npm run cli db alteration deploy 2>&1 | tail -20\\necho rc=$?' → o hook emite 'EXIT-CODE-DE-PIPE'; payload com a forma do incidente 'npm run cli db alteration deploy 2>&1 | tail -20 || { exit 1; }' → saída vazia (o hook cala); hook l.167 (mensagem da classe)"
     label: "DRIFTED: o bash-empty-result-guard.sh pega o dialeto '$? depois de pipe', mas cala diante da forma exata do incidente do Logto ('cmd | tail -20 || { exit 1; }'). A frase 'pega EXATAMENTE essa classe' é larga demais."
-    narrative: "Re-verificação de I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE (decision done). A decisão do incidente (pipefail dentro do sh -c e versão alvo explícita) não é tocada. O que a medição corrige é a ironia registrada: a guarda da casa não pegaria a forma 'pipe || tratador', nem rodando pela ferramenta Bash. A pergunta de cura fica proposta em Q_HOOK_PIPE_OU_TRATADOR_NAO_COBERTO_1027."
+    narrative: "Re-verificação de I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE (decision done). A decisão do incidente (pipefail dentro do sh -c e versão alvo explícita) não é tocada. O que a medição corrige é a ironia registrada: a guarda da casa não pegaria a forma 'pipe || tratador', nem rodando pela ferramenta Bash. A pergunta de cura fica proposta em Q_HOOK_PIPE_OU_TRATADOR_NAO_COBERTO_1027. Regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09) aplicada em 2026-10-28: a aresta segue CONSTRAINS e a decisão segue done, porque só a cláusula de que a guarda pega exatamente essa classe era larga já na data; a decisão do incidente (pipefail dentro do sh -c e versão alvo explícita) segue de pé."
     provenance:
       source: ".claude/hooks/bash-empty-result-guard.sh @ origin/main 8857bc9b8"
       locator: "hook l.73-82 (detector por proximidade), l.152-167; dois payloads JSON no scratchpad, um por dialeto"
@@ -744,7 +744,7 @@ nodes:
     verified_at: "2026-10-27"
     verified_against: "crontab -l do operador → '0 13 * * * …onion-vps-vaultwarden/offsite-cron.sh'; crontab do root → 0 linhas offsite/restic; logs/offsite-cron.log do clone: 7 'snapshot+prune OK' (o último em 2026-10-12T13:00:29Z) e 54 'backup-offsite FALHOU rc=3' no total, um por dia sem exceção de 2026-10-13 a 2026-10-27; 2026-10-27T13:00:02Z '✗ … FALHOU rc=3 — se rc=3, o GPG estava frio'"
     label: "DRIFTED: a linha de cron que faltava existe (crontab do operador, 13:00 UTC), mas o offsite falha todo dia desde 2026-10-13 com rc=3 (GPG frio). O último envio bom foi em 2026-10-12: 15 dias sem cópia fora da máquina."
-    narrative: "Re-verificação de E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA e de Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA. O que o nó elogiava se confirma no vivo: o backup-offsite.sh sai com exit 3 e diz que não fez, sem fingir sucesso. O que mudou é o estado: o cron foi armado em 2026-08-31 (Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO), mas no crontab do usuário, não no do root, e o mecanismo depende do agente GPG destravado, que não está. Medição só de leitura: crontab -l, contagem de linhas no log, nenhum segredo lido."
+    narrative: "Re-verificação de E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA e de Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA. O que o nó elogiava se confirma no vivo: o backup-offsite.sh sai com exit 3 e diz que não fez, sem fingir sucesso. O que mudou é o estado: o cron foi armado em 2026-08-31 (Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO), mas no crontab do usuário, não no do root, e o mecanismo depende do agente GPG destravado, que não está. Medição só de leitura: crontab -l, contagem de linhas no log, nenhum segredo lido. Regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09) aplicada em 2026-10-28: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA valia em 2026-08-12 (cron sem linha offsite) e o vivo andou (cron armado em 2026-08-31), então virou superseded e a aresta virou SUPERSEDES. Para Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA a aresta segue CONSTRAINS: ele já está superseded por Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO, e um segundo SUPERSEDES daria a esta re-medição uma superação que ela não fez."
     provenance:
       source: "crontab -l (operador e root, só leitura) + logs/offsite-cron.log do clone onion-vps-vaultwarden (host)"
       locator: "contagem de '✓ … snapshot+prune OK' e '✗ … backup-offsite FALHOU' por dia; última linha do log"
@@ -753,19 +753,25 @@ nodes:
   - id: Q_OFFSITE_PARADO_DESDE_1012_GPG_FRIO_1027
     node_type: question
     layer: audit
-    plane: PROD
-    status: open
     impact: 5
     confidence: 0.9
-    verified_at: "2026-10-27"
-    verified_against: "logs/offsite-cron.log do clone onion-vps-vaultwarden: último OK em 2026-10-12, rc=3 todo dia de 10-13 a 10-27"
     label: "PROPOSTO: o offsite está parado desde 2026-10-12 (rc=3, GPG frio, todo dia). Destravar e rodar à mão, e o cron precisa de um caminho que não dependa do agente GPG quente, ou de um alerta que alguém leia?"
-    narrative: "Aberta pela re-verificação de 2026-10-27 (E_REVERIFY_OFFSITE_ARMADO_E_FALHANDO_1027). Não vira Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO (done): o mecanismo foi provado e o cron foi armado como o nó diz. O que falta é o mecanismo seguir de pé sem o GPG quente, e a falha diária aparecer para alguém (o log registra, mas ninguém leu por 15 dias). O destravamento e a escolha da cura são do maestro."
+    status: done
+    plane: DEV
+    verified_at: "2026-10-28"
+    verified_against: "decisão do maestro em 2026-10-28, por pergunta com opções (/meta:decide): escolhida «Card agora + alerta»"
+    narrative: |-
+      Aberta pela re-verificação de 2026-10-27 (E_REVERIFY_OFFSITE_ARMADO_E_FALHANDO_1027). Não vira Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO (done): o mecanismo foi provado e o cron foi armado como o nó diz. O que falta é o mecanismo seguir de pé sem o GPG quente, e a falha diária aparecer para alguém (o log registra, mas ninguém leu por 15 dias). O destravamento e a escolha da cura são do maestro.
+
+      verified_against anterior: «logs/offsite-cron.log do clone onion-vps-vaultwarden: último OK em 2026-10-12, rc=3 todo dia de 10-13 a 10-27»
+      proveniência anterior: source «logs/offsite-cron.log do clone onion-vps-vaultwarden (host)» · locator «linhas '✓ … snapshot+prune OK' (última 2026-10-12T13:00:29Z) e '✗ … backup-offsite FALHOU rc=3' (2026-10-13 a 2026-10-27)» · method «measurement: contagem de linhas do log de execução, só leitura» · locality «host»
+      plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)
+      Selado por /meta:decide em 2026-10-28: escolhida «Card agora + alerta»; descartadas: «Só o card agora» · «Repensar o destrave».
     provenance:
-      source: "logs/offsite-cron.log do clone onion-vps-vaultwarden (host)"
-      locator: "linhas '✓ … snapshot+prune OK' (última 2026-10-12T13:00:29Z) e '✗ … backup-offsite FALHOU rc=3' (2026-10-13 a 2026-10-27)"
-      method: "measurement: contagem de linhas do log de execução, só leitura"
-      locality: "host"
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-28: «O backup offsite falha todo dia desde 13/10 por GPG frio; como seguimos?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-28"
+      locality: "pessoa"
   - id: E_REVERIFY_SEGUNDO_DESTINO_SEGUE_AUSENTE_1027
     node_type: evidence
     layer: audit
@@ -923,7 +929,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_REVERIFY_OFFSITE_ARMADO_E_FALHANDO_1027
     to: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA
-    edge_type: CONSTRAINS
+    edge_type: SUPERSEDES
   - from: E_REVERIFY_OFFSITE_ARMADO_E_FALHANDO_1027
     to: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     edge_type: CONSTRAINS

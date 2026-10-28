@@ -1507,6 +1507,54 @@ nodes:
       locator: "a saída do apply (o aborto em «o venv não tem os pinos do requirements.txt») e as contagens de links, dono e modo no venv do granaai e no cache do uv do operador, relatadas na sessão"
       method: "measurement: contagem por find de links>1, dono root e falta de leitura para outros no venv e no cache, depois do apply"
       locality: "host"
+  - id: D_SINAL_BRAIN_SENSIVEL_FORA_DO_REPO_1028
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-28"
+    verified_against: "decisão do maestro em 2026-10-28, por pergunta com opções (/meta:decide): escolhida «Guardar fora do repo»"
+    label: "O sinal original do brain, que é sensível, sai de todo repo e fica guardado numa pasta privada do maestro, com acesso só do dono; já executado em 2026-10-28, sem caminho nem conteúdo registrados aqui."
+    narrative: "Selado por /meta:decide em 2026-10-28: escolhida «Guardar fora do repo»; descartadas: «Apagar» · «Deixar como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-28: «O que fazer com o sinal verbatim, que é sensível?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-28"
+      locality: "pessoa"
+  - id: D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-28"
+    verified_against: "decisão do maestro em 2026-10-28, por pergunta com opções (/meta:decide): escolhida «(A) Pela data dele»"
+    label: "Nó que a re-medição contradiz fica pela data dele: se valia na data, sobre o objeto que leu, e o vivo andou, vira superseded com SUPERSEDES da medida nova; se já estava errado na data, refuted. Vale para o core e a curadoria."
+    narrative: "Selado por /meta:decide em 2026-10-28: escolhida «(A) Pela data dele»; descartadas: «(B) Tudo refutado» · «(C) Tudo fica confirmed». A régua: o que o nó afirmava valia na data dele (valid_from ou verified_at), sobre o objeto que ele leu? Valia e o vivo andou: status superseded, e a aresta da medida nova para ele vira SUPERSEDES. Errado já na data: refuted, com REFUTES. Só uma cláusula errada e o resto de pé: a aresta segue CONSTRAINS e o status fica. Em rodada de radar selada vale a REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): o CONSTRAINS de uma re-medição posterior não vira SUPERSEDES quando isso daria à rodada uma Aufhebung que ela não fez. Aplicada no core no mesmo PR que a selou."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-28: «Nó que a re-medição contradiz: como fica o status?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-28"
+      locality: "pessoa"
+  - id: D_GATE_LENTO_MEDIR_E_CORTAR_CUSTO_1028
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-28"
+    verified_against: "decisão do maestro em 2026-10-28, por pergunta com opções (/meta:decide): escolhida «Medir e cortar custo»"
+    label: "Gate lento e agente parado: primeiro medir e cortar o custo do gate; a guarda de SubagentStop só entra se a medida mostrar trava real."
+    narrative: "Selado por /meta:decide em 2026-10-28: escolhida «Medir e cortar custo»; descartadas: «Guarda SubagentStop já» · «Depois». O plano, em quatro passos: (1) na próxima vez que um agente parar esperando o gate, não empurrar, e medir se ele retoma sozinho; (2) um PR que faz o commit intermediário rodar só as famílias da bancada tocadas pela mudança e deixa a bancada inteira para o fechamento (pr-finalize); (3) uma fila para que duas bancadas inteiras não rodem ao mesmo tempo na VPS; (4) a guarda de SubagentStop só entra se a medida do passo 1 mostrar trava real."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-28: «Qual caminho para o gate lento e o agente parado?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-10-28"
+      locality: "pessoa"
 edges:
   - from: E_PY315_APPLY_GRANAAI_HARDLINK_PERM_1027
     to: D_PY315_EXECUCAO_POR_OPS_E_OPT_1027
@@ -1784,3 +1832,12 @@ edges:
   - from: E_REVERIFY_DESIGN_SETUP_PEER_REF_1027
     to: E_DESIGN_SETUP_ESTUDO_CURADORIA_1027
     edge_type: SUPPORTS
+  - from: D_SINAL_BRAIN_SENSIVEL_FORA_DO_REPO_1028
+    to: D_SINAL_COMPLIANCE_REDIGIDO_NO_CORE_PUBLICO
+    edge_type: TRACES_TO
+  - from: D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028
+    to: E_REVERIFY_DESIGN_SETUP_PEER_REF_1027
+    edge_type: TRACES_TO
+  - from: D_GATE_LENTO_MEDIR_E_CORTAR_CUSTO_1028
+    to: E_FORK_VS_AGENTE_NOVO_PAR_3_PRE_REGISTRO_1026
+    edge_type: TRACES_TO

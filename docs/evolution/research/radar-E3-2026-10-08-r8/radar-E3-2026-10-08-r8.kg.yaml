@@ -34,13 +34,13 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 0.9
     verified_at: "2026-10-08"
     verified_against: "2.1.295: 'Added onFailure: block for command and HTTP hooks: a hook that can't start, times out, or exits with an unexpected code blocks the action instead of letting it through'; no core, .claude/settings.json tem 20 hooks command e NENHUM com onFailure (medido por leitura do JSON)"
     label: "o harness ganhou onFailure: block (2.1.295) e em 2026-10-08 nenhum dos 20 hooks do Onion o usava: nos PreToolUse, hook que não inicia, estoura o timeout ou sai com código fora de 0/2 deixa a ação passar (doc de hooks); o PreModelSwitch já bloqueia por timeout"
-    narrative: "Os vetos do Onion se apoiam no exit 2 (a capacidade que justifica o acoplamento, no CLAUDE.md). O modo de falha que eles não cobriam por construção é o hook que nem roda: python ausente, timeout, crash antes do exit 2. Esses casos eram tratados um a um dentro de cada script (fail-closed escrito à mão). O harness agora oferece fail-closed declarativo para o hook inteiro. RECONCILIAÇÃO 2026-10-11 (SAC-83): os 3 vetos PreToolUse passaram a declarar o campo; o retrato de 2026-10-08 fica como estado daquela data."
+    narrative: "Os vetos do Onion se apoiam no exit 2 (a capacidade que justifica o acoplamento, no CLAUDE.md). O modo de falha que eles não cobriam por construção é o hook que nem roda: python ausente, timeout, crash antes do exit 2. Esses casos eram tratados um a um dentro de cada script (fail-closed escrito à mão). O harness agora oferece fail-closed declarativo para o hook inteiro. RECONCILIAÇÃO 2026-10-11 (SAC-83): os 3 vetos PreToolUse passaram a declarar o campo; o retrato de 2026-10-08 fica como estado daquela data. Reconciliado em 2026-10-28 pela regra de D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028 (grafo sinais-de-campo-2026-09): valia em 2026-10-08; o primeiro onFailure: block entrou em dd6acd420 (2026-10-11); superado por E_REVERIFY_1027_SEIS_HOOKS_COM_ONFAILURE."
     provenance:
       source: "CHANGELOG 2.1.295 e .claude/settings.json@d56f685c"
       locator: "2.1.295, 1º item 'Added onFailure'; settings.json, chave hooks"
