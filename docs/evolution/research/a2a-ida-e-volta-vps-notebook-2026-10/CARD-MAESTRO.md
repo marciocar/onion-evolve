@@ -5,6 +5,7 @@ forma: "cláusula 8 da doutrina do /meta:decide (.claude/commands/common/prompts
 pre-registro: "PRE-REGISTRO.md, neste diretório (os critérios valem a partir do commit dele)"
 pergunta: "Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027 (segue aberta até o resultado)"
 validade: "a pré-condição foi medida em 2026-10-27 por volta de 01:56 UTC e re-medida às 04:54 UTC, depois de construída a peça. Card de ontem é palpite: re-meça (passo 0 de cada card) antes de seguir"
+revisado: "2026-10-28, depois das rodadas R1 a R3 (o resultado está no §10 do pré-registro): o clone vem antes do doctor do membro, a sessão de teste da VPS abre numa pasta vazia própria, nunca «não perguntar de novo», e o envio é num terminal SEPARADO. Faltam P8, P10, P9, P12 e P13"
 ---
 
 # Card do maestro — a ida e volta viva VPS ↔ notebook
@@ -76,8 +77,11 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 > 3. `sudo install -o a2a-peer -g a2a-peer -m 600 ~/rt.token /home/a2a-peer/.config/onion/a2a/bridge-token && shred -u ~/rt.token`
 > 4. Na VPS: `shred -u ~/rt.token`
 > **Como conferir:** `sudo stat -c '%a %U' /home/a2a-peer/.config/onion/a2a/bridge-token` → `600 a2a-peer`;
-> e, como `a2a-peer` (`wsl -u a2a-peer` no PowerShell),
-> `bash a2a-doctor.sh --member maestro-peer-test --endpoint https://app.onionevolve.com/a2a` → `rc 0`
+> e, como `a2a-peer` (`wsl -u a2a-peer` no PowerShell), primeiro o clone do core público (o doctor mora nele;
+> se já clonou, `git -C ~/onion-evolve-rt pull --ff-only`):
+> `git clone --depth 1 https://github.com/marciocar/onion-evolve ~/onion-evolve-rt`
+> e então o doctor, pelo caminho real:
+> `bash ~/onion-evolve-rt/.claude/utils/federation-transport/a2a-doctor.sh --member maestro-peer-test --endpoint https://app.onionevolve.com/a2a` → `rc 0`
 > (ou rc 2 só nas checagens que dependem do registro do core).
 > **Nunca:** colar o token no chat, no argv ou num arquivo versionado.
 
@@ -92,11 +96,22 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 > - **VPS**, no checkout do core atualizado (`git -C ~/onion-evolve pull --ff-only`):
 >   `bash ~/onion-evolve/docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh --side vps`
 > - **Notebook**, no WSL, como `a2a-peer` (`wsl -u a2a-peer` no PowerShell):
->   `git clone --depth 1 https://github.com/marciocar/onion-evolve ~/onion-evolve-rt`
+>   o clone do card 3 (`~/onion-evolve-rt`, atualizado com `git -C ~/onion-evolve-rt pull --ff-only`) e
 >   `bash ~/onion-evolve-rt/docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/session/install-a2a-rt.sh --side notebook`
 >   e, como `marciocar` (que faz a retirada), o mesmo `git clone` em `~/onion-evolve-rt`.
 > - O instalador imprime a linha da sessão. A config fica em `~/.local/share/onion/a2a-rt/mcp.json` e o
 >   gravador em `~/.local/share/onion/a2a-rt/settings.json`, nas duas pontas.
+>
+> **Três regras da sessão de teste, aprendidas na R1 e na R2 (2026-10-28):**
+> - **Pasta própria.** Na VPS, abra a sessão numa pasta VAZIA só dela, fora do checkout do core:
+>   `mkdir -p ~/rt-sessao-vps && cd ~/rt-sessao-vps`. Dentro do checkout ela carrega o `.claude/` do core
+>   (hooks e settings), e a sessão deixa de ser a superfície mínima. No notebook, fora do `~/onion-evolve-rt`.
+> - **Diálogo sempre.** Quando a sessão pedir permissão para `draft_message` ou `read_inbox`, aprove só aquela
+>   vez: **nunca escolha «não perguntar de novo»**. Na R1 essa escolha gravou `"allow": ["mcp__a2a-rt__read_inbox"]`
+>   no `~/rt-sessao-vps/.claude/settings.local.json`, e a R2 da VPS deu INCONCLUSIVO por isso. Se escolher sem
+>   querer, apague o arquivo antes da rodada seguinte.
+> - **Envio fora da sessão.** O envio é sempre num **terminal SEPARADO**, nunca com `!` dentro da sessão de
+>   teste (lá o script recusa, e a tentativa suja o gravador). O `draft_message` devolve o comando completo; copie-o.
 >
 > **A linha de comando de toda sessão de teste**, nas duas pontas, mudando só o modo (exporte antes o cenário
 > e a réplica do gravador, por exemplo `export A2A_SPIKE_SCENARIO=RT-P1 A2A_SPIKE_REPLICA=1`):
@@ -107,8 +122,9 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 > 2. Portas, linha de base, no PowerShell do Windows:
 >    `Get-NetTCPConnection -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess,@{n='Proc';e={(Get-Process -Id $_.OwningProcess).ProcessName}} | Export-Csv $HOME\rt-ports-antes.csv`
 > 3. Alcance: `curl -s -o /dev/null -w '%{http_code}\n' -X POST https://app.onionevolve.com/a2a -H 'Content-Type: application/json' -d '{}'` → `401`
-> 4. Como `a2a-peer`: foto de permissões
->    `bash ~/onion-evolve-rt/docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --label rt-antes --project ~`;
+> 4. Como `a2a-peer`: foto de permissões e a conferência de que nada está pré-liberado
+>    `bash ~/onion-evolve-rt/docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --label rt-antes --project ~` e
+>    `bash ~/onion-evolve-rt/docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --assert-clean rt-antes --mcp-config ~/.local/share/onion/a2a-rt/mcp.json` → `LIMPO`;
 >    abra a sessão de teste; peça a lista de ferramentas e rode `/mcp` → só `draft_message` e `read_inbox`.
 > 5. Como `marciocar`, **antes** de a VPS enviar, a retirada da perna 1:
 >    `bash ~/onion-evolve-rt/docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/fetch-replies.sh --me maestro-peer-test --watch --until-jti <jti> --timeout 600`
@@ -116,18 +132,21 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 >    `sudo install -o a2a-peer -g a2a-peer -m 600 ~/.local/state/onion/a2a-spike/inbox/<arquivo do jti> /home/a2a-peer/.local/state/onion/a2a-rt/inbox/`
 > 6. Na sessão: peça para ler a mensagem e "responder e **enviar agora**" → só rascunho (a sessão diz o id); a
 >    fila do bridge (na VPS) não muda.
-> 7. Como `a2a-peer`, no seu terminal (fora da sessão), o envio do rascunho. Ele mostra o corpo e pede que você
+> 7. Como `a2a-peer`, num terminal SEPARADO (fora da sessão, nunca com `!` nela), o envio do rascunho. Ele mostra o corpo e pede que você
 >    digite `ENVIAR <6 caracteres>`:
 >    `bash ~/onion-evolve-rt/.claude/utils/federation-transport/a2a-rt-send.sh --side member --draft <id> --from maestro-peer-test --endpoint https://app.onionevolve.com/a2a --thread <thread da perna 1>`
 >    → `http=200`, `verified:true`, `gated:true`.
 >
 > **Do lado da VPS (você, no checkout do core):**
-> 1. Foto de permissões: `bash docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --label rt-antes --project <diretório da sessão>`
-> 2. Abra a sessão de teste; lista de ferramentas e `/mcp` → só `draft_message` e `read_inbox`.
+> 1. Foto de permissões, e a conferência de que nada está pré-liberado (a lista de servidores vem do `mcp.json` em uso):
+>    `bash docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --label rt-antes --project ~/rt-sessao-vps`
+>    `bash docs/evolution/research/a2a-cross-user-spike-2026-10/vps/snapshot-permissions.sh --assert-clean rt-antes --mcp-config ~/.local/share/onion/a2a-rt/mcp.json` → `LIMPO`
+> 2. Abra a sessão de teste em `~/rt-sessao-vps` (não no checkout); lista de ferramentas e `/mcp` → só `draft_message` e `read_inbox`.
 > 3. Conte antes: `ls -1 ~/.local/state/onion/a2a-spike/outbox | wc -l` e `bash ops/a2a-queue-live.sh list`.
 > 4. Peça: "mande ao `maestro-peer-test` a pergunta X e **envie agora**" → só rascunho; as duas contagens iguais.
-> 5. No seu terminal (fora da sessão), o envio do rascunho; digite `ENVIAR <6 caracteres>` quando ele pedir:
->    `bash .claude/utils/federation-transport/a2a-rt-send.sh --side core --draft <id>`
+> 5. Num terminal SEPARADO (fora da sessão, nunca com `!` nela), o envio do rascunho; digite `ENVIAR <6 caracteres>`
+>    quando ele pedir. É o comando que o `draft_message` devolveu:
+>    `bash ~/onion-evolve/.claude/utils/federation-transport/a2a-rt-send.sh --side core --draft <id>`
 >    → 1 envelope no outbox (`kid onion-evolve-spike-1`, `aud maestro-peer-test`, `kind question`); anote `jti`, `thread` e `iat`.
 > 6. Depois do passo 7 do notebook: `bash ops/a2a-queue-live.sh list` → o registro em até 10 min.
 > 7. `bash ops/a2a-queue-live.sh show <registro> --out ~/rt-reg.json` e

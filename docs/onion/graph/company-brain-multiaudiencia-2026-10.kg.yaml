@@ -13,6 +13,9 @@ meta:
   # ═══ TETO: 30 NÓS. Pendência nova entra quando uma fechada sai. ═══
 # Arestas para nó de OUTRO grafo do core (contrato v4.3).
 external_edges:
+  - from: E_MA_IDA_E_VOLTA_R3_SEM_CANAL_DO_HARNESS_1028
+    to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028"
+    edge_type: TRACES_TO
   - from: Q_MA_A2A_ENTRE_CONTAS
     to: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027"
     edge_type: DEPENDS_ON
@@ -324,6 +327,23 @@ nodes:
       locator: "mensagem repassada pela sessão principal do core"
       method: "testimony: posição prévia da sessão dona do contrato"
       locality: "pessoa"
+  - id: E_MA_IDA_E_VOLTA_R3_SEM_CANAL_DO_HARNESS_1028
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    owner: core
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-28"
+    verified_against: "a rodada R3 da ida e volta VPS ↔ notebook (E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028, no sinais-de-campo), juiz DADO nas duas pontas; a conta do Claude de cada ponta não foi registrada no teste"
+    label: "Uma ida e volta limpa entre duas sessões que não dividem nenhum canal do harness (máquinas e usuários do sistema diferentes) passou pelo canal A2A do core; entre contas do Claude na mesma máquina segue sem medida"
+    narrative: "O que a medida diz para esta pergunta: o canal A2A do core (HTTP do bridge, envelope assinado, aceite humano, MCP que só grava rascunho) não depende do SendMessage nem de nada da conta do Claude, e fechou uma ida e volta limpa entre a VPS e o notebook. O que ela NÃO diz: a conta de cada ponta não foi anotada, e o caso do hub (contas diferentes na mesma máquina e no mesmo usuário Linux) não rodou. A medida-mãe segue aberta (faltam os negativos e os destinos fechados), e esta pergunta também."
+    provenance:
+      source: "sessão do core, leitura do resultado registrado no sinais-de-campo"
+      locator: "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml#E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028"
+      method: "medição: resultado da R3 lido contra o que esta pergunta precisa"
+      locality: "repo"
 edges:
   - from: E_MA_SINAL_DO_HUB_1027
     to: Q_MA_AUDIENCES
@@ -423,4 +443,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_MA_KGSSOT_POSICAO_WIKI_BRIDGE_1028
     to: Q_MA_WIKI_BRIDGE
+    edge_type: SUPPORTS
+  - from: E_MA_IDA_E_VOLTA_R3_SEM_CANAL_DO_HARNESS_1028
+    to: Q_MA_A2A_ENTRE_CONTAS
     edge_type: SUPPORTS
