@@ -137,8 +137,8 @@ while IFS=$'\x1f' read -r mid role path kind superby; do
     [ -n "${role}" ] || continue
     # LINHAGEM HISTÓRICA (`superseded_by: <id>`, 2026-10-27): adoção superada por OUTRO membro no mesmo
     # remoto. O clone dela carrega o carimbo do SUCESSOR, que é medido na entrada dele; comparar o papel
-    # antigo com o carimbo do sucessor acusava PAPEL-INCOMPATIVEL para sempre (medido: `granaai`, registro
-    # standalone × carimbo hub do brain-granaai). Mesma régua do ops/registry-pins.sh; a forma do campo
+    # antigo com o carimbo do sucessor acusava PAPEL-INCOMPATIVEL para sempre (medido num membro real: registro
+    # standalone × carimbo hub do sucessor). Mesma régua do pin por adotante (core-only); a forma do campo
     # (alvo existe, sem cadeia) é cobrada pelo members-validate.sh. Contado e declarado, nunca calado.
     if [ -n "${superby}" ]; then superseded=$((superseded + 1)); continue; fi
     if [ -z "${path}" ] || [ ! -d "${path}" ]; then adopter_unreadable=$((adopter_unreadable + 1)); continue; fi

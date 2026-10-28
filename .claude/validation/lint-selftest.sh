@@ -39976,7 +39976,7 @@ run_door_role_parity_selftests() {
   if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/CARIMBO-AUSENTE' <<< "${_drpa_out}"; then
     record_pass "door-role-parity: (g5) adotante com clone e SEM carimbo é nomeado (não passa calado)"
   else record_fail "door-role-parity: (g5)" "clone sem carimbo passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
-  # (g7) LINHAGEM HISTÓRICA (2026-10-27, medido no registro real: `granaai`, standalone, superseded_by brain-granaai):
+  # (g7) LINHAGEM HISTÓRICA (2026-10-27, medido no registro real: um membro standalone com superseded_by):
   #      a adoção superada mora no MESMO clone do sucessor, e o carimbo lá é o dele (hub). Comparar o papel antigo
   #      com o carimbo do sucessor acusava PAPEL-INCOMPATIVEL para sempre. A antiga sai da comparação, contada e
   #      DECLARADA; o sucessor segue julgado (g7b). MUTANTE: sem o ramo do superseded_by, (g7) volta a acusar.
