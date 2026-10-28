@@ -2,8 +2,7 @@
 branch: feat/a2a-rt-r1-r3-result-and-cures
 pr: pendente
 date: 2026-10-28
-reviewed_diff_sha256: c1767955b1b02c1f59b96eb2f39731a8484544baee865eb57a5d23a2e89f935c
-reviewed_code_sha256: 6006bb267cd624b80e54bd02dc178469cc824c6b615f397d4d4fb89565e22351
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 5
 tokens: 106689
