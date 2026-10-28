@@ -715,6 +715,35 @@ export function coherenceCodes(doc, corpus = null) {
   return out.concat(criterionCodes(doc), termCodes(doc));
 }
 
+const TEXT_LOCATOR = new RegExp('^(line|char)=(?:([0-9]+)(?:,([0-9]*))?|,([0-9]+))'
+  + "(?:;length=[0-9]+(?:,[A-Za-z0-9!#$%&'+^_`{}~-]+)?)*$");
+
+/** O locator text (RFC 5147, contrato v4.17) cabe no texto? (text_in_range do kg_trace.py): true, false, ou null quando
+ * o locator não segue a gramática da norma. Posições contadas a partir de 0, como fronteiras, de 0 ao número de linhas
+ * (line) ou de caracteres (char), com cada quebra de linha, CRLF, LF ou CR, contada como um caractere (RFC 5147 §4.1).
+ * O char conta code points, não unidades UTF-16: um emoji é um caractere, como no Python, e não dois, como no length
+ * do JS. O ;length= da norma é aceito e não é conferido. */
+export function textInRange(text, locator) {
+  const m = typeof locator === 'string' ? TEXT_LOCATOR.exec(locator) : null;
+  if (!m || typeof text !== 'string') return null;
+  const norm = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  let total;
+  if (m[1] === 'line') {
+    total = (norm.match(/\n/g) || []).length + (norm && !norm.endsWith('\n') ? 1 : 0);
+  } else {
+    total = Array.from(norm).length;
+  }
+  let start;
+  let end;
+  if (m[2] === undefined) {
+    [start, end] = [0, Number(m[4])];
+  } else {
+    start = Number(m[2]);
+    end = m[3] === undefined ? start : m[3] === '' ? total : Number(m[3]);
+  }
+  return start >= 0 && start <= end && end <= total;
+}
+
 /** integrity.term-notation-duplicate (v4.14), só entre nós do mesmo grafo (term_located da referência): dois nós vivos
  * com x_term no mesmo esquema (x_term.scheme ou, sem ele, o grafo, de nome meta.id) e com a mesma notation; o aviso cai em cada nó
  * depois do primeiro. A notation se compara exata. */

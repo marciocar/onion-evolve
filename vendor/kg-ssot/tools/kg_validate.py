@@ -90,7 +90,7 @@ CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 # A versão do contrato que este leitor julga. Uma regra que só o leitor vê (o perfil YAML, a quebra de linha) não muda
 # os bytes dos schemas sozinha: a higiene cobra que a descrição de um deles declare "No v<versão>", e é isso que
 # move o sha256 que o gate guarda como identidade.
-CONTRACT_VERSION = "4.16"
+CONTRACT_VERSION = "4.17"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -1568,6 +1568,12 @@ MESSAGES = {
                                        "the JSON file it names.",
     "integrity.trace-locator-unreadable": "The JSON file that the node's provenance.locator points into does not "
                                           "read as JSON.",
+    "integrity.trace-locator-out-of-range": "The node's provenance.locator, read by its scheme, points to a line, a "
+                                            "character, a row, a column or a node that the file it names does not have.",
+    "integrity.trace-quote-missing": "The exact text of the node's provenance.locator (scheme quote) does not appear in "
+                                     "the file it names.",
+    "integrity.trace-sha256-mismatch": "The provenance.sha256 of the node differs from the hash of the file it names: "
+                                       "the source changed after it was read.",
     "integrity.projection-id-missing": "A context page cites a node id that no graph of its projection_of has.",
     "integrity.criterion-digest": "The sha256 of the criterion version does not match its text or its file.",
     "integrity.criterion-ref-unreadable": "The ref of the criterion version does not read: the file, the fragment, or "
@@ -1635,6 +1641,12 @@ HINTS = {
     "integrity.trace-locator-missing": "Point the locator to where the value is now (was the key renamed or moved?), "
                                        "or retire the node if the value is gone.",
     "integrity.trace-locator-unreadable": "Fix the JSON file, or point the node to the file that holds the value.",
+    "integrity.trace-locator-out-of-range": "Point the locator to where the passage is now (lines from 0 as boundaries "
+                                            "in text, rows and columns from 1 in csv), or fix the scheme.",
+    "integrity.trace-quote-missing": "Copy the passage again as it is in the file, or retire the node if the passage "
+                                     "is gone.",
+    "integrity.trace-sha256-mismatch": "Read the source again and record the new hash, or cite the commit that has the "
+                                       "version that was read.",
     "integrity.projection-id-missing": "Fix the id, add the graph that has it to projection_of (a URL pinned to the "
                                        "commit for another repository), or list the name in projection_ignore if it "
                                        "is not a node id.",

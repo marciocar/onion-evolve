@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kg-ssot.dev/spec/revisit.schema.json",
+  "title": "kg-ssot.revisit/1",
+  "description": "Desde a 4.36.0. A saída de kg_query.py --revisit --format json: as decisões vivas (status que não é superseded nem refuted) que pedem revisão na data as_of, pela atenção (impact × confidence × fator do status × (1 + grau)), cada uma com os motivos: evidence-due (algo em que ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e segue viva). on_event lista as decisões que só têm reverify_on, porque o evento não tem data. Ficam à parte, nunca em silêncio: unstamped (cadência sem verified_at) e unresolved (apoio fora do corpus). O apoio refutado ou substituído não é motivo: a história dele está no --decision.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "root",
+    "as_of",
+    "decisions",
+    "on_event",
+    "unstamped",
+    "unresolved"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.revisit/1"
+    },
+    "root": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date"
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/brief"
+          },
+          {
+            "type": "object",
+            "required": [
+              "attention",
+              "reasons"
+            ],
+            "properties": {
+              "attention": {
+                "type": "number",
+                "minimum": 0
+              },
+              "reasons": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/brief"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "on_event": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/brief"
+          },
+          {
+            "type": "object",
+            "required": [
+              "reverify_on"
+            ]
+          }
+        ]
+      }
+    },
+    "unstamped": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/brief"
+      },
+      "description": "As decisões com reverify_every e sem verified_at: a cadência nunca vence sem o carimbo."
+    },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "decision",
+          "file",
+          "target",
+          "edge_type"
+        ],
+        "properties": {
+          "decision": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "edge_type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Os apoios que não estão no corpus lido, e por isso não foram julgados."
+    }
+  },
+  "$defs": {
+    "brief": {
+      "type": "object",
+      "required": [
+        "file",
+        "id",
+        "found"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "node_type": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "edge_type": {
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "evidence-due",
+            "review-due",
+            "contested"
+          ]
+        },
+        "due_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "attention": {
+          "type": "number"
+        },
+        "reasons": {
+          "type": "array"
+        },
+        "reverify_on": {}
+      }
+    }
+  }
+}

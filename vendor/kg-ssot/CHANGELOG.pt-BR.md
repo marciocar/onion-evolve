@@ -10,6 +10,48 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.37.0] - 2026-10-28
+
+Contrato v4.17, só SHOULD: nada que passava reprova. Uma afirmação já diz de onde veio; agora ela pode dizer exatamente
+onde, na fonte, e guardar o hash do que leu, para que uma ferramenta confira os dois.
+
+- O `provenance.scheme` diz como ler o locator: `json-pointer` (RFC 6901), `text` (RFC 5147, posições a partir de 0,
+  caracteres em code points e cada quebra de linha como um), `csv` (RFC 7111, um tipo de seleção, a partir de 1), `pdf`
+  (RFC 8118, a página física a partir de 1), `media` (Media Fragments, npt, o fim de fora), `quote` (o texto exato),
+  `html` (`#id`) e `kg-node` (um nó do grafo nomeado no `source`). As URIs do `conformsTo` do Web Annotation do W3C
+  valem como alias, inclusive a da RFC 3778. O locator que não cabe no esquema alerta como
+  `form.pattern.node.provenance.locator`.
+- O `provenance.sha256` é o SHA-256 do que foi lido, num campo próprio (`form.pattern.node.provenance.sha256`); o
+  `kg_trace` calcula o hash de uma fonte do repositório como o git a guarda, então ele é o mesmo no Windows e no Linux.
+- O `kg_trace check` lê a fonte pelo esquema e pelo hash: a linha, o caractere, a linha ou coluna do CSV, a citação, o
+  nó ou o JSON Pointer existe, e o hash confere (`integrity.trace-locator-out-of-range`, `integrity.trace-quote-missing`,
+  `integrity.trace-sha256-mismatch`). Com `--with PREFIXO=PASTA`, a fonte dada por URL é lida no commit fixado, de um
+  da raiz de um clone git local; o commit que o clone não tem, ou a pasta que não é a raiz de um clone, nunca é lido
+  da árvore de trabalho, e o nome de branch (`main`) conta como `unpinned`. O que não se julga é contado (`form_only`,
+  `unpinned`, `malformed`, `not_json`, `not_text`), nunca como ok. A saída JSON ganha `schemes`.
+- O leitor JS exporta `textInRange`, que conta code points e quebras de linha como o leitor Python. A suíte de
+  conformidade passa de 463 para 508 casos.
+- A tensão aberta entre duas afirmações, prevista para esta versão, foi medida pelo critério pré-registrado e ficou de
+  fora (2 de 10 com o avaliador cego, contra o piso de 3).
+
+## [4.36.0] - 2026-10-28
+
+Contrato v4.16, sem mudança. Um grafo já guarda a história das suas decisões: a decisão nova substitui a antiga, a
+refutação guarda o nó refutado, e nada é apagado. Esta versão torna essa história uma pergunta que se faz.
+
+- O `kg_query --sort attention` ordena os nós pelo peso deles no radar, `impact × confidence × fator do status × (1 +
+  grau)`, com o grau no escopo do arquivo do nó e o empate pelo id em ordem decrescente, e dá a mesma fila do radar do
+  framework onde o formato nasceu num grafo que passa no MUST.
+- O `kg_query --decision <id>` dá a história de uma decisão: o que ela substituiu e o que a substituiu em toda a
+  linhagem de `SUPERSEDES`, o que a refuta e a apoia, e em que ela se apoia, com o status de cada um
+  (`kg-ssot.decision/1`).
+- O `kg_query --revisit [--as-of DATA]` lista as decisões vivas a revisitar, pela atenção, com o motivo:
+  `evidence-due`, `review-due` ou `contested`, em que o apoio é o que chega na decisão por `SUPPORTS` e aquilo a que ela
+  se liga ou de que depende; o apoio refutado ou substituído é história que o `--decision` mostra, não motivo; as que esperam um evento, as que têm cadência e não
+  carimbo, e as que se apoiam em algo fora do corpus saem à parte (`kg-ssot.revisit/1`).
+- `kg_trace.py projection`: o id de uma página cujo grafo declarado não se lê deixa de ser `missing`; o erro do grafo
+  segue reprovando a página.
+
 ## [4.35.0] - 2026-10-27
 
 Contrato v4.16, sem mudança. **Python 3.12 ou mais** (era 3.11): o pacote, o bundle MCPB e a documentação dizem isso,

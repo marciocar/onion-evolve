@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:7c9700c7976a29d9 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:2248ccd2ece011b2 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.35.0",
+  "release": "kg-ssot-v4.37.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -182,7 +182,7 @@ As últimas linhas:
 
 ```text
 —
-latest: 463/463 (reprova)
+latest: 508/508 (reprova)
 optional: 10/24 (só reporta)
 ```
 
@@ -838,6 +838,44 @@ chain: complete
 
 A corrente é declarada por quem escreve o grafo: a projeção a mede, não prova quem de fato disse o quê.
 
+### A atenção e as decisões a revisitar (4.36.0)
+
+Uma decisão é um nó como os outros, e o grafo já guarda a história dela: a decisão nova `SUPERSEDES` a antiga, a
+refutação guarda o nó refutado, e nada é apagado. Três visões tornam essa história uma pergunta que se faz.
+
+- **`--sort attention`** ordena os nós pelo peso deles no radar: `impact × confidence × fator do status × (1 + grau)`,
+  em que o grau conta as arestas que tocam o nó e o fator do status é 1,0 para `open`, `confirmed` e `unverifiable`, 1,3
+  para `drifted`, 0,2 para `superseded`, 0,1 para `done` e 0 para `refuted`. O empate vai para o id em ordem
+  decrescente. É a mesma fórmula e o mesmo desempate do radar do framework onde o formato nasceu, então os dois dão a
+  mesma fila num mesmo grafo que passa no MUST. O grau fica no escopo do arquivo do nó, como no radar: a aresta conta
+  para as pontas locais do arquivo que a declara, o evento de um `trigger` também conta, e a aresta que chega de outro
+  arquivo não, então a atenção não muda com o `--root`. Cada nó da página traz a sua `attention`; a ordem usa o valor sem
+  arredondar.
+- **`--decision <id>`** dá a história de uma decisão: o que ela substituiu e o que a substituiu, em toda a linhagem de
+  `SUPERSEDES`, o que a refuta, o que a apoia e em que ela se apoia (as `SUPPORTS` que chegam nela, as `TRACES_TO` e
+  `DEPENDS_ON` que saem dela, e o passo do `provenance.source`; a `SUPPORTS` que sai dela diz o que ela apoia, não em
+  que ela se apoia), com o status de cada um. `--format json` dá `kg-ssot.decision/1`
+  (`spec/decision.schema.json`).
+- **`--revisit`** lista as decisões vivas (nem `superseded` nem `refuted`) que pedem revisão, pela atenção, cada uma com
+  os motivos: `evidence-due` (algo em que ela se apoia passou do `reverify_every`), `review-due` (a própria decisão passou do
+  `reverify_every`) e `contested` (ela recebe `REFUTES` e segue viva). A decisão com só `reverify_on` espera o evento e
+  sai à parte; a decisão com cadência e sem `verified_at` sai em `unstamped`, e o apoio fora do corpus em `unresolved`,
+  para nada sumir em silêncio. O apoio refutado ou substituído não é motivo:
+  inferido das arestas, deu 1 aviso útil em 10 no corpus do framework onde o formato nasceu, e por isso a queda aparece
+  no `--decision`, onde quem lê vê o status de cada apoio. `--as-of AAAA-MM-DD` muda a data; o padrão é hoje. `--format json` dá `kg-ssot.revisit/1`
+  (`spec/revisit.schema.json`).
+
+```bash
+kg-query --root . --open --sort attention --limit 10
+kg-query --root . --decision D_RETRY_3
+kg-query --root . --revisit
+```
+
+As opções rejeitadas não pedem campo novo: escreva cada opção como um nó, e a decisão escolhida refuta ou substitui as
+outras, com o motivo na narrativa. Um detector automático de contradições foi medido para esta versão e ficou de fora:
+ele achava afirmações irmãs, não contradições. A tensão é a refutação que alguém registra, e a atenção diz qual olhar
+primeiro.
+
 ## `kg_diff.py`: o diff por id entre revisões
 
 Compara dois grafos, ou todos os grafos que mudaram entre duas revisões do git, alinhando os nós pelo id e as
@@ -1113,6 +1151,39 @@ chave que some do JSON é pego, e não só o arquivo.
 - **Saída e rc.** O ponteiro que não resolve é `integrity.trace-locator-missing`, e o JSON que não se lê é
   `integrity.trace-locator-unreadable`; os dois dão rc 1. A saída JSON ganha `locators`, aditivo e fora do `required`,
   então a saída da 4.25 segue válida. Ponha o caminho também no `trace:`: é ele que diz que o próprio arquivo sumiu.
+
+### O locator pelo esquema, e o hash da fonte (4.37.0)
+
+Quando um nó declara `provenance.scheme` ou `provenance.sha256` (contrato v4.17), o `kg_trace check` abre a fonte e os
+confere.
+
+- **A fonte.** O arquivo do repositório que o `provenance.source` nomeia ou, com `--with PREFIXO=PASTA`, o arquivo que
+  uma URL nomeia no commit da URL (`<prefixo>/<commit>/<caminho>`), lido de um clone local do outro repositório com
+  `git show`. A pasta tem de ser a raiz de um clone git, e a referência da URL, o nome de um commit: o commit que o
+  clone não tem, ou a pasta que não é a raiz de um clone, é `missing_source`, e o nome de branch ou de tag (`main`,
+  `HEAD`) é `unpinned`, porque anda. Uma fonte fixada nunca é conferida contra outra versão. A URL sem `--with` que
+  case é contada como `absolute`.
+- **O hash.** O `provenance.sha256` contra o conteúdo da fonte como o git o guarda: o arquivo rastreado e sem mudança
+  desde o índice é lido do blob, então um checkout que troca as quebras de linha (`core.autocrlf`, o padrão do git no
+  Windows) dá o mesmo hash que no Linux, e o mesmo de `git show <commit>:<caminho> | sha256sum`. O arquivo com
+  mudança, ou fora do git, é lido do disco. A diferença é `integrity.trace-sha256-mismatch`, a fonte mudou depois de
+  lida.
+- **O locator.** `text` (o intervalo de linhas ou de caracteres existe, com os caracteres em code points e cada quebra
+  de linha contada como um, como pede a RFC 5147), `csv` (a linha, a coluna ou a célula existe, a coluna da célula
+  contra a linha dela), `quote` (o texto exato aparece, com os espaços em sequência contados como um), `kg-node` (o nó
+  existe no grafo) e `json-pointer` (ele resolve numa fonte `.json`, nas duas formas da RFC 6901). Fora do alcance é
+  `integrity.trace-locator-out-of-range`; a citação que não está lá, `integrity.trace-quote-missing`. Não julgado, e
+  contado, nunca como ok: `pdf`, `media` e `html` (`form_only`, julgados pela forma no schema), o locator fora da
+  gramática do esquema, o scheme fora da tabela ou o `sha256` fora da forma (`malformed`, que o schema já alerta), o
+  JSON Pointer numa fonte que não é JSON (`not_json`) e a fonte que não é UTF-8 (`not_text`). O ponteiro julgado aqui
+  não é julgado de novo em `locators`; o que não pôde ser julgado aqui (a fonte que sumiu, a âncora no `trace:`)
+  segue julgado lá, como na 4.35.0.
+- **Saída e rc.** Cada falha dá rc 1. A saída JSON ganha `schemes`, aditivo e fora do `required`.
+
+```bash
+kg-trace check --root . \
+  --with https://github.com/acme/core/blob=../core
+```
 
 ### O checador de projeção (`kg_trace.py projection`, 4.35.0)
 

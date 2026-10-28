@@ -1,0 +1,6 @@
+{
+  "graph": "docs/business-context/business-context.kg.yaml",
+  "id": "business-context",
+  "must": [],
+  "should": {}
+}

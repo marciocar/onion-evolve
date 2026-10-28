@@ -1,0 +1,6 @@
+{
+  "graph": "docs/design-context/design-context.kg.yaml",
+  "id": "design-context",
+  "must": [],
+  "should": {}
+}

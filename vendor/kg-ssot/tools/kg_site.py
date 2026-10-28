@@ -23,7 +23,7 @@ REPO = "https://github.com/marciocar/kg-ssot/blob/main/"
 PAGES = ["README.md", "ADOPTING.md", "CHANGELOG.md"]
 MANUAL = "docs/manual"
 # os arquivos que as páginas mostram (a demonstração gravada do README) vão junto, no mesmo caminho
-ASSETS = ["docs/demo/kg-ssot-demo.gif"]
+ASSETS = ["docs/demo/kg-ssot-demo.gif", "docs/demo/kg-ssot-demo.pt-BR.gif"]
 # [texto](alvo) e [texto](alvo#âncora); o alvo não tem espaço nem fecha-parêntese
 LINK = re.compile(r"(\]\()([^)\s#]+)((?:#[^)\s]*)?\))")
 

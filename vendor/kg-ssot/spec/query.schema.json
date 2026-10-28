@@ -140,7 +140,8 @@
         "sort": {
           "enum": [
             "corpus",
-            "impact"
+            "impact",
+            "attention"
           ]
         },
         "limit": {
@@ -527,6 +528,11 @@
               ]
             }
           }
+        },
+        "attention": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Desde a 4.36.0, só com --sort attention: impact × confidence × fator do status × (1 + grau), o peso do nó no radar."
         }
       }
     }
