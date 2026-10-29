@@ -2,7 +2,8 @@
 branch: chore/update-round-439-pins
 pr: pendente
 date: 2026-10-29
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0af2a0bc3dc742f8e46ecc40310aea2035c33f8beb23bbf2af75ccd26e9c7402
+reviewed_code_sha256: 581d7fd0f2a01aae59c4739a93bdb81f9fce4a6688eac37f00c7966637bec706
 findings_total: 0
 findings_real: 0
 tokens: 0
