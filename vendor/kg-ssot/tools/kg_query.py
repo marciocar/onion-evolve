@@ -638,7 +638,7 @@ def _unresolved_reason(corpus, path):
     return "outside_corpus"
 
 
-def revisit(corpus, as_of):
+def revisit(corpus, as_of, where=()):
     """As decisões vivas que pedem revisão (kg-ssot.revisit/1), pela atenção, com o motivo: evidence-due (algo em que
     ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e
     segue viva). Ficam à parte, nunca em silêncio: on_event (só reverify_on, porque o evento não tem data), unstamped
@@ -648,10 +648,13 @@ def revisit(corpus, as_of):
     repositório é lido no commit fixado da URL; só as decisões do corpus local são julgadas (o grafo externo entra só
     como apoio); o não resolvido traz o motivo (_unresolved_reason); e upstream_changed lista, à parte e sem virar
     motivo, a decisão local cujo apoio externo tem outro status (ou sumiu) na ponta do clone."""
+    conds = parse_where(where)
     items, on_event, unstamped, unresolved, upstream = [], [], [], [], []
     for key in list(corpus.order):
         node = corpus.nodes[key]
         if node.get("node_type") != "decision" or node.get("status") in HISTORY or key[0] in corpus.external:
+            continue
+        if conds and not where_matches(node, conds):  # desde a 4.39.0: a fila de um dono (--where owner=X)
             continue
         reasons, seen = [], set()
 
@@ -707,9 +710,12 @@ def revisit(corpus, as_of):
     raw = {(it["file"], it["id"]): attention(corpus, (it["file"], it["id"]), raw=True) for it in items}
     pos = {k: i for i, k in enumerate(by_attention(list(raw), raw))}
     items.sort(key=lambda it: pos[(it["file"], it["id"])])
-    return {"schema_version": REVISIT_SCHEMA, "root": corpus.root, "as_of": as_of.isoformat(),
-            "decisions": items, "on_event": on_event, "unstamped": unstamped, "unresolved": unresolved,
-            "upstream_changed": upstream}
+    res = {"schema_version": REVISIT_SCHEMA, "root": corpus.root, "as_of": as_of.isoformat(),
+           "decisions": items, "on_event": on_event, "unstamped": unstamped, "unresolved": unresolved,
+           "upstream_changed": upstream}
+    if where:
+        res["where"] = list(where)
+    return res
 
 
 def _line(b):
@@ -746,6 +752,8 @@ def revisit_human(res):
             lines.append(f"    {reason[r['reason']]}{due}: {r['id']}  {(r.get('label') or '')[:70]}")
     lines.append(_("· {n} decision(s) to revisit on {date}; {m} wait for an event (reverify_on)").format(
         n=len(res["decisions"]), date=res["as_of"], m=len(res["on_event"])))
+    if res.get("where"):
+        lines.append(_("· only the decisions where {where}").format(where=" and ".join(res["where"])))
     if res["unstamped"]:
         lines.append(_("· {n} decision(s) have a cadence but no verified_at, so they never come due: {ids}").format(
             n=len(res["unstamped"]), ids=", ".join(d["id"] for d in res["unstamped"][:10])))
@@ -857,6 +865,58 @@ def _text(node, key):
     return v if isinstance(v, str) else ""
 
 
+WHERE_MAX = 10
+
+
+def parse_where(items):
+    """As condições do --where (4.39.0): cada CHAVE=VALOR vira (caminho, valor). A chave é owner, um campo x_* ou um
+    caminho com ponto num x_* (x_raci.responsible); as condições se somam. ValueError: condição quebrada."""
+    items = [items] if isinstance(items, str) else list(items or ())  # um texto solto é uma condição só
+    if len(items) > WHERE_MAX:
+        raise ValueError(_("--where takes at most {max} conditions").format(max=WHERE_MAX))
+    conds = []
+    for item in items:
+        if not isinstance(item, str) or "=" not in item:
+            raise ValueError(_("--where {item}: write KEY=VALUE").format(item=repr(item)))
+        key, _sep, value = item.partition("=")
+        path = tuple(key.split("."))
+        if not key or any(not part for part in path):
+            raise ValueError(_("--where {item}: the key is empty or has an empty part").format(item=repr(item)))
+        if not (path == ("owner",) or path[0].startswith("x_")):
+            raise ValueError(_("--where {item}: the key is owner or an x_* field (x_raci.responsible)").format(
+                item=repr(item)))
+        conds.append((path, unicodedata.normalize("NFC", value)))
+    return conds
+
+
+def _scalar_text(value):
+    """O texto com que um escalar do nó casa o VALOR do --where: o texto como está, true/false, null ou o número."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if value is None:
+        return "null"
+    if isinstance(value, str):
+        return unicodedata.normalize("NFC", value)  # "sessão" em NFD casa owner=sessão
+    if isinstance(value, (int, float)):
+        return str(value)
+    return None
+
+
+def where_matches(node, conds):
+    """O nó casa todas as condições? A chave que falta não casa; um escalar casa por igualdade de texto, e uma lista,
+    quando algum escalar dela casa."""
+    for path, value in conds:
+        cur = node
+        for part in path:
+            if not isinstance(cur, dict) or part not in cur:
+                return False
+            cur = cur[part]
+        found = [cur] if not isinstance(cur, list) else cur
+        if not any(_scalar_text(v) == value for v in found):
+            return False
+    return True
+
+
 def matches(node, key, f):
     if f["ids"] and key[1] not in f["ids"]:
         return False
@@ -878,6 +938,8 @@ def matches(node, key, f):
         day = kg_validate.iso_date(node.get("verified_at")) if isinstance(node.get("verified_at"), str) else None
         if day is not None and day >= f["verified_before"]:
             return False
+    if f.get("where") and not where_matches(node, f["where"]):
+        return False
     return True
 
 
@@ -923,7 +985,7 @@ def project(corpus, key, narrative=False, fields=()):
 def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=None, layer=None, file=None, text=None,
           in_narrative=False, open_only=False, verified_before=None, around=None, depth=1, edge_types=(),
           direction="both", sort="corpus", limit=50, cursor=None, narrative=False, fields=(), max_bytes=None,
-          semantic=None, ranker=None):
+          semantic=None, ranker=None, where=()):
     """A consulta inteira, no formato kg-ssot.query/1. ValueError: pedido quebrado. max_bytes: o teto da página em bytes
     de JSON (o servidor MCP passa o dele); a página corta antes do limit quando o passa, sempre com ao menos um nó, e o
     next_cursor continua de onde ela parou.
@@ -945,7 +1007,7 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         offset = int(cursor)
     f = {"ids": set(ids), "id_prefix": id_prefix, "node_type": node_type, "status": "open" if open_only else status,
          "plane": plane, "layer": layer, "file": file, "text": text, "in_narrative": in_narrative,
-         "verified_before": verified_before}
+         "verified_before": verified_before, "where": parse_where(where)}
     expanded = term_forms(corpus, text) if text else []
     f["forms"] = [_word(form) for form in dict.fromkeys(form for t in expanded for form in t["forms"])]
     f["notations"] = [_word(n) for n in dict.fromkeys(t["notation"] for t in expanded if t["notation"])]
@@ -1010,6 +1072,8 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                "fields": list(fields)}
     if semantic is not None:
         request["semantic"] = semantic
+    if where:
+        request["where"] = list(where)
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
     res = {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
            "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
@@ -1071,6 +1135,8 @@ def human(res):
                       _("· order: similarity to --semantic")).format(k=s["k"])
                      + _("; model {model}; {indexed} node(s) from the index, {now} embedded now").format(
                          model=s["model"]["id"], indexed=s["index"]["nodes"], now=s["index"]["embedded_now"]))
+    if res["query"].get("where"):
+        lines.append(_("· only the nodes where {where}").format(where=" and ".join(res["query"]["where"])))
     shown = len(res["nodes"])
     first = int(res["query"]["cursor"] or 0)
     tail = _("; next page: --cursor {cursor}").format(cursor=res["next_cursor"]) if res["next_cursor"] else ""
@@ -1111,6 +1177,9 @@ def main(argv=None):
                     help=_("with --chain, --decision or --revisit, read the graph of another repository that a "
                            "provenance.source URL names, at the commit of the URL: the URL prefix before the commit, and "
                            "the local folder of that repository (repeatable)"))
+    ap.add_argument("--where", action="append", default=[], metavar=_("KEY=VALUE"),
+                    help=_("only the nodes where the key has the value (repeatable, all of them): owner or an x_* "
+                           "field, with a dot for a nested key (x_raci.responsible); with --revisit, its decisions"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
@@ -1164,6 +1233,8 @@ def main(argv=None):
         return broken(_("--with goes with --chain, --decision or --revisit"))
     if args.as_of is not None and not args.revisit:
         return broken(_("--as-of goes with --revisit"))
+    if args.where and (args.decision is not None or args.chain is not None):
+        return broken(_("--where filters the node queries and --revisit, not --decision or --chain"))
     if args.decision is not None or args.revisit:
         if args.decision is not None and args.revisit:
             return broken(_("--decision and --revisit are different questions: ask one at a time"))
@@ -1177,7 +1248,8 @@ def main(argv=None):
         try:
             corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
             corpus.withs = [with_spec(w) for w in args.withs]
-            res = decision_history(corpus, args.decision) if args.decision is not None else revisit(corpus, as_of)
+            res = decision_history(corpus, args.decision) if args.decision is not None else \
+                revisit(corpus, as_of, args.where)
         except (OSError, ValueError, UnicodeDecodeError) as exc:
             return broken(exc)
         if args.format == "json":
@@ -1205,7 +1277,7 @@ def main(argv=None):
                     open_only=args.open_only, verified_before=before, around=args.around, depth=args.depth,
                     edge_types=args.edge_types, direction=args.direction, sort=args.sort, limit=args.limit,
                     cursor=args.cursor, narrative=args.narrative, fields=args.fields, semantic=args.semantic,
-                    ranker=ranker)
+                    ranker=ranker, where=args.where)
     except (OSError, ValueError, UnicodeDecodeError) as exc:
         return broken(exc)
     text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else human(res)

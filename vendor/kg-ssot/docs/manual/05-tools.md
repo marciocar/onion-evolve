@@ -123,7 +123,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.38.0",
+  "release": "kg-ssot-v4.39.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -766,9 +766,10 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text WORDS` | Words that the label contains, all of them, without case or accents (`verificacao` matches `Verificação`, since 4.23); `--in-narrative` also searches the narrative. When the whole text is a term of the vocabulary (its `pref` or a current domain synonym, folded, or its `notation`, exactly), the term and every node that has any of its forms as a whole word match too, and `expanded` says which term; a case-scoped or retired synonym does not expand. No match gives a `hint`, which says when the zero comes from the other filters, so a zero does not pass for "there is none" |
 | `--semantic QUESTION` | Since 4.26, with the `vector` extra: orders the nodes that pass the other filters by similarity to the question (`--model`, `--model-dir`; see `kg_vector.py` below). Alone, the order is the vector's; with `--text`, the text's list (in corpus order) and the vector's are fused by RRF (k=60), ties going to the vector position. Give the short term to `--text` and the whole question to `--semantic`: that is what the bench measured (14 of 20 hits, against 12 for the vector and 9 for the text). The filters apply to both, both lists are complete, and `--limit` only pages the fused list, so in hybrid mode `total` counts every candidate and `semantic.text_matches` says how many match `--text`. The JSON gains `semantic` (mode, model with revision and sha256, and where each vector came from: the index, embedded now, the process memory, or no text) and a `rank` per node; without `--semantic` the output does not change |
 | `--open` | The open queue (status `open`) |
+| `--where KEY=VALUE` | Since 4.39.0: only the nodes where `owner` or an `x_*` field (a dot for a nested key) has the value; repeatable, all of them must hold. See "The queue of an owner" below |
 | `--verified-before YYYY-MM-DD` | Nodes with no `verified_at`, or verified before the date |
 | `--around ID` | The neighborhood: `<path>#<id>`, or an id that is unique in the corpus; `--depth`, `--edge-type` (repeatable), `--direction out\|in\|both` |
-| `--sort corpus\|impact` | Corpus order, or declared impact. The attention formula stays with the radar of whoever uses it |
+| `--sort corpus\|impact\|attention` | Corpus order, declared impact, or attention (impact × confidence × status factor × (1 + degree), the radar's value) |
 | `--limit N` and `--cursor C` | The page (up to 1000) and the cursor for the next one, valid for the same query over the same corpus |
 | `--fields GLOB` | Node keys that come out in `extra`, as they are in the graph: `--fields 'x_*'` |
 | `--narrative` | Includes each node's narrative |
@@ -905,6 +906,26 @@ Without `/blob`, the reference read would be `blob`, which pins nothing, and the
 
 ```bash
 kg-query --root . --revisit --with https://github.com/acme/core/blob=../core
+```
+
+### The queue of an owner: `--where` (4.39.0)
+
+`--where KEY=VALUE` keeps only the nodes where the key has the value. The key is `owner` or an `x_*` field, with a dot
+for a nested key (`x_raci.responsible`); a scalar matches by its text, a list when one of its items does, and a node
+without the key does not match. Repeat it to add conditions, all of which must hold. It works with `--open`, the other
+filters and `--sort`, and with `--revisit`, which then judges only the decisions that match; the JSON output echoes the
+conditions in `where`, and the human output says the list is filtered. With `--revisit`, every list (the decisions,
+`on_event`, `unstamped`, `unresolved` and `upstream_changed`) keeps only the matching decisions. The MCP `kg_query`
+tool takes the same `where`. A key outside `owner` and `x_*`, or a condition without `=`, is a broken input (rc 2).
+It is not the `--where` of `kg_validate`, which shows the node each code comes from. A number in the graph matches
+by its value as Python writes it (`owner: 1e3` matches `owner=1000.0`), text is compared in NFC, so the same accented
+word matches however it was typed, and case and spaces count. A list of maps is not searched, and a map never matches.
+
+It is the queue a session opens with when several sessions share one coordination graph, each with its `owner`:
+
+```bash
+kg-query --root . --open --where owner=kg-ssot --sort attention
+kg-query --root . --revisit --where owner=core
 ```
 
 ## `kg_diff.py`: diff by id between revisions
@@ -1239,6 +1260,11 @@ only `node_sha256`. `digest` reads the working tree under the root; for a pinned
 ```bash
 kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
+
+With `--format json` (4.39.0), `digest` returns `kg-ssot.digest/1` (`spec/digest.schema.json`): one result per
+reference, with `node_sha256` and a `status` of `ok`, `not_found` or `no_canonical_form`, and the same exit code as the
+text output. Read the value from the field instead of splitting the text line. A broken input (a path outside the
+root, a file that cannot be read) stops before any result is printed, in both formats, with rc 2.
 
 ### The projection checker (`kg_trace.py projection`, 4.35.0)
 

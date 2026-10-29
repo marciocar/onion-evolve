@@ -165,6 +165,13 @@
         "semantic": {
           "type": "string",
           "description": "Desde a 4.26: a pergunta do --semantic; ausente sem ele."
+        },
+        "where": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "desde a 4.39.0: as condições CHAVE=VALOR do --where, só quando a consulta as pediu"
         }
       }
     },

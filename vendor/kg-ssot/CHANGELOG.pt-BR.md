@@ -10,6 +10,23 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.39.0] - 2026-10-29
+
+Sem mudança no contrato (segue v4.18). Quando várias sessões de vida longa dividem um grafo de coordenação, cada uma com
+o seu `owner`, cada uma abre com a própria fila.
+
+- `kg_query --where CHAVE=VALOR`: só os nós em que `owner` ou um campo `x_*` (com ponto para uma chave aninhada, como
+  `x_raci.responsible`) tem o valor; uma lista casa quando um dos itens casa, e as condições se somam. Vale com o
+  `--open`, com os outros filtros e com o `--revisit`, que então julga só as decisões que casam; o JSON ecoa as
+  condições em `where`, e a ferramenta `kg_query` do MCP aceita o mesmo filtro. No core do Onion, a fila de cada um dos
+  cinco donos bate exatamente com uma contagem independente.
+- `kg-trace digest --format json` devolve `kg-ssot.digest/1` (`spec/digest.schema.json`), com o `node_sha256` e o
+  `status` de cada referência, para ninguém precisar partir a linha de texto. Com entrada quebrada, o `digest` agora
+  para antes de imprimir qualquer resultado, nos dois formatos (antes imprimia as linhas boas antes do erro).
+- Ficaram de fora antes do código, com o gatilho escrito: transformar um REFUTES entre grafos de verticais diferentes
+  numa `question` com dono (ainda não existe nenhuma aresta assim no corpus a que se destinava), e um `--due` com os
+  nós vencidos de qualquer tipo (ainda não há cadência vencida ali).
+
 ## [4.38.0] - 2026-10-28
 
 Contrato v4.18, só SHOULD: nada que passava reprova. Um company brain atravessa vários repositórios, e uma decisão num

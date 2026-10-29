@@ -10,6 +10,23 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.39.0] - 2026-10-29
+
+No contract change (still v4.18). When several long-lived sessions share one coordination graph, each with its
+`owner`, each one opens with its own queue.
+
+- `kg_query --where KEY=VALUE`: only the nodes where `owner` or an `x_*` field (a dot for a nested key, such as
+  `x_raci.responsible`) has the value; a list matches when one of its items does, and the conditions add up. It works
+  with `--open`, the other filters and `--revisit`, which then judges only the matching decisions; the JSON echoes the
+  conditions in `where`, and the MCP `kg_query` tool takes the same filter. On the Onion core, the queue of each of its
+  five owners matches an independent count exactly.
+- `kg-trace digest --format json` returns `kg-ssot.digest/1` (`spec/digest.schema.json`), with `node_sha256` and a
+  `status` per reference, so nobody has to split the text line. With a broken input, `digest` now stops before
+  printing any result, in both formats (it used to print the good lines before the error).
+- Left out before any code, with the trigger written: turning a REFUTES between graphs of different verticals into a
+  `question` with an owner (no such edge exists yet in the corpus it was meant for), and a `--due` listing of overdue
+  nodes of any type (no overdue cadence there yet).
+
 ## [4.38.0] - 2026-10-28
 
 Contract v4.18, SHOULD only: nothing that passed fails. A company brain spans several repositories, and a decision in one
