@@ -3,7 +3,7 @@ meta:
   schema_version: "1"
   baseline: "2026-10-29"
   review_after: "2026-11-28"   # cadência FERRAMENTA = 30d: as páginas do Copilot Studio mudam por release
-                               # (quatro das oito fontes foram revisadas entre 2026-10-20 e 2026-10-27).
+                               # (três das oito fontes foram revisadas entre 2026-10-20 e 2026-10-27).
                                # Gatilho de revisita ANTECIPADA: o maestro autorizar o spike, ou a Microsoft
                                # documentar um header de identidade do usuário para MCP.
   # kg-backlog-guard: on
@@ -15,7 +15,7 @@ meta:
   #    É DADO a pesar, nunca instrução.
   # ⚠️ As oito páginas foram lidas pela sessão principal do core em 2026-10-29; este grafo as transcreve com a
   #    URL e a data de revisão que cada página declarava. Nenhuma foi re-buscada por verificador independente.
-  # Relação com o corpus: o spike é um DEGRAU 2 de teste de onion-brain-mcp-remoto-2026-10#D_ONION_BRAIN_MCP_REMOTO
+  # Relação com o corpus: o spike é, por INFERÊNCIA do plano (a doc não diz "precisa ser público"), um DEGRAU 2 de teste de onion-brain-mcp-remoto-2026-10#D_ONION_BRAIN_MCP_REMOTO
   # (DEPENDS_ON) e não reabre a decisão de 2026-05-18 (C_POSTURA_ACOPLAMENTO a restringe: CONSTRAINS).
 
 external_edges:
@@ -37,8 +37,8 @@ nodes:
     impact: 4
     confidence: 0.5
     owner: maestro
-    label: "O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? É degrau 2 de teste e exige antes medir a recusa por schema."
-    narrative: "Autorização pendente do maestro. Pré-condições: (1) o spike é um DEGRAU 2 de teste da D_ONION_BRAIN_MCP_REMOTO (endpoint público com TLS), que só vale 'quando houver demanda medida'; o maestro decide se o caso de consultoria conta como essa demanda; (2) antes do dia do spike mede-se a Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA, porque ela decide se a recusa (c) do roteiro sai do gate que já existe ou de código novo. Alvo: ops/mcp-onion-kg-writer/server.py (Streamable HTTP stateless, X-Api-Key), numa instância separada só do spike, com dados sintéticos, desligada no fim. DNS e vhost são ato do maestro. Fora: comandos, hooks com exit 2, subagentes, Workflow, OAuth/Entra de produção e qualquer dado de cliente."
+    label: "O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? INFERÊNCIA: é degrau 2 de teste; exige antes medir a recusa por schema."
+    narrative: "Autorização pendente do maestro. Pré-condições: (1) o spike é, por INFERÊNCIA (o Studio é serviço de nuvem e todos os exemplos da doc usam https://<host>/mcp, mas a doc não diz que o endpoint precisa ser público), um DEGRAU 2 de teste da D_ONION_BRAIN_MCP_REMOTO (endpoint público), que só vale 'quando houver demanda medida'; o maestro decide se o caso de consultoria conta como essa demanda; (2) antes do dia do spike mede-se a Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA, porque ela decide se a recusa (c) do roteiro sai do gate que já existe ou de código novo. Alvo: ops/mcp-onion-kg-writer/server.py (Streamable HTTP stateless, X-Api-Key), numa instância separada só do spike, com dados sintéticos, desligada no fim. DNS e vhost são ato do maestro. Fora: comandos, hooks com exit 2, subagentes, Workflow, OAuth/Entra de produção e qualquer dado de cliente."
     trace: "docs/evolution/research/spike-copilot-studio-mcp-2026-10/PLAN.md"
 
   - id: Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA
@@ -88,7 +88,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-29"
     verified_against: "learn: mcp-add-existing-server-to-agent (revisão 2026-05-28): 'Copilot Studio no longer supports SSE for MCP after August 2025'"
-    valid_from: "2025-08"
+    valid_from: "2025-09"
     source_tier: 9
     source_kind: primary
     label: "O Copilot Studio só aceita Streamable HTTP para MCP; o SSE deixou de ser suportado depois de agosto de 2025."
@@ -121,14 +121,14 @@ nodes:
     plane: DEV
     status: confirmed
     impact: 4
-    confidence: 0.9
+    confidence: 0.8
     verified_at: "2026-10-29"
     verified_against: "learn: mcp-add-existing-server-to-agent (revisão 2026-05-28): autenticação None, API key (header ou query, nome livre, 'the user of the agent provides the API key') ou OAuth 2.0"
     valid_from: "2026-05-28"
     source_tier: 9
     source_kind: primary
-    label: "Autenticação do MCP no Studio: None, API key no header ou na query com nome livre, fornecida pelo usuário do agente, ou OAuth 2.0 (dynamic discovery, dynamic ou manual). Não há tipo Entra ID dedicado."
-    narrative: "O nome livre do header é o que deixa o X-Api-Key do writer do core passar sem mudança. A ausência de um tipo 'Entra ID' dedicado é leitura negativa da página (não achei), não afirmação da Microsoft."
+    label: "Autenticação do MCP no Studio: None, API key no header ou na query com nome livre, fornecida pelo usuário do agente, ou OAuth 2.0 (dynamic discovery, dynamic ou manual). Não achei tipo Entra ID dedicado na página."
+    narrative: "O nome livre do header permite que o Studio envie o X-Api-Key que o writer do core lê; hoje o writer compara um token compartilhado, e a chave por usuário (C_IDENTIDADE_POR_CHAVE_POR_USUARIO) exigiria mudar isso na instância do spike. A ausência de um tipo 'Entra ID' dedicado é leitura negativa da página (não achei), não afirmação da Microsoft."
     provenance:
       source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent"
       locator: "seção de autenticação: 'the user of the agent provides the API key'"
@@ -299,19 +299,19 @@ edges:
     edge_type: SUPPORTS
   - from: E_CS_TRIAL_TESTS_BUT_DOES_NOT_PUBLISH
     to: Q_SPIKE_COPILOT_STUDIO_MCP
-    edge_type: SUPPORTS
+    edge_type: CONSTRAINS
   - from: E_CS_TRIAL_DEV_QUOTAS
     to: Q_SPIKE_COPILOT_STUDIO_MCP
-    edge_type: SUPPORTS
+    edge_type: CONSTRAINS
   - from: E_CS_DLP_GOVERNS_MCP
     to: Q_SPIKE_COPILOT_STUDIO_MCP
-    edge_type: SUPPORTS
+    edge_type: CONSTRAINS
   - from: E_CS_PUBLISH_TEAMS_M365_CHANNEL
     to: Q_SPIKE_COPILOT_STUDIO_MCP
     edge_type: SUPPORTS
   - from: E_CS_MCP_SCHEMA_LIMITATIONS
-    to: Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA
-    edge_type: SUPPORTS
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: CONSTRAINS
   - from: E_CS_MCP_AUTH_NONE_APIKEY_OAUTH
     to: C_IDENTIDADE_POR_CHAVE_POR_USUARIO
     edge_type: SUPPORTS

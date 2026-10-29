@@ -540,31 +540,11 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## onion-identity-2026-07 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 29.2 | `C_NS1_KG` | onion-identity-2026-07 | NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado |
-| 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
-| 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
-| 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
-
-## task-manager-vocabulario-2026-10 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 28.8 | `C_PAGINATION_AS_OPAQUE_ITERATOR` | task-manager-vocabulario-2026-10 | interface.md deve expor a paginação como iterador opaco (próxima página ou fim), sem expor offset, índice nem cursor: os 5 pr |
-| 26.4 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
-| 18.0 | `D_TASK_MANAGER_INTERFACE_WAVE2` | task-manager-vocabulario-2026-10 | Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (12 required, 12 optional) com assinatura; cada adapter dec |
-| 13.5 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
-| 10.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
-| 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
-
 ## maestro — 23 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 28.0 | `Q_SPIKE_COPILOT_STUDIO_MCP` | spike-copilot-studio-mcp-2026-10 | O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? É de |
+| 30.0 | `Q_SPIKE_COPILOT_STUDIO_MCP` | spike-copilot-studio-mcp-2026-10 | O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? INFER |
 | 22.5 | `D_MA_ARCH` | company-brain-multiaudiencia-2026-10 | A escolha da arquitetura do Company Brain multiaudiência, depois das perguntas de audiência, superfície, classificação, merca |
 | 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 17.5 | `Q_MA_ENFORCEMENT` | company-brain-multiaudiencia-2026-10 | Barreira paga (plano do forge com CODEOWNERS, rulesets e checks obrigatórios) ou barreira por superfície mais detecção no plan |
@@ -587,6 +567,26 @@
 | 2.0 | `Q_COORD_MAESTRO_DISSECAR_CLAI` | coordenacao-sessoes-2026-10 | A dissecação do clai (baalimago/clai), deixada para depois. |
 | 2.0 | `Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE` | coordenacao-sessoes-2026-10 | Decidir que x_raci, x_doc_version, x_copy_* e o par E_ SUPPORTS D_ ficam como convenção do adotante até dois adotantes usarem a |
 | 2.0 | `Q_COORD_MAESTRO_SGE_REGISTRO_PENDENTES` | coordenacao-sessoes-2026-10 | As decisões do maestro que o sge tem em espera, em um nó: as 4 ligações «normalizado» da SAEB, as branches antigas de update |
+
+## onion-identity-2026-07 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 29.2 | `C_NS1_KG` | onion-identity-2026-07 | NS1: framework que constroi conhecimento reconciliavel vivo (KG); edge mais forte, negocio nao provado |
+| 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
+| 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
+| 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
+
+## task-manager-vocabulario-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 28.8 | `C_PAGINATION_AS_OPAQUE_ITERATOR` | task-manager-vocabulario-2026-10 | interface.md deve expor a paginação como iterador opaco (próxima página ou fim), sem expor offset, índice nem cursor: os 5 pr |
+| 26.4 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
+| 18.0 | `D_TASK_MANAGER_INTERFACE_WAVE2` | task-manager-vocabulario-2026-10 | Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (12 required, 12 optional) com assinatura; cada adapter dec |
+| 13.5 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
+| 10.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
+| 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
 
 ## slm-capitalizacao-2026-10 — 8 item(ns)
 
@@ -672,11 +672,11 @@
 | 8.0 | `Q_MA_A2A_ENTRE_CONTAS` | company-brain-multiaudiencia-2026-10 | Sessões de contas diferentes do Claude (mesma máquina e mesmo usuário Linux, ou máquinas diferentes) se coordenam pelo core co |
 | 8.0 | `Q_MA_WIKI_BRIDGE` | company-brain-multiaudiencia-2026-10 | Ponte wiki↔grafo: a página da wiki como projeção do grafo (projection_of) ou um importador da wiki para nós? |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 6.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
 | 4.5 | `Q_COORD_CORE_COMPANY_BRAIN_MARKET_PROPOSAL` | coordenacao-sessoes-2026-10 | A decisão D_COMPANY_BRAIN_MARKET_PROPOSAL, da curadoria, depois do card da organização. |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
+| 4.0 | `Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA` | spike-copilot-studio-mcp-2026-10 | A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no w |
 | 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
 | 3.0 | `Q_COORD_CORE_ESPERANTO_VEREDITOS` | coordenacao-sessoes-2026-10 | Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT_REJECT (rejeitar, sem costura) |
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
