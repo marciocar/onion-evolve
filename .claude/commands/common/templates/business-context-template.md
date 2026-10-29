@@ -56,6 +56,14 @@ Este template ajuda times de produto a projetar sua **Arquitetura de Contexto de
 - No spaces, underscores, or UPPERCASE
 - Keep filenames descriptive and business-focused
 
+**Carimbo e marcas de lacuna (valem em todo arquivo gerado):**
+- Cada arquivo, exceto `index.md` e `README.md`, leva logo abaixo do título a linha `> **Última Atualização:** YYYY-MM-DD`
+  (REGRA 15 (Frescor de contexto de domínio: carimbo de atualização)).
+- `[INFERIDO]` marca o que foi deduzido das fontes sem confirmação de quem decide.
+- `[TO BE COMPLETED]` marca o dado que existe mas não foi coletado.
+- `[DECISÃO PENDENTE]` marca a decisão do dono do negócio que não foi tomada nem aferida e não pode ser
+  inferida; ela entra nas "Pendências de validação" do `index.md`, com quem decide.
+
 ### Create an Index File First
 
 **Create: `index.md` (or `business-context.md`)**

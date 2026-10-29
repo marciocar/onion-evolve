@@ -32,7 +32,7 @@ related_commands:
   - /docs/build-compliance-docs
 
 version: "3.0.0"
-updated: "2025-11-24"
+updated: "2026-10-29"
 ---
 
 Você é o **Security Information Master** - orquestrador principal do sistema de geração de documentação de compliance. Sua missão é analisar requisitos de compliance, detectar frameworks aplicáveis e coordenar especialistas para gerar documentação auditável.
@@ -644,7 +644,7 @@ Documentos Gerados:
 1. docs/business-context/index.md (perfil da empresa)
 2. docs/technical-context/system-architecture.md (infraestrutura)
 3. README.md (overview do projeto)
-4. docs/business-context/CUSTOMER_JOURNEY.md (clientes e requisitos)
+4. docs/business-context/01-customer/journey.md (clientes e requisitos)
 
 # Para modo Due Diligence
 1. Checklist file provided by user

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**754 itens abertos** em 132 grafo(s) com aberto (de 171 no escopo) · 133 grupo(s), agrupados por `owner:` (44 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**761 itens abertos** em 132 grafo(s) com aberto (de 171 no escopo) · 133 grupo(s), agrupados por `owner:` (47 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -649,7 +649,7 @@
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
 | 3.0 | `C_MA_CODEOWNERS_TEMPLATE` | company-brain-multiaudiencia-2026-10 | Trabalho: um template de CODEOWNERS por vertical, útil já como sinalização e efetivo se houver plano pago. |
-| 3.0 | `Q_COORD_CORE_ESPERANTO_VEREDITOS` | coordenacao-sessoes-2026-10 | Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT (estacionar com gatilho). |
+| 3.0 | `Q_COORD_CORE_ESPERANTO_VEREDITOS` | coordenacao-sessoes-2026-10 | Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT_REJECT (rejeitar, sem costura) |
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
 | 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
 | 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
@@ -657,7 +657,7 @@
 | 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
 | 2.0 | `Q_COORD_FIXTURE_NODE_SELFTEST_TMP` | coordenacao-sessoes-2026-10 | O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás. |
 
-## maestro — 19 item(ns)
+## maestro — 22 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -672,13 +672,16 @@
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 5.0 | `Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA` | coordenacao-sessoes-2026-10 | Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. D |
 | 4.5 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
+| 4.5 | `Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB` | coordenacao-sessoes-2026-10 | Decidir levar ao hub a receita do piloto do documento controlado: o procedimento com dono e RACI, a cadência, PDF e DOCX gerados  |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 | 4.0 | `Q_COORD_DECIDIR_VIGIA_DE_EVENTOS` | coordenacao-sessoes-2026-10 | Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático c |
+| 3.0 | `Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO` | coordenacao-sessoes-2026-10 | Decidir o --pin <caminho#ID> no kg-decide-seal.sh, que grava o nó E_ irmão com o node_sha256 da versão aprovada; antes do códi |
 | 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
 | 3.0 | `Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT` | coordenacao-sessoes-2026-10 | Os textos da vitrine e o dia zero do lançamento da kg-ssot. |
 | 2.0 | `Q_COORD_MAESTRO_DISSECAR_CLAI` | coordenacao-sessoes-2026-10 | A dissecação do clai (baalimago/clai), deixada para depois. |
+| 2.0 | `Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE` | coordenacao-sessoes-2026-10 | Decidir que x_raci, x_doc_version, x_copy_* e o par E_ SUPPORTS D_ ficam como convenção do adotante até dois adotantes usarem a |
 | 2.0 | `Q_COORD_MAESTRO_SGE_REGISTRO_PENDENTES` | coordenacao-sessoes-2026-10 | As decisões do maestro que o sge tem em espera, em um nó: as 4 ligações «normalizado» da SAEB, as branches antigas de update |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
@@ -814,7 +817,7 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## sinais-de-campo-2026-09 — 7 item(ns)
+## sinais-de-campo-2026-09 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -824,7 +827,11 @@
 | 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
 | 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
 | 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
+| 3.6 | `Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029` | sinais-de-campo-2026-09 | O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (co |
+| 2.0 | `Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029` | sinais-de-campo-2026-09 | O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente  |
+| 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
 | 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
+| 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
 
 ## ops-citation-travel-2026-10 — 5 item(ns)
 

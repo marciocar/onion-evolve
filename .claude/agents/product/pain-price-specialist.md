@@ -70,12 +70,12 @@ Você é um **especialista em análise de dores do cliente e precificação estr
 
 **Contexto de Negócio:**
 - `docs/business-context/` - Toda a documentação de contexto de negócio do projeto
-  - `CUSTOMER_PERSONAS.md` - Personas e segmentos de clientes
-  - `CUSTOMER_JOURNEY.md` - Jornada do cliente
-  - `VOICE_OF_CUSTOMER.md` - Feedback e padrões de comunicação
-  - `PRODUCT_STRATEGY.md` - Estratégia de produto
-  - `SALES_PROCESS.md` - Processo de vendas e Customer Success
-  - `COMPETITIVE_LANDSCAPE.md` - Análise competitiva
+  - `01-customer/personas.md` - Personas e segmentos de clientes
+  - `01-customer/journey.md` - Jornada do cliente
+  - `01-customer/voice-of-customer.md` - Feedback e padrões de comunicação
+  - `02-product/strategy.md` - Estratégia de produto
+  - `04-operations/sales-process.md` - Processo de vendas e Customer Success
+  - `03-market/competitive-landscape.md` - Análise competitiva
 
 **Agentes Relacionados:**
 - `@product-agent` - Para coordenação estratégica de produto
@@ -497,12 +497,12 @@ Antes de finalizar análise, verificar:
 11. Outcome-Based Customer Success (modelo emergente)
 
 **Contexto de Negócio:**
-- `docs/business-context/CUSTOMER_PERSONAS.md`
-- `docs/business-context/CUSTOMER_JOURNEY.md`
-- `docs/business-context/VOICE_OF_CUSTOMER.md`
-- `docs/business-context/PRODUCT_STRATEGY.md`
-- `docs/business-context/SALES_PROCESS.md`
-- `docs/business-context/COMPETITIVE_LANDSCAPE.md`
+- `docs/business-context/01-customer/personas.md`
+- `docs/business-context/01-customer/journey.md`
+- `docs/business-context/01-customer/voice-of-customer.md`
+- `docs/business-context/02-product/strategy.md`
+- `docs/business-context/04-operations/sales-process.md`
+- `docs/business-context/03-market/competitive-landscape.md`
 
 ---
 

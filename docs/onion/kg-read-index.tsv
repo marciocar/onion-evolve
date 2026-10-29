@@ -1603,6 +1603,12 @@ docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md	Q_CORTEX_
 docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md	Q_CORTEX_HANDOFF_GATILHO	docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md	Q_CORTEX_PPTX_DOCX_PROXIMO_PASSO	docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-27-proposal-cortex-measured.md	Q_CORTEX_REGISTRO_DE_USO_GATILHO	docs/evolution/dissect/cortex-2026-10/cortex-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-29-signal-build-business-docs-consultoria.md	E_SINAL_BUILD_BUSINESS_DOCS_CONSULTORIA_1029	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-10-29-signal-build-business-docs-consultoria.md	Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-10-29-signal-business-context-nomes-e-hookspath.md	Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md	E_SINAL_WORKTREE_MATERIAL_IGNORADO_1029	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md	Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md	Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml

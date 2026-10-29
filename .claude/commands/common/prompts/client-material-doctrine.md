@@ -86,6 +86,20 @@ lacuna mais séria da doutrina.
 - **A guarda de nome comercial não alcança tudo.** As varreduras do framework derivam nomes do
   registro de membros, então **cliente não registrado é invisível a elas**. Num material que nomeia o
   cliente de propósito, a conferência é humana por construção.
+- **Fora do git, a regra do `.gitignore` vai sem barra final.** Escreva `_material`, e não `_material/`.
+  A forma com barra casa só diretório; um symlink de mesmo nome é arquivo, aparece como não rastreado, e um
+  `git add -A` o commita. Sem a barra, a regra cobre o diretório e o symlink (medido num adotante em
+  2026-10-29, que contornou pelo `.git/info/exclude`).
+- **Em worktree, o material ignorado se escreve no checkout principal.** O arquivo ignorado não viaja com o
+  git: ele some quando a worktree é removida, inclusive a worktree de agente em segundo plano. Escreva e
+  mantenha o material no checkout principal, e na worktree aponte para lá.
+- **Em worktree, o gate do grafo de reunião precisa da raiz do checkout principal.** O
+  `meeting-graph-check.sh` resolve `meta.x_meeting_source` e os `trace:` contra a raiz git; na worktree, o
+  material não está lá, e o symlink para o checkout principal sai da raiz pelo realpath
+  (FONTE-FORA-DA-RAIZ). Rode com `--root <checkout principal>`:
+  `bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> --root "$(git rev-parse --path-format=absolute --git-common-dir)/.."`.
+  O `--root` vale para TODOS os `trace:` do grafo, não só o material: um derivado em `docs/meetings/` mudado só na
+  worktree é julgado contra a versão do checkout principal. Confira o grafo de novo depois do merge.
 
 ### 7. Quando o limite é material, avisar é parte do material
 

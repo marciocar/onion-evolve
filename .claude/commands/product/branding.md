@@ -8,7 +8,7 @@ allowed-tools: Read Edit
 category: product
 tags: [branding, positioning, marketing]
 version: "3.0.0"
-updated: "2026-06-02"
+updated: "2026-10-29"
 related_agents:
   - branding-positioning-specialist
 ---
@@ -28,15 +28,15 @@ Comando especializado para trabalhar com Branding e Posicionamento de Marca usan
 
 **1.1. Carregar Contexto de Negócio**
 - Ler arquivos em `docs/business-context/` para entender:
-  - Estratégia de produto (`PRODUCT_STRATEGY.md`)
-  - Posicionamento competitivo (`COMPETITIVE_LANDSCAPE.md`)
-  - Framework de mensagens (`MESSAGING_FRAMEWORK.md`)
-  - Personas de clientes (`CUSTOMER_PERSONAS.md`)
-  - Jornada do cliente (`CUSTOMER_JOURNEY.md`)
-  - Voz do cliente (`VOICE_OF_CUSTOMER.md`)
-  - Processo de vendas (`SALES_PROCESS.md`)
-  - Métricas de produto (`PRODUCT_METRICS.md`)
-  - Tendências da indústria (`INDUSTRY_TRENDS.md`)
+  - Estratégia de produto (`02-product/strategy.md`)
+  - Posicionamento competitivo (`03-market/competitive-landscape.md`)
+  - Framework de mensagens (`04-operations/messaging-framework.md`)
+  - Personas de clientes (`01-customer/personas.md`)
+  - Jornada do cliente (`01-customer/journey.md`)
+  - Voz do cliente (`01-customer/voice-of-customer.md`)
+  - Processo de vendas (`04-operations/sales-process.md`)
+  - Métricas de produto (`02-product/metrics.md`)
+  - Tendências da indústria (`03-market/industry-trends.md`)
 
 **1.2. Identificar Informações Relevantes**
 - Extrair elementos que informam branding:
@@ -118,11 +118,11 @@ Comando especializado para trabalhar com Branding e Posicionamento de Marca usan
 ### 4. Integração com Contexto Existente
 
 **4.1. Atualizar Documentos de Negócio**
-- Atualizar `MESSAGING_FRAMEWORK.md` com:
+- Atualizar `04-operations/messaging-framework.md` com:
   - Brand Positioning Statement formal
   - Posicionamento estratégico atualizado
   - Brand guidelines quando aplicável
-- Atualizar `COMPETITIVE_LANDSCAPE.md` com:
+- Atualizar `03-market/competitive-landscape.md` com:
   - Análise de posicionamento competitivo
   - Matriz de posicionamento visual
   - Diferenciação estratégica
@@ -256,16 +256,16 @@ Comando especializado para trabalhar com Branding e Posicionamento de Marca usan
 ```
 
 **Processo:**
-1. Carregar contexto de negócio (PRODUCT_STRATEGY, CUSTOMER_PERSONAS, COMPETITIVE_LANDSCAPE)
+1. Carregar contexto de negócio (02-product/strategy, 01-customer/personas, 03-market/competitive-landscape)
 2. Identificar público-alvo: startups e empresas que precisam capacitar equipes
 3. Extrair diferenciação: curadoria + metodologia + evidências + custo acessível
 4. Invocar @branding-positioning-specialist com contexto consolidado
 5. Desenvolver Brand Positioning Statement formal
-6. Atualizar MESSAGING_FRAMEWORK.md com posicionamento
+6. Atualizar 04-operations/messaging-framework.md com posicionamento
 
 **Output:**
 - Brand Positioning Statement completo e fundamentado
-- Documentação atualizada em MESSAGING_FRAMEWORK.md
+- Documentação atualizada em 04-operations/messaging-framework.md
 - Análise de posicionamento usando frameworks (Porter, Matriz)
 
 ---
@@ -278,12 +278,12 @@ Comando especializado para trabalhar com Branding e Posicionamento de Marca usan
 ```
 
 **Processo:**
-1. Carregar COMPETITIVE_LANDSCAPE.md para identificar concorrentes
+1. Carregar 03-market/competitive-landscape.md para identificar concorrentes
 2. Extrair dimensões relevantes do mercado
 3. Invocar @branding-positioning-specialist para análise competitiva
 4. Criar matriz de posicionamento visual
 5. Identificar oportunidade de posicionamento único
-6. Atualizar COMPETITIVE_LANDSCAPE.md com análise
+6. Atualizar 03-market/competitive-landscape.md com análise
 
 **Output:**
 - Matriz de posicionamento completa
@@ -301,13 +301,13 @@ Comando especializado para trabalhar com Branding e Posicionamento de Marca usan
 ```
 
 **Processo:**
-1. Carregar MESSAGING_FRAMEWORK.md para entender tom de voz existente
-2. Carregar PRODUCT_STRATEGY.md para valores e propósito
-3. Carregar CUSTOMER_PERSONAS.md para público-alvo
+1. Carregar 04-operations/messaging-framework.md para entender tom de voz existente
+2. Carregar 02-product/strategy.md para valores e propósito
+3. Carregar 01-customer/personas.md para público-alvo
 4. Invocar @branding-positioning-specialist para desenvolver guidelines
 5. Colaborar com @storytelling-business-specialist para narrativa
 6. Criar manual completo de brand guidelines
-7. Atualizar MESSAGING_FRAMEWORK.md com guidelines
+7. Atualizar 04-operations/messaging-framework.md com guidelines
 
 **Output:**
 - Brand Guidelines completo (identidade visual e verbal)
@@ -325,7 +325,7 @@ Comando especializado para trabalhar com Branding e Posicionamento de Marca usan
 ```
 
 **Processo:**
-1. Carregar INDUSTRY_TRENDS.md para tendências do mercado
+1. Carregar 03-market/industry-trends.md para tendências do mercado
 2. Carregar contexto completo de negócio
 3. Invocar @branding-positioning-specialist para estratégia 2025
 4. Aplicar tendências relevantes (sustentabilidade, personalização, omnicanal, etc.)
@@ -425,7 +425,7 @@ R: Recomendado, mas o comando pode trabalhar com contexto parcial. Gaps serão i
 R: Sim! O comando suporta análise de posicionamento atual e desenvolvimento de novo posicionamento.
 
 **P: O comando atualiza automaticamente os documentos de negócio?**  
-R: Sim, o comando atualiza MESSAGING_FRAMEWORK.md e COMPETITIVE_LANDSCAPE.md com branding desenvolvido.
+R: Sim, o comando atualiza 04-operations/messaging-framework.md e 03-market/competitive-landscape.md com branding desenvolvido.
 
 **P: Posso desenvolver apenas parte do branding (ex: só posicionamento)?**  
 R: Sim! Especifique no input o que deseja desenvolver. O comando se adapta ao escopo.

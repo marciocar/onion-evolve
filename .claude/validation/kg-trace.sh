@@ -15,6 +15,7 @@
 # carregava: id entre aspas COM as aspas, alvo da 2ª raiz com `../` e 3ª raiz não indexada.
 #
 # A raiz externa `memory/` (a memória da sessão, fora do repo) é declarada ao produto com --external-root.
+# Outras raízes externas vêm do ALVO (ver «Ext.» abaixo): o material que mora numa pasta ignorada pelo git.
 #
 # Uso  : bash .claude/validation/kg-trace.sh [<repo_root>] [--format tsv | --emit-index [--out <arquivo>]]
 # --out: o índice é escrito num temporário AO LADO do destino e só troca o destino (mv) com rc 0. Existe porque
@@ -45,6 +46,17 @@
 #        fixture, e um adotante pode guardar grafos quebrados DE PROPÓSITO noutro lugar (medido em 2026-10-25: o
 #        kg-ssot tem 8 casos inválidos em docs/onion/measurements/, que o CI dele exclui; o update os tornava 8 HARD
 #        da REGRA 55 com ILEGIVEL). O arquivo é do adotante; o core não escreve nele.
+# Ext. : <repo_root>/.kg-ssot/trace-external-roots.txt (do ALVO, opcional) — um prefixo relativo por linha, `#`
+#        comenta, o mesmo parser do trace-excludes.txt; cada um vira mais um `--external-root`, somado ao `memory/`
+#        fixo. Existe porque o material de cliente mora numa pasta ignorada pelo git (doutrina client-material), e o
+#        `/product:extract-meeting` grava `trace: <pasta-ignorada>/transcricao.md#Lx`: sem a declaração, cada nó do
+#        grafo de reunião vira `integrity.trace-target-missing` (20 HARD da REGRA 55 medidos num adotante em
+#        2026-10-29, pela REGRA 55 (O `trace:` de um nó APONTA para alvo que EXISTE)). O prefixo declarado sai do julgamento como external_root (contado no skipped, não resolvido).
+#        O prefixo é casado LITERALMENTE com o texto do `trace:` (startswith do produto, antes de tirar `./`): escreva-o
+#        com barra final (`_material/`, ao contrário da regra do .gitignore), senão `_material` isenta `_material2/…`, e
+#        `./_material/x` não casa. A isenção vale também onde o material existe (o checkout principal): lá quem
+#        julga o trace é o meeting-graph-check.sh. Arquivo ausente = só `memory/`. Prefixo absoluto é recusado pelo produto (entrada quebrada, rc 2).
+#        O arquivo é do adotante; o core não escreve nele.
 # Env  : ONION_KG_TRACE — caminho do kg_trace.py (default: <repo_root>/vendor/kg-ssot/tools/kg_trace.py; a bancada
 #        aponta o do core quando roda numa caixa de areia sem vendor).
 set -euo pipefail
@@ -114,6 +126,14 @@ if [ -f "${REPO_ROOT}/.kg-ssot/trace-excludes.txt" ]; then
     [ -n "${_g}" ] && _KT_EXCL+=(--exclude "${_g}")
   done < "${REPO_ROOT}/.kg-ssot/trace-excludes.txt"
 fi
+# as raízes externas: o `memory/` fixo e, opcional, as do alvo (mesmo parser do trace-excludes.txt)
+_KT_EXT=(--external-root memory/)
+if [ -f "${REPO_ROOT}/.kg-ssot/trace-external-roots.txt" ]; then
+  while IFS= read -r _g || [ -n "${_g}" ]; do
+    _g="${_g%%#*}"; _g="${_g#"${_g%%[![:space:]]*}"}"; _g="${_g%"${_g##*[![:space:]]}"}"
+    [ -n "${_g}" ] && _KT_EXT+=(--external-root "${_g}")
+  done < "${REPO_ROOT}/.kg-ssot/trace-external-roots.txt"
+fi
 # o próprio produto KG-SSOT (tools/ na raiz, sem vendor de si mesmo) se julga pelo kg_trace.py dele
 [ -n "${ONION_KG_TRACE:-}" ] || [ -f "${KT}" ] || [ ! -f "${REPO_ROOT}/tools/kg_trace.py" ] || KT="${REPO_ROOT}/tools/kg_trace.py"
 command -v python3 >/dev/null 2>&1 || { echo "ERRO kg-trace: python3 ausente" >&2; exit 2; }
@@ -128,7 +148,7 @@ if [ "${MODE}" = index ]; then
   # O rc do produto é lido, nunca a prosa: 0|1 trazem o JSON (1 = há missing ou grafo ilegível, que a REGRA 55
   # acusa; o índice segue com o que resolve). Outro rc, JSON ilegível ou sem `resolved_targets` = NAO-GEROU, rc 2.
   _kj="$(mktemp)"; trap 'rm -f "${_kj}"' EXIT
-  _krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
+  _krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" "${_KT_EXT[@]}" ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
   case "${_krc}" in
     0|1) : ;;
     3) echo "ERRO kg-trace --emit-index: índice VAZIO (o produto não leu nenhum grafo; 0 nós com trace resolvível)" >&2; exit 3 ;;
@@ -158,7 +178,7 @@ PY
 fi
 
 if [ "${MODE}" = human ]; then
-  _hrc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} || _hrc=$?
+  _hrc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" "${_KT_EXT[@]}" ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} || _hrc=$?
   [ "${_hrc}" -ne 3 ] || { echo "AVISO kg-trace: corpus vazio (o kg_trace.py não leu nenhum grafo, rc 3)" >&2; exit 0; }
   exit "${_hrc}"
 fi
@@ -167,7 +187,7 @@ fi
 # O rc do produto é lido, nunca a prosa: 0 resolve · 1 missing/ilegível · outro = entrada quebrada (a regra vira
 # HARD de ambiente no lint, nunca verde).
 _kj="$(mktemp)"; trap 'rm -f "${_kj}"' EXIT
-_krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" --external-root memory/ ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
+_krc=0; python3 -I -B "${KT}" check --root "${REPO_ROOT}" "${_KT_EXT[@]}" ${_KT_EXCL[@]+"${_KT_EXCL[@]}"} --format json >"${_kj}" 2>/dev/null || _krc=$?
 # rc 3 = corpus vazio (kg-ssot >= 4.27): o JSON pode nem vir, e a guarda de vacuidade abaixo julga do mesmo jeito
 # (corpus com `trace:` e nada lido segue VACUIDADE). Sem achado, sai 0.
 case "${_krc}" in
