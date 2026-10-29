@@ -443,11 +443,11 @@ nodes:
     owner: kg-ssot
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-28"
+    verified_at: "2026-10-29"
     evidence_class: testimony
-    verified_against: "relato da curadoria ao censo cruzado de 2026-10-28, confirmado pelo kg-ssot na correção do mesmo dia"
-    label: "A aresta tipada entre repos pela URL fixada, que fecha os 3 buracos de E_OBJECAO_CB_KG_SPLIT, candidata à 4.38.0."
-    narrative: "E_OBJECAO_CB_KG_SPLIT é nó da curadoria. A peça é do contrato e liga ao Q_MA_CROSS_REPO do grafo do Company Brain, que só abre se Q_MA_WRITE_SURFACE escolher superfície com mais de um repo. Gatilho: o pré-registro do kg-ssot."
+    verified_against: "medida da bancada da kg-ssot 4.39.0 sobre os 3 buracos de E_OBJECAO_CB_KG_SPLIT, relatada ao core em 2026-10-29 e não re-executada por ele; o kg-ssot registrou o mesmo em Q_KG_CROSS_REPO_TYPED_EDGE_1029, no grafo do repo dele"
+    label: "Dos 3 buracos de E_OBJECAO_CB_KG_SPLIT, o do pin já se cobre por citação; a aresta tipada com ponta por URL pede contrato e o grafo de submodule pede ferramenta."
+    narrative: "Medida da bancada 4.39.0. Buraco 3 (o pin): coberto pela citação com URL fixada no commit. Buraco 1 (aresta tipada com uma ponta por URL): pede CONTRATO, porque essa aresta reprova no MUST (form.pattern.edge.from e integrity.dangling-from) e o external_edges só aceita caminho do mesmo repo. Buraco 2 (o grafo de submodule): pede FERRAMENTA, porque o --root não lê o grafo de um submodule. E_OBJECAO_CB_KG_SPLIT é nó da curadoria. A peça liga ao Q_MA_CROSS_REPO do grafo do Company Brain. Gatilho: Q_MA_WRITE_SURFACE escolher uma superfície com mais de um repo. O kg-ssot registrou o mesmo em Q_KG_CROSS_REPO_TYPED_EDGE_1029 (citado em texto, sem aresta externa: o grafo mora em outro repo). Segue open."
   - id: Q_COORD_KGSSOT_HASH_CANONICO_SCHEME_KG_NODE
     node_type: question
     layer: audit
