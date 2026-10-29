@@ -819,10 +819,11 @@ def main(argv=None):
 
 def main_digest(args):
     """kg_trace.py digest ARQUIVO#ID...: o provenance.node_sha256 de cada nó (contrato v4.18), o SHA-256 do JCS (RFC
-    8785) do nó no modelo canônico do grafo, para quem anota a ponte kg-node. rc 0 · 1 nó que não existe ou se repete,
-    grafo ilegível (NOT FOUND) ou nó sem forma JCS, como um inteiro fora de ±(2^53−1) (NO CANONICAL FORM) · 2 entrada
-    quebrada. Com --format json (4.39.0), kg-ssot.digest/1 (spec/digest.schema.json): um resultado por referência, com o
-    status ok, not_found ou no_canonical_form."""
+    8785) do nó no modelo canônico do grafo, para quem anota a ponte kg-node. rc 0 · 1 nó que não existe ou se repete
+    (NOT FOUND), grafo que não parseia (UNREADABLE, desde a 4.39.1, com o código do leitor) ou nó sem forma JCS, como um
+    inteiro fora de ±(2^53−1) (NO CANONICAL FORM) · 2 entrada quebrada. Com --format json (4.39.0), kg-ssot.digest/1
+    (spec/digest.schema.json): um resultado por referência, com o status ok, not_found, unreadable ou
+    no_canonical_form."""
     if not args.pages:
         print(_("BROKEN INPUT  {error}").format(error=_("digest takes FILE#ID")), file=sys.stderr)
         return 2
@@ -844,19 +845,24 @@ def main_digest(args):
             return 2
         _tree, doc, code = kg_validate.parse_v1(kg_validate.as_source(path, text))
         digest = None if code else kg_validate.node_digest(doc, nid)
-        status = "ok"
-        if digest is None:
-            found = not code and isinstance(doc, dict) and isinstance(doc.get("nodes"), list) and sum(
+        status, extra = "ok", {}
+        if code:
+            status, extra = "unreadable", {"code": code}  # o grafo não parseia: o nó não foi procurado, não está ausente
+            rc = 1
+        elif digest is None:
+            found = isinstance(doc, dict) and isinstance(doc.get("nodes"), list) and sum(
                 1 for n in doc["nodes"] if isinstance(n, dict) and n.get("id") == nid) == 1
             status = "no_canonical_form" if found else "not_found"
             rc = 1
-        results.append({"ref": ref, "file": path, "id": nid, "node_sha256": digest, "status": status})
+        results.append({"ref": ref, "file": path, "id": nid, "node_sha256": digest, "status": status, **extra})
     if args.format == "json":
         print(json.dumps({"schema_version": "kg-ssot.digest/1", "results": results}, ensure_ascii=False, indent=1))
         return rc
     for r in results:
         if r["status"] == "ok":
             print(f"{r['node_sha256']}  {r['ref']}")
+        elif r["status"] == "unreadable":
+            print(_("UNREADABLE  {ref}  {code}").format(ref=r["ref"], code=r["code"]))
         else:
             print((_("NO CANONICAL FORM  {ref}") if r["status"] == "no_canonical_form" else
                    _("NOT FOUND  {ref}")).format(ref=r["ref"]))

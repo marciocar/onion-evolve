@@ -10,6 +10,14 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.39.1] - 2026-10-29
+
+No contract change (still v4.18).
+
+- `kg-trace digest`: a graph that does not parse is now `unreadable`, with the reader's `code` (text: `UNREADABLE
+  FILE#ID CODE`), and no longer `not_found`. The node was not looked for, so it is not missing. The exit code stays 1.
+  Found in a field test of 4.39.0.
+
 ## [4.39.0] - 2026-10-29
 
 No contract change (still v4.18). When several long-lived sessions share one coordination graph, each with its

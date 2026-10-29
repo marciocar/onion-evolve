@@ -3581,6 +3581,10 @@ msgid "· {n} support(s) are outside the corpus and were not judged ({why}): {id
 msgstr "· {n} apoio(s) estão fora do corpus e não foram julgados ({why}): {ids}"
 
 #: tools/kg_trace.py
+msgid "UNREADABLE  {ref}  {code}"
+msgstr "ILEGÍVEL  {ref}  {code}"
+
+#: tools/kg_trace.py
 msgid "NOT FOUND  {ref}"
 msgstr "NÃO ACHADO  {ref}"
 
