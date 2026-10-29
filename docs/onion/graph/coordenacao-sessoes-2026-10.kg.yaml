@@ -416,11 +416,11 @@ nodes:
     owner: core
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-28"
+    verified_at: "2026-10-29"
     evidence_class: testimony
-    verified_against: "relato da curadoria ao censo cruzado de 2026-10-28; o sinal docs/evolution/inbox/2026-10-28-proposal-esperanto.md chegou ao inbox do core e ainda não está na main"
-    label: "Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT (estacionar com gatilho)."
-    narrative: "Os vereditos são da curadoria, no grafo dela; o selo é do maestro, pelo /meta:decide, e a execução depois do selo é do core. O sinal está em docs/evolution/inbox/2026-10-28-proposal-esperanto.md. Gatilho: a triagem do sinal pelo core, que leva as duas perguntas ao maestro."
+    verified_against: "os dois sinais da curadoria, docs/evolution/inbox/2026-10-28-proposal-esperanto.md e docs/evolution/inbox/2026-10-28-proposal-esperanto-ports.md, lidos inteiros e versionados no inbox do core na triagem de 2026-10-29"
+    label: "Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT_REJECT (rejeitar, sem costura), que substitui o parquear da 1ª versão."
+    narrative: "Os vereditos são da curadoria, no grafo dela; o selo é do maestro e a execução depois do selo é do core. Há duas versões do sinal: a 1ª (proposal-esperanto) propunha parquear o cliente de vários provedores; a 2ª (proposal-esperanto-ports) traz a resposta do maestro pelo /meta:decide de 2026-10-28, depois do braço das portas: rejeitar as duas peças, sem costura. A 2ª substitui a 1ª. Os dois nós estão open no grafo da curadoria, com a resposta do maestro como testemunho, e fecham com x_dissect_sealed_by quando o core selar. Os dois sinais ficam no inbox até o selo. Gatilho: o selo do maestro."
   - id: Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE
     node_type: question
     layer: audit
@@ -509,6 +509,45 @@ nodes:
     verified_against: "os sinais docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher.md (o pedido do hub) e docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher-market.md (o estudo da curadoria, PR 162 dela), lidos em 2026-10-29; os casos W1 a W3d são medida da curadoria numa cópia do core fixada em 1d04d4e24, não re-executada pelo core"
     label: "Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático com o «só o humano envia»."
     narrative: "O hub pediu um vigia que leve e-mail, Slack, wiki, GitHub e AWS ao Onion sem um Claude aberto; a curadoria estudou o padrão de mercado por camada. As quatro decisões do maestro: (1) a coleta, pelo Argo Events num k3s com EventBus ou por coletores finos próprios, declarados; (2) o aceite dos eventos, em lote ou automático por regra para coletor confiável e assinado (a triagem antes do aceite contorna o gate e não é recomendada); (3) o Gmail, por push pelo Google Cloud, por IMAP com OAuth ou por IMAP com senha de app; (4) o conflito entre o aviso automático pedido pelo hub e a regra «só o humano envia», mais um membro por coletor no members.yaml. A hipótese do maestro: o vigia roda sobre o A2A do Onion, cada coletor é um remetente A2A que assina o envelope CloudEvents, a fila do receptor no bridge é a caixa durável, o aceite reverifica e a triagem usa a peça de rascunho. Medido pela curadoria numa cópia do core: o CloudEvent assinado passa no a2a-verify, a repetição e o corpo trocado são vetados, e o mutante sem o body_sha256 deixa passar o adulterado. NÃO exercitados: o aceite, a fila do bridge e um coletor real. O A2A 1.0 oficial não assina mensagem; a assinatura é do perfil Onion, e a ligação A2A-CloudEvents é solução própria, porque o mercado não a tem. O pedido de perfil event foi aceito pelo kg-ssot; a hipótese é não precisar de perfil novo, com os atributos do CloudEvents (id, source, type, time, subject e o link) mapeados num nó evidence. Gatilho: a rodada do /meta:decide com o maestro."
+  - id: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-29"
+    evidence_class: testimony
+    verified_against: "sinal da curadoria document-control-2026-10, versionado no inbox do core em docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md (revisado para público), lido inteiro na triagem de 2026-10-29; a medição é do laboratório da curadoria com dados sintéticos, não re-executada no core"
+    label: "Decidir o --pin <caminho#ID> no kg-decide-seal.sh, que grava o nó E_ irmão com o node_sha256 da versão aprovada; antes do código, o desenho passa pelo kg-ssot."
+    narrative: "A curadoria propõe fechar o ciclo do documento controlado com a corrente de hashes que o contrato já tem: o D_ selado com o testemunho e um E_ irmão (aresta E_ SUPPORTS D_) que fixa o node_sha256 do documento aprovado. A peça que falta é o selo gravar esse E_ sem mexer na proveniência do testemunho. Achado medido pela curadoria na 4.39.0, para o kg-ssot: o --revisit do kg_query NÃO acende quando o documento aprovado muda, nem com o hash regravado; ele julga só a cadência vencida e o REFUTES, e o upstream_changed compara o status, não o hash. Só o kg_trace check acusa a mudança, como node-sha256-mismatch. A curadoria propôs ao kg-ssot um motivo de revisita «o hash fixado mudou», para a aprovação entrar na fila de revisão e não só no check. Gatilho: decisão do maestro. Depois do selo, o desenho vai ao kg-ssot e o código é do core."
+  - id: Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-29"
+    evidence_class: testimony
+    verified_against: "sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 2, lido na triagem de 2026-10-29; o --where x_raci.responsible=X da 4.39.0 é medição da curadoria, não re-executada no core"
+    label: "Decidir que x_raci, x_doc_version, x_copy_* e o par E_ SUPPORTS D_ ficam como convenção do adotante até dois adotantes usarem a mesma forma."
+    narrative: "O kg-ssot já propôs a forma: x_raci aninhado (responsible, accountable, consulted, informed), lido pelo --where da 4.39.0, com o owner do contrato como o A. Nenhuma norma exige RACI (a SOC 2 pede responsabilidade definida, não a matriz). A proposta é não promover nada a perfil canônico com um uso só: a convenção vira perfil quando um 2º adotante usar a mesma forma. Gatilho: decisão do maestro; depois dela, o gatilho da promoção é o 2º uso."
+  - id: Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: maestro
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-29"
+    evidence_class: testimony
+    verified_against: "sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 3, lido na triagem de 2026-10-29"
+    label: "Decidir levar ao hub a receita do piloto do documento controlado: o procedimento com dono e RACI, a cadência, PDF e DOCX gerados da fonte, um COPY_ por camada e a aprovação com o par de nós."
+    narrative: "O piloto é do hub, pela sessão dele (um escritor por repo); o core leva só a forma, sem conteúdo do hub. A ordem proposta é: (1) o procedimento de controle de acesso como nó com dono e RACI; (2) a cadência com reverify_every, que dá aviso pelo --due e pelo radar, não reprovação; (3) a fonte gerando PDF e DOCX (Pandoc e WeasyPrint, medidos pela curadoria); (4) um COPY_ por camada (wiki, Drive, Slack), com o adaptador do hub; (5) a aprovação com o par de nós, que depende do --pin. Gatilho: decisão do maestro."
 edges:
   - from: Q_COORD_UPDATE_4_ADOTANTES_4390
     to: Q_COORD_UPDATE_4_ADOTANTES_4380
@@ -626,4 +665,10 @@ edges:
     edge_type: TRACES_TO
   - from: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
     to: Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO
+    edge_type: TRACES_TO
+  - from: Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB
+    to: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
+    edge_type: DEPENDS_ON
+  - from: Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE
+    to: Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB
     edge_type: TRACES_TO

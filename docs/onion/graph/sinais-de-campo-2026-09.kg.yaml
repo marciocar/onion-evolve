@@ -1640,6 +1640,92 @@ nodes:
       locator: "brief do PR de manutenção do core, item 10, 2026-10-28"
       method: "testimony: relato de um caso, não medido no core"
       locality: "pessoa"
+  - id: E_SINAL_WORKTREE_MATERIAL_IGNORADO_1029
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-29"
+    verified_against: "sinal de campo de um adotante sem registro, transcrito pelo core sem o nome do adotante e lido inteiro na triagem de 2026-10-29; as medições são do adotante, não re-executadas no core"
+    label: "Num adotante com material de cliente em pasta ignorada, a worktree produziu quatro atritos: core.hooksPath absoluto, FONTE-FORA-DA-RAIZ no meeting-graph-check, a regra dir/ do .gitignore sem cobrir o symlink e 20 HARD da REGRA 55 (O `trace:` de um nó APONTA para alvo que EXISTE)."
+    narrative: "O core absorveu no PR desta triagem o que era barato: a doutrina client-material recomenda a regra sem barra final, diz que o material ignorado se escreve no checkout principal e documenta o --root do meeting-graph-check.sh em worktree; o kg-trace.sh lê o .kg-ssot/trace-external-roots.txt opcional e soma cada prefixo como --external-root, com o caso (j) na bancada kg_trace_root_file. Ficam abertos o reescrever automático do core.hooksPath, o meeting-graph-check aceitar a raiz do worktree principal sozinho e a criação do arquivo de raízes externas pela adoção ou pelo extract-meeting. A afirmação do sinal de que o /meta:adopt gerou _material/ com barra não foi achada no core: o grep por _material em .claude e ops deu zero linha de adoção em 2026-10-29. A decisão de versionar docs/meetings/ é do adotante e não ganha nó aqui."
+    trace: "docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md"
+      locator: "os quatro itens numerados e o corolário"
+      method: "testimony: medição feita no adotante e recebida por mensagem entre sessões; não remedida no core"
+      locality: "repo"
+  - id: E_SINAL_BUILD_BUSINESS_DOCS_CONSULTORIA_1029
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-29"
+    verified_against: "sinal de campo de um adotante sem registro, transcrito pelo core sem o nome do adotante e lido inteiro na triagem de 2026-10-29; as medições são do adotante, não re-executadas no core"
+    label: "No dogfood de uma consultoria, o /docs:build-business-docs não carimbava a REGRA 15, não listava o /meta:inventory, pesquisava fora do onion-research e supunha produto próprio."
+    narrative: "O core absorveu no PR desta triagem os itens 2, 3 e 4 e a marca pedida pelo maestro: a Fase 3 manda carimbar Última Atualização em cada arquivo, os próximos passos e o QA trazem o /meta:inventory pela REGRA 8 (Inventário canônico sincronizado com o filesystem), a Fase 1.2 roteia para a skill onion-research e a marca [DECISÃO PENDENTE] entra ao lado de [INFERIDO] e [TO BE COMPLETED], no comando e no template. O item 1, o modo de engajamento de consultoria, fica aberto: tem um uso só. Um 2º sinal do mesmo dia (2026-10-29-signal-business-context-nomes-e-hookspath, em _processed) mostrou que o /product:analyze-pain-price, o @pain-price-specialist e outros consumidores liam os nomes antigos em caixa alta (CUSTOMER_PERSONAS.md e afins), que o build não gera; no mesmo PR, 65 menções em 6 arquivos de .claude/ passaram aos nomes do build (01-customer/personas.md e afins)."
+    trace: "docs/evolution/inbox/_processed/2026-10-29-signal-build-business-docs-consultoria.md"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-29-signal-build-business-docs-consultoria.md"
+      locator: "os itens 1 a 4 e «O que funcionou»"
+      method: "testimony: medição feita no adotante e recebida por mensagem entre sessões; não remedida no core"
+      locality: "repo"
+  - id: Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-29"
+    evidence_class: testimony
+    verified_against: "sinal de campo de 2026-10-29 em docs/evolution/inbox/_processed/2026-10-29-signal-build-business-docs-consultoria.md, lido inteiro na triagem; não remedido no core"
+    label: "O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente e a oferta toma o lugar do produto?"
+    narrative: "O comando e o template supõem que o repositório é o produto de quem o usa: personas são os clientes do produto e o sales-process é o do produto. Numa consultoria as camadas foram reinterpretadas à mão (personas do engajamento e clientes do cliente, a oferta no lugar do produto). Um uso só não paga o modo novo. Gatilho: o 2º engajamento de consultoria que rode o comando."
+    trace: "docs/evolution/inbox/_processed/2026-10-29-signal-build-business-docs-consultoria.md"
+  - id: Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-29"
+    evidence_class: testimony
+    verified_against: "sinais de campo de 2026-10-29 em docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md (item 1) e em docs/evolution/inbox/_processed/2026-10-29-signal-business-context-nomes-e-hookspath.md (item 2, a recorrência), lidos inteiros na triagem; no core, a worktree desta triagem nasceu com o core.hooksPath a corrigir à mão; não remedido no adotante"
+    label: "O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (core e adotante)."
+    narrative: "Com o core.hooksPath absoluto, toda worktree roda o pre-commit do checkout principal, e um PR que mexe no pre-commit não se prova sozinho. O session-currency-check.sh avisa; a causa provável é a criação de worktree de agente pelo harness. Recorrência medida em 2 repos (core e adotante): no adotante, a correção à mão (git config core.hooksPath .githooks) foi desfeita pela worktree nova seguinte do harness, e o aviso voltou; no core, a correção à mão é rotina. Proposta: hook que reescreve para relativo (no install-onion-githook.sh ou num check de sessão), não só o aviso. Não implementado nesta triagem porque muda hook e configuração do git do usuário; a forja é pelo /meta:forge-guard. Gatilho: decisão do maestro de forjar; a recorrência já está medida."
+    trace: "docs/evolution/inbox/_processed/2026-10-29-signal-business-context-nomes-e-hookspath.md"
+  - id: Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-29"
+    evidence_class: testimony
+    verified_against: "sinal de campo de 2026-10-29 em docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md, lido inteiro na triagem; não remedido no core"
+    label: "O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir/..)?"
+    narrative: "Na worktree, o material ignorado não existe, e o symlink para o checkout principal sai da raiz pelo realpath (FONTE-FORA-DA-RAIZ). O contorno documentado agora na doutrina client-material é o --root do checkout principal. Aceitar a raiz principal sozinho afrouxa a guarda e pede o conjunto de 7 peças. Gatilho: o 2º caso de FONTE-FORA-DA-RAIZ em worktree, ou um adotante que esqueça o --root no CI."
+    trace: "docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md"
+  - id: Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-29"
+    evidence_class: testimony
+    verified_against: "sinal de campo de 2026-10-29 em docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md, lido inteiro na triagem; não remedido no core"
+    label: "A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pasta ignorada?"
+    narrative: "O kg-trace.sh passou a ler o arquivo, mas ninguém o cria: o adotante o escreve à mão. Sem ele, cada nó do grafo de reunião com trace para a pasta ignorada dá integrity.trace-target-missing na worktree e no CI. Gatilho: o 2º adotante com material de cliente em pasta ignorada."
+    trace: "docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md"
 edges:
   - from: Q_META_VELHO_EM_GRAFO_SELADO_1028
     to: D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028
@@ -1956,3 +2042,15 @@ edges:
   - from: E_IDA_E_VOLTA_CONTAMINACAO_E_SEIS_CURAS_1028
     to: E_A2A_PECA_RASCUNHO_BANCADA_E_DOGFOOD_LOCAL_1027
     edge_type: CONSTRAINS
+  - from: Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029
+    to: E_SINAL_BUILD_BUSINESS_DOCS_CONSULTORIA_1029
+    edge_type: TRACES_TO
+  - from: Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029
+    to: E_SINAL_WORKTREE_MATERIAL_IGNORADO_1029
+    edge_type: TRACES_TO
+  - from: Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029
+    to: E_SINAL_WORKTREE_MATERIAL_IGNORADO_1029
+    edge_type: TRACES_TO
+  - from: Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029
+    to: E_SINAL_WORKTREE_MATERIAL_IGNORADO_1029
+    edge_type: TRACES_TO

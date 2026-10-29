@@ -36568,6 +36568,31 @@ run_kg_trace_root_file_selftests() {
   if [ "${rh0}" -eq 1 ] && [ "${rh1}" -eq 1 ] && [ "${rh2}" -eq 0 ]; then
     record_pass "kg-trace-root: (h) grafo quebrado fora de fixture reprova; o glob do .kg-ssot/trace-excludes.txt o tira; comentário não exclui"
   else record_fail "kg-trace-root: (h)" "rc sem/comentário/com glob = ${rh0}/${rh1}/${rh2}; esperado 1/1/0"; fi
+  # (j) material de cliente em pasta IGNORADA pelo git (sinal de campo de 2026-10-29: 20 HARD da REGRA 55 (O `trace:` de
+  #     um nó APONTA para alvo que EXISTE) num grafo de
+  #     reunião): o `trace:` aponta `_material/…`, que não está no repo nem no disco da worktree. Sem o .kg-ssot/trace-external-roots.txt reprova
+  #     (TARGET-MISSING, rc 1, o comportamento de antes); só com comentário segue reprovando; com o prefixo declarado sai
+  #     do julgamento como external_root (rc 0), e o `memory/` fixo segue valendo junto (o nó C_MEMORIA não reprova).
+  { printf 'meta:\n  id: g3\n  schema_version: "1"\nnodes:\n'
+    _no C_MATERIAL '_material/transcricao.md#L3'
+    _no C_MEMORIA  'memory/notas.md'
+    printf 'edges: []\n'; } > "${sb}/docs/onion/graph/g3.kg.yaml"
+  printf '_material\n' > "${sb}/.gitignore"
+  # o material NÃO existe no disco, como na worktree e no CI (o produto resolve pelo disco: no checkout principal, com a
+  # pasta presente, o trace resolve sozinho, e é fora dele que os HARD nasciam)
+  ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  local rj0=0 rj1=0 rj2=0 tj0 tj1 tj2
+  rm -f "${sb}/.kg-ssot/trace-external-roots.txt"
+  tj0="$(ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${sb}" --format tsv 2>&1)" || rj0=$?
+  printf '# só comentário\n   # _material\n' > "${sb}/.kg-ssot/trace-external-roots.txt"
+  tj1="$(ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${sb}" --format tsv 2>&1)" || rj1=$?
+  printf '# o material do cliente, fora do git\n   _material/   # a pasta ignorada, linha indentada\n' > "${sb}/.kg-ssot/trace-external-roots.txt"
+  tj2="$(ONION_KG_TRACE="${REPO_ROOT}/vendor/kg-ssot/tools/kg_trace.py" bash "${sb}/.claude/validation/kg-trace.sh" "${sb}" --format tsv 2>&1)" || rj2=$?
+  if [ "${rj0}" -eq 1 ] && grep -q $'\tC_MATERIAL\t.*TARGET-MISSING' <<< "${tj0}" \
+     && [ "${rj1}" -eq 1 ] && grep -q $'\tC_MATERIAL\t.*TARGET-MISSING' <<< "${tj1}" \
+     && [ "${rj2}" -eq 0 ] && ! grep -q 'C_MATERIAL\|C_MEMORIA' <<< "${tj2}"; then
+    record_pass "kg-trace-root: (j) trace em pasta ignorada: sem .kg-ssot/trace-external-roots.txt e só com comentário reprova; com o prefixo declarado sai como external_root, somado ao memory/"
+  else record_fail "kg-trace-root: (j)" "rc ausente/comentário/declarado = ${rj0}/${rj1}/${rj2}; esperado 1/1/0 (tsv0=${tj0:0:120} · tsv2=${tj2:0:120})"; fi
   # (i) rc 3 do produto (kg-ssot >= 4.27: nenhum grafo lido) é CORPUS VAZIO, não ENTRADA-QUEBRADA. Produto de
   #     mentira que sai 3 sem JSON: num corpus sem grafo, humano e TSV saem 0 e o índice sai 3 (o dia 1 do adotante);
   #     no corpus deste sandbox, que TEM `trace:`, o TSV segue acusando VACUIDADE (a guarda não fica cega pelo 3).

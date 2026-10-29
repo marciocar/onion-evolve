@@ -1,7 +1,7 @@
 ---
 name: build-business-docs
 description: Gerar arquitetura de contexto de negócio na pasta declarada (default `docs/business-context/`).
-allowed-tools: Read Write WebSearch Bash(find *) Bash(bash .claude/utils/scope/resolve-context-dir.sh *)
+allowed-tools: Read Write Skill WebSearch Bash(find *) Bash(bash .claude/utils/scope/resolve-context-dir.sh *)
 
 parameters:
   - name: sources
@@ -15,8 +15,8 @@ tags:
   - documentation
   - spec-as-code
 
-version: "4.1.0"
-updated: "2026-10-20"
+version: "4.2.0"
+updated: "2026-10-29"
 
 output_path: docs/business-context/
 
@@ -24,6 +24,8 @@ related_commands:
   - /docs:build-tech-docs
   - /meta:create-knowledge-base
   - /docs:build-index
+  - /meta:inventory
+  - /onion-research
 
 related_agents:
   - product-agent
@@ -88,7 +90,11 @@ Resultado esperado: documentação modular que permite que IA e humanos entendam
 - Entender modelo de negócio (preço, monetização, fluxos de receita)
 
 **1.2 Pesquisa de mercado**
-- Pesquisar panorama competitivo (via `WebSearch`)
+- Pesquisar panorama competitivo pela skill **`onion-research`**, que conduz ao workflow `/onion-research`:
+  ela injeta o corpus que os grafos já têm, fixa os eixos invariantes (mercado e capital, trajetória,
+  analistas, comunidade) e grava o resultado num `.kg.yaml` com tier de fonte e radar rc 0. Não use
+  `WebSearch` avulso nem agente de pesquisa solto com o grafo montado à mão; se o workflow não estiver
+  disponível, declare o desvio no `index.md`
 - Identificar tendências do setor e dinâmicas de mercado
 - Analisar segmentos de cliente e casos de uso
 - Mapear ambiente regulatório quando relevante
@@ -131,9 +137,24 @@ Faça múltiplas rodadas se necessário. Ao final, apresente um **resumo dos pon
 > `[INFERIDO]` e liste as suposições numa seção "Pendências de validação" no
 > `index.md`. Sem evidência → `[TO BE COMPLETED]`, nunca invenção.
 
+**As três marcas de lacuna** (valem nos dois modos, interativo ou não):
+
+| Marca | Quando usar |
+|-------|-------------|
+| `[INFERIDO]` | a afirmação foi deduzida das fontes, sem confirmação de quem decide |
+| `[TO BE COMPLETED]` | falta evidência; o dado existe, mas não foi coletado |
+| `[DECISÃO PENDENTE]` | é uma decisão de quem é dono do negócio que ainda não foi tomada ou aferida e que não pode ser inferida das fontes (preço, segmento prioritário, oferta). Liste-a nas "Pendências de validação" do `index.md`, com quem decide |
+
 ### Fase 3 — Geração
 
 Gere os arquivos em `docs/business-context/` seguindo a estrutura abaixo. Crie apenas os arquivos relevantes ao projeto (não é obrigatório preencher todas as camadas).
+
+> **Carimbo de frescor em cada arquivo.** Pela REGRA 15 (Frescor de contexto de domínio: carimbo de
+> atualização), todo arquivo gerado, exceto `index.md` e `README.md`, leva no cabeçalho, logo abaixo do título, a linha
+> `> **Última Atualização:** YYYY-MM-DD`, com a data da geração. O lint casa pelo radical `Atualiza` (ou por
+> `updated:`/`date:` no frontmatter); sem o carimbo, cada arquivo vira violação no primeiro commit, e a fase
+> Manage (`/meta:context-freshness`) não tem como medir a idade. Ao regenerar, atualize a data só dos
+> arquivos cujo conteúdo mudou.
 
 > **Convenção de nomes (esta seção tem precedência sobre o template-base).** Use
 > **kebab-case minúsculo** para todos os arquivos (`personas.md`,
@@ -204,6 +225,7 @@ docs/business-context/
    ∟ Revisar com stakeholders
    ∟ /docs:build-tech-docs (contexto técnico)
    ∟ /docs:build-index (atualizar índice mestre)
+   ∟ /meta:inventory (o inventário conta os arquivos de business-context/)
 
 ━━━━━━━━━━━━━━
 
@@ -218,7 +240,8 @@ docs/business-context/
 - [ ] Toda afirmação tem fonte rastreável (issue, depoimento, métrica, web search)
 - [ ] Análise competitiva usa informação verificável e atual
 - [ ] Modelo de negócio reflete realidade (não inventado)
-- [ ] Pontos não verificáveis estão marcados como `[TO BE COMPLETED]`
+- [ ] Pontos não verificáveis estão marcados como `[TO BE COMPLETED]`, e decisões do dono não tomadas, como `[DECISÃO PENDENTE]`
+- [ ] Cada arquivo gerado (exceto `index.md` e `README.md`) tem a linha `Última Atualização` no cabeçalho
 
 ### Otimização para IA
 - [ ] Personas incluem guidelines de interação com IA
@@ -230,6 +253,11 @@ docs/business-context/
 - [ ] Camadas relevantes ao projeto preenchidas
 - [ ] Jornada cobre awareness → advocacy
 - [ ] Estratégia alinhada com posicionamento real
+
+### Sincronização
+- [ ] **Passo final — sincronizar a SSOT:** após gerar, rodar **`/meta:inventory`**. O inventário conta os
+  arquivos de `business-context/`, e a REGRA 8 (Inventário canônico sincronizado com o filesystem) é HARD:
+  gerar sem regenerar barra o commit. Mecanismo: `common:prompts:inventory-sync-after-create`.
 
 ---
 

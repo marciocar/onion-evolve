@@ -7,7 +7,7 @@ allowed-tools: Read Glob
 category: product
 tags: [pain, pricing, discovery, value]
 version: "3.0.0"
-updated: "2026-06-02"
+updated: "2026-10-29"
 related_agents:
   - pain-price-specialist
 ---
@@ -38,12 +38,16 @@ Wrapper otimizado para `@pain-price-specialist`. Em vez de invocar o agente dire
 
 ### 1. Identificar tipo de análise
 
+> Os caminhos abaixo são relativos à pasta de contexto de negócio (`resolve-context-dir.sh business`, default
+> `docs/business-context/`) e seguem os nomes que o `/docs:build-business-docs` gera: kebab-case em subpastas
+> numeradas. Se o arquivo não existir com esse nome, procure pelo `index.md` da pasta antes de declarar ausência.
+
 | Tipo | Indicador | Contexto a carregar |
 |------|-----------|---------------------|
-| **A — Cliente específico** | menciona empresa/cliente nominal | `CUSTOMER_PERSONAS.md`, `CUSTOMER_JOURNEY.md` |
-| **B — Segmento/persona** | menciona segmento, sem cliente nominal | `CUSTOMER_PERSONAS.md`, `CUSTOMER_JOURNEY.md`, `VOICE_OF_CUSTOMER.md` |
-| **C — Validação de proposta de valor** | menciona preço/proposta atual a validar | `PRODUCT_STRATEGY.md`, `SALES_PROCESS.md`, `COMPETITIVE_LANDSCAPE.md` |
-| **D — Comparativa** | menciona múltiplos cenários/modelos | `COMPETITIVE_LANDSCAPE.md` + repetir invocação por cenário |
+| **A — Cliente específico** | menciona empresa/cliente nominal | `01-customer/personas.md`, `01-customer/journey.md` |
+| **B — Segmento/persona** | menciona segmento, sem cliente nominal | `01-customer/personas.md`, `01-customer/journey.md`, `01-customer/voice-of-customer.md` |
+| **C — Validação de proposta de valor** | menciona preço/proposta atual a validar | `02-product/strategy.md`, `04-operations/sales-process.md`, `03-market/competitive-landscape.md` |
+| **D — Comparativa** | menciona múltiplos cenários/modelos | `03-market/competitive-landscape.md` + repetir invocação por cenário |
 
 ### 2. Preparar contexto
 
@@ -123,6 +127,6 @@ Próximos passos: apresentar proposta outcome-based · validar WTP · contrato c
 ## 📚 Referências
 
 - **KB (frameworks/métodos):** `docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md`
-- **Contexto de negócio:** `docs/business-context/` (`CUSTOMER_PERSONAS`, `CUSTOMER_JOURNEY`, `VOICE_OF_CUSTOMER`, `PRODUCT_STRATEGY`, `SALES_PROCESS`, `COMPETITIVE_LANDSCAPE`)
+- **Contexto de negócio:** `docs/business-context/` (`01-customer/personas`, `01-customer/journey`, `01-customer/voice-of-customer`, `02-product/strategy`, `04-operations/sales-process`, `03-market/competitive-landscape`)
 - **Agente:** `@pain-price-specialist`
 - **Relacionados:** `@product-agent`, `/product/spec`, `/product/task`

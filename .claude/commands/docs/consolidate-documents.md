@@ -26,7 +26,7 @@ tags:
   - documentation
 
 version: "3.0.0"
-updated: "2025-12-01"
+updated: "2026-10-29"
 
 related_commands:
   - /product/consolidate-meetings
@@ -295,7 +295,7 @@ Use `/docs/consolidate-documents` quando:
 /docs/consolidate-documents "docs/business-context/"
 
 # Consolidar arquivos específicos
-/docs/consolidate-documents "docs/business-context/CUSTOMER_JOURNEY.md docs/business-context/CUSTOMER_PERSONAS.md docs/business-context/CUSTOMER_COMMUNICATION.md"
+/docs/consolidate-documents "docs/business-context/01-customer/journey.md docs/business-context/01-customer/personas.md docs/business-context/04-operations/customer-communication.md"
 
 # Foco em divergências
 /docs/consolidate-documents "docs/business-context/" --focus="divergences"

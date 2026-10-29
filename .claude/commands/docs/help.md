@@ -5,7 +5,7 @@ allowed-tools: Read
 category: docs
 tags: [help, documentation, guide]
 version: "3.0.0"
-updated: "2025-11-24"
+updated: "2026-10-29"
 ---
 
 # 📚 Sistema de Ajuda - Comandos de Documentação
@@ -43,7 +43,7 @@ O Sistema Onion oferece **4 comandos especializados** para documentação:
 **Objetivo**: Criar inteligência de negócios otimizada para IA
 **Quando usar**: Compreender clientes, mercado e estratégia de produto
 **Workflow**: Análise produto → Q&A estratégico → Múltiplos arquivos de negócio  
-**Output**: CUSTOMER_PERSONAS.md, COMPETITIVE_LANDSCAPE.md, etc.
+**Output**: 01-customer/personas.md, 03-market/competitive-landscape.md, etc.
 
 ### **🗂️ `/docs/build-index`** - Construção de Índices
 **Objetivo**: Organizar documentação através de índices estruturados
@@ -154,11 +154,11 @@ elif [ "$COMANDO_ESPECIFICO" = "build-business-docs" ]; then
     echo "     ∟ Validação de estratégia de negócio"
     echo ""
     echo "   ▶ **Fase 3**: Geração de Contexto Multi-Arquivo"
-    echo "     ∟ CUSTOMER_PERSONAS.md (perfis de cliente)"
-    echo "     ∟ CUSTOMER_JOURNEY.md (jornada completa)" 
-    echo "     ∟ VOICE_OF_CUSTOMER.md (feedback e padrões)"
-    echo "     ∟ COMPETITIVE_LANDSCAPE.md (análise competitiva)"
-    echo "     ∟ PRODUCT_STRATEGY.md (estratégia e posicionamento)"
+    echo "     ∟ 01-customer/personas.md (perfis de cliente)"
+    echo "     ∟ 01-customer/journey.md (jornada completa)" 
+    echo "     ∟ 01-customer/voice-of-customer.md (feedback e padrões)"
+    echo "     ∟ 03-market/competitive-landscape.md (análise competitiva)"
+    echo "     ∟ 02-product/strategy.md (estratégia e posicionamento)"
     echo ""
     echo "**📚 Argumentos Obrigatórios:**"
     echo "Você deve fornecer links para materiais de produto, landing pages,"
@@ -249,7 +249,7 @@ else
     echo "**📊 Contexto de Negócio:**" 
     echo "   ▶ **/docs/build-business-docs** - Inteligência de mercado"
     echo "     ∟ Para: Produto, vendas, suporte contextual ao cliente"
-    echo "     ∟ Output: CUSTOMER_PERSONAS.md, COMPETITIVE_LANDSCAPE.md"
+    echo "     ∟ Output: 01-customer/personas.md, 03-market/competitive-landscape.md"
     echo "     ∟ Uso: /docs/help build-business-docs (detalhes)"
     echo ""
     echo "**🗂️ Organização:**"
