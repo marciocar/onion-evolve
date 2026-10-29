@@ -26080,6 +26080,10 @@ EOF_RP
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then
     record_pass "relay-public: (k) o check passa no próprio --selftest ($(grep -o '[0-9]*/[0-9]* verdes' <<< "${o}"))"
   else record_fail "relay-public: (k) --selftest do check" "$(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (l) o corpus real no modo que o lint consome: o índice do core não tem sinal marcado sem revisão
+  if o="$(LC_ALL=C bash "${chk}" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then record_pass "relay-public: (l) o índice real no modo --format tsv → rc 0, nenhum sinal marcado sem revisão"
+  else record_fail "relay-public: (l) índice real" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
   # Um mutante pode trocar DUAS âncoras (old2/new2): onde a cura mora em duas linhas que se cobrem (listar pelo
   # índice E ler o blob do índice; o `exit` no fecho do frontmatter E a condição fm == 1), reverter só uma não
   # reverte a cura, e o mutante de uma linha só mediria a redundância, não o comportamento.
