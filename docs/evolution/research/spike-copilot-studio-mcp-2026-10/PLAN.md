@@ -25,8 +25,9 @@ Legenda: **[EXISTE]** = caminho no repo ou fato medido; **[DOC]** = doc primári
 
 - [EXISTE] A `D_ONION_BRAIN_MCP_REMOTO`, em
   `docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml`, foi selada em
-  2026-10-12 em dois degraus. O **degrau 1** é rede privada, via LibreChat. O **degrau 2** é um endpoint público
-  com TLS e o servidor como resource server OAuth 2.1 por org, e só vale **"quando houver demanda medida"**.
+  2026-10-12 em dois degraus. O **degrau 1** é rede privada, via LibreChat. O **degrau 2** é "OAuth RS público por
+  org" (texto do selo; a narrativa do Elenxo detalha endpoint público com TLS e o servidor como resource server
+  que valida o JWT do Logto), e só vale **"quando houver demanda medida"**.
 - [INFERÊNCIA] O Copilot Studio é um serviço de nuvem e só alcança o que está na internet. A doc não diz "precisa
   ser público", mas todos os exemplos usam `https://<host>/mcp`. **Este spike é, portanto, um degrau 2 de teste.**
   O maestro decide se o caso de consultoria conta como a demanda medida.

@@ -395,7 +395,7 @@ nodes:
     narrative: "A FAVOR: custo zero agora. CONTRA: o paliativo é um segundo leitor do corpus que diverge do radar (o veredito do Onion é o parser do radar, não uma releitura JS), e existe um precedente pronto (opção A) com custo marginal mínimo. O pedido de campo do hub (E_BRAIN_MCP_PEDIDO_DE_CAMPO) continua aberto."
     trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
 
-  # ═══════════════════ A DECISÃO (OPEN — o maestro sela) ═══════════════════
+  # ═══════════════════ A DECISÃO (nasceu OPEN; SELADA pelo maestro em 2026-10-12) ═══════════════════
 
   - id: D_ONION_BRAIN_MCP_REMOTO
     node_type: decision
