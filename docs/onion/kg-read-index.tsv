@@ -316,6 +316,8 @@
 .claude/utils/adopt/write-stamp.sh	E_W9_PIN_GREP_MEDIDO	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/census/census-seal.py	Q_REABRIR_CARIMBO_POR_PROBE	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 .claude/utils/census/census-workflow.mjs	Q_PROBE_WORKFLOW_ALIAS	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
+.claude/utils/co-evolution/co-relay.sh	D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
+.claude/utils/co-evolution/co-relay.sh	D_NAO_MEDIDA_SE_TRATA_COMO_PUBLICA	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
 .claude/utils/co-evolution/co-relay.sh	E_CANAL_UPSTREAM_VENDOR_NO_CO_RELAY	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/utils/co-evolution/co-relay.sh	E_CO_RELAY_CORE_SE_PROVA	docs/evolution/research/field-hub-update-2026-10-19/field-hub-update-2026-10-19.kg.yaml
 .claude/utils/co-evolution/mail-receiver.sh	C_ntfy_default_publico	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
@@ -610,6 +612,7 @@
 .claude/validation/lint-selftest.sh	D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_36_selftests	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/lint-selftest.sh	E_BANCADA_CASOS_E_MUTANTES	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_BANCADA_E_MUTANTE_HOOKSPATH	docs/evolution/research/guard-hookspath-absolute-2026-10/hookspath-absolute-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_BANCADA_MORREU_CALADA_POR_SET_E	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_BANCADA_NAO_CONTAVA_PARA_NINGUEM	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
@@ -670,6 +673,7 @@
 .claude/validation/projection-safety.sh	E_PRIMITIVE_EXISTS	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety_exists	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
+.claude/validation/relay-public-review-check.sh	D_INDICE_NAO_ARVORE	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
 .claude/validation/resolve-integration-branch.sh	SY4_prod_resolve_integration_branch	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/resolve-production-branch.sh	SY5_branch_roles_second_resolver	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/review-artifact-check.sh	E_O_VERDICT_GANHOU_VOCABULARIO_MAS_NAO_VERIFICACAO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -2308,6 +2312,7 @@ docs/evolution/review/feat-kg-seal-check.md	D_GUARDA_DA_BANCADA_NOMEIA_A_CAUSA	d
 docs/evolution/review/feat-meta-radar-surface.md	E_ELENXO_DA_PASSADA_ONDA6	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/evolution/review/feat-plugin-completo-drive.md	E_ARGUMENTO_CORRIGIDO_ANTES_DO_MERGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/review/feat-public-distribution-decisions.md	Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+docs/evolution/review/feat-relay-guard-public-target.md	E_ELENXO_APROVOU_COM_RESSALVAS_CURADAS	docs/evolution/research/guard-relay-public-review-2026-10/relay-public-review-2026-10.kg.yaml
 docs/evolution/review/feat-testing-visibility-onda0.md	E_ELENXO_REPROVOU_A_ONDA_0	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 docs/evolution/review/fix-bench-emit-pipe-race.md	E_CAUSA_ABERTA_LEITOR_MULTITHREAD_0904	docs/onion/graph/fios-abertos.kg.yaml
 docs/evolution/review/fix-bench-emit-pipe-race.md	E_CURA_HERE_STRING_MEDIDA_0904	docs/onion/graph/fios-abertos.kg.yaml
