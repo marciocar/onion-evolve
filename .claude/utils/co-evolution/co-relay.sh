@@ -35,7 +35,7 @@
 # PAPÉIS:     maestro = humano (autoridade final, Ato-3) · maestro principal = core
 #             (onion-evolve, rege a evolução). A sessão home do destino commita.
 #
-# Uso       : co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run]
+# Uso       : co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public]
 #               <signal-file> : basename OU path. Omitido = todos os .md de 1º nível
 #                               da fonte (default docs/evolution/inbox/).
 #               --target <p>  : path LOCAL do CORE (OBRIGATÓRIO — o adotante não tem
@@ -43,6 +43,14 @@
 #                               ou do DONO de um vendor (vendor/<x>/.<x>-version prova).
 #               --from <dir>  : fonte alternativa do(s) sinal(is) (default: o inbox).
 #               --dry-run     : mostra o plano, não escreve nada.
+#               --confirm-public : o remetente releu o sinal e confirma a entrega a um destino que
+#                               PODE ser público (visibilidade medida 'public' ou não medida).
+#
+# Destino público (guarda de 2026-10-29, ver o bloco "Guarda de DESTINO PÚBLICO" abaixo): o carteiro
+#             mede a visibilidade do destino pelo forge; público ou não medido → sem --confirm-public
+#             PARA (exit 2) e mostra sinal, destino, aviso e os termos da lista local de risco
+#             (só aviso). Com a confirmação, o sinal chega marcado `reviewed_for_public: false` no
+#             frontmatter, e a REGRA 113 do lint do destino barra commitá-lo assim.
 #
 # Gracioso  : uso inválido / não-adotante / alvo ausente ou não-git → exit 2 (erro
 #             de uso, pt-BR em STDERR). Sinal já presente no inbox/ do core → no-op
@@ -60,14 +68,15 @@ set -uo pipefail
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 STAMP="${REPO_ROOT}/.claude/.onion-version"
 
-usage() { echo "uso: co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run]" >&2; exit 2; }
+usage() { echo "uso: co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public]" >&2; exit 2; }
 
-SIGNAL_ARG="" ; TARGET="" ; FROM_DIR="" ; DRY=0
+SIGNAL_ARG="" ; TARGET="" ; FROM_DIR="" ; DRY=0 ; CONFIRM_PUBLIC=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --target) TARGET="${2:-}"; shift 2 || usage ;;
     --from)   FROM_DIR="${2:-}"; shift 2 || usage ;;
     --dry-run) DRY=1; shift ;;
+    --confirm-public) CONFIRM_PUBLIC=1; shift ;;
     -h|--help) usage ;;
     -*) echo "ERRO: flag desconhecida: $1" >&2; usage ;;
     *) if [ -z "${SIGNAL_ARG}" ]; then SIGNAL_ARG="$1"; else echo "ERRO: argumento extra: $1" >&2; usage; fi; shift ;;
@@ -297,6 +306,70 @@ else
 fi
 ORIGS=("${FILES[@]}")   # o sinal como o autor escreveu (no canal de vendor, FILES passa a ser a cópia com rodapé)
 
+
+# --- Guarda de DESTINO PÚBLICO (proposta do hub de 2026-10-29, forjada pelo /meta:forge-guard) -------------
+# DEFEITO MEDIDO, 2 casos em 3 dias, os dois segurados só pela revisão do destino, sem mecanismo:
+#   · 2026-10-27/28: um sinal chegou ao inbox do core (repo PÚBLICO) verbatim, com nome de cliente, plano,
+#     administradores, uma chave e achados de teste de invasão; o core commitou só um resumo;
+#   · 2026-10-29: uma resposta chegou numa v1 com incidente e exposição, e a v2 "reescrita como forma" ainda
+#     permitia reconstruir setor, postura de segurança, vínculo, canais e comitês.
+# O carteiro só COPIA, então a trava útil tem duas metades:
+#   1. aqui, no remetente: destino público ou NÃO MEDIDO para sem --confirm-public, mostrando o que vai e
+#      para onde; a lista local de termos de risco só AVISA (guarda por lista falha pelo vocabulário:
+#      paráfrase passa e palavra legítima acusa, por isso ela nunca bloqueia);
+#   2. no destino: o sinal chega com `reviewed_for_public: false` no frontmatter, e a REGRA 113 (Sinal
+#      relayado a destino público só se commita revisado) do lint de lá barra o commit até a sessão do
+#      destino revisar e gravar `true`. A trava fica no lado que PUBLICA.
+# VISIBILIDADE: medida pelo forge, nunca declarada pelo remetente (quem declararia "privado" é exatamente
+# quem a guarda vigia). Sem remote origin = `local` (não publicado). GitHub = `gh api repos/<dono>/<repo>`.
+# MODO DE FALHA DECLARADO: gh ausente, sem auth, sem rede, repo inacessível ou host que não é o GitHub =
+# `unknown`, e unknown se trata como público. Não é a guarda acusando: a mensagem diz NÃO MEDIDA, e o
+# custo de uma confirmação a mais é menor que o de um vazamento num repo público. `internal` (visível à
+# organização) não é público. CO_RELAY_GH troca o binário (bancada).
+# O QUE ESTA GUARDA NÃO PEGA: paráfrase (o caso de 2026-10-29 era exatamente isso), sinal que não passa
+# pelo carteiro (cópia à mão, A2A), remetente que confirma no reflexo, e destino que troca a marca sem
+# revisar. A confirmação é lombada; a revisão continua sendo do destino.
+CO_RELAY_GH="${CO_RELAY_GH:-gh}"
+_target_visibility() {  # $1 = destino → stdout "<vis><TAB><como>"; vis ∈ public|private|internal|local|unknown
+  local remote n path owner repo v tmo=()
+  remote="$(git -C "$1" remote get-url origin 2>/dev/null || true)"
+  if [ -z "${remote}" ]; then printf 'local\tsem remote origin: o destino não está publicado em forge nenhum\n'; return 0; fi
+  n="$(_norm_remote "${remote}")"
+  case "${n}" in
+    github.com/*/*) path="${n#github.com/}"; owner="${path%%/*}"; repo="${path#*/}" ;;
+    *) printf 'unknown\to remote origin não é do GitHub, e o carteiro só sabe medir lá\n'; return 0 ;;
+  esac
+  case "${repo}" in ''|*/*) printf 'unknown\tremote fora da forma github.com/<dono>/<repo>\n'; return 0 ;; esac
+  command -v "${CO_RELAY_GH}" >/dev/null 2>&1 || { printf 'unknown\to gh não está instalado neste host\n'; return 0; }
+  command -v timeout >/dev/null 2>&1 && tmo=(timeout 20)
+  v="$(${tmo[@]+"${tmo[@]}"} "${CO_RELAY_GH}" api "repos/${owner}/${repo}" --jq .visibility 2>/dev/null)" || v=""
+  v="$(printf '%s' "${v}" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')"
+  case "${v}" in
+    public|private|internal) printf '%s\tmedida pelo forge (gh api repos/%s/%s)\n' "${v}" "${owner}" "${repo}" ;;
+    *) printf 'unknown\to gh não mediu (sem auth, sem rede ou repo inacessível a esta conta)\n' ;;
+  esac
+}
+IFS=$'\t' read -r T_VIS T_VIS_HOW <<< "$(_target_visibility "${TARGET}")"
+PUBLIC_GATE=0
+# >>> portao-publico
+case "${T_VIS}" in public|unknown) PUBLIC_GATE=1 ;; esac
+# <<< portao-publico
+if [ "${T_VIS}" = unknown ]; then T_VIS_SHOW="NÃO MEDIDA (tratada como pública)"; else T_VIS_SHOW="${T_VIS}"; fi
+
+# Lista LOCAL de termos de risco: do adotante, fora do core, nunca versionada num repo público. Um termo por
+# linha, `#` comenta, casa sem distinção de caixa (só ASCII: acento não se dobra). SÓ AVISA.
+RISK_FILE="${CO_RELAY_RISK_TERMS:-${REPO_ROOT}/.claude/relay-risk-terms.local}"
+_risk_report() {  # $1 = sinal → stdout: uma linha por termo que casa (vazio = sem lista ou nada casou)
+  [ -f "${RISK_FILE}" ] || return 0
+  local t lines
+  while IFS= read -r t || [ -n "${t}" ]; do
+    t="$(printf '%s' "${t%$'\r'}" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')"
+    case "${t}" in ''|'#'*) continue ;; esac
+    lines="$(grep -n -i -F -- "${t}" "$1" 2>/dev/null | cut -d: -f1 | paste -sd, -)"
+    [ -z "${lines}" ] || printf '      ⚠️  termo de risco da lista local «%s» em l.%s (aviso, não bloqueia)\n' "${t}" "${lines}"
+  done < "${RISK_FILE}"
+}
+
 DEST_DIR="${TARGET}/docs/evolution/inbox"
 
 # --- Aviso honesto: o core pode não ter o canal nesta árvore (branch atual) ---
@@ -312,8 +385,52 @@ if [ "${DRY}" -eq 1 ]; then
   echo "  alvo     : ${TARGET}  (${T_LABEL})"
   echo "  destino  : ${DEST_DIR}/"
   [ -z "${VENDOR_AUTH}" ] || echo "  autoriza : ${VENDOR_AUTH} (a tag ${VENDOR_TAG} do destino reproduz os ${VENDOR_NFILES} arquivos do carimbo)"
-  for f in "${FILES[@]}"; do echo "  relayar  : $(basename "$f")"; done
+  echo "  visível  : ${T_VIS_SHOW} — ${T_VIS_HOW}"
+  for f in "${FILES[@]}"; do echo "  relayar  : $(basename "$f")"; [ "${PUBLIC_GATE}" -eq 0 ] || _risk_report "$f"; done
+  if [ "${PUBLIC_GATE}" -eq 1 ]; then
+    echo "  ⚠️  este texto pode ser commitado num repo PÚBLICO: a entrega exigirá --confirm-public e o sinal"
+    echo "     chegará marcado reviewed_for_public: false (o destino revisa antes do commit)."
+  fi
   exit 0
+fi
+
+# --- Destino público ou não medido: para sem a confirmação explícita -----------------------------------------
+if [ "${PUBLIC_GATE}" -eq 1 ] && [ "${CONFIRM_PUBLIC}" -eq 0 ]; then
+  {
+    echo "PARADO: este texto pode ser commitado num repo PÚBLICO."
+    echo "  alvo        : ${TARGET}  (${T_LABEL})"
+    echo "  visibilidade: ${T_VIS_SHOW} — ${T_VIS_HOW}"
+    for f in "${FILES[@]}"; do echo "  sinal       : ${f}"; _risk_report "$f"; done
+    echo "  Releia cada sinal como se já estivesse publicado: vai a FORMA (o que mudar no Onion e por quê), não o"
+    echo "  detalhe do seu projeto (cliente, pessoas, segredo, incidente, postura de segurança). Paráfrase que"
+    echo "  deixa reconstruir o detalhe vaza igual, e nenhuma lista de termos a pega."
+    echo "  Para entregar: repita com --confirm-public. O sinal chega marcado reviewed_for_public: false, e a"
+    echo "  REGRA 113 (Sinal relayado a destino público só se commita revisado) barra o commit dele até a sessão"
+    echo "  do destino revisar."
+  } >&2
+  exit 2
+fi
+
+# --- Com a confirmação, o sinal viaja MARCADO "a revisar antes do commit" -------------------------------------
+# A marca é do DESTINO conceder: um `reviewed_for_public` que o remetente tenha escrito sai, e entra `false`.
+# Determinística (sem data), então o dedup por conteúdo segue valendo entre entregas iguais.
+_mark_review() {  # $1 = sinal → stdout: o sinal com reviewed_for_public: false no frontmatter
+  if awk 'NR == 1 { if ($0 !~ /^---\r?$/) exit 1; next } /^---\r?$/ { f = 1; exit } END { exit !f }' "$1"; then
+    awk 'NR == 1 { print; fm = 1; next }
+         fm == 1 && /^---\r?$/ { print "reviewed_for_public: false"; fm = 0; print; next }
+         fm == 1 && /^[ \t]*reviewed_for_public[ \t]*:/ { next }   # a do remetente sai
+         { print }' "$1"
+  else
+    printf -- '---\nreviewed_for_public: false\n---\n\n'; cat "$1"
+  fi
+}
+RSTAGE="" ; STAGE=""
+trap 'rm -rf "${RSTAGE:-}" "${STAGE:-}"' EXIT
+if [ "${PUBLIC_GATE}" -eq 1 ]; then
+  RSTAGE="$(mktemp -d)" || { echo "ERRO: mktemp falhou." >&2; exit 2; }
+  MARKED=()
+  for f in "${FILES[@]}"; do _mark_review "$f" > "${RSTAGE}/$(basename "$f")"; MARKED+=("${RSTAGE}/$(basename "$f")"); done
+  FILES=("${MARKED[@]}")
 fi
 
 # --- Canal de vendor: a autorização VIAJA no sinal entregue ---------------------------------------------------
@@ -322,7 +439,6 @@ fi
 # continua valendo: a mesma entrega, de novo, é byte-idêntica ao que já está no inbox/ ou no _processed/ de lá.
 if [ -n "${VENDOR_AUTH}" ]; then
   STAGE="$(mktemp -d)" || { echo "ERRO: mktemp falhou." >&2; exit 2; }
-  trap 'rm -rf "${STAGE}"' EXIT
   # normalizado: a URL crua do origin pode trazer `usuário:token@`, e o sinal vai para o repo alheio, que o commita
   SENDER="$(git -C "${REPO_ROOT}" remote get-url origin 2>/dev/null || true)"
   SENDER="$([ -n "${SENDER}" ] && _norm_remote "${SENDER}" || basename "${REPO_ROOT}")"
@@ -348,10 +464,25 @@ _strip_vendor_footer() {
   local n; n="$(grep -n -m1 -F '<!-- co-relay: canal upstream de vendor -->' "$1" 2>/dev/null | cut -d: -f1)"
   if [ -n "${n}" ] && [ "${n}" -ge 4 ]; then head -n "$((n - 4))" "$1"; else cat "$1"; fi
 }
+# O mesmo vale para a marca de revisão: um sinal entregue ANTES desta guarda (sem a marca) e já triado não
+# pode voltar só porque a entrega de hoje leva `reviewed_for_public`. O corpo normalizado tira o rodapé de
+# vendor, a chave reviewed_for_public do frontmatter e o frontmatter vazio que a marca cria.
+_norm_signal() {  # $1 → stdout: o corpo do sinal, sem o que o carteiro acrescenta
+  _strip_vendor_footer "$1" \
+    | awk 'NR == 1 && /^---\r?$/ { fm = 1; print; next }
+           fm == 1 && /^---\r?$/ { fm = 0; print; next }
+           fm == 1 && /^[ \t]*reviewed_for_public[ \t]*:/ { next }
+           { print }' \
+    | awk 'NR == 1 && /^---\r?$/ { a = 1; next }
+           NR == 2 && a && /^---\r?$/ { b = 1; next }
+           NR == 2 && a { print "---" }
+           NR == 3 && b && /^\r?$/ { next }
+           { print }
+           END { if (a && NR == 1) print "---" }'
+}
 _same_signal() {  # $1 = entrega, $2 = original, $3 = arquivo já no destino
   cmp -s "$1" "$3" && return 0
-  [ -n "${VENDOR_AUTH}" ] || return 1
-  cmp -s "$2" <(_strip_vendor_footer "$3")
+  cmp -s <(_norm_signal "$2") <(_norm_signal "$3")
 }
 
 mkdir -p "${DEST_DIR}" 2>/dev/null || { echo "ERRO: não foi possível criar ${DEST_DIR} (permissão?)." >&2; exit 2; }
@@ -411,4 +542,8 @@ done
 echo "Onion: Carteiro-local upstream concluído — ${relayed} relayado(s), ${skipped} no-op." >&2
 echo "       Próximo (sessão do destino, ${T_LABEL}): ler 📬, commitar + triar (git mv p/ inbox/_processed/)." >&2
 echo "       (entrega-sem-commit: o adotante NÃO commitou no repo alheio — invariante I3)." >&2
+if [ "${PUBLIC_GATE}" -eq 1 ] && [ "${relayed}" -gt 0 ]; then
+  echo "       Destino possivelmente PÚBLICO (${T_VIS_SHOW}): o sinal chegou com reviewed_for_public: false." >&2
+  echo "       O destino revisa, commita só a forma (um resumo) e grava true; até lá a REGRA 113 barra o commit." >&2
+fi
 exit 0
