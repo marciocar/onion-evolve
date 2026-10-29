@@ -427,15 +427,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-28"
-    evidence_class: testimony
-    verified_against: "relato da curadoria ao censo cruzado de 2026-10-28, confirmado pelo kg-ssot na correção do mesmo dia"
+    verified_at: "2026-10-29"
+    verified_against: "gh pr view 292 -R marciocar/onion-kg-ssot em 2026-10-29: MERGED em 2026-10-28, merge 55db567, título «feat(query): 4.38.0, o --with no --revisit e no --decision e o hash canônico do nó citado»; git ls-remote --tags do espelho marciocar/kg-ssot mostra kg-ssot-v4.38.0 (2d231cb7e8b6 desreferenciada); a API JSON do PyPI dá a kg-ssot na versão 4.38.0; a adoção no core é o PR 1427 (MERGED, merge 1d04d4e24cec)"
     label: "O --with no --revisit e no --decision, porque hoje 26 apoios por URL entram sem julgamento."
-    narrative: "A curadoria depende disso para julgar os apoios por URL nos vereditos de fora. Gatilho: o pré-registro do kg-ssot."
+    narrative: "A curadoria depende disso para julgar os apoios por URL nos vereditos de fora. Gatilho: o pré-registro do kg-ssot. Fechado em 2026-10-29: a kg-ssot 4.38.0 entregou o --with no --revisit e no --decision do kg_query pelo PR 292 do onion-kg-ssot, com a tag kg-ssot-v4.38.0 no espelho e a versão 4.38.0 no PyPI, e o core a adotou pelo PR 1427. O nó equivalente no produto, Q_KG_QUERY_WITH_REVISIT_1028, está done pelo PR 294 do onion-kg-ssot (citado em texto, sem aresta externa: o grafo mora em outro repo)."
   - id: Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA
     node_type: question
     layer: audit
@@ -453,15 +452,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: kg-ssot
     impact: 2
     confidence: 0.5
-    verified_at: "2026-10-28"
-    evidence_class: testimony
-    verified_against: "relato da curadoria ao censo cruzado de 2026-10-28, confirmado pelo kg-ssot na correção do mesmo dia"
+    verified_at: "2026-10-29"
+    verified_against: "grep -n node_sha256 vendor/kg-ssot/tools/kg_trace.py no core em 2026-10-29 (vendor na 4.38.0 pelo CHANGELOG): o check confere o provenance.node_sha256 e o subcomando digest o calcula como SHA-256 do JCS (RFC 8785) do nó, contrato v4.18; o PR 292 do onion-kg-ssot (MERGED, 55db567) entregou; o core já o usa em Q_MA_FREE_ORG_READ_ENFORCED, no grafo company-brain-multiaudiencia-2026-10, com scheme kg-node"
     label: "O hash canônico do nó citado no scheme kg-node, em versão futura da kg-ssot."
-    narrative: "Com o hash, quem cita um nó de outro repo prova que o nó citado é o mesmo que foi lido. Gatilho: o pré-registro do kg-ssot."
+    narrative: "Com o hash, quem cita um nó de outro repo prova que o nó citado é o mesmo que foi lido. Gatilho: o pré-registro do kg-ssot. Fechado em 2026-10-29: a 4.38.0 (contrato v4.18) entregou o provenance.node_sha256, o SHA-256 do JCS (RFC 8785) do nó, que exige scheme: kg-node. O kg_trace check confere o hash no commit fixado (pelo --with quando o nó é de outro repo) e o kg_trace digest dá o valor; Python e JS produzem a mesma forma canônica. Na curadoria, pelo PR 163 dela, 32 de 32 pontes foram conferidas, e só a mudança no nó citado derrubou a ponte (relato do kg-ssot, não re-executado pelo core). O pré-registro é o critério E3 de docs/onion/measurements/release-4380/CRITERIA.md, no repo do kg-ssot (citado em texto)."
   - id: Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION
     node_type: question
     layer: audit

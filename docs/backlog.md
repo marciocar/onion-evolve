@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**744 itens abertos** em 130 grafo(s) com aberto (de 169 no escopo) · 132 grupo(s), agrupados por `owner:` (44 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**742 itens abertos** em 130 grafo(s) com aberto (de 169 no escopo) · 132 grupo(s), agrupados por `owner:` (42 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -691,15 +691,13 @@
 | 3.4 | `C_TETO_DERIVADO_E_MINI` | task-manager-capabilities-2026-10 | TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-m |
 | 3.2 | `C_TETO_METODO_CITADO_EM_PROSA` | task-manager-capabilities-2026-10 | TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdo |
 
-## kg-ssot — 5 item(ns)
+## kg-ssot — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 20.0 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
 | 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
 | 4.5 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos pela URL fixada, que fecha os 3 buracos de E_OBJECAO_CB_KG_SPLIT, candidata à 4.38.0. |
-| 3.0 | `Q_COORD_KGSSOT_WITH_NO_REVISIT_E_DECISION` | coordenacao-sessoes-2026-10 | O --with no --revisit e no --decision, porque hoje 26 apoios por URL entram sem julgamento. |
-| 2.0 | `Q_COORD_KGSSOT_HASH_CANONICO_SCHEME_KG_NODE` | coordenacao-sessoes-2026-10 | O hash canônico do nó citado no scheme kg-node, em versão futura da kg-ssot. |
 
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 
