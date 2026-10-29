@@ -2,7 +2,8 @@
 branch: chore/triage-inbox-1029
 pr: pendente
 date: 2026-10-29
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0525c4b69d411e808891235f59b509d6ceed60e3cfc333e427548890245fcd99
+reviewed_code_sha256: ca29c9e703ab4e8092beaf08db21bfbecf01c2bd158fd4e47f9f3b586f3e7626
 findings_total: 10
 findings_real: 10
 tokens: 138681
