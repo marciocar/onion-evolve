@@ -38,8 +38,8 @@ Wrapper otimizado para `@pain-price-specialist`. Em vez de invocar o agente dire
 
 ### 1. Identificar tipo de análise
 
-> Os caminhos abaixo são relativos à pasta de contexto de negócio (`resolve-context-dir.sh business`, default
-> `docs/business-context/`) e seguem os nomes que o `/docs:build-business-docs` gera: kebab-case em subpastas
+> Os caminhos abaixo são relativos à pasta de contexto de negócio (a declarada em `.claude/onion-context.yaml`,
+> `context.business`; default `docs/business-context/`; na dúvida, `Glob` por `**/business-context/index.md`) e seguem os nomes que o `/docs:build-business-docs` gera: kebab-case em subpastas
 > numeradas. Se o arquivo não existir com esse nome, procure pelo `index.md` da pasta antes de declarar ausência.
 
 | Tipo | Indicador | Contexto a carregar |
