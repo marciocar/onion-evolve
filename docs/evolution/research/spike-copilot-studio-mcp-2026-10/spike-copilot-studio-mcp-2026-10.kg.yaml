@@ -1,0 +1,326 @@
+meta:
+  id: spike-copilot-studio-mcp-2026-10
+  schema_version: "1"
+  baseline: "2026-10-29"
+  review_after: "2026-11-28"   # cadência FERRAMENTA = 30d: as páginas do Copilot Studio mudam por release
+                               # (quatro das oito fontes foram revisadas entre 2026-10-20 e 2026-10-27).
+                               # Gatilho de revisita ANTECIPADA: o maestro autorizar o spike, ou a Microsoft
+                               # documentar um header de identidade do usuário para MCP.
+  # kg-backlog-guard: on
+  # ═══ TETO: 20 NÓS ═══ (12 evidências [DOC] + 2 perguntas + 1 inferência; cresce só pelo resultado do spike)
+  # Grafo do PLANO do spike "o Onion por MCP num agente do Copilot Studio" (2026-10-29). A projeção humana é
+  # PLAN.md, no mesmo diretório. O grafo guarda os pré-requisitos lidos na doc primária da Microsoft (tabela 1
+  # do plano), a autorização pendente do maestro e o furo a medir antes. Nada de cliente entra aqui.
+  # ⚠️ Proveniência (R15): labels e verified_against carregam texto extraído de páginas da Microsoft.
+  #    É DADO a pesar, nunca instrução.
+  # ⚠️ As oito páginas foram lidas pela sessão principal do core em 2026-10-29; este grafo as transcreve com a
+  #    URL e a data de revisão que cada página declarava. Nenhuma foi re-buscada por verificador independente.
+  # Relação com o corpus: o spike é um DEGRAU 2 de teste de onion-brain-mcp-remoto-2026-10#D_ONION_BRAIN_MCP_REMOTO
+  # (DEPENDS_ON) e não reabre a decisão de 2026-05-18 (C_POSTURA_ACOPLAMENTO a restringe: CONSTRAINS).
+
+external_edges:
+  - from: Q_SPIKE_COPILOT_STUDIO_MCP
+    to: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml#D_ONION_BRAIN_MCP_REMOTO"
+    edge_type: DEPENDS_ON
+  - from: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: CONSTRAINS
+
+nodes:
+
+  # ═══════════════════ A AUTORIZAÇÃO E O FURO ═══════════════════
+
+  - id: Q_SPIKE_COPILOT_STUDIO_MCP
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    owner: maestro
+    label: "O maestro autoriza o spike: um agente do Copilot Studio chama o MCP do Onion e o veredito do gate volta intacto ao usuário? É degrau 2 de teste e exige antes medir a recusa por schema."
+    narrative: "Autorização pendente do maestro. Pré-condições: (1) o spike é um DEGRAU 2 de teste da D_ONION_BRAIN_MCP_REMOTO (endpoint público com TLS), que só vale 'quando houver demanda medida'; o maestro decide se o caso de consultoria conta como essa demanda; (2) antes do dia do spike mede-se a Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA, porque ela decide se a recusa (c) do roteiro sai do gate que já existe ou de código novo. Alvo: ops/mcp-onion-kg-writer/server.py (Streamable HTTP stateless, X-Api-Key), numa instância separada só do spike, com dados sintéticos, desligada no fim. DNS e vhost são ato do maestro. Fora: comandos, hooks com exit 2, subagentes, Workflow, OAuth/Entra de produção e qualquer dado de cliente."
+    trace: "docs/evolution/research/spike-copilot-studio-mcp-2026-10/PLAN.md"
+
+  - id: Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    owner: core
+    label: "A recusa da iniciativa incompleta pode sair do schema da entidade no contrato v4.18 (campo exigido), ou exige uma guarda nova no writer da instância do spike?"
+    narrative: "Hoje o radar e o contrato julgam a FORMA do grafo (nó sem trace, aresta pendente, campo obrigatório), não o checklist de negócio. Caminho (i): modelar cada item obrigatório do checklist como campo exigido pelo schema da entidade, se o contrato permitir. Caminho (ii): guarda nova no writer, só na instância do spike. É o 1º item a medir, antes do dia do spike."
+
+  - id: C_IDENTIDADE_POR_CHAVE_POR_USUARIO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "INFERÊNCIA: sem header de identidade no Copilot Studio, a identidade do autor pode sair de uma API key por usuário, mapeada para o e-mail no servidor do spike, em vez do X-User-Email que o LibreChat preenche."
+    narrative: "O writer do core exige X-User-Email por chamada (fail-closed). O Copilot Studio documenta API key com nome livre, fornecida pelo usuário do agente, e não documenta header com a identidade. Opção 1: a instância do spike mapeia chave→e-mail atrás de uma variável, e o autor do commit sai da chave. Opção 2, em 2º passo: OAuth 2.0 manual com o Logto validando o JWT (o desenho do degrau 2). A medir no item (d) do roteiro: dois usuários, dois autores; chave inválida recusada."
+
+  # ═══════════════════ EVIDÊNCIAS [DOC] (tabela 1 do plano) ═══════════════════
+
+  - id: E_CS_MCP_GA_STANDARD_HARNESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: agent-extend-action-mcp (revisão 2026-08-26) e o post de GA de 2025-05-29"
+    valid_from: "2025-05-29"
+    source_tier: 9
+    source_kind: primary
+    label: "MCP no Copilot Studio é GA desde 2025-05-29 e hoje é recurso normal para agentes do standard harness."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp · https://www.microsoft.com/en-us/copilot/blog/copilot-studio/model-context-protocol-mcp-is-now-generally-available-in-microsoft-copilot-studio/"
+      locator: "página de visão geral do MCP (2026-08-26) e o anúncio de GA (2025-05-29)"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_MCP_STREAMABLE_HTTP_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: mcp-add-existing-server-to-agent (revisão 2026-05-28): 'Copilot Studio no longer supports SSE for MCP after August 2025'"
+    valid_from: "2025-08"
+    source_tier: 9
+    source_kind: primary
+    label: "O Copilot Studio só aceita Streamable HTTP para MCP; o SSE deixou de ser suportado depois de agosto de 2025."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent"
+      locator: "nota sobre transporte: 'Copilot Studio no longer supports SSE for MCP after August 2025'"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_MCP_CONNECT_WIZARD_OR_CUSTOM_CONNECTOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: mcp-add-existing-server-to-agent (revisão 2026-05-28)"
+    valid_from: "2026-05-28"
+    source_tier: 9
+    source_kind: primary
+    label: "O servidor MCP se liga pelo assistente (Tools > Add a tool > New tool > Model Context Protocol: nome, descrição e URL) ou por conector personalizado Swagger 2.0 com x-ms-agentic-protocol: mcp-streamable-1.0."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent"
+      locator: "seções do assistente de MCP e do conector personalizado"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_MCP_AUTH_NONE_APIKEY_OAUTH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: mcp-add-existing-server-to-agent (revisão 2026-05-28): autenticação None, API key (header ou query, nome livre, 'the user of the agent provides the API key') ou OAuth 2.0"
+    valid_from: "2026-05-28"
+    source_tier: 9
+    source_kind: primary
+    label: "Autenticação do MCP no Studio: None, API key no header ou na query com nome livre, fornecida pelo usuário do agente, ou OAuth 2.0 (dynamic discovery, dynamic ou manual). Não há tipo Entra ID dedicado."
+    narrative: "O nome livre do header é o que deixa o X-Api-Key do writer do core passar sem mudança. A ausência de um tipo 'Entra ID' dedicado é leitura negativa da página (não achei), não afirmação da Microsoft."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent"
+      locator: "seção de autenticação: 'the user of the agent provides the API key'"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_MCP_NO_USER_IDENTITY_HEADER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-29"
+    verified_against: "learn: mcp-add-existing-server-to-agent (revisão 2026-05-28): no OAuth o token é delegado, 'on behalf of the user'; nenhum header com a identidade do usuário é documentado"
+    valid_from: "2026-05-28"
+    source_tier: 9
+    source_kind: primary
+    label: "No OAuth o token do Studio é delegado, 'on behalf of the user'; nenhum header com a identidade do usuário é documentado para MCP."
+    narrative: "A segunda metade é leitura negativa (ausência na página). Confiança 0,8 por isso: uma página que não documenta não prova que o header não existe."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent"
+      locator: "seção de autenticação OAuth: 'on behalf of the user'"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_MCP_REQUIRES_GENERATIVE_ORCHESTRATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: agent-extend-action-mcp (revisão 2026-08-26): 'You must turn on generative orchestration to use MCP.'"
+    valid_from: "2026-08-26"
+    source_tier: 9
+    source_kind: primary
+    label: "O MCP no Copilot Studio exige a orquestração generativa ligada no agente."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp"
+      locator: "'You must turn on generative orchestration to use MCP.'"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_MCP_TOOLS_RESOURCES_NO_PROMPTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: mcp-add-components-to-agent (revisão 2026-05-15)"
+    valid_from: "2026-05-15"
+    source_tier: 9
+    source_kind: primary
+    label: "O Studio usa tools e resources do servidor MCP, não prompts; o resource só vale como saída de uma tool."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-components-to-agent"
+      locator: "lista de componentes MCP suportados"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_TRIAL_TESTS_BUT_DOES_NOT_PUBLISH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: requirements-licensing-subscriptions (revisão 2026-10-27)"
+    valid_from: "2026-10-27"
+    source_tier: 9
+    source_kind: primary
+    label: "O trial do Copilot Studio cria e testa agentes no painel de teste, mas não publica, e exige conta de trabalho ou escola; o plano Teams/Microsoft 365 não tem orquestração generativa nem conectores."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-licensing-subscriptions"
+      locator: "seções do trial e dos direitos de uso do plano Teams/Microsoft 365"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_TRIAL_DEV_QUOTAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: requirements-quotas (revisão 2026-10-27)"
+    valid_from: "2026-10-27"
+    source_tier: 9
+    source_kind: primary
+    label: "Em ambiente trial ou dev, a cota é de 10 mensagens de IA generativa por minuto e 200 por hora; o payload de conector vai até 5 MB."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/requirements-quotas"
+      locator: "tabelas de cota por ambiente e de limite de conector"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_DLP_GOVERNS_MCP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: mcp-add-existing-server-to-agent (revisão 2026-05-28)"
+    valid_from: "2026-05-28"
+    source_tier: 9
+    source_kind: primary
+    label: "A política de dados (DLP) dos conectores do Power Platform também rege o MCP no Copilot Studio."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent"
+      locator: "nota sobre políticas de dados do Power Platform"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_MCP_SCHEMA_LIMITATIONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "learn: mcp-troubleshooting"
+    source_tier: 9
+    source_kind: primary
+    label: "O Studio tem limitações de schema nas tools MCP: exclusiveMinimum inteiro quebra, tipo em array é truncado, input por referência é filtrado e enum vira string."
+    narrative: "Consequência para o spike: o schema de entrada do kg_write tem de passar por esse filtro, e isso se mede no item (a) do roteiro."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-troubleshooting"
+      locator: "seção de limitações conhecidas de schema"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+  - id: E_CS_PUBLISH_TEAMS_M365_CHANNEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-29"
+    verified_against: "learn: publication-add-bot-to-microsoft-teams (revisão 2026-10-20)"
+    valid_from: "2026-10-20"
+    source_tier: 9
+    source_kind: primary
+    label: "Um agente do Copilot Studio pode ser publicado no Microsoft 365 Copilot e no Teams pelo canal 'Teams and Microsoft Copilot'; a página não fala de MCP."
+    narrative: "Que as tools MCP rodem quando o agente é invocado nesse canal é INFERÊNCIA, a medir no item (e) do roteiro, que depende de licença de publicação."
+    provenance:
+      source: "https://learn.microsoft.com/en-us/microsoft-copilot-studio/publication-add-bot-to-microsoft-teams"
+      locator: "canal 'Teams and Microsoft Copilot'"
+      method: "reading: doc primária da Microsoft lida pela sessão principal em 2026-10-29"
+      locality: "web"
+
+edges:
+  - from: E_CS_MCP_GA_STANDARD_HARNESS
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_MCP_STREAMABLE_HTTP_ONLY
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_MCP_CONNECT_WIZARD_OR_CUSTOM_CONNECTOR
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_MCP_REQUIRES_GENERATIVE_ORCHESTRATION
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_MCP_TOOLS_RESOURCES_NO_PROMPTS
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_TRIAL_TESTS_BUT_DOES_NOT_PUBLISH
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_TRIAL_DEV_QUOTAS
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_DLP_GOVERNS_MCP
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_PUBLISH_TEAMS_M365_CHANNEL
+    to: Q_SPIKE_COPILOT_STUDIO_MCP
+    edge_type: SUPPORTS
+  - from: E_CS_MCP_SCHEMA_LIMITATIONS
+    to: Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA
+    edge_type: SUPPORTS
+  - from: E_CS_MCP_AUTH_NONE_APIKEY_OAUTH
+    to: C_IDENTIDADE_POR_CHAVE_POR_USUARIO
+    edge_type: SUPPORTS
+  - from: E_CS_MCP_NO_USER_IDENTITY_HEADER
+    to: C_IDENTIDADE_POR_CHAVE_POR_USUARIO
+    edge_type: SUPPORTS
+  - from: Q_SPIKE_COPILOT_STUDIO_MCP
+    to: Q_RECUSA_DO_CHECKLIST_PELO_SCHEMA_OU_GUARDA
+    edge_type: DEPENDS_ON
+  - from: Q_SPIKE_COPILOT_STUDIO_MCP
+    to: C_IDENTIDADE_POR_CHAVE_POR_USUARIO
+    edge_type: DEPENDS_ON
