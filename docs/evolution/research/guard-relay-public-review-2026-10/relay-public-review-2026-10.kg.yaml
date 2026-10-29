@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 12 NÓS ═══
+# ═══ TETO: 14 NÓS ═══
 meta:
   id: relay-public-review-2026-10
   schema_version: "1"
@@ -77,8 +77,26 @@ nodes:
     impact: 3
     confidence: 0.8
     trace: ".claude/validation/lint-selftest.sh"
-    label: "Família relay_public: 10 comportamentos do carteiro, cada um com caso e mutante; o dispatcher da REGRA 113 sobre o índice que o carteiro produz; o --selftest do check (10 casos) e 5 mutantes dele."
-    narrative: "Casos do carteiro: público sem confirmação para; não medida para; privado entrega byte-idêntico; a marca entra; o true do remetente sai; frontmatter criado; dry-run mostra; lista avisa; lista não muda o desfecho; sinal pré-guarda já triado não volta pela marca. Mutantes do check: árvore no lugar do índice (2), chave fora do frontmatter, valor ignorado, sem árvore git virando aprovação."
+    label: "Família relay_public: 11 comportamentos do carteiro, 10 com caso e mutante e a polaridade da lista sem mutante próprio; o dispatcher da REGRA 113 sobre o índice que o carteiro produz; o --selftest do check (10 casos) e 5 mutantes dele."
+    narrative: "Casos do carteiro: público sem confirmação para; não medida para; privado entrega byte-idêntico; a marca entra; o true do remetente sai; frontmatter criado; dry-run mostra; lista avisa; lista não muda o desfecho; sinal pré-guarda já triado não volta pela marca; reenvio público sem confirmação com tudo já triado é no-op. Mais o índice real no modo --format tsv que o lint consome. Mutantes do check: árvore no lugar do índice (dois, de duas âncoras cada, porque a cura mora em duas linhas que se cobrem), chave fora do frontmatter, valor ignorado, sem árvore git virando aprovação."
+
+  - id: E_ELENXO_APROVOU_COM_RESSALVAS_CURADAS
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: "docs/evolution/review/feat-relay-guard-public-target.md"
+    label: "Passada adversarial (revisor novo, só-leitura, mandato de falso positivo): APROVADO_COM_RESSALVAS, 6 achados, 4 reais, nenhum reprovando. Os 4 reais e o endurecimento foram curados ou declarados no mesmo laço."
+    narrative: "Curados: (1) o portão parava antes do dedup, e um reenvio com tudo já triado pedia confirmação (o portão agora conta só os pendentes; caso m com mutante); (2) visibilidade não medida marcava false num destino que pode ser privado (a marca agora diz, em comentário, a visibilidade medida, e a mensagem da REGRA 113 diz que unknown num repo privado se resolve com true); (5) reescrever o resumo no mesmo arquivo untracked perde a revisão num reenvio (o co-evolve.md manda nome novo); (6) o --selftest do check limpa GIT_DIR e GIT_INDEX_FILE. Declarados no teto: (3) régua --- na linha 1 lida como frontmatter; (4) apagar a linha da marca cala a guarda."
+
+  - id: C_TETO_REGUA_NA_LINHA_1
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.8
+    label: "TETO: um --- na linha 1 usado como régua horizontal vira abertura de frontmatter, no carteiro e no check; a marca entra antes do 2º ---. Raro, e as duas metades leem igual."
 
   - id: C_TETO_PARAFRASE
     node_type: claim
@@ -139,5 +157,11 @@ edges:
     to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
     edge_type: CONSTRAINS
   - from: C_TETO_LISTA_DE_TERMOS
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_APROVOU_COM_RESSALVAS_CURADAS
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: SUPPORTS
+  - from: C_TETO_REGUA_NA_LINHA_1
     to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
     edge_type: CONSTRAINS

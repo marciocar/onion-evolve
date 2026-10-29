@@ -21,7 +21,10 @@
 #
 # O QUE ELA NÃO PEGA (teto declarado):
 #   · paráfrase e detalhe reconstruível: a guarda vê a MARCA, não o conteúdo. Ela cobra que a revisão
-#     aconteceu, nunca que foi boa — `true` gravado sem reler passa;
+#     aconteceu, nunca que foi boa — `true` gravado sem reler passa, e APAGAR a linha da marca também
+#     (sinal sem a chave cala, pelo item abaixo);
+#   · um `---` na linha 1 usado como régua horizontal é lido como abertura de frontmatter, aqui e no
+#     carteiro (a marca entra antes do 2º `---`); raro, e as duas metades leem igual;
 #   · sinal que não passou pelo carteiro (cópia à mão, A2A, colado na sessão): chega sem a marca e cala;
 #   · marca fora do frontmatter, ou aninhada (indentada): cala;
 #   · `docs/evolution/inbound/` (o canal downstream) e qualquer caminho fora do inbox: fora do escopo;
@@ -38,7 +41,7 @@ while [ $# -gt 0 ]; do
     --format) FORMAT="${2:-text}"; shift 2 ;;
     --format=*) FORMAT="${1#--format=}"; shift ;;
     --selftest) MODE="selftest"; shift ;;
-    -h|--help) sed -n '2,34p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,37p' "$0"; exit 0 ;;
     *) REPO="$1"; shift ;;
   esac
 done
@@ -75,7 +78,7 @@ _scan() {
     done < <(_frontmatter_values "${tmp}")
     [ -n "${bad}" ] || continue
     if [ "${fmt}" = tsv ]; then
-      printf 'HARD\tsem-revisao\t%s\t%s\n' "${p}" "sinal relayado a destino possivelmente público está no índice com reviewed_for_public: ${bad} — releia-o como se já estivesse publicado, commite só a forma (um resumo sem cliente, pessoas, segredo, incidente nem postura de segurança), grave reviewed_for_public: true e re-adicione; ou tire-o do índice (git restore --staged)"
+      printf 'HARD\tsem-revisao\t%s\t%s\n' "${p}" "sinal relayado a destino possivelmente público está no índice com reviewed_for_public: ${bad} — releia-o como se já estivesse publicado, commite só a forma (um resumo sem cliente, pessoas, segredo, incidente nem postura de segurança), grave reviewed_for_public: true e re-adicione; ou tire-o do índice (git restore --staged). O comentário da marca diz a visibilidade que o carteiro mediu: se diz unknown e este repo é privado, basta gravar true"
     else
       printf 'HARD [sem-revisao] %s: reviewed_for_public: %s — revise antes do commit e grave true\n' "${p}" "${bad}"
     fi
@@ -85,6 +88,9 @@ _scan() {
 }
 
 _selftest() {
+  # chamado de dentro de um hook do git, estas variáveis apontariam os `add`/`rm --cached` da fixture para o
+  # índice REAL (achado da passada adversarial de 2026-10-29)
+  unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_PREFIX
   local tmp total=0 fails=0 out rc
   tmp="$(mktemp -d)"; git -C "${tmp}" init -q
   mkdir -p "${tmp}/docs/evolution/inbox/_processed" "${tmp}/docs/outro"
