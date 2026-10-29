@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**742 itens abertos** em 130 grafo(s) com aberto (de 169 no escopo) · 132 grupo(s), agrupados por `owner:` (42 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**752 itens abertos** em 131 grafo(s) com aberto (de 170 no escopo) · 133 grupo(s), agrupados por `owner:` (42 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -471,6 +471,21 @@
 | 4.8 | `C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA` | machine-path-2026-10 | TETO: absoluto de raiz que não é de sistema FORA de argumento de shell (raízes como workspace ou data em prosa) passa calado  |
 | 3.4 | `C_TETO_VARIAVEL_WINDOWS_E_FORA_DE_NO` | machine-path-2026-10 | TETO: não vê a variável HOME (não é literal), caminho Windows (C:\\), o que está fora de nó (meta.note, arestas) nem coment |
 | 3.0 | `C_TETO_VERBOS_DE_SHELL_SAO_LISTA` | machine-path-2026-10 | TETO: o contexto de shell é uma LISTA de verbos e o redirecionamento. Raiz não-sistema depois de outro verbo (um clone para dest |
+
+## relay-public-review-2026-10 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 38.4 | `D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA` | relay-public-review-2026-10 | Desenho: duas metades. No remetente, o co-relay.sh mede a visibilidade do destino e, público ou não medido, para sem --confirm-p |
+| 7.2 | `C_TETO_PARAFRASE` | relay-public-review-2026-10 | TETO: a guarda vê a MARCA, não o conteúdo. Paráfrase que deixa reconstruir o detalhe passa (o caso de 2026-10-29 era exatament |
+| 6.8 | `D_INDICE_NAO_ARVORE` | relay-public-review-2026-10 | A REGRA 113 lê o ÍNDICE do git (git grep --cached e git show :caminho), nunca a árvore: o carteiro escreve o sinal untracked, e |
+| 5.1 | `C_TETO_FORA_DO_CARTEIRO` | relay-public-review-2026-10 | TETO: sinal que não passa pelo carteiro (cópia à mão, A2A, colado na sessão) chega sem a marca e a REGRA 113 cala; o inbound/ |
+| 4.8 | `C_TETO_CONFIRMACAO_REFLEXA` | relay-public-review-2026-10 | TETO: --confirm-public é lombada. Uma sessão pode confirmar no reflexo, e para o core (público) a confirmação vira o caminho  |
+| 4.8 | `E_BANCADA_CASOS_E_MUTANTES` | relay-public-review-2026-10 | Família relay_public: 11 comportamentos do carteiro, 10 com caso e mutante e a polaridade da lista sem mutante próprio; o dispat |
+| 4.8 | `E_ELENXO_APROVOU_COM_RESSALVAS_CURADAS` | relay-public-review-2026-10 | Passada adversarial (revisor novo, só-leitura, mandato de falso positivo): APROVADO_COM_RESSALVAS, 6 achados, 4 reais, nenhum rep |
+| 4.2 | `D_NAO_MEDIDA_SE_TRATA_COMO_PUBLICA` | relay-public-review-2026-10 | Modo de falha declarado: visibilidade não medida (gh ausente, sem auth, sem rede, repo inacessível, host fora do GitHub) se trat |
+| 3.4 | `C_TETO_LISTA_DE_TERMOS` | relay-public-review-2026-10 | TETO: a lista de termos casa substring sem caixa, só ASCII (acento não se dobra), falha pelo vocabulário e não bloqueia. Ela n |
+| 1.6 | `C_TETO_REGUA_NA_LINHA_1` | relay-public-review-2026-10 | TETO: um --- na linha 1 usado como régua horizontal vira abertura de frontmatter, no carteiro e no check; a marca entra antes do  |
 
 ## radar-E3-2026-09-04 — 1 item(ns)
 
