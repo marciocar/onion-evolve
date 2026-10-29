@@ -51,7 +51,10 @@ decisão. Superfície de controle limpa > completude: o backlog é a fila ACION�
    a paridade é estrutural, não uma promessa.
 3. **`--check`** (advisory): `bash .claude/validation/kg-backlog-project.sh --check` — compara o
    recomputado vs o commitado e diz se drifou. Não é gate (projeção-sob-demanda, como o oráculo-PoC fez).
-4. **Reportar**: os contadores (N abertos · M grafos · K owners) e o path. Se algum grafo marcado
+4. **A minha fila** (só leitura, desde a kg-ssot 4.39.0): a fila de UMA sessão, no corpus inteiro e
+   não só nos grafos marcados, é `python3 -I vendor/kg-ssot/tools/kg_query.py --root . --open --where owner=<dono> --sort attention`
+   (`<dono>` é o `owner:` da sessão: core, curadoria, kg-ssot, brain, sge, maestro). Não escreve nada.
+5. **Reportar**: os contadores (N abertos · M grafos · K owners) e o path. Se algum grafo marcado
    mudou de cap/estado, lembre que `kg-backlog-check.sh` (REGRA 58) é quem cobra o cap+carimbo.
 
 ## Saída

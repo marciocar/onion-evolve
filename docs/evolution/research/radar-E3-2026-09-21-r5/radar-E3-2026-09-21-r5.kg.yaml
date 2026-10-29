@@ -23,6 +23,10 @@ meta:
     vai acusar de novo — o que falta ali nao e a ARESTA, e a MEDICAO. A cura e revisitar
     (`/onion-research --revisit`), nao carimbar. Registrado em 2026-09-23 conduzindo o
     /meta:drive; corrigido no mesmo dia depois que a passada adversarial mostrou os dois furos.
+  # kg-backlog-guard: on
+  # ═══ TETO: 15 NOS. Rodada fechada: cresce so por recorrencia medida da mesma classe ou cura executada. ═══
+  # Recolocado em 2026-10-29: o marcador e o teto foram apagados por engano no commit fcbe8d6af
+  # (2026-09-23, fix(regra-89)), junto com o comentario que a reescrita do supersedes_none substituiu.
 
 nodes:
   - id: Q_E3_DELTA_2_1_278
