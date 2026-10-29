@@ -1,9 +1,10 @@
 ---
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 4
 tokens: 118635
 duration_min: 16
-verdict: APROVADO_COM_RESSALVAS_E_CURADO
+verdict: CORRIGIDO
 elenxo: sim
 nota: >
   Uma passada de refutador novo, só-leitura, com mandato de achar falso positivo. Ele aprovou com
