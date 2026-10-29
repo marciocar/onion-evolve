@@ -2,7 +2,8 @@
 branch: chore/coord-seal-4380
 pr: pendente
 date: 2026-10-29
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0bce69b3ca46c870947278839a5923d8dcf3bd886103c0a6c3ea4e2cac60b77a
+reviewed_code_sha256: ab77f91bdb5e4da6d4f92794706fdc37361ef8d7904e977a78bee41ff3c28bbe
 findings_total: 2
 findings_real: 2
 tokens: 0
