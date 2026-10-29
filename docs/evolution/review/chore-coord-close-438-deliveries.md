@@ -2,7 +2,8 @@
 branch: chore/coord-close-438-deliveries
 pr: pendente
 date: 2026-10-29
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 85fe8e7b2817395113eb79deffe06eb9b594f7c418c4c6af65362c94c10036c1
+reviewed_code_sha256: 47138f5076c496b6795d7fb449c2dafb536fa56333a085b69cb48118dda627b1
 findings_total: 1
 findings_real: 1
 tokens: 0
