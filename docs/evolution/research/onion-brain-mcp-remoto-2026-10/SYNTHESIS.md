@@ -11,6 +11,10 @@ duration_min: 19
 Pesquisa pelo `/onion-research` no modo `decision`. O grafo traz **1 nó de decisão aberto**,
 `D_ONION_BRAIN_MCP_REMOTO`, que o maestro sela. Esta sessão não sela.
 
+> **Nota de 2026-10-29:** o maestro selou a `D_ONION_BRAIN_MCP_REMOTO` em 2026-10-12, em dois degraus
+> (código no core, hospedagem na família; degrau 1 via LibreChat em rede privada, degrau 2 público só com
+> demanda medida). O nó está `confirmed`; o texto abaixo é o retrato da pesquisa antes do selo.
+
 - **Fontes:** 15 lidas e 64 claims extraídas. Das 25 verificadas por votação 3/2, 11 foram confirmadas
   e 14 refutadas.
 - **Elenxo:** 45 objeções, das quais 30 sobreviveram e entraram como `CONSTRAINS`.
