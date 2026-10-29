@@ -1,6 +1,11 @@
 # Template de Arquitetura de Contexto de Negócio
 *Framework estratégico para organizar conhecimento de negócio para habilitar desenvolvimento de produto e sucesso do cliente baseados em IA*
 
+> **Estrutura vigente:** os nomes e as subpastas numeradas que o `/docs:build-business-docs` gera
+> (`01-customer/personas.md`, `03-market/competitive-landscape.md`…) têm precedência sobre os nomes planos
+> citados como exemplo neste template. Os consumidores (`/product:analyze-pain-price`, `/product:branding`…)
+> leem a estrutura do comando.
+
 ---
 
 ## Propósito Deste Template
