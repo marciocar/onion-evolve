@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**104 regras** no total — **91 HARD**, **45 SOFT**.
+**105 regras** no total — **92 HARD**, **46 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -194,6 +194,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 64 | Compose sem bind local ou com segredo em fallback literal | HARD + SOFT | porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables |
 | 100 | Superfície que viaja não cita ops/ como se o destinatário o tivesse | HARD + SOFT | porta/adotante recebendo instrução que aponta para ops/, que não viaja (com catraca). |
 | 106 | Superfície que viaja passa pela varredura de vazamento da publicação | HARD + SOFT | id de adotante com prefixo onion- ou caminho de máquina entrando por PR verde e só sendo barrado no fim, pelo motor de publicação das portas. |
+| 113 | Sinal relayado a destino público só se commita revisado | HARD + SOFT | sinal de adotante entregue ao inbox de um repo PÚBLICO ser commitado verbatim, com o detalhe do projeto dele (cliente, pessoas, segredo, incidente), antes de a sessão do destino o revisar. |
 
 ## Processo com resíduo
 

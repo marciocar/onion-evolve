@@ -6298,6 +6298,42 @@ check_kg_projection() {
 }
 check_kg_projection
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 113 — Sinal relayado a destino público só se commita revisado [HARD + SOFT]
+# previne: sinal de adotante entregue ao inbox de um repo PÚBLICO ser commitado verbatim, com o detalhe do projeto dele (cliente, pessoas, segredo, incidente), antes de a sessão do destino o revisar.
+#   DANO MEDIDO (2 casos em 3 dias, segurados só pela revisão do core, sem mecanismo): 2026-10-27/28, um sinal
+#   chegou ao inbox do core verbatim, com nome de cliente, plano, administradores, uma chave e achados de teste
+#   de invasão; 2026-10-29, uma resposta chegou numa v1 com incidente e exposição, e uma v2 que ainda permitia
+#   reconstruir o que importava. O carteiro (co-relay.sh) agora mede a visibilidade do destino, para sem
+#   --confirm-public e entrega o sinal com `reviewed_for_public: false` no frontmatter; esta regra barra o
+#   commit dele (o ÍNDICE, nunca a árvore: o untracked que o carteiro escreve não deixa o gate vermelho) até a
+#   sessão do destino revisar e gravar `true`. Lógica e teto (paráfrase, marca trocada sem reler, sinal fora
+#   do carteiro) em relay-public-review-check.sh. Sem índice git = SOFT NÃO-VERIFICADO.
+check_relay_public_review() {
+  local helper="${SCRIPT_DIR}/relay-public-review-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in */docs/evolution/inbox/*|*/relay-public-review-check.sh) : ;; *) return 0 ;; esac
+  fi
+  local _R="REGRA 113 (Sinal relayado a destino público só se commita revisado)"
+  local _repo="${ONION_RELAY_REVIEW_REPO:-${REPO_ROOT}}"   # troca o repo julgado (bancada: o dispatcher sobre um índice de mktemp)
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${_repo}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    violation "${_sev:-HARD}" "${_repo}/${_path}" "${_R}: [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -eq 3 ]; then
+    violation "SOFT" "${helper}" "${_R}: [NAO-VERIFICADO] sem índice git — os sinais do inbox não foram julgados; isto não é aprovação"
+  elif [ "${_hrc}" -ne 0 ]; then
+    violation "HARD" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_relay_public_review
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================

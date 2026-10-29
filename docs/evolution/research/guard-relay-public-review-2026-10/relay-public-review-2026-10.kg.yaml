@@ -1,0 +1,143 @@
+# kg-backlog-guard: on
+# ═══ TETO: 12 NÓS ═══
+meta:
+  id: relay-public-review-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-29"
+  review_after: "2026-12-15"
+  note: "Forja (/meta:forge-guard) da guarda de destino público do carteiro upstream e da REGRA 113 (Sinal relayado a destino público só se commita revisado), proposta pelo hub em 2026-10-29. O fato mora aqui; o backlog só cita estes ids."
+nodes:
+  - id: E_DEFEITO_SINAL_COM_DETALHE_NO_INBOX_PUBLICO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    valid_from: "2026-10-27"
+    verified_at: "2026-10-29"
+    verified_against: "relato da sessão do core que reteve os dois sinais, e o sinal de proposta do hub de 2026-10-29 no inbox do core"
+    label: "O DEFEITO, DATADO: 2 casos em 3 dias de sinal de adotante chegando ao inbox do core, repo público, com detalhe do projeto dele. Nos dois quem segurou foi a revisão do core antes do commit, sem mecanismo."
+    narrative: "2026-10-27/28: um sinal chegou verbatim, com nome de cliente, plano, administradores, uma chave e achados de teste de invasão; o core o reteve e commitou só um resumo. 2026-10-29: uma resposta chegou numa v1 com incidente e exposição, e uma v2 reescrita como forma que ainda permitia reconstruir setor, postura de segurança, vínculo, canais e comitês; o core removeu a v1 sem commit e commita só um resumo da v2. O carteiro só copiava: nada media a visibilidade do destino nem marcava o sinal para revisão. Os detalhes dos dois casos não entram neste grafo, que é público."
+    provenance:
+      source: "sinal de proposta do hub de 2026-10-29 (inbox do core, arquivado em docs/evolution/inbox/_processed/ na triagem)"
+      locator: "seções 'O que aconteceu' e 'A proposta' do sinal do hub; os dois casos, pela forma, no brief da sessão do core de 2026-10-29"
+      method: "testimony: relato da sessão do core que fez as duas revisões, mais o sinal do hub"
+      locality: "repo"
+
+  - id: E_CENSO_SEM_GUARDA_DA_CLASSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-29"
+    verified_against: "bash .claude/validation/guard-census.sh . --markdown"
+    label: "O censo de 2026-10-29 não achou guarda da classe: 3 moldes de hook, 24 de check de lint, 307 famílias de bancada, passivo de guarda morta zero. O co-relay.sh só tinha guardas de papel e de destino (quem pode relayar para quem), nenhuma de conteúdo."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seções 'moldes por SUBSTRATO', 'massa' e 'passivo' da saída de 2026-10-29"
+      method: "measurement: guard-census.sh na carga da forja"
+      locality: "repo"
+
+  - id: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: ".claude/utils/co-evolution/co-relay.sh"
+    label: "Desenho: duas metades. No remetente, o co-relay.sh mede a visibilidade do destino e, público ou não medido, para sem --confirm-public e entrega o sinal marcado reviewed_for_public: false. No destino, a REGRA 113 barra commitar a marca false. A trava fica no lado que publica."
+    narrative: "Das 4 peças do hub, as 4 entraram, com dois ajustes. (1) Visibilidade medida pelo forge (gh api repos/<dono>/<repo>), não declarada: o adotante não tem members.yaml, o members.yaml do core não tem campo de visibilidade, e quem declararia 'privado' é quem a guarda vigia. (2) A lista de termos é local ao adotante (.claude/relay-risk-terms.local ou CO_RELAY_RISK_TERMS), só avisa e nunca muda o desfecho. O lado do core, sugerido no brief, entrou como check de lint porque o lint roda no pre-commit e no CI, e a marca é dado do arquivo. Hook PreToolUse descartado: barraria só a sessão do Claude, não o commit à mão nem o CI."
+
+  - id: D_INDICE_NAO_ARVORE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/relay-public-review-check.sh"
+    label: "A REGRA 113 lê o ÍNDICE do git (git grep --cached e git show :caminho), nunca a árvore: o carteiro escreve o sinal untracked, e ler a árvore deixaria o gate do destino vermelho a cada entrega de terceiro (cláusula 5 da doutrina da guarda)."
+    narrative: "Ler o índice também julga o que de fato vai ser commitado: se a árvore diz true e o índice ainda diz false, acusa. Molde: veto-onfailure-check.sh (helper com --selftest e --format tsv, dispatcher que distingue 'julgou' de 'não rodou'). Sem índice git sai rc 3 e o dispatcher emite SOFT NAO-VERIFICADO, nunca aprovação."
+
+  - id: D_NAO_MEDIDA_SE_TRATA_COMO_PUBLICA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    trace: ".claude/utils/co-evolution/co-relay.sh"
+    label: "Modo de falha declarado: visibilidade não medida (gh ausente, sem auth, sem rede, repo inacessível, host fora do GitHub) se trata como pública. Destino sem remote origin é local e passa sem confirmação."
+    narrative: "Tensão com a cláusula 4 (errar para o lado de calar): a guarda não afirma que o destino é público, diz NÃO MEDIDA, e o custo é uma confirmação a mais contra um vazamento num repo público. internal (visível à organização) conta como não público. A bancada usa um gh falso por CO_RELAY_GH, e a família co-relay antiga passou a usá-lo também, porque os casos de hub e de vendor têm remote github.com e chamariam a rede."
+
+  - id: E_BANCADA_CASOS_E_MUTANTES
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "Família relay_public: 10 comportamentos do carteiro, cada um com caso e mutante; o dispatcher da REGRA 113 sobre o índice que o carteiro produz; o --selftest do check (10 casos) e 5 mutantes dele."
+    narrative: "Casos do carteiro: público sem confirmação para; não medida para; privado entrega byte-idêntico; a marca entra; o true do remetente sai; frontmatter criado; dry-run mostra; lista avisa; lista não muda o desfecho; sinal pré-guarda já triado não volta pela marca. Mutantes do check: árvore no lugar do índice (2), chave fora do frontmatter, valor ignorado, sem árvore git virando aprovação."
+
+  - id: C_TETO_PARAFRASE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "TETO: a guarda vê a MARCA, não o conteúdo. Paráfrase que deixa reconstruir o detalhe passa (o caso de 2026-10-29 era exatamente isso), e true gravado sem reler passa. A guarda cobra que a revisão aconteceu, nunca que foi boa."
+
+  - id: C_TETO_FORA_DO_CARTEIRO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    label: "TETO: sinal que não passa pelo carteiro (cópia à mão, A2A, colado na sessão) chega sem a marca e a REGRA 113 cala; o inbound/ (canal downstream) e o histórico de commits ficam fora do escopo."
+    narrative: "Gatilho nomeado para estender: um caso medido de sinal com detalhe que chegou ao inbox público por outro caminho e foi commitado."
+
+  - id: C_TETO_CONFIRMACAO_REFLEXA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "TETO: --confirm-public é lombada. Uma sessão pode confirmar no reflexo, e para o core (público) a confirmação vira o caminho de sempre. O que segura é a releitura do remetente e a revisão do destino; a marca só torna a revisão obrigatória antes do commit."
+
+  - id: C_TETO_LISTA_DE_TERMOS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.85
+    label: "TETO: a lista de termos casa substring sem caixa, só ASCII (acento não se dobra), falha pelo vocabulário e não bloqueia. Ela nunca viaja para o core, e versioná-la num repo público vazaria os próprios termos."
+
+edges:
+  - from: E_DEFEITO_SINAL_COM_DETALHE_NO_INBOX_PUBLICO
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: SUPPORTS
+  - from: E_CENSO_SEM_GUARDA_DA_CLASSE
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: SUPPORTS
+  - from: D_INDICE_NAO_ARVORE
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: DEPENDS_ON
+  - from: D_NAO_MEDIDA_SE_TRATA_COMO_PUBLICA
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: DEPENDS_ON
+  - from: E_BANCADA_CASOS_E_MUTANTES
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: SUPPORTS
+  - from: C_TETO_PARAFRASE
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_FORA_DO_CARTEIRO
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_CONFIRMACAO_REFLEXA
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_LISTA_DE_TERMOS
+    to: D_DUAS_METADES_REMETENTE_PARA_DESTINO_BARRA
+    edge_type: CONSTRAINS

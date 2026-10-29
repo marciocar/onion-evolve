@@ -3,8 +3,8 @@ name: co-evolve
 description: Orienta a sessão na co-evolução Onion core↔derivados — detecta o papel do repo (core/consumidor via .claude/.onion-version), lê o inbox de mensagens pendentes, mostra a posição nos 3 fluxos e como sinalizar/gerenciar. Use no início de sessão ou quando o hook avisar 📬.
 category: meta
 tags: [co-evolution, inbox, bridge, federation, onboarding, sdaal]
-version: "1.4.0"
-updated: "2026-07-16"
+version: "1.5.0"
+updated: "2026-10-29"
 allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evolution/*) Bash(git fetch origin*) Bash(git pull --ff-only*) Bash(git merge --ff-only origin/main*) Bash(bash .claude/validation/onion-version.sh) Bash(bash .claude/validation/peer-ref-check.sh *)
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 ---
@@ -135,6 +135,15 @@ Ao **tratar** uma mensagem, mover para o `_processed/` **do canal** dela
 (`git mv docs/evolution/<inbox|inbound>/<arquivo> docs/evolution/<inbox|inbound>/_processed/`). Assim o
 "lido/não-lido" fica **git-visível** (sem state file) e o hook deixa de contá-la. **Só mover após o maestro
 confirmar** que a mensagem foi de fato endereçada.
+
+**Sinal marcado `reviewed_for_public: false` (desde 2026-10-29):** o carteiro upstream marca assim o sinal
+que entregou a um repo público ou de visibilidade não medida, e a REGRA 113 (Sinal relayado a destino
+público só se commita revisado) barra o commit dele enquanto a marca não for `true`. Antes de commitar,
+releia o sinal como se já estivesse publicado. Se ele traz detalhe do projeto do remetente (cliente,
+pessoas, segredo, incidente, postura de segurança), ou permite reconstruí-lo por paráfrase, **não commite o
+texto**: escreva um resumo da forma (o que muda no Onion e por quê) e descarte o original sem commit.
+Então grave `reviewed_for_public: true` no que vai ao índice. A guarda só confere a marca; quem decide é
+esta releitura.
 
 **Caso residual — duplicata untracked (entrega de carteiro pós-triagem):** se uma mensagem de 1º nível é
 **untracked** (entrega-sem-commit do co-relay/co-deliver) e **byte-idêntica** a uma cópia já em

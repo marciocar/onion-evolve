@@ -25538,6 +25538,12 @@ run_corelay_selftests() {
   if [ ! -f "${helper}" ]; then record_fail "co-relay" "helper ausente: ${helper}"; return; fi
   local d core rc
   local SIG="docs/evolution/inbox/2026-01-01-sinal-teste.md"
+  # Desde a guarda de destino público (REGRA 113, 2026-10-29) o carteiro MEDE a visibilidade do destino pelo
+  # gh quando o remote é do GitHub — e os casos de hub e de vendor abaixo põem remote github.com/acme/*.
+  # Sem este gh falso a bancada chamaria a rede (e o gh real, sem acesso a acme/*, devolveria "não medida",
+  # que pede --confirm-public). Aqui todo destino mede `private`; a guarda tem família própria.
+  local _gh_fake; _gh_fake="$(mktemp -d)"; printf '#!/bin/sh\necho private\n' > "${_gh_fake}/gh"; chmod +x "${_gh_fake}/gh"
+  export CO_RELAY_GH="${_gh_fake}/gh"
 
   # builder: cria adotante git em $1 com stamp role=$2 + 1 sinal no inbox
   mk_adopter() {
@@ -25957,7 +25963,7 @@ open(sys.argv[1] + "/vendor/prod/.prod-version", "w").write(json.dumps(d, indent
   local v8_i=1; _v8 "${helper}" && v8_i=0
   if [ "${v8_i}" -eq 0 ]; then record_pass "co-relay: (V8) sinal triado + vendor em tag nova → no-op (o dedup compara o corpo, não o rodapé)"
   else record_fail "co-relay: (V8) 📬 fantasma pelo rodapé" "re-entregou o sinal já triado"; fi
-  sed 's|^  cmp -s "$2" <(_strip_vendor_footer "$3")$|  return 1|' "${helper}" > "${mutd}/m7.sh"
+  sed 's|^  cmp -s <(_norm_signal "$2") <(_norm_signal "$3")$|  return 1|' "${helper}" > "${mutd}/m7.sh"
   local v8_m=1; _v8 "${mutd}/m7.sh" && v8_m=0
   _prove_mutation "co-relay: (V-M7) com o dedup pelo arquivo inteiro, a tag nova faria voltar o sinal triado — (V8) morde" \
     "${helper}" "${mutd}/m7.sh" "${v8_i}" "${v8_m}"
@@ -25967,7 +25973,140 @@ open(sys.argv[1] + "/vendor/prod/.prod-version", "w").write(json.dumps(d, indent
   if [ "${vrc}" -eq 2 ] && grep -q 'este próprio repo' <<< "${out_v9}" && [ "$(cat "${own}/${SIG}")" = "# sinal de teste" ]; then
     record_pass "co-relay: (V9) --target = este próprio repo → exit 2, a fonte intocada"
   else record_fail "co-relay: (V9) relay para si" "rc=${vrc}: ${out_v9}"; fi
-  rm -rf "${d}" "${own}" "${own5}" "${own6}" "${v3_d}" "${v3_own}" "${mutd}"
+  rm -rf "${d}" "${own}" "${own5}" "${own6}" "${v3_d}" "${v3_own}" "${mutd}" "${_gh_fake}"
+  unset CO_RELAY_GH
+}
+
+# ---------------------------------------------------------------------------
+# Modo relay-public — a guarda de DESTINO PÚBLICO do carteiro upstream e a REGRA 113 (Sinal relayado a
+# destino público só se commita revisado) no destino. Defeito medido: 2 casos em 3 dias (2026-10-27/28 e
+# 2026-10-29) de sinal com detalhe do adotante chegando ao inbox do core PÚBLICO, segurados só pela revisão.
+# Exercita o co-relay.sh COMO A SESSÃO O INVOCA (cd no adotante, --target no core, gh falso no lugar do
+# forge) e o lint de produção (dispatcher) sobre o índice que o carteiro de fato produz. Cada comportamento
+# tem caso e mutante (python, troca exata: a âncora que não casa reprova como "não aplicou").
+# ---------------------------------------------------------------------------
+run_relay_public_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/co-evolution/co-relay.sh"
+  local chk="${REPO_ROOT}/.claude/validation/relay-public-review-check.sh"
+  [ -f "${helper}" ] && [ -f "${chk}" ] || { record_fail "relay-public" "guarda ausente (${helper} ou ${chk})"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "relay-public: python3 ausente (os mutantes usam troca exata em python)"; return; }
+  local W; W="$(mktemp -d)"
+  local SIGN="docs/evolution/inbox/2026-01-01-sinal-publico.md" SIGB="docs/evolution/inbox/2026-01-02-sem-frontmatter.md"
+  mkdir -p "${W}/bin"
+  printf '#!/bin/sh\n[ -n "${FAKE_VIS:-}" ] || exit 1\necho "${FAKE_VIS}"\n' > "${W}/bin/gh"; chmod +x "${W}/bin/gh"
+  _rp_world() {  # recria adotante ($W/a) e core ($W/c, remote github.com/acme/core) do zero
+    rm -rf "${W}/a" "${W}/c"; mkdir -p "${W}/a/.claude" "${W}/a/docs/evolution/inbox" "${W}/c/.claude/validation"
+    git -C "${W}/a" init -q; printf 'role: adopted\n' > "${W}/a/.claude/.onion-version"
+    printf -- '---\ntitle: proposta\nreviewed_for_public: true\n---\n\n# A Acme pediu X\n' > "${W}/a/${SIGN}"
+    printf '# sinal sem frontmatter\n' > "${W}/a/${SIGB}"
+    git -C "${W}/c" init -q; cp "${REPO_ROOT}/.claude/validation/onion-version.sh" "${W}/c/.claude/validation/"
+    git -C "${W}/c" remote add origin https://github.com/acme/core.git
+    mkdir -p "${W}/c/docs/evolution/inbox/_processed"
+  }
+  local rc out
+  _rp() {  # $1 = helper, $2 = visibilidade do gh falso ("" = gh falha), demais = flags → rc/out
+    local h="$1" vis="$2"; shift 2
+    rc=0; out="$( ( cd "${W}/a" && FAKE_VIS="${vis}" CO_RELAY_GH="${W}/bin/gh" CO_RELAY_RISK_TERMS="${W}/terms" LC_ALL=C bash "${h}" --target "${W}/c" "$@" ) 2>&1)" || rc=$?
+  }
+  printf 'acme\n# comentario\n' > "${W}/terms"
+  # Cada caso é uma função: $1 = helper → 0 se o comportamento vale. O mesmo caso roda no intacto e no mutante.
+  _c_pub_stops() { _rp_world; _rp "$1" public
+    [ "${rc}" -eq 2 ] && [ ! -e "${W}/c/${SIGN}" ] && grep -q 'repo PÚBLICO' <<< "${out}" && grep -qF "${SIGN}" <<< "${out}"; }
+  _c_unknown_stops() { _rp_world; _rp "$1" ""
+    [ "${rc}" -eq 2 ] && [ ! -e "${W}/c/${SIGN}" ] && grep -q 'NÃO MEDIDA' <<< "${out}"; }
+  _c_private_passes() { _rp_world; _rp "$1" private
+    [ "${rc}" -eq 0 ] && cmp -s "${W}/a/${SIGN}" "${W}/c/${SIGN}" && ! grep -q 'reviewed_for_public: false' "${W}/c/${SIGN}"; }
+  _c_marks() { _rp_world; _rp "$1" public --confirm-public
+    [ "${rc}" -eq 0 ] && [ "$(grep -c '^reviewed_for_public: false$' "${W}/c/${SIGN}" 2>/dev/null)" = 1 ]; }
+  _c_strips_sender_true() { _rp_world; _rp "$1" public --confirm-public
+    [ "${rc}" -eq 0 ] && [ -f "${W}/c/${SIGN}" ] && ! grep -q 'reviewed_for_public: true' "${W}/c/${SIGN}"; }
+  _c_prepends() { _rp_world; _rp "$1" public --confirm-public
+    [ "${rc}" -eq 0 ] && [ "$(sed -n 1,3p "${W}/c/${SIGB}" 2>/dev/null | tr '\n' '|')" = '---|reviewed_for_public: false|---|' ] \
+      && [ "$(tail -1 "${W}/c/${SIGB}")" = '# sinal sem frontmatter' ]; }
+  _c_dry() { _rp_world; _rp "$1" public --dry-run
+    [ "${rc}" -eq 0 ] && [ ! -e "${W}/c/${SIGN}" ] && grep -q -- '--confirm-public' <<< "${out}" && grep -q 'visível  : public' <<< "${out}"; }
+  _c_risk_warns() { _rp_world; _rp "$1" public
+    [ "${rc}" -eq 2 ] && grep -q '«acme» em l.6 (aviso, não bloqueia)' <<< "${out}"; }
+  _c_dedup_preguard() { _rp_world; cp "${W}/a/${SIGN}" "${W}/c/docs/evolution/inbox/_processed/2026-01-01-ja-triado.md"; _rp "$1" public --confirm-public
+    [ "${rc}" -eq 0 ] && [ ! -e "${W}/c/${SIGN}" ] && [ -e "${W}/c/${SIGB}" ]; }
+
+  # (h) polaridade honesta da lista: sem lista, nada de aviso, e a lista NUNCA muda o desfecho (rc 2 nos dois)
+  _rp_world; rm -f "${W}/terms"; _rp "${helper}" public; local rc_nolist="${rc}" out_nolist="${out}"
+  printf 'acme\n# comentario\n' > "${W}/terms"
+  if [ "${rc_nolist}" -eq 2 ] && ! grep -q 'termo de risco' <<< "${out_nolist}" && _c_risk_warns "${helper}"; then
+    record_pass "relay-public: (h) a lista local de termos só AVISA: sem lista cala, com lista acusa a linha, e o desfecho é o mesmo (rc 2)"
+  else record_fail "relay-public: (h) lista de termos" "rc_sem_lista=${rc_nolist}; ${out:0:200}"; fi
+
+  local mut="${W}/m.sh" name fn old new
+  while IFS=$'\x1f' read -r name fn old new; do
+    [ -n "${name}" ] || continue
+    local ok_i=1 ok_m=1
+    "${fn}" "${helper}" && ok_i=0
+    if [ "${ok_i}" -eq 0 ]; then record_pass "relay-public: ${name}"
+    else record_fail "relay-public: ${name}" "rc=${rc}: ${out:0:240}"; fi
+    if ! python3 -I -B -c 'import sys; src,dst,a,b=sys.argv[1:5]; s=open(src,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(dst,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${helper}" "${mut}" "${old}" "${new}"; then
+      record_fail "relay-public: mutante de ${name}" "a âncora não casou exatamente uma vez no co-relay.sh"; continue
+    fi
+    "${fn}" "${mut}" && ok_m=0
+    _prove_mutation "relay-public: mutante morde → ${name}" "${helper}" "${mut}" "${ok_i}" "${ok_m}"
+  done <<EOF_RP
+(a) destino PÚBLICO sem --confirm-public → exit 2, nada entregue, e diz o arquivo e o aviso$(printf '\x1f')_c_pub_stops$(printf '\x1f')case "\${T_VIS}" in public|unknown) PUBLIC_GATE=1 ;; esac$(printf '\x1f')case "\${T_VIS}" in __never__) PUBLIC_GATE=1 ;; esac
+(b) visibilidade NÃO MEDIDA (gh falhou) se trata como pública → exit 2$(printf '\x1f')_c_unknown_stops$(printf '\x1f')case "\${T_VIS}" in public|unknown) PUBLIC_GATE=1 ;; esac$(printf '\x1f')case "\${T_VIS}" in public) PUBLIC_GATE=1 ;; esac
+(c) destino PRIVADO → entrega byte-idêntica, sem confirmação e sem marca (a guarda cala no honesto)$(printf '\x1f')_c_private_passes$(printf '\x1f')case "\${T_VIS}" in public|unknown) PUBLIC_GATE=1 ;; esac$(printf '\x1f')case "\${T_VIS}" in *) PUBLIC_GATE=1 ;; esac
+(d) com --confirm-public o sinal chega com reviewed_for_public: false no frontmatter$(printf '\x1f')_c_marks$(printf '\x1f')fm == 1 && /^---\r?\$/ { print "reviewed_for_public: false"; fm = 0; print; next }$(printf '\x1f')fm == 1 && /^---\r?\$/ { fm = 0; print; next }
+(e) o reviewed_for_public: true que o REMETENTE escreveu sai (a marca é do destino conceder)$(printf '\x1f')_c_strips_sender_true$(printf '\x1f'){ next }   # a do remetente sai$(printf '\x1f'){ print; next }   # mutante
+(f) sinal sem frontmatter ganha um, com a marca, e o corpo intacto$(printf '\x1f')_c_prepends$(printf '\x1f')printf -- '---\nreviewed_for_public: false\n---\n\n'; cat "\$1"$(printf '\x1f')cat "\$1"
+(g) --dry-run num destino público mostra a visibilidade e o que a entrega exigirá, sem escrever$(printf '\x1f')_c_dry$(printf '\x1f')  echo "  visível  : \${T_VIS_SHOW} — \${T_VIS_HOW}"$(printf '\x1f')  :
+(h2) a lista local acusa o termo e a linha$(printf '\x1f')_c_risk_warns$(printf '\x1f')  [ -f "\${RISK_FILE}" ] || return 0$(printf '\x1f')  return 0
+(i) sinal entregue ANTES da guarda (sem marca) e já triado não volta pela marca (dedup pelo corpo normalizado)$(printf '\x1f')_c_dedup_preguard$(printf '\x1f')  cmp -s <(_norm_signal "\$2") <(_norm_signal "\$3")$(printf '\x1f')  return 1
+EOF_RP
+
+  # (j) O LADO QUE PUBLICA, pelo dispatcher de produção, sobre o índice que o carteiro de fato produz:
+  #     entregue (untracked) cala · adicionado com a marca false → HARD da REGRA 113 · revisado (true) cala.
+  _rp_world; _rp "${helper}" public --confirm-public
+  local lint_l n_untracked n_staged n_reviewed
+  _lint113() { ( cd "${REPO_ROOT}" && ONION_RELAY_REVIEW_REPO="${W}/c" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${W}/c/${SIGN}" 2>&1 || true ) \
+                 | grep -c 'REGRA 113 (Sinal relayado a destino público só se commita revisado): \[sem-revisao\]' || true; }
+  n_untracked="$(_lint113)"
+  git -C "${W}/c" add -- "${SIGN}" >/dev/null 2>&1; n_staged="$(_lint113)"
+  sed -i 's/^reviewed_for_public: false$/reviewed_for_public: true/' "${W}/c/${SIGN}"; git -C "${W}/c" add -- "${SIGN}" >/dev/null 2>&1; n_reviewed="$(_lint113)"
+  if [ "${n_untracked}" = 0 ] && [ "${n_staged}" = 1 ] && [ "${n_reviewed}" = 0 ]; then
+    record_pass "relay-public: (j) dispatcher: o sinal que o carteiro entregou cala untracked, vira HARD da REGRA 113 no índice, e cala revisado"
+  else record_fail "relay-public: (j) dispatcher" "untracked=${n_untracked} staged=${n_staged} revisado=${n_reviewed}"; fi
+
+  # (k) as polaridades do check (--selftest) e os mutantes dele: ler a árvore em vez do índice, e a chave fora do frontmatter
+  local o
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then
+    record_pass "relay-public: (k) o check passa no próprio --selftest ($(grep -o '[0-9]*/[0-9]* verdes' <<< "${o}"))"
+  else record_fail "relay-public: (k) --selftest do check" "$(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # Um mutante pode trocar DUAS âncoras (old2/new2): onde a cura mora em duas linhas que se cobrem (listar pelo
+  # índice E ler o blob do índice; o `exit` no fecho do frontmatter E a condição fm == 1), reverter só uma não
+  # reverte a cura, e o mutante de uma linha só mediria a redundância, não o comportamento.
+  local want mo mrc old2 new2
+  while IFS=$'\x1f' read -r old new want old2 new2; do
+    [ -n "${old}" ] || continue
+    if ! python3 -I -B -c 'import sys
+src, dst = sys.argv[1:3]; s = open(src, encoding="utf-8").read(); pairs = sys.argv[3:]
+for a, b in zip(pairs[0::2], pairs[1::2]):
+    if a == "": continue
+    if s.count(a) != 1: sys.exit(3)
+    s = s.replace(a, b)
+open(dst, "w", encoding="utf-8").write(s)' \
+         "${chk}" "${mut}" "${old}" "${new}" "${old2:-}" "${new2:-}"; then
+      record_fail "relay-public: (k-m) mutante do check não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${mut}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "relay-public: (k-m) mutante do check morde → ✗ ${want}"
+    else record_fail "relay-public: (k-m) mutante do check NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_RPC
+    git -C "\${repo}" show ":\${p}" > "\${tmp}" 2>/dev/null || continue$(printf '\x1f')    cat "\${repo}/\${p}" > "\${tmp}" 2>/dev/null || continue$(printf '\x1f')(iv) índice false com a árvore true acusa
+LC_ALL=C git -C "\${repo}" grep --cached -z -l$(printf '\x1f')LC_ALL=C git -C "\${repo}" grep --untracked -z -l$(printf '\x1f')(iii) untracked cala$(printf '\x1f')    git -C "\${repo}" show ":\${p}" > "\${tmp}" 2>/dev/null || continue$(printf '\x1f')    cat "\${repo}/\${p}" > "\${tmp}" 2>/dev/null || continue
+       fm == 1 && /^reviewed_for_public[ \t]*:/ {$(printf '\x1f')       /^reviewed_for_public[ \t]*:/ {$(printf '\x1f')(vi) corpo cala$(printf '\x1f')       fm == 1 && /^---\r?\$/ { exit }$(printf '\x1f')       fm == 1 && /^---\r?\$/ { fm = 0; next }
+      case "\$(printf '%s' "\${v}" | tr '[:upper:]' '[:lower:]')" in true) : ;; *) bad="\${v}" ;; esac$(printf '\x1f')      case "\${v}" in *) : ;; esac$(printf '\x1f')(i) marcado false no índice acusa
+    || { echo "relay-public-review-check: \${repo} não é uma árvore git — sem índice, não julguei" >&2; return 3; }$(printf '\x1f')    || return 0$(printf '\x1f')(x) sem árvore git
+EOF_RPC
+  rm -rf "${W}"
 }
 
 # ---------------------------------------------------------------------------
@@ -30459,6 +30598,9 @@ _family run_design_tokens_selftests
 
 # Modo co-relay — idem (carteiro upstream; adotante+core em mktemp, sem fixture-file).
 _family run_corelay_selftests
+
+# Modo relay-public — guarda de destino público do carteiro + REGRA 113 no destino (2026-10-29).
+_family run_relay_public_selftests
 
 # Modo co-deliver — carteiro downstream (resolução local_path do members.yaml; sinal 2026-07-10).
 _family run_codeliver_selftests

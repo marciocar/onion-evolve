@@ -3,10 +3,10 @@ name: co-relay
 description: 'Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do /meta:co-deliver. Relaya um sinal do adotante (docs/evolution/inbox/) direto no inbox/ do CORE que vive na MESMA máquina, para o hook "you have mail" sinalizar 📬 sem o maestro copiar à mão. ENTREGA-SEM-COMMIT (o adotante nunca commita no repo alheio — invariante I3); o commit + triagem é da sessão do core. Dissolve o incidente "commit cross-repo na branch errada" (sinal S2): sem commit, não há pergunta de branch/push. Roda só no ADOTANTE.'
 category: meta
 tags: [co-evolution, upstream, transport, carteiro, inbox, relay, bridge]
-version: "1.2.0"
-updated: "2026-10-20"
+version: "1.3.0"
+updated: "2026-10-29"
 allowed-tools: Read Bash(bash .claude/utils/co-evolution/co-relay.sh*) Bash(ls docs/evolution/*) Bash(cat .claude/.onion-version)
-argument-hint: "[<signal-file>] --target <path-local-do-core|do-hub|do-dono-de-um-vendor> [--from <dir>] [--dry-run]"
+argument-hint: "[<signal-file>] --target <path-local-do-core|do-hub|do-dono-de-um-vendor> [--from <dir>] [--dry-run] [--confirm-public]"
 ---
 
 # 📨 /meta:co-relay — Carteiro-local (upstream, relay de sinal ao core)
@@ -72,10 +72,35 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
 
 **Sempre rode com `--dry-run` primeiro** para conferir alvo + lista de arquivos antes de escrever.
 
+## Passo 2b — Destino público: confirmação explícita e revisão no destino (desde 2026-10-29)
+
+O core é um repo **público**, e o hub pode ser. Em 2026-10-27/28 e 2026-10-29 chegaram ao inbox do core
+sinais com detalhe do projeto do adotante (cliente, pessoas, segredo, incidente, postura de segurança), e
+quem segurou foi a revisão do core, sem mecanismo. Agora o helper:
+
+- **mede a visibilidade do destino pelo forge** (`gh api repos/<dono>/<repo>` sobre o remote `origin` do
+  destino). Sem remote = `local`. gh ausente, sem auth, sem rede ou host fora do GitHub = **NÃO MEDIDA**,
+  e não medida se trata como pública. O remetente não declara a visibilidade: quem declararia "privado" é
+  quem a guarda vigia;
+- **público ou não medido, sem `--confirm-public`: para** (exit 2) e mostra o arquivo, o destino e o aviso
+  "este texto pode ser commitado num repo público". O `--dry-run` mostra a mesma visibilidade sem parar;
+- **avisa pela lista local de termos de risco**, se ela existir: `.claude/relay-risk-terms.local` (ou o
+  caminho em `CO_RELAY_RISK_TERMS`), um termo por linha, `#` comenta. A lista é do adotante, não viaja
+  para o core e **não deve ser versionada** num repo público. Ela **nunca bloqueia**: lista de palavras
+  dá falso positivo e deixa a paráfrase passar;
+- **com `--confirm-public`, entrega o sinal marcado `reviewed_for_public: false`** no frontmatter (cria
+  um frontmatter se não houver, e troca qualquer `reviewed_for_public` que o remetente tenha escrito). A
+  REGRA 113 (Sinal relayado a destino público só se commita revisado) do lint do destino barra commitar
+  o sinal assim; a sessão do destino revisa, commita só a forma e grava `true`.
+
+Antes de confirmar, releia o sinal como se já estivesse publicado: vai a **forma** (o que mudar no Onion e
+por quê), não o detalhe do seu projeto. Paráfrase que deixa reconstruir o detalhe vaza igual, e nenhuma
+guarda a pega. A confirmação é lombada; quem decide é a sua releitura e a revisão do destino.
+
 ## Passo 3 — Relayar
 
 ```bash
-bash .claude/utils/co-evolution/co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run]
+bash .claude/utils/co-evolution/co-relay.sh [<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run] [--confirm-public]
 ```
 
 O helper: aplica a guarda de papel (stamp), valida o alvo (git + avisa se não tem `docs/evolution/` na
