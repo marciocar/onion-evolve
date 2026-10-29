@@ -5,23 +5,77 @@
   "description": "A saída de kg-trace digest --format json (desde a 4.39.0): o provenance.node_sha256 de cada nó pedido, o SHA-256 do JCS (RFC 8785) do nó no modelo canônico do grafo, para quem anota a ponte kg-node.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "results"],
+  "required": [
+    "schema_version",
+    "results"
+  ],
   "properties": {
-    "schema_version": {"const": "kg-ssot.digest/1"},
+    "schema_version": {
+      "const": "kg-ssot.digest/1"
+    },
     "results": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["ref", "file", "id", "node_sha256", "status"],
+        "required": [
+          "ref",
+          "file",
+          "id",
+          "node_sha256",
+          "status"
+        ],
         "properties": {
-          "ref": {"type": "string", "description": "a referência pedida, ARQUIVO#ID"},
-          "file": {"type": "string"},
-          "id": {"type": "string"},
-          "node_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$",
-                          "description": "o valor a pôr no provenance.node_sha256; null quando o status não é ok"},
-          "status": {"enum": ["ok", "not_found", "no_canonical_form"],
-                     "description": "ok; not_found (o nó não existe, se repete, ou o grafo não se lê); no_canonical_form (o nó existe e não tem forma JCS, como um inteiro fora de ±(2^53−1))"}
+          "ref": {
+            "type": "string",
+            "description": "a referência pedida, ARQUIVO#ID"
+          },
+          "file": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "node_sha256": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "o valor a pôr no provenance.node_sha256; null quando o status não é ok"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "not_found",
+              "unreadable",
+              "no_canonical_form"
+            ],
+            "description": "ok; not_found (o nó não existe ou se repete); unreadable (desde a 4.39.1: o grafo não parseia, e o nó não foi procurado); no_canonical_form (o nó existe e não tem forma JCS, como um inteiro fora de ±(2^53−1))"
+          },
+          "code": {
+            "type": "string",
+            "description": "só com status unreadable: o código do leitor que recusou o grafo, como parse.yaml-error"
+          }
+        },
+        "if": {
+          "properties": {
+            "status": {
+              "const": "unreadable"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "code"
+          ]
+        },
+        "else": {
+          "not": {
+            "required": [
+              "code"
+            ]
+          }
         }
       }
     }

@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:8c905189f3b96049 -->
+<!-- translation-of: ADOPTING.md sha256:af4b355b316a26e7 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -342,6 +342,11 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.39.0` para a `kg-ssot-v4.39.1`, o contrato não muda (v4.18) e nenhum veredito muda. No JSON do
+`kg-trace digest`, o grafo que não parseia sai `unreadable`, com um `code`, em vez de `not_found`, e a linha de texto
+diz `ILEGÍVEL ARQUIVO#ID CÓDIGO` em vez de `NÃO ACHADO`. Quem valida contra o schema da 4.39.0, ou trata o `status` num
+`switch` exaustivo, precisa aceitar o valor e o campo novos.
 
 Da `kg-ssot-v4.38.0` para a `kg-ssot-v4.39.0`, o contrato não muda (v4.18) e nenhum veredito muda. O JSON da consulta
 ganha `query.where`, e o do revisit ganha `where`, só quando o `--where` foi pedido.

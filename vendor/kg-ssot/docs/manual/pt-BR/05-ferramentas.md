@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:3f8e9ad45dbbcac3 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:b33e3469e1ff5338 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -1246,8 +1246,9 @@ kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
 
 Com `--format json` (4.39.0), o `digest` devolve `kg-ssot.digest/1` (`spec/digest.schema.json`): um resultado por
-referência, com o `node_sha256` e o `status` `ok`, `not_found` ou `no_canonical_form`, e o mesmo código de saída do
-texto. Leia o valor pelo campo, em vez de partir a linha de texto. Uma entrada quebrada (um caminho fora da raiz, um
+referência, com o `node_sha256` e o `status` `ok`, `not_found`, `unreadable` ou `no_canonical_form`, e o mesmo código
+de saída do texto. Desde a 4.39.1, o grafo que não parseia sai `unreadable`, com o `code` do leitor, e não mais
+`not_found`: o nó não foi procurado, então não está ausente. Leia o valor pelo campo, em vez de partir a linha de texto. Uma entrada quebrada (um caminho fora da raiz, um
 arquivo que não se lê) para antes de imprimir qualquer resultado, nos dois formatos, com rc 2.
 
 ### O checador de projeção (`kg_trace.py projection`, 4.35.0)

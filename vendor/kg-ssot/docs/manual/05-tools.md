@@ -1262,8 +1262,9 @@ kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
 
 With `--format json` (4.39.0), `digest` returns `kg-ssot.digest/1` (`spec/digest.schema.json`): one result per
-reference, with `node_sha256` and a `status` of `ok`, `not_found` or `no_canonical_form`, and the same exit code as the
-text output. Read the value from the field instead of splitting the text line. A broken input (a path outside the
+reference, with `node_sha256` and a `status` of `ok`, `not_found`, `unreadable` or `no_canonical_form`, and the same
+exit code as the text output. Since 4.39.1, a graph that does not parse is `unreadable`, with the reader's `code`, and
+no longer `not_found`: the node was not looked for, so it is not missing. Read the value from the field instead of splitting the text line. A broken input (a path outside the
 root, a file that cannot be read) stops before any result is printed, in both formats, with rc 2.
 
 ### The projection checker (`kg_trace.py projection`, 4.35.0)

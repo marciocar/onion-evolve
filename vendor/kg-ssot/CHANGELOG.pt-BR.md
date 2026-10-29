@@ -10,6 +10,14 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.39.1] - 2026-10-29
+
+Sem mudança no contrato (segue v4.18).
+
+- `kg-trace digest`: o grafo que não parseia agora sai `unreadable`, com o `code` do leitor (no texto, `ILEGÍVEL
+  ARQUIVO#ID CÓDIGO`), e não mais `not_found`. O nó não foi procurado, então não está ausente. O código de saída segue
+  1. Achado num teste de campo da 4.39.0.
+
 ## [4.39.0] - 2026-10-29
 
 Sem mudança no contrato (segue v4.18). Quando várias sessões de vida longa dividem um grafo de coordenação, cada uma com
