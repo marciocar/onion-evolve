@@ -3607,3 +3607,39 @@ msgstr "Leia o nó citado de novo e registre o hash novo (kg_trace.py digest ARQ
 #: tools/kg_trace.py
 msgid "{path} is outside the root"
 msgstr "{path} está fora da raiz"
+
+#: tools/kg_query.py
+msgid "--where filters the node queries and --revisit, not --decision or --chain"
+msgstr "o --where filtra as consultas de nós e o --revisit, não o --decision nem o --chain"
+
+#: tools/kg_query.py
+msgid "--where takes at most {max} conditions"
+msgstr "o --where aceita no máximo {max} condições"
+
+#: tools/kg_query.py
+msgid "--where {item}: the key is empty or has an empty part"
+msgstr "--where {item}: a chave está vazia ou tem uma parte vazia"
+
+#: tools/kg_query.py
+msgid "--where {item}: the key is owner or an x_* field (x_raci.responsible)"
+msgstr "--where {item}: a chave é owner ou um campo x_* (x_raci.responsible)"
+
+#: tools/kg_query.py
+msgid "--where {item}: write KEY=VALUE"
+msgstr "--where {item}: escreva CHAVE=VALOR"
+
+#: tools/kg_query.py
+msgid "KEY=VALUE"
+msgstr "CHAVE=VALOR"
+
+#: tools/kg_query.py
+msgid "only the nodes where the key has the value (repeatable, all of them): owner or an x_* field, with a dot for a nested key (x_raci.responsible); with --revisit, its decisions"
+msgstr "só os nós em que a chave tem o valor (repetível, todas valendo): owner ou um campo x_*, com ponto para uma chave aninhada (x_raci.responsible); com --revisit, as decisões dele"
+
+#: tools/kg_query.py
+msgid "· only the decisions where {where}"
+msgstr "· só as decisões em que {where}"
+
+#: tools/kg_query.py
+msgid "· only the nodes where {where}"
+msgstr "· só os nós em que {where}"

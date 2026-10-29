@@ -1,4 +1,4 @@
-<!-- translation-of: README.md sha256:707c53d0f56e26d9 -->
+<!-- translation-of: README.md sha256:6874a4ea448f0504 -->
 <div align="center">
 
 # KG-SSOT
@@ -11,7 +11,7 @@
 <sub>Tradução do original em inglês; quando os dois divergirem, vale o inglês.</sub>
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.38.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.38.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.39.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.39.0-6f42c1)](spec/release.json)
 [![Conformidade: 512/512](https://img.shields.io/badge/conformidade-512%2F512-2ea44f)](spec/conformance/README.pt-BR.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -21,7 +21,9 @@
 
 [Documentação](https://marciocar.github.io/kg-ssot/) · [Manual em português](docs/manual/pt-BR/README.md) · [Adotar](ADOPTING.pt-BR.md) · [O contrato](docs/manual/pt-BR/04-contrato.md) · [Suíte de conformidade](spec/conformance/README.pt-BR.md) · [Changelog](CHANGELOG.pt-BR.md) · [Para agentes de IA](llms.txt)
 
-![O KG-SSOT em 40 segundos: o contrato recusa uma afirmação sem fonte, a correção, uma consulta e o gate](docs/demo/kg-ssot-demo.pt-BR.gif)
+![O KG-SSOT em 50 segundos: uma afirmação sustentada por um teste que roda, uma refatoração que apaga o teste, o grafo acusando a fonte que sumiu e a decisão a revisitar subindo para o topo do backlog](docs/demo/kg-ssot-showcase.pt-BR.gif)
+
+[O contrato em 40 segundos](docs/demo/kg-ssot-demo.pt-BR.gif): uma afirmação sem fonte é recusada, depois corrigida, consultada e posta sob o gate.
 
 </div>
 
@@ -84,7 +86,7 @@ As ferramentas imprimem em inglês por padrão e em português do Brasil quando 
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | o arquivo `.mcpb` da [última release](https://github.com/marciocar/kg-ssot/releases/latest) | O servidor MCP como extensão de um clique |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | O mesmo servidor para qualquer cliente MCP |
 | [Contêiner](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | O servidor MCP como serviço ao lado de um cliente sem Python, como o LibreChat |
-| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.38.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
+| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.39.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
 
 ## Um nó, por dentro
 
@@ -201,7 +203,7 @@ flowchart LR
 
 ## Estado
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.38.0`. O leitor de referência passa em 512 de 512 casos de `latest/`.
+- **Vigente:** contrato v4, release `kg-ssot-v4.39.0`. O leitor de referência passa em 512 de 512 casos de `latest/`.
 - **Em uso:** três adotantes rodam o gate no CI, um deles em produção.
 - **Próximo:** o v5 vai reprovar um `method` fora da forma `<classe>: <detalhe>`, que hoje só avisa.
 - **Aberto:** a camada semântica (frescor, contradição, completude de domínio) vive em `optional/`, e o leitor de

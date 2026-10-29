@@ -169,7 +169,12 @@ TOOLS = {
                             "cursor": {"type": "string", "maxLength": 12},
                             "narrative": {"type": "boolean", "description": P_("includes the narrative of each node")},
                             "fields": {"type": "array", "items": {"type": "string", "maxLength": 64}, "maxItems": 20,
-                                       "description": P_("node keys that go out in extra, as globs: x_*, owner")}}},
+                                       "description": P_("node keys that go out in extra, as globs: x_*, owner")},
+                            "where": {"type": "array", "maxItems": 10,
+                                      "items": {"type": "string", "pattern": "^[^=]+=", "maxLength": 300},
+                                      "description": P_("KEY=VALUE conditions, all of them: owner or an x_* field, with "
+                                                        "a dot for a nested key; owner=<session> is that session's "
+                                                        "queue")}}},
         "needs_store": True, "writes": False},
     "kg_terms": {
         "description": P_("Resolves a domain term in the vocabulary of the store (the x_term profile, contract v4.11): "
@@ -647,7 +652,7 @@ class Server:
                                      sort=args.get("sort", "corpus"), limit=args.get("limit", 50),
                                      cursor=args.get("cursor"), narrative=args.get("narrative", False),
                                      fields=args.get("fields", ()), max_bytes=self.max_bytes,
-                                     semantic=args.get("semantic"), ranker=ranker)
+                                     semantic=args.get("semantic"), ranker=ranker, where=args.get("where", ()))
             except ValueError as exc:
                 raise ToolError(str(exc)) from None
             return res, False

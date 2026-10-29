@@ -153,6 +153,13 @@
         }
       },
       "description": "As decisões locais cujo apoio externo mudou na ponta do clone desde o commit fixado; não é motivo de revisão."
+    },
+    "where": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "desde a 4.39.0: as condições CHAVE=VALOR do --where, só quando o --revisit as pediu; todas as listas (decisions, on_event, unstamped, unresolved e upstream_changed) trazem só as decisões que casam"
     }
   },
   "$defs": {

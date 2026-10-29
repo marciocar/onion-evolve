@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:3418464fc33b61eb -->
+<!-- translation-of: docs/manual/05-tools.md sha256:3f8e9ad45dbbcac3 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -126,7 +126,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.38.0",
+  "release": "kg-ssot-v4.39.0",
   "sha256": { "must": "6a05cb1e…", "should": "04327d29…" }
  },
  "results": [
@@ -758,9 +758,10 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem maiúscula nem acento (`verificacao` casa `Verificação`, desde a 4.23); `--in-narrative` procura também na narrative. Quando o texto inteiro é um termo do vocabulário (o `pref` ou um sinônimo de domínio atual, dobrados, ou a `notation`, exata), casam também o termo e todo nó que tenha qualquer forma dele como palavra inteira, e o `expanded` diz qual termo; o sinônimo de caso ou aposentado não expande. Nenhum nó dá um `hint`, que diz quando o zero vem dos outros filtros, para o zero não passar por "não há" |
 | `--semantic PERGUNTA` | Desde a 4.26, com o extra `vector`: ordena os nós que passam nos outros filtros pela semelhança com a pergunta (`--model`, `--model-dir`; ver o `kg_vector.py` abaixo). Sozinho, a ordem é a do vetor; com `--text`, a lista do texto (na ordem do corpus) e a do vetor se fundem por RRF (k=60), com o empate pela posição no vetor. Dê o termo curto ao `--text` e a pergunta inteira ao `--semantic`: é o que a bancada mediu (14 de 20 acertos, contra 12 do vetor e 9 do texto). Os filtros valem para os dois, as duas listas são completas, e o `--limit` só pagina a lista fundida; por isso, no híbrido, o `total` conta todos os candidatos, e o `semantic.text_matches` diz quantos casam o `--text`. O JSON ganha `semantic` (modo, modelo com revisão e sha256, e de onde veio cada vetor: o índice, embutido na hora, a memória do processo, ou sem texto) e um `rank` por nó; sem `--semantic` a saída não muda |
 | `--open` | A fila dos abertos (status `open`) |
+| `--where CHAVE=VALOR` | Desde a 4.39.0: só os nós em que `owner` ou um campo `x_*` (com ponto para chave aninhada) tem o valor; repetível, e todas têm de valer. Veja "A fila de um dono" abaixo |
 | `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
 | `--around ID` | A vizinhança: `<caminho>#<id>`, ou um id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
-| `--sort corpus\|impact` | A ordem do corpus, ou o impacto declarado. A fórmula de atenção fica com o radar de quem a usa |
+| `--sort corpus\|impact\|attention` | A ordem do corpus, o impacto declarado ou a atenção (impacto × confiança × fator do status × (1 + grau), o valor do radar) |
 | `--limit N` e `--cursor C` | A página (até 1000) e o cursor da próxima, que vale para a mesma consulta sobre o mesmo corpus |
 | `--fields GLOB` | Chaves do nó que saem em `extra`, como estão no grafo: `--fields 'x_*'` |
 | `--narrative` | Inclui a narrative de cada nó |
@@ -896,6 +897,27 @@ prefixo acaba logo antes do commit: no GitHub ele inclui o `/blob` (`https://git
 
 ```bash
 kg-query --root . --revisit --with https://github.com/acme/core/blob=../core
+```
+
+### A fila de um dono: `--where` (4.39.0)
+
+O `--where CHAVE=VALOR` deixa só os nós em que a chave tem o valor. A chave é `owner` ou um campo `x_*`, com ponto para
+uma chave aninhada (`x_raci.responsible`); um escalar casa pelo texto, uma lista quando um dos itens casa, e o nó sem a
+chave não casa. Repita para somar condições, e todas têm de valer. Vale com o `--open`, com os outros filtros e com o
+`--sort`, e com o `--revisit`, que então julga só as decisões que casam; a saída JSON ecoa as condições em `where`, e a
+saída humana diz que a lista está filtrada. Com o `--revisit`, todas as listas (as decisões, `on_event`, `unstamped`,
+`unresolved` e `upstream_changed`) ficam só com as decisões que casam. A ferramenta `kg_query` do MCP aceita o mesmo
+`where`. Uma chave fora de `owner` e `x_*`, ou uma condição sem `=`, é entrada quebrada (rc 2).
+Não é o `--where` do `kg_validate`, que mostra de que nó sai cada código. Um número do grafo casa pelo valor como o
+Python o escreve (`owner: 1e3` casa `owner=1000.0`), o texto é comparado em NFC, então a mesma palavra acentuada casa
+de qualquer jeito que foi digitada, e maiúscula e espaço contam. Uma lista de mapas não é percorrida, e um mapa nunca
+casa.
+
+É a fila com que uma sessão abre quando várias sessões dividem um grafo de coordenação, cada uma com o seu `owner`:
+
+```bash
+kg-query --root . --open --where owner=kg-ssot --sort attention
+kg-query --root . --revisit --where owner=core
 ```
 
 ## `kg_diff.py`: o diff por id entre revisões
@@ -1222,6 +1244,11 @@ o `node_sha256`. O `digest` lê a árvore de trabalho sob a raiz; para uma fonte
 ```bash
 kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
+
+Com `--format json` (4.39.0), o `digest` devolve `kg-ssot.digest/1` (`spec/digest.schema.json`): um resultado por
+referência, com o `node_sha256` e o `status` `ok`, `not_found` ou `no_canonical_form`, e o mesmo código de saída do
+texto. Leia o valor pelo campo, em vez de partir a linha de texto. Uma entrada quebrada (um caminho fora da raiz, um
+arquivo que não se lê) para antes de imprimir qualquer resultado, nos dois formatos, com rc 2.
 
 ### O checador de projeção (`kg_trace.py projection`, 4.35.0)
 
