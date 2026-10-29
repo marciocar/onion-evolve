@@ -141,9 +141,11 @@ que entregou a um repo público ou de visibilidade não medida, e a REGRA 113 (S
 público só se commita revisado) barra o commit dele enquanto a marca não for `true`. Antes de commitar,
 releia o sinal como se já estivesse publicado. Se ele traz detalhe do projeto do remetente (cliente,
 pessoas, segredo, incidente, postura de segurança), ou permite reconstruí-lo por paráfrase, **não commite o
-texto**: escreva um resumo da forma (o que muda no Onion e por quê) e descarte o original sem commit.
-Então grave `reviewed_for_public: true` no que vai ao índice. A guarda só confere a marca; quem decide é
-esta releitura.
+texto**: escreva um resumo da forma (o que muda no Onion e por quê) **num arquivo de nome novo** e
+descarte o original sem commit. Reescrever no mesmo arquivo untracked perde a revisão: um reenvio do
+remetente com corpo diferente cai por cima dele. Então grave `reviewed_for_public: true` no que vai ao
+índice. O comentário da marca traz a visibilidade que o carteiro mediu; `unknown` num repo privado se
+resolve gravando `true`. A guarda só confere a marca; quem decide é esta releitura.
 
 **Caso residual — duplicata untracked (entrega de carteiro pós-triagem):** se uma mensagem de 1º nível é
 **untracked** (entrega-sem-commit do co-relay/co-deliver) e **byte-idêntica** a uma cópia já em

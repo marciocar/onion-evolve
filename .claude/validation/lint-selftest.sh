@@ -26017,16 +26017,18 @@ run_relay_public_selftests() {
   _c_private_passes() { _rp_world; _rp "$1" private
     [ "${rc}" -eq 0 ] && cmp -s "${W}/a/${SIGN}" "${W}/c/${SIGN}" && ! grep -q 'reviewed_for_public: false' "${W}/c/${SIGN}"; }
   _c_marks() { _rp_world; _rp "$1" public --confirm-public
-    [ "${rc}" -eq 0 ] && [ "$(grep -c '^reviewed_for_public: false$' "${W}/c/${SIGN}" 2>/dev/null)" = 1 ]; }
+    [ "${rc}" -eq 0 ] && [ "$(grep -c '^reviewed_for_public: false  # o carteiro mediu a visibilidade deste repo: public$' "${W}/c/${SIGN}" 2>/dev/null)" = 1 ]; }
   _c_strips_sender_true() { _rp_world; _rp "$1" public --confirm-public
     [ "${rc}" -eq 0 ] && [ -f "${W}/c/${SIGN}" ] && ! grep -q 'reviewed_for_public: true' "${W}/c/${SIGN}"; }
   _c_prepends() { _rp_world; _rp "$1" public --confirm-public
-    [ "${rc}" -eq 0 ] && [ "$(sed -n 1,3p "${W}/c/${SIGB}" 2>/dev/null | tr '\n' '|')" = '---|reviewed_for_public: false|---|' ] \
+    [ "${rc}" -eq 0 ] && [ "$(sed -n 1,3p "${W}/c/${SIGB}" 2>/dev/null | tr '\n' '|')" = '---|reviewed_for_public: false  # o carteiro mediu a visibilidade deste repo: public|---|' ] \
       && [ "$(tail -1 "${W}/c/${SIGB}")" = '# sinal sem frontmatter' ]; }
   _c_dry() { _rp_world; _rp "$1" public --dry-run
     [ "${rc}" -eq 0 ] && [ ! -e "${W}/c/${SIGN}" ] && grep -q -- '--confirm-public' <<< "${out}" && grep -q 'visível  : public' <<< "${out}"; }
   _c_risk_warns() { _rp_world; _rp "$1" public
     [ "${rc}" -eq 2 ] && grep -q '«acme» em l.6 (aviso, não bloqueia)' <<< "${out}"; }
+  _c_noop_no_confirm() { _rp_world; cp "${W}/a/${SIGN}" "${W}/c/docs/evolution/inbox/_processed/a.md"; cp "${W}/a/${SIGB}" "${W}/c/docs/evolution/inbox/_processed/b.md"; _rp "$1" public
+    [ "${rc}" -eq 0 ] && ! grep -q 'PARADO' <<< "${out}" && grep -q '0 relayado' <<< "${out}"; }
   _c_dedup_preguard() { _rp_world; cp "${W}/a/${SIGN}" "${W}/c/docs/evolution/inbox/_processed/2026-01-01-ja-triado.md"; _rp "$1" public --confirm-public
     [ "${rc}" -eq 0 ] && [ ! -e "${W}/c/${SIGN}" ] && [ -e "${W}/c/${SIGB}" ]; }
 
@@ -26054,12 +26056,13 @@ run_relay_public_selftests() {
 (a) destino PÚBLICO sem --confirm-public → exit 2, nada entregue, e diz o arquivo e o aviso$(printf '\x1f')_c_pub_stops$(printf '\x1f')case "\${T_VIS}" in public|unknown) PUBLIC_GATE=1 ;; esac$(printf '\x1f')case "\${T_VIS}" in __never__) PUBLIC_GATE=1 ;; esac
 (b) visibilidade NÃO MEDIDA (gh falhou) se trata como pública → exit 2$(printf '\x1f')_c_unknown_stops$(printf '\x1f')case "\${T_VIS}" in public|unknown) PUBLIC_GATE=1 ;; esac$(printf '\x1f')case "\${T_VIS}" in public) PUBLIC_GATE=1 ;; esac
 (c) destino PRIVADO → entrega byte-idêntica, sem confirmação e sem marca (a guarda cala no honesto)$(printf '\x1f')_c_private_passes$(printf '\x1f')case "\${T_VIS}" in public|unknown) PUBLIC_GATE=1 ;; esac$(printf '\x1f')case "\${T_VIS}" in *) PUBLIC_GATE=1 ;; esac
-(d) com --confirm-public o sinal chega com reviewed_for_public: false no frontmatter$(printf '\x1f')_c_marks$(printf '\x1f')fm == 1 && /^---\r?\$/ { print "reviewed_for_public: false"; fm = 0; print; next }$(printf '\x1f')fm == 1 && /^---\r?\$/ { fm = 0; print; next }
+(d) com --confirm-public o sinal chega com reviewed_for_public: false no frontmatter$(printf '\x1f')_c_marks$(printf '\x1f')fm == 1 && /^---\r?\$/ { print mark; fm = 0; print; next }$(printf '\x1f')fm == 1 && /^---\r?\$/ { fm = 0; print; next }
 (e) o reviewed_for_public: true que o REMETENTE escreveu sai (a marca é do destino conceder)$(printf '\x1f')_c_strips_sender_true$(printf '\x1f'){ next }   # a do remetente sai$(printf '\x1f'){ print; next }   # mutante
-(f) sinal sem frontmatter ganha um, com a marca, e o corpo intacto$(printf '\x1f')_c_prepends$(printf '\x1f')printf -- '---\nreviewed_for_public: false\n---\n\n'; cat "\$1"$(printf '\x1f')cat "\$1"
+(f) sinal sem frontmatter ganha um, com a marca, e o corpo intacto$(printf '\x1f')_c_prepends$(printf '\x1f')printf -- '---\n%s\n---\n\n' "\${MARK_LINE}"; cat "\$1"$(printf '\x1f')cat "\$1"
 (g) --dry-run num destino público mostra a visibilidade e o que a entrega exigirá, sem escrever$(printf '\x1f')_c_dry$(printf '\x1f')  echo "  visível  : \${T_VIS_SHOW} — \${T_VIS_HOW}"$(printf '\x1f')  :
 (h2) a lista local acusa o termo e a linha$(printf '\x1f')_c_risk_warns$(printf '\x1f')  [ -f "\${RISK_FILE}" ] || return 0$(printf '\x1f')  return 0
 (i) sinal entregue ANTES da guarda (sem marca) e já triado não volta pela marca (dedup pelo corpo normalizado)$(printf '\x1f')_c_dedup_preguard$(printf '\x1f')  cmp -s <(_norm_signal "\$2") <(_norm_signal "\$3")$(printf '\x1f')  return 1
+(m) reenvio público SEM confirmação em que todo sinal já foi triado no destino → no-op rc 0, sem PARADO (o portão vem depois do dedup)$(printf '\x1f')_c_noop_no_confirm$(printf '\x1f')  [ "\${dup}" -eq 1 ] || PENDING+=("\${o}")$(printf '\x1f')  PENDING+=("\${o}")
 EOF_RP
 
   # (j) O LADO QUE PUBLICA, pelo dispatcher de produção, sobre o índice que o carteiro de fato produz:
@@ -26070,7 +26073,7 @@ EOF_RP
                  | grep -c 'REGRA 113 (Sinal relayado a destino público só se commita revisado): \[sem-revisao\]' || true; }
   n_untracked="$(_lint113)"
   git -C "${W}/c" add -- "${SIGN}" >/dev/null 2>&1; n_staged="$(_lint113)"
-  sed -i 's/^reviewed_for_public: false$/reviewed_for_public: true/' "${W}/c/${SIGN}"; git -C "${W}/c" add -- "${SIGN}" >/dev/null 2>&1; n_reviewed="$(_lint113)"
+  sed -i 's/^reviewed_for_public: false .*$/reviewed_for_public: true/' "${W}/c/${SIGN}"; git -C "${W}/c" add -- "${SIGN}" >/dev/null 2>&1; n_reviewed="$(_lint113)"
   if [ "${n_untracked}" = 0 ] && [ "${n_staged}" = 1 ] && [ "${n_reviewed}" = 0 ]; then
     record_pass "relay-public: (j) dispatcher: o sinal que o carteiro entregou cala untracked, vira HARD da REGRA 113 no índice, e cala revisado"
   else record_fail "relay-public: (j) dispatcher" "untracked=${n_untracked} staged=${n_staged} revisado=${n_reviewed}"; fi

@@ -394,44 +394,8 @@ if [ "${DRY}" -eq 1 ]; then
   exit 0
 fi
 
-# --- Destino público ou não medido: para sem a confirmação explícita -----------------------------------------
-if [ "${PUBLIC_GATE}" -eq 1 ] && [ "${CONFIRM_PUBLIC}" -eq 0 ]; then
-  {
-    echo "PARADO: este texto pode ser commitado num repo PÚBLICO."
-    echo "  alvo        : ${TARGET}  (${T_LABEL})"
-    echo "  visibilidade: ${T_VIS_SHOW} — ${T_VIS_HOW}"
-    for f in "${FILES[@]}"; do echo "  sinal       : ${f}"; _risk_report "$f"; done
-    echo "  Releia cada sinal como se já estivesse publicado: vai a FORMA (o que mudar no Onion e por quê), não o"
-    echo "  detalhe do seu projeto (cliente, pessoas, segredo, incidente, postura de segurança). Paráfrase que"
-    echo "  deixa reconstruir o detalhe vaza igual, e nenhuma lista de termos a pega."
-    echo "  Para entregar: repita com --confirm-public. O sinal chega marcado reviewed_for_public: false, e a"
-    echo "  REGRA 113 (Sinal relayado a destino público só se commita revisado) barra o commit dele até a sessão"
-    echo "  do destino revisar."
-  } >&2
-  exit 2
-fi
-
-# --- Com a confirmação, o sinal viaja MARCADO "a revisar antes do commit" -------------------------------------
-# A marca é do DESTINO conceder: um `reviewed_for_public` que o remetente tenha escrito sai, e entra `false`.
-# Determinística (sem data), então o dedup por conteúdo segue valendo entre entregas iguais.
-_mark_review() {  # $1 = sinal → stdout: o sinal com reviewed_for_public: false no frontmatter
-  if awk 'NR == 1 { if ($0 !~ /^---\r?$/) exit 1; next } /^---\r?$/ { f = 1; exit } END { exit !f }' "$1"; then
-    awk 'NR == 1 { print; fm = 1; next }
-         fm == 1 && /^---\r?$/ { print "reviewed_for_public: false"; fm = 0; print; next }
-         fm == 1 && /^[ \t]*reviewed_for_public[ \t]*:/ { next }   # a do remetente sai
-         { print }' "$1"
-  else
-    printf -- '---\nreviewed_for_public: false\n---\n\n'; cat "$1"
-  fi
-}
 RSTAGE="" ; STAGE=""
 trap 'rm -rf "${RSTAGE:-}" "${STAGE:-}"' EXIT
-if [ "${PUBLIC_GATE}" -eq 1 ]; then
-  RSTAGE="$(mktemp -d)" || { echo "ERRO: mktemp falhou." >&2; exit 2; }
-  MARKED=()
-  for f in "${FILES[@]}"; do _mark_review "$f" > "${RSTAGE}/$(basename "$f")"; MARKED+=("${RSTAGE}/$(basename "$f")"); done
-  FILES=("${MARKED[@]}")
-fi
 
 # --- Canal de vendor: a autorização VIAJA no sinal entregue ---------------------------------------------------
 # O dono do vendor recebe de um repo que não é o core nem o seu filho; sem dizer por que a entrega passou, a
@@ -484,6 +448,59 @@ _same_signal() {  # $1 = entrega, $2 = original, $3 = arquivo já no destino
   cmp -s "$1" "$3" && return 0
   cmp -s <(_norm_signal "$2") <(_norm_signal "$3")
 }
+
+# --- Destino público ou não medido: para sem a confirmação explícita -----------------------------------------
+# O portão vem DEPOIS do dedup (achado da passada adversarial de 2026-10-29): um reenvio em que todo sinal já
+# está no destino, ou já foi triado lá, é no-op e não pede confirmação. Antes, ele parava e listava sinal
+# já triado, que é o cenário da corrida de 2026-07-03 que o dedup existe para cobrir.
+PENDING=()
+for i in "${!ORIGS[@]}"; do
+  o="${ORIGS[$i]}"; dup=0
+  for ex in "${DEST_DIR}"/*.md "${DEST_DIR}/_processed"/*.md; do
+    [ -f "${ex}" ] || continue
+    if cmp -s <(_norm_signal "${o}") <(_norm_signal "${ex}"); then dup=1; break; fi
+  done
+  [ "${dup}" -eq 1 ] || PENDING+=("${o}")
+done
+if [ "${PUBLIC_GATE}" -eq 1 ] && [ "${CONFIRM_PUBLIC}" -eq 0 ] && [ "${#PENDING[@]}" -gt 0 ]; then
+  {
+    echo "PARADO: este texto pode ser commitado num repo PÚBLICO."
+    echo "  alvo        : ${TARGET}  (${T_LABEL})"
+    echo "  visibilidade: ${T_VIS_SHOW} — ${T_VIS_HOW}"
+    for f in "${PENDING[@]}"; do echo "  sinal       : ${f}"; _risk_report "$f"; done
+    echo "  Releia cada sinal como se já estivesse publicado: vai a FORMA (o que mudar no Onion e por quê), não o"
+    echo "  detalhe do seu projeto (cliente, pessoas, segredo, incidente, postura de segurança). Paráfrase que"
+    echo "  deixa reconstruir o detalhe vaza igual, e nenhuma lista de termos a pega."
+    echo "  Para entregar: repita com --confirm-public. O sinal chega marcado reviewed_for_public: false, e a"
+    echo "  REGRA 113 (Sinal relayado a destino público só se commita revisado) barra o commit dele até a sessão"
+    echo "  do destino revisar."
+  } >&2
+  exit 2
+fi
+
+# --- Com a confirmação, o sinal viaja MARCADO "a revisar antes do commit" -------------------------------------
+# A marca é do DESTINO conceder: um `reviewed_for_public` que o remetente tenha escrito sai, e entra `false`,
+# com a visibilidade que o remetente mediu num comentário: o destino nunca mede a própria, e um `unknown`
+# num repo privado se resolve lá gravando true (achado da passada adversarial de 2026-10-29).
+# Determinística (sem data), então o dedup por conteúdo segue valendo entre entregas iguais.
+MARK_LINE="reviewed_for_public: false  # o carteiro mediu a visibilidade deste repo: ${T_VIS}"
+_mark_review() {  # $1 = sinal → stdout: o sinal com reviewed_for_public: false no frontmatter
+  if awk 'NR == 1 { if ($0 !~ /^---\r?$/) exit 1; next } /^---\r?$/ { f = 1; exit } END { exit !f }' "$1"; then
+    awk -v mark="${MARK_LINE}" 'NR == 1 { print; fm = 1; next }
+         fm == 1 && /^---\r?$/ { print mark; fm = 0; print; next }
+         fm == 1 && /^[ \t]*reviewed_for_public[ \t]*:/ { next }   # a do remetente sai
+         { print }' "$1"
+  else
+    printf -- '---\n%s\n---\n\n' "${MARK_LINE}"; cat "$1"
+  fi
+}
+RSTAGE=""
+if [ "${PUBLIC_GATE}" -eq 1 ]; then
+  RSTAGE="$(mktemp -d)" || { echo "ERRO: mktemp falhou." >&2; exit 2; }
+  MARKED=()
+  for f in "${FILES[@]}"; do _mark_review "$f" > "${RSTAGE}/$(basename "$f")"; MARKED+=("${RSTAGE}/$(basename "$f")"); done
+  FILES=("${MARKED[@]}")
+fi
 
 mkdir -p "${DEST_DIR}" 2>/dev/null || { echo "ERRO: não foi possível criar ${DEST_DIR} (permissão?)." >&2; exit 2; }
 
