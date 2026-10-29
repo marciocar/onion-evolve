@@ -8,7 +8,7 @@ findings_real: 10
 tokens: 138681
 duration_min: 4
 findings_fixed: 9
-verdict: APROVADO_COM_RESSALVAS
+verdict: CORRIGIDO
 elenxo: sim
 reviewer: subagente separado, só leitura (general-purpose), sobre o diff da branch; 2ª passada sobre o delta depois das curas
 nota: "o achado 2 (sinal do documento controlado na raiz do inbox) fica por instrução da sessão principal: aguarda três decisões do maestro"
