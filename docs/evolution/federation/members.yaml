@@ -264,7 +264,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/gmill   # PRIVADO — campo OPERACIONAL (ops/registry-pins.sh o lê); fica até o repo ser renomeado; não entra nas projeções
     local_path: "/home/marcio/gmill"     # clonado em 2026-09-30 para validar as KBs do sinal
-    onion_version: 8278fee79d1c   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-09)
+    onion_version: 58f162825541   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-30)
     adopted_at: 2026-09-16               # do carimbo (`adopted_at`), não de suposição
     mode: greenfield                     # do carimbo (`mode`)
     personality_summary: "Hub de operações que adota os próprios projetos. Fonte do sinal upstream de 2026-09-30 com três KBs (Zoho Projects API V3, GLPI API V1×V2 e o padrão chamado→tarefa), absorvidas no core com scrub e carimbo de versão."
@@ -741,7 +741,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-curation (privado)
     local_path: /home/marcio/onion-curation
-    onion_version: 1d04d4e24cec   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-29)
+    onion_version: 67e9d003689f   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-30)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "Nasceu do pedido do maestro por um estudo profundo que disseca plataformas, aplicativos, sites, perfis, ideias, repositórios, ferramentas, arquiteturas, tecnologias, métodos, funcionalidades, concorrentes, modelos e negócios como CURADORIA para o Onion Evolve. Aqui se disseca e se PROPÕE (absorver | costurar | parquear | rejeitar, com evidência); a palavra final é do core, com a lente de Aristóteles, e a proposta sobe pelo inbox."
@@ -762,7 +762,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-kg-ssot (privado)
     local_path: /home/marcio/onion-kg-ssot
-    onion_version: 1d04d4e24cec   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-29)
+    onion_version: 67e9d003689f   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-30)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "O grafo de conhecimento verificável como PRODUTO INDEPENDENTE: adota e usa o Onion, e o Onion adota e usa o KG-SSOT (dogfood nos dois sentidos). Tem contextos próprios, feitos de pesquisa profunda e de mercado ali dentro, e lê o core só para entender o encaixe. Primeiro marco: o contrato formal do .kg.yaml (JSON Schema + suíte de conformidade) que o core passará a consumir."
