@@ -470,7 +470,7 @@ def chain(corpus, ref, edge_types=("TRACES_TO",)):
 
 
 DECISION_SCHEMA = "kg-ssot.decision/1"
-REVISIT_SCHEMA = "kg-ssot.revisit/1"
+REVISIT_SCHEMA = "kg-ssot.revisit/2"  # /2 desde a 4.40.0: o motivo pin-changed amplia o enum
 HISTORY = {"refuted", "superseded"}  # a história: o nó fica, mas não é mais a SSOT viva
 LEANS_ON = ("TRACES_TO", "DEPENDS_ON")  # a decisão se apoia no nó para onde estas arestas saem; SUPPORTS conta ao contrário
 
@@ -639,7 +639,9 @@ def _unresolved_reason(corpus, path):
 
 
 def revisit(corpus, as_of, where=()):
-    """As decisões vivas que pedem revisão (kg-ssot.revisit/1), pela atenção, com o motivo: evidence-due (algo em que
+    """As decisões vivas que pedem revisão (kg-ssot.revisit/2), pela atenção, com o motivo: pin-changed (desde a 4.40.0,
+    um apoio, ou o nó que ele cita pelo kg-node a um salto, que não bate mais com a versão fixada: _pin_failures; a
+    fixação que não se confere vai para unresolved: _pin_problems; sem raiz, nada se confere), evidence-due (algo em que
     ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e
     segue viva). Ficam à parte, nunca em silêncio: on_event (só reverify_on, porque o evento não tem data), unstamped
     (cadência sem verified_at, que nunca vence) e unresolved (um apoio que não está no corpus, e por isso não foi
@@ -650,6 +652,8 @@ def revisit(corpus, as_of, where=()):
     motivo, a decisão local cujo apoio externo tem outro status (ou sumiu) na ponta do clone."""
     conds = parse_where(where)
     items, on_event, unstamped, unresolved, upstream = [], [], [], [], []
+    pins = _pin_failures(corpus)  # desde a 4.40.0: a versão fixada que mudou (pin-changed)
+    problems = _pin_problems(corpus)  # e a fixação que não se confere, que vai para unresolved
     for key in list(corpus.order):
         node = corpus.nodes[key]
         if node.get("node_type") != "decision" or node.get("status") in HISTORY or key[0] in corpus.external:
@@ -692,6 +696,19 @@ def revisit(corpus, as_of, where=()):
                                  "pinned_status": dnode.get("status"), "head_status": head})
             if dnode.get("status") in HISTORY or dnode.get("node_type") == "question":
                 continue  # o que caiu ou foi respondido é história, e o --decision a mostra
+            # 4.40.0: o apoio cuja fixação não bate mais (forma 1, o node_sha256; ou o sha256 do próprio apoio), ou o
+            # nó que o apoio cita pelo kg-node, a um salto, cuja fixação não bate (forma 2, o texto do documento mudou)
+            chain = [c for c in (dep, _cited(corpus, dep)) if c is not None]
+            hit = next((c for c in chain if c in pins), None)  # o que o check acusa vence o que não se confere
+            if hit is not None:
+                pin = pins[hit]
+                add("pin-changed", dep, edge_type=how, changed=f"{hit[0]}#{hit[1]}", pin=pin["pin"],
+                    source=pin["source"], recorded=pin["recorded"], current=pin["current"], gone=pin["gone"])
+            else:
+                bad = next((c for c in chain if c in problems), None)
+                if bad is not None:
+                    unresolved.append({"decision": key[1], "file": key[0], "target": f"{bad[0]}#{bad[1]}",
+                                       "edge_type": how, "reason": problems[bad]})
             when = _due(dnode, as_of)
             if when:
                 add("evidence-due", dep, edge_type=how, due_on=when.isoformat())
@@ -718,6 +735,85 @@ def revisit(corpus, as_of, where=()):
     return res
 
 
+def _pin_failures(corpus):
+    """{chave do nó: falha} dos nós cuja fixação não bate mais (4.40.0): o provenance.node_sha256 que não é o hash do nó
+    citado, ou o provenance.sha256 que não é o dos bytes da fonte. É a mesma conferência do kg_trace check, que este
+    reusa, para os dois nunca discordarem; cada falha traz o código, a fonte, o hash gravado e o de agora."""
+    import kg_trace  # aqui, e não no topo: o kg_trace importa este módulo
+    if not corpus.root:
+        return {}  # sem raiz (arquivos soltos), não há onde ler as fontes: nada se confere, nada acende
+    root = pathlib.Path(corpus.root)
+    res, _located = kg_trace.check_schemes(corpus, root, corpus.withs)
+    out, files = {}, {}
+    for f in res["failures"]:
+        key = (f["file"], f["id"])
+        prov = corpus.nodes[key]["provenance"]
+        # o nó fixado que sumiu do documento: o check dá out-of-range no kg-node, e a versão aprovada não existe mais
+        gone = f["code"] == kg_trace.OUT_OF_RANGE and f["scheme"] == "kg-node" and prov.get("node_sha256") is not None
+        if f["code"] not in (kg_trace.NODE_SHA_MISMATCH, kg_trace.SHA_MISMATCH) and not gone:
+            continue
+        gdir = pathlib.PurePosixPath(key[0]).parent.as_posix()
+        state, target, data = kg_trace.read_source(prov["source"], gdir, root, corpus.withs, files)
+        if f["code"] == kg_trace.SHA_MISMATCH:
+            pin, recorded = "sha256", prov.get("sha256")
+            current = kg_trace.hashlib.sha256(data).hexdigest() if data is not None else None
+        else:
+            pin, recorded = "node_sha256", prov.get("node_sha256")
+            nid = f["locator"][1:] if f["locator"].startswith("#") else f["locator"]
+            current = None
+            if data is not None and not gone:
+                _t, doc, _c = kg_validate.parse_v1(kg_validate.as_source(target, data.decode("utf-8-sig", "replace")))
+                current = kg_validate.node_digest(doc, nid)
+        out[key] = {"code": f["code"], "pin": pin, "source": target, "recorded": recorded, "current": current,
+                    "gone": gone}
+    return out
+
+
+def _pin_problems(corpus):
+    """{chave do nó: motivo} das fixações que não se conferem (4.40.0), para irem a unresolved e nunca sumirem em
+    silêncio: pin_malformed (o hash fora da forma de 64 hex minúsculos, ou o node_sha256 sem o esquema kg-node que o
+    define) e pin_source_missing (a fonte fixada não existe mais, ou não se lê)."""
+    import kg_trace
+    if not corpus.root:
+        return {}
+    root, out, files = pathlib.Path(corpus.root), {}, {}
+    for key in corpus.order:
+        prov = corpus.nodes[key].get("provenance")
+        if not isinstance(prov, dict) or (prov.get("sha256") is None and prov.get("node_sha256") is None):
+            continue
+        sha, node_sha = prov.get("sha256"), prov.get("node_sha256")
+        if any(v is not None and not (isinstance(v, str) and kg_trace.SHA256.fullmatch(v)) for v in (sha, node_sha)) \
+                or (node_sha is not None and prov.get("scheme") != "kg-node") or not isinstance(prov.get("source"), str):
+            out[key] = "pin_malformed"
+            continue
+        gdir = pathlib.PurePosixPath(key[0]).parent.as_posix()
+        state, _target, _data = kg_trace.read_source(prov["source"], gdir, root, corpus.withs, files)
+        if state == "missing":
+            out[key] = "pin_source_missing"
+        elif state != "ok":  # absolute (URL sem --with), unpinned, outside_root, not_path: o check só conta em skipped
+            out[key] = "pin_unchecked"
+    return out
+
+
+def _cited(corpus, key):
+    """A chave do nó que o provenance.source de um nó cita pelo esquema kg-node (ARQUIVO#ID), quando o arquivo está no
+    corpus; senão None. É o salto do apoio ao documento que ele fixa."""
+    prov = corpus.nodes.get(key, {}).get("provenance")
+    if not isinstance(prov, dict) or prov.get("scheme") != "kg-node" or not isinstance(prov.get("source"), str):
+        return None
+    import kg_trace
+    if not corpus.root:
+        return None
+    loc = prov.get("locator").strip() if isinstance(prov.get("locator"), str) else ""
+    frag = prov["source"].strip().strip("\"'").strip().partition("#")[2]
+    nid = (loc[1:] if loc.startswith("#") else loc) or frag
+    gdir = pathlib.PurePosixPath(key[0]).parent.as_posix()
+    kind, _target, found = kg_trace.locate_source(prov["source"], gdir, pathlib.Path(corpus.root))
+    if not nid or kind != "resolved" or (found[0], nid) not in corpus.nodes:
+        return None  # o mesmo caminho que o check resolve: a raiz, a pasta do grafo e a pasta pai dela
+    return (found[0], nid)
+
+
 def _line(b):
     label = (b.get("label") or "")[:90]
     return f"{b['id']}  {b.get('status') or '-'}  {label}" if b.get("found") else f"{b['id']}  {_('(outside the corpus)')}"
@@ -740,7 +836,8 @@ def decision_human(res):
 
 
 def revisit_human(res):
-    reason = {"evidence-due": _("what it rests on is due for a re-check"),
+    reason = {"pin-changed": _("the version it was pinned to has changed"),
+              "evidence-due": _("what it rests on is due for a re-check"),
               "review-due": _("the decision itself is due for review"),
               "contested": _("it is refuted and still live")}
     lines = []
@@ -750,6 +847,13 @@ def revisit_human(res):
         for r in d["reasons"]:
             due = f" ({r['due_on']})" if r.get("due_on") else ""
             lines.append(f"    {reason[r['reason']]}{due}: {r['id']}  {(r.get('label') or '')[:70]}")
+            if r["reason"] == "pin-changed" and r.get("gone"):
+                lines.append("      " + _("{changed}: the pinned node is no longer in {source}").format(
+                    changed=r["changed"], source=r["source"]))
+            elif r["reason"] == "pin-changed":
+                lines.append("      " + _("{changed}: {pin} {recorded} is now {current}").format(
+                    changed=r["changed"], pin=r["pin"], recorded=(r["recorded"] or "-")[:12],
+                    current=(r["current"] or _("unreadable"))[:12]))
     lines.append(_("· {n} decision(s) to revisit on {date}; {m} wait for an event (reverify_on)").format(
         n=len(res["decisions"]), date=res["as_of"], m=len(res["on_event"])))
     if res.get("where"):
@@ -761,11 +865,18 @@ def revisit_human(res):
         lines.append(_("· {decision}: what it rests on changed upstream since the pinned commit: {support} was {pinned}, "
                        "now {head}").format(decision=u["decision"], support=u["support"], pinned=u["pinned_status"],
                                             head=u["head_status"]))
-    if res["unresolved"]:
-        why = collections.Counter(u.get("reason", "outside_corpus") for u in res["unresolved"])
+    pin_left = [u for u in res["unresolved"] if u.get("reason", "").startswith("pin_")]
+    outside = [u for u in res["unresolved"] if u not in pin_left]
+    if outside:
+        why = collections.Counter(u.get("reason", "outside_corpus") for u in outside)
         lines.append(_("· {n} support(s) are outside the corpus and were not judged ({why}): {ids}").format(
-            n=len(res["unresolved"]), why=", ".join(f"{k} {v}" for k, v in sorted(why.items())),
-            ids=", ".join(u["target"] for u in res["unresolved"][:5])))
+            n=len(outside), why=", ".join(f"{k} {v}" for k, v in sorted(why.items())),
+            ids=", ".join(u["target"] for u in outside[:5])))
+    if pin_left:  # 4.40.0: o apoio está no corpus, e a fixação dele é que não se confere
+        why = collections.Counter(u["reason"] for u in pin_left)
+        lines.append(_("· {n} pinned support(s) could not be checked ({why}): {ids}").format(
+            n=len(pin_left), why=", ".join(f"{k} {v}" for k, v in sorted(why.items())),
+            ids=", ".join(u["target"] for u in pin_left[:5])))
     return "\n".join(lines)
 
 

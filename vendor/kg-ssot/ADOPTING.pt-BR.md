@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:af4b355b316a26e7 -->
+<!-- translation-of: ADOPTING.md sha256:836cf8d76073b896 -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -342,6 +342,13 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.39.1` para a `kg-ssot-v4.40.0`, o contrato não muda (v4.18) e nenhum veredito muda. Duas saídas JSON
+sobem de versão de schema, porque um schema fechado ganhou valores: `kg-ssot.revisit/2` (o motivo `pin-changed`, com
+os campos dele, e os motivos `pin_malformed`, `pin_source_missing` e `pin_unchecked` em `unresolved`) e `kg-ssot.digest/2`
+(`file_missing`, `unreadable` para o arquivo não UTF-8, e o `node_sha256` amarrado ao `ok`). Quem confere o
+`schema_version` deve aceitar o `/2`. No texto do `digest`, o arquivo ausente sai `ARQUIVO AUSENTE` e não para mais o
+lote com rc 2.
 
 Da `kg-ssot-v4.39.0` para a `kg-ssot-v4.39.1`, o contrato não muda (v4.18) e nenhum veredito muda. No JSON do
 `kg-trace digest`, o grafo que não parseia sai `unreadable`, com um `code`, em vez de `not_found`, e a linha de texto

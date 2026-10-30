@@ -10,6 +10,26 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.40.0] - 2026-10-30
+
+No contract change (still v4.18). An approved document now comes back to the review queue when it changes.
+
+- `kg_query --revisit` gains the `pin-changed` reason: a live decision comes back when a support, or the node that
+  support cites by `kg-node` one step away, no longer matches the version it was pinned to, by
+  `provenance.node_sha256` (the node was rewritten) or by `provenance.sha256` (the text of the file changed without
+  touching the graph). It is the same check as `kg_trace check`, and the item says what changed, which pin, the
+  recorded hash and the current one; a pinned node that disappeared from its document fires too, with `current`
+  null. A pin that cannot be checked goes to `unresolved` (`pin_malformed`, `pin_source_missing`, `pin_unchecked`).
+  Pins are checked with `--root`; a support read through `--with` is not checked yet. This is the approval of a controlled document: the decision is the testimony, and an
+  evidence that supports it pins the approved version. The JSON is now `kg-ssot.revisit/2`.
+- `kg_trace.py digest` takes a batch: a file that does not exist is `file_missing`, and a file that is not UTF-8 is
+  `unreadable` with `code` `encoding.not-utf8` (or `io.unreadable`), each as the result of its own reference, and the batch goes on (rc
+  1). Only a path outside the root, or a reference without `FILE#ID`, stops the batch with rc 2. The schema now ties
+  `node_sha256` to `ok`. The JSON is now `kg-ssot.digest/2`.
+- From now on, a JSON output with a closed schema that gains a value or a field moves to a new schema version. The
+  4.39.1 widened `kg-ssot.digest/1` in place, which broke a consumer that validated strictly against the 4.39.0
+  schema; it stays as published, and this release names the change.
+
 ## [4.39.1] - 2026-10-29
 
 No contract change (still v4.18).

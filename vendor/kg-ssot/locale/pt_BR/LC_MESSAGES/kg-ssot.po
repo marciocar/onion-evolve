@@ -3581,6 +3581,30 @@ msgid "· {n} support(s) are outside the corpus and were not judged ({why}): {id
 msgstr "· {n} apoio(s) estão fora do corpus e não foram julgados ({why}): {ids}"
 
 #: tools/kg_trace.py
+msgid "FILE MISSING  {ref}"
+msgstr "ARQUIVO AUSENTE  {ref}"
+
+#: tools/kg_query.py
+msgid "{changed}: the pinned node is no longer in {source}"
+msgstr "{changed}: o nó fixado não está mais em {source}"
+
+#: tools/kg_query.py
+msgid "· {n} pinned support(s) could not be checked ({why}): {ids}"
+msgstr "· {n} apoio(s) fixado(s) não puderam ser conferidos ({why}): {ids}"
+
+#: tools/kg_query.py
+msgid "the version it was pinned to has changed"
+msgstr "a versão que ela fixou mudou"
+
+#: tools/kg_query.py
+msgid "{changed}: {pin} {recorded} is now {current}"
+msgstr "{changed}: o {pin} {recorded} agora é {current}"
+
+#: tools/kg_query.py
+msgid "unreadable"
+msgstr "ilegível"
+
+#: tools/kg_trace.py
 msgid "UNREADABLE  {ref}  {code}"
 msgstr "ILEGÍVEL  {ref}  {code}"
 

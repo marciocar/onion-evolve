@@ -10,6 +10,25 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.40.0] - 2026-10-30
+
+Sem mudança no contrato (segue v4.18). Um documento aprovado volta para a fila de revisão quando muda.
+
+- O `kg_query --revisit` ganha o motivo `pin-changed`: uma decisão viva volta quando um apoio, ou o nó que esse apoio
+  cita pelo `kg-node` a um salto, não bate mais com a versão que fixou, pelo `provenance.node_sha256` (o nó foi
+  regravado) ou pelo `provenance.sha256` (o texto do arquivo mudou sem passar pelo grafo). É a mesma conferência do
+  `kg_trace check`, e o item diz o que mudou, qual fixação, o hash gravado e o de agora; o nó fixado que sumiu do
+  documento também acende, com o `current` null. A fixação que não se confere vai para `unresolved` (`pin_malformed`,
+  `pin_source_missing`, `pin_unchecked`). As fixações se conferem com `--root`; o apoio lido pelo `--with` ainda não. É a aprovação de um documento controlado: a decisão é
+  o testemunho, e uma evidência que a apoia fixa a versão aprovada. O JSON passa a `kg-ssot.revisit/2`.
+- O `kg_trace.py digest` aceita um lote: o arquivo que não existe sai `file_missing`, e o que não é UTF-8 sai
+  `unreadable` com o `code` `encoding.not-utf8` (ou `io.unreadable`), cada um como resultado da própria referência, e o lote segue (rc 1).
+  Só o caminho fora da raiz, ou a referência sem `ARQUIVO#ID`, para o lote com rc 2. O schema passa a amarrar o
+  `node_sha256` ao `ok`. O JSON passa a `kg-ssot.digest/2`.
+- Daqui em diante, uma saída JSON com schema fechado que ganha valor ou campo sobe a versão do schema. A 4.39.1
+  ampliou o `kg-ssot.digest/1` sem subir a versão, o que quebrou quem validava estrito contra o schema da 4.39.0; ela
+  fica como publicada, e esta release dá nome à mudança.
+
 ## [4.39.1] - 2026-10-29
 
 Sem mudança no contrato (segue v4.18).

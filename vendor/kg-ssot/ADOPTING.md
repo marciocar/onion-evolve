@@ -343,6 +343,13 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.39.1` to `kg-ssot-v4.40.0`, the contract does not change (v4.18) and no verdict changes. Two JSON
+outputs move to a new schema version, because a closed schema gained values: `kg-ssot.revisit/2` (the `pin-changed`
+reason, with its fields, and the `pin_malformed`, `pin_source_missing` and `pin_unchecked` reasons in `unresolved`) and
+`kg-ssot.digest/2` (`file_missing`, `unreadable` for a non-UTF-8 file, and `node_sha256` tied to `ok`). A consumer
+that checks `schema_version` should accept `/2`. In the text of `digest`, a missing file is `FILE MISSING` and no
+longer stops the batch with rc 2.
+
 From `kg-ssot-v4.39.0` to `kg-ssot-v4.39.1`, the contract does not change (v4.18) and no verdict changes. In the JSON
 of `kg-trace digest`, a graph that does not parse comes as `unreadable`, with a `code`, instead of `not_found`, and the
 text line says `UNREADABLE FILE#ID CODE` instead of `NOT FOUND`. A consumer that validates against the 4.39.0 schema,

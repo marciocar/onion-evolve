@@ -867,13 +867,21 @@ a refutation keeps the refuted node, and nothing is deleted. Three views make th
   supports, not what it rests on), each with its status. `--format json` gives
   `kg-ssot.decision/1` (`spec/decision.schema.json`).
 - **`--revisit`** lists the live decisions (not `superseded` nor `refuted`) that ask for a review, by attention, each
-  with its reasons: `evidence-due` (something it rests on is past its `reverify_every`), `review-due` (the decision itself is past its
+  with its reasons: `pin-changed` (since 4.40.0: a support, or the node it cites by `kg-node`, one step away, no longer
+  matches the version it was pinned to, by `provenance.node_sha256` or by `provenance.sha256`; the same check as
+  `kg_trace check`, and the item carries `changed`, `pin`, `source`, `recorded` and `current`), `evidence-due` (something it rests on is past its `reverify_every`), `review-due` (the decision itself is past its
   `reverify_every`) and `contested` (it receives a `REFUTES` and is still live). A decision with only `reverify_on`
   waits for its event and is listed apart; a decision with a cadence but no `verified_at` is listed in `unstamped`, and
   a support outside the corpus in `unresolved`, so nothing is dropped in silence. A support that was refuted or
   superseded is not a reason: inferred from the edges, it gave 1 useful warning in 10 on the corpus of the framework
   where the format was born, so the fall shows in `--decision`, where the reader sees the status of each support. `--as-of YYYY-MM-DD` sets the date; the default is today. `--format json`
-  gives `kg-ssot.revisit/1` (`spec/revisit.schema.json`).
+  gives `kg-ssot.revisit/2` (`spec/revisit.schema.json`; `/2` since 4.40.0, for the new reason). A pin that cannot be
+  checked goes to `unresolved`: `pin_malformed` (the hash is not 64 lowercase hex, or a `node_sha256` lacks the
+  `kg-node` scheme), `pin_source_missing` (the pinned source no longer exists) or `pin_unchecked` (the source is a URL
+  without `--with`, a moving ref, outside the root, or not a path). A pinned node that disappeared from its document
+  also fires `pin-changed`, with `current` null. The pins are checked only with `--root`, and a support read from
+  another repository through `--with` does not have its pin checked yet, as in `kg_trace check`. This is the approval of a controlled
+  document: the decision is the testimony, and an evidence that `SUPPORTS` it pins the approved version.
 
 ```bash
 kg-query --root . --open --sort attention --limit 10
@@ -1261,11 +1269,14 @@ only `node_sha256`. `digest` reads the working tree under the root; for a pinned
 kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
 
-With `--format json` (4.39.0), `digest` returns `kg-ssot.digest/1` (`spec/digest.schema.json`): one result per
-reference, with `node_sha256` and a `status` of `ok`, `not_found`, `unreadable` or `no_canonical_form`, and the same
-exit code as the text output. Since 4.39.1, a graph that does not parse is `unreadable`, with the reader's `code`, and
-no longer `not_found`: the node was not looked for, so it is not missing. Read the value from the field instead of splitting the text line. A broken input (a path outside the
-root, a file that cannot be read) stops before any result is printed, in both formats, with rc 2.
+With `--format json` (4.39.0), `digest` returns `kg-ssot.digest/2` (`spec/digest.schema.json`; `/2` since 4.40.0):
+one result per reference, with `node_sha256` and a `status` of `ok`, `not_found`, `file_missing`, `unreadable` or
+`no_canonical_form`, and the same exit code as the text output. `node_sha256` is present with `ok` and null otherwise.
+Since 4.40.0, a file that does not exist is `file_missing` (text: `FILE MISSING`), and a file that is not UTF-8 is
+`unreadable` with `code` `encoding.not-utf8` (or `io.unreadable`, when it exists but cannot be read): each is the
+result of its own reference, and the batch goes on. Since 4.39.1, a graph that does not parse is `unreadable`, with the reader's `code`, and
+no longer `not_found`: the node was not looked for, so it is not missing. Read the value from the field instead of splitting the text line. Only a broken call stops the batch before any result, in both
+formats, with rc 2: a path outside the root, or a reference without `FILE#ID`.
 
 ### The projection checker (`kg_trace.py projection`, 4.35.0)
 
