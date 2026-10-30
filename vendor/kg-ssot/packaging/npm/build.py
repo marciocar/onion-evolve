@@ -46,10 +46,11 @@ def manifest(version, deps):
     return {
         "name": "kg-ssot",
         "version": version,
-        "description": "JavaScript reader for the KG-SSOT verifiable knowledge graph contract (.kg.yaml and .kg.json): "
-                       "a precompiled validator, no eval, for Node and React Native/Expo.",
-        "keywords": ["knowledge-graph", "provenance", "json-schema", "conformance", "yaml", "json", "validator",
-                     "react-native", "expo", "verifiable"],
+        "description": "JavaScript reader for KG-SSOT, the trust layer for a company brain: knowledge graphs "
+                       "(.kg.yaml and .kg.json) where a confirmed claim cites its source. A precompiled validator, no eval, "
+                       "for Node and React Native/Expo.",
+        "keywords": ["knowledge-graph", "company-brain", "provenance", "json-schema", "conformance", "yaml", "json",
+                     "validator", "react-native", "expo", "verifiable"],
         "homepage": MIRROR,
         "repository": {"type": "git", "url": f"git+{MIRROR}.git"},
         "bugs": {"url": f"{MIRROR}/issues"},

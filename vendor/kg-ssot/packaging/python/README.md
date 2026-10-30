@@ -2,8 +2,8 @@
 
 <!-- mcp-name: io.github.marciocar/kg-ssot -->
 
-**A verifiable knowledge graph: every claim says where it came from, when it was verified, and what depends on it.
-Your CI rejects the claims that don't.**
+**The trust layer for a company brain: a knowledge graph where a confirmed claim says where it came from and can say
+when it was verified, and where a decision comes back for review when a source it pinned changes.**
 
 This package ships the formal KG-SSOT contract and the tools that enforce it:
 

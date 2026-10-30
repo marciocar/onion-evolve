@@ -3493,8 +3493,8 @@ msgid "the history of a decision: what it replaced, what replaced it, what refut
 msgstr "a história de uma decisão: o que ela substituiu, o que a substituiu, o que a refuta e em que ela se apoia, com o status de cada um"
 
 #: tools/kg_query.py
-msgid "the live decisions to revisit, by attention: what they rest on was refuted, superseded or is due, they are due themselves, or they are contested"
-msgstr "as decisões vivas a revisitar, pela atenção: aquilo em que se apoiam foi refutado, substituído ou venceu, elas mesmas venceram, ou são contestadas"
+msgid "the live decisions to revisit, by attention: the version they were pinned to changed, what they rest on is due, they are due themselves, or they are contested"
+msgstr "as decisões vivas a revisitar, pela atenção: a versão que fixaram mudou, aquilo em que se apoiam venceu, elas mesmas venceram, ou são contestadas"
 
 #: tools/kg_query.py
 msgid "what it rests on is due for a re-check"

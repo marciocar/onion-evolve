@@ -1,17 +1,17 @@
-<!-- translation-of: README.md sha256:19177be7a32bd45d -->
+<!-- translation-of: README.md sha256:789a6f67dab6d046 -->
 <div align="center">
 
 # KG-SSOT
 
-**Grafos de conhecimento verificáveis em texto puro: toda afirmação diz de onde veio, quando foi conferida pela
-última vez e o que depende dela, e o seu CI recusa as que não dizem.**
+**A camada de confiança de um Company Brain: grafos de conhecimento em texto puro em que uma afirmação confirmada tem
+de citar a fonte, uma decisão registra o que substituiu e em que se apoia, e uma decisão volta para revisão quando uma fonte que ela fixou muda.**
 
 [English](README.md) | **Português (Brasil)**
 
 <sub>Tradução do original em inglês; quando os dois divergirem, vale o inglês.</sub>
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.40.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.40.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.40.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.40.1-6f42c1)](spec/release.json)
 [![Conformidade: 512/512](https://img.shields.io/badge/conformidade-512%2F512-2ea44f)](spec/conformance/README.pt-BR.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -31,9 +31,11 @@
 
 ## Por que
 
-Equipes, de pessoas ou de agentes, acumulam conclusões: "o retry é idempotente", "decidimos por três tentativas".
-Elas moram em atas, tickets e memórias de conversa, e no caminho perdem três coisas: **a fonte**, **a data da última
-conferência** e **o que depende delas**. Uma frase convincente sem nenhuma das três passa numa revisão apressada.
+Um Company Brain costuma nascer empilhando documentos num RAG ou num GraphRAG. Isso guarda os dados, mas não as
+decisões: quem decidiu o quê, com base em qual fonte, e se essa fonte ainda vale. Equipes, de pessoas ou de agentes,
+acumulam conclusões como "o retry é idempotente" ou "decidimos por três tentativas", e no caminho perdem três coisas:
+**a fonte**, **a data da última conferência** e **o que depende delas**. Quando quem decidiu sai da empresa, o
+raciocínio sai junto.
 
 O KG-SSOT trata isso como problema de **formato**, não de disciplina. O conhecimento vive num grafo `.kg.yaml`,
 versionado junto do código, e um **contrato formal** decide no CI o que reprova:
@@ -44,6 +46,20 @@ versionado junto do código, e um **contrato formal** decide no CI o que reprova
 - uma aresta que aponta para o nada reprova, e um nó sem arestas também;
 - um carimbo de verificação sem nada contra o que conferir, uma decisão sem origem e uma afirmação de produção
   apoiada só em testemunho **geram avisos**.
+
+## O que ele faz por um Company Brain
+
+| Você precisa saber... | O KG-SSOT dá |
+|---|---|
+| De onde veio uma afirmação | Uma `provenance` em toda afirmação confirmada: o arquivo, a linha ou o nó, e, se você o fixar, um hash que o `kg_trace.py check` confere |
+| Por que uma decisão foi tomada, e o que ela substituiu | `kg_query --decision ID`: a linhagem inteira de `SUPERSEDES`, o que a sustenta e o status de cada apoio |
+| Quais decisões olhar de novo | `kg_query --revisit`: as que passaram da cadência de revisão, as contestadas e aquelas cujo documento aprovado ou fonte fixada mudou |
+| O que está na mesa de cada dono | `kg_query --open --where owner=X --sort attention` |
+| O que disse um e-mail, um chat ou um evento de wiki, e quem enviou | Um nó `evidence` com os nomes do CloudEvents 1.0.2 em `x_event`, fixado no documento aceito no inbox ([receita](docs/manual/pt-BR/08-receitas.md)) |
+
+Conhecimento de negócio, técnico, de compliance e de design pode morar no mesmo formato, no seu repositório. Ele se
+pluga como pacote Python ou servidor MCP, com um validador JavaScript no npm, e o gate de CI é um dos usos, não o
+objetivo. As fixações se conferem quando o `kg_query` ou o `kg_trace.py` roda com `--root`.
 
 ## Comece em 60 segundos
 
@@ -86,7 +102,7 @@ As ferramentas imprimem em inglês por padrão e em português do Brasil quando 
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | o arquivo `.mcpb` da [última release](https://github.com/marciocar/kg-ssot/releases/latest) | O servidor MCP como extensão de um clique |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | O mesmo servidor para qualquer cliente MCP |
 | [Contêiner](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | O servidor MCP como serviço ao lado de um cliente sem Python, como o LibreChat |
-| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.40.0` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
+| O seu repositório | `kg_vendor.py update --tag kg-ssot-v4.40.1` | A release vendorizada por tag, com um carimbo sha256, e o gate no seu CI ([manual, capítulo 6](docs/manual/pt-BR/06-adocao-e-ci.md)) |
 
 ## Um nó, por dentro
 
@@ -199,11 +215,12 @@ flowchart LR
 | Uma linguagem de consulta sobre um grafo grande | Um banco de grafos | Um formato de arquivo e um contrato, sem servidor |
 | Interoperabilidade com a web semântica | RDF, OWL, SHACL | Um vocabulário YAML pequeno e fechado, que se lê bem num diff, e uma exportação PROV-O |
 | Busca corporativa sobre documentos | Uma plataforma de busca | Nenhum conector nem índice: só o grafo que a equipe escreve |
+| Recuperação sobre trechos de documentos (RAG, GraphRAG) | Um banco vetorial ou uma ferramenta de GraphRAG | As afirmações que esses documentos fazem, as decisões tomadas sobre elas e o que revisitar |
 | A garantia de que uma afirmação é **verdadeira** | Revisão humana, testes | A garantia de que ela **diz** de onde veio e quando foi conferida |
 
 ## Estado
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.40.0`. O leitor de referência passa em 512 de 512 casos de `latest/`.
+- **Vigente:** contrato v4, release `kg-ssot-v4.40.1`. O leitor de referência passa em 512 de 512 casos de `latest/`.
 - **Em uso:** três adotantes rodam o gate no CI, um deles em produção.
 - **Próximo:** o v5 vai reprovar um `method` fora da forma `<classe>: <detalhe>`, que hoje só avisa.
 - **Aberto:** a camada semântica (frescor, contradição, completude de domínio) vive em `optional/`, e o leitor de

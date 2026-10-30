@@ -10,6 +10,19 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.40.1] - 2026-10-30
+
+No contract change (still v4.18), and no verdict changes.
+
+- The README and the package descriptions on PyPI, npm, the MCP Registry and the MCPB bundle now say what KG-SSOT is
+  for: the trust layer for a company brain, where a confirmed claim cites its source, a decision records what it
+  replaced and what it rests on, and a decision comes back for review when a source it pinned by hash changes. A new section maps each need to the
+  command that answers it.
+- The manual has a recipe for an external event (an e-mail, a chat message, a wiki edit) that arrived by a signed
+  message: an `evidence` node with the CloudEvents 1.0.2 names in `x_event`, pinned to the accepted inbox document.
+- `kg-query --revisit --help` now names the reasons it really uses, including `pin-changed`; it named a refuted or
+  superseded support, which was never a reason (4.36.0 left it out before the release).
+
 ## [4.40.0] - 2026-10-30
 
 No contract change (still v4.18). An approved document now comes back to the review queue when it changes.

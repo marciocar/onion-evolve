@@ -37,13 +37,13 @@ build-backend = "hatchling.build"
 [project]
 name = "kg-ssot"
 version = "{version}"
-description = "Verifiable knowledge graphs in plain text (.kg.yaml and .kg.json): the formal contract, reference reader, conformance suite, per-graph CI gate, gated store and MCP server."
+description = "The trust layer for a company brain: knowledge graphs in plain text (.kg.yaml and .kg.json) where a confirmed claim cites its source and a decision comes back for review when a source it pinned changes. Contract, reference reader, conformance suite, CI gate, store, query and MCP server."
 readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
 authors = [{{ name = "Marcio Carvalho" }}]
-keywords = ["knowledge-graph", "provenance", "json-schema", "conformance", "yaml", "json", "mcp", "verifiable", "audit"]
+keywords = ["knowledge-graph", "company-brain", "provenance", "decision-records", "json-schema", "conformance", "yaml", "json", "mcp", "verifiable", "audit"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",

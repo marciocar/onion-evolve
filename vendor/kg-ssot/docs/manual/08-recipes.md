@@ -273,3 +273,95 @@ The contract checks the form, the edges, and the provenance. It does not run you
 runs `tests/test_streak.py`. The graph records what was measured, when, and how (`method`), and `verified_at` tells
 you how long ago. When the rule changes, the PR that changes the code changes the node too, and the diff shows both
 together.
+
+## Record an external event that arrived by a signed message
+
+An e-mail, a chat message, a wiki edit or a cloud notification often reaches a company brain through an inbox, after a
+signed envelope was checked and accepted. Record it as an `evidence` node, with no new node type: the `event` node
+type already exists, and it means a domain event that changes a `state`.
+
+- Put the event attributes in `x_event`, with the context attribute names of CloudEvents 1.0.2. CloudEvents requires
+  `specversion`, `id`, `source` and `type`, and makes `subject`, `time`, `datacontenttype` and `dataschema` optional.
+  The contract does not judge `x_event`: these rules come from CloudEvents. A resend should keep the same `source` +
+  `id`, so that the consumer can treat it as a duplicate.
+- The `provenance` points at the document that the inbox accepted. Its `sha256` is the hash of that file, so
+  `kg_trace.py check` catches an edit made after acceptance. The `method` says that the accept step checked the
+  signature and the body hash.
+- The identifier of the delivery (the `jti` of the signed token) and the hash of the message body go as `x_jti` and
+  `x_body_sha256` inside `provenance`. The contract accepts `x_` keys there without a warning. The body hash is not
+  the `sha256` of the source, because the accepted document wraps the body.
+
+The accepted document, `docs/inbox/2026-10-30-a2a-billing-agent-3f9c2a1b7d4e5f60.md`:
+
+```markdown
+---
+from: billing-agent
+---
+Invoice 4512 was paid on 2026-10-29.
+```
+
+The file ends with a line break, and `sha256` is the hash of the whole file. The body is the last line, without
+the line break, and `x_body_sha256` is its hash.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: events
+nodes:
+  - id: Q_INVOICE_4512_PAID
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: Was invoice 4512 paid?
+  - id: E_INVOICE_4512_PAID
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: Invoice 4512 was paid on 2026-10-29, as the billing agent reported.
+    verified_at: "2026-10-30"
+    verified_against: the accepted inbox document, with the signature and the body hash checked again on acceptance
+    x_event:
+      specversion: "1.0"
+      id: "pay-4512-001"
+      source: "https://billing.example.com/invoices"
+      type: "com.example.billing.invoice.paid"
+      subject: "invoice/4512"
+      time: "2026-10-29T14:03:00Z"
+    provenance:
+      source: docs/inbox/2026-10-30-a2a-billing-agent-3f9c2a1b7d4e5f60.md
+      locator: "the last line"
+      method: "measurement: the accept step checked the signed envelope and the body hash again"
+      sha256: "56a7861a08417a4fc45bd86f5268f33f8e38836cff6a98678151ff71c87ed281"
+      x_jti: "nb-7c1e9a04d2b3"
+      x_body_sha256: "fe4fcd74067bb4a644273109f601905615c27fc964cfb41d8201840fd7f746a6"
+      locality: repo
+edges:
+  - from: E_INVOICE_4512_PAID
+    to: Q_INVOICE_4512_PAID
+    edge_type: SUPPORTS
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/events.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root .
+```
+
+```text
+PASS docs/events.kg.yaml
+· 1 files; 1 pass the MUST; 0 with a SHOULD warning (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 1 source(s) read by scheme or sha256: 1 ok, 0 failed (1 sha256 checked); not judged (counted): 0 form only, 0 URL with no --with, 0 source not found, 0 malformed scheme, locator or hash, 0 other
+· 0 trace(s) judged: 0 resolve, 0 missing; not judged (counted): 0 absolute or URL, 0 external root, 0 not a path, 0 not text
+```
+
+If someone edits the accepted document later, `kg_trace.py check` fails (rc 1):
+
+```text
+integrity.trace-sha256-mismatch  docs/events.kg.yaml#E_INVOICE_4512_PAID  → docs/inbox/2026-10-30-a2a-billing-agent-3f9c2a1b7d4e5f60.md [sha256] the last line  The provenance.sha256 of the node differs from the hash of the file it names: the source changed after it was read.
+```
+
+A node alone fails as `integrity.orphan-node`: an event always serves a question or a decision, so link it. When two
+adopters use `x_event`, it becomes a canonical profile in the contract, judged only when present.

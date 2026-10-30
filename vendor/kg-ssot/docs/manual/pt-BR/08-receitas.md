@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/08-recipes.md sha256:dfa6116b84f6924b -->
+<!-- translation-of: docs/manual/08-recipes.md sha256:a8cf797d93000d4c -->
 # 8. Receitas
 
 [English](../08-recipes.md) | **Português (Brasil)**
@@ -275,3 +275,95 @@ PASSA   docs/streak.kg.yaml
 O contrato confere a forma, as arestas e a proveniência. Ele não roda o seu teste nem lê o seu código: quem roda
 `tests/test_streak.py` é o CI do app. O grafo registra o que foi medido, quando e como (`method`), e o `verified_at`
 diz há quanto tempo. Quando a regra mudar, o PR que muda o código muda o nó também, e o diff mostra os dois juntos.
+
+## Registrar um evento externo que chegou por mensagem assinada
+
+Um e-mail, uma mensagem de chat, uma edição de wiki ou um aviso de nuvem muitas vezes chega ao Company Brain por um
+inbox, depois que um envelope assinado foi conferido e aceito. Registre-o como nó `evidence`, sem tipo novo de nó: o
+tipo `event` já existe, e quer dizer um evento de domínio, que muda um `state`.
+
+- Os atributos do evento vão em `x_event`, com os nomes dos atributos de contexto do CloudEvents 1.0.2. O CloudEvents
+  exige `specversion`, `id`, `source` e `type`, e deixa opcionais `subject`, `time`, `datacontenttype` e `dataschema`.
+  O contrato não julga o `x_event`: essas regras vêm do CloudEvents. Um reenvio deve manter o mesmo `source` + `id`,
+  para que o consumidor o reconheça como duplicata.
+- A `provenance` aponta o documento que o inbox aceitou. O `sha256` dela é o hash desse arquivo, então o
+  `kg_trace.py check` pega uma edição feita depois do aceite. O `method` diz que o aceite conferiu a assinatura e o
+  hash do corpo.
+- O identificador da entrega (o `jti` do token assinado) e o hash do corpo da mensagem vão como `x_jti` e
+  `x_body_sha256` dentro da `provenance`. O contrato aceita chaves `x_` ali sem alerta. O hash do corpo não é o
+  `sha256` da fonte, porque o documento aceito embrulha o corpo.
+
+O documento aceito, `docs/inbox/2026-10-30-a2a-billing-agent-3f9c2a1b7d4e5f60.md`:
+
+```markdown
+---
+from: billing-agent
+---
+Invoice 4512 was paid on 2026-10-29.
+```
+
+O arquivo termina com uma quebra de linha, e o `sha256` é o hash do arquivo inteiro. O corpo é a última linha, sem
+a quebra de linha, e o `x_body_sha256` é o hash dele.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: events
+nodes:
+  - id: Q_INVOICE_4512_PAID
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: Was invoice 4512 paid?
+  - id: E_INVOICE_4512_PAID
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: Invoice 4512 was paid on 2026-10-29, as the billing agent reported.
+    verified_at: "2026-10-30"
+    verified_against: the accepted inbox document, with the signature and the body hash checked again on acceptance
+    x_event:
+      specversion: "1.0"
+      id: "pay-4512-001"
+      source: "https://billing.example.com/invoices"
+      type: "com.example.billing.invoice.paid"
+      subject: "invoice/4512"
+      time: "2026-10-29T14:03:00Z"
+    provenance:
+      source: docs/inbox/2026-10-30-a2a-billing-agent-3f9c2a1b7d4e5f60.md
+      locator: "the last line"
+      method: "measurement: the accept step checked the signed envelope and the body hash again"
+      sha256: "56a7861a08417a4fc45bd86f5268f33f8e38836cff6a98678151ff71c87ed281"
+      x_jti: "nb-7c1e9a04d2b3"
+      x_body_sha256: "fe4fcd74067bb4a644273109f601905615c27fc964cfb41d8201840fd7f746a6"
+      locality: repo
+edges:
+  - from: E_INVOICE_4512_PAID
+    to: Q_INVOICE_4512_PAID
+    edge_type: SUPPORTS
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/events.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_trace.py check --root .
+```
+
+```text
+PASSA   docs/events.kg.yaml
+· 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 1 fonte(s) lida(s) pelo scheme ou pelo sha256: 1 ok, 0 com falha (1 sha256 conferido(s)); não julgado (contado): 0 só pela forma, 0 URL sem --with, 0 fonte não achada, 0 scheme, locator ou hash malformado, 0 outro(s)
+· 0 trace(s) julgado(s): 0 resolve(m), 0 faltando; fora de julgamento (contados): 0 absoluto(s) ou URL, 0 raiz externa, 0 não caminho, 0 fora de texto
+```
+
+Se alguém editar o documento aceito depois, o `kg_trace.py check` reprova (rc 1):
+
+```text
+integrity.trace-sha256-mismatch  docs/events.kg.yaml#E_INVOICE_4512_PAID  → docs/inbox/2026-10-30-a2a-billing-agent-3f9c2a1b7d4e5f60.md [sha256] the last line  O provenance.sha256 do nó difere do hash do arquivo que ele nomeia: a fonte mudou depois de lida.
+```
+
+Um nó sozinho reprova como `integrity.orphan-node`: um evento sempre serve a uma pergunta ou a uma decisão, então
+ligue-o. Quando dois adotantes usarem o `x_event`, ele vira um perfil canônico no contrato, julgado só quando presente.

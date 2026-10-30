@@ -1,6 +1,6 @@
 {
   "name": "kg-ssot",
-  "version": "4.40.0",
+  "version": "4.40.1",
   "description": "Write, fix, validate and query verifiable knowledge graphs in plain text (.kg.yaml and .kg.json) with the KG-SSOT tools.",
   "author": {
     "name": "Marcio Carvalho"
