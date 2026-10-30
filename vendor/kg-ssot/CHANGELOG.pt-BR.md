@@ -10,6 +10,19 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.40.1] - 2026-10-30
+
+Sem mudança no contrato (segue v4.18), e nenhum veredito muda.
+
+- O README e as descrições dos pacotes no PyPI, no npm, no MCP Registry e no bundle MCPB passam a dizer para que o
+  KG-SSOT serve: a camada de confiança de um Company Brain, em que uma afirmação confirmada cita a fonte, uma decisão registra o que substituiu e em que se apoia, e uma decisão volta para revisão quando uma fonte que ela fixou muda. Uma seção nova liga cada
+  necessidade ao comando que a atende.
+- O manual ganha uma receita para o evento externo (um e-mail, uma mensagem de chat, uma edição de wiki) que chegou
+  por mensagem assinada: um nó `evidence` com os nomes do CloudEvents 1.0.2 em `x_event`, fixado no documento aceito
+  no inbox.
+- O `kg-query --revisit --help` passa a nomear os motivos que ele usa de verdade, incluindo o `pin-changed`; ele citava
+  o apoio refutado ou substituído, que nunca foi motivo (a 4.36.0 o tirou antes da release).
+
 ## [4.40.0] - 2026-10-30
 
 Sem mudança no contrato (segue v4.18). Um documento aprovado volta para a fila de revisão quando muda.

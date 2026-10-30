@@ -1281,8 +1281,8 @@ def main(argv=None):
                     help=_("the history of a decision: what it replaced, what replaced it, what refutes it and what it "
                            "rests on, with the status of each"))
     ap.add_argument("--revisit", action="store_true",
-                    help=_("the live decisions to revisit, by attention: what they rest on was refuted, superseded or "
-                           "is due, they are due themselves, or they are contested"))
+                    help=_("the live decisions to revisit, by attention: the version they were pinned to changed, what "
+                           "they rest on is due, they are due themselves, or they are contested"))
     ap.add_argument("--as-of", metavar=_("YYYY-MM-DD"), help=_("with --revisit, the date that counts as today"))
     ap.add_argument("--with", action="append", default=[], dest="withs", metavar=_("PREFIX=FOLDER"),
                     help=_("with --chain, --decision or --revisit, read the graph of another repository that a "

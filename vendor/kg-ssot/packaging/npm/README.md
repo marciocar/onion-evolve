@@ -4,8 +4,8 @@
 [![license](https://img.shields.io/npm/l/kg-ssot)](https://github.com/marciocar/kg-ssot/blob/main/LICENSE)
 [![node](https://img.shields.io/node/v/kg-ssot)](https://github.com/marciocar/kg-ssot)
 
-**The JavaScript reader for the KG-SSOT contract, the verifiable knowledge graph. Every claim says where it came
-from, when someone verified it, and what depends on it.**
+**The JavaScript reader for KG-SSOT, the trust layer for a company brain. A confirmed claim says where it came from,
+and can say when someone verified it and what depends on it.**
 
 `kg-ssot` checks a `.kg.yaml` or `.kg.json` graph against the current contract (v4). It returns the MUST verdict and
 the SHOULD warnings, with the stable codes of the conformance suite. The package ships:

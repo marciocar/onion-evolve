@@ -2,13 +2,13 @@
 
 # KG-SSOT
 
-**Verifiable knowledge graphs in plain text: every claim says where it came from, when it was last verified and
-what depends on it, and your CI rejects the ones that don't.**
+**The trust layer for a company brain: knowledge graphs in plain text where a confirmed claim must cite its source,
+a decision records what it replaced and what it rests on, and a decision comes back for review when a source it pinned changes.**
 
 **English** | [Português (Brasil)](README.pt-BR.md)
 
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Contract: v4 · release 4.40.0](https://img.shields.io/badge/contract-v4%20%C2%B7%204.40.0-6f42c1)](spec/release.json)
+[![Contract: v4 · release 4.40.1](https://img.shields.io/badge/contract-v4%20%C2%B7%204.40.1-6f42c1)](spec/release.json)
 [![Conformance: 512/512](https://img.shields.io/badge/conformance-512%2F512-2ea44f)](spec/conformance/README.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-3776ab)](tools/requirements.txt)
 [![PyPI](https://img.shields.io/pypi/v/kg-ssot)](https://pypi.org/project/kg-ssot/)
@@ -28,10 +28,11 @@ what depends on it, and your CI rejects the ones that don't.**
 
 ## Why
 
-Teams, of people or of agents, pile up conclusions: "the retry is idempotent", "we decided on three attempts".
-They live in meeting notes, tickets and chat memories, and on the way they lose three things: **the source**, **the
-date it was last verified** and **what depends on it**. A convincing sentence without any of the three passes a
-hurried review.
+A company brain is usually built by piling documents into RAG or GraphRAG. That keeps the data, but not the
+decisions: who decided what, on which source, and whether that source still holds. Teams, of people or of agents,
+pile up conclusions such as "the retry is idempotent" or "we decided on three attempts", and on the way they lose
+three things: **the source**, **the date it was last verified** and **what depends on it**. When the person who
+decided leaves, the reasoning leaves too.
 
 KG-SSOT treats this as a **format** problem, not a discipline problem. Knowledge lives in a `.kg.yaml` graph,
 versioned next to the code, and a **formal contract** decides in CI what fails:
@@ -42,6 +43,20 @@ versioned next to the code, and a **formal contract** decides in CI what fails:
 - an edge that points nowhere fails, and so does a node with no edges;
 - a verification stamp with nothing to check against, a decision with no origin and a production claim backed only by
   testimony **raise warnings**.
+
+## What it does for a company brain
+
+| You need to know... | KG-SSOT gives you |
+|---|---|
+| Where a claim came from | A `provenance` on every confirmed claim: the file, the line or the node, and, if you pin it, a hash that `kg_trace.py check` verifies |
+| Why a decision was made, and what it replaced | `kg_query --decision ID`: the whole `SUPERSEDES` line, what supports it and the status of each support |
+| Which decisions to look at again | `kg_query --revisit`: the ones past their review cadence, contested, or whose approved document or pinned source changed |
+| What is on each owner's plate | `kg_query --open --where owner=X --sort attention` |
+| What an e-mail, chat or wiki event said, and who sent it | An `evidence` node with the CloudEvents 1.0.2 names in `x_event`, pinned to the accepted inbox document ([recipe](docs/manual/08-recipes.md)) |
+
+Business, technical, compliance and design knowledge can live in the same format, in your repository. It plugs in
+as a Python package or an MCP server, with a JavaScript validator on npm, and the CI gate is one of its uses, not the
+point. The pins are checked when `kg_query` or `kg_trace.py` runs with `--root`.
 
 ## Get started in 60 seconds
 
@@ -84,7 +99,7 @@ The tools print in English by default and in Brazilian Portuguese when your loca
 | [Claude Desktop](https://github.com/marciocar/kg-ssot/releases/latest) | the `.mcpb` file from the [latest release](https://github.com/marciocar/kg-ssot/releases/latest) | The MCP server as a one-click extension |
 | [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.marciocar/kg-ssot) | `io.github.marciocar/kg-ssot` | The same server for any MCP client |
 | [Container](https://github.com/marciocar/kg-ssot/pkgs/container/kg-ssot) | `docker pull ghcr.io/marciocar/kg-ssot` | The MCP server as a service next to a client without Python, such as LibreChat |
-| Your repository | `kg_vendor.py update --tag kg-ssot-v4.40.0` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
+| Your repository | `kg_vendor.py update --tag kg-ssot-v4.40.1` | The release vendored by tag, with a sha256 stamp, and the gate in your CI ([manual, chapter 6](docs/manual/06-adoption-and-ci.md)) |
 
 ## A node, inside
 
@@ -197,11 +212,12 @@ flowchart LR
 | A query language over a large graph | A graph database | A file format and a contract, with no server |
 | Semantic web interoperability | RDF, OWL, SHACL | A small, closed YAML vocabulary that reads well in a diff, and a PROV-O export |
 | Enterprise search over documents | A search platform | No connectors or index: only the graph the team writes |
+| Retrieval over document chunks (RAG, GraphRAG) | A vector store or a GraphRAG tool | The claims those documents make, the decisions taken on them, and what to revisit |
 | A guarantee that a claim is **true** | Human review, tests | The guarantee that it **says** where it came from and when it was verified |
 
 ## Status
 
-- **Current:** contract v4, release `kg-ssot-v4.40.0`. The reference reader passes 512 of 512 cases in `latest/`.
+- **Current:** contract v4, release `kg-ssot-v4.40.1`. The reference reader passes 512 of 512 cases in `latest/`.
 - **In use:** three adopters run the gate in CI, one of them in production.
 - **Next:** v5 will fail a `method` outside the `<class>: <detail>` form, which only warns today.
 - **Open:** the semantic layer (freshness, contradiction, domain completeness) lives in `optional/`, and the reference
