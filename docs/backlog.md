@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**764 itens abertos** em 133 grafo(s) com aberto (de 172 no escopo) · 134 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**767 itens abertos** em 134 grafo(s) com aberto (de 173 no escopo) · 135 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1142,6 +1142,14 @@
 |--:|---|---|---|
 | 7.2 | `C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE` | forge-cc-update-2026-10 | teto declarado: o medidor não decide se um item do CHANGELOG toca o Onion; casar por palavra-chave fabricaria as ligações que a |
 | 3.6 | `Q_ISSUE_PELO_ADAPTER_EXECUTAVEL` | forge-cc-update-2026-10 | quando o adapter executável do task manager existir (SAC-65), o passo de ação vira chamada, não prosa seguida pela sessão? |
+
+## radar-E3-2026-10-30-r21 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.2 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030` | radar-E3-2026-10-30-r21 | o SDK do bridge deve subir para 0.3.314 por paridade (três versões atrás); o alvo da SAC-261 envelheceu, só a metade do pin de |
+| 2.2 | `Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030` | radar-E3-2026-10-30-r21 | a cobertura dos vetos sobre o Monitor deve virar caso da guarda de deriva de binário, ou ficar só declarada? |
+| 2.0 | `Q_AVALIAR_BLOCKWRITESOUTSIDE_NA_CASA_1030` | radar-E3-2026-10-30-r21 | o veto nativo de escrita fora do diretório de trabalho cabe na casa (ou num adotante regulado), com as escritas legítimas declar |
 
 ## rito-task-manager-2026-09 — 4 item(ns)
 

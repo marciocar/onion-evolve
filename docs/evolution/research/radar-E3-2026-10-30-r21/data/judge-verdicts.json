@@ -1,0 +1,436 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "data/2.1.314.txt não bate byte a byte com a seção ## 2.1.314 do CHANGELOG oficial, ou um label/verified_against cita texto ou número de linha do item que não está lá",
+   "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V='## 2.1.314' '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-30-r21/data/2.1.314.txt; grep -n '' no arquivo para as linhas citadas"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+   "check": "re-executar a medição do nó (o censo com raiz '.'; npm view do SDK; gh api das tags e de base-action/action.yml na v1.0.265; grep, sed -n e python no core; ls da extensão; type which/grep; a família cited_directive; a sonda do Monitor com comando inofensivo)"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+   "check": "ler o label e o verified_against e conferir no core (grep/ls/leitura do hook, número de linha por grep -n) que a superfície existe e se comporta como afirmado"
+  },
+  {
+   "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+   "when": "a rodada supera um nó da r20 que não existe ou cujo estado afirmado ainda vale; ou deixa de superar um nó da r20 cujo estado a medição de hoje derrubou",
+   "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-10-28-r20/radar-E3-2026-10-28-r20.kg.yaml e comparar o estado que ele afirma com a medição de hoje"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core (hook, guarda, settings, comando, skill, CI, bridge, worktree, core.hooksPath, adotante) e a rodada não o mediu nem o listou",
+   "check": "para cada item de data/2.1.314.txt, grep do termo-chave no core (.claude, ops, .github, CLAUDE.md) e leitura da superfície achada"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "CU1: cópia data/2.1.314.txt",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V='## 2.1.314' '$0==V{f=1;print;next} /^## /{f=0} f' > sec.txt; cmp sec.txt data/2.1.314.txt → rc 0 (idênticos); wc -l = 122; grep -c '^- ' = 119; grep -c '^## 2.1.313' no CHANGELOG = 0; cat -n conferiu cada linha citada nos nós (3, 4, 5, 6, 8, 9, 10, 16, 24, 25, 28, 30, 31, 34-36, 38, 39, 43, 58, 64, 68, 88, 89, 92, 94-96, 98-121): todas batem com o texto afirmado"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "cópia byte a byte e números de linha corretos; única imprecisão cosmética: o intervalo 'Claude Tag e sessões na nuvem (105 a 121)' inclui a linha 114, que é [Remote Control], citada à parte no mesmo nó"
+  },
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "timeout 300 bash .claude/validation/cc-delta-census.sh . --markdown → rc 0; 'DELTA 1 versão(ões): 2.1.314 a 2.1.314'; baseline 2.1.312, disco 2.1.314, processo 2.1.314, SDK bridge 2.1.310 (SDK 0.3.310); seção 2.1.314 com 122 linhas e 119 itens"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz integralmente"
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "leitura do grafo: 15 nós da rodada ligam itens a superfícies com medição; as lacunas medidas estão nas omissões abaixo (bancada e index.lock, PostToolUse no Monitor, linha 62 no bridge, hooksPath, nome de comando no revisor)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "pergunta legítima e aberta; fecha com as omissões incorporadas"
+  },
+  {
+   "alvo": "E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "npm view @anthropic-ai/claude-agent-sdk version claudeCodeVersion time.modified → '0.3.314', '2.1.314', '2026-10-30T01:06:46.178Z'; grep -n claude-code-action .github/workflows/onion-review.yml → 301 e 456 uses: ...@6d5ae526d25ce88daa2200be073e1a373167f064; gh api repos/anthropics/claude-code-action/tags → v1.0.265 6d5ae526d25c...; gh api .../contents/base-action/action.yml?ref=v1.0.265 | base64 -d | grep -n CLAUDE_CODE_VERSION → 150: CLAUDE_CODE_VERSION=\"2.1.314\"; gh pr view 1439 → MERGED, 'chore(ci): o revisor do CI sobe a claude-code-action para v1.0.265'; git show 2c4be0895 → 'ci(review): a claude-code-action sobe para v1.0.264'; gh variable list → rc 0, 0 bytes; sudo -n -u onion .../claude-agent-sdk-linux-x64/claude --version → 2.1.310; grep -c '^## 2.1.313' = 0"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "todos os números reproduzem; três versões publicadas atrás (311, 312, 314) confere"
+  },
+  {
+   "alvo": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "sudo -n -u onion find /var/lib/onion-bridge/chat-homes -maxdepth 4 → uma só home (0000000000000000) com .claude.json e .claude/{backups,sessions}, SEM settings.json; python sobre as chaves do .claude.json → ['firstStartTime','hasResetAutoModeOptInForDefaultOffer','machineID','migrationVersion','opusProMigrationComplete','pluginUsage','seenNotifications','sonnet1m45MigrationComplete','userID'] (sem projects, sem allowedTools); find /var/lib/onion-bridge/workspaces -maxdepth 4 -name 'settings*.json' -path '*/.claude/*' → 4 settings.json (fonte project, INCLUÍDA) e zero settings.local.json nos 5 workspaces; sed -n 625,636p ops/chat-runner.sh → a linha 635 está dentro de handshake() ('a política mínima que o lançador exige'), a sonda do wrapper, não o caminho do runner; o argv real vem de src/chat-query-options.ts:54 do bridge (settingSources: ['project']) e launcher.py:137-139 recusa outro valor"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "reescrita do verified_against: 'razões além da paridade: a linha 36 não tem o que vazar hoje (a única home do /chat não tem settings.json, o .claude.json dela não tem projects nem consentimentos, e nenhum dos 5 workspaces tem settings.local.json; --setting-sources=project é exigido pelo launcher.py linhas 137-139 do bridge e espelhado na sonda handshake() de ops/chat-runner.sh linha 635); candidata não medida: a linha 62 (prompt com <bash-stdout> não reconhecido por host stream-json local), e o bridge é host stream-json (ops/chat-runner.sh linha 634); a linha 71 não se aplica (o runner nega Task e Agent, linha 629)'",
+    "medida": "sudo -n -u onion find /var/lib/onion-bridge/chat-homes /var/lib/onion-bridge/workspaces -maxdepth 4 -name 'settings*.json' -path '*/.claude/*'; sed -n 625,636p ops/chat-runner.sh"
+   },
+   "nota": "a 'razão medida além da paridade' (linha 36) tem exposição ZERO medida hoje: as fontes excluídas (user na home, local nos workspaces) estão vazias; a pergunta segue de pé pela paridade, mas a razão está inflada"
+  },
+  {
+   "alvo": "E_VETOS_DO_BASH_ALCANCAM_O_MONITOR_NA_2_1_314_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "Bash: cat /nonexistent-juiz-r21/<arquivo .env> → 'PreToolUse:Bash hook error: [pretooluse-env-guard.sh]: GUARDA-PRETOOLUSE (.env)'; Monitor com o mesmo comando → 'PreToolUse:Monitor hook error: [pretooluse-env-guard.sh]: GUARDA-PRETOOLUSE (.env) ...' (barrado); Bash e Monitor com 'git -C /nonexistent-juiz-r21 push -f origin main' (inofensivo: o diretório não existe) → os dois barrados com 'PreToolUse:{Bash,Monitor} hook error: [pretooluse-merge-gate.sh]: git push com alvo MAIN negado'; o env-guard alimentado direto com tool_name=Monitor → rc 0, com tool_name=Bash → rc 2 (logo o harness entrega o comando do Monitor como Bash); grep -n: env-guard 1084 (tool_name) e 1093 (elif tool == 'Bash'); tool_input em protect-main 16, merge-gate 42, moat-gate 141, direct-provider 357, kg-read-leg 298; grep -rn Monitor .claude/hooks = 0 linhas; grep -rln Monitor .claude/validation = nenhum; python sobre .claude/settings.json: 26 hooks, nenhum com if, seis PreToolUse com Bash no matcher"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduzido ao vivo e AMPLIADO: o merge-gate também barra pelo Monitor; ver a omissão do PostToolUse"
+  },
+  {
+   "alvo": "Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n Monitor ops/chat-runner.sh → 629: EXEC = \"Bash,Monitor,PowerShell,REPL,Workflow,Task,Agent\"; linha 633: 'disableAllHooks': True; grep -rln Monitor .claude/validation → nenhum"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "pergunta bem posta; deveria levar junto o achado de que o PostToolUse Bash não alcança o Monitor"
+  },
+  {
+   "alvo": "E_BLOCKWRITES_FORA_DO_DIRETORIO_SEM_USO_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -rlF blockWritesOutsideWorkingDirectories .claude ops .github CLAUDE.md → nenhum; python: .claude/settings.json permissions keys = ['allow']; ~/.claude/settings.json permissions = {allow: list, defaultMode: 'bypassPermissions'}, sem additionalDirectories; esta worktree mora em /home/marcio/worktrees, fora do checkout"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "Q_AVALIAR_BLOCKWRITESOUTSIDE_NA_CASA_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "sed -n 3p data/2.1.314.txt → 'Write, Edit and NotebookEdit refuse paths outside the working directories in every permission mode'"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "pergunta coerente com a cláusula 1 da doutrina; não liga nada sem medir"
+  },
+  {
+   "alvo": "E_SETTING_SOURCES_DO_RUNNER_DO_CHAT_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n ops/chat-runner.sh → 202 CLAUDE_SRC=.../claude-agent-sdk-linux-x64/claude, 629 EXEC, 633 settings, 634-635 args com --setting-sources=project e --permission-mode default; command grep -nF setting-sources .claude/validation/veto-onfailure-check.sh → 12 e 26; sudo -n -u onion grep -rn setting-sources no bridge → deploy/chat-runner/launcher.py:137-139 ('--setting-sources só aceita project'), src/chat-query-options.ts:54 settingSources: ['project']; binário --version → 2.1.310"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "afirmação correta e honesta sobre o que não mediu; precisão: a linha 635 é a sonda handshake() do wrapper, o runner real é o launcher do bridge; a lacuna 'alcance nas homes' agora está medida (exposição zero, ver Q_SUBIR)"
+  },
+  {
+   "alvo": "E_PRECOMPACT_HOOK_NAO_EMITE_SAIDA_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "wc -l .claude/hooks/worklog-precompact-breadcrumb.sh → 33; leitura integral: a única escrita é a linha 32, printf ... >> \"$notes\" 2>/dev/null; nenhuma saída no stdout; python sobre settings: PreCompact só com este hook"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "E_CLAUDE_P_SAI_1_E_O_VEREDITO_DO_REVISOR_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "sed -n 270,284p .claude/validation/review-verdict.sh → casos (d) execution_file ausente → NÃO revisou (l.277) e (e) vazio → NÃO revisou (l.280); command grep -rlF 'claude -p' .claude ops .github CLAUDE.md → agent-skills-specialist.md, veto-onfailure-check.sh, lint-artifacts.sh, lint-selftest.sh, onion-review.yml (linhas 286 e 441, comentários)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "a lista de grep omite lint-selftest.sh:42176, que também é só comentário; a conclusão fica"
+  },
+  {
+   "alvo": "E_INDEX_LOCK_DO_HARNESS_E_A_DISPUTA_NOMEADA_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -nF index.lock ops/materialize-adopter.sh ops/materialize-door.sh → 78 e 475 conferem"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "o que afirma reproduz; a superfície mais forte (a bancada) ficou de fora: ver a omissão"
+  },
+  {
+   "alvo": "E_WHICH_LIMPO_GREP_SEGUE_FUNCAO_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "type which → 'which is /usr/bin/which'; type grep → 'grep is a function'"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "E_SINAL_CLAUDE_OPUS_4_E_GRAFIA_COM_PONTO_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -n claude-opus-4 data/2.1.314.txt → só a linha 43; command grep -rlF nas superfícies: ANTHROPIC_BASE_URL, 'LLM gateway', availableModels, deniedModels, ANTHROPIC_DEFAULT_OPUS_MODEL → nenhum; python: env do settings de usuário = ['CLAUDE_CODE_ENABLE_TODO_TOOLS','CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS'] (sem base URL); command grep -n claude-opus-4 .claude/agents/development/claude-code-specialist.md → 208: \"model\": \"claude-opus-4-7\"; censo: allowlist claude-fable-5-1, claude-opus-5-5, claude-opus-5"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz; o achado lateral (opus-4-7 no corpo, fora do alcance da REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable)) confere"
+  },
+  {
+   "alvo": "E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "ls ~/.vscode-server/extensions | grep -i claude → anthropic.claude-code-2.1.306-linux-x64 (única); grep -n '^## 2.1.3' CHANGELOG → 307, 308, 309, 310, 311, 312, 314 acima de 306 = sete"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -rlF nas superfícies: ultrareview, remote-control, FORCE_HYPERLINK, 'Monitor(' → nenhum; /btw → aside-router.sh e .claude/diary/2026-08-04-maestro-aside-side-channel.md; ls -A ~/.claude/skills/.trash → inexistente; ~/.claude/plugins/.trash → 8 entradas; python: remoteControlAtStartup = True"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz; não lista as linhas 15, 33, 34 e 62, tratadas nas omissões (só a 62 tem superfície)"
+  },
+  {
+   "alvo": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_314_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C timeout 590 bash .claude/validation/lint-selftest.sh --families cited_directive → rc 0; Passaram 6, Pularam 0, Falharam 0, 'OK ✓ — todas as guardas reagiram conforme esperado.'; claude --version → 2.1.314"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "reproduz"
+  },
+  {
+   "alvo": "aresta SUPERSEDES E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030 → r20#E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: E_HOST_NA_2_1_312' r20 → linha 58; o r20 afirma host 2.1.312 e revisor 2.1.311 (pin v1.0.263); hoje claude --version 2.1.314 e o pin é v1.0.265 (CLAUDE_CODE_VERSION 2.1.314)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "alvo existe e o estado caiu"
+  },
+  {
+   "alvo": "aresta SUPERSEDES Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030 → r20#Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312' r20 → linha 74; alvo 0.3.312 e v1.0.264; hoje npm view → 0.3.314 e o pin já passou de v1.0.264 (2c4be0895) para v1.0.265 (5320d49ae)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "alvo existe e envelheceu"
+  },
+  {
+   "alvo": "aresta SUPERSEDES E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1030 → r20#E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028' r20 → linha 194, 'seis versões atrás'; hoje sete (CHANGELOG 307-312 e 314)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "segue C_SUPERACAO_20261028_DISTANCIA_RELATIVA_TAMBEM_SE_SUPERA"
+  },
+  {
+   "alvo": "ausência de SUPERSEDES sobre r20#E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_312_1028",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "sed -n 1,31p r20 → a r20 não superou o nó da guarda da r19 (external_edges só host, pergunta e extensão); o nó r20 afirma uma medição datada contra 2.1.312, que segue verdadeira como história; a re-medição de hoje (rc 0, 6/0/0) nasce como nó próprio"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "não se aplica (veredito positivo)",
+    "medida": "não se aplica"
+   },
+   "nota": "não superar é coerente com o precedente: a medição datada não foi derrubada, só repetida"
+  },
+  {
+   "alvo": "omissão: r20#E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028 não superado",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'id: E_NOME_DE_COMANDO_FORA_DO_KEBAB' r20 → linha 119; label: 'a correção não chega ao revisor do CI (2.1.311) nem ao bridge (2.1.310)'; hoje gh api .../base-action/action.yml?ref=v1.0.265 → CLAUDE_CODE_VERSION=\"2.1.314\" e onion-review.yml 301/456 fixam v1.0.265; find .claude/commands -name '*.md' | wc -l → 166 (os nomes fora do kebab seguem)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "nó novo E_NOME_DE_COMANDO_FORA_DO_KEBAB_CORRECAO_CHEGA_AO_REVISOR_1030 ('os 166 .md de .claude/commands, com os README e os templates com sublinhado, carregam no host 2.1.314 e no revisor do CI 2.1.314 (pin v1.0.265); só o bridge 2.1.310 segue sem a correção') com external_edge SUPERSEDES para r20#E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028",
+    "medida": "gh api 'repos/anthropics/claude-code-action/contents/base-action/action.yml?ref=v1.0.265' --jq .content | base64 -d | grep -n CLAUDE_CODE_VERSION; find .claude/commands -name '*.md' | wc -l"
+   },
+   "nota": "metade do estado do nó caiu: a correção da linha 9 da 2.1.312 agora CHEGA ao revisor do CI; só o bridge segue sem ela"
+  },
+  {
+   "alvo": "omissão: r20#E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028 sem re-medida na 2.1.314",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "git -C /home/marcio/onion-evolve config --local --get core.hooksPath → '.githooks' (RELATIVO, não absoluto como o r20 mediu); ls -t .git/worktrees → nenhuma worktree de agente criada depois da instalação do 2.1.314 (versions/2.1.314 de 2026-10-30 01:06; as últimas de agente são de 2026-10-29 12:30, pelo 2.1.312; a desta rodada, cc-update-r21, nasceu às 02:47 fora de .claude/worktrees); gh issue view 85039 e 88747 -R anthropics/claude-code → OPEN, closedAt null; grep -n hooksPath .claude/hooks/session-currency-check.sh → linhas 29-77, a guarda que avisa quando está ABSOLUTO"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "nó novo E_HOOKSPATH_RELATIVO_HOJE_SEM_WORKTREE_DE_AGENTE_DO_2_1_314_1030 ('core.hooksPath local é .githooks, relativo; nenhuma worktree de agente nasceu sob o 2.1.314; as issues 85039 e 88747 seguem abertas; se o 2.1.314 ainda regrava para absoluto não está medido') com SUPERSEDES para r20#E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028, e uma pergunta para medir na próxima worktree de agente (git config --get core.hooksPath e stat do .git/config antes e depois)",
+    "medida": "git -C /home/marcio/onion-evolve config --local --get core.hooksPath; ls -la --time-style=full-iso -t /home/marcio/onion-evolve/.git/worktrees | head; gh issue view 85039 -R anthropics/claude-code --json state"
+   },
+   "nota": "o estado afirmado pelo r20 ('segue absoluto') não vale hoje, e a rodada não mediu se o 2.1.314 ainda regrava o hooksPath ao criar worktree de agente; a linha 34 (worktree e sandbox) era o gancho para olhar"
+  },
+  {
+   "alvo": "omissão: linha 25 (index.lock) — a bancada _archive_staged é a superfície medida da disputa",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "command grep -nF index.lock .claude/validation/lint-selftest.sh → 1549, 1573 (e casos 9833, 20298-20341); sed -n 1543,1575p → _archive_staged retenta git write-tree 5 vezes porque 'git write-tree PRECISA do .git/index.lock', com disputa MEDIDA neste repo '2 workers ⇒ 33% de falha · 3 ⇒ 56% · 4 ⇒ 58% · 6 ⇒ 70%', e cai para HEAD (fixture do já commitado, falso-verde possível) quando desiste; command grep -nF index.lock .claude/validation/lint-artifacts.sh → 2734"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "acrescentar ao verified_against de E_INDEX_LOCK_DO_HARNESS_E_A_DISPUTA_NOMEADA_1030: '.claude/validation/lint-selftest.sh linhas 1549 a 1573 (_archive_staged) mede a disputa de .git/index.lock entre workers paralelos (33% a 70%) e cai para HEAD ao desistir; o harness era um contendor a mais quando a bancada roda com a sessão aberta (pre-commit); a origem das falhas passadas segue não medida'",
+    "medida": "command grep -nF index.lock .claude/validation/lint-selftest.sh; sed -n 1543,1575p .claude/validation/lint-selftest.sh"
+   },
+   "nota": "o nó cita só os materializadores; a bancada (que roda no pre-commit com a sessão aberta) é onde a casa mediu a disputa e onde a atualização de diff em segundo plano do harness seria um contendor a mais"
+  },
+  {
+   "alvo": "omissão: linha 35 — o PostToolUse que casa Bash (bash-empty-result-guard) NÃO roda no Monitor",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "python sobre .claude/settings.json → PostToolUse matcher 'Bash' → bash-empty-result-guard.sh (o 7º hook que casa Bash, fora da contagem de seis PreToolUse); sonda ao vivo: Bash com \"printf 'juiz-r21\\n' | head -1; echo rc=$?\" → 'PostToolUse:Bash hook blocking error ... EXIT-CODE-DE-PIPE'; o MESMO comando pelo Monitor → 'Monitor started', evento 'juiz-r21 / rc=0', NENHUM retorno do hook"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "acrescentar a E_VETOS_DO_BASH_ALCANCAM_O_MONITOR_NA_2_1_314_1030 e a Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030: 'a cobertura é só de PreToolUse; o PostToolUse Bash (bash-empty-result-guard.sh) não roda no Monitor, medido ao vivo; o merge-gate também barra pelo Monitor (git -C /nonexistent push -f origin main)'",
+    "medida": "comparar Bash e Monitor com o comando inofensivo printf 'x\\n' | head -1; echo rc=$? (o hook PostToolUse aparece só no Bash)"
+   },
+   "nota": "a cobertura nova é só de PreToolUse (o item diz 'can block or ask'); o guarda anti-fail-open de saída, que casa Bash, não alcança o Monitor; nem o nó nem a pergunta da bancada o dizem"
+  },
+  {
+   "alvo": "omissão: linha 62 — o bridge é host stream-json local e a correção não chega ao CLI 2.1.310",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "sed -n 62p data/2.1.314.txt → 'Fixed prompts containing tags such as <bash-stdout> or <local-command-stdout> not being acknowledged to a local stream-json host'; command grep -rlF stream-json .claude ops .github CLAUDE.md → ops/chat-runner.sh (linha 634: --output-format stream-json --input-format stream-json); sudo -n -u onion .../claude-agent-sdk-linux-x64/claude --version → 2.1.310; a rodada não lista a linha 62 em nó nenhum"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "acrescentar a linha 62 como razão candidata (efeito não medido) em Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030, e registrar em E_ITENS_SEM_SUPERFICIE_NO_CORE_1030 que a linha 71 não se aplica ao bridge (o runner nega Task e Agent, ops/chat-runner.sh linha 629)",
+    "medida": "grep -n stream-json ops/chat-runner.sh; sudo -n -u onion /home/onion/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude --version"
+   },
+   "nota": "é o único item do delta, além do 36, que descreve o modo de operação do bridge; prompt de convidado com essas tags não é reconhecido até o SDK subir; efeito no /chat não medido (exigiria sessão real)"
+  }
+ ]
+}
