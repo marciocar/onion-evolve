@@ -682,7 +682,7 @@
 | 3.0 | `Q_COORD_ESCRITOR_CARIMBO_SO_TROCA_PIN` | coordenacao-sessoes-2026-10 | O escritor do carimbo troca só o pin no label e não atualiza o resto da frase. |
 | 3.0 | `Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA` | coordenacao-sessoes-2026-10 | O grafo de coordenação de pendências entre sessões vira doutrina ou ferramenta própria (ex.: /meta:coord)? |
 | 3.0 | `Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO` | coordenacao-sessoes-2026-10 | Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo. |
-| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core. |
+| 3.0 | `Q_COORD_UPDATE_4_ADOTANTES_4390` | coordenacao-sessoes-2026-10 | A rodada de update da 4.39.0 aos quatro adotantes, com o pin c091dc66cf5c do core, e a 2ª onda, com o pin 67e9d003689f e a kg-sso |
 | 3.0 | `Q_COORD_URL_FIXADA_NOS_SELOS_DE_FORA` | coordenacao-sessoes-2026-10 | Gravar a URL fixada no sha nos nós de selo que citam outro repositório, depois do --with da 4.35.0. |
 | 2.0 | `Q_COORD_FIXTURE_NODE_SELFTEST_TMP` | coordenacao-sessoes-2026-10 | O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás. |
 
