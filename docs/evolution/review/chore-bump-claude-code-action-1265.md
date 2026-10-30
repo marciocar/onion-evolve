@@ -2,7 +2,8 @@
 branch: chore/bump-claude-code-action-1265
 pr: pendente
 date: 2026-10-30
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9953a843dfa4a1307f506551c3aa7216a3695cecb34b51cc310b7865fea08079
+reviewed_code_sha256: 976b70e054f35f19c6abccfc2b64d5f5e68f1f40f6fe07de92d0af2641e28ef9
 findings_total: 1
 findings_real: 1
 tokens: 43059
