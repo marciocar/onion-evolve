@@ -284,6 +284,9 @@ jobs:
         # `plugins` e o docs/usage.md para claude-plugins-official. Este job não usa `plugins`; nenhum input nem output usado aqui muda.
         # Razão além da paridade (rodada 20 do radar do Claude Code, SAC-261): a 2.1.312 corrige o comando com nome inválido que
         # derrubava os outros e deixava `claude -p` sem saída, e este job roda o CLI headless no checkout do PR, com os comandos dele.
+        # SUBIDO para v1.0.265 (6d5ae526; a tag anotada é 2d2c14f8) em 2026-10-30, pelo aviso do session-currency-check: 1 commit só
+        # ("bump Claude Code to 2.1.314 and Agent SDK to 0.3.314"), em 6 arquivos (locks, package.json, action.yml do base-action e run.ts);
+        # as notas da release só trazem o link do changelog. Nenhum input nem output usado aqui muda.
         # Antes: SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
         # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
         # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
@@ -295,7 +298,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@d70510b174a1244958df0b03166a54912811f3e6
+        uses: anthropics/claude-code-action@6d5ae526d25ce88daa2200be073e1a373167f064
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
@@ -436,6 +439,9 @@ jobs:
         # `plugins` e o docs/usage.md para claude-plugins-official. Este job não usa `plugins`; nenhum input nem output usado aqui muda.
         # Razão além da paridade (rodada 20 do radar do Claude Code, SAC-261): a 2.1.312 corrige o comando com nome inválido que
         # derrubava os outros e deixava `claude -p` sem saída, e este job roda o CLI headless no checkout do PR, com os comandos dele.
+        # SUBIDO para v1.0.265 (6d5ae526; a tag anotada é 2d2c14f8) em 2026-10-30, pelo aviso do session-currency-check: 1 commit só
+        # ("bump Claude Code to 2.1.314 and Agent SDK to 0.3.314"), em 6 arquivos (locks, package.json, action.yml do base-action e run.ts);
+        # as notas da release só trazem o link do changelog. Nenhum input nem output usado aqui muda.
         # Antes: SUBIDO para v1.0.260 (8d70a0dd; a tag anotada é 1c5885c4) em 2026-10-23, pela decisão de subidas da r16: a
         # v1.0.259 não tem notas, e o compare v1.0.258..v1.0.260 tem 2 commits. Um é o bump (CLI 2.1.309, SDK 0.3.309);
         # o outro (#1915) fixa o sha do PR que o run faz checkout, mas só no modo tag (setupBranch). Com prompt este job
@@ -447,7 +453,7 @@ jobs:
         # Contrato verificado antes de trocar: `execution_file` segue existindo como output e
         # segue sendo array JSON (`JSON.stringify(messages, null, 2)`), e prompt/anthropic_api_key/
         # claude_args seguem válidos — o review-verdict.sh depende dos três.
-        uses: anthropics/claude-code-action@d70510b174a1244958df0b03166a54912811f3e6
+        uses: anthropics/claude-code-action@6d5ae526d25ce88daa2200be073e1a373167f064
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
