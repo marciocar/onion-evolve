@@ -400,7 +400,7 @@ hub-formacao-enterprise	tier	hub
 hub-formacao-enterprise	trust-advises	onion-evolve	
 hub-operacoes-enterprise	adopts	onion-evolve	
 hub-operacoes-enterprise	mode	greenfield	
-hub-operacoes-enterprise	pin	8278fee79d1c	
+hub-operacoes-enterprise	pin	58f162825541	
 hub-operacoes-enterprise	specialization	hub	
 hub-operacoes-enterprise	specialization	itsm	
 hub-operacoes-enterprise	specialization	task-manager-integration	
@@ -646,7 +646,7 @@ onion-core	tier	source
 onion-core	trust-advises	onion-evolve	
 onion-curation	adopts	onion-evolve	
 onion-curation	mode	greenfield	
-onion-curation	pin	1d04d4e24cec	
+onion-curation	pin	67e9d003689f	
 onion-curation	specialization	curadoria	
 onion-curation	specialization	dissecacao	
 onion-curation	specialization	mercado	
@@ -713,7 +713,7 @@ onion-evolve	specialization	sdaal
 onion-evolve	tier	source	
 onion-kg-ssot	adopts	onion-evolve	
 onion-kg-ssot	mode	greenfield	
-onion-kg-ssot	pin	1d04d4e24cec	
+onion-kg-ssot	pin	67e9d003689f	
 onion-kg-ssot	specialization	kg-ssot	
 onion-kg-ssot	specialization	produto	
 onion-kg-ssot	specialization	schema	
