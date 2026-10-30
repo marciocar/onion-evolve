@@ -821,14 +821,17 @@ def main_digest(args):
     """kg_trace.py digest ARQUIVO#ID...: o provenance.node_sha256 de cada nó (contrato v4.18), o SHA-256 do JCS (RFC
     8785) do nó no modelo canônico do grafo, para quem anota a ponte kg-node. rc 0 · 1 nó que não existe ou se repete
     (NOT FOUND), grafo que não parseia (UNREADABLE, desde a 4.39.1, com o código do leitor) ou nó sem forma JCS, como um
-    inteiro fora de ±(2^53−1) (NO CANONICAL FORM) · 2 entrada quebrada. Com --format json (4.39.0), kg-ssot.digest/1
-    (spec/digest.schema.json): um resultado por referência, com o status ok, not_found, unreadable ou
-    no_canonical_form."""
+    inteiro fora de ±(2^53−1) (NO CANONICAL FORM) · 2 entrada quebrada, que para o lote antes de qualquer resultado: o
+    caminho fora da raiz ou a referência sem ARQUIVO#ID. Desde a 4.40.0, o arquivo que não existe (FILE MISSING) e o
+    que não decodifica em UTF-8 (UNREADABLE, code encoding.not-utf8) ou não se lê (code io.unreadable) são resultados da
+    própria referência, com rc 1, e
+    não param o lote. Com --format json, kg-ssot.digest/2 (spec/digest.schema.json, /2 desde a 4.40.0): um resultado
+    por referência, com o status ok, not_found, file_missing, unreadable ou no_canonical_form."""
     if not args.pages:
         print(_("BROKEN INPUT  {error}").format(error=_("digest takes FILE#ID")), file=sys.stderr)
         return 2
-    rc, results = 0, []
-    for ref in args.pages:
+    rc, results, refs = 0, [], []
+    for ref in args.pages:  # primeiro a entrada inteira: a entrada quebrada para o lote antes de qualquer resultado
         path, sep, nid = ref.rpartition("#")
         if not sep or not path or not nid:
             print(_("BROKEN INPUT  {error}").format(error=_("digest takes FILE#ID")), file=sys.stderr)
@@ -838,12 +841,19 @@ def main_digest(args):
         if full != base and base not in full.parents:
             print(_("BROKEN INPUT  {error}").format(error=_("{path} is outside the root").format(path=path)), file=sys.stderr)
             return 2
+        refs.append((ref, path, nid, full))
+    for ref, path, nid, full in refs:
+        if not full.is_file():  # 4.40.0: o arquivo ausente é um achado da referência, e não para o lote
+            results.append({"ref": ref, "file": path, "id": nid, "node_sha256": None, "status": "file_missing"})
+            rc = 1
+            continue
         try:
-            text = full.read_text(encoding="utf-8-sig")
-        except (OSError, UnicodeDecodeError) as exc:
-            print(_("BROKEN INPUT  {error}").format(error=exc), file=sys.stderr)
-            return 2
-        _tree, doc, code = kg_validate.parse_v1(kg_validate.as_source(path, text))
+            text = full.read_bytes().decode("utf-8-sig")
+            _tree, doc, code = kg_validate.parse_v1(kg_validate.as_source(path, text))
+        except UnicodeDecodeError:
+            _tree, doc, code = None, None, "encoding.not-utf8"
+        except OSError:  # o arquivo existe e não se lê (sem permissão, por exemplo): achado da referência
+            _tree, doc, code = None, None, "io.unreadable"
         digest = None if code else kg_validate.node_digest(doc, nid)
         status, extra = "ok", {}
         if code:
@@ -856,11 +866,13 @@ def main_digest(args):
             rc = 1
         results.append({"ref": ref, "file": path, "id": nid, "node_sha256": digest, "status": status, **extra})
     if args.format == "json":
-        print(json.dumps({"schema_version": "kg-ssot.digest/1", "results": results}, ensure_ascii=False, indent=1))
+        print(json.dumps({"schema_version": "kg-ssot.digest/2", "results": results}, ensure_ascii=False, indent=1))
         return rc
     for r in results:
         if r["status"] == "ok":
             print(f"{r['node_sha256']}  {r['ref']}")
+        elif r["status"] == "file_missing":
+            print(_("FILE MISSING  {ref}").format(ref=r["ref"]))
         elif r["status"] == "unreadable":
             print(_("UNREADABLE  {ref}  {code}").format(ref=r["ref"], code=r["code"]))
         else:

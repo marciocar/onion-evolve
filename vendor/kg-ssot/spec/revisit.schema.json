@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kg-ssot.dev/spec/revisit.schema.json",
-  "title": "kg-ssot.revisit/1",
-  "description": "Desde a 4.36.0. A saída de kg_query.py --revisit --format json: as decisões vivas (status que não é superseded nem refuted) que pedem revisão na data as_of, pela atenção (impact × confidence × fator do status × (1 + grau)), cada uma com os motivos: evidence-due (algo em que ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e segue viva). on_event lista as decisões que só têm reverify_on, porque o evento não tem data. Ficam à parte, nunca em silêncio: unstamped (cadência sem verified_at) e unresolved (apoio fora do corpus). O apoio refutado ou substituído não é motivo: a história dele está no --decision. Desde a 4.38.0, com --with, o apoio de outro repositório é lido no commit fixado da URL, e só as decisões do corpus local são julgadas. Cada item de unresolved traz reason: no_with (URL sem --with que case), not_found (o arquivo ou o nó não estão no commit), not_pinned_url (a fonte não é uma URL com commit, como dono/repo@ref:caminho) ou outside_corpus. upstream_changed lista, à parte e sem virar motivo de revisão, a decisão local cujo apoio externo tem outro status na ponta do clone (o HEAD da pasta do --with), ou sumiu dela (missing-node, missing-file): o commit fixado ficou para trás. unpinned: o apoio externo foi lido sem fixação real (o commit da URL não está no clone, a pasta não é git, ou o ref é branch ou tag) e não foi julgado.",
+  "title": "kg-ssot.revisit/2",
+  "description": "Desde a 4.36.0. A saída de kg_query.py --revisit --format json: as decisões vivas (status que não é superseded nem refuted) que pedem revisão na data as_of, pela atenção (impact × confidence × fator do status × (1 + grau)), cada uma com os motivos: pin-changed (desde a 4.40.0, o que muda o schema para /2: um apoio, ou o nó que ele cita pelo kg-node, cuja fixação por provenance.node_sha256 ou provenance.sha256 não bate mais, a mesma conferência do kg_trace check), evidence-due (algo em que ela se apoia venceu a cadência), review-due (a própria decisão venceu a cadência) e contested (ela recebe REFUTES e segue viva). on_event lista as decisões que só têm reverify_on, porque o evento não tem data. Ficam à parte, nunca em silêncio: unstamped (cadência sem verified_at) e unresolved (apoio fora do corpus). O apoio refutado ou substituído não é motivo: a história dele está no --decision. Desde a 4.38.0, com --with, o apoio de outro repositório é lido no commit fixado da URL, e só as decisões do corpus local são julgadas. Cada item de unresolved traz reason: no_with (URL sem --with que case), not_found (o arquivo ou o nó não estão no commit), not_pinned_url (a fonte não é uma URL com commit, como dono/repo@ref:caminho) ou outside_corpus. upstream_changed lista, à parte e sem virar motivo de revisão, a decisão local cujo apoio externo tem outro status na ponta do clone (o HEAD da pasta do --with), ou sumiu dela (missing-node, missing-file): o commit fixado ficou para trás. unpinned: o apoio externo foi lido sem fixação real (o commit da URL não está no clone, a pasta não é git, ou o ref é branch ou tag) e não foi julgado.",
   "type": "object",
   "required": [
     "schema_version",
@@ -16,7 +16,7 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "kg-ssot.revisit/1"
+      "const": "kg-ssot.revisit/2"
     },
     "root": {
       "type": [
@@ -50,7 +50,32 @@
                 "type": "array",
                 "minItems": 1,
                 "items": {
-                  "$ref": "#/$defs/brief"
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/brief"
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "reason": {
+                            "const": "pin-changed"
+                          }
+                        },
+                        "required": [
+                          "reason"
+                        ]
+                      },
+                      "then": {
+                        "required": [
+                          "changed",
+                          "pin",
+                          "source",
+                          "recorded",
+                          "current"
+                        ]
+                      }
+                    }
+                  ]
                 }
               }
             }
@@ -110,12 +135,15 @@
               "not_found",
               "not_pinned_url",
               "outside_corpus",
-              "unpinned"
+              "unpinned",
+              "pin_malformed",
+              "pin_source_missing",
+              "pin_unchecked"
             ]
           }
         }
       },
-      "description": "Os apoios que não estão no corpus lido, e por isso não foram julgados."
+      "description": "Os apoios que não estão no corpus lido, e por isso não foram julgados. Desde a 4.40.0, também a fixação de um apoio (ou do nó que ele cita pelo kg-node) que não se confere: pin_malformed (o hash fora da forma, ou o node_sha256 sem o esquema kg-node) pin_source_missing (a fonte fixada não existe mais) e pin_unchecked (a fonte é uma URL sem --with, um ref que anda, fica fora da raiz ou não é caminho)."
     },
     "upstream_changed": {
       "type": "array",
@@ -203,6 +231,7 @@
         },
         "reason": {
           "enum": [
+            "pin-changed",
             "evidence-due",
             "review-due",
             "contested"
@@ -218,7 +247,40 @@
         "reasons": {
           "type": "array"
         },
-        "reverify_on": {}
+        "reverify_on": {},
+        "changed": {
+          "type": "string",
+          "description": "desde a 4.40.0, só com pin-changed: ARQUIVO#ID do nó cuja fixação não bate mais (o próprio apoio, ou o nó que ele cita pelo kg-node)"
+        },
+        "pin": {
+          "enum": [
+            "node_sha256",
+            "sha256"
+          ],
+          "description": "só com pin-changed: qual fixação mudou"
+        },
+        "source": {
+          "type": "string",
+          "description": "só com pin-changed: a fonte conferida"
+        },
+        "recorded": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "só com pin-changed: o hash gravado"
+        },
+        "current": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "só com pin-changed: o hash de agora, ou null quando a fonte não se lê"
+        },
+        "gone": {
+          "type": "boolean",
+          "description": "só com pin-changed: true quando o nó fixado sumiu do documento (o current é null), e não quando mudou"
+        }
       }
     }
   }

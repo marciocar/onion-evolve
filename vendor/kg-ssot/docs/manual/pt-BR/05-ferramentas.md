@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:b33e3469e1ff5338 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:b26ac1fb7acc1bee -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -858,13 +858,21 @@ refutação guarda o nó refutado, e nada é apagado. Três visões tornam essa 
   que ela se apoia), com o status de cada um. `--format json` dá `kg-ssot.decision/1`
   (`spec/decision.schema.json`).
 - **`--revisit`** lista as decisões vivas (nem `superseded` nem `refuted`) que pedem revisão, pela atenção, cada uma com
-  os motivos: `evidence-due` (algo em que ela se apoia passou do `reverify_every`), `review-due` (a própria decisão passou do
+  os motivos: `pin-changed` (desde a 4.40.0: um apoio, ou o nó que ele cita pelo `kg-node`, a um salto, não bate mais
+  com a versão que fixou, pelo `provenance.node_sha256` ou pelo `provenance.sha256`; é a mesma conferência do
+  `kg_trace check`, e o item traz `changed`, `pin`, `source`, `recorded` e `current`), `evidence-due` (algo em que ela se apoia passou do `reverify_every`), `review-due` (a própria decisão passou do
   `reverify_every`) e `contested` (ela recebe `REFUTES` e segue viva). A decisão com só `reverify_on` espera o evento e
   sai à parte; a decisão com cadência e sem `verified_at` sai em `unstamped`, e o apoio fora do corpus em `unresolved`,
   para nada sumir em silêncio. O apoio refutado ou substituído não é motivo:
   inferido das arestas, deu 1 aviso útil em 10 no corpus do framework onde o formato nasceu, e por isso a queda aparece
-  no `--decision`, onde quem lê vê o status de cada apoio. `--as-of AAAA-MM-DD` muda a data; o padrão é hoje. `--format json` dá `kg-ssot.revisit/1`
-  (`spec/revisit.schema.json`).
+  no `--decision`, onde quem lê vê o status de cada apoio. `--as-of AAAA-MM-DD` muda a data; o padrão é hoje. `--format json` dá `kg-ssot.revisit/2`
+  (`spec/revisit.schema.json`; `/2` desde a 4.40.0, pelo motivo novo). A fixação que não se confere vai para
+  `unresolved`: `pin_malformed` (o hash não tem 64 hex minúsculos, ou um `node_sha256` não tem o esquema `kg-node`) ou
+  `pin_source_missing` (a fonte fixada não existe mais) ou `pin_unchecked` (a fonte é uma URL sem `--with`, um ref que
+  anda, fica fora da raiz ou não é caminho). O nó fixado que sumiu do documento também acende `pin-changed`, com o
+  `current` null. As fixações só se conferem com `--root`, e o apoio lido de outro repositório pelo `--with` ainda não
+  tem a fixação conferida, como no `kg_trace check`. É a aprovação de um documento controlado: a decisão é o
+  testemunho, e uma evidência que a `SUPPORTS` fixa a versão aprovada.
 
 ```bash
 kg-query --root . --open --sort attention --limit 10
@@ -1245,11 +1253,14 @@ o `node_sha256`. O `digest` lê a árvore de trabalho sob a raiz; para uma fonte
 kg-trace digest docs/graph/seals.kg.yaml#D_RETRY_POLICY
 ```
 
-Com `--format json` (4.39.0), o `digest` devolve `kg-ssot.digest/1` (`spec/digest.schema.json`): um resultado por
-referência, com o `node_sha256` e o `status` `ok`, `not_found`, `unreadable` ou `no_canonical_form`, e o mesmo código
-de saída do texto. Desde a 4.39.1, o grafo que não parseia sai `unreadable`, com o `code` do leitor, e não mais
-`not_found`: o nó não foi procurado, então não está ausente. Leia o valor pelo campo, em vez de partir a linha de texto. Uma entrada quebrada (um caminho fora da raiz, um
-arquivo que não se lê) para antes de imprimir qualquer resultado, nos dois formatos, com rc 2.
+Com `--format json` (4.39.0), o `digest` devolve `kg-ssot.digest/2` (`spec/digest.schema.json`; `/2` desde a 4.40.0):
+um resultado por referência, com o `node_sha256` e o `status` `ok`, `not_found`, `file_missing`, `unreadable` ou
+`no_canonical_form`, e o mesmo código de saída do texto. O `node_sha256` vem com `ok` e é null nos outros. Desde a
+4.40.0, o arquivo que não existe sai `file_missing` (no texto, `ARQUIVO AUSENTE`), e o que não é UTF-8 sai
+`unreadable` com o `code` `encoding.not-utf8` (ou `io.unreadable`, quando existe e não se lê): cada um é resultado
+da própria referência, e o lote segue. Desde a 4.39.1, o grafo que não parseia sai `unreadable`, com o `code` do leitor, e não mais
+`not_found`: o nó não foi procurado, então não está ausente. Leia o valor pelo campo, em vez de partir a linha de texto. Só a chamada quebrada para o lote antes de qualquer
+resultado, nos dois formatos, com rc 2: um caminho fora da raiz, ou uma referência sem `ARQUIVO#ID`.
 
 ### O checador de projeção (`kg_trace.py projection`, 4.35.0)
 

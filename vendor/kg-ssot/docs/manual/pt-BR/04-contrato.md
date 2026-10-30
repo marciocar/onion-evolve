@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/04-contract.md sha256:8ada412c98d0f510 -->
+<!-- translation-of: docs/manual/04-contract.md sha256:4da477e964e60388 -->
 # 4. O contrato
 
 [English](../04-contract.md) | **Português (Brasil)**
@@ -149,6 +149,7 @@ rótulo de versão próprio (v4.4 na 4.11.0, v4.5 na 4.12.0, v4.6 na 4.13.0, v4.
 | 4.29 | Contrato v4.15, sem mudança. O extra `rdf` lê a exportação PROV, e o `kg_prov_export.py --full` exporta o documento inteiro; na 4.29.1, a ponta de aresta malformada vai como literal |
 | 4.30 | Contrato v4.15, sem mudança. A skill de agente (`skills/kg-ssot/`, formato Agent Skills) e o marketplace de plugin do Claude Code |
 | 4.31 | Contrato v4.15, sem mudança. O site de documentação e a demo, publicados só no repositório público (`mirror_only`); na 4.31.1, o site renderiza os blocos de código |
+| 4.40 | Contrato v4.18, sem mudança. O `kg_query --revisit` ganha o `pin-changed`, a decisão cuja versão fixada mudou (`kg-ssot.revisit/2`); o `kg_trace.py digest` aceita um lote em que o arquivo ausente ou não UTF-8 é resultado da própria referência (`kg-ssot.digest/2`) |
 | 4.38 | Contrato v4.18, só SHOULD: `provenance.node_sha256`, o hash canônico do nó citado (RFC 8785); o `kg_query --revisit` e o `--decision` leem o apoio de outro repositório no commit fixado com `--with`, e listam as decisões cujo apoio mudou na origem; `kg_trace.py digest` |
 | 4.37 | Contrato v4.17, só SHOULD: `provenance.scheme` (como ler o locator: `json-pointer`, `text`, `csv`, `pdf`, `media`, `quote`, `html`, `kg-node`) e `provenance.sha256` (o hash do que foi lido, num campo próprio); o `kg_trace check` lê a fonte pelo esquema e pelo hash, também num commit fixado de outro repositório com `--with` |
 | 4.36 | Contrato v4.16, sem mudança. `kg_query --sort attention` (a fórmula do radar), `--decision` (a história de uma decisão) e `--revisit` (as decisões vivas a revisitar, com o motivo) |
