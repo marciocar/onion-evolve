@@ -13,14 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-28
-    cc_version: "2.1.312"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "juiz independente (opus não-fork): 0 reprovados e 6 exagerados (3 nós e 3 omissões), reescritos com 6 superações; 1 omissão virou nó; Aufhebung: SUPERSEDES de 3 nós da r19 (versões de quem serve, a pergunta da subida e a extensão do VS Code)"
-                            # rodada 20 (2.1.311->2.1.312, uma versão, 39 itens). Host na 2.1.312; revisor na 2.1.311
-                            # (v1.0.263); /chat (SDK 0.3.310) duas atrás (SAC-261, substitui o alvo da SAC-259); extensão
-                            # do VS Code do host na 2.1.306 (SAC-260). core.hooksPath absoluto: a 2.1.312 não muda nada.
-                            # Histórico da r19 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-28-r20/radar-E3-2026-10-28-r20.kg.yaml
+    last_run: 2026-10-30
+    cc_version: "2.1.314"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "juiz independente (opus não-fork): 1 exagerado e 5 reprovados (2 superações da r20 que faltavam e 3 omissões), aplicados com 6 superações; 2 nós novos; Aufhebung: SUPERSEDES de 5 nós da r20 (versões de quem serve, a pergunta da subida, a extensão do VS Code, o nome de comando e o core.hooksPath)"
+                            # rodada 21 (2.1.312->2.1.314, uma versão, 119 itens). Host e revisor (v1.0.265) na 2.1.314;
+                            # /chat (SDK 0.3.310) três atrás (SAC-262, substitui o alvo da SAC-261); vetos do Bash alcançam
+                            # o Monitor (SAC-263); veto nativo de escrita fora do diretório (SAC-264); extensão do VS Code na
+                            # 2.1.306 (SAC-260). Histórico da r20 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-30-r21/radar-E3-2026-10-30-r21.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

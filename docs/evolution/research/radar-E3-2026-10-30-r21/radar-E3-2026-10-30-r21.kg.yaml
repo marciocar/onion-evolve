@@ -1,0 +1,483 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.314 a 2.1.314 contra a baseline 2.1.312.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-30-r21
+  schema_version: "1"
+  baseline: "2026-10-30"
+  review_after: "2026-11-29"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-30); 17 da rodada; 25 após o juiz (2 superações de nó da r20 viraram nó, 6 superações).
+# ═══ AUFHEBUNG ═══
+#   DECIDIDO (2026-10-30): (a). O nó das versões de quem serve da r20 caiu (host 2.1.314, revisor 2.1.314 pelo pin
+#   v1.0.265, bridge segue 2.1.310), a pergunta da subida da r20 ficou com alvo velho (0.3.312 e v1.0.264; o pin já
+#   subiu duas vezes e hoje existe o SDK 0.3.314), e o nó da extensão do VS Code da r20 caiu pela distância relativa
+#   (seis versões atrás; hoje sete). Depois do juiz, mais duas: o nó do nome de comando da r20 (a correção não chegava
+#   ao revisor 2.1.311; hoje chega, 2.1.314) e o do core.hooksPath absoluto (hoje é relativo, sem worktree de agente
+#   criada sob a 2.1.314).
+external_edges:
+  - from: E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030
+    to: "docs/evolution/research/radar-E3-2026-10-28-r20/radar-E3-2026-10-28-r20.kg.yaml#E_HOST_NA_2_1_312_BRIDGE_NA_2_1_310_REVISOR_NA_2_1_311_1028"
+    edge_type: SUPERSEDES
+  - from: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030
+    to: "docs/evolution/research/radar-E3-2026-10-28-r20/radar-E3-2026-10-28-r20.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028"
+    edge_type: SUPERSEDES
+  - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1030
+    to: "docs/evolution/research/radar-E3-2026-10-28-r20/radar-E3-2026-10-28-r20.kg.yaml#E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1028"
+    edge_type: SUPERSEDES
+  - from: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CORRECAO_CHEGA_AO_REVISOR_1030
+    to: "docs/evolution/research/radar-E3-2026-10-28-r20/radar-E3-2026-10-28-r20.kg.yaml#E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028"
+    edge_type: SUPERSEDES
+  - from: E_HOOKSPATH_RELATIVO_HOJE_SEM_WORKTREE_DE_AGENTE_DO_2_1_314_1030
+    to: "docs/evolution/research/radar-E3-2026-10-28-r20/radar-E3-2026-10-28-r20.kg.yaml#E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-30"
+    verified_against: "CHANGELOG oficial: seções 2.1.314 (122 linhas, 119 itens); baseline 2.1.312, disco 2.1.314, processo 2.1.314, SDK bridge 2.1.310"
+    label: "o delta desde a baseline 2.1.312 são 1 versão(ões), de 2.1.314 a 2.1.314, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.314 a ## 2.1.314 (cópias em docs/evolution/research/radar-E3-2026-10-30-r21/data/)"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-30"
+    verified_against: "fechada em 2026-10-30 pela rodada 21 do radar do Claude Code: 119 itens; os candidatos medidos no vivo (versões de quem serve, Monitor sob os vetos com sonda ao vivo, blockWritesOutsideWorkingDirectories, --setting-sources do /chat, PreCompact, claude -p, index.lock, which, o sinal claude-opus-4, extensão do VS Code, core.hooksPath, nome de comando, itens sem superfície, a guarda cited_directive); juiz independente (subagente opus não-fork): 21 SUSTENTA, 1 EXAGERA, 5 REPROVA (2 superações de nó da r20 que faltavam e 3 omissões), 6 superações (data/judge-verdicts.json, judge-verdict-check rc 0); o que toca: o Monitor sob os vetos (SAC-263), o veto nativo de escrita (SAC-264) e a subida do SDK do bridge (SAC-262); os itens sem medição estão nos NÃO-VERIFICADOS da SYNTHESIS"
+    label: "quais itens de 2.1.314 a 2.1.314 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+    trace: "docs/evolution/research/radar-E3-2026-10-30-r21/SYNTHESIS.md e data/judge-verdicts.json"
+  - id: E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-30"
+    verified_against: "censo (cc-delta-census.sh com raiz '.'): disco 2.1.314, processo 2.1.314, binário do CLI embutido no SDK do bridge --version = 2.1.310 (SDK 0.3.310), 3 versões publicadas atrás (2.1.311, 2.1.312, 2.1.314; não há seção 2.1.313 no CHANGELOG); npm view @anthropic-ai/claude-agent-sdk version claudeCodeVersion time.modified = 0.3.314, 2.1.314, 2026-10-30T01:06:46.178Z; os dois uses: de .github/workflows/onion-review.yml (linhas 301 e 456) fixam 6d5ae526 = tag v1.0.265 (gh api tags), subidos pelo commit 5320d49ae (PR #1439); na tag v1.0.265, base-action/action.yml linha 150 é CLAUDE_CODE_VERSION=\"2.1.314\"; gh variable list do repo vazio, logo o interruptor ONION_REVIEW_MODE está no padrão off e o revisor só roda com a label review:ia"
+    label: "o host e o revisor do CI estão na 2.1.314 (pin v1.0.265); o /chat do bridge segue na 2.1.310 (SDK 0.3.310), três versões publicadas atrás, e o SDK 0.3.314 já existe no npm"
+    narrative: "O delta da 2.1.311, da 2.1.312 e da 2.1.314 não chega a quem serve pelo SDK do bridge. O SDK vive em repo alheio e o deploy é do maestro (ops/update-bridge.sh): a rodada registra e não sobe nada. A metade do pin da SAC-261 foi feita (v1.0.264 em 2c4be0895, v1.0.265 em 5320d49ae)."
+    provenance:
+      source: ".claude/validation/cc-delta-census.sh, .github/workflows/onion-review.yml, o registro npm e a API do GitHub"
+      locator: "tabela de versões do censo; uses: da claude-code-action; base-action/action.yml na tag v1.0.265"
+      method: "measurement: --version dos binários pelo censo, npm view, gh api das tags e do conteúdo na tag"
+      locality: "host"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-30"
+    verified_against: "proposta da rodada 21 do radar do Claude Code: subir o Agent SDK do bridge de 0.3.310 para 0.3.314 pelo ops/update-bridge.sh (deploy do maestro, repo alheio); a metade do pin da SAC-261 já foi feita (v1.0.265, commit 5320d49ae) e a do SDK não; a razão é a paridade (três versões publicadas atrás); a linha 36 (--setting-sources) NÃO tem o que vazar hoje: medido como a conta do serviço, só lendo, a home do /chat não tem settings.json e nenhum workspace tem settings.local.json (só o .claude/settings.json de projeto, que é fonte incluída); candidata não medida: a linha 62 (prompt com tags como <bash-stdout> não reconhecido por host stream-json local), porque o /chat é host stream-json (ops/chat-runner.sh linha 634) no CLI 2.1.310; a linha 71 não se aplica, porque o runner nega Task e Agent (linha 629); nada sobe nesta rodada; issue SAC-262, que substitui o alvo da SAC-261 (comentada); reescrito após o EXAGERA do juiz"
+    label: "o SDK do bridge deve subir para 0.3.314 por paridade (três versões atrás); o alvo da SAC-261 envelheceu, só a metade do pin dela foi feita, e nenhuma correção da 2.1.314 tem efeito medido no /chat"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-262"
+      locator: "issue SAC-262 do projeto Onion — core: próximas levas (substitui o alvo da SAC-261, comentada); ops/chat-runner.sh linhas 629 e 634"
+      method: "derived: proposta da rodada a partir de E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030 e E_SETTING_SOURCES_DO_RUNNER_DO_CHAT_1030"
+      locality: "web"
+  - id: E_VETOS_DO_BASH_ALCANCAM_O_MONITOR_NA_2_1_314_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-30"
+    verified_against: "linha 35 da 2.1.314 (hooks que casam Bash não rodavam nos comandos de shell iniciados pelo Monitor; agora rodam, podem bloquear ou perguntar, não aprovar nem reescrever): .claude/settings.json tem seis PreToolUse com Bash no matcher (pretooluse-env-guard 'Read|Grep|Bash', pretooluse-protect-main, pretooluse-merge-gate, pretooluse-moat-gate, pretooluse-direct-provider-api 'Bash', kg-read-leg 'Read|Edit|Write|Bash'; python sobre o settings); nenhum hook usa if (python: campo if ausente nos 26), então a linha 92 não muda nada; SONDA AO VIVO no processo 2.1.314 desta rodada: um cat de um .env num diretório inexistente pela ferramenta Bash foi barrado pelo env-guard, e o MESMO comando pela ferramenta Monitor foi barrado também, com o rótulo 'PreToolUse:Monitor hook error' e a mensagem do env-guard; o env-guard só julga quando tool_name == 'Bash' (linha 1093 do hook), logo o hook recebeu o comando do Monitor julgado como Bash; os outros cinco leem tool_input.command sem olhar tool_name (protect-main linha 16, merge-gate linha 42, moat-gate linha 141, direct-provider linha 357, kg-read-leg linha 298), e o Monitor traz o campo command (esquema da ferramenta); antes da 2.1.314 o Monitor era um desvio dos vetos de exit 2 (merge na main, push, .env); grep -rn Monitor .claude/hooks = zero, nenhum hook nem caso da bancada cita o Monitor; o juiz repetiu a sonda e também viu o merge-gate barrar pelo Monitor um push forçado para a main num diretório inexistente, e alimentou o env-guard direto (tool_name Monitor sai 0, Bash sai 2); a cobertura é SÓ de PreToolUse: o PostToolUse com matcher Bash (bash-empty-result-guard.sh) NÃO roda no Monitor, medido ao vivo pelo juiz e re-medido pela rodada (o mesmo pipe com head e leitura de rc dispara o aviso pelo Bash e fica em silêncio pelo Monitor)"
+    label: "na 2.1.314 os vetos PreToolUse que casam Bash passam a alcançar os comandos do Monitor, medido ao vivo pelo env-guard e pelo merge-gate; o aviso PostToolUse do Bash não alcança; antes era um desvio, e nada na casa prova essa cobertura"
+    provenance:
+      source: ".claude/settings.json, .claude/hooks e a sonda ao vivo pelas ferramentas Bash e Monitor"
+      locator: "matchers PreToolUse; linha 1093 do env-guard"
+      method: "measurement: execução de um comando inofensivo (arquivo inexistente) pelas duas ferramentas, leitura dos hooks"
+      locality: "host"
+  - id: Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-10-30"
+    verified_against: "proposta da rodada 21: a cobertura dos vetos sobre o Monitor depende do binário (antes da 2.1.314 não havia), e nenhum caso da bancada nem da guarda de deriva de binário (cited_directive) a exerce (grep Monitor em .claude/hooks = zero); decidir se ela vira caso da guarda de deriva de binário (que só mede onde o Claude Code está instalado) ou fica declarada na KB dos vetos; o runner do /chat nega o Monitor (EXEC em ops/chat-runner.sh linha 629) e desliga todos os hooks, então lá a questão não se põe; o caso cobre as duas metades: PreToolUse alcança o Monitor, PostToolUse não (omissão apontada pelo juiz); issue SAC-263"
+    label: "a cobertura dos vetos sobre o Monitor deve virar caso da guarda de deriva de binário, ou ficar só declarada?"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-263"
+      locator: "issue SAC-263 do projeto Onion — core: próximas levas; grep Monitor em .claude/hooks; linha 629 do runner"
+      method: "derived: proposta da rodada a partir de E_VETOS_DO_BASH_ALCANCAM_O_MONITOR_NA_2_1_314_1030"
+      locality: "web"
+  - id: E_BLOCKWRITES_FORA_DO_DIRETORIO_SEM_USO_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-30"
+    verified_against: "linha 3 da 2.1.314 (permissions.blockWritesOutsideWorkingDirectories: Write, Edit e NotebookEdit recusam caminho fora dos diretórios de trabalho em todo modo de permissão): grep -rlF no core (.claude, ops, .github, CLAUDE.md) = nenhum arquivo; .claude/settings.json só tem permissions.allow; o settings de usuário tem permissions.defaultMode = bypassPermissions e nenhuma additionalDirectories (python, só nomes de chave); a casa escreve fora do diretório de trabalho por desenho: ⟨as worktrees fora do checkout (esta rodada inclusive)⟩, ⟨o scratchpad da sessão⟩ e ⟨a memória da conta⟩; é um veto nativo que vale sob bypassPermissions, a mesma propriedade que o CLAUDE.md dá ao exit 2 de hook"
+    label: "a 2.1.314 traz um veto nativo de escrita fora dos diretórios de trabalho que vale sob bypassPermissions; a casa não o usa, roda em bypass e escreve fora do diretório por desenho"
+    provenance:
+      source: "data/2.1.314.txt, .claude/settings.json e o settings de usuário (nomes de chave)"
+      locator: "linha 3 da cópia; chaves permissions"
+      method: "measurement: grep e python sobre nomes de chave"
+      locality: "host"
+  - id: Q_AVALIAR_BLOCKWRITESOUTSIDE_NA_CASA_1030
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-30"
+    verified_against: "proposta da rodada 21 (cláusula 1 da doutrina: versão nova pode oferecer o que a casa faz à mão): medir num sandbox se blockWritesOutsideWorkingDirectories, com as worktrees, o scratchpad e a memória declarados como diretórios de trabalho, cabe no core ou em adotante regulado; não ligar sem medir, porque a casa escreve fora do diretório por desenho; issue SAC-264"
+    label: "o veto nativo de escrita fora do diretório de trabalho cabe na casa (ou num adotante regulado), com as escritas legítimas declaradas?"
+    provenance:
+      source: "https://linear.app/sacola/issue/SAC-264"
+      locator: "issue SAC-264 do projeto Onion — core: próximas levas; linha 3 de data/2.1.314.txt"
+      method: "derived: proposta da rodada a partir de E_BLOCKWRITES_FORA_DO_DIRETORIO_SEM_USO_1030"
+      locality: "web"
+  - id: E_SETTING_SOURCES_DO_RUNNER_DO_CHAT_1030
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-30"
+    verified_against: "linha 36 da 2.1.314 (um arquivo de settings excluído por --setting-sources ainda fornecia algumas configurações, como regras do auto mode e consentimentos de permissão salvos): a linha 635 de ops/chat-runner.sh fica dentro de handshake(), a sonda do runner, e espelha o --setting-sources=project que o lançador do bridge exige (omissão de origem apontada pelo juiz: o argv real vem do repo do bridge); o CLI é o do SDK do bridge (linha 202, claude-agent-sdk-linux-x64/claude), 2.1.310 pelo censo, logo a correção não chega; mas não há o que vazar: find de settings*.json sob .claude nas homes e workspaces do /chat, como a conta do serviço e só lendo, devolve só o .claude/settings.json de projeto de 4 workspaces (fonte incluída), nenhum settings.local.json e nenhum settings de home; .claude/validation/veto-onfailure-check.sh (linhas 12 e 26) também cita --setting-sources, como registro de defeito datado da 2.1.296"
+    label: "o /chat exclui settings por --setting-sources e roda o CLI 2.1.310, sem a correção do vazamento; hoje não há settings excluído para vazar, então a exposição medida é zero"
+    provenance:
+      source: "ops/chat-runner.sh"
+      locator: "linhas 202 e 629 a 636"
+      method: "measurement: leitura do runner, o censo e find como a conta do serviço; reescrito com o EXAGERA do juiz"
+      locality: "repo"
+  - id: E_PRECOMPACT_HOOK_NAO_EMITE_SAIDA_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-30"
+    verified_against: "linha 24 da 2.1.314 (saída muito grande de PreCompact fazia a compactação falhar; agora corta em 10.000 caracteres): o único PreCompact do core é .claude/hooks/worklog-precompact-breadcrumb.sh (33 linhas), que lê o stdin e escreve só por >> num arquivo de notas (linha 32), sem saída para o harness"
+    label: "o corte de 10.000 caracteres na saída de PreCompact não toca o core, cujo único PreCompact escreve em arquivo e não emite saída"
+    provenance:
+      source: ".claude/hooks/worklog-precompact-breadcrumb.sh"
+      locator: "linha 32"
+      method: "reading: leitura do hook"
+      locality: "repo"
+  - id: E_CLAUDE_P_SAI_1_E_O_VEREDITO_DO_REVISOR_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-30"
+    verified_against: "linha 8 da 2.1.314 (claude -p saía 0 sem saída quando a partida falhava; agora imprime o erro e sai 1): o headless da casa é o revisor do CI, agora no CLI 2.1.314 (pin v1.0.265); o .claude/validation/review-verdict.sh já não confia no rc: lê o execution_file e trata ausente ou vazio como NÃO revisou (casos d e e, linhas 276 a 281); grep 'claude -p' no core só acha comentários (onion-review.yml linhas 286 e 441, veto-onfailure-check.sh, lint-artifacts.sh, lint-selftest.sh linha 42176) e a prosa do agent-skills-specialist; o bridge usa o SDK em stream-json, não -p"
+    label: "a correção do claude -p sem saída alcança o revisor do CI, cujo veredito já não dependia do rc; a falha de partida passa a aparecer como erro e não só como 'NÃO revisou'"
+    provenance:
+      source: ".claude/validation/review-verdict.sh e .github/workflows/onion-review.yml"
+      locator: "linhas 276 a 281 do review-verdict; linhas 286 e 441 do workflow"
+      method: "measurement: grep e leitura"
+      locality: "repo"
+  - id: E_INDEX_LOCK_DO_HARNESS_E_A_DISPUTA_NOMEADA_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.55
+    verified_at: "2026-10-30"
+    verified_against: "linha 25 da 2.1.314 (atualizações de diff em segundo plano pegavam por instantes o index lock do repositório, e um comando git no mesmo momento falhava com 'Unable to create .git/index.lock: File exists'): ops/materialize-adopter.sh linha 78 já nomeia 'disputa de .git/index.lock' como causa possível de git write-tree não responder, e ops/materialize-door.sh linha 475 registra uma passada adversarial com index.lock; a superfície medida da disputa é a bancada: .claude/validation/lint-selftest.sh linhas 1549 a 1573 (_archive_staged) registra que git write-tree precisa do .git/index.lock, que a disputa entre workers paralelos é alta e que, depois de 5 tentativas, a fixture cai para HEAD com aviso (omissão apontada pelo juiz); ela roda no pre-commit com a sessão aberta, onde o harness era um contendor a mais; o pre-commit e o pr-finalize rodam git com a sessão aberta; não está medido se alguma falha da casa veio do harness"
+    label: "a correção do index lock tomado pelo harness remove um contendor da disputa que a bancada (_archive_staged) e os materializadores já nomeiam; a origem das falhas passadas não foi medida"
+    provenance:
+      source: "ops/materialize-adopter.sh, ops/materialize-door.sh e .claude/validation/lint-selftest.sh"
+      locator: "linha 78; linha 475; lint-selftest.sh linhas 1549 a 1573"
+      method: "measurement: grep -rnF index.lock; acrescido com a omissão do juiz"
+      locality: "repo"
+  - id: E_WHICH_LIMPO_GREP_SEGUE_FUNCAO_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "linha 89 da 2.1.314 (a shell da ferramenta Bash limpa alias ou função which herdada e para de passar funções which/unsetenv exportadas): no processo 2.1.314, type which = o which do sistema, e type grep = 'grep is a function' (o ugrep da shell do usuário segue chegando); a correção só cobre which"
+    label: "a limpeza do which na shell do Bash não muda o grep, que segue função na shell do agente; os scripts da casa precisam continuar sem depender do grep interativo"
+    provenance:
+      source: "shell da ferramenta Bash no processo 2.1.314"
+      locator: "type which; type grep"
+      method: "measurement: execução de type"
+      locality: "host"
+  - id: E_SINAL_CLAUDE_OPUS_4_E_GRAFIA_COM_PONTO_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "o sinal do censo (claude-opus-4 fora da allowlist do E6) vem da linha 43 da 2.1.314, a única com o termo (grep -n), que cita claude-opus-4.8 como grafia com ponto atrás de gateway de LLM; a casa não roda atrás de gateway (grep ANTHROPIC_BASE_URL e 'LLM gateway' em .claude/settings.json e ops/*.sh = nenhum); a allowlist do E6 é claude-fable-5-1, claude-opus-5-5, claude-opus-5 (censo); linha 94 (availableModels, deniedModels, ANTHROPIC_DEFAULT_OPUS_MODEL) = nenhum arquivo no core; achado lateral: o único claude-opus-4 do core é .claude/agents/development/claude-code-specialist.md linha 208, '\"model\": \"claude-opus-4-7\"' numa recomendação de settings de usuário, fora da allowlist e fora de frontmatter (a REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable) só lê frontmatter)"
+    label: "o sinal claude-opus-4 é a grafia com ponto de gateway da linha 43, sem superfície no core; o core tem uma recomendação defasada claude-opus-4-7 no corpo do claude-code-specialist, que a REGRA 3 não vê"
+    provenance:
+      source: "data/2.1.314.txt e .claude/agents/development/claude-code-specialist.md"
+      locator: "linha 43 da cópia; linha 208 do agente"
+      method: "measurement: grep"
+      locality: "repo"
+  - id: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1030
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "o diretório de extensões do VS Code Server da conta do host segue com uma só, anthropic.claude-code-2.1.306-linux-x64 (ls), agora sete versões publicadas atrás do CLI (2.1.307 a 2.1.312 e 2.1.314; o CHANGELOG não tem 2.1.313); os itens de VS Code da 2.1.314 (linhas 6 e 95, compactação ociosa; linhas 98 a 104) só valem quando ela subir; a pergunta da r19 sobre ela (SAC-260) segue aberta"
+    label: "a extensão do VS Code do host segue na 2.1.306, sete versões atrás, e os itens de VS Code da 2.1.314 não a alcançam"
+    provenance:
+      source: "diretório de extensões do VS Code Server do host"
+      locator: "anthropic.claude-code-2.1.306-linux-x64"
+      method: "measurement: ls do diretório de extensões e grep das seções do CHANGELOG"
+      locality: "host"
+  - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.65
+    verified_at: "2026-10-30"
+    verified_against: "grep -rlF em .claude, ops, .github e CLAUDE.md (fora das worktrees): ultrareview (linhas 16 e 88) = nenhum; remote-control (linhas 16 e 30) = nenhum; FORCE_HYPERLINK (linha 96) = nenhum; /btw (linhas 28 e 58) só em .claude/validation/aside-router.sh (texto que sugere /btw ao maestro) e num diário; Monitor( em condição if (linha 92) = nenhum; Claude apps gateway, Bedrock, Vertex, Foundry (linhas 4, 5, 9, 10, 38, 39): a casa não roda atrás de gateway (ver o nó do sinal); Claude Tag e sessões na nuvem (linhas 105 a 113 e 115 a 121); linha 71 (memória em turnos de SDK com muitos subagentes) não se aplica ao /chat, que nega Task e Agent (ops/chat-runner.sh linha 629); linha 34 (sandbox em worktree pelo -p --resume): nenhum settings tem a chave sandbox: o revisor da casa é a claude-code-action; no host, o .trash de skills da conta não existe e o .trash de plugins da conta tem 8 entradas (linhas 64 e 68, sem efeito medível); Remote Control (linhas 30, 31, 114) vale no host, onde o settings de usuário tem remoteControlAtStartup = True, e nenhuma guarda do core lê esse estado"
+    label: "ultrareview, o gateway de apps, Bedrock e afins, FORCE_HYPERLINK, o if com Monitor, Claude Tag e as sessões na nuvem não têm superfície no core; Remote Control e o .trash valem só no host"
+    provenance:
+      source: "grep no core e o settings de usuário (nomes de chave)"
+      locator: "termos-chave de cada linha citada"
+      method: "measurement: grep -rlF por termo, ls e python sobre nomes de chave"
+      locality: "repo"
+  - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_314_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-30"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive no host com 2.1.314: rc 0, Passaram 6, Pularam 0, Falharam 0, 'OK ✓ — todas as guardas reagiram conforme esperado.'"
+    label: "a guarda de deriva de binário (cited_directive) segue verde contra o CLI 2.1.314 instalado"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "família cited_directive"
+      method: "measurement: execução da família da bancada no host"
+      locality: "host"
+  - id: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CORRECAO_CHEGA_AO_REVISOR_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-30"
+    verified_against: "nó apontado pelo juiz (CU4) e medido pela rodada: o nó da r20 dizia que a correção da linha 9 da 2.1.312 (nome de comando inválido derrubando os outros e deixando claude -p sem saída) não chegava ao revisor do CI (2.1.311); hoje o pin é v1.0.265 (6d5ae526), e base-action/action.yml linha 150 nessa tag instala o CLI 2.1.314; find .claude/commands -name '*.md' = 166, com os README e os quatro templates com sublinhado; só o CLI do bridge (2.1.310) segue sem a correção"
+    label: "a correção do nome de comando inválido chega hoje ao host e ao revisor do CI (2.1.314); só o bridge (2.1.310) segue sem ela"
+    provenance:
+      source: ".github/workflows/onion-review.yml e base-action/action.yml na tag v1.0.265"
+      locator: "linhas 301 e 456 do workflow; linha 150 do action.yml"
+      method: "measurement: gh api do conteúdo na tag e find"
+      locality: "web"
+  - id: E_HOOKSPATH_RELATIVO_HOJE_SEM_WORKTREE_DE_AGENTE_DO_2_1_314_1030
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.6
+    verified_at: "2026-10-30"
+    verified_against: "nó apontado pelo juiz (CU4) e medido pela rodada: git config --local --get core.hooksPath no checkout principal = .githooks, relativo (a worktree desta rodada foi criada por git worktree add, não pelo harness, e recebeu git config core.hooksPath .githooks); nenhuma worktree de agente do harness nasceu sob a 2.1.314 (o juiz conferiu as datas em .git/worktrees contra a instalação de hoje); gh issue view 85039 e 88747 -R anthropics/claude-code = OPEN as duas; nenhum dos 119 itens da 2.1.314 cita core.hooksPath; se a 2.1.314 ainda regrava o valor para absoluto ao criar worktree de agente NÃO está medido"
+    label: "o core.hooksPath está relativo hoje porque nenhuma worktree de agente nasceu sob a 2.1.314; as issues seguem abertas, e se a 2.1.314 ainda o regrava para absoluto não foi medido"
+    provenance:
+      source: "configuração git do core e a API de issues do GitHub"
+      locator: "git config --local core.hooksPath; issues anthropics/claude-code 85039 e 88747"
+      method: "measurement: git config e gh issue view"
+      locality: "host"
+  - id: C_SUPERACAO_20261030_O_CHAT_NAO_TEM_SETTINGS_EXCLUIDO_PARA_VAZAR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: find de settings*.json nas homes e workspaces do /chat como a conta do serviço: só o settings de projeto de 4 workspaces; aplicada em Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030 e E_SETTING_SOURCES_DO_RUNNER_DO_CHAT_1030"
+    label: "correção de vazamento só é razão de subida quando há o que vazar; no /chat de hoje não há settings excluído, e a razão da subida volta a ser paridade"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030"
+      method: "judges: subagente opus independente, critério CU3"
+      locality: "repo"
+  - id: C_SUPERACAO_20261030_NO_DE_ALCANCE_CAI_QUANDO_O_REVISOR_SOBE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: base-action/action.yml na v1.0.265, linha 150 = 2.1.314; aplicada como nó novo com SUPERSEDES"
+    label: "nó que afirma quem NÃO recebe uma correção cai quando quem servia sobe; a rodada tem de revisar os nós de alcance da anterior, não só os de versão"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: omissão: r20#E_NOME_DE_COMANDO_FORA_DO_KEBAB_CARREGA_NA_2_1_312_1028 não superado"
+      method: "judges: subagente opus independente, critério CU4"
+      locality: "repo"
+  - id: C_SUPERACAO_20261030_HOOKSPATH_SE_RE_MEDE_A_CADA_VERSAO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: git config --local --get core.hooksPath = .githooks; issues 85039 e 88747 OPEN; aplicada como nó novo com SUPERSEDES"
+    label: "o estado do core.hooksPath se re-mede a cada rodada, e o relativo de hoje não prova a correção: só a próxima worktree de agente sob a versão nova mede"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: omissão: r20#E_HOOKSPATH_SEGUE_ABSOLUTO_NA_2_1_312_1028 sem re-medida"
+      method: "judges: subagente opus independente, critério CU4"
+      locality: "repo"
+  - id: C_SUPERACAO_20261030_A_DISPUTA_DO_INDEX_LOCK_MORA_NA_BANCADA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: grep -nF index.lock .claude/validation/lint-selftest.sh: linhas 1549 a 1573 (_archive_staged); aplicada em E_INDEX_LOCK_DO_HARNESS_E_A_DISPUTA_NOMEADA_1030"
+    label: "a superfície medida da disputa do index lock é a bancada do pre-commit, não só os materializadores"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: omissão: linha 25, a bancada _archive_staged"
+      method: "judges: subagente opus independente, critério CU5"
+      locality: "repo"
+  - id: C_SUPERACAO_20261030_MONITOR_RECEBE_SO_O_PRETOOLUSE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: o mesmo pipe com head e leitura de rc pelo Bash dispara o bash-empty-result-guard e pelo Monitor não; aplicada no nó do Monitor e na pergunta da bancada"
+    label: "a cobertura nova do Monitor é só de PreToolUse; o aviso anti-fail-open do PostToolUse fica de fora"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: omissão: linha 35, o PostToolUse não roda no Monitor"
+      method: "judges: subagente opus independente, critério CU5"
+      locality: "repo"
+  - id: C_SUPERACAO_20261030_O_CHAT_E_HOST_STREAM_JSON
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-10-30"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), re-medida pela rodada: grep -n stream-json ops/chat-runner.sh (linha 634); aplicada como razão candidata não medida em Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030 e a linha 71 em E_ITENS_SEM_SUPERFICIE_NO_CORE_1030"
+    label: "item de host stream-json local é candidato para o /chat; o efeito só se mede numa sessão real"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: omissão: linha 62, o /chat é host stream-json"
+      method: "judges: subagente opus independente, critério CU5"
+      locality: "repo"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030
+    edge_type: SUPPORTS
+  - from: E_SETTING_SOURCES_DO_RUNNER_DO_CHAT_1030
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030
+    edge_type: SUPPORTS
+  - from: E_VETOS_DO_BASH_ALCANCAM_O_MONITOR_NA_2_1_314_1030
+    to: Q_A_COBERTURA_DO_MONITOR_VIRA_CASO_DA_BANCADA_1030
+    edge_type: SUPPORTS
+  - from: E_BLOCKWRITES_FORA_DO_DIRETORIO_SEM_USO_1030
+    to: Q_AVALIAR_BLOCKWRITESOUTSIDE_NA_CASA_1030
+    edge_type: SUPPORTS
+  - from: E_VETOS_DO_BASH_ALCANCAM_O_MONITOR_NA_2_1_314_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_BLOCKWRITES_FORA_DO_DIRETORIO_SEM_USO_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SETTING_SOURCES_DO_RUNNER_DO_CHAT_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_PRECOMPACT_HOOK_NAO_EMITE_SAIDA_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_P_SAI_1_E_O_VEREDITO_DO_REVISOR_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_INDEX_LOCK_DO_HARNESS_E_A_DISPUTA_NOMEADA_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_WHICH_LIMPO_GREP_SEGUE_FUNCAO_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SINAL_CLAUDE_OPUS_4_E_GRAFIA_COM_PONTO_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITENS_SEM_SUPERFICIE_NO_CORE_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_314_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261030_O_CHAT_NAO_TEM_SETTINGS_EXCLUIDO_PARA_VAZAR
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261030_NO_DE_ALCANCE_CAI_QUANDO_O_REVISOR_SOBE
+    to: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CORRECAO_CHEGA_AO_REVISOR_1030
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261030_HOOKSPATH_SE_RE_MEDE_A_CADA_VERSAO
+    to: E_HOOKSPATH_RELATIVO_HOJE_SEM_WORKTREE_DE_AGENTE_DO_2_1_314_1030
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261030_A_DISPUTA_DO_INDEX_LOCK_MORA_NA_BANCADA
+    to: E_INDEX_LOCK_DO_HARNESS_E_A_DISPUTA_NOMEADA_1030
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261030_MONITOR_RECEBE_SO_O_PRETOOLUSE
+    to: E_VETOS_DO_BASH_ALCANCAM_O_MONITOR_NA_2_1_314_1030
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261030_O_CHAT_E_HOST_STREAM_JSON
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030
+    edge_type: TRACES_TO
+  - from: E_NOME_DE_COMANDO_FORA_DO_KEBAB_CORRECAO_CHEGA_AO_REVISOR_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOOKSPATH_RELATIVO_HOJE_SEM_WORKTREE_DE_AGENTE_DO_2_1_314_1030
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
