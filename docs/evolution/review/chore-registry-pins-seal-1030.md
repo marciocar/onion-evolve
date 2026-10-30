@@ -2,7 +2,8 @@
 branch: chore/registry-pins-seal-1030
 pr: pendente
 date: 2026-10-30
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c1d9320651da56a989e2816fa4aa11f6b2444c862ffdbd7b97124de8c277ea4a
+reviewed_code_sha256: ed44ed17bbec140529fe146a9c6104bd772110fe576a64cc4eafc7d2cf052a99
 findings_total: 5
 findings_real: 0
 tokens: 36874
