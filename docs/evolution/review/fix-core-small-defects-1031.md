@@ -2,7 +2,8 @@
 branch: fix/core-small-defects-1031
 pr: pendente
 date: 2026-10-31
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e81bbd3aa2cadf443c0f6eba54765414e5bf604fea4028dd4dd2c5192f14e12b
+reviewed_code_sha256: da051dbcce96c953716db4edf8570ba2b223dee4dd6ac15460ec2bd5e597b25d
 findings_total: 7
 findings_real: 3
 tokens: 77476
