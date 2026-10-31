@@ -120,7 +120,9 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
   `--query "$ARGUMENTS"`, que torna inertes `(`, `)`, `&`, `;`, `|` e `*`. **Teto que resta**: `"`,
   `` ` `` e `$` no texto da pergunta ainda quebram, porque erro de SINTAXE no eval não é capturável por
   `|| true`. Se acontecer, reinvoque sem esses caracteres — a pergunta inteira vai no `question:` do
-  workflow de qualquer forma, então nada de informação se perde.
+  workflow de qualquer forma, então nada de informação se perde. **Sem argumento a skill abre** (desde
+  2026-10-31): `--query ""` sai rc 0 com o aviso «sem pergunta» e não varre o corpus; pergunte ao maestro
+  o que pesquisar antes da etapa 1 (bancada: `run_corpus_grep_selftests`, caso (d)).
 
 - Só a sessão principal roda o workflow (opt-in por comando); subagente não orquestra.
 - Sem WebSearch disponível o workflow degrada: use `WebFetch` sobre fontes do roster e declare.

@@ -1452,8 +1452,11 @@ SANDBOX="$(mktemp -d)"
 #    `declarado != verificado`, porque o artefato PARECE protegido.
 #    `_bench_abort_guard` é chamado PRIMEIRO e sua 1ª instrução é `local rc=$?`, então o exit status
 #    real chega intacto; a limpeza vem depois e nunca mascara o veredito.
-_bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}" "${_SNAPDIR:-}"; }
-  rm -f "${_FIXTURE_NODE:-}" 2>/dev/null || true   # nó-fixture do (e) de kg-backlog (mktemp no top-level)
+# ⚠️ O `rm` do `_FIXTURE_NODE` mora DENTRO do handler (Q_COORD_FIXTURE_NODE_SELFTEST_TMP, 2026-10-31). Ele
+#    ficava na linha de baixo do `}` de uma função de uma linha só: rodava UMA vez no top-level, antes de o
+#    mktemp existir (no-op), e nunca no EXIT. Medido: 3188 nós-fixture órfãos em /tmp. Guarda: caso (a2) de
+#    run_kg_backlog_selftests, que lê o corpo da função carregada.
+_bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}" "${_SNAPDIR:-}"; rm -f "${_FIXTURE_NODE:-}" 2>/dev/null || true; }
 trap _bench_on_exit EXIT
 # A CÓPIA EXCLUI AS FIXTURES TRANSITÓRIAS DE OUTROS CASOS. Casos como marketplace-bundle e
 #    moat-boundary criam fixtures NA ÁRVORE VIVA (eles testam o LINT, que varre o dir real), com a
@@ -7936,11 +7939,21 @@ run_corpus_grep_selftests() {
     record_pass "corpus-grep: (c) sem termo ⇒ rc=2 (recusa, não varredura silenciosa)"
   else record_fail "corpus-grep: (c)" "sem termo devolveu rc=${_rc}; esperado 2 — varrer tudo por omissão é fail-open"; fi
 
-  # (d) `--query ""` é o MESMO caso de (c): frase vazia não é licença para varrer tudo
-  _rc=0; bash "${sut}" --query '' >/dev/null 2>&1 || _rc=$?
-  if [ "${_rc}" = "2" ]; then
-    record_pass "corpus-grep: (d) --query vazio ⇒ rc=2 (a frase vazia não vira varredura total)"
-  else record_fail "corpus-grep: (d)" "--query '' devolveu rc=${_rc}; esperado 2"; fi
+  # (d) `--query ""` é o /onion-research SEM argumento (a injeção passa `$ARGUMENTS` vazio). Até 2026-10-31 saía
+  #     rc=2 e o rc da injeção abortava a skill inteira (Q_COORD_CORE_ONION_RESEARCH_SEM_ARGUMENTO). Agora: rc=0,
+  #     aviso «sem pergunta» e NENHUMA varredura (sem `# corpus:`) — a frase vazia segue sem virar varredura total.
+  #     Também só-espaços, e também com --json (payload parseável, mode sem-pergunta). O (c) segue rc=2.
+  local _dq
+  for _dq in '' '   '; do
+    _rc=0; _o="$(bash "${sut}" --query "${_dq}" --top 40 2>&1)" || _rc=$?
+    if [ "${_rc}" = "0" ] && grep -q 'sem pergunta' <<< "${_o}" && ! grep -q '^# corpus:' <<< "${_o}"; then
+      record_pass "corpus-grep: (d) --query '${_dq}' ⇒ rc=0, aviso «sem pergunta», sem varredura (a skill abre sem argumento)"
+    else record_fail "corpus-grep: (d)" "--query '${_dq}' devolveu rc=${_rc} (esperado 0, «sem pergunta», sem '# corpus:'): o /onion-research sem argumento volta a abortar — saída: $(head -c 200 <<< "${_o}")"; fi
+  done
+  _rc=0; _o="$(bash "${sut}" --query '' --json 2>&1)" || _rc=$?
+  if [ "${_rc}" = "0" ] && python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("mode")=="sem-pergunta" and d.get("hits")==[] else 1)' <<< "${_o}" 2>/dev/null; then
+    record_pass "corpus-grep: (d2) --query '' --json ⇒ rc=0 e JSON com mode sem-pergunta e hits vazio"
+  else record_fail "corpus-grep: (d2)" "--query '' --json: rc=${_rc}, saída não é o JSON sem-pergunta: $(head -c 200 <<< "${_o}")"; fi
 
   # (e) --query conversa com --json (as flags não se excluem)
   _rc=0; _o="$(bash "${sut}" --query 'adopt' --json 2>&1)" || _rc=$?
@@ -21720,6 +21733,22 @@ run_kg_backlog_selftests() {
   if [ "${rc}" -eq 0 ]; then
     record_pass "kg-backlog: (a) o backlog vivo do repo PASSA (intacto satisfaz o caso)"
   else record_fail "kg-backlog: (a)" "o backlog real ja reprova (rc=${rc}): ${out}"; fi
+
+  # (a2) o nó-fixture SOME no EXIT da suíte (Q_COORD_FIXTURE_NODE_SELFTEST_TMP, 2026-10-31). O `rm` ficava fora
+  #     do handler e o mktemp vazava a cada rodada (3188 órfãos medidos em /tmp). Comportamento, não texto:
+  #     um bash filho carrega o `_bench_on_exit` QUE ESTA SUÍTE ARMOU, cria o temporário e sai; o arquivo tem
+  #     de ter sumido. MUTANTE: o mesmo filho com o handler de antes da cura (sem o rm) deixa o arquivo.
+  local _fx_def _fx_t _fx_m
+  _fx_def="$(declare -f _bench_on_exit)"
+  _fx_t="$(mktemp)"; _fx_m="$(mktemp)"
+  env -u SANDBOX -u _SNAPDIR _FX_DEF="${_fx_def}" _FIXTURE_NODE="${_fx_t}" \
+    bash -c '_bench_abort_guard() { :; }; eval "${_FX_DEF}"; trap _bench_on_exit EXIT; exit 0' >/dev/null 2>&1 || true
+  env -u SANDBOX -u _SNAPDIR _FIXTURE_NODE="${_fx_m}" \
+    bash -c '_bench_abort_guard() { :; }; _bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}" "${_SNAPDIR:-}"; }; trap _bench_on_exit EXIT; exit 0' >/dev/null 2>&1 || true
+  if [ ! -e "${_fx_t}" ] && [ -e "${_fx_m}" ]; then
+    record_pass "kg-backlog: (a2) o handler de EXIT da suíte apaga o _FIXTURE_NODE (e o mutante sem o rm deixa o órfão)"
+  else record_fail "kg-backlog: (a2)" "fixture-pós-EXIT existe=$([ -e "${_fx_t}" ] && echo sim || echo nao) · mutante-deixou=$([ -e "${_fx_m}" ] && echo sim || echo nao) — o rm do _FIXTURE_NODE saiu do _bench_on_exit e o mktemp vaza a cada rodada"; fi
+  rm -f "${_fx_t}" "${_fx_m}"
 
   # (b) DONE-NU — o coracao. A REGRA 49 NAO alcanca este arquivo (ele e todo `plane: DEV`, de
   #     proposito), entao declarar `done` sem carimbo saia DE GRACA antes desta guarda.
