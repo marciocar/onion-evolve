@@ -2,7 +2,8 @@
 branch: chore/coord-graph-harvest-1031
 pr: pendente
 date: 2026-10-31
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 82ba99bdc395f3dec55ead7bb335c8c8fa018abeb13a3a2da14cc8c8ffc230b0
+reviewed_code_sha256: f048dcac11c2b0c617595f205c86492048910c53f148575b6f49efe30182fd03
 findings_total: 11
 findings_real: 4
 tokens: 85028
