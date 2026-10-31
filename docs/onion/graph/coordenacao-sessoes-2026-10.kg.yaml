@@ -171,8 +171,8 @@ nodes:
     impact: 3
     confidence: 0.5
     verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
-    label: "Os textos da vitrine e o dia zero do lançamento da kg-ssot."
-    narrative: "Decisão de texto e de data do maestro. Anotado em 2026-10-28, pelo kg-ssot: o lançamento (Show HN, LinkedIn e Instagram, pelas contas do maestro; o GIF é do kg-ssot) está liberado desde a 4.36.0."
+    label: "Os textos da vitrine e o dia zero do lançamento da kg-ssot, marcado para 2026-11-04."
+    narrative: "Decisão de texto e de data do maestro. Anotado em 2026-10-28, pelo kg-ssot: o lançamento (Show HN, LinkedIn e Instagram, pelas contas do maestro; o GIF é do kg-ssot) está liberado desde a 4.36.0. Atualizado em 2026-10-31, por mensagem do kg-ssot: o dia zero está marcado para 2026-11-04, e os textos estão na versão 5 do LAUNCH.md do kg-ssot, que o maestro reescreve na voz dele."
   - id: Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS
     node_type: question
     layer: audit
@@ -351,7 +351,7 @@ nodes:
     verified_at: "2026-10-29"
     evidence_class: testimony
     verified_against: "medida da bancada da kg-ssot 4.39.0 sobre os 3 buracos de E_OBJECAO_CB_KG_SPLIT, relatada ao core em 2026-10-29 e não re-executada por ele; o kg-ssot registrou o mesmo em Q_KG_CROSS_REPO_TYPED_EDGE_1029, no grafo do repo dele"
-    label: "Parada no gatilho Q_MA_WRITE_SURFACE (company-brain-multiaudiencia-2026-10, open)."
+    label: "A aresta tipada entre repos (ponta por URL e grafo de submodule): parada no gatilho Q_MA_WRITE_SURFACE (company-brain-multiaudiencia-2026-10, open)."
     narrative: "Medida da bancada 4.39.0. Buraco 3 (o pin): coberto pela citação com URL fixada no commit. Buraco 1 (aresta tipada com uma ponta por URL): pede CONTRATO, porque essa aresta reprova no MUST (form.pattern.edge.from e integrity.dangling-from) e o external_edges só aceita caminho do mesmo repo. Buraco 2 (o grafo de submodule): pede FERRAMENTA, porque o --root não lê o grafo de um submodule. E_OBJECAO_CB_KG_SPLIT é nó da curadoria. A peça liga ao Q_MA_CROSS_REPO do grafo do Company Brain. Gatilho: Q_MA_WRITE_SURFACE escolher uma superfície com mais de um repo. O kg-ssot registrou o mesmo em Q_KG_CROSS_REPO_TYPED_EDGE_1029 (citado em texto, sem aresta externa: o grafo mora em outro repo). Segue open."
   - id: Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION
     node_type: question
@@ -432,7 +432,7 @@ nodes:
     provenance:
       source: "notas da sessão principal do core e mensagem do kg-ssot repassada por ela, 2026-10-31"
       locator: "a encomenda da sessão principal que abriu esta colheita"
-      method: "medição: grep, git log -S e a execução do kg-corpus-grep sobre origin/main para os itens do core; os do kg-ssot ficam como testemunho"
+      method: "measurement: grep, git log -S e a execução do kg-corpus-grep sobre origin/main, só para os itens do core; os do kg-ssot e o efeito na abertura da skill são testemunho, citados como tal nos nós"
       locality: "repo"
   - id: Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO
     node_type: question
@@ -456,8 +456,8 @@ nodes:
     confidence: 0.8
     verified_at: "2026-10-31"
     verified_against: "bash .claude/validation/kg-corpus-grep.sh --query \"\" --top 40 em origin/main 56cc18aeb: rc 2 e a linha de uso; a diretiva de injeção da l.23 de .claude/skills/onion-research/SKILL.md passa \"$ARGUMENTS\" ao --query"
-    label: "O /onion-research sem argumento aborta a skill inteira: a injeção roda kg-corpus-grep.sh --query \"\", que sai com erro de uso."
-    narrative: "A diretiva de injeção do corpus roda antes do modelo ler a skill; com a pergunta vazia o script sai rc 2 e a skill não carrega. A cura é a pergunta vazia sair rc 0 com aviso «sem pergunta», com caso na família de bancada do kg-corpus-grep."
+    label: "O /onion-research sem argumento: a injeção do corpus roda kg-corpus-grep.sh --query \"\", que sai rc 2 com erro de uso, e a skill não abre."
+    narrative: "A diretiva de injeção do corpus roda antes do modelo ler a skill. O rc 2 com a pergunta vazia foi medido; que ele derrube a abertura da skill é testemunho das notas da sessão, e a seção Fronteiras do SKILL.md registra o mesmo efeito para erro na injeção. A cura é a pergunta vazia sair rc 0 com aviso «sem pergunta», com caso na família de bancada do kg-corpus-grep."
   - id: Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL
     node_type: question
     layer: audit
@@ -505,7 +505,7 @@ nodes:
     verified_against: "mensagem do kg-ssot de 2026-10-31, repassada pela sessão principal do core; os nós citados moram no grafo do repo do kg-ssot e não foram relidos pelo core"
     label: "Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a leitura cega do pin-changed."
     narrative: "Quatro gatilhos, cada um com a sua régua, citados em texto porque os nós moram em outro repo. Q_KG_CROSS_VERTICAL_REFUTES_1029: 3 ou mais REFUTES entre grafos de verticais diferentes no core (era 0 em 8db8ac9). Q_KG_DUE_ANY_TYPE_1029: documentos do brain com reverify_every, ou 3 ou mais nós não-decisão vencidos. D_KG_EVENT_PROFILE_1030, o perfil B do x_event: 2 adotantes ou 50 nós. A leitura cega do pin-changed: 5 decisões acesas no campo. Nenhum disparou; quem medir o campo e ver a régua cruzada avisa o kg-ssot."
-  - id: Q_COORD_MAESTRO_DIA_ZERO_KGSSOT_1104_E_FORMA_C
+  - id: Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT
     node_type: question
     layer: audit
     plane: DEV
@@ -515,8 +515,8 @@ nodes:
     confidence: 0.5
     evidence_class: testimony
     verified_against: "mensagem do kg-ssot de 2026-10-31, repassada pela sessão principal do core; o LAUNCH.md mora no repo do kg-ssot e não foi relido pelo core"
-    label: "O dia zero do lançamento da kg-ssot, marcado para 2026-11-04, e o plano da forma C (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto."
-    narrative: "Os textos do dia zero estão na versão 5 do LAUNCH.md do kg-ssot, e o maestro os reescreve na voz dele. A forma C é a camada de confiança gerenciada, com preço e bilhetagem; o plano dela não foi aberto. Refina Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT com a data e acrescenta a forma C."
+    label: "O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto."
+    narrative: "A forma C é a camada de confiança gerenciada, com preço e bilhetagem; o plano dela não foi aberto. O dia zero do lançamento (2026-11-04) não ganha nó aqui: atualizou no lugar Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT, que já era a mesma pendência."
   - id: Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE
     node_type: question
     layer: audit
@@ -626,10 +626,10 @@ edges:
   - from: Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO
     to: E_COORD_NOTAS_DA_SESSAO_1031
     edge_type: TRACES_TO
-  - from: Q_COORD_MAESTRO_DIA_ZERO_KGSSOT_1104_E_FORMA_C
+  - from: Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT
     to: E_COORD_NOTAS_DA_SESSAO_1031
     edge_type: TRACES_TO
-  - from: Q_COORD_MAESTRO_DIA_ZERO_KGSSOT_1104_E_FORMA_C
+  - from: Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT
     to: Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT
     edge_type: TRACES_TO
   - from: Q_COORD_CORE_ESCRITOR_A2A_ACCEPT_EVIDENCE
