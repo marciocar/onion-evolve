@@ -17,8 +17,8 @@ nota: "tokens e duração do revisor medidos pelo harness (77476 tokens, 578 s, 
 
 # Passada adversarial: `fix/core-small-defects-1031`
 
-Empilhado sobre o #1446 (`chore/coord-graph-harvest-1031`). A colheita é daquele PR e aparece aqui pelo diff contra
-a `main`. Os ids colhidos são `Q_COORD_UPDATE_4_ADOTANTES_4370`, `Q_COORD_UPDATE_4_ADOTANTES_4380`,
+Nasceu empilhado sobre o #1446 (`chore/coord-graph-harvest-1031`), já mergeado; este branch foi rebaseado na `main`
+e o diff não traz mais a colheita. Os ids colhidos são `Q_COORD_UPDATE_4_ADOTANTES_4370`, `Q_COORD_UPDATE_4_ADOTANTES_4380`,
 `Q_COORD_WORKTREES_TRAVADAS_SESSAO_BD`, `Q_COORD_MAESTRO_CARTOES_2_3_4_IDA_E_VOLTA`,
 `Q_COORD_CORE_RESIDUO_ADOTANTE_ELENXO_SEM_TIL`, `Q_COORD_CORE_CC_UPDATE_2_1_312`, `Q_COORD_CORE_DPAREN_END_KG_READ_LEG`,
 `Q_COORD_CORE_SELFTEST_9_CASOS_NO_ADOTADO`, `Q_COORD_KGSSOT_WITH_NO_REVISIT_E_DECISION`,
