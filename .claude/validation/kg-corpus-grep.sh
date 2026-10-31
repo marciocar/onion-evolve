@@ -34,7 +34,10 @@ PHRASE=0; _WARN=""; TOP=""; _QUERY_SEEN=0
 while [ "$#" -gt 0 ]; do case "$1" in
   --json) JSON=1;;
   --all-status) ALL=1;;
-  --query) _QUERY_SEEN=1; shift; read -r -a _q <<< "${1:-}"; [ "${#_q[@]}" -gt 0 ] && TERMS+=("${_q[@]}");;
+  --query) _QUERY_SEEN=1; shift
+           # `--query` SEM valor (último argumento) é erro de uso, não pergunta vazia: recusa rc 2.
+           [ "$#" -gt 0 ] || { echo "kg-corpus-grep: --query sem valor — passe a frase entre aspas (vazia vale: --query \"\")." >&2; exit 2; }
+           read -r -a _q <<< "${1}"; [ "${#_q[@]}" -gt 0 ] && TERMS+=("${_q[@]}");;
   -h|--help) sed -n '2,10p' "$0"; exit 0;;
   # ⚠️ TERMO POSICIONAL COM ESPACOS e tratado como `--query`, e DECLARADO (dano medido 2026-10-03):
   #    `kg-corpus-grep.sh "auto-evolucao evolve laco raio-X auditoria"` casava a frase INTEIRA como UM
