@@ -30,11 +30,11 @@ JSON=0; ALL=0; TERMS=()
 # `while`+`shift`, NÃO `for a in "$@"`: num `for` a lista é expandida ANTES da 1ª volta, então o
 # `shift` do `--query` não move a iteração e a frase entrava DUAS vezes — como termos e como termo
 # inteiro (medido na própria cura, em 2026-10-01).
-PHRASE=0; _WARN=""; TOP=""
+PHRASE=0; _WARN=""; TOP=""; _QUERY_SEEN=0
 while [ "$#" -gt 0 ]; do case "$1" in
   --json) JSON=1;;
   --all-status) ALL=1;;
-  --query) shift; read -r -a _q <<< "${1:-}"; [ "${#_q[@]}" -gt 0 ] && TERMS+=("${_q[@]}");;
+  --query) _QUERY_SEEN=1; shift; read -r -a _q <<< "${1:-}"; [ "${#_q[@]}" -gt 0 ] && TERMS+=("${_q[@]}");;
   -h|--help) sed -n '2,10p' "$0"; exit 0;;
   # ⚠️ TERMO POSICIONAL COM ESPACOS e tratado como `--query`, e DECLARADO (dano medido 2026-10-03):
   #    `kg-corpus-grep.sh "auto-evolucao evolve laco raio-X auditoria"` casava a frase INTEIRA como UM
@@ -72,6 +72,16 @@ case "${TOP}" in
 esac
 # agora sim: todos os flags lidos, o emissor decide. Em --json o aviso viaja no payload (campo mode).
 [ -n "${_WARN}" ] && [ "${JSON}" != "1" ] && printf '%s\n' "${_WARN}" >&2
+# `--query` com frase VAZIA (ou só espaços) é o /onion-research invocado SEM argumento: a injeção da skill
+# roda `--query "$ARGUMENTS"` com `$ARGUMENTS` vazio, e o rc 2 da recusa abortava a skill inteira
+# (Q_COORD_CORE_ONION_RESEARCH_SEM_ARGUMENTO, 2026-10-31). Sai rc 0 com o aviso «sem pergunta» e SEM varrer
+# o corpus: a frase vazia continua não sendo licença para varredura total. Sem NENHUM termo e sem `--query`
+# segue a recusa rc 2 abaixo (invocação errada de quem chama à mão).
+if [ "${#TERMS[@]}" -eq 0 ] && [ "${_QUERY_SEEN}" = "1" ]; then
+  if [ "${JSON}" = "1" ]; then printf '{"terms": [], "mode": "sem-pergunta", "hits": []}\n'
+  else echo "kg-corpus-grep: sem pergunta — nada buscado no corpus (passe a pergunta em --query \"<frase>\")."; fi
+  exit 0
+fi
 [ "${#TERMS[@]}" -gt 0 ] || { echo "uso: kg-corpus-grep.sh <termo> [termo...] | --query \"<frase>\" | --phrase \"<frase literal>\" [--json] [--all-status]" >&2; exit 2; }
 if [ -n "${ONION_KG_CORPUS_FILES:-}" ]; then files="${ONION_KG_CORPUS_FILES}"
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada

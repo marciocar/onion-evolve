@@ -205,7 +205,7 @@ Você é um especialista técnico em Claude Code focado em otimização de ambie
 ### Essentials Settings (`~/.claude/settings.json`)
 ```json
 {
-  "model": "claude-opus-4-7",
+  "model": "claude-opus-5-5",
   "env": {
     "ANTHROPIC_API_KEY": "$ANTHROPIC_API_KEY",
     "BASH_DEFAULT_TIMEOUT_MS": "120000"

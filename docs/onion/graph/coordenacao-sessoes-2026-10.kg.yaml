@@ -144,13 +144,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 2
     confidence: 0.5
-    verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
+    verified_at: "2026-10-31"
+    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: caso (a2) de run_kg_backlog_selftests verde (um bash filho carrega o _bench_on_exit armado pela suíte e o temporário some no EXIT); com o rm tirado do handler (mutante) o mesmo caso sai ✗ «fixture-pós-EXIT existe=sim»"
     label: "O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás."
-    narrative: "Backlog técnico: o caso cria o temporário e não o remove ao sair."
+    narrative: "Backlog técnico: o caso cria o temporário e não o remove ao sair. O rm do _FIXTURE_NODE ficava na linha seguinte ao } de uma função de uma linha e rodava uma vez no top-level, antes do mktemp; nunca no EXIT. Medido em 2026-10-31: 3188 nós-fixture órfãos no diretório temporário do sistema. Curado em fix/core-small-defects-1031: o rm entrou no _bench_on_exit."
   - id: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
     node_type: question
     layer: audit
@@ -450,14 +451,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.8
     verified_at: "2026-10-31"
-    verified_against: "bash .claude/validation/kg-corpus-grep.sh --query \"\" --top 40 em origin/main 56cc18aeb: rc 2 e a linha de uso; a diretiva de injeção da l.23 de .claude/skills/onion-research/SKILL.md passa \"$ARGUMENTS\" ao --query"
+    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: kg-corpus-grep.sh --query \"\" --top 40 sai rc 0 com «sem pergunta»; run_corpus_grep_selftests 8/8, com os casos (d) e (d2) novos; o (d) do main de antes (rc 2) é o mutante e reprova o caso novo"
     label: "O /onion-research sem argumento: a injeção do corpus roda kg-corpus-grep.sh --query \"\", que sai rc 2 com erro de uso, e a skill não abre."
-    narrative: "A diretiva de injeção do corpus roda antes do modelo ler a skill. O rc 2 com a pergunta vazia foi medido; que ele derrube a abertura da skill é testemunho das notas da sessão, e a seção Fronteiras do SKILL.md registra o mesmo efeito para erro na injeção. A cura é a pergunta vazia sair rc 0 com aviso «sem pergunta», com caso na família de bancada do kg-corpus-grep."
+    narrative: "A diretiva de injeção do corpus roda antes do modelo ler a skill. O rc 2 com a pergunta vazia foi medido; que ele derrube a abertura da skill é testemunho das notas da sessão, e a seção Fronteiras do SKILL.md registra o mesmo efeito para erro na injeção. A cura é a pergunta vazia sair rc 0 com aviso «sem pergunta», com caso na família de bancada do kg-corpus-grep. Curado em fix/core-small-defects-1031: com --query vazio ou só de espaços o kg-corpus-grep.sh sai rc 0 com o aviso «sem pergunta» e não varre o corpus; sem nenhum termo e sem --query segue a recusa rc 2."
   - id: Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL
     node_type: question
     layer: audit
@@ -485,14 +486,14 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 2
     confidence: 0.8
     verified_at: "2026-10-31"
-    verified_against: "grep -rn claude-opus-4-7 .claude/agents em origin/main 56cc18aeb: development/claude-code-specialist.md l.208, num bloco de exemplo de settings no corpo; a REGRA 3 lê só o model: do frontmatter"
+    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: grep -rn claude-opus-4-7 .claude/agents sai vazio (rc 1) e grep -n '\"model\"' em development/claude-code-specialist.md mostra claude-opus-5-5 na l.208, presente em session_models"
     label: "O corpo do claude-code-specialist.md recomenda claude-opus-4-7, fora da allowlist de modelos, num lugar que a REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable) não lê."
-    narrative: "A recomendação está num exemplo de settings dentro do corpo do agente. A cura é trocar por um id da allowlist atual (session_models em docs/onion/radar-baselines.yaml)."
+    narrative: "A recomendação está num exemplo de settings dentro do corpo do agente. A cura é trocar por um id da allowlist atual (session_models em docs/onion/radar-baselines.yaml). Curado em fix/core-small-defects-1031: o exemplo de settings recomenda claude-opus-5-5, que está em session_models de docs/onion/radar-baselines.yaml."
   - id: Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO
     node_type: question
     layer: audit
