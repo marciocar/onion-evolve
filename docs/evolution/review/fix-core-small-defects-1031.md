@@ -2,8 +2,7 @@
 branch: fix/core-small-defects-1031
 pr: pendente
 date: 2026-10-31
-reviewed_diff_sha256: e81bbd3aa2cadf443c0f6eba54765414e5bf604fea4028dd4dd2c5192f14e12b
-reviewed_code_sha256: da051dbcce96c953716db4edf8570ba2b223dee4dd6ac15460ec2bd5e597b25d
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 3
 tokens: 77476
@@ -12,7 +11,7 @@ findings_fixed: 1
 verdict: APROVADO
 elenxo: nao
 reviewer: "@branch-code-reviewer, agente separado e só leitura, mandato refutar (2ª instância: a 1ª travou ao tentar escrever arquivo e não entregou veredito)"
-nota: "tokens e duração do revisor medidos pelo harness (77476 tokens, 578 s, com ~7 min perdidos no timeout da família kg_backlog). Dos 3 achados reais, 1 curado (d3) e 2 cosméticos declarados abaixo, sem cura."
+nota: "tokens e duração do revisor medidos pelo harness (77476 tokens, 578 s, com ~7 min perdidos no timeout da família kg_backlog). Dos 3 achados reais, 1 curado (d3) e 2 cosméticos declarados abaixo, sem cura. Recarimbo depois do rebase sobre a main (o #1446 foi mergeado por rebase): o diff de código contra a base é byte a byte o mesmo de antes, medido por sha256 do git diff sem as projeções geradas (3fb81505f01d nos dois lados)."
 ---
 
 # Passada adversarial: `fix/core-small-defects-1031`
