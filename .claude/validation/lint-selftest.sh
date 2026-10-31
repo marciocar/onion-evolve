@@ -7954,6 +7954,12 @@ run_corpus_grep_selftests() {
   if [ "${_rc}" = "0" ] && python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("mode")=="sem-pergunta" and d.get("hits")==[] else 1)' <<< "${_o}" 2>/dev/null; then
     record_pass "corpus-grep: (d2) --query '' --json ⇒ rc=0 e JSON com mode sem-pergunta e hits vazio"
   else record_fail "corpus-grep: (d2)" "--query '' --json: rc=${_rc}, saída não é o JSON sem-pergunta: $(head -c 200 <<< "${_o}")"; fi
+  # (d3) `--query` SEM valor (último argumento) é erro de uso: rc=2. Achado da passada adversarial de 2026-10-31 —
+  #      a 1ª forma da cura tratava a flag sem valor como pergunta vazia, e o erro de digitação parecia sucesso.
+  _rc=0; bash "${sut}" --query >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" = "2" ]; then
+    record_pass "corpus-grep: (d3) --query sem valor ⇒ rc=2 (erro de uso, não pergunta vazia)"
+  else record_fail "corpus-grep: (d3)" "--query sem valor devolveu rc=${_rc}; esperado 2 — flag sem valor não é pergunta vazia"; fi
 
   # (e) --query conversa com --json (as flags não se excluem)
   _rc=0; _o="$(bash "${sut}" --query 'adopt' --json 2>&1)" || _rc=$?

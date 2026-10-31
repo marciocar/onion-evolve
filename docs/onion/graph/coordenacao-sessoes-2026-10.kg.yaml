@@ -456,7 +456,7 @@ nodes:
     impact: 3
     confidence: 0.8
     verified_at: "2026-10-31"
-    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: kg-corpus-grep.sh --query \"\" --top 40 sai rc 0 com «sem pergunta»; run_corpus_grep_selftests 8/8, com os casos (d) e (d2) novos; o (d) do main de antes (rc 2) é o mutante e reprova o caso novo"
+    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: kg-corpus-grep.sh --query \"\" --top 40 sai rc 0 com «sem pergunta»; run_corpus_grep_selftests 9/9, com os casos (d), (d2) e (d3) novos (o (d3) mantém rc 2 para --query sem valor); o (d) do main de antes (rc 2) é o mutante e reprova o caso novo"
     label: "O /onion-research sem argumento: a injeção do corpus roda kg-corpus-grep.sh --query \"\", que sai rc 2 com erro de uso, e a skill não abre."
     narrative: "A diretiva de injeção do corpus roda antes do modelo ler a skill. O rc 2 com a pergunta vazia foi medido; que ele derrube a abertura da skill é testemunho das notas da sessão, e a seção Fronteiras do SKILL.md registra o mesmo efeito para erro na injeção. A cura é a pergunta vazia sair rc 0 com aviso «sem pergunta», com caso na família de bancada do kg-corpus-grep. Curado em fix/core-small-defects-1031: com --query vazio ou só de espaços o kg-corpus-grep.sh sai rc 0 com o aviso «sem pergunta» e não varre o corpus; sem nenhum termo e sem --query segue a recusa rc 2."
   - id: Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL
