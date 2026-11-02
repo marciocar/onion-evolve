@@ -383,42 +383,69 @@ nodes:
   - id: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-29"
     evidence_class: testimony
-    verified_against: "sinal da curadoria document-control-2026-10, versionado no inbox do core em docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md (revisado para público), lido inteiro na triagem de 2026-10-29; a medição é do laboratório da curadoria com dados sintéticos, não re-executada no core"
     label: "Decidir o --pin <caminho#ID> no kg-decide-seal.sh, que grava o nó E_ irmão com o node_sha256 da versão aprovada; antes do código, o desenho passa pelo kg-ssot."
-    narrative: "A curadoria propõe fechar o ciclo do documento controlado com a corrente de hashes que o contrato já tem: o D_ selado com o testemunho e um E_ irmão (aresta E_ SUPPORTS D_) que fixa o node_sha256 do documento aprovado. A peça que falta é o selo gravar esse E_ sem mexer na proveniência do testemunho. Achado medido pela curadoria na 4.39.0, para o kg-ssot: o --revisit do kg_query NÃO acende quando o documento aprovado muda, nem com o hash regravado; ele julga só a cadência vencida e o REFUTES, e o upstream_changed compara o status, não o hash. Só o kg_trace check acusa a mudança, como node-sha256-mismatch. A curadoria propôs ao kg-ssot um motivo de revisita «o hash fixado mudou», para a aprovação entrar na fila de revisão e não só no check. Gatilho: decisão do maestro. Depois do selo, o desenho vai ao kg-ssot e o código é do core."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»"
+    narrative: |-
+      A curadoria propõe fechar o ciclo do documento controlado com a corrente de hashes que o contrato já tem: o D_ selado com o testemunho e um E_ irmão (aresta E_ SUPPORTS D_) que fixa o node_sha256 do documento aprovado. A peça que falta é o selo gravar esse E_ sem mexer na proveniência do testemunho. Achado medido pela curadoria na 4.39.0, para o kg-ssot: o --revisit do kg_query NÃO acende quando o documento aprovado muda, nem com o hash regravado; ele julga só a cadência vencida e o REFUTES, e o upstream_changed compara o status, não o hash. Só o kg_trace check acusa a mudança, como node-sha256-mismatch. A curadoria propôs ao kg-ssot um motivo de revisita «o hash fixado mudou», para a aprovação entrar na fila de revisão e não só no check. Gatilho: decisão do maestro. Depois do selo, o desenho vai ao kg-ssot e o código é do core.
+
+      verified_against anterior: «sinal da curadoria document-control-2026-10, versionado no inbox do core em docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md (revisado para público), lido inteiro na triagem de 2026-10-29; a medição é do laboratório da curadoria com dados sintéticos, não re-executada no core»
+      Selado por /meta:decide em 2026-11-02: escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»; descartadas: «Só o --pin» · «Adiar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
   - id: Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 2
     confidence: 0.5
-    verified_at: "2026-10-29"
     evidence_class: testimony
-    verified_against: "sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 2, lido na triagem de 2026-10-29; o --where x_raci.responsible=X da 4.39.0 é medição da curadoria, não re-executada no core"
     label: "Decidir que x_raci, x_doc_version, x_copy_* e o par E_ SUPPORTS D_ ficam como convenção do adotante até dois adotantes usarem a mesma forma."
-    narrative: "O kg-ssot já propôs a forma: x_raci aninhado (responsible, accountable, consulted, informed), lido pelo --where da 4.39.0, com o owner do contrato como o A. Nenhuma norma exige RACI (a SOC 2 pede responsabilidade definida, não a matriz). A proposta é não promover nada a perfil canônico com um uso só: a convenção vira perfil quando um 2º adotante usar a mesma forma. Gatilho: decisão do maestro; depois dela, o gatilho da promoção é o 2º uso."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»"
+    narrative: |-
+      O kg-ssot já propôs a forma: x_raci aninhado (responsible, accountable, consulted, informed), lido pelo --where da 4.39.0, com o owner do contrato como o A. Nenhuma norma exige RACI (a SOC 2 pede responsabilidade definida, não a matriz). A proposta é não promover nada a perfil canônico com um uso só: a convenção vira perfil quando um 2º adotante usar a mesma forma. Gatilho: decisão do maestro; depois dela, o gatilho da promoção é o 2º uso.
+
+      verified_against anterior: «sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 2, lido na triagem de 2026-10-29; o --where x_raci.responsible=X da 4.39.0 é medição da curadoria, não re-executada no core»
+      Selado por /meta:decide em 2026-11-02: escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»; descartadas: «Só o --pin» · «Adiar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
   - id: Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-29"
     evidence_class: testimony
-    verified_against: "sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 3, lido na triagem de 2026-10-29"
     label: "Decidir levar ao hub a receita do piloto do documento controlado: o procedimento com dono e RACI, a cadência, PDF e DOCX gerados da fonte, um COPY_ por camada e a aprovação com o par de nós."
-    narrative: "O piloto é do hub, pela sessão dele (um escritor por repo); o core leva só a forma, sem conteúdo do hub. A ordem proposta é: (1) o procedimento de controle de acesso como nó com dono e RACI; (2) a cadência com reverify_every, que dá aviso pelo --due e pelo radar, não reprovação; (3) a fonte gerando PDF e DOCX (Pandoc e WeasyPrint, medidos pela curadoria); (4) um COPY_ por camada (wiki, Drive, Slack), com o adaptador do hub; (5) a aprovação com o par de nós, que depende do --pin. Gatilho: decisão do maestro."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»"
+    narrative: |-
+      O piloto é do hub, pela sessão dele (um escritor por repo); o core leva só a forma, sem conteúdo do hub. A ordem proposta é: (1) o procedimento de controle de acesso como nó com dono e RACI; (2) a cadência com reverify_every, que dá aviso pelo --due e pelo radar, não reprovação; (3) a fonte gerando PDF e DOCX (Pandoc e WeasyPrint, medidos pela curadoria); (4) um COPY_ por camada (wiki, Drive, Slack), com o adaptador do hub; (5) a aprovação com o par de nós, que depende do --pin. Gatilho: decisão do maestro.
+
+      verified_against anterior: «sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 3, lido na triagem de 2026-10-29»
+      Selado por /meta:decide em 2026-11-02: escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»; descartadas: «Só o --pin» · «Adiar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
   - id: E_COORD_NOTAS_DA_SESSAO_1031
     node_type: evidence
     layer: audit
@@ -530,6 +557,38 @@ nodes:
     verified_against: "mensagem do kg-ssot de 2026-10-31, repassada pela sessão principal do core; a receita mora no manual da kg-ssot (08-recipes) e não foi relida pelo core"
     label: "Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by a signed message» do manual da kg-ssot. Só se o hub pedir."
     narrative: "Gatilho: o hub pedir. Sem o pedido, não se constrói; o nó existe para a ideia não se perder."
+  - id: D_COORD_PERSONAS_DE_VERTICAL_ACEITA_1102
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Aceitar a proposta»"
+    label: "Personas de vertical: aceita a proposta da curadoria (D_VERTICAL_PERSONAS_PROPOSAL) — as sessões atuais seguem como personas entre repos, um escritor por repo, com os dois consertos na coordenação; vertical nova só pelo limiar de 3 pendências abertas ou 1 há mais de 14 dias"
+    narrative: "Selado por /meta:decide em 2026-11-02: escolhida «Aceitar a proposta»; descartadas: «Aceitar sem o limiar» · «Adiar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Personas de vertical: como fica?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
+  - id: D_COORD_MODELO_DE_OPERACAO_SEM_NOME_CURTO_1102
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Nenhum nome curto»"
+    label: "Nome do modelo de operação: nenhum nome curto (D_OPERATING_MODEL_NAME_PROPOSAL) — descrever pelas peças de mercado"
+    narrative: "Selado por /meta:decide em 2026-11-02: escolhida «Nenhum nome curto»; descartadas: «Company Brain» · «Depois de dissecar o Gas Town»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-02: «Nome do modelo de operação: qual nome curto fica?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -640,5 +699,11 @@ edges:
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
   - from: Q_COORD_UPDATE_4_ADOTANTES_4390
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: D_COORD_PERSONAS_DE_VERTICAL_ACEITA_1102
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: D_COORD_MODELO_DE_OPERACAO_SEM_NOME_CURTO_1102
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
