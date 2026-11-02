@@ -2,8 +2,7 @@
 branch: docs/coord-research-first-1102
 pr: pendente
 date: 2026-11-02
-reviewed_diff_sha256: 9633f1e7c987342a8bffcfd8d1918f084cac3b388e740169d3fba41c7fcab26b
-reviewed_code_sha256: c9ac3ef0657732011e687542e0a3f0111bafb6a62dfe0cc717f30e404bf0924d
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 1
 tokens: 0
