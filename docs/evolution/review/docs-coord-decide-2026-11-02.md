@@ -2,7 +2,8 @@
 branch: docs/coord-decide-2026-11-02
 pr: pendente
 date: 2026-11-02
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f27eda3e44e6b74674670bb94a93b8ed51989dd834af1445404499d704cf667f
+reviewed_code_sha256: 84ad9b3849f3804cadef4d820cf7852cf0086ac1aff17d524994c180508eff49
 findings_total: 1
 findings_real: 0
 tokens: 0

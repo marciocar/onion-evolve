@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**772 itens abertos** em 134 grafo(s) com aberto (de 173 no escopo) · 135 grupo(s), agrupados por `owner:` (54 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**769 itens abertos** em 134 grafo(s) com aberto (de 173 no escopo) · 135 grupo(s), agrupados por `owner:` (51 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -540,7 +540,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 26 item(ns)
+## maestro — 23 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -556,7 +556,6 @@
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
 | 5.0 | `Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA` | coordenacao-sessoes-2026-10 | Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. D |
-| 4.5 | `Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB` | coordenacao-sessoes-2026-10 | Decidir levar ao hub a receita do piloto do documento controlado: o procedimento com dono e RACI, a cadência, PDF e DOCX gerados  |
 | 4.5 | `Q_COORD_MAESTRO_GITHUB_MCP_OFICIAL_NA_ORG` | coordenacao-sessoes-2026-10 | O teste do MCP oficial do GitHub na mesma organização gratuita, depois do card da organização. |
 | 4.5 | `Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT` | coordenacao-sessoes-2026-10 | Os textos da vitrine e o dia zero do lançamento da kg-ssot, marcado para 2026-11-04. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
@@ -564,11 +563,9 @@
 | 4.0 | `Q_COORD_DECIDIR_VIGIA_DE_EVENTOS` | coordenacao-sessoes-2026-10 | Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático c |
 | 3.2 | `Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO` | coordenacao-sessoes-2026-10 | O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa. |
 | 3.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
-| 3.0 | `Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO` | coordenacao-sessoes-2026-10 | Decidir o --pin <caminho#ID> no kg-decide-seal.sh, que grava o nó E_ irmão com o node_sha256 da versão aprovada; antes do códi |
 | 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
 | 3.0 | `Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL` | coordenacao-sessoes-2026-10 | Ligar ClientAliveInterval e ClientAliveCountMax no sshd da VPS, para a porta de um túnel reverso morto não ficar presa. |
 | 2.0 | `Q_COORD_MAESTRO_DISSECAR_CLAI` | coordenacao-sessoes-2026-10 | A dissecação do clai (baalimago/clai), deixada para depois. |
-| 2.0 | `Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE` | coordenacao-sessoes-2026-10 | Decidir que x_raci, x_doc_version, x_copy_* e o par E_ SUPPORTS D_ ficam como convenção do adotante até dois adotantes usarem a |
 | 2.0 | `Q_COORD_MAESTRO_SGE_REGISTRO_PENDENTES` | coordenacao-sessoes-2026-10 | As decisões do maestro que o sge tem em espera, em um nó: as 4 ligações «normalizado» da SAEB, as branches antigas de update |
 
 ## onion-identity-2026-07 — 4 item(ns)
