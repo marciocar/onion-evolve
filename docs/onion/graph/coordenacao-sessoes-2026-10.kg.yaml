@@ -589,6 +589,40 @@ nodes:
       locator: "pergunta com opções de 2026-11-02: «Nome do modelo de operação: qual nome curto fica?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
       locality: "pessoa"
+  - id: E_COORD_VIGIA_PESQUISE_ANTES_1102
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    evidence_class: testimony
+    verified_against: "respostas do maestro no /meta:decide de 2026-11-02 (rodada 2), em texto livre, às três perguntas do vigia"
+    label: "O maestro não escolheu entre as formas do vigia de eventos: à coleta (coletor fino próprio ou Argo Events em k3s), ao aceite (em lote pelo humano ou automático por regra) e ao aviso (só rascunho ou envio automático interno) respondeu «ambos, escalável, pesquise antes». O caminho do Gmail (a 4ª decisão do nó) não foi perguntado."
+    narrative: "Leitura do core: o pedido é um desenho que comporte as duas formas em cada camada e escale de uma para a outra, com o degrau que começa e o gatilho que passa ao seguinte, medindo o custo na VPS compartilhada. A rodada complementar é da curadoria, dona do estudo (Q_EW_SCALABLE_LADDER_1102, no repo dela). Q_COORD_DECIDIR_VIGIA_DE_EVENTOS segue aberta: pesquisar antes não é escolha."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "rodada 2 de 2026-11-02, perguntas Coleta, Aceite e Aviso"
+      method: "testimony: resposta livre do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
+  - id: E_COORD_PORTAS_DO_ONION_CORE_PESQUISE_ANTES_1102
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    evidence_class: testimony
+    verified_against: "resposta do maestro no /meta:decide de 2026-11-02 (rodada 2), em texto livre, à pergunta do Esperanto"
+    label: "Sobre o Esperanto, o maestro rejeita os dois (D_PIECE_CORE_DEPENDENCY e D_PIECE_MULTI_PROVIDER_CLIENT_REJECT, da curadoria), mas quer portas do onion-core para outras plataformas e modelos (onion-codex, onion-mistral, onion-gemma, onion-qwen), com o onion-core e o Claude como base e modelo padrão, e aderência e transformação para os outros; o Onion Evolve segue a maquinaria principal. Pediu pesquisa antes de selar."
+    narrative: "A pesquisa é do core: run wf_407cda39-1fb, grafo em docs/evolution/research/onion-core-ports-multi-model-2026-11/. O selo dos D_PIECE_* na curadoria espera o resultado e o selo do maestro."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "rodada 2 de 2026-11-02, pergunta Esperanto"
+      method: "testimony: resposta livre do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -705,5 +739,11 @@ edges:
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
   - from: D_COORD_MODELO_DE_OPERACAO_SEM_NOME_CURTO_1102
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: E_COORD_VIGIA_PESQUISE_ANTES_1102
+    to: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
+    edge_type: SUPPORTS
+  - from: E_COORD_PORTAS_DO_ONION_CORE_PESQUISE_ANTES_1102
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
