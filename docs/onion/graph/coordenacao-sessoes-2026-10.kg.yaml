@@ -9,6 +9,7 @@ meta:
   note: "TETO, declarado: este grafo guarda o COMPROMISSO e a ORDEM, não o fato. A pendência que já tem nó em outro grafo do core NÃO ganha nó aqui; entra por external_edges (Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027 é a onda 1 do design, por exemplo). Nó de outro repositório entra pela proveniência com a URL fixada no sha, conferida por peer-ref-check, porque o gate só confere external_edges contra os grafos deste repo. O estado dos PRs é o da medição de 2026-10-27, e o grafo não se atualiza sozinho: quem fecha uma pendência fecha o nó aqui, com carimbo, e o backlog a tira na regeneração seguinte. O core não escreve nome de cliente nem conteúdo de repo privado: o brain e os adotantes aparecem pelo nome."
   # kg-backlog-guard: on
   # ↑ opt-in da REGRA 58 (O backlog cumpre as promessas do próprio meta:): teto e carimbo do done cobrados pelo lint.
+  # Colheita de 2026-11-02: os nós done das rodadas do /meta:decide de 2026-11-02 saíram; o selo vive em @4f5513fd4 e no git.
   # Colheita de 2026-10-31: os 10 nós done e o 1 refuted saíram no mesmo commit que abriu as pendências novas; a história fica no git (blame deste arquivo) e nos resíduos de revisão, como no fios-abertos.
   # ═══ TETO: 40 NÓS. Pendência nova entra quando uma fechada sai. ═══
 # Arestas para nó de OUTRO grafo do core (contrato v4.3): a pendência que já tem nó lá não ganha nó aqui.
@@ -140,18 +141,6 @@ nodes:
     verified_against: "censo das pendências entre sessões feito pela sessão principal do core em 2026-10-27 por volta das 16h UTC, com o estado dos PRs reconferido por `gh pr list` e `gh pr checks` na criação deste grafo"
     label: "Os nomes únicos no scratchpad entre agentes viraram recorrência e pedem mecanismo."
     narrative: "Backlog técnico: subagentes dividem o scratchpad, e o mesmo nome de arquivo (o corpo do PR, por exemplo) já foi sobrescrito mais de uma vez. Recorrência medida pede guarda, não lembrete."
-  - id: Q_COORD_FIXTURE_NODE_SELFTEST_TMP
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    owner: core
-    impact: 2
-    confidence: 0.5
-    verified_at: "2026-10-31"
-    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: caso (a2) de run_kg_backlog_selftests verde (um bash filho carrega o _bench_on_exit armado pela suíte e o temporário some no EXIT); com o rm tirado do handler (mutante) o mesmo caso sai ✗ «fixture-pós-EXIT existe=sim»"
-    label: "O _FIXTURE_NODE do lint-selftest.sh deixa arquivo temporário para trás."
-    narrative: "Backlog técnico: o caso cria o temporário e não o remove ao sair. O rm do _FIXTURE_NODE ficava na linha seguinte ao } de uma função de uma linha e rodava uma vez no top-level, antes do mktemp; nunca no EXIT. Medido em 2026-10-31: 3188 nós-fixture órfãos no diretório temporário do sistema. Curado em fix/core-small-defects-1031: o rm entrou no _bench_on_exit."
   - id: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
     node_type: question
     layer: audit
@@ -380,72 +369,6 @@ nodes:
     verified_against: "os sinais docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher.md (o pedido do hub) e docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher-market.md (o estudo da curadoria, PR 162 dela), lidos em 2026-10-29; os casos W1 a W3d são medida da curadoria numa cópia do core fixada em 1d04d4e24, não re-executada pelo core"
     label: "Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático com o «só o humano envia»."
     narrative: "O hub pediu um vigia que leve e-mail, Slack, wiki, GitHub e AWS ao Onion sem um Claude aberto; a curadoria estudou o padrão de mercado por camada. As quatro decisões do maestro: (1) a coleta, pelo Argo Events num k3s com EventBus ou por coletores finos próprios, declarados; (2) o aceite dos eventos, em lote ou automático por regra para coletor confiável e assinado (a triagem antes do aceite contorna o gate e não é recomendada); (3) o Gmail, por push pelo Google Cloud, por IMAP com OAuth ou por IMAP com senha de app; (4) o conflito entre o aviso automático pedido pelo hub e a regra «só o humano envia», mais um membro por coletor no members.yaml. A hipótese do maestro: o vigia roda sobre o A2A do Onion, cada coletor é um remetente A2A que assina o envelope CloudEvents, a fila do receptor no bridge é a caixa durável, o aceite reverifica e a triagem usa a peça de rascunho. Medido pela curadoria numa cópia do core: o CloudEvent assinado passa no a2a-verify, a repetição e o corpo trocado são vetados, e o mutante sem o body_sha256 deixa passar o adulterado. NÃO exercitados: o aceite, a fila do bridge e um coletor real. O A2A 1.0 oficial não assina mensagem; a assinatura é do perfil Onion, e a ligação A2A-CloudEvents é solução própria, porque o mercado não a tem. O pedido de perfil event foi aceito pelo kg-ssot; a hipótese é não precisar de perfil novo, com os atributos do CloudEvents (id, source, type, time, subject e o link) mapeados num nó evidence. Gatilho: a rodada do /meta:decide com o maestro."
-  - id: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
-    node_type: question
-    layer: audit
-    owner: maestro
-    impact: 3
-    confidence: 0.5
-    evidence_class: testimony
-    label: "Decidir o --pin <caminho#ID> no kg-decide-seal.sh, que grava o nó E_ irmão com o node_sha256 da versão aprovada; antes do código, o desenho passa pelo kg-ssot."
-    status: done
-    plane: DEV
-    verified_at: "2026-11-02"
-    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»"
-    narrative: |-
-      A curadoria propõe fechar o ciclo do documento controlado com a corrente de hashes que o contrato já tem: o D_ selado com o testemunho e um E_ irmão (aresta E_ SUPPORTS D_) que fixa o node_sha256 do documento aprovado. A peça que falta é o selo gravar esse E_ sem mexer na proveniência do testemunho. Achado medido pela curadoria na 4.39.0, para o kg-ssot: o --revisit do kg_query NÃO acende quando o documento aprovado muda, nem com o hash regravado; ele julga só a cadência vencida e o REFUTES, e o upstream_changed compara o status, não o hash. Só o kg_trace check acusa a mudança, como node-sha256-mismatch. A curadoria propôs ao kg-ssot um motivo de revisita «o hash fixado mudou», para a aprovação entrar na fila de revisão e não só no check. Gatilho: decisão do maestro. Depois do selo, o desenho vai ao kg-ssot e o código é do core.
-
-      verified_against anterior: «sinal da curadoria document-control-2026-10, versionado no inbox do core em docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md (revisado para público), lido inteiro na triagem de 2026-10-29; a medição é do laboratório da curadoria com dados sintéticos, não re-executada no core»
-      Selado por /meta:decide em 2026-11-02: escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»; descartadas: «Só o --pin» · «Adiar».
-    provenance:
-      source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
-      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
-      locality: "pessoa"
-  - id: Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE
-    node_type: question
-    layer: audit
-    owner: maestro
-    impact: 2
-    confidence: 0.5
-    evidence_class: testimony
-    label: "Decidir que x_raci, x_doc_version, x_copy_* e o par E_ SUPPORTS D_ ficam como convenção do adotante até dois adotantes usarem a mesma forma."
-    status: done
-    plane: DEV
-    verified_at: "2026-11-02"
-    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»"
-    narrative: |-
-      O kg-ssot já propôs a forma: x_raci aninhado (responsible, accountable, consulted, informed), lido pelo --where da 4.39.0, com o owner do contrato como o A. Nenhuma norma exige RACI (a SOC 2 pede responsabilidade definida, não a matriz). A proposta é não promover nada a perfil canônico com um uso só: a convenção vira perfil quando um 2º adotante usar a mesma forma. Gatilho: decisão do maestro; depois dela, o gatilho da promoção é o 2º uso.
-
-      verified_against anterior: «sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 2, lido na triagem de 2026-10-29; o --where x_raci.responsible=X da 4.39.0 é medição da curadoria, não re-executada no core»
-      Selado por /meta:decide em 2026-11-02: escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»; descartadas: «Só o --pin» · «Adiar».
-    provenance:
-      source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
-      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
-      locality: "pessoa"
-  - id: Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB
-    node_type: question
-    layer: audit
-    owner: maestro
-    impact: 3
-    confidence: 0.5
-    evidence_class: testimony
-    label: "Decidir levar ao hub a receita do piloto do documento controlado: o procedimento com dono e RACI, a cadência, PDF e DOCX gerados da fonte, um COPY_ por camada e a aprovação com o par de nós."
-    status: done
-    plane: DEV
-    verified_at: "2026-11-02"
-    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»"
-    narrative: |-
-      O piloto é do hub, pela sessão dele (um escritor por repo); o core leva só a forma, sem conteúdo do hub. A ordem proposta é: (1) o procedimento de controle de acesso como nó com dono e RACI; (2) a cadência com reverify_every, que dá aviso pelo --due e pelo radar, não reprovação; (3) a fonte gerando PDF e DOCX (Pandoc e WeasyPrint, medidos pela curadoria); (4) um COPY_ por camada (wiki, Drive, Slack), com o adaptador do hub; (5) a aprovação com o par de nós, que depende do --pin. Gatilho: decisão do maestro.
-
-      verified_against anterior: «sinal da curadoria document-control-2026-10 (docs/evolution/inbox/2026-10-29-curation-document-control-2026-10-c.md), seção «O que o core decide», item 3, lido na triagem de 2026-10-29»
-      Selado por /meta:decide em 2026-11-02: escolhida «Os três: --pin no kg-decide-seal.sh pelo core; RACI e versão como convenção do adotante até haver uso; receita do piloto ao hub»; descartadas: «Só o --pin» · «Adiar».
-    provenance:
-      source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-02: «Documento controlado (D_DOCUMENT_CONTROL_PROPOSAL da curadoria): qual caminho?»"
-      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
-      locality: "pessoa"
   - id: E_COORD_NOTAS_DA_SESSAO_1031
     node_type: evidence
     layer: audit
@@ -474,18 +397,6 @@ nodes:
     verified_against: "grep -n 'config --local' .claude/utils/adopt/prove-gate-blocks.sh em origin/main 56cc18aeb: a fotografia na l.92, o exit 4 na l.117; o rc 4 falso foi medido em 2026-10-30 pela sessão do kg-ssot e não re-executado pelo core"
     label: "O prove-gate-blocks.sh fotografa o git config --local, que numa worktree é o .git/config compartilhado: outra sessão criando branch no meio da prova dá rc 4 falso."
     narrative: "Medido em 2026-10-30 no kg-ssot. Numa worktree o --local não é da worktree, é o config do repositório inteiro, e uma branch nova criada por outra sessão escreve nele. A prova compara antes e depois e acusa mudança que não é dela. A cura pede mutante na bancada e cuidado com o que a prova deixa de enxergar; fica fora do PR de defeitos pequenos."
-  - id: Q_COORD_CORE_ONION_RESEARCH_SEM_ARGUMENTO
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    owner: core
-    impact: 3
-    confidence: 0.8
-    verified_at: "2026-10-31"
-    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: kg-corpus-grep.sh --query \"\" --top 40 sai rc 0 com «sem pergunta»; run_corpus_grep_selftests 9/9, com os casos (d), (d2) e (d3) novos (o (d3) mantém rc 2 para --query sem valor); o (d) do main de antes (rc 2) é o mutante e reprova o caso novo"
-    label: "O /onion-research sem argumento: a injeção do corpus roda kg-corpus-grep.sh --query \"\", que sai rc 2 com erro de uso, e a skill não abre."
-    narrative: "A diretiva de injeção do corpus roda antes do modelo ler a skill. O rc 2 com a pergunta vazia foi medido; que ele derrube a abertura da skill é testemunho das notas da sessão, e a seção Fronteiras do SKILL.md registra o mesmo efeito para erro na injeção. A cura é a pergunta vazia sair rc 0 com aviso «sem pergunta», com caso na família de bancada do kg-corpus-grep. Curado em fix/core-small-defects-1031: com --query vazio ou só de espaços o kg-corpus-grep.sh sai rc 0 com o aviso «sem pergunta» e não varre o corpus; sem nenhum termo e sem --query segue a recusa rc 2."
   - id: Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL
     node_type: question
     layer: audit
@@ -509,18 +420,6 @@ nodes:
     verified_against: "git log -S no .claude/diary/index.md de origin/main 56cc18aeb: o nome de host da VPS entra no commit 8c3b7356d, PR #477, de 2026-07-28, e segue lá"
     label: "O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa."
     narrative: "O repo é público. Um nome de host não é segredo, mas é identificador de infraestrutura. Limpar mexe numa entrada de julho e, para ter efeito, na história; a decisão é do maestro. Este nó não repete o nome."
-  - id: Q_COORD_CORE_CLAUDE_CODE_SPECIALIST_MODELO_FORA_DA_ALLOWLIST
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    owner: core
-    impact: 2
-    confidence: 0.8
-    verified_at: "2026-10-31"
-    verified_against: "medido no PR fix/core-small-defects-1031 em 2026-10-31: grep -rn claude-opus-4-7 .claude/agents sai vazio (rc 1) e grep -n '\"model\"' em development/claude-code-specialist.md mostra claude-opus-5-5 na l.208, presente em session_models"
-    label: "O corpo do claude-code-specialist.md recomenda claude-opus-4-7, fora da allowlist de modelos, num lugar que a REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable) não lê."
-    narrative: "A recomendação está num exemplo de settings dentro do corpo do agente. A cura é trocar por um id da allowlist atual (session_models em docs/onion/radar-baselines.yaml). Curado em fix/core-small-defects-1031: o exemplo de settings recomenda claude-opus-5-5, que está em session_models de docs/onion/radar-baselines.yaml."
   - id: Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO
     node_type: question
     layer: audit
@@ -557,38 +456,6 @@ nodes:
     verified_against: "mensagem do kg-ssot de 2026-10-31, repassada pela sessão principal do core; a receita mora no manual da kg-ssot (08-recipes) e não foi relida pelo core"
     label: "Opcional, prioridade baixa: um escritor a2a-accept que vira nó evidence, pela receita «Record an external event that arrived by a signed message» do manual da kg-ssot. Só se o hub pedir."
     narrative: "Gatilho: o hub pedir. Sem o pedido, não se constrói; o nó existe para a ideia não se perder."
-  - id: D_COORD_PERSONAS_DE_VERTICAL_ACEITA_1102
-    node_type: decision
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 3
-    confidence: 0.9
-    verified_at: "2026-11-02"
-    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Aceitar a proposta»"
-    label: "Personas de vertical: aceita a proposta da curadoria (D_VERTICAL_PERSONAS_PROPOSAL) — as sessões atuais seguem como personas entre repos, um escritor por repo, com os dois consertos na coordenação; vertical nova só pelo limiar de 3 pendências abertas ou 1 há mais de 14 dias"
-    narrative: "Selado por /meta:decide em 2026-11-02: escolhida «Aceitar a proposta»; descartadas: «Aceitar sem o limiar» · «Adiar»."
-    provenance:
-      source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-02: «Personas de vertical: como fica?»"
-      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
-      locality: "pessoa"
-  - id: D_COORD_MODELO_DE_OPERACAO_SEM_NOME_CURTO_1102
-    node_type: decision
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 3
-    confidence: 0.9
-    verified_at: "2026-11-02"
-    verified_against: "decisão do maestro em 2026-11-02, por pergunta com opções (/meta:decide): escolhida «Nenhum nome curto»"
-    label: "Nome do modelo de operação: nenhum nome curto (D_OPERATING_MODEL_NAME_PROPOSAL) — descrever pelas peças de mercado"
-    narrative: "Selado por /meta:decide em 2026-11-02: escolhida «Nenhum nome curto»; descartadas: «Company Brain» · «Depois de dissecar o Gas Town»."
-    provenance:
-      source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-11-02: «Nome do modelo de operação: qual nome curto fica?»"
-      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
-      locality: "pessoa"
   - id: E_COORD_VIGIA_PESQUISE_ANTES_1102
     node_type: evidence
     layer: audit
@@ -623,6 +490,24 @@ nodes:
       locator: "rodada 2 de 2026-11-02, pergunta Esperanto"
       method: "testimony: resposta livre do maestro por pergunta com opções, 2026-11-02"
       locality: "pessoa"
+  - id: Q_COORD_CORE_PIN_NO_SELADOR_1102
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    owner: core
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-02"
+    evidence_class: testimony
+    verified_against: "selo do maestro de 2026-11-02 em Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO (@4f5513fd4, colhido depois)"
+    label: "Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha256, verified_at e verified_against, e a aresta E_ SUPPORTS D_; com bancada e mutante."
+    narrative: "Desenho revisado pelo kg-ssot em 2026-10-29; nunca o node_sha256 no próprio D_. A convenção RACI e versão fica no adotante, e o piloto é do hub."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "rodada 1 de 2026-11-02, pergunta Doc control"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
+      locality: "pessoa"
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -637,9 +522,6 @@ edges:
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
   - from: Q_COORD_SCRATCHPAD_NOMES_UNICOS_MECANISMO
-    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
-    edge_type: TRACES_TO
-  - from: Q_COORD_FIXTURE_NODE_SELFTEST_TMP
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
   - from: Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA
@@ -696,25 +578,13 @@ edges:
   - from: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
     to: Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO
     edge_type: TRACES_TO
-  - from: Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB
-    to: Q_COORD_MAESTRO_DOCCTRL_PIN_NO_SELO
-    edge_type: DEPENDS_ON
-  - from: Q_COORD_MAESTRO_DOCCTRL_CONVENCAO_DO_ADOTANTE
-    to: Q_COORD_MAESTRO_DOCCTRL_RECEITA_PILOTO_HUB
-    edge_type: TRACES_TO
   - from: Q_COORD_CORE_PROVE_GATE_BLOCKS_CONFIG_COMPARTILHADO
-    to: E_COORD_NOTAS_DA_SESSAO_1031
-    edge_type: TRACES_TO
-  - from: Q_COORD_CORE_ONION_RESEARCH_SEM_ARGUMENTO
     to: E_COORD_NOTAS_DA_SESSAO_1031
     edge_type: TRACES_TO
   - from: Q_COORD_MAESTRO_SSHD_CLIENT_ALIVE_TUNEL
     to: E_COORD_NOTAS_DA_SESSAO_1031
     edge_type: TRACES_TO
   - from: Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO
-    to: E_COORD_NOTAS_DA_SESSAO_1031
-    edge_type: TRACES_TO
-  - from: Q_COORD_CORE_CLAUDE_CODE_SPECIALIST_MODELO_FORA_DA_ALLOWLIST
     to: E_COORD_NOTAS_DA_SESSAO_1031
     edge_type: TRACES_TO
   - from: Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO
@@ -735,15 +605,12 @@ edges:
   - from: Q_COORD_UPDATE_4_ADOTANTES_4390
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
-  - from: D_COORD_PERSONAS_DE_VERTICAL_ACEITA_1102
-    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
-    edge_type: TRACES_TO
-  - from: D_COORD_MODELO_DE_OPERACAO_SEM_NOME_CURTO_1102
-    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
-    edge_type: TRACES_TO
   - from: E_COORD_VIGIA_PESQUISE_ANTES_1102
     to: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
     edge_type: SUPPORTS
   - from: E_COORD_PORTAS_DO_ONION_CORE_PESQUISE_ANTES_1102
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: Q_COORD_CORE_PIN_NO_SELADOR_1102
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
