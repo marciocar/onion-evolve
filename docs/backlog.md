@@ -553,6 +553,7 @@
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
+| 6.0 | `Q_COORD_DECIDIR_VIGIA_DE_EVENTOS` | coordenacao-sessoes-2026-10 | Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático c |
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
 | 5.0 | `Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA` | coordenacao-sessoes-2026-10 | Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. D |
@@ -560,7 +561,6 @@
 | 4.5 | `Q_COORD_MAESTRO_VITRINE_E_DIA_ZERO_KGSSOT` | coordenacao-sessoes-2026-10 | Os textos da vitrine e o dia zero do lançamento da kg-ssot, marcado para 2026-11-04. |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
-| 4.0 | `Q_COORD_DECIDIR_VIGIA_DE_EVENTOS` | coordenacao-sessoes-2026-10 | Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático c |
 | 3.2 | `Q_COORD_MAESTRO_HOST_NO_INDICE_DO_DIARIO` | coordenacao-sessoes-2026-10 | O índice do diário (.claude/diary/index.md) carrega um nome de host da VPS desde julho; o maestro decide se limpa. |
 | 3.0 | `Q_COORD_MAESTRO_DEPLOY_ESCRITOR_4370` | coordenacao-sessoes-2026-10 | O deploy do escritor de grafo com a kg-ssot 4.37.0: ops/update-kg-writer.sh depois do PR 1424, e o probe. |
 | 3.0 | `Q_COORD_MAESTRO_GPU_EXTENSAO_NAVEGADOR` | coordenacao-sessoes-2026-10 | Os testes de GPU da extensão do navegador (Q_MC_BROWSER_LOCAL, da curadoria). |
