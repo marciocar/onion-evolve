@@ -31,6 +31,7 @@ nodes:
     evidence_class: observation
     verified_against: "DIARIO.md desta pasta (estratégias 1 a 22, medida até 17:40 UTC), PRE-REGISTRO.md dos spikes (Emenda 6) e o resíduo de revisão da branch do vigia (PR #1461)"
     label: "Numa janela de cerca de 10 horas, o core orquestrou a curadoria e o kg-ssot sem o maestro no terminal; as revisões cruzadas pegaram mais de 60 achados reais antes de qualquer veredito valer."
+    trace: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
     narrative: "No fecho: pré-registro dos spikes em 3 versões e 6 emendas com 2 revisores (PRE-REGISTRO.md §10); executor revisado em 6 passadas; comandos do vigia em 8 passadas e 4 conferências curtas da curadoria (resíduo docs/evolution/review/feat-event-watcher-plan-e-commands.md, PR #1461). Os mais de 60 achados somam as seções §9 e §9b do pré-registro e os dois resíduos de revisão. O que mais pesou: três defeitos que dariam BARRA falso nos spikes e um gatilho do vigia que dispararia por ausência."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
@@ -152,6 +153,7 @@ nodes:
     verified_at: "2026-11-03"
     verified_against: "proposta do core a partir de C_SO_*; não construída, não pesquisada no mercado"
     label: "Proposta: a orquestração de sessões vira mecanismo em três degraus: à mão com registro (hoje), rascunho da próxima fila aprovado pelo humano, e despacho por A2A dentro de autorização datada."
+    trace: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
     narrative: "Degrau 1 (hoje): diário mais o grafo de coordenação, à mão. Degrau 2: o vigia de eventos e o grafo de coordenação alimentam um rascunho da próxima fila, com papel, dono e lease de CPU, que o humano aprova. Degrau 3: despacho automático por A2A entre sessões, dentro de uma autorização datada. Recomendação do core: não construir o degrau 2 antes do gatilho de Q_SO_GATILHO_DE_CONSTRUCAO. O que já existe ou está em PR e o mecanismo usaria: o grafo de coordenação (pendência com dono), os comandos de medida do vigia de eventos (PLAN-E, com o registro de rascunhos; em PR, #1461, no fecho deste estudo), o canal entre sessões (SendMessage) e o A2A (envio com aceite humano). Peça nova: o lease de CPU, que hoje é lock social (C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL)."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
