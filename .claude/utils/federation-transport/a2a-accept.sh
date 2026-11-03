@@ -118,7 +118,7 @@ WRAP="${ROOT}/.claude/utils/guardrails/onion-untrusted-wrap.sh"
 [ -f "${WRAP}" ] || { echo "ERRO: moldura R15.2 ausente (${WRAP}) — o corpo não entra no inbox sem ela." >&2; exit 1; }
 METRICS="${HERE}/a2a-metrics.py"
 [ -f "${METRICS}" ] || { echo "ERRO: a2a-metrics.py ausente (${METRICS}) — sem o log de sombra o aceite não é medido; nada aceito." >&2; exit 1; }
-SHADOW_ARGS=(--receiver "${RECEIVER}"); [ -z "${SHADOW_LOG}" ] || SHADOW_ARGS=(--log "${SHADOW_LOG}")
+SHADOW_ARGS=(--receiver "${RECEIVER}"); [ -z "${SHADOW_LOG}" ] || SHADOW_ARGS+=(--log "${SHADOW_LOG}")   # a lacuna grava o receptor
 
 # --- forma do registro (um documento JSON, objeto) ------------------------------------------------------
 jq -es 'length==1 and (.[0]|type=="object")' "${REC}" >/dev/null 2>&1 || refuse "registro não é UM objeto JSON válido."

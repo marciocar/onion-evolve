@@ -11210,7 +11210,12 @@ PY
     _qlrc "${r}" 2 && [ "$(_qljget "${r}" 'select(.ending) | .bad_received_at')" = 1 ] \
       && [ "$(_qljget "${r}" 'select(.ending) | .no_received_at')" = 0 ] && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 5 ]; }
   _qlcase "(q40) count: receivedAt com data impossível (2026-02-30) conta em bad_received_at, os outros dias seguem, rc 2 (ponto 2)" \
-    '        dt.date.fromisoformat(o["receivedAt"][:10])' '        pass' _c_badat
+    '        dt.datetime.fromisoformat(o["receivedAt"][:19])' '        pass' _c_badat
+  _c_badhour() { _c_cnt5 "$1" || return 1; _qlday "${d}/q/x2.tx2.json" tx2 2026-11-02T25:61:00Z
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 2 && [ "$(_qljget "${r}" 'select(.ending) | .bad_received_at')" = 1 ] && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 5 ]; }
+  _qlcase "(q52) count: receivedAt com hora impossível (T25:61) conta em bad_received_at, rc 2" \
+    '        dt.datetime.fromisoformat(o["receivedAt"][:19])' '        dt.date.fromisoformat(o["receivedAt"][:10])' _c_badhour
   _c_boom() { local r; r="$(QLR_ENV="ONION_A2A_QUEUE_NOW=999999999999" _qlr "$1" count --by-day --stage 1 --json)"; QL_WHY="${r:0:300}"
     _qlrc "${r}" 2 && _qlhas "${r}" "ERRO inesperado"; }
   _c_cefrom() { local ce='"{\"specversion\":\"1.0\",\"id\":\"ev-7\",\"source\":\"/vigia\",\"type\":\"t\"}"'
@@ -17223,6 +17228,27 @@ PY
   _rt_gap "${mut}/g10.py" && rc_gm=0
   _prove_mutation "a2a-rt (g10) mutante: a linha drafted estrita (sem lacuna)" "${mcp}" "${mut}/g10.py" "${rc_gi}" "${rc_gm}"
   rm -f "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
+  # (g16) falha DUPLA (linha drafted e draft-gap.log): o rascunho é RECUSADO e não fica no disco
+  _rt_req "${sb}/g16.req" x '{"name":"draft_message","arguments":{"to":"onion-evolve","text":"falha dupla","idempotency_key":"dupla-1"}}'
+  _rt_dupla() {  # $1 = mcp
+    rm -rf "${ST}/drafts" "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
+    ( umask 022; : > "${ST}/drafts.jsonl"; : > "${ST}/draft-gap.log" ); chmod 644 "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
+    local o; o="$(_rt "$1" "${sb}/g16.req")"
+    [ "$(_rt_iserr "${o}" 1)" = "true" ] && [ ! -e "${ST}/drafts/dupla-1.json" ] && _rt_has "$(_rt_text "${o}" 1)" "RECUSADO"
+  }
+  python3 - "${mcp}" "${mut}/g16.py" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = """        raise ToolError(f"nem a linha drafted nem o marcador draft-gap.log foram gravados ({e}): o rascunho foi "\n                        "RECUSADO, nada foi gravado")\n"""
+assert a in s
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, "        gap_msg = 'falha dupla engolida'\n", 1))
+PY
+  local rc_di=1 rc_dm=1; _rt_dupla "${mcp}" && rc_di=0
+  if [ "${rc_di}" = 0 ]; then record_pass "a2a-rt (g16): falha dupla (linha drafted e draft-gap.log) → o rascunho é RECUSADO e não fica no disco"
+  else record_fail "a2a-rt (g16): falha dupla" "drafts=$(ls "${ST}/drafts" 2>/dev/null)"; fi
+  _rt_dupla "${mut}/g16.py" && rc_dm=0
+  _prove_mutation "a2a-rt (g16) mutante: a falha dupla engolida" "${mcp}" "${mut}/g16.py" "${rc_di}" "${rc_dm}"
+  rm -f "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
   # (g2…g5) o contador draft-stats sobre registros sintéticos (os refutadores do PLAN-E §3), relógio fixo
   local met="${ft}/a2a-metrics.py" DNOW=1793707200
   _dsgen() {  # _dsgen <cenário> <arq>
@@ -17287,7 +17313,7 @@ PY
   _dsempty() { local r; r="$(_dsst "$1" vazio --last 30)"; DS_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_dsj "${r}" '.no_data')" = true ]; }
   _dsbad() { local r; r="$(_dsst "$1" ks --since-stage-on 2026-13-45)"; DS_WHY="${r:0:400}"; [ "${r%%|*}" = 3 ]; }
   _dspre() { local r; r="$(_dsst "$1" a27 --last 30)"; DS_WHY="${r:0:400}"
-    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[(.preconditions_missing|join("+")),.auto_send_criterion_met,(.trigger_auto_send|tostring)] | map(tostring) | join(",")')" = "closed_list+kill_switch+rate_cap,true,null" ]; }
+    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[(.preconditions_missing|join("+")),.auto_send_criterion_met,(.trigger_auto_send|tostring),(.trigger_unavailable_reason|type)] | map(tostring) | join(",")')" = "closed_list+kill_switch+rate_cap,true,null,string" ]; }
   _dscase() {  # _dscase <nome> <função> <âncora> <troca>
     local rc_i=1 rc_m=1; DS_WHY=""
     "$2" "${met}" && rc_i=0
@@ -17754,6 +17780,20 @@ elif scen == "auto":
         L.append(ln(now - 3 * 86400 - i, "accept", None, f"a{i}", mode="auto"))
     for i in (2, 5):
         L.append(ln(now - 2 * 86400 - i, None, "reject", f"a{i}", mode="auto", sup=L[i]["line_id"]))
+elif scen in ("absent", "autonomc"):
+    pass
+def mc(t, a, b):
+    return {"line_id": lid(), "logged_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t)), "kind": "mode_change",
+            "from_mode": a, "to_mode": b, "actor": "op"}
+if scen in ("auto", "xrev", "dilute", "mix"):
+    L.insert(0, mc(now - 5 * 86400, "shadow", "auto"))     # o modo auto explicado por uma troca registrada
+elif scen == "absent":
+    for i in range(50):
+        L.append(ln(now - (16 - i * 14 // 49) * 86400 - i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
+    L += [mc(now - 86400, "shadow", "auto"), mc(now - 3600, "auto", "shadow")]   # volta à sombra SEM linha auto
+elif scen == "autonomc":
+    for i in range(10):
+        L.append(ln(now - 3 * 86400 - i, "accept", None, f"a{i}", mode="auto"))
 with open(path, "w") as f:
     for o in L:
         f.write(json.dumps(o) + "\n")
@@ -17762,7 +17802,7 @@ with open(path, "w") as f:
 PY
   }
   # _shst <metrics> <cenário> [extra] → "rc|json"
-  _shst() { local o r=0 m=shadow; case "$2" in auto|xrev|dilute|mix) m=auto ;; esac; _shgen "$2" "${d}/sh-$2.jsonl"
+  _shst() { local o r=0 m=shadow; case "$2" in auto|xrev|dilute|mix|autonomc) m=auto ;; esac; _shgen "$2" "${d}/sh-$2.jsonl"
     o="$(python3 -I "$1" shadow-stats --mode "${m}" --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
   _shj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
   _sh_on() { local r; r="$(_shst "$1" s50)"; SH_WHY="${r:0:400}"
@@ -17802,9 +17842,33 @@ PY
     python3 -I "$1" shadow-append --log "${d}/sh-n5.jsonl" --gap-log "${d}/gap-n5.log" --mode shadow --rule-decision accept \
       --human-decision accept >/dev/null 2>&1 || r=$?; SH_WHY="rc=${r}"
     [ "${r}" = 4 ] && [ "$(jq -r '.gap_id | length' "${d}/gap-n5.log" 2>/dev/null)" = 36 ] && [ ! -s "${d}/sh-n5.jsonl" ]; }
-  _sh_n6() { local r; printf '%s\n' '{"logged_at":"2026-11-02T10:00:00Z","gap_id":"11111111-1111-4111-8111-111111111111","point":"accept","jti":"j","taskId":"t","why":"x"}' \
-      '{"logged_at":"2026-11-02T11:00:00Z","resolves":"11111111-1111-4111-8111-111111111111","resolved_by":"22222222-2222-4222-8222-222222222222"}' > "${d}/gap-res.log"
-    r="$(_shst "$1" s50 --gap-log "${d}/gap-res.log")"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '.gaps_in_window')" = 0 ]; }
+  _sh_n6() {  # $1 = metrics: lacuna real (log dentro do repo em uso), resolução de OUTRO evento recusada, a certa aceita
+    local R="${d}/res" r=0; rm -rf "${R}"; mkdir -p "${R}/repo"
+    _shap() { python3 -I "$1" shadow-append --receiver core-x --gap-log "${R}/gap.log" --mode shadow --rule-decision accept \
+      --human-decision accept --from m --ce-source /w --jti jr "${@:2}" >/dev/null 2>&1; }
+    A2A_METRICS_REPO_ROOT="${R}/repo" _shap "$1" --log "${R}/repo/s.jsonl" --ce-id ev-r || r=$?
+    [ "${r}" = 4 ] || { SH_WHY="a lacuna deveria nascer (rc 4), deu ${r}"; return 1; }
+    local gid; gid="$(jq -r .gap_id "${R}/gap.log")"
+    r=0; _shap "$1" --log "${R}/good.jsonl" --ce-id OUTRO --resolves-gap "${gid}" || r=$?
+    [ "${r}" = 3 ] && [ ! -e "${R}/good.jsonl" ] || { SH_WHY="evento trocado deveria dar rc 3 sem gravar, deu ${r}"; return 1; }
+    r=0; _shap "$1" --log "${R}/good.jsonl" --ce-id ev-r --resolves-gap "${gid}" || r=$?
+    [ "${r}" = 0 ] || { SH_WHY="a resolução certa deu ${r}"; return 1; }
+    r=0; _shap "$1" --log "${R}/good.jsonl" --ce-id ev-r --resolves-gap "${gid}" || r=$?
+    [ "${r}" = 3 ] || { SH_WHY="lacuna já fechada deveria dar rc 3, deu ${r}"; return 1; }
+    local o; o="$(python3 -I "$1" shadow-stats --mode shadow --receiver core-x --log "${R}/good.jsonl" --gap-log "${R}/gap.log" --json 2>/dev/null)"
+    SH_WHY="stats: ${o:0:300}"; [ "$(jq -r .gaps_in_window <<< "${o}")" = 0 ]; }
+  _sh_forged() { local r; printf '%s\n' '{"logged_at":"2026-11-02T10:00:00Z","gap_id":"11111111-1111-4111-8111-111111111111","point":"accept","receiver":null,"from":"m","ce_source":"/w","ce_id":"e3","jti":null,"taskId":null,"ids_verified":true,"mode":"shadow","rule_id":"accept-rule","rule_version":"1","why":"x"}' \
+      '{"logged_at":"2026-11-02T11:00:00Z","resolves":"11111111-1111-4111-8111-111111111111","resolved_by":"22222222-2222-4222-8222-222222222222"}' > "${d}/gap-forj.log"
+    r="$(_shst "$1" s50 --gap-log "${d}/gap-forj.log")"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.gaps_in_window')" = 1 ]; }
+  _sh_absent() { local r; r="$(_shst "$1" absent)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.trigger_rule_on')" != true ] && [ "$(_shj "${r}" '.no_data')" = true ]; }
+  _sh_mismatch() { local r; r="$(_shst "$1" autonomc)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '[.mode_in_force,(.mode_mismatch|type)] | join(",")')" = "shadow,string" ]; }
+  _sh_mc() { local r1=0 r2=0; rm -f "${d}/mc.jsonl"
+    python3 -I "$1" mode-change --log "${d}/mc.jsonl" --to auto >/dev/null 2>&1 || r1=$?
+    python3 -I "$1" mode-change --log "${d}/mc.jsonl" --to auto >/dev/null 2>&1 || r2=$?
+    SH_WHY="r1=${r1} r2=${r2}"
+    [ "${r1}" = 0 ] && [ "${r2}" = 3 ] && [ "$(jq -r '[.kind,.from_mode,.to_mode,(.actor|length>0)] | map(tostring) | join(",")' "${d}/mc.jsonl")" = "mode_change,shadow,auto,true" ]; }
   _sh_n7() { local r; r="$(_shst "$1" future)"; SH_WHY="${r:0:400}"
     [ "$(_shj "${r}" '[.events,.future_logged_at] | map(tostring) | join(",")')" = "50,1" ]; }
   _sh_from() { local r; r="$(_shst "$1" twofrom)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.events')" = 2 ]; }
@@ -17816,7 +17880,7 @@ PY
   _sh_xrev() { local r; r="$(_shst "$1" xrev)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.reversals_7d')" = 0 ]; }
   _sh_mal() { local r; r="$(_shst "$1" mal)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.malformed')" = 1 ]; }
   _sh_base() { local r; r="$(_shst "$1" base)"; SH_WHY="${r:0:400}"
-    [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.rule_id,.rule_on_criterion_met,.trigger_rule_on,(.trigger_rule_on_reason|type)] | map(tostring) | join(",")')" = "baseline-accept-all,true,false,string" ]; }
+    [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.rule_id,.rule_on_criterion_met,(.trigger_rule_on|tostring),(.trigger_unavailable_reason|type)] | map(tostring) | join(",")')" = "baseline-accept-all,true,null,string" ]; }
   _sh_unv() { local r; r="$(_shst "$1" unv)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.events')" = 2 ]; }
   _sh_gap() { local r; printf '{"logged_at":"2026-11-02T10:00:00Z","point":"accept","jti":"j","taskId":"t","why":"x"}\n' > "${d}/gap-um.log"
     r="$(_shst "$1" s50 --gap-log "${d}/gap-um.log")"; SH_WHY="${r:0:400}"
@@ -17846,15 +17910,17 @@ PY
   _shcase "(sh7) shadow-stats --mode auto: 2 reversões em 10 decisões (0,2 > 0,15) → back_to_shadow_criterion_met" _sh_auto \
     'o["human_decision"] != effective(tgt)' 'False'
   _shcase "(sh8) shadow-stats: linha malformada → rc 2 (não pôde medir), contada em malformed" _sh_mal \
-    '            malformed += 1' '            pass'
+    'elif o is None or validate_shadow(o):
+            malformed += 1' 'elif o is None or validate_shadow(o):
+            pass'
   _shcase "(sh9) shadow-stats: log ausente → rc 2 (ausência não é zero)" _sh_none \
     '        raise MeasureError(f"log ausente:' '        return []; raise MeasureError(f"log ausente:'
-  _shcase "(sh10) shadow-stats: a regra linha de base (baseline-accept-all) NUNCA liga a regra: critério cumprido, trigger_rule_on false com o motivo" _sh_base \
+  _shcase "(sh10) shadow-stats: a regra linha de base (baseline-accept-all) NUNCA liga a regra: trigger_rule_on null com trigger_unavailable_reason" _sh_base \
     '        if out["rule_id"] in BASELINE_RULE_IDS:' '        if False:'
   _shcase "(sh11) shadow-stats: linhas com ids_verified false deduplicam pelo taskId, nunca pelos ce_* (2 recusas com o mesmo ce = 2 eventos)" _sh_unv \
     '    if o.get("ids_verified") is False:' '    if False:'
   _shcase "(sh12) shadow-stats: lacuna registrada (shadow-gap.log) dentro da janela → rc 2" _sh_gap \
-    '(2 if malformed or future or out["gaps_in_window"] or not_instr else' '(2 if malformed or future or not_instr else'
+    '(2 if malformed or future or out["gaps_in_window"] or not_instr or out["mode_mismatch"]' '(2 if malformed or future or not_instr or out["mode_mismatch"]'
   _shcase "(sh13) shadow-stats: days_covered são dias COMPLETOS (23:59 → 00:01 de 14 dias depois = 13, não dispara) (M1)" _sh_m1 \
     '    out["days_covered"] = max(0, (now - first) // 86400)' '    out["days_covered"] = (utc_day(now) - utc_day(first)).days'
   _shcase "(sh14) shadow-stats: o modo vem de --mode, nunca da última linha (auto com 3 reversões + 1 shadow no fim, --mode auto) (A1)" _sh_mode \
@@ -17878,13 +17944,21 @@ PY
   _shcase "(sh25) shadow-stats: logged_at com data impossível → rc 2 pelo tratador de exceção, nunca rc 1 (M2)" _sh_bdate \
     '    except Exception as e:                              # M2' '    except ZeroDivisionError as e:                      # M2'
   _shcase "(sh26) shadow-stats: a janela recomeça na volta de auto para shadow (15 d a 0,96, 20 d auto, 1 h de volta → não religa) (N1)" _sh_n1 \
-    '            scur = [o for o in scur if stamp_epoch(o["logged_at"]) > max(autos)]' '            pass'
+    '        marks = [stamp_epoch(o["logged_at"]) for o in cur if o["mode"] == "auto"]' '        marks = []'
   _shcase "(sh27) shadow-stats --mode auto sem linhas auto → no_data e rc 2 (N4)" _sh_n4 \
     '    if not scur:' '    if False:'
   _shcase "(sh28) shadow-append: linha inválida (sem chave de evento) vira LACUNA com gap_id (rc 4), nunca rc 3 sem marcador (N5)" _sh_n5 \
     '            return _gap(e, clean_str(o.get("--jti")), clean_str(o.get("--task-id")))' '            raise'
-  _shcase "(sh29) shadow-stats: lacuna fechada por resolved_by não dá rc 2 (N6)" _sh_n6 \
-    '        if isinstance(o, dict) and o.get("gap_id") in closed:' '        if False:'
+  _shcase "(sh29) --resolves-gap: lacuna real se fecha só com a linha do MESMO evento (outro evento e lacuna já fechada = rc 3); fechada não dá rc 2" _sh_n6 \
+    '            if not _gap_matches(g, line):' '            if False:'
+  _shcase "(sh34) shadow-stats: resolução forjada (resolved_by que não está no log) NÃO fecha a lacuna → rc 2" _sh_forged \
+    '        if g is not None and line is not None and _gap_matches(g, line):' '        if g is not None:'
+  _shcase "(sh35) shadow-stats: volta à sombra 1 h antes por mode_change, sem linha auto ('absent-auto') → trigger_rule_on não-true" _sh_absent \
+    'for c in changes if c["to_mode"] == "shadow"' 'for c in changes if False'
+  _shcase "(sh36) shadow-stats --mode auto sem mode_change que o explique → mode_mismatch e rc 2" _sh_mismatch \
+    '    if mode != in_force:' '    if False:'
+  _shcase "(sh37) mode-change grava a troca (de, para, quem) e recusa trocar para o modo vigente (rc 3)" _sh_mc \
+    '        if now_mode == o["--to"]:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
     '        elif stamp_epoch(o["logged_at"]) > now:' '        elif False:'
   _shcase "(sh31) shadow-stats: a chave do CloudEvent é escopada pelo remetente (dois membros, mesmo source+id = 2 eventos)" _sh_from \
