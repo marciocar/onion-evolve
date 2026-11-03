@@ -2,7 +2,8 @@
 branch: docs/a2a-rt-remeasure-1103
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c1127658d33b098f108d55bd8511110df352c8dd433dcbf1ae153757bc396846
+reviewed_code_sha256: 4a106eb5d6b123059728dd9d2a4d10976a5408c53fc9f4c8c0b70732f7b23a37
 findings_total: 4
 findings_real: 1
 tokens: 96057
