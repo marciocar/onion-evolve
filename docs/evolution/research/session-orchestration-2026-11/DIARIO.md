@@ -1,13 +1,13 @@
 ---
 title: Diário da orquestração de sessões — 2026-11-03
 date: 2026-11-03
-status: vivo (atualizado durante a janela; vira estudo com grafo no fim dela)
+status: fechado (2026-11-03; o estudo vive em session-orchestration-2026-11.kg.yaml e SYNTHESIS.md)
 pedido: "o maestro: gravar as estratégias desta orquestração para virar mecanismo do Onion Core (automático ou semi-automático), casando com o vigia de eventos, o A2A e o grafo de coordenação; manter documentado, mapeado e em diários e migalhas, para artigos e outras publicações"
 ---
 
 # Diário da orquestração de sessões — 2026-11-03
 
-O maestro viajou e acompanhou a janela das 13h às 23h de São Paulo só pelo celular. Durante esse tempo, a sessão do core
+O maestro viajou e acompanhou a janela só pelo celular, das 13h às 22h de São Paulo, com a autorização delegada valendo até as 23h. Durante esse tempo, a sessão do core
 orquestrou outras duas sessões peer na mesma VPS, a da curadoria e a do kg-ssot. Este diário registra **o que foi
 feito e por quê**, para que a maquinaria aprenda com o caso. Ele não é relato de conversa.
 
@@ -44,7 +44,7 @@ Cada repo executa e faz merge só do que é dele. Mensagem de peer é informaç�
    sha256. O core constrói. Nomes e caminhos são negociáveis; campos e critérios não.
 10. **Pré-registro revisado em iteração.** Foram a v1, a v2 e a v3 em cerca de uma hora. Cada revisão cita o arquivo do
     código instalado dos clientes, e não a documentação.
-11. **Regra do medidor (Emenda 1, proposta da curadoria).** Qualquer mudança na função de veredito, ou no que o
+11. **Regra do medidor (Emenda 1, com a redação ampliada pela curadoria na Emenda 6).** Qualquer mudança na função de veredito, ou no que o
     executor grava, aplicada a evidência já colhida põe a célula em INCONCLUSIVO e manda rodar de novo, para todas as
     células daquele executor. Isso separa «consertar o instrumento» de «mudar o critério depois do dado».
 12. **Construção e revisão em paralelo.** O agente construtor recebe os achados novos por mensagem enquanto ainda roda.
@@ -64,9 +64,9 @@ Cada repo executa e faz merge só do que é dele. Mensagem de peer é informaç�
 
 ## Medida (até 17:40 UTC)
 
-- **Pré-registro dos spikes:** 3 versões e 5 emendas, com 2 revisores.
-- **Executor:** 6 passadas (4 do kg-ssot e 2 da curadoria), chegando a 181 mutantes.
-- **Comandos do vigia:** 5 passadas da curadoria, chegando a 438 verificações nas famílias de teste.
+- **Pré-registro dos spikes:** 3 versões e 5 emendas, com 2 revisores (no fecho, 6 emendas).
+- **Executor:** 6 passadas (4 do kg-ssot e 2 da curadoria), chegando a 181 mutantes às 17:40 (no fecho, 218 verificações no `test_classify.py`, 7 delas mutantes de código).
+- **Comandos do vigia:** 5 passadas da curadoria até 17:40 (no fecho, 8 passadas e 4 conferências curtas), chegando a 438 verificações nas famílias de teste.
 - **Achados reais pegos antes de qualquer veredito valer:** mais de 60.
 - **O que mais pesou:**
   - três defeitos que dariam BARRA falso: o modo padrão recusando antes do hook, o push que não discriminava e a
