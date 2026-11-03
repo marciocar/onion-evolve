@@ -1,0 +1,286 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "data/2.1.316.txt ou data/2.1.317.txt não bate byte a byte com a seção correspondente do CHANGELOG oficial, ou um label/verified_against cita texto do item que não está lá",
+   "check": "for V in 2.1.316 2.1.317; do diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk -v V=\"## $V\" '$0==V{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-11-03-r22/data/$V.txt; done"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+   "check": "re-executar a medição do nó (o censo com raiz '.'; npm view do SDK; grep no core; a família cited_directive; leitura do agent-policy.ts do bridge com sudo -n)"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+   "check": "ler o label e o verified_against e conferir no core (grep/ls/leitura do hook, número de linha por grep -n) que a superfície existe e se comporta como afirmado"
+  },
+  {
+   "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+   "when": "a rodada supera um nó da r21 que não existe ou cujo estado afirmado ainda vale; ou deixa de superar um nó da r21 cujo estado a medição de hoje derrubou",
+   "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-10-30-r21/radar-E3-2026-10-30-r21.kg.yaml e comparar o estado que ele afirma com a medição de hoje"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core (hook, guarda, settings, comando, skill, CI, bridge, worktree, core.hooksPath, adotante) e a rodada não o mediu nem o listou",
+   "check": "para cada item de data/2.1.314.txt, grep do termo-chave no core (.claude, ops, .github, CLAUDE.md) e leitura da superfície achada"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "CU1: cópias data/2.1.316.txt e data/2.1.317.txt e citações dos nós",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md > CHANGELOG.md; for V in 2.1.316 2.1.317; do diff <(awk -v V=\"## $V\" '$0==V{f=1;print;next} /^## /{f=0} f' CHANGELOG.md) data/$V.txt; done → diff vazio nas duas (rc 0); wc -l = 58 e 90; grep -c '^- ' = 55 e 87"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "as 4 citações entre «» (effort de subagentes l.67, managed settings l.42 da 2.1.316, dica de retomada l.62, onFailure l.5) achadas verbatim nas cópias"
+   },
+   "nota": "Bate byte a byte. Única diferença de forma: a citação do onFailure em E_SDK_HOOK_ONFAILURE_SEM_CALLBACK_NO_BRIDGE_1103 tira as crases de `onFailure: \"block\"`; o texto está lá."
+  },
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "wc -l data/2.1.316.txt data/2.1.317.txt → 58, 90; grep -c '^- ' → 55, 87; claude --version → 2.1.317 (Claude Code)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "linhas, itens e versões do esqueleto reproduzem"
+   },
+   "nota": "Esqueleto, julgado brevemente."
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "leitura do nó (pergunta aberta do esqueleto)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "pergunta segue aberta; as omissões do CU5 abaixo são o que ainda falta para fechá-la"
+   },
+   "nota": "Esqueleto; não fecha enquanto as omissões do CU5 não forem medidas ou listadas."
+  },
+  {
+   "alvo": "E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "npm view @anthropic-ai/claude-agent-sdk versions --json → depois de 0.3.310 só há 0.3.311, 0.3.312, 0.3.314, 0.3.315, 0.3.316, 0.3.317 (6); grep -n '^## 2.1.31' CHANGELOG.md → 2.1.311, 2.1.312, 2.1.314, 2.1.316, 2.1.317 (5; não há 2.1.313 nem 2.1.315 no CHANGELOG)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "rótulo corrigido: o bridge está seis versões publicadas atrás no npm (cinco no CHANGELOG; 2.1.313 nunca saiu), não sete",
+    "medida": "claude --version → 2.1.317; sudo -n grep claude-agent-sdk package.json do bridge → ^0.3.310, e o package.json do SDK instalado → version 0.3.310, claudeCodeVersion 2.1.310; grep claude-code-action onion-review.yml → l.301 e l.456 @6d5ae526; gh api da tag v1.0.265 → 6d5ae526, e o package.json nesse sha pede o SDK ^0.3.314; currency-census.sh → action 1.0.265 instala o CLI 2.1.314"
+   },
+   "nota": "Os três estados reproduzem. Só 'sete versões atrás' não: é a diferença 317−310, e a r21 (o nó que este supera) contava versões PUBLICADAS e excluía a 2.1.313 explicitamente. Correção: 'seis versões publicadas atrás (2.1.313 não existe)'."
+  },
+  {
+   "alvo": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_317_E_PIN_DO_REVISOR_PARA_V1_0_267_1103",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "npm view @anthropic-ai/claude-agent-sdk version → 0.3.317; gh api repos/anthropics/claude-code-action/git/tags/865bb43f… → v1.0.267 -> 4845bacbb38b3c4b15d948f035349786f678e068; package.json nesse sha pede ^0.3.317; currency-census.sh → 'a v1.0.267 instala o CLI 2.1.317'"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "alvo e sha reproduzem"
+   },
+   "nota": "Ok. O pin vira PR do core, e o deploy do bridge fica com o maestro."
+  },
+  {
+   "alvo": "E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "frontmatter de .claude/agents → 43 sonnet e 8 opus (51); grep -rl '^effort:' .claude/agents | wc -l → 0; grep -rn 'effort:' .claude/workflows/*.js | wc -l → 27 (toda chamada agent()/ag() dos 2 workflows passa effort); CHANGELOG l.67: só vale para subagentes 'on a different model from the main conversation'"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "rótulo corrigido: só os agentes cujo modelo DIFERE do da sessão perdem o esforço da sessão; numa sessão opus são os 43 sonnet, e os 8 opus seguem no esforço da sessão",
+    "medida": "leitura do binário 2.1.317 (~/.local/share/claude/versions/2.1.317): function Zlt(e,n,r){return e.sessionEffort?.kind!==\"level\"||n===void 0||r===void 0||B8t(n,r)?e:yro(e)}, ou seja, mesmo modelo que o pickedEffortModel mantém o esforço da sessão, e só modelo diferente o zera (yro)"
+   },
+   "nota": "O rótulo 'os 51 agentes passam a rodar no esforço padrão do modelo deles' é incondicional; o item e o binário o condicionam a modelo diferente do da conversa. Os números (51, 43/8, 0, 27) reproduzem."
+  },
+  {
+   "alvo": "Q_AGENTES_DECLARAM_O_ESFORCO_1103",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "mesma medição do nó-pai: Zlt(...) no binário 2.1.317 mantém o esforço da sessão para agente no mesmo modelo; 8 agentes opus no frontmatter"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "pergunta reescrita: declarar effort (ou fixar CLAUDE_CODE_SUBAGENT_EFFORT) para os agentes cujo modelo difere do da sessão de quem os chama",
+    "medida": "contagem do frontmatter: 43 sonnet e 8 opus; CLAUDE_CODE_SUBAGENT_EFFORT aparece 8 vezes no binário (_Lo lê a variável só quando o agente não tem effort e nenhuma camada herdada o nomeia)"
+   },
+   "nota": "A premissa 'o esforço da sessão deixou de valer para eles' herda o exagero do nó-pai. A pergunta em si é válida."
+  },
+  {
+   "alvo": "E_SETTINGS_GERENCIADOS_REMOTOS_APLICAM_SEM_APROVACAO_1103",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n '10b' PRE-REGISTRO.md da worktree (base df1020472) → nada (a seção §10b não existe nesta base); git show docs/a2a-rt-remeasure-1103:…/PRE-REGISTRO.md | grep -i -E 'Enterprise managed|remote-settings|managed settings' → nada; ls -la ~/.claude/remote-settings.json → existe, 29 bytes, conteúdo {\"channelsEnabled\": true}"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "o nó ancorado de verdade: a fonte gerenciada remota existe e hoje carrega channelsEnabled: true (canais, um caminho de mensagem de entrada na sessão, que é justamente o que o teste A2A isola); o localizador deve apontar a colagem do maestro, não o §10b",
+    "medida": "cat ~/.claude/remote-settings.json → {\"channelsEnabled\": true}; claude --help: --setting-sources só aceita user, project, local (a fonte gerenciada fica fora do alcance dela e do --settings)"
+   },
+   "nota": "A observação do /status não está no §10b citado: ele só existe na branch não mergeada docs/a2a-rt-remeasure-1103 e não fala de settings gerenciados. O rótulo vale, mas a prova citada não o sustenta, e o nó não mediu o CONTEÚDO, que é a superfície real."
+  },
+  {
+   "alvo": "E_DICA_DE_RETOMADA_NAO_REPETE_AS_FLAGS_DO_TESTE_1103",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "leitura do binário 2.1.317: HMo(r,e) devolve \"\" assim que um valor de flag falha em E=/^[\\w./:+][\\w./:@=+-]*$/ (o valor vazio de --tools \"\" falha); eFi só imprime flags com '/' ou '.' se couberem na largura do terminal"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar; o mecanismo reforça o nó",
+    "medida": "offsets 292735203 (HMo/P2s) e 276160176 (eFi) no binário 2.1.317; claude --help | grep -E 'chrome|strict-mcp' → --chrome, --no-chrome e --strict-mcp-config existem"
+   },
+   "nota": "Uma observação colada, mas o rótulo fica no escopo dela ('a sessão de teste') e não generaliza. O binário mostra que não foi acaso: com --tools \"\" a dica descarta TODAS as flags, sempre. Melhoria sugerida: citar o mecanismo e trocar method de 'medição no vivo pela sessão do core' por observação do maestro (locality já diz pessoa)."
+  },
+  {
+   "alvo": "Q_CARD_DO_TESTE_PROIBE_RETOMAR_PELA_DICA_1103",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "decorre do nó-pai; HMo no binário 2.1.317 confirma que a linha do teste (com --tools \"\") nunca volta na dica"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "mesma leitura de binário do nó-pai"
+   },
+   "nota": "A pergunta procede e o mecanismo a torna determinística."
+  },
+  {
+   "alvo": "E_CLAUDE_IN_CHROME_FURA_O_STRICT_MCP_CONFIG_1103",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep -c claudeInChromeDefaultEnabled ~/.claude.json → 1 (valor true); claude --help | grep chrome → --chrome, --no-chrome; sudo -n grep claudeInChromeDefaultEnabled /home/onion/.claude.json → nada (rc 1)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "esta própria sessão de juiz (subagente na VPS) tem 22 ferramentas mcp__claude-in-chrome__* na lista de ferramentas adiadas, o que corrobora o 22"
+   },
+   "nota": "O rótulo é condicional ('com claudeInChromeDefaultEnabled ligado'), e por isso não exagera: o usuário do bridge não tem a chave. Ressalva de proveniência: a Emenda 2 citada só existe na branch não mergeada docs/a2a-rt-remeasure-1103 (commit fb87ebecc), não na base da rodada."
+  },
+  {
+   "alvo": "E_SDK_HOOK_ONFAILURE_SEM_CALLBACK_NO_BRIDGE_1103",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "sudo -n sed -n 18,26p /home/onion/onion-bridge/src/agent-policy.ts → comentário 5 (disableAllHooks + allowManagedHooksOnly); sudo -n grep -rn -E 'hooks\\s*:|HookCallback|onFailure' src/ → nenhum registro de hook por callback (só canUseTool); SDK instalado 0.3.310"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "grep no src do bridge"
+   },
+   "nota": "Ok. Nota: o par CLI disso é a REGRA 101 (veto PreToolUse por exit 2 declara onFailure: block), em .claude/validation/veto-onfailure-check.sh; o nó podia citá-la."
+  },
+  {
+   "alvo": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_317_1103",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 0, Passaram 6, Falharam 0, 'OK ✓'; o caso (f) diz 'a estrutura dos 3 trechos esta no binario instalado E na guarda', e readlink -f $(command -v claude) → …/versions/2.1.317"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "o caso (f) exerce o binário instalado (2.1.317), não só a cópia"
+   },
+   "nota": "Reproduz."
+  },
+  {
+   "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1103",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "printf 'opus 4.8\\n' > t.txt; command grep -c -i 'opus-4-8|opus 4.8' t.txt → 0 (e grep da shell → 0): sem -E o '|' é literal, e o grep citado é vazio por construção; ls ~/.vscode-server/extensions | grep claude → anthropic.claude-code-2.1.306-linux-x64"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "medição corrigida: command grep -rn -i -E 'opus-4-8|opus 4\\.8|fast.?mode' .claude ops .github CLAUDE.md → 0, e o bridge roda claude-opus-5 (chat-query-options.ts l.61); o rótulo deve excluir o VS Code (a extensão do host existe) e nomear o Remote Control como só do host",
+    "medida": "command grep -rn -i -E com controle positivo (t.txt casa com -E); sudo -n grep no src do bridge; ls do diretório de extensões; grep -n remoteControlAtStartup ~/.claude/settings.json → l.78 true"
+   },
+   "nota": "A conclusão sobre o Opus 4.8 e o PowerShell reproduz com a grep corrigida, mas a grep citada não mede nada. 'VS Code … nenhum desses usos' contradiz a r21, que mediu a extensão no host (ainda lá, na 2.1.306), e os itens de Remote Control da 2.1.317 (l.17, l.18, l.76, l.88) somem sem registro."
+  },
+  {
+   "alvo": "CU4: SUPERSEDES de E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030 e Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n '  - id:' r21.kg.yaml → l.62 e l.78 existem; r21 dizia host 2.1.314 e alvo 0.3.314; hoje claude --version 2.1.317 e npm view 0.3.317"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "as duas medições de hoje derrubam o estado afirmado"
+   },
+   "nota": "Alvos existem e caíram de fato."
+  },
+  {
+   "alvo": "CU4: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1030 (r21) derrubado e não superado",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n 'E_EXTENSAO_VSCODE' r21.kg.yaml → l.243, 'sete versões atrás' do CLI 2.1.314; hoje ls ~/.vscode-server/extensions → ainda 2.1.306, e grep -n '^## 2.1.3' CHANGELOG.md dá 2.1.307, 308, 309, 310, 311, 312, 314, 316, 317 = nove publicadas atrás do CLI 2.1.317"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "nó novo E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103 ('nove versões publicadas atrás; os itens [VSCode] da 2.1.316 l.43-47 e da 2.1.317 l.77-83 não a alcançam') com SUPERSEDES para o da r21",
+    "medida": "ls do diretório de extensões do VS Code Server do host; contagem das seções do CHANGELOG oficial baixado hoje"
+   },
+   "nota": "Mesmo padrão do nó de versões que a rodada superou: o estado com número relativo ao host caiu quando o host subiu. Candidato menor da mesma classe: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_314_1030 ('contra o CLI 2.1.314 instalado'). O instalado agora é 2.1.317, e a rodada criou o sucessor sem a aresta. Os demais nós da r21 conferidos seguem de pé: 6 PreToolUse com Bash, hooksPath .githooks, grep ainda função, PreCompact com 33 linhas, chat-runner l.635."
+  },
+  {
+   "alvo": "CU5: omissões do delta 2.1.316–2.1.317 que tocam superfície do core",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "grep -c -i -E 'SendMessage|Remote Control|remote-control|transcript|Read tool' no .kg.yaml da r22 → 2 (só citações do E_SETTINGS e do E_ITENS, nenhuma de SendMessage, Read ou transcript); python sobre .claude/settings.json → PreToolUse 'SendMessage|Write|Edit' → house-code-gloss.sh; PreToolUse 'Read|Grep|Bash' → pretooluse-env-guard.sh; 'Read|Edit|Write|Bash' → kg-read-leg.sh"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "listar e medir na rodada: (1) 2.1.317 l.66 SendMessage a agente em fundo; (2) l.70 Read sem o stub; (3) l.29 limpeza de transcripts com --setting-sources; (4) itens de Remote Control l.17/18/88; (5) 2.1.316 l.20 subagente que herdou modelo volta ao principal ao acordar; (6) l.37 da 2.1.317 Prompt is too long com CLAUDE.md grande",
+    "medida": "(1) house-code-gloss.sh l.305 trata SendMessage, e background-task-probe.sh mede tarefas de fundo; (2) os 2 hooks de Read são PreToolUse, então só o custo de token muda; (3) ops/chat-runner.sh l.635 usa --setting-sources=project, há 2193 .jsonl com mais de 30 dias em ~/.claude/projects e nenhum cleanupPeriodDays; (4) ~/.claude/settings.json l.78 remoteControlAtStartup true; (6) wc -c CLAUDE.md = 26230 e 21 commits nele desde 2026-10-01"
+   },
+   "nota": "Detalhe e impacto na resposta do juiz. Checados SEM toque: SHELLOPTS (grep 0 em .claude/ops/.github), e-mail da conta (git user.email difere; nenhum caminho de shell o envia; o provider ativo não usa e-mail)."
+  }
+ ]
+}
