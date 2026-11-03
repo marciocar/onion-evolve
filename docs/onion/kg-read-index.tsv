@@ -736,6 +736,7 @@ CLAUDE.md	E_CLAUDE_MD	docs/onion/graph/onion-identity-2026-07.kg.yaml
 CLAUDE.md	E_CLAUDE_MD_CRESCEU_52_DEPOIS_DO_SELO	docs/evolution/research/guard-claude-md-size-2026-10/claude-md-size-2026-10.kg.yaml
 CLAUDE.md	E_F3_BYPASS_EM_PROJECT_SETTINGS_IGNORADO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 CLAUDE.md	E_F3_PERMISSION_PROMPTS_NONE	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
+CLAUDE.md	E_OBJECAO_CI_GATE_IS_FLOOR_NOT_SUBSTITUTE	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
 LICENSE	SY6_ev_licenca_mit	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/INDEX.md	C_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/INDEX.md	E_J_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
@@ -1676,6 +1677,8 @@ docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-1
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	C_PIECE_HOOKS_BLOCK_PARTIAL_THREE_FAIL_OPEN_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	C_PIECE_SKILLS_LOAD_EQUIVALENT_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	C_RECOMMENDATION_AFTER_SPIKES_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
+docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	E_OBJECAO_CODEX_HOOK_IS_SAFEGUARD_NOT_BOUNDARY	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
+docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	E_OBJECAO_CODEX_VETO_NOT_IN_RC_OR_JSON	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	Q_CODEX_APPLY_PATCH_UPDATE_AND_WORKTREES_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	Q_CODEX_BLOCK_MACHINE_SIGNAL_FOR_CI_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
 docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md	Q_CODEX_HOOK_FAIL_OPEN_EXERCISED_1026	docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml
@@ -2081,6 +2084,11 @@ docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md	B5_16_decisao_fro
 docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md	B5_16_decisao_gancho_dado_verificavel	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md	B5_16_metodo_fanout_sintese	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md	B5_16_question_linha_leiga_p6_bloqueada	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml	C_OPCAO_A_GENERATOR_PER_HARNESS	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
+docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml	C_OPCAO_B_RUNTIME_BRIDGE	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
+docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml	C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
+docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml	C_OPCAO_D_NO_NEW_DOOR_UNTIL_DEMAND	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
+docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml	E_LACUNAS_ONION_CORE_PORTS_2026_11	docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml
 docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md	D_RATIFY_DIRECAO_C	docs/evolution/research/onion-d2-data-currency-2026-07/onion-d2-data-currency-2026-07.kg.yaml
 docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md	A_RESEARCH_MARKET	docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml
 docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md	C_sub_residuo	docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml
