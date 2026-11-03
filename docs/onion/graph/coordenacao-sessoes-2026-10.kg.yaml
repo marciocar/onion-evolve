@@ -359,16 +359,25 @@ nodes:
   - id: Q_COORD_DECIDIR_VIGIA_DE_EVENTOS
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 4
     confidence: 0.5
-    verified_at: "2026-10-29"
     evidence_class: testimony
-    verified_against: "os sinais docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher.md (o pedido do hub) e docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher-market.md (o estudo da curadoria, PR 162 dela), lidos em 2026-10-29; os casos W1 a W3d são medida da curadoria numa cópia do core fixada em 1d04d4e24, não re-executada pelo core"
     label: "Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático com o «só o humano envia»."
-    narrative: "O hub pediu um vigia que leve e-mail, Slack, wiki, GitHub e AWS ao Onion sem um Claude aberto; a curadoria estudou o padrão de mercado por camada. As quatro decisões do maestro: (1) a coleta, pelo Argo Events num k3s com EventBus ou por coletores finos próprios, declarados; (2) o aceite dos eventos, em lote ou automático por regra para coletor confiável e assinado (a triagem antes do aceite contorna o gate e não é recomendada); (3) o Gmail, por push pelo Google Cloud, por IMAP com OAuth ou por IMAP com senha de app; (4) o conflito entre o aviso automático pedido pelo hub e a regra «só o humano envia», mais um membro por coletor no members.yaml. A hipótese do maestro: o vigia roda sobre o A2A do Onion, cada coletor é um remetente A2A que assina o envelope CloudEvents, a fila do receptor no bridge é a caixa durável, o aceite reverifica e a triagem usa a peça de rascunho. Medido pela curadoria numa cópia do core: o CloudEvent assinado passa no a2a-verify, a repetição e o corpo trocado são vetados, e o mutante sem o body_sha256 deixa passar o adulterado. NÃO exercitados: o aceite, a fila do bridge e um coletor real. O A2A 1.0 oficial não assina mensagem; a assinatura é do perfil Onion, e a ligação A2A-CloudEvents é solução própria, porque o mercado não a tem. O pedido de perfil event foi aceito pelo kg-ssot; a hipótese é não precisar de perfil novo, com os atributos do CloudEvents (id, source, type, time, subject e o link) mapeados num nó evidence. Gatilho: a rodada do /meta:decide com o maestro."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Os três degraus 1: coletor fino próprio, aceite em lote pelo maestro e aviso só em rascunho; o core constrói os 3 comandos de medição que faltam; Gmail depois»"
+    narrative: |-
+      O hub pediu um vigia que leve e-mail, Slack, wiki, GitHub e AWS ao Onion sem um Claude aberto; a curadoria estudou o padrão de mercado por camada. As quatro decisões do maestro: (1) a coleta, pelo Argo Events num k3s com EventBus ou por coletores finos próprios, declarados; (2) o aceite dos eventos, em lote ou automático por regra para coletor confiável e assinado (a triagem antes do aceite contorna o gate e não é recomendada); (3) o Gmail, por push pelo Google Cloud, por IMAP com OAuth ou por IMAP com senha de app; (4) o conflito entre o aviso automático pedido pelo hub e a regra «só o humano envia», mais um membro por coletor no members.yaml. A hipótese do maestro: o vigia roda sobre o A2A do Onion, cada coletor é um remetente A2A que assina o envelope CloudEvents, a fila do receptor no bridge é a caixa durável, o aceite reverifica e a triagem usa a peça de rascunho. Medido pela curadoria numa cópia do core: o CloudEvent assinado passa no a2a-verify, a repetição e o corpo trocado são vetados, e o mutante sem o body_sha256 deixa passar o adulterado. NÃO exercitados: o aceite, a fila do bridge e um coletor real. O A2A 1.0 oficial não assina mensagem; a assinatura é do perfil Onion, e a ligação A2A-CloudEvents é solução própria, porque o mercado não a tem. O pedido de perfil event foi aceito pelo kg-ssot; a hipótese é não precisar de perfil novo, com os atributos do CloudEvents (id, source, type, time, subject e o link) mapeados num nó evidence. Gatilho: a rodada do /meta:decide com o maestro.
+
+      verified_against anterior: «os sinais docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher.md (o pedido do hub) e docs/evolution/inbox/_processed/2026-10-28-proposal-event-watcher-market.md (o estudo da curadoria, PR 162 dela), lidos em 2026-10-29; os casos de teste do vigia (numerados de 1 a 3d pela curadoria) são medida dela numa cópia do core fixada em 1d04d4e24, não re-executada pelo core»
+      Selado por /meta:decide em 2026-11-03: escolhida «Os três degraus 1: coletor fino próprio, aceite em lote pelo maestro e aviso só em rascunho; o core constrói os 3 comandos de medição que faltam; Gmail depois»; descartadas: «k3s + Argo Events» · «Parquear o vigia».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «Vigia de eventos fora da sessão: como começar?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
   - id: E_COORD_NOTAS_DA_SESSAO_1031
     node_type: evidence
     layer: audit
@@ -508,6 +517,22 @@ nodes:
       locator: "rodada 1 de 2026-11-02, pergunta Doc control"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-02"
       locality: "pessoa"
+  - id: D_COORD_SPIKES_DAS_PORTAS_NA_VPS_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «VPS com instalação isolada; spikes primeiro»"
+    label: "Os spikes das portas (Qwen Code e Mistral Vibe: veto na falha, sinal no headless, subagente e MCP) rodam primeiro, na VPS, com os harnesses isolados do SO e um modelo aberto pequeno local; o gerador do Qwen Code só depois, com dado"
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «VPS com instalação isolada; spikes primeiro»; descartadas: «VPS mais together.ai para qualidade» · «Só together.ai» · «Gerador do Qwen Code direto»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «Spikes das portas: onde rodam e o que roda primeiro?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -613,4 +638,7 @@ edges:
     edge_type: TRACES_TO
   - from: Q_COORD_CORE_PIN_NO_SELADOR_1102
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: D_COORD_SPIKES_DAS_PORTAS_NA_VPS_1103
+    to: E_COORD_PORTAS_DO_ONION_CORE_PESQUISE_ANTES_1102
     edge_type: TRACES_TO

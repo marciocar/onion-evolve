@@ -321,6 +321,14 @@ A linha de comando passa a ser:
 
 Nenhum critério do §2 nem modo de falha do §3 muda.
 
+### Emenda 3 · 2026-11-03 · o `EndConversation` fica fora da lista exata do S7
+
+**Motivo:** o `/mcp` das sessões de teste mostra, além do `a2a-rt`, o `EndConversation` embutido no harness. Ele
+encerra a conversa e não envia, não assina, não aceita nem pareia. **Decisão do maestro (2026-11-03,
+`D_A2A_S7_ENDCONVERSATION_POR_EMENDA_1103`):** o S7 passa a ler «exatamente `draft_message` e `read_inbox`, mais o
+`ToolSearch` e o `EndConversation`, se o harness os mantiver». Rejeitada: medir se `--disallowedTools` o tira.
+Nenhum outro critério do §2 nem modo de falha do §3 muda.
+
 ## 10. Registro de resultados (preencher na execução)
 
 **Preenchido em 2026-10-28** pela sessão do core, com as saídas coladas pelo maestro (sem segredo, sem o nome da
@@ -392,8 +400,8 @@ passou a carimbar a assinatura.
 **Senha em colagem.** Em duas colagens, uma senha digitada num terminal sem prompt (depois do `archive`, que não
 pede senha) apareceu no texto. Ela não foi gravada em nenhum arquivo. Trocá-la é decisão do maestro.
 
-**Veredito parcial:** S2, S3, S5, S6 e S8b medidos; S1 pela leitura da Emenda 2, a confirmar pelo maestro; S4
-parcial (falta a impressão); S7 parcial: o `claude-in-chrome` foi curado com o `--no-chrome`, e o `EndConversation`
-segue aberto com o maestro; **S8a (P12) aberto**. Nenhum
+**Veredito parcial:** S2, S3, S5, S6 e S8b medidos; S1 pela leitura da Emenda 2, confirmada pelo maestro em 2026-11-03 (`D_A2A_S1_VALE_R3_E_R5_1103`); S4
+parcial (falta a impressão); S7 fechado pela Emenda 3 (o `claude-in-chrome` curado com o `--no-chrome`, e o `EndConversation`
+fora da lista exata por decisão do maestro); **S8a (P12) aberto**. Nenhum
 modo de falha de transporte, autoenvio, identidade, aprovação ou porta apareceu. Enquanto o P12 não rodar e o S4
 não fechar, **a pergunta segue aberta**, sem SUCESSO declarado.

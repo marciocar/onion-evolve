@@ -1743,6 +1743,54 @@ nodes:
     label: "A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pasta ignorada?"
     narrative: "O kg-trace.sh passou a ler o arquivo, mas ninguém o cria: o adotante o escreve à mão. Sem ele, cada nó do grafo de reunião com trace para a pasta ignorada dá integrity.trace-target-missing na worktree e no CI. Gatilho: o 2º adotante com material de cliente em pasta ignorada."
     trace: "docs/evolution/inbox/_processed/2026-10-29-signal-worktree-material-ignorado.md"
+  - id: D_A2A_S1_VALE_R3_E_R5_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Valem a rodada 3 e a rodada 5»"
+    label: "O maestro aceita a rodada 3 (2026-10-28) e a rodada 5 (2026-11-03), limpas nas duas pontas e com reinício entre elas, como as duas rodadas do critério 1 do pré-registro da ida e volta (Emenda 2)"
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Valem a rodada 3 e a rodada 5»; descartadas: «Rodar uma rodada 6 na mesma janela»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «Teste A2A, critério 1: a rodada 3 e a rodada 5 valem?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
+  - id: D_COMPOSICAO_SEGUE_PARQUEADA_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Não disparou»"
+    label: "O maestro decide que o gatilho do parque da composição Claude ↔ Codex (D_COMPOSITION_STAY_PARKED_1025, no grafo da curadoria) não disparou com a ida e volta de 2026-11-03: faltam a perna do Codex e o SUCESSO"
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Não disparou»; descartadas: «Disparou em parte»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «Parque da composição: o gatilho disparou?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
+  - id: D_A2A_S7_ENDCONVERSATION_POR_EMENDA_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Emenda datada»"
+    label: "O maestro decide que o EndConversation embutido no harness fica fora da lista exata do critério 7 da ida e volta por emenda datada: ele encerra a conversa e não envia, não assina, não aceita nem pareia"
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Emenda datada»; descartadas: «Medir se dá para tirar com --disallowedTools»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «Critério 7 do teste A2A: o que fazer com o EndConversation?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
 edges:
   - from: Q_META_VELHO_EM_GRAFO_SELADO_1028
     to: D_STATUS_POR_DATA_DO_NO_NA_REMEDICAO_1028
@@ -2076,4 +2124,13 @@ edges:
     edge_type: TRACES_TO
   - from: Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029
     to: E_SINAL_WORKTREE_MATERIAL_IGNORADO_1029
+    edge_type: TRACES_TO
+  - from: D_A2A_S1_VALE_R3_E_R5_1103
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: D_COMPOSICAO_SEGUE_PARQUEADA_1103
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
+    edge_type: TRACES_TO
+  - from: D_A2A_S7_ENDCONVERSATION_POR_EMENDA_1103
+    to: Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027
     edge_type: TRACES_TO
