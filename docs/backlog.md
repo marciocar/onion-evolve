@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**770 itens abertos** em 134 grafo(s) com aberto (de 173 no escopo) · 135 grupo(s), agrupados por `owner:` (52 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**773 itens abertos** em 135 grafo(s) com aberto (de 174 no escopo) · 136 grupo(s), agrupados por `owner:` (52 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1168,6 +1168,14 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
+
+## radar-E3-2026-11-03-r22 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.3 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_317_E_PIN_DO_REVISOR_PARA_V1_0_267_1103` | radar-E3-2026-11-03-r22 | o SDK do bridge sobe para 0.3.317 e o pin do revisor para v1.0.267 (sha 4845bacb); o deploy do bridge é do maestro, o pin é PR d |
+| 3.0 | `Q_AGENTES_DECLARAM_O_ESFORCO_1103` | radar-E3-2026-11-03-r22 | os agentes cujo modelo difere do da sessão de quem os chama devem declarar effort no frontmatter, ou a casa fixa CLAUDE_CODE_SUBA |
+| 2.4 | `Q_CARD_DO_TESTE_PROIBE_RETOMAR_PELA_DICA_1103` | radar-E3-2026-11-03-r22 | o card do teste A2A deve proibir retomar a sessão de teste pela dica de saída e mandar sempre a linha de comando inteira |
 
 ## ai-front-2026-10 — 1 item(ns)
 
