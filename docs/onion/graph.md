@@ -646,7 +646,7 @@ onion-core	tier	source
 onion-core	trust-advises	onion-evolve	
 onion-curation	adopts	onion-evolve	
 onion-curation	mode	greenfield	
-onion-curation	pin	67e9d003689f	
+onion-curation	pin	3ade85b7e1c0	
 onion-curation	specialization	curadoria	
 onion-curation	specialization	dissecacao	
 onion-curation	specialization	mercado	
