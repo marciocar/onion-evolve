@@ -17248,6 +17248,29 @@ PY
   else record_fail "a2a-rt (g16): falha dupla" "drafts=$(ls "${ST}/drafts" 2>/dev/null)"; fi
   _rt_dupla "${mut}/g16.py" && rc_dm=0
   _prove_mutation "a2a-rt (g16) mutante: a falha dupla engolida" "${mcp}" "${mut}/g16.py" "${rc_di}" "${rc_dm}"
+  # (g16b) o unlink do rascunho FALHA (injetado numa cópia): a resposta diz "NÃO foi apagado", o arquivo ficou e é erro
+  python3 - "${mcp}" "${mut}/g16f.py" "${mut}/g16fm.py" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = """            os.unlink(path)\n            left = "nada foi gravado"\n"""
+assert a in s
+f = s.replace(a, """            raise PermissionError(13, "Permission denied")\n            left = "nada foi gravado"\n""", 1)
+open(sys.argv[2], "w", encoding="utf-8").write(f)
+m = 'f"MAS o arquivo do rascunho {path} NÃO foi apagado ({e2.strerror}): apague-o à mão antes de qualquer "'
+assert m in f
+open(sys.argv[3], "w", encoding="utf-8").write(f.replace(m, '"nada foi gravado"', 1))
+PY
+  _rt_dupla_f() {  # $1 = mcp com o unlink que falha
+    rm -rf "${ST}/drafts" "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
+    ( umask 022; : > "${ST}/drafts.jsonl"; : > "${ST}/draft-gap.log" ); chmod 644 "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
+    local o; o="$(_rt "$1" "${sb}/g16.req")"
+    _rt_has "$(_rt_text "${o}" 1)" "NÃO foi apagado" && [ -f "${ST}/drafts/dupla-1.json" ] && [ "$(_rt_iserr "${o}" 1)" = "true" ]
+  }
+  local rc_ui=1 rc_um=1; _rt_dupla_f "${mut}/g16f.py" && rc_ui=0
+  if [ "${rc_ui}" = 0 ]; then record_pass "a2a-rt (g16b): unlink que falha na falha dupla → a resposta diz 'NÃO foi apagado', o arquivo ficou, e é erro"
+  else record_fail "a2a-rt (g16b): unlink que falha" "drafts=$(ls "${ST}/drafts" 2>/dev/null)"; fi
+  _rt_dupla_f "${mut}/g16fm.py" && rc_um=0
+  _prove_mutation "a2a-rt (g16b) mutante: a mensagem que esconde o arquivo que ficou" "${mut}/g16f.py" "${mut}/g16fm.py" "${rc_ui}" "${rc_um}"
   rm -f "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
   # (g2…g5) o contador draft-stats sobre registros sintéticos (os refutadores do PLAN-E §3), relógio fixo
   local met="${ft}/a2a-metrics.py" DNOW=1793707200
@@ -17787,6 +17810,21 @@ def mc(t, a, b):
             "from_mode": a, "to_mode": b, "actor": "op"}
 if scen in ("auto", "xrev", "dilute", "mix"):
     L.insert(0, mc(now - 5 * 86400, "shadow", "auto"))     # o modo auto explicado por uma troca registrada
+elif scen == "x1":
+    L.append(mc(now - 41 * 86400, "shadow", "auto"))
+    L.append(mc(now - 40 * 86400 - 43200, "auto", "shadow"))
+    for i in range(50):
+        L.append(ln(now - (40 - i * 15 // 49) * 86400 - i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
+    for i in range(10):
+        L.append(ln(now - (24 - i) * 86400, "accept", None, f"a{i}", mode="auto"))  # auto SEM troca vigente
+    L.append(ln(now - 3600, "accept", "accept", "volta"))
+elif scen == "autofut":
+    L.append(mc(now - 5 * 86400, "shadow", "auto"))
+    for i in range(10):
+        L.append(ln(now - 3 * 86400 - i, "accept", None, f"a{i}", mode="auto"))
+    for i in (2, 5):
+        L.append(ln(now - 2 * 86400 - i, None, "reject", f"a{i}", mode="auto", sup=L[i + 1]["line_id"]))
+    L.append(ln(now + 600, "accept", None, "fut", mode="auto"))
 elif scen == "a3":
     for i in range(5):
         L.append(ln(now - 6 * 86400 - i, "accept", None, f"x{i}", mode="auto"))      # ANTES da troca para auto
@@ -17824,7 +17862,7 @@ with open(path, "w") as f:
 PY
   }
   # _shst <metrics> <cenário> [extra] → "rc|json"
-  _shst() { local o r=0 m=shadow; case "$2" in auto|xrev|dilute|mix|autonomc|a3) m=auto ;; esac; _shgen "$2" "${d}/sh-$2.jsonl"
+  _shst() { local o r=0 m=shadow; case "$2" in auto|xrev|dilute|mix|autonomc|a3|autofut) m=auto ;; esac; _shgen "$2" "${d}/sh-$2.jsonl"
     o="$(python3 -I "$1" shadow-stats --mode "${m}" --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
   _shj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
   _sh_on() { local r; r="$(_shst "$1" s50)"; SH_WHY="${r:0:400}"
@@ -17870,7 +17908,7 @@ PY
       --human-decision accept --from m --ce-source /w --jti jr "${@:2}" >/dev/null 2>&1; }
     A2A_METRICS_REPO_ROOT="${R}/repo" _shap "$1" --log "${R}/repo/s.jsonl" --ce-id ev-r || r=$?
     [ "${r}" = 4 ] || { SH_WHY="a lacuna deveria nascer (rc 4), deu ${r}"; return 1; }
-    local gid; gid="$(jq -r .gap_id "${R}/gap.log")"
+    local gid; gid="$(jq -r .gap_id "${R}/gap.log")"; sleep 1      # a linha que fecha é ESTRITAMENTE posterior
     r=0; _shap "$1" --log "${R}/good.jsonl" --ce-id OUTRO --resolves-gap "${gid}" || r=$?
     [ "${r}" = 3 ] && [ ! -e "${R}/good.jsonl" ] || { SH_WHY="evento trocado deveria dar rc 3 sem gravar, deu ${r}"; return 1; }
     r=0; _shap "$1" --log "${R}/good.jsonl" --ce-id ev-r --resolves-gap "${gid}" || r=$?
@@ -17898,6 +17936,7 @@ PY
     A2A_METRICS_REPO_ROOT="${R}/repo" python3 -I "$1" shadow-append --receiver core-x --log "${R}/repo/s.jsonl" --gap-log "${R}/gap.log" \
       --mode shadow --rule-decision accept --human-decision accept --from membro-a --jti jx >/dev/null 2>&1 || r=$?
     [ "${r}" = 4 ] || { SH_WHY="a lacuna deveria nascer, deu ${r}"; return 1; }
+    sleep 1                                                       # a linha que fecha é ESTRITAMENTE posterior
     r=0; python3 -I "$1" shadow-append --receiver core-x --log "${R}/good.jsonl" --gap-log "${R}/gap.log" --mode shadow --rule-decision accept \
       --human-decision accept --from membro-b --jti jx --resolves-gap "$(jq -r .gap_id "${R}/gap.log")" >/dev/null 2>&1 || r=$?
     SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ ! -e "${R}/good.jsonl" ]; }
@@ -17920,6 +17959,23 @@ PY
   _sh_anterior() { local r; r="$(_shfix "$1" anterior)"; SH_WHY="${r:0:300}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" .gaps_in_window)" = 1 ]; }
   _sh_dupla() { local r; r="$(_shfix "$1" dupla)"; SH_WHY="${r:0:300}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" .gaps_in_window)" = 2 ]; }
   _sh_semrcv() { local r; r="$(_shfix "$1" semrcv)"; SH_WHY="${r:0:300}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" .gaps_in_window)" = 1 ]; }
+  _sh_x1() { local r; r="$(_shst "$1" x1)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.trigger_rule_on')" != true ] && [ "$(_shj "${r}" '.mode_mismatch|type')" = string ]; }
+  _sh_wexist() { local r=0; rm -f "${d}/w.jsonl"
+    python3 -I "$1" shadow-append --log "${d}/w.jsonl" --gap-log "${d}/w-gap.log" --mode shadow --rule-decision accept \
+      --human-decision accept --from m --jti w1 >/dev/null 2>&1 || { SH_WHY="a 1ª linha (shadow) falhou"; return 1; }
+    python3 -I "$1" shadow-append --log "${d}/w.jsonl" --gap-log "${d}/w-gap.log" --mode auto --rule-decision accept \
+      --from m --jti w2 >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${d}/w.jsonl")" = 1 ] && [ ! -e "${d}/w-gap.log" ]; }
+  _sh_wabsent() { local r=0; rm -f "${d}/w2.jsonl"
+    python3 -I "$1" shadow-append --log "${d}/w2.jsonl" --gap-log "${d}/w2-gap.log" --mode auto --rule-decision accept \
+      --from m --jti w3 >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ ! -e "${d}/w2.jsonl" ]; }
+  _sh_norcv() { local r=0 gl="${d}/nr-gap.log"; rm -f "${d}/nr.jsonl"
+    printf '{"logged_at":"2026-11-01T00:00:00Z","gap_id":"44444444-4444-4444-8444-444444444444","point":"accept","from":"m","ce_source":"/w","ce_id":"ev-z","jti":null,"taskId":null,"ids_verified":true,"mode":"shadow","rule_id":"baseline-accept-all","rule_version":"1","why":"x"}\n' > "${gl}"
+    python3 -I "$1" shadow-append --receiver core-x --log "${d}/nr.jsonl" --gap-log "${gl}" --mode shadow --rule-decision accept \
+      --human-decision accept --from m --ce-source /w --ce-id ev-z --resolves-gap 44444444-4444-4444-8444-444444444444 >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ ! -e "${d}/nr.jsonl" ]; }
   _sh_mc() { local r1=0 r2=0; rm -f "${d}/mc.jsonl"
     python3 -I "$1" mode-change --log "${d}/mc.jsonl" --to auto >/dev/null 2>&1 || r1=$?
     python3 -I "$1" mode-change --log "${d}/mc.jsonl" --to auto >/dev/null 2>&1 || r2=$?
@@ -18020,7 +18076,7 @@ PY
   _shcase "(sh40) resolução apontando linha que EXISTE e não casa (outro evento) NÃO fecha a lacuna" _sh_naocasa \
     '        if _gap_matches(g, line):' '        if True:'
   _shcase "(sh41) resolução por linha ANTERIOR à lacuna NÃO a fecha" _sh_anterior \
-    '                and stamp_epoch(line["logged_at"]) >= stamp_epoch(g["logged_at"])):' '                ):'
+    '                and stamp_epoch(line["logged_at"]) > stamp_epoch(g["logged_at"])):' '                ):'
   _shcase "(sh42) uma linha não fecha duas lacunas (resolved_by repetido anula as duas resoluções)" _sh_dupla \
     '        if g is None or line is None or used[r.get("resolved_by")] > 1:' '        if g is None or line is None:'
   _shcase "(sh43) lacuna sem receptor conta para todo receptor (julgamento c)" _sh_semrcv \
@@ -18031,6 +18087,35 @@ PY
     '        out["trigger_rule_on"] = out["trigger_back_to_shadow"] = None' '        pass'
   _shcase "(sh46) linha de sombra de formato anterior (sem from) dá malformed e rc 2, nunca contagem (sem legado)" _sh_legacy \
     '    if not isinstance(o, dict) or tuple(sorted(o)) != tuple(sorted(SHADOW_KEYS)):' '    if not isinstance(o, dict) or not set(o) <= set(SHADOW_KEYS):'
+  _shcase "(sh47) X1: auto de −24 a −10 d depois da volta à sombra (sem nova troca) → mode_mismatch, rc 2, gatilho não-true" _sh_x1 \
+    '    loose = [o for o in valid if o["mode"] == "auto" and mode_before(changes, stamp_epoch(o["logged_at"])) != "auto"]' '    loose = [o for o in valid if o["mode"] == "auto" and not any(stamp_epoch(c["logged_at"]) < stamp_epoch(o["logged_at"]) for c in changes if c["to_mode"] == "auto")]'
+  _shcase "(sh48) o escritor recusa (rc 3) shadow-append --mode auto num log em modo shadow, sem gravar nem abrir lacuna" _sh_wexist \
+    '                if line["mode"] != vig:' '                if False:'
+  _shcase "(sh49) o escritor recusa (rc 3) --mode auto num log que ainda não existe (o modo vigente é shadow)" _sh_wabsent \
+    '        elif line["mode"] != "shadow":' '        elif False:'
+  _shcase "(sh50) lacuna sem receptor + --resolves-gap → rc 3 e nenhuma linha gravada" _sh_norcv \
+    '            if not g.get("receiver"):' '            if False:'
+  # (sh51) julgamento: linha no futuro anula SÓ o trigger_rule_on; o de volta à sombra (proteção) segue o critério. Para
+  # o caso enxergar isso, a base é uma cópia em que a reversão TEM produtor (SHADOW_NOT_INSTRUMENTED vazio)
+  OLD='SHADOW_NOT_INSTRUMENTED = ("reversal",)' NEW='SHADOW_NOT_INSTRUMENTED = ()' python3 - "${met}" "${d}/met-inst.py" <<'PY'
+import os, sys
+s = open(sys.argv[1], encoding="utf-8").read(); assert os.environ["OLD"] in s
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(os.environ["OLD"], os.environ["NEW"], 1))
+PY
+  OLD='        out["trigger_rule_on"] = None
+    if out["mode_mismatch"] or future:' NEW='        out["trigger_rule_on"] = out["trigger_back_to_shadow"] = None
+    if out["mode_mismatch"] or future:' python3 - "${d}/met-inst.py" "${d}/met-inst-mut.py" <<'PY'
+import os, sys
+s = open(sys.argv[1], encoding="utf-8").read(); o = os.environ["OLD"]
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1) if o in s else s)
+PY
+  _sh_fut() { local r; r="$(_shst "$1" autofut)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '[.future_logged_at,.back_to_shadow_criterion_met,(.trigger_back_to_shadow|tostring),(.trigger_rule_on|tostring)] | map(tostring) | join(",")')" = "1,true,true,null" ]; }
+  local rc_fi=1 rc_fm=1; _sh_fut "${d}/met-inst.py" && rc_fi=0
+  if [ "${rc_fi}" = 0 ]; then record_pass "a2a-accept: (sh51) linha no futuro anula só o trigger_rule_on; o de volta à sombra segue o critério (rc 2)"
+  else record_fail "a2a-accept: (sh51) futuro e gatilho de proteção" "${SH_WHY}"; fi
+  _sh_fut "${d}/met-inst-mut.py" && rc_fm=0
+  _prove_mutation "a2a-accept: (sh51) mutante: o futuro calando também o gatilho de proteção" "${d}/met-inst.py" "${d}/met-inst-mut.py" "${rc_fi}" "${rc_fm}"
   _shcase "(sh37) mode-change grava a troca (de, para, quem) e recusa trocar para o modo vigente (rc 3)" _sh_mc \
     '        if now_mode == o["--to"]:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \

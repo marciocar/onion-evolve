@@ -44,6 +44,9 @@
 # RISCO RESIDUAL declarado — HOME versionado por dotfiles (~/.git) pode levar o log a um commit pessoal; a guarda só
 # impede que o log fique dentro do repo em uso.
 #
+# RÉGUA DE FRONTEIRA ÚNICA: "depois" é ESTRITAMENTE posterior (>), nos dois lugares: a linha que fecha uma lacuna
+# tem logged_at > o da lacuna, e uma troca de modo vale para as linhas com logged_at > o dela.
+#
 # SEM LEGADO: os logs (sombra, lacuna, rascunhos, draft-gap) nascem nesta branch. VPS: medido em 2026-11-03 (nenhum
 # arquivo, nas duas contas); notebook: deduzido pela versão do clone (4f5513f, anterior à branch), não medido.
 # Um arquivo de formato anterior lido pelo validador dá malformed e rc 2, nunca contagem.
@@ -222,7 +225,7 @@ def read_gaps(path, shadow_lines=(), receiver=None):
         if g is None or line is None or used[r.get("resolved_by")] > 1:
             continue                                    # uma linha não fecha duas lacunas
         if not (isinstance(g.get("logged_at"), str) and TS_RE.fullmatch(g["logged_at"])
-                and stamp_epoch(line["logged_at"]) >= stamp_epoch(g["logged_at"])):
+                and stamp_epoch(line["logged_at"]) > stamp_epoch(g["logged_at"])):
             continue                                    # linha ANTERIOR à lacuna não regrava o que ela perdeu
         if _gap_matches(g, line):
             closed.add(g["gap_id"])
@@ -439,6 +442,12 @@ def validate_mode_change(o):
     return ""
 
 
+def mode_before(changes, t):
+    """O modo vigente ESTRITAMENTE antes do instante t (régua de fronteira única: a troca vale para o que vem depois)."""
+    past = sorted((stamp_epoch(c["logged_at"]), c["to_mode"]) for c in changes if stamp_epoch(c["logged_at"]) < t)
+    return past[-1][1] if past else "shadow"
+
+
 def mode_in_force(changes, now):
     """O modo vigente pelas linhas mode_change (a sombra começa em shadow): → (modo, epoch da última troca)."""
     past = sorted((stamp_epoch(c["logged_at"]), c["to_mode"]) for c in changes if stamp_epoch(c["logged_at"]) <= now)
@@ -523,9 +532,9 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
         version, rule_id = valid[-1]["rule_version"], valid[-1]["rule_id"]
         cur = [o for o in valid if o["rule_version"] == version and o["rule_id"] == rule_id]
         out["rule_version"], out["rule_id"] = version, rule_id
-    # julgamento (a): toda linha auto exige uma troca para auto ANTES dela, em qualquer --mode
-    to_auto = sorted(stamp_epoch(c["logged_at"]) for c in changes if c["to_mode"] == "auto")
-    loose = [o for o in valid if o["mode"] == "auto" and not any(t < stamp_epoch(o["logged_at"]) for t in to_auto)]
+    # julgamento (a, 5ª passada): a linha auto só vale se o modo VIGENTE no instante dela (troca estritamente antes)
+    # for auto; fora disso é solta e dá mode_mismatch, em qualquer --mode
+    loose = [o for o in valid if o["mode"] == "auto" and mode_before(changes, stamp_epoch(o["logged_at"])) != "auto"]
     if loose:
         out["mode_mismatch"] = "; ".join(x for x in (out["mode_mismatch"], (
             f"{len(loose)} linha(s) auto sem mode_change para auto antes dela: o modo não está explicado pelo log")) if x)
@@ -629,9 +638,14 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     # a janela é a da regra vigente (desde a 1ª linha dela) e a dos 7 dias; lacuna de hora ilegível cai em todas
     w_start = min(first, w0)
     out["gaps_in_window"] = sum(1 for g in gaps if g is None or w_start <= g <= now)
-    if out["mode_mismatch"] or future:
-        # medida em dúvida (modo não explicado, relógio no futuro): nenhum gatilho sai afirmado
+    if out["mode_mismatch"]:
+        # modo não explicado pelo log: nenhum gatilho sai afirmado
         out["trigger_rule_on"] = out["trigger_back_to_shadow"] = None
+    if future:
+        # linha no futuro (julgamento): anula SÓ o trigger_rule_on; o de volta à sombra é de proteção e não se cala por
+        # dado ruim (segue o que o critério e a instrumentação dizem); o rc segue 2
+        out["trigger_rule_on"] = None
+    if out["mode_mismatch"] or future:
         out["trigger_unavailable_reason"] = "; ".join(x for x in (
             out["mode_mismatch"], f"{future} linha(s) no futuro (até {ahead} s à frente)" if future else None) if x)
     fired = out["trigger_rule_on"] is True or out["trigger_back_to_shadow"] is True
@@ -895,6 +909,23 @@ def main(argv):
                 raise UsageError(f"--resolves-gap: a lacuna é do receptor {g['receiver']}, não deste")
             if not _gap_matches(g, line):
                 raise UsageError("--resolves-gap: a linha nova não casa com a lacuna (evento, remetente, modo ou regra)")
+            if not (TS_RE.fullmatch(str(g.get("logged_at"))) and stamp_epoch(line["logged_at"]) > stamp_epoch(g["logged_at"])):
+                raise UsageError("--resolves-gap: a linha tem de ser ESTRITAMENTE posterior à lacuna (repita em 1 s)")
+        # o escritor só grava no modo VIGENTE: linha de outro modo seria uma decisão que o log não explica
+        if os.path.lexists(log):
+            try:
+                prior = read_log(log)
+            except MeasureError:
+                prior = None                            # ilegível: o append falha adiante e vira lacuna
+            if prior is not None:
+                ch = [x for _, x in prior if isinstance(x, dict) and x.get("kind") == "mode_change"
+                      and not validate_mode_change(x)]
+                vig = mode_in_force(ch, int(time.time()))[0]
+                if line["mode"] != vig:
+                    raise UsageError(f"--mode {line['mode']}, mas o modo vigente do log é {vig}: grave a troca com "
+                                     "mode-change antes")
+        elif line["mode"] != "shadow":
+            raise UsageError(f"--mode {line['mode']} num log sem troca de modo: o modo vigente é shadow")
         try:
             append_line(log, line)
         except MeasureError as e:
