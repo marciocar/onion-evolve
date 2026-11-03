@@ -234,7 +234,8 @@ def draft_message(args):
         return _text(f"RASCUNHO já existia (idempotente): {draft_id} · para {to} · {len(raw)} bytes · "
                      f"sha256 {body_sha}. NADA FOI ENVIADO. {_send_hint(draft_id, thread)}")
     # o REGISTRO DE RASCUNHOS (PLAN-E §3): todo rascunho novo vira a linha `drafted`; editar é um rascunho novo com
-    # supersedes_draft. Sem a linha não há rascunho (um rascunho fora do registro seria enviável e não contado)
+    # supersedes_draft. A linha que falha NÃO impede o rascunho (julgamento da curadoria, ponto 3): vira LACUNA em
+    # draft-gap.log, dita na resposta, e o draft-stats sai rc 2 na janela dela
     try:
         log, metrics = os.path.join(STATE, "drafts.jsonl"), _metrics()
         old_path = ""
@@ -250,11 +251,10 @@ def draft_message(args):
             if (old.get("to"), old.get("thread") or "") != (to, thread):
                 raise ToolError(f"o rascunho {sup} é de outro destinatário ou de outra conversa: editar é substituir "
                                 "na MESMA conversa. Nada foi gravado.")
-        metrics.check_log(log)
+        line = metrics.draft_line("drafted", draft_id, thread, to, sup or None)
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             fd = None
             json.dump(doc, f, ensure_ascii=False)
-        metrics.append_line(log, metrics.draft_line("drafted", draft_id, thread, to, sup or None))
     except BaseException as e:
         if fd is not None:
             os.close(fd)
@@ -265,11 +265,16 @@ def draft_message(args):
         if isinstance(e, ToolError):
             raise
         raise ToolError(f"o registro de rascunhos recusou a linha ({e}): nada foi gravado")
+    try:
+        gap_msg = metrics.append_draft_with_gap(log, line)
+    except Exception as e:
+        gap_msg = f"LACUNA NÃO REGISTRADA: nem a linha drafted nem o marcador draft-gap.log foram gravados ({e})"
     if old_path:
         os.makedirs(os.path.join(DRAFTS, "superseded"), mode=0o700, exist_ok=True)
         os.replace(old_path, os.path.join(DRAFTS, "superseded", f"{sup}.json"))
     return _text(f"RASCUNHO gravado: {draft_id} · para {to} · {len(raw)} bytes · sha256 {body_sha}"
                  f"{f' · substitui {sup} (que não pode mais ser enviado)' if sup else ''}. "
+                 f"{('ATENÇÃO, ' + gap_msg + '. ') if gap_msg else ''}"
                  f"NADA FOI ENVIADO, e nenhuma ferramenta desta sessão envia. {_send_hint(draft_id, thread)}")
 
 

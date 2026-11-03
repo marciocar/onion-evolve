@@ -21,8 +21,12 @@
 # Depois do envio, o rascunho vai para drafts/sent/ e o par (rascunho, jti) entra em sent.tsv: o mesmo
 # rascunho não sai duas vezes. O envio também grava a linha `sent` no registro de rascunhos (<state>/drafts.jsonl,
 # a2a-metrics.py; PLAN-E §3). Rascunho substituído por uma edição (drafts/superseded/) não existe mais para envio.
-# Exit: 0 enviado (ou gravado no outbox) · 1 envio falhou (HTTP != 200) · 2 uso, rascunho inválido ou ferramenta
-#       ausente · 4 RECUSADO: sem terminal ou sem a confirmação digitada
+# O envio não sai sem rastro: o registro é pré-checado ANTES da confirmação, e registro que não aceita escrita
+# RECUSA o envio (rc 2). Se a linha `sent` falhar DEPOIS (a mensagem já saiu), vira lacuna em draft-gap.log e o
+# script sai 5, "enviado sem registro" (julgamento da curadoria, ponto 3).
+# Exit: 0 enviado (ou gravado no outbox) · 1 envio falhou (HTTP != 200) · 2 uso, rascunho inválido, ferramenta
+#       ausente ou registro de rascunhos que não aceita escrita · 4 RECUSADO: sem terminal ou sem a confirmação
+#       digitada · 5 ENVIADO SEM REGISTRO (a linha sent falhou depois do envio; lacuna marcada)
 # Exercitado por lint-selftest.sh (run_a2a_rt_selftests).
 # =============================================================================
 set -euo pipefail
@@ -48,7 +52,7 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --thread) need "$@"; THREAD="$2"; shift 2 ;;
   --outbox) need "$@"; OUTBOX="$2"; shift 2 ;;
   --exp-offset) need "$@"; EXP_OFF="$2"; shift 2 ;;
-  -h|--help) sed -n '2,27p' "$0"; exit 0 ;;
+  -h|--help) sed -n '2,31p' "$0"; exit 0 ;;
   *) die "argumento desconhecido: $1 (não existe flag que pule a confirmação)" ;;
 esac; done
 
@@ -83,6 +87,12 @@ SHA="$(openssl dgst -sha256 < "${WORK}/body" | awk '{print $NF}')"
 BYTES="$(LC_ALL=C wc -c < "${WORK}/body" | tr -d ' ')"
 CODE="${SHA: -6}"
 
+# ── o envio não sai sem rastro: o registro de rascunhos tem de aceitar a linha `sent` ANTES de qualquer envio ──
+METRICS="${HERE}/a2a-metrics.py"; DLOG="${STATE}/drafts.jsonl"
+[ -f "${METRICS}" ] || die "a2a-metrics.py ausente (${METRICS}): sem o registro de rascunhos nada é enviado"
+python3 -I "${METRICS}" draft-append --check --log "${DLOG}" >/dev/null 2> "${WORK}/precheck.err" \
+  || die "o registro de rascunhos (${DLOG}) não aceita a linha sent ($(head -c 300 "${WORK}/precheck.err")): nada enviado"
+
 # ── mostrar e pedir confirmação no TERMINAL (não no stdin: um pipe não é humano) ─────────────────────────
 # a sonda roda num SUBSHELL: um `exec` com redirecionamento que falha não pode derrubar o script antes da recusa
 ( exec 3<>/dev/tty ) 2>/dev/null || refuse "sem terminal (/dev/tty): o envio exige um humano no terminal."
@@ -112,12 +122,15 @@ exec 3>&-
 record_sent() {  # $1 = jti
   ( umask 077; printf '%s\t%s\t%s\t%s\t%s\n' "${DRAFT}" "$1" "${THREAD}" "$(date +%s)" "${SIDE}" >> "${SENT_TSV}" )
   ( umask 077; mkdir -p "${STATE}/drafts/sent" ); mv -f "${DF}" "${STATE}/drafts/sent/${DRAFT}.json"
-  # o registro de rascunhos (PLAN-E §3): a linha `sent`. A mensagem JÁ saiu; se a linha falhar, o rascunho conta
-  # como descartado em 24 h (contra o envio automático: a falha é conservadora), e o aviso diz isso
-  python3 -I "${HERE}/a2a-metrics.py" draft-append --log "${STATE}/drafts.jsonl" --event sent --draft-id "${DRAFT}" \
-      --thread "${THREAD}" --recipient "${TO}" >/dev/null 2> "${WORK}/metrics.err" \
-    || echo "a2a-rt-send: AVISO — enviado, mas a linha 'sent' do registro de rascunhos falhou ($(head -c 300 "${WORK}/metrics.err")): este rascunho vai contar como descartado." >&2
+  # o registro de rascunhos (PLAN-E §3): a linha `sent`. A mensagem JÁ saiu (o pré-cheque passou); se a linha falhar
+  # agora, ela vira LACUNA em draft-gap.log e o envio sai 5: ENVIADO SEM REGISTRO, nunca um rc 0 silencioso
+  if ! python3 -I "${METRICS}" draft-append --log "${DLOG}" --gap-on-fail --event sent --draft-id "${DRAFT}" \
+      --thread "${THREAD}" --recipient "${TO}" >/dev/null 2> "${WORK}/metrics.err"; then
+    echo "a2a-rt-send: ENVIADO SEM REGISTRO — a linha 'sent' falhou depois do envio ($(head -c 300 "${WORK}/metrics.err")); o draft-stats sai rc 2 nesta janela." >&2
+    REC_RC=5
+  fi
 }
+REC_RC=0
 TARGS=(); [ -z "${THREAD}" ] || TARGS=(--thread "${THREAD}")
 
 if [ "${SIDE}" = core ]; then
@@ -138,7 +151,7 @@ if [ "${SIDE}" = core ]; then
   ( umask 077; cp "${WORK}/env.json" "${OUTBOX}/${MS}-question-${JTI}.json" )
   THREAD="${TH}"; record_sent "${JTI}"
   echo "gravado no outbox: ${OUTBOX}/${MS}-question-${JTI}.json · kid ${KID} · aud ${TO} · jti ${JTI} · thread ${TH} · iat ${MS%???}"
-  exit 0
+  exit "${REC_RC}"
 fi
 
 # member: o a2a-send.sh envia (bearer só por arquivo 0600; ele recusa segredo legível por outros)
@@ -151,6 +164,6 @@ bash "${SEND}" --from "${FROM}" --to "${TO}" --endpoint "${ENDPOINT}" "${KARGS[@
   --body-file "${WORK}/body" --out "${WORK}/env.json" 2> "${WORK}/send.err" || rc=$?
 cat "${WORK}/send.err" >&2
 JTI="$(sed -n 's/.*http=[0-9]* jti=\([A-Za-z0-9._-]*\) .*/\1/p' "${WORK}/send.err" | tail -n1)"
-if [ "${rc}" -eq 0 ]; then record_sent "${JTI:-?}"; exit 0; fi
+if [ "${rc}" -eq 0 ]; then record_sent "${JTI:-?}"; exit "${REC_RC}"; fi
 [ "${rc}" -eq 1 ] && exit 1
 exit 2

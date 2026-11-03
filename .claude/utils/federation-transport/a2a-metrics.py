@@ -17,7 +17,11 @@
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
 #                  (preconditions_missing); o critério do PLAN-D sai em auto_send_criterion_met. Com --since-stage-on,
-#                  trigger_back_to_draft sai null com not_instrumented (nenhuma peça grava lista/chave ainda) e rc 2
+#                  trigger_back_to_draft sai null com not_instrumented (nenhuma peça grava lista/chave ainda) e rc 2.
+#                  `sent` sem o `drafted` dele, ou lacuna em draft-gap.log na janela da amostra = rc 2.
+#                  Por tipo de linha: `drafted` que falha vira lacuna (o rascunho nasce); `sent` é estrito ANTES do
+#                  envio (o a2a-rt-send.sh pré-checa e recusa) e vira lacuna se falhar DEPOIS (envio com rc 5); os
+#                  atos de bloqueio e de chave de corte são estritos (draft-append sem --gap-on-fail)
 #
 # LACUNA (julgamento da curadoria, ponto f): a linha de sombra que não se grava NÃO barra o aceite nem o archive. O
 # shadow-append grava então um marcador em shadow-gap.log (data, ponto, jti, taskId; as mesmas regras de 0600 fora
@@ -181,6 +185,27 @@ def read_gaps(path):
 def default_draft_log():
     st = os.environ.get("A2A_RT_STATE") or os.path.join(os.path.expanduser("~"), ".local", "state", "onion", "a2a-rt")
     return os.path.join(st, "drafts.jsonl")
+
+
+def default_draft_gap_log(draft_log):
+    """O marcador de lacuna do registro de rascunhos: draft-gap.log ao lado do registro (mesmas regras de escrita)."""
+    return os.path.join(os.path.dirname(os.path.abspath(draft_log)), "draft-gap.log")
+
+
+def append_draft_with_gap(log, line, gap_log=None):
+    """Grava a linha; se falhar, grava a LACUNA (draft-gap.log) e devolve a mensagem dela. Sem nem a lacuna, levanta.
+
+    Julgamento da curadoria (2026-11-03, ponto 3): `drafted` nasce mesmo com a linha falhando (lacuna); `sent` que
+    falha DEPOIS do envio também vira lacuna (e o envio sai com rc != 0). Os atos de bloqueio e de chave de corte são
+    estritos: quem os grava não usa esta função."""
+    try:
+        append_line(log, line)
+        return ""
+    except MeasureError as e:
+        gap = gap_log or default_draft_gap_log(log)
+        append_line(gap, {"logged_at": utc_stamp(), "event": line["event"], "draft_id": line["draft_id"],
+                          "why": str(e)[:300]})
+        return f"LACUNA: a linha {line['event']} de {line['draft_id']} NÃO foi gravada ({e}); marcador em {gap}"
 
 
 def _repo_in_use():
@@ -526,7 +551,7 @@ def validate_draft(o):
     return ""
 
 
-def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None):
+def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None, gaps=()):
     """→ (saída, rc, descartes a gravar). O descarte de 24 h é calculado aqui, haja ou não linha `discarded`."""
     malformed = 0
     valid = []
@@ -561,6 +586,8 @@ def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None):
         closed.append((t0, i, status))
     closed.sort()
     sample = [s for _, _, s in closed[-last:]] if last > 0 else []
+    # a janela da amostra começa no rascunho mais antigo dela; sem amostra, toda lacuna está na janela
+    w_start = closed[-last:][0][0] if (last > 0 and closed) else None
     tail = 0
     for _, _, s in reversed(closed):
         if s != "approved":
@@ -599,8 +626,12 @@ def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None):
             not_instr = True
         else:
             out["trigger_back_to_draft"] = out["back_to_draft_criterion_met"]
+    # ponto 3 da curadoria: `sent` sem o `drafted` dele é LACUNA (nunca aprovado sem edição), e o marcador de lacuna
+    # (draft-gap.log) na janela também: a medida não é verde (rc 2)
+    out["gaps_in_window"] = sum(1 for g in gaps if g is None or w_start is None or w_start <= g <= now)
+    gap = out["unregistered_sent"] > 0 or out["gaps_in_window"] > 0
     fired = out["trigger_auto_send"] is True or out["trigger_back_to_draft"] is True
-    return out, (2 if malformed or not_instr or out["no_data"] else (1 if fired else 0)), to_write
+    return out, (2 if malformed or not_instr or out["no_data"] or gap else (1 if fired else 0)), to_write
 
 
 # ─────────────────────────────── CLI ───────────────────────────────
@@ -733,7 +764,7 @@ def main(argv):
         return rc
     if cmd == "draft-append":
         o = _opts(rest, {"--log": True, "--check": False, "--event": True, "--draft-id": True, "--thread": True,
-                         "--recipient": True, "--supersedes-draft": True})
+                         "--recipient": True, "--supersedes-draft": True, "--gap-on-fail": False, "--gap-log": True})
         log = o.get("--log") or default_draft_log()
         if o.get("--check"):
             check_log(log)
@@ -741,12 +772,20 @@ def main(argv):
             return 0
         line = draft_line(o.get("--event", ""), _nullable(o.get("--draft-id")), o.get("--thread"),
                           _nullable(o.get("--recipient")), _nullable(o.get("--supersedes-draft")))
-        append_line(log, line)
+        if o.get("--gap-on-fail"):
+            if line["event"] not in ("drafted", "sent"):
+                raise UsageError("--gap-on-fail só vale para drafted e sent: os atos de bloqueio e de chave são estritos")
+            msg = append_draft_with_gap(log, line, o.get("--gap-log"))
+            if msg:
+                print(f"[a2a-metrics] {msg}", file=sys.stderr)
+                return 4
+        else:
+            append_line(log, line)
         print(f"ok: {log} line_id={line['line_id']}")
         return 0
     if cmd == "draft-stats":
         o = _opts(rest, {"--log": True, "--last": True, "--since-stage-on": True, "--now": True, "--no-write": False,
-                         "--json": False})
+                         "--json": False, "--gap-log": True})
         log = o.get("--log") or default_draft_log()
         last = o.get("--last", str(AUTO_SEND_SAMPLE))
         if not re.fullmatch(r"[1-9]\d{0,5}", last):
@@ -754,7 +793,8 @@ def main(argv):
         since = o.get("--since-stage-on")
         if since is not None and not _valid_day(since):
             raise UsageError("--since-stage-on exige AAAA-MM-DD, um dia UTC que exista")
-        out, rc, to_write = draft_stats(read_log(log), _now(o), int(last), since)
+        out, rc, to_write = draft_stats(read_log(log), _now(o), int(last), since,
+                                        read_gaps(o.get("--gap-log") or default_draft_gap_log(log)))
         if to_write and not o.get("--no-write"):
             # o descarte vira linha (nenhuma peça grava descarte; PLAN-E §3); a contagem acima já o incluiu. Log que
             # recusa a escrita (permissão, dono, árvore git) é log em que não se confia: a saída sai, e o rc é 2
