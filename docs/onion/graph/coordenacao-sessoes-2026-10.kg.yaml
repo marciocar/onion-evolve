@@ -308,13 +308,13 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     owner: core
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-29"
+    verified_at: "2026-11-03"
     evidence_class: testimony
-    verified_against: "os dois sinais da curadoria, docs/evolution/inbox/2026-10-28-proposal-esperanto.md e docs/evolution/inbox/2026-10-28-proposal-esperanto-ports.md, lidos inteiros e versionados no inbox do core na triagem de 2026-10-29"
+    verified_against: "fechada em 2026-11-03: a curadoria selou D_PIECE_CORE_DEPENDENCY e D_PIECE_MULTI_PROVIDER_CLIENT_REJECT como done no grafo dela (PR #184, merge 1759719), com proveniência em D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11 e E_COORD_PORTAS_DO_ONION_CORE_PESQUISE_ANTES_1102 do core @a4861ff8c; os dois sinais do Esperanto foram para docs/evolution/inbox/_processed/"
     label: "Selar os vereditos do Esperanto: D_PIECE_CORE_DEPENDENCY (rejeitar) e D_PIECE_MULTI_PROVIDER_CLIENT_REJECT (rejeitar, sem costura), que substitui o parquear da 1ª versão."
     narrative: "Os vereditos são da curadoria, no grafo dela; o selo é do maestro e a execução depois do selo é do core. Há duas versões do sinal: a 1ª (proposal-esperanto) propunha parquear o cliente de vários provedores; a 2ª (proposal-esperanto-ports) traz a resposta do maestro pelo /meta:decide de 2026-10-28, depois do braço das portas: rejeitar as duas peças, sem costura. A 2ª substitui a 1ª. Os dois nós estão open no grafo da curadoria, com a resposta do maestro como testemunho, e fecham com x_dissect_sealed_by quando o core selar. Os dois sinais ficam no inbox até o selo. Gatilho: o selo do maestro."
   - id: Q_COORD_CUR_REMEDIR_ESTACIONAMENTO_TRANSPORTE
