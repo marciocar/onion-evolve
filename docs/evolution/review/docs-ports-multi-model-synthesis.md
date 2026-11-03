@@ -2,7 +2,8 @@
 branch: docs/ports-multi-model-synthesis
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e2e78ea0af6deb8caf3c7b1bd3c0dbef1dc8a3b9bb8fa5f6b1b9b6b7b7d07318
+reviewed_code_sha256: b2ad0cb5cbe8263b7ffa165d2a8b555307a8579b11db8bc4076db13e3d5d8018
 findings_total: 3
 findings_real: 1
 tokens: 0
