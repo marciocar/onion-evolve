@@ -1,0 +1,1384 @@
+meta:
+  id: onion-core-ports-multi-model-2026-11
+  schema_version: "1"
+  baseline: "2026-11-02"
+  review_after: "2026-12-02"   # 30d: o tipo DOMINANTE é FERRAMENTA. A decisão pende do contrato de hooks,
+                               # skills e modo headless de harnesses que mudam a cada release (Qwen Code,
+                               # Mistral Vibe, Gemini CLI/Antigravity CLI, Codex CLI) e de transpiladores
+                               # comunitários (Ruler, rulesync). A metade doutrinária (postura de acoplamento)
+                               # pediria 12m, mas a decisão pende do dado curto. Gatilho extra: sinal no inbox
+                               # de adotante do members.yaml pedindo harness ou modelo aberto por soberania de
+                               # dados ou regulação, ou spike verde do veto no Qwen Code.
+  # kg-backlog-guard: on
+  # ═══ TETO: 65 NÓS ═══
+  note: "/meta:decide 2026-11-02. MODO DECISÃO: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11 nasce OPEN, o maestro sela. 17 confirmadas, 8 refutadas na votação, 0 não verificadas por acesso, 38 fontes e 37 claims cortadas por orçamento; Elenxo 44 objeções, 28 sobreviventes, 28 modeladas; 0 recusadas pelo motor; 12 superações achadas, 12 modeladas."
+  #
+  # Corpus conferido antes de escrever (cláusula 0): codex-as-core-2026-10 (spikes do Codex CLI 0.164.0:
+  # veto PARCIAL, três falhas abertas, veto fora do rc e do --json), maestro-vivo-2026-08
+  # (E_PRETOOLUSE_BARRA_SOB_BYPASS), radar-E3-2026-10-08-r8 (E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO) e
+  # door-role-parity-2026-09 (D_MATRIZ_DE_PORTAS_2026_10). Nada da pesquisa CONTRADIZ esses nós: as
+  # arestas externas são de rastro (TRACES_TO), sem SUPERSEDES nem REFUTES cross-grafo.
+
+external_edges:
+  - from: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    to: "docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml#C_RECOMMENDATION_AFTER_SPIKES_1026"
+    edge_type: TRACES_TO
+  - from: E_CC_EXIT2_OVERRIDES_ALLOW_BYPASS_UNSTATED
+    to: "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml#E_PRETOOLUSE_BARRA_SOB_BYPASS"
+    edge_type: TRACES_TO
+  - from: E_CC_FAIL_OPEN_DEFAULT_ONFAILURE_295
+    to: "docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml#E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_CODEX_VETO_NOT_IN_RC_OR_JSON
+    to: "docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml#E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026"
+    edge_type: TRACES_TO
+  - from: E_OBJECAO_CODEX_HOOK_IS_SAFEGUARD_NOT_BOUNDARY
+    to: "docs/evolution/research/codex-as-core-2026-10/codex-as-core-2026-10.kg.yaml#E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026"
+    edge_type: TRACES_TO
+  - from: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    to: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
+    edge_type: TRACES_TO
+
+nodes:
+
+  # ═══════════════════ A PERGUNTA ═══════════════════
+
+  - id: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "rodada /onion-research de 2026-11-02 (modo decisão, /meta:decide): 17 claims confirmadas, 8 refutadas, 38 fontes e 37 claims cortadas; 28 objeções sobreviventes do Elenxo"
+    label: "Como o Onion deve fazer portas do onion-core para outros harnesses e modelos (onion-codex vivo; candidatas onion-mistral, onion-gemma, onion-qwen), com onion-core + Claude Code + Claude como base e uma camada de aderência e transformação gerada?"
+    narrative: "Quatro sub-perguntas: (1) o padrão de mercado em out/2026 para framework de agente portável (AGENTS.md, Agent Skills, MCP, hooks, A2A, AAIF) e quais harnesses abertos rodam modelos abertos (Mistral Vibe, Qwen Code, Gemini CLI, opencode, goose, Codex com modelo aberto); (2) que peças do core cada candidata sustenta (veto por exit 2, skills, subagentes, MCP, headless para CI, sandbox), por primárias; (3) a forma da camada de transformação (gerador por porta como ops/materialize-door.sh vs ponte em runtime) sem voltar ao agnosticismo abandonado em 2026-05-18; (4) qual porta primeiro e com qual gatilho de demanda. Origem: decisão do maestro de 2026-11-02 no /meta:decide, que rejeitou o Esperanto como dependência do núcleo mas quer portas do onion-core para outras plataformas, com o Onion Evolve como fonte. PERMANECE ABERTA até o maestro selar o D_."
+    trace: "/meta:decide de 2026-11-02 · pergunta sobre portas do onion-core para outros harnesses e modelos · docs/evolution/research/onion-core-ports-multi-model-2026-11/SYNTHESIS.md"
+
+  # ═══════════════════ EVIDÊNCIAS CONFIRMADAS DA RODADA ═══════════════════
+
+  - id: E_GEMINI_HOOK_EXIT2_BLOCKS_STDERR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-02"
+    verified_against: "https://geminicli.com/docs/hooks/reference/ — votos 3-0, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "O hook do Gemini CLI barra uma ação com exit 2, usando stderr como motivo da rejeição — o mesmo código do exit 2 do Claude Code."
+    narrative: "Votos 3-0. Restringido por E_OBJECAO_GEMINI_FAIL_PATH_NOT_SAME_CONTRACT: o código coincide, mas o caminho de falha não ('Other: Warning ... the CLI continues'), sem regra para timeout e sem opção de fail-closed."
+    trace: "https://geminicli.com/docs/hooks/reference/"
+    provenance:
+      source: "https://geminicli.com/docs/hooks/reference/"
+      locator: "seção de exit codes dos hooks"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_GEMINI_HOOK_JSON_DENY_BLOCK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-02"
+    verified_against: "https://geminicli.com/docs/hooks/reference/ — votos 3-0, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "O Gemini CLI também barra a ferramenta por JSON em stdout, com decision deny ou block (alias), e exige que stdout leve só o JSON final."
+    narrative: "Votos 3-0; o Elenxo não achou evidência contrária. Ressalva da própria página: o efeito 'depends on the event'."
+    trace: "https://geminicli.com/docs/hooks/reference/"
+    provenance:
+      source: "https://geminicli.com/docs/hooks/reference/"
+      locator: "seção de saída JSON (decision allow/deny/block)"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_CC_EXIT2_BLOCKING_EXIT1_NOT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    verified_against: "https://code.claude.com/docs/en/hooks — votos 3-0, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "No Claude Code, exit 2 de hook é erro bloqueante nos eventos que podem bloquear (PreToolUse, UserPromptSubmit, Stop, PreCompact, Elicitation), com stderr como mensagem; exit 1 sem JSON válido NÃO bloqueia."
+    narrative: "Votos 3-0; bate com o corpus (REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block)). O exit 1 não bloquear é justamente o fail-open que o core já cura com onFailure: block."
+    trace: "https://code.claude.com/docs/en/hooks"
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "tabela 'Exit code 2 behavior per event'"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_CC_EXIT2_OVERRIDES_ALLOW_BYPASS_UNSTATED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-02"
+    verified_against: "https://code.claude.com/docs/en/hooks — votos 3-0, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "No Claude Code o exit 2 prevalece sobre JSON: nem permissionDecision 'allow' deixa a ação passar. A página NÃO afirma que o exit 2 barra sob bypassPermissions — isso vem de medição própria do corpus."
+    narrative: "Votos 3-0. A lacuna sobre bypassPermissions já está fechada no corpus por medição (E_PRETOOLUSE_BARRA_SOB_BYPASS em maestro-vivo-2026-08, citado em codex-as-core-2026-10); o fato 'barra sob bypass' fica ancorado na medição, não na doc."
+    trace: "https://code.claude.com/docs/en/hooks"
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "seção de precedência entre exit code e JSON (permissionDecision)"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_VIBE_HOOK_JSON_DENY_STRICT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-02"
+    verified_against: "https://github.com/MistralAI/mistral-vibe — votos 3-0, tier 9; reconferido pelo Elenxo em https://docs.mistral.ai/vibe/code/cli/hooks"
+    source_tier: 9
+    source_kind: primary
+    label: "Os hooks do Mistral Vibe barram por JSON decision: deny com exit 0; exit não-zero é falha, e só com strict=true a falha vira negação. O contrato difere do exit 2: o gerador da porta traduz o veto."
+    narrative: "Votos 3-0. O Elenxo confirmou na doc de hooks: 'when strict is true, parse and runtime failures become denials (pre_tool)', default false. A favor: strict=true é o único fail-closed por hook documentado entre os harnesses abertos lidos."
+    trace: "https://github.com/MistralAI/mistral-vibe"
+    provenance:
+      source: "https://github.com/MistralAI/mistral-vibe"
+      locator: "README, seção Hooks (decision deny, strict)"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_QWEN_PRETOOLUSE_EXIT2_SKILLS_PAGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-02"
+    verified_against: "https://qwenlm.github.io/qwen-code-docs/en/users/features/skills/ — votos 3-0, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "O Qwen Code sustenta hook PreToolUse que barra a chamada de ferramenta com exit 2, sem depender da cooperação do modelo ('Hooks run as code')."
+    narrative: "Votos 3-0, mas a 'equivalência ao Claude Code' que a claim original afirmava foi restringida por E_OBJECAO_QWEN_EQUIVALENCE_PROVES_LESS: a página é de skills, o veto é afirmado de passagem, e o caminho de falha (timeout, outros códigos) não está provado equivalente. A âncora correta do exit 2 é a página de hooks (C_SUPERACAO_20261102_QWEN_HOOKS_PAGE_ANCHOR). Confiança rebaixada de 0.85 para 0.7 pela objeção."
+    trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/skills/"
+    provenance:
+      source: "https://qwenlm.github.io/qwen-code-docs/en/users/features/skills/"
+      locator: "trecho 'Hooks run as code, so they do not depend on the model's cooperation'"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_QWEN_SKILLS_DIRS_READS_CLAUDE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-02"
+    verified_against: "https://qwenlm.github.io/qwen-code-docs/en/users/features/skills/ — votos 3-0, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "O Qwen Code usa skills SKILL.md com frontmatter YAML em .qwen/skills/ (projeto) e no home do usuário, e lê o diretório de skills de outros agentes (inclusive o do Claude Code) via skills.directories."
+    narrative: "Votos 3-0. Precisão do Elenxo: só vale CONFIGURADO, não por padrão ('Add the other agent's folder to skills.directories'), e as skills de extensão ficam fora."
+    trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/skills/"
+    provenance:
+      source: "https://qwenlm.github.io/qwen-code-docs/en/users/features/skills/"
+      locator: "seção de diretórios de skills (skills.directories)"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_QWEN_COMMAND_HOOK_EXIT2_BLOCKING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-02"
+    verified_against: "https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/ — votos 2-1, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "No Qwen Code, hook command em settings.json com exit 2 é erro bloqueante (stderr volta ao modelo); outros códigos não bloqueiam."
+    narrative: "Votos 2-1; o voto dissidente cai diante da primária ('exit 2 is a Blocking error. Ignores stdout, passes stderr as error feedback'). A equivalência ao Claude Code no caminho de falha (timeout, crash) segue sem medida."
+    trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/"
+    provenance:
+      source: "https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/"
+      locator: "tabela de exit codes do command hook"
+      method: "judges: votação adversarial 2-1 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_VIBE_PROGRAMMATIC_AUTO_APPROVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-02"
+    verified_against: "https://mistral.ai/news/devstral-2-vibe-cli/ — votos 3-0, tier 8; reconferido pelo Elenxo no README de github.com/mistralai/mistral-vibe"
+    valid_from: "2025-12-09"
+    source_tier: 8
+    source_kind: primary
+    label: "O Vibe CLI tem execução programática não interativa com auto-aprovação de ferramentas, config.toml para modelos e provedores locais e controle de permissões de ferramentas — relevante para CI e porta."
+    narrative: "Votos 3-0. O README atual confirma -p/--prompt, --auto-approve/--yolo, --output json|streaming e exit codes de 0 a 4. Não medido: se o veto do hook aparece no rc ou no json (E_OBJECAO_VIBE_VETO_SIGNAL_HEADLESS_UNMEASURED)."
+    trace: "https://mistral.ai/news/devstral-2-vibe-cli/"
+    provenance:
+      source: "https://mistral.ai/news/devstral-2-vibe-cli/"
+      locator: "anúncio de 2025-12-09, seção do Vibe CLI"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_RULESYNC_SINGLE_SOURCE_GENERATOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-11-02"
+    verified_against: "https://github.com/dyoshikawa/rulesync — votos 3-0, tier 7"
+    source_tier: 7
+    source_kind: primary
+    label: "O rulesync é gerador de fonte única (.rulesync/) que emite configuração para vários harnesses, com import e convert; a página não descreve ponte em runtime."
+    narrative: "Votos 3-0. O rulesync lista Hooks como feature e o Kiro emite hooks: o padrão de mercado 'gerador' cobre hooks em parte, o que reforça a forma gerador para a camada de transformação. Cobertura parcial e assimétrica por alvo (E_OBJECAO_TRANSPILER_PARTIAL_COVERAGE)."
+    trace: "https://github.com/dyoshikawa/rulesync"
+    provenance:
+      source: "https://github.com/dyoshikawa/rulesync"
+      locator: "README, descrição do projeto e tabela de features por alvo"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_CC_FAIL_OPEN_DEFAULT_ONFAILURE_295
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-11-02"
+    verified_against: "https://www.developersdigest.tech/blog/coding-agent-hooks-fail-open-vs-fail-closed-2026 — votos 3-0, tier 5; corroborado pelo corpus (E_ONFAILURE_IGNORADO_ANTES_DE_295, spikes de codex-as-core-2026-10)"
+    valid_from: "2026-10"
+    source_tier: 5
+    source_kind: engineer
+    label: "O Claude Code falha aberto por padrão em hooks e só tem fail-closed por onFailure: block a partir da v2.1.295; Codex e Gemini CLI não têm opção de fail-closed documentada."
+    narrative: "Votos 3-0, fonte tier 5 corroborada pelo corpus. Omissão apontada pelo Elenxo: o Vibe TEM fail-closed (strict=true), e isso pesa na escolha de porta sem invalidar o achado."
+    trace: "https://www.developersdigest.tech/blog/coding-agent-hooks-fail-open-vs-fail-closed-2026"
+    provenance:
+      source: "https://www.developersdigest.tech/blog/coding-agent-hooks-fail-open-vs-fail-closed-2026"
+      locator: "comparativo fail-open vs fail-closed por harness"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_RULER_GENERATOR_31_AGENTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-11-02"
+    verified_against: "https://github.com/intellectronica/ruler — votos 3-0, tier 5"
+    source_tier: 5
+    source_kind: engineer
+    label: "O Ruler é gerador de fonte única (.ruler/*.md concatenado e escrito por harness via 'ruler apply'), não ponte em runtime, e suporta 31 agentes, entre eles Claude Code, Codex CLI, Gemini CLI, OpenCode, Goose, Qwen Code e Mistral Vibe."
+    narrative: "Votos 3-0. O Elenxo contou 32 linhas, uma delas o pseudo-agente AGENTS.md, logo 31 agentes. A tabela do Ruler não lista skills para o Qwen Code, que as suporta: o transpilador atrasa em relação ao harness (custo de churn)."
+    trace: "https://github.com/intellectronica/ruler"
+    provenance:
+      source: "https://github.com/intellectronica/ruler"
+      locator: "README, tabela de agentes suportados"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_RULER_PER_HARNESS_NOT_PER_MODEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-11-02"
+    verified_against: "https://github.com/intellectronica/ruler — votos 3-0, tier 5; reforçado pelo Elenxo na config-reference do Codex"
+    source_tier: 5
+    source_kind: engineer
+    label: "O Ruler gera por HARNESS, não por modelo: Mistral, Gemma e Qwen só aparecem como harnesses (Mistral Vibe, Qwen Code), nunca como alvo de modelo. 'onion-gemma' como porta é erro de categoria."
+    narrative: "Votos 3-0; decisivo segundo o Elenxo. Reforço: a config-reference do Codex diz que a config local do projeto ignora 'model_provider, model_providers, notify, profile, profiles' e manda pôr chaves de provedor na config do usuário. O modelo é escolha do usuário, não da porta; Gemma não tem harness próprio."
+    trace: "https://github.com/intellectronica/ruler"
+    provenance:
+      source: "https://github.com/intellectronica/ruler"
+      locator: "README, lista de alvos (todos harnesses)"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_AAIF_AGENT_SKILLS_DONATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "https://powerdrill.ai/blog/agent-skills-agentic-ai-foundation — votos 3-0, tier 3; pertença reconferida pelo Elenxo em https://aaif.io/projects/ (sem data)"
+    valid_from: "2026-10-22"
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: "Segundo blog tier 3, a Anthropic doou o padrão Agent Skills à AAIF em 22/10/2026 e mais de 70 plataformas o integram; a primária aaif.io confirma só a PERTENÇA, sem data nem contagem."
+    narrative: "Votos 3-0, mas fonte vendor-on-competitor (sempre suspeita). E_OBJECAO_AAIF_SKILLS_DATE_TIER3: a data e o 70+ só vêm do powerdrill. A superação C_SUPERACAO_20261102_AAIF_SKILLS_MEMBERSHIP_PRIMARY entrega o fato que a decisão usa (Agent Skills é projeto da AAIF)."
+    trace: "https://powerdrill.ai/blog/agent-skills-agentic-ai-foundation"
+    provenance:
+      source: "https://powerdrill.ai/blog/agent-skills-agentic-ai-foundation"
+      locator: "parágrafo da doação de 22/10/2026"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_AAIF_TEN_PROJECTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-11-02"
+    verified_against: "https://powerdrill.ai/blog/agent-skills-agentic-ai-foundation — votos 3-0, tier 3; lista reconferida pelo Elenxo em https://aaif.io/projects/"
+    valid_from: "2025-12"
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: "A AAIF hospeda 10 projetos — Agent Router, Agent Skills, A2A, AGENTS.md, agentgateway, Goose, MCP, Open Responses, OpenEnv, OpenSandbox — e foi lançada em dez/2025 com três."
+    narrative: "Votos 3-0. O Elenxo confirmou a lista na primária aaif.io/projects; a data de lançamento não está na página. Padrão de mercado para portabilidade: AGENTS.md + Agent Skills + MCP sob a mesma fundação."
+    trace: "https://powerdrill.ai/blog/agent-skills-agentic-ai-foundation"
+    provenance:
+      source: "https://powerdrill.ai/blog/agent-skills-agentic-ai-foundation"
+      locator: "lista de projetos hospedados"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_AI_CODE_GUARDRAILS_CI_GATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "https://pypi.org/project/ai-code-guardrails/ — votos 3-0, tier 3"
+    valid_from: "2026-08-06"
+    source_tier: 3
+    source_kind: engineer
+    label: "O pacote ai-code-guardrails implementa guardas determinísticas como função pura do git diff, executáveis em qualquer CI e localmente, sem depender de harness nem de hook de agente."
+    narrative: "Votos 3-0, tier 3. Restringido por E_OBJECAO_CI_GATE_IS_FLOOR_NOT_SUBSTITUTE: gate por diff julga DEPOIS da ação; não impede o que o PreToolUse barra antes. A superação é interna: o gate de shell do próprio core já roda no CI do onion-codex."
+    trace: "https://pypi.org/project/ai-code-guardrails/"
+    provenance:
+      source: "https://pypi.org/project/ai-code-guardrails/"
+      locator: "descrição do pacote"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  - id: E_GEMINI_ELEVEN_HOOK_EVENTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-11-02"
+    verified_against: "https://geminicli.com/docs/hooks/reference/ — votos 3-0, tier 9"
+    source_tier: 9
+    source_kind: primary
+    label: "O Gemini CLI tem 11 eventos de hook (BeforeTool, AfterTool, BeforeAgent, AfterAgent, BeforeModel, BeforeToolSelection, AfterModel, SessionStart, SessionEnd, Notification, PreCompress), em settings.json, matcher regex, type command, timeout 60000 ms."
+    narrative: "Votos 3-0. Os nomes diferem do Claude Code (BeforeTool vs PreToolUse): exige tradução no gerador, sem invalidar o achado."
+    trace: "https://geminicli.com/docs/hooks/reference/"
+    provenance:
+      source: "https://geminicli.com/docs/hooks/reference/"
+      locator: "lista de eventos de hook"
+      method: "judges: votação adversarial 3-0 da rodada de 2026-11-02"
+      locality: "web"
+
+  # ═══════════════════ MERCADO / CAPITAL (cláusula 4) ═══════════════════
+
+  - id: E_MERCADO_PORTABILIDADE_SEM_CAPITAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "síntese do eixo mercado/capital da rodada de 2026-11-02: zero rodada, zero M&A, zero analista; sinal institucional só de fonte tier 3"
+    source_tier: 3
+    source_kind: aggregator
+    label: "SEM SINAL de capital: nenhuma rodada, M&A ou analista sobre portabilidade multi-harness. A AAIF consolida os padrões; os laboratórios de modelo aberto mantêm harness próprio; a portabilidade é ferramenta comunitária (Ruler, rulesync)."
+    narrative: "Leitura do sintetizador: Mistral (Vibe/Devstral), Qwen (Qwen Code) e Google (Gemini CLI) mantêm harness aberto próprio; o mercado de portabilidade é de geradores comunitários, não de produto financiado. Nenhum dado de capital indica demanda paga por porta multi-harness. Para a decisão: reforça o gatilho por demanda nomeada de adotante, não por aposta de mercado."
+    trace: "https://powerdrill.ai/blog/agent-skills-agentic-ai-foundation"
+    provenance:
+      source: "síntese do worker de mercado da rodada /onion-research de 2026-11-02"
+      locator: "seção Mercado do repasse do sintetizador"
+      method: "testimony: síntese de 1 agente sobre as fontes da rodada"
+      locality: "host"
+
+  # ═══════════════════ LACUNAS (cláusula 8 — lacuna vira nó) ═══════════════════
+
+  - id: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-02"
+    verified_against: "contagem direta sobre o repasse da rodada em 2026-11-02: 17 confirmadas, 8 refutadas, 0 não verificadas, 38 fontes e 37 claims cortadas, 44 objeções do Elenxo das quais 28 survives=true, 0 recusadas, 12 superações achadas"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "CONTABILIDADE: 17 confirmadas; 8 refutadas na votação; 0 não verificadas; 38 fontes e 37 claims cortadas por orçamento; Elenxo 44 objeções, 28 sobreviventes, 28 modeladas; 0 recusadas pelo motor; 12 superações, 12 modeladas."
+    narrative: "(A) REFUTADAS NA VOTAÇÃO (8; nem todas por fonte fraca — 6 em fonte tier >=7, e o Elenxo contesta 6 refutações): R1 Vibe segue Agent Skills e carrega AGENTS.md, projeção sem transformação de formato (tier 9; refutação contrariada, resta transformação de CONTEÚDO); R2 Qwen define CLAUDE_PROJECT_DIR e aceita matchers do Claude Code sem mudança (tier 9; refutação contrariada, mas tool_name no stdin é o id de runtime — superação QWEN_TOOL_NAME_RUNTIME_ID); R3 primária de dez/2025 do Vibe sem hooks/skills/subagentes/MCP (tier 8; superada pelo README atual); R4 rulesync com cobertura parcial (tier 7; 3 de 4 subafirmações confirmadas); R5 guard que converte erro em exit 2 portável entre CC, Cursor, Codex e Gemini (tier 5; portar o script não porta o enforcement); R6 Ruler com subagentes só em 5 harnesses e sem hooks (tier 5; refutação contrariada; Gemini e Qwen têm subagentes nativos); R7 Codex roda modelo aberto via oss_provider/[profiles.*] (tier 4; perfis viraram arquivos na 0.134.0); R8 Gemini CLI substituído pelo Antigravity CLI em 18/06/2026 (tier 9; só no tier gratuito e Google One). (B) NÃO VERIFICADAS por 403/truncagem: 0. (C) CORTADAS POR ORÇAMENTO: 38 fontes, 37 claims; entre as fontes não lidas: docs.mistral.ai/vibe/code/cli/hooks (lida depois pelo Elenxo), rtk-ai/rtk#3391, lilting.ch, commandcode.ai, atlan.com, paperclipped.de, arXiv 2604.21090, ics.com, docs.rs agent-harness-adapter-core, tembo.io. (D) OBJEÇÕES: 44 do Elenxo, 28 sobreviventes, 28 modeladas como E_OBJECAO_*; as 16 não sobreviventes (achados 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15, 17 e descartes dez/2025, guard portável, Codex oss) foram absorvidas nas narrativas. (E) RECUSADAS pelo motor (naoJulgada): 0. (F) SUPERAÇÕES: 12 achadas, 12 modeladas (7 com TRACES_TO para este nó, 5 para objeções). (G) NÃO MEDIDO E NOMEADO, decisivo para selar: modelo aberto em loop agêntico diante do veto (insiste ou contorna), fail-path de timeout em Qwen e Gemini, sinal do veto no rc/json do Vibe e do Qwen headless, inferência local sem GPU no ambiente do core, custo de churn por porta."
+    trace: "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml"
+    provenance:
+      source: "repasse da rodada /onion-research de 2026-11-02 ao write(KG)"
+      locator: "listas Confirmadas, Não verificadas/refutadas, Objeções do Elenxo e SUPERAÇÕES do repasse"
+      method: "testimony: contagem do repasse pela sessão que escreveu o grafo"
+      locality: "host"
+
+  # ═══════════════════ AS OPÇÕES (uma claim por opção, todas open) ═══════════════════
+
+  - id: C_OPCAO_A_GENERATOR_PER_HARNESS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: "OPÇÃO A: gerador por HARNESS (não por modelo), extensão do ops/publish-door.sh e do materialize-door.sh, com tabela de capacidades por alvo e tradução do contrato do veto; o modelo fica na config do usuário."
+    narrative: "A FAVOR: é a forma dos dois transpiladores de mercado (Ruler, rulesync), ambos geradores de fonte única; o core já projeta quatro portas por gerador; a porta é projeção, o core não muda, sem voltar ao agnosticismo. O Qwen Code é a tradução mais fina (exit 2, CLAUDE_PROJECT_DIR, matchers do Claude como apelido, leitura das skills do Claude). CONTRA: a paridade do veto se mede no caminho de falha, não no exit 2; o tool_name em runtime difere (run_shell_command); a camada de permissões também tem de ser traduzida; skills viajam em formato mas o conteúdo que cita ferramentas e @agentes do Claude precisa de reescrita; custo de churn de alvos não medido. Restringida pela maioria das objeções sobreviventes (CONSTRAINS)."
+    trace: "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml"
+
+  - id: C_OPCAO_B_RUNTIME_BRIDGE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.2
+    label: "OPÇÃO B: ponte em runtime — o core traduz eventos e hooks em execução para o harness alvo."
+    narrative: "A FAVOR: um único artefato em execução, sem projeção por porta. CONTRA: nenhum dos transpiladores de mercado lidos faz ponte (ambos geradores); a evidência sobrevivente aponta tool_name trocado ('Shell' vs 'Bash') e failClosed:false no import de hooks do Cursor — uma ponte que compara nome de ferramenta deixa passar; a única candidata de mercado (crate agent-harness-adapter-core) não foi lida. Puxa o core para o agnosticismo abandonado em 2026-05-18. Não refutada por evidência lida (por isso open, não refuted): restringida."
+    trace: "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml"
+
+  - id: C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "OPÇÃO C: só piso agnóstico — portar o gate de shell (.claude/validation) para o CI de qualquer harness, sem porta de harness."
+    narrative: "A FAVOR: o fosso medido do Onion está nas 26.596 linhas de shell agnóstico que REPROVA e roda em qualquer CI; já está provado no onion-codex ('Onion Validate (Codex)'); custo baixo, sem acoplamento. CONTRA: gate por diff julga depois da ação e não substitui o PreToolUse que barra antes (push em main, vazamento de env) — é o piso, não o substituto. Na recomendação do Elenxo, C é SEMPRE o piso, combinado a D agora e A no gatilho."
+    trace: "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml"
+
+  - id: C_OPCAO_D_NO_NEW_DOOR_UNTIL_DEMAND
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: "OPÇÃO D: não abrir porta nova agora — onion-codex segue como única linha viva até haver demanda medida de adotante nomeado."
+    narrative: "A FAVOR: sem sinal de capital nem de adotante pedindo harness aberto; modelo aberto em loop agêntico diante do veto não foi medido; nenhum spike do veto em Qwen ou Vibe; evita elefante branco. CONTRA: adia o aprendizado de portabilidade executável que o onion-codex já mostrou valer (achou o buraco da REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable) em TOML). Recomendação do Elenxo: D agora, com A como forma quando o gatilho disparar."
+    trace: "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml"
+
+  # ═══════════════════ A DECISÃO (OPEN — o maestro sela) ═══════════════════
+
+  - id: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: "DECISÃO ABERTA: portas do onion-core para outros harnesses e modelos — A gerador por harness · B ponte em runtime · C só piso agnóstico de CI · D nenhuma porta nova até demanda medida. Elenxo: D agora, A como forma no gatilho, C sempre piso, B rejeitada."
+    narrative: "RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação; texto integral do repasse): D agora, com A como forma quando o gatilho disparar. C é sempre o piso. B fica rejeitada. Por que rejeitar B: a evidência sobrevivente aponta o tool_name trocado ('Shell' vs 'Bash') e o failClosed:false do Cursor, e a ponte não tem medida de mercado (o adapter-core não foi lido). Os dois transpiladores de mercado (Ruler, rulesync) são geradores. Constraints que sobreviveram: (1) A porta é por HARNESS, nunca por modelo. 'onion-gemma' é erro de categoria (Gemma não tem harness), e 'onion-mistral' significa porta para o Vibe. A config do projeto no Codex ignora model_provider e profiles, logo o modelo é escolha do usuário, documentada na porta, não projetada por ela. (2) A paridade do veto se mede no caminho de falha, não só no exit 2. Gemini e Qwen tratam outros códigos como warning e calam sobre o timeout. Só o Claude Code (onFailure: block) e o Vibe (strict=true) documentam fail-closed. O gerador traduz o contrato (exit 2 para Qwen e Gemini; JSON deny com strict=true para o Vibe) e o guard fecha por construção. (3) O veto tem de aparecer como sinal de máquina no modo headless. O Codex exec saiu com rc=0 nas 9 rodadas que barraram, e no Vibe isso não foi medido. (4) A camada de permissões também é traduzida, porque a doc do CC recomenda permissões, e não hook, para deny rígido. (5) As skills viajam em formato (Agent Skills, SKILL.md, sob a AAIF; Vibe e Qwen leem), mas o conteúdo que cita ferramentas e @agentes do Claude precisa de reescrita ou fica core-only. (6) Não se volta ao agnosticismo. O core não muda por causa da porta: o gerador projeta, a porta perde capacidade declarada (ex.: handlers http/agent e PreModelSwitch ficam core-only), e a porta nunca alimenta a fonte. (7) O custo de churn dos alvos é real e não foi medido (Kiro dividido em dois, Ruler atrasado em relação às skills do Qwen). Primeira porta, quando houver gatilho: onion-qwen. É a tradução mais fina pela primária: PreToolUse com exit 2, CLAUDE_PROJECT_DIR definido, matchers do Claude 'work unchanged' e leitura das skills do Claude via skills.directories. Só nasce depois de um spike nos moldes do codex-as-core-2026-10: o veto barra sob YOLO, o timeout e o crash fecham, e o veto sai no rc e no json. A segunda é o Vibe (o melhor fail-path com strict=true, Agent Skills e AGENTS.md nativos, subagentes herdando hooks; mas sandbox só experimental e 0 nós no corpus). O Gemini CLI sai da fila (substituído pelo Antigravity no tier gratuito desde 18/06/2026 e não otimizado para o Gemini 4). Gatilho de demanda, contra elefante branco: um adotante nomeado no members.yaml que peça um harness ou modelo aberto por soberania de dados ou regulação, registrado como sinal no inbox. Sem esse sinal e sem spike verde, nenhuma porta nova. Antes de selar, falta medir modelo aberto em loop agêntico diante do veto, que hoje é lacuna aberta. Ressalva desta escrita: a superação QWEN_TOOL_NAME_RUNTIME_ID mostra que o stdin do Qwen carrega o id de runtime (run_shell_command, write_file), então 'matchers work unchanged' vale para a CONFIGURAÇÃO, não para o hook que ramifica em tool_name (ex.: .claude/hooks/house-code-gloss.sh l.312)."
+    trace: "/meta:decide de 2026-11-02 · rodada /onion-research em modo decisão sobre portas do onion-core"
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ──
+  # 28 sobreviventes entregues, 28 modeladas. Confiança <= 0.6 em TODAS: afirmação de UM agente,
+  # sem votação. 0 objeções recusadas pelo motor (naoJulgada) neste run.
+
+  - id: E_OBJECAO_GEMINI_FAIL_PATH_NOT_SAME_CONTRACT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://geminicli.com/docs/hooks/reference/ → 'Other: Warning ... the CLI continues with a warning'; sem regra de timeout; sem fail-closed"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): o exit 2 do Gemini CLI coincide, mas o contrato não é o mesmo no caminho de falha — outros códigos viram warning e seguem, o timeout não é documentado e não há opção fail-closed como o onFailure: block."
+    narrative: "Alvo: achado 1 (Gemini exit 2 = mesmo contrato do Claude Code). Critério E1_EVIDENCIA_CONTRARIA. A mesma página diz que o Gemini CLI foi substituído pelo Antigravity CLI em 18/06/2026 no tier gratuito e Google One e não foi otimizado para o Gemini 4 Argon: o alvo encolhe. Superação: nenhuma (um guard que converta todo erro interno em exit 2 é condição futura; Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA só foi medido no Claude Code)."
+    trace: "https://geminicli.com/docs/hooks/reference/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao alvo 'Achado 1' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_QWEN_EQUIVALENCE_PROVES_LESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/ → 'Non-blocking error. stderr only shown in debug mode, execution continues' + ausência de regra de timeout"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): o veto exit 2 do Qwen é afirmado de passagem numa página de skills; 'equivalente ao Claude Code' prova menos do que afirma — o caminho de falha (outros códigos, timeout) não está provado equivalente."
+    narrative: "Alvo: achado 6. Critério E2_PROVA_MENOS. A página de hooks diz que outros códigos são 'Non-blocking error ... execution continues' e não diz o que acontece no timeout; só PermissionDenied e PostToolBatch têm falha declarada aberta. Superação ACHADA (entrega): a âncora correta do exit 2 é a página de hooks (C_SUPERACAO_20261102_QWEN_HOOKS_PAGE_ANCHOR); a equivalência no fail-path segue sem medida."
+    trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao alvo 'Achado 6' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_AAIF_SKILLS_DATE_TIER3
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://aaif.io/projects/ → Agent Skills listado, sem data; data e contagem só em powerdrill.ai (tier 3)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): a primária aaif.io lista o Agent Skills mas não dá data para nenhum projeto; a doação em 22/10/2026 e o '70+ plataformas' só vêm de blog tier 3."
+    narrative: "Alvo: achado 14. Critério E2_PROVA_MENOS. Superação ACHADA (entrega): a pertença do Agent Skills à AAIF pela primária (C_SUPERACAO_20261102_AAIF_SKILLS_MEMBERSHIP_PRIMARY); data e contagem seguem sem fonte."
+    trace: "https://aaif.io/projects/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao alvo 'Achado 14' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CI_GATE_IS_FLOOR_NOT_SUBSTITUTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-02"
+    verified_against: "bash .claude/validation/kg-corpus-grep.sh 'ai-code-guardrails' (sem nó no corpus) + CLAUDE.md: a capacidade que COMPRA o acoplamento barra a ação"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): gate por git diff julga DEPOIS da ação e não impede o que o PreToolUse barra antes (push em main, vazamento de env); o CI é o piso, não o substituto do veto."
+    narrative: "Alvo: achado 16 (ai-code-guardrails, tier 3). Critério E2_PROVA_MENOS. Superação ACHADA (entrega): o gate agnóstico do próprio core (.claude/validation/, 26.596 linhas de shell) já portado e rodando no CI do onion-codex como 'Onion Validate (Codex)' (C_SUPERACAO_20261102_CORE_SHELL_GATE_IN_CODEX_CI). Limita a opção C a piso."
+    trace: "CLAUDE.md"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao alvo 'Achado 16' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_VIBE_SKILLS_FORMAT_NATIVE_CONTENT_REWRITE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://github.com/mistralai/mistral-vibe → 'Vibe follows the Agent Skills specification' e 'You can create AGENTS.md files'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): a refutação de 'Vibe segue Agent Skills e carrega AGENTS.md' é contrariada pela primária; a transformação que resta é de CONTEÚDO (nomes de ferramenta do Claude, @agentes), não de formato."
+    narrative: "Alvo: descarte por comodismo (R1). Critério E1_EVIDENCIA_CONTRARIA. skill_paths custom aceitam qualquer diretório. Superação: nenhuma — só a doc declara; não há spike carregando uma skill do core no Vibe; kg-corpus-grep 'Vibe' = 0 nós (2026-11-02)."
+    trace: "https://github.com/mistralai/mistral-vibe"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao descarte 'Vibe segue Agent Skills e carrega AGENTS.md' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_QWEN_MATCHERS_UNCHANGED_UNMEASURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/ → 'QWEN_PROJECT_DIR, CLAUDE_PROJECT_DIR and GEMINI_PROJECT_DIR are set' e 'works unchanged'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): a primária contraria a refutação — o Qwen define CLAUDE_PROJECT_DIR em todo command hook e um matcher copiado do Claude Code ('Bash', 'Write|Edit') 'works unchanged'; a doc ressalva ancorar ids de runtime."
+    narrative: "Alvo: descarte por comodismo (R2). Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — declarado pela doc e não medido; não há spike equivalente ao codex-as-core-2026-10, e o fail-path do timeout não está documentado. Ver também C_SUPERACAO_20261102_QWEN_TOOL_NAME_RUNTIME_ID: o tool_name no stdin é o id de runtime."
+    trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao descarte 'Qwen define CLAUDE_PROJECT_DIR e aceita matchers' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_TRANSPILER_PARTIAL_COVERAGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://github.com/dyoshikawa/rulesync → 'commands is global-only'; 'excluded from --targets \"*\"'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): três de quatro subafirmações da cobertura parcial do rulesync se confirmam (Codex commands global-only, ignore deprecado em favor de permissions, plugins fora de --targets '*'); só a do Kiro está errada."
+    narrative: "Alvo: descarte por comodismo (R4). Critério E1_EVIDENCIA_CONTRARIA. A tese da cobertura parcial fica de pé. Superação: nenhuma — rulesync e Ruler declaram lacunas por alvo, e nenhum cobre o exit 2 traduzido com caminho de falha fechado."
+    trace: "https://github.com/dyoshikawa/rulesync"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao descarte 'transpilador com cobertura parcial' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_RULER_SUBAGENTS_FIVE_NO_HOOKS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://github.com/intellectronica/ruler → lista de 5 alvos de subagente + 'skipped with a warning'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): a primária do Ruler confirma verbatim 5 alvos de subagente (Claude Code, Cursor, Codex TOML, Copilot, OpenCode), Gemini CLI 'skipped with a warning' e nenhuma menção a hooks."
+    narrative: "Alvo: descarte por comodismo (R6). Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — o Ruler não emite subagente para Vibe nem Qwen; o rulesync tem Hooks sem mapeamento por alvo legível. Ver C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN: os harnesses têm a primitiva; quem não propaga é o Ruler."
+    trace: "https://github.com/intellectronica/ruler"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao descarte 'Ruler: subagentes só em 5 harnesses; hooks não tratados' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_GEMINI_CLI_REPLACED_ANTIGRAVITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://geminicli.com/docs/hooks/reference/ → 'replaced by Antigravity CLI on June 18th, 2026'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): a primária contraria a refutação — o Gemini CLI foi substituído pelo Antigravity CLI em 18/06/2026 (tier gratuito e Google One) e não foi otimizado para o Gemini 4 Argon. Tira o Gemini CLI da fila."
+    narrative: "Alvo: descarte por comodismo (R8). Critério E1_EVIDENCIA_CONTRARIA. O descarte só valeria pelo escopo (os pagos seguem no Gemini CLI), e não foi esse o argumento. Superação: nenhuma — a doc de hooks do Antigravity CLI não foi lida; onion-antigravity está CONGELADO."
+    trace: "https://geminicli.com/docs/hooks/reference/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção ao descarte 'Gemini CLI substituído pelo Antigravity CLI' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_GEMINI_EVENT_NAMES_NEED_TRANSLATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'cortada por orçamento' sem voto de refutação; achado 17 corrobora (BeforeTool vs PreToolUse)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada por orçamento sem refutação — no Gemini os nomes de evento e o matcher mcp_<server>_<tool> diferem dos do Claude Code; precisa de tabela de tradução no gerador."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — não existe no core tabela de tradução de eventos Claude→Gemini nem gerador."
+    trace: "https://geminicli.com/docs/hooks/reference/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'Gemini: nomes de evento e matcher diferem' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_OPEN_MODEL_AGENTIC_LOOP_UNMEASURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "lacuna 'evidência de modelos abertos em loops agênticos' sem claim ancorada; fontes ics.com e tembo.io marcadas 'fonte não lida'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortou-se sem medida a única evidência do run sobre modelo aberto em loop agêntico (Devstral 2 72,2% SWE-bench; Sonnet 4.5 preferido em avaliação humana); o comportamento do modelo aberto diante do veto não foi medido."
+    narrative: "Alvo: claim cortada por orçamento. Critério E4_LACUNA_ABERTA. Superação: nenhuma — não há benchmark de modelo aberto rodando o loop do Onion (veto + skills) nem medida de se o modelo insiste ou contorna o veto. É a pré-condição nomeada na recomendação antes de selar."
+    trace: "https://mistral.ai/news/devstral-2-vibe-cli/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'Devstral 2 72,2% SWE-bench' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_DEVSTRAL_GPU_LOCAL_INFERENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'cortada por orçamento' sem refutação; memória vps-optimization-state (VPS sem GPU)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada sem medida — Devstral 2 exige 4×H100 e o Small 2 (Apache, 256K) roda em 1 GPU; isso decide a viabilidade de uma porta 'local/soberana', e o ambiente do core não tem GPU."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — não há GPU medida no ambiente do core nem claim no run."
+    trace: "https://mistral.ai/news/devstral-2-vibe-cli/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'Devstral 2 exige 4×H100' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_VIBE_ACP_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.4
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'cortada por orçamento'; primária do ACP não lida"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada sem medida — o Vibe integra o Zed via ACP (Kilo Code e Cline parceiros); o ACP é mais um protocolo fora da AAIF que a porta teria de considerar. Peso baixo."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — a primária do ACP não foi lida."
+    trace: "https://github.com/mistralai/mistral-vibe"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'Vibe integra o Zed via ACP' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_GENERATORS_IGNORE_A2A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "README do rulesync lido em 2026-11-02 não menciona A2A"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada sem medida — geradores de mercado (rulesync) adotam só AGENTS.md e Agent Skills como padrões abertos e ignoram A2A e a AAIF como um todo; isso qualifica o 'padrão de mercado'."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — nenhum gerador de mercado lido trata A2A; o Onion A2A (perfil do A2A aberto) fica fora do que a porta projeta por gerador de terceiro."
+    trace: "https://github.com/dyoshikawa/rulesync"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'rulesync só lista AGENTS.md e Agent Skills' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_RULESYNC_NO_GEMINI_VIBE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://github.com/dyoshikawa/rulesync → 'Neither is named as a supported target' (Gemini CLI, Mistral Vibe)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada mas verdadeira — o rulesync cobre Qwen, Codex, goose e opencode, mas não Gemini CLI nem Mistral Vibe; nenhum gerador único cobre todas as candidatas."
+    narrative: "Alvo: claim cortada por orçamento. Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — o rulesync não cobre o Vibe; o Ruler cobre, mas sem hooks. Reforça que o gerador do Onion é próprio (extensão do publish-door), não terceiro."
+    trace: "https://github.com/dyoshikawa/rulesync"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'rulesync cobre Qwen, Codex, goose, opencode' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_TARGET_CHURN_COST_UNMEASURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "lacuna 'custos de manutenção de transpiladores multi-harness' sem claim ancorada; divisão do Kiro confirmada no README do rulesync"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): o custo de churn de alvos (Kiro dividido em kiro-cli e kiro-ide, roo/continue em fim de vida) foi cortado sem medida e responde direto à pergunta (3) sobre manutenção."
+    narrative: "Alvo: claim cortada por orçamento. Critério E4_LACUNA_ABERTA. Superação: nenhuma — o CLAUDE.md conta 18+ re-materializações da porta onion-core, mas não mede horas nem quebras por porta."
+    trace: "https://github.com/dyoshikawa/rulesync"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'custo de churn de alvos em transpiladores' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CURSOR_SHELL_TOOLNAME_FAILOPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'cortada por orçamento' sem refutação; primária do Cursor não lida (primário citado, não lido)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente; primário citado, não lido): o Cursor importa hooks do Claude Code com tool_name 'Shell' e failClosed: false — um guard que compara o nome da ferramenta deixa a chamada passar. Evidência mais forte contra ponte em runtime."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — a primária do Cursor não foi lida; o onion-cursor está CONGELADO. Limita a opção B sem refutá-la por evidência lida."
+    trace: "https://cursor.com/docs/agent/hooks"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'Cursor importa hooks com tool_name Shell e failClosed false' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CODEX_HOOK_IS_SAFEGUARD_NOT_BOUNDARY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "grep -n 'Falha aberta 3' docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md; corpus C_PIECE_RULES_SANDBOX_PARTIAL_1026 e E_SPIKE_DOC_HOOK_FAIL_OPEN_DECLARED_1026"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada mas corroborada pelo corpus — no Codex o hook é salvaguarda, não fronteira; a fronteira é sandbox e aprovação."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — a SYNTHESIS do codex-as-core-2026-10 diz que as rules do execpolicy e os hooks gerenciados (requirements.toml) não foram testados."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'no Codex o hook é salvaguarda, não fronteira' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CODEX_VETO_NOT_IN_RC_OR_JSON
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-02"
+    verified_against: "grep -n 'sinal de máquina estável' docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md; corpus E_SPIKE_S1_BLOCK_SIGNAL_NOT_IN_RC_OR_JSON_1026"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada mas coerente com o corpus — no Codex campo não suportado reporta e deixa seguir, hook com wrapper errado sai 0 sem disparar e o veto não aparece no rc nem no --json."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — o spike de 2026-10-26 mediu rc=0 nas 9 rodadas que barraram; o sinal de veto estável no codex exec segue lacuna aberta. Fundamenta a constraint (3) da recomendação."
+    trace: "docs/evolution/research/codex-as-core-2026-10/SYNTHESIS.md"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'hooks do Codex parecidos com os do CC' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CC_HANDLER_TYPES_CORE_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'cortada por orçamento'; corpus E_REVERIFY_1027_SEIS_HOOKS_COM_ONFAILURE conta 26 hooks command"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada sem medida — o contrato de hooks do CC tem 5 tipos de handler e dezenas de eventos; o gerador só traduz o handler command, e http, mcp_tool, prompt, agent e PreModelSwitch ficam core-only."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — não há inventário dos tipos de handler usados pelo core além dos 26 hooks command. Fundamenta a constraint (6): a porta perde capacidade declarada."
+    trace: "https://code.claude.com/docs/en/hooks"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'contrato de hooks do CC é específico' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CC_SAME_EVENTS_SETUP_UNEXAMINED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.4
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'cortada por orçamento'; primária não lida"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada sem medida — os mesmos eventos valem em todas as superfícies do CC, com Setup em -p; peso baixo para as portas, mas a decisão não a examinou."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: n/a para as portas (só vale para o próprio Claude Code); primária não lida."
+    trace: "https://code.claude.com/docs/en/hooks"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'mesmos eventos em todas as superfícies do CC' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_PERMISSIONS_LAYER_MUST_TRANSLATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'cortada por orçamento' sem refutação; doc do CC (hook não concede aprovação; o if é best-effort; para deny rígido, use permissões)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): cortada sem medida e atinge a tese do moat — se a doc do CC recomenda permissões, e não hook, para deny rígido, a porta precisa traduzir também a camada de permissões, não só o exit 2."
+    narrative: "Alvo: claim cortada por orçamento. Critério E3_DESCARTE_SEM_MEDIDA. Superação: nenhuma — não existe mapeamento das permissões do core para as de cada harness; o rulesync tem a feature 'permissions', não medida para as candidatas. Fundamenta a constraint (4)."
+    trace: "https://code.claude.com/docs/en/hooks"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'hook não concede aprovação; para deny rígido, use permissões' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_VIBE_VETO_SIGNAL_HEADLESS_UNMEASURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://github.com/mistralai/mistral-vibe → tabela de exit codes 0–4"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): o Vibe roda não interativo (--prompt/pipe, json/streaming, exit 0–4), mas não se mediu se o veto do hook aparece no rc ou no --output json — a falha que o Codex teve."
+    narrative: "Alvo: claim cortada por orçamento. Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — nem a doc de hooks nem o README dizem como a negação aparece no json; não há spike."
+    trace: "https://github.com/mistralai/mistral-vibe"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'Vibe não interativo por --prompt/pipe' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_VIBE_SANDBOX_EXPERIMENTAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "WebFetch https://docs.mistral.ai/vibe/code/cli/hooks → 'Subagents inherit the parent's hook configuration'; README: sandbox 'Not built in'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): o Vibe tem MCP e subagentes que herdam os hooks do pai, mas sandbox 'Not built in' — só no --agent-socket experimental e sem Windows."
+    narrative: "Alvo: claim cortada por orçamento. Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — não há sandbox estável medida no Vibe. Por isso o Vibe é a SEGUNDA porta na recomendação, não a primeira."
+    trace: "https://docs.mistral.ai/vibe/code/cli/hooks"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à cortada 'Vibe: MCP e subagentes; sandbox só no --agent-socket' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_VIBE_HOOKS_PRIMARY_CORPUS_ZERO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-11-02"
+    verified_against: "bash .claude/validation/kg-corpus-grep.sh 'Vibe' → '208 grafos · termos: vibe · 0 nó(s)'"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): a primária de hooks do Vibe (docs.mistral.ai/vibe/code/cli/hooks) não foi lida no run, e o corpus não sabe nada do Vibe (0 nós)."
+    narrative: "Alvo: fonte não lida. Critério E2_PROVA_MENOS. Superação ACHADA (entrega): o Elenxo leu a primária em 2026-11-02, que confirma o achado 5 e acrescenta strict=true e a herança dos hooks nos subagentes (C_SUPERACAO_20261102_VIBE_HOOKS_PRIMARY_READ)."
+    trace: "https://docs.mistral.ai/vibe/code/cli/hooks"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção à 'Fonte não lida — docs.mistral.ai/vibe/code/cli/hooks' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_HOOK_TIMEOUT_FAILPATH_UNMEASURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "lacuna 'hooks e enforcement nos harnesses abertos': timeout e fail-path sem claim ancorada; rtk-ai/rtk#3391, lilting.ch e commandcode.ai não lidos"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): as fontes sobre hooks em harnesses abertos (rtk-ai/rtk#3391, lilting.ch, commandcode.ai) não foram lidas; o comportamento em timeout segue sem medida justo onde Gemini e Qwen calam."
+    narrative: "Alvo: fontes não lidas. Critério E4_LACUNA_ABERTA. Superação: nenhuma — as primárias lidas (geminicli.com, docs do Qwen) não dizem nada sobre timeout; não há spike. Fundamenta a constraint (2) e o spike pré-condição do onion-qwen."
+    trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção às 'Fontes não lidas — rtk-ai/rtk#3391, lilting.ch, commandcode.ai' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_AAIF_SOURCES_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-02"
+    verified_against: "prompt do run: 'fonte não lida' para atlan.com, paperclipped.de e arXiv 2604.21090 (primário citado, não lido)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): atlan.com, paperclipped.de e o arXiv 2604.21090 (primário citado, não lido) não foram lidos; data e contagem da doação dependem de tier 3, e o arXiv poderia ancorar a interoperabilidade real das skills."
+    narrative: "Alvo: fontes não lidas. Critério E3_DESCARTE_SEM_MEDIDA. Superação ACHADA (entrega): aaif.io/projects como primária da pertença (C_SUPERACAO_20261102_AAIF_PROJECTS_PAGE_AS_PRIMARY); entrega a pertença, não a data."
+    trace: "https://aaif.io/projects/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção às 'Fontes não lidas — atlan.com, paperclipped.de, arXiv 2604.21090' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_OPEN_MODEL_SKILL_ACTIVATION_BRIDGE_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.4
+    verified_at: "2026-11-02"
+    verified_against: "lacuna 'modelos abertos em loops agênticos' e 'ponte em runtime' sem claim ancorada; ics.com, docs.rs agent-harness-adapter-core e tembo.io não lidos"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): ics.com ('make Qwen Code actually use your skills') sugere que modelo aberto não ativa skills de forma confiável; o crate agent-harness-adapter-core seria evidência de ponte em runtime, e ninguém o leu."
+    narrative: "Alvo: fontes não lidas. Critério E4_LACUNA_ABERTA. O eixo 'aconselha' (o markdown acoplado) é o que a porta mais carrega, e a ativação de skill por modelo aberto não foi medida. Superação: nenhuma — fontes não lidas, corpus sem nó sobre o tema. Limita a opção B (sem medida de ponte de mercado) e a decisão (pré-condição antes de selar)."
+    trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/skills/"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
+      locator: "objeção às 'Fontes não lidas — ics.com, docs.rs agent-harness-adapter-core, tembo.io' (survives=true)"
+      method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  # ═══════════════════ SUPERAÇÕES (SAC-151 — reprovação que achou o que supera vira nó) ═══════════════════
+  # 12 achadas, 12 modeladas: 7 com TRACES_TO para E_LACUNAS (refutadas na votação), 5 para E_OBJECAO_*.
+
+  - id: C_SUPERACAO_20261102_QWEN_TOOL_NAME_RUNTIME_ID
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O Qwen Code segue o contrato de hooks do Claude Code no ENVELOPE (PreToolUse, exit 2, permissionDecision, CLAUDE_PROJECT_DIR, Bash/Read/Write como apelido de matcher), mas o tool_name no stdin é o id de runtime: hook que ramifica em tool_name precisa de reescrita ou shim."
+    narrative: "Medida: três WebFetch da primária de hooks do Qwen Code (exit codes, apelidos de matcher, tool_name no stdin e schema de saída) e um grep no core em .claude/hooks/*.sh, que achou a comparação literal com 'Write'/'Edit' em .claude/hooks/house-code-gloss.sh l.312. Sem a reescrita, a guarda passa a deixar tudo passar em silêncio. Critério V2_CONTRADITA. Alvo reprovado (R2): 'Qwen tem hooks compatíveis com Claude Code ... camada de transformação gerada é fina'."
+    trace: "WebFetch https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/ (tool_name 'run_shell_command', 'write_file'); grep -n 'name not in (\"Write\", \"Edit\")' .claude/hooks/house-code-gloss.sh (l.312)"
+
+  - id: C_SUPERACAO_20261102_VIBE_README_CURRENT_PIECES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O README atual do mistralai/mistral-vibe (Apache-2.0, movido por Devstral) declara MCP, skills na spec Agent Skills, subagentes, hooks herdados pelos subagentes, sandbox experimental via --agent-socket e modo não interativo; falta medir se o hook barra de forma determinística."
+    narrative: "Medida: WebFetch de github.com/mistralai/mistral-vibe em 2026-11-02 com trechos verbatim de cada peça, confrontado com o anúncio de 2025-12-09 em mistral.ai/news/devstral-2-vibe-cli/, onde nenhuma aparece. Critério V4_DESATUALIZADA. Alvo reprovado (R3): 'a fonte primária de dez/2025 não cita hooks, skills, subagentes, MCP nem sandbox'."
+    trace: "WebFetch https://github.com/mistralai/mistral-vibe e procurar 'Hooks wire arbitrary shell commands', 'Agent Skills specification', 'agent_type = \"subagent\"', 'configure MCP', '--agent-socket'"
+
+  - id: C_SUPERACAO_20261102_RULESYNC_ASYMMETRIC_KIRO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Mesmo com fonte única, o rulesync tem cobertura parcial e assimétrica: Codex commands só global; ignore deprecado em favor de permissions; plugins fora de --targets '*'; e no Kiro só kiro-cli/kiro-ide emitem hooks válidos (o alias kiro escreve onde o CLI não lê)."
+    narrative: "Medida: grep no README atual do rulesync (main, baixado em 2026-11-02): l.83 (Codex global-only), l.176 (ignore→permissions), l.178 (plugins excluídos de --targets '*'), l.180 (hooks Kiro em kiro-cli/kiro-ide; o alias deprecado escreve em .kiro/agents/default.json, que o CLI não lê), tabela l.133-135. Critério V1_QUOTE_NAO_SUSTENTA. Alvo reprovado (R4): 'hooks do Kiro só no alias deprecado'."
+    trace: "curl -sL https://raw.githubusercontent.com/dyoshikawa/rulesync/main/README.md | grep -n -F 'both emit hooks as a single'"
+
+  - id: C_SUPERACAO_20261102_EXIT2_PRE_ACTION_FOUR_HARNESSES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Exit 2 bloqueia nos eventos PRÉ-ação de Claude Code, Cursor, Codex e Gemini CLI; um guard que traduz em exit 2 os próprios erros CAPTURADOS porta o bloqueio; fail-closed contra hang/timeout exige config por harness (onFailure:block, failClosed:true), sem equivalente no Codex."
+    narrative: "Medida: WebFetch em 2026-11-02 das quatro docs oficiais (code.claude.com/docs/en/hooks, cursor.com/docs/agent/hooks, learn.chatgpt.com/docs/hooks, geminicli.com/docs/hooks/), com trechos verbatim: bloqueio por exit 2 no evento pré-ação nas quatro; ressalva de timeout e de evento pós-ação em três. Critério V2_CONTRADITA. Alvo reprovado (R5): 'um script de guard que converte qualquer erro interno em exit 2 é portável entre os quatro harnesses'."
+    trace: "WebFetch https://learn.chatgpt.com/docs/hooks e grep -F 'can fail the hook without blocking the tool'; WebFetch https://code.claude.com/docs/en/hooks e grep -F \"doesn't block the tool call\""
+
+  - id: C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O Ruler (experimental) só PROPAGA subagentes para 5 alvos, mas subagentes nativos existem também no Gemini CLI (.gemini/agents/*.md, ligados por padrão) e no Qwen Code (.qwen/agents/*.md), em Markdown com frontmatter no formato do Claude Code."
+    narrative: "Medida: WebFetch do README do Ruler (5 alvos, 'skipped with a warning'); WebFetch de geminicli.com/docs/core/subagents/ (Last updated Jun 8, 2026: '.gemini/agents/*.md', 'Subagents are enabled by default'); doc do Qwen Code (.qwen/agents/, /agents create). O README do Ruler não menciona hooks: fora dele por omissão, não por declaração. Critério V2_CONTRADITA. Alvo reprovado (R6)."
+    trace: "WebFetch https://geminicli.com/docs/core/subagents/ e grep -F '.gemini/agents/*.md'; WebFetch https://qwenlm.github.io/qwen-code-docs/en/users/features/sub-agents/ e grep -F '.qwen/agents'"
+
+  - id: C_SUPERACAO_20261102_CODEX_OSS_PROFILE_FILES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O Codex CLI roda modelo aberto local via --oss com oss_provider ou --local-provider, mais [model_providers.*]; desde a 0.134.0 perfis são arquivos de overlay <nome>.config.toml no CODEX_HOME, não [profiles.*]; em codex exec o provedor local tem de estar definido."
+    narrative: "Medida: WebFetch em 2026-11-02 da doc primária learn.chatgpt.com/docs/config-file/config-advanced, com citações verbatim de --oss, --local-provider/oss_provider, provedores reservados (ollama/lmstudio), a mudança de --profile na 0.134.0 e o erro de codex exec sem provedor; confrontado com o blog-fonte, que ainda traz [profiles.local-deepseek]. Continua sendo ponte em tempo de configuração, sem gerador por porta: o modelo é do usuário. Critério V2_CONTRADITA. Alvo reprovado (R7)."
+    trace: "WebFetch https://learn.chatgpt.com/docs/config-file/config-advanced e grep -F 'In Codex 0.134.0 and later, `--profile` no longer reads `[profiles.profile-name]` from `config.toml`'"
+
+  - id: C_SUPERACAO_20261102_GEMINI_CLI_RETAIL_SUNSET_SCOPE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Em 18/06/2026 o Gemini CLI deixou de servir AI Pro/Ultra e o uso gratuito, que passaram ao Antigravity CLI; segue por chave de API paga e licença Code Assist Standard/Enterprise, e não é otimizado para o Gemini 4 Argon: linha em descontinuação no varejo."
+    narrative: "Medida: WebFetch em 2026-11-02 de geminicli.com/docs/hooks/reference/ (banner com o qualificador de escopo) e de developers.googleblog.com (frases de escopo e de acesso mantido). O Antigravity CLI manteria Agent Skills, Hooks, Subagents e Extensions como plugins, segundo o blog (texto do repasse cortado aí). Critério V1_QUOTE_NAO_SUSTENTA. Alvo reprovado (R8): 'O Gemini CLI foi substituído' sem o qualificador."
+    trace: "WebFetch https://geminicli.com/docs/hooks/reference/ e grep -F 'Unpaid tier and Google One users: Gemini CLI was replaced by Antigravity CLI'; WebFetch https://developers.googleblog.com/en/an-important-update-transitioning-gemini-cli-to-antigravity-cli/"
+
+  - id: C_SUPERACAO_20261102_QWEN_HOOKS_PAGE_ANCHOR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A âncora correta do veto exit 2 do Qwen Code é a página de HOOKS, não a de skills: 'exit 2 is a Blocking error. Ignores stdout, passes stderr as error feedback'."
+    narrative: "Medida: WebFetch da página de hooks em 2026-11-02. Entrega a ancoragem do veto; a equivalência no caminho de falha segue sem medida. Critério E2_PROVA_MENOS. Alvo reprovado: achado 6 (Qwen PreToolUse barra com exit 2, equivalente ao Claude Code)."
+    trace: "WebFetch https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/ → 'Non-blocking error. stderr only shown in debug mode, execution continues'"
+
+  - id: C_SUPERACAO_20261102_AAIF_SKILLS_MEMBERSHIP_PRIMARY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A pertença do Agent Skills à AAIF se ancora na primária: aaif.io/projects lista 'Agent Skills' entre os 10 projetos hospedados."
+    narrative: "Medida: aaif.io/projects lido em 2026-11-02. Entrega o fato que a decisão usa (o formato das skills é padrão aberto sob fundação); data e contagem seguem sem fonte. Critério E2_PROVA_MENOS. Alvo reprovado: achado 14 (doação em 22/10/2026, 70+ plataformas)."
+    trace: "WebFetch https://aaif.io/projects/ → Agent Skills listado, sem data"
+
+  - id: C_SUPERACAO_20261102_CORE_SHELL_GATE_IN_CODEX_CI
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O gate agnóstico do próprio core (.claude/validation/, 26.596 linhas de shell) já está portado e roda no CI do onion-codex como 'Onion Validate (Codex)' — o valor 'gate em CI agnóstico' sem pacote de terceiro."
+    narrative: "Medida: o CLAUDE.md registra a linha viva onion-codex com gate determinístico próprio (.codex/validation/ + CI). Medida interna. Critério E2_PROVA_MENOS. Alvo reprovado: achado 16 (ai-code-guardrails como gate em CI agnóstico)."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'ai-code-guardrails' + CLAUDE.md: 'a capacidade que COMPRA o acoplamento ... barra a ação'"
+
+  - id: C_SUPERACAO_20261102_VIBE_HOOKS_PRIMARY_READ
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A primária de hooks do Vibe foi lida: confirma o veto por JSON deny, acrescenta strict=true (falha vira negação em pre_tool) e a herança dos hooks nos subagentes."
+    narrative: "Medida: WebFetch de docs.mistral.ai/vibe/code/cli/hooks em 2026-11-02, com os trechos verbatim citados nas objeções. Critério E2_PROVA_MENOS. Alvo reprovado: fonte não lida (docs.mistral.ai/vibe/code/cli/hooks); o corpus tinha 0 nós sobre o Vibe."
+    trace: "bash .claude/validation/kg-corpus-grep.sh 'Vibe' → '208 grafos · termos: vibe · 0 nó(s)'"
+
+  - id: C_SUPERACAO_20261102_AAIF_PROJECTS_PAGE_AS_PRIMARY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "aaif.io/projects serve de primária para a pertença do Agent Skills à AAIF, no lugar de atlan.com, paperclipped.de e do arXiv 2604.21090 não lidos; entrega a pertença, não a data."
+    narrative: "Medida: aaif.io/projects lido em 2026-11-02 — Agent Skills entre os 10 projetos. Critério E3_DESCARTE_SEM_MEDIDA. Alvo reprovado: fontes não lidas (atlan.com, paperclipped.de, arXiv 2604.21090)."
+    trace: "prompt do run: 'fonte não lida' para as três URLs; WebFetch https://aaif.io/projects/"
+
+edges:
+
+  # ── evidências sustentam a pergunta ──
+  - from: E_GEMINI_HOOK_EXIT2_BLOCKS_STDERR
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_GEMINI_HOOK_JSON_DENY_BLOCK
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_CC_EXIT2_BLOCKING_EXIT1_NOT
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_CC_EXIT2_OVERRIDES_ALLOW_BYPASS_UNSTATED
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_VIBE_HOOK_JSON_DENY_STRICT
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_QWEN_PRETOOLUSE_EXIT2_SKILLS_PAGE
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_QWEN_SKILLS_DIRS_READS_CLAUDE
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_QWEN_COMMAND_HOOK_EXIT2_BLOCKING
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_VIBE_PROGRAMMATIC_AUTO_APPROVE
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_RULESYNC_SINGLE_SOURCE_GENERATOR
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_CC_FAIL_OPEN_DEFAULT_ONFAILURE_295
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_RULER_GENERATOR_31_AGENTS
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_RULER_PER_HARNESS_NOT_PER_MODEL
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_AAIF_AGENT_SKILLS_DONATION
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_AAIF_TEN_PROJECTS
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_AI_CODE_GUARDRAILS_CI_GATE
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_GEMINI_ELEVEN_HOOK_EVENTS
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_MERCADO_PORTABILIDADE_SEM_CAPITAL
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: SUPPORTS
+
+  # ── a decisão responde a pergunta; opções são candidatas da decisão ──
+  - from: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    to: Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11
+    edge_type: TRACES_TO
+  - from: C_OPCAO_A_GENERATOR_PER_HARNESS
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_RUNTIME_BRIDGE
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: SUPPORTS
+  - from: C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: SUPPORTS
+  - from: C_OPCAO_D_NO_NEW_DOOR_UNTIL_DEMAND
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: SUPPORTS
+
+  # ── evidências que sustentam opções ──
+  - from: E_RULESYNC_SINGLE_SOURCE_GENERATOR
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: SUPPORTS
+  - from: E_RULER_GENERATOR_31_AGENTS
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: SUPPORTS
+  - from: E_RULER_PER_HARNESS_NOT_PER_MODEL
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: SUPPORTS
+  - from: E_QWEN_COMMAND_HOOK_EXIT2_BLOCKING
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: SUPPORTS
+  - from: E_QWEN_SKILLS_DIRS_READS_CLAUDE
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: SUPPORTS
+  - from: E_VIBE_HOOK_JSON_DENY_STRICT
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: SUPPORTS
+  - from: E_AAIF_TEN_PROJECTS
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: SUPPORTS
+  - from: E_AI_CODE_GUARDRAILS_CI_GATE
+    to: C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY
+    edge_type: SUPPORTS
+  - from: E_MERCADO_PORTABILIDADE_SEM_CAPITAL
+    to: C_OPCAO_D_NO_NEW_DOOR_UNTIL_DEMAND
+    edge_type: SUPPORTS
+
+  # ── objeções sobreviventes LIMITAM (CONSTRAINS) — 28 objeções ──
+  - from: E_OBJECAO_GEMINI_FAIL_PATH_NOT_SAME_CONTRACT
+    to: E_GEMINI_HOOK_EXIT2_BLOCKS_STDERR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GEMINI_FAIL_PATH_NOT_SAME_CONTRACT
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_QWEN_EQUIVALENCE_PROVES_LESS
+    to: E_QWEN_PRETOOLUSE_EXIT2_SKILLS_PAGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_QWEN_EQUIVALENCE_PROVES_LESS
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AAIF_SKILLS_DATE_TIER3
+    to: E_AAIF_AGENT_SKILLS_DONATION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CI_GATE_IS_FLOOR_NOT_SUBSTITUTE
+    to: E_AI_CODE_GUARDRAILS_CI_GATE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CI_GATE_IS_FLOOR_NOT_SUBSTITUTE
+    to: C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_VIBE_SKILLS_FORMAT_NATIVE_CONTENT_REWRITE
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_QWEN_MATCHERS_UNCHANGED_UNMEASURED
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TRANSPILER_PARTIAL_COVERAGE
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RULER_SUBAGENTS_FIVE_NO_HOOKS
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GEMINI_CLI_REPLACED_ANTIGRAVITY
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GEMINI_EVENT_NAMES_NEED_TRANSLATION
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPEN_MODEL_AGENTIC_LOOP_UNMEASURED
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DEVSTRAL_GPU_LOCAL_INFERENCE
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_VIBE_ACP_UNREAD
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GENERATORS_IGNORE_A2A
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RULESYNC_NO_GEMINI_VIBE
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TARGET_CHURN_COST_UNMEASURED
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CURSOR_SHELL_TOOLNAME_FAILOPEN
+    to: C_OPCAO_B_RUNTIME_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CODEX_HOOK_IS_SAFEGUARD_NOT_BOUNDARY
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CODEX_VETO_NOT_IN_RC_OR_JSON
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CC_HANDLER_TYPES_CORE_ONLY
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CC_SAME_EVENTS_SETUP_UNEXAMINED
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PERMISSIONS_LAYER_MUST_TRANSLATE
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_VIBE_VETO_SIGNAL_HEADLESS_UNMEASURED
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_VIBE_SANDBOX_EXPERIMENTAL
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_VIBE_HOOKS_PRIMARY_CORPUS_ZERO
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HOOK_TIMEOUT_FAILPATH_UNMEASURED
+    to: C_OPCAO_A_GENERATOR_PER_HARNESS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AAIF_SOURCES_UNREAD
+    to: E_AAIF_AGENT_SKILLS_DONATION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPEN_MODEL_SKILL_ACTIVATION_BRIDGE_UNREAD
+    to: C_OPCAO_B_RUNTIME_BRIDGE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPEN_MODEL_SKILL_ACTIVATION_BRIDGE_UNREAD
+    to: D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11
+    edge_type: CONSTRAINS
+
+  # ── superações rastreiam a reprovação que registram (TRACES_TO) — 12 ──
+  - from: C_SUPERACAO_20261102_QWEN_TOOL_NAME_RUNTIME_ID
+    to: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_VIBE_README_CURRENT_PIECES
+    to: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_RULESYNC_ASYMMETRIC_KIRO
+    to: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_EXIT2_PRE_ACTION_FOUR_HARNESSES
+    to: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN
+    to: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_CODEX_OSS_PROFILE_FILES
+    to: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_GEMINI_CLI_RETAIL_SUNSET_SCOPE
+    to: E_LACUNAS_ONION_CORE_PORTS_2026_11
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_QWEN_HOOKS_PAGE_ANCHOR
+    to: E_OBJECAO_QWEN_EQUIVALENCE_PROVES_LESS
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_AAIF_SKILLS_MEMBERSHIP_PRIMARY
+    to: E_OBJECAO_AAIF_SKILLS_DATE_TIER3
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_CORE_SHELL_GATE_IN_CODEX_CI
+    to: E_OBJECAO_CI_GATE_IS_FLOOR_NOT_SUBSTITUTE
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_VIBE_HOOKS_PRIMARY_READ
+    to: E_OBJECAO_VIBE_HOOKS_PRIMARY_CORPUS_ZERO
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261102_AAIF_PROJECTS_PAGE_AS_PRIMARY
+    to: E_OBJECAO_AAIF_SOURCES_UNREAD
+    edge_type: TRACES_TO
