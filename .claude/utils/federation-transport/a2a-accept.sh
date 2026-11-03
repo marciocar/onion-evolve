@@ -45,14 +45,16 @@
 # LOG DE SOMBRA (PLAN-E §2 da curadoria, 2026-11-03): cada aceite NOVO grava uma linha `human_decision: accept`
 #   no log de sombra do aceite (a2a-metrics.py shadow-append), com os ids do CloudEvent lidos do corpo DEPOIS da
 #   reverificação (ce_source, ce_id, ce_time; o corpo nunca vai ao log), o jti assinado e o taskId. A regra v1 é a
-#   linha de base declarada (aceita todo registro verificado). O log mora fora de árvore git, 0600:
-#   --shadow-log <arq>, ou A2A_SHADOW_LOG, ou ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl.
-#   Log que não se pode escrever = RECUSA antes do doc (aceite sem medida abriria buraco no denominador).
+#   linha de base declarada (rule_id baseline-accept-all, que nunca liga a regra automática). O log mora fora de
+#   árvore git, 0600: --shadow-log <arq>, ou A2A_SHADOW_LOG, ou
+#   ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl. Log que não aceita a linha NÃO barra o aceite
+#   (julgamento da curadoria, ponto f): a falha vai alto ao stderr e vira marcador em shadow-gap.log (A2A_SHADOW_GAP_LOG,
+#   ou o mesmo diretório padrão), e o shadow-stats sai rc 2 em toda janela com lacuna. Nem o marcador gravado = rc 1.
 #
 # Uso : a2a-accept.sh <pending-record.json> [--inbox <dir>] [--receiver <id>] [--trust-repo <path>]
 #                     [--invites <a2a-invites.json>] [--ledger <arquivo>] [--shadow-log <arquivo>]
 # Exit: 0 = aceito (ou já existia) · 1 = recusado (reverificação vetou/divergiu, malformado, revogado) ·
-#       2 = uso incorreto. O doc criado com a linha de sombra falhada sai 1 com AVISO (aceito, mas fora da medida).
+#       2 = uso incorreto. Aceito com a linha de sombra E o marcador de lacuna falhados sai 1 (aceito, buraco não registrado).
 # Exercitado por lint-selftest.sh (run_a2a_accept_selftests).
 # =============================================================================
 set -uo pipefail
@@ -296,9 +298,6 @@ if [ -n "${EXIST}" ] || [ -n "${LEDGER_TASK}" ]; then
   refuse "o jti deste envelope já foi aceito por OUTRO registro (${EXIST:-razão de aceites}) — replay ou registro forjado reaproveitando o jti; nada sobrescrito."
 fi
 mkdir -p "${INBOX}"
-# o log de sombra tem de aceitar a linha ANTES do doc nascer: aceite sem a linha seria um buraco no denominador
-SH_ERR="$(python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" --check 2>&1 >/dev/null)" \
-  || refuse "o log de sombra do aceite não aceita escrita (${SH_ERR#\[a2a-metrics\] ERRO: }) — nada aceito; corrija o log ou aponte --shadow-log."
 
 q() { jq -Rn --arg v "$1" '$v'; }   # string JSON = escalar YAML entre aspas duplas (nada cru no YAML)
 if [ -n "${BODY_PATH}" ]; then
@@ -367,13 +366,20 @@ DOC_SHA="$(openssl dgst -sha256 < "${TMP}/doc.md" | awk '{print $NF}')"
 ( umask 077; printf '%s %s %s %s\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" "${DOC_SHA}" >> "${LEDGER}" ) 2>/dev/null \
   || echo "AVISO: o doc foi criado, mas o razão de aceites (${LEDGER}) não foi gravado: o dedupe fica só pelo nome." >&2
 
-# a linha de sombra: decisão humana = accept; a regra v1 (linha de base) aceita todo registro reverificado
-if ! SH_OUT="$(python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" --mode shadow --rule-decision accept \
+# a linha de sombra: decisão humana = accept; a regra v1 (linha de base) aceita todo registro reverificado.
+# Falha da linha NÃO desfaz o aceite: o a2a-metrics registra a lacuna (rc 4); sem nem a lacuna, rc 1
+SH_RC=0
+SH_OUT="$(python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" --point accept --mode shadow --rule-decision accept \
       --human-decision accept --jti "${JTI}" --task-id "${TASKID}" --ce-source "${CE_SOURCE}" --ce-id "${CE_ID}" \
-      --ce-time "${CE_TIME}" 2>&1)"; then
-  echo "AVISO: o doc foi criado, mas a linha do log de sombra falhou (${SH_OUT}): este aceite fica FORA da medida." >&2
-  echo "aceito → ${OUT}"
-  exit 1
-fi
+      --ce-time "${CE_TIME}" 2>&1)" || SH_RC=$?
+case "${SH_RC}" in
+  0) ;;
+  4) printf '%s\n' "${SH_OUT}" >&2
+     echo "AVISO ALTO: o aceite valeu, mas a linha de sombra NÃO foi gravada — LACUNA registrada; o shadow-stats não mede esta janela até o log ser corrigido." >&2 ;;
+  *) printf '%s\n' "${SH_OUT}" >&2
+     echo "ERRO: o aceite valeu, mas nem a linha de sombra nem o marcador de lacuna foram gravados — buraco NÃO registrado na medida; corrija o log." >&2
+     echo "aceito → ${OUT}"
+     exit 1 ;;
+esac
 echo "aceito → ${OUT}"
 echo "  (próximo: /meta:co-evolve p/ triar, lendo o DOC — nunca o JSON da fila; e limpar o registro da fila do bridge — ato humano)" >&2

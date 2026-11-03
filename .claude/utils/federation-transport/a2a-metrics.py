@@ -9,8 +9,16 @@
 #   ce             o parse do CloudEvent dentro do corpo do sinal (só id, source, type e time; nunca o corpo)
 #   shadow-append  uma linha do log de sombra do aceite (nasce no a2a-accept.sh e no archive --force-unaccepted)
 #   shadow-stats   a concordância regra × humano e a taxa de reversão          (o "a2a-shadow-stats" do PLAN-E)
+#                  days_covered = DIAS COMPLETOS APÓS O 1º: a diferença em dias UTC entre a 1ª linha da regra vigente
+#                  e hoje (a linha de hoje dá 0). Lacuna registrada (shadow-gap.log) na janela = rc 2
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
+#                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
+#                  (preconditions_missing); o critério do PLAN-D sai em auto_send_criterion_met
+#
+# LACUNA (julgamento da curadoria, ponto f): a linha de sombra que não se grava NÃO barra o aceite nem o archive. O
+# shadow-append grava então um marcador em shadow-gap.log (data, ponto, jti, taskId; as mesmas regras de 0600 fora
+# do git) e sai 4; o shadow-stats sai 2 em toda janela que contém lacuna. Se nem o marcador se grava, sai 2.
 # Um arquivo só, e não três comandos, porque o escritor (line_id, 0600, fora de árvore git, trava) e o parse do
 # CloudEvent são os mesmos para todos: três cópias divergiriam.
 #
@@ -22,7 +30,8 @@
 #
 # EXIT dos contadores (PLAN-E §0): 0 mediu e nenhum gatilho disparou · 1 mediu e algum gatilho disparou ·
 #   2 não pôde medir (arquivo ausente ou ilegível, linha malformada) · 3 uso inválido.
-# EXIT dos escritores: 0 linha gravada (ou --check ok) · 2 não gravou · 3 uso inválido.
+# EXIT dos escritores: 0 linha gravada (ou --check ok) · 2 não gravou (nem a lacuna) · 3 uso inválido ·
+#   4 (só shadow-append) a linha falhou e a LACUNA foi registrada em shadow-gap.log.
 # Exercitado por lint-selftest.sh (run_a2a_accept_selftests: ce e sombra; run_a2a_rt_selftests: rascunhos).
 # =============================================================================
 import calendar
@@ -40,7 +49,7 @@ MODES = ("shadow", "auto")
 DRAFT_EVENTS = ("drafted", "sent", "discarded", "blocked_out_of_list", "sent_out_of_list",
                 "kill_switch_on", "kill_switch_off", "blocked_rate_cap")
 SHADOW_KEYS = ("line_id", "logged_at", "mode", "ce_source", "ce_id", "ce_time", "jti", "taskId", "rule_id",
-               "rule_version", "rule_decision", "human_decision", "reason", "human_actor", "supersedes")
+               "rule_version", "rule_decision", "human_decision", "reason", "human_actor", "supersedes", "ids_verified")
 DRAFT_KEYS = ("line_id", "logged_at", "draft_id", "thread", "recipient", "supersedes_draft", "event", "actor")
 # critérios do PLAN-D, sem mudar (PLAN-E §2 e §3)
 RULE_ON_DAYS, RULE_ON_EVENTS, RULE_ON_AGREEMENT = 14, 50, 0.95
@@ -50,8 +59,13 @@ WINDOW_7D = 7 * 86400
 AUTO_SEND_SAMPLE, AUTO_SEND_RATE = 30, 0.90
 DISCARD_SECONDS = 24 * 3600         # escolha da curadoria: rascunho sem sent e sem substituto em 24 h = descartado
 # a regra v1 do aceite é a LINHA DE BASE declarada: aceita todo registro verificado. Não há regra de verdade ainda;
-# uma regra nova troca a versão, e a contagem recomeça (PLAN-E §2)
-RULE_ID, RULE_VERSION = "accept-rule", "1"
+# uma regra nova troca o rule_id ou a versão, e a contagem recomeça (PLAN-E §2). Julgamento da curadoria (2026-11-03,
+# ponto d): a linha de base NUNCA liga a regra automática: com ela, trigger_rule_on sai false com o motivo
+RULE_ID, RULE_VERSION = "baseline-accept-all", "1"
+BASELINE_RULE_IDS = ("baseline-accept-all",)
+# julgamento da curadoria (ponto e): o envio automático exige lista fechada, chave de corte e teto de taxa NO CORE.
+# Enquanto faltarem, trigger_auto_send sai null (nunca true). Quem construir uma das três a tira daqui
+AUTO_SEND_PRECONDITIONS_MISSING = ("closed_list", "kill_switch", "rate_cap")
 
 UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\Z")
 TS_RE = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\Z")
@@ -137,6 +151,22 @@ def default_shadow_log(receiver):
     if not ID_RE.fullmatch(receiver or ""):
         raise UsageError("--receiver fora da forma [A-Za-z0-9._-] (1º caractere letra ou dígito)")
     return os.path.join(state_home(), "onion", "a2a-metrics", f"accept-shadow.{receiver}.jsonl")
+
+
+def default_gap_log():
+    x = os.environ.get("A2A_SHADOW_GAP_LOG", "")
+    return x if x else os.path.join(state_home(), "onion", "a2a-metrics", "shadow-gap.log")
+
+
+def read_gaps(path):
+    """→ epochs das lacunas (None = linha ilegível: lacuna de hora desconhecida). Arquivo ausente = nenhuma lacuna."""
+    if not os.path.lexists(path):
+        return []
+    out = []
+    for _, o in read_log(path):
+        t = o.get("logged_at") if isinstance(o, dict) else None
+        out.append(stamp_epoch(t) if isinstance(t, str) and TS_RE.fullmatch(t) else None)
+    return out
 
 
 def default_draft_log():
@@ -235,12 +265,13 @@ def _actor():
 
 # ─────────────────────────────── log de sombra ───────────────────────────────
 def shadow_line(mode, rule_decision, human_decision, *, ce_source=None, ce_id=None, ce_time=None, jti=None,
-                task_id=None, reason=None, supersedes=None, rule_id=RULE_ID, rule_version=RULE_VERSION, actor=None):
+                task_id=None, reason=None, supersedes=None, rule_id=RULE_ID, rule_version=RULE_VERSION, actor=None,
+                ids_verified=True):
     obj = {"line_id": new_line_id(), "logged_at": utc_stamp(), "mode": mode, "ce_source": ce_source, "ce_id": ce_id,
            "ce_time": ce_time, "jti": jti, "taskId": task_id, "rule_id": rule_id, "rule_version": rule_version,
            "rule_decision": rule_decision, "human_decision": human_decision, "reason": reason,
            "human_actor": actor if actor is not None else (_actor() if human_decision is not None else None),
-           "supersedes": supersedes}
+           "supersedes": supersedes, "ids_verified": ids_verified}
     why = validate_shadow(obj)
     if why:
         raise UsageError(f"linha de sombra inválida: {why}")
@@ -270,13 +301,21 @@ def validate_shadow(o):
         return "rule_id/rule_version ausentes"
     if o["supersedes"] is not None and (not isinstance(o["supersedes"], str) or not UUID_RE.fullmatch(o["supersedes"])):
         return "supersedes fora da forma UUID"
+    if not isinstance(o["ids_verified"], bool):
+        return "ids_verified não é booleano"
     if not event_key(o):
-        return "sem chave de evento (ce_source + ce_id, ou jti)"
+        return "sem chave de evento (ce_source + ce_id, ou jti; com ids_verified false, o taskId)"
     return ""
 
 
 def event_key(o):
-    """Evento = par ce_source + ce_id (CloudEvents: source + id é único), ou o jti quando o corpo não tem CloudEvent."""
+    """Evento = par ce_source + ce_id (CloudEvents: source + id é único), ou o jti quando o corpo não tem CloudEvent.
+
+    Linha com ids_verified false (a recusa do archive: o registro nunca passou pela reverificação) deduplica pelo
+    taskId que o bridge gerou, NUNCA pelos ce_* ou pelo jti, que quem escreve na fila escolhe (curadoria, ponto c).
+    """
+    if o.get("ids_verified") is False:
+        return ("task", o["taskId"]) if o.get("taskId") else None
     if o.get("ce_source") and o.get("ce_id"):
         return ("ce", o["ce_source"], o["ce_id"])
     if o.get("jti"):
@@ -294,8 +333,9 @@ def _kappa(conf, total):
     return round((po - pe) / (1 - pe), 4)
 
 
-def shadow_stats(lines, now, queue_rows=None):
-    """→ (saída, rc). `lines` = read_log(); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None)."""
+def shadow_stats(lines, now, queue_rows=None, gaps=()):
+    """→ (saída, rc). `lines` = read_log(); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None);
+    `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
     malformed = 0
     valid = []
     for _, o in lines:
@@ -303,11 +343,12 @@ def shadow_stats(lines, now, queue_rows=None):
             malformed += 1
         else:
             valid.append(o)
-    out = {"rule_version": None, "since": None, "days_covered": 0, "events": 0, "undecided": None, "agree": 0,
+    out = {"rule_id": None, "rule_version": None, "since": None, "days_covered": 0, "events": 0, "undecided": None, "agree": 0,
            "agreement": None, "mode": None, "decisions_7d": 0, "reversals_7d": 0, "reversal_rate_7d": None,
            "malformed": malformed, "trigger_rule_on": None, "trigger_back_to_shadow": None,
-           "confusion": {r: {h: 0 for h in DECISIONS} for r in DECISIONS}, "kappa": None}
-    all_keys = {event_key(o) for o in valid}
+           "confusion": {r: {h: 0 for h in DECISIONS} for r in DECISIONS}, "kappa": None,
+           "rule_on_criterion_met": None, "trigger_rule_on_reason": None, "gaps_in_window": 0}
+    all_keys = {event_key(o) for o in valid} | {("task", o["taskId"]) for o in valid if o.get("taskId")}
     if queue_rows is not None:
         und = 0
         for r in queue_rows:
@@ -317,14 +358,17 @@ def shadow_stats(lines, now, queue_rows=None):
             if now - stamp_epoch(at[:19] + "Z") <= HOLD_SECONDS:
                 continue
             k = event_key({"ce_source": r.get("ce_source"), "ce_id": r.get("ce_id"), "jti": r.get("jti")})
-            if k is None or k not in all_keys:
+            if (k is None or k not in all_keys) and ("task", r.get("taskId")) not in all_keys:
                 und += 1
         out["undecided"] = und
     if not valid:
-        return out, (2 if malformed else 0)
+        out["gaps_in_window"] = len(gaps)
+        return out, (2 if malformed or gaps else 0)
     version = valid[-1]["rule_version"]
-    cur = [o for o in valid if o["rule_version"] == version]
+    rule_id = valid[-1]["rule_id"]
+    cur = [o for o in valid if o["rule_version"] == version and o["rule_id"] == rule_id]
     out["rule_version"] = version
+    out["rule_id"] = rule_id
     out["mode"] = cur[-1]["mode"]
     first = min(stamp_epoch(o["logged_at"]) for o in cur)
     out["since"] = utc_day(first).isoformat()
@@ -372,13 +416,23 @@ def shadow_stats(lines, now, queue_rows=None):
     out["decisions_7d"], out["reversals_7d"] = len(dec7), rev7
     out["reversal_rate_7d"] = round(rev7 / len(dec7), 4) if dec7 else None
     if out["mode"] == "shadow":
-        out["trigger_rule_on"] = bool(out["days_covered"] >= RULE_ON_DAYS and n_events >= RULE_ON_EVENTS
-                                      and out["agreement"] is not None and out["agreement"] >= RULE_ON_AGREEMENT)
+        met = bool(out["days_covered"] >= RULE_ON_DAYS and n_events >= RULE_ON_EVENTS
+                   and out["agreement"] is not None and out["agreement"] >= RULE_ON_AGREEMENT)
+        out["rule_on_criterion_met"] = met
+        if rule_id in BASELINE_RULE_IDS:
+            out["trigger_rule_on"] = False
+            out["trigger_rule_on_reason"] = (f"a regra {rule_id} é a linha de base (aceita tudo): ela nunca liga a "
+                                             "regra automática, por maior que seja a concordância")
+        else:
+            out["trigger_rule_on"] = met
     else:
         rate = out["reversal_rate_7d"]
         out["trigger_back_to_shadow"] = bool(rate > BACK_TO_SHADOW_RATE) if rate is not None else rev7 > 0
+    # a janela é a da regra vigente (desde a 1ª linha dela) e a dos 7 dias; lacuna de hora ilegível cai em todas
+    w_start = min(first, w0)
+    out["gaps_in_window"] = sum(1 for g in gaps if g is None or w_start <= g <= now)
     fired = out["trigger_rule_on"] is True or out["trigger_back_to_shadow"] is True
-    return out, (2 if malformed else (1 if fired else 0))
+    return out, (2 if malformed or out["gaps_in_window"] else (1 if fired else 0))
 
 
 # ─────────────────────────────── registro de rascunhos ───────────────────────────────
@@ -463,9 +517,13 @@ def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None):
            "trigger_auto_send": None, "trigger_back_to_draft": None,
            "closed": len(sample), "unregistered_sent": len([d for d in sent_at if d not in drafted]),
            "malformed": malformed}
+    out["preconditions_missing"] = list(AUTO_SEND_PRECONDITIONS_MISSING)
+    out["auto_send_criterion_met"] = None
     if last >= AUTO_SEND_SAMPLE:
-        out["trigger_auto_send"] = bool(len(sample) >= AUTO_SEND_SAMPLE and (
+        out["auto_send_criterion_met"] = bool(len(sample) >= AUTO_SEND_SAMPLE and (
             tail >= AUTO_SEND_SAMPLE or (out["unedited_rate"] is not None and out["unedited_rate"] >= AUTO_SEND_RATE)))
+        # sem as três salvaguardas no core o envio automático não liga, por melhor que seja a amostra
+        out["trigger_auto_send"] = None if out["preconditions_missing"] else out["auto_send_criterion_met"]
     if since_stage_on is not None:
         t_on = calendar.timegm(time.strptime(since_stage_on, "%Y-%m-%d"))
         acts = [o for o in valid if stamp_epoch(o["logged_at"]) >= t_on]
@@ -514,7 +572,7 @@ def _say_stats(kind, out, rc):
     print(f"[a2a-metrics] {kind}: " + " · ".join(f"{k}={json.dumps(v, ensure_ascii=False)}" for k, v in out.items()))
     print({0: "[a2a-metrics] mediu: nenhum gatilho disparou",
            1: "[a2a-metrics] mediu: GATILHO disparou (leve à mesa do maestro)",
-           2: "[a2a-metrics] NÃO PÔDE MEDIR por inteiro (linha malformada): nada aqui é verde"}[rc])
+           2: "[a2a-metrics] NÃO PÔDE MEDIR por inteiro (linha malformada ou lacuna na janela): nada aqui é verde"}[rc])
 
 
 def main(argv):
@@ -535,7 +593,8 @@ def main(argv):
     if cmd == "shadow-append":
         o = _opts(rest, {"--log": True, "--receiver": True, "--check": False, "--mode": True, "--rule-decision": True,
                          "--human-decision": True, "--reason": True, "--jti": True, "--task-id": True,
-                         "--ce-source": True, "--ce-id": True, "--ce-time": True, "--supersedes": True})
+                         "--ce-source": True, "--ce-id": True, "--ce-time": True, "--supersedes": True,
+                         "--ids-unverified": False, "--point": True, "--gap-log": True})
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         if o.get("--check"):
             check_log(log)
@@ -545,12 +604,27 @@ def main(argv):
                            _nullable(o.get("--human-decision")), ce_source=_nullable(o.get("--ce-source")),
                            ce_id=_nullable(o.get("--ce-id")), ce_time=_nullable(o.get("--ce-time")),
                            jti=_nullable(o.get("--jti")), task_id=_nullable(o.get("--task-id")),
-                           reason=_nullable(o.get("--reason")), supersedes=_nullable(o.get("--supersedes")))
-        append_line(log, line)
+                           reason=_nullable(o.get("--reason")), supersedes=_nullable(o.get("--supersedes")),
+                           ids_verified=not o.get("--ids-unverified"))
+        try:
+            append_line(log, line)
+        except MeasureError as e:
+            gap_log = o.get("--gap-log") or default_gap_log()
+            gap = {"logged_at": utc_stamp(), "point": o.get("--point", "accept"), "jti": line["jti"],
+                   "taskId": line["taskId"], "why": str(e)[:300]}
+            print(f"[a2a-metrics] LACUNA: a linha de sombra NÃO foi gravada ({e})", file=sys.stderr)
+            try:
+                append_line(gap_log, gap)
+            except MeasureError as e2:
+                raise MeasureError(f"nem a linha de sombra nem o marcador de lacuna foram gravados: {e2}")
+            print(f"[a2a-metrics] LACUNA registrada em {gap_log}: o shadow-stats sai rc 2 em toda janela que a contém",
+                  file=sys.stderr)
+            return 4
         print(f"ok: {log} line_id={line['line_id']}")
         return 0
     if cmd == "shadow-stats":
-        o = _opts(rest, {"--log": True, "--receiver": True, "--queue-jsonl": True, "--now": True, "--json": False})
+        o = _opts(rest, {"--log": True, "--receiver": True, "--queue-jsonl": True, "--now": True, "--json": False,
+                         "--gap-log": True})
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         rows = None
         if "--queue-jsonl" in o:
@@ -558,7 +632,7 @@ def main(argv):
                 rows = [json.loads(x) for x in open(o["--queue-jsonl"], encoding="utf-8") if x.strip()]
             except (OSError, ValueError) as e:
                 raise MeasureError(f"--queue-jsonl ilegível: {e}")
-        out, rc = shadow_stats(read_log(log), _now(o), rows)
+        out, rc = shadow_stats(read_log(log), _now(o), rows, read_gaps(o.get("--gap-log") or default_gap_log()))
         if o.get("--json"):
             print(json.dumps(out, ensure_ascii=False))
         else:

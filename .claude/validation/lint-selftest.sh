@@ -10977,7 +10977,7 @@ EOF
     out="$(cd "${d}" && env PATH="${QLR_PATH:-}${d}/stub:${PATH}" LC_ALL=C ONION_A2A_QUEUE_TEST=1 ONION_A2A_QUEUE_DIR="${d}/q" \
       ONION_A2A_QUEUE_INBOX="${d}/inbox" ONION_A2A_QUEUE_BACKUP="${QLR_BK:-${d}/bk.sh}" ONION_A2A_QUEUE_LOCK="${d}/lock" \
       ONION_A2A_QUEUE_METRICS="${REPO_ROOT}/.claude/utils/federation-transport/a2a-metrics.py" \
-      ONION_A2A_QUEUE_SHADOW_LOG="${QLR_SHADOW:-${d}/sh/shadow.jsonl}" \
+      ONION_A2A_QUEUE_SHADOW_LOG="${QLR_SHADOW:-${d}/sh/shadow.jsonl}" ONION_A2A_QUEUE_GAP_LOG="${d}/sh/gap.log" \
       ${QLR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
@@ -11180,8 +11180,8 @@ p = sys.argv[1]; r = json.load(open(p)); r["envelope"] = {"jws": "h.eyJqdGkiOiJq
 PY
     local r; r="$(_qlr "$1" archive s7.t7.json --force-unaccepted "recusa de teste da bancada" --apply)"; QL_WHY="${r:0:400}"
     _qlrc "${r}" 0 && [ "$(stat -c %a "${d}/sh/shadow.jsonl" 2>/dev/null)" = 600 ] \
-      && [ "$(jq -r 'select(.jti=="j-rej-1") | [.mode,.human_decision,.rule_decision,.reason,.taskId] | join(",")' "${d}/sh/shadow.jsonl" 2>/dev/null)" \
-           = "shadow,reject,accept,recusa de teste da bancada,t7" ] && ! grep -q CORPO-SECRETO "${d}/sh/shadow.jsonl"; }
+      && [ "$(jq -r 'select(.jti=="j-rej-1") | [.mode,.human_decision,.rule_decision,.reason,.taskId,.rule_id,.ids_verified] | map(tostring) | join(",")' "${d}/sh/shadow.jsonl" 2>/dev/null)" \
+           = "shadow,reject,accept,recusa de teste da bancada,t7,baseline-accept-all,false" ] && ! grep -q CORPO-SECRETO "${d}/sh/shadow.jsonl"; }
   _c_shgit() { git init -q "${d}/sh-git"; _qlrec "${d}/q/s8.t8.json" t8 membro-f null
     python3 -I - "${d}/q/s8.t8.json" <<'PY'
 import json, sys
@@ -11189,11 +11189,17 @@ p = sys.argv[1]; r = json.load(open(p)); r["envelope"] = {"jws": "h.eyJqdGkiOiJq
 PY
     local r; r="$(QLR_SHADOW="${d}/sh-git/x/shadow.jsonl" _qlr "$1" archive s8.t8.json --force-unaccepted "recusa de teste da bancada" --apply)"
     QL_WHY="${r:0:400}"; rm -rf "${d}/sh-git"
-    _qlrc "${r}" 2 && [ -f "${d}/q/s8.t8.json" ] && [ ! -e "${d}/q/_archived/s8.t8.json" ]; }
+    _qlrc "${r}" 0 && [ ! -e "${d}/q/s8.t8.json" ] && [ -f "${d}/q/_archived/s8.t8.json" ] && _qlhas "${r}" "LACUNA" \
+      && [ "$(jq -r '[.point,.taskId,.jti] | join(",")' "${d}/sh/gap.log" 2>/dev/null)" = "reject,t8,j-rej-1" ] \
+      && [ "$(stat -c %a "${d}/sh/gap.log")" = 600 ]; }
   _qlcase "(q36) archive --force-unaccepted grava a RECUSA humana no log de sombra (0600, jti do JWS, motivo, regra v1, sem corpo)" \
     '  SHADOW=1' '  SHADOW=0' _c_shrej
-  _qlcase "(q37) log de sombra que não aceita escrita (dentro de árvore git) → rc 2 e nada movido" \
-    '|| die 2 "o log de sombra do aceite não aceita escrita' '|| true "o log de sombra do aceite não aceita escrita' _c_shgit
+  _qlcase "(q37) log de sombra que não aceita a linha (árvore git) NÃO barra o archive: rc 0, movido, LACUNA alta em shadow-gap.log (0600)" \
+    "    4) printf '%s\\n[%s] AVISO ALTO" "    4) exit 1; printf '%s\\n[%s] AVISO ALTO" _c_shgit
+  _c_cntzero() { _c_cnt5 "$1" || return 1; local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    [ "$(_qljget "${r}" 'select(.ending) | .zero_vs_down')" = indistinguishable ]; }
+  _qlcase "(q38) count: a linha final declara zero_vs_down: indistinguishable (sem batimento do bridge, zero e fora não se distinguem)" \
+    '"zero_vs_down": "indistinguishable"}' '}' _c_cntzero
   rm -rf "${d}"
 }
 
@@ -17115,14 +17121,16 @@ PY
   _dsst() { local o r=0; _dsgen "$2" "${sb}/ds-$2.jsonl"; o="$(python3 -I "$1" draft-stats --log "${sb}/ds-$2.jsonl" --now "${DNOW}" --json "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
   _dsj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
   _ds27() { local r; r="$(_dsst "$1" a27 --last 30)"; DS_WHY="${r:0:400}"
-    [ "${r%%|*}" = 1 ] && [ "$(_dsj "${r}" '[.approved_unedited,.edited,.discarded,.unedited_rate,.trigger_auto_send,(.trigger_back_to_draft|tostring)] | map(tostring) | join(",")')" = "27,2,1,0.9,true,null" ]; }
+    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[.approved_unedited,.edited,.discarded,.unedited_rate,.auto_send_criterion_met,(.trigger_back_to_draft|tostring)] | map(tostring) | join(",")')" = "27,2,1,0.9,true,null" ]; }
   _ds26() { local r; r="$(_dsst "$1" a26 --last 30)"; DS_WHY="${r:0:400}"
-    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[.approved_unedited,.unedited_rate,.trigger_auto_send] | map(tostring) | join(",")')" = "26,0.8667,false" ]; }
+    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[.approved_unedited,.unedited_rate,.auto_send_criterion_met] | map(tostring) | join(",")')" = "26,0.8667,false" ]; }
   _dsvirt() { local r; r="$(_dsst "$1" virt --last 30)"; DS_WHY="${r:0:400}"
-    [ "${r%%|*}" = 1 ] && [ "$(_dsj "${r}" '[.closed,.approved_unedited,.discarded,.unedited_rate,.trigger_auto_send] | map(tostring) | join(",")')" = "30,29,1,0.9667,true" ] \
+    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[.closed,.approved_unedited,.discarded,.unedited_rate,.auto_send_criterion_met] | map(tostring) | join(",")')" = "30,29,1,0.9667,true" ] \
       && [ "$(jq -r 'select(.event=="discarded") | .draft_id' "${sb}/ds-virt.jsonl")" = d29 ]; }
   _dsks() { local r; r="$(_dsst "$1" ks --since-stage-on 2026-11-01)"; DS_WHY="${r:0:400}"
     [ "${r%%|*}" = 1 ] && [ "$(_dsj "${r}" '[.kill_switch_acts_since_on,.out_of_list_since_on,.trigger_back_to_draft] | map(tostring) | join(",")')" = "2,0,true" ]; }
+  _dspre() { local r; r="$(_dsst "$1" a27 --last 30)"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[(.preconditions_missing|join("+")),.auto_send_criterion_met,(.trigger_auto_send|tostring)] | map(tostring) | join(",")')" = "closed_list+kill_switch+rate_cap,true,null" ]; }
   _dscase() {  # _dscase <nome> <função> <âncora> <troca>
     local rc_i=1 rc_m=1; DS_WHY=""
     "$2" "${met}" && rc_i=0
@@ -17135,7 +17143,7 @@ PY
     "$2" "${mut}/ds-mut.py" && rc_m=0
     _prove_mutation "a2a-rt: $1 (MUT)" "${met}" "${mut}/ds-mut.py" "${rc_i}" "${rc_m}"
   }
-  _dscase "(g2) draft-stats: 30 rascunhos, 27 aprovados sem edição, 2 editados, 1 descartado → 0,90, trigger_auto_send, rc 1" _ds27 \
+  _dscase "(g2) draft-stats: 30 rascunhos, 27 aprovados sem edição, 2 editados, 1 descartado → 0,90, critério do envio automático cumprido" _ds27 \
     '        if did in superseded:' '        if False:'
   _dscase "(g3) draft-stats: 26 de 30 → 0,8667, NÃO dispara" _ds26 \
     '>= AUTO_SEND_RATE))' '>= AUTO_SEND_RATE - 0.05))'
@@ -17143,6 +17151,8 @@ PY
     '        elif did in disc_line or now > t0 + DISCARD_SECONDS:' '        elif did in disc_line:'
   _dscase "(g5) draft-stats: kill_switch_on seguido de off entre duas leituras → trigger_back_to_draft, rc 1" _dsks \
     'any(o["event"] == "kill_switch_on" for o in ks)' 'False'
+  _dscase "(g6) draft-stats: sem lista fechada, chave de corte e teto de taxa no core → preconditions_missing e trigger_auto_send null, nunca true" _dspre \
+    'AUTO_SEND_PRECONDITIONS_MISSING = ("closed_list", "kill_switch", "rate_cap")' 'AUTO_SEND_PRECONDITIONS_MISSING = ()'
   rm -rf "${sb}"
 }
 
@@ -17159,7 +17169,7 @@ run_a2a_accept_selftests() {
   local d tr ib out rc doc NOW
   d="$(mktemp -d)"; tr="${d}/trust"; ib="${d}/inbox"; mkdir -p "${ib}" "${tr}/docs/evolution/federation" "${tr}/.claude/utils/federation-transport/jwks"
   # o aceite grava o log de sombra (PLAN-E §2); a bancada nunca escreve no ~/.local/state de quem roda
-  local -x A2A_SHADOW_LOG="${d}/shadow/accept.jsonl"
+  local -x A2A_SHADOW_LOG="${d}/shadow/accept.jsonl" A2A_SHADOW_GAP_LOG="${d}/shadow/gap.log"
   cat > "${tr}/docs/evolution/federation/members.yaml" <<'YML'
 members:
   - id: onion-evolve
@@ -17445,8 +17455,8 @@ PY
     [ "${rc}" = 0 ] || return 1
     A2A_SHADOW_LOG="${shl}" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" >/dev/null 2>&1 || return 1
     [ "$(grep -c . "${shl}" 2>/dev/null)" = 1 ] && [ "$(stat -c %a "${shl}")" = 600 ] && ! grep -q SEGREDO "${shl}" || return 1
-    [ "$(jq -r '[.mode,.human_decision,.rule_decision,.ce_source,.ce_id,.ce_time,.jti,(.taskId|length>0)] | map(tostring) | join(",")' "${shl}")" \
-      = "shadow,accept,accept,/vigia/x,ev-42,2026-11-03T10:00:00Z,jti-ce-1,true" ]
+    [ "$(jq -r '[.mode,.human_decision,.rule_decision,.ce_source,.ce_id,.ce_time,.jti,(.taskId|length>0),.rule_id,.ids_verified] | map(tostring) | join(",")' "${shl}")" \
+      = "shadow,accept,accept,/vigia/x,ev-42,2026-11-03T10:00:00Z,jti-ce-1,true,baseline-accept-all,true" ]
   }
   if _shacc "${helper}"; then record_pass "a2a-accept: (sh1) o aceite grava UMA linha de sombra (accept, 0600) com o CloudEvent do corpo reverificado e o jti, sem o corpo; a repetição não grava outra"
   else record_fail "a2a-accept: (sh1) linha de sombra do aceite" "rc=${rc} out='$(head -c 300 <<< "${out}")' log=$(head -c 400 "${shl}" 2>/dev/null)"; fi
@@ -17460,23 +17470,25 @@ PY
   if _shacc "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: (sh1) mutante" "a linha sem os ids do CloudEvent passou"
   else record_pass "a2a-accept: (sh1) mutante: a linha sem os ids do CloudEvent reprova"; fi
   cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
-  # (sh2) log de sombra que não aceita escrita (dentro de árvore git) → RECUSA antes do doc: nada aceito
-  _shgit() {  # $1 = aceite → 0 se recusou sem doc
-    rm -rf "${ibs}" "${d}/ledger-sh" "${d}/gitlog"; mkdir -p "${ibs}"; git init -q "${d}/gitlog"
-    rc=0; out="$(A2A_SHADOW_LOG="${d}/gitlog/s.jsonl" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" 2>&1)" || rc=$?
-    [ "${rc}" = 1 ] && [ -z "$(find "${ibs}" -name '*.md')" ] && grep -q 'log de sombra' <<< "${out}"
+  # (sh2) log de sombra que não aceita a linha (árvore git) NÃO barra o aceite (curadoria, ponto f): o doc nasce,
+  # rc 0, a falha vai alto ao stderr e vira marcador em shadow-gap.log (0600) com o jti
+  _shgit() {  # $1 = aceite → 0 se aceitou e registrou a lacuna
+    rm -rf "${ibs}" "${d}/ledger-sh" "${d}/gitlog" "${d}/gap-sh.log"; mkdir -p "${ibs}"; git init -q "${d}/gitlog"
+    rc=0; out="$(A2A_SHADOW_LOG="${d}/gitlog/s.jsonl" A2A_SHADOW_GAP_LOG="${d}/gap-sh.log" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" 2>&1)" || rc=$?
+    [ "${rc}" = 0 ] && [ -n "$(find "${ibs}" -name '*.md')" ] && grep -q 'LACUNA' <<< "${out}" \
+      && [ "$(jq -r '[.point,.jti] | join(",")' "${d}/gap-sh.log" 2>/dev/null)" = "accept,jti-ce-1" ] && [ "$(stat -c %a "${d}/gap-sh.log")" = 600 ]
   }
-  if _shgit "${helper}"; then record_pass "a2a-accept: (sh2) log de sombra dentro de árvore git → RECUSA antes do doc (aceite sem medida não nasce)"
-  else record_fail "a2a-accept: (sh2) log de sombra inválido" "rc=${rc} out='$(head -c 300 <<< "${out}")'"; fi
+  if _shgit "${helper}"; then record_pass "a2a-accept: (sh2) log de sombra que não aceita a linha NÃO barra o aceite: doc criado, rc 0, LACUNA alta e marcador 0600 com o jti"
+  else record_fail "a2a-accept: (sh2) lacuna no aceite" "rc=${rc} out='$(head -c 300 <<< "${out}")'"; fi
   python3 - "${mft}/.claude/utils/federation-transport/a2a-accept.sh" <<'PY'
 import sys
 p = sys.argv[1]; s = open(p, encoding="utf-8").read()
-a = '  || refuse "o log de sombra do aceite não aceita escrita'
+a = """  4) printf '%s\\n' "${SH_OUT}" >&2"""
 assert a in s, "ancora"
-open(p, "w", encoding="utf-8").write(s.replace(a, '  || true "o log de sombra do aceite não aceita escrita', 1))
+open(p, "w", encoding="utf-8").write(s.replace(a, """  4) refuse "MUTANTE: lacuna vira recusa"; printf '%s\\n' "${SH_OUT}" >&2""", 1))
 PY
-  if _shgit "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: (sh2) mutante" "sem a checagem prévia o caso ainda passou"
-  else record_pass "a2a-accept: (sh2) mutante: sem a checagem prévia o doc nasce sem a linha e o caso reprova"; fi
+  if _shgit "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: (sh2) mutante" "a lacuna tratada como recusa ainda passou"
+  else record_pass "a2a-accept: (sh2) mutante: a lacuna tratada como recusa (rc 1) reprova"; fi
   cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
 
   # (sh3…sh8) o contador shadow-stats sobre logs sintéticos (os refutadores do PLAN-E §2), cada um com mutante no
@@ -17489,17 +17501,22 @@ scen, path, now = sys.argv[1], sys.argv[2], int(sys.argv[3])
 def lid():
     b = bytearray(os.urandom(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128; h = b.hex()
     return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
-def ln(t, rule, human, key, mode="shadow", ver="1", sup=None):
+# "accept-rule" é uma regra hipotética que NÃO é a linha de base (a base nunca liga a regra; caso sh10)
+def ln(t, rule, human, key, mode="shadow", ver="1", sup=None, rid="accept-rule", ids=True, task=None):
     return {"line_id": lid(), "logged_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t)), "mode": mode,
-            "ce_source": "/w", "ce_id": key, "ce_time": None, "jti": None, "taskId": None, "rule_id": "accept-rule",
+            "ce_source": "/w", "ce_id": key, "ce_time": None, "jti": None, "taskId": task, "rule_id": rid,
             "rule_version": ver, "rule_decision": rule, "human_decision": human, "reason": None,
-            "human_actor": "op" if human else None, "supersedes": sup}
+            "human_actor": "op" if human else None, "supersedes": sup, "ids_verified": ids}
 L = []
-if scen in ("s50", "s50v", "mal"):
+if scen in ("s50", "s50v", "mal", "base"):
     for i in range(50):
         day = i * 14 // 49
         L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}",
-                    ver="2" if scen == "s50v" and day >= 10 else "1"))
+                    ver="2" if scen == "s50v" and day >= 10 else "1",
+                    rid="baseline-accept-all" if scen == "base" else "accept-rule"))
+elif scen == "unv":
+    for i in range(2):
+        L.append(ln(now - 3600 + i, "accept", "reject", "mesmo-ce", ids=False, task=f"t{i}"))
 elif scen == "s60":
     for i in range(60):
         L.append(ln(now - (14 - i * 14 // 59) * 86400 + i, "accept", "reject" if i >= 50 else "accept", f"e{i}"))
@@ -17516,7 +17533,7 @@ with open(path, "w") as f:
 PY
   }
   # _shst <metrics> <cenário> [extra] → "rc|json"
-  _shst() { local o r=0; _shgen "$2" "${d}/sh-$2.jsonl"; o="$(python3 -I "$1" shadow-stats --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
+  _shst() { local o r=0; _shgen "$2" "${d}/sh-$2.jsonl"; o="$(python3 -I "$1" shadow-stats --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
   _shj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
   _sh_on() { local r; r="$(_shst "$1" s50)"; SH_WHY="${r:0:400}"
     [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.events,.agree,.agreement,.days_covered,.trigger_rule_on,(.trigger_back_to_shadow|tostring)] | map(tostring) | join(",")')" = "50,48,0.96,14,true,null" ]; }
@@ -17531,6 +17548,12 @@ PY
   _sh_auto() { local r; r="$(_shst "$1" auto)"; SH_WHY="${r:0:400}"
     [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.mode,.decisions_7d,.reversals_7d,.reversal_rate_7d,.trigger_back_to_shadow,(.trigger_rule_on|tostring)] | map(tostring) | join(",")')" = "auto,10,2,0.2,true,null" ]; }
   _sh_mal() { local r; r="$(_shst "$1" mal)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.malformed')" = 1 ]; }
+  _sh_base() { local r; r="$(_shst "$1" base)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.rule_id,.rule_on_criterion_met,.trigger_rule_on,(.trigger_rule_on_reason|type)] | map(tostring) | join(",")')" = "baseline-accept-all,true,false,string" ]; }
+  _sh_unv() { local r; r="$(_shst "$1" unv)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.events')" = 2 ]; }
+  _sh_gap() { local r; printf '{"logged_at":"2026-11-02T10:00:00Z","point":"accept","jti":"j","taskId":"t","why":"x"}\n' > "${d}/gap-um.log"
+    r="$(_shst "$1" s50 --gap-log "${d}/gap-um.log")"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.gaps_in_window')" = 1 ]; }
   _sh_none() { local r=0; python3 -I "$1" shadow-stats --log "${d}/nao-existe.jsonl" --json >/dev/null 2>&1 || r=$?; SH_WHY="rc=${r}"; [ "${r}" = 2 ]; }
   _shcase() {  # _shcase <nome> <função> <âncora> <troca>
     local rc_i=1 rc_m=1; SH_WHY=""
@@ -17547,17 +17570,23 @@ PY
   _shcase "(sh3) shadow-stats: 50 eventos em 14 dias, 48 concordâncias → 0,96, trigger_rule_on, rc 1 (o de volta sai null)" _sh_on \
     'RULE_ON_DAYS, RULE_ON_EVENTS, RULE_ON_AGREEMENT = 14, 50, 0.95' 'RULE_ON_DAYS, RULE_ON_EVENTS, RULE_ON_AGREEMENT = 14, 50, 0.97'
   _shcase "(sh4) shadow-stats: os mesmos 50 com a rule_version trocada no dia 10 NÃO disparam (a contagem recomeça)" _sh_ver \
-    'cur = [o for o in valid if o["rule_version"] == version]' 'cur = list(valid)'
+    'cur = [o for o in valid if o["rule_version"] == version and o["rule_id"] == rule_id]' 'cur = list(valid)'
   _shcase "(sh5) shadow-stats: regra que aceita tudo, 50 aceites e 10 recusas do archive → 0,8333, NÃO dispara" _sh_rej \
     '        if rule == human:' '        if True:'
   _shcase "(sh6) shadow-stats: registro na fila há mais de 3 dias sem decisão = undecided, fora do denominador" _sh_und \
-    '            if k is None or k not in all_keys:' '            if False:'
+    '            if (k is None or k not in all_keys) and ("task", r.get("taskId")) not in all_keys:' '            if False:'
   _shcase "(sh7) shadow-stats no modo auto: 2 reversões em 10 decisões (0,2 > 0,15) → trigger_back_to_shadow, rc 1" _sh_auto \
     'o["human_decision"] != effective(tgt)' 'False'
   _shcase "(sh8) shadow-stats: linha malformada → rc 2 (não pôde medir), contada em malformed" _sh_mal \
     '            malformed += 1' '            pass'
   _shcase "(sh9) shadow-stats: log ausente → rc 2 (ausência não é zero)" _sh_none \
     '        raise MeasureError(f"log ausente:' '        return []; raise MeasureError(f"log ausente:'
+  _shcase "(sh10) shadow-stats: a regra linha de base (baseline-accept-all) NUNCA liga a regra: critério cumprido, trigger_rule_on false com o motivo" _sh_base \
+    '        if rule_id in BASELINE_RULE_IDS:' '        if False:'
+  _shcase "(sh11) shadow-stats: linhas com ids_verified false deduplicam pelo taskId, nunca pelos ce_* (2 recusas com o mesmo ce = 2 eventos)" _sh_unv \
+    '    if o.get("ids_verified") is False:' '    if False:'
+  _shcase "(sh12) shadow-stats: lacuna registrada (shadow-gap.log) dentro da janela → rc 2" _sh_gap \
+    '(2 if malformed or out["gaps_in_window"] else' '(2 if malformed else'
 
   rm -rf "${d}"
 }
