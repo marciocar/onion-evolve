@@ -18094,8 +18094,8 @@ PY
   _shcase "(sh7) shadow-stats --mode auto: 2 reversões em 10 decisões (0,2 > 0,15) → back_to_shadow_criterion_met" _sh_auto \
     'o["human_decision"] != effective(tgt)' 'False'
   _shcase "(sh8) shadow-stats: linha malformada → rc 2 (não pôde medir), contada em malformed" _sh_mal \
-    'elif o is None or validate_shadow(o):
-            malformed += 1' 'elif o is None or validate_shadow(o):
+    'elif o is None or validate_shadow(o) or o["line_id"] in dup:
+            malformed += 1' 'elif o is None or validate_shadow(o) or o["line_id"] in dup:
             pass'
   _shcase "(sh9) shadow-stats: log ausente → rc 2 (ausência não é zero)" _sh_none \
     '        raise MeasureError(f"log ausente:' '        return []; raise MeasureError(f"log ausente:'
@@ -18175,8 +18175,8 @@ s = open(sys.argv[1], encoding="utf-8").read(); assert os.environ["OLD"] in s
 open(sys.argv[2], "w", encoding="utf-8").write(s.replace(os.environ["OLD"], os.environ["NEW"], 1))
 PY
   OLD='        out["trigger_rule_on"] = None
-    if out["mode_mismatch"] or future:' NEW='        out["trigger_rule_on"] = out["trigger_back_to_shadow"] = None
-    if out["mode_mismatch"] or future:' python3 - "${d}/met-inst.py" "${d}/met-inst-mut.py" <<'PY'
+    if dup:' NEW='        out["trigger_rule_on"] = out["trigger_back_to_shadow"] = None
+    if dup:' python3 - "${d}/met-inst.py" "${d}/met-inst-mut.py" <<'PY'
 import os, sys
 s = open(sys.argv[1], encoding="utf-8").read(); o = os.environ["OLD"]
 open(sys.argv[2], "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1) if o in s else s)
@@ -18441,6 +18441,26 @@ PY
     '                    if tgt is None or event_key(tgt) != event_key(line):' '                    if False:'
   _shcase "(sh75) leitor: uma linha forjada com supersedes entre eventos não muda o desfecho do outro evento (agree 1)" _sh_xsup \
     '    superseded = {o["supersedes"] for o in scur if _same_event_sup(o)}' '    superseded = {o["supersedes"] for o in scur if o["supersedes"]}'
+  _sh_dup() {  # line_id duplicado (cópia e cola de linha): malformed, rc 2, gatilhos null — nunca a última em silêncio
+    local r o; _shgen s50 "${d}/sh-dup.jsonl"; tail -1 "${d}/sh-dup.jsonl" >> "${d}/sh-dup.jsonl"
+    o="$(python3 -I "$1" shadow-stats --mode shadow --log "${d}/sh-dup.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" 2>&1)" && r=0 || r=$?
+    SH_WHY="rc=${r} ${o:0:300}"
+    [ "${r}" = 2 ] && [ "$(jq -r '[.duplicate_line_ids,.malformed,(.trigger_rule_on|tostring),(.trigger_unavailable_reason|type)] | map(tostring) | join(",")' <<< "${o}")" = "1,2,null,string" ]; }
+  _sh_dupgap() {  # a linha que fecharia a lacuna, duplicada, não fecha nada (read_gaps também confere)
+    local R="${d}/dg" r=0 gid o; rm -rf "${R}"; mkdir -p "${R}/repo"
+    _shap() { python3 -I "$1" shadow-append --receiver core-x --gap-log "${R}/gap.log" --mode shadow --rule-decision accept \
+      --human-decision accept --from m --ce-source /w --jti jr "${@:2}" >/dev/null 2>&1; }
+    A2A_METRICS_REPO_ROOT="${R}/repo" _shap "$1" --log "${R}/repo/s.jsonl" --ce-id ev-d || r=$?
+    [ "${r}" = 4 ] || { SH_WHY="a lacuna deveria nascer (rc 4), deu ${r}"; return 1; }
+    gid="$(jq -r .gap_id "${R}/gap.log")"; sleep 1
+    _shap "$1" --log "${R}/good.jsonl" --ce-id ev-d --resolves-gap "${gid}" || { SH_WHY="a resolução falhou"; return 1; }
+    tail -1 "${R}/good.jsonl" >> "${R}/good.jsonl"
+    o="$(python3 -I "$1" shadow-stats --mode shadow --receiver core-x --log "${R}/good.jsonl" --gap-log "${R}/gap.log" --json 2>/dev/null)"
+    SH_WHY="stats: ${o:0:300}"; [ "$(jq -r .gaps_in_window <<< "${o}")" = 1 ]; }
+  _shcase "(sh76) line_id duplicado no log de sombra → malformed (as duas cópias), rc 2 e gatilhos null" _sh_dup \
+    '    dup = _dup_line_ids(o for _, o in lines)' '    dup = set()'
+  _shcase "(sh77) a linha de resolução com line_id duplicado não fecha a lacuna (read_gaps)" _sh_dupgap \
+    '    dup = _dup_line_ids(o for _, o in shadow_lines)' '    dup = set()'
   _shcase "(sh37) mode-change grava a troca (de, para, quem) e recusa trocar para o modo vigente (rc 3)" _sh_mc \
     '        if now_mode == o["--to"]:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
