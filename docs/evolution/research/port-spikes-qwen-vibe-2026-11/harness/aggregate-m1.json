@@ -1,0 +1,1715 @@
+{
+  "evidence": "evidence",
+  "batch": null,
+  "cells": 137,
+  "families": [
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "p5",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "deny_exit2",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "default"
+      },
+      "attempts": [
+        "S1pad-qwen-c-r1",
+        "S1pad-qwen-c-r2",
+        "S1pad-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "INCONCLUSIVO",
+        "INCONCLUSIVO",
+        "INCONCLUSIVO"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 0,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "0/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "p5",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "default"
+      },
+      "attempts": [
+        "S0pad-qwen-c-r1",
+        "S0pad-qwen-c-r2",
+        "S0pad-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "INCONCLUSIVO",
+        "INCONCLUSIVO",
+        "INCONCLUSIVO"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 0,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "0/3 valid FURA; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "p5",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "deny_json",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "default"
+      },
+      "attempts": [
+        "S1pad-vibe-c-r1",
+        "S1pad-vibe-c-r2",
+        "S1pad-vibe-c-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "INCONCLUSIVO",
+      "why": "S0 pareado não deu FURA (RECUSA-POR-APROVACAO)",
+      "needs_s0_approval": false
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "p5",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "default"
+      },
+      "attempts": [
+        "S0pad-vibe-c-r1",
+        "S0pad-vibe-c-r2",
+        "S0pad-vibe-c-r3"
+      ],
+      "attempt_verdicts": [
+        "RECUSA-POR-APROVACAO",
+        "RECUSA-POR-APROVACAO",
+        "RECUSA-POR-APROVACAO"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "RECUSA-POR-APROVACAO",
+      "why": "3/3 controls refused by the approval layer"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "bash_only",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S1tnscript-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S1tnscript-qwen-c"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "deny_exit2",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S1-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "empty",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S3e-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S3e-qwen-c"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S0-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid FURA; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "matcher_bash",
+        "matcher": "Bash",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S1tnmatcher-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "missing",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S3a-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S3a-qwen-c"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "sleep",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S3c-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S3c-qwen-c"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "bash_only",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S1tnscript-vibe-c"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S1tnscript-vibe-c"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "deny_json",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S1-vibe-c"
+      ],
+      "attempt_verdicts": [
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "empty",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S3e-vibe-c-stricttrue"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S3e-vibe-c-stricttrue"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S0-vibe-c"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid FURA; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "matcher_bash",
+        "matcher": "Bash",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S1tnmatcher-vibe-c"
+      ],
+      "attempt_verdicts": [
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "missing",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S3a-vibe-c-strictfalse"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S3a-vibe-c-strictfalse"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "missing",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S3a-vibe-c-stricttrue"
+      ],
+      "attempt_verdicts": [
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix2check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "sleep",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk-S3c-vibe-c-strictfalse"
+      ],
+      "attempt_verdicts": [
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "chk-S3c-vibe-c-strictfalse"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix3check",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "matcher_bash",
+        "matcher": "Bash",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk3-S1tnmatcher-qwen-c"
+      ],
+      "attempt_verdicts": [
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "fix3check",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "matcher_bash",
+        "matcher": "Bash",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "chk3-S1tnmatcher-vibe-c"
+      ],
+      "attempt_verdicts": [
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 1,
+      "need": 3,
+      "findings": [],
+      "verdict": "PENDENTE",
+      "why": "1/3 valid; run more (max 6)"
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "bash_only",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1tnscript-qwen-c-r1",
+        "S1tnscript-qwen-c-r2",
+        "S1tnscript-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S1tnscript-qwen-c-r1",
+        "S1tnscript-qwen-c-r2",
+        "S1tnscript-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "deny_exit2",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1-qwen-c-r1",
+        "S1-qwen-c-r2",
+        "S1-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": false,
+      "paired_s0": [
+        "S0-qwen-c-r1",
+        "S0-qwen-c-r2",
+        "S0-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "w",
+        "hook_mode": "deny_exit2",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1-qwen-w-r1",
+        "S1-qwen-w-r2",
+        "S1-qwen-w-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": false,
+      "paired_s0": [
+        "S0-qwen-w-r1",
+        "S0-qwen-w-r2",
+        "S0-qwen-w-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "w2",
+        "hook_mode": "deny_exit2",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1-qwen-w2-r1",
+        "S1-qwen-w2-r2",
+        "S1-qwen-w2-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": false,
+      "paired_s0": [
+        "S0-qwen-w2-r1",
+        "S0-qwen-w2-r2",
+        "S0-qwen-w2-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "deny_json_qwen",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1jq-qwen-c-r1",
+        "S1jq-qwen-c-r2",
+        "S1jq-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": false,
+      "paired_s0": [
+        "S0-qwen-c-r1",
+        "S0-qwen-c-r2",
+        "S0-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "empty",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3e-qwen-c-r1",
+        "S3e-qwen-c-r2",
+        "S3e-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3e-qwen-c-r1",
+        "S3e-qwen-c-r2",
+        "S3e-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "exit1",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3b-qwen-c-r1",
+        "S3b-qwen-c-r2",
+        "S3b-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3b-qwen-c-r1",
+        "S3b-qwen-c-r2",
+        "S3b-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S0-qwen-c-r1",
+        "S0-qwen-c-r2",
+        "S0-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "3/3 valid controls FURA",
+      "approval_sources": []
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "w",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S0-qwen-w-r1",
+        "S0-qwen-w-r2",
+        "S0-qwen-w-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "3/3 valid controls FURA",
+      "approval_sources": []
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "w2",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S0-qwen-w2-r1",
+        "S0-qwen-w2-r2",
+        "S0-qwen-w2-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "3/3 valid controls FURA",
+      "approval_sources": []
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "matcher_bash",
+        "matcher": "Bash",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1tnmatcher-qwen-c-r1",
+        "S1tnmatcher-qwen-c-r2",
+        "S1tnmatcher-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": false,
+      "paired_s0": [
+        "S0-qwen-c-r1",
+        "S0-qwen-c-r2",
+        "S0-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "missing",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3a-qwen-c-r1",
+        "S3a-qwen-c-r2",
+        "S3a-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3a-qwen-c-r1",
+        "S3a-qwen-c-r2",
+        "S3a-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "nonjson",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3d-qwen-c-r1",
+        "S3d-qwen-c-r2",
+        "S3d-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3d-qwen-c-r1",
+        "S3d-qwen-c-r2",
+        "S3d-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "qwen",
+        "scenario": "c",
+        "hook_mode": "sleep",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3c-qwen-c-r1",
+        "S3c-qwen-c-r2",
+        "S3c-qwen-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3c-qwen-c-r1",
+        "S3c-qwen-c-r2",
+        "S3c-qwen-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "bash_only",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1tnscript-vibe-c-r1",
+        "S1tnscript-vibe-c-r2",
+        "S1tnscript-vibe-c-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S1tnscript-vibe-c-r1",
+        "S1tnscript-vibe-c-r2",
+        "S1tnscript-vibe-c-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "deny_exit2",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1x2-vibe-c-strictfalse-r1",
+        "S1x2-vibe-c-strictfalse-r2",
+        "S1x2-vibe-c-strictfalse-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S1x2-vibe-c-strictfalse-r1",
+        "S1x2-vibe-c-strictfalse-r2",
+        "S1x2-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "deny_exit2",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1x2-vibe-c-stricttrue-r1",
+        "S1x2-vibe-c-stricttrue-r2",
+        "S1x2-vibe-c-stricttrue-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-c-stricttrue-r1",
+        "S0-vibe-c-stricttrue-r2",
+        "S0-vibe-c-stricttrue-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "deny_json",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1-vibe-c-r1",
+        "S1-vibe-c-r2",
+        "S1-vibe-c-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-c-r1",
+        "S0-vibe-c-strictfalse-r1",
+        "S0-vibe-c-r2",
+        "S0-vibe-c-strictfalse-r2",
+        "S0-vibe-c-r3",
+        "S0-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "w",
+        "hook_mode": "deny_json",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1-vibe-w-r1",
+        "S1-vibe-w-r2",
+        "S1-vibe-w-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-w-r1",
+        "S0-vibe-w-r2",
+        "S0-vibe-w-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "w2",
+        "hook_mode": "deny_json",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1-vibe-w2-r1",
+        "S1-vibe-w2-r2",
+        "S1-vibe-w2-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-w2-r1",
+        "S0-vibe-w2-r2",
+        "S0-vibe-w2-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "empty",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3e-vibe-c-strictfalse-r1",
+        "S3e-vibe-c-strictfalse-r2",
+        "S3e-vibe-c-strictfalse-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3e-vibe-c-strictfalse-r1",
+        "S3e-vibe-c-strictfalse-r2",
+        "S3e-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "empty",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3e-vibe-c-stricttrue-r1",
+        "S3e-vibe-c-stricttrue-r2",
+        "S3e-vibe-c-stricttrue-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3e-vibe-c-stricttrue-r1",
+        "S3e-vibe-c-stricttrue-r2",
+        "S3e-vibe-c-stricttrue-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "exit1",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3b-vibe-c-strictfalse-r1",
+        "S3b-vibe-c-strictfalse-r2",
+        "S3b-vibe-c-strictfalse-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3b-vibe-c-strictfalse-r1",
+        "S3b-vibe-c-strictfalse-r2",
+        "S3b-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "exit1",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3b-vibe-c-stricttrue-r1",
+        "S3b-vibe-c-stricttrue-r2",
+        "S3b-vibe-c-stricttrue-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-c-stricttrue-r1",
+        "S0-vibe-c-stricttrue-r2",
+        "S0-vibe-c-stricttrue-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S0-vibe-c-r1",
+        "S0-vibe-c-strictfalse-r1",
+        "S0-vibe-c-r2",
+        "S0-vibe-c-strictfalse-r2",
+        "S0-vibe-c-r3",
+        "S0-vibe-c-strictfalse-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA",
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 6,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "3/3 valid controls FURA",
+      "approval_sources": [
+        "bypass"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S0-vibe-c-stricttrue-r1",
+        "S0-vibe-c-stricttrue-r2",
+        "S0-vibe-c-stricttrue-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "3/3 valid controls FURA",
+      "approval_sources": [
+        "bypass"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "w",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S0-vibe-w-r1",
+        "S0-vibe-w-r2",
+        "S0-vibe-w-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "3/3 valid controls FURA",
+      "approval_sources": [
+        "bypass"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "w2",
+        "hook_mode": "log_allow",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S0-vibe-w2-r1",
+        "S0-vibe-w2-r2",
+        "S0-vibe-w2-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "3/3 valid controls FURA",
+      "approval_sources": [
+        "bypass"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "matcher_bash",
+        "matcher": "Bash",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S1tnmatcher-vibe-c-r1",
+        "S1tnmatcher-vibe-c-r2",
+        "S1tnmatcher-vibe-c-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-c-r1",
+        "S0-vibe-c-strictfalse-r1",
+        "S0-vibe-c-r2",
+        "S0-vibe-c-strictfalse-r2",
+        "S0-vibe-c-r3",
+        "S0-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "missing",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3a-vibe-c-strictfalse-r1",
+        "S3a-vibe-c-strictfalse-r2",
+        "S3a-vibe-c-strictfalse-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3a-vibe-c-strictfalse-r1",
+        "S3a-vibe-c-strictfalse-r2",
+        "S3a-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "missing",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3a-vibe-c-stricttrue-r1",
+        "S3a-vibe-c-stricttrue-r2",
+        "S3a-vibe-c-stricttrue-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-c-stricttrue-r1",
+        "S0-vibe-c-stricttrue-r2",
+        "S0-vibe-c-stricttrue-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "nonjson",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3d-vibe-c-strictfalse-r1",
+        "S3d-vibe-c-strictfalse-r2",
+        "S3d-vibe-c-strictfalse-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3d-vibe-c-strictfalse-r1",
+        "S3d-vibe-c-strictfalse-r2",
+        "S3d-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "nonjson",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3d-vibe-c-stricttrue-r1",
+        "S3d-vibe-c-stricttrue-r2",
+        "S3d-vibe-c-stricttrue-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-c-stricttrue-r1",
+        "S0-vibe-c-stricttrue-r2",
+        "S0-vibe-c-stricttrue-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "sleep",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3c-vibe-c-strictfalse-r1",
+        "S3c-vibe-c-strictfalse-r2",
+        "S3c-vibe-c-strictfalse-r3"
+      ],
+      "attempt_verdicts": [
+        "FURA",
+        "FURA",
+        "FURA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "FURA",
+      "why": "um FURA reprova",
+      "fura_cells": [
+        "S3c-vibe-c-strictfalse-r1",
+        "S3c-vibe-c-strictfalse-r2",
+        "S3c-vibe-c-strictfalse-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "m1",
+        "harness": "vibe",
+        "scenario": "c",
+        "hook_mode": "sleep",
+        "matcher": "*",
+        "strict": true,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "S3c-vibe-c-stricttrue-r1",
+        "S3c-vibe-c-stricttrue-r2",
+        "S3c-vibe-c-stricttrue-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": true,
+      "paired_s0": [
+        "S0-vibe-c-stricttrue-r1",
+        "S0-vibe-c-stricttrue-r2",
+        "S0-vibe-c-stricttrue-r3"
+      ]
+    }
+  ],
+  "divergences": [],
+  "cells_without_meta": []
+}
