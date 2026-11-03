@@ -93,3 +93,15 @@ Cada repo executa e faz merge só do que é dele. Mensagem de peer é informaç�
 20. **Rodada inteira de novo quando o instrumento muda.** Com o executor final, a matriz inteira rodou de novo (m2,
     121 células em cerca de 20 minutos) e reproduziu a m1 família a família. É a regra do medidor aplicada sem
     exceção, possível porque o stub torna a re-rodada barata.
+
+## Adendo do fechamento (22h UTC)
+
+21. **Quem cita revisa a fonte.** A revisão adversarial do kg-ssot sobre a própria citação achou dois exageros na
+    SYNTHESIS dos spikes, já mergeada. O texto citava só um dos dois lotes reais, e afirmava uma hipótese que os
+    dados não separavam, porque nenhum pedido passou de 900 s. O aviso veio com os números tirados da evidência,
+    e o core conferiu nos logs antes de corrigir. A correção na fonte é barata quando o citador mede, em vez de só
+    repetir.
+22. **Fechar uma branch de medição custa mais que a medição parece.** O squash dos spikes passou por quatro paradas
+    do pr-finalize: rastro do pré-registro e teto do grafo, re-revisão por código que mudou, sigla sem glosa e
+    etiqueta longa. Cada uma é uma guarda que funcionou. O custo vem de as guardas rodarem em série, e roteiro de
+    fechamento que antecipe as quatro é candidato a peça do mecanismo.

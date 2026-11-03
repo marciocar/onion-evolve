@@ -80,10 +80,14 @@ com o dado.
 A receita do modelo local é do kg-ssot (`docs/onion/measurements/mcp-ports-2026-11-03/RECIPE.md`@872c42f5 no
 repo dele). Os tempos do braço real desta rodada (6 a 19 min por célula) são medidas próprias, gravadas na
 evidência dos lotes reais (`harness/evidence-archive/evidence-real1.tar.gz` e `evidence-real2.tar.gz`, células `RS*`). O braço real do Qwen usou a configuração de tempo da RECIPE (`streamIdleTimeoutMs: 0`), e é a 1ª
-medida do 9B com ela: nenhuma célula teve ETIMEDOUT nem nova tentativa. O tempo até o 1º byte do turno principal foi
-de 684 s e 650 s (15,7 mil tokens de prompt, 23 a 24 tok/s), abaixo dos ~900 s depois do início em que a RECIPE registrou a
-queda da conexão no Gemma e no Ministral; com 16 e 18 min de processo sem queda, isso sustenta, sem provar, que o corte
-conta só até o 1º byte da resposta. Os logs do servidor (`_llama-server-real*.log`) estão dentro desses mesmos arquivos.
+medida do 9B com ela. Nas quatro células do Qwen, duas do real1 e duas do real2, nenhuma teve ETIMEDOUT nem
+nova tentativa. A leitura do prompt do turno principal levou de 650 s a 702 s (15,7 mil tokens, 22 a 24 tok/s), e
+o maior tempo total de um pedido foi 731,7 s, com 16 a 19 minutos de processo. Isso mostra que o corte de ~900 s da
+RECIPE, onde a conexão do Gemma e do Ministral caiu, **não conta do início do processo**. Mas **não separa** «o corte
+conta até o 1º byte» de «o corte conta a duração total da conexão», porque nenhum pedido passou de 900 s. O teste
+que separa as duas é um pedido com o 1º byte antes de 900 s e o fim depois, com uma geração longa. (Correção de
+2026-11-03, apontada pela revisão do kg-ssot e conferida nos logs: a 1ª redação citava só o real1 e afirmava a
+hipótese do 1º byte.) Os logs do servidor (`_llama-server-real*.log`) estão dentro desses mesmos arquivos.
 
 ## Valeu a pena
 
