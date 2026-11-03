@@ -533,6 +533,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-03: «Spikes das portas: onde rodam e o que roda primeiro?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
       locality: "pessoa"
+  - id: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Aceitar a proposta»"
+    label: "O maestro aceita a dissecação da curadoria sobre SQLite dentro de um Claude Project como base estruturada do time: a prática como fonte dos dados do time é rejeitada, e um exportador SQLite somente leitura do grafo fica parqueado com gatilho"
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Aceitar a proposta»; descartadas: «Absorver o exportador já» · «Ler o estudo antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «SQLite num Claude Project (dissecação da curadoria): qual veredito?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -641,4 +657,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_COORD_SPIKES_DAS_PORTAS_NA_VPS_1103
     to: E_COORD_PORTAS_DO_ONION_CORE_PESQUISE_ANTES_1102
+    edge_type: TRACES_TO
+  - from: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
+    to: E_COORD_CENSO_DAS_PENDENCIAS_1027
     edge_type: TRACES_TO
