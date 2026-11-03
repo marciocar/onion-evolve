@@ -28,10 +28,15 @@
 #                  sem --human-decision), até existir o escritor da regra. À mão, a decisão humana no auto sem
 #                  --supersedes para uma linha da regra válida desta janela é recusada (rc 3), e o --supersedes dado
 #                  tem de ser essa linha (senão rc 3).
+#                  MODELO DE AMEAÇA: o log editado à mão está fora do que o leitor defende, além da detecção de
+#                  line_id duplicado (que vira malformed, rc 2 e gatilhos null; também pega cópia e cola e merge).
 #                  BAIXOS declarados (8ª passada): B2 — a metade mode_before do filtro da linha da regra (A1) não tem
 #                  teste próprio; só importa num empate no mesmo segundo, que já sai como troca ambígua. B3 — uma
 #                  lacuna rule_line_missing aberta no auto não fecha depois da volta para shadow (a regravação seria
 #                  noutro modo); ela segura o rc 2 por até 7 dias da janela. Escolha conservadora.
+#                  B4 (9ª passada) — no auto, uma 2ª linha da regra sem humano, escrita à mão depois da reversão e
+#                  apontando a regra do mesmo evento, vira a cabeça e tira o evento de events e agree (reversals não
+#                  mudam). Cai no PONTO ABERTO da linha da regra escrita à mão.
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
@@ -214,6 +219,17 @@ def _gap_matches(g, line):
             and g.get("rule_id") == line["rule_id"] and g.get("rule_version") == line["rule_version"])
 
 
+def _dup_line_ids(objs):
+    """→ os line_id que aparecem em mais de uma linha. A CLI gera UUID v4, então duplicado é acidente (cópia e cola,
+    merge de dois logs) ou edição à mão: o leitor indexa por line_id e ficaria com a última em silêncio (achado da
+    curadoria na 9ª passada: a reversão de outro evento sumia, e a cabeça de um evento caía)."""
+    seen, dup = set(), set()
+    for o in objs:
+        if isinstance(o, dict) and isinstance(o.get("line_id"), str) and o.get("kind") != "mode_change":
+            (dup if o["line_id"] in seen else seen).add(o["line_id"])
+    return dup
+
+
 def read_gaps(path, shadow_lines=(), receiver=None):
     """→ epochs das lacunas ABERTAS (None = linha ilegível: lacuna de hora desconhecida). Arquivo ausente = nenhuma.
 
@@ -222,7 +238,9 @@ def read_gaps(path, shadow_lines=(), receiver=None):
     lacuna (_gap_matches): resolução forjada à mão, ou de outro evento, não fecha nada. Com `receiver`, a lacuna de
     outro receptor fica fora."""
     rows = _gap_rows(path)
-    by_id = {o["line_id"]: o for _, o in shadow_lines if isinstance(o, dict) and not validate_shadow(o)}
+    dup = _dup_line_ids(o for _, o in shadow_lines)
+    by_id = {o["line_id"]: o for _, o in shadow_lines if isinstance(o, dict) and not validate_shadow(o)
+             and o["line_id"] not in dup}             # line_id duplicado não fecha lacuna
     gaps = {o["gap_id"]: o for o in rows if isinstance(o, dict) and "resolves" not in o
             and isinstance(o.get("gap_id"), str)}
     closed = set()
@@ -524,6 +542,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
     malformed = future = ahead = 0
     valid, changes = [], []
+    dup = _dup_line_ids(o for _, o in lines)
     for _, o in lines:
         if isinstance(o, dict) and o.get("kind") == "mode_change":
             if validate_mode_change(o):
@@ -533,8 +552,8 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
                 ahead = max(ahead, stamp_epoch(o["logged_at"]) - now)
             else:
                 changes.append(o)                       # a troca de modo é ato registrado, não decisão
-        elif o is None or validate_shadow(o):
-            malformed += 1
+        elif o is None or validate_shadow(o) or o["line_id"] in dup:
+            malformed += 1                             # line_id duplicado = malformada (todas as cópias)
         elif stamp_epoch(o["logged_at"]) > now:
             future += 1                                # N7: linha do futuro (relógio torto) não é evento
             ahead = max(ahead, stamp_epoch(o["logged_at"]) - now)
@@ -542,7 +561,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
             valid.append(o)
     out = {"rule_id": None, "rule_version": None, "since": None, "days_covered": 0, "events": 0, "undecided": None,
            "agree": 0, "agreement": None, "mode": mode, "decisions_7d": 0, "reversals_7d": 0,
-           "reversal_rate_7d": None, "malformed": malformed, "trigger_rule_on": None, "trigger_back_to_shadow": None,
+           "reversal_rate_7d": None, "malformed": malformed, "duplicate_line_ids": len(dup), "trigger_rule_on": None, "trigger_back_to_shadow": None,
            "confusion": {r: {h: 0 for h in DECISIONS} for r in DECISIONS}, "kappa": None,
            "rule_on_criterion_met": None, "trigger_unavailable_reason": None, "back_to_shadow_criterion_met": None,
            "mode_in_force": None, "mode_mismatch": None,
@@ -681,9 +700,13 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
         # linha no futuro (julgamento): anula SÓ o trigger_rule_on; o de volta à sombra é de proteção e não se cala por
         # dado ruim (segue o que o critério e a instrumentação dizem); o rc segue 2
         out["trigger_rule_on"] = None
-    if out["mode_mismatch"] or future:
+    if dup:
+        # line_id duplicado: o desfecho de algum evento pode ter mudado sem rastro; nenhum gatilho sai afirmado
+        out["trigger_rule_on"] = out["trigger_back_to_shadow"] = None
+    if out["mode_mismatch"] or future or dup:
         out["trigger_unavailable_reason"] = "; ".join(x for x in (
-            out["mode_mismatch"], f"{future} linha(s) no futuro (até {ahead} s à frente)" if future else None) if x)
+            out["mode_mismatch"], f"{future} linha(s) no futuro (até {ahead} s à frente)" if future else None,
+            f"{len(dup)} line_id duplicado(s) no log (cópia, merge ou edição à mão)" if dup else None) if x)
     fired = out["trigger_rule_on"] is True or out["trigger_back_to_shadow"] is True
     return out, (2 if malformed or future or out["gaps_in_window"] or not_instr or out["mode_mismatch"]
                  else (1 if fired else 0))
