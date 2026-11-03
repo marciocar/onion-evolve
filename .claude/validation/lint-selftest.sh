@@ -17834,6 +17834,12 @@ elif scen == "ambig":
         L.append(ln(now - (14 - day) * 86400 - i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
     L += [mc(now - 3 * 86400, "shadow", "auto"), mc(now - 3 * 86400, "auto", "shadow"),   # ambíguas no mesmo segundo
           mc(now - 2 * 86400, "auto", "shadow")]
+elif scen == "xsup":
+    X1 = ln(now - 3 * 3600, "accept", "accept", "X")
+    Y3 = ln(now - 2 * 3600, "accept", "accept", "Y")
+    Y1 = ln(now - 3600, "accept", "reject", "Y")
+    F = ln(now - 1800, "accept", "accept", "X", sup=Y1["line_id"])                # forjada: X aponta uma linha de Y
+    L += [X1, Y3, Y1, F]
 elif scen == "x1":
     L.append(mc(now - 41 * 86400, "shadow", "auto"))
     L.append(mc(now - 40 * 86400 - 43200, "auto", "shadow"))
@@ -18330,7 +18336,7 @@ PY
   _shcase "(sh64) A3: a lacuna same_second nasce no modo de DEPOIS da troca, e a resolução nele é honrada pelo leitor" _sh_a3b \
     '                line["mode"] = mode_before(ch, t_line + 1) or line["mode"]' '                line["mode"] = vig or line["mode"]'
   _shcase "(sh65) A4: à mão, decisão humana no auto sem --supersedes para a linha da regra válida → rc 3" _sh_a4 \
-    '                    elif rl:' '                    elif False:'
+    '                elif not o.get("--producer") and line["human_decision"] is not None and not line["supersedes"] and rl:' '                elif False:'
   _sh_supok() {  # M1: --supersedes certo (a linha da regra válida) → rc 0, e a reversão conta
     local R="${d}/sp" r=0 rid o; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
@@ -18349,9 +18355,9 @@ PY
       --human-decision accept --from m --ce-source /w --ce-id ev-sb --supersedes 66666666-6666-4666-8666-666666666666 >/dev/null 2>&1 || r=$?
     SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 2 ]; }
   _shcase "(sh66) M1: à mão no auto, --supersedes = a linha da regra válida → rc 0 e a reversão conta" _sh_supok \
-    '                        if line["supersedes"] not in ids:' '                        if True:'
+    '                    if line["supersedes"] not in {x["line_id"] for x in rl}:' '                    if True:'
   _shcase "(sh67) M1: à mão no auto, --supersedes de fora (UUID que não é a linha da regra) → rc 3, nada gravado" _sh_supbad \
-    '                        if line["supersedes"] not in ids:' '                        if False:'
+    '                    if line["supersedes"] not in {x["line_id"] for x in rl}:' '                    if False:'
   _sh_prodmode() { local r=0; rm -f "${d}/pm.jsonl"
     python3 -I "$1" shadow-append --receiver core-x --log "${d}/pm.jsonl" --gap-log "${d}/pm-gap.log" --producer --mode auto \
       --rule-decision accept --from m --jti pm >/dev/null 2>&1 || r=$?
@@ -18408,6 +18414,33 @@ PY
   _shoutro "${mft}/.claude/utils/federation-transport/a2a-accept.sh" && rc_am=0
   _prove_mutation "a2a-accept: (sh71) mutante: o filtro sem a chave do evento casa a regra de outro evento" "${met}" "${mfm}" "${rc_ai}" "${rc_am}"
   cp "${met}" "${mfm}"
+  _sh_rulesup() {  # no auto, a linha da REGRA à mão com --supersedes para a linha humana de outro evento → rc 3
+    local R="${d}/rs" r=0 hid; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-b || { SH_WHY="a linha da regra falhou"; return 1; }
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto --human-decision accept \
+      --from m --ce-source /w --ce-id ev-b --supersedes "$(jq -r 'select(.ce_id=="ev-b") | .line_id' "${R}/l.jsonl")" >/dev/null 2>&1 \
+      || { SH_WHY="a reversão de ev-b falhou"; return 1; }
+    hid="$(tail -1 "${R}/l.jsonl" | jq -r .line_id)"
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto --rule-decision reject \
+      --from m --ce-source /w --ce-id ev-a --supersedes "${hid}" >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 3 ]; }
+  _sh_shsup() {  # no shadow, --supersedes de OUTRO evento → rc 3
+    local R="${d}/ss" r=0 oid; rm -rf "${R}"; mkdir -p "${R}"
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode shadow --rule-decision accept \
+      --human-decision reject --from m --ce-source /w --ce-id ev-1 >/dev/null 2>&1 || { SH_WHY="a 1ª linha falhou"; return 1; }
+    oid="$(jq -r .line_id "${R}/l.jsonl")"
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode shadow --rule-decision accept \
+      --human-decision accept --from m --ce-source /w --ce-id ev-2 --supersedes "${oid}" >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 1 ]; }
+  _sh_xsup() { local r; r="$(_shst "$1" xsup)"; SH_WHY="${r:0:400}"
+    [ "$(_shj "${r}" '[.events,.agree] | map(tostring) | join(",")')" = "2,1" ]; }
+  _shcase "(sh73) no auto, a linha da REGRA à mão com --supersedes para a linha humana de outro evento → rc 3" _sh_rulesup \
+    '                    if line["supersedes"] not in {x["line_id"] for x in rl}:' '                    if False:'
+  _shcase "(sh74) no shadow, --supersedes de OUTRO evento → rc 3 (o alvo tem de existir e ser do mesmo evento)" _sh_shsup \
+    '                    if tgt is None or event_key(tgt) != event_key(line):' '                    if False:'
+  _shcase "(sh75) leitor: uma linha forjada com supersedes entre eventos não muda o desfecho do outro evento (agree 1)" _sh_xsup \
+    '    superseded = {o["supersedes"] for o in scur if _same_event_sup(o)}' '    superseded = {o["supersedes"] for o in scur if o["supersedes"]}'
   _shcase "(sh37) mode-change grava a troca (de, para, quem) e recusa trocar para o modo vigente (rc 3)" _sh_mc \
     '        if now_mode == o["--to"]:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
