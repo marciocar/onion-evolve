@@ -119,7 +119,7 @@ PowerShell entra só para medir portas. Detalhe no §8 do pré-registro.
 >
 > **A linha de comando de toda sessão de teste**, nas duas pontas, mudando só o modo (exporte antes o cenário
 > e a réplica do gravador, por exemplo `export A2A_SPIKE_SCENARIO=RT-P1 A2A_SPIKE_REPLICA=1`):
-> `claude --tools "" --strict-mcp-config --mcp-config ~/.local/share/onion/a2a-rt/mcp.json --settings ~/.local/share/onion/a2a-rt/settings.json --permission-mode default`
+> `claude --tools "" --strict-mcp-config --no-chrome --mcp-config ~/.local/share/onion/a2a-rt/mcp.json --settings ~/.local/share/onion/a2a-rt/settings.json --permission-mode default`
 >
 > **Do lado do notebook (WSL):**
 > 1. Portas, linha de base, no WSL: `ss -ltnup > ~/rt-ports-antes.txt`
