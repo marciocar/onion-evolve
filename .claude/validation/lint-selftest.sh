@@ -10939,6 +10939,10 @@ run_a2a_queue_live_selftests() {
   if [ ! -f "${wr}" ]; then record_skip "a2a-queue-live: sem ops/a2a-queue-live.sh (core-only) — nada a testar"; return; fi
   command -v python3 >/dev/null 2>&1 || { record_skip "a2a-queue-live: python3 ausente → pulado"; return; }
   command -v flock >/dev/null 2>&1 || { record_skip "a2a-queue-live: flock ausente → pulado"; return; }
+  # A6: a q37 prova a guarda do REPO EM USO, que se acha pelo .git da raiz; sem ele a família não mede (e o diretório
+  # que a guarda nunca deixa nascer não pode sobrar de uma corrida anterior, senão envenena a q37)
+  if [ ! -e "${REPO_ROOT}/.git" ]; then record_skip "a2a-queue-live: sem .git na raiz do repo — a guarda do repo em uso não se prova → família recusada"; return; fi
+  rm -rf "${REPO_ROOT}/.claude/sessions/.a2a-metrics-bancada-nao-cria"
   local d; d="$(mktemp -d)"
   mkdir -p "${d}/stub" "${d}/mvstub" "${d}/op"
   printf '#!/bin/sh\necho "sudo-stub: a bancada nunca chama sudo" >&2\nexit 97\n' > "${d}/stub/sudo"
@@ -10977,7 +10981,7 @@ EOF
     out="$(cd "${d}" && env PATH="${QLR_PATH:-}${d}/stub:${PATH}" LC_ALL=C ONION_A2A_QUEUE_TEST=1 ONION_A2A_QUEUE_DIR="${d}/q" \
       ONION_A2A_QUEUE_INBOX="${d}/inbox" ONION_A2A_QUEUE_BACKUP="${QLR_BK:-${d}/bk.sh}" ONION_A2A_QUEUE_LOCK="${d}/lock" \
       ONION_A2A_QUEUE_METRICS="${REPO_ROOT}/.claude/utils/federation-transport/a2a-metrics.py" \
-      ONION_A2A_QUEUE_SHADOW_LOG="${QLR_SHADOW:-${d}/sh/shadow.jsonl}" ONION_A2A_QUEUE_GAP_LOG="${d}/sh/gap.log" \
+      ONION_A2A_QUEUE_SHADOW_LOG="${QLR_SHADOW:-${d}/sh/shadow.jsonl}" ONION_A2A_QUEUE_GAP_LOG="${QLR_GAP:-${d}/sh/gap.log}" \
       ${QLR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
@@ -11232,6 +11236,16 @@ PY
     _qlrc "${r}" 2 && [ "$(_qljget "${r}" 'select(.ending) | .no_data')" = true ]; }
   _qlcase "(q51) count sem nenhum dia medido (fila vazia sem --since; --since no futuro) → no_data e rc 2 (N3)" \
     'final["no_data"] = not out' 'final["no_data"] = False' _c_nodays
+  _c_dupla() { _qlrec "${d}/q/s10.t10.json" t10 membro-h null
+    python3 -I - "${d}/q/s10.t10.json" <<'PY'
+import json, sys
+p = sys.argv[1]; r = json.load(open(p)); r["envelope"] = {"jws": "h.eyJqdGkiOiJqLXJlai0xIn0.s"}; json.dump(r, open(p, "w"))
+PY
+    local r; r="$(QLR_SHADOW="${inrepo}/x/s.jsonl" QLR_GAP="${inrepo}/x/gap.log" _qlr "$1" archive s10.t10.json --force-unaccepted "recusa de teste da bancada" --apply)"
+    QL_WHY="${r:0:400}"
+    [ ! -e "${inrepo}" ] && _qlrc "${r}" 0 && [ -f "${d}/q/_archived/s10.t10.json" ] && _qlhas "${r}" "ERRO ALTO"; }
+  _qlcase "(q53) archive com falha DUPLA (linha de sombra e lacuna) sai rc 0 com ERRO ALTO, o registro arquivado (A5)" \
+    "    *) printf '%s\\n[%s] ERRO ALTO" "    *) exit 1; printf '%s\\n[%s] ERRO ALTO" _c_dupla
   _qlcase "(q49) count: exceção inesperada (relógio fora do alcance do calendário) → rc 2, nunca rc 1 (M2)" \
     'sys.excepthook = _boom' 'pass' _c_boom
   _c_zdays() { _c_cnt5 "$1" || return 1; local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-01 --json)"; QL_WHY="${r:0:400}"
@@ -11290,6 +11304,7 @@ PY
       && ! grep -qs t-hub "${d}/sh/shadow.jsonl"; }
   _qlcase "(q48) archive forçado de registro de HUB não vira recusa no log de sombra do core (M6)" \
     '[ "${STATUS%%:*}" = forcado ] && [ "${Q}" != "${QUEUE}" ]; then' '[ "${STATUS%%:*}" = forcado ] && false; then' _c_rejhub
+  rm -rf "${REPO_ROOT}/.claude/sessions/.a2a-metrics-bancada-nao-cria"
   rm -rf "${d}"
 }
 
@@ -17992,33 +18007,39 @@ PY
     [ "${r%%|*}" = 2 ] && case "$(_shj "${r}" '.mode_mismatch')" in *"ambíguas"*) true ;; *) false ;; esac; }
   _epoch_ts() { python3 -I -c 'import sys, time; print(time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(int(sys.argv[1]))))' "$1"; }
   _sh_wsame() {  # escritor: a resolução no MESMO segundo da lacuna é recusada (rc 3), sem gravar
-    local R="${d}/ws" k r=9 t0
+    local same=0 R="${d}/ws" k r=9 t0
     for k in 1 2 3 4 5 6 7 8; do
       rm -rf "${R}"; mkdir -p "${R}"; t0="$(date -u +%s)"
       printf '{"logged_at":"%s","gap_id":"55555555-5555-4555-8555-555555555555","point":"accept","receiver":"core-x","from":"m","ce_source":"/w","ce_id":"ev-s","jti":null,"taskId":null,"ids_verified":true,"mode":"shadow","rule_id":"baseline-accept-all","rule_version":"1","why":"x"}\n' "$(_epoch_ts "${t0}")" > "${R}/gap.log"
       r=0; python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode shadow --rule-decision accept \
-        --human-decision accept --from m --ce-source /w --ce-id ev-s --resolves-gap 55555555-5555-4555-8555-555555555555 >/dev/null 2>&1 || r=$?
-      [ "$(date -u +%s)" = "${t0}" ] && break
+        --human-decision accept --from m --ce-source /w --ce-id ev-s --resolves-gap 55555555-5555-4555-8555-555555555555 >/dev/null 2>"${R}/err" || r=$?
+      [ "$(date -u +%s)" = "${t0}" ] && { same=1; break; }
     done
+    [ "${same}" = 1 ] || { SH_WHY="nenhuma das 8 tentativas caiu no mesmo segundo: o caso não mediu"; return 1; }
+    grep -q "ESTRITAMENTE posterior" "${R}/err" || { SH_WHY="stderr sem a mensagem certa: $(head -c 200 "${R}/err")"; return 1; }
     SH_WHY="rc=${r} (tentativa ${k})"; [ "${r}" = 3 ] && [ ! -e "${R}/l.jsonl" ]; }
   _sh_wmc() {  # escritor: linha no MESMO segundo de uma troca de modo é recusada (repita em 1 s)
-    local R="${d}/wm" k r=9 t0
+    local same=0 R="${d}/wm" k r=9 t0
     for k in 1 2 3 4 5 6 7 8; do
       rm -rf "${R}"; mkdir -p "${R}"; t0="$(date -u +%s)"
       python3 -I "$1" mode-change --log "${R}/l.jsonl" --to auto >/dev/null 2>&1 || { SH_WHY="mode-change falhou"; return 1; }
       r=0; python3 -I "$1" shadow-append --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode shadow --rule-decision accept \
-        --human-decision accept --from m --jti wm >/dev/null 2>&1 || r=$?
-      [ "$(date -u +%s)" = "${t0}" ] && break
+        --human-decision accept --from m --jti wm >/dev/null 2>"${R}/err" || r=$?
+      [ "$(date -u +%s)" = "${t0}" ] && { same=1; break; }
     done
+    [ "${same}" = 1 ] || { SH_WHY="nenhuma das 8 tentativas caiu no mesmo segundo: o caso não mediu"; return 1; }
+    grep -q "repita em 1 s" "${R}/err" || { SH_WHY="stderr sem a mensagem certa: $(head -c 200 "${R}/err")"; return 1; }
     SH_WHY="rc=${r} (tentativa ${k})"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 1 ]; }
   _sh_mc2() {  # mode-change no MESMO segundo da troca anterior é recusado (N3)
-    local R="${d}/m2" k r=9 t0
+    local same=0 R="${d}/m2" k r=9 t0
     for k in 1 2 3 4 5 6 7 8; do
       rm -rf "${R}"; mkdir -p "${R}"; t0="$(date -u +%s)"
       python3 -I "$1" mode-change --log "${R}/l.jsonl" --to auto >/dev/null 2>&1 || { SH_WHY="1ª troca falhou"; return 1; }
-      r=0; python3 -I "$1" mode-change --log "${R}/l.jsonl" --to auto >/dev/null 2>&1 || r=$?
-      [ "$(date -u +%s)" = "${t0}" ] && break
+      r=0; python3 -I "$1" mode-change --log "${R}/l.jsonl" --to auto >/dev/null 2>"${R}/err" || r=$?
+      [ "$(date -u +%s)" = "${t0}" ] && { same=1; break; }
     done
+    [ "${same}" = 1 ] || { SH_WHY="nenhuma das 8 tentativas caiu no mesmo segundo: o caso não mediu"; return 1; }
+    grep -q "já há uma troca de modo neste segundo" "${R}/err" || { SH_WHY="stderr sem a mensagem certa: $(head -c 200 "${R}/err")"; return 1; }
     SH_WHY="rc=${r} (tentativa ${k})"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 1 ]; }
   _sh_mc() { local r1=0 r2=0; rm -f "${d}/mc.jsonl"
     python3 -I "$1" mode-change --log "${d}/mc.jsonl" --to auto >/dev/null 2>&1 || r1=$?
@@ -18135,9 +18156,9 @@ PY
   _shcase "(sh47) X1: auto de −24 a −10 d depois da volta à sombra (sem nova troca) → mode_mismatch, rc 2, gatilho não-true" _sh_x1 \
     '    loose = [o for o in valid if o["mode"] == "auto" and mode_before(changes, stamp_epoch(o["logged_at"])) != "auto"]' '    loose = [o for o in valid if o["mode"] == "auto" and not any(stamp_epoch(c["logged_at"]) < stamp_epoch(o["logged_at"]) for c in changes if c["to_mode"] == "auto")]'
   _shcase "(sh48) o escritor recusa (rc 3) shadow-append --mode auto num log em modo shadow, sem gravar nem abrir lacuna" _sh_wexist \
-    '            elif want != "current" and line["mode"] != vig:' '            elif False:'
+    '            if refusal is None and want != "current" and line["mode"] != vig:' '            if False:'
   _shcase "(sh49) o escritor recusa (rc 3) --mode auto num log que ainda não existe (o modo vigente é shadow)" _sh_wabsent \
-    '            elif want != "current" and line["mode"] != vig:' '            elif False:'
+    '            if refusal is None and want != "current" and line["mode"] != vig:' '            if False:'
   _shcase "(sh50) lacuna sem receptor + --resolves-gap → rc 3 e nenhuma linha gravada" _sh_norcv \
     '            if not g.get("receiver"):' '            if False:'
   # (sh51) julgamento: linha no futuro anula SÓ o trigger_rule_on; o de volta à sombra (proteção) segue o critério. Para
@@ -18217,6 +18238,98 @@ PY
     _prove_mutation "a2a-accept: (${_id}) ${_nm} (MUT)" "${met}" "${mfm}" "${rc_ai}" "${rc_am}"
   done
   cp "${met}" "${mfm}"
+  # (sh61) A5: o aceite com falha DUPLA (linha e lacuna dentro do repo em uso) sai rc 0 com ERRO ALTO
+  _shdupla() {  # $1 = aceite
+    local sroot; sroot="$(cd "$(dirname "$1")/../../.." && pwd)"
+    rm -rf "${ibs}" "${d}/ledger-dp"; mkdir -p "${ibs}"
+    rc=0; out="$(A2A_SHADOW_LOG="${sroot}/.a2a-metrics-bancada-nao-cria/s.jsonl" A2A_SHADOW_GAP_LOG="${sroot}/.a2a-metrics-bancada-nao-cria/gap.log" \
+      bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-dp" 2>&1)" || rc=$?
+    [ ! -e "${sroot}/.a2a-metrics-bancada-nao-cria" ] && [ "${rc}" = 0 ] && [ -n "$(find "${ibs}" -name '*.md')" ] && grep -q 'ERRO ALTO' <<< "${out}"
+  }
+  if _shdupla "${helper}"; then record_pass "a2a-accept: (sh61) aceite com falha dupla (linha e lacuna) sai rc 0 com ERRO ALTO, doc criado (A5)"
+  else record_fail "a2a-accept: (sh61) falha dupla no aceite" "rc=${rc} $(head -c 300 <<< "${out}")"; fi
+  python3 - "${mft}/.claude/utils/federation-transport/a2a-accept.sh" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read()
+a = """  *) printf '%s\\n' "${SH_OUT}" >&2"""
+assert a in s, "ancora"
+open(p, "w", encoding="utf-8").write(s.replace(a, """  *) exit 1; printf '%s\\n' "${SH_OUT}" >&2""", 1))
+PY
+  if _shdupla "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: (sh61) mutante" "o aceite que sai 1 na falha dupla passou"
+  else record_pass "a2a-accept: (sh61) mutante: o aceite que sai ≠ 0 na falha dupla reprova"; fi
+  cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
+  # utilitários do modo auto à mão (log real, CLI real)
+  _mc() { python3 -I "$1" mode-change --log "$2" --to "$3" >/dev/null 2>&1; }
+  _rule() { python3 -I "$1" shadow-append --receiver core-x --log "$2" --gap-log "$3" --mode auto --rule-decision reject \
+      --from m --ce-source /w --ce-id "$4" >/dev/null 2>&1; }
+  _prod() { python3 -I "$1" shadow-append --receiver core-x --log "$2" --gap-log "$3" --producer --mode current --point accept \
+      --rule-decision accept --human-decision accept --from m --ce-source /w --ce-id "$4" "${@:5}" 2>/dev/null; }
+  _sh_a1() {  # A1: linha da regra de uma janela auto ANTERIOR (auto→shadow→auto) não vale: lacuna rule_line_missing
+    local R="${d}/a1" r=0; rm -rf "${R}"; mkdir -p "${R}"
+    python3 -I - "${R}/l.jsonl" <<'PY'
+import json, os, sys, time
+now = int(time.time())
+def lid():
+    b = bytearray(os.urandom(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128; h = b.hex()
+    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
+ts = lambda t: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t))
+mc = lambda t, a, b: {"line_id": lid(), "logged_at": ts(t), "kind": "mode_change", "from_mode": a, "to_mode": b, "actor": "op"}
+rule = {"line_id": lid(), "logged_at": ts(now - 9 * 86400), "mode": "auto", "ce_source": "/w", "ce_id": "ev-a1", "ce_time": None,
+        "jti": None, "taskId": None, "rule_id": "baseline-accept-all", "rule_version": "1", "rule_decision": "reject",
+        "human_decision": None, "reason": None, "human_actor": None, "supersedes": None, "ids_verified": True, "from": "m"}
+L = [mc(now - 10 * 86400, "shadow", "auto"), rule, mc(now - 8 * 86400, "auto", "shadow"), mc(now - 2 * 86400, "shadow", "auto")]
+with os.fdopen(os.open(sys.argv[1], os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), "w") as f:
+    for o in L:
+        f.write(json.dumps(o) + "\n")
+PY
+    _prod "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a1 >/dev/null || r=$?
+    SH_WHY="rc=${r} gap=$(head -c 200 "${R}/gap.log" 2>/dev/null)"
+    [ "${r}" = 4 ] && [ "$(jq -r '[.reason,.mode] | join(",")' "${R}/gap.log" 2>/dev/null)" = "rule_line_missing,auto" ]; }
+  _sh_a3a() {  # A3: a rule_line_missing (modo auto) fecha com --mode current depois que a linha da regra existe
+    local R="${d}/a3a" r=0 gid o; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _prod "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a3 >/dev/null || r=$?
+    [ "${r}" = 4 ] || { SH_WHY="a lacuna deveria nascer (rc 4), deu ${r}"; return 1; }
+    gid="$(jq -r .gap_id "${R}/gap.log")"
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a3 || { SH_WHY="a linha da regra à mão falhou"; return 1; }; sleep 1
+    r=0; python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode current \
+      --rule-decision accept --human-decision accept --from m --ce-source /w --ce-id ev-a3 --resolves-gap "${gid}" >/dev/null 2>&1 || r=$?
+    [ "${r}" = 0 ] || { SH_WHY="a resolução com --mode current deu ${r}"; return 1; }
+    o="$(python3 -I "$1" shadow-stats --mode auto --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --json 2>/dev/null)"
+    SH_WHY="stats: ${o:0:300}"; [ "$(jq -r .gaps_in_window <<< "${o}")" = 0 ]; }
+  _sh_a3b() {  # A3: a lacuna same_second nasce no modo que vale DEPOIS da troca, e a resolução nele é honrada pelo leitor
+    local R="${d}/a3b" k r=9 same=0 t0 gid o
+    for k in 1 2 3 4 5 6; do
+      rm -rf "${R}"; mkdir -p "${R}"
+      _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change auto falhou"; return 1; }; sleep 1
+      t0="$(date -u +%s)"; _mc "$1" "${R}/l.jsonl" shadow || { SH_WHY="mode-change shadow falhou"; return 1; }
+      r=0; _prod "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a3b >/dev/null || r=$?
+      [ "$(date -u +%s)" = "${t0}" ] && { same=1; break; }
+    done
+    [ "${same}" = 1 ] || { SH_WHY="nenhuma tentativa no mesmo segundo"; return 1; }
+    [ "${r}" = 4 ] && [ "$(jq -r '[.reason,.mode] | join(",")' "${R}/gap.log")" = "same_second,shadow" ] \
+      || { SH_WHY="lacuna: $(head -c 300 "${R}/gap.log")"; return 1; }
+    gid="$(jq -r .gap_id "${R}/gap.log")"; sleep 1
+    r=0; python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode current \
+      --rule-decision accept --human-decision accept --from m --ce-source /w --ce-id ev-a3b --resolves-gap "${gid}" >/dev/null 2>&1 || r=$?
+    [ "${r}" = 0 ] || { SH_WHY="a resolução deu ${r}"; return 1; }
+    o="$(python3 -I "$1" shadow-stats --mode shadow --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --json 2>/dev/null)"
+    SH_WHY="stats: ${o:0:300}"; [ "$(jq -r .gaps_in_window <<< "${o}")" = 0 ]; }
+  _sh_a4() {  # A4: à mão, decisão humana no auto sem --supersedes para a linha da regra válida → rc 3
+    local R="${d}/a4" r=0; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a4 || { SH_WHY="a linha da regra falhou"; return 1; }
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
+      --human-decision accept --from m --ce-source /w --ce-id ev-a4 >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 2 ] && [ ! -e "${R}/gap.log" ]; }
+  _shcase "(sh62) A1: linha da regra de uma janela auto ANTERIOR (auto→shadow→auto) não vale → lacuna rule_line_missing" _sh_a1 \
+    '                      and t_auto is not None and stamp_epoch(x["logged_at"]) > t_auto' '                      and True'
+  _shcase "(sh63) A3: a lacuna rule_line_missing (modo auto) fecha com --mode current e o leitor a honra" _sh_a3a \
+    '            if not _gap_matches(g, line):' '            if not _gap_matches(g, dict(line, mode="shadow")):'
+  _shcase "(sh64) A3: a lacuna same_second nasce no modo de DEPOIS da troca, e a resolução nele é honrada pelo leitor" _sh_a3b \
+    '                line["mode"] = mode_before(ch, t_line + 1) or line["mode"]' '                line["mode"] = vig or line["mode"]'
+  _shcase "(sh65) A4: à mão, decisão humana no auto sem --supersedes para a linha da regra válida → rc 3" _sh_a4 \
+    '                elif rl and not o.get("--producer"):' '                elif False:'
   _shcase "(sh37) mode-change grava a troca (de, para, quem) e recusa trocar para o modo vigente (rc 3)" _sh_mc \
     '        if now_mode == o["--to"]:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
