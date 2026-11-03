@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**773 itens abertos** em 135 grafo(s) com aberto (de 174 no escopo) · 136 grupo(s), agrupados por `owner:` (52 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**791 itens abertos** em 136 grafo(s) com aberto (de 175 no escopo) · 137 grupo(s), agrupados por `owner:` (52 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -68,6 +68,29 @@
 | 2.4 | `C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE` | kg-multi-graph-view-2026-09 | OPCAO O4: referencia cross-arquivo vira ARESTA de 1a classe no schema (edge com file:id, resolvida pelo motor). Confianca 0.2: o E |
 | 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
 | 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
+
+## onion-core-ports-multi-model-2026-11 — 18 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 81.0 | `C_OPCAO_A_GENERATOR_PER_HARNESS` | onion-core-ports-multi-model-2026-11 | OPÇÃO A: gerador por HARNESS (não por modelo), extensão do ops/publish-door.sh e do materialize-door.sh, com tabela de capacid |
+| 55.0 | `Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11` | onion-core-ports-multi-model-2026-11 | Como o Onion deve fazer portas do onion-core para outros harnesses e modelos (onion-codex vivo; candidatas onion-mistral, onion-ge |
+| 32.5 | `D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11` | onion-core-ports-multi-model-2026-11 | DECISÃO ABERTA: portas do onion-core para outros harnesses e modelos — A gerador por harness · B ponte em runtime · C só pis |
+| 9.0 | `C_OPCAO_D_NO_NEW_DOOR_UNTIL_DEMAND` | onion-core-ports-multi-model-2026-11 | OPÇÃO D: não abrir porta nova agora — onion-codex segue como única linha viva até haver demanda medida de adotante nomeado. |
+| 8.0 | `C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY` | onion-core-ports-multi-model-2026-11 | OPÇÃO C: só piso agnóstico — portar o gate de shell (.claude/validation) para o CI de qualquer harness, sem porta de harness |
+| 3.6 | `C_SUPERACAO_20261102_AAIF_PROJECTS_PAGE_AS_PRIMARY` | onion-core-ports-multi-model-2026-11 | aaif.io/projects serve de primária para a pertença do Agent Skills à AAIF, no lugar de atlan.com, paperclipped.de e do arXiv 26 |
+| 3.6 | `C_SUPERACAO_20261102_AAIF_SKILLS_MEMBERSHIP_PRIMARY` | onion-core-ports-multi-model-2026-11 | A pertença do Agent Skills à AAIF se ancora na primária: aaif.io/projects lista 'Agent Skills' entre os 10 projetos hospedados. |
+| 3.6 | `C_SUPERACAO_20261102_CODEX_OSS_PROFILE_FILES` | onion-core-ports-multi-model-2026-11 | O Codex CLI roda modelo aberto local via --oss com oss_provider ou --local-provider, mais [model_providers.*]; desde a 0.134.0 per |
+| 3.6 | `C_SUPERACAO_20261102_CORE_SHELL_GATE_IN_CODEX_CI` | onion-core-ports-multi-model-2026-11 | O gate agnóstico do próprio core (.claude/validation/, 26.596 linhas de shell) já está portado e roda no CI do onion-codex com |
+| 3.6 | `C_SUPERACAO_20261102_EXIT2_PRE_ACTION_FOUR_HARNESSES` | onion-core-ports-multi-model-2026-11 | Exit 2 bloqueia nos eventos PRÉ-ação de Claude Code, Cursor, Codex e Gemini CLI; um guard que traduz em exit 2 os próprios err |
+| 3.6 | `C_SUPERACAO_20261102_GEMINI_CLI_RETAIL_SUNSET_SCOPE` | onion-core-ports-multi-model-2026-11 | Em 18/06/2026 o Gemini CLI deixou de servir AI Pro/Ultra e o uso gratuito, que passaram ao Antigravity CLI; segue por chave de API |
+| 3.6 | `C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN` | onion-core-ports-multi-model-2026-11 | O Ruler (experimental) só PROPAGA subagentes para 5 alvos, mas subagentes nativos existem também no Gemini CLI (.gemini/agents/* |
+| 3.6 | `C_SUPERACAO_20261102_QWEN_HOOKS_PAGE_ANCHOR` | onion-core-ports-multi-model-2026-11 | A âncora correta do veto exit 2 do Qwen Code é a página de HOOKS, não a de skills: 'exit 2 is a Blocking error. Ignores stdout |
+| 3.6 | `C_SUPERACAO_20261102_QWEN_TOOL_NAME_RUNTIME_ID` | onion-core-ports-multi-model-2026-11 | O Qwen Code segue o contrato de hooks do Claude Code no ENVELOPE (PreToolUse, exit 2, permissionDecision, CLAUDE_PROJECT_DIR, Bash |
+| 3.6 | `C_SUPERACAO_20261102_RULESYNC_ASYMMETRIC_KIRO` | onion-core-ports-multi-model-2026-11 | Mesmo com fonte única, o rulesync tem cobertura parcial e assimétrica: Codex commands só global; ignore deprecado em favor de p |
+| 3.6 | `C_SUPERACAO_20261102_VIBE_HOOKS_PRIMARY_READ` | onion-core-ports-multi-model-2026-11 | A primária de hooks do Vibe foi lida: confirma o veto por JSON deny, acrescenta strict=true (falha vira negação em pre_tool) e  |
+| 3.6 | `C_SUPERACAO_20261102_VIBE_README_CURRENT_PIECES` | onion-core-ports-multi-model-2026-11 | O README atual do mistralai/mistral-vibe (Apache-2.0, movido por Devstral) declara MCP, skills na spec Agent Skills, subagentes, h |
+| 3.2 | `C_OPCAO_B_RUNTIME_BRIDGE` | onion-core-ports-multi-model-2026-11 | OPÇÃO B: ponte em runtime — o core traduz eventos e hooks em execução para o harness alvo. |
 
 ## radar-E7-2026-10-27 — 9 item(ns)
 
