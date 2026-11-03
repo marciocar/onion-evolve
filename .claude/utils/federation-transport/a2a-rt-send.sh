@@ -19,7 +19,8 @@
 #   --state D   o estado do a2a-rt (default ~/.local/state/onion/a2a-rt): lê drafts/<id>.json
 # A chave privada e o token só são lidos pelo a2a-send.sh, por arquivo 0600 (nunca argv, nunca log).
 # Depois do envio, o rascunho vai para drafts/sent/ e o par (rascunho, jti) entra em sent.tsv: o mesmo
-# rascunho não sai duas vezes.
+# rascunho não sai duas vezes. O envio também grava a linha `sent` no registro de rascunhos (<state>/drafts.jsonl,
+# a2a-metrics.py; PLAN-E §3). Rascunho substituído por uma edição (drafts/superseded/) não existe mais para envio.
 # Exit: 0 enviado (ou gravado no outbox) · 1 envio falhou (HTTP != 200) · 2 uso, rascunho inválido ou ferramenta
 #       ausente · 4 RECUSADO: sem terminal ou sem a confirmação digitada
 # Exercitado por lint-selftest.sh (run_a2a_rt_selftests).
@@ -47,7 +48,7 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --thread) need "$@"; THREAD="$2"; shift 2 ;;
   --outbox) need "$@"; OUTBOX="$2"; shift 2 ;;
   --exp-offset) need "$@"; EXP_OFF="$2"; shift 2 ;;
-  -h|--help) sed -n '2,26p' "$0"; exit 0 ;;
+  -h|--help) sed -n '2,27p' "$0"; exit 0 ;;
   *) die "argumento desconhecido: $1 (não existe flag que pule a confirmação)" ;;
 esac; done
 
@@ -111,6 +112,11 @@ exec 3>&-
 record_sent() {  # $1 = jti
   ( umask 077; printf '%s\t%s\t%s\t%s\t%s\n' "${DRAFT}" "$1" "${THREAD}" "$(date +%s)" "${SIDE}" >> "${SENT_TSV}" )
   ( umask 077; mkdir -p "${STATE}/drafts/sent" ); mv -f "${DF}" "${STATE}/drafts/sent/${DRAFT}.json"
+  # o registro de rascunhos (PLAN-E §3): a linha `sent`. A mensagem JÁ saiu; se a linha falhar, o rascunho conta
+  # como descartado em 24 h (contra o envio automático: a falha é conservadora), e o aviso diz isso
+  python3 -I "${HERE}/a2a-metrics.py" draft-append --log "${STATE}/drafts.jsonl" --event sent --draft-id "${DRAFT}" \
+      --thread "${THREAD}" --recipient "${TO}" >/dev/null 2> "${WORK}/metrics.err" \
+    || echo "a2a-rt-send: AVISO — enviado, mas a linha 'sent' do registro de rascunhos falhou ($(head -c 300 "${WORK}/metrics.err")): este rascunho vai contar como descartado." >&2
 }
 TARGS=(); [ -z "${THREAD}" ] || TARGS=(--thread "${THREAD}")
 

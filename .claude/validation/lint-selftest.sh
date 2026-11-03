@@ -10959,7 +10959,7 @@ EOF
   local svc_home; svc_home="$(sed -n 's/^SVC_HOME=//p' "${wr}" | head -1)"
   # a fila de sandbox: o core na raiz (um aceito, um não), um hub num subdiretório; o corpo leva um marcador
   _qlreset() {
-    rm -rf "${d}/q" "${d}/inbox" "${d}/op/"*
+    rm -rf "${d}/q" "${d}/inbox" "${d}/op/"* "${d}/sh"
     mkdir -p "${d}/q/hub-bancada" "${d}/inbox/_processed"
     _qlrec() { printf '{"taskId":"%s","receivedAt":"2026-10-15T12:00:00.000Z","from":"%s","receiver":%s,"signal":{"id":"s","from":"%s","body":"CORPO-SECRETO-BANCADA"},"verdict":{"verified":true},"envelope":{"jws":"x"}}\n' "$2" "$3" "$4" "$3" > "$1"; }
     _qlrec "${d}/q/s1.t-aceito.json" t-aceito membro-a '"onion-evolve"'
@@ -10976,6 +10976,8 @@ EOF
     local w="$1" rc=0 out; shift
     out="$(cd "${d}" && env PATH="${QLR_PATH:-}${d}/stub:${PATH}" LC_ALL=C ONION_A2A_QUEUE_TEST=1 ONION_A2A_QUEUE_DIR="${d}/q" \
       ONION_A2A_QUEUE_INBOX="${d}/inbox" ONION_A2A_QUEUE_BACKUP="${QLR_BK:-${d}/bk.sh}" ONION_A2A_QUEUE_LOCK="${d}/lock" \
+      ONION_A2A_QUEUE_METRICS="${REPO_ROOT}/.claude/utils/federation-transport/a2a-metrics.py" \
+      ONION_A2A_QUEUE_SHADOW_LOG="${QLR_SHADOW:-${d}/sh/shadow.jsonl}" \
       ${QLR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
     printf '%s|%s' "${rc}" "${out}"
   }
@@ -11118,6 +11120,80 @@ PY
   _qlcase "(q29) list em texto não imprime caractere de controle vindo do remetente" \
     'o={k: ("".join(c for c in v if c.isprintable()) if isinstance(v, str) else v) for k, v in json.loads(sys.argv[1]).items()}' \
     'o=json.loads(sys.argv[1])' _c_ansi
+  # ── count (PLAN-E §1 da curadoria, 2026-11-03): a contagem diária com os arquivados, e os refutadores dela ──
+  # O relógio é fixo (ONION_A2A_QUEUE_NOW = 2026-11-03T12:00Z): o último dia completo é 2026-11-02.
+  local qnow=1793707200
+  # _qlday <arq> <taskId> <receivedAt> [corpo-json-string] → registro com o corpo dado no envelope (o CloudEvent mora nele)
+  _qlday() { printf '{"taskId":"%s","receivedAt":"%s","from":"m","receiver":"onion-evolve","signal":{"id":"s"},"verdict":{"verified":true},"envelope":{"jws":"x","signal":{"body":%s}}}\n' \
+      "$2" "$3" "${4:-\"corpo\"}" > "$1"; }
+  _qlcount() { QLR_ENV="ONION_A2A_QUEUE_NOW=${qnow}" _qlr "$@"; }
+  _qljget() {  # _qljget <saída do _qlr> <jq> → o valor tirado da linha cujo "day" ou "ending" casa
+    printf '%s\n' "${1#*|}" | grep '^{' | jq -r "$2" 2>/dev/null | grep -v '^null$' | head -1; }
+  _c_cnt5() { local i
+    for i in 1 2 3; do _qlday "${d}/q/c${i}.tc${i}.json" "tc${i}" "2026-11-02T0${i}:00:00.000Z"; done
+    mkdir -p "${d}/q/_archived"; for i in 4 5; do _qlday "${d}/q/_archived/c${i}.tc${i}.json" "tc${i}" "2026-11-02T0${i}:00:00Z"; done
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 5 ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .ending')" = 2026-11-02 ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .trigger_back // "nulo"')" = nulo ] && ! _qlhas "${r}" "corpo"; }
+  _c_cntnoat() { _c_cnt5 "$1"; printf '{"taskId":"tz","from":"m","signal":{},"verdict":{"verified":true}}\n' > "${d}/q/_archived/c6.tz.json"
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 2 && [ "$(_qljget "${r}" 'select(.ending) | .no_received_at')" = 1 ] \
+      && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 5 ]; }
+  _c_cntfresh() { rm -rf "${d}/q/"*.json "${d}/q/hub-bancada"
+    local r; r="$(_qlcount "$1" count --by-day --stage 2 --since 2026-10-04 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(printf '%s\n' "${r#*|}" | grep -c '"no_data": true')" = 30 ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .trigger_back')" = false ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .consecutive_days_under_1000')" = 0 ]; }
+  _c_cntback() { rm -rf "${d}/q/"*.json "${d}/q/hub-bancada"; local i day
+    for i in $(seq 0 29); do day="$(python3 -I -c 'import sys,datetime as d; print(d.date(2026,11,2)-d.timedelta(days=int(sys.argv[1])))' "${i}")"
+      _qlday "${d}/q/b${i}.tb${i}.json" "tb${i}" "${day}T10:00:00Z"; done
+    local r; r="$(_qlcount "$1" count --by-day --stage 2 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 1 && [ "$(_qljget "${r}" 'select(.ending) | .consecutive_days_under_1000')" = 30 ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .trigger_back')" = true ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .trigger_b // "nulo"')" = nulo ]; }
+  _c_cntce() { local ce='"{\"specversion\":\"1.0\",\"id\":\"ev-1\",\"source\":\"/vigia\",\"type\":\"t\"}"'
+    _qlday "${d}/q/e1.te1.json" te1 2026-11-02T01:00:00Z "${ce}"; _qlday "${d}/q/e2.te2.json" te2 2026-11-02T02:00:00Z "${ce}"
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 1 ] && ! _qlhas "${r}" "vigia"; }
+  _c_cntdup() { _qlday "${d}/q/u1.json" "" 2026-11-02T01:00:00Z; mkdir -p "${d}/q/_archived"; cp "${d}/q/u1.json" "${d}/q/_archived/u1.json"
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.ending) | .duplicated')" = 1 ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .no_dedup_key')" = 1 ] && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 1 ]; }
+  _qlcase "(q30) count: 3 vivos e 2 arquivados do mesmo dia dão total 5 (PLAN-E §1), sem o corpo, só dias completos" \
+    '_rows="$(scan "${q}/_archived")" || die 2' '_rows="" || die 2' _c_cnt5
+  _qlcase "(q31) count: arquivado sem receivedAt → no_received_at 1, rc 2, e o dia dos outros 5 continua 5" \
+    'bad = fin["malformed"] or fin["no_received_at"]' 'bad = fin["malformed"]' _c_cntnoat
+  _qlcase "(q32) count: 30 dias de bridge sem registro saem no_data e NÃO disparam trigger_back" \
+    '"no_data": tot == 0})' '"no_data": False})' _c_cntfresh
+  _qlcase "(q33) count --stage 2: 30 dias seguidos abaixo de 1000 → trigger_back, rc 1, e o gatilho do degrau 1 sai null" \
+    'OVER, UNDER, DAYS_B, DAYS_BACK = 5000, 1000, 7, 30' 'OVER, UNDER, DAYS_B, DAYS_BACK = 5000, 1000, 7, 31' _c_cntback
+  _qlcase "(q34) count: o mesmo CloudEvent (source + id) em dois registros conta uma vez" \
+    'o["ce_source"], o["ce_id"] = ce["source"], ce["id"]' 'o["ce_source"], o["ce_id"] = None, None' _c_cntce
+  _qlcase "(q35) count: o mesmo registro na fila e em _archived/ conta uma vez (duplicated 1; sem taskId, no_dedup_key 1)" \
+    'fin["duplicated"] += 1' 'pass' _c_cntdup
+  # ── a recusa humana no log de sombra do aceite (PLAN-E §2): nasce no archive --force-unaccepted ──
+  _c_shrej() { _qlrec "${d}/q/s7.t7.json" t7 membro-e null
+    python3 -I - "${d}/q/s7.t7.json" <<'PY'
+import json, sys
+p = sys.argv[1]; r = json.load(open(p)); r["envelope"] = {"jws": "h.eyJqdGkiOiJqLXJlai0xIn0.s"}; json.dump(r, open(p, "w"))
+PY
+    local r; r="$(_qlr "$1" archive s7.t7.json --force-unaccepted "recusa de teste da bancada" --apply)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(stat -c %a "${d}/sh/shadow.jsonl" 2>/dev/null)" = 600 ] \
+      && [ "$(jq -r 'select(.jti=="j-rej-1") | [.mode,.human_decision,.rule_decision,.reason,.taskId] | join(",")' "${d}/sh/shadow.jsonl" 2>/dev/null)" \
+           = "shadow,reject,accept,recusa de teste da bancada,t7" ] && ! grep -q CORPO-SECRETO "${d}/sh/shadow.jsonl"; }
+  _c_shgit() { git init -q "${d}/sh-git"; _qlrec "${d}/q/s8.t8.json" t8 membro-f null
+    python3 -I - "${d}/q/s8.t8.json" <<'PY'
+import json, sys
+p = sys.argv[1]; r = json.load(open(p)); r["envelope"] = {"jws": "h.eyJqdGkiOiJqLXJlai0xIn0.s"}; json.dump(r, open(p, "w"))
+PY
+    local r; r="$(QLR_SHADOW="${d}/sh-git/x/shadow.jsonl" _qlr "$1" archive s8.t8.json --force-unaccepted "recusa de teste da bancada" --apply)"
+    QL_WHY="${r:0:400}"; rm -rf "${d}/sh-git"
+    _qlrc "${r}" 2 && [ -f "${d}/q/s8.t8.json" ] && [ ! -e "${d}/q/_archived/s8.t8.json" ]; }
+  _qlcase "(q36) archive --force-unaccepted grava a RECUSA humana no log de sombra (0600, jti do JWS, motivo, regra v1, sem corpo)" \
+    '  SHADOW=1' '  SHADOW=0' _c_shrej
+  _qlcase "(q37) log de sombra que não aceita escrita (dentro de árvore git) → rc 2 e nada movido" \
+    '|| die 2 "o log de sombra do aceite não aceita escrita' '|| true "o log de sombra do aceite não aceita escrita' _c_shgit
   rm -rf "${d}"
 }
 
@@ -16802,6 +16878,11 @@ PY
        && grep -qF 'gravado no outbox: ' "${sb}/c.out" && ! grep -qF '(dry-run: ' "${sb}/c.out"; then
       record_pass "a2a-rt (c): com a confirmação certa grava UM envelope assinado (kid do core, aud, kind question, exp 3600, 0600), o ESC, o CSI de 8 bits e o bidi do rascunho aparecem desarmados na tela, e a saída diz 'gravado no outbox' sem o '(dry-run: …)' da etapa interna"
     else record_fail "a2a-rt (c): confirmação certa" "rc=${rc} outbox=$(_rt_nob) assinatura=${okv:-falhou} $(head -c 400 "${sb}/c.out")"; fi
+    # PLAN-E §3: o rascunho nasceu com a linha `drafted` e o envio gravou a `sent` (o registro de rascunhos, 0600)
+    _rt_sentline() { [ "$(jq -r 'select(.draft_id=="q1") | .event' "${CS}/drafts.jsonl" 2>/dev/null | sort | paste -sd, -)" = "drafted,sent" ] \
+      && [ "$(stat -c %a "${CS}/drafts.jsonl")" = 600 ] && [ "$(jq -r 'select(.event=="sent") | .recipient' "${CS}/drafts.jsonl")" = membro-x ]; }
+    if _rt_sentline; then record_pass "a2a-rt (c-registro): o rascunho tem a linha drafted e o envio grava a sent no registro de rascunhos (0600, destinatário)"
+    else record_fail "a2a-rt (c-registro): linhas do registro" "$(head -c 400 "${CS}/drafts.jsonl" 2>/dev/null) · $(head -c 200 "${sb}/c.out")"; fi
     rc=0; _rt_c_tty "${snd}" "ENVIAR ${CODE}" || rc=$?
     if [ "${rc}" = 2 ] && [ "$(_rt_nob)" = 1 ]; then record_pass "a2a-rt (c): o mesmo rascunho não sai duas vezes (rc 2, outbox com 1)"
     else record_fail "a2a-rt (c): reenvio do rascunho" "rc=${rc} outbox=$(_rt_nob)"; fi
@@ -16859,6 +16940,16 @@ PY
     else rc=0; _rt_c_notty "${mut}/send/a2a-rt-send.sh" || rc=$?
       if [ "${rc}" != 4 ] && [ "$(_rt_nob)" = 1 ]; then record_pass "a2a-rt (c) mutante: sem a confirmação o envio sai sem terminal (rc ${rc}, 1 envelope) e o caso o pega"
       else record_fail "a2a-rt (c) mutante" "o envio sem confirmação não saiu (rc ${rc}, outbox $(_rt_nob)): o caso não prova a confirmação"; fi
+    fi
+    # mutante do registro: o envio que não grava a linha `sent` (o append vira --check) reprova o caso (c-registro)
+    mkdir -p "${mut}/send2"; cp "${a2s}" "${ft}/a2a-metrics.py" "${mut}/send2/"
+    sed 's/ draft-append --log "\${STATE}\/drafts.jsonl" --event sent / draft-append --log "${STATE}\/drafts.jsonl" --check /' "${snd}" > "${mut}/send2/a2a-rt-send.sh"
+    rm -rf "${OB2}"; mkdir -p "${CS}/drafts"; mv "${CS}/drafts/sent/q1.json" "${CS}/drafts/q1.json" 2>/dev/null; : > "${CS}/sent.tsv"
+    grep -v '"event":"sent"' "${CS}/drafts.jsonl" > "${sb}/dl.tmp"; cat "${sb}/dl.tmp" > "${CS}/drafts.jsonl"
+    if cmp -s "${snd}" "${mut}/send2/a2a-rt-send.sh"; then record_fail "a2a-rt (c-registro) mutante" "a âncora do draft-append sumiu"
+    else rc=0; _rt_c_tty "${mut}/send2/a2a-rt-send.sh" "ENVIAR ${CODE}" || rc=$?
+      if [ "${rc}" = 0 ] && [ "$(_rt_nob)" = 1 ] && ! _rt_sentline; then record_pass "a2a-rt (c-registro) mutante: o envio sem a linha sent sai (rc 0) e o caso reprova"
+      else record_fail "a2a-rt (c-registro) mutante" "rc=${rc} outbox=$(_rt_nob): o mutante não isolou a linha sent $(head -c 300 "${sb}/c.out")"; fi
     fi
   fi
 
@@ -16958,6 +17049,100 @@ PY
     elif _rt_card "${mut}/card.md"; then record_fail "a2a-rt (f-card) mutante" "o 'bash a2a-doctor.sh' nu passou"
     else record_pass "a2a-rt (f-card) mutante: o 'bash a2a-doctor.sh' nu (a forma antiga) reprova"; fi
   fi
+
+  # ─────────────────── (g) o REGISTRO DE RASCUNHOS (PLAN-E §3 da curadoria, 2026-11-03) ───────────────────
+  # (g1) editar = rascunho novo com supersedes_draft na MESMA conversa: duas linhas drafted, o antigo sai de drafts/
+  # (não pode mais ser enviado), e nada disso toca rede ou subprocesso; outra conversa é recusada
+  _rt_req "${sb}/g.req" x '{"name":"draft_message","arguments":{"to":"onion-evolve","text":"versão 1","thread":"th-g","idempotency_key":"g-a"}}' \
+    '{"name":"draft_message","arguments":{"to":"onion-evolve","text":"versão 2","thread":"th-g","idempotency_key":"g-b","supersedes_draft":"g-a"}}' \
+    '{"name":"draft_message","arguments":{"to":"onion-evolve","text":"versão 3","thread":"outra","idempotency_key":"g-c","supersedes_draft":"g-b"}}'
+  _rt_edit() {  # $1 = mcp → 0 se a edição virou registro
+    rm -rf "${ST}/drafts" "${ST}/drafts.jsonl" "${sb}/net-called"; local o; o="$(_rt "$1" "${sb}/g.req")"
+    [ ! -s "${AUD}" ] && [ ! -e "${sb}/net-called" ] || return 1
+    [ -f "${ST}/drafts/g-b.json" ] && [ ! -e "${ST}/drafts/g-a.json" ] && [ -f "${ST}/drafts/superseded/g-a.json" ] || return 1
+    [ "$(_rt_iserr "${o}" 3)" = "true" ] && [ ! -e "${ST}/drafts/g-c.json" ] || return 1
+    [ "$(jq -r '[.event,.draft_id,(.supersedes_draft // "-"),.thread,.recipient] | join(",")' "${ST}/drafts.jsonl" | paste -sd'|' -)" \
+      = "drafted,g-a,-,th-g,onion-evolve|drafted,g-b,g-a,th-g,onion-evolve" ] && [ "$(stat -c %a "${ST}/drafts.jsonl")" = 600 ]
+  }
+  if _rt_edit "${mcp}"; then record_pass "a2a-rt (g1): editar = rascunho novo com supersedes_draft (duas linhas drafted, 0600; o antigo sai de drafts/), sem rede nem subprocesso; outra conversa recusada"
+  else record_fail "a2a-rt (g1): edição no registro" "$(head -c 400 "${ST}/drafts.jsonl" 2>/dev/null) · aud=$(head -c 200 "${AUD}")"; fi
+  python3 - "${mcp}" "${mut}/g1.py" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read()
+a = 'metrics.draft_line("drafted", draft_id, thread, to, sup or None)'
+assert a in s
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, 'metrics.draft_line("drafted", draft_id, thread, to, None)', 1))
+PY
+  cp "${ft}/a2a-metrics.py" "${mut}/a2a-metrics.py"
+  local rc_i=1 rc_m=1; _rt_edit "${mcp}" && rc_i=0; _rt_edit "${mut}/g1.py" && rc_m=0
+  _prove_mutation "a2a-rt (g1) mutante: a linha drafted sem supersedes_draft reprova" "${mcp}" "${mut}/g1.py" "${rc_i}" "${rc_m}"
+  # (g2…g5) o contador draft-stats sobre registros sintéticos (os refutadores do PLAN-E §3), relógio fixo
+  local met="${ft}/a2a-metrics.py" DNOW=1793707200
+  _dsgen() {  # _dsgen <cenário> <arq>
+    python3 -I - "$1" "$2" "${DNOW}" <<'PY'
+import json, os, sys, time
+scen, path, now = sys.argv[1], sys.argv[2], int(sys.argv[3])
+def lid():
+    b = bytearray(os.urandom(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128; h = b.hex()
+    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
+def ln(t, ev, did=None, sup=None):
+    return {"line_id": lid(), "logged_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t)), "draft_id": did,
+            "thread": "th" if did else None, "recipient": "onion-evolve" if did else None, "supersedes_draft": sup,
+            "event": ev, "actor": "op"}
+L = []
+if scen in ("a27", "a26"):
+    edited, disc = {5: 6, 12: 13}, {20} | ({21} if scen == "a26" else set())
+    sup_of = {v: k for k, v in edited.items()}
+    for i in range(30):
+        t = now - (40 - i) * 86400
+        L.append(ln(t, "drafted", f"d{i}", f"d{sup_of[i]}" if i in sup_of else None))
+        if i in disc:
+            L.append(ln(t + 90000, "discarded", f"d{i}"))
+        elif i not in edited:
+            L.append(ln(t + 60, "sent", f"d{i}"))
+elif scen == "virt":
+    for i in range(29):
+        t = now - (40 - i) * 86400
+        L += [ln(t, "drafted", f"d{i}"), ln(t + 60, "sent", f"d{i}")]
+    L.append(ln(now - 25 * 3600, "drafted", "d29"))
+elif scen == "ks":
+    L += [ln(now - 3600, "kill_switch_on"), ln(now - 1800, "kill_switch_off")]
+with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), "w") as f:   # o escritor exige 0600
+    for o in L:
+        f.write(json.dumps(o) + "\n")
+PY
+  }
+  _dsst() { local o r=0; _dsgen "$2" "${sb}/ds-$2.jsonl"; o="$(python3 -I "$1" draft-stats --log "${sb}/ds-$2.jsonl" --now "${DNOW}" --json "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
+  _dsj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
+  _ds27() { local r; r="$(_dsst "$1" a27 --last 30)"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 1 ] && [ "$(_dsj "${r}" '[.approved_unedited,.edited,.discarded,.unedited_rate,.trigger_auto_send,(.trigger_back_to_draft|tostring)] | map(tostring) | join(",")')" = "27,2,1,0.9,true,null" ]; }
+  _ds26() { local r; r="$(_dsst "$1" a26 --last 30)"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[.approved_unedited,.unedited_rate,.trigger_auto_send] | map(tostring) | join(",")')" = "26,0.8667,false" ]; }
+  _dsvirt() { local r; r="$(_dsst "$1" virt --last 30)"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 1 ] && [ "$(_dsj "${r}" '[.closed,.approved_unedited,.discarded,.unedited_rate,.trigger_auto_send] | map(tostring) | join(",")')" = "30,29,1,0.9667,true" ] \
+      && [ "$(jq -r 'select(.event=="discarded") | .draft_id' "${sb}/ds-virt.jsonl")" = d29 ]; }
+  _dsks() { local r; r="$(_dsst "$1" ks --since-stage-on 2026-11-01)"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 1 ] && [ "$(_dsj "${r}" '[.kill_switch_acts_since_on,.out_of_list_since_on,.trigger_back_to_draft] | map(tostring) | join(",")')" = "2,0,true" ]; }
+  _dscase() {  # _dscase <nome> <função> <âncora> <troca>
+    local rc_i=1 rc_m=1; DS_WHY=""
+    "$2" "${met}" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "a2a-rt: $1"; else record_fail "a2a-rt: $1" "${DS_WHY}"; fi
+    OLD="$3" NEW="$4" python3 - "${met}" "${mut}/ds-mut.py" <<'PY'
+import os, sys
+s = open(sys.argv[1], encoding="utf-8").read(); o = os.environ["OLD"]
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1) if o in s else s)
+PY
+    "$2" "${mut}/ds-mut.py" && rc_m=0
+    _prove_mutation "a2a-rt: $1 (MUT)" "${met}" "${mut}/ds-mut.py" "${rc_i}" "${rc_m}"
+  }
+  _dscase "(g2) draft-stats: 30 rascunhos, 27 aprovados sem edição, 2 editados, 1 descartado → 0,90, trigger_auto_send, rc 1" _ds27 \
+    '        if did in superseded:' '        if False:'
+  _dscase "(g3) draft-stats: 26 de 30 → 0,8667, NÃO dispara" _ds26 \
+    '>= AUTO_SEND_RATE))' '>= AUTO_SEND_RATE - 0.05))'
+  _dscase "(g4) draft-stats: 29 aprovados e 1 rascunho de 25 h sem linha de descarte → 30 fechados, 29/30 (não 29/29), e a linha discarded nasce" _dsvirt \
+    '        elif did in disc_line or now > t0 + DISCARD_SECONDS:' '        elif did in disc_line:'
+  _dscase "(g5) draft-stats: kill_switch_on seguido de off entre duas leituras → trigger_back_to_draft, rc 1" _dsks \
+    'any(o["event"] == "kill_switch_on" for o in ks)' 'False'
   rm -rf "${sb}"
 }
 
@@ -16973,6 +17158,8 @@ run_a2a_accept_selftests() {
   # (--trust-repo): o core (fonte), o membro acme, o hub hub-a e o filho kid-a.
   local d tr ib out rc doc NOW
   d="$(mktemp -d)"; tr="${d}/trust"; ib="${d}/inbox"; mkdir -p "${ib}" "${tr}/docs/evolution/federation" "${tr}/.claude/utils/federation-transport/jwks"
+  # o aceite grava o log de sombra (PLAN-E §2); a bancada nunca escreve no ~/.local/state de quem roda
+  local -x A2A_SHADOW_LOG="${d}/shadow/accept.jsonl"
   cat > "${tr}/docs/evolution/federation/members.yaml" <<'YML'
 members:
   - id: onion-evolve
@@ -17245,6 +17432,132 @@ PY
   rc=0; out="$(bash "${lone}/.claude/utils/federation-transport/a2a-accept.sh" "${rh}" --inbox "${ibh}" 2>&1)" || rc=$?
   if [ "${rc}" -eq 2 ] && grep -q 'não sei o receptor' <<< "${out}"; then record_pass "a2a-accept: (F3.a6) instalação sem registro (o hub) e sem --receiver → rc 2, nunca aceita a fila de qualquer um"
   else record_fail "a2a-accept: (F3.a6) sem registro e sem --receiver" "rc=${rc} out='${out}'"; fi
+
+  # ── LOG DE SOMBRA do aceite (PLAN-E §2 da curadoria, 2026-11-03) ─────────────────────────────────────────
+  # (sh1) o aceite NOVO grava UMA linha accept com os ids do CloudEvent do corpo REVERIFICADO, o jti assinado e o
+  # taskId, sem o corpo; o aceite repetido (idempotente) não grava outra
+  local met="${REPO_ROOT}/.claude/utils/federation-transport/a2a-metrics.py" shl="${d}/shadow-ce.jsonl" ibs="${d}/inbox-shadow"
+  mkdir -p "${ibs}"
+  _arec acme onion-evolve jti-ce-1 "$((NOW-60))" '{"specversion":"1.0","id":"ev-42","source":"/vigia/x","type":"t","time":"2026-11-03T10:00:00Z","data":"SEGREDO-DO-CORPO"}' "${d}/r-ce.json"
+  _shacc() {  # $1 = aceite → 0 se a linha certa nasceu, uma vez só
+    rm -rf "${ibs}" "${shl}" "${d}/ledger-sh"; mkdir -p "${ibs}"
+    rc=0; out="$(A2A_SHADOW_LOG="${shl}" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" 2>&1)" || rc=$?
+    [ "${rc}" = 0 ] || return 1
+    A2A_SHADOW_LOG="${shl}" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" >/dev/null 2>&1 || return 1
+    [ "$(grep -c . "${shl}" 2>/dev/null)" = 1 ] && [ "$(stat -c %a "${shl}")" = 600 ] && ! grep -q SEGREDO "${shl}" || return 1
+    [ "$(jq -r '[.mode,.human_decision,.rule_decision,.ce_source,.ce_id,.ce_time,.jti,(.taskId|length>0)] | map(tostring) | join(",")' "${shl}")" \
+      = "shadow,accept,accept,/vigia/x,ev-42,2026-11-03T10:00:00Z,jti-ce-1,true" ]
+  }
+  if _shacc "${helper}"; then record_pass "a2a-accept: (sh1) o aceite grava UMA linha de sombra (accept, 0600) com o CloudEvent do corpo reverificado e o jti, sem o corpo; a repetição não grava outra"
+  else record_fail "a2a-accept: (sh1) linha de sombra do aceite" "rc=${rc} out='$(head -c 300 <<< "${out}")' log=$(head -c 400 "${shl}" 2>/dev/null)"; fi
+  python3 - "${mft}/.claude/utils/federation-transport/a2a-accept.sh" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read()
+a = '--ce-source "${CE_SOURCE}" --ce-id "${CE_ID}"'
+assert a in s, "ancora"
+open(p, "w", encoding="utf-8").write(s.replace(a, '--ce-source "" --ce-id ""', 1))
+PY
+  if _shacc "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: (sh1) mutante" "a linha sem os ids do CloudEvent passou"
+  else record_pass "a2a-accept: (sh1) mutante: a linha sem os ids do CloudEvent reprova"; fi
+  cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
+  # (sh2) log de sombra que não aceita escrita (dentro de árvore git) → RECUSA antes do doc: nada aceito
+  _shgit() {  # $1 = aceite → 0 se recusou sem doc
+    rm -rf "${ibs}" "${d}/ledger-sh" "${d}/gitlog"; mkdir -p "${ibs}"; git init -q "${d}/gitlog"
+    rc=0; out="$(A2A_SHADOW_LOG="${d}/gitlog/s.jsonl" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" 2>&1)" || rc=$?
+    [ "${rc}" = 1 ] && [ -z "$(find "${ibs}" -name '*.md')" ] && grep -q 'log de sombra' <<< "${out}"
+  }
+  if _shgit "${helper}"; then record_pass "a2a-accept: (sh2) log de sombra dentro de árvore git → RECUSA antes do doc (aceite sem medida não nasce)"
+  else record_fail "a2a-accept: (sh2) log de sombra inválido" "rc=${rc} out='$(head -c 300 <<< "${out}")'"; fi
+  python3 - "${mft}/.claude/utils/federation-transport/a2a-accept.sh" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read()
+a = '  || refuse "o log de sombra do aceite não aceita escrita'
+assert a in s, "ancora"
+open(p, "w", encoding="utf-8").write(s.replace(a, '  || true "o log de sombra do aceite não aceita escrita', 1))
+PY
+  if _shgit "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: (sh2) mutante" "sem a checagem prévia o caso ainda passou"
+  else record_pass "a2a-accept: (sh2) mutante: sem a checagem prévia o doc nasce sem a linha e o caso reprova"; fi
+  cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
+
+  # (sh3…sh8) o contador shadow-stats sobre logs sintéticos (os refutadores do PLAN-E §2), cada um com mutante no
+  # a2a-metrics.py. O relógio é fixo (--now); as linhas nascem com logged_at relativo a ele
+  local SNOW=1793707200
+  _shgen() {  # _shgen <cenário> <arq>
+    python3 -I - "$1" "$2" "${SNOW}" <<'PY'
+import json, os, sys, time
+scen, path, now = sys.argv[1], sys.argv[2], int(sys.argv[3])
+def lid():
+    b = bytearray(os.urandom(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128; h = b.hex()
+    return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
+def ln(t, rule, human, key, mode="shadow", ver="1", sup=None):
+    return {"line_id": lid(), "logged_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t)), "mode": mode,
+            "ce_source": "/w", "ce_id": key, "ce_time": None, "jti": None, "taskId": None, "rule_id": "accept-rule",
+            "rule_version": ver, "rule_decision": rule, "human_decision": human, "reason": None,
+            "human_actor": "op" if human else None, "supersedes": sup}
+L = []
+if scen in ("s50", "s50v", "mal"):
+    for i in range(50):
+        day = i * 14 // 49
+        L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}",
+                    ver="2" if scen == "s50v" and day >= 10 else "1"))
+elif scen == "s60":
+    for i in range(60):
+        L.append(ln(now - (14 - i * 14 // 59) * 86400 + i, "accept", "reject" if i >= 50 else "accept", f"e{i}"))
+elif scen == "auto":
+    for i in range(10):
+        L.append(ln(now - 3 * 86400 + i, "accept", None, f"a{i}", mode="auto"))
+    for i in (2, 5):
+        L.append(ln(now - 2 * 86400 + i, None, "reject", f"a{i}", mode="auto", sup=L[i]["line_id"]))
+with open(path, "w") as f:
+    for o in L:
+        f.write(json.dumps(o) + "\n")
+    if scen == "mal":
+        f.write('{"line_id": "x"}\n')
+PY
+  }
+  # _shst <metrics> <cenário> [extra] → "rc|json"
+  _shst() { local o r=0; _shgen "$2" "${d}/sh-$2.jsonl"; o="$(python3 -I "$1" shadow-stats --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
+  _shj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
+  _sh_on() { local r; r="$(_shst "$1" s50)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.events,.agree,.agreement,.days_covered,.trigger_rule_on,(.trigger_back_to_shadow|tostring)] | map(tostring) | join(",")')" = "50,48,0.96,14,true,null" ]; }
+  _sh_ver() { local r; r="$(_shst "$1" s50v)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '.rule_version')" = 2 ] && [ "$(_shj "${r}" '.trigger_rule_on')" = false ]; }
+  _sh_rej() { local r; r="$(_shst "$1" s60)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.events,.agreement,.trigger_rule_on,.confusion.accept.reject] | map(tostring) | join(",")')" = "60,0.8333,false,10" ]; }
+  _sh_und() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","ce_source":"/w","ce_id":"nova","jti":"j"}' \
+      '{"receivedAt":"2026-10-20T10:00:00Z","ce_source":"/w","ce_id":"e3","jti":"j"}' '{"receivedAt":"2026-11-03T10:00:00Z","jti":"recente"}' > "${d}/sh-q.jsonl"
+    r="$(_shst "$1" s50 --queue-jsonl "${d}/sh-q.jsonl")"; SH_WHY="${r:0:400}"
+    [ "$(_shj "${r}" '.undecided')" = 1 ] && [ "$(_shj "${r}" '.events')" = 50 ]; }
+  _sh_auto() { local r; r="$(_shst "$1" auto)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.mode,.decisions_7d,.reversals_7d,.reversal_rate_7d,.trigger_back_to_shadow,(.trigger_rule_on|tostring)] | map(tostring) | join(",")')" = "auto,10,2,0.2,true,null" ]; }
+  _sh_mal() { local r; r="$(_shst "$1" mal)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.malformed')" = 1 ]; }
+  _sh_none() { local r=0; python3 -I "$1" shadow-stats --log "${d}/nao-existe.jsonl" --json >/dev/null 2>&1 || r=$?; SH_WHY="rc=${r}"; [ "${r}" = 2 ]; }
+  _shcase() {  # _shcase <nome> <função> <âncora> <troca>
+    local rc_i=1 rc_m=1; SH_WHY=""
+    "$2" "${met}" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "a2a-accept: $1"; else record_fail "a2a-accept: $1" "${SH_WHY}"; fi
+    OLD="$3" NEW="$4" python3 - "${met}" "${d}/met-mut.py" <<'PY'
+import os, sys
+s = open(sys.argv[1], encoding="utf-8").read(); o = os.environ["OLD"]
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1) if o in s else s)
+PY
+    "$2" "${d}/met-mut.py" && rc_m=0
+    _prove_mutation "a2a-accept: $1 (MUT)" "${met}" "${d}/met-mut.py" "${rc_i}" "${rc_m}"
+  }
+  _shcase "(sh3) shadow-stats: 50 eventos em 14 dias, 48 concordâncias → 0,96, trigger_rule_on, rc 1 (o de volta sai null)" _sh_on \
+    'RULE_ON_DAYS, RULE_ON_EVENTS, RULE_ON_AGREEMENT = 14, 50, 0.95' 'RULE_ON_DAYS, RULE_ON_EVENTS, RULE_ON_AGREEMENT = 14, 50, 0.97'
+  _shcase "(sh4) shadow-stats: os mesmos 50 com a rule_version trocada no dia 10 NÃO disparam (a contagem recomeça)" _sh_ver \
+    'cur = [o for o in valid if o["rule_version"] == version]' 'cur = list(valid)'
+  _shcase "(sh5) shadow-stats: regra que aceita tudo, 50 aceites e 10 recusas do archive → 0,8333, NÃO dispara" _sh_rej \
+    '        if rule == human:' '        if True:'
+  _shcase "(sh6) shadow-stats: registro na fila há mais de 3 dias sem decisão = undecided, fora do denominador" _sh_und \
+    '            if k is None or k not in all_keys:' '            if False:'
+  _shcase "(sh7) shadow-stats no modo auto: 2 reversões em 10 decisões (0,2 > 0,15) → trigger_back_to_shadow, rc 1" _sh_auto \
+    'o["human_decision"] != effective(tgt)' 'False'
+  _shcase "(sh8) shadow-stats: linha malformada → rc 2 (não pôde medir), contada em malformed" _sh_mal \
+    '            malformed += 1' '            pass'
+  _shcase "(sh9) shadow-stats: log ausente → rc 2 (ausência não é zero)" _sh_none \
+    '        raise MeasureError(f"log ausente:' '        return []; raise MeasureError(f"log ausente:'
 
   rm -rf "${d}"
 }
