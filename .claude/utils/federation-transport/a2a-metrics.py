@@ -4,7 +4,7 @@
 # docs/evolution/research/event-watcher-2026-10/PLAN-E.md, critério selado no nó C_EVENT_WATCHER_PLAN_E).
 #
 # POR QUE EXISTE (2026-11-03): a escada do vigia (degraus 1 a 3) só passa de desejo a gatilho com três medições
-# que o core não tinha: a contagem diária da fila (verbo `count` do ops/a2a-queue-live.sh), o log de SOMBRA do
+# que o core não tinha: a contagem diária da fila (verbo `count` do leitor da fila viva; no core, ops/a2a-queue-live.sh (core-only)), o log de SOMBRA do
 # aceite e o registro dos RASCUNHOS do aviso. Este arquivo guarda as duas últimas e a peça comum às três:
 #   ce             o parse do CloudEvent dentro do corpo do sinal (só id, source, type e time; nunca o corpo)
 #   shadow-append  uma linha do log de sombra do aceite (nasce no a2a-accept.sh e no archive --force-unaccepted)
@@ -538,7 +538,7 @@ def _received_epoch(at):
 
 def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     """→ (saída, rc). `lines` = read_log(); `mode` = o modo em vigor (shadow|auto), dado por quem pergunta e NUNCA
-    tirado da última linha (cura A1); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None);
+    tirado da última linha (cura A1); `queue_rows` = linhas do `list --json` da fila viva (core-only: ops/a2a-queue-live.sh) (ou None);
     `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
     malformed = future = ahead = 0
     valid, changes = [], []
@@ -1091,7 +1091,7 @@ def main(argv):
         else:
             _say_stats("sombra do aceite", out, rc)
             if out["undecided"] is None:
-                print("[a2a-metrics] undecided NÃO medido: passe --queue-jsonl (a saída de ops/a2a-queue-live.sh list --json)")
+                print("[a2a-metrics] undecided NÃO medido: passe --queue-jsonl (a lista da fila viva em JSONL, uma mensagem por linha)")
         return rc
     if cmd == "draft-append":
         o = _opts(rest, {"--log": True, "--check": False, "--event": True, "--draft-id": True, "--thread": True,
