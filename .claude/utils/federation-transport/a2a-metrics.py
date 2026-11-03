@@ -602,7 +602,11 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     # M1: DIAS COMPLETOS APÓS O 1º = períodos inteiros de 24 h desde a 1ª linha (23:59 → 00:01 de 14 dias depois = 13)
     out["days_covered"] = max(0, (now - first) // 86400)
     by_id = {o["line_id"]: o for o in scur}
-    superseded = {o["supersedes"] for o in scur if o["supersedes"]}
+
+    def _same_event_sup(o):
+        # supersedes só vale dentro do MESMO evento: a linha que aponta outro evento não muda o desfecho dele
+        return bool(o["supersedes"]) and o["supersedes"] in by_id and event_key(by_id[o["supersedes"]]) == event_key(o)
+    superseded = {o["supersedes"] for o in scur if _same_event_sup(o)}
     events = {}
     for i, o in enumerate(scur):
         events.setdefault(event_key(o), []).append((i, o))
@@ -613,7 +617,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     conf = out["confusion"]
     n_events = agree = holds = 0
     for k, ls in events.items():
-        roots = [o for _, o in ls if not o["supersedes"] or o["supersedes"] not in by_id]
+        roots = [o for _, o in ls if not _same_event_sup(o)]
         rule = next((o["rule_decision"] for o in roots if o["rule_decision"] is not None), None)
         heads = [(stamp_epoch(o["logged_at"]), i, o) for i, o in ls if o["line_id"] not in superseded]
         final = max(heads)[2] if heads else ls[-1][1]       # a decisão humana FINAL da cadeia de supersedes
@@ -935,6 +939,7 @@ def main(argv):
         # 1º o MODO da linha, com a MESMA régua do leitor (mode_before no instante da linha); só depois a lacuna e o
         # casamento do --resolves-gap, que veem a linha já decidida (A3 da 7ª passada)
         refusal = reason = None
+        rl = []
         prior = []
         if os.path.lexists(log):
             try:
@@ -952,7 +957,7 @@ def main(argv):
                 line["mode"] = mode_before(ch, t_line + 1) or line["mode"]
             elif vig is None:
                 refusal, reason = "troca de modo ambígua (duas no mesmo segundo, destinos diferentes)", "mode_ambiguous"
-            elif vig == "auto" and (want == "current" or line["human_decision"] is not None):
+            elif vig == "auto":
                 # julgamento: no auto, a decisão humana confirma ou reverte a linha da REGRA do mesmo evento, e ela só
                 # vale se for desta janela auto (depois da última troca para auto, e com o modo vigente auto nela)
                 t_auto = max((stamp_epoch(c["logged_at"]) for c in ch if c["to_mode"] == "auto"
@@ -969,20 +974,26 @@ def main(argv):
                         refusal, reason = "não há a linha da regra deste evento nesta janela auto", "rule_line_missing"
                     else:
                         line["supersedes"] = rl[-1]["line_id"]
-                elif not o.get("--producer"):
-                    ids = {x["line_id"] for x in rl}
-                    if line["supersedes"]:
-                        # M1 (8ª passada): o --supersedes à mão tem de ser a linha da regra VÁLIDA desta janela, para o
-                        # mesmo evento: outro evento, UUID de fora ou linha humana são recusados
-                        if line["supersedes"] not in ids:
-                            raise UsageError("--supersedes não é a linha da regra válida deste evento nesta janela auto")
-                    elif rl:
-                        # A4: à mão, decisão humana no auto sem supersedes para uma linha da regra válida é recusada
-                        raise UsageError("no modo auto a decisão humana tem de apontar a linha da regra (--supersedes) "
-                                         "ou usar --mode current")
+                elif not o.get("--producer") and line["human_decision"] is not None and not line["supersedes"] and rl:
+                    # A4: à mão, decisão humana no auto sem supersedes para uma linha da regra válida é recusada
+                    raise UsageError("no modo auto a decisão humana tem de apontar a linha da regra (--supersedes) "
+                                     "ou usar --mode current")
             if refusal is None and want != "current" and line["mode"] != vig:
                 refusal, reason = (f"--mode {line['mode']}, mas o modo vigente no instante da linha é {vig}: grave a "
                                    "troca com mode-change antes"), "mode_not_in_force"
+            if line["supersedes"] and not o.get("--producer"):
+                # o --supersedes à mão se confere SEMPRE (com ou sem decisão humana): no auto ele tem de ser a linha da
+                # regra válida desta janela, para o mesmo evento (M1); no shadow, uma linha existente do MESMO evento
+                if line["mode"] == "auto":
+                    if line["supersedes"] not in {x["line_id"] for x in rl}:
+                        raise UsageError("--supersedes não é a linha da regra válida deste evento nesta janela auto")
+                else:
+                    tgt = next((x for _, x in prior if isinstance(x, dict) and not validate_shadow(x)
+                                and x["line_id"] == line["supersedes"]), None)
+                    if tgt is None or event_key(tgt) != event_key(line):
+                        raise UsageError("--supersedes tem de apontar uma linha existente do MESMO evento")
+        elif line["supersedes"] and not o.get("--producer"):
+            raise UsageError("o log está ilegível: o --supersedes não pode ser conferido")
         if refusal:
             # recusa a um PRODUTOR oficial (aceite, archive) vira lacuna e nunca some; a quem chama à mão, rc 3
             if o.get("--producer"):
