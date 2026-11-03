@@ -26,7 +26,12 @@
 #                  escritor a um produtor oficial vira lacuna (rc 4), nunca some
 #                  PONTO ABERTO declarado: a linha da REGRA no auto ainda se escreve à mão (shadow-append --mode auto
 #                  sem --human-decision), até existir o escritor da regra. À mão, a decisão humana no auto sem
-#                  --supersedes para uma linha da regra válida desta janela é recusada (rc 3)
+#                  --supersedes para uma linha da regra válida desta janela é recusada (rc 3), e o --supersedes dado
+#                  tem de ser essa linha (senão rc 3).
+#                  BAIXOS declarados (8ª passada): B2 — a metade mode_before do filtro da linha da regra (A1) não tem
+#                  teste próprio; só importa num empate no mesmo segundo, que já sai como troca ambígua. B3 — uma
+#                  lacuna rule_line_missing aberta no auto não fecha depois da volta para shadow (a regravação seria
+#                  noutro modo); ela segura o rc 2 por até 7 dias da janela. Escolha conservadora.
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
@@ -944,8 +949,7 @@ def main(argv):
                 line["mode"] = mode_before(ch, t_line + 1) or line["mode"]
             elif vig is None:
                 refusal, reason = "troca de modo ambígua (duas no mesmo segundo, destinos diferentes)", "mode_ambiguous"
-            elif vig == "auto" and (want == "current" or (line["human_decision"] is not None
-                                                          and not line["supersedes"])):
+            elif vig == "auto" and (want == "current" or line["human_decision"] is not None):
                 # julgamento: no auto, a decisão humana confirma ou reverte a linha da REGRA do mesmo evento, e ela só
                 # vale se for desta janela auto (depois da última troca para auto, e com o modo vigente auto nela)
                 t_auto = max((stamp_epoch(c["logged_at"]) for c in ch if c["to_mode"] == "auto"
@@ -962,10 +966,17 @@ def main(argv):
                         refusal, reason = "não há a linha da regra deste evento nesta janela auto", "rule_line_missing"
                     else:
                         line["supersedes"] = rl[-1]["line_id"]
-                elif rl and not o.get("--producer"):
-                    # A4: à mão, decisão humana no auto sem supersedes para uma linha da regra válida é recusada
-                    raise UsageError("no modo auto a decisão humana tem de apontar a linha da regra (--supersedes) ou "
-                                     "usar --mode current")
+                elif not o.get("--producer"):
+                    ids = {x["line_id"] for x in rl}
+                    if line["supersedes"]:
+                        # M1 (8ª passada): o --supersedes à mão tem de ser a linha da regra VÁLIDA desta janela, para o
+                        # mesmo evento: outro evento, UUID de fora ou linha humana são recusados
+                        if line["supersedes"] not in ids:
+                            raise UsageError("--supersedes não é a linha da regra válida deste evento nesta janela auto")
+                    elif rl:
+                        # A4: à mão, decisão humana no auto sem supersedes para uma linha da regra válida é recusada
+                        raise UsageError("no modo auto a decisão humana tem de apontar a linha da regra (--supersedes) "
+                                         "ou usar --mode current")
             if refusal is None and want != "current" and line["mode"] != vig:
                 refusal, reason = (f"--mode {line['mode']}, mas o modo vigente no instante da linha é {vig}: grave a "
                                    "troca com mode-change antes"), "mode_not_in_force"
