@@ -2,7 +2,8 @@
 branch: docs/decide-2026-11-03-r3
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 65b4bfff3c6f01fe864b125b3c9046f16c897d8900a112e9c0e7f1e377fd94e7
+reviewed_code_sha256: 3166b34835f1d3236c000fb8a800f19c5b8ee232391d1c5244d52580c7282fb0
 findings_total: 1
 findings_real: 1
 tokens: 0
