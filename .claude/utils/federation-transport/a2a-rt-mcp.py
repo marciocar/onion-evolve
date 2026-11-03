@@ -272,10 +272,12 @@ def draft_message(args):
         # um rascunho fora do registro e fora da lacuna seria um buraco que ninguém vê
         try:
             os.unlink(path)
-        except OSError:
-            pass
+            left = "nada foi gravado"
+        except OSError as e2:
+            left = (f"MAS o arquivo do rascunho {path} NÃO foi apagado ({e2.strerror}): apague-o à mão antes de qualquer "
+                    "envio")
         raise ToolError(f"nem a linha drafted nem o marcador draft-gap.log foram gravados ({e}): o rascunho foi "
-                        "RECUSADO, nada foi gravado")
+                        f"RECUSADO, {left}")
     if old_path:
         os.makedirs(os.path.join(DRAFTS, "superseded"), mode=0o700, exist_ok=True)
         os.replace(old_path, os.path.join(DRAFTS, "superseded", f"{sup}.json"))
