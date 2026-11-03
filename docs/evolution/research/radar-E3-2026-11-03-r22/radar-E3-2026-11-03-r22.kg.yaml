@@ -1,0 +1,443 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.316 a 2.1.317 contra a baseline 2.1.314.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-11-03-r22
+  schema_version: "1"
+  baseline: "2026-11-03"
+  review_after: "2026-12-03"   # 30d: cadência de ferramenta
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-11-03); 11 da rodada; 24 após o juiz (4 nós novos e 7 superações).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+#   DECIDIDO (2026-11-03): (a). O nó das versões de quem serve da r21 caiu (host 2.1.317) e a pergunta da subida
+#   do SDK da r21 ficou com alvo velho (0.3.314; hoje 0.3.317). Depois do juiz, mais duas: a extensão do VS Code
+#   (hoje nove versões atrás) e a guarda de deriva (sucessora medida na 2.1.317).
+external_edges:
+  - from: E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103
+    to: "docs/evolution/research/radar-E3-2026-10-30-r21/radar-E3-2026-10-30-r21.kg.yaml#E_HOST_E_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1030"
+    edge_type: SUPERSEDES
+  - from: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_317_E_PIN_DO_REVISOR_PARA_V1_0_267_1103
+    to: "docs/evolution/research/radar-E3-2026-10-30-r21/radar-E3-2026-10-30-r21.kg.yaml#Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_314_1030"
+    edge_type: SUPERSEDES
+  - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103
+    to: "docs/evolution/research/radar-E3-2026-10-30-r21/radar-E3-2026-10-30-r21.kg.yaml#E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1030"
+    edge_type: SUPERSEDES
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_317_1103
+    to: "docs/evolution/research/radar-E3-2026-10-30-r21/radar-E3-2026-10-30-r21.kg.yaml#E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_314_1030"
+    edge_type: SUPERSEDES
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG oficial: seções 2.1.316 (58 linhas, 55 itens), 2.1.317 (90 linhas, 87 itens); baseline 2.1.314, disco 2.1.317, processo 2.1.317, SDK bridge 2.1.310"
+    label: "o delta desde a baseline 2.1.314 são 2 versão(ões), de 2.1.316 a 2.1.317, extraídas do CHANGELOG oficial"
+    trace: "docs/evolution/research/radar-E3-2026-11-03-r22/SYNTHESIS.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.316 a ## 2.1.317 (cópias em docs/evolution/research/radar-E3-2026-11-03-r22/data/)"
+      method: "measurement: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-11-03"
+    verified_against: "fechada em 2026-11-03 pela rodada 22 do radar do Claude Code: 142 itens; os candidatos medidos no vivo (versões de quem serve, esforço dos subagentes, settings gerenciados remotos, dica de retomada, MCP do Chrome, onFailure do SDK, SendMessage a agente em fundo, limpeza de transcripts, VS Code, Remote Control, itens sem superfície, a guarda cited_directive); juiz independente (subagente opus não-fork): 10 SUSTENTA, 5 EXAGERA, 2 REPROVA, 7 superações (data/judge-verdicts.json, judge-verdict-check rc 0); os itens sem medição estão nos NÃO-VERIFICADOS da SYNTHESIS"
+    label: "quais itens de 2.1.316 a 2.1.317 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "claude --version 2.1.317 (disco e processo, censo de 2026-11-03); onion-review.yml usa claude-code-action@6d5ae526 (v1.0.265, CLI 2.1.314, pelo session-currency-check); o package.json do bridge ⟨checkout do serviço na VPS⟩ pede @anthropic-ai/claude-agent-sdk ^0.3.310 e o binário embutido diz 2.1.310; npm view dá 0.3.317"
+    label: "quem serve o Onion em 2026-11-03: o host na 2.1.317, o revisor do CI na 2.1.314 e o bridge na 2.1.310, seis versões publicadas atrás do host no npm (a 2.1.313 nunca saiu)"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções 2.1.316 e 2.1.317; package.json do bridge; onion-review.yml linhas 301 e 456"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_317_E_PIN_DO_REVISOR_PARA_V1_0_267_1103
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-03"
+    verified_against: "npm view @anthropic-ai/claude-agent-sdk version → 0.3.317; o pin v1.0.267 da claude-code-action instala o CLI 2.1.317 (session-currency-check de 2026-11-03)"
+    label: "o SDK do bridge sobe para 0.3.317 e o pin do revisor para v1.0.267 (sha 4845bacb); o deploy do bridge é do maestro, o pin é PR do core, provado no PR seguinte"
+  - id: E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG 2.1.317: «Changed subagents and teammates on a different model from the main conversation to use that model's saved effort level or its default, instead of the session's effort level». No core: 51 agentes com model fixo (43 sonnet, 8 opus; censo), 0 com effort no frontmatter (grep '^effort:' em .claude/agents = 0); os workflows declaram effort por chamada (27 ocorrências em .claude/workflows/*.js)"
+    label: "na 2.1.317 os agentes do core cujo modelo difere do da sessão passam a rodar no esforço padrão do modelo deles: numa sessão opus são os 43 sonnet, e os 8 opus seguem no esforço da sessão; os workflows não mudam, porque declaram o esforço por chamada"
+    narrative: "A 2.1.316 também trouxe CLAUDE_CODE_SUBAGENT_EFFORT, que fixa o esforço dos subagentes quando nada mais o nomeia. Nenhum agente do core declara effort, então o efeito é o padrão do modelo. Não foi medido se isso muda a qualidade de algum agente."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.317 (item Changed subagents…) e ## 2.1.316 (Added CLAUDE_CODE_SUBAGENT_EFFORT)"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: Q_AGENTES_DECLARAM_O_ESFORCO_1103
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-03"
+    verified_against: "decorre de E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103; nenhuma medição de qualidade feita"
+    label: "os agentes cujo modelo difere do da sessão de quem os chama devem declarar effort no frontmatter, ou a casa fixa CLAUDE_CODE_SUBAGENT_EFFORT"
+  - id: E_SETTINGS_GERENCIADOS_REMOTOS_APLICAM_SEM_APROVACAO_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG 2.1.316: «settings fetched from Anthropic's API now apply without an approval prompt». Medido: o /status da sessão de teste A2A da VPS (colagem do maestro de 2026-11-03) lista as fontes «User settings, Command line arguments, Enterprise managed settings (remote)»; o remote-settings.json do usuário existe e carrega channelsEnabled: true (lido pelo juiz); nem --settings nem --strict-mcp-config controlam essa fonte"
+    label: "as configurações gerenciadas pela organização chegam às sessões do Onion sem aprovação desde a 2.1.316, inclusive às sessões de teste A2A, e hoje ligam os canais (channelsEnabled), um caminho de mensagem de entrada que o pré-registro não lista como superfície"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.316 (Changed server-managed settings…); PRE-REGISTRO.md da ida e volta, §10b"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_DICA_DE_RETOMADA_NAO_REPETE_AS_FLAGS_DO_TESTE_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG 2.1.317: «Improved the \"Resume this session with\" hint shown at exit to repeat the flags you launched with (for example `--chrome --debug`) ahead of `--resume`». Medido no notebook com a 2.1.317, sessão aberta com --tools \"\" --strict-mcp-config --no-chrome --mcp-config … --settings … --permission-mode default: a dica de saída foi só «claude --resume 462f1206-…», sem nenhuma dessas flags"
+    label: "na 2.1.317 a dica de retomada não repetiu as flags de isolamento da sessão de teste A2A; quem retomar por ela abre a sessão sem --tools vazio, sem --strict-mcp-config e sem --no-chrome"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.317 (Improved the Resume hint…); colagem do maestro de 2026-11-03 (P9 do notebook)"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "pessoa"
+  - id: Q_CARD_DO_TESTE_PROIBE_RETOMAR_PELA_DICA_1103
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-11-03"
+    verified_against: "decorre de E_DICA_DE_RETOMADA_NAO_REPETE_AS_FLAGS_DO_TESTE_1103"
+    label: "o card do teste A2A deve proibir retomar a sessão de teste pela dica de saída e mandar sempre a linha de comando inteira"
+  - id: E_CLAUDE_IN_CHROME_FURA_O_STRICT_MCP_CONFIG_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-03"
+    verified_against: "não é item do delta; medido ao vivo na 2.1.317 (VPS): a sessão aberta com --strict-mcp-config e --mcp-config só com o a2a-rt mostrou no /mcp o claude-in-chrome (22 ferramentas) como «Built-in MCPs (always available)»; o arquivo de estado do usuário do Claude Code ⟨.claude.json na home⟩ tem claudeInChromeDefaultEnabled: true; com --no-chrome o /mcp mostrou 1 servidor"
+    label: "o --strict-mcp-config não barra o MCP embutido do Chrome: com claudeInChromeDefaultEnabled ligado, toda sessão do Onion ganha 22 ferramentas de navegador, a menos que a linha leve --no-chrome"
+    narrative: "Curado no teste A2A pela Emenda 2 do pré-registro. Fica a pergunta para outras sessões isoladas da casa (o /chat do bridge usa o SDK, não medido aqui)."
+    provenance:
+      source: "medição ao vivo na sessão de teste A2A da VPS, 2.1.317"
+      locator: "PRE-REGISTRO.md da ida e volta, Emenda 2 (docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/)"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_SDK_HOOK_ONFAILURE_SEM_CALLBACK_NO_BRIDGE_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG 2.1.317: «Added onFailure: \"block\" for Agent SDK hook callbacks». O bridge não registra hook por callback: agent-policy.ts (comentário 5) corta os hooks com disableAllHooks e allowManagedHooksOnly; e o SDK dele está na 0.3.310"
+    label: "o onFailure block para callbacks de hook do Agent SDK não tem superfície no bridge, que corta os hooks em vez de registrá-los"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md e o agent-policy.ts do bridge"
+      locator: "## 2.1.317 (Added onFailure…); agent-policy.ts, comentário 5"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_317_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 0, «OK ✓ — todas as guardas reagiram conforme esperado», em 2026-11-03 com o Claude Code 2.1.317"
+    label: "a guarda de deriva de binário (cited_directive) segue verde na 2.1.317"
+    provenance:
+      source: "execução da família cited_directive da bancada"
+      locator: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_ITENS_SEM_SUPERFICIE_NO_CORE_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-11-03"
+    verified_against: "grep -rn -i -E 'opus-4-8|opus 4\\.8|fast.?mode' .claude ops .github CLAUDE.md → 0 (o bridge roda claude-opus-5); grep -c -i powershell .claude/settings.json → 0; os itens de gateway, cloud sessions, Claude Tag, self-hosted runner e Windows não têm superfície no core"
+    label: "o fim do fast mode do Opus 4.8, a correção dos hooks PowerShell e os itens de gateway, nuvem, Claude Tag, runner e Windows não tocam o core; o VS Code e o Remote Control têm nós próprios"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md e grep no core"
+      locator: "seções 2.1.316 e 2.1.317; .claude, ops e .claude/settings.json"
+      method: "measurement: medição no vivo pela sessão do core"
+      locality: "repo"
+  - id: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-11-03"
+    verified_against: "extensão anthropic.claude-code-2.1.306 instalada no host (ls, medido pelo juiz); host na 2.1.317: nove versões publicadas atrás; os itens [VSCode] da 2.1.316 e da 2.1.317 não a alcançam"
+    label: "a extensão do VS Code do host segue na 2.1.306, nove versões publicadas atrás, e os itens [VSCode] do delta não chegam a ela"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.316 e ## 2.1.317, itens [VSCode]; ls das extensões do host"
+      method: "measurement: medição no vivo pela sessão do core e pelo juiz"
+      locality: "repo"
+  - id: E_SENDMESSAGE_MOVE_COMANDO_DO_AGENTE_PARA_O_FUNDO_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG 2.1.317: «Changed SendMessage so a message to a running background agent arrives earlier: its running command moves to the background, without being stopped». No core: hook PreToolUse casa SendMessage (house-code-gloss.sh) e background-task-probe.sh vigia tarefas de fundo; a casa manda SendMessage a agentes em fundo (resíduo e juiz desta rodada)"
+    label: "na 2.1.317 uma mensagem a um agente em fundo manda o comando dele para o fundo sem pará-lo; um agente que roda um gate longo pode responder antes de o gate terminar, e a resposta não prova o gate"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.317 (Changed SendMessage…); .claude/hooks/house-code-gloss.sh e .claude/hooks/background-task-probe.sh"
+      method: "measurement: medição no vivo pela sessão do core e pelo juiz"
+      locality: "repo"
+  - id: E_LIMPEZA_DE_TRANSCRIPTS_COM_SETTING_SOURCES_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG 2.1.317: «Fixed old transcripts not being cleaned up on machines where some runs skip cleanup, such as runs using --setting-sources». No core: ops/chat-runner.sh usa --setting-sources; o juiz contou 2193 .jsonl com mais de 30 dias nos projetos do usuário, sem cleanupPeriodDays no settings"
+    label: "desde a 2.1.317 a limpeza de transcripts antigos volta a rodar onde o --setting-sources a pulava, e o custo de runs antigos de workflow, que a casa recupera do journal, pode sumir com eles"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.317 (Fixed old transcripts…); ops/chat-runner.sh"
+      method: "measurement: medição no vivo pela sessão do core e pelo juiz"
+      locality: "repo"
+  - id: E_REMOTE_CONTROL_SO_NO_HOST_1103
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-11-03"
+    verified_against: "CHANGELOG 2.1.317: itens de Remote Control (disableRemoteControl, don't ask again de mod, fork names, mensagem após restart); o settings do usuário do host tem remoteControlAtStartup: true; nenhuma superfície no repo"
+    label: "os itens de Remote Control da 2.1.317 só tocam o host, que abre toda sessão com o Remote Control ligado; nada no repo depende deles"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "## 2.1.317, itens de Remote Control"
+      method: "measurement: medição no vivo pela sessão do core e pelo juiz"
+      locality: "repo"
+  - id: C_SUPERACAO_20261103_BRIDGE_SEIS_VERSOES_PUBLICADAS_ATRAS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-03"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103"
+    label: "a distância de versões se conta pelas publicadas: o bridge está seis versões atrás no npm, não sete"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261103_ESFORCO_SO_MUDA_COM_MODELO_DIFERENTE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-03"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103"
+    label: "o esforço da sessão só deixa de valer para o agente cujo modelo difere do da sessão; os de mesmo modelo seguem nele"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261103_PERGUNTA_DO_ESFORCO_RESTRITA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-03"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em Q_AGENTES_DECLARAM_O_ESFORCO_1103"
+    label: "a pergunta do esforço vale só para os agentes de modelo diferente do de quem os chama"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de Q_AGENTES_DECLARAM_O_ESFORCO_1103"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261103_SETTINGS_REMOTOS_LIGAM_CANAIS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-03"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_SETTINGS_GERENCIADOS_REMOTOS_APLICAM_SEM_APROVACAO_1103"
+    label: "a fonte gerenciada remota carrega channelsEnabled: true, um caminho de entrada de mensagem na sessão, e a prova é a colagem do maestro"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_SETTINGS_GERENCIADOS_REMOTOS_APLICAM_SEM_APROVACAO_1103"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261103_GREP_COM_E_E_VSCODE_TEM_SUPERFICIE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-03"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_ITENS_SEM_SUPERFICIE_NO_CORE_1103"
+    label: "o grep de alternativa precisa de -E, e o VS Code e o Remote Control têm superfície no host"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: EXAGERA de E_ITENS_SEM_SUPERFICIE_NO_CORE_1103"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261103_EXTENSAO_VSCODE_DA_R21_CAIU
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-03"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103"
+    label: "o nó da extensão do VS Code da rodada anterior caiu pela distância e ganha sucessor com SUPERSEDES"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: REPROVA de E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+  - id: C_SUPERACAO_20261103_OMISSOES_DO_DELTA_MEDIDAS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.75
+    verified_at: "2026-11-03"
+    verified_against: "superação entregue pelo juiz (judge-verdict-check: SUPERACAO), aplicada pela rodada em E_SENDMESSAGE_MOVE_COMANDO_DO_AGENTE_PARA_O_FUNDO_1103"
+    label: "as omissões do delta que tocam superfície viraram nós ou NÃO-VERIFICADOS, medidas"
+    provenance:
+      source: "data/judge-verdicts.json"
+      locator: "veredito: REPROVA de E_SENDMESSAGE_MOVE_COMANDO_DO_AGENTE_PARA_O_FUNDO_1103"
+      method: "judges: subagente opus independente"
+      locality: "repo"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103
+    to: Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_317_E_PIN_DO_REVISOR_PARA_V1_0_267_1103
+    edge_type: SUPPORTS
+  - from: E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103
+    to: Q_AGENTES_DECLARAM_O_ESFORCO_1103
+    edge_type: SUPPORTS
+  - from: E_DICA_DE_RETOMADA_NAO_REPETE_AS_FLAGS_DO_TESTE_1103
+    to: Q_CARD_DO_TESTE_PROIBE_RETOMAR_PELA_DICA_1103
+    edge_type: SUPPORTS
+  - from: E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SETTINGS_GERENCIADOS_REMOTOS_APLICAM_SEM_APROVACAO_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_DICA_DE_RETOMADA_NAO_REPETE_AS_FLAGS_DO_TESTE_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_IN_CHROME_FURA_O_STRICT_MCP_CONFIG_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SDK_HOOK_ONFAILURE_SEM_CALLBACK_NO_BRIDGE_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_317_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ITENS_SEM_SUPERFICIE_NO_CORE_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261103_BRIDGE_SEIS_VERSOES_PUBLICADAS_ATRAS
+    to: E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261103_ESFORCO_SO_MUDA_COM_MODELO_DIFERENTE
+    to: E_EFFORT_DOS_SUBAGENTES_SEGUE_O_MODELO_NA_2_1_317_1103
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261103_PERGUNTA_DO_ESFORCO_RESTRITA
+    to: Q_AGENTES_DECLARAM_O_ESFORCO_1103
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261103_SETTINGS_REMOTOS_LIGAM_CANAIS
+    to: E_SETTINGS_GERENCIADOS_REMOTOS_APLICAM_SEM_APROVACAO_1103
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261103_GREP_COM_E_E_VSCODE_TEM_SUPERFICIE
+    to: E_ITENS_SEM_SUPERFICIE_NO_CORE_1103
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261103_EXTENSAO_VSCODE_DA_R21_CAIU
+    to: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261103_OMISSOES_DO_DELTA_MEDIDAS
+    to: E_SENDMESSAGE_MOVE_COMANDO_DO_AGENTE_PARA_O_FUNDO_1103
+    edge_type: TRACES_TO
+  - from: E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SENDMESSAGE_MOVE_COMANDO_DO_AGENTE_PARA_O_FUNDO_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_LIMPEZA_DE_TRANSCRIPTS_COM_SETTING_SOURCES_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_REMOTE_CONTROL_SO_NO_HOST_1103
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
