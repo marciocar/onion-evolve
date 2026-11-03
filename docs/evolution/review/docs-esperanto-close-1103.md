@@ -2,7 +2,8 @@
 branch: docs/esperanto-close-1103
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 96efec90eb53cc04bb5b29e166d1c2eeec7fdcd8828e4a8807178419d8c15332
+reviewed_code_sha256: fbb6ba036cd07d01b3a4b50ebb18a45ace63392f77e3eaf1849e598d59939769
 findings_total: 1
 findings_real: 0
 tokens: 0
