@@ -343,9 +343,9 @@ for ln in open(rows_path, encoding="utf-8"):
         fin["no_received_at"] += 1
         continue
     try:
-        dt.date.fromisoformat(o["receivedAt"][:10])
+        dt.datetime.fromisoformat(o["receivedAt"][:19])
     except ValueError:
-        # data impossível (2026-02-30): conta à parte, sai do dia, e o rc vira 2 — nunca aborta a contagem
+        # data ou hora impossível (2026-02-30, T25:61): conta à parte, sai do dia, e o rc vira 2 — nunca aborta
         fin["bad_received_at"] += 1
         continue
     # M5: o CloudEvent só deduplica registro que o bridge verificou; os ids de registro não verificado são escolha de
@@ -498,7 +498,7 @@ elif [ "${STATUS%%:*}" = forcado ] && [ -z "${TID}" ]; then
   say "AVISO: ${REC} não tem taskId na forma: a recusa fica fora do log de sombra (sem chave de evento verificável)"
 elif [ "${STATUS%%:*}" = forcado ]; then
   SHADOW=1
-  SH_ARGS=(--receiver "${RECEIVER:-${DEFAULT_RECEIVER}}"); [ -z "${SHADOW_LOG}" ] || SH_ARGS=(--log "${SHADOW_LOG}")
+  SH_ARGS=(--receiver "${RECEIVER:-${DEFAULT_RECEIVER}}"); [ -z "${SHADOW_LOG}" ] || SH_ARGS+=(--log "${SHADOW_LOG}")
   [ -z "${GAP_LOG}" ] || SH_ARGS+=(--gap-log "${GAP_LOG}")
   [ -f "${METRICS}" ] || die 2 "a2a-metrics.py ausente (${METRICS}): sem ele nem a lacuna se registra; nada movido"
 fi
