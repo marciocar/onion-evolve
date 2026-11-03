@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/03-format.md sha256:e602f96586f44514 -->
+<!-- translation-of: docs/manual/03-format.md sha256:99dcaf26d6c806f9 -->
 # 3. Referência do formato
 
 [English](../03-format.md) | **Português (Brasil)**
@@ -208,9 +208,16 @@ códigos escritos nos labels e nas narrativas contra o vocabulário (capítulo 5
   - id: T_EAN
     node_type: entity
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
     confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "o PDF do dicionário de dados baixado em 2026-10-22"
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "itens 9, 10 e 11"
+      method: "reading: o PDF baixado, verbete a verbete"
+      locality: web
     label: "Código EAN: o código de 13 dígitos que identifica o país, o fabricante e o produto."
     x_term:
       pref: "Código EAN"
@@ -233,6 +240,10 @@ códigos escritos nos labels e nas narrativas contra o vocabulário (capítulo 5
 
 O exemplo inteiro, tirado do dicionário de dados aberto da CMED/ANVISA, está em
 [`spec/vocab-examples/cmed-dictionary.kg.yaml`](../../../spec/vocab-examples/cmed-dictionary.kg.yaml).
+
+Um termo em vigor é `confirmed`, com a `provenance` da fonte de onde foi adotado, como qualquer outro fato. Deixe-o
+`open` só enquanto a definição ainda está em negociação: o `kg_vocab.py` resolve um termo aberto do mesmo jeito, mas a
+fila de nós abertos (`kg_query --open`) listaria uma definição assentada como trabalho pendente.
 
 ### `x_mirror`, `x_doc_cycle` e `x_questionnaire`
 

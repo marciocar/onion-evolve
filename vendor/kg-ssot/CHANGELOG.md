@@ -10,6 +10,15 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.40.2] - 2026-11-03
+
+No contract change (still v4.18), and no verdict changes.
+
+- The manual shows how to count every owner's queue from one query: the JSON output of `kg_query --open` carries `owner`
+  only when asked, with `--fields owner`, which returns it in each node's `extra`, with `--limit` up to 1000 and `next_cursor` past that.
+- A term in force is `confirmed` with the `provenance` of its source. The term example in the manual and the terms of
+  `spec/vocab-examples/cmed-dictionary.kg.yaml` were `open`, which put settled definitions in the queue of open nodes.
+
 ## [4.40.1] - 2026-10-30
 
 No contract change (still v4.18), and no verdict changes.

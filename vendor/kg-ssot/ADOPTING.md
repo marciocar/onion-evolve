@@ -343,6 +343,10 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.40.1` to `kg-ssot-v4.40.2`, nothing changes for a graph or a gate: the contract (v4.18), the
+schemas and the verdicts are the same. The manual and the vocabulary example are new: the terms of the example are now
+`confirmed` with `provenance`, and the manual shows `--fields owner` for the queue of each owner.
+
 From `kg-ssot-v4.40.0` to `kg-ssot-v4.40.1`, nothing changes for a graph or a gate: the contract (v4.18), the
 schemas and the verdicts are the same. The README, the package descriptions and the `--help` of `kg-query --revisit`
 are new.
