@@ -36,7 +36,9 @@
 #   count       SÓ LEITURA (PLAN-E §1 da curadoria, 2026-11-03): a contagem diária da fila por data UTC do receivedAt,
 #               viva E _archived/, somando todos os receptores (a saída mostra cada um só para leitura). Deduplica
 #               por ce_source + ce_id (o CloudEvent do corpo), senão pelo taskId; sem nenhum dos dois conta uma vez
-#               (no_dedup_key); o mesmo nome na fila e em _archived/ conta uma vez (duplicated). Malformado e sem
+#               (no_dedup_key); o mesmo nome na fila e em _archived/ conta uma vez (duplicated). O CloudEvent só
+#               deduplica registro verificado pelo bridge (deduped_by_ce); o não verificado, pelo taskId. Todo
+#               receptor lido aparece em by_receiver, com 0 se preciso; zero_days conta os dias zerados. Malformado e sem
 #               receivedAt não têm dia: só a linha final, e rc 2. Só dias UTC COMPLETOS (ending = ontem). Dia sem
 #               registro sai no_data e QUEBRA as duas sequências (o bridge ainda não marca quando esteve fora, então
 #               zero e fora são indistinguíveis, e a linha final o declara em zero_vs_down: indistinguishable; na
@@ -47,6 +49,7 @@
 #   (human_decision: reject, o motivo em reason) no log de sombra do aceite do OPERADOR (a2a-metrics.py,
 #   ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl), com ids_verified false: o evento é o taskId.
 #   A linha que falha NÃO desfaz o archive: vira LACUNA em shadow-gap.log (aviso alto); sem nem a lacuna, rc 1.
+#   Só a fila do CORE gera recusa na sombra (registro de hub não); a regra v1 (baseline-accept-all) é sempre accept.
 #   Fixos, sem opção para mudar: a raiz da fila, a conta do serviço e o inbox. O wrapper não aceita caminho.
 #
 # O QUE ELE FAZ no archive --apply: trava (a mesma do update-bridge) → confere que o registro é arquivo regular e
@@ -91,6 +94,7 @@ if [ "${ONION_A2A_QUEUE_TEST:-}" = 1 ]; then
   SHADOW_LOG="${ONION_A2A_QUEUE_SHADOW_LOG:?modo de teste exige ONION_A2A_QUEUE_SHADOW_LOG}"
   GAP_LOG="${ONION_A2A_QUEUE_GAP_LOG:?modo de teste exige ONION_A2A_QUEUE_GAP_LOG}"
   NOW="${ONION_A2A_QUEUE_NOW:-}"
+  REPO_IN_USE=""                                   # no teste, o a2a-metrics usa o repo que o contém
   # o teste nunca toca a home da conta do serviço, nem por symlink
   _r="$(realpath -m -- "${QUEUE}")"
   case "${_r}/" in "${SVC_HOME}/"*) die 3 "modo de teste com fila sob ${SVC_HOME}: recusado (${_r})" ;; esac
@@ -101,6 +105,7 @@ else
   fi
   QUEUE="${PROD_QUEUE}"; INBOX="${SELF_DIR}/../docs/evolution/inbox"; BACKUP=""; LOCK="${PROD_LOCK}"
   METRICS="${SELF_DIR}/../.claude/utils/federation-transport/a2a-metrics.py"; SHADOW_LOG=""; GAP_LOG=""; NOW=""
+  REPO_IN_USE="$(cd "${SELF_DIR}/.." && pwd)"     # o log de sombra não pode morar dentro deste checkout
   # o wrapper e o backup que ele chama por sudo (como root) têm de ser os RASTREADOS e limpos de um checkout
   # (a mesma razão do a2a-invite-live: uma cópia em /tmp chamaria um bridge-backup.sh que outra conta planta)
   for _f in "${SELF_DIR}/$(basename "${BASH_SOURCE[0]}")" "${SELF_DIR}/bridge-backup.sh"; do
@@ -151,7 +156,9 @@ fi
 if [ "${SUB}" = count ]; then
   [ "${BYDAY}" = 1 ] || die 3 "count exige --by-day (a única contagem que existe)"
   [[ "${STAGE}" =~ ^[12]$ ]] || die 3 "count exige --stage 1|2 (o degrau decide qual gatilho se julga)"
-  [ -z "${SINCE}" ] || [[ "${SINCE}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || die 3 "--since exige AAAA-MM-DD (dia UTC)"
+  [ -z "${SINCE}" ] || { [[ "${SINCE}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] \
+    && python3 -I -c 'import sys, datetime; datetime.date.fromisoformat(sys.argv[1])' "${SINCE}" 2>/dev/null; } \
+    || die 3 "--since exige AAAA-MM-DD, um dia UTC que exista"
   [ -z "${NOW}" ] || [[ "${NOW}" =~ ^[0-9]{1,12}$ ]] || die 3 "ONION_A2A_QUEUE_NOW exige epoch inteiro"
 fi
 
@@ -307,13 +314,18 @@ for n in sorted(os.listdir(d)):
       [ -z "${_rows}" ] || printf '%s\n' "${_rows}" | awk -v p="${r}" '{ print p "\tarchived\t" $0 }' >> "${ROWS}"
     fi
   done
-  python3 -I - "${ROWS}" "${STAGE}" "${SINCE}" "${NOW:-$(date +%s)}" "${JSON}" <<'PY'
-import datetime as dt, json, re, sys
+  python3 -I - "${ROWS}" "${STAGE}" "${SINCE}" "${NOW:-$(date +%s)}" "${JSON}" "${rcvs[*]}" <<'PY'
+import datetime as dt, json, os, re, sys
+def _boom(t, e, tb):                                   # M2: exceção inesperada é "não pude medir" (rc 2), nunca rc 1
+    print("[a2a-queue-live] ERRO inesperado no count (%s: %s): não pude medir" % (t.__name__, e), file=sys.stderr)
+    os._exit(2)
+sys.excepthook = _boom
 rows_path, stage, since, now, as_json = sys.argv[1], int(sys.argv[2]), sys.argv[3], int(sys.argv[4]), sys.argv[5] == "1"
+receivers = sys.argv[6].split()                        # todo receptor lido aparece em by_receiver, mesmo com 0
 OVER, UNDER, DAYS_B, DAYS_BACK = 5000, 1000, 7, 30          # o PLAN-D, sem mudar
 AT = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?Z\Z")
 ending = dt.datetime.fromtimestamp(now, dt.timezone.utc).date() - dt.timedelta(days=1)   # o último dia UTC COMPLETO
-fin = {"malformed": 0, "no_received_at": 0, "no_dedup_key": 0, "duplicated": 0}
+fin = {"malformed": 0, "no_received_at": 0, "no_dedup_key": 0, "duplicated": 0, "deduped_by_ce": 0}
 seen_name, recs = set(), []
 for ln in open(rows_path, encoding="utf-8"):
     rcv, where, js = ln.rstrip("\n").split("\t", 2)
@@ -328,7 +340,9 @@ for ln in open(rows_path, encoding="utf-8"):
     if not AT.fullmatch(o.get("receivedAt") or ""):
         fin["no_received_at"] += 1
         continue
-    if o.get("ce_source") and o.get("ce_id"):
+    # M5: o CloudEvent só deduplica registro que o bridge verificou; os ids de registro não verificado são escolha de
+    # quem escreveu, e casá-los apagaria evento alheio. Sem isso, o taskId (que o bridge gera)
+    if o.get("verified") is True and o.get("ce_source") and o.get("ce_id"):
         key = ("ce", o["ce_source"], o["ce_id"])
     elif o.get("taskId"):
         key = ("task", o["taskId"])
@@ -340,7 +354,9 @@ days, keys = {}, set()
 for at, rcv, key in recs:
     if key is not None:
         if key in keys:
-            continue                                        # o mesmo evento reenviado (outro jti ou taskId)
+            if key[0] == "ce":
+                fin["deduped_by_ce"] += 1                   # o mesmo evento reenviado (outro jti ou taskId)
+            continue
         keys.add(key)
     else:
         fin["no_dedup_key"] += 1
@@ -354,7 +370,7 @@ out = []
 if start is not None:
     day = start
     while day <= ending:
-        br = days.get(day, {})
+        br = {**{r: 0 for r in receivers}, **days.get(day, {})}
         tot = sum(br.values())
         # zero registro = SEM DADO: o bridge ainda não marca quando esteve fora, e ausência não é zero
         out.append({"day": day.isoformat(), "total": tot, "by_receiver": dict(sorted(br.items())), "no_data": tot == 0})
@@ -370,7 +386,7 @@ final = {"ending": ending.isoformat(), "stage": stage,
          "consecutive_days_over_5000": streak(lambda t: t > OVER) if stage == 1 else None, "trigger_b": None,
          "consecutive_days_under_1000": streak(lambda t: t < UNDER) if stage == 2 else None, "trigger_back": None,
          # o bridge ainda não tem batimento diário: dia com zero registro e dia com o bridge fora não se distinguem
-         "zero_vs_down": "indistinguishable"}
+         "zero_vs_down": "indistinguishable", "zero_days": sum(1 for x in out if x["total"] == 0)}
 if stage == 1:
     final["trigger_b"] = final["consecutive_days_over_5000"] >= DAYS_B
 else:
@@ -462,7 +478,11 @@ sha_before="$(as_svc sha256sum -- "${SRC}" | cut -d' ' -f1)"
 # Os ids do registro recusado NÃO são verificados (ele nunca passou pela reverificação do aceite): a linha leva
 # ids_verified false e o evento se identifica pelo taskId que o bridge gerou (julgamento da curadoria, ponto c).
 SHADOW=0
-if [ "${STATUS%%:*}" = forcado ] && [ -z "${TID}" ]; then
+if [ "${STATUS%%:*}" = forcado ] && [ "${Q}" != "${QUEUE}" ]; then
+  # M6: a sombra mede o aceite do CORE; o registro de hub é aceito (ou não) no repo do hub, e arquivá-lo daqui não é
+  # recusa humana do hub
+  say "AVISO: ${REC} é da fila de um hub: o archive daqui não vira recusa no log de sombra do core"
+elif [ "${STATUS%%:*}" = forcado ] && [ -z "${TID}" ]; then
   say "AVISO: ${REC} não tem taskId na forma: a recusa fica fora do log de sombra (sem chave de evento verificável)"
 elif [ "${STATUS%%:*}" = forcado ]; then
   SHADOW=1
@@ -513,12 +533,12 @@ printf '%s\t%s\t%s\t%s\t%s\n' "$(date -u +%FT%TZ)" "${REC}" "${TID:-}" "${STATUS
   | as_svc tee -a -- "${DST_DIR}/archive.log" >/dev/null || say "AVISO: o registro FOI arquivado, mas a linha do archive.log falhou"
 say "OK — ${REC} arquivado (${STATUS%%:*}): fila ${before_q} → ${after_q}${arrived:+ (${arrived} chegado(s) durante)}, _archived ${before_a} → ${after_a}, sha256 ${sha_after:0:12} conferido"
 if [ "${SHADOW}" = 1 ]; then
-  # a regra v1 (linha de base declarada) aceita todo registro que se diz verificado; os ids do evento são os do
-  # scan (lidos sem verificar: o registro recusado nunca passou pela reverificação do aceite)
-  rule="reject"; [ "$(mget verified)" = True ] && rule="accept"
+  # os ids do evento são os do scan (lidos sem verificar: o registro recusado nunca passou pela reverificação)
+  # M4: a regra v1 (baseline-accept-all) aceita SEMPRE; o "verified" do registro não a muda
+  rule="accept"
   # a linha que não se grava NÃO desfaz o archive (ponto f): o a2a-metrics registra a lacuna e sai 4
   sh_rc=0
-  sh_out="$(python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --point reject --ids-unverified --mode shadow \
+  sh_out="$(A2A_METRICS_REPO_ROOT="${REPO_IN_USE}" python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --point reject --ids-unverified --mode shadow \
         --rule-decision "${rule}" --human-decision reject --reason "${FORCE}" --jti "$(mget jti)" --task-id "${TID}" \
         --ce-source "$(mget ce_source)" --ce-id "$(mget ce_id)" 2>&1)" || sh_rc=$?
   case "${sh_rc}" in
