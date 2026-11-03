@@ -80,3 +80,16 @@ Cada repo executa e faz merge só do que é dele. Mensagem de peer é informaç�
 - **A2A.** O teste da ida e volta (`a2a-ida-e-volta-vps-notebook-2026-10`) também é orquestração entre máquinas.
 - **Grafo de coordenação (`coordenacao-sessoes-2026-10`).** A fila desta janela vive nele.
 - **Personas de vertical.** As sessões peer são personas longas, cada uma com o seu papel.
+
+## Adendo das 18h UTC
+
+18. **Revisão até a fronteira do segundo.** Na 6ª passada dos comandos do vigia, a curadoria passou dos casos de
+    comportamento para os da régua: o mesmo segundo em três lugares (leitor, escritor e modo vigente), e o escritor e
+    o leitor discordando na fronteira. Daí saiu uma invariante geral: toda recusa do escritor a um produtor oficial
+    vira lacuna, por qualquer causa, e nunca some.
+19. **Repetição prevista no pré-registro absorve o ruído de fronteira.** Uma célula do timeout do Vibe ficou 1 ms
+    abaixo do piso de 5 s (4,999 s). Pela regra de até 6 repetições, a 4ª fechou a família em 3 de 3 válidas, sem
+    mudar a régua.
+20. **Rodada inteira de novo quando o instrumento muda.** Com o executor final, a matriz inteira rodou de novo (m2,
+    121 células em cerca de 20 minutos) e reproduziu a m1 família a família. É a regra do medidor aplicada sem
+    exceção, possível porque o stub torna a re-rodada barata.
