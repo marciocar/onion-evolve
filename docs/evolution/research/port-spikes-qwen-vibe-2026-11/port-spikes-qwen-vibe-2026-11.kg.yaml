@@ -227,6 +227,22 @@ nodes:
       locator: "aggregate-all.json, famílias citadas"
       method: "measurement: células executadas pelo harness/run_cell.sh e julgadas por classify.py e aggregate.py (commitados)"
       locality: "repo"
+  - id: D_PORT_SPIKES_RODADA_2_ANTES_DE_FECHAR_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Mais spikes antes»"
+    label: "O maestro mantém aberta a pergunta das portas e pede uma 2ª rodada de spikes antes de fechá-la: hook sobre ferramenta MCP, subagente, o atalho do process_start no Vibe e a camada de permissões."
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Mais spikes antes»; descartadas: «Fechar com o dado» · «Vibe como 1ª candidata»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «O que faço com a pergunta das portas (Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11) depois dos spikes?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
 edges:
   - from: E_PORT_SPIKE_QWEN_VETO_EXIT2_BARRA_1103
     to: Q_PORT_SPIKES_VETO_QWEN_VIBE_1103
@@ -267,3 +283,6 @@ edges:
   - from: C_PORT_SPIKE_CRITERIO_DA_PORTA_1103
     to: Q_PORT_SPIKES_VETO_QWEN_VIBE_1103
     edge_type: SUPPORTS
+  - from: D_PORT_SPIKES_RODADA_2_ANTES_DE_FECHAR_1103
+    to: Q_PORT_SPIKES_VETO_QWEN_VIBE_1103
+    edge_type: TRACES_TO
