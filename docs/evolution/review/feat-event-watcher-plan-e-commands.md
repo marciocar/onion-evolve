@@ -2,8 +2,8 @@
 branch: feat/event-watcher-plan-e-commands
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: c35c2c0d7d60c3e63347699230951196f41e5ce26ea03948cef603158cb582f6
+reviewed_diff_sha256: c30e0f567d7c75583feb97e7e65ce65c0e97b1dc58eb64ad5483cc5f6051cc1e
+reviewed_code_sha256: 80354978edc696d03764cf7d7791d23a716e748ef5075449ff8557aff2f8fed0
 findings_total: 78
 findings_real: 73
 tokens: 0
