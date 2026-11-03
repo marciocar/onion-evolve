@@ -24,6 +24,9 @@
 #                  grava no modo VIGENTE no instante da linha; no auto, a decisão humana vira confirmação ou reversão
 #                  da linha da regra do evento (supersedes), e sem ela vira lacuna rule_line_missing. Toda recusa do
 #                  escritor a um produtor oficial vira lacuna (rc 4), nunca some
+#                  PONTO ABERTO declarado: a linha da REGRA no auto ainda se escreve à mão (shadow-append --mode auto
+#                  sem --human-decision), até existir o escritor da regra. À mão, a decisão humana no auto sem
+#                  --supersedes para uma linha da regra válida desta janela é recusada (rc 3)
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
@@ -921,8 +924,59 @@ def main(argv):
             if have:
                 print(f"ok: {log} (a linha deste evento já existe)")
                 return 0
+        # 1º o MODO da linha, com a MESMA régua do leitor (mode_before no instante da linha); só depois a lacuna e o
+        # casamento do --resolves-gap, que veem a linha já decidida (A3 da 7ª passada)
+        refusal = reason = None
+        prior = []
+        if os.path.lexists(log):
+            try:
+                prior = read_log(log)
+            except MeasureError:
+                prior = None                            # ilegível: o append falha adiante e vira lacuna
+        if prior is not None:
+            ch = [x for _, x in prior if isinstance(x, dict) and x.get("kind") == "mode_change"
+                  and not validate_mode_change(x)]
+            t_line = stamp_epoch(line["logged_at"])
+            vig = mode_before(ch, t_line)
+            if any(stamp_epoch(c["logged_at"]) == t_line for c in ch):
+                refusal, reason = "a linha cairia no MESMO segundo de uma troca de modo: repita em 1 s", "same_second"
+                # a lacuna nasce no modo que vale DEPOIS da troca deste segundo: é nele que a regravação cai
+                line["mode"] = mode_before(ch, t_line + 1) or line["mode"]
+            elif vig is None:
+                refusal, reason = "troca de modo ambígua (duas no mesmo segundo, destinos diferentes)", "mode_ambiguous"
+            elif vig == "auto" and (want == "current" or (line["human_decision"] is not None
+                                                          and not line["supersedes"])):
+                # julgamento: no auto, a decisão humana confirma ou reverte a linha da REGRA do mesmo evento, e ela só
+                # vale se for desta janela auto (depois da última troca para auto, e com o modo vigente auto nela)
+                t_auto = max((stamp_epoch(c["logged_at"]) for c in ch if c["to_mode"] == "auto"
+                              and stamp_epoch(c["logged_at"]) < t_line), default=None)
+                rl = [x for _, x in prior if isinstance(x, dict) and not validate_shadow(x) and x["mode"] == "auto"
+                      and x["human_decision"] is None and x["rule_decision"] is not None
+                      and event_key(x) == event_key(dict(line, mode="auto")) and x["rule_id"] == line["rule_id"]
+                      and x["rule_version"] == line["rule_version"]
+                      and t_auto is not None and stamp_epoch(x["logged_at"]) > t_auto
+                      and mode_before(ch, stamp_epoch(x["logged_at"])) == "auto"]
+                if want == "current":
+                    line["mode"], line["rule_decision"] = "auto", None
+                    if not rl:
+                        refusal, reason = "não há a linha da regra deste evento nesta janela auto", "rule_line_missing"
+                    else:
+                        line["supersedes"] = rl[-1]["line_id"]
+                elif rl and not o.get("--producer"):
+                    # A4: à mão, decisão humana no auto sem supersedes para uma linha da regra válida é recusada
+                    raise UsageError("no modo auto a decisão humana tem de apontar a linha da regra (--supersedes) ou "
+                                     "usar --mode current")
+            if refusal is None and want != "current" and line["mode"] != vig:
+                refusal, reason = (f"--mode {line['mode']}, mas o modo vigente no instante da linha é {vig}: grave a "
+                                   "troca com mode-change antes"), "mode_not_in_force"
+        if refusal:
+            # recusa a um PRODUTOR oficial (aceite, archive) vira lacuna e nunca some; a quem chama à mão, rc 3
+            if o.get("--producer"):
+                return _gap(refusal, line["jti"], line["taskId"], line, reason)
+            raise UsageError(refusal)
         if o.get("--resolves-gap"):
             # a resolução se confere ANTES de gravar: a lacuna existe, está aberta, é deste receptor e casa com a linha
+            # JÁ DECIDIDA (modo incluso)
             rows = _gap_rows(gap_log)
             g = next((x for x in rows if isinstance(x, dict) and "resolves" not in x
                       and x.get("gap_id") == o["--resolves-gap"]), None)
@@ -938,42 +992,6 @@ def main(argv):
                 raise UsageError("--resolves-gap: a linha nova não casa com a lacuna (evento, remetente, modo ou regra)")
             if not (TS_RE.fullmatch(str(g.get("logged_at"))) and stamp_epoch(line["logged_at"]) > stamp_epoch(g["logged_at"])):
                 raise UsageError("--resolves-gap: a linha tem de ser ESTRITAMENTE posterior à lacuna (repita em 1 s)")
-        # o modo da linha se decide com a MESMA régua do leitor: mode_before(trocas, instante da linha)
-        refusal = reason = None
-        prior = []
-        if os.path.lexists(log):
-            try:
-                prior = read_log(log)
-            except MeasureError:
-                prior = None                            # ilegível: o append falha adiante e vira lacuna
-        if prior is not None:
-            ch = [x for _, x in prior if isinstance(x, dict) and x.get("kind") == "mode_change"
-                  and not validate_mode_change(x)]
-            t_line = stamp_epoch(line["logged_at"])
-            vig = mode_before(ch, t_line)
-            if any(stamp_epoch(c["logged_at"]) == t_line for c in ch):
-                refusal, reason = "a linha cairia no MESMO segundo de uma troca de modo: repita em 1 s", "same_second"
-            elif vig is None:
-                refusal, reason = "troca de modo ambígua (duas no mesmo segundo, destinos diferentes)", "mode_ambiguous"
-            elif want == "current" and vig == "auto":
-                # julgamento: no auto, a decisão humana confirma ou reverte a linha da REGRA do mesmo evento
-                line["mode"], line["rule_decision"] = "auto", None
-                rl = [x for _, x in prior if isinstance(x, dict) and not validate_shadow(x) and x["mode"] == "auto"
-                      and x["human_decision"] is None and x["rule_decision"] is not None
-                      and event_key(x) == event_key(line) and x["rule_id"] == line["rule_id"]
-                      and x["rule_version"] == line["rule_version"]]
-                if not rl:
-                    refusal, reason = "não há a linha da regra deste evento no modo auto", "rule_line_missing"
-                else:
-                    line["supersedes"] = rl[-1]["line_id"]
-            elif want != "current" and line["mode"] != vig:
-                refusal, reason = (f"--mode {line['mode']}, mas o modo vigente no instante da linha é {vig}: grave a "
-                                   "troca com mode-change antes"), "mode_not_in_force"
-        if refusal:
-            # recusa a um PRODUTOR oficial (aceite, archive) vira lacuna e nunca some; a quem chama à mão, rc 3
-            if o.get("--producer"):
-                return _gap(refusal, line["jti"], line["taskId"], line, reason)
-            raise UsageError(refusal)
         try:
             append_line(log, line)
         except MeasureError as e:

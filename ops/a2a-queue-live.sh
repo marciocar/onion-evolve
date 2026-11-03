@@ -50,7 +50,8 @@
 #   LOG DE SOMBRA: o archive --apply de um registro NÃO aceito (--force-unaccepted) grava a recusa humana
 #   (human_decision: reject, o motivo em reason) no log de sombra do aceite do OPERADOR (a2a-metrics.py,
 #   ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl), com ids_verified false: o evento é o taskId.
-#   A linha que falha NÃO desfaz o archive: vira LACUNA em shadow-gap.log (aviso alto); sem nem a lacuna, rc 1.
+#   A linha que falha NÃO desfaz o archive: vira LACUNA em shadow-gap.log (aviso alto); sem nem a lacuna, ERRO ALTO
+#   no stderr e rc 0 (o log nunca muda o rc do archive).
 #   Só a fila do CORE gera recusa na sombra (registro de hub não); a regra v1 (baseline-accept-all) é sempre accept.
 #   Fixos, sem opção para mudar: a raiz da fila, a conta do serviço e o inbox. O wrapper não aceita caminho.
 #
@@ -558,8 +559,8 @@ if [ "${SHADOW}" = 1 ]; then
   case "${sh_rc}" in
     0) say "log de sombra: recusa humana registrada (${sh_out#ok: })" ;;
     4) printf '%s\n[%s] AVISO ALTO: o registro FOI arquivado, mas a linha de sombra NÃO foi gravada — LACUNA registrada; o shadow-stats não mede esta janela\n' "${sh_out}" "${NAME}" >&2 ;;
-    *) printf '%s\n[%s] ERRO: o registro FOI arquivado, mas nem a linha de sombra nem o marcador de lacuna foram gravados — buraco NÃO registrado\n' "${sh_out}" "${NAME}" >&2
-       exit 1 ;;
+    # julgamento (A5): como o aceite, o archive nunca sai ≠ 0 por causa do log; o buraco vai ALTO ao stderr
+    *) printf '%s\n[%s] ERRO ALTO: o registro FOI arquivado, mas nem a linha de sombra nem o marcador de lacuna foram gravados — buraco NÃO registrado\n' "${sh_out}" "${NAME}" >&2 ;;
   esac
 fi
 exit 0
