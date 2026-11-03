@@ -16,6 +16,7 @@
 #   ops/a2a-queue-live.sh list    [--receiver <id>] [--json]
 #   ops/a2a-queue-live.sh show    <registro> --out <arq> [--receiver <id>]
 #   ops/a2a-queue-live.sh archive <registro> [--receiver <id>] [--force-unaccepted <motivo>] [--apply]
+#   ops/a2a-queue-live.sh count   --by-day --stage 1|2 [--receiver <id>] [--since AAAA-MM-DD] [--json]
 #
 #   <registro>  o NOME do arquivo na fila, como o list imprime (sem diretório).
 #   --receiver  a fila de um hub (o subdiretório com o id dele). Sem ele: a fila do core (a raiz) no show e no
@@ -32,6 +33,18 @@
 #   no frontmatter, a linha `taskId: <o taskId do registro>` que o a2a-accept.sh escreve. O taskId é o
 #   randomUUID que o bridge gera por registro. Registro sem taskId, ou de outro receptor (o hub aceita no repo
 #   dele, que este wrapper não lê), conta como NÃO aceito.
+#   count       SÓ LEITURA (PLAN-E §1 da curadoria, 2026-11-03): a contagem diária da fila por data UTC do receivedAt,
+#               viva E _archived/, somando todos os receptores (a saída mostra cada um só para leitura). Deduplica
+#               por ce_source + ce_id (o CloudEvent do corpo), senão pelo taskId; sem nenhum dos dois conta uma vez
+#               (no_dedup_key); o mesmo nome na fila e em _archived/ conta uma vez (duplicated). Malformado e sem
+#               receivedAt não têm dia: só a linha final, e rc 2. Só dias UTC COMPLETOS (ending = ontem). Dia sem
+#               registro sai no_data e QUEBRA as duas sequências (o bridge ainda não marca quando esteve fora, então
+#               zero e fora são indistinguíveis: na dúvida, sem dado). Gatilhos do PLAN-D: --stage 1 julga
+#               trigger_b (> 5000 por dia, 7 dias seguidos); --stage 2 julga trigger_back (< 1000 por dia, 30 dias
+#               seguidos); o do outro degrau sai null. rc do count: 0 mediu sem gatilho · 1 gatilho · 2 não mediu.
+#   LOG DE SOMBRA: o archive --apply de um registro NÃO aceito (--force-unaccepted) grava a recusa humana
+#   (human_decision: reject, o motivo em reason) no log de sombra do aceite do OPERADOR (a2a-metrics.py,
+#   ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl). O log tem de aceitar a escrita ANTES do mv.
 #   Fixos, sem opção para mudar: a raiz da fila, a conta do serviço e o inbox. O wrapper não aceita caminho.
 #
 # O QUE ELE FAZ no archive --apply: trava (a mesma do update-bridge) → confere que o registro é arquivo regular e
@@ -44,7 +57,8 @@
 #   fila, backup) · 3 uso inválido
 #
 # MODO DE TESTE (bancada): ONION_A2A_QUEUE_TEST=1 com ONION_A2A_QUEUE_DIR, ONION_A2A_QUEUE_INBOX,
-#   ONION_A2A_QUEUE_BACKUP (comando que imprime "ok: <artefato>") e ONION_A2A_QUEUE_LOCK. Nele tudo roda como
+#   ONION_A2A_QUEUE_BACKUP (comando que imprime "ok: <artefato>"), ONION_A2A_QUEUE_LOCK, ONION_A2A_QUEUE_METRICS
+#   (o a2a-metrics.py), ONION_A2A_QUEUE_SHADOW_LOG e, opcional, ONION_A2A_QUEUE_NOW (epoch). Nele tudo roda como
 #   QUEM RODA (sem sudo) e a fila não pode estar sob a home da conta do serviço.
 #   Qualquer ONION_A2A_QUEUE_* sem o modo de teste é uso inválido (rc 3): produção não se redireciona por env.
 set -uo pipefail
@@ -71,6 +85,9 @@ if [ "${ONION_A2A_QUEUE_TEST:-}" = 1 ]; then
   INBOX="${ONION_A2A_QUEUE_INBOX:?modo de teste exige ONION_A2A_QUEUE_INBOX}"
   BACKUP="${ONION_A2A_QUEUE_BACKUP:?modo de teste exige ONION_A2A_QUEUE_BACKUP}"
   LOCK="${ONION_A2A_QUEUE_LOCK:?modo de teste exige ONION_A2A_QUEUE_LOCK}"
+  METRICS="${ONION_A2A_QUEUE_METRICS:?modo de teste exige ONION_A2A_QUEUE_METRICS}"
+  SHADOW_LOG="${ONION_A2A_QUEUE_SHADOW_LOG:?modo de teste exige ONION_A2A_QUEUE_SHADOW_LOG}"
+  NOW="${ONION_A2A_QUEUE_NOW:-}"
   # o teste nunca toca a home da conta do serviço, nem por symlink
   _r="$(realpath -m -- "${QUEUE}")"
   case "${_r}/" in "${SVC_HOME}/"*) die 3 "modo de teste com fila sob ${SVC_HOME}: recusado (${_r})" ;; esac
@@ -80,6 +97,7 @@ else
     die 3 "variável ONION_A2A_QUEUE_* sem ONION_A2A_QUEUE_TEST=1: produção não se redireciona por ambiente"
   fi
   QUEUE="${PROD_QUEUE}"; INBOX="${SELF_DIR}/../docs/evolution/inbox"; BACKUP=""; LOCK="${PROD_LOCK}"
+  METRICS="${SELF_DIR}/../.claude/utils/federation-transport/a2a-metrics.py"; SHADOW_LOG=""; NOW=""
   # o wrapper e o backup que ele chama por sudo (como root) têm de ser os RASTREADOS e limpos de um checkout
   # (a mesma razão do a2a-invite-live: uma cópia em /tmp chamaria um bridge-backup.sh que outra conta planta)
   for _f in "${SELF_DIR}/$(basename "${BASH_SOURCE[0]}")" "${SELF_DIR}/bridge-backup.sh"; do
@@ -100,12 +118,12 @@ as_svc() {
 
 # ── argumentos: lista FECHADA (o wrapper não vira mover genérico como a conta do serviço) ───────────────
 SUB="$1"; shift
-REC=""; RECEIVER=""; OUT=""; FORCE=""; FORCE_SET=0; APPLY=0; JSON=0
+REC=""; RECEIVER=""; OUT=""; FORCE=""; FORCE_SET=0; APPLY=0; JSON=0; BYDAY=0; STAGE=""; SINCE=""
 ID_RE='^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$'          # a forma do queueDirFor do bridge
 REC_RE='^[A-Za-z0-9][A-Za-z0-9._-]{0,250}\.json$'   # nome de registro: sem barra, sem ponto inicial
 case "${SUB}" in
   show|archive) [ $# -ge 1 ] || usage; REC="$1"; shift ;;
-  list) : ;;
+  list|count) : ;;
   *) usage ;;
 esac
 while [ $# -gt 0 ]; do
@@ -114,7 +132,10 @@ while [ $# -gt 0 ]; do
     --out)               [ "${SUB}" = show ] || die 3 "--out só no show"; OUT="${2:-}"; shift 2 || usage ;;
     --force-unaccepted)  [ "${SUB}" = archive ] || die 3 "--force-unaccepted só no archive"; FORCE="${2:-}"; FORCE_SET=1; shift 2 || usage ;;
     --apply)             [ "${SUB}" = archive ] || die 3 "--apply só no archive"; APPLY=1; shift ;;
-    --json)              [ "${SUB}" = list ] || die 3 "--json só no list"; JSON=1; shift ;;
+    --json)              [ "${SUB}" = list ] || [ "${SUB}" = count ] || die 3 "--json só no list e no count"; JSON=1; shift ;;
+    --by-day)            [ "${SUB}" = count ] || die 3 "--by-day só no count"; BYDAY=1; shift ;;
+    --stage)             [ "${SUB}" = count ] || die 3 "--stage só no count"; STAGE="${2:-}"; shift 2 || usage ;;
+    --since)             [ "${SUB}" = count ] || die 3 "--since só no count"; SINCE="${2:-}"; shift 2 || usage ;;
     *) die 3 "opção não aceita: $1 (a fila, a conta do serviço e o inbox são fixos)" ;;
   esac
 done
@@ -124,6 +145,12 @@ if [ "${FORCE_SET}" = 1 ]; then
   [[ "${FORCE}" =~ ^[^[:cntrl:]]{8,200}$ ]] || die 3 "--force-unaccepted exige um motivo de 8 a 200 caracteres, numa linha"
 fi
 [ "${SUB}" = show ] && [ -z "${OUT}" ] && die 3 "show exige --out <arq novo> (a cópia que o aceite lê)"
+if [ "${SUB}" = count ]; then
+  [ "${BYDAY}" = 1 ] || die 3 "count exige --by-day (a única contagem que existe)"
+  [[ "${STAGE}" =~ ^[12]$ ]] || die 3 "count exige --stage 1|2 (o degrau decide qual gatilho se julga)"
+  [ -z "${SINCE}" ] || [[ "${SINCE}" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || die 3 "--since exige AAAA-MM-DD (dia UTC)"
+  [ -z "${NOW}" ] || [[ "${NOW}" =~ ^[0-9]{1,12}$ ]] || die 3 "ONION_A2A_QUEUE_NOW exige epoch inteiro"
+fi
 
 # a fila de um receptor: a do core na raiz, a de um hub no subdiretório (o mesmo queueDirFor do bridge)
 qdir() { if [ -z "$1" ] || [ "$1" = "${DEFAULT_RECEIVER}" ]; then printf '%s' "${QUEUE}"; else printf '%s/%s' "${QUEUE}" "$1"; fi; }
@@ -154,6 +181,25 @@ for n in sorted(os.listdir(d)):
                    ("from", r.get("from") or s.get("from")), ("receiver", r.get("receiver"))):
         o[k] = val if isinstance(val, str) else None
     o["verified"] = v.get("verified") is True
+    # ids para CONTAR e casar evento (PLAN-E): o CloudEvent do corpo e o jti do JWS, lidos SEM verificar e com
+    # forma fechada; o corpo em si nunca sai daqui
+    e = r.get("envelope") if isinstance(r.get("envelope"), dict) else {}
+    es = e.get("signal") if isinstance(e.get("signal"), dict) else {}
+    b = es.get("body") if isinstance(es.get("body"), str) else s.get("body")
+    o["ce_source"] = o["ce_id"] = o["jti"] = None
+    ok = lambda x: x if isinstance(x, str) and 0 < len(x) <= 256 and x.isprintable() else None
+    try:
+        ce = json.loads(b) if isinstance(b, str) else None
+    except Exception:
+        ce = None
+    if isinstance(ce, dict) and ce.get("specversion") == "1.0" and ok(ce.get("type")) and ok(ce.get("source")) and ok(ce.get("id")):
+        o["ce_source"], o["ce_id"] = ce["source"], ce["id"]
+    try:
+        import base64
+        p = e["jws"].split(".")[1]
+        o["jti"] = ok(json.loads(base64.urlsafe_b64decode(p + "=" * (-len(p) % 4))).get("jti"))
+    except Exception:
+        pass
     print(json.dumps(o))'
 scan() { as_svc python3 -I -c "${SCAN_PY}" "$1"; }
 
@@ -232,6 +278,117 @@ print("  %s\n      remetente=%s  recebido_em=%s  verified=%s  aceito=%s" % (o["n
   exit 0
 fi
 
+# ── count (PLAN-E §1): só leitura; a fila viva E _archived/, por dia UTC do receivedAt ─────────────────────
+if [ "${SUB}" = count ]; then
+  rcvs=()
+  if [ -n "${RECEIVER}" ]; then
+    as_svc test -d "$(qdir "${RECEIVER}")" || die 2 "não há fila para o receptor '${RECEIVER}'"
+    rcvs=("${RECEIVER}")
+  else
+    rcvs=("${DEFAULT_RECEIVER}")
+    while IFS= read -r _s; do [ -n "${_s}" ] && rcvs+=("${_s}"); done < <(as_svc python3 -I -c 'import os, re, sys
+d = sys.argv[1]
+for n in sorted(os.listdir(d)):
+    if re.match(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$", n) and os.path.isdir(os.path.join(d, n)) and not os.path.islink(os.path.join(d, n)):
+        print(n)' "${QUEUE}")
+  fi
+  ROWS="$(mktemp)"; trap 'rm -f "${ROWS}"' EXIT
+  # cada linha: <receptor> TAB <live|archived> TAB <json do scan>; scan que falha = não pôde medir (rc 2)
+  for r in "${rcvs[@]}"; do
+    q="$(qdir "${r}")"
+    _rows="$(scan "${q}")" || die 2 "não li a fila ${q}"
+    [ -z "${_rows}" ] || printf '%s\n' "${_rows}" | awk -v p="${r}" '{ print p "\tlive\t" $0 }' >> "${ROWS}"
+    if as_svc test -d "${q}/_archived"; then
+      as_svc test -L "${q}/_archived" && die 2 "${q}/_archived é symlink: não conto o que mora em outro lugar"
+      _rows="$(scan "${q}/_archived")" || die 2 "não li ${q}/_archived"
+      [ -z "${_rows}" ] || printf '%s\n' "${_rows}" | awk -v p="${r}" '{ print p "\tarchived\t" $0 }' >> "${ROWS}"
+    fi
+  done
+  python3 -I - "${ROWS}" "${STAGE}" "${SINCE}" "${NOW:-$(date +%s)}" "${JSON}" <<'PY'
+import datetime as dt, json, re, sys
+rows_path, stage, since, now, as_json = sys.argv[1], int(sys.argv[2]), sys.argv[3], int(sys.argv[4]), sys.argv[5] == "1"
+OVER, UNDER, DAYS_B, DAYS_BACK = 5000, 1000, 7, 30          # o PLAN-D, sem mudar
+AT = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?Z\Z")
+ending = dt.datetime.fromtimestamp(now, dt.timezone.utc).date() - dt.timedelta(days=1)   # o último dia UTC COMPLETO
+fin = {"malformed": 0, "no_received_at": 0, "no_dedup_key": 0, "duplicated": 0}
+seen_name, recs = set(), []
+for ln in open(rows_path, encoding="utf-8"):
+    rcv, where, js = ln.rstrip("\n").split("\t", 2)
+    o = json.loads(js)
+    if (rcv, o["name"]) in seen_name:                      # o mesmo registro na fila e em _archived/
+        fin["duplicated"] += 1
+        continue
+    seen_name.add((rcv, o["name"]))
+    if o.get("malformed"):
+        fin["malformed"] += 1
+        continue
+    if not AT.fullmatch(o.get("receivedAt") or ""):
+        fin["no_received_at"] += 1
+        continue
+    if o.get("ce_source") and o.get("ce_id"):
+        key = ("ce", o["ce_source"], o["ce_id"])
+    elif o.get("taskId"):
+        key = ("task", o["taskId"])
+    else:
+        key = None
+    recs.append((o["receivedAt"], rcv, key))
+recs.sort()
+days, keys = {}, set()
+for at, rcv, key in recs:
+    if key is not None:
+        if key in keys:
+            continue                                        # o mesmo evento reenviado (outro jti ou taskId)
+        keys.add(key)
+    else:
+        fin["no_dedup_key"] += 1
+    day = dt.date.fromisoformat(at[:10])
+    if day > ending:
+        continue                                            # o dia corrente não entra
+    d = days.setdefault(day, {})
+    d[rcv] = d.get(rcv, 0) + 1
+start = dt.date.fromisoformat(since) if since else (min(days) if days else None)
+out = []
+if start is not None:
+    day = start
+    while day <= ending:
+        br = days.get(day, {})
+        tot = sum(br.values())
+        # zero registro = SEM DADO: o bridge ainda não marca quando esteve fora, e ausência não é zero
+        out.append({"day": day.isoformat(), "total": tot, "by_receiver": dict(sorted(br.items())), "no_data": tot == 0})
+        day += dt.timedelta(days=1)
+def streak(pred):
+    n = 0
+    for x in reversed(out):
+        if x["no_data"] or not pred(x["total"]):
+            break
+        n += 1
+    return n
+final = {"ending": ending.isoformat(), "stage": stage,
+         "consecutive_days_over_5000": streak(lambda t: t > OVER) if stage == 1 else None, "trigger_b": None,
+         "consecutive_days_under_1000": streak(lambda t: t < UNDER) if stage == 2 else None, "trigger_back": None}
+if stage == 1:
+    final["trigger_b"] = final["consecutive_days_over_5000"] >= DAYS_B
+else:
+    final["trigger_back"] = final["consecutive_days_under_1000"] >= DAYS_BACK
+final.update(fin)
+for x in out:
+    if as_json:
+        print(json.dumps(x, ensure_ascii=False))
+    else:
+        print("  %s  total=%d%s  %s" % (x["day"], x["total"], "  SEM DADO" if x["no_data"] else "",
+              " ".join("%s=%d" % kv for kv in x["by_receiver"].items())))
+if as_json:
+    print(json.dumps(final, ensure_ascii=False))
+else:
+    print("[a2a-queue-live] " + " · ".join("%s=%s" % (k, json.dumps(v)) for k, v in final.items()))
+bad = fin["malformed"] or fin["no_received_at"]
+if bad:
+    print("[a2a-queue-live] NÃO PÔDE MEDIR por inteiro: registro malformado ou sem receivedAt (rc 2)", file=sys.stderr)
+sys.exit(2 if bad else (1 if final["trigger_b"] or final["trigger_back"] else 0))
+PY
+  exit $?
+fi
+
 # ── show e archive: o registro existe e é arquivo regular? ─────────────────────────────────────────────
 Q="$(qdir "${RECEIVER}")"
 SRC="${Q}/${REC}"
@@ -296,6 +453,19 @@ before_q="$(count "${Q}")"; before_a="$(count "${DST_DIR}")"; before_names="$(na
 sha_before="$(as_svc sha256sum -- "${SRC}" | cut -d' ' -f1)"
 [[ "${before_q}" =~ ^[1-9][0-9]*$ ]] && [ -n "${sha_before}" ] || die 2 "não medi a fila antes do arquivamento"
 
+# ── a recusa humana entra no log de sombra do aceite (PLAN-E §2): o log tem de aceitar a linha ANTES do mv ──
+SHADOW=0
+if [ "${STATUS%%:*}" = forcado ] && [ -z "$(mget jti)" ] && { [ -z "$(mget ce_source)" ] || [ -z "$(mget ce_id)" ]; }; then
+  # sem jti e sem CloudEvent não há evento pelo PLAN-E (o par source + id, ou o jti): declarado, não contado
+  say "AVISO: ${REC} não tem jti nem CloudEvent legível: a recusa fica fora do log de sombra (não é evento pelo PLAN-E)"
+elif [ "${STATUS%%:*}" = forcado ]; then
+  SHADOW=1
+  SH_ARGS=(--receiver "${RECEIVER:-${DEFAULT_RECEIVER}}"); [ -z "${SHADOW_LOG}" ] || SH_ARGS=(--log "${SHADOW_LOG}")
+  [ -f "${METRICS}" ] || die 2 "a2a-metrics.py ausente (${METRICS}): sem o log de sombra a recusa não é medida; nada movido"
+  sh_err="$(python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --check 2>&1 >/dev/null)" \
+    || die 2 "o log de sombra do aceite não aceita escrita (${sh_err}): nada movido"
+fi
+
 # ── backup rotulado do estado do bridge (cifrado), artefato NOMEADO ────────────────────────────────────
 label="pre-queue-archive-$(printf '%s' "${TID:-${REC}}" | tr -c 'A-Za-z0-9' '-' | cut -c1-8)"
 if [ "${TEST}" = 1 ]; then BK_OUT="$("${BACKUP}" "${label}")"; else BK_OUT="$(sudo -n "${SELF_DIR}/bridge-backup.sh" "${label}")"; fi
@@ -337,4 +507,16 @@ sha_after="$(as_svc sha256sum -- "${DST}" | cut -d' ' -f1)"
 printf '%s\t%s\t%s\t%s\t%s\n' "$(date -u +%FT%TZ)" "${REC}" "${TID:-}" "${STATUS}" "$(id -un)" \
   | as_svc tee -a -- "${DST_DIR}/archive.log" >/dev/null || say "AVISO: o registro FOI arquivado, mas a linha do archive.log falhou"
 say "OK — ${REC} arquivado (${STATUS%%:*}): fila ${before_q} → ${after_q}${arrived:+ (${arrived} chegado(s) durante)}, _archived ${before_a} → ${after_a}, sha256 ${sha_after:0:12} conferido"
+if [ "${SHADOW}" = 1 ]; then
+  # a regra v1 (linha de base declarada) aceita todo registro que se diz verificado; os ids do evento são os do
+  # scan (lidos sem verificar: o registro recusado nunca passou pela reverificação do aceite)
+  rule="reject"; [ "$(mget verified)" = True ] && rule="accept"
+  if ! sh_out="$(python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --mode shadow --rule-decision "${rule}" \
+        --human-decision reject --reason "${FORCE}" --jti "$(mget jti)" --task-id "${TID}" \
+        --ce-source "$(mget ce_source)" --ce-id "$(mget ce_id)" 2>&1)"; then
+    printf '[%s] ERRO: o registro FOI arquivado, mas a linha do log de sombra falhou (%s): esta recusa fica FORA da medida\n' "${NAME}" "${sh_out}" >&2
+    exit 1
+  fi
+  say "log de sombra: recusa humana registrada (${sh_out#ok: })"
+fi
 exit 0

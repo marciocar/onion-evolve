@@ -76,6 +76,7 @@ git-async e local **documentam/apontam** o fluxo que já existe (`co-*`), não r
 | [`a2a-accept.sh`](a2a-accept.sh) | o ato humano fila → inbox |
 | [`a2a-rt-mcp.py`](a2a-rt-mcp.py) | a **peça de rascunho** (desde 2026-10-27): MCP local por stdio com só `draft_message` (grava rascunho, nunca envia) e `read_inbox` (lê uma vez, como dado na moldura R15.2) |
 | [`a2a-rt-send.sh`](a2a-rt-send.sh) | o envio HUMANO do rascunho: mostra, pede a confirmação digitada no terminal e só então assina e envia pelo `a2a-send.sh` |
+| [`a2a-metrics.py`](a2a-metrics.py) | as medições da escada do vigia de eventos (desde 2026-11-03, PLAN-E da curadoria): o log de **sombra** do aceite (escrito pelo `a2a-accept.sh` e pelo `archive --force-unaccepted` da fila) e o **registro de rascunhos** (escrito pelo `a2a-rt-mcp.py` e pelo `a2a-rt-send.sh`), com os contadores `shadow-stats` e `draft-stats`. JSON Lines 0600 fora de árvore git; só ids e decisões, nunca o corpo. A contagem diária da fila é o `count` do `ops/a2a-queue-live.sh` (core-only) |
 
 Superfície: [`/meta:federation-a2a`](../../commands/meta/federation-a2a.md). Bancada:
 `run_federation_a2a_selftests` (com a `a2a_verify`, a `a2a_accept` e a `a2a_ssrf`) e `run_a2a_rt_selftests` (a peça
