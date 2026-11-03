@@ -61,7 +61,7 @@ MODES = ("shadow", "auto")
 DRAFT_EVENTS = ("drafted", "sent", "discarded", "blocked_out_of_list", "sent_out_of_list",
                 "kill_switch_on", "kill_switch_off", "blocked_rate_cap")
 SHADOW_KEYS = ("line_id", "logged_at", "mode", "ce_source", "ce_id", "ce_time", "jti", "taskId", "rule_id",
-               "rule_version", "rule_decision", "human_decision", "reason", "human_actor", "supersedes", "ids_verified")
+               "rule_version", "rule_decision", "human_decision", "reason", "human_actor", "supersedes", "ids_verified", "from")
 DRAFT_KEYS = ("line_id", "logged_at", "draft_id", "thread", "recipient", "supersedes_draft", "event", "actor")
 # critérios do PLAN-D, sem mudar (PLAN-E §2 e §3)
 RULE_ON_DAYS, RULE_ON_EVENTS, RULE_ON_AGREEMENT = 14, 50, 0.95
@@ -333,12 +333,12 @@ def _actor():
 # ─────────────────────────────── log de sombra ───────────────────────────────
 def shadow_line(mode, rule_decision, human_decision, *, ce_source=None, ce_id=None, ce_time=None, jti=None,
                 task_id=None, reason=None, supersedes=None, rule_id=RULE_ID, rule_version=RULE_VERSION, actor=None,
-                ids_verified=True):
+                ids_verified=True, from_=None):
     obj = {"line_id": new_line_id(), "logged_at": utc_stamp(), "mode": mode, "ce_source": ce_source, "ce_id": ce_id,
            "ce_time": ce_time, "jti": jti, "taskId": task_id, "rule_id": rule_id, "rule_version": rule_version,
            "rule_decision": rule_decision, "human_decision": human_decision, "reason": reason,
            "human_actor": actor if actor is not None else (_actor() if human_decision is not None else None),
-           "supersedes": supersedes, "ids_verified": ids_verified}
+           "supersedes": supersedes, "ids_verified": ids_verified, "from": from_}
     why = validate_shadow(obj)
     if why:
         raise UsageError(f"linha de sombra inválida: {why}")
@@ -370,6 +370,8 @@ def validate_shadow(o):
         return "supersedes fora da forma UUID"
     if not isinstance(o["ids_verified"], bool):
         return "ids_verified não é booleano"
+    if o["from"] is not None and (not isinstance(o["from"], str) or not ID_RE.fullmatch(o["from"])):
+        return "from fora da forma de id"
     if not event_key(o):
         return "sem chave de evento (ce_source + ce_id, ou jti; com ids_verified false, o taskId)"
     return ""
@@ -384,7 +386,8 @@ def event_key(o):
     if o.get("ids_verified") is False:
         return ("task", o["taskId"]) if o.get("taskId") else None
     if o.get("ce_source") and o.get("ce_id"):
-        return ("ce", o["ce_source"], o["ce_id"])
+        # escopada pelo REMETENTE (o from assinado): um membro que reusa o source + id de outro não funde as cadeias
+        return ("ce", o.get("from"), o["ce_source"], o["ce_id"])
     if o.get("jti"):
         return ("jti", o["jti"])
     return None
@@ -415,13 +418,14 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     """→ (saída, rc). `lines` = read_log(); `mode` = o modo em vigor (shadow|auto), dado por quem pergunta e NUNCA
     tirado da última linha (cura A1); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None);
     `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
-    malformed = future = 0
+    malformed = future = ahead = 0
     valid = []
     for _, o in lines:
         if o is None or validate_shadow(o):
             malformed += 1
         elif stamp_epoch(o["logged_at"]) > now:
             future += 1                                # N7: linha do futuro (relógio torto) não é evento
+            ahead = max(ahead, stamp_epoch(o["logged_at"]) - now)
         else:
             valid.append(o)
     out = {"rule_id": None, "rule_version": None, "since": None, "days_covered": 0, "events": 0, "undecided": None,
@@ -429,7 +433,8 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
            "reversal_rate_7d": None, "malformed": malformed, "trigger_rule_on": None, "trigger_back_to_shadow": None,
            "confusion": {r: {h: 0 for h in DECISIONS} for r in DECISIONS}, "kappa": None,
            "rule_on_criterion_met": None, "trigger_rule_on_reason": None, "back_to_shadow_criterion_met": None,
-           "not_instrumented": None, "holds": 0, "no_data": False, "gaps_in_window": 0, "future_logged_at": future}
+           "not_instrumented": None, "holds": 0, "no_data": False, "gaps_in_window": 0, "future_logged_at": future,
+           "future_max_ahead_s": ahead if future else None}
     cur = []
     if valid:
         version, rule_id = valid[-1]["rule_version"], valid[-1]["rule_id"]
@@ -446,7 +451,8 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
             t = _received_epoch(r.get("receivedAt"))
             if t is not None and now - t <= HOLD_SECONDS:
                 continue                               # ainda dentro dos 3 dias: não é hold
-            k = event_key({"ce_source": r.get("ce_source"), "ce_id": r.get("ce_id"), "jti": r.get("jti")})
+            k = event_key({"from": r.get("from"), "ce_source": r.get("ce_source"), "ce_id": r.get("ce_id"),
+                           "jti": r.get("jti")})
             if (k is None or k not in cur_keys) and ("task", r.get("taskId")) not in cur_keys:
                 und += 1                               # sem receivedAt legível também conta: ausência não é "recente"
         out["undecided"] = und
@@ -724,7 +730,7 @@ def main(argv):
                          "--human-decision": True, "--reason": True, "--jti": True, "--task-id": True,
                          "--ce-source": True, "--ce-id": True, "--ce-time": True, "--supersedes": True,
                          "--ids-unverified": False, "--point": True, "--gap-log": True, "--if-absent": False,
-                         "--resolves-gap": True})
+                         "--resolves-gap": True, "--from": True})
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         if o.get("--check"):
             check_log(log)
@@ -753,7 +759,7 @@ def main(argv):
                                ce_id=_nullable(o.get("--ce-id")), ce_time=_nullable(o.get("--ce-time")),
                                jti=_nullable(o.get("--jti")), task_id=_nullable(o.get("--task-id")),
                                reason=_nullable(o.get("--reason")), supersedes=_nullable(o.get("--supersedes")),
-                               ids_verified=not o.get("--ids-unverified"))
+                               ids_verified=not o.get("--ids-unverified"), from_=_nullable(o.get("--from")))
         except UsageError as e:
             return _gap(e, clean_str(o.get("--jti")), clean_str(o.get("--task-id")))
         if o.get("--if-absent") and os.path.lexists(log):

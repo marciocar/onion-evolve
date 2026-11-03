@@ -548,10 +548,12 @@ if [ "${SHADOW}" = 1 ]; then
   # os ids do evento são os do scan (lidos sem verificar: o registro recusado nunca passou pela reverificação)
   # M4: a regra v1 (baseline-accept-all) aceita SEMPRE; o "verified" do registro não a muda
   rule="accept"
+  # o remetente escopa a chave do CloudEvent; do registro não verificado só vale na forma de id (senão, vazio)
+  rfrom="$(mget from)"; [[ "${rfrom}" =~ ${ID_RE} ]] || rfrom=""
   # a linha que não se grava NÃO desfaz o archive (ponto f): o a2a-metrics registra a lacuna e sai 4
   sh_rc=0
   sh_out="$(A2A_METRICS_REPO_ROOT="${REPO_IN_USE}" python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --point reject --ids-unverified --mode shadow \
-        --rule-decision "${rule}" --human-decision reject --reason "${FORCE}" --jti "$(mget jti)" --task-id "${TID}" \
+        --rule-decision "${rule}" --human-decision reject --reason "${FORCE}" --jti "$(mget jti)" --task-id "${TID}" --from "${rfrom}" \
         --ce-source "$(mget ce_source)" --ce-id "$(mget ce_id)" 2>&1)" || sh_rc=$?
   case "${sh_rc}" in
     0) say "log de sombra: recusa humana registrada (${sh_out#ok: })" ;;
