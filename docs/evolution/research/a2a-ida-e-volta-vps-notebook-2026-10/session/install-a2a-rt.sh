@@ -20,7 +20,7 @@
 # o draft_message devolve o comando de envio COMPLETO, para um terminal separado (achado b, 2026-10-28).
 # Abra a sessão de teste numa pasta VAZIA própria (ex.: ~/rt-sessao-vps), fora do checkout do core: lá dentro
 # ela carrega o .claude/ do core (hooks, settings), e a sessão de teste deixa de ser a superfície mínima.
-# Depois: claude --tools "" --strict-mcp-config --mcp-config ~/.local/share/onion/a2a-rt/mcp.json \
+# Depois: claude --tools "" --strict-mcp-config --no-chrome --mcp-config ~/.local/share/onion/a2a-rt/mcp.json \
 #                --settings ~/.local/share/onion/a2a-rt/settings.json --permission-mode default
 # Exit: 0 montado · 2 uso ou arquivo ausente
 # =============================================================================
