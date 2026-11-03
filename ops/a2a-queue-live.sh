@@ -552,7 +552,7 @@ if [ "${SHADOW}" = 1 ]; then
   rfrom="$(mget from)"; [[ "${rfrom}" =~ ${ID_RE} ]] || rfrom=""
   # a linha que não se grava NÃO desfaz o archive (ponto f): o a2a-metrics registra a lacuna e sai 4
   sh_rc=0
-  sh_out="$(A2A_METRICS_REPO_ROOT="${REPO_IN_USE}" python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --point reject --ids-unverified --mode shadow \
+  sh_out="$(A2A_METRICS_REPO_ROOT="${REPO_IN_USE}" python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --point reject --ids-unverified --mode current --producer \
         --rule-decision "${rule}" --human-decision reject --reason "${FORCE}" --jti "$(mget jti)" --task-id "${TID}" --from "${rfrom}" \
         --ce-source "$(mget ce_source)" --ce-id "$(mget ce_id)" 2>&1)" || sh_rc=$?
   case "${sh_rc}" in
