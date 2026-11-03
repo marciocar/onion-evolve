@@ -19,7 +19,7 @@ com sinal de máquina. Decisão de origem: `D_COORD_SPIKES_DAS_PORTAS_NA_VPS_110
 `onion-core-ports-multi-model-2026-11`.
 
 **Como:**
-- **Pré-registro:** o `PRE-REGISTRO.md`, na v3, com 5 emendas datadas. Foi revisado em três camadas, desenho, código e
+- **Pré-registro:** o `PRE-REGISTRO.md`, na v3, com 6 emendas datadas. Foi revisado em três camadas, desenho, código e
   processo, pela curadoria e pelo kg-ssot, e reprovado cinco vezes antes de fechar.
 - **Matriz:** roda contra um **modelo stub**, um servidor local compatível com OpenAI que devolve uma chamada de
   ferramenta fixa, decidida pelo conteúdo do pedido. O **lote do critério é o m2** (121 células com o executor final

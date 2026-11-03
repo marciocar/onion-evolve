@@ -8,6 +8,7 @@ meta:
   review_after: "2026-12-03"   # 30d: estudo de prática com gatilho de construção aberto
   x_supersedes_none: "Estudo novo de um caso: nenhum grafo anterior é superado. O grafo de coordenação (coordenacao-sessoes-2026-10) é a peça que ele estende, não a que ele derruba."
   # ═══ TETO: 20 NÓS ═══
+  # As C_SO_* são OBSERVAÇÕES desta janela (confirmed); como regra geral são candidatas, gated por Q_SO_GATILHO_DE_CONSTRUCAO.
 external_edges:
   - from: E_SO_JANELA_DE_2026_11_03
     to: "docs/onion/graph/coordenacao-sessoes-2026-10.kg.yaml#D_COORD_SPIKES_DAS_PORTAS_NA_VPS_1103"
@@ -28,9 +29,9 @@ nodes:
     confidence: 0.85
     verified_at: "2026-11-03"
     evidence_class: observation
-    verified_against: "DIARIO.md desta pasta (estratégias 1 a 20 e a medida até 17:40 UTC), escrito durante a janela"
+    verified_against: "DIARIO.md desta pasta (estratégias 1 a 22, medida até 17:40 UTC), PRE-REGISTRO.md dos spikes (Emenda 6) e o resíduo de revisão da branch do vigia (PR #1461)"
     label: "Numa janela de cerca de 10 horas, o core orquestrou a curadoria e o kg-ssot sem o maestro no terminal; as revisões cruzadas pegaram mais de 60 achados reais antes de qualquer veredito valer."
-    narrative: "Pré-registro dos spikes em 3 versões e 6 emendas com 2 revisores; executor revisado em 6 passadas; comandos do vigia em 8 passadas da curadoria. O que mais pesou: três defeitos que dariam BARRA falso nos spikes e um gatilho do vigia que dispararia por ausência."
+    narrative: "No fecho: pré-registro dos spikes em 3 versões e 6 emendas com 2 revisores (PRE-REGISTRO.md §10); executor revisado em 6 passadas; comandos do vigia em 8 passadas e 4 conferências curtas da curadoria (resíduo docs/evolution/review/feat-event-watcher-plan-e-commands.md, PR #1461). Os mais de 60 achados somam as seções §9 e §9b do pré-registro e os dois resíduos de revisão. O que mais pesou: três defeitos que dariam BARRA falso nos spikes e um gatilho do vigia que dispararia por ausência."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "seções «Estratégias», «Medida (até 17:40 UTC)» e «Adendo das 18h UTC»"
@@ -45,7 +46,7 @@ nodes:
     confidence: 0.7
     verified_at: "2026-11-03"
     verified_against: "tabela «Papéis que emergiram» do DIARIO.md; um caso só (N=1)"
-    label: "Três papéis emergiram sem desenho prévio: orquestrador e construtor (core), dona da especificação e revisora adversarial (curadoria), fornecedora de medida e revisora técnica (kg-ssot). Cada repo executa e faz merge só do que é dele."
+    label: "Nesta janela, três papéis apareceram: orquestrador e construtor (core, papel dado pelo maestro), dona da especificação e revisora adversarial (curadoria), fornecedora de medida e revisora técnica (kg-ssot). Cada repo executa e faz merge só do que é dele."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "seção «Papéis que emergiram»"
@@ -75,7 +76,7 @@ nodes:
     confidence: 0.75
     verified_at: "2026-11-03"
     verified_against: "estratégias 2, 10 e 16 do DIARIO.md; o kg-ssot aprovou o código e reprovou o processo (veredito criado depois do dado, hash fora de commit, procedência sobrescrita)"
-    label: "Revisar em três camadas, desenho, código e processo, pega defeitos que a camada anterior aprova: o processo reprovou um executor cujo código já tinha passado."
+    label: "Nesta janela, a revisão em três camadas (desenho, código e processo) pegou defeito que a camada anterior aprovou: o processo reprovou um executor cujo código já tinha passado."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "estratégias 2, 10 e 16"
@@ -89,12 +90,12 @@ nodes:
     impact: 4
     confidence: 0.8
     verified_at: "2026-11-03"
-    verified_against: "Emendas 1 e 6 do PRE-REGISTRO.md dos spikes; a re-rodada m2 (121 células) reproduziu a m1 família a família"
+    verified_against: "Emendas 1, 5 e 6 do PRE-REGISTRO.md dos spikes; a re-rodada m2 (121 células) reproduziu a m1 família a família"
     label: "Mudou a função de veredito ou o que o executor grava, toda célula daquele executor volta a INCONCLUSIVO e roda de novo; reclassificar acrescenta a linha de quem reclassificou e nunca sobrescreve a procedência."
     provenance:
       source: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/PRE-REGISTRO.md"
-      locator: "Emenda 1 e Emenda 6"
-      method: "leitura: DIARIO.md desta pasta"
+      locator: "Emendas 1, 5 e 6"
+      method: "leitura: PRE-REGISTRO.md dos spikes"
       locality: "repo"
   - id: C_SO_FRASE_DE_VEREDITO_DO_INSTRUMENTO
     node_type: claim
@@ -105,7 +106,7 @@ nodes:
     confidence: 0.8
     verified_at: "2026-11-03"
     verified_against: "achado A1 da curadoria: «o real confirma o stub» saiu de comparação à mão; curado pelo pareamento no aggregate-final.json"
-    label: "Toda frase de veredito cita o campo do agregado que a produz, ou declara que foi feita à mão e com quantas células."
+    label: "Nesta janela, uma frase de veredito feita à mão («o real confirma o stub») foi pega e trocada pelo campo do agregado que a produz; a regra candidata é toda frase citar o campo ou se declarar feita à mão."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "estratégia 17"
@@ -120,7 +121,7 @@ nodes:
     confidence: 0.75
     verified_at: "2026-11-03"
     verified_against: "estratégias 9 e 15 do DIARIO.md; julgamentos da curadoria nos comandos do vigia (log de medida não trava a entrada; registro de envio falha fechado)"
-    label: "Entre repos, quem escreveu a especificação julga a semântica dos pontos abertos; quem constrói negocia nomes e caminhos, nunca campos e critérios."
+    label: "Nesta janela, a curadoria, dona da especificação, julgou a semântica dos pontos abertos, e o core, construtor, negociou só nomes e caminhos."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/DIARIO.md"
       locator: "estratégias 9 e 15"
@@ -151,7 +152,7 @@ nodes:
     verified_at: "2026-11-03"
     verified_against: "proposta do core a partir de C_SO_*; não construída, não pesquisada no mercado"
     label: "Proposta: a orquestração de sessões vira mecanismo em três degraus: à mão com registro (hoje), rascunho da próxima fila aprovado pelo humano, e despacho por A2A dentro de autorização datada."
-    narrative: "Degrau 1 (hoje): diário mais o grafo de coordenação, à mão. Degrau 2: o vigia de eventos e o grafo de coordenação alimentam um rascunho da próxima fila, com papel, dono e lease de CPU, que o humano aprova. Degrau 3: despacho automático por A2A entre sessões, dentro de uma autorização datada. Recomendação do core: não construir o degrau 2 antes do gatilho de Q_SO_GATILHO_DE_CONSTRUCAO. O que já existe e o mecanismo usaria: o grafo de coordenação (pendência com dono), o vigia de eventos (PLAN-E, com o registro de rascunhos), o canal entre sessões (SendMessage) e o A2A (envio com aceite humano). Peça nova: o lease de CPU, que hoje é lock social (C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL)."
+    narrative: "Degrau 1 (hoje): diário mais o grafo de coordenação, à mão. Degrau 2: o vigia de eventos e o grafo de coordenação alimentam um rascunho da próxima fila, com papel, dono e lease de CPU, que o humano aprova. Degrau 3: despacho automático por A2A entre sessões, dentro de uma autorização datada. Recomendação do core: não construir o degrau 2 antes do gatilho de Q_SO_GATILHO_DE_CONSTRUCAO. O que já existe ou está em PR e o mecanismo usaria: o grafo de coordenação (pendência com dono), os comandos de medida do vigia de eventos (PLAN-E, com o registro de rascunhos; em PR, #1461, no fecho deste estudo), o canal entre sessões (SendMessage) e o A2A (envio com aceite humano). Peça nova: o lease de CPU, que hoje é lock social (C_SO_RODIZIO_DE_CPU_E_LOCK_SOCIAL)."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
       locator: "seção «O mecanismo proposto»"
@@ -167,7 +168,8 @@ nodes:
     confidence: 0.5
     verified_at: "2026-11-03"
     verified_against: "N=1 janela registrada (E_SO_JANELA_DE_2026_11_03)"
-    label: "Gatilho para construir o degrau 2: três janelas de orquestração registradas pelo mesmo diário mostrando os mesmos papéis e as mesmas estratégias, mais a pesquisa de mercado de Q_SO_PADROES_DE_MERCADO respondida."
+    label: "Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três papéis e ao menos 5 das 7 regras C_SO_* observadas, mais Q_SO_PADROES_DE_MERCADO respondida."
+    narrative: "Refutação: numa janela de outro tipo de trabalho, papéis diferentes rebaixam C_SO_TRES_PAPEIS a específico do trabalho, e o degrau 2 volta a desenho."
     provenance:
       source: "docs/evolution/research/session-orchestration-2026-11/SYNTHESIS.md"
       locator: "seção «Gatilho»"

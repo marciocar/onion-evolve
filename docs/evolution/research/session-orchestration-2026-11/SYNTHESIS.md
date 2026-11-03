@@ -38,16 +38,19 @@ era dele.
 
 1. **Degrau 1 (hoje):** o diário e o grafo de coordenação, mantidos à mão pela sessão orquestradora.
 2. **Degrau 2 (semiautomático):** o vigia de eventos e o grafo de coordenação alimentam um **rascunho** da próxima
-   fila, com papel, dono e lease de CPU. O humano aprova. Usa o que já existe: a pendência com dono do grafo de
-   coordenação, o registro de rascunhos do vigia (PLAN-E), o canal entre sessões e o A2A com aceite humano. A peça
+   fila, com papel, dono e lease de CPU. O humano aprova. Usa o que já existe ou está em PR: a pendência com dono do
+   grafo de coordenação, o registro de rascunhos do vigia (PLAN-E, em PR, #1461, no fecho deste estudo), o canal entre sessões e o A2A com aceite humano. A peça
    nova é o **lease de CPU**, que hoje é lock social.
 3. **Degrau 3 (automático em escopo):** despacho por A2A entre sessões, dentro de uma autorização datada. Merge
    alheio, deploy e segredo seguem do maestro em qualquer degrau.
 
 ## Gatilho (`Q_SO_GATILHO_DE_CONSTRUCAO`, `Q_SO_PADROES_DE_MERCADO`)
 
-O caso é um só (N=1). O degrau 2 só se constrói com duas condições:
-- três janelas registradas pelo mesmo diário, com os mesmos papéis e estratégias;
+O caso é um só (N=1): as linhas da tabela acima são observações desta janela, e como regra geral são candidatas. O
+degrau 2 só se constrói com duas condições:
+- três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três papéis
+  e ao menos 5 das 7 regras observadas. Papéis diferentes numa janela de outro trabalho refutam `C_SO_TRES_PAPEIS`
+  como geral;
 - a pesquisa de mercado feita antes, pelo `/onion-research`. Ela pergunta que padrões já cobrem papéis entre
   agentes, reserva de recurso e passagem de tarefa com aceite, como o ciclo de tarefa do A2A aberto. O perfil do
   Onion vai por cima, e cunhagem só entra onde o mercado não tiver.

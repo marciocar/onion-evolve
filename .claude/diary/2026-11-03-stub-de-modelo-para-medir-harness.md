@@ -21,5 +21,5 @@ kg: docs/evolution/research/port-spikes-qwen-vibe-2026-11/port-spikes-qwen-vibe-
 ## Evidence
 O stub (`harness/stub_llm.py`) devolve a chamada fixa quando o pedido tem `tools` e não tem resultado de ferramenta,
 "DONE" depois do resultado e texto nas chamadas auxiliares; marca STUB-INVÁLIDO quando a chamada não valida. O braço
-real (Qwen3.5-9B na CPU) confirmou o controle positivo e o veto do push nos dois clientes, entre 7 e 18 minutos por
+real (Qwen3.5-9B na CPU) confirmou o controle positivo e o veto do push nos dois clientes, entre 6 e 19 minutos por
 célula.

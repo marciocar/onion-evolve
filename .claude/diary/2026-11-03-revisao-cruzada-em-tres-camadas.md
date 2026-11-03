@@ -20,11 +20,11 @@ reprovou; o código fechou e o processo reprovou.
 
 ## Evidence
 - Pré-registro dos spikes: v1 reprovada (BARRA sem prova de disparo, modo padrão recusando antes do hook, push que não
-  discriminava), v2 reprovada (stub decidindo pela ordem das chamadas), v3 fechada com 5 emendas.
+  discriminava), v2 reprovada (stub decidindo pela ordem das chamadas), v3 fechada com 6 emendas.
 - Executor: o kg-ssot, reclassificando a partir do `git archive`, achou que o `*.log` do `.gitignore` da raiz tirava
   toda a prova do commit; depois, o hook certo conferido depois do efeito; depois, veredito criado depois do dado e
   procedência sobrescrita.
-- Comandos do vigia: a curadoria (dona do PLAN-E) achou em cinco passadas a lacuna fechada por qualquer linha, o
+- Comandos do vigia: a curadoria (dona do PLAN-E) achou em oito passadas a lacuna fechada por qualquer linha, o
   mode_change no futuro descartado em silêncio e um remetente apagando o evento de outro.
 
 ## Why it matters
