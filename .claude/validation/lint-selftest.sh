@@ -18208,8 +18208,9 @@ def lid():
     return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
 ts = lambda t: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t))
 L = [{"line_id": lid(), "logged_at": ts(now - 2 * 86400), "kind": "mode_change", "from_mode": "shadow", "to_mode": "auto", "actor": "op"}]
-if kind == "regra":
-    L.append({"line_id": lid(), "logged_at": ts(now - 86400), "mode": "auto", "ce_source": "/vigia/x", "ce_id": "ev-42",
+if kind in ("regra", "outro"):
+    L.append({"line_id": lid(), "logged_at": ts(now - 86400), "mode": "auto", "ce_source": "/vigia/x",
+              "ce_id": "ev-42" if kind == "regra" else "ev-outro",
               "ce_time": None, "jti": None, "taskId": None, "rule_id": "baseline-accept-all", "rule_version": "1",
               "rule_decision": "reject", "human_decision": None, "reason": None, "human_actor": None, "supersedes": None,
               "ids_verified": True, "from": "acme"})
@@ -18351,6 +18352,62 @@ PY
     '                        if line["supersedes"] not in ids:' '                        if True:'
   _shcase "(sh67) M1: à mão no auto, --supersedes de fora (UUID que não é a linha da regra) → rc 3, nada gravado" _sh_supbad \
     '                        if line["supersedes"] not in ids:' '                        if False:'
+  _sh_prodmode() { local r=0; rm -f "${d}/pm.jsonl"
+    python3 -I "$1" shadow-append --receiver core-x --log "${d}/pm.jsonl" --gap-log "${d}/pm-gap.log" --producer --mode auto \
+      --rule-decision accept --from m --jti pm >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ ! -e "${d}/pm.jsonl" ] && [ ! -e "${d}/pm-gap.log" ]; }
+  _sh_supother() {  # supersedes apontando a linha da regra de OUTRO evento → rc 3
+    local R="${d}/so" r=0 rid; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-x && _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-y || { SH_WHY="linhas da regra falharam"; return 1; }
+    rid="$(jq -r 'select(.ce_id=="ev-y") | .line_id' "${R}/l.jsonl")"
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
+      --human-decision accept --from m --ce-source /w --ce-id ev-x --supersedes "${rid}" >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 3 ]; }
+  _sh_suphuman() {  # supersedes apontando uma linha HUMANA do mesmo evento → rc 3
+    local R="${d}/sh" r=0 rid hid; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-h || { SH_WHY="a linha da regra falhou"; return 1; }
+    rid="$(jq -r 'select(.ce_id=="ev-h") | .line_id' "${R}/l.jsonl")"
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
+      --human-decision accept --from m --ce-source /w --ce-id ev-h --supersedes "${rid}" >/dev/null 2>&1 || { SH_WHY="a reversão válida falhou"; return 1; }
+    hid="$(tail -1 "${R}/l.jsonl" | jq -r .line_id)"
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
+      --human-decision reject --from m --ce-source /w --ce-id ev-h --supersedes "${hid}" >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 3 ]; }
+  _sh_rev2() {  # C2: dois humanos apontando a MESMA linha da regra = 1 evento revertido
+    local R="${d}/r2" rid o k; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-r2 || { SH_WHY="a linha da regra falhou"; return 1; }
+    rid="$(jq -r 'select(.ce_id=="ev-r2") | .line_id' "${R}/l.jsonl")"
+    for k in 1 2; do
+      python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
+        --human-decision accept --from m --ce-source /w --ce-id ev-r2 --supersedes "${rid}" >/dev/null 2>&1 || { SH_WHY="reversão ${k} falhou"; return 1; }
+    done
+    o="$(python3 -I "$1" shadow-stats --mode auto --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --json 2>/dev/null)"
+    SH_WHY="stats: ${o:0:300}"; [ "$(jq -r .reversals_7d <<< "${o}")" = 1 ]; }
+  _shcase "(sh68) C3: --producer com modo declarado (não current) → rc 3, nada gravado" _sh_prodmode \
+    '        if o.get("--producer") and want != "current":' '        if False:'
+  _shcase "(sh69) --supersedes apontando a linha da regra de OUTRO evento → rc 3" _sh_supother \
+    '                      and event_key(x) == event_key(dict(line, mode="auto")) and x["rule_id"] == line["rule_id"]' '                      and x["rule_id"] == line["rule_id"]'
+  _shcase "(sh70) --supersedes apontando uma linha HUMANA do mesmo evento → rc 3" _sh_suphuman \
+    '                      and x["human_decision"] is None and x["rule_decision"] is not None' '                      and True'
+  _shcase "(sh72) C2: reversals_7d conta eventos (dois humanos sobre a mesma linha da regra = 1)" _sh_rev2 \
+    '                rev7.add(event_key(o))' '                rev7.add(o["line_id"])'
+  _shoutro() { _shauto "$1" outro
+    [ "${rc}" = 0 ] && [ "$(jq -r .reason "${d}/auto-gap.log" 2>/dev/null)" = rule_line_missing ] && [ "$(grep -c . "${d}/auto.jsonl")" = 2 ]; }
+  cp "${met}" "${mfm}"; rc_ai=1; rc_am=1; _shoutro "${helper}" && rc_ai=0
+  if [ "${rc_ai}" = 0 ]; then record_pass "a2a-accept: (sh71) o aceite em auto com a linha da regra só de OUTRO evento grava lacuna rule_line_missing (rc 0)"
+  else record_fail "a2a-accept: (sh71) aceite com regra de outro evento" "rc=${rc} gap=$(head -c 200 "${d}/auto-gap.log" 2>/dev/null)"; fi
+  OLD='                      and event_key(x) == event_key(dict(line, mode="auto")) and x["rule_id"] == line["rule_id"]' \
+  NEW='                      and x["rule_id"] == line["rule_id"]' python3 - "${met}" "${mfm}" <<'PY'
+import os, sys
+s = open(sys.argv[1], encoding="utf-8").read(); o = os.environ["OLD"]
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1) if o in s else s)
+PY
+  _shoutro "${mft}/.claude/utils/federation-transport/a2a-accept.sh" && rc_am=0
+  _prove_mutation "a2a-accept: (sh71) mutante: o filtro sem a chave do evento casa a regra de outro evento" "${met}" "${mfm}" "${rc_ai}" "${rc_am}"
+  cp "${met}" "${mfm}"
   _shcase "(sh37) mode-change grava a troca (de, para, quem) e recusa trocar para o modo vigente (rc 3)" _sh_mc \
     '        if now_mode == o["--to"]:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
