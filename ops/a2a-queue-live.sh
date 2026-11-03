@@ -39,12 +39,14 @@
 #               (no_dedup_key); o mesmo nome na fila e em _archived/ conta uma vez (duplicated). Malformado e sem
 #               receivedAt não têm dia: só a linha final, e rc 2. Só dias UTC COMPLETOS (ending = ontem). Dia sem
 #               registro sai no_data e QUEBRA as duas sequências (o bridge ainda não marca quando esteve fora, então
-#               zero e fora são indistinguíveis: na dúvida, sem dado). Gatilhos do PLAN-D: --stage 1 julga
+#               zero e fora são indistinguíveis, e a linha final o declara em zero_vs_down: indistinguishable; na
+#               dúvida, sem dado). Gatilhos do PLAN-D: --stage 1 julga
 #               trigger_b (> 5000 por dia, 7 dias seguidos); --stage 2 julga trigger_back (< 1000 por dia, 30 dias
 #               seguidos); o do outro degrau sai null. rc do count: 0 mediu sem gatilho · 1 gatilho · 2 não mediu.
 #   LOG DE SOMBRA: o archive --apply de um registro NÃO aceito (--force-unaccepted) grava a recusa humana
 #   (human_decision: reject, o motivo em reason) no log de sombra do aceite do OPERADOR (a2a-metrics.py,
-#   ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl). O log tem de aceitar a escrita ANTES do mv.
+#   ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl), com ids_verified false: o evento é o taskId.
+#   A linha que falha NÃO desfaz o archive: vira LACUNA em shadow-gap.log (aviso alto); sem nem a lacuna, rc 1.
 #   Fixos, sem opção para mudar: a raiz da fila, a conta do serviço e o inbox. O wrapper não aceita caminho.
 #
 # O QUE ELE FAZ no archive --apply: trava (a mesma do update-bridge) → confere que o registro é arquivo regular e
@@ -58,7 +60,7 @@
 #
 # MODO DE TESTE (bancada): ONION_A2A_QUEUE_TEST=1 com ONION_A2A_QUEUE_DIR, ONION_A2A_QUEUE_INBOX,
 #   ONION_A2A_QUEUE_BACKUP (comando que imprime "ok: <artefato>"), ONION_A2A_QUEUE_LOCK, ONION_A2A_QUEUE_METRICS
-#   (o a2a-metrics.py), ONION_A2A_QUEUE_SHADOW_LOG e, opcional, ONION_A2A_QUEUE_NOW (epoch). Nele tudo roda como
+#   (o a2a-metrics.py), ONION_A2A_QUEUE_SHADOW_LOG, ONION_A2A_QUEUE_GAP_LOG e, opcional, ONION_A2A_QUEUE_NOW (epoch). Nele tudo roda como
 #   QUEM RODA (sem sudo) e a fila não pode estar sob a home da conta do serviço.
 #   Qualquer ONION_A2A_QUEUE_* sem o modo de teste é uso inválido (rc 3): produção não se redireciona por env.
 set -uo pipefail
@@ -87,6 +89,7 @@ if [ "${ONION_A2A_QUEUE_TEST:-}" = 1 ]; then
   LOCK="${ONION_A2A_QUEUE_LOCK:?modo de teste exige ONION_A2A_QUEUE_LOCK}"
   METRICS="${ONION_A2A_QUEUE_METRICS:?modo de teste exige ONION_A2A_QUEUE_METRICS}"
   SHADOW_LOG="${ONION_A2A_QUEUE_SHADOW_LOG:?modo de teste exige ONION_A2A_QUEUE_SHADOW_LOG}"
+  GAP_LOG="${ONION_A2A_QUEUE_GAP_LOG:?modo de teste exige ONION_A2A_QUEUE_GAP_LOG}"
   NOW="${ONION_A2A_QUEUE_NOW:-}"
   # o teste nunca toca a home da conta do serviço, nem por symlink
   _r="$(realpath -m -- "${QUEUE}")"
@@ -97,7 +100,7 @@ else
     die 3 "variável ONION_A2A_QUEUE_* sem ONION_A2A_QUEUE_TEST=1: produção não se redireciona por ambiente"
   fi
   QUEUE="${PROD_QUEUE}"; INBOX="${SELF_DIR}/../docs/evolution/inbox"; BACKUP=""; LOCK="${PROD_LOCK}"
-  METRICS="${SELF_DIR}/../.claude/utils/federation-transport/a2a-metrics.py"; SHADOW_LOG=""; NOW=""
+  METRICS="${SELF_DIR}/../.claude/utils/federation-transport/a2a-metrics.py"; SHADOW_LOG=""; GAP_LOG=""; NOW=""
   # o wrapper e o backup que ele chama por sudo (como root) têm de ser os RASTREADOS e limpos de um checkout
   # (a mesma razão do a2a-invite-live: uma cópia em /tmp chamaria um bridge-backup.sh que outra conta planta)
   for _f in "${SELF_DIR}/$(basename "${BASH_SOURCE[0]}")" "${SELF_DIR}/bridge-backup.sh"; do
@@ -365,7 +368,9 @@ def streak(pred):
     return n
 final = {"ending": ending.isoformat(), "stage": stage,
          "consecutive_days_over_5000": streak(lambda t: t > OVER) if stage == 1 else None, "trigger_b": None,
-         "consecutive_days_under_1000": streak(lambda t: t < UNDER) if stage == 2 else None, "trigger_back": None}
+         "consecutive_days_under_1000": streak(lambda t: t < UNDER) if stage == 2 else None, "trigger_back": None,
+         # o bridge ainda não tem batimento diário: dia com zero registro e dia com o bridge fora não se distinguem
+         "zero_vs_down": "indistinguishable"}
 if stage == 1:
     final["trigger_b"] = final["consecutive_days_over_5000"] >= DAYS_B
 else:
@@ -453,17 +458,17 @@ before_q="$(count "${Q}")"; before_a="$(count "${DST_DIR}")"; before_names="$(na
 sha_before="$(as_svc sha256sum -- "${SRC}" | cut -d' ' -f1)"
 [[ "${before_q}" =~ ^[1-9][0-9]*$ ]] && [ -n "${sha_before}" ] || die 2 "não medi a fila antes do arquivamento"
 
-# ── a recusa humana entra no log de sombra do aceite (PLAN-E §2): o log tem de aceitar a linha ANTES do mv ──
+# ── a recusa humana entra no log de sombra do aceite (PLAN-E §2) ─────────────────────────────────────────
+# Os ids do registro recusado NÃO são verificados (ele nunca passou pela reverificação do aceite): a linha leva
+# ids_verified false e o evento se identifica pelo taskId que o bridge gerou (julgamento da curadoria, ponto c).
 SHADOW=0
-if [ "${STATUS%%:*}" = forcado ] && [ -z "$(mget jti)" ] && { [ -z "$(mget ce_source)" ] || [ -z "$(mget ce_id)" ]; }; then
-  # sem jti e sem CloudEvent não há evento pelo PLAN-E (o par source + id, ou o jti): declarado, não contado
-  say "AVISO: ${REC} não tem jti nem CloudEvent legível: a recusa fica fora do log de sombra (não é evento pelo PLAN-E)"
+if [ "${STATUS%%:*}" = forcado ] && [ -z "${TID}" ]; then
+  say "AVISO: ${REC} não tem taskId na forma: a recusa fica fora do log de sombra (sem chave de evento verificável)"
 elif [ "${STATUS%%:*}" = forcado ]; then
   SHADOW=1
   SH_ARGS=(--receiver "${RECEIVER:-${DEFAULT_RECEIVER}}"); [ -z "${SHADOW_LOG}" ] || SH_ARGS=(--log "${SHADOW_LOG}")
-  [ -f "${METRICS}" ] || die 2 "a2a-metrics.py ausente (${METRICS}): sem o log de sombra a recusa não é medida; nada movido"
-  sh_err="$(python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --check 2>&1 >/dev/null)" \
-    || die 2 "o log de sombra do aceite não aceita escrita (${sh_err}): nada movido"
+  [ -z "${GAP_LOG}" ] || SH_ARGS+=(--gap-log "${GAP_LOG}")
+  [ -f "${METRICS}" ] || die 2 "a2a-metrics.py ausente (${METRICS}): sem ele nem a lacuna se registra; nada movido"
 fi
 
 # ── backup rotulado do estado do bridge (cifrado), artefato NOMEADO ────────────────────────────────────
@@ -511,12 +516,16 @@ if [ "${SHADOW}" = 1 ]; then
   # a regra v1 (linha de base declarada) aceita todo registro que se diz verificado; os ids do evento são os do
   # scan (lidos sem verificar: o registro recusado nunca passou pela reverificação do aceite)
   rule="reject"; [ "$(mget verified)" = True ] && rule="accept"
-  if ! sh_out="$(python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --mode shadow --rule-decision "${rule}" \
-        --human-decision reject --reason "${FORCE}" --jti "$(mget jti)" --task-id "${TID}" \
-        --ce-source "$(mget ce_source)" --ce-id "$(mget ce_id)" 2>&1)"; then
-    printf '[%s] ERRO: o registro FOI arquivado, mas a linha do log de sombra falhou (%s): esta recusa fica FORA da medida\n' "${NAME}" "${sh_out}" >&2
-    exit 1
-  fi
-  say "log de sombra: recusa humana registrada (${sh_out#ok: })"
+  # a linha que não se grava NÃO desfaz o archive (ponto f): o a2a-metrics registra a lacuna e sai 4
+  sh_rc=0
+  sh_out="$(python3 -I "${METRICS}" shadow-append "${SH_ARGS[@]}" --point reject --ids-unverified --mode shadow \
+        --rule-decision "${rule}" --human-decision reject --reason "${FORCE}" --jti "$(mget jti)" --task-id "${TID}" \
+        --ce-source "$(mget ce_source)" --ce-id "$(mget ce_id)" 2>&1)" || sh_rc=$?
+  case "${sh_rc}" in
+    0) say "log de sombra: recusa humana registrada (${sh_out#ok: })" ;;
+    4) printf '%s\n[%s] AVISO ALTO: o registro FOI arquivado, mas a linha de sombra NÃO foi gravada — LACUNA registrada; o shadow-stats não mede esta janela\n' "${sh_out}" "${NAME}" >&2 ;;
+    *) printf '%s\n[%s] ERRO: o registro FOI arquivado, mas nem a linha de sombra nem o marcador de lacuna foram gravados — buraco NÃO registrado\n' "${sh_out}" "${NAME}" >&2
+       exit 1 ;;
+  esac
 fi
 exit 0
