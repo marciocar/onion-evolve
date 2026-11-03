@@ -42,16 +42,23 @@
 # registro de confiança. Registro de outro receptor é RECUSADO; registro antigo, sem os dois campos, só é
 # aceito no core. No hub, que não tem o registro do core: --receiver <hub> e --trust-repo <clone do core>.
 #
+# LOG DE SOMBRA (PLAN-E §2 da curadoria, 2026-11-03): cada aceite NOVO grava uma linha `human_decision: accept`
+#   no log de sombra do aceite (a2a-metrics.py shadow-append), com os ids do CloudEvent lidos do corpo DEPOIS da
+#   reverificação (ce_source, ce_id, ce_time; o corpo nunca vai ao log), o jti assinado e o taskId. A regra v1 é a
+#   linha de base declarada (aceita todo registro verificado). O log mora fora de árvore git, 0600:
+#   --shadow-log <arq>, ou A2A_SHADOW_LOG, ou ~/.local/state/onion/a2a-metrics/accept-shadow.<receptor>.jsonl.
+#   Log que não se pode escrever = RECUSA antes do doc (aceite sem medida abriria buraco no denominador).
+#
 # Uso : a2a-accept.sh <pending-record.json> [--inbox <dir>] [--receiver <id>] [--trust-repo <path>]
-#                     [--invites <a2a-invites.json>]
+#                     [--invites <a2a-invites.json>] [--ledger <arquivo>] [--shadow-log <arquivo>]
 # Exit: 0 = aceito (ou já existia) · 1 = recusado (reverificação vetou/divergiu, malformado, revogado) ·
-#       2 = uso incorreto
+#       2 = uso incorreto. O doc criado com a linha de sombra falhada sai 1 com AVISO (aceito, mas fora da medida).
 # Exercitado por lint-selftest.sh (run_a2a_accept_selftests).
 # =============================================================================
 set -uo pipefail
 
-REC=""; INBOX=""; RECEIVER=""; TRUST_REPO=""; INVITES=""; LEDGER=""
-USAGE="uso: a2a-accept.sh <pending-record.json> [--inbox <dir>] [--receiver <id>] [--trust-repo <path>] [--invites <arquivo>] [--ledger <arquivo>]"
+REC=""; INBOX=""; RECEIVER=""; TRUST_REPO=""; INVITES=""; LEDGER=""; SHADOW_LOG="${A2A_SHADOW_LOG:-}"
+USAGE="uso: a2a-accept.sh <pending-record.json> [--inbox <dir>] [--receiver <id>] [--trust-repo <path>] [--invites <arquivo>] [--ledger <arquivo>] [--shadow-log <arquivo>]"
 # IDADE MÁXIMA do envelope no aceite (refutador do SAC-150): o receivedAt NÃO é assinado, e quem escreve na
 # fila pode reapresentar um envelope genuíno antigo com um receivedAt dentro da janela dele. Sem uma testemunha
 # do recebimento fora do UID do serviço (D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A), o aceite limita
@@ -67,6 +74,7 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --trust-repo) TRUST_REPO="${2:-}"; [ -n "${TRUST_REPO}" ] || { echo "uso: --trust-repo exige valor" >&2; exit 2; }; shift 2 ;;
   --invites) INVITES="${2:-}"; [ -n "${INVITES}" ] || { echo "uso: --invites exige valor" >&2; exit 2; }; shift 2 ;;
   --ledger) LEDGER="${2:-}"; [ -n "${LEDGER}" ] || { echo "uso: --ledger exige valor" >&2; exit 2; }; shift 2 ;;
+  --shadow-log) SHADOW_LOG="${2:-}"; [ -n "${SHADOW_LOG}" ] || { echo "uso: --shadow-log exige valor" >&2; exit 2; }; shift 2 ;;
   -*) echo "${USAGE}" >&2; exit 2 ;;
   *) [ -z "${REC}" ] && REC="$1"; shift ;;
 esac; done
@@ -106,6 +114,9 @@ GATE="${HERE}/a2a-verify.sh"
 WRAP="${ROOT}/.claude/utils/guardrails/onion-untrusted-wrap.sh"
 [ -f "${GATE}" ] || { echo "ERRO: gate ausente (${GATE}) — sem reverificar, nada é aceito." >&2; exit 1; }
 [ -f "${WRAP}" ] || { echo "ERRO: moldura R15.2 ausente (${WRAP}) — o corpo não entra no inbox sem ela." >&2; exit 1; }
+METRICS="${HERE}/a2a-metrics.py"
+[ -f "${METRICS}" ] || { echo "ERRO: a2a-metrics.py ausente (${METRICS}) — sem o log de sombra o aceite não é medido; nada aceito." >&2; exit 1; }
+SHADOW_ARGS=(--receiver "${RECEIVER}"); [ -z "${SHADOW_LOG}" ] || SHADOW_ARGS=(--log "${SHADOW_LOG}")
 
 # --- forma do registro (um documento JSON, objeto) ------------------------------------------------------
 jq -es 'length==1 and (.[0]|type=="object")' "${REC}" >/dev/null 2>&1 || refuse "registro não é UM objeto JSON válido."
@@ -252,6 +263,11 @@ print(n)
 PY
 )" || refuse "falha ao sanear o corpo."
 case "${CTRL_N}" in ''|*[!0-9]*) refuse "falha ao sanear o corpo." ;; esac
+# os ids do CloudEvent, do corpo JÁ reverificado (amarrado pelo body_sha256 assinado): peça nova do PLAN-E §0.
+# Corpo sem CloudEvent dá os quatro null, e o evento passa a ser identificado pelo jti
+CE_JSON="$(python3 -I "${METRICS}" ce --body-file "${TMP}/body.raw")" || refuse "falha ao ler o CloudEvent do corpo."
+ce_get() { printf '%s' "${CE_JSON}" | jq -r --arg k "$1" '.[$k] // ""'; }
+CE_SOURCE="$(ce_get ce_source)"; CE_ID="$(ce_get ce_id)"; CE_TIME="$(ce_get ce_time)"
 # cerca de código maior que a maior sequência de crases do corpo (mínimo 3)
 TICKS="$(python3 -I -c 'import re,sys; s=open(sys.argv[1],encoding="utf-8").read(); m=max([len(x) for x in re.findall(r"`+", s)] or [0]); print("`"*max(3, m+1))' "${TMP}/body.txt")"
 
@@ -280,6 +296,9 @@ if [ -n "${EXIST}" ] || [ -n "${LEDGER_TASK}" ]; then
   refuse "o jti deste envelope já foi aceito por OUTRO registro (${EXIST:-razão de aceites}) — replay ou registro forjado reaproveitando o jti; nada sobrescrito."
 fi
 mkdir -p "${INBOX}"
+# o log de sombra tem de aceitar a linha ANTES do doc nascer: aceite sem a linha seria um buraco no denominador
+SH_ERR="$(python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" --check 2>&1 >/dev/null)" \
+  || refuse "o log de sombra do aceite não aceita escrita (${SH_ERR#\[a2a-metrics\] ERRO: }) — nada aceito; corrija o log ou aponte --shadow-log."
 
 q() { jq -Rn --arg v "$1" '$v'; }   # string JSON = escalar YAML entre aspas duplas (nada cru no YAML)
 if [ -n "${BODY_PATH}" ]; then
@@ -348,5 +367,13 @@ DOC_SHA="$(openssl dgst -sha256 < "${TMP}/doc.md" | awk '{print $NF}')"
 ( umask 077; printf '%s %s %s %s\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" "${DOC_SHA}" >> "${LEDGER}" ) 2>/dev/null \
   || echo "AVISO: o doc foi criado, mas o razão de aceites (${LEDGER}) não foi gravado: o dedupe fica só pelo nome." >&2
 
+# a linha de sombra: decisão humana = accept; a regra v1 (linha de base) aceita todo registro reverificado
+if ! SH_OUT="$(python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" --mode shadow --rule-decision accept \
+      --human-decision accept --jti "${JTI}" --task-id "${TASKID}" --ce-source "${CE_SOURCE}" --ce-id "${CE_ID}" \
+      --ce-time "${CE_TIME}" 2>&1)"; then
+  echo "AVISO: o doc foi criado, mas a linha do log de sombra falhou (${SH_OUT}): este aceite fica FORA da medida." >&2
+  echo "aceito → ${OUT}"
+  exit 1
+fi
 echo "aceito → ${OUT}"
 echo "  (próximo: /meta:co-evolve p/ triar, lendo o DOC — nunca o JSON da fila; e limpar o registro da fila do bridge — ato humano)" >&2

@@ -115,6 +115,9 @@ TOOLS = [
                 "text": {"type": "string", "description": "o corpo da mensagem (UTF-8, até 8192 bytes)"},
                 "thread": {"type": "string", "description": "id da conversa, quando é resposta"},
                 "idempotency_key": {"type": "string", "description": "chave do rascunho ([A-Za-z0-9._-], até 64)"},
+                "supersedes_draft": {"type": "string", "description": (
+                    "quando o humano pede para EDITAR um rascunho ainda não enviado: o id dele. O novo o substitui "
+                    "(mesmo destinatário e mesma conversa) e o antigo deixa de poder ser enviado")},
             },
             "required": ["to", "text"],
             "additionalProperties": False,
@@ -193,7 +196,8 @@ def draft_message(args):
     text = args.get("text")
     thread = args.get("thread") or ""
     key = args.get("idempotency_key") or ""
-    extra = set(args) - {"to", "text", "thread", "idempotency_key"}
+    sup = args.get("supersedes_draft") or ""
+    extra = set(args) - {"to", "text", "thread", "idempotency_key", "supersedes_draft"}
     if extra:
         raise ToolError(f"argumento desconhecido: {sorted(extra)}")
     if not isinstance(to, str) or not ID_RE.fullmatch(to):
@@ -212,6 +216,8 @@ def draft_message(args):
         draft_id = key
     else:
         draft_id = "d-" + hashlib.sha256(f"{to}\n{thread}\n{body_sha}".encode()).hexdigest()[:20]
+    if not isinstance(sup, str) or (sup and (not ID_RE.fullmatch(sup) or sup == draft_id)):
+        raise ToolError("'supersedes_draft' fora da forma [A-Za-z0-9._-], ou o próprio rascunho")
     os.makedirs(DRAFTS, mode=0o700, exist_ok=True)
     path = os.path.join(DRAFTS, f"{draft_id}.json")
     doc = {"draft_id": draft_id, "from": ME, "to": to, "thread": thread, "text": text,
@@ -227,10 +233,56 @@ def draft_message(args):
             raise ToolError(f"a chave {draft_id} já tem OUTRO rascunho; use outra chave. Nada foi gravado.")
         return _text(f"RASCUNHO já existia (idempotente): {draft_id} · para {to} · {len(raw)} bytes · "
                      f"sha256 {body_sha}. NADA FOI ENVIADO. {_send_hint(draft_id, thread)}")
-    with os.fdopen(fd, "w", encoding="utf-8") as f:
-        json.dump(doc, f, ensure_ascii=False)
-    return _text(f"RASCUNHO gravado: {draft_id} · para {to} · {len(raw)} bytes · sha256 {body_sha}. "
+    # o REGISTRO DE RASCUNHOS (PLAN-E §3): todo rascunho novo vira a linha `drafted`; editar é um rascunho novo com
+    # supersedes_draft. Sem a linha não há rascunho (um rascunho fora do registro seria enviável e não contado)
+    try:
+        log, metrics = os.path.join(STATE, "drafts.jsonl"), _metrics()
+        old_path = ""
+        if sup:
+            old_path = os.path.join(DRAFTS, f"{sup}.json")
+            try:
+                old = json.load(open(old_path, encoding="utf-8")) if not os.path.islink(old_path) else None
+            except (OSError, ValueError):
+                old = None
+            if not isinstance(old, dict):
+                raise ToolError(f"não há rascunho pendente {sup} para substituir (já enviado, já substituído ou "
+                                "inexistente). Nada foi gravado.")
+            if (old.get("to"), old.get("thread") or "") != (to, thread):
+                raise ToolError(f"o rascunho {sup} é de outro destinatário ou de outra conversa: editar é substituir "
+                                "na MESMA conversa. Nada foi gravado.")
+        metrics.check_log(log)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            fd = None
+            json.dump(doc, f, ensure_ascii=False)
+        metrics.append_line(log, metrics.draft_line("drafted", draft_id, thread, to, sup or None))
+    except BaseException as e:
+        if fd is not None:
+            os.close(fd)
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+        if isinstance(e, ToolError):
+            raise
+        raise ToolError(f"o registro de rascunhos recusou a linha ({e}): nada foi gravado")
+    if old_path:
+        os.makedirs(os.path.join(DRAFTS, "superseded"), mode=0o700, exist_ok=True)
+        os.replace(old_path, os.path.join(DRAFTS, "superseded", f"{sup}.json"))
+    return _text(f"RASCUNHO gravado: {draft_id} · para {to} · {len(raw)} bytes · sha256 {body_sha}"
+                 f"{f' · substitui {sup} (que não pode mais ser enviado)' if sup else ''}. "
                  f"NADA FOI ENVIADO, e nenhuma ferramenta desta sessão envia. {_send_hint(draft_id, thread)}")
+
+
+def _metrics():
+    """O a2a-metrics.py ao lado deste arquivo (o escritor do registro). Ausente = ToolError: nada se grava sem ele."""
+    import importlib.util
+    p = os.path.join(HERE, "a2a-metrics.py")
+    if not os.path.isfile(p):
+        raise ToolError(f"a2a-metrics.py ausente ({p}): sem o registro de rascunhos nada é gravado")
+    spec = importlib.util.spec_from_file_location("a2a_metrics", p)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 # ─────────────────────────────── read_inbox ──────────────────────────────────
