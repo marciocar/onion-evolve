@@ -11213,6 +11213,20 @@ PY
     '        dt.date.fromisoformat(o["receivedAt"][:10])' '        pass' _c_badat
   _c_boom() { local r; r="$(QLR_ENV="ONION_A2A_QUEUE_NOW=999999999999" _qlr "$1" count --by-day --stage 1 --json)"; QL_WHY="${r:0:300}"
     _qlrc "${r}" 2 && _qlhas "${r}" "ERRO inesperado"; }
+  _c_cefrom() { local ce='"{\"specversion\":\"1.0\",\"id\":\"ev-7\",\"source\":\"/vigia\",\"type\":\"t\"}"'
+    _qlday "${d}/q/f1.tf1.json" tf1 2026-11-02T01:00:00Z "${ce}"; _qlday "${d}/q/f2.tf2.json" tf2 2026-11-02T02:00:00Z "${ce}"
+    sed -i 's/"from":"m"/"from":"outro-membro"/' "${d}/q/f1.tf1.json"
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 2 ] && [ "$(_qljget "${r}" 'select(.ending) | .deduped_by_ce')" = 0 ]; }
+  _qlcase "(q50) count: a chave do CloudEvent é escopada pelo remetente (outro membro com o mesmo source+id não apaga o evento) (N2)" \
+    'key = ("ce", o.get("from"), o["ce_source"], o["ce_id"])' 'key = ("ce", o["ce_source"], o["ce_id"])' _c_cefrom
+  _c_nodays() { rm -rf "${d}/q/"*.json "${d}/q/hub-bancada"
+    local r; r="$(_qlcount "$1" count --by-day --stage 2 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 2 && [ "$(_qljget "${r}" 'select(.ending) | .no_data')" = true ] || return 1
+    r="$(_qlcount "$1" count --by-day --stage 2 --since 2027-01-01 --json)"; QL_WHY="futuro: ${r:0:400}"
+    _qlrc "${r}" 2 && [ "$(_qljget "${r}" 'select(.ending) | .no_data')" = true ]; }
+  _qlcase "(q51) count sem nenhum dia medido (fila vazia sem --since; --since no futuro) → no_data e rc 2 (N3)" \
+    'final["no_data"] = not out' 'final["no_data"] = False' _c_nodays
   _qlcase "(q49) count: exceção inesperada (relógio fora do alcance do calendário) → rc 2, nunca rc 1 (M2)" \
     'sys.excepthook = _boom' 'pass' _c_boom
   _c_zdays() { _c_cnt5 "$1" || return 1; local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-01 --json)"; QL_WHY="${r:0:400}"
@@ -17665,7 +17679,7 @@ L = []
 if scen in ("s50", "s50v", "mal", "base"):
     for i in range(50):
         day = i * 14 // 49
-        L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}",
+        L.append(ln(now - (14 - day) * 86400 - i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}",
                     ver="2" if scen == "s50v" and day >= 10 else "1",
                     rid="baseline-accept-all" if scen == "base" else "accept-rule"))
 elif scen == "m1":
@@ -17673,37 +17687,59 @@ elif scen == "m1":
     for i in range(50):
         L.append(ln(n2 - 13 * 86400 - 120 - i, "accept", "accept", f"e{i}"))    # 23:5x do dia 0 (13 d 2 min antes)
 elif scen == "mix":
-    for i in range(50):
-        day = i * 14 // 49
-        L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
-    L.append(ln(now - 60, "accept", None, "zz", mode="auto"))
+    for i in range(10):
+        L.append(ln(now - 3 * 86400 + i, "accept", None, f"a{i}", mode="auto"))
+    for i in range(3):
+        L.append(ln(now - 2 * 86400 + i, None, "reject", f"a{i}", mode="auto", sup=L[i]["line_id"]))
+    L.append(ln(now - 60, "accept", "reject", "zz"))                    # a ÚLTIMA linha é shadow
 elif scen == "chain":
     for i in range(50):
-        L.append(ln(now - (14 - i * 14 // 49) * 86400 + i, "accept", "accept", f"e{i}"))
+        L.append(ln(now - (14 - i * 14 // 49) * 86400 - i, "accept", "accept", f"e{i}"))
     L.append(ln(now - 30, None, "reject", "e0", sup=L[0]["line_id"]))
 elif scen == "hold":
     for i in range(50):
         day = i * 14 // 49
-        L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
+        L.append(ln(now - (14 - day) * 86400 - i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
     for i in range(5):
         L.append(ln(now - 3600 + i, "accept", "hold", f"h{i}"))
 elif scen == "xrev":
     for i in range(10):
-        L.append(ln(now - 3 * 86400 + i, "accept", None, f"a{i}", mode="auto"))
+        L.append(ln(now - 3 * 86400 - i, "accept", None, f"a{i}", mode="auto"))
     L.append(ln(now - 2 * 86400, None, "reject", "a2", mode="auto", sup=L[5]["line_id"]))
 elif scen == "vazio":
     pass
+elif scen == "dilute":
+    for i in range(10):
+        L.append(ln(now - 3 * 86400 - i, "accept", None, f"a{i}", mode="auto"))
+    for i in range(3):
+        L.append(ln(now - 2 * 86400 - i, None, "reject", f"a{i}", mode="auto", sup=L[i]["line_id"]))
+    for i in range(20):
+        L.append(ln(now - 86400 + i, "accept", "reject", f"s{i}"))
+elif scen in ("baddate", "future"):
+    for i in range(50):
+        day = i * 14 // 49
+        L.append(ln(now - (14 - day) * 86400 - i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
+    x = ln(now + 3600, "accept", "accept", "f0")
+    if scen == "baddate":
+        x["logged_at"] = "2026-02-30T00:00:00Z"
+    L.append(x)
+elif scen == "n1":
+    for i in range(50):
+        L.append(ln(now - (35 - i * 14 // 49) * 86400 - i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
+    for i in range(20):
+        L.append(ln(now - (20 - i) * 86400 + 60, "accept", None, f"a{i}", mode="auto"))
+    L.append(ln(now - 3600, "accept", "accept", "volta"))
 elif scen == "unv":
     for i in range(2):
         L.append(ln(now - 3600 + i, "accept", "reject", "mesmo-ce", ids=False, task=f"t{i}"))
 elif scen == "s60":
     for i in range(60):
-        L.append(ln(now - (14 - i * 14 // 59) * 86400 + i, "accept", "reject" if i >= 50 else "accept", f"e{i}"))
+        L.append(ln(now - (14 - i * 14 // 59) * 86400 - i, "accept", "reject" if i >= 50 else "accept", f"e{i}"))
 elif scen == "auto":
     for i in range(10):
-        L.append(ln(now - 3 * 86400 + i, "accept", None, f"a{i}", mode="auto"))
+        L.append(ln(now - 3 * 86400 - i, "accept", None, f"a{i}", mode="auto"))
     for i in (2, 5):
-        L.append(ln(now - 2 * 86400 + i, None, "reject", f"a{i}", mode="auto", sup=L[i]["line_id"]))
+        L.append(ln(now - 2 * 86400 - i, None, "reject", f"a{i}", mode="auto", sup=L[i]["line_id"]))
 with open(path, "w") as f:
     for o in L:
         f.write(json.dumps(o) + "\n")
@@ -17712,7 +17748,7 @@ with open(path, "w") as f:
 PY
   }
   # _shst <metrics> <cenário> [extra] → "rc|json"
-  _shst() { local o r=0 m=shadow; case "$2" in auto|xrev) m=auto ;; esac; _shgen "$2" "${d}/sh-$2.jsonl"
+  _shst() { local o r=0 m=shadow; case "$2" in auto|xrev|dilute|mix) m=auto ;; esac; _shgen "$2" "${d}/sh-$2.jsonl"
     o="$(python3 -I "$1" shadow-stats --mode "${m}" --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
   _shj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
   _sh_on() { local r; r="$(_shst "$1" s50)"; SH_WHY="${r:0:400}"
@@ -17732,7 +17768,7 @@ PY
   _sh_m1() { local r; r="$(_shst "$1" m1 --now 1793664060)"; SH_WHY="${r:0:400}"
     [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.days_covered,.trigger_rule_on] | map(tostring) | join(",")')" = "13,false" ]; }
   _sh_mode() { local r; r="$(_shst "$1" mix)"; SH_WHY="${r:0:400}"
-    [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.mode,.events,.trigger_rule_on] | map(tostring) | join(",")')" = "shadow,50,true" ]; }
+    [ "$(_shj "${r}" '[.mode,.reversals_7d,.back_to_shadow_criterion_met] | map(tostring) | join(",")')" = "auto,3,true" ]; }
   _sh_empty() { local r; r="$(_shst "$1" vazio)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.no_data')" = true ]; }
   _sh_chain() { local r; r="$(_shst "$1" chain)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '[.events,.agree] | map(tostring) | join(",")')" = "50,49" ]; }
   _sh_hold() { local r; r="$(_shst "$1" hold)"; SH_WHY="${r:0:400}"
@@ -17741,6 +17777,22 @@ PY
     r="$(_shst "$1" s50 --queue-jsonl "${d}/sh-q2.jsonl")"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.undecided')" = 2 ]; }
   _sh_und3() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","ce_source":"/w","ce_id":"e3"}' > "${d}/sh-q3.jsonl"
     r="$(_shst "$1" s50v --queue-jsonl "${d}/sh-q3.jsonl")"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.undecided')" = 1 ]; }
+  _sh_dil() { local r; r="$(_shst "$1" dilute)"; SH_WHY="${r:0:400}"
+    [ "$(_shj "${r}" '[.decisions_7d,.reversals_7d,.reversal_rate_7d,.back_to_shadow_criterion_met] | map(tostring) | join(",")')" = "10,3,0.3,true" ]; }
+  _sh_bdate() { local r; r="$(_shst "$1" baddate)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && _rt_has_err "${r}"; }
+  _rt_has_err() { case "${1#*|}" in *"ERRO inesperado"*) true ;; *) false ;; esac; }
+  _sh_n1() { local r; r="$(_shst "$1" n1)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.events,.trigger_rule_on] | map(tostring) | join(",")')" = "1,false" ]; }
+  _sh_n4() { local r; r="$(_shst "$1" s50 --mode auto)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.no_data')" = true ]; }
+  _sh_n5() { local r=0; rm -f "${d}/gap-n5.log"
+    python3 -I "$1" shadow-append --log "${d}/sh-n5.jsonl" --gap-log "${d}/gap-n5.log" --mode shadow --rule-decision accept \
+      --human-decision accept >/dev/null 2>&1 || r=$?; SH_WHY="rc=${r}"
+    [ "${r}" = 4 ] && [ "$(jq -r '.gap_id | length' "${d}/gap-n5.log" 2>/dev/null)" = 36 ] && [ ! -s "${d}/sh-n5.jsonl" ]; }
+  _sh_n6() { local r; printf '%s\n' '{"logged_at":"2026-11-02T10:00:00Z","gap_id":"11111111-1111-4111-8111-111111111111","point":"accept","jti":"j","taskId":"t","why":"x"}' \
+      '{"logged_at":"2026-11-02T11:00:00Z","resolves":"11111111-1111-4111-8111-111111111111","resolved_by":"22222222-2222-4222-8222-222222222222"}' > "${d}/gap-res.log"
+    r="$(_shst "$1" s50 --gap-log "${d}/gap-res.log")"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '.gaps_in_window')" = 0 ]; }
+  _sh_n7() { local r; r="$(_shst "$1" future)"; SH_WHY="${r:0:400}"
+    [ "$(_shj "${r}" '[.events,.future_logged_at] | map(tostring) | join(",")')" = "50,1" ]; }
   _sh_xrev() { local r; r="$(_shst "$1" xrev)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.reversals_7d')" = 0 ]; }
   _sh_mal() { local r; r="$(_shst "$1" mal)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.malformed')" = 1 ]; }
   _sh_base() { local r; r="$(_shst "$1" base)"; SH_WHY="${r:0:400}"
@@ -17782,10 +17834,10 @@ PY
   _shcase "(sh11) shadow-stats: linhas com ids_verified false deduplicam pelo taskId, nunca pelos ce_* (2 recusas com o mesmo ce = 2 eventos)" _sh_unv \
     '    if o.get("ids_verified") is False:' '    if False:'
   _shcase "(sh12) shadow-stats: lacuna registrada (shadow-gap.log) dentro da janela → rc 2" _sh_gap \
-    '(2 if malformed or out["gaps_in_window"] or not_instr else' '(2 if malformed or not_instr else'
+    '(2 if malformed or future or out["gaps_in_window"] or not_instr else' '(2 if malformed or future or not_instr else'
   _shcase "(sh13) shadow-stats: days_covered são dias COMPLETOS (23:59 → 00:01 de 14 dias depois = 13, não dispara) (M1)" _sh_m1 \
     '    out["days_covered"] = max(0, (now - first) // 86400)' '    out["days_covered"] = (utc_day(now) - utc_day(first)).days'
-  _shcase "(sh14) shadow-stats: o modo vem de --mode, nunca da última linha (50 shadow + 1 auto no fim, --mode shadow → dispara) (A1)" _sh_mode \
+  _shcase "(sh14) shadow-stats: o modo vem de --mode, nunca da última linha (auto com 3 reversões + 1 shadow no fim, --mode auto) (A1)" _sh_mode \
     '    scur = [o for o in cur if o["mode"] == mode]' '    mode = cur[-1]["mode"]; scur = cur'
   _shcase "(sh15) shadow-stats --mode auto: a reversão não tem produtor no core → trigger_back_to_shadow null, not_instrumented, rc 2 (A2)" _sh_noinst \
     'SHADOW_NOT_INSTRUMENTED = ("reversal",)' 'SHADOW_NOT_INSTRUMENTED = ()'
@@ -17801,6 +17853,20 @@ PY
     '    cur_keys = {event_key(o) for o in cur} | {("task", o["taskId"]) for o in cur if o.get("taskId")}' '    cur_keys = {event_key(o) for o in valid}'
   _shcase "(sh21) shadow-stats: reversão só no MESMO evento (supersedes de outro evento não conta) (B3)" _sh_xrev \
     '        if tgt is not None and event_key(tgt) == event_key(o):' '        if tgt is not None:'
+  _shcase "(sh24) shadow-stats --mode auto: as recusas shadow do archive não diluem a taxa de reversão (0,3, não 0,1) (A1, funcional)" _sh_dil \
+    '    scur = [o for o in cur if o["mode"] == mode]          # A1: cada gatilho sobre as linhas do SEU modo' '    scur = cur'
+  _shcase "(sh25) shadow-stats: logged_at com data impossível → rc 2 pelo tratador de exceção, nunca rc 1 (M2)" _sh_bdate \
+    '    except Exception as e:                              # M2' '    except ZeroDivisionError as e:                      # M2'
+  _shcase "(sh26) shadow-stats: a janela recomeça na volta de auto para shadow (15 d a 0,96, 20 d auto, 1 h de volta → não religa) (N1)" _sh_n1 \
+    '            scur = [o for o in scur if stamp_epoch(o["logged_at"]) > max(autos)]' '            pass'
+  _shcase "(sh27) shadow-stats --mode auto sem linhas auto → no_data e rc 2 (N4)" _sh_n4 \
+    '    if not scur:' '    if False:'
+  _shcase "(sh28) shadow-append: linha inválida (sem chave de evento) vira LACUNA com gap_id (rc 4), nunca rc 3 sem marcador (N5)" _sh_n5 \
+    '            return _gap(e, clean_str(o.get("--jti")), clean_str(o.get("--task-id")))' '            raise'
+  _shcase "(sh29) shadow-stats: lacuna fechada por resolved_by não dá rc 2 (N6)" _sh_n6 \
+    '        if isinstance(o, dict) and o.get("gap_id") in closed:' '        if False:'
+  _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
+    '        elif stamp_epoch(o["logged_at"]) > now:' '        elif False:'
   # (sh22) B5: log num diretório com .git ALHEIO ao repo em uso (o HOME versionado por dotfiles) não é recusado
   _sh_dot() { rm -rf "${d}/dotfiles-home"; git init -q "${d}/dotfiles-home"; local r=0
     A2A_METRICS_REPO_ROOT="${REPO_ROOT}" python3 -I "$1" shadow-append --log "${d}/dotfiles-home/s.jsonl" --gap-log "${d}/gap-dot.log" --mode shadow --rule-decision accept \
