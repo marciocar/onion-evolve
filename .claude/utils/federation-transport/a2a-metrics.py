@@ -19,7 +19,11 @@
 #                  --resolves-gap <gap_id> por uma linha que case com tudo isso (senão rc 3), e fechada não dá rc 2.
 #                  O modo vigente vem das linhas mode_change (subcomando mode-change); --mode que nenhuma troca
 #                  explica = rc 2 (mode_mismatch). Gatilho inviável sai null com trigger_unavailable_reason
-#   mode-change    grava a troca de modo do aceite (de, para, quem, quando) no log de sombra
+#   mode-change    grava a troca de modo do aceite (de, para, quem, quando) no log de sombra; recusa a troca no mesmo
+#                  segundo da anterior (repita em 1 s). shadow-append --mode current --producer (o aceite e o archive)
+#                  grava no modo VIGENTE no instante da linha; no auto, a decisão humana vira confirmação ou reversão
+#                  da linha da regra do evento (supersedes), e sem ela vira lacuna rule_line_missing. Toda recusa do
+#                  escritor a um produtor oficial vira lacuna (rc 4), nunca some
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
@@ -443,15 +447,30 @@ def validate_mode_change(o):
 
 
 def mode_before(changes, t):
-    """O modo vigente ESTRITAMENTE antes do instante t (régua de fronteira única: a troca vale para o que vem depois)."""
-    past = sorted((stamp_epoch(c["logged_at"]), c["to_mode"]) for c in changes if stamp_epoch(c["logged_at"]) < t)
-    return past[-1][1] if past else "shadow"
+    """O modo vigente ESTRITAMENTE antes do instante t (régua de fronteira única: a troca vale para o que vem depois).
+
+    → "shadow" | "auto", ou None quando a última troca antes de t é AMBÍGUA (duas no mesmo segundo com destinos
+    diferentes): sem desempate por ordem de arquivo nem alfabética. É a MESMA função no leitor e no escritor."""
+    past = [(stamp_epoch(c["logged_at"]), c["to_mode"]) for c in changes if stamp_epoch(c["logged_at"]) < t]
+    if not past:
+        return "shadow"
+    last = max(ts for ts, _ in past)
+    dests = {m for ts, m in past if ts == last}
+    return dests.pop() if len(dests) == 1 else None
+
+
+def ambiguous_changes(changes):
+    """Segundos com duas ou mais trocas de destinos diferentes (N3): o log não explica o modo ali."""
+    by = {}
+    for c in changes:
+        by.setdefault(stamp_epoch(c["logged_at"]), set()).add(c["to_mode"])
+    return sorted(ts for ts, ds in by.items() if len(ds) > 1)
 
 
 def mode_in_force(changes, now):
-    """O modo vigente pelas linhas mode_change (a sombra começa em shadow): → (modo, epoch da última troca)."""
-    past = sorted((stamp_epoch(c["logged_at"]), c["to_mode"]) for c in changes if stamp_epoch(c["logged_at"]) <= now)
-    return (past[-1][1], past[-1][0]) if past else ("shadow", None)
+    """O modo vigente pelas linhas mode_change até `now` (inclusive): → (modo ou None se ambíguo, epoch da última)."""
+    past = [stamp_epoch(c["logged_at"]) for c in changes if stamp_epoch(c["logged_at"]) <= now]
+    return mode_before(changes, now + 1), (max(past) if past else None)
 
 
 def event_key(o):
@@ -525,8 +544,13 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     in_force, last_change = mode_in_force(changes, now)
     out["mode_in_force"] = in_force
     if mode != in_force:
-        out["mode_mismatch"] = (f"--mode {mode}, mas o log diz {in_force} (nenhuma linha mode_change explica o modo "
-                                "pedido): grave a troca com mode-change")
+        out["mode_mismatch"] = (f"--mode {mode}, mas o log diz {in_force or 'AMBÍGUO'} (nenhuma linha mode_change "
+                                "explica o modo pedido): grave a troca com mode-change")
+    amb = ambiguous_changes(changes)
+    if amb:
+        # N3 (julgamento): duas trocas no mesmo segundo com destinos diferentes = ambíguo, sem desempate
+        out["mode_mismatch"] = "; ".join(x for x in (out["mode_mismatch"], (
+            f"{len(amb)} segundo(s) com trocas de modo ambíguas (destinos diferentes no mesmo segundo)")) if x)
     cur = []
     if valid:
         version, rule_id = valid[-1]["rule_version"], valid[-1]["rule_id"]
@@ -845,24 +869,27 @@ def main(argv):
                          "--human-decision": True, "--reason": True, "--jti": True, "--task-id": True,
                          "--ce-source": True, "--ce-id": True, "--ce-time": True, "--supersedes": True,
                          "--ids-unverified": False, "--point": True, "--gap-log": True, "--if-absent": False,
-                         "--resolves-gap": True, "--from": True})
+                         "--resolves-gap": True, "--from": True, "--producer": False})
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         if o.get("--check"):
             check_log(log)
             print(f"ok: {log}")
             return 0
+        want = o.get("--mode", "shadow")
+        if want not in MODES + ("current",):
+            raise UsageError("--mode exige shadow, auto ou current (o modo vigente no instante da linha)")
         gap_log = o.get("--gap-log") or default_gap_log()
         if o.get("--resolves-gap") and not UUID_RE.fullmatch(o["--resolves-gap"]):
             raise UsageError("--resolves-gap exige o gap_id (UUID) da lacuna")
 
-        def _gap(why, jti, task, line=None):
+        def _gap(why, jti, task, line=None, reason=None):
             # a lacuna grava receptor, chave do evento, modo e regra: só a linha que casar com tudo isso a fecha
             src = line or {"from": clean_str(o.get("--from")), "ce_source": clean_str(o.get("--ce-source")),
                            "ce_id": clean_str(o.get("--ce-id")), "jti": jti, "taskId": task,
-                           "ids_verified": not o.get("--ids-unverified"), "mode": o.get("--mode", "shadow"),
+                           "ids_verified": not o.get("--ids-unverified"), "mode": want if want in MODES else "shadow",
                            "rule_id": RULE_ID, "rule_version": RULE_VERSION}
             gap = {"logged_at": utc_stamp(), "gap_id": new_line_id(), "point": o.get("--point", "accept"),
-                   "receiver": clean_str(o.get("--receiver")), "why": str(why)[:300],
+                   "receiver": clean_str(o.get("--receiver")), "why": str(why)[:300], "reason": reason,
                    **{k: src.get(k) for k in GAP_KEY_FIELDS + ("mode", "rule_id", "rule_version")}}
             print(f"[a2a-metrics] LACUNA: a linha de sombra NÃO foi gravada ({why})", file=sys.stderr)
             try:
@@ -875,7 +902,7 @@ def main(argv):
         try:
             # N5: a linha se valida DENTRO do try: linha inválida (sem chave de evento, valor fora da forma) também
             # vira lacuna, nunca um rc 3 sem marcador
-            line = shadow_line(o.get("--mode", "shadow"), _nullable(o.get("--rule-decision")),
+            line = shadow_line(want if want in MODES else "shadow", _nullable(o.get("--rule-decision")),
                                _nullable(o.get("--human-decision")), ce_source=_nullable(o.get("--ce-source")),
                                ce_id=_nullable(o.get("--ce-id")), ce_time=_nullable(o.get("--ce-time")),
                                jti=_nullable(o.get("--jti")), task_id=_nullable(o.get("--task-id")),
@@ -911,21 +938,42 @@ def main(argv):
                 raise UsageError("--resolves-gap: a linha nova não casa com a lacuna (evento, remetente, modo ou regra)")
             if not (TS_RE.fullmatch(str(g.get("logged_at"))) and stamp_epoch(line["logged_at"]) > stamp_epoch(g["logged_at"])):
                 raise UsageError("--resolves-gap: a linha tem de ser ESTRITAMENTE posterior à lacuna (repita em 1 s)")
-        # o escritor só grava no modo VIGENTE: linha de outro modo seria uma decisão que o log não explica
+        # o modo da linha se decide com a MESMA régua do leitor: mode_before(trocas, instante da linha)
+        refusal = reason = None
+        prior = []
         if os.path.lexists(log):
             try:
                 prior = read_log(log)
             except MeasureError:
                 prior = None                            # ilegível: o append falha adiante e vira lacuna
-            if prior is not None:
-                ch = [x for _, x in prior if isinstance(x, dict) and x.get("kind") == "mode_change"
-                      and not validate_mode_change(x)]
-                vig = mode_in_force(ch, int(time.time()))[0]
-                if line["mode"] != vig:
-                    raise UsageError(f"--mode {line['mode']}, mas o modo vigente do log é {vig}: grave a troca com "
-                                     "mode-change antes")
-        elif line["mode"] != "shadow":
-            raise UsageError(f"--mode {line['mode']} num log sem troca de modo: o modo vigente é shadow")
+        if prior is not None:
+            ch = [x for _, x in prior if isinstance(x, dict) and x.get("kind") == "mode_change"
+                  and not validate_mode_change(x)]
+            t_line = stamp_epoch(line["logged_at"])
+            vig = mode_before(ch, t_line)
+            if any(stamp_epoch(c["logged_at"]) == t_line for c in ch):
+                refusal, reason = "a linha cairia no MESMO segundo de uma troca de modo: repita em 1 s", "same_second"
+            elif vig is None:
+                refusal, reason = "troca de modo ambígua (duas no mesmo segundo, destinos diferentes)", "mode_ambiguous"
+            elif want == "current" and vig == "auto":
+                # julgamento: no auto, a decisão humana confirma ou reverte a linha da REGRA do mesmo evento
+                line["mode"], line["rule_decision"] = "auto", None
+                rl = [x for _, x in prior if isinstance(x, dict) and not validate_shadow(x) and x["mode"] == "auto"
+                      and x["human_decision"] is None and x["rule_decision"] is not None
+                      and event_key(x) == event_key(line) and x["rule_id"] == line["rule_id"]
+                      and x["rule_version"] == line["rule_version"]]
+                if not rl:
+                    refusal, reason = "não há a linha da regra deste evento no modo auto", "rule_line_missing"
+                else:
+                    line["supersedes"] = rl[-1]["line_id"]
+            elif want != "current" and line["mode"] != vig:
+                refusal, reason = (f"--mode {line['mode']}, mas o modo vigente no instante da linha é {vig}: grave a "
+                                   "troca com mode-change antes"), "mode_not_in_force"
+        if refusal:
+            # recusa a um PRODUTOR oficial (aceite, archive) vira lacuna e nunca some; a quem chama à mão, rc 3
+            if o.get("--producer"):
+                return _gap(refusal, line["jti"], line["taskId"], line, reason)
+            raise UsageError(refusal)
         try:
             append_line(log, line)
         except MeasureError as e:
@@ -942,11 +990,17 @@ def main(argv):
             raise UsageError("mode-change exige --to shadow|auto")
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         cur_lines = read_log(log) if os.path.lexists(log) else []
-        now_mode, _ = mode_in_force([x for _, x in cur_lines if isinstance(x, dict) and x.get("kind") == "mode_change"
-                                     and not validate_mode_change(x)], int(time.time()))
+        ch = [x for _, x in cur_lines if isinstance(x, dict) and x.get("kind") == "mode_change" and not validate_mode_change(x)]
+        stamp = utc_stamp()
+        t_now = stamp_epoch(stamp)
+        if any(stamp_epoch(c["logged_at"]) == t_now for c in ch):
+            raise UsageError("já há uma troca de modo neste segundo: repita em 1 s (N3: sem desempate no mesmo segundo)")
+        now_mode = mode_before(ch, t_now)
+        if now_mode is None:
+            raise UsageError("o modo vigente é AMBÍGUO (duas trocas no mesmo segundo): resolva o log antes de trocar")
         if now_mode == o["--to"]:
             raise UsageError(f"o modo já é {now_mode}: não há troca a gravar")
-        line = {"line_id": new_line_id(), "logged_at": utc_stamp(), "kind": "mode_change", "from_mode": now_mode,
+        line = {"line_id": new_line_id(), "logged_at": stamp, "kind": "mode_change", "from_mode": now_mode,
                 "to_mode": o["--to"], "actor": _actor()}
         append_line(log, line)
         print(f"ok: {log} mode_change {now_mode} → {o['--to']} line_id={line['line_id']}")
