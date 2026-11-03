@@ -11182,24 +11182,89 @@ PY
     _qlrc "${r}" 0 && [ "$(stat -c %a "${d}/sh/shadow.jsonl" 2>/dev/null)" = 600 ] \
       && [ "$(jq -r 'select(.jti=="j-rej-1") | [.mode,.human_decision,.rule_decision,.reason,.taskId,.rule_id,.ids_verified] | map(tostring) | join(",")' "${d}/sh/shadow.jsonl" 2>/dev/null)" \
            = "shadow,reject,accept,recusa de teste da bancada,t7,baseline-accept-all,false" ] && ! grep -q CORPO-SECRETO "${d}/sh/shadow.jsonl"; }
-  _c_shgit() { git init -q "${d}/sh-git"; _qlrec "${d}/q/s8.t8.json" t8 membro-f null
+  local inrepo="${REPO_ROOT}/.claude/sessions/.a2a-metrics-bancada-nao-cria"
+  _c_shgit() { _qlrec "${d}/q/s8.t8.json" t8 membro-f null
     python3 -I - "${d}/q/s8.t8.json" <<'PY'
 import json, sys
 p = sys.argv[1]; r = json.load(open(p)); r["envelope"] = {"jws": "h.eyJqdGkiOiJqLXJlai0xIn0.s"}; json.dump(r, open(p, "w"))
 PY
-    local r; r="$(QLR_SHADOW="${d}/sh-git/x/shadow.jsonl" _qlr "$1" archive s8.t8.json --force-unaccepted "recusa de teste da bancada" --apply)"
-    QL_WHY="${r:0:400}"; rm -rf "${d}/sh-git"
-    _qlrc "${r}" 0 && [ ! -e "${d}/q/s8.t8.json" ] && [ -f "${d}/q/_archived/s8.t8.json" ] && _qlhas "${r}" "LACUNA" \
+    local r; r="$(QLR_SHADOW="${inrepo}/x/shadow.jsonl" _qlr "$1" archive s8.t8.json --force-unaccepted "recusa de teste da bancada" --apply)"
+    QL_WHY="${r:0:400}"
+    [ ! -e "${inrepo}" ] && _qlrc "${r}" 0 && [ ! -e "${d}/q/s8.t8.json" ] && [ -f "${d}/q/_archived/s8.t8.json" ] && _qlhas "${r}" "LACUNA" \
       && [ "$(jq -r '[.point,.taskId,.jti] | join(",")' "${d}/sh/gap.log" 2>/dev/null)" = "reject,t8,j-rej-1" ] \
       && [ "$(stat -c %a "${d}/sh/gap.log")" = 600 ]; }
   _qlcase "(q36) archive --force-unaccepted grava a RECUSA humana no log de sombra (0600, jti do JWS, motivo, regra v1, sem corpo)" \
     '  SHADOW=1' '  SHADOW=0' _c_shrej
-  _qlcase "(q37) log de sombra que não aceita a linha (árvore git) NÃO barra o archive: rc 0, movido, LACUNA alta em shadow-gap.log (0600)" \
+  _qlcase "(q37) log de sombra dentro do repo em uso NÃO barra o archive: rc 0, movido, LACUNA alta em shadow-gap.log (0600)" \
     "    4) printf '%s\\n[%s] AVISO ALTO" "    4) exit 1; printf '%s\\n[%s] AVISO ALTO" _c_shgit
   _c_cntzero() { _c_cnt5 "$1" || return 1; local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
     [ "$(_qljget "${r}" 'select(.ending) | .zero_vs_down')" = indistinguishable ]; }
   _qlcase "(q38) count: a linha final declara zero_vs_down: indistinguishable (sem batimento do bridge, zero e fora não se distinguem)" \
-    '"zero_vs_down": "indistinguishable"}' '}' _c_cntzero
+    '"zero_vs_down": "indistinguishable",' '' _c_cntzero
+  # ── curas da revisão adversarial da curadoria sobre 409059754 ──
+  _c_baddate() { local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-02-30 --json)"; QL_WHY="${r:0:300}"; _qlrc "${r}" 3; }
+  _qlcase "(q39) count --since 2026-02-30 (dia que não existe) → rc 3, uso inválido (M2)" \
+    '&& python3 -I -c '"'"'import sys, datetime; datetime.date.fromisoformat(sys.argv[1])'"'"' "${SINCE}" 2>/dev/null; }' '; }' _c_baddate
+  _c_boom() { _qlday "${d}/q/x1.tx1.json" tx1 2026-02-30T01:00:00Z
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --json)"; QL_WHY="${r:0:300}"; _qlrc "${r}" 2 && _qlhas "${r}" "ERRO inesperado"; }
+  _qlcase "(q40) count: exceção inesperada (receivedAt com dia inexistente) → rc 2, nunca rc 1 (M2)" \
+    'sys.excepthook = _boom' 'pass' _c_boom
+  _c_zdays() { _c_cnt5 "$1" || return 1; local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-01 --json)"; QL_WHY="${r:0:400}"
+    [ "$(_qljget "${r}" 'select(.ending) | .zero_days')" = 1 ]; }
+  _qlcase "(q41) count: a linha final traz zero_days (os dias zerados) (M3)" \
+    '"zero_days": sum(1 for x in out if x["total"] == 0)}' '"zero_days": 0}' _c_zdays
+  _c_cever() { local ce='"{\"specversion\":\"1.0\",\"id\":\"ev-9\",\"source\":\"/vigia\",\"type\":\"t\"}"'
+    _qlday "${d}/q/v1.tv1.json" tv1 2026-11-02T01:00:00Z "${ce}"; _qlday "${d}/q/v2.tv2.json" tv2 2026-11-02T02:00:00Z "${ce}"
+    _qlday "${d}/q/n1.tn1.json" tn1 2026-11-02T03:00:00Z "${ce}"; _qlday "${d}/q/n2.tn2.json" tn2 2026-11-02T04:00:00Z "${ce}"
+    sed -i 's/"verified":true/"verified":false/' "${d}/q/n1.tn1.json" "${d}/q/n2.tn2.json"
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 3 ] && [ "$(_qljget "${r}" 'select(.ending) | .deduped_by_ce')" = 1 ]; }
+  _qlcase "(q42) count: o CloudEvent só deduplica registro verificado (2 verificados = 1; 2 não verificados = 2), deduped_by_ce 1 (M5)" \
+    'if o.get("verified") is True and o.get("ce_source") and o.get("ce_id"):' 'if o.get("ce_source") and o.get("ce_id"):' _c_cever
+  _c_sum() { _qlday "${d}/q/m1.tm1.json" tm1 2026-11-02T01:00:00Z; _qlday "${d}/q/hub-bancada/m2.tm2.json" tm2 2026-11-02T02:00:00Z
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 2 ] \
+      && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .by_receiver | to_entries | map("\(.key)=\(.value)") | join(",")')" = "hub-bancada=1,onion-evolve=1" ]; }
+  _qlcase "(q43) count: o total soma os receptores (core + hub no mesmo dia = 2) (M7)" \
+    '        tot = sum(br.values())' '        tot = br.get("onion-evolve", 0)' _c_sum
+  _c_rcv0() { _qlday "${d}/q/k1.tk1.json" tk1 2026-11-02T01:00:00Z
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .by_receiver["hub-bancada"]')" = 0 ]; }
+  _qlcase "(q44) count: receptor lido sem registro no dia aparece em by_receiver com 0, nunca some (M5)" \
+    '        br = {**{r: 0 for r in receivers}, **days.get(day, {})}' '        br = dict(days.get(day, {}))' _c_rcv0
+  _c_trigb() { rm -rf "${d}/q/"*.json "${d}/q/hub-bancada"
+    python3 -I - "${d}/q" <<'PY'
+import datetime as dt, sys
+q = sys.argv[1]
+for k in range(7):
+    day = dt.date(2026, 11, 2) - dt.timedelta(days=k)
+    for i in range(5001):
+        open(f"{q}/b{k}-{i}.json", "w").write('{"taskId":"t%d-%d","receivedAt":"%sT10:00:00Z","verdict":{"verified":true}}' % (k, i, day))
+PY
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 1 && [ "$(_qljget "${r}" 'select(.ending) | .consecutive_days_over_5000')" = 7 ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .trigger_b')" = true ] && [ "$(_qljget "${r}" 'select(.ending) | .trigger_back // "nulo"')" = nulo ]; }
+  _qlcase "(q45) count --stage 1: 7 dias seguidos acima de 5000 → trigger_b true, rc 1 (M7)" \
+    'OVER, UNDER, DAYS_B, DAYS_BACK = 5000, 1000, 7, 30' 'OVER, UNDER, DAYS_B, DAYS_BACK = 5000, 1000, 8, 30' _c_trigb
+  _c_tdedup() { _qlday "${d}/q/p1.json" t-mesmo 2026-11-02T01:00:00Z; _qlday "${d}/q/p2.json" t-mesmo 2026-11-02T02:00:00Z
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 1 ]; }
+  _qlcase "(q46) count: sem CloudEvent, dois registros com o mesmo taskId contam uma vez (dedup só pelo taskId) (M7)" \
+    '        key = ("task", o["taskId"])' '        key = ("task", o["name"])' _c_tdedup
+  _c_rejunv() { _qlrec "${d}/q/s9.t9.json" t9 membro-g null
+    python3 -I - "${d}/q/s9.t9.json" <<'PY'
+import json, sys
+p = sys.argv[1]; r = json.load(open(p)); r["verdict"] = {"verified": False}; json.dump(r, open(p, "w"))
+PY
+    local r; r="$(_qlr "$1" archive s9.t9.json --force-unaccepted "recusa de teste da bancada" --apply)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ "$(jq -r 'select(.taskId=="t9") | .rule_decision' "${d}/sh/shadow.jsonl" 2>/dev/null)" = accept ]; }
+  _qlcase "(q47) archive de registro NÃO verificado: a regra v1 (baseline-accept-all) segue accept (M4)" \
+    '  rule="accept"' '  rule="reject"; [ "$(mget verified)" = True ] && rule="accept"' _c_rejunv
+  _c_rejhub() { local r; r="$(_qlr "$1" archive s3.t-hub.json --receiver hub-bancada --force-unaccepted "recusa de teste da bancada" --apply)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && [ -f "${d}/q/hub-bancada/_archived/s3.t-hub.json" ] && _qlhas "${r}" "fila de um hub" \
+      && ! grep -qs t-hub "${d}/sh/shadow.jsonl"; }
+  _qlcase "(q48) archive forçado de registro de HUB não vira recusa no log de sombra do core (M6)" \
+    '[ "${STATUS%%:*}" = forcado ] && [ "${Q}" != "${QUEUE}" ]; then' '[ "${STATUS%%:*}" = forcado ] && false; then' _c_rejhub
   rm -rf "${d}"
 }
 
@@ -17113,6 +17178,8 @@ elif scen == "virt":
     L.append(ln(now - 25 * 3600, "drafted", "d29"))
 elif scen == "ks":
     L += [ln(now - 3600, "kill_switch_on"), ln(now - 1800, "kill_switch_off")]
+elif scen == "vazio":
+    pass
 with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), "w") as f:   # o escritor exige 0600
     for o in L:
         f.write(json.dumps(o) + "\n")
@@ -17128,7 +17195,11 @@ PY
     [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[.closed,.approved_unedited,.discarded,.unedited_rate,.auto_send_criterion_met] | map(tostring) | join(",")')" = "30,29,1,0.9667,true" ] \
       && [ "$(jq -r 'select(.event=="discarded") | .draft_id' "${sb}/ds-virt.jsonl")" = d29 ]; }
   _dsks() { local r; r="$(_dsst "$1" ks --since-stage-on 2026-11-01)"; DS_WHY="${r:0:400}"
-    [ "${r%%|*}" = 1 ] && [ "$(_dsj "${r}" '[.kill_switch_acts_since_on,.out_of_list_since_on,.trigger_back_to_draft] | map(tostring) | join(",")')" = "2,0,true" ]; }
+    [ "$(_dsj "${r}" '[.kill_switch_acts_since_on,.out_of_list_since_on,.back_to_draft_criterion_met] | map(tostring) | join(",")')" = "2,0,true" ]; }
+  _dsnoinst() { local r; r="$(_dsst "$1" ks --since-stage-on 2026-11-01)"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_dsj "${r}" '[(.trigger_back_to_draft|tostring),(.not_instrumented|join("+"))] | join(",")')" = "null,blocked_out_of_list+sent_out_of_list+kill_switch_on+kill_switch_off" ]; }
+  _dsempty() { local r; r="$(_dsst "$1" vazio --last 30)"; DS_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_dsj "${r}" '.no_data')" = true ]; }
+  _dsbad() { local r; r="$(_dsst "$1" ks --since-stage-on 2026-13-45)"; DS_WHY="${r:0:400}"; [ "${r%%|*}" = 3 ]; }
   _dspre() { local r; r="$(_dsst "$1" a27 --last 30)"; DS_WHY="${r:0:400}"
     [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[(.preconditions_missing|join("+")),.auto_send_criterion_met,(.trigger_auto_send|tostring)] | map(tostring) | join(",")')" = "closed_list+kill_switch+rate_cap,true,null" ]; }
   _dscase() {  # _dscase <nome> <função> <âncora> <troca>
@@ -17149,10 +17220,16 @@ PY
     '>= AUTO_SEND_RATE))' '>= AUTO_SEND_RATE - 0.05))'
   _dscase "(g4) draft-stats: 29 aprovados e 1 rascunho de 25 h sem linha de descarte → 30 fechados, 29/30 (não 29/29), e a linha discarded nasce" _dsvirt \
     '        elif did in disc_line or now > t0 + DISCARD_SECONDS:' '        elif did in disc_line:'
-  _dscase "(g5) draft-stats: kill_switch_on seguido de off entre duas leituras → trigger_back_to_draft, rc 1" _dsks \
+  _dscase "(g5) draft-stats: kill_switch_on seguido de off entre duas leituras → back_to_draft_criterion_met" _dsks \
     'any(o["event"] == "kill_switch_on" for o in ks)' 'False'
   _dscase "(g6) draft-stats: sem lista fechada, chave de corte e teto de taxa no core → preconditions_missing e trigger_auto_send null, nunca true" _dspre \
     'AUTO_SEND_PRECONDITIONS_MISSING = ("closed_list", "kill_switch", "rate_cap")' 'AUTO_SEND_PRECONDITIONS_MISSING = ()'
+  _dscase "(g7) draft-stats --since-stage-on: atos sem produtor no core → trigger_back_to_draft null, not_instrumented, rc 2 (A2)" _dsnoinst \
+    'DRAFT_NOT_INSTRUMENTED = ("blocked_out_of_list", "sent_out_of_list", "kill_switch_on", "kill_switch_off")' 'DRAFT_NOT_INSTRUMENTED = ()'
+  _dscase "(g8) draft-stats: log vazio → no_data e rc 2 (A2)" _dsempty \
+    '(2 if malformed or not_instr or out["no_data"] else' '(2 if malformed or not_instr else'
+  _dscase "(g9) draft-stats --since-stage-on 2026-13-45 → rc 3, uso inválido (M2)" _dsbad \
+    '        if since is not None and not _valid_day(since):' '        if since is not None and not DAY_RE.fullmatch(since):'
   rm -rf "${sb}"
 }
 
@@ -17472,13 +17549,14 @@ PY
   cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
   # (sh2) log de sombra que não aceita a linha (árvore git) NÃO barra o aceite (curadoria, ponto f): o doc nasce,
   # rc 0, a falha vai alto ao stderr e vira marcador em shadow-gap.log (0600) com o jti
-  _shgit() {  # $1 = aceite → 0 se aceitou e registrou a lacuna
-    rm -rf "${ibs}" "${d}/ledger-sh" "${d}/gitlog" "${d}/gap-sh.log"; mkdir -p "${ibs}"; git init -q "${d}/gitlog"
-    rc=0; out="$(A2A_SHADOW_LOG="${d}/gitlog/s.jsonl" A2A_SHADOW_GAP_LOG="${d}/gap-sh.log" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" 2>&1)" || rc=$?
-    [ "${rc}" = 0 ] && [ -n "$(find "${ibs}" -name '*.md')" ] && grep -q 'LACUNA' <<< "${out}" \
+  _shgit() {  # $1 = aceite → 0 se aceitou e registrou a lacuna (o log apontado DENTRO do repo em uso dele, cura B5)
+    local sroot; sroot="$(cd "$(dirname "$1")/../../.." && pwd)"
+    rm -rf "${ibs}" "${d}/ledger-sh" "${d}/gap-sh.log"; mkdir -p "${ibs}"
+    rc=0; out="$(A2A_SHADOW_LOG="${sroot}/.a2a-metrics-bancada-nao-cria/s.jsonl" A2A_SHADOW_GAP_LOG="${d}/gap-sh.log" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-sh" 2>&1)" || rc=$?
+    [ ! -e "${sroot}/.a2a-metrics-bancada-nao-cria" ] && [ "${rc}" = 0 ] && [ -n "$(find "${ibs}" -name '*.md')" ] && grep -q 'LACUNA' <<< "${out}" \
       && [ "$(jq -r '[.point,.jti] | join(",")' "${d}/gap-sh.log" 2>/dev/null)" = "accept,jti-ce-1" ] && [ "$(stat -c %a "${d}/gap-sh.log")" = 600 ]
   }
-  if _shgit "${helper}"; then record_pass "a2a-accept: (sh2) log de sombra que não aceita a linha NÃO barra o aceite: doc criado, rc 0, LACUNA alta e marcador 0600 com o jti"
+  if _shgit "${helper}"; then record_pass "a2a-accept: (sh2) log de sombra dentro do repo em uso NÃO barra o aceite: doc criado, rc 0, LACUNA alta e marcador 0600 com o jti"
   else record_fail "a2a-accept: (sh2) lacuna no aceite" "rc=${rc} out='$(head -c 300 <<< "${out}")'"; fi
   python3 - "${mft}/.claude/utils/federation-transport/a2a-accept.sh" <<'PY'
 import sys
@@ -17514,6 +17592,31 @@ if scen in ("s50", "s50v", "mal", "base"):
         L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}",
                     ver="2" if scen == "s50v" and day >= 10 else "1",
                     rid="baseline-accept-all" if scen == "base" else "accept-rule"))
+elif scen == "m1":
+    n2 = now - 43200 + 60                                          # 00:01 do dia 14
+    for i in range(50):
+        L.append(ln(n2 - 13 * 86400 - 120 - i, "accept", "accept", f"e{i}"))    # 23:5x do dia 0 (13 d 2 min antes)
+elif scen == "mix":
+    for i in range(50):
+        day = i * 14 // 49
+        L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
+    L.append(ln(now - 60, "accept", None, "zz", mode="auto"))
+elif scen == "chain":
+    for i in range(50):
+        L.append(ln(now - (14 - i * 14 // 49) * 86400 + i, "accept", "accept", f"e{i}"))
+    L.append(ln(now - 30, None, "reject", "e0", sup=L[0]["line_id"]))
+elif scen == "hold":
+    for i in range(50):
+        day = i * 14 // 49
+        L.append(ln(now - (14 - day) * 86400 + i, "accept", "reject" if i in (7, 30) else "accept", f"e{i}"))
+    for i in range(5):
+        L.append(ln(now - 3600 + i, "accept", "hold", f"h{i}"))
+elif scen == "xrev":
+    for i in range(10):
+        L.append(ln(now - 3 * 86400 + i, "accept", None, f"a{i}", mode="auto"))
+    L.append(ln(now - 2 * 86400, None, "reject", "a2", mode="auto", sup=L[5]["line_id"]))
+elif scen == "vazio":
+    pass
 elif scen == "unv":
     for i in range(2):
         L.append(ln(now - 3600 + i, "accept", "reject", "mesmo-ce", ids=False, task=f"t{i}"))
@@ -17533,7 +17636,8 @@ with open(path, "w") as f:
 PY
   }
   # _shst <metrics> <cenário> [extra] → "rc|json"
-  _shst() { local o r=0; _shgen "$2" "${d}/sh-$2.jsonl"; o="$(python3 -I "$1" shadow-stats --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
+  _shst() { local o r=0 m=shadow; case "$2" in auto|xrev) m=auto ;; esac; _shgen "$2" "${d}/sh-$2.jsonl"
+    o="$(python3 -I "$1" shadow-stats --mode "${m}" --log "${d}/sh-$2.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
   _shj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
   _sh_on() { local r; r="$(_shst "$1" s50)"; SH_WHY="${r:0:400}"
     [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.events,.agree,.agreement,.days_covered,.trigger_rule_on,(.trigger_back_to_shadow|tostring)] | map(tostring) | join(",")')" = "50,48,0.96,14,true,null" ]; }
@@ -17546,7 +17650,22 @@ PY
     r="$(_shst "$1" s50 --queue-jsonl "${d}/sh-q.jsonl")"; SH_WHY="${r:0:400}"
     [ "$(_shj "${r}" '.undecided')" = 1 ] && [ "$(_shj "${r}" '.events')" = 50 ]; }
   _sh_auto() { local r; r="$(_shst "$1" auto)"; SH_WHY="${r:0:400}"
-    [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.mode,.decisions_7d,.reversals_7d,.reversal_rate_7d,.trigger_back_to_shadow,(.trigger_rule_on|tostring)] | map(tostring) | join(",")')" = "auto,10,2,0.2,true,null" ]; }
+    [ "$(_shj "${r}" '[.mode,.decisions_7d,.reversals_7d,.reversal_rate_7d,.back_to_shadow_criterion_met,(.trigger_rule_on|tostring)] | map(tostring) | join(",")')" = "auto,10,2,0.2,true,null" ]; }
+  _sh_noinst() { local r; r="$(_shst "$1" auto)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '[(.trigger_back_to_shadow|tostring),(.not_instrumented|join("+"))] | join(",")')" = "null,reversal" ]; }
+  _sh_m1() { local r; r="$(_shst "$1" m1 --now 1793664060)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.days_covered,.trigger_rule_on] | map(tostring) | join(",")')" = "13,false" ]; }
+  _sh_mode() { local r; r="$(_shst "$1" mix)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '[.mode,.events,.trigger_rule_on] | map(tostring) | join(",")')" = "shadow,50,true" ]; }
+  _sh_empty() { local r; r="$(_shst "$1" vazio)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.no_data')" = true ]; }
+  _sh_chain() { local r; r="$(_shst "$1" chain)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '[.events,.agree] | map(tostring) | join(",")')" = "50,49" ]; }
+  _sh_hold() { local r; r="$(_shst "$1" hold)"; SH_WHY="${r:0:400}"
+    [ "$(_shj "${r}" '[.events,.holds,.agreement,.confusion.accept.hold] | map(tostring) | join(",")')" = "50,5,0.96,5" ]; }
+  _sh_und2() { local r; printf '%s\n' '{"jti":"sem-data","taskId":"tx1"}' '{"receivedAt":"2026-10-20T10:00:00+02:00","jti":"com-offset","taskId":"tx2"}' > "${d}/sh-q2.jsonl"
+    r="$(_shst "$1" s50 --queue-jsonl "${d}/sh-q2.jsonl")"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.undecided')" = 2 ]; }
+  _sh_und3() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","ce_source":"/w","ce_id":"e3"}' > "${d}/sh-q3.jsonl"
+    r="$(_shst "$1" s50v --queue-jsonl "${d}/sh-q3.jsonl")"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.undecided')" = 1 ]; }
+  _sh_xrev() { local r; r="$(_shst "$1" xrev)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.reversals_7d')" = 0 ]; }
   _sh_mal() { local r; r="$(_shst "$1" mal)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.malformed')" = 1 ]; }
   _sh_base() { local r; r="$(_shst "$1" base)"; SH_WHY="${r:0:400}"
     [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.rule_id,.rule_on_criterion_met,.trigger_rule_on,(.trigger_rule_on_reason|type)] | map(tostring) | join(",")')" = "baseline-accept-all,true,false,string" ]; }
@@ -17554,7 +17673,8 @@ PY
   _sh_gap() { local r; printf '{"logged_at":"2026-11-02T10:00:00Z","point":"accept","jti":"j","taskId":"t","why":"x"}\n' > "${d}/gap-um.log"
     r="$(_shst "$1" s50 --gap-log "${d}/gap-um.log")"; SH_WHY="${r:0:400}"
     [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.gaps_in_window')" = 1 ]; }
-  _sh_none() { local r=0; python3 -I "$1" shadow-stats --log "${d}/nao-existe.jsonl" --json >/dev/null 2>&1 || r=$?; SH_WHY="rc=${r}"; [ "${r}" = 2 ]; }
+  _sh_none() { local r=0 e; e="$(python3 -I "$1" shadow-stats --mode shadow --log "${d}/nao-existe.jsonl" --json 2>&1 >/dev/null)" || r=$?; SH_WHY="rc=${r} ${e:0:200}"
+    [ "${r}" = 2 ] && grep -q 'log ausente' <<< "${e}"; }
   _shcase() {  # _shcase <nome> <função> <âncora> <troca>
     local rc_i=1 rc_m=1; SH_WHY=""
     "$2" "${met}" && rc_i=0
@@ -17574,19 +17694,63 @@ PY
   _shcase "(sh5) shadow-stats: regra que aceita tudo, 50 aceites e 10 recusas do archive → 0,8333, NÃO dispara" _sh_rej \
     '        if rule == human:' '        if True:'
   _shcase "(sh6) shadow-stats: registro na fila há mais de 3 dias sem decisão = undecided, fora do denominador" _sh_und \
-    '            if (k is None or k not in all_keys) and ("task", r.get("taskId")) not in all_keys:' '            if False:'
-  _shcase "(sh7) shadow-stats no modo auto: 2 reversões em 10 decisões (0,2 > 0,15) → trigger_back_to_shadow, rc 1" _sh_auto \
+    '            if (k is None or k not in cur_keys) and ("task", r.get("taskId")) not in cur_keys:' '            if False:'
+  _shcase "(sh7) shadow-stats --mode auto: 2 reversões em 10 decisões (0,2 > 0,15) → back_to_shadow_criterion_met" _sh_auto \
     'o["human_decision"] != effective(tgt)' 'False'
   _shcase "(sh8) shadow-stats: linha malformada → rc 2 (não pôde medir), contada em malformed" _sh_mal \
     '            malformed += 1' '            pass'
   _shcase "(sh9) shadow-stats: log ausente → rc 2 (ausência não é zero)" _sh_none \
     '        raise MeasureError(f"log ausente:' '        return []; raise MeasureError(f"log ausente:'
   _shcase "(sh10) shadow-stats: a regra linha de base (baseline-accept-all) NUNCA liga a regra: critério cumprido, trigger_rule_on false com o motivo" _sh_base \
-    '        if rule_id in BASELINE_RULE_IDS:' '        if False:'
+    '        if out["rule_id"] in BASELINE_RULE_IDS:' '        if False:'
   _shcase "(sh11) shadow-stats: linhas com ids_verified false deduplicam pelo taskId, nunca pelos ce_* (2 recusas com o mesmo ce = 2 eventos)" _sh_unv \
     '    if o.get("ids_verified") is False:' '    if False:'
   _shcase "(sh12) shadow-stats: lacuna registrada (shadow-gap.log) dentro da janela → rc 2" _sh_gap \
-    '(2 if malformed or out["gaps_in_window"] else' '(2 if malformed else'
+    '(2 if malformed or out["gaps_in_window"] or not_instr else' '(2 if malformed or not_instr else'
+  _shcase "(sh13) shadow-stats: days_covered são dias COMPLETOS (23:59 → 00:01 de 14 dias depois = 13, não dispara) (M1)" _sh_m1 \
+    '    out["days_covered"] = max(0, (now - first) // 86400)' '    out["days_covered"] = (utc_day(now) - utc_day(first)).days'
+  _shcase "(sh14) shadow-stats: o modo vem de --mode, nunca da última linha (50 shadow + 1 auto no fim, --mode shadow → dispara) (A1)" _sh_mode \
+    '    scur = [o for o in cur if o["mode"] == mode]' '    mode = cur[-1]["mode"]; scur = cur'
+  _shcase "(sh15) shadow-stats --mode auto: a reversão não tem produtor no core → trigger_back_to_shadow null, not_instrumented, rc 2 (A2)" _sh_noinst \
+    'SHADOW_NOT_INSTRUMENTED = ("reversal",)' 'SHADOW_NOT_INSTRUMENTED = ()'
+  _shcase "(sh16) shadow-stats: log vazio → no_data e rc 2, nunca zero (A2)" _sh_empty \
+    '        return out, 2' '        return out, 0'
+  _shcase "(sh17) shadow-stats: vale a decisão humana FINAL da cadeia de supersedes (49 de 50) (M7)" _sh_chain \
+    '        final = max(heads)[2] if heads else ls[-1][1]' '        final = ls[0][1]'
+  _shcase "(sh18) shadow-stats: hold não é discordância (fica fora do denominador; holds 5) (B2)" _sh_hold \
+    '        if "hold" in (rule, human):' '        if False:'
+  _shcase "(sh19) shadow-stats: registro da fila sem receivedAt ou com offset antigo conta como undecided (B2)" _sh_und2 \
+    '            if t is not None and now - t <= HOLD_SECONDS:' '            if t is None or now - t <= HOLD_SECONDS:'
+  _shcase "(sh20) shadow-stats: a decisão só casa na MESMA regra vigente (e3 decidido na versão 1 segue undecided na 2) (B2)" _sh_und3 \
+    '    cur_keys = {event_key(o) for o in cur} | {("task", o["taskId"]) for o in cur if o.get("taskId")}' '    cur_keys = {event_key(o) for o in valid}'
+  _shcase "(sh21) shadow-stats: reversão só no MESMO evento (supersedes de outro evento não conta) (B3)" _sh_xrev \
+    '        if tgt is not None and event_key(tgt) == event_key(o):' '        if tgt is not None:'
+  # (sh22) B5: log num diretório com .git ALHEIO ao repo em uso (o HOME versionado por dotfiles) não é recusado
+  _sh_dot() { rm -rf "${d}/dotfiles-home"; git init -q "${d}/dotfiles-home"; local r=0
+    A2A_METRICS_REPO_ROOT="${REPO_ROOT}" python3 -I "$1" shadow-append --log "${d}/dotfiles-home/s.jsonl" --gap-log "${d}/gap-dot.log" --mode shadow --rule-decision accept \
+      --human-decision accept --jti j-dot >/dev/null 2>&1 || r=$?; SH_WHY="rc=${r}"; [ "${r}" = 0 ] && [ -s "${d}/dotfiles-home/s.jsonl" ]; }
+  _shcase "(sh22) o log só não pode morar no repo EM USO: um .git alheio (HOME de dotfiles) não recusa (B5)" _sh_dot \
+    'return root if p == root or p.startswith(root + os.sep) else ""' 'return root if os.path.lexists(os.path.join(p, ".git")) or p == root or p.startswith(root + os.sep) else ""'
+  # (sh23) B1: o "já aceito" grava a linha de sombra que faltar, uma vez só
+  _shre() {  # $1 = aceite
+    rm -rf "${ibs}" "${shl}" "${d}/ledger-re"; mkdir -p "${ibs}"
+    A2A_SHADOW_LOG="${d}/sh-outro.jsonl" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-re" >/dev/null 2>&1 || return 1
+    A2A_SHADOW_LOG="${shl}" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-re" >/dev/null 2>&1 || return 1
+    A2A_SHADOW_LOG="${shl}" bash "$1" "${d}/r-ce.json" --inbox "${ibs}" --trust-repo "${tr}" --ledger "${d}/ledger-re" >/dev/null 2>&1 || return 1
+    [ "$(grep -c . "${shl}" 2>/dev/null)" = 1 ] && [ "$(jq -r .jti "${shl}")" = jti-ce-1 ]
+  }
+  if _shre "${helper}"; then record_pass "a2a-accept: (sh23) o 'já aceito' grava a linha de sombra que faltava, uma vez só (B1)"
+  else record_fail "a2a-accept: (sh23) já aceito sem a linha" "log=$(head -c 300 "${shl}" 2>/dev/null)"; fi
+  python3 - "${mft}/.claude/utils/federation-transport/a2a-accept.sh" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read()
+a = "    shadow_record --if-absent || exit 1\n"
+assert a in s, "ancora"
+open(p, "w", encoding="utf-8").write(s.replace(a, "    true\n", 1))
+PY
+  if _shre "${mft}/.claude/utils/federation-transport/a2a-accept.sh"; then record_fail "a2a-accept: (sh23) mutante" "sem a gravação no 'já aceito' o caso passou"
+  else record_pass "a2a-accept: (sh23) mutante: o 'já aceito' que não grava a linha faltante reprova"; fi
+  cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
 
   rm -rf "${d}"
 }
