@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**791 itens abertos** em 136 grafo(s) com aberto (de 175 no escopo) · 137 grupo(s), agrupados por `owner:` (52 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**789 itens abertos** em 136 grafo(s) com aberto (de 175 no escopo) · 137 grupo(s), agrupados por `owner:` (51 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -69,13 +69,12 @@
 | 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
 | 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
 
-## onion-core-ports-multi-model-2026-11 — 18 item(ns)
+## onion-core-ports-multi-model-2026-11 — 17 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 81.0 | `C_OPCAO_A_GENERATOR_PER_HARNESS` | onion-core-ports-multi-model-2026-11 | OPÇÃO A: gerador por HARNESS (não por modelo), extensão do ops/publish-door.sh e do materialize-door.sh, com tabela de capacid |
 | 55.0 | `Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11` | onion-core-ports-multi-model-2026-11 | Como o Onion deve fazer portas do onion-core para outros harnesses e modelos (onion-codex vivo; candidatas onion-mistral, onion-ge |
-| 32.5 | `D_ONION_CORE_PORTS_MULTI_HARNESS_2026_11` | onion-core-ports-multi-model-2026-11 | DECISÃO ABERTA: portas do onion-core para outros harnesses e modelos — A gerador por harness · B ponte em runtime · C só pis |
 | 9.0 | `C_OPCAO_D_NO_NEW_DOOR_UNTIL_DEMAND` | onion-core-ports-multi-model-2026-11 | OPÇÃO D: não abrir porta nova agora — onion-codex segue como única linha viva até haver demanda medida de adotante nomeado. |
 | 8.0 | `C_OPCAO_C_AGNOSTIC_CI_FLOOR_ONLY` | onion-core-ports-multi-model-2026-11 | OPÇÃO C: só piso agnóstico — portar o gate de shell (.claude/validation) para o CI de qualquer harness, sem porta de harness |
 | 3.6 | `C_SUPERACAO_20261102_AAIF_PROJECTS_PAGE_AS_PRIMARY` | onion-core-ports-multi-model-2026-11 | aaif.io/projects serve de primária para a pertença do Agent Skills à AAIF, no lugar de atlan.com, paperclipped.de e do arXiv 26 |
@@ -563,7 +562,7 @@
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
 
-## maestro — 23 item(ns)
+## maestro — 22 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -576,7 +575,6 @@
 | 8.0 | `Q_COORD_MAESTRO_A2A_NEGATIVOS_E_DESTINO_FECHADO` | coordenacao-sessoes-2026-10 | Os negativos e os destinos fechados do teste de ida e volta, que ainda seguram a medida Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027. |
 | 8.0 | `Q_COORD_MAESTRO_DECIDIR_CLASSIFICATION` | coordenacao-sessoes-2026-10 | A decisão do maestro sobre Q_MA_CLASSIFICATION, que muda o contrato do grafo; o trabalho depois do selo é do kg-ssot. |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 6.0 | `Q_COORD_DECIDIR_VIGIA_DE_EVENTOS` | coordenacao-sessoes-2026-10 | Decidir o vigia de eventos fora da sessão: a coleta, o aceite dos eventos, o caminho do Gmail e o conflito do aviso automático c |
 | 6.0 | `Q_COORD_MAESTRO_5_DEPENDENCIAS_EXTERNAS` | coordenacao-sessoes-2026-10 | Decidir as 5 dependências externas candidatas listadas no PR 1405: o Perplexity no research-agent, o Context7 e o Perplexity no l |
 | 6.0 | `Q_COORD_MAESTRO_PLANO_FORMA_C_KGSSOT` | coordenacao-sessoes-2026-10 | O plano da forma C da kg-ssot (a camada de confiança gerenciada, com preço e bilhetagem), que não foi aberto. |
 | 5.0 | `Q_COORD_BRAIN_SEGREDO_VERSIONADO_ALERTA` | coordenacao-sessoes-2026-10 | Alerta de segurança: um arquivo de ambiente de teste foi apontado como segredo versionado no brain. O conteúdo nunca foi lido. D |
@@ -623,6 +621,22 @@
 | 16.8 | `C_OPEN_SHOWCASE_PRIVATE_HOLDOUT` | slm-capitalizacao-2026-10 | LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia ab |
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
+
+## sinais-de-campo-2026-09 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 26.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
+| 8.0 | `Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027` | sinais-de-campo-2026-09 | O molde de contexto como grafo, provado no piloto do design, se estende aos contextos business, technical e compliance do core e d |
+| 8.0 | `Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027` | sinais-de-campo-2026-09 | Como o core constrói o design-context como contexto de primeira classe (setup, skill resolvedora, auditoria de frescor e ligaçõ |
+| 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
+| 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
+| 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
+| 3.6 | `Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029` | sinais-de-campo-2026-09 | O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (co |
+| 2.0 | `Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029` | sinais-de-campo-2026-09 | O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente  |
+| 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
+| 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
+| 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 
@@ -746,22 +760,6 @@
 | 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
 | 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): parada no gatilho Q_MA_WRITE_SURFACE (company-brain-multiaudienc |
 | 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
-
-## sinais-de-campo-2026-09 — 11 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 20.0 | `Q_IDA_E_VOLTA_VPS_NOTEBOOK_MEDIDA_1027` | sinais-de-campo-2026-09 | A ida e volta viva pela composição do Onion, medida entre a VPS do core e o notebook local do maestro (máquinas diferentes), pa |
-| 8.0 | `Q_CONTEXTOS_COMO_GRAFO_EXTENSAO_1027` | sinais-de-campo-2026-09 | O molde de contexto como grafo, provado no piloto do design, se estende aos contextos business, technical e compliance do core e d |
-| 8.0 | `Q_DESIGN_CONTEXT_PRIMEIRA_CLASSE_1027` | sinais-de-campo-2026-09 | Como o core constrói o design-context como contexto de primeira classe (setup, skill resolvedora, auditoria de frescor e ligaçõ |
-| 7.2 | `E_DESIGN_GRAFO_DESENHO_DO_CONTRATO_KG_SSOT_1027` | sinais-de-campo-2026-09 | Desenho do contrato para o design como grafo, vindo da sessão do kg-ssot: camada domain, tipos de nó fixados, external_edges ent |
-| 6.0 | `Q_DESIGN_QUARTA_DIMENSAO_GATILHO_1027` | sinais-de-campo-2026-09 | O gatilho que muda a doutrina das três dimensões para quatro, com o design como a quarta, já disparou? Dispara quando o ciclo d |
-| 4.5 | `Q_PYYAML_604_CP315_GATILHO_1027` | sinais-de-campo-2026-09 | O PyYAML 6.0.4 (ou outra versão) já publicou no PyPI o wheel cp315 com a libyaml? Quando publicar, o pino com hash sobe no kg-ss |
-| 3.6 | `Q_HOOKSPATH_ABSOLUTO_REESCREVER_SOZINHO_1029` | sinais-de-campo-2026-09 | O core.hooksPath absoluto deve ser reescrito para .githooks por um hook, em vez de só avisado? Recorrência medida em 2 repos (co |
-| 2.0 | `Q_BUILD_BUSINESS_DOCS_MODO_CONSULTORIA_1029` | sinais-de-campo-2026-09 | O /docs:build-business-docs ganha um modo ou seção de engajamento de consultoria, em que o negócio descrito é o de um cliente  |
-| 2.0 | `Q_MEETING_GRAPH_CHECK_RAIZ_DO_WORKTREE_PRINCIPAL_1029` | sinais-de-campo-2026-09 | O meeting-graph-check.sh deve aceitar, sem --root, a fonte ignorada que mora no worktree principal (git rev-parse --git-common-dir |
-| 2.0 | `Q_META_VELHO_EM_GRAFO_SELADO_1028` | sinais-de-campo-2026-09 | O radar deixa passar meta.x_* desatualizado: um grafo selado e medido segue declarando no meta que é pré-registro. |
-| 2.0 | `Q_TRACE_EXTERNAL_ROOTS_NASCE_NA_ADOCAO_1029` | sinais-de-campo-2026-09 | A adoção ou o /product:extract-meeting deve criar o .kg-ssot/trace-external-roots.txt quando a doutrina manda o material para pa |
 
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 
