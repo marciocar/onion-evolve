@@ -37,7 +37,8 @@
 #               viva E _archived/, somando todos os receptores (a saída mostra cada um só para leitura). Deduplica
 #               por ce_source + ce_id (o CloudEvent do corpo), senão pelo taskId; sem nenhum dos dois conta uma vez
 #               (no_dedup_key); o mesmo nome na fila e em _archived/ conta uma vez (duplicated). O CloudEvent só
-#               deduplica registro verificado pelo bridge (deduped_by_ce); o não verificado, pelo taskId. Todo
+#               deduplica registro verificado pelo bridge, escopado pelo remetente (from + source + id;
+#               deduped_by_ce); o não verificado, pelo taskId. Nenhum dia no intervalo = no_data e rc 2. Todo
 #               receptor lido aparece em by_receiver, com 0 se preciso; zero_days conta os dias zerados. receivedAt
 #               com data impossível conta em bad_received_at (rc 2, os outros dias seguem). Malformado e sem
 #               receivedAt não têm dia: só a linha final, e rc 2. Só dias UTC COMPLETOS (ending = ontem). Dia sem
@@ -349,8 +350,10 @@ for ln in open(rows_path, encoding="utf-8"):
         continue
     # M5: o CloudEvent só deduplica registro que o bridge verificou; os ids de registro não verificado são escolha de
     # quem escreveu, e casá-los apagaria evento alheio. Sem isso, o taskId (que o bridge gera)
+    # N2: a chave é escopada pelo REMETENTE (o from que o bridge verificou): um membro que manda antes o mesmo
+    # source + id de outro não apaga os eventos dele
     if o.get("verified") is True and o.get("ce_source") and o.get("ce_id"):
-        key = ("ce", o["ce_source"], o["ce_id"])
+        key = ("ce", o.get("from"), o["ce_source"], o["ce_id"])
     elif o.get("taskId"):
         key = ("task", o["taskId"])
     else:
@@ -399,6 +402,8 @@ if stage == 1:
 else:
     final["trigger_back"] = final["consecutive_days_under_1000"] >= DAYS_BACK
 final.update(fin)
+# N3: nenhum dia no intervalo (fila vazia sem --since, ou --since no futuro) é SEM DADO, nunca "nada disparou"
+final["no_data"] = not out
 for x in out:
     if as_json:
         print(json.dumps(x, ensure_ascii=False))
@@ -409,9 +414,9 @@ if as_json:
     print(json.dumps(final, ensure_ascii=False))
 else:
     print("[a2a-queue-live] " + " · ".join("%s=%s" % (k, json.dumps(v)) for k, v in final.items()))
-bad = fin["malformed"] or fin["no_received_at"] or fin["bad_received_at"]
+bad = fin["malformed"] or fin["no_received_at"] or fin["bad_received_at"] or final["no_data"]
 if bad:
-    print("[a2a-queue-live] NÃO PÔDE MEDIR por inteiro: registro malformado, sem receivedAt ou com data impossível (rc 2)", file=sys.stderr)
+    print("[a2a-queue-live] NÃO PÔDE MEDIR por inteiro: nenhum dia no intervalo, ou registro malformado, sem receivedAt ou com data impossível (rc 2)", file=sys.stderr)
 sys.exit(2 if bad else (1 if final["trigger_b"] or final["trigger_back"] else 0))
 PY
   exit $?
