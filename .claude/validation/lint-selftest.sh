@@ -11205,9 +11205,15 @@ PY
   _c_baddate() { local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-02-30 --json)"; QL_WHY="${r:0:300}"; _qlrc "${r}" 3; }
   _qlcase "(q39) count --since 2026-02-30 (dia que não existe) → rc 3, uso inválido (M2)" \
     '&& python3 -I -c '"'"'import sys, datetime; datetime.date.fromisoformat(sys.argv[1])'"'"' "${SINCE}" 2>/dev/null; }' '; }' _c_baddate
-  _c_boom() { _qlday "${d}/q/x1.tx1.json" tx1 2026-02-30T01:00:00Z
-    local r; r="$(_qlcount "$1" count --by-day --stage 1 --json)"; QL_WHY="${r:0:300}"; _qlrc "${r}" 2 && _qlhas "${r}" "ERRO inesperado"; }
-  _qlcase "(q40) count: exceção inesperada (receivedAt com dia inexistente) → rc 2, nunca rc 1 (M2)" \
+  _c_badat() { _c_cnt5 "$1" || return 1; _qlday "${d}/q/x1.tx1.json" tx1 2026-02-30T01:00:00Z
+    local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-02 --json)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 2 && [ "$(_qljget "${r}" 'select(.ending) | .bad_received_at')" = 1 ] \
+      && [ "$(_qljget "${r}" 'select(.ending) | .no_received_at')" = 0 ] && [ "$(_qljget "${r}" 'select(.day=="2026-11-02") | .total')" = 5 ]; }
+  _qlcase "(q40) count: receivedAt com data impossível (2026-02-30) conta em bad_received_at, os outros dias seguem, rc 2 (ponto 2)" \
+    '        dt.date.fromisoformat(o["receivedAt"][:10])' '        pass' _c_badat
+  _c_boom() { local r; r="$(QLR_ENV="ONION_A2A_QUEUE_NOW=999999999999" _qlr "$1" count --by-day --stage 1 --json)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 2 && _qlhas "${r}" "ERRO inesperado"; }
+  _qlcase "(q49) count: exceção inesperada (relógio fora do alcance do calendário) → rc 2, nunca rc 1 (M2)" \
     'sys.excepthook = _boom' 'pass' _c_boom
   _c_zdays() { _c_cnt5 "$1" || return 1; local r; r="$(_qlcount "$1" count --by-day --stage 1 --since 2026-11-01 --json)"; QL_WHY="${r:0:400}"
     [ "$(_qljget "${r}" 'select(.ending) | .zero_days')" = 1 ]; }
@@ -16980,7 +16986,7 @@ PY
       record_pass "a2a-rt (c): lado member com a confirmação certa: UM curl, o token nunca em argv nem na saída, o thread da perna 1 e o sent.tsv registrado"
     else record_fail "a2a-rt (c): member com confirmação" "rc=${rc} curl=$(cat "${sb}/net-called" 2>/dev/null | head -c 300) $(head -c 300 "${sb}/m.out")"; fi
     # mutante: a confirmação removida (sonda e comparação viram `true`) → o caso sem terminal tem de reprovar
-    mkdir -p "${mut}/send"; cp "${a2s}" "${mut}/send/a2a-send.sh"
+    mkdir -p "${mut}/send"; cp "${a2s}" "${mut}/send/a2a-send.sh"; cp "${ft}/a2a-metrics.py" "${mut}/send/"   # o envio pré-checa o registro
     sed -e 's/^( exec 3<>\/dev\/tty ) 2>\/dev\/null || refuse .*$/true/' -e 's/^exec 3<>\/dev\/tty$/exec 3<>\/dev\/null/' \
         -e 's/^\[ "\${ANS}" = "ENVIAR \${CODE}" \] || refuse .*$/true/' "${snd}" > "${mut}/send/a2a-rt-send.sh"
     rm -rf "${OB2}"; mkdir -p "${CS}/drafts"; mv "${CS}/drafts/sent/q1.json" "${CS}/drafts/q1.json" 2>/dev/null; : > "${CS}/sent.tsv"
@@ -17014,7 +17020,7 @@ PY
     fi
     # mutante do registro: o envio que não grava a linha `sent` (o append vira --check) reprova o caso (c-registro)
     mkdir -p "${mut}/send2"; cp "${a2s}" "${ft}/a2a-metrics.py" "${mut}/send2/"
-    sed 's/ draft-append --log "\${STATE}\/drafts.jsonl" --event sent / draft-append --log "${STATE}\/drafts.jsonl" --check /' "${snd}" > "${mut}/send2/a2a-rt-send.sh"
+    sed 's/ --gap-on-fail --event sent / --check /' "${snd}" > "${mut}/send2/a2a-rt-send.sh"
     rm -rf "${OB2}"; mkdir -p "${CS}/drafts"; mv "${CS}/drafts/sent/q1.json" "${CS}/drafts/q1.json" 2>/dev/null; : > "${CS}/sent.tsv"
     grep -v '"event":"sent"' "${CS}/drafts.jsonl" > "${sb}/dl.tmp"; cat "${sb}/dl.tmp" > "${CS}/drafts.jsonl"
     if cmp -s "${snd}" "${mut}/send2/a2a-rt-send.sh"; then record_fail "a2a-rt (c-registro) mutante" "a âncora do draft-append sumiu"
@@ -17022,6 +17028,41 @@ PY
       if [ "${rc}" = 0 ] && [ "$(_rt_nob)" = 1 ] && ! _rt_sentline; then record_pass "a2a-rt (c-registro) mutante: o envio sem a linha sent sai (rc 0) e o caso reprova"
       else record_fail "a2a-rt (c-registro) mutante" "rc=${rc} outbox=$(_rt_nob): o mutante não isolou a linha sent $(head -c 300 "${sb}/c.out")"; fi
     fi
+    # (g11) ponto 3: registro que não aceita a linha sent → o envio é RECUSADO antes de sair (rc 2, nada no outbox)
+    _rt_strict() {  # $1 = send script → 0 se recusou sem enviar
+      rm -rf "${OB2}"; mkdir -p "${CS}/drafts"; mv "${CS}/drafts/sent/q1.json" "${CS}/drafts/q1.json" 2>/dev/null; : > "${CS}/sent.tsv"
+      chmod 644 "${CS}/drafts.jsonl"; local r=0; _rt_c_tty "$1" "ENVIAR ${CODE}" || r=$?; chmod 600 "${CS}/drafts.jsonl"
+      [ "${r}" = 2 ] && [ "$(_rt_nob)" = 0 ] && grep -q 'nada enviado' "${sb}/c.out"
+    }
+    mkdir -p "${mut}/send4"; cp "${a2s}" "${ft}/a2a-metrics.py" "${mut}/send4/"
+    python3 - "${snd}" "${mut}/send4/a2a-rt-send.sh" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read(); a = '  || die "o registro de rascunhos ('
+assert a in s
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, '  || true "o registro de rascunhos (', 1))
+PY
+    local rc_i=1 rc_m=1; _rt_strict "${snd}" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "a2a-rt (g11): registro de rascunhos que não aceita a linha sent → envio RECUSADO antes de sair (rc 2, outbox vazio)"
+    else record_fail "a2a-rt (g11): envio estrito" "$(head -c 300 "${sb}/c.out")"; fi
+    _rt_strict "${mut}/send4/a2a-rt-send.sh" && rc_m=0
+    _prove_mutation "a2a-rt (g11) mutante: sem o pré-cheque o envio sai sem rastro" "${snd}" "${mut}/send4/a2a-rt-send.sh" "${rc_i}" "${rc_m}"
+    # (g12) ponto 3: a linha sent que falha DEPOIS do envio → lacuna marcada e rc 5, "ENVIADO SEM REGISTRO"
+    # (o a2a-metrics.py é um dublê que aprova o pré-cheque e recusa a linha: a falha entre os dois não se encena de outro jeito)
+    mkdir -p "${mut}/send3"; cp "${a2s}" "${mut}/send3/"
+    printf '%s\n' 'import sys' 'if "--check" in sys.argv: sys.exit(0)' 'print("[a2a-metrics] LACUNA: dublê", file=sys.stderr); sys.exit(4)' > "${mut}/send3/a2a-metrics.py"
+    cp "${snd}" "${mut}/send3/a2a-rt-send.sh"
+    mkdir -p "${mut}/send5"; cp "${a2s}" "${mut}/send3/a2a-metrics.py" "${mut}/send5/"
+    sed 's/^    REC_RC=5$/    REC_RC=0/' "${snd}" > "${mut}/send5/a2a-rt-send.sh"
+    _rt_after() {  # $1 = send script → 0 se saiu 5 com o envelope no outbox
+      rm -rf "${OB2}"; mkdir -p "${CS}/drafts"; mv "${CS}/drafts/sent/q1.json" "${CS}/drafts/q1.json" 2>/dev/null; : > "${CS}/sent.tsv"
+      local r=0; _rt_c_tty "$1" "ENVIAR ${CODE}" || r=$?
+      [ "${r}" = 5 ] && [ "$(_rt_nob)" = 1 ] && grep -q 'ENVIADO SEM REGISTRO' "${sb}/c.out"
+    }
+    rc_i=1; rc_m=1; _rt_after "${mut}/send3/a2a-rt-send.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "a2a-rt (g12): a linha sent que falha depois do envio → rc 5 'ENVIADO SEM REGISTRO' (lacuna), nunca rc 0"
+    else record_fail "a2a-rt (g12): enviado sem registro" "$(head -c 300 "${sb}/c.out")"; fi
+    _rt_after "${mut}/send5/a2a-rt-send.sh" && rc_m=0
+    _prove_mutation "a2a-rt (g12) mutante: o envio sem registro que sai 0" "${mut}/send3/a2a-rt-send.sh" "${mut}/send5/a2a-rt-send.sh" "${rc_i}" "${rc_m}"
   fi
 
   # ─────────────────── (e2) a linha do dry-run do a2a-send.sh diz o que aconteceu ───────────────────
@@ -17147,6 +17188,27 @@ PY
   cp "${ft}/a2a-metrics.py" "${mut}/a2a-metrics.py"
   local rc_i=1 rc_m=1; _rt_edit "${mcp}" && rc_i=0; _rt_edit "${mut}/g1.py" && rc_m=0
   _prove_mutation "a2a-rt (g1) mutante: a linha drafted sem supersedes_draft reprova" "${mcp}" "${mut}/g1.py" "${rc_i}" "${rc_m}"
+  # (g10) ponto 3: a linha drafted que falha NÃO impede o rascunho: ele nasce, a lacuna vai a draft-gap.log (0600) e a
+  # resposta a diz
+  _rt_req "${sb}/gg.req" x '{"name":"draft_message","arguments":{"to":"onion-evolve","text":"com lacuna","idempotency_key":"gap-1"}}'
+  _rt_gap() {  # $1 = mcp
+    rm -rf "${ST}/drafts" "${ST}/drafts.jsonl" "${ST}/draft-gap.log"; ( umask 022; : > "${ST}/drafts.jsonl" ); chmod 644 "${ST}/drafts.jsonl"
+    local o; o="$(_rt "$1" "${sb}/gg.req")"
+    [ -f "${ST}/drafts/gap-1.json" ] && [ "$(_rt_iserr "${o}" 1)" = "false" ] && _rt_has "$(_rt_text "${o}" 1)" "LACUNA" \
+      && [ "$(jq -r '[.event,.draft_id] | join(",")' "${ST}/draft-gap.log" 2>/dev/null)" = "drafted,gap-1" ] && [ "$(stat -c %a "${ST}/draft-gap.log")" = 600 ]
+  }
+  python3 - "${mcp}" "${mut}/g10.py" <<'PY'
+import sys
+s = open(sys.argv[1], encoding="utf-8").read(); a = "        gap_msg = metrics.append_draft_with_gap(log, line)\n"
+assert a in s
+open(sys.argv[2], "w", encoding="utf-8").write(s.replace(a, "        metrics.append_line(log, line); gap_msg = ''\n", 1))
+PY
+  local rc_gi=1 rc_gm=1; _rt_gap "${mcp}" && rc_gi=0
+  if [ "${rc_gi}" = 0 ]; then record_pass "a2a-rt (g10): a linha drafted que falha não impede o rascunho: ele nasce, com LACUNA na resposta e em draft-gap.log (0600)"
+  else record_fail "a2a-rt (g10): lacuna do drafted" "$(head -c 300 "${ST}/draft-gap.log" 2>/dev/null)"; fi
+  _rt_gap "${mut}/g10.py" && rc_gm=0
+  _prove_mutation "a2a-rt (g10) mutante: a linha drafted estrita (sem lacuna)" "${mcp}" "${mut}/g10.py" "${rc_gi}" "${rc_gm}"
+  rm -f "${ST}/drafts.jsonl" "${ST}/draft-gap.log"
   # (g2…g5) o contador draft-stats sobre registros sintéticos (os refutadores do PLAN-E §3), relógio fixo
   local met="${ft}/a2a-metrics.py" DNOW=1793707200
   _dsgen() {  # _dsgen <cenário> <arq>
@@ -17180,12 +17242,22 @@ elif scen == "ks":
     L += [ln(now - 3600, "kill_switch_on"), ln(now - 1800, "kill_switch_off")]
 elif scen == "vazio":
     pass
+elif scen == "orphan":
+    for i in range(30):
+        t = now - (40 - i) * 86400
+        L += [ln(t, "drafted", f"d{i}"), ln(t + 60, "sent", f"d{i}")]
+    L.append(ln(now - 3600, "sent", "fantasma"))
 with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), "w") as f:   # o escritor exige 0600
     for o in L:
         f.write(json.dumps(o) + "\n")
 PY
   }
-  _dsst() { local o r=0; _dsgen "$2" "${sb}/ds-$2.jsonl"; o="$(python3 -I "$1" draft-stats --log "${sb}/ds-$2.jsonl" --now "${DNOW}" --json "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
+  _dsst() { local o r=0; _dsgen "$2" "${sb}/ds-$2.jsonl"; o="$(python3 -I "$1" draft-stats --log "${sb}/ds-$2.jsonl" --now "${DNOW}" --json --gap-log "${sb}/dgap-nenhuma.log" "${@:3}" 2>&1)" || r=$?; printf '%s|%s' "${r}" "${o}"; }
+  _dsorph() { local r; r="$(_dsst "$1" orphan --last 30)"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_dsj "${r}" '[.unregistered_sent,.approved_unedited] | map(tostring) | join(",")')" = "1,30" ]; }
+  _dsgapw() { local r; printf '{"logged_at":"2026-11-02T10:00:00Z","event":"drafted","draft_id":"dx","why":"x"}\n' > "${sb}/dgap-um.log"
+    r="$(_dsst "$1" a27 --last 30 --gap-log "${sb}/dgap-um.log")"; DS_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_dsj "${r}" '.gaps_in_window')" = 1 ]; }
   _dsj() { jq -r "$2" <<< "${1#*|}" 2>/dev/null; }
   _ds27() { local r; r="$(_dsst "$1" a27 --last 30)"; DS_WHY="${r:0:400}"
     [ "${r%%|*}" = 0 ] && [ "$(_dsj "${r}" '[.approved_unedited,.edited,.discarded,.unedited_rate,.auto_send_criterion_met,(.trigger_back_to_draft|tostring)] | map(tostring) | join(",")')" = "27,2,1,0.9,true,null" ]; }
@@ -17227,7 +17299,11 @@ PY
   _dscase "(g7) draft-stats --since-stage-on: atos sem produtor no core → trigger_back_to_draft null, not_instrumented, rc 2 (A2)" _dsnoinst \
     'DRAFT_NOT_INSTRUMENTED = ("blocked_out_of_list", "sent_out_of_list", "kill_switch_on", "kill_switch_off")' 'DRAFT_NOT_INSTRUMENTED = ()'
   _dscase "(g8) draft-stats: log vazio → no_data e rc 2 (A2)" _dsempty \
-    '(2 if malformed or not_instr or out["no_data"] else' '(2 if malformed or not_instr else'
+    '(2 if malformed or not_instr or out["no_data"] or gap else' '(2 if malformed or not_instr or gap else'
+  _dscase "(g13) draft-stats: sent sem o drafted dele é lacuna → rc 2, nunca aprovado sem edição (ponto 3)" _dsorph \
+    '    gap = out["unregistered_sent"] > 0 or out["gaps_in_window"] > 0' '    gap = out["gaps_in_window"] > 0'
+  _dscase "(g14) draft-stats: lacuna em draft-gap.log na janela da amostra → rc 2 (ponto 3)" _dsgapw \
+    '    gap = out["unregistered_sent"] > 0 or out["gaps_in_window"] > 0' '    gap = out["unregistered_sent"] > 0'
   _dscase "(g9) draft-stats --since-stage-on 2026-13-45 → rc 3, uso inválido (M2)" _dsbad \
     '        if since is not None and not _valid_day(since):' '        if since is not None and not DAY_RE.fullmatch(since):'
   rm -rf "${sb}"
