@@ -18329,7 +18329,28 @@ PY
   _shcase "(sh64) A3: a lacuna same_second nasce no modo de DEPOIS da troca, e a resolução nele é honrada pelo leitor" _sh_a3b \
     '                line["mode"] = mode_before(ch, t_line + 1) or line["mode"]' '                line["mode"] = vig or line["mode"]'
   _shcase "(sh65) A4: à mão, decisão humana no auto sem --supersedes para a linha da regra válida → rc 3" _sh_a4 \
-    '                elif rl and not o.get("--producer"):' '                elif False:'
+    '                    elif rl:' '                    elif False:'
+  _sh_supok() {  # M1: --supersedes certo (a linha da regra válida) → rc 0, e a reversão conta
+    local R="${d}/sp" r=0 rid o; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-sp || { SH_WHY="a linha da regra falhou"; return 1; }
+    rid="$(jq -r 'select(.ce_id=="ev-sp") | .line_id' "${R}/l.jsonl")"
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
+      --human-decision accept --from m --ce-source /w --ce-id ev-sp --supersedes "${rid}" >/dev/null 2>&1 || r=$?
+    [ "${r}" = 0 ] || { SH_WHY="supersedes certo deu ${r}"; return 1; }
+    o="$(python3 -I "$1" shadow-stats --mode auto --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --json 2>/dev/null)"
+    SH_WHY="stats: ${o:0:300}"; [ "$(jq -r .reversals_7d <<< "${o}")" = 1 ]; }
+  _sh_supbad() {  # M1: --supersedes de fora (UUID que não é a linha da regra) → rc 3, nada gravado
+    local R="${d}/sb" r=0; rm -rf "${R}"; mkdir -p "${R}"
+    _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
+    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-sb || { SH_WHY="a linha da regra falhou"; return 1; }
+    python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
+      --human-decision accept --from m --ce-source /w --ce-id ev-sb --supersedes 66666666-6666-4666-8666-666666666666 >/dev/null 2>&1 || r=$?
+    SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 2 ]; }
+  _shcase "(sh66) M1: à mão no auto, --supersedes = a linha da regra válida → rc 0 e a reversão conta" _sh_supok \
+    '                        if line["supersedes"] not in ids:' '                        if True:'
+  _shcase "(sh67) M1: à mão no auto, --supersedes de fora (UUID que não é a linha da regra) → rc 3, nada gravado" _sh_supbad \
+    '                        if line["supersedes"] not in ids:' '                        if False:'
   _shcase "(sh37) mode-change grava a troca (de, para, quem) e recusa trocar para o modo vigente (rc 3)" _sh_mc \
     '        if now_mode == o["--to"]:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
