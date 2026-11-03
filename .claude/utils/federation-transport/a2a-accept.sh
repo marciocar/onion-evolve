@@ -276,7 +276,7 @@ CE_SOURCE="$(ce_get ce_source)"; CE_ID="$(ce_get ce_id)"; CE_TIME="$(ce_get ce_t
 shadow_record() {
   local SH_RC=0 SH_OUT
   SH_OUT="$(A2A_METRICS_REPO_ROOT="${ROOT}" python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" "$@" --point accept \
-        --mode shadow --rule-decision accept --human-decision accept --jti "${JTI}" --task-id "${TASKID}" \
+        --mode shadow --rule-decision accept --human-decision accept --jti "${JTI}" --task-id "${TASKID}" --from "${FROM}" \
         --ce-source "${CE_SOURCE}" --ce-id "${CE_ID}" --ce-time "${CE_TIME}" 2>&1)" || SH_RC=$?
   case "${SH_RC}" in
   0) ;;

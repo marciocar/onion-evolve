@@ -17318,6 +17318,17 @@ PY
     '    gap = out["unregistered_sent"] > 0 or out["gaps_in_window"] > 0' '    gap = out["gaps_in_window"] > 0'
   _dscase "(g14) draft-stats: lacuna em draft-gap.log na janela da amostra → rc 2 (ponto 3)" _dsgapw \
     '    gap = out["unregistered_sent"] > 0 or out["gaps_in_window"] > 0' '    gap = out["unregistered_sent"] > 0'
+  _dsrc5() {  # $1 = metrics → 0 se a lacuna que o envio rc 5 grava (sent com --gap-on-fail) põe o draft-stats em rc 2
+    _dsgen a27 "${sb}/ds-rc5.jsonl"; chmod 644 "${sb}/ds-rc5.jsonl"; rm -f "${sb}/dgap-rc5.log"
+    local r=0 o rr=0
+    python3 -I "$1" draft-append --log "${sb}/ds-rc5.jsonl" --gap-on-fail --gap-log "${sb}/dgap-rc5.log" --event sent \
+      --draft-id d29 --thread th --recipient onion-evolve >/dev/null 2>&1 || r=$?
+    [ "${r}" = 4 ] || { DS_WHY="o append deveria registrar a lacuna (rc 4), deu ${r}"; return 1; }
+    o="$(python3 -I "$1" draft-stats --log "${sb}/ds-rc5.jsonl" --gap-log "${sb}/dgap-rc5.log" --last 30 --no-write --json 2>&1)" || rr=$?
+    DS_WHY="rc=${rr} ${o:0:300}"; [ "${rr}" = 2 ] && [ "$(jq -r .gaps_in_window <<< "${o}" 2>/dev/null)" = 1 ]
+  }
+  _dscase "(g15) draft-stats: a lacuna do envio 'ENVIADO SEM REGISTRO' (rc 5) põe a janela que o contém em rc 2 (ponto 3)" _dsrc5 \
+    'append_line(gap, {"logged_at": utc_stamp(), "event": line["event"]' 'append_line(gap, {"logged_at": "2000-01-01T00:00:00Z", "event": line["event"]'
   _dscase "(g9) draft-stats --since-stage-on 2026-13-45 → rc 3, uso inválido (M2)" _dsbad \
     '        if since is not None and not _valid_day(since):' '        if since is not None and not DAY_RE.fullmatch(since):'
   rm -rf "${sb}"
@@ -17670,11 +17681,11 @@ def lid():
     b = bytearray(os.urandom(16)); b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128; h = b.hex()
     return f"{h[:8]}-{h[8:12]}-{h[12:16]}-{h[16:20]}-{h[20:]}"
 # "accept-rule" é uma regra hipotética que NÃO é a linha de base (a base nunca liga a regra; caso sh10)
-def ln(t, rule, human, key, mode="shadow", ver="1", sup=None, rid="accept-rule", ids=True, task=None):
+def ln(t, rule, human, key, mode="shadow", ver="1", sup=None, rid="accept-rule", ids=True, task=None, frm="m"):
     return {"line_id": lid(), "logged_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(t)), "mode": mode,
             "ce_source": "/w", "ce_id": key, "ce_time": None, "jti": None, "taskId": task, "rule_id": rid,
             "rule_version": ver, "rule_decision": rule, "human_decision": human, "reason": None,
-            "human_actor": "op" if human else None, "supersedes": sup, "ids_verified": ids}
+            "human_actor": "op" if human else None, "supersedes": sup, "ids_verified": ids, "from": frm}
 L = []
 if scen in ("s50", "s50v", "mal", "base"):
     for i in range(50):
@@ -17708,6 +17719,9 @@ elif scen == "xrev":
     L.append(ln(now - 2 * 86400, None, "reject", "a2", mode="auto", sup=L[5]["line_id"]))
 elif scen == "vazio":
     pass
+elif scen == "twofrom":
+    L.append(ln(now - 3600, "accept", "accept", "mesmo", frm="membro-a"))
+    L.append(ln(now - 1800, "accept", "reject", "mesmo", frm="membro-b"))
 elif scen == "dilute":
     for i in range(10):
         L.append(ln(now - 3 * 86400 - i, "accept", None, f"a{i}", mode="auto"))
@@ -17757,8 +17771,8 @@ PY
     [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '.rule_version')" = 2 ] && [ "$(_shj "${r}" '.trigger_rule_on')" = false ]; }
   _sh_rej() { local r; r="$(_shst "$1" s60)"; SH_WHY="${r:0:400}"
     [ "${r%%|*}" = 0 ] && [ "$(_shj "${r}" '[.events,.agreement,.trigger_rule_on,.confusion.accept.reject] | map(tostring) | join(",")')" = "60,0.8333,false,10" ]; }
-  _sh_und() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","ce_source":"/w","ce_id":"nova","jti":"j"}' \
-      '{"receivedAt":"2026-10-20T10:00:00Z","ce_source":"/w","ce_id":"e3","jti":"j"}' '{"receivedAt":"2026-11-03T10:00:00Z","jti":"recente"}' > "${d}/sh-q.jsonl"
+  _sh_und() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","from":"m","ce_source":"/w","ce_id":"nova","jti":"j"}' \
+      '{"receivedAt":"2026-10-20T10:00:00Z","from":"m","ce_source":"/w","ce_id":"e3","jti":"j"}' '{"receivedAt":"2026-11-03T10:00:00Z","jti":"recente"}' > "${d}/sh-q.jsonl"
     r="$(_shst "$1" s50 --queue-jsonl "${d}/sh-q.jsonl")"; SH_WHY="${r:0:400}"
     [ "$(_shj "${r}" '.undecided')" = 1 ] && [ "$(_shj "${r}" '.events')" = 50 ]; }
   _sh_auto() { local r; r="$(_shst "$1" auto)"; SH_WHY="${r:0:400}"
@@ -17775,7 +17789,7 @@ PY
     [ "$(_shj "${r}" '[.events,.holds,.agreement,.confusion.accept.hold] | map(tostring) | join(",")')" = "50,5,0.96,5" ]; }
   _sh_und2() { local r; printf '%s\n' '{"jti":"sem-data","taskId":"tx1"}' '{"receivedAt":"2026-10-20T10:00:00+02:00","jti":"com-offset","taskId":"tx2"}' > "${d}/sh-q2.jsonl"
     r="$(_shst "$1" s50 --queue-jsonl "${d}/sh-q2.jsonl")"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.undecided')" = 2 ]; }
-  _sh_und3() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","ce_source":"/w","ce_id":"e3"}' > "${d}/sh-q3.jsonl"
+  _sh_und3() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","from":"m","ce_source":"/w","ce_id":"e3"}' > "${d}/sh-q3.jsonl"
     r="$(_shst "$1" s50v --queue-jsonl "${d}/sh-q3.jsonl")"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.undecided')" = 1 ]; }
   _sh_dil() { local r; r="$(_shst "$1" dilute)"; SH_WHY="${r:0:400}"
     [ "$(_shj "${r}" '[.decisions_7d,.reversals_7d,.reversal_rate_7d,.back_to_shadow_criterion_met] | map(tostring) | join(",")')" = "10,3,0.3,true" ]; }
@@ -17793,6 +17807,12 @@ PY
     r="$(_shst "$1" s50 --gap-log "${d}/gap-res.log")"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 1 ] && [ "$(_shj "${r}" '.gaps_in_window')" = 0 ]; }
   _sh_n7() { local r; r="$(_shst "$1" future)"; SH_WHY="${r:0:400}"
     [ "$(_shj "${r}" '[.events,.future_logged_at] | map(tostring) | join(",")')" = "50,1" ]; }
+  _sh_from() { local r; r="$(_shst "$1" twofrom)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.events')" = 2 ]; }
+  _sh_holdfrom() { local r; printf '%s\n' '{"receivedAt":"2026-10-20T10:00:00Z","from":"m","ce_source":"/w","ce_id":"e3"}' \
+      '{"receivedAt":"2026-10-20T10:00:00Z","from":"outro","ce_source":"/w","ce_id":"e4"}' > "${d}/sh-q4.jsonl"
+    r="$(_shst "$1" s50 --queue-jsonl "${d}/sh-q4.jsonl")"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.undecided')" = 1 ]; }
+  _sh_ahead() { local r; r="$(_shst "$1" future)"; SH_WHY="${r:0:400}"
+    [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '[.future_logged_at,.future_max_ahead_s] | map(tostring) | join(",")')" = "1,3600" ]; }
   _sh_xrev() { local r; r="$(_shst "$1" xrev)"; SH_WHY="${r:0:400}"; [ "$(_shj "${r}" '.reversals_7d')" = 0 ]; }
   _sh_mal() { local r; r="$(_shst "$1" mal)"; SH_WHY="${r:0:400}"; [ "${r%%|*}" = 2 ] && [ "$(_shj "${r}" '.malformed')" = 1 ]; }
   _sh_base() { local r; r="$(_shst "$1" base)"; SH_WHY="${r:0:400}"
@@ -17867,6 +17887,12 @@ PY
     '        if isinstance(o, dict) and o.get("gap_id") in closed:' '        if False:'
   _shcase "(sh30) shadow-stats: linha com logged_at no futuro conta em future_logged_at, não como evento (N7)" _sh_n7 \
     '        elif stamp_epoch(o["logged_at"]) > now:' '        elif False:'
+  _shcase "(sh31) shadow-stats: a chave do CloudEvent é escopada pelo remetente (dois membros, mesmo source+id = 2 eventos)" _sh_from \
+    '        return ("ce", o.get("from"), o["ce_source"], o["ce_id"])' '        return ("ce", o["ce_source"], o["ce_id"])'
+  _shcase "(sh32) shadow-stats: o casamento dos holds usa o remetente (o e3 do mesmo membro casa; o e4 de outro segue undecided)" _sh_holdfrom \
+    'k = event_key({"from": r.get("from"), "ce_source"' 'k = event_key({"ce_source"'
+  _shcase "(sh33) shadow-stats: future_logged_at diz quantas linhas e o maior desvio (future_max_ahead_s 3600), rc 2" _sh_ahead \
+    '            ahead = max(ahead, stamp_epoch(o["logged_at"]) - now)' '            ahead = 0'
   # (sh22) B5: log num diretório com .git ALHEIO ao repo em uso (o HOME versionado por dotfiles) não é recusado
   _sh_dot() { rm -rf "${d}/dotfiles-home"; git init -q "${d}/dotfiles-home"; local r=0
     A2A_METRICS_REPO_ROOT="${REPO_ROOT}" python3 -I "$1" shadow-append --log "${d}/dotfiles-home/s.jsonl" --gap-log "${d}/gap-dot.log" --mode shadow --rule-decision accept \
