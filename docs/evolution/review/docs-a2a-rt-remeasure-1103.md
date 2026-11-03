@@ -2,8 +2,7 @@
 branch: docs/a2a-rt-remeasure-1103
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: 1efa585a121d4648ba4f2bfd7eddc60635f187c11edc606f415c86a89cca3ceb
-reviewed_code_sha256: 6d6b1ca821c8ba05e57cc6da93676902d5751deb7aefeb112e72f6b5a415d57d
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 1
 tokens: 96057
@@ -39,3 +38,10 @@ Sem IP, hostname, e-mail, token nem senha nas linhas novas; S8a aberto e S4 parc
 ## Mutantes
 
 Nenhum: não há código novo, só a flag na linha de comando.
+
+## Re-revisão depois do contrato (2026-11-03)
+
+O contrato KG-SSOT barrou cinco códigos sem glosa no nó novo (R3, R5, P12, S4 no label e na narrativa).
+A cura trocou cada um pela glosa («rodada 3», «rodada 5», «passo 12», «critério 4 (identidade depois do
+reinício)»), sem mudar afirmação nem número. Conferido inline: o diff são 2 linhas do mesmo nó, e o gate
+`ops/kg-gate-ci.sh` deu rc 0.
