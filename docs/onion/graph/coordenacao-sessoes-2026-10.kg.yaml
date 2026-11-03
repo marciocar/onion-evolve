@@ -549,6 +549,38 @@ nodes:
       locator: "pergunta com opções de 2026-11-03: «SQLite num Claude Project (dissecação da curadoria): qual veredito?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
       locality: "pessoa"
+  - id: D_COORD_AUTORIZACAO_ESTENDIDA_ATE_9H_1104
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Estender até amanhã cedo»"
+    label: "O maestro estende a autorização delegada da orquestração até as 9h de São Paulo de 2026-11-04, com os mesmos limites: merge alheio, deploy e segredo seguem dele."
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Estender até amanhã cedo»; descartadas: «Encerrar às 23h» · «Parar já»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «O que fazemos com a orquestração da curadoria e do kg-ssot depois das 23h?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
+  - id: D_COORD_FILA_DA_NOITE_DOS_PEERS_1103
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-03"
+    verified_against: "decisão do maestro em 2026-11-03, por pergunta com opções (/meta:decide): escolhida «Mercado da orquestração|kg_query que agrega|Teste do 1º byte»"
+    label: "A fila da noite: a curadoria pesquisa o mercado da orquestração de sessões (Q_SO_PADROES_DE_MERCADO); o kg-ssot avança a agregação no kg_query e planeja, sem rodar, o teste que separa o corte no 1º byte da duração total."
+    narrative: "Selado por /meta:decide em 2026-11-03: escolhida «Mercado da orquestração|kg_query que agrega|Teste do 1º byte»; descartadas: «Nada novo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-03: «Até as 23h, onde ponho as sessões peer?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
+      locality: "pessoa"
 edges:
   - from: Q_COORD_PROMOVER_GRAFO_DE_COORDENACAO_A_DOUTRINA_OU_FERRAMENTA
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
@@ -660,4 +692,10 @@ edges:
     edge_type: TRACES_TO
   - from: D_COORD_SQLITE_EM_PROJECT_VEREDITO_1103
     to: E_COORD_CENSO_DAS_PENDENCIAS_1027
+    edge_type: TRACES_TO
+  - from: D_COORD_AUTORIZACAO_ESTENDIDA_ATE_9H_1104
+    to: D_COORD_SPIKES_DAS_PORTAS_NA_VPS_1103
+    edge_type: TRACES_TO
+  - from: D_COORD_FILA_DA_NOITE_DOS_PEERS_1103
+    to: D_COORD_SPIKES_DAS_PORTAS_NA_VPS_1103
     edge_type: TRACES_TO
