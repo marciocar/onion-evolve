@@ -329,6 +329,16 @@ encerra a conversa e não envia, não assina, não aceita nem pareia. **Decisão
 `ToolSearch` e o `EndConversation`, se o harness os mantiver». Rejeitada: medir se `--disallowedTools` o tira.
 Nenhum outro critério do §2 nem modo de falha do §3 muda.
 
+### Emenda 4 · 2026-11-03 · as configurações gerenciadas da organização são superfície
+
+**Motivo:** desde a 2.1.316 as configurações gerenciadas pela organização aplicam sem aprovação, e o `/status` das
+sessões de teste lista «Enterprise managed settings (remote)» como fonte; hoje elas carregam `channelsEnabled: true`
+(rodada 22 do radar do Claude Code, `E_SETTINGS_GERENCIADOS_REMOTOS_APLICAM_SEM_APROVACAO_1103`). Nem `--settings`
+nem `--strict-mcp-config` controlam essa fonte. **Decisão do maestro (2026-11-03,
+`D_A2A_CANAIS_GERENCIADOS_REGISTRAR_E_MEDIR_1103`):** registrar como superfície e, na próxima sessão de teste, medir
+que nenhum canal entra sem `--channels`. Rejeitadas: desligar na organização e só registrar. Nenhum critério do §2
+nem modo de falha do §3 muda.
+
 ## 10. Registro de resultados (preencher na execução)
 
 **Preenchido em 2026-10-28** pela sessão do core, com as saídas coladas pelo maestro (sem segredo, sem o nome da

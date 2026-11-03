@@ -475,7 +475,7 @@ nodes:
     node_type: decision
     impact: 5
     confidence: 0.5
-    label: "DECISÃO ABERTA: portas do onion-core para outros harnesses e modelos — A gerador por harness · B ponte em runtime · C só piso agnóstico de CI · D nenhuma porta nova até demanda medida. Elenxo: D agora, A como forma no gatilho, C sempre piso, B rejeitada."
+    label: "DECISÃO SELADA em 2026-11-03: nenhuma porta nova até demanda medida, com o gerador por harness como forma; spikes no Qwen Code e no Vibe antes de qualquer gerador. Opções: A gerador por harness · B ponte em runtime · C só piso de CI · D nenhuma porta até demanda"
     trace: "/meta:decide de 2026-11-02 · rodada /onion-research em modo decisão sobre portas do onion-core"
     status: done
     plane: DEV
