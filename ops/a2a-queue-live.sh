@@ -38,7 +38,8 @@
 #               por ce_source + ce_id (o CloudEvent do corpo), senão pelo taskId; sem nenhum dos dois conta uma vez
 #               (no_dedup_key); o mesmo nome na fila e em _archived/ conta uma vez (duplicated). O CloudEvent só
 #               deduplica registro verificado pelo bridge (deduped_by_ce); o não verificado, pelo taskId. Todo
-#               receptor lido aparece em by_receiver, com 0 se preciso; zero_days conta os dias zerados. Malformado e sem
+#               receptor lido aparece em by_receiver, com 0 se preciso; zero_days conta os dias zerados. receivedAt
+#               com data impossível conta em bad_received_at (rc 2, os outros dias seguem). Malformado e sem
 #               receivedAt não têm dia: só a linha final, e rc 2. Só dias UTC COMPLETOS (ending = ontem). Dia sem
 #               registro sai no_data e QUEBRA as duas sequências (o bridge ainda não marca quando esteve fora, então
 #               zero e fora são indistinguíveis, e a linha final o declara em zero_vs_down: indistinguishable; na
@@ -325,7 +326,7 @@ receivers = sys.argv[6].split()                        # todo receptor lido apar
 OVER, UNDER, DAYS_B, DAYS_BACK = 5000, 1000, 7, 30          # o PLAN-D, sem mudar
 AT = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?Z\Z")
 ending = dt.datetime.fromtimestamp(now, dt.timezone.utc).date() - dt.timedelta(days=1)   # o último dia UTC COMPLETO
-fin = {"malformed": 0, "no_received_at": 0, "no_dedup_key": 0, "duplicated": 0, "deduped_by_ce": 0}
+fin = {"malformed": 0, "no_received_at": 0, "bad_received_at": 0, "no_dedup_key": 0, "duplicated": 0, "deduped_by_ce": 0}
 seen_name, recs = set(), []
 for ln in open(rows_path, encoding="utf-8"):
     rcv, where, js = ln.rstrip("\n").split("\t", 2)
@@ -339,6 +340,12 @@ for ln in open(rows_path, encoding="utf-8"):
         continue
     if not AT.fullmatch(o.get("receivedAt") or ""):
         fin["no_received_at"] += 1
+        continue
+    try:
+        dt.date.fromisoformat(o["receivedAt"][:10])
+    except ValueError:
+        # data impossível (2026-02-30): conta à parte, sai do dia, e o rc vira 2 — nunca aborta a contagem
+        fin["bad_received_at"] += 1
         continue
     # M5: o CloudEvent só deduplica registro que o bridge verificou; os ids de registro não verificado são escolha de
     # quem escreveu, e casá-los apagaria evento alheio. Sem isso, o taskId (que o bridge gera)
@@ -402,9 +409,9 @@ if as_json:
     print(json.dumps(final, ensure_ascii=False))
 else:
     print("[a2a-queue-live] " + " · ".join("%s=%s" % (k, json.dumps(v)) for k, v in final.items()))
-bad = fin["malformed"] or fin["no_received_at"]
+bad = fin["malformed"] or fin["no_received_at"] or fin["bad_received_at"]
 if bad:
-    print("[a2a-queue-live] NÃO PÔDE MEDIR por inteiro: registro malformado ou sem receivedAt (rc 2)", file=sys.stderr)
+    print("[a2a-queue-live] NÃO PÔDE MEDIR por inteiro: registro malformado, sem receivedAt ou com data impossível (rc 2)", file=sys.stderr)
 sys.exit(2 if bad else (1 if final["trigger_b"] or final["trigger_back"] else 0))
 PY
   exit $?
