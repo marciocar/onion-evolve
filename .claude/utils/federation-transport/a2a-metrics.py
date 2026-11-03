@@ -538,7 +538,7 @@ def _received_epoch(at):
 
 def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     """→ (saída, rc). `lines` = read_log(); `mode` = o modo em vigor (shadow|auto), dado por quem pergunta e NUNCA
-    tirado da última linha (cura A1); `queue_rows` = linhas do `list --json` da fila viva (core-only: ops/a2a-queue-live.sh) (ou None);
+    tirado da última linha (cura A1); `queue_rows` = linhas do `list --json` da fila viva (core-only, ops/a2a-queue-live.sh) (ou None);
     `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
     malformed = future = ahead = 0
     valid, changes = [], []
