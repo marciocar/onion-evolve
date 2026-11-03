@@ -25,9 +25,16 @@ nodes:
   - id: T_EAN
     node_type: entity
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
     confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "o PDF do dicionário de dados baixado em 2026-10-22 (sha256 44e8af589f6a0860...)"
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "itens 9, 10 e 11 e a linha CO_EAN da tabela De/Para"
+      method: "reading: o PDF baixado e convertido em texto, os verbetes e a tabela De/Para"
+      locality: web
     label: "Código EAN: o código de 13 dígitos que identifica o país de origem, o fabricante e o produto, com um dígito verificador."
     x_term:
       pref: "Código EAN"
@@ -60,9 +67,16 @@ nodes:
   - id: T_GGREM
     node_type: entity
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
     confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "o PDF do dicionário de dados baixado em 2026-10-22 (sha256 44e8af589f6a0860...)"
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "item 6 e a linha CO_GGREM da tabela De/Para"
+      method: "reading: o PDF baixado e convertido em texto, os verbetes e a tabela De/Para"
+      locality: web
     label: "Código GGREM: o identificador de cada apresentação, gerado só pela CMED e único por apresentação."
     x_term:
       pref: "Código GGREM"
@@ -79,9 +93,16 @@ nodes:
   - id: T_LABORATORIO
     node_type: entity
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
     confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "o PDF do dicionário de dados baixado em 2026-10-22 (sha256 44e8af589f6a0860...)"
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "item 12 e a linha NO_RAZAO_SOCIAL da tabela De/Para"
+      method: "reading: o PDF baixado e convertido em texto, os verbetes e a tabela De/Para"
+      locality: web
     label: "Laboratório: o nome da empresa detentora do registro sanitário."
     x_term:
       pref: "Laboratório"
@@ -108,9 +129,16 @@ nodes:
   - id: T_TA_PRECO_MEDICAMENTO
     node_type: entity
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
     confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "o PDF do dicionário de dados baixado em 2026-10-22 (sha256 44e8af589f6a0860...)"
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "o parágrafo antes da tabela De/Para e a tabela (TA_PRECO_MEDICAMENTO, conjunto atual)"
+      method: "reading: o PDF baixado e convertido em texto, os verbetes e a tabela De/Para"
+      locality: web
     label: "TA_PRECO_MEDICAMENTO: o conjunto atual de preços de medicamentos ao consumidor em geral."
     x_term:
       pref: "TA_PRECO_MEDICAMENTO"
@@ -118,9 +146,16 @@ nodes:
   - id: T_TA_PRECO_MEDICAMENTO_GOV
     node_type: entity
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
     confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "o PDF do dicionário de dados baixado em 2026-10-22 (sha256 44e8af589f6a0860...)"
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "o parágrafo antes da tabela De/Para e a tabela (TA_PRECO_MEDICAMENTO_GOV, conjunto atual)"
+      method: "reading: o PDF baixado e convertido em texto, os verbetes e a tabela De/Para"
+      locality: web
     label: "TA_PRECO_MEDICAMENTO_GOV: o conjunto atual de preços de medicamentos ao governo."
     x_term:
       pref: "TA_PRECO_MEDICAMENTO_GOV"

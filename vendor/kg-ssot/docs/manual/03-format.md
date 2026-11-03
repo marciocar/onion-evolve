@@ -205,9 +205,16 @@ narratives against the vocabulary (chapter 5).
   - id: T_EAN
     node_type: entity
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
     confidence: 0.9
+    verified_at: "2026-10-22"
+    verified_against: "the data dictionary PDF downloaded on 2026-10-22"
+    provenance:
+      source: "https://dados.anvisa.gov.br/dados/TA_PRECO_MEDICAMENTO%20-%20Dicionario%20de%20Dados.pdf"
+      locator: "items 9, 10 and 11"
+      method: "reading: the downloaded PDF, entry by entry"
+      locality: web
     label: "EAN code: the 13-digit code that identifies the country, the maker and the product."
     x_term:
       pref: "Código EAN"
@@ -230,6 +237,10 @@ narratives against the vocabulary (chapter 5).
 
 The whole example, from the open data dictionary of the Brazilian drug price regulator, is in
 [`spec/vocab-examples/cmed-dictionary.kg.yaml`](../../spec/vocab-examples/cmed-dictionary.kg.yaml).
+
+A term in force is `confirmed` with the `provenance` of the source it was adopted from, like any other fact. Leave it
+`open` only while the definition is still being negotiated: `kg_vocab.py` resolves an open term the same way, but the
+queue of open nodes (`kg_query --open`) would list a settled definition as pending work.
 
 ### `x_mirror`, `x_doc_cycle` and `x_questionnaire`
 

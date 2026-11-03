@@ -10,6 +10,15 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.40.2] - 2026-11-03
+
+Sem mudança no contrato (segue v4.18), e nenhum veredito muda.
+
+- O manual mostra como contar a fila de todos os donos numa consulta só: a saída JSON do `kg_query --open` traz o
+  `owner` só quando se pede, com `--fields owner`, que o devolve no `extra` de cada nó, com `--limit` até 1000 e o `next_cursor` acima disso.
+- Um termo em vigor é `confirmed`, com a `provenance` da fonte dele. O exemplo de termo do manual e os termos de
+  `spec/vocab-examples/cmed-dictionary.kg.yaml` estavam `open`, o que punha definições assentadas na fila de nós abertos.
+
 ## [4.40.1] - 2026-10-30
 
 Sem mudança no contrato (segue v4.18), e nenhum veredito muda.

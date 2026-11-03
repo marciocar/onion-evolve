@@ -936,6 +936,14 @@ kg-query --root . --open --where owner=kg-ssot --sort attention
 kg-query --root . --revisit --where owner=core
 ```
 
+The JSON output does not carry `owner` unless asked: `--fields owner` returns it in each node's `extra`, which is how
+you count every owner's queue from one query. A page holds 50 nodes by default and up to 1000 with `--limit`; past
+that, follow `next_cursor`. A node without `owner` is in nobody's queue; count it apart.
+
+```bash
+kg-query --root . --open --fields owner --format json --limit 1000
+```
+
 ## `kg_diff.py`: diff by id between revisions
 
 Compares two graphs, or every graph that changed between two git revisions, aligning nodes by id and edges by their

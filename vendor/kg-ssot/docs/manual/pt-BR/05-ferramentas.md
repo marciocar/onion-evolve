@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:b26ac1fb7acc1bee -->
+<!-- translation-of: docs/manual/05-tools.md sha256:7e2b44f4b1ba585e -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -926,6 +926,14 @@ casa.
 ```bash
 kg-query --root . --open --where owner=kg-ssot --sort attention
 kg-query --root . --revisit --where owner=core
+```
+
+A saída JSON não traz o `owner` sem pedir: o `--fields owner` o devolve no `extra` de cada nó, e é assim que se conta a
+fila de todos os donos numa consulta só. Uma página traz 50 nós por padrão e até 1000 com `--limit`; acima disso, siga
+o `next_cursor`. Nó sem `owner` não está na fila de ninguém; conte-o à parte.
+
+```bash
+kg-query --root . --open --fields owner --format json --limit 1000
 ```
 
 ## `kg_diff.py`: o diff por id entre revisões
