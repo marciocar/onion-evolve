@@ -15,7 +15,11 @@
 #                  = no_data e rc 2; gatilho sem produtor no core (a reversão) sai null com not_instrumented e rc 2.
 #                  No modo shadow a janela RECOMEÇA na última passagem de auto para shadow; modo pedido sem linhas
 #                  = no_data e rc 2; linha com logged_at no futuro conta em future_logged_at (não é evento; rc 2).
-#                  Lacuna tem gap_id e se fecha com shadow-append --resolves-gap <gap_id> (fechada não dá rc 2)
+#                  Lacuna tem gap_id, receptor, chave do evento, modo e regra; fecha-se com shadow-append
+#                  --resolves-gap <gap_id> por uma linha que case com tudo isso (senão rc 3), e fechada não dá rc 2.
+#                  O modo vigente vem das linhas mode_change (subcomando mode-change); --mode que nenhuma troca
+#                  explica = rc 2 (mode_mismatch). Gatilho inviável sai null com trigger_unavailable_reason
+#   mode-change    grava a troca de modo do aceite (de, para, quem, quando) no log de sombra
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
@@ -174,22 +178,49 @@ def default_gap_log():
     return x if x else os.path.join(state_home(), "onion", "a2a-metrics", "shadow-gap.log")
 
 
-def read_gaps(path):
+GAP_KEY_FIELDS = ("from", "ce_source", "ce_id", "jti", "taskId", "ids_verified")
+
+
+def _gap_key(g):
+    return event_key({k: g.get(k) for k in GAP_KEY_FIELDS})
+
+
+def _gap_rows(path):
+    return [o for _, o in read_log(path)] if os.path.lexists(path) else []
+
+
+def _gap_matches(g, line):
+    """A linha nova regrava a decisão que a lacuna perdeu? Mesma chave de evento (com o from), modo e regra."""
+    return (_gap_key(g) is not None and _gap_key(g) == event_key(line) and g.get("mode") == line["mode"]
+            and g.get("rule_id") == line["rule_id"] and g.get("rule_version") == line["rule_version"])
+
+
+def read_gaps(path, shadow_lines=(), receiver=None):
     """→ epochs das lacunas ABERTAS (None = linha ilegível: lacuna de hora desconhecida). Arquivo ausente = nenhuma.
 
-    N6: a lacuna tem gap_id; quando o operador regrava a decisão que faltou (shadow-append --resolves-gap <gap_id>),
-    uma linha {"resolves": <gap_id>, "resolved_by": <line_id>} a fecha, e lacuna fechada não dá rc 2."""
-    if not os.path.lexists(path):
-        return []
-    rows = [o for _, o in read_log(path)]
-    closed = {o.get("resolves") for o in rows if isinstance(o, dict) and isinstance(o.get("resolved_by"), str)
-              and UUID_RE.fullmatch(o["resolved_by"]) and isinstance(o.get("resolves"), str)}
+    A lacuna grava receptor, chave do evento, modo e regra. Ela só se fecha quando uma linha de resolução
+    {"resolves": <gap_id>, "resolved_by": <line_id>} aponta uma linha que EXISTE no log de sombra lido e casa com a
+    lacuna (_gap_matches): resolução forjada à mão, ou de outro evento, não fecha nada. Com `receiver`, a lacuna de
+    outro receptor fica fora."""
+    rows = _gap_rows(path)
+    by_id = {o["line_id"]: o for _, o in shadow_lines if isinstance(o, dict) and not validate_shadow(o)}
+    gaps = {o["gap_id"]: o for o in rows if isinstance(o, dict) and "resolves" not in o
+            and isinstance(o.get("gap_id"), str)}
+    closed = set()
+    for r in rows:
+        if not isinstance(r, dict) or "resolves" not in r:
+            continue
+        g, line = gaps.get(r.get("resolves")), by_id.get(r.get("resolved_by"))
+        if g is not None and line is not None and _gap_matches(g, line):
+            closed.add(g["gap_id"])
     out = []
     for o in rows:
         if isinstance(o, dict) and "resolves" in o:
             continue                                    # a linha de resolução não é lacuna
         if isinstance(o, dict) and o.get("gap_id") in closed:
             continue
+        if isinstance(o, dict) and receiver and o.get("receiver") and o["receiver"] != receiver:
+            continue                                    # lacuna de outro receptor
         t = o.get("logged_at") if isinstance(o, dict) else None
         out.append(stamp_epoch(t) if isinstance(t, str) and TS_RE.fullmatch(t) else None)
     return out
@@ -377,6 +408,29 @@ def validate_shadow(o):
     return ""
 
 
+MODE_CHANGE_KEYS = ("line_id", "logged_at", "kind", "from_mode", "to_mode", "actor")
+
+
+def validate_mode_change(o):
+    if not isinstance(o, dict) or tuple(sorted(o)) != tuple(sorted(MODE_CHANGE_KEYS)) or o["kind"] != "mode_change":
+        return "não é linha mode_change"
+    if not isinstance(o["line_id"], str) or not UUID_RE.fullmatch(o["line_id"]):
+        return "line_id fora da forma UUID"
+    if not isinstance(o["logged_at"], str) or not TS_RE.fullmatch(o["logged_at"]):
+        return "logged_at fora de RFC 3339 UTC com Z"
+    if o["from_mode"] not in MODES or o["to_mode"] not in MODES or o["from_mode"] == o["to_mode"]:
+        return "from_mode/to_mode fora de shadow|auto, ou iguais"
+    if clean_str(o["actor"], 64) is None:
+        return "actor não é string imprimível"
+    return ""
+
+
+def mode_in_force(changes, now):
+    """O modo vigente pelas linhas mode_change (a sombra começa em shadow): → (modo, epoch da última troca)."""
+    past = sorted((stamp_epoch(c["logged_at"]), c["to_mode"]) for c in changes if stamp_epoch(c["logged_at"]) <= now)
+    return (past[-1][1], past[-1][0]) if past else ("shadow", None)
+
+
 def event_key(o):
     """Evento = par ce_source + ce_id (CloudEvents: source + id é único), ou o jti quando o corpo não tem CloudEvent.
 
@@ -419,9 +473,14 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     tirado da última linha (cura A1); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None);
     `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
     malformed = future = ahead = 0
-    valid = []
+    valid, changes = [], []
     for _, o in lines:
-        if o is None or validate_shadow(o):
+        if isinstance(o, dict) and o.get("kind") == "mode_change":
+            if validate_mode_change(o):
+                malformed += 1
+            else:
+                changes.append(o)                       # a troca de modo é ato registrado, não decisão
+        elif o is None or validate_shadow(o):
             malformed += 1
         elif stamp_epoch(o["logged_at"]) > now:
             future += 1                                # N7: linha do futuro (relógio torto) não é evento
@@ -432,9 +491,16 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
            "agree": 0, "agreement": None, "mode": mode, "decisions_7d": 0, "reversals_7d": 0,
            "reversal_rate_7d": None, "malformed": malformed, "trigger_rule_on": None, "trigger_back_to_shadow": None,
            "confusion": {r: {h: 0 for h in DECISIONS} for r in DECISIONS}, "kappa": None,
-           "rule_on_criterion_met": None, "trigger_rule_on_reason": None, "back_to_shadow_criterion_met": None,
+           "rule_on_criterion_met": None, "trigger_unavailable_reason": None, "back_to_shadow_criterion_met": None,
+           "mode_in_force": None, "mode_mismatch": None,
            "not_instrumented": None, "holds": 0, "no_data": False, "gaps_in_window": 0, "future_logged_at": future,
            "future_max_ahead_s": ahead if future else None}
+    # o modo vigente vem das linhas mode_change; pedido que nenhuma troca explica = não medido (rc 2)
+    in_force, last_change = mode_in_force(changes, now)
+    out["mode_in_force"] = in_force
+    if mode != in_force:
+        out["mode_mismatch"] = (f"--mode {mode}, mas o log diz {in_force} (nenhuma linha mode_change explica o modo "
+                                "pedido): grave a troca com mode-change")
     cur = []
     if valid:
         version, rule_id = valid[-1]["rule_version"], valid[-1]["rule_id"]
@@ -458,16 +524,18 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
         out["undecided"] = und
     scur = [o for o in cur if o["mode"] == mode]          # A1: cada gatilho sobre as linhas do SEU modo
     if mode == "shadow":
-        autos = [stamp_epoch(o["logged_at"]) for o in cur if o["mode"] == "auto"]
-        if autos:
-            # N1 (julgamento da dona): voltar à sombra é a regra ter errado; a janela RECOMEÇA na última passagem de
-            # auto para shadow, e a concordância antiga não religa a regra
-            scur = [o for o in scur if stamp_epoch(o["logged_at"]) > max(autos)]
+        # N1 (julgamento da dona): voltar à sombra é a regra ter errado; a janela RECOMEÇA na última volta para shadow
+        # (a linha mode_change) — ou na última linha auto, se for mais recente — e a concordância antiga não religa
+        marks = [stamp_epoch(o["logged_at"]) for o in cur if o["mode"] == "auto"]
+        marks += [stamp_epoch(c["logged_at"]) for c in changes if c["to_mode"] == "shadow"
+                  and stamp_epoch(c["logged_at"]) <= now]
+        if marks:
+            scur = [o for o in scur if stamp_epoch(o["logged_at"]) > max(marks)]
     if not scur:
         # log vazio, só malformadas, ou nenhuma linha do modo pedido: SEM DADO, nunca contagem zero (A2, N4)
         out["no_data"] = True
         out["gaps_in_window"] = len(gaps)
-        return out, 2
+        return out, 2                                   # (e mode_mismatch, se houver, segue dito na saída)
     first = min(stamp_epoch(o["logged_at"]) for o in scur)
     out["since"] = utc_day(first).isoformat()
     # M1: DIAS COMPLETOS APÓS O 1º = períodos inteiros de 24 h desde a 1ª linha (23:59 → 00:01 de 14 dias depois = 13)
@@ -523,9 +591,9 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
                    and out["agreement"] is not None and out["agreement"] >= RULE_ON_AGREEMENT)
         out["rule_on_criterion_met"] = met
         if out["rule_id"] in BASELINE_RULE_IDS:
-            out["trigger_rule_on"] = False
-            out["trigger_rule_on_reason"] = (f"a regra {out['rule_id']} é a linha de base (aceita tudo): ela nunca liga "
-                                             "a regra automática, por maior que seja a concordância")
+            # gatilho inviável sai null, com o motivo na chave comum aos dois contadores
+            out["trigger_unavailable_reason"] = (f"a regra {out['rule_id']} é a linha de base (aceita tudo): ela nunca "
+                                                 "liga a regra automática, por maior que seja a concordância")
         else:
             out["trigger_rule_on"] = met
     else:
@@ -534,6 +602,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
         # A2: nenhuma peça do core grava a reversão humana (a linha com supersedes): gatilho sem produtor sai null
         if SHADOW_NOT_INSTRUMENTED:
             out["not_instrumented"] = list(SHADOW_NOT_INSTRUMENTED)
+            out["trigger_unavailable_reason"] = "sem produtor no core: " + ", ".join(SHADOW_NOT_INSTRUMENTED)
             not_instr = True
         else:
             out["trigger_back_to_shadow"] = out["back_to_shadow_criterion_met"]
@@ -541,7 +610,8 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     w_start = min(first, w0)
     out["gaps_in_window"] = sum(1 for g in gaps if g is None or w_start <= g <= now)
     fired = out["trigger_rule_on"] is True or out["trigger_back_to_shadow"] is True
-    return out, (2 if malformed or future or out["gaps_in_window"] or not_instr else (1 if fired else 0))
+    return out, (2 if malformed or future or out["gaps_in_window"] or not_instr or out["mode_mismatch"]
+                 else (1 if fired else 0))
 
 
 # ─────────────────────────────── registro de rascunhos ───────────────────────────────
@@ -635,6 +705,10 @@ def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None, gaps=())
             tail >= AUTO_SEND_SAMPLE or (out["unedited_rate"] is not None and out["unedited_rate"] >= AUTO_SEND_RATE)))
         # sem as três salvaguardas no core o envio automático não liga, por melhor que seja a amostra
         out["trigger_auto_send"] = None if out["preconditions_missing"] else out["auto_send_criterion_met"]
+        if out["preconditions_missing"]:
+            out["trigger_unavailable_reason"] = ("faltam no core: " + ", ".join(out["preconditions_missing"]) +
+                                                 " (o envio automático não liga sem elas)")
+    out.setdefault("trigger_unavailable_reason", None)
     out["back_to_draft_criterion_met"] = None
     out["not_instrumented"] = None
     out["no_data"] = not valid                          # log vazio é SEM DADO, nunca amostra zero (cura A2)
@@ -650,6 +724,8 @@ def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None, gaps=())
         # nenhuma peça do core grava esses atos ainda: o gatilho pedido sai null, e a medida não é verde (rc 2)
         if DRAFT_NOT_INSTRUMENTED:
             out["not_instrumented"] = list(DRAFT_NOT_INSTRUMENTED)
+            out["trigger_unavailable_reason"] = "; ".join(x for x in (out["trigger_unavailable_reason"],
+                                                       "sem produtor no core: " + ", ".join(DRAFT_NOT_INSTRUMENTED)) if x)
             not_instr = True
         else:
             out["trigger_back_to_draft"] = out["back_to_draft_criterion_met"]
@@ -740,9 +816,15 @@ def main(argv):
         if o.get("--resolves-gap") and not UUID_RE.fullmatch(o["--resolves-gap"]):
             raise UsageError("--resolves-gap exige o gap_id (UUID) da lacuna")
 
-        def _gap(why, jti, task):
+        def _gap(why, jti, task, line=None):
+            # a lacuna grava receptor, chave do evento, modo e regra: só a linha que casar com tudo isso a fecha
+            src = line or {"from": clean_str(o.get("--from")), "ce_source": clean_str(o.get("--ce-source")),
+                           "ce_id": clean_str(o.get("--ce-id")), "jti": jti, "taskId": task,
+                           "ids_verified": not o.get("--ids-unverified"), "mode": o.get("--mode", "shadow"),
+                           "rule_id": RULE_ID, "rule_version": RULE_VERSION}
             gap = {"logged_at": utc_stamp(), "gap_id": new_line_id(), "point": o.get("--point", "accept"),
-                   "jti": jti, "taskId": task, "why": str(why)[:300]}
+                   "receiver": clean_str(o.get("--receiver")), "why": str(why)[:300],
+                   **{k: src.get(k) for k in GAP_KEY_FIELDS + ("mode", "rule_id", "rule_version")}}
             print(f"[a2a-metrics] LACUNA: a linha de sombra NÃO foi gravada ({why})", file=sys.stderr)
             try:
                 append_line(gap_log, gap)
@@ -773,14 +855,43 @@ def main(argv):
             if have:
                 print(f"ok: {log} (a linha deste evento já existe)")
                 return 0
+        if o.get("--resolves-gap"):
+            # a resolução se confere ANTES de gravar: a lacuna existe, está aberta, é deste receptor e casa com a linha
+            rows = _gap_rows(gap_log)
+            g = next((x for x in rows if isinstance(x, dict) and "resolves" not in x
+                      and x.get("gap_id") == o["--resolves-gap"]), None)
+            if g is None:
+                raise UsageError(f"--resolves-gap: não há a lacuna {o['--resolves-gap']} em {gap_log}")
+            if any(isinstance(x, dict) and x.get("resolves") == g["gap_id"] for x in rows):
+                raise UsageError(f"--resolves-gap: a lacuna {g['gap_id']} já está fechada")
+            if g.get("receiver") and g["receiver"] != clean_str(o.get("--receiver")):
+                raise UsageError(f"--resolves-gap: a lacuna é do receptor {g['receiver']}, não deste")
+            if not _gap_matches(g, line):
+                raise UsageError("--resolves-gap: a linha nova não casa com a lacuna (evento, remetente, modo ou regra)")
         try:
             append_line(log, line)
         except MeasureError as e:
-            return _gap(e, line["jti"], line["taskId"])
+            return _gap(e, line["jti"], line["taskId"], line)
         if o.get("--resolves-gap"):
             append_line(gap_log, {"logged_at": utc_stamp(), "resolves": o["--resolves-gap"],
-                                  "resolved_by": line["line_id"]})
+                                  "resolved_by": line["line_id"], "receiver": clean_str(o.get("--receiver"))})
         print(f"ok: {log} line_id={line['line_id']}")
+        return 0
+    if cmd == "mode-change":
+        # quem MUDA o modo grava a troca (de, para, quem, quando): o shadow-stats lê o modo vigente daqui
+        o = _opts(rest, {"--log": True, "--receiver": True, "--to": True})
+        if o.get("--to") not in MODES:
+            raise UsageError("mode-change exige --to shadow|auto")
+        log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
+        cur_lines = read_log(log) if os.path.lexists(log) else []
+        now_mode, _ = mode_in_force([x for _, x in cur_lines if isinstance(x, dict) and x.get("kind") == "mode_change"
+                                     and not validate_mode_change(x)], int(time.time()))
+        if now_mode == o["--to"]:
+            raise UsageError(f"o modo já é {now_mode}: não há troca a gravar")
+        line = {"line_id": new_line_id(), "logged_at": utc_stamp(), "kind": "mode_change", "from_mode": now_mode,
+                "to_mode": o["--to"], "actor": _actor()}
+        append_line(log, line)
+        print(f"ok: {log} mode_change {now_mode} → {o['--to']} line_id={line['line_id']}")
         return 0
     if cmd == "shadow-stats":
         o = _opts(rest, {"--log": True, "--receiver": True, "--queue-jsonl": True, "--now": True, "--json": False,
@@ -794,8 +905,9 @@ def main(argv):
                 rows = [json.loads(x) for x in open(o["--queue-jsonl"], encoding="utf-8") if x.strip()]
             except (OSError, ValueError) as e:
                 raise MeasureError(f"--queue-jsonl ilegível: {e}")
-        out, rc = shadow_stats(read_log(log), _now(o), o["--mode"], rows,
-                               read_gaps(o.get("--gap-log") or default_gap_log()))
+        lines = read_log(log)
+        out, rc = shadow_stats(lines, _now(o), o["--mode"], rows,
+                               read_gaps(o.get("--gap-log") or default_gap_log(), lines, clean_str(o.get("--receiver"))))
         if o.get("--json"):
             print(json.dumps(out, ensure_ascii=False))
         else:

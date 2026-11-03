@@ -268,7 +268,14 @@ def draft_message(args):
     try:
         gap_msg = metrics.append_draft_with_gap(log, line)
     except Exception as e:
-        gap_msg = f"LACUNA NÃO REGISTRADA: nem a linha drafted nem o marcador draft-gap.log foram gravados ({e})"
+        # falha DUPLA (a linha drafted E o marcador de lacuna): o rascunho é recusado (julgamento da curadoria), porque
+        # um rascunho fora do registro e fora da lacuna seria um buraco que ninguém vê
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+        raise ToolError(f"nem a linha drafted nem o marcador draft-gap.log foram gravados ({e}): o rascunho foi "
+                        "RECUSADO, nada foi gravado")
     if old_path:
         os.makedirs(os.path.join(DRAFTS, "superseded"), mode=0o700, exist_ok=True)
         os.replace(old_path, os.path.join(DRAFTS, "superseded", f"{sup}.json"))
