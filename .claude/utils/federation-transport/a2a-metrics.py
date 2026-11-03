@@ -631,7 +631,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     out["agreement"] = round(agree / n_events, 4) if n_events else None
     out["kappa"] = _kappa(conf, n_events + holds)
     w0 = now - WINDOW_7D
-    dec7, rev7 = set(), 0
+    dec7, rev7 = set(), set()                          # C2: reversões contam EVENTOS revertidos, não linhas
     for o in scur:
         t = stamp_epoch(o["logged_at"])
         if t < w0 or t > now:
@@ -639,13 +639,13 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
         tgt = by_id.get(o["supersedes"]) if o["supersedes"] else None
         if tgt is not None and event_key(tgt) == event_key(o):   # B3: reversão só no MESMO evento
             if o["human_decision"] is not None and effective(tgt) is not None and o["human_decision"] != effective(tgt):
-                rev7 += 1
+                rev7.add(event_key(o))
             continue                                    # linha de reversão/correção não conta como decisão
         d = o["human_decision"] if mode == "shadow" else o["rule_decision"]
         if d is not None:
             dec7.add(event_key(o))
-    out["decisions_7d"], out["reversals_7d"] = len(dec7), rev7
-    out["reversal_rate_7d"] = round(rev7 / len(dec7), 4) if dec7 else None
+    out["decisions_7d"], out["reversals_7d"] = len(dec7), len(rev7)
+    out["reversal_rate_7d"] = round(len(rev7) / len(dec7), 4) if dec7 else None
     not_instr = False
     if mode == "shadow":
         met = bool(out["days_covered"] >= RULE_ON_DAYS and n_events >= RULE_ON_EVENTS
@@ -659,7 +659,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
             out["trigger_rule_on"] = met
     else:
         rate = out["reversal_rate_7d"]
-        out["back_to_shadow_criterion_met"] = bool(rate > BACK_TO_SHADOW_RATE) if rate is not None else rev7 > 0
+        out["back_to_shadow_criterion_met"] = bool(rate > BACK_TO_SHADOW_RATE) if rate is not None else len(rev7) > 0
         # A2: nenhuma peça do core grava a reversão humana (a linha com supersedes): gatilho sem produtor sai null
         if SHADOW_NOT_INSTRUMENTED:
             out["not_instrumented"] = list(SHADOW_NOT_INSTRUMENTED)
@@ -886,6 +886,9 @@ def main(argv):
         want = o.get("--mode", "shadow")
         if want not in MODES + ("current",):
             raise UsageError("--mode exige shadow, auto ou current (o modo vigente no instante da linha)")
+        if o.get("--producer") and want != "current":
+            # C3: o produtor oficial não declara modo; quem declara passa sempre pela checagem da linha da regra
+            raise UsageError("--producer só vale com --mode current")
         gap_log = o.get("--gap-log") or default_gap_log()
         if o.get("--resolves-gap") and not UUID_RE.fullmatch(o["--resolves-gap"]):
             raise UsageError("--resolves-gap exige o gap_id (UUID) da lacuna")
