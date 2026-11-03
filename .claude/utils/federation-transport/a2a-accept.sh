@@ -270,6 +270,23 @@ case "${CTRL_N}" in ''|*[!0-9]*) refuse "falha ao sanear o corpo." ;; esac
 CE_JSON="$(python3 -I "${METRICS}" ce --body-file "${TMP}/body.raw")" || refuse "falha ao ler o CloudEvent do corpo."
 ce_get() { printf '%s' "${CE_JSON}" | jq -r --arg k "$1" '.[$k] // ""'; }
 CE_SOURCE="$(ce_get ce_source)"; CE_ID="$(ce_get ce_id)"; CE_TIME="$(ce_get ce_time)"
+# shadow_record [--if-absent]: a linha de sombra deste aceite (decisão humana accept; a regra v1, linha de base, aceita
+# todo registro reverificado). Falha da linha NÃO desfaz o aceite: o a2a-metrics registra a LACUNA (rc 4). Sem nem a
+# lacuna, devolve 1. O log só não pode morar dentro do repo em uso (A2A_METRICS_REPO_ROOT = a raiz deste checkout)
+shadow_record() {
+  local SH_RC=0 SH_OUT
+  SH_OUT="$(A2A_METRICS_REPO_ROOT="${ROOT}" python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" "$@" --point accept \
+        --mode shadow --rule-decision accept --human-decision accept --jti "${JTI}" --task-id "${TASKID}" \
+        --ce-source "${CE_SOURCE}" --ce-id "${CE_ID}" --ce-time "${CE_TIME}" 2>&1)" || SH_RC=$?
+  case "${SH_RC}" in
+  0) ;;
+  4) printf '%s\n' "${SH_OUT}" >&2
+     echo "AVISO ALTO: o aceite valeu, mas a linha de sombra NÃO foi gravada — LACUNA registrada; o shadow-stats não mede esta janela até o log ser corrigido." >&2 ;;
+  *) printf '%s\n' "${SH_OUT}" >&2
+     echo "ERRO: o aceite valeu, mas nem a linha de sombra nem o marcador de lacuna foram gravados — buraco NÃO registrado na medida; corrija o log." >&2
+     return 1 ;;
+  esac
+}
 # cerca de código maior que a maior sequência de crases do corpo (mínimo 3)
 TICKS="$(python3 -I -c 'import re,sys; s=open(sys.argv[1],encoding="utf-8").read(); m=max([len(x) for x in re.findall(r"`+", s)] or [0]); print("`"*max(3, m+1))' "${TMP}/body.txt")"
 
@@ -293,6 +310,9 @@ EXIST="$(find "${INBOX}" -maxdepth 2 -type f -name "*-a2a-*-${JTI_SHA:0:16}.md" 
 LEDGER_TASK="$(awk -v j="${JTI_SHA}" '$1 == j { print $2; exit }' "${LEDGER}" 2>/dev/null || true)"
 if [ -n "${EXIST}" ] || [ -n "${LEDGER_TASK}" ]; then
   if { [ -z "${EXIST}" ] || [ "$(fm_taskid "${EXIST}")" = "${TASKID}" ]; } && { [ -z "${LEDGER_TASK}" ] || [ "${LEDGER_TASK}" = "${TASKID}" ]; }; then
+    # cura B1: o aceite anterior pode ter nascido sem a linha de sombra (antes do log existir, ou com lacuna): ela
+    # é gravada agora, se faltar; a que já existe não se repete
+    shadow_record --if-absent || exit 1
     echo "já aceito (não sobrescreve): ${EXIST:-razão ${LEDGER}}" >&2; exit 0
   fi
   refuse "o jti deste envelope já foi aceito por OUTRO registro (${EXIST:-razão de aceites}) — replay ou registro forjado reaproveitando o jti; nada sobrescrito."
@@ -366,20 +386,6 @@ DOC_SHA="$(openssl dgst -sha256 < "${TMP}/doc.md" | awk '{print $NF}')"
 ( umask 077; printf '%s %s %s %s\n' "${JTI_SHA}" "${TASKID}" "$(basename "${OUT}")" "${DOC_SHA}" >> "${LEDGER}" ) 2>/dev/null \
   || echo "AVISO: o doc foi criado, mas o razão de aceites (${LEDGER}) não foi gravado: o dedupe fica só pelo nome." >&2
 
-# a linha de sombra: decisão humana = accept; a regra v1 (linha de base) aceita todo registro reverificado.
-# Falha da linha NÃO desfaz o aceite: o a2a-metrics registra a lacuna (rc 4); sem nem a lacuna, rc 1
-SH_RC=0
-SH_OUT="$(python3 -I "${METRICS}" shadow-append "${SHADOW_ARGS[@]}" --point accept --mode shadow --rule-decision accept \
-      --human-decision accept --jti "${JTI}" --task-id "${TASKID}" --ce-source "${CE_SOURCE}" --ce-id "${CE_ID}" \
-      --ce-time "${CE_TIME}" 2>&1)" || SH_RC=$?
-case "${SH_RC}" in
-  0) ;;
-  4) printf '%s\n' "${SH_OUT}" >&2
-     echo "AVISO ALTO: o aceite valeu, mas a linha de sombra NÃO foi gravada — LACUNA registrada; o shadow-stats não mede esta janela até o log ser corrigido." >&2 ;;
-  *) printf '%s\n' "${SH_OUT}" >&2
-     echo "ERRO: o aceite valeu, mas nem a linha de sombra nem o marcador de lacuna foram gravados — buraco NÃO registrado na medida; corrija o log." >&2
-     echo "aceito → ${OUT}"
-     exit 1 ;;
-esac
+shadow_record || { echo "aceito → ${OUT}"; exit 1; }
 echo "aceito → ${OUT}"
 echo "  (próximo: /meta:co-evolve p/ triar, lendo o DOC — nunca o JSON da fila; e limpar o registro da fila do bridge — ato humano)" >&2

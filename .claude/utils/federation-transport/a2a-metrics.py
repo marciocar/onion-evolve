@@ -9,12 +9,15 @@
 #   ce             o parse do CloudEvent dentro do corpo do sinal (só id, source, type e time; nunca o corpo)
 #   shadow-append  uma linha do log de sombra do aceite (nasce no a2a-accept.sh e no archive --force-unaccepted)
 #   shadow-stats   a concordância regra × humano e a taxa de reversão          (o "a2a-shadow-stats" do PLAN-E)
-#                  days_covered = DIAS COMPLETOS APÓS O 1º: a diferença em dias UTC entre a 1ª linha da regra vigente
-#                  e hoje (a linha de hoje dá 0). Lacuna registrada (shadow-gap.log) na janela = rc 2
+#                  --mode shadow|auto é OBRIGATÓRIO (o modo em vigor; cada gatilho conta só as linhas do seu modo).
+#                  days_covered = DIAS COMPLETOS APÓS O 1º: períodos inteiros de 24 h desde a 1ª linha da regra
+#                  vigente, floor((agora - 1ª)/86400). Lacuna registrada (shadow-gap.log) na janela = rc 2; log vazio
+#                  = no_data e rc 2; gatilho sem produtor no core (a reversão) sai null com not_instrumented e rc 2
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
-#                  (preconditions_missing); o critério do PLAN-D sai em auto_send_criterion_met
+#                  (preconditions_missing); o critério do PLAN-D sai em auto_send_criterion_met. Com --since-stage-on,
+#                  trigger_back_to_draft sai null com not_instrumented (nenhuma peça grava lista/chave ainda) e rc 2
 #
 # LACUNA (julgamento da curadoria, ponto f): a linha de sombra que não se grava NÃO barra o aceite nem o archive. O
 # shadow-append grava então um marcador em shadow-gap.log (data, ponto, jti, taskId; as mesmas regras de 0600 fora
@@ -25,8 +28,10 @@
 # REGRAS COMUNS (PLAN-E §0): JSON Lines (UTF-8, uma linha por valor, '\n'); hora RFC 3339 sempre em UTC com Z; o
 # "dia" é a data UTC; cada linha tem line_id (UUID v4) e a correção é uma linha NOVA com `supersedes`; nunca se
 # reescreve uma linha. O corpo do sinal NUNCA vai ao log: só ids, hashes e decisões. O arquivo nasce 0600 num
-# diretório 0700, fora de qualquer árvore git (recusa se um ancestral tem .git), e o escritor recusa symlink,
-# arquivo de outro dono e arquivo legível por grupo/outros.
+# diretório 0700, fora do repo em uso (o toplevel do core ou do adotante que roda), e o escritor recusa symlink,
+# arquivo de outro dono e arquivo legível por grupo/outros. A guarda de lugar é só o REPO EM USO (core ou adotante):
+# RISCO RESIDUAL declarado — HOME versionado por dotfiles (~/.git) pode levar o log a um commit pessoal; a guarda só
+# impede que o log fique dentro do repo em uso.
 #
 # EXIT dos contadores (PLAN-E §0): 0 mediu e nenhum gatilho disparou · 1 mediu e algum gatilho disparou ·
 #   2 não pôde medir (arquivo ausente ou ilegível, linha malformada) · 3 uso inválido.
@@ -66,6 +71,10 @@ BASELINE_RULE_IDS = ("baseline-accept-all",)
 # julgamento da curadoria (ponto e): o envio automático exige lista fechada, chave de corte e teto de taxa NO CORE.
 # Enquanto faltarem, trigger_auto_send sai null (nunca true). Quem construir uma das três a tira daqui
 AUTO_SEND_PRECONDITIONS_MISSING = ("closed_list", "kill_switch", "rate_cap")
+# cura A2 da revisão: gatilho cujo fato NENHUMA peça do core produz sai null, com not_instrumented, e rc 2 quando pedido.
+# Quem construir o produtor tira o fato daqui (e o caso da bancada que o afirma passa a valer)
+SHADOW_NOT_INSTRUMENTED = ("reversal",)              # a linha humana com supersedes que contraria a regra (modo auto)
+DRAFT_NOT_INSTRUMENTED = ("blocked_out_of_list", "sent_out_of_list", "kill_switch_on", "kill_switch_off")
 
 UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\Z")
 TS_RE = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z\Z")
@@ -174,8 +183,13 @@ def default_draft_log():
     return os.path.join(st, "drafts.jsonl")
 
 
-def _inside_git_tree(directory):
-    p = os.path.realpath(directory)
+def _repo_in_use():
+    """O toplevel do repo EM USO (o core ou o adotante): A2A_METRICS_REPO_ROOT, que o aceite e o wrapper passam, ou o
+    repo que contém este arquivo. Só ele é proibido ao log (cura B5 da revisão da curadoria)."""
+    r = os.environ.get("A2A_METRICS_REPO_ROOT", "")
+    if r:
+        return os.path.realpath(r)
+    p = os.path.dirname(os.path.realpath(__file__))
     while True:
         if os.path.lexists(os.path.join(p, ".git")):
             return p
@@ -185,18 +199,33 @@ def _inside_git_tree(directory):
         p = up
 
 
+def _inside_repo_in_use(directory):
+    """→ o repo em uso, se `directory` (ou o ancestral existente mais próximo, antes de criar nada) mora dentro dele.
+
+    RISCO RESIDUAL DECLARADO: um HOME versionado por dotfiles (~/.git) não é barrado; nele o log pode acabar num
+    commit pessoal. A guarda só impede que o log fique dentro do repo em uso."""
+    root = _repo_in_use()
+    if not root:
+        return ""
+    p = os.path.abspath(directory)
+    while not os.path.exists(p) and os.path.dirname(p) != p:
+        p = os.path.dirname(p)
+    p = os.path.realpath(p)
+    return root if p == root or p.startswith(root + os.sep) else ""
+
+
 def _open_log_for_append(path):
     """Abre o log para acréscimo com as regras do §0. Levanta MeasureError com o motivo; devolve o fd."""
     path = os.path.abspath(path)
     d = os.path.dirname(path)
+    g = _inside_repo_in_use(d)                     # ANTES de criar diretório: nada nasce dentro do repo em uso
+    if g:
+        raise MeasureError(f"o log {path} cairia dentro do repo em uso {g}: o log mora fora dele")
     if not os.path.isdir(d):
         try:
             os.makedirs(d, mode=0o700, exist_ok=True)
         except OSError as e:
             raise MeasureError(f"não criei o diretório do log {d}: {e.strerror}")
-    g = _inside_git_tree(d)
-    if g:
-        raise MeasureError(f"o log {path} cairia dentro da árvore git {g}: o log mora fora de qualquer árvore git")
     try:
         fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT | os.O_NOFOLLOW, 0o600)
     except OSError as e:
@@ -333,8 +362,20 @@ def _kappa(conf, total):
     return round((po - pe) / (1 - pe), 4)
 
 
-def shadow_stats(lines, now, queue_rows=None, gaps=()):
-    """→ (saída, rc). `lines` = read_log(); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None);
+def _received_epoch(at):
+    """receivedAt em RFC 3339 (Z ou offset) → epoch; ausente ou ilegível → None (cura B2: não some do undecided)."""
+    if not isinstance(at, str) or not RFC3339_RE.fullmatch(at):
+        return None
+    try:
+        x = re.sub(r"(\.\d{6})\d+", r"\1", at).replace("Z", "+00:00")
+        return int(dt.datetime.fromisoformat(x).timestamp())
+    except ValueError:
+        return None
+
+
+def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
+    """→ (saída, rc). `lines` = read_log(); `mode` = o modo em vigor (shadow|auto), dado por quem pergunta e NUNCA
+    tirado da última linha (cura A1); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None);
     `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
     malformed = 0
     valid = []
@@ -343,96 +384,112 @@ def shadow_stats(lines, now, queue_rows=None, gaps=()):
             malformed += 1
         else:
             valid.append(o)
-    out = {"rule_id": None, "rule_version": None, "since": None, "days_covered": 0, "events": 0, "undecided": None, "agree": 0,
-           "agreement": None, "mode": None, "decisions_7d": 0, "reversals_7d": 0, "reversal_rate_7d": None,
-           "malformed": malformed, "trigger_rule_on": None, "trigger_back_to_shadow": None,
+    out = {"rule_id": None, "rule_version": None, "since": None, "days_covered": 0, "events": 0, "undecided": None,
+           "agree": 0, "agreement": None, "mode": mode, "decisions_7d": 0, "reversals_7d": 0,
+           "reversal_rate_7d": None, "malformed": malformed, "trigger_rule_on": None, "trigger_back_to_shadow": None,
            "confusion": {r: {h: 0 for h in DECISIONS} for r in DECISIONS}, "kappa": None,
-           "rule_on_criterion_met": None, "trigger_rule_on_reason": None, "gaps_in_window": 0}
-    all_keys = {event_key(o) for o in valid} | {("task", o["taskId"]) for o in valid if o.get("taskId")}
+           "rule_on_criterion_met": None, "trigger_rule_on_reason": None, "back_to_shadow_criterion_met": None,
+           "not_instrumented": None, "holds": 0, "no_data": False, "gaps_in_window": 0}
+    cur = []
+    if valid:
+        version, rule_id = valid[-1]["rule_version"], valid[-1]["rule_id"]
+        cur = [o for o in valid if o["rule_version"] == version and o["rule_id"] == rule_id]
+        out["rule_version"], out["rule_id"] = version, rule_id
+    # B2: só casa decisão da MESMA regra vigente; o taskId (do bridge) casa também
+    cur_keys = {event_key(o) for o in cur} | {("task", o["taskId"]) for o in cur if o.get("taskId")}
     if queue_rows is not None:
         und = 0
         for r in queue_rows:
-            at = r.get("receivedAt") if isinstance(r, dict) else None
-            if not isinstance(at, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,9})?Z", at):
-                continue
-            if now - stamp_epoch(at[:19] + "Z") <= HOLD_SECONDS:
-                continue
-            k = event_key({"ce_source": r.get("ce_source"), "ce_id": r.get("ce_id"), "jti": r.get("jti")})
-            if (k is None or k not in all_keys) and ("task", r.get("taskId")) not in all_keys:
+            if not isinstance(r, dict):
                 und += 1
+                continue
+            t = _received_epoch(r.get("receivedAt"))
+            if t is not None and now - t <= HOLD_SECONDS:
+                continue                               # ainda dentro dos 3 dias: não é hold
+            k = event_key({"ce_source": r.get("ce_source"), "ce_id": r.get("ce_id"), "jti": r.get("jti")})
+            if (k is None or k not in cur_keys) and ("task", r.get("taskId")) not in cur_keys:
+                und += 1                               # sem receivedAt legível também conta: ausência não é "recente"
         out["undecided"] = und
-    if not valid:
+    if not cur:
+        # log vazio (ou só linhas malformadas) é SEM DADO, nunca contagem zero (cura A2)
+        out["no_data"] = True
         out["gaps_in_window"] = len(gaps)
-        return out, (2 if malformed or gaps else 0)
-    version = valid[-1]["rule_version"]
-    rule_id = valid[-1]["rule_id"]
-    cur = [o for o in valid if o["rule_version"] == version and o["rule_id"] == rule_id]
-    out["rule_version"] = version
-    out["rule_id"] = rule_id
-    out["mode"] = cur[-1]["mode"]
+        return out, 2
     first = min(stamp_epoch(o["logged_at"]) for o in cur)
     out["since"] = utc_day(first).isoformat()
-    out["days_covered"] = (utc_day(now) - utc_day(first)).days
-    by_id = {o["line_id"]: o for o in cur}
-    superseded = {o["supersedes"] for o in cur if o["supersedes"]}
+    # M1: DIAS COMPLETOS APÓS O 1º = períodos inteiros de 24 h desde a 1ª linha (23:59 → 00:01 de 14 dias depois = 13)
+    out["days_covered"] = max(0, (now - first) // 86400)
+    scur = [o for o in cur if o["mode"] == mode]          # A1: cada gatilho sobre as linhas do SEU modo
+    by_id = {o["line_id"]: o for o in scur}
+    superseded = {o["supersedes"] for o in scur if o["supersedes"]}
     events = {}
-    for i, o in enumerate(cur):
+    for i, o in enumerate(scur):
         events.setdefault(event_key(o), []).append((i, o))
 
     def effective(o):
         return o["human_decision"] if o["human_decision"] is not None else o["rule_decision"]
 
     conf = out["confusion"]
-    n_events = agree = 0
+    n_events = agree = holds = 0
     for k, ls in events.items():
         roots = [o for _, o in ls if not o["supersedes"] or o["supersedes"] not in by_id]
         rule = next((o["rule_decision"] for o in roots if o["rule_decision"] is not None), None)
         heads = [(stamp_epoch(o["logged_at"]), i, o) for i, o in ls if o["line_id"] not in superseded]
-        final = max(heads)[2] if heads else ls[-1][1]
+        final = max(heads)[2] if heads else ls[-1][1]       # a decisão humana FINAL da cadeia de supersedes
         human = final["human_decision"]
         if human is None or rule is None:
             continue                                    # sem decisão humana (ou sem a da regra): fora do denominador
-        n_events += 1
         conf[rule][human] += 1
+        if "hold" in (rule, human):
+            holds += 1                                  # B2: hold não é discordância; fica fora do denominador
+            continue
+        n_events += 1
         if rule == human:
             agree += 1
-    out["events"], out["agree"] = n_events, agree
+    out["events"], out["agree"], out["holds"] = n_events, agree, holds
     out["agreement"] = round(agree / n_events, 4) if n_events else None
-    out["kappa"] = _kappa(conf, n_events)
+    out["kappa"] = _kappa(conf, n_events + holds)
     w0 = now - WINDOW_7D
     dec7, rev7 = set(), 0
-    for o in cur:
+    for o in scur:
         t = stamp_epoch(o["logged_at"])
         if t < w0 or t > now:
             continue
         tgt = by_id.get(o["supersedes"]) if o["supersedes"] else None
-        if tgt is not None:
+        if tgt is not None and event_key(tgt) == event_key(o):   # B3: reversão só no MESMO evento
             if o["human_decision"] is not None and effective(tgt) is not None and o["human_decision"] != effective(tgt):
                 rev7 += 1
             continue                                    # linha de reversão/correção não conta como decisão
-        d = o["human_decision"] if o["mode"] == "shadow" else o["rule_decision"]
+        d = o["human_decision"] if mode == "shadow" else o["rule_decision"]
         if d is not None:
             dec7.add(event_key(o))
     out["decisions_7d"], out["reversals_7d"] = len(dec7), rev7
     out["reversal_rate_7d"] = round(rev7 / len(dec7), 4) if dec7 else None
-    if out["mode"] == "shadow":
+    not_instr = False
+    if mode == "shadow":
         met = bool(out["days_covered"] >= RULE_ON_DAYS and n_events >= RULE_ON_EVENTS
                    and out["agreement"] is not None and out["agreement"] >= RULE_ON_AGREEMENT)
         out["rule_on_criterion_met"] = met
-        if rule_id in BASELINE_RULE_IDS:
+        if out["rule_id"] in BASELINE_RULE_IDS:
             out["trigger_rule_on"] = False
-            out["trigger_rule_on_reason"] = (f"a regra {rule_id} é a linha de base (aceita tudo): ela nunca liga a "
-                                             "regra automática, por maior que seja a concordância")
+            out["trigger_rule_on_reason"] = (f"a regra {out['rule_id']} é a linha de base (aceita tudo): ela nunca liga "
+                                             "a regra automática, por maior que seja a concordância")
         else:
             out["trigger_rule_on"] = met
     else:
         rate = out["reversal_rate_7d"]
-        out["trigger_back_to_shadow"] = bool(rate > BACK_TO_SHADOW_RATE) if rate is not None else rev7 > 0
+        out["back_to_shadow_criterion_met"] = bool(rate > BACK_TO_SHADOW_RATE) if rate is not None else rev7 > 0
+        # A2: nenhuma peça do core grava a reversão humana (a linha com supersedes): gatilho sem produtor sai null
+        if SHADOW_NOT_INSTRUMENTED:
+            out["not_instrumented"] = list(SHADOW_NOT_INSTRUMENTED)
+            not_instr = True
+        else:
+            out["trigger_back_to_shadow"] = out["back_to_shadow_criterion_met"]
     # a janela é a da regra vigente (desde a 1ª linha dela) e a dos 7 dias; lacuna de hora ilegível cai em todas
     w_start = min(first, w0)
     out["gaps_in_window"] = sum(1 for g in gaps if g is None or w_start <= g <= now)
     fired = out["trigger_rule_on"] is True or out["trigger_back_to_shadow"] is True
-    return out, (2 if malformed or out["gaps_in_window"] else (1 if fired else 0))
+    return out, (2 if malformed or out["gaps_in_window"] or not_instr else (1 if fired else 0))
 
 
 # ─────────────────────────────── registro de rascunhos ───────────────────────────────
@@ -524,6 +581,10 @@ def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None):
             tail >= AUTO_SEND_SAMPLE or (out["unedited_rate"] is not None and out["unedited_rate"] >= AUTO_SEND_RATE)))
         # sem as três salvaguardas no core o envio automático não liga, por melhor que seja a amostra
         out["trigger_auto_send"] = None if out["preconditions_missing"] else out["auto_send_criterion_met"]
+    out["back_to_draft_criterion_met"] = None
+    out["not_instrumented"] = None
+    out["no_data"] = not valid                          # log vazio é SEM DADO, nunca amostra zero (cura A2)
+    not_instr = False
     if since_stage_on is not None:
         t_on = calendar.timegm(time.strptime(since_stage_on, "%Y-%m-%d"))
         acts = [o for o in valid if stamp_epoch(o["logged_at"]) >= t_on]
@@ -531,9 +592,15 @@ def draft_stats(lines, now, last=AUTO_SEND_SAMPLE, since_stage_on=None):
         ks = [o for o in acts if o["event"] in ("kill_switch_on", "kill_switch_off")]
         out["out_of_list_since_on"] = oob
         out["kill_switch_acts_since_on"] = len(ks)
-        out["trigger_back_to_draft"] = bool(oob > 0 or any(o["event"] == "kill_switch_on" for o in ks))
+        out["back_to_draft_criterion_met"] = bool(oob > 0 or any(o["event"] == "kill_switch_on" for o in ks))
+        # nenhuma peça do core grava esses atos ainda: o gatilho pedido sai null, e a medida não é verde (rc 2)
+        if DRAFT_NOT_INSTRUMENTED:
+            out["not_instrumented"] = list(DRAFT_NOT_INSTRUMENTED)
+            not_instr = True
+        else:
+            out["trigger_back_to_draft"] = out["back_to_draft_criterion_met"]
     fired = out["trigger_auto_send"] is True or out["trigger_back_to_draft"] is True
-    return out, (2 if malformed else (1 if fired else 0)), to_write
+    return out, (2 if malformed or not_instr or out["no_data"] else (1 if fired else 0)), to_write
 
 
 # ─────────────────────────────── CLI ───────────────────────────────
@@ -562,6 +629,16 @@ def _now(o):
     if not re.fullmatch(r"\d{1,12}", v):
         raise UsageError("--now exige epoch inteiro")
     return int(v)
+
+
+def _valid_day(v):
+    if not isinstance(v, str) or not DAY_RE.fullmatch(v):
+        return False
+    try:
+        dt.date.fromisoformat(v)
+        return True
+    except ValueError:
+        return False
 
 
 def _nullable(v):
@@ -594,7 +671,7 @@ def main(argv):
         o = _opts(rest, {"--log": True, "--receiver": True, "--check": False, "--mode": True, "--rule-decision": True,
                          "--human-decision": True, "--reason": True, "--jti": True, "--task-id": True,
                          "--ce-source": True, "--ce-id": True, "--ce-time": True, "--supersedes": True,
-                         "--ids-unverified": False, "--point": True, "--gap-log": True})
+                         "--ids-unverified": False, "--point": True, "--gap-log": True, "--if-absent": False})
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         if o.get("--check"):
             check_log(log)
@@ -606,6 +683,17 @@ def main(argv):
                            jti=_nullable(o.get("--jti")), task_id=_nullable(o.get("--task-id")),
                            reason=_nullable(o.get("--reason")), supersedes=_nullable(o.get("--supersedes")),
                            ids_verified=not o.get("--ids-unverified"))
+        if o.get("--if-absent") and os.path.lexists(log):
+            # cura B1: o "já aceito" grava a linha só se ela faltar (mesmo evento, mesma decisão, mesma regra)
+            try:
+                have = any(isinstance(x, dict) and not validate_shadow(x) and event_key(x) == event_key(line)
+                           and x["human_decision"] == line["human_decision"] and x["rule_id"] == line["rule_id"]
+                           and x["rule_version"] == line["rule_version"] for _, x in read_log(log))
+            except MeasureError:
+                have = False                            # ilegível: tenta gravar (e a falha vira lacuna)
+            if have:
+                print(f"ok: {log} (a linha deste evento já existe)")
+                return 0
         try:
             append_line(log, line)
         except MeasureError as e:
@@ -624,7 +712,9 @@ def main(argv):
         return 0
     if cmd == "shadow-stats":
         o = _opts(rest, {"--log": True, "--receiver": True, "--queue-jsonl": True, "--now": True, "--json": False,
-                         "--gap-log": True})
+                         "--gap-log": True, "--mode": True})
+        if o.get("--mode") not in MODES:
+            raise UsageError("shadow-stats exige --mode shadow|auto (o modo em vigor; nunca o da última linha)")
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         rows = None
         if "--queue-jsonl" in o:
@@ -632,7 +722,8 @@ def main(argv):
                 rows = [json.loads(x) for x in open(o["--queue-jsonl"], encoding="utf-8") if x.strip()]
             except (OSError, ValueError) as e:
                 raise MeasureError(f"--queue-jsonl ilegível: {e}")
-        out, rc = shadow_stats(read_log(log), _now(o), rows, read_gaps(o.get("--gap-log") or default_gap_log()))
+        out, rc = shadow_stats(read_log(log), _now(o), o["--mode"], rows,
+                               read_gaps(o.get("--gap-log") or default_gap_log()))
         if o.get("--json"):
             print(json.dumps(out, ensure_ascii=False))
         else:
@@ -661,8 +752,8 @@ def main(argv):
         if not re.fullmatch(r"[1-9]\d{0,5}", last):
             raise UsageError("--last exige inteiro positivo")
         since = o.get("--since-stage-on")
-        if since is not None and not DAY_RE.fullmatch(since):
-            raise UsageError("--since-stage-on exige AAAA-MM-DD (dia UTC)")
+        if since is not None and not _valid_day(since):
+            raise UsageError("--since-stage-on exige AAAA-MM-DD, um dia UTC que exista")
         out, rc, to_write = draft_stats(read_log(log), _now(o), int(last), since)
         if to_write and not o.get("--no-write"):
             # o descarte vira linha (nenhuma peça grava descarte; PLAN-E §3); a contagem acima já o incluiu. Log que
@@ -690,4 +781,7 @@ if __name__ == "__main__":
         sys.exit(3)
     except MeasureError as e:
         print(f"[a2a-metrics] ERRO: {e}", file=sys.stderr)
+        sys.exit(2)
+    except Exception as e:                              # M2: exceção inesperada é "não pude medir", nunca rc 1
+        print(f"[a2a-metrics] ERRO inesperado ({type(e).__name__}: {e}): não pude medir", file=sys.stderr)
         sys.exit(2)
