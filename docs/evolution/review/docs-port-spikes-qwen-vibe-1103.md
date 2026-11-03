@@ -2,8 +2,8 @@
 branch: docs/port-spikes-qwen-vibe-1103
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: 38a940d01a223bb53764776df347aca3275308161c22e63050be2ea96471637a
+reviewed_diff_sha256: d3cca22222ad45039a19dceadbb10b56085eb52c19e0fbc88858db4872d0ba74
+reviewed_code_sha256: 8e1fd279eb4ba790854df476b2a252f9da6af385f0e046888bc99367397880dd
 findings_total: 80
 findings_real: 70
 tokens: 0
