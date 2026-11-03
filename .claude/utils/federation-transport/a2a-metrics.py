@@ -12,7 +12,10 @@
 #                  --mode shadow|auto é OBRIGATÓRIO (o modo em vigor; cada gatilho conta só as linhas do seu modo).
 #                  days_covered = DIAS COMPLETOS APÓS O 1º: períodos inteiros de 24 h desde a 1ª linha da regra
 #                  vigente, floor((agora - 1ª)/86400). Lacuna registrada (shadow-gap.log) na janela = rc 2; log vazio
-#                  = no_data e rc 2; gatilho sem produtor no core (a reversão) sai null com not_instrumented e rc 2
+#                  = no_data e rc 2; gatilho sem produtor no core (a reversão) sai null com not_instrumented e rc 2.
+#                  No modo shadow a janela RECOMEÇA na última passagem de auto para shadow; modo pedido sem linhas
+#                  = no_data e rc 2; linha com logged_at no futuro conta em future_logged_at (não é evento; rc 2).
+#                  Lacuna tem gap_id e se fecha com shadow-append --resolves-gap <gap_id> (fechada não dá rc 2)
 #   draft-append   uma linha do registro de rascunhos (nasce no a2a-rt-mcp.py e no a2a-rt-send.sh)
 #   draft-stats    os rascunhos aprovados sem edição e os atos que mandam voltar (o "a2a-draft-stats" do PLAN-E)
 #                  Sem lista fechada, chave de corte e teto de taxa no core, trigger_auto_send sai null
@@ -172,11 +175,21 @@ def default_gap_log():
 
 
 def read_gaps(path):
-    """→ epochs das lacunas (None = linha ilegível: lacuna de hora desconhecida). Arquivo ausente = nenhuma lacuna."""
+    """→ epochs das lacunas ABERTAS (None = linha ilegível: lacuna de hora desconhecida). Arquivo ausente = nenhuma.
+
+    N6: a lacuna tem gap_id; quando o operador regrava a decisão que faltou (shadow-append --resolves-gap <gap_id>),
+    uma linha {"resolves": <gap_id>, "resolved_by": <line_id>} a fecha, e lacuna fechada não dá rc 2."""
     if not os.path.lexists(path):
         return []
+    rows = [o for _, o in read_log(path)]
+    closed = {o.get("resolves") for o in rows if isinstance(o, dict) and isinstance(o.get("resolved_by"), str)
+              and UUID_RE.fullmatch(o["resolved_by"]) and isinstance(o.get("resolves"), str)}
     out = []
-    for _, o in read_log(path):
+    for o in rows:
+        if isinstance(o, dict) and "resolves" in o:
+            continue                                    # a linha de resolução não é lacuna
+        if isinstance(o, dict) and o.get("gap_id") in closed:
+            continue
         t = o.get("logged_at") if isinstance(o, dict) else None
         out.append(stamp_epoch(t) if isinstance(t, str) and TS_RE.fullmatch(t) else None)
     return out
@@ -402,11 +415,13 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     """→ (saída, rc). `lines` = read_log(); `mode` = o modo em vigor (shadow|auto), dado por quem pergunta e NUNCA
     tirado da última linha (cura A1); `queue_rows` = linhas do `ops/a2a-queue-live.sh list --json` (ou None);
     `gaps` = read_gaps() (lacuna na janela = rc 2: a medida tem buraco)."""
-    malformed = 0
+    malformed = future = 0
     valid = []
     for _, o in lines:
         if o is None or validate_shadow(o):
             malformed += 1
+        elif stamp_epoch(o["logged_at"]) > now:
+            future += 1                                # N7: linha do futuro (relógio torto) não é evento
         else:
             valid.append(o)
     out = {"rule_id": None, "rule_version": None, "since": None, "days_covered": 0, "events": 0, "undecided": None,
@@ -414,7 +429,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
            "reversal_rate_7d": None, "malformed": malformed, "trigger_rule_on": None, "trigger_back_to_shadow": None,
            "confusion": {r: {h: 0 for h in DECISIONS} for r in DECISIONS}, "kappa": None,
            "rule_on_criterion_met": None, "trigger_rule_on_reason": None, "back_to_shadow_criterion_met": None,
-           "not_instrumented": None, "holds": 0, "no_data": False, "gaps_in_window": 0}
+           "not_instrumented": None, "holds": 0, "no_data": False, "gaps_in_window": 0, "future_logged_at": future}
     cur = []
     if valid:
         version, rule_id = valid[-1]["rule_version"], valid[-1]["rule_id"]
@@ -435,16 +450,22 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
             if (k is None or k not in cur_keys) and ("task", r.get("taskId")) not in cur_keys:
                 und += 1                               # sem receivedAt legível também conta: ausência não é "recente"
         out["undecided"] = und
-    if not cur:
-        # log vazio (ou só linhas malformadas) é SEM DADO, nunca contagem zero (cura A2)
+    scur = [o for o in cur if o["mode"] == mode]          # A1: cada gatilho sobre as linhas do SEU modo
+    if mode == "shadow":
+        autos = [stamp_epoch(o["logged_at"]) for o in cur if o["mode"] == "auto"]
+        if autos:
+            # N1 (julgamento da dona): voltar à sombra é a regra ter errado; a janela RECOMEÇA na última passagem de
+            # auto para shadow, e a concordância antiga não religa a regra
+            scur = [o for o in scur if stamp_epoch(o["logged_at"]) > max(autos)]
+    if not scur:
+        # log vazio, só malformadas, ou nenhuma linha do modo pedido: SEM DADO, nunca contagem zero (A2, N4)
         out["no_data"] = True
         out["gaps_in_window"] = len(gaps)
         return out, 2
-    first = min(stamp_epoch(o["logged_at"]) for o in cur)
+    first = min(stamp_epoch(o["logged_at"]) for o in scur)
     out["since"] = utc_day(first).isoformat()
     # M1: DIAS COMPLETOS APÓS O 1º = períodos inteiros de 24 h desde a 1ª linha (23:59 → 00:01 de 14 dias depois = 13)
     out["days_covered"] = max(0, (now - first) // 86400)
-    scur = [o for o in cur if o["mode"] == mode]          # A1: cada gatilho sobre as linhas do SEU modo
     by_id = {o["line_id"]: o for o in scur}
     superseded = {o["supersedes"] for o in scur if o["supersedes"]}
     events = {}
@@ -514,7 +535,7 @@ def shadow_stats(lines, now, mode, queue_rows=None, gaps=()):
     w_start = min(first, w0)
     out["gaps_in_window"] = sum(1 for g in gaps if g is None or w_start <= g <= now)
     fired = out["trigger_rule_on"] is True or out["trigger_back_to_shadow"] is True
-    return out, (2 if malformed or out["gaps_in_window"] or not_instr else (1 if fired else 0))
+    return out, (2 if malformed or future or out["gaps_in_window"] or not_instr else (1 if fired else 0))
 
 
 # ─────────────────────────────── registro de rascunhos ───────────────────────────────
@@ -702,18 +723,39 @@ def main(argv):
         o = _opts(rest, {"--log": True, "--receiver": True, "--check": False, "--mode": True, "--rule-decision": True,
                          "--human-decision": True, "--reason": True, "--jti": True, "--task-id": True,
                          "--ce-source": True, "--ce-id": True, "--ce-time": True, "--supersedes": True,
-                         "--ids-unverified": False, "--point": True, "--gap-log": True, "--if-absent": False})
+                         "--ids-unverified": False, "--point": True, "--gap-log": True, "--if-absent": False,
+                         "--resolves-gap": True})
         log = o.get("--log") or default_shadow_log(o.get("--receiver", ""))
         if o.get("--check"):
             check_log(log)
             print(f"ok: {log}")
             return 0
-        line = shadow_line(o.get("--mode", "shadow"), _nullable(o.get("--rule-decision")),
-                           _nullable(o.get("--human-decision")), ce_source=_nullable(o.get("--ce-source")),
-                           ce_id=_nullable(o.get("--ce-id")), ce_time=_nullable(o.get("--ce-time")),
-                           jti=_nullable(o.get("--jti")), task_id=_nullable(o.get("--task-id")),
-                           reason=_nullable(o.get("--reason")), supersedes=_nullable(o.get("--supersedes")),
-                           ids_verified=not o.get("--ids-unverified"))
+        gap_log = o.get("--gap-log") or default_gap_log()
+        if o.get("--resolves-gap") and not UUID_RE.fullmatch(o["--resolves-gap"]):
+            raise UsageError("--resolves-gap exige o gap_id (UUID) da lacuna")
+
+        def _gap(why, jti, task):
+            gap = {"logged_at": utc_stamp(), "gap_id": new_line_id(), "point": o.get("--point", "accept"),
+                   "jti": jti, "taskId": task, "why": str(why)[:300]}
+            print(f"[a2a-metrics] LACUNA: a linha de sombra NÃO foi gravada ({why})", file=sys.stderr)
+            try:
+                append_line(gap_log, gap)
+            except MeasureError as e2:
+                raise MeasureError(f"nem a linha de sombra nem o marcador de lacuna foram gravados: {e2}")
+            print(f"[a2a-metrics] LACUNA registrada em {gap_log} (gap_id {gap['gap_id']}): o shadow-stats sai rc 2 "
+                  "em toda janela que a contém, até a decisão ser regravada com --resolves-gap", file=sys.stderr)
+            return 4
+        try:
+            # N5: a linha se valida DENTRO do try: linha inválida (sem chave de evento, valor fora da forma) também
+            # vira lacuna, nunca um rc 3 sem marcador
+            line = shadow_line(o.get("--mode", "shadow"), _nullable(o.get("--rule-decision")),
+                               _nullable(o.get("--human-decision")), ce_source=_nullable(o.get("--ce-source")),
+                               ce_id=_nullable(o.get("--ce-id")), ce_time=_nullable(o.get("--ce-time")),
+                               jti=_nullable(o.get("--jti")), task_id=_nullable(o.get("--task-id")),
+                               reason=_nullable(o.get("--reason")), supersedes=_nullable(o.get("--supersedes")),
+                               ids_verified=not o.get("--ids-unverified"))
+        except UsageError as e:
+            return _gap(e, clean_str(o.get("--jti")), clean_str(o.get("--task-id")))
         if o.get("--if-absent") and os.path.lexists(log):
             # cura B1: o "já aceito" grava a linha só se ela faltar (mesmo evento, mesma decisão, mesma regra)
             try:
@@ -728,17 +770,10 @@ def main(argv):
         try:
             append_line(log, line)
         except MeasureError as e:
-            gap_log = o.get("--gap-log") or default_gap_log()
-            gap = {"logged_at": utc_stamp(), "point": o.get("--point", "accept"), "jti": line["jti"],
-                   "taskId": line["taskId"], "why": str(e)[:300]}
-            print(f"[a2a-metrics] LACUNA: a linha de sombra NÃO foi gravada ({e})", file=sys.stderr)
-            try:
-                append_line(gap_log, gap)
-            except MeasureError as e2:
-                raise MeasureError(f"nem a linha de sombra nem o marcador de lacuna foram gravados: {e2}")
-            print(f"[a2a-metrics] LACUNA registrada em {gap_log}: o shadow-stats sai rc 2 em toda janela que a contém",
-                  file=sys.stderr)
-            return 4
+            return _gap(e, line["jti"], line["taskId"])
+        if o.get("--resolves-gap"):
+            append_line(gap_log, {"logged_at": utc_stamp(), "resolves": o["--resolves-gap"],
+                                  "resolved_by": line["line_id"]})
         print(f"ok: {log} line_id={line['line_id']}")
         return 0
     if cmd == "shadow-stats":
