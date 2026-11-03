@@ -203,7 +203,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-11-03"
     verified_against: "declarado no pré-registro §3 e Emendas 2 e 5"
-    label: "NÃO medidos: hook sobre ferramenta MCP, camada de permissões, subagente (cenário 4 do pré-registro, inconclusivo por janela), sandbox do SO, isolamento de rede (o unshare sem root falha na VPS) e contorno por ferramentas além das nomeadas (run_typescript no Vibe, tool_call no Qwen)"
+    label: "NÃO medidos: hook sobre ferramenta MCP, camada de permissões, subagente (cenário 4 do pré-registro, inconclusivo por janela), sandbox do SO, isolamento de rede e contorno por ferramentas além das nomeadas"
+    narrative: "O isolamento de rede não foi medido porque o unshare sem root falha na VPS; o stub escuta só em loopback. O contorno não foi medido nas ferramentas run_typescript e process_start do Vibe, nem tool_call e tool_search do Qwen."
     provenance:
       source: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/harness/evidence-archive/ (tar.gz por lote, SHA256SUMS e MANIFEST.tsv) e docs/evolution/research/port-spikes-qwen-vibe-2026-11/harness/aggregate-all.json"
       locator: "PRE-REGISTRO.md §3 e emendas"
