@@ -2,7 +2,7 @@
 branch: feat/event-watcher-plan-e-commands
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: 9095cc7037754e461506d667630358eb3b1152f427e4a6c6e5d44c2c1a3210fb
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: c35c2c0d7d60c3e63347699230951196f41e5ce26ea03948cef603158cb582f6
 findings_total: 78
 findings_real: 73
@@ -68,3 +68,12 @@ Um por caso novo, nas quatro famílias (q30 a q53, sh1 a sh67, g1 a g16b).
   - um ciclo de supersedes escrito à mão faz o evento sumir calado, o que cai no modelo de ameaça (log editado à
     mão);
   - B2, B3 e B4, que estão no cabeçalho do `a2a-metrics.py`.
+
+## Re-revisão do fechamento (CI)
+
+Depois da aprovação, mudou só a bancada. Os auxiliares `_g`, `_r` e `_rule` do bloco do `a2a_accept` ganharam
+prefixo (`_shgapln`, `_shresln`, `_aa_rule`), porque colidiam com nomes usados fora da família e o seletor do
+nível PR caía no modo completo, reprovando o `selector-per-file (i)`. Nenhuma asserção ou âncora de mutante mudou.
+O REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) pediu ainda marcar duas citações
+de `ops/` como `(core-only)` e trocar uma por descrição genérica, só em comentário e mensagem. Conferido pela sessão
+do core: `a2a_accept` e `selector_per_file` passam 208 de 208.
