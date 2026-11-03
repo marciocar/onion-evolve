@@ -17974,15 +17974,15 @@ PY
   _shfix() {  # _shfix <metrics> <modo-da-lacuna> → "rc|json"
     _shgen s50 "${d}/fix.jsonl"
     local i40 i41 gl="${d}/fix-gap.log"; i40="$(jq -r 'select(.ce_id=="e40") | .line_id' "${d}/fix.jsonl")"; i41="$(jq -r 'select(.ce_id=="e41") | .line_id' "${d}/fix.jsonl")"
-    _g() { printf '{"logged_at":"%s","gap_id":"%s","point":"accept",%s"from":"m","ce_source":"/w","ce_id":"e40","jti":null,"taskId":null,"ids_verified":true,"mode":"shadow","rule_id":"accept-rule","rule_version":"1","why":"x"}\n' "$1" "$2" "${3-\"receiver\":\"core-x\",}"; }
-    _r() { printf '{"logged_at":"2026-11-02T12:00:00Z","resolves":"%s","resolved_by":"%s","receiver":"core-x"}\n' "$1" "$2"; }
+    _shgapln() { printf '{"logged_at":"%s","gap_id":"%s","point":"accept",%s"from":"m","ce_source":"/w","ce_id":"e40","jti":null,"taskId":null,"ids_verified":true,"mode":"shadow","rule_id":"accept-rule","rule_version":"1","why":"x"}\n' "$1" "$2" "${3-\"receiver\":\"core-x\",}"; }
+    _shresln() { printf '{"logged_at":"2026-11-02T12:00:00Z","resolves":"%s","resolved_by":"%s","receiver":"core-x"}\n' "$1" "$2"; }
     local G1=11111111-1111-4111-8111-111111111111 G2=33333333-3333-4333-8333-333333333333
     case "$2" in
-      naocasa) { _g 2026-10-29T12:00:00Z "${G1}"; _r "${G1}" "${i41}"; } > "${gl}" ;;
-      anterior) { _g 2026-11-02T00:00:00Z "${G1}"; _r "${G1}" "${i40}"; } > "${gl}" ;;
-      dupla) { _g 2026-10-29T12:00:00Z "${G1}"; _g 2026-10-29T12:00:00Z "${G2}"; _r "${G1}" "${i40}"; _r "${G2}" "${i40}"; } > "${gl}" ;;
-      semrcv) _g 2026-10-29T12:00:00Z "${G1}" "" > "${gl}" ;;
-      mesmo) { _g "$(jq -r 'select(.ce_id=="e40") | .logged_at' "${d}/fix.jsonl")" "${G1}"; _r "${G1}" "${i40}"; } > "${gl}" ;;
+      naocasa) { _shgapln 2026-10-29T12:00:00Z "${G1}"; _shresln "${G1}" "${i41}"; } > "${gl}" ;;
+      anterior) { _shgapln 2026-11-02T00:00:00Z "${G1}"; _shresln "${G1}" "${i40}"; } > "${gl}" ;;
+      dupla) { _shgapln 2026-10-29T12:00:00Z "${G1}"; _shgapln 2026-10-29T12:00:00Z "${G2}"; _shresln "${G1}" "${i40}"; _shresln "${G2}" "${i40}"; } > "${gl}" ;;
+      semrcv) _shgapln 2026-10-29T12:00:00Z "${G1}" "" > "${gl}" ;;
+      mesmo) { _shgapln "$(jq -r 'select(.ce_id=="e40") | .logged_at' "${d}/fix.jsonl")" "${G1}"; _shresln "${G1}" "${i40}"; } > "${gl}" ;;
     esac
     local o rr=0; o="$(python3 -I "$1" shadow-stats --mode shadow --receiver core-x --log "${d}/fix.jsonl" --gap-log "${gl}" --now "${SNOW}" --json 2>&1)" || rr=$?
     printf '%s|%s' "${rr}" "${o}"; }
@@ -18267,7 +18267,7 @@ PY
   cp "${helper}" "${mft}/.claude/utils/federation-transport/a2a-accept.sh"
   # utilitários do modo auto à mão (log real, CLI real)
   _mc() { python3 -I "$1" mode-change --log "$2" --to "$3" >/dev/null 2>&1; }
-  _rule() { python3 -I "$1" shadow-append --receiver core-x --log "$2" --gap-log "$3" --mode auto --rule-decision reject \
+  _aa_rule() { python3 -I "$1" shadow-append --receiver core-x --log "$2" --gap-log "$3" --mode auto --rule-decision reject \
       --from m --ce-source /w --ce-id "$4" >/dev/null 2>&1; }
   _prod() { python3 -I "$1" shadow-append --receiver core-x --log "$2" --gap-log "$3" --producer --mode current --point accept \
       --rule-decision accept --human-decision accept --from m --ce-source /w --ce-id "$4" "${@:5}" 2>/dev/null; }
@@ -18298,7 +18298,7 @@ PY
     _prod "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a3 >/dev/null || r=$?
     [ "${r}" = 4 ] || { SH_WHY="a lacuna deveria nascer (rc 4), deu ${r}"; return 1; }
     gid="$(jq -r .gap_id "${R}/gap.log")"
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a3 || { SH_WHY="a linha da regra à mão falhou"; return 1; }; sleep 1
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a3 || { SH_WHY="a linha da regra à mão falhou"; return 1; }; sleep 1
     r=0; python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode current \
       --rule-decision accept --human-decision accept --from m --ce-source /w --ce-id ev-a3 --resolves-gap "${gid}" >/dev/null 2>&1 || r=$?
     [ "${r}" = 0 ] || { SH_WHY="a resolução com --mode current deu ${r}"; return 1; }
@@ -18325,7 +18325,7 @@ PY
   _sh_a4() {  # A4: à mão, decisão humana no auto sem --supersedes para a linha da regra válida → rc 3
     local R="${d}/a4" r=0; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a4 || { SH_WHY="a linha da regra falhou"; return 1; }
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-a4 || { SH_WHY="a linha da regra falhou"; return 1; }
     python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
       --human-decision accept --from m --ce-source /w --ce-id ev-a4 >/dev/null 2>&1 || r=$?
     SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 2 ] && [ ! -e "${R}/gap.log" ]; }
@@ -18340,7 +18340,7 @@ PY
   _sh_supok() {  # M1: --supersedes certo (a linha da regra válida) → rc 0, e a reversão conta
     local R="${d}/sp" r=0 rid o; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-sp || { SH_WHY="a linha da regra falhou"; return 1; }
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-sp || { SH_WHY="a linha da regra falhou"; return 1; }
     rid="$(jq -r 'select(.ce_id=="ev-sp") | .line_id' "${R}/l.jsonl")"
     python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
       --human-decision accept --from m --ce-source /w --ce-id ev-sp --supersedes "${rid}" >/dev/null 2>&1 || r=$?
@@ -18350,7 +18350,7 @@ PY
   _sh_supbad() {  # M1: --supersedes de fora (UUID que não é a linha da regra) → rc 3, nada gravado
     local R="${d}/sb" r=0; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-sb || { SH_WHY="a linha da regra falhou"; return 1; }
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-sb || { SH_WHY="a linha da regra falhou"; return 1; }
     python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
       --human-decision accept --from m --ce-source /w --ce-id ev-sb --supersedes 66666666-6666-4666-8666-666666666666 >/dev/null 2>&1 || r=$?
     SH_WHY="rc=${r}"; [ "${r}" = 3 ] && [ "$(grep -c . "${R}/l.jsonl")" = 2 ]; }
@@ -18365,7 +18365,7 @@ PY
   _sh_supother() {  # supersedes apontando a linha da regra de OUTRO evento → rc 3
     local R="${d}/so" r=0 rid; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-x && _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-y || { SH_WHY="linhas da regra falharam"; return 1; }
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-x && _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-y || { SH_WHY="linhas da regra falharam"; return 1; }
     rid="$(jq -r 'select(.ce_id=="ev-y") | .line_id' "${R}/l.jsonl")"
     python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
       --human-decision accept --from m --ce-source /w --ce-id ev-x --supersedes "${rid}" >/dev/null 2>&1 || r=$?
@@ -18373,7 +18373,7 @@ PY
   _sh_suphuman() {  # supersedes apontando uma linha HUMANA do mesmo evento → rc 3
     local R="${d}/sh" r=0 rid hid; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-h || { SH_WHY="a linha da regra falhou"; return 1; }
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-h || { SH_WHY="a linha da regra falhou"; return 1; }
     rid="$(jq -r 'select(.ce_id=="ev-h") | .line_id' "${R}/l.jsonl")"
     python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
       --human-decision accept --from m --ce-source /w --ce-id ev-h --supersedes "${rid}" >/dev/null 2>&1 || { SH_WHY="a reversão válida falhou"; return 1; }
@@ -18384,7 +18384,7 @@ PY
   _sh_rev2() {  # C2: dois humanos apontando a MESMA linha da regra = 1 evento revertido
     local R="${d}/r2" rid o k; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-r2 || { SH_WHY="a linha da regra falhou"; return 1; }
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-r2 || { SH_WHY="a linha da regra falhou"; return 1; }
     rid="$(jq -r 'select(.ce_id=="ev-r2") | .line_id' "${R}/l.jsonl")"
     for k in 1 2; do
       python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto \
@@ -18417,7 +18417,7 @@ PY
   _sh_rulesup() {  # no auto, a linha da REGRA à mão com --supersedes para a linha humana de outro evento → rc 3
     local R="${d}/rs" r=0 hid; rm -rf "${R}"; mkdir -p "${R}"
     _mc "$1" "${R}/l.jsonl" auto || { SH_WHY="mode-change falhou"; return 1; }; sleep 1
-    _rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-b || { SH_WHY="a linha da regra falhou"; return 1; }
+    _aa_rule "$1" "${R}/l.jsonl" "${R}/gap.log" ev-b || { SH_WHY="a linha da regra falhou"; return 1; }
     python3 -I "$1" shadow-append --receiver core-x --log "${R}/l.jsonl" --gap-log "${R}/gap.log" --mode auto --human-decision accept \
       --from m --ce-source /w --ce-id ev-b --supersedes "$(jq -r 'select(.ce_id=="ev-b") | .line_id' "${R}/l.jsonl")" >/dev/null 2>&1 \
       || { SH_WHY="a reversão de ev-b falhou"; return 1; }
