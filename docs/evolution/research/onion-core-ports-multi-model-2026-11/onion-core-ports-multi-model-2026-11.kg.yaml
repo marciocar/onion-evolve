@@ -419,7 +419,7 @@ nodes:
     source_tier: 10
     source_kind: internal-audit
     label: "CONTABILIDADE: 17 confirmadas; 8 refutadas na votação; 0 não verificadas; 38 fontes e 37 claims cortadas por orçamento; Elenxo 44 objeções, 28 sobreviventes, 28 modeladas; 0 recusadas pelo motor; 12 superações, 12 modeladas."
-    narrative: "(A) REFUTADAS NA VOTAÇÃO (8; nem todas por fonte fraca — 6 em fonte tier >=7, e o Elenxo contesta 6 refutações): R1 Vibe segue Agent Skills e carrega AGENTS.md, projeção sem transformação de formato (tier 9; refutação contrariada, resta transformação de CONTEÚDO); R2 Qwen define CLAUDE_PROJECT_DIR e aceita matchers do Claude Code sem mudança (tier 9; refutação contrariada, mas tool_name no stdin é o id de runtime — superação QWEN_TOOL_NAME_RUNTIME_ID); R3 primária de dez/2025 do Vibe sem hooks/skills/subagentes/MCP (tier 8; superada pelo README atual); R4 rulesync com cobertura parcial (tier 7; 3 de 4 subafirmações confirmadas); R5 guard que converte erro em exit 2 portável entre CC, Cursor, Codex e Gemini (tier 5; portar o script não porta o enforcement); R6 Ruler com subagentes só em 5 harnesses e sem hooks (tier 5; refutação contrariada; Gemini e Qwen têm subagentes nativos); R7 Codex roda modelo aberto via oss_provider/[profiles.*] (tier 4; perfis viraram arquivos na 0.134.0); R8 Gemini CLI substituído pelo Antigravity CLI em 18/06/2026 (tier 9; só no tier gratuito e Google One). (B) NÃO VERIFICADAS por 403/truncagem: 0. (C) CORTADAS POR ORÇAMENTO: 38 fontes, 37 claims; entre as fontes não lidas: docs.mistral.ai/vibe/code/cli/hooks (lida depois pelo Elenxo), rtk-ai/rtk#3391, lilting.ch, commandcode.ai, atlan.com, paperclipped.de, arXiv 2604.21090, ics.com, docs.rs agent-harness-adapter-core, tembo.io. (D) OBJEÇÕES: 44 do Elenxo, 28 sobreviventes, 28 modeladas como E_OBJECAO_*; as 16 não sobreviventes (achados 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15, 17 e descartes dez/2025, guard portável, Codex oss) foram absorvidas nas narrativas. (E) RECUSADAS pelo motor (naoJulgada): 0. (F) SUPERAÇÕES: 12 achadas, 12 modeladas (7 com TRACES_TO para este nó, 5 para objeções). (G) NÃO MEDIDO E NOMEADO, decisivo para selar: modelo aberto em loop agêntico diante do veto (insiste ou contorna), fail-path de timeout em Qwen e Gemini, sinal do veto no rc/json do Vibe e do Qwen headless, inferência local sem GPU no ambiente do core, custo de churn por porta."
+    narrative: "(A) REFUTADAS NA VOTAÇÃO (8; nem todas por fonte fraca — 6 em fonte tier >=7, e o Elenxo contesta 6 refutações): refutada 1 Vibe segue Agent Skills e carrega AGENTS.md, projeção sem transformação de formato (tier 9; refutação contrariada, resta transformação de CONTEÚDO); refutada 2 Qwen define CLAUDE_PROJECT_DIR e aceita matchers do Claude Code sem mudança (tier 9; refutação contrariada, mas tool_name no stdin é o id de runtime — superação QWEN_TOOL_NAME_RUNTIME_ID); refutada 3 primária de dez/2025 do Vibe sem hooks/skills/subagentes/MCP (tier 8; superada pelo README atual); refutada 4 rulesync com cobertura parcial (tier 7; 3 de 4 subafirmações confirmadas); refutada 5 guard que converte erro em exit 2 portável entre CC, Cursor, Codex e Gemini (tier 5; portar o script não porta o enforcement); refutada 6 Ruler com subagentes só em 5 harnesses e sem hooks (tier 5; refutação contrariada; Gemini e Qwen têm subagentes nativos); refutada 7 Codex roda modelo aberto via oss_provider/[profiles.*] (tier 4; perfis viraram arquivos na 0.134.0); refutada 8 Gemini CLI substituído pelo Antigravity CLI em 18/06/2026 (tier 9; só no tier gratuito e Google One). (B) NÃO VERIFICADAS por 403/truncagem: 0. (C) CORTADAS POR ORÇAMENTO: 38 fontes, 37 claims; entre as fontes não lidas: docs.mistral.ai/vibe/code/cli/hooks (lida depois pelo Elenxo), rtk-ai/rtk#3391, lilting.ch, commandcode.ai, atlan.com, paperclipped.de, arXiv 2604.21090, ics.com, docs.rs agent-harness-adapter-core, tembo.io. (D) OBJEÇÕES: 44 do Elenxo, 28 sobreviventes, 28 modeladas como E_OBJECAO_*; as 16 não sobreviventes (achados 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15, 17 e descartes dez/2025, guard portável, Codex oss) foram absorvidas nas narrativas. (E) RECUSADAS pelo motor (naoJulgada): 0. (F) SUPERAÇÕES: 12 achadas, 12 modeladas (7 com TRACES_TO para este nó, 5 para objeções). (G) NÃO MEDIDO E NOMEADO, decisivo para selar: modelo aberto em loop agêntico diante do veto (insiste ou contorna), fail-path de timeout em Qwen e Gemini, sinal do veto no rc/json do Vibe e do Qwen headless, inferência local sem GPU no ambiente do core, custo de churn por porta."
     trace: "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml"
     provenance:
       source: "repasse da rodada /onion-research de 2026-11-02 ao write(KG)"
@@ -572,7 +572,7 @@ nodes:
     source_tier: 3
     source_kind: analysis
     label: "OBJEÇÃO (Elenxo, 1 agente): a refutação de 'Vibe segue Agent Skills e carrega AGENTS.md' é contrariada pela primária; a transformação que resta é de CONTEÚDO (nomes de ferramenta do Claude, @agentes), não de formato."
-    narrative: "Alvo: descarte por comodismo (R1). Critério E1_EVIDENCIA_CONTRARIA. skill_paths custom aceitam qualquer diretório. Superação: nenhuma — só a doc declara; não há spike carregando uma skill do core no Vibe; kg-corpus-grep 'Vibe' = 0 nós (2026-11-02)."
+    narrative: "Alvo: descarte por comodismo (refutada 1). Critério E1_EVIDENCIA_CONTRARIA. skill_paths custom aceitam qualquer diretório. Superação: nenhuma — só a doc declara; não há spike carregando uma skill do core no Vibe; kg-corpus-grep 'Vibe' = 0 nós (2026-11-02)."
     trace: "https://github.com/mistralai/mistral-vibe"
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
@@ -591,7 +591,7 @@ nodes:
     source_tier: 3
     source_kind: analysis
     label: "OBJEÇÃO (Elenxo, 1 agente): a primária contraria a refutação — o Qwen define CLAUDE_PROJECT_DIR em todo command hook e um matcher copiado do Claude Code ('Bash', 'Write|Edit') 'works unchanged'; a doc ressalva ancorar ids de runtime."
-    narrative: "Alvo: descarte por comodismo (R2). Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — declarado pela doc e não medido; não há spike equivalente ao codex-as-core-2026-10, e o fail-path do timeout não está documentado. Ver também C_SUPERACAO_20261102_QWEN_TOOL_NAME_RUNTIME_ID: o tool_name no stdin é o id de runtime."
+    narrative: "Alvo: descarte por comodismo (refutada 2). Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — declarado pela doc e não medido; não há spike equivalente ao codex-as-core-2026-10, e o fail-path do timeout não está documentado. Ver também C_SUPERACAO_20261102_QWEN_TOOL_NAME_RUNTIME_ID: o tool_name no stdin é o id de runtime."
     trace: "https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/"
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
@@ -610,7 +610,7 @@ nodes:
     source_tier: 3
     source_kind: analysis
     label: "OBJEÇÃO (Elenxo, 1 agente): três de quatro subafirmações da cobertura parcial do rulesync se confirmam (Codex commands global-only, ignore deprecado em favor de permissions, plugins fora de --targets '*'); só a do Kiro está errada."
-    narrative: "Alvo: descarte por comodismo (R4). Critério E1_EVIDENCIA_CONTRARIA. A tese da cobertura parcial fica de pé. Superação: nenhuma — rulesync e Ruler declaram lacunas por alvo, e nenhum cobre o exit 2 traduzido com caminho de falha fechado."
+    narrative: "Alvo: descarte por comodismo (refutada 4). Critério E1_EVIDENCIA_CONTRARIA. A tese da cobertura parcial fica de pé. Superação: nenhuma — rulesync e Ruler declaram lacunas por alvo, e nenhum cobre o exit 2 traduzido com caminho de falha fechado."
     trace: "https://github.com/dyoshikawa/rulesync"
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
@@ -629,7 +629,7 @@ nodes:
     source_tier: 3
     source_kind: analysis
     label: "OBJEÇÃO (Elenxo, 1 agente): a primária do Ruler confirma verbatim 5 alvos de subagente (Claude Code, Cursor, Codex TOML, Copilot, OpenCode), Gemini CLI 'skipped with a warning' e nenhuma menção a hooks."
-    narrative: "Alvo: descarte por comodismo (R6). Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — o Ruler não emite subagente para Vibe nem Qwen; o rulesync tem Hooks sem mapeamento por alvo legível. Ver C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN: os harnesses têm a primitiva; quem não propaga é o Ruler."
+    narrative: "Alvo: descarte por comodismo (refutada 6). Critério E1_EVIDENCIA_CONTRARIA. Superação: nenhuma — o Ruler não emite subagente para Vibe nem Qwen; o rulesync tem Hooks sem mapeamento por alvo legível. Ver C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN: os harnesses têm a primitiva; quem não propaga é o Ruler."
     trace: "https://github.com/intellectronica/ruler"
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
@@ -648,7 +648,7 @@ nodes:
     source_tier: 3
     source_kind: analysis
     label: "OBJEÇÃO (Elenxo, 1 agente): a primária contraria a refutação — o Gemini CLI foi substituído pelo Antigravity CLI em 18/06/2026 (tier gratuito e Google One) e não foi otimizado para o Gemini 4 Argon. Tira o Gemini CLI da fila."
-    narrative: "Alvo: descarte por comodismo (R8). Critério E1_EVIDENCIA_CONTRARIA. O descarte só valeria pelo escopo (os pagos seguem no Gemini CLI), e não foi esse o argumento. Superação: nenhuma — a doc de hooks do Antigravity CLI não foi lida; onion-antigravity está CONGELADO."
+    narrative: "Alvo: descarte por comodismo (refutada 8). Critério E1_EVIDENCIA_CONTRARIA. O descarte só valeria pelo escopo (os pagos seguem no Gemini CLI), e não foi esse o argumento. Superação: nenhuma — a doc de hooks do Antigravity CLI não foi lida; onion-antigravity está CONGELADO."
     trace: "https://geminicli.com/docs/hooks/reference/"
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-11-02, modo decisão"
@@ -1027,7 +1027,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "O Qwen Code segue o contrato de hooks do Claude Code no ENVELOPE (PreToolUse, exit 2, permissionDecision, CLAUDE_PROJECT_DIR, Bash/Read/Write como apelido de matcher), mas o tool_name no stdin é o id de runtime: hook que ramifica em tool_name precisa de reescrita ou shim."
-    narrative: "Medida: três WebFetch da primária de hooks do Qwen Code (exit codes, apelidos de matcher, tool_name no stdin e schema de saída) e um grep no core em .claude/hooks/*.sh, que achou a comparação literal com 'Write'/'Edit' em .claude/hooks/house-code-gloss.sh l.312. Sem a reescrita, a guarda passa a deixar tudo passar em silêncio. Critério V2_CONTRADITA. Alvo reprovado (R2): 'Qwen tem hooks compatíveis com Claude Code ... camada de transformação gerada é fina'."
+    narrative: "Medida: três WebFetch da primária de hooks do Qwen Code (exit codes, apelidos de matcher, tool_name no stdin e schema de saída) e um grep no core em .claude/hooks/*.sh, que achou a comparação literal com 'Write'/'Edit' em .claude/hooks/house-code-gloss.sh l.312. Sem a reescrita, a guarda passa a deixar tudo passar em silêncio. Critério V2_CONTRADITA. Alvo reprovado (refutada 2): 'Qwen tem hooks compatíveis com Claude Code ... camada de transformação gerada é fina'."
     trace: "WebFetch https://qwenlm.github.io/qwen-code-docs/en/users/features/hooks/ (tool_name 'run_shell_command', 'write_file'); grep -n 'name not in (\"Write\", \"Edit\")' .claude/hooks/house-code-gloss.sh (l.312)"
 
   - id: C_SUPERACAO_20261102_VIBE_README_CURRENT_PIECES
@@ -1037,7 +1037,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "O README atual do mistralai/mistral-vibe (Apache-2.0, movido por Devstral) declara MCP, skills na spec Agent Skills, subagentes, hooks herdados pelos subagentes, sandbox experimental via --agent-socket e modo não interativo; falta medir se o hook barra de forma determinística."
-    narrative: "Medida: WebFetch de github.com/mistralai/mistral-vibe em 2026-11-02 com trechos verbatim de cada peça, confrontado com o anúncio de 2025-12-09 em mistral.ai/news/devstral-2-vibe-cli/, onde nenhuma aparece. Critério V4_DESATUALIZADA. Alvo reprovado (R3): 'a fonte primária de dez/2025 não cita hooks, skills, subagentes, MCP nem sandbox'."
+    narrative: "Medida: WebFetch de github.com/mistralai/mistral-vibe em 2026-11-02 com trechos verbatim de cada peça, confrontado com o anúncio de 2025-12-09 em mistral.ai/news/devstral-2-vibe-cli/, onde nenhuma aparece. Critério V4_DESATUALIZADA. Alvo reprovado (refutada 3): 'a fonte primária de dez/2025 não cita hooks, skills, subagentes, MCP nem sandbox'."
     trace: "WebFetch https://github.com/mistralai/mistral-vibe e procurar 'Hooks wire arbitrary shell commands', 'Agent Skills specification', 'agent_type = \"subagent\"', 'configure MCP', '--agent-socket'"
 
   - id: C_SUPERACAO_20261102_RULESYNC_ASYMMETRIC_KIRO
@@ -1047,7 +1047,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "Mesmo com fonte única, o rulesync tem cobertura parcial e assimétrica: Codex commands só global; ignore deprecado em favor de permissions; plugins fora de --targets '*'; e no Kiro só kiro-cli/kiro-ide emitem hooks válidos (o alias kiro escreve onde o CLI não lê)."
-    narrative: "Medida: grep no README atual do rulesync (main, baixado em 2026-11-02): l.83 (Codex global-only), l.176 (ignore→permissions), l.178 (plugins excluídos de --targets '*'), l.180 (hooks Kiro em kiro-cli/kiro-ide; o alias deprecado escreve em .kiro/agents/default.json, que o CLI não lê), tabela l.133-135. Critério V1_QUOTE_NAO_SUSTENTA. Alvo reprovado (R4): 'hooks do Kiro só no alias deprecado'."
+    narrative: "Medida: grep no README atual do rulesync (main, baixado em 2026-11-02): l.83 (Codex global-only), l.176 (ignore→permissions), l.178 (plugins excluídos de --targets '*'), l.180 (hooks Kiro em kiro-cli/kiro-ide; o alias deprecado escreve em .kiro/agents/default.json, que o CLI não lê), tabela l.133-135. Critério V1_QUOTE_NAO_SUSTENTA. Alvo reprovado (refutada 4): 'hooks do Kiro só no alias deprecado'."
     trace: "curl -sL https://raw.githubusercontent.com/dyoshikawa/rulesync/main/README.md | grep -n -F 'both emit hooks as a single'"
 
   - id: C_SUPERACAO_20261102_EXIT2_PRE_ACTION_FOUR_HARNESSES
@@ -1057,7 +1057,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "Exit 2 bloqueia nos eventos PRÉ-ação de Claude Code, Cursor, Codex e Gemini CLI; um guard que traduz em exit 2 os próprios erros CAPTURADOS porta o bloqueio; fail-closed contra hang/timeout exige config por harness (onFailure:block, failClosed:true), sem equivalente no Codex."
-    narrative: "Medida: WebFetch em 2026-11-02 das quatro docs oficiais (code.claude.com/docs/en/hooks, cursor.com/docs/agent/hooks, learn.chatgpt.com/docs/hooks, geminicli.com/docs/hooks/), com trechos verbatim: bloqueio por exit 2 no evento pré-ação nas quatro; ressalva de timeout e de evento pós-ação em três. Critério V2_CONTRADITA. Alvo reprovado (R5): 'um script de guard que converte qualquer erro interno em exit 2 é portável entre os quatro harnesses'."
+    narrative: "Medida: WebFetch em 2026-11-02 das quatro docs oficiais (code.claude.com/docs/en/hooks, cursor.com/docs/agent/hooks, learn.chatgpt.com/docs/hooks, geminicli.com/docs/hooks/), com trechos verbatim: bloqueio por exit 2 no evento pré-ação nas quatro; ressalva de timeout e de evento pós-ação em três. Critério V2_CONTRADITA. Alvo reprovado (refutada 5): 'um script de guard que converte qualquer erro interno em exit 2 é portável entre os quatro harnesses'."
     trace: "WebFetch https://learn.chatgpt.com/docs/hooks e grep -F 'can fail the hook without blocking the tool'; WebFetch https://code.claude.com/docs/en/hooks e grep -F \"doesn't block the tool call\""
 
   - id: C_SUPERACAO_20261102_NATIVE_SUBAGENTS_GEMINI_QWEN
@@ -1067,7 +1067,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "O Ruler (experimental) só PROPAGA subagentes para 5 alvos, mas subagentes nativos existem também no Gemini CLI (.gemini/agents/*.md, ligados por padrão) e no Qwen Code (.qwen/agents/*.md), em Markdown com frontmatter no formato do Claude Code."
-    narrative: "Medida: WebFetch do README do Ruler (5 alvos, 'skipped with a warning'); WebFetch de geminicli.com/docs/core/subagents/ (Last updated Jun 8, 2026: '.gemini/agents/*.md', 'Subagents are enabled by default'); doc do Qwen Code (.qwen/agents/, /agents create). O README do Ruler não menciona hooks: fora dele por omissão, não por declaração. Critério V2_CONTRADITA. Alvo reprovado (R6)."
+    narrative: "Medida: WebFetch do README do Ruler (5 alvos, 'skipped with a warning'); WebFetch de geminicli.com/docs/core/subagents/ (Last updated Jun 8, 2026: '.gemini/agents/*.md', 'Subagents are enabled by default'); doc do Qwen Code (.qwen/agents/, /agents create). O README do Ruler não menciona hooks: fora dele por omissão, não por declaração. Critério V2_CONTRADITA. Alvo reprovado (refutada 6)."
     trace: "WebFetch https://geminicli.com/docs/core/subagents/ e grep -F '.gemini/agents/*.md'; WebFetch https://qwenlm.github.io/qwen-code-docs/en/users/features/sub-agents/ e grep -F '.qwen/agents'"
 
   - id: C_SUPERACAO_20261102_CODEX_OSS_PROFILE_FILES
@@ -1077,7 +1077,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "O Codex CLI roda modelo aberto local via --oss com oss_provider ou --local-provider, mais [model_providers.*]; desde a 0.134.0 perfis são arquivos de overlay <nome>.config.toml no CODEX_HOME, não [profiles.*]; em codex exec o provedor local tem de estar definido."
-    narrative: "Medida: WebFetch em 2026-11-02 da doc primária learn.chatgpt.com/docs/config-file/config-advanced, com citações verbatim de --oss, --local-provider/oss_provider, provedores reservados (ollama/lmstudio), a mudança de --profile na 0.134.0 e o erro de codex exec sem provedor; confrontado com o blog-fonte, que ainda traz [profiles.local-deepseek]. Continua sendo ponte em tempo de configuração, sem gerador por porta: o modelo é do usuário. Critério V2_CONTRADITA. Alvo reprovado (R7)."
+    narrative: "Medida: WebFetch em 2026-11-02 da doc primária learn.chatgpt.com/docs/config-file/config-advanced, com citações verbatim de --oss, --local-provider/oss_provider, provedores reservados (ollama/lmstudio), a mudança de --profile na 0.134.0 e o erro de codex exec sem provedor; confrontado com o blog-fonte, que ainda traz [profiles.local-deepseek]. Continua sendo ponte em tempo de configuração, sem gerador por porta: o modelo é do usuário. Critério V2_CONTRADITA. Alvo reprovado (refutada 7)."
     trace: "WebFetch https://learn.chatgpt.com/docs/config-file/config-advanced e grep -F 'In Codex 0.134.0 and later, `--profile` no longer reads `[profiles.profile-name]` from `config.toml`'"
 
   - id: C_SUPERACAO_20261102_GEMINI_CLI_RETAIL_SUNSET_SCOPE
@@ -1087,7 +1087,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "Em 18/06/2026 o Gemini CLI deixou de servir AI Pro/Ultra e o uso gratuito, que passaram ao Antigravity CLI; segue por chave de API paga e licença Code Assist Standard/Enterprise, e não é otimizado para o Gemini 4 Argon: linha em descontinuação no varejo."
-    narrative: "Medida: WebFetch em 2026-11-02 de geminicli.com/docs/hooks/reference/ (banner com o qualificador de escopo) e de developers.googleblog.com (frases de escopo e de acesso mantido). O Antigravity CLI manteria Agent Skills, Hooks, Subagents e Extensions como plugins, segundo o blog (texto do repasse cortado aí). Critério V1_QUOTE_NAO_SUSTENTA. Alvo reprovado (R8): 'O Gemini CLI foi substituído' sem o qualificador."
+    narrative: "Medida: WebFetch em 2026-11-02 de geminicli.com/docs/hooks/reference/ (banner com o qualificador de escopo) e de developers.googleblog.com (frases de escopo e de acesso mantido). O Antigravity CLI manteria Agent Skills, Hooks, Subagents e Extensions como plugins, segundo o blog (texto do repasse cortado aí). Critério V1_QUOTE_NAO_SUSTENTA. Alvo reprovado (refutada 8): 'O Gemini CLI foi substituído' sem o qualificador."
     trace: "WebFetch https://geminicli.com/docs/hooks/reference/ e grep -F 'Unpaid tier and Google One users: Gemini CLI was replaced by Antigravity CLI'; WebFetch https://developers.googleblog.com/en/an-important-update-transitioning-gemini-cli-to-antigravity-cli/"
 
   - id: C_SUPERACAO_20261102_QWEN_HOOKS_PAGE_ANCHOR
