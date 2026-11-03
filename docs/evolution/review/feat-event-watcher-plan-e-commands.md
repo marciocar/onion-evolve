@@ -3,14 +3,14 @@ branch: feat/event-watcher-plan-e-commands
 pr: pendente
 date: 2026-11-03
 reviewed_diff_sha256: pendente
-findings_total: 75
-findings_real: 70
+findings_total: 78
+findings_real: 73
 tokens: 0
 duration_min: 300
-findings_fixed: 68
+findings_fixed: 71
 verdict: REPROVADO_E_CURADO
 elenxo: sim
-reviewer: "curadoria (dona do PLAN-E): 8 passadas adversariais do Elenxo em agente separado, mais os julgamentos de semântica"
+reviewer: "curadoria (dona do PLAN-E): 8 passadas adversariais do Elenxo em agente separado e 4 conferências curtas, mais os julgamentos de semântica; branch APROVADA pela curadoria em 78ee060a6"
 nota: "tokens 0 = não medido do lado da revisão (correu na sessão da curadoria, que declarou o custo por passada, de 80 mil a 230 mil tokens); o construtor foi um agente do core."
 ---
 
@@ -55,3 +55,15 @@ envio falha fechado; toda recusa do escritor a um produtor oficial vira lacuna).
 ## Mutantes
 
 Um por caso novo, nas quatro famílias (q30 a q53, sh1 a sh67, g1 a g16b).
+
+## Conferências finais (9ª rodada, 2026-11-03)
+
+- **Supersedes sem decisão humana** (b614a3b85): o `--supersedes` é conferido sempre, e o leitor ignora o que aponta
+  outro evento. Casos sh73, sh74 e sh75, com mutante. Conferido pela curadoria: passa.
+- **Colisão de line_id** (78ee060a6): o id duplicado vira malformado, sai rc 2 com os gatilhos null, e não fecha
+  lacuna. Casos sh76 e sh77, com mutante. Conferido pela curadoria: passa, e a branch está aprovada.
+- **Baixos declarados**, não curados:
+  - o bloco `if dup:` não tem caso próprio; o sh76 o pega porque as duas cópias tiram o log de 50 eventos;
+  - um ciclo de supersedes escrito à mão faz o evento sumir calado, o que cai no modelo de ameaça (log editado à
+    mão);
+  - B2, B3 e B4, que estão no cabeçalho do `a2a-metrics.py`.
