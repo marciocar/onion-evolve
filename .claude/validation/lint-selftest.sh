@@ -191,6 +191,12 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 #                              TOTAL; quem consome AGRUPA por nome. Emitir uma linha só
 #                              exigiria o pai somar shards e esconderia a distribuição real
 #                              do trabalho, que é justamente o que se quer ver.
+#   --disk-report <ABS.tsv>    SONDA DE DISCO por família (2026-11-04, #1461): arquivo À PARTE do
+#                              --report (os leitores dele não mudam). Uma linha `inicio` ANTES da
+#                              família e uma `fim` depois, gravadas na hora (append), com o disco
+#                              livre do FS do TMPDIR e do workspace e o tamanho do TMPDIR próprio
+#                              da família. Família sem `fim` = a que estava rodando quando a faixa
+#                              morreu. Caminho ABSOLUTO; falha de I/O NÃO muda o rc.
 SELFTEST_EXPECTED_EXIT=0   # 1 = o script chegou a uma saida PROJETADA (ajuda, listagem, uso invalido)
 SELFTEST_LIST=0; SELFTEST_MAP=0; SELFTEST_TIMING="${ONION_SELFTEST_TIMING:-0}"
 SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_FAMILIES:-}"
@@ -211,10 +217,14 @@ SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_i
 # O retrato e o inventário do PAI (arranque compartilhado, 2026-10-13) só valem para o worker (--child) que ele
 # disparou: uma bancada aninhada roda sobre OUTRA árvore e herdar o retrato dela seria testar o repo errado.
 SELFTEST_SNAPSHOT=""; SELFTEST_INVENTORY_ENV=""; _SNAPDIR=""; SELFTEST_STARTUP_WHY=""
+# A SONDA DE DISCO segue a mesma regra: o caminho só vale para o worker que o pai disparou. Uma bancada
+# aninhada (selftest_lanes) que o herdasse escreveria as famílias SINTÉTICAS dela no relatório real da faixa.
+SELFTEST_DISK_REPORT=""
 if [ "${SELFTEST_CHILD}" = "1" ]; then
   SELFTEST_SNAPSHOT="${ONION_SELFTEST_SNAPSHOT:-}"; SELFTEST_INVENTORY_ENV="${ONION_SELFTEST_INVENTORY_ENV:-}"
+  SELFTEST_DISK_REPORT="${ONION_SELFTEST_DISK_REPORT:-}"
 fi
-unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS ONION_SELFTEST_FIXTURES_LANE ONION_SELFTEST_FULL ONION_SELFTEST_SNAPSHOT ONION_SELFTEST_INVENTORY_ENV
+unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS ONION_SELFTEST_FIXTURES_LANE ONION_SELFTEST_FULL ONION_SELFTEST_SNAPSHOT ONION_SELFTEST_INVENTORY_ENV ONION_SELFTEST_DISK_REPORT
 while [ $# -gt 0 ]; do
   case "$1" in
     --list) SELFTEST_LIST=1 ;;
@@ -222,6 +232,8 @@ while [ $# -gt 0 ]; do
     --timing) SELFTEST_TIMING=1 ;;
     --report) shift; SELFTEST_REPORT="${1:-}" ;;
     --report=*) SELFTEST_REPORT="${1#--report=}" ;;
+    --disk-report) shift; SELFTEST_DISK_REPORT="${1:-}" ;;
+    --disk-report=*) SELFTEST_DISK_REPORT="${1#--disk-report=}" ;;
     --child) SELFTEST_CHILD=1 ;;
     --dry-run) SELFTEST_DRY=1 ;;
     --local) SELFTEST_LOCAL=1 ;;
@@ -271,6 +283,64 @@ if [ -n "${SELFTEST_REPORT}" ]; then
     echo "lint-selftest: --report não combina com --list/--map/--dry-run (nenhuma guarda roda; não há o que relatar)" >&2
     exit 2
   fi
+fi
+
+# ── SONDA DE DISCO POR FAMÍLIA (2026-11-04, PR #1461) ─────────────────────────────────────────────
+#
+#  O CASO QUE A PEDIU: a faixa 2 do #1461 morreu no runner com «Free space left: 0 MB» e estourou o
+#  teto de 25 min; local, cada família passa sozinha com pico de 270 MB no df. A faixa cancelada deixou
+#  um artefato quase vazio, porque o --report é escrito pelo PAI, no FIM — e uma faixa que morre por
+#  timeout não chega ao fim. Sem medida do CI, qualquer culpado nomeado seria palpite.
+#
+#  ⚠️ ESTA É A EXCEÇÃO DECLARADA À RESTRIÇÃO (a) DO --report ("quem escreve é o pai"). A sonda TEM de
+#     escrever durante a família, então quem escreve é quem roda a família — o worker. O que torna isso
+#     seguro é a forma da escrita: SÓ append (O_APPEND), UMA linha curta por `printf`, bem abaixo de
+#     PIPE_BUF — o kernel não intercala nem sobrescreve linhas de workers concorrentes. Por isso ela vive
+#     num arquivo À PARTE: o TSV do --report e os seus leitores (selftest-summary, main-bench-alarm)
+#     ficam byte a byte como eram.
+#
+#  FORMATO (uma linha por evento; `-` = não medido, nunca 0):
+#    familia ⇥ fase(inicio|fim) ⇥ epoch ⇥ worker ⇥ tmp_livre_kb ⇥ ws_livre_kb ⇥ tmp_familia_kb
+#  · tmp_livre_kb / ws_livre_kb: `df -Pk` (portável) do FS do TMPDIR original e do REPO_ROOT;
+#  · tmp_familia_kb: `du -sk` do TMPDIR PRÓPRIO da família, no fim, antes de qualquer limpeza (a sonda
+#    não apaga nada: o que a família deixou é exatamente o que se quer medir);
+#  · `_faixa` inicio/fim: o processo de topo, antes e depois de tudo.
+#  LEITURA: família com `inicio` e sem `fim` é a que estava rodando quando a faixa morreu; a queda de
+#  livre entre `inicio` e `fim` mistura os workers concorrentes, o tmp_familia_kb não.
+#  ⚠️ LIMITE DECLARADO: o TMPDIR próprio só pega o que a família cria por `mktemp` honrando o TMPDIR. As
+#     famílias que fixam `TMPDIR=/tmp` (para não cair dentro de um repositório) escapam dele — para
+#     essas, a pista é a queda do tmp_livre_kb.
+#  A ESCRITA NÃO MUDA O VEREDITO: falha de I/O (disco cheio, que é o caso que a sonda persegue) avisa
+#  em stderr e segue.
+if [ -n "${SELFTEST_DISK_REPORT}" ]; then
+  case "${SELFTEST_DISK_REPORT}" in
+    /*) ;;
+    *) SELFTEST_EXPECTED_EXIT=1; echo "lint-selftest: --disk-report exige caminho ABSOLUTO (recebi '${SELFTEST_DISK_REPORT}')" >&2; exit 2 ;;
+  esac
+  if [ "${SELFTEST_LIST}" = "1" ] || [ "${SELFTEST_MAP}" = "1" ] || [ "${SELFTEST_DRY}" = "1" ]; then
+    SELFTEST_EXPECTED_EXIT=1
+    echo "lint-selftest: --disk-report não combina com --list/--map/--dry-run (nenhuma família roda; não há o que medir)" >&2
+    exit 2
+  fi
+fi
+SELFTEST_DISK_TMPBASE="${TMPDIR:-/tmp}"
+_selftest_disk_probe_free_kb() {   # $1 = caminho → KB livres do FS dele (`-` se o df não respondeu)
+  local _v; _v="$(df -Pk "$1" 2>/dev/null | awk 'NR==2{print $4}')" || _v=""
+  case "${_v}" in ''|*[!0-9]*) printf -- '-' ;; *) printf '%s' "${_v}" ;; esac
+}
+_selftest_disk_probe_write() {   # $1 familia · $2 fase · $3 tmp_familia_kb
+  [ -n "${SELFTEST_DISK_REPORT}" ] || return 0
+  local _line
+  _line="$1"$'\t'"$2"$'\t'"$(date +%s)"$'\t'"${SELFTEST_SHARD:--}"$'\t'"$(_selftest_disk_probe_free_kb "${SELFTEST_DISK_TMPBASE}")"$'\t'"$(_selftest_disk_probe_free_kb "${REPO_ROOT}")"$'\t'"$3"
+  { printf '%s\n' "${_line}" >> "${SELFTEST_DISK_REPORT}"; } 2>/dev/null \
+    || echo "  ⚠ --disk-report: não consegui gravar '$1 $2' em ${SELFTEST_DISK_REPORT} (o veredito NÃO muda por isso)" >&2
+  return 0
+}
+# o topo (serial, ou o pai da faixa paralela) abre o arquivo com o cabeçalho; o worker só acrescenta
+if [ -n "${SELFTEST_DISK_REPORT}" ] && [ "${SELFTEST_CHILD}" = "0" ]; then
+  { printf 'familia\tfase\tepoch\tworker\ttmp_livre_kb\tws_livre_kb\ttmp_familia_kb\n' > "${SELFTEST_DISK_REPORT}"; } 2>/dev/null \
+    || echo "  ⚠ --disk-report: não consegui criar ${SELFTEST_DISK_REPORT} (o veredito NÃO muda por isso)" >&2
+  _selftest_disk_probe_write _faixa inicio -
 fi
 
 if [ "${SELFTEST_JOBS}" = "auto" ]; then SELFTEST_JOBS="$(nproc 2>/dev/null || echo 1)"; fi
@@ -423,6 +493,16 @@ _family() {
     if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then : > "${SELFTEST_QUEUE}/done/${name}"; fi
     return 0
   fi
+  # SONDA DE DISCO (só com --disk-report): a linha `inicio` vai para o arquivo ANTES de a família rodar —
+  # é ela que nomeia a família que estava no ar quando a faixa morreu. A família ganha um TMPDIR próprio
+  # (filho do TMPDIR original) para o `du` do fim medir só o que ELA deixou.
+  local _dp_tmp="" _dp_had_tmpdir=0 _dp_old_tmpdir="${TMPDIR:-}"
+  [ -n "${TMPDIR+x}" ] && _dp_had_tmpdir=1
+  if [ -n "${SELFTEST_DISK_REPORT}" ]; then
+    _dp_tmp="$(mktemp -d "${SELFTEST_DISK_TMPBASE}/onion-selftest-${name}.XXXXXX" 2>/dev/null)" || _dp_tmp=""
+    _selftest_disk_probe_write "${name}" inicio -
+    [ -n "${_dp_tmp}" ] && export TMPDIR="${_dp_tmp}"
+  fi
   t0="${SECONDS}"
   local _p0="${PASS}" _f0="${FAIL}" _s0="${SKIP}"
   if [ -n "${SLOT_FD}" ]; then
@@ -432,6 +512,15 @@ _family() {
     "${fn}"
   fi
   _slot_release
+  if [ -n "${SELFTEST_DISK_REPORT}" ]; then
+    if [ "${_dp_had_tmpdir}" = "1" ]; then export TMPDIR="${_dp_old_tmpdir}"; else unset TMPDIR; fi
+    local _dp_kb="-"
+    if [ -n "${_dp_tmp}" ]; then
+      _dp_kb="$(du -sk "${_dp_tmp}" 2>/dev/null | awk '{print $1}')" || _dp_kb=""
+      case "${_dp_kb}" in ''|*[!0-9]*) _dp_kb="-" ;; esac
+    fi
+    _selftest_disk_probe_write "${name}" fim "${_dp_kb}"
+  fi
   # delta por família — a granularidade é FAMÍLIA e não CASO de propósito: os nomes de quem FALHOU
   # já viajam pelo protocolo, e registrar os ~980 nomes de quem passou engordaria o trailer 6× sem
   # responder nenhuma pergunta que já não esteja respondida.
@@ -1388,6 +1477,7 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
         ONION_SELFTEST_QUEUE="${_tdir}/q" ONION_SELFTEST_SHARD="${i}/${_j}" ONION_SELFTEST_TIMING="${SELFTEST_TIMING}" \
         ONION_SELFTEST_FIXTURES_LANE="${SELFTEST_FIXTURES_LANE}" \
         ONION_SELFTEST_SNAPSHOT="${SELFTEST_SNAPSHOT}" ONION_SELFTEST_INVENTORY_ENV="${SELFTEST_INVENTORY_ENV}" \
+        ONION_SELFTEST_DISK_REPORT="${SELFTEST_DISK_REPORT}" \
         bash "${BASH_SOURCE[0]}" --child > "${_tdir}/${i}.out" 2>&1 &
       _pids[i]=$!
     done
@@ -32109,6 +32199,17 @@ i=s.rindex('echo "=== Sumário do auto-teste de guardas ==="')
 # insere antes do bloco list/child (que precede o cabeçalho do sumário)
 k=s.rfind('if [ "${SELFTEST_LIST}" = "1" ]; then SUMMARY_PRINTED=1; exit 0; fi', 0, i)
 syn='run_zz_ok_selftests() { record_pass "zz ok"; }\n_family run_zz_ok_selftests\nrun_zz_ok2_selftests() { record_pass "zz ok2"; }\n_family run_zz_ok2_selftests\nrun_zz_abort_selftests() { exit 3; }\n_family run_zz_abort_selftests\n'
+# zz_disk (caso t, sonda de disco): 2 MB no TMPDIR da família + a linha `inicio` dela lida DURANTE a família
+syn+=r'''run_zz_disk_selftests() {
+  local _zzd; _zzd="$(mktemp -d)"; head -c 2097152 /dev/zero > "${_zzd}/peso"
+  if [ -n "${ZZ_DISK_PEEK:-}" ] && awk -F'\t' '$1=="zz_disk" && $2=="inicio"{f=1} END{exit !f}' "${ZZ_DISK_PEEK}" 2>/dev/null; then
+    record_pass "zz disk: inicio gravado antes do fim da familia"
+  else record_fail "zz disk" "a linha inicio da sonda NAO estava no arquivo durante a familia"; fi
+  }
+  _family run_zz_disk_selftests
+'''
+# ⚠️ o `}` e o `_family` da zz_disk vão RECUADOS: na coluna 0 o `^_family ` estático do harness-inventory
+#    a contava como família do arquivo real (309 contra 308 do --list) e o seletor do pre-commit a mapeava
 s=s[:k]+syn+s[k:]; open(p,"w").write(s)
 PYI
   local copy="${d}/.claude/validation/lint-selftest.sh"
@@ -32235,6 +32336,82 @@ PYMUT
       record_pass "selftest-lanes: (q) TOTAL do --report = soma das famílias (${totp})"
     else record_fail "selftest-lanes: (q) aritmética do --report" "soma das famílias=${somap} TOTAL=${totp:-<ausente>}"; fi
   else record_fail "selftest-lanes: (q) --report não produziu TSV com cabeçalho" "arquivo=${rep}"; fi
+
+  # (t) SONDA DE DISCO POR FAMÍLIA (--disk-report, 2026-11-04, PR #1461). A faixa 2 do #1461 morreu sem disco
+  #     no runner e deixou um artefato quase vazio: o --report só sai no fim, e a faixa cancelada não tem fim.
+  #     Três coisas têm de valer, e cada uma tem o seu mutante/contraprova:
+  #     (t1) o arquivo traz, por família, inicio e fim com disco livre do TMPDIR e do workspace e o tamanho
+  #          do TMPDIR da família (zz_disk deixa 2 MB ⇒ ≥ 2048 KB), e o TSV do --report NÃO muda de forma;
+  #     (t2) a linha `inicio` é gravada ANTES de a família terminar — a própria zz_disk a lê de dentro; o
+  #          MUTANTE que só grava o `inicio` depois da família (o arquivo final igual!) tem de reprovar;
+  #     (t3) família que derruba o worker deixa `inicio` sem `fim` — é assim que se lê o culpado na faixa morta.
+  local _sldp_rep="${d}/disk-t.tsv" _sldp_tsv="${d}/rep-t.tsv" _sldp_o _sldp_r _sldp_bad=""
+  local _sldp_mut="${d}/.claude/validation/lint-selftest-dmut.sh" _sldp_mo _sldp_mr
+  _sldp_o="$(ZZ_DISK_PEEK="${_sldp_rep}" bash "${copy}" --families zz_ok,zz_disk --jobs 2 --report "${_sldp_tsv}" --disk-report "${_sldp_rep}" 2>&1)" && _sldp_r=0 || _sldp_r=$?
+  [ "${_sldp_r}" -eq 0 ] && grep -q 'Passaram : 2$' <<< "${_sldp_o}" || _sldp_bad="${_sldp_bad} rc=${_sldp_r}/$(grep -oE 'Passaram : [0-9]+' <<< "${_sldp_o}" | tail -1)"
+  [ "$(head -1 "${_sldp_rep}" 2>/dev/null)" = "$(printf 'familia\tfase\tepoch\tworker\ttmp_livre_kb\tws_livre_kb\ttmp_familia_kb')" ] || _sldp_bad="${_sldp_bad} cabeçalho-da-sonda"
+  _sldp_bad="${_sldp_bad}$(awk -F'\t' 'NR>1 { k=$1"/"$2; seen[k]=NR
+      if ($5 !~ /^[0-9]+$/ || $6 !~ /^[0-9]+$/) printf " df-ilegível:%s", k
+      if ($1=="zz_disk" && $2=="fim" && !($7 ~ /^[0-9]+$/ && $7+0 >= 2048)) printf " zz_disk-tmp=%s(<2048KB)", $7 }
+    END { n=split("_faixa/inicio zz_ok/inicio zz_ok/fim zz_disk/inicio zz_disk/fim _faixa/fim", need, " ")
+      for (i=1;i<=n;i++) if (!(need[i] in seen)) printf " falta:%s", need[i]
+      if (seen["zz_disk/inicio"] >= seen["zz_disk/fim"]) printf " zz_disk:inicio-depois-do-fim" }' "${_sldp_rep}" 2>/dev/null || echo " sonda-ilegível")"
+  [ "$(head -1 "${_sldp_tsv}" 2>/dev/null)" = "$(printf 'familia\tpass\tfail\tskip\tsegundos')" ] \
+    && awk -F'\t' '$1=="zz_disk" || $1=="zz_ok" {n++; if (NF!=5) bad=1} END{exit !(n==2 && !bad)}' "${_sldp_tsv}" \
+    || _sldp_bad="${_sldp_bad} --report-mudou-de-forma"
+  if [ -z "${_sldp_bad}" ]; then
+    record_pass "selftest-lanes: (t1) --disk-report: inicio/fim por família com df do TMPDIR e do workspace e o TMPDIR da família (zz_disk ≥ 2 MB); o --report segue com 5 colunas"
+  else record_fail "selftest-lanes: (t1) sonda de disco" "${_sldp_bad}"; fi
+  # (t2) mutante: o `inicio` sai do lugar e vai para DEPOIS da família — o arquivo final teria as mesmas linhas
+  python3 - "${copy}" "${_sldp_mut}" <<'PYDMUT'
+import re, sys
+src, dst = sys.argv[1], sys.argv[2]
+s = open(src).read()
+rx = re.compile(r'^    _selftest_disk_probe_write "\$\{name\}" inicio -\n', re.M)
+anc = '  _slot_release\n  if [ -n "${SELFTEST_DISK_REPORT}" ]; then\n'
+if len(rx.findall(s)) != 1 or s.count(anc) != 1: sys.exit(0)   # sem as âncoras o mutante não nasce e o caso acusa
+s = rx.sub('', s).replace(anc, '  _slot_release\n  _selftest_disk_probe_write "${name}" inicio -\n  if [ -n "${SELFTEST_DISK_REPORT}" ]; then\n')
+open(dst, "w").write(s)
+PYDMUT
+  if [ ! -f "${_sldp_mut}" ]; then
+    record_fail "selftest-lanes: (t2) mutante" "a âncora do \`inicio\` da sonda não está UMA vez no _family — a gravação antes da família sumiu ou mudou de forma"
+  else
+    rm -f "${_sldp_rep}"
+    _sldp_mo="$(ZZ_DISK_PEEK="${_sldp_rep}" bash "${_sldp_mut}" --families zz_disk --disk-report "${_sldp_rep}" 2>&1)" && _sldp_mr=0 || _sldp_mr=$?
+    rm -f "${_sldp_mut}"
+    if [ "${_sldp_r}" -eq 0 ] && [ "${_sldp_mr}" -eq 1 ] && grep -q 'zz disk' <<< "${_sldp_mo}" \
+       && awk -F'\t' '$1=="zz_disk" && $2=="inicio"{f=1} END{exit !f}' "${_sldp_rep}" 2>/dev/null; then
+      record_pass "selftest-lanes: (t2) SUT grava o inicio ANTES da família (ela o lê de dentro); o mutante que o grava depois tem o mesmo arquivo final e REPROVA (exit 1)"
+    else record_fail "selftest-lanes: (t2) inicio antes da família" "SUT rc=${_sldp_r}; mutante rc=${_sldp_mr} (esperado 1, com 'zz disk' reprovado e o inicio presente no arquivo final)"; fi
+  fi
+  # (t3) worker morto no meio da família ⇒ inicio sem fim (a leitura do culpado numa faixa cancelada) + caminho relativo recusado
+  rm -f "${_sldp_rep}"
+  bash "${copy}" --families zz_ok,zz_abort --jobs 2 --disk-report "${_sldp_rep}" >/dev/null 2>&1 || true
+  _sldp_o="$(bash "${copy}" --families zz_ok --disk-report rel-disk.tsv 2>&1)" && _sldp_r=0 || _sldp_r=$?
+  if awk -F'\t' '$1=="zz_abort" && $2=="inicio"{i=1} $1=="zz_abort" && $2=="fim"{f=1} $1=="zz_ok" && $2=="fim"{o=1} END{exit !(i && !f && o)}' "${_sldp_rep}" 2>/dev/null \
+     && [ "${_sldp_r}" -eq 2 ] && grep -q 'caminho ABSOLUTO' <<< "${_sldp_o}"; then
+    record_pass "selftest-lanes: (t3) família que derruba o worker fica com inicio e SEM fim no --disk-report; caminho relativo ⇒ rc=2"
+  else record_fail "selftest-lanes: (t3) faixa morta" "relativo rc=${_sldp_r}; linhas zz_abort: $(grep -c '^zz_abort' "${_sldp_rep}" 2>/dev/null || echo 0) (esperado só o inicio)"; fi
+  # (t4) O CI USA A SONDA DE VERDADE: o passo da bancada passa --disk-report, o artefato leva o arquivo, e o
+  #      teto do PASSO fica abaixo do teto do JOB — sem essa folga, o timeout mata o job antes de os passos
+  #      `if: always()` subirem a evidência da faixa morta (o artefato quase vazio do #1461).
+  local _sldp_wf="${REPO_ROOT}/.github/workflows/onion-selftest.yml"
+  if [ -f "${_sldp_wf}" ]; then
+    if python3 - "${_sldp_wf}" <<'PYDWF'
+import re, sys
+s = open(sys.argv[1]).read()
+job = s[s.index('\n  selftest:\n'):s.index('\n  selftest-gate:\n')]
+jt = int(re.search(r'^    timeout-minutes: (\d+)$', job, re.M).group(1))
+i = job.index('lint-selftest.sh --jobs auto')
+step = job[job.rindex('      - name:', 0, i):i + 600]   # do início do PASSO da bancada até o comando
+st = re.findall(r'^        timeout-minutes: (\d+)$', step, re.M)
+ok = ('--disk-report "${GITHUB_WORKSPACE}/selftest-disk.tsv"' in step and st and int(st[-1]) < jt
+      and re.search(r'upload-artifact[\s\S]*?\n\s+selftest-disk\.tsv\n', job))
+sys.exit(0 if ok else 1)
+PYDWF
+    then record_pass "selftest-lanes: (t4) o workflow passa --disk-report, sobe selftest-disk.tsv no artefato e o teto do passo é menor que o do job"
+    else record_fail "selftest-lanes: (t4) wire-in da sonda" "o workflow não passa --disk-report, não sobe selftest-disk.tsv ou o teto do passo não fica abaixo do teto do job"; fi
+  else record_skip "selftest-lanes: (t4) workflow ausente (adotante sem .github) — wire-in não verificado"; fi
 
   rm -rf "${d}"
 
@@ -49857,6 +50034,8 @@ if [ "${SELFTEST_CHILD}" = "1" ]; then
   SUMMARY_PRINTED=1; exit 0
 fi
 # ── escrita do relatório: PAI, contagem completa, ANTES do veredito, sem poder mudá-lo ─────────
+# a sonda de disco fecha a faixa no topo (o worker não: a faixa é do pai)
+if [ -n "${SELFTEST_DISK_REPORT}" ] && [ "${SELFTEST_CHILD}" = "0" ]; then _selftest_disk_probe_write _faixa fim -; fi
 if [ -n "${SELFTEST_REPORT}" ]; then
   {
     printf 'familia\tpass\tfail\tskip\tsegundos\n'
