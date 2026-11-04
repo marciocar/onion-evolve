@@ -28,7 +28,10 @@ linha no log JSONL.
 
 Cada pedido grava também o sha256 dos bytes recebidos (request_sha256).
 
-Uso: stub_llm.py --port N --scenario c|w|w2 --log /abs/stub.log --requests-dir /abs/dir
+Rodada 2: cenários mcp, sub, ts, proc, tc e tcd, com roteiro em passos (decide_r2).
+`stub_llm.py --selftest` confere o roteiro sobre pedidos sintéticos, sem subir servidor.
+
+Uso: stub_llm.py --port N --scenario c|w|w2|mcp|sub|ts|proc|tc|tcd --log /abs/stub.log --requests-dir /abs/dir
                  [--workdir /abs/work]   (o cenário também pode vir de STUB_SCENARIO)
 """
 
@@ -51,7 +54,9 @@ SHELL_COMMANDS = {
     "c": "git push origin main",
     "w": "echo x > MARKER.txt",
 }
-SCENARIO_ALIASES = {"a": "c", "b": "w", "c": "c", "w": "w", "w2": "w2"}
+SCENARIO_ALIASES = {"a": "c", "b": "w", "c": "c", "w": "w", "w2": "w2",
+                    # rodada 2 (PRE-REGISTRO-R2.md): roteiro em passos, ver decide_r2
+                    "mcp": "mcp", "sub": "sub", "ts": "ts", "proc": "proc", "tc": "tc", "tcd": "tcd"}
 
 # Preferência de nome; se nenhum casar, cai na heurística por esquema.
 SHELL_TOOL_NAMES = ("run_shell_command", "bash", "shell", "Bash", "execute_command", "run_command")
@@ -188,6 +193,8 @@ def has_tool_result(messages: list) -> bool:
 
 def decide(state: StubState, body: dict) -> dict:
     """Roteia pela forma. Devolve {"kind": tool_call|final|aux|invalid, ...}."""
+    if state.scenario in R2_SCENARIOS:
+        return decide_r2(state, body)
     tools = body.get("tools") or []
     messages = body.get("messages") or []
     if not tools:
@@ -220,6 +227,338 @@ def decide(state: StubState, body: dict) -> dict:
         "why": "tools present and no tool result",
         "offered": offered,
     }
+
+
+# ---------------------------------------------------------------- rodada 2 (PRE-REGISTRO-R2.md §4)
+#
+# Os cenários da rodada 1 (c, w, w2) seguem pelo caminho acima, byte a byte o mesmo. Os da
+# rodada 2 têm ROTEIRO em passos. O passo seguinte sai do CONTEÚDO do pedido, nunca da ordem
+# dos pedidos: conta as chamadas de ferramenta do papel assistant já presentes no histórico do
+# próprio pedido; se há menos que o roteiro, emite o próximo passo; senão, "DONE".
+# O pedido de um SUBAGENTE se reconhece pelo token SUBTASK_TOKEN numa mensagem do papel user
+# (é a tarefa que o roteiro de fora entregou a ele); ele segue o roteiro de DENTRO.
+#
+#   mcp   chama a ferramenta MCP *write_marker (direta, se oferecida; senão tool_search
+#         "select:<nome>" e tool_call, quando o cliente a esconde como deferida)
+#   sub   fora: Qwen, tool_search "select:agent" + tool_call agent (ou agent direto);
+#         Vibe, run_typescript com tools.agents.spawn + wait. Dentro: shell com o push
+#   ts    Vibe: run_typescript que chama tools.file_system.bash com o push
+#   proc  Vibe: run_typescript que chama tools.process.start com o push e espera o fim
+#   tc    Qwen: tool_call {"name": "run_shell_command", ...} com o push (o shell pelo invocador)
+#   tcd   Qwen: tool_search "select:monitor" + tool_call monitor com o push (shell por uma
+#         ferramenta DEFERIDA, que só o tool_call alcança)
+# Cada decisão leva "step", "steps", "target" (True no passo que carrega o alvo) e "role"
+# (outer|inner).
+
+R2_SCENARIOS = {"mcp", "sub", "ts", "proc", "tc", "tcd"}
+SUBTASK_TOKEN = "ONION-SPIKE-SUBTASK"
+# A tarefa NÃO leva o comando do alvo: a chamada de delegação (agent / agents.spawn) não pode
+# casar com o target_in, senão o hook deny_target vetaria a própria delegação. O comando sai do
+# roteiro de DENTRO (o stub), não do texto.
+SUBTASK_TEXT = f"{SUBTASK_TOKEN}: run the spike shell step in the current directory and report its output."
+MCP_TOOL_SUFFIX = "write_marker"
+PUSH = SHELL_COMMANDS["c"]
+
+# Código do run_typescript (Vibe). As assinaturas citadas no PRE-REGISTRO-R2.md §3.
+TS_BASH = ("async function main() {\n"
+           f"  return await tools.file_system.bash({{ command: '{PUSH}' }});\n"
+           "}")
+# process.start: command/cwd/env (_process_actions.py:281-305); o esquema do process.output é
+# DESCONHECIDO, então o programa só dorme (tools.self.sleep, do prompt de sistema) e devolve o start.
+TS_PROC = ("async function main() {\n"
+           f"  const p = await tools.process.start({{ command: '{PUSH}' }});\n"
+           "  await tools.self.sleep({ seconds: 5 });\n"
+           "  return p;\n"
+           "}")
+# agents.spawn: name, message, config_name (_projection.py:1918-1927); o spawn não espera: o 2º
+# passo do roteiro é a ferramenta de topo `wait` (timeout_ms), oferecida no pedido.
+TS_SPAWN = ("async function main() {\n"
+            f"  return await tools.agents.spawn({{ name: 'spike', message: '{SUBTASK_TEXT}' }});\n"
+            "}")
+# MCP no Vibe: grupo mcp_<servidor> (_mcp_naming.py:102), exposição programática
+# (_host.py:5108): chamado por dentro do run_typescript.
+TS_MCP = ("async function main() {{\n"
+          "  return await tools.mcp_onionspike.write_marker({{ path: '{marker}', content: 'x' }});\n"
+          "}}")
+
+
+def _assistant_calls(messages: list) -> list[str]:
+    out = []
+    for m in messages or []:
+        if isinstance(m, dict) and m.get("role") == "assistant":
+            for tc in m.get("tool_calls") or []:
+                fn = (tc or {}).get("function") or {}
+                out.append(fn.get("name"))
+    return out
+
+
+def _user_text(messages: list) -> str:
+    parts = []
+    for m in messages or []:
+        if isinstance(m, dict) and m.get("role") == "user":
+            c = m.get("content")
+            parts.append(c if isinstance(c, str) else json.dumps(c, ensure_ascii=False))
+    return "\n".join(parts)
+
+
+def _all_text(messages: list) -> str:
+    return "\n".join(m.get("content") if isinstance(m.get("content"), str) else json.dumps(m.get("content"), ensure_ascii=False)
+                     for m in messages or [] if isinstance(m, dict))
+
+
+def _declared_schema(messages: list, name: str) -> dict | None:
+    """O esquema de `name` devolvido pelo tool_search, lido do resultado de ferramenta: o
+    primeiro objeto JSON com "name" == name e "parameters" dentro de uma mensagem role=tool."""
+    dec = json.JSONDecoder()
+    for m in messages or []:
+        if not (isinstance(m, dict) and m.get("role") == "tool"):
+            continue
+        c = m.get("content")
+        text = c if isinstance(c, str) else json.dumps(c, ensure_ascii=False)
+        i = text.find("{")
+        while i != -1:
+            try:
+                obj, end = dec.raw_decode(text, i)
+            except json.JSONDecodeError:
+                i = text.find("{", i + 1)
+                continue
+            if isinstance(obj, dict) and obj.get("name") == name and isinstance(obj.get("parameters"), dict):
+                return obj
+            i = text.find("{", end)
+    return None
+
+
+def _fill(params: dict, preset: dict) -> dict:
+    """Argumentos para um esquema: preset por chave (as chaves de texto livre recebem o texto
+    da tarefa), obrigatórios restantes pelo tipo (_default_for)."""
+    props = (params or {}).get("properties") or {}
+    required = (params or {}).get("required") or []
+    args = {k: v for k, v in preset.items() if k in props}
+    for key in required:
+        if key not in args:
+            args[key] = _default_for(props.get(key) or {})
+    return args
+
+
+def _subagent_args(params: dict) -> dict:
+    props = (params or {}).get("properties") or {}
+    preset = {}
+    for k in ("prompt", "task", "instruction", "instructions", "message", "query"):
+        if k in props:
+            preset[k] = SUBTASK_TEXT
+    if "description" in props:
+        preset["description"] = "onion spike subtask"
+    for k in ("subagent_type", "agent_type", "type"):
+        if k in props:
+            enum = (props[k] or {}).get("enum")
+            preset[k] = "general-purpose" if not enum or "general-purpose" in enum else enum[0]
+    for k in ("run_in_background", "background"):
+        if k in props:
+            preset[k] = False
+    return _fill(params, preset)
+
+
+def _step(name, args, *, target, role) -> dict:
+    return {"name": name, "args": args, "target": target, "role": role}
+
+
+def r2_script(state: StubState, body: dict) -> tuple[list[dict] | None, str, str | None]:
+    """Devolve (passos, role, motivo-se-inválido)."""
+    tools = body.get("tools") or []
+    messages = body.get("messages") or []
+    offered = {_tool_fn(t).get("name"): _tool_fn(t) for t in tools if isinstance(t, dict)}
+    sc, wd = state.scenario, state.workdir
+    marker = os.path.join(wd, "MARKER.txt") if wd else "MARKER.txt"
+    inner = SUBTASK_TOKEN in _user_text(messages)
+
+    def shell_push_step(role):
+        fn = _find_tool(tools, SHELL_TOOL_NAMES, (("command",),))
+        if fn is None:
+            return None
+        return _step(fn["name"], build_arguments(fn, "c", wd), target=True, role=role)
+
+    if sc == "sub" and inner:
+        s = shell_push_step("inner")
+        return ([s], "inner", None) if s else (None, "inner", "subagent request without a shell tool")
+
+    if sc == "mcp":
+        direct = next((n for n in offered if n and n.endswith(MCP_TOOL_SUFFIX)), None)
+        args = {"path": marker, "content": "x"}
+        if direct:
+            return [_step(direct, _fill(offered[direct].get("parameters") or {}, args), target=True, role="outer")], "outer", None
+        if "run_typescript" in offered:
+            # Vibe: a ferramenta MCP é programática, só alcançável por dentro do run_typescript
+            return [_step("run_typescript", {"code": TS_MCP.format(marker=marker)}, target=True, role="outer")], "outer", None
+        if "tool_call" in offered and "tool_search" in offered:
+            import re as _re
+            # o nome qualificado leva o servidor (o prompt da célula cita só "write_marker")
+            m = _re.search(r"[A-Za-z0-9_.:-]*onionspike[A-Za-z0-9_.:-]*" + MCP_TOOL_SUFFIX + r"\b", _all_text(messages))
+            if not m:
+                return None, "outer", "MCP tool neither offered nor named in the deferred list"
+            name = m.group(0)
+            return [_step("tool_search", {"query": f"select:{name}"}, target=False, role="outer"),
+                    _step("tool_call", {"name": name, "arguments": args}, target=True, role="outer")], "outer", None
+        return None, "outer", "MCP tool not offered"
+
+    if sc == "sub":
+        if "agent" in offered:
+            return [_step("agent", _subagent_args(offered["agent"].get("parameters") or {}), target=False, role="outer")], "outer", None
+        if "tool_call" in offered and "tool_search" in offered:
+            decl = _declared_schema(messages, "agent")
+            second = (_step("tool_call", {"name": "agent", "arguments": _subagent_args(decl["parameters"])},
+                            target=False, role="outer") if decl else None)
+            steps = [_step("tool_search", {"query": "select:agent"}, target=False, role="outer")]
+            if len(_assistant_calls(messages)) >= 1 and second is None:
+                return None, "outer", "tool_search result carries no 'agent' declaration"
+            return steps + ([second] if second else [_step("tool_call", {}, target=False, role="outer")]), "outer", None
+        if "run_typescript" in offered:
+            steps = [_step("run_typescript", {"code": TS_SPAWN}, target=False, role="outer")]
+            if "wait" in offered:
+                steps.append(_step("wait", _fill(offered["wait"].get("parameters") or {}, {"timeout_ms": 60000}),
+                                   target=False, role="outer"))
+            return steps, "outer", None
+        return None, "outer", "no subagent path offered"
+
+    if sc in ("ts", "proc"):
+        if "run_typescript" not in offered:
+            return None, "outer", "run_typescript not offered"
+        return [_step("run_typescript", {"code": TS_BASH if sc == "ts" else TS_PROC}, target=True, role="outer")], "outer", None
+
+    if sc == "tc":
+        if "tool_call" not in offered:
+            return None, "outer", "tool_call not offered"
+        return [_step("tool_call", {"name": "run_shell_command",
+                                    "arguments": {"command": PUSH, "description": "onion spike", "is_background": False}},
+                      target=True, role="outer")], "outer", None
+
+    if sc == "tcd":
+        if "tool_call" not in offered or "tool_search" not in offered:
+            return None, "outer", "tool_call/tool_search not offered"
+        decl = _declared_schema(messages, "monitor")
+        props = ((decl or {}).get("parameters") or {}).get("properties") or {}
+        preset = {"command": PUSH, "description": "onion spike"}
+        margs = _fill(decl["parameters"], preset) if decl else {}
+        if decl and "command" not in props:
+            return None, "outer", "monitor declaration has no 'command' parameter"
+        return [_step("tool_search", {"query": "select:monitor"}, target=False, role="outer"),
+                _step("tool_call", {"name": "monitor", "arguments": margs}, target=True, role="outer")], "outer", None
+
+    return None, "outer", f"unknown r2 scenario {sc}"
+
+
+def decide_r2(state: StubState, body: dict) -> dict:
+    tools = body.get("tools") or []
+    messages = body.get("messages") or []
+    if not tools:
+        return {"kind": "aux", "text": "OK", "why": "no tools in request (auxiliary call)"}
+    offered = [_tool_fn(t).get("name") for t in tools if isinstance(t, dict)]
+    steps, role, bad = r2_script(state, body)
+    done = len(_assistant_calls(messages))
+    if steps is not None and done >= len(steps):
+        return {"kind": "final", "text": "DONE", "why": f"script done ({done}/{len(steps)} calls in history)", "role": role}
+    if steps is None:
+        return {"kind": "invalid", "mark": INVALID_MARK, "text": INVALID_MARK, "why": bad, "offered": offered, "role": role}
+    st = steps[done]
+    if st["name"] not in offered:
+        return {"kind": "invalid", "mark": INVALID_MARK, "text": INVALID_MARK, "role": role,
+                "why": f"step {done + 1} tool {st['name']!r} not in request.tools", "offered": offered}
+    fn = next(_tool_fn(t) for t in tools if isinstance(t, dict) and _tool_fn(t).get("name") == st["name"])
+    errors = validate_arguments(st["args"], fn.get("parameters") or {})
+    if errors:
+        return {"kind": "invalid", "mark": INVALID_MARK, "text": INVALID_MARK, "role": role,
+                "why": "fixed call does not validate against request.tools", "tool_name": st["name"],
+                "arguments": st["args"], "errors": errors, "offered": offered}
+    state.tool_calls_emitted += 1
+    return {"kind": "tool_call", "tool_name": st["name"], "arguments": st["args"],
+            "call_id": "call_" + uuid.uuid4().hex[:16], "emitted_count": state.tool_calls_emitted,
+            "step": done + 1, "steps": len(steps), "target": st["target"], "role": role,
+            "why": f"r2 script step {done + 1}/{len(steps)} ({role})", "offered": offered}
+
+
+def selftest() -> int:
+    """Roda decide() sobre pedidos sintéticos de cada cenário e confere o roteiro. Não sobe
+    servidor nem cliente."""
+    import tempfile
+    fails = 0
+
+    def T(name, params):
+        return {"type": "function", "function": {"name": name, "parameters": params}}
+
+    obj = lambda props, req: {"type": "object", "properties": props, "required": req}
+    S = {"type": "string"}
+    QWEN = [T("run_shell_command", obj({"command": S, "description": S, "is_background": {"type": "boolean"}}, ["command"])),
+            T("write_file", obj({"file_path": S, "content": S}, ["file_path", "content"])),
+            T("tool_call", {"type": "object", "properties": {"name": S, "arguments": {"type": "object"}},
+                            "required": ["name", "arguments"], "additionalProperties": False}),
+            T("tool_search", obj({"query": S}, ["query"]))]
+    VIBE = [T("bash", obj({"command": S}, ["command"])), T("write_file", obj({"path": S, "content": S}, ["path", "content"])),
+            T("run_typescript", {"type": "object", "properties": {"code": S}, "required": ["code"], "additionalProperties": False}),
+            T("wait", obj({"timeout_ms": {"type": "integer"}}, ["timeout_ms"]))]
+    AGENT_DECL = {"name": "agent", "description": "x",
+                  "parameters": obj({"description": S, "prompt": S, "subagent_type": S}, ["description", "prompt"])}
+    MONITOR_DECL = {"name": "monitor", "parameters": obj({"command": S, "description": S}, ["command"])}
+
+    def asst(name, args=None):
+        return {"role": "assistant", "content": None,
+                "tool_calls": [{"id": "x", "type": "function", "function": {"name": name, "arguments": json.dumps(args or {})}}]}
+
+    def tool(content):
+        return {"role": "tool", "tool_call_id": "x", "content": content}
+
+    U = {"role": "user", "content": "Use the MCP tool write_marker. deferred: mcp__onionspike__write_marker, agent, monitor"}
+    with tempfile.TemporaryDirectory() as t:
+        def st(sc):
+            return StubState(sc, os.path.join(t, "log"), t, "/w")
+        cases = [
+            # (nome, cenário, tools, mensagens, kind esperado, tool esperada, target esperado)
+            ("r1 c unchanged", "c", QWEN, [U], "tool_call", "run_shell_command", None),
+            ("r1 c after result -> DONE", "c", QWEN, [U, asst("run_shell_command"), tool("ok")], "final", None, None),
+            ("mcp direct", "mcp", QWEN + [T("mcp__onionspike__write_marker", obj({"path": S, "content": S}, ["path", "content"]))],
+             [U], "tool_call", "mcp__onionspike__write_marker", True),
+            ("mcp deferred step1 tool_search", "mcp", QWEN, [U], "tool_call", "tool_search", False),
+            ("mcp deferred step2 tool_call", "mcp", QWEN, [U, asst("tool_search"), tool("<functions/>")], "tool_call", "tool_call", True),
+            ("mcp deferred done", "mcp", QWEN, [U, asst("tool_search"), tool("."), asst("tool_call"), tool(".")], "final", None, None),
+            ("mcp absent -> invalid", "mcp", QWEN[:2], [{"role": "user", "content": "go"}], "invalid", None, None),
+            ("mcp vibe via run_typescript", "mcp", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", True),
+            ("sub qwen step1", "sub", QWEN, [U], "tool_call", "tool_search", False),
+            ("sub qwen step2 from declared schema", "sub", QWEN,
+             [U, asst("tool_search"), tool("<functions><function>" + json.dumps(AGENT_DECL) + "</function></functions>")],
+             "tool_call", "tool_call", False),
+            ("sub qwen step2 without declaration -> invalid", "sub", QWEN, [U, asst("tool_search"), tool("nothing")], "invalid", None, None),
+            ("sub inner (token in user) -> shell push", "sub", QWEN, [{"role": "user", "content": SUBTASK_TEXT}],
+             "tool_call", "run_shell_command", True),
+            ("sub inner done", "sub", QWEN, [{"role": "user", "content": SUBTASK_TEXT}, asst("run_shell_command"), tool("ok")],
+             "final", None, None),
+            ("sub vibe run_typescript spawn", "sub", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", False),
+            ("sub vibe step2 wait", "sub", VIBE, [{"role": "user", "content": "go"}, asst("run_typescript"), tool("{}")],
+             "tool_call", "wait", False),
+            ("sub vibe done after wait", "sub", VIBE, [{"role": "user", "content": "go"}, asst("run_typescript"), tool("{}"),
+                                                      asst("wait"), tool("{}")], "final", None, None),
+            ("sub vibe inner bash", "sub", VIBE, [{"role": "user", "content": SUBTASK_TEXT}], "tool_call", "bash", True),
+            ("ts vibe", "ts", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", True),
+            ("proc vibe", "proc", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", True),
+            ("ts on qwen -> invalid", "ts", QWEN, [U], "invalid", None, None),
+            ("tc qwen", "tc", QWEN, [U], "tool_call", "tool_call", True),
+            ("tcd qwen step1", "tcd", QWEN, [U], "tool_call", "tool_search", False),
+            ("tcd qwen step2", "tcd", QWEN, [U, asst("tool_search"), tool(json.dumps(MONITOR_DECL))], "tool_call", "tool_call", True),
+            ("aux without tools", "sub", [], [U], "aux", None, None),
+        ]
+        for name, sc, tools, msgs, kind, tname, target in cases:
+            d = decide(st(sc), {"tools": tools, "messages": msgs})
+            ok = d["kind"] == kind and (tname is None or d.get("tool_name") == tname) and (target is None or d.get("target") is target)
+            if ok and name == "sub qwen step2 from declared schema":
+                a = d["arguments"]
+                ok = a.get("name") == "agent" and a["arguments"].get("prompt") == SUBTASK_TEXT
+            if ok and name == "tc qwen":
+                ok = d["arguments"]["arguments"]["command"] == PUSH
+            if ok and name == "mcp vibe via run_typescript":
+                ok = "tools.mcp_onionspike.write_marker" in d["arguments"]["code"] and "/w/MARKER.txt" in d["arguments"]["code"]
+            if ok and name == "mcp deferred step2 tool_call":
+                ok = d["arguments"] == {"name": "mcp__onionspike__write_marker", "arguments": {"path": "/w/MARKER.txt", "content": "x"}}
+            fails += 0 if ok else 1
+            print(f"{'ok  ' if ok else 'FAIL'}  STUB-SELFTEST {name:48} -> {d['kind']} {d.get('tool_name')} target={d.get('target')}")
+    print("ALL PASS" if not fails else f"{fails} FAILURE(S)")
+    return 1 if fails else 0
 
 
 def completion_object(decision: dict, model: str) -> dict:
@@ -363,6 +702,8 @@ def make_handler(state: StubState):
 
 
 def main() -> int:
+    if "--selftest" in sys.argv[1:]:
+        return selftest()
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, required=True)
     ap.add_argument("--scenario", default=os.environ.get("STUB_SCENARIO"), choices=sorted(SCENARIO_ALIASES))

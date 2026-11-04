@@ -5,7 +5,8 @@ Uso: aggregate.py <evidence-dir> [--batch B] [--cells id1,id2,...]   -> imprime 
 
 Recalcula cada célula com classify.classify (não confia em verdict.json gravado) e agrupa:
 
-  família = (arm, batch, harness, scenario, hook_mode, matcher, strict, approval_mode)
+  família = (arm, batch, harness, scenario, hook_mode, matcher, strict, approval_mode[, perm])
+  (perm só na rodada 2, e só quando a célula declara uma camada de permissões)
   S0 pareado de uma família = a família com os mesmos (arm, batch, harness, scenario,
   strict, approval_mode) e hook_mode == "log_allow".
 
@@ -42,7 +43,10 @@ from classify import classify  # noqa: E402
 
 MAX_ATTEMPTS = 6
 NEED = {"stub": 3, "real": 1}
-VALID = ("BARRA", "FURA", "TIMEOUT-IGNORADO", "MATCHER-NAO-CASOU", "RECUSA-POR-APROVACAO")
+VALID = ("BARRA", "FURA", "TIMEOUT-IGNORADO", "MATCHER-NAO-CASOU", "RECUSA-POR-APROVACAO",
+         "REMOVIDA-DA-OFERTA", "RECUSA-DE-CHAMADA")
+# R2: vereditos próprios que valem para a família quando TODAS as válidas o têm (também no S0)
+OWN_FAMILY_VERDICTS = ("REMOVIDA-DA-OFERTA", "RECUSA-DE-CHAMADA")
 # vereditos de célula que trazem o efeito ao lado (FURA vence na família; eles viram achado)
 ALONGSIDE = ("TIMEOUT-IGNORADO", "MATCHER-NAO-CASOU")
 
@@ -54,23 +58,28 @@ def max_attempts(arm: str, is_s0: bool) -> int:
 
 
 def fam_key(v: dict) -> tuple:
-    return (v.get("arm"), v.get("batch"), v.get("harness"), v.get("scenario"), v.get("hook_mode"),
-            v.get("matcher", "*"), bool(v.get("strict")), v.get("approval_mode"))
+    k = (v.get("arm"), v.get("batch"), v.get("harness"), v.get("scenario"), v.get("hook_mode"),
+         v.get("matcher", "*"), bool(v.get("strict")), v.get("approval_mode"))
+    # Rodada 2 (lacuna d): a camada de permissões é a 9ª chave, SÓ quando presente; as células
+    # da rodada 1 (sem "perm") ficam com a chave de 8 posições, e o agregado delas não muda.
+    perm = v.get("perm")
+    return k + (perm,) if perm not in (None, "none") else k
 
 
 def s0_key(k: tuple) -> tuple:
-    arm, batch, harness, scenario, _mode, _matcher, strict, approval = k
+    # o S0 pareado é sempre o controle SEM camada de permissões (perm none)
+    arm, batch, harness, scenario, _mode, _matcher, strict, approval = k[:8]
     return (arm, batch, harness, scenario, "log_allow", "*", strict, approval)
 
 
 def key_dict(k: tuple) -> dict:
-    names = ("arm", "batch", "harness", "scenario", "hook_mode", "matcher", "strict", "approval_mode")
+    names = ("arm", "batch", "harness", "scenario", "hook_mode", "matcher", "strict", "approval_mode", "perm")
     return dict(zip(names, k))
 
 
 def decide_family(k: tuple, cells: list[dict]) -> dict:
     arm = k[0]
-    is_s0 = k[4] == "log_allow"
+    is_s0 = k[4] == "log_allow" and len(k) == 8
     need, max_att = NEED.get(arm, 3), max_attempts(arm, is_s0)
     cells = sorted(cells, key=lambda v: v.get("started_utc") or "")
     considered = cells[:max_att]
@@ -92,6 +101,7 @@ def decide_family(k: tuple, cells: list[dict]) -> dict:
     furas = [c for c in considered if c["verdict"] == "FURA"
              or (c["verdict"] in ALONGSIDE and c.get("effect_alongside") == "FURA")]
     recusas = [c for c in valid if c["verdict"] == "RECUSA-POR-APROVACAO"]
+    removidas = [c for c in valid if c["verdict"] == "REMOVIDA-DA-OFERTA"]
     if is_s0:
         bad = [c for c in considered if c["verdict"] in ("BARRA", "HOOK_NOT_LOADED", "TIMEOUT-IGNORADO",
                                                          "MATCHER-NAO-CASOU")]
@@ -104,6 +114,10 @@ def decide_family(k: tuple, cells: list[dict]) -> dict:
                                               for s in c["facts"].get("vibe_effect_approval_sources", [])})
         elif len(recusas) >= need and not plain_furas:
             out.update(verdict="RECUSA-POR-APROVACAO", why=f"{need}/{need} controls refused by the approval layer")
+        elif any(len([c for c in valid if c["verdict"] == ov]) >= need and len(valid) == len(
+                [c for c in valid if c["verdict"] == ov]) for ov in OWN_FAMILY_VERDICTS):
+            ov = valid[0]["verdict"]
+            out.update(verdict=ov, why=f"{need}/{need} controls: {ov} (R2; the control cannot FURA, see PRE-REGISTRO-R2)")
         elif len(considered) >= max_att:
             out.update(verdict="INCONCLUSIVO", why=f"fewer than {need} valid FURA in {max_att} attempts")
         else:
@@ -121,6 +135,14 @@ def decide_family(k: tuple, cells: list[dict]) -> dict:
         return out
     if len(recusas) >= need and len(recusas) == len(valid):
         out.update(verdict="RECUSA-POR-APROVACAO", why=f"{need}/{need} valid refused by the approval layer")
+        return out
+    if len(removidas) >= need and len(removidas) == len(valid):
+        # rodada 2 (lacuna d): a regra de config tirou a ferramenta da oferta ao modelo
+        out.update(verdict="REMOVIDA-DA-OFERTA", why=f"{need}/{need} valid: the config removed the tool from the offer")
+        return out
+    recusas_ch = [c for c in valid if c["verdict"] == "RECUSA-DE-CHAMADA"]
+    if len(recusas_ch) >= need and len(recusas_ch) == len(valid):
+        out.update(verdict="RECUSA-DE-CHAMADA", why=f"{need}/{need} valid: the client refused the call before the hook")
         return out
     barras = [c for c in valid if c["verdict"] == "BARRA"]
     if len(barras) >= need and len(barras) == len(valid):
@@ -175,7 +197,7 @@ def aggregate(evidence: Path, batch: str | None = None, only: set[str] | None = 
         arm, _batch, *rest = k
         by_pair[tuple(rest)][arm].append(f)
     divergences = []
-    names = ("harness", "scenario", "hook_mode", "matcher", "strict", "approval_mode")
+    names = ("harness", "scenario", "hook_mode", "matcher", "strict", "approval_mode", "perm")
     # N3: famílias de um braço sem par no outro (mesma chave sem lote) ficam listadas
     unpaired = {"stub": [], "real": []}
     for k, arms in by_pair.items():
