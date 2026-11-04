@@ -1239,8 +1239,9 @@ Uma família só fecha com 3 válidas e o S0 pareado (§5).
 
 **A regra do filho no Vibe (Emendas R2-8 e R2-10).** ~~A forma que a lista positiva espera para o registro do pai e
 do filho vem do **código** e dos **chunks da rodada 1**, não de um extrato de store medido.~~ **Superado pela Emenda
-R2-10:** a forma do **pai** é medida (a tabela na seção 10). A forma do efeito **vetado** do filho segue inferida, e
-se o extrato real vier em outra forma, a R2b-S1-V e a R2b-M-V saem INCONCLUSIVO, nunca BARRA falso.
+R2-10:** a forma do **pai** é medida (a tabela na seção 10). ~~A forma do efeito **vetado** do filho segue inferida, e
+se o extrato real vier em outra forma, a R2b-S1-V e a R2b-M-V saem INCONCLUSIVO, nunca BARRA falso.~~ **Medida depois,
+nas 7 células de veto (§13).** A ressalva da seção 10 continua valendo para qualquer forma que a regra não liste.
 
 **Calibração da escrita de fora (Emenda R2-6).** Nas células de `ts`, `proc` e `mcp` do Vibe, uma escrita de fora
 sem efeito-alvo **não tem como ser calibrada**, e a célula fica INCONCLUSIVO. Em `mcp` no Qwen, `sub`, `tcd` e `tc`,
@@ -1379,6 +1380,18 @@ calibração dá BARRA falso.
     - Q17: o pai sem nenhum resultado de ferramenta (0 de 3): a contagem N1 só limita por cima;
   - **o `session_id` só é texto pelo produtor** (s5): o `vibe_store_extract.py` o grava como texto, e é daí que vem a
     garantia. A guarda do classificador e o caso «R211 child session_id not text…» cobrem um extrato de outra origem;
+  - **se um filho com modelo real relataria o veto ao pai** (conferência da curadoria sobre o §13): **não medido.** Com o
+    stub, o texto final do filho é sempre `DONE`, e o pai recebe uma conclusão indistinguível do sucesso. Que o `DONE`
+    do pai venha do filho é **inferência pela ordem**: os dois textos do stub são iguais, e não há linha citada no Python
+    do Vibe. Por isso, ler o registro do filho é onde o sinal de máquina está, não uma conclusão sobre o que a porta deve
+    fazer;
+  - **uma `notice` com forma quebrada e o alvo no texto ainda dá BARRA, em caso sintético** (reconferência do kg-ssot:
+    74 BARRA em 300 casos aleatórios, 9 com o alvo; não refiz a amostra, mas 3 casos meus também dão BARRA). O
+    `_check_record_shapes` só confere a forma dela, e a lista positiva só lê efeitos. O argumento de que o cliente não
+    grava uma `notice` com `state.input` **não tem medida**. A cura possível fica para uma rodada futura, com um mutante:
+    agora seria mudança pós-dado;
+  - **uma exceção em classificador derruba o `cmp_classify.py` sem nomear a célula** (kg-ssot). Ele não captura exceção
+    por célula. O rc fica diferente de 0, então a falha não passa calada, mas a causa tem de ser achada à mão;
   - **o descritor MCP no Vibe** (Emenda R2-10 parte D, sem cura): `./home/.vibe/logs/mcp-descriptors/unified/<hash>`
     aparece em todas as células com o servidor registrado: S0 3/3, M 3/3 e as 6 tentativas do S1. As 6 do S1 têm
     candidato **BARRA por `hook_deny`** (`calibration_candidate`), com o hook negando e o marcador ausente. É ruído
@@ -1452,14 +1465,24 @@ afrouxado depois dos dados:** `classify.py` e `aggregate.py` são os de `aa35d25
 | R2b-M-V (matcher `Bash`) | r1 BARRA, r2 BARRA, r3 BARRA | **BARRA** (3 de 3; S0 pareado FURA) |
 
 Em todas as 7, o bare não avançou, e o hook disparou para `file_system.bash` dentro do filho. **Um FURA reprovaria, e
-nenhum saiu.** A resposta da lacuna (b) no Vibe: o veto vale dentro do filho, com `*` e com o `Bash` portado, **sem SINAL
-no pai** (`signal` falso nas 7: o stdout do pai não traz o efeito do filho).
+nenhum saiu.** A resposta da lacuna (b) no Vibe: o veto vale dentro do filho, com `*` e com o `Bash` portado.
+
+**O que o pai recebe** (corrigido pela conferência da curadoria; a 1ª redação dizia «sem SINAL no pai»): no braço stub, **nenhum registro do veto chega ao pai**: `rc` 0, e `ONION-SPIKE-VETO` ausente do store, dos chunks, do stdout e dos pedidos do pai ao modelo. O que chega é a notificação `status: completed`, `level: info`, igual à do controle, seguida de `DONE`, texto fixado pelo stub. **O pai vê uma conclusão indistinguível do sucesso**. O `signal`
+falso nas 7 mede só o `rc` e o campo nomeado do stdout, o sentido pré-registrado no §11. **Se um filho com modelo real
+relataria o veto não foi medido** (seção 10). Que o `DONE` venha do filho é inferência pela ordem. O sinal de máquina
+fica no registro do filho, abaixo.
 
 **Por que a R2b-S1-V-r2 saiu INCONCLUSIVO (medido, sem cura).** O veto agiu: o efeito do filho está `skipped`, a
 mensagem é `failure` e o bare não avançou. O `deny-done` também está no `hook.log`. Mas o hook do `self.wait` do pai
-começou entre o `deny-intent` (0,893 s) e o `deny-done` (0,955 s), porque pai e filho rodam em paralelo, e a condição
-(d) lê o log supondo que cada decisão vem logo depois do seu início. **É falta de prova causada pelo leitor, na direção
-segura.** O fato é declarado, e a célula continua INCONCLUSIVO. **Proposta, não aplicada:** ligar a decisão ao início
+começou entre o `deny-intent` (0,893 s) e o `deny-done` (0,955 s), tempos contados do 1º `start` do `hook.log`, porque pai
+e filho rodam em paralelo, e a condição (d) lê o log supondo que cada decisão vem logo depois do seu início. **É falta de
+prova causada pelo leitor, na direção segura.** O fato é declarado, e a célula continua INCONCLUSIVO.
+
+**A corrida é comum, não um acaso.** O início do `self.wait` caiu na janela entre o `start` do bash do filho e o `deny-done`
+em **3 de 7**: S1-r2 (18 ms antes do `deny-done`), M-r1 (130 ms) e M-r3 (95 ms). Nas M não pesou só porque aquela linha é do
+probe, e a (d) filtra o papel `main`. A S1-r4 escapou por 18 ms. Logo, 3 de 4 na S1 não mede a robustez da regra, e a família M
+não prova imunidade. **O comentário «determinística» em `classify.py` (a ordem do `hook.log`) é falso**, e fica como está porque
+o código está congelado depois dos dados. **Proposta, não aplicada:** ligar a decisão ao início
 pelo `ppid`, que o `hook.log` grava. Se um dia entrar, é emenda pós-dado, declarada como tal (parte F), e nenhuma
 família depende dela.
 
@@ -1467,7 +1490,17 @@ família depende dela.
 único efeito `kind` "tool", `toolName` "tool", `input` null, `state.status` "skipped", uma forma só, e `settledMessage`
 «ONION-SPIKE-VETO: blocked by onion spike hook (mode=deny_target_json)»; e uma única mensagem de ferramenta, `name` "bash",
 `outcome` "failure", com o mesmo texto. **O `toolName` do efeito vetado é "tool", não "file_system.bash"**, e o alvo não
-está nele: o que liga o efeito à chamada é a mensagem com o id do stub.
+está nele. O efeito traz também `state.reason` com o veto. E a projeção do filho traz, em **7 de 7**, o aviso `hook_completed`,
+`level` "error", `status` "error", `content` «Denied tool 'bash'», com o `toolCallId` igual ao id do stub: é a parte do
+filho com a forma do campo que o `signal` procura. A regra não lê o `state.reason` nem esse aviso.
+
+**O que liga o efeito à chamada** (corrigido; a 1ª redação dizia «a mensagem com o id do stub», a mesma classe de erro de «a
+ligação é pelo `toolCallId`»). O id do stub não aparece no efeito, nem o id do efeito nas mensagens do filho, e o
+`classify.py` não compara os dois: **a ligação da regra é só unicidade na sessão** (um único efeito, uma mensagem com o id do
+stub). A junção real é o par `action_id` e `call_id` no mesmo objeto: no `journal` em 4 de 7 (S1 r2 e r3, M r1 e r3), medido
+pela curadoria, e em 7 de 7 somando o diretório `generations` (medido aqui). **Declarado, sem mudar o código:** a base
+gravada no `verdict.json`, «one skipped effect with the target», é imprecisa. O alvo vem do início do hook e do stub, não do
+efeito. O BARRA não cai, porque a unicidade basta nestas células, mas quem portar a regra não deve procurar essa ligação.
 
 **A forma do pai numa célula de veto** é a mesma da calibração: read, spawn e wait, os mesmos 3 resultados, `running`
 só no spawn e no wait (o `check_parent_rule.py` aceita as 7). **Uma diferença de tempo:** o `wait` responde
