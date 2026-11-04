@@ -4,7 +4,7 @@
 # Uso: reproduce.sh [--keep]
 #
 # 1. confere o SHA256SUMS dos .tar.gz;
-# 2. extrai os lotes (m1, m2, p5, real1, real2, fixtures e, da rodada 2, r2) para um diretório
+# 2. extrai os lotes (m1, m2, p5, real1, real2, fixtures e, da rodada 2, r2 e r2cal) para um diretório
 #    temporário, e o superseded e o r2-superseded à parte (só para conferir a integridade; o
 #    agregador ignora _superseded);
 # 3. confere cada verdict.json extraído contra o sha256 do MANIFEST.tsv;
@@ -29,7 +29,7 @@ if [ "${1:-}" = "--keep" ]; then echo "keeping $TMP"; else trap 'chmod -R u+w "$
 echo "ok   archives match SHA256SUMS"
 
 mkdir -p "$TMP/evidence" "$TMP/superseded"
-for lot in m1 m2 p5 real1 real2 fixtures r2; do
+for lot in m1 m2 p5 real1 real2 fixtures r2 r2cal; do
   tar -xzf "$ARC/evidence-$lot.tar.gz" -C "$TMP/evidence" || { echo "FAIL: extract $lot"; exit 1; }
 done
 for lot in superseded r2-superseded; do

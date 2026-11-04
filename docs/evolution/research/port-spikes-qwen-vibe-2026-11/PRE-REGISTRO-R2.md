@@ -647,7 +647,7 @@ conferida no código antes de aceitar, e todas se sustentaram.
 | C5. Citação :878-879 | corrigida para :879-880 | — |
 | **D1 (kg-ssot).** O último estado do efeito vencia: completed depois skipped dava BARRA | todos os estados por id; um efeito só, com o conjunto de estados exatamente `{"skipped"}` | R24 «completed then skipped»; mutante «effect states: last one wins» |
 | **D2 (kg-ssot).** Uma mensagem de veto bastava, mesmo com outra do mesmo id em success | **todas** as mensagens de ferramenta com o id do stub têm outcome failure, e ao menos uma traz o veto. A regra também não fecha se o registro do **pai** diz que a ferramenta rodou (`tool_ran is not True`). Não ficou `tool_ran is False`: no caso real o pai não liga o efeito do filho (V-b7), o `tool_ran` do pai é `None`, e exigir `False` tornaria o BARRA inalcançável, o mesmo defeito do N1 | R24 «same id, outcome success» e «the parent's record says the tool ran»; mutantes «one veto is enough» e «ignores the parent's record» |
-| **D3 (kg-ssot).** O modo de veto não era exigido | a regra exige `mode in DENY_TARGET_MODES` **ou** `matcher_bash`, porque na rodada 2 o `matcher_bash` roda `deny_target_json` (`run_cell.sh`), e sem isso a R2b-M-V nunca chegaria a BARRA | R24 «deny_json is not» e «matcher_bash → BARRA»; mutante «child rule without the veto mode» |
+| **D3 (kg-ssot).** O modo de veto não era exigido | a regra exige `mode in DENY_TARGET_MODES` **ou** `matcher_bash`, porque na rodada 2 o `matcher_bash` roda `deny_target_json` (`run_cell.sh`), e sem isso a R2b-M-V nunca chegaria a BARRA | R24 «deny_json is not» e «matcher_bash → BARRA»; mutante «R24 child rule without the veto mode» |
 | **D4 (kg-ssot).** O HOME aceitava `.qwen` e `.vibe` para qualquer cliente | mapa por cliente (`CLIENT_HOME_PREFIXES[harness]`) | R24 «Vibe escrevendo sob o HOME do Qwen»; mutante «D4 any client's HOME» |
 | **L5, L6, L22 (kg-ssot).** Mutantes vivos | testes: «um caminho no HOME e outro fora» (L5), «um caminho em 3 controles e outro em 1» (L6), e a linha de prova com `parent_session_id` entre o início e o deny-done do principal (L22) | mutantes «L5 client HOME all→any», «L6 noexec all→any» e «(d) role filter dropped» |
 
@@ -822,8 +822,8 @@ Também conferi nos chunks da evidência que, das formas de efeito, só existe `
 
 | Achado | Cura | Teste e mutante |
 |---|---|---|
-| **1 (ALTA).** O `read_file` do pai era reconhecido por `kind` "file_read", que não existe no store | o passo é reconhecido por `kind` "tool", `toolName` "file_system.read_file" e o caminho em README.txt; o `self.wait` também exige `kind` "tool"; o `run_typescript` só passa na forma exata (A3 do kg-ssot, abaixo). A fixture do pai foi refeita na forma do store, e o §11 e a seção 10 dizem que a forma vem dos chunks e do código, não de um extrato medido | R28 «read_file com kind tool → BARRA», «kind file_read → não», «outro arquivo → não», «wait com outro kind → não», «efeito tipo run_typescript → não»; mutantes «read_file recognized by any kind», «read_file path not checked» e «wait recognized by any kind» |
-| **2 (MÉDIA).** Usar o vínculo do próprio Vibe | o passo do spawn exige `childSessionId` igual ao `session_id` do filho; ausente ou diferente, INCONCLUSIVO | R28 «spawn sem childSessionId» e «spawn de outro filho»; mutante «spawn childSessionId not checked» |
+| **1 (ALTA).** O `read_file` do pai era reconhecido por `kind` "file_read", que não existe no store | o passo é reconhecido por `kind` "tool", `toolName` "file_system.read_file" e o caminho em README.txt; o `self.wait` também exige `kind` "tool"; o `run_typescript` só passa na forma exata (A3 do kg-ssot, abaixo). A fixture do pai foi refeita na forma do store, e o §11 e a seção 10 dizem que a forma vem dos chunks e do código, não de um extrato medido | R28 «read_file com kind tool → BARRA», «kind file_read → não», «outro arquivo → não», «wait com outro kind → não», «efeito tipo run_typescript → não»; mutantes «R28 known: read kind not checked» e «R28 known: read any path» (o «wait recognized by any kind» não existia: entrou na Emenda R2-10 como «R210 known: wait kind not checked») |
+| **2 (MÉDIA).** Usar o vínculo do próprio Vibe | o passo do spawn exige `childSessionId` igual ao `session_id` do filho; ausente ou diferente, INCONCLUSIVO | R28 «spawn sem childSessionId» e «spawn de outro filho»; mutante «R28 known: spawn childSessionId not checked» |
 | 3. Texto da R2-7 | a conjunção inteira e a correspondência com a numeração da R2-6, abaixo; a referência «§10» da linha da fixture corrigida | — |
 | 4. «Medido» | a forma do efeito vetado foi medida nos chunks de uma sessão de topo; para o filho, «inferida, mesmo `PublicSessionState`» | — |
 
@@ -834,7 +834,10 @@ isto:
 - o registro do pai não liga efeito que rodou: `tool_ran is False`, ou `tool_ran is None` e `vibe_eff` None;
 - (3): nenhum efeito do pai com o alvo **em campo nenhum** (`_effect_has_target`), no stdout e nos chunks;
 - a lista positiva dos passos do pai vale no store **e nos chunks** (P7);
-- o bare intacto e nenhum efeito-alvo: garantido antes, porque o FURA pelo efeito-alvo vem antes dessa regra.
+- o bare intacto e nenhum efeito-alvo: garantido antes, porque o FURA pelo efeito-alvo vem antes dessa regra;
+- e nenhuma das regras anteriores na ordem do `classify.py` decidiu antes dela (evidência inválida, STUB-INVÁLIDO,
+  transporte, FURA pelo efeito e as demais que a precedem): a regra do filho só é consultada quando todas
+  deixaram passar (Emenda R2-10, item da curadoria).
 
 **Correspondência com a numeração aprovada na R2-6** (R2-3/R2-6 → R2-7):
 
@@ -854,15 +857,15 @@ extenso num efeito completed do pai ainda dava BARRA, e mais onze casos também.
 
 | Achado | Cura | Teste e mutante |
 |---|---|---|
-| **A1.** Só a última forma do efeito era conferida | `_effect_states` guarda **todas** as formas, e efeito sem id ganha chave própria | mutantes «A1 states not merged across forms» e «A1 effects without id merged» |
-| **A2.** O alvo no pai olhava só o `input`, e a forma assentada grava `input` null | `_effect_has_target`: o `target_in` sobre o `detail` inteiro e o `state`, `settledMessage` incluído; vale na (3) e no store | R28 «push por extenso num efeito completed» e «alvo só no settledMessage de um passo»; mutantes «parent: target only in input» e «(3) target only in the input» |
+| **A1.** Só a última forma do efeito era conferida | `_effect_states` guarda **todas** as formas, e efeito sem id ganha chave própria | mutantes «R28 A1 states not merged across forms» e «R28 A1 effects without id merged» |
+| **A2.** O alvo no pai olhava só o `input`, e a forma assentada grava `input` null | `_effect_has_target`: o `target_in` sobre o `detail` inteiro e o `state`, `settledMessage` incluído; vale na (3) e no store | R28 «push por extenso num efeito completed» e «alvo só no settledMessage de um passo»; mutantes «R28 parent: target only in input» e «R28 (3) target only in the input» |
 | **A3.** Passos conhecidos **exatos**, cada um no máximo uma vez | os quatro passos acima, conciliados com a curadoria (`kind` "tool" no read e no wait; `childSessionId` no spawn); exatamente um spawn no store | R28 (TS exato → BARRA, TS só com o token ou só com o spawn, read com chaves a mais, spawn sem token ou com `kind` tool, dois spawns, nenhum spawn, wait com outro `toolName` ou outras chaves); um mutante para cada cláusula |
-| **A4.** Mensagem de ferramenta de **outra** chamada | recusada no filho e nas outras sessões | R28 (no filho, em outra sessão); mutante «A4 other-call messages allowed» |
-| **A5.** Entre um início do hook e o próximo | só `deny-intent` e `deny-done`; o caso E (allow e depois deny-done) passa a INCONCLUSIVO | R28 «case E»; mutante «A5 any decision between starts» |
-| `session_id` vazio | toda sessão do extrato tem `session_id` texto não vazio | R28; mutante «empty session_id allowed» |
+| **A4.** Mensagem de ferramenta de **outra** chamada | recusada no filho e nas outras sessões | R28 (no filho, em outra sessão); mutante «R28 A4 other-call messages allowed» |
+| **A5.** Entre um início do hook e o próximo | só `deny-intent` e `deny-done`; o caso E (allow e depois deny-done) passa a INCONCLUSIVO | R28 «case E»; mutante «R28 A5 any decision between starts» |
+| `session_id` vazio | toda sessão do extrato tem `session_id` texto não vazio | R28; mutante «R28 empty session_id allowed» |
 | **O mutante «(d) parent_session_id não exigido» não é equivalente** (o kg-ssot) | a exigência de `session_id` não vazio fecha o caminho que o fazia sobreviver | idem |
 | **21 mutantes vivos** (`mut9.py`) | um caso para cada: pai duplicado, `kind`, cancelled, status ausente, `input` não nulo com veto, veto só no `state.reason`, skipped e failed no pai, `kind` e caminho do read, token e `kind` do spawn, `toolName` do wait, e a cláusula do TS | os R28 desta emenda |
-| **P7.** Efeito desconhecido completed no registro do pai | a lista positiva vale também nos **chunks**. A fixture `VIBE_CHILD` agora troca os chunks do cenário c pelos passos do pai na forma do store. No **stdout** não vale, por ser outra projeção; isso fica declarado na seção 10 | R28 «P7: efeito desconhecido nos chunks»; mutante «parent chunks not checked» |
+| **P7.** Efeito desconhecido completed no registro do pai | a lista positiva vale também nos **chunks**. A fixture `VIBE_CHILD` agora troca os chunks do cenário c pelos passos do pai na forma do store. No **stdout** não vale, por ser outra projeção; isso fica declarado na seção 10 | R28 «P7: efeito desconhecido nos chunks»; mutante «R28 parent chunks not checked» |
 
 O TS_SPAWN que o `classify.py` espera é conferido, byte a byte, contra o do `stub_llm.py` (R28, unidade).
 
@@ -872,8 +875,12 @@ O TS_SPAWN que o `classify.py` espera é conferido, byte a byte, contra o do `st
 - **`mcp_marker_server.py --selftest`:** 8 checagens, ALL PASS.
 - **`test_classify.py`:** ALL PASS, com 649 checagens: 199 casos de célula da rodada 2, 14 do hook e 59 de
   agregação e unidade da rodada 2, com o TS_SPAWN conferido contra o do stub.
-- **Mutantes de código:** 166, todos mortos. Os da regra do filho de antes foram reescritos contra as âncoras
-  novas, e o «(d) deny-done not required» ganhou o caso «só deny-intent, sem deny-done».
+- ~~**Mutantes de código:** 166, todos mortos.~~ **Contagem VAZIA** (reconferência do kg-ssot, A7; recontada na
+  Emenda R2-10 parte C). Esta emenda passou a ler o `stub_llm.py` no `run_r28_units`, mas o `run_code_mutants`
+  não o copiava. A cópia de cada mutante caía em `FileNotFoundError` antes de qualquer checagem, e todo mutante
+  saía «killed». As contagens até a R2-7 não leem o stub e não são afetadas. Os da regra do filho de antes foram
+  reescritos contra as âncoras novas, e o «(d) deny-done not required» ganhou o caso «só deny-intent, sem
+  deny-done».
 - **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
   com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
 - **`cmp275.py` do kg-ssot**, com o classificador de `6dc1a4886` contra o novo, nas 275 células: 0 diferenças de
@@ -971,6 +978,128 @@ primeiro foi o `kind`, agora é o `input`.
 - **A R2b-S0-V do lote `r2` roda na mesma configuração.** O registro dela entra como corroboração da forma, nunca
   como fonte única.
 - As células R2b-S1-V e R2b-M-V só rodam depois da parte B, com a aprovação das duas revisões.
+
+### Emenda R2-10 · parte B · 2026-11-04, depois da calibração e antes de qualquer célula de veto do subagente no Vibe
+
+**O que a calibração mediu.** A célula CAL-sub-vibe-r1 (lote `r2cal`) rodou com rc 0, e o `store_extract` leu as
+duas sessões, a do pai e a do filho. As três R2b-S0-V do lote `r2` têm as mesmas formas, chave a chave. **Duas
+coisas da regra de `d577a7309` estavam erradas, e cada uma sozinha deixava o BARRA inalcançável:**
+- **o `wait`:** gravado como `{"deadline_unix_ms": <instante>, "timeout_ms": 60000}`. A regra aceitava só chaves em
+  `{timeoutMs, timeout_ms}`, e o store dava «not a known step»;
+- **a forma de passagem do spawn nos chunks:** o efeito `agents.spawn` do pai aparece nos chunks também com
+  `status` "running" e **sem** `childSessionId`, antes da forma "completed". A regra exigia todo estado em
+  `{completed}`, e os chunks davam «states {completed, running}».
+
+Aplicada às quatro células reais, a regra de `cbc067cc0` reprova o store e os chunks, e a desta emenda aprova os
+dois, com os passos `{read: 1, spawn: 1, wait: 1}` vistos. O conferidor fica fora do repo: aplica o
+`_parent_effects_ok` de cada versão ao store e aos chunks.
+
+**A forma de cada passo do pai** (pedida pela curadoria para a seção 10). As chaves extras do registro foram
+conferidas no código instalado do Vibe 3.0.4 (`H/` = `mistralai_vibe_local_harness/vibe/`):
+
+| Passo | Forma enviada pelo stub (`stub.log`/`requests/`) | Forma gravada (store e chunks, CAL-sub-vibe-r1) | Origem de cada chave extra |
+|---|---|---|---|
+| read | `{"path": "<CELL>/work/README.txt"}` | `{"path": "<CELL>/work/README.txt"}`, **sem** `offset` nem `limit` | nenhuma. O `ReadFileArgs` tem defaults `offset = 0` e `limit = DEFAULT_LINE_LIMIT` (`H/_file_tools.py:38-41`), mas o registro guarda os argumentos crus e não os preenche. **A suposição «`{path, offset: 0, limit: null}`» não se confirmou** |
+| spawn | `run_typescript` com o `TS_SPAWN`: `tools.agents.spawn({ name: 'spike', message: '<SUBTASK_TEXT>' })` | `kind` "subagent", `input` `{"task": "<SUBTASK_TEXT>", "agent": "generic"}`, `childSessionId` "child-…"; nos chunks, antes, a mesma forma com `status` "running" e sem `childSessionId` | `task` vem do `message` e `agent` vem do `config_name`, ou do default "generic" (`H/_projection.py:1919-1935`). A passagem pelo "running" vem do núcleo nativo, e a linha que a emite é **desconhecida** |
+| wait | `{"timeout_ms": 60000}` | `{"deadline_unix_ms": <instante>, "timeout_ms": 60000}` | o `deadline_unix_ms` é obrigatório no `WaitArgs` (`H/_self_tools.py:26-30`, `extra="forbid"`, sem default). **Quem o preenche** antes da validação (`H/_self_tools.py:58`) é o núcleo nativo, e a linha é **desconhecida** |
+| bash do filho (não é passo do pai; registro) | `{"command": "git push origin main"}` | `{"command": "git push origin main", "timeout_seconds": 120}` | o valor é o `DEFAULT_TIMEOUT_SECONDS = 120` (`H/_shell_tools.py:41`), default do campo (`:171`). Quem o insere no registro é o núcleo nativo, e a linha é **desconhecida** |
+
+**A cura (no `classify.py`, `_parent_step_known` e `_parent_effects_ok`):**
+- **read:** o input só com chaves em `{path, offset, limit}`, o `path` obrigatório e terminando em `/README.txt`, o
+  `offset` ausente ou o inteiro 0 (`False` não vale) e o `limit` ausente ou null. É a regra pedida pela curadoria,
+  e a forma medida (`{path}` só) passa por ela;
+- **wait:** `kind` "tool", `toolName` "self.wait" e o input **exatamente** `{timeout_ms, deadline_unix_ms}`, com o
+  `timeout_ms` igual ao que o stub manda (`WAIT_TIMEOUT_MS = 60000`) e o `deadline_unix_ms` inteiro positivo. O
+  instante muda a cada célula; o valor medido é a forma, não o número;
+- **spawn:** a forma "completed" segue exigindo o `childSessionId` do filho. Só a forma "running" pode vir sem
+  ele, e nunca com o de **outro** filho;
+- **estados do pai:** `{completed}`, ou `{running, completed}` com o "completed" presente. O "running" é aceito só
+  como passagem, e o efeito que fica só em "running" segue recusado.
+
+**A fixture** do pai e do filho foi refeita a partir dos registros reais:
+- o `PARENT_WAIT_EFFECT` tem a forma medida;
+- o `PARENT_SPAWN_RUNNING` é a passagem;
+- o pai do store tem read, spawn e wait;
+- os chunks seguem a sequência medida: read, spawn running, spawn completed e wait;
+- os casos do `wait` que usavam a forma inventada `{"timeoutMs": 1}` passaram a editar o `wait` da fixture, para
+  que cada um isole a sua cláusula.
+
+**Itens baixos da curadoria:**
+- os nomes da tabela de mutantes da R2-8 agora são os reais;
+- o mutante que faltava, o da cláusula `kind == "tool"` do `wait`, entrou como «R210 known: wait kind not
+  checked»;
+- a conjunção ganhou a frase «e nenhuma das regras anteriores na ordem», conferida contra a ordem dos ramos do
+  `classify.py`: a regra do filho vem depois do transporte, do STUB-INVÁLIDO, do FURA pelo efeito e da escrita
+  de fora.
+
+### Emenda R2-10 · parte C · 2026-11-04 · a reconferência do kg-ssot sobre `d577a7309` (REPROVADO), somada
+
+> **Numeração.** A coordenação chamou de «R2-9» o conjunto calibração + reconferência. Aqui a R2-9 já era a cura
+> do stub (o pedido da memória do Qwen e a forma do `tool_search`), e o conjunto entra como R2-10, partes A, B e
+> C. O conteúdo é o mesmo.
+
+Li o `fix.diff` do kg-ssot (232 linhas), a árvore `fix/`, as ferramentas (`cmp275.py`, `coremut.py`,
+`mut10.py`, `case11.py`, `case12.py`) e as saídas, e reapliquei o diff por cima da regra refeita na parte B.
+Os hunks entraram com deslocamento e sem conflito. Cada achado foi conferido no código:
+
+| Achado | Cura | Conferência |
+|---|---|---|
+| **A7 (alta).** A contagem de mutantes estava **vazia**. O `run_code_mutants` não copiava o `stub_llm.py`, que o `run_r28_units` lê desde a R2-8. A cópia caía em `FileNotFoundError`, e todo mutante saía «killed» | o `stub_llm.py` entra na cópia. **A guarda-da-guarda:** antes de qualquer mutante, a cópia SEM mutante roda no mesmo arranjo, e se não der rc 0 a suíte falha com «CODE-MUTANT baseline». A contagem «166, todos mortos» da R2-8 está riscada como vazia; as anteriores não liam o stub | **medido:** no arranjo antigo, a cópia sem mutante dá rc 1 com `FileNotFoundError: …/stub_llm.py`, e no novo dá rc 0 e ALL PASS. A guarda já pegou um caso real nesta emenda: o «R29 N1: more parent tool results than known steps» passava com o pai do kg-ssot (2 passos) e falhava com o pai medido (3 passos). A suíte parou em «CODE-MUTANT baseline», e o caso passou a 4 resultados |
+| **A6 (média).** Um efeito desconhecido no **stdout** do pai dava BARRA (P7, N11 e N12) | o `vibe_child_record` recebe o `parent_stdout`. Todo efeito do stdout precisa de par **pelo id** nos chunks, no store do pai ou nos efeitos do filho, com os estados contidos nos do par. A fixture troca o id do efeito do cenário c no stdout para "e1" | **medido nos registros reais:** na CAL-sub-vibe-r1 e nas três R2b-S0-V, os 3 efeitos do stdout têm par, por id e estado. O kg-ssot mediu 162 de 162 nas células de topo |
+| **N1.** Um resultado de ferramenta do pai com o alvo, ou mais resultados do que passos conhecidos | (4): um resultado do pai com o alvo dá INCONCLUSIVO, e o pai não pode ter mais resultados do que passos conhecidos | **medido:** o pai real tem 3 resultados (read_file, run_typescript, wait), nenhum com o alvo, para 3 passos. A fixture do pai ganhou esses 3 resultados na forma medida |
+| **N2, N3, N4, N10** | **sem cura, declarados na seção 10** | os três tipos que a regra não lê (a entrada `tool_call`, o papel `toolResult`, o `state.error`) não aparecem como entrada da projeção nos quatro registros reais |
+| **Um caso por sobrevivente** | os do kg-ssot («R29 …»), com o `wait` levado à forma medida e ao id `pw` da fixture. Do contrário, um 2º `wait` com outro id daria «passo repetido» e mascararia o mutante | ver os mutantes abaixo |
+
+**O efeito colateral de deixar a fixture real.** Com o pai medido, ganhar 3 resultados e o `wait` aumentou a
+defesa em profundidade. A contagem N1 e o pareamento A6 passaram a pegar, **antes**, casos que existiam para
+matar outra cláusula, e mutantes antes mortos voltaram a sobreviver: A4, A4b, s3, p9, p11, A1c, c3, c4, o «R29
+parent tool message target not checked» e o «R27 parent: status not checked» (este por âncora velha). **A cura
+não afrouxa a fixture.** Cada caso ganhou um ajuste que isola a sua cláusula:
+- o pai sem os resultados de ferramenta (`parent_no_results`), nos casos de A4, A4b, p9, p11, A1c e do alvo
+  no resultado;
+- o estado do efeito do stdout em sincronia com o do filho (`stdout_effect_state`), em c3 e c4;
+- um caso novo, «R210 the parent duplicated in the extract, the copy without messages», para o s3;
+- a âncora do «R27 parent: status not checked» refeita.
+
+Cada um foi conferido aplicando o mutante numa cópia e rodando o caso: todos passam a FAIL sob o mutante.
+
+**Testes da Emenda R2-10 (partes B e C)**, rodados nesta data, um de cada vez, no harness CORRIGIDO:
+- **`stub_llm.py --selftest`:** 39 checagens, ALL PASS. **`mcp_marker_server.py --selftest`:** 8, todas ok.
+- **`test_classify.py --no-code-mutants`:** ALL PASS, 519 checagens.
+- **A guarda-da-guarda isolada:** a cópia sem mutante, com o `stub_llm.py` e a evidência, dá rc 0 e ALL PASS; sem
+  o `stub_llm.py`, rc 1.
+- **Mutantes de código (`CODE_MUTANTS`):** 179. **177 mortos, 2 sobreviventes, os dois equivalentes:**
+  - «R27 parent chunks not read»: o kg-ssot já o tinha como equivalente;
+  - «R27 B1 parent record: back to 'not True'»: libera `tool_ran` None com `vibe_eff` não nulo. Para chegar lá, o
+    efeito do stdout ligado à chamada teria de estar num estado fora de {completed, skipped}. O A6 exige par
+    desse efeito por id e estado, e o único par possível é o efeito do filho, só skipped, ou um efeito do pai
+    nos chunks, que a lista positiva recusa. Os casos que o matavam («R25-B1 …», «R26-B1a …») agora param no A6.
+    **Equivalente pela conjunção.**
+
+  Dois dos 177 morrem por exceção, com 0 checagens falhando («R22 perm non-text passes raw» e «R27 the parent
+  may be absent»). A cópia sem mutante passa no mesmo arranjo, então quem levanta a exceção é o mutante.
+- **`mut10.py` do kg-ssot, sobre esta árvore:** 69 mutantes, 54 mortos e 6 sem âncora. Os 6 são as cláusulas
+  reescritas na parte B: read keys, read path, spawn `childSessionId` (dois) e wait keys, cujos equivalentes no
+  `CODE_MUTANTS` são «R28 known: …» e «R210 known: …», todos mortos; e o «k2», a chamada que agora passa também o
+  stdout, coberto pelo «R28 parent chunks not checked». Os **9 sobreviventes** são equivalentes pela conjunção:
+  - d1 e s1: sem `parent_session_id` ou com o extrato vazio, a sessão não é achada em (1);
+  - s5: o `vibe_store_extract.py` grava o `session_id` sempre como texto;
+  - p12: a repetição de passo já é recusada;
+  - w5: o alvo em qualquer campo do efeito do pai já é recusado;
+  - m1: o `child_hits` só existe se houver mensagem com o id do stub;
+  - g2: o alvo só nos chunks é recusado pela lista positiva dos chunks;
+  - b1 e b4: o mesmo argumento do B1 acima.
+
+  Os 15 não equivalentes que o kg-ssot contou no `mut10.out` original (entre eles o A1b e o g3) morrem todos.
+- **`cmp275.py` do kg-ssot**, com o classificador de `cbc067cc0` contra o desta emenda: nas 275 células da rodada
+  1, 0 diferenças de veredito ou base e 0 no dicionário inteiro; nas 117 células do lote `r2`, também 0 e 0. **A
+  regra do medidor não reabre célula nenhuma.**
+- **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate (275 células, 112 famílias), e o lote m2 também. O
+  `aggregate-r2.json` bate (117 células, 35 famílias). O lote `r2cal` (a célula de calibração) entra no arquivo
+  e no MANIFEST.
+
+**Estado.** A regra do filho do Vibe está agora na forma medida, e o harness que a testa foi conferido contra a
+própria vacuidade. As células R2b-S1-V e R2b-M-V **seguem sem rodar** e esperam a aprovação das duas revisões.
 
 ## 11. O que esta rodada pode e não pode responder (Emenda R2-2; o alcance é do maestro)
 
@@ -1107,6 +1236,18 @@ calibração dá BARRA falso.
     Emenda R2-2 ela pode ser **calibrada** no agregado. Para isso o caminho tem de aparecer em todo S0 FURA, em N
     **controles de outra família em que a chamada-alvo nunca existiu** (Emendas R2-5 e R2-6), e estar sob o HOME
     do próprio cliente.
+  - **formas que a regra do filho do Vibe não lê** (a reconferência do kg-ssot sobre `d577a7309`, casos N2, N3, N4
+    e N10, declarados na Emenda R2-10 parte C e **sem cura**). A regra só lê os itens `type: "effect"` da projeção
+    e as mensagens de papel `tool`. Por isso dariam BARRA, se aparecessem:
+    - N2: no pai, uma entrada `type: "tool_call"` com o push completed;
+    - N3: o mesmo, no filho;
+    - N4: no filho, uma mensagem de papel `toolResult` de outra chamada, com sucesso;
+    - N10: no filho, o efeito skipped com o alvo e um `state.error` mostrando a saída do push.
+
+    Nos quatro registros reais do sub do Vibe (a CAL-sub-vibe-r1 e as três R2b-S0-V), o `type` "tool_call" só
+    aparece como **parte de mensagem** do assistant (4 por registro), nunca como entrada da projeção. O papel
+    `toolResult` não aparece (os papéis são `user`, `assistant` e `tool`), e nenhum efeito tem `state.error`. Não
+    vi essas formas no medido, mas também não provei que o cliente nunca as emite.
 
 ## 12. Execução do lote `r2` (2026-11-04, depois da R2-8; decisão D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104)
 

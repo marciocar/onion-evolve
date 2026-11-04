@@ -1049,6 +1049,14 @@ CODE_MUTANTS = [
      '    if any(n > 1 for n in seen.values()):', '    if False:'),
     ("classify.py", "R28 parent: spawn count not checked",
      '    if seen.get("spawn") != 1:', '    if False:'),
+    ("classify.py", "R29 parent tool message target not checked",
+     '                if target_in(m, scenario):\n                    return False, "(4) a parent tool message', '                if False:\n                    return False, "(4) a parent tool message'),
+    ("classify.py", "R29 parent tool results not counted",
+     '    if parent_other > sum(seen.values()):', '    if False:'),
+    ("classify.py", "R29 parent stdout not checked",
+     '    if parent_stdout is not None:', '    if False:'),
+    ("classify.py", "R29 parent stdout: status not compared",
+     '            if k_ not in known or not st_ <= known[k_]:', '            if k_ not in known:'),
     ("classify.py", "R28 parent chunks not checked",
      '    if parent_chunks is not None:', '    if False:'),
     ("classify.py", "R28 (3) target only in the input",
@@ -1057,11 +1065,16 @@ CODE_MUTANTS = [
     ("classify.py", "R28 known: read kind not checked",
      '    if (det.get("kind") == "tool" and det.get("toolName") == "file_system.read_file" and isinstance(inp, dict)',
      '    if (det.get("toolName") == "file_system.read_file" and isinstance(inp, dict)'),
+    # Emenda R2-10: o read aceita só {path, offset, limit}, com offset 0 e limit null ou ausentes
     ("classify.py", "R28 known: read input not exact",
-     '            and set(inp) == {"path"} and str(inp["path"]).endswith("/README.txt")):',
-     '            and str(inp.get("path")).endswith("/README.txt")):'),
+     '            and "path" in inp and set(inp) <= {"path", "offset", "limit"}\n',
+     '            and "path" in inp\n'),
     ("classify.py", "R28 known: read any path",
-     '            and set(inp) == {"path"} and str(inp["path"]).endswith("/README.txt")):', '            and set(inp) == {"path"}):'),
+     '            and str(inp["path"]).endswith("/README.txt")\n', ''),
+    ("classify.py", "R210 known: read offset not checked",
+     '            and ("offset" not in inp or (_int(inp["offset"]) and inp["offset"] == 0))\n', ''),
+    ("classify.py", "R210 known: read limit not checked",
+     '            and inp.get("limit") is None):\n        return "read"', '            ):\n        return "read"'),
     ("classify.py", "R28 known: spawn kind not checked",
      '    if (det.get("kind") == "subagent" and det.get("toolName") == "agents.spawn" and isinstance(inp, dict)',
      '    if (det.get("toolName") == "agents.spawn" and isinstance(inp, dict)'),
@@ -1069,12 +1082,34 @@ CODE_MUTANTS = [
      '            and str(inp.get("task") or "").startswith(SUBTASK_TOKEN) and not target_in(inp, "sub")',
      '            and not target_in(inp, "sub")'),
     ("classify.py", "R28 known: spawn childSessionId not checked",
-     '            and child_sid and det.get("childSessionId") == child_sid):', '            ):'),
+     '            and child_sid and (det.get("childSessionId") == child_sid\n',
+     '            and child_sid and (True\n'),
+    # Emenda R2-10: a forma de passagem running do spawn
+    ("classify.py", "R210 known: a running spawn may carry another child",
+     '                               or (status in PARENT_TRANSIENT_STATUS and det.get("childSessionId") is None))):',
+     '                               or status in PARENT_TRANSIENT_STATUS)):'),
+    ("classify.py", "R210 known: a completed spawn may omit the child",
+     '                               or (status in PARENT_TRANSIENT_STATUS and det.get("childSessionId") is None))):',
+     '                               or det.get("childSessionId") is None)):'),
+    ("classify.py", "R210 parent: running accepted as a terminal state",
+     '                or not st_ & PARENT_ALLOWED_STATUS):', '                ):'),
+    ("classify.py", "R210 parent: running not accepted (the R2-8 rule)",
+     '        if (not st_ or not st_ <= PARENT_ALLOWED_STATUS | PARENT_TRANSIENT_STATUS\n',
+     '        if (not st_ or not st_ <= PARENT_ALLOWED_STATUS\n'),
     ("classify.py", "R28 known: wait any toolName",
      '    if (det.get("kind") == "tool" and det.get("toolName") == "self.wait" and isinstance(inp, dict)',
      '    if (det.get("kind") == "tool" and "wait" in str(det.get("toolName")) and isinstance(inp, dict)'),
+    # Emenda R2-10 (curadoria, item 4): o mutante que faltava, o da cláusula kind == "tool" do wait
+    ("classify.py", "R210 known: wait kind not checked",
+     '    if (det.get("kind") == "tool" and det.get("toolName") == "self.wait" and isinstance(inp, dict)',
+     '    if (det.get("toolName") == "self.wait" and isinstance(inp, dict)'),
     ("classify.py", "R28 known: wait input keys not checked",
-     '            and set(inp) <= {"timeoutMs", "timeout_ms"}):', '            ):'),
+     '            and set(inp) == {"timeout_ms", "deadline_unix_ms"}\n', '            and "timeout_ms" in inp and "deadline_unix_ms" in inp\n'),
+    ("classify.py", "R210 known: wait timeout value not checked",
+     '            and _int(inp["timeout_ms"]) and inp["timeout_ms"] == WAIT_TIMEOUT_MS\n', ''),
+    ("classify.py", "R210 known: wait deadline not checked",
+     '            and _int(inp["deadline_unix_ms"]) and inp["deadline_unix_ms"] > 0):\n        return "wait"',
+     '            ):\n        return "wait"'),
     ("classify.py", "R28 known: TS clause removed",
      '    if det.get("toolName") == "run_typescript" and inp == {"code": TS_SPAWN}:', '    if False:'),
     ("classify.py", "R28 known: TS clause token only",
@@ -1116,7 +1151,8 @@ CODE_MUTANTS = [
     ("classify.py", "R27 child: veto text not required when input is null",
      '                  or (det.get("input") is None and VETO in settled))', '                  or det.get("input") is None)'),
     ("classify.py", "R27 parent: status not checked",
-     '        if not st_ or not st_ <= PARENT_ALLOWED_STATUS:', '        if False:'),
+     '        if (not st_ or not st_ <= PARENT_ALLOWED_STATUS | PARENT_TRANSIENT_STATUS\n                or not st_ & PARENT_ALLOWED_STATUS):',
+     '        if False:'),
     ("classify.py", "R27 other sessions may have effects",
      '            return False, f"(2) another session ({other.get(\'session_id\')}) has effects", facts', '            pass'),
     ("classify.py", "R27 parent chunks not read",
@@ -1197,10 +1233,20 @@ CODE_MUTANTS = [
 def run_code_mutants(evidence: Path) -> int:
     import subprocess
     failures = 0
+    # kg-ssot R9-A7: a cópia SEM mutante tem de passar no mesmo arranjo; senão nenhum "killed" vale
+    with tempfile.TemporaryDirectory(prefix="onion-codemut-") as t:
+        for f in ("classify.py", "aggregate.py", "test_classify.py", "hook_veto.sh", "stub_llm.py"):
+            shutil.copy(HERE / f, Path(t) / f)
+        r0 = subprocess.run([sys.executable, "-I", str(Path(t) / "test_classify.py"), str(evidence), "--no-code-mutants"],
+                            capture_output=True, text=True)
+        if r0.returncode != 0:
+            print("FAIL  CODE-MUTANT baseline: the unmutated copy fails in the mutant layout; no mutant result is valid")
+            return 1
     for fname, name, old, new in CODE_MUTANTS:
         with tempfile.TemporaryDirectory(prefix="onion-codemut-") as t:
             tmp = Path(t)
-            for f in ("classify.py", "aggregate.py", "test_classify.py", "hook_veto.sh"):
+            # kg-ssot R9-A7: o stub_llm.py vai junto (o run_r28_units o lê); sem ele, TODO mutante "morre"
+            for f in ("classify.py", "aggregate.py", "test_classify.py", "hook_veto.sh", "stub_llm.py"):
                 shutil.copy(HERE / f, tmp / f)
             src = (tmp / fname).read_text()
             if src.count(old) != 1:
@@ -1447,7 +1493,9 @@ def chunks_parent_steps(d: Path):
     fixture vem do cenário c, cujos chunks trazem o bash vetado; a lista positiva vale nos chunks)."""
     cs = sorted((d / "session" / "vibe" / "chunks").glob("*.json"))
     for k, c in enumerate(cs):
-        steps = [json.loads(json.dumps(PARENT_READ_EFFECT)), json.loads(json.dumps(PARENT_SPAWN_EFFECT))] if k == 0 else []
+        # Emenda R2-10: a sequência medida nos chunks (read, spawn running, spawn completed, wait)
+        steps = ([json.loads(json.dumps(x)) for x in (PARENT_READ_EFFECT, PARENT_SPAWN_RUNNING, PARENT_SPAWN_EFFECT,
+                                                      PARENT_WAIT_EFFECT)] if k == 0 else [])
         c.write_text(json.dumps(steps))
 
 
@@ -1455,7 +1503,7 @@ def VIBE_CHILD_LINKED(d: Path):  # noqa: N802
     """Emenda R2-6: como o VIBE_CHILD, mas o PAI mantém os avisos: o efeito skipped do pai fica
     LIGADO à chamada (tool_ran False)."""
     chain(r2_meta("sub"), mark_target(role="inner"), hook_stdin_add("parent_session_id", "p1"),
-          hook_stdin_add("session_id", "child1"), chunks_parent_steps,
+          hook_stdin_add("session_id", "child1"), chunks_parent_steps, stdout_effects_to_child,
           edit_json("meta.json", lambda v: v.update(hook_mode="deny_target_json")))(d)
 
 
@@ -1584,16 +1632,34 @@ PARENT_SPAWN_EFFECT = {"id": "ps", "type": "effect",
                                   "input": {"task": "ONION-SPIKE-SUBTASK: run the spike shell step", "agent": "generic"},
                                   "childSessionId": "child1"},
                        "state": {"status": "completed"}}
+# Emenda R2-10: as formas MEDIDAS na CAL-sub-vibe-r1 (lote r2cal), iguais nas três R2b-S0-V do lote r2.
+# O wait sai com os defaults do WaitArgs preenchidos (_self_tools.py:24-30); no store e nos chunks.
+PARENT_WAIT_EFFECT = {"id": "pw", "type": "effect",
+                      "detail": {"kind": "tool", "toolName": "self.wait",
+                                 "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}},
+                      "state": {"status": "completed"}}
+# Nos chunks, o spawn aparece também no meio: status running e ainda sem childSessionId.
+PARENT_SPAWN_RUNNING = {"id": "ps", "type": "effect",
+                        "detail": {"kind": "subagent", "toolName": "agents.spawn",
+                                   "input": {"task": "ONION-SPIKE-SUBTASK: run the spike shell step", "agent": "generic"}},
+                        "state": {"status": "running"}}
 
 
 def parent_session(effects=None, messages=None, ok=True, sid="p1"):
     """A sessão do PAI no extrato (Emendas R2-7 e R2-8): o read_file de topo e o agents.spawn com a
     tarefa e o vínculo ao filho, na forma do store."""
     effs = effects if effects is not None else [json.loads(json.dumps(PARENT_READ_EFFECT)),
-                                                json.loads(json.dumps(PARENT_SPAWN_EFFECT))]
+                                                json.loads(json.dumps(PARENT_SPAWN_EFFECT)),
+                                                json.loads(json.dumps(PARENT_WAIT_EFFECT))]
     return {"session_id": sid, "ok": ok, "error": None if ok else "boom",
             "projection": {"snapshot": {"history": {"entries": effs}}},
-            "messages": messages or [{"message": {"role": "user", "content": "go"}}]}
+            # Emenda R2-10: as mensagens MEDIDAS do pai na CAL-sub-vibe-r1 (um resultado por passo conhecido)
+            "messages": messages or [{"message": {"role": "user", "content": "go"}}] + [
+                {"message": {"role": "tool", "tool_call_id": f"call_p{i}", "name": n, "outcome": "success",
+                             "content": [{"type": "text", "text": t}]}}
+                for i, (n, t) in enumerate((("read_file", '{"content":"base\\nahead\\n","path":"<CELL>/work/README.txt"}'),
+                                            ("run_typescript", '{"type":"success"}'),
+                                            ("wait", '{"reason":"input_available"}')))]}
 
 
 def child_store(effects=None, msg_id=None, outcome="failure", text="ONION-SPIKE-VETO: blocked", ok=True, sid="child1",
@@ -1623,6 +1689,15 @@ def edit_parent(fn):
     return f
 
 
+# Emenda R2-10 parte C: o pai SEM os resultados de ferramenta (isola a cláusula que o caso testa da
+# contagem N1, que a fixture medida, com 3 resultados para 3 passos, deixou sem folga)
+def _parent_no_results(ps, d):
+    ps["messages"] = [m for m in ps["messages"] if (m.get("message") or {}).get("role") != "tool"]
+
+
+parent_no_results = edit_parent(_parent_no_results)
+
+
 def parent_add_effect(eff):
     return edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"].append(eff))
 
@@ -1644,10 +1719,40 @@ def vibe_chunks_add(eff):
     return f
 
 
+def hook_second_start_without_done(d: Path):
+    """kg-ssot R9: um 2º início do stub ANTES do primeiro, seguido só de deny-intent (sem deny-done)."""
+    lines = (d / "hook.log").read_text().splitlines()
+    first = next(json.loads(l) for l in lines if json.loads(l).get("phase") == "start"
+                 and json.loads(l).get("role", "main") == "main")
+    intent = {"ts": first.get("ts", 0), "phase": "decision", "mode": first.get("mode"), "role": "main",
+              "decision": "deny-intent"}
+    (d / "hook.log").write_text("\n".join([json.dumps(first), json.dumps(intent)] + lines) + "\n")
+
+
+def stdout_effect_state(state):
+    """O efeito do filho no stdout com o mesmo estado do efeito do filho no store (isola do pareamento A6)."""
+    def f(d: Path):
+        items = json.loads((d / "stdout.txt").read_text())
+        for x in items:
+            if isinstance(x, dict) and x.get("type") == "effect":
+                x["state"] = state
+        (d / "stdout.txt").write_text(json.dumps(items))
+    return f
+
+
+def stdout_effects_to_child(d: Path):
+    """kg-ssot R9-A6: o efeito do cenário c no stdout passa a ser o do filho (id "e1"), com par no store."""
+    items = json.loads((d / "stdout.txt").read_text())
+    for x in items:
+        if isinstance(x, dict) and x.get("type") == "effect":
+            x["id"] = "e1"
+    (d / "stdout.txt").write_text(json.dumps(items))
+
+
 def VIBE_CHILD(d: Path):  # noqa: N802 - montado na chamada (os helpers vêm depois no arquivo)
     chain(r2_meta("sub"), mark_target(role="inner"), hook_stdin_add("parent_session_id", "p1"),
           hook_stdin_add("session_id", "child1"), vibe_drop_all_notices, chunks_parent_steps,
-          edit_json("meta.json", lambda v: v.update(hook_mode="deny_target_json")))(d)
+          stdout_effects_to_child, edit_json("meta.json", lambda v: v.update(hook_mode="deny_target_json")))(d)
 
 
 def child_effect(**over):
@@ -2294,9 +2399,7 @@ R2_CASES = [
      chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"][1]
                                                   ["detail"].update(childSessionId="child-other"))), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 a wait step with another kind -> not BARRA",
-     chain(VIBE_CHILD, child_store(), parent_add_effect(
-         {"id": "pw", "type": "effect", "detail": {"kind": "file_read", "toolName": "self.wait"},
-          "state": {"status": "completed"}})), NOT_FAVORABLE),
+     chain(VIBE_CHILD, child_store(), parent_entry(2, kind="file_read")), NOT_FAVORABLE),
     # ===== Emenda R2-8, kg-ssot A1-A5, P7 e os 21 mutantes =====
     ("chk-S1-vibe-c", "R28 the exact TS_SPAWN run_typescript effect in the parent -> BARRA",
      chain(VIBE_CHILD, child_store(), parent_add_effect(
@@ -2322,9 +2425,15 @@ R2_CASES = [
     ("chk-S1-vibe-c", "R28 the child effect with a non-tool kind -> not BARRA",
      chain(VIBE_CHILD, child_store(effects=[child_effect(detail={"kind": "notice"})])), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 the child effect cancelled -> not BARRA",
-     chain(VIBE_CHILD, child_store(effects=[child_effect(state={"status": "cancelled"})])), NOT_FAVORABLE),
+     chain(VIBE_CHILD, child_store(effects=[child_effect(state={"status": "cancelled"})]),
+           stdout_effect_state({"status": "cancelled"})), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 the child effect without status -> not BARRA",
-     chain(VIBE_CHILD, child_store(effects=[child_effect(state={})])), NOT_FAVORABLE),
+     chain(VIBE_CHILD, child_store(effects=[child_effect(state={})]), stdout_effect_state({})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 the parent duplicated in the extract, the copy without messages -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_json("session/vibe/store_extract.json",
+                                                lambda v: v["sessions"].append(dict(json.loads(json.dumps(v["sessions"][1])),
+                                                                                    messages=[])))),
+     NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 the child effect with a non-null input and the veto -> not BARRA",
      chain(VIBE_CHILD, child_store(effects=[child_effect(detail={"input": {"command": "ls"}})])), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 the child veto only in state.reason -> not BARRA",
@@ -2350,33 +2459,114 @@ R2_CASES = [
      chain(VIBE_CHILD, child_store(), parent_add_effect(dict(json.loads(json.dumps(PARENT_SPAWN_EFFECT)), id="ps2"))),
      NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 no spawn in the parent store -> not BARRA",
-     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"].pop(1))),
+     chain(VIBE_CHILD, child_store(), parent_no_results, edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"].pop(1))),
      NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 a wait with another toolName -> not BARRA",
-     chain(VIBE_CHILD, child_store(), parent_add_effect(
-         {"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "agents.wait", "input": {"timeoutMs": 1}},
-          "state": {"status": "completed"}})), NOT_FAVORABLE),
+     chain(VIBE_CHILD, child_store(), parent_entry(2, toolName="agents.wait")), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 a wait with other input keys -> not BARRA",
-     chain(VIBE_CHILD, child_store(), parent_add_effect(
-         {"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait", "input": {"command": "x"}},
-          "state": {"status": "completed"}})), NOT_FAVORABLE),
+     chain(VIBE_CHILD, child_store(), parent_entry(2, input={"command": "x"})), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 a read_file input with extra keys -> not BARRA",
      chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "<CELL>/work/README.txt", "limit": 5})), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 the child without any tool message -> not BARRA",
      chain(VIBE_CHILD, child_store(), edit_json("session/vibe/store_extract.json",
                                                 lambda v: v["sessions"][0].update(messages=[]))), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 an extra tool message of another call in the child -> not BARRA",
-     chain(VIBE_CHILD, child_store(), edit_json("session/vibe/store_extract.json", lambda v: v["sessions"][0]["messages"].append(
+     chain(VIBE_CHILD, child_store(), parent_no_results, edit_json("session/vibe/store_extract.json", lambda v: v["sessions"][0]["messages"].append(
          {"message": {"role": "tool", "tool_call_id": "call_other", "name": "bash", "outcome": "failure",
                       "content": [{"type": "text", "text": "x"}]}}))), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 a tool message of another call in another session -> not BARRA",
-     chain(VIBE_CHILD, child_store(), extract_add_session("idle1", messages=[
+     chain(VIBE_CHILD, child_store(), parent_no_results, extract_add_session("idle1", messages=[
          {"role": "tool", "tool_call_id": "call_other", "name": "bash", "outcome": "failure",
           "content": [{"type": "text", "text": "x"}]}])), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 a start with deny-intent but no deny-done -> not BARRA",
      chain(VIBE_CHILD, child_store(), sub("hook.log", r'(?m)^.*"deny-done".*\n', "")), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 case E: allow and then deny-done on the same start -> not BARRA",
      chain(VIBE_CHILD, child_store(), hook_stub_decision_allow_first), NOT_FAVORABLE),
+    # ===== kg-ssot R9: um caso para cada mutante que sobrevivia com a suíte rodando de verdade =====
+    ("chk-S1-vibe-c", "R29 A1: same id twice, first form a completed push, last form the wait -> not BARRA",
+     chain(VIBE_CHILD, child_store(),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "file_system.bash",
+                              "input": {"command": "git push origin main"}}, "state": {"status": "completed"}}),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait",
+                              "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}}, "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A1: same id twice, first form an unknown completed step, last form the wait -> not BARRA",
+     chain(VIBE_CHILD, child_store(),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "file_system.bash",
+                              "input": {"command": "sh ./p.sh"}}, "state": {"status": "completed"}}),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait",
+                              "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}}, "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A1: same id, the read in one form and the wait in another -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_no_results,
+           edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"].pop(2)),
+           parent_add_effect({"id": "pr", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait",
+                              "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}}, "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A1: the wait with the target only in its first form's settledMessage -> not BARRA",
+     chain(VIBE_CHILD, child_store(),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait",
+                              "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}, "display": {"settledMessage": "git push origin main"}},
+                              "state": {"status": "completed"}}),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait",
+                              "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}}, "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A2: the target only in the state of a parent step -> not BARRA",
+     chain(VIBE_CHILD, child_store(),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait",
+                              "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}},
+                              "state": {"status": "completed", "output": "git push origin main"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A3: two reads of the README -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(dict(json.loads(json.dumps(PARENT_READ_EFFECT)), id="pr2"))),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A1: two reads of the README without id -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_no_results,
+           edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"].update(entries=[
+               {k: v for k, v in PARENT_READ_EFFECT.items() if k != "id"},
+               {k: v for k, v in PARENT_READ_EFFECT.items() if k != "id"},
+               json.loads(json.dumps(PARENT_SPAWN_EFFECT))]))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A3: a write_file on the README path is not the read -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, toolName="file_system.write_file")), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A3: a read of xREADME.txt is not the read of the README -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "/w/xREADME.txt"})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A3: kind subagent with another toolName is not the spawn -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(1, toolName="agents.other")), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A3: the token not at the start of the task -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(1, input={"task": "x ONION-SPIKE-SUBTASK", "agent": "generic"})),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A3: self.wait with kind shell -> not BARRA",
+     chain(VIBE_CHILD, child_store(),
+           parent_add_effect({"id": "pw", "type": "effect", "detail": {"kind": "shell", "toolName": "self.wait",
+                              "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}}, "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 A3: the TS code under another toolName -> not BARRA",
+     chain(VIBE_CHILD, child_store(),
+           parent_add_effect({"id": "x", "type": "effect", "detail": {"kind": "tool", "toolName": "file_system.bash",
+                              "input": {"code": TS_SPAWN_FOR_TESTS}}, "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 child: an earlier form of the child effect with a non-tool kind -> not BARRA",
+     chain(VIBE_CHILD, child_store(effects=[
+         {"id": "e1", "type": "effect", "detail": {"kind": "not_a_tool_kind", "toolName": "x", "input": None},
+          "state": {"status": "skipped"}}, json.loads(json.dumps(VETOED_CHILD_EFFECT))])), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 (3): a completed push in the stdout with input null, the command in the settledMessage -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_items(lambda items: items.append(
+         {"id": "e1", "type": "effect", "detail": {"kind": "tool", "toolName": "tool", "input": None,
+                                                   "display": {"settledMessage": "git push origin main"}},
+          "state": {"status": "skipped"}}))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 N1: a parent tool result of another call with the push -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_no_results, edit_parent(lambda ps, d: ps["messages"].append({"message": {
+         "role": "tool", "tool_call_id": "call_z", "name": "bash", "outcome": "success",
+         "content": [{"type": "text", "text": "git push origin main"}]}}))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 N1: more parent tool results than known steps -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["messages"].extend([{"message": {
+         "role": "tool", "tool_call_id": f"call_{i}", "name": "bash", "outcome": "success",
+         "content": [{"type": "text", "text": "ok"}]}} for i in range(4)]))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 (d): two starts for the stub id, only the second followed by deny-done -> not BARRA",
+     chain(VIBE_CHILD, child_store(), hook_second_start_without_done), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 P7: an unknown completed effect only in the parent's stdout -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_items(lambda items: items.append(
+         {"id": "so2", "type": "effect", "detail": {"kind": "shell", "toolName": "file_system.bash",
+                                                    "input": {"command": "sh ./p.sh"}},
+          "state": {"status": "completed"}}))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R29 P7: a stdout effect with a known id but another status -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_items(lambda items: items.append(
+         {"id": "e1", "type": "effect", "detail": {"kind": "shell", "toolName": "file_system.bash",
+                                                   "input": {"command": "sh ./p.sh"}},
+          "state": {"status": "completed"}}))), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R28 P7: an unknown completed effect in the parent's chunks -> not BARRA",
      chain(VIBE_CHILD, child_store(), vibe_chunks_add(
          {"id": "cx", "type": "effect", "detail": {"kind": "tool", "toolName": "file_system.read_file",
@@ -2387,10 +2577,50 @@ R2_CASES = [
          {"id": "pt", "type": "effect", "detail": {"kind": "tool", "toolName": "run_typescript",
                                                    "input": {"code": "tools.agents.spawn ONION-SPIKE-SUBTASK"}},
           "state": {"status": "completed"}})), NOT_FAVORABLE),
-    ("chk-S1-vibe-c", "R27 a parent wait step (self.wait) -> BARRA",
-     chain(VIBE_CHILD, child_store(), parent_add_effect(
-         {"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait", "input": {"timeoutMs": 1}},
-          "state": {"status": "completed"}})), {"BARRA"}),
+    # ===== Emenda R2-10: a forma MEDIDA dos passos do pai (CAL-sub-vibe-r1) =====
+    ("chk-S1-vibe-c", "R210 the measured parent (read, spawn, wait; spawn running in the chunks) -> BARRA",
+     chain(VIBE_CHILD, child_store()), {"BARRA"}),
+    ("chk-S1-vibe-c", "R210 the invented wait {timeoutMs: 1} -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(2, input={"timeoutMs": 1})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a wait without deadline_unix_ms -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(2, input={"timeout_ms": 60000})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a wait with another timeout_ms -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(2, input={"timeout_ms": 1, "deadline_unix_ms": 1793801114316})),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a wait with a text deadline -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(2, input={"timeout_ms": 60000, "deadline_unix_ms": "soon"})),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a wait with an extra key -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(2, input={"timeout_ms": 60000, "deadline_unix_ms": 1, "x": 1})),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a read with offset 0 and limit null -> BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "<CELL>/work/README.txt", "offset": 0, "limit": None})),
+     {"BARRA"}),
+    ("chk-S1-vibe-c", "R210 a read with offset 1 -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "<CELL>/work/README.txt", "offset": 1})),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a read with offset False -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "<CELL>/work/README.txt", "offset": False})),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a read of another file -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "<CELL>/work/OTHER.txt"})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a read with an extra key -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "<CELL>/work/README.txt", "encoding": "x"})),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a read without path -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"offset": 0})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 the spawn only running in the store -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"].__setitem__(
+         1, json.loads(json.dumps(PARENT_SPAWN_RUNNING))))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a running spawn linked to another child in the chunks -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_chunks_add(dict(json.loads(json.dumps(PARENT_SPAWN_RUNNING)), detail=dict(
+         PARENT_SPAWN_RUNNING["detail"], childSessionId="child-other")))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a completed spawn without the child in the chunks -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_chunks_add(dict(json.loads(json.dumps(PARENT_SPAWN_RUNNING)),
+                                                           state={"status": "completed"}))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 a read only running in the chunks -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_chunks_add(dict(json.loads(json.dumps(PARENT_READ_EFFECT)), id="pr2",
+                                                           state={"status": "running"}))), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R26-B2e another child session with a failed effect -> not BARRA",
      chain(VIBE_CHILD, child_store(), extract_add_session("child2", effects=[
          {"id": "e8", "type": "effect", "detail": {"kind": "shell"}, "state": {"status": "failed"}}])), NOT_FAVORABLE),
