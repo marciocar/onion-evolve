@@ -868,7 +868,8 @@ CODE_MUTANTS = [
     ("classify.py", "R21 HOOK-NAO-VIU rule removed",
      '    elif (r2 and mode not in ("log_allow", "none") and load_proven and not hook_saw_target',
      '    elif (False and load_proven and not hook_saw_target'),
-    ("classify.py", "R21 discrepant hook ignored", '    if r2 and hook_discrepant:', '    if False:'),
+    ("classify.py", "R21 discrepant hook ignored", '    elif r2 and hook_discrepant:', '    elif False:'),
+    ("classify.py", "R21 transport retry ignored", '    if transport_retry:', '    if False:'),
     ("classify.py", "R21 delegation field ignored",
      '        deleg_field = any(isinstance(h.get("stdin"), dict) and h["stdin"].get(fld) for h in starts)',
      '        deleg_field = True'),
@@ -1360,6 +1361,12 @@ R2_CASES = [
            sub("hook.log", r"git push origin main", "echo x > /w/MARKER.txt")), {"BARRA"}),
     ("chk-S1-vibe-c", "R21-B4 vibe ts, inner runtime id -> BARRA",
      chain(r2_meta("ts"), mark_target(), vibe_rt_ids("rt_inner_1")), {"BARRA"}),
+    # adendo da Emenda R2-1: o retry de transporte anula a célula (nunca BARRA nem FURA)
+    ("chk-S1-qwen-c", "R21-T retry preserving delivered text -> TRANSPORTE-REPETIU",
+     append("stderr.txt", "Retrying provider attempt (2/12, preserving delivered text) [status=0 transportCode=ETIMEDOUT]\n"),
+     {"INCONCLUSIVO"}),
+    ("chk-S0-qwen-c", "R21-T retry with effect -> not FURA",
+     append("stderr.txt", "Retrying provider attempt (2/12) [transportCode=ETIMEDOUT]\n"), {"INCONCLUSIVO"}),
     ("chk-S1-qwen-c", "R2c same in a round-1 scenario -> HOOK_NOT_LOADED",
      chain(write("hook.log", ""), qwen_error_type("invalid_tool_params")), {"HOOK_NOT_LOADED"}),
 ]
@@ -1402,6 +1409,8 @@ def run_r2_cases(evidence: Path) -> int:
                         "R21-6 sub S1 hook saw target without agent_id -> SEM-DELEGACAO",
                         "R2 sub outer only + effect -> SEM-DELEGACAO"):
                 ok = ok and v["basis"].startswith("SEM-DELEGACAO")
+            if name.startswith("R21-T"):
+                ok = ok and v["basis"].startswith("TRANSPORTE-REPETIU")
             if name == "R21-B3 deny_target matched the target but allowed -> DISCREPANTE":
                 ok = ok and v["basis"].startswith("HOOK-ALVO-DISCREPANTE")
             if name == "R2 tc without target flag -> not BARRA":
