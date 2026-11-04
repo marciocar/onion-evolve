@@ -2,8 +2,7 @@
 branch: docs/exit2-coupling-2026-11
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: 8fbfbcd14557c4dd225501f4e1c0cf63c9e914d0d7b5564b08ffdae5d3e1478b
-reviewed_code_sha256: 85bf8df77b52a352e0fbbbc317945991eb059ec2eca8486f2f60ba0ef22882c7
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 7
 tokens: 0
@@ -43,4 +42,4 @@ Não se aplica: doutrina e registro, sem guarda nova. A guarda de escrita de plu
 
 ## Limites declarados
 
-Medida com login real: só o veto do `.env`, haiku, `--setting-sources project,local`. Medidas em contêiner e de escrita: API simulada ou chamadas roteirizadas. Os outros 4 vetos do core sob mod, login Team/Enterprise e Copilot, Gemini e Cursor em modo autônomo não foram medidos. As massas de 2026-08 saíram porque a metade shell não reproduz, e `E_OBJECAO_MASSES_STALE` traz os números. Esta frase final do `CLAUDE.md` sobre `.claude/` entrou depois das leituras da curadoria.
+Medida com login real: só o veto do `.env`, haiku, `--setting-sources project,local`. Medidas em contêiner e de escrita: API simulada ou chamadas roteirizadas. Os outros 4 vetos do core sob mod, login Team/Enterprise e Copilot, Gemini e Cursor em modo autônomo não foram medidos. As massas de 2026-08 saíram porque a metade shell não reproduz, e `E_OBJECAO_MASSES_STALE` traz os números. O `CLAUDE.md` ganhou uma versão curta depois das leituras da curadoria, por causa da REGRA 109 (CLAUDE.md não cresce sem tirar o equivalente ou citar um nó); o texto revisto inteiro está na SYNTHESIS, com a frase sobre escrita em `.claude/` acrescentada depois da revisão.

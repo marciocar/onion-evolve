@@ -162,3 +162,45 @@ Saíram caminho de máquina, usuário e host, trocados por `⟨…⟩`; ficaram 
 5 cópias da guarda em `policies/*/hooks/`, iguais à `pretooluse-env-guard.sh` em `88793c4a9` (mesmo sha256, `c4c26976be089b4e…`).
 Os `SHA256SUMS.*` valem para os originais, e por isso `PRE-REGISTRO*.md`, `run_cell.sh`, `consolidado.txt`, `results.jsonl` e
 `efeitos-*.txt` saneados não batem com eles. O único IP é `127.0.0.1`, do stub.
+
+## Redação completa da doutrina
+
+O `CLAUDE.md` guarda a versão curta, por causa da REGRA 109 (CLAUDE.md não cresce sem tirar o equivalente ou citar um nó). A versão revista pela curadoria, com grau de prova e condições, é esta:
+
+**A capacidade que COMPRA o acoplamento** (corrigido em 2026-08-16; **exclusividade retirada em
+2026-11-04**, decisão do maestro, `D_EXIT2_COUPLING_WORDING_2026_11`): a frase dizia que o **`exit 2`
+determinístico de hook**, que barra a ação inclusive sob `bypassPermissions`, não existia fora do
+Claude Code e que nenhum CI o replicava. O veto segue sendo o que barra no core; a exclusividade caiu:
+- **Por grau de prova.** *Medido:* Codex CLI 0.164.0 barra sob
+  `--dangerously-bypass-approvals-and-sandbox`, com hook confiável (sem confiança, o `codex exec` o pula
+  em silêncio); Qwen Code 0.26.6 barra no caminho feliz; no Mistral Vibe 3.0.4 o `exit 2` só barra com
+  `strict`; Goose 1.57.0 em modo auto barra, libera em falha e barra com `on_failure: block` (API
+  simulada, só shell, sem subagente). *Só por doc:* Copilot CLI, Gemini CLI e Cursor. *Sem medida em
+  nenhum:* Copilot, Gemini e Cursor em modo autônomo; o Antigravity nem tem primária. A medida do Goose
+  não dispara o gatilho abaixo, que exige os 5 vetos reais na mesma bancada.
+- **O veto é camada de conformidade, não fronteira de segurança.** É conclusão do Onion, não fala da
+  Anthropic. Condições de força: sem chave de política na configuração gerenciada (`{}` ou só chave de
+  controle, como `prependPlugins`, não contam) ou login Team/Enterprise (este, só por doc), **um mod que
+  carrega vence o veto e a regra `deny`, inclusive sob bypass** (o veto, medido em 2.1.318 com login
+  Max, 6 de 6; a `deny`, medida com API simulada). Sob bypass o próprio agente pode gravar o mod em
+  `.claude/skills/` e, com aceite de confiança, a sessão seguinte fura; sem aceite ele não carrega dali,
+  mas em `~/.claude/skills/` carregou mesmo sem aceite. Nenhum veto do core barra escrita em `.claude/` sob bypass, e sobrescrever a guarda tira o veto na mesma
+  sessão (chamadas roteirizadas, 18 de 18). O hook, mesmo gerenciado, **falha aberto** sem
+  `onFailure: block`. E **o que o mod inicia por si não passa pelo gate**: com a guarda de mods sentada,
+  o processo do mod ainda leu o `.env`. Só `allowManagedModsOnly` o parou nas duas vias, `--plugin-dir` e
+  skills do projeto (nesta, o processo só foi medido com a política em conjunto; sozinha, ela recusou o
+  mod que aprova), e `blockedMarketplaces` parou na via de skills, medido em conjunto. Tudo isso, salvo
+  os 6 de 6, medido com API simulada.
+- **O que nenhum CI replica é só o momento antes da execução na sessão.** Para a `main`, onde o plano
+  dá ruleset, os checks exigidos já cobrem (neste repo, ativo).
+- **O vazio declarado:** a postura abaixo pede capacidade que não exista fora, e **hoje nenhuma
+  capacidade exclusiva está medida**.
+- **Gatilho de reabertura da postura:** quando um harness que não seja o Claude Code passar, na mesma
+  bancada, nos 5 vetos reais do core, em caminho feliz, falha e modo autônomo; ou quando o
+  `/meta:cc-update` mudar a regra da guarda.
+
+- **Escrita em `.claude/`:** nenhum veto do core a barra sob bypass, e sobrescrever a guarda tira o veto na mesma sessão (chamadas roteirizadas, 18 de 18). A história do `SendMessage` e as massas de 2026-08 ficam em `docs/evolution/research/claude-code-2.1-onion-2026-08/`.
+
+## Documentos das medidas
+
+Pré-registros e as peças `.md` dos mods de laboratório estão em `data/documentos-das-medidas.tar.gz`, para não contarem como documento de análise do repo.

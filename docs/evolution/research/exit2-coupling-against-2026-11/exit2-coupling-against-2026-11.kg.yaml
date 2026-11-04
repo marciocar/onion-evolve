@@ -338,7 +338,7 @@ nodes:
     trace: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-real-hooks/consolidado.txt"
     provenance:
       source: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-real-hooks/results.jsonl"
-      locator: "campo veredito por run A-1 a C-3; pré-registro em data/mods-real-hooks/PRE-REGISTRO.md"
+      locator: "campo veredito por run A-1 a C-3; pré-registro em data/documentos-das-medidas.tar.gz, mods-real-hooks/PRE-REGISTRO.md"
       method: "measurement: claude -p com login real, hooks reais em clone descartável, desfecho no stream-json por analyze.py"
       locality: "repo"
   - id: E_MODS_MANAGED_CONTAINER_STUB_1104
@@ -358,7 +358,7 @@ nodes:
     trace: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/consolidado.txt"
     provenance:
       source: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/results.jsonl"
-      locator: "campos cell, chamadas, proc e sec_default; pré-registro e Emenda 1 em data/mods-managed/PRE-REGISTRO-MANAGED.md"
+      locator: "campos cell, chamadas, proc e sec_default; pré-registro e Emenda 1 em data/documentos-das-medidas.tar.gz, mods-managed/PRE-REGISTRO-MANAGED.md"
       method: "measurement: claude -p em contêiner sem rede, stub local da Messages API, hooks reais do clone, desfecho no stream-json por lab/analyze.py"
       locality: "repo"
   - id: E_SANDBOX_WRITE_CLAUDE_DIR_SCRIPTED_1104
@@ -378,7 +378,7 @@ nodes:
     trace: "docs/evolution/research/exit2-coupling-against-2026-11/data/sandbox-cell/consolidado.txt"
     provenance:
       source: "docs/evolution/research/exit2-coupling-against-2026-11/data/sandbox-cell/consolidado.txt"
-      locator: "linhas MAIN, KONT, DN, DN2, BW, DC e SE/SF/SL; pré-registro e emendas em data/sandbox-cell/PRE-REGISTRO.md"
+      locator: "linhas MAIN, KONT, DN, DN2, BW, DC e SE/SF/SL; pré-registro e emendas em data/documentos-das-medidas.tar.gz, sandbox-cell/PRE-REGISTRO.md"
       method: "measurement: claude -p no host com HOME falso, stub local da Messages API, hooks reais do clone, desfecho pelo disco e pelo stream"
       locality: "repo"
   - id: E_MERCADO_EXIT2_COUPLING_1104
