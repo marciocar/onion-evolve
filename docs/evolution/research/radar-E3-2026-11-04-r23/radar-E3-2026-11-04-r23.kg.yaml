@@ -80,7 +80,6 @@ nodes:
     verified_against: "npm view @anthropic-ai/claude-agent-sdk version → 0.3.318; gh api commits/v1.0.268 → c0949c50a78c1ec8ce2647db36629b870e715d0c; currency-census.sh: a v1.0.268 instala o CLI 2.1.318"
     label: "o SDK do bridge sobe para 0.3.318 e o pin do revisor para v1.0.268 (sha c0949c50); o deploy do bridge é do maestro, o pin é PR do core, provado no PR seguinte"
   - id: E_CORRECOES_HEADLESS_NAO_CHEGAM_AO_CHAT_DO_BRIDGE_1104
-    x_path_is_content: "citação"
     node_type: evidence
     layer: audit
     plane: DEV
@@ -88,7 +87,7 @@ nodes:
     impact: 2
     confidence: 0.7
     verified_at: "2026-11-04"
-    verified_against: "CHANGELOG 2.1.318: «Fixed non-interactive launches replacing a `~/.claude.json` that isn't valid JSON with defaults; the start now fails, says how to restore the file, and leaves it as is (anthropics/claude-code#87551)», «Fixed retention cleanup leaving a home that only runs `claude -p` with no `~/.claude.json` backup» e «Improved unattended runs (`claude -p`, SDK apps) to stop rewriting `~/.claude.json` on every run when nothing in it changed». No core: ops/chat-runner.sh l.363 dá a cada chat uma home própria (ONION_CHAT_HOME_ROOT=…/chat-homes) e liga nela o CLI do SDK ⟨binário do node_modules do bridge, montado só-leitura na unidade do chat⟩ (l.202); l.634-635 lança o CLI sem terminal (--output-format stream-json --input-format stream-json); esse binário diz 2.1.310"
+    verified_against: "CHANGELOG 2.1.318: «Fixed non-interactive launches replacing a ⟨o arquivo de estado do usuário⟩ that isn't valid JSON with defaults; the start now fails, says how to restore the file, and leaves it as is (anthropics/claude-code#87551)», «Fixed retention cleanup leaving a home that only runs `claude -p` with no ⟨o arquivo de estado do usuário⟩ backup» e «Improved unattended runs (`claude -p`, SDK apps) to stop rewriting ⟨o arquivo de estado do usuário⟩ on every run when nothing in it changed». No core: ops/chat-runner.sh l.363 dá a cada chat uma home própria (ONION_CHAT_HOME_ROOT=…/chat-homes) e liga nela o CLI do SDK ⟨binário do node_modules do bridge, montado só-leitura na unidade do chat⟩ (l.202); l.634-635 lança o CLI sem terminal (--output-format stream-json --input-format stream-json); esse binário diz 2.1.310"
     label: "as três correções de 2.1.318 para homes que só rodam o CLI sem terminal descrevem as homes do /chat do bridge, mas não chegam a elas enquanto o SDK do bridge seguir no CLI 2.1.310"
     narrative: "A mudança de comportamento mais visível é a primeira: um arquivo de estado do usuário inválido deixa de ser trocado pelo padrão e passa a impedir o início. Numa home de chat isso troca um reset silencioso por um turno recusado. Não foi medido se alguma home de chat já teve o arquivo inválido."
     provenance:

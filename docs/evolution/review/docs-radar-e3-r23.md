@@ -2,7 +2,7 @@
 branch: docs/radar-e3-r23
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: 7320148801edcbb8c8367cbc037504cf31de3dd39c44a209c2ab5c97bfbf0b77
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: bfc5868f719caddf4bcce3465cf9a0268048788a83e654e6447d74a3837ae9e9
 findings_total: 22
 findings_real: 5
@@ -37,3 +37,7 @@ As Q_* abertas viraram as issues SAC-271 a SAC-274, e a do SDK foi ligada ao SAC
 ## Mutantes
 
 Nenhum: não há código.
+
+## Re-revisão (CI)
+
+A bancada `kg-machine-path` acusou uma isenção nova de caminho de máquina (`x_path_is_content`) no nó das correções sem terminal. A citação literal do caminho do arquivo de estado do usuário virou descrição, e a isenção saiu. Conferido pela sessão do core: radar e contrato rc 0, família `kg_machine_path` verde.
