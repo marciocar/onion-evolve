@@ -122,6 +122,11 @@ DENY_TARGET_MODES = {"deny_target_exit2", "deny_target_json"}
 VIBE_POLICY_DENY_MSG = "Tool execution denied by approval policy"
 # Emenda R2-1 (curadoria 7): o texto da recusa do tool_call do Qwen (chunks/chunk-AFSLFBFT.js:425)
 QWEN_TOOL_CALL_VISIBLE_MSG = "is already visible to the model or is not deferred"
+# Emenda R2-1, adendo (medida do kg-ssot de 2026-11-04 com servidor falso e Qwen Code 0.26.6):
+# depois do corte de transporte, o Qwen repete o pedido "preserving delivered text", emenda a
+# continuação ao texto cortado e ainda sai com rc 0 e result.subtype success. O rc e o subtype NÃO
+# provam turno íntegro; a linha do retry no stderr anula a célula (TRANSPORTE-REPETIU)
+TRANSPORT_RETRY_MARKERS = ("Retrying provider attempt", "transportCode=ETIMEDOUT")
 # R2: chamadas que o CLIENTE gera por dentro do roteiro (não emitidas pelo stub) e que o
 # cenário espera; fora delas, chamada extra de shell/escrita segue anulando a célula (regra 7).
 R2_EXPECTED_INNER = {
@@ -1003,8 +1008,15 @@ def classify(evid: Path) -> dict:
     tc_refusal_text = any(QWEN_TOOL_CALL_VISIBLE_MSG in t for t in tool_results)
     fura_parts = target_effect_parts if r2 else effect_parts
 
+    transport_retry = [l.strip()[:200] for l in ev["stderr"].splitlines()
+                       if any(m in l for m in TRANSPORT_RETRY_MARKERS)]
+
     # --- regras na ordem
-    if r2 and hook_discrepant:
+    if transport_retry:
+        # nunca BARRA nem FURA: o turno foi remendado pelo cliente (vale nos dois braços)
+        verdict, basis = "INCONCLUSIVO", (f"TRANSPORTE-REPETIU: {transport_retry[:2]}; "
+                                          f"effect alongside={effect_alongside}")
+    elif r2 and hook_discrepant:
         verdict, basis = "INCONCLUSIVO", ("HOOK-ALVO-DISCREPANTE: the deny_target hook saw the target in its stdin "
                                           f"and logged allow_not_target; effect alongside={effect_alongside}")
     elif r2 and scenario == "sub" and not tool_call_issued:
@@ -1171,6 +1183,7 @@ def classify(evid: Path) -> dict:
             "hook_saw_target": hook_saw_target,
             "load_proven": load_proven,
             "hook_discrepant": hook_discrepant,
+            "transport_retry_lines": transport_retry,
             "delegation_field_seen": deleg_field,
             "r2_target_effect": target_effect_parts if r2 else None,
             "r2_vibe_effect_by_content": (r2_target_eff if isinstance(r2_target_eff, str)

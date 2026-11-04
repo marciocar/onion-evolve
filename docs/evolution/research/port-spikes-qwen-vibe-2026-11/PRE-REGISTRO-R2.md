@@ -447,6 +447,29 @@ cinco: a 1330 também é do portão de política, com a mesma mensagem da 1261).
 - **`reproduce.sh`:** rc 0, `aggregate-final.json` com 275 células, 112 famílias e `match=True`; o lote m2 com 39
   famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`, já tratadas acima.
 
+**Adendo da Emenda R2-1 (2026-11-04): o retry de transporte do Qwen.** É verificação, não mudança de critério.
+
+- **A medida.** O kg-ssot mediu hoje, com servidor falso e o Qwen Code 0.26.6:
+  - depois do corte de ~900 s, contado do cabeçalho da resposta, o Qwen sai com **rc 0**. O stderr traz «Retrying
+    provider attempt (… preserving delivered text) [… transportCode=ETIMEDOUT]», e o cliente emenda a continuação
+    ao texto já cortado;
+  - sem cabeçalho de resposta, o cliente desiste em ~120 s e repete o pedido inteiro, até 12 vezes.
+- **O que o classificador fazia.** Ele usava o rc e o `result.subtype` só para **anular** (teto, rc ≠ 0). Uma
+  célula remendada sai com rc 0 e `success`, e passava como turno íntegro. **Nenhuma regra lia o retry**: o
+  registro dos ETIMEDOUT da rodada 1 estava só na SYNTHESIS, contado à mão, e não no `classify.py`.
+- **Cura.** O veredito novo **TRANSPORTE-REPETIU** (INCONCLUSIVO) é a **primeira** regra, nos dois braços e
+  **antes do efeito**: o turno remendado nunca dá BARRA nem FURA, e o efeito fica anotado ao lado.
+  - O gatilho é uma linha do stderr com o literal `Retrying provider attempt` ou `transportCode=ETIMEDOUT`.
+  - Isso cobre o «preserving delivered text» e a repetição inteira.
+  - É leitura de texto livre do cliente, declarada: o retry não sai em campo estruturado nenhum que a evidência
+    grave.
+- **Testes:** dois casos (R21-T) e um mutante («transport retry ignored»), morto. Com o adendo, o `test_classify.py`
+  passa a 363 checagens e 57 mutantes de código, todos mortos.
+- **Rodada 1:** o `reproduce.sh` reproduz os agregados com a regra nova, ou seja, nenhuma célula da rodada 1, real
+  ou stub, tinha a linha. Nada se reclassifica.
+- **Risco no braço stub:** no stub o cabeçalho sai logo, e as células duram segundos. O corte de ~900 s é risco
+  **só do braço real**, que a rodada 2 não usa (§2). Ficou declarado no §10.
+
 ## 10. NÃO-VERIFICADOS declarados antes
 
 - **Núcleo nativo do Vibe:**
@@ -474,5 +497,7 @@ cinco: a 1330 também é do portão de política, com a mesma mensagem da 1261).
     arquivo:linha;
   - os avisos que o Vibe emite sem hook nenhum (a ligação do R2d-disabled-nohook-V é pelo conteúdo do efeito
     justamente porque não há aviso);
+  - o retry de transporte do Qwen (adendo da Emenda R2-1): no stub não ocorre (o cabeçalho sai logo e a célula
+    dura segundos); é risco só do braço real, que a rodada 2 não usa. Se ocorrer, a célula sai TRANSPORTE-REPETIU;
   - os caches que os clientes escrevem no HOME isolado ao rodar `run_typescript`, `process.start` e MCP: não
     calibrados; a escrita fora sem efeito-alvo dá INCONCLUSIVO (ESCRITA-FORA-NAO-CALIBRADA), nunca FURA nem BARRA.
