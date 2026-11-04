@@ -138,15 +138,20 @@ case "$MODE" in
       IS_TARGET="$(printf '%s' "$STDIN_RAW" | python3 -I -c '
 import json, sys
 sys.path.insert(0, sys.argv[1])
-from classify import target_in
+from classify import target_in, TARGET_KIND
 try:
     st = json.load(sys.stdin)
 except Exception:
     print(1); sys.exit(0)        # stdin ilegível: nega (fecha)
-print(1 if target_in(st.get("tool_input") if isinstance(st, dict) else st, sys.argv[2]) else 0)
+# Emenda R2-1 (kg-ssot B3): só libera com stdin objeto, tool_input presente e cenário conhecido
+if not isinstance(st, dict) or "tool_input" not in st or sys.argv[2] not in TARGET_KIND:
+    print(1); sys.exit(0)
+print(1 if target_in(st["tool_input"], sys.argv[2]) else 0)
 ' "$HERE" "$SCENARIO")"
     fi
-    if [ "$IS_TARGET" != "1" ]; then
+    # Emenda R2-1 (curadoria 11, kg-ssot B3): libera SÓ com a saída exatamente "0"; Python que
+    # caiu, saída vazia ou qualquer outra coisa nega (fecha)
+    if [ "$IS_TARGET" = "0" ]; then
       log_line decision allow_not_target
       exit 0
     fi
