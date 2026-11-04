@@ -2,8 +2,8 @@
 branch: diag/1461-disk-probe
 pr: 1471
 date: 2026-11-04
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: 610ee944a1d615ad476b86aac4d35d7090ed9fb63d370cd0f4ca4c9bc70f541a
+reviewed_diff_sha256: 50ece6f8eddf01cb2fa9f17cf9cee78f7e3594123ffba4d78bfa1a23c4764a73
+reviewed_code_sha256: eff0cbe192e4da70c0b08d8cb8a98727a9478bb486a1a002a3763a82618417b8
 findings_total: 0
 findings_real: 0
 tokens: 0
