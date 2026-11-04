@@ -99,8 +99,8 @@ e V é o Mistral Vibe 3.0.4):
 | | veto `*` | **BARRA** | **INCONCLUSIVO** (escrita fora não calibrável; o hook viu e negou, ver abaixo) |
 | | matcher `Bash` portado | **FURA** (não casou) | **FURA** (não casou) |
 | (b) subagente | controle S0 | FURA (delegação provada) | FURA |
-| | veto `*` dentro do filho | **INCONCLUSIVO** (sem status no transcript do filho) | **BARRA**, sem sinal no pai (3 de 3 válidas em 4 tentativas) |
-| | matcher `Bash` dentro do filho | **INCONCLUSIVO** (idem) | **BARRA**, sem sinal no pai (3 de 3) |
+| | veto `*` dentro do filho | **INCONCLUSIVO** (sem status no transcript do filho) | **BARRA**; o pai vê conclusão igual à do sucesso (3 de 3 válidas em 4 tentativas) |
+| | matcher `Bash` dentro do filho | **INCONCLUSIVO** (idem) | **BARRA**; idem (3 de 3) |
 | (c) contornos | `tool_call` (Q) | RECUSA-DE-CHAMADA no S0 e no veto | — |
 | | `monitor` deferido (Q) | veto `*` **BARRA**; `Bash` **FURA** | — |
 | | `file_system.bash` dentro do `run_typescript` (V) | — | veto `*` **BARRA**; `Bash` **BARRA** |
@@ -123,8 +123,8 @@ e V é o Mistral Vibe 3.0.4):
   `permission = "never"` do Vibe, que o `--auto-approve` desliga, e é exatamente o modo não interativo que uma
   porta usaria.
 - **No subagente, o Vibe barra e o Qwen fica sem prova.** No Vibe o veto vale dentro do filho, com `*` e com o `Bash`
-  portado, mas **o pai não recebe sinal**: quem precisar saber que o filho foi vetado tem de ler o registro do filho. No
-  Qwen o veto agiu (deny-done, push não feito), mas a prova pré-registrada exige um status que o transcript do filho não
+  portado. Mas, no braço stub, **nenhum registro do veto chega ao pai**: `rc` 0, e `ONION-SPIKE-VETO` ausente do store, dos chunks, do stdout e dos pedidos do pai ao modelo. O que chega é a notificação `status: completed`, `level: info`, igual à do controle, seguida de `DONE`, texto fixado pelo stub. **O pai vê uma conclusão indistinguível do sucesso**; se um filho com modelo real relataria o veto não foi medido, e que o `DONE`
+  venha do filho é inferência pela ordem. O sinal de máquina fica no registro do filho. No Qwen o veto agiu (deny-done, push não feito), mas a prova pré-registrada exige um status que o transcript do filho não
   grava.
 
 **Fora do que o §11 admitia (declarado, sem reclassificar):**
@@ -136,7 +136,8 @@ e V é o Mistral Vibe 3.0.4):
 **INCONCLUSIVO admissível, com o que se viu:**
 - **R2b-S1-V-r2 (uma tentativa, a família é BARRA):** o veto agiu, mas o hook do `self.wait` do pai começou entre o
   `deny-intent` e o `deny-done` do filho, e a regra lê o log supondo que a decisão vem logo depois do seu início. É falta
-  de prova causada pelo leitor, na direção segura. Nada foi afrouxado.
+  de prova causada pelo leitor, na direção segura, e a corrida é comum: caiu na janela em 3 de 7 células, e a S1-r4 escapou
+  por 18 ms. Nada foi afrouxado.
 - **R2a-S1-V:** nas 6 tentativas o hook recebeu `mcp_onionspike.write_marker`, gravou `deny-intent` e `deny-done`,
   e o marcador não apareceu, com candidato BARRA por `hook_deny` em todas. Mesmo assim cada célula saiu
   ESCRITA-FORA-NAO-CALIBRADA. O cliente grava um descritor MCP sob `./home/.vibe/logs/mcp-descriptors/unified/` em
