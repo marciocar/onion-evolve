@@ -929,7 +929,8 @@ CODE_MUTANTS = [
      '        elif not furas and any(len([c for c in valid if c["verdict"] == ov]) >= need and len(valid) == len(',
      '        elif any(len([c for c in valid if c["verdict"] == ov]) >= need and len(valid) == len('),
     ("aggregate.py", "R23 A2 calibration outside the client HOME",
-     '        in_client_home = all(p.startswith(CLIENT_HOME_PREFIXES) for p in mine)', '        in_client_home = True'),
+     '        in_client_home = all(p.startswith(CLIENT_HOME_PREFIXES.get(v.get("harness"), ())) for p in mine)',
+     '        in_client_home = True'),
     ("aggregate.py", "R23 A5 calib union", 'mine <= set.intersection(*sets)', 'mine <= set.union(*sets)'),
     ("aggregate.py", "R23 A5 calib NEED dropped",
      '        if len(sets) >= need and mine and mine <= set.intersection(*sets)', '        if sets and mine and mine <= set.intersection(*sets)'),
@@ -982,18 +983,50 @@ CODE_MUTANTS = [
     ("classify.py", "R23 persistent retry ignored",
      '|\\[Persistent\\] Attempt \\d+ failed")', '")'),
     ("classify.py", "R23 child rule removed",
-     '    elif r2 and harness == "vibe" and scenario == "sub" and child_ok and not bare_advanced and not fura_parts:',
-     '    elif False:'),
-    ("classify.py", "R23 child (b) count not checked",
-     '    if len(effects) != 1 or ((next(iter(effects.values())).get("state") or {}).get("status") != "skipped"):',
-     '    if not effects:'),
-    ("classify.py", "R23 child (c) id not checked",
-     '        if (isinstance(m, dict) and m.get("role") == "tool" and m.get("tool_call_id") == stub_call_id',
-     '        if (isinstance(m, dict) and m.get("role") == "tool"'),
-    ("classify.py", "R23 child (c) outcome not checked",
-     '                and m.get("outcome") == "failure" and VETO in', '                and VETO in'),
-    ("classify.py", "R23 child (c) veto text not checked",
-     'and VETO in json.dumps(m.get("content"), ensure_ascii=False)):', '):'),
+     '    elif (r2 and harness == "vibe" and scenario == "sub" and child_ok\n', '    elif (False\n'),
+    # Emenda R2-4
+    ("classify.py", "R24 child (b) count not checked",
+     '    if len(effects) != 1 or next(iter(effects.values())) != {"skipped"}:', '    if not effects:'),
+    ("classify.py", "R24 child (c) id not checked",
+     '        if isinstance(m, dict) and m.get("role") == "tool" and m.get("tool_call_id") == stub_call_id:',
+     '        if isinstance(m, dict) and m.get("role") == "tool":'),
+    ("classify.py", "R24 child (c) outcome not checked",
+     '    if not same_id or any(m.get("outcome") != "failure" for m in same_id) or not hits:',
+     '    if not same_id or not hits:'),
+    ("classify.py", "R24 child (c) veto text not checked",
+     '    hits = [m for m in same_id if VETO in json.dumps(m.get("content"), ensure_ascii=False)]', '    hits = same_id'),
+    ("classify.py", "R24 child effect states: last one wins",
+     '            effects.setdefault(str(d.get("id")), set()).add(str((d.get("state") or {}).get("status")))',
+     '            effects[str(d.get("id"))] = {str((d.get("state") or {}).get("status"))}'),
+    ("classify.py", "R24 child messages: one veto is enough",
+     '    if not same_id or any(m.get("outcome") != "failure" for m in same_id) or not hits:',
+     '    if not any(m.get("outcome") == "failure" for m in hits):'),
+    ("classify.py", "R24 child rule without the veto mode",
+     '          and (mode in DENY_TARGET_MODES or mode == "matcher_bash") and tool_ran is not True):',
+     '          and tool_ran is not True):'),
+    ("classify.py", "R24 child (d) parent_session_id not required",
+     '            cur = st if (st.get("tool_call_id") == stub_call_id and st.get("parent_session_id")) else None',
+     '            cur = st if st.get("tool_call_id") == stub_call_id else None'),
+    ("classify.py", "R24 child (d) role filter dropped",
+     '        if h.get("role", "main") != "main":\n            continue\n        st = h.get("stdin") if isinstance(h.get("stdin"), dict) else {}',
+     '        st = h.get("stdin") if isinstance(h.get("stdin"), dict) else {}'),
+    ("classify.py", "R24 child rule ignores the parent's record",
+     '          and (mode in DENY_TARGET_MODES or mode == "matcher_bash") and tool_ran is not True):',
+     '          and (mode in DENY_TARGET_MODES or mode == "matcher_bash")):'),
+    ("aggregate.py", "R24 control includes the candidate's own family",
+     '               if fk != own]', '               ]'),
+    ("aggregate.py", "R24 control: tool ran still counts",
+     '        not_run = ((v.get("verdict") == "BARRA" or cand_v == "BARRA") and f.get("tool_ran") is False)',
+     '        not_run = (v.get("verdict") == "BARRA" or cand_v == "BARRA")'),
+    ("aggregate.py", "R24 L6 noexec all->any",
+     '        in_noexec = all(sum(1 for c in ctl if p in c) >= need for p in mine)',
+     '        in_noexec = any(sum(1 for c in ctl if p in c) >= need for p in mine)'),
+    ("aggregate.py", "R24 L5 client HOME all->any",
+     '        in_client_home = all(p.startswith(CLIENT_HOME_PREFIXES.get(v.get("harness"), ())) for p in mine)',
+     '        in_client_home = any(p.startswith(CLIENT_HOME_PREFIXES.get(v.get("harness"), ())) for p in mine)'),
+    ("aggregate.py", "R24 D4 any client's HOME",
+     '        in_client_home = all(p.startswith(CLIENT_HOME_PREFIXES.get(v.get("harness"), ())) for p in mine)',
+     '        in_client_home = all(p.startswith(("./home/.qwen/", "./home/.vibe/")) for p in mine)'),
     ("classify.py", "R23 child (d) deny-done not required",
      '        elif h.get("phase") == "decision" and h.get("decision") == "deny-done" and cur is not None:\n            d_ok, child_sid',
      '        elif h.get("phase") == "decision" and cur is not None:\n            d_ok, child_sid'),
@@ -1227,6 +1260,18 @@ def stub_target_id(d: Path) -> str:
     raise AssertionError("no target call in stub.log")
 
 
+def child_extra_message(outcome):
+    """Uma 2ª mensagem de ferramenta com o MESMO id do stub, com o outcome dado e sem o veto."""
+    def f(d: Path):
+        p = d / "session" / "vibe" / "store_extract.json"
+        v = json.loads(p.read_text())
+        cid = stub_target_id(d)
+        v["sessions"][0]["messages"].append({"message": {"role": "tool", "tool_call_id": cid, "name": "bash",
+                                                         "outcome": outcome, "content": [{"type": "text", "text": "ok"}]}})
+        p.write_text(json.dumps(v))
+    return f
+
+
 def child_store(effects=None, msg_id=None, outcome="failure", text="ONION-SPIKE-VETO: blocked", ok=True, sid="child1"):
     """Emenda R2-3: escreve o extrato do store do Vibe com a sessão do filho."""
     def f(d: Path):
@@ -1246,7 +1291,26 @@ def child_store(effects=None, msg_id=None, outcome="failure", text="ONION-SPIKE-
 
 def VIBE_CHILD(d: Path):  # noqa: N802 - montado na chamada (os helpers vêm depois no arquivo)
     chain(r2_meta("sub"), mark_target(role="inner"), hook_stdin_add("parent_session_id", "p1"),
-          hook_stdin_add("session_id", "child1"), vibe_drop_all_notices)(d)
+          hook_stdin_add("session_id", "child1"), vibe_drop_all_notices,
+          edit_json("meta.json", lambda v: v.update(hook_mode="deny_target_json")))(d)
+
+
+def child_probe_with_psid_main_without(d: Path):
+    """Emenda R2-4 (curadoria 4, kg-ssot L21/L22): o stdin do hook PRINCIPAL não traz
+    parent_session_id; uma linha de PROVA, entre o início e o deny-done do principal, traz."""
+    out = []
+    for line in (d / "hook.log").read_text().splitlines():
+        r = json.loads(line)
+        if r.get("phase") == "start" and r.get("role", "main") == "main" and isinstance(r.get("stdin"), dict):
+            r["stdin"].pop("parent_session_id", None)
+            out.append(json.dumps(r))
+            probe = json.loads(json.dumps(r))
+            probe["role"] = "probe"
+            probe["stdin"]["parent_session_id"] = "p1"
+            out.append(json.dumps(probe))
+            continue
+        out.append(json.dumps(r))
+    (d / "hook.log").write_text("\n".join(out) + "\n")
 
 
 def vibe_target_source(source):
@@ -1717,10 +1781,27 @@ R2_CASES = [
      NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R23-4 (c) outcome success -> not BARRA", chain(VIBE_CHILD, child_store(outcome="success")), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R23-4 (c) no veto text -> not BARRA", chain(VIBE_CHILD, child_store(text="denied")), NOT_FAVORABLE),
-    ("chk-S1-vibe-c", "R23-4 (d) no deny-done -> not BARRA", chain(VIBE_CHILD, child_store(), hook_allows), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R23-4 (d) no deny-done -> not BARRA",
+     chain(VIBE_CHILD, child_store(), hook_allows, M_(hook_mode="deny_target_json")), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R23-4 (d) hook session id is not the child's -> not BARRA",
      chain(VIBE_CHILD, child_store(sid="other-session")), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R23-4 child store did not load -> not BARRA", chain(VIBE_CHILD, child_store(ok=False)), NOT_FAVORABLE),
+    # ===== Emenda R2-4 =====
+    ("chk-S1-vibe-c", "R24 child effect completed then skipped -> not BARRA", chain(VIBE_CHILD, child_store(effects=[
+        {"id": "e1", "type": "effect", "detail": {"kind": "shell"}, "state": {"status": "completed"}},
+        {"id": "e1", "type": "effect", "detail": {"kind": "shell"}, "state": {"status": "skipped"}}])), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R24 another tool message with the same id and outcome success -> not BARRA",
+     chain(VIBE_CHILD, child_store(), child_extra_message("success")), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R24 child rule needs a veto mode (deny_json is not) -> not BARRA",
+     chain(VIBE_CHILD, child_store(), M_(hook_mode="deny_json")), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R24 child rule with matcher_bash -> BARRA",
+     chain(VIBE_CHILD, child_store(), M_(hook_mode="matcher_bash")), {"BARRA"}),
+    ("chk-S1-vibe-c", "R24 main hook stdin without parent_session_id -> not BARRA",
+     chain(VIBE_CHILD, child_store(), child_probe_with_psid_main_without), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R24 the parent's record says the tool ran -> not BARRA",
+     chain(r2_meta("sub"), mark_target(role="inner"), hook_stdin_add("parent_session_id", "p1"),
+           hook_stdin_add("session_id", "child1"), M_(hook_mode="deny_target_json"),
+           set_vibe_effect_status("completed"), child_store()), NOT_FAVORABLE),
     # 3: o retry persistente do Qwen, no debug log
     ("chk-S1-qwen-c", "R23-3 '[Persistent] Attempt N failed' in the debug log -> TRANSPORTE",
      write_debug("[Persistent] Attempt 2 failed with status 500. Retrying in 4s...\n"), {"INCONCLUSIVO"}),
@@ -1975,6 +2056,10 @@ def run_r22_aggregate(evidence: Path) -> int:
                 clone(evidence, tmp, "chk-S1-vibe-c", f"S1-{r}", f"2026-11-04T16:01:0{r}Z", batch="r22", scenario="ts",
                       scenario_canonical="ts")
                 chain(mark_target(), append("outside_after.txt", s1_path.format(u=uu[r + 3]) + "\t9\t1.0\n"))(tmp / f"S1-{r}")
+                # Emenda R2-4: o controle de não-execução é de OUTRA família (aqui, a do matcher_bash)
+                clone(evidence, tmp, "chk-S1-vibe-c", f"M-{r}", f"2026-11-04T16:02:0{r}Z", batch="r22", scenario="ts",
+                      scenario_canonical="ts", hook_mode="matcher_bash")
+                chain(mark_target(), append("outside_after.txt", s1_path.format(u=uu[r + 6 if r < 3 else 0]) + "\t9\t1.0\n"))(tmp / f"M-{r}")
             res = aggregate(tmp)
             f = fam(res, batch="r22", hook_mode="deny_json")
             check(label, f["verdict"], want)
@@ -2042,13 +2127,40 @@ def run_r23_units() -> int:
     three = [cell(f"S1-{i}", "deny_json", "INCONCLUSIVO", [P], cand="BARRA") for i in range(3)]
     vs = s0 + three
     calibrate_outside_by_s0(vs)
-    check("path in every S0 and in 3 no-exec cells -> calibrated", three[0]["verdict"], "BARRA")
+    # Emenda R2-4 (curadoria 1): a família da candidata não é controle dela mesma
+    check("only the candidate's own family as control -> not calibrated", three[0]["verdict"], "INCONCLUSIVO")
 
-    def run(s0_paths, s1_paths, s0_verdict="FURA", s1_mode="deny_json", extra=()):
+    def ctl_cells(paths, mode="matcher_bash", verdict="BARRA", **fx):
+        out = []
+        for i, ps in enumerate(paths):
+            c = cell(f"C-{mode}-{i}", mode, verdict, ps)
+            c["facts"].update(fx)
+            out.append(c)
+        return out
+
+    def run(s0_paths, s1_paths, s0_verdict="FURA", s1_mode="deny_json", extra=(), ctl=None):
         s0x = [cell(f"S0-{i}", "log_allow", s0_verdict, ps, tool_ran=True) for i, ps in enumerate(s0_paths)]
         s1x = [cell(f"S1-{i}", s1_mode, "INCONCLUSIVO", ps, cand="BARRA") for i, ps in enumerate(s1_paths)]
-        calibrate_outside_by_s0(s0x + s1x + list(extra))
+        ctlx = ctl_cells(s1_paths) if ctl is None else ctl
+        calibrate_outside_by_s0(s0x + s1x + ctlx + list(extra))
         return s1x[0]["verdict"]
+
+    check("control from another family -> calibrated", run([[P]] * 3, [[P]] * 3), "BARRA")
+    check("control = cells where the target call never existed (REMOVIDA) -> calibrated",
+          run([[P]] * 3, [[P]] * 3, ctl=ctl_cells([[P]] * 3, mode="log_allow", verdict="REMOVIDA-DA-OFERTA",
+                                                    tool_ran=None)), "BARRA")
+    check("control that ran the tool -> not calibrated",
+          run([[P]] * 3, [[P]] * 3, ctl=ctl_cells([[P]] * 3, tool_ran=True)), "INCONCLUSIVO")
+    # kg-ssot L6: um caminho em 3 controles e outro em 1 só -> não calibra (all, não any)
+    Q = "./home/.vibe/q"
+    check("one path in 3 controls, another in 1 -> not calibrated",
+          run([[P, Q]] * 3, [[P, Q]] * 3, ctl=ctl_cells([[P, Q], [P], [P]])), "INCONCLUSIVO")
+    # kg-ssot D4/L5: o HOME do OUTRO cliente não vale, e um caminho fora do HOME não passa por estar
+    # junto de um de dentro
+    W = "./home/.qwen/x"
+    check("Vibe cell writing under the Qwen HOME -> not calibrated", run([[W]] * 3, [[W]] * 3), "INCONCLUSIVO")
+    check("one path in the client HOME and one outside -> not calibrated",
+          run([[P, "./home/.ssh/k"]] * 3, [[P, "./home/.ssh/k"]] * 3), "INCONCLUSIVO")
 
     A, B, C = "./home/.vibe/a", "./home/.vibe/b", "./home/.vibe/c"
     # kg-ssot A2 / A5: A, B e C distintos no S0 (a interseção é vazia) -> não calibra (mata a união)
