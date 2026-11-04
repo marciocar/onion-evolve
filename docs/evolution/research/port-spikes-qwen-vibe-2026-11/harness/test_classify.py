@@ -1015,16 +1015,88 @@ CODE_MUTANTS = [
      '                 and not f.get("workdir_changes") and not f.get("hooks_config_changed"))', '                 )'),
     ("aggregate.py", "R26 control: quiet not required",
      '        if never_called and quiet and not f.get("bare_ref_advanced")', '        if never_called and not f.get("bare_ref_advanced")'),
-    ("classify.py", "R25 child (d) deny-done not required",
-     '        elif h.get("phase") == "decision" and h.get("decision") == "deny-done" and cur is not None:\n            denied.append(cur)',
-     '        elif h.get("phase") == "decision" and cur is not None:\n            denied.append(cur)'),
+    # Emenda R2-8: a forma do store
+    # Emenda R2-8 (kg-ssot A1-A5, mut9, e as âncoras novas)
+    ("classify.py", "R28 (d) deny-done not required",
+     '            elif h.get("decision") == "deny-done":\n                denied.append(cur)',
+     '            else:\n                denied.append(cur)'),
+    ("classify.py", "R28 (d) one deny-done is enough",
+     '    if (not starts_for_id or set(denied) != set(range(len(starts_for_id))) or bad_decision or not child_sid',
+     '    if (not starts_for_id or not denied or bad_decision or not child_sid'),
+    ("classify.py", "R28 other sessions may fail to load",
+     '    if any(not isinstance(x, dict) or x.get("ok") is not True or not isinstance(x.get("session_id"), str)\n           or not x.get("session_id") for x in sessions):',
+     '    if False:'),
+    ("classify.py", "R28 empty session_id allowed",
+     '    if any(not isinstance(x, dict) or x.get("ok") is not True or not isinstance(x.get("session_id"), str)\n           or not x.get("session_id") for x in sessions):',
+     '    if any(not isinstance(x, dict) or x.get("ok") is not True for x in sessions):'),
+    ("classify.py", "R28 child: allowed status not enforced",
+     '    if (not states or not states <= CHILD_ALLOWED_STATUS or not has_target', '    if (not states or not has_target'),
+    ("classify.py", "R28 child: target not required",
+     '    if (not states or not states <= CHILD_ALLOWED_STATUS or not has_target', '    if (not states or not states <= CHILD_ALLOWED_STATUS'),
+    ("classify.py", "R28 child: kind not checked",
+     '            or any((f_.get("detail") or {}).get("kind") not in VIBE_TOOL_KINDS for f_ in ch_forms)):', '            ):'),
+    ("classify.py", "R28 child: input-target branch removed",
+     '    has_target = (target_in(det.get("input"), scenario)\n', '    has_target = (False\n'),
+    ("classify.py", "R28 child: veto anywhere in the effect",
+     '                  or (det.get("input") is None and VETO in settled))',
+     '                  or VETO in json.dumps(eff, ensure_ascii=False))'),
+    ("classify.py", "R28 parent: target only in input",
+     '        if any(_effect_has_target(f_, scenario) for f_ in forms_):',
+     '        if any(target_in((f_.get("detail") or {}).get("input"), scenario) for f_ in forms_):'),
+    ("classify.py", "R28 parent: unknown step allowed",
+     '        if None in kinds_ or len(kinds_) != 1:', '        if False:'),
+    ("classify.py", "R28 parent: a step may repeat",
+     '    if any(n > 1 for n in seen.values()):', '    if False:'),
+    ("classify.py", "R28 parent: spawn count not checked",
+     '    if seen.get("spawn") != 1:', '    if False:'),
+    ("classify.py", "R28 parent chunks not checked",
+     '    if parent_chunks is not None:', '    if False:'),
+    ("classify.py", "R28 (3) target only in the input",
+     '                               and _effect_has_target(x, scenario)\n',
+     '                               and target_in((x.get("detail") or {}).get("input"), scenario)\n'),
+    ("classify.py", "R28 known: read kind not checked",
+     '    if (det.get("kind") == "tool" and det.get("toolName") == "file_system.read_file" and isinstance(inp, dict)',
+     '    if (det.get("toolName") == "file_system.read_file" and isinstance(inp, dict)'),
+    ("classify.py", "R28 known: read input not exact",
+     '            and set(inp) == {"path"} and str(inp["path"]).endswith("/README.txt")):',
+     '            and str(inp.get("path")).endswith("/README.txt")):'),
+    ("classify.py", "R28 known: read any path",
+     '            and set(inp) == {"path"} and str(inp["path"]).endswith("/README.txt")):', '            and set(inp) == {"path"}):'),
+    ("classify.py", "R28 known: spawn kind not checked",
+     '    if (det.get("kind") == "subagent" and det.get("toolName") == "agents.spawn" and isinstance(inp, dict)',
+     '    if (det.get("toolName") == "agents.spawn" and isinstance(inp, dict)'),
+    ("classify.py", "R28 known: spawn token not required",
+     '            and str(inp.get("task") or "").startswith(SUBTASK_TOKEN) and not target_in(inp, "sub")',
+     '            and not target_in(inp, "sub")'),
+    ("classify.py", "R28 known: spawn childSessionId not checked",
+     '            and child_sid and det.get("childSessionId") == child_sid):', '            ):'),
+    ("classify.py", "R28 known: wait any toolName",
+     '    if (det.get("kind") == "tool" and det.get("toolName") == "self.wait" and isinstance(inp, dict)',
+     '    if (det.get("kind") == "tool" and "wait" in str(det.get("toolName")) and isinstance(inp, dict)'),
+    ("classify.py", "R28 known: wait input keys not checked",
+     '            and set(inp) <= {"timeoutMs", "timeout_ms"}):', '            ):'),
+    ("classify.py", "R28 known: TS clause removed",
+     '    if det.get("toolName") == "run_typescript" and inp == {"code": TS_SPAWN}:', '    if False:'),
+    ("classify.py", "R28 known: TS clause token only",
+     '    if det.get("toolName") == "run_typescript" and inp == {"code": TS_SPAWN}:',
+     '    if det.get("toolName") == "run_typescript" and SUBTASK_TOKEN in str(inp):'),
+    ("classify.py", "R28 msgs: id not checked",
+     '            if m.get("tool_call_id") == stub_call_id:\n                all_same_id.append(m)',
+     '            if True:\n                all_same_id.append(m)'),
+    ("classify.py", "R28 A4 other-call messages allowed",
+     '                return False, "(4) a tool message of another call in the child or in another session", facts',
+     '                pass'),
+    ("classify.py", "R28 A5 any decision between starts",
+     '            if h.get("decision") not in CHILD_HOOK_DECISIONS:\n                bad_decision = True',
+     '            if False:\n                bad_decision = True'),
+    ("classify.py", "R28 A1 states not merged across forms",
+     '            states, _, forms = out.get(key, (set(), None, []))', '            _s, _, forms = out.get(key, (set(), None, []))\n            states = set()'),
+    ("classify.py", "R28 A1 effects without id merged",
+     '            key = str(d.get("id")) if d.get("id") is not None else f"<no-id-{len(out)}>"', '            key = str(d.get("id"))'),
     # Emenda R2-7: a lista positiva
     ("classify.py", "R27 child: more than one effect allowed", '    if len(ch_eff) != 1:', '    if not ch_eff:'),
     ("classify.py", "R27 child: effect states: last one wins",
      '            states.add(st if isinstance(st, str) else None)', '            states = {st if isinstance(st, str) else None}'),
-    ("classify.py", "R27 msgs: id not checked",
-     '            if isinstance(m, dict) and m.get("role") == "tool" and m.get("tool_call_id") == stub_call_id:',
-     '            if isinstance(m, dict) and m.get("role") == "tool":'),
     ("classify.py", "R27 msgs: outcome not checked",
      '    if not all_same_id or any(m.get("outcome") != "failure" for m in all_same_id) or not child_hits:',
      '    if not all_same_id or not child_hits:'),
@@ -1039,33 +1111,17 @@ CODE_MUTANTS = [
     ("classify.py", "R27 child chosen by 'not the parent'",
      '    child = [x for x in sessions if x.get("session_id") == child_sid]',
      '    child = [x for x in sessions if x.get("session_id") != parent_sid]'),
-    ("classify.py", "R27 other sessions may fail to load",
-     '    if any(not isinstance(x, dict) or x.get("ok") is not True for x in sessions):', '    if False:'),
     ("classify.py", "R27 the parent may be absent",
      '    if len(child) != 1 or len(parent) != 1:', '    if len(child) != 1:'),
-    ("classify.py", "R27 child: allowed status not enforced",
-     '    if not states or not states <= CHILD_ALLOWED_STATUS or det.get("kind") not in VIBE_TOOL_KINDS or not has_target:',
-     '    if not states or det.get("kind") not in VIBE_TOOL_KINDS or not has_target:'),
-    ("classify.py", "R27 child: target not required",
-     '    if not states or not states <= CHILD_ALLOWED_STATUS or det.get("kind") not in VIBE_TOOL_KINDS or not has_target:',
-     '    if not states or not states <= CHILD_ALLOWED_STATUS or det.get("kind") not in VIBE_TOOL_KINDS:'),
     ("classify.py", "R27 child: veto text not required when input is null",
      '                  or (det.get("input") is None and VETO in settled))', '                  or det.get("input") is None)'),
     ("classify.py", "R27 parent: status not checked",
      '        if not st_ or not st_ <= PARENT_ALLOWED_STATUS:', '        if False:'),
-    ("classify.py", "R27 parent: target effect allowed",
-     '            return False, "(2) the parent record has an effect with the target", facts', '            pass'),
-    ("classify.py", "R27 parent: unknown step allowed",
-     '            return False, "(2) the parent record has an effect that is not a known step of the script", facts',
-     '            pass'),
     ("classify.py", "R27 other sessions may have effects",
      '            return False, f"(2) another session ({other.get(\'session_id\')}) has effects", facts', '            pass'),
     ("classify.py", "R27 parent chunks not read",
      '                               for x in list(ev["items"]) + list(ev.get("vibe_chunks") or []))',
      '                               for x in list(ev["items"]))'),
-    ("classify.py", "R27 F1b parent target effect: only completed/failed",
-     '                               and target_in((x.get("detail") or {}).get("input"), scenario)\n                               for x in',
-     '                               and target_in((x.get("detail") or {}).get("input"), scenario)\n                               and (x.get("state") or {}).get("status") in ("completed", "failed")\n                               for x in'),
     ("classify.py", "R27 B2a multiple session_ids -> first",
      '    child_sid = sid_list[0] if sid_list and all(x == sid_list[0] for x in sid_list) else None',
      '    child_sid = sid_list[0] if sid_list else None'),
@@ -1074,9 +1130,6 @@ CODE_MUTANTS = [
     # Emenda R2-6 (kg-ssot F1-F4)
     ("classify.py", "R26 F1 generic rules may close the Vibe sub",
      '    elif r2 and harness == "vibe" and scenario == "sub":\n', '    elif False:\n'),
-    ("classify.py", "R25 B2 one deny-done is enough",
-     '    if (not starts_for_id or set(denied) != set(range(len(starts_for_id))) or not child_sid',
-     '    if (not starts_for_id or not denied or not child_sid'),
     ("classify.py", "R25 discrepancy ignores matcher_bash",
      '    if mode in DENY_TARGET_MODES or (r2 and mode == "matcher_bash"):', '    if mode in DENY_TARGET_MODES:'),
     ("aggregate.py", "R24 L6 noexec all->any",
@@ -1389,11 +1442,20 @@ def child_parent_session_first(d: Path):
     p.write_text(json.dumps(v))
 
 
+def chunks_parent_steps(d: Path):
+    """Emenda R2-8 (P7): os chunks da sessão do pai na forma do store, com os passos do roteiro (a
+    fixture vem do cenário c, cujos chunks trazem o bash vetado; a lista positiva vale nos chunks)."""
+    cs = sorted((d / "session" / "vibe" / "chunks").glob("*.json"))
+    for k, c in enumerate(cs):
+        steps = [json.loads(json.dumps(PARENT_READ_EFFECT)), json.loads(json.dumps(PARENT_SPAWN_EFFECT))] if k == 0 else []
+        c.write_text(json.dumps(steps))
+
+
 def VIBE_CHILD_LINKED(d: Path):  # noqa: N802
     """Emenda R2-6: como o VIBE_CHILD, mas o PAI mantém os avisos: o efeito skipped do pai fica
     LIGADO à chamada (tool_ran False)."""
     chain(r2_meta("sub"), mark_target(role="inner"), hook_stdin_add("parent_session_id", "p1"),
-          hook_stdin_add("session_id", "child1"),
+          hook_stdin_add("session_id", "child1"), chunks_parent_steps,
           edit_json("meta.json", lambda v: v.update(hook_mode="deny_target_json")))(d)
 
 
@@ -1499,22 +1561,36 @@ def child_second_hook_start_allowed(d: Path):
     (d / "hook.log").write_text("\n".join(lines) + "\n")
 
 
+TS_SPAWN_FOR_TESTS = ("async function main() {\n"
+                      "  return await tools.agents.spawn({ name: 'spike', message: 'ONION-SPIKE-SUBTASK: run the spike "
+                      "shell step in the current directory and report its output.' });\n"
+                      "}")
+
+
 VETOED_CHILD_EFFECT = {"id": "e1", "type": "effect",
                        "detail": {"kind": "tool", "toolName": "tool", "input": None,
                                   "display": {"settledMessage": "ONION-SPIKE-VETO: blocked by onion spike hook"}},
                        "state": {"status": "skipped"}}
 
 
+# Emenda R2-8: a forma do STORE (a mesma dos chunks da rodada 1): todo builtin sai com kind "tool"
+# e toolName "<grupo>.<ferramenta>"; só o agents.spawn ganha kind "subagent", com childSessionId
+PARENT_READ_EFFECT = {"id": "pr", "type": "effect",
+                      "detail": {"kind": "tool", "toolName": "file_system.read_file",
+                                 "input": {"path": "<CELL>/work/README.txt"}},
+                      "state": {"status": "completed"}}
+PARENT_SPAWN_EFFECT = {"id": "ps", "type": "effect",
+                       "detail": {"kind": "subagent", "toolName": "agents.spawn",
+                                  "input": {"task": "ONION-SPIKE-SUBTASK: run the spike shell step", "agent": "generic"},
+                                  "childSessionId": "child1"},
+                       "state": {"status": "completed"}}
+
+
 def parent_session(effects=None, messages=None, ok=True, sid="p1"):
-    """A sessão do PAI no extrato (Emenda R2-7): o read_file de topo e o agents.spawn com a tarefa."""
-    effs = effects if effects is not None else [
-        {"id": "pr", "type": "effect", "detail": {"kind": "file_read", "toolName": "file_system.read_file",
-                                                   "input": {"path": "<CELL>/work/README.txt"}},
-         "state": {"status": "completed"}},
-        {"id": "ps", "type": "effect", "detail": {"kind": "subagent", "toolName": "agents.spawn",
-                                                   "input": {"task": "ONION-SPIKE-SUBTASK: run the spike shell step",
-                                                             "agent": "generic"}},
-         "state": {"status": "completed"}}]
+    """A sessão do PAI no extrato (Emendas R2-7 e R2-8): o read_file de topo e o agents.spawn com a
+    tarefa e o vínculo ao filho, na forma do store."""
+    effs = effects if effects is not None else [json.loads(json.dumps(PARENT_READ_EFFECT)),
+                                                json.loads(json.dumps(PARENT_SPAWN_EFFECT))]
     return {"session_id": sid, "ok": ok, "error": None if ok else "boom",
             "projection": {"snapshot": {"history": {"entries": effs}}},
             "messages": messages or [{"message": {"role": "user", "content": "go"}}]}
@@ -1570,8 +1646,39 @@ def vibe_chunks_add(eff):
 
 def VIBE_CHILD(d: Path):  # noqa: N802 - montado na chamada (os helpers vêm depois no arquivo)
     chain(r2_meta("sub"), mark_target(role="inner"), hook_stdin_add("parent_session_id", "p1"),
-          hook_stdin_add("session_id", "child1"), vibe_drop_all_notices,
+          hook_stdin_add("session_id", "child1"), vibe_drop_all_notices, chunks_parent_steps,
           edit_json("meta.json", lambda v: v.update(hook_mode="deny_target_json")))(d)
+
+
+def child_effect(**over):
+    e = json.loads(json.dumps(VETOED_CHILD_EFFECT))
+    for k, v in over.items():
+        if k == "detail":
+            e["detail"].update(v)
+        else:
+            e[k] = v
+    return e
+
+
+def parent_entry(idx, **detail):
+    return edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"][idx]["detail"].update(detail))
+
+
+def parent_state(idx, status):
+    return edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"][idx].update(state={"status": status}))
+
+
+def hook_stub_decision_allow_first(d: Path):
+    """Caso E: depois do início do stub, uma decisão allow e só então deny-done."""
+    out, done = [], False
+    for line in (d / "hook.log").read_text().splitlines():
+        r = json.loads(line)
+        if (not done and r.get("phase") == "decision" and r.get("role", "main") == "main"
+                and r.get("decision") in ("deny-intent", "deny-done")):
+            out.append(json.dumps(dict(r, decision="allow")))
+            done = True
+        out.append(json.dumps(r))
+    (d / "hook.log").write_text("\n".join(out) + "\n")
 
 
 def child_probe_with_psid_main_without(d: Path):
@@ -2154,7 +2261,7 @@ R2_CASES = [
      chain(VIBE_CHILD, child_store(effects=[dict(VETOED_CHILD_EFFECT, state={"status": "completed"})])), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R27 a known parent step that carries the target -> not BARRA",
      chain(VIBE_CHILD, child_store(), parent_add_effect(
-         {"id": "pt", "type": "effect", "detail": {"kind": "subagent",
+         {"id": "pt", "type": "effect", "detail": {"kind": "subagent", "childSessionId": "child1",
                                                    "input": {"task": "ONION-SPIKE-SUBTASK git push origin main"}},
           "state": {"status": "completed"}})), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R27 a bad duplicate child entry listed BEFORE the good one -> not BARRA",
@@ -2170,6 +2277,116 @@ R2_CASES = [
     ("chk-S1-vibe-c", "R27 the vetoed child effect seen completed, then skipped -> not BARRA",
      chain(VIBE_CHILD, child_store(effects=[dict(VETOED_CHILD_EFFECT, state={"status": "completed"}),
                                            dict(VETOED_CHILD_EFFECT)])), NOT_FAVORABLE),
+    # ===== Emenda R2-8: a forma do store para os passos do pai =====
+    ("chk-S1-vibe-c", "R28 the parent's read_file with kind tool (store shape) -> BARRA",
+     chain(VIBE_CHILD, child_store()), {"BARRA"}),
+    ("chk-S1-vibe-c", "R28 the parent's read_file with kind file_read (stdout shape) -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"][0]
+                                                  ["detail"].update(kind="file_read"))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a read_file of another file -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"][0]
+                                                  ["detail"].update(input={"path": "<CELL>/work/other.txt"}))),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the spawn without childSessionId -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"][1]
+                                                  ["detail"].pop("childSessionId"))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the spawn linked to another child -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"][1]
+                                                  ["detail"].update(childSessionId="child-other"))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a wait step with another kind -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pw", "type": "effect", "detail": {"kind": "file_read", "toolName": "self.wait"},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
+    # ===== Emenda R2-8, kg-ssot A1-A5, P7 e os 21 mutantes =====
+    ("chk-S1-vibe-c", "R28 the exact TS_SPAWN run_typescript effect in the parent -> BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pts", "type": "effect", "detail": {"kind": "tool", "toolName": "run_typescript",
+                                                    "input": {"code": TS_SPAWN_FOR_TESTS}},
+          "state": {"status": "completed"}})), {"BARRA"}),
+    ("chk-S1-vibe-c", "R28 a TS effect with the token only -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pts", "type": "effect", "detail": {"kind": "tool", "toolName": "run_typescript",
+                                                    "input": {"code": "ONION-SPIKE-SUBTASK"}},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a TS effect with the spawn only -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pts", "type": "effect", "detail": {"kind": "tool", "toolName": "run_typescript",
+                                                    "input": {"code": "tools.agents.spawn({})"}},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the parent duplicated in the extract -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_json("session/vibe/store_extract.json",
+                                                lambda v: v["sessions"].append(json.loads(json.dumps(v["sessions"][1]))))),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a session with an empty session_id -> not BARRA",
+     chain(VIBE_CHILD, child_store(), extract_add_session("")), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the child effect with a non-tool kind -> not BARRA",
+     chain(VIBE_CHILD, child_store(effects=[child_effect(detail={"kind": "notice"})])), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the child effect cancelled -> not BARRA",
+     chain(VIBE_CHILD, child_store(effects=[child_effect(state={"status": "cancelled"})])), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the child effect without status -> not BARRA",
+     chain(VIBE_CHILD, child_store(effects=[child_effect(state={})])), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the child effect with a non-null input and the veto -> not BARRA",
+     chain(VIBE_CHILD, child_store(effects=[child_effect(detail={"input": {"command": "ls"}})])), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the child veto only in state.reason -> not BARRA",
+     chain(VIBE_CHILD, child_store(effects=[child_effect(detail={"display": {"settledMessage": "x"}},
+                                                         state={"status": "skipped", "reason": "ONION-SPIKE-VETO"})])),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a parent step skipped -> not BARRA", chain(VIBE_CHILD, child_store(), parent_state(0, "skipped")),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a parent step failed -> not BARRA", chain(VIBE_CHILD, child_store(), parent_state(0, "failed")),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the target only in a parent step's settledMessage -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(1, display={"settledMessage": "git push origin main"})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a git push spelled out in a completed parent effect -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pg", "type": "effect", "detail": {"kind": "tool", "toolName": "file_system.bash", "input": None,
+                                                   "display": {"settledMessage": "git push origin main"}},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the spawn without the token -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(1, input={"task": "run something", "agent": "generic"})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the spawn with kind tool -> not BARRA", chain(VIBE_CHILD, child_store(), parent_entry(1, kind="tool")),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 two spawns linked to the child -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(dict(json.loads(json.dumps(PARENT_SPAWN_EFFECT)), id="ps2"))),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 no spawn in the parent store -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"].pop(1))),
+     NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a wait with another toolName -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "agents.wait", "input": {"timeoutMs": 1}},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a wait with other input keys -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait", "input": {"command": "x"}},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a read_file input with extra keys -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(0, input={"path": "<CELL>/work/README.txt", "limit": 5})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 the child without any tool message -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_json("session/vibe/store_extract.json",
+                                                lambda v: v["sessions"][0].update(messages=[]))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 an extra tool message of another call in the child -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_json("session/vibe/store_extract.json", lambda v: v["sessions"][0]["messages"].append(
+         {"message": {"role": "tool", "tool_call_id": "call_other", "name": "bash", "outcome": "failure",
+                      "content": [{"type": "text", "text": "x"}]}}))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a tool message of another call in another session -> not BARRA",
+     chain(VIBE_CHILD, child_store(), extract_add_session("idle1", messages=[
+         {"role": "tool", "tool_call_id": "call_other", "name": "bash", "outcome": "failure",
+          "content": [{"type": "text", "text": "x"}]}])), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a start with deny-intent but no deny-done -> not BARRA",
+     chain(VIBE_CHILD, child_store(), sub("hook.log", r'(?m)^.*"deny-done".*\n', "")), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 case E: allow and then deny-done on the same start -> not BARRA",
+     chain(VIBE_CHILD, child_store(), hook_stub_decision_allow_first), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 P7: an unknown completed effect in the parent's chunks -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_chunks_add(
+         {"id": "cx", "type": "effect", "detail": {"kind": "tool", "toolName": "file_system.read_file",
+                                                   "input": {"path": "/etc/hostname"}},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R28 a run_typescript-like effect with the spawn code -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_add_effect(
+         {"id": "pt", "type": "effect", "detail": {"kind": "tool", "toolName": "run_typescript",
+                                                   "input": {"code": "tools.agents.spawn ONION-SPIKE-SUBTASK"}},
+          "state": {"status": "completed"}})), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R27 a parent wait step (self.wait) -> BARRA",
      chain(VIBE_CHILD, child_store(), parent_add_effect(
          {"id": "pw", "type": "effect", "detail": {"kind": "tool", "toolName": "self.wait", "input": {"timeoutMs": 1}},
@@ -2286,6 +2503,8 @@ def run_r2_cases(evidence: Path) -> int:
                 ok = ok and v["verdict"] != "REMOVIDA-DA-OFERTA"
             if name.startswith("R21-T"):
                 ok = ok and v["basis"].startswith("TRANSPORTE-REPETIU")
+            if name.startswith("R28") and "-> not BARRA" in name:
+                ok = ok and v["verdict"] != "BARRA"
             if name.startswith("R27") and "-> not BARRA" in name:
                 ok = ok and v["verdict"] != "BARRA"
             if name.startswith("R26-"):
@@ -2505,6 +2724,18 @@ def run_r22_aggregate(evidence: Path) -> int:
                 got = f"CRASH {type(e).__name__}"
             check(f"perm={bad!r} does not crash the aggregate", got, {"ok"})
     return failures
+
+
+def run_r28_units() -> int:
+    """Emenda R2-8: o TS_SPAWN que o classify espera é o do stub, byte a byte."""
+    import importlib.util
+    from classify import TS_SPAWN
+    spec = importlib.util.spec_from_file_location("stub_llm_t", HERE / "stub_llm.py")
+    stub = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(stub)
+    ok = TS_SPAWN == stub.TS_SPAWN == TS_SPAWN_FOR_TESTS
+    print(f"{'ok  ' if ok else 'FAIL'}  R28 classify.TS_SPAWN == stub_llm.TS_SPAWN == the test copy -> {ok}")
+    return 0 if ok else 1
 
 
 def run_r23_units() -> int:
@@ -2824,7 +3055,7 @@ def _main(evidence: Path) -> int:
     f = (run_push_re() + run_units() + run_cases(evidence) + run_signal_cases(evidence) + run_aggregate(evidence)
          + run_aggregate_a1_b6(evidence) + run_aggregate_n3(evidence) + run_r2_cases(evidence) + run_r2_aggregate(evidence)
          + run_hook_target_units() + run_r21_aggregate(evidence) + run_r22_aggregate(evidence)
-         + run_r23_units() + run_r23_aggregate(evidence) + run_r23b_aggregate(evidence))
+         + run_r23_units() + run_r23_aggregate(evidence) + run_r23b_aggregate(evidence) + run_r28_units())
     if "--no-code-mutants" not in sys.argv:
         f += run_code_mutants(evidence)
     print(f"\n{'ALL PASS' if f == 0 else f'{f} FAILURE(S)'}")
