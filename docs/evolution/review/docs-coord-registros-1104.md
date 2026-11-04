@@ -2,7 +2,8 @@
 branch: docs/coord-registros-1104
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5a94d8cb2468612d4831ada939ac4892bf4005d07090b31f54f02bc6e8573444
+reviewed_code_sha256: 2eec63adfa1723b0ba5d1a9f5bcf02a1cbd5caf7ac8d4e75c8c5f6a4df0665ea
 findings_total: 3
 findings_real: 3
 tokens: 0
