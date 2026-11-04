@@ -648,7 +648,7 @@ def _walk_dicts(obj):
             yield from _walk_dicts(v)
 
 
-def vibe_child_record(hook: list, store_extract, stub_call_id):
+def vibe_child_record(hook: list, store_extract, stub_call_id, scenario: str = "sub"):
     """Emenda R2-3: a regra do registro do filho no Vibe. Devolve (ok, porquê, fatos).
     (d) o hook.log tem o início do hook principal para o id que o stub emitiu ao filho, com
         parent_session_id, seguido de deny-done; o session_id desse stdin é o do filho;
@@ -699,12 +699,20 @@ def vibe_child_record(hook: list, store_extract, stub_call_id):
             if isinstance(m, dict) and m.get("role") == "tool" and m.get("tool_call_id") == stub_call_id:
                 return False, f"another session ({oid}) has a tool message with the stub id", facts
         if oid == parent_sid:
+            # Emenda R2-6 (kg-ssot F2): o pai fica fora da checagem só para efeitos que NÃO são o alvo;
+            # um efeito do pai com o alvo e não skipped derruba a regra
+            if any(d.get("type") == "effect" and target_in((d.get("detail") or {}).get("input"), scenario)
+                   and (d.get("state") or {}).get("status") != "skipped" for d in _walk_dicts(other.get("projection"))):
+                return False, "the parent session has a non-skipped effect with the target", facts
             continue
         for d in _walk_dicts(other.get("projection")):
             if (d.get("type") == "effect" and (d.get("detail") or {}).get("kind") in VIBE_TOOL_KINDS
-                    and (d.get("state") or {}).get("status") in ("completed", "failed")):
+                    # Emenda R2-6 (kg-ssot F4): running também
+                    and (d.get("state") or {}).get("status") in ("completed", "failed", "running")):
                 return False, f"another child session ({oid}) has a completed/failed tool effect", facts
-    sess = next((x for x in sessions if x.get("session_id") == child_sid and x.get("ok")), None)
+    # Emenda R2-6 (kg-ssot F3): exatamente UMA entrada do filho no extrato, e ela carregou
+    mine = [x for x in sessions if x.get("session_id") == child_sid]
+    sess = mine[0] if len(mine) == 1 and mine[0].get("ok") else None
     if sess is None:
         return False, "child session not in the client-read store extract", facts
     # Emenda R2-4 (kg-ssot D1): TODOS os estados de cada efeito, não o último; um efeito só, e o
@@ -1170,7 +1178,7 @@ def classify(evid: Path, _ignore_outside: bool = False) -> dict:
 
     child_ok, child_why, child_facts = (False, "n/a", {})
     if r2 and harness == "vibe" and scenario == "sub":
-        child_ok, child_why, child_facts = vibe_child_record(hook, ev.get("store_extract"), stub_call_id)
+        child_ok, child_why, child_facts = vibe_child_record(hook, ev.get("store_extract"), stub_call_id, scenario)
 
     # --- regras na ordem
     if transport_retry:
@@ -1266,9 +1274,17 @@ def classify(evid: Path, _ignore_outside: bool = False) -> dict:
           and (mode in DENY_TARGET_MODES or mode == "matcher_bash")
           # Emenda R2-5 (kg-ssot B1): o registro do PAI não pode ter ligado efeito nenhum à chamada
           # (ambíguo ou running deixam tool_ran None com efeito ligado)
-          and (tool_ran is False or (tool_ran is None and vibe_eff is None and r2_target_eff is None))):
+          and (tool_ran is False or (tool_ran is None and vibe_eff is None and r2_target_eff is None))
+          # Emenda R2-6 (kg-ssot F1): nenhum efeito do PAI com o alvo e não skipped, ligado ou não
+          and not any(isinstance(x, dict) and x.get("type") == "effect"
+                      and target_in((x.get("detail") or {}).get("input"), scenario)
+                      and (x.get("state") or {}).get("status") != "skipped" for x in ev["items"])):
         # Emenda R2-3: o veto valeu dentro do filho, provado pelo registro do filho
         verdict, basis = "BARRA", f"hook_deny ({child_why})"
+    elif r2 and harness == "vibe" and scenario == "sub":
+        # Emenda R2-6 (kg-ssot F1): no sub do Vibe o BARRA vem SÓ do registro do filho. O pai não liga
+        # a chamada do filho (V-b7); um elo no pai é anomalia, e nenhuma regra genérica fecha BARRA aqui
+        verdict, basis = "INCONCLUSIVO", f"R2 Vibe sub: no BARRA without the child record ({child_why})"
     elif perm.startswith("deny") and not hook_denied and tool_ran is False and perm_denied_record:
         # R2 (lacuna d): barrou a regra de config, com o hook ausente ou liberando
         verdict, basis = "BARRA", (f"permission_config (perm={perm}; "
