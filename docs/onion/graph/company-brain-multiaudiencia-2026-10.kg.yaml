@@ -449,6 +449,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-04: «O que roda o Onion no Slack da GranaAI no piloto?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
       locality: "pessoa"
+  - id: D_MA_PROPOSTA_DE_MERCADO_ACEITA_CONDICIONADA_1104
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Aceitar, condicionada ao card»"
+    label: "O maestro aceita a proposta de mercado do Company Brain da curadoria (um repositório por audiência numa organização gratuita), condicionada ao card que prova a conta só de leitura barrada no push; se o card falhar, volta à mesa."
+    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Aceitar, condicionada ao card»; descartadas: «Esperar o card»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-04: «Como selar a proposta de mercado do Company Brain?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
+      locality: "pessoa"
 edges:
   - from: E_MA_SINAL_DO_HUB_1027
     to: Q_MA_AUDIENCES
@@ -572,4 +588,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_MA_RUNTIME_PESQUISAR_ANTES_1104
     to: Q_MA_WRITE_SURFACE
+    edge_type: TRACES_TO
+  - from: D_MA_PROPOSTA_DE_MERCADO_ACEITA_CONDICIONADA_1104
+    to: Q_MA_FREE_ORG_READ_ENFORCED
     edge_type: TRACES_TO

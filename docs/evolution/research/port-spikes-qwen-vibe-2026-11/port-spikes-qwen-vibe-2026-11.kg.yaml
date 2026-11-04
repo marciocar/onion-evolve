@@ -243,6 +243,22 @@ nodes:
       locator: "pergunta com opções de 2026-11-03: «O que faço com a pergunta das portas (Q_ONION_CORE_PORTS_MULTI_MODEL_2026_11) depois dos spikes?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-03"
       locality: "pessoa"
+  - id: D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Opção 1, mas buscar a questão do subagente do Vibe na documentação oficial dos itens, fóruns e comunidades especializadas»"
+    label: "O maestro manda rodar já as células aprovadas da 2ª rodada e buscar a questão do subagente do Vibe na documentação oficial, em fóruns e comunidades especializadas; as duas células do subagente no Vibe esperam a regra fechar."
+    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Opção 1, mas buscar a questão do subagente do Vibe na documentação oficial dos itens, fóruns e comunidades especializadas» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Esperar a regra fechar» · «Tirar o subagente do Vibe»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-04: «2ª rodada dos spikes: o que fazemos com a regra do subagente no Vibe?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
+      locality: "pessoa"
 edges:
   - from: E_PORT_SPIKE_QWEN_VETO_EXIT2_BARRA_1103
     to: Q_PORT_SPIKES_VETO_QWEN_VIBE_1103
@@ -285,4 +301,7 @@ edges:
     edge_type: SUPPORTS
   - from: D_PORT_SPIKES_RODADA_2_ANTES_DE_FECHAR_1103
     to: Q_PORT_SPIKES_VETO_QWEN_VIBE_1103
+    edge_type: TRACES_TO
+  - from: D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104
+    to: D_PORT_SPIKES_RODADA_2_ANTES_DE_FECHAR_1103
     edge_type: TRACES_TO
