@@ -2,7 +2,8 @@
 branch: docs/exit2-coupling-2026-11
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a87b7c71fe9ab9d5314b66ea8ff693808bd07419c1db791ecdf40dff8e240513
+reviewed_code_sha256: 7eb7a0f487a1de8f05f9a7af2e7175eaf465e789fc4fb53cae6f348fd26f17df
 findings_total: 7
 findings_real: 7
 tokens: 0
