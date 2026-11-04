@@ -220,10 +220,11 @@ jobs:
           set -o pipefail
           # DIAGNÓSTICO DO #1461, só nesta branch (o PR fecha sem merge): a cada 20 s, os maiores processos e os
           # maiores arquivos, inclusive os abertos e já apagados, para nomear quem enche o disco.
-          ( while :; do
+          ( set +e +o pipefail
+            while :; do
               echo "=== $(date +%s) livre_kb=$(df --output=avail "${TMPDIR:-/tmp}" | tail -1)"
-              ps -eo pid,ppid,etimes,pcpu,rss,args --sort=-pcpu | head -12 | cut -c1-260
-              find "${TMPDIR:-/tmp}" "${GITHUB_WORKSPACE}" -xdev -type f -size +100M -printf 'ARQ %s %p\n' 2>/dev/null | sort -k2 -n -r | head -8
+              ps -eo pid,ppid,etimes,pcpu,rss,args --sort=-pcpu | sed -n 1,12p | cut -c1-260
+              find "${TMPDIR:-/tmp}" "${GITHUB_WORKSPACE}" -xdev -type f -size +100M -printf 'ARQ %s %p\n' 2>/dev/null | sort -k2 -n -r | sed -n 1,8p
               python3 -I -c "
           import os
           rows = []
