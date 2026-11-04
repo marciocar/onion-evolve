@@ -1,0 +1,411 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:chains.schema.json",
+  "title": "A cadeia de transmissão em lote (kg-ssot.chains/1)",
+  "description": "Saída de `kg_query.py --chain ID --chain ID... --format json` com mais de um id, e da ferramenta kg_query do servidor MCP com `chain`, desde a 4.43.0. Até 50 ids, na ordem pedida, e o repetido conta uma vez; com um id só, a saída segue sendo o kg-ssot.chain/1, sem este envelope. Cada entrada traz o kg-ssot.chain/1 inteiro em `chain`, e em `origins` cada origem da cadeia com o status do nó, que o kg-ssot.chain/1 não traz. O id que não existe, ou que existe em mais de um grafo, fica na entrada dele com `outcome` not_resolved e o motivo em `error`, sem derrubar o lote. O lote para de abrir cadeias quando já gastou 1000 caminhos, o teto de uma cadeia só: as que sobram saem com `outcome` not_run e `truncated` true.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "root",
+    "edge_types",
+    "requested",
+    "truncated",
+    "unreadable",
+    "chains"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.chains/1"
+    },
+    "root": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "edge_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requested": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 50,
+      "description": "quantos ids distintos o lote pediu"
+    },
+    "truncated": {
+      "type": "boolean",
+      "description": "alguma cadeia não foi aberta porque o lote passou do teto de caminhos"
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "code"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chains": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 50,
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "outcome",
+        "error",
+        "chain",
+        "origins"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "o id como foi pedido"
+        },
+        "outcome": {
+          "enum": [
+            "ok",
+            "not_resolved",
+            "not_run"
+          ]
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "o motivo, na língua da saída, quando não há cadeia"
+        },
+        "chain": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/chain"
+            }
+          ]
+        },
+        "origins": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "file",
+              "id",
+              "status"
+            ],
+            "properties": {
+              "file": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "status": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "ok"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "chain": {
+                "type": "object"
+              },
+              "error": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "chain": {
+                "type": "null"
+              },
+              "error": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "o kg-ssot.chain/1 de um id",
+      "required": [
+        "schema_version",
+        "root",
+        "start",
+        "edge_types",
+        "bands",
+        "truncated",
+        "paths"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "kg-ssot.chain/1"
+        },
+        "root": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "start": {
+          "$ref": "#/$defs/at"
+        },
+        "edge_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bands": {
+          "type": "object"
+        },
+        "truncated": {
+          "type": "boolean"
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "links",
+              "weakest_link",
+              "origin",
+              "grade"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "complete",
+                  "broken",
+                  "cycle",
+                  "too_long"
+                ]
+              },
+              "links": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/link"
+                }
+              },
+              "weakest_link": {
+                "type": "object",
+                "required": [
+                  "confidence",
+                  "ids",
+                  "at"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "confidence": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "at": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/at"
+                    }
+                  }
+                }
+              },
+              "origin": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "id",
+                      "file",
+                      "method_class",
+                      "confidence",
+                      "declared"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "file": {
+                        "type": "string"
+                      },
+                      "method_class": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "confidence": {
+                        "type": [
+                          "number",
+                          "null"
+                        ]
+                      },
+                      "declared": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                ]
+              },
+              "grade": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "strict",
+                  "lenient"
+                ],
+                "properties": {
+                  "strict": {
+                    "enum": [
+                      "strong",
+                      "acceptable",
+                      "weak"
+                    ]
+                  },
+                  "lenient": {
+                    "enum": [
+                      "strong",
+                      "acceptable",
+                      "weak"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "at": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "id"
+      ],
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "link": {
+      "type": "object",
+      "required": [
+        "file",
+        "id",
+        "ref",
+        "found",
+        "confidence",
+        "method_class",
+        "label"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "found": {
+          "type": "boolean"
+        },
+        "confidence": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "pinned": {
+          "type": "boolean"
+        },
+        "declared": {
+          "type": "boolean"
+        },
+        "edges_not_followed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "method_class": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

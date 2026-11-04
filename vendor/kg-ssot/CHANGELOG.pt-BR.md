@@ -10,6 +10,36 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.43.0] - 2026-11-04
+
+Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. A consulta que funcionava na 4.42.0 imprime o mesmo `kg-ssot.query/1`, salvo as duas recusas novas no fim desta lista.
+
+- O `kg_query --due [--as-of AAAA-MM-DD]` lista os nós de qualquer tipo cujo `verified_at` mais `reverify_every` venceu,
+  do mais atrasado para o menos, com `due_on` e `days_late`. A conta é a do `kg_validate --due`, chamada, não copiada; o que
+  aquele relatório traz de `x_term`, `x_mirror` e `x_doc_cycle` segue lá. Só esta consulta imprime o `kg-ssot.query/2`: o schema
+  é fechado, e os campos novos pedem versão nova. Quem usa o `--due` e confere o `schema_version` deve aceitar o `/2`.
+- O `--where` e o `--group-by` de nós aceitam o grau derivado das arestas internas do grafo do nó: `degree.in`,
+  `degree.out`, `degree.total`, com o tipo de aresta opcional. O `--where degree.in.SUPPORTS=0` acha os nós sem aresta interna
+  `SUPPORTS` no próprio grafo. O `SUPPORTS` de outro grafo não conta: complete com
+  `--edges --where edge_type=SUPPORTS --where scope=external`; toda resposta com o grau diz isso no `hint`. O tipo de aresta
+  que nenhuma aresta interna tem conta 0 com um
+  `hint`, e no `--revisit`, que não tem `hint`, é recusado (rc 2).
+- O `--has CAMPO` e o `--missing CAMPO` (repetíveis, com ponto para chave aninhada) testam qualquer campo do nó. O campo
+  que falta e o `null` são o mesmo; o texto vazio e o `0` têm valor. Só quando pedidos, o eco do pedido ganha `has` e `missing`. O
+  caminho que nenhum nó do corpus tem com valor ganha um `hint`, e o caminho que começa com `degree` é recusado (rc 2).
+- O `--group-by` aceita `label` e `narrative`, com o texto inteiro: com `--min-count 2`, os nós com o mesmo texto.
+- O `--where` aceita `CHAVE^=VALOR` (começa com) e `CHAVE*=VALOR` (contém), em nós e em arestas: distingue maiúsculas, em
+  NFC, e só texto casa, como o `STARTS WITH` e o `CONTAINS` do Cypher. Depois do `=`, o valor é literal.
+- O `--chain` é repetível, até 50 ids, e mais de um imprime o novo `kg-ssot.chains/1` (`spec/chains.schema.json`): um
+  `kg-ssot.chain/1` por id, com o status de cada origem. Um id só segue imprimindo o `kg-ssot.chain/1`.
+- A ferramenta `kg_query` do MCP aceita `due`, `as_of`, `has`, `missing` e `chain`, e a descrição dela traz a gramática nova.
+- O `kg_query --help` não descreve mais a ferramenta como na release 4.17.
+- Recusa nova: a chave do `--where` que ainda termina em `^ * $ ! < > ~ |` depois de lido o operador dá rc 2, em nós e em arestas.
+  O `x_n!=12` procurava uma chave chamada `x_n!` e respondia 0 sem aviso; nenhuma chave real terminava assim nos corpora medidos.
+- Recusa nova: a ferramenta `kg_query` do MCP com `edges` não aceita mais `open`, `in_narrative` nem `narrative`, que ela ignorava.
+  Por quê: quantas decisões concluídas não têm aresta interna `SUPPORTS`, pergunta que nenhuma consulta só respondia, sai agora
+  de uma, com os mesmos 14 de um gabarito e de uma contagem independente num corpus real.
+
 ## [4.42.0] - 2026-11-04
 
 Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. O `kg-ssot.query/1` não muda.

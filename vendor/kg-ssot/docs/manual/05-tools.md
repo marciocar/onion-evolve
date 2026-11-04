@@ -522,7 +522,7 @@ adapter: the product does not depend on it, and it does not depend on any partic
 | `kg_get` | Reads a graph, or an earlier version with `ref` |
 | `kg_list` | Lists the graphs in the store |
 | `kg_history` | The operations on a graph, newest first |
-| `kg_query` | The `kg_query.py` query and projection over the store: filters, the open queue, the neighborhood, and `fields`, paginated by cursor |
+| `kg_query` | The `kg_query.py` query and projection over the store: filters, the open queue, the neighborhood, and `fields`, paginated by cursor; since 4.43.0, also `due`, `as_of`, `has`, `missing` and `chain` |
 | `kg_terms` | Since 4.19.0: resolves a domain term by its preferred name or a synonym (the `x_term` profile), with the source, version, and verification date of each synonym and the term that replaces a superseded one; without `text`, lists the terms |
 | `kg_schema_help` | The current contract, for a model: the full MUST and SHOULD schemas, a minimal example that passes, the integrity rules, and the fix for the most common codes |
 
@@ -766,16 +766,17 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text WORDS` | Words that the label contains, all of them, without case or accents (`verificacao` matches `Verificação`, since 4.23); `--in-narrative` also searches the narrative. When the whole text is a term of the vocabulary (its `pref` or a current domain synonym, folded, or its `notation`, exactly), the term and every node that has any of its forms as a whole word match too, and `expanded` says which term; a case-scoped or retired synonym does not expand. No match gives a `hint`, which says when the zero comes from the other filters, so a zero does not pass for "there is none" |
 | `--semantic QUESTION` | Since 4.26, with the `vector` extra: orders the nodes that pass the other filters by similarity to the question (`--model`, `--model-dir`; see `kg_vector.py` below). Alone, the order is the vector's; with `--text`, the text's list (in corpus order) and the vector's are fused by RRF (k=60), ties going to the vector position. Give the short term to `--text` and the whole question to `--semantic`: that is what the bench measured (14 of 20 hits, against 12 for the vector and 9 for the text). The filters apply to both, both lists are complete, and `--limit` only pages the fused list, so in hybrid mode `total` counts every candidate and `semantic.text_matches` says how many match `--text`. The JSON gains `semantic` (mode, model with revision and sha256, and where each vector came from: the index, embedded now, the process memory, or no text) and a `rank` per node; without `--semantic` the output does not change |
 | `--open` | The open queue (status `open`) |
-| `--group-by FIELD` | Since 4.41.0: count the nodes by field instead of listing them (`kg-ssot.groups/2` since 4.42.0). See "How many, by field" below |
+| `--group-by FIELD` | Since 4.41.0: count the nodes by field instead of listing them (`kg-ssot.groups/2` since 4.42.0). See "How many, by field" and, for `label`, `narrative` and the degree, "Overdue nodes, degree, presence and text" below |
 | `--edges`, `--count-distinct FIELD`, `--min-count N` | Since 4.42.0: edges as the subject, distinct counts and a minimum count. See "Edges as the subject" below |
-| `--where KEY=VALUE` | Since 4.39.0: only the nodes where `owner`, an `x_*` field or (since 4.42.0) `provenance.<key>` (a dot for a nested key) has the value; repeatable, all of them must hold. See "The queue of an owner" below |
+| `--where KEY=VALUE` | Since 4.39.0: only the nodes where `owner`, an `x_*` field or (since 4.42.0) `provenance.<key>` (a dot for a nested key) has the value; repeatable, all of them must hold. See "The queue of an owner" below; since 4.43.0, also the degree and the operators `^=` and `*=`, in "Overdue nodes, degree, presence and text" below |
+| `--due [--as-of YYYY-MM-DD]`, `--has FIELD`, `--missing FIELD` | Since 4.43.0: what is overdue, and whether a field is there. See "Overdue nodes, degree, presence and text" below |
 | `--verified-before YYYY-MM-DD` | Nodes with no `verified_at`, or verified before the date |
 | `--around ID` | The neighborhood: `<path>#<id>`, or an id that is unique in the corpus; `--depth`, `--edge-type` (repeatable), `--direction out\|in\|both` |
 | `--sort corpus\|impact\|attention` | Corpus order, declared impact, or attention (impact × confidence × status factor × (1 + degree), the radar's value) |
 | `--limit N` and `--cursor C` | The page (up to 1000) and the cursor for the next one, valid for the same query over the same corpus |
 | `--fields GLOB` | Node keys that come out in `extra`, as they are in the graph: `--fields 'x_*'` |
 | `--narrative` | Includes each node's narrative |
-| `--format json` | The stable `kg-ssot.query/1` format (`spec/query.schema.json`) |
+| `--format json` | The stable `kg-ssot.query/1` format; `kg-ssot.query/2` with `--due`, which adds `due_on` and `days_late` (`spec/query.schema.json`) |
 
 A graph that does not parse shows up in `unreadable`, with its `parse.*` code, and does not bring the query down. The
 label of the other end of each edge is cut at 200 characters: a node with a long label cited by thousands of edges
@@ -849,6 +850,15 @@ chain: complete
   already prices the relay; the origin is, because it is where the claim is made.
 
 The chain is declared by whoever writes the graph: the projection measures it, it does not prove who really said what.
+
+Since 4.43.0, `--chain` is repeatable, up to 50 ids (more is rc 2), and a repeated id counts once. One id prints
+`kg-ssot.chain/1`, and an id that does not resolve is rc 2. More than one prints `kg-ssot.chains/1`
+(`spec/chains.schema.json`), in the order asked: each entry has the whole `kg-ssot.chain/1` in `chain` and, in `origins`,
+each origin with the `status` of its node. An id that does not exist, or that exists in more than one graph, stays in its
+own entry with `outcome: not_resolved` and the reason in `error`, and the batch is still rc 0. The batch stops opening
+chains after 1000 paths, the limit of one chain: the rest come out with `outcome: not_run`, and `truncated` is true. Ask
+those ids in a smaller batch. `--edge-type` applies to the whole batch. In the MCP server, `chain` takes a list of ids and
+only `edge_types` next to it, and an answer above the server's byte cap is refused with a request to ask fewer ids.
 
 ### Attention, and the decisions to revisit (4.36.0)
 
@@ -1008,8 +1018,79 @@ kg-query --root . --where provenance.locality=web --group-by file               
 ```
 
 Since 4.42.0 the node `--where` and `--group-by` also take `provenance.<key>`. Two-hop questions (an evidence that
-constrains a decision that traces to a question) and absence (a node that receives no `SUPPORTS`) are not covered by a
-single query yet.
+constrains a decision that traces to a question) are not covered by a single query yet. Absence (a node that receives no
+`SUPPORTS`) is, since 4.43.0, in the next section.
+
+### Overdue nodes, degree, presence and text (4.43.0)
+
+`--due` takes no date, unlike `kg_validate --due`. It lists the nodes of any type whose `verified_at` plus `reverify_every` is due by `--as-of` (default: today), the
+most overdue first and, on the same date, in corpus order. Each node gains `due_on` and `days_late` (0 is due that very
+day). The sum is that of `kg_validate --due`, so the two agree. What that report adds for `x_term`, `x_mirror` and
+`x_doc_cycle` stays there, and so does the list of nodes that only have a `reverify_on`. A node with `reverify_every` and no
+readable `verified_at` never comes due, and the `hint` says how many there are: that includes a `verified_at` with an
+hour, which is not a date in the contract. A cadence outside the form never comes due either, in both readers. On a graph
+that already fails the contract, the two lists can differ: a repeated id comes out once here, the first node, and a
+numeric id does not come out here, while `kg_validate --due` lists every line. `--due` is a filter: it combines with
+the others and with `--group-by`, but not with `--sort impact`, `--sort attention` or `--semantic`, which ask for another
+order (rc 2). The JSON output is `kg-ssot.query/2`, the `/1` plus those fields; every other query stays in `/1`.
+
+The `--where` of nodes has these forms, and every condition must hold:
+
+| Form | Matches |
+|---|---|
+| `KEY=VALUE` | The text of the value: `x_n=12` matches the number 12, `x_b=true` the boolean. A list matches when one of its items does. A missing key does not match |
+| `KEY^=VALUE` | Text that starts with the value |
+| `KEY*=VALUE` | Text that contains the value |
+| `degree.in=N`, `degree.out=N`, `degree.total=N` | The count of the node's internal edges, a whole number |
+| `degree.in.TYPE=N` (also `out` and `total`) | The same count, for one edge type |
+
+The key is `owner`, an `x_*` field (a dot for a nested key), `provenance.<key>` or a degree; `label^=` is refused (rc 2),
+since `--text` and `--id-prefix` answer that. The `--where` of `--edges` takes `^=` and `*=` on the edge fields, as
+`from.id^=D_`, and there the degree does not exist. A key that still ends in `^ * $ ! < > ~ |` after the operator is read
+is refused (rc 2), for nodes and edges: `x_n!=12` is not "different from", and there is no such operator.
+
+- **Text operators.** Case-sensitive, both sides in NFC. Only text matches: `null`, a missing key, a number, a boolean and
+  `.nan` never do, as with Cypher's `STARTS WITH` and `CONTAINS`. A date is read as the text that writes it, as in a
+  `.kg.json`, so `x_when^=2026-11` matches. In a list, one text item is enough, which is the
+  rule of `=` here (in Cypher a list gives null). An empty value matches any text and nothing else. The key ends at the
+  first `=`, and after it the value is literal: `x_f^=a=b` looks for `a=b`, and `owner=^a` looks for `^a`.
+- **Degree.** It counts the internal edges of the node's own graph, line by line: a repeated edge counts again, a loop
+  counts in `in` and in `out`, and so twice in `total`, and an edge whose other end is missing counts for the end that
+  exists. An external edge does not count, and neither does an edge that comes from another graph. It is not the degree of
+  the attention formula, which follows the radar and counts other things. If a graph repeats an id, its lines add up in the
+  first node, the only one the query keeps. The value is a whole number with `=`: `degree.in=x`, `degree.in=01` and
+  `degree.in^=1` are refused (rc 2). An edge type that no internal edge of the corpus has counts 0, and the `hint` says
+  so, because the zero of a typo must not pass for "there is none". The same holds for `--group-by` and `--count-distinct`.
+  In `--revisit`, whose output has no `hint`, such a type is refused (rc 2). Every answer with the degree says in its `hint` that an edge from another graph does not count. So `degree.in.SUPPORTS=0` means no internal
+  `SUPPORTS` edge in the node's own graph, and no more than that: a `SUPPORTS` from another graph is not counted, and
+  `--edges --where edge_type=SUPPORTS --where scope=external` lists those to complete the answer.
+- **Presence.** `--has FIELD` and `--missing FIELD` take any field of the node, with a dot for a nested key, up to 10 of
+  each. A missing field and `null` are the same: they lack it. Empty text, `0`, `false`, an empty list and an empty map
+  have a value, as with Cypher's `IS NOT NULL`. The path does not go into a list. The same field in both is refused (rc 2),
+  and so is any path that starts with `degree`, since the degree is derived and is not a field of the node. A path that no
+  node of the corpus has with a value gets a `hint`, because `--has trce` would answer 0 and `--missing trce` the whole
+  corpus.
+- **Which queries.** `--due`, `--has` and `--missing` filter the node queries: with `--edges`, `--decision`, `--chain` or
+  `--revisit` they are rc 2. `--where` with a degree or an operator also works in `--revisit`.
+- **Grouping by text.** `--group-by` also takes `label` and `narrative`, with the whole text, and `true` and `1` stay in
+  separate groups. With `--min-count 2`, they find the nodes with the same text. The group joins text in NFC and in NFD
+  under one NFC key, and the node itself stays as it is. A node without the field falls in the `null` group, as in any
+  `--group-by`: `--has narrative` leaves it out.
+- **Group-by fields, for nodes.** `file`, `node_type`, `status`, `plane`, `layer`, `owner`, `label`, `narrative`, an `x_*`
+  field, `provenance.<key>`, `meta.<key>`, and `degree.in`, `degree.out` and `degree.total`, with an optional edge type.
+
+```bash
+kg-query --root . --due --type evidence --where owner=ana                      # what is overdue, on one owner's plate
+kg-query --root . --due --as-of 2027-01-01 --group-by file                     # what will be overdue, per graph
+kg-query --root . --type decision --status done --where degree.in.SUPPORTS=0   # finished decisions with no internal SUPPORTS edge in their own graph
+kg-query --root . --group-by degree.total                                      # the histogram of the degree
+kg-query --root . --type evidence --missing trace --has provenance.source      # evidence with a source and no trace
+kg-query --root . --group-by label --min-count 2                               # nodes with the same label
+kg-query --root . --edges --where from.id^=D_ --group-by edge_type             # what leaves the decisions, by a prefix
+```
+
+The MCP `kg_query` tool takes the same forms in `where` and `group_by`, plus `due`, `as_of`, `has` and `missing`, with the
+same refusals in the same words.
 
 ## `kg_diff.py`: diff by id between revisions
 

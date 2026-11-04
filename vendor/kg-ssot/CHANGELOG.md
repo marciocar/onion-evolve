@@ -10,6 +10,36 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.43.0] - 2026-11-04
+
+No contract change (still v4.18), and no verdict changes. A query that worked in 4.42.0 prints the same `kg-ssot.query/1`, except for the two new refusals at the end of this list.
+
+- `kg_query --due [--as-of YYYY-MM-DD]` lists the nodes of any type whose `verified_at` plus `reverify_every` is due, the
+  most overdue first, with `due_on` and `days_late`. The sum is that of `kg_validate --due`, called, not copied; what that
+  report adds for `x_term`, `x_mirror` and `x_doc_cycle` stays there. Only this query prints `kg-ssot.query/2`: the schema
+  is closed and the new fields need a new version. A consumer that uses `--due` and checks `schema_version` should accept `/2`.
+- The node `--where` and `--group-by` take the degree derived from the internal edges of the node's graph: `degree.in`,
+  `degree.out`, `degree.total`, with an optional edge type. `--where degree.in.SUPPORTS=0` finds the nodes with no internal
+  `SUPPORTS` edge in their own graph. A `SUPPORTS` from another graph is not counted: complete it with
+  `--edges --where edge_type=SUPPORTS --where scope=external`; every answer with the degree says so in its `hint`. An edge
+  type that no internal edge has counts 0 with a
+  `hint`, and in `--revisit`, which has no `hint`, it is refused (rc 2).
+- `--has FIELD` and `--missing FIELD` (repeatable, a dot for a nested key) test any field of a node. A missing field and
+  `null` are the same; empty text and `0` have a value. Only when asked, the request echo gains `has` and `missing`. A path
+  that no node of the corpus has with a value gets a `hint`, and a path that starts with `degree` is refused (rc 2).
+- `--group-by` takes `label` and `narrative`, with the whole text: with `--min-count 2`, the nodes with the same text.
+- `--where` takes `KEY^=VALUE` (starts with) and `KEY*=VALUE` (contains), for nodes and edges: case-sensitive, in NFC, and
+  only text matches, as Cypher's `STARTS WITH` and `CONTAINS`. After the `=`, the value is literal.
+- `--chain` is repeatable, up to 50 ids, and more than one prints the new `kg-ssot.chains/1` (`spec/chains.schema.json`):
+  one `kg-ssot.chain/1` per id, with the status of each origin. One id still prints `kg-ssot.chain/1`.
+- The MCP `kg_query` tool takes `due`, `as_of`, `has`, `missing` and `chain`, and its description gives the new grammar.
+- The `kg_query --help` no longer describes the tool as of release 4.17.
+- New refusal: a `--where` key that still ends in `^ * $ ! < > ~ |` after the operator is read is rc 2, for nodes and edges.
+  `x_n!=12` used to look for a key named `x_n!` and answer 0 without a word; no real key ended that way in the corpora measured.
+- New refusal: the MCP `kg_query` tool with `edges` no longer takes `open`, `in_narrative` or `narrative`, which it used to ignore.
+  Why: how many finished decisions have no internal `SUPPORTS` edge, a question no single query answered, now comes out of
+  one, with the same 14 as an answer key and an independent count on a real corpus.
+
 ## [4.42.0] - 2026-11-04
 
 No contract change (still v4.18), and no verdict changes. `kg-ssot.query/1` does not change.
