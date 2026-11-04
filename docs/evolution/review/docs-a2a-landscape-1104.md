@@ -2,7 +2,7 @@
 branch: docs/a2a-landscape-1104
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: 6b1ba4c48d6cd3d52c3cfc6d897b9e3dba5c24010d1c03d1b412ef860abc7ed8
+reviewed_diff_sha256: 5b43cf0860a7b41b419354d76075e5baae5c56f583b6341364409f700924ed6a
 reviewed_code_sha256: cd7946702226b35e9736555d1713ed3aba099e239f4c9e79dc862831da1005e4
 findings_total: 30
 findings_real: 4
