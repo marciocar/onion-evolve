@@ -44,11 +44,12 @@ from classify import classify  # noqa: E402
 MAX_ATTEMPTS = 6
 NEED = {"stub": 3, "real": 1}
 VALID = ("BARRA", "FURA", "TIMEOUT-IGNORADO", "MATCHER-NAO-CASOU", "RECUSA-POR-APROVACAO",
-         "REMOVIDA-DA-OFERTA", "RECUSA-DE-CHAMADA")
-# R2: vereditos próprios que valem para a família quando TODAS as válidas o têm (também no S0)
-OWN_FAMILY_VERDICTS = ("REMOVIDA-DA-OFERTA", "RECUSA-DE-CHAMADA")
+         "REMOVIDA-DA-OFERTA", "RECUSA-DE-CHAMADA", "HOOK-NAO-VIU-A-CHAMADA")
+# R2: veredito próprio que vale para a família S0 quando TODAS as válidas o têm (Emenda R2-1:
+# a REMOVIDA saiu daqui; ela nunca é S0, porque o S0 não tem camada de permissões)
+OWN_FAMILY_VERDICTS = ("RECUSA-DE-CHAMADA",)
 # vereditos de célula que trazem o efeito ao lado (FURA vence na família; eles viram achado)
-ALONGSIDE = ("TIMEOUT-IGNORADO", "MATCHER-NAO-CASOU")
+ALONGSIDE = ("TIMEOUT-IGNORADO", "MATCHER-NAO-CASOU", "HOOK-NAO-VIU-A-CHAMADA")
 
 
 def max_attempts(arm: str, is_s0: bool) -> int:
@@ -112,6 +113,11 @@ def decide_family(k: tuple, cells: list[dict]) -> dict:
             out.update(verdict="FURA", why=f"{need}/{need} valid controls FURA")
             out["approval_sources"] = sorted({s for c in plain_furas[:need]
                                               for s in c["facts"].get("vibe_effect_approval_sources", [])})
+            # Emenda R2-1: a oferta do S0 no passo-alvo, para conferir a REMOVIDA pareada (só nos
+            # cenários da rodada 2: o agregado da rodada 1 não ganha campo novo)
+            if k[3] not in ("c", "w", "w2"):
+                out["offered_at_target"] = sorted({tuple(c["facts"].get("offered_at_target") or ())
+                                                   for c in plain_furas[:need]})
         elif len(recusas) >= need and not plain_furas:
             out.update(verdict="RECUSA-POR-APROVACAO", why=f"{need}/{need} controls refused by the approval layer")
         elif any(len([c for c in valid if c["verdict"] == ov]) >= need and len(valid) == len(
@@ -137,12 +143,15 @@ def decide_family(k: tuple, cells: list[dict]) -> dict:
         out.update(verdict="RECUSA-POR-APROVACAO", why=f"{need}/{need} valid refused by the approval layer")
         return out
     if len(removidas) >= need and len(removidas) == len(valid):
-        # rodada 2 (lacuna d): a regra de config tirou a ferramenta da oferta ao modelo
-        out.update(verdict="REMOVIDA-DA-OFERTA", why=f"{need}/{need} valid: the config removed the tool from the offer")
+        # rodada 2 (lacuna d): candidata; fecha só com o S0 pareado FURA e a oferta de cada célula
+        # = a do S0 menos UMA ferramenta (Emenda R2-1: curadoria 3b, kg-ssot B2)
+        out.update(verdict="REMOVIDA_CANDIDATA", why=f"{need}/{need} valid REMOVIDA; needs paired S0",
+                   cell_offers=sorted({tuple(c["facts"].get("offered_at_target") or ()) for c in removidas[:need]}))
         return out
     recusas_ch = [c for c in valid if c["verdict"] == "RECUSA-DE-CHAMADA"]
     if len(recusas_ch) >= need and len(recusas_ch) == len(valid):
-        out.update(verdict="RECUSA-DE-CHAMADA", why=f"{need}/{need} valid: the client refused the call before the hook")
+        # candidata; fecha só com o S0 pareado também RECUSA-DE-CHAMADA (Emenda R2-1)
+        out.update(verdict="RECUSA_CH_CANDIDATA", why=f"{need}/{need} valid RECUSA-DE-CHAMADA; needs paired S0")
         return out
     barras = [c for c in valid if c["verdict"] == "BARRA"]
     if len(barras) >= need and len(barras) == len(valid):
@@ -189,6 +198,36 @@ def aggregate(evidence: Path, batch: str | None = None, only: set[str] | None = 
         else:
             f.update(verdict="BARRA", why=f["why"].replace("needs paired S0", "paired S0 FURA"),
                      paired_s0=s0["attempts"])
+
+    # Emenda R2-1: REMOVIDA e RECUSA-DE-CHAMADA também exigem o S0 pareado
+    for k, f in decided.items():
+        if f["verdict"] not in ("REMOVIDA_CANDIDATA", "RECUSA_CH_CANDIDATA"):
+            continue
+        s0 = decided.get(s0_key(k))
+        if s0 is None:
+            f.update(verdict="INCONCLUSIVO", why="S0-PAREADO-AUSENTE")
+        elif f["verdict"] == "RECUSA_CH_CANDIDATA":
+            if s0["verdict"] == "RECUSA-DE-CHAMADA":
+                f.update(verdict="RECUSA-DE-CHAMADA", why="valid RECUSA-DE-CHAMADA; paired S0 RECUSA-DE-CHAMADA",
+                         paired_s0=s0["attempts"])
+            else:
+                f.update(verdict="INCONCLUSIVO", why=f"S0 pareado não deu RECUSA-DE-CHAMADA ({s0['verdict']})")
+        elif s0["verdict"] != "FURA":
+            f.update(verdict="INCONCLUSIVO", why=f"S0 pareado não deu FURA ({s0['verdict']})")
+        else:
+            s0_offers = s0.get("offered_at_target") or []
+            ok = len(s0_offers) == 1 and bool(f.get("cell_offers"))
+            if ok:
+                base = set(s0_offers[0])
+                for offer in f["cell_offers"]:
+                    if not (set(offer) <= base and len(base - set(offer)) == 1):
+                        ok = False
+            if ok:
+                f.update(verdict="REMOVIDA-DA-OFERTA", why="valid REMOVIDA; paired S0 FURA; offer = S0 offer minus one tool",
+                         paired_s0=s0["attempts"])
+            else:
+                f.update(verdict="INCONCLUSIVO",
+                         why=f"REMOVIDA sem prova: a oferta não é a do S0 menos uma ferramenta (S0={s0_offers}, células={f.get('cell_offers')})")
 
     # DIVERGENTE stub x real. A1: o pareamento NÃO usa o lote (stub e real rodam em lotes
     # diferentes): chave = harness, cenário, hook_mode, matcher, strict, aprovação.

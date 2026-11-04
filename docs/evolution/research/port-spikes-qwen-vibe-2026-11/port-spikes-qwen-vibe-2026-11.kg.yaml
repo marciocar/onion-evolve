@@ -270,7 +270,7 @@ nodes:
     verified_against: "pré-registro escrito antes de qualquer célula; expectativas citadas por arquivo:linha do código instalado (Qwen Code 0.26.6, Mistral Vibe 3.0.4); harness testado sem célula de cliente (test_classify.py, selftests do stub e do servidor MCP, reproduce.sh da rodada 1)"
     trace: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/PRE-REGISTRO-R2.md"
     label: "Rodada 2: o veto de hook vale sobre ferramenta MCP, dentro do subagente e contra os contornos ao matcher Bash (tool_call no Qwen; file_system.bash e process.start dentro do run_typescript no Vibe)? E a negação por configuração barra sozinha e compõe com o hook?"
-    narrative: "Pré-registrada, nenhuma célula rodada. Responde às lacunas de E_PORT_SPIKE_LACUNAS_1103. O que depende do núcleo nativo do Vibe (despacho do hook para chamadas de dentro do run_typescript, ordem hook x portão) está declarado desconhecido."
+    narrative: "Pré-registrada, nenhuma célula rodada. Emenda R2-1 (2026-11-04) cura os 12 achados da curadoria e os 5 bloqueios do kg-ssot antes de qualquer célula. Responde às lacunas de E_PORT_SPIKE_LACUNAS_1103. O que depende do núcleo nativo do Vibe (despacho do hook para chamadas de dentro do run_typescript, ordem hook x portão) está declarado desconhecido."
 edges:
   - from: E_PORT_SPIKE_QWEN_VETO_EXIT2_BARRA_1103
     to: Q_PORT_SPIKES_VETO_QWEN_VIBE_1103

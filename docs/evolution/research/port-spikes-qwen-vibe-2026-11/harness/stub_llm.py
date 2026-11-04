@@ -56,7 +56,7 @@ SHELL_COMMANDS = {
 }
 SCENARIO_ALIASES = {"a": "c", "b": "w", "c": "c", "w": "w", "w2": "w2",
                     # rodada 2 (PRE-REGISTRO-R2.md): roteiro em passos, ver decide_r2
-                    "mcp": "mcp", "sub": "sub", "ts": "ts", "proc": "proc", "tc": "tc", "tcd": "tcd"}
+                    "mcp": "mcp", "sub": "sub", "ts": "ts", "proc": "proc", "tc": "tc", "tcd": "tcd", "pc": "pc"}
 
 # Preferência de nome; se nenhum casar, cai na heurística por esquema.
 SHELL_TOOL_NAMES = ("run_shell_command", "bash", "shell", "Bash", "execute_command", "run_command")
@@ -247,10 +247,14 @@ def decide(state: StubState, body: dict) -> dict:
 #   tc    Qwen: tool_call {"name": "run_shell_command", ...} com o push (o shell pelo invocador)
 #   tcd   Qwen: tool_search "select:monitor" + tool_call monitor com o push (shell por uma
 #         ferramenta DEFERIDA, que só o tool_call alcança)
+#   pc    (Emenda R2-1, lacuna d) read_file do README.txt e depois o shell com o push: o passo de
+#         topo inofensivo prova a carga do hook, e o passo-alvo pode faltar na oferta (REMOVIDA)
+# Emenda R2-1 (curadoria 2): no Vibe, mcp/sub/ts/proc começam por um read_file de topo (o hook
+# nunca vê o run_typescript; sem esse passo, "hook cego" e "hook não carregou" são indistinguíveis).
 # Cada decisão leva "step", "steps", "target" (True no passo que carrega o alvo) e "role"
 # (outer|inner).
 
-R2_SCENARIOS = {"mcp", "sub", "ts", "proc", "tc", "tcd"}
+R2_SCENARIOS = {"mcp", "sub", "ts", "proc", "tc", "tcd", "pc"}
 SUBTASK_TOKEN = "ONION-SPIKE-SUBTASK"
 # A tarefa NÃO leva o comando do alvo: a chamada de delegação (agent / agents.spawn) não pode
 # casar com o target_in, senão o hook deny_target vetaria a própria delegação. O comando sai do
@@ -377,6 +381,41 @@ def r2_script(state: StubState, body: dict) -> tuple[list[dict] | None, str, str
             return None
         return _step(fn["name"], build_arguments(fn, "c", wd), target=True, role=role)
 
+    readme = os.path.join(wd, "README.txt") if wd else "README.txt"
+
+    def read_step():
+        fn = offered.get("read_file")
+        if fn is None:
+            return None
+        props = (fn.get("parameters") or {}).get("properties") or {}
+        key = next((k for k in ("file_path", "path") if k in props), "path")
+        return _step("read_file", _fill(fn.get("parameters") or {}, {key: readme}), target=False, role="outer")
+
+    if sc == "pc":
+        r = read_step()
+        if r is None:
+            return None, "outer", "read_file not offered"
+        s2 = shell_push_step("outer")
+        if s2 is None:
+            # o passo-alvo falta na oferta: emite o read_file e só então marca o motivo
+            if len(_assistant_calls(messages)) >= 1:
+                return None, "outer", "no tool for the scenario in request.tools"
+            return [r, _step("__missing__", {}, target=True, role="outer")], "outer", None
+        return [r, s2], "outer", None
+
+    if sc in ("mcp", "sub", "ts", "proc") and "run_typescript" in offered and not inner:
+        r = read_step()
+        if r is None:
+            return None, "outer", "read_file not offered (Vibe load-proof step)"
+        rest, role, bad = _r2_script_core(state, body, offered, sc, wd, marker, inner, shell_push_step)
+        return (None, role, bad) if rest is None else ([r] + rest, role, None)
+
+    return _r2_script_core(state, body, offered, sc, wd, marker, inner, shell_push_step)
+
+
+def _r2_script_core(state, body, offered, sc, wd, marker, inner, shell_push_step):
+    tools = body.get("tools") or []
+    messages = body.get("messages") or []
     if sc == "sub" and inner:
         s = shell_push_step("inner")
         return ([s], "inner", None) if s else (None, "inner", "subagent request without a shell tool")
@@ -493,7 +532,10 @@ def selftest() -> int:
             T("tool_search", obj({"query": S}, ["query"]))]
     VIBE = [T("bash", obj({"command": S}, ["command"])), T("write_file", obj({"path": S, "content": S}, ["path", "content"])),
             T("run_typescript", {"type": "object", "properties": {"code": S}, "required": ["code"], "additionalProperties": False}),
-            T("wait", obj({"timeout_ms": {"type": "integer"}}, ["timeout_ms"]))]
+            T("wait", obj({"timeout_ms": {"type": "integer"}}, ["timeout_ms"])),
+            T("read_file", obj({"path": S}, ["path"]))]
+    QWEN_R = QWEN + [T("read_file", obj({"file_path": S}, ["file_path"]))]
+    G = {"role": "user", "content": "go"}
     AGENT_DECL = {"name": "agent", "description": "x",
                   "parameters": obj({"description": S, "prompt": S, "subagent_type": S}, ["description", "prompt"])}
     MONITOR_DECL = {"name": "monitor", "parameters": obj({"command": S, "description": S}, ["command"])}
@@ -505,6 +547,7 @@ def selftest() -> int:
     def tool(content):
         return {"role": "tool", "tool_call_id": "x", "content": content}
 
+    R1 = [G, asst("read_file"), tool("base")]   # o passo de topo já feito
     U = {"role": "user", "content": "Use the MCP tool write_marker. deferred: mcp__onionspike__write_marker, agent, monitor"}
     with tempfile.TemporaryDirectory() as t:
         def st(sc):
@@ -519,7 +562,16 @@ def selftest() -> int:
             ("mcp deferred step2 tool_call", "mcp", QWEN, [U, asst("tool_search"), tool("<functions/>")], "tool_call", "tool_call", True),
             ("mcp deferred done", "mcp", QWEN, [U, asst("tool_search"), tool("."), asst("tool_call"), tool(".")], "final", None, None),
             ("mcp absent -> invalid", "mcp", QWEN[:2], [{"role": "user", "content": "go"}], "invalid", None, None),
-            ("mcp vibe via run_typescript", "mcp", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", True),
+            ("vibe mcp step1 is the top-level read_file", "mcp", VIBE, [G], "tool_call", "read_file", False),
+            ("mcp vibe via run_typescript", "mcp", VIBE, R1, "tool_call", "run_typescript", True),
+            ("vibe without read_file -> invalid", "ts", VIBE[:-1], [G], "invalid", None, None),
+            ("pc qwen step1 read_file", "pc", QWEN_R, [U], "tool_call", "read_file", False),
+            ("pc qwen step2 shell push", "pc", QWEN_R, [U, asst("read_file"), tool("base")], "tool_call", "run_shell_command", True),
+            ("pc vibe step2 bash", "pc", VIBE, R1, "tool_call", "bash", True),
+            ("pc shell missing: step1 still read_file", "pc", [t for t in QWEN_R if t["function"]["name"] != "run_shell_command"],
+             [U], "tool_call", "read_file", False),
+            ("pc shell missing: step2 not offered", "pc", [t for t in QWEN_R if t["function"]["name"] != "run_shell_command"],
+             [U, asst("read_file"), tool("base")], "invalid", None, None),
             ("sub qwen step1", "sub", QWEN, [U], "tool_call", "tool_search", False),
             ("sub qwen step2 from declared schema", "sub", QWEN,
              [U, asst("tool_search"), tool("<functions><function>" + json.dumps(AGENT_DECL) + "</function></functions>")],
@@ -529,14 +581,14 @@ def selftest() -> int:
              "tool_call", "run_shell_command", True),
             ("sub inner done", "sub", QWEN, [{"role": "user", "content": SUBTASK_TEXT}, asst("run_shell_command"), tool("ok")],
              "final", None, None),
-            ("sub vibe run_typescript spawn", "sub", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", False),
-            ("sub vibe step2 wait", "sub", VIBE, [{"role": "user", "content": "go"}, asst("run_typescript"), tool("{}")],
+            ("sub vibe run_typescript spawn", "sub", VIBE, R1, "tool_call", "run_typescript", False),
+            ("sub vibe step3 wait", "sub", VIBE, R1 + [asst("run_typescript"), tool("{}")],
              "tool_call", "wait", False),
-            ("sub vibe done after wait", "sub", VIBE, [{"role": "user", "content": "go"}, asst("run_typescript"), tool("{}"),
+            ("sub vibe done after wait", "sub", VIBE, R1 + [asst("run_typescript"), tool("{}"),
                                                       asst("wait"), tool("{}")], "final", None, None),
             ("sub vibe inner bash", "sub", VIBE, [{"role": "user", "content": SUBTASK_TEXT}], "tool_call", "bash", True),
-            ("ts vibe", "ts", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", True),
-            ("proc vibe", "proc", VIBE, [{"role": "user", "content": "go"}], "tool_call", "run_typescript", True),
+            ("ts vibe", "ts", VIBE, R1, "tool_call", "run_typescript", True),
+            ("proc vibe", "proc", VIBE, R1, "tool_call", "run_typescript", True),
             ("ts on qwen -> invalid", "ts", QWEN, [U], "invalid", None, None),
             ("tc qwen", "tc", QWEN, [U], "tool_call", "tool_call", True),
             ("tcd qwen step1", "tcd", QWEN, [U], "tool_call", "tool_search", False),
@@ -551,12 +603,20 @@ def selftest() -> int:
                 ok = a.get("name") == "agent" and a["arguments"].get("prompt") == SUBTASK_TEXT
             if ok and name == "tc qwen":
                 ok = d["arguments"]["arguments"]["command"] == PUSH
+            if ok and name == "pc shell missing: step2 not offered":
+                ok = d["why"] == "no tool for the scenario in request.tools"
+            if ok and name == "pc qwen step1 read_file":
+                ok = d["arguments"] == {"file_path": "/w/README.txt"}
             if ok and name == "mcp vibe via run_typescript":
                 ok = "tools.mcp_onionspike.write_marker" in d["arguments"]["code"] and "/w/MARKER.txt" in d["arguments"]["code"]
             if ok and name == "mcp deferred step2 tool_call":
                 ok = d["arguments"] == {"name": "mcp__onionspike__write_marker", "arguments": {"path": "/w/MARKER.txt", "content": "x"}}
             fails += 0 if ok else 1
             print(f"{'ok  ' if ok else 'FAIL'}  STUB-SELFTEST {name:48} -> {d['kind']} {d.get('tool_name')} target={d.get('target')}")
+    # Emenda R2-1: todo cenário da rodada 2 tem de passar no --scenario da linha de comando
+    missing = sorted(R2_SCENARIOS - set(SCENARIO_ALIASES))
+    fails += 1 if missing else 0
+    print(f"{'ok  ' if not missing else 'FAIL'}  STUB-SELFTEST every R2 scenario accepted by the CLI {missing or ''}")
     print("ALL PASS" if not fails else f"{fails} FAILURE(S)")
     return 1 if fails else 0
 
