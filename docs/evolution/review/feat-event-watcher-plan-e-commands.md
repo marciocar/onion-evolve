@@ -2,7 +2,7 @@
 branch: feat/event-watcher-plan-e-commands
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: 09c2e1cbb9a66c22c13609e28245fc1eba976f205adf7edafd9515ad94574732
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: ab0df0ce1682b14879e2cdffa0628a1e8538988d14767b9357283adf3fd5c5b1
 findings_total: 78
 findings_real: 73
@@ -83,3 +83,11 @@ do core: `a2a_accept` e `selector_per_file` passam 208 de 208.
 No CI, o sh76 passava o stderr do `shadow-stats` ao jq (`2>&1`). O jq falhou no parse, e o worker da faixa morreu
 sem somar. A cura manda só o stdout ao jq e protege o jq com `|| true` no sh76 e no sh77. Nenhuma asserção mudou,
 e `a2a_accept` com `selector_per_file` passa 208 de 208.
+
+## Re-revisão: tempo e disco das faixas no CI
+
+As faixas 1 e 2 da bancada completa estouravam o teto de 25 minutos. A causa medida: os casos (d) e (e) da
+`shared_startup` usavam o `a2a_accept` como carga de ponta a ponta, três rodadas aninhadas. Esta branch levou o
+`a2a_accept` de 42 para cerca de 200 casos, e a `shared_startup` foi de 56 s para 1077 s no CI. Esses casos testam
+o arranque dos workers, e não o A2A, então passam a usar a família leve `trust_topology`. Localmente, a
+`shared_startup` passa 6 de 6 em 9 s. Nenhuma asserção mudou.

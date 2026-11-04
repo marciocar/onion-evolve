@@ -47127,15 +47127,15 @@ run_shared_startup_selftests() {
   else record_fail "shared-startup: (c) cache inseguro" "why=${w1} execuções=${c1}"; fi
   unset ONION_SELFTEST_INVENTORY_CACHE_DIR
   # (d) PONTA A PONTA: a faixa paralela declara que os workers usaram o retrato e o inventário do pai, e passa
-  out="$(LC_ALL=C bash "${sut}" --jobs 2 --families a2a_accept,adopter_gate 2>&1 || true)"
+  out="$(LC_ALL=C bash "${sut}" --jobs 2 --families trust_topology,adopter_gate 2>&1 || true)"
   if grep -q '^  Arranque : 2/2 worker' <<< "${out}" && grep -q 'retrato da árvore e inventário feitos 1× pelo pai' <<< "${out}" \
      && grep -qE '^  Falharam : 0$' <<< "${out}"; then
     record_pass "shared-startup: (d) --jobs 2: os 2 workers usaram retrato e inventário do pai, e a bancada passa"
   else record_fail "shared-startup: (d) ponta a ponta" "$(grep -E 'Arranque|arranque|Falharam' <<< "${out}" | tr '\n' '|' | cut -c1-240)"; fi
   # (e) O RETRATO NÃO VAZA para bancada aninhada nem sobrevive ao sumiço: sem --child a variável é ignorada;
   #     com --child e o arquivo sumido, o worker diz e faz o próprio
-  out="$(ONION_SELFTEST_SNAPSHOT="${d}/nao-existe.tar" LC_ALL=C bash "${sut}" --families a2a_accept 2>&1 || true)"
-  local out2; out2="$(ONION_SELFTEST_CHILD=1 ONION_SELFTEST_SNAPSHOT="${d}/nao-existe.tar" ONION_SELFTEST_FAMILIES=a2a_accept LC_ALL=C bash "${sut}" 2>&1 || true)"
+  out="$(ONION_SELFTEST_SNAPSHOT="${d}/nao-existe.tar" LC_ALL=C bash "${sut}" --families trust_topology 2>&1 || true)"
+  local out2; out2="$(ONION_SELFTEST_CHILD=1 ONION_SELFTEST_SNAPSHOT="${d}/nao-existe.tar" ONION_SELFTEST_FAMILIES=trust_topology LC_ALL=C bash "${sut}" 2>&1 || true)"
   if ! grep -q 'retrato do pai' <<< "${out}" && grep -qE '^  Falharam : 0$' <<< "${out}" \
      && grep -q 'retrato do pai .* sumiu' <<< "${out2}" && grep -q '^#ONION_SELFTEST_STARTUP retrato=proprio' <<< "${out2}"; then
     record_pass "shared-startup: (e) fora de --child o retrato herdado é ignorado; worker com retrato sumido declara e faz o próprio"
