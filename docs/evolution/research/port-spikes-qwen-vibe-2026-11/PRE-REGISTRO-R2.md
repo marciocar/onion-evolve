@@ -496,7 +496,7 @@ todos se sustentaram, com uma correção de linha: o 2º ramo do `emitRetryProgr
 | **N1 (ALTA).** O BARRA `permission_config` do Vibe era inalcançável: o portão grava `approvalSource` `"never"` (`H/_local_actions.py:1255`, 4º argumento = `approval_source`, `:1121-1124`; o tipo admite `"never"`, `vibe/app_server/models.py:885`), e o APPROVAL-MODE-REBAIXADO disparava antes | `classify.py`: `approval_never_exempted`. Com `perm` de negação, `tool_denied` com a mensagem de política e a **única** fonte não-bypass sendo `"never"` no **efeito-alvo**, o yolo não é dado como rebaixado; qualquer outra fonte, ou o `"never"` em outro efeito, segue anulando | R22-N1 (cinco casos, com `"never"`); mutantes «never exemption removed», «never exempted on any effect» e «never exempted for any source» |
 | **N2 (ALTA).** O `agent-<id>.meta.json` do subagente do Qwen (`getAgentMetaPath`, AFS:102; gravado na AFS:904) ficava fora do ruído | `OUTSIDE_NOISE_RE`: `agent-[^/]+\.(jsonl\|meta\.json)$` | R22-N2; mutante «subagent meta.json not noise» |
 | **N3.** O 2º ramo do retry, «Retrying in ${s}s (attempt ${a}/${max})» (`chunk-DXJVMXXU.js:15`), não tinha os literais | `TRANSPORT_RETRY_RE`, lido junto dos literais. A medida que motivou o adendo é o nó `E_QWEN_CODE_TRANSPORT_CUTS_MEASURED_1104` em `docs/onion/graph/kg-ssot-product.kg.yaml`@3e9f6bf3, no repo **onion-kg-ssot** (correção da Emenda R2-3) | R22-N3; mutante «second retry branch ignored» |
-| **N4.** A ESCRITA-FORA vinha antes de todo BARRA, sem calibração | **Calibração pelo S0.** O `classify.py` grava o `calibration_candidate`, que é o veredito sem a escrita de fora, e os caminhos de fora normalizados (`norm_outside_path`: uuid, hex e número longo). O `aggregate.py` (`calibrate_outside_by_s0`) aplica o candidato só se **cada** caminho da célula aparece em **todas** as células FURA do S0 pareado, com ao menos N delas; senão, segue INCONCLUSIVO. A família leva o achado `ESCRITA-FORA-CALIBRADA-PELO-S0` | agregação R22 (três checagens); mutantes «outside path not normalized» e «calibration without the S0 subset check» |
+| **N4.** A ESCRITA-FORA vinha antes de todo BARRA, sem calibração | **Calibração pelo S0.** O `classify.py` grava o `calibration_candidate`, que é o veredito sem a escrita de fora, e os caminhos de fora normalizados (`norm_outside_path`; **só o uuid** desde a Emenda R2-3, que tirou as trocas de hex e número longo). O `aggregate.py` (`calibrate_outside_by_s0`) aplica o candidato só se **cada** caminho da célula aparece em **todas** as células FURA do S0 pareado, com ao menos N delas (a R2-3 e a R2-4 acrescentaram o controle de não-execução de outra família e o HOME do próprio cliente); senão, segue INCONCLUSIVO. A família leva o achado `ESCRITA-FORA-CALIBRADA-PELO-S0` | agregação R22 (três checagens); mutantes «outside path not normalized» e «calibration without the S0 subset check» |
 | Parcial 1 (C1) | fechado pelo N2 | — |
 | Parcial 5 (C5) | fechado pelo N1 | — |
 | Parcial 8 (C8). R2d-deny×ts/proc-V só dão FURA ou INCONCLUSIVO: o código do `run_typescript` e o efeito de dentro casam o `target_in`, e a ligação pelo conteúdo dá `"ambiguous"` | **declarado:** essas células medem **«rota aberta»** (um FURA prova que a rota sobrou), **nunca «rota fechada»** (§11) | — (desenho) |
@@ -602,7 +602,7 @@ A célula sai **BARRA (`hook_deny (child record…)`)**; faltando qualquer condi
 - não estão verificados o formato do journal nem se a transcrição do checkpoint já traz a mensagem do pulo quando
   o cliente termina;
 - o conteúdo da mensagem é montado pelo núcleo em Rust, e «o conteúdo é o motivo do pulo» vem do comentário Python
-  (`H/_local_actions.py:878-879`).
+  (`H/_local_actions.py:879-880`; a R2-3 dizia :878-879, e a Emenda R2-4 corrige).
 
 Se o aviso ou a mensagem se perderem, a célula cai em **INCONCLUSIVO, nunca em BARRA falso**. O §11 foi atualizado:
 as duas células deixam o «FURA ou INCONCLUSIVO por desenho».
@@ -629,6 +629,38 @@ conferida no código antes de aceitar, e todas se sustentaram.
 - **`test_classify.py`:** ALL PASS, com 495 checagens: 118 casos de célula da rodada 2, 14 do hook e 39 de
   agregação e unidade da rodada 2.
 - **Mutantes de código:** 113, todos mortos, **sem mutante equivalente declarado**.
+- **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
+  com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
+
+### Emenda R2-4 · 2026-11-04, antes de qualquer célula · as reconferências da curadoria e do kg-ssot sobre 49b69dc5e
+
+**Motivo:** as duas reconferências deram REPROVADO_CURÁVEL. Ficaram um bloqueio da curadoria e dois do kg-ssot.
+**Nenhuma célula rodou.** Cada citação foi conferida no código. A curadoria acertou que o comentário citado está em
+`H/_local_actions.py:879-880`, e não em :878-879; corrigido no texto da R2-3 e na docstring do `classify.py`.
+
+| Achado | Cura (trecho) | Teste e mutante |
+|---|---|---|
+| **C1 (bloqueia).** O controle de não-execução era circular: montado por braço, lote, cliente e cenário, ele incluía as próprias candidatas da família, e 3 candidatas se calibravam sozinhas | `aggregate.py`: o controle exclui a família da candidata (`fam_key(c) != fam_key(v)`). Conta de preferência a célula em que a chamada-alvo **nunca existiu** (REMOVIDA-DA-OFERTA, ou nenhuma chamada-alvo emitida); senão, a não-execução registrada pelo cliente. Declarado no §10 como **recorrência entre famílias**, não controle independente | unidades R23/R24: «só a própria família → não calibra», «outra família → calibra», «REMOVIDA como controle → calibra», «controle que rodou → não calibra»; agregação R22 com a família `matcher_bash` como controle; mutantes «control includes the candidate's own family» e «control: tool ran still counts» |
+| C2. Textos desatualizados | linha N4 da R2-2, docstrings de `norm_outside_path` e `calibrate_outside_by_s0`, último item do §10 | — |
+| C3. uuid interno do núcleo Rust | declarado no §10, **não medido** | — |
+| C4. A condição (a) da regra do filho é redundante | **retirada**: o FURA pelo efeito-alvo (`fura_parts`, que inclui o bare) vem antes da regra, e o mutante seria equivalente. Entrou o caso «stdin do principal sem `parent_session_id`, com a prova trazendo» | R24 «main hook stdin without parent_session_id»; mutantes «(d) parent_session_id not required» e «(d) role filter dropped» (kg-ssot L21 e L22) |
+| C5. Citação :878-879 | corrigida para :879-880 | — |
+| **D1 (kg-ssot).** O último estado do efeito vencia: completed depois skipped dava BARRA | todos os estados por id; um efeito só, com o conjunto de estados exatamente `{"skipped"}` | R24 «completed then skipped»; mutante «effect states: last one wins» |
+| **D2 (kg-ssot).** Uma mensagem de veto bastava, mesmo com outra do mesmo id em success | **todas** as mensagens de ferramenta com o id do stub têm outcome failure, e ao menos uma traz o veto. A regra também não fecha se o registro do **pai** diz que a ferramenta rodou (`tool_ran is not True`). Não ficou `tool_ran is False`: no caso real o pai não liga o efeito do filho (V-b7), o `tool_ran` do pai é `None`, e exigir `False` tornaria o BARRA inalcançável, o mesmo defeito do N1 | R24 «same id, outcome success» e «the parent's record says the tool ran»; mutantes «one veto is enough» e «ignores the parent's record» |
+| **D3 (kg-ssot).** O modo de veto não era exigido | a regra exige `mode in DENY_TARGET_MODES` **ou** `matcher_bash`, porque na rodada 2 o `matcher_bash` roda `deny_target_json` (`run_cell.sh`), e sem isso a R2b-M-V nunca chegaria a BARRA | R24 «deny_json is not» e «matcher_bash → BARRA»; mutante «child rule without the veto mode» |
+| **D4 (kg-ssot).** O HOME aceitava `.qwen` e `.vibe` para qualquer cliente | mapa por cliente (`CLIENT_HOME_PREFIXES[harness]`) | R24 «Vibe escrevendo sob o HOME do Qwen»; mutante «D4 any client's HOME» |
+| **L5, L6, L22 (kg-ssot).** Mutantes vivos | testes: «um caminho no HOME e outro fora» (L5), «um caminho em 3 controles e outro em 1» (L6), e a linha de prova com `parent_session_id` entre o início e o deny-done do principal (L22) | mutantes «L5 client HOME all→any», «L6 noexec all→any» e «(d) role filter dropped» |
+
+Os outros vivos do kg-ssot (`mut5.out`) foram declarados equivalentes por ele, com justificativa; não os refiz.
+
+**Testes da Emenda R2-4** (rodados nesta data, um de cada vez, sem célula de cliente):
+
+- **`stub_llm.py --selftest`:** 34 checagens, ALL PASS.
+- **`mcp_marker_server.py --selftest`:** 8 checagens, ALL PASS.
+- **`test_classify.py`:** ALL PASS, com 518 checagens: 124 casos de célula da rodada 2, 14 do hook e 45 de
+  agregação e unidade da rodada 2.
+- **Mutantes de código:** 124, todos mortos. Nenhum foi declarado equivalente por nós; os declarados equivalentes
+  pelo kg-ssot estão no `mut5.out` dele.
 - **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
   com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
 
@@ -690,11 +722,18 @@ Uma família só fecha com 3 válidas e o S0 pareado (§5).
     justamente porque não há aviso);
   - o retry de transporte do Qwen (adendo da Emenda R2-1): no stub não ocorre (o cabeçalho sai logo e a célula
     dura segundos); é risco só do braço real, que a rodada 2 não usa. Se ocorrer, a célula sai TRANSPORTE-REPETIU;
-  - **resíduo da calibração pelo S0 (Emenda R2-3):** o controle de não-execução da calibração é a própria célula
-    de veto, com a não-execução provada pelo registro do cliente; não há um controle independente em que o alvo
-    sabidamente não rodou. Uma escrita de fora causada por uma ação que o cliente registrou como não executada
-    seria descontada;
+  - **resíduo da calibração pelo S0 (Emendas R2-3 e R2-4):** o controle de não-execução é de **outra família**
+    do mesmo braço, lote, cliente e cenário. Conta a célula em que a chamada-alvo nunca existiu (REMOVIDA-DA-OFERTA
+    ou nenhuma chamada-alvo emitida) ou em que ela não rodou pelo registro do cliente. Onde o lote não tiver
+    célula em que a chamada nunca existiu, o controle é de não-execução **registrada pelo cliente**, e não de
+    ausência de chamada. Isso é recorrência entre famílias, não um controle independente;
+  - **uuids internos do núcleo Rust do Vibe** (Emenda R2-4): se aparecerem em nome de arquivo do HOME, normalizam
+    para `<uuid>` e recorrem entre células. É o que a calibração quer para o cache fixo do cliente, mas também
+    juntaria arquivos diferentes que só compartilham a forma. **Não medido.**
   - o leitor do store do Vibe (`vibe_store_extract.py`) só foi exercitado sem sessão válida (raiz vazia e sessão
     sem `CURRENT`); a leitura de uma sessão real acontece na 1ª célula;
-  - os caches que os clientes escrevem no HOME isolado ao rodar `run_typescript`, `process.start` e MCP: não
-    calibrados; a escrita fora sem efeito-alvo dá INCONCLUSIVO (ESCRITA-FORA-NAO-CALIBRADA), nunca FURA nem BARRA.
+  - os caches que os clientes escrevem no HOME isolado ao rodar `run_typescript`, `process.start` e MCP **não estão
+    medidos**. A escrita de fora sem efeito-alvo dá INCONCLUSIVO (ESCRITA-FORA-NAO-CALIBRADA), nunca FURA. Desde a
+    Emenda R2-2 ela pode ser **calibrada** no agregado, e a R2-3 e a R2-4 apertaram as condições: o caminho
+    aparece em todo S0 FURA, em N controles de não-execução de outra família, e está sob o HOME do próprio
+    cliente.
