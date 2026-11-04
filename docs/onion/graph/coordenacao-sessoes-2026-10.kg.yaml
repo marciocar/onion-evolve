@@ -561,9 +561,9 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-11-04"
-    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Repesquisar o vigia como serviço vendorizável (como o kg-ssot) para Onion, kg-ssot e company brains; canais Slack, WhatsApp/WAHA, ClickUp (Grana.Ai) e WhatsApp, Teams, Linear (Onion Evolve)»"
-    label: "O maestro pede nova pesquisa do vigia de eventos: o melhor para o Onion, o kg-ssot e os company brains, de preferência peça vendorizável como o kg-ssot, para Slack, WAHA e ClickUp na Grana.Ai e WhatsApp, Teams e Linear no Onion Evolve."
-    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Repesquisar o vigia como serviço vendorizável (como o kg-ssot) para Onion, kg-ssot e company brains; canais Slack, WhatsApp/WAHA, ClickUp (Grana.Ai) e WhatsApp, Teams, Linear (Onion Evolve)» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Coberta pelo que existe» · «Selar outra direção»."
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Repesquisar o vigia como serviço vendorizável (como o kg-ssot) para Onion, kg-ssot e company brains; canais Slack, WhatsApp/WAHA, ClickUp (no adotante granaai) e WhatsApp, Teams, Linear (Onion Evolve)»"
+    label: "O maestro pede nova pesquisa do vigia de eventos: o melhor para o Onion, o kg-ssot e os company brains, de preferência peça vendorizável como o kg-ssot, para Slack, WAHA e ClickUp no adotante granaai e WhatsApp, Teams e Linear no Onion Evolve."
+    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Repesquisar o vigia como serviço vendorizável (como o kg-ssot) para Onion, kg-ssot e company brains; canais Slack, WhatsApp/WAHA, ClickUp (no adotante granaai) e WhatsApp, Teams, Linear (Onion Evolve)» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Coberta pelo que existe» · «Selar outra direção»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
       locator: "pergunta com opções de 2026-11-04: «Fecho a proposta do vigia de eventos como coberta?»"
