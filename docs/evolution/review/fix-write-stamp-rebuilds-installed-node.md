@@ -2,7 +2,8 @@
 branch: fix/write-stamp-rebuilds-installed-node
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 186c4b1f09d9d7c927146d5994fcb3e8e440a3c4e276e24913d24e6a8006c87c
+reviewed_code_sha256: 20db3dd6afce2da7104b57b49f8cfa9180d7edd19b89197bccdd120c35abdbd1
 findings_total: 10
 findings_real: 10
 tokens: 0
