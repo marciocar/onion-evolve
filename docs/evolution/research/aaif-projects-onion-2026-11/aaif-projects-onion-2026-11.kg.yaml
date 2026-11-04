@@ -522,7 +522,7 @@ nodes:
     source_tier: 8
     source_kind: primary
     label: "Em crates/goose-agent/src/pre_tool_call_hook.rs o veto é retorno de trait Rust (Allow ou Deny, e o Deny vira erro ao modelo). Vale SÓ para esse caminho: o Goose também tem hook de comando com exit 2."
-    narrative: "A claim do leitor ia além: dizia que o veto 'é retorno de trait Rust, não exit code de processo externo'. A citação ancora o enum; a negativa foi derrubada pelo Elenxo (E_OBJECAO_C21_GOOSE_COMMAND_HOOK_EXIT2, critério E1). Este nó grava só a parte que o arquivo sustenta, e a contabilidade do E_LACUNAS registra o recorte. Texto do leitor conservado: a decisão depende da implementação de cada hook, e Err não nega nem permite."
+    narrative: "A claim do leitor ia além: dizia que o veto 'é retorno de trait Rust, não exit code de processo externo'. A citação ancora o enum; a negativa foi derrubada pelo Elenxo (E_OBJECAO_C21_GOOSE_COMMAND_HOOK_EXIT2, primeiro critério do Elenxo). Este nó grava só a parte que o arquivo sustenta, e a contabilidade do E_LACUNAS registra o recorte. Texto do leitor conservado: a decisão depende da implementação de cada hook, e Err não nega nem permite."
     trace: "https://github.com/aaif-goose/goose/blob/main/crates/goose-agent/src/pre_tool_call_hook.rs"
     provenance:
       source: "https://github.com/aaif-goose/goose/blob/main/crates/goose-agent/src/pre_tool_call_hook.rs"
