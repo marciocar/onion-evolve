@@ -154,6 +154,7 @@
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_MEDIR_O_DONO_NAO_O_CARIMBO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_ORFAO_EXIGE_TRES_PROVAS	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-10-02-quatro-decisoes-seladas-e-tres-guardas-com-defeito-datado.md	E_O_EVOLVE_E_2_DE_7_NAO_ZERO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
+.claude/hooks	C_TETO_GOOSE	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/hooks	E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/hooks/background-task-probe.sh	D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/hooks/bash-empty-result-guard.sh	E_HOOK_PR_SEM_PASSADA_CURADO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
@@ -260,6 +261,7 @@
 .claude/skills/onion-orchestration/SKILL.md	E_WORKFLOW_GANHOU_RETOMADA_E_FALHA_EXPLICITA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	SY4_open_agent_teams_capability_detection	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+.claude/skills/onion-patterns/SKILL.md	C_TETO_AGENT_SKILLS	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/skills/onion-patterns/SKILL.md	E_MEDIDO_CATALOGO_SETE_PLAYBOOKS_1011	docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml
 .claude/skills/onion-patterns/SKILL.md	SY4_prod_rfc0002_catalogo_playbooks	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/skills/onion-patterns/SKILL.md	SY5_playbooks_materialization_open	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -326,7 +328,10 @@
 .claude/utils/diagnose/scaffold-diagnose-store.sh	A_helper	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
 .claude/utils/diagnose/scaffold-diagnose-store.sh	D_scaffold_e_doutrina	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
 .claude/utils/diagnose/scaffold-diagnose-store.sh	E_gap_scaffold	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
+.claude/utils/federation-transport	C_TETO_A2A	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/utils/federation-transport	C_no_sender_exists	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+.claude/utils/federation-transport/a2a-rt-mcp.py	C_DEFEITO_A2A_RT_MCP_ECOA_VERSAO	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+.claude/utils/federation-transport/a2a-send.sh	C_TETO_AGENTGATEWAY	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/utils/federation-transport/a2a-ssrf-check.sh	E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_F1_CORPO_FORA_DA_ASSINATURA	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_F1_F2_CURADOS_NO_GATE_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
@@ -408,6 +413,7 @@
 .claude/utils/task-manager/progress.sh	D_PROGRESS_E_DERIVACAO_COM_HELPER	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
 .claude/utils/task-manager/progress.sh	E_PERCENTUAL_PONDERADO_E_DECLARADO	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
 .claude/utils/task-manager/provider-hosts.tsv	C_TETO_A_LISTA_DE_HOSTS_E_VOCABULARIO	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
+.claude/validation	C_TETO_OPENENV	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 .claude/validation	E_sem_gate_client_safe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/validation/adapter-enforcement-check.sh	Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA	docs/evolution/research/machinery-enforcement-2026-10/machinery-enforcement-2026-10.kg.yaml
 .claude/validation/agent-frontmatter-keys-check.sh	D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV	docs/evolution/research/guard-agent-frontmatter-keys-2026-10/agent-frontmatter-keys-2026-10.kg.yaml
@@ -1628,6 +1634,23 @@ docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md	E_I
 docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md	E_IDA_E_VOLTA_R3_DADO_NAS_DUAS_PONTAS_1028	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/research/a2a-ida-e-volta-vps-notebook-2026-10/PRE-REGISTRO.md	E_IDA_E_VOLTA_REMEDICAO_NEGATIVOS_1103	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/research/a2a-landscape-2026-11/SYNTHESIS.md	Q_A2A_LANDSCAPE_2026_11	docs/evolution/research/a2a-landscape-2026-11/a2a-landscape-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/SYNTHESIS.md	C_TABELA_FINAL_AAIF_2026_11	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/SYNTHESIS.md	E_TESTEMUNHO_REVISAO_CURADORIA_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/SYNTHESIS.md	Q_AAIF_NAO_MEDIDO_2026_11	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml	E_LACUNAS_AAIF_PROJECTS_ONION_2026_11	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/a2a-sdk-card-parse.txt	E_MEDIDA_A2A_SDK_LE_CARD_0_3_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/agentgateway-envelope.jsonl	C_SUPERACAO_20261104_C24_ENVELOPE_ATRAVESSA	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/agentgateway-envelope.jsonl	E_MEDIDA_AGENTGATEWAY_ENVELOPE_INTEGRO_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/agents-md-cells.jsonl	E_MEDIDA_AGENTS_MD_NA_REQUISICAO_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/goose-mcp-client.jsonl	C_SUPERACAO_20261104_C06_CLIENTE_ERA_NOVA_MEDIDO	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/goose-mcp-client.jsonl	C_SUPERACAO_20261104_C22_GOOSE_CONECTA_KG_MCP	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/goose-mcp-client.jsonl	E_MEDIDA_GOOSE_CLIENTE_MCP_REAL_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/mcp-stdio-probe.txt	E_MEDIDA_MCP_STDIO_DOIS_SERVIDORES_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/quote-check.tsv	E_CONFERENCIA_CRUA_DAS_41_CITACOES	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/skills-ref-validate.txt	C_SUPERACAO_20261104_C15_VALIDADOR_RODADO	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/skills-ref-validate.txt	E_MEDIDA_SKILLS_REF_VALIDATE_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/versions.txt	E_ARTEFATO_LICENCA_SO_NO_REPO	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+docs/evolution/research/aaif-projects-onion-2026-11/data/veto-cells.jsonl	E_MEDIDA_VETO_GOOSE_E_CC_1104	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_PRIMARIES_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_MERCADO_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
@@ -2554,6 +2577,7 @@ ops/bridge-auth/logto-provision.sh	E_org_membership_grows_2026_08	docs/onion/gra
 ops/bridge-auth/logto-provision.sh	E_p1p3_provisioned	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	E_slice1_revocation_isolated	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	I_PROVISION_FICOU_PARA_TRAS_NO_RENAME	docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml
+ops/chat-runner.sh	C_TETO_OPENSANDBOX	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 ops/chat-runner.sh	E_VERIFY_DO_BRIDGE_SEPARA_NAO_MEDIU_DE_REPROVOU_1016	docs/evolution/research/radar-E3-2026-10-16-r12/radar-E3-2026-10-16-r12.kg.yaml
 ops/kg-gate-ci.sh	E_KG_SSOT_425_ADOTADA_1024	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 ops/materialize-door.sh	E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE	docs/onion/graph/federation-health-2026-07.kg.yaml
@@ -2625,6 +2649,9 @@ vendor/kg-ssot/.kg-ssot-version	E_KG_SSOT_432_ADOTADA_1027	docs/onion/graph/sina
 vendor/kg-ssot/.kg-ssot-version	E_KG_SSOT_433_ADOTADA_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 vendor/kg-ssot/.kg-ssot-version	E_KG_SSOT_434_ADOTADA_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 vendor/kg-ssot/.kg-ssot-version	E_KG_SSOT_435_ADOTADA_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+vendor/kg-ssot/LICENSE	C_SUPERACAO_20261104_C09_LICENCA_ARTEFATO_MCP	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
+vendor/kg-ssot/LICENSE	E_KG_SSOT_E_MCPB_LICENCAS_LIDAS	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 vendor/kg-ssot/spec/kg-contract-v4.schema.json	C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 vendor/kg-ssot/spec/kg-contract-v4.schema.json	E_CORE_CONTRACT_NODE_KEYS_CLOSED_ENUM	docs/evolution/research/audit-evidence-machinery-2026-10/audit-evidence-machinery-2026-10.kg.yaml
+vendor/kg-ssot/tools/kg_mcp.py	C_TETO_MCP	docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml
 vendor/kg-ssot/tools/requirements.txt	Q_PYYAML_604_CP315_GATILHO_1027	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml

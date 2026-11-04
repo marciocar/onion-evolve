@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**798 itens abertos** em 140 grafo(s) com aberto (de 179 no escopo) · 141 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**801 itens abertos** em 141 grafo(s) com aberto (de 180 no escopo) · 142 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -682,6 +682,14 @@
 | 2.4 | `C_S4_F8` | whatsapp-api-2026-07 | Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con… |
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
+
+## aaif-projects-onion-2026-11 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.0 | `Q_DOCTRINE_EXIT2_REVIEW_2026_11` | aaif-projects-onion-2026-11 | Pergunta aberta ao maestro: a frase de CLAUDE.md:16 ('isso não existe fora') se sustenta? Esta cura não redige doutrina: a respo |
+| 7.7 | `C_DEFEITO_A2A_RT_MCP_ECOA_VERSAO` | aaif-projects-onion-2026-11 | Defeito medido, não corrigido aqui: .claude/utils/federation-transport/a2a-rt-mcp.py l.548-549 devolve em initialize a versão qu |
+| 4.0 | `Q_AAIF_NAO_MEDIDO_2026_11` | aaif-projects-onion-2026-11 | Sem medir depois da cura: adoção real de qualquer projeto; quem paga por projeto e receita; envio real ao perfil A2A por cliente |
 
 ## elenxos-2026-08-07 — 2 item(ns)
 
