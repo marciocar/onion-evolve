@@ -19,8 +19,10 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   - **Por grau de prova.** *Medido:* Codex CLI 0.164.0 barra sob
     `--dangerously-bypass-approvals-and-sandbox`, com hook confiável (sem confiança, o `codex exec` o pula
     em silêncio); Qwen Code 0.26.6 barra no caminho feliz; no Mistral Vibe 3.0.4 o `exit 2` só barra com
-    `strict`. *Só por doc:* Copilot CLI, Gemini CLI e Cursor. *Só por leitura:* Goose. *Sem medida em
-    nenhum:* Copilot, Gemini e Cursor em modo autônomo; o Antigravity nem tem primária.
+    `strict`; Goose 1.57.0 em modo auto barra, libera em falha e barra com `on_failure: block` (API
+    simulada, só shell, sem subagente). *Só por doc:* Copilot CLI, Gemini CLI e Cursor. *Sem medida em
+    nenhum:* Copilot, Gemini e Cursor em modo autônomo; o Antigravity nem tem primária. A medida do Goose
+    não dispara o gatilho abaixo, que exige os 5 vetos reais na mesma bancada.
   - **O veto é camada de conformidade, não fronteira de segurança.** É conclusão do Onion, não fala da
     Anthropic. Condições de força: sem chave de política na configuração gerenciada (`{}` ou só chave de
     controle, como `prependPlugins`, não contam) ou login Team/Enterprise (este, só por doc), **um mod que

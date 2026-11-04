@@ -31,8 +31,8 @@ que barra sob `bypassPermissions`, não existe fora do Claude Code, nenhum CI re
 | Medido | Codex CLI 0.164.0 | barra por `exit 2` e JSON deny sob `--dangerously-bypass-approvals-and-sandbox`, com hook confiável; sem confiança, o `codex exec` pula o hook em silêncio (`E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026`) | `E_OBJECAO_CODEX_BYPASS_MEASURED` |
 | Medido | Qwen Code 0.26.6 | barra no caminho feliz; abre em toda falha do hook | `E_OBJECAO_RUN_PAID_MEASUREMENTS_LEFT_OUT` |
 | Medido | Mistral Vibe 3.0.4 | o `exit 2` só barra com `strict`; o veto próprio é JSON com `exit 0` | `E_OBJECAO_RUN_PAID_MEASUREMENTS_LEFT_OUT` |
+| Medido | Goose 1.57.0, modo auto | `exit 2` barra 3 de 3, a falha libera e `on_failure: block` barra; API simulada, só shell, sem subagente. Não dispara o gatilho, que exige os 5 vetos reais na mesma bancada | `aaif-projects-onion-2026-11#E_MEDIDA_VETO_GOOSE_E_CC_1104` |
 | Só por doc | Copilot CLI, Gemini CLI, Cursor | `exit 2` nega; nada medido em modo autônomo pelo Onion | `E_COPILOT_HOOK_EXIT2_DENY`, `E_GEMINI_BEFORETOOL_EXIT2_DOC`, `E_OBJECAO_CURSOR_ASK_WRONG_TARGET` |
-| Só por leitura | Goose | hook de comando com `exit 2`, sem spike, em grafo ainda não rastreado | `Q_EXIT2_COUPLING_AGAINST_2026_11` |
 | Sem primária | Antigravity | nenhuma doc oficial achada | `E_OBJECAO_CUT_GEMINI_REPLACED_ANTIGRAVITY` |
 
 ### Força: o veto é camada de conformidade, não fronteira de segurança
@@ -69,13 +69,22 @@ Sem política, sob bypass, a sessão grava o mod com `Write` ou `Bash` e, com ac
 gerenciado com arquivo inexistente falha aberto (célula X2). Limites: API simulada, chave fictícia, sem modelo real, sem login Max. Seis células
 foram escolhidas depois de ver a 1ª rodada, e isso está na Emenda 1 do pré-registro.
 
-**A revisão da curadoria, conferida sem rerodar** (`onion-curation@6ca64f3`, `evidence/lab/out/cells-review.jsonl`): arquivo
+**A revisão da curadoria, conferida sem rerodar** (repositório privado dela, commit `6ca64f3`, `evidence/lab/out/cells-review.jsonl`): arquivo
 gerenciado só com `prependPlugins` vazio, ou só com `managedSourcesBehavior`, não senta a guarda, e o mod fura, 3 de 3 cada. Com
 `cleanupPeriodDays` senta. Logo conta a chave de política, não o arquivo não vazio, e a recomendação do Elenxo, que dizia «não
 vazia», fica registrada como estava no nó selado e corrigida aqui. Regra `deny` com mod que aprova sob bypass também fura, 3 de 3.
 
 O `onFailure: block` está nos 5 vetos do core (`.claude/settings.json`, lido no fechamento): env, protect-main, merge-gate,
 moat-gate e direct-provider-api.
+
+**Medida 3, escrita em `.claude/` e sandbox** (`E_SANDBOX_WRITE_CLAUDE_DIR_SCRIPTED_1104`, `data/sandbox-cell/`, 249 sessões):
+
+- nenhum veto do core barra escrita em `.claude/` sob bypass, por `Write`, `Edit` ou `Bash`, e os 21 contornos passam;
+- sobrescrever a guarda derruba o veto na mesma sessão, 18 de 18; sobrescrever `settings.json` o derruba após 4 s;
+- a regra `deny` de `Edit` em `.claude/` barra `Write`, `Edit`, `tee`, `cp` e redirecionamento simples, mas não `cat` com heredoc, `python` nem nome montado em variável;
+- o sandbox nativo sobe sem gaiola nesta VPS, por falta de `socat`, e o `cat` passa; só `failIfUnavailable` recusa a partida.
+
+Limite: chamadas roteirizadas, não modelo real. A leitura estática do Elenxo se confirmou, e o `Bash` vai junto.
 
 ### CI: a frase estreitou
 
@@ -125,13 +134,19 @@ Thoughtworks Radar Vol. 35 põe agent sandboxing em Adopt, o que é sinal de ana
 - **`blockedMarketplaces` sozinho:** só em conjunto com `disableSideloadFlags` e hook gerenciado.
 - **Os outros 4 vetos do core sob mod:** as duas medidas só exercitam o do `.env`.
 - **Copilot, Gemini e Cursor em modo autônomo:** sem rodagem do Onion. O gatilho exige exatamente isso.
-- **Antigravity:** sem primária. **Goose:** por leitura, em grafo não rastreado (`aaif-projects-onion-2026-11`), citado sem aresta.
-- **Edit ou Write em `.claude/` sob bypass:** as células W1 e W4 mostram a escrita em `.claude/skills/x` passando com os hooks
-  reais, em API simulada; nos demais caminhos de `.claude/` segue só a leitura estática. Não há sandbox configurado, e a cura
-  candidata fica fora desta redação.
+- **Antigravity:** sem primária.
+- **Goose em ferramentas além de shell, em subagentes e com os 5 vetos reais:** a medida é com API simulada e só shell.
+- **`protect-main` e `merge-gate` sob mod:** `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2` fechou pela pergunta sobre o exit 2, e a extensão a esses dois é inferência.
+- **Um modelo real tentando escrever em `.claude/`:** a medida 3 é de chamadas roteirizadas; mede se a chamada é barrada, não se
+  um modelo a tentaria. O sandbox nativo com `socat` instalado não foi medido, e a cura candidata fica fora desta redação.
 - **Agente e comando de plugin sob `allowManagedModsOnly`:** só listados, não invocados.
 - **Capital:** valores do Elenxo sem primária.
 - **Citações de Copilot, Gemini, Cursor e Codex:** vieram por WebFetch mediado por modelo.
+
+## O que este fechamento encerra em outros grafos
+
+- `Q_DOCTRINE_EXIT2_REVIEW_2026_11`, em `aaif-projects-onion-2026-11`: fechada no selo, com aresta entre grafos e as citações a `CLAUDE.md:16` e `:28` presas ao commit `1cf173342`.
+- `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2`, em `vetos-por-tokens-2026-10`: respondida pela medida 1, com os limites no nó.
 
 ## Valeu a pena
 
