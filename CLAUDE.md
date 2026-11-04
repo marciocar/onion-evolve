@@ -12,48 +12,18 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   Desenvolvimento com IA (Pulse Mais), com alunos usando. A decisão de 2026-05-18 foi **parar de
   gastar energia em agnosticismo** para poder usar recursos de fronteira. É conclusão de experimento
   real, não restrição de nascença.
-  **A capacidade que COMPRA o acoplamento** (corrigido em 2026-08-16; **exclusividade retirada em
-  2026-11-04**, decisão do maestro, `D_EXIT2_COUPLING_WORDING_2026_11`): a frase dizia que o **`exit 2`
-  determinístico de hook**, que barra a ação inclusive sob `bypassPermissions`, não existia fora do
-  Claude Code e que nenhum CI o replicava. O veto segue sendo o que barra no core; a exclusividade caiu:
-  - **Por grau de prova.** *Medido:* Codex CLI 0.164.0 barra sob
-    `--dangerously-bypass-approvals-and-sandbox`, com hook confiável (sem confiança, o `codex exec` o pula
-    em silêncio); Qwen Code 0.26.6 barra no caminho feliz; no Mistral Vibe 3.0.4 o `exit 2` só barra com
-    `strict`; Goose 1.57.0 em modo auto barra, libera em falha e barra com `on_failure: block` (API
-    simulada, só shell, sem subagente). *Só por doc:* Copilot CLI, Gemini CLI e Cursor. *Sem medida em
-    nenhum:* Copilot, Gemini e Cursor em modo autônomo; o Antigravity nem tem primária. A medida do Goose
-    não dispara o gatilho abaixo, que exige os 5 vetos reais na mesma bancada.
-  - **O veto é camada de conformidade, não fronteira de segurança.** É conclusão do Onion, não fala da
-    Anthropic. Condições de força: sem chave de política na configuração gerenciada (`{}` ou só chave de
-    controle, como `prependPlugins`, não contam) ou login Team/Enterprise (este, só por doc), **um mod que
-    carrega vence o veto e a regra `deny`, inclusive sob bypass** (o veto, medido em 2.1.318 com login
-    Max, 6 de 6; a `deny`, medida com API simulada). Sob bypass o próprio agente pode gravar o mod em
-    `.claude/skills/` e, com aceite de confiança, a sessão seguinte fura; sem aceite ele não carrega dali,
-    mas em `~/.claude/skills/` carregou mesmo sem aceite. Nenhum veto do core barra escrita em `.claude/` sob bypass, e sobrescrever a guarda tira o veto na mesma
-    sessão (chamadas roteirizadas, 18 de 18). O hook, mesmo gerenciado, **falha aberto** sem
-    `onFailure: block`. E **o que o mod inicia por si não passa pelo gate**: com a guarda de mods sentada,
-    o processo do mod ainda leu o `.env`. Só `allowManagedModsOnly` o parou nas duas vias, `--plugin-dir` e
-    skills do projeto (nesta, o processo só foi medido com a política em conjunto; sozinha, ela recusou o
-    mod que aprova), e `blockedMarketplaces` parou na via de skills, medido em conjunto. Tudo isso, salvo
-    os 6 de 6, medido com API simulada.
-  - **O que nenhum CI replica é só o momento antes da execução na sessão.** Para a `main`, onde o plano
-    dá ruleset, os checks exigidos já cobrem (neste repo, ativo).
-  - **O vazio declarado:** a postura abaixo pede capacidade que não exista fora, e **hoje nenhuma
-    capacidade exclusiva está medida**.
-  - **Gatilho de reabertura da postura:** quando um harness que não seja o Claude Code passar, na mesma
-    bancada, nos 5 vetos reais do core, em caminho feliz, falha e modo autônomo; ou quando o
-    `/meta:cc-update` mudar a regra da guarda.
+  **A capacidade que COMPRA o acoplamento** (exclusividade retirada em 2026-11-04,
+  `D_EXIT2_COUPLING_WORDING_2026_11`): o **`exit 2` determinístico de hook** segue sendo o que barra no
+  core, mas **não é exclusivo** (medido no Codex, no Qwen, no Goose e no Vibe com `strict`) e **é camada
+  de conformidade, não fronteira de segurança** (conclusão do Onion): sem chave de política na
+  configuração gerenciada, um mod que carrega vence o veto e a regra `deny` (login Max, 6 de 6), e o hook
+  falha aberto sem `onFailure: block`. **Hoje nenhuma capacidade exclusiva está medida.** A postura
+  reabre quando outro harness passar nos 5 vetos reais na mesma bancada, ou quando o `/meta:cc-update`
+  mudar a regra da guarda.
 
-  O exemplo antigo era `SendMessage` no modo Teams, e a medição o
-  derrubou: em 2026-08-16 `grep -rn SendMessage .claude` dava **ZERO** — a capacidade **nunca foi
-  exercitada na maquinaria** (em 2026-10-25: 1 menção; ele é o canal vivo entre sessões pelo harness,
-  sem peça do Onion). Acoplamento declarado e não usado é
-  a pior categoria: paga-se o preço doutrinário sem receber a capacidade. E há uma inversão a saber:
-  **o shell agnóstico é o que REPROVA (roda em qualquer CI)** e **o markdown acoplado é o que ACONSELHA**
-  — o fosso do Onion está, de fato, na metade que não precisa de acoplamento nenhum. Os números de
-  2026-08-16 saíram daqui em 2026-11-04, porque a metade shell não se reproduz (`E_OBJECAO_MASSES_STALE`).
-  SSOT: `docs/evolution/research/exit2-coupling-against-2026-11/` e
-  `docs/evolution/research/claude-code-2.1-onion-2026-08/`.
+  O exemplo antigo, `SendMessage`, caiu: zero uso na maquinaria. **O shell agnóstico
+  REPROVA (roda em qualquer CI)** e **o markdown acoplado ACONSELHA**: o fosso não precisa de acoplamento.
+  SSOT: `docs/evolution/research/exit2-coupling-against-2026-11/`.
 - **A postura de acoplamento** (o critério que decide toda adoção de substrato): *acoplado ao Claude
   Code para tirar vantagem da sua estrutura e maquinaria, **mas mantendo independência sempre que
   isso for mais vantajoso e o acoplamento não for necessidade***. Acople só quando a capacidade
