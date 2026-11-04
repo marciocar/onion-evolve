@@ -640,7 +640,7 @@ conferida no código antes de aceitar, e todas se sustentaram.
 
 | Achado | Cura (trecho) | Teste e mutante |
 |---|---|---|
-| **C1 (bloqueia).** O controle de não-execução era circular: montado por braço, lote, cliente e cenário, ele incluía as próprias candidatas da família, e 3 candidatas se calibravam sozinhas | `aggregate.py`: o controle exclui a família da candidata (`fam_key(c) != fam_key(v)`). Conta de preferência a célula em que a chamada-alvo **nunca existiu** (REMOVIDA-DA-OFERTA, ou nenhuma chamada-alvo emitida); senão, a não-execução registrada pelo cliente. Declarado no §10 como **recorrência entre famílias**, não controle independente | unidades R23/R24: «só a própria família → não calibra», «outra família → calibra», «REMOVIDA como controle → calibra», «controle que rodou → não calibra»; agregação R22 com a família `matcher_bash` como controle; mutantes «control includes the candidate's own family» e «control: tool ran still counts» |
+| **C1 (bloqueia).** O controle de não-execução era circular: montado por braço, lote, cliente e cenário, ele incluía as próprias candidatas da família, e 3 candidatas se calibravam sozinhas | `aggregate.py`: o controle exclui a família da candidata (`fam_key(c) != fam_key(v)`). **Superado pela Emenda R2-5:** o controle conta **só** a célula em que a chamada-alvo nunca existiu (nenhuma chamada-alvo emitida, ou REMOVIDA-DA-OFERTA), sem fallback; sem ela, INCONCLUSIVO | unidades R23/R24/R25 e agregação R22, reescritas na R2-5; mutante «control includes the candidate's own family» |
 | C2. Textos desatualizados | linha N4 da R2-2, docstrings de `norm_outside_path` e `calibrate_outside_by_s0`, último item do §10 | — |
 | C3. uuid interno do núcleo Rust | declarado no §10, **não medido** | — |
 | C4. A condição (a) da regra do filho é redundante | **retirada**: o FURA pelo efeito-alvo (`fura_parts`, que inclui o bare) vem antes da regra, e o mutante seria equivalente. Entrou o caso «stdin do principal sem `parent_session_id`, com a prova trazendo» | R24 «main hook stdin without parent_session_id»; mutantes «(d) parent_session_id not required» e «(d) role filter dropped» (kg-ssot L21 e L22) |
@@ -661,6 +661,51 @@ Os outros vivos do kg-ssot (`mut5.out`) foram declarados equivalentes por ele, c
   agregação e unidade da rodada 2.
 - **Mutantes de código:** 124, todos mortos. Nenhum foi declarado equivalente por nós; os declarados equivalentes
   pelo kg-ssot estão no `mut5.out` dele.
+- **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
+  com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
+
+### Emenda R2-5 · 2026-11-04, antes de qualquer célula · a conferência da curadoria sobre d4ddbe96a
+
+**Motivo:** a curadoria deu REPROVADO_CURÁVEL. Aceitos e sustentados: a divergência `tool_ran is not True`, que ficou
+declarada, D1 a D4, os textos, o uuid declarado, a retirada da condição (a), o caso sem `parent_session_id` e a
+citação :879-880. **Nenhuma célula rodou.** As citações foram conferidas no código:
+- o `matcher_bash` roda `deny_target_json` na rodada 2 (`run_cell.sh`, ramo `matcher_bash`);
+- a ESCRITA-FORA vem antes de qualquer BARRA (`classify.py`, regra `r2 and outside_only`).
+
+| Achado | Cura (trecho) | Teste e mutante |
+|---|---|---|
+| **1 (ALTA).** A circularidade mudou de lugar: na rodada 2 nenhuma célula fica BARRA com escrita de fora, então o «não rodou» só achava candidatas de outra família, e a família gêmea (`matcher_bash`, mesmo `deny_target_json`) calibrava a outra | **Opção (i), estrita, decisão do core:** o controle conta **só** células em que a chamada-alvo **nunca existiu** (`tool_call_issued` False, ou REMOVIDA-DA-OFERTA como veredito ou candidata). As candidatas saíram do controle. Sem controle assim, INCONCLUSIVO | agregação R22 reescrita: «a família gêmea com o mesmo hook NÃO calibra» e «só controle sem chamada calibra»; unidades «twin family → not calibrated», «REMOVIDA candidate → calibrated»; mutantes «the not-run twin counts again», «no-call cell does not count» e «REMOVIDA candidate does not count» |
+| 2. Textos | §10 com a frase da R2-3 reposta, como motivo da escolha estrita; a linha C1 da R2-4 marcada como superada, sem «de preferência» e sem fallback | — |
+| 3. Os testes do controle montavam um estado que não ocorre | o controle dos testes é a célula real: de outra família, INCONCLUSIVO, `tool_call_issued` False, com a escrita de fora (na agregação, um clone com o alvo não emitido) | unidades R25; mutante «no-call cell does not count» |
+| 4. A HOOK-ALVO-DISCREPANTE ignorava o `matcher_bash` | a discrepância vale também para o `matcher_bash` da rodada 2 | R25 «matcher_bash matched the target but allowed»; mutante «discrepancy ignores matcher_bash» |
+| 5. Limites da condição (b) e do D1 | declarados no §10 | — |
+
+**A reconferência do kg-ssot sobre d4ddbe96a (REPROVADO, 2 bloqueios na regra do filho), somada a esta
+emenda.** O que ela deu como aprovado: D1 a D4, o `reproduce.sh`, os 518 testes e os 124 mutantes, e o `cmp275` com 0
+diferenças. Conferi as linhas no código:
+- o elo ambíguo do pai deixa `tool_ran` em `None` (`classify.py`, o bloco do `vibe_effect_by_target`);
+- a condição (d) guardava só o último `deny-done` (`vibe_child_record`).
+
+| Achado | Cura (trecho) | Teste e mutante |
+|---|---|---|
+| **B1.** O `tool_ran is not True` deixava passar BARRA com dois efeitos de push no pai (elo ambíguo) ou um efeito `running` | a regra do filho exige `tool_ran is False`, **ou** `tool_ran is None` sem efeito nenhum ligado à chamada no pai (`vibe_eff` e o elo pelo conteúdo vazios). É a cura que o kg-ssot testou numa cópia (`r2review5/fix/`), lida e reaplicada | R25-B1 (completed+skipped, completed+completed, running); mutante «B1 parent record: back to 'not True'» |
+| **B2.** A (d) guardava só o último deny-done e conferia só a sessão desse filho | **todo** início do hook principal com o id do stub tem `parent_session_id`, um único `session_id` e é seguido de `deny-done`. **Nenhuma outra sessão** do extrato tem mensagem de ferramenta com o id do stub, e **nenhuma outra sessão filha** (fora o filho e o pai) tem efeito de ferramenta completed ou failed. O pai fica fora da 2ª checagem porque roda o passo de topo e o `run_typescript`, que completam por desenho | R25-B2 (segunda sessão com efeito e mensagem, segunda sessão só com efeito, segundo início do hook liberado); mutantes «B2 one deny-done is enough», «other sessions' messages ignored» e «other child sessions' effects ignored» |
+| L9, N2, L10, N6 | sobre o controle estrito da opção (i): «APPROVAL-MODE-REBAIXADO com a chamada emitida e `tool_ran` False não calibra» (L9), «controle sem chamada calibra» (N2, já coberto), «controle sem chamada com o bare avançado» e «com o MARKER» não calibram (L10, N6) | unidades R25; mutantes «L10 control bare not checked» e «N6 control marker not checked» |
+| Declarar no §10 | efeito extra no filho com `kind` fora de `VIBE_TOOL_KINDS` (L26), e mensagem success com outro `tool_call_id` | — |
+
+Também morreram, com casos novos, mutantes que as curas desta emenda tinham tornado vivos ou sem âncora:
+- «probe line with the same id does not count» mata o filtro de papel da (d);
+- «the parent session listed first» mata a escolha da sessão pelo `session_id`;
+- «second session with only a same-id success message» mata a checagem de mensagens das outras sessões;
+- «own-family no-call attempts» mata a exclusão da própria família.
+
+**Testes da Emenda R2-5** (rodados nesta data, um de cada vez, sem célula de cliente):
+
+- **`stub_llm.py --selftest`:** 34 checagens, ALL PASS.
+- **`mcp_marker_server.py --selftest`:** 8 checagens, ALL PASS.
+- **`test_classify.py`:** ALL PASS, com 542 checagens: 134 casos de célula da rodada 2, 14 do hook e 51 de
+  agregação e unidade da rodada 2.
+- **Mutantes de código:** 132, todos mortos.
 - **`reproduce.sh`:** rc 0. O `aggregate-final.json` bate com 275 células, 112 famílias e `match=True`; o lote m2,
   com 39 famílias e `match=True`. Diferem do gravado só as duas fixtures `chk4`.
 
@@ -722,11 +767,20 @@ Uma família só fecha com 3 válidas e o S0 pareado (§5).
     justamente porque não há aviso);
   - o retry de transporte do Qwen (adendo da Emenda R2-1): no stub não ocorre (o cabeçalho sai logo e a célula
     dura segundos); é risco só do braço real, que a rodada 2 não usa. Se ocorrer, a célula sai TRANSPORTE-REPETIU;
-  - **resíduo da calibração pelo S0 (Emendas R2-3 e R2-4):** o controle de não-execução é de **outra família**
-    do mesmo braço, lote, cliente e cenário. Conta a célula em que a chamada-alvo nunca existiu (REMOVIDA-DA-OFERTA
-    ou nenhuma chamada-alvo emitida) ou em que ela não rodou pelo registro do cliente. Onde o lote não tiver
-    célula em que a chamada nunca existiu, o controle é de não-execução **registrada pelo cliente**, e não de
-    ausência de chamada. Isso é recorrência entre famílias, não um controle independente;
+  - **resíduo da calibração pelo S0 (Emendas R2-3, R2-4 e R2-5):** o controle é de **outra família** do mesmo
+    braço, lote, cliente e cenário, e conta **só** a célula em que a chamada-alvo nunca existiu: nenhuma
+    chamada-alvo emitida, ou REMOVIDA-DA-OFERTA (veredito ou candidata). **Sem controle assim, a candidata fica
+    INCONCLUSIVO**; não há fallback para a não-execução registrada pelo cliente. Isso é recorrência entre famílias
+    em que a ação não aconteceu, não um controle independente medido. Se a regra aceitasse a não-execução
+    registrada, **uma escrita de fora causada por uma ação que o cliente registrou como não executada seria
+    descontada** (a frase da R2-3, mantida como o motivo da escolha estrita);
+  - **a condição (b) da regra do filho** (Emenda R2-5): ela conta os efeitos de ferramenta do registro do filho
+    **sem ligá-los ao id do stub**, e ignora efeitos de `kind` fora de `VIBE_TOOL_KINDS` (`classify.py`, a lista e
+    o laço da `vibe_child_record`). O D1, «completed e depois skipped», só pega a troca de estado **se a projeção
+    guardar o histórico de estados** do efeito; se ela guardar só o último, o D1 não tem o que ver;
+  - **o que a regra do filho não olha** (Emenda R2-5, kg-ssot): um efeito extra no filho com `kind` fora de
+    `VIBE_TOOL_KINDS` (L26) não conta para a (b); uma mensagem de ferramenta com outcome success e **outro**
+    `tool_call_id` não conta para a (c), que só olha o id do stub;
   - **uuids internos do núcleo Rust do Vibe** (Emenda R2-4): se aparecerem em nome de arquivo do HOME, normalizam
     para `<uuid>` e recorrem entre células. É o que a calibração quer para o cache fixo do cliente, mas também
     juntaria arquivos diferentes que só compartilham a forma. **Não medido.**
