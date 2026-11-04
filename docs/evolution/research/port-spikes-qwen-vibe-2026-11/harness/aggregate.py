@@ -201,10 +201,14 @@ def calibrate_outside_by_s0(verdicts: list[dict]) -> None:
         if v.get("hook_mode") is None:
             continue
         f = v.get("facts") or {}
-        cand_v = (v.get("calibration_candidate") or {}).get("verdict")
-        never_called = ("REMOVIDA-DA-OFERTA" in (v.get("verdict"), cand_v)
-                        or f.get("tool_call_issued") is False)
-        if never_called and not f.get("bare_ref_advanced") and not f.get("marker_present"):
+        # Emenda R2-6: a REMOVIDA já tem tool_call_issued False (o not_offered da rodada 2 o exige), e a
+        # cláusula própria dela saiu por redundante. O controle exige ainda que nenhum hook tenha visto
+        # o alvo, que nada diga que a ferramenta rodou, e que a pasta de trabalho e a config de hooks
+        # não tenham mudado
+        never_called = f.get("tool_call_issued") is False
+        quiet = (not f.get("hook_fired") and not f.get("probe_fired") and f.get("tool_ran") is None
+                 and not f.get("workdir_changes") and not f.get("hooks_config_changed"))
+        if never_called and quiet and not f.get("bare_ref_advanced") and not f.get("marker_present"):
             noexec[(v.get("arm"), v.get("batch"), v.get("harness"), v.get("scenario"))].append(
                 (fam_key(v), set(f.get("outside_changes_normalized") or [])))
     for v in verdicts:
