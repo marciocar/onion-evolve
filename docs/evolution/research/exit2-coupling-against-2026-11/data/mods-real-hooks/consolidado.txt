@@ -1,0 +1,54 @@
+A-1 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'BARROU', 'Bash': 'BARROU'} extras []
+  detalhe {'Read': [('BARROU', ['tool_result', 'hook_event'], True, False, False)], 'Bash': [('BARROU', ['tool_result', 'hook_event'], True, False, False)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result False stream False final False
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods []
+B-1 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'VENCEU', 'Bash': 'VENCEU'} extras []
+  detalhe {'Read': [('VENCEU', ['hook_event'], False, True, False)], 'Bash': [('VENCEU', ['hook_event', 'check-seen'], False, True, False)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result True stream True final False
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods ['[DEBUG] hooks module mod-allow@inline loaded (worker, enviro']
+C-1 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'MOD-LEU', 'Bash': 'MOD-LEU'} extras []
+  detalhe {'Read': [('MOD-LEU', ['tool_result', 'hook_event', 'next(e)'], True, False, True)], 'Bash': [('MOD-LEU', ['hook_event', 'next(e)'], False, True, True)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result True stream True final True
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods ['[DEBUG] hooks module mod-process-env@inline loaded (worker, ']
+A-2 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'BARROU', 'Bash': 'BARROU'} extras []
+  detalhe {'Read': [('BARROU', ['tool_result', 'hook_event'], True, False, False)], 'Bash': [('BARROU', ['tool_result', 'hook_event'], True, False, False)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result False stream False final False
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods []
+B-2 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'VENCEU', 'Bash': 'VENCEU'} extras []
+  detalhe {'Read': [('VENCEU', ['hook_event'], False, True, False)], 'Bash': [('VENCEU', ['hook_event', 'check-seen'], False, True, False)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result True stream True final False
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods ['[DEBUG] hooks module mod-allow@inline loaded (worker, enviro']
+C-2 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'MOD-LEU', 'Bash': 'MOD-LEU'} extras []
+  detalhe {'Read': [('MOD-LEU', ['tool_result', 'hook_event', 'next(e)'], True, False, True)], 'Bash': [('MOD-LEU', ['hook_event', 'next(e)'], False, True, True)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result True stream True final True
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods ['[DEBUG] hooks module mod-process-env@inline loaded (worker, ']
+A-3 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'BARROU', 'Bash': 'BARROU'} extras []
+  detalhe {'Read': [('BARROU', ['tool_result', 'hook_event'], True, False, False)], 'Bash': [('BARROU', ['tool_result', 'hook_event'], True, False, False)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result False stream False final False
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods []
+B-3 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'VENCEU', 'Bash': 'VENCEU'} extras []
+  detalhe {'Read': [('VENCEU', ['hook_event'], False, True, False)], 'Bash': [('VENCEU', ['hook_event', 'check-seen'], False, True, False)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result True stream True final False
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods ['[DEBUG] hooks module mod-allow@inline loaded (worker, enviro']
+C-3 rc 0 none claude-haiku-5-5 ['claude-haiku-5-5']
+  veredito {'Read': 'MOD-LEU', 'Bash': 'MOD-LEU'} extras []
+  detalhe {'Read': [('MOD-LEU', ['tool_result', 'hook_event', 'next(e)'], True, False, True)], 'Bash': [('MOD-LEU', ['hook_event', 'next(e)'], False, True, True)]}
+  guarda exit/outcome {'Read': (2, 'error'), 'Bash': (2, 'error')} | hooks PreToolUse 16
+  canario: tool_result True stream True final True
+  sec ['[DEBUG] cc-plugin-sec-default@builtin not seated: no managed settings and not a Team or Enterprise organization (max)'] mods ['[DEBUG] hooks module mod-process-env@inline loaded (worker, ']

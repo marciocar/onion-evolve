@@ -12,16 +12,40 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   Desenvolvimento com IA (Pulse Mais), com alunos usando. A decisão de 2026-05-18 foi **parar de
   gastar energia em agnosticismo** para poder usar recursos de fronteira. É conclusão de experimento
   real, não restrição de nascença.
-  **A capacidade que COMPRA o acoplamento** (corrigido em 2026-08-16, medido): o **`exit 2`
-  determinístico de hook**, que barra a ação inclusive sob `bypassPermissions` — isso não existe fora
-  do Claude Code e nenhum CI replica. O exemplo antigo era `SendMessage` no modo Teams, e a medição o
+  **A capacidade que COMPRA o acoplamento** (corrigido em 2026-08-16; **exclusividade retirada em
+  2026-11-04**, decisão do maestro, `D_EXIT2_COUPLING_WORDING_2026_11`): a frase dizia que o **`exit 2`
+  determinístico de hook**, que barra a ação inclusive sob `bypassPermissions`, não existia fora do
+  Claude Code e que nenhum CI o replicava. O veto segue sendo o que barra no core; a exclusividade caiu:
+  - **Por grau de prova.** *Medido:* Codex CLI 0.164.0 barra sob
+    `--dangerously-bypass-approvals-and-sandbox`, com hook confiável; Qwen Code 0.26.6 barra no caminho
+    feliz; no Mistral Vibe 3.0.4 o `exit 2` só barra com `strict`. *Só por doc:* Copilot CLI, Gemini CLI
+    e Cursor. *Só por leitura:* Goose. *Sem medida em nenhum:* Copilot, Gemini e Cursor em modo
+    autônomo; o Antigravity nem tem primária.
+  - **O veto é camada de conformidade, não fronteira de segurança.** É conclusão do Onion, não fala da
+    Anthropic. Condições de força: sem configuração gerenciada não vazia ou login Team/Enterprise (este,
+    só por doc), **um mod que carrega vence o veto** (medido em 2.1.318 com login Max, 6 de 6; sob bypass
+    o próprio agente pode gravá-lo e a sessão seguinte fura, medido com API simulada); o hook comum
+    **falha aberto** sem `onFailure: block`; e **o que o mod inicia por si não passa pelo gate**: com a
+    guarda de mods sentada, o processo do mod ainda leu o `.env`, e só `allowManagedModsOnly` ou
+    `blockedMarketplaces` o pararam (medido com API simulada).
+  - **O que nenhum CI replica é só o momento antes da execução na sessão.** Para a `main`, o ruleset com
+    checks exigidos já cobre.
+  - **O vazio declarado:** a postura abaixo pede capacidade que não exista fora, e **hoje nenhuma
+    capacidade exclusiva está medida**.
+  - **Gatilho de reabertura da postura:** quando um harness que não seja o Claude Code passar, na mesma
+    bancada, nos 5 vetos reais do core, em caminho feliz, falha e modo autônomo; ou quando o
+    `/meta:cc-update` mudar a regra da guarda.
+
+  O exemplo antigo era `SendMessage` no modo Teams, e a medição o
   derrubou: em 2026-08-16 `grep -rn SendMessage .claude` dava **ZERO** — a capacidade **nunca foi
   exercitada na maquinaria** (em 2026-10-25: 1 menção; ele é o canal vivo entre sessões pelo harness,
   sem peça do Onion). Acoplamento declarado e não usado é
   a pior categoria: paga-se o preço doutrinário sem receber a capacidade. E há uma inversão a saber:
-  medidas as massas, **26.596 linhas de shell agnóstico (o que REPROVA, roda em qualquer CI)** contra
-  **52.655 de markdown acoplado (o que ACONSELHA)** — o fosso do Onion está, de fato, na metade que
-  não precisa de acoplamento nenhum. SSOT: `docs/evolution/research/claude-code-2.1-onion-2026-08/`.
+  **o shell agnóstico é o que REPROVA (roda em qualquer CI)** e **o markdown acoplado é o que ACONSELHA**
+  — o fosso do Onion está, de fato, na metade que não precisa de acoplamento nenhum. Os números de
+  2026-08-16 saíram daqui em 2026-11-04, porque a metade shell não se reproduz (`E_OBJECAO_MASSES_STALE`).
+  SSOT: `docs/evolution/research/exit2-coupling-against-2026-11/` e
+  `docs/evolution/research/claude-code-2.1-onion-2026-08/`.
 - **A postura de acoplamento** (o critério que decide toda adoção de substrato): *acoplado ao Claude
   Code para tirar vantagem da sua estrutura e maquinaria, **mas mantendo independência sempre que
   isso for mais vantajoso e o acoplamento não for necessidade***. Acople só quando a capacidade

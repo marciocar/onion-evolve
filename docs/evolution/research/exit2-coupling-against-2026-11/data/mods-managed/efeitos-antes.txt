@@ -1,0 +1,12 @@
+⟨home⟩/.claude/settings.json 1793153151 4984
+ls: cannot access '/etc/claude-code': No such file or directory
+88793c4a9b806d13b0279e9a5fbee15cdec33834
+ M .claude/session-lifecycle.jsonl
+ M docs/onion/metrics/gtm-context-freshness-metric.jsonl
+ M docs/onion/metrics/gtm-cycle-completion.jsonl
+ M docs/onion/metrics/gtm-federation-engagement.jsonl
+ M docs/onion/metrics/gtm-session-velocity.jsonl
+?? docs/evolution/research/aaif-projects-onion-2026-11/
+?? docs/evolution/research/vibe-subagent-2026-11/
+113
+0

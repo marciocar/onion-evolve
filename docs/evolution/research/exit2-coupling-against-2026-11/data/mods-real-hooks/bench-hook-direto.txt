@@ -1,0 +1,4 @@
+GUARDA-PRETOOLUSE (.env): Read de um arquivo .env (arquivo d
+rc=2
+GUARDA-PRETOOLUSE (.env): 'cat' lendo .env — o conteúdo d
+rc=2

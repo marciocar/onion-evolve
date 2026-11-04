@@ -97,7 +97,7 @@ if skills:
 if hooks:
     out.append("## Hooks\n\n| Evento | Script |\n|---|---|")
     out += [f"| `{esc(e)}` | `{esc(s)}` |" for e,s in hooks]; out.append("")
-    out.append("Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é a capacidade que só existe no Claude Code. Nenhum envia dados para fora; todos rodam local.\n")
+    out.append("Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2`: é camada de conformidade, não fronteira de segurança, e sem configuração gerenciada um mod carregado vence o veto. Nenhum envia dados para fora; todos rodam local.\n")
 out.append("## Requisitos\n\n- Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.\n- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `meta:adopt` (comando do core, não distribuído por plugin) no repositório-fonte.\n")
 # Só campos CONTENT-STABLE aqui: ref/commit_date mudam a cada commit e fariam o README driftar (REGRA 19 acusou no CI, 2026-09-04).
 out.append("## Proveniência\n\n| Campo | Valor |\n|---|---|\n| Origem | %s |\n| tree_sha (hash do conteúdo das fontes) | `%s` |\n\nA origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é %s. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.\n" % (source_label(prov.get("repository")), str(prov.get("tree_sha","?"))[:12], PUBREPO))

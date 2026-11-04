@@ -58,7 +58,7 @@ L.append("| Validar (dev) | `/plugin validate ./plugins/onion` | `claude plugin 
 L.append("")
 L.append("**Política de versão.** A versão de cada plugin é **derivada do conteúdo** (`0.1.<N>`, N = commits que tocaram as fontes canônicas): ela anda exatamente quando o conteúdo anda, e o `plugin update` — que compara versões, não conteúdo — enxerga a mudança. A entrada do marketplace não repete a versão: o `plugin.json` é a autoridade (recomendação oficial).\n")
 L.append("## Requisitos\n")
-L.append("- Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`).\n- `bash`, `git`, `awk`; `python3` para os motores de grafo e censos; `jq` opcional.\n- Os hooks são scripts locais e determinísticos; podem vetar uma ação com `exit 2` (é a capacidade que só o Claude Code oferece). Nenhum envia dados para fora.\n")
+L.append("- Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`).\n- `bash`, `git`, `awk`; `python3` para os motores de grafo e censos; `jq` opcional.\n- Os hooks são scripts locais e determinísticos; podem vetar uma ação com `exit 2` (camada de conformidade, não fronteira de segurança: sem configuração gerenciada, um mod carregado vence o veto). Nenhum envia dados para fora.\n")
 L.append("## O que este canal é — e o que não é\n")
 L.append("- **É** instalação de capacidade: read-only, versionada, atualizável, removível. Os seus grafos de conhecimento são **seus** (o plugin traz o motor; você constrói o SSOT).\n- **Não é** adoção/vendorização: para ter o Onion dentro do repositório (customizável, com co-evolução), o canal é `meta:adopt` (comando do core) no repositório-fonte.\n- **Não vem** a meta-fábrica (gerar novos comandos/verticais/adotantes) nem os grafos privados do core — por desenho (moat).\n")
 L.append("## Estrutura de cada plugin\n")

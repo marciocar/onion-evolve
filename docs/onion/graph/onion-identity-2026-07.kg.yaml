@@ -16,6 +16,9 @@ external_edges:
   - from: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
     to: D_FAMILIA_TEM_TRES_REGIMES_2026_09
     edge_type: CONSTRAINS
+  - from: C_EXIT2_CONFORMIDADE_SEM_EXCLUSIVIDADE_1104
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
+    edge_type: TRACES_TO
 nodes:
   # ---- perguntas de pesquisa (F2) ----
   - id: Q_IDENTITY
@@ -990,6 +993,23 @@ nodes:
       method: "medição: grep -n \"mantendo independência sempre que\" CLAUDE.md em origin/main cffe09fe → l.25"
       locality: "repo"
 
+  - id: C_EXIT2_CONFORMIDADE_SEM_EXCLUSIVIDADE_1104
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-11-04"
+    verified_against: "selo do maestro de 2026-11-04 em D_EXIT2_COUPLING_WORDING_2026_11 e as duas medidas do mesmo grafo; CLAUDE.md, trecho da capacidade que compra o acoplamento"
+    label: "Limite à postura de acoplamento: o exit 2 de hook não é exclusivo do Claude Code, é camada de conformidade e não fronteira de segurança, e hoje nenhuma capacidade exclusiva está medida. A postura segue, com gatilho de reabertura nomeado."
+    narrative: "A postura em si não muda: C_POSTURA_ACOPLAMENTO segue confirmada, e por isso este nó a restringe em vez de superá-la. O que muda é a capacidade que a justificava. Gatilho, selado pelo maestro: reabrir a postura quando um harness que não seja o Claude Code passar, na mesma bancada, nos 5 vetos reais do core, em caminho feliz, falha e modo autônomo; ou quando /meta:cc-update mudar a regra da guarda de mods. A correção de 2026-08-16 e a ADR de superação ficam como história datada."
+    trace: "docs/evolution/research/exit2-coupling-against-2026-11/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml"
+      locator: "nó D_EXIT2_COUPLING_WORDING_2026_11, opção escolhida: C com o gatilho da D"
+      method: "derived: da decisão selada pelo maestro e das medidas E_MAESTRO_MOD_BEATS_VETO_LOGIN_MAX_1104 e E_MODS_MANAGED_CONTAINER_STUB_1104"
+      locality: "repo"
   - id: C_CORE_NAO_E_FAMILIA
     node_type: claim
     layer: audit
@@ -1762,3 +1782,6 @@ edges:
   - from: E_REVERIFY_DOGFOOD_VALUE_PRS_1027
     to: C_DOGFOOD_VALUE
     edge_type: SUPPORTS
+  - from: C_EXIT2_CONFORMIDADE_SEM_EXCLUSIVIDADE_1104
+    to: C_POSTURA_ACOPLAMENTO
+    edge_type: CONSTRAINS

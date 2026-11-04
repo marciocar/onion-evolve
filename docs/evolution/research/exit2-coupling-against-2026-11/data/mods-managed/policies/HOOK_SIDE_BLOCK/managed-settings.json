@@ -1,0 +1,21 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /etc/claude-code/hooks/managed-env-veto.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "disableSideloadFlags": true,
+  "blockedMarketplaces": [
+    {
+      "source": "skills-dir"
+    }
+  ]
+}
