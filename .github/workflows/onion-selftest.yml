@@ -218,6 +218,28 @@ jobs:
         timeout-minutes: 22
         run: |
           set -o pipefail
+          # DIAGNÓSTICO DO #1461, só nesta branch (o PR fecha sem merge): a cada 20 s, os maiores processos e os
+          # maiores arquivos, inclusive os abertos e já apagados, para nomear quem enche o disco.
+          ( while :; do
+              echo "=== $(date +%s) livre_kb=$(df --output=avail "${TMPDIR:-/tmp}" | tail -1)"
+              ps -eo pid,ppid,etimes,pcpu,rss,args --sort=-pcpu | head -12 | cut -c1-260
+              find "${TMPDIR:-/tmp}" "${GITHUB_WORKSPACE}" -xdev -type f -size +100M -printf 'ARQ %s %p\n' 2>/dev/null | sort -k2 -n -r | head -8
+              python3 -I -c "
+          import os
+          rows = []
+          for pid in filter(str.isdigit, os.listdir('/proc')):
+              try:
+                  for fd in os.listdir(f'/proc/{pid}/fd'):
+                      st = os.stat(f'/proc/{pid}/fd/{fd}')
+                      if st.st_size > 100 * 1024 * 1024:
+                          rows.append((st.st_size, pid, fd, os.readlink(f'/proc/{pid}/fd/{fd}'), open(f'/proc/{pid}/cmdline').read().replace(chr(0), ' ')[:200]))
+              except OSError:
+                  pass
+          for r in sorted(rows, reverse=True)[:8]:
+              print('FD', *r)
+          "
+              sleep 20
+            done ) > "${GITHUB_WORKSPACE}/selftest-disk-sampler.log" 2>&1 &
           bash .claude/validation/lint-selftest.sh --jobs auto \
             --families "${{ matrix.faixa.familias }}" \
             --report "${GITHUB_WORKSPACE}/selftest-report.tsv" \
@@ -244,6 +266,7 @@ jobs:
             selftest.log
             selftest-report.tsv
             selftest-disk.tsv
+            selftest-disk-sampler.log
           if-no-files-found: warn
           retention-days: 30
 
