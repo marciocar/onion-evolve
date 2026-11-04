@@ -950,12 +950,6 @@
 | 2.4 | `C_SUPERACAO_20261021_SCF_2026_3_NUMBERING_IN_ERL` | audit-evidence-machinery-2026-10 | A página do ERL do SCF já numera os mapeamentos em 2026.3 e rotula o esquema anterior como Legacy; a 2026.2 da página de downlo |
 | 2.4 | `C_SUPERACAO_20261021_TRESTLE_V5_2_0_LATEST_AND_TRACKS` | audit-evidence-machinery-2026-10 | O cabeçalho 'v5.2.0 (2026-10-05)' marcado Latest na página de Releases do trestle, mais 'stable (actively developed)' para v5 e  |
 
-## port-spikes-qwen-vibe-2026-11 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 14.4 | `Q_PORT_SPIKES_RODADA_2_LACUNAS_1104` | port-spikes-qwen-vibe-2026-11 | Rodada 2: o veto de hook vale sobre ferramenta MCP, dentro do subagente e contra os contornos ao matcher Bash (tool_call no Qwen;  |
-
 ## radar-E3-2026-10-03-r6 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1036,6 +1030,12 @@
 | 2.4 | `C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER` | merge-process-onion-2026-10 | OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa dri |
 | 2.0 | `C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT` | merge-process-onion-2026-10 | OPÇÃO K — contrarian: trunk direto sem fila e sem projeção commitada. Elenxo: REJEITAR — o core passa no critério time pe |
 | 1.0 | `C_OPCAO_J_STACKED_PRS_GRAPHITE` | merge-process-onion-2026-10 | OPÇÃO J — stacked PRs / Graphite. Elenxo: REJEITAR — a dor medida é de arquivo-ímã, não de dependência entre PRs. |
+
+## port-spikes-qwen-vibe-2026-11 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.0 | `Q_PORT_SPIKES_RODADA_2_LACUNAS_1104` | port-spikes-qwen-vibe-2026-11 | Rodada 2: o veto de hook vale sobre ferramenta MCP, dentro do subagente e contra os contornos ao matcher Bash (tool_call no Qwen;  |
 
 ## dissect-forge-2026-10 — 2 item(ns)
 

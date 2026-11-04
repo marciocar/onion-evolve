@@ -2,7 +2,8 @@
 branch: docs/port-spikes-r2-prereg
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6baf036c6893c432ce8138bae6afeef53deb9ab8dabaaf0dbb9b8274dc300b9f
+reviewed_code_sha256: 032f4ba59ffc120f91247489a08673024e06deeda7296c45ea1a5717f792353c
 findings_total: 0
 findings_real: 0
 tokens: 0
