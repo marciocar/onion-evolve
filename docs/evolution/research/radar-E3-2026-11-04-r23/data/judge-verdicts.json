@@ -1,0 +1,356 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "data/2.1.318.txt não bate byte a byte com a seção ## 2.1.318 do CHANGELOG oficial, ou um label/verified_against cita entre «» texto do item que não está lá",
+   "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '$0==\"## 2.1.318\"{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-11-04-r23/data/2.1.318.txt; e, para cada citação entre «», grep -F do trecho em data/2.1.318.txt"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando citado em verified_against, re-executado no vivo, devolve outro número ou outro estado",
+   "check": "re-executar a medição do nó: claude --version; npm view do SDK e do CLI; gh api commits/<tag> da claude-code-action; currency-census.sh; readlink do executável dos processos de pgrep -u <conta> -x claude; claude auth status (só as chaves e o prazo); a família cited_directive; claude plugin validate --strict .; grep -n nas linhas citadas"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) a casa sem nomear a superfície medida, ou a superfície citada não existe ou não faz o que o nó diz",
+   "check": "ler o label e o verified_against e conferir no core (grep/ls/leitura do hook ou do script, número de linha por grep -n) que a superfície existe e se comporta como afirmado"
+  },
+  {
+   "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+   "when": "a rodada supera um nó da r22 que não existe ou cujo estado afirmado ainda vale; ou deixa de superar um nó da r22 cujo estado a medição de hoje derrubou",
+   "check": "grep -n 'id: <NO>' docs/evolution/research/radar-E3-2026-11-03-r22/radar-E3-2026-11-03-r22.kg.yaml e comparar o estado que ele afirma com a medição de hoje (candidatos listados no comentário AUFHEBUNG do grafo da r23)"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item de data/2.1.318.txt toca uma superfície do core (hook, guarda, settings, comando, skill, agente, workflow, CI, bridge, worktree, plugin/marketplace, MCP, adotante) e a rodada não o mediu nem o listou em NÃO-VERIFICADOS",
+   "check": "para cada item de data/2.1.318.txt, grep do termo-chave no core (.claude, ops, .github, CLAUDE.md) e leitura da superfície achada; conferir contra os nós e a lista NÃO-VERIFICADOS da SYNTHESIS"
+  },
+  {
+   "id": "CU6_CAMINHO_DE_MAQUINA_OU_NOME_SENSIVEL",
+   "when": "o grafo ou a SYNTHESIS expõe hostname, IP, nome de cliente, caminho de home de conta fora de citação, ou valor sensível (e-mail, data exata do login, org)",
+   "check": "bash .claude/validation/kg-contract-check.sh <grafo> (MACHINE-PATH, REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe)); grep -n -E '@|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+|/home/' no grafo e na SYNTHESIS"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "CU1: cópia data/2.1.318.txt e citações «» dos nós",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md > CHANGELOG.md; diff <(awk '$0==\"## 2.1.318\"{f=1;print;next} /^## /{f=0} f' CHANGELOG.md) data/2.1.318.txt → vazio (rc 0); wc -l → 87; grep -c '^- ' → 84; python sobre o grafo: cada trecho entre «» com grep -F em data/2.1.318.txt"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "as 9 citações do CHANGELOG entre «» estão verbatim em data/2.1.318.txt; as 5 restantes citam o core ou saída de ferramenta e foram conferidas na fonte: session-version-drift.sh l.45, onion-orchestration/SKILL.md l.69-70 (quebra de linha no meio), saída do currency-census.sh, «OK ✓» da bancada e «✔ Validation passed» do plugin validate"
+   }
+  },
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "claude --version → 2.1.318 (Claude Code); bash .claude/validation/cc-delta-census.sh . --markdown → baseline 2.1.317, disco 2.1.318, processo 2.1.318, SDK bridge 2.1.310 (SDK 0.3.310); 2.1.318 com 87 linhas e 84 itens"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "versões, linhas e itens do esqueleto reproduzem"
+   }
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "leitura do nó (pergunta aberta do esqueleto)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "a pergunta segue aberta; as omissões medidas no veredito CU5 abaixo são o que falta para fechá-la"
+   }
+  },
+  {
+   "alvo": "E_HOST_NA_2_1_318_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "claude --version → 2.1.318; grep -n claude-code-action@ .github/workflows/onion-review.yml → l.301 e l.456 @6d5ae526; gh api repos/anthropics/claude-code-action/commits/v1.0.265 → 6d5ae526…, commits/v1.0.268 → c0949c50…; action.yml/base-action em v1.0.265 nomeiam 2.1.314 e em v1.0.268 nomeiam 2.1.318; package.json da action: ^0.3.314 e ^0.3.318; npm view @anthropic-ai/claude-agent-sdk versions → depois de 0.3.310: 311, 312, 314, 315, 316, 317, 318 (7); grep -n '^## 2.1.31' CHANGELOG.md → 311, 312, 314, 316, 317, 318 (6); cc-delta-census.sh → SDK bridge 2.1.310 (SDK 0.3.310)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "os três números e as duas contagens (7 no npm, 6 seções) reproduzem"
+   },
+   "nota": "O package.json do bridge não é legível pela conta do maestro sem sudo; a versão do binário veio do medidor, que o roda como a conta do serviço."
+  },
+  {
+   "alvo": "Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_318_E_PIN_DO_REVISOR_PARA_V1_0_268_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "npm view @anthropic-ai/claude-agent-sdk version → 0.3.318; gh api repos/anthropics/claude-code-action/commits/v1.0.268 --jq .sha → c0949c50a78c1ec8ce2647db36629b870e715d0c; currency-census.sh → 'a v1.0.268 instala o CLI 2.1.318'"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "alvo, sha e versão do CLI reproduzem"
+   }
+  },
+  {
+   "alvo": "E_CORRECOES_HEADLESS_NAO_CHEGAM_AO_CHAT_DO_BRIDGE_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n 'onion-chat-bin\\|HOME_ROOT' ops/chat-runner.sh → l.202 CLAUDE_SRC (binário do SDK), l.209 HOME_ROOT=…/chat-homes, l.363 ONION_CHAT_HOME_ROOT, l.375 BIND_RO do binário (só leitura); sed -n 634,635p → --output-format/--input-format stream-json; no bridge (origin/main) deploy/chat-runner/launcher.py l.118 só aceita stream-json e l.228-232 dá HOME=<raiz>/<slug>"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "a superfície existe e roda o CLI sem terminal numa home própria; o binário é o 2.1.310 do SDK"
+   },
+   "nota": "Precisão: a home é por WORKSPACE (slug do convidado, launcher l.228), não por chat; e l.634-635 é o handshake do verificador, que reproduz os argumentos do lançamento real. Não muda a conclusão."
+  },
+  {
+   "alvo": "E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_318_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive → rc 0, 'OK ✓ — todas as guardas reagiram conforme esperado' (1m15s de parede, 27.9 s de espera por vaga); readlink -f $(command -v claude) → …/versions/2.1.318"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "reproduz no binário 2.1.318"
+   }
+  },
+  {
+   "alvo": "E_PROCESSOS_EM_BINARIO_DELETADO_NO_HOST_1104",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "for p in $(pgrep -u <conta> -x claude); do tr '\\0' ' ' </proc/$p/cmdline; readlink /proc/$p/exe; done → o 2.1.314 (deleted) é `claude agents` e o 2.1.312 (deleted) é uma conversa `claude` simples; nenhum é `claude remote-control`; ps -u <conta> -o pid=,comm=,args= | grep -E 'bg-spare|bg-pty-host' + readlink /proc/<pid>/exe → 8 processos-reserva de dois `claude daemon run` (comm = a versão, por isso invisíveis a pgrep -x claude), 4 deles em binário apagado (2 em 2.1.312, 2 em 2.1.314)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "o nó reancorado no ator que o item nomeia: o daemon de fundo. Hoje há dois `claude daemon run` na 2.1.318 e quatro processos-reserva deles em binário apagado (2.1.312 e 2.1.314), além de uma conversa na 2.1.312 e da visão `claude agents` na 2.1.314. São 6 processos em binário apagado, não 2. O remoteControlAtStartup liga o Remote Control na sessão interativa, que não é host `claude remote-control`, e não prova o caso do spawn ENOENT",
+    "medida": "ps -u <conta> -o pid=,comm=,args= filtrado por bg-spare|bg-pty-host|daemon|agents, readlink do exe no procfs de cada um: daemons 2.1.318; reservas 2.1.312 (deleted) ×2, 2.1.314 (deleted) ×2, 2.1.318 ×4; pgrep -x claude não as conta porque o comm delas é a string da versão"
+   },
+   "nota": "A correção da 2.1.318 vale para o daemon que roda a 2.1.318 (os dois rodam). As reservas antigas pertencem a daemons já na 2.1.318 e foram pré-lançadas antes da subida. Não medi se o daemon as reaproveita ou descarta."
+  },
+  {
+   "alvo": "E_DICA_DO_HOOK_DE_DERIVA_MANDA_CONTINUE_1104",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n -- '--continue' .claude/hooks/session-version-drift.sh .claude/validation/currency-census.sh .claude/validation/lint-artifacts.sh → l.45, l.247, l.5136 (as três existem); tr '\\0' ' ' </proc/<pid>/cmdline do processo em 2.1.314 (deleted) → `claude agents`, não uma conversa; processos de conversa na janela da regressão (2.1.314–2.1.317): um só, `claude --resume` na 2.1.316"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "rótulo corrigido: o processo na 2.1.314 é a visão `claude agents`, que não tem conversa a continuar nem recebe o hook de UserPromptSubmit. A conversa viva na janela da regressão é um `claude --resume` na 2.1.316. Quem seguir a receita hoje relança o binário do disco, que é o 2.1.318 e já traz a correção",
+    "medida": "cmdline e exe de cada processo `claude` da conta: 2.1.314 (deleted) = `claude agents`; 2.1.316 = `claude --resume` (sessão de um repo peer); readlink -f $(command -v claude) → 2.1.318"
+   },
+   "nota": "As três superfícies que mandam usar --continue existem e estão citadas com as linhas certas. O exagero está só em quem segue a receita."
+  },
+  {
+   "alvo": "Q_CENSO_DE_SESSOES_EM_BINARIO_DELETADO_1104",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "pgrep -u <conta> -x claude → 9 (2 deleted); ps -u <conta> -o pid=,comm=,args= + readlink /proc/<pid>/exe de todos → mais 8 processos-reserva do daemon (comm = versão), 4 deleted; total em binário apagado = 6"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "pergunta reescrita: o censo lista os processos da conta pelo executável (readlink do exe no procfs, sufixo deleted), não pelo nome claude. Hoje são 6: uma conversa, a visão claude agents e quatro reservas do daemon. As reservas se renovam reiniciando o daemon, não a sessão",
+    "medida": "comparação pgrep -x claude (2 deleted) contra ps -o comm + readlink do exe (6 deleted); o comm das reservas é a string da versão (2.1.312, 2.1.314), e por isso o filtro por nome não as vê"
+   },
+   "nota": "A premissa sobre o hook procede: session-version-drift.sh l.26-27 lê só /proc/$CLAUDE_PID/exe."
+  },
+  {
+   "alvo": "E_FIM_DO_LOGIN_LEGIVEL_NO_AUTH_STATUS_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "claude auth status | python (só as chaves e o prazo) → chaves incluem loginExpiresAt, authMethod claude.ai, apiProvider firstParty, 22 dias até o fim; grep -rn -E 'claude auth (status|login)|loginExpiresAt|credential_expires_at' .claude ops .github | wc -l → 0; onion-review.yml l.303 e l.458 → anthropic_api_key"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "reproduz: o campo existe, o prazo é 22 dias, e nenhuma peça do core o lê"
+   },
+   "nota": "O bridge não tem login claude.ai guardado: sudo -n test -f na credencial da conta do serviço → ausente (rc 1). O fim do login não o alcança por esse caminho."
+  },
+  {
+   "alvo": "Q_CENSO_AVISA_O_FIM_DO_LOGIN_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "decorre do nó-pai; grep -n 'auth' .claude/validation/currency-census.sh → nada sobre login"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "a pergunta procede"
+   }
+  },
+  {
+   "alvo": "E_RETOMADA_DE_WORKFLOW_NAO_RERRODA_AGENTES_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n resumeFromRunId .claude/skills/onion-orchestration/SKILL.md → l.69 e l.317; sed -n 69,70p → '`Workflow({scriptPath, resumeFromRunId})` replica do cache / os agentes já concluídos'; ls .claude/workflows → meta-evolve-fanout.js, onion-research.js"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "a promessa existe nas linhas citadas"
+   },
+   "nota": "Não há caso medido de retomada depois de limite de uso na casa; o nó não afirma que houve."
+  },
+  {
+   "alvo": "E_SUBAGENTE_EM_FUNDO_MANDA_O_COMANDO_AO_FUNDO_EM_3_MIN_1104",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rh -a -F 'after running for 180s' nos transcripts .jsonl do usuário, agrupado pelo campo version → 2.1.311: 44, 2.1.312: 69 (2026-10-27 a 29), 2.1.318: 34 (hoje); a frase 'Command was moved to the background (ID: …) after running for Ns' só sai com subagentCapApplied (PXr no binário 2.1.318); binário 2.1.317: o corte vinha da flag de servidor tengu_maple_ferry (yqr, default 0); binário 2.1.318: xXr devolve zDr=180000 salvo cache 'off' ou '1h'"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "rótulo corrigido: o corte de 3 min dos subagentes em fundo já valia na casa por flag do servidor, com 113 ocorrências na 2.1.311 e na 2.1.312. Na 2.1.318 ele vira constante de código (180000 ms) para todos os provedores, e só se desliga com cache de prompt 'off' ou de 1 h. Os subagentes da casa gravam cache de 5 min, então o corte se aplica a eles",
+    "medida": "contagem por versão nos transcripts (113 antes da 2.1.318, 34 hoje); leitura das funções yqr (2.1.317) e xXr (2.1.318) e da constante zDr=180000 no binário; cache_creation dos 40 transcripts de subagente mais recentes: ephemeral_5m > 0 e ephemeral_1h = 0 em todos"
+   },
+   "nota": "A ligação com o preâmbulo procede, e o risco é maior do que o nó diz: 147 comandos já foram movidos ao fundo, não é hipótese."
+  },
+  {
+   "alvo": "Q_PREAMBULO_NOMEIA_O_CORTE_DE_3_MIN_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "sed -n 25,26p .claude/commands/common/prompts/execution-agent-preamble.md → fecha só por pr-finalize.sh --push; processos longos com run_in_background e espera por PID; grep -c '3 min\\|180' no preâmbulo → 0"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "a pergunta procede e fica mais forte"
+   },
+   "nota": "O verified_against ('nenhuma medição de gate que passe de 3 min feita') está superado pela medição do juiz: 147 comandos de subagente movidos ao fundo aos 180 s nos transcripts. A rodada pode citar isso."
+  },
+  {
+   "alvo": "E_PLUGIN_VALIDATE_COM_NOME_PADRAO_NAO_MUDA_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "find . -name 'marketplace*.json' → .claude-plugin/marketplace.json e vendor/kg-ssot/.claude-plugin/marketplace.json; sed -n 878,888p ops/publish-door.sh → (5c) valida ${DEST} e cada plugin; l.614 → o catálogo do bundle é ${DEST}/.claude-plugin/marketplace.json; claude plugin validate --strict . → '✔ Validation passed', rc 0"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "reproduz"
+   }
+  },
+  {
+   "alvo": "E_EXTENSAO_VSCODE_NA_2_1_306_E_O_CLI_NAO_A_SOBE_MAIS_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "ls ~/.vscode-server/extensions | grep claude → anthropic.claude-code-2.1.306-linux-x64; npm view @anthropic-ai/claude-code versions → depois de 2.1.306: 307, 308, 309, 310, 311, 312, 314, 315, 316, 317, 318 (11); grep -n '^## 2.1.3' CHANGELOG.md → 10 seções depois de 2.1.306"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "reproduz"
+   },
+   "nota": "Nota: a extensão já não subia na prática pelo caminho antigo, porque ficou na 2.1.306 enquanto o CLI andou onze versões. A 2.1.318 só torna isso explícito."
+  },
+  {
+   "alvo": "Q_SUBIR_A_EXTENSAO_DO_VSCODE_PELO_EDITOR_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -n -i 'vscode\\|extens' .claude/validation/currency-census.sh → nada"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "a pergunta procede: o censo não lista a extensão"
+   }
+  },
+  {
+   "alvo": "E_ITENS_SEM_SUPERFICIE_NO_CORE_1104",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep -rln -E 'turn\\.step|prompt\\.submit|\\$\\.model\\.fork' .claude ops .github | wc -l → 0; diretório de mods do usuário ausente; python sobre .claude/settings.json → 10 eventos, 26 hooks, 20 sem onFailure, sem Setup; grep CLAUDE_ENV_FILE → 0; grep -c deniedMcpServers|allowedProviders nos três settings → 0 em cada (arquivos existem); .mcp.json ausente; claude mcp add/remove só em claude-code-specialist.md e adapters/jira.md; grep -rl '^user-invocable: *false' → 0; grep retryable= → 0; ~/.claude.json: 0 servidores MCP em nível de usuário e de projeto; stat -c %U dos processos claude → todos da conta do maestro"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "cada exclusão reproduz"
+   }
+  },
+  {
+   "alvo": "CU4: SUPERSEDES das quatro candidatas da r22",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU4_SUPERACAO_SEM_ALVO_OU_ERRADA",
+    "comando": "grep -n '  - id:' docs/evolution/research/radar-E3-2026-11-03-r22/radar-E3-2026-11-03-r22.kg.yaml → E_HOST_NA_2_1_317_REVISOR_NA_2_1_314_BRIDGE_NA_2_1_310_1103 (l.57), Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_317_E_PIN_DO_REVISOR_PARA_V1_0_267_1103 (l.72), E_GUARDA_DE_DERIVA_DE_BINARIO_VERDE_NA_2_1_317_1103 (l.179), E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103 (l.209); hoje: claude --version 2.1.318 (r22: 2.1.317); npm 0.3.318 e action v1.0.268 (r22: 0.3.317 e v1.0.267); cited_directive rc 0 na 2.1.318; extensão onze publicadas atrás (r22: nove)"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "os quatro alvos existem e o estado que afirmam caiu pela medição de hoje; os outros nós da r22 (SendMessage, limpeza de transcripts, Remote Control, Chrome, onFailure do SDK, esforço) seguem valendo e não se superam"
+   },
+   "nota": "Decisão: external_edges com quatro SUPERSEDES: E_HOST_…_1104 → r22#E_HOST_NA_2_1_317_…_1103; Q_SUBIR_SDK_…_0_3_318_…_1104 → r22#Q_SUBIR_SDK_…_0_3_317_…_1103; E_GUARDA_…_2_1_318_1104 → r22#E_GUARDA_…_2_1_317_1103; E_EXTENSAO_VSCODE_NA_2_1_306_E_O_CLI_NAO_A_SOBE_MAIS_1104 → r22#E_EXTENSAO_VSCODE_SEGUE_NA_2_1_306_1103. O C_SUPERACAO_20261103_BRIDGE_SEIS_VERSOES_PUBLICADAS_ATRAS da r22 tem a contagem datada (hoje são sete), mas o método que afirma segue valendo. Não precisa de aresta."
+  },
+  {
+   "alvo": "CU5: omissões do delta 2.1.318 que tocam superfície",
+   "veredito": "REPROVA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "ps -u <conta> -o pid=,comm=,args= | grep -E 'bg-spare|bg-pty-host' + readlink /proc/<pid>/exe (item l.24, o daemon); grep -rn -E 'claude plugin (marketplace|install|update|uninstall|enable|disable|list)' .claude ops .github (item l.14); primeira linha com version no transcript das 3 sessões retomadas (item l.66)"
+   },
+   "superacao": {
+    "classe": "entrega",
+    "achada": true,
+    "o_que": "medir e registrar: (1) l.24, o daemon de fundo. Quatro processos-reserva de daemon em binário apagado, invisíveis a pgrep -x claude; impacto 2; entra no nó do binário apagado e na pergunta do censo. (2) l.14, comandos `claude plugin` saindo antes de salvar o refresh do token. Os geradores de README do marketplace (.claude/utils/marketplace/marketplace-readme.sh l.40 e l.52-56, plugin-readme.sh l.84) ensinam o adotante a rodar claude plugin marketplace add/install/update, e o publish-door.sh l.885 roda claude plugin validate em laço; impacto 1, NÃO-VERIFICADO se o validate renova token. (3) l.66, o fim da correção de 2.1.288: medido sem impacto, porque as três sessões retomadas vivas começaram na 2.1.303, 2.1.308 e 2.1.311, todas depois da 2.1.286; entra em E_ITENS_SEM_SUPERFICIE",
+    "medida": "ps + readlink: 4 reservas deleted; grep: 7 linhas em 2 geradores de README + publish-door.sh l.885; primeira versão nos transcripts ativos do core, da curadoria e do kg-ssot: 2.1.303, 2.1.308, 2.1.311"
+   },
+   "nota": "Sem omissão nos demais 84 itens: os de ~/.claude.json, login, mods, MCP, nuvem, gateway, runner, VS Code e Remote Control estão em nó ou em NÃO-VERIFICADOS. O item de processo de outra conta (l.25) está no E_ITENS: todos os processos claude são da conta do maestro."
+  },
+  {
+   "alvo": "CU6: caminho de máquina, IP, nome sensível no grafo e na SYNTHESIS",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU6_CAMINHO_DE_MAQUINA_OU_NOME_SENSIVEL",
+    "comando": "bash .claude/validation/kg-contract-check.sh docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml → conforme, rc 0; grep -n -E '@|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+|/home/' no grafo e na SYNTHESIS → só nomes de pacote npm e o pin da action"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada a superar",
+    "medida": "nada exposto; o prazo do login está em dias, não em data"
+   }
+  }
+ ]
+}
