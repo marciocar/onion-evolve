@@ -14,15 +14,15 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   real, não restrição de nascença.
   **A capacidade que COMPRA o acoplamento** (exclusividade retirada em 2026-11-04,
   `D_EXIT2_COUPLING_WORDING_2026_11`): o **`exit 2` determinístico de hook** segue sendo o que barra no
-  core, mas **não é exclusivo** (medido no Codex, no Qwen, no Goose e no Vibe com `strict`) e **é camada
-  de conformidade, não fronteira de segurança** (conclusão do Onion): sem chave de política na
-  configuração gerenciada, um mod que carrega vence o veto e a regra `deny` (login Max, 6 de 6), e o hook
-  falha aberto sem `onFailure: block`. **Hoje nenhuma capacidade exclusiva está medida.** A postura
+  core, mas **não é exclusivo** (medido em Codex, Qwen, Goose e Vibe com `strict`) e **é camada
+  de conformidade, não fronteira de segurança** (conclusão do Onion): sem chave de política
+  gerenciada, um mod que carrega vence o veto (login Max, 6 de 6) e a `deny` (API simulada); com ela, o que
+  o mod inicia por si segue fora do gate; e o hook falha aberto sem `onFailure: block`. **Hoje nenhuma capacidade exclusiva está medida.** A postura
   reabre quando outro harness passar nos 5 vetos reais na mesma bancada, ou quando o `/meta:cc-update`
   mudar a regra da guarda.
 
-  O exemplo antigo, `SendMessage`, caiu: zero uso na maquinaria. **O shell agnóstico
-  REPROVA (roda em qualquer CI)** e **o markdown acoplado ACONSELHA**: o fosso não precisa de acoplamento.
+  O exemplo antigo, `SendMessage`, caiu: zero uso. **O shell agnóstico
+  REPROVA** e **o markdown acoplado ACONSELHA**: o fosso não precisa de acoplamento.
   SSOT: `docs/evolution/research/exit2-coupling-against-2026-11/`.
 - **A postura de acoplamento** (o critério que decide toda adoção de substrato): *acoplado ao Claude
   Code para tirar vantagem da sua estrutura e maquinaria, **mas mantendo independência sempre que
