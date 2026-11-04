@@ -509,7 +509,7 @@ nodes:
       method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
       locality: "web"
 
-  - id: E_API7_AUTH_DELEGATED_OUT_OF_BAND
+  - id: E_a fornecedora api7.ai_AUTH_DELEGATED_OUT_OF_BAND
     node_type: evidence
     plane: DEV
     status: confirmed
@@ -528,7 +528,7 @@ nodes:
       method: "judges: votação 3-0 do run /onion-research de 2026-11-04"
       locality: "web"
 
-  - id: E_API7_SIGNED_CARD_NOT_TRUST
+  - id: E_a fornecedora api7.ai_SIGNED_CARD_NOT_TRUST
     node_type: evidence
     plane: DEV
     status: confirmed
@@ -580,7 +580,7 @@ nodes:
     source_tier: 8
     source_kind: primary
     label: "Mercado: sem sinal de capital direto (rodada, M&A ou valuation) ligado ao A2A. Sinais institucionais: mais de 150 apoiadores, as três grandes nuvens, produção em Huawei e Tencent, AAIF desde 17/08/2026; o dinheiro corre pelas plataformas."
-    narrative: "Do sintetizador: (a) >50 → >150 organizações (LF, abr/2026), com AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP e ServiceNow; (b) Google Cloud, Azure AI Foundry e AWS Bedrock AgentCore, e produção de consumo de massa na China (Huawei HarmonyOS/Celia, Tencent WeChat); (c) governança consolidada na AAIF em 17/08/2026; (d) analistas: Thoughtworks Radar Assess em 2025-11, blip fora da edição atual; nenhum sinal de Gartner ou Forrester no material verificado. Fornecedores de gateway (API7/AISIX) se posicionam sobre o A2A, mas a claim de suporte do AISIX a 0.3 e 1.0 foi refutada. Leitura follow-the-money: o protocolo é bem comum de fundação; o valor é capturado por nuvens, gateways e IdPs. Para o Onion: construir sobre o padrão aberto, não competir com ele."
+    narrative: "Do sintetizador: (a) >50 → >150 organizações (LF, abr/2026), com AWS, Cisco, Google, IBM, Microsoft, Salesforce, SAP e ServiceNow; (b) Google Cloud, Azure AI Foundry e AWS Bedrock AgentCore, e produção de consumo de massa na China (Huawei HarmonyOS/Celia, Tencent WeChat); (c) governança consolidada na AAIF em 17/08/2026; (d) analistas: Thoughtworks Radar Assess em 2025-11, blip fora da edição atual; nenhum sinal de Gartner ou Forrester no material verificado. Fornecedores de gateway (AISIX (da fornecedora api7.ai)) se posicionam sobre o A2A, mas a claim de suporte do AISIX a 0.3 e 1.0 foi refutada. Leitura follow-the-money: o protocolo é bem comum de fundação; o valor é capturado por nuvens, gateways e IdPs. Para o Onion: construir sobre o padrão aberto, não competir com ele."
     trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
     provenance:
       source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
@@ -643,8 +643,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    label: "A A2A 1.0 (v1.0.0 em 12/03/2026, v1.0.1 em 28/05/2026) traz tenant opcional e assinatura de card por JWS+JCS; o suporte do AISIX a 0.3 e 1.0 sem tradução é autodeclaração da API7, e a 0.10.0 invalida card 1.0 assinado ao reescrever URLs."
-    narrative: "Medida: WebFetch em a2a-protocol.org/latest/whats-new-v1 (multi-tenancy e JWS/JCS verbatim), github.com/a2aproject/A2A/releases (datas das tags) e api7.ai/blog/a2a-protocol-gateway-layer (ressalva verbatim da 0.10.0: 'not as a transparent signed-card proxy'). Critério: V5_MARKETING (o domínio api7.ai é o fornecedor do AISIX). Alvo reprovado: 'A2A 1.0 ...; o gateway AISIX da API7 suporta A2A 0.3 e 1.0 sem tradução de protocolo' (tier 5). Afirmação de UM juiz, sem votação."
+    label: "A A2A 1.0 (v1.0.0 em 12/03/2026, v1.0.1 em 28/05/2026) traz tenant opcional e assinatura de card por JWS+JCS; o suporte do AISIX a 0.3 e 1.0 sem tradução é autodeclaração da fornecedora api7.ai, e a 0.10.0 invalida card 1.0 assinado ao reescrever URLs."
+    narrative: "Medida: WebFetch em a2a-protocol.org/latest/whats-new-v1 (multi-tenancy e JWS/JCS verbatim), github.com/a2aproject/A2A/releases (datas das tags) e api7.ai/blog/a2a-protocol-gateway-layer (ressalva verbatim da 0.10.0: 'not as a transparent signed-card proxy'). Critério: V5_MARKETING (o domínio api7.ai é o fornecedor do AISIX). Alvo reprovado: 'A2A 1.0 ...; o gateway AISIX da fornecedora api7.ai suporta A2A 0.3 e 1.0 sem tradução de protocolo' (tier 5). Afirmação de UM juiz, sem votação."
     trace: "WebFetch https://api7.ai/blog/a2a-protocol-gateway-layer e grep -F 'not as a transparent signed-card proxy'"
 
 edges:
@@ -717,10 +717,10 @@ edges:
   - from: E_AGENTCORE_SIGV4_VS_OAUTH_401
     to: Q_A2A_LANDSCAPE_2026_11
     edge_type: SUPPORTS
-  - from: E_API7_AUTH_DELEGATED_OUT_OF_BAND
+  - from: E_a fornecedora api7.ai_AUTH_DELEGATED_OUT_OF_BAND
     to: Q_A2A_LANDSCAPE_2026_11
     edge_type: SUPPORTS
-  - from: E_API7_SIGNED_CARD_NOT_TRUST
+  - from: E_a fornecedora api7.ai_SIGNED_CARD_NOT_TRUST
     to: Q_A2A_LANDSCAPE_2026_11
     edge_type: SUPPORTS
   - from: E_THOUGHTWORKS_ASSESS_2025_11
@@ -752,6 +752,6 @@ edges:
   - from: C_SUPERACAO_20261104_PUSH_OPTIONAL_CAPABILITY
     to: E_LLMS_REF_THREE_BINDINGS_AND_TASK_RPCS
     edge_type: CONSTRAINS
-  - from: E_API7_SIGNED_CARD_NOT_TRUST
+  - from: E_a fornecedora api7.ai_SIGNED_CARD_NOT_TRUST
     to: E_WHATS_NEW_V1_SIGNED_CARD_JWS_JCS
     edge_type: CONSTRAINS
