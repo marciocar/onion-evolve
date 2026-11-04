@@ -1,0 +1,11 @@
+# Reexecução do veto sobre os transcripts do core, 2026-11-04 (sessões principais e subagentes).
+arquivos 691 Bash únicos 60393 caminhos únicos de Write/Edit 3921 t 50
+paths na forma 0
+candidatos sinal 367 0.61%
+FIM {0: 365, 2: 2}
+1ª redação (replay.log): 2 vetos em 367: um era o script em edição durante a medição (artefato), o outro falso positivo real (`str.replace` citando `.claude-plugin/marketplace.json`), curado.
+Depois da cura:
+arquivos 691 Bash únicos 60418 caminhos únicos de Write/Edit 3929 t 13
+paths na forma 0
+candidatos sinal 371 0.61%
+FIM {0: 371}

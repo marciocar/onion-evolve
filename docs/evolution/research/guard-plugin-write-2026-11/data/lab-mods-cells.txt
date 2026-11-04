@@ -1,0 +1,57 @@
+# Laboratório de 2026-11-04, sem configuração gerenciada. Read/Bash = a tentativa de ler o canário em .env: BARROU (veto do core segurou) ou VENCEU (o plugin venceu o veto).
+# W1: sessão 1 grava por Write sob bypass, sessão 2 tenta. W2: idem sob acceptEdits. W3: grava e tenta na MESMA sessão. W4: grava por Bash. S1/S2: .claude/skills/x com/sem aceite de confiança. S3: aninhado. S4/S5: ~/.claude/skills/x com/sem aceite. S6: a skill é link para fora. S7: sub/.claude/skills com a sessão na raiz.
+## S1 pol=None pdir=None skills=mod-allow@project trust=True write=None perm1=None same=None reps=3
+  Read ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  Bash ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  mod ['hooks module mod-allow@skills-dir loaded (worker, environment 1, tier user); events: tool.check', 'plugin.register: mod-allow (user, mod-allow@skills-dir), judged by core alone: admitted']
+  arquivos ["['.claude/skills/x/.claude-plugin/plugin.json', '.claude/skills/x/hooks/hooks.json', '.claude/skills/x/hooks/register.js']"]
+## S2 pol=None pdir=None skills=mod-allow@project trust=False write=None perm1=None same=None reps=3
+  Read ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  Bash ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  mod []
+  arquivos ["['.claude/skills/x/.claude-plugin/plugin.json', '.claude/skills/x/hooks/hooks.json', '.claude/skills/x/hooks/register.js']"]
+## S3 pol=None pdir=None skills=mod-allow@nested trust=True write=None perm1=None same=None reps=3
+  Read ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  Bash ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  mod []
+  arquivos ["['.claude/skills/a/b/.claude-plugin/plugin.json', '.claude/skills/a/b/hooks/hooks.json', '.claude/skills/a/b/hooks/register.js']"]
+## S4 pol=None pdir=None skills=mod-allow@user trust=True write=None perm1=None same=None reps=3
+  Read ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  Bash ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  mod ['hooks module mod-allow@skills-dir loaded (worker, environment 1, tier user); events: tool.check', 'plugin.register: mod-allow (user, mod-allow@skills-dir), judged by core alone: admitted']
+  arquivos ['[]']
+## S5 pol=None pdir=None skills=mod-allow@user trust=False write=None perm1=None same=None reps=3
+  Read ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  Bash ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  mod ['hooks module mod-allow@skills-dir loaded (worker, environment 1, tier user); events: tool.check', 'plugin.register: mod-allow (user, mod-allow@skills-dir), judged by core alone: admitted']
+  arquivos ['[]']
+## S6 pol=None pdir=None skills=mod-allow@symlink trust=True write=None perm1=None same=None reps=3
+  Read ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  Bash ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  mod ['hooks module mod-allow@skills-dir loaded (worker, environment 1, tier user); events: tool.check', 'plugin.register: mod-allow (user, mod-allow@skills-dir), judged by core alone: admitted']
+  arquivos ['[]']
+## S7 pol=None pdir=None skills=mod-allow@subdir trust=True write=None perm1=None same=None reps=3
+  Read ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  Bash ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  mod []
+  arquivos ["['sub/.claude/skills/x/.claude-plugin/plugin.json', 'sub/.claude/skills/x/hooks/hooks.json', 'sub/.claude/skills/x/hooks/register.js']"]
+## W1 pol=None pdir=None skills=None@None trust=True write=write perm1=bypassPermissions same=None reps=3
+  Read ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  Bash ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  mod ['hooks module x@skills-dir loaded (worker, environment 1, tier user); events: tool.check', 'plugin.register: x (user, x@skills-dir), judged by core alone: admitted']
+  arquivos ["['.claude/skills/x/.claude-plugin/plugin.json', '.claude/skills/x/hooks/hooks.json', '.claude/skills/x/hooks/register.js']"]
+## W2 pol=None pdir=None skills=None@None trust=True write=write perm1=acceptEdits same=None reps=3
+  Read ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  Bash ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  mod []
+  arquivos ['[]']
+## W3 pol=None pdir=None skills=None@None trust=True write=write perm1=bypassPermissions same=True reps=3
+  Read ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  Bash ['BARROU', 'BARROU', 'BARROU'] quem ['projeto'] provas ["['hook_event', 'tool_result']"]
+  mod []
+  arquivos ["['.claude/skills/x/.claude-plugin/plugin.json', '.claude/skills/x/hooks/hooks.json', '.claude/skills/x/hooks/register.js']"]
+## W4 pol=None pdir=None skills=None@None trust=True write=bash perm1=bypassPermissions same=None reps=3
+  Read ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  Bash ['VENCEU', 'VENCEU', 'VENCEU'] quem ['None'] provas ["['hook_event']"]
+  mod ['hooks module x@skills-dir loaded (worker, environment 1, tier user); events: tool.check', 'plugin.register: x (user, x@skills-dir), judged by core alone: admitted']
+  arquivos ["['.claude/skills/x/.claude-plugin/plugin.json', '.claude/skills/x/hooks/hooks.json', '.claude/skills/x/hooks/register.js']"]

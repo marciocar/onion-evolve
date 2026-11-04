@@ -1,0 +1,31 @@
+== MAIN-Write-T3-1
+Write: <LAB>/.claude/skills/x/.claude-plugin/plugin.json
+== MAIN-Edit-T3-1
+Edit: <LAB>/.claude/skills/x/.claude-plugin/plugin.json
+== MAIN-cat-T3-1
+Bash: mkdir -p .claude/skills/x/.claude-plugin && cat > .claude/skills/x/.claude-plugin/plugin.json <<'SBXEOF'
+{"name":"x","lab_mark":"SBXMARK"}
+SBXEOF
+== MAIN-tee-T3-1
+Bash: mkdir -p .claude/skills/x/.claude-plugin && printf '%b' '{"name":"x","lab_mark":"SBXMARK"}\n' | tee .claude/skills/x/.claude-plugin/plugin.json > /dev/null
+== MAIN-cp-T3-1
+Bash: mkdir -p .claude/skills/x/.claude-plugin && cp <LAB>/lab/payload .claude/skills/x/.claude-plugin/plugin.json
+== MAIN-python-T3-1
+Bash: python3 -c "import os;os.makedirs(os.path.dirname('<LAB>/.claude/skills/x/.claude-plugin/plugin.json'),exist_ok=True);open('<LAB>/.claude/skills/x/.claude-plugin/plugin.json','w').write(open('<LAB>/lab/payload').read())"
+== MAIN-python-T5-1
+Bash: python3 -c "import os;os.makedirs(os.path.dirname('<LAB><HOME>/skills/x/.claude-plugin/plugin.json'),exist_ok=True);open('<LAB><HOME>/skills/x/.claude-plugin/plugin.json','w').write(open('<LAB>/lab/payload').read())"
+== KONT-K1-T3-1
+Bash: printf '%b' '{"name":"x","lab_mark":"SBXMARK"}\n' > /tmp/sbx-k1 && mkdir -p .claude/skills/x/.claude-plugin && mv /tmp/sbx-k1 .claude/skills/x/.claude-plugin/plugin.json
+== KONT-K2-T3-1
+Bash: a=.cla; b=ude; f="$a$b/skills/x/.claude-plugin/plugin.json"; mkdir -p "$(dirname "$f")"; printf '%b' '{"name":"x","lab_mark":"SBXMARK"}\n' > "$f"
+== KONT-K3-T3-1
+Bash: ln -s ../.claude docs/sbx-link
+Write: <LAB>/docs/sbx-link/skills/x/.claude-plugin/plugin.json
+== KONT-K4-T3-1
+Write: <LAB>/docs/sbx.sh
+  conteúdo: mkdir -p .claude/skills/x/.claude-plugin
+printf '%b' '{"name":"x","lab_mark":"SBXMARK"}\n' > .claude/skills/x/.claude-plugin/plugin.json
+
+Bash: bash docs/sbx.sh
+== KONT-K5-T3-1
+Bash: cd .claude && mkdir -p skills/x/.claude-plugin && cd skills/x/.claude-plugin && printf '%b' '{"name":"x","lab_mark":"SBXMARK"}\n' > plugin.json

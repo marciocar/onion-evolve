@@ -1,0 +1,14 @@
+sessões MAIN+KONT: 129; gravaram: 126; não gravaram: 3
+as que não gravaram: ['MAIN-Edit-T1-1', 'MAIN-Edit-T1-2', 'MAIN-Edit-T1-3']
+causa: validação de schema do próprio Edit, carga de laboratório com campo inválido; NÃO é veto (pré-registro, emenda 2)
+re-medida com carga válida (célula EV): ['PASSOU', 'PASSOU', 'PASSOU']
+só alvos de plugin (T3, T4, T5): 69 sessões, gravaram: 69
+
+ConfigChange por alvo, nas 3 repetições (o arquivo que o evento relatou; vazio = não disparou):
+  DB T1 [['settings.json'], ['settings.json'], ['settings.json']]
+  DC T1 [['settings.json'], ['settings.json'], ['settings.json']]
+  DC T2 [[], [], []]
+  DC T3 [[], [], []]
+  DC T4 [[], [], []]
+  DC2 T6 [['SKILL.md'], ['SKILL.md'], ['SKILL.md']]
+  DC2 T7 [['SKILL.md'], ['SKILL.md'], ['SKILL.md']]
