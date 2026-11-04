@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**838 itens abertos** em 141 grafo(s) com aberto (de 181 no escopo) · 142 grupo(s), agrupados por `owner:` (48 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**806 itens abertos** em 142 grafo(s) com aberto (de 181 no escopo) · 143 grupo(s), agrupados por `owner:` (49 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -136,51 +136,6 @@
 | 3.2 | `Q_XSESSION_LIVE_NOT_VERIFIED` | canal-vivo-sessoes-2026-10 | NÃO VERIFICADO, fechar antes de qualquer absorção: dois membros da mesma org Team; dois usuários do SO na mesma máquina; clou |
 | 3.0 | `Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (b): algum adotante pediu canal entre organizações? Se sim, o caminho é o A2A gated que o core já tem, n |
 | 3.0 | `Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (a): a Anthropic respondeu à issue #87954 (pedido de canal entre usuários) ou lançou canal nativo entre u |
-
-## exit2-coupling-against-2026-11 — 40 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 75.0 | `C_OPCAO_C_RETIRE_EXCLUSIVITY_COMPLIANCE_LAYER` | exit2-coupling-against-2026-11 | C: retirar a exclusividade e dizer que o veto é camada de conformidade, não fronteira de segurança |
-| 54.0 | `Q_EXIT2_COUPLING_AGAINST_2026_11` | exit2-coupling-against-2026-11 | O que derruba a tese do CLAUDE.md de que o exit 2 de hook, que barra sob bypassPermissions, não existe fora do Claude Code, nenhu |
-| 26.0 | `C_OPCAO_D_REVISE_POSTURE_WITH_TRIGGER` | exit2-coupling-against-2026-11 | D: rever a própria postura de acoplamento, com gatilho nomeado |
-| 17.0 | `C_OPCAO_A_KEEP_WITH_MOD_CONDITION` | exit2-coupling-against-2026-11 | A: manter a frase só com a condição do mod |
-| 5.4 | `C_SUPERACAO_20261104_CUT_SEATED_GUARD_CONDITION` | exit2-coupling-against-2026-11 | Configuração gerenciada não vazia senta a guarda. |
-| 4.5 | `C_OPCAO_B_REWRITE_CAPABILITY` | exit2-coupling-against-2026-11 | B: reescrever a capacidade que compra o acoplamento, nomeando outra |
-| 3.6 | `C_SUPERACAO_20261104_ANTHROPIC_PERMISSIONS_PRECEDENCE` | exit2-coupling-against-2026-11 | A primária que entrega o valor é da Anthropic: permissions.md, seção 'Precedence among rules, hooks, and mods', mais mods/admi |
-| 3.6 | `C_SUPERACAO_20261104_CC_FAIL_OPEN_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: em Linux, com hook de comando e onFailure ausente, PreToolUse falha aberto, salvo exit 1 com JSON válido, |
-| 3.6 | `C_SUPERACAO_20261104_CODEX_BYPASS_MEASURED` | exit2-coupling-against-2026-11 | Rodagem da curadoria no Codex CLI 0.164.0, com seis rodadas. |
-| 3.6 | `C_SUPERACAO_20261104_CODEX_FAIL_OPEN_V0166` | exit2-coupling-against-2026-11 | Formulação corrigida: no Codex rust-v0.166.0, hook PreToolUse que quebra, estoura o tempo ou devolve JSON inválido fica Failed  |
-| 3.6 | `C_SUPERACAO_20261104_CODEX_OFFICIAL_GUARDRAIL` | exit2-coupling-against-2026-11 | Doc oficial da OpenAI e a rodagem E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026. |
-| 3.6 | `C_SUPERACAO_20261104_CODEX_PRIMARIES_REPLACE_BLOG` | exit2-coupling-against-2026-11 | Primárias que dispensam o blog: doc oficial de hooks do Codex, fonte pre_tool_use.rs em openai/codex e E_SPIKE_S1_TRUSTED_HOOK_BL |
-| 3.6 | `C_SUPERACAO_20261104_COPILOT_DOC_CLOUD_AGENT_FIRES` | exit2-coupling-against-2026-11 | A referência de hooks do Copilot não cita --allow-all-tools nem --yolo, e allowing-tools não fala de hooks; mas no cloud agent, |
-| 3.6 | `C_SUPERACAO_20261104_CURSOR_3_21_STAFF_BY_MODE` | exit2-coupling-against-2026-11 | Formulação corrigida, por staff do Cursor em tópico mais novo: no 3.21.16 (out/2026), deny vale em Auto-review, Allowlist e Run |
-| 3.6 | `C_SUPERACAO_20261104_CUT_ADVISORY_NO_HOOKS` | exit2-coupling-against-2026-11 | Leitura do advisory. |
-| 3.6 | `C_SUPERACAO_20261104_CUT_CVE_25724_DETAILS` | exit2-coupling-against-2026-11 | O próprio advisory. |
-| 3.6 | `C_SUPERACAO_20261104_CUT_MOD_FS_PROCESS_UNVETOED` | exit2-coupling-against-2026-11 | allowManagedModsOnly impede os hooks do mod de rodar («allowManagedModsOnly com mod de processo»). |
-| 3.6 | `C_SUPERACAO_20261104_CVE_25724_NOT_HOOK` | exit2-coupling-against-2026-11 | Prova correta do limite do veto: permissions.md, 'the mod can approve a call that a deny rule refuses or a PreToolUse hook blocked |
-| 3.6 | `C_SUPERACAO_20261104_CVE_40068_TRUST_NOT_VETO` | exit2-coupling-against-2026-11 | Citar o advisory do fornecedor em vez do NVD. |
-| 3.6 | `C_SUPERACAO_20261104_ENDOR_VENDOR_BETTER_SOURCES` | exit2-coupling-against-2026-11 | Doc da Anthropic e Thoughtworks Radar vol. 35: 'We now consider agent sandboxing a sensible default for all agents', anel Adopt. |
-| 3.6 | `C_SUPERACAO_20261104_EXIT2_JSON_NOT_DIFFERENTIATOR` | exit2-coupling-against-2026-11 | A parte 'sob bypass' existe por medição, não por doc: célula «hook sem mod» do laboratório. |
-| 3.6 | `C_SUPERACAO_20261104_GEMINI_BLOG_DUPLICATES` | exit2-coupling-against-2026-11 | A doc oficial do Gemini CLI, já lida no achado 2. |
-| 3.6 | `C_SUPERACAO_20261104_GEMINI_SOURCE_V0660_YOLO` | exit2-coupling-against-2026-11 | A primária que faltava é o código e o teste de integração do gemini-cli v0.66.0: o exit 2 do BeforeTool barra antes da polít |
-| 3.6 | `C_SUPERACAO_20261104_HOOK_POLICY_WORDING_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: o filtro if é best-effort e por isso não serve para allow/deny rígido; deny e exit 2 valem sob bypass e |
-| 3.6 | `C_SUPERACAO_20261104_HOOK_VECTOR_BY_DESIGN` | exit2-coupling-against-2026-11 | Tabela 'What runs before you trust a folder', de permissions.md, como prova vigente da superfície de ataque. |
-| 3.6 | `C_SUPERACAO_20261104_MANAGED_CLIENT_SIDE_NOT_BOUNDARY` | exit2-coupling-against-2026-11 | Formulação corrigida: managed settings são a camada de PRECEDÊNCIA e distribuição de política; a versão server-managed é  |
-| 3.6 | `C_SUPERACAO_20261104_MOD_ANSWER_MANAGED_RUNS_FIRST` | exit2-coupling-against-2026-11 | Formulação corrigida: se um mod responde em tool.call sem chamar next, a ferramenta não roda, nem os PreToolUse e PostToolUse n |
-| 3.6 | `C_SUPERACAO_20261104_MOD_UNDERSIZED_SELF_INSTALL` | exit2-coupling-against-2026-11 | permissions.md mais as células «mod-allow com hook», «mod-allow sob bypass», «mod em skills com aceite» e a ponta a ponta d |
-| 3.6 | `C_SUPERACAO_20261104_RADAR_ADOPT_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: o Radar Vol 35 põe Agent sandboxing em Adopt como padrão sensato para todos os agentes; em blip separado |
-| 3.6 | `C_SUPERACAO_20261104_RADAR_PDF_CITES_HOOKS` | exit2-coupling-against-2026-11 | Formulação corrigida: a landing do Radar Vol. 35 não cita Claude Code, mas o PDF cita Claude Code e hooks 11 vezes cada, recome |
-| 3.6 | `C_SUPERACAO_20261104_REFUT_CC_FAIL_OPEN` | exit2-coupling-against-2026-11 | onFailure: block, em uso nos 5 vetos do core. |
-| 3.6 | `C_SUPERACAO_20261104_REFUT_CODEX_EXIT2_FACT` | exit2-coupling-against-2026-11 | Doc oficial e rodagem da curadoria. |
-| 3.6 | `C_SUPERACAO_20261104_REFUT_MANAGED_TOP_PRECEDENCE` | exit2-coupling-against-2026-11 | Hook gerenciado com guarda sentada: células «hook gerenciado contra mod-allow» e «hook gerenciado contra mod-answer» seguram  |
-| 3.6 | `C_SUPERACAO_20261104_REFUT_MOD_ANSWER_FORGES_SIGNAL` | exit2-coupling-against-2026-11 | Hook gerenciado segura esse caso («hook gerenciado contra mod-answer»). |
-| 3.6 | `C_SUPERACAO_20261104_REFUT_RADAR_ADOPT` | exit2-coupling-against-2026-11 | A própria página do blip, anel Adopt. |
-| 3.6 | `C_SUPERACAO_20261104_RUN_PAID_MEASUREMENTS_LEFT_OUT` | exit2-coupling-against-2026-11 | Mapa por harness: medido em Codex e Qwen (veto) e Vibe (contrato diferente); só por doc em Copilot, Gemini e Cursor; por leitura  |
-| 3.6 | `C_SUPERACAO_20261104_SETTINGS_PAGE_SCOPE_CORRECTED` | exit2-coupling-against-2026-11 | Formulação corrigida: settings.md não trata de exit 2, exclusividade, mods nem CVEs; cobre escopos, precedência e política ge |
-| 3.6 | `C_SUPERACAO_20261104_UNREAD_DANIELVAUGHAN_DIVERGES` | exit2-coupling-against-2026-11 | Rodagem no Codex 0.164.0 sob --dangerously-bypass-approvals-and-sandbox. |
-| 3.6 | `C_SUPERACAO_20261104_UNREAD_GENTIC_BASH_RULE` | exit2-coupling-against-2026-11 | Primária em permissions.md para o que o blog só relatava. |
-| 3.6 | `C_SUPERACAO_20261104_UNREAD_VULN_TODAY` | exit2-coupling-against-2026-11 | O advisory do fornecedor. |
 
 ## a2a-empresa-adotante-2026-10 — 33 item(ns)
 
@@ -345,6 +300,16 @@
 | 3.6 | `C_OPCAO_E_MULTI_TENANT_POR_CLAIM` | onion-brain-mcp-remoto-2026-10 | OPÇÃO E: multi-tenant único com a raiz escolhida por claim do token — adiada até haver mais de um hub. |
 | 1.5 | `C_OPCAO_D_WORKERS_AS_PROXY` | onion-brain-mcp-remoto-2026-10 | OPÇÃO D: padrão Cloudflare Workers com o servidor atuando como AS proxy para o IdP do hub — listada como rejeitada por acopla |
 | 1.2 | `C_OPCAO_F_SEM_MCP_LEITOR_JS` | onion-brain-mcp-remoto-2026-10 | OPÇÃO F: não fazer MCP — manter o segundo leitor JS do corpus (o paliativo atual do hub). |
+
+## vibe-subagent-2026-11 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 52.8 | `Q_VIBE_SUBAGENT_SESSION_HOOKS_1104` | vibe-subagent-2026-11 | No Mistral Vibe 3.0.4, como o subagente do agents.spawn grava a sessão e o vínculo pai→filho, como o registro do filho liga o  |
+| 5.4 | `C_SUPERACAO_20261104_CHILD_SESSIONS_EMPTY_BY_STRUCTURE` | vibe-subagent-2026-11 | Na 3.0.4, meta.json.child_sessions vem vazio por estrutura (nenhum escritor de ChildSessionLink; o adapter só copia o previous),  |
+| 3.6 | `C_SUPERACAO_20261104_HOOKS_PAGE_ANSWERS_PART` | vibe-subagent-2026-11 | A página de agentes não cobre (1)-(4), mas a página oficial de hooks documenta que subagentes herdam os hooks do projeto, o std |
+| 3.6 | `C_SUPERACAO_20261104_README_SESSION_JOURNAL` | vibe-subagent-2026-11 | O README chama o armazenamento atual da sessão de session journal, no diretório de logs de sessão sob VIBE_HOME (journal_dir no |
+| 3.6 | `C_SUPERACAO_20261104_RELEASES_CONFIRM_HOOKS_IN_SUBAGENT` | vibe-subagent-2026-11 | As release notes confirmam hooks dentro do subagente (v3.0.2), parent_session_id, session_id e transcript_path no stdin (v2.26.0), |
 
 ## onda-derivada-e-o-lugar-do-onion-2026-10 — 9 item(ns)
 
@@ -728,6 +693,14 @@
 | 2.4 | `C_S5_F7` | whatsapp-api-2026-07 | No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira… |
 | 1.6 | `C_S5_F8` | whatsapp-api-2026-07 | Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:… |
 
+## aaif-projects-onion-2026-11 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.0 | `Q_DOCTRINE_EXIT2_REVIEW_2026_11` | aaif-projects-onion-2026-11 | Pergunta aberta ao maestro: a frase de CLAUDE.md:16 ('isso não existe fora') se sustenta? Esta cura não redige doutrina: a respo |
+| 7.7 | `C_DEFEITO_A2A_RT_MCP_ECOA_VERSAO` | aaif-projects-onion-2026-11 | Defeito medido, não corrigido aqui: .claude/utils/federation-transport/a2a-rt-mcp.py l.548-549 devolve em initialize a versão qu |
+| 4.0 | `Q_AAIF_NAO_MEDIDO_2026_11` | aaif-projects-onion-2026-11 | Sem medir depois da cura: adoção real de qualquer projeto; quem paga por projeto e receita; envio real ao perfil A2A por cliente |
+
 ## elenxos-2026-08-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -747,7 +720,7 @@
 |--:|---|---|---|
 | 22.5 | `Q_MA_CLASSIFICATION` | company-brain-multiaudiencia-2026-10 | Que campo de classificação/visibilidade entra no contrato do grafo, e como sai a projeção redigida por audiência? |
 | 7.5 | `Q_MA_CROSS_REPO` | company-brain-multiaudiencia-2026-10 | Aresta e corpus entre repos, se a hipótese B ou C pedir que o grafo do conhecimento e o grafo técnico vivam em repos diferentes? |
-| 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): gatilho disparado em 2026-11-04: Q_MA_WRITE_SURFACE escolheu um  |
+| 6.0 | `Q_COORD_KGSSOT_ARESTA_ENTRE_REPOS_URL_FIXADA` | coordenacao-sessoes-2026-10 | A aresta tipada entre repos (ponta por URL e grafo de submodule): parada no gatilho Q_MA_WRITE_SURFACE (company-brain-multiaudienc |
 | 3.0 | `Q_COORD_KGSSOT_GATILHOS_DE_CAMPO_DO_PRODUTO` | coordenacao-sessoes-2026-10 | Os gatilhos de campo do produto kg-ssot, agrupados: refutação entre verticais, prazo de qualquer tipo, o perfil B do x_event e a |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
@@ -875,7 +848,7 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
-## core — 21 item(ns)
+## core — 22 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -887,6 +860,7 @@
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 6.0 | `Q_SO_GATILHO_DE_CONSTRUCAO` | session-orchestration-2026-11 | Gatilho do degrau 2: três janelas registradas pelo mesmo diário, ao menos uma com outro tipo de trabalho, cada uma com os três  |
 | 4.8 | `Q_COORD_CORE_PIN_NO_SELADOR_1102` | coordenacao-sessoes-2026-10 | Construir o --pin no kg-decide-seal.sh: ao selar a aprovação, gravar o E_ irmão com provenance.source = o documento, node_sha25 |
+| 4.5 | `Q_COORD_CORE_COMPANY_BRAIN_MARKET_PROPOSAL` | coordenacao-sessoes-2026-10 | A decisão D_COMPANY_BRAIN_MARKET_PROPOSAL, da curadoria, depois do card da organização. |
 | 4.5 | `Q_COORD_CORE_WRAPPER_CLONE_SERVIDO_LEITOR` | coordenacao-sessoes-2026-10 | Um wrapper que atualiza o clone servido pelo MCP de leitura, para ele não ficar parado no commit da instalação. |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 | 4.0 | `C_MA_CROSS_WRITE_DETECTOR` | company-brain-multiaudiencia-2026-10 | Trabalho: um detector de escrita cruzada (commit fora da vertical do autor, mudança em código por quem não é técnico) que avi |
@@ -1187,13 +1161,6 @@
 |--:|---|---|---|
 | 8.0 | `C_IDENTIDADE_POR_CHAVE_POR_USUARIO` | spike-copilot-studio-mcp-2026-10 | INFERÊNCIA: sem header de identidade no Copilot Studio, a identidade do autor pode sair de uma API key por usuário, mapeada para |
 
-## aaif-projects-onion-2026-11 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.7 | `C_DEFEITO_A2A_RT_MCP_ECOA_VERSAO` | aaif-projects-onion-2026-11 | Defeito medido, não corrigido aqui: .claude/utils/federation-transport/a2a-rt-mcp.py l.548-549 devolve em initialize a versão qu |
-| 4.0 | `Q_AAIF_NAO_MEDIDO_2026_11` | aaif-projects-onion-2026-11 | Sem medir depois da cura: adoção real de qualquer projeto; quem paga por projeto e receita; envio real ao perfil A2A por cliente |
-
 ## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -1389,6 +1356,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `Q_SUBIR_SDK_DO_BRIDGE_PARA_0_3_312_E_PIN_DO_REVISOR_PARA_V1_0_264_1028` | radar-E3-2026-10-28-r20 | o SDK do bridge deve subir para 0.3.312 e o pin do revisor do CI para v1.0.264; o alvo da SAC-259 envelheceu, e só a metade do pi |
+
+## vetos-por-tokens-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2` | vetos-por-tokens-2026-10 | TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se  |
 
 ## cortex-2026-10 — 5 item(ns)
 

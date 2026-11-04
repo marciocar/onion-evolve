@@ -1,0 +1,524 @@
+# kg-backlog-guard: on
+meta:
+  id: vibe-subagent-2026-11
+  schema_version: "1"
+  baseline: "2026-11-04"
+  review_after: "2026-12-04"   # 30d: tipo dominante é ferramenta (o Vibe solta release quase diária; a 3.1.0 saiu no PyPI no próprio dia da pesquisa)
+  # ═══ TETO: 24 NÓS ═══
+  purpose: "Confirmar ou refutar, por fonte pública, o que o core leu no código instalado do Mistral Vibe 3.0.4 sobre o subagente do agents.spawn (store, vínculo pai→filho, hook negado, hooks herdados, forma dos efeitos)."
+external_edges:
+  - from: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    to: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/port-spikes-qwen-vibe-2026-11.kg.yaml#D_PORT_SPIKES_RODADA_2_ANTES_DE_FECHAR_1103"
+    edge_type: TRACES_TO
+  - from: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    to: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/port-spikes-qwen-vibe-2026-11.kg.yaml#D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104"
+    edge_type: TRACES_TO
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/port-spikes-qwen-vibe-2026-11.kg.yaml#E_PORT_SPIKE_R2_SUBAGENTE_1104"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-04"
+    verified_against: "run /onion-research gênero qa de 2026-11-04: 16 claims confirmadas, 4 refutadas com superação"
+    trace: "pergunta da 2ª rodada de spikes das portas (PRE-REGISTRO-R2.md, emendas R2-1 a R2-8)"
+    label: "No Mistral Vibe 3.0.4, como o subagente do agents.spawn grava a sessão e o vínculo pai→filho, como o registro do filho liga o pre_tool negado ao toolCallId, se os hooks do projeto rodam nele e qual a forma dos efeitos?"
+    narrative: "Respondido por fonte pública: (3) sim, os hooks do projeto são herdados pelo subagente (doc oficial, README, PyPI, release v3.0.2), com session_id, parent_session_id, transcript_path, cwd e hook_event_name no stdin, e tool_name, tool_call_id e tool_input no pre_tool; (1) em parte: o store unified/<session_id> e o childSessionId em _meta['mistral.vibe.subagent'] estão no código-fonte público da v3.0.3, não na documentação, que só expõe parent_session_id nos hooks e não declara o vínculo como contrato estável. Sem resposta pública: (2) a ligação do efeito skipped e da mensagem role tool/outcome ao toolCallId, e (4) kind tool, toolName grupo.ferramenta, input null e settledMessage. Para (2) e (4) a leitura do core no código instalado segue sendo a única fonte. Fica open por isso."
+  - id: E_VIBE_HOOKS_DOC_STDIN_PARENT_SESSION_ID_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "https://docs.mistral.ai/vibe/code/cli/hooks · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "A doc oficial de hooks do Vibe declara session_id, parent_session_id, transcript_path e cwd no stdin dos hooks: o vínculo filho→pai é exposto por parent_session_id; não documenta childSessionId nem a estabilidade do vínculo."
+    narrative: "Confirma a existência do vínculo pai→filho como dado público, mas só na direção filho→pai e só no stdin do hook. O childSessionId que o core leu em _projection.py e _subagents/_controller.py não aparece na documentação."
+    trace: "https://docs.mistral.ai/vibe/code/cli/hooks"
+    provenance:
+      source: "https://docs.mistral.ai/vibe/code/cli/hooks"
+      locator: "seção do payload JSON de stdin dos hooks"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_HOOKS_DOC_SUBAGENT_INHERITS_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "https://docs.mistral.ai/vibe/code/cli/hooks · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "Subagentes herdam a configuração de hooks do pai, então os hooks do projeto rodam dentro do subagente; hooks de projeto só carregam em pastas confiáveis."
+    narrative: "Responde o item (3) da pergunta. Não diz se o hook dispara para chamadas feitas de dentro do run_typescript, lacuna que o corpus já declarava."
+    trace: "https://docs.mistral.ai/vibe/code/cli/hooks"
+    provenance:
+      source: "https://docs.mistral.ai/vibe/code/cli/hooks"
+      locator: "trecho 'Subagents inherit the parent's hook configuration, so policies apply transitively'"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_HOOKS_DOC_PRE_TOOL_DENY_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "https://docs.mistral.ai/vibe/code/cli/hooks · votos 3-0"
+    source_tier: 9
+    source_kind: primary
+    label: "Quando pre_tool nega a chamada, post_tool não dispara e o reason vira o erro da ferramenta visto pelo LLM; a doc não menciona efeito skipped, mensagem role tool com outcome nem a ligação ao toolCallId, embora o payload do pre_tool traga tool_call_id."
+    narrative: "É coerente com o comentário que o core leu em _local_actions.py:879-880 ('the skip reason is the model-visible tool result'), mas não confirma nem refuta a forma do registro do filho (item 2)."
+    trace: "https://docs.mistral.ai/vibe/code/cli/hooks"
+    provenance:
+      source: "https://docs.mistral.ai/vibe/code/cli/hooks"
+      locator: "seção pre_tool (deny/reason) e post_tool"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_README_HOOKS_INHERITED_STDIN_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/MistralAI/mistral-vibe · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "Os hooks do projeto (.vibe/hooks.toml, só em pastas confiáveis) são herdados pelo subagente, e o stdin de todo hook traz session_id, parent_session_id, transcript_path, cwd e hook_event_name."
+    trace: "https://github.com/MistralAI/mistral-vibe"
+    provenance:
+      source: "https://github.com/MistralAI/mistral-vibe"
+      locator: "README, seção de hooks"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_README_PRE_TOOL_DENY_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/MistralAI/mistral-vibe · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "pre_tool recebe tool_name, tool_call_id e tool_input; quando nega, o reason vira o erro de ferramenta visto pelo modelo e post_tool não dispara; o README não diz como o tool_call_id aparece nos registros do filho."
+    trace: "https://github.com/MistralAI/mistral-vibe"
+    provenance:
+      source: "https://github.com/MistralAI/mistral-vibe"
+      locator: "README, seção de hooks (pre_tool/post_tool)"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_V303_SUBAGENT_STORE_UNIFIED_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://raw.githubusercontent.com/mistralai/mistral-vibe/v3.0.3/vibe/app_server/_subagent_runs.py · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "No código público da v3.0.3, a sessão do subagente é sessão filha da raiz, gravada em store próprio em <storage_root>/unified/<session_id>, ao lado do da raiz."
+    narrative: "Confirma por fonte pública a leitura do core no código instalado da 3.0.4 (logs/session/unified/<id-do-filho>/, _storage.py:2280, lida por UnifiedSessionStore). Também fecha a dedução que o corpus marcava como lacuna: pai e filho ficam no mesmo store raiz, cada um no seu diretório. Fonte é código, não contrato documentado."
+    trace: "https://raw.githubusercontent.com/mistralai/mistral-vibe/v3.0.3/vibe/app_server/_subagent_runs.py"
+    provenance:
+      source: "https://raw.githubusercontent.com/mistralai/mistral-vibe/v3.0.3/vibe/app_server/_subagent_runs.py"
+      locator: "construção do caminho do store da sessão filha"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_V303_CHILD_SESSION_LINK_META_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://raw.githubusercontent.com/mistralai/mistral-vibe/v3.0.3/vibe/app_server/_subagent_runs.py · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "O vínculo pai→filho é lido de state.output._meta['mistral.vibe.subagent'] nos efeitos de spawn, com childSessionId e spawnCallId (mapa child→spawnCallId); SubagentRun expõe session_id, parent_session_id e root_session_id."
+    narrative: "Confirma no código público o childSessionId que o core leu no efeito do agents.spawn (_projection.py:1990-1997; _controller.py:1841-1855). É estável no sentido de ser o caminho que o próprio app_server usa, mas não é contrato documentado."
+    trace: "https://raw.githubusercontent.com/mistralai/mistral-vibe/v3.0.3/vibe/app_server/_subagent_runs.py"
+    provenance:
+      source: "https://raw.githubusercontent.com/mistralai/mistral-vibe/v3.0.3/vibe/app_server/_subagent_runs.py"
+      locator: "leitura de _meta['mistral.vibe.subagent'] e classe SubagentRun"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_V302_HOOKS_IN_SUBAGENTS_RELEASE_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://api.github.com/repos/mistralai/mistral-vibe/releases · votos 3-0"
+    valid_from: "2026-10-22"
+    source_tier: 8
+    source_kind: primary
+    label: "A v3.0.2 do Vibe (2026-10-22) passou a executar os hooks do hooks.toml também nas chamadas de ferramenta feitas dentro de subagentes, incluindo o evento post_agent."
+    narrative: "Data o início do comportamento do item (3): antes da v3.0.2 os hooks não rodavam dentro do subagente. A 3.0.4 do core é posterior."
+    trace: "https://api.github.com/repos/mistralai/mistral-vibe/releases"
+    provenance:
+      source: "https://api.github.com/repos/mistralai/mistral-vibe/releases"
+      locator: "corpo da release v3.0.2"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_PYPI303_SUBAGENT_INHERITS_HOOKS_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://pypi.org/project/mistral-vibe/3.0.3/ · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "Na doc do mistral-vibe 3.0.3, os subagentes herdam a configuração de hooks do pai; hooks de projeto ficam em <projeto>/.vibe/hooks.toml e só carregam em pastas confiáveis."
+    trace: "https://pypi.org/project/mistral-vibe/3.0.3/"
+    provenance:
+      source: "https://pypi.org/project/mistral-vibe/3.0.3/"
+      locator: "descrição do pacote, seção de hooks"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_PYPI303_HOOK_STDIN_FIELDS_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://pypi.org/project/mistral-vibe/3.0.3/ · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "O stdin JSON dos hooks traz session_id, parent_session_id, transcript_path, cwd e hook_event_name; pre_tool acrescenta tool_name, tool_call_id e tool_input; post_tool acrescenta tool_status, tool_output e tool_output_text."
+    trace: "https://pypi.org/project/mistral-vibe/3.0.3/"
+    provenance:
+      source: "https://pypi.org/project/mistral-vibe/3.0.3/"
+      locator: "descrição do pacote, payload dos hooks"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_PYPI303_PRE_TOOL_DENY_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "https://pypi.org/project/mistral-vibe/3.0.3/ · votos 3-0"
+    source_tier: 8
+    source_kind: primary
+    label: "Um hook pre_tool pode negar a chamada; o motivo vira o erro de ferramenta visto pelo modelo e post_tool não dispara; a página não documenta como o registro do filho liga skipped/outcome ao toolCallId."
+    trace: "https://pypi.org/project/mistral-vibe/3.0.3/"
+    provenance:
+      source: "https://pypi.org/project/mistral-vibe/3.0.3/"
+      locator: "descrição do pacote, seção pre_tool"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_PYPI_PROJECT_HOOKS_INHERITED_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://pypi.org/project/mistral-vibe/ · votos 3-0"
+    source_tier: 7
+    source_kind: primary
+    label: "Hooks do projeto (<project>/.vibe/hooks.toml) são herdados pelos subagentes do Vibe, então as políticas se aplicam transitivamente."
+    trace: "https://pypi.org/project/mistral-vibe/"
+    provenance:
+      source: "https://pypi.org/project/mistral-vibe/"
+      locator: "descrição da versão corrente, seção de hooks"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_PYPI_HOOK_STDIN_FIELDS_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://pypi.org/project/mistral-vibe/ · votos 3-0"
+    source_tier: 7
+    source_kind: primary
+    label: "O stdin de todos os hooks do Vibe inclui session_id, parent_session_id, transcript_path, cwd e hook_event_name; pre_tool acrescenta tool_name, tool_call_id e tool_input."
+    trace: "https://pypi.org/project/mistral-vibe/"
+    provenance:
+      source: "https://pypi.org/project/mistral-vibe/"
+      locator: "descrição da versão corrente, payload dos hooks"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_PYPI_PRE_TOOL_DENY_NO_SKIPPED_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "https://pypi.org/project/mistral-vibe/ · votos 3-0"
+    source_tier: 7
+    source_kind: primary
+    label: "Quando um hook pre_tool nega a chamada, o reason vira o erro de ferramenta visto pelo LLM e post_tool não dispara; a página não documenta efeito skipped nem a ligação ao toolCallId no registro do filho."
+    trace: "https://pypi.org/project/mistral-vibe/"
+    provenance:
+      source: "https://pypi.org/project/mistral-vibe/"
+      locator: "descrição da versão corrente, seção pre_tool"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_ISSUE1277_UNIFIED_JOURNAL_LAYOUT_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-11-04"
+    verified_against: "https://github.com/mistralai/mistral-vibe/issues/1277 · votos 3-0"
+    valid_from: "2026-10-17"
+    source_tier: 6
+    source_kind: engineer
+    label: "Na v2.26.1 do Vibe, o harness unificado grava a sessão em logs/session/unified/<id>/ sob o diretório do Vibe, com journal segments, generations e projection chunks."
+    narrative: "Relato de usuário numa issue sobre ValidationError em hook_call; o layout bate com o que o core leu na 3.0.4 (store unified/<id>, chunks de projeção). O formato interno do journal (núcleo Rust) segue sem fonte pública."
+    trace: "https://github.com/mistralai/mistral-vibe/issues/1277"
+    provenance:
+      source: "https://github.com/mistralai/mistral-vibe/issues/1277"
+      locator: "corpo da issue, listagem do diretório da sessão"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_VIBE_NEWRELEASES_2260_STDIN_PARENT_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-11-04"
+    verified_against: "https://newreleases.io/project/pypi/mistral-vibe/release/2.26.0 · votos 3-0"
+    source_tier: 5
+    source_kind: aggregator
+    label: "Nos hooks do harness unificado do Vibe 2.26.0 (hooks.toml), o stdin volta a incluir session_id, transcript_path e parent_session_id."
+    trace: "https://newreleases.io/project/pypi/mistral-vibe/release/2.26.0"
+    provenance:
+      source: "https://newreleases.io/project/pypi/mistral-vibe/release/2.26.0"
+      locator: "notas da release 2.26.0"
+      method: "judges: votação 3-0 do Verify adversarial do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_MERCADO_VIBE_SUBAGENT_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-11-04"
+    verified_against: "síntese do eixo mercado/capital do run /onion-research de 2026-11-04 · https://pypi.org/project/mistral-vibe/"
+    source_tier: 7
+    source_kind: primary
+    label: "Mercado: sem sinal. O ângulo mercado/capital só devolveu a documentação do pacote no PyPI; nenhuma rodada, M&A ou leitura de analista apareceu sobre o Vibe nem sobre o desenho de subagentes e hooks da Mistral."
+    narrative: "Ausência de sinal é dado, não conclusão de que não há movimento: a busca de mercado desta rodada foi estreita (tema técnico de formato de registro). Revisitar junto com a pergunta das portas."
+    trace: "https://pypi.org/project/mistral-vibe/"
+    provenance:
+      source: "https://pypi.org/project/mistral-vibe/"
+      locator: "único retorno do ângulo mercado/capital"
+      method: "derived: síntese do eixo mercado/capital do run /onion-research de 2026-11-04"
+      locality: "web"
+  - id: E_LACUNAS_VIBE_SUBAGENT_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-11-04"
+    verified_against: "contabilidade do run /onion-research qa de 2026-11-04: 16 confirmadas, 4 refutadas (0 por fonte fraca), 0 não verificadas, 19 fontes e 41 claims cortadas por orçamento; 0 recusadas pelo motor; 4 superações achadas"
+    label: "Lacunas: 16 confirmadas, 4 refutadas (todas com superação, nenhuma por fonte fraca), 0 não verificadas, 19 fontes e 41 claims cortadas por orçamento, 0 reprovações recusadas pelo motor, 4 superações."
+    narrative: "REFUTADAS (4, cada uma com superação C_SUPERACAO_20261104_* e TRACES_TO para este nó): (1) 'a doc de agentes não cobre nada de (1)-(4)' (tier 9): a página de hooks cobre (3) e parte de (1); (2) 'sessões 2.0+ são pastas com meta.json e messages.jsonl' (tier 8): o README chama o armazenamento atual de session journal, e meta.json/messages.jsonl é formato de importação histórica; (3) 'as release notes não confirmam nem refutam' (tier 8): confirmam hooks no subagente (v3.0.2), parent_session_id no stdin (v2.26.0) e journal por subagente (v3.0.1); (4) 'o vínculo pai→filho não é estável' (tier 6, issue #1277): child_sessions vazio no meta.json é estrutural na 3.0.4, não instabilidade. REFUTADAS POR FONTE FRACA (tier ≤4): 0. NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 19 fontes e 41 claims. RECUSADAS PELO MOTOR: 0. LACUNAS ABERTAS: (a) item 2, como o registro do filho liga o efeito skipped e a mensagem role tool/outcome ao toolCallId: sem fonte pública, só a leitura do core (_projection.py:1637 e 1647-1653; protocol.py:814-820); (b) item 4, kind tool, toolName grupo.ferramenta, input null no estado assentado e settledMessage: sem fonte pública; (c) childSessionId só no código-fonte, sem documentação como contrato estável; (d) se o hook dispara em chamadas feitas de dentro do run_typescript: nenhuma fonte; (e) formato do journal no núcleo Rust: sem fonte; (f) Discord, Reddit e blogs técnicos: sem sinal; (g) o PyPI publicou a 3.1.0 em 2026-11-04, então a leitura do core na 3.0.4 pode já estar defasada."
+    trace: "journal do run /onion-research gênero qa de 2026-11-04"
+    provenance:
+      source: "journal do run /onion-research gênero qa de 2026-11-04"
+      locator: "listas de claims confirmadas, refutadas, cortadas por orçamento e superações"
+      method: "derived: contabilidade do run repassada ao escritor"
+      locality: "host"
+
+  # ── Superações (SAC-151): cada reprovação que achou o que supera vira nó ──────────────────
+
+  - id: C_SUPERACAO_20261104_HOOKS_PAGE_ANSWERS_PART
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "A página de agentes não cobre (1)-(4), mas a página oficial de hooks documenta que subagentes herdam os hooks do projeto, o stdin com session_id, parent_session_id, transcript_path, cwd e hook_event_name, o pre_tool com tool_call_id e o match agents_spawn."
+    narrative: "Medida: em 2026-11-04 o juiz baixou a página de hooks com curl e achou verbatim 'Subagents inherit the parent's hook configuration', 'parent_session_id', 'tool_call_id' e 'agents_spawn'; o mesmo grep na página de agentes deu 0; a página da 2.26.0 no newreleases.io confirma parent_session_id no stdin. Só o formato da sessão do subagente (journal, chunks, PublicSessionState) fica sem fonte. Critério: V2_CONTRADITA. Alvo reprovado: 'A documentação oficial do Vibe sobre agentes/subagentes não cobre ... não confirma nem refuta o que o core leu' (tier 9). Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://docs.mistral.ai/vibe/code/cli/hooks | sed 's/<[^>]*>/ /g' | command grep -oE '.{0,80}(Subagents inherit|parent_session_id|tool_call_id|agents_spawn).{0,80}'"
+  - id: C_SUPERACAO_20261104_README_SESSION_JOURNAL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "O README chama o armazenamento atual da sessão de session journal, no diretório de logs de sessão sob VIBE_HOME (journal_dir no export.json; --output-dir copia o journal); pastas com meta.json e messages.jsonl são só formato de importação histórica."
+    narrative: "Medida: curl do README cru da main (1495 linhas); grep -n achou journal (l.337, 393, 615), 'Historical imports' (l.1332), parent_session_id (l.1254) e 'Subagents inherit' (l.1248); grep -c de childSessionId|PublicSessionState|chunk deu 0. Versão corrente no PyPI conferida: 3.1.0, publicada em 2026-11-04. O vínculo pai→filho só aparece como parent_session_id no stdin dos hooks. Critério: V1_QUOTE_NAO_SUSTENTA. Alvo reprovado: 'As sessões 2.0+ são pastas com meta.json e messages.jsonl sob o diretório de logs (VIBE_HOME) ...' (tier 8). Afirmação de UM juiz, sem votação."
+    trace: "curl -sL https://raw.githubusercontent.com/mistralai/mistral-vibe/main/README.md -o R.md && sed -n '1330,1334p' R.md && grep -n -i 'journal' R.md && grep -c -iE 'childSessionId|PublicSessionState|chunk' R.md"
+  - id: C_SUPERACAO_20261104_RELEASES_CONFIRM_HOOKS_IN_SUBAGENT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "As release notes confirmam hooks dentro do subagente (v3.0.2), parent_session_id, session_id e transcript_path no stdin (v2.26.0), nomes de ferramenta qualificados (v3.0.2) e journal e store por subagente (v3.0.1); silenciam sobre childSessionId e skipped."
+    narrative: "Também silenciam sobre chunks, PublicSessionState, toolCallId e settledMessage. Medida: download das 99 releases pela API do GitHub e grep -n -i por childSession, parent_session, skipped, toolCallId, settled, PublicSessionState, journal, store, subagent e hook no corpo; cada linha mapeada para tag e data por script Python. Critério: V2_CONTRADITA. Alvo reprovado: 'As release notes não documentam ... não confirmam nem refutam a leitura do core' (tier 8). Afirmação de UM juiz, sem votação."
+    trace: "curl -s 'https://api.github.com/repos/mistralai/mistral-vibe/releases?per_page=100' | python3 -c \"import json,sys;[print(r['tag_name'],l) for r in json.load(sys.stdin) for l in (r['body'] or '').splitlines() if 'parent_session_id' in l or 'run for tool calls made inside subagents' in l or 'copies its journal' in l]\""
+  - id: C_SUPERACAO_20261104_CHILD_SESSIONS_EMPTY_BY_STRUCTURE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Na 3.0.4, meta.json.child_sessions vem vazio por estrutura (nenhum escritor de ChildSessionLink; o adapter só copia o previous), não por instabilidade; o vínculo existe por parent_session_id no meta do filho e por state.child_sessions no runtime do pai."
+    narrative: "Medida: leitura verbatim da issue #1277 (versão 2.26.1, ValidationError em hook_call, sem PR, label nem comentário; o childSessionId null só aparece no 3º spawn, a 0,7 s do crash). curl do raw v3.0.4/vibe/app_server/_subagent_runs.py deu HTTP 200, com child_session_records:168, parent_session_id:206 e childSessionId:320. No pacote 3.0.4 instalado, o grep de escritores só devolveu a definição em core/types.py:44/80 e o append de runtime em events.py:636; as linhas 1429-1440 do _unified_harness_backend_adapter.py mostram parent_session_id=session.parent_session_id e child_sessions=previous.child_sessions if previous else []. Critério: V1_QUOTE_NAO_SUSTENTA. Alvo reprovado: 'O vínculo pai→filho não é estável ...' (tier 6). Afirmação de UM juiz, sem votação."
+    trace: "WebFetch https://github.com/mistralai/mistral-vibe/issues/1277; S=⟨site-packages do mistral-vibe 3.0.4⟩/vibe; grep -rnE 'ChildSessionLink[^A-Za-z_]|child_sessions[.]append' $S; sed -n 1429,1440p $S/app_server/_unified_harness_backend_adapter.py"
+
+  # ── A medida (fechamento): os testes das portas, depois do run, contra o que a pesquisa disse ──
+
+  - id: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-11-04"
+    verified_against: "as 7 células de veto do subagente no Vibe 3.0.4 (evidence-r2veto.tar.gz) e as 3 do controle sem veto (evidence-r2.tar.gz), abertas e recontadas nesta conferência: hook.log, store_extract.json, a árvore do store, chunks, stdout e pedidos ao modelo"
+    valid_from: "2026-11-04"
+    source_tier: 9
+    source_kind: primary
+    label: "Medido na 3.0.4 (modelo stub): store e hooks herdados confirmados, e 3 correções: o filho não tem meta.json; o efeito vetado não traz toolCallId; toolName tool e input null valem só no vetado. Os hooks medidos eram do usuário, não do projeto."
+    narrative: "O run terminou às 13:00Z e as células de veto rodaram a partir das 18:55Z; a pesquisa não as viu, e este nó as confere sem reescrever os nós dela. CONFIRMA, em 7 de 7: pai e filho ficam lado a lado em logs/session/unified/, o filho em child-<id>, com CURRENT, chunks, generations e journal; o hook roda dentro do filho, com session_id child-<id>, parent_session_id igual ao id do pai (null nos hooks do pai) e transcript_path apontando o store do filho; o stdin do pre_tool traz exatamente cwd, hook_event_name, parent_session_id, session_id, tool_call_id, tool_input, tool_name e transcript_path; o motivo do veto chega ao modelo do filho como mensagem role tool, name bash, com o tool_call_id da chamada; _meta['mistral.vibe.subagent'] traz agentName, agentType, childSessionId, generation e spawnCallId, com spawnCallId igual ao tool_call_id do hook do agents.spawn e childSessionId igual ao diretório do filho. CORRIGE: (a) C_SUPERACAO_20261104_CHILD_SESSIONS_EMPTY_BY_STRUCTURE põe o parent_session_id no meta do filho, e o diretório do filho não tem meta.json em nenhuma das 7; a chave está em generations/*/runtime-state.json, com o id do pai. O vazio de child_sessions no meta.json do pai se confirma em 7 de 7, sempre com um único spawn. (b) Item 2 da pergunta, que o nó dava como sem resposta: o efeito vetado não traz toolCallId; o id da chamada está na mensagem de ferramenta e no aviso hook_completed, com level error e o texto Denied tool 'bash'. A junção real é o par action_id e call_id, em journal e generations (PRE-REGISTRO-R2.md, seção 13). (c) Item 4 da pergunta: a premissa kind tool, toolName grupo.ferramenta e input null no estado assentado não vale como forma única. O efeito vetado tem toolName tool, input null, status skipped e o veto em settledMessage. Os efeitos concluídos mantêm o input e o nome qualificado: file_system.bash no filho do controle (3 de 3), e read_file, agents.spawn e self.wait no pai (7 de 7). (d) Lacuna d de E_LACUNAS_VIBE_SUBAGENT_1104: o hook dispara em chamada de dentro do run_typescript; o agents.spawn chega com tool_call_id typescript:5:call_…:0:tool:0, em 7 de 7. (e) Pergunta aberta do retorno sobre childSessionId null: o null aparece nos chunks do pai na forma running, em 7 de 7, e a forma completed traz o id; N filhos concorrentes não foram medidos. (f) A recomendação do retorno de depender do campo documentado tem um limite medido: no stdout JSON do pai aparece childSessionId, não documentado, e não aparece parent_session_id, o documentado, que só chega por hook. NÃO MEDE: hooks de projeto nem pasta confiável (o hooks.toml das células fica em VIBE_HOME, escopo do usuário); post_tool e post_agent (só pre_tool configurado); modelo real; a 3.1.0; o formato interno do journal."
+    trace: "docs/evolution/research/vibe-subagent-2026-11/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/harness/evidence-archive/evidence-r2veto.tar.gz e evidence-r2.tar.gz, e docs/evolution/research/port-spikes-qwen-vibe-2026-11/PRE-REGISTRO-R2.md"
+      locator: "células R2b-S1-V-r1 a r4 e R2b-M-V-r1 a r3 (veto), R2b-S0-V-r1 a r3 (controle); seção 13 do pré-registro"
+      method: "measurement: contagem por script sobre a evidência arquivada das células rodadas por harness/run_cell.sh; nenhuma célula nova"
+      locality: "repo"
+edges:
+  - from: E_VIBE_HOOKS_DOC_STDIN_PARENT_SESSION_ID_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_HOOKS_DOC_SUBAGENT_INHERITS_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_HOOKS_DOC_PRE_TOOL_DENY_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_README_HOOKS_INHERITED_STDIN_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_README_PRE_TOOL_DENY_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_V303_SUBAGENT_STORE_UNIFIED_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_V303_CHILD_SESSION_LINK_META_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_V302_HOOKS_IN_SUBAGENTS_RELEASE_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_PYPI303_SUBAGENT_INHERITS_HOOKS_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_PYPI303_HOOK_STDIN_FIELDS_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_PYPI303_PRE_TOOL_DENY_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_PYPI_PROJECT_HOOKS_INHERITED_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_PYPI_HOOK_STDIN_FIELDS_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_PYPI_PRE_TOOL_DENY_NO_SKIPPED_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_ISSUE1277_UNIFIED_JOURNAL_LAYOUT_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_NEWRELEASES_2260_STDIN_PARENT_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_MERCADO_VIBE_SUBAGENT_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_VIBE_SUBAGENT_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: C_SUPERACAO_20261104_HOOKS_PAGE_ANSWERS_PART
+    to: E_LACUNAS_VIBE_SUBAGENT_1104
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261104_README_SESSION_JOURNAL
+    to: E_LACUNAS_VIBE_SUBAGENT_1104
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261104_RELEASES_CONFIRM_HOOKS_IN_SUBAGENT
+    to: E_LACUNAS_VIBE_SUBAGENT_1104
+    edge_type: TRACES_TO
+  - from: C_SUPERACAO_20261104_CHILD_SESSIONS_EMPTY_BY_STRUCTURE
+    to: E_LACUNAS_VIBE_SUBAGENT_1104
+    edge_type: TRACES_TO
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: Q_VIBE_SUBAGENT_SESSION_HOOKS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: E_VIBE_V303_SUBAGENT_STORE_UNIFIED_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: E_VIBE_V303_CHILD_SESSION_LINK_META_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: E_VIBE_HOOKS_DOC_SUBAGENT_INHERITS_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: E_VIBE_HOOKS_DOC_STDIN_PARENT_SESSION_ID_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: E_VIBE_HOOKS_DOC_PRE_TOOL_DENY_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: E_VIBE_ISSUE1277_UNIFIED_JOURNAL_LAYOUT_1104
+    edge_type: SUPPORTS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: C_SUPERACAO_20261104_CHILD_SESSIONS_EMPTY_BY_STRUCTURE
+    edge_type: CONSTRAINS
+  - from: E_VIBE_SUBAGENT_MEDIDO_NOS_SPIKES_1104
+    to: E_LACUNAS_VIBE_SUBAGENT_1104
+    edge_type: CONSTRAINS
