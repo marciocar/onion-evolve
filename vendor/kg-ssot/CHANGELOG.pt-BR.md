@@ -10,6 +10,19 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.41.0] - 2026-11-03
+
+Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. O `kg-ssot.query/1` não muda.
+
+- O `kg_query --group-by CAMPO` conta os nós que uma consulta acha, pelo valor de um campo, em vez de listá-los:
+  `file`, `node_type`, `status`, `plane`, `layer`, `owner`, um campo `x_*` (com ponto para chave aninhada) ou
+  `meta.<chave>` do grafo do nó, repetível até 5 para a combinação. Os filtros valem antes, todos os grupos saem sem
+  página, o campo que falta é o próprio grupo `null`, e as contagens somam o `total`. A saída é o novo
+  `kg-ssot.groups/1`, com o schema em `spec/groups.schema.json`. A ferramenta `kg_query` do MCP aceita os mesmos campos
+  em `group_by`. Não combina com `--semantic`, `--cursor`, `--decision`, `--chain` nem `--revisit` (rc 2). Por quê: num
+  teste em que um agente respondeu 15 perguntas de contagem e filtro sobre um corpus, ele escreveu código sobre o YAML
+  em vez de usar o `kg_query`, e isso pula o leitor do contrato. O grau de entrada de um nó ainda não está coberto.
+
 ## [4.40.2] - 2026-11-03
 
 Sem mudança no contrato (segue v4.18), e nenhum veredito muda.

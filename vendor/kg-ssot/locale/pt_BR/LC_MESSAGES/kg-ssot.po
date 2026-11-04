@@ -3671,3 +3671,31 @@ msgstr "· só as decisões em que {where}"
 #: tools/kg_query.py
 msgid "· only the nodes where {where}"
 msgstr "· só os nós em que {where}"
+
+#: tools/kg_query.py
+msgid "--group-by counts every node the filters find: it does not combine with --semantic or --cursor"
+msgstr "--group-by conta todos os nós que os filtros acham: não combina com --semantic nem com --cursor"
+
+#: tools/kg_query.py
+msgid "--group-by counts the node queries, not --decision, --chain or --revisit"
+msgstr "--group-by conta as consultas de nós, não --decision, --chain nem --revisit"
+
+#: tools/kg_query.py
+msgid "--group-by takes at most {max} fields"
+msgstr "--group-by aceita no máximo {max} campos"
+
+#: tools/kg_query.py
+msgid "--group-by {item}: the field is file, node_type, status, plane, layer, owner, an x_* field (x_raci.responsible) or meta.<key>"
+msgstr "--group-by {item}: o campo é file, node_type, status, plane, layer, owner, um campo x_* (x_raci.responsible) ou meta.<chave>"
+
+#: tools/kg_query.py
+msgid "--group-by {item}: the field is repeated"
+msgstr "--group-by {item}: o campo está repetido"
+
+#: tools/kg_query.py
+msgid "count the nodes the filters find, by the value of the field (repeatable, up to 5): file, node_type, status, plane, layer, owner, an x_* field (with a dot for a nested key) or meta.<key> of the node's graph; prints kg-ssot.groups/1, every group, without pages"
+msgstr "conta os nós que os filtros acham, pelo valor do campo (repetível, até 5): file, node_type, status, plane, layer, owner, um campo x_* (com ponto para chave aninhada) ou meta.<chave> do grafo do nó; imprime o kg-ssot.groups/1, com todos os grupos, sem página"
+
+#: tools/kg_query.py
+msgid "· {total} node(s) in {graphs} graph(s), in {groups} group(s) by {fields}"
+msgstr "· {total} nó(s) em {graphs} grafo(s), em {groups} grupo(s) por {fields}"

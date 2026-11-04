@@ -10,6 +10,19 @@ Releases before 4.16.0 are described in [ADOPTING.md](ADOPTING.md).
 
 ## [Unreleased]
 
+## [4.41.0] - 2026-11-03
+
+No contract change (still v4.18), and no verdict changes. `kg-ssot.query/1` does not change.
+
+- `kg_query --group-by FIELD` counts the nodes a query finds, by the value of a field, instead of listing them: `file`,
+  `node_type`, `status`, `plane`, `layer`, `owner`, an `x_*` field (a dot for a nested key) or `meta.<key>` of the
+  node's graph, repeatable up to 5 for the combination. The filters apply first, every group comes out without pages,
+  a missing field is its own `null` group, and the counts add up to `total`. The output is the new
+  `kg-ssot.groups/1`, with its schema in `spec/groups.schema.json`. The MCP `kg_query` tool takes the same fields in
+  `group_by`. It does not combine with `--semantic`, `--cursor`, `--decision`, `--chain` or `--revisit` (rc 2).
+  Why: in a test where an agent answered 15 counting and filtering questions over a corpus, it wrote code over the
+  YAML instead of using `kg_query`, which skips the reader of the contract. The in-degree of a node is not covered yet.
+
 ## [4.40.2] - 2026-11-03
 
 No contract change (still v4.18), and no verdict changes.

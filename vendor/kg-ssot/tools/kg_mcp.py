@@ -138,7 +138,8 @@ TOOLS = {
                          "open nodes; around returns the neighborhood of a node (name#id, or the unique id) by depth, "
                          "edge type and direction. Each node comes with its outgoing and incoming edges and the other "
                          "end resolved to its label (local or external, and whether it exists). Pages by cursor: repeat "
-                         "with next_cursor until it comes back null. semantic orders by similarity to a question (needs "
+                         "with next_cursor until it comes back null. group_by counts the nodes by field instead of "
+                         "listing them: use it for how many, per graph or per status. semantic orders by similarity to a question (needs "
                          "the vector extra on the server); with text, both orders are fused by RRF."),
         "inputSchema": {"type": "object", "additionalProperties": False,
                         "properties": {
@@ -174,7 +175,14 @@ TOOLS = {
                                       "items": {"type": "string", "pattern": "^[^=]+=", "maxLength": 300},
                                       "description": P_("KEY=VALUE conditions, all of them: owner or an x_* field, with "
                                                         "a dot for a nested key; owner=<session> is that session's "
-                                                        "queue")}}},
+                                                        "queue")},
+                            "group_by": {"type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": True,
+                                         "items": {"type": "string", "minLength": 1, "maxLength": 200},
+                                         "description": P_("count the nodes the filters find, by the value of each "
+                                                           "field, instead of listing them (kg-ssot.groups/1, every "
+                                                           "group, without pages): graph name as file, node_type, "
+                                                           "status, plane, layer, owner, an x_* field (with a dot for a "
+                                                           "nested key) or meta.<key>")}}},
         "needs_store": True, "writes": False},
     "kg_terms": {
         "description": P_("Resolves a domain term in the vocabulary of the store (the x_term profile, contract v4.11): "
@@ -639,6 +647,9 @@ class Server:
             day = kg_validate.iso_date(before) if before is not None else None
             if before is not None and day is None:
                 raise ToolError(P_("verified_before {value}: the date is YYYY-MM-DD").format(value=repr(before)))
+            if args.get("group_by") and (args.get("semantic") is not None or args.get("cursor") is not None):
+                raise ToolError(P_("group_by counts every node the filters find: it does not combine with semantic "
+                                   "or cursor"))
             ranker = None
             if args.get("semantic") is not None:
                 ranker = self.semantic_ranker()
@@ -652,9 +663,14 @@ class Server:
                                      sort=args.get("sort", "corpus"), limit=args.get("limit", 50),
                                      cursor=args.get("cursor"), narrative=args.get("narrative", False),
                                      fields=args.get("fields", ()), max_bytes=self.max_bytes,
-                                     semantic=args.get("semantic"), ranker=ranker, where=args.get("where", ()))
+                                     semantic=args.get("semantic"), ranker=ranker, where=args.get("where", ()),
+                                     group_by=args.get("group_by", ()))
             except ValueError as exc:
                 raise ToolError(str(exc)) from None
+            if "groups" in res and self.max_bytes is not None and \
+                    len(json.dumps(res["groups"], ensure_ascii=False)) > self.max_bytes:  # os grupos não têm página
+                raise ToolError(P_("{n} groups do not fit in one answer: narrow the filters or group by fewer "
+                                   "fields").format(n=len(res["groups"])))
             return res, False
         if name == "kg_terms":
             corpus = kg_query.Corpus()

@@ -1,6 +1,6 @@
 {
-  "version": "4.40.2",
-  "tag": "kg-ssot-v4.40.2",
+  "version": "4.41.0",
+  "tag": "kg-ssot-v4.41.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -32,6 +32,7 @@
     "spec/decision.schema.json",
     "spec/revisit.schema.json",
     "spec/digest.schema.json",
+    "spec/groups.schema.json",
     "spec/examples/",
     "spec/vocab-examples/",
     "spec/conformance/README.md",

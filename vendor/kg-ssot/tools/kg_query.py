@@ -66,6 +66,7 @@ class Corpus:
         self.files = []
         self.root = None  # a raiz do --root, contra a qual os caminhos (file) e a ponta externa se resolvem
         self.meta_ids = {}  # arquivo -> meta.id (o kg_vocab monta o IRI do termo com ele, como o kg_prov_export)
+        self.metas = {}  # arquivo -> o meta do grafo (o --group-by meta.<chave>, 4.41.0)
         self.withs = []  # [(prefixo da URL, pasta local)]: o --with lê o grafo de outro repositório (4.35.0)
         self.external = {}  # URL do grafo lido pelo --with -> {"base": prefixo/ref/, "pinned": bool}
         # o grau da atenção (4.36.0), no escopo do arquivo, como o radar: a aresta conta para as pontas locais do arquivo
@@ -82,6 +83,8 @@ class Corpus:
             self.unreadable.append({"file": name, "code": code or "parse.root-not-mapping"})
             return
         meta = doc.get("meta")
+        if isinstance(meta, dict):
+            self.metas[name] = meta
         if isinstance(meta, dict) and isinstance(meta.get("id"), str):
             self.meta_ids[name] = meta["id"]
         for n in doc.get("nodes") if isinstance(doc.get("nodes"), list) else []:
@@ -1013,6 +1016,66 @@ def _scalar_text(value):
     return None
 
 
+GROUP_BY_MAX = 5
+GROUP_FIELDS = ("file", "node_type", "status", "plane", "layer", "owner")
+GROUPS_VERSION = "kg-ssot.groups/1"
+
+
+def parse_group_by(items):
+    """Os campos do --group-by (4.41.0): file, node_type, status, plane, layer, owner, um x_* (com ponto para a chave
+    aninhada, como no --where) ou meta.<chave> (o meta do grafo do nó). ValueError: campo fora disso."""
+    items = [items] if isinstance(items, str) else list(items or ())
+    if len(items) > GROUP_BY_MAX:
+        raise ValueError(_("--group-by takes at most {max} fields").format(max=GROUP_BY_MAX))
+    out = []
+    for item in items:
+        path = tuple(item.split(".")) if isinstance(item, str) else ()
+        if not path or any(not part for part in path) or not (
+                (len(path) == 1 and path[0] in GROUP_FIELDS) or path[0].startswith("x_")
+                or (path[0] == "meta" and len(path) > 1)):
+            raise ValueError(_("--group-by {item}: the field is file, node_type, status, plane, layer, owner, an x_* "
+                               "field (x_raci.responsible) or meta.<key>").format(item=repr(item)))
+        if item in out:
+            raise ValueError(_("--group-by {item}: the field is repeated").format(item=repr(item)))
+        out.append(item)
+    return out
+
+
+def group_value(corpus, key, field):
+    """O valor do nó no campo do grupo: o que falta é None; o escalar sai como está (a data, em ISO); a lista ou o mapa,
+    como o texto JSON dele, de modo que cada nó cai num grupo só."""
+    if field == "file":
+        return key[0]
+    path = field.split(".")
+    cur = corpus.metas.get(key[0]) if path[0] == "meta" else corpus.nodes[key]
+    for part in path[1:] if path[0] == "meta" else path:
+        if not isinstance(cur, dict) or part not in cur:
+            return None
+        cur = cur[part]
+    cur = _plain(cur)
+    if isinstance(cur, float) and cur.is_integer():
+        cur = int(cur)  # 1.0 e 1 são o mesmo valor JSON: a chave não depende de qual veio primeiro no corpus
+    if isinstance(cur, (datetime.date, datetime.datetime)):
+        return cur.isoformat()
+    if isinstance(cur, (dict, list)):
+        return json.dumps(cur, ensure_ascii=False, sort_keys=True,
+                          default=lambda v: v.isoformat() if isinstance(v, (datetime.date, datetime.datetime)) else str(v))
+    if cur is None or isinstance(cur, (str, bool, int, float)):
+        return unicodedata.normalize("NFC", cur) if isinstance(cur, str) else cur
+    return str(cur)
+
+
+def group_counts(corpus, hits, fields):
+    """Os grupos dos nós achados: [{key: {campo: valor}, count}], da contagem maior para a menor e, no empate, pela
+    chave (o null antes do texto)."""
+    # o booleano leva a marca do tipo: no Python True == 1 e os dois têm o mesmo hash, e o Counter fundiria x: true com
+    # x: 1, que o --where separa (achado do Elenxo da 4.41.0)
+    counts = collections.Counter(tuple((type(v) is bool, v) for v in (group_value(corpus, k, f) for f in fields))
+                                 for k in hits)
+    order = sorted(counts.items(), key=lambda kv: (-kv[1], [(v is not None, b, str(v), type(v).__name__) for b, v in kv[0]]))
+    return [{"key": dict(zip(fields, (v for _b, v in values))), "count": n} for values, n in order]
+
+
 def where_matches(node, conds):
     """O nó casa todas as condições? A chave que falta não casa; um escalar casa por igualdade de texto, e uma lista,
     quando algum escalar dela casa."""
@@ -1096,7 +1159,7 @@ def project(corpus, key, narrative=False, fields=()):
 def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=None, layer=None, file=None, text=None,
           in_narrative=False, open_only=False, verified_before=None, around=None, depth=1, edge_types=(),
           direction="both", sort="corpus", limit=50, cursor=None, narrative=False, fields=(), max_bytes=None,
-          semantic=None, ranker=None, where=()):
+          semantic=None, ranker=None, where=(), group_by=()):
     """A consulta inteira, no formato kg-ssot.query/1. ValueError: pedido quebrado. max_bytes: o teto da página em bytes
     de JSON (o servidor MCP passa o dele); a página corta antes do limit quando o passa, sempre com ao menos um nó, e o
     next_cursor continua de onde ela parou.
@@ -1105,6 +1168,10 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
     fundem por RRF (k=60), com o empate pela posição no vetor. As duas listas são completas, e o limit só pagina."""
     if not 1 <= limit <= MAX_LIMIT:
         raise ValueError(_("--limit must be between 1 and {max}").format(max=MAX_LIMIT))
+    group_by = parse_group_by(group_by)
+    if group_by and (semantic is not None or cursor is not None):
+        raise ValueError(_("--group-by counts every node the filters find: it does not combine with --semantic or "
+                           "--cursor"))
     if depth < 0:
         raise ValueError(_("--depth must be 0 or more"))
     if direction not in ("out", "in", "both"):
@@ -1152,6 +1219,10 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         sem = {"mode": "hybrid" if text else "semantic", "question": semantic, "k": RRF_K, **used}
         if text:  # o total do híbrido são todos os candidatos; quantos casam o --text sai à parte
             sem["text_matches"] = len(text_hits)
+    grouped = group_counts(corpus, hits, group_by) if group_by else None
+    if grouped is not None:
+        hits_for_page = hits
+        hits = hits[:0]  # os grupos dispensam a página: nada é projetado
     if sort == "impact":
         rank = {k: i for i, k in enumerate(corpus.order)}
 
@@ -1186,6 +1257,9 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
     if where:
         request["where"] = list(where)
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
+    if grouped is not None:
+        request["group_by"] = list(group_by)
+        hits = hits_for_page
     res = {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
            "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
            "nodes": page}
@@ -1206,7 +1280,47 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                                  "term of the vocabulary (kg_vocab.py lookup)"))
             if sem is not None:
                 res["hint"] += _("; the order comes from --semantic alone")
+    if grouped is not None:
+        out = {"schema_version": GROUPS_VERSION, "root": res["root"], "query": request, "graphs": res["graphs"],
+               "unreadable": unreadable, "total": res["total"], "groups": grouped}
+        if res.get("hint"):
+            out["hint"] = res["hint"]
+        return out
     return res
+
+
+def _group_text(v):
+    """O valor do grupo na saída humana sem ambiguidade: o que não é texto sai em JSON (true, 1, null), e o texto sai
+    como está, salvo quando se confundiria com um deles ou tem quebra de linha, e aí sai entre aspas."""
+    if not isinstance(v, str):
+        return json.dumps(v, ensure_ascii=False)
+    try:
+        json.loads(v)  # qualquer JSON, inclusive um texto que já vem entre aspas
+        looks = True
+    except ValueError:
+        looks = False
+    if looks or not v or v != v.strip() or "  " in v or any(unicodedata.category(c)[0] == "C" for c in v):
+        return json.dumps(v, ensure_ascii=False)
+    return v
+
+
+def groups_human(res):
+    lines = []
+    for g in res["groups"]:
+        key = "  ".join(f"{k}={_group_text(v)}" for k, v in g["key"].items())
+        lines.append(f"{g['count']:>6}  {key}")
+    for u in res["unreadable"][:5]:
+        lines.append(_("UNREADABLE  {file}: {code}").format(file=u["file"], code=u["code"]))
+    if len(res["unreadable"]) > 5:
+        lines.append(_("UNREADABLE  and {n} more graph(s) (--format json shows the full list)")
+                     .format(n=len(res["unreadable"]) - 5))
+    if res.get("hint"):
+        lines.append("· " + res["hint"])
+    if res["query"].get("where"):
+        lines.append(_("· only the nodes where {where}").format(where=" and ".join(res["query"]["where"])))
+    lines.append(_("· {total} node(s) in {graphs} graph(s), in {groups} group(s) by {fields}").format(
+        total=res["total"], graphs=res["graphs"], groups=len(res["groups"]), fields=", ".join(res["query"]["group_by"])))
+    return "\n".join(lines)
 
 
 def human(res):
@@ -1291,6 +1405,10 @@ def main(argv=None):
     ap.add_argument("--where", action="append", default=[], metavar=_("KEY=VALUE"),
                     help=_("only the nodes where the key has the value (repeatable, all of them): owner or an x_* "
                            "field, with a dot for a nested key (x_raci.responsible); with --revisit, its decisions"))
+    ap.add_argument("--group-by", action="append", default=[], metavar=_("FIELD"),
+                    help=_("count the nodes the filters find, by the value of the field (repeatable, up to 5): file, "
+                           "node_type, status, plane, layer, owner, an x_* field (with a dot for a nested key) or "
+                           "meta.<key> of the node's graph; prints kg-ssot.groups/1, every group, without pages"))
     ap.add_argument("--depth", type=int, default=1)
     ap.add_argument("--edge-type", action="append", default=[], dest="edge_types")
     ap.add_argument("--direction", default="both", choices=("out", "in", "both"))
@@ -1323,6 +1441,9 @@ def main(argv=None):
         before = kg_validate.iso_date(args.verified_before)
         if before is None:
             return broken(_("--verified-before {value}: the date must be YYYY-MM-DD").format(value=repr(args.verified_before)))
+    if args.group_by and (args.semantic is not None or args.cursor is not None):
+        return broken(_("--group-by counts every node the filters find: it does not combine with --semantic or "
+                        "--cursor"))
     ranker = None
     if args.semantic is not None:
         if not args.semantic.strip():  # o pedido quebrado é rc 2 antes de olhar o extra
@@ -1344,6 +1465,8 @@ def main(argv=None):
         return broken(_("--with goes with --chain, --decision or --revisit"))
     if args.as_of is not None and not args.revisit:
         return broken(_("--as-of goes with --revisit"))
+    if args.group_by and (args.decision is not None or args.chain is not None or args.revisit):
+        return broken(_("--group-by counts the node queries, not --decision, --chain or --revisit"))
     if args.where and (args.decision is not None or args.chain is not None):
         return broken(_("--where filters the node queries and --revisit, not --decision or --chain"))
     if args.decision is not None or args.revisit:
@@ -1388,10 +1511,11 @@ def main(argv=None):
                     open_only=args.open_only, verified_before=before, around=args.around, depth=args.depth,
                     edge_types=args.edge_types, direction=args.direction, sort=args.sort, limit=args.limit,
                     cursor=args.cursor, narrative=args.narrative, fields=args.fields, semantic=args.semantic,
-                    ranker=ranker, where=args.where)
+                    ranker=ranker, where=args.where, group_by=args.group_by)
     except (OSError, ValueError, UnicodeDecodeError) as exc:
         return broken(exc)
-    text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else human(res)
+    text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else \
+        (groups_human(res) if args.group_by else human(res))
     # o surrogate solto (\ud800, que o contrato só avisa) não é UTF-8: sai como o escape \ud800, que no JSON é o mesmo valor
     print(text.encode("utf-8", "backslashreplace").decode("utf-8"))
     return 0

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:groups.schema.json",
+  "title": "Contagem agrupada de uma consulta (kg-ssot.groups/1)",
+  "description": "Saída de `kg_query.py --group-by CAMPO --format json` e da ferramenta kg_query do servidor MCP com `group_by`, desde a 4.41.0. Conta os nós que os filtros da consulta acham, agrupados pelo valor de cada campo pedido: file (o caminho do grafo, ou o nome dele no servidor MCP), node_type, status, plane, layer, owner, um x_* (com ponto para a chave aninhada) ou meta.<chave> (o meta do grafo do nó). Com mais de um campo, o grupo é a combinação. O campo que falta vale null e forma o próprio grupo; a data sai em ISO, e a lista ou o mapa sai como o texto JSON dele (chaves ordenadas), de modo que cada nó cai num grupo só e a soma das contagens é `total`. O booleano não se funde com o número (true e 1 são grupos separados), mas 1 e 1.0 são um grupo (a chave sai 1), e a data, a lista ou o mapa e o .nan ou .inf caem no grupo do texto que os escreve. A lista de grupos é inteira, sem página, da contagem maior para a menor e, no empate, pela chave (o null antes do texto). `query` ecoa o pedido normalizado de kg-ssot.query/1 com `group_by`. Não combina com --semantic nem com --cursor.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "root",
+    "query",
+    "graphs",
+    "unreadable",
+    "total",
+    "groups"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "kg-ssot.groups/1"
+    },
+    "root": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "a raiz do --root, ou null quando os grafos vieram um a um"
+    },
+    "query": {
+      "type": "object",
+      "required": [
+        "group_by"
+      ],
+      "properties": {
+        "group_by": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "description": "o eco do pedido, nos campos de kg-ssot.query/1, mais group_by"
+    },
+    "graphs": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unreadable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "code"
+        ],
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "total": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "quantos nós a consulta acha; é a soma das contagens"
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "key",
+          "count"
+        ],
+        "properties": {
+          "key": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            },
+            "description": "campo do group_by -> valor do grupo"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "hint": {
+      "type": "string",
+      "description": "o porquê de um zero do --text, como em kg-ssot.query/1"
+    }
+  }
+}
