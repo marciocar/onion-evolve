@@ -75,11 +75,12 @@ com o dado.
 - O modo de aprovação padrão fica fora do critério: no Qwen ele não oferece ferramenta de ação; no Vibe o controle dá
   recusa por aprovação, e o veto fica INCONCLUSIVO por falta de controle pareado com FURA.
 
-## Rodada 2 — resultados (RASCUNHO de 2026-11-04, à espera das revisões)
+## Rodada 2 — resultados (fechada em 2026-11-04, com as duas revisões)
 
-> Rascunho. O lote `r2` está fechado no braço stub, inclusive o veto do subagente no Vibe (`PRE-REGISTRO-R2.md` §13).
-> A regra dessas células foi posta na forma medida e commitada antes dos dados (`aa35d25eb`). Os resultados de §13 ainda
-> não foram revisados.
+> O lote `r2` está fechado no braço stub, inclusive o veto do subagente no Vibe (`PRE-REGISTRO-R2.md` §13). A regra dessas
+> células foi posta na forma medida e commitada antes dos dados. Revisões: o kg-ssot recalculou os 7 vereditos sem
+> objeção, e os 4 achados da curadoria sobre o §13 estão curados. **A questão da rodada segue aberta no grafo:** a
+> leitura para a porta é rascunho até a decisão do maestro, e os SHAs citados têm a correspondência no §14 do pré-registro.
 
 **Como:**
 - `PRE-REGISTRO-R2.md`, com as Emendas R2-1 a R2-8 antes de qualquer célula. A Emenda R2-9 curou duas formas
