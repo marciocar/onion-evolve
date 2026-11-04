@@ -1781,6 +1781,12 @@ docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-cor
 docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml	D_RULE_CORPUS_STRATEGY_1001	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml	E_LACUNAS_CORPUS_DE_REGRAS_1001	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml	E_N3_NAO_TRANSFERE	docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml
+docs/evolution/research/exit2-coupling-against-2026-11/SYNTHESIS.md	C_EXIT2_CONFORMIDADE_SEM_EXCLUSIVIDADE_1104	docs/onion/graph/onion-identity-2026-07.kg.yaml
+docs/evolution/research/exit2-coupling-against-2026-11/SYNTHESIS.md	Q_EXIT2_COUPLING_AGAINST_2026_11	docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml
+docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/consolidado.txt	E_MODS_MANAGED_CONTAINER_STUB_1104	docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml
+docs/evolution/research/exit2-coupling-against-2026-11/data/mods-real-hooks/consolidado.txt	C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
+docs/evolution/research/exit2-coupling-against-2026-11/data/mods-real-hooks/consolidado.txt	E_MAESTRO_MOD_BEATS_VETO_LOGIN_MAX_1104	docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml
+docs/evolution/research/exit2-coupling-against-2026-11/data/sandbox-cell/consolidado.txt	E_SANDBOX_WRITE_CLAUDE_DIR_SCRIPTED_1104	docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml
 docs/evolution/research/fable-5-1-superacao-2026-09/SYNTHESIS.md	E_LACUNAS_DECLARADAS_FABLE51	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 docs/evolution/research/fable-5-1-superacao-2026-09/SYNTHESIS.md	Q_SUPERACAO_FABLE_5_1	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-claude-code.md	D_HOOK_PREMODELSWITCH_GUARDA	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
