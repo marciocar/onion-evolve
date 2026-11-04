@@ -38204,6 +38204,104 @@ run_adopter_shape_selftests() {
     esac
   fi
   unset -f _i5_run
+  # (i6) O MOLDE DE UPDATE É REFEITO, NÃO REMENDADO (sinal da curadoria, 2026-11-04, 4ª recorrência seguida, cada uma
+  #      curada à mão): no label "pin `X` (update de D, com o kg-ssot V e o contrato vC), modo…" e na narrative "Pins
+  #      anteriores…: `a`, …; a adoção foi `z`." o motor trocava só o pin, e a data, a versão, a lista (sem o pin que
+  #      acabou de sair) e a provenance ficavam do update anterior. Fixture: a semente real do semeador convertida para
+  #      o molde da curadoria. a) label refeito com hoje, a kg-ssot e o contrato do vendor e o papel/modo/integração do
+  #      carimbo; a lista ganha o pin que sai na frente; a provenance cita o carimbo novo; radar e contrato rc 0.
+  #      b) idempotência: o mesmo pin de novo não muda nada, e o motor forçado a rodar outra vez (x_pin de volta ao
+  #      antigo) não duplica a lista. c) RECUSA (rc 4, grafo intacto): label no molde com token fora dele, narrative
+  #      fora do molde, vendor sem a versão, e label editado fora dos moldes com dado do update ("atualizado em").
+  #      MUTANTES: um por guarda nova, cada um tem de derrubar o caso que a guarda segura.
+  local _rb_seed="${REPO_ROOT}/.claude/utils/adopt/seed-adoption-graph.sh" _rb_today
+  _rb_today="$(date +%F)"
+  _as_rb_fixture() {  # $1=dir → semente no molde de update, carimbo já no pin novo, vendor/kg-ssot medível
+    local _e="$1"
+    mkdir -p "${_e}/.claude" "${_e}/vendor/kg-ssot/tools"
+    printf 'framework: onion-evolve\nsource_commit: 3ade85b7e1c0\nsource_commit_date: 2026-11-03\nrole: adopted\nadopted_at: 2026-09-01\nmode: greenfield\nintegration_branch: main\n' > "${_e}/.claude/.onion-version"
+    bash "${_rb_seed}" "${_e}" --gate-proven >/dev/null 2>&1 || return 1
+    python3 - "${_e}/docs/onion/graph/onion-adoption.kg.yaml" <<'PY' || return 1
+import re, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read()
+s = re.sub(r'(?m)^    label: "Framework instalado: pin `3ade85b7e1c0`.*$',
+           '    label: "Framework instalado: pin `3ade85b7e1c0` (update de 2026-11-03, com o kg-ssot 4.40.2 e o contrato v4.17), modo `greenfield`, papel `adopted`, integração `main`."', s, count=1)
+s = re.sub(r'(?m)^(  - id: ONION_INSTALLED\n(?:    .*\n)*?)    narrative: ".*"$',
+           lambda m: m.group(1) + '    narrative: "Pins anteriores, do mais novo ao mais velho (log da onion/vendor): `67e9d003689f`, `c091dc66cf5c`; a adoção foi `5b529e980779`. Atualizar com /meta:adopt --update."', s, count=1)
+s = s.replace('      source: ".claude/.onion-version deste repo"\n      locator: "campos source_commit, mode, role e integration_branch"',
+              '      source: ".claude/.onion-version@d86aa63"\n      locator: "campos source_commit, role, mode; vendor/kg-ssot/.kg-ssot-version@d86aa63"', 1)
+assert "update de 2026-11-03" in s and "a adoção foi `5b529e980779`" in s and "@d86aa63" in s
+open(p, "w", encoding="utf-8").write(s)
+PY
+    printf '{"product": "kg-ssot", "version": "9.8.7"}\n' > "${_e}/vendor/kg-ssot/.kg-ssot-version"
+    printf 'CONTRACT_VERSION = "4.18"\n' > "${_e}/vendor/kg-ssot/tools/kg_validate.py"
+    printf 'framework: onion-evolve\nsource_commit: a682c090d1bc\nsource_commit_date: 2026-11-04\nrole: hub\nadopted_at: 2026-09-01\nmode: greenfield\nintegration_branch: develop\n' > "${_e}/.claude/.onion-version"
+  }
+  _as_rb_run() {  # $1=helper → lista de desvios (vazio = ok)
+    local _e="${d}/i6-$RANDOM" _bad="" _r=0 _g _h0 _h1 _n
+    _as_rb_fixture "${_e}" || { printf ' fixture-nao-montou'; return; }
+    _g="${_e}/docs/onion/graph/onion-adoption.kg.yaml"
+    # a) refeito
+    bash "$1" "${_e}" >/dev/null 2>&1 || _r=$?
+    [ "${_r}" -eq 0 ] || _bad="${_bad} a:rc=${_r}(esperado-0)"
+    grep -qxF "    label: \"Framework instalado: pin \`a682c090d1bc\` (update de ${_rb_today}, com o kg-ssot 9.8.7 e o contrato v4.18), modo \`greenfield\`, papel \`hub\`, integração \`develop\`.\"" "${_g}" \
+      || _bad="${_bad} a:label-nao-refeito"
+    grep -qxF '    narrative: "Pins anteriores, do mais novo ao mais velho (log da onion/vendor): `3ade85b7e1c0`, `67e9d003689f`, `c091dc66cf5c`; a adoção foi `5b529e980779`. Atualizar com /meta:adopt --update."' "${_g}" \
+      || _bad="${_bad} a:lista-sem-o-pin-que-saiu"
+    grep -qxF '      source: ".claude/.onion-version"' "${_g}" || _bad="${_bad} a:provenance-source-velha"
+    grep -qF "lidos no update de ${_rb_today} para o pin a682c090d1bc\"" "${_g}" || _bad="${_bad} a:provenance-locator-velho"
+    grep -q 'd86aa63' "${_g}" && _bad="${_bad} a:provenance-cita-o-commit-do-update-anterior"
+    grep -qx '    x_pin: "a682c090d1bc"' "${_g}" || _bad="${_bad} a:x_pin"
+    ( cd "${REPO_ROOT}" && bash .claude/validation/kg-radar.sh "${_g}" --integrity --schema ) >/dev/null 2>&1 || _bad="${_bad} a:radar-rc=$?"
+    ( cd "${REPO_ROOT}" && bash .claude/validation/kg-contract-check.sh "${_g}" ) >/dev/null 2>&1 || _bad="${_bad} a:contrato-rc=$?"
+    # b) idempotência: o mesmo pin não muda nada; forçado a rodar de novo, a lista não duplica
+    _h0="$(sha256sum "${_g}" | cut -d' ' -f1)"; bash "$1" "${_e}" >/dev/null 2>&1 || true
+    _h1="$(sha256sum "${_g}" | cut -d' ' -f1)"; [ "${_h0}" = "${_h1}" ] || _bad="${_bad} b:mesmo-pin-mudou-o-grafo"
+    sed -i 's/^    x_pin: .*/    x_pin: "3ade85b7e1c0"/' "${_g}"; bash "$1" "${_e}" >/dev/null 2>&1 || true
+    _n="$(grep -m1 '^    narrative: "Pins anteriores' "${_g}" | grep -o '3ade85b7e1c0' | wc -l)"
+    [ "${_n}" -eq 1 ] || _bad="${_bad} b:lista-com-o-pin-${_n}-vezes"
+    # c) recusa: rc 4 e o grafo intacto, em cada forma que o motor não sabe refazer
+    _as_rb_refuse() {  # $1=helper $2=rótulo $3=programa python que estraga a fixture (recebe o grafo e o alvo)
+      local _f="${d}/i6c-$RANDOM" _rc=0 _a _b
+      _as_rb_fixture "${_f}" || { printf ' c:%s:fixture' "$2"; return; }
+      python3 -c "$3" "${_f}/docs/onion/graph/onion-adoption.kg.yaml" "${_f}" || { printf ' c:%s:setup' "$2"; return; }
+      _a="$(sha256sum "${_f}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
+      bash "$1" "${_f}" >/dev/null 2>&1 || _rc=$?
+      _b="$(sha256sum "${_f}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
+      [ "${_rc}" -eq 4 ] || printf ' c:%s:rc=%s(esperado-4)' "$2" "${_rc}"
+      [ "${_a}" = "${_b}" ] || printf ' c:%s:escreveu' "$2"
+    }
+    _bad="${_bad}$(_as_rb_refuse "$1" label-fora-do-molde 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="e o contrato v4.17), modo"; assert a in s; open(p,"w",encoding="utf-8").write(s.replace(a,"e o contrato v4.17, revisado em 2026-11-02), modo"))')"
+    _bad="${_bad}$(_as_rb_refuse "$1" narrative-fora-do-molde 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="Pins anteriores, do mais novo"; assert a in s; open(p,"w",encoding="utf-8").write(s.replace(a,"Histórico dos pins, do mais novo"))')"
+    _bad="${_bad}$(_as_rb_refuse "$1" vendor-sem-versao 'import os, sys; os.remove(os.path.join(sys.argv[2], "vendor/kg-ssot/.kg-ssot-version"))')"
+    _bad="${_bad}$(_as_rb_refuse "$1" label-do-dono-com-data-do-update 'import re, sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); s2=re.sub(r"(?m)^    label: \"Framework instalado: pin .*$", "    label: \"Framework instalado: pin `3ade85b7e1c0` (atualizado em 2026-11-03), modo `greenfield`.\"", s, count=1); assert s2!=s; s2=s2.replace("x_pin: \"a682c090d1bc\"","x_pin: \"3ade85b7e1c0\""); open(p,"w",encoding="utf-8").write(s2)')"
+    unset -f _as_rb_refuse
+    printf '%s' "${_bad}"
+  }
+  local _rb; _rb="$(_as_rb_run "${_pk}")"
+  if [ -z "${_rb}" ]; then
+    record_pass "adopter-shape: (i6) molde de update: label, lista de pins (com o que saiu, sem duplicar) e provenance refeitos de fontes medidas, radar e contrato rc 0; fora do molde recusa com rc 4 sem escrever"
+  else record_fail "adopter-shape: (i6)" "${_rb}"; fi
+  # MUTANTES (i6): cada guarda nova, desligada, tem de derrubar o caso que ela segura (o desvio esperado no padrão)
+  _as_rb_mutant() {  # $1=rótulo $2=trecho do helper $3=troca $4=desvio esperado (glob)
+    local _m="${d}/stamp-i6-mut-$1.sh" _out
+    python3 -c 'import sys; s=open(sys.argv[1],encoding="utf-8").read(); n=s.count(sys.argv[3]); open(sys.argv[2],"w",encoding="utf-8").write(s.replace(sys.argv[3],sys.argv[4]) if n==1 else s)' "${_pk}" "${_m}" "$2" "$3"
+    if cmp -s "${_pk}" "${_m}"; then record_fail "adopter-shape: (i6-MUT $1) setup" "a mutação não foi aplicada (âncora mudou ou não é única?)"; return; fi
+    _out="$(_as_rb_run "${_m}")"
+    case "${_out}" in
+      $4) record_pass "adopter-shape: (i6-MUT $1) sem a guarda o caso cai — é load-bearing" ;;
+      *)  record_fail "adopter-shape: (i6-MUT $1)" "o mutante não derrubou o desvio esperado ($4); saiu [${_out}]" ;;
+    esac
+  }
+  _as_rb_mutant refaz 'if li is not None and UPD_PREFIX.match(blk[li]):' 'if False:' '*a:label-nao-refeito*'
+  _as_rb_mutant pin-que-sai '        hist.insert(0, cur)' '        pass' '*a:lista-sem-o-pin-que-saiu*'
+  _as_rb_mutant sem-duplicar ' and not any(same(cur, h) for h in hist):' ':' '*b:lista-com-o-pin-2-vezes*'
+  _as_rb_mutant provenance '    prov = {"source":' '    prov = {} and {"source":' '*a:provenance-source-velha*'
+  _as_rb_mutant recusa-label '        refuse("o label começa no molde de update mas não casa com ele inteiro (token fora do molde)")' '        refuse("x") if False else None' '*c:label-fora-do-molde:rc=*'
+  _as_rb_mutant recusa-narrative '        refuse("o label está no molde de update, mas a narrative não traz a lista de pins anteriores no molde")' '        refuse("x") if False else None' '*c:narrative-fora-do-molde:rc=*'
+  _as_rb_mutant recusa-vendor '        refuse("a versão da kg-ssot não foi medida em vendor/kg-ssot/.kg-ssot-version")' '        kv = "0.0.0"' '*c:vendor-sem-versao:rc=*'
+  _as_rb_mutant recusa-marcador 'elif li is not None and not label_ok and STALE_MARK.search(blk[li]):' 'elif False:' '*c:label-do-dono-com-data-do-update:rc=*'
+  unset -f _as_rb_fixture _as_rb_run _as_rb_mutant
 
   rm -rf "${d}"
 }
