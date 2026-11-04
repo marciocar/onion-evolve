@@ -6439,6 +6439,41 @@ check_act_signature() {
 }
 check_act_signature
 
+# ───────────────────────────────────────────────────────────────────────────
+# REGRA 114 — Plugin não mora em .claude/skills no disco [HARD + SOFT]
+# previne: um plugin plantado em .claude/skills, que carrega na sessão seguinte e cujo tool.check vence os vetos do core, passar despercebido por ter sido escrito por um caminho que o veto não vê.
+#   DEFEITO MEDIDO (2026-11-04, em LABORATÓRIO, não em dano de produção; Claude Code 2.1.318): nenhuma das 129 tentativas
+#   de escrita em .claude/ e ~/.claude/skills foi barrada por veto do core; o plugin gravado sob bypass carregou na sessão
+#   seguinte e venceu o veto do .env (células W1 e W4). É a metade do veto que NÃO depende do vocabulário do Bash: julga o
+#   RESULTADO no disco, por qualquer caminho que ele tenha vindo. Passivo medido na forja: ZERO arquivos no git, no core e nos
+#   adotantes clonados nesta máquina. Por isso nasce HARD no core, sem catraca. No derivado (IS_DERIVED) é SOFT: o adotante
+#   pode instalar um plugin ali por escolha dele, e o core não julga o projeto alheio. Só o repo: `~/.claude/skills` é com
+#   o SessionStart, porque o gate não depende do `~` de quem roda. Lógica e teto em plugin-write-scan-check.sh; o veto da
+#   escrita é o hook pretooluse-plugin-write-guard.sh, peça de teto do grafo guard-plugin-write-2026-11.
+check_plugin_write_scan() {
+  local helper="${SCRIPT_DIR}/plugin-write-scan-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in */.claude/skills/*|*/plugin-write-scan-check.sh) : ;; *) return 0 ;; esac
+  fi
+  local _R="REGRA 114 (Plugin não mora em .claude/skills no disco)"
+  local _repo="${ONION_PLUGIN_SCAN_REPO:-${REPO_ROOT}}"   # troca o repo julgado (bancada)
+  local _out _hrc=0 _err _sev _code _path _msg
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${_repo}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    [ "${IS_DERIVED}" -eq 1 ] && _sev="SOFT"
+    violation "${_sev:-HARD}" "${_repo}/${_path}" "${_R}: [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "HARD" "${helper}" "${_R}: a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_plugin_write_scan
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================

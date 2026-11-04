@@ -40,6 +40,12 @@
           },
           {
             "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-plugin-write-scan.sh\"",
+            "timeout": 5,
+            "statusMessage": "Varrendo plugin em .claude/skills (Onion)"
+          },
+          {
+            "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-beacon-hook.sh\" up",
             "timeout": 5,
             "statusMessage": "Acendendo farol de sessão (Onion)"
@@ -189,6 +195,16 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-direct-provider-api.sh\"",
+            "onFailure": "block"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-plugin-write-guard.sh\"",
             "onFailure": "block"
           }
         ]

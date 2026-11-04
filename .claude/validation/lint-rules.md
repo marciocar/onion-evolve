@@ -215,6 +215,7 @@ As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a 
 | 86 | Workflow de CI PARSEIA como YAML | HARD | workflow inexecutável passando por existente, e guarda morta por sintaxe |
 | 88 | Job de workflow que EXECUTA arquivo do repo faz checkout | HARD + SOFT | job sem `actions/checkout` invocando script versionado; o bash sai 127 e o `rc != 0` |
 | 101 | Veto PreToolUse por exit 2 declara onFailure: block | HARD + SOFT | veto que falha ABERTO quando o hook nem roda (script ausente sai 127 e a ação passa). |
+| 114 | Plugin não mora em .claude/skills no disco | HARD + SOFT | um plugin plantado em .claude/skills, que carrega na sessão seguinte e cujo tool.check vence os vetos do core, passar despercebido por ter sido escrito por um caminho que o veto não vê. |
 | 115 | Hooks rodam python em modo isolado | HARD + SOFT | um hook, ou o que ele executa, rodar python sem `-I` e importar de fora da instalação do interpretador |
 | 117 | Ato de deploy tem assinatura no veto | HARD + SOFT | um wrapper de deploy nascer, ou ter a gramática mudada, fora do veto do ATO do pretooluse-moat-gate.sh |
 

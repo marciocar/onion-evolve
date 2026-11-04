@@ -1,0 +1,33 @@
+LIVE-Edit-CTRL-1	gravou	mudou	veto=0	outro_erro=2	resultados=4	skills-no-status=0
+LIVE-Edit-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=4	skills-no-status=1
+LIVE-Edit-T4-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=4	skills-no-status=1
+LIVE-Edit-T5-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=4	skills-no-status=0
+LIVE-Write-CTRL-1	gravou	mudou	veto=0	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-Write-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-Write-T4-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-Write-T5-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cat-CTRL-1	gravou	mudou	veto=0	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cat-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cat-T4-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cat-T5-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cp-CTRL-1	gravou	mudou	veto=0	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cp-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cp-T4-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-cp-T5-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-python-CTRL-1	gravou	mudou	veto=0	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-python-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-python-T4-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-python-T5-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-tee-CTRL-1	gravou	mudou	veto=0	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-tee-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-tee-T4-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVE-tee-T5-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVEH-Write-T6-1	gravou	mudou	veto=0	outro_erro=2	resultados=4	skills-no-status=1
+LIVEH-cat-T2-1	gravou	mudou	veto=0	outro_erro=2	resultados=3	skills-no-status=0
+LIVEH-cat-T6-1	gravou	mudou	veto=0	outro_erro=2	resultados=3	skills-no-status=1
+LIVEK-K1-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVEK-K2-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+LIVEK-K3-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=4	skills-no-status=0
+LIVEK-K4-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=4	skills-no-status=0
+LIVEK-K5-T3-1	alvo intacto	sha igual	veto=1	outro_erro=2	resultados=3	skills-no-status=0
+32 sessões; vetos: 23 ; gravaram: 9

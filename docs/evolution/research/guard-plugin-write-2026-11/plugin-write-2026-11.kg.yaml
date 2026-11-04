@@ -1,0 +1,285 @@
+# kg-backlog-guard: on
+# ═══ TETO: 19 NÓS ═══
+meta:
+  id: plugin-write-2026-11
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-11-04"
+  review_after: "2026-12-20"
+  note: "Forja (/meta:forge-guard) do veto à escrita de plugin em .claude/skills e da varredura do disco, a REGRA 114 (Plugin não mora em .claude/skills no disco). Decisão do maestro de 2026-11-04: veto estreito mais varredura no disco. É contenção de acidente e de injeção ingênua, NÃO fronteira. O Elenxo (a passada adversarial) ficou pendente: quem a roda é a sessão principal do core."
+nodes:
+  - id: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    valid_from: "2026-11-04"
+    verified_at: "2026-11-04"
+    verified_against: "data/lab-mods-cells.txt (células W1, W4, S1 a S7) e data/lab-sandbox-summary.txt, derivados dos laboratórios da sessão de 2026-11-04"
+    label: "O DEFEITO, MEDIDO EM LABORATÓRIO, NÃO EM DANO DE PRODUÇÃO: em 2026-11-04, um plugin gravado em .claude/skills/x sob bypass carregou na sessão seguinte e venceu o veto do .env nas 3 repetições. Nenhum adotante sofreu isto."
+    narrative: "Em 2026-11-04, com Claude Code 2.1.318, um plugin gravado em .claude/skills/x sob bypassPermissions carregou na sessão seguinte, e o tool.check dele venceu o veto do .env nas 3 repetições, gravado por Write (W1) e por Bash (W4). Nenhum adotante sofreu isto. O modelo era um roteiro contra um stub da Messages API, com chave fictícia: mede-se a decisão local do Claude Code sobre a chamada, não se um modelo real a tentaria. W2 (a sessão de escrita em acceptEdits) não gravou e o veto segurou. W3 (gravar e tentar na mesma sessão) gravou e o veto segurou: o efeito vem na sessão seguinte. S1 repete o efeito com o plugin já no lugar. S2 mostra que, sem aceite de confiança no projeto, o plugin de .claude/skills não carrega. S5 mostra o oposto na pasta de skills do usuário: sem aceite, carrega e vence. S3 (aninhado em a/b) e S7 (sub/.claude/skills com a sessão na raiz) não carregaram. S6 (a skill é link para fora do projeto) carregou e venceu."
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-mods-cells.txt"
+      locator: "seções W1, W2, W3, W4, S1 a S7; hashes das fontes em data/SOURCE.txt"
+      method: "measurement: sessões de roteiro fixo em contêiner, 3 repetições por célula, desfecho calculado do stream-json e do disco"
+      locality: "repo"
+
+  - id: E_NENHUM_VETO_BARRA_ESCRITA_EM_CLAUDE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    valid_from: "2026-11-04"
+    verified_at: "2026-11-04"
+    verified_against: "data/lab-sandbox-matrix.tsv e data/lab-sandbox-summary.txt"
+    label: "Das 129 tentativas de escrita em .claude/ e na pasta de skills do usuário, NENHUMA foi barrada por veto do core: 126 gravaram, e 3 foram recusadas pela validação de schema do próprio Edit, porque a carga do laboratório tinha um campo inválido. Com carga válida, as 3 gravaram."
+    narrative: "Só nos alvos de plugin: 69 de 69. Matriz de 6 alvos por 6 métodos (Write, Edit, cat, tee, cp, python3 -c) mais 5 contornos, 3 repetições. O braço rodou no host (a emenda 1 do pré-registro diz por quê), com HOME falso. A leitura rápida de 0 barradas em 129 é verdadeira quanto a veto, e a ressalva das 3 fica escrita aqui para ninguém refutar o número pela metade."
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-sandbox-summary.txt"
+      locator: "as 5 primeiras linhas; sessão a sessão em lab-sandbox-matrix.tsv"
+      method: "measurement: reconta do results.jsonl do laboratório, pelo disco e não pela fala do modelo"
+      locality: "repo"
+
+  - id: E_CONFIGCHANGE_NAO_VE_PLUGIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    valid_from: "2026-11-04"
+    verified_at: "2026-11-04"
+    verified_against: "data/lab-sandbox-summary.txt, seção ConfigChange"
+    label: "O evento ConfigChange não dispara em plugin.json nem em hooks.json sob .claude/skills, e dispara em SKILL.md na mesma pasta: o controle positivo prova que a pasta é vigiada e os arquivos de plugin não. Daí a varredura pelo resultado, e não um hook de configuração."
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/lab-sandbox-summary.txt"
+      locator: "células DC T3, DC T4 (vazias), DC2 T6 e DC2 T7 (SKILL.md)"
+      method: "measurement: hook de log no ConfigChange em 3 repetições"
+      locality: "repo"
+
+  - id: E_CENSO_CLASSE_NOVA_E_PASSIVO_ZERO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "GUARD_CENSUS_QUERY=<termo> bash .claude/validation/guard-census.sh . --markdown, por termo; git ls-files; find -L nas pastas de skills"
+    label: "O censo de 2026-11-04 não achou guarda da classe: as menções a .claude-plugin e hooks.json são das guardas do bundle de plugin, que julgam outra coisa. O passivo é zero."
+    narrative: "Nenhum arquivo na forma no git do core, na pasta de skills do usuário, nem nos adotantes clonados nesta máquina. Armadilha de medidor: o GUARD_CENSUS_QUERY é uma frase, e não uma lista de termos. A 1ª rodada com vários termos respondeu que nada mencionava o assunto; termo a termo, apareceram as guardas de bundle. O nome do termo muda a resposta, e zero aqui era zero por vocabulário."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seções 'moldes por SUBSTRATO', 'já existe guarda' e 'passivo' da saída de 2026-11-04"
+      method: "measurement: censo na carga da forja e varredura no disco"
+      locality: "repo"
+
+  - id: D_VETO_ESTREITO_MAIS_VARREDURA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    trace: ".claude/hooks/pretooluse-plugin-write-guard.sh"
+    label: "Decisão do maestro de 2026-11-04: veto estreito mais varredura no disco. Um hook PreToolUse em Write, Edit, NotebookEdit e Bash com exit 2 e onFailure block, e um check que olha o RESULTADO no disco, na partida da sessão e no lint, sem depender de como o arquivo foi escrito."
+    narrative: "O hook é a metade rápida, que barra antes de escrever e fala com quem errou. A varredura é a metade que não falha pelo vocabulário: tudo o que o hook não vê cai nela, desde que o arquivo fique no disco."
+
+  - id: D_MOLDE_COMPOE_O_JUIZ_DO_MOAT
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: ".claude/hooks/lib/plugin-write-judge.py"
+    label: "Molde pelo censo: pretooluse-direct-provider-api.sh é o único PreToolUse com --selftest próprio, e é a forma de hook mais check de lint. A lógica de alvo vem do pretooluse-moat-gate.sh."
+    narrative: "O juiz novo carrega o moat-judge.py inteiro e troca só alvo, relevância e classes, em vez de copiar a tabela verbo-destino. A hipótese do pedido era que o tokenizador segue cd, variável literal e script. Provada contra os contornos: cd antes de > (K5), mv da pasta temporária (K1) e variável literal passaram no juiz sem nada novo. Não bastou em três: a variável cujo valor é montado de pedaços literais (K2, o lib a esquece, e o juiz faz a conta), a remoção (o MOAT conta rm como escrita, e aqui remover é a cura) e a origem de um mv. E o heredoc lido por interpretador é inerte para o tokenizador: o juiz o lê à parte. O preço é acoplar aos nomes internos do moat-judge; a família da bancada reprova se um deles mudar."
+
+  - id: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    trace: ".claude/hooks/pretooluse-plugin-write-guard.sh"
+    label: "O veto julga a FORMA do caminho, como escrito e resolvido, em qualquer raiz, sem isenção da pasta temporária nem do scratchpad. A isenção foi pesada e descartada pela medida: nenhum dos 3.929 caminhos de Write e Edit dos transcripts tem a forma."
+    narrative: "E o 1º componente depois de skills/ é o NOME da skill: uma skill chamada hooks cala, o que diverge do glob literal do pedido, de propósito."
+
+  - id: D_HARD_NO_CORE_SOFT_NO_DERIVADO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    trace: ".claude/validation/lint-artifacts.sh"
+    label: "REGRA 114 (Plugin não mora em .claude/skills no disco): HARD no core, SOFT no derivado, e só o repo, sem a pasta de casa. O adotante pode instalar um plugin ali por escolha dele, e o gate não pode depender da pasta de casa de quem roda."
+    narrative: "A pasta de casa é com o SessionStart, que só avisa. Passada a cláusula 5 da doutrina: quem controla a entrada do check é o próprio repo, então um terceiro não deixa o gate vermelho à distância."
+
+  - id: E_REPLAY_ACHOU_UM_FALSO_POSITIVO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "data/replay-2026-11-04.txt: reexecução do hook sobre os transcripts do core"
+    label: "O replay sobre 60.418 comandos Bash únicos dos transcripts reprovou a 1ª redação com a bancada verde: um python3 com str.replace que citava .claude-plugin/marketplace.json, o da raiz do repo. Curado e virado caso com mutante. Depois da cura, 0 vetos em 371 candidatos."
+    narrative: "Só 0,61% dos comandos chega ao juiz. Duas causas: o código embutido aceitava o .claude-plugin sem .claude/skills, e confundia str.replace com os.replace. O replay cobre só as rotas de sinal e de cópia; a de script solto e a de symlink dependem do disco de hoje e não entraram na conta. Zero vetos também quer dizer que o corpus não tem nenhum positivo: ele mede falso positivo, nunca cobertura. O caminho quente, um Write sem python, mediu 64 ms sob carga 12; o veto do MOAT, no mesmo instante, cerca de 440 ms."
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/replay-2026-11-04.txt"
+      locator: "as duas rodadas, antes e depois da cura"
+      method: "measurement: subprocess do hook real, com o JSON como o runner entrega, sob nice"
+      locality: "repo"
+
+  - id: E_BANCADA_CASOS_E_MUTANTES
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "Família plugin_write_guard: a cópia limpa provada verde no mesmo arranjo antes de contar morto, com LC_ALL=C; 33 mutantes, cada um revertendo uma cura e exigindo que um caso NOMEADO reprove."
+    narrative: "A 1ª rodada achou dois casos decorativos, e um defeito de âncora no próprio mutante, curados. Os dois casos que passavam verdes com a cura revertida: 'sem --home' não fixava o HOME, então o mutante lia a pasta real, que está limpa; e o caso da raiz estava mascarado pela outra cura. Sem o mutante, os dois davam licença. A polaridade de cala e o teto também são medidos: o --selftest imprime 7 linhas TETO, e um teto que passar a barrar reprova o caso e obriga a mudar o cabeçalho."
+
+  - id: E_DOGFOOD_AO_VIVO_NO_HARNESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-11-04"
+    verified_against: "data/live-dogfood-2026-11-04.tsv: mesmo laboratório do defeito, mesmo roteiro, com a guarda no settings.json do clone"
+    label: "Dogfood no harness de verdade, sob bypassPermissions e com o mesmo roteiro do defeito: 32 sessões, 1 repetição. As 23 de ataque terminaram com alvo intacto e o veto no tool_result; as 9 honestas gravaram. Onde antes 69 de 69 gravavam."
+    narrative: "Ataque: Write, Edit, cat, tee, cp e python3 -c nos alvos T3, T4 e T5, mais os contornos K1 a K5. Honesto: os 6 métodos em docs/, Write e cat em skills/onion/SKILL.md, e cat em .claude/hooks. O modelo segue sendo roteiro de stub: prova que o harness honra o exit 2 nesta forma, não que um modelo real não ache outra rota. Uma repetição só, e o clone é do commit de checkpoint desta forja."
+    provenance:
+      source: "docs/evolution/research/guard-plugin-write-2026-11/data/live-dogfood-2026-11-04.tsv"
+      locator: "uma linha por sessão; a última linha é a conta"
+      method: "measurement: sessões de claude -p contra stub, desfecho pelo sha do alvo e pelo tool_result do stream-json"
+      locality: "repo"
+
+  - id: C_TETO_NAO_E_FRONTEIRA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "TETO (peça 7): esta guarda é contenção de acidente e de injeção ingênua, NÃO fronteira. Quem quer contornar consegue, e o custo de contornar é baixo. Ela reduz o acaso, não o adversário; quem precisa de fronteira precisa de outra coisa, como configuração gerenciada ou sandbox."
+
+  - id: C_TETO_BASH_FALHA_PELO_VOCABULARIO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/hooks/pretooluse-plugin-write-guard.sh"
+    label: "TETO: em Bash a lista falha pelo vocabulário. Sem veto, medidos como caso TETO: script versionado, python3 x.py, python3 -c com o caminho em variável, base64 -d com sh, git apply, tar -x na pasta de skills e nome calculado em runtime."
+    narrative: "Sem caso próprio: unzip e cp -r cuja origem ainda não existe, script em dois tempos que monta o nome, e cp chamado por dentro de um programa. O pedido listava também python3 -c, script em dois tempos, curl -o, dd, install, rsync e nome em variável. Medido: com o caminho literal, o juiz alcança todos, e são casos de acusa. Fica de fora a forma em que o caminho não aparece, e a varredura pega o resultado se ele ficar no disco. Mudar de nome é contornar: um arquivo escrito em .claude/skills/x/.claude-plugin por qualquer dessas rotas só cai na varredura."
+
+  - id: C_TETO_MOD_E_MCP_FORA_DO_PRETOOLUSE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "TETO: o processo de um mod e um MCP de escrita ficam fora do PreToolUse: a escrita deles não é uma chamada de Write nem de Bash desta sessão. Só a varredura os alcança, e só depois."
+
+  - id: C_TETO_CAI_JUNTO_COM_O_SETTINGS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "TETO: o hook é de projeto e cai junto com o .claude/settings.json e com o próprio script, que o veto não protege. A medição gravou settings e hook sem barreira (alvos T1 e T2), e EH mostrou disableAllHooks derrubando o veto na mesma sessão."
+    narrative: "Proteger estes dois arquivos travaria a edição do core, com 74 commits em hooks em 30 dias: fica como declarado, sem veto."
+
+  - id: C_TETO_PARTIDA_E_DETECCAO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    trace: ".claude/hooks/session-plugin-write-scan.sh"
+    label: "TETO: no SessionStart o plugin presente JÁ CARREGOU: o aviso é detecção, não prevenção, e um plugin plantado pode mudar o que a sessão faz a partir daí."
+    narrative: "A varredura não vê sub/.claude/skills, CLAUDE_CONFIG_DIR fora da pasta de casa, --plugin-dir nem node_modules, e na partida usa timeout de 4 s."
+
+  - id: C_FALSO_POSITIVO_E_O_DEFEITO_DOMINANTE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    label: "A vizinha ensina: a guarda do .env deu dois falsos positivos hoje, relatados pelo maestro, e mais dois nesta forja (um grep em .claude/utils/*/* e um python3 com heredoc cujo texto citava o arquivo de segredos)."
+    narrative: "A guarda nova casa só caminho de escrita, nunca o texto; e a cada rodada o replay é quem decide."
+
+  - id: C_CONSEQUENCIA_A_SESSAO_NAO_FORJA_MOD
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: "Consequência declarada: nesta árvore a sessão não forja mod em .claude/skills nem na pasta de skills do usuário, e a skill embutida plugin-authoring grava ali. Quem instala é o maestro, fora da sessão. Não há variável de bypass, por desenho."
+    narrative: "Não medido: uma sessão real com a plugin-authoring contra este veto. O laboratório só mostrou que o caminho é o mesmo (mod carregado como x@skills-dir)."
+
+  - id: Q_ELENXO_PENDENTE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    trace: "docs/evolution/review/feat-guard-plugin-write.md"
+    label: "O Elenxo não rodou: a passada adversarial é da sessão principal, em revisor novo, com mandato de achar o falso positivo. Enquanto ela não rodar, nada aqui está selado. O resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) ficou com a passada pendente."
+
+edges:
+  - from: E_DEFEITO_PLUGIN_EM_SKILLS_VENCE_O_VETO
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: SUPPORTS
+  - from: E_NENHUM_VETO_BARRA_ESCRITA_EM_CLAUDE
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: SUPPORTS
+  - from: E_CONFIGCHANGE_NAO_VE_PLUGIN
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: SUPPORTS
+  - from: E_CENSO_CLASSE_NOVA_E_PASSIVO_ZERO
+    to: D_MOLDE_COMPOE_O_JUIZ_DO_MOAT
+    edge_type: SUPPORTS
+  - from: D_MOLDE_COMPOE_O_JUIZ_DO_MOAT
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: DEPENDS_ON
+  - from: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: DEPENDS_ON
+  - from: D_HARD_NO_CORE_SOFT_NO_DERIVADO
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: DEPENDS_ON
+  - from: E_REPLAY_ACHOU_UM_FALSO_POSITIVO
+    to: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
+    edge_type: SUPPORTS
+  - from: E_BANCADA_CASOS_E_MUTANTES
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_AO_VIVO_NO_HARNESS
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: SUPPORTS
+  - from: C_TETO_NAO_E_FRONTEIRA
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: CONSTRAINS
+  - from: C_TETO_BASH_FALHA_PELO_VOCABULARIO
+    to: C_TETO_NAO_E_FRONTEIRA
+    edge_type: SUPPORTS
+  - from: C_TETO_MOD_E_MCP_FORA_DO_PRETOOLUSE
+    to: C_TETO_NAO_E_FRONTEIRA
+    edge_type: SUPPORTS
+  - from: C_TETO_CAI_JUNTO_COM_O_SETTINGS
+    to: C_TETO_NAO_E_FRONTEIRA
+    edge_type: SUPPORTS
+  - from: C_TETO_PARTIDA_E_DETECCAO
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: CONSTRAINS
+  - from: C_FALSO_POSITIVO_E_O_DEFEITO_DOMINANTE
+    to: D_JULGA_A_FORMA_EM_QUALQUER_RAIZ
+    edge_type: SUPPORTS
+  - from: C_CONSEQUENCIA_A_SESSAO_NAO_FORJA_MOD
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: CONSTRAINS
+  - from: Q_ELENXO_PENDENTE
+    to: D_VETO_ESTREITO_MAIS_VARREDURA
+    edge_type: CONSTRAINS

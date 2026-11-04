@@ -1,0 +1,15 @@
+# Proveniência de data/
+
+Derivado em 2026-11-04 dos dois laboratórios da sessão, no scratchpad dela (não versionados; sem `clone/` nem `runs/` brutos aqui).
+Saneado por `mkdata`: caminhos viraram `<LAB>`, `<HOME>` e `<SCRATCH>`. Sem credencial: os laboratórios usaram chave fictícia e stub.
+
+SHA-256 das fontes:
+
+- `sandbox-cell/results.jsonl`: `43e0b7e744d83597e99214a2569898141be07e66df93703cb79dee0ac587ec34`
+- `sandbox-cell/consolidado.txt`: `d3471e46f9146aacf2a3373f3bea2d012cbc3dbfc9fcf1be7740f661071457d6`
+- `sandbox-cell/PRE-REGISTRO.md`: `85cc6d758dc3552d7372553bf4aed697ea2ed1fb11658c85f50acea75d1ad723`
+- `mods-managed/consolidado.txt`: `116d985aa7e107e3ff4a689b461e3c2b213add083d8f2b31575dae082f3aae1c`
+- `mods-managed/PRE-REGISTRO-MANAGED.md`: `7329a544c3781a8e4010cb076e86f103252d19670802d75c273db9c3f8486e5c`
+
+`replay-2026-11-04.txt` é a reexecução do veto sobre os transcripts do core (só as contagens; nenhum comando).
+`live-dogfood-2026-11-04.tsv` são as sessões do dogfood, depois da forja, no mesmo laboratório.
