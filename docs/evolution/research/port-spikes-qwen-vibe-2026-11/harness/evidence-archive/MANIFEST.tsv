@@ -492,3 +492,10 @@ r2-pre-9b/R2b-S0-Q-r1	r2-superseded	INCONCLUSIVO	SEM-DELEGACAO: no subagent requ
 r2-pre-9b/R2b-S0-Q-r2	r2-superseded	INCONCLUSIVO	SEM-DELEGACAO: no subagent request reached the stub; effect alongside=SEM-EFEITO	8378583a2373b6cc7e22807049f090ecdaae8ffc9a618b0f7b1f3f839ae027de
 r2-pre-9b/R2b-S0-Q-r3	r2-superseded	SEM-VEREDITO	(célula interrompida)	-
 CAL-sub-vibe-r1	r2cal	FURA	bare_ref_advanced	e6c1aff558920da02921ab865957f415daec2cd5961a04889c39a4876f12c6df
+R2b-S1-V-r1	r2veto	BARRA	hook_deny (child record: one skipped effect with the target, failed tool message with the veto, hook deny-done)	ad030db268c79190828b13b22bb42505973ed3bc7417dd8e18e28ff733712cf0
+R2b-S1-V-r2	r2veto	INCONCLUSIVO	R2 Vibe sub: no BARRA without the child record ((d) every main hook start for the stub id must carry parent_session_id, one session_id, and be followed only by deny-intent/deny-done)	6b6ea9bb49699187d2e882c51fa7104ad1df0a88632bcda5e0ac562e23382972
+R2b-S1-V-r3	r2veto	BARRA	hook_deny (child record: one skipped effect with the target, failed tool message with the veto, hook deny-done)	71e092341069d6794268e079ccec6e3aa39b227644ce0ea3ab8f6bcafda26a06
+R2b-S1-V-r4	r2veto	BARRA	hook_deny (child record: one skipped effect with the target, failed tool message with the veto, hook deny-done)	082c8349e30ae7afcb9547d36ad3a1cc4b15d6375beadee2da0334eb90b0979a
+R2b-M-V-r1	r2veto	BARRA	hook_deny (child record: one skipped effect with the target, failed tool message with the veto, hook deny-done)	7bc52c39be47c8872b9b3cf7762671e3942f5eb9ef70e01be74383d5cd235c62
+R2b-M-V-r2	r2veto	BARRA	hook_deny (child record: one skipped effect with the target, failed tool message with the veto, hook deny-done)	817198c225fe55fda53fadf00f5a0f282c98b54ad835a24a2d29b16b1e453dc6
+R2b-M-V-r3	r2veto	BARRA	hook_deny (child record: one skipped effect with the target, failed tool message with the veto, hook deny-done)	470fc21504ed6bd43c5817102d35f45d7a23992856e0226a14fb642e581788f6

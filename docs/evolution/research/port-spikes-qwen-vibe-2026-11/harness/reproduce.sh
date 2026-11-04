@@ -21,6 +21,7 @@
 #    que o cliente grava de fato.
 # 7. roda cmp_classify.py contra harness/reference/classify_r2_lot.py (cópia do classificador de cbc067cc0): é a
 #    medida de que depende a isenção da regra do medidor. As células coletadas depois dela ficam de fora.
+# 8. no lote r2veto, cobra que o veredito gravado (classificador pré-dado) seja o recalculado.
 # rc 0 se os três agregados baterem, a integridade conferir, a regra aceitar os registros reais e o comparador der
 # 0 diferenças de veredito; 1 senão.
 set -uo pipefail
@@ -34,7 +35,7 @@ if [ "${1:-}" = "--keep" ]; then echo "keeping $TMP"; else trap 'chmod -R u+w "$
 echo "ok   archives match SHA256SUMS"
 
 mkdir -p "$TMP/evidence" "$TMP/superseded"
-for lot in m1 m2 p5 real1 real2 fixtures r2 r2cal; do
+for lot in m1 m2 p5 real1 real2 fixtures r2 r2cal r2veto; do
   tar -xzf "$ARC/evidence-$lot.tar.gz" -C "$TMP/evidence" || { echo "FAIL: extract $lot"; exit 1; }
 done
 for lot in superseded r2-superseded; do
@@ -117,12 +118,13 @@ for ref in ("aggregate-m2.json", "aggregate-final.json", "aggregate-r2.json"):
     rc |= 0 if same else 1
 
 # 6. a lista positiva do pai aceita o que o Vibe grava (Emenda R2-10 parte D)
-real = sorted(str(d) for d in ev.iterdir() if d.name == "CAL-sub-vibe-r1" or d.name.startswith("R2b-S0-V-r"))
+real = sorted(str(d) for d in ev.iterdir() if d.name == "CAL-sub-vibe-r1"
+              or d.name.startswith(("R2b-S0-V-r", "R2b-S1-V-r", "R2b-M-V-r")))
 out = subprocess.run([sys.executable, "-I", str(here / "check_parent_rule.py"), "--classify-dir", str(here), *real],
                      capture_output=True, text=True)
 print(out.stdout.rstrip() or out.stderr[-300:])
-print(f"{'ok  ' if out.returncode == 0 and len(real) == 4 else 'FAIL'} parent rule on the real records: {len(real)} cells")
-rc |= 0 if out.returncode == 0 and len(real) == 4 else 1
+print(f"{'ok  ' if out.returncode == 0 and len(real) == 11 else 'FAIL'} parent rule on the real records: {len(real)} cells")
+rc |= 0 if out.returncode == 0 and len(real) == 11 else 1
 
 # 7. a isenção da regra do medidor: nenhuma célula muda de veredito contra o classificador que produziu o lote r2
 out = subprocess.run([sys.executable, "-I", str(here / "cmp_classify.py"), str(here / "reference" / "classify_r2_lot.py"),
@@ -130,6 +132,13 @@ out = subprocess.run([sys.executable, "-I", str(here / "cmp_classify.py"), str(h
                       "--skip-lots", "r2veto"], capture_output=True, text=True)
 print(out.stdout.rstrip() or out.stderr[-300:])
 rc |= 1 if out.returncode else 0
+
+# 8. o lote r2veto foi julgado pelo classificador pré-dado: o gravado tem de bater com o recalculado
+veto = [l.split("\t") for l in lines if l.split("\t")[1] == "r2veto"]
+moved = [c[0] for c in veto if (classify(ev / c[0])["verdict"], classify(ev / c[0])["basis"])
+         != (json.loads((ev / c[0] / "verdict.json").read_text())["verdict"], json.loads((ev / c[0] / "verdict.json").read_text())["basis"])]
+print(f"{'ok  ' if not moved and len(veto) == 7 else 'FAIL'} lot r2veto: {len(veto)} cells, stored = recalculated, moved {moved}")
+rc |= 1 if moved or len(veto) != 7 else 0
 sys.exit(rc)
 PY
 RC=$?

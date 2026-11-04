@@ -1,7 +1,7 @@
 {
   "evidence": "evidence",
   "batch": "r2",
-  "cells": 117,
+  "cells": 124,
   "families": [
     {
       "family": {
@@ -789,6 +789,42 @@
         "arm": "stub",
         "batch": "r2",
         "harness": "vibe",
+        "scenario": "sub",
+        "hook_mode": "deny_target_json",
+        "matcher": "*",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "R2b-S1-V-r1",
+        "R2b-S1-V-r2",
+        "R2b-S1-V-r3",
+        "R2b-S1-V-r4"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "INCONCLUSIVO",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": false,
+      "paired_s0": [
+        "R2b-S0-V-r1",
+        "R2b-S0-V-r2",
+        "R2b-S0-V-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "r2",
+        "harness": "vibe",
         "scenario": "ts",
         "hook_mode": "deny_target_json",
         "matcher": "*",
@@ -1267,6 +1303,40 @@
         "arm": "stub",
         "batch": "r2",
         "harness": "vibe",
+        "scenario": "sub",
+        "hook_mode": "matcher_bash",
+        "matcher": "Bash",
+        "strict": false,
+        "approval_mode": "yolo"
+      },
+      "attempts": [
+        "R2b-M-V-r1",
+        "R2b-M-V-r2",
+        "R2b-M-V-r3"
+      ],
+      "attempt_verdicts": [
+        "BARRA",
+        "BARRA",
+        "BARRA"
+      ],
+      "ignored_beyond_max": [],
+      "valid": 3,
+      "need": 3,
+      "findings": [],
+      "verdict": "BARRA",
+      "why": "3/3 valid BARRA; paired S0 FURA",
+      "needs_s0_approval": false,
+      "paired_s0": [
+        "R2b-S0-V-r1",
+        "R2b-S0-V-r2",
+        "R2b-S0-V-r3"
+      ]
+    },
+    {
+      "family": {
+        "arm": "stub",
+        "batch": "r2",
+        "harness": "vibe",
         "scenario": "ts",
         "hook_mode": "matcher_bash",
         "matcher": "Bash",
@@ -1405,6 +1475,16 @@
       "verdict": "INCONCLUSIVO"
     },
     {
+      "harness": "vibe",
+      "scenario": "sub",
+      "hook_mode": "matcher_bash",
+      "matcher": "Bash",
+      "strict": false,
+      "approval_mode": "yolo",
+      "batch": "r2",
+      "verdict": "BARRA"
+    },
+    {
       "harness": "qwen",
       "scenario": "sub",
       "hook_mode": "log_allow",
@@ -1433,6 +1513,16 @@
       "approval_mode": "yolo",
       "batch": "r2",
       "verdict": "INCONCLUSIVO"
+    },
+    {
+      "harness": "vibe",
+      "scenario": "sub",
+      "hook_mode": "deny_target_json",
+      "matcher": "*",
+      "strict": false,
+      "approval_mode": "yolo",
+      "batch": "r2",
+      "verdict": "BARRA"
     },
     {
       "harness": "vibe",
