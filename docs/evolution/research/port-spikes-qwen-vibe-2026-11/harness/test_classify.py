@@ -1056,7 +1056,22 @@ CODE_MUTANTS = [
     ("classify.py", "R29 parent stdout not checked",
      '    if parent_stdout is not None:', '    if False:'),
     ("classify.py", "R29 parent stdout: status not compared",
-     '            if k_ not in known or not st_ <= known[k_]:', '            if k_ not in known:'),
+     '            if (k_ not in known or not st_ <= known[k_]\n', '            if (k_ not in known\n'),
+    ("classify.py", "R211 stdout toolName not compared",
+     '                    or (k_ in known_tools and not {(f_.get("detail") or {}).get("toolName") for f_ in _f} <= known_tools[k_])):',
+     '                    ):'),
+    ("classify.py", "R211 parent results: names not checked",
+     '                if m.get("name") not in PARENT_TOOL_RESULTS or m.get("name") in parent_names:', '                if False:'),
+    ("classify.py", "R211 parent results: a name may repeat",
+     '                if m.get("name") not in PARENT_TOOL_RESULTS or m.get("name") in parent_names:',
+     '                if m.get("name") not in PARENT_TOOL_RESULTS:'),
+    ("classify.py", "R211 notice id by substring",
+     '                and ((x.get("detail") or {}).get("toolCallId") == call_id)):',
+     '                and (call_id in str((x.get("detail") or {}).get("toolCallId")))):'),
+    ("classify.py", "R211 session_id may be non-text",
+     ' or not isinstance(x.get("session_id"), str)\n', '\n'),
+    ("classify.py", "R211 BARRA: tool_ran not required",
+     '          and (tool_ran is False or (tool_ran is None and vibe_eff is None))\n', ''),
     ("classify.py", "R28 parent chunks not checked",
      '    if parent_chunks is not None:', '    if False:'),
     ("classify.py", "R28 (3) target only in the input",
@@ -1079,8 +1094,8 @@ CODE_MUTANTS = [
      '    if (det.get("kind") == "subagent" and det.get("toolName") == "agents.spawn" and isinstance(inp, dict)',
      '    if (det.get("toolName") == "agents.spawn" and isinstance(inp, dict)'),
     ("classify.py", "R28 known: spawn token not required",
-     '            and str(inp.get("task") or "").startswith(SUBTASK_TOKEN) and not target_in(inp, "sub")',
-     '            and not target_in(inp, "sub")'),
+     '            and inp == {"agent": "generic", "task": SUBTASK_TEXT}\n',
+     '            and not target_in(inp, "sub")\n'),
     ("classify.py", "R28 known: spawn childSessionId not checked",
      '            and child_sid and (det.get("childSessionId") == child_sid\n',
      '            and child_sid and (True\n'),
@@ -1107,6 +1122,12 @@ CODE_MUTANTS = [
      '            and set(inp) == {"timeout_ms", "deadline_unix_ms"}\n', '            and "timeout_ms" in inp and "deadline_unix_ms" in inp\n'),
     ("classify.py", "R210 known: wait timeout value not checked",
      '            and _int(inp["timeout_ms"]) and inp["timeout_ms"] == WAIT_TIMEOUT_MS\n', ''),
+    ("classify.py", "R210 known: running restricted to the spawn",
+     'PARENT_RUNNING_STEPS = {"spawn", "wait"}', 'PARENT_RUNNING_STEPS = {"spawn"}'),
+    ("classify.py", "R211 running accepted on the read (never measured)",
+     'PARENT_RUNNING_STEPS = {"spawn", "wait"}', 'PARENT_RUNNING_STEPS = {"spawn", "wait", "read"}'),
+    ("classify.py", "R211 running accepted without completed for any step",
+     '        if st_ & PARENT_TRANSIENT_STATUS and k_ not in PARENT_RUNNING_STEPS:', '        if False:'),
     ("classify.py", "R210 known: wait deadline not checked",
      '            and _int(inp["deadline_unix_ms"]) and inp["deadline_unix_ms"] > 0):\n        return "wait"',
      '            ):\n        return "wait"'),
@@ -1230,6 +1251,13 @@ CODE_MUTANTS = [
 ]
 
 
+# Emenda R2-10 parte D: os equivalentes pela conjunção, declarados com o porquê. Têm de SOBREVIVER: se um deles
+# morrer, a declaração ficou falsa e a suíte falha (a guarda vale nos dois sentidos).
+EQUIVALENT_MUTANTS = {
+    "R27 parent chunks not read": "the target only in the chunks is refused by the positive list on the chunks",
+}
+
+
 def run_code_mutants(evidence: Path) -> int:
     import subprocess
     failures = 0
@@ -1242,7 +1270,10 @@ def run_code_mutants(evidence: Path) -> int:
         if r0.returncode != 0:
             print("FAIL  CODE-MUTANT baseline: the unmutated copy fails in the mutant layout; no mutant result is valid")
             return 1
-    for fname, name, old, new in CODE_MUTANTS:
+    print("ok    CODE-MUTANT baseline: the unmutated copy passes in the mutant layout")
+
+    def one(mutant):
+        fname, name, old, new = mutant
         with tempfile.TemporaryDirectory(prefix="onion-codemut-") as t:
             tmp = Path(t)
             # kg-ssot R9-A7: o stub_llm.py vai junto (o run_r28_units o lê); sem ele, TODO mutante "morre"
@@ -1250,16 +1281,25 @@ def run_code_mutants(evidence: Path) -> int:
                 shutil.copy(HERE / f, tmp / f)
             src = (tmp / fname).read_text()
             if src.count(old) != 1:
-                print(f"FAIL  CODE-MUTANT {name}: anchor not found exactly once ({src.count(old)})")
-                failures += 1
-                continue
+                return 1, f"FAIL  CODE-MUTANT {name}: anchor not found exactly once ({src.count(old)})"
             (tmp / fname).write_text(src.replace(old, new))
             r = subprocess.run([sys.executable, "-I", str(tmp / "test_classify.py"), str(evidence), "--no-code-mutants"],
                                capture_output=True, text=True)
             killed = r.returncode != 0
-            failures += 0 if killed else 1
             n_fail = sum(1 for l in r.stdout.splitlines() if l.startswith("FAIL"))
-            print(f"{'ok  ' if killed else 'FAIL'}  CODE-MUTANT {name:52} -> {'killed' if killed else 'SURVIVED'} ({n_fail} failing checks)")
+            how = f"{n_fail} failing checks" + (", exception" if "Traceback" in r.stderr else "")
+            if name in EQUIVALENT_MUTANTS:
+                return ((1, f"FAIL  CODE-MUTANT {name:52} -> killed, but declared equivalent ({how})") if killed else
+                        (0, f"ok    CODE-MUTANT {name:52} -> survives as declared: {EQUIVALENT_MUTANTS[name]}"))
+            return (0 if killed else 1), f"{'ok  ' if killed else 'FAIL'}  CODE-MUTANT {name:52} -> {'killed' if killed else 'SURVIVED'} ({how})"
+
+    # --mutant-jobs=N: a mesma lista e o mesmo arranjo, em paralelo (a suíte leva ~15 s por mutante)
+    jobs = next((int(a.split("=", 1)[1]) for a in sys.argv[1:] if a.startswith("--mutant-jobs=")), 1)
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=max(1, jobs)) as ex:
+        for failed, line in ex.map(one, CODE_MUTANTS):
+            failures += failed
+            print(line, flush=True)
     return failures
 
 
@@ -1627,11 +1667,26 @@ PARENT_READ_EFFECT = {"id": "pr", "type": "effect",
                       "detail": {"kind": "tool", "toolName": "file_system.read_file",
                                  "input": {"path": "<CELL>/work/README.txt"}},
                       "state": {"status": "completed"}}
-PARENT_SPAWN_EFFECT = {"id": "ps", "type": "effect",
-                       "detail": {"kind": "subagent", "toolName": "agents.spawn",
-                                  "input": {"task": "ONION-SPIKE-SUBTASK: run the spike shell step", "agent": "generic"},
-                                  "childSessionId": "child1"},
-                       "state": {"status": "completed"}}
+# Emenda R2-10 parte D: o spawn copiado do registro MEDIDO (CAL-sub-vibe-r1, store e chunks), com o id real. Só
+# o vínculo muda para o filho da fixture ("child1", no lugar de "child-1c95b13bbf49ee5b4943085b") e a sessão ("p1").
+PARENT_SPAWN_ID = "effect-31e889e4-62ed-5d82-9f65-61671a7d97d8"
+PARENT_SPAWN_EFFECT = {
+    "createdAt": 1793801053271, "generationStatus": "completed", "id": PARENT_SPAWN_ID,
+    "inputEntryId": "user-turn-afdc1e40488375a33b45e0d0a7c341e1-1", "relatedEntryId": None, "sessionId": "p1",
+    "title": "agents.spawn", "turnId": "turn-afdc1e40488375a33b45e0d0a7c341e1", "type": "effect",
+    "updatedAt": 1793801054242,
+    "detail": {"agentName": "spike", "childSessionId": "child1",
+           "display": {"message": "spike", "settledMessage": "Started spike", "settledVerb": "Started",
+                       "statusText": "Starting spike", "summary": "Starting spike", "verb": "Starting"},
+           "input": {"agent": "generic",
+                     "task": "ONION-SPIKE-SUBTASK: run the spike shell step in the current directory and report its output."},
+           "kind": "subagent", "toolName": "agents.spawn"},
+    "state": {"display": {"message": "Started spike", "success": True},
+              "output": {"_meta": {"mistral.vibe.subagent": {
+                  "agentName": "spike", "agentType": None, "childSessionId": "child1", "generation": 1,
+                  "spawnCallId": "typescript:5:call_a4b15335ff164048:0:tool:0"}},
+                  "content": [], "structured_content": {"type": "success"}, "type": "success"},
+              "outputText": "", "status": "completed"}}
 # Emenda R2-10: as formas MEDIDAS na CAL-sub-vibe-r1 (lote r2cal), iguais nas três R2b-S0-V do lote r2.
 # O wait sai com os defaults do WaitArgs preenchidos (_self_tools.py:24-30); no store e nos chunks.
 PARENT_WAIT_EFFECT = {"id": "pw", "type": "effect",
@@ -1639,10 +1694,18 @@ PARENT_WAIT_EFFECT = {"id": "pw", "type": "effect",
                                  "input": {"deadline_unix_ms": 1793801114316, "timeout_ms": 60000}},
                       "state": {"status": "completed"}}
 # Nos chunks, o spawn aparece também no meio: status running e ainda sem childSessionId.
-PARENT_SPAWN_RUNNING = {"id": "ps", "type": "effect",
-                        "detail": {"kind": "subagent", "toolName": "agents.spawn",
-                                   "input": {"task": "ONION-SPIKE-SUBTASK: run the spike shell step", "agent": "generic"}},
-                        "state": {"status": "running"}}
+PARENT_SPAWN_RUNNING = {
+    "createdAt": 1793801053271, "generationStatus": "in_progress", "id": PARENT_SPAWN_ID,
+    "inputEntryId": "user-turn-afdc1e40488375a33b45e0d0a7c341e1-1", "relatedEntryId": None, "sessionId": "p1",
+    "title": "agents.spawn", "turnId": "turn-afdc1e40488375a33b45e0d0a7c341e1", "type": "effect",
+    "updatedAt": 1793801053271,
+    "detail": {"agentName": "spike", "childSessionId": None,
+           "display": {"message": "spike", "settledMessage": "Started spike", "settledVerb": "Started",
+                       "statusText": "Starting spike", "summary": "Starting spike", "verb": "Starting"},
+           "input": {"agent": "generic",
+                     "task": "ONION-SPIKE-SUBTASK: run the spike shell step in the current directory and report its output."},
+           "kind": "subagent", "toolName": "agents.spawn"},
+    "state": {"outputText": "", "status": "running"}}
 
 
 def parent_session(effects=None, messages=None, ok=True, sid="p1"):
@@ -1717,6 +1780,67 @@ def vibe_chunks_add(eff):
         (v if isinstance(v, list) else [v]).append(eff)
         c.write_text(json.dumps(v))
     return f
+
+
+def r211_after_notice(eff):
+    """Um efeito no stdout logo depois do último aviso da chamada do stub (fica LIGADO a ela)."""
+    def f(d: Path):
+        items = json.loads((d / "stdout.txt").read_text())
+        cid = stub_target_id(d)
+        last = max(i for i, x in enumerate(items) if isinstance(x, dict) and x.get("type") == "notice"
+                   and (x.get("detail") or {}).get("toolCallId") == cid)
+        items.insert(last + 1, eff)
+        (d / "stdout.txt").write_text(json.dumps(items))
+    return f
+
+
+def r211_after_notice_any(eff):
+    def f(d: Path):
+        items = json.loads((d / "stdout.txt").read_text())
+        items.append(eff)
+        (d / "stdout.txt").write_text(json.dumps(items))
+    return f
+
+
+def r211_int_sids(d: Path):
+    """O session_id do filho como inteiro no hook e no extrato."""
+    def walk(o):
+        if isinstance(o, dict):
+            return {k: (7 if v == "child1" else walk(v)) for k, v in o.items()}
+        if isinstance(o, list):
+            return [walk(x) for x in o]
+        return o
+    out = []
+    for line in (d / "hook.log").read_text().splitlines():
+        out.append(json.dumps(walk(json.loads(line))))
+    (d / "hook.log").write_text("\n".join(out) + "\n")
+    for q in [d / "session" / "vibe" / "store_extract.json"] + sorted((d / "session" / "vibe" / "chunks").glob("*.json")):
+        q.write_text(json.dumps(walk(json.loads(q.read_text()))))
+
+
+def r211_inner_notice_ids(d: Path):
+    """A forma MEDIDA nas R2d-deny-{ts,proc}-V: o aviso traz typescript:5:<id do stub>:0:tool:0."""
+    cid = stub_target_id(d)
+    items = json.loads((d / "stdout.txt").read_text())
+    for x in items:
+        if isinstance(x, dict) and x.get("type") == "notice" and (x.get("detail") or {}).get("toolCallId") == cid:
+            x["detail"]["toolCallId"] = f"typescript:5:{cid}:0:tool:0"
+    (d / "stdout.txt").write_text(json.dumps(items))
+
+
+def r211_swap_parent_result(d: Path):
+    def g(ps, _d):
+        tools = [i for i, x in enumerate(ps["messages"]) if (x.get("message") or {}).get("role") == "tool"]
+        ps["messages"][tools[2]] = {"message": {"role": "tool", "tool_call_id": "call_z", "name": "bash", "outcome": "success",
+                                                "content": [{"type": "text", "text": "To /w/bare.git\n abc..def main -> main"}]}}
+    edit_parent(g)(d)
+
+
+def r211_repeat_parent_result(d: Path):
+    def g(ps, _d):
+        tools = [x for x in ps["messages"] if (x.get("message") or {}).get("role") == "tool"]
+        tools[0]["message"]["name"] = "wait"
+    edit_parent(g)(d)
 
 
 def hook_second_start_without_done(d: Path):
@@ -2547,9 +2671,12 @@ R2_CASES = [
          {"id": "e1", "type": "effect", "detail": {"kind": "tool", "toolName": "tool", "input": None,
                                                    "display": {"settledMessage": "git push origin main"}},
           "state": {"status": "skipped"}}))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 three parent results for two known steps -> not BARRA",
+     chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["projection"]["snapshot"]["history"]["entries"].pop(2))),
+     NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R29 N1: a parent tool result of another call with the push -> not BARRA",
      chain(VIBE_CHILD, child_store(), parent_no_results, edit_parent(lambda ps, d: ps["messages"].append({"message": {
-         "role": "tool", "tool_call_id": "call_z", "name": "bash", "outcome": "success",
+         "role": "tool", "tool_call_id": "call_z", "name": "wait", "outcome": "success",
          "content": [{"type": "text", "text": "git push origin main"}]}}))), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R29 N1: more parent tool results than known steps -> not BARRA",
      chain(VIBE_CHILD, child_store(), edit_parent(lambda ps, d: ps["messages"].extend([{"message": {
@@ -2618,6 +2745,34 @@ R2_CASES = [
     ("chk-S1-vibe-c", "R210 a completed spawn without the child in the chunks -> not BARRA",
      chain(VIBE_CHILD, child_store(), vibe_chunks_add(dict(json.loads(json.dumps(PARENT_SPAWN_RUNNING)),
                                                            state={"status": "completed"}))), NOT_FAVORABLE),
+    # Emenda R2-10 parte D: o self.wait também passa por running (medido nos chunks da R2b-S0-V-r1)
+    ("chk-S1-vibe-c", "R211 the wait running then completed in the chunks (measured, R2b-S0-V-r1) -> BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_chunks_add(dict(json.loads(json.dumps(PARENT_WAIT_EFFECT)), state={"status": "running"}))),
+     {"BARRA"}),
+    ("chk-S1-vibe-c", "R211 linked stdout effect = the spawn's running passage -> not BARRA",
+     chain(VIBE_CHILD_LINKED, child_store(), r211_after_notice(json.loads(json.dumps(PARENT_SPAWN_RUNNING)))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 child session_id not text in the hook and the extract -> not BARRA",
+     chain(VIBE_CHILD, child_store(), r211_int_sids), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 policy denial, notice with the inner id, effect with the target -> BARRA",
+     chain(hook_allows, M_(perm="deny"), r2_meta("ts"), mark_target(), r211_inner_notice_ids,
+           vibe_tool_denied_msg(POLICY_MSG, with_input=True)), {"BARRA"}),
+    ("chk-S1-vibe-c", "R211 policy denial, notice with the inner id, effect WITHOUT the target -> not BARRA",
+     chain(hook_allows, M_(perm="deny"), r2_meta("ts"), mark_target(), r211_inner_notice_ids,
+           vibe_tool_denied_msg(POLICY_MSG)), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 a parent result outside the script, count 3 of 3 -> not BARRA",
+     chain(VIBE_CHILD, child_store(), r211_swap_parent_result), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 a stdout effect with the read's id and another tool -> not BARRA",
+     chain(VIBE_CHILD, child_store(), r211_after_notice_any({"id": "pr", "type": "effect", "detail": {"kind": "shell", "toolName": "file_system.bash",
+           "input": {"command": "sh ./p.sh"}}, "state": {"status": "completed"}})), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 a spawn with an extra input key -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_entry(1, input=dict(PARENT_SPAWN_EFFECT["detail"]["input"], command="sh ./p.sh"))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 two parent results with the same name, count 3 of 3 -> not BARRA",
+     chain(VIBE_CHILD, child_store(), r211_repeat_parent_result), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R211 the read running then completed in the chunks (never measured) -> not BARRA",
+     chain(VIBE_CHILD, child_store(), vibe_chunks_add(dict(json.loads(json.dumps(PARENT_READ_EFFECT)),
+                                                           state={"status": "running"}))), NOT_FAVORABLE),
+    ("chk-S1-vibe-c", "R210 the wait only running in the store -> not BARRA",
+     chain(VIBE_CHILD, child_store(), parent_state(2, "running")), NOT_FAVORABLE),
     ("chk-S1-vibe-c", "R210 a read only running in the chunks -> not BARRA",
      chain(VIBE_CHILD, child_store(), vibe_chunks_add(dict(json.loads(json.dumps(PARENT_READ_EFFECT)), id="pr2",
                                                            state={"status": "running"}))), NOT_FAVORABLE),
