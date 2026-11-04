@@ -18442,7 +18442,7 @@ PY
   _shcase "(sh75) leitor: uma linha forjada com supersedes entre eventos não muda o desfecho do outro evento (agree 1)" _sh_xsup \
     '    superseded = {o["supersedes"] for o in scur if _same_event_sup(o)}' '    superseded = {o["supersedes"] for o in scur if o["supersedes"]}'
   _sh_dup() {  # line_id duplicado (cópia e cola de linha): malformed, rc 2, gatilhos null — nunca a última em silêncio
-    local r o; _shgen s50 "${d}/sh-dup.jsonl"; tail -1 "${d}/sh-dup.jsonl" >> "${d}/sh-dup.jsonl"
+    local r o; _shgen s50 "${d}/sh-dup.jsonl"; local _dup; _dup="$(tail -1 "${d}/sh-dup.jsonl")"; printf '%s\n' "${_dup}" >> "${d}/sh-dup.jsonl"
     o="$(python3 -I "$1" shadow-stats --mode shadow --log "${d}/sh-dup.jsonl" --now "${SNOW}" --json --gap-log "${d}/gap-nenhuma.log" 2>/dev/null)" && r=0 || r=$?
     SH_WHY="rc=${r} ${o:0:300}"   # só o stdout vai ao jq: stderr misturado mata o parse (e o worker, no CI)
     [ "${r}" = 2 ] && [ "$(jq -r '[.duplicate_line_ids,.malformed,(.trigger_rule_on|tostring),(.trigger_unavailable_reason|type)] | map(tostring) | join(",")' <<< "${o}" 2>/dev/null || true)" = "1,2,null,string" ]; }
@@ -18454,7 +18454,7 @@ PY
     [ "${r}" = 4 ] || { SH_WHY="a lacuna deveria nascer (rc 4), deu ${r}"; return 1; }
     gid="$(jq -r .gap_id "${R}/gap.log")"; sleep 1
     _shap "$1" --log "${R}/good.jsonl" --ce-id ev-d --resolves-gap "${gid}" || { SH_WHY="a resolução falhou"; return 1; }
-    tail -1 "${R}/good.jsonl" >> "${R}/good.jsonl"
+    printf '%s\n' "$(tail -1 "${R}/good.jsonl")" >> "${R}/good.jsonl"
     o="$(python3 -I "$1" shadow-stats --mode shadow --receiver core-x --log "${R}/good.jsonl" --gap-log "${R}/gap.log" --json 2>/dev/null)"
     SH_WHY="stats: ${o:0:300}"; [ "$(jq -r .gaps_in_window <<< "${o}" 2>/dev/null || true)" = 1 ]; }
   _shcase "(sh76) line_id duplicado no log de sombra → malformed (as duas cópias), rc 2 e gatilhos null" _sh_dup \
