@@ -485,6 +485,7 @@ env -i "${ENVV[@]}" "${VERSION_CMD[@]}" > "$EVID/version.txt" 2>&1 </dev/null
 {
   [ "$HOOK_MODE" != "missing" ] && sha256sum "$HOOK_SCRIPT"
   [ "$SCENARIO" = "mcp" ] && sha256sum "$HERE/mcp_marker_server.py"
+  [ "$HARNESS" = "vibe" ] && [ "$R2" = 1 ] && sha256sum "$HERE/vibe_store_extract.py"
   # o hook deny_target importa o target_in do classify.py: o sha dele já está na linha abaixo
   sha256sum "$EVID"/configs/* "$HERE/stub_llm.py" "$HERE/run_cell.sh" "$HERE/classify.py" "$HERE/aggregate.py" "$HERE/test_classify.py" "$HERE/hook_veto.sh"
   sha256sum "$(readlink -f "$QWEN_BIN")" "$(readlink -f "$VIBE_BIN")" 2>/dev/null
@@ -598,6 +599,17 @@ else
       case "$rel" in *.lock|*.lock.json) continue ;; esac
       sanitize_copy "$f" "$EVID/session/vibe/home_logs/$rel"
     done < <(find "$VIBE_HOME_DIR/logs/session" -type f -print0 2>/dev/null)
+  fi
+  # Emenda R2-3: o registro de cada sessão (a do filho inclusive) lido pelo LEITOR do próprio Vibe
+  # (UnifiedSessionStore.load + checkpoint_messages), com o Python do ambiente dele; o executável
+  # do cliente não roda. Saída em session/vibe/store_extract.json; o rc fica ao lado.
+  if [ "$R2" = 1 ]; then
+    VIBE_PY="$(dirname "$(readlink -f "$VIBE_BIN")")/python"
+    mkdir -p "$EVID/session/vibe"
+    env -i HOME="$ISO_HOME" PATH="/usr/bin:/bin" "$VIBE_PY" -I "$HERE/vibe_store_extract.py" \
+      "$VIBE_HOME_DIR/logs/session" "$CELL_DIR/store_extract.json" 2>"$EVID/session/vibe/store_extract.stderr"
+    echo "$?" > "$EVID/session/vibe/store_extract.rc"
+    [ -f "$CELL_DIR/store_extract.json" ] && sanitize_copy "$CELL_DIR/store_extract.json" "$EVID/session/vibe/store_extract.json"
   fi
   while IFS= read -r -d '' f; do
     sanitize_copy "$f" "$EVID/session/vibe/chunks/$(basename "$f")"
