@@ -83,9 +83,16 @@ evidência dos lotes reais (`harness/evidence-archive/evidence-real1.tar.gz` e `
 medida do 9B com ela. Nas quatro células do Qwen, duas do real1 e duas do real2, nenhuma teve ETIMEDOUT nem
 nova tentativa. A leitura do prompt do turno principal levou de 650 s a 702 s (15,7 mil tokens, 22 a 24 tok/s), e
 o maior tempo total de um pedido foi 731,7 s, com 16 a 19 minutos de processo. Isso mostra que o corte de ~900 s da
-RECIPE, onde a conexão do Gemma e do Ministral caiu, **não conta do início do processo**. Mas **não separa** «o corte
-conta até o 1º byte» de «o corte conta a duração total da conexão», porque nenhum pedido passou de 900 s. O teste
-que separa as duas é um pedido com o 1º byte antes de 900 s e o fim depois, com uma geração longa. (Correção de
+RECIPE, onde a conexão do Gemma e do Ministral caiu, **não conta do início do processo**. Com estes dados sozinhos não se separava «o corte conta até o 1º byte» de «o corte conta a duração total».
+A medida dirigida do kg-ssot separou depois, com um servidor falso e o Qwen Code 0.26.6 (nó
+`E_QWEN_CODE_TRANSPORT_CUTS_MEASURED_1104` em `docs/onion/graph/kg-ssot-product.kg.yaml@3e9f6bf3`, no repo onion-kg-ssot):
+- **o corte conta ~900 s a partir do início da resposta**, não do pedido nem do 1º byte;
+- **sem início de resposta em ~120 s, o cliente repete o pedido inteiro**, sem aviso;
+- **depois do corte, o cliente sai com rc 0 e emenda a continuação**, e por isso o classificador da 2ª rodada trata
+  esse retry como INCONCLUSIVO (TRANSPORTE-REPETIU);
+- 400 s de silêncio no meio da resposta não derrubam a conexão.
+
+Nas células desta rodada, a resposta começou em 650 a 702 s e terminou antes de ~900 s depois disso. (Correção de
 2026-11-03, apontada pela revisão do kg-ssot e conferida nos logs: a 1ª redação citava só o real1 e afirmava a
 hipótese do 1º byte.) Os logs do servidor (`_llama-server-real*.log`) estão dentro desses mesmos arquivos.
 
