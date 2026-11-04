@@ -52,6 +52,8 @@ nodes:
     node_type: question
     plane: DEV
     status: done
+    verified_at: "2026-11-04"
+    verified_against: "retorno do run wf_e7411d7e-52e (26 claims confirmadas e 4 refutadas com superação, 3 votos por claim) e a SYNTHESIS.md desta pasta"
     impact: 5
     confidence: 0.7
     label: "Panorama do A2A em novembro de 2026 com o Onion como lente: spec e governança, quem adota, caminhos consolidados e composição com MCP, autenticação entre agentes (OIDC self-hosted como o Logto), comparação com o perfil Onion A2A e mercado."
