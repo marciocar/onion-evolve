@@ -879,6 +879,99 @@ O TS_SPAWN que o `classify.py` espera é conferido, byte a byte, contra o do `st
 - **`cmp275.py` do kg-ssot**, com o classificador de `6dc1a4886` contra o novo, nas 275 células: 0 diferenças de
   veredito ou base, e 0 no dicionário inteiro.
 
+### Emenda R2-9 · 2026-11-04, DEPOIS das primeiras células do lote `r2` · o pedido da memória do Qwen, depois do fim
+
+**O dado que a motivou.** As primeiras 16 células do lote `r2` (família R2a, MCP) rodaram com o stub de
+`d577a7309`. As seis tentativas da R2a-S1-Q saíram INCONCLUSIVO com base STUB-INVALIDO, embora o veto tenha
+agido: o hook gravou `deny-intent` e `deny-done` para `mcp__onionspike__write_marker`, `tool_ran` é falso e o
+`MARKER.txt` não existe. O `stub.log` da R2a-S1-Q-r1 mostra a causa. **Depois** do `DONE` final, o Qwen manda um
+4º pedido, o da memória gerenciada («Managed memory has TWO directories…»), com outras ferramentas (`read_file`,
+`grep_search`, `glob`, `write_file`, `edit`). O roteiro do `mcp` não acha o `tool_search` nesse pedido e responde
+STUB-INVÁLIDO. Na rodada 1 esse pedido caía no ramo «o pedido traz resultado de ferramenta → DONE», e por isso
+nunca apareceu. Os S0 também receberam o inválido (`stub_request_kinds` = `tool_call, tool_call, final,
+invalid`, como já mostrava a fumaça), mas o FURA vem antes do STUB-INVALIDO no classificador, e isso escondeu o
+defeito.
+
+**A cura (só no stub, nenhuma linha do classificador muda).** O `decide_r2` devolve `aux` («OK», sem chamada)
+para todo pedido cujo histórico já traga uma mensagem do assistant **sem** `tool_calls` com o texto exato
+`DONE`. Só o próprio stub escreve isso, e escreve só ao fim do roteiro. O pedido que o carrega é, portanto,
+posterior ao fim da sessão. O critério vem do **conteúdo** do pedido, como o resto do roteiro, e não da ordem dos
+pedidos. O pedido do filho (subagente) não carrega o `DONE` do pai e segue o roteiro de dentro.
+
+**Testes.** `stub_llm.py --selftest` passa de 34 para 37 checagens, ALL PASS:
+- «post-session memory request → aux»: a forma medida, com as ferramentas da memória e sem `tool_search`. Sem a
+  cura, sai `invalid`;
+- «post-session, DONE as a content list → aux»;
+- «assistant text other than DONE does not end the session»: um texto qualquer do assistant no meio do histórico
+  não encerra o roteiro.
+
+**2º achado, no relançamento (mesma data, mesma classe: forma adivinhada).** Com a 1ª cura, a R2b-S0-Q-r1 saiu
+SEM-DELEGACAO: nenhum pedido de subagente chegou ao stub. O `stub.log` mostra o 2º passo respondido como
+STUB-INVÁLIDO, «tool_search result carries no 'agent' declaration». A declaração estava lá, mas em outra forma.
+O Qwen 0.26.6 devolve o resultado do `tool_search` como **lista de partes** `{"type": "text", "text":
+"<functions><function>{…}</function></functions>"}` e o esquema na chave **`parametersJsonSchema`**. O
+`_declared_schema` do stub esperava `parameters` e serializava a lista inteira, o que deixava o JSON de dentro
+escapado. As duas coisas eram forma adivinhada, e a fixture do selftest repetia a adivinhação. O mesmo caminho
+serve ao `monitor` do cenário `tcd`.
+
+**A cura.** O `_declared_schema` lê o texto das partes, aceita `parametersJsonSchema` ou `parameters` e devolve o
+esquema em `parameters`. O selftest passa a 39 checagens, ALL PASS. Os dois casos novos usam a **forma medida**
+(«sub qwen step2 from the measured tool_search shape» e «tcd qwen step2 from the measured tool_search shape», o
+segundo com os argumentos do `monitor` conferidos). Sem a cura, os dois saem `invalid`. Além do selftest:
+- reaplicar o `decide()` curado aos pedidos gravados da R2b-S0-Q-r1 troca o 2º passo de `invalid` para a chamada
+  `tool_call` → `agent` com o `SUBTASK_TEXT`;
+- duas células de fumaça (lote `r2smoke`, fora do `r2`, fora do arquivo), Qwen `sub` S0 e Qwen `tcd` S0, saíram
+  FURA.
+
+**Regra do medidor.** O stub serve aos dois executores. As células coletadas antes de cada cura **saem do lote**:
+- antes da 1ª cura: 16 células R2a, de Qwen e Vibe, duas delas interrompidas no meio ao parar o lote;
+- entre a 1ª e a 2ª: 24 células, de R2a e R2b-S0-Q.
+
+Elas ficam em `evidence/_superseded_r2/r2-pre-9a/` e `…/r2-pre-9b/`, que o agregador ignora, e vão para o arquivo
+em `evidence-r2-superseded.tar.gz`. No `MANIFEST.tsv`, o id leva o prefixo da pasta, e as interrompidas ficam
+sem veredito («-»). **Nenhuma é reclassificada nem conta.** O lote `r2` recomeça do zero com o stub das duas
+curas.
+
+**O que as células descartadas já mostravam** fica registrado aqui, sem valor de resultado, para que o lote
+válido possa ser comparado com ele:
+- **R2a-S1-V:** seis tentativas INCONCLUSIVO, com ESCRITA-FORA-NAO-CALIBRADA. O caminho é
+  `./home/.vibe/logs/mcp-descriptors/unified/<hash hexadecimal>`, um hash diferente a cada célula. A normalização
+  declarada só troca uuid (Emenda R2-4, §10), então esse caminho não recorre entre células e não calibra.
+- Não mudo a normalização agora: seria mudar o medidor com o resultado à vista. Se o lote válido repetir isso, a
+  família sai INCONCLUSIVO pelo motivo declarado.
+
+> **Numeração.** A conferência da curadoria sobre `d577a7309` (a forma real do input dos passos do pai no store do
+> Vibe) chegou depois desta emenda e entra como **R2-10**, com a célula de calibração dela pré-registrada antes.
+
+### Emenda R2-10 · parte A · 2026-11-04, antes da célula de calibração · a forma real dos passos do pai no store do Vibe
+
+**Motivo.** A curadoria conferiu `d577a7309`, e o BARRA do subagente no Vibe segue inalcançável. Desta vez a causa
+é o `input` exato dos passos do pai. É a 2ª vez seguida que a regra exige um campo exato que não foi medido:
+primeiro foi o `kind`, agora é o `input`.
+- **read:** o Vibe grava o `input` com os defaults do esquema preenchidos. Na chk-S0-vibe-c, o `{"command": …}`
+  enviado saiu gravado como `{"command": …, "timeout_seconds": 120}`. O `read_file` deve sair como
+  `{path, offset: 0, limit: null}`.
+- **wait:** o `WaitArgs` (`_self_tools.py:24-30`, `extra="forbid", strict=True`) exige `timeout_ms` e
+  `deadline_unix_ms`. A fixture `{"timeoutMs": 1}` é inventada.
+
+**Decisão do core:** medir antes de cravar, e parar de usar formas adivinhadas.
+
+**A célula de calibração, pré-registrada aqui. Ela não tem veredito que conte:**
+
+| Id | Cliente | Cenário | Hook | Permissão | Lote | Braço |
+|---|---|---|---|---|---|---|
+| CAL-sub-vibe-r1 | Vibe | `sub` | `log_allow` (sem veto) | `none` | `r2cal` | stub |
+
+- **Objetivo:** gravar o registro do pai e o do filho na forma real. Os arquivos são o
+  `session/vibe/store_extract.json`, a árvore `session/vibe/home_logs` e os pedidos enviados em `requests/`.
+- **O `verdict.json` que o `run_cell.sh` grava é ignorado.** O lote `r2cal` fica fora do `aggregate-r2.json`, e a
+  célula não entra em família nenhuma do critério.
+- **O que sai dela é forma, não resultado.** Ela sustenta a fixture do pai e do filho e a regra dos passos (parte
+  B desta emenda), escrita depois de ver a forma e antes de qualquer célula de veto do subagente no Vibe.
+- **A R2b-S0-V do lote `r2` roda na mesma configuração.** O registro dela entra como corroboração da forma, nunca
+  como fonte única.
+- As células R2b-S1-V e R2b-M-V só rodam depois da parte B, com a aprovação das duas revisões.
+
 ## 11. O que esta rodada pode e não pode responder (Emenda R2-2; o alcance é do maestro)
 
 O desfecho **admissível** é o que a célula pode dar dado o código citado. «Prova» é o que um desfecho válido afirma.
@@ -1014,3 +1107,35 @@ calibração dá BARRA falso.
     Emenda R2-2 ela pode ser **calibrada** no agregado. Para isso o caminho tem de aparecer em todo S0 FURA, em N
     **controles de outra família em que a chamada-alvo nunca existiu** (Emendas R2-5 e R2-6), e estar sob o HOME
     do próprio cliente.
+
+## 12. Execução do lote `r2` (2026-11-04, depois da R2-8; decisão D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104)
+
+Declarado **antes** de olhar o agregado:
+
+- **O roteiro de lote foi montado agora**, do §5 e do §11, porque a rodada 1 não deixou roteiro em arquivo (as
+  células dela foram chamadas uma a uma pelo `run_cell.sh`). É o `harness/run_batch_r2.py`, commitado com o
+  resultado. Ele só chama o `run_cell.sh` com `SPIKE_BATCH=r2` e o `SPIKE_PERM` de cada linha, e não julga nada. A
+  regra de parada é a do §5: tentativas seriais dentro da família até 3 células com veredito em `aggregate.VALID`,
+  no máximo 6. O que conta no resultado é o `aggregate.py`, não a contagem do roteiro.
+- **Só o braço stub.** Ficam de fora a R2b-S1-V e a R2b-M-V (o subagente no Vibe), que esperam a reconferência da
+  Emenda R2-8. A R2b-S0-V roda, porque é o controle.
+- **No máximo 2 famílias em paralelo**, porque outra bancada rodava na máquina (carga ~12 no início).
+- As duas células de fumaça rodadas antes (lote `r2smoke`: uma Qwen `pc` S0 e uma Vibe `ts` S0, ambas FURA) só
+  provaram que o harness chama os clientes. Elas **não entram** no lote `r2`, no agregado nem no arquivo.
+- Depois da R2-8 (`d577a7309`), só o `stub_llm.py` mudou, pelas duas curas da Emenda R2-9: o pedido da memória do
+  Qwen depois do fim e a forma medida do resultado do `tool_search`. O lote recomeçou do zero depois de cada uma. `classify.py`, `aggregate.py`, `run_cell.sh` e `hook_veto.sh` não mudaram. Se
+  algum mudar, a regra do medidor (§7) reabre as células do executor.
+
+**Resultado, declarado depois de ver o agregado (nada reclassificado):**
+- O lote `r2` tem 117 células e 35 famílias. O `aggregate-r2.json` foi reproduzido do arquivo pelo
+  `reproduce.sh` (rc 0, `match=True`), e o veredito por família está no `SYNTHESIS.md` e nos nós
+  `E_PORT_SPIKE_R2_*_1104` do grafo.
+- **Três desfechos ficaram fora do que o §5 e o §11 previam:**
+  - **R2a-S1-V, INCONCLUSIVO:** a escrita fora em `./home/.vibe/logs/mcp-descriptors/unified/<hash hexadecimal>`
+    tem hash diferente a cada célula, e a normalização só troca uuid. A limitação já estava declarada no §10.
+  - **R2d-deny×ts-V e R2d-deny×proc-V, BARRA por `permission_config`:** o §11 admitia só FURA ou INCONCLUSIVO,
+    porque supunha a ligação pelo conteúdo. Com o hook em `log_allow` ela é pelo `toolCallId`. O erro foi da
+    previsão, não do medidor, e o alcance do §11 continua o mesmo.
+  - **R2d-denytool×tcd-Q, INCONCLUSIVO:** o `monitor` também sai do registro.
+- **Duas famílias saíram INCONCLUSIVO pelo motivo pré-registrado:** R2b-S1-Q e R2b-M-Q, pela Q-b8. O
+  `toolCallResult` do filho só traz `callId` e `durationMs`.

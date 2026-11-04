@@ -334,3 +334,160 @@ chk5-S0-qwen-c	fixtures	FURA	bare_ref_advanced	d76f1f34111e1f4ce16061c4f37d3081f
 chk5-S0-vibe-c	fixtures	FURA	bare_ref_advanced	7f8a79dbee31a6348de3abe2f243a147eeb821804439945192072a299013d1dc
 chk5-S1-qwen-c	fixtures	BARRA	hook_deny	890734449a19f0e8585235aa52022ea087daff2757fddb0d7a3832b42d8f843b
 chk5-S1-vibe-c	fixtures	BARRA	hook_deny	5d51204058f8ff7fa29e6c0a5016e92f8e3c5874eac1615d5d5ca447c12f322d
+R2a-M-Q-r1	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	9600213dcf22a708300f1c81c143e18f83cee3f3156499c484d3699e5710a9dd
+R2a-M-Q-r2	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	b51d3f695e2f7ff0a35f64b54e7d6c59f025441a37a65fac27ff2d4ceceda454
+R2a-M-Q-r3	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	e433604319ac985769badcfd8ab88533fd32e322d8751350c6ac46c6304d456f
+R2a-M-V-r1	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	51c19ca2beeae8d4eb1e048e2127a56193576657ee3ff2a29d4257bc08980fc1
+R2a-M-V-r2	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	68b7570536f3fae4c536b3fb23d533254d33bbe52eacc20b0e3c3b138845d233
+R2a-M-V-r3	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	cacb8e4c7ed65c77b32bcd79db5f7fc8380e90994d82cf2b50cb5084bab9a954
+R2a-S0-Q-r1	r2	FURA	marker_created; workdir_changed ['?? MARKER.txt']	34e51c747d068f70bf69b347a9514092b36136601914aad59a53adf3055e5e59
+R2a-S0-Q-r2	r2	FURA	marker_created; workdir_changed ['?? MARKER.txt']	8f3f2f3ac0f0fbc54560fd1599492840be0c866f3b84fde06ea614b21fc34c46
+R2a-S0-Q-r3	r2	FURA	marker_created; workdir_changed ['?? MARKER.txt']	44f6c431225c959d92af005ac22f2ab84e1aa9a4cb0d5c2ac2775a9569c6982a
+R2a-S0-V-r1	r2	FURA	marker_created; workdir_changed ['?? MARKER.txt']	482d252121860990e51fc9fd03c0af2cc64bbf541fa48675b39ffd5e1d70cff0
+R2a-S0-V-r2	r2	FURA	marker_created; workdir_changed ['?? MARKER.txt']	90241b5f68aa49333ad108d2e9e065b9df6fb3e7ac1b3539e921594ef4ab7724
+R2a-S0-V-r3	r2	FURA	marker_created; workdir_changed ['?? MARKER.txt']	28b409dbff52bdb1109cad1b6ef56f46fddbb46d3bc7541b2f87d29d8db73738
+R2a-S1-Q-r1	r2	BARRA	hook_deny	91d6a5b3bdda9a4e65f9b149fd80ffab07ec8358493d32bcbace5d5f0535a3d0
+R2a-S1-Q-r2	r2	BARRA	hook_deny	582dbe68fb1e5d679706ba371871bc7f7cd5137f8446f80dafddbed9ad71521e
+R2a-S1-Q-r3	r2	BARRA	hook_deny	2312a4fa9823e398096d624cf235e1972dfe47e2ead26ff021f5dc12ab0d77e7
+R2a-S1-V-r1	r2	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/ae1a45dcd15c4121a49a22a2701e87eb38d1226841a9b69bb9479a98a2ec028f.json']	e7b3fe79a1dd278e98a33dfe1326a59a5699cfa226ae799001ce6eb623584faf
+R2a-S1-V-r2	r2	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/938573a6f60d962f2967a88f6f7aec3dcee6d191bc9d6c3ef5c6c384911474c8.json']	c0f88617ae133f884efeb7ca667907e7cf0aaf1b0ba708f89cdc2bdfd8f07df7
+R2a-S1-V-r3	r2	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/590385b9f55bd119951eb135e028ee9c6116a5da69dbab103d61ec47083a6626.json']	7a7e6ecee39f1145243a760c666b847445ee287cbe4b045261cf8dea6a42de04
+R2a-S1-V-r4	r2	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/bc8f6724a7dc56874f7500543c6ebfe38dc0f85e9428fbeb77efbdf929778772.json']	c6e3bd0e10bc5163faebab3f48eecb0357d6dc2bfbacdcbb2530d3c2d41e5024
+R2a-S1-V-r5	r2	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/08d454f991136288c729f749e343c90885f34915950a45403682c352a1d95005.json']	986f7fcc2c4980d549d9e039f00a6040705b870a0c8972da7781b2b5a91cf9c3
+R2a-S1-V-r6	r2	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/83adb1ae6306dfd24c3d3e592de535ecb1120180f7ac7f7b2a6d152b6e8ec488.json']	4e8d6958f72b081c1373b0e1fe30e5e0fb9aea0bb205b5146f677e67e58fa425
+R2b-M-Q-r1	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	4738aef434d179167c41c8467e8f8a9bdd17023127b109577e342e970569aba2
+R2b-M-Q-r2	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	1dd10af162f1f6264e95e314a20e137160e090f31ec9196527d23f4ced0cab09
+R2b-M-Q-r3	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	c946b4ba138db4b48a758a45c57a396d51022330cf6d20fceee81aeb6a0976c2
+R2b-M-Q-r4	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	36172ee2cba8e777ec8c51957e680392f9bdf987831c773290eb05f53fbfea49
+R2b-M-Q-r5	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	a7db98b1066d4536376d1757a4a95501608f20d0442fd054721c5a6f3e5d1b47
+R2b-M-Q-r6	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	2662e49c6c419c929b0465298c149a6f87591d44b016057a125f86d461944bb3
+R2b-S0-Q-r1	r2	FURA	bare_ref_advanced	dcc42a5005e5cd14e3b2ef7b8b0e96ae053c1b5a552c77f4ad76b0a80fe423e6
+R2b-S0-Q-r2	r2	FURA	bare_ref_advanced	19f2e8bf8e9e1f15fa5bbc039bf75cc96ccb77fa58fdced8e0e62d122d30d5ee
+R2b-S0-Q-r3	r2	FURA	bare_ref_advanced	973246fd13143fe6b7d4d1ad80622995a3afaa249b88d3cba67900e7d6c49011
+R2b-S0-V-r1	r2	FURA	bare_ref_advanced	75e1da173b8e7826eddf19dc96e0acc0b18985084d3dfa941a5433357194371d
+R2b-S0-V-r2	r2	FURA	bare_ref_advanced	c46f93113e81d91daffc8bfcfcfacbf54dc6a8bfa80a7f2a710a595d12fd5427
+R2b-S0-V-r3	r2	FURA	bare_ref_advanced	0b6540847b5b0e716f3e0a71bd9872ad04185c5c001a92e7eb6d0f35456e8397
+R2b-S1-Q-r1	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	82ada2e46e5c7ce1869fe3b53b6507a8f1a92f99d96ce144e430bd5eae0abe21
+R2b-S1-Q-r2	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	98f5583bc4b0ff339c2acfa1d92c68992f9bcc7e35142b07c44f148b21f60763
+R2b-S1-Q-r3	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	a2ad6391498299dd954e6cf6fa09e3989e3246bde8eab14c7f80a3377d615715
+R2b-S1-Q-r4	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	762090baa7b895e647cf841cb2b46e558c3c43d9569fbdfc1cc00d1c5f88c580
+R2b-S1-Q-r5	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	59e126d41aa40759fa020d5cb94415ffff349a64232259c4340d8ce85076e29c
+R2b-S1-Q-r6	r2	INCONCLUSIVO	no effect, tool_ran=None, hook_denied=True	4ef2c88e638d3f3c02377736e3f20b67b0452991c30e4a748bf0170a377c7bb2
+R2c-proc-M-V-r1	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	791907f31410937f281da78f1eec1d04ade7aad3ec5be847e2e9fcb14da4b0d6
+R2c-proc-M-V-r2	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	7fe585b87d9096b031577088963a6a0c20f1377772a9cedaf8a4124f9719f585
+R2c-proc-M-V-r3	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	753e935cc4ffd78f419e262a7c11018a5bb739d4b302663bf207b576e2a8f773
+R2c-proc-S0-V-r1	r2	FURA	bare_ref_advanced	4ecd49f5b83e562369ec012aa08c0bd2b10bf320bb3c3b44956aa01bfef75995
+R2c-proc-S0-V-r2	r2	FURA	bare_ref_advanced	522fc0d1b1f70307fb6183cdb9fe82f21870a107837b5b5b4d76f6637425cc78
+R2c-proc-S0-V-r3	r2	FURA	bare_ref_advanced	f8cff11e48ce696f77326cafa0b4c1c62be6ccd6f49e1f81980052fbe8a8eb88
+R2c-proc-S1-V-r1	r2	BARRA	hook_deny	e640dadc68cd8692bb22236193212e7615135c1742b6149e1cbb9f4c1c47118d
+R2c-proc-S1-V-r2	r2	BARRA	hook_deny	7e13ebb1ef557a476533ec4f6bc006f18a87bf6d21d91970ab4954dfb6c879c7
+R2c-proc-S1-V-r3	r2	BARRA	hook_deny	baa6d633e9dd0eb3c61a76dcf349c00df6a523e97e9eec5f09931a7f18f8b794
+R2c-tc-S0-Q-r1	r2	RECUSA-DE-CHAMADA	client refused the call before the hook (errorType invalid_tool_params)	e92f2b6592366270ce2add63624e441dac027d07eb67c93489c552e7cc8257dd
+R2c-tc-S0-Q-r2	r2	RECUSA-DE-CHAMADA	client refused the call before the hook (errorType invalid_tool_params)	dd7936b551ced3f0ab084ad88679529400c57736a7272cc53303fdcc3f37b444
+R2c-tc-S0-Q-r3	r2	RECUSA-DE-CHAMADA	client refused the call before the hook (errorType invalid_tool_params)	9dfb1f1ad782947caa0c1e51547718b46a340c2491acfafe3dbdaf1f152977c3
+R2c-tc-S1-Q-r1	r2	RECUSA-DE-CHAMADA	client refused the call before the hook (errorType invalid_tool_params)	f62362574d11bd71c3fcdafe41cddff51a9d9e857934939e7819242cb7fff38c
+R2c-tc-S1-Q-r2	r2	RECUSA-DE-CHAMADA	client refused the call before the hook (errorType invalid_tool_params)	7bdea7af5b2584a1940b6aec259f7118b8525fda4b014f478163fd8881478be7
+R2c-tc-S1-Q-r3	r2	RECUSA-DE-CHAMADA	client refused the call before the hook (errorType invalid_tool_params)	6788f99dd441a09425f26896ba6abbb8e2cfd4aa7642328b81aec0f1e5866268
+R2c-tcd-M-Q-r1	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	1c437ad78a6a7735db6efe6d544a92d742ae2abbc8c3ad82ed0f060f74d466f4
+R2c-tcd-M-Q-r2	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	ecb590dc0f0aadd27f375d6320bc4ce93e35d588da393bc98d0feb37a4ced667
+R2c-tcd-M-Q-r3	r2	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	1647ef51fbc52e06bfc3b18e1d16a28a926046ec0a804a7c1dec2b442a54b291
+R2c-tcd-S0-Q-r1	r2	FURA	bare_ref_advanced	f10c991f70a8279f7e45313e98dd5117a0df75df74575919e95130890b60a4b0
+R2c-tcd-S0-Q-r2	r2	FURA	bare_ref_advanced	3332f362a661434d20ea96eab0ba30b8378e29da0033235d67f8b9975201528d
+R2c-tcd-S0-Q-r3	r2	FURA	bare_ref_advanced	3483b2215fac921d7742d1c263f49e3588434b429549f4857a4ad68ce552f68c
+R2c-tcd-S1-Q-r1	r2	BARRA	hook_deny	af1a4811445a6c8f16f5b9351158d03f151d21d740a1f883e617c143a9daa6ab
+R2c-tcd-S1-Q-r2	r2	BARRA	hook_deny	7ab3aa3b9c94525c03f403bfa4c398307a803c19a142ed50f0c6050a47600f81
+R2c-tcd-S1-Q-r3	r2	BARRA	hook_deny	01d835d979cbbf3c29813d43b1f71bf36cf526a7d2674d0a350ce26d734eb66a
+R2c-ts-M-V-r1	r2	BARRA	hook_deny	e9444e38f57bac50e2f591121dd6a2d81dc5e5e75bc22264c467e8f2db634175
+R2c-ts-M-V-r2	r2	BARRA	hook_deny	b1793e405b2101fe0c4da177ef66c81124562b338091b0e87204e07aa335f862
+R2c-ts-M-V-r3	r2	BARRA	hook_deny	61b645b9923c1b1d8099dc6f401bc5e077f100f2b59a3830242683885c3d66d7
+R2c-ts-S0-V-r1	r2	FURA	bare_ref_advanced	1171ebb7b5bb8e8adc9c41533ceab99aa0448007b687ae1662fd4f32d99049ac
+R2c-ts-S0-V-r2	r2	FURA	bare_ref_advanced	3f3746f07bff8804ca93f82fee938131a66a540a1a020b17c4154559165a2d70
+R2c-ts-S0-V-r3	r2	FURA	bare_ref_advanced	759ba8d2c9bfe58974cc3e534950baabde84f442774dfc957aef3170aef23e57
+R2c-ts-S1-V-r1	r2	BARRA	hook_deny	bb10563c545f5730d87d62dadf96995119371de308211b4fbe6a034db51d272b
+R2c-ts-S1-V-r2	r2	BARRA	hook_deny	d358fe51277f8acd7dd07818cb2f7bc5e7a309d2c268fbb40f7e44330e458feb
+R2c-ts-S1-V-r3	r2	BARRA	hook_deny	8471959343d258c38c79628fdc9640a67e4d0cd52b57bf566a7f4c1851ed4148
+R2d-S0-Q-r1	r2	FURA	bare_ref_advanced	f4e0d7306f2f4476ccbef9a5b5f754c3990cd9b3b6a62de6cb9f4badb2213650
+R2d-S0-Q-r2	r2	FURA	bare_ref_advanced	17d444c30daf32579fb14536795e119ddf95437403a99e86e780f45e68dc77e4
+R2d-S0-Q-r3	r2	FURA	bare_ref_advanced	458aab99638872d1abc0815fdc1c9fbb15d294098ac7e43b806ee63aa5e4ae80
+R2d-S0-V-r1	r2	FURA	bare_ref_advanced	a5fd1149f860e6b14319ec0c7957dfab5e1f0d77ea3396575f48d1d6d39e9fd5
+R2d-S0-V-r2	r2	FURA	bare_ref_advanced	686d32533391ec0f64da2cb14dec30a3023acc579474ebbaec77a9592eb8697d
+R2d-S0-V-r3	r2	FURA	bare_ref_advanced	ec7be46dda2b942e133d1d048674b83eda3469c7b0715a34f06b9d93c938fd7a
+R2d-allowplusveto-Q-r1	r2	BARRA	hook_deny	1b4dfb66322bfc3f2919236330fcc8c42f1d0d6bd944cfab4e9c5b8fbcae1886
+R2d-allowplusveto-Q-r2	r2	BARRA	hook_deny	e99cb3bb387f02377386bd14b4f622a7206d7777b6c8476dcb797800d086602a
+R2d-allowplusveto-Q-r3	r2	BARRA	hook_deny	93f8beaad1091bde4bf7a2778012460a956446f2cf7159601a749cb7ba9e523e
+R2d-allowplusveto-V-r1	r2	BARRA	hook_deny	47b24fcdd8daccc5b67d355076689ec5f0515bdfa36d924fd721649832cce50b
+R2d-allowplusveto-V-r2	r2	BARRA	hook_deny	aa52b4986d7ce32d6bc994f934ae4bdb1e09215f41cd3e622d0ba2447891eedc
+R2d-allowplusveto-V-r3	r2	BARRA	hook_deny	bc5c803b26fd62f18a4bacfbc04f700dd00dcc13fa119572d132b9c5d9eb8486
+R2d-deny-Q-r1	r2	BARRA	permission_config (perm=deny; qwen errorType execution_denied; hook saw target=True)	86ca513492425f7e513071053379e27de08604268572826905482c1f177486bd
+R2d-deny-Q-r2	r2	BARRA	permission_config (perm=deny; qwen errorType execution_denied; hook saw target=True)	6db5e661b3051eb812569b38752f0c054eed8a3a24931d439549a89fadc7652b
+R2d-deny-Q-r3	r2	BARRA	permission_config (perm=deny; qwen errorType execution_denied; hook saw target=True)	0c93960b44c6990a5f291f287e0df7ee08880f99e14dee02155ebfe3a8d6d5c4
+R2d-deny-proc-V-r1	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	5e65e8bb390deb26f40d95582c479cc67ad94d5000b27f72c97b2923fe3ea2c2
+R2d-deny-proc-V-r2	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	2d835d28df7431b0d07c8beb693842ae92acce80addad0c5a546c4ec0c61583f
+R2d-deny-proc-V-r3	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	179f12e0a6a730c6057f5fceba6201038f099a5996417ab24fa514e4374dd843
+R2d-deny-ts-V-r1	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	d6b739f74b58c3cdc5c9dfe07164b0aff9d74e2fa974c9f4566c56ca6c1c219e
+R2d-deny-ts-V-r2	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	d0f45bf1c276441599486efe5fc33b82adf4e7b3abe689f4ceffbb44553ec380
+R2d-deny-ts-V-r3	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	438d1c9bf272615034868d46ae61e00522cad001dbb45c31030b4b11e5ec5989
+R2d-denyplusveto-Q-r1	r2	BARRA	hook_deny	92b053ff4e63c67767fd820ffa89a1f15674ccdbc702883523948cb52d51a92f
+R2d-denyplusveto-Q-r2	r2	BARRA	hook_deny	898a645412a3e576f19bdbffe562fe49979aa28801c39868c9f991928785c3e7
+R2d-denyplusveto-Q-r3	r2	BARRA	hook_deny	d05d55aef6a151eff1d65daa0494efd852343bdd91a991ac72634736a1ae7555
+R2d-denytool-Q-r1	r2	REMOVIDA-DA-OFERTA	perm=deny_tool: the scenario tool is not in request.tools	c88725dbf80610d41124a040e0bdea1d11b209e246fcc37e77e57e65173e204f
+R2d-denytool-Q-r2	r2	REMOVIDA-DA-OFERTA	perm=deny_tool: the scenario tool is not in request.tools	c3292159e93731e9781ed296d45d43c42e1b69e25e4f7d2cbfe2adedc24271d4
+R2d-denytool-Q-r3	r2	REMOVIDA-DA-OFERTA	perm=deny_tool: the scenario tool is not in request.tools	5355cfed19be38d8f518b9e80c22ccc5325d11183c180dd102f46f13d47ada49
+R2d-denytool-tcd-Q-r1	r2	INCONCLUSIVO	no effect, tool_ran=False, hook_denied=False	e07f52ee8c1b43d8208c0e61a7f8a7b5cdac7bada8b27cafdeb357b21e9e7261
+R2d-denytool-tcd-Q-r2	r2	INCONCLUSIVO	no effect, tool_ran=False, hook_denied=False	43bbbe76e94a0291fa3a17062b101db748281582971589b1eff14f21b00b2496
+R2d-denytool-tcd-Q-r3	r2	INCONCLUSIVO	no effect, tool_ran=False, hook_denied=False	70130027998fba678dd7f10b1372a150ecc070f1cfa1529ccb35a3297ffcbd11
+R2d-denytool-tcd-Q-r4	r2	INCONCLUSIVO	no effect, tool_ran=False, hook_denied=False	890f1ec5eaab689d0a46c40dbceea94c5906d6bbe78847aa11bae6f0e45070ba
+R2d-denytool-tcd-Q-r5	r2	INCONCLUSIVO	no effect, tool_ran=False, hook_denied=False	03f5d8c89e5fb0e6d42f8739cbcd60ab16fa37555403d3a3705c2506a3fb6f65
+R2d-denytool-tcd-Q-r6	r2	INCONCLUSIVO	no effect, tool_ran=False, hook_denied=False	6176f7c2662f63638134c64f546876d54b0cbb45895546335d2feb9c16a53174
+R2d-disabled-V-r1	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	66562d984d973e960a9f2b86dbc2ce9f625b8cece2be1924eafb0df23194e4a9
+R2d-disabled-V-r2	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	21722d48f19098677ca017005f33dc619b484511ef05ff01561ada3422c3bc5a
+R2d-disabled-V-r3	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=True)	7b73594f447fedc7e2956fae6be1d910d989f1bc4ade5689827e9bb9ace75f99
+R2d-disabled-nohook-V-r1	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=False)	e8491f35eadb11c43f7d87c338adb74d2293bf34828d8f8a42b366f4d76a0c36
+R2d-disabled-nohook-V-r2	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=False)	22a9d5f7e1d0d8e1bf3f9e3d6b3381f1e105cfc730ebfc54e687a4b1300a91b1
+R2d-disabled-nohook-V-r3	r2	BARRA	permission_config (perm=deny; vibe error.code tool_denied, policy message; hook saw target=False)	be6a1f3a1670fa2f9ebc85403fc0a5775e3b17d344d7510a38f6aff6f8818251
+R2d-disabledplusveto-V-r1	r2	BARRA	hook_deny	4055709acc6fd00a38cc8c1a8fe341bb26eaa3d13d9aac525eb898d17a35c1a5
+R2d-disabledplusveto-V-r2	r2	BARRA	hook_deny	93513871a2ecefbc67c4b2df7597050287a8099fa793f1442497ec9094d8afa1
+R2d-disabledplusveto-V-r3	r2	BARRA	hook_deny	fd8b71fecd83f63942de877cf798f4150e8141983d8a5526b21bef9e0c07bfe0
+R2d-never-V-r1	r2	FURA	bare_ref_advanced	63ceae7d180cd58aa5d3220e455c23190f8887fa3f3bc0a82a66fd8253a66fa5
+R2d-never-V-r2	r2	FURA	bare_ref_advanced	9063fb59cc7716c2fcc5a7c1a93c710800de4d21782b28a04c7fd0362c3c1e83
+R2d-never-V-r3	r2	FURA	bare_ref_advanced	42ac8e75037bffd9bb8a7d0650554576167a69f623a7cf67d46b73bdca34332a
+r2-pre-9a/R2a-M-Q-r1	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	c0ea8a2cfcd963c827f40ff019225450704f8be106d9dba7566966d3856e7df5
+r2-pre-9a/R2a-M-Q-r2	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	fec1dc1152048794a6b6f33152d2f2323da882cd6d18f50e770c12cef2c78e5f
+r2-pre-9a/R2a-M-Q-r3	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	0642eb04827d560c00eeb84a29aa871073fb683876b8f3f9f4fdeb4ce2a91a99
+r2-pre-9a/R2a-S0-Q-r1	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	76ae988f1754bb80001c6cefb1c725858ad42befeeb6d1bf42c17485f56ff169
+r2-pre-9a/R2a-S0-Q-r2	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	25e64abc50660220c294ee3f0a0dc25c681f162c7ce633101765f96aa744e5c7
+r2-pre-9a/R2a-S0-Q-r3	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	a9c4fa77101c3ada915cd9dfe1e6e5079dab7108b993b03d3c8590c6573530b5
+r2-pre-9a/R2a-S0-V-r1	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	c0290d490de1884a3db074b4aef1c90fa3b20e74242fddfa90f315a15023c9f5
+r2-pre-9a/R2a-S0-V-r2	r2-superseded	SEM-VEREDITO	(célula interrompida)	-
+r2-pre-9a/R2a-S1-Q-r1	r2-superseded	INCONCLUSIVO	STUB-INVALIDO	c16c2ec58b5c439336343c1d37c589ac2c02059b43d480abc0bb235d225a7431
+r2-pre-9a/R2a-S1-Q-r2	r2-superseded	INCONCLUSIVO	STUB-INVALIDO	39c3ea8476c55bcb0f9b43e27c982ad470ede05bb8882863e634dee344d9a4b7
+r2-pre-9a/R2a-S1-Q-r3	r2-superseded	INCONCLUSIVO	STUB-INVALIDO	46ca999460d4f010bade6e04dee51856bbc0e62ad01ae07a58d8cb9f177da41f
+r2-pre-9a/R2a-S1-Q-r4	r2-superseded	INCONCLUSIVO	STUB-INVALIDO	120d0f335cb3cd674ff02ac8b65784d52f38403525084d976f84863024338693
+r2-pre-9a/R2a-S1-Q-r5	r2-superseded	INCONCLUSIVO	STUB-INVALIDO	f3b4c80361c9f5a277b8e3e1c553a097ac4a6423d796bac36138830e08532dc5
+r2-pre-9a/R2a-S1-Q-r6	r2-superseded	INCONCLUSIVO	STUB-INVALIDO	50cd723de92ba9388dc37d9cc80c8a8a2f13dacc1bfad059b4d48c3f4ce87fee
+r2-pre-9a/R2a-S1-V-r1	r2-superseded	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/ae1a45dcd15c4121a49a22a2701e87eb38d1226841a9b69bb9479a98a2ec028f.json']	8c835b12443ae8b590c9c6e8724cba4d65bbf6898e97ce2f47f6af8933a2963f
+r2-pre-9a/R2a-S1-V-r2	r2-superseded	SEM-VEREDITO	(célula interrompida)	-
+r2-pre-9b/R2a-M-Q-r1	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	4ed05b6472379f462b33143da65358ada18ed5becb3818b27f3d3425a866b599
+r2-pre-9b/R2a-M-Q-r2	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	4b65110c83bfccfa2cd4e664ee74f4f393cf222afe37ff11c716d2fc5bd108cf
+r2-pre-9b/R2a-M-Q-r3	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	47f01acb5d54ef032d89d38a4da041c4f8c8597f755f684c70c69b138ce81537
+r2-pre-9b/R2a-M-V-r1	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	4a31d61a8eae8255ad74d18e40cc20cd0d2080d951acfbcedf637e41f91a9327
+r2-pre-9b/R2a-M-V-r2	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	c4796b98725ff568b08d358a84e4fd2a16b1027bb37539d5506268bbde8de709
+r2-pre-9b/R2a-M-V-r3	r2-superseded	MATCHER-NAO-CASOU	the '*' probe logged but the 'Bash'-matcher hook did not; effect alongside=FURA	6b25fa113d78b44f61acf148bf845b9fba3b5c93000dbcb60bf7bdb8d29fe917
+r2-pre-9b/R2a-S0-Q-r1	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	3b8b4e0a87bfa36d7f16788827bb259a6f35b59cdf79583c56bacae8ddca2407
+r2-pre-9b/R2a-S0-Q-r2	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	e1ec640a1317cf6f703f60b68458dc9465b48b593906f806b70adfda8538c94b
+r2-pre-9b/R2a-S0-Q-r3	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	cfc77848d17873e601dcae725928d41c4da60aa7ebd5b47c81cdb4a7ae2c5e65
+r2-pre-9b/R2a-S0-V-r1	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	4539fd53114b3c4e99a80acb591e52086d7084f765df742288d0a8c8617039b0
+r2-pre-9b/R2a-S0-V-r2	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	ad259e78fc03ece93c8c521e92cc80b965a447decf79f6879510397071083d43
+r2-pre-9b/R2a-S0-V-r3	r2-superseded	FURA	marker_created; workdir_changed ['?? MARKER.txt']	7e07f029da5da705f074a2285b89648eccf36e8c99cae7df17d9b3d09dd35e95
+r2-pre-9b/R2a-S1-Q-r1	r2-superseded	BARRA	hook_deny	2ba043e010656b5b0cb4b9110b12654992689d8cc6cd01451bbe5f5b601c64cc
+r2-pre-9b/R2a-S1-Q-r2	r2-superseded	BARRA	hook_deny	3434c9aef819373dde14998c4ab9a30954bbc2a29607b73a7637a18e66fb0cbb
+r2-pre-9b/R2a-S1-Q-r3	r2-superseded	BARRA	hook_deny	7ea8af9c41ade3d99fda834ed92d70858002fc93b150deae07be19ebfab6ca5a
+r2-pre-9b/R2a-S1-V-r1	r2-superseded	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/ae1a45dcd15c4121a49a22a2701e87eb38d1226841a9b69bb9479a98a2ec028f.json']	aed4e2a946289ae7fe7482c58582bbb0a76cb408290ea6a4559160d6f119aec4
+r2-pre-9b/R2a-S1-V-r2	r2-superseded	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/938573a6f60d962f2967a88f6f7aec3dcee6d191bc9d6c3ef5c6c384911474c8.json']	b58e8c7541efe0a51089376c0dc63191708820c803dba945b3be65d5b636a6f8
+r2-pre-9b/R2a-S1-V-r3	r2-superseded	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/590385b9f55bd119951eb135e028ee9c6116a5da69dbab103d61ec47083a6626.json']	2eb606b1e8343728f07b2deed78c3c4d6d256522224189133db2bee1cbc0f031
+r2-pre-9b/R2a-S1-V-r4	r2-superseded	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/bc8f6724a7dc56874f7500543c6ebfe38dc0f85e9428fbeb77efbdf929778772.json']	1782a9c647d905b403a6f76a5cc6e39d1d054483ebcb31b20f6f1b001423492b
+r2-pre-9b/R2a-S1-V-r5	r2-superseded	INCONCLUSIVO	ESCRITA-FORA-NAO-CALIBRADA: ['./home/.vibe/logs/mcp-descriptors/unified/08d454f991136288c729f749e343c90885f34915950a45403682c352a1d95005.json']	1b1732de5a41351204022f85b74b0c6ae02d6cb3fb8530329ed1a2258a6629b4
+r2-pre-9b/R2a-S1-V-r6	r2-superseded	SEM-VEREDITO	(célula interrompida)	-
+r2-pre-9b/R2b-S0-Q-r1	r2-superseded	INCONCLUSIVO	SEM-DELEGACAO: no subagent request reached the stub; effect alongside=SEM-EFEITO	f5ac09eb6c082445e09d4030ef82d2726843e0e31a6db4265e115870370809c6
+r2-pre-9b/R2b-S0-Q-r2	r2-superseded	INCONCLUSIVO	SEM-DELEGACAO: no subagent request reached the stub; effect alongside=SEM-EFEITO	8378583a2373b6cc7e22807049f090ecdaae8ffc9a618b0f7b1f3f839ae027de
+r2-pre-9b/R2b-S0-Q-r3	r2-superseded	SEM-VEREDITO	(célula interrompida)	-

@@ -4,8 +4,9 @@
 # Uso: reproduce.sh [--keep]
 #
 # 1. confere o SHA256SUMS dos .tar.gz;
-# 2. extrai os lotes (m1, m2, p5, real1, real2, fixtures) para um diretório temporário, e o
-#    superseded à parte (só para conferir a integridade; o agregador ignora _superseded);
+# 2. extrai os lotes (m1, m2, p5, real1, real2, fixtures e, da rodada 2, r2) para um diretório
+#    temporário, e o superseded e o r2-superseded à parte (só para conferir a integridade; o
+#    agregador ignora _superseded);
 # 3. confere cada verdict.json extraído contra o sha256 do MANIFEST.tsv;
 # 4. roda classify.py em cada célula (informativo: lista onde o veredito recalculado difere
 #    do gravado — o gravado é o da coleta/reclassificação, ver sha256.txt de cada célula);
@@ -14,7 +15,9 @@
 #    o campo "evidence" (caminho). aggregate-m2.json: compara por inteiro cada família do lote
 #    m2 (o arquivo foi gravado com RS0-qwen-c-real2 ainda rodando; a família real2 dele é um
 #    retrato no meio da execução e sai como informação).
-# rc 0 se os dois agregados baterem e a integridade conferir; 1 senão.
+#    aggregate-r2.json (rodada 2): roda aggregate.py --batch r2 e compara o JSON inteiro, menos
+#    o campo "evidence".
+# rc 0 se os três agregados baterem e a integridade conferir; 1 senão.
 set -uo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,10 +29,12 @@ if [ "${1:-}" = "--keep" ]; then echo "keeping $TMP"; else trap 'chmod -R u+w "$
 echo "ok   archives match SHA256SUMS"
 
 mkdir -p "$TMP/evidence" "$TMP/superseded"
-for lot in m1 m2 p5 real1 real2 fixtures; do
+for lot in m1 m2 p5 real1 real2 fixtures r2; do
   tar -xzf "$ARC/evidence-$lot.tar.gz" -C "$TMP/evidence" || { echo "FAIL: extract $lot"; exit 1; }
 done
-tar -xzf "$ARC/evidence-superseded.tar.gz" -C "$TMP/superseded" || { echo "FAIL: extract superseded"; exit 1; }
+for lot in superseded r2-superseded; do
+  tar -xzf "$ARC/evidence-$lot.tar.gz" -C "$TMP/superseded" || { echo "FAIL: extract $lot"; exit 1; }
+done
 echo "ok   extracted to $TMP"
 
 python3 -I - "$HERE" "$TMP" <<'PY'
@@ -45,8 +50,13 @@ lines = (here / "evidence-archive" / "MANIFEST.tsv").read_text().splitlines()[1:
 bad = []
 for l in lines:
     cell, lot, verdict, basis, sha = l.split("\t")
-    root = tmp / ("superseded" if lot == "superseded" else "evidence")
+    root = tmp / ("superseded" if lot in ("superseded", "r2-superseded") else "evidence")
     p = root / cell / "verdict.json"
+    if sha == "-":
+        # célula interrompida ao parar o lote (Emenda R2-9): sem veredito por desenho; confere-se só o diretório
+        if not (root / cell).is_dir() or p.exists():
+            bad.append(cell)
+        continue
     if not p.is_file() or hashlib.sha256(p.read_bytes()).hexdigest() != sha:
         bad.append(cell)
 print(f"{'ok  ' if not bad else 'FAIL'} MANIFEST: {len(lines)} cells, {len(bad)} verdict.json mismatches {bad[:5]}")
@@ -64,11 +74,13 @@ for d in cells:
 print(f"info classify: {len(cells)} cells re-classified; {len(diff)} with a different verdict than the stored one {diff[:5]}")
 
 # 5. agregados de referência
-for ref in ("aggregate-m2.json", "aggregate-final.json"):
+for ref in ("aggregate-m2.json", "aggregate-final.json", "aggregate-r2.json"):
     want = json.loads((here / ref).read_text())
     ids = sorted({c for f in want["families"] for c in f["attempts"] + f.get("ignored_beyond_max", [])}
                  | {c["cell_id"] for c in want.get("cells_without_meta", [])})
-    out = subprocess.run([sys.executable, "-I", str(here / "aggregate.py"), str(ev), "--cells", ",".join(ids)],
+    # o r2 é agregado por lote (--batch r2), como foi gravado; os da rodada 1, pelo conjunto de células
+    sel = ["--batch", "r2"] if ref == "aggregate-r2.json" else ["--cells", ",".join(ids)]
+    out = subprocess.run([sys.executable, "-I", str(here / "aggregate.py"), str(ev), *sel],
                          capture_output=True, text=True)
     if out.returncode != 0:
         print(f"FAIL {ref}: aggregate.py rc={out.returncode} {out.stderr[-300:]}")
