@@ -28,7 +28,7 @@ que barra sob `bypassPermissions`, não existe fora do Claude Code, nenhum CI re
 
 | Grau de prova | Harness | O que se sabe | Nó |
 |---|---|---|---|
-| Medido | Codex CLI 0.164.0 | barra por `exit 2` e JSON deny sob `--dangerously-bypass-approvals-and-sandbox`, com hook confiável | `E_OBJECAO_CODEX_BYPASS_MEASURED` |
+| Medido | Codex CLI 0.164.0 | barra por `exit 2` e JSON deny sob `--dangerously-bypass-approvals-and-sandbox`, com hook confiável; sem confiança, o `codex exec` pula o hook em silêncio (`E_SPIKE_FAILOPEN_UNTRUSTED_HOOK_SKIPPED_1026`) | `E_OBJECAO_CODEX_BYPASS_MEASURED` |
 | Medido | Qwen Code 0.26.6 | barra no caminho feliz; abre em toda falha do hook | `E_OBJECAO_RUN_PAID_MEASUREMENTS_LEFT_OUT` |
 | Medido | Mistral Vibe 3.0.4 | o `exit 2` só barra com `strict`; o veto próprio é JSON com `exit 0` | `E_OBJECAO_RUN_PAID_MEASUREMENTS_LEFT_OUT` |
 | Só por doc | Copilot CLI, Gemini CLI, Cursor | `exit 2` nega; nada medido em modo autônomo pelo Onion | `E_COPILOT_HOOK_EXIT2_DENY`, `E_GEMINI_BEFORETOOL_EXIT2_DOC`, `E_OBJECAO_CURSOR_ASK_WRONG_TARGET` |
@@ -60,21 +60,28 @@ células, 117 repetições):
 | Política neutra, que só senta a guarda | barrado | **lê** | não medido |
 | Hook gerenciado | barrado pelo gerenciado | **lê** na chamada inocente | não medido |
 | `disableSideloadFlags` | flags recusadas na partida; em skills, barrado | **lê** se vier por skills do projeto | carrega por skills; recusado por flag |
-| `allowManagedModsOnly` | recusado | **não lê** | segue, inventário igual ao da linha de base |
-| `blockedMarketplaces` skills-dir | não medido | **não lê** | não medido |
+| `allowManagedModsOnly` | recusado, por flag e por skills | **não lê** por flag; por skills, só medido com a combinação | segue, inventário igual ao da linha de base |
+| `blockedMarketplaces` skills-dir, em conjunto com `disableSideloadFlags` e hook gerenciado | não medido | **não lê** por skills | não medido |
 
-Sem política, sob bypass, a sessão grava o mod com `Write` ou `Bash` e **a sessão seguinte vence** (células W1, W4); em
-`acceptEdits` a escrita é recusada (célula W2). Em falha, o JSON gerenciado inválido não inicia (célula X1), e o hook
+Sem política, sob bypass, a sessão grava o mod com `Write` ou `Bash` e, com aceite de confiança, **a sessão seguinte vence**
+(células W1, W4); em `acceptEdits` a escrita é recusada (célula W2). Sem aceite, o mod não carrega das skills do projeto
+(célula S2), mas das skills do usuário carrega (célula S5). Em falha, o JSON gerenciado inválido não inicia (célula X1), e o hook
 gerenciado com arquivo inexistente falha aberto (célula X2). Limites: API simulada, chave fictícia, sem modelo real, sem login Max. Seis células
 foram escolhidas depois de ver a 1ª rodada, e isso está na Emenda 1 do pré-registro.
+
+**A revisão da curadoria, conferida sem rerodar** (`onion-curation@6ca64f3`, `evidence/lab/out/cells-review.jsonl`): arquivo
+gerenciado só com `prependPlugins` vazio, ou só com `managedSourcesBehavior`, não senta a guarda, e o mod fura, 3 de 3 cada. Com
+`cleanupPeriodDays` senta. Logo conta a chave de política, não o arquivo não vazio, e a recomendação do Elenxo, que dizia «não
+vazia», fica registrada como estava no nó selado e corrigida aqui. Regra `deny` com mod que aprova sob bypass também fura, 3 de 3.
 
 O `onFailure: block` está nos 5 vetos do core (`.claude/settings.json`, lido no fechamento): env, protect-main, merge-gate,
 moat-gate e direct-provider-api.
 
 ### CI: a frase estreitou
 
-Só o momento **antes da execução na sessão** não tem par no CI. Para a `main`, o ruleset com checks exigidos já cobre
-(`E_OBJECAO_THESIS_NO_CI_NARROW`). Para `.env` e efeitos locais, o concorrente é sandbox e permissão de sistema.
+Só o momento **antes da execução na sessão** não tem par no CI. Para a `main`, onde o plano dá ruleset, os checks exigidos já cobrem
+(`E_OBJECAO_THESIS_NO_CI_NARROW`); neste repo, público, `onion-main-required-checks` está ativo, lido no forge em 2026-11-04.
+Em repo privado na conta Free o ruleset devolve 403 (`E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN`). Para `.env` e efeitos locais, o concorrente é sandbox e permissão de sistema.
 
 ### Alternativa: o vazio fica declarado
 
@@ -113,6 +120,9 @@ Thoughtworks Radar Vol. 35 põe agent sandboxing em Adopt, o que é sinal de ana
   gerenciada. A aplicação de `allowManagedModsOnly` nesta máquina é ato do maestro; nada foi aplicado, e o efeito no login
   dele segue sem medida.
 - **Login Team ou Enterprise:** só por doc.
+- **Hook gerenciado com `onFailure: block`:** a falha aberta do gerenciado foi medida sem essa chave e com arquivo inexistente.
+- **Mod de processo por skills sob `allowManagedModsOnly` sozinho:** só com a combinação; sozinha, a política recusou o mod que aprova.
+- **`blockedMarketplaces` sozinho:** só em conjunto com `disableSideloadFlags` e hook gerenciado.
 - **Os outros 4 vetos do core sob mod:** as duas medidas só exercitam o do `.env`.
 - **Copilot, Gemini e Cursor em modo autônomo:** sem rodagem do Onion. O gatilho exige exatamente isso.
 - **Antigravity:** sem primária. **Goose:** por leitura, em grafo não rastreado (`aaif-projects-onion-2026-11`), citado sem aresta.

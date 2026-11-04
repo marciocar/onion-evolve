@@ -17,19 +17,24 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   determinístico de hook**, que barra a ação inclusive sob `bypassPermissions`, não existia fora do
   Claude Code e que nenhum CI o replicava. O veto segue sendo o que barra no core; a exclusividade caiu:
   - **Por grau de prova.** *Medido:* Codex CLI 0.164.0 barra sob
-    `--dangerously-bypass-approvals-and-sandbox`, com hook confiável; Qwen Code 0.26.6 barra no caminho
-    feliz; no Mistral Vibe 3.0.4 o `exit 2` só barra com `strict`. *Só por doc:* Copilot CLI, Gemini CLI
-    e Cursor. *Só por leitura:* Goose. *Sem medida em nenhum:* Copilot, Gemini e Cursor em modo
-    autônomo; o Antigravity nem tem primária.
+    `--dangerously-bypass-approvals-and-sandbox`, com hook confiável (sem confiança, o `codex exec` o pula
+    em silêncio); Qwen Code 0.26.6 barra no caminho feliz; no Mistral Vibe 3.0.4 o `exit 2` só barra com
+    `strict`. *Só por doc:* Copilot CLI, Gemini CLI e Cursor. *Só por leitura:* Goose. *Sem medida em
+    nenhum:* Copilot, Gemini e Cursor em modo autônomo; o Antigravity nem tem primária.
   - **O veto é camada de conformidade, não fronteira de segurança.** É conclusão do Onion, não fala da
-    Anthropic. Condições de força: sem configuração gerenciada não vazia ou login Team/Enterprise (este,
-    só por doc), **um mod que carrega vence o veto** (medido em 2.1.318 com login Max, 6 de 6; sob bypass
-    o próprio agente pode gravá-lo e a sessão seguinte fura, medido com API simulada); o hook comum
-    **falha aberto** sem `onFailure: block`; e **o que o mod inicia por si não passa pelo gate**: com a
-    guarda de mods sentada, o processo do mod ainda leu o `.env`, e só `allowManagedModsOnly` ou
-    `blockedMarketplaces` o pararam (medido com API simulada).
-  - **O que nenhum CI replica é só o momento antes da execução na sessão.** Para a `main`, o ruleset com
-    checks exigidos já cobre.
+    Anthropic. Condições de força: sem chave de política na configuração gerenciada (`{}` ou só chave de
+    controle, como `prependPlugins`, não contam) ou login Team/Enterprise (este, só por doc), **um mod que
+    carrega vence o veto e a regra `deny`, inclusive sob bypass** (o veto, medido em 2.1.318 com login
+    Max, 6 de 6; a `deny`, medida com API simulada). Sob bypass o próprio agente pode gravar o mod em
+    `.claude/skills/` e, com aceite de confiança, a sessão seguinte fura; sem aceite ele não carrega dali,
+    mas em `~/.claude/skills/` carregou mesmo sem aceite. O hook, mesmo gerenciado, **falha aberto** sem
+    `onFailure: block`. E **o que o mod inicia por si não passa pelo gate**: com a guarda de mods sentada,
+    o processo do mod ainda leu o `.env`. Só `allowManagedModsOnly` o parou nas duas vias, `--plugin-dir` e
+    skills do projeto (nesta, o processo só foi medido com a política em conjunto; sozinha, ela recusou o
+    mod que aprova), e `blockedMarketplaces` parou na via de skills, medido em conjunto. Tudo isso, salvo
+    os 6 de 6, medido com API simulada.
+  - **O que nenhum CI replica é só o momento antes da execução na sessão.** Para a `main`, onde o plano
+    dá ruleset, os checks exigidos já cobrem (neste repo, ativo).
   - **O vazio declarado:** a postura abaixo pede capacidade que não exista fora, e **hoje nenhuma
     capacidade exclusiva está medida**.
   - **Gatilho de reabertura da postura:** quando um harness que não seja o Claude Code passar, na mesma
