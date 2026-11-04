@@ -2,7 +2,7 @@
 branch: feat/event-watcher-plan-e-commands
 pr: pendente
 date: 2026-11-03
-reviewed_diff_sha256: bfe535aab5a59748a3c193677a64d0b93ad1921f3922586c6e1ff1a84b152df1
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: c400084be09c0fae2f8a00a068b444bd76aa0491fb2ea93b40bac76b2ddab14e
 findings_total: 78
 findings_real: 73
@@ -91,3 +91,7 @@ As faixas 1 e 2 da bancada completa estouravam o teto de 25 minutos. A causa med
 `a2a_accept` de 42 para cerca de 200 casos, e a `shared_startup` foi de 56 s para 1077 s no CI. Esses casos testam
 o arranque dos workers, e não o A2A, então passam a usar a família leve `trust_topology`. Localmente, a
 `shared_startup` passa 6 de 6 em 9 s. Nenhuma asserção mudou.
+
+## Re-revisão pendente (2026-11-04)
+
+A causa do disco cheio no CI (faixa 2) era o próprio teste: `tail -1 f >> f` nos casos sh76 e na fixture `good.jsonl` se realimenta no coreutils do runner (92 GB medidos pelo amostrador do PR de diagnóstico) e termina no coreutils 9.4 da máquina local. Troquei os dois por leitura antes da escrita. A revisão da curadoria não leu este diff, por isso o hash está pendente.
