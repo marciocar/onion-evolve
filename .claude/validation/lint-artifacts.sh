@@ -6118,7 +6118,9 @@ check_adoption_graph_pin() {
   out="$(bash "${h}" "${REPO_ROOT}" --check 2>&1)" || rc=$?
   case "${rc}" in
     0) : ;;
-    1) violation "HARD" "docs/onion/graph/onion-adoption.kg.yaml" "${out#stamp-adoption-graph-pin: } — re-carimbe pelo escritor do pin: bash .claude/utils/kg/stamp-adoption-graph-pin.sh ." ;;
+    # se o escritor RECUSAR (rc 4: label ou narrative que ele não sabe refazer), re-rodá-lo recusa de novo; a mensagem diz
+    # o conserto à mão em vez de mandar o operador num laço (revisão adversarial do write-stamp, 2026-11-04, achado 8)
+    1) violation "HARD" "docs/onion/graph/onion-adoption.kg.yaml" "${out#stamp-adoption-graph-pin: } — re-carimbe pelo escritor do pin: bash .claude/utils/kg/stamp-adoption-graph-pin.sh . (se ele sair rc 4, RECUSADO, conserte à mão o label do ONION_INSTALLED como a mensagem dele pede e rode de novo)" ;;
     3) violation "SOFT" "docs/onion/graph/onion-adoption.kg.yaml" "${out#stamp-adoption-graph-pin: } — grave o x_pin com bash .claude/utils/kg/stamp-adoption-graph-pin.sh ." ;;
     *) violation "SOFT" "docs/onion/graph/onion-adoption.kg.yaml" "a guarda não pôde julgar (rc=${rc}): ${out:0:200}" ;;
   esac

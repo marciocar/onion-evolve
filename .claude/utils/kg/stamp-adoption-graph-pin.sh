@@ -28,7 +28,10 @@
 # do molde, versão da kg-ssot ou contrato não medidos no vendor; e label editado FORA dos moldes que traz um dado do
 # update que o motor não sabe refazer ("update de", "atualizado em/de/para", "kg-ssot", "contrato v"): trocar só o
 # pin ali deixaria a data e a versão do update anterior. Esta lista é de vocabulário, e o que ela não nomeia segue a
-# troca do token (limite declarado).
+# troca do token (limite declarado). Também recusa (revisão adversarial de 2026-11-04): modo, papel ou integração do
+# carimbo com aspa, barra, crase ou quebra de linha; x_pin e pin do label divergentes; provenance fora de bloco ou
+# com chave fora de source/locator/method/locality; e documento novo que não passa na leitura YAML de volta. A data
+# do label é o updated_at do carimbo (o relógio só quando ele falta).
 #
 # Uso : stamp-adoption-graph-pin.sh <DEST> [--check]
 #   --check: não escreve; rc 0 = o pin do grafo é o do carimbo (ou não há semente) · 1 = divergem
@@ -114,10 +117,17 @@ if li is not None and UPD_PREFIX.match(blk[li]):
     nm = UPD_NARR.match(blk[ni]) if ni is not None else None
     if not nm:
         refuse("o label está no molde de update, mas a narrative não traz a lista de pins anteriores no molde")
+    # x_pin e pin do label DIVERGENTES: qual deles saiu é leitura, não medida, e escolher um perde o outro da lista
+    # (revisão adversarial, achado 3: a forma existe no campo, em duas cópias de um hub)
+    _lp = LABEL_PIN.search(blk[li]).group(1)
+    if xi is not None and not same(cur, _lp):
+        refuse(f"o x_pin ({cur}) e o pin do label ({_lp}) divergem — qual saiu não é medida, e a lista perderia um deles")
+    # a guarda da versão é um `if`, não um `assert`: com PYTHONOPTIMIZE o assert some (revisão adversarial, achado 5)
     try:
-        kv = json.load(open(os.path.join(dest, "vendor/kg-ssot/.kg-ssot-version"), encoding="utf-8"))["version"]
-        assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", str(kv))
+        kv = str(json.load(open(os.path.join(dest, "vendor/kg-ssot/.kg-ssot-version"), encoding="utf-8"))["version"])
     except Exception:
+        kv = ""
+    if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", kv):
         refuse("a versão da kg-ssot não foi medida em vendor/kg-ssot/.kg-ssot-version")
     try:
         cv = re.search(r'^CONTRACT_VERSION\s*=\s*["\']([0-9]+(?:\.[0-9]+)*)["\']', open(os.path.join(dest, "vendor/kg-ssot/tools/kg_validate.py"), encoding="utf-8").read(), re.M).group(1)
@@ -126,13 +136,27 @@ if li is not None and UPD_PREFIX.match(blk[li]):
     def sfield(name):
         for l in open(os.path.join(dest, ".claude/.onion-version"), encoding="utf-8"):
             if l.startswith(name + ":"):
-                return re.sub(r"\s*#.*$", "", l.split(":", 1)[1]).strip()
+                v = re.sub(r"\s*#.*$", "", l.split(":", 1)[1]).strip()
+                if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":   # escalar YAML entre aspas: um par sai
+                    v = v[1:-1]
+                return v
         return ""
     smode = sfield("mode") or m.group("mode")
     srole = sfield("role") or m.group("role")
     sib = sfield("integration_branch") or m.group("ib")
-    blk[li] = (f'    label: "Framework instalado: pin `{pin}` (update de {today}, com o kg-ssot {kv} e o contrato v{cv}), '
+    # o valor entra num escalar entre aspas e entre crases: aspa, barra, crase ou quebra de linha quebrariam o YAML
+    # ou o molde, e o motor sairia rc 0 (revisão adversarial, achado 1). Não se escapa: recusa-se.
+    for _k, _v in (("mode", smode), ("role", srole), ("integration_branch", sib)):
+        if re.search(r'["\\`\r\n]', _v):
+            refuse(f"o campo {_k} do carimbo traz aspa, barra, crase ou quebra de linha ({_v!r}) e não cabe no label")
+    # a DATA do update é a do carimbo (updated_at), e o relógio só entra quando o carimbo não a tem (achado 9)
+    udate = sfield("updated_at")
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", udate):
+        udate = today
+    blk[li] = (f'    label: "Framework instalado: pin `{pin}` (update de {udate}, com o kg-ssot {kv} e o contrato v{cv}), '
                f'modo `{smode}`, papel `{srole}`, integração `{sib}`."')
+    if not UPD_LABEL.match(blk[li]):
+        refuse("o label refeito não casa com o molde de update")
     adopt = nm.group("adopt")
     hist = [h for h in re.findall(r"`([0-9a-f]{7,40})`", nm.group("list")) if not same(h, pin)]
     if cur and not same(cur, pin) and not same(cur, adopt) and not any(same(cur, h) for h in hist):
@@ -141,9 +165,23 @@ if li is not None and UPD_PREFIX.match(blk[li]):
                + f'; a adoção foi `{adopt}`.{nm.group("rest")}"')
     # a provenance passa a dizer o carimbo NOVO; sem @<commit> do adotante, que ainda não existe quando o motor roda
     prov = {"source": '".claude/.onion-version"',
-            "locator": f'"campos source_commit, role, mode e integration_branch; a versão da kg-ssot em vendor/kg-ssot/.kg-ssot-version e o CONTRACT_VERSION em vendor/kg-ssot/tools/kg_validate.py, lidos no update de {today} para o pin {pin}"',
+            "locator": f'"campos source_commit, role, mode e integration_branch; a versão da kg-ssot em vendor/kg-ssot/.kg-ssot-version e o CONTRACT_VERSION em vendor/kg-ssot/tools/kg_validate.py, lidos no update de {udate} para o pin {pin}"',
             "method": '"reading: carimbo e vendor/kg-ssot lidos pelo escritor do carimbo no update"'}
     pi = field("provenance")
+    # provenance em BLOCO é a única forma que o motor sabe refazer: inline ({…}) ou null ganhariam filhos e o YAML
+    # quebraria com rc 0 (revisão adversarial, achado 2)
+    if pi is not None and blk[pi].rstrip() != "    provenance:":
+        refuse("a provenance não está em bloco (inline ou null) e o motor não sabe refazê-la")
+    # Chave fora de source/locator/method/locality descreve a leitura ANTERIOR (sha256, node_sha256 e scheme, o achado 10;
+    # e um x_commit "@<commit do update velho>", que a sonda do revisor trouxe): com source/locator novos ela mentiria.
+    # É LISTA DE PERMISSÃO, não de bloqueio: uma chave nova que o motor não conhece recusa em vez de ficar velha.
+    if pi is not None:
+        _k = pi + 1
+        while _k < len(blk) and blk[_k].startswith("      "):
+            _key = blk[_k].strip().split(":", 1)[0]
+            if _key not in ("source", "locator", "method", "locality"):
+                refuse(f"a provenance traz {_key}, que descreve a leitura anterior e o motor não sabe refazer")
+            _k += 1
     if pi is None:
         blk.append("    provenance:"); pi = len(blk) - 1
     k = pi + 1
@@ -208,7 +246,34 @@ if cur:
         if l.startswith("    verified_against:") or (in_prov and re.match(r"^      (source|locator):", l)):
             blk[n] = HEX.sub(_swap, l)
 new = lines[:start] + blk + lines[end:]
+# CONFERE ANTES DE TROCAR (revisão adversarial, achados 1 e 2): o documento novo tem de ser YAML, e o nó lido de volta
+# tem de ser o que se escreveu. Sem PyYAML, a conferência é obrigatória só no molde de update, que reescreve mais.
 if new != lines:
+    try:
+        import yaml
+    except Exception:
+        yaml = None
+        if rebuilt:
+            refuse("PyYAML ausente: o nó refeito não pôde ser conferido antes da escrita")
+    if yaml is not None:
+        # safe_load_all: a semente antiga abria e fechava o cabeçalho com o separador de documento, e esse grafo tem
+        # DOIS documentos. Exigir um só recusaria sete adotantes que o motor carimbava (medido no dogfood desta cura).
+        def _read_node(text):
+            for _d in yaml.safe_load_all(text):
+                for _n in ((_d or {}).get("nodes") or []) if isinstance(_d, dict) else []:
+                    if isinstance(_n, dict) and _n.get("id") == "ONION_INSTALLED":
+                        return _n
+            raise KeyError("ONION_INSTALLED")
+        try:
+            _read_node("\n".join(lines)); _old_ok = True
+        except Exception:
+            _old_ok = False   # YAML que já não lia antes: o caminho antigo segue como era; o refeito recusa abaixo
+        try:
+            if str(_read_node("\n".join(new)).get("x_pin")) != pin:
+                raise ValueError("x_pin lido de volta difere do escrito")
+        except Exception as _e:
+            if _old_ok or rebuilt:
+                refuse(f"o documento novo não passa na leitura YAML de volta ({type(_e).__name__})")
     open(path + ".pin-tmp", "w", encoding="utf-8").write("\n".join(new))
     import os; os.replace(path + ".pin-tmp", path)
 print(f"stamp-adoption-graph-pin: ONION_INSTALLED carimbado com o pin {pin}"
