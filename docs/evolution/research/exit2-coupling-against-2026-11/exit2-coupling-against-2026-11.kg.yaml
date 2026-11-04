@@ -9,9 +9,12 @@ meta:
                                # gatilho dela já disparou: a revisita real é o selo do maestro, não a data.
   # ═══ TETO: 108 NÓS ═══
   # Justificativa do teto: modo decisão exige 1 nó por objeção sobrevivente (52) e 1 por superação achada (35).
-  # Células do laboratório da curadoria (onion-curation@187fba9, evidence/lab/RESULTS.md), citadas por nome na prosa: G0=hook sem mod · G1=mod-allow com hook · G1b=mod-allow sob bypass · G3=mod-answer sem guarda · G6=arquivo gerenciado vazio · G7=allowManagedModsOnly com mod de processo · G9h=guarda sentada com hook · G9d=guarda sentada com deny · G9p=guarda sentada com mod de processo · N3a=hook gerenciado contra mod-allow · N3b=hook gerenciado contra mod-answer · N6=guarda sentada contra mod-answer · S1=mod em skills com aceite.
-  # Fechamento (2026-11-04): o teto foi respeitado. A 1ª medida promoveu o nó que já existia, e a 2ª ocupou a vaga da duplicata de blog.
+  # Células do laboratório da curadoria (curadoria@187fba9, evidence/lab/RESULTS.md), citadas por nome na prosa: G0=hook sem mod · G1=mod-allow com hook · G1b=mod-allow sob bypass · G3=mod-answer sem guarda · G6=arquivo gerenciado vazio · G7=allowManagedModsOnly com mod de processo · G9h=guarda sentada com hook · G9d=guarda sentada com deny · G9p=guarda sentada com mod de processo · N3a=hook gerenciado contra mod-allow · N3b=hook gerenciado contra mod-answer · N6=guarda sentada contra mod-answer · S1=mod em skills com aceite.
+  # Fechamento (2026-11-04): o teto foi respeitado. A 1ª medida promoveu o nó que já existia, a 2ª ocupou a vaga da duplicata de blog, e a 3ª, a da objeção sobre uma página com HTTP 403, que o próprio nó dizia não pesar.
 external_edges:
+  - from: "docs/evolution/research/aaif-projects-onion-2026-11/aaif-projects-onion-2026-11.kg.yaml#E_MEDIDA_VETO_GOOSE_E_CC_1104"
+    to: C_OPCAO_C_RETIRE_EXCLUSIVITY_COMPLIANCE_LAYER
+    edge_type: SUPPORTS
   - from: D_EXIT2_COUPLING_WORDING_2026_11
     to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#C_POSTURA_ACOPLAMENTO"
     edge_type: TRACES_TO
@@ -54,7 +57,7 @@ nodes:
     impact: 5
     confidence: 0.6
     label: "O que derruba a tese do CLAUDE.md de que o exit 2 de hook, que barra sob bypassPermissions, não existe fora do Claude Code, nenhum CI replica e compra o acoplamento? Exclusividade, força e alternativa."
-    narrative: "Pesquisa CONTRA a tese, pedida pelo maestro em 2026-11-04 antes de decidir a redação da doutrina. Medição dada na pergunta: 2.1.318, login Max, hooks reais do Onion; mod que aprova em tool.check venceu o veto em 6 de 6; sem mod o veto barrou 6 de 6; guarda embutida 'not seated'. Estado da resposta no fechamento, 2026-11-04: a metade EXCLUSIVIDADE tem contraexemplo medido (Codex 0.164.0 sob bypass; Qwen no caminho feliz); a metade FORÇA tem primária, laboratório e as duas medidas de hoje (E_MAESTRO_MOD_BEATS_VETO_LOGIN_MAX_1104, E_MODS_MANAGED_CONTAINER_STUB_1104); a metade ALTERNATIVA segue sem resposta medida (nenhuma capacidade substituta comparada com concorrentes), por isso a pergunta fica open mesmo com a redação selada: o selo declara o vazio, não o preenche. Grafo não rastreado citado pelo nome, sem aresta: aaif-projects-onion-2026-11 (Q_DOCTRINE_EXIT2_REVIEW_2026_11, C_TETO_GOOSE: Goose v1.57.0 com hook de comando exit 2, por leitura, sem spike)."
+    narrative: "Pesquisa CONTRA a tese, pedida pelo maestro em 2026-11-04 antes de decidir a redação da doutrina. Medição dada na pergunta: 2.1.318, login Max, hooks reais do Onion; mod que aprova em tool.check venceu o veto em 6 de 6; sem mod o veto barrou 6 de 6; guarda embutida 'not seated'. Estado da resposta no fechamento, 2026-11-04: a metade EXCLUSIVIDADE tem contraexemplo medido (Codex 0.164.0 sob bypass; Qwen no caminho feliz); a metade FORÇA tem primária, laboratório e as duas medidas de hoje (E_MAESTRO_MOD_BEATS_VETO_LOGIN_MAX_1104, E_MODS_MANAGED_CONTAINER_STUB_1104); a metade ALTERNATIVA segue sem resposta medida (nenhuma capacidade substituta comparada com concorrentes), por isso a pergunta fica open mesmo com a redação selada: o selo declara o vazio, não o preenche. O estudo da AAIF, aaif-projects-onion-2026-11, mediu o Goose 1.57.0 (E_MEDIDA_VETO_GOOSE_E_CC_1104, aresta no topo): em modo auto o exit 2 barra 3 de 3, a falha libera e block barra, com API simulada, só shell, sem subagente. Isso não dispara o gatilho, que exige os 5 vetos reais na mesma bancada; Q_DOCTRINE_EXIT2_REVIEW_2026_11, naquele grafo, fecha neste selo."
     trace: "docs/evolution/research/exit2-coupling-against-2026-11/SYNTHESIS.md"
   - id: D_EXIT2_COUPLING_WORDING_2026_11
     node_type: decision
@@ -351,12 +354,32 @@ nodes:
     source_kind: measurement
     valid_from: "2026-11-04"
     label: "Medido em contêiner, 2.1.318, API simulada, 39 células e 117 repetições: chave de política gerenciada senta a guarda e o mod deixa de aprovar, mas o mod de processo ainda lê o .env; allowManagedModsOnly o parou nas duas vias, blockedMarketplaces em skills. Sem login Max."
-    narrative: "SEM POLÍTICA: mod-allow vence 3 de 3 por --plugin-dir, em skills do projeto com aceite, em skills do usuário com e sem aceite e por link para fora; não carrega sem aceite no projeto, aninhado nem em subpasta. AUTOINSTALAÇÃO: a sessão grava o mod com Write ou Bash sob bypass e a seguinte vence; em acceptEdits a escrita é recusada; na mesma sessão segue barrado. POLÍTICA NEUTRA, só para sentar a guarda: o mod roda e não aprova, e o mod de processo lê e devolve o canário no Bash. HOOK GERENCIADO: nega antes do projeto, e o mod de processo lê na chamada inocente. disableSideloadFlags recusa as flags na partida e NÃO para o mod em skills do projeto (previsão errada). allowManagedModsOnly: mod recusado e plugin sem mod segue com o inventário da linha de base. Por --plugin-dir o mod de processo não lê com a política sozinha; por skills do projeto o mod de processo só foi medido com a combinação, e a política sozinha recusou o mod que aprova, com a mesma linha de recusa da guarda. blockedMarketplaces skills-dir parou o mod de processo, medido junto com disableSideloadFlags e hook gerenciado; o par com essas duas chaves e sem ela lê. FALHA: JSON gerenciado inválido não inicia; hook gerenciado apontando para arquivo inexistente falha aberto, e quem segura é a guarda sentada com o hook do projeto. LIMITES: API simulada por stub com roteiro fixo e chave fictícia, sem modelo real; sem login Max, logo Max com configuração gerenciada NÃO foi medido; login Team ou Enterprise sem célula; só o veto do .env; contêiner sem rede; 6 células escolhidas depois de ver a 1ª rodada, na Emenda 1 do pré-registro; o teste de --mcp-config sem servidor é vazio, sem veredito; agente e comando do plugin só listados, não invocados. O maestro escolheu allowManagedModsOnly para esta máquina; aplicar é ato dele e nada foi aplicado. REVISÃO DA CURADORIA, 2026-11-04, conferida contra onion-curation@6ca64f3 em docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/out/cells-review.jsonl, sem rerodar: arquivo gerenciado só com prependPlugins vazio, ou só com managedSourcesBehavior, não senta a guarda e o mod fura, 3 de 3 cada; com cleanupPeriodDays, a política neutra acima, senta. Logo não basta o arquivo não vazio: conta a chave de política, e a redação do fechamento foi corrigida. Regra deny com mod-allow sob bypass também fura, 3 de 3. A falha do hook gerenciado foi medida com arquivo inexistente e sem onFailure; o gerenciado com onFailure block não foi medido."
+    narrative: "SEM POLÍTICA: mod-allow vence 3 de 3 por --plugin-dir, em skills do projeto com aceite, em skills do usuário com e sem aceite e por link para fora; não carrega sem aceite no projeto, aninhado nem em subpasta. AUTOINSTALAÇÃO: a sessão grava o mod com Write ou Bash sob bypass e a seguinte vence; em acceptEdits a escrita é recusada; na mesma sessão segue barrado. POLÍTICA NEUTRA, só para sentar a guarda: o mod roda e não aprova, e o mod de processo lê e devolve o canário no Bash. HOOK GERENCIADO: nega antes do projeto, e o mod de processo lê na chamada inocente. disableSideloadFlags recusa as flags na partida e NÃO para o mod em skills do projeto (previsão errada). allowManagedModsOnly: mod recusado e plugin sem mod segue com o inventário da linha de base. Por --plugin-dir o mod de processo não lê com a política sozinha; por skills do projeto o mod de processo só foi medido com a combinação, e a política sozinha recusou o mod que aprova, com a mesma linha de recusa da guarda. blockedMarketplaces skills-dir parou o mod de processo, medido junto com disableSideloadFlags e hook gerenciado; o par com essas duas chaves e sem ela lê. FALHA: JSON gerenciado inválido não inicia; hook gerenciado apontando para arquivo inexistente falha aberto, e quem segura é a guarda sentada com o hook do projeto. LIMITES: API simulada por stub com roteiro fixo e chave fictícia, sem modelo real; sem login Max, logo Max com configuração gerenciada NÃO foi medido; login Team ou Enterprise sem célula; só o veto do .env; contêiner sem rede; 6 células escolhidas depois de ver a 1ª rodada, na Emenda 1 do pré-registro; o teste de --mcp-config sem servidor é vazio, sem veredito; agente e comando do plugin só listados, não invocados. O maestro escolheu allowManagedModsOnly para esta máquina; aplicar é ato dele e nada foi aplicado. REVISÃO DA CURADORIA, 2026-11-04, conferida contra curadoria@6ca64f3 em docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/out/cells-review.jsonl, sem rerodar: arquivo gerenciado só com prependPlugins vazio, ou só com managedSourcesBehavior, não senta a guarda e o mod fura, 3 de 3 cada; com cleanupPeriodDays, a política neutra acima, senta. Logo não basta o arquivo não vazio: conta a chave de política, e a redação do fechamento foi corrigida. Regra deny com mod-allow sob bypass também fura, 3 de 3. A falha do hook gerenciado foi medida com arquivo inexistente e sem onFailure; o gerenciado com onFailure block não foi medido."
     trace: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/consolidado.txt"
     provenance:
       source: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-managed/results.jsonl"
       locator: "campos cell, chamadas, proc e sec_default; pré-registro e Emenda 1 em data/mods-managed/PRE-REGISTRO-MANAGED.md"
       method: "measurement: claude -p em contêiner sem rede, stub local da Messages API, hooks reais do clone, desfecho no stream-json por lab/analyze.py"
+      locality: "repo"
+  - id: E_SANDBOX_WRITE_CLAUDE_DIR_SCRIPTED_1104
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-11-04"
+    verified_against: "data/sandbox-cell/consolidado.txt, 249 sessões, conferido contra o results.jsonl do laboratório: matriz principal com 105 PASSOU e 3 de Edit em settings.json recusados por schema da carga; repetição com carga válida PASSOU 3 de 3"
+    source_tier: 9
+    source_kind: measurement
+    valid_from: "2026-11-04"
+    label: "Medido no host, 2.1.318, chamadas roteirizadas, 249 sessões: nenhum veto do core barra escrita em .claude/ sob bypass, por Write, Edit ou Bash; sobrescrever a guarda derruba o veto na mesma sessão; o sandbox nativo sobe sem gaiola aqui, por falta de socat."
+    narrative: "Hipótese vinda de leitura estática (E_OBJECAO_REFUT_EDITABLE_POLICY) e agora medida. MATRIZ: 6 alvos por 6 métodos por 3 repetições, settings.json, a guarda do .env, plugin.json e hooks.json em skills do projeto, plugin.json em skills do usuário e um controle: tudo passa, e os 21 contornos também. O VETO NA MESMA SESSÃO: depois de sobrescrever a guarda, a sonda não barra, 18 de 18; depois de settings.json ela ainda barra logo em seguida, e com 4 s de espera não barra, 3 de 3; idem com disableAllHooks. REGRA DENY: Edit de .claude por --settings barra Write, Edit, tee, cp e redirecionamento simples; passam cat com heredoc, python, nome montado em variável e script escrito fora. A mesma regra em skills do usuário: Write, Edit, tee e cp barram, e cat e python passam. blockWritesOutsideWorkingDirectories barra Write e não cat. ConfigChange dispara em settings.json e em SKILL.md, e não na guarda nem em plugin.json e hooks.json do mod; saindo com exit 2, o arquivo muda mesmo assim, e o veto segue. SANDBOX: enabled sobe sem gaiola, com aviso, porque falta socat, e o cat passa; failIfUnavailable recusa a partida. LIMITES: chamadas roteirizadas por stub, com chave fictícia, não modelo real: mede se a CHAMADA é barrada, não se um modelo a tentaria nem como reage ao veto. Host com HOME falso, não contêiner (Emenda 1). 18 sessões de deny em skills do projeto saíram da conta por âncora errada da regra (Emenda 2), e as células de reparo foram escolhidas depois de ver a 1ª bateria (Emendas 2 e 3). Conferência de efeitos intacta; o HEAD do repo mudou por commit de outra sessão."
+    trace: "docs/evolution/research/exit2-coupling-against-2026-11/data/sandbox-cell/consolidado.txt"
+    provenance:
+      source: "docs/evolution/research/exit2-coupling-against-2026-11/data/sandbox-cell/consolidado.txt"
+      locator: "linhas MAIN, KONT, DN, DN2, BW, DC e SE/SF/SL; pré-registro e emendas em data/sandbox-cell/PRE-REGISTRO.md"
+      method: "measurement: claude -p no host com HOME falso, stub local da Messages API, hooks reais do clone, desfecho pelo disco e pelo stream"
       locality: "repo"
   - id: E_MERCADO_EXIT2_COUPLING_1104
     node_type: evidence
@@ -370,7 +393,7 @@ nodes:
     source_tier: 3
     source_kind: synthesis
     label: "MERCADO: nenhuma claim confirmada traz rodada, M&A, receita ou analista sobre veto de hook ou quem financia cada harness. É lacuna, não irrelevância. Busca secundária do Elenxo aponta capital em isolamento fora do harness: sinal fraco."
-    narrative: "Sintetizador: sem sinal de capital; o único apoio de analista seria o Thoughtworks Radar (Agent sandboxing em Adopt), refutado na votação e reaberto pelo Elenxo (E_OBJECAO_REFUT_RADAR_ADOPT). A única fonte com interesse comercial é a Endor Labs (vendor-on-competitor, tier 3). Do corpus: o Goose tem a AAIF como steward e foi fundado pela Block, mas C_TETO_GOOSE registra 'sem resposta ancorada' em quem adota e em quem paga (grafo aaif-projects-onion-2026-11, não rastreado). E_PRETOOLUSE_BARRA_SOB_BYPASS cita o FailproofAI como produto sobre o mesmo primitivo, o que aponta o veto como mercadoria; é sinal único e não dimensiona o mercado. Valores do Elenxo, NÃO CONFERIDOS: Anthropic US$ 30 bi em Série G e Claude Code acima de US$ 2,5 bi anualizados em fev/2026 (resumo de busca; anúncio citado, não lido); Daytona US$ 24 mi, E2B US$ 21 mi, Zenity US$ 125 mi, Onyx US$ 113 mi (busca secundária)."
+    narrative: "Sintetizador: sem sinal de capital; o único apoio de analista seria o Thoughtworks Radar (Agent sandboxing em Adopt), refutado na votação e reaberto pelo Elenxo (E_OBJECAO_REFUT_RADAR_ADOPT). A única fonte com interesse comercial é a Endor Labs (vendor-on-competitor, tier 3). Do corpus: o Goose tem a AAIF como steward e foi fundado pela Block, mas C_TETO_GOOSE registra 'sem resposta ancorada' em quem adota e em quem paga (grafo aaif-projects-onion-2026-11). E_PRETOOLUSE_BARRA_SOB_BYPASS cita o FailproofAI como produto sobre o mesmo primitivo, o que aponta o veto como mercadoria; é sinal único e não dimensiona o mercado. Valores do Elenxo, NÃO CONFERIDOS: Anthropic US$ 30 bi em Série G e Claude Code acima de US$ 2,5 bi anualizados em fev/2026 (resumo de busca; anúncio citado, não lido); Daytona US$ 24 mi, E2B US$ 21 mi, Zenity US$ 125 mi, Onyx US$ 113 mi (busca secundária)."
     trace: ".claude/workflows/onion-research.js@f0df31449, modo decision, rodada de 2026-11-04"
     provenance:
       source: ".claude/workflows/onion-research.js@f0df31449, modo decision, rodada de 2026-11-04"
@@ -421,7 +444,7 @@ nodes:
     verified_at: "2026-11-04"
     verified_against: "O advisory fala de deny rules e symlink, severidade Low, CVSS 2.3, corrigido na v2.1.7, e não menciona hooks. Não enfraquece o veto de hook; usar como prova de FORÇA estica a evidência."
     label: "OBJEÇÃO (Achado 3): a CVE-2026-25724 é de deny rule por symlink, Low 2.3, corrigida na 2.1.7, e não cita hooks; usá-la como prova de FORÇA contra o veto estica a evidência."
-    narrative: "Alvo: Achado 3: CVE-2026-25724, deny por symlink (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): Prova correta do limite do veto: permissions.md, 'the mod can approve a call that a deny rule refuses or a PreToolUse hook blocked', mais as células «mod-allow com hook» e «mod-allow sob bypass» do laboratório. Medida: Li a página oficial em 2026-11-04 e onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md: «mod-allow com hook» e «mod-allow sob bypass», 3 de 3 em cada, 2.1.318."
+    narrative: "Alvo: Achado 3: CVE-2026-25724, deny por symlink (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): Prova correta do limite do veto: permissions.md, 'the mod can approve a call that a deny rule refuses or a PreToolUse hook blocked', mais as células «mod-allow com hook» e «mod-allow sob bypass» do laboratório. Medida: Li a página oficial em 2026-11-04 e curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md: «mod-allow com hook» e «mod-allow sob bypass», 3 de 3 em cada, 2.1.318."
     trace: "curl -sL https://github.com/anthropics/claude-code/security/advisories/GHSA-4q92-rfm6-2cqx | grep -ci hook"
     provenance:
       source: "https://github.com/anthropics/claude-code/security/advisories/GHSA-4q92-rfm6-2cqx"
@@ -490,9 +513,9 @@ nodes:
     verified_against: "Certo, mas subdimensionado e com fonte fraca. A primária diz o mesmo em permissions.md, e também vale para API key e CLAUDE_CODE_OAUTH_TOKEN com login Team guardado. Falta o pior caso, medido: em bypassPermissions o agente grava 3 Write em .claude/skills/x/ e a sessão seguinte carrega o mod e fura o exit 2 (RESULTS.md, ponta a ponta, 1 corrida por modo; depende do aceite de confiança). O mod não precisa vir de fora."
     label: "OBJEÇÃO (Achado 7): 'mod aprova o que hook barrou' tem primária em permissions.md e está subdimensionado: medido, sob bypass o agente grava o mod em .claude/skills/ e a sessão seguinte fura o exit 2, após aceite de confiança."
     narrative: "Alvo: Achado 7: mod aprova o que deny e hook barraram (blog, tier 5) (kind=finding). Afirmação de 1 agente, sem votação. Critério pré-registrado: E2_PROVA_MENOS. Superação achada (classe entrega): permissions.md mais as células «mod-allow com hook», «mod-allow sob bypass», «mod em skills com aceite» e a ponta a ponta do laboratório, além dos 6 de 6 do maestro no login Max. Medida: Li a doc e RESULTS.md. Não reexecutei células. O login Team ou Enterprise segue sem célula."
-    trace: "grep -n 'Ponta a ponta' onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
+    trace: "grep -n 'Ponta a ponta' curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
     provenance:
-      source: "github.com/marciocar/onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
+      source: "curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
       locator: "bloco 'Ponta a ponta'; células G1, G1b e S1"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_CODEX_BYPASS_MEASURED
@@ -812,9 +835,9 @@ nodes:
     verified_against: "Primária: 'Permission rules and PreToolUse hooks apply to Claude's tool calls, not to a mod's $.fs and $.process calls' e 'Mods aren't sandboxed'. Medido com guarda ativa: G9p, 'o processo do mod rodou'. Isso derruba a opção A sozinha: mesmo com a condição, o veto não segura o processo do mod."
     label: "OBJEÇÃO (corte sem medida): regras e hooks valem para as chamadas de Claude, não para $.fs e $.process do mod; medido em «guarda sentada com mod de processo» com guarda ativa, o processo do mod rodou. Isso derruba a opção A sozinha, mesmo com a condição."
     narrative: "Alvo: Cortada: regras e hooks não valem para $.fs e $.process do mod (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E1_EVIDENCIA_CONTRARIA. Superação achada (classe entrega): allowManagedModsOnly impede os hooks do mod de rodar («allowManagedModsOnly com mod de processo»). Medida: RESULTS.md, «allowManagedModsOnly com mod de processo», 3 repetições. Exige configuração gerenciada, ausente nesta VPS."
-    trace: "grep -n 'G9p' onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
+    trace: "grep -n 'G9p' curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
     provenance:
-      source: "github.com/marciocar/onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
+      source: "curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
       locator: "célula G9p; 'Mods aren't sandboxed'"
       method: "judges: Elenxo, 1 agente sem votação"
   - id: E_OBJECAO_CUT_DISABLE_ALL_HOOKS_REMOTE_OFF
@@ -1121,23 +1144,6 @@ nodes:
       locator: "advisory"
       method: "judges: Elenxo, 1 agente sem votação"
       locality: "web"
-  - id: E_OBJECAO_UNREAD_VPNCENTRAL_403
-    node_type: evidence
-    layer: audit
-    plane: DEV
-    status: confirmed
-    impact: 1
-    confidence: 0.4
-    verified_at: "2026-11-04"
-    verified_against: "Tentei e recebi HTTP 403. Conteúdo não verificado; não usar. Não pesa, porque há advisories primários."
-    label: "OBJEÇÃO (fonte não lida na rodada): vpncentral devolveu HTTP 403; conteúdo não verificado e não deve ser usado. Não pesa, porque há advisories primários."
-    narrative: "Alvo: Não lida: vpncentral (kind=discarded-by-comodismo). Afirmação de 1 agente, sem votação. Critério pré-registrado: E3_DESCARTE_SEM_MEDIDA. Superação procurada e não achada (classe nenhuma): Leitura da própria página. Medida: WebFetch devolveu 403; não tentei cache nem arquivo."
-    trace: "curl -sI https://vpncentral.com/critical-claude-code-vulnerabilities-enable-remote-code-execution/ | head -1"
-    provenance:
-      source: "https://vpncentral.com/critical-claude-code-vulnerabilities-enable-remote-code-execution/"
-      locator: "HTTP 403"
-      method: "judges: Elenxo, 1 agente sem votação"
-      locality: "web"
   - id: E_OBJECAO_RUN_PAID_MEASUREMENTS_LEFT_OUT
     node_type: evidence
     layer: audit
@@ -1265,7 +1271,7 @@ nodes:
     verified_at: "2026-11-04"
     verified_against: "contabilidade do motor na rodada: 13 refutadas, 0 não verificadas, 39 fontes e 37 claims cortadas, 0 recusadas, 35 superações achadas; contagem das objeções feita sobre a lista recebida"
     label: "LACUNAS: 13 refutadas, 0 não verificadas, 39 fontes e 37 claims cortadas por orçamento; 52 objeções sobreviventes de 57, 52 modeladas; 0 recusas do motor; 35 superações. Copilot, Gemini e Cursor em modo autônomo seguem sem medição."
-    narrative: "REFUTADAS NA VOTAÇÃO (13; todas com superação achada, em nó C_SUPERACAO_20261104_): doc do Copilot CLI não menciona --allow-all-tools, --yolo nem equivalente a bypassPermissions (tier 9); página do Gemini não fala de yolo, approval mode nem confiança em hooks de projeto (tier 9); hooks são fail-open por padrão e só onFailure block muda (tier 9); a doc recomenda permissões, e não hooks, para allow/deny rígido (tier 9); settings gerenciados no topo da precedência sustentam política como camada de força (tier 9); página de settings não trata de exclusividade, mods nem CVEs (tier 9); Thoughtworks Radar lista Agent sandboxing em Adopt como defesa no lugar do veto (tier 7); Radar não menciona hooks, exit code, bypassPermissions nem Claude Code (tier 7); se um mod responde, a ferramenta e os hooks de configuração não rodam (tier 5); Codex CLI com exit 2 e modelo igual ao do Claude Code, por blog (tier 4); no Codex o hook falha aberto, logo conformidade e não fronteira, por blog (tier 4); sandbox abaixo do agente; política editável de dentro não é fronteira, pela Endor (tier 3); no Cursor só deny vale, e ask e allow são ignorados em todos os caminhos, por fórum (tier 3). NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 39 fontes e 37 claims; a lista individual não chegou a este escritor; 15 claims cortadas reaparecem nas objeções 'Cortada:' e 10 fontes nas objeções 'Não lida:'. OBJEÇÕES: 57 no total, 52 sobreviventes, todas modeladas (N=52, M=52, nenhuma de fora); 5 não sobreviveram, por evidência: 'doc recomenda permissões', 'página de settings', 'Radar não menciona hooks', 'Cursor só aplica deny em todos os caminhos', 'patchwork-audit cve-2026-hook-bypass' (a página não traz ID de CVE; o defeito é do próprio Patchwork). RECUSADAS PELO MOTOR: 0. LACUNAS QUE SEGUEM ABERTAS: rodagem do Copilot sob --allow-all-tools ou --yolo; rodagem do binário do Gemini em yolo (só texto de código e teste na v0.66.0); doc oficial ou rodagem do Antigravity CLI; rodagem do Cursor em modo autônomo; rodagem do OpenCode, inclusive batch.ts; modo autônomo do Qwen (a 2ª rodada de spikes segue em curso); login Team ou Enterprise real no laboratório; exit 2 em subagente e em Edit/Write na 2.1.318; célula em que o agente grava disableAllHooks; primária do desligamento remoto de mods; comparação de Workflow e PreModelSwitch com concorrentes; recorte exato das massas de 2026-08-16; mapa de financiamento com primárias. LIMITES: citações de Copilot, Gemini, Cursor e Codex vieram por WebFetch mediado por modelo; o laboratório usa stub e chave fictícia; textos de 4 superações chegaram cortados pelo motor e estão marcados no próprio nó."
+    narrative: "REFUTADAS NA VOTAÇÃO (13; todas com superação achada, em nó C_SUPERACAO_20261104_): doc do Copilot CLI não menciona --allow-all-tools, --yolo nem equivalente a bypassPermissions (tier 9); página do Gemini não fala de yolo, approval mode nem confiança em hooks de projeto (tier 9); hooks são fail-open por padrão e só onFailure block muda (tier 9); a doc recomenda permissões, e não hooks, para allow/deny rígido (tier 9); settings gerenciados no topo da precedência sustentam política como camada de força (tier 9); página de settings não trata de exclusividade, mods nem CVEs (tier 9); Thoughtworks Radar lista Agent sandboxing em Adopt como defesa no lugar do veto (tier 7); Radar não menciona hooks, exit code, bypassPermissions nem Claude Code (tier 7); se um mod responde, a ferramenta e os hooks de configuração não rodam (tier 5); Codex CLI com exit 2 e modelo igual ao do Claude Code, por blog (tier 4); no Codex o hook falha aberto, logo conformidade e não fronteira, por blog (tier 4); sandbox abaixo do agente; política editável de dentro não é fronteira, pela Endor (tier 3); no Cursor só deny vale, e ask e allow são ignorados em todos os caminhos, por fórum (tier 3). NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 39 fontes e 37 claims; a lista individual não chegou a este escritor; 15 claims cortadas reaparecem nas objeções 'Cortada:' e 10 fontes nas objeções 'Não lida:'. OBJEÇÕES: 57 no total, 52 sobreviventes, todas modeladas (N=52, M=52, nenhuma de fora); 5 não sobreviveram, por evidência: 'doc recomenda permissões', 'página de settings', 'Radar não menciona hooks', 'Cursor só aplica deny em todos os caminhos', 'patchwork-audit cve-2026-hook-bypass' (a página não traz ID de CVE; o defeito é do próprio Patchwork). RECUSADAS PELO MOTOR: 0. LACUNAS QUE SEGUEM ABERTAS: rodagem do Copilot sob --allow-all-tools ou --yolo; rodagem do binário do Gemini em yolo (só texto de código e teste na v0.66.0); doc oficial ou rodagem do Antigravity CLI; rodagem do Cursor em modo autônomo; rodagem do OpenCode, inclusive batch.ts; modo autônomo do Qwen (a 2ª rodada de spikes segue em curso); login Team ou Enterprise real no laboratório; exit 2 em subagente e em Edit/Write na 2.1.318; célula em que o agente grava disableAllHooks; primária do desligamento remoto de mods; comparação de Workflow e PreModelSwitch com concorrentes; recorte exato das massas de 2026-08-16; mapa de financiamento com primárias. LIMITES: citações de Copilot, Gemini, Cursor e Codex vieram por WebFetch mediado por modelo; o laboratório usa stub e chave fictícia; textos de 4 superações chegaram cortados pelo motor e estão marcados no próprio nó. NO FECHAMENTO duas entradas saíram do grafo, pelo teto de 108: a duplicata de blog do Gemini e a objeção sobre https://vpncentral.com/critical-claude-code-vulnerabilities-enable-remote-code-execution/, que devolveu HTTP 403 e que o próprio nó dizia não pesar; os números acima são os da rodada."
     trace: ".claude/workflows/onion-research.js@f0df31449, modo decision, rodada de 2026-11-04"
     provenance:
       source: ".claude/workflows/onion-research.js@f0df31449, modo decision, rodada de 2026-11-04"
@@ -1410,7 +1416,7 @@ nodes:
     impact: 3
     confidence: 0.6
     label: "Prova correta do limite do veto: permissions.md, 'the mod can approve a call that a deny rule refuses or a PreToolUse hook blocked', mais as células «mod-allow com hook» e «mod-allow sob bypass» do laboratório."
-    narrative: "Medida: Li a página oficial em 2026-11-04 e onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md: «mod-allow com hook» e «mod-allow sob bypass», 3 de 3 em cada, 2.1.318. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 3: CVE-2026-25724, deny por symlink."
+    narrative: "Medida: Li a página oficial em 2026-11-04 e curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md: «mod-allow com hook» e «mod-allow sob bypass», 3 de 3 em cada, 2.1.318. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 3: CVE-2026-25724, deny por symlink."
     trace: "curl -sL https://github.com/anthropics/claude-code/security/advisories/GHSA-4q92-rfm6-2cqx | grep -ci hook"
   - id: C_SUPERACAO_20261104_EXIT2_JSON_NOT_DIFFERENTIATOR
     node_type: claim
@@ -1451,7 +1457,7 @@ nodes:
     confidence: 0.6
     label: "permissions.md mais as células «mod-allow com hook», «mod-allow sob bypass», «mod em skills com aceite» e a ponta a ponta do laboratório, além dos 6 de 6 do maestro no login Max."
     narrative: "Medida: Li a doc e RESULTS.md. Não reexecutei células. O login Team ou Enterprise segue sem célula. Critério: E2_PROVA_MENOS. Alvo reprovado: Achado 7: mod aprova o que deny e hook barraram (blog, tier 5)."
-    trace: "grep -n 'Ponta a ponta' onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
+    trace: "grep -n 'Ponta a ponta' curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
   - id: C_SUPERACAO_20261104_CODEX_BYPASS_MEASURED
     node_type: claim
     layer: audit
@@ -1561,7 +1567,7 @@ nodes:
     confidence: 0.6
     label: "allowManagedModsOnly impede os hooks do mod de rodar («allowManagedModsOnly com mod de processo»)."
     narrative: "Medida: RESULTS.md, «allowManagedModsOnly com mod de processo», 3 repetições. Exige configuração gerenciada, ausente nesta VPS. Critério: E1_EVIDENCIA_CONTRARIA. Alvo reprovado: Cortada: regras e hooks não valem para $.fs e $.process do mod."
-    trace: "grep -n 'G9p' onion-curation@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
+    trace: "grep -n 'G9p' curadoria@187fba9:docs/evolution/dissect/claude-code-mods-2026-11/evidence/lab/RESULTS.md"
   - id: C_SUPERACAO_20261104_CUT_CVE_25724_DETAILS
     node_type: claim
     layer: audit
@@ -1619,7 +1625,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    label: "Mapa por harness: medido em Codex e Qwen (veto) e Vibe (contrato diferente); só por doc em Copilot, Gemini e Cursor; por leitura em Goose."
+    label: "Mapa por harness: medido em Codex e Qwen (veto) e Vibe (contrato diferente); só por doc em Copilot, Gemini e Cursor; por leitura em Goose. O Goose passou a medido depois, no estudo da AAIF."
     narrative: "Medida: Li os nós port-spikes e codex-as-core no commit f0df31449. A 2ª rodada de spikes segue em curso, e o modo autônomo do Qwen não está coberto: o nó diz que no -p padrão ele nem oferece shell. Critério: E2_PROVA_MENOS. Alvo reprovado: Lacuna da rodada: as rodagens já pagas ficaram fora dos achados."
     trace: "grep -n 'exit 2 do Claude Code não é veto' docs/evolution/research/port-spikes-qwen-vibe-2026-11/port-spikes-qwen-vibe-2026-11.kg.yaml"
 edges:
@@ -1848,9 +1854,6 @@ edges:
   - from: E_OBJECAO_UNREAD_VULN_TODAY
     to: D_EXIT2_COUPLING_WORDING_2026_11
     edge_type: CONSTRAINS
-  - from: E_OBJECAO_UNREAD_VPNCENTRAL_403
-    to: D_EXIT2_COUPLING_WORDING_2026_11
-    edge_type: CONSTRAINS
   - from: E_OBJECAO_RUN_PAID_MEASUREMENTS_LEFT_OUT
     to: C_OPCAO_C_RETIRE_EXCLUSIVITY_COMPLIANCE_LAYER
     edge_type: CONSTRAINS
@@ -1994,4 +1997,13 @@ edges:
     edge_type: CONSTRAINS
   - from: E_MODS_MANAGED_CONTAINER_STUB_1104
     to: C_SUPERACAO_20261104_CUT_SEATED_GUARD_CONDITION
+    edge_type: CONSTRAINS
+  - from: E_SANDBOX_WRITE_CLAUDE_DIR_SCRIPTED_1104
+    to: Q_EXIT2_COUPLING_AGAINST_2026_11
+    edge_type: SUPPORTS
+  - from: E_SANDBOX_WRITE_CLAUDE_DIR_SCRIPTED_1104
+    to: E_OBJECAO_REFUT_EDITABLE_POLICY
+    edge_type: SUPPORTS
+  - from: E_SANDBOX_WRITE_CLAUDE_DIR_SCRIPTED_1104
+    to: D_EXIT2_COUPLING_WORDING_2026_11
     edge_type: CONSTRAINS

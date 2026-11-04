@@ -13,6 +13,9 @@ meta:
 # Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
 # x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
 external_edges:
+  - from: C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#E_MAESTRO_MOD_BEATS_VETO_LOGIN_MAX_1104"
+    edge_type: TRACES_TO
   - to: "docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml#Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH"
     edge_type: SUPERSEDES
 nodes:
@@ -139,15 +142,17 @@ nodes:
     node_type: question
     plane: PROD
     impact: 4
-    confidence: 0.6
-    status: open
-    verified_at: '2026-10-05'
-    verified_against: "estado vivo medido: nenhum mod instalado (diretório mods do usuário e .claude/mods ausentes; settings.json sem chave mods) — hoje o desvio nao pode ocorrer nesta casa; a PERGUNTA (o mod passa por cima do exit 2?) segue sem medida"
-    label: 'TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se ela passa tambem por cima do EXIT 2 de um PreToolUse — e nesse exit 2 que estes dois vetos (e o CLAUDE.md, como razao do acoplamento) se apoiam. Sem mod instalado para testar. GATILHO: o primeiro mod instalado nesta casa, ou a doc do harness responder.'
+    confidence: 0.85
+    status: done
+    verified_at: "2026-11-04"
+    verified_against: "E_MAESTRO_MOD_BEATS_VETO_LOGIN_MAX_1104: em 2.1.318, login Max, hook real do .env com exit 2 e mod que aprova em tool.check: a ação passou em 6 de 6; sem mod, barrada em 6 de 6"
+    label: "Respondida: sim, a aprovação de um mod passa por cima do exit 2 de um PreToolUse. Medido em 2.1.318 com login Max e hook real, 6 de 6, sem guarda de mods sentada. Não exercitou os dois vetos deste grafo, só o do .env."
+    narrative: "Fecha pelo gatilho que o próprio teto nomeou: a medida e a doc do harness responderam, e a doc diz que o mod pode aprovar a chamada que um hook PreToolUse barrou. LIMITES DA MEDIDA: só o veto do .env; modelo haiku; --setting-sources project,local, então a configuração de usuário fica de fora; mod carregado por --plugin-dir; caminho feliz do hook. O QUE FICA SEM MEDIDA: protect-main e merge-gate, os dois vetos deste grafo, não rodaram sob mod. A extensão a eles é inferência: o mod decide depois do hook, e o que recebe é a negativa, qualquer que seja o veto que a emitiu. Com guarda de mods sentada o mod não aprova; isso está na mesma pesquisa, com API simulada. Texto anterior do teto: TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se ela passa tambem por cima do EXIT 2 de um PreToolUse — e nesse exit 2 que estes dois vetos (e o CLAUDE.md, como razao do acoplamento) se apoiam. Sem mod instalado para testar. GATILHO: o primeiro mod instalado nesta casa, ou a doc do harness responder. Verificação anterior, de 2026-10-05: estado vivo medido: nenhum mod instalado (diretório mods do usuário e .claude/mods ausentes; settings.json sem chave mods) — hoje o desvio nao pode ocorrer nesta casa; a PERGUNTA (o mod passa por cima do exit 2?) segue sem medida"
+    trace: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-real-hooks/consolidado.txt"
     provenance:
-      source: "docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt"
-      locator: "l.2"
-      method: "leitura: changelog 2.1.289 verbatim do radar E3 r7"
+      source: "docs/evolution/research/exit2-coupling-against-2026-11/data/mods-real-hooks/results.jsonl"
+      locator: "campo veredito das células A e B"
+      method: "measurement: claude -p com login real, hooks reais em clone descartável, desfecho no stream-json"
       locality: "repo"
 
   - id: C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM

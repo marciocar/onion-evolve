@@ -62,7 +62,7 @@ Tudo com script e log em `data/`, chave fictícia, isolado, em loopback. Stub me
 | comando inexistente | libera (1) | libera (1) |
 | exit 1 ou inexistente, com block | barra (1 cada) | barra (1 cada) |
 
-Isso corrige o rótulo de `E_OBJECAO_C21`: o fail-open é dos dois, logo não é "a diferença real". O que a medida significa para a frase de `CLAUDE.md:16` fica em `Q_DOCTRINE_EXIT2_REVIEW_2026_11`, pergunta aberta apontando para a pesquisa em curso `wf_ff363b47-bb6`, em `docs/evolution/research/exit2-coupling-against-2026-11/`. Esta rodada não redige doutrina.
+Isso corrige o rótulo de `E_OBJECAO_C21`: o fail-open é dos dois, logo não é "a diferença real". O que a medida significa para a frase do `CLAUDE.md` (l.16 em `1cf173342`) ficou em `Q_DOCTRINE_EXIT2_REVIEW_2026_11`, fechada pelo selo do maestro de 2026-11-04 (`D_EXIT2_COUPLING_WORDING_2026_11`, em `docs/evolution/research/exit2-coupling-against-2026-11/`). Esta rodada não redigiu doutrina.
 
 **Dois tropeços do laboratório, declarados:**
 - Na 1ª passada do veto, o controle positivo não rodou: o stub morria por herdar o pipe da substituição de comando. O lote foi descartado.

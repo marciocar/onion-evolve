@@ -7,7 +7,7 @@
 #    Os binários de terceiros rodaram isolados, em loopback, sem credencial, e foram apagados ao fim.
 #
 # Relação com o corpus: amplia os grafos citados em external_edges sem editá-los. Nenhum nó do corpus é
-# derrubado; a frase de CLAUDE.md:16 fica como pergunta em Q_DOCTRINE_EXIT2_REVIEW_2026_11, sem tocar a doutrina.
+# derrubado; a frase de CLAUDE.md:16@1cf173342 ficou como pergunta em Q_DOCTRINE_EXIT2_REVIEW_2026_11, sem tocar a doutrina; o selo de 2026-11-04 a fechou.
 #
 # Nada aqui é selo do maestro. Os C_TETO_* fecham a classe por critério pré-registrado (status confirmed, método derived).
 meta:
@@ -17,7 +17,7 @@ meta:
   review_after: "2026-12-04"   # 30d: o tipo dominante é FERRAMENTA/SPEC (releases de Goose, agentgateway,
                                # Agent Router, OpenSandbox e OpenEnv; revisões do MCP; a tag v1.1.0-rc do A2A).
                                # REGRA 67 (Grafo de pesquisa com REVISITA carimbada): ferramenta e preço, 30d. O preço de tabela da AAIF (mercado) entra nessa cadência, a menor.
-                               # Gatilhos antecipados: (1) v1.1.0 final do A2A; (2) o fecho da pesquisa exit2-coupling-against-2026-11;
+                               # Gatilhos antecipados: (1) v1.1.0 final do A2A; (2) o fecho da pesquisa exit2-coupling-against-2026-11 (disparado em 2026-11-04);
                                # (3) consumidor nomeado para agentgateway ou Goose; (4) goose entrar na bancada das portas.
   note: "Rodada de primárias de 2026-11-04 curada no mesmo dia, com rodagem própria: tabela final em C_TABELA_FINAL_AAIF_2026_11, projetada em SYNTHESIS.md."
   # kg-backlog-guard: on
@@ -27,6 +27,9 @@ meta:
   #   a tabela final, 1 defeito nomeado e a lista do que ficou sem medir. Nada cortado; superado fica como superseded.
 
 external_edges:
+  - from: Q_DOCTRINE_EXIT2_REVIEW_2026_11
+    to: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml#D_EXIT2_COUPLING_WORDING_2026_11"
+    edge_type: TRACES_TO
   - from: E_AAIF_PROJECTS_PAGE_TEN_LISTED
     to: "docs/evolution/research/onion-core-ports-multi-model-2026-11/onion-core-ports-multi-model-2026-11.kg.yaml#E_AAIF_TEN_PROJECTS"
     edge_type: SUPPORTS
@@ -110,12 +113,19 @@ nodes:
   - id: Q_DOCTRINE_EXIT2_REVIEW_2026_11
     node_type: question
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-11-04"
+    verified_against: "selo do maestro em D_EXIT2_COUPLING_WORDING_2026_11, 2026-11-04, opção C com o gatilho da D; na redação nova a frase sai do CLAUDE.md, e grep -n 'exclusividade retirada' CLAUDE.md a encontra"
     impact: 5
     confidence: 0.5
-    label: "Pergunta aberta ao maestro: a frase de CLAUDE.md:16 ('isso não existe fora') se sustenta? Esta cura não redige doutrina: a resposta é da pesquisa em curso wf_ff363b47-bb6, em docs/evolution/research/exit2-coupling-against-2026-11/."
-    narrative: "Este nó só pergunta; não sela nem edita a doutrina. Em 2026-11-04 o diretório da pesquisa ainda não existia em origin/main, por isso é citado aqui em texto e não por aresta externa. O que este grafo entrega à pesquisa: E_OBJECAO_DOCTRINE_EXIT2_CLAUDE_MD (leitura do Goose) e E_MEDIDA_VETO_GOOSE_E_CC_1104 (rodagem com stub: exit 2 barra e falha libera nos dois). O corpus já tinha rodagem contrária à frase antes desta rodada, com arestas no topo do arquivo: codex-as-core-2026-10#E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026 (2026-10-26), #E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026, onion-core-ports-multi-model-2026-11#C_SUPERACAO_20261102_EXIT2_PRE_ACTION_FOUR_HARNESSES, port-spikes-qwen-vibe-2026-11#E_PORT_SPIKE_QWEN_VETO_EXIT2_BARRA_1103 e #E_PORT_SPIKE_EXIT2_NAO_BARRA_NO_VIBE_SEM_STRICT_1103; maestro-vivo-2026-08#C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C contestara a frase por outro eixo. A versão anterior deste nó dizia que a postura (C_POSTURA_ACOPLAMENTO) não estava em causa; a afirmação foi retirada, porque CLAUDE.md:28 manda acoplar só quando a capacidade 'não existe fora', e se o critério fica sem exemplo é parte da pergunta. O que ainda só o Claude Code entrega não foi medido aqui."
-    trace: "grep -n 'isso não existe fora' CLAUDE.md"
+    label: "Respondida: a frase do CLAUDE.md ('isso não existe fora', l.16 em 1cf173342) não se sustentou. O maestro selou em 2026-11-04 a retirada da exclusividade (D_EXIT2_COUPLING_WORDING_2026_11), e a nova redação tira a frase."
+    narrative: "Este nó só pergunta; não sela nem edita a doutrina. Quando este nó nasceu, o diretório da pesquisa ainda não existia em origin/main e foi citado em texto; no fechamento da pesquisa a aresta para o selo entrou em external_edges. O que este grafo entrega à pesquisa: E_OBJECAO_DOCTRINE_EXIT2_CLAUDE_MD (leitura do Goose) e E_MEDIDA_VETO_GOOSE_E_CC_1104 (rodagem com stub: exit 2 barra e falha libera nos dois). O corpus já tinha rodagem contrária à frase antes desta rodada, com arestas no topo do arquivo: codex-as-core-2026-10#E_SPIKE_S1_TRUSTED_HOOK_BLOCKS_0164_1026 (2026-10-26), #E_SPIKE_FAILOPEN_IGNORE_USER_CONFIG_1026, onion-core-ports-multi-model-2026-11#C_SUPERACAO_20261102_EXIT2_PRE_ACTION_FOUR_HARNESSES, port-spikes-qwen-vibe-2026-11#E_PORT_SPIKE_QWEN_VETO_EXIT2_BARRA_1103 e #E_PORT_SPIKE_EXIT2_NAO_BARRA_NO_VIBE_SEM_STRICT_1103; maestro-vivo-2026-08#C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C contestara a frase por outro eixo. A versão anterior deste nó dizia que a postura (C_POSTURA_ACOPLAMENTO) não estava em causa; a afirmação foi retirada, porque CLAUDE.md:28@1cf173342 manda acoplar só quando a capacidade 'não existe fora', e se o critério fica sem exemplo é parte da pergunta. O que ainda só o Claude Code entrega não foi medido aqui. FECHAMENTO, 2026-11-04: a resposta veio do selo; o título anterior era: Pergunta aberta ao maestro: a frase de CLAUDE.md:16@1cf173342 ('isso não existe fora') se sustenta? Esta cura não redige doutrina: a resposta é da pesquisa em curso wf_ff363b47-bb6, em docs/evolution/research/exit2-coupling-against-2026-11/."
+    trace: "grep -n 'exclusividade retirada' CLAUDE.md"
+    provenance:
+      source: "docs/evolution/research/exit2-coupling-against-2026-11/exit2-coupling-against-2026-11.kg.yaml"
+      locator: "nó D_EXIT2_COUPLING_WORDING_2026_11, opção escolhida: C com o gatilho da D"
+      method: "derived: da decisão selada pelo maestro no outro grafo; este nó só pergunta e não sela"
+      locality: "repo"
 
   - id: C_RECOMENDACAO_ELENXO_2026_11_04
     node_type: claim
@@ -1653,15 +1663,15 @@ nodes:
     impact: 5
     confidence: 0.6
     verified_at: "2026-11-04"
-    verified_against: "grep -n 'isso não existe fora' CLAUDE.md; gh api -H 'Accept: application/vnd.github.raw' repos/aaif-goose/goose/contents/documentation/docs/guides/context-engineering/hooks.md | grep -n 'Exit code `2`'"
+    verified_against: "git show 1cf173342:CLAUDE.md | grep -n 'isso não existe fora'; gh api -H 'Accept: application/vnd.github.raw' repos/aaif-goose/goose/contents/documentation/docs/guides/context-engineering/hooks.md | grep -n 'Exit code `2`'"
     source_tier: 3
     source_kind: analysis
-    label: "OBJEÇÃO (Elenxo, 1 agente): a leitura do Goose contraria a frase de CLAUDE.md:16, a capacidade que justifica o acoplamento. Equivalência não medida: pode sobrar uma parte verdadeira, mas a frase absoluta não se sustenta."
-    narrative: "Alvo: doutrina em CLAUDE.md:16: o exit 2 de hook não existe fora do Claude Code. Evidência: A leitura do Goose contraria a frase, e esta é a capacidade que a doutrina diz que compra o acoplamento. hooks.md do Goose: 'Exit code 2 — goose blocks'; mod.rs:901 na v1.57.0. A corpus-grep 'Open Plugins' dá 0 nós, então nem a spec de hooks que ele segue estava mapeada. O que não está medido é a equivalência: comportamento sob modo sem permissão, default on_failure allow e cobertura de eventos. Pode sobrar uma parte verdadeira, mas a frase absoluta não se sustenta. Critério E1_EVIDENCIA_CONTRARIA. Superação achada=false, classe nenhuma: Sem rodagem comparando os dois vetos. Medida: Só leitura de doc e código por gh api. A próxima medida é rodar um hook exit 2 no Goose v1.57.0 em modo autônomo e comparar com o Claude Code sob bypassPermissions."
-    trace: "grep -n 'isso não existe fora' CLAUDE.md; gh api -H 'Accept: application/vnd.github.raw' repos/aaif-goose/goose/contents/documentation/docs/guides/context-engineering/hooks.md | grep -n 'Exit code `2`'"
+    label: "OBJEÇÃO (Elenxo, 1 agente): a leitura do Goose contraria a frase de CLAUDE.md:16@1cf173342, a capacidade que justifica o acoplamento. Equivalência não medida: pode sobrar uma parte verdadeira, mas a frase absoluta não se sustenta."
+    narrative: "Alvo: doutrina em CLAUDE.md:16@1cf173342: o exit 2 de hook não existe fora do Claude Code. Evidência: A leitura do Goose contraria a frase, e esta é a capacidade que a doutrina diz que compra o acoplamento. hooks.md do Goose: 'Exit code 2 — goose blocks'; mod.rs:901 na v1.57.0. A corpus-grep 'Open Plugins' dá 0 nós, então nem a spec de hooks que ele segue estava mapeada. O que não está medido é a equivalência: comportamento sob modo sem permissão, default on_failure allow e cobertura de eventos. Pode sobrar uma parte verdadeira, mas a frase absoluta não se sustenta. Critério E1_EVIDENCIA_CONTRARIA. Superação achada=false, classe nenhuma: Sem rodagem comparando os dois vetos. Medida: Só leitura de doc e código por gh api. A próxima medida é rodar um hook exit 2 no Goose v1.57.0 em modo autônomo e comparar com o Claude Code sob bypassPermissions."
+    trace: "git show 1cf173342:CLAUDE.md | grep -n 'isso não existe fora'; gh api -H 'Accept: application/vnd.github.raw' repos/aaif-goose/goose/contents/documentation/docs/guides/context-engineering/hooks.md | grep -n 'Exit code `2`'"
     provenance:
       source: "repasse do Elenxo da rodada /onion-research de 2026-11-04 ao write(KG)"
-      locator: "objeção a 'doutrina em CLAUDE.md:16: o exit 2 de hook não existe fora do Claude Code' (survives=true)"
+      locator: "objeção a 'doutrina em CLAUDE.md:16@1cf173342: o exit 2 de hook não existe fora do Claude Code' (survives=true)"
       method: "testimony: objeção de 1 agente do Elenxo, sem votação adversarial nem ancoragem"
       locality: "host"
 
