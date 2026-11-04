@@ -13,14 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-11-03
-    cc_version: "2.1.317"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "juiz independente (opus não-fork): 5 exagerados e 2 reprovados (o nó do VS Code da r21 sem sucessor e seis omissões), aplicados com 7 superações; 4 nós novos; Aufhebung: SUPERSEDES de 4 nós da r21 (versões de quem serve, a pergunta da subida, a extensão do VS Code e a guarda de deriva)"
-                            # rodada 22 (2.1.314->2.1.317, duas versões, 142 itens). Host na 2.1.317, revisor (v1.0.265) na
-                            # 2.1.314, /chat (SDK 0.3.310) seis publicadas atrás (SAC-265, supera a SAC-262); esforço dos
-                            # agentes de outro modelo (SAC-266); dica de retomada sem as flags do teste A2A (SAC-267). Seguem
-                            # da r21: SAC-263 (Monitor) e SAC-264 (veto nativo de escrita). Histórico da r21 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-11-03-r22/radar-E3-2026-11-03-r22.kg.yaml
+    last_run: 2026-11-04
+    cc_version: "2.1.318"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "juiz independente (opus não-fork): 4 exagerados e 1 reprovado (omissões do delta: daemon de fundo, claude plugin e o fim da correção da 2.1.288), aplicados com 5 superações; 1 nó novo; Aufhebung: SUPERSEDES de 4 nós da r22 (versões de quem serve, a pergunta da subida, a extensão do VS Code e a guarda de deriva)"
+                            # rodada 23 (2.1.317->2.1.318, uma versão, 84 itens). Host na 2.1.318, revisor (v1.0.265) na
+                            # 2.1.314, /chat (SDK 0.3.310) sete publicadas atrás no npm; seis processos em binário apagado
+                            # (daemon de fundo); fim do login legível (loginExpiresAt); corte de 3 min dos subagentes em fundo
+                            # já valia por flag e virou constante. Ações: cinco Q_* abertas no kg. Histórico da r22 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-11-04-r23/radar-E3-2026-11-04-r23.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
