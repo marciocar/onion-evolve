@@ -2,7 +2,8 @@
 branch: docs/aaif-projects-2026-11
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7f9120fec7d8ffb87bcc4c1d69bf546d36eb623a5d97102e4c0bc78b9f99f226
+reviewed_code_sha256: 90b1d21c0546ca08e8f25a7018d892f75ca6e1bd49b77e78f21c8a2a9cad329e
 findings_total: 15
 findings_real: 15
 tokens: 0
