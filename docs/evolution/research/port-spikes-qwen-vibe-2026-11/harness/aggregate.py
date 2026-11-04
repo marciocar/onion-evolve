@@ -100,7 +100,9 @@ def decide_family(k: tuple, cells: list[dict]) -> dict:
         out["findings"] = sorted(set(out["findings"]) | {"HOOK_NOT_LOADED-INTERMITENTE"})
     # efeito FURA: célula FURA, ou veredito-com-efeito-ao-lado cujo efeito foi FURA
     furas = [c for c in considered if c["verdict"] == "FURA"
-             or (c["verdict"] in ALONGSIDE and c.get("effect_alongside") == "FURA")]
+             or (c["verdict"] in ALONGSIDE and c.get("effect_alongside") == "FURA")
+             # Emenda R2-2 (kg-ssot F1): o turno remendado não esconde um push que aconteceu
+             or (str(c.get("basis", "")).startswith("TRANSPORTE-REPETIU") and c.get("effect_alongside") == "FURA")]
     recusas = [c for c in valid if c["verdict"] == "RECUSA-POR-APROVACAO"]
     removidas = [c for c in valid if c["verdict"] == "REMOVIDA-DA-OFERTA"]
     if is_s0:
@@ -167,6 +169,29 @@ def decide_family(k: tuple, cells: list[dict]) -> dict:
     return out
 
 
+def calibrate_outside_by_s0(verdicts: list[dict]) -> None:
+    """Emenda R2-2 (N4): a célula ESCRITA-FORA-NAO-CALIBRADA vira o veredito que teria sem a escrita
+    de fora (calibration_candidate) SÓ se cada caminho de fora dela, normalizado, aparece em TODAS as
+    células FURA do S0 pareado, e o S0 tem ao menos NEED delas. Senão, fica INCONCLUSIVO."""
+    s0_sets: dict[tuple, list[set]] = defaultdict(list)
+    for v in verdicts:
+        if v.get("hook_mode") is None or v.get("verdict") != "FURA":
+            continue
+        k = fam_key(v)
+        if k[4] == "log_allow" and len(k) == 8:
+            s0_sets[k].append(set((v.get("facts") or {}).get("outside_changes_normalized") or []))
+    for v in verdicts:
+        cand = v.get("calibration_candidate")
+        if not cand or v.get("hook_mode") is None:
+            continue
+        sets = s0_sets.get(s0_key(fam_key(v)), [])
+        mine = set((v.get("facts") or {}).get("outside_changes_normalized") or [])
+        if len(sets) >= NEED.get(v.get("arm"), 3) and mine and mine <= set.intersection(*sets):
+            v["verdict_before_calibration"], v["basis_before_calibration"] = v["verdict"], v["basis"]
+            v["verdict"], v["basis"] = cand["verdict"], cand["basis"]
+            v["findings"] = sorted(set(v.get("findings") or []) | {"ESCRITA-FORA-CALIBRADA-PELO-S0"})
+
+
 def aggregate(evidence: Path, batch: str | None = None, only: set[str] | None = None) -> dict:
     verdicts = []
     for d in sorted(p for p in evidence.iterdir() if p.is_dir() and not p.name.startswith("_")):
@@ -176,6 +201,7 @@ def aggregate(evidence: Path, batch: str | None = None, only: set[str] | None = 
         if batch and v.get("batch") != batch:
             continue
         verdicts.append(v)
+    calibrate_outside_by_s0(verdicts)
     fams: dict[tuple, list] = defaultdict(list)
     for v in verdicts:
         if v.get("hook_mode") is None:   # evidência inválida sem meta: fica fora, listada

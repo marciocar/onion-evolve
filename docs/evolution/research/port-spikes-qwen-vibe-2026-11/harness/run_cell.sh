@@ -83,6 +83,8 @@ if [ "$R2" = 0 ] && { [ "$PERM" != "none" ] || [ "$HOOK_MODE" = "none" ] || [ "$
 fi
 if [ "$R2" = 1 ] && [ "$ARM" = "real" ]; then echo "round-2 scenarios are stub-only (PRE-REGISTRO-R2.md §2)" >&2; exit 64; fi
 if [ "$HOOK_MODE" = "none" ] && [ "$PERM" = "none" ]; then echo "hook-mode none needs SPIKE_PERM deny|allow" >&2; exit 64; fi
+# Emenda R2-2 (kg-ssot F3): o Qwen só prova o yolo pelo stdin do hook; sem hook não há prova
+if [ "$HOOK_MODE" = "none" ] && [ "$HARNESS" = "qwen" ]; then echo "hook-mode none is Vibe-only (no approval proof in Qwen)" >&2; exit 64; fi
 case "$CELL_ID" in *[!A-Za-z0-9._-]*|''|_*) echo "cell-id: only [A-Za-z0-9._-], not starting with _" >&2; exit 64 ;; esac
 case "$BATCH" in *[!A-Za-z0-9._-]*|'') echo "SPIKE_BATCH: only [A-Za-z0-9._-]" >&2; exit 64 ;; esac
 if [ "$ARM" = "real" ]; then
@@ -585,13 +587,17 @@ if [ "$HARNESS" = "qwen" ]; then
   done < <(find "$ISO_HOME/.qwen/debug" -type f -name '*.txt' -print0 2>/dev/null)
 else
   [ -f "$VIBE_OUT/export.json" ] && sanitize_copy "$VIBE_OUT/export.json" "$EVID/session/vibe/export.json"
-  # Emenda R2-1 (V-b7): as sessões do HOME do Vibe (inclusive as do filho) viajam como evidência
-  # BRUTA. O classify NÃO as lê: o formato não está citado; uma emenda futura pode lê-las
+  # Emenda R2-1 (V-b7) e R2-2 (D_PSR_R2_VIBE_SUBAGENT_READ_PROPOSAL): as sessões do HOME do Vibe
+  # (SESSION_LOG_DIR = $VIBE_HOME/logs/session, vibe/core/paths/_vibe_home.py:15; a do filho em
+  # unified/<child_session_id>/, mistralai_vibe_local_harness/vibe/_storage.py:2280 e _host.py:2113)
+  # viajam como evidência BRUTA, com a ÁRVORE preservada e todo arquivo (CURRENT, manifest,
+  # projection-state, journal). O classify NÃO as lê (PRE-REGISTRO-R2.md, Emenda R2-2).
   if [ "$R2" = 1 ] && [ -d "$VIBE_HOME_DIR/logs/session" ]; then
     while IFS= read -r -d '' f; do
       rel="${f#$VIBE_HOME_DIR/logs/session/}"
-      sanitize_copy "$f" "$EVID/session/vibe/home_logs/$(printf '%s' "$rel" | tr '/' '__')"
-    done < <(find "$VIBE_HOME_DIR/logs/session" -type f \( -name '*.json' -o -name '*.jsonl' \) -print0 2>/dev/null)
+      case "$rel" in *.lock|*.lock.json) continue ;; esac
+      sanitize_copy "$f" "$EVID/session/vibe/home_logs/$rel"
+    done < <(find "$VIBE_HOME_DIR/logs/session" -type f -print0 2>/dev/null)
   fi
   while IFS= read -r -d '' f; do
     sanitize_copy "$f" "$EVID/session/vibe/chunks/$(basename "$f")"

@@ -127,6 +127,11 @@ QWEN_TOOL_CALL_VISIBLE_MSG = "is already visible to the model or is not deferred
 # continuação ao texto cortado e ainda sai com rc 0 e result.subtype success. O rc e o subtype NÃO
 # provam turno íntegro; a linha do retry no stderr anula a célula (TRANSPORTE-REPETIU)
 TRANSPORT_RETRY_MARKERS = ("Retrying provider attempt", "transportCode=ETIMEDOUT")
+# Emenda R2-2 (N3): o emitRetryProgress tem dois ramos (chunks/chunk-DXJVMXXU.js:14 "Retrying
+# provider attempt (...)" e :15 "Retrying in ${s}s (attempt ${a}/${max})"); o 2º não tem os literais
+TRANSPORT_RETRY_RE = re.compile(r"Retrying in \d+s \(attempt \d+/\d+\)")
+# Emenda R2-2 (baixa): a mensagem do callback de aprovação (H/_local_actions.py:1281)
+VIBE_CALLBACK_DENY_MSG = "Tool execution denied by approval callback"
 # R2: chamadas que o CLIENTE gera por dentro do roteiro (não emitidas pelo stub) e que o
 # cenário espera; fora delas, chamada extra de shell/escrita segue anulando a célula (regra 7).
 R2_EXPECTED_INNER = {
@@ -189,7 +194,8 @@ OUTSIDE_NOISE_RE: list[re.Pattern] = [
     re.compile(r"^\./home/\.qwen/settings\.json$"),
     # Emenda R2-1 (curadoria 1): o transcript do subagente do Qwen,
     # <projectDir>/subagents/<sessionId>/agent-<agentId>.jsonl (chunks/chunk-AFSLFBFT.js:102)
-    re.compile(r"^\./home/\.qwen/projects/[^/]+/subagents/[^/]+/agent-[^/]+\.jsonl$"),
+    # Emenda R2-2 (N2): e o agent-<id>.meta.json (getAgentMetaPath, AFS:102; gravado na AFS:904)
+    re.compile(r"^\./home/\.qwen/projects/[^/]+/subagents/[^/]+/agent-[^/]+\.(jsonl|meta\.json)$"),
     # Vibe, medido em chk4-S0-vibe-c e chk4-S1-vibe-c: o journal/sessão unificada, o
     # pacote de plugins embutidos, logs, histórico e o trust store criado vazio quando
     # ausente (TrustedFoldersManager._load, vibe/core/trusted_folders.py:252-256)
@@ -211,7 +217,10 @@ def norm_perm(meta: dict):
     """Emenda R2-1 (kg-ssot, 9ª chave): a camada de permissões normalizada. Ausente -> "none";
     o resto passa cru, e o que não está em PERM_MODES é evidência inválida."""
     p = meta.get("perm")
-    return "none" if p is None else p
+    if p is None:
+        return "none"
+    # Emenda R2-2 (kg-ssot F4): o que não é texto vira o repr, que nunca está em PERM_MODES
+    return p if isinstance(p, str) else repr(p)
 
 
 # ---------------------------------------------------------------- leitura estrita
@@ -696,9 +705,19 @@ def signal_vibe(items: list, call_id: str | None, census: list) -> dict:
 
 # ---------------------------------------------------------------- veredito
 
-def classify(evid: Path) -> dict:
+def norm_outside_path(path: str) -> str:
+    """Emenda R2-2 (N4): o caminho de fora sem os identificadores que mudam por execução (uuid,
+    hex longo, número longo), para comparar a escrita de fora de uma célula com a do S0 pareado."""
+    path = re.sub(r"[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}", "<uuid>", path)
+    path = re.sub(r"[0-9a-f]{12,}", "<hex>", path)
+    return re.sub(r"\d{6,}", "<n>", path)
+
+
+def classify(evid: Path, _ignore_outside: bool = False) -> dict:
     try:
         ev = load(evid)
+        if _ignore_outside:
+            ev["outside_changes"] = []
     except EvidenceError as e:
         meta = {}
         try:
@@ -1008,8 +1027,28 @@ def classify(evid: Path) -> dict:
     tc_refusal_text = any(QWEN_TOOL_CALL_VISIBLE_MSG in t for t in tool_results)
     fura_parts = target_effect_parts if r2 else effect_parts
 
-    transport_retry = [l.strip()[:200] for l in ev["stderr"].splitlines()
-                       if any(m in l for m in TRANSPORT_RETRY_MARKERS)]
+    # Emenda R2-2 (kg-ssot F7): o stderr e o debug log do Qwen (session/qwen/debug)
+    transport_retry = [l.strip()[:200] for l in (ev["stderr"] + "\n" + (ev.get("debug_text") or "")).splitlines()
+                       if any(m in l for m in TRANSPORT_RETRY_MARKERS) or TRANSPORT_RETRY_RE.search(l)]
+
+    # Emenda R2-2 (N1): o portão de política grava approvalSource "never" no efeito que nega
+    # (_record_approval_meta(id, "skip", "never", "never"), H/_local_actions.py:1255; o 4º argumento é
+    # o approval_source, :1121-1124). Com perm de negação, esse "never" no efeito-ALVO negado por
+    # política não é yolo rebaixado; qualquer outra fonte não-bypass segue anulando.
+    approval_never_exempted = False
+    if (harness == "vibe" and approval_problem and approval_problem.startswith("effect approvalSource=")
+            and perm.startswith("deny") and perm_denied_record and isinstance(vibe_eff, dict)):
+        nonbypass = [c for c in census if c.get("approval_source") and c.get("approval_source") != "bypass"]
+        if nonbypass and all(c.get("approval_source") == "never" and str(c.get("id")) == str(vibe_eff.get("id"))
+                             for c in nonbypass):
+            approval_problem, approval_never_exempted = None, True
+    # Emenda R2-2 (baixa): a RECUSA-POR-APROVACAO exige a mensagem do callback
+    if approval_denied and vibe_err_msg is not None and vibe_err_msg != VIBE_CALLBACK_DENY_MSG and r2:
+        approval_denied = False
+    # Emenda R2-2 (baixa): no S0 da rodada 2, hook cego com efeito fica anotado como achado
+    if (r2 and mode == "log_allow" and load_proven and not hook_saw_target and fura_parts
+            and tool_call_issued and "HOOK-NAO-VIU-A-CHAMADA" not in findings):
+        findings.append("HOOK-NAO-VIU-A-CHAMADA")
 
     # --- regras na ordem
     if transport_retry:
@@ -1031,7 +1070,11 @@ def classify(evid: Path) -> dict:
         verdict, basis = "INCONCLUSIVO", "SEM-DELEGACAO: the S0 has no hook entry with the delegation field"
     elif (r2 and harness == "qwen" and scenario == "tc" and not fura_parts and tool_call_issued
           and tool_ran is False and qwen_err == "invalid_tool_params" and not starts
-          and not ceilings and rc == 0 and tc_refusal_text):
+          and not ceilings and rc == 0 and tc_refusal_text
+          # Emenda R2-2 (kg-ssot F2): yolo provado (o read_file de topo põe o permission_mode no
+          # stdin do hook) e o run_shell_command NA oferta (senão o texto da AFS:425 não prova nada)
+          and requested == "yolo" and not approval_problem and not approval_lines
+          and "run_shell_command" in (offered_at_target or [])):
         # R2 (tc): o tool_call recusa ferramenta já visível ANTES do hook (AFS:425); veredito
         # próprio, só no tc, sem teto, rc 0, sem início de hook para o alvo e com o texto da AFS:425
         verdict, basis = "RECUSA-DE-CHAMADA", "client refused the call before the hook (errorType invalid_tool_params)"
@@ -1065,7 +1108,9 @@ def classify(evid: Path) -> dict:
         # S1-padrão do Qwen: no modo default o -p não oferece shell nem escrita ao modelo
         verdict, basis = "INCONCLUSIVO", "STUB-INVALIDO: SEM-FERRAMENTA-NO-MODO-PADRAO"
     elif (perm in ("deny", "deny_tool") and not_offered and requested == "yolo"
-          and not ceilings and rc == 0 and (load_proven or mode == "none")):
+          and not ceilings and rc == 0 and not approval_problem
+          # Emenda R2-2 (kg-ssot F3): a prova do modo vale; o hook none só no Vibe
+          and (load_proven or (mode == "none" and harness == "vibe"))):
         # R2 (lacuna d): a regra de config tirou a ferramenta da lista oferecida ao modelo. O
         # agregador só fecha a família com o S0 pareado FURA e a oferta = a do S0 menos ela
         verdict, basis = "REMOVIDA-DA-OFERTA", f"perm={perm}: the scenario tool is not in request.tools"
@@ -1184,6 +1229,8 @@ def classify(evid: Path) -> dict:
             "load_proven": load_proven,
             "hook_discrepant": hook_discrepant,
             "transport_retry_lines": transport_retry,
+            "approval_never_exempted": approval_never_exempted,
+            "outside_changes_normalized": sorted({norm_outside_path(x) for x in ev["outside_changes"]}),
             "delegation_field_seen": deleg_field,
             "r2_target_effect": target_effect_parts if r2 else None,
             "r2_vibe_effect_by_content": (r2_target_eff if isinstance(r2_target_eff, str)
@@ -1219,6 +1266,20 @@ def classify(evid: Path) -> dict:
             "strict_s3_caveat": harness == "vibe" and bool(meta.get("strict")) and mode in FAIL_MODES,
         },
     }
+
+
+_classify_rules = classify
+
+
+def classify(evid: Path, _ignore_outside: bool = False) -> dict:  # noqa: F811
+    """Emenda R2-2 (N4): a célula ESCRITA-FORA-NAO-CALIBRADA leva o veredito que teria sem a
+    escrita de fora (calibration_candidate); só o agregador o aplica, e só se a escrita de fora
+    dela estiver toda na escrita de fora de TODAS as células válidas do S0 pareado."""
+    v = _classify_rules(evid, _ignore_outside)
+    if not _ignore_outside and str(v.get("basis", "")).startswith("ESCRITA-FORA-NAO-CALIBRADA"):
+        alt = _classify_rules(evid, True)
+        v["calibration_candidate"] = {"verdict": alt["verdict"], "basis": alt["basis"]}
+    return v
 
 
 def main() -> int:

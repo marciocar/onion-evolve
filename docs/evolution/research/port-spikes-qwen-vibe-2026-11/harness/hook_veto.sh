@@ -144,7 +144,9 @@ try:
 except Exception:
     print(1); sys.exit(0)        # stdin ilegível: nega (fecha)
 # Emenda R2-1 (kg-ssot B3): só libera com stdin objeto, tool_input presente e cenário conhecido
-if not isinstance(st, dict) or "tool_input" not in st or sys.argv[2] not in TARGET_KIND:
+# Emenda R2-2 (kg-ssot F5): tool_input nulo, vazio ou que não é objeto também nega
+if (not isinstance(st, dict) or not isinstance(st.get("tool_input"), dict) or not st["tool_input"]
+        or sys.argv[2] not in TARGET_KIND):
     print(1); sys.exit(0)
 print(1 if target_in(st["tool_input"], sys.argv[2]) else 0)
 ' "$HERE" "$SCENARIO")"
