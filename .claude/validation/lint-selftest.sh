@@ -38208,12 +38208,13 @@ run_adopter_shape_selftests() {
   #      curada à mão): no label "pin `X` (update de D, com o kg-ssot V e o contrato vC), modo…" e na narrative "Pins
   #      anteriores…: `a`, …; a adoção foi `z`." o motor trocava só o pin, e a data, a versão, a lista (sem o pin que
   #      acabou de sair) e a provenance ficavam do update anterior. Fixture: a semente real do semeador convertida para
-  #      o molde da curadoria. a) label refeito com hoje, a kg-ssot e o contrato do vendor e o papel/modo/integração do
-  #      carimbo; a lista ganha o pin que sai na frente; a provenance cita o carimbo novo; radar e contrato rc 0.
+  #      o molde da curadoria. a) label refeito com a data, a kg-ssot e o contrato do vendor e o papel/modo/integração
+  #      do carimbo; a lista ganha o pin que sai na frente; a provenance cita o carimbo novo; radar e contrato rc 0.
   #      b) idempotência: o mesmo pin de novo não muda nada, e o motor forçado a rodar outra vez (x_pin de volta ao
-  #      antigo) não duplica a lista. c) RECUSA (rc 4, grafo intacto): label no molde com token fora dele, narrative
-  #      fora do molde, vendor sem a versão, e label editado fora dos moldes com dado do update ("atualizado em").
-  #      MUTANTES: um por guarda nova, cada um tem de derrubar o caso que a guarda segura.
+  #      antigo) não duplica a lista. c) RECUSA (rc 4, grafo intacto, o motivo certo na mensagem) em cada forma que o
+  #      motor não sabe refazer. d) a data do label é o updated_at do carimbo. e) rollback para um pin da lista: ele sai
+  #      dela. f) o pin que sai é o da adoção: não entra na lista. (c), (d), (e) e (f) vêm da revisão adversarial de
+  #      2026-11-04 sobre a 1ª versão desta cura. MUTANTES: um por guarda, cada um tem de derrubar o caso que ela segura.
   local _rb_seed="${REPO_ROOT}/.claude/utils/adopt/seed-adoption-graph.sh" _rb_today
   _rb_today="$(date +%F)"
   _as_rb_fixture() {  # $1=dir → semente no molde de update, carimbo já no pin novo, vendor/kg-ssot medível
@@ -38230,18 +38231,36 @@ s = re.sub(r'(?m)^(  - id: ONION_INSTALLED\n(?:    .*\n)*?)    narrative: ".*"$'
            lambda m: m.group(1) + '    narrative: "Pins anteriores, do mais novo ao mais velho (log da onion/vendor): `67e9d003689f`, `c091dc66cf5c`; a adoção foi `5b529e980779`. Atualizar com /meta:adopt --update."', s, count=1)
 s = s.replace('      source: ".claude/.onion-version deste repo"\n      locator: "campos source_commit, mode, role e integration_branch"',
               '      source: ".claude/.onion-version@d86aa63"\n      locator: "campos source_commit, role, mode; vendor/kg-ssot/.kg-ssot-version@d86aa63"', 1)
-assert "update de 2026-11-03" in s and "a adoção foi `5b529e980779`" in s and "@d86aa63" in s
+if not ("update de 2026-11-03" in s and "a adoção foi `5b529e980779`" in s and "@d86aa63" in s):
+    sys.exit(1)
 open(p, "w", encoding="utf-8").write(s)
 PY
     printf '{"product": "kg-ssot", "version": "9.8.7"}\n' > "${_e}/vendor/kg-ssot/.kg-ssot-version"
     printf 'CONTRACT_VERSION = "4.18"\n' > "${_e}/vendor/kg-ssot/tools/kg_validate.py"
     printf 'framework: onion-evolve\nsource_commit: a682c090d1bc\nsource_commit_date: 2026-11-04\nrole: hub\nadopted_at: 2026-09-01\nmode: greenfield\nintegration_branch: develop\n' > "${_e}/.claude/.onion-version"
   }
+  # $1=helper $2=rótulo $3=programa python que prepara a fixture (recebe o grafo, o alvo e o carimbo) → o grafo resultante
+  _as_rb_prep() {
+    local _f="${d}/i6-$2-$RANDOM"
+    _as_rb_fixture "${_f}" || return 1
+    python3 -c "$3" "${_f}/docs/onion/graph/onion-adoption.kg.yaml" "${_f}" "${_f}/.claude/.onion-version" || return 1
+    printf '%s' "${_f}"
+  }
+  _as_rb_refuse() {  # $1=helper $2=rótulo $3=preparo $4=trecho do motivo esperado na mensagem
+    local _f _rc=0 _a _b
+    _f="$(_as_rb_prep "$1" "$2" "$3")" || { printf ' c:%s:setup' "$2"; return; }
+    _a="$(sha256sum "${_f}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
+    bash "$1" "${_f}" > "${_f}/out" 2>&1 || _rc=$?
+    _b="$(sha256sum "${_f}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
+    [ "${_rc}" -eq 4 ] || printf ' c:%s:rc=%s(esperado-4)' "$2" "${_rc}"
+    [ "${_a}" = "${_b}" ] || printf ' c:%s:escreveu' "$2"
+    grep -qF -- "$4" "${_f}/out" || printf ' c:%s:motivo' "$2"
+  }
   _as_rb_run() {  # $1=helper → lista de desvios (vazio = ok)
-    local _e="${d}/i6-$RANDOM" _bad="" _r=0 _g _h0 _h1 _n
+    local _e="${d}/i6-$RANDOM" _bad="" _r=0 _g _h0 _h1 _n _f
     _as_rb_fixture "${_e}" || { printf ' fixture-nao-montou'; return; }
     _g="${_e}/docs/onion/graph/onion-adoption.kg.yaml"
-    # a) refeito
+    # a) refeito (o carimbo não tem updated_at: a data cai no relógio)
     bash "$1" "${_e}" >/dev/null 2>&1 || _r=$?
     [ "${_r}" -eq 0 ] || _bad="${_bad} a:rc=${_r}(esperado-0)"
     grep -qxF "    label: \"Framework instalado: pin \`a682c090d1bc\` (update de ${_rb_today}, com o kg-ssot 9.8.7 e o contrato v4.18), modo \`greenfield\`, papel \`hub\`, integração \`develop\`.\"" "${_g}" \
@@ -38257,32 +38276,45 @@ PY
     # b) idempotência: o mesmo pin não muda nada; forçado a rodar de novo, a lista não duplica
     _h0="$(sha256sum "${_g}" | cut -d' ' -f1)"; bash "$1" "${_e}" >/dev/null 2>&1 || true
     _h1="$(sha256sum "${_g}" | cut -d' ' -f1)"; [ "${_h0}" = "${_h1}" ] || _bad="${_bad} b:mesmo-pin-mudou-o-grafo"
-    sed -i 's/^    x_pin: .*/    x_pin: "3ade85b7e1c0"/' "${_g}"; bash "$1" "${_e}" >/dev/null 2>&1 || true
+    sed -i 's/^    x_pin: .*/    x_pin: "3ade85b7e1c0"/; s/pin `a682c090d1bc` (update/pin `3ade85b7e1c0` (update/' "${_g}"; bash "$1" "${_e}" >/dev/null 2>&1 || true
     _n="$(grep -m1 '^    narrative: "Pins anteriores' "${_g}" | grep -o '3ade85b7e1c0' | wc -l)"
     [ "${_n}" -eq 1 ] || _bad="${_bad} b:lista-com-o-pin-${_n}-vezes"
-    # c) recusa: rc 4 e o grafo intacto, em cada forma que o motor não sabe refazer
-    _as_rb_refuse() {  # $1=helper $2=rótulo $3=programa python que estraga a fixture (recebe o grafo e o alvo)
-      local _f="${d}/i6c-$RANDOM" _rc=0 _a _b
-      _as_rb_fixture "${_f}" || { printf ' c:%s:fixture' "$2"; return; }
-      python3 -c "$3" "${_f}/docs/onion/graph/onion-adoption.kg.yaml" "${_f}" || { printf ' c:%s:setup' "$2"; return; }
-      _a="$(sha256sum "${_f}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
-      bash "$1" "${_f}" >/dev/null 2>&1 || _rc=$?
-      _b="$(sha256sum "${_f}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
-      [ "${_rc}" -eq 4 ] || printf ' c:%s:rc=%s(esperado-4)' "$2" "${_rc}"
-      [ "${_a}" = "${_b}" ] || printf ' c:%s:escreveu' "$2"
-    }
-    _bad="${_bad}$(_as_rb_refuse "$1" label-fora-do-molde 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="e o contrato v4.17), modo"; assert a in s; open(p,"w",encoding="utf-8").write(s.replace(a,"e o contrato v4.17, revisado em 2026-11-02), modo"))')"
-    _bad="${_bad}$(_as_rb_refuse "$1" narrative-fora-do-molde 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="Pins anteriores, do mais novo"; assert a in s; open(p,"w",encoding="utf-8").write(s.replace(a,"Histórico dos pins, do mais novo"))')"
-    _bad="${_bad}$(_as_rb_refuse "$1" vendor-sem-versao 'import os, sys; os.remove(os.path.join(sys.argv[2], "vendor/kg-ssot/.kg-ssot-version"))')"
-    _bad="${_bad}$(_as_rb_refuse "$1" label-do-dono-com-data-do-update 'import re, sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); s2=re.sub(r"(?m)^    label: \"Framework instalado: pin .*$", "    label: \"Framework instalado: pin `3ade85b7e1c0` (atualizado em 2026-11-03), modo `greenfield`.\"", s, count=1); assert s2!=s; s2=s2.replace("x_pin: \"a682c090d1bc\"","x_pin: \"3ade85b7e1c0\""); open(p,"w",encoding="utf-8").write(s2)')"
-    unset -f _as_rb_refuse
+    # c) recusa: rc 4, o grafo intacto e o motivo certo, em cada forma que o motor não sabe refazer
+    _bad="${_bad}$(_as_rb_refuse "$1" label-fora-do-molde 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="e o contrato v4.17), modo"; s2=s.replace(a,"e o contrato v4.17, revisado em 2026-11-02), modo"); sys.exit(s2==s) if s2==s else open(p,"w",encoding="utf-8").write(s2)' 'não casa com ele inteiro')"
+    _bad="${_bad}$(_as_rb_refuse "$1" narrative-fora-do-molde 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="Pins anteriores, do mais novo"; s2=s.replace(a,"Histórico dos pins, do mais novo"); sys.exit(1) if s2==s else open(p,"w",encoding="utf-8").write(s2)' 'a narrative não traz a lista')"
+    _bad="${_bad}$(_as_rb_refuse "$1" vendor-sem-versao 'import os, sys; os.remove(os.path.join(sys.argv[2], "vendor/kg-ssot/.kg-ssot-version"))' 'a versão da kg-ssot não foi medida')"
+    _bad="${_bad}$(_as_rb_refuse "$1" vendor-sem-contrato 'import os, sys; os.remove(os.path.join(sys.argv[2], "vendor/kg-ssot/tools/kg_validate.py"))' 'o contrato não foi medido')"
+    _bad="${_bad}$(_as_rb_refuse "$1" label-do-dono-com-data-do-update 'import re, sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); s2=re.sub(r"(?m)^    label: \"Framework instalado: pin .*$", "    label: \"Framework instalado: pin `3ade85b7e1c0` (atualizado em 2026-11-03), modo `greenfield`.\"", s, count=1); sys.exit(1) if s2==s else open(p,"w",encoding="utf-8").write(s2)' "o label editado traz 'atualizado em'")"
+    _bad="${_bad}$(_as_rb_refuse "$1" carimbo-com-aspa 'import sys; p=sys.argv[3]; s=open(p,encoding="utf-8").read(); open(p,"w",encoding="utf-8").write(s.replace("integration_branch: develop","integration_branch: fe\"at"))' 'o campo integration_branch do carimbo traz aspa')"
+    _bad="${_bad}$(_as_rb_refuse "$1" x_pin-divergente 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); s2=s.replace("x_pin: \"3ade85b7e1c0\"","x_pin: \"1111111aaaaa\""); sys.exit(1) if s2==s else open(p,"w",encoding="utf-8").write(s2)' 'o x_pin (1111111aaaaa) e o pin do label (3ade85b7e1c0) divergem')"
+    _bad="${_bad}$(_as_rb_refuse "$1" provenance-inline 'import re, sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); s2=re.sub(r"(?m)^(  - id: ONION_INSTALLED\n(?:    .*\n)*?)    provenance:\n(?:      .*\n)+", lambda m: m.group(1)+"    provenance: {source: \"x\", locator: \"y\", method: \"reading: z\"}\n", s, count=1); sys.exit(1) if s2==s else open(p,"w",encoding="utf-8").write(s2)' 'a provenance não está em bloco')"
+    _bad="${_bad}$(_as_rb_refuse "$1" provenance-com-hash 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="      locator: \"campos source_commit, role, mode; vendor/kg-ssot/.kg-ssot-version@d86aa63\"\n"; s2=s.replace(a, a+"      sha256: \"deadbeef\"\n"); sys.exit(1) if s2==s else open(p,"w",encoding="utf-8").write(s2)' 'a provenance traz sha256')"
+    _bad="${_bad}$(_as_rb_refuse "$1" yaml-que-nao-le 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); a="Atualizar com /meta:adopt --update."; s2=s.replace(a,"Atualizar com /meta:adopt --update \\q."); sys.exit(1) if s2==s else open(p,"w",encoding="utf-8").write(s2)' 'não passa na leitura YAML de volta')"
+    # d) a data do update é o updated_at do carimbo, não o relógio
+    _f="$(_as_rb_prep "$1" data 'import sys; open(sys.argv[3],"a",encoding="utf-8").write("updated_at: 2026-11-02\n")')" || _bad="${_bad} d:setup"
+    if [ -n "${_f}" ]; then
+      bash "$1" "${_f}" >/dev/null 2>&1 || true
+      grep -qF 'pin `a682c090d1bc` (update de 2026-11-02, com o kg-ssot' "${_f}/docs/onion/graph/onion-adoption.kg.yaml" || _bad="${_bad} d:data-nao-e-a-do-carimbo"
+    fi
+    # e) rollback para um pin que já está na lista: ele sai dela (não é "anterior" a si mesmo)
+    _f="$(_as_rb_prep "$1" rollback 'import sys; p=sys.argv[3]; s=open(p,encoding="utf-8").read(); open(p,"w",encoding="utf-8").write(s.replace("source_commit: a682c090d1bc","source_commit: 67e9d003689f"))')" || _bad="${_bad} e:setup"
+    if [ -n "${_f}" ]; then
+      bash "$1" "${_f}" >/dev/null 2>&1 || true
+      grep -qF 'anteriores, do mais novo ao mais velho (log da onion/vendor): `3ade85b7e1c0`, `c091dc66cf5c`; a adoção' "${_f}/docs/onion/graph/onion-adoption.kg.yaml" || _bad="${_bad} e:pin-novo-ficou-na-lista"
+    fi
+    # f) o pin que sai é o da adoção (1º update): ele já está em "a adoção foi", não entra na lista
+    _f="$(_as_rb_prep "$1" adocao 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); s=s.replace("x_pin: \"3ade85b7e1c0\"","x_pin: \"5b529e980779\"").replace("pin `3ade85b7e1c0` (update","pin `5b529e980779` (update"); open(p,"w",encoding="utf-8").write(s)')" || _bad="${_bad} f:setup"
+    if [ -n "${_f}" ]; then
+      bash "$1" "${_f}" >/dev/null 2>&1 || true
+      grep -qF '(log da onion/vendor): `67e9d003689f`, `c091dc66cf5c`; a adoção foi `5b529e980779`.' "${_f}/docs/onion/graph/onion-adoption.kg.yaml" || _bad="${_bad} f:pin-da-adocao-entrou-na-lista"
+    fi
     printf '%s' "${_bad}"
   }
   local _rb; _rb="$(_as_rb_run "${_pk}")"
   if [ -z "${_rb}" ]; then
-    record_pass "adopter-shape: (i6) molde de update: label, lista de pins (com o que saiu, sem duplicar) e provenance refeitos de fontes medidas, radar e contrato rc 0; fora do molde recusa com rc 4 sem escrever"
+    record_pass "adopter-shape: (i6) molde de update: label (data do carimbo), lista de pins (com o que saiu, sem duplicar, sem o novo nem o da adoção) e provenance refeitos, radar e contrato rc 0; fora do molde recusa com rc 4, sem escrever e com o motivo"
   else record_fail "adopter-shape: (i6)" "${_rb}"; fi
-  # MUTANTES (i6): cada guarda nova, desligada, tem de derrubar o caso que ela segura (o desvio esperado no padrão)
+  # MUTANTES (i6): cada guarda, desligada, tem de derrubar o desvio que ela segura (o padrão glob do 4º argumento)
   _as_rb_mutant() {  # $1=rótulo $2=trecho do helper $3=troca $4=desvio esperado (glob)
     local _m="${d}/stamp-i6-mut-$1.sh" _out
     python3 -c 'import sys; s=open(sys.argv[1],encoding="utf-8").read(); n=s.count(sys.argv[3]); open(sys.argv[2],"w",encoding="utf-8").write(s.replace(sys.argv[3],sys.argv[4]) if n==1 else s)' "${_pk}" "${_m}" "$2" "$3"
@@ -38297,11 +38329,22 @@ PY
   _as_rb_mutant pin-que-sai '        hist.insert(0, cur)' '        pass' '*a:lista-sem-o-pin-que-saiu*'
   _as_rb_mutant sem-duplicar ' and not any(same(cur, h) for h in hist):' ':' '*b:lista-com-o-pin-2-vezes*'
   _as_rb_mutant provenance '    prov = {"source":' '    prov = {} and {"source":' '*a:provenance-source-velha*'
-  _as_rb_mutant recusa-label '        refuse("o label começa no molde de update mas não casa com ele inteiro (token fora do molde)")' '        refuse("x") if False else None' '*c:label-fora-do-molde:rc=*'
-  _as_rb_mutant recusa-narrative '        refuse("o label está no molde de update, mas a narrative não traz a lista de pins anteriores no molde")' '        refuse("x") if False else None' '*c:narrative-fora-do-molde:rc=*'
-  _as_rb_mutant recusa-vendor '        refuse("a versão da kg-ssot não foi medida em vendor/kg-ssot/.kg-ssot-version")' '        kv = "0.0.0"' '*c:vendor-sem-versao:rc=*'
-  _as_rb_mutant recusa-marcador 'elif li is not None and not label_ok and STALE_MARK.search(blk[li]):' 'elif False:' '*c:label-do-dono-com-data-do-update:rc=*'
-  unset -f _as_rb_fixture _as_rb_run _as_rb_mutant
+  # sem a recusa, o label fora do molde é REFEITO e escrito com rc 0: o mutante morde pelo motivo certo
+  _as_rb_mutant recusa-label '        refuse("o label começa no molde de update mas não casa com ele inteiro (token fora do molde)")' '        pass' '*c:label-fora-do-molde:rc=0(*'
+  # sem a recusa, a narrative fora do molde estoura um AttributeError (rc 1): o caso mede o CONTRATO de rc (4 exato)
+  _as_rb_mutant recusa-narrative '        refuse("o label está no molde de update, mas a narrative não traz a lista de pins anteriores no molde")' '        pass' '*c:narrative-fora-do-molde:rc=1(*'
+  _as_rb_mutant recusa-vendor '        refuse("a versão da kg-ssot não foi medida em vendor/kg-ssot/.kg-ssot-version")' '        kv = "0.0.0"' '*c:vendor-sem-versao:rc=0(*'
+  _as_rb_mutant recusa-contrato '        refuse("o contrato não foi medido (CONTRACT_VERSION em vendor/kg-ssot/tools/kg_validate.py)")' '        cv = "0.0"' '*c:vendor-sem-contrato:rc=0(*'
+  _as_rb_mutant recusa-marcador 'elif li is not None and not label_ok and STALE_MARK.search(blk[li]):' 'elif False:' '*c:label-do-dono-com-data-do-update:rc=0(*'
+  _as_rb_mutant recusa-aspa "        if re.search(r'[\"\\\\\`\\r\\n]', _v):" '        if False:' '*c:carimbo-com-aspa:motivo*'
+  _as_rb_mutant recusa-x_pin '    if xi is not None and not same(cur, _lp):' '    if False:' '*c:x_pin-divergente:rc=0(*'
+  _as_rb_mutant recusa-inline '    if pi is not None and blk[pi].rstrip() != "    provenance:":' '    if False:' '*c:provenance-inline:motivo*'
+  _as_rb_mutant recusa-chave '            if _key not in ("source", "locator", "method", "locality"):' '            if False:' '*c:provenance-com-hash:rc=0(*'
+  _as_rb_mutant leitura-de-volta '            if _old_ok or rebuilt:' '            if False:' '*c:yaml-que-nao-le:rc=0(*'
+  _as_rb_mutant data-do-carimbo '    udate = sfield("updated_at")' '    udate = today' '*d:data-nao-e-a-do-carimbo*'
+  _as_rb_mutant rollback 'nm.group("list")) if not same(h, pin)]' 'nm.group("list")) if True]' '*e:pin-novo-ficou-na-lista*'
+  _as_rb_mutant pin-da-adocao ' and not same(cur, adopt)' '' '*f:pin-da-adocao-entrou-na-lista*'
+  unset -f _as_rb_fixture _as_rb_prep _as_rb_refuse _as_rb_run _as_rb_mutant
 
   rm -rf "${d}"
 }
