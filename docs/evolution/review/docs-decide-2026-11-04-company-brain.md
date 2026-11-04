@@ -2,7 +2,8 @@
 branch: docs/decide-2026-11-04-company-brain
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: bc959bc420531812e018064f03be550ec0aa1208bb417396ee023bbc44dd65db
+reviewed_code_sha256: 6e44cd23e1a93f776975f2b74090933b60ce35de529175e9d5cd871b305ad228
 findings_total: 1
 findings_real: 0
 tokens: 0
