@@ -1355,8 +1355,9 @@ calibração dá BARRA falso.
     ou no filho;
   - **o efeito vetado do filho** (Emenda R2-7): a lista aceita o `input` com o alvo, **ou** o `input` null com
     `ONION-SPIKE-VETO` no `settledMessage`. A forma foi **medida nos chunks de uma sessão de topo** (fixture
-    `chk-S1-vibe-c`: `kind` "tool", `input` null, `settledMessage` com o veto). Para o extrato de um **filho** ela é
-    **inferida** (o mesmo `PublicSessionState`), não medida (correção da Emenda R2-8);
+    `chk-S1-vibe-c`: `kind` "tool", `input` null, `settledMessage` com o veto). ~~Para o extrato de um **filho** ela é
+    **inferida** (o mesmo `PublicSessionState`), não medida (correção da Emenda R2-8);~~ **Medida no extrato do filho,
+    nas 7 células de veto (§13);**
   - **o que a regra do filho não pega por construção do hook** (Emenda R2-6): um início com `allow` e depois
     `deny-done` daria BARRA, mas o `hook_veto.sh` (`:94-112`) grava allow e deny em ramos exclusivos e nunca
     escreve os dois para o mesmo início. Os casos com `kind` fora de `VIBE_TOOL_KINDS`, ou com o comando fora do
@@ -1426,7 +1427,7 @@ Declarado **antes** de olhar o agregado:
   diferenças; Emenda R2-10 parte D). O `classify.py` mudou depois, na R2-10, dentro da isenção.
 
 **Resultado, declarado depois de ver o agregado (nada reclassificado):**
-- O lote `r2` tem 117 células e 35 famílias. O `aggregate-r2.json` foi reproduzido do arquivo pelo
+- O lote `r2` tinha aqui 117 células e 35 famílias (124 e 37 com as células de veto do §13). O `aggregate-r2.json` foi reproduzido do arquivo pelo
   `reproduce.sh` (rc 0, `match=True`), e o veredito por família está no `SYNTHESIS.md` e nos nós
   `E_PORT_SPIKE_R2_*_1104` do grafo.
 - **Só dois desfechos ficaram fora do que o §11 admitia: R2d-deny×ts-V e R2d-deny×proc-V, BARRA por
@@ -1439,3 +1440,39 @@ Declarado **antes** de olhar o agregado:
   - **R2a-S1-V:** a escrita fora do descritor MCP (seção 10);
   - **R2d-denytool×tcd-Q:** o `monitor` também sai do registro, e nenhuma regra julga isso;
   - **R2b-S1-Q e R2b-M-Q:** pela Q-b8, o `toolCallResult` do filho só traz `callId` e `durationMs`.
+
+## 13. As células de veto do subagente no Vibe (2026-11-04, DEPOIS do commit pré-dado `aa35d25eb`)
+
+**Rodadas por ordem da sessão do core**, com as condições verdes, no braço stub, lote `r2`, em série. **Nada foi
+afrouxado depois dos dados:** `classify.py` e `aggregate.py` são os de `aa35d25eb`.
+
+| Família | Tentativas | Veredito da família |
+|---|---|---|
+| R2b-S1-V (veto `*`) | r1 BARRA, **r2 INCONCLUSIVO**, r3 BARRA, r4 BARRA | **BARRA** (3 de 3 válidas; S0 pareado FURA) |
+| R2b-M-V (matcher `Bash`) | r1 BARRA, r2 BARRA, r3 BARRA | **BARRA** (3 de 3; S0 pareado FURA) |
+
+Em todas as 7, o bare não avançou, e o hook disparou para `file_system.bash` dentro do filho. **Um FURA reprovaria, e
+nenhum saiu.** A resposta da lacuna (b) no Vibe: o veto vale dentro do filho, com `*` e com o `Bash` portado, **sem SINAL
+no pai** (`signal` falso nas 7: o stdout do pai não traz o efeito do filho).
+
+**Por que a R2b-S1-V-r2 saiu INCONCLUSIVO (medido, sem cura).** O veto agiu: o efeito do filho está `skipped`, a
+mensagem é `failure` e o bare não avançou. O `deny-done` também está no `hook.log`. Mas o hook do `self.wait` do pai
+começou entre o `deny-intent` (0,893 s) e o `deny-done` (0,955 s), porque pai e filho rodam em paralelo, e a condição
+(d) lê o log supondo que cada decisão vem logo depois do seu início. **É falta de prova causada pelo leitor, na direção
+segura.** O fato é declarado, e a célula continua INCONCLUSIVO. **Proposta, não aplicada:** ligar a decisão ao início
+pelo `ppid`, que o `hook.log` grava. Se um dia entrar, é emenda pós-dado, declarada como tal (parte F), e nenhuma
+família depende dela.
+
+**A forma medida do filho vetado no store** (era inferida, seção 10; igual nas 7 células): uma sessão `child-…`, com um
+único efeito `kind` "tool", `toolName` "tool", `input` null, `state.status` "skipped", uma forma só, e `settledMessage`
+«ONION-SPIKE-VETO: blocked by onion spike hook (mode=deny_target_json)»; e uma única mensagem de ferramenta, `name` "bash",
+`outcome` "failure", com o mesmo texto. **O `toolName` do efeito vetado é "tool", não "file_system.bash"**, e o alvo não
+está nele: o que liga o efeito à chamada é a mensagem com o id do stub.
+
+**A forma do pai numa célula de veto** é a mesma da calibração: read, spawn e wait, os mesmos 3 resultados, `running`
+só no spawn e no wait (o `check_parent_rule.py` aceita as 7). **Uma diferença de tempo:** o `wait` responde
+`input_available` ou, se o filho acabou antes dele, `timeout`. Na R2b-S1-V-r1 ele esperou os 60 s inteiros (72 s de
+célula). A regra não lê essa resposta.
+
+**O agregado:** 124 células e 37 famílias. As 35 famílias anteriores não mudam. O lote fica em
+`evidence-r2veto.tar.gz`, e o `reproduce.sh` cobra o gravado contra o recalculado (passo 8).
