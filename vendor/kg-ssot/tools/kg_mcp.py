@@ -140,7 +140,12 @@ TOOLS = {
                          "end resolved to its label (local or external, and whether it exists). Pages by cursor: repeat "
                          "with next_cursor until it comes back null. group_by counts the nodes by field instead of "
                          "listing them: use it for how many, per graph or per status. semantic orders by similarity to a question (needs "
-                         "the vector extra on the server); with text, both orders are fused by RRF."),
+                         "the vector extra on the server); with text, both orders are fused by RRF. where also takes "
+                         "KEY^=VALUE (starts with) and KEY*=VALUE (contains), case-sensitive and on text only, and the "
+                         "degree counted from the internal edges of the node's own graph: degree.in.SUPPORTS=0 finds the "
+                         "nodes with no incoming internal SUPPORTS edge; a SUPPORTS from another graph is not counted, so "
+                         "to complete it list edges=true with where edge_type=SUPPORTS and scope=external. has and missing test whether any field is there, and null counts as missing. due=true "
+                         "lists what is overdue, the most overdue first. chain follows up to 50 ids back to their origin."),
         "inputSchema": {"type": "object", "additionalProperties": False,
                         "properties": {
                             "ids": {"type": "array", "items": {"type": "string", "maxLength": 200}, "maxItems": 200},
@@ -174,21 +179,48 @@ TOOLS = {
                             "where": {"type": "array", "maxItems": 10,
                                       "items": {"type": "string", "pattern": "^[^=]+=", "maxLength": 300},
                                       "description": P_("KEY=VALUE conditions, all of them: owner, an x_* field (a dot "
-                                                        "for a nested key) or provenance.<key>; owner=<session> is "
-                                                        "that session's queue; with edges, the edge fields")},
+                                                        "for a nested key), provenance.<key>, or the degree over internal "
+                                                        "edges: degree.in, degree.out or degree.total, with an optional edge type, and a "
+                                                        "whole number (degree.in.SUPPORTS=0); owner=<session> is that "
+                                                        "session's queue; with edges, the edge fields. KEY^=VALUE starts "
+                                                        "with and KEY*=VALUE contains: case-sensitive, and null, numbers "
+                                                        "and booleans never match")},
+                            "has": {"type": "array", "minItems": 1, "maxItems": 10,
+                                    "items": {"type": "string", "minLength": 1, "maxLength": 200},
+                                    "description": P_("only the nodes that have these fields, any field, with a dot for "
+                                                      "a nested key (provenance.source); null counts as lacking it, and "
+                                                      "empty text and 0 count as having it")},
+                            "missing": {"type": "array", "minItems": 1, "maxItems": 10,
+                                        "items": {"type": "string", "minLength": 1, "maxLength": 200},
+                                        "description": P_("only the nodes that lack these fields, or have them as null")},
+                            "due": {"type": "boolean",
+                                    "description": P_("only the nodes of any type whose verified_at plus reverify_every "
+                                                      "is due, the most overdue first, each with due_on and days_late; "
+                                                      "does not combine with sort=impact or semantic")},
+                            "as_of": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+                                      "description": P_("with due, the date that counts as today")},
+                            "chain": {"type": "array", "minItems": 1, "items": {"type": "string", "maxLength": 300},
+                                      "description": P_("the transmission chain from each id (name#id, or the unique id) "
+                                                        "back to its origin, up to 50 ids, by the edge types in "
+                                                        "edge_types (default TRACES_TO): one id gives kg-ssot.chain/1, "
+                                                        "more give kg-ssot.chains/1, one chain per id with the status "
+                                                        "of the origin. Takes only edge_types")},
                             "group_by": {"type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": True,
                                          "items": {"type": "string", "minLength": 1, "maxLength": 200},
                                          "description": P_("count the nodes the filters find, by the value of each "
                                                            "field, instead of listing them (kg-ssot.groups/2, every "
                                                            "group, without pages): graph name as file, node_type, "
-                                                           "status, plane, layer, owner, an x_* field (with a dot for a "
-                                                           "nested key), provenance.<key> or meta.<key>")},
+                                                           "status, plane, layer, owner, label, narrative (with "
+                                                           "min_count 2, the nodes with the same text), an x_* field "
+                                                           "(with a dot for a nested key), provenance.<key>, meta.<key> "
+                                                           "or the degree (degree.in, degree.out, degree.total, with an "
+                                                           "optional edge type)")},
                             "edges": {"type": "boolean",
                                       "description": P_("count and list edges instead of nodes (internal and external); "
                                                         "where and group_by then take edge_type, scope, file, "
                                                         "meta.<key>, and from.<field> and to.<field> (id, file, found, "
                                                         "node_type, status, plane, layer, owner, an x_* field or "
-                                                        "provenance.<key>)")},
+                                                        "provenance.<key>), also with ^= and *= (from.id^=D_)")},
                             "count_distinct": {"type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": True,
                                                "items": {"type": "string", "minLength": 1, "maxLength": 200},
                                                "description": P_("with group_by, count the distinct values (or "
@@ -664,9 +696,11 @@ class Server:
             if args.get("edges"):
                 node_only = sorted(k for k in ("ids", "id_prefix", "node_type", "status", "plane", "layer", "text",
                                                "in_narrative", "open", "verified_before", "around", "depth",
-                                               "edge_types", "direction", "sort", "semantic", "narrative", "fields")
+                                               "edge_types", "direction", "sort", "semantic", "narrative", "fields",
+                                               "has", "missing", "due", "as_of", "chain")
                                    if args.get(k) not in (None, False, [], "", 1, "both", "corpus")
-                                   or (k == "depth" and args.get(k) not in (None, 1)))
+                                   or (k == "depth" and args.get(k) not in (None, 1))
+                                   or args.get(k) is True)  # True == 1 na lista acima: o flag ligado também é filtro de nó
                 if node_only:
                     raise ToolError(P_("edges counts edges: it does not combine with {keys}; filter the edges with "
                                        "where (edge_type=…, from.status=…)").format(keys=", ".join(node_only)))
@@ -687,9 +721,28 @@ class Server:
                     raise ToolError(P_("{n} groups do not fit in one answer: narrow the filters or group by fewer "
                                        "fields").format(n=len(res["groups"])))
                 return res, False
+            if args.get("chain") is not None:
+                others = sorted(k for k in args if k not in ("chain", "edge_types"))
+                if others:
+                    raise ToolError(P_("chain follows the ids: it takes only edge_types, not {keys}").format(
+                        keys=", ".join(others)))
+                try:
+                    res = kg_query.chain_request(corpus, args["chain"], args.get("edge_types", ()))
+                except ValueError as exc:
+                    raise ToolError(str(exc)) from None
+                if self.max_bytes is not None and len(json.dumps(res, ensure_ascii=False)) > self.max_bytes:
+                    raise ToolError(P_("the chains do not fit in one answer: ask fewer ids"))
+                return res, False
             if args.get("group_by") and (args.get("semantic") is not None or args.get("cursor") is not None):
                 raise ToolError(P_("group_by counts every node the filters find: it does not combine with semantic "
                                    "or cursor"))
+            if args.get("as_of") is not None and not args.get("due"):  # a ferramenta não tem o --revisit que a recusa de lá cita
+                raise ToolError(P_("as_of goes with due"))
+            try:  # a mesma recusa da linha de comando, antes de carregar o modelo do semantic
+                kg_query.check_due(args.get("due", False), args.get("as_of"), args.get("sort", "corpus"),
+                                   args.get("semantic"))
+            except ValueError as exc:
+                raise ToolError(str(exc)) from None
             ranker = None
             if args.get("semantic") is not None:
                 ranker = self.semantic_ranker()
@@ -705,7 +758,9 @@ class Server:
                                      fields=args.get("fields", ()), max_bytes=self.max_bytes,
                                      semantic=args.get("semantic"), ranker=ranker, where=args.get("where", ()),
                                      group_by=args.get("group_by", ()),
-                                     count_distinct=args.get("count_distinct", ()), min_count=args.get("min_count"))
+                                     count_distinct=args.get("count_distinct", ()), min_count=args.get("min_count"),
+                                     due=args.get("due", False), as_of=args.get("as_of"), has=args.get("has", ()),
+                                     missing=args.get("missing", ()))
             except ValueError as exc:
                 raise ToolError(str(exc)) from None
             if "groups" in res and self.max_bytes is not None and \

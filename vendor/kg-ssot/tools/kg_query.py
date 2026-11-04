@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A consulta e a projeção legível de um corpus de grafos .kg.yaml e .kg.json (release 4.17, O3 do roteiro).
+"""A consulta e a projeção legível de um corpus de grafos .kg.yaml e .kg.json.
 
 Lê muitos grafos de uma vez e seleciona nós por id, prefixo, tipo, status, plano, camada e texto do label; traz a
 vizinhança por tipo de aresta e profundidade, a fila dos abertos (--open) e os nós sem verified_at ou conferidos
@@ -8,14 +8,19 @@ resolvida de id para label, local ou externa (external_edges), e se a ponta exis
 
 Não julga: o veredito é do kg_validate.py, e um grafo que não parseia sai em "unreadable", sem derrubar a consulta.
 Ranqueia por atenção desde a 4.36.0 (--sort attention): impact × confidence × fator do status × (1 + grau), a mesma fórmula e o mesmo desempate do radar do framework onde o formato nasceu.
-Saída humana, ou JSON no formato kg-ssot.query/1 (spec/query.schema.json).
+Saída humana, ou JSON no formato kg-ssot.query/1, ou /2 com --due (spec/query.schema.json); as arestas, os grupos e a cadeia em lote têm
+os formatos deles (edges.schema.json, groups.schema.json, chains.schema.json).
 
 Uso:
   kg_query.py [--root DIR [--exclude GLOB]... [--no-default-excludes] | ARQ...] [filtros] [--around ID [--depth N] [--edge-type T]...
-              [--direction out|in|both]] [--sort corpus|impact] [--limit N] [--cursor C] [--narrative]
+              [--direction out|in|both]] [--sort corpus|impact|attention] [--limit N] [--cursor C] [--narrative]
               [--fields GLOB]... [--format human|json]
   filtros (todos juntos, em E): --id ID... --id-prefix P --type T --status S --plane P --layer L --file TRECHO
                                 --text PALAVRAS [--in-narrative] --open --verified-before AAAA-MM-DD
+                                --where CHAVE=VALOR (e CHAVE^=VALOR, começa com; CHAVE*=VALOR, contém; degree.in.TIPO=0)
+                                --has CAMPO --missing CAMPO --due [--as-of AAAA-MM-DD]
+  contagem: --group-by CAMPO... [--count-distinct CAMPO...] [--min-count N]; arestas como sujeito: --edges
+  uma cadeia ou um lote: --chain ID... (até 50); a história: --decision ID; a fila de revisão: --revisit
   --root DIR lê os .kg.yaml e .kg.json rastreados pelo git sob DIR (sem git, todos sob DIR), menos o vendor e os
   fixtures (vendor/*, fixtures/*, */fixtures/*, docs/materials/* e, desde a 4.20.0, toda pasta com o carimbo
   .kg-ssot-version abaixo de DIR); os caminhos saem relativos a DIR, que
@@ -47,11 +52,13 @@ else:  # script ou vendor
 _ = kg_i18n._
 
 SCHEMA_VERSION = "kg-ssot.query/1"
+DUE_VERSION = "kg-ssot.query/2"  # desde a 4.43.0, só com --due: o schema é fechado, e o --due acrescenta campos ao nó
 MAX_LIMIT = 1000
 # o label da OUTRA ponta de uma aresta sai cortado: sem o corte, um nó de label longo citado por milhares de arestas
 # (duplicadas, ou externas de outro grafo) multiplica a resposta pelo número de arestas (2 MB de grafo, 7,5 GB de saída)
 END_LABEL_MAX = 200
 NODE_FIELDS = ("node_type", "status", "plane", "layer", "impact", "confidence", "verified_at")
+DEGREE_SIDES = ("in", "out", "total")
 
 
 class Corpus:
@@ -73,6 +80,21 @@ class Corpus:
         # o grau da atenção (4.36.0), no escopo do arquivo, como o radar: a aresta conta para as pontas locais do arquivo
         # que a declara, e o evento do trigger (ou on) de uma aresta também conta; a que chega de outro arquivo não
         self.local_degree = collections.Counter()
+        # o grau derivado (4.43.0), que não é o da atenção: só as arestas internas, linha por linha, por tipo. Sai de
+        # self.edges na hora de ler, para alcançar também o que o --with trouxer depois
+        self._degree = {"in": collections.defaultdict(collections.Counter), "out": collections.defaultdict(collections.Counter)}
+        self._degree_seen = 0
+
+    def internal_degree(self, key, side, edge_type=None):
+        """Quantas arestas internas do grafo do nó tocam o nó, em in, out ou total, de um tipo ou de todos. A linha repetida
+        conta de novo; o laço conta em in e em out, e por isso duas vezes em total; a aresta externa não entra."""
+        for e in self.edges[self._degree_seen:]:
+            if e["scope"] == "internal":
+                self._degree["out"][e["from"]][e["edge_type"]] += 1
+                self._degree["in"][e["to"]][e["edge_type"]] += 1
+        self._degree_seen = len(self.edges)
+        counts = [self._degree[s].get(key, {}) for s in (("in", "out") if side == "total" else (side,))]
+        return sum(sum(c.values()) if edge_type is None else c.get(edge_type, 0) for c in counts)
 
     def add(self, name, text):
         if name in self.files:  # o mesmo arquivo dado duas vezes não duplica as arestas
@@ -478,6 +500,54 @@ def chain(corpus, ref, edge_types=("TRACES_TO",)):
             "edge_types": sorted(edge_types), "bands": bands, "truncated": truncated, "paths": out}
 
 
+CHAINS_SCHEMA = "kg-ssot.chains/1"
+CHAIN_BATCH_MAX = 50
+
+
+def chain_request(corpus, refs, edge_types=("TRACES_TO",)):
+    """O --chain como foi pedido: um id só (o repetido conta uma vez) dá o kg-ssot.chain/1 de sempre, com a recusa de
+    sempre; mais de um dá o kg-ssot.chains/1. ValueError: pedido quebrado, ou o id único que não se resolve."""
+    refs = list(dict.fromkeys([refs] if isinstance(refs, str) else refs))
+    if len(refs) > CHAIN_BATCH_MAX:
+        raise ValueError(_("--chain takes at most {max} ids").format(max=CHAIN_BATCH_MAX))
+    return chain(corpus, refs[0], edge_types) if len(refs) == 1 else chains(corpus, refs, edge_types)
+
+
+def chains(corpus, refs, edge_types=("TRACES_TO",)):
+    """A cadeia em lote (kg-ssot.chains/1, 4.43.0): uma entrada por id, na ordem pedida, com o kg-ssot.chain/1 inteiro e
+    o status de cada origem. O id que não se resolve fica na entrada dele, com o motivo, sem derrubar o lote. Cada cadeia
+    pode chegar a MAX_PATHS caminhos; o lote para de abrir cadeias quando já gastou esse tanto, e as que sobram saem
+    not_run, para 50 ids não multiplicarem por 50 o pior caso de uma."""
+    items, spent = [], 0
+    for ref in refs:
+        item = {"ref": ref, "outcome": "ok", "error": None, "chain": None, "origins": []}
+        if spent >= MAX_PATHS:
+            item.update(outcome="not_run", error=_("the batch stopped at {n} paths: ask this id in a smaller batch")
+                        .format(n=MAX_PATHS))
+        else:
+            try:
+                doc = chain(corpus, ref, edge_types)
+            except ValueError as exc:
+                item.update(outcome="not_resolved", error=str(exc))
+            else:
+                spent += len(doc["paths"])
+                item.update(chain=doc, origins=_origins(corpus, doc))
+        items.append(item)
+    return {"schema_version": CHAINS_SCHEMA, "root": corpus.root, "edge_types": sorted(set(edge_types or ("TRACES_TO",))),
+            "requested": len(refs), "truncated": any(i["outcome"] == "not_run" for i in items),
+            "unreadable": list(corpus.unreadable), "chains": items}
+
+
+def _origins(corpus, doc):
+    """As origens de uma cadeia, cada uma uma vez, com o status do nó, que o kg-ssot.chain/1 não traz."""
+    keys = dict.fromkeys((p["origin"]["file"], p["origin"]["id"]) for p in doc["paths"] if p["origin"])
+    out = []
+    for key in keys:
+        status = corpus.nodes[key].get("status") if key in corpus.nodes else None
+        out.append({"file": key[0], "id": key[1], "status": status if isinstance(status, str) else None})
+    return out
+
+
 DECISION_SCHEMA = "kg-ssot.decision/1"
 REVISIT_SCHEMA = "kg-ssot.revisit/2"  # /2 desde a 4.40.0: o motivo pin-changed amplia o enum
 HISTORY = {"refuted", "superseded"}  # a história: o nó fica, mas não é mais a SSOT viva
@@ -569,7 +639,7 @@ def _due(node, as_of):
         return None
     try:
         when = kg_validate.add_duration(stamp, every)
-    except OverflowError:
+    except (OverflowError, ValueError):  # os mesmos do due_report: vence depois do ano 9999, não vence na data pedida
         return None
     return when if when <= as_of else None
 
@@ -660,6 +730,10 @@ def revisit(corpus, as_of, where=()):
     como apoio); o não resolvido traz o motivo (_unresolved_reason); e upstream_changed lista, à parte e sem virar
     motivo, a decisão local cujo apoio externo tem outro status (ou sumiu) na ponta do clone."""
     conds = parse_where(where)
+    # o kg-ssot.revisit/2 não tem hint: o zero de um tipo com erro de grafia sairia calado, e por isso é recusa
+    for field, edge_type in _unknown_degree_types(corpus, [".".join(c[0]) for c in conds]):
+        raise ValueError(_("--where {field}: the edge type {type} does not exist in the internal edges of the corpus, and "
+                           "--revisit has no way to warn").format(field=field, type=edge_type))
     items, on_event, unstamped, unresolved, upstream = [], [], [], [], []
     pins = _pin_failures(corpus)  # desde a 4.40.0: a versão fixada que mudou (pin-changed)
     problems = _pin_problems(corpus)  # e a fixação que não se confere, que vai para unresolved
@@ -667,7 +741,7 @@ def revisit(corpus, as_of, where=()):
         node = corpus.nodes[key]
         if node.get("node_type") != "decision" or node.get("status") in HISTORY or key[0] in corpus.external:
             continue
-        if conds and not where_matches(node, conds):  # desde a 4.39.0: a fila de um dono (--where owner=X)
+        if conds and not where_matches(node, conds, corpus, key):  # desde a 4.39.0: a fila de um dono (--where owner=X)
             continue
         reasons, seen = [], set()
 
@@ -932,6 +1006,26 @@ def chain_human(res):
     return "\n".join(lines)
 
 
+def chains_human(res):
+    lines = []
+    for item in res["chains"]:
+        lines.append(f"== {item['ref']}")
+        if item["chain"] is None:
+            lines.append("  " + item["error"])
+            continue
+        lines.append(chain_human(item["chain"]))
+        for o in item["origins"]:
+            lines.append(_("  status of the origin {id}: {status}").format(id=o["id"], status=o["status"] or "-"))
+    for u in res["unreadable"][:5]:
+        lines.append(_("UNREADABLE  {file}: {code}").format(file=u["file"], code=u["code"]))
+    if len(res["unreadable"]) > 5:
+        lines.append(_("UNREADABLE  and {n} more graph(s) (--format json shows the full list)")
+                     .format(n=len(res["unreadable"]) - 5))
+    done = sum(1 for i in res["chains"] if i["outcome"] == "ok")
+    lines.append(_("· {done} of {n} chain(s) projected").format(done=done, n=res["requested"]))
+    return "\n".join(lines)
+
+
 def fold(text):
     """A forma de comparar texto: NFKD sem as marcas de acento, minúsculas pelo casefold, espaço repetido em um.
     «verificação» e «VERIFICACAO» dobram para o mesmo texto (desde a 4.23)."""
@@ -986,11 +1080,42 @@ def _text(node, key):
 
 
 WHERE_MAX = 10
+WHOLE_NUMBER = re.compile(r"0|[1-9][0-9]*")
+NOT_OPERATORS = tuple("^*$!<>~|")  # o que sobra no fim da chave depois do operador é um operador que não existe
+
+
+def _degree_path(path):
+    """O caminho é o grau derivado: degree.in, degree.out ou degree.total, com o tipo de aresta opcional depois."""
+    return path[0] == "degree" and len(path) in (2, 3) and path[1] in DEGREE_SIDES and all(path)
+
+
+def _split_condition(item):
+    """(chave, operador, valor) de CHAVE=VALOR, CHAVE^=VALOR (começa com) ou CHAVE*=VALOR (contém), 4.43.0. A chave vai até
+    o primeiro =, e o operador é o último caractere dela; depois do =, o valor é literal e fica em NFC. Sobrar ^ * $ ! < > ~
+    ou | no fim da chave é um operador que não existe (x_n!=12), e daria 0 em silêncio: ValueError. Nenhuma chave real termina
+    assim: em 252.109 chaves nos três corpora, medidos em 2026-11-04, só o << de um caso de conformidade que reprova."""
+    key, _sep, value = item.partition("=")
+    op = key[-1] if key.endswith(("^", "*")) else ""
+    key = key[:-1] if op else key
+    if key.endswith(NOT_OPERATORS):
+        raise ValueError(_("--where {item}: {char} is not an operator: write KEY=VALUE, KEY^=VALUE or KEY*=VALUE")
+                         .format(item=repr(item), char=key[-1]))
+    return key, op, unicodedata.normalize("NFC", value)
+
+
+def _text_hit(value, op, wanted):
+    """O valor casa o operador de texto? Só texto casa, como o STARTS WITH e o CONTAINS do Cypher: o null, o número e o
+    booleano não, e a comparação distingue maiúsculas, em NFC."""
+    if not isinstance(value, str):
+        return False
+    value = unicodedata.normalize("NFC", value)
+    return value.startswith(wanted) if op == "^" else wanted in value
 
 
 def parse_where(items):
-    """As condições do --where (4.39.0): cada CHAVE=VALOR vira (caminho, valor). A chave é owner, um campo x_* ou um
-    caminho com ponto num x_* (x_raci.responsible); as condições se somam. ValueError: condição quebrada."""
+    """As condições do --where (4.39.0): cada condição vira (caminho, operador, valor), com o operador de
+    _split_condition. A chave é owner, um campo x_* ou um caminho com ponto num x_* (x_raci.responsible), provenance.<chave>
+    ou o grau derivado (degree.in.SUPPORTS, só com = e um inteiro); as condições se somam. ValueError: condição quebrada."""
     items = [items] if isinstance(items, str) else list(items or ())  # um texto solto é uma condição só
     if len(items) > WHERE_MAX:
         raise ValueError(_("--where takes at most {max} conditions").format(max=WHERE_MAX))
@@ -998,15 +1123,56 @@ def parse_where(items):
     for item in items:
         if not isinstance(item, str) or "=" not in item:
             raise ValueError(_("--where {item}: write KEY=VALUE").format(item=repr(item)))
-        key, _sep, value = item.partition("=")
+        key, op, value = _split_condition(item)
         path = tuple(key.split("."))
         if not key or any(not part for part in path):
             raise ValueError(_("--where {item}: the key is empty or has an empty part").format(item=repr(item)))
-        if not (path == ("owner",) or path[0].startswith("x_") or (path[0] == "provenance" and len(path) > 1)):
-            raise ValueError(_("--where {item}: the key is owner, an x_* field (x_raci.responsible) or "
-                               "provenance.<key>").format(item=repr(item)))
-        conds.append((path, unicodedata.normalize("NFC", value)))
+        if not (path == ("owner",) or path[0].startswith("x_") or (path[0] == "provenance" and len(path) > 1)
+                or _degree_path(path)):
+            raise ValueError(_("--where {item}: the key is owner, an x_* field (x_raci.responsible), provenance.<key> or "
+                               "degree.in, degree.out or degree.total, with an optional edge type").format(item=repr(item)))
+        if _degree_path(path) and (op or not WHOLE_NUMBER.fullmatch(value)):
+            raise ValueError(_("--where {item}: the degree is a count: use = and a whole number (degree.in.SUPPORTS=0)")
+                             .format(item=repr(item)))
+        conds.append((path, op, value))
     return conds
+
+
+def parse_presence(items, flag):
+    """Os campos do --has e do --missing (4.43.0), como caminhos. Valem para qualquer campo do nó, menos os que começam em
+    degree: o grau é derivado e não está no nó, e nenhum grafo dos três corpora tem esse campo (medido em 2026-11-04).
+    ValueError: campo quebrado."""
+    items = [items] if isinstance(items, str) else list(items or ())
+    if len(items) > WHERE_MAX:
+        raise ValueError(_("{flag} takes at most {max} fields").format(flag=flag, max=WHERE_MAX))
+    out = []
+    for item in dict.fromkeys(items):
+        path = tuple(item.split(".")) if isinstance(item, str) else ()
+        if not path or any(not part for part in path):
+            raise ValueError(_("{flag} {item}: the field is empty or has an empty part").format(flag=flag, item=repr(item)))
+        if path[0] == "degree":
+            raise ValueError(_("{flag} {item}: the degree is derived, not a field of the node: use --where "
+                               "degree.in=0").format(flag=flag, item=repr(item)))
+        out.append(path)
+    return out
+
+
+def check_due(due, as_of, sort, semantic):
+    """A data do --due, ou None sem ele. ValueError: --as-of sem --due, data quebrada, ou outra ordem pedida junto. É
+    daqui que a linha de comando e o servidor MCP tiram a mesma recusa, antes de carregar o que o --semantic pede."""
+    if not due:
+        if as_of is not None:
+            raise ValueError(_("--as-of goes with --revisit or --due"))
+        return None
+    if sort != "corpus" or semantic is not None:
+        raise ValueError(_("--due orders from the most overdue: it does not combine with --sort impact or attention, or "
+                           "with --semantic"))
+    if as_of is None:
+        return datetime.date.today()
+    day = kg_validate.iso_date(as_of)
+    if day is None:
+        raise ValueError(_("--as-of {value}: the date must be YYYY-MM-DD").format(value=repr(as_of)))
+    return day
 
 
 def _scalar_text(value):
@@ -1023,7 +1189,7 @@ def _scalar_text(value):
 
 
 GROUP_BY_MAX = 5
-GROUP_FIELDS = ("file", "node_type", "status", "plane", "layer", "owner")
+GROUP_FIELDS = ("file", "node_type", "status", "plane", "layer", "owner", "label", "narrative")
 GROUPS_VERSION = "kg-ssot.groups/2"
 EDGES_VERSION = "kg-ssot.edges/1"
 EDGE_TOP = ("edge_type", "scope", "file")
@@ -1031,9 +1197,9 @@ END_FIELDS = ("id", "file", "found", "node_type", "status", "plane", "layer", "o
 
 
 def _node_path_ok(path):
-    """O caminho é um campo de nó que se agrupa: um dos GROUP_FIELDS, um x_* ou provenance.<chave>."""
+    """O caminho é um campo de nó que se agrupa: um dos GROUP_FIELDS, um x_*, provenance.<chave> ou o grau derivado."""
     return ((len(path) == 1 and path[0] in GROUP_FIELDS) or path[0].startswith("x_")
-            or (path[0] == "provenance" and len(path) > 1))
+            or (path[0] == "provenance" and len(path) > 1) or _degree_path(path))
 
 
 def _edge_path_ok(path):
@@ -1052,8 +1218,9 @@ def _edge_path_ok(path):
 
 def parse_group_by(items, flag="--group-by", edges=False):
     """Os campos do --group-by (4.41.0) e do --count-distinct (4.42.0). Nos nós: file, node_type, status, plane, layer,
-    owner, um x_* (com ponto para a chave aninhada, como no --where), provenance.<chave> ou meta.<chave> (o meta do
-    grafo do nó). Nas arestas (--edges): os de _edge_path_ok. ValueError: campo fora disso."""
+    owner, label, narrative (o texto inteiro), um x_* (com ponto para a chave aninhada, como no --where),
+    provenance.<chave>, meta.<chave> (o meta do grafo do nó) ou o grau derivado (degree.in, degree.out, degree.total, com
+    o tipo opcional). Nas arestas (--edges): os de _edge_path_ok. ValueError: campo fora disso."""
     items = [items] if isinstance(items, str) else list(items or ())
     if len(items) > GROUP_BY_MAX:
         raise ValueError(_("{flag} takes at most {max} fields").format(flag=flag, max=GROUP_BY_MAX))
@@ -1066,8 +1233,9 @@ def parse_group_by(items, flag="--group-by", edges=False):
             raise ValueError((_("{flag} {item}: the edge field is edge_type, scope, file, meta.<key>, or from.<field> "
                                 "and to.<field> (id, file, found, node_type, status, plane, layer, owner, an x_* field "
                                 "or provenance.<key>)") if edges else
-                              _("{flag} {item}: the field is file, node_type, status, plane, layer, owner, an x_* "
-                                "field (x_raci.responsible), provenance.<key> or meta.<key>")).format(
+                              _("{flag} {item}: the field is file, node_type, status, plane, layer, owner, label, "
+                                "narrative, an x_* field (x_raci.responsible), provenance.<key>, meta.<key>, or "
+                                "degree.in, degree.out or degree.total, with an optional edge type")).format(
                 flag=flag, item=repr(item)))
         if item in out:
             raise ValueError(_("{flag} {item}: the field is repeated").format(flag=flag, item=repr(item)))
@@ -1091,6 +1259,8 @@ def group_value(corpus, key, field):
     path = field.split(".")
     if path[0] == "meta":
         return _group_norm(_walk(corpus.metas.get(key[0]), path[1:]))
+    if _degree_path(path):
+        return corpus.internal_degree(key, path[1], path[2] if len(path) == 3 else None)
     return _group_norm(_walk(corpus.nodes[key], path))
 
 
@@ -1163,17 +1333,21 @@ def group_counts(corpus, hits, fields, distinct=(), min_count=None):
     return aggregate(hits, lambda k, f: group_value(corpus, k, f), fields, distinct, min_count)
 
 
-def where_matches(node, conds):
-    """O nó casa todas as condições? A chave que falta não casa; um escalar casa por igualdade de texto, e uma lista,
-    quando algum escalar dela casa."""
-    for path, value in conds:
+def where_matches(node, conds, corpus=None, key=None):
+    """O nó casa todas as condições? A chave que falta não casa; um escalar casa por igualdade de texto ou pelo operador,
+    e uma lista, quando algum escalar dela casa. O grau derivado se lê do corpus, pela chave do nó."""
+    for path, op, value in conds:
+        if _degree_path(path):
+            if str(corpus.internal_degree(key, path[1], path[2] if len(path) == 3 else None)) != value:
+                return False
+            continue
         cur = node
         for part in path:
             if not isinstance(cur, dict) or part not in cur:
                 return False
             cur = cur[part]
         found = [cur] if not isinstance(cur, list) else cur
-        if not any(_scalar_text(v) == value for v in found):
+        if not any(_text_hit(v, op, value) if op else _scalar_text(v) == value for v in found):
             return False
     return True
 
@@ -1199,9 +1373,45 @@ def matches(node, key, f):
         day = kg_validate.iso_date(node.get("verified_at")) if isinstance(node.get("verified_at"), str) else None
         if day is not None and day >= f["verified_before"]:
             return False
-    if f.get("where") and not where_matches(node, f["where"]):
+    if f.get("where") and not where_matches(node, f["where"], f.get("corpus"), key):
+        return False
+    if any(_walk(node, path) is None for path in f.get("has", ())):  # o que falta e o null são o mesmo: faltam
+        return False
+    if any(_walk(node, path) is not None for path in f.get("missing", ())):
+        return False
+    if f.get("due") is not None and _due(node, f["due"]) is None:
         return False
     return True
+
+
+def _unknown_degree_types(corpus, fields):
+    """Os (campo, tipo) de degree.<lado>.<tipo> cujo tipo nenhuma aresta interna do corpus tem."""
+    known = {e["edge_type"] for e in corpus.edges if e["scope"] == "internal"}
+    out = []
+    for field in dict.fromkeys(fields):
+        path = field.split(".")
+        if _degree_path(path) and len(path) == 3 and path[2] not in known:
+            out.append((field, path[2]))
+    return out
+
+
+def _degree_hint(corpus, fields):
+    """O aviso do tipo de aresta que nenhuma aresta interna tem: degree.in.TIPO dá 0, e o zero de um erro de grafia não
+    pode passar por "não há"."""
+    notes = [_("{field}: the edge type {type} does not exist in the internal edges of the corpus, so it counts 0")
+            .format(field=field, type=edge_type) for field, edge_type in _unknown_degree_types(corpus, fields)]
+    if any(field == "degree" or field.startswith("degree.") for field in fields):  # achado da curadoria: 0 não é "não há"
+        notes.append(_("the degree counts only the internal edges of each node's own graph; an edge from another graph "
+                       "does not count: see --edges --where scope=external"))
+    return notes
+
+
+def _presence_hint(corpus, flag, paths):
+    """O aviso do caminho do --has ou do --missing que nenhum nó do corpus tem com valor: o --has daria 0 e o --missing, o
+    corpus inteiro, e o erro de digitação não pode passar por resposta."""
+    return [_("{flag} {field}: no node of the corpus has this field with a value; check the spelling")
+            .format(flag=flag, field=".".join(path)) for path in paths
+            if all(_walk(corpus.nodes[k], path) is None for k in corpus.order)]
 
 
 def _end_view(corpus, key, ref):
@@ -1246,13 +1456,17 @@ def project(corpus, key, narrative=False, fields=()):
 def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=None, layer=None, file=None, text=None,
           in_narrative=False, open_only=False, verified_before=None, around=None, depth=1, edge_types=(),
           direction="both", sort="corpus", limit=50, cursor=None, narrative=False, fields=(), max_bytes=None,
-          semantic=None, ranker=None, where=(), group_by=(), count_distinct=(), min_count=None):
-    """A consulta inteira, no formato kg-ssot.query/1. ValueError: pedido quebrado. max_bytes: o teto da página em bytes
+          semantic=None, ranker=None, where=(), group_by=(), count_distinct=(), min_count=None, due=False, as_of=None,
+          has=(), missing=()):
+    """A consulta inteira, no formato kg-ssot.query/1, ou /2 com due. ValueError: pedido quebrado. max_bytes: o teto da página em bytes
     de JSON (o servidor MCP passa o dele); a página corta antes do limit quando o passa, sempre com ao menos um nó, e o
     next_cursor continua de onde ela parou.
     semantic (desde a 4.26): a pergunta que o ranker (kg_vector.Ranker) ordena por semelhança, sobre os nós que passam
     nos outros filtros. Sozinho, a ordem é a do vetor; com text, a lista do texto (na ordem do corpus) e a do vetor se
-    fundem por RRF (k=60), com o empate pela posição no vetor. As duas listas são completas, e o limit só pagina."""
+    fundem por RRF (k=60), com o empate pela posição no vetor. As duas listas são completas, e o limit só pagina.
+    due (desde a 4.43.0): só os nós com verified_at + reverify_every vencidos até as_of (o padrão é hoje), do mais atrasado
+    para o menos, com due_on e days_late; a conta é a do kg_validate --due. has e missing: os campos que o nó tem de ter
+    ou não ter, e o null conta como faltar."""
     if not 1 <= limit <= MAX_LIMIT:
         raise ValueError(_("--limit must be between 1 and {max}").format(max=MAX_LIMIT))
     group_by = parse_group_by(group_by)
@@ -1273,7 +1487,13 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         offset = int(cursor)
     f = {"ids": set(ids), "id_prefix": id_prefix, "node_type": node_type, "status": "open" if open_only else status,
          "plane": plane, "layer": layer, "file": file, "text": text, "in_narrative": in_narrative,
-         "verified_before": verified_before, "where": parse_where(where)}
+         "verified_before": verified_before, "where": parse_where(where), "corpus": corpus,
+         "has": parse_presence(has, "--has"), "missing": parse_presence(missing, "--missing"),
+         "due": check_due(due, as_of, sort, semantic)}
+    both = [".".join(path) for path in f["has"] if path in f["missing"]]
+    if both:
+        raise ValueError(_("--has and --missing ask for opposite things about {fields}: no node has and lacks a field")
+                         .format(fields=", ".join(both)))
     expanded = term_forms(corpus, text) if text else []
     f["forms"] = [_word(form) for form in dict.fromkeys(form for t in expanded for form in t["forms"])]
     f["notations"] = [_word(n) for n in dict.fromkeys(t["notation"] for t in expanded if t["notation"])]
@@ -1318,6 +1538,8 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
             v = corpus.nodes[k].get("impact")
             return v if isinstance(v, (int, float)) and not isinstance(v, bool) else float("-inf")
         hits.sort(key=lambda k: (-impact(k), rank[k]))
+    elif f["due"] is not None:  # a ordem é estável: na mesma data, a do corpus
+        hits.sort(key=lambda k: _due(corpus.nodes[k], f["due"]))
     elif sort == "attention":
         att = {k: attention(corpus, k) for k in hits}
         hits = by_attention(hits, {k: attention(corpus, k, raw=True) for k in hits})
@@ -1328,6 +1550,9 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
             node["attention"] = att[k]
         if sem is not None:
             node["rank"] = ranks[k]
+        if f["due"] is not None:
+            when = _due(corpus.nodes[k], f["due"])
+            node["due_on"], node["days_late"] = when.isoformat(), (f["due"] - when).days
         size += len(json.dumps(node, ensure_ascii=False))
         if page and max_bytes is not None and size > max_bytes:
             break
@@ -1344,6 +1569,12 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         request["semantic"] = semantic
     if where:
         request["where"] = list(where)
+    if f["has"]:
+        request["has"] = [".".join(path) for path in f["has"]]
+    if f["missing"]:
+        request["missing"] = [".".join(path) for path in f["missing"]]
+    if f["due"] is not None:
+        request["due"], request["as_of"] = True, f["due"].isoformat()
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
     if grouped is not None:
         request["group_by"] = list(group_by)
@@ -1352,7 +1583,7 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
         if min_count is not None:
             request["min_count"] = min_count
         hits = hits_for_page
-    res = {"schema_version": SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
+    res = {"schema_version": DUE_VERSION if f["due"] is not None else SCHEMA_VERSION, "root": corpus.root, "query": request, "graphs": len(corpus.files),
            "unreadable": unreadable, "total": len(hits), "next_cursor": str(nxt) if nxt is not None else None,
            "nodes": page}
     if sem is not None:
@@ -1372,6 +1603,17 @@ def query(corpus, *, ids=(), id_prefix=None, node_type=None, status=None, plane=
                                  "term of the vocabulary (kg_vocab.py lookup)"))
             if sem is not None:
                 res["hint"] += _("; the order comes from --semantic alone")
+    notes = _degree_hint(corpus, [".".join(c[0]) for c in f["where"]] + list(group_by) + list(count_distinct))
+    notes += _presence_hint(corpus, "--has", f["has"]) + _presence_hint(corpus, "--missing", f["missing"])
+    if f["due"] is not None:
+        rest = dict(f, due=None)
+        never = sum(1 for k in keys if kg_validate.parse_duration(corpus.nodes[k].get("reverify_every"))
+                    and kg_validate._as_date(corpus.nodes[k].get("verified_at")) is None and matches(corpus.nodes[k], k, rest))
+        if never:
+            notes.append(_("{n} node(s) have reverify_every without a readable verified_at, so they never come due: "
+                           "kg_validate --due lists them").format(n=never))
+    if notes:
+        res["hint"] = "; ".join(([res["hint"]] if res.get("hint") else []) + notes)
     if grouped is not None:
         out = {"schema_version": GROUPS_VERSION, "root": res["root"], "query": request, "graphs": res["graphs"],
                "unreadable": unreadable, "subject": "nodes", "counted": _counted(count_distinct),
@@ -1397,7 +1639,8 @@ def _check_counting(group_by, count_distinct, min_count, edges):
 
 
 def parse_edge_where(items):
-    """As condições do --where com --edges: CAMPO=VALOR, com os campos de aresta de _edge_path_ok."""
+    """As condições do --where com --edges: (campo, operador, valor), com os campos de aresta de _edge_path_ok e os
+    operadores de _split_condition."""
     items = [items] if isinstance(items, str) else list(items or ())
     if len(items) > WHERE_MAX:
         raise ValueError(_("--where takes at most {max} conditions").format(max=WHERE_MAX))
@@ -1405,19 +1648,21 @@ def parse_edge_where(items):
     for item in items:
         if not isinstance(item, str) or "=" not in item:
             raise ValueError(_("--where {item}: write KEY=VALUE").format(item=repr(item)))
-        key, _sep, value = item.partition("=")
+        key, op, value = _split_condition(item)
         parse_group_by([key], "--where", edges=True)
-        conds.append((key, unicodedata.normalize("NFC", value)))
+        conds.append((key, op, value))
     return conds
 
 
 def edge_matches(corpus, edge, conds):
     """A aresta casa todas as condições? Como no --where de nós: o escalar casa pelo texto, a lista quando algum item
-    casa, e o que falta (null) só casa com o texto null."""
-    for key, value in conds:
-        cur = _plain(edge_raw(corpus, edge, key))
+    casa, e o que falta (null) só casa com o texto null. O operador lê o valor antes do _plain, que daria ao .nan a forma
+    de um texto, e o null não casa com ele."""
+    for key, op, value in conds:
+        raw = edge_raw(corpus, edge, key)
+        cur = raw if op else _plain(raw)
         found = cur if isinstance(cur, list) else [cur]
-        if not any(_scalar_text(v) == value for v in found):
+        if not any(_text_hit(v, op, value) if op else _scalar_text(v) == value for v in found):
             return False
     return True
 
@@ -1447,7 +1692,8 @@ def edge_query(corpus, *, where=(), file=None, group_by=(), count_distinct=(), m
             raise ValueError(_("--cursor {cursor} is invalid: use the next_cursor of a previous query").format(cursor=repr(cursor)))
         offset = int(cursor)
     hits = [e for e in corpus.edges if (not file or file in e["file"]) and edge_matches(corpus, e, conds)]
-    request = {"edges": True, "file": file, "where": [f"{k}={v}" for k, v in conds], "limit": limit, "cursor": cursor}
+    request = {"edges": True, "file": file, "where": [f"{k}{op}={v}" for k, op, v in conds], "limit": limit,
+               "cursor": cursor}
     unreadable = [u for u in corpus.unreadable if not file or file in u["file"]]
     base = {"root": corpus.root, "query": request, "graphs": len(corpus.files), "unreadable": unreadable}
     if group_by:
@@ -1509,6 +1755,18 @@ def _group_text(v):
     return v
 
 
+def _narrowed(request):
+    """As linhas que dizem o recorte do --has, do --missing e do --due, para o total não passar pelo do corpus inteiro."""
+    lines = []
+    if request.get("has"):
+        lines.append(_("· only the nodes that have {fields}").format(fields=", ".join(request["has"])))
+    if request.get("missing"):
+        lines.append(_("· only the nodes that lack {fields}").format(fields=", ".join(request["missing"])))
+    if request.get("due"):
+        lines.append(_("· only the nodes due by {as_of}, the most overdue first").format(as_of=request["as_of"]))
+    return lines
+
+
 def groups_human(res):
     lines = []
     for g in res["groups"]:
@@ -1525,6 +1783,7 @@ def groups_human(res):
     if res["query"].get("where"):
         lines.append((_("· only the edges where {where}") if edges else _("· only the nodes where {where}")).format(
             where=" and ".join(res["query"]["where"])))
+    lines.extend(_narrowed(res["query"]))
     if res["counted"] != "rows":
         lines.append(_("· the count is of distinct {fields}").format(fields=", ".join(res["counted"].split(":", 1)[1].split(","))))
     if res["query"].get("min_count") is not None:
@@ -1544,7 +1803,9 @@ def human(res):
         r = n.get("rank")
         pos = "" if r is None else (f"  [text={r['text'] if r['text'] is not None else '-'} vector={r['vector']}]"
                                     if res["semantic"]["mode"] == "hybrid" else f"  [vector={r['vector']}]")
-        lines.append(f"{n['file']}  {n['id']}  {tag}{imp}{pos}  {label[:160]}")
+        late = "" if "due_on" not in n else "  " + _("[due {due_on}, {days} day(s) late]").format(
+            due_on=n["due_on"], days=n["days_late"])
+        lines.append(f"{n['file']}  {n['id']}  {tag}{imp}{pos}{late}  {label[:160]}")
         for e in n["out"]:
             t = e["to"]
             where = "" if t["file"] == n["file"] else f"{t['file']}#"
@@ -1574,6 +1835,7 @@ def human(res):
                          model=s["model"]["id"], indexed=s["index"]["nodes"], now=s["index"]["embedded_now"]))
     if res["query"].get("where"):
         lines.append(_("· only the nodes where {where}").format(where=" and ".join(res["query"]["where"])))
+    lines.extend(_narrowed(res["query"]))
     shown = len(res["nodes"])
     first = int(res["query"]["cursor"] or 0)
     tail = _("; next page: --cursor {cursor}").format(cursor=res["next_cursor"]) if res["next_cursor"] else ""
@@ -1584,8 +1846,9 @@ def human(res):
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=_("Query a corpus of .kg.yaml and .kg.json graphs and project the nodes "
-                                               "for reading (release 4.17)."))
+    ap = argparse.ArgumentParser(description=_("Query a corpus of .kg.yaml and .kg.json graphs without judging them: list "
+                                               "and filter nodes or edges, count them by group, walk the neighborhood, "
+                                               "follow transmission chains and decisions, and find what is due."))
     ap.add_argument("files", nargs="*", help=_(".kg.yaml or .kg.json files (or --root)"))
     ap.add_argument("--root", help=_("the corpus root: the graphs git tracks under it"))
     ap.add_argument("--id", action="append", default=[], dest="ids", help=_("exact id (repeatable)"))
@@ -1600,32 +1863,47 @@ def main(argv=None):
     ap.add_argument("--open", action="store_true", dest="open_only", help=_("the queue of open nodes (status open)"))
     ap.add_argument("--verified-before", metavar=_("YYYY-MM-DD"), help=_("without verified_at, or verified before the date"))
     ap.add_argument("--around", metavar="ID", help=_("the neighborhood of the node (<path>#<id>, or an id unique in the corpus)"))
-    ap.add_argument("--chain", metavar="ID",
+    ap.add_argument("--chain", metavar="ID", action="append",
                     help=_("the transmission chain from the node back to its origin: the weakest link and the origin's "
-                           "strength, as separate axes, with a strict and a lenient grade"))
+                           "strength, as separate axes, with a strict and a lenient grade; repeatable, up to 50 ids: "
+                           "more than one prints kg-ssot.chains/1, one chain per id, with the status of the origin"))
     ap.add_argument("--decision", metavar="ID",
                     help=_("the history of a decision: what it replaced, what replaced it, what refutes it and what it "
                            "rests on, with the status of each"))
     ap.add_argument("--revisit", action="store_true",
                     help=_("the live decisions to revisit, by attention: the version they were pinned to changed, what "
                            "they rest on is due, they are due themselves, or they are contested"))
-    ap.add_argument("--as-of", metavar=_("YYYY-MM-DD"), help=_("with --revisit, the date that counts as today"))
+    ap.add_argument("--due", action="store_true",
+                    help=_("the nodes of any type whose verified_at plus reverify_every is due by --as-of (default: "
+                           "today), the most overdue first, each with due_on and days_late; the sum is that of "
+                           "kg_validate --due, which also reports the profiles (x_term, x_mirror, x_doc_cycle)"))
+    ap.add_argument("--as-of", metavar=_("YYYY-MM-DD"), help=_("with --revisit or --due, the date that counts as today"))
     ap.add_argument("--with", action="append", default=[], dest="withs", metavar=_("PREFIX=FOLDER"),
                     help=_("with --chain, --decision or --revisit, read the graph of another repository that a "
                            "provenance.source URL names, at the commit of the URL: the URL prefix before the commit, and "
                            "the local folder of that repository (repeatable)"))
     ap.add_argument("--where", action="append", default=[], metavar=_("KEY=VALUE"),
-                    help=_("only the nodes where the key has the value (repeatable, all of them): owner or an x_* "
-                           "field, with a dot for a nested key (x_raci.responsible); with --revisit, its decisions"))
+                    help=_("only the nodes where the key has the value (repeatable, all of them): owner, an x_* field, "
+                           "with a dot for a nested key (x_raci.responsible), provenance.<key>, or the degree derived "
+                           "from the internal edges of its own graph (degree.in, degree.out, degree.total, "
+                           "degree.in.SUPPORTS=0 for no internal edge of a type); KEY^=VALUE starts with and KEY*=VALUE contains, case-sensitive, text only; "
+                           "with --revisit, its decisions"))
+    ap.add_argument("--has", action="append", default=[], metavar=_("FIELD"),
+                    help=_("only the nodes that have the field, any field, with a dot for a nested key (repeatable, up "
+                           "to 10); null counts as lacking it, and empty text and 0 count as having it"))
+    ap.add_argument("--missing", action="append", default=[], metavar=_("FIELD"),
+                    help=_("only the nodes that lack the field, or have it as null (repeatable, up to 10)"))
     ap.add_argument("--group-by", action="append", default=[], metavar=_("FIELD"),
                     help=_("count the nodes the filters find, by the value of the field (repeatable, up to 5): file, "
-                           "node_type, status, plane, layer, owner, an x_* field (with a dot for a nested key) or "
-                           "meta.<key> of the node's graph, or provenance.<key>; prints kg-ssot.groups/2, every group, without pages"))
+                           "node_type, status, plane, layer, owner, label, narrative, an x_* field (with a dot for a "
+                           "nested key), meta.<key> of the node's graph, provenance.<key>, or the degree (degree.in, "
+                           "degree.out, degree.total, with an optional edge type); prints kg-ssot.groups/2, every group, "
+                           "without pages"))
     ap.add_argument("--edges", action="store_true",
                     help=_("count and list edges instead of nodes (internal and external): --where and --group-by take "
                            "edge_type, scope, file, meta.<key>, and from.<field> and to.<field> (id, file, found, "
-                           "node_type, status, plane, layer, owner, an x_* field or provenance.<key>); without "
-                           "--group-by, prints kg-ssot.edges/1"))
+                           "node_type, status, plane, layer, owner, an x_* field or provenance.<key>), also with ^= "
+                           "and *=; without --group-by, prints kg-ssot.edges/1"))
     ap.add_argument("--count-distinct", action="append", default=[], metavar=_("FIELD"),
                     help=_("with --group-by, count the distinct values of the field in each group instead of the rows "
                            "(repeatable: the distinct combinations); null does not count"))
@@ -1656,6 +1934,8 @@ def main(argv=None):
     def broken(msg):
         print(_("BROKEN INPUT  {error}").format(error=msg), file=sys.stderr)
         return 2
+    if args.due and args.files and any(kg_validate.iso_date(f) for f in args.files):  # --due 2026-11-30: a data viraria arquivo
+        return broken(_("--due takes no date: give the date with --as-of YYYY-MM-DD"))
     if bool(args.root) == bool(args.files):
         return broken(_("give either --root or the files"))
     before = None
@@ -1672,6 +1952,8 @@ def main(argv=None):
                                            ("--decision", args.decision), ("--revisit", args.revisit),
                                            ("--semantic", args.semantic), ("--fields", args.fields),
                                            ("--narrative", args.narrative), ("--sort", args.sort != "corpus"),
+                                           ("--has", args.has), ("--missing", args.missing), ("--due", args.due),
+                                           ("--as-of", args.as_of),
                                            ("--edge-type", args.edge_types), ("--with", args.withs),
                                            ("--depth", args.depth != 1), ("--direction", args.direction != "both"),
                                            ("--model", args.model), ("--model-dir", args.model_dir))
@@ -1695,6 +1977,13 @@ def main(argv=None):
     if args.group_by and (args.semantic is not None or args.cursor is not None):
         return broken(_("--group-by counts every node the filters find: it does not combine with --semantic or "
                         "--cursor"))
+    if (args.due or args.has or args.missing) and (args.decision is not None or args.chain is not None or args.revisit):
+        return broken(_("--due, --has and --missing filter the node queries, not --decision, --chain or --revisit"))
+    if not args.revisit:  # o --as-of do --revisit é conferido adiante, como sempre
+        try:
+            check_due(args.due, args.as_of, args.sort, args.semantic)
+        except ValueError as exc:
+            return broken(exc)
     ranker = None
     if args.semantic is not None:
         if not args.semantic.strip():  # o pedido quebrado é rc 2 antes de olhar o extra
@@ -1714,8 +2003,6 @@ def main(argv=None):
         return broken(_("--model and --model-dir go with --semantic"))
     if args.withs and args.chain is None and args.decision is None and not args.revisit:
         return broken(_("--with goes with --chain, --decision or --revisit"))
-    if args.as_of is not None and not args.revisit:
-        return broken(_("--as-of goes with --revisit"))
     if args.group_by and (args.decision is not None or args.chain is not None or args.revisit):
         return broken(_("--group-by counts the node queries, not --decision, --chain or --revisit"))
     if args.where and (args.decision is not None or args.chain is not None):
@@ -1749,10 +2036,11 @@ def main(argv=None):
         try:
             corpus = load(args.root, args.files, args.exclude, not args.no_default_excludes)
             corpus.withs = [with_spec(w) for w in args.withs]
-            res = chain(corpus, args.chain, args.edge_types)
+            res = chain_request(corpus, args.chain, args.edge_types)
         except (OSError, ValueError, UnicodeDecodeError) as exc:
             return broken(exc)
-        text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else chain_human(res)
+        text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else \
+            (chains_human(res) if res["schema_version"] == CHAINS_SCHEMA else chain_human(res))
         print(text.encode("utf-8", "backslashreplace").decode("utf-8"))
         return 0
     try:
@@ -1763,7 +2051,8 @@ def main(argv=None):
                     edge_types=args.edge_types, direction=args.direction, sort=args.sort, limit=args.limit,
                     cursor=args.cursor, narrative=args.narrative, fields=args.fields, semantic=args.semantic,
                     ranker=ranker, where=args.where, group_by=args.group_by,
-                    count_distinct=args.count_distinct, min_count=args.min_count)
+                    count_distinct=args.count_distinct, min_count=args.min_count, due=args.due, as_of=args.as_of,
+                    has=args.has, missing=args.missing)
     except (OSError, ValueError, UnicodeDecodeError) as exc:
         return broken(exc)
     text = json.dumps(res, ensure_ascii=False, indent=1) if args.format == "json" else \

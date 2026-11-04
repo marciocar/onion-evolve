@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:7ccba4ca7f335477 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:7c1f0d0a5a0f5d04 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -519,7 +519,7 @@ produto não depende dele, e ele não depende de nenhum cliente específico.
 | `kg_get` | Lê um grafo, ou uma versão anterior com `ref` |
 | `kg_list` | Lista os grafos do armazém |
 | `kg_history` | As operações de um grafo, da mais nova para a mais antiga |
-| `kg_query` | A consulta e a projeção do `kg_query.py` sobre o armazém: filtros, a fila dos abertos, a vizinhança e `fields`, paginada por cursor |
+| `kg_query` | A consulta e a projeção do `kg_query.py` sobre o armazém: filtros, a fila dos abertos, a vizinhança e `fields`, paginada por cursor; desde a 4.43.0, também `due`, `as_of`, `has`, `missing` e `chain` |
 | `kg_terms` | Desde a 4.19.0: resolve um termo de domínio pelo nome preferido ou por um sinônimo (o perfil `x_term`), com a fonte, a versão e a data de conferência de cada sinônimo e o termo que substitui um termo substituído; sem `text`, lista os termos |
 | `kg_schema_help` | O contrato vigente, para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
 
@@ -758,16 +758,17 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem maiúscula nem acento (`verificacao` casa `Verificação`, desde a 4.23); `--in-narrative` procura também na narrative. Quando o texto inteiro é um termo do vocabulário (o `pref` ou um sinônimo de domínio atual, dobrados, ou a `notation`, exata), casam também o termo e todo nó que tenha qualquer forma dele como palavra inteira, e o `expanded` diz qual termo; o sinônimo de caso ou aposentado não expande. Nenhum nó dá um `hint`, que diz quando o zero vem dos outros filtros, para o zero não passar por "não há" |
 | `--semantic PERGUNTA` | Desde a 4.26, com o extra `vector`: ordena os nós que passam nos outros filtros pela semelhança com a pergunta (`--model`, `--model-dir`; ver o `kg_vector.py` abaixo). Sozinho, a ordem é a do vetor; com `--text`, a lista do texto (na ordem do corpus) e a do vetor se fundem por RRF (k=60), com o empate pela posição no vetor. Dê o termo curto ao `--text` e a pergunta inteira ao `--semantic`: é o que a bancada mediu (14 de 20 acertos, contra 12 do vetor e 9 do texto). Os filtros valem para os dois, as duas listas são completas, e o `--limit` só pagina a lista fundida; por isso, no híbrido, o `total` conta todos os candidatos, e o `semantic.text_matches` diz quantos casam o `--text`. O JSON ganha `semantic` (modo, modelo com revisão e sha256, e de onde veio cada vetor: o índice, embutido na hora, a memória do processo, ou sem texto) e um `rank` por nó; sem `--semantic` a saída não muda |
 | `--open` | A fila dos abertos (status `open`) |
-| `--group-by CAMPO` | Desde a 4.41.0: conta os nós por campo em vez de listá-los (`kg-ssot.groups/2` desde a 4.42.0). Veja "Quantos, por campo" abaixo |
+| `--group-by CAMPO` | Desde a 4.41.0: conta os nós por campo em vez de listá-los (`kg-ssot.groups/2` desde a 4.42.0). Veja "Quantos, por campo" e, para `label`, `narrative` e o grau, "Vencidos, grau, presença e texto" abaixo |
 | `--edges`, `--count-distinct CAMPO`, `--min-count N` | Desde a 4.42.0: as arestas como sujeito, a contagem de distintos e o mínimo. Veja "As arestas como sujeito" abaixo |
-| `--where CHAVE=VALOR` | Desde a 4.39.0: só os nós em que `owner`, um campo `x_*` ou (desde a 4.42.0) `provenance.<chave>` (com ponto para chave aninhada) tem o valor; repetível, e todas têm de valer. Veja "A fila de um dono" abaixo |
+| `--where CHAVE=VALOR` | Desde a 4.39.0: só os nós em que `owner`, um campo `x_*` ou (desde a 4.42.0) `provenance.<chave>` (com ponto para chave aninhada) tem o valor; repetível, e todas têm de valer. Veja "A fila de um dono" abaixo; desde a 4.43.0, também o grau e os operadores `^=` e `*=`, em "Vencidos, grau, presença e texto" abaixo |
+| `--due [--as-of AAAA-MM-DD]`, `--has CAMPO`, `--missing CAMPO` | Desde a 4.43.0: o que venceu, e se um campo está lá. Veja "Vencidos, grau, presença e texto" abaixo |
 | `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
 | `--around ID` | A vizinhança: `<caminho>#<id>`, ou um id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
 | `--sort corpus\|impact\|attention` | A ordem do corpus, o impacto declarado ou a atenção (impacto × confiança × fator do status × (1 + grau), o valor do radar) |
 | `--limit N` e `--cursor C` | A página (até 1000) e o cursor da próxima, que vale para a mesma consulta sobre o mesmo corpus |
 | `--fields GLOB` | Chaves do nó que saem em `extra`, como estão no grafo: `--fields 'x_*'` |
 | `--narrative` | Inclui a narrative de cada nó |
-| `--format json` | O formato estável `kg-ssot.query/1` (`spec/query.schema.json`) |
+| `--format json` | O formato estável `kg-ssot.query/1`; o `kg-ssot.query/2` com `--due`, que acrescenta `due_on` e `days_late` (`spec/query.schema.json`) |
 
 O grafo que não parseia sai em `unreadable`, com o código `parse.*` dele, e não derruba a consulta. O label da outra
 ponta de cada aresta sai cortado em 200 caracteres: um nó de label longo citado por milhares de arestas não
@@ -840,6 +841,15 @@ chain: complete
   `confidence` dele já dá o preço do repasse; a origem é, porque é onde a afirmação nasce.
 
 A corrente é declarada por quem escreve o grafo: a projeção a mede, não prova quem de fato disse o quê.
+
+Desde a 4.43.0, o `--chain` é repetível, até 50 ids (acima disso, rc 2), e o id repetido conta uma vez. Um id só imprime o
+`kg-ssot.chain/1`, e o id que não se resolve dá rc 2. Mais de um imprime o `kg-ssot.chains/1`
+(`spec/chains.schema.json`), na ordem pedida: cada entrada traz o `kg-ssot.chain/1` inteiro em `chain` e, em `origins`,
+cada origem com o `status` do nó. O id que não existe, ou que existe em mais de um grafo, fica na entrada dele com
+`outcome: not_resolved` e o motivo em `error`, e o lote segue com rc 0. O lote para de abrir cadeias depois de 1000
+caminhos, o teto de uma cadeia: as que sobram saem com `outcome: not_run`, e o `truncated` fica true. Peça esses ids num
+lote menor. O `--edge-type` vale para o lote inteiro. No servidor MCP, o `chain` recebe uma lista de ids e, ao lado, só
+`edge_types`, e a resposta acima do teto de bytes do servidor é recusada, com o pedido de pedir menos ids.
 
 ### A atenção e as decisões a revisitar (4.36.0)
 
@@ -999,8 +1009,77 @@ kg-query --root . --where provenance.locality=web --group-by file               
 ```
 
 Desde a 4.42.0, o `--where` e o `--group-by` de nós também aceitam `provenance.<chave>`. Perguntas de dois saltos (uma
-evidência que restringe uma decisão que leva a uma pergunta) e de ausência (um nó que não recebe `SUPPORTS`) ainda não
-saem de uma consulta só.
+evidência que restringe uma decisão que leva a uma pergunta) ainda não saem de uma consulta só. A de ausência (um nó que
+não recebe `SUPPORTS`) sai, desde a 4.43.0, na próxima seção.
+
+### Vencidos, grau, presença e texto (4.43.0)
+
+O `--due` não recebe data, ao contrário do `kg_validate --due`. Ele lista os nós de qualquer tipo cujo `verified_at` mais `reverify_every` venceu até o `--as-of` (o padrão é hoje),
+do mais atrasado para o menos e, na mesma data, na ordem do corpus. Cada nó ganha `due_on` e `days_late` (0 é o que vence
+naquele dia). A conta é a do `kg_validate --due`, e por isso os dois concordam. O que aquele relatório traz de `x_term`,
+`x_mirror` e `x_doc_cycle` segue lá, e também a lista dos nós que só têm `reverify_on`. O nó com `reverify_every` e
+sem `verified_at` legível nunca vence, e o `hint` diz quantos são: isso inclui o `verified_at` com hora, que não é data no
+contrato. A cadência fora da forma também nunca vence, nos dois leitores. Em grafo que já reprova no contrato, as duas
+listas podem diferir: o id repetido sai uma vez aqui, o primeiro nó, e o id numérico não sai aqui, enquanto o
+`kg_validate --due` lista cada linha. O `--due` é um filtro: combina com os outros e com o
+`--group-by`, mas não com `--sort impact`, `--sort attention` nem `--semantic`, que pedem outra ordem (rc 2). A saída JSON é
+o `kg-ssot.query/2`, o `/1` mais esses campos; toda outra consulta segue em `/1`.
+
+O `--where` de nós tem estas formas, e todas as condições têm de valer:
+
+| Forma | Casa |
+|---|---|
+| `CHAVE=VALOR` | O texto do valor: `x_n=12` casa o número 12, `x_b=true` o booleano. A lista casa quando um item dela casa. A chave que falta não casa |
+| `CHAVE^=VALOR` | O texto que começa com o valor |
+| `CHAVE*=VALOR` | O texto que contém o valor |
+| `degree.in=N`, `degree.out=N`, `degree.total=N` | A contagem das arestas internas do nó, um número inteiro |
+| `degree.in.TIPO=N` (também `out` e `total`) | A mesma contagem, de um tipo de aresta |
+
+A chave é `owner`, um campo `x_*` (com ponto para chave aninhada), `provenance.<chave>` ou um grau; `label^=` é recusado
+(rc 2), porque o `--text` e o `--id-prefix` respondem a isso. O `--where` do `--edges` aceita `^=` e `*=` nos campos de
+aresta, como `from.id^=D_`, e lá o grau não existe. A chave que ainda termina em `^ * $ ! < > ~ |` depois de lido o operador
+é recusada (rc 2), em nós e em arestas: `x_n!=12` não é "diferente de", e esse operador não existe.
+
+- **Operadores de texto.** Distinguem maiúsculas, com os dois lados em NFC. Só texto casa: `null`, chave que falta, número,
+  booleano e `.nan` nunca casam, como no `STARTS WITH` e no `CONTAINS` do Cypher. A data é lida como o texto que a escreve,
+  como num `.kg.json`, e por isso `x_when^=2026-11` casa. Numa lista, basta um item de texto,
+  que é a regra do `=` aqui (no Cypher, a lista dá null). O valor vazio casa qualquer texto e nada mais. A chave termina no
+  primeiro `=`, e depois dele o valor é literal: `x_f^=a=b` procura `a=b`, e `owner=^a` procura `^a`.
+- **Grau.** Conta as arestas internas do próprio grafo do nó, linha por linha: a aresta repetida conta de novo, o laço conta
+  em `in` e em `out`, e por isso duas vezes em `total`, e a aresta cuja outra ponta falta conta para a ponta que existe. A
+  aresta externa não conta, nem a que vem de outro grafo. Não é o grau da fórmula da atenção, que segue o radar e conta
+  outras coisas. Se um grafo repete um id, as linhas se somam no primeiro nó, o único que a consulta guarda. O valor é um
+  número inteiro com `=`: `degree.in=x`, `degree.in=01` e `degree.in^=1` são recusados (rc 2). O tipo de aresta que nenhuma
+  aresta interna do corpus tem conta 0, e o `hint` avisa, porque o zero de um erro de grafia não pode passar por "não há".
+  O mesmo vale para o `--group-by` e o `--count-distinct`. No `--revisit`, cuja saída não tem `hint`, esse tipo é recusado
+  (rc 2). Toda resposta com o grau diz no `hint` que a aresta vinda de outro grafo não conta. Assim, `degree.in.SUPPORTS=0` quer dizer sem aresta interna `SUPPORTS` no próprio grafo, e nada além
+  disso: o `SUPPORTS` de outro grafo não conta, e `--edges --where edge_type=SUPPORTS --where scope=external` lista esses,
+  para completar a resposta.
+- **Presença.** O `--has CAMPO` e o `--missing CAMPO` aceitam qualquer campo do nó, com ponto para chave aninhada, até 10
+  de cada. O campo que falta e o `null` são o mesmo: faltam. O texto vazio, o `0`, o `false`, a lista vazia e o mapa vazio
+  têm valor, como no `IS NOT NULL` do Cypher. O caminho não entra em lista. O mesmo campo nos dois é recusado (rc 2), e
+  também todo caminho que começa com `degree`, porque o grau é derivado e não é campo do nó. O caminho que nenhum nó do
+  corpus tem com valor ganha um `hint`, porque o `--has trce` responderia 0 e o `--missing trce`, o corpus inteiro.
+- **Em que consultas.** O `--due`, o `--has` e o `--missing` filtram as consultas de nós: com `--edges`, `--decision`,
+  `--chain` ou `--revisit`, dão rc 2. O `--where` com grau ou operador também vale no `--revisit`.
+- **Agrupar por texto.** O `--group-by` aceita também `label` e `narrative`, com o texto inteiro, e `true` e `1` ficam em
+  grupos separados. Com `--min-count 2`, acham os nós com o mesmo texto. O grupo une texto em NFC e em NFD numa chave NFC, e
+  o nó segue como está. O nó sem o campo cai no grupo `null`, como em todo `--group-by`: o `--has narrative` o deixa de fora.
+- **Campos do agrupamento, em nós.** `file`, `node_type`, `status`, `plane`, `layer`, `owner`, `label`, `narrative`, um campo
+  `x_*`, `provenance.<chave>`, `meta.<chave>`, e `degree.in`, `degree.out` e `degree.total`, com o tipo de aresta opcional.
+
+```bash
+kg-query --root . --due --type evidence --where owner=ana                      # o que venceu, na mesa de um dono
+kg-query --root . --due --as-of 2027-01-01 --group-by file                     # o que vai vencer, por grafo
+kg-query --root . --type decision --status done --where degree.in.SUPPORTS=0   # decisões concluídas sem aresta interna SUPPORTS no próprio grafo
+kg-query --root . --group-by degree.total                                      # o histograma do grau
+kg-query --root . --type evidence --missing trace --has provenance.source      # evidência com fonte e sem trace
+kg-query --root . --group-by label --min-count 2                               # nós com o mesmo label
+kg-query --root . --edges --where from.id^=D_ --group-by edge_type             # o que sai das decisões, por um prefixo
+```
+
+A ferramenta `kg_query` do MCP aceita as mesmas formas em `where` e `group_by`, mais `due`, `as_of`, `has` e `missing`, com as
+mesmas recusas nas mesmas palavras.
 
 ## `kg_diff.py`: o diff por id entre revisões
 

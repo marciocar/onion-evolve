@@ -1,4 +1,4 @@
-<!-- translation-of: ADOPTING.md sha256:44c1abd8ee451422 -->
+<!-- translation-of: ADOPTING.md sha256:e8a07ae248c974cf -->
 # Adotar o contrato KG-SSOT
 
 [English](ADOPTING.md) | **Português (Brasil)**
@@ -342,6 +342,14 @@ update de novo"). O segundo `update`, já com o kit novo, grava o arquivo sem pr
 `git add`, o `check --index` confirma que o índice guarda os bytes da release. Outra saída é rodar o update uma vez
 só, pelo clone da tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`). Uma regra
 própria para o vendor no `.gitattributes` da raiz (`vendor/kg-ssot/** -text`) continua valendo e pode ficar.
+
+Da `kg-ssot-v4.42.0` para a `kg-ssot-v4.43.0`, nada muda para um grafo ou um gate: o contrato (v4.18) e os vereditos
+são os mesmos, e a consulta que já funcionava imprime o mesmo `kg-ssot.query/1`. O `kg_query --due` é novo e imprime o
+`kg-ssot.query/2` (os campos `due_on` e `days_late`); o `--has`, o `--missing`, o grau e os operadores `^=` e `*=` no
+`--where`, e o `label` e a `narrative` no `--group-by` também são novos. O `--chain` repetido é novo, com uma saída nova, o
+`kg-ssot.chains/1`; um `--chain` só imprime o `kg-ssot.chain/1`, como antes. Quem repetia o `--chain` recebia só o último
+id, e agora recebe todos. A chave do `--where` que ainda termina em `^ * $ ! < > ~ |` depois de lido o operador respondia 0 e
+agora dá rc 2, e a ferramenta do MCP com `edges` não aceita mais `open`, `in_narrative` nem `narrative`.
 
 Da `kg-ssot-v4.41.0` para a `kg-ssot-v4.42.0`, nada muda para um grafo ou um gate: o contrato (v4.18) e os vereditos
 são os mesmos, e o `kg-ssot.query/1` não muda. O `kg_query --edges`, o `--count-distinct` e o `--min-count` são novos,

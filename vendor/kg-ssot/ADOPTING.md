@@ -343,6 +343,14 @@ After `git add`, `check --index` confirms that the index holds the release bytes
 once, from the clone of the tag (`../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.8.1 --dest vendor/kg-ssot`).
 A rule of your own for the vendor in the root `.gitattributes` (`vendor/kg-ssot/** -text`) still works and can stay.
 
+From `kg-ssot-v4.42.0` to `kg-ssot-v4.43.0`, nothing changes for a graph or a gate: the contract (v4.18) and the
+verdicts are the same, and a query that worked before prints the same `kg-ssot.query/1`. `kg_query --due` is new and
+prints `kg-ssot.query/2` (the fields `due_on` and `days_late`); `--has`, `--missing`, the degree and the `^=` and `*=`
+operators in `--where`, and `label` and `narrative` in `--group-by` are new too. A repeated `--chain` is new, with a new
+output, `kg-ssot.chains/1`; one `--chain` prints `kg-ssot.chain/1`, as before. A consumer that used to repeat `--chain`
+got only the last id, and now gets all of them. A `--where` key that still ends in `^ * $ ! < > ~ |` after the operator
+is read used to answer 0 and is now rc 2, and the MCP tool with `edges` no longer takes `open`, `in_narrative` or `narrative`.
+
 From `kg-ssot-v4.41.0` to `kg-ssot-v4.42.0`, nothing changes for a graph or a gate: the contract (v4.18) and the
 verdicts are the same, and `kg-ssot.query/1` does not change. `kg_query --edges`, `--count-distinct` and `--min-count`
 are new, with a new output, `kg-ssot.edges/1`. The grouped output moves from `kg-ssot.groups/1` to `kg-ssot.groups/2`

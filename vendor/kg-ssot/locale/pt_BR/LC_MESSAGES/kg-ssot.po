@@ -1274,10 +1274,6 @@ msgid "; next page: --cursor {cursor}"
 msgstr "; próxima página: --cursor {cursor}"
 
 #: tools/kg_query.py
-msgid "Query a corpus of .kg.yaml and .kg.json graphs and project the nodes for reading (release 4.17)."
-msgstr "A consulta e a projeção legível de um corpus de grafos .kg.yaml e .kg.json (release 4.17)."
-
-#: tools/kg_query.py
 msgid "UNREADABLE  and {n} more graph(s) (--format json shows the full list)"
 msgstr "NÃO LIDO  e mais {n} grafo(s) (a lista inteira sai em --format json)"
 
@@ -3281,10 +3277,6 @@ msgid "chain: {status}"
 msgstr "corrente: {status}"
 
 #: tools/kg_query.py
-msgid "the transmission chain from the node back to its origin: the weakest link and the origin's strength, as separate axes, with a strict and a lenient grade"
-msgstr "a corrente de transmissão do nó até a origem: o elo mais fraco e a força da origem, em eixos separados, com um grau estrito e um leniente"
-
-#: tools/kg_query.py
 msgid "complete"
 msgstr "completa"
 
@@ -3521,20 +3513,12 @@ msgid "read a file of another repository that a URL names, in the commit of the 
 msgstr "lê um arquivo de outro repositório que uma URL nomeia, no commit da URL: o grafo do projection_of, ou o provenance.source do check"
 
 #: tools/kg_query.py
-msgid "--as-of goes with --revisit"
-msgstr "--as-of vai com --revisit"
-
-#: tools/kg_query.py
 msgid "--decision and --revisit are different questions: ask one at a time"
 msgstr "--decision e --revisit são perguntas diferentes: faça uma de cada vez"
 
 #: tools/kg_query.py
 msgid "--decision and --revisit do not combine with --around, --text, --semantic or --chain"
 msgstr "--decision e --revisit não se combinam com --around, --text, --semantic nem --chain"
-
-#: tools/kg_query.py
-msgid "with --revisit, the date that counts as today"
-msgstr "com --revisit, a data que conta como hoje"
 
 #: tools/kg_trace.py
 msgid "· {judged} source(s) read by scheme or sha256: {ok} ok, {failed} failed ({sha} sha256 checked); not judged (counted): {form} form only, {absolute} URL with no --with, {missing} source not found, {malformed} malformed scheme, locator or hash, {other} other"
@@ -3637,10 +3621,6 @@ msgid "KEY=VALUE"
 msgstr "CHAVE=VALOR"
 
 #: tools/kg_query.py
-msgid "only the nodes where the key has the value (repeatable, all of them): owner or an x_* field, with a dot for a nested key (x_raci.responsible); with --revisit, its decisions"
-msgstr "só os nós em que a chave tem o valor (repetível, todas valendo): owner ou um campo x_*, com ponto para uma chave aninhada (x_raci.responsible); com --revisit, as decisões dele"
-
-#: tools/kg_query.py
 msgid "· only the decisions where {where}"
 msgstr "· só as decisões em que {where}"
 
@@ -3677,14 +3657,6 @@ msgid "--min-count must be an integer from 1"
 msgstr "--min-count tem de ser um inteiro a partir de 1"
 
 #: tools/kg_query.py
-msgid "--where {item}: the key is owner, an x_* field (x_raci.responsible) or provenance.<key>"
-msgstr "--where {item}: a chave é owner, um campo x_* (x_raci.responsible) ou provenance.<chave>"
-
-#: tools/kg_query.py
-msgid "count and list edges instead of nodes (internal and external): --where and --group-by take edge_type, scope, file, meta.<key>, and from.<field> and to.<field> (id, file, found, node_type, status, plane, layer, owner, an x_* field or provenance.<key>); without --group-by, prints kg-ssot.edges/1"
-msgstr "conta e lista arestas em vez de nós (internas e externas): --where e --group-by aceitam edge_type, scope, file, meta.<chave>, e from.<campo> e to.<campo> (id, file, found, node_type, status, plane, layer, owner, um campo x_* ou provenance.<chave>); sem --group-by, imprime o kg-ssot.edges/1"
-
-#: tools/kg_query.py
 msgid "with --group-by, count the distinct values of the field in each group instead of the rows (repeatable: the distinct combinations); null does not count"
 msgstr "com --group-by, conta os valores distintos do campo em cada grupo em vez das linhas (repetível: as combinações distintas); o null não conta"
 
@@ -3699,10 +3671,6 @@ msgstr "{flag} aceita no máximo {max} campos"
 #: tools/kg_query.py
 msgid "{flag} {item}: the edge field is edge_type, scope, file, meta.<key>, or from.<field> and to.<field> (id, file, found, node_type, status, plane, layer, owner, an x_* field or provenance.<key>)"
 msgstr "{flag} {item}: o campo de aresta é edge_type, scope, file, meta.<chave>, ou from.<campo> e to.<campo> (id, file, found, node_type, status, plane, layer, owner, um campo x_* ou provenance.<chave>)"
-
-#: tools/kg_query.py
-msgid "{flag} {item}: the field is file, node_type, status, plane, layer, owner, an x_* field (x_raci.responsible), provenance.<key> or meta.<key>"
-msgstr "{flag} {item}: o campo é file, node_type, status, plane, layer, owner, um campo x_* (x_raci.responsible), provenance.<chave> ou meta.<chave>"
 
 #: tools/kg_query.py
 msgid "{flag} {item}: the field is repeated"
@@ -3753,5 +3721,131 @@ msgid "(the whole graph)"
 msgstr "(o grafo inteiro)"
 
 #: tools/kg_query.py
-msgid "count the nodes the filters find, by the value of the field (repeatable, up to 5): file, node_type, status, plane, layer, owner, an x_* field (with a dot for a nested key) or meta.<key> of the node's graph, or provenance.<key>; prints kg-ssot.groups/2, every group, without pages"
-msgstr "conta os nós que os filtros acham, pelo valor do campo (repetível, até 5): file, node_type, status, plane, layer, owner, um campo x_* (com ponto para chave aninhada) ou meta.<chave> do grafo do nó, ou provenance.<chave>; imprime o kg-ssot.groups/2, com todos os grupos, sem página"
+msgid "  status of the origin {id}: {status}"
+msgstr "  status da origem {id}: {status}"
+
+#: tools/kg_query.py
+msgid "--as-of goes with --revisit or --due"
+msgstr "--as-of vai com --revisit ou --due"
+
+#: tools/kg_query.py
+msgid "--chain takes at most {max} ids"
+msgstr "o --chain aceita no máximo {max} ids"
+
+#: tools/kg_query.py
+msgid "--due orders from the most overdue: it does not combine with --sort impact or attention, or with --semantic"
+msgstr "o --due ordena do mais atrasado para o menos: não se combina com --sort impact ou attention, nem com --semantic"
+
+#: tools/kg_query.py
+msgid "--due, --has and --missing filter the node queries, not --decision, --chain or --revisit"
+msgstr "--due, --has e --missing filtram as consultas de nós, não --decision, --chain nem --revisit"
+
+#: tools/kg_query.py
+msgid "--has and --missing ask for opposite things about {fields}: no node has and lacks a field"
+msgstr "--has e --missing pedem o oposto sobre {fields}: nenhum nó tem e não tem um campo"
+
+#: tools/kg_query.py
+msgid "--where {item}: the degree is a count: use = and a whole number (degree.in.SUPPORTS=0)"
+msgstr "--where {item}: o grau é uma contagem: use = e um número inteiro (degree.in.SUPPORTS=0)"
+
+#: tools/kg_query.py
+msgid "--where {item}: the key is owner, an x_* field (x_raci.responsible), provenance.<key> or degree.in, degree.out or degree.total, with an optional edge type"
+msgstr "--where {item}: a chave é owner, um campo x_* (x_raci.responsible), provenance.<chave> ou degree.in, degree.out ou degree.total, com o tipo de aresta opcional"
+
+#: tools/kg_query.py
+msgid "Query a corpus of .kg.yaml and .kg.json graphs without judging them: list and filter nodes or edges, count them by group, walk the neighborhood, follow transmission chains and decisions, and find what is due."
+msgstr "Consulta um corpus de grafos .kg.yaml e .kg.json sem julgá-los: lista e filtra nós ou arestas, conta por grupo, percorre a vizinhança, segue cadeias de transmissão e decisões, e acha o que venceu."
+
+#: tools/kg_query.py
+msgid "[due {due_on}, {days} day(s) late]"
+msgstr "[venceu em {due_on}, {days} dia(s) de atraso]"
+
+#: tools/kg_query.py
+msgid "count and list edges instead of nodes (internal and external): --where and --group-by take edge_type, scope, file, meta.<key>, and from.<field> and to.<field> (id, file, found, node_type, status, plane, layer, owner, an x_* field or provenance.<key>), also with ^= and *=; without --group-by, prints kg-ssot.edges/1"
+msgstr "conta e lista arestas em vez de nós (internas e externas): --where e --group-by aceitam edge_type, scope, file, meta.<chave>, e from.<campo> e to.<campo> (id, file, found, node_type, status, plane, layer, owner, um campo x_* ou provenance.<chave>), também com ^= e *=; sem --group-by, imprime o kg-ssot.edges/1"
+
+#: tools/kg_query.py
+msgid "count the nodes the filters find, by the value of the field (repeatable, up to 5): file, node_type, status, plane, layer, owner, label, narrative, an x_* field (with a dot for a nested key), meta.<key> of the node's graph, provenance.<key>, or the degree (degree.in, degree.out, degree.total, with an optional edge type); prints kg-ssot.groups/2, every group, without pages"
+msgstr "conta os nós que os filtros acham, pelo valor do campo (repetível, até 5): file, node_type, status, plane, layer, owner, label, narrative, um campo x_* (com ponto para chave aninhada), meta.<chave> do grafo do nó, provenance.<chave>, ou o grau (degree.in, degree.out, degree.total, com o tipo de aresta opcional); imprime o kg-ssot.groups/2, com todos os grupos, sem página"
+
+#: tools/kg_query.py
+msgid "only the nodes that have the field, any field, with a dot for a nested key (repeatable, up to 10); null counts as lacking it, and empty text and 0 count as having it"
+msgstr "só os nós que têm o campo, qualquer campo, com ponto para chave aninhada (repetível, até 10); null conta como faltar, e o texto vazio e o 0 contam como ter"
+
+#: tools/kg_query.py
+msgid "only the nodes that lack the field, or have it as null (repeatable, up to 10)"
+msgstr "só os nós a que falta o campo, ou que o têm como null (repetível, até 10)"
+
+#: tools/kg_query.py
+msgid "only the nodes where the key has the value (repeatable, all of them): owner, an x_* field, with a dot for a nested key (x_raci.responsible), provenance.<key>, or the degree derived from the internal edges of its own graph (degree.in, degree.out, degree.total, degree.in.SUPPORTS=0 for no internal edge of a type); KEY^=VALUE starts with and KEY*=VALUE contains, case-sensitive, text only; with --revisit, its decisions"
+msgstr "só os nós em que a chave tem o valor (repetível, todas valendo): owner, um campo x_*, com ponto para uma chave aninhada (x_raci.responsible), provenance.<chave>, ou o grau derivado das arestas internas do próprio grafo (degree.in, degree.out, degree.total, degree.in.SUPPORTS=0 para nenhuma aresta interna de um tipo); CHAVE^=VALOR começa com e CHAVE*=VALOR contém, distinguindo maiúsculas, só em texto; com --revisit, as decisões dele"
+
+#: tools/kg_query.py
+msgid "the batch stopped at {n} paths: ask this id in a smaller batch"
+msgstr "o lote parou em {n} caminhos: peça este id num lote menor"
+
+#: tools/kg_query.py
+msgid "the nodes of any type whose verified_at plus reverify_every is due by --as-of (default: today), the most overdue first, each with due_on and days_late; the sum is that of kg_validate --due, which also reports the profiles (x_term, x_mirror, x_doc_cycle)"
+msgstr "os nós de qualquer tipo cujo verified_at mais reverify_every venceu até o --as-of (o padrão é hoje), do mais atrasado para o menos, cada um com due_on e days_late; a conta é a do kg_validate --due, que também relata os perfis (x_term, x_mirror, x_doc_cycle)"
+
+#: tools/kg_query.py
+msgid "the transmission chain from the node back to its origin: the weakest link and the origin's strength, as separate axes, with a strict and a lenient grade; repeatable, up to 50 ids: more than one prints kg-ssot.chains/1, one chain per id, with the status of the origin"
+msgstr "a cadeia de transmissão do nó até a origem: o elo mais fraco e a força da origem, em eixos separados, com um grau estrito e um leniente; repetível, até 50 ids: mais de um imprime o kg-ssot.chains/1, uma cadeia por id, com o status da origem"
+
+#: tools/kg_query.py
+msgid "with --revisit or --due, the date that counts as today"
+msgstr "com --revisit ou --due, a data que conta como hoje"
+
+#: tools/kg_query.py
+msgid "{field}: the edge type {type} does not exist in the internal edges of the corpus, so it counts 0"
+msgstr "{field}: o tipo de aresta {type} não existe nas arestas internas do corpus, e por isso conta 0"
+
+#: tools/kg_query.py
+msgid "{flag} {item}: the degree is derived, not a field of the node: use --where degree.in=0"
+msgstr "{flag} {item}: o grau é derivado, não é campo do nó: use --where degree.in=0"
+
+#: tools/kg_query.py
+msgid "{flag} {item}: the field is empty or has an empty part"
+msgstr "{flag} {item}: o campo está vazio ou tem uma parte vazia"
+
+#: tools/kg_query.py
+msgid "{flag} {item}: the field is file, node_type, status, plane, layer, owner, label, narrative, an x_* field (x_raci.responsible), provenance.<key>, meta.<key>, or degree.in, degree.out or degree.total, with an optional edge type"
+msgstr "{flag} {item}: o campo é file, node_type, status, plane, layer, owner, label, narrative, um campo x_* (x_raci.responsible), provenance.<chave>, meta.<chave>, ou degree.in, degree.out ou degree.total, com o tipo de aresta opcional"
+
+#: tools/kg_query.py
+msgid "{n} node(s) have reverify_every without a readable verified_at, so they never come due: kg_validate --due lists them"
+msgstr "{n} nó(s) têm reverify_every sem verified_at legível, e por isso nunca vencem: o kg_validate --due os lista"
+
+#: tools/kg_query.py
+msgid "· only the nodes due by {as_of}, the most overdue first"
+msgstr "· só os nós vencidos até {as_of}, do mais atrasado para o menos"
+
+#: tools/kg_query.py
+msgid "· only the nodes that have {fields}"
+msgstr "· só os nós que têm {fields}"
+
+#: tools/kg_query.py
+msgid "· only the nodes that lack {fields}"
+msgstr "· só os nós a que falta {fields}"
+
+#: tools/kg_query.py
+msgid "· {done} of {n} chain(s) projected"
+msgstr "· {done} de {n} cadeia(s) projetada(s)"
+
+#: tools/kg_query.py
+msgid "--where {item}: {char} is not an operator: write KEY=VALUE, KEY^=VALUE or KEY*=VALUE"
+msgstr "--where {item}: {char} não é um operador: escreva CHAVE=VALOR, CHAVE^=VALOR ou CHAVE*=VALOR"
+
+#: tools/kg_query.py
+msgid "--where {field}: the edge type {type} does not exist in the internal edges of the corpus, and --revisit has no way to warn"
+msgstr "--where {field}: o tipo de aresta {type} não existe nas arestas internas do corpus, e o --revisit não tem como avisar"
+
+#: tools/kg_query.py
+msgid "{flag} {field}: no node of the corpus has this field with a value; check the spelling"
+msgstr "{flag} {field}: nenhum nó do corpus tem este campo com valor; confira a grafia"
+
+msgid "the degree counts only the internal edges of each node's own graph; an edge from another graph does not count: see --edges --where scope=external"
+msgstr "o grau conta só as arestas internas do grafo de cada nó; a aresta vinda de outro grafo não conta: veja --edges --where scope=external"
+
+msgid "--due takes no date: give the date with --as-of YYYY-MM-DD"
+msgstr "--due não recebe data: dê a data com --as-of AAAA-MM-DD"
