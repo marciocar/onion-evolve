@@ -661,19 +661,49 @@ def vibe_child_record(hook: list, store_extract, stub_call_id):
     facts: dict = {"child_session_id": None}
     if not stub_call_id:
         return False, "no stub id for the child call", facts
-    child_sid, d_ok, cur = None, False, None
+    # Emenda R2-5 (kg-ssot B2): TODO início do hook principal com o id do stub tem de ter
+    # parent_session_id e ser seguido de deny-done, e todos trazem o MESMO session_id (o do filho)
+    starts_for_id, denied, cur = [], [], None
     for h in hook:
         if h.get("role", "main") != "main":
             continue
         st = h.get("stdin") if isinstance(h.get("stdin"), dict) else {}
         if h.get("phase") == "start":
-            cur = st if (st.get("tool_call_id") == stub_call_id and st.get("parent_session_id")) else None
+            cur = None
+            if st.get("tool_call_id") == stub_call_id:
+                starts_for_id.append(st)
+                cur = len(starts_for_id) - 1
         elif h.get("phase") == "decision" and h.get("decision") == "deny-done" and cur is not None:
-            d_ok, child_sid = True, cur.get("session_id")
+            denied.append(cur)
+    sids = {st.get("session_id") for st in starts_for_id}
+    parents = {st.get("parent_session_id") for st in starts_for_id}
+    child_sid = next(iter(sids)) if len(sids) == 1 else None
+    parent_sid = next(iter(parents)) if len(parents) == 1 else None
     facts["child_session_id"] = child_sid
-    if not d_ok or not child_sid:
-        return False, "(d) no deny-done for the child call with parent_session_id", facts
+    facts["child_hook_starts"] = len(starts_for_id)
+    if (not starts_for_id or set(denied) != set(range(len(starts_for_id))) or not child_sid
+            or not parent_sid):
+        return False, ("(d) every main hook start for the stub id must carry parent_session_id, one session_id, "
+                       "and be followed by deny-done"), facts
     sessions = [x for x in ((store_extract or {}).get("sessions") or []) if isinstance(x, dict)]
+    # Emenda R2-5 (kg-ssot B2): nenhuma OUTRA sessão do extrato tem mensagem de ferramenta com o id
+    # do stub; nenhuma outra sessão filha (nem o filho, nem o pai) tem efeito de ferramenta
+    # completed ou failed. O pai fica fora da 2ª checagem: ele roda o passo de topo e o
+    # run_typescript, que completam por desenho.
+    for other in sessions:
+        oid = other.get("session_id")
+        if oid == child_sid:
+            continue
+        for item in (other.get("messages") or []):
+            m = item.get("message") if isinstance(item, dict) and isinstance(item.get("message"), dict) else item
+            if isinstance(m, dict) and m.get("role") == "tool" and m.get("tool_call_id") == stub_call_id:
+                return False, f"another session ({oid}) has a tool message with the stub id", facts
+        if oid == parent_sid:
+            continue
+        for d in _walk_dicts(other.get("projection")):
+            if (d.get("type") == "effect" and (d.get("detail") or {}).get("kind") in VIBE_TOOL_KINDS
+                    and (d.get("state") or {}).get("status") in ("completed", "failed")):
+                return False, f"another child session ({oid}) has a completed/failed tool effect", facts
     sess = next((x for x in sessions if x.get("session_id") == child_sid and x.get("ok")), None)
     if sess is None:
         return False, "child session not in the client-read store extract", facts
@@ -1090,7 +1120,9 @@ def classify(evid: Path, _ignore_outside: bool = False) -> dict:
     load_proven = main_loaded or probe_loaded
     # Emenda R2-1 (kg-ssot B3): o deny_target casou o alvo no stdin e mesmo assim liberou
     hook_discrepant = False
-    if mode in DENY_TARGET_MODES:
+    # Emenda R2-5 (curadoria 4): o matcher_bash da rodada 2 roda deny_target_* (run_cell.sh), e
+    # a discrepância vale para ele também
+    if mode in DENY_TARGET_MODES or (r2 and mode == "matcher_bash"):
         cur = None
         for h in hook:
             if h.get("role", "main") != "main":
@@ -1231,7 +1263,10 @@ def classify(evid: Path, _ignore_outside: bool = False) -> dict:
     # (deny_target_*, ou o matcher_bash, que na rodada 2 roda deny_target_json — run_cell.sh), e o
     # registro do PAI não pode dizer que a ferramenta rodou (kg-ssot D2/D3)
     elif (r2 and harness == "vibe" and scenario == "sub" and child_ok
-          and (mode in DENY_TARGET_MODES or mode == "matcher_bash") and tool_ran is not True):
+          and (mode in DENY_TARGET_MODES or mode == "matcher_bash")
+          # Emenda R2-5 (kg-ssot B1): o registro do PAI não pode ter ligado efeito nenhum à chamada
+          # (ambíguo ou running deixam tool_ran None com efeito ligado)
+          and (tool_ran is False or (tool_ran is None and vibe_eff is None and r2_target_eff is None))):
         # Emenda R2-3: o veto valeu dentro do filho, provado pelo registro do filho
         verdict, basis = "BARRA", f"hook_deny ({child_why})"
     elif perm.startswith("deny") and not hook_denied and tool_ran is False and perm_denied_record:

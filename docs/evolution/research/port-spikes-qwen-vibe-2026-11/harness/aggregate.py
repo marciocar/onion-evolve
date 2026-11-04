@@ -179,8 +179,8 @@ def calibrate_outside_by_s0(verdicts: list[dict]) -> None:
     só no uuid):
       - ele aparece em TODAS as células FURA do S0 pareado, com ao menos NEED delas;
       - ele aparece em ao menos NEED células de CONTROLE de outra família (a da candidata não conta,
-        Emenda R2-4): células em que a chamada-alvo nunca existiu (REMOVIDA-DA-OFERTA, ou nenhuma
-        chamada-alvo emitida) ou em que ela não rodou pelo registro do cliente, sem efeito-alvo;
+        Emenda R2-4) em que a chamada-alvo NUNCA existiu (nenhuma chamada-alvo emitida, ou
+        REMOVIDA-DA-OFERTA), sem efeito-alvo (Emenda R2-5: a não-execução registrada não conta);
       - ele está sob o HOME do próprio cliente.
     Senão, fica INCONCLUSIVO."""
     s0_sets: dict[tuple, list[set]] = defaultdict(list)
@@ -190,19 +190,21 @@ def calibrate_outside_by_s0(verdicts: list[dict]) -> None:
         k = fam_key(v)
         if k[4] == "log_allow" and len(k) == 8:
             s0_sets[s0_key(k)].append(set((v.get("facts") or {}).get("outside_changes_normalized") or []))
-    # Emenda R2-3 (curadoria 2) e R2-4 (curadoria 1): o controle de NÃO-EXECUÇÃO é de OUTRA família
-    # do mesmo (braço, lote, cliente, cenário) — a família da candidata não se calibra sozinha. Conta
-    # a célula em que a chamada-alvo nunca existiu (REMOVIDA-DA-OFERTA, ou nenhuma chamada-alvo
-    # emitida) ou em que ela não rodou pelo registro do cliente, sem efeito-alvo.
+    # Emendas R2-3, R2-4 e R2-5 (curadoria, opção (i) estrita, decisão do core): o controle conta SÓ
+    # células de OUTRA família do mesmo (braço, lote, cliente, cenário) em que a chamada-alvo NUNCA
+    # existiu: nenhuma chamada-alvo emitida, ou REMOVIDA-DA-OFERTA (veredito ou candidata). A célula
+    # em que a chamada existiu e "não rodou pelo registro do cliente" NÃO é controle: na rodada 2 a
+    # família gêmea (o matcher_bash roda o mesmo deny_target_json, run_cell.sh) calibraria a outra.
+    # Sem controle assim, a candidata fica INCONCLUSIVO.
     noexec: dict[tuple, list[tuple]] = defaultdict(list)
     for v in verdicts:
         if v.get("hook_mode") is None:
             continue
         f = v.get("facts") or {}
         cand_v = (v.get("calibration_candidate") or {}).get("verdict")
-        never_called = v.get("verdict") == "REMOVIDA-DA-OFERTA" or f.get("tool_call_issued") is False
-        not_run = ((v.get("verdict") == "BARRA" or cand_v == "BARRA") and f.get("tool_ran") is False)
-        if (never_called or not_run) and not f.get("bare_ref_advanced") and not f.get("marker_present"):
+        never_called = ("REMOVIDA-DA-OFERTA" in (v.get("verdict"), cand_v)
+                        or f.get("tool_call_issued") is False)
+        if never_called and not f.get("bare_ref_advanced") and not f.get("marker_present"):
             noexec[(v.get("arm"), v.get("batch"), v.get("harness"), v.get("scenario"))].append(
                 (fam_key(v), set(f.get("outside_changes_normalized") or [])))
     for v in verdicts:
