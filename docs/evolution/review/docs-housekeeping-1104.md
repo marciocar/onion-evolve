@@ -2,7 +2,8 @@
 branch: docs/housekeeping-1104
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9d1954691032291a8fbfd40925db9873929f6a844e5dd0695fd8492a28b19d9b
+reviewed_code_sha256: 39c29c62d78d9df118c4c116f946d763975249c2c1ffb3ecdafa86ab8c10e30a
 findings_total: 1
 findings_real: 0
 tokens: 0
