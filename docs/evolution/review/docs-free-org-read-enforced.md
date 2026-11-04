@@ -2,7 +2,8 @@
 branch: docs/free-org-read-enforced
 pr: pendente
 date: 2026-11-04
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7e85b4884a60f21c8450df4ffc09f1e7ed343835d1f1e832accb8a5c02d34f54
+reviewed_code_sha256: c45618e0365398c7418e46fc348f87d2ae5abf244ea870fd013b5c0dbb40a8a7
 findings_total: 0
 findings_real: 0
 tokens: 0
