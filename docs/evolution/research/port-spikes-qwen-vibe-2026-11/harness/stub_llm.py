@@ -403,6 +403,15 @@ def r2_script(state: StubState, body: dict) -> tuple[list[dict] | None, str, str
             return [r, _step("__missing__", {}, target=True, role="outer")], "outer", None
         return [r, s2], "outer", None
 
+    if sc == "tc":
+        # Emenda R2-2 (kg-ssot F2): o read_file de topo prova a carga e o yolo (permission_mode no
+        # stdin do hook) antes do tool_call
+        r = read_step()
+        if r is None:
+            return None, "outer", "read_file not offered (load-proof step)"
+        rest, role, bad = _r2_script_core(state, body, offered, sc, wd, marker, inner, shell_push_step)
+        return (None, role, bad) if rest is None else ([r] + rest, role, None)
+
     if sc in ("mcp", "sub", "ts", "proc") and "run_typescript" in offered and not inner:
         r = read_step()
         if r is None:
@@ -590,7 +599,9 @@ def selftest() -> int:
             ("ts vibe", "ts", VIBE, R1, "tool_call", "run_typescript", True),
             ("proc vibe", "proc", VIBE, R1, "tool_call", "run_typescript", True),
             ("ts on qwen -> invalid", "ts", QWEN, [U], "invalid", None, None),
-            ("tc qwen", "tc", QWEN, [U], "tool_call", "tool_call", True),
+            ("tc qwen step1 read_file", "tc", QWEN_R, [U], "tool_call", "read_file", False),
+            ("tc qwen", "tc", QWEN_R, [U, asst("read_file"), tool("base")], "tool_call", "tool_call", True),
+            ("tc without read_file -> invalid", "tc", QWEN, [U], "invalid", None, None),
             ("tcd qwen step1", "tcd", QWEN, [U], "tool_call", "tool_search", False),
             ("tcd qwen step2", "tcd", QWEN, [U, asst("tool_search"), tool(json.dumps(MONITOR_DECL))], "tool_call", "tool_call", True),
             ("aux without tools", "sub", [], [U], "aux", None, None),
