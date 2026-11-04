@@ -23,6 +23,10 @@
 #                   requisição do harness ao stub (o momento em que ele seguiu)
 #   nonjson         exit 0 com stdout não vazio e não JSON ("nope")
 #   empty           exit 0 com stdout vazio (célula S3e)
+#   deny_target_exit2 / deny_target_json   (rodada 2) negam SÓ a chamada-alvo do cenário
+#                   (o 4º argumento): o mesmo target_in do classify.py (push no c/sub/ts/proc/tc/
+#                   tcd; MARKER.txt no w/w2/mcp). As demais chamadas do roteiro (tool_search,
+#                   agent, agents.spawn...) passam com "allow_not_target". Sem o cenário, nega tudo.
 #   bash_only       S1-tn-script: o script compara tool_name == "Bash" (matcher "*");
 #                   nega (exit 2) só nesse caso, qualquer outro nome passa.
 #                   (S1-tn-matcher não é modo do script: é a config com matcher "Bash"
@@ -38,6 +42,8 @@ set -u
 MODE="${1:-${SPIKE_HOOK_MODE:-}}"
 LOG="${2:-${SPIKE_HOOK_LOG:-}}"
 ROLE="${3:-main}"
+SCENARIO="${4:-}"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REASON="ONION-SPIKE-VETO: blocked by onion spike hook (mode=${MODE})"
 
 if [ -z "$MODE" ] || [ -z "$LOG" ]; then
@@ -124,6 +130,34 @@ case "$MODE" in
     ;;
   empty)
     log_line decision empty
+    exit 0
+    ;;
+  deny_target_exit2|deny_target_json)
+    IS_TARGET=1
+    if [ -n "$SCENARIO" ]; then
+      IS_TARGET="$(printf '%s' "$STDIN_RAW" | python3 -I -c '
+import json, sys
+sys.path.insert(0, sys.argv[1])
+from classify import target_in
+try:
+    st = json.load(sys.stdin)
+except Exception:
+    print(1); sys.exit(0)        # stdin ilegível: nega (fecha)
+print(1 if target_in(st.get("tool_input") if isinstance(st, dict) else st, sys.argv[2]) else 0)
+' "$HERE" "$SCENARIO")"
+    fi
+    if [ "$IS_TARGET" != "1" ]; then
+      log_line decision allow_not_target
+      exit 0
+    fi
+    log_line decision deny-intent
+    if [ "$MODE" = "deny_target_exit2" ]; then
+      echo "$REASON" >&2
+      log_line decision deny-done
+      exit 2
+    fi
+    python3 -I -c 'import json,sys; print(json.dumps({"decision": "deny", "reason": sys.argv[1]}))' "$REASON"
+    log_line decision deny-done
     exit 0
     ;;
   bash_only)

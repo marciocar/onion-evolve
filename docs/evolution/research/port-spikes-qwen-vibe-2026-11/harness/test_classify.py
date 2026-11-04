@@ -800,6 +800,32 @@ CODE_MUTANTS = [
     ("aggregate.py", "N3 approval removed from divergence key",
      '        arm, _batch, *rest = k\n        by_pair[tuple(rest)][arm].append(f)',
      '        arm, _batch, *rest = k\n        by_pair[tuple(rest[:-1])][arm].append(f)'),
+    # rodada 2
+    ("classify.py", "R2 target flag ignored",
+     'target_rec = target_recs[0] if target_recs else None', 'target_rec = issued[0] if issued else None'),
+    ("classify.py", "R2 expected-inner allowance removed",
+     'extra_sw = [c for c in extra_sw if str(c.get("name")) not in allowed and str(c.get("kind")) not in allowed]',
+     'extra_sw = []'),
+    ("classify.py", "R2 mcp target read as push",
+     '"mcp": "marker",\n               "sub"', '"mcp": "push",\n               "sub"'),
+    ("classify.py", "R2 Vibe inner runtime id ignored",
+     'call_id, target_level = tid, "inner-runtime"', 'target_level = "inner-runtime"'),
+    ("classify.py", "R2 SEM-DELEGACAO folded into SEM-TENTATIVA",
+     'elif not tool_call_issued and r2 and scenario == "sub" and issued:', 'elif False:'),
+    ("classify.py", "R2d permission rule removed",
+     'elif perm.startswith("deny") and not hook_denied and tool_ran is False and perm_denied_record:',
+     'elif False:'),
+    ("classify.py", "R2d REMOVIDA without perm",
+     'elif perm != "none" and not_offered and not effect_parts:', 'elif not_offered and not effect_parts:'),
+    ("classify.py", "R2c RECUSA-DE-CHAMADA outside round 2",
+     'if (r2 and harness == "qwen" and not effect_parts and tool_call_issued and tool_ran is False',
+     'if (harness == "qwen" and not effect_parts and tool_call_issued and tool_ran is False'),
+    ("classify.py", "R2 hook target_in ignores the scenario (push only)",
+     '    push = TARGET_KIND.get(scenario, "marker") == "push"', '    push = True'),
+    ("aggregate.py", "R2 perm key dropped",
+     'return k + (perm,) if perm not in (None, "none") else k', 'return k'),
+    ("aggregate.py", "R2 log_allow with perm counted as S0",
+     'is_s0 = k[4] == "log_allow" and len(k) == 8', 'is_s0 = k[4] == "log_allow"'),
 ]
 
 
@@ -809,7 +835,7 @@ def run_code_mutants(evidence: Path) -> int:
     for fname, name, old, new in CODE_MUTANTS:
         with tempfile.TemporaryDirectory(prefix="onion-codemut-") as t:
             tmp = Path(t)
-            for f in ("classify.py", "aggregate.py", "test_classify.py"):
+            for f in ("classify.py", "aggregate.py", "test_classify.py", "hook_veto.sh"):
                 shutil.copy(HERE / f, tmp / f)
             src = (tmp / fname).read_text()
             if src.count(old) != 1:
@@ -823,6 +849,259 @@ def run_code_mutants(evidence: Path) -> int:
             failures += 0 if killed else 1
             n_fail = sum(1 for l in r.stdout.splitlines() if l.startswith("FAIL"))
             print(f"{'ok  ' if killed else 'FAIL'}  CODE-MUTANT {name:52} -> {'killed' if killed else 'SURVIVED'} ({n_fail} failing checks)")
+    return failures
+
+
+
+# ---------------------------------------------------------------- rodada 2 (PRE-REGISTRO-R2.md §5)
+# Sem evidência da rodada 2 ainda: os casos clonam células da rodada 1 e trocam a meta para um
+# cenário da rodada 2, marcando no stub.log o passo-alvo. Medem as REGRAS novas, não os clientes.
+
+def r2_meta(scenario, **over):
+    def f(d: Path):
+        m = json.loads((d / "meta.json").read_text())
+        m.update(scenario=scenario, scenario_canonical=scenario, **over)
+        (d / "meta.json").write_text(json.dumps(m))
+    return f
+
+
+def mark_target(flag=True, role="outer"):
+    def f(d: Path):
+        p = d / "stub.log"
+        out, n = [], 0
+        for line in p.read_text().splitlines():
+            r = json.loads(line)
+            dec = r.get("decision") or {}
+            if dec.get("kind") == "tool_call":
+                dec.update(target=flag, role=role, step=1, steps=1)
+                n += 1
+            out.append(json.dumps(r))
+        if not n:
+            raise AssertionError("no tool_call to mark")
+        p.write_text("\n".join(out) + "\n")
+    return f
+
+
+def insert_prep_step(d: Path):
+    """Põe, ANTES do passo-alvo, um passo de preparo (tool_search, target False) com outro id."""
+    p = d / "stub.log"
+    out = []
+    for line in p.read_text().splitlines():
+        r = json.loads(line)
+        if (r.get("decision") or {}).get("kind") == "tool_call":
+            prep = json.loads(line)
+            prep["decision"].update(call_id="call_prep0000000000", tool_name="tool_search", target=False)
+            prep["seq"] = r["seq"] - 0.5
+            out.append(json.dumps(prep))
+        out.append(json.dumps(r))
+    p.write_text("\n".join(out) + "\n")
+
+
+def qwen_add_function_call(name, cid="call_extra000000000"):
+    def f(d: Path):
+        chat = sorted((d / "session" / "qwen" / "chats").glob("*.jsonl"))[0]
+        with open(chat, "a") as fh:
+            fh.write(json.dumps({"message": {"parts": [{"functionCall": {"id": cid, "name": name, "args": {}}}]}}) + "\n")
+    return f
+
+
+def main_to_probe(d: Path):
+    """O hook "Bash" não registrou e a prova "*" sim: as linhas do hook principal viram linhas da
+    prova (as células m1 do S1-tn-matcher não tinham prova "*")."""
+    sub("hook.log", r'"role": "main"', '"role": "probe"')(d)
+
+
+def hook_allows(d: Path):
+    """O hook principal libera: as decisões de veto viram allow e o modo vira log_allow."""
+    sub("hook.log", r'"decision": "deny-(intent|done)"', '"decision": "allow"')(d)
+    sub("hook.log", r'"mode": "deny_[a-z0-9_]+"', '"mode": "log_allow"')(d)
+    edit_json("meta.json", lambda v: v.update(hook_mode="log_allow"))(d)
+
+
+def qwen_error_type(et):
+    def f(d: Path):
+        n = 0
+        for chat in (d / "session" / "qwen" / "chats").glob("*.jsonl"):
+            out = []
+            for line in chat.read_text().splitlines():
+                r = json.loads(line)
+                if isinstance(r.get("toolCallResult"), dict):
+                    r["toolCallResult"]["errorType"] = et
+                    n += 1
+                out.append(json.dumps(r))
+            chat.write_text("\n".join(out) + "\n")
+        if not n:
+            raise AssertionError("no toolCallResult")
+    return f
+
+
+def stub_not_offered(d: Path):
+    """O stub não achou a ferramenta do cenário (a regra de config a tirou da oferta)."""
+    p = d / "stub.log"
+    out = []
+    for line in p.read_text().splitlines():
+        r = json.loads(line)
+        if (r.get("decision") or {}).get("kind") == "tool_call":
+            r["decision"] = {"kind": "invalid", "mark": "STUB-INVÁLIDO", "text": "STUB-INVÁLIDO",
+                             "why": "no tool for the scenario in request.tools", "offered": []}
+        out.append(json.dumps(r))
+    p.write_text("\n".join(out) + "\n")
+
+
+def vibe_tool_denied(d: Path):
+    def f(items):
+        for x in items:
+            if isinstance(x, dict) and x.get("type") == "effect":
+                x.setdefault("state", {}).update(status="skipped", error={"code": "tool_denied"})
+        return items
+    vibe_items(f)(d)
+
+
+def vibe_hook_call_id(new_id):
+    return sub("hook.log", r'"tool_call_id": "call_[0-9a-f]+"', f'"tool_call_id": "{new_id}"')
+
+
+R2_CASES = [
+    ("chk-S1-qwen-c", "R2 tc target marked -> BARRA", chain(r2_meta("tc"), mark_target()), {"BARRA"}),
+    ("chk-S1-qwen-c", "R2 tc without target flag -> not BARRA", r2_meta("tc"), NOT_FAVORABLE),
+    ("chk-S1-qwen-c", "R2 tc prep step before target -> BARRA", chain(r2_meta("tc"), mark_target(), insert_prep_step), {"BARRA"}),
+    ("chk-S1-qwen-c", "R2 sub outer only -> SEM-DELEGACAO", chain(r2_meta("sub"), mark_target(False)), {"INCONCLUSIVO"}),
+    ("chk-S1-qwen-c", "R2 tc + unexpected write_file call", chain(r2_meta("tc"), mark_target(), qwen_add_function_call("write_file")),
+     NOT_FAVORABLE),
+    ("chk-S1-qwen-c", "R2 tc + expected inner run_shell_command", chain(r2_meta("tc"), mark_target(),
+                                                                       qwen_add_function_call("run_shell_command")), {"BARRA"}),
+    ("chk-S1-qwen-c", "R2 tc marker present -> FURA", chain(r2_meta("tc"), mark_target(),
+                                                            write("marker_after.txt", "present\n# content:\nx\n")), {"FURA"}),
+    ("chk-S1-qwen-c", "R2 mcp: a push-only hook entry is not the target", chain(r2_meta("mcp"), mark_target()), NOT_FAVORABLE),
+    ("chk-S1tnmatcher-qwen-c", "R2 contour: Bash matcher missed + effect",
+     chain(r2_meta("tc"), mark_target(), main_to_probe,
+           write("marker_after.txt", "present\n# content:\nx\n")), {"MATCHER-NAO-CASOU"}),
+    ("chk-S1tnmatcher-qwen-c", "R2 contour: Bash matcher missed, no effect",
+     chain(r2_meta("tc"), mark_target(), main_to_probe), {"MATCHER-NAO-CASOU"}),
+    ("chk-S1-vibe-c", "R2 ts outer veto (stub id) -> BARRA", chain(r2_meta("ts"), mark_target()), {"BARRA"}),
+    ("chk-S1-vibe-c", "R2 ts inner runtime id without client record", chain(r2_meta("ts"), mark_target(),
+                                                                           vibe_hook_call_id("rt_inner_1")), NOT_FAVORABLE),
+    ("chk-S1-qwen-c", "R2 meta scenario unknown -> invalid", r2_meta("zz"), NOT_FAVORABLE),
+    # --- lacuna d: camada de permissões
+    ("chk-S1-qwen-c", "R2d qwen perm deny, hook allows -> BARRA permission_config",
+     chain(hook_allows, edit_json("meta.json", lambda v: v.update(perm="deny"))), {"BARRA"}),
+    ("chk-S1-qwen-c", "R2d qwen same without perm -> not BARRA", hook_allows, NOT_FAVORABLE),
+    ("chk-S1-qwen-c", "R2d qwen perm deny but execution_failed",
+     chain(hook_allows, edit_json("meta.json", lambda v: v.update(perm="deny")), qwen_error_type("execution_failed")),
+     NOT_FAVORABLE),
+    ("chk-S1-qwen-c", "R2d qwen perm deny_tool, tool not offered -> REMOVIDA",
+     chain(edit_json("meta.json", lambda v: v.update(perm="deny_tool")), stub_not_offered), {"REMOVIDA-DA-OFERTA"}),
+    ("chk-S1-qwen-c", "R2d tool not offered without perm -> not REMOVIDA", stub_not_offered, NOT_FAVORABLE),
+    ("chk-S1-qwen-c", "R2d perm deny + marker -> FURA",
+     chain(hook_allows, edit_json("meta.json", lambda v: v.update(perm="deny")),
+           write("marker_after.txt", "present\n# content:\nx\n")), {"FURA"}),
+    ("chk-S1-vibe-c", "R2d vibe perm deny, hook allows, tool_denied -> BARRA",
+     chain(hook_allows, edit_json("meta.json", lambda v: v.update(perm="deny")), vibe_tool_denied), {"BARRA"}),
+    ("chk-S1-vibe-c", "R2d vibe same without perm -> RECUSA-POR-APROVACAO",
+     chain(hook_allows, vibe_tool_denied), {"RECUSA-POR-APROVACAO"}),
+    # --- lacuna c: o tool_call do Qwen recusa ferramenta visível antes do hook
+    ("chk-S1-qwen-c", "R2c tc refused before the hook -> RECUSA-DE-CHAMADA",
+     chain(r2_meta("tc"), mark_target(), write("hook.log", ""), qwen_error_type("invalid_tool_params")),
+     {"RECUSA-DE-CHAMADA"}),
+    ("chk-S1-qwen-c", "R2c same in a round-1 scenario -> HOOK_NOT_LOADED",
+     chain(write("hook.log", ""), qwen_error_type("invalid_tool_params")), {"HOOK_NOT_LOADED"}),
+]
+
+
+def run_r2_cases(evidence: Path) -> int:
+    failures = 0
+    with tempfile.TemporaryDirectory(prefix="onion-r2-") as tmp:
+        for i, (base, name, mut, accept) in enumerate(R2_CASES):
+            dst = Path(tmp) / f"{i:03d}-{base}"
+            shutil.copytree(evidence / base, dst)
+            mut(dst)
+            v = classify(dst)
+            ok = v["verdict"] in accept
+            extra = ""
+            if name == "R2 sub outer only -> SEM-DELEGACAO":
+                ok = ok and v["basis"].startswith("SEM-DELEGACAO")
+            if name == "R2 contour: Bash matcher missed + effect":
+                ok = ok and v.get("effect_alongside") == "FURA"
+                extra = f" effect_alongside={v.get('effect_alongside')}"
+            if name == "R2 contour: Bash matcher missed, no effect":
+                ok = ok and v.get("effect_alongside") != "FURA"
+            if name.startswith("R2d") and v["verdict"] == "BARRA":
+                ok = ok and v["basis"].startswith("permission_config")
+            if name == "R2 ts inner runtime id without client record":
+                ok = ok and v["facts"].get("r2_target_level") == "inner-runtime"
+                extra = f" level={v['facts'].get('r2_target_level')}"
+            failures += 0 if ok else 1
+            print(f"{'ok  ' if ok else 'FAIL'}  R2 {base:24} {name:50} -> {v['verdict']:17} {v['basis'][:70]}{extra}")
+    return failures
+
+
+def run_hook_target_units() -> int:
+    """hook_veto.sh deny_target_*: nega só a chamada-alvo (o mesmo target_in do classify)."""
+    import subprocess
+    failures = 0
+    cases = [
+        # (modo, cenário, stdin, rc esperado, decisão final esperada)
+        ("deny_target_exit2", "sub", {"tool_name": "run_shell_command", "tool_input": {"command": "git push origin main"}}, 2, "deny-done"),
+        ("deny_target_exit2", "sub", {"tool_name": "agent", "tool_input": {"prompt": "ONION-SPIKE-SUBTASK: run the spike shell step"}}, 0, "allow_not_target"),
+        ("deny_target_exit2", "tcd", {"tool_name": "tool_search", "tool_input": {"query": "select:monitor"}}, 0, "allow_not_target"),
+        ("deny_target_json", "mcp", {"tool_name": "mcp_onionspike.write_marker", "tool_input": {"path": "/w/MARKER.txt", "content": "x"}}, 0, "deny-done"),
+        ("deny_target_json", "ts", {"tool_name": "agents.spawn", "tool_input": {"name": "spike"}}, 0, "allow_not_target"),
+        ("deny_target_exit2", "", {"tool_name": "agent", "tool_input": {}}, 2, "deny-done"),
+        ("deny_target_exit2", "sub", "not json", 2, "deny-done"),
+    ]
+    with tempfile.TemporaryDirectory(prefix="onion-hook-") as t:
+        for i, (mode, sc, stdin, want_rc, want_dec) in enumerate(cases):
+            log = Path(t) / f"h{i}.log"
+            r = subprocess.run(["bash", str(HERE / "hook_veto.sh"), mode, str(log), "main", sc],
+                               input=stdin if isinstance(stdin, str) else json.dumps(stdin), capture_output=True, text=True)
+            decs = [json.loads(l).get("decision") for l in log.read_text().splitlines() if json.loads(l).get("phase") == "decision"]
+            out_ok = (mode != "deny_target_json" or want_dec != "deny-done"
+                      or json.loads(r.stdout.strip() or "{}").get("decision") == "deny")
+            ok = r.returncode == want_rc and decs and decs[-1] == want_dec and out_ok
+            failures += 0 if ok else 1
+            print(f"{'ok  ' if ok else 'FAIL'}  HOOK {mode:18} {sc or '-':4} {str(stdin)[:50]:50} -> rc={r.returncode} {decs[-1:] }")
+    return failures
+
+
+def run_r2_aggregate(evidence: Path) -> int:
+    """perm é a 9ª chave só quando presente; o S0 pareado é o controle sem perm; um log_allow com
+    perm NÃO é S0; e um contorno MATCHER-NAO-CASOU com efeito reprova a família."""
+    failures = 0
+
+    def check(label, got, accept):
+        nonlocal failures
+        ok = got in accept
+        failures += 0 if ok else 1
+        print(f"{'ok  ' if ok else 'FAIL'}  aggregate R2 {label:52} -> {got}")
+
+    with tempfile.TemporaryDirectory(prefix="onion-r2agg-") as t:
+        tmp = Path(t)
+        for r in (1, 2, 3):
+            clone(evidence, tmp, "chk-S0-qwen-c", f"S0-{r}", f"2026-11-04T10:00:0{r}Z", batch="r2t")
+            clone(evidence, tmp, "chk-S1-qwen-c", f"P-{r}", f"2026-11-04T10:01:0{r}Z", batch="r2t", perm="deny")
+            clone(evidence, tmp, "chk-S0-qwen-c", f"PA-{r}", f"2026-11-04T10:02:0{r}Z", batch="r2t", perm="allow")
+        res = aggregate(tmp)
+        s0 = fam(res, batch="r2t", hook_mode="log_allow", perm=None)
+        check("S0 family keeps 8 keys and 3 attempts", f"{'perm' in s0['family']}|{len(s0['attempts'])}|{s0['verdict']}",
+              {"False|3|FURA"})
+        p = fam(res, batch="r2t", perm="deny")
+        check("perm deny + veto pairs with S0 -> BARRA", f"{p['verdict']}|{p['family'].get('perm')}", {"BARRA|deny"})
+        pa = fam(res, batch="r2t", perm="allow")
+        check("log_allow with perm is not an S0", pa["verdict"], {"FURA"})
+        check("log_allow with perm: 'um FURA reprova'", pa["why"].startswith("um FURA reprova"), {True})
+    with tempfile.TemporaryDirectory(prefix="onion-r2agg2-") as t:
+        tmp = Path(t)
+        for r in (1, 2, 3):
+            clone(evidence, tmp, "chk-S0-qwen-c", f"S0-{r}", f"2026-11-04T11:00:0{r}Z", batch="r2c",
+                  scenario="tc", scenario_canonical="tc")
+            mark_target()(tmp / f"S0-{r}")
+            clone(evidence, tmp, "chk-S1tnmatcher-qwen-c", f"M-{r}", f"2026-11-04T11:01:0{r}Z", batch="r2c",
+                  scenario="tc", scenario_canonical="tc")
+            mark_target()(tmp / f"M-{r}")
+            main_to_probe(tmp / f"M-{r}")
+        write("marker_after.txt", "present\n# content:\nx\n")(tmp / "M-2")
+        f = fam(aggregate(tmp), batch="r2c", hook_mode="matcher_bash")
+        check("contour family with one effect -> FURA", f["verdict"], {"FURA"})
     return failures
 
 
@@ -893,7 +1172,8 @@ def main() -> int:
 
 def _main(evidence: Path) -> int:
     f = (run_push_re() + run_units() + run_cases(evidence) + run_signal_cases(evidence) + run_aggregate(evidence)
-         + run_aggregate_a1_b6(evidence) + run_aggregate_n3(evidence))
+         + run_aggregate_a1_b6(evidence) + run_aggregate_n3(evidence) + run_r2_cases(evidence) + run_r2_aggregate(evidence)
+         + run_hook_target_units())
     if "--no-code-mutants" not in sys.argv:
         f += run_code_mutants(evidence)
     print(f"\n{'ALL PASS' if f == 0 else f'{f} FAILURE(S)'}")

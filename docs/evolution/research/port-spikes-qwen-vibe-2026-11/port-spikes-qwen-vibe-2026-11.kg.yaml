@@ -259,6 +259,18 @@ nodes:
       locator: "pergunta com opções de 2026-11-04: «2ª rodada dos spikes: o que fazemos com a regra do subagente no Vibe?»"
       method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
       locality: "pessoa"
+  - id: Q_PORT_SPIKES_RODADA_2_LACUNAS_1104
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-11-04"
+    verified_against: "pré-registro escrito antes de qualquer célula; expectativas citadas por arquivo:linha do código instalado (Qwen Code 0.26.6, Mistral Vibe 3.0.4); harness testado sem célula de cliente (test_classify.py, selftests do stub e do servidor MCP, reproduce.sh da rodada 1)"
+    trace: "docs/evolution/research/port-spikes-qwen-vibe-2026-11/PRE-REGISTRO-R2.md"
+    label: "Rodada 2: o veto de hook vale sobre ferramenta MCP, dentro do subagente e contra os contornos ao matcher Bash (tool_call no Qwen; file_system.bash e process.start dentro do run_typescript no Vibe)? E a negação por configuração barra sozinha e compõe com o hook?"
+    narrative: "Pré-registrada, nenhuma célula rodada. Responde às lacunas de E_PORT_SPIKE_LACUNAS_1103. O que depende do núcleo nativo do Vibe (despacho do hook para chamadas de dentro do run_typescript, ordem hook x portão) está declarado desconhecido."
 edges:
   - from: E_PORT_SPIKE_QWEN_VETO_EXIT2_BARRA_1103
     to: Q_PORT_SPIKES_VETO_QWEN_VIBE_1103
@@ -304,4 +316,6 @@ edges:
     edge_type: TRACES_TO
   - from: D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104
     to: D_PORT_SPIKES_RODADA_2_ANTES_DE_FECHAR_1103
+  - from: Q_PORT_SPIKES_RODADA_2_LACUNAS_1104
+    to: E_PORT_SPIKE_LACUNAS_1103
     edge_type: TRACES_TO
