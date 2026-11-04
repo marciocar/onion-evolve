@@ -4,7 +4,7 @@ meta:
   schema_version: "1"
   baseline: "2026-11-03"
   review_after: "2026-12-03"   # 30d: ferramenta (harnesses mudam a cada release)
-  # ═══ TETO: 20 NÓS ═══
+  # ═══ TETO: 20 NÓS ═══ (21 desde o rebase de 2026-11-04: 19 da investigação e 2 decisões do maestro, seladas em outra sessão)
   x_supersedes_none: "rodada nova; não derruba nó do corpus, só mede o que a pesquisa das portas leu na doc"
 external_edges:
   - from: C_PORT_SPIKE_CRITERIO_DA_PORTA_1103
@@ -395,6 +395,7 @@ edges:
     edge_type: TRACES_TO
   - from: D_PORT_SPIKES_R2_RODAR_APROVADO_E_PESQUISAR_VIBE_1104
     to: D_PORT_SPIKES_RODADA_2_ANTES_DE_FECHAR_1103
+    edge_type: TRACES_TO
   - from: Q_PORT_SPIKES_RODADA_2_LACUNAS_1104
     to: E_PORT_SPIKE_LACUNAS_1103
     edge_type: TRACES_TO

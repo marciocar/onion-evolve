@@ -1509,3 +1509,36 @@ célula). A regra não lê essa resposta.
 
 **O agregado:** 124 células e 37 famílias. As 35 famílias anteriores não mudam. O lote fica em
 `evidence-r2veto.tar.gz`, e o `reproduce.sh` cobra o gravado contra o recalculado (passo 8).
+
+## 14. Os SHAs citados neste texto (rebase de 2026-11-04 sobre a `origin/main`)
+
+Por ordem da sessão do core, a branch foi rebaseada antes de subir, e o rebase reescreveu os 16 commits. **Os SHAs citados
+acima são os de antes do rebase**, e não ficam no histórico remoto. Eu não os troquei no texto, porque as revisões os citam.
+
+| Antes | Depois |
+|---|---|
+| `4201fdad0` | `a7db12c73` |
+| `8bccaee92` | `e686383a7` |
+| `77448e52c` | `a271c576b` |
+| `bcff4b9ae` | `04eceacf7` |
+| `49b69dc5e` | `2318391ad` |
+| `d4ddbe96a` | `39707ea8a` |
+| `77de9ec51` | `a49fd1c52` |
+| `17f5bf1a6` | `50941c1d1` |
+| `6dc1a4886` | `8e57f743e` |
+| `d577a7309` | `c9c263453` |
+| `cbc067cc0` | `16d53f52e` |
+| `b208fbeb9` | `b4d1f55ae` |
+| `9e9d29db6` | `cede5d4ad` |
+| `aa35d25eb` | `70e0de25a` |
+| `7959b1a02` | `c2bb87091` |
+| `7a77f07b5` | `e9af8deaa` |
+
+- **O conteúdo não mudou.** O único conflito foi no `.kg.yaml`: os dois nós de decisão que vieram da main e os desta
+  rodada, unidos sem perda. `classify.py`, `aggregate.py`, `test_classify.py` e os arquivos de evidência saíram idênticos
+  aos de `7a77f07b5`.
+- **A prova de que o commit pré-dado veio antes dos dados** passa a ser esta: o pré-dado foi commitado às 18:29:23Z (o
+  reflog e a data de autor), e a 1ª célula de veto começou às 18:55:46Z (`meta.json`). A data de *committer* mudou com o
+  rebase. As 7 células gravam em `sha256.txt` os hashes de `classify.py` e `test_classify.py`, os do commit pré-dado.
+- **A referência:** `harness/reference/classify_r2_lot.py` é o `classify.py` da linha `cbc067cc0` da tabela (o blob
+  `43988b581cc4` não depende do rebase).
