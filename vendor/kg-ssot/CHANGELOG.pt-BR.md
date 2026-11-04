@@ -10,6 +10,25 @@ Esta é a tradução; a fonte é o [CHANGELOG.md](CHANGELOG.md) em inglês. As r
 
 ## [Unreleased]
 
+## [4.42.0] - 2026-11-04
+
+Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. O `kg-ssot.query/1` não muda.
+
+- O `kg_query --edges` conta e lista arestas em vez de nós: as internas e as externas. O `--where` e o `--group-by`
+  aceitam `edge_type`, `scope`, `file`, `meta.<chave>`, e `from.<campo>` e `to.<campo>` (`id`, `file`, `found`,
+  `node_type`, `status`, `plane`, `layer`, `owner`, `x_*` ou `provenance.<chave>`). Sem `--group-by`, imprime a lista
+  paginada `kg-ssot.edges/1` (`spec/edges.schema.json`).
+- O `--count-distinct CAMPO` (repetível) conta os valores ou combinações distintas em cada grupo; o valor null não
+  conta, como no `count(DISTINCT)` do Cypher, nem a combinação com algum null, como no `COUNT(DISTINCT a, b)` do SQL; o `--min-count N` deixa os grupos a partir de N, como o `HAVING` do SPARQL. Os dois valem
+  para nós e arestas. Juntos, dão o grau de entrada de um nó por origens distintas.
+- O `--where` e o `--group-by` de nós aceitam `provenance.<chave>`, como `provenance.locality`.
+- A saída agrupada passa ao `kg-ssot.groups/2`: ganha `subject` (`nodes` ou `edges`) e `counted` (`rows` ou
+  `distinct:<campos>`), e uma contagem de distintos pode ser 0. Quem confere o `schema_version` deve aceitar o `/2`.
+- A ferramenta `kg_query` do MCP aceita `edges`, `count_distinct` e `min_count`.
+  Por quê: na bancada da curadoria, de 15 perguntas de contagem sobre um corpus, mais cinco saem agora só do
+  `kg_query`, iguais ao gabarito (contagem por tipo de aresta, grau de entrada, alvos externos, proveniência e
+  substituição).
+
 ## [4.41.0] - 2026-11-03
 
 Nenhuma mudança de contrato (segue o v4.18), e nenhum veredito muda. O `kg-ssot.query/1` não muda.

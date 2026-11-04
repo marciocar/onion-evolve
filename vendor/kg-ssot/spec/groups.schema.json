@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:groups.schema.json",
-  "title": "Contagem agrupada de uma consulta (kg-ssot.groups/1)",
-  "description": "Saída de `kg_query.py --group-by CAMPO --format json` e da ferramenta kg_query do servidor MCP com `group_by`, desde a 4.41.0. Conta os nós que os filtros da consulta acham, agrupados pelo valor de cada campo pedido: file (o caminho do grafo, ou o nome dele no servidor MCP), node_type, status, plane, layer, owner, um x_* (com ponto para a chave aninhada) ou meta.<chave> (o meta do grafo do nó). Com mais de um campo, o grupo é a combinação. O campo que falta vale null e forma o próprio grupo; a data sai em ISO, e a lista ou o mapa sai como o texto JSON dele (chaves ordenadas), de modo que cada nó cai num grupo só e a soma das contagens é `total`. O booleano não se funde com o número (true e 1 são grupos separados), mas 1 e 1.0 são um grupo (a chave sai 1), e a data, a lista ou o mapa e o .nan ou .inf caem no grupo do texto que os escreve. A lista de grupos é inteira, sem página, da contagem maior para a menor e, no empate, pela chave (o null antes do texto). `query` ecoa o pedido normalizado de kg-ssot.query/1 com `group_by`. Não combina com --semantic nem com --cursor.",
+  "title": "Contagem agrupada de uma consulta (kg-ssot.groups/2)",
+  "description": "Saída de `kg_query.py --group-by CAMPO --format json` e da ferramenta kg_query do servidor MCP com `group_by`, desde a 4.41.0 (o /2 desde a 4.42.0, com `subject` e `counted`). Conta os nós que os filtros da consulta acham, agrupados pelo valor de cada campo pedido: file (o caminho do grafo, ou o nome dele no servidor MCP), node_type, status, plane, layer, owner, um x_* (com ponto para a chave aninhada) ou meta.<chave> (o meta do grafo do nó). Com mais de um campo, o grupo é a combinação. O campo que falta vale null e forma o próprio grupo; a data sai em ISO, e a lista ou o mapa sai como o texto JSON dele (chaves ordenadas), de modo que cada nó cai num grupo só e a soma das contagens é `total`. O booleano não se funde com o número (true e 1 são grupos separados), mas 1 e 1.0 são um grupo (a chave sai 1), e a data, a lista ou o mapa e o .nan ou .inf caem no grupo do texto que os escreve. A lista de grupos é inteira, sem página, da contagem maior para a menor e, no empate, pela chave (o null antes do texto). `query` ecoa o pedido normalizado de kg-ssot.query/1 com `group_by`. Não combina com --semantic nem com --cursor. Desde a 4.42.0: `subject` diz o que se conta, nós (`nodes`) ou arestas (`edges`, com --edges, e aí os campos são os de aresta: edge_type, scope, file, meta.<chave>, from.<campo> e to.<campo>); `counted` diz o que é a contagem, as linhas (`rows`) ou as combinações distintas dos campos do --count-distinct (`distinct:<campos>`, que ignoram o null, como o count(DISTINCT) do Cypher), e aí a contagem pode ser 0; com --min-count, só os grupos a partir dele saem, e a soma deixa de ser o `total`. Nos nós, o campo pode ser também provenance.<chave>.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -11,12 +11,14 @@
     "query",
     "graphs",
     "unreadable",
+    "subject",
+    "counted",
     "total",
     "groups"
   ],
   "properties": {
     "schema_version": {
-      "const": "kg-ssot.groups/1"
+      "const": "kg-ssot.groups/2"
     },
     "root": {
       "type": [
@@ -67,6 +69,18 @@
         }
       }
     },
+    "subject": {
+      "enum": [
+        "nodes",
+        "edges"
+      ],
+      "description": "o que se conta: nós ou arestas (--edges)"
+    },
+    "counted": {
+      "type": "string",
+      "pattern": "^(rows|distinct:.+)$",
+      "description": "rows (as linhas) ou distinct:<campos> (as combinações distintas, sem null)"
+    },
     "total": {
       "type": "integer",
       "minimum": 0,
@@ -97,7 +111,7 @@
           },
           "count": {
             "type": "integer",
-            "minimum": 1
+            "minimum": 0
           }
         }
       }
@@ -106,5 +120,29 @@
       "type": "string",
       "description": "o porquê de um zero do --text, como em kg-ssot.query/1"
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "counted": {
+            "const": "rows"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "groups": {
+            "items": {
+              "properties": {
+                "count": {
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

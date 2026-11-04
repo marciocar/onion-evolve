@@ -1,4 +1,4 @@
-<!-- translation-of: docs/manual/05-tools.md sha256:c0f0a08d8e561a77 -->
+<!-- translation-of: docs/manual/05-tools.md sha256:7ccba4ca7f335477 -->
 # 5. Ferramentas
 
 [English](../05-tools.md) | **Português (Brasil)**
@@ -758,8 +758,9 @@ alvo.kg.yaml  EV_A  evidence/confirmed/DEV imp=3  A evidência sintética que su
 | `--text PALAVRAS` | Palavras que o label contém, todas, sem maiúscula nem acento (`verificacao` casa `Verificação`, desde a 4.23); `--in-narrative` procura também na narrative. Quando o texto inteiro é um termo do vocabulário (o `pref` ou um sinônimo de domínio atual, dobrados, ou a `notation`, exata), casam também o termo e todo nó que tenha qualquer forma dele como palavra inteira, e o `expanded` diz qual termo; o sinônimo de caso ou aposentado não expande. Nenhum nó dá um `hint`, que diz quando o zero vem dos outros filtros, para o zero não passar por "não há" |
 | `--semantic PERGUNTA` | Desde a 4.26, com o extra `vector`: ordena os nós que passam nos outros filtros pela semelhança com a pergunta (`--model`, `--model-dir`; ver o `kg_vector.py` abaixo). Sozinho, a ordem é a do vetor; com `--text`, a lista do texto (na ordem do corpus) e a do vetor se fundem por RRF (k=60), com o empate pela posição no vetor. Dê o termo curto ao `--text` e a pergunta inteira ao `--semantic`: é o que a bancada mediu (14 de 20 acertos, contra 12 do vetor e 9 do texto). Os filtros valem para os dois, as duas listas são completas, e o `--limit` só pagina a lista fundida; por isso, no híbrido, o `total` conta todos os candidatos, e o `semantic.text_matches` diz quantos casam o `--text`. O JSON ganha `semantic` (modo, modelo com revisão e sha256, e de onde veio cada vetor: o índice, embutido na hora, a memória do processo, ou sem texto) e um `rank` por nó; sem `--semantic` a saída não muda |
 | `--open` | A fila dos abertos (status `open`) |
-| `--group-by CAMPO` | Desde a 4.41.0: conta os nós por campo em vez de listá-los (`kg-ssot.groups/1`). Veja "Quantos, por campo" abaixo |
-| `--where CHAVE=VALOR` | Desde a 4.39.0: só os nós em que `owner` ou um campo `x_*` (com ponto para chave aninhada) tem o valor; repetível, e todas têm de valer. Veja "A fila de um dono" abaixo |
+| `--group-by CAMPO` | Desde a 4.41.0: conta os nós por campo em vez de listá-los (`kg-ssot.groups/2` desde a 4.42.0). Veja "Quantos, por campo" abaixo |
+| `--edges`, `--count-distinct CAMPO`, `--min-count N` | Desde a 4.42.0: as arestas como sujeito, a contagem de distintos e o mínimo. Veja "As arestas como sujeito" abaixo |
+| `--where CHAVE=VALOR` | Desde a 4.39.0: só os nós em que `owner`, um campo `x_*` ou (desde a 4.42.0) `provenance.<chave>` (com ponto para chave aninhada) tem o valor; repetível, e todas têm de valer. Veja "A fila de um dono" abaixo |
 | `--verified-before AAAA-MM-DD` | Os nós sem `verified_at`, ou conferidos antes da data |
 | `--around ID` | A vizinhança: `<caminho>#<id>`, ou um id único no corpus; `--depth`, `--edge-type` (repetível), `--direction out\|in\|both` |
 | `--sort corpus\|impact\|attention` | A ordem do corpus, o impacto declarado ou a atenção (impacto × confiança × fator do status × (1 + grau), o valor do radar) |
@@ -945,7 +946,7 @@ no `--where`) ou `meta.<chave>`, um campo do `meta` do grafo do nó (`meta.id`, 
 agrupar pela combinação, até 5 campos. O campo que falta vale `null` e forma o próprio grupo; a data sai em ISO, e a
 lista ou o mapa sai como o texto JSON dele, de modo que cada nó cai num grupo só e as contagens somam o `total`. Todos
 os grupos saem, sem página, da contagem maior para a menor. Os filtros valem antes. A saída JSON é o
-`kg-ssot.groups/1` (`spec/groups.schema.json`), e o `kg-ssot.query/1` não muda. Não combina com `--semantic` nem com
+`kg-ssot.groups/2` (`spec/groups.schema.json`; o `/1` até a 4.41.0), e o `kg-ssot.query/1` não muda. Não combina com `--semantic` nem com
 `--cursor`, nem com `--decision`, `--chain` ou `--revisit` (rc 2). A ferramenta `kg_query` do MCP aceita os mesmos
 campos em `group_by`, onde `file` é o nome do grafo no armazém; os grupos não têm página, então a resposta maior que
 o teto de tamanho do servidor é recusada, com o pedido de estreitar os filtros. `true` e `1` são grupos separados, como no
@@ -962,8 +963,44 @@ kg-query --root . --type evidence --status confirmed --group-by meta.id --format
 ```
 
 Contar é pergunta para o leitor do contrato, não para código sobre o YAML: o leitor pula o vendor e as fixtures, põe em
-`unreadable` o grafo que não parseia em vez de adivinhá-lo e aplica os mesmos filtros de toda consulta. Quantas arestas
-chegam a um nó (o grau de entrada) ainda não está coberto.
+`unreadable` o grafo que não parseia em vez de adivinhá-lo e aplica os mesmos filtros de toda consulta. O grau de entrada
+de um nó e as outras contagens de arestas estão em "As arestas como sujeito", abaixo.
+
+### As arestas como sujeito: `--edges` (4.42.0)
+
+O `--edges` faz a consulta contar e listar arestas em vez de nós: as internas (`edges`, escopo `internal`) e as externas
+(`external_edges`, escopo `external`), na ordem do corpus. O `--where` e o `--group-by` passam a aceitar os campos de
+aresta: `edge_type`, `scope`, `file` (o grafo que declara a aresta), `meta.<chave>` desse grafo, e `from.<campo>` e
+`to.<campo>`, em que o campo da ponta é `id`, `file`, `found` (se a ponta existe no corpus), `node_type`, `status`,
+`plane`, `layer`, `owner`, um campo `x_*` ou `provenance.<chave>`. A ponta fora do corpus guarda o `id` e o `file` e tem
+os campos de nó nulos. Sem `--group-by`, a saída é a lista paginada `kg-ssot.edges/1` (`spec/edges.schema.json`); com
+ele, o `kg-ssot.groups/2` com `subject: edges`. Os filtros de nó (`--type`, `--status`, `--text`, `--around`, `--chain` e
+semelhantes) não combinam com `--edges` (rc 2): filtre as arestas com o `--where`. No `--where` de arestas, a chave que
+falta casa `null`, como no grupo `null` (no `--where` de nós, a chave que falta nunca casa). A aresta externa sem `from`
+tem o grafo inteiro como origem: o `from.id` é null, e o `from.found` diz se esse grafo está no corpus. A aresta cujas
+pontas não são texto fica fora da contagem, como na leitura do grafo pelos outros comandos.
+
+Duas opções de contagem valem com o `--group-by`, para nós e para arestas:
+
+- O `--count-distinct CAMPO` conta, em cada grupo, os valores distintos do campo em vez das linhas; repita para contar
+  combinações distintas (um nó é `to.file` mais `to.id`). O valor null não conta, como no `count(DISTINCT)` do Cypher;
+  a combinação com algum null também não conta, como no `COUNT(DISTINCT a, b)` do SQL. A contagem pode então ser 0, e
+  o `counted` diz `distinct:<campos>`.
+- O `--min-count N` deixa só os grupos com contagem a partir de N, como o `HAVING` do SPARQL; as contagens deixam então
+  de somar o `total`.
+
+```bash
+kg-query --root . --edges --group-by edge_type --group-by scope                     # a forma das arestas
+kg-query --root . --edges --where scope=internal --group-by to.file --group-by to.id \
+  --count-distinct from.id --min-count 9                                            # grau de entrada de 9 origens distintas
+kg-query --root . --edges --where edge_type=SUPERSEDES --where from.status=confirmed \
+  --where to.status=superseded --group-by scope --count-distinct to.file --count-distinct to.id
+kg-query --root . --where provenance.locality=web --group-by file                  # 4.42.0: provenance também nos nós
+```
+
+Desde a 4.42.0, o `--where` e o `--group-by` de nós também aceitam `provenance.<chave>`. Perguntas de dois saltos (uma
+evidência que restringe uma decisão que leva a uma pergunta) e de ausência (um nó que não recebe `SUPPORTS`) ainda não
+saem de uma consulta só.
 
 ## `kg_diff.py`: o diff por id entre revisões
 

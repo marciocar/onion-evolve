@@ -8,26 +8,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: packaging/npm/cli.mjs
-msgid "--corpus without a directory"
-msgstr "--corpus sem diretório"
-
-#: packaging/npm/cli.mjs
-msgid "ERROR"
-msgstr "ERRO"
-
-#: packaging/npm/cli.mjs
-msgid "WARNING"
-msgstr "AVISO"
-
-#: packaging/npm/cli.mjs
-msgid "unknown option: {option}"
-msgstr "opção desconhecida: {option}"
-
-#: packaging/npm/cli.mjs
-msgid "usage: kg-ssot-validate <file.kg.yaml|file.kg.json>... [--json] [--corpus DIR]"
-msgstr "uso: kg-ssot-validate <arquivo.kg.yaml|arquivo.kg.json>... [--json] [--corpus DIR]"
-
 #: tools/kg_conformance.py
 msgid "--proposals-schema and --proposals-should-schema go together"
 msgstr "--proposals-schema e --proposals-should-schema vão juntos"
@@ -3649,10 +3629,6 @@ msgid "--where {item}: the key is empty or has an empty part"
 msgstr "--where {item}: a chave está vazia ou tem uma parte vazia"
 
 #: tools/kg_query.py
-msgid "--where {item}: the key is owner or an x_* field (x_raci.responsible)"
-msgstr "--where {item}: a chave é owner ou um campo x_* (x_raci.responsible)"
-
-#: tools/kg_query.py
 msgid "--where {item}: write KEY=VALUE"
 msgstr "--where {item}: escreva CHAVE=VALOR"
 
@@ -3681,21 +3657,101 @@ msgid "--group-by counts the node queries, not --decision, --chain or --revisit"
 msgstr "--group-by conta as consultas de nós, não --decision, --chain nem --revisit"
 
 #: tools/kg_query.py
-msgid "--group-by takes at most {max} fields"
-msgstr "--group-by aceita no máximo {max} campos"
-
-#: tools/kg_query.py
-msgid "--group-by {item}: the field is file, node_type, status, plane, layer, owner, an x_* field (x_raci.responsible) or meta.<key>"
-msgstr "--group-by {item}: o campo é file, node_type, status, plane, layer, owner, um campo x_* (x_raci.responsible) ou meta.<chave>"
-
-#: tools/kg_query.py
-msgid "--group-by {item}: the field is repeated"
-msgstr "--group-by {item}: o campo está repetido"
-
-#: tools/kg_query.py
-msgid "count the nodes the filters find, by the value of the field (repeatable, up to 5): file, node_type, status, plane, layer, owner, an x_* field (with a dot for a nested key) or meta.<key> of the node's graph; prints kg-ssot.groups/1, every group, without pages"
-msgstr "conta os nós que os filtros acham, pelo valor do campo (repetível, até 5): file, node_type, status, plane, layer, owner, um campo x_* (com ponto para chave aninhada) ou meta.<chave> do grafo do nó; imprime o kg-ssot.groups/1, com todos os grupos, sem página"
-
-#: tools/kg_query.py
 msgid "· {total} node(s) in {graphs} graph(s), in {groups} group(s) by {fields}"
 msgstr "· {total} nó(s) em {graphs} grafo(s), em {groups} grupo(s) por {fields}"
+
+#: tools/kg_query.py
+msgid "--count-distinct and --min-count count the groups of --group-by: give it too"
+msgstr "--count-distinct e --min-count contam os grupos do --group-by: dê ele também"
+
+#: tools/kg_query.py
+msgid "--edges counts edges: it does not combine with {flags}; filter the edges with --where (edge_type=…, from.status=…)"
+msgstr "--edges conta arestas: não combina com {flags}; filtre as arestas com --where (edge_type=…, from.status=…)"
+
+#: tools/kg_query.py
+msgid "--group-by counts every edge the filters find: it does not combine with --cursor"
+msgstr "--group-by conta todas as arestas que os filtros acham: não combina com --cursor"
+
+#: tools/kg_query.py
+msgid "--min-count must be an integer from 1"
+msgstr "--min-count tem de ser um inteiro a partir de 1"
+
+#: tools/kg_query.py
+msgid "--where {item}: the key is owner, an x_* field (x_raci.responsible) or provenance.<key>"
+msgstr "--where {item}: a chave é owner, um campo x_* (x_raci.responsible) ou provenance.<chave>"
+
+#: tools/kg_query.py
+msgid "count and list edges instead of nodes (internal and external): --where and --group-by take edge_type, scope, file, meta.<key>, and from.<field> and to.<field> (id, file, found, node_type, status, plane, layer, owner, an x_* field or provenance.<key>); without --group-by, prints kg-ssot.edges/1"
+msgstr "conta e lista arestas em vez de nós (internas e externas): --where e --group-by aceitam edge_type, scope, file, meta.<chave>, e from.<campo> e to.<campo> (id, file, found, node_type, status, plane, layer, owner, um campo x_* ou provenance.<chave>); sem --group-by, imprime o kg-ssot.edges/1"
+
+#: tools/kg_query.py
+msgid "with --group-by, count the distinct values of the field in each group instead of the rows (repeatable: the distinct combinations); null does not count"
+msgstr "com --group-by, conta os valores distintos do campo em cada grupo em vez das linhas (repetível: as combinações distintas); o null não conta"
+
+#: tools/kg_query.py
+msgid "with --group-by, keep only the groups with a count from N"
+msgstr "com --group-by, deixa só os grupos com contagem a partir de N"
+
+#: tools/kg_query.py
+msgid "{flag} takes at most {max} fields"
+msgstr "{flag} aceita no máximo {max} campos"
+
+#: tools/kg_query.py
+msgid "{flag} {item}: the edge field is edge_type, scope, file, meta.<key>, or from.<field> and to.<field> (id, file, found, node_type, status, plane, layer, owner, an x_* field or provenance.<key>)"
+msgstr "{flag} {item}: o campo de aresta é edge_type, scope, file, meta.<chave>, ou from.<campo> e to.<campo> (id, file, found, node_type, status, plane, layer, owner, um campo x_* ou provenance.<chave>)"
+
+#: tools/kg_query.py
+msgid "{flag} {item}: the field is file, node_type, status, plane, layer, owner, an x_* field (x_raci.responsible), provenance.<key> or meta.<key>"
+msgstr "{flag} {item}: o campo é file, node_type, status, plane, layer, owner, um campo x_* (x_raci.responsible), provenance.<chave> ou meta.<chave>"
+
+#: tools/kg_query.py
+msgid "{flag} {item}: the field is repeated"
+msgstr "{flag} {item}: o campo está repetido"
+
+#: tools/kg_query.py
+msgid "· only the edges where {where}"
+msgstr "· só as arestas em que {where}"
+
+#: tools/kg_query.py
+msgid "· only the groups with a count from {n}"
+msgstr "· só os grupos com contagem a partir de {n}"
+
+#: tools/kg_query.py
+msgid "· the count is of distinct {fields}"
+msgstr "· a contagem é de {fields} distintos"
+
+#: tools/kg_query.py
+msgid "· {total} edge(s) in {graphs} graph(s)"
+msgstr "· {total} aresta(s) em {graphs} grafo(s)"
+
+#: tools/kg_query.py
+msgid "· {total} edge(s) in {graphs} graph(s), in {groups} group(s) by {fields}"
+msgstr "· {total} aresta(s) em {graphs} grafo(s), em {groups} grupo(s) por {fields}"
+
+#: packaging/npm/cli.mjs
+msgid "--corpus without a directory"
+msgstr "--corpus sem diretório"
+
+#: packaging/npm/cli.mjs
+msgid "ERROR"
+msgstr "ERRO"
+
+#: packaging/npm/cli.mjs
+msgid "WARNING"
+msgstr "AVISO"
+
+#: packaging/npm/cli.mjs
+msgid "unknown option: {option}"
+msgstr "opção desconhecida: {option}"
+
+#: packaging/npm/cli.mjs
+msgid "usage: kg-ssot-validate <file.kg.yaml|file.kg.json>... [--json] [--corpus DIR]"
+msgstr "uso: kg-ssot-validate <arquivo.kg.yaml|arquivo.kg.json>... [--json] [--corpus DIR]"
+
+#: tools/kg_query.py
+msgid "(the whole graph)"
+msgstr "(o grafo inteiro)"
+
+#: tools/kg_query.py
+msgid "count the nodes the filters find, by the value of the field (repeatable, up to 5): file, node_type, status, plane, layer, owner, an x_* field (with a dot for a nested key) or meta.<key> of the node's graph, or provenance.<key>; prints kg-ssot.groups/2, every group, without pages"
+msgstr "conta os nós que os filtros acham, pelo valor do campo (repetível, até 5): file, node_type, status, plane, layer, owner, um campo x_* (com ponto para chave aninhada) ou meta.<chave> do grafo do nó, ou provenance.<chave>; imprime o kg-ssot.groups/2, com todos os grupos, sem página"

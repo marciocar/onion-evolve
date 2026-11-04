@@ -173,16 +173,30 @@ TOOLS = {
                                        "description": P_("node keys that go out in extra, as globs: x_*, owner")},
                             "where": {"type": "array", "maxItems": 10,
                                       "items": {"type": "string", "pattern": "^[^=]+=", "maxLength": 300},
-                                      "description": P_("KEY=VALUE conditions, all of them: owner or an x_* field, with "
-                                                        "a dot for a nested key; owner=<session> is that session's "
-                                                        "queue")},
+                                      "description": P_("KEY=VALUE conditions, all of them: owner, an x_* field (a dot "
+                                                        "for a nested key) or provenance.<key>; owner=<session> is "
+                                                        "that session's queue; with edges, the edge fields")},
                             "group_by": {"type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": True,
                                          "items": {"type": "string", "minLength": 1, "maxLength": 200},
                                          "description": P_("count the nodes the filters find, by the value of each "
-                                                           "field, instead of listing them (kg-ssot.groups/1, every "
+                                                           "field, instead of listing them (kg-ssot.groups/2, every "
                                                            "group, without pages): graph name as file, node_type, "
                                                            "status, plane, layer, owner, an x_* field (with a dot for a "
-                                                           "nested key) or meta.<key>")}}},
+                                                           "nested key), provenance.<key> or meta.<key>")},
+                            "edges": {"type": "boolean",
+                                      "description": P_("count and list edges instead of nodes (internal and external); "
+                                                        "where and group_by then take edge_type, scope, file, "
+                                                        "meta.<key>, and from.<field> and to.<field> (id, file, found, "
+                                                        "node_type, status, plane, layer, owner, an x_* field or "
+                                                        "provenance.<key>)")},
+                            "count_distinct": {"type": "array", "minItems": 1, "maxItems": 5, "uniqueItems": True,
+                                               "items": {"type": "string", "minLength": 1, "maxLength": 200},
+                                               "description": P_("with group_by, count the distinct values (or "
+                                                                 "combinations) of these fields in each group; null "
+                                                                 "does not count")},
+                            "min_count": {"type": "integer", "minimum": 1,
+                                          "description": P_("with group_by, keep only the groups with a count from "
+                                                            "this")}}},
         "needs_store": True, "writes": False},
     "kg_terms": {
         "description": P_("Resolves a domain term in the vocabulary of the store (the x_term profile, contract v4.11): "
@@ -647,6 +661,32 @@ class Server:
             day = kg_validate.iso_date(before) if before is not None else None
             if before is not None and day is None:
                 raise ToolError(P_("verified_before {value}: the date is YYYY-MM-DD").format(value=repr(before)))
+            if args.get("edges"):
+                node_only = sorted(k for k in ("ids", "id_prefix", "node_type", "status", "plane", "layer", "text",
+                                               "in_narrative", "open", "verified_before", "around", "depth",
+                                               "edge_types", "direction", "sort", "semantic", "narrative", "fields")
+                                   if args.get(k) not in (None, False, [], "", 1, "both", "corpus")
+                                   or (k == "depth" and args.get(k) not in (None, 1)))
+                if node_only:
+                    raise ToolError(P_("edges counts edges: it does not combine with {keys}; filter the edges with "
+                                       "where (edge_type=…, from.status=…)").format(keys=", ".join(node_only)))
+                if (args.get("count_distinct") or args.get("min_count") is not None) and not args.get("group_by"):
+                    raise ToolError(P_("count_distinct and min_count count the groups of group_by: give it too"))
+                if args.get("group_by") and args.get("cursor") is not None:
+                    raise ToolError(P_("group_by counts every edge the filters find: it does not combine with cursor"))
+                try:
+                    res = kg_query.edge_query(corpus, where=args.get("where", ()), file=args.get("graph"),
+                                              group_by=args.get("group_by", ()),
+                                              count_distinct=args.get("count_distinct", ()),
+                                              min_count=args.get("min_count"), limit=args.get("limit", 50),
+                                              cursor=args.get("cursor"), max_bytes=self.max_bytes)
+                except ValueError as exc:
+                    raise ToolError(str(exc)) from None
+                if "groups" in res and self.max_bytes is not None and \
+                        len(json.dumps(res["groups"], ensure_ascii=False)) > self.max_bytes:
+                    raise ToolError(P_("{n} groups do not fit in one answer: narrow the filters or group by fewer "
+                                       "fields").format(n=len(res["groups"])))
+                return res, False
             if args.get("group_by") and (args.get("semantic") is not None or args.get("cursor") is not None):
                 raise ToolError(P_("group_by counts every node the filters find: it does not combine with semantic "
                                    "or cursor"))
@@ -664,7 +704,8 @@ class Server:
                                      cursor=args.get("cursor"), narrative=args.get("narrative", False),
                                      fields=args.get("fields", ()), max_bytes=self.max_bytes,
                                      semantic=args.get("semantic"), ranker=ranker, where=args.get("where", ()),
-                                     group_by=args.get("group_by", ()))
+                                     group_by=args.get("group_by", ()),
+                                     count_distinct=args.get("count_distinct", ()), min_count=args.get("min_count"))
             except ValueError as exc:
                 raise ToolError(str(exc)) from None
             if "groups" in res and self.max_bytes is not None and \
