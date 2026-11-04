@@ -123,13 +123,23 @@ nodes:
   - id: Q_MA_WRITE_SURFACE
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: core
     impact: 5
     confidence: 0.5
     label: "Onde cada audiência escreve: no repo por PR, na wiki, pelo MCP de escrita por identidade, no task manager ou num repo próprio por responsabilidade (hipóteses A a D do hub e E do maestro)?"
-    narrative: "A: um repo com pastas por vertical (barato, mas o não técnico vai ao git e a barreira só existe com plano pago). B: repo de conhecimento separado do código (barreira por permissão de repo, que funciona no plano gratuito; pede aresta entre repos). C: superfícies por audiência com o grafo como núcleo (o negócio na wiki e no MCP de escrita por identidade, a tecnologia no repo; a escrita já nasce separada; pede ponte wiki↔grafo e classificação). D: C mais detecção no repo, a que o hub recomenda estudar primeiro. E (do maestro, C_MA_REPOS_POR_RESPONSABILIDADE_VENDORIZADOS_1028): repos separados por responsabilidade, ligados por vendorização com pin, no molde do kg-ssot vendorizado no core; a barreira é a permissão por repo, sem CODEOWNERS; o custo a medir é a regra «doc no mesmo PR do código», que passa a cruzar repos. Em todas as opções, o MCP é superfície explícita de escrita e de leitura (visão do maestro, 2026-10-28): o escritor por identidade que já existe escreve numa área própria, só aceita grafo válido, assina com o e-mail do autor e trava a escrita sobre cópia velha pelo sha; o MCP de leitura serve a todos. Fecha com a recomendação do core, medida contra a matriz de Q_MA_AUDIENCES e o estudo de mercado, levada a D_MA_ARCH."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-04"
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Três camadas: um repo por responsabilidade (opção E), rascunho por canal no chat promovido ao canônico por PR com aprovação do dono da área presa ao hash do nó, e área pessoal descartável»"
+    narrative: |-
+      A: um repo com pastas por vertical (barato, mas o não técnico vai ao git e a barreira só existe com plano pago). B: repo de conhecimento separado do código (barreira por permissão de repo, que funciona no plano gratuito; pede aresta entre repos). C: superfícies por audiência com o grafo como núcleo (o negócio na wiki e no MCP de escrita por identidade, a tecnologia no repo; a escrita já nasce separada; pede ponte wiki↔grafo e classificação). D: C mais detecção no repo, a que o hub recomenda estudar primeiro. E (do maestro, C_MA_REPOS_POR_RESPONSABILIDADE_VENDORIZADOS_1028): repos separados por responsabilidade, ligados por vendorização com pin, no molde do kg-ssot vendorizado no core; a barreira é a permissão por repo, sem CODEOWNERS; o custo a medir é a regra «doc no mesmo PR do código», que passa a cruzar repos. Em todas as opções, o MCP é superfície explícita de escrita e de leitura (visão do maestro, 2026-10-28): o escritor por identidade que já existe escreve numa área própria, só aceita grafo válido, assina com o e-mail do autor e trava a escrita sobre cópia velha pelo sha; o MCP de leitura serve a todos. Fecha com a recomendação do core, medida contra a matriz de Q_MA_AUDIENCES e o estudo de mercado, levada a D_MA_ARCH.
+
+      Selado por /meta:decide em 2026-11-04: escolhida «Três camadas: um repo por responsabilidade (opção E), rascunho por canal no chat promovido ao canônico por PR com aprovação do dono da área presa ao hash do nó, e área pessoal descartável»; descartadas: «Wiki + MCP por identidade (C/D)» · «Um repo com pastas (A)».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-04: «Onde cada audiência escreve no piloto da GranaAI?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
+      locality: "pessoa"
   - id: Q_MA_CLASSIFICATION
     node_type: question
     layer: audit
@@ -153,13 +163,23 @@ nodes:
   - id: Q_MA_ENFORCEMENT
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     owner: maestro
     impact: 5
     confidence: 0.5
     label: "Barreira paga (plano do forge com CODEOWNERS, rulesets e checks obrigatórios) ou barreira por superfície mais detecção no plano gratuito?"
-    narrative: "Decisão de custo do maestro. Fato medido pelo hub: a barreira do servidor não está disponível no plano atual, então hoje a pasta por vertical é só convenção. Com o plano pago, CODEOWNERS e check obrigatório viram bloqueio do servidor; sem ele, a barreira vem de onde cada audiência escreve (Q_MA_WRITE_SURFACE) e o repo fica com detecção (C_MA_CROSS_WRITE_DETECTOR). Espera a superfície, a classificação e o mercado."
+    status: done
+    plane: DEV
+    verified_at: "2026-11-04"
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Plano gratuito: a permissão por repositório como única prevenção real, o resto por convenção e detecção; antes, medir o card Q_MA_FREE_ORG_READ_ENFORCED»"
+    narrative: |-
+      Decisão de custo do maestro. Fato medido pelo hub: a barreira do servidor não está disponível no plano atual, então hoje a pasta por vertical é só convenção. Com o plano pago, CODEOWNERS e check obrigatório viram bloqueio do servidor; sem ele, a barreira vem de onde cada audiência escreve (Q_MA_WRITE_SURFACE) e o repo fica com detecção (C_MA_CROSS_WRITE_DETECTOR). Espera a superfície, a classificação e o mercado.
+
+      Selado por /meta:decide em 2026-11-04: escolhida «Plano gratuito: a permissão por repositório como única prevenção real, o resto por convenção e detecção; antes, medir o card Q_MA_FREE_ORG_READ_ENFORCED»; descartadas: «Plano pago (Team)» · «Depois».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-04: «Barreira de permissão no GitHub: plano gratuito ou pago?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
+      locality: "pessoa"
   - id: Q_MA_CROSS_REPO
     node_type: question
     layer: audit
@@ -395,6 +415,38 @@ nodes:
       locator: "systemctl show (Environment, EnvironmentFiles, DropInPaths, ExecStart) da unidade do MCP de leitura do hub; o comentário da unit; log -1 no worktree servido e no worktree do código; stat do FETCH_HEAD do clone; systemctl list-timers --all; crontab -l; grep -rn ONION_KG_ROOT ops/"
       method: "measurement: comandos só leitura rodados pela sessão do core, sem ler o EnvironmentFile nem segredo; o served_commit e os 23 grafos são testemunho do maestro"
       locality: "host"
+  - id: D_MA_CANAL_EXTERNO_SO_APOS_CLASSIFICACAO_1104
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Só após a classificação»"
+    label: "O canal com parceiro externo (Slack Connect) só entra no piloto depois que o campo de visibilidade estiver no contrato do kg-ssot e a projeção por audiência existir; o piloto começa só com canais internos."
+    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Só após a classificação»; descartadas: «Já, com projeção à mão» · «Pesquisar o padrão antes»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-04: «Quando o canal com parceiro externo entra no piloto?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
+      locality: "pessoa"
+  - id: D_MA_RUNTIME_PESQUISAR_ANTES_1104
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-11-04"
+    verified_against: "decisão do maestro em 2026-11-04, por pergunta com opções (/meta:decide): escolhida «Pesquisar antes»"
+    label: "O runtime do Onion no Slack (Claude in Slack nativo, bot próprio com Agent SDK e kg_mcp, ou bot de mercado) só se escolhe depois de uma rodada de pesquisa que compare os três."
+    narrative: "Selado por /meta:decide em 2026-11-04: escolhida «Pesquisar antes»; descartadas: «Nativo antes, medir» · «Bot próprio já»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-11-04: «O que roda o Onion no Slack da GranaAI no piloto?»"
+      method: "testimony: decisão do maestro por pergunta com opções, 2026-11-04"
+      locality: "pessoa"
 edges:
   - from: E_MA_SINAL_DO_HUB_1027
     to: Q_MA_AUDIENCES
@@ -513,3 +565,9 @@ edges:
   - from: E_MA_MCP_CLONE_SERVIDO_PARADO_1028
     to: C_MA_MCP_READ_LIVE
     edge_type: CONSTRAINS
+  - from: D_MA_CANAL_EXTERNO_SO_APOS_CLASSIFICACAO_1104
+    to: Q_MA_CLASSIFICATION
+    edge_type: TRACES_TO
+  - from: D_MA_RUNTIME_PESQUISAR_ANTES_1104
+    to: Q_MA_WRITE_SURFACE
+    edge_type: TRACES_TO
