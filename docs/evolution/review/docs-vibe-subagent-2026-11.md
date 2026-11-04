@@ -37,5 +37,5 @@ Não se aplica: nenhum executável mudou.
 ## Limites declarados
 
 - A recontagem usou scripts avulsos, fora do repo, sobre os arquivos de evidência; nenhuma célula nova rodou.
-- Sem bancada, por decisão de quem pediu: máquina compartilhada.
+- A ordem era não rodar a bancada, por a máquina ser compartilhada, e ela rodou: o commit b86c25641 passou pelo pre-commit, que a dispara, e eu não conferi isso antes. Foram 1864 casos, 0 falhas, 8 workers e 28 min 44 s. A carga de 1 minuto estava em 7,11 antes e em 11,25 logo depois; o pico não foi medido, então não sei se o limite de 15 foi respeitado.
 - Os tokens são o `totalTokens` do diário do run; a soma dos transcritos não reconciliou com ele (a síntese dá os números).
